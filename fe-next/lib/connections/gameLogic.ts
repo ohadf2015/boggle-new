@@ -72,6 +72,18 @@ export function checkGuess(input: string, puzzle: ConnectionPuzzle): GuessResult
 export interface InitGameStateOptions {
   /** Lives to start with — clamped to [0..INITIAL_LIVES]. Defaults to INITIAL_LIVES. */
   initialLives?: number;
+  /** See GameState.attemptsPerPuzzle. Ignored when < 1. */
+  attemptsPerPuzzle?: number;
+}
+
+/**
+ * Guesses the player still has on the CURRENT puzzle. In per-puzzle mode this
+ * is the puzzle's own budget; otherwise it's the shared life pool. Either way
+ * it's the single number the HUD should show.
+ */
+export function attemptsLeft(state: GameState): number {
+  if (!state.attemptsPerPuzzle) return state.lives;
+  return Math.max(0, state.attemptsPerPuzzle - state.wrongAttempts);
 }
 
 export function initGameState(puzzles: ConnectionPuzzle[], opts?: InitGameStateOptions): GameState {
@@ -79,7 +91,11 @@ export function initGameState(puzzles: ConnectionPuzzle[], opts?: InitGameStateO
   const lives = Number.isFinite(requested)
     ? Math.max(0, Math.min(INITIAL_LIVES, Math.floor(requested)))
     : INITIAL_LIVES;
+  const perPuzzle = opts?.attemptsPerPuzzle;
   return {
+    attemptsPerPuzzle: Number.isFinite(perPuzzle) && (perPuzzle as number) >= 1
+      ? Math.floor(perPuzzle as number)
+      : undefined,
     puzzles,
     currentIndex: 0,
     score: 0,
@@ -131,8 +147,20 @@ export function applyGuess(state: GameState, input: string): GameState {
     return { ...state, status: 'correct', score: state.score + base + bonus, streak: newStreak, wrongAttempts: 0 };
   }
 
-  const newLives = Math.max(0, state.lives - 1);
   const newWrongAttempts = state.wrongAttempts + 1;
+
+  // Per-puzzle budget: the run's shared lives are untouched, and burning the
+  // last attempt reveals this bridge rather than ending the whole run.
+  if (state.attemptsPerPuzzle) {
+    return {
+      ...state,
+      status: newWrongAttempts >= state.attemptsPerPuzzle ? 'gaveUp' : 'wrong',
+      wrongAttempts: newWrongAttempts,
+      streak: 0,
+    };
+  }
+
+  const newLives = Math.max(0, state.lives - 1);
   return {
     ...state,
     status: newLives === 0 ? 'outOfLives' : 'wrong',

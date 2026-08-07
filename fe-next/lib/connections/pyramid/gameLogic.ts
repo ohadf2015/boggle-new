@@ -4,6 +4,20 @@ import type { PyramidPuzzle } from './types';
 
 export const FINALE_POINTS = 500;
 
+/**
+ * Wrong guesses allowed per stage. Budgeted PER STAGE, not as one shared pool:
+ * a pool of 3 across 4 stages meant three misses on base riddle 1 ended the run
+ * before the finale was ever seen. Burning a BASE stage reveals its bridge (it
+ * still feeds the finale) and play continues; burning the FINALE is the only
+ * real loss — and the only place the ad-gated revive is offered.
+ */
+export const PYRAMID_ATTEMPTS_PER_STAGE = 4;
+
+/** Guesses left on the current stage — the number the HUD should show. */
+export function pyramidAttemptsLeft(state: PyramidState): number {
+  return Math.max(0, PYRAMID_ATTEMPTS_PER_STAGE - state.wrongAttempts);
+}
+
 const POINTS_BY_DIFFICULTY: Record<ConnectionPuzzle['difficulty'], number> = {
   easy: POINTS_EASY,
   medium: POINTS_MEDIUM,
@@ -89,12 +103,26 @@ export function pyramidGuess(state: PyramidState, input: string): PyramidState {
     }
   }
 
-  const lives = Math.max(0, state.lives - 1);
+  const wrongAttempts = state.wrongAttempts + 1;
+  if (wrongAttempts < PYRAMID_ATTEMPTS_PER_STAGE) {
+    return { ...state, status: 'wrong', wrongAttempts };
+  }
+
+  // Stage budget spent. A base stage yields its bridge and the run goes on; the
+  // finale is the terminal loss, routed through outOfLives so the player is
+  // offered the rewarded revive before it becomes final.
+  if (state.stage === 3) {
+    return { ...state, status: 'outOfLives', lives: 0, wrongAttempts };
+  }
+  const puzzle = state.pyramid.base[state.stage];
+  const gaveUpBase = [...state.gaveUpBase] as [boolean, boolean, boolean];
+  gaveUpBase[state.stage] = true;
   return {
     ...state,
-    status: lives === 0 ? 'outOfLives' : 'wrong',
-    lives,
-    wrongAttempts: state.wrongAttempts + 1,
+    status: 'gaveUp',
+    solvedBridges: [...state.solvedBridges, puzzle.bridge],
+    gaveUpBase,
+    wrongAttempts,
   };
 }
 
@@ -135,7 +163,7 @@ export function pyramidAdvance(state: PyramidState): PyramidState {
   };
 }
 
-/** Ad-gated revive (parity with the daily): restore lives, resume the current stage. */
+/** Ad-gated revive: refill the stage's attempt budget and resume where we were. */
 export function pyramidRevive(state: PyramidState): PyramidState {
   if (ENDED.has(state.status)) return state;
   return { ...state, lives: INITIAL_LIVES, wrongAttempts: 0, status: 'playing' };

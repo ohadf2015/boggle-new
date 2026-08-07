@@ -7,6 +7,7 @@ import {
   pyramidGiveUp,
   pyramidRevive,
   checkFinaleGuess,
+  PYRAMID_ATTEMPTS_PER_STAGE,
 } from '../gameLogic';
 import type { PyramidPuzzle } from '../types';
 import type { ConnectionPuzzle } from '../../types';
@@ -45,28 +46,31 @@ describe('pyramidGuess — base stages', () => {
     expect(s.lives).toBe(3);
   });
 
-  it('wrong guess costs a life and keeps the stage', () => {
+  it('wrong guess spends a stage attempt and keeps the stage', () => {
     const s = pyramidGuess(initPyramidState(PYRAMID), 'sun');
     expect(s.status).toBe('wrong');
-    expect(s.lives).toBe(2);
     expect(s.wrongAttempts).toBe(1);
     expect(s.solvedBridges).toEqual([]);
   });
 
-  it('third wrong guess reaches outOfLives, then advance loses the run', () => {
+  it('burning a base stage reveals its bridge and the run continues', () => {
     let s = initPyramidState(PYRAMID);
-    s = pyramidGuess(s, 'x1');
-    s = pyramidGuess(s, 'x2');
-    s = pyramidGuess(s, 'x3');
-    expect(s.status).toBe('outOfLives');
-    expect(s.lives).toBe(0);
-    expect(pyramidAdvance(s).status).toBe('lost');
+    for (let i = 0; i < PYRAMID_ATTEMPTS_PER_STAGE; i++) s = pyramidGuess(s, `x${i}`);
+    expect(s.status).toBe('gaveUp');
+    expect(s.gaveUpBase[0]).toBe(true);
+    expect(pyramidAdvance(s).status).toBe('playing');
   });
 
   it('guessing is a no-op after the run ended', () => {
     let s = initPyramidState(PYRAMID);
-    for (const g of ['x1', 'x2', 'x3']) s = pyramidGuess(s, g);
+    // Burn all three base stages, then the finale — the only terminal loss.
+    for (let stage = 0; stage < 3; stage++) {
+      for (let i = 0; i < PYRAMID_ATTEMPTS_PER_STAGE; i++) s = pyramidGuess(s, `x${i}`);
+      s = pyramidAdvance(s);
+    }
+    for (let i = 0; i < PYRAMID_ATTEMPTS_PER_STAGE; i++) s = pyramidGuess(s, `f${i}`);
     const ended = pyramidAdvance(s);
+    expect(ended.status).toBe('lost');
     expect(pyramidGuess(ended, 'moon')).toBe(ended);
   });
 });
@@ -119,13 +123,11 @@ describe('finale', () => {
     expect(checkFinaleGuess('dark', PYRAMID)).toBe(false);
   });
 
-  it('wrong finale guess costs a life; out of lives loses', () => {
+  it('wrong finale guess spends an attempt; burning them all loses', () => {
     let s = atFinale();
-    s = pyramidGuess(s, 'x1');
+    s = pyramidGuess(s, 'x0');
     expect(s.status).toBe('wrong');
-    expect(s.lives).toBe(2);
-    s = pyramidGuess(s, 'x2');
-    s = pyramidGuess(s, 'x3');
+    for (let i = 1; i < PYRAMID_ATTEMPTS_PER_STAGE; i++) s = pyramidGuess(s, `x${i}`);
     expect(s.status).toBe('outOfLives');
     expect(pyramidAdvance(s).status).toBe('lost');
   });
@@ -137,13 +139,16 @@ describe('finale', () => {
 });
 
 describe('pyramidRevive', () => {
-  it('restores lives and resumes play', () => {
+  it('refills the stage attempt budget and resumes play at the finale', () => {
     let s = initPyramidState(PYRAMID);
-    for (const g of ['x1', 'x2', 'x3']) s = pyramidGuess(s, g);
+    s = pyramidAdvance(pyramidGuess(s, 'moon'));
+    s = pyramidAdvance(pyramidGuess(s, 'day'));
+    s = pyramidAdvance(pyramidGuess(s, 'flash'));
+    for (let i = 0; i < PYRAMID_ATTEMPTS_PER_STAGE; i++) s = pyramidGuess(s, `x${i}`);
     expect(s.status).toBe('outOfLives');
     const revived = pyramidRevive(s);
-    expect(revived.lives).toBe(3);
+    expect(revived.wrongAttempts).toBe(0);
     expect(revived.status).toBe('playing');
-    expect(revived.stage).toBe(0);
+    expect(revived.stage).toBe(3);
   });
 });

@@ -13379,6 +13379,11 @@ const en = {
       "questTitle": "Word Bridge",
       "questDesc": "Find the word that links both sides — 5 bridges a day.",
       "nextIn": "Next bridge in",
+      "triesLeft": "{count} tries left",
+      "lastTry": "Last try!",
+      "completeTough": "Tough one today!",
+      "zeroSolved": "No bridges built — but now you know all {total}. Fresh set tomorrow.",
+      "answerKey": "Today's bridges",
       "shareCallout": {
         "perfect": "Perfect chain! ⚡ Not one slip.",
         "flawless": "Every bridge built. 🌉",

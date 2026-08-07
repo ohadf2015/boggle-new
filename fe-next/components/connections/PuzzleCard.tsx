@@ -186,7 +186,15 @@ export default function PuzzleCard({
         )}
 
         <AnimatePresence mode="wait">
-          <div key={`chain-${puzzle.id}`} className="relative flex items-center justify-center gap-2 mb-4 flex-wrap">
+          {/* No wrapping: the reveal beam is absolutely positioned across this
+              row, so a wrapped chain would draw it straight through both lines.
+              Chips scale with the container instead (long Hebrew smichut pairs
+              like טלוויזיה + חינוכית overflow a 360px phone at a fixed 24px). */}
+          <div
+            key={`chain-${puzzle.id}`}
+            className="relative flex flex-nowrap items-center justify-center gap-1.5 mb-4"
+            style={{ containerType: 'inline-size' }}
+          >
             {/* The "bridge built" moment: a hard beam draws across the chain on reveal. */}
             {bridgeRevealed && (
               <m.div
@@ -208,7 +216,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="font-neo-display text-2xl text-neo-white font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
+              className="font-neo-display text-[clamp(0.8rem,5.2cqi,1.5rem)] leading-tight text-neo-white font-bold tracking-wide px-2 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm whitespace-nowrap"
             >
               {puzzle.word1}
             </m.span>
@@ -219,7 +227,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="text-neo-white text-xl font-mono select-none"
+              className="text-neo-white text-[clamp(0.7rem,3.2cqi,1.25rem)] font-mono select-none shrink-0"
             >
               +
             </m.span>
@@ -231,8 +239,8 @@ export default function PuzzleCard({
               animate="animate"
               exit="exit"
               className={[
-                'min-w-[56px] h-10 px-3 rounded-neo border-2 flex items-center justify-center',
-                'font-neo-display font-bold text-lg transition-all duration-300',
+                'min-w-[clamp(2.25rem,14cqi,3.5rem)] h-10 px-2 rounded-neo border-2 flex shrink-0 items-center justify-center',
+                'font-neo-display font-bold text-[clamp(0.8rem,4.6cqi,1.125rem)] transition-all duration-300',
                 isCorrect
                   ? 'border-neo-lime bg-neo-lime/20 text-neo-lime'
                   : isGaveUp
@@ -264,7 +272,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="text-neo-white text-xl font-mono select-none"
+              className="text-neo-white text-[clamp(0.7rem,3.2cqi,1.25rem)] font-mono select-none shrink-0"
             >
               +
             </m.span>
@@ -275,7 +283,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="font-neo-display text-2xl text-neo-white font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
+              className="font-neo-display text-[clamp(0.8rem,5.2cqi,1.5rem)] leading-tight text-neo-white font-bold tracking-wide px-2 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm whitespace-nowrap"
             >
               {puzzle.word2}
             </m.span>

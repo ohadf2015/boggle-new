@@ -15317,6 +15317,11 @@ const ja = {
       "questTitle": "ワードブリッジ",
       "questDesc": "両側をつなぐ言葉を見つけよう。毎日5問。",
       "nextIn": "次の問題まで",
+      "triesLeft": "残り{count}回",
+      "lastTry": "最後のチャンス！",
+      "completeTough": "今日は手ごわい！",
+      "zeroSolved": "橋は架からなかったけど、{total}個すべての答えがわかりました。明日は新しい問題です。",
+      "answerKey": "今日の橋",
       "shareCallout": {
         "perfect": "完璧な連鎖！⚡ ミスゼロ。",
         "flawless": "すべての橋を架けた。🌉",

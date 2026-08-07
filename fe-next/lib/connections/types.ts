@@ -56,6 +56,13 @@ export interface GameState {
   ratedIds: Set<string>;
   /** True once the player has paid (ad/admin) to see the hint for the current puzzle. Resets per puzzle. */
   hintRevealed: boolean;
+  /**
+   * When set, wrong guesses are budgeted PER PUZZLE instead of draining the
+   * shared `lives` pool: spending the last attempt reveals that bridge
+   * (`gaveUp`) and play continues to the next puzzle. Undefined = endless-mode
+   * behaviour (shared lives, run ends at `outOfLives`).
+   */
+  attemptsPerPuzzle?: number;
 }
 
 export type PuzzleRating = 'like' | 'dislike';

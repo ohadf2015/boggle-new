@@ -71,13 +71,26 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
 
       {/* Competitive hooks surfaced right on the landing — pyramid is the flagship */}
       <div className="mx-auto mb-6 flex max-w-md flex-wrap justify-center gap-3 px-4">
+        {/* "Pyramid" alone tells a first-time visitor nothing — the tagline is
+            what sells the flagship mode. */}
         {getPyramidsForLocale(locale).length > 0 && (
           <Link
             href={`/${locale}/connections/pyramid`}
-            className="flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-purple bg-neo-purple px-4 py-2.5 font-neo-display text-base font-black text-neo-white shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+            data-testid="landing-pyramid-cta"
+            className="flex w-full items-center gap-3 rounded-neo border-neo-thick border-neo-purple bg-neo-purple px-4 py-3 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
           >
-            <Pyramid className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            {t('connections.pyramid.cta', locale === 'he' ? 'פירמידה' : 'Pyramid')}
+            <Pyramid className="h-6 w-6 shrink-0 text-neo-white" strokeWidth={2.5} aria-hidden="true" />
+            <span className="flex min-w-0 flex-1 flex-col text-start">
+              <span className="font-neo-display text-base font-black text-neo-white">
+                {t('connections.pyramid.cta', locale === 'he' ? 'פירמידה' : 'Pyramid')}
+              </span>
+              <span className="font-neo-body text-xs text-neo-white/85">
+                {t(
+                  'connections.pyramid.tagline',
+                  locale === 'he' ? '3 חידות. מילה אחת מחברת ביניהן.' : '3 riddles. 1 word connects them all.',
+                )}
+              </span>
+            </span>
           </Link>
         )}
         <Link

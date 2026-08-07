@@ -15,6 +15,14 @@ import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
 /** Number of puzzles in a daily challenge. */
 export const DAILY_PUZZLE_COUNT = 5;
 
+/**
+ * Wrong guesses allowed per bridge before the answer is revealed and play moves
+ * on. Budgeted per puzzle, NOT as one shared pool: a shared pool of 3 meant a
+ * player could end the whole run — and land on a "0 solved" screen — before
+ * even seeing bridges 3-5.
+ */
+export const DAILY_ATTEMPTS_PER_PUZZLE = 4;
+
 const POINTS_BY_DIFFICULTY: Record<ConnectionPuzzle['difficulty'], number> = {
   easy: POINTS_EASY,
   medium: POINTS_MEDIUM,

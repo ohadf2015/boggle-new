@@ -38,6 +38,7 @@ import { momentumState, isStreakMilestone } from '@/lib/connections/momentum';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsMomentumChip from './ConnectionsMomentumChip';
 import OutOfLivesModal from './OutOfLivesModal';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 
 const ConnectionsEffectsCanvas = dynamic(() => import('./ConnectionsEffectsCanvas'), { ssr: false });
@@ -432,6 +433,9 @@ export default function ConnectionsGame() {
                 {t('connections.quitToMenu')}
               </button>
             </div>
+            {/* /connections/play is a GAME_ROUTES path so the anchored banner
+                never shows — this terminal card is the mode's only ad surface. */}
+            <ResultsBannerSlot placement="singleplayer-complete" className="mt-4" />
           </m.div>
         </div>
       );

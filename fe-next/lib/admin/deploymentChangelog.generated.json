@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-01T09:52:37.587Z",
+  "generatedAt": "2026-08-07T09:11:08.106Z",
   "commits": [
     {
-      "sha": "d2ba8a60ef58c5044049527132e807b01a26ef1c",
-      "shortSha": "d2ba8a6",
-      "subject": "fix(test): make growthTracking.metadata assertions resistant to leading session_start call",
+      "sha": "e1add9bce11cf8c1f834adedc6227ba973d3cd92",
+      "shortSha": "e1add9b",
+      "subject": "docs: flag the two deliberate divergences left by the previous commits",
       "author": "Ohad Fisher",
-      "date": "2026-08-01T11:37:52+03:00"
+      "date": "2026-08-07T11:48:03+03:00"
     },
     {
-      "sha": "6beb550023b7a91a239fbdf81b25c39b0de2884c",
-      "shortSha": "6beb550",
-      "subject": "chore(nightly): commit docs artifacts left dirty by 07-30 salvage run + mark 07-31/08-01 restores resolved",
+      "sha": "eacafe1e1df1afdc4e21114245213e9f8ec13c7f",
+      "shortSha": "eacafe1",
+      "subject": "fix(sentry): judge socket errors by code, not by their translated message",
       "author": "Ohad Fisher",
-      "date": "2026-08-01T11:16:04+03:00"
+      "date": "2026-08-07T11:46:43+03:00"
     },
     {
-      "sha": "54cb63f494a570a9752f9b2cea380010d56634ab",
-      "shortSha": "54cb63f",
-      "subject": "fix(nightly): restore code stranded by 07-31 + 08-01 docs-only gate salvage",
+      "sha": "0acd6a92d681e10bddb62b3e5c97d4c82883c4eb",
+      "shortSha": "0acd6a9",
+      "subject": "perf(word-craft): stop shipping 9.5MB of dictionary to the browser",
       "author": "Ohad Fisher",
-      "date": "2026-08-01T11:15:25+03:00"
+      "date": "2026-08-07T11:46:25+03:00"
     },
     {
-      "sha": "0ced0a276e54610f5bc496311431ad441d7dbdf1",
-      "shortSha": "0ced0a2",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-01",
+      "sha": "63f9239866b0d63868d7af2670636618b69cda4c",
+      "shortSha": "63f9239",
+      "subject": "fix(nightly): close the 18 pre-07-05 restore-queue tags + recover 2 stranded files",
       "author": "Ohad Fisher",
-      "date": "2026-08-01T05:57:11+03:00"
+      "date": "2026-08-07T11:33:09+03:00"
     },
     {
-      "sha": "8000fc35b1382937985b2d7485f0aa916b6e792d",
-      "shortSha": "8000fc3",
-      "subject": "ci: move bundle-analysis + lighthouse to a nightly schedule",
+      "sha": "860a01b2c592d711db424350e7bffe875a9e98cc",
+      "shortSha": "860a01b",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-07",
       "author": "Ohad Fisher",
-      "date": "2026-07-31T13:15:22+03:00"
+      "date": "2026-08-07T04:58:10+03:00"
     },
     {
-      "sha": "75bec28535aa4b73f8f2ae26138ef8fc36248575",
-      "shortSha": "75bec28",
-      "subject": "fix: ensure last leaderboard item is fully visible on mobile",
-      "author": "Ohad Fisher",
-      "date": "2026-07-31T09:15:05Z"
+      "sha": "c7eb4c81db5675764cb582f894e40f7a6fcc4522",
+      "shortSha": "c7eb4c8",
+      "subject": "fix(dictionary): share one server-side copy of each word list to stop heap OOM (#791)",
+      "author": "ohadf2015",
+      "date": "2026-08-06T17:56:00+03:00"
     },
     {
-      "sha": "2ce178911eb3d460402582ff982dc35458575c68",
-      "shortSha": "2ce1789",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-31",
-      "author": "Ohad Fisher",
-      "date": "2026-07-31T05:54:50+03:00"
+      "sha": "ca0bc318d18300dd913829bd83128604762c92b9",
+      "shortSha": "ca0bc31",
+      "subject": "fix(android-install): stop native app flashing the \"Get the App\" promo (#789)",
+      "author": "ohadf2015",
+      "date": "2026-08-06T17:15:06+03:00"
     },
     {
-      "sha": "7433104e4b8f71a973e048e9f5d58d73437c68f4",
-      "shortSha": "7433104",
-      "subject": "Merge branch 'perf/android-promo-lcp-guard'",
+      "sha": "8443b0d3f49aca8b9ebeea4c82951d72945ba84c",
+      "shortSha": "8443b0d",
+      "subject": "fix(word-wheel): re-measure the pixi canvases instead of freezing mount-time size",
       "author": "Ohad Fisher",
-      "date": "2026-07-30T08:21:42Z"
+      "date": "2026-08-06T11:04:09+03:00"
     },
     {
-      "sha": "3aa0151812eb3c34c1c70c6fdaa80d7989655bfe",
-      "shortSha": "3aa0151",
-      "subject": "feat: wire D1 retention funnel — return_visit event + streak lifecycle to PostHog",
+      "sha": "d6deb3f7f33457bd9f605dffe76a9e7262cad23b",
+      "shortSha": "d6deb3f",
+      "subject": "fix(nightly): restore code stranded by the 08-03/08-04/08-06 gate salvages",
       "author": "Ohad Fisher",
-      "date": "2026-07-30T08:20:24Z"
+      "date": "2026-08-06T11:03:47+03:00"
     },
     {
-      "sha": "1c2e05659708861fcf28b9e7ad926b76bc239522",
-      "shortSha": "1c2e056",
-      "subject": "fix(nightly): age-escalate stranded restore-queue work so it can't strand silently",
-      "author": "Ohad Fisher",
-      "date": "2026-07-30T09:16:44+03:00"
+      "sha": "14a78f6eeac03f8ac4c3e107bdcd3641bf38cf90",
+      "shortSha": "14a78f6",
+      "subject": "fix(layout): remove EmailCaptureModal so it no longer pops over the game screen (#787)",
+      "author": "ohadf2015",
+      "date": "2026-08-05T12:31:38+03:00"
     },
     {
-      "sha": "fb449f84fcece1332c58f576abff81e8b61cb7a1",
-      "shortSha": "fb449f8",
-      "subject": "test: restore nightly TDD tests dropped by gate salvage (2026-07-30)",
-      "author": "Ohad Fisher",
-      "date": "2026-07-30T09:13:22+03:00"
+      "sha": "c2c082b699bce00556812c8519dd75b07c136448",
+      "shortSha": "c2c082b",
+      "subject": "fix(feedback): cache-bust widget.js so returning users get the neo-brutalist mobile launcher (#785)",
+      "author": "ohadf2015",
+      "date": "2026-08-04T20:13:03+03:00"
     },
     {
-      "sha": "ef3df8473bbf9820ddadf93f6c5e2d4628c1457c",
-      "shortSha": "ef3df84",
-      "subject": "feat: ship nightly lane code — teacher district upsell, LCP fetchpriority, wordcraft score count-up, games-played push counter, posthog flag deactivate",
-      "author": "Ohad Fisher",
-      "date": "2026-07-30T07:56:44+03:00"
+      "sha": "2dc9e50a897d25e5e1bbcad33aea55f0352fc196",
+      "shortSha": "2dc9e50",
+      "subject": "fix(feedback): collapse mobile launcher to icon-only chip on real phones (#784)",
+      "author": "ohadf2015",
+      "date": "2026-08-04T18:26:17+03:00"
     },
     {
-      "sha": "da18d0d3233a6a103fcfb160498c1634df1384c4",
-      "shortSha": "da18d0d",
-      "subject": "fix(mem): right-size V8 heap cap below container to stop RSS riding to OOM",
+      "sha": "5fde7409aa37fdbdea6e645942fe6ba7409f1cbf",
+      "shortSha": "5fde740",
+      "subject": "docs(onboarding): fix stale comment — FTUE routes to auto-start practice, not Daily Challenge",
       "author": "Ohad Fisher",
-      "date": "2026-07-30T01:05:54+03:00"
+      "date": "2026-08-04T09:43:55Z"
     },
     {
-      "sha": "140142b8bc07ca5ab27572ea2b0d9754f7accce6",
-      "shortSha": "140142b",
-      "subject": "feat: ELO rating system full-stack implementation",
+      "sha": "dccd4e6c3c4ee4f76a2128e2488f6cdf73c95fb6",
+      "shortSha": "dccd4e6",
+      "subject": "fix(server): no-cache /widget.js and /sw.js — 1yr immutable header froze the feedback button for returning users",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T20:52:29Z"
+      "date": "2026-08-04T09:15:32Z"
     },
     {
-      "sha": "a28b5dd5120b32840d5fdc08304048970e866184",
-      "shortSha": "a28b5dd",
-      "subject": "perf: optimize ad script loading — async/lazyOnload + preconnects + CLS observer",
+      "sha": "a8295daef1a5436aa76c43346f4388af63a800f7",
+      "shortSha": "a8295da",
+      "subject": "feat(onboarding): instrument FTUE fast-lane + localize Quick Play skip (D1 retention)",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T15:07:11Z"
+      "date": "2026-08-04T09:02:22Z"
     },
     {
-      "sha": "e72e6111d78a6a5515c017cd761cfa581b00d3cc",
-      "shortSha": "e72e611",
-      "subject": "perf(landing): interaction-gate Android install auto-popup — it was the LCP element",
+      "sha": "3e001355186fd67bbe556d7a2107095c046363c4",
+      "shortSha": "3e00135",
+      "subject": "feat(feedback): single neo-brutalist feedback button — drop in-app FAB, restyle shared widget",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T13:59:32Z"
+      "date": "2026-08-04T06:14:31Z"
     },
     {
-      "sha": "55008d6823299b169ba7e5a21e68059e625c4a95",
-      "shortSha": "55008d6",
-      "subject": "Merge remote-tracking branch 'origin/master'",
+      "sha": "5294ce70722480055c9f832301e5b1f96f86b93d",
+      "shortSha": "5294ce7",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-04",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T13:01:29Z"
+      "date": "2026-08-04T07:01:44+03:00"
     },
     {
-      "sha": "c61820ced28abe633ddcb6d58db10558304b9e44",
-      "shortSha": "c61820c",
-      "subject": "Merge: landing CWV fixes (CLS 0.98→0.004, -2.3MB) — Growth Radar finding #1",
+      "sha": "5e6d00ec374a0d38c64b1f0830009d03ef075105",
+      "shortSha": "5e6d00e",
+      "subject": "perf(landing): lazy-load Sentry SDK, preload LCP cube image, skip dictionary warm on /",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T13:01:17Z"
+      "date": "2026-08-03T18:53:59Z"
     },
     {
-      "sha": "89db3e94bc0f9b5b2105c65db728790f5e5f4729",
-      "shortSha": "89db3e9",
-      "subject": "perf(landing): eliminate CLS 1.0 — FTUE overlays landing instead of replacing it",
+      "sha": "e2eb5643f97755695812f6cbd7ecfac3d6150840",
+      "shortSha": "e2eb564",
+      "subject": "feat(feedback): onboard feedback.devtools shared widget site-wide",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T12:57:53Z"
+      "date": "2026-08-03T18:44:48Z"
     },
     {
-      "sha": "04477ddb50fc53ef10f44b2281721e15a39cf2f8",
-      "shortSha": "04477dd",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-29",
+      "sha": "c78b2b36bb57e4f7a79f3e95f44f45b65d374328",
+      "shortSha": "c78b2b3",
+      "subject": "perf(landing): stop CookieConsent modal from being the LCP element",
       "author": "Ohad Fisher",
-      "date": "2026-07-29T15:44:59+03:00"
+      "date": "2026-08-03T17:34:03Z"
     }
   ]
 }

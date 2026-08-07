@@ -2,9 +2,13 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { m } from 'framer-motion';
-import { Share2 } from 'lucide-react';
+import Link from 'next/link';
+import { Share2, Heart, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -15,6 +19,8 @@ import {
   pyramidAdvance,
   pyramidGiveUp,
   pyramidRevive,
+  pyramidAttemptsLeft,
+  PYRAMID_ATTEMPTS_PER_STAGE,
   type PyramidState,
 } from '@/lib/connections/pyramid/gameLogic';
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
@@ -27,6 +33,7 @@ import PyramidProgress from './PyramidProgress';
 import FinaleCard from './FinaleCard';
 import PuzzleCard from '../PuzzleCard';
 import ConnectionsMascot from '../ConnectionsMascot';
+import DailyAnswerKey from '../DailyAnswerKey';
 
 type Action =
   | { type: 'GUESS'; input: string }
@@ -185,6 +192,17 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
     setInput('');
   }, []);
 
+  // The revive button used to call handleRevive directly — it was LABELLED
+  // "watch an ad" but granted the revive for free. Gate it on a real rewarded
+  // ad (admins keep the free refill).
+  const reviveAd = useRewardedFeatureUnlock({
+    placement: 'connections_pyramid_revive',
+    surface: 'retry',
+    onUnlock: handleRevive,
+    disabled: isAdmin || pyramidState.status !== 'outOfLives',
+    context: { pyramidId: pyramid.id, stage: pyramidState.stage },
+  });
+
   const handleShare = useCallback(async () => {
     const baseOutcomes: readonly [BridgeOutcome, BridgeOutcome, BridgeOutcome] = [
       outcomesRef.current.get(0) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
@@ -256,6 +274,19 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
               {t('connections.pyramid.reveal')}: <span className="font-bold text-neo-white">{pyramid.metaAnswer}</span>
             </p>
           )}
+          {/* The 3 base bridges the run passed through — a lost pyramid used to
+              reveal only the meta, so a player who burned the base stages left
+              without ever learning what those answers were. */}
+          <div className="mt-4">
+            <DailyAnswerKey
+              puzzles={pyramid.base}
+              solvedIndices={new Set(
+                pyramid.base.map((_, i) => i).filter((i) => !pyramidState.gaveUpBase[i]),
+              )}
+              title={t('connections.daily.answerKey')}
+              isRTL={language === 'he'}
+            />
+          </div>
           <m.button
             type="button"
             onClick={handleShare}
@@ -266,6 +297,24 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
             {results.copied ? t('connections.daily.copied') : t('connections.daily.share')}
           </m.button>
         </m.div>
+
+        {/* The terminal screen was a dead end — no way onward without the back
+            button. Route players to the daily, which always has something to play. */}
+        <Link
+          href={`/${language}/connections/daily`}
+          data-testid="pyramid-back-to-daily"
+          className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        >
+          <span className="flex min-w-0 flex-1 flex-col text-start">
+            <span className="font-neo-display text-base font-black text-neo-cyan">
+              {t('connections.daily.cta')}
+            </span>
+            <span className="font-neo-body text-xs text-neo-white/70">{t('connections.daily.questDesc')}</span>
+          </span>
+          <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-cyan" />
+        </Link>
+
+        <ResultsBannerSlot placement="daily-complete" />
       </div>
     );
   }
@@ -282,15 +331,31 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
         >
           <ConnectionsMascot status="outOfLives" className="mb-2 h-20 w-20" />
           <h1 className="font-neo-display text-2xl font-black text-neo-red">{t('connections.outOfLives')}</h1>
+          <p className="mt-2 font-neo-body text-sm text-neo-white/70">{t('connections.reviveDescription')}</p>
           <div className="mt-4 flex flex-col gap-3">
-            <m.button
-              type="button"
-              onClick={handleRevive}
-              whileTap={{ scale: 0.96 }}
-              className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
-            >
-              {t('connections.reviveAd')}
-            </m.button>
+            {isAdmin ? (
+              <m.button
+                type="button"
+                onClick={handleRevive}
+                whileTap={{ scale: 0.96 }}
+                className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
+              >
+                {t('connections.adminRefill')}
+              </m.button>
+            ) : reviveAd.canShowAd ? (
+              <m.button
+                type="button"
+                data-testid="pyramid-revive-ad"
+                onClick={reviveAd.offer}
+                whileTap={{ scale: 0.96 }}
+                disabled={reviveAd.status === 'loading' || reviveAd.status === 'showing'}
+                className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:opacity-60"
+              >
+                {t('connections.reviveAd')}
+              </m.button>
+            ) : (
+              <p className="font-neo-body text-xs text-neo-white/50">{t('connections.noAdAvailable')}</p>
+            )}
             <m.button
               type="button"
               onClick={() => {
@@ -320,6 +385,30 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
         <p className="text-center font-neo-body text-xs text-neo-white/60">
           {baseStage ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
         </p>
+        {/* Attempts were spent invisibly — the player only learned a budget
+            existed when the run ended. Show it, per stage. */}
+        <div
+          data-testid="pyramid-attempts"
+          data-remaining={pyramidAttemptsLeft(pyramidState)}
+          className="flex items-center justify-center gap-1.5"
+          aria-label={t('connections.daily.triesLeft', { count: pyramidAttemptsLeft(pyramidState) })}
+        >
+          {pyramidAttemptsLeft(pyramidState) === 1 && (
+            <span className="font-neo-body text-[0.7rem] font-bold uppercase tracking-wider text-neo-red">
+              {t('connections.daily.lastTry')}
+            </span>
+          )}
+          {Array.from({ length: PYRAMID_ATTEMPTS_PER_STAGE }, (_, i) => (
+            <Heart
+              key={i}
+              aria-hidden="true"
+              className={`h-4 w-4 transition-colors duration-200 ${
+                i < pyramidAttemptsLeft(pyramidState) ? 'fill-neo-red text-neo-red' : 'text-neo-white/25'
+              }`}
+              strokeWidth={2.5}
+            />
+          ))}
+        </div>
         <PyramidProgress
           stage={pyramidState.stage}
           solvedBridges={pyramidState.solvedBridges}

@@ -15392,6 +15392,11 @@ const es = {
       "questTitle": "Puente de palabras",
       "questDesc": "Encuentra la palabra que une ambos lados: 5 puentes al día.",
       "nextIn": "Próximo puente en",
+      "triesLeft": "{count} intentos restantes",
+      "lastTry": "¡Último intento!",
+      "completeTough": "¡Día difícil!",
+      "zeroSolved": "Ningún puente construido, pero ya conoces los {total}. Mañana hay set nuevo.",
+      "answerKey": "Los puentes de hoy",
       "shareCallout": {
         "perfect": "¡Cadena perfecta! ⚡ Sin fallos.",
         "flawless": "Todos los puentes, tendidos. 🌉",

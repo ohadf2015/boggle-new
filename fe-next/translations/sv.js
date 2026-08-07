@@ -270,6 +270,11 @@ const sv = {
       "questTitle": "Ordbro",
       "questDesc": "Hitta ordet som binder ihop båda sidorna — fem broar om dagen.",
       "nextIn": "Nästa bro om",
+      "triesLeft": "{count} försök kvar",
+      "lastTry": "Sista försöket!",
+      "completeTough": "Tuff dag!",
+      "zeroSolved": "Inga broar byggda — men nu kan du alla {total}. Nytt set imorgon.",
+      "answerKey": "Dagens broar",
       "shareCallout": {
         "perfect": "Perfekt kedja! ⚡ Inte ett snedsteg.",
         "flawless": "Alla broar byggda. 🌉",

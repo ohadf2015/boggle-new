@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
-import { Share2, Flame, Target, Pyramid as PyramidIcon } from 'lucide-react';
+import { Share2, Flame, Target, Pyramid as PyramidIcon, Heart, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -17,9 +18,10 @@ import {
   giveUp as giveUpLogic,
   revealHint as revealHintLogic,
   markRated,
+  attemptsLeft,
 } from '@/lib/connections/gameLogic';
 import type { GameState, PuzzleRating } from '@/lib/connections/types';
-import { dailyPuzzleSet } from '@/lib/connections/daily';
+import { dailyPuzzleSet, DAILY_ATTEMPTS_PER_PUZZLE } from '@/lib/connections/daily';
 import {
   todayUTC,
   getGuestFingerprint,
@@ -37,6 +39,8 @@ import { MedalArt } from './ConnectionsRewardArt';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsLeaderboard from './ConnectionsLeaderboard';
 import DailyResultRecap from './DailyResultRecap';
+import DailyAnswerKey from './DailyAnswerKey';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -87,7 +91,9 @@ export default function ConnectionsDailyChallenge() {
   const sfx = useSoundEffects();
 
   const today = useRef(todayUTC()).current;
-  const [state, dispatch] = useReducer(reducer, language, (lang) => initGameState(dailyPuzzleSet(today, lang)));
+  const [state, dispatch] = useReducer(reducer, language, (lang) =>
+    initGameState(dailyPuzzleSet(today, lang), { attemptsPerPuzzle: DAILY_ATTEMPTS_PER_PUZZLE }),
+  );
   const total = state.puzzles.length;
 
   const startRef = useRef<number>(0);
@@ -134,16 +140,18 @@ export default function ConnectionsDailyChallenge() {
       prevStatusRef.current !== state.status &&
       !outcomesRef.current.has(idx)
     ) {
-      // Reached but not solved (skipped or lost the last life here).
+      // Reached but not solved (skipped, or burnt the last attempt here). The
+      // attempt that triggers the reveal lands on 'gaveUp', never 'wrong', so
+      // the tally above misses it — take whichever count is higher.
       outcomesRef.current.set(idx, {
         reached: true,
         solved: false,
-        wrongAttempts: wrongByIndexRef.current[idx] ?? 0,
+        wrongAttempts: Math.max(wrongByIndexRef.current[idx] ?? 0, state.wrongAttempts),
         hintUsed: state.hintRevealed,
       });
     }
     prevStatusRef.current = state.status;
-  }, [state.status, state.currentIndex, state.hintRevealed, sfx, haptic, customHaptic]);
+  }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, sfx, haptic, customHaptic]);
 
   // On finish: submit the result (once) and load the leaderboard.
   useEffect(() => {
@@ -231,13 +239,16 @@ export default function ConnectionsDailyChallenge() {
   }, [t, today, results, collectOutcomes]);
 
   if (isTerminal) {
+    const blanked = solvedCount === 0;
     return (
       <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-6">
         <m.div
           initial={{ opacity: 0, y: 16, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-          className="rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
+          className={`rounded-neo border-neo-thick bg-neo-navy-light p-5 text-center shadow-hard ${
+            blanked ? 'border-neo-cyan' : 'border-neo-lime'
+          }`}
         >
           {(() => {
             const medal = earnedMedal(solvedCount, total);
@@ -251,22 +262,42 @@ export default function ConnectionsDailyChallenge() {
               </div>
             );
           })()}
-          <h1 className="font-neo-display text-2xl font-black text-neo-white">{t('connections.daily.complete')}</h1>
-          <div className="mt-3 flex items-center justify-center gap-4">
-            <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-cyan">
-              <Target className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-              {t('connections.daily.solved', { count: solvedCount, total })}
-            </span>
-            <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-orange">
-              <Flame className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-              {results?.streak ?? 0}
-            </span>
-          </div>
-          <p className="mt-1 font-neo-body text-sm text-neo-white/70">
-            {t('connections.score')}: <span className="font-bold text-neo-white">{state.score.toLocaleString()}</span>
-          </p>
+          <h1 className="font-neo-display text-2xl font-black text-neo-white">
+            {t(blanked ? 'connections.daily.completeTough' : 'connections.daily.complete')}
+          </h1>
+          {/* A blanked run gets encouragement + the answer key instead of a bare
+              "0 solved / Score: 0", which read as a punishment and taught nothing. */}
+          {blanked ? (
+            <p className="mx-auto mt-2 max-w-[19rem] font-neo-body text-sm text-neo-white/75">
+              {t('connections.daily.zeroSolved', { total })}
+            </p>
+          ) : (
+            <>
+              <div className="mt-3 flex items-center justify-center gap-4">
+                <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-cyan">
+                  <Target className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
+                  {t('connections.daily.solved', { count: solvedCount, total })}
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-orange">
+                  <Flame className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
+                  {results?.streak ?? 0}
+                </span>
+              </div>
+              <p className="mt-1 font-neo-body text-sm text-neo-white/70">
+                {t('connections.score')}: <span className="font-bold text-neo-white">{state.score.toLocaleString()}</span>
+              </p>
+            </>
+          )}
           <div className="mt-3">
             <DailyResultRecap outcomes={collectOutcomes()} nextLabel={t('connections.daily.nextIn')} />
+          </div>
+          <div className="mt-4">
+            <DailyAnswerKey
+              puzzles={state.puzzles}
+              solvedIndices={solvedRef.current}
+              title={t('connections.daily.answerKey')}
+              isRTL={language === 'he'}
+            />
           </div>
           <m.button
             type="button"
@@ -279,15 +310,30 @@ export default function ConnectionsDailyChallenge() {
           </m.button>
         </m.div>
 
+        {/* Pyramid is the deeper mode and the natural next step once the day's
+            5 bridges are spent — promoted from a thin text link to a real card. */}
         {getPyramidsForLocale(language).length > 0 && (
-          <Link
-            href={`/${language}/connections/pyramid`}
-            className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 px-4 py-2.5 font-neo-display text-sm font-black text-neo-purple shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <PyramidIcon className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            {t('connections.pyramid.cta')} — {t('connections.pyramid.tagline')}
-          </Link>
+          <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+            <Link
+              href={`/${language}/connections/pyramid`}
+              data-testid="pyramid-cta"
+              className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-neo border-neo-purple bg-neo-purple/25">
+                <PyramidIcon className="h-6 w-6 text-neo-purple" strokeWidth={2.5} aria-hidden="true" />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col text-start">
+                <span className="font-neo-display text-base font-black text-neo-purple">
+                  {t('connections.pyramid.cta')}
+                </span>
+                <span className="font-neo-body text-xs text-neo-white/70">{t('connections.pyramid.tagline')}</span>
+              </span>
+              <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-purple" />
+            </Link>
+          </m.div>
         )}
+
+        <ResultsBannerSlot placement="daily-complete" />
 
         <ConnectionsLeaderboard
           rows={results?.rows ?? []}
@@ -302,6 +348,7 @@ export default function ConnectionsDailyChallenge() {
 
   const currentPuzzle = state.puzzles[state.currentIndex];
   if (!currentPuzzle) return null;
+  const remaining = attemptsLeft(state);
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4">
@@ -311,6 +358,30 @@ export default function ConnectionsDailyChallenge() {
           <span data-testid="daily-progress" className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
             {state.currentIndex + 1} / {total}
           </span>
+        </div>
+        {/* Attempts were spent invisibly before — the player only found out the
+            budget existed when the run ended. Show it, per bridge. */}
+        <div
+          data-testid="daily-attempts"
+          data-remaining={remaining}
+          className="flex items-center justify-end gap-1.5"
+          aria-label={t('connections.daily.triesLeft', { count: remaining })}
+        >
+          {remaining === 1 && (
+            <span className="font-neo-body text-[0.7rem] font-bold uppercase tracking-wider text-neo-red">
+              {t('connections.daily.lastTry')}
+            </span>
+          )}
+          {Array.from({ length: DAILY_ATTEMPTS_PER_PUZZLE }, (_, i) => (
+            <Heart
+              key={i}
+              aria-hidden="true"
+              className={`h-4 w-4 transition-colors duration-200 ${
+                i < remaining ? 'fill-neo-red text-neo-red' : 'text-neo-white/25'
+              }`}
+              strokeWidth={2.5}
+            />
+          ))}
         </div>
         <ConnectionsProgressTrack
           key={solvedVersion}
