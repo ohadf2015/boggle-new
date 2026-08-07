@@ -45,11 +45,11 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Increment play count
-    await supabase
-      .from('custom_puzzles')
-      .update({ total_plays: (puzzle.total_plays || 0) + 1 })
-      .eq('id', puzzle.id);
+    // NB: total_plays is deliberately NOT incremented here. GET must stay safe and
+    // idempotent — this route is unauthenticated, so a mutation made it CSRF-able
+    // (any third-party `<img src=".../api/custom-puzzle/CODE">` inflated the count)
+    // and it also re-fired on Next/CDN prefetch. The counter now lives on the
+    // rate-limited submit POST, which fires once per real, de-duplicated play.
 
     return NextResponse.json({
       success: true,

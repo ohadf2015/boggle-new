@@ -113,7 +113,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       supabase.auth.getUser(),
       supabase
         .from('custom_puzzles')
-        .select('id, puzzle_code, target_word, creator_id, creator_guest_fingerprint, creator_efficiency_score')
+        .select('id, puzzle_code, target_word, creator_id, creator_guest_fingerprint, creator_efficiency_score, total_plays')
         .eq('puzzle_code', puzzleCode.toLowerCase())
         .single(),
     ]);
@@ -205,6 +205,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { error: 'Failed to submit attempt' },
         { status: 500 }
       );
+    }
+
+    // Count the play here rather than on the GET: this path is rate-limited and
+    // only reached once per player (a repeat submit exits above via 23505), so it
+    // counts real plays instead of link previews and prefetches. Failure is logged,
+    // never silent, and never fails the submit — the attempt row is the source of
+    // truth and total_plays is only a denormalised convenience.
+    // Isolated try: the attempt row is already inserted at this point, so a
+    // failure here must never turn a recorded submission into a 500 — the player
+    // would see "submit failed" for a score that actually saved. Swallowed, but
+    // never silently: always logged.
+    try {
+      const { error: playCountError } = await supabase
+        .from('custom_puzzles')
+        .update({ total_plays: (puzzle.total_plays || 0) + 1 })
+        .eq('id', puzzle.id);
+
+      if (playCountError) {
+        console.error('Failed to increment custom puzzle total_plays:', playCountError);
+      }
+    } catch (playCountError) {
+      console.error('Failed to increment custom puzzle total_plays:', playCountError);
     }
 
     // Check if they beat the creator

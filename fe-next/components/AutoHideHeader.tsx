@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Header from './Header';
 import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -38,9 +39,22 @@ export function AutoHideHeader({ className, onVisibilityChange, collapseSpacerWh
   const { isInGame } = useNavigation();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
 
+  const isVisible = !isOnCrazyGamesPlatform && !isTvFullscreen && !isInGame;
+
+  // Report visibility from an effect, never from the render body: the parent
+  // typically setStates in this callback, and calling it during render is a
+  // setState-during-render of another component (React warning + extra render
+  // pass on every header render). The ref keeps an unstable inline callback
+  // from re-firing the effect — it should fire only when visibility changes.
+  const onVisibilityChangeRef = useRef(onVisibilityChange);
+  onVisibilityChangeRef.current = onVisibilityChange;
+
+  useEffect(() => {
+    onVisibilityChangeRef.current?.(isVisible);
+  }, [isVisible]);
+
   // CrazyGames: portal provides its own chrome — remove header AND spacer (empty band fix e4a3ef8a)
   if (isOnCrazyGamesPlatform) {
-    if (onVisibilityChange) onVisibilityChange(false);
     return null;
   }
 
@@ -48,7 +62,6 @@ export function AutoHideHeader({ className, onVisibilityChange, collapseSpacerWh
   // Header uses fixed+spacer pattern — removing both causes CLS 0.29 on /en/multiplayer
   // as the spacer-height slot collapses and content shifts up by 60–124px.
   if (isTvFullscreen || isInGame) {
-    if (onVisibilityChange) onVisibilityChange(false);
     // Focused full-screen game surfaces opt out of the reserved spacer so the
     // hidden header leaves no empty band at the top (see prop docs above).
     if (collapseSpacerWhenHidden) {
@@ -62,7 +75,6 @@ export function AutoHideHeader({ className, onVisibilityChange, collapseSpacerWh
     );
   }
 
-  if (onVisibilityChange) onVisibilityChange(true);
   return <Header className={className} />;
 }
 

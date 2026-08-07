@@ -162,7 +162,9 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
           }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{
-            scale: [0, 1.3, 1],
+            // Same length as `times` — trailing repeat holds the settled scale
+            // while the opacity keyframe fades it out.
+            scale: [0, 1.3, 1, 1],
             opacity: [0, 1, 1, 0],
           }}
           transition={{
@@ -215,19 +217,23 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
               opacity: 0,
             }}
             animate={{
+              // All keyframe arrays match `times` (4 entries) — the trailing
+              // repeat parks the coin on the target while it shrinks and fades.
               x: [
                 particle.offsetX,
                 particle.offsetX + (particle.id % 2 === 0 ? 30 : -30),
+                targetPosition.x,
                 targetPosition.x,
               ],
               y: [
                 particle.offsetY,
                 particle.offsetY - 50,
                 targetPosition.y,
+                targetPosition.y,
               ],
               scale: [0, 1.2, 1, 0.6],
               opacity: [0, 1, 1, 0],
-              rotate: [0, 180, 360],
+              rotate: [0, 180, 360, 360],
             }}
             transition={{
               duration: 1.0, // Slightly faster for snappier feel

@@ -309,4 +309,23 @@ describe('DuelHistory', () => {
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
+
+  describe('Error Handling', () => {
+    it('should show empty state when getDuelStats rejects', async () => {
+      // RED: Before fix, this will hang with loading spinner. After fix, it should show empty state.
+      mockGetDuelStats.mockRejectedValueOnce(new Error('Network error'));
+      mockGetDuelHistory.mockRejectedValueOnce(new Error('Network error'));
+
+      render(<DuelHistory studentId="student-1" />);
+
+      // Wait for the rejection to settle
+      await waitFor(() => {
+        // The loader should disappear after the error
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+
+        // The empty state should appear instead
+        expect(screen.getByText('No duels played yet')).toBeInTheDocument();
+      });
+    });
+  });
 });

@@ -38,32 +38,38 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
         return;
       }
 
-      // Verify duel exists and user is participant
-      const { data: duel, error } = await getDuelById(duelId);
+      // Verify duel exists and user is participant.
+      // `finally` clears the checking flag on EVERY exit — success, early return,
+      // or throw. Clearing it per-branch is how this screen got stuck on a
+      // permanent spinner in the first place; a new branch would re-introduce it.
+      try {
+        const { data: duel, error } = await getDuelById(duelId);
 
-      if (error || !duel) {
+        if (error || !duel) {
+          setDuelError(t('duelNotFound'));
+          return;
+        }
+
+        // Check if user is a participant
+        const isParticipant =
+          duel.challenger_id === user.id || duel.opponent_id === user.id;
+
+        if (!isParticipant) {
+          setDuelError(t('notParticipant'));
+          return;
+        }
+
+        // Set duel type and opponent name
+        setDuelType(duel.duel_type || 'async');
+        const opponentId = duel.challenger_id === user.id ? duel.opponent_id : duel.challenger_id;
+        const { data: opponentProfile } = await getProfile(opponentId, 'minimal');
+        setOpponentName(opponentProfile?.display_name || t('common.opponent'));
+      } catch (error) {
+        console.error('[DuelGamePageClient] Failed to verify duel:', error);
         setDuelError(t('duelNotFound'));
+      } finally {
         setIsChecking(false);
-        return;
       }
-
-      // Check if user is a participant
-      const isParticipant =
-        duel.challenger_id === user.id || duel.opponent_id === user.id;
-
-      if (!isParticipant) {
-        setDuelError(t('notParticipant'));
-        setIsChecking(false);
-        return;
-      }
-
-      // Set duel type and opponent name
-      setDuelType(duel.duel_type || 'async');
-      const opponentId = duel.challenger_id === user.id ? duel.opponent_id : duel.challenger_id;
-      const { data: opponentProfile } = await getProfile(opponentId, 'minimal');
-      setOpponentName(opponentProfile?.display_name || t('common.opponent'));
-
-      setIsChecking(false);
     };
 
     verifyDuel();

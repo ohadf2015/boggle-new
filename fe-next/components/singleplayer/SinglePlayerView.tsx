@@ -328,14 +328,20 @@ const SinglePlayerView: React.FC = () => {
           <>
             {gameState.mode === 'practice' ? (
               <PracticeResults
-                key={resultsData.gameSessionId || `results-${Date.now()}`}
+                // Stable fallback — a Date.now() key is recomputed on every
+                // render, remounting the results view mid-animation. The results
+                // phase already unmounts between games, so a constant is enough.
+                key={resultsData.gameSessionId || 'results'}
                 results={resultsData}
                 onPlayAgain={handlePlayAgain}
                 onBackToLobby={handleBackToLobby}
               />
             ) : (
               <SinglePlayerResults
-                key={resultsData.gameSessionId || `results-${Date.now()}`}
+                // Stable fallback — a Date.now() key is recomputed on every
+                // render, remounting the results view mid-animation. The results
+                // phase already unmounts between games, so a constant is enough.
+                key={resultsData.gameSessionId || 'results'}
                 results={resultsData}
                 mode={gameState.mode}
                 onPlayAgain={handlePlayAgain}

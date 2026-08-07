@@ -64,11 +64,17 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
   useEffect(() => {
     const fetchPendingChallenges = async () => {
       setIsLoading(true);
-      const { data } = await getPendingDuelsForStudent(studentId);
-      if (data) {
-        setPendingChallenges(data);
+      try {
+        const { data } = await getPendingDuelsForStudent(studentId);
+        if (data) {
+          setPendingChallenges(data);
+        }
+      } catch (error) {
+        console.error('[DuelLobby] Failed to fetch pending challenges:', error);
+        // Leave pendingChallenges empty so empty state renders
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchPendingChallenges();

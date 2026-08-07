@@ -222,14 +222,24 @@ export function CoinTrajectory({
                   controlX - particle.startX - particle.size / 2,
                   targetPos.x - particle.startX - particle.size / 2,
                 ],
+                // Every keyframe array must be the same length as `times` below:
+                // framer applies one `times` to all animated values, and a mismatch
+                // throws in dev / mis-eases in prod. Last value repeats = "hold at
+                // target while the coin shrinks and fades out".
                 y: [
                   0,
                   controlY - particle.startY - particle.size / 2,
                   targetPos.y - particle.startY - particle.size / 2,
+                  targetPos.y - particle.startY - particle.size / 2,
                 ],
                 scale: [0, 1.2, 1, 0.5],
                 opacity: [0, 1, 1, 0.8],
-                rotate: [particle.rotation, particle.rotation + 180, particle.rotation + 360],
+                rotate: [
+                  particle.rotation,
+                  particle.rotation + 180,
+                  particle.rotation + 360,
+                  particle.rotation + 360,
+                ],
               }}
               transition={{
                 duration: duration / 1000,

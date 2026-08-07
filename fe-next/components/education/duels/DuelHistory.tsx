@@ -59,20 +59,25 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     async function loadData() {
       setLoading(true);
 
-      const [statsResult, historyResult] = await Promise.all([
-        getDuelStats(studentId),
-        getDuelHistory(studentId, 20),
-      ]);
+      try {
+        const [statsResult, historyResult] = await Promise.all([
+          getDuelStats(studentId),
+          getDuelHistory(studentId, 20),
+        ]);
 
-      if (statsResult.data) {
-        setStats(statsResult.data);
+        if (statsResult.data) {
+          setStats(statsResult.data);
+        }
+
+        if (historyResult.data) {
+          setHistory(historyResult.data);
+        }
+      } catch (error) {
+        console.error('[DuelHistory] Failed to load duel data:', error);
+        // Leave stats/history empty so empty state renders
+      } finally {
+        setLoading(false);
       }
-
-      if (historyResult.data) {
-        setHistory(historyResult.data);
-      }
-
-      setLoading(false);
     }
 
     loadData();

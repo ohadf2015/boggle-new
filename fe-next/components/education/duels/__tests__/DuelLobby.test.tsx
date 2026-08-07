@@ -317,6 +317,25 @@ describe('DuelLobby', () => {
     });
   });
 
+  describe('error handling', () => {
+    it('shows empty state when getPendingDuelsForStudent rejects', async () => {
+      // RED: Before fix, this will hang with loading spinner. After fix, it should show empty state.
+      getPendingDuelsForStudent.mockRejectedValueOnce(new Error('Network error'));
+
+      const { container } = render(<DuelLobby {...defaultProps} />);
+
+      // Wait for the rejection to settle
+      await waitFor(() => {
+        // The spinner should disappear after the error
+        const spinner = container.querySelector('.animate-spin');
+        expect(spinner).not.toBeInTheDocument();
+
+        // The "no pending challenges" message should appear instead
+        expect(screen.getByText('No pending challenges')).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('neo-brutalist styling', () => {
     it('uses neo-brutalist design classes', () => {
       render(<DuelLobby {...defaultProps} />);

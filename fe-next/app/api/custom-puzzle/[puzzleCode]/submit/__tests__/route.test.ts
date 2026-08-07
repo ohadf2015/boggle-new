@@ -27,6 +27,9 @@ vi.mock('@/utils/customPuzzle', () => ({
 // --- Supabase mock ---
 const mockGetUser = vi.fn();
 const mockFrom = vi.fn();
+// total_plays is incremented here (moved off the unauthenticated GET, which was
+// CSRF-able). Held at module scope so tests can assert on the write.
+const mockUpdatePlays = vi.fn();
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn().mockResolvedValue({
@@ -72,6 +75,7 @@ const mockPuzzle = {
   creator_id: 'creator-user-id',
   creator_guest_fingerprint: null,
   creator_efficiency_score: 100,
+  total_plays: 7,
 };
 
 const mockAttemptData = {
@@ -90,6 +94,7 @@ function setupDefaultMocks({
   insertData = mockAttemptData,
   profileData = null,
   user = { id: 'user-1' },
+  playCountError = null as { message: string } | null,
 } = {}) {
   mockGetUser.mockResolvedValue({ data: { user }, error: null });
 
@@ -99,6 +104,10 @@ function setupDefaultMocks({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: puzzle, error: puzzleError }),
+        update: (values: unknown) => {
+          mockUpdatePlays(values);
+          return { eq: vi.fn().mockResolvedValue({ error: playCountError }) };
+        },
       };
     }
     if (table === 'profiles') {
@@ -209,6 +218,29 @@ describe('POST /api/custom-puzzle/[puzzleCode]/submit', () => {
       const res = await POST(makeRequest(validBody), makeParams()); // body has targetWord: APPLE
       expect(res.status).toBe(400);
       expect(res.data.error).toContain('Invalid target word');
+    });
+  });
+
+  // total_plays used to be incremented by the unauthenticated GET, which made it
+  // CSRF-able from any third-party <img src> and re-fired on prefetch. It now
+  // lives here, on the rate-limited POST that runs once per real play.
+  describe('Play counter', () => {
+    it('increments total_plays on a successful submission', async () => {
+      setupDefaultMocks();
+
+      const res = await POST(makeRequest(validBody), makeParams());
+
+      expect(res.status).toBe(200);
+      expect(mockUpdatePlays).toHaveBeenCalledWith({ total_plays: 8 }); // fixture has 7
+    });
+
+    it('still returns 200 when the counter write fails — the attempt is already saved', async () => {
+      setupDefaultMocks({ playCountError: { message: 'db down' } });
+
+      const res = await POST(makeRequest(validBody), makeParams());
+
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
     });
   });
 

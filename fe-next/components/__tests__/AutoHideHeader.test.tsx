@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AutoHideHeader } from '@/components/AutoHideHeader';
@@ -67,6 +68,42 @@ describe('AutoHideHeader', () => {
     const onVisibilityChange = vi.fn();
     render(<AutoHideHeader onVisibilityChange={onVisibilityChange} />);
     expect(onVisibilityChange).toHaveBeenCalledWith(false);
+  });
+
+  // Regression: onVisibilityChange used to be invoked in the render body, which
+  // is a parent setState-during-child-render (React logs "Cannot update a
+  // component while rendering a different component" and schedules an extra
+  // render pass). It must fire from an effect — once per actual change.
+  it('reports visibility from an effect: fires once on mount, not again on a re-render with unchanged visibility', () => {
+    const onVisibilityChange = vi.fn();
+    const { rerender } = render(<AutoHideHeader onVisibilityChange={onVisibilityChange} />);
+
+    expect(onVisibilityChange).toHaveBeenCalledTimes(1);
+    expect(onVisibilityChange).toHaveBeenLastCalledWith(true);
+
+    onVisibilityChange.mockClear();
+    rerender(<AutoHideHeader onVisibilityChange={onVisibilityChange} />);
+    expect(onVisibilityChange).not.toHaveBeenCalled();
+  });
+
+  it('does not call onVisibilityChange while rendering (parent may setState in the callback)', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    function Parent() {
+      const [visible, setVisible] = useState(true);
+      return (
+        <div data-visible={String(visible)}>
+          <AutoHideHeader onVisibilityChange={setVisible} />
+        </div>
+      );
+    }
+
+    render(<Parent />);
+
+    const renderPhaseWarning = consoleError.mock.calls.some((args) =>
+      args.some((arg) => typeof arg === 'string' && arg.includes('Cannot update a component')),
+    );
+    expect(renderPhaseWarning).toBe(false);
+    consoleError.mockRestore();
   });
 
   it('collapses the spacer (returns null) during gameplay when collapseSpacerWhenHidden is set — no empty band on focused game screens', () => {

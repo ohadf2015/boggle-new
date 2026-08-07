@@ -32,18 +32,24 @@ function DuelsPageClientInner() {
 
     async function loadData() {
       setLoading(true);
-      const [classroomRes, lessonsRes] = await Promise.all([
-        getStudentClassroom(user!.id),
-        getLessons(user!.id),
-      ]);
-      if (classroomRes.data) {
-        setClassroom(classroomRes.data);
-        // Fetch classmates when classroom is available
-        const studentsRes = await getClassroomStudents(classroomRes.data.id);
-        if (studentsRes.data) setClassmates(studentsRes.data);
+      try {
+        const [classroomRes, lessonsRes] = await Promise.all([
+          getStudentClassroom(user!.id),
+          getLessons(user!.id),
+        ]);
+        if (classroomRes.data) {
+          setClassroom(classroomRes.data);
+          // Fetch classmates when classroom is available
+          const studentsRes = await getClassroomStudents(classroomRes.data.id);
+          if (studentsRes.data) setClassmates(studentsRes.data);
+        }
+        if (lessonsRes.data) setLessons(lessonsRes.data);
+      } catch (error) {
+        console.error('[DuelsPageClient] Failed to load data:', error);
+        // Leave classroom null so empty state renders
+      } finally {
+        setLoading(false);
       }
-      if (lessonsRes.data) setLessons(lessonsRes.data);
-      setLoading(false);
     }
     loadData();
   }, [user, router, language]);

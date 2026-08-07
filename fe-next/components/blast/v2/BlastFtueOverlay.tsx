@@ -139,7 +139,20 @@ function AnimatedFinger() {
         duration: 2.2,
         repeat: Infinity,
         ease: 'easeInOut',
-        times: [0, 0.15, 0.85, 1],
+        // Per-value `times`: a single top-level one is applied to every keyframe
+        // array, and x has 3 stops to opacity's 4. Padding x would turn the even
+        // glide into a dart-and-hold, so each value keeps its own timing.
+        // duration/repeat/ease are RESTATED, not inherited: motion-dom's
+        // getValueTransition only merges the parent transition when the sub-object
+        // sets `inherit`, so omitting them here would silently drop the infinite
+        // loop and fall back to the default duration.
+        x: { duration: 2.2, repeat: Infinity, ease: 'easeInOut', times: [0, 0.5, 1] },
+        opacity: {
+          duration: 2.2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          times: [0, 0.15, 0.85, 1],
+        },
       }}
     >
       <svg

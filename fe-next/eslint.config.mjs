@@ -7,10 +7,13 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
-    // Nightly loop's isolated build dir (NEXT_BUILD_DIR=.next-nightly). Without
-    // this, `npm run lint` scans 550+ minified build chunks → bogus
-    // react/display-name errors + ~36min lint → the nightly gate fails forever.
-    ".next-nightly/**",
+    // Every isolated build dir (NEXT_BUILD_DIR=.next-nightly, .next-perf,
+    // .next-dev-verify, …). Without this, `npm run lint` scans 550+ minified
+    // build chunks → bogus react/display-name + rules-of-hooks errors and a
+    // ~36min lint → the gate fails forever. Globbed rather than listed one by
+    // one: `.next-nightly` was enumerated here and `.next-perf` still broke lint
+    // the moment another session used it.
+    ".next-*/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

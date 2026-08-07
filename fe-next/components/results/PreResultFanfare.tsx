@@ -108,9 +108,14 @@ export const PreResultFanfare = memo(function PreResultFanfare({
   const prefersReduced = typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Hand off from an effect, not from the render body: onComplete() advances the
+  // parent's flow state, and calling it while rendering is a setState-during-render
+  // of another component.
+  useEffect(() => {
+    if (prefersReduced) onComplete();
+  }, [prefersReduced, onComplete]);
+
   if (prefersReduced) {
-    // Immediately hand off
-    onComplete();
     return null;
   }
 
