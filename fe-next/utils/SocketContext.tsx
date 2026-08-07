@@ -5,6 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { sanitizeRoomName } from '@/utils/consts';
 import { computeReconnectDelay } from '@/utils/reconnectDelay';
+import { isExpectedSocketErrorCode } from '@/utils/sentry';
 import { getRejoinIntent, planReconnectRejoin } from '@/utils/socketRejoin';
 import { readGuestBirthYear } from '@/lib/families/guestAge';
 import { resolveGrandfatheredAdult } from '@/lib/families/grandfather';
@@ -373,17 +374,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
       // Only log non-empty errors to reduce noise
       if (error && typeof error === 'object' && Object.keys(error).length > 0) {
         const code = (error as Record<string, unknown>).code;
-        const expectedCodes = [
-          'GAME_NOT_FOUND', 'NOT_IN_GAME', 'PLAYER_NOT_IN_GAME', 'ROOM_NOT_FOUND',
-          'GAME_NOT_IN_PROGRESS', 'GAME_ALREADY_IN_PROGRESS', 'GAME_ALREADY_STARTED',
-          'INTERNAL_ERROR', 'AUTH_REQUIRED',
-        ];
         const expectedMessages = [
           'Not in a game', 'You are not in a game', 'Target word already found',
         ];
         const msg = (error as Record<string, unknown>).message;
         if (
-          (typeof code === 'string' && expectedCodes.includes(code)) ||
+          isExpectedSocketErrorCode(code) ||
+          code === 'INTERNAL_ERROR' ||
           (typeof msg === 'string' && expectedMessages.includes(msg))
         ) {
           logger.log('[SOCKET.IO] Expected error:', error);

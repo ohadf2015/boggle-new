@@ -237,10 +237,40 @@ const EXPECTED_ERROR_PATTERNS = [
 ];
 
 /**
- * Check if an error is expected (should NOT be captured to Sentry)
+ * Typed socket error codes that describe routine game-state churn (a stale
+ * client flag, a room that closed, a rejoin race) rather than a defect.
+ *
+ * These are matched on the CODE, never on the message: handlers localize the
+ * message via t() before reporting, so an English regex over the text silently
+ * stops matching in English and can never match for HE/JA/SV/ES players. That
+ * exact drift sent GAME_NOT_IN_PROGRESS to Sentry as an unexpected error.
  */
-export function isExpectedError(error: Error | unknown): boolean {
+const EXPECTED_SOCKET_ERROR_CODES = new Set([
+  "GAME_NOT_FOUND",
+  "NOT_IN_GAME",
+  "PLAYER_NOT_IN_GAME",
+  "ROOM_NOT_FOUND",
+  "GAME_NOT_IN_PROGRESS",
+  "GAME_ALREADY_IN_PROGRESS",
+  "GAME_ALREADY_STARTED",
+  "AUTH_REQUIRED",
+]);
+
+/** Locale-independent expectedness check for a typed socket error code. */
+export function isExpectedSocketErrorCode(code: unknown): boolean {
+  return typeof code === "string" && EXPECTED_SOCKET_ERROR_CODES.has(code);
+}
+
+/**
+ * Check if an error is expected (should NOT be captured to Sentry).
+ *
+ * Pass `code` whenever the error came from a typed socket payload — it is the
+ * locale-independent signal; the message patterns are only a fallback for
+ * untyped errors.
+ */
+export function isExpectedError(error: Error | unknown, code?: unknown): boolean {
   if (!error) return true;
+  if (isExpectedSocketErrorCode(code)) return true;
 
   const errorMessage =
     error instanceof Error

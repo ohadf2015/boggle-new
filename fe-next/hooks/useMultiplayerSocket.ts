@@ -396,7 +396,7 @@ export function useMultiplayerSocket(
       }
 
       const errorToCapture = new Error(resolvedMessage || errorCode || 'Unknown socket error');
-      const expected = isExpectedError(errorToCapture);
+      const expected = isExpectedError(errorToCapture, errorCode);
 
       // Only send unexpected errors to Sentry; expected ones just log locally
       if (expected) {
