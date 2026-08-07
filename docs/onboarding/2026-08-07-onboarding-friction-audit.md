@@ -284,3 +284,50 @@ Veterans and the blast-after-arena rule are untouched. 5 unit tests.
 
 **Deliberately NOT changed:** `connections` measured worst (11.1%) but on n=9 —
 too little evidence, left in place.
+
+---
+
+## Follow-up pass — the two items the first pass left open
+
+### 5. Offline no longer offers a CTA it knows will fail
+`components/multiplayer/ArenaCTAStrip.tsx`. Both arena CTAs (`QUICK START`,
+`CREATE PRIVATE BATTLE`) were only ever disabled on `isQuickPlayLoading`, so
+the replay showed them bright, enabled and inviting **while the app was already
+rendering its own `⚠️ Offline` badge**. The secondary button had no
+`disabled:` styling at all — it stayed fully lit even once inert.
+
+Now: both disable while the device is offline, the primary swaps its label to
+`mp.quality.reconnecting` (an existing key — present in all 6 locales, so no
+new strings and no ratchet risk), and both get real disabled styling.
+
+**Scope, deliberately:** this covers the DEVICE-offline case, which is what the
+replay showed. A first attempt also read socket state here, but `useSocket`
+throws outside a `SocketProvider` and that made the leaf unrenderable — its own
+existing tests caught it. The dead-socket-while-online case is handled inside
+`useMultiplayerJoin` instead (pending state up front, explicit reconnect, 12s),
+which is the better place for it.
+
+### 6. The FTUE screen leads with the game, not a form
+`components/onboarding/QuickStartStep.tsx`. The screen opened with a wordmark
+and then a form: avatar, name field, 6 flags, PLAY, two links, and an
+account-signup block — roughly 8 interactive targets, zero gameplay, and an
+email ask before the player had seen a single tile.
+
+- A self-tracing `MiniGrid` now sits directly under the wordmark, above
+  everything else, so the one mechanic (drag to link letters) demonstrates
+  itself within a second of arrival. It reuses the existing localized
+  `demoConfigs` (already shared with WelcomeDemoStep and PreGameTutorial) and is
+  keyed on the selected language so switching language re-demos in that language.
+- `OnboardingGoogleSignup` is removed from this screen. Guests already get a
+  signup CTA on the result screen, where there is finally something to sign up
+  FOR — this restores value-then-ask instead of ask-then-value.
+
+One pre-existing test file needed a `MiniGrid` stub added: the real component
+pulls framer-motion's `useMotionValue`/`useSpring`/`useTransform`, which that
+file's lightweight framer mock does not provide. Board behaviour is covered by
+the new `QuickStartStep.showsTheGame.test.tsx`.
+
+**Not measured yet.** Both of these are reasoned from replay evidence, not from
+an experiment. The FTUE change in particular should be watched against
+`growth:onboarding_started -> growth:onboarding_completed` (currently 61 -> 37)
+before it is assumed to have worked.

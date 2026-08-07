@@ -10,7 +10,8 @@ import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import { useImeText } from '@/hooks/useImeText';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
-import OnboardingGoogleSignup from './OnboardingGoogleSignup';
+import MiniGrid from './MiniGrid';
+import { demoConfigs } from './demoConfigs';
 import { NeoPanel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/types';
@@ -38,6 +39,17 @@ export interface QuickStartStepProps {
  *   something they must supply.
  * - Language is one tap, applied in place. It does not advance anything.
  * - The tutorial is a link, not a step.
+ * - The GAME leads. A self-tracing demo board sits above everything else so a
+ *   player sees what LexiClash actually is within a second of arriving. The
+ *   screen previously opened with a wordmark and a form: an avatar, a name
+ *   field, six flags, PLAY, two links and an account-signup block — roughly
+ *   eight interactive targets and not one tile of gameplay. 24 of 61 starters
+ *   (39%) abandoned here.
+ * - Nothing is asked for before the game has given something. The signup block
+ *   that used to sit at the bottom of this card asked for an account before the
+ *   player had seen a single word; guests already get a signup CTA on the
+ *   result screen, where there is finally something to sign up FOR.
+ * See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
  */
 const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, onHaveAccount }) => {
   const { t, dir, language, setLanguage } = useLanguage();
@@ -77,6 +89,9 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
     [language, setLanguage]
   );
 
+  // Localized demo word/path — shared with WelcomeDemoStep and PreGameTutorial.
+  const demo = demoConfigs[selectedLang] ?? demoConfigs.en;
+
   const handlePlay = useCallback(() => {
     // Read the DOM directly — React state can lag mid-composition on mobile.
     const live = getLiveName();
@@ -97,6 +112,20 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
       >
         LexiClash
       </m.h1>
+
+      {/* The game, first. Self-tracing so it demonstrates the one mechanic
+          (drag to link letters) without asking the player to do anything. */}
+      <MiniGrid
+        key={selectedLang}
+        size={3}
+        letters={demo.letters}
+        demoWord={demo.word}
+        demoPath={demo.path}
+        autoTrace
+        showHints={false}
+        onDemoComplete={() => {}}
+        className="pointer-events-none"
+      />
 
       {/* Language — one tap, applied in place. Deliberately small and above the
           card: it is a correction affordance, not a question the player must
@@ -230,8 +259,6 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
             </button>
           )}
         </div>
-
-        <OnboardingGoogleSignup name={name} avatar={avatar} nameValid nameEdited={name.trim() !== suggestionRef.current.trim()} />
       </NeoPanel>
     </div>
   );

@@ -45,6 +45,16 @@ vi.mock('../OnboardingGoogleSignup', () => ({
   default: () => <div data-testid="google-signup" />,
 }));
 
+// The demo board leads the screen now. Stubbed here so these tests stay about
+// the identity/PLAY behaviour they were written for — the real MiniGrid pulls
+// framer-motion's useMotionValue/useSpring/useTransform, which this file's
+// lightweight framer mock does not provide. Board behaviour is covered in
+// QuickStartStep.showsTheGame.test.tsx.
+vi.mock('../MiniGrid', () => ({
+  __esModule: true,
+  default: () => <div data-testid="ftue-demo-grid" />,
+}));
+
 vi.mock('@/utils/onboardingNameSuggestions', () => ({
   suggestPlayerName: () => 'WordWizard',
 }));
