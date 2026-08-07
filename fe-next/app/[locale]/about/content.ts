@@ -17,7 +17,7 @@ export type AboutContent = {
   };
   whatWeDo: { title: string; content: string; content2: string };
   technology: { title: string; content: string; content2: string };
-  forEducators: { title: string; content: string; content2: string };
+  forEducators: { title: string; content: string; content2: string; ctaLabel: string };
   community: { title: string; content: string; content2: string };
   values: {
     title: string;
@@ -92,6 +92,7 @@ export const contentByLocale: Record<string, AboutContent> = {
       title: 'For Educators',
       content: 'LexiClash was designed with education in mind from day one. Our Education Mode provides teachers with a powerful set of tools to integrate word games into their curriculum. Teachers can create custom word lists aligned with their lesson plans, assign timed challenges to individual students or entire classes, and monitor progress through detailed analytics dashboards.',
       content2: 'Research consistently shows that competitive word games improve vocabulary retention significantly compared to traditional study methods. By turning vocabulary practice into a game, students stay engaged longer and retain more. LexiClash is used in language arts classes, ESL programs, and foreign language courses around the world. Our multilingual support makes it especially valuable for bilingual education and language immersion programs.',
+      ctaLabel: 'Explore programs for schools',
     },
     community: {
       title: 'Our Community',

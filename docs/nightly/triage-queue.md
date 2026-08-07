@@ -2003,3 +2003,11 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: lane time budget consumed restoring+fixing the stale 20260802-010002 drop (score 0.444, top-ranked, restore-first per brief contract)
   - recommended owner: self (lane 01, next run)
+
+## 2026-08-07
+- [PostHog] MP rageclick trend WORSENED after 08-04 RoomListView joiningRoomCode fix
+  - baseline 2 (pre-fix window) -> measured 49 events over trailing 7d; daily rageclick/pageview rate: 07-31..08-03 ~4-16%, 08-04..08-06 climbing to 18%/41%/68%
+  - RoomListView.tsx:346-387 join-button wiring (disabled/aria-busy/click-guard) verified CORRECT — root cause is NOT that button
+  - status: deferred
+  - why: ambiguous root cause — rageclick matches ANY element on /multiplayer, not just the room-join button; needs replay/heatmap inspection to find the actual rage-clicked element (host lobby CTA? mode picker? something added after 08-04?)
+  - recommended owner: lane 11 (mode-qa) or lane 02 (perf) — has agent-browser/replay tooling this lane lacks

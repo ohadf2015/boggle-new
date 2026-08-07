@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import LegalPageLayout from '@/components/legal/LegalPageLayout';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -14,17 +15,20 @@ function FeatureCard({
   title,
   content,
   isDarkMode,
+  href,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   content: string;
   isDarkMode: boolean;
+  href?: string;
 }) {
-  return (
+  const card = (
     <div
       className={cn(
-        'p-5 rounded-neo border-3 border-neo-black',
-        isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard'
+        'p-5 rounded-neo border-3 border-neo-black h-full',
+        isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard',
+        href && 'transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
       )}
     >
       <div className="flex items-center gap-3 mb-3">
@@ -45,6 +49,7 @@ function FeatureCard({
       </p>
     </div>
   );
+  return href ? <Link href={href}>{card}</Link> : card;
 }
 
 export default function AboutPageClient(): React.ReactElement {
@@ -113,6 +118,7 @@ export default function AboutPageClient(): React.ReactElement {
             title={c.whatMakesUsDifferent.education.title}
             content={c.whatMakesUsDifferent.education.content}
             isDarkMode={isDarkMode}
+            href={`/${locale}/education`}
           />
           <FeatureCard
             icon={Shield}
@@ -143,7 +149,16 @@ export default function AboutPageClient(): React.ReactElement {
       <section className="mb-8">
         <h2 className={sectionHeadingClass}>{c.forEducators.title}</h2>
         <p className={cn(paragraphClass, 'mb-4')}>{c.forEducators.content}</p>
-        <p className={paragraphClass}>{c.forEducators.content2}</p>
+        <p className={cn(paragraphClass, 'mb-4')}>{c.forEducators.content2}</p>
+        <Link
+          href={`/${locale}/education/for-schools`}
+          className={cn(
+            'inline-flex items-center gap-2 font-bold underline',
+            isDarkMode ? 'text-neo-cyan' : 'text-neo-pink-dark'
+          )}
+        >
+          {c.forEducators.ctaLabel} →
+        </Link>
       </section>
 
       {/* Section 8: Community */}

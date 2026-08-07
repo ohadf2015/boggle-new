@@ -12,6 +12,7 @@ import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { useDrillMusic } from '@/hooks/useDrillMusic';
+import { useHaptics } from '@/hooks/useHaptics';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import ComboMasterCompletePhase from './ComboMasterCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
@@ -70,6 +71,7 @@ export default function ComboMaster({
     playComboMilestoneSound,
     playComboBreakSound,
   } = useSoundEffects();
+  const { warning: warningHaptic } = useHaptics();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -88,6 +90,7 @@ export default function ComboMaster({
   comboRef.current = combo;
   const comboBreaksRef = useRef(comboBreaks);
   comboBreaksRef.current = comboBreaks;
+  const warnedThisComboRef = useRef(false);
 
   const { validateWord } = useDrillWordSubmit({
     grid,
@@ -119,6 +122,7 @@ export default function ComboMaster({
   const startComboTimer = useCallback(() => {
     if (comboTimerRef.current) clearInterval(comboTimerRef.current);
     setComboTimer(levelConfig.comboTimeout);
+    warnedThisComboRef.current = false;
 
     comboTimerRef.current = setInterval(() => {
       setComboTimer(prev => {
@@ -129,6 +133,14 @@ export default function ComboMaster({
       });
     }, 1000);
   }, [levelConfig.comboTimeout]);
+
+  // Urgency warning haptic — fires once per combo life when time is running out
+  useEffect(() => {
+    if (phase === 'playing' && comboTimer === 2 && comboRef.current > 0 && !warnedThisComboRef.current) {
+      warnedThisComboRef.current = true;
+      warningHaptic();
+    }
+  }, [comboTimer, phase, warningHaptic]);
 
   // Handle combo break when timer reaches 0
   useEffect(() => {
@@ -252,7 +264,8 @@ export default function ComboMaster({
           {/* Combo display */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            combo >= 5 ? 'bg-neo-orange' : 'bg-neo-navy-elevated'
+            combo >= 5 ? 'bg-neo-orange' : 'bg-neo-navy-elevated',
+            phase === 'playing' && comboTimer <= 2 && combo > 0 && 'animate-neo-shake'
           )}>
             <Flame className={cn(
               'w-4 h-4',

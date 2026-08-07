@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { clearSessionPreservingUsername } from '@/utils/session';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
 import type { Socket } from 'socket.io-client';
 
@@ -45,8 +46,11 @@ export function usePlayerExit({
       e.preventDefault();
       e.stopPropagation();
     }
+    if (gameActive) {
+      trackGrowthEvent('game_abandon_attempted', { mode: 'multiplayer', gameCode });
+    }
     setShowExitConfirm(true);
-  }, []);
+  }, [gameActive, gameCode]);
 
   const confirmExitRoom = useCallback(() => {
     logger.log('[PLAYER] Exit confirmed, closing connection');

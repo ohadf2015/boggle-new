@@ -195,7 +195,11 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               <Link href={`/${locale}/anagram`} className="text-neo-pink underline">
                 resolvedor de anagramas
               </Link>{' '}
-              encuentra al instante todas las palabras que puedes formar.
+              encuentra al instante todas las palabras que puedes formar. ¿Buscas{' '}
+              <Link href={`/${locale}/education/esl-word-games`} className="text-neo-yellow underline">
+                juegos de vocabulario en inglés
+              </Link>{' '}
+              para el aula? Tenemos una sección dedicada para profesores y estudiantes de ESL.
             </p>
           </div>
         </section>

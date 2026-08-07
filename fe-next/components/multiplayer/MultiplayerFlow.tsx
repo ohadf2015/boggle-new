@@ -146,6 +146,18 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // exp-mp-quickplay-eager-disable-v1: local pending flag for immediate button disable.
   // Only used when eager-disable variant is active; control path never sets this.
   const [isQuickPlayPending, setIsQuickPlayPending] = useState(false);
+  // Bounded fallback clear: the effect below only clears this on `isJoining`
+  // CHANGING to false, but handleJoin has early-return paths (socket not
+  // connected) that never flip isJoining at all — leaving Quick Play stuck
+  // disabled for the rest of the session (rage-click regression, 2026-08-07).
+  const quickPlayPendingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearQuickPlayPendingTimeout = useCallback(() => {
+    if (quickPlayPendingTimeoutRef.current) {
+      clearTimeout(quickPlayPendingTimeoutRef.current);
+      quickPlayPendingTimeoutRef.current = null;
+    }
+  }, []);
+  useEffect(() => clearQuickPlayPendingTimeout, [clearQuickPlayPendingTimeout]);
   const isSeekingOverlay = quickPlay && isJoining && seekingVariant === 'match-seeking';
   useEffect(() => {
     if (!isSeekingOverlay) return;
@@ -284,8 +296,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     if (!isJoining) {
       setJoiningRoomCode(null);
       setIsQuickPlayPending(false);
+      clearQuickPlayPendingTimeout();
     }
-  }, [isJoining]);
+  }, [isJoining, clearQuickPlayPendingTimeout]);
 
   // Handle create room button
   const handleCreateClick = useCallback(() => {
@@ -362,6 +375,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     });
     if (eagerDisableVariant === 'eager-disable') {
       setIsQuickPlayPending(true);
+      clearQuickPlayPendingTimeout();
+      quickPlayPendingTimeoutRef.current = setTimeout(() => {
+        setIsQuickPlayPending(false);
+      }, 8000);
       trackGrowthEvent('mp_quickplay_eager_shown', {});
     }
     trackGrowthEvent('mp_quickplay_initiated', { hadMatchRoom: !!matchRoom });
@@ -391,7 +408,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // so inviting friends to join is a valid affordance.
     cgShowInvite(gameCode);
 
-  }, [isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite, eagerDisableVariant]);
+  }, [isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite, eagerDisableVariant, clearQuickPlayPendingTimeout]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
