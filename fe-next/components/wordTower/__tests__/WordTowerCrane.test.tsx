@@ -32,14 +32,15 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
     expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
   });
 
-  it('lays the held word as a VERTICAL column so it matches how it settles into the tower', () => {
+  it('lays the held word as a HORIZONTAL girder — the floor it is about to become', () => {
     render(
       <WordTowerCrane word="TREE" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
     );
     const container = screen.getByTestId('crane-block');
-    // Vertical stack, base-first: flex-col-reverse renders word[0] at the BOTTOM,
-    // mirroring the tower (pos 0 = base). A horizontal row would have neither.
-    expect(container.className).toContain('flex-col-reverse');
+    // One row, reading order: the girder on the hook IS the floor that lands, so
+    // it must match `towerFloor`'s horizontal course, not hang as a spire.
+    expect(container.className).toContain('flex-row');
+    expect(container.className).not.toContain('flex-col');
     const tiles = screen.getAllByTestId('crane-letter');
     expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
   });

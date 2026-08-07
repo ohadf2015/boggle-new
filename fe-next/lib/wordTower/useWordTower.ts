@@ -52,7 +52,7 @@ type Action =
   | { type: 'clear' }
   | { type: 'submit'; isInDictionary: (canonWord: string) => boolean }
   | { type: 'hold'; isInDictionary: (canonWord: string) => boolean }
-  | { type: 'commitPlacement'; multiplier: number }
+  | { type: 'commitPlacement'; multiplier: number; offset?: number }
   | { type: 'cancelPlacement' }
   | { type: 'scramble' }
   | { type: 'scramblePaid' }
@@ -128,7 +128,7 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
       if (isTowerWordUsed(state.game, state.pendingWord)) {
         return { ...state, pendingWord: null, selected: [], lastError: 'duplicate', errorKey: state.errorKey + 1 };
       }
-      const { state: nextGame, result } = applyTowerWord(state.game, state.pendingWord, action.multiplier);
+      const { state: nextGame, result } = applyTowerWord(state.game, state.pendingWord, action.multiplier, action.offset ?? 0);
       return {
         ...state,
         game: nextGame,
@@ -206,7 +206,7 @@ export function useWordTower(opts: UseWordTowerOpts) {
       clear: () => dispatch({ type: 'clear' }),
       submit: () => dispatch({ type: 'submit', isInDictionary: dictRef.current }),
       hold: () => dispatch({ type: 'hold', isInDictionary: dictRef.current }),
-      commitPlacement: (multiplier: number) => dispatch({ type: 'commitPlacement', multiplier }),
+      commitPlacement: (multiplier: number, offset = 0) => dispatch({ type: 'commitPlacement', multiplier, offset }),
       cancelPlacement: () => dispatch({ type: 'cancelPlacement' }),
       scramble: () => dispatch({ type: 'scramble' }),
       scramblePaid: () => dispatch({ type: 'scramblePaid' }),

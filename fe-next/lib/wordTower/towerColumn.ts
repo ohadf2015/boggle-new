@@ -1,33 +1,18 @@
 /**
- * Word Tower — vertical letter-chain model (pure, renderer-agnostic).
+ * Word Tower — per-word colour + glyph contrast (pure, renderer-agnostic).
  *
- * The tower is a Shiritori chain: floor N's last letter === floor N+1's first
- * letter (the "connector"). Rendered as a single vertical column of one-letter-
- * per-row tiles, each WORD gets its own colour and every connector letter is
- * tinted the blend of its two neighbouring word colours — so the chain reads as
- * a continuous ribbon climbing the screen, recolouring at each join.
+ * What is LEFT of this module: each word gets its own deterministic colour and
+ * every glyph gets a legible ink colour for the tile it sits on.
  *
- * No Pixi / DOM imports here so it stays trivially unit-testable; the scene
- * consumes {@link buildTowerColumn} + {@link wordColor} + {@link blendColors}.
+ * What was REMOVED (2026-08-07): the vertical letter-chain model —
+ * `buildTowerColumn`, `cellAltitudes`, `sharedConnectorLen`, `blendColors`,
+ * `hexToHsl`. It rendered the tower as a single column of one-letter-per-row
+ * tiles and tinted each Shiritori connector the blend of its two neighbouring
+ * words. The Shiritori chain was retired (see `validateTowerWord`), which left
+ * the connector-blend describing a mechanic that no longer existed and the
+ * tower drawn as a 1-tile-wide spire. A word is now ONE horizontal floor —
+ * see `towerFloor.ts`.
  */
-
-import type { TowerSurpriseEvent } from './towerSurprise';
-
-/** One row of the tower. `letter` cells carry a glyph; `brick` cells are the
- *  spoiler-free versus rows (rival words are hidden, only height is shown).
- *  `surprise` marks a cell whose floor was placed on a variable-reward pop, so
- *  the renderer can draw it as a distinct "surprise block" (cosmetic only). */
-export type ColumnCell =
-  | { kind: 'letter'; char: string; color: number; shared: boolean; surprise?: TowerSurpriseEvent }
-  | { kind: 'brick'; color: number };
-
-// Vibrant neo-brutalist saturation/lightness — bright enough for dark glyphs,
-// chroma high enough that hue-blended connectors still read as "both colours".
-const WORD_S = 0.72; // richer, less candy-bright — founder: tiles read too childish
-const WORD_L = 0.5;
-// Golden angle: consecutive words land ~137.5° apart on the wheel → maximal,
-// non-repeating hue separation so no two adjacent words ever look alike.
-const GOLDEN_ANGLE = 137.508;
 
 /** HSL → packed 24-bit RGB int (Pixi-friendly). */
 export function hslToHex(h: number, s: number, l: number): number {
@@ -55,7 +40,29 @@ function hue2rgb(p: number, q: number, t: number): number {
   return p;
 }
 
-/** Packed 24-bit RGB int → HSL ({ h: 0–360, s/l: 0–1 }). */
+/** Vibrant neo-brutalist saturation/lightness — bright enough for dark glyphs. */
+const WORD_S = 0.72; // richer, less candy-bright — founder: tiles read too childish
+const WORD_L = 0.5;
+/** Golden angle: consecutive words land ~137.5° apart on the wheel → maximal,
+ *  non-repeating hue separation so no two adjacent words ever look alike. */
+const GOLDEN_ANGLE = 137.508;
+
+/** Deterministic, distinct colour for the Nth word in the chain. */
+export function wordColor(index: number): number {
+  return hslToHex((index * GOLDEN_ANGLE) % 360, WORD_S, WORD_L);
+}
+
+/** Glyph colour that stays legible on a given tile fill (relative luminance). */
+export function textColorOn(hex: number): number {
+  const r = ((hex >> 16) & 0xff) / 255;
+  const g = ((hex >> 8) & 0xff) / 255;
+  const b = (hex & 0xff) / 255;
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return lum > 0.55 ? 0x14141f : 0xfffef0;
+}
+
+/** Packed 24-bit RGB int → HSL ({ h: 0–360, s/l: 0–1 }). Inverse of
+ *  {@link hslToHex}; used to assert material/grading properties. */
 export function hexToHsl(hex: number): { h: number; s: number; l: number } {
   const r = ((hex >> 16) & 0xff) / 255;
   const g = ((hex >> 8) & 0xff) / 255;
@@ -75,109 +82,4 @@ export function hexToHsl(hex: number): { h: number; s: number; l: number } {
     if (h < 0) h += 360;
   }
   return { h, s, l };
-}
-
-/** Deterministic, distinct colour for the Nth word in the chain. */
-export function wordColor(index: number): number {
-  return hslToHex((index * GOLDEN_ANGLE) % 360, WORD_S, WORD_L);
-}
-
-/** Blend two colours in HSL along the shorter hue arc — keeps chroma so the
- *  result reads as "a combination of both", not a muddy RGB average. */
-export function blendColors(a: number, b: number): number {
-  if (a === b) return a; // exact identity (and dodges round-trip rounding)
-  const ca = hexToHsl(a);
-  const cb = hexToHsl(b);
-  let dh = cb.h - ca.h;
-  if (dh > 180) dh -= 360;
-  if (dh < -180) dh += 360;
-  return hslToHex(ca.h + dh * 0.5, (ca.s + cb.s) / 2, (ca.l + cb.l) / 2);
-}
-
-/** Glyph colour that stays legible on a given tile fill (relative luminance). */
-export function textColorOn(hex: number): number {
-  const r = ((hex >> 16) & 0xff) / 255;
-  const g = ((hex >> 8) & 0xff) / 255;
-  const b = (hex & 0xff) / 255;
-  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return lum > 0.55 ? 0x14141f : 0xfffef0;
-}
-
-/**
- * Flatten the floor list into the global bottom→top column of cells. Consecutive
- * words share their connector letter, so it is emitted exactly once and tinted
- * the blend of the two words. Empty-word floors (versus spoiler-free) become a
- * single brick cell. Array index === stable global row index (the tower is
- * append-only), which the scene uses as its sprite-registry key.
- */
-export function buildTowerColumn(
-  floors: ReadonlyArray<{ word: string; surprise?: TowerSurpriseEvent }>,
-): ColumnCell[] {
-  const cells: ColumnCell[] = [];
-  floors.forEach((floor, i) => {
-    const color = wordColor(i);
-    const chars = Array.from(floor.word ?? '');
-
-    if (chars.length === 0) {
-      cells.push({ kind: 'brick', color });
-      return;
-    }
-
-    // Shared connector with the previous word: 1 char normally, 2 when the chain
-    // continued through a vowel ([before][vowel]). Detected by matching the prev
-    // word's tail to this word's head — merge those leading tiles (blend tint)
-    // rather than duplicate them, so the chain reads as one continuous ribbon.
-    let start = 0;
-    if (i > 0) {
-      const prev = Array.from(floors[i - 1].word ?? '');
-      const conn = sharedConnectorLen(prev, chars);
-      for (let k = 0; k < conn; k++) {
-        const cell = cells[cells.length - conn + k];
-        if (cell && cell.kind === 'letter') { cell.color = blendColors(cell.color, color); cell.shared = true; }
-      }
-      start = conn;
-    }
-    for (let j = start; j < chars.length; j++) {
-      cells.push({ kind: 'letter', char: chars[j], color, shared: false, surprise: floor.surprise });
-    }
-  });
-  return cells;
-}
-
-/**
- * Cumulative altitude (m) for each cell emitted by {@link buildTowerColumn},
- * returned as a parallel array (same length, same order). Each cell is placed at
- * the mid-point of its floor's metre band, so the scene can grade every tile by
- * the biome at *its own* height (the tower spans city→space simultaneously).
- * Mirrors buildTowerColumn's emission exactly — connector letters are merged
- * into the previous floor, so they are NOT re-counted here.
- */
-export function cellAltitudes(floors: ReadonlyArray<{ word: string; meters: number }>): number[] {
-  const alts: number[] = [];
-  let base = 0; // altitude at the bottom of the current floor
-  floors.forEach((floor, i) => {
-    const meters = floor.meters ?? 0;
-    const chars = Array.from(floor.word ?? '');
-    if (chars.length === 0) {
-      alts.push(base + meters / 2); // brick floor → one cell at mid-band
-      base += meters;
-      return;
-    }
-    const start = i > 0 ? sharedConnectorLen(Array.from(floors[i - 1].word ?? ''), chars) : 0;
-    const emitted = chars.length - start;
-    for (let j = 0; j < emitted; j++) {
-      const frac = emitted > 0 ? (j + 0.5) / emitted : 0.5;
-      alts.push(base + meters * frac);
-    }
-    base += meters;
-  });
-  return alts;
-}
-
-/** Length of the shared chain connector between consecutive words (0, 1, or 2). */
-export function sharedConnectorLen(prev: string[], cur: string[]): number {
-  const pn = prev.length, cn = cur.length;
-  if (pn >= 2 && cn >= 2 && cur[0] === prev[pn - 2] && cur[1] === prev[pn - 1]) return 2;
-  if (pn >= 1 && cn >= 1 && cur[0] === prev[pn - 1]) return 1;
-  return 0;
 }

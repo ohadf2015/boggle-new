@@ -6,60 +6,7 @@ import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
  * backdrop both consume these.
  */
 
-export interface CourseTile {
-  char: string;
-  /** Left edge of the tile within the course band (px). */
-  x: number;
-  /** Square tile side length (px). */
-  size: number;
-}
-
-export interface CourseLayout {
-  tiles: CourseTile[];
-  /** Total laid width of the course (px). */
-  width: number;
-  /** Tile side length, i.e. course height (px). */
-  height: number;
-}
-
-interface CourseOpts {
-  gap?: number;
-  maxTile?: number;
-  minTile?: number;
-  /** Text direction — RTL places logical char 0 at the right-most slot. */
-  dir?: 'ltr' | 'rtl';
-}
-
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
-
-/**
- * Lay a word out as a horizontal course of square letter-tiles, centered within
- * `courseW`. Unicode-safe (one tile per code point) and bidi-aware: for `rtl`
- * the logical first character is placed at the visual right edge so Hebrew /
- * Arabic words read correctly instead of mirror-flipped.
- */
-export function courseTileLayout(word: string, courseW: number, opts: CourseOpts = {}): CourseLayout {
-  const chars = Array.from(word);
-  const n = chars.length;
-  if (n === 0) return { tiles: [], width: 0, height: 0 };
-
-  const gap = opts.gap ?? 4;
-  const maxTile = opts.maxTile ?? 56;
-  const minTile = opts.minTile ?? 18;
-  const dir = opts.dir ?? 'ltr';
-
-  const fit = (courseW - gap * (n - 1)) / n;
-  const size = clamp(fit, minTile, maxTile);
-  const width = n * size + (n - 1) * gap;
-  const startX = (courseW - width) / 2;
-
-  const tiles = chars.map((char, i) => {
-    const slot = dir === 'rtl' ? n - 1 - i : i; // visual slot from the left
-    return { char, x: startX + slot * (size + gap), size };
-  });
-
-  return { tiles, width, height: size };
-}
 
 /** Default number of committed rows kept on screen before the camera follows
  *  the climb. Founder ask (2026-06-19): "the tower should show only the top 2

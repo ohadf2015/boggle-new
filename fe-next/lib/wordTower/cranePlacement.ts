@@ -29,12 +29,40 @@ export interface PlacementOutcome {
  * a reward amplifier, not a precision fail-gate. Only a clearly mistimed release
  * falls to sloppy/miss. */
 export const PERFECT_MAX = 0.18;
+/** Hard ceiling on the widened perfect window, however many bonuses stack.
+ *  Leaves a `good` band with real width so the drop still has three readable
+ *  outcomes at max upgrades on a long platform. */
+export const PERFECT_MAX_CEILING = 0.34;
 export const GOOD_MAX = 0.45;
 export const SLOPPY_MAX = 0.62;
 /** Cosy "catch": a missed drop still lands at least this much of the block. */
 export const MIN_CAUGHT_OVERLAP = 0.2;
 /** Bad drops in a row before a miss is allowed to topple a floor. */
 export const TOPPLE_AFTER_SLOPPY = 2;
+
+/** Ceiling on the platform bonus — a wide floor helps, it never removes the
+ *  skill check (the perfect window can at most roughly double). */
+export const MAX_SUPPORT_BAND_BONUS = 0.12;
+/** Word length at/below which the floor below offers no help. */
+const SUPPORT_FREE_LEN = 3;
+/** Perfect-window widening per letter of the supporting floor. */
+const SUPPORT_BONUS_PER_LETTER = 0.02;
+
+/**
+ * How much the floor BELOW widens the perfect window, by its word length.
+ *
+ * A word is one horizontal floor whose width scales with its length
+ * (`towerFloor.ts`), so a long word is literally a bigger landing platform.
+ * This is the scoring half of that: build long words and the next drop is
+ * genuinely easier to nail. It gives the word game and the stacking game a
+ * shared currency — vocabulary buys stability — instead of two mini-games
+ * bolted together, and it is the Tower Bloxx loop (good placement makes the
+ * next placement easier) expressed in the letters the player actually chose.
+ */
+export function supportBandBonus(supportWordLen: number): number {
+  const over = Math.max(0, Math.floor(supportWordLen) - SUPPORT_FREE_LEN);
+  return Math.min(MAX_SUPPORT_BAND_BONUS, over * SUPPORT_BONUS_PER_LETTER);
+}
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
@@ -48,10 +76,13 @@ const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
  */
 export function alignmentBand(offset: number, perfectBandBonus = 0): PlacementQuality {
   const e = clamp01(offset);
-  // `perfectBandBonus` (the Wide Footing upgrade) widens ONLY the perfect window,
-  // so buying it makes nailing the green sweet-spot reliably easier — never the
-  // good/sloppy edges, so a clear miss is still a miss.
-  if (e <= PERFECT_MAX + Math.max(0, perfectBandBonus)) return 'perfect';
+  // `perfectBandBonus` widens ONLY the perfect window — never the good/sloppy
+  // edges, so a clear miss is still a miss. Two sources stack into it (max-level
+  // Wide Footing at +0.12 and a long supporting floor at +0.12), so it is capped
+  // HERE rather than at the call sites: unclamped, 0.18 + 0.24 leaves a 0.03-wide
+  // `good` band, i.e. every non-sloppy drop reads `perfect` and the celebration
+  // has nothing left to escalate into.
+  if (e <= Math.min(PERFECT_MAX_CEILING, PERFECT_MAX + Math.max(0, perfectBandBonus))) return 'perfect';
   if (e <= GOOD_MAX) return 'good';
   if (e <= SLOPPY_MAX) return 'sloppy';
   return 'miss';

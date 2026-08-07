@@ -229,7 +229,13 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   // the girder height so the load hangs high under the jib and lands EXACTLY on
   // the shadow (craneGeometry owns the arithmetic).
   const beamLen = craneBeamBricks(word).chars.length;
-  const beamHPx = beamLen * craneBeamTilePx(beamLen);
+  // The girder is now ONE ROW of bricks (the floor it becomes), so its height is
+  // a single brick and its width grows with the word. Height feeds the hang
+  // geometry — a one-brick-tall load leaves real air under the hook to fall
+  // through, where the old vertical column ate most of the drop.
+  const beamTileSize = craneBeamTilePx(beamLen);
+  const beamHPx = beamLen > 0 ? beamTileSize : 0;
+  const beamWPx = beamLen > 0 ? beamLen * beamTileSize + (beamLen - 1) * 3 : 0;
   const cableLen = craneCableLenPx(beamHPx);
   const fallPx = craneFallPx(beamHPx);
   const armPx = craneArmPx(beamHPx);
@@ -588,17 +594,17 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                 }}
                 aria-hidden
               />
-              {/* Held WORD BEAM — bricks stacked base-first (flex-col-reverse:
-                  word[0] at the bottom, exactly how it settles into the tower at pos 0).
+              {/* Held WORD GIRDER — ONE ROW in reading order, i.e. exactly the
+                  floor it becomes when it lands (see lib/wordTower/towerFloor.ts).
                   The bricks wear the FINAL committed material colour, so the girder does
                   NOT change colour when it lands. The "stop here" skill cue lives on the
                   glow ring + the reticle/shadow below, not on the face. */}
-              <div className="relative mx-auto" style={{ width: `${beamTilePx}px` }}>
+              <div className="relative mx-auto" style={{ width: `${beamWPx}px` }}>
                 <div
                   ref={beamElRef}
                   data-testid="crane-block"
                   className={cn(
-                    'flex flex-col-reverse items-stretch justify-center gap-px rounded-none',
+                    'flex flex-row items-stretch justify-center gap-[3px] rounded-none',
                     !reducedMotion && !falling && 'animate-neo-pop',
                     celebrating && release?.glow && 'crane-girder-perfect',
                     // Perfect-release cue: a lime glow ring (NOT a face recolour) so
@@ -606,7 +612,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                     onSweetSpot && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                   )}
                   style={{
-                    width: `${beamTilePx}px`,
+                    width: `${beamWPx}px`,
                     height: `${beamHPx}px`,
                     // Squash on touchdown compresses the girder onto the tower.
                     transformOrigin: 'bottom center',

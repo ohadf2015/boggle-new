@@ -7,7 +7,8 @@ import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS, TOWER_EMBERS, TOWER_DUST, AIR_STREAKS, RUBBLE_BURST } from '@/lib/gameEngine/presets/particles';
 import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
-import { buildTowerColumn, cellAltitudes, wordColor } from '@/lib/wordTower/towerColumn';
+import { wordColor } from '@/lib/wordTower/towerColumn';
+import { floorCourse, nextFloorX, GROUND_PAD_TILES } from '@/lib/wordTower/towerFloor';
 import { gradeBlockColor, blockSurface, ZONE_MATERIAL, type BlockSurface, type ZoneMaterialPalette } from '@/lib/wordTower/blockGrade';
 import { surpriseBlockColor } from '@/lib/wordTower/surpriseBlockStyle';
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
@@ -34,6 +35,7 @@ import { WordTowerParallaxProps } from './WordTowerParallaxProps';
 import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
+import { shouldShowMiniTower } from '@/lib/wordTower/miniTower';
 import { WordTowerGroundPlane } from './WordTowerGroundPlane';
 import { WordTowerAmbient } from './WordTowerAmbient';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
@@ -65,8 +67,6 @@ interface SceneProps {
   reducedMotion?: boolean;
   /** Height (px) of the bottom control deck — the tower grounds just above it. */
   bottomInsetPx?: number;
-  /** Anchor length (1 or 2) — how many leading pending chars are the connector. */
-  anchorLen?: number;
   /** Active tower-skin material palette (six zone colours). Defaults to classic. */
   palette?: ZoneMaterialPalette;
   /** Personal best (m) — drawn as a tick on the minimap. */
@@ -129,12 +129,6 @@ interface PanState {
 /** Fraction of the user's pan applied to the background (parallax — bg slower). */
 const BG_PAN_DEPTH = 0.4;
 
-/** Max pending-preview ghost bricks drawn at the crown while spelling. Founder
- *  ask (2026-06-20): "the tower should always display max 2 top letter blocks —
- *  here you can see around 5." Capping the live preview keeps the tower's crown
- *  clean; the full word still reads in the wheel hub + on the carried girder. */
-const MAX_PENDING_PREVIEW = 2;
-
 /** How far the user must scroll down (px) before the back-to-top button shows. */
 const BACK_TO_TOP_REVEAL_PX = 90;
 
@@ -159,16 +153,33 @@ function capParticles(requested: number, budgetMax: number): number {
   return Math.min(requested, budgetMax);
 }
 
-/** One live row in the unified (committed ++ pending) stack. */
+/** One live tile in the unified (committed ++ pending) stack of FLOORS. */
 interface LiveCell {
   key: string;
-  pos: number; // position from the bottom — stable registry key
+  /** Floor index from the bottom — the tile's row. */
+  pos: number;
+  /** Tile-centre x relative to the canvas centre: the floor's drop offset plus
+   *  the tile's slot within its floor. */
+  x: number;
+  /** Tile side length — long words shrink to stay on screen. */
+  size: number;
   char: string | null;
   color: number;
   /** Zone decoration for this tile — by the biome at its OWN altitude. */
   surface: BlockSurface;
   pending: boolean;
   shared: boolean;
+}
+
+/** How far the stack may wander off-centre before the drift is clamped, as a
+ *  fraction of canvas width. A wonky tower is the point; a tower that walks out
+ *  of frame is a bug. */
+const MAX_TOWER_DRIFT_FRAC = 0.16;
+
+/** Floor index out of a `f{floor}c{char}` registry key (−1 if it isn't one). */
+function floorOfKey(key: string): number {
+  const n = Number(key.slice(1, key.indexOf('c')));
+  return Number.isFinite(n) ? n : -1;
 }
 
 /** Ease the tower container back to the build line. Bails if the user grabs it
@@ -194,7 +205,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, committed bricks tumble. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', wreckDoneKey = 0, panState, heightM }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', wreckDoneKey = 0, panState, heightM }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const perf = useDevicePerformance();
   const particleBudget = useParticleBudget();
@@ -298,9 +309,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const groundScreenY = H - bottomInsetPx;
     groundYRef.current = groundScreenY; // sway/lean pivot rides the deck line
 
-    // Build the unified bottom→top stack: committed letters/bricks + pending ghosts.
-    const committed = buildTowerColumn(floors);
-    const C = committed.length;
+    // Build the unified bottom→top stack of FLOORS. One word = ONE horizontal
+    // course of tiles, laid at the offset the crane actually dropped it at, so
+    // the silhouette is a record of the run (Tower Bloxx). Replaces the old
+    // vertical one-letter-per-row column, which existed to draw the retired
+    // Shiritori chain.
+    const C = floors.length;
     // Grounded camera: base stands on the deck, stack grows up, camera pans once
     // the committed tower (NOT the pending preview) overflows the window.
     const { size, half, rowH, centerY, baseCenter, shift } = towerRowLayout({ pinCount: C, H, bottomInsetPx });
@@ -312,40 +326,76 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const panMin = towerPanMin(centerY(0), H, bottomInsetPx, half);
     panState.current.panMin = panMin;
     panState.current.shift = shift;
-    // Grade every committed tile by the biome at ITS OWN altitude (the tower
-    // spans city→space at once): the base reads bright-and-built, the top dim-
-    // and-neon, with the zone shifting continuously as you scroll the column.
-    const alts = cellAltitudes(floors);
-    const pendingColor = wordColor(floors.length);
-    const topSurface = blockSurface(biomeId);
-    // Skip the anchor (pendingWord[0]) when it's already the committed top.
-    // Cap the live ghost preview to the first MAX_PENDING_PREVIEW bricks so a long
-    // word doesn't grow a tall column of blocks above the crown (the full word is
-    // shown in the wheel hub + carried on the crane girder). Stable positions →
-    // the diff registry keeps each preview brick's char fixed as the word grows.
-    const pchars = (C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(anchorLen))
-      .slice(0, MAX_PENDING_PREVIEW);
+    // Lay every floor as a horizontal course and chain them: each floor sits at
+    // its own drop offset RELATIVE to the floor below, so errors accumulate into
+    // a genuinely wonky tower and a long word is a wide, forgiving platform for
+    // the next drop.
+    const dir: 'ltr' | 'rtl' = locale === 'he' ? 'rtl' : 'ltr';
+    const maxDrift = W * MAX_TOWER_DRIFT_FRAC;
+    const courses = floors.map((f) => floorCourse(Array.from(f.word ?? '').length, size, W, dir));
+    const floorXs: number[] = [];
+    let supportX = 0;
+    let supportW = GROUND_PAD_TILES * size;
+    floors.forEach((f, i) => {
+      const x = nextFloorX(supportX, f.offset ?? 0, courses[i].width || size, supportW, maxDrift);
+      floorXs.push(x);
+      supportX = x;
+      supportW = courses[i].width || supportW;
+    });
+    // Grade every floor by the biome at ITS OWN altitude (the tower spans
+    // city→space at once): the base reads bright-and-built, the top dim-and-neon.
+    let altAcc = 0;
+    const floorAlts = floors.map((f) => {
+      const mid = altAcc + (f.meters ?? 0) / 2;
+      altAcc += f.meters ?? 0;
+      return mid;
+    });
 
-    const live: LiveCell[] = committed.map((cell, i) => {
-      const zone = biomeForHeight(alts[i] ?? 0);
+    const live: LiveCell[] = [];
+    floors.forEach((f, i) => {
+      const zone = biomeForHeight(floorAlts[i] ?? 0);
       // A surprise floor keeps its bold signature colour UNgraded, so a cool
       // moment stands out as a bright landmark against the biome-graded tower.
-      const surprise = cell.kind === 'letter' ? cell.surprise : undefined;
-      const sigColor = surpriseBlockColor(surprise);
-      return {
-        key: `s${i}`,
-        pos: i,
-        char: cell.kind === 'letter' ? cell.char : null,
-        color: sigColor ?? gradeBlockColor(cell.color, zone, palette),
-        surface: blockSurface(zone),
-        pending: false,
-        shared: cell.kind === 'letter' ? cell.shared : false,
-      };
+      const sigColor = surpriseBlockColor(f.surprise);
+      const color = sigColor ?? gradeBlockColor(wordColor(i), zone, palette);
+      const surface = blockSurface(zone);
+      const course = courses[i];
+      Array.from(f.word ?? '').forEach((ch, j) => {
+        live.push({
+          key: `f${i}c${j}`,
+          pos: i,
+          x: floorXs[i] + (course.xs[j] ?? 0),
+          size: course.size || size,
+          char: ch,
+          color,
+          surface,
+          pending: false,
+          shared: false,
+        });
+      });
     });
-    // The very first letter at game start is the chain seed (the foundation),
-    // not a preview — render it solid so it reads as "start here", not a ghost.
-    // Pending tiles grow at the current top → grade them by the live top biome.
-    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: gradeBlockColor(pendingColor, biomeId, palette), surface: topSurface, pending: !(C === 0 && k === 0), shared: false }));
+    // The word being built previews as a GHOST floor at the crown, centred on the
+    // floor it will land on. It is ONE row now, so the whole word can show — the
+    // old 2-brick cap existed only to stop a long word growing a tall spire.
+    const pchars = Array.from(pendingWord);
+    if (pchars.length > 0) {
+      const ghost = floorCourse(pchars.length, size, W, dir);
+      const ghostColor = gradeBlockColor(wordColor(C), biomeId, palette);
+      const ghostSurface = blockSurface(biomeId);
+      pchars.forEach((ch, j) => {
+        live.push({
+          key: `f${C}c${j}`,
+          pos: C,
+          x: supportX + (ghost.xs[j] ?? 0),
+          size: ghost.size,
+          char: ch,
+          color: ghostColor,
+          surface: ghostSurface,
+          pending: true,
+          shared: false,
+        });
+      });
+    }
 
     const total = live.length;
     const maxPos = total - 1;
@@ -383,10 +433,13 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // Add newcomers / update survivors — survivors keep their FIXED local y.
     for (const l of live) {
       const y = localY(l.pos);
+      // Resting x = canvas centre + the floor's drop offset + the tile's slot.
+      const tx = centerX + l.x;
       const existing = registry.current.get(l.key);
       if (!existing) {
-        const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos, l.surface, locale);
-        tile.x = centerX;
+        const tile = makeTile(l.char, l.size, l.color, l.pending, l.shared, l.pos, l.surface, locale);
+        tile.x = tx;
+        tile.baseX = tx;
         tile.zIndex = l.pos;
         tilt.addChild(tile);
         registry.current.set(l.key, tile);
@@ -401,22 +454,25 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           const fx = letterPlacementFx(depth);
           dropIn(tile, y, 0, () => {
             if (!enableComplex) return;
-            impactRing(tilt, centerX, y + half, half, l.color, fx.ringScale * 0.6);
-            if ((fx.dustPuff ?? 0) > 0) engine.particles.burst(TOWER_DUST, centerX, y + half, capParticles(fx.dustPuff ?? 0, particleBudget.max));
-            engine.particles.burst(COMBO_FLASH, centerX, y + half, capParticles(Math.round(fx.particles * 0.6), particleBudget.max));
+            impactRing(tilt, tx, y + half, half, l.color, fx.ringScale * 0.6);
+            if ((fx.dustPuff ?? 0) > 0) engine.particles.burst(TOWER_DUST, tx, y + half, capParticles(fx.dustPuff ?? 0, particleBudget.max));
+            engine.particles.burst(COMBO_FLASH, tx, y + half, capParticles(Math.round(fx.particles * 0.6), particleBudget.max));
           });
         }
       } else {
         // Fixed local y → reposition ONLY on a real layout change (resize); never
         // for the climb — that is the container's job, keeping the stack rigid.
-        if (Math.abs(existing.y - y) > 0.5) { placeInstant(existing, y); existing.x = centerX; }
+        if (Math.abs(existing.y - y) > 0.5) { placeInstant(existing, y); }
+        // A committed floor's x is fixed by its drop offset; keep the sprite (and
+        // the wind tick's origin) in sync when the layout or the offset changes.
+        if (Math.abs((existing.baseX ?? existing.x) - tx) > 0.5) { existing.x = tx; existing.baseX = tx; }
         if (existing.color !== l.color || existing.pending !== l.pending) {
           const lockingIn = existing.pending && !l.pending;
           if (lockingIn && !reducedMotion) {
             // Paint solid at once (the ghost was only a preview), then swivel the
             // whole word-run in as a group below — no per-brick recolor fade.
             paintTile(existing, l.color, l.pending, l.shared);
-            committing.push({ tile: existing, restX: centerX, restY: y, color: l.color, pos: l.pos });
+            committing.push({ tile: existing, restX: tx, restY: y, color: l.color, pos: l.pos });
           } else if (reducedMotion) {
             paintTile(existing, l.color, l.pending, l.shared);
           } else {
@@ -427,18 +483,17 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       }
     }
 
-    // Swivel the committed word in as ONE rigid piece, hinged at the base joint.
+    // Set the committed FLOOR down as ONE rigid slab, hinged under its own
+    // centre — the crane lowering a girder into place. All its tiles share a row,
+    // so the hinge is the floor's own bottom edge, not a run of stacked bricks.
     if (committing.length > 0 && !reducedMotion) {
       const restYs = committing.map((b) => b.restY);
-      const baseRestY = Math.max(...restYs); // bottom-most new brick (largest y)
-      const topRestY = Math.min(...restYs);
-      const pivotX = centerX;
-      const pivotY = baseRestY + half; // the hinge: bottom edge of the run's base
-      const topDy = pivotY - topRestY; // distance pivot → top brick (for arc cap)
+      const baseRestY = Math.max(...restYs);
+      const pivotX = committing.reduce((sum, b) => sum + b.restX, 0) / committing.length;
+      const pivotY = baseRestY + half; // the hinge: the floor's bottom edge
       // Quality-linked wobble: a perfect drop snaps in tight, a sloppy one staggers.
-      const startDeg = swivelStartDeg(leanRef.current, topDy, impactQualityRef.current ?? 'good');
+      const startDeg = swivelStartDeg(leanRef.current, half, impactQualityRef.current ?? 'good');
       const durMs = swivelDurationMs(committing.length);
-      const baseColor = committing[0].color;
       // Event-driven land feedback — quality + word heft drive squash, punch,
       // rings, particles, and shake. Reduced-motion collapses to static zeros.
       const land = landFeedback(impactQualityRef.current ?? 'good', {
@@ -485,15 +540,21 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       lastCommitRef.current = performance.now(); // gate shaft-wind off until swivel ends
       commitDurRef.current = durMs;
       const basePos = Math.min(...committing.map((b) => b.pos));
-      const settledBelow: number[] = [];
-      for (const key of registry.current.keys()) {
-        const p = Number(key.slice(1));
-        if (Number.isFinite(p)) settledBelow.push(p);
+      // Index the settled tiles by FLOOR so the wave bumps whole floors, not
+      // single letters (one floor is now a row of tiles, not one brick).
+      const byFloor = new Map<number, TileSprite[]>();
+      for (const [key, tile] of registry.current) {
+        const p = floorOfKey(key);
+        if (p < 0 || tile.pending) continue;
+        const bucket = byFloor.get(p);
+        if (bucket) bucket.push(tile); else byFloor.set(p, [tile]);
       }
-      for (const hit of resonanceSchedule(basePos, settledBelow)) {
-        const tile = registry.current.get(`s${hit.pos}`);
-        if (!tile) continue;
-        window.setTimeout(() => { if (!tile.destroyed) bumpScale(tile, 0.07); }, hit.delayMs);
+      for (const hit of resonanceSchedule(basePos, [...byFloor.keys()])) {
+        const tiles = byFloor.get(hit.pos);
+        if (!tiles) continue;
+        window.setTimeout(() => {
+          for (const tile of tiles) if (!tile.destroyed) bumpScale(tile, 0.07);
+        }, hit.delayMs);
       }
     }
 
@@ -525,7 +586,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       ground.removeChildren();
       if (C > 0 && enableGlow) {
         const groundLocalY = groundScreenY - c.y;
-        drawGroundShadow(ground, centerX, groundLocalY, size, C, palette[biomeForHeight(alts[0] ?? 0)] ?? palette.city);
+        // The shadow tracks the BASE floor: its own x and its own width, so a
+        // tower that drifted sideways casts its shadow where it actually stands.
+        drawGroundShadow(ground, centerX + (floorXs[0] ?? 0), groundLocalY, (courses[0]?.width || size) * 0.5, C, palette[biomeForHeight(floorAlts[0] ?? 0)] ?? palette.city);
       }
     }
 
@@ -537,14 +600,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       foundationRef.current = null;
     }
     if (tilt && C > 0) {
-      const foundationColor = palette[biomeForHeight(alts[0] ?? 0)] ?? palette.city;
-      foundationRef.current = drawTowerFoundation(tilt, centerX, localY(0) + half, size, foundationColor);
+      const foundationColor = palette[biomeForHeight(floorAlts[0] ?? 0)] ?? palette.city;
+      // The plinth sits under the BASE FLOOR — its x and its width, so it reads
+      // as ground the tower actually stands on, not a stub under the centre.
+      foundationRef.current = drawTowerFoundation(tilt, centerX + (floorXs[0] ?? 0), localY(0) + half, courses[0]?.width || size, foundationColor);
     }
 
     firstRender.current = false;
     prevMaxPos.current = maxPos;
     topPosRef.current = maxPos; // shaft-wind tick reads this
-  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId, palette, locale, enableComplex, enableGlow, particleBudget, heightM]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, panState, biomeId, palette, locale, enableComplex, enableGlow, particleBudget, heightM]);
 
   // A rejected WORD is an INPUT mistake, not tower damage — so the error feel
   // lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on
@@ -674,9 +739,11 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         const windMul = windMultRef.current;
         for (const [key, tile] of registry.current) {
           if (tile.destroyed || tile.pending) continue;
-          const p = Number(key.slice(1));
-          if (!Number.isFinite(p)) continue;
-          tile.x = cx + shaftWindX(p, top, now, inst) * windMul;
+          const p = floorOfKey(key);
+          if (p < 0) continue;
+          // Sway FROM the tile's resting slot, not from the canvas centre —
+          // otherwise the wind would straighten every wonky floor each frame.
+          tile.x = (tile.baseX ?? cx) + shaftWindX(p, top, now, inst) * windMul;
         }
       }
 
@@ -777,8 +844,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, capParticles(land.particles, budget));
       engine.shake.shake({ intensity: land.shakePx, duration: 0.34, decay: 'exponential' });
     } else if (q === 'good') {
-      engine.flash.flash({ color: land.flashColor, duration: 0.22, intensity: land.flashIntensity * 0.7 });
-      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, capParticles(land.particles, budget));
+      // A good drop is the BASELINE — it gets the landing thud (rings, dust and
+      // a quality-scaled punch, fired from the swivel above) and nothing more.
+      // It used to throw a screen flash and a confetti burst too, which meant an
+      // ordinary word looked almost exactly like a perfect one and the skill
+      // shot had nothing left to escalate into. Juice only reads as juice when
+      // the ordinary case is quieter than the great one.
     } else if (q === 'sloppy') {
       engine.flash.flash({ color: land.flashColor, duration: 0.22, intensity: land.flashIntensity });
       engine.particles.burst(COMBO_FLASH, x, y, capParticles(land.particles, budget));
@@ -789,12 +860,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       if (land.debris > 0) engine.particles.burst(RUBBLE_BURST, x, H * 0.5, capParticles(land.debris, budget));
       engine.shake.shake({ intensity: land.shakePx, duration: 0.26, decay: 'exponential' });
     }
-    // Word-length tier flourish on top of the quality cue (longer build = more).
+    // Word-length flourish, reserved for the genuinely long build. `tall` and
+    // `highRise` start at ordinary word lengths, so confetti on those fired on
+    // most drops and spent the celebration budget on the average case.
     if (lastResult.tier === 'skyscraper') {
       engine.particles.burst(GOLD_STARS, x, y, capParticles(30, budget));
       engine.shake.shake({ intensity: 9, duration: 0.34, decay: 'exponential' });
-    } else if (lastResult.tier === 'highRise' || lastResult.tier === 'tall') {
-      engine.particles.burst(CONFETTI_BURST, x, y, capParticles(20, budget));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultKey]);
@@ -1061,14 +1132,16 @@ export function WordTowerScene(props: SceneProps) {
       />
       {/* Pocket mini-tower: zone bands + a marker at the current height. Tap to
           jump back to the build line. */}
-      <WordTowerMinimap
-        heightM={props.heightM}
-        viewM={viewAlt}
-        personalBestM={props.personalBestM ?? 0}
-        rivals={props.rivals}
-        onScrollTop={scrollToTop}
-        t={props.t ?? ((k) => k)}
-      />
+      {shouldShowMiniTower(props.heightM, props.personalBestM ?? 0) && (
+        <WordTowerMinimap
+          heightM={props.heightM}
+          viewM={viewAlt}
+          personalBestM={props.personalBestM ?? 0}
+          rivals={props.rivals}
+          onScrollTop={scrollToTop}
+          t={props.t ?? ((k) => k)}
+        />
+      )}
       {/* Back-to-top button — only while scrolled down past the build line. */}
       {pannedDown && (
         <button

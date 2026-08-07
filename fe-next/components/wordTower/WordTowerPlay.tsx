@@ -59,7 +59,7 @@ import { WordTowerActionMenu } from './WordTowerActionMenu';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, formatHeightGain, type DropVerdict } from '@/lib/wordTower/dropVerdict';
-import type { PlacementOutcome, PlacementQuality } from '@/lib/wordTower/cranePlacement';
+import { supportBandBonus, type PlacementOutcome, type PlacementQuality } from '@/lib/wordTower/cranePlacement';
 import { playChromeFrame, DEFAULT_TOP_CHROME_PX } from '@/lib/wordTower/playChromeFrame';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
@@ -897,6 +897,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       });
   }, [buildPayload, daily]);
   const sessionRestoredRef = useRef(false);
+  // Hoisted out of the dep array: the exhaustive-deps rule cannot verify a
+  // member expression (`tower.restore`) and demanded the whole `tower` object,
+  // which would re-run this restore effect on every state change.
+  const restoreTower = tower.restore;
   useEffect(() => {
     if (sessionRestoredRef.current) return;
     if (typeof window === 'undefined') return;
@@ -918,8 +922,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     // an authenticated player whose server progress is ahead).
     if (restored.floors.length === 0 && restored.heightM === 0) return;
     if (restored.floors.length < initialGame.floors.length || restored.heightM < initialGame.heightM) return;
-    tower.restore(restored);
-  }, [daily, dictionary, initialGame, language, tower.restore]);
+    restoreTower(restored);
+  }, [daily, dictionary, initialGame, language, restoreTower]);
 
   // Save cadence: every 5 floors + on biome crossing (rare, high-signal).
   const floorsCount = game.floors.length;
@@ -1076,7 +1080,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         biomeId={biomeId}
         heightM={game.heightM}
         pendingWord=""
-        anchorLen={game.anchorLetter.length}
         resultKey={tower.state.resultKey}
         errorKey={tower.state.errorKey}
         lastResult={tower.state.lastResult}
@@ -1119,7 +1122,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           chrome. One layout owner means
           they can never overlap each other — or the centred banners — at
           hand-tuned absolute offsets again (the 390px pile-up, 2026-07-02). */}
-      <div className="pointer-events-none absolute start-2 top-36 z-20 flex max-w-[45%] flex-col items-start gap-1" dir={dir}>
+      {/* Parked just ABOVE the build line, on the start side. At `top-36` the
+          rail sat inside the crane's chrome and drew over the mast; hung off the
+          deck instead, it drew over the tower's own base floor. The band just
+          above the build line is the one strip that stays clear at every tower
+          height — the crown pins at the build line, so everything below it is
+          tower and everything above is sky (2026-08-07). */}
+      <div
+        className="pointer-events-none absolute start-2 top-[38%] z-20 flex max-w-[45%] flex-col items-start gap-1"
+        dir={dir}
+      >
         {/* (The decorative "biome spine" bar that used to run down this rail is
             gone. It carried no information the tower, sky and block colours were
             not already showing, and it drew a permanent stripe down the side of
@@ -1221,7 +1233,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           reducedMotion={reducedMotion}
           periodMs={sweepMs}
           instability={instability}
-          perfectBandBonus={upgradeEffects.perfectBandBonus}
+          // Upgrade widening + the PLATFORM the last word left behind: a long
+          // word is a wide floor, and a wide floor is genuinely easier to land
+          // on. This is what ties the word game to the stacking game.
+          perfectBandBonus={upgradeEffects.perfectBandBonus + supportBandBonus(game.floors[game.floors.length - 1]?.len ?? 0)}
           blockColorHex={blockColorHex}
           blockTextHex={blockTextHex}
           craneTopPx={chromeFrame.craneTopPx}

@@ -36,7 +36,7 @@ describe('WordTowerNoticeColumn', () => {
     expect(container.querySelectorAll('[role="status"]').length).toBe(0);
   });
 
-  it('stacks simultaneous beats in ONE column, verdict first', () => {
+  it('shows at most TWO beats — the rest queue behind them', () => {
     const { container } = render(
       <WordTowerNoticeColumn
         {...baseProps}
@@ -45,20 +45,21 @@ describe('WordTowerNoticeColumn', () => {
         reward={{ coins: 32, tier: 'common', source: 'zone', key: 2 }}
       />,
     );
-    // All three beats share one flex-column container — the anti-pile-up contract.
+    // Three cards stacked over the play field was the pile-up; two is the cap.
+    // Each beat auto-dismisses, so the losers take a slot in turn.
     const column = container.querySelector('[data-testid="wt-notice-column"]') as HTMLElement;
     expect(column.className).toContain('flex-col');
     const beats = column.querySelectorAll(':scope > [role="status"]');
-    expect(beats.length).toBe(3);
-    // Verdict leads the stack.
+    expect(beats.length).toBe(2);
+    // The verdict leads — it answers "did I nail it?" while the drop is landing.
     expect(beats[0].textContent).toContain('wordTower.verdict.perfect');
     expect(beats[0].textContent).toContain('+4m');
-    // Zone banner and coin reveal follow inside the SAME column.
+    // Zone (priority 50) takes the second slot; the coin reveal (55) waits.
     expect(column.textContent).toContain('SKY');
-    expect(column.textContent).toContain('+32');
+    expect(column.textContent).not.toContain('+32');
   });
 
-  it('caps simultaneous beats at MAX 3, dropping lower-priority ones', () => {
+  it('drops every lower-priority beat, however many fire at once', () => {
     const { container } = render(
       <WordTowerNoticeColumn
         {...baseProps}
@@ -70,11 +71,11 @@ describe('WordTowerNoticeColumn', () => {
     );
     const column = container.querySelector('[data-testid="wt-notice-column"]') as HTMLElement;
     const beats = column.querySelectorAll(':scope > [role="status"]');
-    expect(beats.length).toBe(3);
-    // Verdict, zone and reward win; the lower-priority sabotage earn is hidden.
+    expect(beats.length).toBe(2);
+    // Verdict + zone win the two slots; reward and the sabotage earn wait.
     expect(column.textContent).toContain('wordTower.verdict.perfect');
     expect(column.textContent).toContain('SKY');
-    expect(column.textContent).toContain('+32');
+    expect(column.textContent).not.toContain('+32');
     expect(column.textContent).not.toContain('wordTower.sabotage.earned');
   });
 

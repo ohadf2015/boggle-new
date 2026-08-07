@@ -15,6 +15,17 @@ export function miniTowerScaleMax(heightM: number, personalBestM = 0): number {
   return Math.max(120, peak * 1.15);
 }
 
+/** Climb height (m) at which the minimap starts earning its screen space.
+ *  Below this the whole rail is one flat `city` band with the marker parked at
+ *  the bottom — a grey stripe down the side of the play field that says nothing
+ *  the altitude readout doesn't already say, and there is nothing to pan to. */
+export const MINI_TOWER_REVEAL_M = 30;
+
+/** Whether the minimap is worth drawing yet. */
+export function shouldShowMiniTower(heightM: number, personalBestM = 0): boolean {
+  return Math.max(heightM, personalBestM) >= MINI_TOWER_REVEAL_M;
+}
+
 /** Fraction (0..1) of the scale an altitude sits at (0 = base, 1 = top). */
 export function altToFraction(m: number, scaleMax: number): number {
   if (scaleMax <= 0) return 0;

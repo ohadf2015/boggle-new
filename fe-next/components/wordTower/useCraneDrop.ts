@@ -37,7 +37,7 @@ import { NO_MODIFIERS, reducedTopple, type PerkModifiers } from '@/lib/wordTower
  * topple lands. Lean resets when a topple recovers the tower.
  */
 export function useCraneDrop(
-  commit: (multiplier: number) => void,
+  commit: (multiplier: number, signedOffset: number) => void,
   hazard: (floors: number, kind: HazardKind, ids: string[]) => void,
   mods: PerkModifiers = NO_MODIFIERS,
   /** Word-aware height × for the held word (daily mutator). Default 1 = no twist. */
@@ -64,6 +64,10 @@ export function useCraneDrop(
   const sloppyRef = useRef(0);
   const perfectRef = useRef(0);
   const leanHistoryRef = useRef<number[]>([]);
+  // The signed error of the drop currently landing. The crane reports it via
+  // `pushSignedOffset` immediately before `onDrop`, and the commit stores it on
+  // the floor so the scene can lay that floor at the offset it truly landed at.
+  const lastSignedRef = useRef(0);
   // Lean at the moment of the drop — snapshotted before the new offset lands, so
   // it sizes the celebration by how wild the rescue looked.
   const preDropLeanRef = useRef(0);
@@ -76,6 +80,7 @@ export function useCraneDrop(
 
   /** Record the signed (−1..+1) drop offset for the rolling lean window. */
   const pushSignedOffset = useCallback((signed: number) => {
+    lastSignedRef.current = Math.max(-1, Math.min(1, signed));
     preDropLeanRef.current = leanFromOffsets(leanHistoryRef.current);
     leanHistoryRef.current = pushLeanOffset(leanHistoryRef.current, signed);
     setStreaks((s) => ({ ...s, leanDeg: leanFromOffsets(leanHistoryRef.current) }));
@@ -97,7 +102,7 @@ export function useCraneDrop(
           ? o.heightMultiplier * (1 + perfectStreakBonus(perfectRef.current) + m.perfectBonus)
           : o.heightMultiplier;
       // The day's word-aware twist (golden letter / vowels / length) rides on top.
-      commit(base * m.heightMult * wordMultRef.current());
+      commit(base * m.heightMult * wordMultRef.current(), lastSignedRef.current);
 
       // A topple lands from the usual miss-after-grace OR a fumbled clutch — but
       // `reinforced` can hold it back, and `cushion`/`featherfall` make the crane

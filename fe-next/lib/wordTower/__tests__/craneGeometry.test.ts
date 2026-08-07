@@ -16,11 +16,10 @@ import {
   craneShadowOffsetFromOuterTop,
 } from '../craneGeometry';
 
-/** Beam pixel heights for realistic word lengths (3..10 letters). */
-const beamHeights = Array.from({ length: 8 }, (_, i) => {
-  const len = i + 3;
-  return craneBeamTilePx(len) * len;
-});
+/** Beam pixel heights for realistic word lengths (3..10 letters). The girder is
+ *  ONE ROW of bricks (the floor it becomes), so its height is a single brick —
+ *  it used to be a vertical column, i.e. `tile * len`. */
+const beamHeights = Array.from({ length: 8 }, (_, i) => craneBeamTilePx(i + 3));
 
 describe('craneGeometry', () => {
   it('lands the girder exactly on the shadow for every word length', () => {

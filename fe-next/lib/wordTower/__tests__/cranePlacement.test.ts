@@ -9,7 +9,12 @@ import {
   PERFECT_MAX,
   GOOD_MAX,
   SLOPPY_MAX,
+  supportBandBonus,
+  MAX_SUPPORT_BAND_BONUS,
+  PERFECT_MAX_CEILING,
 } from '../cranePlacement';
+// The Wide Footing upgrade's ceiling, from the upgrade effects clamp.
+const MAX_UPGRADE_BAND_BONUS = 0.12;
 
 describe('perfectBandBonus — Wide Footing widens ONLY the green sweet-spot', () => {
   it('an offset just past the base perfect edge becomes perfect with the bonus', () => {
@@ -159,5 +164,41 @@ describe('craneOffsetAt — sweeping crane position', () => {
   it('reaches the extremes a quarter and three-quarters through the sweep', () => {
     expect(craneOffsetAt(500, 2000)).toBeCloseTo(1);
     expect(craneOffsetAt(1500, 2000)).toBeCloseTo(-1);
+  });
+});
+
+describe('supportBandBonus — a long word below is a forgiving platform', () => {
+  it('gives a short platform no help at all', () => {
+    expect(supportBandBonus(0)).toBe(0);
+    expect(supportBandBonus(3)).toBe(0);
+  });
+
+  it('widens the perfect window as the floor below gets longer', () => {
+    expect(supportBandBonus(5)).toBeGreaterThan(supportBandBonus(4));
+    expect(supportBandBonus(8)).toBeGreaterThan(supportBandBonus(5));
+  });
+
+  it('caps the help so vocabulary never removes the skill check', () => {
+    expect(supportBandBonus(40)).toBe(MAX_SUPPORT_BAND_BONUS);
+  });
+
+  it('turns a would-be `good` drop into `perfect` on a wide platform', () => {
+    const err = PERFECT_MAX + 0.05;
+    expect(alignmentBand(err, supportBandBonus(3))).toBe('good');
+    expect(alignmentBand(err, supportBandBonus(9))).toBe('perfect');
+  });
+});
+
+describe('perfect-window ceiling — `good` must survive every stacked bonus', () => {
+  it('leaves a good band even at max upgrade + max platform bonus', () => {
+    const maxStack = MAX_UPGRADE_BAND_BONUS + MAX_SUPPORT_BAND_BONUS;
+    expect(PERFECT_MAX + maxStack).toBeGreaterThan(PERFECT_MAX_CEILING); // the cap is load-bearing
+    expect(PERFECT_MAX_CEILING).toBeLessThan(GOOD_MAX);
+    // A drop just past the capped perfect edge is still `good`, not `perfect`.
+    expect(alignmentBand(PERFECT_MAX_CEILING + 0.01, maxStack)).toBe('good');
+  });
+
+  it('keeps the good band at least a quarter of the sloppy threshold wide', () => {
+    expect(GOOD_MAX - PERFECT_MAX_CEILING).toBeGreaterThanOrEqual(0.1);
   });
 });

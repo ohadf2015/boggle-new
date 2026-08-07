@@ -289,6 +289,11 @@ export interface WordTowerFloor {
    *  Deterministic (seeded upstream) + serialized, so a resumed/replayed run
    *  redraws the same special floors. Purely cosmetic — never affects height. */
   surprise?: TowerSurpriseEvent;
+  /** Signed horizontal drop error this floor landed with (−1 full-left … 0 dead
+   *  centre … +1 full-right). GEOMETRY, not score: the scene lays the floor at
+   *  this offset from the one below, so the tower silhouette is a record of the
+   *  run. Serialized, so a reload redraws the same wonky stack. */
+  offset?: number;
 }
 export interface WordTowerPlayerState {
   gameCode: string;
@@ -436,6 +441,9 @@ export function applyTowerWord(
   state: WordTowerPlayerState,
   word: string,
   placementMultiplier = 1,
+  /** Signed drop error (−1..1). Stored on the floor so the scene can lay it at
+   *  the offset it was actually dropped at (see `WordTowerFloor.offset`). */
+  dropOffset = 0,
 ): { state: WordTowerPlayerState; result: ApplyResult } {
   const { language } = state;
   const w = canon(word, language);
@@ -481,7 +489,7 @@ export function applyTowerWord(
 
   const next: WordTowerPlayerState = {
     ...state,
-    floors: [...state.floors, { word: w, len, meters, placementMultiplier, surprise: surprise.next.activeSurprise?.event }],
+    floors: [...state.floors, { word: w, len, meters, placementMultiplier, offset: Math.max(-1, Math.min(1, dropOffset)), surprise: surprise.next.activeSurprise?.event }],
     heightM,
     combo,
     // No chain: the anchor stays empty; the wheel carries over unchanged.

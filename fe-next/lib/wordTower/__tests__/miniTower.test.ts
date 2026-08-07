@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { miniTowerScaleMax, altToFraction, miniTowerZones } from '../miniTower';
+import { miniTowerScaleMax, altToFraction, miniTowerZones, shouldShowMiniTower, MINI_TOWER_REVEAL_M } from '../miniTower';
 
 describe('miniTowerScaleMax', () => {
   it('keeps a minimum scale so an early tower is not a sliver', () => {
@@ -45,5 +45,21 @@ describe('miniTowerZones', () => {
     const zones = miniTowerZones(120); // below the 150m stratosphere threshold
     expect(zones.every((z) => z.id !== 'orbit' && z.id !== 'galaxy')).toBe(true);
     expect(zones[zones.length - 1]!.toFrac).toBe(1);
+  });
+});
+
+describe('shouldShowMiniTower — the rail earns its place only once there is a climb', () => {
+  it('stays hidden on a fresh, short tower (nothing to navigate, all one grey band)', () => {
+    expect(shouldShowMiniTower(0, 0)).toBe(false);
+    expect(shouldShowMiniTower(5, 0)).toBe(false);
+  });
+
+  it('shows once the climb is taller than a screenful', () => {
+    expect(shouldShowMiniTower(MINI_TOWER_REVEAL_M, 0)).toBe(true);
+    expect(shouldShowMiniTower(400, 0)).toBe(true);
+  });
+
+  it('shows when the personal best is worth chasing even if today is short', () => {
+    expect(shouldShowMiniTower(2, 300)).toBe(true);
   });
 });

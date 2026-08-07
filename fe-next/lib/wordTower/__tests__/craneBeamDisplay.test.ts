@@ -5,6 +5,7 @@ import {
   CRANE_BEAM_MAX_BRICKS,
   CRANE_BEAM_TILE_MIN_PX,
   CRANE_BEAM_TILE_MAX_PX,
+  CRANE_BEAM_BUDGET_PX,
 } from '../craneBeamDisplay';
 
 describe('craneBeamBricks — show the whole word, badge only the rare overflow', () => {
@@ -59,14 +60,21 @@ describe('craneBeamBricks — show the whole word, badge only the rare overflow'
 });
 
 describe('craneBeamTilePx — bricks shrink so the full word fits the bay', () => {
-  it('keeps the comfy max size for short words', () => {
+  it('keeps the comfy max size while the girder still fits the width budget', () => {
     expect(craneBeamTilePx(1)).toBe(CRANE_BEAM_TILE_MAX_PX);
     expect(craneBeamTilePx(3)).toBe(CRANE_BEAM_TILE_MAX_PX);
+    expect(craneBeamTilePx(5)).toBe(CRANE_BEAM_TILE_MAX_PX);
   });
 
-  it('shrinks monotonically as the word grows longer', () => {
+  it('shrinks monotonically once the word outgrows the budget', () => {
+    expect(craneBeamTilePx(10)).toBeLessThan(craneBeamTilePx(8));
     expect(craneBeamTilePx(8)).toBeLessThan(craneBeamTilePx(5));
-    expect(craneBeamTilePx(5)).toBeLessThan(craneBeamTilePx(3));
+  });
+
+  it('never widens the girder past the budget', () => {
+    for (let n = 1; n <= CRANE_BEAM_MAX_BRICKS; n++) {
+      expect(n * craneBeamTilePx(n)).toBeLessThanOrEqual(CRANE_BEAM_BUDGET_PX + n);
+    }
   });
 
   it('never returns an illegibly small or oversized brick', () => {

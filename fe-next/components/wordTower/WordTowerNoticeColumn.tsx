@@ -30,9 +30,18 @@ const TOWER_TIER_KEY: Record<'highRise' | 'tall' | 'skyscraper', string> = {
   skyscraper: 'wordTower.celebration.skyscraper',
 };
 
-/** Hard ceiling on simultaneous notices so they never pile into an overwhelming
- *  stack (founder screenshot 2026-07-02). */
-const MAX_NOTICES = 3;
+/** Hard ceiling on simultaneous notices: TWO.
+ *
+ *  Three was a wall — the very first word of a fresh tower fired NEW DAILY BEST
+ *  + a coin reveal + an achievement at once, three stacked cards over the play
+ *  field before the player had seen their own floor land (2026-08-07).
+ *
+ *  ONE would be cleaner still, but it silently eats the beats it displaces: the
+ *  verdict holds the only slot for VERDICT_MS (750) plus its exit reveal (160),
+ *  so a TOAST_MS (950) achievement would surface for the last ~40ms of its life
+ *  and read as nothing at all. Two lets the verdict and one companion share the
+ *  moment while the rest queue behind them as their windows expire. */
+const MAX_NOTICES = 2;
 
 /** Priority order: the most screen-dominant / time-sensitive beats win when
  *  many fire at once. Verdict and alarms always lead; scenic flybys trail. */

@@ -77,6 +77,10 @@ export type TileSprite = Container & {
   variation?: TileVariation;
   /** The surface decoration kind this tile was built with — drives material feel. */
   surface?: BlockSurface;
+  /** Resting screen-x for this tile: the floor's drop offset + the tile's slot
+   *  within its floor. Per-frame effects (shaft wind) offset FROM this instead of
+   *  from the canvas centre, so a wonky tower stays wonky while it sways. */
+  baseX?: number;
 };
 
 const easeOutCubic = (k: number) => 1 - Math.pow(1 - k, 3);

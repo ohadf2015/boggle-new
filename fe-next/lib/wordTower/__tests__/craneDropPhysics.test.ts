@@ -92,7 +92,8 @@ describe('(c) the crane holds the load high', () => {
 
   it('gives every real word length a watchable fall', () => {
     // beamH for an N-letter girder, as WordTowerCrane computes it.
-    const beamHFor = (n: number) => n * craneBeamTilePx(n);
+    // One-row girder: height is a single brick, not a column of `n`.
+    const beamHFor = (n: number) => craneBeamTilePx(n);
     for (let n = 3; n <= 10; n++) {
       expect(craneFallPx(beamHFor(n))).toBeGreaterThanOrEqual(MIN_FALL_PX);
     }

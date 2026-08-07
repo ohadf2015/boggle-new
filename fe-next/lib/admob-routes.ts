@@ -25,6 +25,10 @@ const GAME_ROUTES = [
   '/hebrew-multiplayer-word-game',
   '/admin',
   '/connections',
+  // Word Tower is a full-bleed play surface: the anchored banner AND the
+  // install promo (which gates on this same list) were drawn over the crane and
+  // the landing zone mid-drop.
+  '/word-tower',
 ];
 
 // Hub landings that share a prefix with a GAME_ROUTES entry but are themselves

@@ -10,6 +10,8 @@ import { craneBeamBricks, craneBeamTilePx } from '@/lib/wordTower/craneBeamDispl
 import {
   CABLE_DRAPE_MAX_PX,
   CRANE_CHROME_H_PX,
+  CRANE_SHADOW_Y_PX,
+  MIN_FALL_PX,
   craneBeamBottomPx,
   craneCableLenPx,
   craneFallPx,
@@ -24,7 +26,8 @@ const baseProps = {
 
 const beamHFor = (word: string) => {
   const { chars } = craneBeamBricks(word);
-  return chars.length * craneBeamTilePx(chars.length);
+  // One-row girder: height is a single brick, not a column of `chars.length`.
+  return chars.length > 0 ? craneBeamTilePx(chars.length) : 0;
 };
 
 describe('WordTowerCrane adaptive hang geometry', () => {
@@ -53,11 +56,15 @@ describe('WordTowerCrane adaptive hang geometry', () => {
     }
   });
 
-  it('a longer girder never hangs lower than a short one', () => {
-    expect(craneBeamBottomPx(beamHFor('STACKING'))).toBeGreaterThanOrEqual(
-      craneBeamBottomPx(beamHFor('CAT')),
-    );
-    // ...and both still clear the landing mark with room to fall.
-    expect(craneFallPx(beamHFor('STACKING'))).toBeGreaterThan(0);
+  // The girder is ONE ROW now, so a longer word means SMALLER bricks — it hangs
+  // marginally higher, not lower (the old vertical column grew downward). What
+  // still has to hold at every length is that the load clears its landing mark
+  // with a fall the player can actually follow.
+  it('clears the landing mark with a readable fall at any word length', () => {
+    for (const word of ['CAT', 'TOWER', 'STACKING', 'EXTRAORDINARY']) {
+      const h = beamHFor(word);
+      expect(craneBeamBottomPx(h)).toBeLessThan(CRANE_SHADOW_Y_PX);
+      expect(craneFallPx(h)).toBeGreaterThanOrEqual(MIN_FALL_PX);
+    }
   });
 });
