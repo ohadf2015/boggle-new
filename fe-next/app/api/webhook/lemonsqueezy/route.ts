@@ -42,6 +42,17 @@ export async function POST(request: NextRequest) {
     const eventName = payload.meta?.event_name as string
     const userId = payload.meta?.custom_data?.user_id as string | undefined
 
+    // The store is still in TEST mode, and the checkout gate is now open — so anyone who reaches
+    // /teacher/upgrade can pay with Lemon Squeezy's test card (4242…) and this handler would happily
+    // grant them Pro for a payment that never existed. Ignore test-mode events unless we opt in
+    // (set LEMONSQUEEZY_ALLOW_TEST_WEBHOOKS=true to exercise the flow end-to-end ourselves).
+    // Signature is already verified above, so this is a policy decision, not a trust check.
+    const isTestMode = payload?.data?.attributes?.test_mode === true || payload?.meta?.test_mode === true
+    if (isTestMode && process.env.LEMONSQUEEZY_ALLOW_TEST_WEBHOOKS !== 'true') {
+      console.warn(`[LemonSqueezy] Ignoring TEST-mode event ${eventName} — no entitlement granted`, { userId })
+      return NextResponse.json({ received: true, ignored: 'test_mode' })
+    }
+
     console.log(`[LemonSqueezy] Event: ${eventName}`, { userId })
 
     switch (eventName) {
