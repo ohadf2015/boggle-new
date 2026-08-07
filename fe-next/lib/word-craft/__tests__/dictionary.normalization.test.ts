@@ -16,7 +16,7 @@ describe('loadWordCraftDictionary — Hebrew sofit normalization', () => {
   it('matches a Hebrew dictionary word regardless of the player typing sofit form', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ['מים'], // dict has regular form (no sofit)
+      text: async () => 'מים', // dict has regular form (no sofit)
     });
     const dict = await loadWordCraftDictionary('he');
     // Dictionary should accept the sofit form a player would actually spell.
@@ -28,7 +28,7 @@ describe('loadWordCraftDictionary — Hebrew sofit normalization', () => {
   it('matches a Hebrew dictionary word stored with sofit forms too', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ['ילדים'], // ends in ם (sofit) — common in inflected forms
+      text: async () => 'ילדים', // ends in ם (sofit) — common in inflected forms
     });
     const dict = await loadWordCraftDictionary('he');
     // Should hit either the literal form or the regular-only normalized form.
@@ -40,7 +40,7 @@ describe('loadWordCraftDictionary — Spanish accent normalization', () => {
   it('stores accent-stripped form alongside accented form', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ['está'],
+      text: async () => 'está',
     });
     const dict = await loadWordCraftDictionary('es');
     // Both accented and stripped uppercase forms should be present so the

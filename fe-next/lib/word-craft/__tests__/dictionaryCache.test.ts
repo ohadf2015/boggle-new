@@ -12,7 +12,7 @@ function fakeStorage(initial: Record<string, string> = {}) {
 }
 
 function okResponse(words: string[]) {
-  return { ok: true, status: 200, json: async () => words } as unknown as Response;
+  return { ok: true, status: 200, text: async () => words.join('\n') } as unknown as Response;
 }
 
 describe('loadServerWordList — offline cache', () => {

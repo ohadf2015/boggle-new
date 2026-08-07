@@ -67,12 +67,27 @@ function readCachedWordList(
 }
 
 /**
- * Fetch the server-hosted wordlist for locales without a bundled npm package
- * (HE / ES / JA, and SV fallback), with an offline-first localStorage cache:
+ * Payloads above this size are not cacheable: JSON.stringify + setItem at
+ * multi-megabyte scale blocks the main thread and then throws QuotaExceeded
+ * anyway (HE is ~5MB of text, ES ~6MB). Those locales rely on the endpoint's
+ * 24h browser / 7d CDN cache headers instead.
+ * ponytail: flat byte ceiling — swap for IndexedDB if offline play for the big
+ * locales is ever a real requirement (lib/offline/dictionaryDownload.ts already
+ * does exactly that for the downloadable-dictionary feature).
+ */
+const MAX_CACHEABLE_CHARS = 1_000_000
+
+/**
+ * Fetch the shared server-hosted wordlist, with an offline-first localStorage cache:
  *  - On a successful fetch, the word array is persisted so a later flight works.
  *  - On a non-OK status, a thrown fetch (offline), or any error, the last cached
  *    copy is returned instead of an empty Set (which would reject every word).
  * Returns [] only when offline AND nothing was ever cached.
+ *
+ * Uses /api/dictionary-words (newline-delimited, gzipped in-route, served from
+ * the process-wide shared word sets) rather than a mode-specific endpoint, so
+ * Word Craft shares one heap copy and one CDN cache entry with the offline
+ * dictionary system.
  */
 export async function loadServerWordList(
   locale: SupportedLocale,
@@ -84,13 +99,18 @@ export async function loadServerWordList(
   if (!fetchFn) return readCachedWordList(storage, locale)
 
   try {
-    const resp = await fetchFn(`/api/word-craft/wordlist?locale=${locale}`)
+    const resp = await fetchFn(`/api/dictionary-words?lang=${locale}`)
     if (!resp.ok) {
       console.warn(`[loadWordCraftDictionary] Failed to load ${locale}: ${resp.status} — using cache`)
       return readCachedWordList(storage, locale)
     }
-    const words = (await resp.json()) as string[]
-    if (storage && Array.isArray(words)) {
+    const text = await resp.text()
+    const words: string[] = []
+    for (const line of text.split('\n')) {
+      const w = line.trim()
+      if (w) words.push(w)
+    }
+    if (storage && text.length <= MAX_CACHEABLE_CHARS) {
       try {
         storage.setItem(wordCacheKey(locale), JSON.stringify(words))
       } catch {
@@ -104,34 +124,12 @@ export async function loadServerWordList(
   }
 }
 
-export async function loadWordCraftDictionary(locale: SupportedLocale): Promise<Set<string>> {
+export async function loadWordCraftDictionary(
+  locale: SupportedLocale,
+  deps: WordListDeps = {},
+): Promise<Set<string>> {
   const out = new Set<string>()
-
-  // For EN and SV, load from npm packages client-side
-  if (locale === 'en') {
-    try {
-      const { default: englishWords } = await import('an-array-of-english-words', {
-        with: { type: 'json' },
-      })
-      for (const w of englishWords as string[]) addDictKeys(out, w, locale)
-      return out
-    } catch {
-      console.warn('[loadWordCraftDictionary] Failed to load EN from npm, falling back to server')
-    }
-  }
-
-  if (locale === 'sv') {
-    try {
-      const { swedish_words } = await import('@arvidbt/swedish-words')
-      for (const w of swedish_words) addDictKeys(out, w, locale)
-      return out
-    } catch {
-      console.warn('[loadWordCraftDictionary] Failed to load SV from npm, falling back to server')
-    }
-  }
-
-  // For HE / ES / JA / SV (fallback), fetch from server — offline-first (cached).
-  const words = await loadServerWordList(locale)
+  const words = await loadServerWordList(locale, deps)
   for (const w of words) addDictKeys(out, w, locale)
   return out
 }

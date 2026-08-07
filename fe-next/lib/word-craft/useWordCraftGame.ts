@@ -439,7 +439,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const modifierSpec = useMemo(() => toScoreModifier(state.modifier), [state.modifier]);
 
   // Locale-aware dict lookup. Hebrew dict is loaded with sofit→regular
-  // normalization (see /api/word-craft/wordlist) but player tiles still carry
+  // normalization (see lib/word-craft/dictionary.ts) but player tiles still carry
   // sofit forms (ך ם ן ף ץ), so we must normalize the player's word too. Same
   // story for Spanish accents (ESTÁ vs ESTA).
   const isWordValid: DictionaryCheck = useCallback(
