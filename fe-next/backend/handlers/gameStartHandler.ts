@@ -75,6 +75,7 @@ function crosswordRoomSeed(key: string): number {
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
+import { scheduleWheelRushBots } from '../modules/wheelRushBot.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { verifyBoostToken } from '../utils/boostToken.js';
 
@@ -597,6 +598,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           `wheelRushState was discarded for ${gameCode} — getGame() returned null at init, so scoring will deadlock at 0`,
         );
       }
+      if (!getGame(gameCode)?.wheelRushState) {
+        logger.error('WHEEL_RUSH', `Game ${gameCode} wheelRushState NOT SET after initWheelRushState call`);
+      }
     }
 
     // Initialize shiritori (しりとり) word-chain state if needed. Humans only —
@@ -791,6 +795,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           puzzle: cg.wheelRushState.puzzle,
           startedAt: cg.wheelRushState.startedAt,
         });
+        // Schedule bot word submissions — wheel-rush has no round-event scheduler for bots
+        // (only classic gets scheduleRoundEvent + startRushTiles), so bots would sit at 0.
+        // Only schedule when wheelRushState exists; otherwise bots' callback exits silently
+        // and they never score.
+        scheduleWheelRushBots(io, gameCode, validTimer);
+      } else {
+        logger.error('WHEEL_RUSH', `Game ${gameCode} in wheel-rush mode but wheelRushState missing after init`);
       }
     }
 

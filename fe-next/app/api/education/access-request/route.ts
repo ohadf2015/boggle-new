@@ -68,7 +68,7 @@ export async function POST(req: Request) {
   const tpl = teacherAccessAdminNotify(payload);
   await sendEmail({ to: 'lexiclash.game@gmail.com', subject: tpl.subject, html: tpl.html });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ success: true });
 }
 
 export async function GET(request: NextRequest) {

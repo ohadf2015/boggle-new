@@ -49,7 +49,16 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   if (game.gameMode !== 'wheel-rush') { socket.emit('error', { code: 'NOT_WHEEL_RUSH' }); return; }
 
   const state = game.wheelRushState;
-  if (!state) { socket.emit('error', { code: 'WHEEL_STATE_NOT_INITIALIZED' }); return; }
+  if (!state) {
+    logger.warn('WHEEL_RUSH', `submitWheelWord from ${username} in ${gameCode} — wheelRushState is null (mode=${game.gameMode}, state=${game.gameState}, users=${Object.keys(game.users).length})`);
+    socket.emit('error', { code: 'WHEEL_STATE_NOT_INITIALIZED' });
+    return;
+  }
+  // Defensive: ensure the submitting user exists in foundWords (init may have missed a late-join/bot).
+  if (!state.foundWords[username]) {
+    logger.warn('WHEEL_RUSH', `submitWheelWord from ${username} in ${gameCode} — foundWords entry missing, initializing inline`);
+    state.foundWords[username] = [];
+  }
 
   const rawWord = (data.word || '').toUpperCase().trim();
   if (!rawWord) { socket.emit('error', { code: 'WORD_REQUIRED' }); return; }
