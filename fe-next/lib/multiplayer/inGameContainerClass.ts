@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
  */
 export function getMpInGameContainerClass(gameMode: string): string {
   return cn(
-    'flex-1 flex flex-col min-h-0 overflow-x-clip overflow-y-auto bg-neo-navy',
+    'flex-1 flex flex-col min-h-0 overflow-x-clip bg-neo-navy',
     gameMode === 'blast' ? 'p-0' : 'p-0 md:p-4',
   );
 }
