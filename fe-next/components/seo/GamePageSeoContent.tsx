@@ -148,7 +148,17 @@ export function GamePageSeoContent({
               +
             </span>
           </summary>
-          <div className="px-4 pb-6 sm:px-6 sm:pb-8">{body}</div>
+          {/* Cap the OPEN body at a fraction of the viewport and scroll it
+              internally — otherwise the full description + features + FAQ was a
+              multi-screen wall that took over the whole game screen once a player
+              tapped it open ("seo sections that hides all the screen", 2026-08-08).
+              The cap sits on the body (not the <details>): a <details> renders its
+              non-summary content in a slot that a flex/height on the element itself
+              does NOT constrain — verified in Chromium — so the bound has to live
+              here. The summary/title above stays fully visible, keeping the
+              collapse toggle one tap away. All copy remains in the DOM for
+              crawlers/AdSense. */}
+          <div className="max-h-[60dvh] overflow-y-auto px-4 pb-6 sm:px-6 sm:pb-8">{body}</div>
         </details>
       </section>
     );
