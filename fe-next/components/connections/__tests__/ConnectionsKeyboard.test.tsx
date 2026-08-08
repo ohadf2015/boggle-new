@@ -40,6 +40,23 @@ describe('ConnectionsKeyboard', () => {
     expect(backspaceKey.parentElement).toBe(z.parentElement);
   });
 
+  it('gives every Hebrew letter key the same width, including the last row', () => {
+    // Hebrew rows are 6/8/8, so the last row is already the longest and the
+    // submit/backspace keys have no column budget of their own. Sizing letters
+    // off the longest row alone let the bottom row shrink under them.
+    // NB: asserting the two keys share a flex-basis would be vacuous — they
+    // always did. The old bug was runtime flex-SHRINK, which jsdom does not
+    // compute. What actually changed is the divisor: the budget must be 11
+    // columns (8 letters + 3 for the action keys), not the bare longest row of
+    // 8. Pinning the number is what makes this test able to fail.
+    render(<ConnectionsKeyboard {...baseProps} dir="rtl" rows={getKeyboardRows('he')} canSubmit />);
+    const firstRowKey = screen.getByRole('button', { name: 'ק' });   // row 1
+    const lastRowKey = screen.getByRole('button', { name: 'ת' });    // row 3, beside the action keys
+    const expected = `calc(${(100 / 11).toFixed(4)}% - 0.375rem)`;
+    expect(firstRowKey.style.flexBasis).toBe(expected);
+    expect(lastRowKey.style.flexBasis).toBe(expected);
+  });
+
   it('calls onLetter with the tapped Hebrew letter', () => {
     const onLetter = vi.fn();
     render(<ConnectionsKeyboard {...baseProps} dir="rtl" rows={getKeyboardRows('he')} onLetter={onLetter} canSubmit />);

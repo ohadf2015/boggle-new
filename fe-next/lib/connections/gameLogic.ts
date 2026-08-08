@@ -60,12 +60,60 @@ function canonicalize(s: string): string {
   return depluralize(foldDiacritics(normalizeHebrewWord(stripPunctuation(normalizeGuess(s)))));
 }
 
+const HEBREW_RE = /[֐-׿]/;
+/** Shortest matres-stripped key we trust — see matresKey. */
+const MIN_MATRES_KEY_LEN = 3;
+
+/**
+ * Hebrew writes many words two legitimate ways — ktiv male (with the optional
+ * vav/yud mater lectionis) and ktiv haser (without): תוכנית/תכנית, שולחן/שלחן.
+ * 334 of 407 active Hebrew puzzles carry no acceptedAnswers, so the stored
+ * spelling used to be the ONLY one that scored and the other correct spelling
+ * cost the player an attempt.
+ *
+ * Two folds, cheapest first:
+ *  - doubled יי/וו collapse to single (מייד→מיד, ספרייה→ספריה)
+ *  - matresKey drops every vav/yud
+ *
+ * matresKey alone is too permissive for SHORT words, where the mater is lexical
+ * rather than optional — שיר≠שר, עיר≠ער, אור≠ארי, דין≠דן all collapse to a
+ * 2-letter key. Requiring MIN_MATRES_KEY_LEN keeps those distinct while still
+ * covering the real-world variation, which happens in longer words.
+ *
+ * MEASURED TRADE-OFF (2026-08-08, over the 276 distinct active he bridges):
+ * a threshold of 3 gives 148 bridges spelling tolerance and leniently credits
+ * exactly 3 word pairs that collapse together but aren't synonyms —
+ * רגל/ריגול, שינה/שנה, סחר/סוחר. Raising it to 4 would erase all 3 collisions
+ * but strip tolerance from 77 bridges. We keep 3 deliberately: rejecting a
+ * player who typed the word correctly costs them one of only 4 attempts,
+ * while the reverse just hands out a rare undeserved point.
+ */
+function collapseDoubledMatres(s: string): string {
+  return s.replace(/יי/g, 'י').replace(/וו/g, 'ו');
+}
+
+function matresKey(s: string): string {
+  return s.replace(/[וי]/g, '');
+}
+
+function hebrewSpellingMatches(a: string, b: string): boolean {
+  if (!HEBREW_RE.test(a) || !HEBREW_RE.test(b)) return false;
+  if (collapseDoubledMatres(a) === collapseDoubledMatres(b)) return true;
+  const ka = matresKey(a);
+  return ka.length >= MIN_MATRES_KEY_LEN && ka === matresKey(b);
+}
+
 export function checkGuess(input: string, puzzle: ConnectionPuzzle): GuessResult {
   const normalizedGuess = normalizeGuess(input);
   const normalizedAnswer = normalizeGuess(puzzle.bridge);
   const guessKey = canonicalize(input);
   const candidates = [puzzle.bridge, ...(puzzle.acceptedAnswers ?? [])];
-  const correct = candidates.some((c) => canonicalize(c) === guessKey) && guessKey.length > 0;
+  const correct =
+    guessKey.length > 0 &&
+    candidates.some((c) => {
+      const key = canonicalize(c);
+      return key === guessKey || hebrewSpellingMatches(key, guessKey);
+    });
   return { correct, normalizedGuess, normalizedAnswer };
 }
 

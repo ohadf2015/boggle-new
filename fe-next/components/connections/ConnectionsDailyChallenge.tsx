@@ -32,6 +32,12 @@ import {
   type LeaderboardRow,
 } from '@/lib/connections/dailyClient';
 import { buildDailyBridgeGrid, gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
+import {
+  trackDailyStarted,
+  trackDailyBridgeResolved,
+  trackDailyCompleted,
+  trackDailyShared,
+} from '@/lib/connections/dailyTelemetry';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { earnedMedal } from '@/lib/connections/progressTrack';
 import ConnectionsProgressTrack from './ConnectionsProgressTrack';
@@ -115,6 +121,10 @@ export default function ConnectionsDailyChallenge() {
   // Stamp the start time once mounted (kept out of render for purity).
   useEffect(() => {
     startRef.current = Date.now();
+    trackDailyStarted({ locale: language, puzzleCount: total, dateISO: today });
+    // Start is stamped once per mount — re-firing on a locale change would
+    // double-count the same run.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Per-answer feedback (sound + haptic).
@@ -125,6 +135,14 @@ export default function ConnectionsDailyChallenge() {
       setSolvedVersion((v) => v + 1);
       outcomesRef.current.set(idx, {
         reached: true,
+        solved: true,
+        wrongAttempts: wrongByIndexRef.current[idx] ?? 0,
+        hintUsed: state.hintRevealed,
+      });
+      trackDailyBridgeResolved({
+        locale: language,
+        puzzleId: state.puzzles[idx]?.id ?? '',
+        index: idx,
         solved: true,
         wrongAttempts: wrongByIndexRef.current[idx] ?? 0,
         hintUsed: state.hintRevealed,
@@ -143,15 +161,24 @@ export default function ConnectionsDailyChallenge() {
       // Reached but not solved (skipped, or burnt the last attempt here). The
       // attempt that triggers the reveal lands on 'gaveUp', never 'wrong', so
       // the tally above misses it — take whichever count is higher.
+      const wrongAttempts = Math.max(wrongByIndexRef.current[idx] ?? 0, state.wrongAttempts);
       outcomesRef.current.set(idx, {
         reached: true,
         solved: false,
-        wrongAttempts: Math.max(wrongByIndexRef.current[idx] ?? 0, state.wrongAttempts),
+        wrongAttempts,
+        hintUsed: state.hintRevealed,
+      });
+      trackDailyBridgeResolved({
+        locale: language,
+        puzzleId: state.puzzles[idx]?.id ?? '',
+        index: idx,
+        solved: false,
+        wrongAttempts,
         hintUsed: state.hintRevealed,
       });
     }
     prevStatusRef.current = state.status;
-  }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, sfx, haptic, customHaptic]);
+  }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, state.puzzles, language, sfx, haptic, customHaptic]);
 
   // On finish: submit the result (once) and load the leaderboard.
   useEffect(() => {
@@ -169,6 +196,13 @@ export default function ConnectionsDailyChallenge() {
       sfx.playVictorySound();
       if (!prefersReducedMotion) fireVictoryConfetti();
     }
+    trackDailyCompleted({
+      locale: language,
+      solved: puzzlesSolved,
+      total,
+      score: state.score,
+      durationSeconds: timeTakenSeconds,
+    });
     setResults({ loading: true, streak: 0, rank: null, totalPlayers: 0, rows: [] });
 
     const displayName = profile?.display_name || profile?.username || t('connections.daily.guestName');
@@ -196,7 +230,7 @@ export default function ConnectionsDailyChallenge() {
         rows: lb?.leaderboard ?? [],
       });
     })();
-  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, sfx, t]);
+  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, total, sfx, t]);
 
   const handleInput = useCallback((value: string) => dispatch({ type: 'SET_INPUT', input: value }), []);
   const handleSubmit = useCallback(() => dispatch({ type: 'SUBMIT' }), []);
@@ -216,6 +250,7 @@ export default function ConnectionsDailyChallenge() {
 
   const handleShare = useCallback(async () => {
     const outcomes = collectOutcomes();
+    trackDailyShared({ locale: language, solved: outcomes.filter((o) => o.solved).length, total });
     const url = typeof window !== 'undefined' ? `${window.location.origin}/connections/daily` : undefined;
     const text = buildDailyBridgeGrid({
       title: t('connections.title'),
@@ -236,7 +271,7 @@ export default function ConnectionsDailyChallenge() {
     } catch {
       /* user cancelled / unsupported */
     }
-  }, [t, today, results, collectOutcomes]);
+  }, [t, today, results, collectOutcomes, language, total]);
 
   if (isTerminal) {
     const blanked = solvedCount === 0;

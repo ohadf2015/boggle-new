@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { Delete, CornerDownLeft } from 'lucide-react';
+import { letterColumnCount } from '@/lib/connections/keyboard';
 
 interface ConnectionsKeyboardProps {
   /** Keyboard rows in physical-layout order (see lib/connections/keyboard.ts). */
@@ -32,13 +33,18 @@ const KEY_BASE =
 const KEY_SIZE = 'h-12 sm:h-14 min-w-0';
 
 /**
- * One letter-key width for the WHOLE keyboard, derived from the widest row.
- * Every letter key gets this flex-basis with grow disabled, so a 7-key row
- * renders keys identical to a 10-key row (shorter rows just center) instead
- * of each row stretching to its own width.
+ * One letter-key width for the WHOLE keyboard. Every letter key gets this
+ * flex-basis with grow disabled, so a 7-key row renders keys identical to a
+ * 10-key row (shorter rows just center) instead of each row stretching to its
+ * own width.
+ *
+ * The column count comes from letterColumnCount, which reserves room for the
+ * submit/backspace keys flanking the last row — dividing by the longest row
+ * alone squashed the bottom row on layouts where it is already the longest
+ * (Hebrew). See lib/connections/keyboard.ts.
  */
-function letterKeyStyle(maxLen: number): CSSProperties {
-  return { flexBasis: `calc(${(100 / maxLen).toFixed(4)}% - 0.375rem)`, flexGrow: 0, flexShrink: 1 };
+function letterKeyStyle(columns: number): CSSProperties {
+  return { flexBasis: `calc(${(100 / columns).toFixed(4)}% - 0.375rem)`, flexGrow: 0, flexShrink: 1 };
 }
 
 /**
@@ -60,7 +66,7 @@ export default function ConnectionsKeyboard({
   disabled = false,
 }: ConnectionsKeyboardProps) {
   const lastRow = rows.length - 1;
-  const keyStyle = letterKeyStyle(Math.max(...rows.map((row) => row.length)));
+  const keyStyle = letterKeyStyle(letterColumnCount(rows));
   return (
     <div
       dir={dir}
