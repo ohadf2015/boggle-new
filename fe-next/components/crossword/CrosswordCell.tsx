@@ -13,6 +13,8 @@ export interface CrosswordCellProps {
   isActive: boolean;
   inActiveSlot: boolean;
   isWordEnd: boolean;
+  /** Every letter of a word through this cell is filled in correctly. */
+  inSolvedSlot?: boolean;
   check?: 'correct' | 'wrong';
   warmth?: 'cold' | 'warm' | 'hot';
   revealed: boolean;
@@ -31,6 +33,7 @@ function CrosswordCellBase({
   isActive,
   inActiveSlot,
   isWordEnd,
+  inSolvedSlot = false,
   check,
   warmth,
   revealed,
@@ -75,7 +78,14 @@ function CrosswordCellBase({
         ? 'bg-[#7cc0ff]'
         : inActiveSlot
           ? 'bg-[#ffe9a8]'
-          : 'bg-neo-cream';
+          : // A finished word settles into a pale cyan — the single-player accent — so the
+            // board itself shows which answers are locked in, not just the "N/10" counter.
+            // Opaque on purpose: the grid container is black, so an alpha tint composites
+            // down to a dark teal and the navy letters stop being readable. This is
+            // neo-cyan at 25% over neo-cream, precomputed.
+            inSolvedSlot
+            ? 'bg-[#bffef4]'
+            : 'bg-neo-cream';
   const text =
     check === 'wrong'
       ? isActive

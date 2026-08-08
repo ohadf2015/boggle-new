@@ -23,7 +23,7 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
   const AxisIcon = isAcross ? MoveHorizontal : MoveVertical;
 
   return (
-    <div className="flex items-stretch gap-2 w-full max-w-[34rem] mx-auto">
+    <div className="flex items-stretch gap-2 w-full max-w-[28rem] mx-auto">
       <button
         type="button"
         aria-label={t('crossword.prevClue')}
@@ -57,7 +57,9 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
             {slot.number}
           </span>
         )}
-        <span className="font-neo-body font-semibold text-[0.95rem] leading-snug">
+        {/* Clamped: an unbounded clue grew this bar to 3+ lines on narrow phones and
+            stole that height straight off the board. */}
+        <span className="font-neo-body font-semibold text-[0.95rem] leading-snug line-clamp-2">
           {slot?.clue || t('crossword.noClue')}
         </span>
       </div>

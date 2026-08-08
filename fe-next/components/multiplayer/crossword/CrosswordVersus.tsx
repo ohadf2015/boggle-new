@@ -94,10 +94,16 @@ function CrosswordRace({
 
       <div className="mt-2 flex flex-1 flex-col gap-3 overflow-hidden lg:grid lg:grid-cols-[1fr_15rem]">
         {/* Board + clue + keyboard */}
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
-          <CrosswordGrid state={game.state} onSelect={game.focusCell} t={t} solved={solved} />
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
+          {/* Same bounded size-query box as the solo view. CrosswordGrid sizes itself with
+              `100cqmin`, and container-query units fall back to the VIEWPORT when no query
+              container exists — which here would mean a full-bleed board with no height cap
+              at all. Keep this wrapper wherever CrosswordGrid is rendered. */}
+          <div className="flex min-h-0 flex-1 [container-type:size] lg:block lg:flex-none lg:[container-type:normal]">
+            <CrosswordGrid state={game.state} onSelect={game.focusCell} t={t} solved={solved} />
+          </div>
           <ClueBar slot={game.activeSlot} rtl={puzzle.rtl} onPrev={() => game.nextSlot(-1)} onNext={() => game.nextSlot(1)} onToggleDir={game.toggleDir} t={t} />
-          <div className="flex items-center justify-center gap-2">
+          <div className="shrink-0 flex items-center justify-center gap-2">
             <button type="button" onClick={game.checkAll} aria-label={t('crossword.check')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
               <CheckCheck className="h-4 w-4" aria-hidden="true" /> {t('crossword.check')}
             </button>
@@ -111,10 +117,19 @@ function CrosswordRace({
           <div className="shrink-0 lg:hidden">
             <CrosswordKeyboard locale={puzzle.locale} onLetter={game.inputLetter} onBackspace={game.backspace} disabled={solved} backspaceLabel={t('crossword.backspace')} />
           </div>
-          <details className="lg:hidden rounded-neo border-neo border-black bg-neo-navy-light shadow-hard">
-            <summary className="cursor-pointer list-none px-3 py-2.5 font-neo-body text-xs font-bold text-neo-white">{t('crossword.allClues')}</summary>
-            <CrosswordClueList slots={puzzle.slots} activeSlotId={game.activeSlot?.id ?? null} onSelect={(slot) => game.focusSlot(slot.id)} t={t} capturedSlotIds={mySolvedSlotIds} />
-          </details>
+          {/* Full clue list: desktop only. On mobile it was another band competing with the
+              board for a fixed viewport (and the clue bar's prev/next already cycles every
+              clue). Unlike the solo view, this side's rail holds STANDINGS, not clues — so the
+              list has to live here or desktop MP would have no clue list at all. */}
+          <div className="hidden lg:block lg:overflow-y-auto">
+            <CrosswordClueList
+              slots={puzzle.slots}
+              activeSlotId={game.activeSlot?.id ?? null}
+              onSelect={(slot) => game.focusSlot(slot.id)}
+              t={t}
+              capturedSlotIds={mySolvedSlotIds}
+            />
+          </div>
         </div>
 
         {/* Standings rail */}

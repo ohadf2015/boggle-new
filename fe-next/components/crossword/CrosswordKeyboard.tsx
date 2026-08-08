@@ -32,7 +32,7 @@ export function CrosswordKeyboard({
   const dir = locale === 'he' ? 'rtl' : 'ltr';
 
   return (
-    <div dir={dir} className="flex flex-col gap-1.5 w-full max-w-[34rem] mx-auto select-none">
+    <div dir={dir} className="flex flex-col gap-1.5 w-full max-w-[28rem] mx-auto select-none">
       {rows.map((row, i) => (
         <div key={i} className="flex justify-center gap-1">
           {i === rows.length - 1 && (

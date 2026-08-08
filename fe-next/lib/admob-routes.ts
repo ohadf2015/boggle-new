@@ -29,6 +29,10 @@ const GAME_ROUTES = [
   // install promo (which gates on this same list) were drawn over the crane and
   // the landing zone mid-drop.
   '/word-tower',
+  // Crossword is the same shape: a fit-to-viewport board with a pinned keyboard.
+  // The install pill (`fixed end-0 top-1/2`) sat straight over the right-hand
+  // columns of the grid, covering cells the player has to tap.
+  '/crossword',
 ];
 
 // Hub landings that share a prefix with a GAME_ROUTES entry but are themselves
