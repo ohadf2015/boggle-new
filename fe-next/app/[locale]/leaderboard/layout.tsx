@@ -1,100 +1,9 @@
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
-const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
-  en: {
-    title: 'Global Leaderboard - Top Word Game Players Worldwide',
-    description: 'See where you rank among the best word game players worldwide. Compete in LexiClash multiplayer matches and daily challenges to climb the rankings.',
-    features: [
-      'Live-updating global rankings with real-time scores',
-      'All-time leaderboard tracking total scores across all games',
-      'Mode-specific filters: Classic, Blast, Word Hunt, and Daily Challenge each have dedicated ranks',
-      'See your rank position and progress over time',
-      'Compare scores with friends and top players worldwide',
-      'Separate creator leaderboard for community content makers',
-    ],
-    faq: [
-      { question: 'How are leaderboard rankings calculated?', answer: 'Rankings are based on total score accumulated across all multiplayer games. Higher word scores, longer words, and bonus achievements contribute to your total.' },
-      { question: 'How often does the leaderboard update?', answer: 'The leaderboard updates in real-time. Your score changes are reflected immediately after each game finishes.' },
-      { question: 'Do I need an account to appear on the leaderboard?', answer: 'Yes — your score is saved once you create a free account. Guest plays count toward your session score but do not persist to the global ranking.' },
-      { question: 'Are there separate daily and all-time rankings?', answer: 'Yes. Daily rankings reset at midnight UTC so you can compete fresh each day. All-time rankings track your career total across every game you have ever played.' },
-    ],
-  },
-  he: {
-    // AI-drafted — needs native Hebrew review
-    title: 'טבלת מובילים עולמית - השחקנים הטובים ביותר במשחקי מילים',
-    description: 'ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים בעולם. התחרו במשחקים ואתגרים יומיים כדי לטפס בדירוגים.',
-    features: [
-      'דירוגים עולמיים מתעדכנים בזמן אמת',
-      'מעקב אחרי ניקוד כולל לאורך כל המשחקים',
-      'פילטרים לפי מצב: קלאסי, בלאסט, ציד מילים ואתגר יומי',
-      'לשוניות נפרדות לדירוגים יומיים ולכל הזמנים',
-      'השוו ניקוד עם חברים ושחקנים מובילים',
-    ],
-    faq: [
-      { question: 'האם אני צריך חשבון כדי להופיע בטבלה?', answer: 'כן — הניקוד שלכם נשמר לאחר יצירת חשבון חינמי. משחקים של אורח לא נרשמים בדירוג העולמי.' },
-      { question: 'כמה פעמים הטבלה מתעדכנת?', answer: 'הטבלה מתעדכנת בזמן אמת כאשר משחקים מסתיימים. הדירוגים היומיים מתאפסים בחצות UTC.' },
-    ],
-  },
-  ja: {
-    // AI-drafted — needs native Japanese review
-    title: 'グローバルリーダーボード - トップワードゲームプレイヤー世界ランキング',
-    description: '世界中のワードゲームプレイヤーの中であなたの順位を確認しましょう。毎日の挑戦やマルチプレイヤー対戦でランキングを上げてみてください。',
-    features: [
-      'リアルタイム更新のグローバルランキング',
-      '全ゲームの累計スコア追跡',
-      'クラシック、ブラスト、ワードハント、デイリーチャレンジのモード別フィルター',
-      'デイリーとオールタイムの別タブでランキングを確認',
-      '各ゲーム終了後すぐにランキングが反映',
-    ],
-    faq: [
-      { question: 'ランキングのスコアはどう計算されますか？', answer: 'ランキングはすべてのマルチプレイヤーゲームの合計スコアに基づきます。単語の長さ、コンボ倍率、ボーナスタイルがポイントに加算されます。' },
-      { question: 'ランキングに載るにはアカウントが必要ですか？', answer: 'はい。無料アカウントを作成するとスコアが保存されます。ゲストプレイはグローバルランキングには反映されません。' },
-    ],
-  },
-  sv: {
-    // AI-drafted — needs native Swedish review
-    title: 'Global Topplista - Världens Bästa Ordspelare & Rankningar',
-    description: 'Se var du rankas bland världens bästa ordspelare. Tävla i LexiClash multiplayer-matcher och dagliga utmaningar för att klättra i rankingen.',
-    features: [
-      'Realtidsuppdaterade globala rankningar',
-      'All-time-topplista som spårar totalpoäng över alla spel',
-      'Modspecifika filter: Klassiskt, Blast, Word Hunt och Daglig Utmaning',
-      'Separata flikar för dagliga och all-time-rankningar',
-      'Se din rankposition och jämför poäng med vänner världen över',
-    ],
-    faq: [
-      { question: 'Hur beräknas topplistan?', answer: 'Rankningar baseras på din totalpoäng i alla multiplayer-spel. Poäng kommer från ordlängd, kombomultiplikatorer och bonusplattor.' },
-      { question: 'Behöver jag ett konto för att synas på topplistan?', answer: 'Ja — din poäng sparas när du skapar ett gratis konto. Gästspel räknas inte mot det globala rankingsystemet.' },
-    ],
-  },
-  es: {
-    // AI-drafted — needs native Spanish review
-    title: 'Tabla de Clasificación Global - Mejores Jugadores de Palabras',
-    description: 'Descubre tu posición entre los mejores jugadores de juegos de palabras del mundo. Compite en partidas multijugador y desafíos diarios para subir en el ranking.',
-    features: [
-      'Rankings globales actualizados en tiempo real',
-      'Tabla de todos los tiempos con puntuación total acumulada',
-      'Filtros por modo: Clásico, Blast, Word Hunt y Desafío Diario con rankings independientes',
-      'Pestañas separadas para rankings diarios y de todos los tiempos',
-      'Sin registro, sin descarga — juega y aparece en el ranking de inmediato',
-    ],
-    faq: [
-      { question: '¿Cómo se calcula la puntuación de la tabla?', answer: 'Los rankings se basan en tu puntuación total en todos los juegos multijugador. Los puntos provienen de la longitud de las palabras, multiplicadores de combo y fichas de bonificación.' },
-      { question: '¿Necesito una cuenta para aparecer en la tabla?', answer: 'Sí — tu puntuación se guarda al crear una cuenta gratuita. Los juegos de invitado no se registran en el ranking global.' },
-    ],
-  },
-  ru: {
-    title: 'Глобальная таблица лидеров - Топ-игроки в словесные игры во всём мире',
-    description: 'Посмотрите, где вы занимаете место среди лучших игроков в словесные игры во всём мире. Участвуйте в многопользовательских матчах LexiClash и ежедневных вызовах, чтобы подняться в рейтинге.',
-    features: ['Глобальные рейтинги, обновляющиеся в реальном времени', 'Отслеживание таблицы лидеров всё время с общими баллами во всех играх'],
-    faq: [],
-  },
-};
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
@@ -264,12 +173,6 @@ export default async function LeaderboardLayout({ children, params }: Leaderboar
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema, itemListSchema, collectionPageSchema]) }}
       />
       {children}
-      <GamePageSeoContent
-        title={seoContent[locale as keyof typeof seoContent]?.title || seoContent.en.title}
-        description={seoContent[locale as keyof typeof seoContent]?.description || seoContent.en.description}
-        features={seoContent[locale as keyof typeof seoContent]?.features || seoContent.en.features}
-        faq={seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq}
-      />
     </>
   );
 }
