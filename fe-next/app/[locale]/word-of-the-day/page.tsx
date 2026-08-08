@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { wordsByLocale, getRotatedTodayWord, type Locale } from './content';
 import WordOfTheDayClient from './PageClient';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { buildDynamicTitle, buildDynamicDescription, buildSchemas } from './seo';
 
 export const dynamic = 'force-dynamic';
@@ -103,128 +102,6 @@ export default async function WordOfTheDayPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
       />
       <WordOfTheDayClient allWords={allWords} featuredWord={todayWord} />
-      {(() => {
-        const wotdSeoContent: Record<string, {
-          title: string; description: string; features: string[];
-          faq: { question: string; answer: string }[];
-        }> = {
-          en: {
-            title: 'Word of the Day — Learn a New Word Every Day',
-            description: 'Discover a new word every day on LexiClash. Each Word of the Day arrives with a full definition, part of speech, etymology tracing the word back to its Latin, Greek, Old English, or Arabic roots, three usage examples drawn from real published writing, a pronunciation guide, and a fun fact that makes the word memorable. You can then take that word straight into a LexiClash multiplayer match or daily challenge and earn bonus points for finding it on the board. Building vocabulary one word per day is a research-backed strategy: studies in applied linguistics consistently show that 365 deliberately learned words per year — anchored by context, examples, and active use — produces durable retention that flashcards alone cannot match. The Word of the Day archive lets you review past picks and build a personal word log over time.',
-            features: [
-              'New curated word every day with definition, etymology, and three real-world usage examples',
-              'Pronunciation guide with phonetic spelling — useful for ESL learners and pre-presentation prep',
-              'Etymology section traces each word back to its Latin, Greek, Old English, or Arabic origin',
-              'Fun fact for each word — a piece of trivia, surprising connection, or historical context that aids retention',
-              'Practice mode — find the Word of the Day in a LexiClash board round for bonus points',
-              'Browse past words archive — every Word of the Day from launch onwards is searchable and reviewable',
-              'Available in English, Hebrew, Swedish, Japanese, and Spanish — each language has its own curated word list',
-              'Same word for all players globally each day — gives you a shared talking point with friends and family',
-              'Daily push notification (opt-in) so the new word arrives at the start of your day',
-              'Word-of-the-Day calendar view shows your learning streak and total words studied',
-            ],
-            faq: [
-              { question: 'When does the Word of the Day update?', answer: 'A new word is selected every day at midnight UTC. The word is the same for all players worldwide, so you can discuss it with friends, share it in group chats, or quiz family members on the same word you learned that morning.' },
-              { question: 'Can I see previous Words of the Day?', answer: 'Yes — scroll down on the Word of the Day page to browse the archive of past words with their full definitions, etymology, examples, and fun facts. The archive is searchable by word, root language, and date. There is also a calendar view showing your personal streak.' },
-              { question: 'How are the words chosen?', answer: 'Words are curated by a small editorial team. We balance common-but-underused vocabulary (words you might recognize but rarely use, like "ephemeral" or "ubiquitous") with interesting lesser-known terms (like "petrichor" or "sonder"). Each word must have a clear definition, an interesting etymology, and at least three real-world usage examples to qualify.', },
-              { question: 'Is Word of the Day useful for ESL learners?', answer: 'Yes — Word of the Day is particularly well-suited to ESL study because each entry includes a pronunciation guide, usage examples in real sentences, and an etymology section that helps you remember the word through its origin. Many ESL teachers assign it as a daily warm-up exercise.' },
-              { question: 'How does the streak system work?', answer: 'Visiting the Word of the Day page (or reading the daily push notification) counts toward your streak. Miss a day and the streak resets. Hitting milestones — 7, 30, 100 day streaks — unlocks badges and avatar parts. The streak system is designed to make daily vocabulary practice a habit, not a chore.' },
-              { question: 'Can I use the Word of the Day in a LexiClash game?', answer: 'Yes — finding the Word of the Day on a multiplayer or single-player board earns bonus points. Some daily challenges include the Word of the Day as a guaranteed-on-board target. Adventure mode boss fights also occasionally feature it as a required word for victory.' },
-              { question: 'How is this different from a Word of the Day calendar or newsletter?', answer: 'Traditional Word of the Day calendars and newsletters are passive — you read the word once and likely forget it within a week. LexiClash anchors each word in active gameplay (you have to find it on a board, score it, beat opponents using it) which research shows produces 3-5x better long-term retention than passive reading alone.' },
-            ],
-          },
-          he: {
-            title: 'המילה היומית — למדו מילה חדשה כל יום',
-            description: 'גלו מילה חדשה כל יום ב-LexiClash. כל מילה יומית כוללת הגדרה, אטימולוגיה ודוגמאות שימוש.',
-            features: [
-              'מילה חדשה כל יום עם הגדרה ואטימולוגיה',
-              'עובדות מעניינות ומקורות מילים',
-              'עברו על מילים קודמות לבניית אוצר מילים',
-              'זהה לכל השחקנים בעולם — שתפו עם חברים',
-              'חינם, בלי הרשמה ובלי הורדה',
-            ],
-            faq: [
-              { question: 'מתי המילה היומית מתעדכנת?', answer: 'מילה חדשה נבחרת כל יום בחצות UTC. המילה זהה לכל השחקנים בעולם, כך שאפשר לדבר עליה עם חברים.' },
-              { question: 'מה זה המילה היומית של LexiClash?', answer: 'המילה היומית היא מילה אחת חדשה שנבחרת מדי יום מהמילון הקיים, עם הגדרה מלאה, אטימולוגיה (מקור המילה) ודוגמאות שימוש. אפשר להשתמש בה אחר כך במשחק LexiClash.' },
-              { question: 'איך אפשר לראות את המילים היומיות הקודמות?', answer: 'בעמוד המילה היומית יש ארכיון של מילים מהשבועות והחודשים האחרונים. גוללו מטה כדי לעבור על המילים הקודמות עם ההגדרות המלאות שלהן.' },
-              { question: 'האם המילה היומית זהה לכל השחקנים?', answer: 'כן — אותה מילה לכל מי שנכנס ב-24 השעות שלה, בכל העולם. זה הופך את המילה למשהו לדבר עליו: לשתף בקבוצות, להשוות איך הבנתם את ההגדרה ולהשתמש בה במשחק.' },
-              { question: 'איך משחקים עם המילה היומית?', answer: 'אחרי שלמדתם את ההגדרה ואת מקור המילה, אפשר ללחוץ על "תרגול" כדי להיכנס לסבב משחק רגיל ב-LexiClash ולנסות למצוא את המילה היומית בלוח. זוכים בנקודות בונוס אם מוצאים אותה.' },
-            ],
-          },
-          sv: {
-            title: 'Dagens Ord — Lär Dig Ett Nytt Ord Varje Dag',
-            description: 'Upptäck ett nytt ord varje dag på LexiClash. Varje Dagens Ord inkluderar definition, etymologi och användningsexempel.',
-            features: ['Nytt kurerat ord varje dag med definition och etymologi', 'Roliga fakta och ordursprung', 'Bläddra bland tidigare ord för att bygga ordförråd'],
-            faq: [{ question: 'När uppdateras Dagens Ord?', answer: 'Ett nytt ord väljs varje dag vid midnatt UTC. Ordet är samma för alla spelare världen över.' }],
-          },
-          ja: {
-            title: '今日の言葉 — 毎日新しい言葉を学ぼう',
-            description: 'LexiClashで毎日新しい言葉を発見。定義、語源、使用例、豆知識を含みます。',
-            features: ['毎日厳選された新しい言葉と定義・語源', '豆知識と言葉の起源', '過去の言葉を閲覧して語彙を構築'],
-            faq: [{ question: '今日の言葉はいつ更新されますか？', answer: '毎日UTC午前0時に新しい言葉が選ばれます。世界中のすべてのプレイヤーに同じ言葉が表示されます。' }],
-          },
-          es: {
-            title: 'Palabra del Día — Aprende Una Palabra Nueva Cada Día',
-            description: 'Descubre una nueva palabra cada día en LexiClash. Cada Palabra del Día incluye definición, etimología y ejemplos de uso.',
-            features: ['Nueva palabra curada cada día con definición y etimología', 'Datos curiosos y orígenes de palabras', 'Modo práctica — usa la palabra en una ronda de juego', 'Explora palabras anteriores para construir vocabulario'],
-            faq: [
-              { question: '¿Cuándo se actualiza la Palabra del Día?', answer: 'Una nueva palabra se selecciona cada día a medianoche UTC. La palabra es la misma para todos los jugadores en el mundo.' },
-              { question: '¿Puedo ver Palabras del Día anteriores?', answer: 'Sí — desplázate hacia abajo en la página para explorar el archivo de palabras anteriores con sus definiciones completas.' },
-            ],
-          },
-          ru: {
-            title: 'Слово дня — Учите новое слово каждый день',
-            description: 'Откройте для себя новое слово каждый день в LexiClash. Каждое Слово дня включает определение, этимологию и примеры использования.',
-            features: [
-              'Новое тщательно отобранное слово каждый день с определением и этимологией',
-              'Интересные факты и происхождение слов',
-              'Режим практики — используйте слово в раунде игры LexiClash для бонусных очков',
-              'Просмотрите архив предыдущих слов — каждое Слово дня с момента запуска доступно для поиска',
-              'Доступно на английском, иврите, шведском, японском и испанском языках — каждый язык имеет свой тщательно отобранный список слов',
-              'Одно слово для всех игроков глобально каждый день — дает вам общую тему для разговора с друзьями',
-              'Ежедневное push-уведомление (по желанию), чтобы новое слово поступало в начале вашего дня',
-              'Календарный вид Слова дня показывает вашу активность и общее количество изученных слов',
-            ],
-            faq: [
-              { question: 'Когда обновляется Слово дня?', answer: 'Новое слово выбирается каждый день в полночь UTC. Слово одинаково для всех игроков во всем мире, поэтому вы можете обсуждать его с друзьями и семьей.' },
-              { question: 'Я могу видеть предыдущие Слова дня?', answer: 'Да — прокрутите вниз на странице Слова дня, чтобы просмотреть архив предыдущих слов с их полными определениями, этимологией, примерами и интересными фактами. Архив доступен для поиска по слову, корневому языку и дате.' },
-              { question: 'Как выбираются слова?', answer: 'Слова отбираются небольшой редакционной командой. Мы балансируем распространенные, но редко используемые слова со словами, которые вы может быть не знаете. Каждое слово должно иметь четкое определение, интересную этимологию и по крайней мере три примера использования в реальном письме.' },
-              { question: 'Полезно ли Слово дня для изучающих английский язык?', answer: 'Да — Слово дня особенно хорошо подходит для изучения английского, так как каждая запись включает руководство по произношению, примеры использования в реальных предложениях и раздел этимологии, который помогает вам запомнить слово через его происхождение.' },
-              { question: 'Как работает система активности?', answer: 'Посещение страницы Слова дня (или чтение ежедневного push-уведомления) считается за вашу активность. Пропустите день, и активность сбросится. Достижение вех — 7, 30, 100 дней активности — открывает значки и части аватара.' },
-              { question: 'Могу ли я использовать Слово дня в игре LexiClash?', answer: 'Да — нахождение Слова дня на доске мультиплеера или одиночного игрока приносит бонусные очки. Некоторые ежедневные вызовы гарантированно содержат Слово дня как целевое слово.' },
-              { question: 'Чем это отличается от календаря или информационного бюллетеня "Слово дня"?', answer: 'Традиционные календари и информационные бюллетени "Слово дня" пассивны — вы читаете слово один раз и вероятно забудете его в течение недели. LexiClash привязывает каждое слово к активному геймплею, что исследования показывают дает в 3-5 раз лучшее долгосрочное запоминание, чем пассивное чтение.' },
-            ],
-          },
-        };
-        const seoData = wotdSeoContent[locale] ?? wotdSeoContent.en;
-        // Safe: faqJsonLd built entirely from typed object, JSON.stringified — no user input.
-        const faqJsonLd = {
-          '@context': 'https://schema.org',
-          '@type': 'FAQPage',
-          '@id': `https://www.lexiclash.live/${locale}/word-of-the-day#faq`,
-          inLanguage: locale,
-          mainEntity: seoData.faq.map((qa) => ({
-            '@type': 'Question',
-            name: qa.question,
-            acceptedAnswer: { '@type': 'Answer', text: qa.answer },
-          })),
-        };
-        return (
-          <>
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-            />
-            <GamePageSeoContent
-              asH1
-              title={seoData.title}
-              description={seoData.description}
-              features={seoData.features}
-              faq={seoData.faq}
-            />
-          </>
-        );
-      })()}
     </>
   );
 }
