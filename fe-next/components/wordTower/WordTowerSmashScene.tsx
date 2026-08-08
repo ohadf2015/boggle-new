@@ -5,6 +5,7 @@ import { Crosshair, Check } from 'lucide-react';
 import gsap from 'gsap';
 import { Container, Graphics } from 'pixi.js';
 import { cn } from '@/lib/utils';
+import { useParticleBudget } from '@/hooks/useParticleBudget';
 import Avatar from '@/components/Avatar';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
@@ -320,6 +321,13 @@ interface StageProps {
 /** The WebGL scene: crane + swinging ball + rival tower + power meter, plus the
  *  impact choreography. Lives inside <GameCanvas> so it can pull the engine. */
 function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDone }: StageProps) {
+  // Read through a ref: the impact FX fire from inside a GSAP timeline built in a
+  // `[phase]` effect, so closing over the value directly would capture whatever
+  // it was when that effect ran. The budget is a device characteristic that only
+  // changes on a perf-tier switch, and the ref always holds the current one.
+  const budgetMax = useParticleBudget().max;
+  const budgetRef = useRef(budgetMax);
+  budgetRef.current = budgetMax;
   const engine = useGameEngine();
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
@@ -503,6 +511,11 @@ function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDon
     const impactX = topBlock.x - r.blockW / 2;
     const n = floorsRef.current;
     const power = powerRef.current;
+    // Same budget every WordTowerScene burst already respects. These three were
+    // the only uncapped `burst()` calls left in Word Tower, and they are the
+    // biggest: a perfect smash asked for ~100 particles across two presets on
+    // whatever device happened to be running it.
+    const cap = (nParticles: number) => (budgetRef.current <= 0 ? 0 : Math.min(nParticles, budgetRef.current));
 
     const tl = gsap.timeline({ onComplete: onImpactDone });
 
@@ -525,8 +538,8 @@ function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDon
     tl.add(() => {
       const hitY = r.blocks[r.blocks.length - 1].y - 10;
       const burstN = 48 + n * 18 + Math.round(power * 24);
-      engine.particles.burst(BRICK_DEBRIS, impactX, hitY, burstN);
-      engine.particles.burst(IMPACT_SPARKS, impactX, hitY, 30 + Math.round(power * 40));
+      engine.particles.burst(BRICK_DEBRIS, impactX, hitY, cap(burstN));
+      engine.particles.burst(IMPACT_SPARKS, impactX, hitY, cap(30 + Math.round(power * 40)));
       // Dual flash — white core + pink rim for a heavier "demolition" beat.
       engine.flash.flash({ color: 0xffffff, duration: 0.12, intensity: 0.45 + power * 0.35 });
       engine.flash.flash({ color: 0xffe135, duration: 0.28, intensity: 0.3 + power * 0.35 });
@@ -598,7 +611,7 @@ function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDon
       // changing the authoritative floors count (already computed from accuracy).
       if (power >= SMASH_SWEET_SPOT) {
         gsap.delayedCall(0.12, () => {
-          engine.particles.burst(BRICK_DEBRIS, impactX + 10, hitY + 18, 28 + n * 8);
+          engine.particles.burst(BRICK_DEBRIS, impactX + 10, hitY + 18, cap(28 + n * 8));
           engine.shake.shake({ intensity: 8 + n * 2, duration: 0.28, decay: 'exponential' });
         });
       }
