@@ -3,7 +3,8 @@
 import { memo, type CSSProperties } from 'react';
 import { biomeBackdrop } from '@/lib/wordTower/towerLayout';
 import { dollyScaleFor } from '@/lib/wordTower/dollyZoom';
-import { BIOME_THEME } from './biomeTheme';
+import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
+import { BIOME_THEME, type BiomeTheme } from './biomeTheme';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
 /**
@@ -131,6 +132,20 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   const celestialTop = reducedMotion ? '68%' : `${68 - stars * 55}%`;
   const celestialSize = 96 + stars * 40;
 
+  // Signature sky layers for the zone we're in and the one we're climbing into,
+  // weighted by progress through the band — the same continuous cross-fade the
+  // base gradient already gets, so arriving in the nebula is a dissolve rather
+  // than a cut. Usually 0 or 1 entries; 2 only inside a transition.
+  const bandBlend = biomeBlendAt(heightM);
+  const skyFeatures: Array<{ key: string; feat: NonNullable<BiomeTheme['skyFeature']>; weight: number }> = [];
+  const addFeature = (key: string, id: WordTowerBiomeId, weight: number) => {
+    const feat = BIOME_THEME[id].skyFeature;
+    if (feat && weight > 0.001) skyFeatures.push({ key, feat, weight });
+  };
+  addFeature('from', bandBlend.fromId, 1 - bandBlend.t);
+  // At the top biome `toId === fromId`, so there is nothing to fade toward.
+  if (bandBlend.toId !== bandBlend.fromId) addFeature('to', bandBlend.toId, bandBlend.t);
+
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -177,6 +192,26 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
           cue that sells real distance. Fade in with altitude. */}
       {isSky && (
         <>
+          {/* Signature zone layers (nebula ion clouds / the galactic band). Drawn
+              FIRST so the star sheets sit in front of them — the stars are nearer
+              than the thing they're embedded in, and painting the cloud over them
+              would read as fog on the lens instead of depth.
+              Cross-faded across the biome band like the sky gradient itself:
+              `backgroundImage` is not an animatable property, so a layer keyed to
+              the hard biome switch would POP into existence at the threshold. */}
+          {skyFeatures.map(({ key, feat, weight }) => (
+            <div
+              key={key}
+              className="absolute -inset-x-[10%] -inset-y-[20%]"
+              style={{
+                transition: flow,
+                opacity: feat.opacity * weight,
+                backgroundImage: feat.image,
+                mixBlendMode: feat.blend as CSSProperties['mixBlendMode'],
+                transform: `translateY(${-slide(feat.depth, 900)}px)`,
+              }}
+            />
+          ))}
           <div className="absolute inset-0" style={{ transition: flow, opacity: Math.min(1, stars + 0.04), backgroundPosition: starPos(0.2), ...starSheet(340, 1, 1) }} />
           <div className="absolute inset-0" style={{ transition: flow, opacity: stars * 0.85, backgroundPosition: starPos(0.55), ...starSheet(260, 1.5, 4) }} />
           <div className="absolute inset-0" style={{ transition: flow, opacity: stars * 0.72, backgroundPosition: starPos(1.05), ...starSheet(200, 2.4, 7) }} />

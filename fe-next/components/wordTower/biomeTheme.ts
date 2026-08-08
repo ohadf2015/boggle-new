@@ -54,6 +54,28 @@ export interface BiomeTheme {
   airTint: string;
   /** Silhouette colour for distant landmark layers. */
   landmarkColor: string;
+  /**
+   * Signature volumetric sky layer — the one thing that makes a zone
+   * recognisable at a glance rather than "the dark one with stars".
+   *
+   * The rig layers (scaffold/crane/skyline/clouds in `towerLayout.BACKDROP`) are
+   * deliberately zeroed for the space zones, which left the last three biomes —
+   * the EARNED tiers — sharing one look: dark + star sheets + two planets, with
+   * only the gradient changing. This gives the top of the climb something the
+   * bottom cannot have.
+   *
+   * Pure CSS gradients, no image assets: the same brief asks for better
+   * performance, so the payoff for "amazing biomes" must not be download weight.
+   */
+  skyFeature?: {
+    /** CSS `background-image` for the layer. */
+    image: string;
+    opacity: number;
+    /** Parallax depth (fraction of the climb travel) — small = very distant. */
+    depth: number;
+    /** Optional `mix-blend-mode` (e.g. 'screen' so it glows over the stars). */
+    blend?: string;
+  };
 }
 
 /**
@@ -136,6 +158,20 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     celestial: { core: '#ffb3e6', glow: '#ff4fa3', lightTint: 'rgba(255,120,190,0.18)' },
     airTint: '#ff79c6',
     landmarkColor: '#2e0a42',
+    // Ion clouds: three overlapping soft masses at different scales. Deliberately
+    // NOT symmetric or evenly spaced — a regular pattern reads as a texture
+    // swatch, the same tell the far-skyline path had.
+    skyFeature: {
+      image: [
+        'radial-gradient(58% 42% at 24% 30%, rgba(255,79,163,0.55), rgba(255,79,163,0) 70%)',
+        'radial-gradient(46% 34% at 72% 52%, rgba(177,75,255,0.5), rgba(177,75,255,0) 72%)',
+        'radial-gradient(34% 26% at 52% 16%, rgba(255,214,240,0.34), rgba(255,214,240,0) 75%)',
+        'radial-gradient(70% 30% at 60% 78%, rgba(120,30,140,0.42), rgba(120,30,140,0) 78%)',
+      ].join(', '),
+      opacity: 0.85,
+      depth: 0.28,
+      blend: 'screen',
+    },
   },
   galaxy: {
     bg: 'linear-gradient(180deg,#04030a 0%,#2a0a4e 45%,#7a1fae 80%,#ffd23f 100%)',
@@ -150,5 +186,18 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     celestial: { core: '#fff1a8', glow: '#ffd23f', lightTint: 'rgba(255,220,120,0.18)' },
     airTint: '#ffd23f',
     landmarkColor: '#1a0a38',
+    // The galactic band: a bright dust lane cutting the sky on a diagonal, with a
+    // hot core off-centre. A band is the one sky shape that cannot be mistaken
+    // for "more stars" — it gives the final zone a horizon of its own.
+    skyFeature: {
+      image: [
+        'linear-gradient(107deg, rgba(255,225,53,0) 38%, rgba(255,225,53,0.30) 47%, rgba(255,255,255,0.42) 50%, rgba(177,75,255,0.30) 54%, rgba(177,75,255,0) 63%)',
+        'radial-gradient(30% 22% at 63% 44%, rgba(255,241,168,0.6), rgba(255,210,63,0.18) 55%, transparent 78%)',
+        'radial-gradient(80% 46% at 30% 76%, rgba(122,31,174,0.4), transparent 74%)',
+      ].join(', '),
+      opacity: 0.9,
+      depth: 0.16,
+      blend: 'screen',
+    },
   },
 };
