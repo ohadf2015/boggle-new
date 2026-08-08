@@ -111,7 +111,11 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
           'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
           'https://*.doubleclick.net', 'https://*.posthog.com', 'https://eu.i.posthog.com',
           // Google Identity Services (One Tap / Sign In With Google)
-          'https://accounts.google.com/gsi/client'],
+          'https://accounts.google.com/gsi/client',
+          // html2canvas, lazy-loaded by the feedback widget at capture time.
+          // Without it every screenshot is CSP-blocked and feedback arrives
+          // with no visual context. Pinned to one exact file by the widget.
+          'https://cdn.jsdelivr.net'],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com',
           'https://accounts.google.com/gsi/style'],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
@@ -136,7 +140,10 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
           // Google Identity Services One Tap iframe
           'https://accounts.google.com/gsi/'],
         frameAncestors: ["'self'", 'https://*.crazygames.com', 'https://crazygames.com',
-          'https://poki.com', 'https://www.poki.com'],
+          'https://poki.com', 'https://www.poki.com',
+          // Feedback DevTools /preview/:projectId frames this site for element
+          // inspection. Mirrors the list in next.config.mjs.
+          'https://feedback-devtools.com', 'https://www.feedback-devtools.com'],
       },
     },
     // HSTS only in production

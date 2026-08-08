@@ -31,7 +31,9 @@
  * SECURITY: All attribute values are static string literals — no user input.
  */
 // Bump on every public/widget.js change to bust returning users' frozen cache.
-const WIDGET_VERSION = '2';
+// 3: re-fetched to pick up the preview bridge — the vendored copy predated it,
+// so /preview/:projectId on the dashboard never got its inspection handshake.
+const WIDGET_VERSION = '3';
 
 import Script from 'next/script';
 import type { ReactNode } from 'react';
