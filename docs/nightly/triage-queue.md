@@ -2011,3 +2011,28 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: ambiguous root cause — rageclick matches ANY element on /multiplayer, not just the room-join button; needs replay/heatmap inspection to find the actual rage-clicked element (host lobby CTA? mode picker? something added after 08-04?)
   - recommended owner: lane 11 (mode-qa) or lane 02 (perf) — has agent-browser/replay tooling this lane lacks
+
+## 2026-08-08
+- [Supabase] Function Search Path Mutable — public.update_subscriptions_updated_at
+  - trigger function, pure `NEW.updated_at = now()`
+  - status: shipped 20260808_fix_search_path_update_subscriptions_updated_at.sql (via apply_migration)
+  - why: pure hardening (SET search_path=''), zero behavior change, matches autonomy matrix shippable bullet
+  - recommended owner: review-by-eod
+- [Supabase] Signed-In Users Can Execute SECURITY DEFINER Function — public.upsert_push_token
+  - status: reviewed, no action — already fixed in 20260628010000_revoke_push_token_fn_from_public.sql (anon/PUBLIC revoked, authenticated grant is intentional — push-token registration is auth-only by design, route requires session)
+  - why: advisor is re-flagging the intentional authenticated grant, not a new hole
+  - recommended owner: self (closed)
+- [Sentry] Error: Connection is closed. — JAVASCRIPT-NEXTJS-1WM (135762417) + JAVASCRIPT-NEXTJS-1WJ (135762409)
+  - first/last seen: both 2026-07-22 02:06-04:39 UTC (2.5h window), 711 + 121 occurrences, 0 users impacted, unrecurring since
+  - link: https://lexiclash.sentry.io/issues/135762417/ , https://lexiclash.sentry.io/issues/135762409/
+  - status: deferred (reviewed, no fix shipped)
+  - why: both are the SAME one-off Redis restart incident. Root cause: `@socket.io/redis-adapter`'s `RedisAdapter.broadcast()` calls `this.pubClient.publish(channel, msg)` fire-and-forget with no `.catch()` — when ioredis's connection drops mid-reconnect, the queued command rejects and surfaces as an unhandled rejection via Sentry's auto.node instrumentation. This is inside a third-party lib we don't control the source of; our own `broadcastActiveRooms` (fe-next/backend/utils/socketHelpers.ts:76-86) already try/catches synchronously but can't catch an async rejection from a promise it never receives. Genuinely stale (0 recurrence in 17 days), low blast radius (no user impact) — not worth a process-wide `unhandledRejection` filter under tonight's time budget for a non-recurring event.
+  - recommended owner: backend (if it recurs — add a targeted `process.on('unhandledRejection', ...)` filter matching ioredis CONNECTION_CLOSED during broadcastActiveRooms, or upgrade @socket.io/redis-adapter if a fixed version exists)
+- [PostHog] TypeError: Failed to fetch — issue 019fca04-f4b0-7690-a59a-95c44134a09a
+  - occurrences=25, users=8, sessions=9, last 4 days, all on /multiplayer?quickPlay=true
+  - link: https://eu.posthog.com/project/151059/error_tracking/019fca04-f4b0-7690-a59a-95c44134a09a
+  - status: deferred (reviewed, no fix shipped)
+  - why: root frame is our own `public/widget.js` (self-hosted feedback-devtools bundle, see fe-next/components/feedback/FeedbackDevtoolsWidget.tsx) — it monkey-patches `window.fetch` for its own background POST to /api/v1/feedback and that fetch fails, likely a network blip / mobile transition (repeated 3x same session on /multiplayer). `public/widget.js` is a prebuilt minified vendor bundle, not hand-editable source — patching it directly would be overwritten on next widget rebuild. Low severity (background feedback-widget ping, not core gameplay).
+  - recommended owner: backend/vendor (fix belongs in the feedback-devtools SDK's own fetch wrapper — wrap in try/catch or ignore TypeError:Failed to fetch as an expected transient network error at the source repo, not in this bundle)
+- [Feedback reports] 2 QA dogfood test submissions (2026-08-03, kanban t_15388a75) — explicitly "please ignore/delete"
+  - status: no action needed, self-flagged as test data
