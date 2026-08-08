@@ -74,6 +74,28 @@ describe('GamePageSeoContent', () => {
     expect(summary!.querySelector('h1')).not.toBeNull();
   });
 
+  // 2026-08-08 fix: on game screens the EXPANDED collapsible card was a
+  // multi-viewport wall of text that took over the whole screen once opened
+  // (reported: "seo sections that hides all the screen"). When open the card
+  // must be capped to a fraction of the viewport and scroll INTERNALLY so it
+  // can never hide the page. The title/summary stays a fixed, always-reachable
+  // toggle above the scroll region so players can collapse it back.
+  it('caps the expanded collapsible body height and scrolls it internally', () => {
+    const { container } = render(<GamePageSeoContent {...props} collapsible />);
+    // The bound lives on the body div (the <details> content slot is not
+    // constrained by a height on the element itself — Chromium quirk), so the
+    // card can never grow past ~60dvh + summary and take over the screen.
+    const body = container.querySelector('section > details > div') as HTMLElement;
+    expect(body).not.toBeNull();
+    expect(body.className).toContain('max-h-[60dvh]');
+    expect(body.className).toContain('overflow-y-auto');
+    // The summary/title stays a full-height, always-reachable collapse toggle
+    // above the scroll region — it must NOT be inside the capped/scrolled body.
+    const summary = container.querySelector('section > details > summary') as HTMLElement;
+    expect(summary).not.toBeNull();
+    expect(summary.textContent).toContain('Free Word Game');
+  });
+
   it('does not render <details> when collapsible is not set', () => {
     const { container } = render(<GamePageSeoContent {...props} />);
     // Only the FAQ items use <details> — the outer card must not be one.
