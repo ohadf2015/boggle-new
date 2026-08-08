@@ -527,6 +527,11 @@ const es = {
       "chaseGap": "+{m} m",
       "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo"
     },
+    "rank": {
+      "badge": "#{rank}",
+      "aria": "Estás en el puesto {rank} de la clasificación de la torre",
+      "gainAria": "Subiste del puesto {from} al puesto {to}"
+    },
     "minimap": {
       "label": "Mapa de la torre — {m} m, toca para subir"
     },

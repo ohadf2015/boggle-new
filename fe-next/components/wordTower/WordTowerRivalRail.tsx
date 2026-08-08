@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { railRivals, rivalsPassed, type RivalMarker } from '@/lib/wordTower/rivals';
+import { railRivals, rivalScreenY, rivalsPassed, type RivalMarker } from '@/lib/wordTower/rivals';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { PROP_PX_PER_M } from '@/lib/wordTower/parallaxProps';
 import Avatar from '@/components/Avatar';
@@ -17,6 +17,15 @@ interface Props {
   rivals: RivalMarker[];
   /** Viewer's current altitude (m). */
   viewerHeightM: number;
+  /** Camera is being dragged/flung — drop the altitude ease so ghost towers
+   *  track the scroll 1:1 instead of tearing away from the tower they belong to. */
+  panning?: boolean;
+  /** How high the tower has actually been BUILT (m). Distinct from
+   *  `viewerHeightM`, which is the camera: panning down and back up re-crosses
+   *  every rival in between, and a pass celebration driven off the camera would
+   *  congratulate the player for scrolling. Layout reads the camera; anything
+   *  that celebrates reads this. Defaults to the camera for callers with no pan. */
+  climbedHeightM?: number;
   reducedMotion?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
@@ -28,7 +37,8 @@ interface Props {
  * tower you rise past. Crossing one fires a brief "passed {name}!" celebration.
  * Inert + reduced-motion safe.
  */
-export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: Props) {
+export function WordTowerRivalRail({ rivals, viewerHeightM, climbedHeightM, panning, reducedMotion, t }: Props) {
+  const climbed = climbedHeightM ?? viewerHeightM;
   const ref = useRef<HTMLDivElement>(null);
   const [h, setH] = useState(0);
 
@@ -44,13 +54,13 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
 
   // Detect crossings only — NO dismiss timer here. (A timer in this effect would be
   // cancelled by the cleanup on every height change, so the toast would never clear.)
-  const prevHeight = useRef(viewerHeightM);
+  const prevHeight = useRef(climbed);
   const [passed, setPassed] = useState<string | null>(null);
   useEffect(() => {
-    const crossed = rivalsPassed(prevHeight.current, viewerHeightM, rivals);
-    prevHeight.current = viewerHeightM;
+    const crossed = rivalsPassed(prevHeight.current, climbed, rivals);
+    prevHeight.current = climbed;
     if (crossed.length > 0) setPassed(crossed[crossed.length - 1]!.name);
-  }, [viewerHeightM, rivals]);
+  }, [climbed, rivals]);
 
   // Auto-dismiss via the shared hook (rAF watchdog + visibilitychange recovery)
   // so the "passed!" cheer can't strand on screen the way a bare setTimeout can.
@@ -59,6 +69,22 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
   const buildLineY = h * BUILD_LINE_FRACTION;
   // Every rival, always drawn + clamped so none sits below our tower top (#2).
   const markers = h > 0 ? railRivals(viewerHeightM, rivals, buildLineY, PROP_PX_PER_M) : [];
+
+  // Rivals mid-climb RIGHT NOW, drawn as a second, moving marker at their live
+  // altitude. The record marker above is a headstone — a number that has not
+  // changed in days. This one moves between refreshes, which is the only thing
+  // on screen that says another person is playing at the same time as you.
+  // Presence is resolved upstream in `useRivalRace` (which owns the clock) and
+  // read here as a plain flag, so this component stays a pure function of its
+  // props. An idle board sets `live` on nobody rather than inventing company.
+  const climbers = h > 0
+    ? rivals
+      .filter((r) => r.live)
+      .map((r) => ({
+        r,
+        y: Math.max(24, Math.min(rivalScreenY(r.currentHeightM ?? 0, viewerHeightM, buildLineY, PROP_PX_PER_M), h - 8)),
+      }))
+    : [];
 
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
@@ -72,7 +98,7 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
           <div
             key={m.id}
             className={`absolute ${side}`}
-            style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
+            style={{ top: m.screenY, transition: reducedMotion || panning ? 'none' : LINE_FLOW }}
           >
             <span className="absolute -top-7 start-0 flex items-center gap-1.5 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/75 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
               {/* The rival's REAL avatar (their generated identity face), not a flat
@@ -103,6 +129,22 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
           </div>
         );
       })}
+      {/* Live climbers — a bright dashed altitude line + a pulsing chip, drawn
+          ON TOP of the record towers so a rival closing on you is never hidden
+          behind their own headstone. */}
+      {climbers.map(({ r, y }) => (
+        <div
+          key={`live-${r.id}`}
+          className="absolute inset-x-0 z-[2] flex items-center gap-1"
+          style={{ top: y, transition: reducedMotion || panning ? 'none' : LINE_FLOW }}
+        >
+          <div className="h-px flex-1 bg-[repeating-linear-gradient(90deg,#BFFF00_0_6px,transparent_6px_12px)] opacity-70" />
+          <span className="flex items-center gap-1 whitespace-nowrap rounded-neo border-neo border-black bg-neo-lime px-1.5 py-0.5 font-neo-body text-[10px] font-black text-black">
+            <span className={`h-1.5 w-1.5 rounded-full bg-neo-red ${reducedMotion ? '' : 'animate-pulse'}`} />
+            {r.name} · {Math.round(r.currentHeightM ?? 0)}m
+          </span>
+        </div>
+      ))}
       {passed && (
         // Pinned high under the HUD — NOT over the build column (was top-[42%], which
         // covered the tower letters).

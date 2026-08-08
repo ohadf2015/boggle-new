@@ -80,8 +80,15 @@ interface SceneProps {
   /** Fires with the altitude the camera is *looking at* (live height, or lower
    *  while panned) so sibling layers — landmark + rival rails — track the scroll
    *  too instead of freezing at the live height and leaving blank sky on the way
-   *  down. Throttled to one call per animation frame. */
-  onViewAltChange?: (alt: number) => void;
+   *  down. Throttled to one call per animation frame.
+   *
+   *  `panning` says whether the camera is being DRIVEN (drag or fling) rather
+   *  than jumping to a committed height. Siblings must drop their altitude eases
+   *  while it is true, for the same reason the backdrop does: `alt` re-quantises
+   *  every few metres during a scroll, and a 900ms transition simply restarts on
+   *  each step, so every layer chases a target it never reaches and the rails
+   *  visibly tear away from the tower. */
+  onViewAltChange?: (alt: number, panning: boolean) => void;
   /** Visible tower lean (deg, clamped ±LEAN_MAX_DEG) — recent-weighted from the
    *  crane drops. 0 = upright. Applied to the Pixi tower container's angle so the
    *  player SEES instability accumulate before the topple lands. */
@@ -946,7 +953,7 @@ export function WordTowerScene(props: SceneProps) {
     lastViewAltRef.current = null; // forget the panned altitude; we're back at the top
     setPanAltitude(null);
     setPannedDown(false);
-    onViewAltChange?.(heightM); // snap sibling rails back to the live height
+    onViewAltChange?.(heightM, false); // snap sibling rails back to the live height
   }, [heightM, props.biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const viewAlt = panAltitude ?? heightM;
@@ -985,7 +992,9 @@ export function WordTowerScene(props: SceneProps) {
         if (alt !== lastViewAltRef.current) {
           lastViewAltRef.current = alt;
           setPanAltitude(alt);
-          onViewAltChange?.(alt); // landmark + rival rails follow the scroll down
+          // `true`: applyPan only ever runs from a drag or a fling, so by construction
+          // the camera is being driven here — the rails must track it 1:1, not ease.
+          onViewAltChange?.(alt, true); // landmark + rival rails follow the scroll down
         }
         setPannedDown(pan.current.y < -BACK_TO_TOP_REVEAL_PX); // no-op re-render if unchanged
       });
@@ -1033,7 +1042,7 @@ export function WordTowerScene(props: SceneProps) {
     setPanning(false); // the snap owns the motion — layers get their eases back
     setPanAltitude(null);
     setPannedDown(false);
-    onViewAltChange?.(heightM); // rails snap back to the live top with the camera
+    onViewAltChange?.(heightM, false); // rails snap back to the live top with the camera
   }, [heightM, onViewAltChange, stopMomentum]);
 
   // Wrecking-ball mini-game closed — pull the camera back to the build line so
@@ -1103,7 +1112,7 @@ export function WordTowerScene(props: SceneProps) {
           panning={panning}
         />
         {/* Lazy altitude-reference props behind the tower (viewed altitude). */}
-        <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} />
+        <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} panning={panning} />
         {/* Rare drifting sightings (cosmic whale / satellite / shooting star). */}
         <WordTowerSighting heightM={viewAlt} reducedMotion={props.reducedMotion} />
         {/* Ambient leaves / birds / ice crystals — disabled on low-end/reduced motion. */}

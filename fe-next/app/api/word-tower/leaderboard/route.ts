@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
 
     const { data: rows, error } = await supabase
       .from('word_tower_progress')
-      .select('player_id, best_height_m, best_floors, highest_biome')
+      // `current_height_m` + `updated_at` drive the "climbing right now" flag on
+      // the rival rail. Both are derived from writes that already happen; nothing
+      // here is synthesised, so an idle board simply flags nobody.
+      .select('player_id, best_height_m, best_floors, highest_biome, current_height_m, updated_at')
       .gt('best_height_m', 0)
       .order('best_height_m', { ascending: false })
       .limit(TOP_N);
@@ -55,6 +58,8 @@ export async function GET(request: NextRequest) {
         bestHeightM: Number(r.best_height_m) || 0,
         bestFloors: r.best_floors ?? 0,
         highestBiome: r.highest_biome ?? 'city',
+        currentHeightM: Number(r.current_height_m) || 0,
+        updatedAt: r.updated_at ? Date.parse(r.updated_at) : null,
       };
     });
 

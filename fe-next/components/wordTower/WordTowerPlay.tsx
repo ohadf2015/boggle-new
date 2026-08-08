@@ -24,7 +24,8 @@ import {
 import { letterTickRate } from '@/lib/wordTower/placementFx';
 import { WORD_TOWER_MIN_WORD_LEN, WORD_TOWER_BIOMES, WORD_TOWER_SCRAMBLE_COIN_COST } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
-import type { RivalMarker } from '@/lib/wordTower/rivals';
+import type { LeaderboardRivalRow } from '@/lib/wordTower/rivals';
+import { useRivalRace } from '@/lib/wordTower/useRivalRace';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
 import { WordTowerLandmarkRail } from './WordTowerLandmarkRail';
 import { milestoneCrossed } from '@/lib/wordTower/milestones';
@@ -73,6 +74,7 @@ import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
+import { WordTowerRankStakes } from './WordTowerRankStakes';
 import { addCoins, getCoins, spendCoins } from '@/utils/coinManager';
 import { DomCoinBurst } from '@/components/animations/DomCoinBurst';
 import {
@@ -158,8 +160,12 @@ interface PlayProps {
   initialGame: WordTowerPlayerState;
   personalBestM: number;
   onOpenLeaderboard: () => void;
-  /** Other players' records to climb past (empty = no rail). */
-  rivals?: RivalMarker[];
+  /** The raw leaderboard board (empty = no rail). Rows, not pre-picked rivals:
+   *  WHICH rivals are worth racing depends on the viewer's live altitude, so the
+   *  selection happens here via `useRivalRace` rather than at the fetch site.
+   *  Deliberately a single source — a second pre-resolved `rivals` prop would let
+   *  the rail and the rank disagree about who is on the board. */
+  leaderboardRows?: LeaderboardRivalRow[];
   /** Daily Tower run — gates the endless progress POST so a daily (perk-eligible)
    *  climb NEVER writes to the shared monotonic board. */
   daily?: boolean;
@@ -191,11 +197,17 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '', onNewDailyBest }: PlayProps) {
+const NO_ROWS: LeaderboardRivalRow[] = [];
+
+export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, leaderboardRows = NO_ROWS, daily = false, onDailyEngaged, perkSeed = '', onNewDailyBest }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
   const { game } = tower.state;
+  // The live race: a reachable band of rivals centred on THIS climb, plus the
+  // board position that band is worth. Recomputes as the tower grows, so passing
+  // someone immediately promotes the next target instead of emptying the rail.
+  const { rivals, rank, rankGain } = useRivalRace(leaderboardRows, game.heightM);
   // Always-current pointer to the live game, for async callbacks (e.g. the
   // session-start wreck apply) that must act on the latest state, not a stale
   // closure snapshot.
@@ -213,6 +225,20 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const tease = useMemo(() => zoneTeaseAt(game.heightM), [game.heightM]);
   // Viewed altitude (live height, or lower while panned) — drives the landmark + rival rails.
   const [viewAlt, setViewAlt] = useState(game.heightM);
+  // True while the camera is being DRIVEN by a drag or fling. The rails below
+  // ease their altitude over 900ms, which is right for the discrete jump of an
+  // accepted word but wrong under a continuous scroll: `viewAlt` re-quantises
+  // every few metres, each step restarts the transition, and the rails end up
+  // permanently chasing a position they never reach — they visibly lag and tear
+  // away from the tower on the way down and snap back on the way up. The Scene
+  // already suppresses its own backdrop eases for exactly this reason; this
+  // carries the same signal out to its siblings. Both are batched into one
+  // render by React, so a gesture still costs two renders, not two per frame.
+  const [viewPanning, setViewPanning] = useState(false);
+  const onViewAltChange = useCallback((alt: number, panning: boolean) => {
+    setViewAlt(alt);
+    setViewPanning(panning);
+  }, []);
   // Persistent upgrade shop (spend coins on permanent tower boosts between climbs).
   const [showUpgrades, setShowUpgrades] = useState(false);
   // "N words possible" hint — how many dictionary words the player could build
@@ -1098,24 +1124,39 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         wreckDoneKey={wreckDoneKey}
         t={t}
         locale={language}
-        onViewAltChange={setViewAlt}
+        onViewAltChange={onViewAltChange}
       />
 
       {/* World altitude landmarks you climb past (cloud base, jet stream, edge
           of space…) — gives the height a real sense of place. Driven by the
           *viewed* altitude so panning down reveals the marks at that height. */}
-      <WordTowerLandmarkRail viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
+      <WordTowerLandmarkRail viewerHeightM={viewAlt} panning={viewPanning} reducedMotion={reducedMotion} t={t} />
 
-      {/* Rival rail + chase chip — the read-only leaderboard-ghost meta belongs to
-          the (retired) endless mode. The tower is daily-only now, so these never
-          render (displayRivals is empty in daily anyway); gating them out also
-          clears the top-right rival chip that overlapped the header. */}
-      {!daily && (
-        <>
-          <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
-          <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
-        </>
-      )}
+      {/* Rival rail + chase chip + rank. These used to be gated behind `!daily`
+          because the ghost meta was written for the retired endless mode — but
+          the tower is daily-only now AND daily runs persist to the same
+          `word_tower_progress` board, so that gate meant the game shipped with no
+          competitive surface at all. Read-only surfaces are safe in daily; the
+          Wrecking Ball below stays `!daily` because it WRITES shared state. */}
+      {/* NOTE: `displayRivals` carries SABOTAGE-REDUCED heights, and the rail uses
+          the same array for layout and for the pass detector. Lowering a rival's
+          record under your own height therefore counts as passing them. That is
+          defensible (you knocked their tower below yours) and unreachable today —
+          `hitsByRival` is only written by `sab.sabotage`, whose only caller is the
+          `!daily`-gated bay below, and `daily` is const true. If the Wrecking Ball
+          is ever ungated, feed the pass detector the PRE-sabotage heights. */}
+      <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} climbedHeightM={game.heightM} panning={viewPanning} reducedMotion={reducedMotion} t={t} />
+
+      {/* End-side rival column — ONE layout owner for the rank badge + chase
+          chip, mirroring the start-side utility rail. They used to be two
+          independent absolute offsets on the same edge, which is precisely how
+          the 390px pile-up happened. Parked at 22%: the stat HUD + back row own
+          the first ~112px (`DEFAULT_TOP_CHROME_PX`), and the band above the
+          build line is the strip that stays clear at every tower height. */}
+      <div className="pointer-events-none absolute end-2 top-[22%] z-[9] flex flex-col items-end gap-1.5">
+        <WordTowerRankStakes rank={rank} rankGain={rankGain} hasRivals={displayRivals.length > 0} reducedMotion={reducedMotion} t={t} dir={dir} />
+        <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+      </div>
 
       {/* ── Left utility rail ── persistent state chips (steady-hands streak,
           owned perks) stack in ONE flex column on the start side, below the top

@@ -9,6 +9,9 @@ const LINE_FLOW = 'top 900ms cubic-bezier(0.22,1,0.36,1)';
 interface Props {
   /** Viewer's current altitude (m). */
   viewerHeightM: number;
+  /** Camera is being dragged/flung — drop the altitude ease so the marks track
+   *  the scroll 1:1 instead of easing toward a target that moves every step. */
+  panning?: boolean;
   reducedMotion?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
@@ -19,7 +22,7 @@ interface Props {
  * sense of place — you literally rise past the clouds and into orbit. Inert +
  * reduced-motion safe; sits behind the tower and HUD.
  */
-export function WordTowerLandmarkRail({ viewerHeightM, reducedMotion, t }: Props) {
+export function WordTowerLandmarkRail({ viewerHeightM, panning, reducedMotion, t }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [h, setH] = useState(0);
 
@@ -42,7 +45,7 @@ export function WordTowerLandmarkRail({ viewerHeightM, reducedMotion, t }: Props
         <div
           key={m.id}
           className="absolute inset-x-0 flex items-center gap-2 px-3"
-          style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
+          style={{ top: m.screenY, transition: reducedMotion || panning ? 'none' : LINE_FLOW }}
         >
           <span className="whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/55 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white/85 backdrop-blur-sm">
             {m.icon} {t(m.key)} · {m.m}m

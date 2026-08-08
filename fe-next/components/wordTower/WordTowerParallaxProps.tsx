@@ -31,7 +31,7 @@ const MOTION: Record<string, Motion> = {
  * so the two transforms never fight. Mounted only while the prop is within its
  * altitude window — so its image loads lazily on approach and unloads once past.
  */
-function FloatingProp({ prop, reducedMotion }: { prop: ActiveParallaxProp; reducedMotion: boolean }) {
+function FloatingProp({ prop, reducedMotion, panning }: { prop: ActiveParallaxProp; reducedMotion: boolean; panning: boolean }) {
   const innerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,7 +70,14 @@ function FloatingProp({ prop, reducedMotion }: { prop: ActiveParallaxProp; reduc
         // Parallax position is altitude-driven motion → collapse it under reduced-motion.
         transform: `translateY(${reducedMotion ? 0 : prop.offsetPx}px)`,
         opacity: prop.opacity,
-        transition: reducedMotion ? 'opacity 400ms ease-out' : FLOW,
+        // While the camera is being panned, EVERY transition here is wrong.
+        // `offsetPx` and `opacity` both re-quantise several times per gesture:
+        // the 900ms transform ease restarts on each step so the prop never
+        // catches up and visibly slides free of the sky, and the 700ms opacity
+        // ease re-triggers as the prop crosses its altitude window — which is
+        // the flicker you see scrolling down and back up. The pan IS the
+        // animation; these only smooth the discrete jump of an accepted word.
+        transition: panning ? 'none' : (reducedMotion ? 'opacity 400ms ease-out' : FLOW),
         willChange: 'transform',
       }}
     >
@@ -257,7 +264,7 @@ function BiomeEventEmitter({ heightM = 0, reducedMotion = false }: { heightM?: n
  * plane flybys, etc). A pure DOM layer (NOT Pixi — avoids the v8 strict-mode
  * canvas race) sitting behind the transparent Pixi canvas. Inert + reduced-motion safe.
  */
-export function WordTowerParallaxProps({ heightM = 0, reducedMotion = false }: { heightM?: number; reducedMotion?: boolean }) {
+export function WordTowerParallaxProps({ heightM = 0, reducedMotion = false, panning = false }: { heightM?: number; reducedMotion?: boolean; panning?: boolean }) {
   const biome = biomeBlendAt(heightM).fromId;
   const themeData = BIOME_THEME[biome];
   const nativePropIds = new Set(themeData.nativePropIds || []);
@@ -269,7 +276,7 @@ export function WordTowerParallaxProps({ heightM = 0, reducedMotion = false }: {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       {active.map((p) => (
-        <FloatingProp key={p.id} prop={p} reducedMotion={reducedMotion} />
+        <FloatingProp key={p.id} prop={p} reducedMotion={reducedMotion} panning={panning} />
       ))}
       <BiomeEventEmitter heightM={heightM} reducedMotion={reducedMotion} />
     </div>

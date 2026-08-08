@@ -812,6 +812,11 @@ const sv = {
       "chaseGap": "+{m} m",
       "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera"
     },
+    "rank": {
+      "badge": "#{rank}",
+      "aria": "Du är rank {rank} på tornets topplista",
+      "gainAria": "Du klättrade från rank {from} till rank {to}"
+    },
     "minimap": {
       "label": "Tornkarta — {m} m, tryck för toppen"
     },

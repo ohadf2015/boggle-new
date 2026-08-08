@@ -533,6 +533,11 @@ const ja = {
       "chaseGap": "+{m} m",
       "chaseAria": "次のライバル: {name}、抜くまであと {m} m"
     },
+    "rank": {
+      "badge": "#{rank}",
+      "aria": "タワーランキング {rank} 位です",
+      "gainAria": "{from} 位から {to} 位に浮上しました"
+    },
     "minimap": {
       "label": "タワーマップ — {m} m、タップで頂上へ"
     },

@@ -27,6 +27,16 @@ export interface RivalMarker {
   /** Legacy emoji+colour — kept as a last-resort fallback only. */
   avatarEmoji?: string | null;
   avatarColor?: string | null;
+  /** The rival's in-progress altitude (m), 0 when they have no run going. */
+  currentHeightM?: number;
+  /** Epoch ms of their last progress write. Carried RAW so this mapping stays
+   *  pure and time-independent — presence is resolved once, in `useRivalRace`,
+   *  which owns a ticking clock. */
+  updatedAt?: number | null;
+  /** True while the rival is mid-climb. Resolved by `useRivalRace` (via
+   *  `isLiveRival`), never by this mapping — deciding it here would make the
+   *  result depend on when it was called. */
+  live?: boolean;
 }
 
 /** One leaderboard row as returned by `/api/word-tower/leaderboard`. */
@@ -41,6 +51,8 @@ export interface LeaderboardRivalRow {
   avatarImage?: string | null;
   avatarEmoji?: string | null;
   avatarColor?: string | null;
+  currentHeightM?: number;
+  updatedAt?: number | null;
 }
 
 const KNOWN_BIOMES = new Set(['city', 'sky', 'stratosphere', 'orbit', 'nebula', 'galaxy']);
@@ -64,6 +76,8 @@ export function rivalsFromLeaderboard(rows: ReadonlyArray<LeaderboardRivalRow>, 
       avatarImage: r.avatarImage ?? null,
       avatarEmoji: r.avatarEmoji ?? null,
       avatarColor: r.avatarColor ?? null,
+      currentHeightM: Number(r.currentHeightM) || 0,
+      updatedAt: r.updatedAt ?? null,
     }));
 }
 

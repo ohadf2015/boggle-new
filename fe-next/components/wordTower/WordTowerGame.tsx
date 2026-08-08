@@ -12,6 +12,7 @@ import {
 import { dailyTowerGameCode, DAILY_PLAYER_ID, utcDateKey } from '@/lib/wordTower/dailySeed';
 import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
+import { useWordTowerRivals } from '@/lib/wordTower/useWordTowerRivals';
 import { getWithAuth } from '@/utils/authFetch';
 import { WordTowerPlay } from './WordTowerPlay';
 import { WordTowerLeaderboard } from './WordTowerLeaderboard';
@@ -69,6 +70,10 @@ export function WordTowerGame() {
   // const so the many `daily`-gated branches below/downstream still read clearly.
   const daily = true;
   const { recordPlay } = useDailyStreak();
+  // The live board every competitive surface reads from (ghost towers, chase
+  // chip, rank). This used to be a hardcoded `rivals={[]}` with the fetching hook
+  // sitting uncalled, so the whole rival system rendered against an empty array.
+  const leaderboardRows = useWordTowerRivals();
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
@@ -193,7 +198,7 @@ export function WordTowerGame() {
         language={language}
         isInDictionary={isInDictionary}
         dictionary={dictRef.current}
-        rivals={[]}
+        leaderboardRows={leaderboardRows}
         initialGame={progress!.initialGame}
         personalBestM={progress!.personalBestM}
         onOpenLeaderboard={openLeaderboard}

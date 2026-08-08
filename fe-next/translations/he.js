@@ -533,6 +533,11 @@ const he = {
       "chaseGap": "+{m} מ'",
       "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה"
     },
+    "rank": {
+      "badge": "#{rank}",
+      "aria": "אתם במקום {rank} בטבלת המגדל",
+      "gainAria": "עליתם ממקום {from} למקום {to}"
+    },
     "minimap": {
       "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה"
     },
