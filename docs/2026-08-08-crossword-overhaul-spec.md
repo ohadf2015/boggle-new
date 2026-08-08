@@ -55,6 +55,22 @@ disclosure lands at ~30px cells. **Bands must be removed, not just resized.**
 10. Autocheck toggle (wraps existing `checkAll`).
 11. Word-complete celebration — currently only a progress-bar tick.
 
+## Decisions taken on the two open judgement calls
+
+**Solved-word marking stays always-on; no autocheck toggle.** The stat bar already reports *how
+many* words are solved, so withholding *which* was an information asymmetry rather than a
+difficulty setting. NYT makes autocheck a toggle because it is a 15×15 for purists with a
+solve-time leaderboard; this is a 10-clue mini for a casual audience whose reported complaint was
+that it "isn't clear how the words fill the board". A toggle would mean settings UI plus
+persistence plus another control on a viewport already fought over — cost with no matching benefit.
+
+**Mobile full clue list stays removed; swipe replaces it.** The real capability lost was not the
+list but the ability to *jump* to an arbitrary clue — with the list gone you could only step with
+prev/next. Rather than reintroduce a band or a modal for 10 clues, the clue bar now responds to a
+horizontal swipe (`ClueBar`, threshold 40px, ignores taps and mostly-vertical drags, direction
+follows reading order so it matches the chevrons in both LTR and RTL). This is the gesture
+Crosswords Classic uses and it reuses the existing `nextSlot`, which already wraps.
+
 ## Explicitly out of scope
 
 - **RTL column mirroring** (`CrosswordCell.tsx:43`). Flagged by the UI audit as "unconventional";

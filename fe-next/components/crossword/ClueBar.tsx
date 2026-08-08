@@ -1,7 +1,11 @@
 'use client';
 
+import { useRef } from 'react';
 import { ChevronLeft, ChevronRight, MoveHorizontal, MoveVertical } from 'lucide-react';
 import type { Slot } from '@/lib/crossword/types';
+
+/** Horizontal travel (px) before a drag counts as a clue swipe rather than a tap. */
+const SWIPE_MIN_PX = 40;
 
 export interface ClueBarProps {
   slot: Slot | null;
@@ -21,6 +25,28 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
   // Axis icon makes the across/down state legible at a glance; the cyan chrome marks it as the
   // single interactive direction control (re-tapping a cell also flips, but that's not discoverable).
   const AxisIcon = isAcross ? MoveHorizontal : MoveVertical;
+
+  // Swipe the clue to move between clues — the standard mobile crossword gesture, and the
+  // fast way to reach an arbitrary clue now that the phone layout has no full clue list.
+  // Direction follows reading order, so it matches the chevrons either way.
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const p = e.touches[0];
+    swipeStart.current = p ? { x: p.clientX, y: p.clientY } : null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = swipeStart.current;
+    const p = e.changedTouches[0];
+    swipeStart.current = null;
+    if (!start || !p) return;
+    const dx = p.clientX - start.x;
+    const dy = p.clientY - start.y;
+    // Ignore taps and mostly-vertical drags so reading or scrolling never changes the clue.
+    if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) <= Math.abs(dy)) return;
+    const forward = rtl ? dx > 0 : dx < 0;
+    if (forward) onNext();
+    else onPrev();
+  };
 
   return (
     <div className="flex items-stretch gap-2 w-full max-w-[28rem] mx-auto">
@@ -50,7 +76,9 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
 
       {/* Clue display — read-only. Use the AxisIcon button (left) to toggle direction. */}
       <div
-        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 bg-[#ffe9a8] text-neo-navy border-2 border-black rounded-none shadow-hard"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 bg-[#ffe9a8] text-neo-navy border-2 border-black rounded-none shadow-hard touch-pan-y"
       >
         {slot && (
           <span className="shrink-0 inline-flex items-center font-neo-display font-extrabold text-xs uppercase tracking-wide bg-neo-navy text-neo-cream rounded-none px-2 py-1">
