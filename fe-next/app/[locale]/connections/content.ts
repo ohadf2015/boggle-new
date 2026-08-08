@@ -2,89 +2,28 @@
  * Connections (Word Bridge / rosh-zanav) landing copy.
  * Server-rendered for SEO indexability. Client components that need
  * interactive strings outside this route use translations.connections.landing.*.
+ *
+ * en + he live here; the other locales are one file each (content.<locale>.ts)
+ * so no single file blows the 500-line limit. Shapes live in content.types.ts —
+ * importing them from here would make the locale files circular.
+ *
+ * SUPPORTED_LANDING_LOCALES is the ONLY answer to "which locales have landing
+ * copy". page.tsx and app/sitemap.ts both derive from it; they used to carry
+ * their own hardcoded lists that disagreed with this one and with each other.
  */
+export type {
+  BenefitCard,
+  CompareRow,
+  ConnectionsLandingCopy,
+  DemoPuzzle,
+  FaqEntry,
+} from './content.types';
 
-export interface DemoPuzzle {
-  word1: string;
-  word2: string;
-  bridge: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-}
-
-export interface BenefitCard {
-  title: string;
-  body: string;
-}
-
-export interface CompareRow {
-  name: string;
-  doing: string;
-  length: string;
-  skill: string;
-}
-
-export interface FaqEntry {
-  q: string;
-  a: string;
-}
-
-export interface ConnectionsLandingCopy {
-  metaTitle: string;
-  metaDescription: string;
-  metaKeywords: string;
-  ogTitle: string;
-  ogDescription: string;
-  twitterTitle: string;
-  twitterDescription: string;
-  badge: string;
-  h1Pre: string;
-  h1Highlight: string;
-  h1Sub: string;
-  introP1: string;
-  introP2: string;
-  ctaPrimary: string;
-  ctaSecondary: string;
-  demo: {
-    label: string;
-    puzzle: DemoPuzzle;
-    reveal: string;
-    success: string;
-  };
-  samples: {
-    heading: string;
-    sub: string;
-    revealLabel: string;
-    difficultyLabels: { easy: string; medium: string; hard: string };
-    items: DemoPuzzle[];
-  };
-  why: {
-    heading: string;
-    cards: BenefitCard[];
-  };
-  heClassic: {
-    badge: string;
-    title: string;
-    body: string;
-    imageAlt: string;
-  } | null;
-  compare: {
-    heading: string;
-    sub: string;
-    columns: [string, string, string, string];
-    rows: CompareRow[];
-  };
-  faq: {
-    heading: string;
-    items: FaqEntry[];
-  };
-  footerCta: {
-    heading: string;
-    body: string;
-    button: string;
-  };
-  videoGameName: string;
-  videoGameDescription: string;
-}
+import type { ConnectionsLandingCopy } from './content.types';
+import { ES_COPY } from './content.es';
+import { JA_COPY } from './content.ja';
+import { RU_COPY } from './content.ru';
+import { SV_COPY } from './content.sv';
 
 const EN_COPY: ConnectionsLandingCopy = {
   metaTitle: 'Word Bridge — Find the Connecting Word | LexiClash',
@@ -346,12 +285,37 @@ const HE_COPY: ConnectionsLandingCopy = {
     'משחק חידות אסוציאציה חינם בעברית. השחקן מקבל שתי מילים, ועליו למצוא את המילה האחת שמקשרת ביניהן.',
 };
 
-export function getConnectionsLandingCopy(locale: string): ConnectionsLandingCopy {
-  return locale === 'he' ? HE_COPY : EN_COPY;
-}
-
-export const SUPPORTED_LANDING_LOCALES = ['en', 'he'] as const;
+/**
+ * `ja` is deliberately ABSENT even though JA_COPY exists and the Japanese pool
+ * has 194 active puzzles. PageClient.tsx short-circuits `locale === 'ja'` to a
+ * "this game mode is not available" wall (added 7161c59ac, 2026-05-12 — three
+ * months BEFORE the Japanese pool was built, so the gate is very likely stale).
+ * Indexing a page that renders a dead end is worse than not indexing it, and
+ * lifting a deliberate product gate is a product call, not an SEO one.
+ *
+ * To enable Japanese: delete the `locale === 'ja'` branch in PageClient.tsx and
+ * add 'ja' here. Nothing else needs to change — JA_COPY is already wired into
+ * COPY_BY_LOCALE below, and page.tsx + app/sitemap.ts derive from this list.
+ */
+export const SUPPORTED_LANDING_LOCALES = ['en', 'he', 'sv', 'es', 'ru'] as const;
 export type SupportedLandingLocale = (typeof SUPPORTED_LANDING_LOCALES)[number];
+
+// Keyed by SupportedLandingLocale | 'ja': the Record stays exhaustive over the
+// landing locales (add one to the list → TS demands the copy), while 'ja' rides
+// along so direct visitors to /ja/connections would get Japanese copy the moment
+// the PageClient wall comes down. See the note on SUPPORTED_LANDING_LOCALES.
+const COPY_BY_LOCALE: Record<SupportedLandingLocale | 'ja', ConnectionsLandingCopy> = {
+  en: EN_COPY,
+  he: HE_COPY,
+  sv: SV_COPY,
+  ja: JA_COPY,
+  es: ES_COPY,
+  ru: RU_COPY,
+};
+
+export function getConnectionsLandingCopy(locale: string): ConnectionsLandingCopy {
+  return COPY_BY_LOCALE[locale as keyof typeof COPY_BY_LOCALE] ?? EN_COPY;
+}
 
 export function isSupportedLandingLocale(locale: string): locale is SupportedLandingLocale {
   return (SUPPORTED_LANDING_LOCALES as readonly string[]).includes(locale);

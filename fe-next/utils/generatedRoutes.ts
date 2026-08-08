@@ -102,6 +102,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/hebrew-classroom-vocabulary-games",
   "/hebrew-multiplayer-word-game",
   "/how-to-play",
+  "/igra-v-assotsiatsii-onlayn",
   "/igry-v-slova-onlayn",
   "/japanese-word-game",
   "/juego-de-palabras-multijugador",

@@ -35,9 +35,16 @@ export default function robots(): MetadataRoute.Robots {
     '/*?gclid=*',
   ];
 
-  // AI crawlers — explicit Allow signals welcome for citation/training.
+  // AI + search crawlers — explicit Allow signals welcome for citation/training.
   // Same disallow set as default to block share/UTM duplicates.
+  //
+  // YandexBot is here for a search reason rather than an AI one: Yandex carries
+  // the majority of Russian search, and we ship a Russian puzzle bank plus seven
+  // Russian keyword landings. Yandex Webmaster looks for an explicit rule; before
+  // 2026-08-09 the crawler only ever matched the catch-all `*`.
   const aiBots = [
+    'YandexBot',
+    'YandexImages',
     'GPTBot',
     'ChatGPT-User',
     'OAI-SearchBot',

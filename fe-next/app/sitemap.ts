@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
@@ -119,23 +120,27 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // with the noindex in adventure/page.tsx + layout.tsx.
   addForAllLocales(routes, '/daily/archive', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.7 });
 
-  // Connections is LIVE with a real en+he landing (content.ts); other locales
-  // are noindex → canonical en, so emit only the supported pair.
-  (['en', 'he'] as const).forEach((locale) => {
-    routes.push({
-      url: `${BASE_URL}/${locale}/connections`,
-      lastModified: LAST_DEPLOYED,
-      changeFrequency: 'daily',
-      priority: 0.8,
-      alternates: {
-        languages: {
-          'x-default': `${BASE_URL}/en/connections`,
-          en: `${BASE_URL}/en/connections`,
-          he: `${BASE_URL}/he/connections`,
-        },
-      },
+  // Connections emits exactly the locales that have native landing copy —
+  // SUPPORTED_LANDING_LOCALES is the single source of truth, shared with
+  // connections/page.tsx (which gates robots + hreflang off the same list).
+  // Anything not in it is noindex → canonical en, so it must not be listed here.
+  {
+    const connectionsAlternates: Record<string, string> = {
+      'x-default': `${BASE_URL}/en/connections`,
+    };
+    CONNECTIONS_LANDING_LOCALES.forEach((l) => {
+      connectionsAlternates[l] = `${BASE_URL}/${l}/connections`;
     });
-  });
+    CONNECTIONS_LANDING_LOCALES.forEach((locale) => {
+      routes.push({
+        url: `${BASE_URL}/${locale}/connections`,
+        lastModified: LAST_DEPLOYED,
+        changeFrequency: 'daily',
+        priority: 0.8,
+        alternates: { languages: connectionsAlternates },
+      });
+    });
+  }
 
   // Per-date archive child pages are intentionally NOT listed here.
   // They are thin per-puzzle stat/leaderboard snapshots and were dragging the
@@ -347,6 +352,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/filvordy-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/erudit-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/sostav-slova-iz-bukv', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
+  addForLocaleOnly(routes, '/igra-v-assotsiatsii-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
 
   // ─── Education keyword landings (English-only body) ───
   // Same pattern as comparison pages: robots: { index: locale === 'en' }, non-EN

@@ -175,6 +175,11 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         },
         other: {
             'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+            // Yandex Webmaster site ownership — see app/layout.tsx for the why.
+            // Absent (not blank) until NEXT_PUBLIC_YANDEX_VERIFICATION is set.
+            ...(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION
+                ? { 'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION }
+                : {}),
             // Geo-targeting: signal to search engines this site is based in Israel
             'geo.region': 'IL',
             'geo.placename': 'Israel',

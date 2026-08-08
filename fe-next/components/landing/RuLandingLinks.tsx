@@ -3,8 +3,9 @@ import Link from 'next/link';
 // Internal cross-links between the Russian keyword landing pages. Improves crawl
 // discovery + reinforces the ru landing cluster for search. `current` excludes
 // the page rendering it. Russian-only pages, so always rendered under /ru.
-const RU_LANDINGS: { slug: string; label: string }[] = [
+export const RU_LANDINGS: { slug: string; label: string }[] = [
   { slug: 'igry-v-slova-onlayn', label: 'Игры в слова онлайн' },
+  { slug: 'igra-v-assotsiatsii-onlayn', label: 'Игра в ассоциации онлайн' },
   { slug: 'filvordy-onlayn', label: 'Филворды онлайн' },
   { slug: 'slovo-dnya', label: 'Слово дня' },
   { slug: 'balda-onlayn', label: 'Балда онлайн' },

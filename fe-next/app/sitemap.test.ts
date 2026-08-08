@@ -1,5 +1,9 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import sitemap from './sitemap';
+import { RU_LANDINGS } from '../components/landing/RuLandingLinks';
+import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
 const BASE_URL = 'https://www.lexiclash.live';
@@ -109,15 +113,58 @@ describe('sitemap', () => {
   // Connections is LIVE with a real content hub (en+he landing copy in
   // content.ts; other locales are noindex → canonical en). It was missing
   // from the sitemap entirely.
-  it('lists /connections for its supported landing locales (en, he)', () => {
-    for (const locale of ['en', 'he']) {
+  // Emission is derived from SUPPORTED_LANDING_LOCALES, not restated here —
+  // a restated list is exactly how page.tsx, content.ts and this file drifted
+  // apart in the first place (hreflang advertised sv/ja/es while they were
+  // noindexed). Assert the *relationship*: listed iff it has landing copy.
+  it('lists /connections for exactly the locales with landing copy', () => {
+    for (const locale of CONNECTIONS_LANDING_LOCALES) {
       expect(
         routes.find((r) => r.url === `${BASE_URL}/${locale}/connections`),
         `missing /connections for ${locale}`
       ).toBeDefined();
     }
-    const others = routes.filter((r) => /\/(sv|ja|es|ru)\/connections$/.test(r.url));
-    expect(others.map((r) => r.url), 'non-supported connections locales are noindexed').toEqual([]);
+    const emitted = routes
+      .filter((r) => r.url.endsWith('/connections'))
+      .map((r) => r.url.split('/').at(-2));
+    expect([...emitted].sort(), 'no /connections URL without landing copy').toEqual(
+      [...CONNECTIONS_LANDING_LOCALES].sort()
+    );
+  });
+
+  // The RU keyword cluster is only worth anything if all three agree: a route
+  // exists, the sitemap lists it, and its siblings link to it. Google has never
+  // crawled these (URL Inspection: "URL is unknown to Google", 2026-08-09), so
+  // internal links are the discovery path that actually matters.
+  it('keeps the RU landing cluster, its routes and the sitemap in sync', () => {
+    for (const { slug } of RU_LANDINGS) {
+      expect(
+        existsSync(join(__dirname, '[locale]', slug, 'page.tsx')),
+        `RuLandingLinks points at /${slug} but no route exists`
+      ).toBe(true);
+
+      const ruUrl = `${BASE_URL}/ru/${slug}`;
+      expect(routes.find((r) => r.url === ruUrl), `sitemap is missing ${ruUrl}`).toBeDefined();
+
+      const leaked = routes.filter(
+        (r) => r.url.endsWith(`/${slug}`) && !r.url.startsWith(`${BASE_URL}/ru/`)
+      );
+      expect(
+        leaked.map((r) => r.url),
+        `/${slug} is Russian-only — it must not be emitted for other locales`
+      ).toEqual([]);
+    }
+  });
+
+  it('gives every /connections URL hreflang covering all landing locales', () => {
+    const en = routes.find((r) => r.url === `${BASE_URL}/en/connections`);
+    const langs = en?.alternates?.languages ?? {};
+    for (const locale of CONNECTIONS_LANDING_LOCALES) {
+      expect(langs[locale], `missing hreflang ${locale}`).toBe(
+        `${BASE_URL}/${locale}/connections`
+      );
+    }
+    expect(langs['x-default']).toBe(`${BASE_URL}/en/connections`);
   });
 
   // Blast is a LIVE mode whose play route is a noindexed shell; this landing

@@ -1,12 +1,15 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import ConnectionsPageClient from './PageClient';
-import { getConnectionsLandingCopy, isSupportedLandingLocale } from './content';
+import {
+  SUPPORTED_LANDING_LOCALES,
+  getConnectionsLandingCopy,
+  isSupportedLandingLocale,
+} from './content';
 
 export const dynamic = 'force-dynamic';
 
 const BASE_URL = 'https://www.lexiclash.live';
-const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 
 const OG_IMAGE: Record<string, string> = {
   en: 'og-image-en.webp',
@@ -14,6 +17,7 @@ const OG_IMAGE: Record<string, string> = {
   sv: 'og-image-en.webp',
   ja: 'og-image-ja.webp',
   es: 'og-image-en.webp',
+  ru: 'og-image-en.webp',
 };
 
 const OG_LOCALE: Record<string, string> = {
@@ -22,6 +26,7 @@ const OG_LOCALE: Record<string, string> = {
   sv: 'sv_SE',
   ja: 'ja_JP',
   es: 'es_ES',
+  ru: 'ru_RU',
 };
 
 interface PageProps {
@@ -39,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const languageMap: Record<string, string> = {
     'x-default': `${BASE_URL}/en/connections`,
   };
-  SUPPORTED_LOCALES.forEach((l) => {
+  SUPPORTED_LANDING_LOCALES.forEach((l) => {
     languageMap[l] = `${BASE_URL}/${l}/connections`;
   });
 
@@ -88,7 +93,18 @@ export default async function ConnectionsPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'VideoGame',
     name: copy.videoGameName,
-    alternateName: ['Word Bridge', 'rosh-zanav', 'ראש זנב'],
+    // Every localized name of the same game — helps search engines resolve
+    // "和同開珎" / "Мост слов" / "Ordbron" to one entity instead of six.
+    alternateName: [
+      'Word Bridge',
+      'rosh-zanav',
+      'ראש זנב',
+      'Ordbron',
+      '漢字ブリッジ',
+      '和同開珎',
+      'Palabra Puente',
+      'Мост слов',
+    ],
     url: `${BASE_URL}/${locale}/connections`,
     description: copy.videoGameDescription,
     image: `${BASE_URL}/${OG_IMAGE[locale] ?? OG_IMAGE.en}`,
@@ -97,7 +113,7 @@ export default async function ConnectionsPage({ params }: PageProps) {
     playMode: ['SinglePlayer'],
     applicationCategory: 'GameApplication',
     operatingSystem: 'Any (Web Browser)',
-    inLanguage: ['en', 'he'],
+    inLanguage: [...SUPPORTED_LANDING_LOCALES],
     offers: {
       '@type': 'Offer',
       price: '0',
