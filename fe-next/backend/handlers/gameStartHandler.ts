@@ -585,6 +585,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const wheelState = initWheelRushState(puzzle, playerUsernames);
       if (currentGame) {
         currentGame.wheelRushState = wheelState;
+      } else {
+        // If currentGame is null the state above is built and thrown away, and every later
+        // submission — human and bot alike — dies on WHEEL_STATE_NOT_INITIALIZED
+        // (wheelRushHandler.ts:52) with the round stuck at 0. Nothing here can recover it: this
+        // block is synchronous, so re-reading getGame() in the same tick returns the same null.
+        // So this is a loud tombstone, not a fix — if it ever fires, the log names the cause
+        // instead of leaving a silent 0-0 round to be re-reported from a screenshot.
+        logger.error(
+          'WHEEL_RUSH',
+          `wheelRushState was discarded for ${gameCode} — getGame() returned null at init, so scoring will deadlock at 0`,
+        );
       }
     }
 

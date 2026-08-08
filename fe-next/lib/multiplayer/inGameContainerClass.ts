@@ -19,7 +19,12 @@ import { cn } from '@/lib/utils';
  */
 export function getMpInGameContainerClass(gameMode: string): string {
   return cn(
-    'flex-1 flex flex-col min-h-0 overflow-x-clip overflow-y-auto bg-neo-navy',
+    'flex-1 flex flex-col min-h-0 bg-neo-navy',
+    // Wheel-rush has its own internal scroll container (WheelRushView with overflow-hidden
+    // on the root + flex layout). Adding overflow-y-auto here creates a redundant outer
+    // scroll region that pushes the score bars ~30% down the viewport. Classic/Blast/
+    // Word-Hunt scroll on this outer wrapper; wheel-rush scrolls internally only.
+    gameMode === 'wheel-rush' ? 'overflow-hidden' : 'overflow-x-clip overflow-y-auto',
     gameMode === 'blast' ? 'p-0' : 'p-0 md:p-4',
   );
 }
