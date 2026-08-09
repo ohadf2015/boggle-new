@@ -321,7 +321,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         }));
       }
     };
-    const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; stolenFrom?: string; error?: string }) => {
+    const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; error?: string }) => {
       const { t: tt, puzzle: pz, playWordAcceptedSound: accSfx, playWordRejectedSound: rejSfx } = latestRef.current;
       if (!data.accepted) {
         const code = data.error as WheelErrorCode | undefined;
@@ -334,17 +334,11 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       if (data.kind === 'locked') {
         // Dedup by word: a duplicate result emission, or a buffered accept that
         // lands right after a reconnect snapshot already hydrated this word,
-        // must not add a second chip. Each word is unique in the list (the
-        // stolen/closed handlers mutate the single matching entry in place).
+        // must not add a second chip. Each word is unique in the list.
         setMyWords(prev => prev.some(w => w.word === data.word)
           ? prev
           : [{ word: data.word, kind: 'locked', score: data.score, lockUntil: data.lockUntil, ts: Date.now() }, ...prev]);
         flash('ok', `+${data.score}`);
-      } else if (data.kind === 'stolen') {
-        setMyWords(prev => prev.some(w => w.word === data.word)
-          ? prev
-          : [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
-        flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }));
       }
       const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);
       if (coverage !== 'none') celebrateRef.current(coverage, data.word);
@@ -352,27 +346,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       haptic(20);
       setBuiltLetters([]);
     };
-    const onStolen = (data: { word: string; by?: string; from?: string }) => {
-      const { t: tt, username: me, playWordRejectedSound: rejSfx } = latestRef.current;
-      if (data.from === me) {
-        setMyWords(prev => prev.map(w =>
-          w.word === data.word && w.kind === 'locked'
-            ? { ...w, kind: 'stolen-from-me' as const, stolenFrom: data.by }
-            : w,
-        ));
-        flash('err', tt('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }));
-        rejSfx();
-        haptic([40, 30, 40]);
-      }
-    };
-    const onClosed = (data: { word: string; finder: string }) => {
-      setMyWords(prev => prev.map(w => (w.word === data.word && w.kind === 'locked' ? { ...w, kind: 'closed' as const } : w)));
-    };
 
     socket.on('wheelRushInit', onInit);
     socket.on('wheelWordResult', onResult);
-    socket.on('wheelWordStolen', onStolen);
-    socket.on('wheelWordClosed', onClosed);
 
     socket.emit('requestWheelRushState');
     const onReconnect = () => socket.emit('requestWheelRushState');
@@ -380,8 +356,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     return () => {
       socket.off('wheelRushInit', onInit);
       socket.off('wheelWordResult', onResult);
-      socket.off('wheelWordStolen', onStolen);
-      socket.off('wheelWordClosed', onClosed);
       socket.off('connect', onReconnect);
     };
   }, [socket, flash]);

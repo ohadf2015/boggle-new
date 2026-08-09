@@ -7049,8 +7049,6 @@ const he = {
     "missingCenter": "חייב לכלול את האות המרכזית ({letter})",
     "tooShort": "קצר מדי (מינימום {min} אותיות)",
     "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
-    "yourWordStolen": "{by} גנב לך את המילה {word}!",
-    "stealGain": "גניבה +{score}",
     "allLettersUsed": "כל האותיות!",
     "almostAllLetters": "כמעט הכל!",
     "inputPlaceholder": "הקלד מילה...",
@@ -9034,6 +9032,7 @@ const he = {
       "targetWordFound": "🎯 מצאתם את המילה: {word}",
       "targetWordMissed": "🎯 המילה הייתה: {word}",
       "vsAverage": "{pct}% לעומת הממוצע שלכם",
+      "nearMiss": "כמעט! חסרים {pct}% למושלם",
       "betterThan": "טוב יותר מ-{pct}% מתוצאות המשחק המהיר היום",
       "seeLeaderboard": "לטבלת המובילים המלאה",
       "nextRound": "סיבוב נוסף",
@@ -15355,6 +15354,8 @@ const he = {
     },
     "gems": {
       "title": "ציד אבני חן",
+      "ruleHint": "אספו אבני חן, שלבו 3 מאותו סוג לשדרוג, זכו בכתר מכל אחד מ-4 הצבעים",
+      "ruleHintDismiss": "הבנתי",
       "hud": {
         "crownsWon": "כתרים",
         "score": "ניקוד",

@@ -150,7 +150,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                     updateConfig('eyebrows', preset.eyebrows as CustomAvatarConfig['eyebrows']);
                     updateConfig('mouth', preset.mouth as CustomAvatarConfig['mouth']);
                   }}
-                  className="flex items-center gap-1 px-2 py-1.5 rounded-neo border-2 border-neo-white/15 hover:border-neo-white/40 bg-neo-navy-light hover:bg-neo-navy-light/80 transition-colors"
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-neo border-2 border-neo-white/15 hover:border-neo-white/40 bg-neo-navy-light hover:bg-neo-navy-light/80 active:scale-95 active:bg-neo-navy-light/60 transition-all"
                   title={t(preset.labelKey) || preset.name}
                 >
                   <span className="text-base">{preset.emoji}</span>
@@ -283,7 +283,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                       updateConfig(key as keyof CustomAvatarConfig, value);
                     });
                   }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-neo border-2 border-neo-white/15 hover:border-neo-white/40 bg-neo-navy-light hover:bg-neo-navy-light/80 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-neo border-2 border-neo-white/15 hover:border-neo-white/40 bg-neo-navy-light hover:bg-neo-navy-light/80 active:scale-95 active:bg-neo-navy-light/60 transition-all"
                   title={t(theme.labelKey) || theme.name}
                 >
                   {/* Mini color swatch preview */}

@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useTheme } from '@/utils/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle, BookOpen } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle, BookOpen, GraduationCap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -18,6 +19,7 @@ export default function FAQPageClient(): React.ReactElement {
   const locale = params.locale as string;
   const c: FAQContent = contentByLocale[locale] || contentByLocale.en;
   const isDarkMode = theme === 'dark';
+  const { t } = useLanguage();
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -177,6 +179,12 @@ export default function FAQPageClient(): React.ReactElement {
             <Link href={`/${locale}/blog`}>
               <Button size="sm" className="rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black font-bold text-xs shadow-hard-sm">
                 {c.blogViewAll}
+              </Button>
+            </Link>
+            <Link href={`/${locale}/education`}>
+              <Button variant="outline" size="sm" className="rounded-neo border-2 border-neo-black font-bold text-xs">
+                <GraduationCap className="w-3.5 h-3.5 me-1" />
+                {t('footer.educationHub')}
               </Button>
             </Link>
           </div>

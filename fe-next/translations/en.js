@@ -6511,8 +6511,6 @@ const en = {
     "missingCenter": "Must include center letter ({letter})",
     "tooShort": "Too short (min {min} letters)",
     "invalidLetters": "Can only use wheel letters",
-    "yourWordStolen": "{by} stole your word {word}!",
-    "stealGain": "STEAL +{score}",
     "allLettersUsed": "ALL LETTERS!",
     "almostAllLetters": "ALMOST ALL!",
     "inputPlaceholder": "Type a word...",
@@ -7886,6 +7884,7 @@ const en = {
       "targetWordFound": "🎯 You found the word: {word}",
       "targetWordMissed": "🎯 The word was: {word}",
       "vsAverage": "{pct}% vs your average",
+      "nearMiss": "So close! {pct}% from perfect",
       "betterThan": "Better than {pct}% of today's Quick Play scores",
       "seeLeaderboard": "See full leaderboard",
       "nextRound": "Spin next round",
@@ -13907,6 +13906,8 @@ const en = {
     },
     "gems": {
       "title": "Gem Hunt",
+      "ruleHint": "Collect gems, combine 3 of a kind to upgrade, win a crown of all 4 colors",
+      "ruleHintDismiss": "Got it",
       "hud": {
         "crownsWon": "Crowns",
         "score": "Score",

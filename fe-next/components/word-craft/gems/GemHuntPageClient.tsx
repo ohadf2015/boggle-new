@@ -21,6 +21,7 @@ import { GemShop } from './GemShop';
 import { GemCellOverlay } from './GemCellOverlay';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { GemHuntWinScene } from './GemHuntWinScene';
+import { GemHuntRuleHint } from './GemHuntRuleHint';
 import { cn } from '@/lib/utils';
 import type { AbilityCard, AbilityKind } from '@/lib/word-craft/gems/types';
 import { planGemDrama, clampGemDramaForCosy } from '@/lib/word-craft/celebration/gemDrama';
@@ -51,6 +52,14 @@ export default function GemHuntPageClient() {
   }, [setIsInGame]);
 
   const [dict, setDict] = useState<Set<string> | null>(null);
+  const [ruleHintDismissed, setRuleHintDismissed] = useState(false);
+  useEffect(() => {
+    if (window.localStorage.getItem('wordcraft_gems_rule_hint_dismissed') === '1') setRuleHintDismissed(true);
+  }, []);
+  const dismissRuleHint = useCallback(() => {
+    setRuleHintDismissed(true);
+    window.localStorage.setItem('wordcraft_gems_rule_hint_dismissed', '1');
+  }, []);
   useEffect(() => {
     let cancelled = false;
     loadWordCraftDictionary(locale).then((d) => {
@@ -286,6 +295,13 @@ export default function GemHuntPageClient() {
             <span className="text-xs text-neo-white">{t('wordcraft.loadingDict')}</span>
           </div>
         ) : null}
+
+        <GemHuntRuleHint
+          text={t('wordcraft.gems.ruleHint')}
+          dismissLabel={t('wordcraft.gems.ruleHintDismiss')}
+          dismissed={ruleHintDismissed}
+          onDismiss={dismissRuleHint}
+        />
 
         <GemHuntHUD
           inventory={state.inventory}

@@ -6181,6 +6181,7 @@ const ru = {
       "targetWordFound": "🎯 Вы нашли слово: {word}",
       "targetWordMissed": "🎯 Слово было: {word}",
       "vsAverage": "{pct}% к вашему среднему",
+      "nearMiss": "Так близко! {pct}% до идеала",
       "betterThan": "Лучше, чем {pct}% результатов быстрой игры сегодня",
       "seeLeaderboard": "Полная таблица лидеров",
       "nextRound": "Крутить дальше",
@@ -10739,8 +10740,6 @@ const ru = {
     "missingCenter": "Должно содержать центральную букву ({letter})",
     "tooShort": "Слишком коротко (мин {min} букв)",
     "invalidLetters": "Можно использовать только буквы колеса",
-    "yourWordStolen": "{by} украл твоё слово {word}!",
-    "stealGain": "КРАЖА +{score}",
     "allLettersUsed": "ВСЕ БУКВЫ!",
     "almostAllLetters": "ПОЧТИ ВСЕ!",
     "inputPlaceholder": "Печатай слово...",
@@ -11552,6 +11551,8 @@ const ru = {
     },
     "gems": {
       "title": "Охота за самоцветами",
+      "ruleHint": "Собирайте самоцветы, объединяйте 3 одинаковых для улучшения и соберите корону из всех 4 цветов",
+      "ruleHintDismiss": "Понятно",
       "hud": {
         "crownsWon": "Корон",
         "score": "Счёт",

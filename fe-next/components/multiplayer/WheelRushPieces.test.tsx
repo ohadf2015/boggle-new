@@ -43,22 +43,19 @@ describe('MyWordsChips styling', () => {
 
   it('gives every chip the same fixed height so the row never looks ragged', () => {
     const { container } = render(
-      <MyWordsChips words={[entry('locked'), entry('stolen'), entry('closed'), entry('stolen-from-me')]} />,
+      <MyWordsChips words={[entry('locked'), entry('closed')]} />,
     );
     const chips = container.querySelectorAll('[data-kind]');
-    expect(chips.length).toBe(4);
+    expect(chips.length).toBe(2);
     chips.forEach(chip => expect((chip as HTMLElement).className).toContain('h-7'));
   });
 
   it('still distinguishes word status by a subtle tinted border per kind', () => {
     const { container } = render(
-      <MyWordsChips words={[entry('locked'), entry('stolen'), entry('stolen-from-me')]} />,
+      <MyWordsChips words={[entry('locked'), entry('closed')]} />,
     );
     expect((container.querySelector('[data-kind="locked"]') as HTMLElement).className).toContain('border-neo-lime');
-    expect((container.querySelector('[data-kind="stolen"]') as HTMLElement).className).toContain('border-neo-pink');
-    const lost = container.querySelector('[data-kind="stolen-from-me"]') as HTMLElement;
-    expect(lost.className).toContain('border-neo-red');
-    expect(lost.className).toContain('line-through');
+    expect((container.querySelector('[data-kind="closed"]') as HTMLElement).className).toContain('bg-neo-navy-light');
   });
 
   it('shows the score on a chip', () => {

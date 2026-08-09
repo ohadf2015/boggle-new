@@ -5,10 +5,9 @@ import { cn } from '@/lib/utils';
 
 export interface WordEntry {
   word: string;
-  kind: 'locked' | 'stolen' | 'closed' | 'stolen-from-me';
+  kind: 'locked' | 'closed';
   score?: number;
   lockUntil?: number;
-  stolenFrom?: string;
   ts: number;
 }
 
@@ -29,8 +28,6 @@ interface MyWordsChipsProps {
 const CHIP_TONE: Record<WordEntry['kind'], { chip: string; score: string }> = {
   locked: { chip: 'bg-neo-lime/15 border-neo-lime', score: 'text-neo-lime' },
   closed: { chip: 'bg-neo-navy-light border-neo-black', score: 'text-neo-cyan' },
-  stolen: { chip: 'bg-neo-pink/15 border-neo-pink', score: 'text-neo-pink' },
-  'stolen-from-me': { chip: 'bg-neo-red/10 border-neo-red text-neo-white/50 line-through', score: 'text-neo-red/70' },
 };
 
 export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr' }) => {

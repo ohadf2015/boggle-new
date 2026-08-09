@@ -79,6 +79,10 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
     [outcome.history, result.scorePct]
   );
   const beatRival = rival !== null && rival.myValue > rival.theirValue;
+  // Near-miss tension: a strong-but-not-record round nudges "one more round"
+  // harder than a flat score readout. Suppressed once the bigger badges
+  // (best/rank-up) already cover the moment.
+  const isNearMiss = result.scorePct >= 85 && result.scorePct < 100 && !isPersonalBest;
   // Quick Rank: this round's pct just became permanent points
   const rankNow = quickRank(outcome.totalPoints);
   const rankBefore = quickRank(Math.max(0, outcome.totalPoints - result.scorePct));
@@ -139,6 +143,11 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
       {rankedUp && (
         <div className="animate-neo-pop rounded-xl border-neo-thick border-black bg-neo-pink px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-rank-up">
           {t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}
+        </div>
+      )}
+      {isNearMiss && (
+        <div className="animate-neo-pop rounded-xl border-neo-thick border-black bg-neo-orange px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-near-miss">
+          {t('quickPlay.solo.nearMiss', { pct: String(100 - result.scorePct) })}
         </div>
       )}
 

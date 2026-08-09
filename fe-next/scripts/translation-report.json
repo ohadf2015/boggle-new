@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6147,
+    "totalKeysInCode": 6149,
     "keyCountByLanguage": {
-      "en": 11927,
-      "es": 12223,
-      "he": 12128,
-      "ja": 12182,
-      "ru": 11958,
-      "sv": 12178
+      "en": 11928,
+      "es": 12224,
+      "he": 12129,
+      "ja": 12183,
+      "ru": 11959,
+      "sv": 12179
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
@@ -1108,14 +1108,14 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(outcomes)}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 226,
+        "line": 261,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),"
       },
       {
         "pattern": "`connections.daily.medal.${medal}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 260,
+        "line": 295,
         "context": "{t(`connections.daily.medal.${medal}`)}"
       },
       {
@@ -1178,14 +1178,14 @@
         "pattern": "`crossword.dir.${slot.dir}`",
         "type": "template_literal",
         "file": "components/crossword/ClueBar.tsx",
-        "line": 20,
+        "line": 24,
         "context": "const dirLabel = slot ? t(`crossword.dir.${slot.dir}`) : '';"
       },
       {
         "pattern": "`crossword.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/crossword/CrosswordView.tsx",
-        "line": 229,
+        "line": 230,
         "context": "difficultyLabel={t(`crossword.difficulty.${puzzle.difficulty}`)}"
       },
       {
@@ -1808,28 +1808,28 @@
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 127,
+        "line": 131,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 141,
+        "line": 145,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 232,
+        "line": 241,
         "context": "{t(`quickPlay.solo.rank.${rankNow.key}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 239,
+        "line": 248,
         "context": "rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),"
       },
       {
@@ -2004,14 +2004,14 @@
         "pattern": "`wordcraft.gems.dice.families.${sessionDice.id}`",
         "type": "template_literal",
         "file": "components/word-craft/gems/GemHuntPageClient.tsx",
-        "line": 296,
+        "line": 312,
         "context": "? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`), mul"
       },
       {
         "pattern": "`wordcraft.gems.dice.families.${fam.id}`",
         "type": "template_literal",
         "file": "components/word-craft/gems/GemHuntPageClient.tsx",
-        "line": 416,
+        "line": 432,
         "context": "{t(`wordcraft.gems.dice.families.${fam.id}`)}"
       },
       {

@@ -97,7 +97,7 @@ describe('WheelRushView — socket latest-value bridge (compiler un-bail gate)',
       );
     });
 
-    for (const ev of ['wheelRushInit', 'wheelWordResult', 'wheelWordStolen', 'wheelWordClosed']) {
+    for (const ev of ['wheelRushInit', 'wheelWordResult']) {
       expect(countCalls(socket.on, ev)).toBe(1);
       expect(countCalls(socket.off, ev)).toBe(0); // no unbind churn between renders
     }

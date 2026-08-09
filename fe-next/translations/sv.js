@@ -7357,8 +7357,6 @@ const sv = {
     "missingCenter": "Måste innehålla mittenbokstaven ({letter})",
     "tooShort": "För kort (min {min} bokstäver)",
     "invalidLetters": "Kan bara använda hjulets bokstäver",
-    "yourWordStolen": "{by} stal ditt ord {word}!",
-    "stealGain": "STÖLD +{score}",
     "allLettersUsed": "ALLA BOKSTÄVER!",
     "almostAllLetters": "NÄSTAN ALLA!",
     "inputPlaceholder": "Skriv ett ord...",
@@ -9407,6 +9405,7 @@ const sv = {
       "targetWordFound": "🎯 Du hittade ordet: {word}",
       "targetWordMissed": "🎯 Ordet var: {word}",
       "vsAverage": "{pct}% mot ditt snitt",
+      "nearMiss": "Så nära! {pct}% från perfekt",
       "betterThan": "Bättre än {pct}% av dagens snabbspelsresultat",
       "seeLeaderboard": "Visa hela topplistan",
       "nextRound": "Snurra nästa runda",
@@ -15447,6 +15446,8 @@ const sv = {
     },
     "gems": {
       "title": "Ädelstensjakt",
+      "ruleHint": "Samla ädelstenar, kombinera 3 av samma sort för att uppgradera, vinn en krona i alla 4 färger",
+      "ruleHintDismiss": "Uppfattat",
       "hud": {
         "crownsWon": "Kronor",
         "score": "Poäng",

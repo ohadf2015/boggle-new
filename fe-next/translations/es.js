@@ -7091,8 +7091,6 @@ const es = {
     "missingCenter": "Debe incluir la letra central ({letter})",
     "tooShort": "Demasiado corta (mín {min} letras)",
     "invalidLetters": "Solo puedes usar las letras de la rueda",
-    "yourWordStolen": "¡{by} te robó la palabra {word}!",
-    "stealGain": "ROBO +{score}",
     "allLettersUsed": "¡TODAS LAS LETRAS!",
     "almostAllLetters": "¡CASI TODAS!",
     "inputPlaceholder": "Escribe una palabra...",
@@ -9137,6 +9135,7 @@ const es = {
       "targetWordFound": "🎯 Encontraste la palabra: {word}",
       "targetWordMissed": "🎯 La palabra era: {word}",
       "vsAverage": "{pct}% frente a tu media",
+      "nearMiss": "¡Tan cerca! {pct}% para lo perfecto",
       "betterThan": "Mejor que el {pct}% de las partidas rápidas de hoy",
       "seeLeaderboard": "Ver clasificación completa",
       "nextRound": "Girar otra ronda",
@@ -15322,6 +15321,8 @@ const es = {
     },
     "gems": {
       "title": "Caza de Gemas",
+      "ruleHint": "Recoge gemas, combina 3 iguales para mejorar, gana una corona de los 4 colores",
+      "ruleHintDismiss": "Entendido",
       "hud": {
         "crownsWon": "Coronas",
         "score": "Puntos",

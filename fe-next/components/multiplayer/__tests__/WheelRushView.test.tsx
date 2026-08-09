@@ -473,39 +473,6 @@ it('renders the round-timer countdown when remainingTime prop is provided', () =
     expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CAR' });
   });
 
-  it('marks word as stolen-from-me when wheelWordStolen targets self', () => {
-    const socket = makeMockSocket();
-    render(
-      <WheelRushView
-        socket={socket}
-        username="alice"
-        leaderboard={[{ username: 'alice', score: 0 }]}
-        onQuit={vi.fn()}
-        t={tStub}
-      />,
-    );
-    act(() => {
-      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
-    });
-
-    // Alice locks CRANE
-    act(() => {
-      socket.fire('wheelWordResult', {
-        word: 'CRANE', accepted: true, kind: 'locked', score: 15, lockUntil: Date.now() + 3000,
-      });
-    });
-    expect(screen.getByText(/CRANE/)).toBeTruthy();
-
-    // Bob steals it from Alice
-    act(() => {
-      socket.fire('wheelWordStolen', { word: 'CRANE', by: 'bob', from: 'alice' });
-    });
-
-    // Chip should now reflect stolen-from-me state (red variant renders with data-kind)
-    const chip = screen.getByText(/CRANE/);
-    expect(chip.className).toMatch(/neo-red|bg-neo-red/);
-  });
-
   it('calls onFogProgressChange with progress in (0,1) while fog is active', () => {
     vi.useFakeTimers();
     try {

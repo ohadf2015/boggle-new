@@ -40,4 +40,29 @@ describe('QuickPlayResults', () => {
     const pill = screen.getByText('quickPlay.solo.mode.blast');
     expect(pill.className).toContain('bg-neo-pink');
   });
+
+  it('shows a near-miss nudge at 85-99% when this round is not a personal best', () => {
+    const nearMissResult: QuickRoundResult = { ...result, scorePct: 92 };
+    const nearMissOutcome: QuickSubmitOutcome = { ...outcome, scorePct: 92, history: [92] };
+    render(
+      <QuickPlayResults result={nearMissResult} outcome={nearMissOutcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
+    );
+    expect(screen.getByTestId('quick-near-miss')).toHaveTextContent('quickPlay.solo.nearMiss');
+  });
+
+  it('hides the near-miss nudge on a personal best (the bigger badge already covers it)', () => {
+    const bestResult: QuickRoundResult = { ...result, scorePct: 92 };
+    const bestOutcome: QuickSubmitOutcome = { ...outcome, scorePct: 92, history: [92, 50, 40] };
+    render(
+      <QuickPlayResults result={bestResult} outcome={bestOutcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
+    );
+    expect(screen.queryByTestId('quick-near-miss')).not.toBeInTheDocument();
+  });
+
+  it('hides the near-miss nudge below the 85% threshold', () => {
+    render(
+      <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
+    );
+    expect(screen.queryByTestId('quick-near-miss')).not.toBeInTheDocument();
+  });
 });

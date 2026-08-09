@@ -7128,8 +7128,6 @@ const ja = {
     "missingCenter": "中央の文字（{letter}）を含める必要があります",
     "tooShort": "短すぎます（最低{min}文字）",
     "invalidLetters": "ホイールの文字のみ使用できます",
-    "yourWordStolen": "{by}に単語{word}を奪われました！",
-    "stealGain": "スチール +{score}",
     "allLettersUsed": "全文字使用！",
     "almostAllLetters": "あと一文字！",
     "inputPlaceholder": "単語を入力...",
@@ -8506,6 +8504,7 @@ const ja = {
       "targetWordFound": "🎯 単語を発見: {word}",
       "targetWordMissed": "🎯 単語は「{word}」でした",
       "vsAverage": "自己平均より{pct}%",
+      "nearMiss": "惜しい!完璧まであと{pct}%",
       "betterThan": "今日のクイックプレイの{pct}%より上位",
       "seeLeaderboard": "ランキングを見る",
       "nextRound": "次のラウンドへ",
@@ -15169,6 +15168,8 @@ const ja = {
     },
     "gems": {
       "title": "ジェムハント",
+      "ruleHint": "ジェムを集めて同じ種類を3つ組み合わせてアップグレード、4色すべての冠を獲得しよう",
+      "ruleHintDismiss": "わかった",
       "hud": {
         "crownsWon": "クラウン",
         "score": "スコア",
