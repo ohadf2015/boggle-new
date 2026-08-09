@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-08",
-  "note": "Brief top item: /en/leaderboard LCP 8130ms (n not given in brief; brief-first contract -- no fresh PostHog n-check run tonight, so this is NOT a confirmed n>=50 regression, just the brief's top-ranked candidate). Root cause found by reading code, not measurement: PageClientNoSsr.tsx wraps the ENTIRE leaderboard PageClient in next/dynamic({ssr:false}) with no `loading` fallback -- page renders BLANK (no SSR HTML, no client placeholder) until the full PageClient chunk (framer-motion, useSupabaseRealtime hooks, podium) downloads+hydrates+fetches. Fix: added `loading: () => <PageLoader />` so the existing branded loader (already used as this route's loading.tsx) paints immediately instead of blank white. Did not remove ssr:false itself (that guards against an isSupabaseEnabled SSR/client flash -- Class 1 dual-source-of-truth risk, out of scope for a 10-min lane). Prior backend item (unindexed FK public.vocabulary_lessons_classroom_id_fkey) carried, still 2-row table, not touched.\n  Previous night's note: Brief's top backend item (unindexed FK public.vocabulary_lessons_classroom_id_fkey) re-verified via Supabase Management API raw-SQL (n_live_tup=2) -- 3rd night in a row at 2 rows, no index added, EXPLAIN ANALYZE would show near-zero seq-scan cost either way (hard rule: index only if it measurably helps). Brief's top frontend items (multiplayer room LCP 25476ms/19632ms, es-multijugador 4794ms, daily/word-wheel 3414ms/3272ms) all checked against live PostHog n over 24h: /en/multiplayer n=21, /es/juego-de-palabras-multijugador n=11, /en/daily/word-wheel n=5, /en/daily-word-wheel n=1 -- ALL below the mandatory 50-sample floor, so none qualify for a regression verdict (same noise class as the documented 2026-06-10 n=10 false-alarm). No code shipped tonight -- ship-blocking finding is the brief itself surfacing sub-floor-n items as top-scored; nothing to fix without risking a phantom-regression chase. word-wheel canvas mount-size bug (separate, real) was already fixed in the prior commit 8443b0d3f before this lane started.",
+  "date": "2026-08-09",
+  "note": "Brief top items were tryshopli.com mood pages (NOT in this repo -- external site, no code to fix here) and lexiclash /multiplayer?room=XXX invite URLs. The MP room items are STRUCTURALLY unmeasurable per-URL: each room code is unique (?room=K85Q36 etc), so individual URL n is always ~1 -- confirmed by aggregate query: /multiplayer route total n=52/24h (clears floor) but no single room URL ever will. This is the 3rd consecutive night this route pattern surfaces in the brief; prior 2 nights independently found the same per-URL sub-floor issue. No code changed tonight -- root cause is a brief-generation artifact (should aggregate by route template, not exact URL with query string), not a code regression. Filed as perf-watch item. Backend candidates (unindexed FK vocabulary_lessons, unused index word_pacts, auth_db_connections_absolute) carried unchanged from prior 3 nights -- supabase MCP did not connect within lane time budget tonight, REST fallback script not present in scripts/nightly/lib/.",
   "backend": {
     "advisor_performance_lints_total": 108,
     "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- 3rd consecutive night confirmed 2-row table via Management API (n_live_tup=2), no index added",
@@ -10,11 +10,36 @@
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/leaderboard", "p75_lcp_ms": 8130, "n_24h": "not measured (brief-first contract)", "vs_baseline": "root-caused via code read: full-page ssr:false with no loading fallback -> blank until hydration. Fixed: added loading={PageLoader} to PageClientNoSsr.tsx dynamic() call." },
-      { "route": "/en/multiplayer", "p75_lcp_ms": 15373, "n_24h": 21, "vs_baseline": "below 50-sample floor -- DEFERRED, not a confirmed regression (baseline 3228 was itself n=52 over 7d, different window, not comparable)" },
-      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 4913, "n_24h": 11, "vs_baseline": "below 50-sample floor -- DEFERRED" },
-      { "route": "/en/daily/word-wheel", "p75_lcp_ms": 4793, "n_24h": 5, "vs_baseline": "below 50-sample floor -- DEFERRED" },
-      { "route": "/en/daily-word-wheel", "p75_lcp_ms": 3272, "n_24h": 1, "vs_baseline": "below 50-sample floor -- DEFERRED, single sample" }
+      {
+        "route": "/en/leaderboard",
+        "p75_lcp_ms": 8130,
+        "n_24h": "not measured (brief-first contract)",
+        "vs_baseline": "root-caused via code read: full-page ssr:false with no loading fallback -> blank until hydration. Fixed: added loading={PageLoader} to PageClientNoSsr.tsx dynamic() call."
+      },
+      {
+        "route": "/en/multiplayer",
+        "p75_lcp_ms": 15373,
+        "n_24h": 21,
+        "vs_baseline": "below 50-sample floor -- DEFERRED, not a confirmed regression (baseline 3228 was itself n=52 over 7d, different window, not comparable)"
+      },
+      {
+        "route": "/es/juego-de-palabras-multijugador",
+        "p75_lcp_ms": 4913,
+        "n_24h": 11,
+        "vs_baseline": "below 50-sample floor -- DEFERRED"
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms": 4793,
+        "n_24h": 5,
+        "vs_baseline": "below 50-sample floor -- DEFERRED"
+      },
+      {
+        "route": "/en/daily-word-wheel",
+        "p75_lcp_ms": 3272,
+        "n_24h": 1,
+        "vs_baseline": "below 50-sample floor -- DEFERRED, single sample"
+      }
     ],
     "practice_classic_split": {
       "status": "carried from 08-04, not re-touched tonight"
@@ -27,11 +52,26 @@
     "build_id_date": "2026-08-02",
     "note": "no fresh build run tonight (time-budget discipline); top_chunks carried unchanged",
     "top_chunks": [
-      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452 },
-      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284 },
-      { "name": "82055-affbfbb6ca395994.js", "kb": 856 },
-      { "name": "64789.cd0e09fa6af59d97.js", "kb": 736 },
-      { "name": "68292.6432fa305f73e0bf.js", "kb": 648 }
+      {
+        "name": "7fd32332.f8584f0003a0530e.js",
+        "kb": 6452
+      },
+      {
+        "name": "5ee60e17.b67a689edf290af4.js",
+        "kb": 3284
+      },
+      {
+        "name": "82055-affbfbb6ca395994.js",
+        "kb": 856
+      },
+      {
+        "name": "64789.cd0e09fa6af59d97.js",
+        "kb": 736
+      },
+      {
+        "name": "68292.6432fa305f73e0bf.js",
+        "kb": 648
+      }
     ]
   }
 }

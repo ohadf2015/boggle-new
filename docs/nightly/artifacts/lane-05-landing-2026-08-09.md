@@ -1,0 +1,4 @@
+status: shipped
+attempted: improve an existing admin-beta mode (STEP 0) — self-selected Quick Play (canSeeInWorkModes-gated, not in lane 05's last-10 "Mode improvement shipped" rotation)
+files_touched: fe-next/components/quick-play/QuickPlayResults.tsx, fe-next/components/quick-play/__tests__/QuickPlayResults.test.tsx, fe-next/translations/{en,he,sv,ja,es}.js
+next_steps: none — slice complete, tests green (11/11), eslint clean on changed files. Rotation note for tomorrow: Quick Play, crossword, wordfall(Blast V2), adventure haven't had an official "Mode improvement shipped" block in the last 10 lane-05 entries — word-craft/sealed-bid/brain-drill have been over-rotated. Also found: Brain Drill (`brainGym`) has NO admin gate anywhere in code (LandingChallengeCards.tsx pushes it unconditionally) — it's actually public now, contradicting stale memory/learnings that list it as admin-gated. Update the target-list assumption next time instead of re-deriving from scratch.

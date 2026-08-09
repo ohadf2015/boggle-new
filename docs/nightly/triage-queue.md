@@ -2036,3 +2036,36 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - recommended owner: backend/vendor (fix belongs in the feedback-devtools SDK's own fetch wrapper — wrap in try/catch or ignore TypeError:Failed to fetch as an expected transient network error at the source repo, not in this bundle)
 - [Feedback reports] 2 QA dogfood test submissions (2026-08-03, kanban t_15388a75) — explicitly "please ignore/delete"
   - status: no action needed, self-flagged as test data
+
+## 2026-08-09
+- [Restore] Dropped nightly work 20260808-010000 (14 files: WheelRushView/Pieces + PageClientNoSsr + GemHunt + translations)
+  - dropped 2026-08-08, gate error: WheelRushView.tsx TS2345 setState callback type mismatch on a 'stolen'/'stolen-from-me' WordEntry variant
+  - restored version no longer contains that variant (superseded fix already present in backup) — re-verified clean: tsc scoped clean, eslint clean, 31/31 tests green (WheelRushPieces, WheelRushView x2, GemHuntRuleHint)
+  - status: shipped (restored, uncommitted — orchestrator commits)
+  - recommended owner: review-by-eod
+- [PostHog] TypeError: Failed to fetch (issue 019fca04-f4b0-7690-a59a-95c44134a09a)
+  - 91 occurrences/6 users/28 sessions over 5d, unhandled, seen mainly on /multiplayer?quickPlay=true
+  - only in-app frame is a minified Next.js chunk (67917), not in Sentry, no resolvable stack/source in either MCP
+  - status: deferred
+  - why: ambiguous root cause — cannot safely guess which fetch() call without a resolvable stack; likely a network-flake pattern (unhandled fetch rejection), not necessarily an app bug
+  - recommended owner: backend (add sourcemap upload for this chunk or wrap MP quickPlay fetches with reason tagging so PostHog can attribute it)
+- [Sentry] Error: Game hasn't started yet (JAVASCRIPT-NEXTJS-1Y8) + [SOCKET.IO] Error received: Game hasn't started yet (JAVASCRIPT-NEXTJS-1X7)
+  - Both root-caused to GAME_NOT_IN_PROGRESS localized-message drift, already fixed 2026-08-07 (utils/sentry.ts:248 EXPECTED_SOCKET_ERROR_CODES). Both issues' last-seen (08-06) predate the fix — no code change needed.
+  - status: shipped (verification only, no code diff)
+  - why: attempted `update_issue` to resolve both — Sentry MCP returned 403 (known: write access not granted to this MCP token). Needs manual resolve in Sentry UI.
+  - recommended owner: review-by-eod (manually click Resolve on both, or let next lane retry once MCP write scope is fixed)
+- [Supabase advisor] Signed-In Users Can Execute SECURITY DEFINER Function — upsert_push_token
+  - verified SAFE, no change: function body scopes every read/write to `auth.uid()` internally (066_push_notification_system.sql:216,220), never accepts a target user id param. Already hardened — PUBLIC execute revoked, only `authenticated` granted (20260628010000_revoke_push_token_fn_from_public.sql), which is required since it's a real signed-in feature (app/api/player/push-token/route.ts).
+  - status: shipped (verification only, no code diff)
+  - why: closing as a verified-correct finding rather than re-auditing next time
+  - recommended owner: self (closed)
+
+## 2026-08-09
+
+### [Experiment underpowered] `exp-homepage-click-feedback-v1` — promising but n<1000/arm
+- Running since 2026-07-14 (26d), targets exactly tonight's #1 brief item (homepage rage clicks). Result so far: control 144 rageclicks/307 viewers (46.9%) vs click-feedback 91/306 (29.7%) — a real-looking drop, but both arms are well under the 1000-user/arm threshold for an auto-retire decision. Do NOT retire yet; re-check in ~2-3 weeks once n clears 1000/arm.
+- Query to re-check: `SELECT properties['$feature/exp-homepage-click-feedback-v1'] as variant, countIf(event='$rageclick') as rageclicks, uniqIf(person_id, event='$pageview') as viewers FROM events WHERE timestamp > now() - INTERVAL 26 DAY AND variant IS NOT NULL GROUP BY variant`
+
+### [Shipped direct fix, not an A/B] Profile avatar-builder rage clicks — same bug class as homepage
+- Brief's #2 target (`/he/profile` rageclicks, reach=2, el_text "😊 שמח") traced to `components/avatar/AvatarBuilderCategoryOptions.tsx` — the "Expressions" preset buttons (one-click emoji combos) and "Color Theme" preset buttons had `hover:` states but zero `active:`/press feedback, identical root cause to the homepage mode-cards bug that `exp-homepage-click-feedback-v1` measurably improved (see above).
+- n=2 is far too thin to justify standing up a new typed experiment + flag; the fix pattern (`active:scale-95 active:bg-neo-navy-light/60`) is already proven effective with real data, so shipped it directly instead of gating behind a new A/B. Re-check `$rageclick` volume on `/profile` in ~7d.

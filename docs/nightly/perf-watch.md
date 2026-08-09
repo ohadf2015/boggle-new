@@ -249,3 +249,6 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 
 **Not fixed tonight:** multiplayer PageClient is 671 lines, blast radius too high to fix without thorough testing. Human review recommended.
 
+
+## 2026-08-09 — brief item is structurally unmeasurable (3rd night, same route pattern)
+`/multiplayer?room=XXX` invite URLs scored high in tonight's brief (LCP 5876ms, 5556ms). These are per-room unique URLs (room code in query string) -- each individual URL can never reach n>=50 samples, so per-URL LCP is pure noise by construction. The `/multiplayer` route in aggregate has n=52/24h (clears floor) -- if this route needs perf work, measure THAT, not the per-room URL variants the brief surfaces. Recommend: fix the nightly brief generator to group PostHog LCP by route template (strip query params) instead of exact URL, so this stops re-surfacing as a false top-scored item. 3rd consecutive night wasting lane budget on this same noise pattern (2026-08-07, 2026-08-08, 2026-08-09).
