@@ -88,14 +88,27 @@ export function focusCell(state: GameState, row: number, col: number): GameState
   if (!slotAt(state.puzzle, row, col, dir)) {
     dir = dir === 'across' ? 'down' : 'across';
   }
-  return { ...state, active: { row, col }, dir, checks: {} };
+  return { ...state, active: { row, col }, dir, checks: {}, warmths: {} };
 }
 
 /** Toggle across <-> down at the current cell (only if a slot exists in the other dir). */
 export function toggleDir(state: GameState): GameState {
   const other: Direction = state.dir === 'across' ? 'down' : 'across';
   if (!slotAt(state.puzzle, state.active.row, state.active.col, other)) return state;
-  return { ...state, dir: other, checks: {} };
+  return { ...state, dir: other, checks: {}, warmths: {} };
+}
+
+/** Drop the check/warmth verdict for a single cell, leaving the rest of the word's intact.
+ *  Editing one letter shouldn't wipe the feedback you're using to fix the others. */
+function clearCellFeedback(state: GameState, key: string): Pick<GameState, 'checks' | 'warmths'> {
+  if (!state.checks[key] && !state.warmths[key]) {
+    return { checks: state.checks, warmths: state.warmths };
+  }
+  const checks = { ...state.checks };
+  const warmths = { ...state.warmths };
+  delete checks[key];
+  delete warmths[key];
+  return { checks, warmths };
 }
 
 export function currentSlot(state: GameState): Slot | null {
@@ -174,7 +187,13 @@ export function inputLetter(state: GameState, raw: string): GameState {
       active = { row: after[0].row, col: after[0].col };
     }
   }
-  const next = { ...state, entries, active, dir, checks: {} };
+  const next = {
+    ...state,
+    entries,
+    active,
+    dir,
+    ...clearCellFeedback(state, k(state.active.row, state.active.col)),
+  };
   return { ...next, status: recomputeStatus(next) };
 }
 
@@ -185,20 +204,21 @@ export function backspace(state: GameState): GameState {
   if (state.entries[here]) {
     const entries = { ...state.entries };
     delete entries[here];
-    return { ...state, entries, status: 'playing', checks: {} };
+    return { ...state, entries, status: 'playing', ...clearCellFeedback(state, here) };
   }
   if (slot) {
     const i = activeIndex(state, slot);
     const prev = slot.cells[i - 1];
     if (prev) {
+      const prevKey = k(prev.row, prev.col);
       const entries = { ...state.entries };
-      delete entries[k(prev.row, prev.col)];
+      delete entries[prevKey];
       return {
         ...state,
         entries,
         active: { row: prev.row, col: prev.col },
         status: 'playing',
-        checks: {},
+        ...clearCellFeedback(state, prevKey),
       };
     }
   }
@@ -212,7 +232,17 @@ export function moveInSlot(state: GameState, delta: 1 | -1): GameState {
   const i = activeIndex(state, slot);
   const target = slot.cells[i + delta];
   if (!target) return state;
-  return { ...state, active: { row: target.row, col: target.col }, checks: {} };
+  return { ...state, active: { row: target.row, col: target.col }, checks: {}, warmths: {} };
+}
+
+/** Arrow Up/Down: switch to the down word and move, in ONE step.
+ *  Previously the view toggled on the first press and only moved on the second,
+ *  so navigating vertically took two key presses. */
+export function moveVertical(state: GameState, delta: 1 | -1): GameState {
+  const facing = state.dir === 'down' ? state : toggleDir(state);
+  // No down slot through this cell — toggleDir was a no-op, so don't move sideways.
+  if (facing.dir !== 'down') return state;
+  return moveInSlot(facing, delta);
 }
 
 /** Reveal the active cell's solution (hint). */

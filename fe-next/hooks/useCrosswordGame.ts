@@ -12,6 +12,7 @@ import {
   initGame,
   inputLetter as inputLetterFn,
   moveInSlot as moveInSlotFn,
+  moveVertical as moveVerticalFn,
   revealCell as revealCellFn,
   revealWord as revealWordFn,
   toggleDir as toggleDirFn,
@@ -36,6 +37,8 @@ export interface UseCrosswordGame {
   inputLetter: (letter: string) => void;
   backspace: () => void;
   moveInSlot: (delta: 1 | -1) => void;
+  /** Arrow Up/Down: face the down word and move, in one step. */
+  moveVertical: (delta: 1 | -1) => void;
   revealCell: () => void;
   revealWord: () => void;
   checkAll: () => void;
@@ -143,6 +146,7 @@ export function useCrosswordGame(
   const inputLetter = useCallback((letter: string) => setState((s) => inputLetterFn(s, letter)), []);
   const backspace = useCallback(() => setState(backspaceFn), []);
   const moveInSlot = useCallback((delta: 1 | -1) => setState((s) => moveInSlotFn(s, delta)), []);
+  const moveVertical = useCallback((delta: 1 | -1) => setState((s) => moveVerticalFn(s, delta)), []);
   const revealCell = useCallback(() => setState(revealCellFn), []);
   const revealWord = useCallback(() => setState(revealWordFn), []);
   const checkAll = useCallback(() => setState(checkAllFn), []);
@@ -197,6 +201,7 @@ export function useCrosswordGame(
     inputLetter,
     backspace,
     moveInSlot,
+    moveVertical,
     revealCell,
     revealWord,
     checkAll,

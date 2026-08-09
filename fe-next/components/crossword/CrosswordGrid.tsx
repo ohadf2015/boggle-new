@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { currentSlot, type GameState } from '@/lib/crossword/gameState';
+import { solvedSlotIds } from '@/lib/crossword/stats';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CrosswordCell } from './CrosswordCell';
 
@@ -31,6 +32,19 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     () => new Set((slot?.cells ?? []).map((c) => `${c.row},${c.col}`)),
     [slot],
   );
+  // Cells belonging to a word that is completely and correctly filled. The stat bar already
+  // counts these ("3/10 words"), so the board was withholding information the HUD gave away —
+  // players could see that three words were right but not which. Marking them makes filling the
+  // board legible, and gives each finished word a visible payoff instead of only a sound.
+  const solvedCells = useMemo(() => {
+    const s = new Set<string>();
+    for (const id of solvedSlotIds(state)) {
+      const sl = puzzle.slots.find((x) => x.id === id);
+      for (const c of sl?.cells ?? []) s.add(`${c.row},${c.col}`);
+    }
+    return s;
+  }, [state, puzzle.slots]);
+
   // Cells that are the last letter of any word (for Hebrew sofit rendering).
   const wordEndCells = useMemo(() => {
     const s = new Set<string>();
@@ -77,13 +91,17 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     return () => ctx?.revert();
   }, [solved, reduced]);
 
+  // The board must never be clipped. On mobile the parent is a size-query container, so
+  // 100cqmin resolves to the smaller of the space actually left over after the pinned chrome.
+  // Sizing off width alone (the old `92vw`) overflowed the scrollport on short phones.
+  // Desktop has no bounded height, so it falls back to plain width sizing.
   return (
     <div
       ref={gridRef}
       role="grid"
       aria-label={t('crossword.gridLabel')}
       dir={puzzle.rtl ? 'rtl' : 'ltr'}
-      className={`grid gap-px mx-auto w-full max-w-[min(92vw,28rem)] aspect-square bg-black p-px rounded-none ${diffShadow} border-[3px] border-black`}
+      className={`grid gap-px m-auto aspect-square w-[min(100cqmin,28rem)] lg:w-full lg:max-w-[28rem] bg-black p-px rounded-none ${diffShadow} border-[3px] border-black`}
       style={{
         gridTemplateColumns: `repeat(${size}, 1fr)`,
         gridTemplateRows: `repeat(${size}, 1fr)`,
@@ -102,6 +120,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
             isActive={active.row === cell.row && active.col === cell.col}
             inActiveSlot={activeSlotCells.has(key)}
             isWordEnd={wordEndCells.has(key)}
+            inSolvedSlot={solvedCells.has(key)}
             check={checks[key]}
             warmth={warmths[key]}
             revealed={revealed.includes(key)}

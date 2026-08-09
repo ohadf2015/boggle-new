@@ -7,6 +7,7 @@
 import type { ConnectionPuzzle } from '../../types';
 
 export const RU_PUZZLES: ConnectionPuzzle[] = [
+  { id: "ru-a-001", word1: "ЖЕЛЕЗНАЯ", bridge: "ДОРОГА", word2: "ЖИЗНИ", hint: "по ней идут и едут", examples: [{"w1":"железная дорога","w2":"дорога жизни","bridge":"дорога"}], difficulty: "hard", source: "authored" },
   { id: "ru-a-002", word1: "МЁРТВАЯ", bridge: "ТОЧКА", word2: "ЗРЕНИЯ", hint: "ставится в конце предложения", examples: [{"w1":"мёртвая точка","w2":"точка зрения","bridge":"точка"}], difficulty: "medium", source: "authored" },
   { id: "ru-a-003", word1: "ВЫСШАЯ", bridge: "ШКОЛА", word2: "ЖИЗНИ", hint: "там учатся", examples: [{"w1":"высшая школа","w2":"школа жизни","bridge":"школа"}], difficulty: "easy", source: "authored" },
   { id: "ru-a-004", word1: "КРУГЛЫЙ", bridge: "СТОЛ", word2: "ПЕРЕГОВОРОВ", hint: "за ним сидят", examples: [{"w1":"круглый стол","w2":"стол переговоров","bridge":"стол"}], difficulty: "easy", source: "authored" },
@@ -24,6 +25,7 @@ export const RU_PUZZLES: ConnectionPuzzle[] = [
   { id: "ru-a-016", word1: "КРАСНАЯ", bridge: "КНИГА", word2: "РЕКОРДОВ", hint: "её читают", examples: [{"w1":"красная книга","w2":"книга рекордов","bridge":"книга"}], difficulty: "easy", source: "authored" },
   { id: "ru-a-017", word1: "СЕВЕРНЫЙ", bridge: "ПОЛЮС", word2: "ХОЛОДА", hint: "крайняя точка Земли", examples: [{"w1":"северный полюс","w2":"полюс холода","bridge":"полюс"}], difficulty: "medium", source: "authored" },
   { id: "ru-a-018", word1: "ЗВЁЗДНЫЙ", bridge: "ЧАС", word2: "ПИК", hint: "шестьдесят минут", examples: [{"w1":"звёздный час","w2":"час пик","bridge":"час"}], difficulty: "medium", source: "authored" },
+  { id: "ru-a-019", word1: "ГЕНЕРАЛЬНАЯ", bridge: "УБОРКА", word2: "УРОЖАЯ", hint: "наведение порядка или сбор", examples: [{"w1":"генеральная уборка","w2":"уборка урожая","bridge":"уборка"}], difficulty: "medium", source: "authored" },
   { id: "ru-a-020", word1: "МОРСКАЯ", bridge: "ЗВЕЗДА", word2: "ЭКРАНА", hint: "светит на небе и на сцене", examples: [{"w1":"морская звезда","w2":"звезда экрана","bridge":"звезда"}], difficulty: "medium", source: "authored" },
   { id: "ru-a-021", word1: "ИСПОРЧЕННЫЙ", bridge: "ТЕЛЕФОН", word2: "ДОВЕРИЯ", hint: "по нему звонят", examples: [{"w1":"испорченный телефон","w2":"телефон доверия","bridge":"телефон"}], difficulty: "medium", source: "authored" },
   { id: "ru-a-022", word1: "КИТАЙСКАЯ", bridge: "СТЕНА", word2: "ПЛАЧА", hint: "великая — и не только", examples: [{"w1":"китайская стена","w2":"стена плача","bridge":"стена"}], difficulty: "hard", source: "authored" },

@@ -36,7 +36,7 @@ export function CrosswordMasthead({
   streakLabel,
 }: CrosswordMastheadProps) {
   return (
-    <div className="shrink-0 border-neo-thick border-black bg-neo-cream rounded-neo shadow-hard-lg px-4 py-2.5">
+    <div className="shrink-0 border-neo-thick border-black bg-neo-cream rounded-neo shadow-hard-lg px-3 py-1.5 lg:px-4 lg:py-2.5">
       <div className="flex items-center justify-between gap-3">
         <span
           className={`font-neo-body font-bold text-[0.6rem] uppercase tracking-[0.12em] px-2 py-0.5 rounded-full border-neo border-black ${DIFFICULTY_CHIP[difficulty]}`}
@@ -44,7 +44,7 @@ export function CrosswordMasthead({
           {difficultyLabel}
         </span>
 
-        <h1 className="font-serif font-bold text-neo-navy text-lg sm:text-xl leading-none tracking-tight text-center truncate">
+        <h1 className="font-serif font-bold text-neo-navy text-base lg:text-xl leading-none tracking-tight text-center truncate">
           {title}
         </h1>
 
@@ -63,8 +63,10 @@ export function CrosswordMasthead({
         )}
       </div>
 
-      {/* Hairline rule + edition line, the masthead "dateline". */}
-      <div className="mt-1.5 border-t border-black/20 pt-1 text-center">
+      {/* Hairline rule + edition line, the masthead "dateline". Dropped on short
+          viewports (where every pixel goes to the board instead) but kept on tall
+          phones and desktop, where it's the mode's "real newspaper" signal. */}
+      <div className="mt-1.5 border-t border-black/20 pt-1 text-center [@media(max-height:720px)]:hidden lg:block">
         <p className="font-neo-body font-semibold text-[0.65rem] uppercase tracking-[0.18em] text-neo-navy/70">
           {edition}
         </p>

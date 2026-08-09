@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer, ChevronDown } from 'lucide-react';
+import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -88,6 +88,7 @@ export function CrosswordView({
     inputLetter,
     backspace,
     moveInSlot,
+    moveVertical,
     revealCell,
     revealWord,
     checkAll,
@@ -168,9 +169,9 @@ export function CrosswordView({
         moveInSlot(puzzle.rtl ? 1 : -1);
       } else if (key === 'ArrowDown' || key === 'ArrowUp') {
         e.preventDefault();
-        // vertical nav toggles to down if needed, then moves
-        if (state.dir !== 'down') toggleDir();
-        else moveInSlot(key === 'ArrowDown' ? 1 : -1);
+        // Faces the down word and moves in one step (reading state.dir here read a
+        // stale closure, so this used to need two presses).
+        moveVertical(key === 'ArrowDown' ? 1 : -1);
       } else if (key === ' ' || key === 'Tab') {
         e.preventDefault();
         if (key === 'Tab') nextSlot(e.shiftKey ? -1 : 1);
@@ -181,7 +182,7 @@ export function CrosswordView({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [backspace, moveInSlot, inputLetter, toggleDir, nextSlot, state.dir, puzzle.rtl]);
+  }, [backspace, moveInSlot, moveVertical, inputLetter, toggleDir, nextSlot, puzzle.rtl]);
 
   // GSAP entrance for the solved card.
   useEffect(() => {
@@ -268,47 +269,35 @@ export function CrosswordView({
           desktop. */}
       <div className="mt-3 flex min-h-0 flex-1 flex-col lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start rtl:lg:grid-cols-[21rem_minmax(0,1fr)]">
         <div className="flex min-h-0 flex-1 flex-col gap-2 lg:block lg:gap-3">
-          {/* Scrollable middle on mobile so the keyboard can stay pinned. */}
-          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain lg:flex-none lg:gap-3 lg:overflow-visible">
+          {/* Board. On mobile this box owns whatever height is left after the pinned
+              chrome and declares itself a size-query container, so the grid's
+              `100cqmin` resolves to the real free space and can never clip. Nothing
+              here scrolls — the whole board is always on screen. */}
+          <div className="flex min-h-0 flex-1 [container-type:size] lg:block lg:flex-none lg:[container-type:normal]">
             <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
+          </div>
 
-            {/* Desktop keeps the clue under the grid. On mobile it's pinned just
-                above the keyboard instead (below), so it never scrolls out of
-                view while you're filling letters. */}
-            <div className="hidden lg:block">
-              <ClueBar
-                slot={activeSlot}
-                rtl={puzzle.rtl}
-                onPrev={() => nextSlot(-1)}
-                onNext={() => nextSlot(1)}
-                onToggleDir={toggleDir}
-                t={t}
-              />
-            </div>
+          {/* Desktop keeps the clue under the grid. On mobile it's pinned just
+              above the keyboard instead (below), so it stays in view while you're
+              filling letters. */}
+          <div className="hidden lg:mt-3 lg:block">
+            <ClueBar
+              slot={activeSlot}
+              rtl={puzzle.rtl}
+              onPrev={() => nextSlot(-1)}
+              onNext={() => nextSlot(1)}
+              onToggleDir={toggleDir}
+              t={t}
+            />
+          </div>
 
-            {/* Toolbar */}
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
-              <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
-              <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
-              <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
-            </div>
-
-            {/* Mobile: full clue list tucked into a disclosure so it doesn't crowd the board. */}
-            <details className="lg:hidden group bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
-              <summary className="flex items-center justify-between gap-2 cursor-pointer list-none px-3 py-2.5 font-neo-display font-bold text-sm text-neo-white">
-                {t('crossword.allClues')}
-                <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="px-2.5 pb-2.5">
-                <CrosswordClueList
-                  slots={puzzle.slots}
-                  activeSlotId={activeSlot?.id ?? null}
-                  onSelect={handleClueSelect}
-                  t={t}
-                />
-              </div>
-            </details>
+          {/* Toolbar — a fixed 4-up row on mobile so it can never wrap to a second
+              band and push the board off screen. */}
+          <div className="shrink-0 mx-auto grid w-full max-w-[28rem] grid-cols-4 gap-1.5 lg:mt-3 lg:flex lg:justify-center lg:gap-2">
+            <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
+            <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
+            <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
+            <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
           </div>
 
           {/* Mobile: the active clue pinned directly above the keyboard, so it
@@ -478,10 +467,10 @@ function ToolButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1.5 font-neo-body font-semibold text-sm bg-neo-navy-light text-neo-white border-neo border-black rounded-neo shadow-hard px-3 py-2 active:translate-y-[1px] active:shadow-hard-pressed"
+      className="flex min-w-0 flex-col items-center justify-center gap-0.5 font-neo-body font-semibold text-[0.68rem] leading-tight bg-neo-navy-light text-neo-white border-neo border-black rounded-neo shadow-hard px-1.5 py-1.5 active:translate-y-[1px] active:shadow-hard-pressed lg:flex-row lg:gap-1.5 lg:px-3 lg:py-2 lg:text-sm"
     >
       {icon}
-      {label}
+      <span className="w-full truncate text-center">{label}</span>
     </button>
   );
 }

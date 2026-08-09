@@ -3862,6 +3862,14 @@ html.has-global-bottom-nav .page-content-safe {
   padding-top: var(--combined-safe-area-top, env(safe-area-inset-top, 0px));
 }
 
+/* The feedback launcher is bottom-anchored and floats over the game surface — on
+   crossword it sat on top of the bottom-left keyboard key, eating real taps. Every
+   full-screen game locks the body, so hide it there for all modes at once. It stays
+   available everywhere else in the app. */
+body.screen-fit-locked #fdw-root {
+  display: none;
+}
+
 /* Full-screen flex container - LOCKED (no scroll) */
 .screen-fit-locked {
   height: 100vh;
