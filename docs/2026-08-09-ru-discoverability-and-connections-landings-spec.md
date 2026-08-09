@@ -131,12 +131,29 @@ flipped.
 | C | `yandex-verification` meta, env-gated | `app/layout.tsx`, `app/[locale]/layout.tsx` |
 | D | IndexNow ping — 7 live RU URLs, `{"status":200,"submitted":7}` | ops, done 2026-08-09 |
 
-### Owner action required (one item)
+### Yandex Webmaster — registered 2026-08-09, awaiting deploy
 
-Set `NEXT_PUBLIC_YANDEX_VERIFICATION` to the token from
-[webmaster.yandex.com](https://webmaster.yandex.com) → Add site → Meta tag. Until then the
-tag is **absent** (not blank — a placeholder value fails verification silently), and Yandex
-Webmaster cannot be used to submit the sitemap or read RU search data.
+Done via the browser (Playwriter, real Chrome):
+
+- Yandex ID account created through Google SSO as `ohadf2015@gmail.com` (chosen over
+  `lexiclash.game@gmail.com` so webmaster ownership stays on the same login as Search
+  Console). Passkey enrolment declined.
+- `https://www.lexiclash.live` added; **Meta tag** verification method selected.
+- Token issued: **`a0492cff1a6bdd70`**, now emitted from both layouts.
+
+The token is inlined with an env override rather than env-gated. It is public by design —
+it ships in the HTML of every page, which is *how* verification works — so gating it behind
+an unset env var only meant the tag never rendered. `NEXT_PUBLIC_YANDEX_VERIFICATION`
+still overrides if Yandex re-issues.
+
+**Remaining step is a deploy, not a config change.** Yandex fetches
+`https://www.lexiclash.live` to find the tag; prod currently does not serve it (branch is
+unmerged — confirmed by curl). Once deployed, click **Verify ownership** in Yandex
+Webmaster and then submit the sitemap.
+
+DNS TXT verification would have avoided the deploy, but the domain is on Namecheap
+(`pdns1.registrar-servers.com`), not Cloudflare, and no API token is available — and a DNS
+edit is a riskier change than a meta tag that is already committed.
 
 ### Noted, not fixed (out of scope)
 
