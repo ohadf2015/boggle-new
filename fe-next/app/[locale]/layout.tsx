@@ -33,6 +33,7 @@ import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
+import Script from "next/script";
 
 // Install prompts, cookie banner, version checker, churn tracker and the
 // seasonal countdown all live in DeferredLayoutWidgets. They were declared here
@@ -629,6 +630,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
+        {/* GA4 G-7VLG16BJQH — the property existed with no tag on the page, which measures nothing. */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" strategy="afterInteractive" />
+        <Script id="ga4-init" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}
                 <script
                     dangerouslySetInnerHTML={{
