@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
-import { getLemonSqueezyClient, LEMONSQUEEZY_API_BASE } from '@/lib/lemonsqueezy';
-import { createClient } from '@/utils/supabase/server';
+import { getPolarClient } from '@/lib/polar';
 import logger from '@/utils/logger';
 
 /**
@@ -24,23 +23,12 @@ export async function GET(request: NextRequest) {
     // Get subscription status
     const subscription = await checkTeacherSubscription(user.id);
 
-    // If Pro, fetch the portal URL from Lemon Squeezy
+    // If Pro, create a Polar customer portal session (external_customer_id = user id, set at checkout)
     let portalUrl: string | null = null;
     if (subscription.has_pro) {
       try {
-        const supabase = await createClient();
-        const { data: subRecord } = await supabase
-          .from('subscriptions')
-          .select('lemon_squeezy_subscription_id')
-          .eq('user_id', user.id)
-          .single();
-
-        if (subRecord?.lemon_squeezy_subscription_id) {
-          const client = getLemonSqueezyClient();
-          const response = await client.getSubscription(subRecord.lemon_squeezy_subscription_id);
-
-          portalUrl = response?.data?.attributes?.urls?.customer_portal || null;
-        }
+        const client = getPolarClient();
+        portalUrl = await client.createCustomerPortalUrl(user.id);
       } catch (err) {
         logger.warn('Failed to fetch portal URL:', err);
         // Continue even if portal URL fetch fails

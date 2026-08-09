@@ -14,7 +14,7 @@ export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
-  // Store is in test mode / pending KYC — keep the CTA inert until checkout is truly live.
+  // Checkout stays gated until the Polar org is live with production keys — keep the CTA inert.
   // The API enforces this too (503); this just avoids showing a button that can't work.
   const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
 

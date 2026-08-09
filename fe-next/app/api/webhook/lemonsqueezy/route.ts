@@ -106,8 +106,8 @@ async function handleOrderCreated(payload: WebhookPayload, userId?: string) {
       userId: fallbackUserId,
       tier,
       status: 'active',
-      lemonSqueezyOrderId: orderId,
-      lemonSqueezyVariantId: variantId,
+      providerOrderId: orderId,
+      providerProductId: variantId,
     })
     return
   }
@@ -116,8 +116,8 @@ async function handleOrderCreated(payload: WebhookPayload, userId?: string) {
     userId,
     tier,
     status: 'active',
-    lemonSqueezyOrderId: orderId,
-    lemonSqueezyVariantId: variantId,
+    providerOrderId: orderId,
+    providerProductId: variantId,
   })
 }
 
@@ -139,8 +139,8 @@ async function handleSubscriptionCreated(payload: WebhookPayload, userId?: strin
       userId: fallbackUserId,
       tier,
       status: 'active',
-      lemonSqueezySubscriptionId: subscriptionId,
-      lemonSqueezyVariantId: variantId,
+      providerSubscriptionId: subscriptionId,
+      providerProductId: variantId,
       currentPeriodEnd,
     })
     return
@@ -150,8 +150,8 @@ async function handleSubscriptionCreated(payload: WebhookPayload, userId?: strin
     userId,
     tier,
     status: 'active',
-    lemonSqueezySubscriptionId: subscriptionId,
-    lemonSqueezyVariantId: variantId,
+    providerSubscriptionId: subscriptionId,
+    providerProductId: variantId,
     currentPeriodEnd,
   })
 }
@@ -173,8 +173,8 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
       userId: fallbackUserId,
       tier,
       status: status as SubscriptionStatus,
-      lemonSqueezySubscriptionId: subscriptionId,
-      lemonSqueezyVariantId: variantId,
+      providerSubscriptionId: subscriptionId,
+      providerProductId: variantId,
       currentPeriodEnd,
       cancelAtPeriodEnd,
     })
@@ -185,8 +185,8 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     userId,
     tier,
     status: status as SubscriptionStatus,
-    lemonSqueezySubscriptionId: subscriptionId,
-    lemonSqueezyVariantId: variantId,
+    providerSubscriptionId: subscriptionId,
+    providerProductId: variantId,
     currentPeriodEnd,
     cancelAtPeriodEnd,
   })
@@ -204,7 +204,7 @@ async function handleSubscriptionCancelled(payload: WebhookPayload, userId?: str
       userId: fallbackUserId,
       tier: 'free',
       status: 'canceled',
-      lemonSqueezySubscriptionId: subscriptionId,
+      providerSubscriptionId: subscriptionId,
       cancelAtPeriodEnd: true,
     })
     return
@@ -214,7 +214,7 @@ async function handleSubscriptionCancelled(payload: WebhookPayload, userId?: str
     userId,
     tier: 'free',
     status: 'canceled',
-    lemonSqueezySubscriptionId: subscriptionId,
+    providerSubscriptionId: subscriptionId,
     cancelAtPeriodEnd: true,
   })
 }
@@ -231,7 +231,7 @@ async function handleSubscriptionExpired(payload: WebhookPayload, userId?: strin
       userId: fallbackUserId,
       tier: 'free',
       status: 'canceled',
-      lemonSqueezySubscriptionId: subscriptionId,
+      providerSubscriptionId: subscriptionId,
     })
     return
   }
@@ -240,6 +240,6 @@ async function handleSubscriptionExpired(payload: WebhookPayload, userId?: strin
     userId,
     tier: 'free',
     status: 'canceled',
-    lemonSqueezySubscriptionId: subscriptionId,
+    providerSubscriptionId: subscriptionId,
   })
 }

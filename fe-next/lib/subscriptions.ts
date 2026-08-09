@@ -179,23 +179,27 @@ export async function canAddStudent(
 
 /**
  * Upsert a subscription record (called from webhook handler).
+ *
+ * Note: the DB columns are still named `lemon_squeezy_*` (a rename migration on
+ * the live DB isn't worth the risk), but they now store whichever payment
+ * provider is active — Polar after the 2026-08-09 pivot.
  */
 export async function upsertSubscription({
   userId,
   tier,
   status,
-  lemonSqueezySubscriptionId,
-  lemonSqueezyOrderId,
-  lemonSqueezyVariantId,
+  providerSubscriptionId,
+  providerOrderId,
+  providerProductId,
   currentPeriodEnd,
   cancelAtPeriodEnd,
 }: {
   userId: string
   tier: Tier
   status: SubscriptionStatus
-  lemonSqueezySubscriptionId?: string | null
-  lemonSqueezyOrderId?: string | null
-  lemonSqueezyVariantId?: string | null
+  providerSubscriptionId?: string | null
+  providerOrderId?: string | null
+  providerProductId?: string | null
   currentPeriodEnd?: string | null
   cancelAtPeriodEnd?: boolean
 }): Promise<void> {
@@ -206,9 +210,9 @@ export async function upsertSubscription({
       user_id: userId,
       tier,
       status,
-      lemon_squeezy_subscription_id: lemonSqueezySubscriptionId ?? null,
-      lemon_squeezy_order_id: lemonSqueezyOrderId ?? null,
-      lemon_squeezy_variant_id: lemonSqueezyVariantId ?? null,
+      lemon_squeezy_subscription_id: providerSubscriptionId ?? null,
+      lemon_squeezy_order_id: providerOrderId ?? null,
+      lemon_squeezy_variant_id: providerProductId ?? null,
       current_period_end: currentPeriodEnd ?? null,
       cancel_at_period_end: cancelAtPeriodEnd ?? false,
     },
