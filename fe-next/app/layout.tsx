@@ -98,12 +98,11 @@ export const metadata: Metadata = {
         'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
         // Yandex Webmaster site ownership. Yandex is the majority search engine in
         // Russia and verification is the gate for submitting a sitemap / reading RU
-        // search data there. Env-driven so the tag is simply absent until someone
-        // pastes the token from webmaster.yandex.com — an empty/placeholder value
-        // would fail verification silently.
-        ...(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION
-            ? { 'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION }
-            : {}),
+        // search data there. Issued for https://www.lexiclash.live on 2026-08-09;
+        // like google-site-verification above it is a public token, not a secret,
+        // so it is inlined rather than env-gated. Env var stays as an override for
+        // re-issue. Yandex re-checks periodically — removing this un-verifies us.
+        'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || 'a0492cff1a6bdd70',
         // AdSense site-ownership signal — privacy-neutral (no script/cookie). Always
         // present so the review crawler can verify the domain even while ad serving
         // stays consent-gated/dark. See lib/ads/adSensePolicy.ts:getAdSenseAccountMeta.

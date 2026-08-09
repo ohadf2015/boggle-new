@@ -2109,14 +2109,14 @@
         "pattern": "`wordTower.surprise.${meta.key}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerNoticeColumn.tsx",
-        "line": 325,
+        "line": 334,
         "context": "title={meta ? <><span aria-hidden>{meta.emoji}</span> {t(`wordTower.surprise.${meta.key}`)}</> : nul"
       },
       {
         "pattern": "`wordTower.biome.${tease.nextBiomeId}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerNoticeColumn.tsx",
-        "line": 459,
+        "line": 468,
         "context": "{t('wordTower.zone.next', { zone: t(`wordTower.biome.${tease.nextBiomeId}`), m: Math.ceil(tease.mete"
       },
       {

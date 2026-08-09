@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import robots from '../robots';
 
@@ -39,4 +41,24 @@ describe('robots.txt', () => {
   it('still points at the sitemap', () => {
     expect(robots().sitemap).toBe('https://www.lexiclash.live/sitemap.xml');
   });
+});
+
+/**
+ * Yandex re-checks the verification tag periodically. If it disappears the site
+ * is silently un-verified — no build error, no runtime error, we just stop being
+ * able to submit sitemaps or read RU search data. Pin it in both layouts.
+ */
+describe('yandex-verification meta', () => {
+  const YANDEX_TOKEN = 'a0492cff1a6bdd70';
+
+  it.each([['app/layout.tsx'], ['app/[locale]/layout.tsx']])(
+    'is emitted from %s',
+    (relPath) => {
+      const src = readFileSync(join(__dirname, '..', '..', relPath), 'utf8');
+      expect(src, `${relPath} lost the yandex-verification key`).toContain(
+        "'yandex-verification'"
+      );
+      expect(src, `${relPath} lost the issued Yandex token`).toContain(YANDEX_TOKEN);
+    }
+  );
 });
