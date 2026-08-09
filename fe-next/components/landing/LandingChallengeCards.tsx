@@ -81,9 +81,6 @@ const FEATURED_MODES = new Set<LandingCardKey>([
 
 /** CSS stagger delay for each card index */
 
-/** Modes with no content for Japanese locale — hidden from hub */
-const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections']);
-
 export function LandingChallengeCards({
   language,
   activePlayers,
@@ -169,7 +166,6 @@ export function LandingChallengeCards({
     // Adventure is a beta/admin-only preview for now — hide it from the public
     // hub (the route guard in adventure/PageClient blocks direct navigation too).
     const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay');
-    if (language === 'ja') return gated.filter((m) => !JA_HIDDEN_MODES.has(m));
     return gated;
   })();
   // Bump Blast up the hub: it sits directly after the multiplayer ('arena')

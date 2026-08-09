@@ -293,11 +293,14 @@ describe('LandingChallengeCards — all modes always surfaced', () => {
 });
 
 describe('LandingChallengeCards — Japanese locale gates', () => {
-  it('hides connections card for Japanese locale', () => {
+  // Connections was hidden for ja from 2026-05-12 until 2026-08-09 — a gate added
+  // three months BEFORE the Japanese puzzle pool existed. The pool now has 194
+  // active puzzles and the landing ships native ja copy, so the card must show.
+  it('shows connections card for Japanese locale', () => {
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...baseProps} language="ja" />);
-    expect(container.querySelector('[data-cube-key="connections"]')).toBeNull();
+    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });
 
   it('shows connections card for English locale', () => {

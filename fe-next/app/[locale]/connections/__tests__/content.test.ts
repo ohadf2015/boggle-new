@@ -16,25 +16,23 @@ import {
  * back to English and looks fine in every smoke test.
  */
 describe('connections landing copy', () => {
-  it('covers every locale with a puzzle pool that is actually playable', () => {
-    // ja is excluded on purpose: PageClient walls off `locale === 'ja'`.
-    // See the comment on SUPPORTED_LANDING_LOCALES in ../content.ts.
-    expect([...SUPPORTED_LANDING_LOCALES].sort()).toEqual(['en', 'es', 'he', 'ru', 'sv'].sort());
+  it('covers every locale that has a puzzle pool', () => {
+    expect([...SUPPORTED_LANDING_LOCALES].sort()).toEqual(
+      ['en', 'es', 'he', 'ja', 'ru', 'sv'].sort()
+    );
   });
 
   it('does not advertise a locale the game refuses to render', () => {
-    const pageClient = readFileSync(
-      join(__dirname, '..', 'PageClient.tsx'),
-      'utf8'
-    );
-    // Crude but load-bearing: if someone deletes the ja wall, this fails and
-    // points at the one-line change that lets ja into the landing list.
+    const pageClient = readFileSync(join(__dirname, '..', 'PageClient.tsx'), 'utf8');
+    // The ja wall was removed (it predated the 194-puzzle Japanese pool by three
+    // months). This keeps the pair honest in BOTH directions: re-adding the wall
+    // without dropping ja from the list, or vice versa, fails here.
     const jaIsWalled = /locale === 'ja'/.test(pageClient);
     expect(
-      SUPPORTED_LANDING_LOCALES.includes('ja' as never),
+      (SUPPORTED_LANDING_LOCALES as readonly string[]).includes('ja'),
       jaIsWalled
         ? 'ja is walled off in PageClient — it must not be a landing locale'
-        : 'the ja wall is gone — add ja to SUPPORTED_LANDING_LOCALES'
+        : 'the ja wall is gone — ja must be in SUPPORTED_LANDING_LOCALES'
     ).toBe(!jaIsWalled);
   });
 

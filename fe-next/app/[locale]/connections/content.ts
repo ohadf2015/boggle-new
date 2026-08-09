@@ -286,18 +286,17 @@ const HE_COPY: ConnectionsLandingCopy = {
 };
 
 /**
- * `ja` is deliberately ABSENT even though JA_COPY exists and the Japanese pool
- * has 194 active puzzles. PageClient.tsx short-circuits `locale === 'ja'` to a
- * "this game mode is not available" wall (added 7161c59ac, 2026-05-12 — three
- * months BEFORE the Japanese pool was built, so the gate is very likely stale).
- * Indexing a page that renders a dead end is worse than not indexing it, and
- * lifting a deliberate product gate is a product call, not an SEO one.
+ * Every locale with a puzzle pool and native landing copy. page.tsx (robots +
+ * hreflang) and app/sitemap.ts both derive from this list — it is the only
+ * answer to "which locales have landing copy".
  *
- * To enable Japanese: delete the `locale === 'ja'` branch in PageClient.tsx and
- * add 'ja' here. Nothing else needs to change — JA_COPY is already wired into
- * COPY_BY_LOCALE below, and page.tsx + app/sitemap.ts derive from this list.
+ * `ja` was excluded until 2026-08-09: PageClient short-circuited `locale ===
+ * 'ja'` to a "not available" wall added in 7161c59ac (2026-05-12), three months
+ * BEFORE the Japanese pool was built. The pool now has 194 active puzzles, so
+ * both the wall and the landing-card gate were removed together. A test asserts
+ * the pair stays consistent in both directions.
  */
-export const SUPPORTED_LANDING_LOCALES = ['en', 'he', 'sv', 'es', 'ru'] as const;
+export const SUPPORTED_LANDING_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type SupportedLandingLocale = (typeof SUPPORTED_LANDING_LOCALES)[number];
 
 // Keyed by SupportedLandingLocale | 'ja': the Record stays exhaustive over the
