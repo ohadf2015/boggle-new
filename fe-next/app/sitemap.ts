@@ -580,30 +580,22 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Words hub ───
   addForAllLocales(routes, '/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
-  // ─── Programmatic SEO: N-letter word pages (EN-only: 6 URLs) ───
-  // Page sets robots: { index: locale === 'en' } (English word lists). Non-EN
-  // variants are noindexed → emit EN-only to keep the sitemap crawl-clean.
-  const wordLengths = [3, 4, 5, 6, 7, 8];
-  wordLengths.forEach((n) => {
-    addForLocaleOnly(routes, `/words/${n}-letter-words`, {
-      lastModified: LAST_DEPLOYED,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    });
-  });
-
-  // ─── Programmatic SEO: Words starting with letter (EN-only, excluding dead letters) ───
-  // Same English-only-indexed pattern as the N-letter pages above.
-  // Sync with DEAD_LETTERS in app/[locale]/words/starting-with/[letter]/page.tsx
-  const SITEMAP_DEAD_LETTERS = new Set(['c', 'f', 'i', 'o', 'y']);
-  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('').filter(l => !SITEMAP_DEAD_LETTERS.has(l));
-  alphabet.forEach((letter) => {
-    addForLocaleOnly(routes, `/words/starting-with/${letter}`, {
-      lastModified: LAST_DEPLOYED,
-      changeFrequency: 'monthly',
-      priority: 0.65,
-    });
-  });
+  // ─── Programmatic word lists RETIRED from sitemap 2026-08-09 ───
+  // Was: /words/{3..8}-letter-words (6 URLs) + /words/starting-with/{letter} (21 URLs).
+  //
+  // WHY: AdSense rejected this domain TWICE for "low value content"
+  // (docs/2026-07-18-game-portals-web-ads-application-status.md §5), which leaves the
+  // WEB ad line — ~5x the native session volume — earning nothing, while the entire ad
+  // business rests on an Android app with 2–7 DAU. Auto-generated word lists with no
+  // original writing are the canonical trigger for that verdict, and these 27 URLs were
+  // the last such family still advertised (the /anagram seeds went on 2026-06-08 and
+  // /daily/archive/[date] before them).
+  //
+  // COST: none measurable. PostHog 60d — ZERO pageviews across all 27, out of 7,673
+  // site-wide. We are not trading traffic for a monetization bet.
+  //
+  // The /words hub above stays listed: it is a real navigable page, not a generated list.
+  // Reversible — restore this block if a reapply lands and the pages are worth having.
 
   // Anagram hub page (parent of programmatic /anagram/[letters] routes).
   // EN-only indexed (app/[locale]/anagram/page.tsx robots: { index: isEnglish }).

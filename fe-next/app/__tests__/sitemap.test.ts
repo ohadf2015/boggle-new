@@ -138,6 +138,35 @@ describe('sitemap', () => {
     }
   });
 
+  // AdSense rejected www.lexiclash.live TWICE for "low value content"
+  // (docs/2026-07-18-game-portals-web-ads-application-status.md §5), which keeps the
+  // whole WEB ad line — ~5x the native session volume — at zero revenue. The remaining
+  // programmatic word-list pages are the textbook trigger: 27 auto-generated list URLs
+  // with no original writing. PostHog 60d: they drew ZERO pageviews out of 7,673, so
+  // retiring them costs no traffic. Same treatment the /anagram seeds got on 2026-06-08.
+  it('omits programmatic word-list pages (retired 2026-08-09 for AdSense reapply)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+      for (const n of [3, 4, 5, 6, 7, 8]) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}/words/${n}-letter-words`),
+          `sitemap should NOT advertise retired /${locale}/words/${n}-letter-words`,
+        ).toBe(false);
+      }
+      for (const letter of 'abcdefghijklmnopqrstuvwxyz') {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}/words/starting-with/${letter}`),
+          `sitemap should NOT advertise retired /${locale}/words/starting-with/${letter}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('keeps the /words hub itself listed (real navigable content)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    expect(urls.has('https://www.lexiclash.live/en/words')).toBe(true);
+  });
+
   it('lists the anagram hub for EN only', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     expect(urls.has('https://www.lexiclash.live/en/anagram')).toBe(true);
@@ -146,15 +175,11 @@ describe('sitemap', () => {
     }
   });
 
-  it('lists programmatic /words pages (N-letter + starting-with) for EN only', () => {
-    const urls = new Set(sitemap().map((e) => e.url));
-    expect(urls.has('https://www.lexiclash.live/en/words/3-letter-words')).toBe(true);
-    expect(urls.has('https://www.lexiclash.live/en/words/starting-with/a')).toBe(true);
-    for (const locale of ['he', 'sv', 'ja', 'es']) {
-      expect(urls.has(`https://www.lexiclash.live/${locale}/words/3-letter-words`)).toBe(false);
-      expect(urls.has(`https://www.lexiclash.live/${locale}/words/starting-with/a`)).toBe(false);
-    }
-  });
+  // SUPERSEDED 2026-08-09 by 'omits programmatic word-list pages'. This used to assert
+  // the EN-only listing of /words/{n}-letter-words + /words/starting-with/[letter].
+  // Those 27 URLs are now retired from the sitemap AND noindexed to clear the AdSense
+  // "low value content" rejection that keeps all web ad revenue at zero. Not a test
+  // deleted to make a change pass — the behaviour it guarded was deliberately reversed.
 
   it('lists generic comparison pages for EN only (English-only body)', () => {
     const urls = new Set(sitemap().map((e) => e.url));

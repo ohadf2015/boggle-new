@@ -12,16 +12,21 @@ const meta = (locale: string, word: string) =>
   generateMetadata({ params: Promise.resolve({ locale, word }) });
 
 describe('/words/[word] — N-letter-words delegation', () => {
-  it('serves /words/3-letter-words as the N-letter content page (EN indexable)', async () => {
+  it('serves /words/3-letter-words as the N-letter content page', async () => {
     const m = await meta('en', '3-letter-words');
     expect(String(m.title)).toMatch(/3-Letter Words/i);
-    expect(m.robots).toMatchObject({ index: true });
   });
 
-  it('noindexes the N-letter page on non-EN locales (English word list)', async () => {
-    const m = await meta('he', '3-letter-words');
-    expect(String(m.title)).toMatch(/3-Letter Words/i);
-    expect(m.robots).toMatchObject({ index: false });
+  // Was 'EN indexable'. Reversed 2026-08-09: the page still RENDERS everywhere, it is
+  // just no longer offered to search — auto-generated word lists are the "low value
+  // content" AdSense rejected this domain over, which is what keeps the web ad line
+  // (~5x native session volume) earning nothing. Zero pageviews in 60d, so no cost.
+  it('noindexes the N-letter page in every locale, EN included', async () => {
+    for (const locale of ['en', 'he']) {
+      const m = await meta(locale, '3-letter-words');
+      expect(String(m.title)).toMatch(/3-Letter Words/i);
+      expect(m.robots).toMatchObject({ index: false });
+    }
   });
 
   it('handles all valid lengths 3–8', async () => {

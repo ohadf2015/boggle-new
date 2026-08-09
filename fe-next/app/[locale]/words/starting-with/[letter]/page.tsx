@@ -48,7 +48,10 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     // Self-referencing EN hreflang cluster + canonical → /en (non-EN are noindexed,
     // have no localized equivalent, so we never declare them as alternates).
     alternates: enOnlyAlternates(`/words/starting-with/${letter}`),
-    robots: { index: locale === 'en' && !DEAD_LETTERS.has(letter), follow: true },
+    // NOINDEX 2026-08-09 — see NLetterWordsView for the full rationale: AdSense
+    // "low value content" rejection x2 blocks all web ad revenue, these 27 generated
+    // list pages are the trigger, and they drew ZERO pageviews in 60d.
+    robots: { index: false, follow: true },
   };
 }
 

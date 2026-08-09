@@ -74,7 +74,12 @@ export async function nLetterWordsMetadata(locale: string, n: WordLength): Promi
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
     // English word list, index:locale==='en'. Self-referencing EN hreflang.
     alternates: enOnlyAlternates(`/words/${n}-letter-words`),
-    robots: { index: locale === 'en', follow: true },
+    // NOINDEX 2026-08-09: auto-generated word lists are the canonical "low value
+    // content" trigger, and AdSense rejected this domain twice on that ground — which
+    // is what keeps the whole web ad line at zero revenue. Sitemap listing was retired
+    // in the same change (app/sitemap.ts). ZERO pageviews in 60d, so no traffic cost.
+    // follow:true keeps existing link equity flowing to the /words hub.
+    robots: { index: false, follow: true },
   };
 }
 
