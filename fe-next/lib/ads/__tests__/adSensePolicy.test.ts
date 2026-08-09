@@ -4,6 +4,7 @@ import {
   getAdSenseClient,
   isAdSenseConfigured,
   shouldLoadAdSense,
+  summarizeAdSenseFill,
 } from '../adSensePolicy';
 
 describe('adSensePolicy — config', () => {
@@ -90,5 +91,60 @@ describe('adSensePolicy — shouldLoadAdSense', () => {
   it('still loads normally when onboarding is not active (flag omitted or false)', () => {
     expect(shouldLoadAdSense({ ...base, onboardingActive: false })).toBe(true);
     expect(shouldLoadAdSense(base)).toBe(true); // omitted → treated as not active
+  });
+});
+
+describe('adSensePolicy — deployed env var name', () => {
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+    delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  });
+
+  // The deployment (Railway) sets NEXT_PUBLIC_ADSENSE_CLIENT_ID, not the
+  // NEXT_PUBLIC_ADSENSE_CLIENT this module originally read. The drift was
+  // invisible only because both happened to hold the DEFAULT publisher id — so
+  // changing the publisher id in the deployment silently did nothing. Accept
+  // both names so the deployed override is actually live. Same class as the
+  // LEMONSQUEEZY_*_VARIANT_ID drift.
+  it('accepts the deployed NEXT_PUBLIC_ADSENSE_CLIENT_ID name', () => {
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = 'ca-pub-1111111111111111';
+    expect(getAdSenseClient()).toBe('ca-pub-1111111111111111');
+  });
+
+  it('prefers NEXT_PUBLIC_ADSENSE_CLIENT when both are set', () => {
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT = 'ca-pub-2222222222222222';
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID = 'ca-pub-1111111111111111';
+    expect(getAdSenseClient()).toBe('ca-pub-2222222222222222');
+  });
+});
+
+describe('adSensePolicy — fill audit', () => {
+  // WHY this exists: from 2026-06-08 (PurpleAds removed, direct AdSense in) the
+  // web ad layer loaded adsbygoogle.js and rendered ZERO ad units — the only
+  // <ins> on the page is Google's hidden `adsbygoogle-noablate` placeholder.
+  // Nothing reported it, so ~5x the native session volume monetized at 0 for
+  // two months. summarizeAdSenseFill turns that silent no-op into a signal.
+  function insHtml(attrs: string): HTMLElement {
+    const root = document.createElement('div');
+    root.innerHTML = attrs;
+    return root;
+  }
+
+  it('reports zero placements when only the hidden noablate placeholder exists', () => {
+    const root = insHtml('<ins class="adsbygoogle adsbygoogle-noablate" style="display: none !important;"></ins>');
+    expect(summarizeAdSenseFill(root)).toEqual({ units: 0, filled: 0, unfilled: 0 });
+  });
+
+  it('counts real placements and how many Google filled', () => {
+    const root = insHtml(
+      '<ins class="adsbygoogle" data-ad-status="filled"></ins>' +
+        '<ins class="adsbygoogle" data-ad-status="unfilled"></ins>' +
+        '<ins class="adsbygoogle"></ins>',
+    );
+    expect(summarizeAdSenseFill(root)).toEqual({ units: 3, filled: 1, unfilled: 2 });
+  });
+
+  it('reports nothing at all when the script placed no units', () => {
+    expect(summarizeAdSenseFill(insHtml(''))).toEqual({ units: 0, filled: 0, unfilled: 0 });
   });
 });

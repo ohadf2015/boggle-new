@@ -66,11 +66,33 @@ const DEFAULT_CLIENT = 'ca-pub-1896836706464880';
 let loadPromise: Promise<void> | null = null;
 let configured = false;
 
+/**
+ * H5 client id. Reads BOTH spellings: the web-ad runbook's "Env-flip cheat sheet"
+ * documents `NEXT_PUBLIC_H5_GAMES_CLIENT`, the code originally read
+ * `NEXT_PUBLIC_ADSENSE_H5_CLIENT`. Following the runbook would silently have set
+ * nothing — and a dark web ad path reports no error, so nobody would have noticed.
+ */
 export function getH5Client(): string {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT) {
     return process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT;
   }
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_H5_GAMES_CLIENT) {
+    return process.env.NEXT_PUBLIC_H5_GAMES_CLIENT;
+  }
   return DEFAULT_CLIENT;
+}
+
+/**
+ * Whether H5 Games Ads is switched on by env. Accepts the runbook's
+ * `NEXT_PUBLIC_H5_GAMES_ENABLED` as well as the code's original
+ * `NEXT_PUBLIC_H5_ADS_ENABLED` — see getH5Client() for why.
+ */
+export function isH5EnvEnabled(): boolean {
+  if (typeof process === 'undefined') return false;
+  return (
+    process.env.NEXT_PUBLIC_H5_ADS_ENABLED === 'true' ||
+    process.env.NEXT_PUBLIC_H5_GAMES_ENABLED === 'true'
+  );
 }
 
 /** Idempotent: loads the SDK script once and resolves when ready. */

@@ -147,6 +147,9 @@ export type GrowthEvent =
   // repaints, from (c) a native stall that never fires dismissed and hits
   // safety_timeout. NOT a funnel step.
   | 'interstitial_ad_lifecycle'
+  // Web display (AdSense Auto-Ads) placement audit. `units: 0` = the script
+  // loaded but Auto-Ads placed nothing — the silent zero-revenue state.
+  | 'web_ads_fill_audit'
   // Preference
   | 'language_changed'
   // Onboarding funnel

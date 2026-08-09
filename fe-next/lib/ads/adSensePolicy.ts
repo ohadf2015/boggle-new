@@ -15,12 +15,50 @@
  */
 const DEFAULT_ADSENSE_CLIENT = 'ca-pub-1896836706464880';
 
-/** The AdSense client id (`ca-pub-…`). Defaults to our direct publisher id; env-overridable. */
+/**
+ * The AdSense client id (`ca-pub-…`). Defaults to our direct publisher id; env-overridable.
+ *
+ * Reads BOTH names: the deployment sets `NEXT_PUBLIC_ADSENSE_CLIENT_ID` while this module
+ * originally read `NEXT_PUBLIC_ADSENSE_CLIENT`. The drift was invisible because both held
+ * the same value as the default — so overriding the publisher id in the deployment was a
+ * silent no-op. (Same class as the LemonSqueezy variant-id drift.)
+ */
 export function getAdSenseClient(): string {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_CLIENT) {
     return process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
   }
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
+    return process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  }
   return DEFAULT_ADSENSE_CLIENT;
+}
+
+/** What Auto-Ads actually placed on the page. */
+export interface AdSenseFillSummary {
+  /** Real `<ins class="adsbygoogle">` placements (Google's hidden anchor stub excluded). */
+  units: number;
+  /** Placements Google reported as `data-ad-status="filled"`. */
+  filled: number;
+  /** Placements that exist but carry no ad (unfilled, or still blank after the grace period). */
+  unfilled: number;
+}
+
+/**
+ * Audit what Auto-Ads placed. Loading `adsbygoogle.js` says nothing about whether a single
+ * ad rendered — if the publisher id can't serve web inventory, or Auto-Ads is off for the
+ * site, the script loads happily and places nothing. That failure mode is completely silent
+ * and cost the web surface (~5x native session volume) two months of zero display revenue.
+ *
+ * `adsbygoogle-noablate` is Google's own hidden anchor placeholder (`display:none`), not a
+ * placement — counting it would mask "zero ads" as "one unit".
+ */
+export function summarizeAdSenseFill(root: {
+  querySelectorAll: (sel: string) => ArrayLike<Element>;
+}): AdSenseFillSummary {
+  const all = Array.from(root.querySelectorAll('ins.adsbygoogle'));
+  const units = all.filter((el) => !el.classList.contains('adsbygoogle-noablate'));
+  const filled = units.filter((el) => el.getAttribute('data-ad-status') === 'filled').length;
+  return { units: units.length, filled, unfilled: units.length - filled };
 }
 
 /**

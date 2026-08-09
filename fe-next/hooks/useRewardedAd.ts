@@ -6,6 +6,7 @@ import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useH5GamesAds } from '@/hooks/useH5GamesAds';
+import { isH5EnvEnabled } from '@/lib/ads/h5GamesAds';
 import { useGameDistributionAds } from '@/hooks/useGameDistributionAds';
 import { getGdGameId } from '@/lib/ads/gameDistributionAds';
 import { useAyetVideoAds } from '@/hooks/useAyetVideoAds';
@@ -33,42 +34,71 @@ const ONE_HOUR = 60 * 60 * 1000;
 const REWARD_STUCK_WATCHDOG_MS = 120000;
 
 // Daily ad view tracking
+type RewardKind = 'coins' | 'feature';
+
 const DAILY_AD_VIEWS_KEY = 'lexiclash_daily_ad_views';
 const MAX_DAILY_AD_VIEWS = 10;
+// Abuse ceiling for feature unlocks, which mint no coins and so are NOT part of the
+// coin budget above. Deliberately far above real play (retry/extra-life/hint across a
+// long session) — it exists only so removing the coin cap can't leave feature ads
+// globally unbounded, since some surfaces (blast_wave_continue, daily_retry) are
+// per-wave / per-attempt rather than per-day.
+const MAX_DAILY_FEATURE_AD_VIEWS = 40;
 
 function getTodayKey(): string {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
-function getDailyViewCount(): number {
-  if (typeof window === 'undefined') return 0;
+function readDailyCounts(): { count: number; featureCount: number } {
+  if (typeof window === 'undefined') return { count: 0, featureCount: 0 };
   try {
     const stored = localStorage.getItem(DAILY_AD_VIEWS_KEY);
-    if (!stored) return 0;
+    if (!stored) return { count: 0, featureCount: 0 };
     const data = JSON.parse(stored);
-    if (data.date !== getTodayKey()) return 0;
-    return data.count ?? 0;
+    if (data.date !== getTodayKey()) return { count: 0, featureCount: 0 };
+    return { count: data.count ?? 0, featureCount: data.featureCount ?? 0 };
   } catch {
-    return 0;
+    return { count: 0, featureCount: 0 };
   }
 }
 
-function recordDailyView(): void {
+/** Coin-granting views today — the number the "N/10 ads today" UI shows. */
+function getDailyViewCount(): number {
+  return readDailyCounts().count;
+}
+
+function recordDailyView(rewardKind: RewardKind): void {
   if (typeof window === 'undefined') return;
   try {
-    const today = getTodayKey();
-    const stored = localStorage.getItem(DAILY_AD_VIEWS_KEY);
-    let count = 0;
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (data.date === today) count = data.count ?? 0;
-    }
-    localStorage.setItem(DAILY_AD_VIEWS_KEY, JSON.stringify({ date: today, count: count + 1 }));
+    const { count, featureCount } = readDailyCounts();
+    localStorage.setItem(DAILY_AD_VIEWS_KEY, JSON.stringify({
+      date: getTodayKey(),
+      count: rewardKind === 'coins' ? count + 1 : count,
+      featureCount: rewardKind === 'feature' ? featureCount + 1 : featureCount,
+    }));
   } catch { /* silent */ }
 }
 
-function isDailyLimitReached(): boolean {
-  return getDailyViewCount() >= MAX_DAILY_AD_VIEWS;
+/**
+ * The daily cap is a COIN budget, not an ad budget.
+ *
+ * It exists to stop a player minting unlimited gold from `rewardKind: 'coins'` ads.
+ * `rewardKind: 'feature'` ads (retry, extra life, hint reveal, streak freeze — the
+ * large majority of our rewarded surfaces) mint no coins at all: the ad IS the price.
+ * Counting them against the coin budget throttled the highest-eCPM format we serve
+ * (~20x a banner impression) for an economy risk that path doesn't carry, and
+ * dead-ended the player mid-run once the counter filled.
+ *
+ * So the two kinds now hold SEPARATE budgets in the same record: `count` (coins, 10)
+ * and `featureCount` (features, 40 — an abuse ceiling, not a play limit; a normal
+ * session never approaches it). Records written before this split carry no
+ * `featureCount` and read as 0, which is the correct starting state.
+ */
+function isDailyLimitReached(rewardKind: RewardKind = 'coins'): boolean {
+  const { count, featureCount } = readDailyCounts();
+  return rewardKind === 'feature'
+    ? featureCount >= MAX_DAILY_FEATURE_AD_VIEWS
+    : count >= MAX_DAILY_AD_VIEWS;
 }
 
 function isPlaceholderCapped(): boolean {
@@ -109,7 +139,7 @@ interface UseRewardedAdOptions {
    *   the sole reward (e.g. retry, extra life, streak freeze, avatar part).
    *   Prevents the double-reward bug where feature unlocks also paid coins.
    */
-  rewardKind?: 'coins' | 'feature';
+  rewardKind?: RewardKind;
   /**
    * Which gameplay surface this ad serves. Routes to a per-surface AdMob unit
    * so the waterfall can be optimized per placement. Defaults to 'generic'.
@@ -236,7 +266,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // three lets us ship the code dormant and flip the env when approval lands.
   const isProd = process.env.NODE_ENV === 'production';
   const isDev = process.env.NODE_ENV === 'development';
-  const h5EnvEnabled = process.env.NEXT_PUBLIC_H5_ADS_ENABLED === 'true';
+  const h5EnvEnabled = isH5EnvEnabled();
   const hasH5TestFlag = typeof window !== 'undefined' && (
     (window as unknown as { __h5AdsTest?: boolean }).__h5AdsTest === true ||
     (typeof location !== 'undefined' && /[?&]h5ads_test=1/.test(location.search))
@@ -294,7 +324,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : 'no-ad-placeholder';
 
     // Enforce daily limit across all platforms
-    if (isDailyLimitReached()) {
+    if (isDailyLimitReached(rewardKind)) {
       trackRewardedAdDeclined('daily_limit_reached', platformForDecline, telemetrySurface);
       onAdError?.('Daily ad limit reached');
       return;
@@ -389,7 +419,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         recordPlaceholderView();
         setPlaceholderCooldownFlag(isPlaceholderCapped());
       }
-      recordDailyView();
+      // Each kind spends its own budget — see isDailyLimitReached().
+      recordDailyView(rewardKind);
       setDailyViewCount(getDailyViewCount());
       let awarded = 0;
       if (rewardKind === 'coins') {
@@ -531,10 +562,10 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // or warm flapping must not stack loads (198-loads/2-shows lesson).
   const warmedRef = useRef(false);
   useEffect(() => {
-    if (!warm || warmedRef.current || !shouldUseAdMob || isDailyLimitReached()) return;
+    if (!warm || warmedRef.current || !shouldUseAdMob || isDailyLimitReached(rewardKind)) return;
     warmedRef.current = true;
     void adMob.prepareRewarded({ surface });
-  }, [warm, shouldUseAdMob, adMob, surface]);
+  }, [warm, shouldUseAdMob, adMob, surface, rewardKind]);
 
   return {
     status,
@@ -544,10 +575,10 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     prepareAd,
     error,
     rewardAmount,
-    canShowAd: !isDailyLimitReached() && !(isPlaceholder && !isDev),
+    canShowAd: !isDailyLimitReached(rewardKind) && !(isPlaceholder && !isDev),
     viewsToday: dailyViewCount,
     maxViews: MAX_DAILY_AD_VIEWS,
-    isDailyLimitReached: isDailyLimitReached(),
+    isDailyLimitReached: isDailyLimitReached(rewardKind),
     isPlaceholder,
   };
 }

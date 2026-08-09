@@ -7,7 +7,16 @@ import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
 import { useOnboardingActive } from '@/hooks/useOnboardingActive';
 import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
 import { hasConsent, onConsentChange } from '@/utils/cookieConsent';
-import { getAdSenseClient, isAdSenseConfigured, shouldLoadAdSense } from '@/lib/ads/adSensePolicy';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import {
+  getAdSenseClient,
+  isAdSenseConfigured,
+  shouldLoadAdSense,
+  summarizeAdSenseFill,
+} from '@/lib/ads/adSensePolicy';
+
+/** Grace period for Auto-Ads to scan the page and place units before we audit. */
+const FILL_AUDIT_DELAY_MS = 12_000;
 
 /**
  * Direct Google AdSense (Auto-Ads) loader for the WEB app — replaces the externally-injected
@@ -57,6 +66,26 @@ export function AdSenseLoader() {
     s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`;
     s.crossOrigin = 'anonymous';
     document.head.appendChild(s);
+  }, [load]);
+
+  // Loading adsbygoogle.js proves NOTHING about revenue: if the publisher id can't
+  // serve web inventory, or Auto-Ads is off for the site, the script loads fine and
+  // places zero units. That silent no-op ran from 2026-06-08 (PurpleAds removed →
+  // direct AdSense) with the whole web surface — ~5x the native session volume —
+  // monetizing at ₪0, and no signal anywhere. Audit once per load so it can't
+  // happen again unnoticed. `units: 0` = Auto-Ads placed nothing at all.
+  useEffect(() => {
+    if (!load) return;
+    const timer = setTimeout(() => {
+      trackGrowthEvent('web_ads_fill_audit', {
+        ...summarizeAdSenseFill(document),
+        client: getAdSenseClient(),
+        // Auto-Ads legitimately places nothing on some routes, so a bare stream of
+        // `units: 0` can't distinguish "AdSense is dead" from "no placement here".
+        path: window.location.pathname,
+      });
+    }, FILL_AUDIT_DELAY_MS);
+    return () => clearTimeout(timer);
   }, [load]);
 
   return null;
