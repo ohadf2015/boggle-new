@@ -448,6 +448,34 @@ export const EXPERIMENTS = {
    * Ship to PostHog: flag key = 'exp-practice-wheel-cta-v1', 50/50 rollout.
    * Wire: PracticeWheelSandbox.tsx — game-over state, show retry button.
    */
+  /**
+   * Install-promo timing. The Android install promo currently fires 12s after page
+   * load with NO requirement that the visitor has played anything, so a first-timer
+   * is asked to install before any value is delivered.
+   *
+   * Why it matters: native players are the ENTIRE AdMob pool, and AdMob weekly
+   * activeUsers fell 68 → 26 (2026-08-09 audit). Exposure is NOT the constraint —
+   * promo_shown is at an all-time high (81 → 91 → 98 → 124/wk) and pill_shown
+   * 224 → 337/wk — but 82% of promos are dismissed and only ~78 unique people reach
+   * the Play listing per 45 days. The leak is conversion, not reach.
+   *
+   * after-first-game = withhold the auto-popup until `games_completed_count >= 1`.
+   * Fewer, higher-intent prompts. Control is today's behaviour, byte for byte.
+   *
+   * Conversion: android_install_promo_install_click / android_install_promo_shown.
+   * Guardrail: android_install_promo_shown must not collapse to ~0 — if the variant
+   * simply stops showing the promo, that is a bug (silent no-op), not a win.
+   * Ship to PostHog: flag key = 'exp-install-promo-after-first-game-v1', 50/50.
+   * Wire: components/AndroidAppInstallPromo.tsx — auto-popup gate only; the
+   * user-initiated pill and menu entry are untouched.
+   */
+  'exp-install-promo-after-first-game-v1': defineExperiment({
+    variants: ['control', 'after-first-game'] as const,
+    default: 'control',
+    description:
+      'Android install auto-popup timing. after-first-game = withhold until games_completed_count >= 1 (higher-intent prompt); control = current 12s-after-load popup. Targets the 82% promo dismissal behind the native activeUsers 68->26/wk decline. Conversion = android_install_promo_install_click / android_install_promo_shown. Guardrail = android_install_promo_shown must not collapse to ~0.',
+  }),
+
   'exp-practice-wheel-cta-v1': defineExperiment({
     variants: ['control', 'retry-cta'] as const,
     default: 'control',

@@ -152,3 +152,50 @@ describe('shouldShowAndroidInstallPromo', () => {
     ).toBe(true);
   });
 });
+
+describe('shouldShowAndroidInstallPromo — exp-install-promo-after-first-game-v1', () => {
+  // Native players are the entire AdMob pool (activeUsers 68→26/wk), and web→native
+  // install is what creates them. Exposure is at an all-time high (promo_shown 124/wk,
+  // pill_shown 337/wk) yet 82% of promos are dismissed — the leak is conversion, not
+  // reach. The promo currently fires 12s after page load with no requirement that the
+  // visitor has played anything, so a first-timer is asked to install before any value
+  // is delivered. This gate lets the experiment's variant require one completed game
+  // first. CONTROL MUST BE UNCHANGED: omitting the field keeps today's behaviour.
+  const base = {
+    ua: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36',
+    isCapacitorNative: false,
+    isStandalone: false,
+    isInstalled: false,
+    isAllowedRoute: true,
+    dismissedUntil: null,
+    sessionShown: false,
+    now: 1_000_000,
+  };
+
+  it('control (field omitted) shows the promo with zero games played', () => {
+    expect(shouldShowAndroidInstallPromo(base)).toBe(true);
+  });
+
+  it('variant withholds the promo until a game has been completed', () => {
+    expect(
+      shouldShowAndroidInstallPromo({ ...base, requireEngagement: true, gamesCompleted: 0 }),
+    ).toBe(false);
+  });
+
+  it('variant shows the promo once a game has been completed', () => {
+    expect(
+      shouldShowAndroidInstallPromo({ ...base, requireEngagement: true, gamesCompleted: 1 }),
+    ).toBe(true);
+  });
+
+  it('variant treats a missing count as not-yet-engaged (never as engaged)', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, requireEngagement: true })).toBe(false);
+  });
+
+  it('engagement never overrides the other gates', () => {
+    const engaged = { ...base, requireEngagement: true, gamesCompleted: 5 };
+    expect(shouldShowAndroidInstallPromo({ ...engaged, isInstalled: true })).toBe(false);
+    expect(shouldShowAndroidInstallPromo({ ...engaged, sessionShown: true })).toBe(false);
+    expect(shouldShowAndroidInstallPromo({ ...engaged, isAllowedRoute: false })).toBe(false);
+  });
+});

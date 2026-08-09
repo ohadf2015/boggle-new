@@ -7,6 +7,12 @@ const captureMock = vi.fn();
 
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => captureMock(...a) } }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
+// exp-install-promo-after-first-game-v1 — mutable so a test can pick the bucket.
+let mockPromoVariant: 'control' | 'after-first-game' = 'control';
+const exposureMock = vi.fn();
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: mockPromoVariant, trackExposure: exposureMock }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
@@ -46,6 +52,8 @@ beforeEach(() => {
   sessionStorage.clear();
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
   mockNative = false;
+  mockPromoVariant = 'control';
+  exposureMock.mockClear();
   setUA(ANDROID_UA);
   Object.defineProperty(window, 'location', {
     value: { href: 'https://www.lexiclash.live/' },
@@ -199,5 +207,58 @@ describe('AndroidAppInstallPromo', () => {
       await vi.runAllTimersAsync();
     });
     expect(screen.getByText('androidAppPromo.title')).toBeInTheDocument();
+  });
+});
+
+describe('exp-install-promo-after-first-game-v1', () => {
+  // Native players are the whole AdMob pool and weekly activeUsers fell 68 -> 26.
+  // Exposure is at an all-time high while 82% of promos are dismissed, so the
+  // variant trades reach for intent: withhold the auto-popup until one game is done.
+  const tapAndRun = async (ms: number) => {
+    act(() => { fireEvent.pointerDown(window); });
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { vi.advanceTimersByTime(ms); });
+  };
+
+  it('control shows the promo with zero completed games (behaviour unchanged)', async () => {
+    mockPromoVariant = 'control';
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    expect(useAndroidInstallStore.getState().open).toBe(true);
+  });
+
+  it('variant withholds the promo while no game has been completed', async () => {
+    mockPromoVariant = 'after-first-game';
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    expect(useAndroidInstallStore.getState().open).toBe(false);
+  });
+
+  // The whole point: a one-shot check would make "hasn't played yet at 12s" mean
+  // "never sees the promo", which looks like a variant win but is a silent no-op.
+  it('variant RE-ARMS and shows the promo once a game is completed', async () => {
+    mockPromoVariant = 'after-first-game';
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    expect(useAndroidInstallStore.getState().open).toBe(false);
+
+    localStorage.setItem('games_completed_count', '1');
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(true);
+  });
+
+  it('counts exposure only when a promo decision is actually reached', async () => {
+    mockPromoVariant = 'after-first-game';
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    expect(exposureMock).not.toHaveBeenCalled();
+
+    localStorage.setItem('games_completed_count', '1');
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(exposureMock).toHaveBeenCalled();
   });
 });

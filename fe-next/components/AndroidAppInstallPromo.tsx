@@ -26,6 +26,8 @@ import { usePathname } from 'next/navigation';
 import { Zap, WifiOff, Bell } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
+import { useExperiment } from '@/hooks/useExperiment';
+import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import {
   hasLexiClashInstalled,
   isCapacitorNative,
@@ -62,6 +64,12 @@ export default function AndroidAppInstallPromo() {
   const openPromo = useAndroidInstallStore((s) => s.openPromo);
   const closePromo = useAndroidInstallStore((s) => s.closePromo);
   const showPill = useAndroidInstallStore((s) => s.showPill);
+
+  // exp-install-promo-after-first-game-v1 — auto-popup timing only. The pill and the
+  // menu entry (both user-initiated) are untouched by this experiment.
+  const { variant: promoTimingVariant, trackExposure: trackPromoTimingExposure } =
+    useExperiment('exp-install-promo-after-first-game-v1');
+  const requireEngagement = promoTimingVariant === 'after-first-game';
 
   // ── Unsolicited auto-popup gating ──────────────────────────────────────
   useEffect(() => {
@@ -100,9 +108,29 @@ export default function AndroidAppInstallPromo() {
           // was captured), so the bridge may only register during this delay.
           // Without this, the app would flash the popup. (Class 1 / Class 3.)
           if (isCapacitorNative()) return;
+          // Variant gate, evaluated at FIRE time and re-armed — not once at mount.
+          // A one-shot check here would turn "hasn't played yet after 12s" into
+          // "never sees the promo at all", which reads as a variant win while
+          // actually being a silent no-op (Class 4). Re-arming keeps the variant a
+          // DELAY, not a suppression; it stops on show (session flag) or unmount.
+          if (!shouldShowAndroidInstallPromo({
+            ...baseInput,
+            isInstalled: installed,
+            now: Date.now(),
+            requireEngagement,
+            gamesCompleted: readGamesCompletedCount(),
+          })) {
+            timer = undefined;
+            arm();
+            return;
+          }
           sessionStorage.setItem(SESSION_FLAG, '1');
           openPromo('auto_popup');
           trackInstallPromoShown('auto_popup');
+          // Exposure fires HERE, not at mount: only visitors who genuinely reached a
+          // promo decision belong in the experiment, otherwise every ineligible
+          // pageview dilutes both buckets and the result is unreadable.
+          trackPromoTimingExposure();
         }, SHOW_DELAY_MS);
       };
       // LCP guard: only start the countdown after the visitor's first tap or
@@ -132,7 +160,7 @@ export default function AndroidAppInstallPromo() {
       if (timer) clearTimeout(timer);
       cleanupListeners?.();
     };
-  }, [pathname, openPromo]);
+  }, [pathname, openPromo, requireEngagement, trackPromoTimingExposure]);
 
   const persistDismissal = () => {
     localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_DAYS * 86_400_000));

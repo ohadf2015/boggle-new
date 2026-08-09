@@ -113,6 +113,14 @@ export interface AndroidPromoGateInput {
   dismissedUntil: number | null;
   /** promo already shown in this browser session */
   sessionShown: boolean;
+  /**
+   * exp-install-promo-after-first-game-v1 variant: require the visitor to have
+   * completed at least one game before asking them to install. Omitted/false =
+   * CONTROL, i.e. today's behaviour (12s after page load, no engagement needed).
+   */
+  requireEngagement?: boolean;
+  /** Completed games on this device — `readGamesCompletedCount()`. */
+  gamesCompleted?: number;
   /** current time in ms */
   now: number;
 }
@@ -130,5 +138,9 @@ export function shouldShowAndroidInstallPromo(input: AndroidPromoGateInput): boo
   if (!input.isAllowedRoute) return false;
   if (input.sessionShown) return false;
   if (input.dismissedUntil != null && input.now < input.dismissedUntil) return false;
+  // Engagement gate (variant only). `?? 0` so a missing count reads as NOT engaged —
+  // the safe direction: it withholds a prompt rather than firing one on a visitor who
+  // has seen nothing of the game.
+  if (input.requireEngagement && (input.gamesCompleted ?? 0) < 1) return false;
   return true;
 }
