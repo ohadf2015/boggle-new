@@ -4,7 +4,6 @@ import ConnectionsKeyboard from '../ConnectionsKeyboard';
 import { getKeyboardRows } from '@/lib/connections/keyboard';
 
 const baseProps = {
-  dir: 'ltr' as const,
   onLetter: () => {},
   onBackspace: () => {},
   onSubmit: () => {},
@@ -49,7 +48,7 @@ describe('ConnectionsKeyboard', () => {
     // compute. What actually changed is the divisor: the budget must be 11
     // columns (8 letters + 3 for the action keys), not the bare longest row of
     // 8. Pinning the number is what makes this test able to fail.
-    render(<ConnectionsKeyboard {...baseProps} dir="rtl" rows={getKeyboardRows('he')} canSubmit />);
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />);
     const firstRowKey = screen.getByRole('button', { name: 'ק' });   // row 1
     const lastRowKey = screen.getByRole('button', { name: 'ת' });    // row 3, beside the action keys
     const expected = `calc(${(100 / 11).toFixed(4)}% - 0.375rem)`;
@@ -57,9 +56,23 @@ describe('ConnectionsKeyboard', () => {
     expect(lastRowKey.style.flexBasis).toBe(expected);
   });
 
+  it('renders the physical-layout keyboard left-to-right for Hebrew (ק top-left, not mirrored)', () => {
+    // A physical/mobile Hebrew keyboard — and Hebrew Wordle — put ק at the TOP-LEFT,
+    // never mirrored to the right. The key grid is a locale-independent physical
+    // artifact, so the keyboard must flow LTR even though Hebrew text is RTL.
+    const { container } = render(
+      <ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.getAttribute('dir')).toBe('ltr');
+    // ק is the first key of the top row (its visual start under LTR flow).
+    const qof = screen.getByRole('button', { name: 'ק' });
+    expect(qof.parentElement!.firstElementChild).toBe(qof);
+  });
+
   it('calls onLetter with the tapped Hebrew letter', () => {
     const onLetter = vi.fn();
-    render(<ConnectionsKeyboard {...baseProps} dir="rtl" rows={getKeyboardRows('he')} onLetter={onLetter} canSubmit />);
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} onLetter={onLetter} canSubmit />);
     fireEvent.click(screen.getByRole('button', { name: 'ש' }));
     expect(onLetter).toHaveBeenCalledWith('ש');
   });

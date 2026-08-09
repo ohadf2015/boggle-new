@@ -8,8 +8,6 @@ import { letterColumnCount } from '@/lib/connections/keyboard';
 interface ConnectionsKeyboardProps {
   /** Keyboard rows in physical-layout order (see lib/connections/keyboard.ts). */
   rows: readonly string[][];
-  /** Locale direction so the key grid flows correctly in Hebrew. */
-  dir: 'rtl' | 'ltr';
   /** Tap a letter. */
   onLetter: (letter: string) => void;
   /** Tap backspace. */
@@ -56,7 +54,6 @@ function letterKeyStyle(columns: number): CSSProperties {
  */
 export default function ConnectionsKeyboard({
   rows,
-  dir,
   onLetter,
   onBackspace,
   onSubmit,
@@ -68,8 +65,13 @@ export default function ConnectionsKeyboard({
   const lastRow = rows.length - 1;
   const keyStyle = letterKeyStyle(letterColumnCount(rows));
   return (
+    // The key grid is a physical-keyboard artifact, not text: on every physical
+    // and mobile Hebrew keyboard (and Hebrew Wordle) ק sits at the TOP-LEFT and
+    // ENTER on the left of the bottom row. Rendering under the page's rtl dir
+    // mirrored the whole board (ק top-right), breaking the muscle memory this
+    // layout exists to ride — so the keyboard always flows LTR regardless of locale.
     <div
-      dir={dir}
+      dir="ltr"
       className="flex w-full flex-col gap-1 sm:gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light p-1.5 sm:p-2 shadow-hard"
     >
       {rows.map((row, rowIdx) => (
@@ -89,7 +91,7 @@ export default function ConnectionsKeyboard({
               title={submitLabel}
               className={`${KEY_BASE} ${KEY_SIZE} flex-[1.4] min-w-[2.6rem] bg-neo-cyan text-neo-navy active:bg-neo-cyan-light`}
             >
-              <CornerDownLeft className="h-5 w-5 rtl:-scale-x-100" strokeWidth={2.75} aria-hidden="true" />
+              <CornerDownLeft className="h-5 w-5" strokeWidth={2.75} aria-hidden="true" />
             </button>
           )}
           {row.map((ch) => (
@@ -114,7 +116,7 @@ export default function ConnectionsKeyboard({
               title={backspaceLabel}
               className={`${KEY_BASE} ${KEY_SIZE} flex-[1.4] min-w-[2.6rem] bg-neo-pink text-neo-navy active:bg-neo-pink-light`}
             >
-              <Delete className="h-5 w-5 rtl:rotate-180" strokeWidth={2.5} aria-hidden="true" />
+              <Delete className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
             </button>
           )}
         </m.div>

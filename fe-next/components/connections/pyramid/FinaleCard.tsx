@@ -273,7 +273,6 @@ export default function FinaleCard({
               {!isDisabled && (
                 <ConnectionsKeyboard
                   rows={keyboardRows}
-                  dir={isRTL ? 'rtl' : 'ltr'}
                   onLetter={handleLetter}
                   onBackspace={handleBackspace}
                   onSubmit={onSubmit}
