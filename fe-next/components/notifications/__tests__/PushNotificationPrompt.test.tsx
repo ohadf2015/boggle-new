@@ -33,6 +33,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'notifications.prompt.title': 'Stay in the Game!',
         'notifications.prompt.body':
           'Get reminders for daily challenges and streak warnings',
+        'notifications.prompt.firstWinTitle': 'Nice win!',
+        'notifications.prompt.firstWinBody':
+          'Turn on notifications to keep your streak alive',
         'notifications.prompt.enable': 'Enable Notifications',
         'notifications.prompt.notNow': 'Not Now',
       };
@@ -43,10 +46,14 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 // Mock categoryPreferences
 const mockShouldShow = vi.fn();
+const mockShouldShowFirstWin = vi.fn();
+const mockClearFirstWinPending = vi.fn();
 const mockDismiss = vi.fn();
 
 vi.mock('@/utils/pushNotifications', () => ({
   shouldShowPushPrompt: (...args: unknown[]) => mockShouldShow(...args),
+  shouldShowFirstWinPushPrompt: (...args: unknown[]) => mockShouldShowFirstWin(...args),
+  clearFirstWinPromptPending: (...args: unknown[]) => mockClearFirstWinPending(...args),
   dismissPushPrompt: (...args: unknown[]) => mockDismiss(...args),
 }));
 
@@ -74,6 +81,7 @@ describe('PushNotificationPrompt', () => {
     vi.clearAllMocks();
     originalNotification = window.Notification;
     mockShouldShow.mockReturnValue(true);
+    mockShouldShowFirstWin.mockReturnValue(false);
     mockConsentDecided.mockReturnValue(true);
   });
 
@@ -170,6 +178,63 @@ describe('PushNotificationPrompt', () => {
       // THEN
       await waitFor(() => {
         expect(registerPushToken).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('first-win trigger (D1 re-engagement)', () => {
+    it('shows celebratory first-win copy when the first-win gate opens', () => {
+      // GIVEN - a first win just landed; games threshold not yet met
+      mockShouldShow.mockReturnValue(false);
+      mockShouldShowFirstWin.mockReturnValue(true);
+
+      // WHEN
+      render(<PushNotificationPrompt />);
+
+      // THEN - first-win copy, pending flag consumed, tagged trigger
+      expect(screen.getByText('Nice win!')).toBeInTheDocument();
+      expect(mockClearFirstWinPending).toHaveBeenCalled();
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('push_prompt_shown', {
+        trigger: 'first_win',
+      });
+    });
+
+    it('prefers the first-win gate over the games threshold', () => {
+      mockShouldShow.mockReturnValue(true);
+      mockShouldShowFirstWin.mockReturnValue(true);
+
+      render(<PushNotificationPrompt />);
+
+      expect(screen.getByText('Nice win!')).toBeInTheDocument();
+    });
+
+    it('tags granted/dismissed events with the first-win trigger', async () => {
+      mockShouldShow.mockReturnValue(false);
+      mockShouldShowFirstWin.mockReturnValue(true);
+
+      render(<PushNotificationPrompt />);
+      fireEvent.click(screen.getByText('Enable Notifications'));
+
+      await waitFor(() => {
+        expect(mockTrackGrowthEvent).toHaveBeenCalledWith('push_prompt_granted', {
+          trigger: 'first_win',
+        });
+      });
+    });
+
+    it('opens mid-session when the first-win event fires after mount', async () => {
+      // GIVEN - mounted while neither gate is open (player still in game)
+      mockShouldShow.mockReturnValue(false);
+      const { container } = render(<PushNotificationPrompt />);
+      expect(container.firstChild).toBeNull();
+
+      // WHEN - the win lands and arms the prompt
+      mockShouldShowFirstWin.mockReturnValue(true);
+      fireEvent(window, new Event('lexiclash:first-win'));
+
+      // THEN
+      await waitFor(() => {
+        expect(screen.getByText('Nice win!')).toBeInTheDocument();
       });
     });
   });

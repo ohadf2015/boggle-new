@@ -12,6 +12,7 @@ import {
   GAMES_PLAYED_EVENT,
   type NotificationCategoryPreferences,
 } from './types';
+import { FIRST_WIN_PROMPT_PENDING_KEY } from '@/lib/retention/firstWin';
 
 const GAMES_PLAYED_KEY = 'lexiclash_games_played';
 
@@ -99,6 +100,46 @@ export function shouldShowPushPrompt(): boolean {
 /**
  * Dismiss the push prompt for PROMPT_DISMISS_DAYS days
  */
+/**
+ * First-win variant of the push-prompt gate (D1 re-engagement lever). Shows
+ * the opt-in right after the player's first win instead of waiting for the
+ * MIN_GAMES_BEFORE_PROMPT threshold — the win is the peak-dopamine moment and
+ * converts far better. Gates: browser support, permission still 'default',
+ * no active dismissal cooldown, and a pending first-win flag (set by
+ * markFirstGameActivation when `first_game_won` fires).
+ */
+export function shouldShowFirstWinPushPrompt(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  if (typeof window.Notification === 'undefined') return false;
+  if (Notification.permission !== 'default') return false;
+
+  try {
+    const dismissedUntil = localStorage.getItem(PROMPT_DISMISSED_UNTIL_KEY);
+    if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
+      return false;
+    }
+  } catch {
+    // localStorage unavailable — fall through to the pending-flag check
+  }
+
+  try {
+    return localStorage.getItem(FIRST_WIN_PROMPT_PENDING_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Clear the pending first-win prompt flag (called once the prompt shows). */
+export function clearFirstWinPromptPending(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(FIRST_WIN_PROMPT_PENDING_KEY);
+  } catch {
+    // localStorage not available
+  }
+}
+
 /**
  * Increment the games-played counter so shouldShowPushPrompt can eventually trigger (N-16)
  */
