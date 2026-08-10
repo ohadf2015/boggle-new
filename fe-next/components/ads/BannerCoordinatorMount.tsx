@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
+import { useConsumerPro } from '@/hooks/useConsumerPro';
 import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerController';
 
 /**
@@ -12,10 +13,13 @@ import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerContr
  * AnchoredNativeBanner). Wires the plugin's show/hide and load/fail/foreground
  * signals into the module-singleton `bannerController` so the two banner owners
  * (AnchoredNativeBanner + InlineBannerAd) can declare intent without racing.
- * Renders nothing.
+ * Also monitors Consumer Pro status: paid ad-free users get permanent banner
+ * suppression. Renders nothing.
  */
 export default function BannerCoordinatorMount() {
   const { showBanner, hideBanner } = useAdMob();
+  // Consumer Pro status — ad-free users get permanent banner suppression.
+  const { hasConsumerPro } = useConsumerPro();
 
   // Capture showBanner/hideBanner in stable refs so the setup effect runs ONCE
   // (deps=[]) without churning on each render. This prevents setOps from being
@@ -121,9 +125,14 @@ export default function BannerCoordinatorMount() {
     //     --admob-banner-height).
     // NOTE: the two classes live on DIFFERENT nodes (drawer/opt-in on <html>,
     // game-lock on <body>), so we observe both.
+    //
+    // Consumer Pro adds a third permanent suppress: paid ad-free users never
+    // see banners.
+    const hasProRef = { current: hasConsumerPro };
     const syncSuppress = () =>
       void bannerController.setSuppressed(
         shouldSuppressBanner({
+          consumerPro: hasProRef.current,
           drawerOpen: document.documentElement.classList.contains('mobile-drawer-open'),
           inGame: document.body.classList.contains('screen-fit-locked'),
           allowInGame: document.documentElement.classList.contains('banner-allow-in-game'),
@@ -165,7 +174,22 @@ export default function BannerCoordinatorMount() {
       removers.forEach((r) => r());
       void bannerController.setOps(null);
     };
-  }, []);
+  }, [hasConsumerPro]);
+
+  // Separate effect: when Consumer Pro status changes, re-evaluate banner suppress.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    void bannerController.setSuppressed(
+      shouldSuppressBanner({
+        consumerPro: hasConsumerPro,
+        drawerOpen: document.documentElement.classList.contains('mobile-drawer-open'),
+        inGame: document.body.classList.contains('screen-fit-locked'),
+        allowInGame: document.documentElement.classList.contains('banner-allow-in-game'),
+        onboarding: document.documentElement.classList.contains('onboarding-active'),
+        modalOpen: document.documentElement.classList.contains('modal-open'),
+      }),
+    );
+  }, [hasConsumerPro]);
 
   return null;
 }

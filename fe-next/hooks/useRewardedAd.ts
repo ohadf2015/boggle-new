@@ -130,6 +130,14 @@ interface UseRewardedAdOptions {
    * gold button burned 198 loads for 2 shows there).
    */
   warm?: boolean;
+  /**
+   * Consumer Pro / ad-free mode: skip showing the ad entirely and immediately
+   * grant the reward. The user paid to remove ads; they still get the coins.
+   * When true, the hook bypasses all ad providers and calls awardCoinsAndNotify
+   * directly. The onAdStarted callback fires briefly (same as the placeholder
+   * path) so calling sites don't get stuck in 'showing'.
+   */
+  adFree?: boolean;
 }
 
 interface UseRewardedAdReturn {
@@ -189,7 +197,7 @@ interface UseRewardedAdReturn {
  * ```
  */
 export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
-  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic', analyticsSurface, warm = false } = options;
+  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic', analyticsSurface, warm = false, adFree = false } = options;
   const telemetrySurface = analyticsSurface ?? surface;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -297,6 +305,30 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     if (isDailyLimitReached()) {
       trackRewardedAdDeclined('daily_limit_reached', platformForDecline, telemetrySurface);
       onAdError?.('Daily ad limit reached');
+      return;
+    }
+
+    // Consumer Pro / ad-free: skip the ad entirely, grant the reward immediately.
+    // The user paid to remove ads; they still get coins/features without the UX
+    // interruption. Fires onAdStarted briefly (same semantics as the placeholder
+    // path) so callers that gate UI on 'showing' don't hang.
+    if (adFree) {
+      adActiveRef.current = true;
+      emitRewardAdActive(true); // freeze game clock as usual (coins still granted)
+      setStatus('showing');
+      onAdStarted?.();
+      // awardWatchedAd is declared below but captured by the closure at
+      // useCallback definition time — this is safe in function form.
+      void (async () => {
+        if (rewardKind === 'coins') {
+          await awardWatchedAd('ad_free');
+        }
+        onRewardEarned?.(rewardAmount);
+        setStatus('completed');
+        // Unfreeze after a brief pause so the caller sees 'showing' → 'completed'
+        await new Promise(r => setTimeout(r, 200));
+        emitRewardAdActive(false);
+      })();
       return;
     }
 
@@ -514,7 +546,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface, adFree]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths

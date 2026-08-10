@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getLemonSqueezyClient } from '@/lib/lemonsqueezy';
+import type { TierId } from '@/lib/lemonsqueezy';
 import logger from '@/utils/logger';
 
 /**
  * POST /api/subscription/checkout
- * Create a Lemon Squeezy checkout URL for Pro subscription
+ * Create a Lemon Squeezy checkout URL for a subscription tier.
+ *
+ * Body: { tier: 'pro' | 'consumer_pro' }
  *
  * Response:
  * - 200: { url: string } — redirect to this URL
+ * - 400: Missing or invalid tier
  * - 401: Unauthorized
  * - 500: Server error
  */
@@ -26,10 +30,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const body = await request.json().catch(() => ({})) as { tier?: string };
+    const tier = (body.tier ?? 'pro') as TierId;
+
+    if (tier !== 'pro' && tier !== 'consumer_pro') {
+      return NextResponse.json({ error: 'Invalid tier. Must be "pro" or "consumer_pro".' }, { status: 400 });
+    }
+
     const client = getLemonSqueezyClient();
     const checkoutUrl = await client.createCheckout({
       userId: user.id,
-      tier: 'pro',
+      tier,
       email: user.email ?? undefined,
     });
 

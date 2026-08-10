@@ -51,7 +51,7 @@ describe('POST /api/education/school-lead', () => {
   it('200 + inserts a qualified lead row', async () => {
     const res = await POST(mkReq(valid));
     expect(res.status).toBe(200);
-    expect((await res.json()).ok).toBe(true);
+    expect((await res.json()).success).toBe(true);
     expect(insertSpy).toHaveBeenCalledTimes(1);
     const row = insertSpy.mock.calls[0][0];
     expect(row.email).toBe(valid.email);

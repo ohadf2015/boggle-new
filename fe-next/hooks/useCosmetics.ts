@@ -15,6 +15,7 @@ import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
+import { useConsumerPro } from '@/hooks/useConsumerPro';
 
 const EQUIPPED_KEY = 'lexiclash_cosmetics_equipped';
 const PURCHASED_KEY = 'lexiclash_cosmetics_purchased';
@@ -50,6 +51,7 @@ function syncCosmeticsToSupabase(
 
 export function useCosmetics(input: UseCosmeticsInput) {
   const { user, isAuthenticated } = useAuth();
+  const { hasConsumerPro } = useConsumerPro();
   const hasSyncedRef = useRef(false);
 
   const [purchasedIds, setPurchasedIds] = useState<string[]>(() =>
@@ -92,8 +94,9 @@ export function useCosmetics(input: UseCosmeticsInput) {
       seasonRewards: [],
       purchasedIds,
       equippedIds,
+      hasConsumerPro,
     }),
-    [input.rankTier, input.streakDays, input.coins, purchasedIds, equippedIds]
+    [input.rankTier, input.streakDays, input.coins, purchasedIds, equippedIds, hasConsumerPro]
   );
 
   const unlockedCosmetics = useMemo(

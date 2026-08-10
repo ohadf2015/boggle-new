@@ -24,7 +24,9 @@ function getVariantId(p: WebhookPayload): string | undefined {
 function getTierFromVariantId(variantId: string | undefined): Tier {
   if (!variantId) return 'free'
   const proVariantId = process.env.LEMONSQUEEZY_PRO_VARIANT_ID
+  const consumerProVariantId = process.env.LEMONSQUEEZY_CONSUMER_PRO_VARIANT_ID
   if (proVariantId && variantId === proVariantId) return 'pro'
+  if (consumerProVariantId && variantId === consumerProVariantId) return 'consumer_pro'
   return 'free'
 }
 

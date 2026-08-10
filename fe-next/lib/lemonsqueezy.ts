@@ -39,15 +39,28 @@ export interface LemonSqueezyWebhookPayload {
 
 // ---- Tier configuration ----
 
-export type TierId = 'free' | 'pro'
+export type TierId = 'free' | 'pro' | 'consumer_pro'
 
 export interface TierConfig {
   id: TierId
   name: string
   price_monthly_usd: number
-  classes_limit: number | null // null = unlimited
+  /**
+   * Teacher-specific: classes limit, null = unlimited
+   * Only meaningful for 'free' and 'pro' (teacher Pro).
+   */
+  classes_limit: number | null
+  /**
+   * Teacher-specific: students per class limit, null = unlimited
+   * Only meaningful for 'free' and 'pro' (teacher Pro).
+   */
   students_limit_per_class: number | null
   features: string[]
+  /**
+   * Consumer-specific features (ad-free, extra avatar slots, board themes, etc.).
+   * Only populated for 'free' and 'consumer_pro'.
+   */
+  consumerFeatures?: string[]
   /** Lemon Squeezy Variant ID — set via env LEMONSQUEEZY_VARIANT_ID_<TIER> */
   variantId: string | undefined
 }
@@ -81,6 +94,27 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
       'Classroom duel mode',
     ],
     variantId: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
+  },
+  consumer_pro: {
+    id: 'consumer_pro',
+    name: 'Pro',
+    price_monthly_usd: 5.99,
+    classes_limit: 2,
+    students_limit_per_class: 30,
+    features: [
+      'Ad-free experience',
+      'Extra avatar slots',
+      'Custom board themes',
+      'Extended game history',
+      'Cognitive score trends',
+    ],
+    consumerFeatures: [
+      'ad_free',
+      'avatar_slots',
+      'board_themes',
+      'extended_history',
+    ],
+    variantId: process.env.LEMONSQUEEZY_CONSUMER_PRO_VARIANT_ID,
   },
 }
 

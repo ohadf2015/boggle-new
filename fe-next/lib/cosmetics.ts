@@ -12,6 +12,7 @@ export type UnlockCondition =
   | { type: 'streak'; days: number }
   | { type: 'season'; seasonId: number; tier: string }
   | { type: 'purchase'; cost: number }
+  | { type: 'subscription' }
   | { type: 'default' };
 
 export interface Cosmetic {
@@ -31,6 +32,8 @@ export interface PlayerCosmeticState {
   seasonRewards: Array<{ seasonId: number; tier: string }>;
   purchasedIds: string[];
   equippedIds: Partial<Record<CosmeticCategory, string>>;
+  /** Whether the player has an active Consumer Pro subscription. */
+  hasConsumerPro?: boolean;
 }
 
 import { LEADERBOARD_TIER_IDS } from './ranked/leaderboardTiers';
@@ -137,6 +140,15 @@ export const COSMETICS: Cosmetic[] = [
     unlockCondition: { type: 'rank', tier: 'platinum' },
     preview: 'board-theme-galaxy',
   },
+  {
+    id: 'board-pro-neon',
+    category: 'boardTheme',
+    name: 'cosmetics.items.boardProNeon',
+    description: 'cosmetics.items.boardProNeonDesc',
+    rarity: 'legendary',
+    unlockCondition: { type: 'subscription' },
+    preview: 'board-theme-pro-neon',
+  },
 
   // ── Victory Effects (3) ──
   {
@@ -232,9 +244,11 @@ export function isUnlocked(cosmeticId: string, state: PlayerCosmeticState): bool
       return state.streakDays >= cond.days;
     case 'purchase':
       return state.purchasedIds.includes(cosmeticId);
+    case 'subscription':
+      return state.hasConsumerPro === true;
     case 'season':
       return state.seasonRewards.some(
-        (r) => r.seasonId === cond.seasonId && rankAtLeast(r.tier, cond.tier)
+        (r) => r.seasonId === cond.seasonId && rankAtLeast(r.tier, cond.tier),
       );
   }
 }
@@ -298,6 +312,8 @@ export function formatUnlockHint(
       return { key: 'cosmetics.unlock.streak', params: { days: cond.days } };
     case 'purchase':
       return { key: 'cosmetics.unlock.purchase', params: { cost: cond.cost } };
+    case 'subscription':
+      return { key: 'cosmetics.unlock.subscription' };
     case 'season':
       return { key: 'cosmetics.unlock.season' };
   }

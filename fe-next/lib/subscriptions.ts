@@ -1,16 +1,21 @@
 /**
- * Subscription management for LexiClash teachers.
- * Ported from standalone teacher-dashboard repo.
+ * Subscription management for LexiClash.
  *
- * Reads subscription state from the `subscriptions` table in Supabase.
- * Provides tier checking and limit enforcement.
+ * Teacher subscriptions: reads from the `subscriptions` table in Supabase.
+ * Consumer (player) subscriptions: reads from the same `subscriptions` table
+ * but uses a different tier value ('consumer_pro') so one table serves both
+ * revenue streams. A user can hold at most one active subscription; if they
+ * buy Teacher Pro and Consumer Pro, the latest purchase wins ('pro' or
+ * 'consumer_pro').
  */
 
 import { createClient } from '@/utils/supabase/server'
 import { type TierConfig, getTierConfig } from './lemonsqueezy'
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing'
-export type Tier = 'free' | 'pro'
+export type Tier = 'free' | 'pro' | 'consumer_pro'
+
+// ── Teacher subscription types ──
 
 export interface TeacherSubscription {
   tier: Tier
@@ -21,6 +26,31 @@ export interface TeacherSubscription {
   cancel_at_period_end: boolean
   has_pro: boolean
 }
+
+// ── Consumer subscription types ──
+
+/** Consumer Pro feature flags derived from the subscription tier. */
+export interface ConsumerProFeatures {
+  /** Remove all banner + rewarded video ads */
+  adFree: boolean
+  /** Extra avatar slots beyond the free limit */
+  extraAvatarSlots: boolean
+  /** Access to Pro-exclusive board themes */
+  proBoardThemes: boolean
+  /** Extended game history and cognitive score trends */
+  extendedHistory: boolean
+}
+
+export interface ConsumerSubscription {
+  tier: Tier
+  status: SubscriptionStatus
+  current_period_end: string | null
+  cancel_at_period_end: boolean
+  has_consumer_pro: boolean
+  features: ConsumerProFeatures
+}
+
+// ── Teacher subscription helpers ──
 
 /**
  * Check a teacher's current subscription status.
@@ -61,6 +91,67 @@ export async function checkTeacherSubscription(
     has_pro: data.tier === 'pro' && data.status === 'active',
   }
 }
+
+// ── Consumer subscription helpers ──
+
+/**
+ * Check a player's Consumer Pro subscription status.
+ * Defaults to 'free' tier with all features disabled if no record exists.
+ */
+export async function checkConsumerSubscription(
+  userId: string
+): Promise<ConsumerSubscription> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', userId)
+    .single()
+
+  const hasConsumerPro = !error && data?.tier === 'consumer_pro' && data?.status === 'active'
+
+  if (!hasConsumerPro) {
+    return {
+      tier: 'free',
+      status: 'active',
+      current_period_end: null,
+      cancel_at_period_end: false,
+      has_consumer_pro: false,
+      features: {
+        adFree: false,
+        extraAvatarSlots: false,
+        proBoardThemes: false,
+        extendedHistory: false,
+      },
+    }
+  }
+
+  return {
+    tier: 'consumer_pro',
+    status: data.status as SubscriptionStatus,
+    current_period_end: data.current_period_end,
+    cancel_at_period_end: data.cancel_at_period_end,
+    has_consumer_pro: true,
+    features: {
+      adFree: true,
+      extraAvatarSlots: true,
+      proBoardThemes: true,
+      extendedHistory: true,
+    },
+  }
+}
+
+/**
+ * Check whether a player has Consumer Pro (for quick checks where granular
+ * features aren't needed).
+ */
+export async function hasConsumerPro(userId: string): Promise<boolean> {
+  const sub = await checkConsumerSubscription(userId)
+  return sub.has_consumer_pro
+}
+
+// ── Shared helpers ──
 
 /**
  * Check if a teacher can create a new class.

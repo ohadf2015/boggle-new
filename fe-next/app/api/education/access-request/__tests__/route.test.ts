@@ -66,7 +66,7 @@ describe('POST /api/education/access-request', () => {
     const res = await POST(mkReq(validPayload));
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.ok).toBe(true);
+    expect(json.success).toBe(true);
   });
 
   it('stamps user_id and the verified account email onto the row', async () => {

@@ -102,7 +102,7 @@ describe('soloDaily', () => {
     let ls: ReturnType<typeof makeLocalStorageMock>;
     beforeEach(() => {
       ls = makeLocalStorageMock();
-      vi.stubGlobal('window', {} as unknown as Window);
+      vi.stubGlobal('window', { dispatchEvent: vi.fn(), addEventListener: vi.fn() } as unknown as Window);
       vi.stubGlobal('localStorage', ls);
       vi.stubGlobal('sessionStorage', ls);
     });

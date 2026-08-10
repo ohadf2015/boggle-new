@@ -77,8 +77,11 @@ export function shouldSuppressBanner(input: {
   allowInGame: boolean;
   onboarding?: boolean;
   modalOpen?: boolean;
+  /** Consumer Pro users (paid ad-free) — permanently suppresses banners. */
+  consumerPro?: boolean;
 }): boolean {
   return (
+    Boolean(input.consumerPro) ||
     Boolean(input.onboarding) ||
     Boolean(input.modalOpen) ||
     input.drawerOpen ||

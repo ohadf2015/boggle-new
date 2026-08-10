@@ -1395,9 +1395,24 @@ const en = {
     },
     "removeAds": {
       "title": "Remove Ads",
-      "body": "Enjoy LexiClash ad-free. Coming soon — tap to express interest.",
-      "button": "I'm Interested",
-      "comingSoon": "Thanks! We'll let you know."
+      "body": "Enjoy LexiClash ad-free, get extra avatar slots, custom board themes, and more.",
+      "button": "Learn More",
+      "comingSoon": "Thanks! We'll let you know.",
+      "price": "$5.99/mo — ad-free, avatar slots, themes & more",
+      "purchaseButton": "Get Pro",
+      "signInRequired": "Sign in to purchase Pro"
+    },
+    "pro": {
+      "badge": "PRO",
+      "active": "Pro Active",
+      "manage": "Manage Subscription",
+      "includes": "Your Pro benefits:",
+      "benefits": {
+        "adFree": "✓ Ad-free experience",
+        "avatarSlots": "✓ Extra avatar slots",
+        "boardThemes": "✓ Custom board themes",
+        "extendedHistory": "✓ Extended game history"
+      }
     },
     "dangerZone": "Danger Zone",
     "deleteAccount": "Delete Account",
@@ -4943,7 +4958,8 @@ const en = {
       "rank": "Reach {{tier}} rank",
       "streak": "{{days}}-day streak",
       "purchase": "{{cost}} gold",
-      "season": "Season reward"
+      "season": "Season reward",
+      "subscription": "Pro subscription"
     },
     "rank": {
       "title": "Your Rank",
@@ -4975,6 +4991,8 @@ const en = {
       "boardOceanDesc": "Calming ocean waves as your backdrop.",
       "boardGalaxy": "Galaxy Board",
       "boardGalaxyDesc": "Play among the stars.",
+      "boardProNeon": "Pro Neon",
+      "boardProNeonDesc": "Exclusive neon board for Pro subscribers.",
       "victoryConfetti": "Confetti",
       "victoryConfettiDesc": "Classic confetti celebration.",
       "victoryFireworks": "Fireworks",

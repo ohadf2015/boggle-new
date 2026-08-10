@@ -149,6 +149,7 @@ const Avatar = memo<AvatarProps>((props) => {
         style={containerStyle}
         data-testid="header-avatar"
         data-avatar-type="custom"
+        data-mood={mood || undefined}
         {...frameAttr}
       >
         <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
@@ -163,6 +164,7 @@ const Avatar = memo<AvatarProps>((props) => {
       style={containerStyle}
       data-testid="header-avatar"
       data-avatar-type="generated"
+      data-mood={mood || undefined}
       {...frameAttr}
     >
       <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />

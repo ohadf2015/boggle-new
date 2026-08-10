@@ -21,6 +21,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { RemoveAdsProbe } from '@/components/ads/RemoveAdsProbe';
+import { ProStatusBadge } from '@/components/settings/ProStatusBadge';
 import { NotificationCategoryPreferences } from '@/components/notifications/NotificationCategoryPreferences';
 import { OfflineDownloadManager } from '@/components/offline/OfflineDownloadManager';
 import { PlayGamesCard } from '@/components/settings/PlayGamesCard';
@@ -503,6 +504,7 @@ export default function SettingsPageClient(): React.JSX.Element {
               <ChevronRight className={cn('w-5 h-5 rtl:rotate-180', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
             </Link>
           <RemoveAdsProbe isDarkMode={isDarkMode} />
+          <ProStatusBadge isDarkMode={isDarkMode} />
           </m.section>
 
           {/* Play Games (Android only — self-hides elsewhere) */}
