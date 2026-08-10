@@ -14,6 +14,7 @@ import {
   REALTIME_SUBSCRIBE_STATES,
   type RealtimePostgresChangesPayload,
   type RealtimePresenceState,
+  type RealtimeChannelSendResponse,
 } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import logger from '@/utils/logger';
@@ -117,10 +118,14 @@ interface GameRoomHandlers {
   onBroadcast?: (payload: GameRoomBroadcastPayload) => void;
 }
 
+// supabase-js types send/track/untrack as RealtimeChannelSendResponse, which is
+// the three literals WIDENED with `(string & {})`. Re-declaring just the
+// literals here made every one of these assignments a type error, so mirror the
+// library's type instead of narrowing it.
 interface GameRoomChannel {
-  broadcast: (event: string, payload: Record<string, unknown>) => Promise<'ok' | 'timed out' | 'error'> | void;
-  track: (userData: Record<string, unknown>) => Promise<'ok' | 'timed out' | 'error'> | void;
-  untrack: () => Promise<'ok' | 'timed out' | 'error'> | void;
+  broadcast: (event: string, payload: Record<string, unknown>) => Promise<RealtimeChannelSendResponse> | void;
+  track: (userData: Record<string, unknown>) => Promise<RealtimeChannelSendResponse> | void;
+  untrack: () => Promise<RealtimeChannelSendResponse> | void;
   unsubscribe: () => void;
 }
 
