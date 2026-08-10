@@ -14,7 +14,7 @@ export type RefundContent = {
 export const contentByLocale: Record<string, RefundContent> = {
   en: {
     title: 'Refund & Cancellation Policy',
-    intro: 'This policy explains cancellations and refunds for LexiClash Pro subscriptions, operated by Ohad Fisher, an individual sole proprietor based in Israel. Payments and refunds are processed by Lemon Squeezy as Merchant of Record.',
+    intro: 'This policy explains cancellations and refunds for LexiClash Pro subscriptions, operated by Ohad Fisher, an individual sole proprietor based in Israel. Payments and refunds are processed by Polar as Merchant of Record.',
     sections: [
       {
         title: '1. Cancelling your subscription',
@@ -26,7 +26,7 @@ export const contentByLocale: Record<string, RefundContent> = {
       },
       {
         title: '3. How to request a refund',
-        content: 'Contact lexiclash.game@gmail.com with your order details, or use the support/contact option in Lemon Squeezy\'s order confirmation email. Because Lemon Squeezy is the Merchant of Record, approved refunds are issued through Lemon Squeezy to your original payment method.',
+        content: 'Contact lexiclash.game@gmail.com with your order details, or use the support/contact option in Polar\'s order confirmation email. Because Polar is the Merchant of Record, approved refunds are issued through Polar to your original payment method.',
       },
       {
         title: '4. Free trials & promotions',
