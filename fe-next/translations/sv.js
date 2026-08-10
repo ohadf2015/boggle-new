@@ -13606,6 +13606,11 @@ const sv = {
       "firstDay": "Bra spel! Kom tillbaka imorgon för att starta en streak."
     }
   },
+  "dailyStreak": {
+    "badge": "{count} dagars svit",
+    "freezeReady": "Svitskydd redo — en missad dag bryter inte din svit",
+    "freezeUsed": "Svitskyddet räddade din svit!"
+  },
   "notifications": {
     "title": "Aviseringar",
     "bell": "Aviseringar",
@@ -13647,6 +13652,8 @@ const sv = {
     "prompt": {
       "title": "Håll dig i spelet!",
       "body": "Få påminnelser om dagliga utmaningar och svit-varningar",
+      "firstWinTitle": "Snygg vinst!",
+      "firstWinBody": "Slå på aviseringar för att hålla sviten vid liv och aldrig missa dagens utmaning",
       "enable": "Aktivera aviseringar",
       "notNow": "Inte nu"
     },

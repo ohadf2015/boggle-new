@@ -13378,6 +13378,11 @@ const es = {
       "firstDay": "¡Gran juego! Vuelve mañana para comenzar una racha."
     }
   },
+  "dailyStreak": {
+    "badge": "Racha de {count} días",
+    "freezeReady": "Congelación de racha lista: un día perdido no romperá tu racha",
+    "freezeUsed": "¡La congelación salvó tu racha!"
+  },
   "notifications": {
     "title": "Notificaciones",
     "bell": "Notificaciones",
@@ -13419,6 +13424,8 @@ const es = {
     "prompt": {
       "title": "¡Mantente en el juego!",
       "body": "Recibe recordatorios de desafíos diarios y advertencias de racha",
+      "firstWinTitle": "¡Buena victoria!",
+      "firstWinBody": "Activa las notificaciones para mantener tu racha y no perderte el desafío diario",
       "enable": "Activar notificaciones",
       "notNow": "Ahora no"
     },

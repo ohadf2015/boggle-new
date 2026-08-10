@@ -11995,6 +11995,11 @@ const en = {
       "firstDay": "Great game! Come back tomorrow to start a streak."
     }
   },
+  "dailyStreak": {
+    "badge": "{count}-day streak",
+    "freezeReady": "Streak freeze ready — one missed day won't break your streak",
+    "freezeUsed": "Streak freeze saved your streak!"
+  },
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications yet",
@@ -12036,6 +12041,8 @@ const en = {
     "prompt": {
       "title": "Stay in the Game!",
       "body": "Get reminders for daily challenges and streak warnings",
+      "firstWinTitle": "Nice win!",
+      "firstWinBody": "Turn on notifications to keep your streak alive and never miss a daily challenge",
       "enable": "Enable Notifications",
       "notNow": "Not Now"
     },

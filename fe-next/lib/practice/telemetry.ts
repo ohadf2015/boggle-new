@@ -14,6 +14,8 @@
 
 import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
+import { stampFirstWinClockStart } from '@/lib/retention/firstWin';
+import { trackRetentionPlay } from '@/lib/retention/tracking';
 import type { PracticeMode } from './practiceTutorialSteps';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
@@ -34,6 +36,9 @@ interface ModeLocale {
 }
 
 export function trackPracticeStarted(args: ModeLocale): void {
+  // First-win-fast: practice is the FTUE's first game — start the clock so
+  // `first_game_won` can carry time_to_first_win_sec.
+  stampFirstWinClockStart();
   safeCapture('practice_started', {
     mode: args.mode,
     locale: args.locale,
@@ -69,6 +74,23 @@ export function trackPracticeCompleted(args: PracticeCompletedArgs): void {
     duration_seconds: args.durationSeconds,
     streak_day: args.streakDay,
   });
+
+  // Practice completions ARE the FTUE win moment (riddle solved / goal hit,
+  // confetti + popup). Record the activation + the daily streak here because
+  // practice sandboxes don't route through trackGameEnd. Both are idempotent
+  // per device / per day. Dynamic import avoids a module cycle with
+  // utils/growthTracking (which imports the retention tracker).
+  void import('@/utils/growthTracking')
+    .then(({ markFirstGameActivation }) => {
+      markFirstGameActivation({
+        won: true,
+        score: args.wordsFound,
+        wordCount: args.wordsFound,
+        mode: `practice_${args.mode}`,
+      });
+    })
+    .catch(() => { /* activation best-effort */ });
+  trackRetentionPlay({ mode: `practice_${args.mode}` });
 }
 
 export interface PracticeChainClickedArgs {
