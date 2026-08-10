@@ -14,16 +14,17 @@
     "serve": "python3 -m http.server --directory dist 8199",
     "test": "vitest run",
     "validate": "node scripts/validate-dist.mjs",
-    "package": "npm run build && npm run validate && cd dist && zip -qr -X ../lexiclash-standalone.zip . -x '.*' && cd .. && echo 'wrote lexiclash-standalone.zip'",
-    "package:poki": "VITE_PORTAL=poki npm run build && npm run validate && cd dist && zip -qr -X ../lexiclash-poki.zip . -x '.*' && cd .. && echo 'wrote lexiclash-poki.zip'",
-    "package:crazygames": "VITE_PORTAL=crazygames npm run build && npm run validate && cd dist && zip -qr -X ../lexiclash-crazygames.zip . -x '.*' && cd .. && echo 'wrote lexiclash-crazygames.zip'",
-    "package:gd": "VITE_PORTAL=gamedistribution npm run build && npm run validate && cd dist && zip -qr -X ../lexiclash-gamedistribution.zip . -x '.*' && cd .. && echo 'wrote lexiclash-gamedistribution.zip'"
+    "package": "npm run build && npm run validate && python3 scripts/zip-dist.py lexiclash-standalone.zip",
+    "package:poki": "VITE_PORTAL=poki npm run build && npm run validate && python3 scripts/zip-dist.py lexiclash-poki.zip",
+    "package:crazygames": "VITE_PORTAL=crazygames npm run build && npm run validate && python3 scripts/zip-dist.py lexiclash-crazygames.zip",
+    "package:gd": "VITE_PORTAL=gamedistribution npm run build && npm run validate && python3 scripts/zip-dist.py lexiclash-gamedistribution.zip"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@types/node": "^26.2.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
