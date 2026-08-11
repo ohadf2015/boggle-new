@@ -1,8 +1,27 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useShareOpenGuard } from '../useShareOpenGuard';
 
 describe('useShareOpenGuard', () => {
+  // Mock sessionStorage with actual storage functionality
+  beforeEach(() => {
+    const store = new Map<string, string>();
+    const sessionStorageMock = {
+      getItem: vi.fn((key: string) => store.get(key) ?? null),
+      setItem: vi.fn((key: string, value: string) => store.set(key, value)),
+      removeItem: vi.fn((key: string) => store.delete(key)),
+      clear: vi.fn(() => store.clear()),
+      key: vi.fn((index: number) => Array.from(store.keys())[index] ?? null),
+      length: 0,
+    };
+    // @ts-ignore - we know this isn't the full storage API
+    global.sessionStorage = sessionStorageMock;
+  });
+
+  afterEach(() => {
+    // Clear mocks after each test
+    vi.clearAllMocks();
+  });
   it('returns true on first call with a sessionId', () => {
     const { result } = renderHook(() => useShareOpenGuard());
 
@@ -63,5 +82,29 @@ describe('useShareOpenGuard', () => {
     // because the ref persists across re-renders
     const second = result.current.shouldFireShareOpen('game-123');
     expect(second).toBe(false);
+  });
+
+  it('persists guard state via sessionStorage when available', () => {
+    const { result } = renderHook(() => useShareOpenGuard());
+
+    // First call with hook instance
+    const first = result.current.shouldFireShareOpen('game-123');
+    expect(first).toBe(true);
+
+    // Verify sessionStorage was called to store the state
+    expect(global.sessionStorage.setItem).toHaveBeenCalledWith(
+      'lexiclash_share_open_guard',
+      JSON.stringify(['game-123'])
+    );
+
+    // Create a new hook instance (simulating remount)
+    const { result: result2 } = renderHook(() => useShareOpenGuard());
+
+    // The second hook instance should read from sessionStorage and suppress the second call
+    const second = result2.current.shouldFireShareOpen('game-123');
+    expect(second).toBe(false);
+
+    // Verify that getItem was called
+    expect(global.sessionStorage.getItem).toHaveBeenCalledWith('lexiclash_share_open_guard');
   });
 });

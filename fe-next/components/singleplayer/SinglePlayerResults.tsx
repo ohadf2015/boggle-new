@@ -9,6 +9,7 @@ import { TrendingUp, ArrowLeft, RotateCcw } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
 
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import UnfinishedBoardTeaser from '@/components/results/UnfinishedBoardTeaser';
@@ -24,6 +25,7 @@ import TomorrowPreview from '@/components/results/TomorrowPreview';
 
 const UGCFeaturedStrip = dynamic(() => import('@/components/ugc/UGCFeaturedStrip'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+const UnifiedShareModal = dynamic(() => import('@/components/modals/UnifiedShareModal'), { ssr: false });
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -93,6 +95,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 }) => {
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const [showTomorrowPreview, setShowTomorrowPreview] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleBackToLobby = useCallback(() => {
     setShowTomorrowPreview(true);
@@ -226,6 +229,20 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const hasMinimumScore = results.playerScore > 0;
 
   useSharePromptImpression({ variant: sharePromptTiming, enabled: hasMinimumScore });
+
+  // Share modal auto-open: fire exactly once per game session on win
+  const { shouldFireShareOpen } = useShareOpenGuard();
+  useEffect(() => {
+    // Single-player: "win" = beat a bot or new high score
+    const shouldAutoOpen = hasMinimumScore && (isWinner || results.isNewHighScore);
+    if (!shouldAutoOpen) return;
+    if (!results.gameSessionId) return;
+
+    if (shouldFireShareOpen(results.gameSessionId)) {
+      setShowShareModal(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire exactly once per gameSessionId
+  }, [results.gameSessionId, isWinner, results.isNewHighScore, hasMinimumScore]);
 
   const shouldShowConfetti = hasMinimumScore && (
     (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore
@@ -515,6 +532,23 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           timeoutSeconds={15} onVote={handleWordVote}
           onSkip={() => setShowWordValidation(false)} onTimeout={() => setShowWordValidation(false)} />
       )}
+
+      {/* Post-win Share Prompt - Auto-opens exactly once via useShareOpenGuard */}
+      <UnifiedShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        gameCode={`sp_${results.gameSessionId || ''}`}
+        context="post-game"
+        gameResult={{
+          score: results.playerScore,
+          wordCount: results.playerWords?.length || 0,
+          isWinner: isWinner || results.isNewHighScore,
+          longestWord: results.playerWords?.reduce((a, b) => a.length >= b.length ? a : b),
+          maxCombo: results.maxCombo,
+        }}
+        language={gameLanguage}
+        t={t}
+      />
     </div>
   );
 };
