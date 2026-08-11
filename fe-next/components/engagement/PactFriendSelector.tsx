@@ -56,9 +56,9 @@ export const PactFriendSelector: React.FC<PactFriendSelectorProps> = memo(
             r.user_id === user.id ? r.friend_id : r.user_id
           );
 
-          // Get profiles
+          // Get profiles (public view: leaderboard-safe columns only)
           const { data: profiles } = await supabase
-            .from('profiles')
+            .from('public_profiles')
             .select('id, username, avatar_image')
             .in('id', friendIds);
 

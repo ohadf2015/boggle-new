@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
 
     if (referredIds.length > 0) {
       const { data: users } = await supabase
-        .from('profiles')
-        .select('id, username, display_name, avatar_emoji, avatar_color')
+        .from('public_profiles')
+        .select('id, username, avatar_emoji, avatar_color')
         .in('id', referredIds);
 
       referredUsers = users || [];
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
         rewardGranted: referral.reward_granted,
         gamesPlayed: referral.referred_games_played,
         username: referred?.username || null,
-        displayName: referred?.display_name || null,
+        displayName: null, // PII: real names no longer exposed for other users
         avatarEmoji: referred?.avatar_emoji || null,
         avatarColor: referred?.avatar_color || null,
         status,
