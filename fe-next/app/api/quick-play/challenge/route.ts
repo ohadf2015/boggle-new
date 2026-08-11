@@ -91,12 +91,12 @@ export async function GET(request: NextRequest) {
       if (!row) return NextResponse.json({ answered: null });
 
       const { data: accepter } = await supabase
-        .from('profiles')
-        .select('display_name')
+        .from('public_profiles')
+        .select('username')
         .eq('id', row.accepted_by)
         .single();
       return NextResponse.json({
-        answered: { ...row, accepterName: accepter?.display_name || 'Player' },
+        answered: { ...row, accepterName: accepter?.username || 'Player' },
       });
     }
     const { data, error } = await supabase
@@ -107,14 +107,14 @@ export async function GET(request: NextRequest) {
     if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('display_name')
+      .from('public_profiles')
+      .select('username')
       .eq('id', data.challenger_id)
       .single();
 
     return NextResponse.json({
       ...data,
-      challengerName: profile?.display_name || 'Player',
+      challengerName: profile?.username || 'Player',
     });
   } catch (err) {
     captureApiError(err instanceof Error ? err : new Error(String(err)), 'quick-play-challenge-get');

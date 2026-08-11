@@ -34,11 +34,11 @@ export async function GET(request: NextRequest) {
     let avatars: Record<string, unknown> = {};
     if (rows.length > 0) {
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_config')
+        .from('public_profiles')
+        .select('id, username, avatar_config')
         .in('id', rows.map((r) => r.user_id));
       names = Object.fromEntries(
-        (profiles ?? []).map((p: { id: string; display_name: string | null }) => [p.id, p.display_name ?? ''])
+        (profiles ?? []).map((p: { id: string; username: string | null }) => [p.id, p.username ?? ''])
       );
       avatars = Object.fromEntries(
         (profiles ?? []).map((p: { id: string; avatar_config: unknown }) => [p.id, p.avatar_config ?? null])
