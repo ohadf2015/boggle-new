@@ -890,7 +890,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         showShareModal,
         setShowShareModal,
         gameCode,
-        roomName,
+        // no roomName here: this surface has no such variable, and ShareModalState marks it
+        // optional — passing an undeclared identifier threw on every render and the error
+        // boundary swallowed the whole results page.
       }}
       t={t}
       language={language}
