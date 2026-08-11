@@ -68,7 +68,6 @@ export async function GET(request: NextRequest) {
     let referredUsers: Array<{
       id: string;
       username: string | null;
-      display_name: string | null;
       avatar_emoji: string | null;
       avatar_color: string | null;
     }> = [];
