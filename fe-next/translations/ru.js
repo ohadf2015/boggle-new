@@ -1250,6 +1250,11 @@ const ru = {
   "forfeitTitle": "Сдать поединок?",
   "duelComplete": "Поединок завершен!",
   "education": {
+    "nav": {
+      "section": "Учителям",
+      "forTeachers": "Для учителей",
+      "myClassroom": "Мой класс"
+    },
     "duels": {
       "lobby": "Лобби",
       "history": "История",
@@ -5105,6 +5110,46 @@ const ru = {
   "wordAccepted": "Слово принято!",
   "waitingReconnect": "Жду переподключения",
   "admin": {
+    "teacherFunnel": {
+      "title": "Воронка учителей",
+      "subtitle": "Что одобренные учителя сделали дальше.",
+      "blockedAlert": "{count} одобренных учителей не могут войти — роль так и не была выдана.",
+      "error": "Не удалось загрузить воронку учителей",
+      "empty": "Заявок от учителей пока нет",
+      "pageviewHint": "Только именованные заявители. Анонимный трафик образовательных страниц — в PostHog.",
+      "stat": {
+        "requested": "Заявки",
+        "approved": "Одобрено",
+        "roleGranted": "Могут войти",
+        "createdClassroom": "Создали класс",
+        "gotStudents": "С учениками",
+        "assigned": "Выдают задания"
+      },
+      "stage": {
+        "declined": "Отклонено",
+        "awaiting_signup": "Нет аккаунта",
+        "blocked": "Нет доступа",
+        "approved": "Одобрен",
+        "created_class": "Создал класс",
+        "teaching": "Преподаёт"
+      },
+      "trial": {
+        "none": "—",
+        "active": "Активен",
+        "expired": "Истёк"
+      },
+      "lastSeen": {"never": "—", "today": "Сегодня", "daysAgo": "{days} дн. назад"},
+      "col": {
+        "lastSeen": "Был(а)",
+        "teacher": "Учитель",
+        "country": "Страна",
+        "stage": "Этап",
+        "trial": "Пробный",
+        "classes": "Классы",
+        "students": "Ученики",
+        "assignments": "Задания"
+      }
+    },
     "accessDenied": "Доступ запрещен",
     "accessRequired": "Требуется доступ",
     "acquisition": {
@@ -13713,6 +13758,7 @@ const ru = {
     }
   },
   "mpCoach": {
+    "tryWord": "Попробуйте: {word}",
     "idleNudge": "Тяни по буквам, чтобы составить слово",
     "tapHint": "Держи и тяни по буквам, потом отпусти, чтобы отправить",
     "submitHint": "Отпусти палец с последней буквы, чтобы отправить слово",

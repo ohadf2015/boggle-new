@@ -10,6 +10,7 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { DistrictUpsellBanner } from '@/components/teacher/DistrictUpsellBanner';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -20,11 +21,9 @@ function TeacherDashboardInner() {
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
   const { trial } = useTeacherAccess();
 
-  // Check if user is teacher or admin — accepts user_role OR legacy is_admin flag
-  const isTeacher =
-    profile?.user_role === 'teacher' ||
-    profile?.user_role === 'admin' ||
-    profile?.is_admin === true;
+  // Shared predicate — this gate is duplicated in the nav and useTeacherAccess,
+  // and drift here silently bounces approved teachers to the homepage.
+  const isTeacher = isTeacherProfile(profile);
   const isProfileLoading = !authLoading && user && !profile;
 
   useEffect(() => {

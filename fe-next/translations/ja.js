@@ -77,6 +77,7 @@ const ja = {
     }
   },
   "mpCoach": {
+    "tryWord": "例: {word}",
     "idleNudge": "文字をなぞって単語を作ろう",
     "tapHint": "文字を押しながらなぞり、指を離して送信しよう",
     "submitHint": "最後の文字で指を離すと単語が送信されます",
@@ -8596,6 +8597,46 @@ const ja = {
     "daysAgo": "{n}日前"
   },
   "admin": {
+    "teacherFunnel": {
+      "title": "教師ファネル",
+      "subtitle": "承認された教師がその後どう動いたか。",
+      "blockedAlert": "承認済みの教師{count}名がログインできません。権限が付与されていません。",
+      "error": "教師ファネルを読み込めませんでした",
+      "empty": "教師からの申請はまだありません",
+      "pageviewHint": "氏名のある申請者のみ。教育ページの匿名トラフィックは PostHog にあります。",
+      "stat": {
+        "requested": "申請",
+        "approved": "承認",
+        "roleGranted": "ログイン可",
+        "createdClassroom": "クラス作成",
+        "gotStudents": "生徒あり",
+        "assigned": "課題配布"
+      },
+      "stage": {
+        "declined": "却下",
+        "awaiting_signup": "アカウントなし",
+        "blocked": "ログイン不可",
+        "approved": "承認済み",
+        "created_class": "クラス作成",
+        "teaching": "授業中"
+      },
+      "trial": {
+        "none": "—",
+        "active": "有効",
+        "expired": "期限切れ"
+      },
+      "lastSeen": {"never": "—", "today": "今日", "daysAgo": "{days}日前"},
+      "col": {
+        "lastSeen": "最終利用",
+        "teacher": "教師",
+        "country": "国",
+        "stage": "段階",
+        "trial": "試用",
+        "classes": "クラス",
+        "students": "生徒",
+        "assignments": "課題"
+      }
+    },
     "gameModePopularity": "ゲームモード人気",
     "mpModeBreakdown": {
       "title": "マルチプレイヤーモード内訳",
@@ -12558,6 +12599,11 @@ const ja = {
     }
   },
   "education": {
+    "nav": {
+      "section": "教師向け",
+      "forTeachers": "教師の方へ",
+      "myClassroom": "マイクラス"
+    },
     "reviewDue": "復習する単語が{{count}}個あります",
     "postGame": {
       "wordsYouLearned": "学んだ単語",

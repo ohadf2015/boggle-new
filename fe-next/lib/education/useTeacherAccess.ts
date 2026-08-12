@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getWithAuth } from '@/utils/authFetch';
 import type { TeacherAccessRequest, TeacherAccessStatus } from './types';
 import { teacherTrialStatus, type TrialStatus } from './trial';
+import { isTeacherProfile } from './teacherRole';
 
 interface UseTeacherAccessResult {
   hasAccess: boolean;
@@ -22,8 +23,7 @@ export function useTeacherAccess(): UseTeacherAccessResult {
   // impurely during render.
   const [nowMs, setNowMs] = useState(() => Date.now());
 
-  const role = profile?.user_role;
-  const hasAccess = role === 'teacher' || role === 'admin' || profile?.is_admin === true;
+  const hasAccess = isTeacherProfile(profile);
 
   // Fetch the latest request even for users who already have access — approved
   // teachers need their trial deadline to render the activation-urgency banner.

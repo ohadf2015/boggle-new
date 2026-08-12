@@ -27,7 +27,19 @@ const mockSupabase = (profile: any, requestRow: any = null) => {
   };
 };
 
+// Service-role client used to promote ANOTHER user's profile. `profilesUpdate`
+// is a stable spy so tests can assert the promotion ran on this client (which
+// bypasses RLS) rather than the request-scoped one (which silently matches zero
+// rows). `rows` is what the UPDATE ... RETURNING resolves to.
+const mockAdminClient = (rows: any[] | null = [{ id: 'user-1' }], error: any = null) => {
+  const profilesUpdate = vi.fn(() => ({
+    eq: vi.fn(() => ({ select: vi.fn(async () => ({ data: rows, error })) })),
+  }));
+  return { profilesUpdate, from: vi.fn(() => ({ update: profilesUpdate })) };
+};
+
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
+vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 vi.mock('@/lib/email/send', () => ({ sendEmail: vi.fn(async () => ({ ok: true })) }));
 
 import { POST as approve } from '../[id]/approve/route';
@@ -35,6 +47,7 @@ import { POST as decline } from '../[id]/decline/route';
 import { POST as resend } from '../[id]/resend/route';
 import { GET as list } from '../route';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { sendEmail } from '@/lib/email/send';
 
 const req = (body?: any) => new Request('http://t', { method: 'POST', body: body ? JSON.stringify(body) : undefined });
@@ -160,6 +173,49 @@ describe('admin teacher-access endpoints', () => {
     (sendEmail as any).mockResolvedValueOnce({ ok: false, error: 'domain not verified' });
     const res = await resend(req(), { params: Promise.resolve({ id: 'req-1' }) });
     expect(res.status).toBe(502);
+  });
+
+  // Regression: `profiles` RLS is `auth.uid() = id` with NO admin bypass policy,
+  // so promoting another user's row through the request-scoped client updates
+  // ZERO rows and returns NO error. Approval reported success while every
+  // approved teacher stayed `user_role='student'` and got bounced off /teacher
+  // by its role check. Measured 2026-08-12: 14 approved, 0 profiles promoted.
+  it('approve promotes the profile via the service-role client, not the RLS-scoped one', async () => {
+    const row = { id: 'req-1', user_id: 'user-1', email: 'x@y.com', full_name: 'X', locale: 'en' };
+    const sb = mockSupabase(adminProfile, row);
+    const admin = mockAdminClient([{ id: 'user-1' }]);
+    (createClient as any).mockReturnValue(sb);
+    (createAdminClient as any).mockReturnValue(admin);
+
+    const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+
+    expect(res.status).toBe(200);
+    expect(admin.from).toHaveBeenCalledWith('profiles');
+    expect(admin.profilesUpdate).toHaveBeenCalledWith({ user_role: 'teacher' });
+  });
+
+  it('approve fails loudly when the profile promotion matches zero rows', async () => {
+    const row = { id: 'req-1', user_id: 'user-1', email: 'x@y.com', full_name: 'X', locale: 'en' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    (createAdminClient as any).mockReturnValue(mockAdminClient([]));
+
+    const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+
+    expect(res.status).toBe(500);
+    // An approval that did not actually grant the role must not send a
+    // "you're approved" email — that is what stranded the 8 teachers.
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('approve fails loudly when the service-role client is unavailable', async () => {
+    const row = { id: 'req-1', user_id: 'user-1', email: 'x@y.com', full_name: 'X', locale: 'en' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    (createAdminClient as any).mockReturnValue(null);
+
+    const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+
+    expect(res.status).toBe(500);
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it('list rejects non-admin', async () => {
