@@ -17,7 +17,11 @@ import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
 import { MobileShareSection } from './pre-game/MobileShareSection';
 import { SoloPlayPrompt } from './pre-game/SoloPlayPrompt';
-import { shouldShowSoloPlayPrompt } from '@/lib/multiplayer/soloHostPrompt';
+import {
+  shouldShowSoloPlayPrompt,
+  shouldAutoStartAfterBotFill,
+  PUBLIC_ROOM_BOT_START_GRACE_SECONDS,
+} from '@/lib/multiplayer/soloHostPrompt';
 import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
@@ -335,6 +339,12 @@ function HostPreGameView({
   onStartGameRef.current = onStartGame;
   const aloneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const postFillStartRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The post-fill auto-start fires 20s after it is scheduled, so the values it
+  // was scheduled against are stale by then — the host may have pressed Start
+  // themselves. Re-read the live signals at FIRE time, not schedule time.
+  const autoStartSignalsRef = useRef({ isQuickPlay, isPrivate, humanGuestCount, gameState });
+  autoStartSignalsRef.current = { isQuickPlay, isPrivate, humanGuestCount, gameState };
 
   useEffect(() => {
     if (humanGuestCount === 0) {
@@ -357,12 +367,23 @@ function HostPreGameView({
     } else {
       if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      // A real human turned up — cancel any pending bots-only auto-start.
+      if (postFillStartRef.current) {
+        clearTimeout(postFillStartRef.current);
+        postFillStartRef.current = null;
+      }
       setBotCountdown(null);
     }
     return () => {
       if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
     };
   }, [humanGuestCount, isQuickPlay, isPrivate]);
+
+  // Never leave a queued auto-start behind on unmount — it would start a game in
+  // a room the host has already left.
+  useEffect(() => () => {
+    if (postFillStartRef.current) clearTimeout(postFillStartRef.current);
+  }, []);
 
   // Passive rescue for a solo host (alone-timer + Quick Play countdown).
   //
@@ -390,6 +411,18 @@ function HostPreGameView({
       setBotCountdown(null);
       if (isQuickPlay) {
         (onAutoStartWithBotsRef.current ?? onStartGameRef.current)();
+      } else if (shouldAutoStartAfterBotFill({ isQuickPlay, isPrivate, humanGuestCount, gameState })) {
+        // Public room: bots are in, but the host still has to press a Start they
+        // don't know is theirs — 35% never did. Give one last grace window (a
+        // human joining or the room emptying clears this), then just play.
+        postFillStartRef.current = setTimeout(() => {
+          postFillStartRef.current = null;
+          // Re-check against live values: during the grace window the host may
+          // have started the game themselves, or a human may have joined and
+          // started it. Firing blind here would start an already-running round.
+          if (!shouldAutoStartAfterBotFill(autoStartSignalsRef.current)) return;
+          (onAutoStartWithBotsRef.current ?? onStartGameRef.current)();
+        }, PUBLIC_ROOM_BOT_START_GRACE_SECONDS * 1000);
       }
       return;
     }
@@ -399,7 +432,7 @@ function HostPreGameView({
     return () => {
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
-  }, [botCountdown, socket, gameCode, isQuickPlay]);
+  }, [botCountdown, socket, gameCode, isQuickPlay, isPrivate, humanGuestCount, gameState]);
 
   const handleRoomLanguageChange = useCallback((newLang: Language) => {
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
