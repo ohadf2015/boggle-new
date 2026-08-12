@@ -42,5 +42,8 @@ export async function POST(req: Request) {
     await sendEmail({ to: 'lexiclash.game@gmail.com', subject: tpl.subject, html: tpl.html });
   } catch { /* noop — row is already persisted */ }
 
-  return NextResponse.json({ success: true });
+  // Both keys on purpose: this route's error path answers { ok: false, error }, so a caller that
+  // checks `ok` saw undefined on success — the shapes disagreed. `success` stays for any existing
+  // consumer; `ok` makes the success and failure envelopes match.
+  return NextResponse.json({ ok: true, success: true });
 }
