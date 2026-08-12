@@ -15,6 +15,8 @@ import HeaderMobileMenu from './header/HeaderMobileMenu';
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 const AdminGiftModal = dynamic(() => import('./gift/AdminGiftModal').then(m => m.AdminGiftModal), { ssr: false });
 const LeaguePositionBadge = dynamic(() => import('@/components/leagues/LeaguePositionBadge').then(m => m.LeaguePositionBadge), { ssr: false });
+// Dynamic — reads localStorage streak state; self-hides at 0 days.
+const StreakBadge = dynamic(() => import('@/components/StreakBadge'), { ssr: false });
 // Dynamic — DesktopGameNav uses navigation/CrazyGames/veteran hooks; matches the
 // pattern of other sub-components above and keeps Header unit tests insulated.
 const DesktopGameNav = dynamic(() => import('./DesktopGameNav'), { ssr: false });
@@ -104,6 +106,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     {/* Compact league badge — constant awareness on every device.
                         Self-hides for guests / players not yet in a league. */}
                     <div className="block min-w-0"><LeaguePositionBadge /></div>
+                    {/* Daily streak chip — the D1 habit loop, always visible once
+                        the player has a streak going. Self-hides at 0 days. */}
+                    <div className="block shrink-0"><StreakBadge /></div>
                 </div>
 
                 {/* Right cluster: desktop strip (sm+) + side-menu trigger.

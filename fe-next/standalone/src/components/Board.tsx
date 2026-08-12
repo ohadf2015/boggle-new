@@ -68,11 +68,14 @@ export function Board({ board, onSubmit, onTraceStart, flash }: Props) {
   const endTrace = useCallback(() => {
     if (!tracing) return;
     setTracing(false);
-    setPath((p) => {
-      if (p.length > 0) onSubmit(pathToWord(board, p));
-      return [];
-    });
-  }, [tracing, board, onSubmit]);
+    // Submit OUTSIDE the setPath updater: updaters must be pure (React may
+    // re-invoke them during render), and onSubmit dispatches to the parent's
+    // reducer — inside the updater that is a cross-component setState during
+    // render (React warning +, under event bursts, "Maximum update depth
+    // exceeded" crashes — reproduced with a pointer drag on 2026-08-10).
+    if (path.length > 0) onSubmit(pathToWord(board, path));
+    setPath([]);
+  }, [tracing, path, board, onSubmit]);
 
   const inPath = (r: number, c: number) => path.some(([pr, pc]) => pr === r && pc === c);
   const word = pathToWord(board, path);

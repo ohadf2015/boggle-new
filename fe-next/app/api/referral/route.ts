@@ -68,15 +68,14 @@ export async function GET(request: NextRequest) {
     let referredUsers: Array<{
       id: string;
       username: string | null;
-      display_name: string | null;
       avatar_emoji: string | null;
       avatar_color: string | null;
     }> = [];
 
     if (referredIds.length > 0) {
       const { data: users, error: usersError } = await supabase
-        .from('profiles')
-        .select('id, username, display_name, avatar_emoji, avatar_color')
+        .from('public_profiles')
+        .select('id, username, avatar_emoji, avatar_color')
         .in('id', referredIds);
 
       if (!usersError) {
@@ -90,7 +89,7 @@ export async function GET(request: NextRequest) {
       return {
         ...referral,
         username: user?.username,
-        display_name: user?.display_name,
+        display_name: null, // PII: real names no longer exposed for other users
         avatar_emoji: user?.avatar_emoji,
         avatar_color: user?.avatar_color,
       };

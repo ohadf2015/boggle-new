@@ -27,6 +27,12 @@ import {
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
 import { markGameActive, markGameInactive } from '@/utils/abandonOnPagehide';
+import { trackRetentionPlay } from '@/lib/retention/tracking';
+import {
+  stampFirstWinClockStart,
+  consumeFirstWinClockSeconds,
+  markFirstWinPromptPending,
+} from '@/lib/retention/firstWin';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -1013,7 +1019,19 @@ export const markFirstGameActivation = (args: {
     }
     if (won && !localStorage.getItem(wonKey)) {
       localStorage.setItem(wonKey, '1');
-      trackGrowthEvent('first_game_won', { score, wordCount, gameMode: mode });
+      // First-win-fast: how long from first game start to this win (D1 target
+      // is a win-feeling moment inside 60s). Null when the clock never stamped.
+      const timeToFirstWinSec = consumeFirstWinClockSeconds();
+      trackGrowthEvent('first_game_won', {
+        score,
+        wordCount,
+        gameMode: mode,
+        time_to_first_win_sec: timeToFirstWinSec,
+        under_60s: timeToFirstWinSec != null ? timeToFirstWinSec < 60 : undefined,
+      });
+      // Re-engagement: arm the push-opt-in prompt to fire right after the win
+      // (PushNotificationPrompt listens for FIRST_WIN_EVENT / polls the flag).
+      markFirstWinPromptPending();
     }
   } catch {
     /* localStorage unavailable (private mode, quota) — activation best-effort */
@@ -1068,6 +1086,9 @@ export const trackGameStart = (
   });
   trackSessionDepth(sessionGameCount);
   markGameActive(mode);
+  // First-win-fast: start the clock on a brand-new player's first game so the
+  // eventual `first_game_won` carries time_to_first_win_sec (target: <60s).
+  stampFirstWinClockStart();
 };
 
 /**
@@ -1117,6 +1138,11 @@ export const trackGameEnd = (
       wordCount,
       mode,
     });
+
+    // Daily retention streak: every completed game counts as "played today"
+    // (D1 habit loop). Idempotent within a UTC day; emits streak_day_recorded
+    // / streak_freeze_used / streak_broken / streak_milestone.
+    trackRetentionPlay({ mode });
 
     // Award Play Games Services leaderboard score + achievements.
     // Fire-and-forget; the bridge is a no-op off Android and never throws.

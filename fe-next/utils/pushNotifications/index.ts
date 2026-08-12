@@ -11,6 +11,8 @@ export {
   loadCategoryPreferences,
   saveCategoryPreferences,
   shouldShowPushPrompt,
+  shouldShowFirstWinPushPrompt,
+  clearFirstWinPromptPending,
   dismissPushPrompt,
   incrementGamesPlayed,
 } from './categoryPreferences';

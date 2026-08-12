@@ -71,7 +71,7 @@ export function useWordPact(): UseWordPactReturn {
 
       const friendId = data.player1_id === user.id ? data.player2_id : data.player1_id;
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('username, avatar_image')
         .eq('id', friendId)
         .single();

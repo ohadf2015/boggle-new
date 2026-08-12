@@ -11,6 +11,8 @@ import { hasCompletedOnboarding, markOnboardingComplete, hasPlayedBotsGame } fro
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { isFirstSessionPlayer } from '@/lib/retention/firstWin';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
   SinglePlayerMode,
@@ -30,6 +32,45 @@ const DEFAULT_MEDIUM_BOT: BotOpponent = {
   score: 0,
   wordsFound: [],
 };
+
+/**
+ * First-win-fast (D1 lever): a brand-new player's first solo-bots round is an
+ * EASY 60s board against ONE easy bot — a win-feeling moment inside a minute
+ * instead of a 120s MEDIUM game vs a medium bot they usually lose.
+ */
+const FIRST_WIN_CONFIG = {
+  difficulty: 'EASY' as DifficultyLevel,
+  timerSeconds: 60,
+  bots: 1,
+  botDifficulty: 'easy' as const,
+};
+
+/** Apply the first-win config when this device has never completed a game. */
+function firstWinConfigFor(fallback: {
+  difficulty: DifficultyLevel;
+  timerSeconds: number;
+  bots: number;
+  botDifficulty: 'easy' | 'medium' | 'hard';
+}): { config: typeof fallback; isFirstWin: boolean } {
+  if (isFirstSessionPlayer()) {
+    return { config: { ...FIRST_WIN_CONFIG }, isFirstWin: true };
+  }
+  return { config: fallback, isFirstWin: false };
+}
+
+function trackFirstWinConfigApplied(entry: string): void {
+  try {
+    posthog.capture('first_win_config_applied', {
+      entry,
+      difficulty: FIRST_WIN_CONFIG.difficulty,
+      timer_seconds: FIRST_WIN_CONFIG.timerSeconds,
+      bots: FIRST_WIN_CONFIG.bots,
+      bot_difficulty: FIRST_WIN_CONFIG.botDifficulty,
+    });
+  } catch {
+    /* analytics best-effort */
+  }
+}
 
 const BOT_NAMES = [
   'WordBot', 'LexiBot', 'AlphaBot', 'BrainBot', 'SpeedBot',
@@ -167,12 +208,14 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
       hasAutoStartedRef.current = true;
       const botsPreset = getDefaultPreset('solo-bots');
       if (botsPreset) {
-        const bots = generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty);
-        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        const { config, isFirstWin } = firstWinConfigFor(botsPreset.settings);
+        if (isFirstWin) trackFirstWinConfigApplied('autoStart=bots');
+        const bots = generateBotsForPreset(config.bots, config.botDifficulty);
+        const minWordLength = getMinWordLength(uiLanguage, config.difficulty);
         setGameState({
           mode: 'solo-bots',
-          difficulty: botsPreset.settings.difficulty,
-          timerSeconds: botsPreset.settings.timerSeconds,
+          difficulty: config.difficulty,
+          timerSeconds: config.timerSeconds,
           bots,
           language: (uiLanguage as Language) || 'en',
           grid: null,
@@ -194,15 +237,17 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     if (presetParam === 'bots') {
       const botsPreset = getDefaultPreset('solo-bots');
       if (botsPreset) {
-        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
-        const bots = botsPreset.settings.bots > 0
-          ? generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty)
+        const { config, isFirstWin } = firstWinConfigFor(botsPreset.settings);
+        if (isFirstWin) trackFirstWinConfigApplied('preset=bots');
+        const minWordLength = getMinWordLength(uiLanguage, config.difficulty);
+        const bots = config.bots > 0
+          ? generateBotsForPreset(config.bots, config.botDifficulty)
           : [];
         setGameState(prev => ({
           ...prev,
           mode: 'solo-bots',
-          difficulty: botsPreset.settings.difficulty,
-          timerSeconds: botsPreset.settings.timerSeconds,
+          difficulty: config.difficulty,
+          timerSeconds: config.timerSeconds,
           bots,
           language: (uiLanguage as Language) || 'en',
           grid: null,
