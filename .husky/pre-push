@@ -135,8 +135,17 @@ PID_TSC=$!
   # pulls in (`list --filesOnly` resolves the related-files graph WITHOUT
   # importing test bodies, so it's cheap), then shard proportionally. Now the
   # shard count tracks the real fan-out regardless of which file triggered it.
-  FILES_PER_SHARD=120   # ~proven-safe batch per 8GB process (mega-hub: 1000+/8 ≈ 125)
-  MAX_SHARDS=16
+  # 80, not 120: on 2026-08-12 a push whose cone was the WHOLE suite (vitest.setup.ts
+  # changed → every test file is related) OOM-killed a worker in shard 14/16 —
+  # node::OOMErrorHandler in the fork, zero failing assertions, gate red anyway. The
+  # 120 figure predates cones this large, and shrinking the batch is the same lever
+  # the sharding was added for.
+  FILES_PER_SHARD=80
+  # 48, not 16: 16 was the BINDING constraint on a whole-suite cone (3221 test files /
+  # 80 = 41 shards, capped back to 16 → 201 files per process, i.e. the batch size the
+  # OOM happened at). A cap below cone/FILES_PER_SHARD silently un-does the shrink above.
+  # Each shard is a fresh process, so the only cost of more shards is startup, ~15s each.
+  MAX_SHARDS=48
   MEGA_HUB_REGEX='(^|/)translations/|(^|/)LanguageContext\.(ts|tsx)$'
   HUB_REGEX='(^|/)experiments\.(ts|tsx)$|(^|/)contexts/|(^|/)hooks/use[A-Z]'
   SHARDS=1
