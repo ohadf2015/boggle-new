@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 import { teacherTrialExpiry } from '@/lib/education/trial';
@@ -32,8 +33,22 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (upd.error) return NextResponse.json({ ok: false, error: upd.error.message }, { status: 500 });
 
   if (row.user_id) {
-    const r = await sb.from('profiles').update({ user_role: 'teacher' }).eq('id', row.user_id);
+    // `profiles` RLS is `auth.uid() = id` with no admin bypass, so promoting
+    // ANOTHER user's row through the request-scoped client `sb` matches zero
+    // rows and reports no error — a silent no-op. That left every approved
+    // teacher on the default `user_role='student'`, and /teacher's role check
+    // bounced them straight back to the homepage (14 approved, 0 promoted,
+    // 1 classroom ever, measured 2026-08-12). Go through the service-role
+    // client and require that a row actually changed.
+    const admin = createAdminClient();
+    if (!admin) {
+      return NextResponse.json({ ok: false, error: 'service role key not configured' }, { status: 500 });
+    }
+    const r = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', row.user_id).select('id');
     if (r.error) return NextResponse.json({ ok: false, error: r.error.message }, { status: 500 });
+    if (!r.data?.length) {
+      return NextResponse.json({ ok: false, error: 'profile not promoted' }, { status: 500 });
+    }
   } else {
     const r = await sb.from('teacher_access_allowlist').insert({
       email: row.email,

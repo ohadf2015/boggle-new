@@ -77,6 +77,7 @@ const he = {
     }
   },
   "mpCoach": {
+    "tryWord": "נסו: {word}",
     "idleNudge": "גררו על האותיות כדי לאיית מילה",
     "tapHint": "החזיקו וגררו על האותיות, ואז הרימו את האצבע לשליחה",
     "submitHint": "הרימו את האצבע מהאות האחרונה כדי לשלוח את המילה",
@@ -8345,6 +8346,46 @@ const he = {
     "daysAgo": "לפני {n} ימים"
   },
   "admin": {
+    "teacherFunnel": {
+      "title": "משפך המורים",
+      "subtitle": "מה מורים שאושרו באמת עשו אחר כך.",
+      "blockedAlert": "{count} מורים שאושרו לא מצליחים להיכנס — ההרשאה שלהם מעולם לא הוקצתה.",
+      "error": "טעינת משפך המורים נכשלה",
+      "empty": "אין עדיין בקשות ממורים",
+      "pageviewHint": "רק פונים מזוהים. תנועה אנונימית בדפי החינוך נמצאת ב-PostHog.",
+      "stat": {
+        "requested": "הגישו בקשה",
+        "approved": "אושרו",
+        "roleGranted": "יכולים להיכנס",
+        "createdClassroom": "פתחו כיתה",
+        "gotStudents": "עם תלמידים",
+        "assigned": "מקצים משימות"
+      },
+      "stage": {
+        "declined": "נדחה",
+        "awaiting_signup": "אין חשבון",
+        "blocked": "חסום",
+        "approved": "אושר",
+        "created_class": "פתח כיתה",
+        "teaching": "מלמד"
+      },
+      "trial": {
+        "none": "—",
+        "active": "פעילה",
+        "expired": "פגה"
+      },
+      "lastSeen": {"never": "—", "today": "היום", "daysAgo": "לפני {days} ימים"},
+      "col": {
+        "lastSeen": "נראה לאחרונה",
+        "teacher": "מורה",
+        "country": "מדינה",
+        "stage": "שלב",
+        "trial": "תקופת ניסיון",
+        "classes": "כיתות",
+        "students": "תלמידים",
+        "assignments": "משימות"
+      }
+    },
     "gameModePopularity": "פופולריות מצבי משחק",
     "mpModeBreakdown": {
       "title": "פירוק מצבי משחק ריבוי שחקנים",
@@ -12414,6 +12455,11 @@ const he = {
     }
   },
   "education": {
+    "nav": {
+      "section": "מורים",
+      "forTeachers": "למורים",
+      "myClassroom": "הכיתה שלי"
+    },
     "reviewDue": "{{count}} מילים לחזרה",
     "postGame": {
       "wordsYouLearned": "מילים שלמדתם",

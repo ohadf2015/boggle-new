@@ -77,6 +77,7 @@ const sv = {
     }
   },
   "mpCoach": {
+    "tryWord": "Testa: {word}",
     "idleNudge": "Dra över bokstäverna för att stava ett ord",
     "tapHint": "Håll och dra över bokstäverna, släpp sedan för att skicka",
     "submitHint": "Lyft fingret från sista bokstaven för att skicka ordet",
@@ -8700,6 +8701,46 @@ const sv = {
     "daysAgo": "{n}d sedan"
   },
   "admin": {
+    "teacherFunnel": {
+      "title": "Lärartratt",
+      "subtitle": "Vad godkända lärare faktiskt gjorde sedan.",
+      "blockedAlert": "{count} godkända lärare kan inte logga in — rollen tilldelades aldrig.",
+      "error": "Kunde inte ladda lärartratten",
+      "empty": "Inga läraransökningar än",
+      "pageviewHint": "Endast namngivna sökande. Anonym trafik på utbildningssidorna finns i PostHog.",
+      "stat": {
+        "requested": "Ansökte",
+        "approved": "Godkända",
+        "roleGranted": "Kan logga in",
+        "createdClassroom": "Skapade klass",
+        "gotStudents": "Har elever",
+        "assigned": "Delar ut uppgifter"
+      },
+      "stage": {
+        "declined": "Avslagen",
+        "awaiting_signup": "Inget konto",
+        "blocked": "Utelåst",
+        "approved": "Godkänd",
+        "created_class": "Skapade klass",
+        "teaching": "Undervisar"
+      },
+      "trial": {
+        "none": "—",
+        "active": "Aktiv",
+        "expired": "Utgången"
+      },
+      "lastSeen": {"never": "—", "today": "Idag", "daysAgo": "{days}d sedan"},
+      "col": {
+        "lastSeen": "Senast sedd",
+        "teacher": "Lärare",
+        "country": "Land",
+        "stage": "Steg",
+        "trial": "Testperiod",
+        "classes": "Klasser",
+        "students": "Elever",
+        "assignments": "Uppgifter"
+      }
+    },
     "gameModePopularity": "Spelläges popularitet",
     "mpModeBreakdown": {
       "title": "Uppdelning av multiplayer-lägen",
@@ -12786,6 +12827,11 @@ const sv = {
     }
   },
   "education": {
+    "nav": {
+      "section": "Lärare",
+      "forTeachers": "För lärare",
+      "myClassroom": "Min klass"
+    },
     "reviewDue": "{{count}} ord att repetera",
     "postGame": {
       "wordsYouLearned": "Ord du lärt dig",

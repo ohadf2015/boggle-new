@@ -77,6 +77,7 @@ const es = {
     }
   },
   "mpCoach": {
+    "tryWord": "Prueba: {word}",
     "idleNudge": "Arrastra sobre las letras para formar una palabra",
     "tapHint": "Mantén y arrastra sobre las letras, luego suelta para enviar",
     "submitHint": "Levanta el dedo de la última letra para enviar la palabra",
@@ -8430,6 +8431,46 @@ const es = {
     "daysAgo": "hace {n}d"
   },
   "admin": {
+    "teacherFunnel": {
+      "title": "Embudo de docentes",
+      "subtitle": "Qué hicieron realmente los docentes aprobados.",
+      "blockedAlert": "{count} docentes aprobados no pueden entrar: nunca se les asignó el rol.",
+      "error": "No se pudo cargar el embudo de docentes",
+      "empty": "Aún no hay solicitudes de docentes",
+      "pageviewHint": "Solo solicitantes identificados. El tráfico anónimo de las páginas educativas está en PostHog.",
+      "stat": {
+        "requested": "Solicitaron",
+        "approved": "Aprobados",
+        "roleGranted": "Pueden entrar",
+        "createdClassroom": "Crearon clase",
+        "gotStudents": "Con alumnos",
+        "assigned": "Asignan tareas"
+      },
+      "stage": {
+        "declined": "Rechazado",
+        "awaiting_signup": "Sin cuenta",
+        "blocked": "Sin acceso",
+        "approved": "Aprobado",
+        "created_class": "Creó clase",
+        "teaching": "Enseñando"
+      },
+      "trial": {
+        "none": "—",
+        "active": "Activa",
+        "expired": "Vencida"
+      },
+      "lastSeen": {"never": "—", "today": "Hoy", "daysAgo": "hace {days}d"},
+      "col": {
+        "lastSeen": "Última visita",
+        "teacher": "Docente",
+        "country": "País",
+        "stage": "Etapa",
+        "trial": "Prueba",
+        "classes": "Clases",
+        "students": "Alumnos",
+        "assignments": "Tareas"
+      }
+    },
     "gameModePopularity": "Popularidad de modos",
     "mpModeBreakdown": {
       "title": "Desglose de modos multijugador",
@@ -12560,6 +12601,11 @@ const es = {
     }
   },
   "education": {
+    "nav": {
+      "section": "Docentes",
+      "forTeachers": "Para docentes",
+      "myClassroom": "Mi clase"
+    },
     "reviewDue": "{{count}} palabras para repasar",
     "postGame": {
       "wordsYouLearned": "Palabras nuevas",

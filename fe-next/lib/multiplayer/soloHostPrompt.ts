@@ -30,3 +30,38 @@ export function shouldShowSoloPlayPrompt({
 }: SoloHostPromptInput): boolean {
   return humanGuestCount === 0 && gameState === 'waiting' && !botCountdownActive && !isPrivate;
 }
+
+/**
+ * Grace window after a PUBLIC room's lobby auto-fills with bots, before the game
+ * starts on its own. Stacked on the existing 15s alone-timer + 20s visible
+ * countdown, so a host gets ~55s of total silence — long enough that someone
+ * mid-share is not yanked into a bot game, short enough to rescue the session.
+ */
+export const PUBLIC_ROOM_BOT_START_GRACE_SECONDS = 20;
+
+export interface AutoStartAfterBotFillInput {
+  /** Quick Play already starts the instant bots land — it must not fire twice. */
+  isQuickPlay: boolean;
+  isPrivate: boolean;
+  humanGuestCount: number;
+  gameState: string;
+}
+
+/**
+ * Whether a bot-filled PUBLIC lobby should start itself.
+ *
+ * Filling a lobby with bots and then waiting for a Start button the host does
+ * not know is theirs stranded 35% of the sessions that got that far. Adding the
+ * bots was already the decision that this host is playing alone; not starting is
+ * the incoherent half of it. Private rooms keep the old behaviour — that host is
+ * waiting on specific humans.
+ */
+export function shouldAutoStartAfterBotFill({
+  isQuickPlay,
+  isPrivate,
+  humanGuestCount,
+  gameState,
+}: AutoStartAfterBotFillInput): boolean {
+  if (isQuickPlay || isPrivate) return false;
+  return humanGuestCount === 0 && gameState === 'waiting';
+}

@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, Sparkles, User, Bell, BellOff, ChevronDown, Check, Pencil, Bug } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, Sparkles, User, Bell, BellOff, ChevronDown, Check, Pencil, Bug, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -21,6 +21,7 @@ import type { NotificationData } from '../notifications/types';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
+import { teacherMenuEntry } from '@/lib/education/teacherRole';
 import Avatar from '../Avatar';
 import { getStoredCustomAvatar, getStoredUsername, setStoredUsername } from '../../utils/profileStorage';
 import { setGuestName } from '../../utils/guestManager';
@@ -48,6 +49,7 @@ const SWIPE_CLOSE_THRESHOLD = 80;
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
+    const teacherEntry = teacherMenuEntry(profile);
     const { style: playerStyle } = usePlayerStyle();
     const engagementStatus = useEngagementStatus();
     const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
@@ -822,6 +824,25 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             <span>{t('nav.friends')}</span>
                                         </MenuLink>
                                         <GiftNotificationBadge count={friendsBadgeCount} />
+                                    </div>
+
+                                    {/* ─ Teachers ─
+                                        An approved teacher previously had NO way back to
+                                        /teacher except the original approval email. */}
+                                    <div>
+                                        <SectionLabel>{t('education.nav.section')}</SectionLabel>
+                                    </div>
+                                    <div>
+                                        <MenuLink
+                                            href={`/${language}${teacherEntry.href}`}
+                                            onClick={closeMenu}
+                                            accentColor="lime"
+                                        >
+                                            <MenuIcon className="bg-neo-lime/20 border-neo-lime/40">
+                                                <GraduationCap className="w-4 h-4 text-neo-lime" aria-hidden="true" />
+                                            </MenuIcon>
+                                            <span>{t(teacherEntry.labelKey)}</span>
+                                        </MenuLink>
                                     </div>
 
                                     {/* ─ Admin ─ */}

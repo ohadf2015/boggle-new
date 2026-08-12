@@ -58,6 +58,7 @@ const en = {
     }
   },
   "mpCoach": {
+    "tryWord": "Try: {word}",
     "idleNudge": "Drag across letters to spell a word",
     "tapHint": "Hold and drag across letters, then lift to submit",
     "submitHint": "Lift your finger off the last letter to submit the word",
@@ -11177,6 +11178,11 @@ const en = {
     }
   },
   "education": {
+    "nav": {
+      "section": "Teachers",
+      "forTeachers": "For teachers",
+      "myClassroom": "My classroom"
+    },
     "duels": {
       "lobby": "Lobby",
       "history": "History",
@@ -14050,6 +14056,46 @@ const en = {
     }
   },
   "admin": {
+    "teacherFunnel": {
+      "title": "Teacher funnel",
+      "subtitle": "What approved teachers actually did next.",
+      "blockedAlert": "{count} approved teachers can't sign in — their account role was never granted.",
+      "error": "Couldn't load the teacher funnel",
+      "empty": "No teacher requests yet",
+      "pageviewHint": "Named applicants only. Anonymous education-page traffic is in PostHog.",
+      "stat": {
+        "requested": "Applied",
+        "approved": "Approved",
+        "roleGranted": "Can sign in",
+        "createdClassroom": "Made a class",
+        "gotStudents": "Has students",
+        "assigned": "Assigning work"
+      },
+      "stage": {
+        "declined": "Declined",
+        "awaiting_signup": "No account",
+        "blocked": "Locked out",
+        "approved": "Approved",
+        "created_class": "Made a class",
+        "teaching": "Teaching"
+      },
+      "trial": {
+        "none": "—",
+        "active": "Active",
+        "expired": "Expired"
+      },
+      "lastSeen": {"never": "—", "today": "Today", "daysAgo": "{days}d ago"},
+      "col": {
+        "lastSeen": "Last seen",
+        "teacher": "Teacher",
+        "country": "Country",
+        "stage": "Stage",
+        "trial": "Trial",
+        "classes": "Classes",
+        "students": "Students",
+        "assignments": "Tasks"
+      }
+    },
     "accessDenied": "Access Denied",
     "accessRequired": "Access Required",
     "acquisition": {
