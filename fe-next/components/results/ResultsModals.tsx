@@ -100,6 +100,8 @@ interface GameFeedbackState {
   gameMode?: string;
   /** MP session game counter or similar */
   throttleKey?: string;
+  /** Whether this feedback modal is eligible to show */
+  eligible: boolean;
 }
 
 /** Share modal state */
@@ -114,8 +116,6 @@ interface ShareModalState {
   gameResult?: GameResultForShare;
   /** Room name for pre-game share context */
   roomName?: string;
-  /** Whether this feedback modal should be eligible to show */
-  eligible: boolean;
 }
 
 export interface ResultsModalsProps {
