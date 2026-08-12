@@ -26,6 +26,18 @@ vi.mock('framer-motion', () => ({
   useReducedMotion: () => true,
 }));
 
+// Avatar loads AvatarRenderer through next/dynamic (Avatar.tsx:21), and a dynamic import resolves a
+// tick AFTER a synchronous render — so the tree held no [data-mood] node at all and this assertion
+// ran against an empty list no matter what the podium did. The only dynamic component under this
+// tree is that renderer, so standing in for next/dynamic with a synchronous stub carrying the same
+// data-mood contract (AvatarRenderer.tsx:137) makes the test measure what it claims: which slot
+// gets 'win'.
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: () => ({ mood }: { mood?: string }) =>
+    React.createElement('div', { 'data-mood': mood ?? 'idle' }),
+}));
+
 // Friend badge needs auth/lang context we don't care about here.
 vi.mock('@/components/results/ResultsFriendStatus', () => ({
   AddFriendBadge: () => null,

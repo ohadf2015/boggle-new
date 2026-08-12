@@ -102,7 +102,15 @@ describe('soloDaily', () => {
     let ls: ReturnType<typeof makeLocalStorageMock>;
     beforeEach(() => {
       ls = makeLocalStorageMock();
-      vi.stubGlobal('window', {} as unknown as Window);
+      // An EMPTY window is not a realistic stub: production code guards on
+      // `typeof window === 'undefined'`, so an object that exists but has no dispatchEvent slips past
+      // the guard and blows up inside (incrementGamesPlayed fires a GAMES_PLAYED event after every
+      // award). A real browser window always has these — give the stub the same shape.
+      vi.stubGlobal('window', {
+        dispatchEvent: () => true,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      } as unknown as Window);
       vi.stubGlobal('localStorage', ls);
       vi.stubGlobal('sessionStorage', ls);
     });

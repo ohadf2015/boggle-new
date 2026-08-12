@@ -473,3 +473,15 @@ afterEach(() => {
   });
   return { promise, resolve, reject };
 };
+
+// happy-dom installs `fetch` as a non-writable accessor on the global, so the plain
+// `global.fetch = vi.fn()` that ~100 test files in this repo use throws
+//   TypeError: Cannot assign to read only property 'fetch' of object '#<Object>'
+// and takes the whole file down with it — which is why the pre-push suite is red on master and
+// nobody can push from a laptop. Rewriting 100 files to vi.stubGlobal is the bigger change; making
+// the property writable here restores the assignment those files already do, once, for all of them.
+// Tests that DO use vi.stubGlobal keep working — stubGlobal defines its own property either way.
+{
+  const current = globalThis.fetch;
+  Object.defineProperty(globalThis, 'fetch', { value: current, writable: true, configurable: true });
+}
