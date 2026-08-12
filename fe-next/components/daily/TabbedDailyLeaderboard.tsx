@@ -594,7 +594,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     const loadMoreClass = 'w-full py-2 text-xs sm:text-sm font-bold text-neo-purple hover:text-neo-white flex items-center justify-center gap-1.5 transition-colors rounded-neo bg-neo-purple/10 hover:bg-neo-purple/20 border border-neo-purple/40';
 
     return (
-      <div className="space-y-2">
+      <div className={`space-y-2 pb-[calc(var(--admob-banner-height,0px)+var(--mobile-bottom-safe))] md:pb-6`}>
         {/* Load more above */}
         {hasAbove && (
           <button type="button" onClick={loadAbove} className={loadMoreClass}>
