@@ -23,6 +23,7 @@ import { shouldPlayPreResultFanfare } from '@/lib/native/webViewLayerFlash';
 import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
 import type { MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
+import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
@@ -371,6 +372,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
   const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(true);
 
+  // Share modal state - auto-opens on win once per session
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
+
   // Desktop keyboard shortcuts: R=rematch, Escape=exit (enabled after score reveal)
   useGameKeyboardShortcuts({
     onRematch: onReturnToRoom || undefined,
@@ -546,6 +550,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     normalizeUsername,
     gameMode: resolvedGameMode,
   });
+
+  // Share modal auto-open: fire exactly once per game session on win
+  const { shouldFireShareOpen } = useShareOpenGuard();
+  useEffect(() => {
+    if (!isCurrentUserWinner) return;
+    if (!gameCode) return;
+    if (shouldFireShareOpen(gameCode)) {
+      setShowShareModal(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire exactly once per gameCode
+  }, [gameCode, isCurrentUserWinner]);
 
   // CrazyGames lifecycle - stop gameplay when results page loads
   // Call happytime if winner (throttled to once per 30s)
@@ -871,6 +886,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         showFirstWinModal,
         setShowFirstWinModal,
       }}
+      shareModal={{
+        showShareModal,
+        setShowShareModal,
+        gameCode,
+        // no roomName here: this surface has no such variable, and ShareModalState marks it
+        // optional — passing an undeclared identifier threw on every render and the error
+        // boundary swallowed the whole results page.
+      }}
+      t={t}
+      language={language}
     />
   );
 

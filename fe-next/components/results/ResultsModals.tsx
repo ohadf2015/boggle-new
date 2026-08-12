@@ -21,6 +21,7 @@ import { useModalQueue } from '@/hooks/useModalQueue';
 import { trackModalDismissed } from '@/utils/posthogEngagement';
 import type { WordToVote } from '@/types/components';
 import type { ReferralMilestone, LevelUpPayload } from '@/shared/types/socket';
+import type { GameResultForShare } from '@/utils/share';
 
 // Dynamic imports for modals (loaded after initial render)
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
@@ -29,6 +30,7 @@ const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUp
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const GameFeedbackCard = dynamic(() => import('@/components/results/GameFeedbackCard'), { ssr: false });
+const UnifiedShareModal = dynamic(() => import('@/components/modals/UnifiedShareModal'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -98,6 +100,20 @@ interface GameFeedbackState {
   gameMode?: string;
   /** MP session game counter or similar */
   throttleKey?: string;
+}
+
+/** Share modal state */
+interface ShareModalState {
+  /** Whether share modal is visible */
+  showShareModal: boolean;
+  /** Close handler callback */
+  setShowShareModal: (show: boolean) => void;
+  /** Game code for share URL */
+  gameCode?: string;
+  /** Game result data for "Beat My Score" challenges */
+  gameResult?: GameResultForShare;
+  /** Room name for pre-game share context */
+  roomName?: string;
   /** Whether this feedback modal should be eligible to show */
   eligible: boolean;
 }
@@ -115,6 +131,12 @@ export interface ResultsModalsProps {
   firstWinModal: FirstWinModalState;
   /** Game feedback (rating survey) modal state and handlers */
   gameFeedback?: GameFeedbackState;
+  /** Share modal state and handlers */
+  shareModal?: ShareModalState;
+  /** Translation function */
+  t?: (key: string) => string;
+  /** User's language code */
+  language?: string;
 }
 
 // ==============================================
@@ -128,6 +150,9 @@ export function ResultsModals({
   authModal,
   firstWinModal,
   gameFeedback,
+  shareModal,
+  t = (key) => key,
+  language = 'en',
 }: ResultsModalsProps) {
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hideExternal = isOnCrazyGamesPlatform;
@@ -137,9 +162,10 @@ export function ResultsModals({
     // 1. levelUp: Celebration peaks (epic full-screen GSAP, auto-dismisses after 5s)
     // 2. referralMilestone: Friend milestone notifications (quick, non-intrusive)
     // 3. firstWin: Guest signup after first win (high-priority conversion moment)
-    // 4. auth: Guest signup for non-winners (secondary conversion opportunity)
-    // 5. wordFeedback: Dictionary word voting (let players resolve word disputes before leaving)
-    // 6. gameFeedback: Post-game sentiment rating ("How was that round?") — ONLY after rematch CTA visible.
+    // 4. share: Post-win share prompt (auto-opens exactly once)
+    // 5. auth: Guest signup for non-winners (secondary conversion opportunity)
+    // 6. wordFeedback: Dictionary word voting (let players resolve word disputes before leaving)
+    // 7. gameFeedback: Post-game sentiment rating ("How was that round?") — ONLY after rematch CTA visible.
     //    POLICY: useGameFeedback gates on eligible flag + min-games + cooldown.
     //    Eligible should be true ONLY AFTER rematch CTA is visible and accessible.
     //    For SP: eligible after first game. For MP: eligible after 3rd game in session.
@@ -148,14 +174,15 @@ export function ResultsModals({
       { id: 'levelUp', priority: 1, isReady: false },
       { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
       { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
-      { id: 'auth', priority: 4, isReady: !hideExternal && authModal.showAuthModal },
-      { id: 'wordFeedback', priority: 5, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
+      { id: 'share', priority: 4, isReady: shareModal?.showShareModal ?? false },
+      { id: 'auth', priority: 5, isReady: !hideExternal && authModal.showAuthModal },
+      { id: 'wordFeedback', priority: 6, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
     ];
 
     if (gameFeedback) {
       baseModals.push({
         id: 'gameFeedback',
-        priority: 6,
+        priority: 7,
         isReady: !hideExternal && gameFeedback.showGameFeedback,
       });
     }
@@ -166,6 +193,7 @@ export function ResultsModals({
     firstWinModal.showFirstWinModal,
     authModal.showAuthModal,
     wordFeedback.showWordFeedback, wordFeedback.wordToVote,
+    shareModal?.showShareModal,
     gameFeedback,
     hideExternal,
   ]);
@@ -227,6 +255,20 @@ export function ResultsModals({
         <FirstWinSignupModal
           isOpen={activeModalId === 'firstWin'}
           onClose={() => { trackModalDismissed({ modalId: 'first_win_signup', method: 'close_button' }); dismiss('firstWin'); firstWinModal.setShowFirstWinModal(false); }}
+        />
+      )}
+
+      {/* Post-win Share Prompt - Auto-opens exactly once via useShareOpenGuard */}
+      {shareModal && !hideExternal && (
+        <UnifiedShareModal
+          isOpen={activeModalId === 'share'}
+          onClose={() => { trackModalDismissed({ modalId: 'post_win_share', method: 'close_button' }); dismiss('share'); shareModal.setShowShareModal(false); }}
+          gameCode={shareModal.gameCode || ''}
+          roomName={shareModal.roomName}
+          context="post-game"
+          gameResult={shareModal.gameResult}
+          language={language}
+          t={t}
         />
       )}
 

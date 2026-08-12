@@ -318,9 +318,11 @@ export function useDictionaryCache(language: Language): UseDictionaryCacheReturn
       return;
     }
 
-    // Start loading
+    // Start loading — reset the ref to null so checkWord returns false until ready
+    dictionaryRef.current = null;
     setIsLoading(true);
     setError(null);
+    setIsLoaded(false);  // ← Critical: reset to false when switching languages or loading for the first time
 
     fetchDictionary(language)
       .then((wordSet) => {

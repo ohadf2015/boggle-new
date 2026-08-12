@@ -112,7 +112,7 @@ export const contentByLocale: Record<string, PrivacyContent> = {
       },
       {
         title: '13. Payments & Subscriptions',
-        content: 'When you purchase a Pro subscription, payment is processed by Lemon Squeezy, which acts as the Merchant of Record for LexiClash. We receive confirmation of your subscription (plan, status, and billing period) but we do not receive or store your full payment-card details, which are handled by Lemon Squeezy and its payment processors. Lemon Squeezy also handles applicable taxes. For classroom/teacher accounts, we process the student data you provide on your instruction to deliver the service, as described in these policies and our Terms of Service.',
+        content: 'When you purchase a Pro subscription, payment is processed by Polar, which acts as the Merchant of Record for LexiClash. We receive confirmation of your subscription (plan, status, and billing period) but we do not receive or store your full payment-card details, which are handled by Polar and its payment processors. Polar also handles applicable taxes. For classroom/teacher accounts, we process the student data you provide on your instruction to deliver the service, as described in these policies and our Terms of Service.',
       },
     ],
   },
