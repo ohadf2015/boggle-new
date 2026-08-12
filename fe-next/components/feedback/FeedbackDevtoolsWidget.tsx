@@ -33,7 +33,10 @@
 // Bump on every public/widget.js change to bust returning users' frozen cache.
 // 3: re-fetched to pick up the preview bridge — the vendored copy predated it,
 // so /preview/:projectId on the dashboard never got its inspection handshake.
-const WIDGET_VERSION = '3';
+// 4: widget UI is localized (Hebrew strings follow <html lang>) and sets
+// html.fdw-modal-open while its modal is open, which BannerCoordinatorMount
+// reads to hide the native AdMob SurfaceView that was covering the form.
+const WIDGET_VERSION = '4';
 
 import Script from 'next/script';
 import type { ReactNode } from 'react';
@@ -59,7 +62,6 @@ export default function FeedbackDevtoolsWidget(): ReactNode {
             src={`/widget.js?v=${WIDGET_VERSION}`}
             data-token="fdt_28ac691a628a0f801bdc8044d9783d105ec5d72bb85d62a2"
             data-side="left"
-            data-label="Feedback"
             data-theme={LEXICLASH_THEME}
             data-dir="auto"
             data-app-version="web"

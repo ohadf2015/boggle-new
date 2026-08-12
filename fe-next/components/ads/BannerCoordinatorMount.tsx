@@ -131,11 +131,16 @@ export default function BannerCoordinatorMount() {
           // first run stays ad-free — see shouldSuppressBanner. Lives on <html>,
           // already covered by the observer below.
           onboarding: document.documentElement.classList.contains('onboarding-active'),
-          // A modal/dialog is open (ref-counted by the shared DialogContent). The
-          // native banner is a SurfaceView composited ABOVE the WebView, so the
-          // dialog's z-90 overlay can't cover it — suppress so it doesn't paint over
-          // the modal's content/CTAs. Lives on <html>, covered by the observer below.
-          modalOpen: document.documentElement.classList.contains('modal-open'),
+          // A modal/dialog is open (ref-counted by the shared DialogContent), OR the
+          // feedback widget's own modal is open (`fdw-modal-open`, set by the widget
+          // — it lives in a shadow root, so it can't use DialogContent). The native
+          // banner is a SurfaceView composited ABOVE the WebView, so neither overlay
+          // can cover it — suppress so it doesn't paint over the modal's content/CTAs.
+          // Player report 2026-08-12: "the add hides part of the report bug form".
+          // Both live on <html>, covered by the observer below.
+          modalOpen:
+            document.documentElement.classList.contains('modal-open') ||
+            document.documentElement.classList.contains('fdw-modal-open'),
         }),
       );
     syncSuppress(); // reflect any drawer/game state already active at mount
