@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { data: top, error } = await admin
       .from('connections_daily_leaderboard')
       .select(
-        'rank_position, display_name, avatar_emoji, avatar_color, avatar_image, score, time_taken_seconds, streak, puzzles_solved, language',
+        'rank_position, display_name, avatar_emoji, avatar_color, avatar_image, custom_avatar, score, time_taken_seconds, streak, puzzles_solved, language',
       )
       .eq('puzzle_date', date)
       .order('rank_position', { ascending: true })

@@ -2,6 +2,7 @@
 
 import { Flame, Trophy, Medal } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import Avatar from '@/components/Avatar';
 import type { LeaderboardRow } from '@/lib/connections/dailyClient';
 
 interface ConnectionsLeaderboardProps {
@@ -77,13 +78,13 @@ export default function ConnectionsLeaderboard({
                     r.rank_position
                   )}
                 </span>
-                <span
-                  className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-base"
-                  style={{ backgroundColor: r.avatar_color }}
-                  aria-hidden="true"
-                >
-                  {r.avatar_emoji}
-                </span>
+                {/* Seeded on display_name, not player_id — this endpoint deliberately leaks no identifiers. */}
+                <Avatar
+                  customAvatar={r.custom_avatar}
+                  userId={r.display_name}
+                  pixelSize={28}
+                  disableEffects
+                />
                 <span className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-white">
                   {r.display_name}
                 </span>

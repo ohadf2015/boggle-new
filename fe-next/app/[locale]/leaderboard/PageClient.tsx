@@ -34,7 +34,7 @@ import { useTierPosition } from '@/hooks/useTierPosition';
 import { useExperiment } from '@/hooks/useExperiment';
 import { LeaderboardPlayCta } from './LeaderboardPlayCta';
 const TierPositionPanel = dynamic(() => import('@/components/leaderboard/TierPositionPanel'), { ssr: false });
-import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
+import { SeasonLeaderboardTabs, seasonScopeLabelKey, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
 const SeasonBanner = dynamic(() => import('@/components/multiplayer/SeasonBanner').then(m => ({ default: m.SeasonBanner })), { ssr: false });
 const PastSeasonsLeaderboard = dynamic(() => import('@/components/seasons/PastSeasonsLeaderboard').then(m => ({ default: m.PastSeasonsLeaderboard })), { ssr: false });
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -189,7 +189,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           </h1>
           <div className="flex items-center justify-center gap-3 mt-2">
             <p className={cn((isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-              {t('leaderboard.allTime')}
+              {t(seasonScopeLabelKey(seasonScope))}
             </p>
             {/* Live indicator */}
             <div className="flex items-center gap-1.5">
@@ -297,7 +297,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   <div className="flex items-center gap-4">
                     <Avatar
                       customAvatar={profile.avatar_config}
-                      avatarImage={profile.avatar_image ?? undefined}
                       userId={user?.id}
                       size="lg"
                     />
@@ -317,7 +316,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   <div className="flex items-center gap-4">
                     <Avatar
                       customAvatar={profile.avatar_config}
-                      avatarImage={profile.avatar_image ?? undefined}
                       userId={user?.id}
                       size="lg"
                     />
@@ -468,7 +466,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       <div className="sm:hidden shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
                       <Avatar
                         customAvatar={entry.avatar_config}
-                        avatarImage={entry.avatar_image ?? undefined}
                         userId={entry.player_id}
                         size="sm"
                       />

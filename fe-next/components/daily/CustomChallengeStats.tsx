@@ -32,7 +32,8 @@ interface StatsData {
 
 interface LeaderboardEntry {
   rank_position: number;
-  user_id?: string;
+  /** `custom_puzzle_leaderboard` names this `player_id`; reading `user_id` left Avatar with no seed at all. */
+  player_id?: string;
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
@@ -237,7 +238,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
           <div className="space-y-2">
             {leaderboard.map((entry, idx) => (
               <m.div
-                key={`lb-${entry.user_id ?? idx}`}
+                key={`lb-${entry.player_id ?? idx}`}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.05 * idx, type: 'spring', stiffness: 380, damping: 26 }}
@@ -246,7 +247,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-neo-black text-neo-white font-black text-sm">
                   {entry.rank_position}
                 </div>
-                <Avatar customAvatar={entry.avatar_config} userId={entry.user_id} size="lg" />
+                <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="lg" />
                 <div className="flex-1">
                   <div className="font-bold text-neo-black">{entry.display_name}</div>
                   <div className="text-xs text-slate-600">

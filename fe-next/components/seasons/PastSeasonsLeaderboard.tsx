@@ -8,6 +8,8 @@ import { Loader } from '@/components/ui/Loader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { tierColor } from '@/lib/tierColors';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface PastSeason {
   season_id: number;
@@ -27,6 +29,8 @@ interface SeasonRow {
   ranked_mmr: number;
   rank_position: number;
   peak_tier: string;
+  /** Live avatar, joined from `profiles` by the RPC — archived rows carry no avatar of their own. */
+  avatar_config: CustomAvatarConfig | null;
 }
 
 export const PastSeasonsLeaderboard: React.FC = () => {
@@ -122,8 +126,16 @@ export const PastSeasonsLeaderboard: React.FC = () => {
                 <div className="col-span-1 text-center font-neo-display text-neo-white">
                   {row.rank_position === 1 ? '🥇' : row.rank_position === 2 ? '🥈' : row.rank_position === 3 ? '🥉' : `#${row.rank_position}`}
                 </div>
-                <div className="col-span-5 truncate font-neo-body text-sm text-neo-white">
-                  {row.display_name || row.username || '—'}
+                <div className="col-span-5 flex items-center gap-2 min-w-0">
+                  <Avatar
+                    customAvatar={row.avatar_config}
+                    userId={row.player_id}
+                    size="sm"
+                    disableEffects
+                  />
+                  <span className="truncate font-neo-body text-sm text-neo-white">
+                    {row.display_name || row.username || '—'}
+                  </span>
                 </div>
                 <div className="col-span-3 text-right font-neo-display text-sm text-neo-white">
                   {row.total_score.toLocaleString()}

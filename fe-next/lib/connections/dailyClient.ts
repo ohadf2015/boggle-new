@@ -4,6 +4,7 @@
  * this is the network/localStorage edge.
  */
 import { clientStreakAfterSolve, type ClientStreak } from './streak';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface ShareParams {
   title: string;
@@ -164,6 +165,8 @@ export interface LeaderboardRow {
   avatar_emoji: string;
   avatar_color: string;
   avatar_image: string | null;
+  /** The only field `Avatar` actually renders — without it every row gets a generated face. */
+  custom_avatar: CustomAvatarConfig | null;
   score: number;
   time_taken_seconds: number;
   streak: number;

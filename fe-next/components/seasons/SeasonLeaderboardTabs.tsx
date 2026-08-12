@@ -23,6 +23,15 @@ const TABS: ReadonlyArray<{
   { key: 'pastSeasons', labelKey: 'season.pastSeasons', icon: Archive, activeClass: 'bg-neo-purple text-neo-white' },
 ];
 
+/**
+ * Translation key naming the scope currently on screen. The page subtitle used a
+ * hardcoded `leaderboard.allTime`, so the header read "All-Time" while the
+ * season board was showing — share the tabs' own labels instead.
+ */
+export function seasonScopeLabelKey(scope: SeasonTabKey): string {
+  return TABS.find((tab) => tab.key === scope)?.labelKey ?? 'season.thisSeason';
+}
+
 export const SeasonLeaderboardTabs: React.FC<SeasonLeaderboardTabsProps> = ({
   active,
   onChange,

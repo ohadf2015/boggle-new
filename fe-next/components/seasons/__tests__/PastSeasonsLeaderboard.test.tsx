@@ -20,6 +20,18 @@ vi.mock('@/components/ui/EnhancedEmptyState', () => ({
   EnhancedEmptyState: ({ title }: { title: string }) => React.createElement('div', null, title),
 }));
 
+// Avatar draws a deterministic RANDOM face when `customAvatar` is missing, so a
+// "an avatar rendered" assertion passes on the bug. Mirror the real component's
+// data-avatar-type contract instead so the tests can demand the REAL avatar.
+vi.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: ({ customAvatar, userId }: { customAvatar?: unknown; userId?: string }) =>
+    React.createElement('div', {
+      'data-testid': `avatar-${userId}`,
+      'data-avatar-type': customAvatar ? 'custom' : 'generated',
+    }),
+}));
+
 import { PastSeasonsLeaderboard } from '../PastSeasonsLeaderboard';
 
 describe('PastSeasonsLeaderboard', () => {
@@ -46,6 +58,9 @@ describe('PastSeasonsLeaderboard', () => {
             ranked_mmr: 1000,
             rank_position: 1,
             peak_tier: 'Gold',
+            avatar_emoji: '🦊',
+            avatar_color: '#BFFF00',
+            avatar_config: { base: 'oval', eyes: 'robot' },
           }],
           error: null,
         });
@@ -82,5 +97,35 @@ describe('PastSeasonsLeaderboard', () => {
     });
     render(<PastSeasonsLeaderboard />);
     expect(await screen.findByText('PlainUser')).toBeInTheDocument();
+  });
+
+  it('renders the player REAL avatar, not a generated stand-in', async () => {
+    render(<PastSeasonsLeaderboard />);
+    const avatar = await screen.findByTestId('avatar-p1');
+    expect(avatar).toHaveAttribute('data-avatar-type', 'custom');
+  });
+
+  it('still renders an avatar slot for players with no saved avatar', async () => {
+    rpc.mockImplementation((fn: string) => {
+      if (fn === 'list_past_seasons') {
+        return Promise.resolve({
+          data: [{ season_id: 2, name: 'Season 2', start_date: '', end_date: '', entry_count: 1 }],
+          error: null,
+        });
+      }
+      if (fn === 'get_past_season_leaderboard') {
+        return Promise.resolve({
+          data: [{
+            player_id: 'p3', username: 'NoAvatar', display_name: null,
+            total_score: 10, games_played: 1, games_won: 0, ranked_mmr: 1000,
+            rank_position: 1, peak_tier: 'Bronze', avatar_config: null,
+          }],
+          error: null,
+        });
+      }
+      return Promise.resolve({ data: [], error: null });
+    });
+    render(<PastSeasonsLeaderboard />);
+    expect(await screen.findByTestId('avatar-p3')).toBeInTheDocument();
   });
 });

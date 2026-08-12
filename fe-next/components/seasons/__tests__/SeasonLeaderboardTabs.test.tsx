@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { SeasonLeaderboardTabs, type SeasonTabKey } from '../SeasonLeaderboardTabs';
+import { SeasonLeaderboardTabs, seasonScopeLabelKey, type SeasonTabKey } from '../SeasonLeaderboardTabs';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -38,5 +38,13 @@ describe('SeasonLeaderboardTabs', () => {
     expect(onChange).toHaveBeenCalledWith('allTime');
     fireEvent.click(screen.getByRole('tab', { name: 'Past Seasons' }));
     expect(onChange).toHaveBeenCalledWith('pastSeasons');
+  });
+});
+
+describe('seasonScopeLabelKey', () => {
+  it('names the scope actually on screen', () => {
+    expect(seasonScopeLabelKey('season')).toBe('season.thisSeason');
+    expect(seasonScopeLabelKey('allTime')).toBe('season.allTime');
+    expect(seasonScopeLabelKey('pastSeasons')).toBe('season.pastSeasons');
   });
 });
