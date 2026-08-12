@@ -127,4 +127,33 @@ describe('Banner suppress/restore — integration', () => {
       expect(showBannerSpy).toHaveBeenCalled();
     }, { timeout: 5000 });
   });
+
+  it('hides while the feedback widget modal is open (html.fdw-modal-open)', async () => {
+    // Player report 2026-08-12: "the add hides part of the report bug form".
+    // The widget lives in a shadow root, so it can't use DialogContent's
+    // ref-counted `modal-open` — it sets its own class instead.
+    const BannerCoordinatorMount = (await import('../BannerCoordinatorMount')).default;
+    const AnchoredNativeBanner = (await import('../AnchoredNativeBanner')).default;
+
+    render(
+      <>
+        <BannerCoordinatorMount />
+        <AnchoredNativeBanner />
+      </>,
+    );
+
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    hideBannerSpy.mockClear();
+    showBannerSpy.mockClear();
+    resumeBannerSpy.mockClear();
+
+    document.documentElement.classList.add('fdw-modal-open');
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+
+    document.documentElement.classList.remove('fdw-modal-open');
+    await waitFor(() => {
+      expect(resumeBannerSpy).toHaveBeenCalled();
+      expect(showBannerSpy).toHaveBeenCalled();
+    }, { timeout: 5000 });
+  });
 });

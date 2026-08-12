@@ -30,6 +30,13 @@ describe('whyItWorks — the post-solve "aha" teach moment', () => {
 
   it('falls back to concat when examples array is empty', () => {
     const sv: ConnectionPuzzle = { ...base, word1: 'fot', bridge: 'boll', word2: 'plan', examples: [] };
-    expect(whyItWorks(sv)).toEqual({ left: 'fotboll', right: 'bollplan' });
+    expect(whyItWorks(sv, 'sv')).toEqual({ left: 'fotboll', right: 'bollplan' });
+  });
+
+  it('keeps the space in Hebrew smichut pairs', () => {
+    // he-e-001: עוגת שוקולד (chocolate cake) · שוקולד חם (hot chocolate).
+    // Concatenating these produced non-words — player report 2026-08-12.
+    const he: ConnectionPuzzle = { ...base, id: 'he-e-001', word1: 'עוגת', bridge: 'שוקולד', word2: 'חם' };
+    expect(whyItWorks(he, 'he')).toEqual({ left: 'עוגת שוקולד', right: 'שוקולד חם' });
   });
 });

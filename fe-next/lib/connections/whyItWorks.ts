@@ -9,14 +9,26 @@ export interface WhyItWorks {
 }
 
 /**
- * After a solve we reveal *why* the bridge works by showing both real
- * compounds. Closed-compound languages (en/he/sv) concat cleanly, so we derive
- * them; open compounds (Spanish "juego de mesa") need the spelled-out forms, so
- * a stored `examples[0]` wins when present. This turns every solve into a tiny
- * "did you know?" — the talkable moment that fuels sharing.
+ * Languages whose two-word phrases keep the space. Hebrew was wrongly grouped
+ * with the closed-compound languages: a smichut pair is written with a space
+ * ("עוגת שוקולד"), so deriving it by concatenation produced "עוגתשוקולד" — a
+ * non-word. Reported 2026-08-12: "on vieweing the word in bridge in hebrew
+ * there is no space". Only 57 of the 407 Hebrew puzzles ship an examples[]
+ * override, so the derived path is what most solves show.
  */
-export function whyItWorks(p: ConnectionPuzzle): WhyItWorks {
+const OPEN_COMPOUND_LANGS = new Set(['he', 'es', 'ru']);
+
+/**
+ * After a solve we reveal *why* the bridge works by showing both real
+ * compounds. Closed-compound languages (en/sv/ja) concat cleanly, so we derive
+ * them; open compounds (Hebrew "עוגת שוקולד", Spanish "juego de mesa") are
+ * joined with a space. A stored `examples[0]` still wins when present.
+ * This turns every solve into a tiny "did you know?" — the talkable moment
+ * that fuels sharing.
+ */
+export function whyItWorks(p: ConnectionPuzzle, language?: string): WhyItWorks {
   const ex = p.examples?.[0];
   if (ex) return { left: ex.w1, right: ex.w2 };
-  return { left: `${p.word1}${p.bridge}`, right: `${p.bridge}${p.word2}` };
+  const sep = OPEN_COMPOUND_LANGS.has(language ?? '') ? ' ' : '';
+  return { left: `${p.word1}${sep}${p.bridge}`, right: `${p.bridge}${sep}${p.word2}` };
 }

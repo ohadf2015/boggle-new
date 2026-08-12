@@ -343,7 +343,7 @@ export default function PuzzleCard({
           )}
 
           {bridgeRevealed && (() => {
-            const { left, right } = whyItWorks(puzzle);
+            const { left, right } = whyItWorks(puzzle, language);
             return (
               <m.div
                 key="why"
