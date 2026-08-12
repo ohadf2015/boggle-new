@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 
 // Mock hooks before importing the component
 const mockUnlockAudio = vi.fn();
@@ -261,6 +261,13 @@ describe('DailyChallenge - Audio Unlock on Game Start', () => {
     // unlockAudio should be called IMMEDIATELY (synchronously)
     // This is critical for browser autoplay policy compliance
     expect(mockUnlockAudio).toHaveBeenCalledTimes(1);
+
+    // handlePlay is async: it awaits the server already-played check and only then calls
+    // startPlaying(), which unlocks a second time (deliberate — the ad-reward paths reach
+    // startPlaying WITHOUT ever passing the synchronous unlock above, and unlockAudio is
+    // idempotent). Drain that tail here, or it resolves during the NEXT test and inflates
+    // its count — which is exactly how this file was failing 21 tests at master.
+    await waitFor(() => expect(mockUnlockAudio).toHaveBeenCalledTimes(2));
   });
 
   it('should call unlockAudio on every Play button click (idempotent)', async () => {
@@ -272,14 +279,23 @@ describe('DailyChallenge - Audio Unlock on Game Start', () => {
 
     const playButton = screen.getByTestId('play-button');
 
-    // First click
+    // First click: one synchronous unlock, then a second from startPlaying once the async
+    // already-played check resolves (see the note in the test above).
     fireEvent.click(playButton);
     expect(mockUnlockAudio).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(mockUnlockAudio).toHaveBeenCalledTimes(2));
 
-    // Re-render with ready screen again for second click
-    // (in real app, the user might navigate back and click again)
+    // Second click = a FRESH mount. The first click flipped this instance to `playing`, so
+    // its Play button is no longer in the DOM — clicking the detached node does nothing, and
+    // the old version of this test only ever "passed" on the leaked call above.
     vi.clearAllMocks();
-    fireEvent.click(playButton);
+    cleanup();
+    render(<DailyChallenge />);
+    await waitFor(() => {
+      expect(screen.getByTestId('ready-screen')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('play-button'));
     expect(mockUnlockAudio).toHaveBeenCalledTimes(1);
   });
 });
