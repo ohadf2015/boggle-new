@@ -87,3 +87,51 @@ export function nextStuckStage(s: StuckSignals): StuckStage {
 
   return 'none';
 }
+
+// ---------------------------------------------------------------------------
+// Concrete example word
+//
+// The coach copy alone is abstract ("drag across letters to spell a word") and
+// 70% of the 125 players who saw the idle nudge in 30 days ignored it — only
+// 17% of stuck players were helped overall. A player who has gone 60s without a
+// single word does not need the gesture explained; they need to be shown a word
+// that is actually on their board. These pick the word and decide when it helps.
+// ---------------------------------------------------------------------------
+
+/** Long enough to feel like a word, short enough to trace while being watched. */
+const EXAMPLE_MIN_LEN = 3;
+const EXAMPLE_MAX_LEN = 5;
+
+export interface SolvedGridWords {
+  easy: string[];
+  medium: string[];
+  hard: string[];
+}
+
+/**
+ * Pick one demonstrable word from a solved grid — easiest bucket first, since
+ * the reader is by definition failing at this.
+ */
+export function pickCoachExampleWord(words: SolvedGridWords | null | undefined): string | null {
+  if (!words) return null;
+  for (const bucket of [words.easy, words.medium, words.hard]) {
+    const usable = (bucket ?? []).filter(
+      (w) => w.length >= EXAMPLE_MIN_LEN && w.length <= EXAMPLE_MAX_LEN,
+    );
+    // Shortest first: the drag diagram only traces three tiles, so a 3-letter
+    // word makes the picture and the "Try: X" caption show the same thing.
+    if (usable.length) {
+      return usable.reduce((best, w) => (w.length < best.length ? w : best));
+    }
+  }
+  return null;
+}
+
+/**
+ * `submit-hint` is excluded on purpose: that player already built a valid path,
+ * so they understand the board. Their problem is committing the word, and
+ * showing a different word would talk past it.
+ */
+export function stageWantsExampleWord(stage: StuckStage): boolean {
+  return stage === 'idle-nudge' || stage === 'tap-hint' || stage === 'validity-hint';
+}

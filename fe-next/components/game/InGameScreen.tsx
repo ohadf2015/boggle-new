@@ -16,6 +16,7 @@ import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useSelectionStore, resetSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
+import { useCoachExampleWord } from '@/hooks/useCoachExampleWord';
 import { MPStuckCoachCard } from '@/components/game/ftue/MPStuckCoachCard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { isBoardInteractive } from '@/components/game/in-game/boardInteractive';
@@ -267,6 +268,14 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     isClassic: gameMode === 'classic',
     totalGamesPlayed: totalGamesPlayed ?? 0,
     isDesktop,
+  });
+
+  // A word that is genuinely on this board, so the coach can point at something
+  // real instead of only describing the gesture (70% ignored the generic copy).
+  const coachExampleWord = useCoachExampleWord({
+    stage: stuckCoach.stage,
+    grid: letterGrid,
+    language: gameLanguage || 'en',
   });
 
   // Earthquake/fire round effects
@@ -671,6 +680,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
         <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex justify-center px-3">
           <MPStuckCoachCard
             stage={stuckCoach.stage}
+            exampleWord={coachExampleWord}
             onDismiss={() => stuckCoach.dismiss('manual')}
           />
         </div>

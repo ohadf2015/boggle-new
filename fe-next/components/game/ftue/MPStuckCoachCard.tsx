@@ -4,12 +4,18 @@ import { X } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 
-import type { StuckStage } from '../../../lib/ftue/mpStuckCoach';
+import { stageWantsExampleWord, type StuckStage } from '../../../lib/ftue/mpStuckCoach';
 import { DragHintDiagram } from './DragHintDiagram';
 
 interface MPStuckCoachCardProps {
   stage: StuckStage;
   onDismiss: () => void;
+  /**
+   * A word that is genuinely on this player's board. The abstract copy alone is
+   * ignored by 70% of the players who see it — naming a real word turns "drag
+   * across letters" into something they can actually do right now.
+   */
+  exampleWord?: string | null;
 }
 
 // Each stage maps to copy that matches its specific confusion — never generic.
@@ -37,11 +43,12 @@ const COPY: Record<Exclude<StuckStage, 'none'>, { key: string; fallback: string 
  * with a stage-matched message, the wordless drag diagram, and a dismiss button.
  * Renders nothing when there is no active hint.
  */
-export function MPStuckCoachCard({ stage, onDismiss }: MPStuckCoachCardProps) {
+export function MPStuckCoachCard({ stage, onDismiss, exampleWord }: MPStuckCoachCardProps) {
   const { t } = useLanguage();
   if (stage === 'none') return null;
 
   const copy = COPY[stage];
+  const showExample = !!exampleWord && stageWantsExampleWord(stage);
 
   return (
     <div
@@ -49,10 +56,15 @@ export function MPStuckCoachCard({ stage, onDismiss }: MPStuckCoachCardProps) {
       aria-live="polite"
       className="animate-neo-pop pointer-events-auto mx-auto flex w-full max-w-sm items-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-2 text-neo-black shadow-hard-lg"
     >
-      <DragHintDiagram />
-      <p className="flex-1 font-neo-body text-sm leading-snug">
-        {t(copy.key, copy.fallback)}
-      </p>
+      <DragHintDiagram word={showExample ? exampleWord : null} />
+      <div className="flex-1">
+        <p className="font-neo-body text-sm leading-snug">{t(copy.key, copy.fallback)}</p>
+        {showExample && (
+          <p className="mt-1 font-neo-display text-sm font-black leading-snug">
+            {t('mpCoach.tryWord', 'Try: {word}', { word: exampleWord!.toUpperCase() })}
+          </p>
+        )}
+      </div>
       <button
         type="button"
         onClick={onDismiss}
