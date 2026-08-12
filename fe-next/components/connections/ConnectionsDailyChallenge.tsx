@@ -109,6 +109,7 @@ export default function ConnectionsDailyChallenge() {
   const wrongByIndexRef = useRef<Record<number, number>>({});
   const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map());
   const prevStatusRef = useRef(state.status);
+  const prevWrongAttemptsRef = useRef(state.wrongAttempts);
   const submittedRef = useRef(false);
   const [results, setResults] = useState<Results | null>(null);
   const [copied, setCopied] = useState(false);
@@ -149,7 +150,15 @@ export default function ConnectionsDailyChallenge() {
       });
       sfx.playMatchFoundSound();
       customHaptic(GAME_HAPTICS.validWord);
-    } else if (state.status === 'wrong' && prevStatusRef.current !== 'wrong') {
+    } else if (
+      state.status === 'wrong' &&
+      // A second wrong guess on the SAME bridge leaves the status at 'wrong', so a
+      // status-transition guard silently swallows every strike after the first —
+      // no error sound, no buzz (player report 2026-08-12: "second strike on word
+      // bridge doest not vibrate like the first"), and the per-puzzle tally that
+      // feeds telemetry stopped counting too. The attempt counter is the signal.
+      state.wrongAttempts !== prevWrongAttemptsRef.current
+    ) {
       wrongByIndexRef.current[idx] = (wrongByIndexRef.current[idx] ?? 0) + 1;
       sfx.playErrorSound();
       haptic('error');
@@ -178,6 +187,7 @@ export default function ConnectionsDailyChallenge() {
       });
     }
     prevStatusRef.current = state.status;
+    prevWrongAttemptsRef.current = state.wrongAttempts;
   }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, state.puzzles, language, sfx, haptic, customHaptic]);
 
   // On finish: submit the result (once) and load the leaderboard.
