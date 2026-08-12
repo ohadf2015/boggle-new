@@ -9,6 +9,7 @@ import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 import { TeacherAccessQueue } from '@/components/admin/TeacherAccessQueue';
+import { TeacherFunnelPanel } from '@/components/admin/TeacherFunnelPanel';
 
 export function PageClient() {
   const { user, profile, isAdmin, loading } = useAuth();
@@ -38,6 +39,9 @@ export function PageClient() {
       <div className="flex flex-1">
         <AdminSidebar />
         <main className="flex-1 min-w-0 pb-20 sm:pb-6">
+          {/* Funnel first: what happened to the people already approved is more
+              urgent than the next approval decision. */}
+          <TeacherFunnelPanel />
           <TeacherAccessQueue />
         </main>
       </div>

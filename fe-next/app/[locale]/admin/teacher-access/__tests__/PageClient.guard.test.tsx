@@ -29,6 +29,11 @@ vi.mock('@/components/admin/sidebar/AdminSubNav', () => ({ AdminSubNav: () => <d
 vi.mock('@/components/admin/TeacherAccessQueue', () => ({
   TeacherAccessQueue: () => <div data-testid="queue">queue</div>,
 }));
+// Same reason as the queue: the funnel panel fetches on mount, and an unmocked
+// fetch here rejects, blanks the whole render, and reads as a guard regression.
+vi.mock('@/components/admin/TeacherFunnelPanel', () => ({
+  TeacherFunnelPanel: () => <div data-testid="funnel" />,
+}));
 
 // Mutable auth state the tests flip between renders.
 let authState: {
