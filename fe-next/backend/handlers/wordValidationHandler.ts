@@ -27,7 +27,7 @@ import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, getTilesOnResolvedPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
@@ -52,7 +52,7 @@ interface PeerValidationResult {
   isBot?: boolean;
 }
 
-function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null, inputMethod: 'kb' | 'drag' = 'drag'): void {
+function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null, inputMethod: 'kb' | 'drag' = 'drag', clientPath?: Array<{ row: number; col: number }> | null): void {
   // Derive combo and fire round from server state (never trust client)
   const safeComboLevel = game.playerCombos?.[username] || 0;
   const fireRoundActive = game.fireRoundActive === true;
@@ -96,11 +96,22 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     const lang = (game.language || 'en') as import('@/shared/types').Language;
     const boardPositions = makePositionsMap(board.grid, lang);
 
+    // The client submits the EXACT cells the player dragged through. Trust it
+    // (after full validation) over the arbitrary DFS reconstruction — otherwise
+    // special tiles on the player's real path never crack/explode server-side
+    // and the authoritative board update visibly "resurrects" them (the "ice
+    // and bomb don't break or explode" report). Falls back to reconstruction
+    // for legacy clients or a stale board.
+    const validatedClientPath = validateBlastWordPath(normalizedWord, clientPath, board.grid, lang);
+    const resolvedPath = validatedClientPath ?? getWordPath(normalizedWord, boardPositions);
+
     // 1) Tile/letter bonus + move accounting. Degrade to bonus=0 on any failure
     //    (e.g. a corrupted overlay after a Redis restore) WITHOUT aborting — the
     //    base word still scores and, crucially, the cascade/resync below still runs.
     try {
-      const tilesOnPath = getTilesOnPath(normalizedWord, boardPositions, board.overlay, board.overlayMap);
+      const tilesOnPath = validatedClientPath
+        ? getTilesOnResolvedPath(resolvedPath, board.overlayMap)
+        : getTilesOnPath(normalizedWord, boardPositions, board.overlay, board.overlayMap);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;
@@ -123,7 +134,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     //    unicast the authoritative board back (success = the new board, failure =
     //    the untouched one) so the client never strands on a diverged/frozen board.
     if (board.grid && board.tileStates) {
-      const wordPath = getWordPath(normalizedWord, boardPositions);
+      const wordPath = resolvedPath;
       const result = safeCascadeBlastWord(board, wordPath, normalizedWord, blastState.wave ?? 1, lang);
       if (result.ok) {
         // Commit the successfully-cascaded board as this player's authoritative board.

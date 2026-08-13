@@ -52,6 +52,10 @@ interface SubmitWordPayload {
   word: string;
   comboType?: string | null;
   inputMethod?: 'kb' | 'drag';
+  /** Blast MP: the exact cells the player dragged through (validated server-side
+   *  before use; ignored by classic modes). Lets the authoritative cascade hit
+   *  the same special tiles the player's client optimistically cleared. */
+  path?: Array<{ row: number; col: number }>;
 }
 
 interface SubmitWordVotePayload {
@@ -396,9 +400,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
       const comboType = (validation.data as SubmitWordPayload).comboType ?? null;
       const inputMethod = (validation.data as SubmitWordPayload).inputMethod ?? 'drag';
+      const clientPath = (validation.data as SubmitWordPayload).path ?? null;
 
       if (shouldAutoValidate) {
-        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType, inputMethod);
+        handleValidatedWord(io, socket, game, gameCode, username, normalizedWord, isInDictionary === true, comboType, inputMethod, clientPath);
       } else {
         // Word not in dictionary - reject immediately (no pending/AI validation)
         inc('wordNeedsValidation');

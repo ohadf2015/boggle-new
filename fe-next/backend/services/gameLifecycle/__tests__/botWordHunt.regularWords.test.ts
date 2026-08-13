@@ -37,6 +37,8 @@ vi.mock('../../../modules/gameStateManager', () => ({
 }));
 
 vi.mock('../../../modules/blastModeManager', () => ({
+  validateBlastWordPath: vi.fn().mockReturnValue(null),
+  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn(() => 0),
   getTilesOnPath: vi.fn(() => []),
   recordBlastMove: vi.fn(),

@@ -347,11 +347,14 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     gridSize: effectiveGrid?.[0]?.length ?? 4,
   });
 
-  // Blast: emit word + comboType to server
+  // Blast: emit word + comboType + dragged path to server. The path lets the
+  // authoritative cascade break/explode the SAME special tiles the player's
+  // client optimistically cleared — without it the server reconstructs an
+  // arbitrary route and blastBoardUpdate visibly "resurrects" ice/bomb tiles.
   const handleBlastWordWithCombo = useCallback(
-    (word: string, comboType: string | null) => {
+    (word: string, comboType: string | null, path?: Array<{ row: number; col: number }>) => {
       if (!socket) return;
-      socket.emit('submitWord', { word, comboType });
+      socket.emit('submitWord', { word, comboType, ...(path ? { path } : {}) });
     },
     [socket],
   );

@@ -135,6 +135,8 @@ vi.mock('../../../backend/services/gracePeriodLock', () => ({
 
 // Force getTilesOnPath to throw — simulates an unexpected blast state corruption.
 vi.mock('../../../backend/modules/blastModeManager', () => ({
+  validateBlastWordPath: vi.fn().mockReturnValue(null),
+  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(0),
   getTilesOnPath: vi.fn(() => { throw new Error('boom: overlay corruption'); }),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 0, bonusMove: false }),

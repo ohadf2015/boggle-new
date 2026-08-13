@@ -191,7 +191,13 @@ describe('useBlastWordHandler', () => {
     await act(async () => {
       await result.current.handleWordAccepted({ word: 'cat', score: 5 });
     });
-    expect(params.onWordWithComboTypeRef.current).toHaveBeenCalledWith('cat', 'tripleGem');
+    // The dragged path is forwarded too so the MP server's authoritative
+    // cascade clears the SAME special tiles the player saw break locally.
+    expect(params.onWordWithComboTypeRef.current).toHaveBeenCalledWith('cat', 'tripleGem', [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ]);
   });
 
   describe('re-entrancy guard (double-submit race)', () => {

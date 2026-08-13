@@ -22,6 +22,7 @@ import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesP
 import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { computeThawedCells } from '@/components/blast/legacy/utils/blastThaw';
+import { normalizeWordForLanguage, normalizeLetterForLanguage } from './wordValidator.js';
 import type { Language } from '@/shared/types';
 
 // H2: per-game mutex set guarding the check→advance→broadcast sequence so a
@@ -474,4 +475,68 @@ export function getWordPath(
   letterPositions: Map<string, [number, number][]>,
 ): Array<{ row: number; col: number }> {
   return resolveWordPositions(word, letterPositions).map(([r, c]) => ({ row: r, col: c }));
+}
+
+/**
+ * Validate a client-supplied dragged path for a blast word against the board.
+ *
+ * Why this exists: the blast MP client knows WHICH cells the player dragged
+ * through, but historically submitted only the word string — the server then
+ * reconstructed an ARBITRARY matching path via DFS (getWordPath). Whenever a
+ * word has more than one valid path (common with repeated letters), the
+ * server's path could skip the special tiles the player actually used: the
+ * client optimistically cracked ice / detonated the bomb, the authoritative
+ * cascade did not, and the follow-up blastBoardUpdate visibly "resurrected"
+ * the special tiles — the reported "ice and bomb don't break or explode" bug.
+ *
+ * A path is valid iff: one cell per normalized word letter, in bounds, no
+ * reused cells, 8-directional adjacency between consecutive cells, and the
+ * board letters (language-normalized) match the word exactly — the same
+ * semantics as searchWordPath in wordValidator.
+ *
+ * @returns the sanitized path when valid, or null when missing/invalid —
+ *          callers must fall back to getWordPath reconstruction (legacy
+ *          clients, or a stale board mid-cascade) and never reject the word.
+ */
+export function validateBlastWordPath(
+  word: string,
+  path: ReadonlyArray<{ row: number; col: number }> | null | undefined,
+  grid: string[][],
+  language: Language | string,
+): Array<{ row: number; col: number }> | null {
+  if (!path || !Array.isArray(path) || !grid || grid.length === 0) return null;
+  const wordNormalized = normalizeWordForLanguage(word, language);
+  if (path.length !== wordNormalized.length) return null;
+
+  const seen = new Set<string>();
+  for (let i = 0; i < path.length; i++) {
+    const cell = path[i];
+    const row = cell?.row;
+    const col = cell?.col;
+    if (!Number.isInteger(row) || !Number.isInteger(col)) return null;
+    if (row < 0 || row >= grid.length || col < 0 || col >= (grid[row]?.length ?? 0)) return null;
+    const key = `${row},${col}`;
+    if (seen.has(key)) return null; // cell reuse is not a legal path
+    seen.add(key);
+    if (i > 0) {
+      const prev = path[i - 1];
+      if (Math.abs(prev.row - row) > 1 || Math.abs(prev.col - col) > 1) return null;
+    }
+    const cellLetter = normalizeLetterForLanguage(grid[row][col] ?? '', language);
+    if (cellLetter !== wordNormalized[i]) return null;
+  }
+  return path.map(({ row, col }) => ({ row, col }));
+}
+
+/**
+ * Tile types along an ALREADY-RESOLVED path (as opposed to getTilesOnPath,
+ * which reconstructs a path from the word). Pair with validateBlastWordPath
+ * so the tile bonus and the cascade operate on the exact cells the player
+ * dragged through.
+ */
+export function getTilesOnResolvedPath(
+  path: ReadonlyArray<{ row: number; col: number }>,
+  overlayMap: Map<string, BlastTileType>,
+): BlastTileType[] {
+  return path.map(({ row, col }) => overlayMap.get(`${row},${col}`) ?? 'standard');
 }

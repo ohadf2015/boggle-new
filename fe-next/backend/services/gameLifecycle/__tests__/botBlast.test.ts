@@ -114,6 +114,8 @@ vi.mock('../../../utils/playerFoundWordBatcher', () => ({
 }));
 
 vi.mock('../../../modules/blastModeManager', () => ({
+  validateBlastWordPath: vi.fn().mockReturnValue(null),
+  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   getTilesOnPath: mocks.getTilesOnPath,
   calculateBlastTileBonus: mocks.calculateBlastTileBonus,
   recordBlastMove: mocks.recordBlastMove,

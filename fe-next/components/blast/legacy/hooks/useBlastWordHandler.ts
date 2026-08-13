@@ -54,7 +54,7 @@ interface UseBlastWordHandlerParams {
   flyIdRef: MutableRefObject<number>;
   explosionShakeTimerRef: MutableRefObject<ReturnType<typeof setTimeout> | null>;
   nearMissTimerRef: MutableRefObject<ReturnType<typeof setTimeout> | null>;
-  onWordWithComboTypeRef: MutableRefObject<((word: string, comboType: string | null) => void) | undefined>;
+  onWordWithComboTypeRef: MutableRefObject<((word: string, comboType: string | null, path?: Array<{ row: number; col: number }>) => void) | undefined>;
   onComboDetected?: (combos: SpecialCombo[]) => void;
   config: BlastGameConfig;
   t: (key: string) => string;
@@ -114,7 +114,10 @@ export function useBlastWordHandler({
     const hadCombo = detectedCombos.length > 0;
 
     if (onWordWithComboTypeRef.current) {
-      onWordWithComboTypeRef.current(data.word, hadCombo ? detectedCombos[0].type : null);
+      // Pass the dragged path so the MP server's authoritative cascade hits the
+      // SAME special tiles the player sees cleared here (DFS reconstruction can
+      // pick a different route for repeated letters → "ice/bomb don't break").
+      onWordWithComboTypeRef.current(data.word, hadCombo ? detectedCombos[0].type : null, path);
     }
 
     if (hadCombo && onComboDetected) {
