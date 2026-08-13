@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createRequestClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
 interface ClaimResult {
@@ -13,17 +13,20 @@ interface ClaimResult {
  * Claim a gift and receive XP/coins rewards
  */
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: giftId } = await params;
-    const supabase = await createClient();
+    // Bearer-aware client: cookie-only auth silently 401s for clients whose
+    // session isn't in cookies (Capacitor webview, cookie-blocked browsers),
+    // which made gifts unclaimable for exactly the players receiving them.
+    const { supabase, token } = await createRequestClient(request);
 
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getUser(token ?? undefined);
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

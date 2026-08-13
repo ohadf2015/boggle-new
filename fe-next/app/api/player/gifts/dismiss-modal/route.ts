@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createRequestClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -7,14 +7,14 @@ import { captureApiError } from '@/utils/sentry';
  * Mark the gift modal as dismissed for the current user
  * This prevents auto-showing the modal in future sessions
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const { supabase, token } = await createRequestClient(request);
 
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getUser(token ?? undefined);
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

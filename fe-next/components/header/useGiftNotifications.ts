@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
-import { getWithAuth } from '@/utils/authFetch';
+import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function useGiftNotifications() {
@@ -41,9 +41,9 @@ export function useGiftNotifications() {
         }
 
         // Persist dismissal to database IMMEDIATELY (fire-and-forget)
-        fetch('/api/player/gifts/dismiss-modal', {
-            method: 'POST',
-        }).then(() => {
+        // postWithAuth sends the Bearer token — plain fetch 401s for clients
+        // without auth cookies (Capacitor / cookie-blocked browsers).
+        postWithAuth('/api/player/gifts/dismiss-modal').then(() => {
             refreshProfile();
         }).catch(error => {
             console.error('Failed to persist gift modal dismissal:', error);

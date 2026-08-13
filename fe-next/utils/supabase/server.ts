@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
+import { bearerToken } from '@/lib/auth/verifyJwt'
 
 export async function createClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies()
@@ -49,4 +51,40 @@ export async function getSessionUser(supabase: SupabaseClient): Promise<{ user: 
     return { user: null, error: error ?? new Error('No authenticated user') };
   }
   return { user, error: null };
+}
+
+/**
+ * Create a Supabase client authenticated as the request's user for MUTATION
+ * paths (RPCs / writes that rely on `auth.uid()` and RLS).
+ *
+ * Clients whose session lives outside cookies (Capacitor webview, browsers
+ * blocking third-party cookies) send `Authorization: Bearer <jwt>` via
+ * fetchWithAuth — the cookie-only `createClient()` sees them as anonymous and
+ * mutations silently 401. When a Bearer token is present we build a client
+ * scoped to that token so PostgREST/GoTrue treat the call as that user;
+ * otherwise we fall back to the cookie client.
+ *
+ * Verify the caller with `supabase.auth.getUser(token ?? undefined)` after
+ * creating the client — do not skip remote verification on mutation paths.
+ */
+export async function createRequestClient(request: Request): Promise<{ supabase: SupabaseClient; token: string | null }> {
+  const token = bearerToken(request)
+  if (token) {
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+        global: {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      }
+    )
+    return { supabase, token }
+  }
+  return { supabase: await createClient(), token: null }
 }
