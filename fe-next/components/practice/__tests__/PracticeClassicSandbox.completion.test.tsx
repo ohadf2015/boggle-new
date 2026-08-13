@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const validatorCheck = vi.fn();
+const { validatorCheck } = vi.hoisted(() => ({ validatorCheck: vi.fn() }));
 vi.mock('@/lib/practice/usePracticeValidator', () => ({
   usePracticeValidator: () => ({ check: validatorCheck }),
 }));
@@ -66,6 +66,7 @@ describe('PracticeClassicSandbox completion integration', () => {
     render(<PracticeClassicSandbox />);
     expect(isPracticeModeComplete('classic', 'en')).toBe(false);
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
+    expect(screen.queryByTestId('first-session-daily-cta')).toBeNull();
 
     submitWord('STAR');
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
@@ -73,8 +74,10 @@ describe('PracticeClassicSandbox completion integration', () => {
     await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
     submitWord('TIN');
     await waitFor(() => {
-      expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
+      // First practice day converts onto the live Daily, not the next sandbox.
+      expect(screen.getByTestId('first-session-daily-cta')).toBeInTheDocument();
     });
+    expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
     expect(isPracticeModeComplete('classic', 'en')).toBe(true);
   });
 });

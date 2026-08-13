@@ -3705,6 +3705,10 @@ const he = {
     "wordHuntCtaDesc": "ציד מילים חדש כל יום",
     "wordHuntAlreadyPlayed": "כבר שיחקתם היום",
     "wordHuntAlreadyPlayedDesc": "חזרו מחר!",
+    "firstSessionDailyTitle": "מתחילים רצף יומי",
+    "firstSessionDailyBody": "הפאזל של היום מחכה. חוזרים מחר ליום 2.",
+    "firstSessionDailyCta": "לשחק את היומי",
+    "firstSessionComeBack": "יום 1 — חוזרים מחר",
     "encouragement": {
       "legendary": "אדירים!",
       "great": "עבודה יפה!",

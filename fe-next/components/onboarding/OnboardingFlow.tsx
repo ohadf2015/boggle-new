@@ -334,7 +334,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       router.push(
         pendingRoom
           ? `/${language}/multiplayer?room=${pendingRoom}`
-          : `/${language}/practice/classic?play=1`,
+          : `/${language}/practice/classic?play=1&firstGame=1`,
       );
       if (!pendingRoom) trackOnboardingQuickPlay({ source: 'quick_start' });
       emitCompleted({ via: 'quick_start' });

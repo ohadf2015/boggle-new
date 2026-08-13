@@ -6,8 +6,27 @@ import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 // ─── Mocks ───
 
 const mockPush = vi.fn();
+const mockSearchParams = new URLSearchParams();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  useSearchParams: () => mockSearchParams,
+}));
+
+const mockTrackFirstSessionDailyShown = vi.fn();
+const mockTrackFirstSessionDailyClicked = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackFirstSessionDailyShown: (...args: unknown[]) => mockTrackFirstSessionDailyShown(...args),
+  trackFirstSessionDailyClicked: (...args: unknown[]) => mockTrackFirstSessionDailyClicked(...args),
+}));
+
+let mockPracticeStreak = 1;
+vi.mock('@/hooks/usePracticeStreak', () => ({
+  usePracticeStreak: () => ({
+    current: mockPracticeStreak,
+    longest: mockPracticeStreak,
+    lastDayKey: '2026-08-13',
+    record: vi.fn(),
+  }),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -27,6 +46,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'practiceResults.wordHuntCtaDesc': 'Today\'s daily challenge awaits!',
         'practiceResults.wordHuntAlreadyPlayed': 'Already Played Today',
         'practiceResults.wordHuntAlreadyPlayedDesc': 'Come back tomorrow!',
+        'practiceResults.firstSessionDailyTitle': 'Start your daily streak',
+        'practiceResults.firstSessionDailyBody': 'Today\'s puzzle is live. Come back tomorrow for Day 2.',
+        'practiceResults.firstSessionDailyCta': "Play today's Daily",
+        'practiceResults.firstSessionComeBack': 'Day 1 — come back tomorrow',
         'practiceResults.goHome': 'Back to Home',
         'nextStep.backToLobby': 'Back to Lobby',
         'practiceResults.playAgain': 'Play Again',
@@ -169,6 +192,9 @@ describe('PracticeResults — Celebratory Redesign', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockHasPlayedWordHuntToday.mockReturnValue(false);
+    mockPracticeStreak = 1;
+    for (const key of Array.from(mockSearchParams.keys())) mockSearchParams.delete(key);
+    mockSearchParams.set('firstGame', '1');
   });
 
   // ── Celebration mascot ──
@@ -213,19 +239,40 @@ describe('PracticeResults — Celebratory Redesign', () => {
   // ── Word Hunt Daily CTA (primary action) ──
 
   describe('Word Hunt daily CTA', () => {
-    it('renders Word Hunt daily as the primary CTA button', () => {
+    it('shouldRenderFirstSessionDailyCopyWhenFirstGame', () => {
+      // GIVEN a first-session practice result
       render(<PracticeResults {...defaultProps} />);
-      const buttons = screen.getAllByText('Play Word Hunt Daily');
-      expect(buttons.length).toBeGreaterThanOrEqual(1);
+
+      // THEN the CTA names today's real Daily, not another practice mode
+      expect(screen.getAllByText("Play today's Daily").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Day 1 — come back tomorrow').length).toBeGreaterThanOrEqual(1);
     });
 
-    it('navigates into the next practice mode (not the live daily) when CTA is clicked', () => {
-      // Practice flow chains classic → wordHunt practice rather than dropping
-      // the player into the timed daily — keeps the no-pressure experience.
+    it('shouldNavigateToLiveDailyWhenFirstSessionCtaClicked', () => {
+      // GIVEN first-session results
       render(<PracticeResults {...defaultProps} />);
-      const buttons = screen.getAllByText('Play Word Hunt Daily');
-      fireEvent.click(buttons[0]);
-      expect(mockPush).toHaveBeenCalledWith('/en/practice/wordHunt');
+
+      // WHEN the player taps the Daily CTA
+      fireEvent.click(screen.getAllByText("Play today's Daily")[0]);
+
+      // THEN they enter the live Word Hunt Daily, not /practice/wordHunt
+      expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt?from=first_game');
+      expect(mockTrackFirstSessionDailyClicked).toHaveBeenCalledWith(
+        expect.objectContaining({ variant: 'first_session' }),
+      );
+    });
+
+    it('shouldNavigateToLiveDailyWhenReturningPlayerHasNotPlayedToday', () => {
+      // GIVEN a returning practice player (streak > 1, no firstGame flag)
+      mockPracticeStreak = 4;
+      mockSearchParams.delete('firstGame');
+      render(<PracticeResults {...defaultProps} />);
+
+      // WHEN they tap the Daily CTA
+      fireEvent.click(screen.getAllByText('Play Word Hunt Daily')[0]);
+
+      // THEN the button that says Daily actually opens Daily
+      expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt?from=practice_results');
     });
 
     it('shows already-played state when daily was completed today', () => {
@@ -237,6 +284,14 @@ describe('PracticeResults — Celebratory Redesign', () => {
     it('checks daily status using current language', () => {
       render(<PracticeResults {...defaultProps} />);
       expect(mockHasPlayedWordHuntToday).toHaveBeenCalledWith('en');
+    });
+
+    it('shouldFireShownEventOnceOnFirstSessionMount', () => {
+      render(<PracticeResults {...defaultProps} />);
+      expect(mockTrackFirstSessionDailyShown).toHaveBeenCalledTimes(1);
+      expect(mockTrackFirstSessionDailyShown).toHaveBeenCalledWith(
+        expect.objectContaining({ variant: 'first_session' }),
+      );
     });
   });
 

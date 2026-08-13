@@ -1,14 +1,23 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { usePracticeStreak } from '@/hooks/usePracticeStreak';
+import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge/storage';
+import { selectFirstSessionDailyCta } from '@/lib/growth/firstSessionDailyCta';
+import {
+  trackFirstSessionDailyClicked,
+  trackFirstSessionDailyShown,
+} from '@/utils/growthTracking';
 import { haptics } from '@/utils/haptics';
 import PracticeCompleteBanner from './PracticeCompleteBanner';
 import PracticeChainCta from './PracticeChainCta';
 import InlineConfetti from '@/components/effects/InlineConfetti';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
+import type { Language } from '@/shared/types/game';
 
 const ACCENT_BORDER: Record<PracticeMode, string> = {
   classic: 'border-neo-cyan',
@@ -57,18 +66,38 @@ interface Props {
  * same spring entrance, same neo-brutalist mode-accent color) for coherent
  * popup chrome across the practice surface.
  *
- * Single-CTA by design: the chain CTA ("continue to next mode") is the one
- * clear way forward. The "skip to real game" escape already lives on the
- * sandbox itself, so the popup doesn't repeat it.
+ * Single-CTA by design. On the FTUE first classic session the CTA is today's
+ * live Daily (D1 hook). Otherwise the chain CTA continues the practice playlist.
+ * The "skip to real game" escape already lives on the sandbox itself.
  */
 export default function PracticeCompletePopup({ open, mode, onDismiss }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { playButtonClickSound } = useSoundEffects();
+  const { current: practiceStreak } = usePracticeStreak();
+  const shownRef = useRef(false);
+
+  const firstGameFromUrl =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('firstGame') === '1';
+  const isFirstSession = firstGameFromUrl || practiceStreak <= 1;
+  const dailyCta = selectFirstSessionDailyCta({
+    alreadyPlayedToday: hasPlayedWordHuntToday(language as Language),
+    isFirstSession,
+  });
+  // FTUE lands on classic practice. That's the D1 conversion window —
+  // send them to today's live Daily instead of the next practice sandbox.
+  const showFirstSessionDaily = open && mode === 'classic' && dailyCta.variant === 'first_session';
 
   // Light haptic on first open — celebration handshake.
   useEffect(() => {
     if (open) haptics.tap();
   }, [open]);
+
+  useEffect(() => {
+    if (!showFirstSessionDaily || shownRef.current) return;
+    shownRef.current = true;
+    trackFirstSessionDailyShown({ variant: dailyCta.variant, surface: 'practice_complete' });
+  }, [showFirstSessionDaily, dailyCta.variant]);
 
   // ESC dismisses only when a handler is provided. No handler = sticky popup.
   useEffect(() => {
@@ -137,18 +166,51 @@ export default function PracticeCompletePopup({ open, mode, onDismiss }: Props) 
 
         <div className="p-5 flex flex-col gap-4">
           <PracticeCompleteBanner mode={mode} />
-          <div className="relative">
-            {/* Subtle pulsing glow ring behind the primary CTA — celebration
-                emphasis. CSS pulse so it never depends on Framer. */}
-            <div
-              aria-hidden
-              className={`pointer-events-none absolute -inset-1 rounded-neo blur-md ${CTA_BG[mode]} opacity-30 animate-pulse`}
-            />
-            <PracticeChainCta
-              currentMode={mode}
-              className={`relative inline-flex items-center justify-center w-full ${CTA_BG[mode]} ${CTA_TEXT[mode]} border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed`}
-            />
-          </div>
+          {showFirstSessionDaily && dailyCta.href ? (
+            <div className="flex flex-col items-center gap-2">
+              <p
+                data-testid="first-session-comeback"
+                className="text-sm font-bold text-neo-orange text-center"
+              >
+                {t(dailyCta.comeBackKey)}
+              </p>
+              <div className="relative w-full">
+                <div
+                  aria-hidden
+                  className={`pointer-events-none absolute -inset-1 rounded-neo blur-md ${CTA_BG[mode]} opacity-30 animate-pulse`}
+                />
+                <Link
+                  href={`/${language}${dailyCta.href}`}
+                  data-testid="first-session-daily-cta"
+                  data-variant={dailyCta.variant}
+                  onClick={() => {
+                    trackFirstSessionDailyClicked({
+                      variant: dailyCta.variant,
+                      surface: 'practice_complete',
+                    });
+                    playButtonClickSound();
+                    haptics.tap();
+                  }}
+                  className={`relative inline-flex items-center justify-center w-full ${CTA_BG[mode]} ${CTA_TEXT[mode]} border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed`}
+                >
+                  {t(dailyCta.ctaKey)}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="relative">
+              {/* Subtle pulsing glow ring behind the primary CTA — celebration
+                  emphasis. CSS pulse so it never depends on Framer. */}
+              <div
+                aria-hidden
+                className={`pointer-events-none absolute -inset-1 rounded-neo blur-md ${CTA_BG[mode]} opacity-30 animate-pulse`}
+              />
+              <PracticeChainCta
+                currentMode={mode}
+                className={`relative inline-flex items-center justify-center w-full ${CTA_BG[mode]} ${CTA_TEXT[mode]} border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed`}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

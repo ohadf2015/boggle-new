@@ -165,6 +165,9 @@ export type GrowthEvent =
   | 'onboarding_completed'
   | 'onboarding_skipped'
   | 'onboarding_quick_play'
+  // First-session → live Daily conversion (D1 hook). Properties: { variant }.
+  | 'first_session_daily_shown'
+  | 'first_session_daily_clicked'
   // FTUE-gate redirect (useFTUEGate bounces an unauthenticated play surface,
   // e.g. /practice, to the homepage with ?next=). Instruments whether the
   // bounce actually resumes the original destination after onboarding —
@@ -379,6 +382,9 @@ const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   // D1-retention lever: FTUE → auto-start practice game. Queried unprefixed
   // against the t_cce75cc7 return-visit funnel.
   'onboarding_quick_play',
+  // D1-retention lever: first-session results → live Daily Word Hunt.
+  'first_session_daily_shown',
+  'first_session_daily_clicked',
 ]);
 
 /**
@@ -1401,7 +1407,7 @@ export const trackOnboardingSkipped = (
  * Onboarding quick-play — fires when the user takes the FTUE fast lane that
  * lands them in an auto-started classic practice game with zero extra taps:
  * the one-screen quickStart PLAY, the "Skip → Play Now" escape on any FTUE
- * step, or style-step completion (all route to /practice/classic?play=1).
+ * step, or style-step completion (all route to /practice/classic?play=1&firstGame=1).
  * `source` discriminates which entry fired it. This is the D1-retention
  * experiment metric — pair with the return_visit funnel from t_cce75cc7.
  */
@@ -1409,6 +1415,25 @@ export const trackOnboardingQuickPlay = (
   extras: { source: 'quick_start' | 'ftue_skip' | 'style_complete' } & Record<string, unknown>,
 ): void => {
   trackGrowthEvent('onboarding_quick_play', extras);
+};
+
+export type FirstSessionDailyVariant = 'first_session' | 'daily_open' | 'already_played';
+
+/**
+ * First-session Daily pitch — shown on PracticeResults after the FTUE
+ * auto-start game. Pair `first_session_daily_shown` → `_clicked` with
+ * next-day `return_visit` to measure the D1 lift.
+ */
+export const trackFirstSessionDailyShown = (
+  extras: { variant: FirstSessionDailyVariant } & Record<string, unknown>,
+): void => {
+  trackGrowthEvent('first_session_daily_shown', extras);
+};
+
+export const trackFirstSessionDailyClicked = (
+  extras: { variant: FirstSessionDailyVariant } & Record<string, unknown>,
+): void => {
+  trackGrowthEvent('first_session_daily_clicked', extras);
 };
 
 /** Modal action discriminator for funnel analysis. */

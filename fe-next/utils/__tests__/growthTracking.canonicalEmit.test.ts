@@ -122,4 +122,26 @@ describe('trackGrowthEvent — canonical dual-emit', () => {
     const canonical = capture.mock.calls.find(c => c[0] === 'onboarding_quick_play');
     expect(canonical?.[1]).toMatchObject({ source: 'quick_start' });
   });
+
+  // D1-retention lever: first-session → live Daily. Funnel queries the
+  // unprefixed name so shown → clicked → next-day return is measurable.
+  it('trackFirstSessionDailyShown dual-emits canonical first_session_daily_shown', async () => {
+    const { trackFirstSessionDailyShown } = await import('../growthTracking');
+    trackFirstSessionDailyShown({ variant: 'first_session' });
+
+    const names = capture.mock.calls.map(c => c[0]);
+    expect(names).toContain('growth:first_session_daily_shown');
+    expect(names).toContain('first_session_daily_shown');
+    const canonical = capture.mock.calls.find(c => c[0] === 'first_session_daily_shown');
+    expect(canonical?.[1]).toMatchObject({ variant: 'first_session' });
+  });
+
+  it('trackFirstSessionDailyClicked dual-emits canonical first_session_daily_clicked', async () => {
+    const { trackFirstSessionDailyClicked } = await import('../growthTracking');
+    trackFirstSessionDailyClicked({ variant: 'first_session' });
+
+    const names = capture.mock.calls.map(c => c[0]);
+    expect(names).toContain('growth:first_session_daily_clicked');
+    expect(names).toContain('first_session_daily_clicked');
+  });
 });

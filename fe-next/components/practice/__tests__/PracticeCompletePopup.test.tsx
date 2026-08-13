@@ -15,15 +15,36 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playButtonClickSound: vi.fn() }),
 }));
+let mockPracticeStreak = 3;
 vi.mock('@/hooks/usePracticeStreak', () => ({
-  usePracticeStreak: () => ({ current: 3, longest: 3 }),
-  getPracticeStreak: () => ({ current: 3, longest: 3 }),
+  usePracticeStreak: () => ({ current: mockPracticeStreak, longest: mockPracticeStreak, record: vi.fn() }),
+  getPracticeStreak: () => ({ current: mockPracticeStreak, longest: mockPracticeStreak }),
+}));
+
+const mockSearchParams = new URLSearchParams();
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+
+vi.mock('@/utils/dailyChallenge/storage', () => ({
+  hasPlayedWordHuntToday: () => false,
+}));
+
+const mockTrackShown = vi.fn();
+const mockTrackClicked = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackFirstSessionDailyShown: (...args: unknown[]) => mockTrackShown(...args),
+  trackFirstSessionDailyClicked: (...args: unknown[]) => mockTrackClicked(...args),
 }));
 
 import PracticeCompletePopup from '../PracticeCompletePopup';
 
 beforeEach(() => {
   window.localStorage.clear();
+  mockPracticeStreak = 3;
+  mockTrackShown.mockClear();
+  mockTrackClicked.mockClear();
+  for (const key of Array.from(mockSearchParams.keys())) mockSearchParams.delete(key);
 });
 
 describe('PracticeCompletePopup', () => {
@@ -98,5 +119,33 @@ describe('PracticeCompletePopup', () => {
     const panel = screen.getByTestId('practice-complete-popup-panel-classic');
     expect(panel.className).toContain('animate-pop-in');
     expect(panel.style.opacity).not.toBe('0');
+  });
+
+  it('shouldPitchLiveDailyWhenFirstSessionClassicCompletes', () => {
+    // GIVEN the FTUE first practice day just hit its goal
+    mockPracticeStreak = 1;
+    mockSearchParams.set('firstGame', '1');
+
+    // WHEN the completion popup opens
+    render(<PracticeCompletePopup open mode="classic" />);
+
+    // THEN the primary CTA is today's live Daily, not the next practice mode
+    const cta = screen.getByTestId('first-session-daily-cta');
+    expect(cta).toHaveAttribute('href', '/en/daily/word-hunt?from=first_game');
+    expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
+    expect(screen.getByTestId('first-session-comeback')).toBeInTheDocument();
+    expect(mockTrackShown).toHaveBeenCalledWith(expect.objectContaining({ variant: 'first_session' }));
+  });
+
+  it('shouldKeepPracticeChainWhenReturningPlayerCompletesClassic', () => {
+    // GIVEN a returning player (streak > 1, no firstGame flag)
+    mockPracticeStreak = 4;
+
+    // WHEN they finish classic practice
+    render(<PracticeCompletePopup open mode="classic" />);
+
+    // THEN the existing practice-chain handoff stays
+    expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
+    expect(screen.queryByTestId('first-session-daily-cta')).toBeNull();
   });
 });

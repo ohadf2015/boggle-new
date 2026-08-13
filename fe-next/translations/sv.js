@@ -3941,6 +3941,10 @@ const sv = {
     "wordHuntCtaDesc": "Dagens utmaning väntar!",
     "wordHuntAlreadyPlayed": "Redan spelat idag",
     "wordHuntAlreadyPlayedDesc": "Kom tillbaka imorgon!",
+    "firstSessionDailyTitle": "Starta din dagliga streak",
+    "firstSessionDailyBody": "Dagens pussel är redo. Kom tillbaka imorgon för dag 2.",
+    "firstSessionDailyCta": "Spela dagens Daily",
+    "firstSessionComeBack": "Dag 1 — kom tillbaka imorgon",
     "encouragement": {
       "legendary": "Otroligt!",
       "great": "Bra jobbat!",

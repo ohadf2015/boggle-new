@@ -256,7 +256,7 @@ describe('OnboardingFlow', () => {
   it('navigates straight into a practice game from the play button', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
-    expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
+    expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1&firstGame=1');
   });
 
   it('calls onComplete after play', () => {
@@ -353,7 +353,7 @@ describe('OnboardingFlow', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
-      expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
+      expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1&firstGame=1');
     });
   });
 

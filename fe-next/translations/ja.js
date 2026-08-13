@@ -3662,6 +3662,10 @@ const ja = {
     "wordHuntCtaDesc": "今日のチャレンジが待っています！",
     "wordHuntAlreadyPlayed": "本日プレイ済み",
     "wordHuntAlreadyPlayedDesc": "また明日！",
+    "firstSessionDailyTitle": "デイリー連続を始めよう",
+    "firstSessionDailyBody": "今日のパズルが出た。明日戻れば2日目。",
+    "firstSessionDailyCta": "今日のデイリーをプレイ",
+    "firstSessionComeBack": "1日目 — 明日また来て",
     "encouragement": {
       "legendary": "すごい！",
       "great": "ナイス！",
