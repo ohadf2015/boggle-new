@@ -1,77 +1,37 @@
 {
-  "date": "2026-08-09",
-  "note": "Brief top items were tryshopli.com mood pages (NOT in this repo -- external site, no code to fix here) and lexiclash /multiplayer?room=XXX invite URLs. The MP room items are STRUCTURALLY unmeasurable per-URL: each room code is unique (?room=K85Q36 etc), so individual URL n is always ~1 -- confirmed by aggregate query: /multiplayer route total n=52/24h (clears floor) but no single room URL ever will. This is the 3rd consecutive night this route pattern surfaces in the brief; prior 2 nights independently found the same per-URL sub-floor issue. No code changed tonight -- root cause is a brief-generation artifact (should aggregate by route template, not exact URL with query string), not a code regression. Filed as perf-watch item. Backend candidates (unindexed FK vocabulary_lessons, unused index word_pacts, auth_db_connections_absolute) carried unchanged from prior 3 nights -- supabase MCP did not connect within lane time budget tonight, REST fallback script not present in scripts/nightly/lib/.",
+  "date": "2026-08-13",
+  "note": "Brief-first: leaderboard LCP impact-check measured 4140ms (n=1, baseline 8130) -> verdict 'improved' appended to impact-ledger, low-confidence caveat n=1. Both flagged backend advisor items confirmed non-actionable again (4th consecutive night for vocabulary_lessons FK: n_live_tup=2 via Management API -- index has zero benefit on 2 rows; auth_db_connections_absolute is a Supabase dashboard setting, not a code/migration change). Frontend brief items were all per-exact-URL MP room invites (?room=XXX) + single-sample /es and /en/daily/word-hunt hits -- all n<50, sub-floor per mandatory sample gate, DEFERRED not regressions (same recurring brief-generation artifact documented 3+ prior nights). Aggregated by route template: /en/multiplayer n=55 p75_lcp=1672ms -- healthy, no regression. Reused existing .next build (Aug 12 23:45, no fresh build run) for bundle check -- chunk hashes are content-addressed and rotate every build so prior baseline's top_chunks (by filename) are not name-comparable; recorded today's aggregate total instead. No code shipped tonight: landing page critical path already well-optimized (LandingView.tsx dynamic()-splits every below-fold/non-SSR section with loading skeletons; LandingHero.tsx has zero raster <Image> usage -- CSS/SVG hero, no priority-image win available) and no other safe candidate cleared verification within time budget.",
   "backend": {
-    "advisor_performance_lints_total": 108,
-    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- 3rd consecutive night confirmed 2-row table via Management API (n_live_tup=2), no index added",
-    "unused_index_word_pacts": "idx_word_pacts_player2_id -- table has n_live_tup=1, dropping/keeping has negligible impact either way, not touched",
-    "auth_db_connections_absolute": "advisor wants percentage-based Auth connection allocation -- this is a Supabase project dashboard setting, not a code/migration change; deferred to human queue",
-    "not_re_explored": "top_queries / pg_stat_statements -- brief-first contract, no new backend candidate surfaced tonight"
+    "advisor_performance_lints_total": "not re-counted (brief-first contract, only the 2 brief-flagged items checked)",
+    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- 4th consecutive night confirmed 2-row table (n_live_tup=2 via Management API), index skipped: zero benefit on 2 rows, write-cost-only",
+    "auth_db_connections_absolute": "confirmed again: Supabase project dashboard setting (Auth connection allocation strategy), not a code/migration change -- deferred to human queue"
   },
   "frontend": {
     "by_route": [
-      {
-        "route": "/en/leaderboard",
-        "p75_lcp_ms": 8130,
-        "n_24h": "not measured (brief-first contract)",
-        "vs_baseline": "root-caused via code read: full-page ssr:false with no loading fallback -> blank until hydration. Fixed: added loading={PageLoader} to PageClientNoSsr.tsx dynamic() call."
-      },
-      {
-        "route": "/en/multiplayer",
-        "p75_lcp_ms": 15373,
-        "n_24h": 21,
-        "vs_baseline": "below 50-sample floor -- DEFERRED, not a confirmed regression (baseline 3228 was itself n=52 over 7d, different window, not comparable)"
-      },
-      {
-        "route": "/es/juego-de-palabras-multijugador",
-        "p75_lcp_ms": 4913,
-        "n_24h": 11,
-        "vs_baseline": "below 50-sample floor -- DEFERRED"
-      },
-      {
-        "route": "/en/daily/word-wheel",
-        "p75_lcp_ms": 4793,
-        "n_24h": 5,
-        "vs_baseline": "below 50-sample floor -- DEFERRED"
-      },
-      {
-        "route": "/en/daily-word-wheel",
-        "p75_lcp_ms": 3272,
-        "n_24h": 1,
-        "vs_baseline": "below 50-sample floor -- DEFERRED, single sample"
-      }
+      { "route": "/en/multiplayer", "p75_lcp_ms": 1672, "n_24h": 55, "vs_baseline": "healthy, clears floor, no regression" },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 4321, "n_24h": 10, "vs_baseline": "below 50-sample floor -- DEFERRED" },
+      { "route": "/es", "p75_lcp_ms": 5550.75, "n_24h": 2, "vs_baseline": "below 50-sample floor -- DEFERRED" },
+      { "route": "/en/daily/word-hunt", "p75_lcp_ms": 5000, "n_24h": 2, "vs_baseline": "below 50-sample floor -- DEFERRED" }
     ],
-    "practice_classic_split": {
-      "status": "carried from 08-04, not re-touched tonight"
-    },
-    "word_wheel_lcp": {
-      "status": "canvas mount-size fix landed in prior commit 8443b0d3f (before this lane) -- expect today's 3272-4793ms figures to be pre-fix data; re-measure with n>=50 in a future run before drawing conclusions"
+    "leaderboard_impact_check": {
+      "route": "/en/leaderboard",
+      "measured_p75_lcp_ms": 4140,
+      "n": 1,
+      "baseline_p75_lcp_ms": 8130,
+      "verdict": "improved (low confidence, n=1)"
     }
   },
   "bundle": {
-    "build_id_date": "2026-08-02",
-    "note": "no fresh build run tonight (time-budget discipline); top_chunks carried unchanged",
-    "top_chunks": [
-      {
-        "name": "7fd32332.f8584f0003a0530e.js",
-        "kb": 6452
-      },
-      {
-        "name": "5ee60e17.b67a689edf290af4.js",
-        "kb": 3284
-      },
-      {
-        "name": "82055-affbfbb6ca395994.js",
-        "kb": 856
-      },
-      {
-        "name": "64789.cd0e09fa6af59d97.js",
-        "kb": 736
-      },
-      {
-        "name": "68292.6432fa305f73e0bf.js",
-        "kb": 648
-      }
+    "build_id_date": "2026-08-12",
+    "note": "reused existing build (no fresh build run tonight, time-budget discipline). Chunk filenames are content-hashed and rotate every build -- not name-comparable to 08-09 baseline's top_chunks. Recorded aggregate total instead.",
+    "total_chunks_kb": 31482,
+    "total_chunk_files": 964,
+    "top_chunks_by_size": [
+      { "name": "69979-422a79cc34b31edb.js", "kb": 866 },
+      { "name": "64789.df2e709cbf9acbcc.js", "kb": 737 },
+      { "name": "53169.9a603cc7c58f8813.js", "kb": 666 },
+      { "name": "39299.a669474be91129cf.js", "kb": 594 },
+      { "name": "82745.d142101f5213c2a4.js", "kb": 572 }
     ]
   }
 }

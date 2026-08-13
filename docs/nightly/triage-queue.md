@@ -2069,3 +2069,37 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 ### [Shipped direct fix, not an A/B] Profile avatar-builder rage clicks — same bug class as homepage
 - Brief's #2 target (`/he/profile` rageclicks, reach=2, el_text "😊 שמח") traced to `components/avatar/AvatarBuilderCategoryOptions.tsx` — the "Expressions" preset buttons (one-click emoji combos) and "Color Theme" preset buttons had `hover:` states but zero `active:`/press feedback, identical root cause to the homepage mode-cards bug that `exp-homepage-click-feedback-v1` measurably improved (see above).
 - n=2 is far too thin to justify standing up a new typed experiment + flag; the fix pattern (`active:scale-95 active:bg-neo-navy-light/60`) is already proven effective with real data, so shipped it directly instead of gating behind a new A/B. Re-check `$rageclick` volume on `/profile` in ~7d.
+
+## 2026-08-13
+- [Supabase] Public Can Execute SECURITY DEFINER Function `get_user_rank`
+  - reach=0, severity=0.5, advisor: anon_security_definer_function_executable
+  - status: shipped 1 file (migration) — no code file, DB-only
+  - why: grepped all callsites (LandingYourRank.tsx, HomeRankCard.tsx, useSupabaseRealtime.ts) — all gated behind isAuthenticated + pass own profile.id, no anon caller found
+  - recommended owner: review-by-eod (function still lacks p_user_id = auth.uid() check — any authenticated user can still pass an arbitrary UUID and read that user's rank/score; low severity since leaderboard stats aren't sensitive, but flagging for a real look)
+- [Supabase] Security Definer View `custom_puzzle_leaderboard` — VERIFIED CORRECT, no action
+  - advisor: security_definer_view
+  - why: view LEFT JOINs `profiles`, whose RLS is own-row-only (see memory leaderboard-profiles-rls-invoker-trap-2026-08-12). SECURITY DEFINER is required here or the join returns 0 rows for every other player, same bug class as the 2026-08-12 leaderboard incident. Converting to SECURITY INVOKER would reintroduce that bug. Closing as a false positive.
+  - recommended owner: self (closed)
+- [Sentry] "Connection is closed." JAVASCRIPT-NEXTJS-1WM — VERIFIED ALREADY FIXED, sentry-mcp write-403 blocked marking resolved
+  - 711 occurrences, 0 users, first/last seen 2026-07-22 (one day, 22 days stale)
+  - root cause: `@socket.io/redis-adapter`'s `pubClient.publish()` call isn't awaited/caught by socket.io internals; when Redis drops mid-broadcast, ioredis rejects the in-flight publish promise → unhandled rejection
+  - status: fix already present in `fe-next/server/redisAdapter.ts:32-46` (publish() wrapped, swallows exactly this message, comment cites this same 711-count episode) — nothing to ship
+  - recommended owner: self (mark resolved manually in Sentry UI — MCP write is 403'd, see memory sentry-mcp-write-403)
+- [PostHog] React error #418 (hydration mismatch, reach=2), ChunkLoadError (reach=1), 2x "TypeError: Failed to fetch" (reach=1 each), DOMException setPointerCapture (reach=1)
+  - status: deferred, not investigated this run — time budget spent on the higher-scored Supabase/Sentry items above
+  - why: reach≤2 across all five, lower score than items fixed; #418 needs the non-minified dev message to root-cause (React docs link only explains the generic hydration-mismatch class)
+  - recommended owner: self (pick up next lane 01 run)
+
+## 2026-08-13 (lane 03 engagement)
+### /en/multiplayer?room=XXXXXX rage clicks (score 0.896, reach=8, single session)
+- 8 rageclicks in one ~10min session on `?room=WTCKFF`, PostHog `$elements_chain`/`$el_text` both null (client not capturing element detail on this surface — instrumentation gap).
+- Traced `PageClient.tsx` `onError`/`kind==='gone'` path (dead-room toast, shipped 2026-05-25) — gives feedback on a FAILED join, not the culprit by itself.
+- **Root cause isolated (Explore agent, confirmed):** the `?room=` deep-link **auto-join** path (`hooks/useMultiplayerSession.ts:98-179` sets `shouldAutoJoin`; `components/multiplayer/MultiplayerFlow.tsx:261-267` fires `handleInvitationAutoJoin` → `handleJoin` directly, bypassing the modal) shows **zero loading UI** — no spinner, no "joining…" state — while the socket round-trip is in flight. Contrast: the manual `JoinRoomModal.tsx:219` button DOES show `isJoining` text/disabled state; `RoomListView.tsx:355-366` room cards DO disable + track `trackMpRoomJoinBlocked` on blocked clicks. Only the **silent auto-join** (the exact path a `?room=CODE` link hits) lacks this.
+- On failure the room-gone toast is 5s and easy to miss, then `room=` is stripped from the URL silently (`PageClient.tsx:368`) and the lobby returns to its normal, all-enabled appearance with no persistent error card — reads as "nothing happened," not "join failed." User re-taps expecting a retry → rage clicks land on now-enabled lobby buttons.
+- NOT actioned: reverted `exp-mp-lobby-connect-feedback-v1` (ES-only "connecting" feedback UI) caused rage clicks to increase 6→22/7d when live (memory `mp-flow-friction...`) — so blindly re-wiring it to EN is likely to repeat the harm, not fix it. That experiment styled a MODAL state; this bug is upstream of the modal entirely (auto-join skips it) — a different fix (visible auto-join spinner/toast at deep-link entry, not the reverted modal copy) is needed.
+- Recommended owner: next lane 03 or 11 — add a "joining room…" toast/spinner at the `handleInvitationAutoJoin` call site in `MultiplayerFlow.tsx:261-267` (mirroring what `JoinRoomModal` already does), gated behind a new typed flag so it can be measured before wide rollout given the sibling experiment's harm history. TDD + i18n needed; out of scope for this run's remaining budget.
+
+### Flag hygiene sweep (no actions needed)
+- `exp-mp-room-join-loading-v1`, `exp-blast-wave-banner-v1`, `adventure-difficulty-tuning`: inactive in PostHog, 0 call sites in `app/components/hooks/lib/server` — already fully unwired, no code cleanup pending.
+- `exp-mp-lobby-connect-feedback-v1`: inactive, registry entry in `lib/experiments.ts:698` already marked `CONCLUDED 2026-07-26 — REVERTED` in a comment block (not live code) — already clean.
+- Did not reach the full 8-flag "decided winner p<0.05" sweep (active flags: `exp-mp-quickplay-eager-disable-v1`, `exp-wordhunt-clue-shake-v1`, etc.) — would need `experiment-results` queries per flag, deferred to next run for time budget.
