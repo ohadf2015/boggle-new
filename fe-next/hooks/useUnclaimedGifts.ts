@@ -138,7 +138,10 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   // Claim mutation
   const claimMutation = useMutation({
     mutationFn: async (giftId: string) => {
-      const response = await fetch(`/api/player/gifts/${giftId}/claim`, { method: 'POST' });
+      // fetchWithAuth sends the Bearer token — plain fetch relies on auth
+      // cookies, which aren't present for Capacitor / cookie-blocked clients,
+      // so their claims 401'd and gifts stayed unclaimed forever.
+      const response = await fetchWithAuth(`/api/player/gifts/${giftId}/claim`, { method: 'POST' });
       if (!response.ok) {
         const err = await response.json();
         throw new Error(err.error || 'Failed to claim gift');
