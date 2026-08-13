@@ -54,6 +54,8 @@ vi.mock('../botWordHunt', () => ({
 
 // Mock blastModeManager
 vi.mock('../../../modules/blastModeManager', () => ({
+  validateBlastWordPath: vi.fn().mockReturnValue(null),
+  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn(),
   getTilesOnPath: vi.fn(),
   recordBlastMove: vi.fn(),

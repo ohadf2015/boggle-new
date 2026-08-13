@@ -145,6 +145,8 @@ vi.mock('../../../backend/services/gracePeriodLock', () => ({
 }));
 
 vi.mock('../../../backend/modules/blastModeManager', () => ({
+  validateBlastWordPath: vi.fn().mockReturnValue(null),
+  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(10),
   getTilesOnPath: vi.fn().mockReturnValue(['bomb', 'gold']),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 4, bonusMove: true }),

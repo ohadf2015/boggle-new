@@ -72,7 +72,7 @@ interface BlastGameProps {
   onComboDetected?: (combos: SpecialCombo[]) => void;
   pendingDiscovery?: BlastComboType | null;
   acknowledgeDiscovery?: () => void;
-  onWordWithComboType?: (word: string, comboType: string | null) => void;
+  onWordWithComboType?: (word: string, comboType: string | null, path?: Array<{ row: number; col: number }>) => void;
   discoveredCombos?: Set<BlastComboType>;
   initialTileStates?: BlastTileState[][] | null;
   blastSeed?: number | null;

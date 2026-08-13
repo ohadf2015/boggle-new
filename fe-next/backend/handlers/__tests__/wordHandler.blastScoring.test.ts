@@ -131,6 +131,8 @@ vi.mock('../../../backend/services/gracePeriodLock', () => ({
 
 // Setup blast mode manager mock with controllable tile bonus
 vi.mock('../../../backend/modules/blastModeManager', () => ({
+  validateBlastWordPath: vi.fn().mockReturnValue(null),
+  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(10),
   getTilesOnPath: vi.fn().mockReturnValue(['gold', 'standard']),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 1, bonusMove: false }),
