@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useExperiment } from '@/hooks/useExperiment';
-import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
+import { m, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -12,9 +12,10 @@ import ConnectionsKeyboard from './ConnectionsKeyboard';
 import AnswerSlots from './AnswerSlots';
 import { useBridgeTyping } from './useBridgeTyping';
 import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
-import { whyItWorks } from '@/lib/connections/whyItWorks';
 import { freeHintsRemaining, consumeFreeHint } from '@/lib/connections/freeHints';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { BridgeChain } from './BridgeChain';
+import { BridgeSolveReveal } from './BridgeSolveReveal';
 
 interface PuzzleCardProps {
   puzzle: ConnectionPuzzle;
@@ -31,17 +32,6 @@ interface PuzzleCardProps {
 }
 
 const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
-
-const WORD_CHIP_VARIANTS = {
-  initial: { opacity: 0, scale: 0.75, y: 10 },
-  animate: (delay: number) => ({
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 20, delay },
-  }),
-  exit: { opacity: 0, scale: 0.85, transition: { duration: 0.12 } },
-};
 
 const STATUS_BORDER: Record<string, string> = {
   correct: 'border-neo-lime',
@@ -81,6 +71,7 @@ export default function PuzzleCard({
 }: PuzzleCardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
+  const reducedMotion = useReducedMotion();
   const shakeControls = useAnimationControls();
   const prevStatus = useRef(state.status);
 
@@ -131,12 +122,12 @@ export default function PuzzleCard({
   useEffect(() => {
     if (state.status === 'wrong' && prevStatus.current !== 'wrong') {
       shakeControls.start({
-        x: [0, -14, 14, -11, 11, -7, 7, -3, 3, 0],
-        transition: { duration: 0.5, ease: 'easeInOut' },
+        x: reducedMotion ? 0 : [0, -14, 14, -11, 11, -7, 7, -3, 3, 0],
+        transition: reducedMotion ? { duration: 0 } : { duration: 0.5, ease: 'easeInOut' },
       });
     }
     prevStatus.current = state.status;
-  }, [state.status, state.wrongAttempts, shakeControls]);
+  }, [state.status, state.wrongAttempts, shakeControls, reducedMotion]);
 
   const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace } = useBridgeTyping({
     input: state.input,
@@ -157,13 +148,21 @@ export default function PuzzleCard({
   return (
     <AnimatePresence mode="wait">
       <m.div
+        key={`entrance-${puzzle.id}`}
+        initial={reducedMotion ? false : { opacity: 0, y: 32, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
+      >
+      <m.div
         key={puzzle.id}
         animate={shakeControls}
-        initial={{ opacity: 0, y: 32, scale: 0.96 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        // The entrance deliberately does NOT use `whileInView`: this card is the
+        // screen's primary content and is always in view, so gating its opacity
+        // on an IntersectionObserver callback only creates a way for it to stay
+        // invisible. `animate` is already taken by the shake, so the entrance
+        // lives on the wrapper above.
         exit={{ opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.18 } }}
-        transition={CARD_SPRING}
-        viewport={{ once: true }}
+        transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
         className={[
           'relative rounded-neo border-neo-thick shadow-hard',
           borderColor,
@@ -185,110 +184,14 @@ export default function PuzzleCard({
           </span>
         )}
 
-        <AnimatePresence mode="wait">
-          {/* No wrapping: the reveal beam is absolutely positioned across this
-              row, so a wrapped chain would draw it straight through both lines.
-              Chips scale with the container instead (long Hebrew smichut pairs
-              like טלוויזיה + חינוכית overflow a 360px phone at a fixed 24px). */}
-          <div
-            key={`chain-${puzzle.id}`}
-            className="relative flex flex-nowrap items-center justify-center gap-1.5 mb-4"
-            style={{ containerType: 'inline-size' }}
-          >
-            {/* The "bridge built" moment: a hard beam draws across the chain on reveal. */}
-            {bridgeRevealed && (
-              <m.div
-                data-testid="bridge-connector"
-                aria-hidden="true"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className={[
-                  'absolute inset-x-1 top-1/2 -z-10 h-2 -translate-y-1/2 rounded-full border border-black',
-                  'origin-left rtl:origin-right',
-                  isCorrect ? 'bg-neo-lime' : 'bg-neo-red/70',
-                ].join(' ')}
-              />
-            )}
-            <m.span
-              custom={0}
-              variants={WORD_CHIP_VARIANTS}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="font-neo-display text-[clamp(0.8rem,5.2cqi,1.5rem)] leading-tight text-neo-white font-bold tracking-wide px-2 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm whitespace-nowrap"
-            >
-              {puzzle.word1}
-            </m.span>
-
-            <m.span
-              custom={0.06}
-              variants={WORD_CHIP_VARIANTS}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="text-neo-white text-[clamp(0.7rem,3.2cqi,1.25rem)] font-mono select-none shrink-0"
-            >
-              +
-            </m.span>
-
-            <m.div
-              custom={0.12}
-              variants={WORD_CHIP_VARIANTS}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className={[
-                'min-w-[clamp(2.25rem,14cqi,3.5rem)] h-10 px-2 rounded-neo border-2 flex shrink-0 items-center justify-center',
-                'font-neo-display font-bold text-[clamp(0.8rem,4.6cqi,1.125rem)] transition-all duration-300',
-                isCorrect
-                  ? 'border-neo-lime bg-neo-lime/20 text-neo-lime'
-                  : isGaveUp
-                  ? 'border-neo-red bg-neo-red/20 text-neo-red'
-                  : 'border-neo-purple/70 bg-neo-purple/10 text-neo-purple',
-              ].join(' ')}
-            >
-              {bridgeRevealed ? (
-                <m.span
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
-                >
-                  {puzzle.bridge}
-                </m.span>
-              ) : (
-                <m.span
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  ?
-                </m.span>
-              )}
-            </m.div>
-
-            <m.span
-              custom={0.18}
-              variants={WORD_CHIP_VARIANTS}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="text-neo-white text-[clamp(0.7rem,3.2cqi,1.25rem)] font-mono select-none shrink-0"
-            >
-              +
-            </m.span>
-
-            <m.span
-              custom={0.24}
-              variants={WORD_CHIP_VARIANTS}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="font-neo-display text-[clamp(0.8rem,5.2cqi,1.5rem)] leading-tight text-neo-white font-bold tracking-wide px-2 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm whitespace-nowrap"
-            >
-              {puzzle.word2}
-            </m.span>
-          </div>
-        </AnimatePresence>
+        <BridgeChain
+          puzzle={puzzle}
+          isCorrect={isCorrect}
+          isGaveUp={isGaveUp}
+          bridgeRevealed={bridgeRevealed}
+          bufferDisplay={bufferDisplay}
+          isRTL={isRTL}
+        />
 
         <AnimatePresence mode="wait">
           {showHint && (
@@ -342,31 +245,9 @@ export default function PuzzleCard({
             </m.p>
           )}
 
-          {bridgeRevealed && (() => {
-            const { left, right } = whyItWorks(puzzle, language);
-            return (
-              <m.div
-                key="why"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.15 }}
-                className="mb-6 flex flex-col items-center gap-2 rounded-neo border-neo border-neo-lime/30 bg-neo-lime/5 px-3 py-3 shadow-hard-sm"
-              >
-                <span className="text-neo-lime/80 text-xs font-neo-body font-bold uppercase tracking-[0.18em]">
-                  {t('connections.whyItWorks')}
-                </span>
-                <div className="flex flex-wrap items-center justify-center gap-2" dir={isRTL ? 'rtl' : 'ltr'}>
-                  <span className="rounded-neo border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-display font-bold text-sm text-neo-lime">
-                    {left}
-                  </span>
-                  <span className="text-neo-white/40 text-sm select-none" aria-hidden="true">·</span>
-                  <span className="rounded-neo border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-display font-bold text-sm text-neo-lime">
-                    {right}
-                  </span>
-                </div>
-              </m.div>
-            );
-          })()}
+          {bridgeRevealed && (
+            <BridgeSolveReveal puzzle={puzzle} language={language} isCorrect={isCorrect} />
+          )}
         </AnimatePresence>
 
         <div className="flex flex-col gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -559,6 +440,7 @@ export default function PuzzleCard({
             )}
           </m.div>
         )}
+      </m.div>
       </m.div>
     </AnimatePresence>
   );
