@@ -15367,6 +15367,13 @@ const ja = {
   },
   "connections": {
     "daily": {
+      "tier": {
+        "perfect": "全問正解！",
+        "exceptional": "見事！",
+        "great": "すばらしい！",
+        "good": "いい調子！"
+      },
+      "exceptional": "文句なしの出来",
       "title": "デイリーチャレンジ",
       "complete": "デイリー完了！",
       "solved": "{count}/{total} 正解",

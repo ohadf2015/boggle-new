@@ -13386,6 +13386,13 @@ const en = {
   },
   "connections": {
     "daily": {
+      "tier": {
+        "perfect": "Perfect run!",
+        "exceptional": "Outstanding!",
+        "great": "Great work!",
+        "good": "Nice one!"
+      },
+      "exceptional": "Exceptional run",
       "title": "Daily Challenge",
       "complete": "Daily complete!",
       "solved": "{count}/{total} solved",

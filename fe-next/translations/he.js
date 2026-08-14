@@ -14809,6 +14809,13 @@ const he = {
   },
   "connections": {
     "daily": {
+      "tier": {
+        "perfect": "מושלם!",
+        "exceptional": "יוצא מן הכלל!",
+        "great": "עבודה מצוינת!",
+        "good": "יפה מאוד!"
+      },
+      "exceptional": "ריצה יוצאת דופן",
       "title": "אתגר יומי",
       "complete": "סיימתם את האתגר היומי!",
       "solved": "{count}/{total} נפתרו",

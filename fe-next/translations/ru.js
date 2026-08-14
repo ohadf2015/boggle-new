@@ -424,6 +424,13 @@ const ru = {
   },
   "connections": {
     "daily": {
+      "tier": {
+        "perfect": "Идеально!",
+        "exceptional": "Великолепно!",
+        "great": "Отличная работа!",
+        "good": "Хорошо!"
+      },
+      "exceptional": "Исключительный результат",
       "title": "Дневной вызов",
       "complete": "Дневной вызов завершен!",
       "solved": "{count}/{total} решено",

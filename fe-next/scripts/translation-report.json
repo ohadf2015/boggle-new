@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6188,
+    "totalKeysInCode": 6189,
     "keyCountByLanguage": {
-      "en": 11975,
-      "es": 12271,
-      "he": 12176,
-      "ja": 12230,
-      "ru": 12006,
-      "sv": 12226
+      "en": 11980,
+      "es": 12276,
+      "he": 12181,
+      "ja": 12235,
+      "ru": 12011,
+      "sv": 12231
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 326,
+      "templateLiterals": 325,
       "fallbackUsages": 1,
       "variableKeys": 121
     }
@@ -1122,21 +1122,14 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(outcomes)}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 271,
+        "line": 266,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),"
-      },
-      {
-        "pattern": "`connections.daily.medal.${medal}`",
-        "type": "template_literal",
-        "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 305,
-        "context": "{t(`connections.daily.medal.${medal}`)}"
       },
       {
         "pattern": "`connections.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/connections/PuzzleCard.tsx",
-        "line": 184,
+        "line": 188,
         "context": "{t(`connections.difficulty.${puzzle.difficulty}`)}"
       },
       {

@@ -260,6 +260,13 @@ const sv = {
       "onFire": "🔥 {streak} i rad — sluta inte!"
     },
     "daily": {
+      "tier": {
+        "perfect": "Felfritt!",
+        "exceptional": "Enastående!",
+        "great": "Snyggt jobbat!",
+        "good": "Bra jobbat!"
+      },
+      "exceptional": "Enastående runda",
       "title": "Dagens utmaning",
       "complete": "Dagens utmaning klar!",
       "solved": "{count}/{total} lösta",

@@ -15442,6 +15442,13 @@ const es = {
   },
   "connections": {
     "daily": {
+      "tier": {
+        "perfect": "¡Ronda perfecta!",
+        "exceptional": "¡Excepcional!",
+        "great": "¡Gran trabajo!",
+        "good": "¡Bien hecho!"
+      },
+      "exceptional": "Ronda excepcional",
       "title": "Desafío diario",
       "complete": "¡Desafío diario completado!",
       "solved": "{count}/{total} resueltos",
