@@ -14,10 +14,20 @@ interface BridgeChainProps {
 
 const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
 
+/**
+ * The entrance animates SCALE and POSITION but never starts from `opacity: 0`.
+ *
+ * `m` only animates once LazyMotion's `domMax` feature bundle has loaded; until
+ * then every element sits frozen on its `initial` values. An entrance that
+ * starts transparent therefore renders the puzzle — the whole point of the
+ * screen — as a blank area whenever that chunk is slow, blocked or failed, and
+ * the DOM looks perfectly correct while the player sees nothing. Animating
+ * transform only means the worst case is "it appeared without the flourish".
+ * Same reasoning as the mobile-flash rule in .claude/rules/60-recurring-pitfalls.md.
+ */
 const WORD_CHIP_VARIANTS = {
-  initial: { opacity: 0, scale: 0.75, y: 10 },
+  initial: { scale: 0.75, y: 10 },
   animate: (delay: number) => ({
-    opacity: 1,
     scale: 1,
     y: 0,
     transition: { type: 'spring' as const, stiffness: 300, damping: 20, delay },

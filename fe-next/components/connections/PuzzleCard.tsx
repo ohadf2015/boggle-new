@@ -149,8 +149,13 @@ export default function PuzzleCard({
     <AnimatePresence mode="wait">
       <m.div
         key={`entrance-${puzzle.id}`}
-        initial={reducedMotion ? false : { opacity: 0, y: 32, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        // Transform only — never `opacity: 0`. `m` stays frozen on `initial`
+        // until LazyMotion's feature bundle loads, so a transparent start renders
+        // the entire puzzle as a blank area whenever that chunk is slow or
+        // blocked. Animating position/scale degrades to "appeared without the
+        // flourish" instead of "the game is missing".
+        initial={reducedMotion ? false : { y: 32, scale: 0.96 }}
+        animate={{ y: 0, scale: 1 }}
         transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
       >
       <m.div
