@@ -260,7 +260,10 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    // No 16 here: the deployed optimizer answers `"w" parameter (width) of 16 is not allowed`
+    // (Next 16 dropped 16 from the allowed set), while the build still emitted w=16 into the
+    // srcset of every `sizes`-bearing image — a 400 on the homepage's daily mascot.
+    imageSizes: [32, 48, 64, 96, 128, 256, 384],
     // Cache optimized images for 1 year (avatars and static assets rarely change)
     // This dramatically improves P95 latency from 411ms to <50ms for repeat visits
     minimumCacheTTL: 31536000,
