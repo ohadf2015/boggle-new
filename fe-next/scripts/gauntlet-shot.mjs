@@ -23,13 +23,25 @@ await page.goto(`${base}/en/blast/v2`, { waitUntil: 'commit', timeout: 300000 })
 await page.waitForSelector('[data-testid="blast-board"], [data-testid="theme-label"]', { timeout: 300000 }).catch(() => {});
 await page.waitForTimeout(9000);
 
-// Cookie consent is a blocking modal on a fresh browser profile and would
-// otherwise be the only thing in every screenshot.
-// Cookie consent, then the app-install promo that appears behind it.
-for (const name of [/accept all/i, /not now/i, /got it/i]) {
-  const btn = page.getByRole('button', { name });
-  if (await btn.count()) { await btn.first().click().catch(() => {}); await page.waitForTimeout(1500); }
+// On a fresh browser profile the cookie banner and the app-install promo are
+// blocking modals, and the promo can appear AFTER the banner is dismissed — so
+// this runs before every capture, not once.
+async function dismissModals() {
+  for (let pass = 0; pass < 3; pass++) {
+    let clicked = false;
+    for (const name of [/accept all/i, /not now/i, /got it/i, /^close$/i]) {
+      const btn = page.getByRole('button', { name });
+      if (await btn.count()) {
+        await btn.first().click({ timeout: 4000 }).catch(() => {});
+        await page.waitForTimeout(1200);
+        clicked = true;
+      }
+    }
+    if (!clicked) break;
+  }
 }
+
+await dismissModals();
 await page.screenshot({ path: `${outDir}/${label}-1-intro.png` });
 
 // Click through any intro / FTUE / concept card to reach the board.
@@ -41,6 +53,7 @@ for (let i = 0; i < 6; i++) {
   await page.waitForTimeout(1400);
 }
 await page.waitForTimeout(2500);
+await dismissModals();
 await page.screenshot({ path: `${outDir}/${label}-2-board.png` });
 
 // Tight crop of just the board area if we can find it.

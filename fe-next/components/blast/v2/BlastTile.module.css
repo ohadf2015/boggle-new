@@ -129,17 +129,27 @@
   /* Neo-brutalist hard border: 3px solid, near-black */
   border: 3px solid #0b1530;
   border-radius: 10px;
-  /* Hard offset drop shadow (no blur) — neo-brutalist style */
-  box-shadow: 4px 4px 0 0 #0b1530;
-  /* Bevel/depth via inner highlights: top light + bottom shadow */
+  /* Depth + brand, without touching the letter's contrast.
+     The face stays light and the letter stays near-black because in Wordfall
+     the LETTER is the gameplay — unlike a colour-match game, tinting the face
+     would trade legibility for energy. So the brand colour rides the bevel
+     instead: a bright top highlight and a mode-tinted bottom lip give the tile
+     a moulded edge and put the level's colour on every tile, while the letter
+     keeps a full-contrast cream-on-navy read. */
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    inset 0 3px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -5px 0 color-mix(in srgb, var(--tile-mode-color, #ec4899) 42%, #a9a6b5),
+    inset 0 -7px 0 rgba(0, 0, 0, 0.12),
     4px 4px 0 0 #0b1530;
-  font-weight: 800;
+  font-weight: 900;
   font-size: calc(var(--blast-tile-size, 64px) * 0.45);
-  /* Warm off-white tile face in rest state */
-  background: #f4e9d8;
+  /* A pale wash of the level's colour over brand cream, not the old warm beige
+     (which read as a Scrabble tile). Held to 12% so the near-black letter keeps
+     roughly 14:1 contrast on every mode colour — the tile carries the theme,
+     the letter stays the most legible thing on screen. The lip below mixes the
+     mode colour over a COOL neutral: over the old warm beige, lime levels mixed
+     to olive. */
+  background: color-mix(in srgb, var(--tile-mode-color, #ec4899) 12%, #fffef0);
   color: #0b1530;
   user-select: none;
   touch-action: none;
@@ -150,10 +160,11 @@
 
 /* Selected state: electric accent color face + white letter */
 .tile[data-state="selected"] {
-  /* Deeper shadow in pressed state */
+  /* Lifts on selection: same moulded edge, deeper hard shadow. The bottom lip
+     goes dark here because the face is already the mode colour. */
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    inset 0 3px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.22),
     6px 6px 0 0 #0b1530;
   /* Accent color — modeColor prop tints it, pink default for Blast */
   background: var(--tile-mode-color, #ec4899);
