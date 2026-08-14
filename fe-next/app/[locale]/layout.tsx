@@ -369,7 +369,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 'https://www.lexiclash.live',
                 'https://www.instagram.com/lexi.clash',
                 'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-                'https://www.crazygames.com/game/lexiclash',
                 // TODO: Add TikTok and X/Twitter URLs here once accounts are created
             ],
             contactPoint: {
@@ -466,7 +465,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 { '@type': 'ListItem', position: 4, name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure`, description: 'Roguelike word-game adventure with bosses and loot.' },
                 { '@type': 'ListItem', position: 5, name: 'Blast', url: `https://www.lexiclash.live${localePath}/singleplayer`, description: 'Cascading combos and tile-clearing word puzzles.' },
                 { '@type': 'ListItem', position: 6, name: 'Single Player vs AI', url: `https://www.lexiclash.live${localePath}/singleplayer`, description: 'Solo practice against AI bots with adjustable difficulty.' },
-                { '@type': 'ListItem', position: 7, name: 'Brain Training Drills', url: `https://www.lexiclash.live${localePath}/brain-training`, description: 'Quick vocab and pattern drills, daily progression.' },
+                { '@type': 'ListItem', position: 7, name: 'Brain Training Drills', url: `https://www.lexiclash.live${localePath}/brain-training-word-games`, description: 'Quick vocab and pattern drills, daily progression.' },
                 { '@type': 'ListItem', position: 8, name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day`, description: 'Daily featured word with definition, etymology and example use.' },
             ],
         },
