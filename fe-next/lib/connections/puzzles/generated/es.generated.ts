@@ -7,6 +7,20 @@
 import type { ConnectionPuzzle } from '../../types';
 
 export const ES_PUZZLES: ConnectionPuzzle[] = [
+  { id: "es-aug2026-001", word1: "para", bridge: "rayos", word2: "solares", acceptedAnswers: ["rayos infrarrojos","rayos ultravioleta","rayos X"], hint: "Defensa contra truenos y iluminación del sol", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-002", word1: "rompe", bridge: "cabezas", word2: "duras", acceptedAnswers: ["cabezas rapadas","cabezas de turco","cabezas coronadas"], hint: "Juego mental y gente testarudísima", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-003", word1: "guarda", bridge: "ropa", word2: "vieja", acceptedAnswers: ["ropa blanca","ropa sucia","ropa mojada"], hint: "Tu colección de prendas y carne desmenuzada cubana", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-004", word1: "guarda", bridge: "bosque", word2: "tropical", hint: "Guardián forestal y selva de temperaturas altas", difficulty: "medium", source: "council-seed" },
+  { id: "es-aug2026-005", word1: "saca", bridge: "muelas", word2: "del juicio", hint: "Dentista de antaño y dientes que erupcionan en la adultez", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-006", word1: "salta", bridge: "montes", word2: "nevados", hint: "Insecto que salta y alturas heladas y blancas", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-007", word1: "mata", bridge: "ratas", word2: "de laboratorio", acceptedAnswers: ["ratas de alcantarilla","ratas de campo"], hint: "Pesticida y animales usados en investigación", difficulty: "medium", source: "council-seed" },
+  { id: "es-aug2026-008", word1: "corta", bridge: "plumas", word2: "de ave", acceptedAnswers: ["plumas estilográficas","plumas de ganso"], hint: "Navaja pequeña y apéndices aéreos del ave", difficulty: "medium", source: "council-seed" },
+  { id: "es-aug2026-009", word1: "toca", bridge: "discos", word2: "compactos", hint: "Máquina de música de vinilo y medio óptico de almacenamiento", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-010", word1: "guarda", bridge: "espalda", word2: "ancha", hint: "Agente de protección personal y constitución robusta", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-011", word1: "guarda", bridge: "costas", word2: "rocosas", hint: "Cuerpo de vigilancia marina y paisaje de acantilados", difficulty: "medium", source: "council-seed" },
+  { id: "es-aug2026-012", word1: "porta", bridge: "voz", word2: "de mando", acceptedAnswers: ["voz pasiva","voz activa"], hint: "Representante de comunicación y autoridad que ordena", difficulty: "easy", source: "council-seed" },
+  { id: "es-aug2026-013", word1: "guarda", bridge: "polvo", word2: "de talco", hint: "Protección contra suciedad y mineral cosmético", difficulty: "medium", source: "council-seed" },
+  { id: "es-aug2026-014", word1: "mete", bridge: "patas", word2: "de gato", hint: "Persona que se mete y apéndices del felino", difficulty: "medium", source: "council-seed" },
   { id: "es-e-001", word1: "pasa", bridge: "tiempo", word2: "libre", acceptedAnswers: ["tiempo"], hint: "Hobby o momento de ocio", examples: [{"w1":"Pasatiempo","w2":"tiempo libre","bridge":"tiempo"}], difficulty: "easy", source: "council-seed" },
   { id: "es-e-002", word1: "cumple", bridge: "años", word2: "luz", acceptedAnswers: ["años"], hint: "Unidades de tiempo y de distancia", examples: [{"w1":"Cumpleaños","w2":"años luz","bridge":"años"}], difficulty: "easy", source: "council-seed" },
   { id: "es-e-003", word1: "video", bridge: "juego", word2: "mesa", acceptedAnswers: ["juego"], hint: "Diversión digital o con tablero", examples: [{"w1":"Videojuego","w2":"juego de mesa","bridge":"juego"}], difficulty: "easy", source: "council-seed" },
