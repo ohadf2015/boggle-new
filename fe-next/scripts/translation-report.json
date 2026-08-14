@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6149,
+    "totalKeysInCode": 6188,
     "keyCountByLanguage": {
-      "en": 11928,
-      "es": 12224,
-      "he": 12129,
-      "ja": 12183,
-      "ru": 11959,
-      "sv": 12179
+      "en": 11975,
+      "es": 12271,
+      "he": 12176,
+      "ja": 12230,
+      "ru": 12006,
+      "sv": 12226
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 323,
+      "templateLiterals": 326,
       "fallbackUsages": 1,
       "variableKeys": 121
     }
@@ -100,7 +100,7 @@
         "pattern": "`sealedBid.outcome.${settlement.outcome}`",
         "type": "template_literal",
         "file": "app/[locale]/sealed-bid/page.tsx",
-        "line": 275,
+        "line": 278,
         "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
       },
       {
@@ -326,6 +326,20 @@
         "file": "components/admin/SchoolLeadsQueue.tsx",
         "line": 84,
         "context": "<div className=\"text-xs uppercase text-slate-400\">{t(`admin.schoolLeads.count.${k}`)}</div>"
+      },
+      {
+        "pattern": "`admin.teacherFunnel.stage.${r.stage}`",
+        "type": "template_literal",
+        "file": "components/admin/TeacherFunnelPanel.tsx",
+        "line": 140,
+        "context": "{t(`admin.teacherFunnel.stage.${r.stage}`)}"
+      },
+      {
+        "pattern": "`admin.teacherFunnel.trial.${r.trialState}`",
+        "type": "template_literal",
+        "file": "components/admin/TeacherFunnelPanel.tsx",
+        "line": 144,
+        "context": "{t(`admin.teacherFunnel.trial.${r.trialState}`)}"
       },
       {
         "pattern": "`admin.blocklist.duration.${d.key}`",
@@ -835,13 +849,13 @@
         "pattern": "`blast.combo.${detectedCombos[0].type}`",
         "type": "template_literal",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 249,
+        "line": 252,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU"
       },
       {
         "pattern": "blast.combo.${detectedCombos[0].type}",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 249,
+        "line": 252,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
         "type": "template_literal"
       },
@@ -856,42 +870,42 @@
         "pattern": "`blast.chest.tier.${tier}`",
         "type": "template_literal",
         "file": "components/blast/v2/BlastChestBadge.tsx",
-        "line": 145,
+        "line": 146,
         "context": "{t(`blast.chest.tier.${tier}`, tier.toUpperCase())}"
       },
       {
         "pattern": "`blast.themes.${theme}`",
         "type": "template_literal",
         "file": "components/blast/v2/BlastHud.tsx",
-        "line": 165,
+        "line": 207,
         "context": "<span className=\"truncate\">{t(`blast.themes.${theme}`, theme)}</span>"
       },
       {
         "pattern": "`blast.themes.${level.theme}`",
         "type": "template_literal",
         "file": "components/blast/v2/BlastLevelIntroCard.tsx",
-        "line": 64,
+        "line": 65,
         "context": "<span>{t(`blast.themes.${level.theme}`, level.theme)}</span>"
       },
       {
         "pattern": "`${modifierKey}.title`",
         "type": "template_literal",
         "file": "components/blast/v2/BlastLevelIntroCard.tsx",
-        "line": 89,
+        "line": 90,
         "context": "<span>{t(`${modifierKey}.title`, level.modifier)}</span>"
       },
       {
         "pattern": "`${modifierKey}.sub`",
         "type": "template_literal",
         "file": "components/blast/v2/BlastLevelIntroCard.tsx",
-        "line": 91,
+        "line": 92,
         "context": "<span className=\"font-bold\">{t(`${modifierKey}.sub`, '')}</span>"
       },
       {
         "pattern": "`blast.surprise.${meta.key}.title`",
         "type": "template_literal",
         "file": "components/blast/v2/BlastSurpriseBanner.tsx",
-        "line": 62,
+        "line": 65,
         "context": "{t(`blast.surprise.${meta.key}.title`, shown.event)}"
       },
       {
@@ -1108,14 +1122,14 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(outcomes)}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 261,
+        "line": 271,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),"
       },
       {
         "pattern": "`connections.daily.medal.${medal}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 295,
+        "line": 305,
         "context": "{t(`connections.daily.medal.${medal}`)}"
       },
       {
@@ -1185,7 +1199,7 @@
         "pattern": "`crossword.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/crossword/CrosswordView.tsx",
-        "line": 230,
+        "line": 246,
         "context": "difficultyLabel={t(`crossword.difficulty.${puzzle.difficulty}`)}"
       },
       {
@@ -1276,14 +1290,14 @@
         "pattern": "`brain.drills.rarity.${rarity}`",
         "type": "template_literal",
         "file": "components/drills/RareGems.tsx",
-        "line": 198,
-        "context": "setFeedback({ message: `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)"
+        "line": 206,
+        "context": ": `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)})`,"
       },
       {
         "pattern": "`brain.drills.rarity.${rarity}`",
         "type": "template_literal",
         "file": "components/drills/RareGems.tsx",
-        "line": 318,
+        "line": 328,
         "context": "{t(`brain.drills.rarity.${rarity}`)} (+{GEM_POINTS[rarity as keyof typeof GEM_POINTS]})"
       },
       {
@@ -1875,6 +1889,13 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`sealedBid.outcomeEmoji.${r.outcome}`",
+        "type": "template_literal",
+        "file": "components/sealedBid/SealedBidSessionSummary.tsx",
+        "line": 129,
+        "context": "{t(`sealedBid.outcomeEmoji.${r.outcome}`)}"
+      },
+      {
         "pattern": "`rank.tier.${tier}`",
         "type": "template_literal",
         "file": "components/seasons/RankTierChip.tsx",
@@ -2095,7 +2116,7 @@
         "pattern": "`wordTower.error.${lastError}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerHud.tsx",
-        "line": 260,
+        "line": 164,
         "context": "{t(`wordTower.error.${lastError}`)}"
       },
       {
@@ -2123,14 +2144,14 @@
         "pattern": "`wordTower.biome.${biomeId}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 368,
+        "line": 373,
         "context": "setZoneText(t(`wordTower.biome.${biomeId}`));"
       },
       {
         "pattern": "`wordTower.hazard.${hz.kind}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 796,
+        "line": 808,
         "context": "setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }))"
       },
       {
@@ -2235,7 +2256,7 @@
         "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
         "type": "template_literal",
         "file": "host/components/HostPreGameView.tsx",
-        "line": 619,
+        "line": 652,
         "context": "{t(`joinView.${"
       },
       {
@@ -2986,7 +3007,7 @@
         "variable": "hintKey",
         "type": "variable_key",
         "file": "components/sealedBid/SealedBidTable.tsx",
-        "line": 141,
+        "line": 147,
         "context": "{t(hintKey)}"
       },
       {
@@ -2994,14 +3015,14 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/seasons/SeasonLeaderboardTabs.tsx",
-        "line": 65,
+        "line": 74,
         "context": "{t(labelKey)}"
       },
       {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "file": "components/seasons/SeasonLeaderboardTabs.tsx",
-        "line": 65,
+        "line": 74,
         "context": "{t(labelKey)}",
         "type": "variable_key"
       },
@@ -3286,7 +3307,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 84
+          "line": 85
         }
       ]
     },
@@ -3295,7 +3316,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 83
+          "line": 84
         }
       ]
     },
@@ -3304,7 +3325,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 88
+          "line": 89
         }
       ]
     },
@@ -3313,7 +3334,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 80
+          "line": 81
         }
       ]
     },
@@ -3322,7 +3343,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 81
+          "line": 82
         }
       ]
     },
@@ -3331,7 +3352,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 86
+          "line": 87
         }
       ]
     },
@@ -3340,7 +3361,7 @@
       "usages": [
         {
           "file": "components/blast/v2/BlastLevelCompleteCard.tsx",
-          "line": 82
+          "line": 83
         }
       ]
     },

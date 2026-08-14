@@ -19,6 +19,7 @@ import {
 } from '../../backend/dictionaryLoaders';
 import { buildGrid } from '../../lib/crossword/grid';
 import { buildDictIndex, fillGrid, type FillTemplate } from '../../lib/crossword/generate.core';
+import { isRealCrossword } from '../../lib/crossword/templates';
 import { getClue, clueScore } from '../../lib/crossword/clueBank';
 import clueBankJson from '../../lib/crossword/data/clueBank.en.json';
 import { writeFileSync } from 'node:fs';
@@ -50,36 +51,6 @@ function mulberry32(seed: number): () => number {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-// Quality gates — the "is a real crossword" spec, enforced before a grid is accepted.
-function isRealCrossword(grid: (string | null)[][], rtl: boolean): boolean {
-  const hasBlock = grid.some((row) => row.some((c) => c === null));
-  if (!hasBlock) return false;
-
-  const { slots } = buildGrid({ rtl, solution: grid });
-  const across = slots.filter((s) => s.dir === 'across');
-  const down = slots.filter((s) => s.dir === 'down');
-  if (!across.length || !down.length) return false;
-
-  const downWords = new Set(down.map((s) => s.answer));
-  if (across.some((s) => downWords.has(s.answer))) return false; // kills word squares
-
-  const lengths = new Set(slots.map((s) => s.length));
-  if (lengths.size < 2) return false; // varied lengths
-
-  const inAcross = new Set<string>();
-  const inDown = new Set<string>();
-  for (const s of across) for (const c of s.cells) inAcross.add(`${c.row},${c.col}`);
-  for (const s of down) for (const c of s.cells) inDown.add(`${c.row},${c.col}`);
-  for (let r = 0; r < grid.length; r++) {
-    for (let c = 0; c < grid.length; c++) {
-      if (grid[r][c] === null) continue;
-      const k = `${r},${c}`;
-      if (!inAcross.has(k) || !inDown.has(k)) return false; // every white cell doubly-checked
-    }
-  }
-  return true;
 }
 
 interface SeedPuzzle {

@@ -36,6 +36,25 @@ const seedHe: SeedPuzzle = {
   clues: { איש: 'a', יומ: 'b', שמש: 'c' },
 };
 
+/**
+ * A newspaper-scale board. Only its DIMENSION matters here — the pan/zoom affordances key off
+ * grid size, not the fill — so the letters are filler rather than a real puzzle.
+ */
+function buildBigPuzzle() {
+  const N = 11;
+  const grid = Array.from({ length: N }, (_, r) =>
+    Array.from({ length: N }, (_, c) => String.fromCharCode(97 + ((r + c) % 26))),
+  );
+  return buildSeedPuzzle({
+    id: 'grid-big',
+    locale: 'en',
+    difficulty: 'medium',
+    rtl: false,
+    grid,
+    clues: {},
+  });
+}
+
 describe('CrosswordGrid', () => {
   it('renders one gridcell per fillable cell and selects on click', () => {
     const puzzle = buildSeedPuzzle(seedEn);
@@ -57,18 +76,64 @@ describe('CrosswordGrid', () => {
     expect(active.textContent).toContain('b');
   });
 
-  it('colours the grid drop-shadow by difficulty (easy lime · hard pink)', () => {
+  // The shadow lives on the clip box, not the transformed layer: inside the box it would be
+  // cut off by overflow-hidden and would grow with the zoom scale.
+  it('colours the board drop-shadow by difficulty (easy lime · hard pink)', () => {
     const easy = buildSeedPuzzle(seedEn); // seedEn is easy
     const { container: easyC } = render(
       <CrosswordGrid state={initGame(easy)} onSelect={() => {}} t={t} />,
     );
-    expect(easyC.querySelector('[role="grid"]')?.className).toContain('shadow-hard-lime');
+    expect(easyC.querySelector('[data-crossword-board]')?.className).toContain('shadow-hard-lime');
 
     const hard = buildSeedPuzzle({ ...seedEn, id: 'grid-hard', difficulty: 'hard' });
     const { container: hardC } = render(
       <CrosswordGrid state={initGame(hard)} onSelect={() => {}} t={t} />,
     );
-    expect(hardC.querySelector('[role="grid"]')?.className).toContain('shadow-hard-pink');
+    expect(hardC.querySelector('[data-crossword-board]')?.className).toContain('shadow-hard-pink');
+  });
+
+  it('leaves a mini un-pannable so a fitted board cannot be dragged off-centre', () => {
+    const puzzle = buildSeedPuzzle(seedEn); // 4×4 — always fits
+    const { container } = render(
+      <CrosswordGrid state={initGame(puzzle)} onSelect={() => {}} t={t} />,
+    );
+    const board = container.querySelector('[data-crossword-board]');
+    expect(board?.getAttribute('data-pannable')).toBe('false');
+    // and no zoom chrome to clutter a board that never needs it
+    expect(container.querySelector('[aria-label="crossword.zoomIn"]')).toBeNull();
+  });
+
+  it('opens a newspaper-size board zoomed, pannable, with zoom controls', () => {
+    const { container } = render(
+      <CrosswordGrid state={initGame(buildBigPuzzle())} onSelect={() => {}} t={t} />,
+    );
+    const board = container.querySelector('[data-crossword-board]');
+    expect(board?.getAttribute('data-pannable')).toBe('true');
+    expect(container.querySelector('[aria-label="crossword.zoomIn"]')).not.toBeNull();
+  });
+
+  it('does not select a cell when the press was a drag', () => {
+    const onSelect = vi.fn();
+    const { container } = render(
+      <CrosswordGrid state={initGame(buildBigPuzzle())} onSelect={onSelect} t={t} />,
+    );
+    const board = container.querySelector('[data-crossword-board]') as HTMLElement;
+    // jsdom has no layout, so give the box a width for the pan math to work against.
+    Object.defineProperty(board, 'clientWidth', { value: 350, configurable: true });
+    board.getBoundingClientRect = () => ({ left: 0, top: 0, width: 350, height: 350 }) as DOMRect;
+
+    const cell = screen.getAllByRole('gridcell')[0];
+    fireEvent.pointerDown(board, { pointerId: 1, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(board, { pointerId: 1, clientX: 160, clientY: 140 });
+    fireEvent.pointerUp(board, { pointerId: 1, clientX: 160, clientY: 140 });
+    fireEvent.click(cell);
+    expect(onSelect).not.toHaveBeenCalled();
+
+    // a press that barely moves is still a tap
+    fireEvent.pointerDown(board, { pointerId: 2, clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(board, { pointerId: 2, clientX: 101, clientY: 100 });
+    fireEvent.click(cell);
+    expect(onSelect).toHaveBeenCalledTimes(1);
   });
 
   it('renders a Hebrew grid in RTL with final-form letter at word end', () => {

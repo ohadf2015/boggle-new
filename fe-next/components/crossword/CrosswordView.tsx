@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer } from 'lucide-react';
+import { CheckCheck, Eye, List, RotateCcw, Lightbulb, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
-import { crosswordStats } from '@/lib/crossword/stats';
+import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
+import { isNewspaperScale, type CrosswordFormat } from '@/lib/crossword/format';
 import type { CrosswordPuzzle, Difficulty, Slot } from '@/lib/crossword/types';
 import { ClueScramble } from './ClueScramble';
 import { CrosswordGrid } from './CrosswordGrid';
@@ -15,6 +16,7 @@ import { CrosswordKeyboard } from './CrosswordKeyboard';
 import { CrosswordMasthead } from './CrosswordMasthead';
 import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CrosswordFx } from './CrosswordFx';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
@@ -45,6 +47,10 @@ export interface CrosswordViewProps {
   onNewPuzzle?: (difficulty?: Difficulty) => void;
   /** Fired once when the daily is solved, so the host can persist the streak. */
   onDailySolved?: () => void;
+  /** Which board size is being solved. */
+  format?: CrosswordFormat;
+  /** Omitted where the locale's clue bank can't fill a full-size grid — then no toggle renders. */
+  onFormatChange?: (format: CrosswordFormat) => void;
 }
 
 export function CrosswordView({
@@ -54,6 +60,8 @@ export function CrosswordView({
   isDaily = false,
   onNewPuzzle,
   onDailySolved,
+  format = 'mini',
+  onFormatChange,
 }: CrosswordViewProps) {
   const { t, language, dir } = useLanguage();
   const reduced = useReducedMotion();
@@ -100,23 +108,31 @@ export function CrosswordView({
   const solved = state.status === 'solved';
   const overlayRef = useRef<HTMLDivElement>(null);
   const stats = useMemo(() => crosswordStats(state), [state]);
+  const solvedIds = useMemo(() => solvedSlotIds(state), [state]);
   const hintsUsed = state.revealed.length;
 
   // Clue Scramble: show a 10s mini-overlay on first clue selection per slot.
   const [pendingSlot, setPendingSlot] = useState<Slot | null>(null);
   const [clueStreak, setClueStreak] = useState(0);
+  const [cluesOpen, setCluesOpen] = useState(false);
+  // A mini's clues are all reachable from the clue bar's prev/next and swipe. A newspaper grid
+  // has 40+, where stepping one at a time is not navigation — those need a jumpable list.
+  const manyClues = isNewspaperScale(puzzle.slots.length);
   const scrambleAttempted = useRef(new Set<string>());
 
   const handleClueSelect = useCallback(
     (slot: Slot) => {
-      if (solved || scrambleAttempted.current.has(slot.id)) {
+      // The Scramble is a once-per-slot flourish that reads well across a mini's ten clues. On a
+      // newspaper grid it would fire 40+ times — minutes of forced mini-games standing between the
+      // player and the puzzle they opened — so a full-size board skips straight to the slot.
+      if (solved || manyClues || scrambleAttempted.current.has(slot.id)) {
         focusSlot(slot.id);
       } else {
         scrambleAttempted.current.add(slot.id);
         setPendingSlot(slot);
       }
     },
-    [solved, focusSlot],
+    [solved, manyClues, focusSlot],
   );
 
   const handleScrambleResult = useCallback(
@@ -232,6 +248,30 @@ export function CrosswordView({
         streakLabel={t('crossword.streakLabel', { count: streak })}
       />
 
+      {/* Mini ↔ Full. Each size keeps its own daily and its own saved progress, so switching is
+          a change of puzzle, never a loss of one. */}
+      {onFormatChange && (
+        <div
+          className="shrink-0 mt-2 flex items-center justify-center gap-1"
+          role="group"
+          aria-label={t('crossword.formatLabel')}
+        >
+          {(['mini', 'full'] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => onFormatChange(f)}
+              aria-pressed={format === f}
+              className={`font-neo-display font-bold text-xs px-3 py-1 border-neo border-black rounded-neo shadow-hard-sm active:translate-y-[1px] active:shadow-hard-pressed ${
+                format === f ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-navy-light text-neo-white'
+              }`}
+            >
+              {t(`crossword.format.${f}`)}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Slim stat bar: words solved + timer + the live fill bar (fills with CORRECT letters,
           so it only completes at a true solve). */}
       <div className="shrink-0 mt-2 flex items-center gap-3 bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-3 py-1.5">
@@ -291,12 +331,24 @@ export function CrosswordView({
             />
           </div>
 
-          {/* Toolbar — a fixed 4-up row on mobile so it can never wrap to a second
-              band and push the board off screen. */}
-          <div className="shrink-0 mx-auto grid w-full max-w-[28rem] grid-cols-4 gap-1.5 lg:mt-3 lg:flex lg:justify-center lg:gap-2">
+          {/* Toolbar — a fixed row on mobile so it can never wrap to a second band and push
+              the board off screen. The clue-list button only appears on a newspaper-size grid;
+              a mini's ten clues are covered by the clue bar's prev/next and swipe. */}
+          <div
+            className={`shrink-0 mx-auto grid w-full max-w-[28rem] gap-1.5 lg:mt-3 lg:flex lg:justify-center lg:gap-2 ${
+              manyClues ? 'grid-cols-5' : 'grid-cols-4'
+            }`}
+          >
             <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
             <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
             <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
+            {manyClues && (
+              <ToolButton
+                onClick={() => setCluesOpen(true)}
+                icon={<List size={16} />}
+                label={t('crossword.allClues')}
+              />
+            )}
             <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
           </div>
 
@@ -337,6 +389,28 @@ export function CrosswordView({
           />
         </aside>
       </div>
+
+      {/* Mobile "All clues" sheet. The desktop rail already does this job, so this exists only
+          for phones — where a 40-clue grid is otherwise navigable one step at a time.
+          bg-neo-navy is hardcoded rather than the cream/navy pair: this is a dark-only game
+          surface, and the pair flashes cream before the dark class resolves on a lazy mount. */}
+      <Dialog open={cluesOpen} onOpenChange={setCluesOpen}>
+        <DialogContent className="max-h-[85dvh] overflow-y-auto bg-neo-navy text-neo-white">
+          <DialogHeader>
+            <DialogTitle>{t('crossword.allClues')}</DialogTitle>
+          </DialogHeader>
+          <CrosswordClueList
+            slots={puzzle.slots}
+            activeSlotId={activeSlot?.id ?? null}
+            onSelect={(slot) => {
+              setCluesOpen(false);
+              handleClueSelect(slot);
+            }}
+            t={t}
+            capturedSlotIds={solvedIds}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Clue Scramble overlay — shown once per slot, before focusing it */}
       {pendingSlot && (

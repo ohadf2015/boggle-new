@@ -186,6 +186,10 @@ const sv = {
     "tagline": "Fyll i rutnätet, en ledtråd i taget",
     "title": "Korsord",
     "timer": "Tid",
+    "formatLabel": "Korsordsstorlek",
+    "format": { "mini": "Mini", "full": "Fullstor" },
+    "zoomIn": "Zooma in",
+    "zoomOut": "Zooma ut",
     "gridLabel": "Korsordsrutnät",
     "cellLabel": "Rad {row}, kolumn {col}",
     "dir": {
@@ -11775,6 +11779,9 @@ const sv = {
       "retry": "Försök igen",
       "home": "Hem",
       "progressSafe": "Dina framsteg är sparade — nivå {n}"
+    },
+    "progress": {
+      "aria": "{found} av {total} ord hittade"
     },
     "strikes": {
       "label": "Gissningar",

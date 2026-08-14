@@ -102,6 +102,10 @@ const he = {
     "tagline": "מלאו את הלוח, רמז אחר רמז",
     "title": "תשבץ",
     "timer": "זמן",
+    "formatLabel": "גודל התשבץ",
+    "format": { "mini": "מיני", "full": "מלא" },
+    "zoomIn": "הגדלה",
+    "zoomOut": "הקטנה",
     "gridLabel": "לוח תשבץ",
     "cellLabel": "שורה {row}, עמודה {col}",
     "dir": {
@@ -11403,6 +11407,9 @@ const he = {
       "retry": "נסו שוב",
       "home": "בית",
       "progressSafe": "ההתקדמות נשמרה — שלב {n}"
+    },
+    "progress": {
+      "aria": "נמצאו {found} מתוך {total} מילים"
     },
     "strikes": {
       "label": "ניחושים",

@@ -83,6 +83,10 @@ const en = {
     "tagline": "Fill the grid, one clue at a time",
     "title": "Crossword",
     "timer": "Time",
+    "formatLabel": "Puzzle size",
+    "format": { "mini": "Mini", "full": "Full" },
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
     "gridLabel": "Crossword grid",
     "cellLabel": "Row {row}, column {col}",
     "dir": { "across": "Across", "down": "Down" },
@@ -10125,6 +10129,9 @@ const en = {
       "retry": "Try Again",
       "home": "Home",
       "progressSafe": "Your progress is safe — level {n}"
+    },
+    "progress": {
+      "aria": "{found} of {total} words found"
     },
     "strikes": {
       "label": "Guesses",

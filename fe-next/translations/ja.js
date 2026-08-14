@@ -102,6 +102,10 @@ const ja = {
     "tagline": "ヒントを頼りにマスを埋めよう",
     "title": "クロスワード",
     "timer": "タイム",
+    "formatLabel": "パズルのサイズ",
+    "format": { "mini": "ミニ", "full": "フル" },
+    "zoomIn": "拡大",
+    "zoomOut": "縮小",
     "gridLabel": "クロスワードの盤面",
     "cellLabel": "{row}行 {col}列",
     "dir": {
@@ -11547,6 +11551,9 @@ const ja = {
       "retry": "もう一度",
       "home": "ホーム",
       "progressSafe": "進行状況は保存されています — レベル {n}"
+    },
+    "progress": {
+      "aria": "{total}語中{found}語を発見"
     },
     "strikes": {
       "label": "チャンス",
