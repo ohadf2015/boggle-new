@@ -236,6 +236,9 @@ export type GrowthEvent =
   | 'mp_quickplay_socket_wait'
   | 'mp_quickplay_seeking'
   | 'mp_quickplay_joined'
+  // mp_quickplay_rapid_click — Quick Play tapped again while a join was
+  // already in flight (control-arm rage-click signature on /multiplayer).
+  | 'mp_quickplay_rapid_click'
   // Word Hunt results page instrumentation — surfaces rage-click source.
   // wordhunt_results_loaded: fires on mount, tagged with solved + hint_variant
   //   (exp-wordhunt-hint-v1) so PostHog can split rage clicks by variant.

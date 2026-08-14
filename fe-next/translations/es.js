@@ -7105,7 +7105,6 @@ const es = {
     "clear": "Borrar",
     "shuffle": "Mezclar",
     "removeLetter": "Quitar letra",
-    "stealLabel": "ROBAR",
     "foundWords": "Palabras encontradas",
     "possibleWords": "Posibles",
     "excellent": "¡Excelente!",
@@ -8196,6 +8195,7 @@ const es = {
         "unlock": "Desbloquear 3 pistas",
         "loading": "Cargando anuncio…"
       },
+      "luckyGemBonus": "¡Gema de la suerte!",
       "lightning-round": {
         "name": "Ronda Relámpago",
         "description": "Encuentra palabras lo más rápido posible",

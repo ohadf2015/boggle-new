@@ -6,6 +6,9 @@ import {
   isRareGem,
   computeGemProgress,
   celebrationFor,
+  rollLuckyGem,
+  LUCKY_GEM_CHANCE,
+  LUCKY_GEM_MULTIPLIER,
 } from '../rareGems';
 
 describe('classifyGem — length → gem tier (transparent rule)', () => {
@@ -99,5 +102,19 @@ describe('celebrationFor — escalating juice by tier', () => {
     expect(celebrationFor('uncommon')).toBe('medium');
     expect(celebrationFor('rare')).toBe('big');
     expect(celebrationFor('legendary')).toBe('epic');
+  });
+});
+
+describe('rollLuckyGem — variable-reward surprise, independent of tier', () => {
+  it('rolls true when rng lands below the chance threshold', () => {
+    expect(rollLuckyGem(() => 0)).toBe(true);
+    expect(rollLuckyGem(() => LUCKY_GEM_CHANCE - 0.001)).toBe(true);
+  });
+  it('rolls false at/above the chance threshold', () => {
+    expect(rollLuckyGem(() => LUCKY_GEM_CHANCE)).toBe(false);
+    expect(rollLuckyGem(() => 0.99)).toBe(false);
+  });
+  it('multiplier doubles the base gem value', () => {
+    expect(LUCKY_GEM_MULTIPLIER).toBe(2);
   });
 });

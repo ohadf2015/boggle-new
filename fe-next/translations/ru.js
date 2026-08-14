@@ -10276,6 +10276,7 @@ const ru = {
         "rare": "редкое",
         "legendary": "легендарное"
       },
+      "luckyGemBonus": "Счастливый самоцвет!",
       "lightning-round": {
         "name": "Молниеносный Раунд",
         "description": "Найдите слова как можно быстрее",
@@ -10798,7 +10799,6 @@ const ru = {
     "clear": "Очистить",
     "shuffle": "Перемешать",
     "removeLetter": "Удалить букву",
-    "stealLabel": "КРАЖА",
     "foundWords": "Найденные Слова",
     "possibleWords": "Возможные",
     "excellent": "Отлично!",

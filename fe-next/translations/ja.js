@@ -7142,7 +7142,6 @@ const ja = {
     "clear": "クリア",
     "shuffle": "シャッフル",
     "removeLetter": "1文字削除",
-    "stealLabel": "スチール",
     "foundWords": "見つかった単語",
     "possibleWords": "可能",
     "excellent": "素晴らしい！",
@@ -8237,6 +8236,7 @@ const ja = {
         "unlock": "ヒントを3つ解放",
         "loading": "広告を読み込み中…"
       },
+      "luckyGemBonus": "ラッキー宝石！",
       "lightning-round": {
         "name": "ライトニングラウンド",
         "description": "できるだけ速く単語を見つけろ",

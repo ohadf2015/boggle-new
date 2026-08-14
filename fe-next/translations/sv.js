@@ -7371,7 +7371,6 @@ const sv = {
     "clear": "Rensa",
     "shuffle": "Blanda",
     "removeLetter": "Ta bort bokstav",
-    "stealLabel": "STJÄL",
     "foundWords": "Hittade ord",
     "possibleWords": "Möjliga",
     "excellent": "Utmärkt!",
@@ -8467,6 +8466,7 @@ const sv = {
         "unlock": "Lås upp 3 ledtrådar",
         "loading": "Laddar annons…"
       },
+      "luckyGemBonus": "Turgemma!",
       "lightning-round": {
         "name": "Blixtrundan",
         "description": "Hitta ord så snabbt som möjligt",

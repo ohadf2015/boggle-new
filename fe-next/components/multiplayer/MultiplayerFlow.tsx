@@ -353,6 +353,14 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Handle quick play - dual mode with sensible defaults
   const handleQuickPlay = useCallback(() => {
+    // Re-entrancy guard: control-arm users (no eager-disable) see no visual
+    // feedback until `isJoining` flips, so repeat taps re-ran this whole
+    // handler — new room code, new handleJoin call — each tap (rage-click
+    // driver on /multiplayer, PostHog rageclicks_24h). No-op + track instead.
+    if (isJoining || isQuickPlayPending) {
+      trackGrowthEvent('mp_quickplay_rapid_click', {});
+      return;
+    }
     // Get or generate username for quick play. Routed through the shared helper
     // so a guest keeps ONE identity across the create modal, the join modal, the
     // emit chokepoint and here — the inline `Player###` this replaced was never
@@ -408,7 +416,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // so inviting friends to join is a valid affordance.
     cgShowInvite(gameCode);
 
-  }, [isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite, eagerDisableVariant, clearQuickPlayPendingTimeout]);
+  }, [isJoining, isQuickPlayPending, isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite, eagerDisableVariant, clearQuickPlayPendingTimeout]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import LeaderboardPageClient from './PageClientNoSsr';
 
 export const revalidate = 300;
@@ -152,8 +153,18 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
   return (
     <>
       <LeaderboardPageClient />
-      {/* GamePageSeoContent is rendered by leaderboard/layout.tsx — rendering it
-          here too would duplicate the (now visible) content block on the page. */}
+      {/* PageClient (the h1 + live rankings) is ssr:false — Googlebot's initial
+          HTML otherwise has zero page content. This renders the same authored
+          title/description/features/faq visibly so the SSR response isn't just
+          nav+footer chrome. Collapsible: players came to see rankings, not read
+          copy (matches /daily, /multiplayer pattern). */}
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+        collapsible
+      />
       <script type="application/ld+json">{encodeJsonLd(breadcrumbJsonLd)}</script>
       {faqJsonLd && (
         <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>

@@ -7063,7 +7063,6 @@ const he = {
     "clear": "נקה",
     "shuffle": "ערבב",
     "removeLetter": "מחק אות",
-    "stealLabel": "גנוב!",
     "foundWords": "מילים שנמצאו",
     "possibleWords": "אפשרי",
     "excellent": "מצוין!",
@@ -8112,6 +8111,7 @@ const he = {
         "unlock": "פתחו 3 רמזים",
         "loading": "טוען פרסומת…"
       },
+      "luckyGemBonus": "אבן חן בת מזל!",
       "lightning-round": {
         "name": "סיבוב ברק",
         "description": "מצא מילים הכי מהר שאפשר",

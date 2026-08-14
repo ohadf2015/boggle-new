@@ -31,6 +31,8 @@ import {
   classifyGem,
   gemValue,
   GEM_POINTS,
+  rollLuckyGem,
+  LUCKY_GEM_MULTIPLIER,
   celebrationFor,
   computeGemProgress,
   type CelebrationLevel,
@@ -182,8 +184,11 @@ export default function RareGems({
 
     // Valid word — mine a gem! Tier + points come from the pure lib.
     const rarity = classifyGem(word);
-    const points = gemValue(rarity);
-    const celebration = celebrationFor(rarity);
+    const isLucky = rollLuckyGem();
+    const points = isLucky ? gemValue(rarity) * LUCKY_GEM_MULTIPLIER : gemValue(rarity);
+    // Lucky finds always get the epic pop/sparkle, regardless of tier — the
+    // swatch colour still reflects the real (unboosted) rarity.
+    const celebration = isLucky ? 'epic' : celebrationFor(rarity);
 
     // Escalating find ceremony: bigger gem → louder, richer feedback.
     switch (celebration) {
@@ -195,7 +200,12 @@ export default function RareGems({
     setWordsFound(prev => [...prev, { word: upperWord, rarity }]);
     setScore(prev => prev + points);
     setLastWord({ word: upperWord, rarity, points, celebration });
-    setFeedback({ message: `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)})`, type: 'success' });
+    setFeedback({
+      message: isLucky
+        ? `✨ ${t('brain.drills.luckyGemBonus')} +${points} ${t('brain.drills.points')}`
+        : `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)})`,
+      type: 'success',
+    });
     setTimeout(() => {
       setLastWord(null);
       setFeedback(null);

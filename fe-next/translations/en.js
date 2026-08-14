@@ -6525,7 +6525,6 @@ const en = {
     "clear": "Clear",
     "shuffle": "Shuffle",
     "removeLetter": "Remove letter",
-    "stealLabel": "STEAL",
     "foundWords": "Found Words",
     "possibleWords": "Possible",
     "excellent": "Excellent!",
@@ -7649,6 +7648,7 @@ const en = {
         "rare": "rare",
         "legendary": "legendary"
       },
+      "luckyGemBonus": "Lucky Gem!",
       "lightning-round": {
         "name": "Lightning Round",
         "description": "Find words as fast as possible",

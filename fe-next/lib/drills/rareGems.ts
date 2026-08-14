@@ -75,3 +75,16 @@ const CELEBRATION: Record<GemTier, CelebrationLevel> = {
 export function celebrationFor(tier: GemTier): CelebrationLevel {
   return CELEBRATION[tier];
 }
+
+/**
+ * Lucky Gem — a variable-reward surprise layered ON TOP of the transparent
+ * length→tier rule (never replaces it): any gem, regardless of tier, has a
+ * flat chance to double its points. Keeps the tier rule honest/predictable
+ * while adding the near-miss/jackpot tension the length rule alone can't.
+ */
+export const LUCKY_GEM_CHANCE = 0.12;
+export const LUCKY_GEM_MULTIPLIER = 2;
+
+export function rollLuckyGem(rng: () => number = Math.random): boolean {
+  return rng() < LUCKY_GEM_CHANCE;
+}
