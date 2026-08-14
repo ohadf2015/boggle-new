@@ -11,9 +11,11 @@
 
 ## Current (in progress)
 
-### wheel-rush — readiness: 68% — status: IN PROGRESS
+### wheel-rush — readiness: 70% — status: IN PROGRESS
 - **Why next:** promoted from Queue #1 2026-08-02 after sealed-bid reached 90%. Canonical MP mode — no prior audit session.
-- **Last audited:** 2026-08-13.
+- **Last audited:** 2026-08-14.
+- **Covered + FIXED (2026-08-14):** per the 08-13 learnings note ("2 consecutive identical verdicts should escalate the blocker, not buy another night of code audit"), did NOT re-audit clean code paths. Re-verified the carried MINOR item "`resetGameForNewRound` never nulls `wheelRushState`" — **already fixed** (`gameStateManager.ts:361`, same as 08-13's finding #1 for a different key — ledger note was stale, closed, no action needed). Instead found a REAL leftover: the 08-08/08-09 dead steal/lock-mechanic cleanup removed `wordWheel.stealGain`/`yourWordStolen` from all 6 locales but missed a third orphaned key, `wordWheel.stealLabel` ("STEAL"/"גנוב!"/"スチール"/etc) — confirmed zero code references anywhere in the repo (`rg stealLabel` outside `translations/` → empty). **Fixed**: removed `stealLabel` from all 6 locale files (en/he/ja/sv/es/ru); verified all 6 still `require()` cleanly after edit. Closes the last orphaned string from that dead mechanic.
+- Visual QA still not attempted this run (budget went to the translation audit + fix instead) — code-audit only.
 - **Covered (2026-08-13):** re-checked 3 carried "still open" items from 08-09, closed all 3 (no fix needed — audit-only night):
   1. `resetGameForNewRound` not nulling `wheelRushState` between rounds (MINOR) — **already fixed**: `gameStateManager.ts:361` has `game.wheelRushState = null;`, landed via the 08-03/08-04/08-06 nightly stranded-code restore (`d6deb3f7f`). Ledger was stale — closed.
   2. Disconnect/refresh-mid-round reconnect path (Class 3 risk, never actually traced before) — read `wheelRushHandler.ts:111-134` (`handleRequestWheelRushState`) + `WheelRushView.tsx:350-361` (emits `requestWheelRushState` on mount AND on socket `'connect'`) + `SocketContext.tsx:258-283` (`handleConnect` re-emits `join` first, rebuilding the socket→game map, before any per-mode `'connect'` listener registered later in a child component fires). Same dual-layer shape as the RELEASED shiritori/sealed-bid modes (ledger 2026-08-01 note) — listener registration order means `join` always reaches the server before `requestWheelRushState`. Verified clean by direct read, not just pattern-matched.

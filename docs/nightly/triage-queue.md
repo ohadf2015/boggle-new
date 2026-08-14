@@ -4,6 +4,13 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-08-14
+
+### [Rage-click root cause found + fixed] `/multiplayer` — Quick Play re-entrancy
+- Supersedes the 2026-08-01 entry below (same surface, was queued for a HogQL query — root cause found by code read instead). `handleQuickPlay` in `components/multiplayer/MultiplayerFlow.tsx` had no re-entrancy guard: control-arm users of `exp-mp-quickplay-eager-disable-v1` (no eager visual disable) get zero feedback until `isJoining` flips, so each repeat tap re-ran the whole handler — new room code, new `handleJoin` call. Fixed: early-return + `mp_quickplay_rapid_click` tracking when `isJoining || isQuickPlayPending`. Does not touch the eager-disable experiment's treatment logic (guard applies identically to both arms) so it should not bias that experiment's read.
+- Flag hygiene sweep: `exp-mp-quickplay-eager-disable-v1` created 2026-07-29 (16 days), wired in this same file — cannot confirm p<0.05/n≥1000/arm without an expensive PostHog experiment-results query (out of scope for lane time budget). Recommended owner: human — check PostHog experiment results for this key; if `eager-disable` wins, delete `control` branch + flag.
+- Watch: `mp_quickplay_rapid_click` volume next 3 nights — if near-zero after this fix, the rage-click metric on `/multiplayer` should also drop; if still nonzero, the rage-click source is elsewhere on the page (room-list join taps, not Quick Play).
+
 ## 2026-08-01
 
 ### [Flag Health] lane-03 sweep — all 21 `exp-*` keys already wired + flagged live
@@ -2103,3 +2110,14 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - `exp-mp-room-join-loading-v1`, `exp-blast-wave-banner-v1`, `adventure-difficulty-tuning`: inactive in PostHog, 0 call sites in `app/components/hooks/lib/server` — already fully unwired, no code cleanup pending.
 - `exp-mp-lobby-connect-feedback-v1`: inactive, registry entry in `lib/experiments.ts:698` already marked `CONCLUDED 2026-07-26 — REVERTED` in a comment block (not live code) — already clean.
 - Did not reach the full 8-flag "decided winner p<0.05" sweep (active flags: `exp-mp-quickplay-eager-disable-v1`, `exp-wordhunt-clue-shake-v1`, etc.) — would need `experiment-results` queries per flag, deferred to next run for time budget.
+
+## 2026-08-14
+- [Restore] Dropped nightly work 20260813-010004 (10 files: rareGems.ts/.test.ts, RareGems.tsx, page.tsx, 5x translations, report)
+  - status: shipped (restored, resolved in restore-queue.ndjson)
+  - why: original gate failure (`rollLuckyGem is not a function`) no longer reproduces — restored code already has the implementation; all 17 rareGems tests pass, eslint clean on all 4 code files
+  - recommended owner: review-by-eod
+- [Supabase] Security Definer View — `public.custom_puzzle_leaderboard`
+  - advisor: security_definer_view, evidence: view defined with SECURITY DEFINER
+  - status: verified-correct, NOT changed
+  - why: `profiles` SELECT RLS is own-row-only (`auth.uid() = id`, confirmed via pg_policies). The view LEFT JOINs `profiles` to show other players' display_name/avatar on the leaderboard — same trap as [[leaderboard-profiles-rls-invoker-trap-2026-08-12]]. Removing SECURITY DEFINER would silently return NULL names/avatars for every player but the viewer (0-effective-row bug, no error). Closing as by-design.
+  - recommended owner: self (closed)
