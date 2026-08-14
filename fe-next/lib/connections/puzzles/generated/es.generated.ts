@@ -11,7 +11,6 @@ export const ES_PUZZLES: ConnectionPuzzle[] = [
   { id: "es-aug2026-002", word1: "rompe", bridge: "cabezas", word2: "duras", acceptedAnswers: ["cabezas rapadas","cabezas de turco","cabezas coronadas"], hint: "Juego mental y gente testarudísima", difficulty: "easy", source: "council-seed" },
   { id: "es-aug2026-003", word1: "guarda", bridge: "ropa", word2: "vieja", acceptedAnswers: ["ropa blanca","ropa sucia","ropa mojada"], hint: "Tu colección de prendas y carne desmenuzada cubana", difficulty: "easy", source: "council-seed" },
   { id: "es-aug2026-004", word1: "guarda", bridge: "bosque", word2: "tropical", hint: "Guardián forestal y selva de temperaturas altas", difficulty: "medium", source: "council-seed" },
-  { id: "es-aug2026-005", word1: "saca", bridge: "muelas", word2: "del juicio", hint: "Dentista de antaño y dientes que erupcionan en la adultez", difficulty: "easy", source: "council-seed" },
   { id: "es-aug2026-006", word1: "salta", bridge: "montes", word2: "nevados", hint: "Insecto que salta y alturas heladas y blancas", difficulty: "easy", source: "council-seed" },
   { id: "es-aug2026-007", word1: "mata", bridge: "ratas", word2: "de laboratorio", acceptedAnswers: ["ratas de alcantarilla","ratas de campo"], hint: "Pesticida y animales usados en investigación", difficulty: "medium", source: "council-seed" },
   { id: "es-aug2026-008", word1: "corta", bridge: "plumas", word2: "de ave", acceptedAnswers: ["plumas estilográficas","plumas de ganso"], hint: "Navaja pequeña y apéndices aéreos del ave", difficulty: "medium", source: "council-seed" },
