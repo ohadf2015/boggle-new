@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
-import { Share2, Flame, Target, Pyramid as PyramidIcon, Heart, ChevronRight } from 'lucide-react';
+import { Pyramid as PyramidIcon, Heart, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -39,14 +39,9 @@ import {
   trackDailyShared,
 } from '@/lib/connections/dailyTelemetry';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
-import { earnedMedal } from '@/lib/connections/progressTrack';
 import ConnectionsProgressTrack from './ConnectionsProgressTrack';
-import { MedalArt } from './ConnectionsRewardArt';
 import PuzzleCard from './PuzzleCard';
-import ConnectionsLeaderboard from './ConnectionsLeaderboard';
-import DailyResultRecap from './DailyResultRecap';
-import DailyAnswerKey from './DailyAnswerKey';
-import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
+import ConnectionsDailyResults from './ConnectionsDailyResults';
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -284,81 +279,31 @@ export default function ConnectionsDailyChallenge() {
   }, [t, today, results, collectOutcomes, language, total]);
 
   if (isTerminal) {
-    const blanked = solvedCount === 0;
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-6">
-        <m.div
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-          className={`rounded-neo border-neo-thick bg-neo-navy-light p-5 text-center shadow-hard ${
-            blanked ? 'border-neo-cyan' : 'border-neo-lime'
-          }`}
-        >
-          {(() => {
-            const medal = earnedMedal(solvedCount, total);
-            if (medal === 'none') return null;
-            return (
-              <div className="mb-2 flex flex-col items-center">
-                <MedalArt medal={medal} size={104} />
-                <span className="-mt-1 font-neo-display text-sm font-black uppercase tracking-[0.15em] text-neo-yellow">
-                  {t(`connections.daily.medal.${medal}`)}
-                </span>
-              </div>
-            );
-          })()}
-          <h1 className="font-neo-display text-2xl font-black text-neo-white">
-            {t(blanked ? 'connections.daily.completeTough' : 'connections.daily.complete')}
-          </h1>
-          {/* A blanked run gets encouragement + the answer key instead of a bare
-              "0 solved / Score: 0", which read as a punishment and taught nothing. */}
-          {blanked ? (
-            <p className="mx-auto mt-2 max-w-[19rem] font-neo-body text-sm text-neo-white/75">
-              {t('connections.daily.zeroSolved', { total })}
-            </p>
-          ) : (
-            <>
-              <div className="mt-3 flex items-center justify-center gap-4">
-                <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-cyan">
-                  <Target className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-                  {t('connections.daily.solved', { count: solvedCount, total })}
-                </span>
-                <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-orange">
-                  <Flame className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-                  {results?.streak ?? 0}
-                </span>
-              </div>
-              <p className="mt-1 font-neo-body text-sm text-neo-white/70">
-                {t('connections.score')}: <span className="font-bold text-neo-white">{state.score.toLocaleString()}</span>
-              </p>
-            </>
-          )}
-          <div className="mt-3">
-            <DailyResultRecap outcomes={collectOutcomes()} nextLabel={t('connections.daily.nextIn')} />
-          </div>
-          <div className="mt-4">
-            <DailyAnswerKey
-              puzzles={state.puzzles}
-              solvedIndices={solvedRef.current}
-              title={t('connections.daily.answerKey')}
-              isRTL={language === 'he'}
-            />
-          </div>
-          <m.button
-            type="button"
-            onClick={handleShare}
-            whileTap={{ scale: 0.96 }}
-            className="mt-4 inline-flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-pink px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
-          >
-            <Share2 className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            {copied ? t('connections.daily.copied') : t('connections.daily.share')}
-          </m.button>
-        </m.div>
+      <>
+        <ConnectionsDailyResults
+          score={state.score}
+          solvedCount={solvedCount}
+          total={total}
+          streak={results?.streak ?? 0}
+          rank={results?.rank ?? null}
+          totalPlayers={results?.totalPlayers ?? 0}
+          outcomes={collectOutcomes()}
+          puzzles={state.puzzles}
+          leaderboardRows={results?.rows ?? []}
+          isLoading={results?.loading ?? true}
+          onShare={handleShare}
+        />
 
         {/* Pyramid is the deeper mode and the natural next step once the day's
             5 bridges are spent — promoted from a thin text link to a real card. */}
         {getPyramidsForLocale(language).length > 0 && (
-          <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+          <m.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85 }}
+            className="mx-auto w-full max-w-md px-4"
+          >
             <Link
               href={`/${language}/connections/pyramid`}
               data-testid="pyramid-cta"
@@ -377,17 +322,7 @@ export default function ConnectionsDailyChallenge() {
             </Link>
           </m.div>
         )}
-
-        <ResultsBannerSlot placement="daily-complete" />
-
-        <ConnectionsLeaderboard
-          rows={results?.rows ?? []}
-          ownRank={results?.rank ?? null}
-          totalPlayers={results?.totalPlayers ?? 0}
-          streak={results?.streak ?? 0}
-          loading={results?.loading ?? true}
-        />
-      </div>
+      </>
     );
   }
 
