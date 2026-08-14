@@ -80,3 +80,12 @@ docs/nightly/feedback/
 docs/nightly/reports/
 # mode-qa screenshots are transient visual-QA proof (anti-fabrication on-disk check); not committed (avoid PNG bloat)
 docs/nightly/mode-qa/
+
+# Marketing frame dumps and film renders from the trailer/storyboard pipeline.
+# Hundreds of MB per run (336MB across four dirs on 2026-08-14) and reproducible
+# from the storyboard .md, which IS committed. Kept out so a broad `git add`
+# can't sweep them into a commit.
+docs/marketing/*-frames/
+docs/marketing/*-film/
+docs/marketing/**/*-frames/
+docs/marketing/**/*-film/
