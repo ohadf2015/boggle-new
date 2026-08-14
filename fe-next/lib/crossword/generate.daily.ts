@@ -7,6 +7,8 @@
 // that day, forever — not a 73-puzzle cycle), and freeplay generates a fresh puzzle per seed.
 
 import { generatePuzzle, type ClueMap } from './generate.runtime';
+import { pickBigPuzzle } from './bigPool';
+import { supportsFull, type CrosswordFormat } from './format';
 import { fnv1aHash } from '@/lib/rng/seededRandom';
 import { getDailyPuzzle as getStaticDaily, getPool } from './puzzles';
 import type { CrosswordPuzzle, Difficulty, PuzzleLocale } from './types';
@@ -76,19 +78,30 @@ function pickFromPool(seed: number, locale: PuzzleLocale): CrosswordPuzzle | nul
 export async function generateDailyPuzzle(
   dateISO: string,
   locale: PuzzleLocale,
+  format: CrosswordFormat = 'mini',
 ): Promise<CrosswordPuzzle | null> {
   let clues: ClueMap;
+  const difficulty = dailyDifficulty(dateISO);
+  // Saved progress is keyed by puzzle id, so the mini's id must stay byte-identical to what it
+  // has always been — renaming it would silently orphan every in-flight solve on deploy. Only
+  // the new format gets a new namespace, which also keeps the two sizes' progress separate.
+  const id = format === 'full' ? `${locale}-daily-full-${dateISO}` : `${locale}-daily-${dateISO}`;
   try {
     clues = await loadClues(genLocaleFor(locale));
   } catch {
-    return getStaticDaily(dateISO, locale);
+    // The full board has no mini-shaped fallback, and quietly serving a 5×5 to someone who asked
+    // for the newspaper grid would look like the feature simply doesn't work. Fail loudly instead.
+    return format === 'full' ? null : getStaticDaily(dateISO, locale);
+  }
+  if (format === 'full' && supportsFull(locale)) {
+    return pickBigPuzzle(dailySeed(dateISO, locale), clues, { id, locale, difficulty });
   }
   const puzzle = generatePuzzle({
     seed: dailySeed(dateISO, locale),
     locale,
     clues,
-    difficulty: dailyDifficulty(dateISO),
-    id: `${locale}-daily-${dateISO}`,
+    difficulty,
+    id,
   });
   return puzzle ?? getStaticDaily(dateISO, locale);
 }
@@ -101,19 +114,18 @@ export async function generateFreeplayPuzzle(
   seed: number,
   locale: PuzzleLocale,
   difficulty?: Difficulty,
+  format: CrosswordFormat = 'mini',
 ): Promise<CrosswordPuzzle | null> {
   let clues: ClueMap;
+  const id = format === 'full' ? `${locale}-free-full-${seed}` : `${locale}-free-${seed}`;
   try {
     clues = await loadClues(genLocaleFor(locale));
   } catch {
-    return pickFromPool(seed, locale);
+    return format === 'full' ? null : pickFromPool(seed, locale);
   }
-  const puzzle = generatePuzzle({
-    seed,
-    locale,
-    clues,
-    difficulty,
-    id: `${locale}-free-${seed}`,
-  });
+  if (format === 'full' && supportsFull(locale)) {
+    return pickBigPuzzle(seed, clues, { id, locale, difficulty: difficulty ?? 'medium' });
+  }
+  const puzzle = generatePuzzle({ seed, locale, clues, difficulty, id });
   return puzzle ?? pickFromPool(seed, locale);
 }

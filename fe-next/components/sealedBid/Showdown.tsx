@@ -32,14 +32,31 @@ export default function Showdown({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const outcome = settlement.outcome; // unique | clash | none
+
+  // A dict-rejected word and a deliberate pass BOTH settle as 'none'. The only
+  // discriminator is the delta: passing risks nothing (settleBid is called with
+  // stake 0 → delta 0), a rejected word forfeits min(stake, 5). Labelling a
+  // rejected word "Pass" told the player their word was fine and they chose not
+  // to bid — the opposite of what happened.
+  // ponytail: derived, not a new Settlement field — see wager.test.ts, which
+  // pins the non-zero invalid-word penalty this depends on.
+  const rejected = outcome === 'none' && settlement.delta < 0;
+
   const bannerText =
     outcome === 'unique'
       ? t('sealedBid.youWin') || t('sealedBid.unique')
       : outcome === 'clash'
         ? t('sealedBid.youLose') || t('sealedBid.clash')
-        : t('sealedBid.draw') || t('sealedBid.pass');
+        : rejected
+          ? t('sealedBid.notAWord')
+          : t('sealedBid.draw') || t('sealedBid.pass');
 
-  const deltaText = `${settlement.delta >= 0 ? '+' : ''}${settlement.delta}`;
+  // The payout is the payoff beat — ticking it up reads as "being paid" rather
+  // than a number that was always there. Reduced motion lands on it instantly.
+  const [shownDelta, setShownDelta] = useState(reducedMotion ? settlement.delta : 0);
+  const deltaText = `${shownDelta >= 0 ? '+' : ''}${shownDelta}`;
+
+  const clashedWord = outcome === 'clash' && playerWord ? playerWord.toUpperCase() : null;
 
   useEffect(() => {
     if (reducedMotion) {
@@ -108,6 +125,29 @@ export default function Showdown({
     triggerFX();
   }, [bannerVisible, settlement.outcome, reducedMotion, playerWord, payoutTargetRef]);
 
+  // Count the payout up once the banner lands. Interval (not rAF) so it ticks
+  // under fake timers and stays cheap — 20 steps over 600 ms.
+  useEffect(() => {
+    if (reducedMotion) {
+      setShownDelta(settlement.delta);
+      return;
+    }
+    if (!bannerVisible) return;
+    const target = settlement.delta;
+    if (target === 0) {
+      setShownDelta(0);
+      return;
+    }
+    const steps = 20;
+    let step = 0;
+    const id = setInterval(() => {
+      step += 1;
+      setShownDelta(step >= steps ? target : Math.round((target * step) / steps));
+      if (step >= steps) clearInterval(id);
+    }, 30);
+    return () => clearInterval(id);
+  }, [bannerVisible, reducedMotion, settlement.delta]);
+
   // Auto-advance the showdown after the reveal settles, so the round progresses
   // on its own; the Continue button remains as an explicit skip. onDone must be
   // idempotent — Continue-click and this timer can both reach it.
@@ -167,6 +207,17 @@ export default function Showdown({
           <div className="font-neo-body text-xs font-bold uppercase opacity-80">
             {t('sealedBid.chips')}
           </div>
+          {/* Connects the odds board the player was staring at while bidding to
+              the number they just got paid. Without it "+60" is a magic number. */}
+          {outcome === 'unique' && settlement.multiplier > 0 && (
+            <div
+              data-testid="showdown-payout-math"
+              dir="ltr"
+              className="font-neo-body text-[11px] font-bold uppercase tabular-nums opacity-70"
+            >
+              {settlement.stake} × {settlement.multiplier}
+            </div>
+          )}
         </div>
       )}
 
@@ -180,19 +231,30 @@ export default function Showdown({
 
       {/* Rival cards */}
       <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-        {bots.map((bot, index) => (
+        {bots.map((bot, index) => {
+          const isClash = !!clashedWord && bot.word.toUpperCase() === clashedWord;
+          return (
           <div
             key={`${bot.name}-${index}`}
-            className="h-36 w-24 [perspective:800px] sm:h-44 sm:w-28"
+            data-testid="showdown-rival-card"
+            data-clashed={isClash ? 'true' : 'false'}
+            className={`h-36 w-24 [perspective:800px] sm:h-44 sm:w-28 ${
+              isClash && !reducedMotion ? 'animate-neo-shake' : ''
+            }`}
           >
             <div
               ref={(el) => {
                 cardRefs.current[index] = el;
               }}
-              className="relative h-full w-full rounded-neo border-3 border-black shadow-hard-lg transition-transform [transform-style:preserve-3d]"
+              // No `transition-transform` here: GSAP writes `transform` every
+              // frame of the flip, and a CSS transition on the same property
+              // starts a fresh eased tween toward each of those frames —
+              // double-easing that reads as a mushy, laggy flip.
+              className={`relative h-full w-full rounded-neo border-3 shadow-hard-lg [transform-style:preserve-3d] ${
+                isClash ? 'border-neo-red' : 'border-black'
+              }`}
               style={{
                 transform: reducedMotion || bannerVisible ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                transition: reducedMotion ? 'none' : undefined,
               }}
             >
               {/* Back — branded card asset */}
@@ -210,22 +272,40 @@ export default function Showdown({
               </div>
               {/* Face */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-neo bg-neo-cream p-2"
+                className={`absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-neo p-2 ${
+                  isClash ? 'bg-neo-red text-neo-white' : 'bg-neo-cream'
+                }`}
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                 }}
               >
-                <div className="font-neo-body text-[10px] font-bold uppercase text-neo-navy/60">
+                <div
+                  className={`font-neo-body text-[10px] font-bold uppercase ${
+                    isClash ? 'text-neo-white/70' : 'text-neo-navy/60'
+                  }`}
+                >
                   {bot.name}
                 </div>
-                <div className="break-all text-center font-neo-display text-base font-black text-neo-navy sm:text-lg">
+                <div
+                  className={`break-all text-center font-neo-display text-base font-black sm:text-lg ${
+                    isClash ? 'text-neo-white' : 'text-neo-navy'
+                  }`}
+                >
                   {bot.word}
                 </div>
+                {/* Names WHO matched you. Without this a clash was just a red
+                    banner and a wall of identical rival cards. */}
+                {isClash && (
+                  <div className="mt-0.5 rounded-full border-2 border-black bg-neo-white px-2 py-0.5 font-neo-display text-[9px] font-black uppercase tracking-wide text-neo-red">
+                    {t('sealedBid.clash')}
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {bannerVisible && (

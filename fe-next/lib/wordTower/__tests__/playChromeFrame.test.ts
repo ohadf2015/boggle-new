@@ -12,6 +12,7 @@ import {
   playChromeFrame,
   DEFAULT_TOP_CHROME_PX,
   NOTICE_CONSTRUCTION_GAP_PX,
+  TOP_CHROME_NOTICE_GAP_PX,
 } from '../playChromeFrame';
 import { WORD_TOWER_BUILD_LINE_FRACTION } from '../towerLayout';
 import {
@@ -55,7 +56,10 @@ describe('playChromeFrame — shared construction / notice / crane framing', () 
 
   it('places the notice region in the sky above the construction zone', () => {
     const f = playChromeFrame({ viewportH: H, topChromePx: topChrome, deckHeightPx: deck });
-    expect(f.noticeTopPx).toBe(topChrome);
+    // Clears the top chrome by a gap — flush against it read as "the verdict is
+    // covering the clue button" once the play tools moved into the header.
+    expect(f.noticeTopPx).toBe(topChrome + TOP_CHROME_NOTICE_GAP_PX);
+    expect(f.noticeTopPx).toBeGreaterThan(topChrome);
     // Bottom of the notice stack stays above the active tower cluster
     expect(f.noticeTopPx + f.noticeMaxHeightPx).toBeLessThanOrEqual(
       f.constructionTop - NOTICE_CONSTRUCTION_GAP_PX + 0.5,

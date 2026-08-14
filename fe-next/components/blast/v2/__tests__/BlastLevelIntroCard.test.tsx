@@ -27,9 +27,15 @@ describe('BlastLevelIntroCard', () => {
     expect(screen.getByTestId('wordfall-wordmark')).toHaveTextContent('Wordfall');
   });
 
-  it('shows the theme emoji beside the theme name for level identity', () => {
+  it('shows the theme chip beside the theme name for level identity', () => {
     render(<BlastLevelIntroCard level={level} onDismiss={vi.fn()} />);
-    // animals → 🐾
-    expect(screen.getByTestId('intro-card')).toHaveTextContent('🐾');
+    const chip = screen.getByTestId('intro-card').querySelector('img[src^="/themes/"]');
+    expect(chip).toHaveAttribute('src', '/themes/animals.svg');
+  });
+
+  it('renders no emoji on the intro card', () => {
+    render(<BlastLevelIntroCard level={level} onDismiss={vi.fn()} />);
+    const text = screen.getByTestId('intro-card').textContent ?? '';
+    expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
   });
 });

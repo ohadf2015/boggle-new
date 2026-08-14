@@ -44,7 +44,7 @@ export function WordTowerLandmarkRail({ viewerHeightM, reducedMotion, t }: Props
           className="absolute inset-x-0 flex items-center gap-2 px-3"
           style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
         >
-          <span className="whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/55 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white/85 backdrop-blur-sm">
+          <span className="whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/85 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white/85">
             {m.icon} {t(m.key)} · {m.m}m
           </span>
           <span className="h-px flex-1 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.22)_0_8px,transparent_8px_16px)]" />

@@ -5,9 +5,11 @@ import { cellId } from '../engine/cell-id';
 import { computeStrikeBudget } from '../strike-budget';
 import type { BlastLevel } from '../types';
 
-// Bottom row spells "CSE" — a real-letter run that is NOT a theme word and (with
+// Bottom row spells "CSER" — a real-letter run that is NOT a theme word and (with
 // no dictionaryCheck) rejects as 'unknown'. onRejectConfirmed then turns it into
 // a confirmed wrong guess = one strike. Repeating the drag yields more strikes.
+// The run is FOUR tiles because bonus words are only claimable from the board
+// word floor up; a shorter drag rejects as 'length' and is not a guess at all.
 function makeLevel(levelNumber: number): BlastLevel {
   return {
     id: `strike-test-${levelNumber}`,
@@ -18,6 +20,7 @@ function makeLevel(levelNumber: number): BlastLevel {
       { index: 0, tiles: ['C', 'A', 'T'] },
       { index: 1, tiles: ['S', 'U', 'N'] },
       { index: 2, tiles: ['E', 'G', 'G'] },
+      { index: 3, tiles: ['R', 'R', 'R'] },
     ],
     words: ['CAT', 'SUN', 'EGG'],
     resolvableOrder: ['CAT', 'SUN', 'EGG'],
@@ -32,6 +35,7 @@ function strikeOnce(result: { current: ReturnType<typeof useBlastV2> }) {
     result.current.handlers.onPointerDown(cellId(0, 0));
     result.current.handlers.onPointerMove(cellId(1, 0));
     result.current.handlers.onPointerMove(cellId(2, 0));
+    result.current.handlers.onPointerMove(cellId(3, 0));
     result.current.handlers.onPointerUp();
   });
   act(() => {

@@ -8,6 +8,13 @@ interface WordTowerActionMenuProps {
   /** The action controls (upgrades / skin / leaderboard …) revealed on expand. */
   children: ReactNode;
   reducedMotion?: boolean;
+  /** How many unseen things sit behind the button (fresh skin unlocks today).
+   *  > 0 draws the badge — a collapsed menu is otherwise indistinguishable
+   *  whether or not it holds anything new. */
+  noticeCount?: number;
+  /** Fired when the menu OPENS — the caller marks the contents seen there, not
+   *  on dismiss, so reloading mid-look can't resurrect the dot forever. */
+  onOpened?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -23,8 +30,13 @@ interface WordTowerActionMenuProps {
  * outside (or the button again) collapses it. Under reduced motion it just
  * shows/hides with no grow tween.
  */
-export function WordTowerActionMenu({ children, reducedMotion = false, t }: WordTowerActionMenuProps) {
+export function WordTowerActionMenu({ children, reducedMotion = false, noticeCount = 0, onOpened, t }: WordTowerActionMenuProps) {
   const [open, setOpen] = useState(false);
+  const hasNotice = noticeCount > 0;
+  const toggle = () => setOpen((o) => {
+    if (!o) onOpened?.(); // mark seen at SHOW time, never at dismiss time
+    return !o;
+  });
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Tap anywhere outside the menu to collapse it, so it never lingers open over
@@ -56,11 +68,18 @@ export function WordTowerActionMenu({ children, reducedMotion = false, t }: Word
       </div>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         aria-expanded={open}
-        aria-label={t(open ? 'wordTower.hud.menuClose' : 'wordTower.hud.menuOpen')}
+        aria-label={
+          open
+            ? t('wordTower.hud.menuClose')
+            : hasNotice
+              ? t('wordTower.hud.menuNew', { n: noticeCount })
+              : t('wordTower.hud.menuOpen')
+        }
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-neo-thick border-black bg-neo-navy-light text-neo-white shadow-hard backdrop-blur-sm',
+          'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-neo-thick border-black bg-neo-navy-light text-neo-white shadow-hard',
+          !open && hasNotice && 'border-neo-lime/70',
           'hover:scale-105 hover:bg-neo-navy hover:text-neo-cyan hover:border-neo-cyan/50 hover:shadow-hard-lg',
           'active:scale-95 active:text-neo-cyan active:border-neo-cyan',
           'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
@@ -68,6 +87,18 @@ export function WordTowerActionMenu({ children, reducedMotion = false, t }: Word
         )}
       >
         {open ? <X className="h-5 w-5" /> : <MoreHorizontal className="h-6 w-6" />}
+        {!open && hasNotice && (
+          <span
+            data-testid="wt-menu-notice"
+            className={cn(
+              'absolute -end-1 -top-1 flex h-[1.15rem] min-w-[1.15rem] items-center justify-center rounded-full',
+              'border-2 border-black bg-neo-lime px-1 font-neo-body text-[10px] font-black leading-none text-black tabular-nums',
+              reducedMotion ? '' : 'animate-neo-pop',
+            )}
+          >
+            {noticeCount}
+          </span>
+        )}
       </button>
     </div>
   );

@@ -13,6 +13,7 @@
 import { createSafeReadFile, loadHebrewDictionary } from '../../backend/dictionaryLoaders';
 import { buildGrid } from '../../lib/crossword/grid';
 import { buildDictIndex, fillGrid, type FillTemplate } from '../../lib/crossword/generate.core';
+import { isRealCrossword } from '../../lib/crossword/templates';
 import clueBankJson from '../../lib/crossword/data/clueBank.he.json';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -36,25 +37,6 @@ function mulberry32(seed: number): () => number {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-function isRealCrossword(grid: (string | null)[][], rtl: boolean): boolean {
-  if (!grid.some((r) => r.some((c) => c === null))) return false;
-  const { slots } = buildGrid({ rtl, solution: grid });
-  const across = slots.filter((s) => s.dir === 'across');
-  const down = slots.filter((s) => s.dir === 'down');
-  if (!across.length || !down.length) return false;
-  const downWords = new Set(down.map((s) => s.answer));
-  if (across.some((s) => downWords.has(s.answer))) return false; // no word squares
-  if (new Set(slots.map((s) => s.length)).size < 2) return false; // varied lengths
-  const inA = new Set<string>(), inD = new Set<string>();
-  for (const s of across) for (const c of s.cells) inA.add(`${c.row},${c.col}`);
-  for (const s of down) for (const c of s.cells) inD.add(`${c.row},${c.col}`);
-  for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid.length; c++) {
-    if (grid[r][c] === null) continue;
-    if (!inA.has(`${r},${c}`) || !inD.has(`${r},${c}`)) return false; // doubly-checked
-  }
-  return true;
 }
 
 interface SeedPuzzle {

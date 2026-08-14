@@ -7,6 +7,7 @@ import { PreResultFanfare } from '@/components/results/PreResultFanfare';
 import { shouldPlayPreResultFanfare } from '@/lib/native/webViewLayerFlash';
 import { pickBlastResultKind } from '@/lib/blast/v2/resultKind';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
+import { BlastIcon } from './BlastIcon';
 
 type CardProps = Omit<ComponentProps<typeof BlastLevelCompleteCard>, 'onNext'>;
 
@@ -110,13 +111,11 @@ function ChestOpening({ modeColor = '#BFFF00', label }: { modeColor?: string; la
       className="fixed inset-0 grid place-items-center bg-[#0b1530]/95 text-white"
     >
       <div className="flex flex-col items-center gap-4">
-        <span
-          className="text-6xl animate-[blastChestRock_0.5s_ease-in-out_infinite]"
-          style={{ filter: `drop-shadow(0 0 16px ${modeColor})` }}
-          aria-hidden
-        >
-          📦
-        </span>
+        <BlastIcon
+          src="/blast/icons/chest.svg"
+          size={96}
+          className="animate-[blastChestRock_0.5s_ease-in-out_infinite]"
+        />
         <span className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: modeColor }}>
           {label}
         </span>

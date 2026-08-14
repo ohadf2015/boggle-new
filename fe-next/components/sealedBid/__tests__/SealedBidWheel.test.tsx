@@ -2,10 +2,33 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SealedBidWheel from '../SealedBidWheel';
 
-// Mock WordWheelPixiRing to avoid Pixi in jsdom
-vi.mock('../../daily/WordWheelPixiRing', () => ({ default: () => null }));
+// Mock WordWheelPixiRing to avoid Pixi in jsdom, but capture its props so we can
+// assert the ring lays its connector lines on the same angular grid as the tiles.
+const ringProps: Array<Record<string, unknown>> = [];
+vi.mock('../../daily/WordWheelPixiRing', () => ({
+  default: (props: Record<string, unknown>) => {
+    ringProps.push(props);
+    return null;
+  },
+}));
 
 describe('SealedBidWheel', () => {
+  it('tells the pixi ring how many wheel slots there are, so connectors land on the tiles', () => {
+    ringProps.length = 0;
+    render(
+      <SealedBidWheel
+        letters={['A', 'E', 'I', 'N', 'R', 'S', 'T']}
+        onChange={vi.fn()}
+        onSubmit={vi.fn()}
+      />
+    );
+    expect(ringProps.length).toBeGreaterThan(0);
+    // The ring defaults to 6 (the daily wheel's hexagon). Sealed Bid lays 7
+    // tiles, so without this the lines are drawn every 60° while tiles sit
+    // every 51.43° and drift a whole slot apart by the last letter.
+    expect(ringProps[ringProps.length - 1].outerCount).toBe(7);
+  });
+
   it('renders one tile per letter', () => {
     const onChange = vi.fn();
     const onSubmit = vi.fn();

@@ -5,12 +5,13 @@ import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { resultCelebration } from '@/lib/blast/v2/celebration';
-import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
+import { themeArt } from '@/lib/blast/v2/themeArt';
+import { BlastIcon } from './BlastIcon';
 
 type Props = {
   coins: number;
   modeColor?: string;
-  /** Level theme id (e.g. "animals") — drives the result's theme emoji. */
+  /** Level theme id (e.g. "animals") — drives the result's theme chip art. */
   theme?: string;
   levelNumber?: number;
   /** Total theme words in the level (all are found by the time this shows). */
@@ -167,7 +168,7 @@ export function BlastLevelCompleteCard({
   chestNumber,
 }: Props) {
   const { t, language } = useLanguage();
-  const emoji = themeEmoji(theme);
+  const art = themeArt(theme);
   const showStars = typeof stars === 'number' && stars > 0;
   const showBonus = bonusWordsFound > 0;
   const wordCount = wordsFound ?? themeWordCount ?? 0;
@@ -356,14 +357,14 @@ export function BlastLevelCompleteCard({
           </div>
         )}
 
-        {/* Theme emoji — gives each level its own visual identity at a glance. */}
+        {/* Theme chip — gives each level its own visual identity at a glance. */}
         <div
-          data-testid="complete-theme-emoji"
-          className="mt-1 text-4xl leading-none"
+          data-testid="complete-theme-art"
+          className="mt-1 leading-none"
           aria-hidden
           style={{ filter: `drop-shadow(0 0 12px color-mix(in srgb, ${modeColor} 70%, transparent))` }}
         >
-          {emoji}
+          <BlastIcon src={art} size={44} />
         </div>
 
         {/* HERO 1 — stars */}
@@ -407,7 +408,7 @@ export function BlastLevelCompleteCard({
                 style={recordChipStyle(!!isNewBest, modeColor)}
               >
                 {isNewBest
-                  ? `🏆 ${t('blast.complete.recordBest', 'BEST')}`
+                  ? <><BlastIcon src="/blast/icons/trophy.svg" size={16} /> {t('blast.complete.recordBest', 'BEST')}</>
                   : `${'★'.repeat(bestStars!)} ${t('blast.complete.best', 'Best')}`}
               </span>
             )}
@@ -419,7 +420,7 @@ export function BlastLevelCompleteCard({
                 style={recordChipStyle(!!isNewFast, modeColor)}
               >
                 {isNewFast
-                  ? `⚡ ${t('blast.complete.recordFast', 'FASTEST')}`
+                  ? <><BlastIcon src="/blast/icons/bolt.svg" size={16} /> {t('blast.complete.recordFast', 'FASTEST')}</>
                   : t('blast.completeExtras.bestFast', 'Fastest {time}', { time: fastestLabel ?? '' })}
               </span>
             )}
@@ -431,8 +432,8 @@ export function BlastLevelCompleteCard({
                 style={recordChipStyle(!!isNewBonus, modeColor)}
               >
                 {isNewBonus
-                  ? `⭐ ${t('blast.complete.recordBonus', 'BONUS')}`
-                  : t('blast.completeExtras.bestBonus', 'Best ⭐ {count}', { count: String(bestBonus) })}
+                  ? <><BlastIcon src="/blast/icons/star.svg" size={16} /> {t('blast.complete.recordBonus', 'BONUS')}</>
+                  : t('blast.completeExtras.bestBonus', 'Best {count}', { count: String(bestBonus) })}
               </span>
             )}
           </div>
@@ -492,7 +493,7 @@ export function BlastLevelCompleteCard({
                 className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-black"
                 style={{ background: modeColor, color: '#0b1530', boxShadow: `2px 2px 0 #0b1530` }}
               >
-                ⭐ {bonusWordsFound} {t('blast.complete.bonusLabel', 'Bonus')}
+                <BlastIcon src="/blast/icons/star.svg" size={20} /> {bonusWordsFound} {t('blast.complete.bonusLabel', 'Bonus')}
               </span>
             )}
           </div>
@@ -502,8 +503,8 @@ export function BlastLevelCompleteCard({
         {showChest && (
           <div data-testid="complete-chest" data-chest-pct={chestPct} className="mt-4 text-left">
             <div className="flex items-center justify-between mb-1 text-[10px] font-bold uppercase tracking-[0.16em]">
-              <span className="opacity-80">
-                🎁 {t('blast.complete.chestLabel', 'Chest')}{chestNumber ? ` ${chestNumber}` : ''}
+              <span className="opacity-80 inline-flex items-center gap-1">
+                <BlastIcon src="/blast/icons/gift.svg" size={16} /> {t('blast.complete.chestLabel', 'Chest')}{chestNumber ? ` ${chestNumber}` : ''}
               </span>
               <span style={{ color: modeColor }}>
                 {chestPct}%{chestGainPct > 0 ? ` (+${chestGainPct}%)` : ''}

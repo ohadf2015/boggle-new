@@ -83,6 +83,10 @@ const en = {
     "tagline": "Fill the grid, one clue at a time",
     "title": "Crossword",
     "timer": "Time",
+    "formatLabel": "Puzzle size",
+    "format": { "mini": "Mini", "full": "Full" },
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
     "gridLabel": "Crossword grid",
     "cellLabel": "Row {row}, column {col}",
     "dir": { "across": "Across", "down": "Down" },
@@ -396,7 +400,7 @@ const en = {
     "retry": "Try Again",
     "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
     "tier": { "apprentice": "Apprentice", "journeyman": "Journeyman", "master": "Master Architect" },
-    "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "restartConfirm": "Sure?", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "cluesLeft": "{n} left", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter", "backToTop": "Top", "pickLetters": "Pick letters", "dragToBuild": "Drag or tap to spell", "keepBuilding": "Keep building", "menuOpen": "More actions", "menuClose": "Close menu", "chaseGap": "+{m} m", "chaseAria": "Next rival above: {name}, {m} metres to pass" },
+    "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "restartConfirm": "Sure?", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "cluesLeft": "{n} left", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter", "backToTop": "Top", "pickLetters": "Pick letters", "dragToBuild": "Drag or tap to spell", "keepBuilding": "Keep building", "menuOpen": "More actions", "menuNew": "More actions — {n} new", "menuClose": "Close menu", "chaseGap": "+{m} m", "chaseAria": "Next rival above: {name}, {m} metres to pass" },
     "minimap": { "label": "Tower map — {m} m, tap to jump to top" },
     "milestone": { "m50": "Above the treetops! 🌳", "m150": "Cloud territory ☁️", "m400": "The birds are jealous 🐦", "m250": "Higher than the drones 🛸", "m650": "Nebula vibes 🌌", "m900": "Knock knock, space? 🚀", "m1300": "Deep-space dweller 👽", "m1800": "Basically an astronaut now ✨" },
     "ach": { "unlocked": "Achievement!", "firstFloor": "First Floor", "tenFloors": "Tower Block", "skyHigh": "Sky High", "wordsmith": "Wordsmith", "comboKing": "Combo King", "rivalCrusher": "Rival Crusher", "unstoppable": "Unstoppable", "toTheMoon": "To the Moon", "skylineKing": "Skyline King", "centurion": "Centurion", "comboGod": "Combo God", "wordWizard": "Word Wizard", "galaxyClass": "Galaxy Class", "deepSpace": "Deep Space" },
@@ -10125,6 +10129,9 @@ const en = {
       "retry": "Try Again",
       "home": "Home",
       "progressSafe": "Your progress is safe — level {n}"
+    },
+    "progress": {
+      "aria": "{found} of {total} words found"
     },
     "strikes": {
       "label": "Guesses",

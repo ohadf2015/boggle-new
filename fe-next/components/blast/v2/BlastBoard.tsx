@@ -2,11 +2,10 @@
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { LayoutGroup, AnimatePresence, m } from 'framer-motion';
 import type { BlastLevel, CellId, TileFlag } from '@/lib/blast/v2/types';
-import { cellId as makeCellId, type SelectionState, type AlmostWord } from '@/lib/blast/v2/engine';
+import { cellId as makeCellId, type SelectionState } from '@/lib/blast/v2/engine';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { BlastTile, type BlastTileState } from './BlastTile';
 import { BlastSelectionPath } from './BlastSelectionPath';
-import { BlastAlmostGhost } from './BlastAlmostGhost';
 import { useCollapseTimeline } from './useCollapseTimeline';
 import { useInvalidShake } from './useInvalidShake';
 import styles from './BlastTile.module.css';
@@ -24,7 +23,6 @@ type Props = {
   onPointerEnter: (cell: CellId) => void;
   onPointerUp: () => void;
   modeColor?: string;
-  almosts?: AlmostWord[];
   tileIds: string[][];
   revealGlowCells?: CellId[];
   onCommitSelection?: (centers: Array<{ x: number; y: number }>) => void;
@@ -44,7 +42,6 @@ export function BlastBoard({
   onPointerEnter,
   onPointerUp,
   modeColor = '#ec4899',
-  almosts,
   tileIds,
   revealGlowCells = [],
   onCommitSelection,
@@ -152,9 +149,15 @@ export function BlastBoard({
         // strip when only 2 rows remain).
         ['--blast-cols' as string]: String(level.columns.length),
         ['--blast-rows' as string]: String(visualRows),
+        // Lets the playfield frame tint itself with the level's mode colour.
+        ['--blast-mode-color' as string]: modeColor,
       }}
       onPointerUp={onPointerUp}
     >
+      {/* Playfield frame — paints the ground plate and border the wells and
+          tiles sit on. Purely decorative and sized off the same CSS vars, so
+          it never shifts either grid. */}
+      <div aria-hidden data-testid="playfield-frame" className={styles.playfieldFrame} />
       {/* Cell-well backdrop — empty inset slots line up with tile positions.
           Renders a FIXED `visualRows` wells per column so the board stays the
           same size as tiles are cleared (Royal-Match style stable playfield). */}
@@ -223,12 +226,6 @@ export function BlastBoard({
         cells={selection.kind === 'active' ? selection.cells : []}
         getCellCenter={getCellCenter}
         color={modeColor}
-      />
-      <BlastAlmostGhost
-        almosts={almosts ?? []}
-        hidden={selection.kind === 'active'}
-        modeColor={modeColor}
-        boardRef={boardRef}
       />
     </div>
   );

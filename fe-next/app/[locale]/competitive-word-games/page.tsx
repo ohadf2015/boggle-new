@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Best Competitive Word Games with Global Leaderboards (2026) | LexiClash',
-    description: 'Looking for competitive word games with global leaderboards? LexiClash is free, browser-based, real-time multiplayer with ranked daily challenges and a worldwide leaderboard. No download.',
+    description: 'Compete in word games with global leaderboards — free, no download. Real-time multiplayer, ranked daily challenges, worldwide rankings. Start now →',
     keywords: 'best competitive word games with global leaderboards, competitive word games, word games with leaderboards, ranked word games, multiplayer word game leaderboard, real-time word game competition, free competitive word games online',
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {

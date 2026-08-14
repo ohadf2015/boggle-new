@@ -147,7 +147,7 @@ export function WordTowerNoticeColumn({
             {t(v.v.labelKey)}
           </div>
           {v.v.gainText !== '+0m' && (
-            <div dir="ltr" className="rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 font-neo-display text-lg font-black text-neo-white shadow-hard backdrop-blur-sm">
+            <div dir="ltr" className="rounded-neo border-neo border-black bg-neo-navy/95 px-3 py-1 font-neo-display text-lg font-black text-neo-white shadow-hard">
               {v.v.gainText}
             </div>
           )}
@@ -460,7 +460,7 @@ export function WordTowerNoticeColumn({
       node: (
         <div
           key={`tease-${tease.nextBiomeId}`}
-          className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
+          className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/95 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan"
           aria-live="polite"
           role="status"
         >

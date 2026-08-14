@@ -16,15 +16,15 @@ import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
 import { swayAngleAt, swayJitterDeg, wobbleImpulseDeg, WOBBLE_IMPULSE_MS } from '@/lib/wordTower/towerSway';
 import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
-import { swivelStartDeg, swivelDurationMs } from '@/lib/wordTower/swivelDrop';
 import { toppleCrashFx, CRASH_DARK_COLOR } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
-  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLandScaled, impactRing, bumpScale, tumbleOut, drawGroundShadow, drawTowerFoundation,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, shakeX, spawnTenants, squashLandScaled, impactRing, bumpScale, tumbleOut, drawGroundShadow, drawTowerFoundation,
   type TileSprite,
 } from './towerSprites';
 import { impactDipPx, IMPACT_MS } from '@/lib/wordTower/landingImpact';
+import { tenantArrival, TENANT_KINDS } from '@/lib/wordTower/tenants';
 import { tumbleBounceParams } from '@/lib/wordTower/tumbleArc';
 import { punchScaleAt } from '@/lib/wordTower/impactPunch';
 import { shaftWindX } from '@/lib/wordTower/shaftWind';
@@ -242,7 +242,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // Shaft-wind needs the live geometry from the diff effect in the rAF tick.
   const centerXRef = useRef(0);
   const topPosRef = useRef(0);
-  // Suppress wind after a commit until the swivel (which owns the new tiles' x)
+  // Suppress wind after a commit until the impact settle (which owns the new tiles' x)
   // finishes — duration-derived, NOT a fixed guess, so long words can't jump.
   const lastCommitRef = useRef(0);
   const commitDurRef = useRef(0);
@@ -425,9 +425,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     }
 
     // The just-committed word's bricks (pending ghost → solid this render). They
-    // swivel into the stack TOGETHER as one rigid girder after the loop instead
-    // of each popping in place — the satisfying "the crane sets the word down"
-    // beat. Collected base→top (live is bottom→top), with their rest slot.
+    // land TOGETHER as one flat floor after the loop instead of each popping in
+    // place — the crane's fall ends, this is its impact. Collected base→top (live is bottom→top), with their rest slot.
     const committing: { tile: TileSprite; restX: number; restY: number; color: number; pos: number }[] = [];
 
     // Add newcomers / update survivors — survivors keep their FIXED local y.
@@ -446,11 +445,22 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         const isNewTop = l.pos > prevMaxPos.current;
         if (firstRender.current || reducedMotion || !isNewTop) {
           placeInstant(tile, y);
+        } else if (!l.pending) {
+          // A brand-new SOLID tile at the crown = the floor the crane just
+          // dropped. Hand it to the landing block below, which places it flat and
+          // spends the beat on impact (squash · rings · dust · shake · tenants).
+          //
+          // This used to be reachable only via the pending→solid transition, and
+          // `WordTowerPlay` passes `pendingWord=""` (the crane shows the held word
+          // now, so the Pixi ghost floor was retired) — so `committing` was ALWAYS
+          // empty and the ENTIRE landing beat was dead code. Same shape as the
+          // hardcoded `rivals={[]}` that shipped the rival system invisible.
+          committing.push({ tile, restX: tx, restY: y, color: l.color, pos: l.pos });
         } else {
           // A pending preview brick grows gently at the top while the player
           // builds the word (a soft low-distance drop) — the WEIGHTY placement is
-          // saved for the crane drop (the group swivel below).
-          const depth = l.pending ? Math.max(0, l.pos - C) : 0;
+          // saved for the crane drop (the group impact below).
+          const depth = Math.max(0, l.pos - C);
           const fx = letterPlacementFx(depth);
           dropIn(tile, y, 0, () => {
             if (!enableComplex) return;
@@ -469,8 +479,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         if (existing.color !== l.color || existing.pending !== l.pending) {
           const lockingIn = existing.pending && !l.pending;
           if (lockingIn && !reducedMotion) {
-            // Paint solid at once (the ghost was only a preview), then swivel the
-            // whole word-run in as a group below — no per-brick recolor fade.
+            // Paint solid at once (the ghost was only a preview), then land the
+            // whole floor as a group below — no per-brick recolor fade.
             paintTile(existing, l.color, l.pending, l.shared);
             committing.push({ tile: existing, restX: tx, restY: y, color: l.color, pos: l.pos });
           } else if (reducedMotion) {
@@ -483,25 +493,35 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       }
     }
 
-    // Set the committed FLOOR down as ONE rigid slab, hinged under its own
-    // centre — the crane lowering a girder into place. All its tiles share a row,
-    // so the hinge is the floor's own bottom edge, not a run of stacked bricks.
+    // Land the committed FLOOR flat, exactly where it fell.
+    //
+    // It used to SWIVEL in: the whole row rotated 13–22° about its bottom edge
+    // and lowered 30px, a leftover of the retired vertical brick-run model (see
+    // the "floors, not spires" fix). On a horizontal floor that rotation reads as
+    // a skew, and it was the SECOND fall of the same block — the crane already
+    // animates a true gravity drop (fallEase k² + settle) and only commits when
+    // that lands. So the tower re-dropped and tilted a girder the player had
+    // already watched come down. Founder 2026-08-14: "where the blocks fall, this
+    // is where they are, without skew."
+    //
+    // Now the crane owns the FALL and the scene owns the IMPACT: place the row at
+    // its true drop offset, upright (placeInstant zeroes any leftover angle), and
+    // spend the beat on weight — squash, rings, dust, shake, resonance.
     if (committing.length > 0 && !reducedMotion) {
       const restYs = committing.map((b) => b.restY);
       const baseRestY = Math.max(...restYs);
       const pivotX = committing.reduce((sum, b) => sum + b.restX, 0) / committing.length;
-      const pivotY = baseRestY + half; // the hinge: the floor's bottom edge
-      // Quality-linked wobble: a perfect drop snaps in tight, a sloppy one staggers.
-      const startDeg = swivelStartDeg(leanRef.current, half, impactQualityRef.current ?? 'good');
-      const durMs = swivelDurationMs(committing.length);
+      const pivotY = baseRestY + half; // the floor's bottom edge — the impact line
+      const durMs = IMPACT_MS;
       // Event-driven land feedback — quality + word heft drive squash, punch,
       // rings, particles, and shake. Reduced-motion collapses to static zeros.
       const land = landFeedback(impactQualityRef.current ?? 'good', {
         depthFloors: committing.length,
         reducedMotion,
       });
-      swivelWordIn(committing, pivotX, pivotY, startDeg, durMs, (i) => {
-        const { tile } = committing[i];
+      committing.forEach((b, i) => {
+        const { tile } = b;
+        placeInstant(tile, b.restY); // flat, upright, at the offset it was dropped at
         squashLandScaled(tile, land.impactIntensity); // lands with quality-scaled weight
         if (i === 0) {
           // Kick off the whole-tower compression rebound (consumed by the tick loop).
@@ -530,14 +550,42 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
             impactRing(tilt, pivotX, pivotY, half, 0xbfff00, land.ringScale * 1.3);
             engine.particles.burst(GOLD_STARS, pivotX, pivotY, capParticles(land.sparkles, budget));
           }
+
+          // MOVE-IN: the floor is built, so people arrive to live in it — they
+          // drift down under an umbrella/balloon/jetpack (the cast unlocks with
+          // altitude) and vanish into the new floor.
+          //
+          // NOT gated on `enableComplex`. That flag is flipped off by a runtime
+          // FPS watchdog, so gating here would silently delete the whole move-in
+          // beat on any device (or any bad minute) that measures slow — the
+          // "built, shipped invisible" failure this codebase has hit before. A
+          // weak device gets ONE arrival instead of a crowd; reduced motion (the
+          // enclosing branch) still gets none.
+          const floorIdx = Math.min(...committing.map((b) => b.pos));
+          const arrival = tenantArrival(floorIdx, committing.length, heightM);
+          const kindDef = TENANT_KINDS.find((k) => k.id === arrival.kind);
+          if (kindDef) {
+            spawnTenants(tilt, {
+              x: pivotX,
+              y: baseRestY,
+              size: half * 2,
+              count: enableComplex ? arrival.count : 1,
+              glyph: kindDef.glyph,
+              canopy: kindDef.canopy,
+              speed: kindDef.speed,
+              sway: kindDef.sway,
+              fromLeft: arrival.fromLeft,
+              staggerMs: arrival.staggerMs,
+            });
+          }
         }
       });
 
       // RESONANCE — the landing thud rings DOWN through the settled tower below
       // the new joint: each lower tile gives a tiny delayed scale-pop, a wave
       // travelling toward the base. Cosmetic (scale only), so it never touches
-      // the score or fights the swivel above (which owns the new top tiles).
-      lastCommitRef.current = performance.now(); // gate shaft-wind off until swivel ends
+      // the score or fights the impact squash above (which owns the new top tiles).
+      lastCommitRef.current = performance.now(); // gate shaft-wind off until the impact settles
       commitDurRef.current = durMs;
       const basePos = Math.min(...committing.map((b) => b.pos));
       // Index the settled tiles by FLOOR so the wave bumps whole floors, not
@@ -672,7 +720,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // phase-locked with the crane's target-guide swing — both read the same clock
     // + the same instability, so the visible tower lean and the landing target
     // always point the SAME way at the same instant (the headline of the feature).
-    // After a commit the swivel owns the new tiles' x — hold off wind until it
+    // After a commit the impact settle owns the new tiles' x — hold off wind until it
     // finishes (its real duration + a small tail) so the two never fight.
     const WIND_COMMIT_TAIL_MS = 120;
     const tick = (now: number) => {
@@ -845,7 +893,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       engine.shake.shake({ intensity: land.shakePx, duration: 0.34, decay: 'exponential' });
     } else if (q === 'good') {
       // A good drop is the BASELINE — it gets the landing thud (rings, dust and
-      // a quality-scaled punch, fired from the swivel above) and nothing more.
+      // a quality-scaled punch, fired from the impact above) and nothing more.
       // It used to throw a screen flash and a confetti burst too, which meant an
       // ordinary word looked almost exactly like a perfect one and the skill
       // shot had nothing left to escalate into. Juice only reads as juice when
@@ -1107,7 +1155,7 @@ export function WordTowerScene(props: SceneProps) {
         {/* Rare drifting sightings (cosmic whale / satellite / shooting star). */}
         <WordTowerSighting heightM={viewAlt} reducedMotion={props.reducedMotion} />
         {/* Ambient leaves / birds / ice crystals — disabled on low-end/reduced motion. */}
-        <WordTowerAmbient biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} enableComplexAnimations={perf.enableComplexAnimations} />
+        <WordTowerAmbient biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} enableComplexAnimations={perf.enableComplexAnimations} paused={panning} />
       </div>
       {/* Front slice — the near skyline the clouds must pass BEHIND, plus the
           ground haze and the vignette, which have to sit on top of everything.

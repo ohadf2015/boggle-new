@@ -1,43 +1,26 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 import { useExperiment } from '@/hooks/useExperiment';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useWordTowerEnabled } from '@/hooks/useWordTowerEnabled';
 import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 /**
- * The WHOLE Word Tower game is feature-gated: admins always have access (dev
- * preview), and everyone else is gated behind the single `word-tower` PostHog
- * flag (`useWordTowerEnabled`, with a `?word-tower=1` live-verify override). When
- * neither is true, non-admins are redirected home and never see the route exists
- * (no flash of content). `trackExposure` fires for usage analytics.
+ * Word Tower is PUBLIC — the route no longer gates anyone.
+ *
+ * It used to redirect non-admins home unless the `word-tower` PostHog flag was
+ * on. That flag is a MULTIVARIATE experiment ('on'/'off' 50/50), and
+ * `usePostHogFlag<boolean>` hands back the variant STRING — so the gate read
+ * `"off"` as truthy and let everyone through anyway. A gate that only pretends
+ * to gate is worse than none: it made the mode look shipped while the real
+ * blocker (the daily hub only drew the card for admins) went unnoticed. Deleted
+ * rather than repaired — the mode is meant to be live. `trackExposure` stays for
+ * usage analytics.
  */
 export function WordTowerPageClient() {
-  const { language } = useLanguage();
-  const router = useRouter();
-  const { canSeeInWorkModes, loading } = useAuth();
   const { trackExposure } = useExperiment('word-tower');
-  const gameEnabled = useWordTowerEnabled();
-  // Dev bypass so the game is reachable locally (incl. /he RTL playtest) without
-  // an admin session. Production still requires admin or the live feature flag.
-  const isDev = process.env.NODE_ENV === 'development';
-  const allowed = canSeeInWorkModes || gameEnabled || isDev;
 
-  useEffect(() => {
-    if (allowed) trackExposure();
-  }, [allowed, trackExposure]);
-
-  useEffect(() => {
-    if (!loading && !allowed) router.replace(`/${language}`);
-  }, [loading, allowed, language, router]);
-
-  if (loading || !allowed) {
-    return <div className="min-h-[100dvh] bg-neo-navy" aria-hidden />;
-  }
+  useEffect(() => { trackExposure(); }, [trackExposure]);
 
   return (
     <>

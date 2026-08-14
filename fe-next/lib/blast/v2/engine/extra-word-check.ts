@@ -1,5 +1,33 @@
 import type { BlastLevel } from '../types';
-import { LOCALE_CONFIGS } from '../locale-config';
+import { LOCALE_CONFIGS, type LocaleConfig } from '../locale-config';
+
+/**
+ * Shortest run of tiles that counts as a word on the board — for the generator's
+ * unintended-word screen AND for the player's bonus-word claim. These MUST be the
+ * same number: screening at 4 while accepting selections at 2 means the screen
+ * never sees the words the player can actually clear. Measured on the shipped
+ * en chain pack, unintended selectable words per board state:
+ *   min length 2 → 28 avg (85 worst) · 3 → 12 avg · 4 → 3 avg · 5 → 0.3 avg
+ * At 2 the intended word is one option among thirty, and every stray clear
+ * collapses the board out from under the authored chain.
+ *
+ * The rule is: one tile longer than the locale's shortest theme word, capped at
+ * 4, and never longer than its longest word.
+ *   - en/he/sv/es (min 3) → 4. 3-letter hits dominate the false positives
+ *     (especially Hebrew, where most 3-letter substrings are real roots) and
+ *     over-constrain placement to unsolvability.
+ *   - ja (min 2, max 4) → 3. A flat 4 would make a bonus word exactly as long
+ *     as the LONGEST possible Japanese theme word, which effectively deletes
+ *     the mechanic for that locale.
+ * Theme words are exempt — the level's own answers are matched before this
+ * floor applies, so a short answer still clears.
+ */
+export const BOARD_WORD_MIN_LENGTH_FLOOR = 4;
+
+export function boardWordMinLength(config: LocaleConfig): number {
+  const { min, max } = config.wordLengthRange;
+  return Math.min(BOARD_WORD_MIN_LENGTH_FLOOR, min + 1, max);
+}
 
 /**
  * Scans every horizontal and vertical contiguous line segment of the board

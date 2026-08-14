@@ -13,6 +13,10 @@ const mockLevel: BlastLevel = {
     { index: 0, tiles: ['C', 'A', 'T'] },
     { index: 1, tiles: ['S', 'U', 'N'] },
     { index: 2, tiles: ['E', 'G', 'G'] },
+    // Fourth column so row 0 is a FOUR-tile off-theme run ("CSER"). Bonus words
+    // only count from `boardWordMinLength` tiles up, so shorter off-theme drags
+    // now reject as 'length' before the dictionary is consulted.
+    { index: 3, tiles: ['R', 'R', 'R'] },
   ],
   words: ['CAT', 'SUN', 'EGG'],
   resolvableOrder: ['CAT', 'SUN', 'EGG'],
@@ -94,7 +98,7 @@ describe('validation pipeline', () => {
   it('bonus dict word accepted when mechanic enabled', () => {
     const ctxWithBonus: ValidationContext = {
       ...mockContext,
-      bonusDict: new Set(['BON']),
+      bonusDict: new Set(['BONA']),
       bonusDictEnabled: true,
     };
     // Create a level with a path spelling BON
@@ -107,18 +111,25 @@ describe('validation pipeline', () => {
         { index: 0, tiles: ['B', 'A', 'N'] },
         { index: 1, tiles: ['O', 'U', 'U'] },
         { index: 2, tiles: ['N', 'S', 'Z'] },
+        { index: 3, tiles: ['A', 'Z', 'Z'] },
       ],
     };
     const ctxFinal = { ...ctxWithBonus, level: levelWithBonus };
-    const result = validateSelection([cellId(0, 0), cellId(1, 0), cellId(2, 0)], ctxFinal);
+    const result = validateSelection(
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0), cellId(3, 0)],
+      ctxFinal,
+    );
     expect(result.kind).toBe('bonus');
     if (result.kind === 'bonus') {
-      expect(result.word).toBe('BON');
+      expect(result.word).toBe('BONA');
     }
   });
 
   it('unknown word rejected', () => {
-    const result = validateSelection([cellId(0, 0), cellId(1, 0)], mockContext);
+    const result = validateSelection(
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0), cellId(3, 0)],
+      mockContext,
+    );
     expect(result.kind).toBe('reject');
     if (result.kind === 'reject') {
       expect(result.reason).toBe('unknown');
@@ -126,30 +137,30 @@ describe('validation pipeline', () => {
   });
 
   it('free-form dictionary word accepted as bonus when dictionaryCheck provided', () => {
-    // Board: row 0 across spells "CSE" — not in level.words, not in bonusDict.
-    // dictionaryCheck accepts "cse" → treat as bonus.
+    // Board: row 0 across spells "CSER" — not in level.words, not in bonusDict.
+    // dictionaryCheck accepts "cser" → treat as bonus.
     const ctxWithDict: ValidationContext = {
       ...mockContext,
-      dictionaryCheck: (w) => w.toLowerCase() === 'cse',
+      dictionaryCheck: (w) => w.toLowerCase() === 'cser',
     };
     const result = validateSelection(
-      [cellId(0, 0), cellId(1, 0), cellId(2, 0)],
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0), cellId(3, 0)],
       ctxWithDict,
     );
     expect(result.kind).toBe('bonus');
     if (result.kind === 'bonus') {
-      expect(result.word.toLowerCase()).toBe('cse');
+      expect(result.word.toLowerCase()).toBe('cser');
     }
   });
 
   it('free-form dictionary word accepted in reverse', () => {
-    // "ESC" reversed is "CSE" — dict has "esc".
+    // "RESC" reversed is "CSER" — dict has "resc".
     const ctxWithDict: ValidationContext = {
       ...mockContext,
-      dictionaryCheck: (w) => w.toLowerCase() === 'esc',
+      dictionaryCheck: (w) => w.toLowerCase() === 'resc',
     };
     const result = validateSelection(
-      [cellId(0, 0), cellId(1, 0), cellId(2, 0)],
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0), cellId(3, 0)],
       ctxWithDict,
     );
     expect(result.kind).toBe('bonus');
@@ -161,7 +172,7 @@ describe('validation pipeline', () => {
       dictionaryCheck: () => false,
     };
     const result = validateSelection(
-      [cellId(0, 0), cellId(1, 0)],
+      [cellId(0, 0), cellId(1, 0), cellId(2, 0), cellId(3, 0)],
       ctxWithDict,
     );
     expect(result.kind).toBe('reject');

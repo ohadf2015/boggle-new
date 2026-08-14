@@ -46,7 +46,7 @@ export function WordTowerSkinPicker({ skin, t, dir, reducedMotion, inline = fals
         onClick={() => setOpen(true)}
         aria-label={t('wordTower.skin.open')}
         className={cn(
-          'pointer-events-auto relative flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy/85 text-neo-cyan shadow-hard backdrop-blur-sm active:translate-y-0.5 active:shadow-hard-pressed',
+          'pointer-events-auto relative flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy/95 text-neo-cyan shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
           !inline && 'absolute end-2 top-[14%] z-[9]',
         )}
       >

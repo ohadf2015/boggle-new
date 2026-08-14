@@ -102,6 +102,10 @@ const es = {
     "tagline": "Rellena la cuadrícula, pista a pista",
     "title": "Crucigrama",
     "timer": "Tiempo",
+    "formatLabel": "Tamaño del crucigrama",
+    "format": { "mini": "Mini", "full": "Completo" },
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
     "gridLabel": "Cuadrícula del crucigrama",
     "cellLabel": "Fila {row}, columna {col}",
     "dir": {
@@ -524,6 +528,7 @@ const es = {
       "dragToBuild": "Arrastra o toca para formar",
       "keepBuilding": "Seguir formando",
       "menuOpen": "Más acciones",
+      "menuNew": "Más acciones: {n} novedades",
       "menuClose": "Cerrar menú",
       "chaseGap": "+{m} m",
       "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo"
@@ -11548,6 +11553,9 @@ const es = {
       "retry": "Reintentar",
       "home": "Inicio",
       "progressSafe": "Tu progreso está a salvo — nivel {n}"
+    },
+    "progress": {
+      "aria": "{found} de {total} palabras encontradas"
     },
     "strikes": {
       "label": "Intentos",

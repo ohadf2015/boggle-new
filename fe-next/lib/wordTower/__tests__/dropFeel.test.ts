@@ -9,12 +9,6 @@
  */
 import { describe, it, expect } from 'vitest';
 import { dropQualityIntensity, type PlacementQuality } from '../cranePlacement';
-import {
-  brickLiftFrac,
-  SWIVEL_DESCENT_STAGGER,
-  swivelDescent,
-  swivelBrickFrame,
-} from '../swivelDrop';
 import { swayJitterDeg, SWAY_JITTER_MAX_DEG, SWAY_START_INSTABILITY } from '../towerSway';
 import { cableStretchAt } from '../cranePendulum';
 
@@ -36,43 +30,6 @@ describe('dropQualityIntensity', () => {
     }
     expect(dropQualityIntensity('perfect')).toBeGreaterThan(0); // perfect FEELS good
     expect(dropQualityIntensity('miss')).toBeCloseTo(1, 5); // a miss slams hardest
-  });
-});
-
-describe('brickLiftFrac (cascading descent)', () => {
-  it('with a single brick reproduces the uniform descent (back-compat)', () => {
-    for (const k of [0, 0.25, 0.5, 0.75, 1]) {
-      expect(brickLiftFrac(k, 0, 1, SWIVEL_DESCENT_STAGGER)).toBeCloseTo(1 - swivelDescent(k), 6);
-    }
-  });
-
-  it('every brick is flush (lift 0) at k=1 and fully lifted at k=0', () => {
-    for (let i = 0; i < 5; i++) {
-      expect(brickLiftFrac(1, i, 5, SWIVEL_DESCENT_STAGGER)).toBeCloseTo(0, 6);
-      expect(brickLiftFrac(0, i, 5, SWIVEL_DESCENT_STAGGER)).toBeCloseTo(1, 6);
-    }
-  });
-
-  it('higher bricks lag — they are still more lifted mid-animation (wave)', () => {
-    const bottom = brickLiftFrac(0.5, 0, 5, SWIVEL_DESCENT_STAGGER);
-    const top = brickLiftFrac(0.5, 4, 5, SWIVEL_DESCENT_STAGGER);
-    expect(top).toBeGreaterThan(bottom);
-  });
-
-  it('with stagger 0 there is no cascade (all bricks identical)', () => {
-    const a = brickLiftFrac(0.5, 0, 5, 0);
-    const b = brickLiftFrac(0.5, 4, 5, 0);
-    expect(a).toBeCloseTo(b, 6);
-  });
-});
-
-describe('swivelBrickFrame still lands flush with cascade params', () => {
-  it('top brick lands exactly on its rest slot at k=1 even when staggered', () => {
-    const rest = { x: 100, y: 40 };
-    const f = swivelBrickFrame(rest, 100, 200, 14, 30, 1, 3, 5, SWIVEL_DESCENT_STAGGER);
-    expect(f.x).toBeCloseTo(rest.x, 4);
-    expect(f.y).toBeCloseTo(rest.y, 4);
-    expect(f.angleDeg).toBeCloseTo(0, 4);
   });
 });
 

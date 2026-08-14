@@ -5,6 +5,8 @@ import { currentSlot, type GameState } from '@/lib/crossword/gameState';
 import { solvedSlotIds } from '@/lib/crossword/stats';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CrosswordCell } from './CrosswordCell';
+import { useBoardPanZoom, ZOOM_STEP } from './useBoardPanZoom';
+import { initialScale } from '@/lib/crossword/viewport';
 
 export interface CrosswordGridProps {
   state: GameState;
@@ -26,6 +28,10 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     ({ easy: 'shadow-hard-lime', medium: 'shadow-hard-cyan', hard: 'shadow-hard-pink' } as const)[
       puzzle.difficulty
     ] ?? 'shadow-hard-lg';
+
+  // A mini always fits its box, so it gets neither pan nor zoom chrome.
+  const zoomable = initialScale(size) > 1;
+  const pan = useBoardPanZoom({ size, rtl: puzzle.rtl, active });
 
   const slot = currentSlot(state);
   const activeSlotCells = useMemo(
@@ -95,42 +101,90 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
   // 100cqmin resolves to the smaller of the space actually left over after the pinned chrome.
   // Sizing off width alone (the old `92vw`) overflowed the scrollport on short phones.
   // Desktop has no bounded height, so it falls back to plain width sizing.
+  //
+  // The clip box's LAYOUT size is what the old fix pinned down, so zoom is expressed purely as a
+  // transform on the layer inside it: the grid can never grow past its box and re-create the
+  // clipping bug, however far you pinch.
   return (
     <div
-      ref={gridRef}
-      role="grid"
-      aria-label={t('crossword.gridLabel')}
-      dir={puzzle.rtl ? 'rtl' : 'ltr'}
-      className={`grid gap-px m-auto aspect-square w-[min(100cqmin,28rem)] lg:w-full lg:max-w-[28rem] bg-black p-px rounded-none ${diffShadow} border-[3px] border-black`}
-      style={{
-        gridTemplateColumns: `repeat(${size}, 1fr)`,
-        gridTemplateRows: `repeat(${size}, 1fr)`,
-      }}
+      ref={pan.viewportRef}
+      data-crossword-board
+      className={`relative m-auto aspect-square w-[min(100cqmin,28rem)] lg:w-full lg:max-w-[28rem] overflow-hidden touch-none select-none bg-black ${diffShadow} border-[3px] border-black`}
+      onPointerDown={pan.onPointerDown}
+      onPointerMove={pan.onPointerMove}
+      onPointerUp={pan.onPointerUp}
+      onPointerCancel={pan.onPointerUp}
+      onClickCapture={pan.onClickCapture}
+      data-pannable={pan.pannable ? 'true' : 'false'}
+      style={{ cursor: pan.pannable ? 'grab' : undefined }}
     >
-      {puzzle.cells.map((cell) => {
+      <div
+        ref={pan.contentRef}
+        className="absolute inset-0 will-change-transform"
+        style={{ transformOrigin: '0 0' }}
+      >
+        <div
+          ref={gridRef}
+          role="grid"
+          aria-label={t('crossword.gridLabel')}
+          dir={puzzle.rtl ? 'rtl' : 'ltr'}
+          className="grid gap-px h-full w-full bg-black p-px"
+          style={{
+            gridTemplateColumns: `repeat(${size}, 1fr)`,
+            gridTemplateRows: `repeat(${size}, 1fr)`,
+          }}
+        >
+          {puzzle.cells.map((cell) => {
         const key = `${cell.row},${cell.col}`;
-        return (
-          <CrosswordCell
-            key={key}
-            cell={cell}
-            letter={state.entries[key] ?? ''}
-            size={size}
-            rtl={puzzle.rtl}
-            locale={puzzle.locale}
-            isActive={active.row === cell.row && active.col === cell.col}
-            inActiveSlot={activeSlotCells.has(key)}
-            isWordEnd={wordEndCells.has(key)}
-            inSolvedSlot={solvedCells.has(key)}
-            check={checks[key]}
-            warmth={warmths[key]}
-            revealed={revealed.includes(key)}
-            onSelect={onSelect}
-            label={t('crossword.cellLabel', { row: cell.row + 1, col: cell.col + 1 })}
-            enter={!reduced}
-            enterDelay={enterDelay(cell.row, cell.col)}
-          />
-        );
-      })}
+            return (
+              <CrosswordCell
+                key={key}
+                cell={cell}
+                letter={state.entries[key] ?? ''}
+                size={size}
+                rtl={puzzle.rtl}
+                locale={puzzle.locale}
+                isActive={active.row === cell.row && active.col === cell.col}
+                inActiveSlot={activeSlotCells.has(key)}
+                isWordEnd={wordEndCells.has(key)}
+                inSolvedSlot={solvedCells.has(key)}
+                check={checks[key]}
+                warmth={warmths[key]}
+                revealed={revealed.includes(key)}
+                onSelect={onSelect}
+                label={t('crossword.cellLabel', { row: cell.row + 1, col: cell.col + 1 })}
+                enter={!reduced}
+                enterDelay={enterDelay(cell.row, cell.col)}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Zoom affordance for pointer/keyboard users — pinch is touch-only, and a grid this size
+          has to be reachable without one. Hidden entirely on a grid that always fits. */}
+      {zoomable && (
+        <div className="absolute bottom-1 end-1 flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={() => pan.zoomBy(ZOOM_STEP)}
+            disabled={!pan.canZoomIn}
+            aria-label={t('crossword.zoomIn')}
+            className="h-8 w-8 grid place-items-center rounded-neo border-neo border-black bg-neo-cream text-black font-neo-display text-lg leading-none shadow-hard-sm disabled:opacity-40"
+          >
+            +
+          </button>
+          <button
+            type="button"
+            onClick={() => pan.zoomBy(-ZOOM_STEP)}
+            disabled={!pan.canZoomOut}
+            aria-label={t('crossword.zoomOut')}
+            className="h-8 w-8 grid place-items-center rounded-neo border-neo border-black bg-neo-cream text-black font-neo-display text-lg leading-none shadow-hard-sm disabled:opacity-40"
+          >
+            −
+          </button>
+        </div>
+      )}
     </div>
   );
 }

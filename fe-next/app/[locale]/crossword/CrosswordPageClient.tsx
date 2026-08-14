@@ -5,6 +5,12 @@ import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateDailyPuzzle, generateFreeplayPuzzle } from '@/lib/crossword/generate.daily';
 import { loadStreak, persistSolve, type StreakState, emptyStreak } from '@/lib/crossword/streak';
+import {
+  loadFormat,
+  saveFormat,
+  supportsFull,
+  type CrosswordFormat,
+} from '@/lib/crossword/format';
 import type { CrosswordPuzzle, Difficulty, PuzzleLocale } from '@/lib/crossword/types';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { CrosswordLoader } from '@/components/crossword/CrosswordLoader';
@@ -24,24 +30,33 @@ function todayISO(): string {
 
 // Cache the generated daily so a mid-solve refresh keeps the SAME grid (and is instant) — and a
 // deploy that changes the generator can't pull the rug out from under an in-progress solver.
-const dailyCacheKey = (date: string, locale: PuzzleLocale) =>
-  `lexiclash:crossword:daily:${locale}:${date}`;
+const dailyCacheKey = (date: string, locale: PuzzleLocale, format: CrosswordFormat) =>
+  `lexiclash:crossword:daily:${locale}:${format}:${date}`;
 const FREEPLAY_COUNT_KEY = 'lexiclash:crossword:freeplayCount';
 
-function readDailyCache(date: string, locale: PuzzleLocale): CrosswordPuzzle | null {
+function readDailyCache(
+  date: string,
+  locale: PuzzleLocale,
+  format: CrosswordFormat,
+): CrosswordPuzzle | null {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = window.localStorage.getItem(dailyCacheKey(date, locale));
+    const raw = window.localStorage.getItem(dailyCacheKey(date, locale, format));
     return raw ? (JSON.parse(raw) as CrosswordPuzzle) : null;
   } catch {
     return null;
   }
 }
 
-function writeDailyCache(date: string, locale: PuzzleLocale, puzzle: CrosswordPuzzle): void {
+function writeDailyCache(
+  date: string,
+  locale: PuzzleLocale,
+  format: CrosswordFormat,
+  puzzle: CrosswordPuzzle,
+): void {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(dailyCacheKey(date, locale), JSON.stringify(puzzle));
+    window.localStorage.setItem(dailyCacheKey(date, locale, format), JSON.stringify(puzzle));
   } catch {
     /* storage full — daily just regenerates next visit (still deterministic) */
   }
@@ -71,6 +86,10 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   const [edition, setEdition] = useState<Edition>({ isDaily: true, label: '' });
   const [streak, setStreak] = useState<StreakState>(emptyStreak());
   const [generating, setGenerating] = useState(false);
+  // Read on mount rather than in the initialiser: localStorage isn't available during SSR, and a
+  // differing first client render would hydrate-mismatch.
+  const [format, setFormat] = useState<CrosswordFormat>('mini');
+  useEffect(() => setFormat(loadFormat(locale)), [locale]);
   const [genError, setGenError] = useState<boolean>(false);
   const seqRef = useRef(0); // guards against out-of-order async results
 
@@ -96,10 +115,10 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
     setGenError(false);
     (async () => {
       try {
-        const cached = readDailyCache(today, locale);
-        const p = cached ?? (await generateDailyPuzzle(today, locale));
+        const cached = readDailyCache(today, locale, format);
+        const p = cached ?? (await generateDailyPuzzle(today, locale, format));
         if (!p) throw new Error('no puzzle generated');
-        if (!cached) writeDailyCache(today, locale, p);
+        if (!cached) writeDailyCache(today, locale, format, p);
         if (cancelled || seq !== seqRef.current) return;
         setPuzzle(p);
         setEdition({ isDaily: true, label: dailyEditionLabel });
@@ -114,7 +133,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
     return () => {
       cancelled = true;
     };
-  }, [today, locale, dailyEditionLabel]);
+  }, [today, locale, format, dailyEditionLabel]);
 
   const handleNewPuzzle = useCallback(
     (difficulty?: Difficulty) => {
@@ -127,7 +146,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
         void (async () => {
           try {
             const seed = count * 2654435761; // spread counters across the seed space
-            const p = await generateFreeplayPuzzle(seed, locale, difficulty);
+            const p = await generateFreeplayPuzzle(seed, locale, difficulty, format);
             if (seq !== seqRef.current) return;
             if (p) {
               setPuzzle(p);
@@ -144,8 +163,13 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
         })();
       }, 16);
     },
-    [locale, t],
+    [locale, format, t],
   );
+
+  const handleFormatChange = useCallback((next: CrosswordFormat) => {
+    saveFormat(next);
+    setFormat(next);
+  }, []);
 
   const handleDailySolved = useCallback(() => {
     setStreak(persistSolve(today));
@@ -184,6 +208,8 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
         streak={streak.current}
         onNewPuzzle={handleNewPuzzle}
         onDailySolved={handleDailySolved}
+        format={format}
+        onFormatChange={supportsFull(locale) ? handleFormatChange : undefined}
       />
       <ModeCoach mode="crossword" />
     </main>

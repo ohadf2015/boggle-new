@@ -22,6 +22,9 @@ import {
 export const DEFAULT_TOP_CHROME_PX = 112;
 /** Breathing room between the notice stack bottom and the construction zone. */
 export const NOTICE_CONSTRUCTION_GAP_PX = 12;
+/** Breathing room between the top chrome (back row · stats · play tools) and the
+ *  first notice banner. */
+export const TOP_CHROME_NOTICE_GAP_PX = 10;
 /** Height reserved above the crane chrome. Now 0 — the stability dot-meter that
  *  used to live there was removed (the tower's own lean/sway shows instability
  *  better, and the do-or-die state has its own banner). Kept as a parameter
@@ -92,10 +95,13 @@ export function playChromeFrame({
     H - deck,
   );
 
-  const noticeTopPx = topChrome;
+  // Sit CLEAR of the top chrome, not flush against it: the header's last row is
+  // the play tools, and a verdict banner that starts at exactly `topChrome`
+  // reads as if it is covering the clue button (2026-08-14 QA).
+  const noticeTopPx = topChrome + TOP_CHROME_NOTICE_GAP_PX;
   const noticeMaxHeightPx = Math.max(
     NOTICE_MIN_H_PX,
-    Math.floor(constructionTop - topChrome - NOTICE_CONSTRUCTION_GAP_PX),
+    Math.floor(constructionTop - noticeTopPx - NOTICE_CONSTRUCTION_GAP_PX),
   );
 
   // Real DOM path: outer + meter + gap-3 + trolley top + (shadowY - nudge) = build line.

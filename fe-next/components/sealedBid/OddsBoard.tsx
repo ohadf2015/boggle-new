@@ -61,25 +61,36 @@ export default function OddsBoard({
   const multText = t('sealedBid.uniquePays', { mult: multDisplay });
 
   if (compact) {
+    // Rim strip: ONE line, no wrap, no chrome of its own — the table nests this
+    // inside the shared stake strip. The prose forms ("Unique pays 4.0x",
+    // "Potential payout 80") wrapped to two lines at phone widths and cost the
+    // wheel ~75px of height, which is what pushed the tiles onto their
+    // neighbours. Glyphs here, full sentence on the aria-label.
     return (
       <div
         data-testid="odds-board"
-        className="mx-auto flex max-w-sm flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-neo border-2 border-black bg-neo-navy/90 px-3 py-2 shadow-hard-sm"
+        className="flex min-w-0 items-center gap-2 whitespace-nowrap"
       >
-        <div
+        <span
           data-testid="odds-mult"
-          className={`font-neo-display text-base font-black sm:text-lg ${
+          aria-label={multText}
+          dir="ltr"
+          className={`font-neo-display text-base font-black tabular-nums sm:text-lg ${
             hot ? 'text-neo-orange' : 'text-neo-yellow'
           } ${hot && !reducedMotion ? 'animate-neo-pop' : ''}`}
         >
-          {multText}
-        </div>
-        <div
+          ×{multDisplay}
+        </span>
+        <span
           data-testid="odds-payout"
-          className="font-neo-body text-sm font-bold text-neo-cyan tabular-nums"
+          aria-label={payoutText}
+          dir="ltr"
+          className="font-neo-body text-sm font-black text-neo-cyan tabular-nums"
         >
-          {payoutText}
-        </div>
+          {/* No dash branch: the compact strip early-returns null when there is
+              no word yet, so shouldShow is always true by here. */}
+          →{payout}
+        </span>
       </div>
     );
   }

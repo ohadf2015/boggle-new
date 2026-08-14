@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-07T14:17:51.064Z",
+  "generatedAt": "2026-08-14T08:40:41.183Z",
   "commits": [
     {
-      "sha": "39289b1ba2bf2997b9731e9f4601eff1a245ae55",
-      "shortSha": "39289b1",
-      "subject": "fix(react-doctor): unwedge duel loaders, fix render-phase callbacks, restore the linter's ignore lists",
+      "sha": "e6f171458f9c83a8a377e73a64dc6cf1fa4855c8",
+      "shortSha": "e6f1714",
+      "subject": "chore(seo): land the 08-13 + 08-14 seo-daily metadata revisions",
       "author": "Ohad Fisher",
-      "date": "2026-08-07T16:13:41+03:00"
+      "date": "2026-08-14T11:29:56+03:00"
     },
     {
-      "sha": "5adb1644d990aa18c8cda7864ad4fbd01906f195",
-      "shortSha": "5adb164",
-      "subject": "feat(footer): add inline email newsletter signup form (sitewide email capture)",
+      "sha": "dfc34c301061f2ceed54dcb9d1a56e042b806a78",
+      "shortSha": "dfc34c3",
+      "subject": "feat(nightly): restore stranded 2026-08-14 lane work",
       "author": "Ohad Fisher",
-      "date": "2026-08-07T13:10:10Z"
+      "date": "2026-08-14T11:03:13+03:00"
     },
     {
-      "sha": "c533d6211111950525363c705e355be28d1dab39",
-      "shortSha": "c533d62",
-      "subject": "perf(shell): stop inlining the message catalogue in every page's HTML",
+      "sha": "db994fbdb3b076b0943ee9603faec42fbd1c7d14",
+      "shortSha": "db994fb",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-14",
       "author": "Ohad Fisher",
-      "date": "2026-08-07T15:55:31+03:00"
+      "date": "2026-08-14T07:14:05+03:00"
     },
     {
-      "sha": "767feb7ccaefcad445277f7672ddb9ff0b40fd0e",
-      "shortSha": "767feb7",
-      "subject": "fix(onboarding): stop new players dead-ending right after the FTUE",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T15:32:57+03:00"
-    },
-    {
-      "sha": "48190619b0a2ddcb6363b61845f9507e568dbe0d",
-      "shortSha": "4819061",
-      "subject": "test(practice): await the now-lazy sandboxes in the skip-intro test",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T13:03:37+03:00"
-    },
-    {
-      "sha": "55fc22d6dfb7d47f34add079e3dddcb6ebc2286c",
-      "shortSha": "55fc22d",
-      "subject": "fix(connections): stop hints leaking answers and give players real attempts",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T12:33:11+03:00"
-    },
-    {
-      "sha": "e1add9bce11cf8c1f834adedc6227ba973d3cd92",
-      "shortSha": "e1add9b",
-      "subject": "docs: flag the two deliberate divergences left by the previous commits",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:48:03+03:00"
-    },
-    {
-      "sha": "eacafe1e1df1afdc4e21114245213e9f8ec13c7f",
-      "shortSha": "eacafe1",
-      "subject": "fix(sentry): judge socket errors by code, not by their translated message",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:46:43+03:00"
-    },
-    {
-      "sha": "0acd6a92d681e10bddb62b3e5c97d4c82883c4eb",
-      "shortSha": "0acd6a9",
-      "subject": "perf(word-craft): stop shipping 9.5MB of dictionary to the browser",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:46:25+03:00"
-    },
-    {
-      "sha": "63f9239866b0d63868d7af2670636618b69cda4c",
-      "shortSha": "63f9239",
-      "subject": "fix(nightly): close the 18 pre-07-05 restore-queue tags + recover 2 stranded files",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:33:09+03:00"
-    },
-    {
-      "sha": "860a01b2c592d711db424350e7bffe875a9e98cc",
-      "shortSha": "860a01b",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-07",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T04:58:10+03:00"
-    },
-    {
-      "sha": "c7eb4c81db5675764cb582f894e40f7a6fcc4522",
-      "shortSha": "c7eb4c8",
-      "subject": "fix(dictionary): share one server-side copy of each word list to stop heap OOM (#791)",
+      "sha": "e9c025b7bc4c6195e1e3bf76706f17f3c844f9ca",
+      "shortSha": "e9c025b",
+      "subject": "fix(blast): use player's dragged path for MP cascade so ice/bomb tiles break server-side (#806)",
       "author": "ohadf2015",
-      "date": "2026-08-06T17:56:00+03:00"
+      "date": "2026-08-13T16:40:03+03:00"
     },
     {
-      "sha": "ca0bc318d18300dd913829bd83128604762c92b9",
-      "shortSha": "ca0bc31",
-      "subject": "fix(android-install): stop native app flashing the \"Get the App\" promo (#789)",
+      "sha": "fa95aa6743d11de82f135cd613b241eefe70366c",
+      "shortSha": "fa95aa6",
+      "subject": "fix(gifts): accept Bearer auth on gift claim/dismiss mutations (#805)",
       "author": "ohadf2015",
-      "date": "2026-08-06T17:15:06+03:00"
+      "date": "2026-08-13T15:50:43+03:00"
     },
     {
-      "sha": "8443b0d3f49aca8b9ebeea4c82951d72945ba84c",
-      "shortSha": "8443b0d",
-      "subject": "fix(word-wheel): re-measure the pixi canvases instead of freezing mount-time size",
+      "sha": "9794e38c256a987a4415dcea3a651a5ead490d6d",
+      "shortSha": "9794e38",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-13",
       "author": "Ohad Fisher",
-      "date": "2026-08-06T11:04:09+03:00"
+      "date": "2026-08-13T10:06:07+03:00"
     },
     {
-      "sha": "d6deb3f7f33457bd9f605dffe76a9e7262cad23b",
-      "shortSha": "d6deb3f",
-      "subject": "fix(nightly): restore code stranded by the 08-03/08-04/08-06 gate salvages",
+      "sha": "20c2e2f02917093e514f65876715df913cb5106a",
+      "shortSha": "20c2e2f",
+      "subject": "Merge remote-tracking branch 'origin/fix/tests-green-master'",
       "author": "Ohad Fisher",
-      "date": "2026-08-06T11:03:47+03:00"
+      "date": "2026-08-13T09:53:02+03:00"
     },
     {
-      "sha": "14a78f6eeac03f8ac4c3e107bdcd3641bf38cf90",
-      "shortSha": "14a78f6",
-      "subject": "fix(layout): remove EmailCaptureModal so it no longer pops over the game screen (#787)",
-      "author": "ohadf2015",
-      "date": "2026-08-05T12:31:38+03:00"
-    },
-    {
-      "sha": "c2c082b699bce00556812c8519dd75b07c136448",
-      "shortSha": "c2c082b",
-      "subject": "fix(feedback): cache-bust widget.js so returning users get the neo-brutalist mobile launcher (#785)",
-      "author": "ohadf2015",
-      "date": "2026-08-04T20:13:03+03:00"
-    },
-    {
-      "sha": "2dc9e50a897d25e5e1bbcad33aea55f0352fc196",
-      "shortSha": "2dc9e50",
-      "subject": "fix(feedback): collapse mobile launcher to icon-only chip on real phones (#784)",
-      "author": "ohadf2015",
-      "date": "2026-08-04T18:26:17+03:00"
-    },
-    {
-      "sha": "5fde7409aa37fdbdea6e645942fe6ba7409f1cbf",
-      "shortSha": "5fde740",
-      "subject": "docs(onboarding): fix stale comment — FTUE routes to auto-start practice, not Daily Challenge",
+      "sha": "04866ef3eb296a8810d027f41b2e6e51010f065c",
+      "shortSha": "04866ef",
+      "subject": "fix(leaderboard): the All-Time board was empty and past seasons had no faces",
       "author": "Ohad Fisher",
-      "date": "2026-08-04T09:43:55Z"
+      "date": "2026-08-12T23:56:14+03:00"
     },
     {
-      "sha": "dccd4e6c3c4ee4f76a2128e2488f6cdf73c95fb6",
-      "shortSha": "dccd4e6",
-      "subject": "fix(server): no-cache /widget.js and /sw.js — 1yr immutable header froze the feedback button for returning users",
+      "sha": "a4d48e426d35d8ecd5d93736827e14dccf9cfb1b",
+      "shortSha": "a4d48e4",
+      "subject": "fix(gate): shrink shards to 80 files and preload AvatarRenderer — the two ways the pre-push gate fails with zero failing tests",
       "author": "Ohad Fisher",
-      "date": "2026-08-04T09:15:32Z"
+      "date": "2026-08-12T22:28:04+03:00"
+    },
+    {
+      "sha": "244c701b12abbd9a585aade2d037c4c3c0d27d67",
+      "shortSha": "244c701",
+      "subject": "merge: teacher-access outage, admin funnel, MP lobby dropout, in-game coach",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T21:35:26+03:00"
+    },
+    {
+      "sha": "0d92761c43c1abe4330c369b35d6ef339653db9c",
+      "shortSha": "0d92761",
+      "subject": "fix(ftue): the stuck-player coach now names a word that's actually on the board",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T21:35:08+03:00"
+    },
+    {
+      "sha": "cdc2dc96fe7b99c164bd06d8db512e639fc77207",
+      "shortSha": "cdc2dc9",
+      "subject": "fix(mp): a bot-filled public lobby now starts itself instead of waiting forever",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T21:34:53+03:00"
+    },
+    {
+      "sha": "50ac1da2dc6c5adf2183cb4c670788da8796d30f",
+      "shortSha": "50ac1da",
+      "subject": "feat(admin): surface the teacher funnel so a broken gate can't hide again",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T21:34:41+03:00"
+    },
+    {
+      "sha": "4b01e97ae0654fa6618c938d4fcb23b0f56b364e",
+      "shortSha": "4b01e97",
+      "subject": "fix(teacher): approvals never actually granted the teacher role",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T21:34:26+03:00"
+    },
+    {
+      "sha": "cc52efaf8419a7d32e1a7538835916e6748cf62c",
+      "shortSha": "cc52efa",
+      "subject": "merge: fix/feedback-widget-bugs — Hebrew widget UI, ad off the report form, launcher off the bottom nav, Word Bridge spacing + strike haptics",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T20:13:11+03:00"
+    },
+    {
+      "sha": "7445a4907dfb28af309f6dee21557b9430b12adc",
+      "shortSha": "7445a49",
+      "subject": "chore(feedback): re-vendor widget.js with the localized launcher aria-label",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T19:51:08+03:00"
+    },
+    {
+      "sha": "040e8abd09823c4b73dfcab979b6e276836e481b",
+      "shortSha": "040e8ab",
+      "subject": "test(word bridge): every strike buzzes, not only the first",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T19:43:07+03:00"
+    },
+    {
+      "sha": "de6d6f98fd1db2b9e52f1ce59ad4055b344c1f3d",
+      "shortSha": "de6d6f9",
+      "subject": "fix(tests): drain handlePlay's async tail in the audio-unlock test — the last red file at master",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T19:42:17+03:00"
+    },
+    {
+      "sha": "440ce9ad7928e29146aedd6a26795dede0b13faa",
+      "shortSha": "440ce9a",
+      "subject": "fix(word bridge): space Hebrew compounds, buzz on every strike",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T19:36:40+03:00"
+    },
+    {
+      "sha": "eb0fa9e909b98b4e26a8396c5fb5626827cd7d78",
+      "shortSha": "eb0fa9e",
+      "subject": "fix(tests): unblock the pre-push gate — the suite was red on master, so nobody could push",
+      "author": "Ohad Fisher",
+      "date": "2026-08-12T09:50:11+03:00"
     }
   ]
 }

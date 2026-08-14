@@ -21,9 +21,6 @@ const baseProps = (over: Partial<WordTowerHudProps> = {}): WordTowerHudProps => 
   word: '',
   heightM: 12,
   combo: 1,
-  scramblesLeft: 3,
-  possibleWords: null,
-  clueWord: null,
   lastError: null,
   errorKey: 0,
   lastResult: null,
@@ -45,9 +42,10 @@ describe('WordTowerHud deck', () => {
     expect(screen.queryByLabelText('wordTower.hud.scramble')).toBeNull();
   });
 
-  it('shows the scramble tool once the wheel has zero buildable words', () => {
-    render(<WordTowerHud {...baseProps({ possibleWords: 0 })} />);
-    expect(screen.getByLabelText('wordTower.hud.scramble')).toBeTruthy();
+  it('keeps the play TOOLS out of the builder entirely (they live in the top bar now)', () => {
+    render(<WordTowerHud {...baseProps()} />);
+    expect(screen.queryByLabelText('wordTower.hud.scramble')).toBeNull();
+    expect(screen.queryByLabelText('wordTower.hud.clue')).toBeNull();
   });
 
   it('keeps the BUILD action OUT of the bottom deck while no word is spelled', () => {
@@ -108,11 +106,11 @@ describe('WordTowerHud deck', () => {
       expect(wheelIdx).toBeLessThan(endIdx);
     });
 
-    it('drops the scramble tool into the START slot when the player is stuck', () => {
-      render(<WordTowerHud {...baseProps({ possibleWords: 0 })} />);
+    it('keeps the START slot reserved-but-empty so the wheel stays screen-centred', () => {
+      render(<WordTowerHud {...baseProps()} />);
       const start = screen.getByTestId('wt-tool-slot-start');
-      const scramble = screen.getByLabelText('wordTower.hud.scramble');
-      expect(start.contains(scramble)).toBe(true);
+      expect(start).toBeTruthy();
+      expect(start.querySelector('button')).toBeNull();
     });
   });
 
@@ -131,13 +129,19 @@ describe('WordTowerHud deck', () => {
       expect(deck.className).toContain('env(safe-area-inset-bottom)');
     });
 
-    it('keeps the banner reservation whether the deck is expanded or collapsed', () => {
-      const { rerender } = render(<WordTowerHud {...baseProps()} />);
+    it('has no drawer left to collapse — the reservation is unconditional', () => {
+      render(<WordTowerHud {...baseProps()} />);
+      expect(screen.queryByLabelText('wordTower.hud.collapse')).toBeNull();
+      expect(screen.queryByLabelText('wordTower.hud.expand')).toBeNull();
       expect(screen.getByTestId('wt-control-deck').className).toContain('--admob-banner-height');
-      // Collapse the drawer and re-assert (the padding differs per state).
-      fireEvent.click(screen.getByLabelText('wordTower.hud.collapse'));
-      rerender(<WordTowerHud {...baseProps()} />);
-      expect(screen.getByTestId('wt-control-deck').className).toContain('--admob-banner-height');
+    });
+
+    it('draws NO panel behind the builder — only the wheel carries a surface', () => {
+      render(<WordTowerHud {...baseProps()} />);
+      const deck = screen.getByTestId('wt-control-deck');
+      expect(deck.className).not.toContain('bg-neo-navy/95');
+      expect(deck.className).not.toContain('border-t-neo-thick');
+      expect(screen.getByTestId('wt-wheel-surface')).toBeTruthy();
     });
   });
 

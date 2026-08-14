@@ -1,0 +1,127 @@
+/**
+ * Bake the newspaper-size (11×11) EN puzzle pool.
+ *
+ * Why baked rather than generated in the browser like the mini: a 5×5 fills in ~350ms, but an
+ * 11×11 with 40+ doubly-checked slots takes seconds per attempt and fails roughly half of them.
+ * Inline that is a multi-second stall on the loader, and on a low-end Android it is far worse.
+ *
+ * Baking also buys the quality the runtime can't afford. Offline we can generate many candidates
+ * per template and keep only the best-scoring fills; inline the generator has to accept the first
+ * grid that passes the gate.
+ *
+ * Only the GRIDS are written out — clues are looked up from the clue bank at runtime. That keeps
+ * the payload at ~150 bytes per puzzle instead of ~2KB, and means clue-bank improvements flow
+ * into already-baked puzzles for free.
+ *
+ * Usage: npx tsx scripts/crossword/build-big.ts [--count=200] [--size=11] [--steps=200000]
+ */
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { buildDictIndex, fillGrid } from '../../lib/crossword/generate.core';
+import { isRealCrossword, templatesFor } from '../../lib/crossword/templates';
+import { buildGrid } from '../../lib/crossword/grid';
+import { mulberry32 } from '../../lib/rng/seededRandom';
+import clueBankJson from '../../lib/crossword/data/clueBank.en.json';
+
+const clueBank = clueBankJson as unknown as Record<string, { clue: string; score: number }>;
+
+function arg(name: string, dflt: number): number {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? Number(hit.split('=')[1]) : dflt;
+}
+
+function main() {
+  const size = arg('size', 11);
+  const target = arg('count', 200);
+  const maxSteps = arg('steps', 30000);
+  // Shard id. The fill is single-threaded and slow, so the pool is baked by several processes at
+  // once; the shard only shifts the seed stream so they explore different fills, and `--out`
+  // keeps their outputs apart for merging.
+  const shard = arg('shard', 0);
+
+  const templates = templatesFor('en', size);
+  if (!templates.length) {
+    console.error(`No ${size}×${size} templates registered — run search-templates.ts first.`);
+    process.exit(1);
+  }
+
+  const words = Object.keys(clueBank);
+  const idx = buildDictIndex(words);
+  // Commonness rank: 0 = the single commonest word in the bank. Used both to bias the fill and
+  // to judge it afterwards.
+  const byCommon = [...words].sort((a, b) => clueBank[b].score - clueBank[a].score);
+  const rank = new Map(byCommon.map((w, i) => [w, i]));
+  const prefer = new Set(byCommon.slice(0, 800));
+
+  const seen = new Set<string>();
+  const kept: { rows: string[]; mean: number; worst: number }[] = [];
+  const started = Date.now();
+  // Counted, not silent: a filter that rejects everything looks exactly like a slow run, and
+  // "produced zero and said nothing" is the failure mode that costs the most time here.
+  const rejected = { fill: 0, gate: 0, unclued: 0, obscure: 0, dupe: 0 };
+  const RARITY_LIMIT = arg('rarity', 0.7);
+
+  for (let attempt = 0; kept.length < target && attempt < target * 12; attempt++) {
+    const tpl = templates[attempt % templates.length];
+    const grid = fillGrid({ size: tpl.size, rtl: false, blocks: tpl.blocks }, idx, {
+      rng: mulberry32(0x9e3779b9 ^ ((attempt + shard * 100000) * 2654435761)),
+      maxSteps,
+      prefer,
+    });
+    if (!grid) {
+      rejected.fill++;
+      continue;
+    }
+    if (!isRealCrossword(grid, false)) {
+      rejected.gate++;
+      continue;
+    }
+
+    const { slots } = buildGrid({ rtl: false, solution: grid });
+    if (slots.some((s) => !clueBank[s.answer]?.clue)) {
+      rejected.unclued++;
+      continue; // unclued answer — unusable
+    }
+
+    // Quality: a grid full of the bank's rarest words is technically valid and miserable to solve.
+    // Reject any fill whose worst answer is outside the commonest half of the bank, then rank what
+    // survives by average commonness so the best fills win the limited pool slots.
+    const ranks = slots.map((s) => rank.get(s.answer) ?? words.length);
+    const worst = Math.max(...ranks);
+    if (worst > words.length * RARITY_LIMIT) {
+      rejected.obscure++;
+      continue;
+    }
+    const mean = ranks.reduce((a, b) => a + b, 0) / ranks.length;
+
+    const rows = grid.map((row) => row.map((c) => c ?? '#').join(''));
+    const key = rows.join('|');
+    if (seen.has(key)) {
+      rejected.dupe++;
+      continue;
+    }
+    seen.add(key);
+    kept.push({ rows, mean, worst });
+    console.log(
+      `${kept.length}/${target} · ${Math.round((Date.now() - started) / 1000)}s · ` +
+        `rejected ${JSON.stringify(rejected)}`,
+    );
+  }
+
+  console.log(`rejected: ${JSON.stringify(rejected)}`);
+  if (!kept.length) {
+    console.error('Baked ZERO puzzles — check the reject counts above before shipping this pool.');
+    process.exit(1);
+  }
+  kept.sort((a, b) => a.mean - b.mean); // commonest-vocabulary puzzles first
+  const out = { size, grids: kept.map((k) => k.rows) };
+  const suffix = shard ? `.shard${shard}` : '';
+  const path = join(__dirname, `../../lib/crossword/data/grids.en${size}${suffix}.json`);
+  writeFileSync(path, JSON.stringify(out));
+  console.log(
+    `wrote ${kept.length} grids → ${path} ` +
+      `(mean commonness rank ${Math.round(kept.reduce((a, k) => a + k.mean, 0) / (kept.length || 1))})`,
+  );
+}
+
+main();

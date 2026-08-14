@@ -55,6 +55,9 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 vi.mock('framer-motion', () => ({
   ...vi.importActual('framer-motion'),
   m: {
+    a: ({ children, className, style, ...props }: React.ComponentProps<'a'> & { animate?: unknown; initial?: unknown; transition?: unknown; whileHover?: unknown; whileTap?: unknown }) => (
+      <a className={className} style={style} {...props}>{children}</a>
+    ),
     div: ({ children, className, style, animate, initial, ...props }: React.ComponentProps<'div'> & { animate?: unknown; initial?: unknown }) => (
       <div className={className} style={style} {...props}>{children}</div>
     ),

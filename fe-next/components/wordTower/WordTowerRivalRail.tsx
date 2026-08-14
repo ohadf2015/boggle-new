@@ -74,7 +74,7 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
             className={`absolute ${side}`}
             style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
           >
-            <span className="absolute -top-7 start-0 flex items-center gap-1.5 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/75 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
+            <span className="absolute -top-7 start-0 flex items-center gap-1.5 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/90 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white">
               {/* The rival's REAL avatar (their generated identity face), not a flat
                   emoji — seeded fallback from playerId when they have no custom one. */}
               <Avatar

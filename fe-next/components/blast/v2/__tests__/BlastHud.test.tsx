@@ -74,11 +74,19 @@ describe('BlastHud', () => {
     expect(onUndo).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the theme emoji beside the theme name (per-level identity)', () => {
+  it('shows the theme chip art beside the theme name (per-level identity)', () => {
     render(
       <BlastHud levelNumber={5} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} theme="space" />
     );
-    expect(screen.getByTestId('theme-label')).toHaveTextContent('🚀');
+    const chip = screen.getByTestId('theme-label').querySelector('img');
+    expect(chip).toHaveAttribute('src', '/themes/space.svg');
+  });
+
+  it('renders no emoji anywhere in the hud', () => {
+    const { container } = render(
+      <BlastHud levelNumber={5} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} theme="space" />
+    );
+    expect(container.textContent ?? '').not.toMatch(/\p{Extended_Pictographic}/u);
   });
 
   describe('target-word clue gating (only first 3 levels)', () => {

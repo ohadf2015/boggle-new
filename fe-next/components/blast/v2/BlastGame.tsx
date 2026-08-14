@@ -1,12 +1,9 @@
 'use client';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
+import type { BlastLevel } from '@/lib/blast/v2/types';
 import { markUnlockSeen, markConceptSeen, completeFtue, setSkipAll, type UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
-import { detectAlmostWords, detectAllCascades } from '@/lib/blast/v2/engine';
-import { selectCascadeTelegraph } from '@/lib/blast/v2/engine/cascade-telegraph';
-import { scanFormableThemeWords } from '@/lib/blast/v2/engine/word-scan';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { useChainHaptics } from '@/lib/blast/v2/fx/useChainHaptics';
 import { useBlastHaptics } from '@/lib/blast/v2/fx/useBlastHaptics';
@@ -38,6 +35,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useBlastDictionary } from '@/lib/blast/v2/useBlastDictionary';
 import { parseCell } from '@/lib/blast/v2/engine/cell-id';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { BlastIcon } from './BlastIcon';
 
 type Props = {
   level: BlastLevel;
@@ -165,56 +163,17 @@ export function BlastGame({
     status: winStatus,
     chainDepth: state.lastChainDepth,
   });
-  // Almost-word ghost letters — translucent glowing letters in empty cells
-  // that hint at completing a target word. Restricted to tutorial levels
-  // (L1–L2) because the ghosts floating above tall columns or near scattered
-  // tiles read as weird mid-air glow rather than a helpful nudge. Past the
-  // tutorial the board stays clean and the player relies on observation.
-  const almosts = useMemo(
-    () => (level.levelNumber > 2
-      ? []
-      : detectAlmostWords(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale])),
-    [state.level, state.foundWords, level.levelNumber],
-  );
-  const [revealGlowCells, setRevealGlowCells] = useState<CellId[]>([]);
-  // Tutorial-only: auto-glow the next formable word on L1–L2. Past L2 the board
-  // is pure puzzle — marking answers makes every level feel like a guided demo.
-  useEffect(() => {
-    if (state.status === 'levelComplete' || level.levelNumber > 2) {
-      setRevealGlowCells([]);
-      return;
-    }
-    const cascades = detectAllCascades(state.level, state.foundWords, LOCALE_CONFIGS[state.level.locale]);
-    if (cascades.length > 0) {
-      setRevealGlowCells(cascades[0].cells);
-    } else {
-      setRevealGlowCells([]);
-    }
-  }, [state.foundWords, state.level, state.status, level.levelNumber]);
-  // Cascade telegraph — when a clear collapses the board and opens a NEW theme
-  // word, briefly pulse those tiles (anticipation) at ALL levels. Distinct from
-  // the tutorial answer-glow above: transient, reaction-driven, never naming the
-  // word. Reuses the board's revealGlow rendering.
-  const [cascadeGlow, setCascadeGlow] = useState<CellId[]>([]);
-  const cascadeGlowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    if (state.status !== 'playing' || state.lastChainDepth <= 0) return;
-    const cells = selectCascadeTelegraph(
-      state.level,
-      state.foundWords,
-      LOCALE_CONFIGS[state.level.locale],
-      state.lastChainDepth,
-    );
-    if (cells.length === 0) return;
-    setCascadeGlow(cells);
-    if (cascadeGlowTimer.current) clearTimeout(cascadeGlowTimer.current);
-    cascadeGlowTimer.current = setTimeout(() => setCascadeGlow([]), 1300);
-    return () => {
-      if (cascadeGlowTimer.current) clearTimeout(cascadeGlowTimer.current);
-    };
-    // Keyed on chainEventKey: one telegraph per committed move.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.chainEventKey]);
+  // NOTE: the board never marks a formable theme word on its own. THREE paths
+  // used to, and all three are gone:
+  //   1. a persistent L1–L2 "tutorial" glow on `detectAllCascades()[0].cells`,
+  //   2. a 1.3s post-cascade "telegraph" on the same cells, at EVERY level,
+  //   3. `BlastAlmostGhost`, which printed `neededLetter` — the exact missing
+  //      letter of a target word — into the empty cell where it belongs, and
+  //      rendered adrift below the board besides (the ghost layer measures the
+  //      shrinking tile column while the cell wells keep full height).
+  // Between them the answer was drawn on the board and every level played as a
+  // guided demo. The reveal glow is now reserved for `state.hintCells`, which
+  // the player buys with the Hint button.
 
   const { state: progressState, clearLevel, openChest, openMutation } = progress;
   const [showUndoAdModal, setShowUndoAdModal] = useState(false);
@@ -607,10 +566,11 @@ export function BlastGame({
         {state.nextWordMultiplier === 2 && (
           <div
             data-testid="surprise-charge-chip"
-            className="pointer-events-none absolute top-3 right-3 z-30 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#0b1530]"
+            className="pointer-events-none absolute top-3 right-3 z-30 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#0b1530] inline-flex items-center gap-1"
             style={{ background: '#FFE135', border: '2px solid #0b1530', boxShadow: '2px 2px 0 #0b1530' }}
           >
-            {t('blast.surprise.chargedChip', '✨ ×2 charged')}
+            <BlastIcon src="/blast/icons/sparkle.svg" size={12} />
+            {t('blast.surprise.chargedChip', '×2 charged')}
           </div>
         )}
         <BlastFxOverlay
@@ -651,9 +611,8 @@ export function BlastGame({
           onPointerEnter={handlers.onPointerMove}
           onPointerUp={handlers.onPointerUp}
           modeColor={modeColor}
-          almosts={almosts}
           tileIds={state.tileIds}
-          revealGlowCells={[...revealGlowCells, ...cascadeGlow, ...state.hintCells]}
+          revealGlowCells={state.hintCells}
           boardRows={initialBoardRows}
           onCommitSelection={(centers) => {
             clearCentersRef.current = centers;

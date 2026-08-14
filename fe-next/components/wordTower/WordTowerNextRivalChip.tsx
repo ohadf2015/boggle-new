@@ -46,7 +46,7 @@ export function WordTowerNextRivalChip({ rivals, viewerHeightM, reducedMotion, t
 
   return (
     <div
-      className={`pointer-events-none absolute end-2 top-[30%] z-[8] flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy/85 px-2 py-1.5 shadow-hard backdrop-blur-sm ${reducedMotion ? '' : 'animate-neo-pop'}`}
+      className={`pointer-events-none absolute end-2 top-[30%] z-[8] flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy/95 px-2 py-1.5 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
       dir={dir}
       role="status"
       aria-live="polite"

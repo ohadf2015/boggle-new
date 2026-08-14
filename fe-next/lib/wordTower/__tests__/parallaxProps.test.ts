@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { visiblePropsAt, type ParallaxProp } from '../parallaxProps';
+import { visiblePropsAt, WORD_TOWER_PROPS, type ParallaxProp } from '../parallaxProps';
 
 const PX = 5;
 const props: ParallaxProp[] = [
@@ -49,6 +49,33 @@ describe('visiblePropsAt (lazy altitude-anchored parallax)', () => {
       if (!a) continue;
       expect(a.offsetPx).toBeGreaterThanOrEqual(prev);
       prev = a.offsetPx;
+    }
+  });
+});
+
+describe('altitude coverage', () => {
+  // The climb must never run out of scenery. Word Tower carries over across
+  // days, so a committed player passes 2000m — and the prop ladder used to stop
+  // dead at 2100m, leaving an empty sky exactly where the tower is most
+  // impressive (founder 2026-08-14: "create more assets for different heights…
+  // make it more interesting and unexpected").
+  it('has at least one prop in view at every 100m step up to 3300m', () => {
+    const uncovered: number[] = [];
+    for (let m = 0; m <= 3300; m += 100) {
+      if (visiblePropsAt(m).length === 0) uncovered.push(m);
+    }
+    expect(uncovered).toEqual([]);
+  });
+
+  it('keeps every prop id unique (a duplicate would silently shadow art)', () => {
+    const ids = WORD_TOWER_PROPS.map((p) => p.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('points every prop at a word-tower image path', () => {
+    for (const p of WORD_TOWER_PROPS) {
+      expect(p.src.startsWith('/images/word-tower/')).toBe(true);
+      expect(p.src.endsWith('.png')).toBe(true);
     }
   });
 });

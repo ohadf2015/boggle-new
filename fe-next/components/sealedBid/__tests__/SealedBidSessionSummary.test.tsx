@@ -97,6 +97,57 @@ describe('SealedBidSessionSummary rendering', () => {
   });
 });
 
+describe('SealedBidSessionSummary cash-out row', () => {
+  it('shows the cash-out row when coins were actually awarded', () => {
+    render(
+      <SealedBidSessionSummary history={HISTORY} totalScore={35} chips={40} coinsAwarded={12} />
+    );
+    expect(screen.getByTestId('sb-cashout')).toBeInTheDocument();
+  });
+
+  // Second session on the same day: isSoloDailyClaimed short-circuits, so
+  // setCoinsAwarded never fires and coinsAwarded stays at its initial 0. The old
+  // `coinsAwarded !== undefined` guard was always true, so the screen ended a
+  // winning run by announcing "40 chips → 0 coins".
+  it('hides the cash-out row when the daily payout was already claimed', () => {
+    render(
+      <SealedBidSessionSummary history={HISTORY} totalScore={35} chips={40} coinsAwarded={0} />
+    );
+    expect(screen.queryByTestId('sb-cashout')).not.toBeInTheDocument();
+  });
+});
+
+describe('SealedBidSessionSummary round breakdown', () => {
+  it('lists every round with the player word and its outcome', () => {
+    render(<SealedBidSessionSummary history={HISTORY} totalScore={35} />);
+    const rows = screen.getAllByTestId('sb-round-row');
+    expect(rows).toHaveLength(5);
+    expect(rows[0]).toHaveTextContent('STAR');
+    expect(rows[0]).toHaveAttribute('data-outcome', 'unique');
+    expect(rows[1]).toHaveAttribute('data-outcome', 'clash');
+  });
+
+  // `botWord` is only botPicks[0] — on a unique round it names a rival the
+  // player never clashed with. Showing it would be actively wrong, so the row
+  // deliberately omits it.
+  it('does not print the rival word on a round the player won', () => {
+    render(<SealedBidSessionSummary history={HISTORY} totalScore={35} />);
+    expect(screen.getAllByTestId('sb-round-row')[0]).not.toHaveTextContent('RATS');
+  });
+
+  it('shows the signed chip delta for each round', () => {
+    render(<SealedBidSessionSummary history={HISTORY} totalScore={35} />);
+    const rows = screen.getAllByTestId('sb-round-row');
+    expect(rows[0]).toHaveTextContent('+14');
+    expect(rows[2]).toHaveTextContent('0');
+  });
+
+  it('renders nothing extra for an empty history', () => {
+    render(<SealedBidSessionSummary history={[]} totalScore={0} />);
+    expect(screen.queryAllByTestId('sb-round-row')).toHaveLength(0);
+  });
+});
+
 describe('SealedBidSessionSummary share action', () => {
   beforeEach(() => {
     Object.defineProperty(navigator, 'clipboard', {

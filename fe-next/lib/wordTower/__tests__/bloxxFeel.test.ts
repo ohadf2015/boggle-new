@@ -18,7 +18,6 @@ import { fallEase, fallDurationMs, FALL_MIN_MS, FALL_MAX_MS } from '../fallProfi
 import { impactDipPx, squashScale, IMPACT_MS, IMPACT_DEPTH, MAX_DIP_PX } from '../landingImpact';
 import { punchScaleAt, PUNCH_MS, MAX_PUNCH } from '../impactPunch';
 import { landFeedback } from '../landFeedback';
-import { swivelStartDeg } from '../swivelDrop';
 import { cableStretchAt, cableRecoilPx } from '../cranePendulum';
 import { alignmentBand } from '../cranePlacement';
 
@@ -130,15 +129,6 @@ describe('Bloxx (f) cable personality', () => {
 });
 
 describe('Bloxx (g) quality-linked settle wobble', () => {
-  it('perfect snaps tighter than good; sloppy staggers more', () => {
-    const perfect = Math.abs(swivelStartDeg(3, 100, 'perfect'));
-    const good = Math.abs(swivelStartDeg(3, 100, 'good'));
-    const sloppy = Math.abs(swivelStartDeg(3, 100, 'sloppy'));
-    expect(perfect).toBeLessThan(good);
-    expect(sloppy).toBeGreaterThan(good);
-    // Perfect is a confident snap — well under the base tip
-    expect(perfect / good).toBeLessThanOrEqual(0.55);
-  });
 
   it('momentum can change the band (skill is real)', () => {
     const atRest = alignmentBand(Math.abs(landingOffset(0.1, 0)));

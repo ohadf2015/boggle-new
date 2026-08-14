@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import type { ValidationResult } from '@/lib/blast/v2/engine';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { BlastIcon } from './BlastIcon';
 
 type Props = {
   /** True while an off-theme word is awaiting the async dictionary verdict. */
@@ -104,8 +105,9 @@ export function BlastWordFeedback({
             className="rounded-neo border-neo-thick px-4 py-2 shadow-hard"
             style={{ borderColor: '#0b1530', background: modeColor }}
           >
-            <div className="font-neo-display text-sm font-black uppercase leading-none tracking-[0.18em] text-neo-navy">
-              🎯 {t('blast.feedback.target', 'TARGET!')}
+            <div className="font-neo-display text-sm font-black uppercase leading-none tracking-[0.18em] text-neo-navy flex items-center justify-center gap-1">
+              <BlastIcon src="/blast/icons/target.svg" size={20} />
+              {t('blast.feedback.target', 'TARGET!')}
             </div>
             <div className="mt-1 font-neo-display text-2xl font-black uppercase leading-none text-neo-navy">
               {applyHebrewFinalLetters(targetWord)}
@@ -132,8 +134,9 @@ export function BlastWordFeedback({
             className="rounded-neo border-neo-thick px-3 py-1.5 shadow-hard"
             style={{ borderColor: modeColor, background: modeColor }}
           >
-            <div className="font-neo-display text-sm font-black leading-none text-neo-navy">
-              ⭐ {t('blast.feedback.bonusWord', 'BONUS WORD!')}
+            <div className="font-neo-display text-sm font-black leading-none text-neo-navy flex items-center justify-center gap-1">
+              <BlastIcon src="/blast/icons/star.svg" size={20} />
+              {t('blast.feedback.bonusWord', 'BONUS WORD!')}
             </div>
             <div className="mt-0.5 font-neo-body text-lg font-black uppercase leading-none text-neo-navy">
               {applyHebrewFinalLetters(bonusWord)}

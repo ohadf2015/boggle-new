@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
+import { BlastIcon } from './BlastIcon';
 
 type Props = {
   chestNumber: number;
@@ -137,7 +138,7 @@ export function BlastChestBadge({
       }}
     >
       <div className="flex items-center gap-1.5 leading-none">
-        <span aria-hidden style={{ filter: `drop-shadow(0 0 4px ${rimColor})` }}>📦</span>
+        <BlastIcon src="/blast/icons/chest.svg" size={20} style={{ filter: `drop-shadow(0 0 4px ${rimColor})` }} />
         <span
           className="font-neo-display font-black text-sm tracking-wide"
           style={{ color: '#fff', textShadow: `1px 1px 0 #0b1530` }}
