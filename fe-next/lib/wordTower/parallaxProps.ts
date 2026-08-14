@@ -91,6 +91,19 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   { id: 'stratSerpent', src: '/images/word-tower/wt-strat-serpent.png', atM: 235,  topPct: 28, xPct: 68, width: 116, depth: 0.9,  rangeM: 48 },
   { id: 'orbitJelly',   src: '/images/word-tower/wt-orbit-jelly.png',   atM: 430,  topPct: 24, xPct: 28, width: 104, depth: 0.8,  rangeM: 62 },
   { id: 'galaxyWhale',  src: '/images/word-tower/wt-galaxy-whale.png',  atM: 1050, topPct: 24, xPct: 70, width: 134, depth: 0.85, rangeM: 110 },
+  // ── The DEEP band (1750m+). The ladder used to stop at 2100m, so a carried-over
+  //    tower — the whole point of the daily mode — climbed into an empty sky.
+  //    Windows widen with altitude (the climb slows up there, and a prop that
+  //    passes in four drops reads as a set piece, not a conveyor belt). Keep the
+  //    surprises getting stranger the higher you get: tea dragon → space bus →
+  //    star fisherman → a window cleaner who is very far from any window.
+  { id: 'teaDragon',    src: '/images/word-tower/wt-tea-dragon.png',    atM: 1750, topPct: 26, xPct: 26, width: 128, depth: 0.9,  rangeM: 150 },
+  { id: 'moonBus',      src: '/images/word-tower/wt-moon-bus.png',      atM: 2000, topPct: 22, xPct: 70, width: 130, depth: 1.0,  rangeM: 160 },
+  { id: 'starFisher',   src: '/images/word-tower/wt-star-fisher.png',   atM: 2350, topPct: 28, xPct: 28, width: 122, depth: 0.85, rangeM: 180 },
+  { id: 'windowCleaner', src: '/images/word-tower/wt-space-window-cleaner.png', atM: 2600, topPct: 24, xPct: 68, width: 116, depth: 1.05, rangeM: 190 },
+  { id: 'skyMailbox',   src: '/images/word-tower/wt-sky-mailbox.png',   atM: 2950, topPct: 26, xPct: 30, width: 112, depth: 0.95, rangeM: 200 },
+  { id: 'donutPlanet',  src: '/images/word-tower/wt-donut-planet.png',  atM: 3300, topPct: 22, xPct: 66, width: 146, depth: 0.65, rangeM: 240 },
+  { id: 'starCat',      src: '/images/word-tower/wt-star-cat.png',      atM: 3700, topPct: 24, xPct: 30, width: 138, depth: 0.75, rangeM: 260 },
 ];
 
 /**

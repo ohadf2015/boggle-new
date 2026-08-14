@@ -17,7 +17,7 @@ const TONE_CLASS: Record<TowerNoticeTone, string> = {
   purple: 'border-neo-thick bg-neo-purple text-neo-white',
   red: 'border-neo-thick bg-neo-red text-neo-white',
   cream: 'border-neo-thick bg-neo-cream text-black',
-  quiet: 'border-neo bg-neo-navy/80 text-neo-cyan backdrop-blur-sm',
+  quiet: 'border-neo bg-neo-navy/95 text-neo-cyan',
 };
 
 interface Props {

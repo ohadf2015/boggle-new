@@ -87,6 +87,9 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 // Mock framer-motion to avoid animation delays
 vi.mock('framer-motion', () => ({
   m: {
+    a: ({ children, className, style, ...props }: React.ComponentProps<'a'> & { animate?: unknown; initial?: unknown; transition?: unknown; whileHover?: unknown; whileTap?: unknown }) => (
+      <a className={className} style={style} {...props}>{children}</a>
+    ),
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
     span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
     path: 'path',

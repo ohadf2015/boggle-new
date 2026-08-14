@@ -524,6 +524,7 @@ const es = {
       "dragToBuild": "Arrastra o toca para formar",
       "keepBuilding": "Seguir formando",
       "menuOpen": "Más acciones",
+      "menuNew": "Más acciones: {n} novedades",
       "menuClose": "Cerrar menú",
       "chaseGap": "+{m} m",
       "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo"

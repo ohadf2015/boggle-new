@@ -5,7 +5,7 @@ import { Building2, FlaskConical, Check, Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { dailyModeHref, type DailyModeDef } from '@/lib/dailyModes';
 
-interface AdminDailyModeCardProps {
+interface DailyModeQuestCardProps {
   mode: DailyModeDef;
   locale: string;
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -36,16 +36,18 @@ const PREVIEW: Partial<Record<DailyModeDef['id'], string>> = {
 };
 
 /**
- * AdminDailyModeCard — surfaces an admin/beta-gated daily mode in the hub.
+ * DailyModeQuestCard — renders a registry-driven daily mode in the hub.
  *
- * Registry-driven so future modes appear for admins with zero hub edits. Uses a
- * plain hard-nav `<a>` (not the SPA router) because Word Tower's daily run reads
- * its mode from the `?daily=1` query at mount — a client nav wouldn't re-read it.
- * A small "BETA" flask badge makes the gate obvious during the rollout. When the
+ * Registry-driven so a mode graduates from beta to public by flipping one
+ * `adminOnly` boolean, with zero hub edits. Uses a plain hard-nav `<a>` (not the
+ * SPA router) because Word Tower's daily run reads its mode from the `?daily=1`
+ * query at mount — a client nav wouldn't re-read it. The "BETA" flask badge is
+ * drawn ONLY for modes still gated to admins/beta (`mode.adminOnly`); a public
+ * mode like Word Tower must read as a first-class quest. When the
  * mode has a mascot preview it renders full-bleed (QuestCard parity); otherwise a
  * compact icon-circle row (fallback for future modes without art).
  */
-export function AdminDailyModeCard({ mode, locale, t, played = false, delay = 0.3 }: AdminDailyModeCardProps) {
+export function DailyModeQuestCard({ mode, locale, t, played = false, delay = 0.3 }: DailyModeQuestCardProps) {
   const accent = ACCENT[mode.accent];
   const Icon = ICON[mode.id] ?? Building2;
   const previewUrl = PREVIEW[mode.id];
@@ -56,7 +58,7 @@ export function AdminDailyModeCard({ mode, locale, t, played = false, delay = 0.
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
-      data-testid={`daily-admin-card-${mode.id}`}
+      data-testid={`daily-quest-card-${mode.id}`}
       className={cn(
         'relative w-full rounded-xl border-3 border-neo-black',
         'shadow-hard overflow-hidden cursor-pointer p-4',
@@ -99,10 +101,12 @@ export function AdminDailyModeCard({ mode, locale, t, played = false, delay = 0.
               {t('daily.cleared')}
             </span>
           )}
-          <span className="flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-black uppercase rounded border border-neo-purple/50 bg-neo-purple/20 text-neo-purple shrink-0">
-            <FlaskConical className="w-2.5 h-2.5" />
-            {t('daily.adminBeta')}
-          </span>
+          {mode.adminOnly && (
+            <span className="flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-black uppercase rounded border border-neo-purple/50 bg-neo-purple/20 text-neo-purple shrink-0">
+              <FlaskConical className="w-2.5 h-2.5" />
+              {t('daily.adminBeta')}
+            </span>
+          )}
         </div>
         <p className="mt-1 text-xs font-neo-body text-neo-cream/80 line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{t(mode.descKey)}</p>
       </div>

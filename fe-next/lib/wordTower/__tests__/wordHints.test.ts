@@ -62,6 +62,43 @@ describe('pickClueWord', () => {
     expect(pickClueWord(d, ['B', 'O', 'K'], 3)).toBeNull(); // needs two O
     expect(pickClueWord(d, ['B', 'O', 'O', 'K'], 3)).toBe('BOOK');
   });
+
+  // The reported bug: asking for a second clue on the SAME wheel handed back the
+  // same word forever, so a stuck player paid a rewarded ad for zero new
+  // information. `skip` advances through the candidate list.
+  describe('skip — successive clues on one wheel', () => {
+    const wheel = ['C', 'A', 'R', 'T', 'E'];
+
+    it('returns a DIFFERENT word for each successive skip', () => {
+      const first = pickClueWord(dict, wheel, 3, undefined, 0);
+      const second = pickClueWord(dict, wheel, 3, undefined, 1);
+      const third = pickClueWord(dict, wheel, 3, undefined, 2);
+      expect(first).toBe('CARE'); // unchanged default: shortest >= 4 still leads
+      expect(second).not.toBe(first);
+      expect(third).not.toBe(first);
+      expect(third).not.toBe(second);
+      expect([first, second, third].every((w) => w !== null)).toBe(true);
+    });
+
+    it('wraps around rather than returning null once the candidates run out', () => {
+      const d = new Set(['GOAT', 'GOT']);
+      const a = pickClueWord(d, ['G', 'O', 'A', 'T'], 3, undefined, 0);
+      const b = pickClueWord(d, ['G', 'O', 'A', 'T'], 3, undefined, 1);
+      expect(pickClueWord(d, ['G', 'O', 'A', 'T'], 3, undefined, 2)).toBe(a);
+      expect(b).not.toBe(a);
+    });
+
+    it('still returns null when nothing is buildable, whatever the skip', () => {
+      expect(pickClueWord(dict, ['X', 'Y'], 3, undefined, 5)).toBeNull();
+    });
+
+    it('never suggests an already-used word', () => {
+      const used = new Set(['CARE']);
+      for (let skip = 0; skip < 6; skip++) {
+        expect(pickClueWord(dict, wheel, 3, used, skip)).not.toBe('CARE');
+      }
+    });
+  });
 });
 
 describe('usedWords exclusion', () => {
@@ -71,6 +108,9 @@ describe('usedWords exclusion', () => {
     expect(countBuildableWords(d, ['C', 'A', 'R', 'T', 'E'], 3, new Set(['CAT']))).toBe(3);
   });
   it('pickClueWord never suggests a used word', () => {
-    expect(pickClueWord(d, ['C', 'A', 'R', 'T', 'E'], 3, new Set(['CARE', 'CART']))).toBe('CAT');
+    // CARE/CART used → only the two 3-letter words remain; either is a correct
+    // clue (ties break alphabetically now that candidates are ranked, where they
+    // used to fall out of dictionary iteration order).
+    expect(['CAT', 'CAR']).toContain(pickClueWord(d, ['C', 'A', 'R', 'T', 'E'], 3, new Set(['CARE', 'CART'])));
   });
 });

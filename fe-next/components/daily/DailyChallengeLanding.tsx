@@ -13,14 +13,14 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
-import { adminOnlyDailyModes } from '@/lib/dailyModes';
+import { questCardModes } from '@/lib/dailyModes';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { QrWelcomeBanner } from './QrWelcomeBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
-import { AdminDailyModeCard } from './landing/AdminDailyModeCard';
+import { DailyModeQuestCard } from './landing/DailyModeQuestCard';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { ConfettiBackground } from './landing/ConfettiBackground';
 import { FloatingDecorations } from './landing/FloatingDecorations';
@@ -45,10 +45,11 @@ export function DailyChallengeLanding({
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
   const { user, canSeeInWorkModes } = useAuth();
-  // In-work daily modes being readied for the public flow (Word Tower today).
-  // Registry-driven so future modes appear here for admins + beta testers with
-  // no hub edits. See lib/auth/inWorkModeAccess.ts.
-  const adminModes = canSeeInWorkModes ? adminOnlyDailyModes() : [];
+  // Registry-driven quest cards: the PUBLIC ones (Word Tower) for everybody, plus
+  // the still-gated ones (Connections) for admins + beta testers. Word Tower used
+  // to be drawn from `adminOnlyDailyModes()`, which meant ordinary players saw a
+  // two-card hub and the mode was effectively unshipped. See lib/dailyModes.ts.
+  const questModes = questCardModes(canSeeInWorkModes);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -157,7 +158,7 @@ export function DailyChallengeLanding({
   // when the player actually sees the card. Ceiling: assumes the sole beta daily
   // mode is Word Tower — revisit if another admin mode ships without a played
   // signal (it would inflate `total` without ever completing).
-  const showsWordTower = adminModes.some((mode) => mode.id === 'word-tower');
+  const showsWordTower = questModes.some((mode) => mode.id === 'word-tower');
   const totalQuests = 2 + (showsWordTower ? 1 : 0);
 
   // Completion count for progress bar
@@ -369,10 +370,10 @@ export function DailyChallengeLanding({
         />
       )}
 
-      {/* Beta daily modes (Word Tower today) — chained into the quest path as the
-          next node so they read as game 3, not a detached "admin" afterthought.
-          Hidden entirely for non-beta/non-admins (adminModes empty). */}
-      {adminModes.length > 0 && (
+      {/* Registry-driven quest cards — chained into the quest path as the next
+          node so Word Tower reads as game 3, not a detached afterthought. Empty
+          only if every registry mode is gated away from this viewer. */}
+      {questModes.length > 0 && (
         <>
           {/* ── Dotted connector line (Word Wheel → beta quest) ── */}
           <div className="flex flex-col items-center gap-0 py-1">
@@ -386,9 +387,9 @@ export function DailyChallengeLanding({
             <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
           </div>
 
-          <div className="w-full flex flex-col gap-2" data-testid="daily-admin-modes">
-            {adminModes.map((mode, i) => (
-              <AdminDailyModeCard
+          <div className="w-full flex flex-col gap-2" data-testid="daily-quest-modes">
+            {questModes.map((mode, i) => (
+              <DailyModeQuestCard
                 key={mode.id}
                 mode={mode}
                 locale={currentLanguage}

@@ -530,6 +530,7 @@ const he = {
       "dragToBuild": "גררו או הקישו לאיות",
       "keepBuilding": "המשיכו לבנות",
       "menuOpen": "עוד פעולות",
+      "menuNew": "עוד פעולות — {n} חדשים",
       "menuClose": "סגירת התפריט",
       "chaseGap": "+{m} מ'",
       "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה"

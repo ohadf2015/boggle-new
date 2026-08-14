@@ -21,7 +21,7 @@ export function WordTowerStatHud({ heightM, combo, t }: Props) {
   // Simplified readout: altitude + live combo flame only — no expandable detail section.
   return (
     <div
-      className="pointer-events-auto flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy/85 px-2.5 py-1 shadow-hard-sm backdrop-blur-sm"
+      className="pointer-events-auto flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy/95 px-2.5 py-1 shadow-hard-sm"
     >
       <span className="font-neo-display text-2xl font-black leading-none text-neo-white tabular-nums">
         {heightM.toFixed(0)}<span className="text-sm text-neo-cyan">m</span>

@@ -809,6 +809,7 @@ const sv = {
       "dragToBuild": "Dra eller tryck för att stava",
       "keepBuilding": "Fortsätt bygga",
       "menuOpen": "Fler åtgärder",
+      "menuNew": "Fler åtgärder — {n} nya",
       "menuClose": "Stäng meny",
       "chaseGap": "+{m} m",
       "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera"

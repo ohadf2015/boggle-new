@@ -27,7 +27,7 @@ export function CraneStabilityMeter({
   const dots = Array.from({ length: TOPPLE_AFTER_SLOPPY + 1 }, (_, i) => i < consecutiveSloppy);
   return (
     <div
-      className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy/85 px-2 py-1 font-neo-body text-[10px] font-bold uppercase tracking-wider text-neo-white shadow-hard backdrop-blur-sm"
+      className="flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy/95 px-2 py-1 font-neo-body text-[10px] font-bold uppercase tracking-wider text-neo-white shadow-hard"
       aria-label={t('wordTower.crane.stability')}
     >
       <span className="text-[10px]">{t('wordTower.crane.stability')}</span>

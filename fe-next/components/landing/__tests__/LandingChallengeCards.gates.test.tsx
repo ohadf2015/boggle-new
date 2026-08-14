@@ -105,12 +105,12 @@ describe('LandingChallengeCards — Word Craft consolidated to ONE public card',
   });
 });
 
-describe('LandingChallengeCards — Word Tower admin solo gate', () => {
-  it('does NOT render the Word Tower card for a non-admin user', () => {
+describe('LandingChallengeCards — Word Tower is public', () => {
+  it('renders the Word Tower card for a NON-admin user (mode shipped 2026-08-14)', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeNull();
+    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeInTheDocument();
   });
 
   it('renders the Word Tower SOLO card for an admin with /word-tower href', () => {
@@ -177,7 +177,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
-      'wordTower',
+      // 'wordTower' is NOT here any more — the mode shipped publicly 2026-08-14.
       'shiritori',
       'sealedBid',
       'wordfall',

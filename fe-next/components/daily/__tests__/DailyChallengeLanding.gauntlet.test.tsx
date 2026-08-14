@@ -88,6 +88,9 @@ vi.mock('../landing/FloatingDecorations', () => ({
 // --- framer-motion mock ---
 vi.mock('framer-motion', () => ({
   m: {
+    a: ({ children, className, style, ...props }: React.ComponentProps<'a'> & { animate?: unknown; initial?: unknown; transition?: unknown; whileHover?: unknown; whileTap?: unknown }) => (
+      <a className={className} style={style} {...props}>{children}</a>
+    ),
     div: ({ children, ...props }: React.ComponentProps<'div'>) => (
       <div {...props}>{children}</div>
     ),

@@ -251,6 +251,17 @@ export function WordTowerWheel({
         </div>
       )}
 
+      {/* The wheel's OWN surface. The bottom control deck used to supply a solid
+          panel behind everything down here; that panel is gone (it buried the
+          tower), so the disc lives on the wheel itself — the one element that
+          genuinely needs a readable backing behind its letters. Everything
+          around it stays transparent. */}
+      <div
+        aria-hidden
+        data-testid="wt-wheel-surface"
+        className="pointer-events-none absolute inset-[2%] rounded-full border-neo-thick border-black bg-neo-navy/95 shadow-hard"
+      />
+
       {/* Biome glow — the ring's halo brightens with altitude (more satisfying up high). */}
       <div
         aria-hidden
@@ -451,7 +462,7 @@ export function WordTowerWheel({
         ) : (
           <div
             className={cn(
-              'flex h-[34%] min-h-[44px] min-w-[44px] max-w-[60%] items-center justify-center rounded-full border-neo px-3 text-center font-neo-display text-xl font-black uppercase tracking-wide text-neo-white backdrop-blur-sm transition-colors duration-300',
+              'flex h-[34%] min-h-[44px] min-w-[44px] max-w-[60%] items-center justify-center rounded-full border-neo px-3 text-center font-neo-display text-xl font-black uppercase tracking-wide text-neo-white transition-colors duration-300',
               // Idle "waiting for a letter" state used to read as disabled/washed-out
               // next to the ring's glow + sparks — a soft breathing pulse on the
               // border invites the first tap instead of looking inert.

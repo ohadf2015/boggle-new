@@ -115,7 +115,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   // grid is full-bleed art across the board. Colours spread to avoid clusters.
   wordTower: {
     titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
-    Icon: Building2, variant: 'lime', badge: 'ADMIN', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
+    Icon: Building2, variant: 'lime', badge: 'NEW', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
   },
   shiritori: {
     titleKey: 'landing.shiritoriMode', descKey: 'landing.shiritoriModeDesc', path: '/shiritori/solo',

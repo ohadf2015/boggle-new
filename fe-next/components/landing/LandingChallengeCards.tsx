@@ -153,7 +153,8 @@ export function LandingChallengeCards({
     if (!next.includes('brainGym')) next.push('brainGym');
     // WordCraft is public — territory surfaces on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
-    if (canSeeInWorkModes && !next.includes('wordTower')) next.push('wordTower');
+    // Word Tower is public (shipped 2026-08-14 alongside its daily quest card).
+    if (!next.includes('wordTower')) next.push('wordTower');
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
     if (canSeeInWorkModes && !next.includes('shiritori')) next.push('shiritori');

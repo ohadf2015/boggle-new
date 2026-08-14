@@ -53,6 +53,7 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 import { CoinCounterAnimated } from '@/components/animations/CoinCounterAnimated';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
+import { unseenSkinIds, readSeenSkins, markSkinsSeen } from '@/lib/wordTower/menuNotice';
 import { useTowerSkin } from './useTowerSkin';
 import { WordTowerSkinPicker } from './WordTowerSkinPicker';
 import { WordTowerActionMenu } from './WordTowerActionMenu';
@@ -72,6 +73,7 @@ import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
+import { WordTowerToolbar } from './WordTowerToolbar';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 import { addCoins, getCoins, spendCoins } from '@/utils/coinManager';
 import { DomCoinBurst } from '@/components/animations/DomCoinBurst';
@@ -221,8 +223,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     () => (dictionary ? countBuildableWords(dictionary, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
     [dictionary, game.tray, game.usedWords],
   );
-  const clueWord = useMemo(
-    () => (dictionary ? pickClueWord(dictionary, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
+  // Nth clue for the CURRENT wheel. A plain memoised `clueWord` was the bug the
+  // founder hit: identical inputs → identical word, so clue #2 (a rewarded ad)
+  // repeated clue #1. The toolbar owns the index and asks for the next one.
+  const getClue = useCallback(
+    (skip: number) => (dictionary ? pickClueWord(dictionary, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords, skip) : null),
     [dictionary, game.tray, game.usedWords],
   );
   // Dead-end escape: spin a fresh wheel that actually has buildable words left.
@@ -572,6 +577,13 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   }, [personalBest]);
   useAutoDismiss(skinUnlock, () => setSkinUnlock(null), TOAST_MS);
 
+  // Unseen unlocks behind the collapsed action menu → the menu badge. Hydrated
+  // in an effect (localStorage is not available during SSR/first render) and
+  // re-read whenever the menu is opened, which is where they're marked seen.
+  const [seenSkins, setSeenSkins] = useState<string[]>([]);
+  useEffect(() => { setSeenSkins(readSeenSkins()); }, []);
+  const unseenSkins = useMemo(() => unseenSkinIds(personalBest, seenSkins), [personalBest, seenSkins]);
+
   // Unmistakable verdict pop — one big, band-coloured beat on every drop telling
   // the player exactly how they did + the metres gained. Keyed off the placement
   // result; the height delta is read after commit settles into `game.heightM`.
@@ -833,13 +845,30 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setPlayH(el.clientHeight || window.innerHeight);
     return () => ro.disconnect();
   }, []);
+  // Top chrome is MEASURED, not assumed. It used to be the hardcoded
+  // DEFAULT_TOP_CHROME_PX (112), which the notice column uses as its top edge —
+  // so when the header grew a third row (the play tools moved up out of the
+  // deck) every drop verdict landed on top of the clue button. A ref + observer
+  // keeps the two in sync whatever the header ends up holding.
+  const topChromeRef = useRef<HTMLDivElement>(null);
+  const [topChromePx, setTopChromePx] = useState(DEFAULT_TOP_CHROME_PX);
+  useEffect(() => {
+    const el = topChromeRef.current;
+    if (!el) return;
+    const report = () => setTopChromePx(el.offsetHeight || DEFAULT_TOP_CHROME_PX);
+    report();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(report);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const chromeFrame = useMemo(
     () => playChromeFrame({
       viewportH: playH,
-      topChromePx: DEFAULT_TOP_CHROME_PX,
+      topChromePx,
       deckHeightPx: deckHeight,
     }),
-    [playH, deckHeight],
+    [playH, deckHeight, topChromePx],
   );
   const onDeckHeight = useCallback((px: number) => setDeckHeight(px), []);
 
@@ -1294,13 +1323,13 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           Row 1 shares the fixed mute-FAB band: [back] · [coins · menu], reserving
           the FAB's width via me-12. Row 2 centres the compact altitude readout
           directly beneath, so the header reads as a single aligned block. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
+      <div ref={topChromeRef} className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between gap-2">
           <Link
             href={`/${language}`}
             onClick={() => save(true, { force: true })}
             aria-label={t('common.backToHome')}
-            className="pointer-events-auto flex h-10 shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
+            className="pointer-events-auto flex h-10 shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/95 px-3 font-neo-body text-sm font-bold text-neo-white shadow-hard"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
             <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
@@ -1313,7 +1342,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             <LazyMotion features={domAnimation}>
               <CoinCounterAnimated value={coinBalance} size="sm" animateOnMount={false} />
             </LazyMotion>
-            <WordTowerActionMenu t={t} reducedMotion={reducedMotion}>
+            <WordTowerActionMenu
+              t={t}
+              reducedMotion={reducedMotion}
+              noticeCount={unseenSkins.length}
+              onOpened={() => { markSkinsSeen(unseenSkins); setSeenSkins(readSeenSkins()); }}
+            >
               <button
                 type="button"
                 onClick={() => setShowUpgrades(true)}
@@ -1344,6 +1378,24 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             t={t}
           />
         </div>
+        {/* Play tools (clue · reroll · scramble) — hoisted out of the bottom deck
+            so every button in the game lives in this one top band and the wheel
+            below is the only thing competing with the tower (founder 2026-08-14). */}
+        <div className="mx-auto mt-1.5 flex w-fit">
+          <WordTowerToolbar
+            possibleWords={possibleWords}
+            getClue={getClue}
+            wheelKey={game.tray.join('')}
+            scramblesLeft={game.scramblesLeft}
+            scrambleCost={WORD_TOWER_SCRAMBLE_COIN_COST}
+            coinBalance={coinBalance}
+            onScramble={handleScramble}
+            onReroll={reroll}
+            disabled={!!tower.state.pendingWord}
+            t={t}
+            dir={dir}
+          />
+        </div>
       </div>
 
       {/* pointer-events-none so this full-screen layer doesn't shield the header
@@ -1356,10 +1408,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           word={tower.word}
           heightM={game.heightM}
           combo={game.combo}
-          scramblesLeft={game.scramblesLeft}
-          possibleWords={possibleWords}
-          clueWord={clueWord}
-          onReroll={reroll}
           goldenLetter={mutator?.id === 'goldenLetter' ? mutator.goldenLetter : undefined}
           lastError={tower.state.lastError}
           errorKey={tower.state.errorKey}
@@ -1370,9 +1418,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onBackspace={tower.backspace}
           onClear={tower.clear}
           onSubmit={tower.hold}
-          onScramble={handleScramble}
-          scrambleCost={WORD_TOWER_SCRAMBLE_COIN_COST}
-          coinBalance={coinBalance}
           onDeckHeight={onDeckHeight}
           gainPreview={
             tower.word.length >= WORD_TOWER_MIN_WORD_LEN

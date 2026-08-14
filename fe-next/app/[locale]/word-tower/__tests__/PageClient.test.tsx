@@ -28,11 +28,11 @@ describe('WordTowerPageClient gate', () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('redirects a user without in-work access home', () => {
+  it('renders the game for an ORDINARY player — the mode is public now, no redirect', () => {
     useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: false });
     render(<WordTowerPageClient />);
-    expect(screen.queryByTestId('word-tower-game')).not.toBeInTheDocument();
-    expect(replace).toHaveBeenCalledWith('/en');
+    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
   });
 
   it('renders for in-work access even when the experiment flag is off (gate is access-based)', () => {
@@ -43,10 +43,10 @@ describe('WordTowerPageClient gate', () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('does not redirect while auth is still loading', () => {
+  it('renders immediately while auth is still loading — nothing is gated on it', () => {
     useAuth.mockReturnValue({ canSeeInWorkModes: false, loading: true });
     render(<WordTowerPageClient />);
-    expect(screen.queryByTestId('word-tower-game')).not.toBeInTheDocument();
+    expect(screen.getByTestId('word-tower-game')).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
   });
 });

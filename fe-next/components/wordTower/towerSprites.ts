@@ -10,7 +10,6 @@
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import type { BlockSurface } from '@/lib/wordTower/blockGrade';
-import { swivelBrickFrame, SWIVEL_DESCENT_PX, SWIVEL_DESCENT_STAGGER } from '@/lib/wordTower/swivelDrop';
 import { squashScale, IMPACT_MS } from '@/lib/wordTower/landingImpact';
 import { tumbleAt, TUMBLE_MS, type TumbleParams } from '@/lib/wordTower/tumbleArc';
 import { tileVariation, type TileVariation } from './tileVariation';
@@ -422,7 +421,7 @@ export function makeTile(char: string | null, size: number, color: number, pendi
 }
 
 /** Snap a tile to its slot with no animation (resume / reduced-motion / scroll-in).
- *  Resets `angle` too so a tile interrupted mid-swivel never stays tilted. */
+ *  Resets `angle` too so a tile interrupted mid-animation never stays tilted. */
 export function placeInstant(tile: TileSprite, y: number): void {
   tile.anim++; // cancel any in-flight tween
   tile.y = y;
@@ -446,59 +445,6 @@ export function dropIn(tile: TileSprite, toY: number, delay: number, onLand?: ()
   }, () => { tile.y = toY; tile.alpha = 1; onLand?.(); });
 }
 
-/** Swivel a whole word's vertical brick-run into place as ONE rigid piece —
- *  hinged at the base joint, tipping to upright with a damped settle while the
- *  group lowers in. Replaces the per-letter snap with a satisfying, weighty
- *  placement. Each tile stays a child of its container (NO reparenting); we just
- *  drive its local (x, y, angle) from the shared rotation each frame, so the
- *  registry stays consistent and the lean/sway on the container composes on top.
- *  `tiles` are given base→top with their rest (restX, restY). */
-export function swivelWordIn(
-  tiles: { tile: TileSprite; restX: number; restY: number }[],
-  pivotX: number,
-  pivotY: number,
-  startDeg: number,
-  durMs: number,
-  onSettle?: (i: number) => void,
-): void {
-  if (tiles.length === 0) return;
-  // Bump every tile's anim token up front: stops any in-flight tween on them, and
-  // lets a later placeInstant (which also bumps the token) cleanly cancel us.
-  const tokens = tiles.map(({ tile }) => ++tile.anim);
-  const t0 = performance.now();
-  const tick = () => {
-    const now = performance.now();
-    const k = Math.min(1, (now - t0) / durMs);
-    let alive = false;
-    tiles.forEach(({ tile, restX, restY }, i) => {
-      if (tile.destroyed || tile.anim !== tokens[i]) return; // cancelled / torn down
-      alive = true;
-      const f = swivelBrickFrame(
-        { x: restX, y: restY },
-        pivotX,
-        pivotY,
-        startDeg,
-        SWIVEL_DESCENT_PX,
-        k,
-        i,
-        tiles.length,
-        SWIVEL_DESCENT_STAGGER,
-      );
-      tile.x = f.x;
-      tile.y = f.y;
-      tile.angle = f.angleDeg;
-      tile.alpha = 1;
-    });
-    if (!alive) return;
-    if (k < 1) { requestAnimationFrame(tick); return; }
-    tiles.forEach(({ tile, restX, restY }, i) => {
-      if (tile.destroyed || tile.anim !== tokens[i]) return;
-      tile.x = restX; tile.y = restY; tile.angle = 0;
-      onSettle?.(i);
-    });
-  };
-  requestAnimationFrame(tick);
-}
 
 /** Ease a settled tile to a new slot (the stack sliding down/up by a row). */
 export function moveTo(tile: TileSprite, toY: number): void {
@@ -657,4 +603,65 @@ export function shakeX(c: Container, mag = 9, dur = 320): void {
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
+}
+
+/**
+ * Drop a floor's new TENANTS in: little residents drift down under an umbrella
+ * (or a balloon, or a jetpack, the higher you build) and disappear INTO the
+ * floor that just landed — the Tower Bloxx "someone lives here now" beat.
+ *
+ * Deliberately dumb rendering: emoji Text sprites on the tower container, so
+ * they ride the climb/lean/pan with the floor they moved into and need no art
+ * pipeline. They self-destroy at the end of the descent — nothing accumulates,
+ * so a 200-floor tower costs the same as a 2-floor one. Who arrives is decided
+ * by `lib/wordTower/tenants.ts`; this only animates it.
+ */
+export function spawnTenants(
+  parent: Container,
+  opts: {
+    x: number; y: number; size: number;
+    count: number; glyph: string; canopy: string;
+    speed: number; sway: number; fromLeft: boolean; staggerMs: number;
+  },
+): void {
+  const { x, y, size, count, glyph, canopy, speed, sway, fromLeft, staggerMs } = opts;
+  const dropPx = size * 5;
+  const durMs = Math.max(420, (900 / Math.max(0.2, speed)));
+  for (let i = 0; i < count; i++) {
+    const g = new Container();
+    g.zIndex = 1_000_002; // above the tiles: they land ON the floor, not behind it
+    const person = new Text({ text: glyph, style: new TextStyle({ fontSize: size * 0.5 }) });
+    person.anchor.set(0.5, 1);
+    g.addChild(person);
+    if (canopy) {
+      const cap = new Text({ text: canopy, style: new TextStyle({ fontSize: size * 0.55 }) });
+      cap.anchor.set(0.5, 1);
+      cap.y = -size * 0.42;
+      g.addChild(cap);
+    }
+    // Spread arrivals across the floor's width, entering from one side.
+    const lane = count === 1 ? 0 : (i / (count - 1) - 0.5) * size * 1.4;
+    const baseX = x + (fromLeft ? -1 : 1) * size * 0.15 + lane;
+    g.x = baseX;
+    g.y = y - dropPx;
+    g.alpha = 0;
+    parent.addChild(g);
+
+    const t0 = performance.now() + i * staggerMs;
+    const tick = () => {
+      if (g.destroyed || parent.destroyed) return;
+      const now = performance.now();
+      if (now < t0) { requestAnimationFrame(tick); return; }
+      const k = Math.min(1, (now - t0) / durMs);
+      // Canopy descent: near-constant speed (that IS what a canopy does), with a
+      // sway that dies out as the tenant closes on the floor.
+      g.y = (y - dropPx) + dropPx * k;
+      g.x = baseX + Math.sin(k * Math.PI * 2.2) * sway * (1 - k) * (fromLeft ? 1 : -1);
+      // Fade in on entry, then vanish INTO the floor over the last fifth.
+      g.alpha = k < 0.12 ? k / 0.12 : k > 0.8 ? Math.max(0, (1 - k) / 0.2) : 1;
+      if (k < 1) requestAnimationFrame(tick);
+      else { try { g.destroy({ children: true }); } catch { /* pixi teardown race */ } }
+    };
+    requestAnimationFrame(tick);
+  }
 }

@@ -530,6 +530,7 @@ const ja = {
       "dragToBuild": "なぞるかタップして綴る",
       "keepBuilding": "続けて作る",
       "menuOpen": "その他の操作",
+      "menuNew": "その他の操作 — 新着{n}件",
       "menuClose": "メニューを閉じる",
       "chaseGap": "+{m} m",
       "chaseAria": "次のライバル: {name}、抜くまであと {m} m"
