@@ -5,7 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { LEVEL_MODIFIER_INTRO_KEYS } from '@/lib/blast/v2/level-modifiers';
 import { WordfallLogo } from './WordfallLogo';
-import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
+import { themeArt } from '@/lib/blast/v2/themeArt';
+import { BlastIcon } from './BlastIcon';
 
 const MODE_COLORS: Record<string, string> = {
   fruits: '#BFFF00', animals: '#00FFFF', food: '#FF1493', ocean: '#00FFFF',
@@ -60,7 +61,7 @@ export function BlastLevelIntroCard({ level, onDismiss }: { level: BlastLevel; o
           className="flex items-center justify-center gap-2 text-4xl font-black uppercase tracking-wide"
           style={{ color: modeColor, textShadow: `3px 3px 0 #0b1530` }}
         >
-          <span aria-hidden style={{ textShadow: 'none' }}>{themeEmoji(level.theme)}</span>
+          <BlastIcon src={themeArt(level.theme)} size={56} />
           <span>{t(`blast.themes.${level.theme}`, level.theme)}</span>
         </m.div>
         <m.div

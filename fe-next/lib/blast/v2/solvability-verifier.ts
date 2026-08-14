@@ -4,6 +4,7 @@ import type { BlastLevel, ChainLevelSpec, Locale } from './types';
 import { buildChainLevel, type ExtraWordCheck } from './engine/chain-builder';
 import { validateChainLevel } from './engine/chain-validator';
 import { getBlastCommonWords } from './engine/common-words';
+import { boardWordMinLength } from './engine/extra-word-check';
 import { LOCALE_CONFIGS } from './locale-config';
 
 export type LevelVerifyResult =
@@ -23,16 +24,10 @@ async function loadChainPack(locale: Locale): Promise<ChainPackFile | null> {
   }
 }
 
-// Keep in sync with chain-pack-source.ts — see EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR.
-const EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR = 4;
-
 async function buildExtraWordCheck(locale: Locale): Promise<ExtraWordCheck | undefined> {
   try {
     const isCommon = await getBlastCommonWords(locale);
-    const minLength = Math.max(
-      EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR,
-      LOCALE_CONFIGS[locale].wordLengthRange.min,
-    );
+    const minLength = boardWordMinLength(LOCALE_CONFIGS[locale]);
     return { isCommon, minLength };
   } catch {
     return undefined;

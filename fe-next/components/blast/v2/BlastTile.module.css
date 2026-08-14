@@ -30,18 +30,75 @@
   );
 }
 
-/* Empty slot frame behind each tile column. Same size & gap as tiles so
-   landed tiles align perfectly with their well. Soft inset shadow only —
-   no border — so empty columns disappear into the background instead of
-   reading as dashed letters behind the play area. */
+/* The playfield frame. Wordfall's board is mostly empty by design — tiles fall
+   into it from above — so without a frame the play area reads as void and the
+   whole screen looks unfinished (a tile grid floating in the dark). Framing the
+   well grid turns that emptiness into "the shaft the tiles drop down", which is
+   what every polished falling-block game does.
+
+   Sized purely from the same custom properties the wells use rather than by
+   wrapping them in a padded container: a wrapper would offset the wells by its
+   padding while the tiles (a sibling layer) stayed put, and the two grids would
+   drift apart. This element only paints. */
+.playfieldFrame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Headroom above the grid. Wordfall drops tiles in from the top, so the frame
+     extends up past the wells and the grid sits on its floor: the empty space
+     then reads as the shaft the tiles fall down rather than as a void the board
+     happens to be floating in. Bounded by container height so short viewports
+     don't get a frame taller than the board. */
+  --blast-shaft: clamp(0px, 20cqb, 150px);
+  width: calc(
+    var(--blast-cols, 6) * var(--blast-tile-size, 64px) +
+      (var(--blast-cols, 6) - 1) * var(--blast-tile-gap, 8px) + 26px
+  );
+  height: calc(
+    var(--blast-rows, 6) * var(--blast-tile-size, 64px) +
+      (var(--blast-rows, 6) - 1) * var(--blast-tile-gap, 8px) + 26px +
+      var(--blast-shaft)
+  );
+  /* Grow upward only — the extra height must not lift the grid off the floor. */
+  transform: translate(-50%, calc(-50% - (var(--blast-shaft) / 2)));
+  /* Tinted with the level's mode colour so the frame is part of the theme
+     identity rather than neutral chrome. A dark border here would be invisible:
+     unlike a tile (dark border against a cream face) the frame's face is dark
+     too, so the rim has to carry the contrast itself. */
+  border: 3px solid color-mix(in srgb, var(--blast-mode-color, #bfff00) 55%, #0b1530);
+  border-radius: 20px;
+  /* Ground plate: light enough to read as a surface the tiles rest on. */
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 4px 0 rgba(0, 0, 0, 0.38),
+    inset 0 -3px 0 rgba(255, 255, 255, 0.07),
+    0 0 22px color-mix(in srgb, var(--blast-mode-color, #bfff00) 18%, transparent),
+    7px 7px 0 0 #0b1530;
+  pointer-events: none;
+}
+
+/* Hard shadows must fall the other way in Hebrew or the frame looks lit from
+   the wrong side against the rest of the RTL chrome. */
+[dir='rtl'] .playfieldFrame {
+  box-shadow:
+    inset 0 4px 0 rgba(0, 0, 0, 0.38),
+    inset 0 -3px 0 rgba(255, 255, 255, 0.07),
+    0 0 22px color-mix(in srgb, var(--blast-mode-color, #bfff00) 18%, transparent),
+    -7px 7px 0 0 #0b1530;
+}
+
+/* Empty slot behind each tile position. Same size & gap as tiles so landed
+   tiles align perfectly with their well. Was nearly invisible (0.018 alpha),
+   which left players unable to see the grid they were dropping into — the
+   wells now read as real sockets pressed into the ground plate. */
 .cellWell {
   width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
   aspect-ratio: 1 / 1;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.018);
+  background: rgba(0, 0, 0, 0.22);
   box-shadow:
-    inset 0 2px 0 rgba(0, 0, 0, 0.18),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+    inset 0 3px 0 rgba(0, 0, 0, 0.42),
+    inset 0 -2px 0 rgba(255, 255, 255, 0.055);
 }
 
 /* Column wrapper for live tiles — must hold a fixed width matching the well

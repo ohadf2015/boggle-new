@@ -6,13 +6,9 @@ import { buildChainLevel, type ExtraWordCheck } from './engine/chain-builder';
 import { validateChainLevel } from './engine/chain-validator';
 import { LOCALE_CONFIGS } from './locale-config';
 import { getBlastCommonWords } from './engine/common-words';
+import { boardWordMinLength } from './engine/extra-word-check';
 
 type ChainPackFile = { locale: Locale; levels: ChainLevelSpec[] };
-
-// Floor the extra-word-check min length at 4. 3-letter "common" hits dominate
-// false positives (esp. Hebrew, where most 3-letter substrings are real roots)
-// and over-constrain placement to the point of unsolvability.
-const EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR = 4;
 
 export class ChainPackSource implements LevelSource {
   private cache = new Map<Locale, ChainPackFile>();
@@ -37,10 +33,10 @@ export class ChainPackSource implements LevelSource {
     if (cached) return cached;
     try {
       const isCommon = await getBlastCommonWords(locale);
-      const minLength = Math.max(
-        EXTRA_WORD_CHECK_MIN_LENGTH_FLOOR,
-        LOCALE_CONFIGS[locale].wordLengthRange.min,
-      );
+      // Same floor validateSelection claims bonus words at — screening at a
+      // different length than the player can select is how boards ended up
+      // riddled with clearable words the screen never looked at.
+      const minLength = boardWordMinLength(LOCALE_CONFIGS[locale]);
       const check: ExtraWordCheck = { isCommon, minLength };
       this.extraCheckCache.set(locale, check);
       return check;

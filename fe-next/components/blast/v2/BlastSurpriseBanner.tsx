@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { SURPRISE_META, type ActiveSurprise } from '@/lib/blast/v2/surprise';
+import { BlastIcon } from './BlastIcon';
 
 const VISIBLE_MS = 1600;
 
@@ -36,9 +37,11 @@ export function BlastSurpriseBanner({
   const meta = SURPRISE_META[shown.event];
   const coins = Math.round(shown.coins);
   const chestPct = Math.round(shown.chestProgress * 100);
-  const rewardBits: string[] = [];
-  if (coins > 0) rewardBits.push(`+${safeToLocaleString(coins, language)} 🪙`);
-  if (chestPct > 0) rewardBits.push(`+${safeToLocaleString(chestPct, language)}% 💎`);
+  const rewardBits: (string | ReactNode)[] = [];
+  if (coins > 0) rewardBits.push(`+${safeToLocaleString(coins, language)} `);
+  if (coins > 0) rewardBits.push(<BlastIcon key="coin-icon" src="/blast/icons/coin.svg" size={16} />);
+  if (chestPct > 0) rewardBits.push(`+${safeToLocaleString(chestPct, language)}% `);
+  if (chestPct > 0) rewardBits.push(<BlastIcon key="gem-icon" src="/blast/icons/gem.svg" size={16} />);
   if (shown.event === 'lucky_double') rewardBits.push(t('blast.surprise.nextWordDouble', 'Next word ×2'));
 
   return (
@@ -57,7 +60,7 @@ export function BlastSurpriseBanner({
         boxShadow: '3px 3px 0 #0b1530',
       }}
     >
-      <span className="text-lg leading-none" aria-hidden>{meta.emoji}</span>
+      <BlastIcon src={meta.icon} size={20} className="drop-shadow-[0_0_4px_#0b1530]" />
       <span className="text-[12px] font-black uppercase tracking-[0.14em]">
         {t(`blast.surprise.${meta.key}.title`, shown.event)}
       </span>

@@ -5,8 +5,9 @@ import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BlastChestBadge } from './BlastChestBadge';
 import { BlastChestPreviewModal } from './BlastChestPreviewModal';
-import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
+import { themeArt } from '@/lib/blast/v2/themeArt';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
+import { BlastIcon } from './BlastIcon';
 
 type Props = {
   levelNumber: number;
@@ -83,7 +84,7 @@ function CoinDisplay({ coins, modeColor }: { coins: number; modeColor: string })
         textShadow: `1px 1px 0 #0b1530`,
       }}
     >
-      <span aria-hidden style={{ filter: 'drop-shadow(0 0 4px #fbbf24)' }}>🪙</span>
+      <BlastIcon src="/blast/icons/coin.svg" size={24} className="drop-shadow-[0_0_4px_#fbbf24]" />
       <span>{display}</span>
     </m.div>
   );
@@ -122,19 +123,60 @@ export function BlastHud({
   // the theme words blind. The bonus counter is a reward, not a clue, so it
   // stays visible at every level.
   const showTargetWords = !!targetWords && targetWords.length > 0 && levelNumber <= 3;
+  // Theme-word progress. Counts ONLY theme words — foundWords also carries the
+  // player's off-theme bonus finds, which would otherwise push the counter past
+  // the total. A bare "2/4" leaks the word count but never a letter, so unlike
+  // the masked strip above it is safe to show at every level; without it a
+  // player past L3 has no read on how much of the level is left.
+  const targetTotal = targetWords?.length ?? 0;
+  const themeFound = useMemo(
+    () => (targetWords ?? []).filter((w) => foundSet.has(w.toUpperCase())).length,
+    [targetWords, foundSet],
+  );
+  const progressPct = targetTotal > 0 ? (themeFound / targetTotal) * 100 : 0;
+  // The numeric pill is suppressed on the tutorial levels: the masked strip
+  // already shows one chip per word and lights the found ones, so a counter
+  // beside it is the same fact twice. The progress BAR still fills — it costs
+  // no height and reads at a glance.
+  const showProgressPill = targetTotal > 0 && !showTargetWords;
+  const showActions = (mech.revealLetterHint || mech.revealWordHint) || (canUndo && !!onUndo);
+  // One rail instead of four stacked bands. Every band cost ~28px of board
+  // height on a phone, and the board is sized by container query off whatever
+  // is left (see BlastBoard's --blast-rows) — so HUD chrome directly shrinks
+  // the tiles. Strikes / progress / bonus / actions now share a single row.
+  const showRail = hasStrikes || showProgressPill || bonusWordCount > 0 || showActions;
+
+  // Shared pill treatment so the rail reads as one designed component instead
+  // of four independently-styled strips.
+  const pillStyle = {
+    background: 'rgba(0,0,0,0.35)',
+    border: `1.5px solid color-mix(in srgb, ${modeColor} 40%, transparent)`,
+  } as const;
 
   return (
     <>
       <div
-        className="relative flex items-center justify-between gap-2 px-3 py-2.5 bg-[#0b1530] text-white"
+        className="relative flex items-center justify-between gap-2 px-3 py-2 bg-[#0b1530] text-white"
         style={{
           // Theme-tinted gradient sweep across HUD background so each level
           // reads as its own mode (lime/cyan/pink/purple). Subtle — keeps
           // contrast on the white-faced tiles.
           backgroundImage: `linear-gradient(90deg, rgba(11,21,48,1) 0%, color-mix(in srgb, ${modeColor} 22%, #0b1530) 50%, rgba(11,21,48,1) 100%)`,
-          boxShadow: `inset 0 -3px 0 ${modeColor}, 0 4px 12px rgba(0,0,0,0.4)`,
+          boxShadow: `inset 0 -3px 0 color-mix(in srgb, ${modeColor} 22%, #0b1530), 0 4px 12px rgba(0,0,0,0.4)`,
         }}
       >
+        {/* The bar's bottom rule doubles as the level progress meter: it fills
+            left-to-right as theme words are cleared. Costs zero extra height,
+            which is the whole point of the HUD rework. */}
+        <m.div
+          aria-hidden
+          data-testid="hud-progress-bar"
+          className="absolute bottom-0 left-0 h-[3px] rounded-e-full"
+          initial={false}
+          animate={{ width: `${progressPct}%` }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          style={{ background: modeColor, boxShadow: `0 0 10px ${modeColor}` }}
+        />
         <div
           className="flex items-center gap-2 min-w-0 px-2.5 py-1 rounded-lg"
           style={{
@@ -161,7 +203,7 @@ export function BlastHud({
                 className="flex items-center gap-1 text-base font-neo-display font-black uppercase tracking-wide truncate mt-0.5"
                 style={{ color: modeColor, textShadow: `1px 1px 0 #0b1530` }}
               >
-                <span aria-hidden style={{ textShadow: 'none' }}>{themeEmoji(theme)}</span>
+                <BlastIcon src={themeArt(theme)} size={22} />
                 <span className="truncate">{t(`blast.themes.${theme}`, theme)}</span>
               </span>
             )}
@@ -176,42 +218,6 @@ export function BlastHud({
           onPreview={() => setShowPreview(true)}
         />
       </div>
-      {hasStrikes && (
-        <div
-          data-testid="hud-strikes"
-          data-remaining={strikesRemaining}
-          data-danger={strikeDanger ? 'true' : 'false'}
-          className="flex items-center justify-center gap-1.5 px-3 py-1 bg-[#0b1530]/80"
-          aria-label={t('blast.strikes.aria', `${strikesRemaining} guesses left`, {
-            count: String(strikesRemaining),
-          })}
-        >
-          <span className="text-[9px] font-bold uppercase tracking-[0.18em] opacity-55">
-            {t('blast.strikes.label', 'Guesses')}
-          </span>
-          {Array.from({ length: strikeBudget }).map((_, i) => {
-            // Spend pips from the right so the row drains toward empty.
-            const spent = i >= strikesRemaining;
-            const liveColor = strikeDanger ? '#FF6B35' : modeColor;
-            return (
-              <m.span
-                key={i}
-                data-pip
-                data-spent={spent ? 'true' : 'false'}
-                initial={false}
-                animate={{ scale: spent ? [1.5, 1] : 1, opacity: spent ? 0.22 : 1 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className="inline-block w-3 h-3 rounded-sm"
-                style={{
-                  background: spent ? 'rgba(255,255,255,0.12)' : liveColor,
-                  boxShadow: spent ? 'none' : `0 0 6px ${liveColor}`,
-                  border: '1.5px solid #0b1530',
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
       {chestContents && (
         <BlastChestPreviewModal
           chestNumber={chestNumber}
@@ -254,62 +260,124 @@ export function BlastHud({
           })}
         </div>
       )}
-      {bonusWordCount > 0 && (
+      {showRail && (
         <div
-          data-testid="hud-bonus-strip"
-          className="flex items-center justify-center px-3 py-1 bg-[#0b1530]/80"
+          data-testid="hud-rail"
+          className="flex items-center gap-2 px-3 py-1.5 bg-[#0b1530]/85"
+          style={{ borderBottom: `1px solid color-mix(in srgb, ${modeColor} 20%, transparent)` }}
         >
-          <m.span
-            data-testid="hud-bonus-count"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: [1, 1.18, 1], opacity: 1 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="text-[10px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
-            style={{
-              background: 'rgba(255,255,255,0.08)',
-              color: modeColor,
-              border: `1px solid color-mix(in srgb, ${modeColor} 45%, transparent)`,
-            }}
-          >
-            {t('blast.feedback.bonusCount', `⭐ ${bonusWordCount} bonus`, {
-              count: String(bonusWordCount),
-            })}
-          </m.span>
-        </div>
-      )}
-      {((mech.revealLetterHint || mech.revealWordHint) || (canUndo && onUndo)) && (
-        <div className="flex items-center justify-center gap-3 px-4 py-2">
-          {canUndo && onUndo && (
-            <button
-              type="button"
-              onClick={onUndo}
-              data-testid="undo-btn"
-              aria-label={t('blast.undoTooltip', 'Reverse last move')}
-              className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95 inline-flex items-center gap-1.5"
-              style={{
-                background: modeColor,
-                boxShadow: `2px 2px 0 #0b1530`,
-              }}
+          {showProgressPill && (
+            <span
+              data-testid="hud-progress"
+              className="inline-flex items-baseline gap-0.5 rounded-md px-2 py-1 font-neo-display font-black text-xs tabular-nums leading-none"
+              style={pillStyle}
+              aria-label={t('blast.progress.aria', `${themeFound} of ${targetTotal} words found`, {
+                found: String(themeFound),
+                total: String(targetTotal),
+              })}
             >
-              <span aria-hidden>↶</span>
-              {t('blast.undo', 'Undo')}
-            </button>
+              <m.span
+                key={themeFound}
+                initial={{ scale: 1.4 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                style={{ color: modeColor, display: 'inline-block' }}
+              >
+                {themeFound}
+              </m.span>
+              <span className="opacity-45">/{targetTotal}</span>
+            </span>
           )}
-          {(mech.revealLetterHint || mech.revealWordHint) && (
-            <button
-              type="button"
-              onClick={onHint}
-              data-testid="hint-btn"
-              aria-label={t('blast.hint.revealAria', 'Reveal a word — costs a star')}
-              className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95 inline-flex items-center gap-1.5"
-              style={{
-                background: 'white',
-                boxShadow: `2px 2px 0 #0b1530`,
-              }}
+          {hasStrikes && (
+            <span
+              data-testid="hud-strikes"
+              data-remaining={strikesRemaining}
+              data-danger={strikeDanger ? 'true' : 'false'}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 leading-none"
+              style={pillStyle}
+              aria-label={t('blast.strikes.aria', `${strikesRemaining} guesses left`, {
+                count: String(strikesRemaining),
+              })}
             >
-              <span aria-hidden>💡</span>
-              {t('blast.hint.label', 'Hint')}
-            </button>
+              {Array.from({ length: strikeBudget }).map((_, i) => {
+                // Spend pips from the right so the row drains toward empty.
+                const spent = i >= strikesRemaining;
+                const liveColor = strikeDanger ? '#FF6B35' : modeColor;
+                return (
+                  <m.span
+                    key={i}
+                    data-pip
+                    data-spent={spent ? 'true' : 'false'}
+                    initial={false}
+                    animate={
+                      spent
+                        ? { scale: [1.5, 1], opacity: 0.22 }
+                        : strikeDanger
+                          ? { scale: [1, 1.25, 1], opacity: 1 }
+                          : { scale: 1, opacity: 1 }
+                    }
+                    transition={
+                      strikeDanger && !spent
+                        ? { duration: 0.9, repeat: Infinity, ease: 'easeInOut' }
+                        : { duration: 0.3, ease: 'easeOut' }
+                    }
+                    className="inline-block w-2.5 h-2.5 rounded-[3px]"
+                    style={{
+                      background: spent ? 'rgba(255,255,255,0.12)' : liveColor,
+                      boxShadow: spent ? 'none' : `0 0 6px ${liveColor}`,
+                      border: '1.5px solid #0b1530',
+                    }}
+                  />
+                );
+              })}
+            </span>
+          )}
+          {bonusWordCount > 0 && (
+            <m.span
+              data-testid="hud-bonus-count"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: [1, 1.18, 1], opacity: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-black uppercase tracking-wider leading-none"
+              style={{ ...pillStyle, color: modeColor }}
+            >
+              <BlastIcon src="/blast/icons/star.svg" size={12} />
+              {t('blast.feedback.bonusCount', `${bonusWordCount} bonus`, {
+                count: String(bonusWordCount),
+              })}
+            </m.span>
+          )}
+          {/* Actions sit at the trailing edge — `ms-auto` is direction-aware, so
+              they land on the right in English and the left in Hebrew. */}
+          {showActions && (
+            <span className="ms-auto inline-flex items-center gap-2">
+              {canUndo && onUndo && (
+                <button
+                  type="button"
+                  onClick={onUndo}
+                  data-testid="undo-btn"
+                  aria-label={t('blast.undoTooltip', 'Reverse last move')}
+                  className="h-8 px-2.5 rounded-md font-bold text-xs text-[#0b1530] transition-transform active:scale-95 inline-flex items-center gap-1"
+                  style={{ background: modeColor, boxShadow: '2px 2px 0 #0b1530' }}
+                >
+                  <span aria-hidden>↶</span>
+                  {t('blast.undo', 'Undo')}
+                </button>
+              )}
+              {(mech.revealLetterHint || mech.revealWordHint) && (
+                <button
+                  type="button"
+                  onClick={onHint}
+                  data-testid="hint-btn"
+                  aria-label={t('blast.hint.revealAria', 'Reveal a word — costs a star')}
+                  className="h-8 px-2.5 rounded-md font-bold text-xs text-[#0b1530] transition-transform active:scale-95 inline-flex items-center gap-1"
+                  style={{ background: 'white', boxShadow: '2px 2px 0 #0b1530' }}
+                >
+                  <BlastIcon src="/blast/icons/bulb.svg" size={16} />
+                  {t('blast.hint.label', 'Hint')}
+                </button>
+              )}
+            </span>
           )}
         </div>
       )}

@@ -244,12 +244,12 @@ export function resolveSubmitSurprise(
   };
 }
 
-// Emoji + i18n key per event, for the HUD banner. Co-located so adding an
+// Icon path + i18n key per event, for the HUD banner. Co-located so adding an
 // event forces the display metadata in the same edit.
-export const SURPRISE_META: Record<SurpriseEvent, { emoji: string; key: string }> = {
-  coin_burst: { emoji: '🪙', key: 'coinBurst' },
-  gem_shower: { emoji: '💎', key: 'gemShower' },
-  chain_charge: { emoji: '⚡', key: 'chainCharge' },
-  lucky_double: { emoji: '✨', key: 'luckyDouble' },
-  golden_word: { emoji: '🌟', key: 'goldenWord' },
+export const SURPRISE_META: Record<SurpriseEvent, { icon: string; key: string }> = {
+  coin_burst: { icon: '/blast/icons/coin.svg', key: 'coinBurst' },
+  gem_shower: { icon: '/blast/icons/gem.svg', key: 'gemShower' },
+  chain_charge: { icon: '/blast/icons/bolt.svg', key: 'chainCharge' },
+  lucky_double: { icon: '/blast/icons/sparkle.svg', key: 'luckyDouble' },
+  golden_word: { icon: '/blast/icons/star.svg', key: 'goldenWord' },
 };

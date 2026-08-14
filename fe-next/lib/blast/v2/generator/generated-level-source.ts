@@ -9,6 +9,7 @@ import { mechanicsForLevel } from '../mechanic-flags';
 import type { LocaleConfig } from '../locale-config';
 import type { LevelSource } from '../level-source';
 import { findExtraWords } from '../engine';
+import { boardWordMinLength } from '../engine/extra-word-check';
 import { getBlastCommonWords } from '../engine/common-words';
 import { rollLevelModifier } from '../level-modifiers';
 
@@ -28,7 +29,10 @@ export class GeneratedLevelSource implements LevelSource {
     const mechanics = mechanicsForLevel(levelNumber);
     const baseSeed = hashStringToSeed(`${levelNumber}:${locale}:${userIdBucket}:${variantSalt}`);
     const isCommon = await getBlastCommonWords(locale);
-    const minLen = config.wordLengthRange.min;
+    // Screen at the same length the player can claim a bonus word at — below
+    // that floor a selection is rejected outright, so screening it is wasted
+    // regeneration.
+    const minLen = boardWordMinLength(config);
     for (let attempt = 0; attempt < MAX_REGEN_ATTEMPTS; attempt++) {
       const prng = seededPRNG(baseSeed + attempt * 1000);
       const themeKey = pickTheme(prng, config);

@@ -13,6 +13,11 @@ const mockLevel: BlastLevel = {
     { index: 0, tiles: ['C', 'A', 'T'] },
     { index: 1, tiles: ['S', 'U', 'N'] },
     { index: 2, tiles: ['E', 'G', 'G'] },
+    // Fourth column exists so row 0 is a FOUR-tile off-theme run ("CSER").
+    // Bonus words are only claimable from `boardWordMinLength` tiles up, so a
+    // 2- or 3-tile drag now rejects as 'length' before the dictionary is ever
+    // consulted — the off-theme tests need a run that reaches the floor.
+    { index: 3, tiles: ['R', 'R', 'R'] },
   ],
   words: ['CAT', 'SUN', 'EGG'],
   resolvableOrder: ['CAT', 'SUN', 'EGG'],
@@ -20,6 +25,15 @@ const mockLevel: BlastLevel = {
   gravityMode: 'standard',
   difficulty: 1,
 };
+
+// Row 0 of mockLevel, left to right — the canonical off-theme selection.
+const ROW0 = [cellId(0, 0), cellId(1, 0), cellId(2, 0), cellId(3, 0)];
+
+function dragRow0(result: { current: ReturnType<typeof useBlastV2> }) {
+  result.current.handlers.onPointerDown(ROW0[0]!);
+  for (const cell of ROW0.slice(1)) result.current.handlers.onPointerMove(cell);
+  result.current.handlers.onPointerUp();
+}
 
 // Level designed so collapsing CAT reveals DOG.
 //   col0 = [C,A,T,D] bottom-up, col1 = [O], col2 = [G]
@@ -167,7 +181,7 @@ describe('useBlastV2 hook', () => {
   });
 
   it('defers the shake for an "unknown" rejection until the async dict check resolves', () => {
-    // Dragging row 0 spells "CS" — a real-letter run that is NOT a theme word
+    // Dragging row 0 spells "CSER" — a real-letter run that is NOT a theme word
     // and (with no dictionaryCheck) rejects as 'unknown'. This is the retryable
     // path: the player may have found a valid off-theme word, so we must NOT
     // fire the red shake before /api/dictionary/check has had its say.
@@ -175,15 +189,13 @@ describe('useBlastV2 hook', () => {
     const initialShakeKey = result.current.state.invalidShakeKey;
 
     act(() => {
-      result.current.handlers.onPointerDown(cellId(0, 0));
-      result.current.handlers.onPointerMove(cellId(1, 0));
-      result.current.handlers.onPointerUp();
+      dragRow0(result);
     });
 
     // No premature shake — the verdict is pending.
     expect(result.current.state.invalidShakeKey).toBe(initialShakeKey);
     expect(result.current.state.dictCheckPending).toBe(true);
-    expect(result.current.state.lastRejectedCells.length).toBe(2);
+    expect(result.current.state.lastRejectedCells.length).toBe(ROW0.length);
   });
 
   it('shakes immediately for a deterministic rejection (frozen tile) — no dict check', () => {
@@ -216,9 +228,7 @@ describe('useBlastV2 hook', () => {
     const { result } = renderHook(() => useBlastV2(mockLevel));
 
     act(() => {
-      result.current.handlers.onPointerDown(cellId(0, 0));
-      result.current.handlers.onPointerMove(cellId(1, 0));
-      result.current.handlers.onPointerUp();
+      dragRow0(result);
     });
     expect(result.current.state.dictCheckPending).toBe(true);
     const pendingShakeKey = result.current.state.invalidShakeKey;
@@ -233,17 +243,14 @@ describe('useBlastV2 hook', () => {
   });
 
   it('bonusWordCount counts off-theme found words', () => {
-    // dictionaryCheck accepts "CSE" (row 0). It is not a theme word → bonus.
+    // dictionaryCheck accepts "CSER" (row 0). It is not a theme word → bonus.
     const { result } = renderHook(() =>
-      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cse' }),
+      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cser' }),
     );
     expect(result.current.state.bonusWordCount).toBe(0);
 
     act(() => {
-      result.current.handlers.onPointerDown(cellId(0, 0));
-      result.current.handlers.onPointerMove(cellId(1, 0));
-      result.current.handlers.onPointerMove(cellId(2, 0));
-      result.current.handlers.onPointerUp();
+      dragRow0(result);
     });
     expect(result.current.state.foundWords.size).toBe(1);
     expect(result.current.state.bonusWordCount).toBe(1);
@@ -255,9 +262,7 @@ describe('useBlastV2 hook', () => {
 
     // An 'unknown' reject is NOT yet a confirmed miss — verdict pending.
     act(() => {
-      result.current.handlers.onPointerDown(cellId(0, 0));
-      result.current.handlers.onPointerMove(cellId(1, 0));
-      result.current.handlers.onPointerUp();
+      dragRow0(result);
     });
     expect(result.current.state.wrongAttempts).toBe(0);
 
@@ -367,15 +372,12 @@ describe('useBlastV2 hook', () => {
     // Tiles selected across row 0 must be removed after a bonus match —
     // otherwise the board stays identical and the player remains stuck.
     const { result } = renderHook(() =>
-      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cse' }),
+      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cser' }),
     );
     const initialColumn0Height = result.current.state.level.columns[0]!.tiles.length;
 
     act(() => {
-      result.current.handlers.onPointerDown(cellId(0, 0));
-      result.current.handlers.onPointerMove(cellId(1, 0));
-      result.current.handlers.onPointerMove(cellId(2, 0));
-      result.current.handlers.onPointerUp();
+      dragRow0(result);
     });
 
     // Column 0's bottom tile (C) was consumed → height drops by one.
@@ -383,24 +385,21 @@ describe('useBlastV2 hook', () => {
   });
 
   it('accepts free-form dictionary words via dictionaryCheck option', () => {
-    // Board row 0 across spells "CSE" — not in level.words. With
+    // Board row 0 across spells "CSER" — not in level.words. With
     // dictionaryCheck accepting it, useBlastV2 should treat it as a
     // bonus match and add it to foundWords.
     const { result } = renderHook(() =>
-      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cse' }),
+      useBlastV2(mockLevel, { dictionaryCheck: (w) => w.toLowerCase() === 'cser' }),
     );
 
     act(() => {
-      result.current.handlers.onPointerDown(cellId(0, 0));
-      result.current.handlers.onPointerMove(cellId(1, 0));
-      result.current.handlers.onPointerMove(cellId(2, 0));
-      result.current.handlers.onPointerUp();
+      dragRow0(result);
     });
 
     expect(result.current.state.foundWords.size).toBe(1);
     // Stored normalized (lowercase from config.normalize).
     expect(
-      [...result.current.state.foundWords].some((w) => w.toLowerCase() === 'cse'),
+      [...result.current.state.foundWords].some((w) => w.toLowerCase() === 'cser'),
     ).toBe(true);
   });
 
@@ -493,24 +492,34 @@ describe('useBlastV2 hook', () => {
 
   describe('async dictionary fallback', () => {
     it('records rejected cells when local validator says "unknown" so async retry can replay them', () => {
-      // No dictionaryCheck supplied → "CSE" (real letters on row 0) rejects with
-      // reason 'unknown'. BlastGame uses lastRejectedCells to call the
+      // No dictionaryCheck supplied → "CSER" (real letters on row 0) rejects
+      // with reason 'unknown'. BlastGame uses lastRejectedCells to call the
       // /api/dictionary/check endpoint and dispatch onForceBonus on success.
+      const { result } = renderHook(() => useBlastV2(mockLevel));
+
+      act(() => {
+        dragRow0(result);
+      });
+
+      expect(result.current.state.lastValidation).toEqual({ kind: 'reject', reason: 'unknown' });
+      expect(result.current.state.lastRejectedCells).toEqual(ROW0);
+    });
+
+    it('rejects a below-floor run as "length" so no dictionary round-trip fires', () => {
+      // Two tiles of row 0 spell "CS". Under the board word floor this is not a
+      // candidate bonus word at all — it must reject locally as 'length' and
+      // leave nothing queued for the async /api/dictionary/check retry.
       const { result } = renderHook(() => useBlastV2(mockLevel));
 
       act(() => {
         result.current.handlers.onPointerDown(cellId(0, 0));
         result.current.handlers.onPointerMove(cellId(1, 0));
-        result.current.handlers.onPointerMove(cellId(2, 0));
         result.current.handlers.onPointerUp();
       });
 
-      expect(result.current.state.lastValidation).toEqual({ kind: 'reject', reason: 'unknown' });
-      expect(result.current.state.lastRejectedCells).toEqual([
-        cellId(0, 0),
-        cellId(1, 0),
-        cellId(2, 0),
-      ]);
+      expect(result.current.state.lastValidation).toEqual({ kind: 'reject', reason: 'length' });
+      expect(result.current.state.lastRejectedCells).toEqual([]);
+      expect(result.current.state.dictCheckPending).toBe(false);
     });
 
     it('does NOT remember rejected cells for non-retryable rejections (duplicate)', () => {
@@ -534,24 +543,21 @@ describe('useBlastV2 hook', () => {
     });
 
     it('onForceBonus applies a dictionary-confirmed bonus word and clears it from the board', () => {
-      // Player drags row 0 → "CSE" → local validator rejects 'unknown'.
+      // Player drags row 0 → "CSER" → local validator rejects 'unknown'.
       // BlastGame confirms via /api/dictionary/check then calls onForceBonus
       // with the remembered cells. The word is credited, tiles cleared.
       const { result } = renderHook(() => useBlastV2(mockLevel));
 
       act(() => {
-        result.current.handlers.onPointerDown(cellId(0, 0));
-        result.current.handlers.onPointerMove(cellId(1, 0));
-        result.current.handlers.onPointerMove(cellId(2, 0));
-        result.current.handlers.onPointerUp();
+        dragRow0(result);
       });
-      expect(result.current.state.lastRejectedCells.length).toBe(3);
+      expect(result.current.state.lastRejectedCells.length).toBe(ROW0.length);
 
       act(() => {
-        result.current.handlers.onForceBonus(result.current.state.lastRejectedCells, 'cse');
+        result.current.handlers.onForceBonus(result.current.state.lastRejectedCells, 'cser');
       });
 
-      expect(result.current.state.foundWords.has('cse')).toBe(true);
+      expect(result.current.state.foundWords.has('cser')).toBe(true);
       // Bottom row tiles consumed → col0 lost its bottom tile (C).
       expect(result.current.state.level.columns[0]!.tiles.length).toBe(2);
       expect(result.current.state.lastRejectedCells).toEqual([]);

@@ -1,6 +1,7 @@
 import type { CellId, BlastLevel, TileFlag } from '../types';
 import type { LocaleConfig } from '../locale-config';
 import { parseCell } from './cell-id';
+import { boardWordMinLength } from './extra-word-check';
 
 export type ValidationResult =
   | { kind: 'theme_match'; word: string }
@@ -67,6 +68,14 @@ export function validateSelection(cells: CellId[], ctx: ValidationContext): Vali
       const original = ctx.level.words.find((w) => ctx.config.normalize(w) === candidate)!;
       return { kind: 'theme_match', word: original };
     }
+  }
+  // Bonus words only count from `boardWordMinLength` tiles up — the same floor
+  // the level generator screens unintended words at. Below it the board offers
+  // dozens of accidental two- and three-letter clears (AT, OP, ERE…) that
+  // collapse the authored chain and drown the intended word. Theme words are
+  // matched above this gate, so a short answer still clears.
+  if (cells.length < boardWordMinLength(ctx.config)) {
+    return { kind: 'reject', reason: 'length' };
   }
   if (ctx.bonusDictEnabled) {
     for (const candidate of [forward, reversed]) {

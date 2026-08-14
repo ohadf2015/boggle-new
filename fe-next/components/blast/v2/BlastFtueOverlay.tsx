@@ -119,10 +119,14 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
   );
 }
 
-// Anatomical pointing hand drifting across the board to mime a "swipe" gesture.
-// Index finger extended up, other fingers curled into the palm, thumb tucked,
-// blue sleeve cuff. A pulsing touch ring above the fingertip telegraphs the
-// tap target. Neo-brutalist: solid fills, 3px black stroke, hard drop shadow.
+// Stylised pointing glove drifting across the board to mime a "swipe" gesture.
+// Deliberately NOT anatomical: the previous version stacked skin-toned rects and
+// ellipses behind a blue sleeve, which put two colours on screen that exist
+// nowhere else in the palette and left visible seams where the primitives
+// overlapped — at board scale it read as a lumpy mitten with a floating finger.
+// This is one closed path (no seams) in cream on the standard 3px ink outline,
+// like a cartoon glove, and it is small enough that the fist no longer covers
+// the tile the fingertip is pointing at. A pulsing lime ring marks the target.
 function AnimatedFinger() {
   return (
     <m.div
@@ -156,38 +160,36 @@ function AnimatedFinger() {
       }}
     >
       <svg
-        width="64"
-        height="84"
-        viewBox="0 0 64 84"
-        className="drop-shadow-[3px_3px_0_#000]"
+        width="44"
+        height="66"
+        viewBox="0 0 48 72"
+        className="drop-shadow-[3px_3px_0_#0b1530]"
       >
-        {/* Pulsing touch ring above the fingertip */}
+        {/* Pulsing touch ring around the fingertip, marking the tap target. */}
         <m.circle
-          cx="32"
-          cy="9"
+          cx="24"
+          cy="15"
           r={7}
           fill="none"
-          stroke="#FFE135"
+          stroke="#BFFF00"
           strokeWidth="2.5"
           initial={{ opacity: 0.95 }}
-          animate={{ r: [6, 11, 6], opacity: [0.95, 0.25, 0.95] }}
+          animate={{ r: [6, 11, 6], opacity: [0.95, 0.2, 0.95] }}
           transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* Blue sleeve cuff */}
-        <rect x="8" y="66" width="48" height="16" rx="4" fill="#3B82F6" stroke="#000" strokeWidth="3" />
-        {/* Palm body */}
-        <rect x="14" y="40" width="36" height="30" rx="10" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
-        {/* Curled middle-finger knuckle bump peeking above the palm */}
-        <circle cx="42" cy="40" r="6" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
-        {/* Thumb tucked at the side */}
-        <ellipse cx="12" cy="50" rx="7" ry="10" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
-        {/* Extended index finger pointing up */}
-        <rect x="26" y="10" width="14" height="38" rx="7" fill="#FFD8B0" stroke="#000" strokeWidth="3" />
-        {/* Knuckle crease lines */}
-        <path d="M27 24 H39" stroke="#000" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
-        <path d="M27 34 H39" stroke="#000" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
-        {/* Nail */}
-        <rect x="29" y="14" width="8" height="5" rx="2" fill="#FFF6E0" stroke="#000" strokeWidth="1.5" />
+        {/* The glove as ONE closed silhouette: extended index finger, curled
+            fist, thumb lobe on the left. Single path on purpose — the previous
+            version stacked separate rects/ellipses and the overlaps showed. */}
+        <path
+          d="M19 21 A5 5 0 0 1 29 21 L29 34 C35.5 34 42 37.5 42 45 L42 56
+             A9 9 0 0 1 33 65 L17 65 A11 11 0 0 1 6 54 L6 51
+             C1.5 50 0.5 44 4 41.5 C6 40 8 40.5 8.8 42
+             C9.5 37.8 13.5 34 19 34 Z"
+          fill="#FFFEF0"
+          stroke="#0b1530"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
       </svg>
     </m.div>
   );
