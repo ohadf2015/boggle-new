@@ -102,7 +102,10 @@ export default function SealedBidPage() {
       const next = Math.max(1.0, 3.0 - 2.0 * progress);
       bidMultiplierRef.current = next;
       setBidMultiplier(next);
-    }, 100);
+      // 250 ms, not 100 ms: scoring reads bidMultiplierRef (exact, untouched by
+      // this tick), so this interval only drives the badge. At 100 ms it
+      // re-rendered the whole page — wheel and Pixi ring included — 10×/s.
+    }, 250);
     return () => clearInterval(id);
   }, [phase, roundIndex]);
 

@@ -691,6 +691,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
             radius={wheelRadius}
             combo={0}
+            // Tiles below lay out on 360/outerLetters.length; the ring defaults
+            // to 6. The server supplies outerLetters, so any non-hexagon puzzle
+            // would drift the connector lines off the tiles. Keep them in sync.
+            outerCount={outerLetters.length || 6}
             reducedMotion={!!prefersReduced}
           />
           <m.div

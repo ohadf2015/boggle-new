@@ -61,11 +61,18 @@ export interface WheelLetterProps {
   onHoldEnd?: () => void;
   /** Equipped tile-skin id (e.g. 'tile-neon'); reskins resting outer letters. */
   tileSkin?: string | null;
+  /**
+   * Smaller outer tiles for wheels squeezed into a panel rather than owning the
+   * screen (Sealed Bid's felt). Seven tiles need an orbit of ~1.15× the tile
+   * width just to not touch, so the full-size tiles could not fit the height
+   * the felt grants. Same sizes the `short:` viewport variants already use.
+   */
+  compact?: boolean;
 }
 
 export const WheelLetter: React.FC<WheelLetterProps> = ({
   letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, reducedMotion = false,
-  showHoldRing = false, onHoldStart, onHoldEnd, tileSkin,
+  showHoldRing = false, onHoldStart, onHoldEnd, tileSkin, compact = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
@@ -98,7 +105,9 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         // short:sm/short:md compounds force the shrink to win over width breakpoints.
         isCenter
           ? 'w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 short:w-16 short:h-16 short:sm:w-16 short:sm:h-16 short:md:w-16 short:md:h-16 text-3xl sm:text-4xl md:text-5xl short:text-2xl short:sm:text-2xl short:md:text-2xl z-10'
-          : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
+          : compact
+            ? 'w-11 h-11 sm:w-12 sm:h-12 text-base sm:text-lg'
+            : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
         isCenter
           ? isUsed
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'

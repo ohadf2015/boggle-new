@@ -103,8 +103,67 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
         </div>
       </div>
 
-      {chips !== undefined && coinsAwarded !== undefined && (
-        <div className="rounded-neo border-2 border-black bg-neo-navy px-3 py-2 shadow-hard-sm text-center">
+      {/* Per-round breakdown. `history` already carries the word, the rival word
+          and the chip delta for every round — the screen was throwing all of it
+          away and showing three aggregate counts, so a player could not see
+          which of their words actually paid. */}
+      {total > 0 && (
+        <ul className="space-y-1" data-testid="sb-round-list">
+          {history.map((r, i) => (
+            <li
+              key={i}
+              data-testid="sb-round-row"
+              data-outcome={r.outcome}
+              className={`flex items-center gap-2 rounded-neo border-2 border-black px-2 py-1.5 shadow-hard-sm ${
+                r.outcome === 'unique'
+                  ? 'bg-neo-navy'
+                  : r.outcome === 'clash'
+                    ? 'bg-neo-red/20'
+                    : 'bg-neo-navy/60'
+              }`}
+            >
+              <span className="font-neo-display text-[10px] font-black tabular-nums text-neo-white/40">
+                {t('sealedBid.shareCard.roundLabel', { n: i + 1 })}
+              </span>
+              <span className="text-xs" aria-hidden="true">
+                {t(`sealedBid.outcomeEmoji.${r.outcome}`)}
+              </span>
+              <span
+                className={`min-w-0 flex-1 truncate font-neo-display text-xs font-black uppercase tracking-wide ${
+                  r.playerWord ? 'text-neo-white' : 'text-neo-white/30'
+                }`}
+              >
+                {r.playerWord || t('sealedBid.noWord', '—')}
+              </span>
+              {/* No rival word here on purpose: `botWord` is only botPicks[0],
+                  so on a unique round it names a rival you never clashed with,
+                  and on a clash it is your own word repeated. The tint, the
+                  emoji and the delta already carry the outcome. */}
+              <span
+                dir="ltr"
+                className={`shrink-0 font-neo-display text-xs font-black tabular-nums ${
+                  r.points > 0
+                    ? 'text-neo-lime'
+                    : r.points < 0
+                      ? 'text-neo-red'
+                      : 'text-neo-white/40'
+                }`}
+              >
+                {r.points > 0 ? `+${r.points}` : `${r.points}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Only when coins were actually paid. `coinsAwarded` starts at 0 and the
+          daily claim short-circuits on a second run the same day, so the old
+          `!== undefined` guard ended winning sessions with "40 chips → 0 coins". */}
+      {chips !== undefined && !!coinsAwarded && coinsAwarded > 0 && (
+        <div
+          data-testid="sb-cashout"
+          className="rounded-neo border-2 border-black bg-neo-navy px-3 py-2 shadow-hard-sm text-center"
+        >
           <p className="font-neo-body text-xs text-neo-white/60">{t('sealedBid.session.cashOut')}</p>
           <p className="font-neo-display font-black text-sm text-neo-yellow">
             {chips} {t('sealedBid.session.chips')} → {coinsAwarded} {t('sealedBid.session.coins')}

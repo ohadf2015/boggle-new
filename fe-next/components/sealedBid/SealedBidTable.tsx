@@ -98,26 +98,32 @@ export default function SealedBidTable({
           />
         </div>
 
-        {/* Stake pot + odds on felt rim */}
-        <div className="w-full space-y-2 px-3 pb-3">
-          <div
-            data-testid="sb-stake-pot"
-            className="mx-auto flex max-w-xs items-center justify-center gap-2 rounded-full border-2 border-black bg-neo-yellow px-4 py-1.5 shadow-hard-sm"
-          >
-            <span className="font-neo-body text-[10px] font-bold uppercase tracking-wide text-neo-navy/70">
-              {t('sealedBid.currentStake')}
-            </span>
-            <span className="font-neo-display text-lg font-black tabular-nums text-neo-navy">
-              {stake}
-            </span>
-            <span className="font-neo-body text-[10px] font-bold uppercase text-neo-navy/70">
-              {t('sealedBid.chips')}
-            </span>
-          </div>
+        {/* One rim strip: stake · odds. Previously two stacked blocks whose
+            combined 117px left the wheel less height than the chrome around
+            it — and the odds block only appeared once the word hit 3 letters,
+            so the wheel SHRANK mid-selection and the tiles landed on top of
+            their neighbours. One fixed-height row keeps the wheel steady. */}
+        <div className="w-full px-3 pb-3">
+          <div className="mx-auto flex max-w-sm items-center justify-center gap-3 rounded-full border-2 border-black bg-neo-navy/90 px-3 py-1.5 shadow-hard-sm">
+            <div
+              data-testid="sb-stake-pot"
+              className="flex min-w-0 items-center gap-1.5 whitespace-nowrap"
+            >
+              <span className="font-neo-body text-[10px] font-bold uppercase tracking-wide text-neo-white/60">
+                {t('sealedBid.currentStake')}
+              </span>
+              <span className="font-neo-display text-lg font-black tabular-nums text-neo-yellow">
+                {stake}
+              </span>
+            </div>
 
-          {showOdds && (
-            <OddsBoard word={word} stake={stake} reducedMotion={reducedMotion} compact />
-          )}
+            {showOdds && (
+              <>
+                <span aria-hidden className="h-4 w-px shrink-0 bg-neo-white/25" />
+                <OddsBoard word={word} stake={stake} reducedMotion={reducedMotion} compact />
+              </>
+            )}
+          </div>
         </div>
       </SealedBidFeltShell>
 
@@ -147,9 +153,23 @@ export default function SealedBidTable({
             data-testid="sb-lock"
             onClick={onLock}
             disabled={!lockable || disabled}
+            aria-busy={pending}
             className="flex min-h-12 min-w-0 flex-[1.6] items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-3 py-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5 disabled:cursor-not-allowed disabled:bg-neo-lime/40 disabled:text-neo-navy/70 disabled:opacity-100 sm:text-base"
           >
-            {t('sealedBid.lockBid')}
+            {/* The dictionary check is a ~600 ms network round-trip that runs
+                BEFORE the showdown mounts. Without a label change the button
+                just went dead and the tap read as dropped. */}
+            {pending ? (
+              <>
+                <span
+                  aria-hidden
+                  className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-neo-navy border-t-transparent motion-reduce:animate-none"
+                />
+                {t('sealedBid.revealing')}
+              </>
+            ) : (
+              t('sealedBid.lockBid')
+            )}
           </button>
           <button
             type="button"
