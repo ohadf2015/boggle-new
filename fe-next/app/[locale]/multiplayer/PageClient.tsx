@@ -116,6 +116,23 @@ function ViewLoadingSkeleton(): React.JSX.Element {
   );
 }
 
+/**
+ * Report a returning user's invite as consumed, timed from the landing stamp.
+ * Module scope on purpose: it runs from the socket's `joined` callback, never
+ * during render, but a `Date.now()` sitting lexically inside the component
+ * reads as an impure render call to react-hooks/purity. Hoisting it keeps the
+ * lint gate honest instead of silencing it. The new-user path reports this
+ * from useInviteOnboardingMode instead.
+ */
+function reportInviteConsumed(roomCode: string): void {
+  if (typeof sessionStorage === 'undefined') return;
+  const landedTs = sessionStorage.getItem('invite_landed_ts');
+  if (!landedTs) return;
+  const totalSeconds = Math.round((Date.now() - Number(landedTs)) / 1000);
+  trackInviteConsumed({ roomCode, path: 'direct', totalSeconds });
+  sessionStorage.removeItem('invite_landed_ts');
+}
+
 export default function MultiplayerPageClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const isClassroomMode = searchParams?.get('classroom') === 'true';
@@ -289,12 +306,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       if (quickPlay) trackGrowthEvent('mp_quickplay_joined', { asHost: data.isHost, language: data.language ?? language });
       // Track invite consumed for returning users who arrived via ?room= invite redirect.
       // New-user path fires this in useInviteOnboardingMode instead.
-      const inviteLandedTs = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('invite_landed_ts') : null;
-      if (inviteLandedTs && prefilledRoomCode) {
-        const totalSeconds = Math.round((Date.now() - Number(inviteLandedTs)) / 1000);
-        trackInviteConsumed({ roomCode: prefilledRoomCode, path: 'direct', totalSeconds });
-        sessionStorage.removeItem('invite_landed_ts');
-      }
+      if (prefilledRoomCode) reportInviteConsumed(prefilledRoomCode);
       if (data.language) setRoomLanguage(data.language);
       const joinedUsername = data.username || username;
       if (data.isHost) { setUsername(joinedUsername); setStoredUsername(joinedUsername); }
@@ -376,8 +388,17 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         setError(t('errors.usernameTaken'));
         toast.error(t('errors.usernameTaken'), { duration: 4000, icon: '❌', id: MP_TOAST_IDS.usernameTaken });
         setIsActive(false); setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
+      } else if (kind === 'rateLimited') {
+        // Rage-clicking Join is how a player trips the 50 msg/10s limiter, so the
+        // generic "an error occurred" this used to show invited the next tap and
+        // extended the lockout. Say what happened and what to do instead.
+        setError(t('errors.tooManyAttempts'));
+        toast.error(t('errors.tooManyAttempts'), { duration: 4000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
+        setAttemptingReconnect(false);
       } else {
-        const errorMsg = data.message || t('errors.generic');
+        // Prefer a translated string; `data.message` is a hardcoded English
+        // sentence from the backend, so it is the last resort, not the default.
+        const errorMsg = t('errors.generic') || data.message || 'Error';
         setError(errorMsg);
         toast.error(errorMsg, { duration: 4000, icon: '❌', id: MP_TOAST_IDS.joinError });
       }
