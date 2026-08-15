@@ -61,7 +61,11 @@ function main() {
   const rejected = { fill: 0, gate: 0, unclued: 0, obscure: 0, dupe: 0 };
   const RARITY_LIMIT = arg('rarity', 0.7);
 
-  for (let attempt = 0; kept.length < target && attempt < target * 12; attempt++) {
+  // Spend a fixed attempt budget and keep the BEST `target`, rather than stopping at the first
+  // `target` that pass. Oversampling is what makes the commonness ranking mean anything — stop
+  // early and "best" is just "first".
+  const budget = arg('attempts', target * 6);
+  for (let attempt = 0; attempt < budget; attempt++) {
     const tpl = templates[attempt % templates.length];
     const grid = fillGrid({ size: tpl.size, rtl: false, blocks: tpl.blocks }, idx, {
       rng: mulberry32(0x9e3779b9 ^ ((attempt + shard * 100000) * 2654435761)),
@@ -83,9 +87,10 @@ function main() {
       continue; // unclued answer — unusable
     }
 
-    // Quality: a grid full of the bank's rarest words is technically valid and miserable to solve.
-    // Reject any fill whose worst answer is outside the commonest half of the bank, then rank what
-    // survives by average commonness so the best fills win the limited pool slots.
+    // Quality is a RANKING, not a gate. Gating on the single worst answer threw away 239 of 276
+    // valid fills: across 42 crossings, at least one word from the bank's long tail is close to
+    // unavoidable, so the gate rejected excellent grids for one obscure crossing. Instead every
+    // valid fill stays in contention and the pool takes the best by average commonness.
     const ranks = slots.map((s) => rank.get(s.answer) ?? words.length);
     const worst = Math.max(...ranks);
     if (worst > words.length * RARITY_LIMIT) {
@@ -102,10 +107,12 @@ function main() {
     }
     seen.add(key);
     kept.push({ rows, mean, worst });
-    console.log(
-      `${kept.length}/${target} · ${Math.round((Date.now() - started) / 1000)}s · ` +
-        `rejected ${JSON.stringify(rejected)}`,
-    );
+    if (kept.length % 5 === 0) {
+      console.log(
+        `${kept.length} kept · attempt ${attempt + 1}/${budget} · ` +
+          `${Math.round((Date.now() - started) / 1000)}s · rejected ${JSON.stringify(rejected)}`,
+      );
+    }
   }
 
   console.log(`rejected: ${JSON.stringify(rejected)}`);
@@ -114,13 +121,16 @@ function main() {
     process.exit(1);
   }
   kept.sort((a, b) => a.mean - b.mean); // commonest-vocabulary puzzles first
-  const out = { size, grids: kept.map((k) => k.rows) };
+  const pool = kept.slice(0, target);
+  const out = { size, grids: pool.map((k) => k.rows) };
   const suffix = shard ? `.shard${shard}` : '';
   const path = join(__dirname, `../../lib/crossword/data/grids.en${size}${suffix}.json`);
   writeFileSync(path, JSON.stringify(out));
   console.log(
     `wrote ${kept.length} grids → ${path} ` +
-      `(mean commonness rank ${Math.round(kept.reduce((a, k) => a + k.mean, 0) / (kept.length || 1))})`,
+      `(kept ${pool.length} of ${kept.length} valid fills; ` +
+      `mean commonness rank ${Math.round(pool.reduce((a, k) => a + k.mean, 0) / (pool.length || 1))} ` +
+      `of ${words.length})`,
   );
 }
 

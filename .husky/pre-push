@@ -85,7 +85,11 @@ PID_LINT=$!
 (
   if [ -z "$TYPE_RELEVANT" ]; then
     echo "ℹ️  Type check: no type-relevant files changed — skipped"
-  elif ./node_modules/.bin/tsc --noEmit; then
+  # 8 GB, not Node's ~4 GB default: the whole-project check now OOMs on this
+  # codebase ("Ineffective mark-compacts near heap limit", ~75s in, 4013/4127 MB),
+  # which failed the gate on a SIX-FILE seo-only push whose types were fine. 4096
+  # dies, 8192 and 12288 both pass — bumped, not silenced.
+  elif NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192" ./node_modules/.bin/tsc --noEmit; then
     echo "✅ Type check passed"
   else
     echo "❌ Type check failed"

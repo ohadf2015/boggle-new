@@ -20,7 +20,6 @@ export function OrganizationJsonLd(): ReactNode {
         sameAs: [
             'https://www.instagram.com/lexi.clash',
             'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-            'https://www.crazygames.com/game/lexiclash',
         ],
         contactPoint: {
             '@type': 'ContactPoint',

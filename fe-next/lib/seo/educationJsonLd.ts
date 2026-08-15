@@ -14,7 +14,6 @@ const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const SAME_AS = [
   'https://www.instagram.com/lexi.clash',
   'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-  'https://www.crazygames.com/game/lexiclash',
 ];
 
 interface FaqItem {

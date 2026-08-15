@@ -59,10 +59,12 @@ describe('educationJsonLd', () => {
     it('links real external profiles via sameAs (entity verification for AI/search)', () => {
       const schema = buildEducationOrgJsonLd('en');
       expect(Array.isArray(schema.sameAs)).toBe(true);
-      // Must include the three real, existing LexiClash profiles — no placeholders.
+      // Must include the real, existing LexiClash profiles — no placeholders.
       expect(schema.sameAs).toContain('https://www.instagram.com/lexi.clash');
       expect(schema.sameAs).toContain('https://play.google.com/store/apps/details?id=live.lexiclash.app');
-      expect(schema.sameAs).toContain('https://www.crazygames.com/game/lexiclash');
+      // Not the CrazyGames page: that URL 404s, and a sameAs that 404s weakens the entity
+      // instead of verifying it. Put it back the day the listing is actually live.
+      expect(schema.sameAs).not.toContain('https://www.crazygames.com/game/lexiclash');
       // No stray self-reference to a non-canonical domain.
       expect(schema.sameAs).not.toContain('https://www.lexiclash.live');
       expect(schema.sameAs.every((u: string) => !u.includes('lexiclash.com'))).toBe(true);

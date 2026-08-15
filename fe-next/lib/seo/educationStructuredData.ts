@@ -6,7 +6,6 @@ const BASE_URL = 'https://www.lexiclash.live';
 const SAME_AS = [
   'https://www.instagram.com/lexi.clash',
   'https://play.google.com/store/apps/details?id=live.lexiclash.app',
-  'https://www.crazygames.com/game/lexiclash',
 ];
 
 export function educationOrganizationJsonLd(locale: string) {

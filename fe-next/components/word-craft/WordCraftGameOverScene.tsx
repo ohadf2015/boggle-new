@@ -85,6 +85,11 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         ? t('wordcraft.youWon', 'You won!')
         : t('wordcraft.opponentWon', { name: botLabel });
   const squares = t('wordcraft.squares', 'squares');
+  // Close-game tension: a nail-biter feels different from a blowout. Relative
+  // (not absolute) margin so it scales across small/medium/large boards.
+  const totalSquares = playerScore + botScore;
+  const margin = Math.abs(playerScore - botScore);
+  const isCloseGame = !isTie && totalSquares > 0 && margin / totalSquares <= 0.1;
 
   // Full-screen modal: a small bottom banner was easy to miss, so players were
   // unsure the game had actually ended. A dim backdrop + centered card makes the
@@ -114,6 +119,12 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         >
           {label}
         </div>
+
+        {isCloseGame ? (
+          <div className="animate-neo-pop px-3 py-1 bg-neo-orange border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-sm font-neo-display font-black uppercase tracking-wider text-xs">
+            🔥 {t('wordcraft.closeGame', 'So close!')}
+          </div>
+        ) : null}
 
         {/* Concrete result: how many squares each side controls at the buzzer. */}
         <div className="flex items-stretch gap-3 w-full">

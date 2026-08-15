@@ -112,6 +112,38 @@ describe('CrosswordGrid', () => {
     expect(container.querySelector('[aria-label="crossword.zoomIn"]')).not.toBeNull();
   });
 
+  /**
+   * The clamp maths is unit-tested pure, but the chain that matters at runtime is
+   * `active` → effect → commit → inline transform. Nothing else covers it: keyboard navigation
+   * would walk the cursor off a zoomed board with the view sitting still, and every pure test
+   * would still pass.
+   */
+  it('pans the board when focus moves to an off-screen cell', () => {
+    // jsdom reports every element as 0×0, and the board measures itself in its ref callback —
+    // so the width has to exist BEFORE render, not after.
+    const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get: () => 350,
+    });
+    try {
+      let state = { ...initGame(buildBigPuzzle()), active: { row: 0, col: 0 } };
+      const { container, rerender } = render(
+        <CrosswordGrid state={state} onSelect={() => {}} t={t} />,
+      );
+      const board = container.querySelector('[data-crossword-board]') as HTMLElement;
+      const layer = board.firstElementChild as HTMLElement;
+      const atOrigin = layer.style.transform;
+
+      state = { ...state, active: { row: 10, col: 10 } };
+      rerender(<CrosswordGrid state={state} onSelect={() => {}} t={t} />);
+      expect(layer.style.transform).not.toBe(atOrigin);
+      expect(layer.style.transform).toMatch(/translate3d\(-\d/); // moved up-left to the corner
+    } finally {
+      if (original) Object.defineProperty(HTMLElement.prototype, 'clientWidth', original);
+    }
+  });
+
   it('does not select a cell when the press was a drag', () => {
     const onSelect = vi.fn();
     const { container } = render(
