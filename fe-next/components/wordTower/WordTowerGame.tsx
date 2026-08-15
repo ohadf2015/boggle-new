@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
@@ -14,7 +15,13 @@ import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
 import { getWithAuth } from '@/utils/authFetch';
 import { WordTowerPlay } from './WordTowerPlay';
-import { WordTowerLeaderboard } from './WordTowerLeaderboard';
+
+// Modal, opened only on a button click — keep it (and the Avatar module it
+// pulls in) out of the word-tower page's critical-path bundle.
+const WordTowerLeaderboard = dynamic(
+  () => import('./WordTowerLeaderboard').then((m) => m.WordTowerLeaderboard),
+  { ssr: false },
+);
 
 const SUPPORTED: SupportedLocale[] = ['en', 'he', 'sv', 'es', 'ja'];
 

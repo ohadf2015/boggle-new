@@ -332,6 +332,11 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
                   {content.startPracticing}
                 </Button>
               </Link>
+              <Link href={`/${locale}/play-boggle-online-free`}>
+                <Button className="rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
+                  {content.playBoggle}
+                </Button>
+              </Link>
             </div>
           </div>
           <AuthorBioCard />

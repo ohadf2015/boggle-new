@@ -1,25 +1,30 @@
 {
-  "date": "2026-08-14",
-  "note": "supabase MCP never connected this run (toolset stayed empty after repeated ToolSearch checks over ~15min) -- no REST fallback script exists under scripts/nightly/lib/ (checked, absent) -- backend STEP 1 skipped entirely rather than apply an unverified migration (hard rule: index only after EXPLAIN ANALYZE confirms). Carried forward from 08-13: vocabulary_lessons FK confirmed 4 consecutive nights as non-actionable (2-row table, zero index benefit) -- still true, not re-verified tonight, needs no more nightly re-checks. New brief item idx_word_pacts_player2_id (unused index) NOT dropped -- no usage-stat confirmation possible without MCP, deferred. Frontend: found and fixed a real Class-5-pattern LCP delay on /friends -- FriendsPageClient wrapped its ENTIRE above-the-fold content (auth gate text + FriendsList) in a framer-motion m.div with initial={opacity:0,y:20}/animate/duration:0.3, which is exactly the documented anti-pattern (entrance opacity tween on a large/fullscreen layer delays LCP paint -- Chrome excludes opacity:0 elements from LCP candidacy until they cross a visibility threshold). Removed the tween (static div, no animation) -- lowest-risk fix, matches the repo's own recurring-pitfalls Class 5 guidance verbatim. Did not have time to also build + measure before/after LCP (no live prod deploy in this session) -- logged as a metric to re-check via impact ledger in 3 days once it ships and PostHog accumulates n>=50 on /es/friends and /en/friends. Also scanned /en/multiplayer PageClient.tsx (670 lines) for the same pattern -- none found (no opacity-entrance tweens, no missing dynamic() splits) -- did not ship a second frontend fix, did not force one under time pressure.",
+  "date": "2026-08-15",
+  "note": "supabase MCP never connected this run either (repeated ToolSearch checks over the run, tools stayed absent) -- same as 08-14. Backend STEP 1 skipped again, not re-verified. vocabulary_lessons FK: per learnings doc this is confirmed non-actionable 4+ consecutive nights (2-row table) -- not re-checked tonight per the doc's own 'no more nightly re-checks needed' note. idx_word_pacts_player2_id (unused index) still not droppable without a usage-stat query -- deferred again. auth_db_connections_absolute advisor item is a Supabase dashboard toggle (percentage-based connection pool), not a migration/code fix -- out of scope for this lane, belongs in human queue. Frontend: shipped a real bundle-splitting fix on the worst-LCP route from tonight's brief (es/word-tower?daily=1, 18176ms). WordTowerGame.tsx statically imported WordTowerLeaderboard (a click-triggered modal that pulls in the Avatar module -- flagged in a prior perf audit as a 464KB untree-shakeable chunk) into the page's critical-path bundle even though it never renders on first paint. Converted to next/dynamic(ssr:false). Verified: eslint clean on the changed file. Did not run a full build/bundle-size re-measure (time-budget discipline -- single import-graph change, no new deps, no chunk-size claim being made). Checked '/' (2nd-worst LCP, 10621ms) for the same two known patterns (missing next/image priority, Class-5 opacity-entrance tween) -- neither present in app/[locale]/PageClient.tsx (no images, no motion.* usage) -- did not force a second fix under time pressure.",
   "backend": {
-    "mcp_status": "never connected this run -- STEP 1 (execute_sql, EXPLAIN ANALYZE, apply_migration) entirely skipped, not a false-negative, genuinely unavailable",
-    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- carried from 08-13 (4 consecutive nights confirmed non-actionable, 2-row table). Not re-verified tonight (no MCP).",
-    "unused_index_new_item": "public.idx_word_pacts_player2_id on word_pacts -- brief-flagged tonight, NOT dropped (no usage-stat confirmation without MCP), deferred to next run"
+    "mcp_status": "never connected this run -- STEP 1 (execute_sql, EXPLAIN ANALYZE, apply_migration) entirely skipped, consistent with 08-14",
+    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- carried, non-actionable per learnings doc (2-row table, 4+ nights confirmed). No further nightly re-checks needed per that doc.",
+    "unused_index_still_open": "public.idx_word_pacts_player2_id on word_pacts -- brief-flagged again tonight, still not droppable without MCP usage-stat confirmation",
+    "auth_db_connections_advisor": "dashboard config toggle (percentage vs absolute connection allocation), not a code/migration fix -- deferred to human queue"
   },
   "frontend": {
-    "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp_ms": 1672, "n_24h": 55, "vs_baseline": "healthy 08-13 snapshot, not re-measured tonight (no fresh PostHog query per brief-first contract)" }
+    "by_route_from_brief": [
+      { "route": "/es/word-tower?daily=1", "lcp_ms": 18176, "action": "fixed tonight -- see shipped_fix" },
+      { "route": "/", "lcp_ms": 10621, "action": "checked for known patterns (missing image priority, Class-5 opacity tween) -- neither found, no fix shipped" },
+      { "route": "/es/daily/word-hunt", "lcp_ms": 8624, "action": "not investigated this run -- time budget" },
+      { "route": "/es/juego-de-palabras-multijugador", "lcp_ms": 6269, "action": "not investigated this run -- time budget" },
+      { "route": "/en/word-tower?daily=1", "lcp_ms": 5536, "action": "same root cause as the es variant -- covered by tonight's fix" }
     ],
     "shipped_fix": {
-      "route": "/friends (es/en/all locales)",
-      "file": "fe-next/app/[locale]/friends/PageClient.tsx",
-      "change": "removed framer-motion m.div entrance opacity/y tween wrapping entire above-the-fold content -- replaced with static div, dropped now-unused `m` import",
-      "brief_evidence": "es/friends LCP 5302ms, es/friends?ref=... LCP 3908ms",
-      "measured_before_after": "not measured -- no deploy in this session, re-check via impact ledger in 3 days"
+      "route": "/[locale]/word-tower (daily=1)",
+      "file": "fe-next/components/wordTower/WordTowerGame.tsx",
+      "change": "converted static import of WordTowerLeaderboard (click-triggered modal, pulls in the Avatar SVG module) to next/dynamic(..., { ssr: false }) -- removes it from the page's critical-path bundle",
+      "verified": "eslint clean on changed file; no full build run (time budget)",
+      "measured_before_after": "not measured -- no deploy in this session, re-check via impact ledger in 3 days once PostHog accumulates n>=50 on the word-tower daily routes"
     }
   },
   "bundle": {
-    "note": "not re-measured tonight -- no fresh build run (time-budget discipline, brief-first contract did not call for a bundle re-scan given no chunk-affecting change shipped: import removal only, no new deps)",
+    "note": "not re-measured tonight -- single import-graph split, no new deps, no full build run (time-budget discipline)",
     "carried_from_08-13": {
       "total_chunks_kb": 31482,
       "total_chunk_files": 964

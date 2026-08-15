@@ -2121,3 +2121,29 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: verified-correct, NOT changed
   - why: `profiles` SELECT RLS is own-row-only (`auth.uid() = id`, confirmed via pg_policies). The view LEFT JOINs `profiles` to show other players' display_name/avatar on the leaderboard — same trap as [[leaderboard-profiles-rls-invoker-trap-2026-08-12]]. Removing SECURITY DEFINER would silently return NULL names/avatars for every player but the viewer (0-effective-row bug, no error). Closing as by-design.
   - recommended owner: self (closed)
+
+## 2026-08-15
+- [Supabase] function_search_path_mutable on public.guard_profiles_privileged_columns
+  - status: shipped 20260815030000_harden_guard_profiles_search_path.sql
+  - why: pure hardening, function body has no unqualified refs, no behavior change
+  - recommended owner: review-by-eod
+- [Supabase] Security Definer View x3 (public_profiles, connections_daily_leaderboard, custom_puzzle_leaderboard)
+  - status: verified intentional, NOT changed
+  - why: memory leaderboard-profiles-rls-invoker-trap-2026-08-12 — profiles RLS is own-row-only; SECURITY DEFINER is the fix for a prior incident where All-Time/past-season leaderboards silently returned 0 rows under SECURITY INVOKER. Flipping these would reintroduce that bug.
+  - recommended owner: closed, do not re-audit
+- [Supabase] SECURITY DEFINER function anon/authenticated-executable (81 findings incl. get_user_rank, upsert_push_token)
+  - status: verified intentional, NOT changed
+  - why: matches memory supabase-advisor-cleanup-2026-04-29 (69 authd-secdef intentionally kept, same shape, count grew 69->81 as app grew). These are public RPCs called from client code (leaderboard reads, push token registration); REVOKE would break the app.
+  - recommended owner: closed, do not re-audit
+- [PostHog] TypeError: Failed to fetch (019ff9e2-f631-7b41-b1ca-8717b84bef64, reach=4) and (01a000e1-b04d-7263-94c3-12cc44d00cdc, reach=1)
+  - status: deferred
+  - why: generic browser fetch failure (offline/CORS/adblock-shaped); posthog exec tool syntax for issue detail didn't resolve within budget, needs the actual stack/URL to root-cause, not a guess-fix
+  - recommended owner: self (next triage run — pull via query-error-tracking-issues-list or dashboard first, don't re-discover the tool syntax)
+- [Sentry] Error: Connection is closed. (JAVASCRIPT-NEXTJS-1WM, reach=0)
+  - status: deferred
+  - why: reach=0 in current window, likely stale/low-signal; not investigated this run given time budget
+  - recommended owner: self (next triage run, only if reach becomes >0)
+- [PostHog] Minified React error #418 (hydration mismatch, 019f185d-dc16-7bf0-8ff4-7390159a8048, reach=1)
+  - status: deferred
+  - why: hydration mismatches need the actual component diff to root-cause; not investigated this run given time budget
+  - recommended owner: self (next triage run)

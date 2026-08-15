@@ -16,6 +16,7 @@ export type LocaleContent = {
   backToBlog: string;
   playDaily: string;
   startPracticing: string;
+  playBoggle: string;
 };
 
 export const contentByLocale: Record<string, LocaleContent> = {
@@ -175,6 +176,7 @@ Now excuse me, I have a daily challenge to finish and a boss to defeat. My strea
     backToBlog: 'Back to Blog',
     playDaily: 'Try LexiClash Free',
     startPracticing: 'Play Now',
+    playBoggle: 'Play Boggle Free',
   },
   he: {
     title: 'ניסיתי כל משחק מילים שמצאתי. רובם מאכזבים.',
@@ -330,6 +332,7 @@ LexiClash זה מה שקורה כשמישהו מסתכל על באגל ואומ�
     backToBlog: 'חזרה לבלוג',
     playDaily: 'נסו את LexiClash בחינם',
     startPracticing: 'שחקו עכשיו',
+    playBoggle: 'שחקו בבאגל בחינם',
   },
 
   sv: {
@@ -484,6 +487,7 @@ Nu måste ni ursäkta mig, jag har en daglig utmaning att avsluta och en boss at
     backToBlog: 'Tillbaka till bloggen',
     playDaily: 'Prova LexiClash gratis',
     startPracticing: 'Spela nu',
+    playBoggle: 'Spela Boggle gratis',
   },
 
   ja: {
@@ -644,5 +648,6 @@ LexiClashは誰かがBoggleを見て「これをもっと膨らませたら？�
     backToBlog: 'ブログに戻る',
     playDaily: 'LexiClashを無料で試す',
     startPracticing: '今すぐプレイ',
+    playBoggle: 'ボグルを無料でプレイ',
   },
 };
