@@ -42,15 +42,20 @@ export function getNextPracticeMode(current: PracticeMode): PracticeMode | null 
   return PRACTICE_MODES[idx + 1];
 }
 
-export function practiceHubUrl(locale: string): string {
-  return `/${locale}/practice`;
-}
-
 /**
- * Where a results CTA should send the player after they finish the given practice mode.
- * Falls back to the practice hub when the chain is complete (acts as a "what's next?" landing).
+ * Where a results CTA should send the player after they finish the given mode.
+ *
+ * This is the anti-bounce "what's next?" hook on the daily results screens
+ * (PracticeChainCta, rendered by WordWheelResults and DailyWordHuntResults). It
+ * used to point at `/practice/<mode>`, which since the practice retirement only
+ * exists as a 301 — the player reached a real game, but via a needless redirect
+ * hop, behind a button still labelled as practice. It now links the real mode
+ * directly, through the same helper the rest of the app uses.
+ *
+ * The chain-complete case lands on the home hub, because the practice hub it
+ * used to land on is gone.
  */
 export function nextPracticeUrl(current: PracticeMode, locale: string): string {
   const next = getNextPracticeMode(current);
-  return next ? `/${locale}/practice/${next}` : practiceHubUrl(locale);
+  return next ? practiceTargetUrl(next, locale) : `/${locale}`;
 }

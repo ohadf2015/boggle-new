@@ -4,7 +4,6 @@ import {
   isValidPracticeMode,
   PRACTICE_MODES,
   getNextPracticeMode,
-  practiceHubUrl,
   nextPracticeUrl,
 } from '../practiceRoute';
 
@@ -76,20 +75,20 @@ describe('getNextPracticeMode', () => {
   });
 });
 
-describe('practiceHubUrl', () => {
-  it('returns the locale-prefixed practice hub path', () => {
-    expect(practiceHubUrl('he')).toBe('/he/practice');
-    expect(practiceHubUrl('en')).toBe('/en/practice');
+describe('nextPracticeUrl — the chain CTA on daily results', () => {
+  // PracticeChainCta still renders on WordWheelResults and DailyWordHuntResults.
+  // It used to point at /practice/<mode>, which now only exists as a 301, so the
+  // player took a redirect hop to reach a game we could have linked directly.
+  it('links straight at the real mode, never at a retired /practice url', () => {
+    expect(nextPracticeUrl('classic', 'he')).toBe('/he/daily/word-hunt?practice=1');
+    expect(nextPracticeUrl('wordHunt', 'es')).toBe('/es/daily/word-wheel?practice=1');
+    for (const mode of ['classic', 'wordHunt', 'wheelRush'] as const) {
+      expect(nextPracticeUrl(mode, 'en')).not.toContain('/practice/');
+    }
   });
-});
 
-describe('nextPracticeUrl', () => {
-  it('routes to the next mode intro page when one exists', () => {
-    expect(nextPracticeUrl('classic', 'he')).toBe('/he/practice/wordHunt');
-    expect(nextPracticeUrl('wordHunt', 'es')).toBe('/es/practice/wheelRush');
-  });
-
-  it('routes to the practice hub when chain is complete', () => {
-    expect(nextPracticeUrl('wheelRush', 'sv')).toBe('/sv/practice');
+  it('ends the chain on the home hub, not the retired practice hub', () => {
+    expect(nextPracticeUrl('wheelRush', 'sv')).toBe('/sv');
+    expect(nextPracticeUrl('wheelRush', 'en')).not.toContain('practice');
   });
 });

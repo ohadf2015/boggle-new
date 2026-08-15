@@ -44,19 +44,19 @@ describe('PracticeChainCta', () => {
   it('links to the next mode in the playlist when one exists', () => {
     render(<PracticeChainCta currentMode="classic" />);
     const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/he/practice/wordHunt');
+    expect(link).toHaveAttribute('href', '/he/daily/word-hunt?practice=1');
     expect(link.textContent).toMatch(/practice\.continueTo\.wordHunt/);
   });
 
   it('links from wordHunt to wheelRush', () => {
     render(<PracticeChainCta currentMode="wordHunt" />);
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/he/practice/wheelRush');
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/he/daily/word-wheel?practice=1');
   });
 
-  it('routes to the hub with a "all done" label after the last mode', () => {
+  it('routes home with an "all done" label after the last mode', () => {
     render(<PracticeChainCta currentMode="wheelRush" />);
     const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/he/practice');
+    expect(link).toHaveAttribute('href', '/he');
     expect(link.textContent).toMatch(/practice\.allDone/);
   });
 
