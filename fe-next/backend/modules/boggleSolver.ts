@@ -60,8 +60,20 @@ export interface SolverCacheStats {
   };
 }
 
-type LanguageCode = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type LanguageCode = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 type LetterGrid = string[][];
+
+// One entry per language the dictionary ships. A missing entry used to fall
+// through to English, so Russian grids were solved against the English trie and
+// every bot found 0 words. Keep in sync with getAvailableDictionaries().
+const WORD_SET_BY_LANGUAGE: Record<string, () => Set<string> | undefined> = {
+  en: () => dictionary.englishWords,
+  he: () => dictionary.hebrewWords,
+  sv: () => dictionary.swedishWords,
+  ja: () => dictionary.japaneseWords,
+  es: () => dictionary.spanishWords,
+  ru: () => dictionary.russianWords,
+};
 
 // Direction vectors for 8-way adjacent movement
 const DIRECTIONS: [number, number][] = [
@@ -88,27 +100,10 @@ export function getCachedTrie(language: LanguageCode | string): TrieNode | null 
     return cached.trie;
   }
 
-  // Get the dictionary set for this language
-  let wordSet: Set<string> | undefined;
-  switch (language) {
-    case 'en':
-      wordSet = dictionary.englishWords;
-      break;
-    case 'he':
-      wordSet = dictionary.hebrewWords;
-      break;
-    case 'sv':
-      wordSet = dictionary.swedishWords;
-      break;
-    case 'ja':
-      wordSet = dictionary.japaneseWords;
-      break;
-    case 'es':
-      wordSet = dictionary.spanishWords;
-      break;
-    default:
-      wordSet = dictionary.englishWords;
-  }
+  // Get the dictionary set for this language.
+  // Getters, not captured references: loadLanguage() REASSIGNS these Sets, so a
+  // reference grabbed at module load would stay empty forever.
+  const wordSet: Set<string> | undefined = (WORD_SET_BY_LANGUAGE[language] ?? WORD_SET_BY_LANGUAGE.en)();
 
   if (!wordSet || wordSet.size === 0) {
     logger.warn('SOLVER', `No dictionary available for language: ${language}`);

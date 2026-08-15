@@ -68,5 +68,14 @@ Sentry.init({
     /Error inserting player word/i,
     // Transient API failure for non-critical stat
     /Word Hunt leaderboard count error/i,
+    // Client hung up mid-upload; body-parser reports it. Nothing to fix server
+    // side, the request is already gone (JAVASCRIPT-NEXTJS-1JA).
+    /BadRequestError: request aborted/i,
+    /^request aborted$/i,
+    // Node webstreams teardown when a render is aborted mid-flight. Internal to
+    // Next/undici, no app frame in the stack (JAVASCRIPT-NEXTJS-NE). The trigger
+    // we could fix — /apple-touch-icon-precomposed.png falling through to the
+    // [locale] render — is fixed by shipping that file in public/.
+    /transformAlgorithm is not a function/i,
   ],
 });

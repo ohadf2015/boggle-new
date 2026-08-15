@@ -2,7 +2,15 @@
 
 import { X } from 'lucide-react';
 import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
+import { BLAST_RETIRED_SPECIAL_TYPES } from './utils/blastWaveConfig';
 import { TILE_VISUALS } from './blastTileVisuals';
+
+// Retired types are zeroed in every wave distribution, so listing them taught
+// players tiles they can never meet — and locked/key/chocolate/cake had no
+// strings at all, which is where the "Translation missing" Sentry issues came from.
+const GUIDE_TILE_TYPES = BLAST_TILE_TYPE_LIST.filter(
+  (type) => !BLAST_RETIRED_SPECIAL_TYPES.has(type),
+);
 
 interface BlastTileGuideProps {
   isOpen: boolean;
@@ -45,7 +53,7 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
             {/* Scrollable grid */}
             <div className="overflow-y-auto overscroll-contain p-3 flex-1">
               <div className="grid grid-cols-1 gap-2">
-                {BLAST_TILE_TYPE_LIST.map((type) => {
+                {GUIDE_TILE_TYPES.map((type) => {
                   const visual = TILE_VISUALS[type];
                   const Icon = visual.indicator;
                   return (

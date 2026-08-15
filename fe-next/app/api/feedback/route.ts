@@ -255,7 +255,10 @@ export async function POST(request: NextRequest) {
       };
       let { error } = await supabase.from('feedback_reports').insert(richRow);
       if (error) {
-        logger.warn('[Feedback] Rich insert failed, retrying base row:', error.message);
+        // debug, not warn: this fallback is the designed behaviour when the
+        // migration hasn't run yet, and the report is still saved below. The real
+        // failure (both inserts) is logged as an error a few lines down.
+        logger.debug('[Feedback] Rich insert failed, retrying base row:', error.message);
         ({ error } = await supabase.from('feedback_reports').insert(baseRow));
       }
       if (error) {

@@ -45,7 +45,9 @@ export function AddFriendDialog({
 
   const handleCopyInviteLink = useCallback(async () => {
     if (!profile?.username) return;
-    const link = `${window.location.origin}/${language}/friends?ref=${profile.username}`;
+    // encodeURIComponent: usernames legitimately contain spaces and non-ASCII
+    // letters in every locale we ship, and both break a raw query string.
+    const link = `${window.location.origin}/${language}/friends?ref=${encodeURIComponent(profile.username)}`;
     try {
       await navigator.clipboard.writeText(link);
       setLinkCopied(true);

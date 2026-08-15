@@ -4,7 +4,7 @@ import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
 import { cacheAside } from '../../cache/redisCache';
 
-const { load: loadDictionary } = require('../../dictionary');
+const { ensureLanguageLoaded } = require('../../dictionary');
 const { findWordsForBots } = require('../../modules/boggleSolver');
 
 interface BotWords {
@@ -76,7 +76,10 @@ export const solveGridRouter = router({
 
       try {
         const result = await cacheAside<{ success: true; words: BotWords }>(cacheKey, async () => {
-          await loadDictionary();
+          // Load THIS language (see backend/routes/solveGrid.ts): load() early-returns
+          // once boot has loaded English, so non-English solves used an empty word Set
+          // -- and cacheAside then cached the empty result for 10 minutes.
+          await ensureLanguageLoaded(language);
 
           const words = findWordsForBots(grid, language, {
             minLength: 3,

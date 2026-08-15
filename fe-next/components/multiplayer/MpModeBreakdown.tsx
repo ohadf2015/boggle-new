@@ -79,9 +79,10 @@ const MpModeBreakdown = memo<MpModeBreakdownProps>(({ rounds }) => {
       >
         {roundsWithInfo.map((round) => {
           const { Icon, colors } = round;
-          const topScorePlayer = round.scores.reduce((max, s) =>
-            s.score > max.score ? s : max
-          );
+          // Seeded with 0: a round with no scores would otherwise throw
+          // "Reduce of empty array with no initial value" and take the whole
+          // results screen down (same shape as Sentry JAVASCRIPT-NEXTJS-206).
+          const topScore = round.scores.reduce((max, s) => (s.score > max ? s.score : max), 0);
 
           return (
             <m.div key={round.roundIndex} variants={rowVariants}>
@@ -107,7 +108,7 @@ const MpModeBreakdown = memo<MpModeBreakdownProps>(({ rounds }) => {
                   {/* Top score display */}
                   <div className="flex flex-col items-end gap-0.5 p-2 rounded bg-neo-navy-light border border-neo-yellow/30">
                     <span className="text-base font-black tabular-nums text-neo-yellow">
-                      {topScorePlayer.score.toLocaleString()}
+                      {topScore.toLocaleString()}
                     </span>
                     <span className="text-[8px] uppercase tracking-wider text-neo-white/60">
                       {t('mpModeBreakdown.topScore')}

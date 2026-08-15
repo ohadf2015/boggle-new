@@ -12199,6 +12199,14 @@ const sv = {
       "mystery": {
         "name": "Gåta",
         "desc": "Överraskning — poängburst, ny speciell, mini-pop eller mega +150"
+      },
+      "chocolate": {
+        "name": "Choklad",
+        "desc": "Sprider sig till en grannruta varje tur — använd en chokladruta i ett ord för att stoppa den"
+      },
+      "cake": {
+        "name": "Tårta",
+        "desc": "Flerruteblock med delad hälsa — träffa det om och om igen för att förstöra det"
       }
     },
     "highlight": {

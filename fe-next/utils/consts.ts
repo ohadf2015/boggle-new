@@ -175,20 +175,26 @@ export const EMAIL_LOCAL_MAX_LENGTH = 64; // RFC 5321
 // Password must contain at least one uppercase, one lowercase, one number
 export const PASSWORD_STRENGTH_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 
-// Pattern for valid username/room name characters
-// Uses Unicode property escapes to allow any letter or number from any language, plus spaces and ._-
-export const NAME_VALID_PATTERN = /^[\p{L}\p{N}\s._-]+$/u;
+// Pattern for valid username/room name characters.
+// Re-exported from shared/ so the client and the server socket schemas cannot
+// drift apart again (Sentry 1Y8/1YJ/1YK: names in scripts the server had not
+// enumerated passed validation here and were rejected server-side).
+export { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN } from '../shared/constants/namePattern';
+
+// Global-flagged twin of NAME_UNSAFE_PATTERN, for stripping rather than testing.
+// \s in JS already covers \uFEFF and the ASCII whitespace controls, but not the
+// zero-width or bidi-override characters, so they need their own pass.
+const NAME_UNSAFE_GLOBAL = /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g;
 
 /**
- * Sanitize a string to only contain valid room name characters
- * Removes any characters that don't match the backend validation pattern
- * Backend allows: a-zA-Z0-9, spaces, dots, underscores, hyphens, and specific Unicode ranges
- * (Hebrew: \u0590-\u05FF, Hiragana: \u3040-\u309F, Katakana: \u30A0-\u30FF, CJK: \u4E00-\u9FFF)
- * This ensures room names are compatible with backend validation
+ * Sanitize a string to only contain valid room name characters.
+ * Strips exactly what the shared NAME_VALID_PATTERN disallows -- this used to
+ * carry its own Unicode range list and silently ate accented letters.
  */
 export function sanitizeRoomName(name: string): string {
   if (!name) return '';
-  // Remove any characters not in the backend-allowed set
-  // Keep: a-zA-Z0-9, spaces, dots, underscores, hyphens, and specific Unicode ranges
-  return name.replace(/[^a-zA-Z0-9\s._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/g, '').trim();
+  return name
+    .replace(NAME_UNSAFE_GLOBAL, '')
+    .replace(/[^\p{L}\p{M}\p{N}\s._-]/gu, '')
+    .trim();
 }

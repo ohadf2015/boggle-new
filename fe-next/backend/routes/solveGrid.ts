@@ -5,7 +5,7 @@
 
 import express, { Request, Response, Router, NextFunction } from 'express';
  
-const { load: loadDictionary } = require('../dictionary');
+const { ensureLanguageLoaded } = require('../dictionary');
  
 const { findWordsForBots } = require('../modules/boggleSolver');
 import logger from '../utils/logger';
@@ -165,8 +165,10 @@ router.post('/', rateLimit, async (req: SolveGridRequest, res: Response): Promis
   }
 
   try {
-    // Ensure dictionary is loaded
-    await loadDictionary();
+    // Load THIS language, not load(): the global loader early-returns as soon as
+    // `loaded` is set, and boot sets it after English alone. Every non-English
+    // request was therefore solved against an empty word Set.
+    await ensureLanguageLoaded(language);
 
     const words = findWordsForBots(grid, language, {
       minLength: 3,
@@ -176,10 +178,13 @@ router.post('/', rateLimit, async (req: SolveGridRequest, res: Response): Promis
     // Filter out blacklisted words
     const filteredWords = await filterBlacklistedWords(words, language);
 
-    res.json({
-      success: true,
-      words: filteredWords,
-    } as SolveGridResponse);
+    // The 30s global Express timeout may have answered already on a slow solve.
+    if (!res.headersSent) {
+      res.json({
+        success: true,
+        words: filteredWords,
+      } as SolveGridResponse);
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     logger.error('SOLVE-GRID', `Error: ${msg}`);

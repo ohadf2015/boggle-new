@@ -2,6 +2,25 @@ import logger from '@/utils/logger';
 import { POINT_COLORS } from '../../utils/consts';
 import type { GameAchievement, WordObject } from './types';
 
+/**
+ * Longest word in a list, tolerating an empty or missing list.
+ *
+ * Several results surfaces used `words.reduce((a, b) => ...)` with no initial
+ * value, which throws "Reduce of empty array with no initial value" the moment a
+ * player finishes a round without a single valid word (Sentry JAVASCRIPT-NEXTJS-206).
+ * Accepts plain strings or `{ word }` objects since both shapes are in use.
+ */
+export function longestWordOf(
+  words: ReadonlyArray<string | { word?: string }> | null | undefined,
+): string | undefined {
+  let longest: string | undefined;
+  for (const entry of words ?? []) {
+    const word = typeof entry === 'string' ? entry : entry?.word;
+    if (word && word.length > (longest?.length ?? 0)) longest = word;
+  }
+  return longest;
+}
+
 // Lifetime/career achievement keys that should NOT be shown in game results
 // These are cumulative achievements that don't apply to a single round
 export const LIFETIME_ACHIEVEMENT_KEYS = new Set([

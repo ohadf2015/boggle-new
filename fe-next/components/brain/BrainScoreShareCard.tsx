@@ -147,10 +147,14 @@ lexiclash.live`;
     window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
   }, [generateShareText]);
 
-  // Get strongest domain
-  const strongestDomain = Object.entries(domains).reduce((a, b) =>
-    a[1].score > b[1].score ? a : b
-  );
+  // Get strongest domain. Seeded, because reducing an empty `domains` with no
+  // initial value throws and takes the card down (Sentry JAVASCRIPT-NEXTJS-206 shape).
+  const strongestDomainKey = Object.entries(domains).reduce<
+    [string, { score: number }] | null
+  >(
+    (best, entry) => (best === null || entry[1].score > best[1].score ? entry : best),
+    null,
+  )?.[0];
 
   return (
     <>
@@ -208,7 +212,7 @@ lexiclash.live`;
               <div className="grid grid-cols-5 gap-2">
                 {Object.entries(domains).map(([key, data]) => {
                   const Icon = DOMAIN_ICONS[key as keyof typeof DOMAIN_ICONS];
-                  const isStrongest = key === strongestDomain[0];
+                  const isStrongest = key === strongestDomainKey;
 
                   return (
                     <div

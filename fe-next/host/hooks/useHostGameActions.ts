@@ -140,14 +140,17 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   const executeStartGame = useCallback(() => {
     // Debounce: prevent double-click from emitting startGame twice
     if (startGameLockRef.current) {
-      logger.warn('[HOST] Start game already in progress, ignoring duplicate');
+      // debug: this is the debounce doing its job, not a fault.
+      logger.debug('[HOST] Start game already in progress, ignoring duplicate');
       return;
     }
 
     // Validate socket connection BEFORE taking the lock so a transient
     // disconnect doesn't jam retries for the 3s debounce window.
     if (!socket || !socket.connected) {
-      logger.warn('[HOST] Cannot start game: socket not connected');
+      // debug: the player already gets the toast below, and there is nothing
+      // server-side to act on. warn() shipped it to Sentry as an error.
+      logger.debug('[HOST] Cannot start game: socket not connected');
       neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: TOAST_ICONS.plug, duration: 4000 });
       return;
     }

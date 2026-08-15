@@ -8,6 +8,7 @@ import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { TrendingUp, ArrowLeft, RotateCcw } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
+import { longestWordOf } from '@/components/results/utils';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
 
@@ -543,7 +544,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           score: results.playerScore,
           wordCount: results.playerWords?.length || 0,
           isWinner: isWinner || results.isNewHighScore,
-          longestWord: results.playerWords?.reduce((a, b) => a.length >= b.length ? a : b),
+          longestWord: longestWordOf(results.playerWords),
           maxCombo: results.maxCombo,
         }}
         language={gameLanguage}

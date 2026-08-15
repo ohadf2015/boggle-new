@@ -11966,6 +11966,14 @@ const es = {
       "mystery": {
         "name": "Misterio",
         "desc": "Sorpresa — ráfaga de puntos, nueva especial, mini-pop o mega +150"
+      },
+      "chocolate": {
+        "name": "Chocolate",
+        "desc": "Se extiende a una ficha vecina cada turno — usa una ficha de chocolate para detenerlo"
+      },
+      "cake": {
+        "name": "Tarta",
+        "desc": "Bloque de varias fichas con vida compartida — golpéalo una y otra vez para destruirlo"
       }
     },
     "highlight": {

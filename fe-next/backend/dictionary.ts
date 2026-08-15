@@ -60,6 +60,9 @@ interface DictionaryMemoryStats {
   lastAccessed: number;
 }
 
+/** Throttle for retrying a dictionary that loaded empty (see ensureLanguageLoaded). */
+const EMPTY_LOAD_RETRY_MS = 60_000;
+
 class Dictionary {
   static _communityValidator: ((word: string, language: Language) => boolean) | null = null;
 
@@ -75,6 +78,8 @@ class Dictionary {
   loaded: boolean;
   loadedLanguages: Set<Language>;
   loadingPromises: Map<Language, Promise<void>>;
+  /** When a language last loaded EMPTY, so retries are throttled. */
+  emptyLoadAt: Map<Language, number>;
   lastAccessTime: Map<Language, number>;
 
   constructor() {
@@ -89,6 +94,7 @@ class Dictionary {
     this.loaded = false;
     this.loadedLanguages = new Set();
     this.loadingPromises = new Map();
+    this.emptyLoadAt = new Map();
     this.lastAccessTime = new Map();
   }
 
@@ -222,12 +228,27 @@ class Dictionary {
     if (this.loadingPromises.has(language)) {
       return this.loadingPromises.get(language);
     }
+    const failedAt = this.emptyLoadAt.get(language);
+    if (failedAt !== undefined && Date.now() - failedAt < EMPTY_LOAD_RETRY_MS) return;
 
     const loadPromise = this.loadLanguage(language);
     this.loadingPromises.set(language, loadPromise);
 
     try {
       await loadPromise;
+      // loadLanguage() swallows its own errors, so an empty Set is the only
+      // signal that the load failed. Marking it "loaded" anyway pinned the
+      // failure for the life of the process — every later call short-circuited
+      // above and the solver reported "No dictionary available" forever.
+      // Leave it unmarked so the next call retries — but not on every call:
+      // a genuinely broken dictionary would otherwise re-read a 30 MB word file
+      // on every bot word-prep. One retry per minute is enough to self-heal.
+      if (this.getDictionaryForLanguage(language).size === 0) {
+        logger.error('DICT', `${language} dictionary loaded empty - will retry in ${EMPTY_LOAD_RETRY_MS / 1000}s`);
+        this.emptyLoadAt.set(language, Date.now());
+        return;
+      }
+      this.emptyLoadAt.delete(language);
       this.loadedLanguages.add(language);
       this.lastAccessTime.set(language, Date.now());
     } finally {

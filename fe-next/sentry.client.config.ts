@@ -348,6 +348,27 @@ Sentry.init({
     // Third-party SDK chunk (`core.js:297`, fn `Tx`) — Supabase realtime broadcast
     // events with no payload. Not first-party; no .payload access in app code.
     /Cannot read properties of undefined \(reading 'payload'\)/i,
+    // Google Identity Services probing FedCM on browsers that don't support it.
+    // GIS logs it itself and falls back to the normal popup flow; sign-in works.
+    // (JAVASCRIPT-NEXTJS-1RE, 1QZ)
+    /\[GSI_LOGGER\].*FedCM get\(\) rejects/i,
+    // PostHog's own client-side capture rate limiter reporting that it dropped an
+    // event. Analytics policy, not an app fault (JAVASCRIPT-NEXTJS-1X3).
+    /\[PostHog\.js\].*rate limiting/i,
+    // "cently" shopping browser extension failing to monkey-patch window.location
+    // in our page. Third-party, and denyUrls can't see it because it runs inline
+    // in the page context (JAVASCRIPT-NEXTJS-1YR).
+    /\[cently:/i,
+    /failed to patch window\.location setter/i,
+    // Session-replay style capture hitting a cross-origin stylesheet it may not
+    // read. Recording degrades, the app is unaffected (JAVASCRIPT-NEXTJS-1RS).
+    /Cannot get CSS styles from text's parentNode/i,
+    /Not allowed to access cross-origin stylesheet/i,
+    // Our own Playwright runs blocking service-worker registration (JAVASCRIPT-NEXTJS-1ZR).
+    /Service Worker registration blocked by Playwright/i,
+    // Browser refuses to open an audio device (no output, in use, or autoplay
+    // policy). Nothing to fix in app code (JAVASCRIPT-NEXTJS-1HM).
+    /Failed to start the audio device/i,
   ],
 
   denyUrls: [

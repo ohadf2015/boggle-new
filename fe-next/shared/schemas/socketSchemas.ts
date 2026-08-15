@@ -7,6 +7,7 @@
  */
 
 import { z } from 'zod';
+import { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN } from '../constants/namePattern';
 import { customAvatarSchema } from '../types/customAvatar';
 import { BLAST_COMBO_TYPES } from '../types/blast';
 
@@ -85,9 +86,12 @@ export const GameCodeSchema = z.string()
 
 export const RoomNameSchema = z.string()
   .max(50, 'Room name must be at most 50 characters')
-  .regex(/^[a-zA-Z0-9\s._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Room name can only contain letters, numbers, spaces, dots, underscores, and hyphens')
+  // Same pattern the client validates with. The hand-written range list here was
+  // even narrower than the username one (no Latin accents, no Cyrillic), so
+  // "Bjorn's rum" or a Russian room name failed server-side only.
+  .regex(NAME_VALID_PATTERN, 'Room name can only contain letters, numbers, spaces, dots, underscores, and hyphens')
   .transform(s => s.trim())
-  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Room name contains invalid characters')
+  .refine((val) => !NAME_UNSAFE_PATTERN.test(val), 'Room name contains invalid characters')
   .optional();
 
 export const PlayerIdSchema = z.string()
@@ -103,13 +107,16 @@ export const GuestTokenHashSchema = z.string()
 export const UsernameSchema = z.string()
   .min(1, 'Username is required')
   .max(30, 'Username must be at most 30 characters')
-  // Latin: a-zA-Z + Latin-1 Supplement/Extended (\u00C0-\u024F) covers Spanish/Swedish/French/German/Nordic accents.
-  // Sentry 139/142/138/143: non-ASCII names like "Andr\u00E9s", "Bj\u00F6rn", "Fran\u00E7ois" were rejected.
-  // Sentry JAVASCRIPT-NEXTJS-1MC: \u0400-\u04FF (Cyrillic) added for Russian locale.
-  .regex(/^[a-zA-Z0-9._\-\u00C0-\u024F\u0400-\u04FF\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
+  // Same pattern the client validates with (NAME_VALID_PATTERN): any Unicode
+  // letter or number, plus space . _ -. This used to be a hand-written list of
+  // script ranges and had already been patched five times from Sentry
+  // (139/142/138/143 accents, 1MC Cyrillic, 1Y8/1YJ/1YK) because every script
+  // nobody had thought of yet passed the client and was rejected here.
+  .regex(NAME_VALID_PATTERN)
   .transform(s => s.trim())
-  // SECURITY: Reject control characters, zero-width characters, and BOM
-  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');
+  // SECURITY: \p{L} does not exclude control / zero-width / BOM / bidi-override
+  // characters, so they still need an explicit reject.
+  .refine((val) => !NAME_UNSAFE_PATTERN.test(val), 'Username contains invalid characters');
 
 export const WordSchema = z.string()
   .min(1, 'Word is required')

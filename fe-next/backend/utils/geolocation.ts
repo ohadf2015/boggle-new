@@ -183,7 +183,9 @@ async function cacheGeodata(ip: string, data: GeoData): Promise<void> {
     try {
       await redis.setex(`geo:${ip}`, GEOLOCATION_CACHE_TTL, JSON.stringify(data));
     } catch (error) {
-      logger.warn('GEOLOCATION', 'Redis cache write error', { error: (error as Error).message });
+      // debug, not warn: the lookup already succeeded and the caller degrades to
+      // an uncached read. Warn shipped it to Sentry as an actionable error.
+      logger.debug('GEOLOCATION', 'Redis cache write error', { error: (error as Error).message });
     }
   }
 
@@ -302,14 +304,16 @@ export async function lookupIP(ip: string): Promise<GeoData> {
 
     // Cache the result (in background, don't await)
     cacheGeodata(ip, result).catch(err => {
-      logger.warn('GEOLOCATION', 'Cache write failed', { error: err.message });
+      logger.debug('GEOLOCATION', 'Cache write failed', { error: err.message });
     });
 
     return result;
   } catch (error) {
     // Handle AbortError specially for clearer logging
     if ((error as Error).name === 'AbortError') {
-      logger.warn('GEOLOCATION', 'Request timed out', { ip });
+      // debug, not warn: a third-party geo API timing out is expected and fully
+      // handled below (status:'error' -> caller falls back). Sentry noise otherwise.
+      logger.debug('GEOLOCATION', 'Request timed out', { ip });
     } else {
       logger.warn('GEOLOCATION', 'Lookup failed', { ip, error: (error as Error).message });
     }

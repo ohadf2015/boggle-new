@@ -10542,6 +10542,14 @@ const en = {
       "mystery": {
         "name": "Mystery",
         "desc": "Random surprise — score burst, spawn special, mini-pop, or mega +150"
+      },
+      "chocolate": {
+        "name": "Chocolate",
+        "desc": "Spreads to a neighbouring tile every turn — use a chocolate tile in a word to stop it"
+      },
+      "cake": {
+        "name": "Cake",
+        "desc": "Multi-tile block with shared health — hit it again and again to destroy it"
       }
     },
     "highlight": {

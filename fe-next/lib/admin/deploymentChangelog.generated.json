@@ -1,6 +1,48 @@
 {
-  "generatedAt": "2026-08-15T11:44:41.073Z",
+  "generatedAt": "2026-08-15T18:24:08.643Z",
   "commits": [
+    {
+      "sha": "b78edfb032c2f8dae37064cbaf6691d5b1bd7217",
+      "shortSha": "b78edfb",
+      "subject": "fix(quick-play): words scored nothing, the results CTA was dead, and you raced yourself",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T18:25:48+03:00"
+    },
+    {
+      "sha": "e607320a0ddeb967d8a9a7c66eb0103e27b5b2e5",
+      "shortSha": "e607320",
+      "subject": "fix(sitemap): the biggest page on the site was never in the sitemap",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T15:24:25+03:00"
+    },
+    {
+      "sha": "c993aaa7db697d14c834f6e778da31c9e095a1de",
+      "shortSha": "c993aaa",
+      "subject": "test(seo): the hreflang guard only checked the pages, not the sitemap",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T15:22:20+03:00"
+    },
+    {
+      "sha": "eb8d2c7c76a68042a5a90bdc70158ca9783879a4",
+      "shortSha": "eb8d2c7",
+      "subject": "fix(seo): hreflang was telling Google these 31 pages were translations of each other",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T15:12:56+03:00"
+    },
+    {
+      "sha": "65599d522c1fa5cce48a0ff61b687941bb66db94",
+      "shortSha": "65599d5",
+      "subject": "fix(quick-play): mode picker keycaps, bottom-band clearance, version toast",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T14:49:54+03:00"
+    },
+    {
+      "sha": "f755ce2722053b9fbccfa46c50070c742c480458",
+      "shortSha": "f755ce2",
+      "subject": "feat(quick-play): solo rounds run the MP boards and race real players",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T14:48:52+03:00"
+    },
     {
       "sha": "9a20d02acd8d8cfdf0d7f1b3ea237c3c24ea3661",
       "shortSha": "9a20d02",
@@ -98,48 +140,6 @@
       "subject": "fix(friends): the friends module read every other player from a table RLS forbids",
       "author": "Ohad Fisher",
       "date": "2026-08-15T09:56:01+03:00"
-    },
-    {
-      "sha": "d09dce2169d0334c474fa8ccea3fd9e4cb86ba3f",
-      "shortSha": "d09dce2",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-15",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T03:12:56+03:00"
-    },
-    {
-      "sha": "c844b1b87c1f9f5a3e6844e47bc73b3e905e77e9",
-      "shortSha": "c844b1b",
-      "subject": "feat(crossword): bake the newspaper pool so the full-size format actually turns on",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T02:02:54+03:00"
-    },
-    {
-      "sha": "500e6e3552058239864c6539a521a6aacb55a510",
-      "shortSha": "500e6e3",
-      "subject": "Merge pull request #808 from ohadf2015/fix/growth-radar-broken-links",
-      "author": "ohadf2015",
-      "date": "2026-08-14T21:26:51+03:00"
-    },
-    {
-      "sha": "17ea743d5704a9392ced1862fc6371075b7b4e1d",
-      "shortSha": "17ea743",
-      "subject": "fix(pre-push): give the type-check an 8 GB heap — it was OOMing, not failing",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T21:07:12+03:00"
-    },
-    {
-      "sha": "09759abda08507c6f52d8fe54fcc7cb5f0efe966",
-      "shortSha": "09759ab",
-      "subject": "fix(seo): three broken links the crawl found, all of them in our own metadata",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T20:33:23+03:00"
-    },
-    {
-      "sha": "b488aa48b2e7988ffb2839c030595637d3c5af33",
-      "shortSha": "b488aa4",
-      "subject": "fix(connections): add the results-screen tier copy that was rendering as raw keys",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T19:06:33+03:00"
     }
   ]
 }
