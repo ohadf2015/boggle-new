@@ -2,6 +2,10 @@
  * Quick Play shared client types. Server-side counterparts live in
  * backend/modules/quickPlayRound.ts / quickPlaySubmit.ts — keep in sync.
  */
+import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
+
+export type { QuickGhostRival };
+
 export type QuickMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
 
 export const QUICK_MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
@@ -28,6 +32,12 @@ export interface QuickRoundConfig {
   targetWord?: string;
   totalWords: number;
   perfectScore: number;
+  /**
+   * Real players' recent results on this mode, paced across the round clock so
+   * a solo round reads as a live race. Empty when nobody has played the mode
+   * yet, or when the lookup failed — the round still runs.
+   */
+  ghosts?: QuickGhostRival[];
 }
 
 export interface QuickRoundResult {

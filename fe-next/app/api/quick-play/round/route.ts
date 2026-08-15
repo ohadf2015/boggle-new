@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { buildQuickRound, type QuickMode } from '@/backend/modules/quickPlayRound';
+import { fetchGhostRivals } from '@/lib/quickPlay/fetchGhostRivals';
+import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
@@ -31,10 +33,19 @@ export async function POST(request: NextRequest) {
     }
 
     const round = await buildQuickRound(mode, language, seed);
+    // Ghost rivals ride along in the SAME payload rather than a second fetch:
+    // they must be on hand before the timer starts, or rows pop in mid-round.
+    const ghosts = await fetchGhostRivals(
+      await createClient(),
+      mode,
+      round.seed,
+      (err) => captureApiError(err, 'quick-play-round-ghosts')
+    );
     const totalWords = round.words.length;
     return NextResponse.json({
       ...round,
       totalWords,
+      ghosts,
       words: mode === 'wheel-rush' ? round.words : undefined,
     });
   } catch (err) {

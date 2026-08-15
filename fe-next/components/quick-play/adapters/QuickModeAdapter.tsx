@@ -11,19 +11,17 @@
  * height column with no nested page scroll; wheel keeps a scrollable stage so
  * short viewports can still reach the found-words list.
  */
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 import { BlastQuickRound } from './BlastQuickRound';
-import { fromWordWheel, fromSurvival, fromSinglePlayer } from './normalizeResult';
+import { fromWordWheel, fromSurvival } from './normalizeResult';
+import { ghostsToWheelRivals } from '@/lib/quickPlay/ghostRivals';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-// Classic board is mid-beta: admins get the multiplayer board (InGameScreen)
-// run solo; everyone else keeps the previous single-player board until it's
-// proven out. See the `isAdmin` branch in the classic case.
+// Classic runs the multiplayer board (InGameScreen) solo for everyone.
 const QuickClassicBoard = dynamic(() => import('./QuickClassicBoard'), { ssr: false });
-const SinglePlayerGame = dynamic(() => import('@/components/singleplayer/SinglePlayerGame'), { ssr: false });
 const DailyWordHuntSurvival = dynamic(() => import('@/components/daily/DailyWordHuntSurvival'), { ssr: false });
 const WordWheelGame = dynamic(() => import('@/components/daily/WordWheelGame'), { ssr: false });
 
@@ -58,7 +56,7 @@ interface QuickModeAdapterProps {
 }
 
 export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterProps) {
-  const { isAdmin } = useAuth();
+  const { t } = useLanguage();
   const doneRef = useRef(false);
   const wordSet = useRef<Set<string> | null>(null);
   // Lock body height + hide bottom nav for the whole arcade round (classic /
@@ -78,6 +76,21 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     [onDone]
   );
 
+  // Wheel + word-hunt rivals are finished targets ("N points to pass Ada"), so
+  // they need no per-tick pacing — unlike the classic/blast boards, which race
+  // them live on the MP leaderboard. Word hunt in particular has no round clock
+  // to pace against (it is life-drain survival, not a timer).
+  const selfUsername = t('mp.rivals.you');
+  const wheelRivals = useMemo(() => {
+    const rows = ghostsToWheelRivals(config.ghosts ?? [], config.perfectScore, selfUsername);
+    return rows.length > 0 ? rows : undefined;
+  }, [config.ghosts, config.perfectScore, selfUsername]);
+
+  const huntRivals = useMemo(
+    () => wheelRivals?.map((r) => ({ username: r.name, score: r.score })),
+    [wheelRivals]
+  );
+
   switch (config.mode) {
     case 'wheel-rush': {
       if (!wordSet.current) wordSet.current = new Set(config.words ?? []);
@@ -88,6 +101,11 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
             duration={config.durationSec}
             language={config.language as never}
             hideCompetitive
+            // The wheel owns a rival pill + pass toasts already; hideCompetitive
+            // only switches them off because the DAILY board is the wrong cohort
+            // for a quick round. Hand it the quick-play ghosts instead — undefined
+            // when there are none, so the pill stays hidden rather than empty.
+            rivals={wheelRivals}
             hideModeCoach
             onEffect={() => undefined}
             onValidateWord={async (word: string) => wordSet.current!.has(word.toLowerCase())}
@@ -108,6 +126,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
             language={config.language as never}
             targetWord={config.targetWord ?? ''}
             practice={true}
+            rivals={huntRivals}
             hideModeCoach={true}
             onComplete={(r: { wordsDiscovered: Array<{ word: string }> }) =>
               finish(fromSurvival(r, config))
@@ -127,36 +146,12 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
       );
     case 'classic':
     default:
+      /* The MULTIPLAYER board (InGameScreen) run solo — the board players see in
+         a live room, not the legacy SP layout. Ghost rivals need its standings
+         chrome, so there is deliberately no single-player fallback here. */
       return (
         <div className={STAGE_FILL} data-testid="quick-stage-classic">
-          {isAdmin ? (
-            /* BETA (admin-only): the MULTIPLAYER board (InGameScreen) run solo —
-               the board players see in a live room, not the legacy SP layout. */
-            <QuickClassicBoard config={config} onDone={finish} onQuit={onQuit} />
-          ) : (
-            /* Everyone else keeps the previous single-player board until the MP
-               board is proven out. PortraitGameLayout needs flex-1 h-full. */
-            <div className="relative flex h-full min-h-0 w-full flex-1 flex-col px-2 sm:px-3">
-              <SinglePlayerGame
-                settings={{
-                  mode: 'challenge',
-                  difficulty: 'MEDIUM',
-                  language: config.language as never,
-                  grid: config.grid as never,
-                  timerSeconds: config.durationSec,
-                  bots: [], // quick play is bot-free by design
-                  minWordLength: 3,
-                }}
-                targetHighScore={null}
-                hideModeCoach
-                onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
-                  finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
-                }
-                onQuit={onQuit}
-                quitStaysOnPage
-              />
-            </div>
-          )}
+          <QuickClassicBoard config={config} onDone={finish} onQuit={onQuit} />
         </div>
       );
   }

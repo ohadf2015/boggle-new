@@ -59,3 +59,46 @@ describe('BlastQuickRound', () => {
     ]);
   });
 });
+
+// Blast renders its live standings strip (BlastMPLeaderboard) whenever a
+// leaderboard is present, and the closest-rivals gap once there are 2+ rows —
+// so ghosts race here through the same prop the real MP bridge uses.
+describe('BlastQuickRound — ghost rivals', () => {
+  const withGhosts: QuickRoundConfig = {
+    ...config,
+    ghosts: [
+      { userId: 'u1', name: 'Ada', customAvatar: null, scorePct: 50 },
+      { userId: 'u2', name: 'Bo', customAvatar: null, scorePct: 100 },
+    ],
+  };
+
+  beforeEach(() => {
+    lastBlastGameProps.current = null;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('puts the rivals on the same leaderboard the strip already reads', async () => {
+    render(<BlastQuickRound config={withGhosts} onDone={vi.fn()} onQuit={vi.fn()} />);
+    await waitFor(() => expect(lastBlastGameProps.current).not.toBeNull());
+    const names = lastBlastGameProps.current.leaderboard.map((e: { username: string }) => e.username);
+    expect(names).toEqual(['you', 'Ada', 'Bo']);
+  });
+
+  it('climbs the rivals as the round clock ticks down', async () => {
+    vi.useFakeTimers();
+    render(<BlastQuickRound config={withGhosts} onDone={vi.fn()} onQuit={vi.fn()} />);
+    const boScore = () =>
+      lastBlastGameProps.current.leaderboard.find(
+        (e: { username: string }) => e.username === 'Bo'
+      ).score;
+
+    expect(boScore()).toBe(0);
+    await vi.advanceTimersByTimeAsync(30_000);
+    const mid = boScore();
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(config.perfectScore);
+  });
+});

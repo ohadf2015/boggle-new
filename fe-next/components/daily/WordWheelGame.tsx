@@ -59,6 +59,14 @@ interface WordWheelGameProps {
    * hub reuse the real wheel gameplay without the live-game social layer.
    */
   hideCompetitive?: boolean;
+  /**
+   * Caller-supplied rivals, replacing the daily-leaderboard fetch entirely.
+   * Quick Play passes its ghost rivals here: the daily board is the wrong cohort
+   * for a quick round (different puzzle, different duration). Supplying them
+   * also re-enables the rival pill + pass toasts under `hideCompetitive`, which
+   * otherwise switches the whole social layer off.
+   */
+  rivals?: RivalScore[];
   /** Fired with each accepted word + the running found list (practice goal tracking). */
   onWordFound?: (word: string, wordsFound: string[]) => void;
   /** Desktop layout (1024w + 700h) — 3-column grid with ranks/wheel/words. */
@@ -96,7 +104,7 @@ interface RivalScore {
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
   hideModeCoach = false,
-  hideCompetitive = false, onWordFound, isDesktop = false,
+  hideCompetitive = false, rivals: rivalsOverride, onWordFound, isDesktop = false,
   puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
 }) => {
   const { t } = useLanguage();
@@ -167,13 +175,18 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const lastSubmitWasDragRef = useRef(false);
 
   // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
-  const [rivals, setRivals] = useState<RivalScore[]>([]);
+  const [fetchedRivals, setFetchedRivals] = useState<RivalScore[]>([]);
+  const rivals = rivalsOverride ?? fetchedRivals;
+  // The rival layer (pill + pass toasts) is on whenever there is a cohort to
+  // race — either the daily board, or one the caller handed us.
+  const showRivalLayer = !hideCompetitive || !!rivalsOverride;
   const [passToasts, setPassToasts] = useState<Array<{ id: number; name: string }>>([]);
   const passedNamesRef = useRef<Set<string>>(new Set());
   const passToastIdRef = useRef(0);
 
   useEffect(() => {
-    if (hideCompetitive) return; // practice hub: no leaderboard/rivals layer
+    // Caller-supplied cohort short-circuits the daily board entirely.
+    if (hideCompetitive || rivalsOverride) return;
     let cancelled = false;
     let interval: ReturnType<typeof setInterval> | null = null;
     const fetchRivals = async () => {
@@ -204,7 +217,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             return true;
           })
           .sort((a: RivalScore, b: RivalScore) => a.score - b.score);
-        setRivals(list);
+        setFetchedRivals(list);
       } catch { /* leaderboard is best-effort */ }
     };
     const startPolling = () => {
@@ -235,7 +248,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         document.removeEventListener('visibilitychange', handleVisibility);
       }
     };
-  }, [language, hideCompetitive, puzzleDate, currentPlayerId, currentGuestFingerprint]);
+  }, [language, hideCompetitive, rivalsOverride, puzzleDate, currentPlayerId, currentGuestFingerprint]);
 
   // Closest rival above me + pass detection
   const nextRival = useMemo(
@@ -258,7 +271,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // simultaneous passes (combo + pangram) all celebrate, plus mini-celebration
   // burst (combo-flash particles + sound + haptic).
   useEffect(() => {
-    if (hideCompetitive || !rivals.length) return;
+    if (!showRivalLayer || !rivals.length) return;
     const cx = gameContainerRef.current
       ? gameContainerRef.current.getBoundingClientRect().width / 2
       : 200;
@@ -283,7 +296,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         }, delay);
       }
     }
-  }, [score, rivals, onEffect, playComboSound, hideCompetitive]);
+  }, [score, rivals, onEffect, playComboSound, showRivalLayer]);
 
   // ── Drag-to-build support ── (handlers wired after handleLetterPress via the
   // shared useWheelDragSpell hook). Only the pointer-position / dragging refs
@@ -1045,7 +1058,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           locked to one line. pointsToPass derives from score → mutates every
           submit; long HE/JA strings or long player names would otherwise
           wrap the pill and grow the slot, recentering the wheel cluster. */}
-      {!hideCompetitive && (
+      {showRivalLayer && (
       <div
         data-testid="next-rival-slot"
         className="w-full mt-1.5 h-[30px] sm:h-[32px] flex items-center justify-center px-2"
@@ -1077,8 +1090,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* Pass notification toast stack — queued so back-to-back passes all
           celebrate. Each toast stacks vertically with a small offset.
-          Suppressed in the practice hub (no rivals to pass). */}
-      {!hideCompetitive && (
+          Suppressed in the practice hub unless the caller supplied rivals. */}
+      {showRivalLayer && (
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-1.5">
         <AnimatePresence>
           {passToasts.map((toast, i) => (

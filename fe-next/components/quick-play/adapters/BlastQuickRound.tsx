@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 import { hashString } from '@/utils/dailyChallenge/prng';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import { fromBlast } from './normalizeResult';
+import { buildGhostRows } from '@/lib/quickPlay/ghostRivals';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 
 const BlastGame = dynamic(
@@ -47,15 +48,32 @@ export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps
     [foundWords]
   );
 
-  const soloLeaderboard = useMemo(
+  // Solo self-entry plus any ghost rivals. Blast's own standings strip
+  // (BlastMPLeaderboard) and closest-rivals gap already read this exact prop in
+  // real MP, so racing recent players needs no blast-side changes — just rows.
+  const leaderboard = useMemo(
     () => [
       {
         username: BLAST_QUICK_SOLO_USERNAME,
         score: liveScore,
         wordCount: foundWords.length,
       },
+      ...buildGhostRows(config.ghosts ?? [], {
+        perfectScore: config.perfectScore,
+        totalWords: config.totalWords,
+        progress: config.durationSec > 0 ? 1 - remaining / config.durationSec : 0,
+        selfUsername: BLAST_QUICK_SOLO_USERNAME,
+      }),
     ],
-    [liveScore, foundWords.length]
+    [
+      liveScore,
+      foundWords.length,
+      remaining,
+      config.ghosts,
+      config.perfectScore,
+      config.totalWords,
+      config.durationSec,
+    ]
   );
 
   const finish = () => {
@@ -102,7 +120,7 @@ export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps
       totalTime={config.durationSec}
       // Synthetic solo LB so MP displayScore path is non-zero without a server.
       username={BLAST_QUICK_SOLO_USERNAME}
-      leaderboard={soloLeaderboard}
+      leaderboard={leaderboard}
       onWordWithComboType={(word: string) => {
         wordsRef.current.push(word);
         setFoundWords((prev) => [...prev, word]);

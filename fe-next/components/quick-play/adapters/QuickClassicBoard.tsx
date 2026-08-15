@@ -19,6 +19,7 @@ import InGameScreen from '@/components/game/InGameScreen';
 import type { HintsState } from '@/components/game/in-game/types';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 import { fromSinglePlayer } from './normalizeResult';
+import { buildGhostRows } from '@/lib/quickPlay/ghostRivals';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 
 interface QuickClassicBoardProps {
@@ -62,11 +63,36 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
   });
 
   // InGameScreen derives the shown score from the leaderboard entry matching
-  // `username` — feed it a single self-entry so the solo score renders and the
-  // room leaderboard panel (gated on length > 1) stays hidden.
+  // `username`, and every piece of race chrome (mobile rank rail, live
+  // standings, closest-rivals gap) switches on at length > 1. So the ghosts go
+  // in here as ordinary rows — no new UI, the MP board already knows how to run
+  // a race. With no ghosts this collapses back to the single self-entry and the
+  // room chrome stays hidden, exactly as before.
+  const selfUsername = t('mp.rivals.you');
+  const progress =
+    config.durationSec > 0
+      ? 1 - core.timer.remainingTime / config.durationSec
+      : 0;
+
   const leaderboard = useMemo(
-    () => [{ username: 'You', score: core.score, wordCount: core.foundWords.length }],
-    [core.score, core.foundWords.length]
+    () => [
+      { username: selfUsername, score: core.score, wordCount: core.foundWords.length },
+      ...buildGhostRows(config.ghosts ?? [], {
+        perfectScore: config.perfectScore,
+        totalWords: config.totalWords,
+        progress,
+        selfUsername,
+      }),
+    ],
+    [
+      selfUsername,
+      core.score,
+      core.foundWords.length,
+      config.ghosts,
+      config.perfectScore,
+      config.totalWords,
+      progress,
+    ]
   );
 
   const gameActive = Boolean(core.grid) && !core.isPaused && !core.isGameOver && core.timer.remainingTime > 0;
@@ -83,7 +109,7 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
   return (
     <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-neo-navy">
       <InGameScreen
-        username="You"
+        username={selfUsername}
         gameCode="QUICK"
         isPlaying
         gameplayFocusMode

@@ -71,6 +71,11 @@ interface DailyWordHuntSurvivalProps {
   /** Practice mode: suppress life drain + extra-life monetization. */
   practice?: boolean;
   /**
+   * Quick Play only: other players' scores on this mode, shown as a live
+   * standing in the practice header. Undefined for the daily challenge.
+   */
+  rivals?: Array<{ username: string; score: number }>;
+  /**
    * Suppress ModeCoach FTUE and PracticeCoachTip (Quick Play arcade).
    * Independent of `practice` so life-drain can stay off without coach UI.
    */
@@ -100,6 +105,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   currentPlayerId,
   currentGuestFingerprint,
   practice = false,
+  rivals,
   hideModeCoach = false,
   quitStaysOnPage = false,
 }) => {
@@ -573,6 +579,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Top bar */}
       <SurvivalHeader
+        rivals={rivals}
+        selfUsername={t('mp.rivals.you')}
         liveScore={state.liveScore}
         lastScoreIncrement={state.lastScoreIncrement}
         isScoreAnimating={state.isScoreAnimating}

@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
 import { SurvivalAudioEffectsControls } from './SurvivalAudioEffectsControls';
+import { MobileRankIndicator } from '@/components/game/in-game/components/MobileRankIndicator';
 
 export interface SurvivalHeaderProps {
   liveScore: number;
@@ -18,6 +19,16 @@ export interface SurvivalHeaderProps {
   onShopClick?: () => void;
   /** Quick Play mode: suppress daily-specific score tier badge */
   practice?: boolean;
+  /**
+   * Quick Play only: other players' scores on this mode (ghost rivals). Turns
+   * the practice header's otherwise-empty score slot into a live standing,
+   * reusing the same MobileRankIndicator the MP boards show. Undefined for the
+   * daily challenge, which keeps its score badge.
+   */
+  rivals?: Array<{ username: string; score: number }>;
+  /** Label for my own row in the standing. */
+  selfUsername?: string;
+  dir?: 'ltr' | 'rtl';
   t: (key: string) => string;
 }
 
@@ -31,8 +42,15 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   isScoreAnimating,
   onQuitClick,
   practice = false,
+  rivals,
+  selfUsername = 'You',
+  dir = 'ltr',
   t,
 }) => {
+  const standing =
+    practice && rivals && rivals.length > 0
+      ? [{ username: selfUsername, score: liveScore }, ...rivals]
+      : null;
   return (
     <div className="sticky top-0 z-20 flex items-center justify-between mb-1 px-2 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
       <div className="flex items-center gap-1.5">
@@ -47,6 +65,17 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
 
         <SurvivalAudioEffectsControls t={t} />
       </div>
+
+      {standing && (
+        <div data-testid="survival-rank-indicator">
+          <MobileRankIndicator
+            leaderboard={standing}
+            currentUsername={selfUsername}
+            t={t}
+            dir={dir}
+          />
+        </div>
+      )}
 
       {!practice && (
         <AccumulatedScoreDisplay
