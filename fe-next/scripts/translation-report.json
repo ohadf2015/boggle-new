@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6189,
+    "totalKeysInCode": 6156,
     "keyCountByLanguage": {
-      "en": 11980,
-      "es": 12276,
-      "he": 12181,
-      "ja": 12235,
-      "ru": 12011,
-      "sv": 12231
+      "en": 11987,
+      "es": 12283,
+      "he": 12188,
+      "ja": 12242,
+      "ru": 12018,
+      "sv": 12238
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 325,
+      "templateLiterals": 315,
       "fallbackUsages": 1,
-      "variableKeys": 121
+      "variableKeys": 119
     }
   },
   "runtimeRisks": {
@@ -74,27 +74,6 @@
         "file": "app/[locale]/player/[id]/PageClient.tsx",
         "line": 329,
         "context": "{t(`achievements.${key}.name`, key.replace(/_/g, ' '))}"
-      },
-      {
-        "pattern": "`gameModes.${mode}.name`",
-        "type": "template_literal",
-        "file": "app/[locale]/practice/PageClient.tsx",
-        "line": 254,
-        "context": "{t(`gameModes.${mode}.name`)}"
-      },
-      {
-        "pattern": "`gameModes.${mode}.description`",
-        "type": "template_literal",
-        "file": "app/[locale]/practice/PageClient.tsx",
-        "line": 257,
-        "context": "{t(`gameModes.${mode}.description`)}"
-      },
-      {
-        "pattern": "`gameModes.${mode}.name`",
-        "type": "template_literal",
-        "file": "app/[locale]/practice/PageClient.tsx",
-        "line": 308,
-        "context": "aria-label={`${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`}"
       },
       {
         "pattern": "`sealedBid.outcome.${settlement.outcome}`",
@@ -1672,20 +1651,6 @@
         "context": "{t(`onboarding.ftue.v2.mascotReactions.${tier.key}`)}"
       },
       {
-        "pattern": "`practice.${mode}.${key}`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeBailoutCta.tsx",
-        "line": 56,
-        "context": "<span>{t(`practice.${mode}.${key}`)}</span>"
-      },
-      {
-        "pattern": "practice.${mode}.${key}",
-        "file": "components/practice/PracticeBailoutCta.tsx",
-        "line": 56,
-        "context": "<span>{t(`practice.${mode}.${key}`)}</span>",
-        "type": "template_literal"
-      },
-      {
         "pattern": "`practice.continueTo.${next}`",
         "type": "template_literal",
         "file": "components/practice/PracticeChainCta.tsx",
@@ -1693,53 +1658,11 @@
         "context": "const label = next ? t(`practice.continueTo.${next}`) : t('practice.allDone');"
       },
       {
-        "pattern": "`practice.complete.${mode}`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeCompleteBanner.tsx",
-        "line": 38,
-        "context": "{t(`practice.complete.${mode}`)}"
-      },
-      {
-        "pattern": "`practice.mistakeCoach.${kind}.title`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeMistakeCoach.tsx",
-        "line": 132,
-        "context": "{t(`practice.mistakeCoach.${kind}.title`)}"
-      },
-      {
-        "pattern": "`practice.mistakeCoach.${kind}.body`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeMistakeCoach.tsx",
-        "line": 135,
-        "context": "{t(`practice.mistakeCoach.${kind}.body`)}"
-      },
-      {
-        "pattern": "`gameModes.${mode}.name`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeModeNav.tsx",
-        "line": 59,
-        "context": "const label = t(`gameModes.${mode}.name`);"
-      },
-      {
         "pattern": "`education.practice.mastery.${mastery}`",
         "type": "template_literal",
         "file": "components/practice/PracticeModeSelector.tsx",
         "line": 206,
         "context": "{t(`education.practice.mastery.${mastery}`) || mastery}"
-      },
-      {
-        "pattern": "`gameModes.${mode}.name`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeTutorialSheet.tsx",
-        "line": 162,
-        "context": "{t(`gameModes.${mode}.name`)}"
-      },
-      {
-        "pattern": "`gameModes.${mode}.intro.greet`",
-        "type": "template_literal",
-        "file": "components/practice/PracticeTutorialSheet.tsx",
-        "line": 165,
-        "context": "{t(`gameModes.${mode}.intro.greet`)}"
       },
       {
         "pattern": "`achievementTiers.${tier.toLowerCase()}`",
@@ -1801,64 +1724,71 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 76,
+        "line": 77,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 324,
+        "line": 325,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayRankCard.tsx",
+        "line": 32,
+        "context": "{t(`quickPlay.solo.rank.${rankNow.key}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayRankCard.tsx",
+        "line": 39,
+        "context": "rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),"
       },
       {
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 131,
+        "line": 149,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 145,
+        "line": 165,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
-      },
-      {
-        "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
-        "type": "template_literal",
-        "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 241,
-        "context": "{t(`quickPlay.solo.rank.${rankNow.key}`)}"
-      },
-      {
-        "pattern": "`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`",
-        "type": "template_literal",
-        "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 248,
-        "context": "rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayWheel.tsx",
-        "line": 312,
+        "line": 345,
         "context": "aria-label={t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayWheel.tsx",
-        "line": 363,
+        "line": 395,
         "context": "{t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${strikeMode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayWheel.tsx",
-        "line": 459,
+        "line": 487,
         "context": "<span className={NODE_COLORS[strikeMode].text}>{t(`quickPlay.solo.mode.${strikeMode}`)}</span>"
+      },
+      {
+        "pattern": "`quickPlay.solo.blurb.${active}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayWheel.tsx",
+        "line": 513,
+        "context": "{t(`quickPlay.solo.blurb.${active}`)}"
       },
       {
         "pattern": "`ranked.${nextTier.id}`",
@@ -2890,22 +2820,6 @@
         "file": "components/playerStyle/StylePicker.tsx",
         "line": 221,
         "context": "{t(confirmLabelKey)}"
-      },
-      {
-        "pattern": "t(tipKey)",
-        "variable": "tipKey",
-        "type": "variable_key",
-        "file": "components/practice/PracticeInstructions.tsx",
-        "line": 182,
-        "context": "<span>{t(tipKey)}</span>"
-      },
-      {
-        "pattern": "t(tipKey)",
-        "variable": "tipKey",
-        "type": "variable_key",
-        "file": "components/practice/PracticeTutorialSheet.tsx",
-        "line": 213,
-        "context": "{t(tipKey)}"
       },
       {
         "pattern": "t(nameKey)",

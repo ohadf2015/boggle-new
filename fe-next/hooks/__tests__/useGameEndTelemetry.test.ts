@@ -60,3 +60,43 @@ describe('useGameEndTelemetry', () => {
     expect(trackGameEnd).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * Symmetry with useGameStartTelemetry (Class 3 — asymmetric paths).
+ *
+ * MP rolls `random` server-side, so the resolved mode and `gameModeConfirmed`
+ * arrive AFTER the game goes active. The START hook already gates on
+ * `ready: gameModeConfirmed` to avoid capturing the unresolved mode — but the
+ * END hook had no such gate, so it emitted `game_completed` with mode='random'
+ * while no `game_started` for 'random' ever existed. PostHog 30d: random showed
+ * **0 starts against 8 completions**. Both ends must gate on the same signal or
+ * they will keep drifting.
+ */
+describe('useGameEndTelemetry — ready gate mirrors the start hook', () => {
+  it('does NOT emit while the mode is still unresolved', () => {
+    renderHook(() =>
+      useGameEndTelemetry({ mode: 'random', resultsShown: true, score: 10, wordCount: 2, ready: false }),
+    );
+    expect(trackGameEnd).not.toHaveBeenCalled();
+  });
+
+  it('emits once the mode is confirmed, with the resolved mode', () => {
+    const { rerender } = renderHook(
+      ({ mode, ready }) => useGameEndTelemetry({ mode, resultsShown: true, score: 10, wordCount: 2, ready }),
+      { initialProps: { mode: 'random', ready: false } },
+    );
+    expect(trackGameEnd).not.toHaveBeenCalled();
+
+    rerender({ mode: 'blast', ready: true });
+
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+    expect(trackGameEnd.mock.calls[0][0]).toBe('blast');
+  });
+
+  it('defaults to ready so non-MP callers are unaffected', () => {
+    renderHook(() =>
+      useGameEndTelemetry({ mode: 'classic', resultsShown: true, score: 5, wordCount: 1 }),
+    );
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+  });
+});

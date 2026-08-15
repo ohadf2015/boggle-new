@@ -346,6 +346,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   useGameEndTelemetry({
     mode: gameMode ?? 'multiplayer',
     resultsShown: waitingForResults,
+    // Same gate the start hook uses — otherwise a `random` room completes under
+    // the unresolved mode and never matches its own start.
+    ready: gameModeConfirmed,
     score: mpValidWords.reduce((s, w) => s + (w.score ?? 0), 0),
     wordCount: mpValidWords.length,
     extras: {

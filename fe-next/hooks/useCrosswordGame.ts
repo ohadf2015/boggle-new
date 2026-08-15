@@ -24,7 +24,7 @@ import {
   loadProgress,
   saveProgress,
 } from '@/lib/crossword/progress';
-import { emitCrosswordGameEnd } from '@/lib/crossword/telemetry';
+import { emitCrosswordGameEnd, emitCrosswordGameStart } from '@/lib/crossword/telemetry';
 import { crosswordStats } from '@/lib/crossword/stats';
 import type { CrosswordPuzzle, Direction } from '@/lib/crossword/types';
 
@@ -127,6 +127,18 @@ export function useCrosswordGame(
     }
     wordsSolvedRef.current = solved;
   }, [state]);
+
+  // Pair the completion emit with a start, once per puzzle. Without it PostHog
+  // saw crossword completions against ZERO starts, so the mode was missing from
+  // every started→completed funnel. A puzzle restored from storage in the
+  // 'solved' state is not a new attempt, so it emits neither.
+  const startFiredRef = useRef(false);
+  useEffect(() => {
+    if (startFiredRef.current) return;
+    if (state.status === 'solved') return;
+    startFiredRef.current = true;
+    emitCrosswordGameStart(puzzle);
+  }, [state.status, puzzle]);
 
   // Fire onSolved once.
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 /**
  * Lazy PostHog proxy — TDD spec.
@@ -128,5 +128,69 @@ describe('lazyPosthog proxy', () => {
     expect(mockPosthog.reset).toHaveBeenCalled();
     expect(mockPosthog.opt_in_capturing).toHaveBeenCalled();
     expect(mockPosthog.opt_out_capturing).toHaveBeenCalled();
+  });
+});
+
+/**
+ * Rate-limit spec — regression for a SILENT DATA-LOSS bug (Class 4).
+ *
+ * The limiter existed to stay under PostHog's own ~30/s cap, but it DROPPED
+ * every capture over 10/s and emitted nothing to say so. Production effect
+ * (30d, lexiclash.live): the end-of-round and multiplayer-join bursts both
+ * exceed 10 events/s, so `game_completed` and `mp_join_outcome` went missing
+ * for most sessions — 3,963 `results_viewed` against 1,021 `game_completed`,
+ * and 177 of 287 Quick Play joins with no outcome event at all. Every funnel
+ * built on those events under-reported, always in the same direction.
+ *
+ * Contract: over-budget captures are DEFERRED and drained, never discarded.
+ */
+describe('lazyPosthog capture rate limiting', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // The limiter reads performance.now(); pin it to the faked clock so
+    // advancing timers also advances the sliding window. A synchronous burst
+    // then genuinely lands in one instant, exactly as it does in a browser.
+    const origin = Date.now();
+    vi.spyOn(performance, 'now').mockImplementation(() => Date.now() - origin);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('delivers EVERY event in a burst larger than the per-second budget', async () => {
+    await initLazyPostHog('key', {});
+    vi.clearAllMocks();
+
+    for (let i = 0; i < 25; i++) lazyPosthog.capture(`burst-${i}`);
+
+    // Immediate pass is capped — that part is intended.
+    expect(mockPosthog.capture.mock.calls.length).toBeLessThanOrEqual(10);
+
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    const delivered = mockPosthog.capture.mock.calls.map((c) => c[0]);
+    expect(delivered).toHaveLength(25);
+    for (let i = 0; i < 25; i++) expect(delivered).toContain(`burst-${i}`);
+  });
+
+  it('preserves original order when a burst is deferred', async () => {
+    await initLazyPostHog('key', {});
+    vi.clearAllMocks();
+
+    for (let i = 0; i < 20; i++) lazyPosthog.capture(`ord-${i}`);
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    const delivered = mockPosthog.capture.mock.calls.map((c) => c[0]);
+    expect(delivered).toEqual(Array.from({ length: 20 }, (_, i) => `ord-${i}`));
+  });
+
+  it('still throttles: no more than the budget lands in a single window', async () => {
+    await initLazyPostHog('key', {});
+    vi.clearAllMocks();
+
+    for (let i = 0; i < 25; i++) lazyPosthog.capture(`thr-${i}`);
+    expect(mockPosthog.capture.mock.calls.length).toBeLessThanOrEqual(10);
   });
 });

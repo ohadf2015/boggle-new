@@ -505,6 +505,9 @@ const HostView: React.FC<HostViewProps> = memo(({
   useGameEndTelemetry({
     mode: currentGameMode ?? 'multiplayer',
     resultsShown: !!tournament.finalScores,
+    // Same gate the start hook uses — otherwise a `random` room completes under
+    // the unresolved mode and never matches its own start.
+    ready: gameModeConfirmed,
     score: hostResultRow?.score ?? 0,
     wordCount: hostResultRow?.wordsFoundCount ?? 0,
     extras: {

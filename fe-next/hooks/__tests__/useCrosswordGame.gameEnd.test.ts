@@ -11,8 +11,10 @@ import type { SeedPuzzle } from '@/lib/crossword/puzzles/seed';
 import { saveProgress, emptyProgress } from '@/lib/crossword/progress';
 
 const emitCrosswordGameEnd = vi.fn();
+const emitCrosswordGameStart = vi.fn();
 vi.mock('@/lib/crossword/telemetry', () => ({
   emitCrosswordGameEnd: (...args: unknown[]) => emitCrosswordGameEnd(...args),
+  emitCrosswordGameStart: (...args: unknown[]) => emitCrosswordGameStart(...args),
 }));
 
 import { useCrosswordGame } from '../useCrosswordGame';
@@ -35,6 +37,7 @@ const puzzle = buildSeedPuzzle(seed);
 describe('useCrosswordGame — completion analytics wiring', () => {
   beforeEach(() => {
     emitCrosswordGameEnd.mockClear();
+    emitCrosswordGameStart.mockClear();
     localStorage.clear();
   });
 
@@ -76,5 +79,41 @@ describe('useCrosswordGame — completion analytics wiring', () => {
       result.current.inputLetter('x'); // wrong — word never completes correctly
     });
     expect(onWordSolved).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * The paired start emit. Without it crossword reported completions with zero
+ * starts, so it never appeared in a started→completed funnel.
+ */
+describe('useCrosswordGame — start analytics wiring', () => {
+  beforeEach(() => {
+    emitCrosswordGameStart.mockClear();
+    localStorage.clear();
+  });
+
+  it('fires emitCrosswordGameStart once when an unsolved puzzle mounts', () => {
+    renderHook(() => useCrosswordGame(puzzle));
+
+    expect(emitCrosswordGameStart).toHaveBeenCalledTimes(1);
+    expect(emitCrosswordGameStart.mock.calls[0][0]).toMatchObject({ id: puzzle.id });
+  });
+
+  it('does NOT fire a start for a puzzle that mounts already solved', () => {
+    const entries: Record<string, string> = {};
+    for (const c of puzzle.cells) if (!c.block) entries[`${c.row},${c.col}`] = c.solution;
+    saveProgress({ ...emptyProgress(puzzle.id, 1), entries, status: 'solved' });
+
+    renderHook(() => useCrosswordGame(puzzle));
+
+    expect(emitCrosswordGameStart).not.toHaveBeenCalled();
+  });
+
+  it('does not double-fire across re-renders', () => {
+    const { rerender } = renderHook(() => useCrosswordGame(puzzle));
+    rerender();
+    rerender();
+
+    expect(emitCrosswordGameStart).toHaveBeenCalledTimes(1);
   });
 });

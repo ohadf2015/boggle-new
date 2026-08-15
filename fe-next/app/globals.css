@@ -435,6 +435,70 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   to { transform: rotate(360deg); }
 }
 
+/* ── Quick Play mode wheel ──────────────────────────────────────────────
+   The picker's whole motion budget lives here, deliberately as FOUR named
+   beats. It previously had zero: `quick-node-zap`/`quick-knob-pulse` were
+   applied in the component but defined in no stylesheet (Tailwind emits
+   nothing for a class it can't resolve, so they were silent no-ops), and the
+   only surviving motion was an ambient `animate-pulse` at 0.5s — a strobe
+   reading as breakage, not design. Idle beats are slow and staggered; the
+   selection beat is the one loud moment. */
+
+@utility quick-node-float {
+  /* Idle: the four mode keycaps breathe as a constellation. Small and slow on
+     purpose — the wheel must read alive while standing still, without
+     competing with the strike. Per-node phase comes from an inline delay. */
+  animation: quick-node-float 5s ease-in-out infinite;
+}
+@keyframes quick-node-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
+}
+
+@utility quick-wheel-breathe {
+  /* Ambient mode-tinted halo. Replaces the 0.5s strobe: one slow swell, so the
+     disc glows rather than flickers. */
+  animation: quick-wheel-breathe 6.5s ease-in-out infinite;
+}
+@keyframes quick-wheel-breathe {
+  0%, 100% { opacity: 0.55; scale: 0.97; }
+  50% { opacity: 1; scale: 1.02; }
+}
+
+@utility quick-node-zap {
+  /* THE payoff. The picked keycap takes the hit: squash into the board, punch
+     back past rest, settle. Brightness spike lands on the overshoot so the
+     lightning strike and the keycap flash on the same frame. */
+  animation: quick-node-zap 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes quick-node-zap {
+  0% { scale: 1; filter: brightness(1); }
+  18% { scale: 0.88; filter: brightness(0.85); }
+  46% { scale: 1.24; filter: brightness(1.9) drop-shadow(0 0 14px currentColor); }
+  70% { scale: 1.06; filter: brightness(1.15) drop-shadow(0 0 6px currentColor); }
+  100% { scale: 1.12; filter: brightness(1.1); }
+}
+
+@utility quick-knob-pulse {
+  /* Knob while the board loads: an outward charge pulse on the rim, so the
+     wait reads as the machine spinning up rather than a dead control. */
+  animation: quick-knob-pulse 1.1s ease-out infinite;
+}
+@keyframes quick-knob-pulse {
+  0% { box-shadow: 0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.22), 0 0 0 0 rgba(255, 225, 53, 0.55); }
+  70% { box-shadow: 0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.22), 0 0 0 18px rgba(255, 225, 53, 0); }
+  100% { box-shadow: 0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.22), 0 0 0 0 rgba(255, 225, 53, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quick-node-float,
+  .quick-wheel-breathe,
+  .quick-node-zap,
+  .quick-knob-pulse {
+    animation: none;
+  }
+}
+
 /* (wt-dial-spin removed with the "crane steering dial" it span. The dial
    implied a control the player never had — the hub now mirrors the crane's real
    placement band instead, which is information they can actually act on.) */

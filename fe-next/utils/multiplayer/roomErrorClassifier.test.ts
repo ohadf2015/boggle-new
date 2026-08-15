@@ -61,4 +61,38 @@ describe('classifyRoomError', () => {
       expect(classifyRoomError({ message: 'Server is busy, retry shortly' })).toBe('generic');
     });
   });
+
+  /**
+   * Both of these fell through to 'generic' — i.e. the user saw only
+   * "An error occurred", which says nothing about what to change, so they
+   * retried IDENTICALLY. Production (30d, lexiclash.live): 108 join errors from
+   * just 19 people, ~5.7 attempts each, and those same people are the
+   * multiplayer rage-clickers (191 of the product's 320 rage clicks).
+   */
+  describe('errors that told the user nothing, so they retried unchanged', () => {
+    it('classifies the backend NAME_TAKEN code as usernameTaken', () => {
+      // gameLifecycleHandler emits code NAME_TAKEN with the message "That name
+      // is already in use" — the old matcher wanted PLAYER_USERNAME_TAKEN or the
+      // literal word "username", and that message contains neither.
+      expect(classifyRoomError({ code: 'NAME_TAKEN', message: 'That name is already in use' })).toBe('usernameTaken');
+    });
+
+    it('classifies the legacy untyped name-taken message as usernameTaken', () => {
+      expect(classifyRoomError({ message: 'That name is already in use' })).toBe('usernameTaken');
+    });
+
+    it('classifies rate limiting as its own kind, not generic', () => {
+      // socketHandlers emits this when a player trips the 50 msg/10s limiter —
+      // which rage-clicking Join is exactly how you trip. Telling them "an error
+      // occurred" invites another tap, which extends the lockout.
+      expect(classifyRoomError({ message: 'Too many requests. Please try again later.' })).toBe('rateLimited');
+      expect(classifyRoomError({ code: 'RATE_LIMITED', message: 'Slow down.' })).toBe('rateLimited');
+      expect(classifyRoomError({ code: 'RATE_LIMIT_EXCEEDED' })).toBe('rateLimited');
+    });
+
+    it('still returns generic for genuinely unknown payloads', () => {
+      expect(classifyRoomError({ code: 'SOMETHING_NEW', message: 'kaboom' })).toBe('generic');
+      expect(classifyRoomError(null)).toBe('generic');
+    });
+  });
 });

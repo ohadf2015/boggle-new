@@ -11311,6 +11311,7 @@ const ru = {
       "start": "Начать ход"
     },
     "gameOver": "Конец игры",
+    "closeGame": "Так близко!",
     "winnerLabel": "{{name}} победил!",
     "youWon": "Ты победил! 🏆",
     "opponentWon": "{name} победил",

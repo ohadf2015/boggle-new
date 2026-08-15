@@ -104,12 +104,25 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   // CG QA preview / `?disable*` flags can flip the SDK env to 'disabled' even
   // though we're still rendered inside crazygames.com — UI policy (hiding
   // external Sign In/Sign Up) must follow embed status, not ad-runtime status.
-  const [isInCrazyGamesIframe, setIsInCrazyGamesIframe] = useState<boolean>(
-    () => !CRAZYGAMES_FORCE_DISABLED && detectCrazyGamesSync()
-  );
-  const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(
-    () => (!CRAZYGAMES_FORCE_DISABLED && detectCrazyGamesSync() ? 'crazygames' : null)
-  );
+  // Seeded FALSE on purpose, even though detection is synchronous. These
+  // initialisers used to call detectCrazyGamesSync(), which reads `window`: it
+  // returns false during SSR and true on the first client render inside a CG
+  // iframe. Consumers branch on the result (ChatBubble returns null on the
+  // platform, the leaderboard hides sections), so the first client tree differed
+  // from the server HTML — React error #418, 224 events across 72 players (~10%)
+  // on landing, multiplayer and daily simultaneously. React responds by throwing
+  // the server markup away and re-rendering: a flash, and a dead first tap.
+  // Render what the server rendered, then adopt the real value in the effect
+  // below (Class 1 in `.claude/rules/60-recurring-pitfalls.md`).
+  const [isInCrazyGamesIframe, setIsInCrazyGamesIframe] = useState<boolean>(false);
+  const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(null);
+
+  useEffect(() => {
+    if (CRAZYGAMES_FORCE_DISABLED) return;
+    if (!detectCrazyGamesSync()) return;
+    setIsInCrazyGamesIframe(true);
+    setEnvironment((prev) => prev ?? 'crazygames');
+  }, []);
   const [isLoading, setIsLoading] = useState(true);
   const [isInstantMultiplayer, setIsInstantMultiplayer] = useState(false);
   const [cgUser, setCgUser] = useState<{ username: string | null } | null>(null);

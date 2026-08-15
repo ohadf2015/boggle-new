@@ -422,6 +422,22 @@ export const getReferralSource = (): string | null => {
  * Track a growth event
  */
 export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {}): void => {
+  // Seeing a results screen ends the round, whoever reported it. `trackGameEnd`
+  // used to be the only thing clearing the active-game flag, but it is driven by
+  // `useGameEndTelemetry`, which keys off `tournament.finalScores` /
+  // `waitingForResults` — a different source from the one the results screen
+  // itself renders on. When results appeared and that gate did not flip, the
+  // flag stayed set and the in-game view's unmount logged a FINISHED round as
+  // `game_abandoned`: 1,218 in 30d, spiking at the exact round length, none with
+  // a `game_completed` beside them, yet 96.8% had reached a results screen.
+  // Clearing here covers every mode through one chokepoint instead of relying on
+  // the five results components to stay in step (Class 3 in
+  // `.claude/rules/60-recurring-pitfalls.md`). A genuine mid-round exit emits no
+  // results event, so real abandons are untouched.
+  if (event === 'results_viewed' || event === 'mp_results_viewed') {
+    markGameInactive();
+  }
+
   const enrichedData: GrowthEventData = {
     ...data,
     timestamp: Date.now(),

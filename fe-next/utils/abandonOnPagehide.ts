@@ -67,20 +67,33 @@ export function installAbandonOnPagehide(): () => void {
  */
 export function emitAbandonOnSpaNavigate(): void {
   if (!active || alreadyEmitted) return;
-  const durationMs = Date.now() - active.startedAt;
+  const snapshot = active;
+  const durationMs = Date.now() - snapshot.startedAt;
   if (durationMs < MIN_ENGAGED_MS) return;
 
-  alreadyEmitted = true;
-  try {
-    posthog.capture('growth:game_abandoned', {
-      mode: active.mode,
-      gameMode: active.mode,
-      durationSec: Math.round(durationMs / 1000),
-      reason: 'spa_navigate',
-    });
-  } catch {
-    // PostHog not initialized — analytics never block UX
-  }
+  // Settle on the next macrotask instead of emitting straight away. React runs
+  // a component's cleanup BEFORE the effects of the same commit, so when a
+  // round ends normally this fires while `markGameInactive()` — called from the
+  // end-of-game effect — is still one tick away. `active` is therefore still
+  // set, and a COMPLETED game was logged as abandoned: 1,218 of them in 30d,
+  // spiking at the exact round length (302 of classic's 515 at 90-99s against a
+  // 90s round), none with a `game_completed` beside it. Re-checking after the
+  // tick lets the real completion cancel the phantom. A genuine navigation away
+  // clears nothing, so it still emits; tab-close is covered by `pagehide`.
+  setTimeout(() => {
+    if (alreadyEmitted || active !== snapshot) return;
+    alreadyEmitted = true;
+    try {
+      posthog.capture('growth:game_abandoned', {
+        mode: snapshot.mode,
+        gameMode: snapshot.mode,
+        durationSec: Math.round(durationMs / 1000),
+        reason: 'spa_navigate',
+      });
+    } catch {
+      // PostHog not initialized — analytics never block UX
+    }
+  }, 0);
 }
 
 /** @internal Test-only reset hook. */

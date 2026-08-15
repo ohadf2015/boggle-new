@@ -10,7 +10,7 @@
  * = the axis-lock fast-path landed.
  */
 import posthog from '@/lib/analytics/lazyPosthog';
-import { trackGameEnd } from '@/utils/growthTracking';
+import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import type { WordCraftState } from '@/lib/word-craft/useWordCraftGame';
 
 export type WordCraftAxis = 'h' | 'v';
@@ -27,6 +27,12 @@ function safeCapture(event: string, payload: Record<string, unknown>): void {
 /** Fired once when the dictionary finishes loading and the game is ready to play. */
 export function trackWordCraftGameStarted(params: { locale: string }): void {
   safeCapture('word_craft_game_started', { ...params });
+  // Also emit the CANONICAL start. Completion already routes through the shared
+  // `trackGameEnd` (→ `game_completed`), so emitting only the bespoke name left
+  // word-craft reading as 0 starts against 11 completions in PostHog — absent
+  // from every started→completed funnel, and a completion with no start skews
+  // any cross-mode aggregate.
+  trackGameStart('word-craft', { ...params });
 }
 
 /** Fired when the player hits START on the pre-game setup screen. */

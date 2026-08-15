@@ -21,6 +21,16 @@ interface UseGameEndTelemetryArgs {
   mode: string | undefined | null;
   /** True once the post-game results phase is reached. */
   resultsShown: boolean;
+  /**
+   * Gate the emit until the mode is authoritative. Defaults true. Mirrors the
+   * identical option on `useGameStartTelemetry` — MP rolls `random` server-side
+   * and the resolved mode arrives after the game goes active, so the START hook
+   * waited for `gameModeConfirmed` while this one did not. The result was
+   * `game_completed` with mode='random' and no matching start: PostHog 30d
+   * showed random with 0 starts against 8 completions. Both ends gate on the
+   * same signal now (Class 3 in `.claude/rules/60-recurring-pitfalls.md`).
+   */
+  ready?: boolean;
   score: number;
   wordCount: number;
   durationSec?: number;
@@ -29,16 +39,17 @@ interface UseGameEndTelemetryArgs {
 }
 
 export function useGameEndTelemetry({
-  mode, resultsShown, score, wordCount, durationSec, extras,
+  mode, resultsShown, ready = true, score, wordCount, durationSec, extras,
 }: UseGameEndTelemetryArgs): void {
   const firedRef = useRef(false);
 
   useEffect(() => {
     if (firedRef.current) return;
     if (!resultsShown) return;
+    if (!ready) return;
     if (!mode) return;
 
     firedRef.current = true;
     trackGameEnd(mode, score, wordCount, true, durationSec, extras ?? {});
-  }, [mode, resultsShown, score, wordCount, durationSec, extras]);
+  }, [mode, resultsShown, ready, score, wordCount, durationSec, extras]);
 }

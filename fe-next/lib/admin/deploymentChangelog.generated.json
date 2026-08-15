@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-14T08:40:41.183Z",
+  "generatedAt": "2026-08-15T09:16:36.792Z",
   "commits": [
     {
-      "sha": "e6f171458f9c83a8a377e73a64dc6cf1fa4855c8",
-      "shortSha": "e6f1714",
-      "subject": "chore(seo): land the 08-13 + 08-14 seo-daily metadata revisions",
+      "sha": "ba73c02cdcb2eb58f72689c23f456f463a245772",
+      "shortSha": "ba73c02",
+      "subject": "chore(practice): delete the code the retired routes were the only caller of",
       "author": "Ohad Fisher",
-      "date": "2026-08-14T11:29:56+03:00"
+      "date": "2026-08-15T11:49:02+03:00"
     },
     {
-      "sha": "dfc34c301061f2ceed54dcb9d1a56e042b806a78",
-      "shortSha": "dfc34c3",
-      "subject": "feat(nightly): restore stranded 2026-08-14 lane work",
+      "sha": "54b07afd3621ba35fabf0afd78db125f17b7bfe4",
+      "shortSha": "54b07af",
+      "subject": "feat(ftue): retire the /practice routes behind permanent redirects",
       "author": "Ohad Fisher",
-      "date": "2026-08-14T11:03:13+03:00"
+      "date": "2026-08-15T11:30:19+03:00"
     },
     {
-      "sha": "db994fbdb3b076b0943ee9603faec42fbd1c7d14",
-      "shortSha": "db994fb",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-14",
+      "sha": "712e2475dc2f46876e6d436deab83d7efffa3c54",
+      "shortSha": "712e247",
+      "subject": "feat(ftue): take practice off the hub, and give single-player a stuck coach",
       "author": "Ohad Fisher",
-      "date": "2026-08-14T07:14:05+03:00"
+      "date": "2026-08-15T10:53:32+03:00"
     },
     {
-      "sha": "e9c025b7bc4c6195e1e3bf76706f17f3c844f9ca",
-      "shortSha": "e9c025b",
-      "subject": "fix(blast): use player's dragged path for MP cascade so ice/bomb tiles break server-side (#806)",
+      "sha": "99e47dec4938d2aaf0c53b51f1c3238c7fc57d9a",
+      "shortSha": "99e47de",
+      "subject": "feat(ftue): end onboarding inside a real game, not the practice hub",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T10:42:30+03:00"
+    },
+    {
+      "sha": "0efc7a1742e889649eab7a41dc1be764dc1a78a5",
+      "shortSha": "0efc7a1",
+      "subject": "fix(referral): the referral loop had never fired once — close it end to end",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T10:23:09+03:00"
+    },
+    {
+      "sha": "1c4490c56630a6f99fabc962c0b8e05cf3a59ace",
+      "shortSha": "1c4490c",
+      "subject": "Merge remote-tracking branch 'origin/master'",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T10:07:25+03:00"
+    },
+    {
+      "sha": "31b2d54c3b4208a8e21c5a42567c9777ec146bbf",
+      "shortSha": "31b2d54",
+      "subject": "fix(android-install): the install pill ignored the dismissal and came back on every page",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T09:56:26+03:00"
+    },
+    {
+      "sha": "aaf7b8cc088d3213f3af97529243b653806f44f9",
+      "shortSha": "aaf7b8c",
+      "subject": "fix(friends): the friends module read every other player from a table RLS forbids",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T09:56:01+03:00"
+    },
+    {
+      "sha": "d09dce2169d0334c474fa8ccea3fd9e4cb86ba3f",
+      "shortSha": "d09dce2",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-15",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T03:12:56+03:00"
+    },
+    {
+      "sha": "c844b1b87c1f9f5a3e6844e47bc73b3e905e77e9",
+      "shortSha": "c844b1b",
+      "subject": "feat(crossword): bake the newspaper pool so the full-size format actually turns on",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T02:02:54+03:00"
+    },
+    {
+      "sha": "500e6e3552058239864c6539a521a6aacb55a510",
+      "shortSha": "500e6e3",
+      "subject": "Merge pull request #808 from ohadf2015/fix/growth-radar-broken-links",
       "author": "ohadf2015",
-      "date": "2026-08-13T16:40:03+03:00"
+      "date": "2026-08-14T21:26:51+03:00"
     },
     {
-      "sha": "fa95aa6743d11de82f135cd613b241eefe70366c",
-      "shortSha": "fa95aa6",
-      "subject": "fix(gifts): accept Bearer auth on gift claim/dismiss mutations (#805)",
-      "author": "ohadf2015",
-      "date": "2026-08-13T15:50:43+03:00"
-    },
-    {
-      "sha": "9794e38c256a987a4415dcea3a651a5ead490d6d",
-      "shortSha": "9794e38",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-13",
+      "sha": "17ea743d5704a9392ced1862fc6371075b7b4e1d",
+      "shortSha": "17ea743",
+      "subject": "fix(pre-push): give the type-check an 8 GB heap — it was OOMing, not failing",
       "author": "Ohad Fisher",
-      "date": "2026-08-13T10:06:07+03:00"
+      "date": "2026-08-14T21:07:12+03:00"
     },
     {
-      "sha": "20c2e2f02917093e514f65876715df913cb5106a",
-      "shortSha": "20c2e2f",
-      "subject": "Merge remote-tracking branch 'origin/fix/tests-green-master'",
+      "sha": "09759abda08507c6f52d8fe54fcc7cb5f0efe966",
+      "shortSha": "09759ab",
+      "subject": "fix(seo): three broken links the crawl found, all of them in our own metadata",
       "author": "Ohad Fisher",
-      "date": "2026-08-13T09:53:02+03:00"
+      "date": "2026-08-14T20:33:23+03:00"
     },
     {
-      "sha": "04866ef3eb296a8810d027f41b2e6e51010f065c",
-      "shortSha": "04866ef",
-      "subject": "fix(leaderboard): the All-Time board was empty and past seasons had no faces",
+      "sha": "b488aa48b2e7988ffb2839c030595637d3c5af33",
+      "shortSha": "b488aa4",
+      "subject": "fix(connections): add the results-screen tier copy that was rendering as raw keys",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T23:56:14+03:00"
+      "date": "2026-08-14T19:06:33+03:00"
     },
     {
-      "sha": "a4d48e426d35d8ecd5d93736827e14dccf9cfb1b",
-      "shortSha": "a4d48e4",
-      "subject": "fix(gate): shrink shards to 80 files and preload AvatarRenderer — the two ways the pre-push gate fails with zero failing tests",
+      "sha": "52d0de18530afbb678efc37cc52191242fce7f6a",
+      "shortSha": "52d0de1",
+      "subject": "feat(connections): add 8 Russian puzzles, holding back 14 that did not meet the bar",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T22:28:04+03:00"
+      "date": "2026-08-14T16:43:59+03:00"
     },
     {
-      "sha": "244c701b12abbd9a585aade2d037c4c3c0d27d67",
-      "shortSha": "244c701",
-      "subject": "merge: teacher-access outage, admin funnel, MP lobby dropout, in-game coach",
+      "sha": "8242fa4c3fa9a2333dc783dd66a06ea16d003708",
+      "shortSha": "8242fa4",
+      "subject": "fix(connections): credit both answers when two puzzles show the same tiles",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T21:35:26+03:00"
+      "date": "2026-08-14T16:37:32+03:00"
     },
     {
-      "sha": "0d92761c43c1abe4330c369b35d6ef339653db9c",
-      "shortSha": "0d92761",
-      "subject": "fix(ftue): the stuck-player coach now names a word that's actually on the board",
+      "sha": "a75556fddf25e4f2c61cd31fa5e5a48d66b7ad57",
+      "shortSha": "a75556f",
+      "subject": "fix(connections): stop 147 Japanese hints from printing their own answer",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T21:35:08+03:00"
+      "date": "2026-08-14T16:13:46+03:00"
     },
     {
-      "sha": "cdc2dc96fe7b99c164bd06d8db512e639fc77207",
-      "shortSha": "cdc2dc9",
-      "subject": "fix(mp): a bot-filled public lobby now starts itself instead of waiting forever",
+      "sha": "192e7285df35feeeb83e7dd0a22761c33248b4a3",
+      "shortSha": "192e728",
+      "subject": "feat(connections): add 14 Spanish puzzles and stop two Swedish hints reading the puzzle back",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T21:34:53+03:00"
+      "date": "2026-08-14T15:54:37+03:00"
     },
     {
-      "sha": "50ac1da2dc6c5adf2183cb4c670788da8796d30f",
-      "shortSha": "50ac1da",
-      "subject": "feat(admin): surface the teacher funnel so a broken gate can't hide again",
+      "sha": "500513730774440c18e8892d945ec68b330d0e92",
+      "shortSha": "5005137",
+      "subject": "Merge master into connections-gauntlet",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T21:34:41+03:00"
+      "date": "2026-08-14T15:39:27+03:00"
     },
     {
-      "sha": "4b01e97ae0654fa6618c938d4fcb23b0f56b364e",
-      "shortSha": "4b01e97",
-      "subject": "fix(teacher): approvals never actually granted the teacher role",
+      "sha": "19039ff9e9c19eb4ccfa02deab48452e0d319499",
+      "shortSha": "19039ff",
+      "subject": "fix(connections): keep the puzzle visible if motion features never load, and repair 7 Hebrew hints",
       "author": "Ohad Fisher",
-      "date": "2026-08-12T21:34:26+03:00"
-    },
-    {
-      "sha": "cc52efaf8419a7d32e1a7538835916e6748cf62c",
-      "shortSha": "cc52efa",
-      "subject": "merge: fix/feedback-widget-bugs — Hebrew widget UI, ad off the report form, launcher off the bottom nav, Word Bridge spacing + strike haptics",
-      "author": "Ohad Fisher",
-      "date": "2026-08-12T20:13:11+03:00"
-    },
-    {
-      "sha": "7445a4907dfb28af309f6dee21557b9430b12adc",
-      "shortSha": "7445a49",
-      "subject": "chore(feedback): re-vendor widget.js with the localized launcher aria-label",
-      "author": "Ohad Fisher",
-      "date": "2026-08-12T19:51:08+03:00"
-    },
-    {
-      "sha": "040e8abd09823c4b73dfcab979b6e276836e481b",
-      "shortSha": "040e8ab",
-      "subject": "test(word bridge): every strike buzzes, not only the first",
-      "author": "Ohad Fisher",
-      "date": "2026-08-12T19:43:07+03:00"
-    },
-    {
-      "sha": "de6d6f98fd1db2b9e52f1ce59ad4055b344c1f3d",
-      "shortSha": "de6d6f9",
-      "subject": "fix(tests): drain handlePlay's async tail in the audio-unlock test — the last red file at master",
-      "author": "Ohad Fisher",
-      "date": "2026-08-12T19:42:17+03:00"
-    },
-    {
-      "sha": "440ce9ad7928e29146aedd6a26795dede0b13faa",
-      "shortSha": "440ce9a",
-      "subject": "fix(word bridge): space Hebrew compounds, buzz on every strike",
-      "author": "Ohad Fisher",
-      "date": "2026-08-12T19:36:40+03:00"
-    },
-    {
-      "sha": "eb0fa9e909b98b4e26a8396c5fb5626827cd7d78",
-      "shortSha": "eb0fa9e",
-      "subject": "fix(tests): unblock the pre-push gate — the suite was red on master, so nobody could push",
-      "author": "Ohad Fisher",
-      "date": "2026-08-12T09:50:11+03:00"
+      "date": "2026-08-14T15:38:58+03:00"
     }
   ]
 }

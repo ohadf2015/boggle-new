@@ -136,7 +136,6 @@ export const PUBLIC_ROUTES: string[] = [
   "/multiplayer-word-game-online",
   "/online-word-games-with-friends",
   "/play-boggle-online-free",
-  "/practice",
   "/profile",
   "/quests",
   "/quick-play",
