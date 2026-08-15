@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
+import { RETIRED_PRACTICE_REDIRECTS } from './lib/seo/retiredPracticeRedirects.mjs';
 
 const pkg = createRequire(import.meta.url)('./package.json');
 
@@ -152,6 +153,10 @@ const nextConfig = {
   // SEO: Redirect non-www to www and ensure consistent URLs
   async redirects() {
     return [
+      // Practice is retired (FTUE and the hub now lead straight into the real
+      // game). The URLs were live for months, so they redirect per-mode instead
+      // of 404ing the people still holding old links.
+      ...RETIRED_PRACTICE_REDIRECTS,
       // Redirect bare root to default locale (prevents 404 and duplicate content flags).
       // NOTE: in production the custom Express server (server/localeRedirect.ts)
       // handles `/` BEFORE Next sees it — locale-detecting 301 for browsers,
