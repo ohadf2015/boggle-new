@@ -15,15 +15,12 @@ vi.mock('@/components/ui/BackButton', () => ({
 vi.mock('@/hooks/useBackOneLevel', () => ({
   useBackOneLevel: () => vi.fn(),
 }));
-vi.mock('../QuickPlayWheel', () => ({
-  // The real wheel plays immediately on select (tap a node / release a drag) —
-  // there's no separate PLAY button anymore. mock-play stands in for
-  // "release on random", the old default when PLAY was pressed with no pick.
-  QuickPlayWheel: ({ onSelect, isLoading, strikeMode }: any) => (
-    <div data-testid="mock-wheel" data-loading={String(!!isLoading)} data-strike={strikeMode ?? ''}>
-      <button data-testid="mock-select" onClick={() => onSelect('blast', 'drag')}>sel</button>
+vi.mock('../QuickPlayModePicker', () => ({
+  QuickPlayModePicker: ({ onSelect, pendingMode }: any) => (
+    <div data-testid="mock-picker" data-pending-mode={pendingMode ?? ''}>
+      <button data-testid="mock-select" onClick={() => onSelect('blast', 'tap')}>sel</button>
       <button data-testid="mock-play" onClick={() => onSelect('random', 'tap')}>play</button>
-      {isLoading && <div data-testid="quick-play-loading">loading</div>}
+      {pendingMode && <div data-testid="quick-play-loading">loading</div>}
     </div>
   ),
 }));
@@ -101,16 +98,16 @@ describe('QuickPlayHub', () => {
     fireEvent.click(screen.getByTestId('mock-select'));
     expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
       'quick_play_mode_selected',
-      expect.objectContaining({ mode: 'blast', method: 'drag' })
+      expect.objectContaining({ mode: 'blast', method: 'tap' })
     );
   });
 
   it('random PLAY resolves a mode, fetches round, mounts adapter', async () => {
     render(<QuickPlayHub />);
     fireEvent.click(screen.getByTestId('mock-play'));
-    // Loading hold keeps the wheel visible before enter — must not jump straight in.
+    // Loading hold keeps the picker visible with pending state before enter.
     expect(screen.getByTestId('quick-play-loading')).toBeTruthy();
-    expect(screen.getByTestId('mock-wheel').getAttribute('data-loading')).toBe('true');
+    expect(screen.getByTestId('mock-picker').getAttribute('data-pending-mode')).not.toBe('');
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
     expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
       'quick_play_mode_selected',
@@ -120,7 +117,7 @@ describe('QuickPlayHub', () => {
     expect(roundCall).toBeTruthy();
   });
 
-  it('shows loading + strike on the wheel before mounting the game', async () => {
+  it('shows loading + pending state on the picker before mounting the game', async () => {
     let resolveRound: (v: unknown) => void = () => undefined;
     fetchMock.mockImplementation((url: string) => {
       if (String(url).includes('/round')) {
@@ -134,7 +131,7 @@ describe('QuickPlayHub', () => {
     fireEvent.click(screen.getByTestId('mock-select'));
     await waitFor(() => expect(screen.getByTestId('quick-play-loading')).toBeTruthy());
     expect(screen.queryByTestId('mock-finish')).toBeNull();
-    expect(screen.getByTestId('mock-wheel').getAttribute('data-strike')).toBe('blast');
+    expect(screen.getByTestId('mock-picker').getAttribute('data-pending-mode')).toBe('blast');
     resolveRound({ ok: true, json: async () => roundPayload });
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
   });

@@ -1983,6 +1983,7 @@ const es = {
     "roomClosed": "Sala cerrada - hora de crear una nueva",
     "gameCodeNotExist": "Código no encontrado. ¡Verifica!",
     "usernameTaken": "¡Alguien fue más rápido! Prueba otro nombre",
+    "tooManyAttempts": "¡Frena un poco! Espera un segundo y vuelve a intentarlo",
     "gameCodeExists": "¡Ese código está ocupado! Elige otro",
     "somethingWentWrong": "¡Pausita Rápida!",
     "unexpectedError": "Un pequeño fallo - ¡pero tu juego está a salvo!",
@@ -9168,6 +9169,13 @@ const es = {
       "play": "JUGAR",
       "subCaption": "Ronda de 60 segundos · sin bots · tú contra la puntuación perfecta",
       "loading": "Preparando tu tablero…",
+      "blurb": {
+        "classic": "Une letras por la cuadrícula y forma palabras. Cuanto más largas, más puntos.",
+        "blast": "Encadena letras y revienta fichas. Vacía el tablero antes de que suene el reloj.",
+        "word-hunt": "Hay una palabra escondida en la cuadrícula. Encuéntrala — y todo lo que salga por el camino.",
+        "wheel-rush": "Cada palabra lleva la letra del centro. Gira el anillo para encontrar más.",
+        "random": "Que decida la ruleta. 60 segundos, sin bots, tú contra la puntuación perfecta."
+      },
       "mode": {
         "classic": "Clásico",
         "blast": "Explosión",
@@ -15080,6 +15088,7 @@ const es = {
     "winnerLabel": "¡{{name}} gana!",
     "youWon": "¡Ganaste! 🏆",
     "opponentWon": "Ganó {name}",
+    "closeGame": "¡Muy reñido!",
     "playAgain": "Jugar de nuevo",
     "home": "Inicio",
     "finalTiles": "¡Últimas fichas!",

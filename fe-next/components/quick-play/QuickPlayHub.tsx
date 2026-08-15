@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickPlayWheel } from './QuickPlayWheel';
+import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import { shareChallenge } from './challengeShare';
@@ -357,15 +358,16 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         </div>
       )}
 
-      <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden px-2 py-2 sm:py-3">
-        {/* Wheel stays mounted during loading so the lightning strike is visible
-            before gameplay mounts — never jump straight into the board. */}
-        <QuickPlayWheel
-          selection={selection}
-          onSelect={handlePlay}
-          strikeMode={strikeMode}
-          isLoading={phase === 'loading'}
-        />
+      <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden overflow-y-auto px-2 py-4 sm:py-6">
+        {/* Mode picker stays mounted during loading so selection state is visible.
+            Loading state dims siblings and disables random while selected card locks. */}
+        {(phase === 'wheel' || phase === 'loading') && (
+          <QuickPlayModePicker
+            selection={selection}
+            pendingMode={phase === 'loading' ? strikeMode : null}
+            onSelect={handlePlay}
+          />
+        )}
       </div>
     </div>
   );

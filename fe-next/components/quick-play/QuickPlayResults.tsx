@@ -4,15 +4,19 @@
  * Quick Play round results — the between-rounds screen.
  * Core stat is % of perfect (the board's ceiling), NOT placement: quick play
  * frames you vs the board, never vs a lobby of opponents (that's MP's turf).
- * Composes existing pieces: RivalCompareCard, confetti tiers, neo tokens.
+ *
+ * Hierarchy: hero % + score dominates; coins/xp are small chips; rank is
+ * supporting context below the fold; next-round is the only filled CTA.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { haptics } from '@/utils/haptics/HapticsManager';
+import useReducedMotion from '@/hooks/useReducedMotion';
 import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
+import { QuickPlayRankCard } from './QuickPlayRankCard';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
 import { NODE_COLORS } from './modeColors';
@@ -59,6 +63,7 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
   const [showFullBoard, setShowFullBoard] = useState(false);
   const celebrated = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // This screen replaces the game board with no navigation, so keyboard
   // focus needs to move here explicitly instead of being stranded on a
@@ -123,9 +128,22 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
 
   const dash = (result.scorePct / 100) * GAUGE_C;
   const modeColor = NODE_COLORS[result.mode];
+  // Stagger delays: hero 0s, rewards 0.25s, rank 0.5s
+  const staggerDelay = {
+    hero: prefersReducedMotion ? '0s' : '0s',
+    rewards: prefersReducedMotion ? '0s' : '0.25s',
+    rank: prefersReducedMotion ? '0s' : '0.5s',
+  };
+  const heroAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0s)_both]';
+  const rewardsAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0.25s)_both]';
+  const rankAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0.5s)_both]';
 
   return (
-    <div className="flex h-full flex-col gap-2.5 overflow-y-auto overscroll-contain bg-neo-navy px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-results">
+    <div
+      className="flex h-full flex-col gap-2.5 overflow-y-auto overscroll-contain bg-neo-navy px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      data-testid="quick-play-results"
+      data-reveal={prefersReducedMotion ? 'instant' : 'staggered'}
+    >
       <div className="flex items-center justify-center gap-2">
         <span className={`rounded-xl border-neo-thick border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}>
           {t(`quickPlay.solo.mode.${result.mode}`)}
@@ -134,6 +152,8 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
           {t('quickPlay.solo.roundComplete')}
         </h1>
       </div>
+
+      {/* Badges — celebration layer. Restyle/reposition only, keep conditions. */}
 
       {isPersonalBest && (
         <div className="animate-neo-pop -rotate-1 rounded-xl border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-new-best">
@@ -151,28 +171,45 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
         </div>
       )}
 
-      {/* Hero: % of perfect gauge */}
-      <div className="flex items-center gap-4 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard-lg">
-        <div className="relative h-24 w-24 flex-none">
-          <svg width="96" height="96" viewBox="0 0 128 128" className="-rotate-90">
-            <circle cx="64" cy="64" r={GAUGE_R} fill="none" stroke="var(--neo-abyss)" strokeWidth="14" />
-            <circle
-              cx="64" cy="64" r={GAUGE_R} fill="none" stroke={modeColor.hex} strokeWidth="14"
-              strokeDasharray={`${dash} ${GAUGE_C - dash}`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <b className={`font-neo-display text-2xl ${modeColor.text}`}>{result.scorePct}%</b>
-            <small className="text-[9px] tracking-wider text-neo-white/60">{t('quickPlay.solo.ofPerfect')}</small>
+      {/* Hero: % of perfect — DOMINANT element. */}
+      <div
+        className={`rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard-lg ${heroAnimation}`}
+        style={{ '--delay': staggerDelay.hero } as React.CSSProperties}
+        data-testid="quick-hero-card"
+      >
+        <div className="flex flex-col items-center gap-4">
+          {/* Percentage gauge and display */}
+          <div className="relative h-28 w-28">
+            <svg width="112" height="112" viewBox="0 0 128 128" className="-rotate-90">
+              <circle cx="64" cy="64" r={GAUGE_R} fill="none" stroke="var(--neo-abyss)" strokeWidth="14" />
+              <circle
+                cx="64" cy="64" r={GAUGE_R} fill="none" stroke={modeColor.hex} strokeWidth="14"
+                strokeDasharray={`${dash} ${GAUGE_C - dash}`}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <b className={`font-neo-display text-5xl ${modeColor.text}`} data-testid="quick-hero-percentage">
+                {result.scorePct}%
+              </b>
+              <small className="text-[10px] tracking-widest text-neo-white/60">{t('quickPlay.solo.ofPerfect')}</small>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-1 text-neo-cream">
-          <div className="font-neo-display text-xl">
-            <em className={`not-italic ${modeColor.text}`}>{result.score}</em> {t('quickPlay.solo.points')}
+
+          {/* Score secondary line */}
+          <div className="text-center">
+            <div className="font-neo-display text-2xl text-neo-cream">
+              <em className={`not-italic ${modeColor.text}`}>{result.score}</em> {t('quickPlay.solo.points')}
+            </div>
           </div>
-          <div className="text-sm text-neo-white/75">
-            {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
+
+          {/* Percentile comparison — pulled up from rank card */}
+          <div className="w-full border-t border-neo-white/20 pt-3">
+            <p className="text-center text-xs text-neo-cream font-bold">
+              {t('quickPlay.solo.betterThan', { pct: String(outcome.percentileToday) })}
+            </p>
           </div>
+
+          {/* Target word indicator (word-hunt only) */}
           {result.mode === 'word-hunt' && result.targetWord && (
             <div className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
               {t(
@@ -181,6 +218,8 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
               )}
             </div>
           )}
+
+          {/* Improvement vs average */}
           {improvementPct !== null && (
             <span
               className={`w-max rounded-lg border-2 px-2 py-0.5 text-xs font-bold ${
@@ -189,20 +228,22 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
                   : 'border-neo-white/30 bg-neo-white/5 text-neo-white/70'
               }`}
             >
-              {improvementPct >= 0 ? '▲' : '▼'}{' '}
-              {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
+              {improvementPct >= 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
             </span>
           )}
         </div>
       </div>
 
-      {/* Rewards */}
-      <div className="flex gap-2.5">
-        <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border-neo-thick border-black bg-neo-yellow py-2 font-neo-display text-base font-bold text-black shadow-hard">
+      {/* Rewards — small chips, not full-width slabs */}
+      <div
+        className={`flex items-center justify-center gap-3 ${rewardsAnimation}`}
+        style={{ '--delay': staggerDelay.rewards } as React.CSSProperties}
+      >
+        <div className="inline-flex items-center gap-1 rounded-full border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-1.5 font-neo-display text-sm font-bold text-neo-yellow" data-testid="quick-coins-reward">
           ◉ +{outcome.coins}
         </div>
-        <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border-neo-thick border-black bg-neo-purple py-2 font-neo-display text-base font-bold text-white shadow-hard">
-          ★ +{outcome.xp} XP
+        <div className="inline-flex items-center gap-1 rounded-full border-2 border-neo-purple bg-neo-purple/10 px-3 py-1.5 font-neo-display text-sm font-bold text-neo-purple" data-testid="quick-xp-reward">
+          ★ +{outcome.xp}
         </div>
       </div>
 
@@ -224,52 +265,23 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
         />
       )}
 
-      {/* Percentile + Quick Rank — merged into one card (was two) to cut a
-          full card's worth of border/padding overhead. */}
-      <div className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard" data-testid="quick-rank-bar">
-        <p className="mb-1 text-xs text-neo-cream">
-          {t('quickPlay.solo.betterThan', { pct: String(outcome.percentileToday) })}
-        </p>
-        <div className="h-2.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
-          <i
-            className="block h-full border-r-2 border-black bg-neo-cyan"
-            style={{ width: `${outcome.percentileToday}%` }}
-          />
-        </div>
-        <div className="mt-2.5 flex items-center justify-between text-xs">
-          <span className={`font-neo-display font-bold tracking-wide ${rankNow.color}`}>
-            {t(`quickPlay.solo.rank.${rankNow.key}`)}
-          </span>
-          <span className="text-neo-white/60">
-            {rankNow.nextAt !== null
-              ? t('quickPlay.solo.rankProgress', {
-                  points: safeToLocaleString(outcome.totalPoints, language),
-                  next: safeToLocaleString(rankNow.nextAt, language),
-                  rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),
-                })
-              : t('quickPlay.solo.rankMax')}
-          </span>
-        </div>
-        <div className="mt-1 h-2.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
-          <i
-            className="block h-full border-r-2 border-black bg-neo-cozy transition-[width] duration-700"
-            style={{ width: `${Math.round(rankNow.progress * 100)}%` }}
-          />
-        </div>
-        <p className="mt-1 text-[11px] text-neo-white/55">
-          {t('quickPlay.solo.rankGained', { pts: String(result.scorePct) })}
-        </p>
+      {/* Rank progress card — split out for modularity */}
+      <div className={rankAnimation} style={{ '--delay': staggerDelay.rank } as React.CSSProperties}>
+        <QuickPlayRankCard
+          totalPoints={outcome.totalPoints}
+          percentileToday={outcome.percentileToday}
+          scorePct={result.scorePct}
+        />
       </div>
 
-      {/* Leaderboard: collapsed to one summary line by default (was 3 always-open
-          rows) — tap to expand, no scroll cost when the player isn't curious. */}
+      {/* Leaderboard: collapsed to one summary line by default — tap to expand. */}
       {board.length > 0 && (
         <div className="overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated shadow-hard">
           {!showFullBoard ? (
             <button
               type="button"
               onClick={() => setShowFullBoard(true)}
-              className="w-full py-2 text-sm font-bold tracking-wide text-neo-cyan"
+              className="flex h-[44px] w-full items-center justify-center text-sm font-bold tracking-wide text-neo-cyan"
             >
               {t('quickPlay.solo.seeLeaderboard')}
             </button>
@@ -312,11 +324,21 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
         type="button"
         data-testid="quick-results-challenge"
         onClick={onChallenge}
-        className="h-[44px] rounded-2xl border-[3px] border-neo-cozy font-neo-display text-sm font-semibold text-neo-cozy"
+        className="flex h-[44px] items-center justify-center rounded-2xl font-neo-display text-sm font-semibold text-neo-cosy"
       >
         {t('quickPlay.solo.challengeFriend')}
       </button>
       <p className="text-center text-[10px] text-neo-white/45">{t('quickPlay.solo.challengeHint')}</p>
+
+      {/* Bottom spacer: reserves space for the push-notification prompt that anchors
+          at fixed bottom-[calc(5rem+var(--admob-banner-height,0px))], preventing it
+          from covering the primary CTA. The prompt is max-w-md with internal padding,
+          so we reserve an additional 1.5rem buffer. */}
+      <div
+        className="h-[calc(5rem+var(--admob-banner-height,0px)+1.5rem)]"
+        data-testid="quick-results-bottom-spacer"
+        aria-hidden="true"
+      />
     </div>
   );
 }

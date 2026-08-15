@@ -143,18 +143,13 @@ export function QuickPlayStrikeFx({
           stroke-dashoffset: 320;
           animation: quick-bolt-draw-kf 0.35s ease-out forwards;
         }
-        @keyframes quick-node-zap-kf {
-          0%, 100% { filter: brightness(1.05); }
-          40% { filter: brightness(1.35) drop-shadow(0 0 12px currentColor); }
-        }
-        .quick-node-zap { animation: quick-node-zap-kf 0.55s ease-in-out 2; }
-        @keyframes quick-knob-pulse-kf {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.06); }
-        }
-        .quick-knob-pulse { animation: quick-knob-pulse-kf 0.55s ease-in-out infinite; }
+        /* .quick-node-zap / .quick-knob-pulse used to be redefined here, and
+           because this tag mounts only during a strike it silently overrode
+           the globals.css versions — two definitions, and the weaker one won
+           exactly when it mattered. They now live once, in globals.css,
+           alongside the wheel's other three beats. */
         @media (prefers-reduced-motion: reduce) {
-          .quick-bolt-draw, .quick-node-zap, .quick-knob-pulse { animation: none !important; }
+          .quick-bolt-draw { animation: none !important; }
         }
       `}</style>
     </>

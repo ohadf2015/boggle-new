@@ -1519,6 +1519,7 @@ const en = {
     "roomClosedJoinAnother": "This room has ended. Join another room below!",
     "roomNotFoundJoinAnother": "Room not found — it may have ended. Browse rooms below!",
     "usernameTaken": "Someone beat you to it! Try another name",
+    "tooManyAttempts": "Whoa, too fast! Give it a second, then tap again",
     "gameCodeExists": "That code's taken. Pick a new one!",
     "somethingWentWrong": "Quick Timeout!",
     "unexpectedError": "Tiny hiccup - but your game's totally safe!",
@@ -7876,6 +7877,13 @@ const en = {
       "play": "PLAY",
       "subCaption": "60-second round · no bots · you vs the perfect score",
       "loading": "Building your board…",
+      "blurb": {
+        "classic": "Trace words through the letter grid. The longer the chain, the bigger the score.",
+        "blast": "Chain letters to blow up tiles. Clear the board before the clock clears you.",
+        "word-hunt": "One word is hidden in the grid. Find it — and everything else on the way.",
+        "wheel-rush": "Every word has to use the centre letter. Spin the ring to find more.",
+        "random": "Let the wheel decide. 60 seconds, no bots, you against the perfect score."
+      },
       "mode": {
         "classic": "Classic",
         "blast": "Blast",
@@ -13687,6 +13695,7 @@ const en = {
     "winnerLabel": "{{name}} wins!",
     "youWon": "You won! 🏆",
     "opponentWon": "{name} won",
+    "closeGame": "So close!",
     "playAgain": "Play again",
     "home": "Home",
     "finalTiles": "Final tiles!",

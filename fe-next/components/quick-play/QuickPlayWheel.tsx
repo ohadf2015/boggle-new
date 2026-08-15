@@ -10,9 +10,8 @@
  * electric lightning bolt hub→mode, shockwave rings, then board fetch hold
  * before gameplay mounts (so the transition never feels instant).
  */
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
-import Image from 'next/image';
-import { Shuffle, Sparkles, Zap } from 'lucide-react';
+import { useRef, useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
+import { Shuffle, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics/HapticsManager';
@@ -27,13 +26,7 @@ import { QuickPlayStrikeFx } from './QuickPlayStrikeFx';
 import { QuickPlayTetherFx } from './QuickPlayTetherFx';
 import { QUICK_MODES, type QuickMode } from './types';
 import { NODE_COLORS } from './modeColors';
-
-const MODE_ICON_SRC: Record<QuickMode, string> = {
-  classic: '/modes/quickplay-icons/classic-v2.webp',
-  blast: '/modes/quickplay-icons/blast-v2.webp',
-  'word-hunt': '/modes/quickplay-icons/hunt.webp',
-  'wheel-rush': '/modes/quickplay-icons/wheel.webp',
-};
+import { ModeGlyph } from './ModeGlyph';
 
 interface QuickPlayWheelProps {
   selection: WheelSelection;
@@ -69,6 +62,13 @@ const CAPTION_RESERVE = 132;
  * it fills a tall phone or a wide TV instead of capping at a small 376 disc.
  * Observes the wheel root's parent cell; falls back to the viewport pre-mount.
  */
+/**
+ * Bottom chrome (tab bar + page padding) the stage must stay clear of. The
+ * viewport clamp below is measured from the top of the wheel, so this is the
+ * only part of the page it cannot see.
+ */
+const BOTTOM_CHROME = 92;
+
 function useWheelLayout(hostRef: React.RefObject<HTMLElement | null>): WheelLayout {
   const [avail, setAvail] = useState(376);
   useEffect(() => {
@@ -78,16 +78,31 @@ function useWheelLayout(hostRef: React.RefObject<HTMLElement | null>): WheelLayo
       const w = rect?.width || (typeof window !== 'undefined' ? window.innerWidth : 376);
       const h =
         rect?.height || (typeof window !== 'undefined' ? window.innerHeight : 640);
+      // The parent's own height is NOT a safe ceiling: this cell grows to fit
+      // the stage, so sizing off it is circular and let the wheel push the
+      // caption cluster (the only thing that says what a mode IS) below the
+      // fold. Clamp against the viewport from the wheel's own top edge, which
+      // only depends on the header above it.
+      const top = rect?.top ?? 0;
+      const viewportRoom =
+        typeof window !== 'undefined'
+          ? window.innerHeight - top - CAPTION_RESERVE - BOTTOM_CHROME
+          : Infinity;
       // Leave gutters on width and room for the caption cluster on height.
-      setAvail(Math.max(280, Math.min(w - 24, h - CAPTION_RESERVE)));
+      setAvail(Math.max(280, Math.min(w - 24, h - CAPTION_RESERVE, viewportRoom)));
     };
     measure();
+    // Always listen for resize too: the clamp above reads viewport HEIGHT, and
+    // a height-only viewport change never resizes the parent box.
+    window.addEventListener('resize', measure);
     if (host && typeof ResizeObserver !== 'undefined') {
       const ro = new ResizeObserver(measure);
       ro.observe(host);
-      return () => ro.disconnect();
+      return () => {
+        ro.disconnect();
+        window.removeEventListener('resize', measure);
+      };
     }
-    window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [hostRef]);
   return useMemo(() => scaleWheelLayout(avail), [avail]);
@@ -224,7 +239,9 @@ export function QuickPlayWheel({
   return (
     <div
       ref={rootRef}
-      className="flex h-full w-full flex-col items-center justify-center gap-5 bg-neo-navy sm:gap-6"
+      /* No background fill here — the hub paints its atmosphere blobs behind
+         this cell, and an opaque one covered them with a hard-edged rectangle. */
+      className="flex h-full w-full flex-col items-center justify-center gap-4 sm:gap-5"
       data-testid="quick-play-wheel"
       data-wheel-scale={layout.scale.toFixed(3)}
       data-loading={isLoading ? 'true' : 'false'}
@@ -239,10 +256,18 @@ export function QuickPlayWheel({
         <div
           aria-hidden
           data-testid="quick-wheel-ambient"
-          className={`pointer-events-none absolute inset-[4%] rounded-full transition-[background] duration-500 ${
-            !reduceMotion && !strikeMode ? 'animate-pulse' : ''
+          className={`pointer-events-none absolute inset-[4%] rounded-full transition-[background] ${
+            !reduceMotion && !strikeMode ? 'quick-wheel-breathe' : ''
           }`}
-          style={{ background: `radial-gradient(circle at 50% 42%, ${activeHex}33 0%, transparent 62%)` }}
+          style={{
+            background: `radial-gradient(circle at 50% 42%, ${activeHex}33 0%, transparent 62%)`,
+            transitionDuration: '500ms',
+            // Tailwind v4's `duration-*` sets animation-duration as well as
+            // transition-duration. `duration-500` on this element is what made
+            // the old ambient `animate-pulse` run at 0.5s — a strobe, not a
+            // glow. Keep the transition timing off the class list entirely.
+            animationDuration: '6.5s',
+          }}
         />
         {/* Arcade bezel — layered dark rim with real depth (drop + inset). */}
         <div
@@ -308,12 +333,20 @@ export function QuickPlayWheel({
               type="button"
               data-testid={`quick-wheel-node-${mode}`}
               onClick={() => commit(mode, 'tap')}
+              // Pointing at a mode re-themes the whole wheel and swaps the
+              // blurb, so a desktop player learns what each mode is by moving
+              // the mouse. Previously `hovered` only ever moved during a knob
+              // drag, which touch can do and a mouse basically never does.
+              onMouseEnter={() => !locked && setHovered(mode)}
+              onMouseLeave={() => !locked && setHovered((h) => (h === mode ? null : h))}
+              onFocus={() => !locked && setHovered(mode)}
+              onBlur={() => !locked && setHovered((h) => (h === mode ? null : h))}
               disabled={locked}
               aria-label={t(`quickPlay.solo.mode.${mode}`)}
               aria-pressed={isActive}
               className={`absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 touch-manipulation disabled:cursor-wait ${
                 entered && !reduceMotion && !strikeMode ? 'animate-neo-pop' : ''
-              } ${isActive || isStrike ? 'z-10' : ''} ${isStrike && !reduceMotion ? 'quick-node-zap' : ''}`}
+              } ${isActive || isStrike ? 'z-10' : ''}`}
               style={{
                 width: node,
                 height: node,
@@ -328,11 +361,21 @@ export function QuickPlayWheel({
               <span
                 className={`flex h-full w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-2xl border-neo-thick border-black font-neo-display font-bold text-black ${
                   isActive || isStrike ? `ring-4 ${NODE_COLORS[mode].ring}` : ''
-                } ${NODE_COLORS[mode].bg} ${isStrike ? 'brightness-110' : ''} ${
-                  locked && !isStrike ? 'opacity-45' : ''
+                } ${NODE_COLORS[mode].bg} ${locked && !isStrike ? 'opacity-45' : ''} ${
+                  // Idle float and the strike zap both live on the FACE, never
+                  // on the button: the button owns the centering `translate`,
+                  // and the float animates that same property.
+                  reduceMotion
+                    ? ''
+                    : isStrike
+                      ? 'quick-node-zap'
+                      : locked
+                        ? ''
+                        : 'quick-node-float'
                 }`}
                 data-testid={`quick-wheel-node-face-${mode}`}
                 style={{
+                  animationDelay: reduceMotion || isStrike ? undefined : `${idx * 620}ms`,
                   // Chunky beveled arcade keycap: top highlight + bottom shade
                   // (inset) + a solid drop that lifts on the active node.
                   boxShadow:
@@ -341,21 +384,10 @@ export function QuickPlayWheel({
                       : '0 5px 0 rgba(0,0,0,0.7), inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -4px 0 rgba(0,0,0,0.22)',
                 }}
               >
-                <span
-                  className="relative flex items-center justify-center rounded-xl border-2 border-black/20 bg-white/25"
-                  style={{ width: iconPx + 10, height: iconPx + 10 }}
-                >
-                  <Image
-                    src={MODE_ICON_SRC[mode]}
-                    alt=""
-                    aria-hidden
-                    className="object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.4)]"
-                    width={iconPx}
-                    height={iconPx}
-                    style={{ width: iconPx, height: iconPx }}
-                    priority={idx < 2}
-                  />
-                </span>
+                {/* Black ink straight on the accent keycap — the palette rule
+                    for every accent fill in this system. The old raster icons
+                    needed a white plate to survive; a drawn glyph does not. */}
+                <ModeGlyph mode={mode} size={iconPx} />
                 <span
                   className="max-w-[92%] truncate px-0.5 text-center leading-tight"
                   style={{ fontSize: Math.max(10, Math.round(11 * layout.scale)) }}
@@ -392,44 +424,40 @@ export function QuickPlayWheel({
         >
           <span
             className={`relative flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-full border-4 border-black text-neo-cream ring-[3px] ring-inset ${
-              strikeMode ? 'ring-neo-yellow' : 'ring-neo-cozy'
-            } ${entered && !reduceMotion && !strikeMode ? 'animate-neo-pop' : ''} ${
-              strikeMode && !reduceMotion ? 'quick-knob-pulse' : ''
-            }`}
+              entered && !reduceMotion && !strikeMode ? 'animate-neo-pop' : ''
+            } ${strikeMode && !reduceMotion ? 'quick-knob-pulse' : ''}`}
             style={{
-              // Tactile joystick knob: domed radial fill + raised bevel.
-              background: 'radial-gradient(circle at 50% 34%, #33335a, #1a1a30 70%)',
-              boxShadow: '0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.22)',
+              // Tactile joystick knob: domed radial fill + raised bevel. The
+              // rim and halo carry the ACTIVE mode's color, so dragging toward
+              // a node re-themes the control in your hand — that live response
+              // is the interaction, not decoration.
+              background: `radial-gradient(circle at 50% 32%, ${activeHex}2e, #23233f 46%, #14142a 78%)`,
+              boxShadow: `0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.22), 0 0 22px ${activeHex}59`,
+              // Tailwind can't take a runtime ring color; drive it off the same hex.
+              '--tw-ring-color': `${activeHex}d9`,
               animationDelay: reduceMotion || strikeMode ? undefined : '360ms',
               animationFillMode: 'both',
-            }}
+            } as CSSProperties}
           >
             {/* Grip ring — reads as a physical, draggable knob. */}
             <span aria-hidden className="pointer-events-none absolute inset-[14%] rounded-full border-2 border-dashed border-white/15" />
             {isLoading ? (
               <Zap
-                className={`text-neo-yellow ${!reduceMotion ? 'animate-pulse' : ''}`}
-                style={{ width: layout.iconSize * 0.75, height: layout.iconSize * 0.75 }}
+                className="text-neo-yellow"
+                style={{ width: layout.iconSize * 0.8, height: layout.iconSize * 0.8 }}
                 aria-hidden
               />
             ) : (
-              <>
-                <Sparkles
-                  className={`text-neo-cozy ${selection === 'random' && !reduceMotion ? 'animate-pulse' : ''}`}
-                  style={{ width: layout.iconSize * 0.55, height: layout.iconSize * 0.55 }}
-                  aria-hidden
-                />
-                <Shuffle
-                  className={selection === 'random' && !reduceMotion ? 'animate-pulse' : ''}
-                  style={{ width: layout.iconSize * 0.7, height: layout.iconSize * 0.7 }}
-                />
-              </>
+              <Shuffle
+                style={{ width: layout.iconSize * 0.82, height: layout.iconSize * 0.82, color: activeHex }}
+              />
             )}
             <span
-              className={`font-neo-display font-semibold tracking-wide ${
-                isLoading ? 'text-neo-yellow' : 'text-neo-cozy'
-              } ${selection === 'random' && !isLoading && !reduceMotion ? 'animate-pulse' : ''}`}
-              style={{ fontSize: Math.max(9, Math.round(11 * layout.scale)) }}
+              className="font-neo-display font-bold uppercase tracking-wide"
+              style={{
+                fontSize: Math.max(9, Math.round(11 * layout.scale)),
+                color: isLoading ? '#FFE135' : activeHex,
+              }}
             >
               {isLoading
                 ? t('quickPlay.solo.loading')
@@ -460,23 +488,32 @@ export function QuickPlayWheel({
             </>
           ) : null}
         </p>
-      ) : (
-        <p className="px-4 text-center text-sm text-neo-white/55">{t('quickPlay.solo.dragHint')}</p>
-      )}
+      ) : null}
 
-      <div className="flex w-full flex-col items-center gap-2 px-5 sm:gap-3">
-        <p className="flex items-center justify-center gap-2.5 font-neo-display text-[15px] text-neo-cream">
+      {/* Caption cluster. Was three near-identical grey lines with no
+          hierarchy; now name → what you'll do → how to pick. The blurb is the
+          point: most arrivals have never played any of these four modes, and
+          the picker previously named them without ever saying what they are. */}
+      <div className="flex w-full flex-col items-center gap-1.5 px-5">
+        <p
+          className="flex items-center justify-center gap-2.5 font-neo-display text-lg font-bold tracking-wide sm:text-xl"
+          style={{ color: activeHex }}
+        >
           <span
             aria-hidden
-            className={`h-3.5 w-3.5 rounded border-2 border-black ${active !== 'random' ? NODE_COLORS[active].bg : 'bg-neo-cozy'}`}
+            className="h-3.5 w-3.5 rounded-sm border-2 border-black"
+            style={{ background: activeHex }}
           />
-          {t('quickPlay.solo.selected')}{' '}
-          <b className={active !== 'random' ? NODE_COLORS[active].text : 'text-neo-cozy'}>
-            {t(active === 'random' ? 'quickPlay.solo.random' : `quickPlay.solo.mode.${active}`)}
-          </b>
+          {t(active === 'random' ? 'quickPlay.solo.random' : `quickPlay.solo.mode.${active}`)}
+        </p>
+        <p
+          data-testid="quick-mode-blurb"
+          className="min-h-[2.6em] max-w-[44ch] text-balance text-center text-sm leading-snug text-neo-cream/85"
+        >
+          {t(`quickPlay.solo.blurb.${active}`)}
         </p>
         {!isLoading && (
-          <p className="text-xs text-neo-white/50">{t('quickPlay.solo.subCaption')}</p>
+          <p className="text-center text-xs text-neo-white/45">{t('quickPlay.solo.dragHint')}</p>
         )}
       </div>
     </div>

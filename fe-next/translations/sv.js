@@ -2209,6 +2209,7 @@ const sv = {
     "loadFailed": "Gick inte att ladda. Försök igen!",
     "gameCodeNotExist": "Koden hittades inte. Kolla och försök!",
     "usernameTaken": "Någon var snabbare! Prova annat namn",
+    "tooManyAttempts": "För snabbt! Vänta en sekund och försök igen",
     "gameCodeExists": "Den koden är upptagen. Välj en ny!",
     "somethingWentWrong": "Snabb Paus!",
     "unexpectedError": "Liten bugg - men ditt spel är helt säkert!",
@@ -9445,6 +9446,13 @@ const sv = {
       "play": "SPELA",
       "subCaption": "60 sekunder · inga bottar · du mot det perfekta resultatet",
       "loading": "Bygger din bräda…",
+      "blurb": {
+        "classic": "Dra streck mellan bokstäverna och bygg ord. Längre ord ger mer poäng.",
+        "blast": "Kedja ihop bokstäver och spräng brickor. Rensa brädet innan tiden rensar dig.",
+        "word-hunt": "Ett ord gömmer sig i rutnätet. Hitta det – och allt annat på vägen.",
+        "wheel-rush": "Varje ord måste innehålla mittbokstaven. Snurra ringen och hitta fler.",
+        "random": "Låt hjulet bestämma. 60 sekunder, inga bottar, du mot full pott."
+      },
       "mode": {
         "classic": "Klassiskt",
         "blast": "Blast",
@@ -15212,6 +15220,7 @@ const sv = {
     "winnerLabel": "{{name}} vinner!",
     "youWon": "Du vann! 🏆",
     "opponentWon": "{name} vann",
+    "closeGame": "Jämnt!",
     "playAgain": "Spela igen",
     "home": "Hem",
     "finalTiles": "Sista brickorna!",

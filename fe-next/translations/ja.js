@@ -1922,6 +1922,7 @@ const ja = {
     "roomClosed": "ルーム閉鎖 - 新しいの作ろう",
     "gameCodeNotExist": "コードが見つからない。確認して！",
     "usernameTaken": "先を越された！別の名前で",
+    "tooManyAttempts": "連打しすぎ！少し待ってからもう一度どうぞ",
     "gameCodeExists": "そのコードは使用中！新しいのを選んで",
     "somethingWentWrong": "ちょっと休憩！",
     "unexpectedError": "小さなトラブル - でもゲームは安全だよ！",
@@ -8497,6 +8498,13 @@ const ja = {
       "play": "プレイ",
       "subCaption": "60秒ラウンド・ボットなし・パーフェクトに挑戦",
       "loading": "ボードを準備中…",
+      "blurb": {
+        "classic": "文字をなぞって単語をつくろう。長くつなぐほど高得点。",
+        "blast": "文字をつないでタイルを破壊。時間切れになる前に盤面を空に。",
+        "word-hunt": "盤面のどこかに単語がひとつ。それを見つけ、ついでに周りも拾おう。",
+        "wheel-rush": "どの単語にも中央の文字が必要。リングを回してもっと探そう。",
+        "random": "ホイールにおまかせ。60秒、ボットなし、満点との勝負。"
+      },
       "mode": {
         "classic": "クラシック",
         "blast": "ブラスト",
@@ -14927,6 +14935,7 @@ const ja = {
     "winnerLabel": "{{name}}の勝ち!",
     "youWon": "勝利！🏆",
     "opponentWon": "{name} の勝ち",
+    "closeGame": "惜しい！",
     "playAgain": "もう一度",
     "home": "ホーム",
     "finalTiles": "最後のタイル!",
