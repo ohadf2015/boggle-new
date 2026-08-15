@@ -253,10 +253,10 @@ describe('OnboardingFlow', () => {
     expect(screen.queryByTestId('style-select-step')).not.toBeInTheDocument();
   });
 
-  it('navigates straight into a practice game from the play button', () => {
+  it('navigates straight into a real auto-started game from the play button', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
-    expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
+    expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=bots');
   });
 
   it('calls onComplete after play', () => {
@@ -349,11 +349,11 @@ describe('OnboardingFlow', () => {
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
-    it('redirects to the practice game on play when no pending invite', () => {
+    it('redirects to the real game on play when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
-      expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
+      expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?autoStart=bots');
     });
   });
 

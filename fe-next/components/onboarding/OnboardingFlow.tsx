@@ -33,6 +33,7 @@ import CrazyGamesWelcome, { type CrazyGamesMode } from './CrazyGamesWelcome';
 import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 
 
 interface OnboardingFlowProps {
@@ -216,7 +217,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     markOnboardingSkipped();
     emitSkipped(step);
     trackOnboardingQuickPlay({ source: 'ftue_skip', at_step: step });
-    router.push(`/${language}/practice/classic?play=1&firstGame=1`);
+    router.push(firstGameRoute(language));
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
@@ -299,7 +300,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       // 🎯 Route FTUE completers straight into a practice game — eliminates
       // the 2-tap dead zone between onboarding and first play.
       trackOnboardingQuickPlay({ source: 'style_complete' });
-      router.push(`/${language}/practice/classic?play=1&firstGame=1`);
+      router.push(firstGameRoute(language));
     }
     emitCompleted({ via: 'style' });
     onComplete();
@@ -334,7 +335,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       router.push(
         pendingRoom
           ? `/${language}/multiplayer?room=${pendingRoom}`
-          : `/${language}/practice/classic?play=1`,
+          : firstGameRoute(language),
       );
       if (!pendingRoom) trackOnboardingQuickPlay({ source: 'quick_start' });
       emitCompleted({ via: 'quick_start' });

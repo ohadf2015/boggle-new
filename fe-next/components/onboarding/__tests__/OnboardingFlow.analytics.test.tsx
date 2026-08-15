@@ -213,7 +213,7 @@ describe('OnboardingFlow analytics', () => {
   // D1-retention lever: every FTUE exit that lands in an auto-started
   // practice game must fire onboarding_quick_play so the lift is measurable
   // against the return-visit funnel.
-  it('fires onboarding_quick_play (source=quick_start) when the one-screen PLAY starts a practice game', () => {
+  it('fires onboarding_quick_play (source=quick_start) when the one-screen PLAY starts a real game', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     advanceToQuickStart();
     play();
