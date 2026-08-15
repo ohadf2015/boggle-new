@@ -6,6 +6,7 @@
 import { createClient } from '@/utils/supabase/client';
 import logger from '@/utils/logger';
 import { shouldWriteOnlineStatus } from './onlineStatusThrottle';
+import { PUBLIC_PROFILES_TABLE, PUBLIC_PROFILE_COLUMNS } from './publicProfiles';
 import {
   isUserOnline,
   type FriendStatus,
@@ -25,8 +26,8 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
   if (!user || query.length < 2) return [];
 
   const { data: profiles, error } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config, total_games, current_level, last_seen_at')
+    .from(PUBLIC_PROFILES_TABLE)
+    .select(PUBLIC_PROFILE_COLUMNS)
     .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
     .neq('id', user.id)
     .limit(limit);
@@ -95,7 +96,7 @@ export async function getHeadToHead(opponentId: string): Promise<HeadToHeadRecor
   }
 
   const { data: opponent } = await supabase
-    .from('profiles')
+    .from(PUBLIC_PROFILES_TABLE)
     .select('username, avatar_emoji, avatar_color')
     .eq('id', opponentId)
     .single();
@@ -163,7 +164,7 @@ export async function getAllHeadToHead(): Promise<HeadToHeadRecord[]> {
   if (opponentIds.length === 0) return [];
 
   const { data: profiles } = await supabase
-    .from('profiles')
+    .from(PUBLIC_PROFILES_TABLE)
     .select('id, username, avatar_emoji, avatar_color')
     .in('id', opponentIds);
 
@@ -342,8 +343,8 @@ export async function getUserByUsername(username: string): Promise<Friend | null
   const supabase = createClient();
 
   const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config, total_games, current_level, last_seen_at')
+    .from(PUBLIC_PROFILES_TABLE)
+    .select(PUBLIC_PROFILE_COLUMNS)
     .eq('username', username)
     .single();
 

@@ -9,6 +9,11 @@
 import { createClient } from '@/utils/supabase/client';
 import logger from '@/utils/logger';
 import {
+  fetchPublicProfiles,
+  PUBLIC_PROFILES_TABLE,
+  PUBLIC_PROFILE_COLUMNS,
+} from './publicProfiles';
+import {
   isUserOnline,
   type FriendStatus,
   type FriendshipRow,
@@ -239,13 +244,13 @@ export async function getBlockedUsers(): Promise<Friend[]> {
   const blockedIds = blocked.map((b: { friend_id: string }) => b.friend_id);
 
   const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config')
+    .from(PUBLIC_PROFILES_TABLE)
+    .select(PUBLIC_PROFILE_COLUMNS)
     .in('id', blockedIds);
 
   if (!profiles) return [];
 
-  return profiles.map((p: ProfileRow) => ({
+  return (profiles as ProfileRow[]).map((p: ProfileRow) => ({
     id: p.id,
     odUserId: p.id,
     username: p.username || 'Unknown',
@@ -292,8 +297,8 @@ export async function getFriends(userId?: string): Promise<Friend[]> {
   if (friendIds.length === 0) return [];
 
   const { data: profiles, error: profileError } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, avatar_config, total_games, ranked_mmr, current_level, last_seen_at')
+    .from(PUBLIC_PROFILES_TABLE)
+    .select(PUBLIC_PROFILE_COLUMNS)
     .in('id', friendIds);
 
   if (profileError || !profiles) {
@@ -330,21 +335,12 @@ export async function getPendingRequests(userId?: string): Promise<FriendRequest
   const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
   if (!uid) return [];
 
+  // Two round-trips, not a PostgREST embed: an embed resolves through a foreign
+  // key, and the sender's name now comes from the `public_profiles` VIEW, which
+  // has none. See ./publicProfiles.ts for why `profiles` can't be read directly.
   const { data: requests, error } = await supabase
     .from('friends')
-    .select(`
-      id,
-      user_id,
-      created_at,
-      profiles!friends_user_id_fkey (
-        username,
-        display_name,
-        avatar_image,
-        avatar_emoji,
-        avatar_color,
-        avatar_config
-      )
-    `)
+    .select('id, user_id, created_at')
     .eq('friend_id', uid)
     .eq('status', 'pending');
 
@@ -353,21 +349,16 @@ export async function getPendingRequests(userId?: string): Promise<FriendRequest
     return [];
   }
 
-  interface RequestWithProfile {
+  interface RequestRow {
     id: string;
     user_id: string;
     created_at: string;
-    profiles: Array<{
-      username: string;
-      display_name?: string;
-      avatar_image?: string;
-      avatar_emoji?: string;
-      avatar_color?: string;
-      avatar_config?: Record<string, unknown>;
-    }>;
   }
-  return (requests as unknown as RequestWithProfile[]).map((r: RequestWithProfile) => {
-    const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+  const rows = requests as RequestRow[];
+  const profiles = await fetchPublicProfiles(supabase, rows.map((r) => r.user_id));
+
+  return rows.map((r: RequestRow) => {
+    const profile = profiles.get(r.user_id);
     return {
       id: r.id,
       fromUserId: r.user_id,
@@ -418,21 +409,10 @@ export async function getOutgoingRequests(userId?: string): Promise<FriendReques
   const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
   if (!uid) return [];
 
+  // Two round-trips rather than an embed — same reason as getPendingRequests.
   const { data: requests, error } = await supabase
     .from('friends')
-    .select(`
-      id,
-      friend_id,
-      created_at,
-      profiles!friends_friend_id_fkey (
-        username,
-        display_name,
-        avatar_image,
-        avatar_emoji,
-        avatar_color,
-        avatar_config
-      )
-    `)
+    .select('id, friend_id, created_at')
     .eq('user_id', uid)
     .eq('status', 'pending');
 
@@ -441,21 +421,16 @@ export async function getOutgoingRequests(userId?: string): Promise<FriendReques
     return [];
   }
 
-  interface OutgoingRequestWithProfile {
+  interface OutgoingRequestRow {
     id: string;
     friend_id: string;
     created_at: string;
-    profiles: Array<{
-      username: string;
-      display_name?: string;
-      avatar_image?: string;
-      avatar_emoji?: string;
-      avatar_color?: string;
-      avatar_config?: Record<string, unknown>;
-    }>;
   }
-  return (requests as unknown as OutgoingRequestWithProfile[]).map((r: OutgoingRequestWithProfile) => {
-    const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+  const rows = requests as OutgoingRequestRow[];
+  const profiles = await fetchPublicProfiles(supabase, rows.map((r) => r.friend_id));
+
+  return rows.map((r: OutgoingRequestRow) => {
+    const profile = profiles.get(r.friend_id);
     return {
       id: r.id,
       fromUserId: r.friend_id,

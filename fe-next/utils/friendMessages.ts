@@ -6,6 +6,7 @@
 import { createClient } from '@/utils/supabase/client';
 import type { Message, MessageThread, Challenge, FriendThreadRow } from '@/shared/types/friends';
 import logger from '@/utils/logger';
+import { PUBLIC_PROFILES_TABLE } from '@/utils/publicProfiles';
 
 /**
  * Send a message to a friend
@@ -545,7 +546,7 @@ export async function getPendingChallenges(userId?: string): Promise<{ sent: Cha
     const received: Challenge[] = await Promise.all(
       (receivedData || []).map(async (c) => {
         const { data: profile } = await supabase
-          .from('profiles')
+          .from(PUBLIC_PROFILES_TABLE)
           .select('username, display_name, avatar_emoji, avatar_color, avatar_image')
           .eq('id', c.challenger_id)
           .single();
@@ -579,7 +580,7 @@ export async function getPendingChallenges(userId?: string): Promise<{ sent: Cha
     const sent: Challenge[] = await Promise.all(
       (sentData || []).map(async (c) => {
         const { data: profile } = await supabase
-          .from('profiles')
+          .from(PUBLIC_PROFILES_TABLE)
           .select('username, display_name, avatar_emoji, avatar_color, avatar_image')
           .eq('id', c.challenged_id)
           .single();
