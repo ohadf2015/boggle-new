@@ -192,8 +192,52 @@ describe('QuickPlayModePicker', () => {
     expect(new Set(classNames).size).toBe(4);
   });
 
-  it('all four mode cards have distinct sizes (glyph size or card scale)', () => {
-    const { container } = render(
+  // Hierarchy is TWO roles — one hero plus three interchangeable siblings — not
+  // four bespoke sizes. Four different glyph/title/blurb scales (the previous
+  // contract) read as a broken layout rather than as an intentional emphasis.
+  it('the three sibling cards share one size spec', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    const siblings: QuickMode[] = ['blast', 'word-hunt', 'wheel-rush'];
+    const specs = siblings.map((mode) => {
+      const button = screen.getByTestId(`mode-card-${mode}`);
+      const svg = button.querySelector('svg');
+      return [
+        svg?.getAttribute('class') ?? '',
+        button.querySelector('h3')?.className ?? '',
+        button.querySelector('p')?.className ?? '',
+      ].join('|');
+    });
+    expect(new Set(specs).size).toBe(1);
+  });
+
+  it('the hero card outranks its siblings on glyph and title scale', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    const hero = screen.getByTestId('mode-card-classic');
+    const sibling = screen.getByTestId('mode-card-blast');
+    // The step up is a responsive escalation, so it shows as extra `lg:` classes
+    // on the hero rather than a different base size.
+    expect(hero.querySelector('svg')?.getAttribute('class')).toMatch(/lg:[hw]-/);
+    expect(hero.querySelector('h3')?.className).toMatch(/lg:text-/);
+    expect(sibling.querySelector('svg')?.getAttribute('class')).not.toMatch(/lg:[hw]-/);
+    // …and as a bigger grid footprint at the widest breakpoint.
+    expect(hero.className).toContain('lg:col-span-2');
+    expect(hero.className).toContain('lg:row-span-2');
+  });
+
+  it('every mode card constrains its blurb measure and cannot be squeezed by the grid', () => {
+    render(
       <QuickPlayModePicker
         selection="random"
         pendingMode={null}
@@ -201,14 +245,12 @@ describe('QuickPlayModePicker', () => {
       />
     );
     const modes: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
-    const glyphSizes = modes.map((mode) => {
-      // Find the SVG glyph inside each card's button
-      const button = screen.getByRole('button', { name: new RegExp(mode, 'i') });
-      const svg = button.querySelector('svg');
-      return svg?.getAttribute('width') ?? '0';
-    });
-    // All four glyphs should have different rendered sizes
-    expect(new Set(glyphSizes).size).toBe(4);
+    for (const mode of modes) {
+      const button = screen.getByTestId(`mode-card-${mode}`);
+      // Grid items default to min-width:auto and can overflow their track.
+      expect(button.className).toContain('min-w-0');
+      expect(button.querySelector('p')?.className).toMatch(/max-w-\[\d+ch\]/);
+    }
   });
 
   it('entrance animation runs with prefers-reduced-motion fallback', () => {
@@ -278,7 +320,11 @@ describe('QuickPlayModePicker', () => {
     expect(blastButton.getAttribute('aria-current')).toBe('true');
   });
 
-  it('reserves bottom band space so push notifications cannot cover Random button', () => {
+  // An aria-label REPLACES an element's content for assistive tech, so the old
+  // aria-label={mode name} announced the card WITHOUT its promise line. These
+  // assert the labelledby/describedby wiring actually resolves — a dangling id
+  // yields an empty name/description and fails here.
+  it('announces both the mode name and its promise', () => {
     render(
       <QuickPlayModePicker
         selection="random"
@@ -286,10 +332,28 @@ describe('QuickPlayModePicker', () => {
         onSelect={handlePlay}
       />
     );
-    const spacer = screen.getByTestId('quick-picker-bottom-spacer');
-    expect(spacer).toBeTruthy();
-    expect(spacer.getAttribute('aria-hidden')).toBe('true');
-    // Verify the spacer has the calculated height class for notification + banner reservation
-    expect(spacer.className).toContain('h-[calc(5rem+var(--admob-banner-height,0px)+1.5rem)]');
+    for (const mode of ['classic', 'blast', 'word-hunt', 'wheel-rush'] as QuickMode[]) {
+      const card = screen.getByTestId(`mode-card-${mode}`);
+      expect(card).toHaveAccessibleName(`quickPlay.solo.mode.${mode}`);
+      expect(card).toHaveAccessibleDescription(`quickPlay.solo.blurb.${mode}`);
+    }
+    const random = screen.getByTestId('random-button');
+    expect(random).toHaveAccessibleName('quickPlay.solo.random');
+    expect(random).toHaveAccessibleDescription('quickPlay.solo.blurb.random');
+  });
+
+  // The bottom band reservation lives in QuickPlayHub, NOT here. The hub centres
+  // this column vertically, so a trailing spacer inside it is centred along with
+  // the cards and shunts them upward by half its height — which is what put the
+  // dead band above the grid. QuickPlayHub.test.tsx owns the reservation test.
+  it('does not carry the bottom band reservation itself', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    expect(screen.queryByTestId('quick-picker-bottom-spacer')).toBeNull();
   });
 });

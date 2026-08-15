@@ -3,18 +3,27 @@
 /**
  * Quick Play Mode Picker — card-based mode selection
  *
- * Four cards with distinct styling (size, weight, layout asymmetry) let players
- * choose their mode at a glance. Each card carries a complete one-line promise
- * so first-timers know what they're getting before committing. Random is secondary.
+ * Four colour-coded keycaps let players choose a mode at a glance. Each carries
+ * a one-line promise so first-timers know what they're getting. Random is a
+ * secondary bar under the grid, not a fifth peer.
  *
- * Layout:
- * - Mobile (< md): 2-column grid, uniform heights, full-height promises visible
- * - Desktop (md+): 3-column grid, Classic spans 2 rows (tall hero), others regular
+ * Hierarchy is TWO roles, not four. The previous version gave every mode its own
+ * glyph size (56/44/40/36), its own title scale and its own blurb scale; four
+ * bespoke scales sitting side by side read as a broken layout, not as emphasis.
+ * Now: one hero (Classic — the lime "start here" token) plus three sibling cards
+ * sharing a single spec, and the hero earns its rank through grid footprint and
+ * one responsive step-up at `lg`.
+ *
+ * Layout (both topologies tile exactly — no orphan cell at any width):
+ * - < lg: 2×2, four equal cards. No room for a hero; colour carries the ranking.
+ * - lg+: 4×2. Classic 2×2 hero, Blast/Hunt 1×1, Wheel 2×1 across the bottom.
+ *   The 4-column grid starts at `lg`, not `md`: at 768px four tracks are ~170px
+ *   and an 80-character promise ragged-wraps to five lines in a 13ch measure.
  *
  * CRITICAL: All text on accent fills is BLACK (text-black) for WCAG contrast.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ModeGlyph } from './ModeGlyph';
 import { NODE_COLORS } from './modeColors';
@@ -23,33 +32,29 @@ import type { WheelSelection } from './wheelGeometry';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 
-// Desktop layout: Classic tall on left (2x2), Blast/Hunt stack right (1x2 each), Wheel spans bottom.
-// Mobile: 2-column, uniform height for full-text promises.
-const CARD_SIZES: Record<QuickMode, { glyph: number; titleScale: string; blurbScale: string; gridClass: string }> = {
-  classic: {
-    glyph: 56,
-    titleScale: 'text-lg sm:text-xl',
-    blurbScale: 'text-sm sm:text-base',
-    gridClass: 'md:col-span-2 md:row-span-2'
-  },
-  blast: {
-    glyph: 40,
-    titleScale: 'text-base sm:text-lg',
-    blurbScale: 'text-xs sm:text-sm',
-    gridClass: 'md:col-span-1 md:row-span-1'
-  },
-  'word-hunt': {
-    glyph: 36,
-    titleScale: 'text-sm sm:text-base',
-    blurbScale: 'text-xs',
-    gridClass: 'md:col-span-1 md:row-span-1'
-  },
-  'wheel-rush': {
-    glyph: 44,
-    titleScale: 'text-base sm:text-lg',
-    blurbScale: 'text-xs sm:text-sm',
-    gridClass: 'md:col-span-2 md:row-span-1'
-  },
+/** The one card that outranks the others. Everything else shares SIBLING_SPEC. */
+const HERO: QuickMode = 'classic';
+
+const SIBLING_SPEC = {
+  glyph: 'h-9 w-9 sm:h-10 sm:w-10',
+  title: 'text-base sm:text-lg',
+  blurb: 'text-[11px] sm:text-sm',
+} as const;
+
+// The hero owns a cell twice as tall as a sibling's, so it needs mass to match:
+// at `lg` the same 40px glyph and 18px title left ~180px of empty colour field
+// in the middle of the card and it read as unfinished, not as emphasis.
+const HERO_SPEC = {
+  glyph: `${SIBLING_SPEC.glyph} lg:h-24 lg:w-24`,
+  title: `${SIBLING_SPEC.title} lg:text-4xl`,
+  blurb: `${SIBLING_SPEC.blurb} lg:text-lg`,
+} as const;
+
+const GRID_SPANS: Record<QuickMode, string> = {
+  classic: 'lg:col-span-2 lg:row-span-2',
+  blast: '',
+  'word-hunt': '',
+  'wheel-rush': 'lg:col-span-2',
 };
 
 interface QuickPlayModePickerProps {
@@ -64,6 +69,10 @@ export function QuickPlayModePicker({
   onSelect,
 }: QuickPlayModePickerProps) {
   const { t } = useLanguage();
+  // Scope the label/description ids to this instance — hardcoded ids would make
+  // aria-labelledby resolve to the first match in document order if the picker
+  // ever mounted twice (or collided with another component's ids).
+  const uid = useId();
   const [focusedIndex, setFocusedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const isLoading = pendingMode !== null;
@@ -113,16 +122,15 @@ export function QuickPlayModePicker({
   return (
     <div
       ref={containerRef}
-      className="relative flex w-full flex-col gap-4 px-3 sm:px-4 py-4 sm:py-6 flex-1 justify-between"
+      className="relative mx-auto flex w-full max-w-5xl flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6"
       data-testid="quick-play-mode-picker"
     >
-      {/* Mode cards grid.
-          Mobile: 2-column, uniform height, enough height for full-text promises.
-          Desktop: 4-column. Classic is 2x2 hero on left. Blast/Hunt stack right. Wheel spans bottom. */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-4 flex-1 auto-rows-fr">
+      {/* Both topologies tile exactly: 2×2 below lg, 4×2 at lg+ (hero 2×2,
+          two 1×1 siblings on the top-right, Wheel 2×1 across the bottom). */}
+      <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {MODES.map((mode, idx) => {
           const colors = NODE_COLORS[mode];
-          const size = CARD_SIZES[mode];
+          const spec = mode === HERO ? HERO_SPEC : SIBLING_SPEC;
           const isSelected = selection === mode;
           const isPending = pendingMode === mode;
           const isSiblingDimmed = isLoading && !isPending;
@@ -134,86 +142,79 @@ export function QuickPlayModePicker({
               onKeyDown={(e) => handleKeyDown(e, idx)}
               disabled={isLoading && !isPending}
               aria-current={isSelected}
-              aria-label={t(`quickPlay.solo.mode.${mode}`)}
+              // labelledby/describedby, NOT aria-label: an aria-label REPLACES the
+              // element's content for assistive tech, so the promise line — the
+              // whole reason a first-timer can tell these modes apart — was
+              // announced to nobody.
+              aria-labelledby={`${uid}-${mode}-name`}
+              aria-describedby={`${uid}-${mode}-blurb`}
               data-testid={`mode-card-${mode}`}
               className={`
-                group relative flex flex-col items-center justify-center gap-2 rounded-neo border-neo-thick border-black transition-all duration-200
-                ${size.gridClass}
-                p-3 sm:p-4 md:p-5
+                group relative flex min-h-[9rem] min-w-0 flex-col items-start justify-between gap-3 overflow-hidden rounded-neo border-neo-thick border-black text-start transition-all duration-200
+                ${mode === HERO ? 'lg:justify-center lg:gap-5' : ''}
+                ${GRID_SPANS[mode]}
+                p-3 sm:p-4 lg:p-5
                 ${colors.bg} shadow-hard
                 ${isPending ? 'ring-4 ring-white ring-offset-2 ring-offset-black' : ''}
                 ${isSiblingDimmed ? 'opacity-50' : 'opacity-100'}
-                ${!isLoading ? 'hover:ring-2 hover:ring-white hover:ring-offset-1 hover:ring-offset-black' : ''}
-                ${isLoading && !isPending ? 'cursor-not-allowed' : 'cursor-pointer active:shadow-hard-pressed'}
+                ${!isLoading ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-hard-lg motion-reduce:hover:translate-y-0' : ''}
+                ${isLoading && !isPending ? 'cursor-not-allowed' : 'active:translate-y-0 active:shadow-hard-pressed'}
                 focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
               `}
             >
-              {/* Glyph — high contrast (black) on accent fill. Scale with card importance. */}
-              <div
-                className="transition-transform duration-200 group-active:scale-95 flex-shrink-0"
-                style={{ color: 'black' }}
+              {/* Glyph keycap — the black ink needs an edge to sit against, or it
+                  floats as a smudge in the middle of a large colour field. */}
+              <span
+                className="flex flex-shrink-0 items-center justify-center rounded-[6px] border-2 border-black bg-black/10 p-1.5 text-black transition-transform duration-200 group-active:scale-95"
+                aria-hidden="true"
               >
-                <ModeGlyph mode={mode} size={size.glyph} />
-              </div>
+                <ModeGlyph mode={mode} size={40} className={spec.glyph} />
+              </span>
 
-              {/* Mode name and blurb — BOTH BLACK for WCAG contrast.
-                  On mobile: full height allows text to breathe; no clamping.
-                  On desktop: Classic gets bigger text, others scale down. */}
-              <div className="flex flex-col items-center gap-1 px-2 text-center w-full min-w-0">
+              {/* Name + promise — BOTH BLACK for WCAG contrast on the accent fill.
+                  The measure cap keeps the hero's line readable when its cell is
+                  ~500px wide; without it the promise runs past 100 characters. */}
+              <span className="flex min-w-0 flex-col gap-0.5">
                 <h3
-                  className={`
-                    font-neo-display font-bold tracking-wide text-black
-                    ${size.titleScale}
-                  `}
+                  id={`${uid}-${mode}-name`}
+                  className={`font-neo-display font-bold tracking-wide text-black ${spec.title}`}
                 >
                   {t(`quickPlay.solo.mode.${mode}`)}
                 </h3>
                 <p
-                  className={`
-                    font-neo-body font-normal leading-snug text-black
-                    ${size.blurbScale}
-                    w-full break-words overflow-hidden
-                  `}
+                  id={`${uid}-${mode}-blurb`}
+                  className={`font-neo-body font-normal leading-snug text-black ${spec.blurb} max-w-[38ch] break-words`}
                 >
                   {t(`quickPlay.solo.blurb.${mode}`)}
                 </p>
-              </div>
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* Random button — clearly secondary affordance, dark theme.
-          Positioned at bottom with margin-top auto to use full frame. */}
-      <div className="flex justify-center pt-4 sm:pt-5">
-        <button
-          onClick={handleRandomClick}
-          onKeyDown={(e) => handleKeyDown(e, MODES.length)}
-          disabled={isLoading}
-          aria-label={t('quickPlay.solo.random')}
-          data-testid="random-button"
-          className={`
-            group relative flex flex-col items-center gap-1 rounded-lg border-2 border-black px-6 py-3 transition-all duration-200
-            bg-neo-navy-elevated text-neo-cream
-            ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-neo-navy-light'}
-            active:shadow-hard-pressed focus:outline-none focus:ring-2 focus:ring-neo-cream focus:ring-offset-2 focus:ring-offset-black
-            font-neo-display font-semibold text-sm sm:text-base tracking-wide
-          `}
-        >
-          <span>{t('quickPlay.solo.random')}</span>
-          <span className="text-xs font-normal text-neo-cream/80">
-            {t('quickPlay.solo.blurb.random')}
-          </span>
-        </button>
-      </div>
-
-      {/* Bottom band reservation: reserve space for push notification + AdMob banner
-          so they cannot cover the Random button. Matches QuickPlayResults pattern. */}
-      <div
-        className="h-[calc(5rem+var(--admob-banner-height,0px)+1.5rem)]"
-        data-testid="quick-picker-bottom-spacer"
-        aria-hidden="true"
-      />
+      {/* Random — a secondary bar the width of the grid, so the composition
+          closes instead of trailing off into a floating centred pill. */}
+      <button
+        onClick={handleRandomClick}
+        onKeyDown={(e) => handleKeyDown(e, MODES.length)}
+        disabled={isLoading}
+        aria-labelledby={`${uid}-random-name`}
+        aria-describedby={`${uid}-random-blurb`}
+        data-testid="random-button"
+        className={`
+          group flex w-full min-w-0 flex-col items-start gap-0.5 rounded-neo border-2 border-black bg-neo-navy-elevated px-4 py-3 text-start text-neo-cream transition-all duration-200 sm:flex-row sm:items-baseline sm:gap-3 sm:px-5
+          ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-neo-navy-light'}
+          focus:outline-none focus:ring-2 focus:ring-neo-cream focus:ring-offset-2 focus:ring-offset-black active:shadow-hard-pressed
+        `}
+      >
+        <span id={`${uid}-random-name`} className="font-neo-display text-sm font-semibold tracking-wide sm:text-base">
+          {t('quickPlay.solo.random')}
+        </span>
+        <span id={`${uid}-random-blurb`} className="font-neo-body text-[11px] font-normal text-neo-cream/75 sm:text-xs">
+          {t('quickPlay.solo.blurb.random')}
+        </span>
+      </button>
     </div>
   );
 }

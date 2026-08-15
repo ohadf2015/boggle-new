@@ -93,6 +93,16 @@ describe('QuickPlayHub', () => {
     expect(screen.getByTestId('quick-play-hub')).toBeTruthy();
   });
 
+  it('reserves the bottom band OUTSIDE the centred picker column', () => {
+    render(<QuickPlayHub />);
+    const spacer = screen.getByTestId('quick-picker-bottom-spacer');
+    expect(spacer.getAttribute('aria-hidden')).toBe('true');
+    expect(spacer.className).toContain('h-[calc(5rem+var(--admob-banner-height,0px))]');
+    // Must be a direct child of the hub, not of the vertically-centred row —
+    // inside it, the cards get shunted upward by half the reservation.
+    expect(spacer.parentElement?.getAttribute('data-testid')).toBe('quick-play-hub');
+  });
+
   it('selection fires analytics with method', () => {
     render(<QuickPlayHub />);
     fireEvent.click(screen.getByTestId('mock-select'));

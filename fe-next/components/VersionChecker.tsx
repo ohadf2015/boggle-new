@@ -131,8 +131,15 @@ export function VersionChecker() {
 
   // Manual refresh prompt — the reload only happens when the user clicks.
   return (
+    // Docked bottom-centre, not top-centre: every screen in this app puts a
+    // centred title at the top of its header, and a top-centre toast at 2.5rem
+    // landed straight on top of it. Sits above the PWA install prompt
+    // (fixed bottom-4) and clears the AdMob anchor.
     <div
-      className="fixed top-[calc(env(safe-area-inset-top,0px)+2.5rem)] left-1/2 -translate-x-1/2 z-999"
+      // inset-x-0 + justify-center, NOT left-1/2 + -translate-x-1/2: a shrink-to-fit
+      // fixed box laid out from the 50% mark can only ever be half the viewport
+      // wide, so on a phone "New version available" wrapped to three lines.
+      className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px)+var(--admob-banner-height,0px))] inset-x-0 z-999 flex justify-center px-4"
       role="status"
       aria-live="polite"
     >

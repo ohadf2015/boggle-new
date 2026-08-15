@@ -1724,14 +1724,14 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 77,
+        "line": 76,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 325,
+        "line": 324,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
       },
       {

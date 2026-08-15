@@ -1,6 +1,48 @@
 {
-  "generatedAt": "2026-08-15T09:16:36.792Z",
+  "generatedAt": "2026-08-15T11:44:41.073Z",
   "commits": [
+    {
+      "sha": "9a20d02acd8d8cfdf0d7f1b3ea237c3c24ea3661",
+      "shortSha": "9a20d02",
+      "subject": "fix(multiplayer): invite timing read the clock where React says not to",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T13:33:07+03:00"
+    },
+    {
+      "sha": "b901d3729254f4b1cfff816ef4b9b158c7f07e28",
+      "shortSha": "b901d37",
+      "subject": "fix(practice): the daily results chain CTA was still pointing at retired urls",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T12:21:58+03:00"
+    },
+    {
+      "sha": "5afa38b1b274cc5bf01d50cea5ce92869a69e9b7",
+      "shortSha": "5afa38b",
+      "subject": "fix(analytics): the funnel was dropping the events it existed to measure",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T12:20:26+03:00"
+    },
+    {
+      "sha": "970d5b7c9a96eadf6ceb6793fbdb7c03bf48efee",
+      "shortSha": "970d5b7",
+      "subject": "fix(quick-play): Word Hunt told players to watch an ad to play again today",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T12:19:01+03:00"
+    },
+    {
+      "sha": "46b8d52908ca30b8b20036c9254b8426b957d0ec",
+      "shortSha": "46b8d52",
+      "subject": "fix(quick-play): boards were uniform random, so Q was as likely as E",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T12:18:33+03:00"
+    },
+    {
+      "sha": "9836339877137bc83a4ea8dac0fef98e2aa8ab90",
+      "shortSha": "9836339",
+      "subject": "feat(quick-play): the hub asked you to drag a dial at four unlabelled glyphs",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T12:17:20+03:00"
+    },
     {
       "sha": "ba73c02cdcb2eb58f72689c23f456f463a245772",
       "shortSha": "ba73c02",
@@ -98,48 +140,6 @@
       "subject": "fix(connections): add the results-screen tier copy that was rendering as raw keys",
       "author": "Ohad Fisher",
       "date": "2026-08-14T19:06:33+03:00"
-    },
-    {
-      "sha": "52d0de18530afbb678efc37cc52191242fce7f6a",
-      "shortSha": "52d0de1",
-      "subject": "feat(connections): add 8 Russian puzzles, holding back 14 that did not meet the bar",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T16:43:59+03:00"
-    },
-    {
-      "sha": "8242fa4c3fa9a2333dc783dd66a06ea16d003708",
-      "shortSha": "8242fa4",
-      "subject": "fix(connections): credit both answers when two puzzles show the same tiles",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T16:37:32+03:00"
-    },
-    {
-      "sha": "a75556fddf25e4f2c61cd31fa5e5a48d66b7ad57",
-      "shortSha": "a75556f",
-      "subject": "fix(connections): stop 147 Japanese hints from printing their own answer",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T16:13:46+03:00"
-    },
-    {
-      "sha": "192e7285df35feeeb83e7dd0a22761c33248b4a3",
-      "shortSha": "192e728",
-      "subject": "feat(connections): add 14 Spanish puzzles and stop two Swedish hints reading the puzzle back",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T15:54:37+03:00"
-    },
-    {
-      "sha": "500513730774440c18e8892d945ec68b330d0e92",
-      "shortSha": "5005137",
-      "subject": "Merge master into connections-gauntlet",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T15:39:27+03:00"
-    },
-    {
-      "sha": "19039ff9e9c19eb4ccfa02deab48452e0d319499",
-      "shortSha": "19039ff",
-      "subject": "fix(connections): keep the puzzle visible if motion features never load, and repair 7 Hebrew hints",
-      "author": "Ohad Fisher",
-      "date": "2026-08-14T15:38:58+03:00"
     }
   ]
 }

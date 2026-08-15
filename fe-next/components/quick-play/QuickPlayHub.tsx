@@ -10,7 +10,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
-import { QuickPlayWheel } from './QuickPlayWheel';
 import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
@@ -369,6 +368,17 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
           />
         )}
       </div>
+
+      {/* Bottom band reservation: the PWA install prompt (fixed bottom-4) and the
+          AdMob anchor both sit over this screen and would cover the Random bar.
+          It belongs OUT here as a flex sibling, not inside the picker — the
+          centring row above is what positions the cards, so a spacer inside it
+          gets centred too and pushes the whole grid upward by half its height. */}
+      <div
+        className="h-[calc(5rem+var(--admob-banner-height,0px))] flex-none"
+        data-testid="quick-picker-bottom-spacer"
+        aria-hidden="true"
+      />
     </div>
   );
 }
