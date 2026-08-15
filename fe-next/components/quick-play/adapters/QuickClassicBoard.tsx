@@ -116,6 +116,9 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
         t={t}
         dir={dir}
         socket={null}
+        // No server behind this board — useSinglePlayerCore (via onWordSubmit)
+        // is the engine, so the client commits words itself.
+        clientAuthoritative
         letterGrid={core.grid as never}
         remainingTime={core.timer.remainingTime}
         gameActive={gameActive}

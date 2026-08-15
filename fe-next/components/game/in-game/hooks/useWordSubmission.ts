@@ -29,6 +29,17 @@ interface UseWordSubmissionOptions {
   setLastWordFoundTime: (time: number) => void;
   /** Ref holding the detected combo type for current word path (blast multiplayer). */
   comboTypeRef?: MutableRefObject<string | null>;
+  /**
+   * The CLIENT owns word truth for this board — no server will ever answer.
+   * Quick Play runs this multiplayer board solo (QuickClassicBoard, socket=null)
+   * with `useSinglePlayerCore` as the engine behind `onWordSubmit`.
+   *
+   * Must be explicit rather than inferred from `socket == null`: the MP views
+   * type socket as `Socket | null` too, so a reconnect gap looks identical to a
+   * solo board. Committing locally there would add words the server never sees
+   * — the client/server score divergence in Class 3 of 60-recurring-pitfalls.
+   */
+  clientAuthoritative?: boolean;
 }
 
 interface UseWordSubmissionReturn {
@@ -58,6 +69,7 @@ export function useWordSubmission(
     onResetCombo,
     setCurrentFeedback,
     setLastWordFoundTime,
+    clientAuthoritative = false,
     comboTypeRef,
   } = options;
 
@@ -168,9 +180,13 @@ export function useWordSubmission(
     // useSocketFeedback — to avoid audio-lie when server rejects.
     hapticForWordScore(formedWord.length);
 
-    // Submit to server
-    if (!socket || !gameActive) return;
-    socket.emit('submitWord', {
+    if (!gameActive) return;
+
+    // Submit to server. Optional-chained, NOT an early return: this board also
+    // runs solo with socket=null (Quick Play classic — QuickClassicBoard), where
+    // `onWordSubmit` IS the game engine. Gating the local commit on having a
+    // socket made every valid word in a solo round a silent no-op.
+    socket?.emit('submitWord', {
       word: formedWord.toLowerCase(),
       comboLevel: comboLevelRef.current,
       fireRoundActive: fireRoundActiveRef.current,
@@ -178,8 +194,10 @@ export function useWordSubmission(
       inputMethod: meta?.inputMethod ?? 'drag',
     });
 
-    // Add to local found words
-    onWordSubmit?.(formedWord, meta);
+    // Add to local found words. In MP the server is the authority and this is
+    // the optimistic local echo of what we just emitted; with no socket AND no
+    // client authority (a reconnect gap) we commit nothing, exactly as before.
+    if (socket || clientAuthoritative) onWordSubmit?.(formedWord, meta);
     // Intentionally NOT depending on `normalizedFoundWords`: we read the
     // already-normalized Set through `foundWordsSetRef` which is refreshed by
     // the effect above. Putting the array here would force a new callback
@@ -194,6 +212,7 @@ export function useWordSubmission(
     socket,
     onWordSubmit,
     onResetCombo,
+    clientAuthoritative,
     t,
     playWordRejectedSound,
     announceWordResult,

@@ -119,7 +119,9 @@ describe('MODE_META — parity with control renderCard', () => {
   });
 
   describe('admin modes carry the ADMIN badge', () => {
-    it.each(['wordTower', 'shiritori', 'sealedBid'])(
+    // wordTower left this list when it was published — modeMeta.ts now gives it
+    // badge 'NEW' on purpose, so asserting ADMIN here was testing a stale fact.
+    it.each(['shiritori', 'sealedBid'])(
       '%s badge=ADMIN',
       (key) => {
         expect(MODE_META[key].badge).toBe('ADMIN');

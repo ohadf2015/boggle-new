@@ -16,6 +16,8 @@ import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
+import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
+import { captureError } from '@/utils/sentry';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import type { WheelSelection } from './wheelGeometry';
 import { strikeHoldMs } from './lightningPath';
@@ -270,8 +272,36 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   }, [result, language, t]);
 
   if (phase === 'playing' && config) {
+    /* A throw inside a mode adapter used to unmount the whole page: the round
+       never appeared AND the hub went with it, so there was no way back to the
+       picker — and nothing was reported, so it never reached Sentry. Contain it
+       here (one boundary for all four modes) and route the player back. */
     return (
-      <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleNextRound} />
+      <BaseErrorBoundary
+        onError={(err) =>
+          captureError(err, { feature: 'quick-play-round', mode: config.mode, seed: config.seed })
+        }
+        fallback={
+          <div
+            data-testid="quick-round-error"
+            className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 bg-neo-navy p-6 text-center"
+          >
+            <p className="font-neo-display text-lg text-neo-white">
+              {t('errors.errorHeading', "Let's Get You Back!")}
+            </p>
+            <button
+              type="button"
+              data-testid="quick-round-error-retry"
+              onClick={handleNextRound}
+              className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-neo-black shadow-hard active:shadow-hard-pressed"
+            >
+              {t('common.retry', 'Try Again')}
+            </button>
+          </div>
+        }
+      >
+        <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleNextRound} />
+      </BaseErrorBoundary>
     );
   }
 

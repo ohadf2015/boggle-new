@@ -7,6 +7,7 @@ import type { GameState, GameUser, RedisClient, Spectator } from './types';
 
 import logger from '../../utils/logger';
 import * as redisClientModule from '../../redisClient';
+import { reviveBlastModeState } from './reviveBlastState';
 
 /**
  * Shape of a game state as read from Redis.
@@ -144,7 +145,10 @@ export async function restoreGameFromRedis(
       gameSessionId: 0,
       playersReadyForNextGame: {},
       gameMode: persisted.gameMode || 'classic',
-      blastModeState: persisted.blastModeState || null,
+      // Rebuilds overlayMap: Redis stores this JSON-stringified, and a Map
+      // stringifies to `{}` — restoring it raw made every blast word submission
+      // throw inside submitWord (silently, so the player got no feedback at all).
+      blastModeState: reviveBlastModeState(persisted.blastModeState),
       wordHuntState: persisted.wordHuntState || null,
       chatHistory: persisted.chatHistory || undefined,
       cachedResultsPayload: persisted.cachedResultsPayload || undefined,

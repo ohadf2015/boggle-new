@@ -85,6 +85,12 @@ export interface InGameScreenProps {
 
   // Focus mode - hides leaderboard and chat during gameplay
   gameplayFocusMode?: boolean;
+  /**
+   * This board has no server behind it — the client owns word truth and
+   * `onWordSubmit` is the game engine. Set by Quick Play's solo classic round
+   * (QuickClassicBoard), never by a real multiplayer room.
+   */
+  clientAuthoritative?: boolean;
 
   // Achievement dock (rendered outside this component)
   children?: ReactNode;

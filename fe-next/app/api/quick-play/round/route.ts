@@ -35,11 +35,22 @@ export async function POST(request: NextRequest) {
     const round = await buildQuickRound(mode, language, seed);
     // Ghost rivals ride along in the SAME payload rather than a second fetch:
     // they must be on hand before the timer starts, or rows pop in mid-round.
+    const supabase = await createClient();
+    // Resolve the caller so they are kept out of their own rival cohort. Best
+    // effort: a failed auth lookup means a guest round, not a failed round.
+    let selfUserId: string | null = null;
+    try {
+      const { data } = await supabase.auth.getUser();
+      selfUserId = data?.user?.id ?? null;
+    } catch {
+      /* guest / no session */
+    }
     const ghosts = await fetchGhostRivals(
-      await createClient(),
+      supabase,
       mode,
       round.seed,
-      (err) => captureApiError(err, 'quick-play-round-ghosts')
+      (err) => captureApiError(err, 'quick-play-round-ghosts'),
+      selfUserId
     );
     const totalWords = round.words.length;
     return NextResponse.json({

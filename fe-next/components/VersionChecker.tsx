@@ -139,11 +139,18 @@ export function VersionChecker() {
       // inset-x-0 + justify-center, NOT left-1/2 + -translate-x-1/2: a shrink-to-fit
       // fixed box laid out from the 50% mark can only ever be half the viewport
       // wide, so on a phone "New version available" wrapped to three lines.
-      className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px)+var(--admob-banner-height,0px))] inset-x-0 z-999 flex justify-center px-4"
+      //
+      // pointer-events-none is load-bearing, not polish: this box spans the FULL
+      // viewport width, so while it was hit-testable it ate every click in this
+      // horizontal band on every page. On the Quick Play results screen that band
+      // sits exactly on "Spin next round" — the button tested as unclickable
+      // across its entire width, so one finished round left the player stuck.
+      // Only the card below takes pointer input.
+      className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px)+var(--admob-banner-height,0px))] inset-x-0 z-999 flex justify-center px-4 pointer-events-none"
       role="status"
       aria-live="polite"
     >
-      <div className="flex items-center gap-3 bg-neo-purple border-3 border-neo-black rounded-neo px-5 py-3 shadow-hard animate-neo-pop">
+      <div className="pointer-events-auto flex items-center gap-3 bg-neo-purple border-3 border-neo-black rounded-neo px-5 py-3 shadow-hard animate-neo-pop">
         <p className="text-neo-white font-bold text-sm">
           {t('system.newVersionAvailable')}
         </p>

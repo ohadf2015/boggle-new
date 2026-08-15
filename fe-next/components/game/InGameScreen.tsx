@@ -98,6 +98,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
 
   // Focus mode
   gameplayFocusMode = false,
+  clientAuthoritative = false,
 
   // Achievement dock
   children,
@@ -521,6 +522,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     setCurrentFeedback,
     setLastWordFoundTime,
     comboTypeRef,
+    clientAuthoritative,
   });
 
   // Count every submit attempt so the coach can distinguish "spelling junk"

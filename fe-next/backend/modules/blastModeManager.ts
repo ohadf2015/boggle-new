@@ -23,6 +23,7 @@ import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLet
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { computeThawedCells } from '@/components/blast/legacy/utils/blastThaw';
 import { normalizeWordForLanguage, normalizeLetterForLanguage } from './wordValidator.js';
+import { buildOverlayMap } from './gameState/reviveBlastState';
 import type { Language } from '@/shared/types';
 
 // H2: per-game mutex set guarding the check→advance→broadcast sequence so a
@@ -168,10 +169,7 @@ export function initBlastModeState(
     : ((Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0) || 1;
 
   // Build cached overlay lookup map for O(1) getTilesOnPath queries
-  const overlayMap = new Map<string, BlastTileType>();
-  for (const tile of overlay) {
-    overlayMap.set(`${tile.row},${tile.col}`, tile.type);
-  }
+  const overlayMap = buildOverlayMap(overlay);
 
   // Build server-authoritative tileStates from overlay
   const tileStates = buildTileStatesFromOverlay(overlay, grid.length, seed);
@@ -195,7 +193,7 @@ export function getOrInitPlayerBoard(state: BlastModeState, username: string): B
     grid: (state.grid ?? []).map((row) => [...row]),
     tileStates: (state.tileStates ?? []).map((row) => row.map((t) => ({ ...t }))),
     overlay: (state.overlay ?? []).map((o) => ({ ...o })),
-    overlayMap: new Map(state.overlayMap ?? []),
+    overlayMap: buildOverlayMap(state.overlay),
     seed: state.seed ?? 0,
     totalMoves: 0,
     refillCount: 0,
@@ -266,7 +264,7 @@ export function cloneBlastBoard(board: BlastPlayerBoard): BlastPlayerBoard {
     grid: board.grid.map((row) => [...row]),
     tileStates: board.tileStates.map((row) => row.map((t) => ({ ...t }))),
     overlay: board.overlay.map((o) => ({ ...o })),
-    overlayMap: new Map(board.overlayMap),
+    overlayMap: buildOverlayMap(board.overlay),
     seed: board.seed,
     totalMoves: board.totalMoves,
     refillCount: board.refillCount,

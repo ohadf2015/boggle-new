@@ -25,14 +25,24 @@ export async function fetchGhostRivals(
   db: GhostDb,
   mode: string,
   seed: string,
-  onError?: (err: Error) => void
+  onError?: (err: Error) => void,
+  /**
+   * The requesting player, excluded from their own cohort — otherwise you race
+   * your own past runs under your own name. Filtered in SQL, not after: the
+   * candidate window is a fixed 120 most-recent rows, and the person playing
+   * right now owns most of them, so post-filtering would spend the whole budget
+   * on rows it discards and leave few real rivals. Null/undefined for guests.
+   */
+  excludeUserId?: string | null
 ): Promise<QuickGhostRival[]> {
   try {
-    const { data, error } = await db
+    let query = db
       .from('quick_play_results')
       .select('user_id, score_pct')
       .eq('mode', mode)
-      .gt('score_pct', 0)
+      .gt('score_pct', 0);
+    if (excludeUserId) query = query.neq('user_id', excludeUserId);
+    const { data, error } = await query
       .order('created_at', { ascending: false })
       .limit(GHOST_CANDIDATE_LIMIT);
     if (error) throw new Error(error.message);
