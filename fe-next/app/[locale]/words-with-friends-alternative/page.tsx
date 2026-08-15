@@ -37,10 +37,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'x-default': pageUrl,
         en: pageUrl,
-        he: `${BASE_URL}/he/hebrew-multiplayer-word-game`,
-        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
-        ja: `${BASE_URL}/ja/japanese-word-game`,
-        es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
       },
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },

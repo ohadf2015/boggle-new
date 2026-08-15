@@ -39,10 +39,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'x-default': `${BASE_URL}/en/lexiclash-vs-cabanagrams`,
         en: `${BASE_URL}/en/lexiclash-vs-cabanagrams`,
-        he: `${BASE_URL}/he/lexiclash-vs-bananagrams`,
-        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
-        ja: `${BASE_URL}/ja/japanese-word-game`,
-        es: `${BASE_URL}/es/lexiclash-contra-bananagrams`,
       },
     },
     robots: { index: isEnglish, follow: true },

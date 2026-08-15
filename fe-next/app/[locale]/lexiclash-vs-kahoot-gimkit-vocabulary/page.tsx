@@ -52,11 +52,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'x-default': pageUrl,
         en: pageUrl,
-        he: `${BASE_URL}/he/lexiclash-vs-wordwall-kahoot-quizlet`,
-        sv: `${BASE_URL}/sv/education`,
-        ja: `${BASE_URL}/ja/education`,
-        es: `${BASE_URL}/es/juegos-vocabulario-aula`,
-        ru: `${BASE_URL}/ru/education`,
       },
     },
     robots: { index: isEnglish, follow: true },

@@ -37,8 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: pageUrl,
       languages: {
-        'x-default': `${BASE_URL}/en/education/vocabulary-games-classroom`,
-        en: `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        'x-default': pageUrl,
         he: pageUrl,
         'he-IL': pageUrl,
       },

@@ -38,10 +38,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'x-default': `${BASE_URL}/en/lexiclash-vs-puzzly-words`,
         en: `${BASE_URL}/en/lexiclash-vs-puzzly-words`,
-        he: `${BASE_URL}/he/lexiclash-vs-puzzly`,
-        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
-        ja: `${BASE_URL}/ja/japanese-word-game`,
-        es: `${BASE_URL}/es/lexiclash-contra-puzzly`,
       },
     },
     robots: { index: isEnglish, follow: true },

@@ -44,8 +44,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'x-default': `${BASE_URL}/en/lexiclash-vs-wordle`,
         en: `${BASE_URL}/en/lexiclash-vs-wordle`,
         he: `${BASE_URL}/he/lexiclash-neged-wordle`,
-        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
-        ja: `${BASE_URL}/ja/japanese-word-game`,
         es: `${BASE_URL}/es/lexiclash-contra-wordle`,
       },
     },

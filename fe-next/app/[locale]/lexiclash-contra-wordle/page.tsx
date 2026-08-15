@@ -43,12 +43,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: pageUrl,
       languages: {
-        'x-default': `${BASE_URL}/en/lexiclash-vs-wordle`,
+        'x-default': `${BASE_URL}/es/lexiclash-contra-wordle`,
         en: `${BASE_URL}/en/lexiclash-vs-wordle`,
         es: `${BASE_URL}/es/lexiclash-contra-wordle`,
         he: `${BASE_URL}/he/lexiclash-neged-wordle`,
-        sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
-        ja: `${BASE_URL}/ja/japanese-word-game`,
       },
     },
     robots: { index: true, follow: true },
