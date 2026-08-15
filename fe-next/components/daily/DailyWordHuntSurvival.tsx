@@ -400,7 +400,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // render — and on this nav-hidden, guard-armed surface that throw presents as
   // a black, frozen screen (the "exit Daily in Hebrew → black screen" report).
   // buildQuitDialogConfig never throws: broken keys degrade to a generic config.
-  const quitDialog = useMemo(() => buildQuitDialogConfig(t), [t]);
+  // In Quick Play (practice mode), use Word Hunt copy; in daily challenge use ad-gated copy.
+  const quitDialog = useMemo(() =>
+    buildQuitDialogConfig(t, practice ? {
+      titleKey: 'wordHunt.quitConfirmTitle',
+      descriptionKey: 'wordHunt.quitConfirmMessage',
+      confirmKey: 'daily.imSure',
+      cancelKey: 'common.cancel',
+    } : undefined),
+    [t, practice]
+  );
 
   // Handle quit flow
   const handleQuitConfirm = () => {
@@ -495,6 +504,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           currentPlayerId={currentPlayerId ?? null}
           currentGuestFingerprint={currentGuestFingerprint ?? null}
           onQuitClick={handleQuitClick}
+          practice={practice}
           t={t}
         />
 
@@ -567,6 +577,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         lastScoreIncrement={state.lastScoreIncrement}
         isScoreAnimating={state.isScoreAnimating}
         onQuitClick={handleQuitClick}
+        practice={practice}
         t={t}
       />
 

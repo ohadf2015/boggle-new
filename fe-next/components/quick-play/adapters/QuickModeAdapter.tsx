@@ -107,13 +107,13 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
             puzzleNumber={0}
             language={config.language as never}
             targetWord={config.targetWord ?? ''}
-            practice
-            hideModeCoach
+            practice={true}
+            hideModeCoach={true}
             onComplete={(r: { wordsDiscovered: Array<{ word: string }> }) =>
               finish(fromSurvival(r, config))
             }
             onQuit={onQuit}
-            quitStaysOnPage
+            quitStaysOnPage={true}
           />
         </div>
       );

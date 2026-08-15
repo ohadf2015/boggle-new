@@ -16,6 +16,8 @@ export interface SurvivalHeaderProps {
   onQuitClick: () => void;
   /** @deprecated Shop has been removed - clues auto-unlock now */
   onShopClick?: () => void;
+  /** Quick Play mode: suppress daily-specific score tier badge */
+  practice?: boolean;
   t: (key: string) => string;
 }
 
@@ -28,6 +30,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   lastScoreIncrement,
   isScoreAnimating,
   onQuitClick,
+  practice = false,
   t,
 }) => {
   return (
@@ -45,12 +48,14 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
         <SurvivalAudioEffectsControls t={t} />
       </div>
 
-      <AccumulatedScoreDisplay
-        currentScore={liveScore}
-        lastIncrement={lastScoreIncrement}
-        isAnimating={isScoreAnimating}
-        t={t}
-      />
+      {!practice && (
+        <AccumulatedScoreDisplay
+          currentScore={liveScore}
+          lastIncrement={lastScoreIncrement}
+          isAnimating={isScoreAnimating}
+          t={t}
+        />
+      )}
     </div>
   );
 });

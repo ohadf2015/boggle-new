@@ -54,6 +54,8 @@ export interface SurvivalDesktopLayoutProps {
   currentGuestFingerprint: string | null;
   // Quit
   onQuitClick: () => void;
+  /** Quick Play mode: suppress daily-specific score tier badge */
+  practice?: boolean;
   t: (key: string) => string;
 }
 
@@ -96,6 +98,7 @@ function SurvivalDesktopLayoutImpl({
   currentPlayerId,
   currentGuestFingerprint,
   onQuitClick,
+  practice = false,
   t,
 }: SurvivalDesktopLayoutProps): React.ReactElement {
   const sidebarWidth = isTv ? '320px' : '280px';
@@ -131,6 +134,7 @@ function SurvivalDesktopLayoutImpl({
             lastScoreIncrement={lastScoreIncrement}
             isScoreAnimating={isScoreAnimating}
             onQuitClick={onQuitClick}
+            practice={practice}
             t={t}
           />
 
