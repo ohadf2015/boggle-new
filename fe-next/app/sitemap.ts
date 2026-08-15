@@ -611,6 +611,96 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // out of the sitemap avoids inviting crawl of noindexed URLs. The /anagram hub
   // (added above) stays indexed. Reversible with the route's robots flag.
 
+  // ─── The localized-slug landings, which had no <loc> of their own ───
+  //
+  // These nine pages were referenced FORTY times as hreflang alternates of other URLs and never
+  // listed as URLs themselves. That includes /es/juego-de-palabras-multijugador, the single
+  // biggest search asset in the portfolio (~54,000 impressions), and the whole five-language
+  // cluster it belongs to. A sitemap alternate with no <url> entry of its own is an incomplete
+  // declaration, and none of the nine was ever submitted for crawling — they are found only by
+  // internal link.
+  //
+  // The clusters below mirror what each page's generateMetadata declares, which is what makes
+  // them survive pruneUnconfirmedAlternates.
+  const wordGameCluster: Record<string, string> = {
+    en: `${BASE_URL}/en/multiplayer-word-game-online`,
+    es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
+    he: `${BASE_URL}/he/hebrew-multiplayer-word-game`,
+    sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
+    ja: `${BASE_URL}/ja/japanese-word-game`,
+  };
+  Object.values(wordGameCluster).forEach((url) => {
+    routes.push({
+      url,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: { languages: { 'x-default': wordGameCluster.en, ...wordGameCluster } },
+    });
+  });
+
+  // Single-locale landings: indexed in one language only, so the cluster self-references, the
+  // same shape lib/seo/enOnlyAlternates.ts documents.
+  (
+    [
+      ['en', 'best-online-word-games'],
+      ['en', 'boggle-word-shake-free'],
+      ['es', 'lexiclash-contra-wordle'],
+      ['he', 'lexiclash-neged-wordle'],
+    ] as const
+  ).forEach(([locale, slug]) => {
+    const url = `${BASE_URL}/${locale}/${slug}`;
+    routes.push({
+      url,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: { languages: { 'x-default': url, [locale]: url } },
+    });
+  });
+
+  return routes;
+}
+
+/**
+ * Drop every hreflang alternate the target does not confirm.
+ *
+ * Google honours an annotation only when the page it names points BACK, and the sitemap is a
+ * full-strength declaration — fixing the pages' `generateMetadata` and leaving this file alone
+ * keeps the contradiction alive. 294 of the annotations emitted here were unconfirmed: the five
+ * /en/education landings each claimed /he/hebrew-classroom-vocabulary-games, /sv/education and
+ * /es/juegos-vocabulario-aula as their translations, and `langAlternates()` emits all five
+ * locales even for paths added to the sitemap in one locale only, naming URLs that are not in
+ * the sitemap at all and are noindexed besides.
+ *
+ * Applied once, at the single exit, rather than edited into twenty hand-written blocks: this is
+ * a property of the finished route list, and a rule enforced in one place cannot drift the way
+ * those blocks did. Blocks stay free to over-declare; the sanitizer is what makes it safe.
+ *
+ * `x-default` is deliberately left alone. Several single-locale landings point it at another
+ * cluster's canonical on purpose ("Hebrew-only by intent; x-default → /en/daily"), which is a
+ * handoff rather than a translation claim.
+ */
+function pruneUnconfirmedAlternates(routes: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+  // Snapshot first: the loop below rewrites the very objects the lookup reads, so without a copy
+  // the answer would depend on the order routes happen to be in.
+  const declared = new Map(
+    routes.map((r) => [r.url, { ...(r.alternates?.languages ?? {}) } as Record<string, string>]),
+  );
+  for (const route of routes) {
+    const langs = route.alternates?.languages;
+    if (!langs) continue;
+    const kept: Record<string, string> = {};
+    for (const [lang, target] of Object.entries(langs)) {
+      if (lang === 'x-default' || target === route.url) {
+        kept[lang] = target as string;
+        continue;
+      }
+      const targetLangs = declared.get(target as string);
+      if (targetLangs && Object.values(targetLangs).includes(route.url)) kept[lang] = target as string;
+    }
+    route.alternates!.languages = kept;
+  }
   return routes;
 }
 
@@ -619,5 +709,5 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 // /sitemap/[id].xml but does NOT auto-create an index at /sitemap.xml,
 // which then collides with the [locale] catch-all and serves HTML.
 export default function sitemap(): MetadataRoute.Sitemap {
-  return getAllRoutes();
+  return pruneUnconfirmedAlternates(getAllRoutes());
 }
