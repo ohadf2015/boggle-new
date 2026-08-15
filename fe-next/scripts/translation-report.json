@@ -2,12 +2,12 @@
   "summary": {
     "totalKeysInCode": 6156,
     "keyCountByLanguage": {
-      "en": 11987,
-      "es": 12283,
-      "he": 12188,
-      "ja": 12242,
-      "ru": 12018,
-      "sv": 12238
+      "en": 11991,
+      "es": 12287,
+      "he": 12192,
+      "ja": 12246,
+      "ru": 12022,
+      "sv": 12242
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
@@ -765,14 +765,14 @@
         "pattern": "`blast.tileGuide.${type}.name`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastTileGuide.tsx",
-        "line": 65,
+        "line": 73,
         "context": "{t(`blast.tileGuide.${type}.name`)}"
       },
       {
         "pattern": "`blast.tileGuide.${type}.desc`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastTileGuide.tsx",
-        "line": 68,
+        "line": 76,
         "context": "{t(`blast.tileGuide.${type}.desc`)}"
       },
       {
@@ -933,7 +933,7 @@
         "pattern": "`brain.tiers.${tier}`",
         "type": "template_literal",
         "file": "components/brain/BrainScoreShareCard.tsx",
-        "line": 201,
+        "line": 205,
         "context": "{t(`brain.tiers.${tier}`)}"
       },
       {
@@ -1556,7 +1556,7 @@
         "pattern": "`multiplayerFlow.roomList.gameModes.${round.gameMode === 'word-hunt' ? 'wordHunt' : round.gameMode === 'wheel-rush' ? 'w",
         "type": "template_literal",
         "file": "components/multiplayer/MpModeBreakdown.tsx",
-        "line": 100,
+        "line": 101,
         "context": "{t("
       },
       {
@@ -1724,14 +1724,14 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 76,
+        "line": 78,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 324,
+        "line": 354,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
       },
       {
@@ -2730,7 +2730,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/game/in-game/hooks/useWordSubmission.ts",
-        "line": 127,
+        "line": 139,
         "context": "msg = t(errorKey) || errorKey;"
       },
       {
