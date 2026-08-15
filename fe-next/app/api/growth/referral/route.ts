@@ -83,79 +83,13 @@ export async function GET(req: NextRequest) {
 }
 
 // ============================================================
-// POST — Claim a referral code
+// Claiming lives in POST /api/referral
 // ============================================================
-
-export async function POST(req: NextRequest) {
-  try {
-    const user = await getAuthedUser(req);
-    if (!user) return bad('Unauthorized', 401);
-
-    const { code } = await req.json();
-    if (!code || typeof code !== 'string') return bad('Missing referral code');
-
-    const supabase = admin();
-
-    // Find the referrer by referral code
-    const { data: referrer, error: referrerErr } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('referral_code', code.toUpperCase().trim())
-      .single();
-
-    if (referrerErr || !referrer) return bad('Invalid referral code', 404);
-
-    // Cannot refer yourself
-    if (referrer.id === user.id) return bad('Cannot refer yourself', 400);
-
-    // Check if already referred by someone
-    const { data: claimerProfile } = await supabase
-      .from('profiles')
-      .select('referred_by')
-      .eq('id', user.id)
-      .single();
-
-    if (claimerProfile?.referred_by) return bad('Already referred by another user', 400);
-
-    // Check for duplicate referral
-    const { data: existing } = await supabase
-      .from('referrals')
-      .select('id')
-      .eq('referrer_id', referrer.id)
-      .eq('referred_id', user.id)
-      .maybeSingle();
-
-    if (existing) return bad('Referral already claimed', 400);
-
-    // Create referral record
-    const { error: insertErr } = await supabase.from('referrals').insert({
-      referrer_id: referrer.id,
-      referred_id: user.id,
-      referral_code: code.toUpperCase().trim(),
-      reward_granted: false,
-      reward_type: 'signup_bonus',
-      reward_amount: REFERRAL_REWARD_XP,
-      referred_first_game_played: false,
-      referred_games_played: 0,
-      referred_total_score: 0,
-    });
-
-    if (insertErr) return bad('Failed to create referral', 500);
-
-    // Update claimer's profile (referred_by)
-    const { error: claimerUpdateErr } = await supabase
-      .from('profiles')
-      .update({ referred_by: referrer.id })
-      .eq('id', user.id);
-
-    if (claimerUpdateErr) console.error('Failed to update claimer referred_by:', claimerUpdateErr);
-
-    return NextResponse.json({
-      success: true,
-      message: 'Referral claimed! You and your friend will get bonus rewards after they play their first game.',
-    });
-  } catch (err) {
-    console.error('Referral POST error:', err);
-    return bad('Internal server error', 500);
-  }
-}
+//
+// There used to be a second, thinner claim handler here. It wrote the `referrals`
+// row and `referred_by` and stopped there — no coins, no XP, no milestone
+// bonuses, no reward rows — so whichever endpoint a caller happened to pick
+// decided whether the referrer got paid. Neither had a caller, and the loop had
+// never fired once (375 codes issued, 0 referrals). Removed rather than kept in
+// sync: components/referral/ReferralCodeClaimer.tsx now claims against
+// /api/referral, which grants the full reward.

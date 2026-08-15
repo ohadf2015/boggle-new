@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import {
@@ -150,8 +151,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Referral code required' }, { status: 400 });
     }
 
+    // Everything past the auth check touches the REFERRER's row, and profiles is
+    // own-row-only under RLS — the request-scoped client reads zero rows with
+    // error: null and writes zero rows the same way. So the whole redemption ran
+    // as a silent no-op: 375 codes issued, 0 referrals, 0 rewards, ever.
+    // `referrals` is stricter still (INSERT/UPDATE policies are literally
+    // `false`), so only a service-role client can record one at all.
+    // The caller is authenticated above and can only ever name a referrer via a
+    // code they were given; the self-referral and already-referred guards below
+    // are what bound it.
+    const admin = createAdminClient();
+    if (!admin) {
+      return NextResponse.json({ error: 'Referral service unavailable' }, { status: 503 });
+    }
+
     // Find referrer by referral code (also grab current count for milestone detection)
-    const { data: referrer, error: referrerError } = await supabase
+    const { data: referrer, error: referrerError } = await admin
       .from('profiles')
       .select('id, referral_count')
       .eq('referral_code', referralCode.toUpperCase())
@@ -167,7 +182,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user was already referred
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await admin
       .from('profiles')
       .select('referred_by')
       .eq('id', user.id)
@@ -178,7 +193,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update new user's profile with referrer
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from('profiles')
       .update({ referred_by: referrer.id })
       .eq('id', user.id);
@@ -194,7 +209,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create referral tracking record
-    const { data: referralRecord, error: referralError } = await supabase
+    const { data: referralRecord, error: referralError } = await admin
       .from('referrals')
       .insert({
         referrer_id: referrer.id,
@@ -221,7 +236,7 @@ export async function POST(request: NextRequest) {
     const REFERRAL_REWARD_XP = 100;
 
     // 1) Coins via atomic sync_coins RPC — this is the UI-promised gift
-    const { error: coinError } = await supabase.rpc('sync_coins', {
+    const { error: coinError } = await admin.rpc('sync_coins', {
       p_user_id: referrer.id,
       p_amount: COINS_PER_REFERRAL,
       p_reason: 'referral_signup',
@@ -238,7 +253,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2) XP via atomic RPC (preserved for existing players)
-    const { error: xpError } = await supabase.rpc('increment_profile_xp', {
+    const { error: xpError } = await admin.rpc('increment_profile_xp', {
       p_player_id: referrer.id,
       p_xp_amount: REFERRAL_REWARD_XP,
     });
@@ -253,13 +268,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Track referral-specific XP separately (used for display)
-    const { data: referrerProfile } = await supabase
+    const { data: referrerProfile } = await admin
       .from('profiles')
       .select('referral_reward_xp, referral_count')
       .eq('id', referrer.id)
       .single();
 
-    const { error: trackError } = await supabase
+    const { error: trackError } = await admin
       .from('profiles')
       .update({
         referral_reward_xp: (referrerProfile?.referral_reward_xp || 0) + REFERRAL_REWARD_XP,
@@ -277,7 +292,7 @@ export async function POST(request: NextRequest) {
     const milestoneBonusCoins = crossed.reduce((sum, m) => sum + m.coins, 0);
 
     if (milestoneBonusCoins > 0) {
-      const { error: bonusError } = await supabase.rpc('sync_coins', {
+      const { error: bonusError } = await admin.rpc('sync_coins', {
         p_user_id: referrer.id,
         p_amount: milestoneBonusCoins,
         p_reason: 'referral_milestone_bonus',
@@ -299,7 +314,7 @@ export async function POST(request: NextRequest) {
 
       // Record one reward row per milestone for audit/history
       for (const m of crossed) {
-        const { error: milestoneRewardError } = await supabase
+        const { error: milestoneRewardError } = await admin
           .from('referral_rewards')
           .insert({
             player_id: referrer.id,
@@ -322,7 +337,7 @@ export async function POST(request: NextRequest) {
 
     // 4) Record the base signup reward (coins + XP combined)
     if (referralRecord) {
-      const { error: rewardInsertError } = await supabase.from('referral_rewards').insert({
+      const { error: rewardInsertError } = await admin.from('referral_rewards').insert({
         player_id: referrer.id,
         referral_id: referralRecord.id,
         reward_type: 'new_referral',
@@ -337,7 +352,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Mark reward as granted
-      const { error: grantError } = await supabase
+      const { error: grantError } = await admin
         .from('referrals')
         .update({
           reward_granted: true,

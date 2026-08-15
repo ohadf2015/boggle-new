@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -30,8 +31,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid milestone' }, { status: 400 });
     }
 
+    // Every reward below lands on the REFERRER's rows, and a request-scoped
+    // client cannot touch them: `profiles` is own-row-only and `referrals` UPDATE
+    // is policy `false`. So this handler was a silent no-op — 0 reward rows have
+    // ever been written. What bounds the elevated client is that the caller can
+    // only ever pay the referrer their OWN profile already names
+    // (`profile.referred_by`, read below), never an arbitrary player.
+    const admin = createAdminClient();
+    if (!admin) {
+      return NextResponse.json({ error: 'Referral service unavailable' }, { status: 503 });
+    }
+
     // Check if this user was referred
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await admin
       .from('profiles')
       .select('referred_by, total_games')
       .eq('id', user.id)
@@ -56,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the referral record
-    const { data: referral, error: referralError } = await supabase
+    const { data: referral, error: referralError } = await admin
       .from('referrals')
       .select('*')
       .eq('referrer_id', profile.referred_by)
@@ -137,7 +149,7 @@ export async function POST(request: NextRequest) {
       updateData.referred_games_played = profile.total_games;
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from('referrals')
       .update(updateData)
       .eq('id', referral.id);
@@ -152,7 +164,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Grant reward XP to referrer
-    const { error: xpError } = await supabase.rpc('increment_profile_xp', {
+    const { error: xpError } = await admin.rpc('increment_profile_xp', {
       p_player_id: profile.referred_by,
       p_xp_amount: reward.xp,
     });
@@ -165,13 +177,13 @@ export async function POST(request: NextRequest) {
         statusCode: 500,
       });
       // Try direct update if RPC fails
-      const { data: fallbackProfile } = await supabase
+      const { data: fallbackProfile } = await admin
         .from('profiles')
         .select('referral_reward_xp, total_xp')
         .eq('id', profile.referred_by)
         .single();
 
-      const { error: fallbackError } = await supabase
+      const { error: fallbackError } = await admin
         .from('profiles')
         .update({
           total_xp: (fallbackProfile?.total_xp || 0) + reward.xp,
@@ -185,7 +197,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Grant reward coins to referrer via atomic sync_coins RPC
-    const { error: coinError } = await supabase.rpc('sync_coins', {
+    const { error: coinError } = await admin.rpc('sync_coins', {
       p_user_id: profile.referred_by,
       p_amount: reward.coins,
       p_reason: `referral_milestone_${milestone}`,
@@ -202,7 +214,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Record the reward
-    const { error: rewardError } = await supabase.from('referral_rewards').insert({
+    const { error: rewardError } = await admin.from('referral_rewards').insert({
       player_id: profile.referred_by,
       referral_id: referral.id,
       reward_type: `milestone_${milestone}`,

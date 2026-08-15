@@ -11,6 +11,7 @@ import { getPlatform } from '@/utils/platform';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
 import { awardGameEnd } from '@/lib/playGames/awardPlayGames';
 import { maybeRequestReviewAfterWin } from '@/utils/nativeReview';
+import { postWithAuth } from '@/utils/authFetch';
 import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
@@ -1019,6 +1020,15 @@ export const markFirstGameActivation = (args: {
       localStorage.setItem(playedKey, '1');
       trackGrowthEvent('first_game_played', { score, wordCount, gameMode: mode });
       trackGA4Event('funnel_first_game', { mode });
+      // Pay the referrer, if this player arrived through someone's link. This is
+      // the only place that detects a genuine first game exactly once, and the
+      // endpoint had never been called by anything — 0 milestone rewards had ever
+      // been granted. It no-ops server-side for players who weren't referred.
+      // Fire-and-forget: a reward report must never block the end-of-game path.
+      void postWithAuth('/api/referral/milestone', {
+        milestone: 'first_game_played',
+        metadata: { totalScore: score },
+      }).catch(() => {});
     }
     if (won && !localStorage.getItem(wonKey)) {
       localStorage.setItem(wonKey, '1');

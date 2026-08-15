@@ -52,6 +52,10 @@ const ChurnSignalTracker = nextDynamic(
   () => import('@/components/engagement/ChurnSignalTracker').then((m) => ({ default: m.ChurnSignalTracker })),
   { ssr: false, loading: () => null }
 );
+const ReferralCodeClaimer = nextDynamic(
+  () => import('@/components/referral/ReferralCodeClaimer'),
+  { ssr: false, loading: () => null }
+);
 
 /** Mount inside the providers — VersionChecker and the prompts read LanguageContext. */
 export default function DeferredLayoutWidgets() {
@@ -66,6 +70,7 @@ export default function DeferredLayoutWidgets() {
       <NewYearCountdown />
       <CookieConsent />
       <ChurnSignalTracker />
+      <ReferralCodeClaimer />
     </>
   );
 }
