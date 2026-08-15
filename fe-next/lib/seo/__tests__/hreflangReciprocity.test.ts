@@ -19,6 +19,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import sitemap from '../../../app/sitemap';
 
 const APP_DIR = join(process.cwd(), 'app', '[locale]');
 
@@ -103,5 +104,40 @@ describe('hreflang clusters', () => {
       if (!Array.from(langs.values()).some((u) => slugOf(u) === slug)) missing.push(slug);
     }
     expect(missing, `pages whose hreflang omits themselves:\n${missing.join('\n')}`).toEqual([]);
+  });
+});
+
+/**
+ * The sitemap is a SECOND, independent declaration of the same clusters.
+ *
+ * Google treats sitemap hreflang and page hreflang as equal statements, so fixing only the pages
+ * leaves the contradiction live — which is exactly what happened on the first pass here. This
+ * block asserts against the RENDERED routes rather than the source text, because sitemap.ts
+ * builds most entries through helpers and a regex over it would check the wrong thing.
+ */
+describe('sitemap hreflang clusters', () => {
+  const routes = sitemap() as { url: string; alternates?: { languages?: Record<string, string> } }[];
+  const byUrl = new Map(routes.map((r) => [r.url, r.alternates?.languages ?? {}]));
+
+  it('emits a sitemap with alternates at all', () => {
+    expect(routes.length).toBeGreaterThan(50);
+    expect([...byUrl.values()].filter((l) => Object.keys(l).length > 0).length).toBeGreaterThan(20);
+  });
+
+  it('never points at a URL that does not point back', () => {
+    const unconfirmed: string[] = [];
+    for (const [url, langs] of Array.from(byUrl.entries())) {
+      for (const [lang, target] of Object.entries(langs)) {
+        // x-default may legitimately hand off to another cluster's canonical.
+        if (lang === 'x-default' || target === url) continue;
+        const targetLangs = byUrl.get(target);
+        if (!targetLangs) {
+          unconfirmed.push(`${url}: ${lang} -> ${target} (target is not a sitemap entry)`);
+        } else if (!Object.values(targetLangs).includes(url)) {
+          unconfirmed.push(`${url}: ${lang} -> ${target} (no return link)`);
+        }
+      }
+    }
+    expect(unconfirmed, `unconfirmed sitemap hreflang:\n${unconfirmed.join('\n')}`).toEqual([]);
   });
 });
