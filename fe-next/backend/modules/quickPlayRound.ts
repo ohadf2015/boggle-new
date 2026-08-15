@@ -6,7 +6,7 @@
 import { randomUUID } from 'crypto';
 import { findAllWords, getCachedTrie } from './boggleSolver';
 import { calculateWordScore } from '@/shared/utils/scoring';
-import { generateDailyGrid, selectDailyTargetWord } from '@/utils/dailyChallenge/gridGeneration';
+import { generateDailyGridWithWeightedLetters, selectDailyTargetWord } from '@/utils/dailyChallenge/gridGeneration';
 import {
   generateWordWheelPuzzle,
   isValidWordWheelWord,
@@ -93,7 +93,7 @@ export async function buildQuickRound(
     };
   }
 
-  const grid = generateDailyGrid(`quick-${roundSeed}`, language as never);
+  const grid = generateDailyGridWithWeightedLetters(`quick-${roundSeed}`, language as never);
   // A trie is MANDATORY: findAllWords without one falls back to exhaustive
   // depth-15 DFS (no prefix pruning) and effectively never returns.
   const trie = getCachedTrie(language);

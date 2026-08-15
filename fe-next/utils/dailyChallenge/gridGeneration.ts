@@ -109,6 +109,115 @@ export function generateDailyGrid(
 }
 
 /**
+ * Generate a deterministic grid with weighted English letter distribution (for Quick Play)
+ *
+ * Uses realistic English letter frequencies to ensure:
+ * - Mean vowel share ~35% (vs ~20% from uniform distribution)
+ * - Every row has at least one vowel
+ * - Q is extremely rare and almost always paired with U
+ *
+ * English frequency weights derived from corpus analysis.
+ * Non-English languages fall back to unweighted distribution.
+ *
+ * @param dateString - Seed string (e.g., 'quick-uuid')
+ * @param language - Language code
+ * @param rows - Grid height (default 6)
+ * @param cols - Grid width (default 6)
+ * @returns Weighted letter grid
+ */
+export function generateDailyGridWithWeightedLetters(
+  dateString: string,
+  language: Language,
+  rows: number | null = null,
+  cols: number | null = null
+): LetterGrid {
+  // Only use weighted distribution for English; fall back for other languages
+  if (language !== 'en') {
+    return generateDailyGrid(dateString, language, rows, cols);
+  }
+
+  const seedString = `${SEED_SALT}-${dateString}-${language}-weighted`;
+  const seed = hashString(seedString);
+  const random = mulberry32(seed);
+
+  if (rows === null || cols === null) {
+    rows = DIFFICULTIES[DEFAULT_DIFFICULTY].rows;
+    cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
+  }
+
+  // English letter frequencies (as proportions, summing to ~100)
+  // Derived from corpus analysis: E(12.7%), T(9%), A(8.2%), O(7.5%), I(7%), etc.
+  const weightedLetters = [
+    // Vowels (38% total)
+    'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', // A: 8.2%
+    'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', // E: 12.7%
+    'I', 'I', 'I', 'I', 'I', 'I', 'I', // I: 7%
+    'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', // O: 7.5%
+    'U', 'U', 'U', // U: 2.8%
+    // High-frequency consonants
+    'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', // T: 9%
+    'R', 'R', 'R', 'R', 'R', 'R', // R: 6%
+    'S', 'S', 'S', 'S', 'S', 'S', // S: 6.3%
+    'N', 'N', 'N', 'N', 'N', 'N', 'N', // N: 6.7%
+    'L', 'L', 'L', 'L', 'L', // L: 4%
+    'D', 'D', 'D', 'D', // D: 4.3%
+    'H', 'H', 'H', 'H', // H: 3%
+    'C', 'C', 'C', // C: 2.8%
+    'M', 'M', 'M', // M: 2.4%
+    'P', 'P', 'P', // P: 1.9%
+    'G', 'G', 'G', // G: 2%
+    // Medium-frequency consonants
+    'F', 'F', // F: 2.2%
+    'B', 'B', // B: 1.5%
+    'Y', 'Y', // Y: 2%
+    'W', 'W', // W: 1.2%
+    'V', // V: 1%
+    'K', // K: 0.8%
+    'X', // X: 0.15% (rare)
+    'Z', // Z: 0.07% (rare)
+    'J', // J: 0.15%
+    'Q', // Q: 0.1% (very rare, almost always followed by U in English)
+  ];
+
+  const vowels = new Set(['A', 'E', 'I', 'O', 'U']);
+  const grid: string[][] = [];
+
+  for (let i = 0; i < rows; i++) {
+    const row: string[] = [];
+    let hasVowel = false;
+
+    for (let j = 0; j < cols; j++) {
+      let letter: string;
+
+      // For the last cell in a row without a vowel, pick a vowel
+      if (j === cols - 1 && !hasVowel) {
+        const vowelArray = Array.from(vowels);
+        letter = vowelArray[Math.floor(random() * vowelArray.length)];
+      } else {
+        // Pick from weighted distribution
+        letter = weightedLetters[Math.floor(random() * weightedLetters.length)];
+
+        // Special case: if we pick Q, try to follow with U (if next cell exists)
+        if (letter === 'Q' && j < cols - 1) {
+          row.push(letter);
+          j++;
+          letter = 'U'; // Q almost always followed by U in English
+        }
+      }
+
+      if (vowels.has(letter)) {
+        hasVowel = true;
+      }
+      row.push(letter);
+    }
+
+    grid.push(row);
+  }
+
+  return grid;
+}
+
+/**
  * Generate a seeded Japanese grid with embedded kanji compounds
  */
 function generateSeededJapaneseGrid(

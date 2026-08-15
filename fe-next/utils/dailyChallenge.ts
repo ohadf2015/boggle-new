@@ -172,6 +172,7 @@ export {
 // Import those directly from '@/utils/dailyChallenge/gridGeneration.server' in API routes.
 export {
   generateDailyGrid,
+  generateDailyGridWithWeightedLetters,
   generateDailyPuzzle,
   getTodaysDailyPuzzle,
   isWordOnGrid,
