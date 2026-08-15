@@ -135,13 +135,12 @@ export function LandingChallengeCards({
   // One "Start Here" pill at a time. Practice wins for non-veterans (it's the
   // pressure-free onramp); MP cards only get the pill once the player has
   // graduated past practice. Prevents the dual-highlight bug where both
-  // Multiplayer + Practice lit up for brand-new players.
+  // Multiplayer lit up for brand-new players.
   const practiceWinsHighlight = !isVeteran;
 
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
-  //   3. Strip `'practice'` for veterans.
-  //   4. Surface `'practice'` first for brand-new players (< 3 games).
+  //   3. Strip `'practice'` — it is no longer a hub mode for anyone.
   //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
   const baseOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
   // Server stats only ship LandingGameMode keys; ensure the synthetic discovery
@@ -173,19 +172,22 @@ export function LandingChallengeCards({
   // card, regardless of popularity ranking. (Supersedes the old
   // blast-before-adventure rule — arena is always above adventure.)
   const serverOrder: LandingCardKey[] = placeBlastAfterArena(rawOrder);
-  // Veterans have completed practice — remove it so it doesn't compete for
-  // the featured-row slot or the SP grid (they don't need the onramp).
-  // Practice is an onramp cube for NEW players only.
-  const practiceFiltered: LandingCardKey[] = isVeteran
-    ? serverOrder.filter((m) => m !== 'practice')
-    : serverOrder;
+  // Practice is off the hub for EVERYONE, not just veterans.
+  //
+  // It used to be the newcomer onramp — surfaced first, in its own featured row,
+  // for anyone under 3 games. Measured over 90 days: of 299 people who started
+  // practice, 151 (50.5%) never played a real game at all. As an onramp it was a
+  // cul-de-sac for half its intake, so new players now go straight to the real
+  // modes and get help in-game only if they actually get stuck
+  // (components/game/ftue/StuckCoachOverlay.tsx).
+  const practiceFiltered: LandingCardKey[] = serverOrder.filter((m) => m !== 'practice');
   const orderedBeforeFeatured: LandingCardKey[] = isNewbie && !isVeteran
     // A newcomer judges the whole game by the first mode they try, so lead with
     // the ones they actually FINISH. orderModesForNewcomer undoes the
     // blast-after-arena promotion above for this cohort only — blast completes
     // at 31% for first-24h players vs 45% for classic and 56% for word-wheel.
     ? orderModesForNewcomer(
-        ['practice', 'daily', ...practiceFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[],
+        ['daily', ...practiceFiltered.filter((m) => m !== 'daily')] as LandingCardKey[],
       )
     : practiceFiltered[0] === 'daily'
     ? practiceFiltered

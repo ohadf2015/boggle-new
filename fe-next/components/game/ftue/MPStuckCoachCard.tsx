@@ -52,6 +52,7 @@ export function MPStuckCoachCard({ stage, onDismiss, exampleWord }: MPStuckCoach
 
   return (
     <div
+      data-testid="mp-stuck-coach-card"
       role="status"
       aria-live="polite"
       className="animate-neo-pop pointer-events-auto mx-auto flex w-full max-w-sm items-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-2 text-neo-black shadow-hard-lg"

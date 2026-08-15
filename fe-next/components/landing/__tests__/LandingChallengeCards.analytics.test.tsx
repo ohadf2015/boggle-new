@@ -83,11 +83,13 @@ describe('LandingChallengeCards — mode_selected tracking', () => {
     expect(trackModeSelected).toHaveBeenCalledWith(mode, 'home');
   });
 
-  it('clicking practice cube fires trackModeSelected("practice", "home")', () => {
-    mockIsVeteran.mockReturnValue(false); // non-veteran sees practice
+  // Practice is no longer a hub mode for any cohort — half of everyone who
+  // entered it never reached a real game — so there is no cube left to click and
+  // mode_selected can never carry 'practice' from the hub again.
+  it('offers no practice cube to click, for any cohort', () => {
+    mockIsVeteran.mockReturnValue(false);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const cube = container.querySelector('[data-cube-key="practice"]') as HTMLElement;
-    fireEvent.click(cube);
-    expect(trackModeSelected).toHaveBeenCalledWith('practice', 'home');
+    expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
+    expect(trackModeSelected).not.toHaveBeenCalledWith('practice', 'home');
   });
 });

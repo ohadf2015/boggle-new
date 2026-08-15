@@ -65,12 +65,12 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards reordering', () => {
-  it('non-veteran: practice cube renders; every mode visible when 5+ games', () => {
+  it('non-veteran: no practice cube; every other mode visible when 5+ games', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     expect(container.querySelector('[data-cube-key="arena"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-cube-key="practice"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
     expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
     expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });

@@ -164,7 +164,10 @@ export default function MultiplayerStrategyPageClient(): React.ReactElement {
                   {content.tryDaily}
                 </Button>
               </Link>
-              <Link href={`/${locale}/practice`}>
+              {/* Solo play now means the real single-player game, not the
+                  practice hub — half of everyone who entered practice never
+                  reached a real game. */}
+              <Link href={`/${locale}/singleplayer`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.practice}
                 </Button>

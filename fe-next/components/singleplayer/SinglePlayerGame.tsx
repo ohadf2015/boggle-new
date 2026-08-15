@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
@@ -22,6 +22,9 @@ import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
+import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 
@@ -210,13 +213,57 @@ function SinglePlayerGame({
     sessionKey,
   });
 
+  // Lifetime games on this device — the arbiter never tutorialises a veteran.
+  // Read once (lazy initialiser) so it is stable for the whole round and safe
+  // during SSR.
+  const [gamesPlayed] = useState(() =>
+    typeof window === 'undefined' ? 0 : readGamesCompletedCount()
+  );
+
+  // On-screen help for a first-timer, and ONLY for a first-timer who is visibly
+  // stuck. FTUE now lands new players here (lib/onboarding/firstGameRoute.ts)
+  // and ModeCoach is deliberately disabled ("more confusing than helping"), so
+  // without this there is nothing on screen teaching the drag gesture at all.
+  //
+  // The arbiter stays silent once the player scores, silent past their first
+  // game, shows at most one hint per game and auto-hides it after 10s — help
+  // arrives only after 12s frozen or a run of fruitless submits, never as an
+  // opening interruption.
+  const stuckCoach = useMPStuckCoach({
+    active: !!core.grid && !core.isPaused && !core.isGameOver,
+    isClassic: true,
+    totalGamesPlayed: gamesPlayed,
+    isDesktop: core.isDesktop,
+  });
+
+  // Scoring is the signal that the player understands the game; it silences
+  // every later stage. Derived from the found-word list so no grid-interaction
+  // plumbing is needed.
+  const acceptedCount = core.foundWords.filter((w) => w.isValid !== false).length;
+  useEffect(() => {
+    if (acceptedCount > 0) stuckCoach.markAccepted();
+  }, [acceptedCount, stuckCoach]);
+
   const coreWordChange = core.handleWordChange;
   const wrappedWordChange = useCallback(
     (word: string, count: number) => {
       reportActivity();
+      // A path forming IS the drag signal — it distinguishes "building words but
+      // never submitting" from "frozen", which are different hints.
+      if (count > 0) stuckCoach.markDragStart();
       coreWordChange(word, count);
     },
-    [reportActivity, coreWordChange]
+    [reportActivity, coreWordChange, stuckCoach]
+  );
+
+  // Submissions feed the "submitting but nothing is valid" stage.
+  const coreWordSubmit = core.handleWordSubmit;
+  const wrappedWordSubmit = useCallback(
+    (word: string) => {
+      stuckCoach.markSubmit();
+      coreWordSubmit(word);
+    },
+    [stuckCoach, coreWordSubmit]
   );
 
   // Wrap path submit to detect the "select every tile in one drag" hidden
@@ -284,7 +331,7 @@ function SinglePlayerGame({
       setShowHintPrompt: core.setShowHintPrompt,
       directionGuidance: core.directionGuidance,
       training: core.training,
-      onWordSubmit: core.handleWordSubmit,
+      onWordSubmit: wrappedWordSubmit,
       onPathSubmit: wrappedPathSubmit,
       onWordChange: wrappedWordChange,
       onPauseToggle: core.handlePauseToggle,
@@ -331,7 +378,7 @@ function SinglePlayerGame({
     core.setShowHintPrompt,
     core.directionGuidance,
     core.training,
-    core.handleWordSubmit,
+    wrappedWordSubmit,
     wrappedPathSubmit,
     wrappedWordChange,
     core.handlePauseToggle,
@@ -398,6 +445,13 @@ function SinglePlayerGame({
       <ModeCoach mode="classic" />
     ) : null;
 
+  // Rendered from ONE place for all three layouts — portrait, landscape and
+  // desktop reaching the same overlay separately is how one of them silently
+  // loses it (Class 3).
+  const stuckCoachElement = (
+    <StuckCoachOverlay coach={stuckCoach} grid={core.grid} language={settings.language} />
+  );
+
   // Landscape layout
   if (core.isLandscape) {
     return (
@@ -407,6 +461,7 @@ function SinglePlayerGame({
         {practicePromptElement}
         {practiceCoachElement}
         {modeCoachElement}
+      {stuckCoachElement}
         <LandscapeGameLayout
           {...commonProps}
           progressBarExpanded={core.progressBarExpanded}
@@ -427,6 +482,7 @@ function SinglePlayerGame({
         {practicePromptElement}
         {practiceCoachElement}
         {modeCoachElement}
+      {stuckCoachElement}
         <DesktopGameLayout
           {...commonProps}
           targetHighScore={core.targetHighScore}
@@ -446,6 +502,7 @@ function SinglePlayerGame({
       {scorePopupElement}
       {practicePromptElement}
       {modeCoachElement}
+      {stuckCoachElement}
       <PortraitGameLayout
         {...commonProps}
         targetHighScore={core.targetHighScore}

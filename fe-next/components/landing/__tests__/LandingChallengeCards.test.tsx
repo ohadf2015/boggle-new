@@ -54,10 +54,10 @@ const baseProps = {
 };
 
 describe('LandingChallengeCards', () => {
-  it('renders arena and practice cards', () => {
+  it('renders arena, and never a practice card', () => {
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByText('landing.arena')).toBeInTheDocument();
-    expect(screen.getByText('landing.practice')).toBeInTheDocument();
+    expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
   });
 
   it('shows blast mode for all players', () => {
@@ -76,24 +76,24 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
   });
 
-  describe('practice card emphasis for non-veterans', () => {
+  describe('practice is off the hub for every cohort', () => {
     afterEach(() => mockIsVeteran.mockReturnValue(false));
 
-    it('practice cube is highlighted whenever player is not a veteran', () => {
+    it('is absent for a non-veteran — it used to be the highlighted onramp', () => {
       mockIsVeteran.mockReturnValue(false);
       const { container } = render(<LandingChallengeCards {...baseProps} />);
       const practice = container.querySelector('[data-cube-key="practice"]');
-      expect(practice).not.toBeNull();
+      expect(practice).toBeNull();
       // The highlight is rendered as text content "onboarding.welcome.startHere"
-      expect(practice?.textContent).toContain('onboarding.welcome.startHere');
+
     });
 
-    it('practice cube renders above the SP grid (in visible set)', () => {
+    it('is absent from the SP grid too, not merely un-featured', () => {
       mockIsVeteran.mockReturnValue(false);
       const { container } = render(<LandingChallengeCards {...baseProps} />);
       const practice = container.querySelector('[data-cube-key="practice"]');
-      expect(practice).not.toBeNull();
-      expect(practice?.textContent).toContain('landing.practice');
+      expect(practice).toBeNull();
+
     });
 
     it('veteran landing has no practice cube', () => {
@@ -135,10 +135,10 @@ describe('LandingChallengeCards', () => {
       expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
     });
 
-    it('newcomers see practice and no quickPlay', () => {
+    it('newcomers see neither practice nor quickPlay', () => {
       mockIsVeteran.mockReturnValue(false);
       render(<LandingChallengeCards {...baseProps} />);
-      expect(screen.getByText('landing.practice')).toBeInTheDocument();
+      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
       expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
     });
   });
