@@ -37,6 +37,10 @@ import {
 } from '@/utils/androidApp';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 import {
+  readInstallDismissedUntil,
+  persistInstallDismissal,
+} from '@/lib/androidInstall/installCooldown';
+import {
   trackInstallClick,
   trackInstallDismissed,
   trackInstallPromoShown,
@@ -51,8 +55,6 @@ import {
 } from '@/components/ui/dialog';
 
 const SESSION_FLAG = 'android_app_install_promo_shown';
-const DISMISS_KEY = 'android_app_install_promo_dismissed_until';
-const DISMISS_DAYS = 14;
 const SHOW_DELAY_MS = 12_000;
 
 export default function AndroidAppInstallPromo() {
@@ -73,14 +75,13 @@ export default function AndroidAppInstallPromo() {
 
   // ── Unsolicited auto-popup gating ──────────────────────────────────────
   useEffect(() => {
-    const storedDismiss = localStorage.getItem(DISMISS_KEY);
     const baseInput = {
       ua: navigator.userAgent,
       isCapacitorNative: isCapacitorNative(),
       isStandalone: isStandaloneDisplay(),
       isInstalled: false,
       isAllowedRoute: isAllowedAdBannerRoute(pathname),
-      dismissedUntil: storedDismiss ? parseInt(storedDismiss, 10) : null,
+      dismissedUntil: readInstallDismissedUntil(),
       sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
       now: Date.now(),
     };
@@ -113,9 +114,15 @@ export default function AndroidAppInstallPromo() {
           // "never sees the promo at all", which reads as a variant win while
           // actually being a silent no-op (Class 4). Re-arming keeps the variant a
           // DELAY, not a suppression; it stops on show (session flag) or unmount.
+          // Storage is re-read here, not spread from `baseInput`: while the loop
+          // spins the player can dismiss from the header menu row, and a frozen
+          // `dismissedUntil: null` would fire the auto-popup straight through an
+          // active 14-day cooldown. (Class 1 — dual source of truth.)
           if (!shouldShowAndroidInstallPromo({
             ...baseInput,
             isInstalled: installed,
+            dismissedUntil: readInstallDismissedUntil(),
+            sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
             now: Date.now(),
             requireEngagement,
             gamesCompleted: readGamesCompletedCount(),
@@ -162,21 +169,19 @@ export default function AndroidAppInstallPromo() {
     };
   }, [pathname, openPromo, requireEngagement, trackPromoTimingExposure]);
 
-  const persistDismissal = () => {
-    localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_DAYS * 86_400_000));
-  };
-
   const handleDismiss = () => {
     trackInstallDismissed(source);
     closePromo();
-    persistDismissal();
-    // Collapse to the session pill instead of vanishing entirely.
+    persistInstallDismissal();
+    // Collapse to the session pill instead of vanishing entirely. The pill also
+    // reads the cooldown, so this is the LAST appearance for 14 days — it stays
+    // for the rest of this page view, not for every page the player opens next.
     showPill();
   };
 
   const handleInstall = () => {
     trackInstallClick(source);
-    persistDismissal();
+    persistInstallDismissal();
     // Carry an install referrer so the install is attributable in Play Console.
     window.location.href = playStoreUrlWithReferrer('install_popup', language);
   };

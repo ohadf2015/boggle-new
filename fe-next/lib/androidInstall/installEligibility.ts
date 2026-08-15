@@ -5,10 +5,14 @@
  * Deliberately narrower than `shouldShowAndroidInstallPromo` in
  * `utils/androidApp.ts`: that gate also enforces cooldown / once-per-session /
  * route allowlist because it governs an UNSOLICITED auto-popup. The re-entry
- * surfaces are USER-INITIATED, so they stay available regardless of a prior
- * dismissal — we only filter out platforms where installing the native Android
- * app is impossible or pointless (iOS, the native shell, an installed standalone
- * PWA). Desktop IS eligible — desktop players are a deliberate promo target.
+ * surfaces are USER-INITIATED, so this gate only filters out platforms where
+ * installing the native Android app is impossible or pointless (iOS, the native
+ * shell, an installed standalone PWA). Desktop IS eligible — desktop players are
+ * a deliberate promo target.
+ *
+ * The cooldown is deliberately absent here: the header menu row must stay
+ * reachable after a dismissal. The PILL, which auto-appears rather than waiting
+ * to be asked for, layers `isInstallPromoDismissed()` on top of this gate.
  */
 
 import { isAndroidInstallPromoUA } from '@/utils/androidApp';

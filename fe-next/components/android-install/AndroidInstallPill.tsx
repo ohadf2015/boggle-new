@@ -4,10 +4,14 @@
  * AndroidInstallPill — the session re-entry surface for the Android app install.
  *
  * Appears after the user dismisses the auto-popup (the dismiss handler calls
- * `showPill()`), so the offer doesn't vanish entirely for 14 days. It's
- * in-memory/session-only: a reload clears it, and the permanent header menu row
- * (GetAppMenuRow) is the durable way back. Closing it pins a session flag so it
- * stays gone until the next session.
+ * `showPill()`), so the offer doesn't vanish mid-page. The permanent header menu
+ * row (GetAppMenuRow) is the durable way back.
+ *
+ * It is NOT user-initiated — the store defaults it visible, so it auto-appears.
+ * That means it owes the player the same 14-day cooldown the popup respects:
+ * mounting inside an active dismissal renders nothing, and closing it arms the
+ * cooldown itself. Before that it re-appeared on every page load after a "no
+ * thanks" (desktop, 7 days: 2.58 impressions/session vs the popup's 1.07).
  *
  * Anchored to the inline-end EDGE, vertically centred — deliberately clear of
  * the header (top) and the AdMob banner band (bottom) that rides on these same
@@ -20,6 +24,10 @@ import { Smartphone, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 import { isAndroidInstallEntryEligible } from '@/lib/androidInstall/installEligibility';
+import {
+  isInstallPromoDismissed,
+  persistInstallDismissal,
+} from '@/lib/androidInstall/installCooldown';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import {
   isCapacitorNative,
@@ -55,6 +63,14 @@ export default function AndroidInstallPill() {
     if (typeof navigator === 'undefined') return;
     // Bridge already present → definitively native, stay hidden.
     if (isCapacitorNative()) return;
+
+    // Honour the popup's 14-day "no thanks". The pill defaults to visible in the
+    // store, so without this it walked back in on the very next page load and
+    // the dismissal only ever silenced the popup — on desktop that measured 2.58
+    // pill impressions per session against the popup's 1.07.
+    // Read at MOUNT, so a dismissal during this page view still collapses the
+    // popup into the pill (`showPill()`); it's the NEXT page that stays clean.
+    if (isInstallPromoDismissed()) return;
 
     const webEligible = isAndroidInstallEntryEligible({
       ua: navigator.userAgent,
@@ -97,6 +113,10 @@ export default function AndroidInstallPill() {
 
   const handleClose = () => {
     trackInstallPillDismissed();
+    // Closing the pill IS a "no thanks" — arm the same 14-day cooldown the popup
+    // writes, so it doesn't come back next session. The header menu row stays as
+    // the durable, user-initiated way in.
+    persistInstallDismissal();
     sessionStorage.setItem(HIDDEN_KEY, '1');
     setSessionHidden(true);
     hidePill();
