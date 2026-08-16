@@ -15396,6 +15396,7 @@ const ja = {
       "solved": "{count}/{total} 正解",
       "share": "結果をシェア",
       "copied": "コピーしました！",
+      "scoreLabel": "スコア",
       "guestName": "プレイヤー",
       "leaderboard": "本日のランキング",
       "loading": "読み込み中…",

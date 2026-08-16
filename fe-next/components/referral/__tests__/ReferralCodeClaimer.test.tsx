@@ -21,6 +21,11 @@ vi.mock('@/utils/authFetch', () => ({
   postWithAuth: (...args: unknown[]) => postMock(...args),
 }));
 
+const trackGrowthEventMock = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => trackGrowthEventMock(...args),
+}));
+
 let mockAuth: { isAuthenticated: boolean; user: { id: string } | null } = {
   isAuthenticated: false,
   user: null,
@@ -46,6 +51,7 @@ beforeEach(() => {
   localStorage.clear();
   postMock.mockReset();
   postMock.mockResolvedValue(ok());
+  trackGrowthEventMock.mockReset();
   mockAuth = { isAuthenticated: false, user: null };
   setSearch('');
 });
@@ -134,5 +140,28 @@ describe('ReferralCodeClaimer', () => {
     render(<ReferralCodeClaimer />);
 
     await waitFor(() => expect(postMock).not.toHaveBeenCalled());
+  });
+
+  it('tracks referral_link_clicked when a fresh ?ref= lands', async () => {
+    setSearch('?ref=AB12CD');
+
+    render(<ReferralCodeClaimer />);
+
+    await waitFor(() =>
+      expect(trackGrowthEventMock).toHaveBeenCalledWith(
+        'referral_link_clicked',
+        expect.objectContaining({ referralCode: 'AB12CD' })
+      )
+    );
+  });
+
+  it('does not track when there is no ?ref= in the URL', async () => {
+    localStorage.setItem(PENDING_REFERRAL_KEY, 'AB12CD');
+    mockAuth = { isAuthenticated: true, user: { id: 'new-user' } };
+
+    render(<ReferralCodeClaimer />);
+
+    await waitFor(() => expect(postMock).toHaveBeenCalled());
+    expect(trackGrowthEventMock).not.toHaveBeenCalled();
   });
 });

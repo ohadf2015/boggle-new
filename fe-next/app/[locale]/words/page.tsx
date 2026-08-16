@@ -5,6 +5,7 @@ import { InlineBannerAd } from '@/components/ads';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
+import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,6 +139,7 @@ export default async function WordsHubPage({ params }: PageParams) {
 
         <EsScrabbleCrossLink locale={locale} anchorVariant="words" />
         <SvScrabbleCrossLink locale={locale} anchorVariant="words" />
+        <EnBoggleCrossLink locale={locale} anchorVariant="words" />
         <HeScrabbleCrossLink locale={locale} anchorVariant="words" />
 
         {/* Words by Starting Letter */}

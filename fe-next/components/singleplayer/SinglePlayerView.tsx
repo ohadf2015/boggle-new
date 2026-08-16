@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import nextDynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import SinglePlayerGame from './SinglePlayerGame';
-import SinglePlayerResults from './SinglePlayerResults';
-import PracticeResults from './results/PracticeResults';
-import PreGameTutorial from './PreGameTutorial';
 import { getHighScore } from './highScoreManager';
 import { recordGameResult } from '@/utils/playerStats';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
@@ -32,6 +30,12 @@ import { useAchievementQueue } from '@/components/achievements';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
+
+// Off the LCP-critical path (phase 'playing' renders SinglePlayerGame only) —
+// deferred so results/tutorial JS (framer-motion, ads, confetti) doesn't block first paint.
+const SinglePlayerResults = nextDynamic(() => import('./SinglePlayerResults'), { ssr: false });
+const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), { ssr: false });
+const PreGameTutorial = nextDynamic(() => import('./PreGameTutorial'), { ssr: false });
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
 export type SinglePlayerPhase = 'pre-game' | 'playing' | 'results';

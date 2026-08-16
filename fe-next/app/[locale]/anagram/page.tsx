@@ -4,6 +4,7 @@ import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
+import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
@@ -317,6 +318,7 @@ export default async function AnagramHubPage({ params }: PageParams) {
 
         <EsScrabbleCrossLink locale={locale} anchorVariant="anagram" />
         <SvScrabbleCrossLink locale={locale} anchorVariant="anagram" />
+        <EnBoggleCrossLink locale={locale} anchorVariant="anagram" />
         <HeScrabbleCrossLink locale={locale} anchorVariant="anagram" />
 
         <section className="mb-10">

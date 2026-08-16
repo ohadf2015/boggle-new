@@ -19,6 +19,7 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { postWithAuth } from '@/utils/authFetch';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   readReferralCodeFromSearch,
   readPendingReferral,
@@ -34,7 +35,10 @@ export default function ReferralCodeClaimer() {
 
   useEffect(() => {
     const fromUrl = readReferralCodeFromSearch(window.location.search);
-    if (fromUrl) storePendingReferral(fromUrl);
+    if (fromUrl) {
+      storePendingReferral(fromUrl);
+      trackGrowthEvent('referral_link_clicked', { referralCode: fromUrl });
+    }
 
     const code = readPendingReferral();
     if (!code || !isAuthenticated || !user || claiming.current) return;

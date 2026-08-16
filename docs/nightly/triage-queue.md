@@ -4,6 +4,16 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-08-16
+
+### [Watch update] `/multiplayer` rage-clicks persist post-fix — source is NOT Quick Play re-entrancy
+- Closes the 2026-08-14 watch ("if `mp_quickplay_rapid_click` still nonzero after 3 nights, source is elsewhere"): `mp_quickplay_rapid_click` = **0 events in 7d** — the re-entrancy fix fully eliminated that path. Yet `/en/multiplayer` (bare, no `?room=`) still logged **21 `$rageclick` events in 7d**, the single largest rage-click surface in tonight's brief (next highest: 6).
+- Traced both above-fold CTA paths on this page and found NEITHER missing press feedback (ruling out the previously-validated "add `active:scale`" fix pattern from `homepage`/`avatar-builder`, confirmed via impact-check this run — 0 rage-clicks now on `/profile`, was 2):
+  - `ArenaCTAStrip.tsx` (Quick Play / Create Room hero buttons) — already has `whileTap={{scale:0.97}}` + `active:translate-y-0.5` + `active:shadow-hard-pressed` + explicit offline-disabled state.
+  - `RoomListView.tsx` room-list join cards — `whileTap`, disabled+dim (`opacity-50 cursor-not-allowed`) on ALL cards while any join is in-flight, spinner on the clicked card, and `trackMpRoomJoinBlocked`/`trackMpRoomJoinClicked` already fire.
+- `$el_text`/`$elements[1].tag_name` are **null on all 21** rage-click events for this URL (checked via HogQL) — PostHog's autocapture isn't resolving element identity on whatever's being clicked, which is itself an instrumentation gap blocking root-cause. Could be a canvas/SVG/Pixi element, a Framer-Motion-wrapped div PostHog's selector heuristic skips, or the CrazyGames friends strip / live-match-status bar (neither inspected this run — ran out of time budget).
+- Recommended owner: lane-03/lane-02 tomorrow — either (a) add explicit `data-ph-capture-attribute` / `$el_text`-friendly labeling to whatever renders in `CrazyGamesFriendsStrip` and the live-match status bar so the next rage-click sample resolves an element, or (b) pull `$session_id` for a few of the 21 events and watch a session recording directly instead of relying on autocapture element parsing.
+
 ## 2026-08-14
 
 ### [Rage-click root cause found + fixed] `/multiplayer` — Quick Play re-entrancy
@@ -2147,3 +2157,57 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: hydration mismatches need the actual component diff to root-cause; not investigated this run given time budget
   - recommended owner: self (next triage run)
+
+## 2026-08-16
+- [Supabase] IMPACT CHECK regression: get_user_rank still anon-executable after 08-13 fix
+  - baseline advisor finding: 1 (anon_security_definer_function_executable)
+  - status: shipped 08-16 (see migration fix_get_user_rank_anon_execute_public_grant)
+  - why: 08-13's `REVOKE EXECUTE ... FROM anon` never took effect because Postgres also
+    grants EXECUTE to the PUBLIC pseudo-role by default, and every role (incl. anon)
+    implicitly inherits PUBLIC's grants. Verified via has_function_privilege() before
+    and after: anon=true→false, public=true→false, authenticated stays true. Confirmed
+    no anon callsite (both getUserRank() call sites in LandingYourRank.tsx and
+    HomeRankCard.tsx gate on isAuthenticated && profile.id).
+  - recommended owner: review-by-eod
+  - LESSON for future REVOKE-from-anon fixes: always REVOKE FROM PUBLIC, anon (or check
+    has_function_privilege('public', ...) too) — REVOKE FROM anon alone is a no-op if a
+    PUBLIC grant exists underneath it.
+
+- [Sentry] Error: Connection is closed. (JAVASCRIPT-NEXTJS-1WM)
+  - last seen 2026-07-22 (25 days stale) — not a live 24h issue despite appearing in brief
+  - status: skipped
+  - why: stale, socket.io/ioredis broadcast during a redis reconnect blip; no recurrence since
+
+- [PostHog] TypeError: Failed to fetch (01a005c5-a299…, reach=1) and (019ff9e2-f631…, reach=2)
+  - status: reviewed, skipped
+  - why: stack shows /widget.js (our own self-hosted feedback-devtools bundle,
+    public/widget.js) wrapping window.fetch, then a Next.js JS chunk fetch timing out
+    through that wrapper. Root shape is a transient chunk-load network failure, same
+    class already handled by utils/retryImport.ts + ChunkErrorRecovery.tsx + ErrorBoundary.
+    Those matchers key on `name==='ChunkLoadError'` or specific "Loading chunk X failed"
+    messages — this event surfaces as a bare `TypeError: Failed to fetch`, which those
+    regexes don't match. Did NOT broaden the regex to match bare "Failed to fetch":
+    that string fires on any failed network fetch (API calls, images, etc.), not just
+    chunk loads — over-matching risks reload loops mid-game on genuine API failures.
+    reach is 1-2 users total, does not justify that risk tonight.
+  - recommended owner: design review — worth a dedicated matcher for chunk fetch by URL
+    pattern (`/_next/static/chunks/`) rather than broadening on message text alone.
+
+- [PostHog] RangeError: Maximum call stack size exceeded (019f56a2-08d4…, reach=1)
+  - status: deferred, not root-caused
+  - why: stack frames (`a._ended`, `a.play`, `a._emit`) are Howler.js (audio library)
+    internals bundled in chunk 83844 — looks like a play/end event recursion (an 'end'
+    handler synchronously re-triggering play, which ends synchronously again). Needs
+    isolating which app-level sound call feeds Howler this way; single user, ambiguous
+    root cause, out of tonight's time budget.
+  - recommended owner: self (audio/sound system owner), next available triage lane
+
+- [Supabase] Security Definer View: public.custom_puzzle_leaderboard (+ public_profiles,
+  connections_daily_leaderboard also flagged, longstanding)
+  - status: deferred
+  - why: SECURITY DEFINER views bypass querying-user RLS by design here (public leaderboard
+    reads) — same pattern as [[supabase-profiles-anon-write-hole]] class of finding.
+    Changing view owner/security mode without checking downstream leaderboard read paths
+    could silently break results for anon/guest viewers. Needs a deliberate check of what
+    RLS the view is intentionally bypassing before flipping SECURITY INVOKER.
+  - recommended owner: backend, review-by-eod not urgent (longstanding, not new tonight)

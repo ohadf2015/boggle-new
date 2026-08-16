@@ -335,9 +335,24 @@ export default function ConnectionsDailyChallenge() {
       <header className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h1 className="font-neo-display text-lg font-black text-neo-white">{t('connections.daily.title')}</h1>
-          <span data-testid="daily-progress" className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
-            {state.currentIndex + 1} / {total}
-          </span>
+          <div className="flex items-center gap-3">
+            {/* Score was invisible until the results screen — surfacing it live
+                turns each solve into a felt reward instead of a silent tally. */}
+            <m.span
+              key={state.score}
+              initial={prefersReducedMotion ? undefined : { scale: 1.35 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              data-testid="daily-score"
+              aria-label={`${t('connections.daily.scoreLabel')} ${state.score}`}
+              className="font-mono text-sm font-bold text-neo-yellow tabular-nums"
+            >
+              {state.score}
+            </m.span>
+            <span data-testid="daily-progress" className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
+              {state.currentIndex + 1} / {total}
+            </span>
+          </div>
         </div>
         {/* Attempts were spent invisibly before — the player only found out the
             budget existed when the run ended. Show it, per bridge. */}

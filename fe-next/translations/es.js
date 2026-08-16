@@ -15471,6 +15471,7 @@ const es = {
       "solved": "{count}/{total} resueltos",
       "share": "Compartir resultado",
       "copied": "¡Copiado!",
+      "scoreLabel": "Puntos",
       "guestName": "Jugador",
       "leaderboard": "Clasificación de hoy",
       "loading": "Cargando…",

@@ -13414,6 +13414,7 @@ const en = {
       "solved": "{count}/{total} solved",
       "share": "Share result",
       "copied": "Copied!",
+      "scoreLabel": "Score",
       "guestName": "Player",
       "leaderboard": "Today's Leaderboard",
       "loading": "Loading…",

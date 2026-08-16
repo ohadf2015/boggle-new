@@ -14837,6 +14837,7 @@ const he = {
       "solved": "{count}/{total} נפתרו",
       "share": "שתפו תוצאה",
       "copied": "הועתק!",
+      "scoreLabel": "ניקוד",
       "guestName": "שחקן",
       "leaderboard": "טבלת המובילים היום",
       "loading": "טוען…",

@@ -272,6 +272,7 @@ const sv = {
       "solved": "{count}/{total} lösta",
       "share": "Dela resultat",
       "copied": "Kopierat!",
+      "scoreLabel": "Poäng",
       "guestName": "Spelare",
       "leaderboard": "Dagens topplista",
       "loading": "Laddar…",
