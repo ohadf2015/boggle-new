@@ -215,7 +215,7 @@ function cacheHeaders(): RequestHandler {
  * Routes excluded from Express timeout:
  * - /api/cron/* - Next.js routes with maxDuration (120s+)
  */
-function requestTimeout(): RequestHandler {
+export function requestTimeout(): RequestHandler {
   const timeout = parseInt(process.env.REQUEST_TIMEOUT_MS || '30000', 10);
 
   // Routes that handle their own timeouts (Next.js maxDuration or long-running Express routes)
@@ -236,6 +236,21 @@ function requestTimeout(): RequestHandler {
     // Non-critical analytics; route owns a 4s wall-clock cap (see route.ts).
     // Was hanging 30s before its own cap was added — see Railway logs 2026-05-01.
     '/api/analytics/guest-session',
+    // The Next image optimizer MUST NOT be capped here. Next de-duplicates
+    // concurrent requests for one cache key (href + width + quality + output
+    // mime) onto a single in-flight optimization. When this 30s timer fired it
+    // answered 408 and destroyed the socket while sharp was still working, and
+    // that key's in-flight entry never settled again — every later request for
+    // the SAME key awaited a dead promise, hit 30s, and 408'd forever. One slow
+    // conversion (a cold boot converting ~13 cube PNGs at once) therefore
+    // permanently broke that one variant while every other width stayed fast.
+    // Observed 2026-08-16: /modes/cubes/daily.png w=384 and
+    // /seasons/season-5-phonic-phenoms.webp w=256 both 408'd on every request
+    // with a browser `Accept: image/webp`, but returned 200 in ~0.3s with
+    // `Accept: */*` (png passthrough, no conversion) — the daily hero and the
+    // season banner rendered with no art on the home hub. Widths differ per
+    // viewport/DPR, so each device poisons its own subset of keys.
+    '/_next/image',
   ];
 
   const isDev = process.env.NODE_ENV !== 'production';
