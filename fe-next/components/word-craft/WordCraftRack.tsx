@@ -123,26 +123,15 @@ function WordCraftRackImpl({
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
 
-              // Contract:
-              // - Board empty (0 pending): tap → auto-place at center
-              // - 1 pending tile, unselected: tap → select (toggle)
-              // - 1+ pending, selected + axis locked: re-tap → auto-place along axis
-              // - Otherwise: tap → toggle selection
-
+              // Always try to auto-place when tapping a non-pending tile.
+              // - Board empty: places at center along chosenAxis
+              // - 1+ pending: places along chosenAxis (or axis if locked)
+              // - If placement fails (no empty cell), falls back to selection
               const isPending = pendingIds.has(tile.id);
-              const boardIsEmpty = pendingIds.size === 0;
-              const canAutoPlace = (
-                // Empty board: auto-place at center
-                (boardIsEmpty && !isPending && onFastTap)
-                ||
-                // Re-tap of selected tile when axis is locked
-                (isSelected && axisLocked && onFastTap)
-              );
-
-              if (canAutoPlace) {
+              if (!isPending && onFastTap) {
                 onFastTap(tile);
               } else {
-                // Select/deselect the tile
+                // Tile is pending, or no fast-tap available: select/deselect toggle
                 onSelect(isSelected ? null : tile.id);
               }
             }}

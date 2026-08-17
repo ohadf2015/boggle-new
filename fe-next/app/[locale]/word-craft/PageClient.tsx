@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -11,10 +12,16 @@ import { loadSetupPrefs, saveSetupPrefs, type WordCraftSetupChoice } from '@/lib
 import { trackWordCraftSetupStart } from '@/components/word-craft/wordCraftTelemetry';
 import { cn } from '@/lib/utils';
 
-type WordCraftPhase = { name: 'setup' } | { name: 'playing'; choice: WordCraftSetupChoice };
+const WordCraftMP = dynamic(() => import('./WordCraftMP').then((m) => m.default), { ssr: false });
+
+type WordCraftPhase =
+  | { name: 'setup' }
+  | { name: 'playing'; choice: WordCraftSetupChoice }
+  | { name: 'mp'; matchId: string };
 
 /**
  * Decide whether the visit needs the setup screen. Pure so it's unit-testable:
+ *  - ?mp=<matchId> → 1v1 multiplayer (invited by other player)
  *  - duel link → straight to play (the challenger's contract locks everything)
  *  - ?vs=human deep link → straight to hotseat play
  *  - ?quick=1 → straight to play with the persisted prefs
@@ -25,6 +32,8 @@ export function resolveInitialWordCraftPhase(
   hasDuel: boolean,
   prefs: WordCraftSetupChoice,
 ): WordCraftPhase {
+  const mp = searchParams.get('mp');
+  if (mp) return { name: 'mp', matchId: mp };
   if (hasDuel) return { name: 'playing', choice: { ...prefs, opponent: 'bot' } };
   if (searchParams.get('vs') === 'human') return { name: 'playing', choice: { ...prefs, opponent: 'hotseat' } };
   if (searchParams.get('quick') === '1') return { name: 'playing', choice: prefs };
@@ -79,6 +88,11 @@ export default function WordCraftPageClient() {
     setGameInstance((n) => n + 1);
     setPhase({ name: 'playing', choice });
   }, []);
+
+  // 1v1 multiplayer mode
+  if (phase.name === 'mp') {
+    return <WordCraftMP matchId={phase.matchId} />;
+  }
 
   if (phase.name === 'setup') {
     return (

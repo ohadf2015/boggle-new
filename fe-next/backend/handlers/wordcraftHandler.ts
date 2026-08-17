@@ -15,13 +15,12 @@ import {
   getMatchState,
   submitWordCraftMove,
   submitWordCraftPass,
-  setWordCraftTimeoutHandler,
-  setWordCraftGameOverHandler,
   endWordCraftMatch,
   getRemainingTurnTime,
 } from '../modules/wordcraftManager.js';
-import { validateWord } from '../modules/wordValidator.js';
+import { getCachedTrie } from '../modules/boggleSolver.js';
 import type { WordCraftPlacement } from '@/shared/types/wordcraft';
+import type { PlacedTile, RackTile } from '@/lib/word-craft/types';
 
 // Payload schemas
 const submitMoveSchema = z.object({
@@ -41,31 +40,87 @@ const requestStateSchema = z.object({});
 
 type SubmitMovePayload = z.infer<typeof submitMoveSchema>;
 
+// Map roomId → { player1SocketId, player2SocketId, started }
+const roomSeats = new Map<string, { player1SocketId?: string; player2SocketId?: string; started: boolean }>();
+
 export function registerWordCraftHandlers(io: Server, socket: Socket): void {
   const socketId = socket.id;
   let currentRoomId: string | null = null;
+  let currentPlayer: 'player1' | 'player2' | null = null;
 
-  // Track socket's room
+  // Track socket's room and assign seats
   socket.on('joinWordCraftRoom', (data: unknown) => {
     if (!checkRateLimit(socketId)) {
       socket.emit('wordcraftError', { error: 'RATE_LIMITED' });
       return;
     }
 
-    const validation = validatePayload(z.object({ roomId: z.string() }), data);
+    const validation = validatePayload(z.object({ roomId: z.string(), username: z.string() }), data);
     if (!validation.success) {
       socket.emit('wordcraftError', { error: 'INVALID_PAYLOAD', message: validation.error });
       return;
     }
 
-    const { roomId } = validation.data as { roomId: string };
+    const { roomId, username } = validation.data as { roomId: string; username: string };
     currentRoomId = roomId;
 
     socket.join(getGameRoom(roomId));
-    logger.info('WORDCRAFT', `Socket ${socketId} joined room ${roomId}`);
+
+    // Assign seat (player1 or player2) based on who joined first
+    let seats = roomSeats.get(roomId);
+    if (!seats) {
+      seats = { started: false };
+      roomSeats.set(roomId, seats);
+    }
+
+    if (!seats.player1SocketId) {
+      seats.player1SocketId = socketId;
+      currentPlayer = 'player1';
+      logger.info('WORDCRAFT', `Socket ${socketId} assigned player1 in room ${roomId}`);
+    } else if (!seats.player2SocketId) {
+      seats.player2SocketId = socketId;
+      currentPlayer = 'player2';
+      logger.info('WORDCRAFT', `Socket ${socketId} assigned player2 in room ${roomId}`);
+    } else {
+      socket.emit('wordcraftError', { error: 'ROOM_FULL' });
+      return;
+    }
+
+    // Create match if it doesn't exist (first player joins)
+    let state = getMatchState(roomId);
+    if (!state) {
+      try {
+        const player1Username = currentPlayer === 'player1' ? username : 'Player 1';
+        const player2Username = currentPlayer === 'player2' ? username : 'Player 2';
+
+        // Create empty 6x6 board
+        const board: PlacedTile[][] = Array(6).fill(null).map(() => Array(6).fill(null));
+
+        // Create tile bag with 100 tiles
+        const bag: RackTile[] = Array.from({ length: 100 }, (_, i) => ({
+          id: `tile-${i}`,
+          letter: String.fromCharCode(65 + (i % 26)),
+          value: 1,
+          isBlank: false,
+        }));
+
+        state = initializeWordCraftMatch({
+          roomId,
+          player1Username,
+          player2Username,
+          board,
+          bag,
+          turnDeadlineMs: 60000,
+        });
+        logger.info('WORDCRAFT', `Created new match in room ${roomId}`);
+      } catch (err) {
+        logger.error('WORDCRAFT', `Failed to create match: ${err}`);
+        socket.emit('wordcraftError', { error: 'MATCH_CREATION_FAILED' });
+        return;
+      }
+    }
 
     // Send current state to the joining player
-    const state = getMatchState(roomId);
     if (state) {
       socket.emit('wordcraftState', {
         board: state.board,
@@ -82,13 +137,14 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
         turn: state.turn,
         gameStatus: state.gameStatus,
         remainingTime: getRemainingTurnTime(roomId),
+        yourSeat: currentPlayer,
       });
     }
   });
 
   // Submit a move (place tiles)
   socket.on('submitWordCraftMove', async (rawData: unknown) => {
-    if (!currentRoomId || !checkRateLimit(socketId)) {
+    if (!currentRoomId || !currentPlayer || !checkRateLimit(socketId)) {
       socket.emit('wordcraftError', { error: 'RATE_LIMITED' });
       return;
     }
@@ -102,15 +158,24 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
     const { placements, rack } = validation.data as SubmitMovePayload;
 
     try {
+      // Word validator using cached trie (Shiritori pattern)
+      const wordValidator = async (word: string) => {
+        const trie = getCachedTrie('en'); // TODO: use game language
+        if (!trie) return false;
+        let node = trie as any;
+        for (const char of word.toLowerCase()) {
+          node = node[char];
+          if (!node) return false;
+        }
+        return !!(node && node.isWord === true);
+      };
+
       const result = await submitWordCraftMove(
         currentRoomId,
-        'player1', // TODO: map socket to player1/player2
+        currentPlayer,
         placements,
         rack,
-        async (positions, word) => {
-          // Validate word using existing word validator
-          return await validateWord(word, 'en'); // TODO: use game language
-        }
+        wordValidator
       );
 
       if (result.valid) {
@@ -136,7 +201,7 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
 
   // Submit a pass
   socket.on('submitWordCraftPass', (rawData: unknown) => {
-    if (!currentRoomId || !checkRateLimit(socketId)) {
+    if (!currentRoomId || !currentPlayer || !checkRateLimit(socketId)) {
       socket.emit('wordcraftError', { error: 'RATE_LIMITED' });
       return;
     }
@@ -148,7 +213,7 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
     }
 
     try {
-      const result = submitWordCraftPass(currentRoomId, 'player1'); // TODO: map socket to player
+      const result = submitWordCraftPass(currentRoomId, currentPlayer);
 
       if (result.valid) {
         const state = getMatchState(currentRoomId);
@@ -200,6 +265,7 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
         gameStatus: state.gameStatus,
         winner: state.winner,
         remainingTime: getRemainingTurnTime(currentRoomId),
+        yourSeat: currentPlayer,
       });
     }
   });
