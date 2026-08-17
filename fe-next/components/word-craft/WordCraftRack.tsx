@@ -122,25 +122,29 @@ function WordCraftRackImpl({
             onClick={() => {
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
-              // Real axis locked (≥2 collinear tiles): a single tap on ANY tile
-              // auto-places it at the only legal next cell. This is the
-              // lightweight "tap-tap-tap to spell" flow for letters 3..7. It is
-              // unambiguous (one legal cell), so it cannot reproduce the old
-              // length-1 "tap doesn't work" confusion — that was direction
-              // ambiguity, which only exists before a real axis is set.
-              if (autoPlaceOnTap && onFastTap) {
+
+              // Contract:
+              // - Board empty (0 pending): tap → auto-place at center
+              // - 1 pending tile, unselected: tap → select (toggle)
+              // - 1+ pending, selected + axis locked: re-tap → auto-place along axis
+              // - Otherwise: tap → toggle selection
+
+              const isPending = pendingIds.has(tile.id);
+              const boardIsEmpty = pendingIds.size === 0;
+              const canAutoPlace = (
+                // Empty board: auto-place at center
+                (boardIsEmpty && !isPending && onFastTap)
+                ||
+                // Re-tap of selected tile when axis is locked
+                (isSelected && axisLocked && onFastTap)
+              );
+
+              if (canAutoPlace) {
                 onFastTap(tile);
-                return;
+              } else {
+                // Select/deselect the tile
+                onSelect(isSelected ? null : tile.id);
               }
-              // Length-1 convenience: re-tapping the ALREADY-selected tile while a
-              // (provisional) axis is locked auto-places along the chosen axis.
-              // Tapping any OTHER tile just selects it — so "tap a letter, then
-              // tap the cell I want" still works while the direction is being set.
-              if (isSelected && axisLocked && onFastTap) {
-                onFastTap(tile);
-                return;
-              }
-              onSelect(isSelected ? null : tile.id);
             }}
             className={cn(
               // touch-pan-x lets the browser handle horizontal swipe of the

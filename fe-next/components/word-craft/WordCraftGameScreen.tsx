@@ -359,7 +359,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // Fast-tap: when the player has placed >=2 tiles in a line, a tap on a rack
   // tile auto-drops at the next empty cell along that axis. Eliminates per-tile
   // targeting for placements 3..7 of a turn.
-  const handleFastTap = useCallback(
+  const handleRackTileTap = useCallback(
     (tile: { id: string }) => {
       const rackTile = game.activePlayer.rack.find((t) => t.id === tile.id);
       if (!rackTile) return;
@@ -376,10 +376,16 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         const toEl = document.querySelector(`[data-board-cell="${result.placement.row},${result.placement.col}"]`);
         juice.arcTilePlace(fromEl, toEl, rackTile.letter, rackTile.value);
         game.placeTileOnBoard(rackTile.id, result.placement.row, result.placement.col);
+      } else {
+        // Can't auto-place, fall back to selection
+        game.selectRackTile(tile.id);
       }
     },
     [game, juice, chosenAxis],
   );
+
+  // For backwards-compat with existing code that may call handleFastTap directly
+  const handleFastTap = handleRackTileTap;
 
   // Wrap raw recall handlers so the strip / board cells share the same
   // telemetry surface but the analytics can disambiguate the source.
@@ -1115,12 +1121,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           tiles={activeRack}
           selectedId={game.state.selectedRackTileId}
           pendingIds={pendingIds}
-          onSelect={game.selectRackTile}
+          onSelect={handleRackTileTap}
           onTileDragStart={(tile, e) => beginTileDrag(tile.id, tile.letter, tile.value, e)}
           consumeDropFlag={consumeDropFlag}
           onFastTap={handleFastTap}
           axisLocked={game.state.pendingPlacements.length >= 1}
-          autoPlaceOnTap={axis !== null}
           draggingTileId={drag?.active ? drag.tileId : null}
           disabled={!canInteract || !dict}
           ariaLabel={t('wordcraft.yourRack')}

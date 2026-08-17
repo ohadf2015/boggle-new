@@ -86,7 +86,11 @@ export function resolveTap(
   board: Board,
   chosenAxis: Axis = 'h',
 ): ResolveResult {
-  if (pending.length === 0) return { reason: 'no-axis-yet' };
+  // Empty board: auto-place at center
+  if (pending.length === 0) {
+    const center = Math.floor(board.cells.length / 2);
+    return { placement: tileToPlacement(rackTile, center, center) };
+  }
 
   // One pending tile: no axis is locked yet, so honor the player's pre-selected
   // direction (default horizontal). Drop the tap in the first empty cell along
