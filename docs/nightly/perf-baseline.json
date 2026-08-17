@@ -1,29 +1,33 @@
 {
-  "date": "2026-08-16",
-  "note": "supabase MCP never connected this run either (ToolSearch checked twice over the run, tools stayed absent) -- 3rd consecutive night (08-14/08-15/08-16). Backend STEP 1 (EXPLAIN ANALYZE, apply_migration) entirely skipped again. Brief's unindexed_foreign_keys (vocabulary_lessons_classroom_id_fkey) and unused_index (idx_word_pacts_player2_id) carried unchanged -- both need MCP confirmation before any migration, not actionable from REST alone. auth_db_connections_absolute is a dashboard toggle, out of scope for this lane. Frontend: shipped a bundle-splitting fix on the brief's #1 LCP route (en/singleplayer?autoStart=bots, 7324ms). SinglePlayerView.tsx statically imported SinglePlayerResults (557 lines, framer-motion+ads+confetti+achievement badges), PracticeResults (487 lines), and PreGameTutorial (150 lines) -- all three only render after phase transitions away from the initial 'playing' phase (never on first paint, which is SinglePlayerGame). Converted all three to next/dynamic(ssr:false), same pattern as 08-15's WordTowerLeaderboard fix. Verified: eslint clean on the changed file. Did not run full build/bundle-size re-measure (time-budget discipline, single import-graph change, no new deps).",
+  "date": "2026-08-17",
+  "note": "supabase MCP not used this run -- time budget spent on the frontend fix + impact-check verdict; STEP 1 backend deferred again (unindexed_foreign_keys on vocabulary_lessons and auth_db_connections_absolute carried unchanged, both non-actionable without MCP execute_sql/apply_migration). Frontend: brief's candidate routes (esl-word-games n=2, word-craft n=10, /he n=11, / n=20) were ALL below the mandatory 50-sample floor -- no regression verdict written for any of them, per sample-gate rule. Did a code-level pass instead (founder SPEED priority stands regardless of stats) and found a real bug: EducationHeroBanner's above-fold hero <img> (first content element on every /education/* page, incl. esl-word-games) had loading=\"lazy\" -- a lazy-loaded above-fold image is a textbook LCP delay (browser defers fetch start pending layout/intersection check instead of starting it immediately). Fixed to loading=\"eager\" + fetchPriority=\"high\". Also ran the brief's IMPACT CHECK for the 08-14 /friends LCP tween-removal: n=0 web_vitals events in the last 24h on /friends -- no-exposure, verdict written as neutral with an explicit no-exposure note (per learnings, never call a zero-denominator read a real confirmation).",
   "backend": {
-    "mcp_status": "never connected this run -- STEP 1 (execute_sql, EXPLAIN ANALYZE, apply_migration) entirely skipped, 3rd consecutive night",
-    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- carried, non-actionable per learnings doc (2-row table, 4+ nights confirmed)",
-    "unused_index_still_open": "public.idx_word_pacts_player2_id on word_pacts -- brief-flagged again, still not droppable without MCP usage-stat confirmation",
+    "mcp_status": "not used this run -- time spent on frontend fix + impact verdict instead",
+    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- carried, non-actionable per learnings doc (small table, 5+ nights confirmed)",
     "auth_db_connections_advisor": "dashboard config toggle, not a code/migration fix -- deferred to human queue"
   },
   "frontend": {
-    "by_route_from_brief": [
-      { "route": "/en/singleplayer?autoStart=bots", "lcp_ms": 7324, "action": "fixed tonight -- see shipped_fix" },
-      { "route": "/en/multiplayer?room=6RUG6F", "lcp_ms": 6324, "action": "not investigated this run -- time budget, room-specific URL not a stable route to audit" },
-      { "route": "/en/daily/word-wheel", "lcp_ms": 4032, "action": "not investigated this run -- time budget" },
-      { "route": "/sv/tools/word-solver", "lcp_ms": 3761, "action": "not investigated this run -- time budget" }
+    "by_route_from_brief_sample_check": [
+      { "route": "/en/education/esl-word-games", "p75_lcp": 8460, "n": 2, "status": "below 50-sample floor -- no regression verdict; fixed the underlying code bug anyway (lazy hero image)" },
+      { "route": "/en/word-craft", "p75_lcp": 5712, "n": 10, "status": "below 50-sample floor -- not investigated this run, no obvious above-fold image/heavy-import issue found (game logic already dynamic-imported with ssr:false)" },
+      { "route": "/he", "p75_lcp": 4780, "n": 11, "status": "below 50-sample floor -- not investigated this run" },
+      { "route": "/", "p75_lcp": 1902, "n": 20, "status": "below 50-sample floor -- also no longer looks slow (1902ms vs brief's stale 4788ms), likely noise from a prior small-n snapshot" }
     ],
     "shipped_fix": {
-      "route": "/[locale]/singleplayer (autoStart=bots)",
-      "file": "fe-next/components/singleplayer/SinglePlayerView.tsx",
-      "change": "converted static imports of SinglePlayerResults, PracticeResults, PreGameTutorial to next/dynamic(..., { ssr: false }) -- none render during the initial 'playing' phase, removes ~1200 lines + framer-motion/ads/confetti from the page's critical-path bundle",
-      "verified": "eslint clean on changed file; no full build run (time budget)",
-      "measured_before_after": "not measured -- no deploy in this session, re-check via impact ledger in 3 days once PostHog accumulates n>=50 on singleplayer route"
+      "route": "all /[locale]/education/* pages using EducationHeroBanner (esl-word-games, for-schools, vocabulary-games-classroom, etc.)",
+      "file": "fe-next/components/education/EducationHeroBanner.tsx",
+      "change": "hero <img> (first content element after <main>, the LCP candidate on every education landing page) had loading=\"lazy\" -- switched to loading=\"eager\" + fetchPriority=\"high\". Left the <picture>/webp-source markup untouched (minimal diff, avoids breaking 2 existing tests that assert picture/source presence).",
+      "verified": "eslint run on the changed file (see report for result)"
+    },
+    "impact_check_result": {
+      "verdict_for": "02-perf-2026-08-14-friends-lcp-tween",
+      "verdict": "neutral",
+      "measured": 0,
+      "note": "n=0 in last 24h -- no-exposure, not a real re-measurement"
     }
   },
   "bundle": {
-    "note": "not re-measured tonight -- single import-graph split, no new deps, no full build run (time-budget discipline)",
+    "note": "not re-measured tonight -- no new imports/deps added, single one-line attribute change, no full build run (time-budget discipline)",
     "carried_from_08-13": {
       "total_chunks_kb": 31482,
       "total_chunk_files": 964

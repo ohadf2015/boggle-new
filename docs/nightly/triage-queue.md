@@ -2211,3 +2211,27 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
     could silently break results for anon/guest viewers. Needs a deliberate check of what
     RLS the view is intentionally bypassing before flipping SECURITY INVOKER.
   - recommended owner: backend, review-by-eod not urgent (longstanding, not new tonight)
+
+## 2026-08-17
+- [Supabase] Security Definer View: public.custom_puzzle_leaderboard
+  - reach=0, severity=0.9, advisor:security:security_definer_view
+  - status: shipped 20260817030000_fix_custom_puzzle_leaderboard_security_definer.sql
+  - why: same shape as leaderboard-profiles-rls-invoker-trap-2026-08-12 (profiles own-row RLS breaks cross-user joins) — verified fix keeps anon reads working (3/3 rows resolve avatar_config post-fix) before shipping
+  - recommended owner: review-by-eod
+- [Supabase] SECURITY DEFINER anon/authenticated execute: get_past_season_leaderboard, upsert_push_token
+  - advisor:security:anon_security_definer_function_executable / authenticated_security_definer_function_executable
+  - status: verified-correct, NOT changed
+  - why: get_past_season_leaderboard is deliberately GRANTed to anon (migration 20260812210000) and called directly from components/seasons/PastSeasonsLeaderboard.tsx for guest viewers of past-season leaderboards — revoking would break that public leaderboard. upsert_push_token authenticated-exec is the normal RPC pattern for a user writing their own push token; matches the "69 authd-secdef intentionally kept" set from supabase-advisor-cleanup-2026-04-29. Closing both as false positives.
+  - recommended owner: self (closed)
+- [PostHog] Minified React error #418 (occurrences_24h=2, issue 019f185d-dc16-7bf0-8ff4-7390159a8048)
+  - status: deferred — not investigated this run (time budget)
+  - why: needs stack/component identification before diagnosing (React #418 = hydration mismatch); low reach (2) tonight
+  - recommended owner: self (tomorrow)
+- [Sentry] Error: Connection is closed. (JAVASCRIPT-NEXTJS-1WM, JAVASCRIPT-NEXTJS-1WJ, issues_24h reach=0)
+  - status: deferred — not investigated this run (time budget)
+  - why: reach=0 in brief (no active occurrences in window), low priority vs the shipped security fix
+  - recommended owner: self (tomorrow)
+- [PostHog] TypeError: Failed to fetch (occurrences_24h=1, issue 019ff9e2-f631-7b41-b1ca-8717b84bef64)
+  - status: deferred — not investigated this run (time budget)
+  - why: reach=1, generic network-fetch error, needs stack before root-causing
+  - recommended owner: self (tomorrow)
