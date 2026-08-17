@@ -33,6 +33,11 @@ const GAME_ROUTES = [
   // The install pill (`fixed end-0 top-1/2`) sat straight over the right-hand
   // columns of the grid, covering cells the player has to tap.
   '/crossword',
+  // WordCraft is the same again — an h-svh board with a tile rack. Observed
+  // 2026-08-17: the full-screen install promo fired mid-turn, and dismissing it
+  // dropped the player back to a fresh game. Both the 1v1 (`?mp=`) and solo
+  // paths live under this one route.
+  '/word-craft',
 ];
 
 // Hub landings that share a prefix with a GAME_ROUTES entry but are themselves

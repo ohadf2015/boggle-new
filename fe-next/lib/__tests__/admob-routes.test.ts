@@ -31,6 +31,15 @@ describe('isAllowedAdBannerRoute', () => {
     expect(isAllowedAdBannerRoute('/he/word-tower/')).toBe(false);
   });
 
+  it('blocks /word-craft — the install promo fired mid-turn and cost the player their board', () => {
+    expect(isAllowedAdBannerRoute('/word-craft')).toBe(false);
+    expect(isAllowedAdBannerRoute('/en/word-craft')).toBe(false);
+    expect(isAllowedAdBannerRoute('/he/word-craft/')).toBe(false);
+    // The 1v1 match and the other sub-modes share this route via query params,
+    // so blocking the path covers every way into a live game.
+    expect(isAllowedAdBannerRoute('/en/word-craft', new URLSearchParams('mp=abc123'))).toBe(false);
+  });
+
   it('allows the /connections landing (SEO hub) but blocks its gameplay sub-routes', () => {
     expect(isAllowedAdBannerRoute('/connections')).toBe(true);
     expect(isAllowedAdBannerRoute('/he/connections/')).toBe(true);
