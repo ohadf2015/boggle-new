@@ -1,6 +1,41 @@
 {
-  "generatedAt": "2026-08-15T18:24:08.643Z",
+  "generatedAt": "2026-08-17T17:52:06.394Z",
   "commits": [
+    {
+      "sha": "69621908c3adc675e7c12a47a0fff6ce3117153b",
+      "shortSha": "6962190",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-17",
+      "author": "Ohad Fisher",
+      "date": "2026-08-17T05:39:08+03:00"
+    },
+    {
+      "sha": "089626637ea765b6032aef1ac486a949cecab7a9",
+      "shortSha": "0896266",
+      "subject": "fix(images): stop the 30s Express cap from permanently poisoning image variants",
+      "author": "Ohad Fisher",
+      "date": "2026-08-16T22:56:41+03:00"
+    },
+    {
+      "sha": "b907e9cbd2e0b9168057fd40eee0d205e0bb92b0",
+      "shortSha": "b907e9c",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-16",
+      "author": "Ohad Fisher",
+      "date": "2026-08-16T03:57:47+03:00"
+    },
+    {
+      "sha": "0a7784811cac7848fca50e842ff97a80ff794b09",
+      "shortSha": "0a77848",
+      "subject": "chore(i18n): refresh translation report for the new blast tile keys",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T21:57:08+03:00"
+    },
+    {
+      "sha": "0163a06be5090664478d30f2069abfc55c8325eb",
+      "shortSha": "0163a06",
+      "subject": "fix(sentry): bots found no words in Russian, and a zero-word round crashed your own results",
+      "author": "Ohad Fisher",
+      "date": "2026-08-15T21:34:53+03:00"
+    },
     {
       "sha": "b78edfb032c2f8dae37064cbaf6691d5b1bd7217",
       "shortSha": "b78edfb",
@@ -105,41 +140,6 @@
       "subject": "feat(ftue): take practice off the hub, and give single-player a stuck coach",
       "author": "Ohad Fisher",
       "date": "2026-08-15T10:53:32+03:00"
-    },
-    {
-      "sha": "99e47dec4938d2aaf0c53b51f1c3238c7fc57d9a",
-      "shortSha": "99e47de",
-      "subject": "feat(ftue): end onboarding inside a real game, not the practice hub",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T10:42:30+03:00"
-    },
-    {
-      "sha": "0efc7a1742e889649eab7a41dc1be764dc1a78a5",
-      "shortSha": "0efc7a1",
-      "subject": "fix(referral): the referral loop had never fired once — close it end to end",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T10:23:09+03:00"
-    },
-    {
-      "sha": "1c4490c56630a6f99fabc962c0b8e05cf3a59ace",
-      "shortSha": "1c4490c",
-      "subject": "Merge remote-tracking branch 'origin/master'",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T10:07:25+03:00"
-    },
-    {
-      "sha": "31b2d54c3b4208a8e21c5a42567c9777ec146bbf",
-      "shortSha": "31b2d54",
-      "subject": "fix(android-install): the install pill ignored the dismissal and came back on every page",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T09:56:26+03:00"
-    },
-    {
-      "sha": "aaf7b8cc088d3213f3af97529243b653806f44f9",
-      "shortSha": "aaf7b8c",
-      "subject": "fix(friends): the friends module read every other player from a table RLS forbids",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T09:56:01+03:00"
     }
   ]
 }

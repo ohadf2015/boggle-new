@@ -135,6 +135,7 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         role="radiogroup"
         aria-label={t('wordcraft.setup.twist.label')}
         className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-2 [@media(max-height:520px)]:row-start-1 [@media(max-height:520px)]:row-span-2"
+        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.modifier, twists, (modifier) => setChoice((c) => ({ ...c, modifier })))}
       >
         <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
           {t('wordcraft.setup.twist.label')}

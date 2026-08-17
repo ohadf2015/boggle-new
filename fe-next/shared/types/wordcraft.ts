@@ -3,7 +3,7 @@
  * Server-authoritative 1v1 turn-based tile placement game
  */
 
-import type { Tile, Position, PlayerState } from '@/lib/word-craft/types';
+import type { RackTile, PlacedTile } from '@/lib/word-craft/types';
 
 export type WordCraftTurn = 'player1' | 'player2';
 
@@ -11,18 +11,18 @@ export interface WordCraftGameState {
   // Players
   player1: {
     username: string;
-    rack: Tile[];
+    rack: RackTile[];
     score: number;
   };
   player2: {
     username: string;
-    rack: Tile[];
+    rack: RackTile[];
     score: number;
   };
 
   // Board & bag state
-  board: Tile[][];
-  bag: Tile[];
+  board: PlacedTile[][];
+  bag: RackTile[];
   usedTiles: Set<string>;
 
   // Turn management
@@ -43,7 +43,7 @@ export interface WordCraftGameState {
 
 export interface WordCraftPlacement {
   tileId: string;
-  pos: Position;
+  pos: { row: number; col: number };
   letter: string;
 }
 
