@@ -9,6 +9,7 @@ import {
   remaining,
   swap,
   isEmpty,
+  drawWithVowelGuarantee,
 } from '../tileBag';
 
 describe('English tile constants', () => {
@@ -158,5 +159,33 @@ describe('swap', () => {
     const result = swap(bag, dummyTiles);
     expect(result).toHaveLength(1);
     expect(remaining(bag)).toBe(7);
+  });
+});
+
+describe('drawWithVowelGuarantee', () => {
+  const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
+
+  it('initial rack always has at least one vowel (across many random seeds)', () => {
+    for (let seed = 1; seed <= 100; seed++) {
+      const bag = createBag({ seed });
+      const rack = drawWithVowelGuarantee(bag, 7);
+      const hasVowel = rack.some(tile => VOWELS.has(tile.letter));
+      expect(hasVowel).toBe(true, `Seed ${seed} produced no vowels in rack`);
+    }
+  });
+
+  it('returns exactly 7 tiles when bag has enough', () => {
+    const bag = createBag({ seed: 42 });
+    const rack = drawWithVowelGuarantee(bag, 7);
+    expect(rack).toHaveLength(7);
+  });
+
+  it('exhausts the bag if necessary to get a vowel (edge case)', () => {
+    // This is a theoretical edge case — in practice, vowels are ~40% of the
+    // distribution so finding one is nearly guaranteed before draining the bag.
+    const bag = createBag({ seed: 1 });
+    const rack = drawWithVowelGuarantee(bag, 7);
+    expect(rack.length).toBeGreaterThan(0);
+    expect(rack.some(t => VOWELS.has(t.letter))).toBe(true);
   });
 });

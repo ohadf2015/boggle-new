@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from './board';
-import { createBag, draw, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
+import { createBag, draw, drawWithVowelGuarantee, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
@@ -126,8 +126,9 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
       ? modifierOverride
       : rollModifier(seed);
   const rackSize = modifierRackSize(modifier);
-  const playerRack = draw(bag, rackSize);
-  const botRack = draw(bag, rackSize);
+  // Guarantee at least one vowel in opening racks so first move is playable
+  const playerRack = drawWithVowelGuarantee(bag, rackSize);
+  const botRack = drawWithVowelGuarantee(bag, rackSize);
   return {
     // Conquest mode: a neutral grid with no premium squares and no center
     // star. Every cell is plain until a player claims it.
