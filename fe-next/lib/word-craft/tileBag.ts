@@ -102,7 +102,7 @@ export function swap(bag: TileBag, returned: RackTile[], rackSize: number = RACK
 /**
  * Draw n tiles from the bag, guaranteeing at least one vowel (A, E, I, O, U) in
  * the result. If the bag has fewer than n tiles, returns all remaining tiles.
- * Used for initial rack setup to ensure the first move is playable.
+ * Used for initial rack setup and post-move refills to ensure playable racks.
  */
 export function drawWithVowelGuarantee(bag: TileBag, n: number): RackTile[] {
   const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);

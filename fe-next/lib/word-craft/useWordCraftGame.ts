@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from './board';
-import { createBag, draw, drawWithVowelGuarantee, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
+import {
+  createBag,
+  draw,
+  drawWithVowelGuarantee,
+  remaining,
+  swap as swapBag,
+  type SupportedLocale,
+  type TileBag,
+} from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
@@ -178,8 +186,11 @@ function commitMove(
   // Cloning the tile list and carrying a FRESH bag object fixes both.
   const drawCount = Math.max(0, state.rackSize - remainingRack.length);
   const nextBagTiles = state.bag.tiles.slice();
-  const replenish = nextBagTiles.splice(0, Math.min(drawCount, nextBagTiles.length));
-  const nextBag: TileBag = { ...state.bag, tiles: nextBagTiles };
+  // Refill should also guarantee a vowel if the remaining rack has none
+  const replenishBag: TileBag = { ...state.bag, tiles: nextBagTiles };
+  const replenish =
+    drawCount > 0 ? drawWithVowelGuarantee(replenishBag, drawCount) : [];
+  const nextBag: TileBag = replenishBag;
   const newRack = [...remainingRack, ...replenish];
 
   // Stamp newly-placed tiles into the board first so capture logic walks an
@@ -269,32 +280,10 @@ function applyEndgameTerritory(state: WordCraftState): WordCraftState {
 function reducer(state: WordCraftState, action: Action): WordCraftState {
   switch (action.type) {
     case 'SELECT_RACK_TILE': {
-      // Opening nudge: the game's very first tile-select drops the tile onto
-      // the center cell as a normal (recallable) pending placement, killing
-      // the "where do I even start?" blank-board decision. Strictly once per
-      // game — a recall hands full control back (no auto-replace tug-of-war).
-      if (action.id && !state.autoCenterDone && state.pendingPlacements.length === 0 && isFirstMove(state.board)) {
-        const activeRack = state.turn === 'bot' ? state.bot.rack : state.player.rack;
-        const tile = activeRack.find((t) => t.id === action.id);
-        const center = Math.floor(state.board.size / 2);
-        if (tile && !state.board.cells[center][center].tile) {
-          const placement: PlacedTile = {
-            row: center,
-            col: center,
-            letter: tile.letter,
-            value: tile.value,
-            isBlank: tile.isBlank,
-            rackTileId: tile.id,
-          };
-          return {
-            ...state,
-            pendingPlacements: [placement],
-            selectedRackTileId: null,
-            lastError: null,
-            autoCenterDone: true,
-          };
-        }
-      }
+      // Consistent behavior: selecting a tile just selects it (sets selectedRackTileId).
+      // The player then taps a board square to place it. This works the same on move 1,
+      // move 2, and beyond. The UI can help by showing the board center or chosen axis
+      // to guide placement, but the game state treats all moves uniformly.
       return { ...state, selectedRackTileId: action.id, lastError: null };
     }
     case 'PLACE_PENDING':
