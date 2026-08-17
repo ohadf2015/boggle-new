@@ -5,12 +5,12 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { Server, Socket } from 'socket.io';
-import { registerWordCraftHandlers } from '../wordcraftHandler';
+import { registerWordCraftHandlers } from '../wordcraftHandler.js';
 import {
   initializeWordCraftMatch,
   getMatchState,
   submitWordCraftPass,
-} from '../../modules/wordcraftManager';
+} from '../../modules/wordcraftManager.js';
 import type { Tile } from '@/lib/word-craft/types';
 
 describe('WordCraft Handler - Two Client Integration', () => {
