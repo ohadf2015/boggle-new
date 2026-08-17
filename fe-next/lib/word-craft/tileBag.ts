@@ -113,6 +113,12 @@ export function drawWithVowelGuarantee(bag: TileBag, n: number): RackTile[] {
     return rack;
   }
 
+  // Hebrew and Japanese bags carry no Latin vowels at all, so searching for one
+  // would drain the whole bag into the rack. Leave those racks exactly as drawn.
+  if (!bag.tiles.some((t) => VOWELS.has(t.letter))) {
+    return rack;
+  }
+
   // No vowel — keep drawing until we get one, then rebuild the rack
   const extraDrawn: RackTile[] = [];
   while (bag.tiles.length > 0) {
