@@ -2932,6 +2932,7 @@ const ja = {
     },
     "quickStart": {
       "play": "プレイ",
+      "playSub": "2分のクイックゲーム · 登録不要",
       "howToPlay": "遊び方",
       "haveAccount": "アカウントを持っている"
     },
@@ -3269,6 +3270,21 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "streakIgnition": {
+      "titleWon": "ストリーク点火！",
+      "titleLost": "あと1勝で点火",
+      "body": "今日はプレイ済み。明日も戻って炎を守ろう — 1日でも休むと消えてしまいます。",
+      "bodyLost": "1勝すればストリーク開始。思っているより近いです。",
+      "day": "{n}日目"
+    },
+    "tomorrowCard": {
+      "title": "明日：新しいデイリーチャレンジ",
+      "countdown": "新しいパズルまで {time}"
+    },
+    "saveStreak": {
+      "title": "ストリークを保存",
+      "body": "ストリークはこの端末に保存されます。無料アカウントを作成すれば、どこでも引き継げます。"
+    },
     "mpGapNudge": "あと{gap}点差 — 次のラウンドで巻き返そう！",
     "rivals": {
       "aria": "ライバルとの対戦",

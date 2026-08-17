@@ -2528,6 +2528,7 @@ const en = {
     },
     "quickStart": {
       "play": "PLAY",
+      "playSub": "Quick 2-min game · no signup needed",
       "howToPlay": "How to play",
       "haveAccount": "I have an account"
     },
@@ -2807,6 +2808,21 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "streakIgnition": {
+      "titleWon": "STREAK IGNITED!",
+      "titleLost": "ONE WIN TO IGNITE",
+      "body": "You played today. Come back tomorrow to keep the flame alive — miss a day and it goes out.",
+      "bodyLost": "Win one game and your streak begins. You're closer than you think.",
+      "day": "Day {n}"
+    },
+    "tomorrowCard": {
+      "title": "TOMORROW: new Daily Challenge",
+      "countdown": "New puzzle in {time}"
+    },
+    "saveStreak": {
+      "title": "Save my streak",
+      "body": "Streaks live on this device. Create a free account to keep them anywhere."
+    },
     "mpGapNudge": "Only {gap} pts behind — take it next round!",
     "rivals": {
       "aria": "You versus your rivals",

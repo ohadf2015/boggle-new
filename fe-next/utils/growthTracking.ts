@@ -67,6 +67,16 @@ export type GrowthEvent =
   | 'streak_milestone'
   | 'streak_broken'
   | 'streak_freeze_used'
+  // Streak Ignition (t_89663cfc) — first-session win-moment redesign on the
+  // solo results screen. streak_ignition_shown: StreakIgnitionCard impression,
+  //   props { day: number, won: boolean, variant: 'won' | 'lost' }.
+  // tomorrow_card_shown: persistent TomorrowCard impression (first-session
+  //   players only), props { seconds_to_midnight: number }.
+  // save_streak_clicked: player acted on the streak-insurance signup card,
+  //   props { source: 'solo_results' }.
+  | 'streak_ignition_shown'
+  | 'tomorrow_card_shown'
+  | 'save_streak_clicked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
