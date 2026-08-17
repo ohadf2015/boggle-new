@@ -11,7 +11,7 @@ import {
   applyWordCraftMove,
   applyWordCraftPass,
   applyWordCraftTimeout,
-} from '@/lib/word-craft/mp/matchState';
+} from '@/shared/utils/wordcraftMatch';
 import type { Tile } from '@/lib/word-craft/types';
 
 export interface WordCraftMatchInitParams {
@@ -64,10 +64,25 @@ export function initializeWordCraftMatch(
     timers,
   });
 
-  // Start timer for current player (player1)
-  startTurnTimer(roomId, 'player1', turnDeadlineMs);
+  // The clock deliberately does NOT start here. A match is created when the
+  // FIRST player joins, so starting it now means player1 forfeits on the turn
+  // timer while still waiting for an opponent to open the invite link —
+  // observed live: a fresh match reported `finished` before anyone moved.
+  // The handler calls startWordCraftClock once the second seat is filled.
 
   return state;
+}
+
+/**
+ * Start the turn clock for whoever is on turn. Call this when both seats are
+ * occupied; safe to call more than once (startTurnTimer clears any existing
+ * timer for that player first).
+ */
+export function startWordCraftClock(roomId: string): void {
+  const match = activeMatches.get(roomId);
+  if (!match) return;
+  if (match.state.gameStatus !== 'in-progress') return;
+  startTurnTimer(roomId, match.state.turn, match.state.turnDeadlineMs);
 }
 
 export function getMatch(roomId: string):

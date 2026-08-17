@@ -12,6 +12,7 @@ import { validatePayload } from '../utils/socketValidation.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import {
   initializeWordCraftMatch,
+  startWordCraftClock,
   getMatchState,
   submitWordCraftMove,
   submitWordCraftPass,
@@ -120,19 +121,29 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
       }
     }
 
+    // Both seats filled → now the turn clock may run. Before this point the
+    // first player is alone and must not be able to forfeit on time.
+    if (state && seats.player1SocketId && seats.player2SocketId && !seats.started) {
+      seats.started = true;
+      startWordCraftClock(roomId);
+      logger.info('WORDCRAFT', `Both seats filled in room ${roomId} — turn clock started`);
+    }
+
     // Send current state to the joining player
+    // Only send your own rack for security (opponent can't see your tiles)
     if (state) {
+      const yourRack = currentPlayer === 'player1' ? state.player1.rack : state.player2.rack;
       socket.emit('wordcraftState', {
         board: state.board,
         player1: {
           username: state.player1.username,
           score: state.player1.score,
-          rackCount: state.player1.rack.length,
+          rack: currentPlayer === 'player1' ? state.player1.rack : [],
         },
         player2: {
           username: state.player2.username,
           score: state.player2.score,
-          rackCount: state.player2.rack.length,
+          rack: currentPlayer === 'player2' ? state.player2.rack : [],
         },
         turn: state.turn,
         gameStatus: state.gameStatus,
@@ -254,12 +265,12 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
         player1: {
           username: state.player1.username,
           score: state.player1.score,
-          rackCount: state.player1.rack.length,
+          rack: currentPlayer === 'player1' ? state.player1.rack : [],
         },
         player2: {
           username: state.player2.username,
           score: state.player2.score,
-          rackCount: state.player2.rack.length,
+          rack: currentPlayer === 'player2' ? state.player2.rack : [],
         },
         turn: state.turn,
         gameStatus: state.gameStatus,
