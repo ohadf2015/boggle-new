@@ -1934,14 +1934,14 @@
         "pattern": "`wordcraft.difficulty.${d}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 98,
+        "line": 126,
         "context": "label={t(`wordcraft.difficulty.${d}`)}"
       },
       {
         "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 118,
+        "line": 146,
         "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {
