@@ -7,6 +7,32 @@ import { WORDCRAFT_MODIFIERS, modifierLabelKey, type WordCraftModifier } from '@
 import type { WordCraftSetupChoice } from '@/lib/word-craft/setupPrefs';
 import { cn } from '@/lib/utils';
 
+/**
+ * Handle radiogroup keyboard navigation per WAI-ARIA 1.2.
+ * Arrow keys (Right/Down advance, Left/Up go back) cycle through children.
+ */
+function handleRadiogroupKeyDown<T>(
+  event: React.KeyboardEvent,
+  currentValue: T,
+  options: T[],
+  onSelect: (value: T) => void
+) {
+  if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
+
+  event.preventDefault();
+  const currentIndex = options.indexOf(currentValue);
+  if (currentIndex === -1) return;
+
+  let nextIndex = currentIndex;
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    nextIndex = (currentIndex + 1) % options.length;
+  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    nextIndex = (currentIndex - 1 + options.length) % options.length;
+  }
+
+  onSelect(options[nextIndex]);
+}
+
 type TFn = (path: string, fallback?: string) => string;
 
 export interface WordCraftSetupProps {
@@ -55,6 +81,7 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         role="radiogroup"
         aria-label={t('wordcraft.setup.opponent.label')}
         className="grid grid-cols-3 gap-2 shrink-0 [@media(max-height:520px)]:col-start-1 [@media(max-height:520px)]:row-start-1"
+        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.opponent, ['bot', 'hotseat', 'friend'] as const, (opponent) => setChoice((c) => ({ ...c, opponent })))}
       >
         <OpponentCard
           selected={choice.opponent === 'bot'}
@@ -85,6 +112,7 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
           role="radiogroup"
           aria-label={t('wordcraft.setup.difficulty.label')}
           className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-1 [@media(max-height:520px)]:row-start-2"
+          onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.difficulty, BOT_DIFFICULTIES, (difficulty) => setChoice((c) => ({ ...c, difficulty })))}
         >
           <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
             {t('wordcraft.setup.difficulty.label')}
@@ -107,6 +135,7 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         role="radiogroup"
         aria-label={t('wordcraft.setup.twist.label')}
         className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-2 [@media(max-height:520px)]:row-start-1 [@media(max-height:520px)]:row-span-2"
+        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.modifier, twists, (modifier) => setChoice((c) => ({ ...c, modifier })))}
       >
         <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
           {t('wordcraft.setup.twist.label')}
