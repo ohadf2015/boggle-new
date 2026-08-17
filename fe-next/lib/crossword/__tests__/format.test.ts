@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   FULL_SIZE,
+  defaultFormat,
   isNewspaperScale,
   loadFormat,
   saveFormat,
@@ -39,12 +40,33 @@ describe('isNewspaperScale', () => {
   });
 });
 
+describe('defaultFormat', () => {
+  it('opens on the full board wherever the bank can fill one', () => {
+    expect(defaultFormat('en')).toBe('full');
+    expect(defaultFormat('he')).toBe('mini');
+    expect(defaultFormat('es')).toBe('mini');
+    expect(defaultFormat('sv')).toBe('mini');
+  });
+});
+
 describe('format persistence', () => {
   beforeEach(() => window.localStorage.clear());
 
-  it('defaults to mini and round-trips a saved choice', () => {
+  it('opens on the locale default when the player has never chosen', () => {
+    expect(loadFormat('en')).toBe('full');
+    expect(loadFormat('he')).toBe('mini');
+  });
+
+  it('round-trips a saved choice, INCLUDING a deliberate mini', () => {
+    saveFormat('mini');
+    // The full default must not steamroll a player who picked the small board on purpose.
     expect(loadFormat('en')).toBe('mini');
     saveFormat('full');
+    expect(loadFormat('en')).toBe('full');
+  });
+
+  it('falls back to the default on a junk stored value', () => {
+    window.localStorage.setItem('lexiclash:crossword:format', 'jumbo');
     expect(loadFormat('en')).toBe('full');
   });
 

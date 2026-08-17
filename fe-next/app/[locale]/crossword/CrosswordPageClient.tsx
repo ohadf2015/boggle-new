@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { generateDailyPuzzle, generateFreeplayPuzzle } from '@/lib/crossword/generate.daily';
 import { loadStreak, persistSolve, type StreakState, emptyStreak } from '@/lib/crossword/streak';
 import {
+  defaultFormat,
   loadFormat,
   saveFormat,
   supportsFull,
@@ -86,9 +87,11 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   const [edition, setEdition] = useState<Edition>({ isDaily: true, label: '' });
   const [streak, setStreak] = useState<StreakState>(emptyStreak());
   const [generating, setGenerating] = useState(false);
-  // Read on mount rather than in the initialiser: localStorage isn't available during SSR, and a
-  // differing first client render would hydrate-mismatch.
-  const [format, setFormat] = useState<CrosswordFormat>('mini');
+  // Initial state is the locale's DEFAULT (pure — same on server and client, so no hydrate
+  // mismatch); the saved choice is layered on at mount, where localStorage exists. Seeding this
+  // with a hardcoded 'mini' instead would generate and cache a mini every load before the effect
+  // swapped it for the full board — a wasted fill and a visible size flash.
+  const [format, setFormat] = useState<CrosswordFormat>(() => defaultFormat(locale));
   useEffect(() => setFormat(loadFormat(locale)), [locale]);
   const [genError, setGenError] = useState<boolean>(false);
   const seqRef = useRef(0); // guards against out-of-order async results
