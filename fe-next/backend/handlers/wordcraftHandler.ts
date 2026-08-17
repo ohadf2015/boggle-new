@@ -20,6 +20,7 @@ import {
   getRemainingTurnTime,
 } from '../modules/wordcraftManager.js';
 import { getCachedTrie } from '../modules/boggleSolver.js';
+import { createWordCraftBoard, createWordCraftBag } from '@/shared/utils/wordcraftBag.js';
 import type { WordCraftPlacement } from '@/shared/types/wordcraft';
 import type { PlacedTile, RackTile } from '@/lib/word-craft/types';
 
@@ -42,7 +43,79 @@ const requestStateSchema = z.object({});
 type SubmitMovePayload = z.infer<typeof submitMoveSchema>;
 
 // Map roomId → { player1SocketId, player2SocketId, started }
-const roomSeats = new Map<string, { player1SocketId?: string; player2SocketId?: string; started: boolean }>();
+// Usernames are recorded alongside the sockets so a player who drops and comes
+// back is put in the SAME seat. Without that, if both players vanished the first
+// to rejoin would take seat 1 — and seat 1's rack is a different player's tiles.
+const roomSeats = new Map<
+  string,
+  {
+    player1SocketId?: string;
+    player2SocketId?: string;
+    player1Username?: string;
+    player2Username?: string;
+    started: boolean;
+  }
+>();
+
+/**
+ * Emit fresh game state to both players with their private racks.
+ * Called after a move/pass to sync the board, scores, and refilled racks.
+ */
+function broadcastPrivateWordCraftState(io: Server, roomId: string): void {
+  const state = getMatchState(roomId);
+  const seats = roomSeats.get(roomId);
+  if (!state || !seats) return;
+
+  const room = getGameRoom(roomId);
+
+  // Emit to player1 with their rack
+  if (seats.player1SocketId) {
+    const socket1 = io.sockets.sockets.get(seats.player1SocketId);
+    if (socket1) {
+      socket1.emit('wordcraftState', {
+        board: state.board,
+        player1: {
+          username: state.player1.username,
+          score: state.player1.score,
+          rack: state.player1.rack,
+        },
+        player2: {
+          username: state.player2.username,
+          score: state.player2.score,
+          rackCount: state.player2.rack.length,
+        },
+        turn: state.turn,
+        gameStatus: state.gameStatus,
+        remainingTime: getRemainingTurnTime(roomId),
+        yourSeat: 'player1',
+      });
+    }
+  }
+
+  // Emit to player2 with their rack
+  if (seats.player2SocketId) {
+    const socket2 = io.sockets.sockets.get(seats.player2SocketId);
+    if (socket2) {
+      socket2.emit('wordcraftState', {
+        board: state.board,
+        player1: {
+          username: state.player1.username,
+          score: state.player1.score,
+          rackCount: state.player1.rack.length,
+        },
+        player2: {
+          username: state.player2.username,
+          score: state.player2.score,
+          rack: state.player2.rack,
+        },
+        turn: state.turn,
+        gameStatus: state.gameStatus,
+        remainingTime: getRemainingTurnTime(roomId),
+        yourSeat: 'player2',
+      });
+    }
+  }
+}
 
 export function registerWordCraftHandlers(io: Server, socket: Socket): void {
   const socketId = socket.id;
@@ -74,14 +147,31 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
       roomSeats.set(roomId, seats);
     }
 
-    if (!seats.player1SocketId) {
+    // A returning player reclaims their own seat before any free seat is handed
+    // out, so a reconnect can never drop someone into the opponent's rack.
+    const reclaim: 'player1' | 'player2' | null =
+      !seats.player1SocketId && seats.player1Username === username
+        ? 'player1'
+        : !seats.player2SocketId && seats.player2Username === username
+          ? 'player2'
+          : null;
+
+    if (reclaim === 'player1' || (!reclaim && !seats.player1SocketId)) {
       seats.player1SocketId = socketId;
+      seats.player1Username = username;
       currentPlayer = 'player1';
-      logger.info('WORDCRAFT', `Socket ${socketId} assigned player1 in room ${roomId}`);
-    } else if (!seats.player2SocketId) {
+      logger.info(
+        'WORDCRAFT',
+        `Socket ${socketId} ${reclaim ? 'reclaimed' : 'assigned'} player1 in room ${roomId}`,
+      );
+    } else if (reclaim === 'player2' || !seats.player2SocketId) {
       seats.player2SocketId = socketId;
+      seats.player2Username = username;
       currentPlayer = 'player2';
-      logger.info('WORDCRAFT', `Socket ${socketId} assigned player2 in room ${roomId}`);
+      logger.info(
+        'WORDCRAFT',
+        `Socket ${socketId} ${reclaim ? 'reclaimed' : 'assigned'} player2 in room ${roomId}`,
+      );
     } else {
       socket.emit('wordcraftError', { error: 'ROOM_FULL' });
       return;
@@ -94,16 +184,9 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
         const player1Username = currentPlayer === 'player1' ? username : 'Player 1';
         const player2Username = currentPlayer === 'player2' ? username : 'Player 2';
 
-        // Create empty 6x6 board
-        const board: PlacedTile[][] = Array(6).fill(null).map(() => Array(6).fill(null));
-
-        // Create tile bag with 100 tiles
-        const bag: RackTile[] = Array.from({ length: 100 }, (_, i) => ({
-          id: `tile-${i}`,
-          letter: String.fromCharCode(65 + (i % 26)),
-          value: 1,
-          isBlank: false,
-        }));
+        // Create real 13x13 board and properly distributed tile bag
+        const board = createWordCraftBoard(13);
+        const bag = createWordCraftBag(Date.now());
 
         state = initializeWordCraftMatch({
           roomId,
@@ -200,6 +283,8 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
             newTurn: state.turn,
             remainingTime: getRemainingTurnTime(currentRoomId),
           });
+          // Emit fresh state to both players with their private racks and opponent counts
+          broadcastPrivateWordCraftState(io, currentRoomId);
         }
       } else {
         socket.emit('wordcraftError', { error: result.error });
@@ -235,6 +320,8 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
             gameStatus: state.gameStatus,
             remainingTime: getRemainingTurnTime(currentRoomId),
           });
+          // Emit fresh state to both players with their private racks
+          broadcastPrivateWordCraftState(io, currentRoomId);
         }
       } else {
         socket.emit('wordcraftError', { error: result.error });
@@ -282,9 +369,17 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
   });
 
   socket.on('disconnect', () => {
-    if (currentRoomId) {
-      logger.info('WORDCRAFT', `Socket ${socketId} disconnected from room ${currentRoomId}`);
-      // TODO: pause game briefly, allow reconnect
+    if (!currentRoomId) return;
+
+    // Release the seat, keep the match. Seats used to be held forever, so a
+    // player who refreshed was told ROOM_FULL and locked out of their own game.
+    // The match state itself survives on purpose — rejoining must land back on
+    // the same board.
+    const seats = roomSeats.get(currentRoomId);
+    if (seats) {
+      if (seats.player1SocketId === socketId) seats.player1SocketId = undefined;
+      if (seats.player2SocketId === socketId) seats.player2SocketId = undefined;
     }
+    logger.info('WORDCRAFT', `Socket ${socketId} left room ${currentRoomId} — seat released`);
   });
 }
