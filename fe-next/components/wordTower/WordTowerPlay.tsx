@@ -91,6 +91,7 @@ import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { applyAsyncWrecks, type PendingWreck } from '@/lib/wordTower/asyncWreck';
 import { asyncWreckDamageFloors } from '@/lib/wordTower/sabotage';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 
 /** How long a transient celebration toast holds before it auto-dismisses. Kept
  *  short + uniform so banners clear quickly and never pile up / "stick" on
@@ -203,6 +204,43 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // closure snapshot.
   const gameRef = useRef(game);
   gameRef.current = game;
+
+  // Session funnel. Word Tower shipped with ZERO telemetry across its 25
+  // components: PostHog held no word-tower event at all, so "6 players ever"
+  // (word_tower_progress, 2026-08-17) could not be told apart from "hundreds
+  // open it and bounce before floor 1". Endless mode has no completion, so the
+  // pair is start-on-mount / abandon-on-exit carrying the height reached —
+  // that distribution IS the cliff. Reuses the same helpers every other mode
+  // calls, so the mode lands in the existing funnels for free (trackGameStart
+  // also arms the pagehide abandon, which covers a closed tab).
+  useEffect(() => {
+    const startedAt = Date.now();
+    // The daily tower PERSISTS across sessions, so a returning player mounts with
+    // floors already built. Baseline them, or every resumed session would report
+    // "reached floor 1" without the player having placed anything this visit.
+    const floorsAtStart = gameRef.current.floors.length;
+    trackGameStart('word-tower', { daily, floorsAtStart });
+    return () => {
+      const g = gameRef.current;
+      const floorsBuilt = g.floors.length - floorsAtStart;
+      trackGameEnd(
+        'word-tower',
+        Math.round(g.heightM),
+        Math.max(0, floorsBuilt),
+        false,
+        Math.round((Date.now() - startedAt) / 1000),
+        {
+          floors: g.floors.length,
+          floorsBuilt,
+          heightM: Math.round(g.heightM),
+          daily,
+          // The bounce test: did this visit place a single floor at all?
+          placedAnyFloor: floorsBuilt > 0,
+        },
+      );
+    };
+    // Mount/unmount only — a re-run would double-count the session.
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Live coin balance mirror — coinManager is a plain (server-synced) store with
   // no reactive hook, so we mirror it locally (same pattern as the upgrade panel)
