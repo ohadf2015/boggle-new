@@ -372,12 +372,7 @@ export function WordCraftZoomShell({
           background: `radial-gradient(ellipse at center, transparent 60%, rgba(26,26,46,${ZOOM_FEEL.vignetteOpacity}) 100%)`,
         }}
       />
-      {/* Only the player's own zoom earns a control on the board. Auto-follow
-          zooms constantly, and its readout looked like a tile sitting on the
-          grid — the one overlay a blind A/B kept flagging.
-          ponytail: reads the ref, so it appears on the next render after a
-          gesture; every gesture path also changes scale, which re-renders. */}
-      {isZoomed && userControlledRef.current && (
+      {isZoomed && (
         <button
           type="button"
           onClick={handleManualReset}
