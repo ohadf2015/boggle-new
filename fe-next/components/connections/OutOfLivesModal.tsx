@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Heart, Play, Loader2, LogOut } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
+import { getCurrentLives, msUntilNextLife } from '@/lib/connections/livesStore';
 
 interface OutOfLivesModalProps {
   open: boolean;
@@ -27,6 +29,33 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
   });
 
   const isLoading = status === 'loading' || status === 'showing';
+
+  // Time-based refill. On the web `canShowAd` is always false (the rewarded
+  // provider is gated off pending AdSense approval), so before this the modal's
+  // only live control was "quit to menu" — a permanent dead end that is the most
+  // likely cause of Connections' 7.7% completion vs classic's 35%. Poll instead
+  // of trusting one render: the wait outlives any single paint, and the value
+  // lives in localStorage where nothing notifies us.
+  const [msLeft, setMsLeft] = useState<number | null>(null);
+  const [lifeReady, setLifeReady] = useState(false);
+  useEffect(() => {
+    if (!open || isAdmin) return;
+    const tick = () => {
+      setLifeReady(getCurrentLives(language) > 0);
+      setMsLeft(msUntilNextLife(language));
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [open, isAdmin, language]);
+
+  const waitLabel = (() => {
+    if (msLeft === null) return null;
+    const totalSec = Math.max(0, Math.ceil(msLeft / 1000));
+    const mm = Math.floor(totalSec / 60);
+    const ss = totalSec % 60;
+    return mm > 0 ? `${mm}m ${ss}s` : `${ss}s`;
+  })();
 
   return (
     <AnimatePresence>
@@ -68,6 +97,19 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                   <Heart className="w-4 h-4" aria-hidden="true" />
                   {t('connections.adminRefill')}
                 </m.button>
+              ) : lifeReady ? (
+                // A life has regenerated — let them straight back in. This is the
+                // branch that makes the modal recoverable without an ad provider.
+                <m.button
+                  type="button"
+                  onClick={onRevive}
+                  whileHover={{ scale: 1.03, y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-lime bg-neo-lime text-neo-navy font-neo-display font-bold px-5 py-3 shadow-hard"
+                >
+                  <Heart className="w-4 h-4" aria-hidden="true" />
+                  {t('connections.continueWithRegenLife', 'Continue')}
+                </m.button>
               ) : (
                 <m.button
                   type="button"
@@ -95,7 +137,15 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                 {t('connections.quitToMenu')}
               </button>
 
-              {!isAdmin && !canShowAd && (
+              {/* Was a flat "no ad available. Try again later." — true but a dead
+                  end, because nothing told the player that waiting actually works.
+                  The countdown is the recovery instruction. */}
+              {!isAdmin && !lifeReady && waitLabel && (
+                <p className="text-neo-white text-xs">
+                  {t('connections.nextLifeIn', 'Next life in {{time}}', { time: waitLabel })}
+                </p>
+              )}
+              {!isAdmin && !lifeReady && !waitLabel && !canShowAd && (
                 <p className="text-neo-white text-xs">{t('connections.noAdAvailable')}</p>
               )}
             </div>

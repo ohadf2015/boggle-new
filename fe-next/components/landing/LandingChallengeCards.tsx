@@ -215,8 +215,10 @@ export function LandingChallengeCards({
 
   // Modes that fire `mode_selected` in the control switch — preserve so the
   // A/B compares layout, not instrumentation.
+  // `wordTower` was omitted when it went public (2026-08-14), so the hub → mode
+  // step of its funnel emitted nothing and the mode looked like it had no intake.
   const TRACK_SELECTED = new Set<LandingCardKey>([
-    'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft',
+    'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower',
   ]);
   const buildCubeModel = (key: LandingCardKey, role: 'anchor' | 'normal'): ModeCubeModel | null => {
     const meta = MODE_META[key];
