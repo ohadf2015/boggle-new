@@ -51,7 +51,6 @@ import { alphabetForLocale } from '@/lib/word-craft/wordCraftAlphabet';
 import { isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { WordCraftBlankPicker } from '@/components/word-craft/WordCraftBlankPicker';
 import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
-import { WordCraftPlacementGuide } from '@/components/word-craft/WordCraftPlacementGuide';
 import { WordCraftStepHint } from '@/components/word-craft/WordCraftStepHint';
 import { resolveWordCraftStep } from '@/lib/word-craft/stepHint';
 import { WordCraftModifierChip } from '@/components/word-craft/WordCraftModifierChip';
@@ -816,6 +815,26 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // First-move flag drives the rack glow (no center star to ping anymore).
   const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
 
+  // Compute which cells would be valid drop targets based on linearity constraints.
+  // Prevents placing tiles in invalid positions (off-axis) at the UI level.
+  const computeInvalidCell = useMemo(() => {
+    return (row: number, col: number): boolean => {
+      const pending = game.state.pendingPlacements;
+      if (pending.length === 0) return false; // All cells valid when no pending
+      if (pending.length === 1) {
+        // One tile placed: both row and column are valid (axis not locked yet)
+        const p = pending[0];
+        return row !== p.row && col !== p.col;
+      }
+      // Two or more tiles: only cells on the locked axis are valid
+      const axis = inferAxis(pending);
+      if (axis === 'h') return row !== pending[0].row;
+      if (axis === 'v') return col !== pending[0].col;
+      // If axis is null (tiles not aligned), cell is invalid
+      return true;
+    };
+  }, [game.state.pendingPlacements]);
+
   const showPendingStrip = game.state.pendingPlacements.length > 0;
   // Whether the on-screen human may act now. Bot-mode: only on the player's
   // turn. Hot-seat: either seat's turn, but not while the hand-off curtain is
@@ -927,6 +946,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           playerSeed={challengerIdentity.name}
           opponentAvatar={scoreboardOpponent.avatar}
           opponentSeed={scoreboardOpponent.seed}
+          modifier={game.state.modifier}
+          modifierT={t}
           labels={{
             you: hotseat ? t('wordcraft.player1') : t('wordcraft.you'),
             bot: hotseat ? t('wordcraft.player2') : t('wordcraft.bot'),
@@ -942,9 +963,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           } : undefined}
         />
 
-        {/* Active per-game modifier — surfaced so the twist (esp. land_grab
-            chain-capture) is felt, not silent. Hidden for the 'none' baseline. */}
-        <WordCraftModifierChip modifier={game.state.modifier} t={t} />
+        {/* Modifier moved into scoreboard via separate prop */}
 
         {/* Duel target: keeps the challenger's avatar + name + score-to-beat
             visible for the whole async duel (the bot stays as the live board
@@ -991,6 +1010,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
               board={game.state.board}
               pending={game.state.pendingPlacements}
               selectedRackTile={game.state.selectedRackTileId ? game.activePlayer.rack.find((t) => t.id === game.state.selectedRackTileId) ?? null : null}
+              isInvalidDropTarget={computeInvalidCell}
               onCellTap={(cell) => {
                 // Visualize tap-to-place: ghost tile flies from rack to cell.
                 // Cures the "two-tap feels indirect" pain by showing motion.
@@ -1029,9 +1049,12 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
             {!cosyMode && !prefersReducedMotion ? (
               <WordCraftComboBadge streak={game.state.streaks.player} t={t} />
             ) : null}
-            <WordCraftScorePreviewBadge board={game.state.board} placements={game.state.pendingPlacements} />
           </div>
         </div>
+
+        {/* Territory preview — moved outside board zone so it never overlays tiles.
+            Shows pending claim count + dice bonus if applicable. */}
+        <WordCraftScorePreviewBadge board={game.state.board} placements={game.state.pendingPlacements} />
 
         {showPendingStrip ? (
           <WordCraftPendingStrip
@@ -1051,41 +1074,26 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
             }}
           />
         ) : canInteract ? (
-          // Persistent direction toggle, available before the first tile lands so
-          // the player can pre-pick across/down and just keep tapping letters.
-          // On the very first move we also surface the place→submit steps inline
-          // so new players know how to put letters down without opening the tutor.
-          <div className="flex flex-col items-center gap-1 py-0.5 shrink-0">
-            {isFirstMove ? (
-              <WordCraftPlacementGuide
-                labels={{
-                  step1: t('wordcraft.place.step1', 'Tap a letter'),
-                  step2: t('wordcraft.place.step2', 'Tap a square'),
-                  step3: t('wordcraft.place.step3', 'Submit'),
-                }}
-              />
-            ) : null}
-            <div className="flex items-center justify-center gap-2">
-              <WordCraftAxisChip
-                axis={effectiveAxis}
-                onFlip={flipAxis}
-                labelHorizontal={t('wordcraft.axis.horizontal')}
-                labelVertical={t('wordcraft.axis.vertical')}
-                ariaLabel={t('wordcraft.axis.flipAria')}
-              />
-              <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
-            </div>
+          // Persistent direction toggle only — the tutor has the step-by-step guide,
+          // and the live step hint below handles progressive coaching for learners.
+          <div className="flex items-center justify-center gap-2 py-0.5 shrink-0">
+            <WordCraftAxisChip
+              axis={effectiveAxis}
+              onFlip={flipAxis}
+              labelHorizontal={t('wordcraft.axis.horizontal')}
+              labelVertical={t('wordcraft.axis.vertical')}
+              ariaLabel={t('wordcraft.axis.flipAria')}
+            />
+            <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
           </div>
         ) : null}
 
-        {/* Live coaching pill for new players: updates pick → place → submit as
-            the player acts (the static guide above only covers the first move).
-            This directly answers the "I tapped a letter, now what?" stuck moment
-            by saying "Tap a square" the instant a tile is selected. Retires after
-            the first few turns so veterans aren't nagged. */}
+        {/* Live coaching pill: shows only after first placement (no coaching on empty board).
+            Updates pick → place → submit as the player acts. Retires after the first few
+            turns so veterans aren't nagged. */}
         <WordCraftStepHint
           step={
-            game.state.history.length < hintTurnLimit && game.state.turn !== 'over'
+            game.state.history.length > 0 && game.state.history.length < hintTurnLimit && game.state.turn !== 'over'
               ? resolveWordCraftStep({
                   turn: game.state.turn,
                   selectedTileId: game.state.selectedRackTileId,
@@ -1202,13 +1210,15 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         }}
       />
 
-      {/* Floating toast — error doesn't reflow the layout, just overlays. */}
+      {/* Error toast — in its own flex row, centered, never blocks clicks or overlays controls. */}
       {errorMessage ? (
-        <div
-          role="alert"
-          className="absolute left-1/2 -translate-x-1/2 top-[calc(72px+8px)] z-40 max-w-[90%] px-3 py-2 bg-neo-red/95 border-2 border-black text-white text-sm rounded-neo shadow-hard-lg font-neo-body"
-        >
-          {errorMessage}
+        <div className="flex justify-center pointer-events-none shrink-0">
+          <div
+            role="alert"
+            className="px-3 py-2 bg-neo-red/95 border-2 border-black text-white text-sm rounded-neo shadow-hard-lg font-neo-body max-w-[90%] pointer-events-auto"
+          >
+            {errorMessage}
+          </div>
         </div>
       ) : null}
 

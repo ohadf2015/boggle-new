@@ -32,6 +32,8 @@ export interface WordCraftBoardProps {
    * Golden pending/placed tiles carry a gold ring so the twist reads on-board.
    */
   isGolden?: (tileId: string) => boolean;
+  /** Returns true if (row, col) would violate placement constraints. */
+  isInvalidDropTarget?: (row: number, col: number) => boolean;
 }
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -57,6 +59,7 @@ function WordCraftBoardImpl({
   dragHoverCell,
   reticle,
   isGolden,
+  isInvalidDropTarget,
 }: WordCraftBoardProps) {
   const size = board.size;
   const centerIndex = Math.floor(size / 2);
@@ -109,11 +112,12 @@ function WordCraftBoardImpl({
           const pending = pendingByCoord.get(key);
           const placedTile = cell.tile;
           const owner = placedTile ? cell.claim ?? null : null;
-          const isInteractive = !disabled && !placedTile;
+          const isInvalid = isInvalidDropTarget?.(r, c) ?? false;
+          const isInteractive = !disabled && !placedTile && !isInvalid;
           const isEmpty = !placedTile && !pending;
-          const inviteEmpty = isEmpty && hasSelectedTile && !disabled;
+          const inviteEmpty = isEmpty && hasSelectedTile && !disabled && !isInvalid;
           const isDragTarget = dragHoverCell === key && isEmpty;
-          const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
+          const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled && !isInvalid;
           const isReticle = reticle?.row === r && reticle?.col === c;
           const isTabAnchor = tabAnchor.row === r && tabAnchor.col === c;
           const goldenId = pending?.rackTileId ?? placedTile?.rackTileId;
@@ -144,6 +148,7 @@ function WordCraftBoardImpl({
               data-drag-target={isDragTarget ? 'true' : undefined}
               data-axis-hint={isAxisHint ? 'true' : undefined}
               data-reticle={isReticle ? 'true' : undefined}
+              data-invalid={isInvalid ? 'true' : undefined}
               aria-label={ariaLabel}
               tabIndex={isTabAnchor ? 0 : -1}
               disabled={!isInteractive}
@@ -171,7 +176,9 @@ function WordCraftBoardImpl({
                       : 'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]'
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
-                    : 'bg-neo-navy-light/70',
+                    : isInvalid
+                      ? 'bg-neo-navy-light/40 opacity-50 cursor-not-allowed'
+                      : 'bg-neo-navy-light/70',
                 golden && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',

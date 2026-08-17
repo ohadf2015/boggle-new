@@ -28,6 +28,8 @@ interface Props {
   zoomResetLabel?: string;
   /** golden_tiles modifier: true for tile ids that ring-capture on commit. */
   isGolden?: (tileId: string) => boolean;
+  /** Returns true if (row, col) would violate linearity constraints. */
+  isInvalidDropTarget?: (row: number, col: number) => boolean;
 }
 
 export function WordCraftBoardSection(props: Props) {
@@ -73,6 +75,7 @@ export function WordCraftBoardSection(props: Props) {
           locale={props.locale}
           reticle={props.reticle}
           isGolden={props.isGolden}
+          isInvalidDropTarget={props.isInvalidDropTarget}
         />
         <WordCraftPixiStage
           boardRef={boardRef}

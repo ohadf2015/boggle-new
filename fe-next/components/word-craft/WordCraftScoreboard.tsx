@@ -6,6 +6,8 @@ import Avatar from '@/components/Avatar';
 import type { PlayerState } from '@/lib/word-craft/types';
 import type { Turn } from '@/lib/word-craft/useWordCraftGame';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import type { WordCraftModifier } from '@/lib/word-craft/modifiers';
+import { WordCraftModifierChip } from './WordCraftModifierChip';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftScoreboardProps {
@@ -18,6 +20,9 @@ export interface WordCraftScoreboardProps {
   playerSeed?: string;
   opponentAvatar?: CustomAvatarConfig | null;
   opponentSeed?: string;
+  /** Active per-game modifier — surfaced so the twist is felt, not silent. */
+  modifier?: WordCraftModifier;
+  modifierT?: (path: string, fallback?: string) => string;
   labels: {
     you: string;
     bot: string;
@@ -61,6 +66,8 @@ function WordCraftScoreboardImpl({
   playerSeed,
   opponentAvatar,
   opponentSeed,
+  modifier,
+  modifierT,
   labels,
   territory,
 }: WordCraftScoreboardProps) {
@@ -143,22 +150,28 @@ function WordCraftScoreboardImpl({
         <span aria-hidden className="absolute inset-y-0 start-1/2 w-px bg-black/40" />
       </div>
 
-      {/* Tiny meta strip: turn + bag */}
-      <div className="flex items-center justify-between text-[11px] sm:text-xs px-1">
-        <span data-scoreboard-card={turn === 'bot' ? 'bot' : 'player'}
-          className={cn('font-neo-display font-black uppercase tracking-wider', turnTone)}
-        >
-          <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-current me-1.5 align-middle" />
-          {status}
-        </span>
-        {/* Territory label sits with the bag meta — the headline numbers above
-            already ARE the cell counts, so no separate chip is needed. */}
-        {territory ? (
-          <span className="inline-flex items-center gap-1 font-neo-display font-black uppercase tracking-wider text-neo-white/70">
-            <Crown className="w-3 h-3" aria-hidden />
-            {territory.label}
+      {/* Tiny meta strip: turn + territory + modifier + bag */}
+      <div className="flex items-center justify-between gap-2 text-[11px] sm:text-xs px-1 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span data-scoreboard-card={turn === 'bot' ? 'bot' : 'player'}
+            className={cn('font-neo-display font-black uppercase tracking-wider', turnTone)}
+          >
+            <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-current me-1.5 align-middle" />
+            {status}
           </span>
-        ) : null}
+          {/* Territory label sits with the bag meta — the headline numbers above
+              already ARE the cell counts, so no separate chip is needed. */}
+          {territory ? (
+            <span className="inline-flex items-center gap-1 font-neo-display font-black uppercase tracking-wider text-neo-white/70">
+              <Crown className="w-3 h-3" aria-hidden />
+              {territory.label}
+            </span>
+          ) : null}
+          {/* Modifier chip inline in the status row — compact and integrated */}
+          {modifier && modifierT ? (
+            <WordCraftModifierChip modifier={modifier} t={modifierT} />
+          ) : null}
+        </div>
         <span className="inline-flex items-center gap-1 text-neo-white">
           {/* The tile sack — letters left to draw. Gives the bag count a
               physical object instead of a generic hourglass; it wobbles on the
