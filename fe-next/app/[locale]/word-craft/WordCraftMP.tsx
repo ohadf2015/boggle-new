@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { io, type Socket } from 'socket.io-client';
-import type { WordCraftGameState } from '@/shared/types/wordcraft';
+import type { WordCraftStatePayload } from '@/shared/types/wordcraft';
 
 export interface WordCraftMPProps {
   matchId: string;
@@ -31,7 +31,7 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
 
   const username = profile?.display_name || `Player-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
 
-  const [gameState, setGameState] = useState<WordCraftGameState | null>(null);
+  const [gameState, setGameState] = useState<WordCraftStatePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
   const [yourSeat, setYourSeat] = useState<'player1' | 'player2' | null>(null);
@@ -58,8 +58,8 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
     const handleState = (data: any) => {
       console.log('[WordCraft MP] Received state:', data);
       setGameState(data);
-      if (data.yourSeat) {
-        setYourSeat(data.yourSeat);
+      if (data?.you?.seat) {
+        setYourSeat(data.you.seat);
       }
       setIsConnected(true);
     };
@@ -119,8 +119,7 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
   const addPlacement = () => {
     if (!selectedRackTile || !selectedBoardPos || !gameState) return;
 
-    const currentPlayerRack = yourSeat === 'player1' ? gameState.player1.rack : gameState.player2.rack;
-    const rackTile = currentPlayerRack.find((t) => t.id === selectedRackTile);
+    const rackTile = gameState.you.rack.find((t) => t.id === selectedRackTile);
     if (!rackTile) return;
 
     // Prevent duplicate placements
@@ -141,7 +140,7 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
   const submitMove = () => {
     if (!socketRef.current || placements.length === 0 || !gameState) return;
 
-    const rack = yourSeat === 'player1' ? gameState.player1.rack : gameState.player2.rack;
+    const rack = gameState.you.rack;
     socketRef.current.emit('submitWordCraftMove', {
       placements,
       rack,
@@ -187,12 +186,10 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
 
   // Game state display with board
   const inviteUrl = getWordCraftInviteUrl(matchId);
-  const currentPlayerRack = yourSeat === 'player1' ? (gameState.player1.rack || []) : (gameState.player2.rack || []);
-  const opponentRackCount = yourSeat === 'player1'
-    ? (typeof (gameState.player2.rack as any) === 'number' ? gameState.player2.rack : gameState.player2.rack?.length ?? 0)
-    : (typeof (gameState.player1.rack as any) === 'number' ? gameState.player1.rack : gameState.player1.rack?.length ?? 0);
+  const currentPlayerRack = gameState.you.rack;
+  const opponentRackCount = gameState.opponent.rackCount;
   const boardSize = gameState.board.length;
-  const isYourTurn = gameState.turn === yourSeat;
+  const isYourTurn = gameState.isYourTurn;
   const copyInvite = () => {
     navigator.clipboard.writeText(inviteUrl);
   };
@@ -229,15 +226,15 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
         <div className="bg-neo-purple/30 rounded-lg p-4 mb-4 backdrop-blur">
           <div className="flex justify-between">
             <div>
-              <p className="text-sm text-gray-400">{gameState.player1.username}</p>
-              <p className="text-2xl font-bold">{gameState.player1.score}</p>
+              <p className="text-sm text-gray-400">{gameState.you.username}</p>
+              <p className="text-2xl font-bold">{gameState.you.score}</p>
             </div>
             <div className="text-center">
               <p className="text-sm text-gray-400">vs</p>
             </div>
             <div>
-              <p className="text-sm text-gray-400">{gameState.player2.username}</p>
-              <p className="text-2xl font-bold">{gameState.player2.score}</p>
+              <p className="text-sm text-gray-400">{gameState.opponent.username}</p>
+              <p className="text-2xl font-bold">{gameState.opponent.score}</p>
             </div>
           </div>
         </div>

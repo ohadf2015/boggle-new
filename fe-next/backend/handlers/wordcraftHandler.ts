@@ -21,7 +21,12 @@ import {
 } from '../modules/wordcraftManager.js';
 import { getCachedTrie } from '../modules/boggleSolver.js';
 import { createWordCraftBoard, createWordCraftBag } from '@/shared/utils/wordcraftBag.js';
-import type { WordCraftPlacement } from '@/shared/types/wordcraft';
+import type {
+  WordCraftPlacement,
+  WordCraftGameState,
+  WordCraftStatePayload,
+  WordCraftTurn,
+} from '@/shared/types/wordcraft';
 import type { PlacedTile, RackTile } from '@/lib/word-craft/types';
 
 // Payload schemas
@@ -58,6 +63,26 @@ const roomSeats = new Map<
 >();
 
 /**
+ * Build the payload for ONE viewer: their own tiles, the opponent as a count.
+ * Every wordcraftState emit goes through here, so a rack cannot leak to the
+ * wrong socket and the client needs no seat branching to find its own tiles.
+ */
+function stateFor(seat: WordCraftTurn, state: WordCraftGameState, roomId: string): WordCraftStatePayload {
+  const you = seat === 'player1' ? state.player1 : state.player2;
+  const them = seat === 'player1' ? state.player2 : state.player1;
+  return {
+    board: state.board,
+    you: { seat, username: you.username, score: you.score, rack: you.rack },
+    opponent: { username: them.username, score: them.score, rackCount: them.rack.length },
+    turn: state.turn,
+    isYourTurn: state.turn === seat,
+    gameStatus: state.gameStatus,
+    winner: state.winner,
+    remainingTime: getRemainingTurnTime(roomId),
+  };
+}
+
+/**
  * Emit fresh game state to both players with their private racks.
  * Called after a move/pass to sync the board, scores, and refilled racks.
  */
@@ -66,54 +91,10 @@ function broadcastPrivateWordCraftState(io: Server, roomId: string): void {
   const seats = roomSeats.get(roomId);
   if (!state || !seats) return;
 
-  const room = getGameRoom(roomId);
-
-  // Emit to player1 with their rack
-  if (seats.player1SocketId) {
-    const socket1 = io.sockets.sockets.get(seats.player1SocketId);
-    if (socket1) {
-      socket1.emit('wordcraftState', {
-        board: state.board,
-        player1: {
-          username: state.player1.username,
-          score: state.player1.score,
-          rack: state.player1.rack,
-        },
-        player2: {
-          username: state.player2.username,
-          score: state.player2.score,
-          rackCount: state.player2.rack.length,
-        },
-        turn: state.turn,
-        gameStatus: state.gameStatus,
-        remainingTime: getRemainingTurnTime(roomId),
-        yourSeat: 'player1',
-      });
-    }
-  }
-
-  // Emit to player2 with their rack
-  if (seats.player2SocketId) {
-    const socket2 = io.sockets.sockets.get(seats.player2SocketId);
-    if (socket2) {
-      socket2.emit('wordcraftState', {
-        board: state.board,
-        player1: {
-          username: state.player1.username,
-          score: state.player1.score,
-          rackCount: state.player1.rack.length,
-        },
-        player2: {
-          username: state.player2.username,
-          score: state.player2.score,
-          rack: state.player2.rack,
-        },
-        turn: state.turn,
-        gameStatus: state.gameStatus,
-        remainingTime: getRemainingTurnTime(roomId),
-        yourSeat: 'player2',
-      });
-    }
+  for (const seat of ['player1', 'player2'] as WordCraftTurn[]) {
+    const socketId = seat === 'player1' ? seats.player1SocketId : seats.player2SocketId;
+    if (!socketId) continue;
+    io.sockets.sockets.get(socketId)?.emit('wordcraftState', stateFor(seat, state, roomId));
   }
 }
 
@@ -216,23 +197,7 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
     // Only send your own rack for security (opponent can't see your tiles)
     if (state) {
       const yourRack = currentPlayer === 'player1' ? state.player1.rack : state.player2.rack;
-      socket.emit('wordcraftState', {
-        board: state.board,
-        player1: {
-          username: state.player1.username,
-          score: state.player1.score,
-          rack: currentPlayer === 'player1' ? state.player1.rack : [],
-        },
-        player2: {
-          username: state.player2.username,
-          score: state.player2.score,
-          rack: currentPlayer === 'player2' ? state.player2.rack : [],
-        },
-        turn: state.turn,
-        gameStatus: state.gameStatus,
-        remainingTime: getRemainingTurnTime(roomId),
-        yourSeat: currentPlayer,
-      });
+      socket.emit('wordcraftState', stateFor(currentPlayer, state, currentRoomId ?? roomId));
     }
   });
 
@@ -334,7 +299,9 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
 
   // Request current game state (polling or reconnect)
   socket.on('requestWordCraftState', (rawData: unknown) => {
-    if (!currentRoomId) {
+    // No seat means no view to build — a socket that never joined has no
+    // business receiving either player's rack.
+    if (!currentRoomId || !currentPlayer) {
       socket.emit('wordcraftError', { error: 'NOT_IN_ROOM' });
       return;
     }
@@ -347,24 +314,7 @@ export function registerWordCraftHandlers(io: Server, socket: Socket): void {
 
     const state = getMatchState(currentRoomId);
     if (state) {
-      socket.emit('wordcraftState', {
-        board: state.board,
-        player1: {
-          username: state.player1.username,
-          score: state.player1.score,
-          rack: currentPlayer === 'player1' ? state.player1.rack : [],
-        },
-        player2: {
-          username: state.player2.username,
-          score: state.player2.score,
-          rack: currentPlayer === 'player2' ? state.player2.rack : [],
-        },
-        turn: state.turn,
-        gameStatus: state.gameStatus,
-        winner: state.winner,
-        remainingTime: getRemainingTurnTime(currentRoomId),
-        yourSeat: currentPlayer,
-      });
+      socket.emit('wordcraftState', stateFor(currentPlayer, state, currentRoomId));
     }
   });
 
