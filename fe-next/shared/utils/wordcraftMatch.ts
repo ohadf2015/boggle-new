@@ -12,7 +12,7 @@ import type { WordCraftGameState, WordCraftTurn, WordCraftPlacement } from '@/sh
 interface InitMatchParams {
   player1Username: string;
   player2Username: string;
-  board: PlacedTile[][];
+  board: (PlacedTile | null)[][];
   bag: RackTile[];
   roomId: string;
 }
@@ -122,23 +122,86 @@ export async function validateWordCraftMove(
     }
   }
 
-  // Check 4: Validate words formed by these placements
+  // Check 4: the placements must form ONE line, and the run they complete —
+  // including any board tiles they butt against — has to be a real word.
+  //
+  // This previously called `validator(placement.letter)` once per tile, i.e. it
+  // asked the dictionary whether "E" was a word. No move could ever be accepted:
+  // a live two-client match rejected EAR with INVALID_WORD.
+  const rows = new Set(placements.map((p) => p.pos.row));
+  const cols = new Set(placements.map((p) => p.pos.col));
+  const across = rows.size === 1;
+  const down = cols.size === 1;
+  if (!across && !down) {
+    return { valid: false, error: 'INVALID_PLACEMENT' };
+  }
+
+  const size = state.board.length;
+  const letterAt = (row: number, col: number): string | null => {
+    if (row < 0 || col < 0 || row >= size || col >= size) return null;
+    const pending = placements.find((p) => p.pos.row === row && p.pos.col === col);
+    if (pending) return pending.letter;
+    const existing = state.board[row]?.[col];
+    return existing ? existing.letter : null;
+  };
+  const valueAt = (row: number, col: number): number => {
+    const pending = placements.find((p) => p.pos.row === row && p.pos.col === col);
+    if (pending) {
+      const rackTile = currentRack.find((t) => t.id === pending.tileId);
+      return rackTile?.value ?? 0;
+    }
+    return state.board[row]?.[col]?.value ?? 0;
+  };
+
+  // Walk back to the start of the run, then forward to its end.
+  const first = placements.reduce((a, b) =>
+    across ? (a.pos.col <= b.pos.col ? a : b) : (a.pos.row <= b.pos.row ? a : b),
+  );
+  let r = first.pos.row;
+  let c = first.pos.col;
+  for (;;) {
+    const pr = across ? r : r - 1;
+    const pc = across ? c - 1 : c;
+    if (letterAt(pr, pc) === null) break;
+    r = pr;
+    c = pc;
+  }
+
+  const letters: string[] = [];
+  const covered = new Set<string>();
+  let score = 0;
+  while (letterAt(r, c) !== null) {
+    letters.push(letterAt(r, c) as string);
+    score += valueAt(r, c);
+    covered.add(`${r},${c}`);
+    if (across) c += 1;
+    else r += 1;
+  }
+
+  // Every placed tile must sit inside that one run — otherwise the player left a
+  // gap, and the walk above stopped before reaching the stragglers.
   for (const placement of placements) {
-    const isValid = await validator(placement.letter);
-    if (!isValid) {
-      return {
-        valid: false,
-        error: 'INVALID_WORD',
-      };
+    if (!covered.has(`${placement.pos.row},${placement.pos.col}`)) {
+      return { valid: false, error: 'INVALID_PLACEMENT' };
     }
   }
 
-  const score = placements.length * 10;
+  const word = letters.join('');
+  if (word.length < 2) {
+    return { valid: false, error: 'WORD_TOO_SHORT' };
+  }
 
+  if (!(await validator(word))) {
+    return { valid: false, error: 'INVALID_WORD' };
+  }
+
+  // ponytail: sums tile values only — premium squares and the perpendicular
+  // words a placement can also form are not scored yet. Upgrade when MP shares
+  // the solo scorer in lib/word-craft/scoring.ts.
   return {
     valid: true,
     score,
-    scoredWords: placements.map((p) => p.letter),
+    scoredWords: [word],
   };
 }
 
