@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6156,
+    "totalKeysInCode": 6159,
     "keyCountByLanguage": {
-      "en": 11991,
-      "es": 12287,
-      "he": 12192,
-      "ja": 12246,
-      "ru": 12022,
-      "sv": 12242
+      "en": 11994,
+      "es": 12290,
+      "he": 12195,
+      "ja": 12249,
+      "ru": 12024,
+      "sv": 12245
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
@@ -2067,14 +2067,14 @@
         "pattern": "`wordTower.biome.${biomeId}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 373,
+        "line": 411,
         "context": "setZoneText(t(`wordTower.biome.${biomeId}`));"
       },
       {
         "pattern": "`wordTower.hazard.${hz.kind}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 808,
+        "line": 846,
         "context": "setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }))"
       },
       {
@@ -3507,6 +3507,7 @@
       "education.landing.furtherReading.guides",
       "education.landing.furtherReading.glossary",
       "education.landing.furtherReading.wordSolver",
+      "connections.daily.scoreLabel",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",

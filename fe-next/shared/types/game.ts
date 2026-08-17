@@ -21,7 +21,7 @@ export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
  * - Standalone modes (daily / adventure / endless / drill / single player)
  *   which have their own local types in their respective modules.
  */
-export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'shiritori' | 'sealed-bid' | 'crossword';
+export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'shiritori' | 'sealed-bid' | 'crossword' | 'wordcraft';
 export type GameModeSelection = GameMode | 'random';
 
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
