@@ -21,6 +21,8 @@ export const GAME_MODE_WEIGHTS: Record<GameMode, number> = {
   'sealed-bid': 0,
   // Crossword race is an admin/beta parallel-race mode — never auto-rotated.
   'crossword': 0,
+  // WordCraft is a specialized 1v1 mode — never auto-rotated.
+  'wordcraft': 0,
 };
 
 /**

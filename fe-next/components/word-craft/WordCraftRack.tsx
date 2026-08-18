@@ -123,17 +123,27 @@ function WordCraftRackImpl({
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
 
-              // Always try to auto-place when tapping a non-pending tile.
-              // - Board empty: places at center along chosenAxis
-              // - 1+ pending: places along chosenAxis (or axis if locked)
-              // - If placement fails (no empty cell), falls back to selection
+              // Contract, from the player complaint that tap-to-aim stopped
+              // working once a tile was down: tapping an UNSELECTED tile always
+              // just SELECTS it, so "tap a letter, then tap the cell I want"
+              // keeps working at every stage. Fast-tap is the opt-in
+              // convenience — the caller passes autoPlaceOnTap, or the player
+              // re-taps the tile they already selected while an axis is locked.
+              // Auto-placing every tap (briefly the case) took the aiming away.
               const isPending = pendingIds.has(tile.id);
-              if (!isPending && onFastTap) {
+              const shouldFastTap =
+                !isPending &&
+                onFastTap &&
+                // caller opted in, or the player re-taps the tile they already
+                // selected while an axis is locked (explicit confirm gesture).
+                // The first tile of the game is centred by the reducer, not here.
+                (autoPlaceOnTap || (isSelected && axisLocked));
+
+              if (shouldFastTap) {
                 onFastTap(tile);
-              } else {
-                // Tile is pending, or no fast-tap available: select/deselect toggle
-                onSelect(isSelected ? null : tile.id);
+                return;
               }
+              onSelect(isSelected ? null : tile.id);
             }}
             className={cn(
               // touch-pan-x lets the browser handle horizontal swipe of the

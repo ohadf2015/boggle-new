@@ -1913,7 +1913,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 614,
+        "line": 619,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -1941,7 +1941,7 @@
         "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 146,
+        "line": 147,
         "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {

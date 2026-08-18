@@ -280,10 +280,43 @@ function applyEndgameTerritory(state: WordCraftState): WordCraftState {
 function reducer(state: WordCraftState, action: Action): WordCraftState {
   switch (action.type) {
     case 'SELECT_RACK_TILE': {
-      // Consistent behavior: selecting a tile just selects it (sets selectedRackTileId).
-      // The player then taps a board square to place it. This works the same on move 1,
-      // move 2, and beyond. The UI can help by showing the board center or chosen axis
-      // to guide placement, but the game state treats all moves uniformly.
+      // Opening nudge: the game's very first tile-select drops the tile onto the
+      // centre cell as a normal (recallable) pending placement, killing the
+      // "where do I even start?" blank-board decision. Strictly once per game —
+      // a recall hands full control back.
+      //
+      // This lives HERE on purpose. It was deleted once and re-implemented in the
+      // rack component instead, which made every rack tap auto-place and took
+      // away tap-to-aim (the rack's own suite documents that as a player
+      // complaint). The rack stays dumb: it reports a selection, the reducer
+      // decides that the first one lands in the middle.
+      if (
+        action.id &&
+        !state.autoCenterDone &&
+        state.pendingPlacements.length === 0 &&
+        isFirstMove(state.board)
+      ) {
+        const activeRack = state.turn === 'bot' ? state.bot.rack : state.player.rack;
+        const tile = activeRack.find((t) => t.id === action.id);
+        const center = Math.floor(state.board.size / 2);
+        if (tile && !state.board.cells[center][center].tile) {
+          const placement: PlacedTile = {
+            row: center,
+            col: center,
+            letter: tile.letter,
+            value: tile.value,
+            isBlank: tile.isBlank,
+            rackTileId: tile.id,
+          };
+          return {
+            ...state,
+            pendingPlacements: [placement],
+            selectedRackTileId: null,
+            lastError: null,
+            autoCenterDone: true,
+          };
+        }
+      }
       return { ...state, selectedRackTileId: action.id, lastError: null };
     }
     case 'PLACE_PENDING':

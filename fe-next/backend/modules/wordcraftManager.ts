@@ -12,14 +12,14 @@ import {
   applyWordCraftPass,
   applyWordCraftTimeout,
 } from '@/shared/utils/wordcraftMatch';
-import type { Tile } from '@/lib/word-craft/types';
+import type { PlacedTile, RackTile } from '@/lib/word-craft/types';
 
 export interface WordCraftMatchInitParams {
   roomId: string;
   player1Username: string;
   player2Username: string;
-  board: Tile[][];
-  bag: Tile[];
+  board: (PlacedTile | null)[][];
+  bag: RackTile[];
   turnDeadlineMs?: number;
 }
 
@@ -109,7 +109,7 @@ export async function submitWordCraftMove(
   player: WordCraftTurn,
   placements: WordCraftPlacement[],
   rackTiles: Array<{ id: string; letter: string }>,
-  validator: (positions: any[], word: string) => Promise<boolean>
+  validator: (word: string) => Promise<boolean>
 ) {
   const match = activeMatches.get(roomId);
   if (!match) {

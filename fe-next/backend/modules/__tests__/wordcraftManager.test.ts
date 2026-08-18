@@ -10,6 +10,7 @@ import {
   submitWordCraftPass,
   endWordCraftMatch,
   getRemainingTurnTime,
+  startWordCraftClock,
 } from '../wordcraftManager.js';
 import type { Tile } from '@/lib/word-craft/types';
 
@@ -130,7 +131,10 @@ describe('WordCraft Manager', () => {
   });
 
   describe('getRemainingTurnTime', () => {
-    it('should return time remaining for current turn', () => {
+    it('reports no clock until both seats are filled', () => {
+      // A match is created when the FIRST player joins. Starting the clock then
+      // meant player1 forfeited on time while still waiting for the invite to be
+      // opened — a fresh match reported `finished` before anyone had moved.
       initializeWordCraftMatch({
         roomId,
         player1Username: 'alice',
@@ -139,6 +143,20 @@ describe('WordCraft Manager', () => {
         bag: mockBag,
         turnDeadlineMs: 60000,
       });
+
+      expect(getRemainingTurnTime(roomId)).toBe(0);
+    });
+
+    it('should return time remaining for current turn once the clock starts', () => {
+      initializeWordCraftMatch({
+        roomId,
+        player1Username: 'alice',
+        player2Username: 'bob',
+        board: mockBoard,
+        bag: mockBag,
+        turnDeadlineMs: 60000,
+      });
+      startWordCraftClock(roomId);
 
       const remaining = getRemainingTurnTime(roomId);
       expect(remaining).toBeGreaterThan(0);

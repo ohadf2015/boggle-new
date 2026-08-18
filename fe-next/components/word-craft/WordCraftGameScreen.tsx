@@ -1125,6 +1125,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           onTileDragStart={(tile, e) => beginTileDrag(tile.id, tile.letter, tile.value, e)}
           consumeDropFlag={consumeDropFlag}
           onFastTap={handleRackTileTap}
+          autoPlaceOnTap={axis !== null}
           axisLocked={game.state.pendingPlacements.length >= 1}
           draggingTileId={drag?.active ? drag.tileId : null}
           disabled={!canInteract || !dict}

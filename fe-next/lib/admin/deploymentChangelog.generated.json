@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-17T17:52:06.394Z",
+  "generatedAt": "2026-08-17T19:53:38.064Z",
   "commits": [
     {
-      "sha": "69621908c3adc675e7c12a47a0fff6ce3117153b",
-      "shortSha": "6962190",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-17",
+      "sha": "f4d7d6a4c58f6b5f77f63517fdf33112a197fc4a",
+      "shortSha": "f4d7d6a",
+      "subject": "fix(wordcraft-mp): don't start the turn clock until both seats are filled",
       "author": "Ohad Fisher",
-      "date": "2026-08-17T05:39:08+03:00"
+      "date": "2026-08-17T22:47:52+03:00"
     },
     {
-      "sha": "089626637ea765b6032aef1ac486a949cecab7a9",
-      "shortSha": "0896266",
-      "subject": "fix(images): stop the 30s Express cap from permanently poisoning image variants",
+      "sha": "99a9839c155d863ff3dd86e35896ad4b2dcc2411",
+      "shortSha": "99a9839",
+      "subject": "feat(wordcraft-mp): two humans can reach the same match over an invite link",
       "author": "Ohad Fisher",
-      "date": "2026-08-16T22:56:41+03:00"
+      "date": "2026-08-17T22:38:38+03:00"
     },
     {
-      "sha": "b907e9cbd2e0b9168057fd40eee0d205e0bb92b0",
-      "shortSha": "b907e9c",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-16",
+      "sha": "de3851a62b87fb0a2bd60a0a567543066beebf8a",
+      "shortSha": "de3851a",
+      "subject": "test(wordcraft): pin the joker property the backlog said was broken",
       "author": "Ohad Fisher",
-      "date": "2026-08-16T03:57:47+03:00"
+      "date": "2026-08-17T22:33:20+03:00"
     },
     {
-      "sha": "0a7784811cac7848fca50e842ff97a80ff794b09",
-      "shortSha": "0a77848",
-      "subject": "chore(i18n): refresh translation report for the new blast tile keys",
+      "sha": "8ffb70edba5b15cede4b6c1ea34daa1bc0da57a8",
+      "shortSha": "8ffb70e",
+      "subject": "feat(wordcraft-mp): client socket hook + match screen",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T21:57:08+03:00"
+      "date": "2026-08-17T22:21:48+03:00"
     },
     {
-      "sha": "0163a06be5090664478d30f2069abfc55c8325eb",
-      "shortSha": "0163a06",
-      "subject": "fix(sentry): bots found no words in Russian, and a zero-word round crashed your own results",
+      "sha": "2bb90b2e58876f55d8c6a23d25910f246100d3fd",
+      "shortSha": "2bb90b2",
+      "subject": "fix(wordcraft): the board's only overlay was one the player never asked for",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T21:34:53+03:00"
+      "date": "2026-08-17T22:15:11+03:00"
     },
     {
-      "sha": "b78edfb032c2f8dae37064cbaf6691d5b1bd7217",
-      "shortSha": "b78edfb",
-      "subject": "fix(quick-play): words scored nothing, the results CTA was dead, and you raced yourself",
+      "sha": "0dea9fb6df440f48e8a126a226a60f431324d78c",
+      "shortSha": "0dea9fb",
+      "subject": "fix(word-craft): restore fast-tap placement + move zoom indicator",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T18:25:48+03:00"
+      "date": "2026-08-17T22:14:26+03:00"
     },
     {
-      "sha": "e607320a0ddeb967d8a9a7c66eb0103e27b5b2e5",
-      "shortSha": "e607320",
-      "subject": "fix(sitemap): the biggest page on the site was never in the sitemap",
+      "sha": "b6f5b562458787ec9b0f192fe2cfc0b8f9e8297a",
+      "shortSha": "b6f5b56",
+      "subject": "fix(wordcraft): the vowel guarantee handed Hebrew players the whole bag",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T15:24:25+03:00"
+      "date": "2026-08-17T22:03:39+03:00"
     },
     {
-      "sha": "c993aaa7db697d14c834f6e778da31c9e095a1de",
-      "shortSha": "c993aaa",
-      "subject": "test(seo): the hreflang guard only checked the pages, not the sitemap",
+      "sha": "f84dbf0731fb2ed2973ad59a05d82f2c459a45d1",
+      "shortSha": "f84dbf0",
+      "subject": "fix(wordcraft): stop the play screen fighting the player",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T15:22:20+03:00"
+      "date": "2026-08-17T21:58:27+03:00"
     },
     {
-      "sha": "eb8d2c7c76a68042a5a90bdc70158ca9783879a4",
-      "shortSha": "eb8d2c7",
-      "subject": "fix(seo): hreflang was telling Google these 31 pages were translations of each other",
+      "sha": "587bd141baa6e8f8a00075266c97e155f2bc92a5",
+      "shortSha": "587bd14",
+      "subject": "fix(wordcraft): guarantee a vowel on refills and make rack-tap behave the same on every move",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T15:12:56+03:00"
+      "date": "2026-08-17T21:51:34+03:00"
     },
     {
-      "sha": "65599d522c1fa5cce48a0ff61b687941bb66db94",
-      "shortSha": "65599d5",
-      "subject": "fix(quick-play): mode picker keycaps, bottom-band clearance, version toast",
+      "sha": "d22dbd84b02ee12f5ee88d618f0858fa68c0a620",
+      "shortSha": "d22dbd8",
+      "subject": "merge: consolidate wordcraft gauntlet work into one isolated worktree branch",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T14:49:54+03:00"
+      "date": "2026-08-17T21:24:15+03:00"
     },
     {
-      "sha": "f755ce2722053b9fbccfa46c50070c742c480458",
-      "shortSha": "f755ce2",
-      "subject": "feat(quick-play): solo rounds run the MP boards and race real players",
+      "sha": "eb78d18deca3a64c320ef9a48255fab2cd21b973",
+      "shortSha": "eb78d18",
+      "subject": "refactor(wordcraft): move match logic to shared, fix types (RackTile, PlacedTile)",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T14:48:52+03:00"
+      "date": "2026-08-17T21:16:37+03:00"
     },
     {
-      "sha": "9a20d02acd8d8cfdf0d7f1b3ea237c3c24ea3661",
-      "shortSha": "9a20d02",
-      "subject": "fix(multiplayer): invite timing read the clock where React says not to",
+      "sha": "51b8da32220b97c422e56a4ffed8c3543aac620f",
+      "shortSha": "51b8da3",
+      "subject": "feat(wordcraft-mp): shared match state usable by server and client",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T13:33:07+03:00"
+      "date": "2026-08-17T21:15:02+03:00"
     },
     {
-      "sha": "b901d3729254f4b1cfff816ef4b9b158c7f07e28",
-      "shortSha": "b901d37",
-      "subject": "fix(practice): the daily results chain CTA was still pointing at retired urls",
+      "sha": "7976bb0c2f3828088ead1470ff06c0fcc2bd7330",
+      "shortSha": "7976bb0",
+      "subject": "feat(standalone): regenerate the portal preview clips, and stop losing them",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:21:58+03:00"
+      "date": "2026-08-17T21:14:01+03:00"
     },
     {
-      "sha": "5afa38b1b274cc5bf01d50cea5ce92869a69e9b7",
-      "shortSha": "5afa38b",
-      "subject": "fix(analytics): the funnel was dropping the events it existed to measure",
+      "sha": "5ef162defb82044e23b0242de2760b116ae9ff02",
+      "shortSha": "5ef162d",
+      "subject": "fix(wordcraft): guarantee at least one vowel in initial rack",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:20:26+03:00"
+      "date": "2026-08-17T21:08:41+03:00"
     },
     {
-      "sha": "970d5b7c9a96eadf6ceb6793fbdb7c03bf48efee",
-      "shortSha": "970d5b7",
-      "subject": "fix(quick-play): Word Hunt told players to watch an ad to play again today",
+      "sha": "fbbd85170e8adeebf7691b0122f45709acd17339",
+      "shortSha": "fbbd851",
+      "subject": "fix(wordcraft-mp): correct imports in integration test",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:19:01+03:00"
+      "date": "2026-08-17T21:01:39+03:00"
     },
     {
-      "sha": "46b8d52908ca30b8b20036c9254b8426b957d0ec",
-      "shortSha": "46b8d52",
-      "subject": "fix(quick-play): boards were uniform random, so Q was as likely as E",
+      "sha": "16ff0baeee25f76f1ea63e16fdbeeaafbe3f7b28",
+      "shortSha": "16ff0ba",
+      "subject": "test(wordcraft-mp): integration test — two client game flow",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:18:33+03:00"
+      "date": "2026-08-17T20:57:00+03:00"
     },
     {
-      "sha": "9836339877137bc83a4ea8dac0fef98e2aa8ab90",
-      "shortSha": "9836339",
-      "subject": "feat(quick-play): the hub asked you to drag a dial at four unlabelled glyphs",
+      "sha": "90c30550f908dcae20e4fc30074611e8c52aecc3",
+      "shortSha": "90c3055",
+      "subject": "fix(wordcraft): add arrow key navigation to setup radiogroups",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:17:20+03:00"
+      "date": "2026-08-17T20:54:35+03:00"
     },
     {
-      "sha": "ba73c02cdcb2eb58f72689c23f456f463a245772",
-      "shortSha": "ba73c02",
-      "subject": "chore(practice): delete the code the retired routes were the only caller of",
+      "sha": "c48001da2bd45663d906dbfada7ed7245ad2ff5d",
+      "shortSha": "c48001d",
+      "subject": "feat(wordcraft-mp): backend manager + socket handler",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T11:49:02+03:00"
+      "date": "2026-08-17T20:49:57+03:00"
     },
     {
-      "sha": "54b07afd3621ba35fabf0afd78db125f17b7bfe4",
-      "shortSha": "54b07af",
-      "subject": "feat(ftue): retire the /practice routes behind permanent redirects",
+      "sha": "1193df320c8e54a7c54df920a1f7c0fa9b11c17c",
+      "shortSha": "1193df3",
+      "subject": "feat(wordcraft-mp): add GameMode union and pure match state logic",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T11:30:19+03:00"
+      "date": "2026-08-17T20:46:28+03:00"
     },
     {
-      "sha": "712e2475dc2f46876e6d436deab83d7efffa3c54",
-      "shortSha": "712e247",
-      "subject": "feat(ftue): take practice off the hub, and give single-player a stuck coach",
+      "sha": "1d5535eb6657ff06de6fc088461b6325492a672f",
+      "shortSha": "1d5535e",
+      "subject": "i18n(connections): translate the lives countdown + continue for he/es/ru/sv/ja",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T10:53:32+03:00"
+      "date": "2026-08-17T20:44:54+03:00"
     }
   ]
 }

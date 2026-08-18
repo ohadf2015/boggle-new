@@ -5,14 +5,19 @@ function fresh() {
   return buildInitialState({ seed: 7, locale: 'en' });
 }
 
-describe('rack-tap consistency: select-then-place on all moves', () => {
-  it('move 1: selecting a rack tile just selects it (no auto-place)', () => {
+describe('rack-tap: the first tile centres itself, later tiles are aimed', () => {
+  it('move 1: selecting a rack tile drops it on the centre (opening nudge)', () => {
     const s0 = fresh();
     const tile = s0.player.rack[0];
+    const centre = Math.floor(s0.board.size / 2);
     const s1 = wordCraftReducer(s0, { type: 'SELECT_RACK_TILE', id: tile.id });
-    // Consistent behavior: just selects, doesn't place automatically
-    expect(s1.pendingPlacements).toHaveLength(0);
-    expect(s1.selectedRackTileId).toBe(tile.id);
+    // The blank board has exactly one sensible target, so the reducer places it
+    // instead of making the player aim. WordCraftIntegration.test.tsx drives the
+    // same contract end to end; the rack component stays dumb about the board.
+    expect(s1.pendingPlacements).toHaveLength(1);
+    expect(s1.pendingPlacements[0]).toMatchObject({ row: centre, col: centre, rackTileId: tile.id });
+    expect(s1.selectedRackTileId).toBeNull();
+    expect(s1.autoCenterDone).toBe(true);
   });
 
   it('move 2: selecting a rack tile also just selects it', () => {
@@ -53,10 +58,15 @@ describe('rack-tap consistency: select-then-place on all moves', () => {
     expect(s2.selectedRackTileId).toBeNull();
   });
 
-  it('autoCenterDone flag persists but is unused in consistent behavior', () => {
+  it('autoCenterDone makes the nudge strictly once per game', () => {
     const s0 = fresh();
     const s1 = wordCraftReducer(s0, { type: 'SELECT_RACK_TILE', id: s0.player.rack[0].id });
-    // Flag should still exist but doesn't affect behavior
-    expect(s1.autoCenterDone).toBe(false);
+    expect(s1.autoCenterDone).toBe(true);
+    // Recall the nudged tile, then select again: the player is now in control and
+    // must aim, so no second auto-placement.
+    const s2 = wordCraftReducer(s1, { type: 'RECALL_PENDING', rackTileId: s0.player.rack[0].id });
+    const s3 = wordCraftReducer(s2, { type: 'SELECT_RACK_TILE', id: s0.player.rack[1].id });
+    expect(s3.pendingPlacements).toHaveLength(0);
+    expect(s3.selectedRackTileId).toBe(s0.player.rack[1].id);
   });
 });

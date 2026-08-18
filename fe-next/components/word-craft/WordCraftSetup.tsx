@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 function handleRadiogroupKeyDown<T>(
   event: React.KeyboardEvent,
   currentValue: T,
-  options: T[],
+  options: readonly T[],
   onSelect: (value: T) => void
 ) {
   if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) return;
