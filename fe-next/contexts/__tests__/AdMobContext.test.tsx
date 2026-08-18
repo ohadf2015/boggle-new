@@ -286,6 +286,59 @@ describe('AdMobProvider', () => {
     expect(captured!.shouldShowInterstitial()).toBe(true);
   });
 
+  it('counts game ends across sessions, so the slot does not need 6 games in one sitting', async () => {
+    social.tier = 'adult';
+    let first: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { first = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    // Five games, then the user closes the app. No slot yet.
+    for (let i = 0; i < 5; i++) first!.recordGameEnd();
+    expect(first!.shouldShowInterstitial()).toBe(false);
+
+    // Fresh launch — a brand-new provider, as on a cold start.
+    let second: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { second = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    expect(second!.shouldShowInterstitial()).toBe(false); // 5 lifetime games, not due
+    second!.recordGameEnd(); // 6th game overall
+    expect(second!.shouldShowInterstitial()).toBe(true);
+  });
+
+  it('falls back to session-scoped counting when localStorage throws', async () => {
+    social.tier = 'adult';
+    const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage disabled');
+    });
+    const setSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage disabled');
+    });
+    try {
+      let captured: ReturnType<typeof useAdMobContext> | null = null;
+      await act(async () => {
+        render(
+          <AdMobProvider>
+            <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+          </AdMobProvider>
+        );
+      });
+      for (let i = 0; i < 6; i++) captured!.recordGameEnd();
+      expect(captured!.shouldShowInterstitial()).toBe(true);
+    } finally {
+      spy.mockRestore();
+      setSpy.mockRestore();
+    }
+  });
+
   it('caps interstitials at MAX_INTERSTITIALS_PER_SESSION (4) regardless of game-end count', async () => {
     social.tier = 'adult';
     let captured: ReturnType<typeof useAdMobContext> | null = null;

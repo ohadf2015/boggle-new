@@ -51,6 +51,33 @@ const MAX_INTERSTITIALS_PER_SESSION = 4;
 // gives margin for the show to complete before the SDK's own expiry.
 const INTERSTITIAL_TTL_MS = 50 * 60 * 1000;
 
+// Games played across the install's whole life. The cadence below (warmup of 3,
+// then every 3rd game) only ever fired for a user who reached game 6 in ONE
+// sitting — and an undeclared user spends that first slot on the age gate, so
+// their first real interstitial needed NINE games in one session. AdMob says
+// what that cost: 31 interstitial requests in the 79 days since the format went
+// live (2026-07-03), 2 impressions in the whole of August. Counting lifetime
+// games instead makes the slot reachable; MAX_INTERSTITIALS_PER_SESSION still
+// caps the per-session frequency, and the Families tier gate is untouched.
+const GAME_ENDS_KEY = 'lc_total_game_ends';
+
+function readTotalGameEnds(): number {
+  try {
+    const n = Number(localStorage.getItem(GAME_ENDS_KEY));
+    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+  } catch {
+    return 0; // storage unavailable — degrade to the old session-scoped behaviour
+  }
+}
+
+function writeTotalGameEnds(n: number): void {
+  try {
+    localStorage.setItem(GAME_ENDS_KEY, String(n));
+  } catch {
+    // ponytail: best-effort. A failed write just means this game doesn't count.
+  }
+}
+
 const AdMobContext = createContext<AdMobContextValue | null>(null);
 
 export function AdMobProvider({ children }: { children: ReactNode }) {
@@ -66,7 +93,12 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // knowledge of a child → serve NO ads to them. Mirrors the same tier the
   // social-feature gates use, so ad gating can't drift from social gating.
   const { tier, authResolved } = useSocialCapabilities();
-  const totalGameEnds = useRef(0);
+  // Lifetime, not per-session — see GAME_ENDS_KEY. The lazy useState initialiser
+  // runs exactly once (a bare useRef(readTotalGameEnds()) would hit localStorage
+  // on every render); under SSR the read throws and seeds 0, which is the old
+  // behaviour and is never rendered, so hydration can't mismatch on it.
+  const [seededGameEnds] = useState(readTotalGameEnds);
+  const totalGameEnds = useRef(seededGameEnds);
   const interstitialsShown = useRef(0);
   // Latched when an interstitial slot came due but tier was still 'unknown' —
   // the cue for the UI to ask for age at that natural break (state, not ref,
@@ -147,6 +179,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
 
   function recordGameEnd() {
     totalGameEnds.current += 1;
+    writeTotalGameEnds(totalGameEnds.current);
     // A slot came due and the ONLY blocker is that we don't know the user's
     // age — surface the age prompt at this natural break instead of an ad.
     // Declared 13+ → tier 'adult' → real interstitials from the next slot.
