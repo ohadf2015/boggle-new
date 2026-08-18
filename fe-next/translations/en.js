@@ -10801,6 +10801,7 @@ const en = {
       "live": "LIVE",
       "selectClassroom": "Select Classroom",
       "createClassroomFirst": "Create a classroom first to track assignments and duel activity",
+      "reviewEmptyHint": "Create your first classroom to unlock analytics, assignments and reports.",
       "analytics": "Analytics",
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
@@ -11667,7 +11668,18 @@ const en = {
     "onboarding": {
       "getStarted": "Get Started",
       "of": "of",
-      "step": "Step {{current}}"
+      "step": "Step {{current}}",
+      "title": "How LexiClash works in your classroom",
+      "subtitle": "Five quick steps from zero to your first live word game.",
+      "steps": {
+        "create": { "title": "Create your classroom", "text": "One tap — name it and you're set." },
+        "share": { "title": "Share the join code", "text": "Project it on the board or send the link." },
+        "join": { "title": "Students join", "text": "From any device — no accounts needed." },
+        "play": { "title": "Run a live word game", "text": "Pick a lesson and hit start." },
+        "results": { "title": "See results", "text": "Track every student's progress in your dashboard." }
+      },
+      "gotIt": "Got it — let's teach!",
+      "showTutorial": "How it works"
     },
     "practice": {
       "allVocabFound": "All words found!",

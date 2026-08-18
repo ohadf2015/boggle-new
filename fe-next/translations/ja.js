@@ -12272,6 +12272,7 @@ const ja = {
       "live": "ライブ",
       "selectClassroom": "クラスを選択",
       "createClassroomFirst": "課題とデュエルアクティビティを追跡するには、まずクラスを作成してください",
+      "reviewEmptyHint": "最初のクラスを作成すると、分析・課題・レポートが使えます。",
       "analytics": "アナリティクス",
       "insights": "インサイト",
       "viewReports": "レポートを見る",
@@ -13099,7 +13100,18 @@ const ja = {
     "onboarding": {
       "getStarted": "はじめよう",
       "of": "/",
-      "step": "ステップ{{current}}"
+      "step": "ステップ{{current}}",
+      "title": "LexiClash の授業での使い方",
+      "subtitle": "5つのステップでライブ単語ゲームをすぐ開始。",
+      "steps": {
+        "create": { "title": "クラスを作成", "text": "名前をつけるだけですぐ準備完了。" },
+        "share": { "title": "参加コードを共有", "text": "黒板に映すか、リンクを送るだけ。" },
+        "join": { "title": "生徒が参加", "text": "どの端末からでもOK。アカウント不要。" },
+        "play": { "title": "ライブ単語ゲームを開始", "text": "レッスンを選んでスタート。" },
+        "results": { "title": "結果を確認", "text": "ダッシュボードで生徒の進捗を追跡。" }
+      },
+      "gotIt": "OK、さっそく始めよう！",
+      "showTutorial": "使い方"
     },
     "practice": {
       "allVocabFound": "全単語コンプリート！",
