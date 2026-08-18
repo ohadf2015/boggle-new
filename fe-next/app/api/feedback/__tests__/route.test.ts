@@ -69,8 +69,12 @@ vi.mock('@/lib/apiRateLimit', () => ({
   addRateLimitHeaders: (res: unknown) => res,
 }));
 
+// debug/info are NOT optional: the route calls logger.debug() on the
+// rich-insert fallback path, so omitting it threw a TypeError there and the
+// request 500'd before Telegram was ever attempted — which is exactly what the
+// "still succeeds when the DB insert fails" case exercises.
 vi.mock('@/utils/logger', () => ({
-  default: { log: vi.fn(), warn: vi.fn(), error: vi.fn() },
+  default: { log: vi.fn(), info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 vi.mock('@/lib/email', () => ({
