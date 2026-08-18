@@ -10,6 +10,7 @@
  * CTA is the next round — and it lets you pick the mode you go into.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -69,6 +70,17 @@ interface QuickPlayResultsProps {
   onNextRound: (mode?: QuickMode) => void;
   onChallenge: () => void;
 }
+
+/**
+ * The mascot clip is heavy (mp4 + halo/sparkle layers) and only plays on a good
+ * round, so it loads on demand. Inline, never a full-screen overlay: daily
+ * results deliberately dropped the overlay fanfare as "too distracting" (see
+ * DailyWordHuntResults.mascot.test) and the same objection applies here.
+ */
+const MascotCelebrationVideo = dynamic(
+  () => import('@/components/mascot/MascotCelebrationVideo').then((m) => m.MascotCelebrationVideo),
+  { ssr: false }
+);
 
 /** Below this many leaderboard rows a percentile is noise, not information. */
 const MIN_BOARD_FOR_PERCENTILE = 5;
@@ -179,6 +191,21 @@ export function QuickPlayResults({
 
   const myName = profile?.username || t('common.you', 'You');
 
+  // Mascot: at most one clip, only on a moment that earned it. Priority runs
+  // biggest-first — a rank-up outranks a personal best outranks clearing the
+  // whole field. A flat round gets nothing; a mascot for every round is
+  // wallpaper, and a sad mascot after a bad round is a reason to stop playing.
+  const passedAllRivals = rivals.length > 0 && rivals.every((r) => result.scorePct > r.scorePct);
+  const mascotKind = rankedUp
+    ? ('champion' as const)
+    : isPersonalBest
+      ? ('bingo' as const)
+      : passedAllRivals
+        ? ('knight' as const)
+        : dayStreak > 2
+          ? ('streak' as const)
+          : null;
+
   return (
     <div
       className="flex h-full flex-col gap-2.5 overflow-y-auto overscroll-contain bg-neo-navy px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
@@ -205,6 +232,18 @@ export function QuickPlayResults({
           </span>
         )}
       </div>
+
+      {mascotKind && (
+        <div className="flex justify-center" data-testid="quick-mascot" data-mascot-kind={mascotKind}>
+          <MascotCelebrationVideo
+            kind={mascotKind}
+            overlay={false}
+            size="clamp(140px, 30vmin, 220px)"
+            autoDismissMs={3600}
+            title={null}
+          />
+        </div>
+      )}
 
       {/* Badges — celebration layer. Restyle/reposition only, keep conditions. */}
 
@@ -286,7 +325,8 @@ export function QuickPlayResults({
           )}
 
           {/* Improvement vs average */}
-          {improvementPct !== null && (
+          {/* "▲ 0% vs your average" is noise — only show a real move. */}
+          {improvementPct !== null && improvementPct !== 0 && (
             <span
               className={`w-max rounded-lg border-2 px-2 py-0.5 text-xs font-bold ${
                 improvementPct >= 0

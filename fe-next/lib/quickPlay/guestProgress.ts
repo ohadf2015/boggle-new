@@ -100,6 +100,19 @@ export function recordGuestRound(
 }
 
 /**
+ * The player's trailing average score_pct, 0 when they have no history.
+ * Sent with the round request so the rival field can be aimed at their level
+ * — signed in or not, this is the only level signal available before the
+ * first server round of a session.
+ */
+export function recentAveragePct(): number {
+  const { history } = getGuestProgress();
+  if (history.length === 0) return 0;
+  const recent = history.slice(0, 5);
+  return Math.round(recent.reduce((a, b) => a + b, 0) / recent.length);
+}
+
+/**
  * Percentile against today's public leaderboard rows.
  *
  * The server RPC is only reachable with a session, so a guest's percentile came

@@ -14,7 +14,7 @@ import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
-import { recordGuestRound, quickCoinsFor, quickXpFor } from '@/lib/quickPlay/guestProgress';
+import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
 import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
@@ -165,7 +165,10 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode, language, seed: activeChallenge?.seed }),
+        // recentPct lets the server aim the rival field at THIS player: without
+        // it a beginner passes nobody and a strong player passes everyone,
+        // every round. Local history, so guests are covered too; 0 = unknown.
+        body: JSON.stringify({ mode, language, seed: activeChallenge?.seed, recentPct: recentAveragePct() }),
       });
       if (!res.ok) throw new Error(`round fetch ${res.status}`);
       const round = (await res.json()) as QuickRoundConfig;
