@@ -50,6 +50,7 @@ const MODE_META: Record<GameMode | 'random', ModeMeta> = {
   shiritori: { slug: 'shiritori', color: 'cyan', icon: 'Link' },
   'sealed-bid': { slug: 'sealedBid', color: 'pink', icon: 'Gavel' },
   crossword: { slug: 'crossword', color: 'cyan', icon: 'Grid3x3' },
+  wordcraft: { slug: 'wordcraft', color: 'purple', icon: 'Grid2x2' },
   random: { slug: 'random', color: 'lime', icon: 'Shuffle' },
 };
 

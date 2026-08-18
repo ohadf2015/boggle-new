@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { GameMode } from '@/shared/types/game';
 
 const MODE_ICONS: Record<GameMode, string> = {
@@ -13,6 +13,7 @@ const MODE_ICONS: Record<GameMode, string> = {
   'shiritori': '🔗',
   'sealed-bid': '🔨',
   'crossword': '📰',
+  'wordcraft': '🧩',
 };
 
 /** Translation key mapping for each mode */
@@ -25,6 +26,7 @@ const MODE_TRANSLATION_KEYS: Record<GameMode, { name: string; description: strin
   'shiritori': { name: 'gameModes.shiritori.name', description: 'gameModes.shiritori.description' },
   'sealed-bid': { name: 'gameModes.sealedBid.name', description: 'gameModes.sealedBid.description' },
   'crossword': { name: 'gameModes.crossword.name', description: 'gameModes.crossword.description' },
+  'wordcraft': { name: 'wordcraft.title', description: 'wordcraft.modeDesc' },
 };
 
 const RADIAL_GRADIENT_STYLE = { background: 'radial-gradient(circle, var(--tw-gradient-stops))' } as const;
@@ -39,6 +41,7 @@ const MODE_COLORS: Record<GameMode, { from: string; via: string }> = {
   'shiritori': { from: 'from-neo-cyan/30', via: 'via-neo-cyan/5' },
   'sealed-bid': { from: 'from-neo-pink/30', via: 'via-neo-pink/5' },
   'crossword': { from: 'from-neo-cyan/30', via: 'via-neo-cyan/5' },
+  'wordcraft': { from: 'from-neo-purple/30', via: 'via-neo-purple/5' },
 };
 
 interface GameModeIntroProps {
