@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Online Word Games With Friends — Free, No Download | LexiClash',
-    description: 'Play word games with friends online — create a room, share a link, compete in real-time. 2-20+ players on the same grid simultaneously. Free, no download needed.',
+    description: 'Play word games with friends online — create a room, share the link, compete in real-time. 2-20 players, free, no download needed.',
     keywords: 'online word games with friends, play word games with friends, multiplayer word game online, word games for groups, word game with friends free, online multiplayer word games like hanging with friends, word battle with friends, party word game online, word game for groups no download, online free word cloud game multiplayer, word games live with people',
     openGraph: {
       title: 'Play Word Games With Friends Online — Free | LexiClash',
