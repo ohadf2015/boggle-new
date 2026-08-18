@@ -228,7 +228,10 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // --- Telemetry plumbing ---
   // turnIdRef persists for the whole turn so every event tied to one turn
   // lands with the same key. Bumps on each successful commit / pass.
-  const turnIdRef = useRef(`t-${Date.now()}-0`);
+  // Constant initializer on purpose: the old `t-${Date.now()}-0` ran a clock read
+  // during render, which the purity rule flags. Subsequent ids are stamped in
+  // event handlers, where a timestamp is fine.
+  const turnIdRef = useRef('t-0');
   const turnIndexRef = useRef(0);
   // Per-turn count of dispatch sites — fed into `inputMethod` heuristic on
   // turn_submitted so we know which gesture dominated the turn.
@@ -808,19 +811,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // routed straight to RunPageClient by WordCraftClient, so PageClient no
   // longer hijacks the territory view behind a feature flag.
 
-  if (authLoading) {
-    return (
-      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
-        <PageLoader size="lg" text={t('common.loading')} />
-      </div>
-    );
-  }
-
-  const pendingIds = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
-
-  // First-move flag drives the rack glow (no center star to ping anymore).
-  const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
-
   // Compute which cells would be valid drop targets based on linearity constraints.
   // Prevents placing tiles in invalid positions (off-axis) at the UI level.
   const computeInvalidCell = useMemo(() => {
@@ -840,6 +830,20 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
       return true;
     };
   }, [game.state.pendingPlacements]);
+
+  if (authLoading) {
+    return (
+      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
+        <PageLoader size="lg" text={t('common.loading')} />
+      </div>
+    );
+  }
+
+  const pendingIds = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
+
+  // First-move flag drives the rack glow (no center star to ping anymore).
+  const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
+
 
   const showPendingStrip = game.state.pendingPlacements.length > 0;
   // Whether the on-screen human may act now. Bot-mode: only on the player's

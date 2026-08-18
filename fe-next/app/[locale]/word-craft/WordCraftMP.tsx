@@ -29,7 +29,12 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
   const { profile } = useAuth();
   const socketRef = useRef<Socket | null>(null);
 
-  const username = profile?.display_name || `Player-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+  // Generated once, lazily: a random guest name computed during render is impure
+  // and would also change identity on every render, re-triggering the join effect.
+  const [guestName] = useState(
+    () => `Player-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
+  );
+  const username = profile?.display_name || guestName;
 
   const [gameState, setGameState] = useState<WordCraftStatePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
