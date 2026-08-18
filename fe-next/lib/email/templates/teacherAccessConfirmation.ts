@@ -27,6 +27,9 @@ interface Copy {
   greeting: (n: string) => string;
   /** "I'm Ohad, the creator of LexiClash — your access is live." */
   intro: string;
+  whatTitle: string;
+  /** 3 short bullets — the same feature list as the original email, trimmed. */
+  features: string[];
   /** One line on the trial window — informational, no urgency framing. */
   trialLine: (date: string) => string;
   cta: string;
@@ -49,10 +52,16 @@ const COPY: Record<TeacherLocale, Copy> = {
   en: {
     subject: 'Your LexiClash teacher access is live 🎉',
     greeting: (n) => `Hi ${n},`,
-    intro: "I'm Ohad, the creator of LexiClash — and your teacher access is live. Open your dashboard right now and run your first game with your class today.",
-    trialLine: (date) => `Your free trial runs until ${date} — plenty of time to try it with real students.`,
+    intro: "I'm Ohad, the creator of LexiClash — thanks for joining as a teacher. Your access is live right now.",
+    whatTitle: 'What you can do',
+    features: [
+      'Host live classroom word games — students join from any device',
+      'Run vocabulary duels & drills built for learning',
+      'Track progress in your Teacher Dashboard',
+    ],
+    trialLine: (date) => `Your free trial runs until ${date}.`,
     cta: 'Open Teacher Dashboard',
-    ask: `One small ask: reply to this email or write me at ${CONTACT} with any feedback or feature request — I read everything.`,
+    ask: `Feedback or a feature request? Write me directly: ${CONTACT} — I read everything.`,
     signoff: '— Ohad',
     messageLabel: 'A note from our team',
     dir: 'ltr',
@@ -60,10 +69,16 @@ const COPY: Record<TeacherLocale, Copy> = {
   he: {
     subject: 'הגישה שלך כמורה ב-LexiClash פעילה 🎉',
     greeting: (n) => `שלום ${n},`,
-    intro: 'אני אוהד, היוצר של LexiClash — והגישה שלך כמורה פעילה. אפשר לפתוח את לוח הבקרה עכשיו ולהפעיל משחק ראשון עם הכיתה כבר היום.',
-    trialLine: (date) => `תקופת הניסיון בחינם נמשכת עד ${date} — יש המון זמן לנסות עם תלמידים אמיתיים.`,
+    intro: 'אני אוהד, היוצר של LexiClash — תודה שהצטרפת כמורה. הגישה שלך פעילה עכשיו.',
+    whatTitle: 'מה אפשר לעשות',
+    features: [
+      'להפעיל משחקי מילים חיים בכיתה — התלמידים מצטרפים מכל מכשיר',
+      'דו-קרבות אוצר מילים ותרגולים שבנויים ללמידה',
+      'לעקוב אחר ההתקדמות בלוח הבקרה למורה',
+    ],
+    trialLine: (date) => `תקופת הניסיון בחינם נמשכת עד ${date}.`,
     cta: 'פתח/י את לוח הבקרה למורה',
-    ask: `בקשה קטנה: השיבו למייל הזה או כתבו לי ל-${CONTACT} עם כל משוב או בקשת פיצ׳ר — אני קורא הכל.`,
+    ask: `משוב או בקשת פיצ׳ר? כתוב/י לי ישירות: ${CONTACT} — אני קורא הכל.`,
     signoff: '— אוהד',
     messageLabel: 'הערה מהצוות שלנו',
     dir: 'rtl',
@@ -71,10 +86,16 @@ const COPY: Record<TeacherLocale, Copy> = {
   sv: {
     subject: 'Din lärarbehörighet på LexiClash är live 🎉',
     greeting: (n) => `Hej ${n},`,
-    intro: 'Jag är Ohad, skaparen av LexiClash — och din lärarbehörighet är live. Öppna din panel direkt och kör ditt första spel med klassen redan idag.',
-    trialLine: (date) => `Din gratisperiod löper till ${date} — gott om tid att testa med riktiga elever.`,
+    intro: 'Jag är Ohad, skaparen av LexiClash — tack för att du gick med som lärare. Din behörighet är live nu.',
+    whatTitle: 'Vad du kan göra',
+    features: [
+      'Kör live-ordspel i klassrummet — eleverna ansluter från valfri enhet',
+      'Orddueller och övningar byggda för lärande',
+      'Följ framstegen i din lärarpanel',
+    ],
+    trialLine: (date) => `Din gratisperiod löper till ${date}.`,
     cta: 'Öppna lärarpanelen',
-    ask: `En liten önskan: svara på det här mailet eller skriv till mig på ${CONTACT} med feedback eller funktionsönskemål — jag läser allt.`,
+    ask: `Feedback eller en funktionsönskan? Skriv direkt till mig: ${CONTACT} — jag läser allt.`,
     signoff: '— Ohad',
     messageLabel: 'En hälsning från vårt team',
     dir: 'ltr',
@@ -82,10 +103,16 @@ const COPY: Record<TeacherLocale, Copy> = {
   ja: {
     subject: 'LexiClash 教師アクセスが有効になりました 🎉',
     greeting: (n) => `${n}様、`,
-    intro: 'LexiClashの作者、Ohadです。教師アクセスが有効になりました。今すぐダッシュボードを開いて、今日からクラスで最初のゲームを始められます。',
-    trialLine: (date) => `無料トライアルは${date}まで。実際の生徒と試す時間は十分にあります。`,
+    intro: 'LexiClashの作者、Ohadです。教師としてご参加いただきありがとうございます。アクセスは有効になっています。',
+    whatTitle: 'できること',
+    features: [
+      'クラスでライブ単語ゲームを開催 — 生徒はどの端末からでも参加',
+      '学習のための語彙対戦とドリル',
+      '教師ダッシュボードで進捗を確認',
+    ],
+    trialLine: (date) => `無料トライアルは${date}までです。`,
     cta: '教師ダッシュボードを開く',
-    ask: `ひとつお願いです。このメールに返信するか、${CONTACT} まで、フィードバックや機能のリクエストをお聞かせください。すべて読んでいます。`,
+    ask: `フィードバックや機能のリクエストは、${CONTACT} まで直接どうぞ。すべて読んでいます。`,
     signoff: '— Ohad',
     messageLabel: '私たちのチームより',
     dir: 'ltr',
@@ -93,21 +120,33 @@ const COPY: Record<TeacherLocale, Copy> = {
   es: {
     subject: 'Tu acceso de profesor en LexiClash está activo 🎉',
     greeting: (n) => `Hola ${n},`,
-    intro: 'Soy Ohad, el creador de LexiClash — y tu acceso de profesor ya está activo. Abre tu panel ahora mismo y organiza tu primer juego con tu clase hoy.',
-    trialLine: (date) => `Tu prueba gratuita dura hasta el ${date} — tiempo de sobra para probarlo con estudiantes reales.`,
+    intro: 'Soy Ohad, el creador de LexiClash — gracias por unirte como profesor. Tu acceso ya está activo.',
+    whatTitle: 'Qué puedes hacer',
+    features: [
+      'Organiza juegos de palabras en vivo — los estudiantes se unen desde cualquier dispositivo',
+      'Duelos de vocabulario y ejercicios pensados para aprender',
+      'Sigue el progreso en tu panel de profesor',
+    ],
+    trialLine: (date) => `Tu prueba gratuita dura hasta el ${date}.`,
     cta: 'Abrir panel de profesor',
-    ask: `Un pequeño favor: responde a este correo o escríbeme a ${CONTACT} con cualquier comentario o función que te gustaría — lo leo todo.`,
+    ask: `¿Comentarios o una función que te gustaría? Escríbeme directamente: ${CONTACT} — lo leo todo.`,
     signoff: '— Ohad',
     messageLabel: 'Un mensaje de nuestro equipo',
     dir: 'ltr',
   },
   ru: {
-    subject: 'Твой доступ учителя в LexiClash активен 🎉',
-    greeting: (n) => `Привет, ${n}!`,
-    intro: 'Я Охад, создатель LexiClash — твой доступ учителя уже активен. Открой панель прямо сейчас и проведи первую игру с классом уже сегодня.',
-    trialLine: (date) => `Бесплатный пробный период длится до ${date} — времени попробовать с настоящими учениками предостаточно.`,
+    subject: 'Ваш доступ учителя в LexiClash активен 🎉',
+    greeting: (n) => `Здравствуйте, ${n}!`,
+    intro: 'Я Охад, создатель LexiClash — спасибо, что присоединились как учитель. Ваш доступ уже активен.',
+    whatTitle: 'Что можно делать',
+    features: [
+      'Проводите живые словесные игры в классе — ученики подключаются с любого устройства',
+      'Словесные дуэли и упражнения, созданные для обучения',
+      'Отслеживайте прогресс в панели учителя',
+    ],
+    trialLine: (date) => `Бесплатный пробный период — до ${date}.`,
     cta: 'Открыть панель учителя',
-    ask: `Небольшая просьба: ответь на это письмо или напиши мне на ${CONTACT} с любым отзывом или идеей функции — я читаю всё.`,
+    ask: `Отзыв или идея функции? Напишите мне напрямую: ${CONTACT} — я читаю всё.`,
     signoff: '— Охад',
     messageLabel: 'Заметка от нашей команды',
     dir: 'ltr',
@@ -131,6 +170,10 @@ export function teacherAccessConfirmation({ full_name, locale, message, trialExp
       })()
     : '';
 
+  const features = c.features
+    .map((f) => `<li style="margin:0 0 6px 0;">${escape(f)}</li>`)
+    .join('');
+
   const messageBlock = trimmed
     ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
         <tr><td id="admin-message" style="background:#f4f7ff;border:2px solid #1a1a2e;border-radius:8px;padding:16px;font-size:15px;line-height:1.5;color:#1a1a2e;">
@@ -153,6 +196,8 @@ export function teacherAccessConfirmation({ full_name, locale, message, trialExp
           <p style="font-size:18px;font-weight:700;margin:0 0 12px 0;">${c.greeting(escape(full_name))}</p>
           <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.intro)}</p>
           ${trialLine}
+          <p style="font-size:15px;font-weight:700;margin:0 0 8px 0;">${escape(c.whatTitle)}</p>
+          <ul style="font-size:15px;line-height:1.5;margin:0 0 20px 0;padding-${align === 'right' ? 'right' : 'left'}:20px;">${features}</ul>
           <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.ask)}</p>
         </td></tr>
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px;text-align:${align};">${messageBlock}</td></tr>

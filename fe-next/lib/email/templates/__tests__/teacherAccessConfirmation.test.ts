@@ -26,8 +26,16 @@ describe('teacherAccessConfirmation email', () => {
 
   it('asks for feedback / feature requests and promises Ohad reads everything', () => {
     const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
-    expect(html).toMatch(/feedback or feature request/i);
+    expect(html).toMatch(/feedback/i);
+    expect(html).toMatch(/feature request/i);
     expect(html).toMatch(/I read everything/i);
+  });
+
+  it('keeps the original email structure: what-you-can-do feature bullets', () => {
+    const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
+    expect(html).toContain('What you can do');
+    expect(html).toMatch(/classroom word games/i);
+    expect(html).toMatch(/Teacher Dashboard/i);
   });
 
   it.each(LOCALES)('is personal and asks for feedback in %s', (locale) => {
