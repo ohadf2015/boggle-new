@@ -8,6 +8,10 @@ let mockUser:
 let recentCount = 0;
 let mockProfile: { display_name?: string | null; username?: string | null; country_code?: string | null } | null = null;
 let insertMock = vi.fn(async () => ({ data: { id: 'req-1' }, error: null }));
+let approveMock = vi.fn(async (_args?: any) => ({ data: [{ id: 'req-1' }], error: null }));
+let adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
+let adminAvailable = true;
+let sendEmailMock = vi.fn(async (_args: any) => ({ ok: true as boolean, error: undefined as string | undefined }));
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
@@ -28,8 +32,34 @@ vi.mock('@/utils/supabase/server', () => ({
   }),
 }));
 
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () =>
+    adminAvailable
+      ? {
+          from: (table: string) => ({
+            update: (values: any) =>
+              table === 'teacher_access_requests'
+                ? // Auto-approve: update(...).eq('user_id', ...).eq('status', 'pending').select('id')
+                  {
+                    eq: (key: string, val: string) => ({
+                      eq: (key2: string, val2: string) => ({
+                        select: (cols: string) => approveMock({ table, values, key, val, key2, val2, cols }),
+                      }),
+                    }),
+                  }
+                : // Promotion: update({ user_role: 'teacher' }).eq('id', user.id).select('id')
+                  {
+                    eq: (key: string, val: string) => ({
+                      select: (cols: string) => adminSelectMock({ table, values, key, val, cols }),
+                    }),
+                  },
+          }),
+        }
+      : null,
+}));
+
 vi.mock('@/lib/email/send', () => ({
-  sendEmail: vi.fn(async () => ({ ok: true })),
+  sendEmail: (args: any) => sendEmailMock(args),
 }));
 
 const mkReq = (body: any): Request => new Request('http://test/api/education/access-request', {
@@ -60,6 +90,10 @@ describe('POST /api/education/access-request', () => {
     recentCount = 0;
     mockProfile = { display_name: 'Jane Doe', username: 'janed', country_code: 'US' };
     insertMock = vi.fn(async () => ({ data: { id: 'req-1' }, error: null }));
+    approveMock = vi.fn(async () => ({ data: [{ id: 'req-1' }], error: null }));
+    adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
+    adminAvailable = true;
+    sendEmailMock = vi.fn(async () => ({ ok: true, error: undefined }));
   });
 
   it('200 for a signed-up, email-verified user', async () => {
@@ -126,5 +160,81 @@ describe('POST /api/education/access-request', () => {
     recentCount = 3;
     const res = await POST(mkReq(validPayload));
     expect(res.status).toBe(429);
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(approveMock).not.toHaveBeenCalled();
+  });
+
+  describe('instant auto-approval', () => {
+    it('marks the request approved with trial expiry + reviewed_at right after insert (via admin client — RLS has no user UPDATE policy)', async () => {
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      expect(approveMock).toHaveBeenCalledTimes(1);
+      const call = approveMock.mock.calls[0][0] as any;
+      expect(call.table).toBe('teacher_access_requests');
+      expect(call.key).toBe('user_id');
+      expect(call.val).toBe('user-1');
+      expect(call.key2).toBe('status');
+      expect(call.val2).toBe('pending');
+      const update = call.values;
+      expect(update.status).toBe('approved');
+      expect(typeof update.trial_expires_at).toBe('string');
+      // Trial is ~14 days out — just verify it parses and is in the future.
+      expect(new Date(update.trial_expires_at).getTime()).toBeGreaterThan(Date.now());
+      expect(typeof update.reviewed_at).toBe('string');
+    });
+
+    it('500s when the approval matched no request row (silent no-op guard)', async () => {
+      approveMock = vi.fn(async () => ({ data: [], error: null }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(500);
+      expect(adminSelectMock).not.toHaveBeenCalled();
+    });
+
+    it('promotes the profile to teacher via the admin (service-role) client', async () => {
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      expect(adminSelectMock).toHaveBeenCalledTimes(1);
+      const call = adminSelectMock.mock.calls[0][0] as any;
+      expect(call.table).toBe('profiles');
+      expect(call.values).toEqual({ user_role: 'teacher' });
+      expect(call.key).toBe('id');
+      expect(call.val).toBe('user-1');
+    });
+
+    it('500s when the promotion matched no profile row (silent no-op guard)', async () => {
+      adminSelectMock = vi.fn(async () => ({ data: [], error: null }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(500);
+    });
+
+    it('500s when the admin client is not configured', async () => {
+      adminAvailable = false;
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(500);
+    });
+
+    it('still answers 200 when the confirmation email fails', async () => {
+      sendEmailMock = vi.fn(async () => ({ ok: false, error: 'resend down' }));
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+    });
+
+    it('sends the admin notify + the confirmation to the verified account email', async () => {
+      await POST(mkReq(validPayload));
+      expect(sendEmailMock).toHaveBeenCalledTimes(2);
+      const recipients = sendEmailMock.mock.calls.map((c) => (c[0] as any).to);
+      expect(recipients).toContain('lexiclash.game@gmail.com');
+      expect(recipients).toContain('jane@school.edu');
+    });
+
+    it('accepts the ru locale (COPY must have a ru entry)', async () => {
+      const res = await POST(mkReq({ ...validPayload, locale: 'ru' }));
+      expect(res.status).toBe(200);
+      const confirm = sendEmailMock.mock.calls.find((c) => (c[0] as any).to === 'jane@school.edu');
+      expect(confirm).toBeTruthy();
+      expect((confirm![0] as any).subject.length).toBeGreaterThan(0);
+    });
   });
 });

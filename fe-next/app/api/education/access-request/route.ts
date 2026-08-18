@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdminNotify';
+import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
+import { teacherTrialExpiry } from '@/lib/education/trial';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
@@ -65,8 +68,51 @@ export async function POST(req: Request) {
   const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
 
+  // Access is granted INSTANTLY on submit — no manual review step. The insert
+  // only records the request; approval promotes the account in the same
+  // request so the client can redirect straight to /teacher.
+  //
+  // BOTH writes go through the service-role client: teacher_access_requests
+  // RLS has no user UPDATE policy (only tar_admin_update), so approving via
+  // the request-scoped client silently matches 0 rows and leaves the request
+  // 'pending' forever, and profiles RLS blocks self-escalation of user_role
+  // the same way.
+  const admin = createAdminClient();
+  if (!admin) return bad('service role key not configured', 500);
+
+  const trialExpiresAt = teacherTrialExpiry(Date.now());
+  const nowIso = new Date().toISOString();
+  const approve = await admin
+    .from('teacher_access_requests')
+    .update({ status: 'approved', trial_expires_at: trialExpiresAt, reviewed_at: nowIso })
+    .eq('user_id', user.id)
+    .eq('status', 'pending')
+    .select('id');
+  // Approves every pending row this user has (at most a handful — the rate
+  // limit caps requests at 3 per 24h), including the one just inserted.
+  if (approve.error) return bad('approval failed: ' + approve.error.message, 500);
+  if (!approve.data?.length) return bad('request not approved', 500);
+
+  const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
+  if (promoted.error) return bad('promotion failed: ' + promoted.error.message, 500);
+  if (!promoted.data?.length) return bad('profile not promoted', 500);
+
   const tpl = teacherAccessAdminNotify(payload);
   await sendEmail({ to: 'lexiclash.game@gmail.com', subject: tpl.subject, html: tpl.html });
+
+  // Confirmation email is best-effort — the approval (DB state) is the source
+  // of truth and must not be undone by a flaky mail provider, so failures
+  // don't 500. sendEmail reports provider rejections via a resolved
+  // { ok:false } rather than a throw, so inspect it and log.
+  try {
+    const confirmTpl = teacherAccessConfirmation({ full_name, locale, trialExpiresAt });
+    const sent = await sendEmail({ to: email, subject: confirmTpl.subject, html: confirmTpl.html });
+    if (!sent.ok) {
+      console.error('[access-request] confirmation email failed for', email, '-', sent.error);
+    }
+  } catch (e) {
+    console.error('[access-request] confirmation email threw', e);
+  }
 
   // Both keys on purpose: this route's error path answers { ok: false, error }, so a caller that
   // checks `ok` saw undefined on success — the shapes disagreed. `success` stays for any existing

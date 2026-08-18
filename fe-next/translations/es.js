@@ -13329,7 +13329,7 @@ const es = {
     },
     "access": {
       "h1": "Solicitar acceso de maestro",
-      "lede": "Cuéntanos sobre tu aula. Revisamos a mano y respondemos en <24h.",
+      "lede": "Cuéntanos sobre tu aula. El acceso se concede al instante — sin esperar revisión.",
       "full_name": "Tu nombre completo",
       "email": "Tu email",
       "role": "¿Cuál es tu rol?",
@@ -13346,9 +13346,9 @@ const es = {
       "submitting": "Enviando…",
       "submit_error": "Error. Intenta de nuevo.",
       "rate_limited": "Demasiados intentos. Reintentar en 24h.",
-      "success_title": "¡Solicitud recibida!",
-      "success_body": "Revisamos todas manualmente. Respuesta en 1-2 días.",
-      "success_next": "Revisaremos tu solicitud y te escribiremos en 1-2 días. Puedes cerrar.",
+      "success_title": "¡Ya estás dentro! 🎉",
+      "success_body": "Acceso de profesor concedido al instante.",
+      "success_next": "Llevándote a tu panel de profesor…",
       "pending_title": "Tu solicitud está en revisión",
       "pending_body": "Recibida. Te avisaremos pronto.",
       "declined_title": "Esta vez no pudo ser",
@@ -13385,10 +13385,10 @@ const es = {
       "next": {
         "step1_title": "Envía el formulario",
         "step1_body": "5 campos, 60 segundos.",
-        "step2_title": "Revisamos",
-        "step2_body": "Persona real, generalmente <24h.",
+        "step2_title": "Aprobación instantánea",
+        "step2_body": "Sin revisión manual — los profes verificados obtienen acceso al momento.",
         "step3_title": "¡Acceso inmediato!",
-        "step3_body": "Confirmación por email y listo."
+        "step3_body": "Tu panel se abre de inmediato — además de una nota personal de Ohad."
       },
       "regular_game_title": "¿No eres maestro/a? Sin problema.",
       "regular_game_body": "LexiClash es gratis para todos. Juega primero, solicita acceso después.",

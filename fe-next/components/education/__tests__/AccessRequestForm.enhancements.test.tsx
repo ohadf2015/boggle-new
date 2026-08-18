@@ -11,6 +11,17 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AccessRequestForm } from '../AccessRequestForm';
 
+const pushMock = vi.fn();
+const refreshProfileMock = vi.fn(async () => {});
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: pushMock }),
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ refreshProfile: refreshProfileMock }),
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: any) => {
@@ -41,9 +52,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'education.access.submitting': 'Sending…',
         'education.access.submit_error': 'Something went wrong. Please try again.',
         'education.access.rate_limited': 'Too many requests. Please try again in 24 hours.',
-        'education.access.success_title': 'Application sent!',
-        'education.access.success_body': 'We will review and email you within 24 hours.',
-        'education.access.success_next': "We'll review and email you within 1-2 business days.",
+        'education.access.success_title': "You're in! 🎉",
+        'education.access.success_body': 'Teacher access granted instantly.',
+        'education.access.success_next': 'Taking you to your Teacher Dashboard…',
       };
       const raw = keys[key] || key;
       return params ? raw.replace(/\{(\w+)\}/g, (_m, k) => String(params[k] ?? '')) : raw;
@@ -200,7 +211,7 @@ describe('AccessRequestForm', () => {
   });
 
   describe('post-submit guidance', () => {
-    it('shows a success status region with next-steps guidance', async () => {
+    it('shows a success status region promising instant access', async () => {
       const user = userEvent.setup();
       (global.fetch as any).mockResolvedValueOnce({ ok: true });
       render(<AccessRequestForm />);
@@ -209,9 +220,22 @@ describe('AccessRequestForm', () => {
 
       await waitFor(() => {
         const status = screen.getByRole('status');
-        expect(status).toHaveTextContent('Application sent!');
-        expect(status).toHaveTextContent(/business days/i);
+        expect(status).toHaveTextContent("You're in!");
+        expect(status).toHaveTextContent(/granted instantly/i);
       });
+    });
+
+    it('refreshes the profile, then redirects to the locale teacher dashboard', async () => {
+      const user = userEvent.setup();
+      (global.fetch as any).mockResolvedValueOnce({ ok: true });
+      render(<AccessRequestForm />);
+      await fillValid(user);
+      await user.click(screen.getByRole('button', { name: /Send application/i }));
+
+      // Redirect fires ~1.2s after the success beat; the profile refresh must
+      // happen first so /teacher's role gate sees the promoted user_role.
+      await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'), { timeout: 3000 });
+      expect(refreshProfileMock).toHaveBeenCalled();
     });
   });
 });

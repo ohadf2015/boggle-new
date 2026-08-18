@@ -6,6 +6,14 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ refreshProfile: vi.fn(async () => {}) }),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
 import { AccessRequestForm } from '../AccessRequestForm';
 
 describe('<AccessRequestForm>', () => {

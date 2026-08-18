@@ -13572,7 +13572,7 @@ const sv = {
     },
     "access": {
       "h1": "Begär gratis lärargång",
-      "lede": "Fyll formuläret — tar två minuter. Vi granskar din ansökan och mailar ett svar samma dag oftast.",
+      "lede": "Berätta lite om ditt klassrum. Åtkomst ges direkt — ingen väntan på granskning.",
       "full_name": "Dit namn",
       "email": "Din e-postadress",
       "role": "Din roll",
@@ -13589,9 +13589,9 @@ const sv = {
       "submitting": "Skickar…",
       "submit_error": "Något gick fel. Försök igen senare.",
       "rate_limited": "För många försök. Vänta 24 timmar.",
-      "success_title": "Ansökan mottagen!",
-      "success_body": "Vi granskar den och mailar dig snart.",
-      "success_next": "Vi mailar dig ett svar inom 1–2 arbetsdagar. Du kan stänga denna sida.",
+      "success_title": "Du är inne! 🎉",
+      "success_body": "Lärarbehörighet beviljad direkt.",
+      "success_next": "Tar dig till din lärarpanel…",
       "pending_title": "Din ansökan granskas",
       "pending_body": "Vi undersöker den. Du hörs från oss snart.",
       "declined_title": "Din ansökan avslogs denna gång",
@@ -13628,10 +13628,10 @@ const sv = {
       "next": {
         "step1_title": "Steg 1: Ansöka",
         "step1_body": "Fyll formuläret. Två minuter.",
-        "step2_title": "Steg 2: Vi granskar",
-        "step2_body": "En människa läser varje ansökan. Oftast samma dag.",
+        "step2_title": "Steg 2: Direktgodkännande",
+        "step2_body": "Ingen manuell granskning — verifierade lärare får åtkomst samma sekund de ansöker.",
         "step3_title": "Steg 3: Du får åtkomst",
-        "step3_body": "Mejlbekräftelse + omedelbar åtkomst till alla lärarverktyg."
+        "step3_body": "Din panel öppnas direkt — plus en personlig hälsning från Ohad."
       },
       "regular_game_title": "Inte lärare?",
       "regular_game_body": "Spela LexiClash gratis. Börja här, ansök om lärargång senare.",
