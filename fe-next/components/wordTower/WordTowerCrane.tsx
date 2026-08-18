@@ -647,7 +647,13 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
           {aiming && (
             <div
               ref={shadowElRef}
-              className="absolute left-1/2 z-0 h-2 w-14 -translate-x-1/2 rounded-[50%] blur-[1px] will-change-transform"
+              // The shadow sits at the MOMENTUM-PROJECTED landing spot, not under
+              // the beam — the gap between the two IS the carry, and closing it
+              // against the reticle is the whole skill. It used to be a faint
+              // 1px-blurred smudge, which made the one honest aiming cue the
+              // hardest thing on screen to see; a crisp rim makes the carry
+              // legible so the physics can be read rather than guessed.
+              className="absolute left-1/2 z-0 h-2.5 w-16 -translate-x-1/2 rounded-[50%] border border-neo-cream/40 will-change-transform"
               style={{
                 top: `${CRANE_SHADOW_Y_PX - CRANE_SHADOW_VISUAL_NUDGE_PX}px`,
                 backgroundColor: NEUTRAL_SHADOW,

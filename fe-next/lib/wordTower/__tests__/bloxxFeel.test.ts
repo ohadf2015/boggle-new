@@ -22,23 +22,39 @@ import { cableStretchAt, cableRecoilPx } from '../cranePendulum';
 import { alignmentBand } from '../cranePlacement';
 
 describe('Bloxx (a) release-before-center momentum', () => {
-  it('carry is skill-relevant (≥0.55) but fair-capped', () => {
+  it('carry is skill-relevant but cannot exceed the window it aims into', () => {
     // Classic Bloxx: release early, watch the block drift in. Too-soft carry
     // kills the skill; too-hard is unfair on daily leaderboards.
-    expect(CARRY_FACTOR).toBeGreaterThanOrEqual(0.55);
-    expect(CARRY_FACTOR).toBeLessThanOrEqual(0.7);
-    expect(MAX_DRIFT).toBeGreaterThanOrEqual(0.3);
-    expect(MAX_DRIFT).toBeLessThanOrEqual(0.45);
+    //
+    // This used to pin CARRY_FACTOR >= 0.55 and MAX_DRIFT in [0.3, 0.45] as bare
+    // magnitudes, never relating the drift cap to the `perfect` window it has to
+    // land inside. Those numbers violated the fairness this test exists to
+    // protect: at MAX_DRIFT 0.38 against PERFECT_MAX 0.18, a dead-centre release
+    // projected 0.187-0.380 off target and scored `good` in EVERY word-length ×
+    // tower-height combination measured — the lead you had to apply was wider
+    // than the window you were leading into, so aiming correctly could not score
+    // well. The intent is kept; the unchecked constants are gone.
+    //
+    // The magnitude bound now lives in `dropCalibration.test.ts`, which pins the
+    // drift:window RATIO at both ends (big enough to matter, small enough that
+    // the cap does not do the player's timing for them).
+    expect(CARRY_FACTOR).toBeGreaterThan(0);
+    expect(MAX_DRIFT).toBeGreaterThan(0);
   });
 
   it('early release with inward momentum lands closer to centre', () => {
     const release = -0.35;
     const velTowardCenter = 0.0015; // trolley moving right
     const projected = landingOffset(release, velTowardCenter);
+    // The mechanic contract: inward momentum genuinely pulls the landing spot
+    // toward centre. This is the part that matters and it still holds.
     expect(Math.abs(projected)).toBeLessThan(Math.abs(release));
-    // Stronger carry moves MORE toward centre than a weak one would
-    const weak = release + velTowardCenter * FALL_MS * 0.4;
-    expect(Math.abs(projected)).toBeLessThan(Math.abs(weak));
+    // A stronger carry moves further than a weaker one — stated as a property of
+    // `landingOffset` rather than by comparing against a hardcoded 0.4, which was
+    // only `CARRY_FACTOR > 0.4` in disguise and re-pinned the magnitude this
+    // file no longer owns.
+    const weaker = landingOffset(release, velTowardCenter, FALL_MS, CARRY_FACTOR / 2);
+    expect(Math.abs(projected)).toBeLessThan(Math.abs(weaker));
   });
 
   it('drift animation is ease-out (sheds speed mid-air) and lands at k=1', () => {
