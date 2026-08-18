@@ -3221,6 +3221,7 @@ const sv = {
     },
     "quickStart": {
       "play": "SPELA",
+      "playSub": "Snabb 2-minutersmatch · ingen registrering",
       "howToPlay": "Så spelar du",
       "haveAccount": "Jag har ett konto"
     },
@@ -3558,6 +3559,21 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "streakIgnition": {
+      "titleWon": "SVITEN ÄR TÄND!",
+      "titleLost": "EN VINST FÖR ATT TÄNDA DEN",
+      "body": "Du spelade idag. Kom tillbaka imorgon för att hålla elden vid liv — missa en dag och den slocknar.",
+      "bodyLost": "Vinn en match så börjar din svit. Du är närmare än du tror.",
+      "day": "Dag {n}"
+    },
+    "tomorrowCard": {
+      "title": "IMORGON: ny daglig utmaning",
+      "countdown": "Nytt pussel om {time}"
+    },
+    "saveStreak": {
+      "title": "Spara min svit",
+      "body": "Sviter lever på den här enheten. Skapa ett gratiskonto för att behålla dem överallt."
+    },
     "mpGapNudge": "Bara {gap} poäng efter — ta nästa runda!",
     "rivals": {
       "aria": "Du mot dina rivaler",

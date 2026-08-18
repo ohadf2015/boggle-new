@@ -238,6 +238,15 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
           {t('onboarding.quickStart.play')}
         </m.button>
 
+        {/* Expectation-setter (Streak Ignition, t_89663cfc): tapping PLAY is
+            safe and instant — quick game, no account wall. */}
+        <p
+          data-testid="quick-start-play-sub"
+          className="mt-2 text-center text-xs font-bold text-neo-black/60"
+        >
+          {t('onboarding.quickStart.playSub')}
+        </p>
+
         {/* Secondary choices. The tutorial lives here — offered, never imposed. */}
         <div className="mt-3 flex items-center justify-center gap-4 text-xs font-bold">
           <button

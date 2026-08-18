@@ -18,6 +18,13 @@ import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 interface InlineSignupCardProps {
   isAuthenticated: boolean;
   className?: string;
+  /** Override the header copy (default: 'auth.multiGames.title'). Used by the
+   *  solo results screen to reframe signup as streak insurance (t_89663cfc). */
+  titleKey?: string;
+  /** Override the body copy (default: 'auth.multiGames.subtitle'). */
+  bodyKey?: string;
+  /** Fired when the player taps any sign-in button (analytics). */
+  onCTAClick?: () => void;
 }
 
 const benefits: AuthBenefit[] = [
@@ -34,10 +41,18 @@ const benefits: AuthBenefit[] = [
 const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
   isAuthenticated,
   className,
+  titleKey = 'auth.multiGames.title',
+  bodyKey = 'auth.multiGames.subtitle',
+  onCTAClick,
 }) => {
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const { signIn, loadingProvider, error } = useOAuthSignIn();
+
+  const handleSignIn = (provider: 'google' | 'discord') => {
+    onCTAClick?.();
+    signIn(provider);
+  };
 
   if (isAuthenticated) return null;
   if (isOnCrazyGamesPlatform) return null;
@@ -53,7 +68,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
         'relative bg-neo-navy-light border-neo-thick border-neo-black shadow-hard rounded-neo p-4 sm:p-5 overflow-hidden',
         className,
       )}
-      aria-label={t('auth.multiGames.title')}
+      aria-label={t(titleKey)}
     >
       {/* Decorative accent stripe */}
       <div
@@ -65,11 +80,11 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="text-neo-lime shrink-0" size={20} aria-hidden />
         <h3 className="font-neo-display text-lg sm:text-xl font-bold text-neo-white">
-          {t('auth.multiGames.title')}
+          {t(titleKey)}
         </h3>
       </div>
       <p className="text-sm text-neo-white mb-4 leading-snug">
-        {t('auth.multiGames.subtitle')}
+        {t(bodyKey)}
       </p>
 
       {/* Benefits */}
@@ -99,7 +114,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       )}
 
       {/* OAuth buttons */}
-      <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
+      <OAuthButtonGroup onSignIn={handleSignIn} loadingProvider={loadingProvider} />
 
       {error && <AuthErrorMessage message={error} className="mt-3" />}
 

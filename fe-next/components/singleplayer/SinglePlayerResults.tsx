@@ -67,11 +67,16 @@ import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useAsyncChallengeProducer } from '@/hooks/useAsyncChallengeProducer';
+import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const PlacementHero = dynamic(() => import('@/components/results/PlacementHero'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
+// Streak Ignition (t_89663cfc): the first-session payoff. Both cards read
+// localStorage, so they stay out of SSR and reserve their own min-h (CLS=0).
+const StreakIgnitionCard = dynamic(() => import('@/components/results/StreakIgnitionCard'), { ssr: false });
+const TomorrowCard = dynamic(() => import('@/components/results/TomorrowCard'), { ssr: false });
 
 const RANK_CONFETTI_COLORS: Record<number, string[]> = {
   1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'],
@@ -99,8 +104,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [showShareModal, setShowShareModal] = useState(false);
 
   const handleBackToLobby = useCallback(() => {
+    // Streak Ignition (t_89663cfc): first-session players already see the
+    // persistent TomorrowCard on this screen — the 3s auto-dismiss banner
+    // would only duplicate it. Send them straight back to the lobby.
+    if (readGamesCompletedCount() <= 1) {
+      onBackToLobby();
+      return;
+    }
     setShowTomorrowPreview(true);
-  }, []);
+  }, [onBackToLobby]);
 
   const handleQuickReplay = useCallback(() => {
     trackGrowthEvent('results_cta_clicked', { cta: 'quick_replay', mode });
@@ -172,7 +184,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   useGameSessionLogging({ results, language: language as string, userId: user?.id, playerRank });
 
-  const { currentStreak } = useWinStreak();
+  const { currentStreak, isLoaded: isStreakLoaded } = useWinStreak();
 
   // A/B test: show share prompt immediately after hero vs in normal results-page position
   const sharePromptTiming = usePostHogFlag<string>('share-prompt-timing', 'results-page');
@@ -319,8 +331,28 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   );
 
   const signupBlock = !isAuthenticated && !authLoading ? (
-    <InlineSignupCard isAuthenticated={isAuthenticated} />
+    <InlineSignupCard
+      isAuthenticated={isAuthenticated}
+      titleKey="results.saveStreak.title"
+      bodyKey="results.saveStreak.body"
+      onCTAClick={() => trackGrowthEvent('save_streak_clicked', { source: 'solo_results' })}
+    />
   ) : null;
+
+  // Streak Ignition (t_89663cfc): the payoff directly below the celebration
+  // hero — the visible streak + the persistent tomorrow hook. Two-column on
+  // lg (TV/party screens), stacked on mobile. Practice mode has no opponent,
+  // so completing the board IS the win there.
+  const retentionBlock = (
+    <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0 lg:items-stretch">
+      <StreakIgnitionCard
+        won={mode === 'practice' ? true : isWinner}
+        currentStreak={currentStreak}
+        isLoaded={isStreakLoaded}
+      />
+      <TomorrowCard />
+    </div>
+  );
 
   const shareBlock = results.playerScore > 0 ? (
     <GameEmojiShareCard
@@ -457,10 +489,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-                {signupBlock}
                 {ctaBlock}
+                {/* Signup is demoted below the return CTAs and reframed as
+                    streak insurance (t_89663cfc) — the screen asks for a
+                    RETURN first, an account second. */}
+                {signupBlock}
               </div>
             </div>
+            <div className="mt-6">{retentionBlock}</div>
             <div className="mt-8">{analysisBlock}</div>
             {/* Inline banner ad (web iframe; native shows no inline banner) */}
             <CrazyGamesBanner size="728x90" className="mt-6" />
@@ -468,6 +504,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         ) : (
           <div className="space-y-4">
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</m.div>
+            {/* Streak Ignition: the payoff directly below the hero (t_89663cfc) */}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>{retentionBlock}</m.div>
             {showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</m.div>}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>{leaderboardBlock}</m.div>
             <ResultsBannerSlot placement="singleplayer-complete" className="my-3" />
@@ -488,16 +526,18 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
               </m.div>
             )}
-            {signupBlock && (
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
-                {signupBlock}
-              </m.div>
-            )}
             {/* Inline banner ad (web iframe; native shows no inline banner) */}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}>
               <CrazyGamesBanner size="320x50" />
             </m.div>
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }}>{ctaBlock}</m.div>
+            {/* Signup demoted below the return CTAs, reframed as streak
+                insurance (t_89663cfc): ask for the RETURN first. */}
+            {signupBlock && (
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.54 }}>
+                {signupBlock}
+              </m.div>
+            )}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>{analysisBlock}</m.div>
           </div>
         )}
