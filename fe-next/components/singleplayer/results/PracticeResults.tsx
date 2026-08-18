@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useCallback, useMemo, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { m, useMotionValue, useTransform, animate } from 'framer-motion';
 import { ArrowLeft, Trophy, Crosshair, Lock } from 'lucide-react';
@@ -14,6 +14,11 @@ import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/shared/types/game';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { usePracticeStreak } from '@/hooks/usePracticeStreak';
+import { selectFirstSessionDailyCta } from '@/lib/growth/firstSessionDailyCta';
+import {
+  trackFirstSessionDailyClicked,
+  trackFirstSessionDailyShown,
+} from '@/utils/growthTracking';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
 import {
@@ -177,6 +182,7 @@ const PracticeResults = memo(function PracticeResults({
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const reducedMotion = useReducedMotion();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // ─── Daily challenge availability ───
   const dailyAlreadyPlayed = useMemo(
@@ -229,6 +235,20 @@ const PracticeResults = memo(function PracticeResults({
     recordPracticeStreak();
   }, [recordPracticeStreak]);
 
+  // First completed session (FTUE `firstGame=1` or first practice day) is the
+  // D1 conversion window — send them to the live Daily, not more practice.
+  const isFirstSession = searchParams.get('firstGame') === '1' || practiceStreak <= 1;
+  const dailyCta = selectFirstSessionDailyCta({
+    alreadyPlayedToday: dailyAlreadyPlayed,
+    isFirstSession,
+  });
+  const shownRef = useRef(false);
+  useEffect(() => {
+    if (shownRef.current) return;
+    shownRef.current = true;
+    trackFirstSessionDailyShown({ variant: dailyCta.variant });
+  }, [dailyCta.variant]);
+
   // ─── Confetti on mount — celebratory for all tiers ───
   const confettiFired = useRef(false);
   useEffect(() => {
@@ -247,12 +267,14 @@ const PracticeResults = memo(function PracticeResults({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Navigation ───
-  // Route into the practice flow for the next mode rather than the live daily —
-  // keeps the player in no-pressure practice until they exit the chain.
+  // Live Daily, not /practice/wordHunt — the old path promised Daily and
+  // delivered more practice, so first-session players never started a streak.
   const handleWordHuntDaily = useCallback(() => {
+    if (!dailyCta.href) return;
+    trackFirstSessionDailyClicked({ variant: dailyCta.variant });
     clearSessionPreservingUsername();
-    router.push(`/${language}/practice/wordHunt`);
-  }, [router, language]);
+    router.push(`/${language}${dailyCta.href}`);
+  }, [router, language, dailyCta.href, dailyCta.variant]);
 
   const ctaPulseRepeat = reducedMotion ? 0 : 3;
 
@@ -355,6 +377,15 @@ const PracticeResults = memo(function PracticeResults({
               </m.div>
             )}
 
+            {dailyCta.showComeBackHook && (
+              <p
+                data-testid="first-session-comeback"
+                className="text-sm font-bold text-neo-orange mt-2"
+              >
+                {t(dailyCta.comeBackKey)}
+              </p>
+            )}
+
             {/* Subtitle */}
             <m.p
               initial={reducedMotion ? false : { opacity: 0 }}
@@ -392,15 +423,17 @@ const PracticeResults = memo(function PracticeResults({
                 >
                   <Lock className="w-5 h-5" />
                   <div className="text-start">
-                    <span className="block">{t('practiceResults.wordHuntAlreadyPlayed')}</span>
+                    <span className="block">{t(dailyCta.titleKey)}</span>
                     <span className="text-xs font-medium text-white block">
-                      {t('practiceResults.wordHuntAlreadyPlayedDesc')}
+                      {t(dailyCta.bodyKey)}
                     </span>
                   </div>
                 </div>
               ) : (
                 <m.button
                   onClick={handleWordHuntDaily}
+                  data-testid="first-session-daily-cta"
+                  data-variant={dailyCta.variant}
                   animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
                   transition={{
                     duration: 2.5,
@@ -422,9 +455,9 @@ const PracticeResults = memo(function PracticeResults({
                 >
                   <Crosshair className="w-6 h-6" />
                   <div className="text-start">
-                    <span className="block">{t('practiceResults.wordHuntCta')}</span>
+                    <span className="block">{t(dailyCta.ctaKey)}</span>
                     <span className="text-xs font-medium text-neo-black/60 block">
-                      {t('practiceResults.wordHuntCtaDesc')}
+                      {t(dailyCta.bodyKey)}
                     </span>
                   </div>
                   <Trophy className="w-5 h-5 text-amber-600" />
@@ -460,12 +493,14 @@ const PracticeResults = memo(function PracticeResults({
             <m.button
               type="button"
               onClick={handleWordHuntDaily}
+              data-testid="first-session-daily-cta-mobile"
+              data-variant={dailyCta.variant}
               animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
               transition={{ duration: 2, repeat: ctaPulseRepeat, ease: 'easeInOut', repeatDelay: 1 }}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-400 text-neo-black font-black text-sm uppercase border-3 border-neo-black rounded-neo shadow-hard"
             >
               <Trophy className="w-4 h-4" />
-              {t('practiceResults.wordHuntCta')}
+              {t(dailyCta.ctaKey)}
             </m.button>
           )}
           <button

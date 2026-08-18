@@ -3441,6 +3441,10 @@ const es = {
     "wordHuntCtaDesc": "¡El desafío diario te espera!",
     "wordHuntAlreadyPlayed": "Ya jugaste hoy",
     "wordHuntAlreadyPlayedDesc": "¡Vuelve mañana!",
+    "firstSessionDailyTitle": "Empieza tu racha diaria",
+    "firstSessionDailyBody": "El reto de hoy ya está listo. Vuelve mañana para el día 2.",
+    "firstSessionDailyCta": "Jugar el Daily de hoy",
+    "firstSessionComeBack": "Día 1 — vuelve mañana",
     "encouragement": {
       "legendary": "¡Increíble!",
       "great": "¡Buen trabajo!",
