@@ -9131,7 +9131,7 @@ const he = {
       "bestWord": "הטובה",
       "wordsShowAll": "הצג את כל {count}",
       "dayStreak": "{days} ימים ברציפות",
-      "rewardsPending": "התחברו — {coins} מטבעות ממתינים",
+      "rewardsPending": "התחברו כדי להתחיל לצבור מטבעות ו-XP",
       "pickNextMode": "הסיבוב הבא",
       "noWords": "בלי מילים הפעם — הלוח הבא במרחק 60 שניות.",
       "rankProgress": "{points} / {next} עד {rank}",

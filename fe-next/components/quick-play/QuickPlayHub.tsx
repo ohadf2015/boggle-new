@@ -16,6 +16,7 @@ import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
 import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
+import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
@@ -200,6 +201,18 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         // used to hand guests a row of zeros).
         const local = recordGuestRound({ mode: r.mode, scorePct: r.scorePct });
         setDayStreak(local.dayStreak);
+        // The signup modal's teaser reads the SHARED guest ledger, not this
+        // one — quick rounds bumped its game count but never its score, so it
+        // pitched "9 games • 0 pts waiting to be saved" to a player who had
+        // scored thousands. Feed it the round too.
+        if (!user?.id) {
+          const longest = (r.words ?? []).reduce((best, w) => (w.word.length > best.length ? w.word : best), '');
+          updateGuestStatsAfterGame({
+            score: r.score,
+            wordCount: r.wordsFound,
+            longestWord: longest || undefined,
+          });
+        }
 
         // Which of this round's words the player had never found before. Never
         // fatal: a collection lookup that fails costs the ★ badges, not the

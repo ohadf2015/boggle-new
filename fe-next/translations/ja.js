@@ -8563,7 +8563,7 @@ const ja = {
       "bestWord": "最高",
       "wordsShowAll": "全{count}を表示",
       "dayStreak": "{days}日連続",
-      "rewardsPending": "ログイン — {coins}コイン待機中",
+      "rewardsPending": "サインインしてコインとXPを貯めよう",
       "pickNextMode": "次のラウンド",
       "noWords": "今回は単語なし — 次のボードは60秒後。",
       "rankProgress": "{points} / {next}（{rank}まで）",

@@ -6292,7 +6292,7 @@ const ru = {
       "bestWord": "Лучшее",
       "wordsShowAll": "Все {count}",
       "dayStreak": "{days} дней подряд",
-      "rewardsPending": "Войдите — {coins} монет ждут",
+      "rewardsPending": "Войдите, чтобы копить монеты и XP",
       "pickNextMode": "Следующий раунд",
       "noWords": "В этот раз без слов — следующее поле через 60 секунд.",
       "rankProgress": "{points} / {next} до ранга {rank}",

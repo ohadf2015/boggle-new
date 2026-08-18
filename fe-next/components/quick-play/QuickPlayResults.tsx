@@ -369,9 +369,9 @@ export function QuickPlayResults({
         </div>
         {isGuest && (
           <p className="text-center text-[11px] text-neo-white/55" data-testid="quick-rewards-pending">
-            {t('quickPlay.solo.rewardsPending', 'Sign in to keep them — {coins} coins waiting', {
-              coins: safeToLocaleString(outcome.coins, language),
-            })}
+            {/* Says only what's true: nothing grants the accumulated
+                coinsPending on sign-in yet, so don't promise a balance. */}
+            {t('quickPlay.solo.rewardsPending', 'Sign in to start banking coins and XP')}
           </p>
         )}
       </div>

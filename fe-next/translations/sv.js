@@ -9514,7 +9514,7 @@ const sv = {
       "bestWord": "Bästa",
       "wordsShowAll": "Visa alla {count}",
       "dayStreak": "{days} dagars rad",
-      "rewardsPending": "Logga in — {coins} mynt väntar",
+      "rewardsPending": "Logga in för att börja samla mynt och XP",
       "pickNextMode": "Nästa runda",
       "noWords": "Inga ord den här gången – nästa bräde är 60 sekunder bort.",
       "rankProgress": "{points} / {next} till {rank}",

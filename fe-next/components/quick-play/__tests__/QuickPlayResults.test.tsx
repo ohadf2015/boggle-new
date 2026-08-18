@@ -341,4 +341,20 @@ describe('QuickPlayResults — mascot, standings and words', () => {
     screen.getByTestId('quick-results-next').click();
     expect(onNextRound).toHaveBeenLastCalledWith();
   });
+
+  it('fills the words column with the mascot when the round scored nothing', () => {
+    render(
+      <QuickPlayResults
+        result={{ ...flatResult, scorePct: 0, score: 0, wordsFound: 0 }}
+        outcome={{ ...flatOutcome, scorePct: 0 }}
+        rival={null}
+        collected={[]}
+        collectionTotal={12}
+        onNextRound={vi.fn()}
+        onChallenge={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('quick-no-words')).toBeTruthy();
+    expect(screen.queryByTestId('quick-words-collected')).toBeNull();
+  });
 });

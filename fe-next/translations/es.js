@@ -9234,7 +9234,7 @@ const es = {
       "bestWord": "Mejor",
       "wordsShowAll": "Ver todas {count}",
       "dayStreak": "{days} días seguidos",
-      "rewardsPending": "Inicia sesión — {coins} monedas esperando",
+      "rewardsPending": "Inicia sesión para empezar a acumular monedas y XP",
       "pickNextMode": "Siguiente ronda",
       "noWords": "Sin palabras esta vez: el próximo tablero está a 60 segundos.",
       "rankProgress": "{points} / {next} para {rank}",

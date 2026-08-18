@@ -7941,7 +7941,7 @@ const en = {
       "bestWord": "Best",
       "wordsShowAll": "Show all {count}",
       "dayStreak": "{days}-day streak",
-      "rewardsPending": "Sign in to keep them — {coins} coins waiting",
+      "rewardsPending": "Sign in to start banking coins and XP",
       "pickNextMode": "Next round",
       "noWords": "No words this time — the next board is 60 seconds away.",
       "rankProgress": "{points} / {next} to {rank}",
