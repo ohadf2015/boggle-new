@@ -9469,14 +9469,14 @@ const sv = {
       "dragHint": "Dra knappen mot ett läge — eller låt den stå på Slumpa",
       "selected": "Valt:",
       "play": "SPELA",
-      "subCaption": "60 sekunder · inga bottar · du mot det perfekta resultatet",
+      "subCaption": "60 sekunder · tre rivaler · du mot det perfekta resultatet",
       "loading": "Bygger din bräda…",
       "blurb": {
         "classic": "Dra streck mellan bokstäverna och bygg ord. Längre ord ger mer poäng.",
         "blast": "Kedja ihop bokstäver och spräng brickor. Rensa brädet innan tiden rensar dig.",
         "word-hunt": "Ett ord gömmer sig i rutnätet. Hitta det – och allt annat på vägen.",
         "wheel-rush": "Varje ord måste innehålla mittbokstaven. Snurra ringen och hitta fler.",
-        "random": "Låt hjulet bestämma. 60 sekunder, inga bottar, du mot full pott."
+        "random": "Låt hjulet bestämma. 60 sekunder, tre rivaler, du mot full pott."
       },
       "mode": {
         "classic": "Klassiskt",

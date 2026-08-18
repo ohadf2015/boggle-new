@@ -9189,14 +9189,14 @@ const es = {
       "dragHint": "Arrastra la perilla hacia un modo — o déjala en Aleatorio",
       "selected": "Elegido:",
       "play": "JUGAR",
-      "subCaption": "Ronda de 60 segundos · sin bots · tú contra la puntuación perfecta",
+      "subCaption": "Ronda de 60 segundos · tres rivales · tú contra la puntuación perfecta",
       "loading": "Preparando tu tablero…",
       "blurb": {
         "classic": "Une letras por la cuadrícula y forma palabras. Cuanto más largas, más puntos.",
         "blast": "Encadena letras y revienta fichas. Vacía el tablero antes de que suene el reloj.",
         "word-hunt": "Hay una palabra escondida en la cuadrícula. Encuéntrala — y todo lo que salga por el camino.",
         "wheel-rush": "Cada palabra lleva la letra del centro. Gira el anillo para encontrar más.",
-        "random": "Que decida la ruleta. 60 segundos, sin bots, tú contra la puntuación perfecta."
+        "random": "Que decida la ruleta. 60 segundos, tres rivales, tú contra la puntuación perfecta."
       },
       "mode": {
         "classic": "Clásico",
