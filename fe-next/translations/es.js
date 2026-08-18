@@ -3042,6 +3042,21 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "streakIgnition": {
+      "titleWon": "¡RACHA ENCENDIDA!",
+      "titleLost": "UNA VICTORIA PARA ENCENDERLA",
+      "body": "Jugaste hoy. Vuelve mañana para mantener la llama viva — si fallas un día, se apaga.",
+      "bodyLost": "Gana una partida y tu racha comienza. Estás más cerca de lo que crees.",
+      "day": "Día {n}"
+    },
+    "tomorrowCard": {
+      "title": "MAÑANA: nuevo Desafío Diario",
+      "countdown": "Nuevo puzzle en {time}"
+    },
+    "saveStreak": {
+      "title": "Guardar mi racha",
+      "body": "Las rachas viven en este dispositivo. Crea una cuenta gratis para conservarlas en cualquier lugar."
+    },
     "mpGapNudge": "¡Solo {gap} pts detrás — conquista la próxima ronda!",
     "rivals": {
       "aria": "Tú contra tus rivales",
@@ -5026,6 +5041,7 @@ const es = {
     },
     "quickStart": {
       "play": "JUGAR",
+      "playSub": "Partida rápida de 2 min · sin registro",
       "howToPlay": "Cómo se juega",
       "haveAccount": "Ya tengo cuenta"
     },

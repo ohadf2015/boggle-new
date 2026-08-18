@@ -160,4 +160,13 @@ describe('QuickStartStep', () => {
     setup({ onHaveAccount: undefined });
     expect(screen.queryByTestId('quick-start-have-account')).not.toBeInTheDocument();
   });
+
+  // Streak Ignition (t_89663cfc): the sub-line sets the expectation that
+  // tapping PLAY is safe and instant — quick game, no account wall.
+  it('sets expectations under PLAY: quick game, no signup needed', () => {
+    setup();
+    expect(screen.getByTestId('quick-start-play-sub')).toHaveTextContent(
+      'onboarding.quickStart.playSub',
+    );
+  });
 });
