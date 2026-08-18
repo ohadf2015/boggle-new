@@ -7030,6 +7030,7 @@ const sv = {
     "completedCount": "Klart",
     "nextQuestsIn": "Nästa Uppdrag Om",
     "timedQuest": "Tidsbegränsat",
+    "relaxedQuest": "Lugnt uppdrag",
     "untimedQuest": "Utan Timer",
     "startQuest": "STARTA QUEST",
     "adminBeta": "Beta",

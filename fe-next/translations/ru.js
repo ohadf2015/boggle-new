@@ -6385,6 +6385,7 @@ const ru = {
     "completedCount": "Завершено",
     "nextQuestsIn": "Следующие Квесты В",
     "timedQuest": "Квест на Время",
+    "relaxedQuest": "Спокойный квест",
     "untimedQuest": "Квест без Времени",
     "startQuest": "НАЧАТЬ КВЕСТ",
     "adminBeta": "Бета",

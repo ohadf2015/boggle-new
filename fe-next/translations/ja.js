@@ -6770,6 +6770,7 @@ const ja = {
     "completedCount": "完了",
     "nextQuestsIn": "次のクエストまで",
     "timedQuest": "タイムクエスト",
+    "relaxedQuest": "のんびりクエスト",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
     "adminBeta": "ベータ",

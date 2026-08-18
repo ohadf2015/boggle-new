@@ -17,7 +17,9 @@ export interface QuestCardProps {
   title: string;
   tagline: string;
   details?: string;
-  color: 'orange' | 'yellow';
+  /** `yellow` and `cyan` both render the cyan chrome below — kept distinct so
+   *  callers name their own accent; only `orange` branches. */
+  color: 'orange' | 'yellow' | 'cyan';
   status: 'new' | 'won' | 'lost' | 'unavailable';
   isLoadingStatus?: boolean;
   onPlay: () => void;

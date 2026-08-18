@@ -6867,6 +6867,7 @@ const he = {
     "completedCount": "הושלמו",
     "nextQuestsIn": "משימות חדשות בעוד",
     "timedQuest": "משימה בזמן",
+    "relaxedQuest": "משימה רגועה",
     "untimedQuest": "משימה חופשית",
     "startQuest": "התחילו משימה",
     "adminBeta": "ביתא",

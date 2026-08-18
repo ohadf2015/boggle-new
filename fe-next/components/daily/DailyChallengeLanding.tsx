@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
-import { Timer, CircleDot, Check, X, Eye, Sparkles } from 'lucide-react';
+import { Timer, CircleDot, Check, X, Eye, Sparkles, Building2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,7 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
-import { questCardModes } from '@/lib/dailyModes';
+import { questCardModes, visibleDailyModes } from '@/lib/dailyModes';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
@@ -51,6 +51,7 @@ export function DailyChallengeLanding({
   // two-card hub and the mode was effectively unshipped. See lib/dailyModes.ts.
   const questModes = questCardModes(canSeeInWorkModes);
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Pre-game gauntlet banner. Reads the same rival contract the share link emits
@@ -154,11 +155,13 @@ export function DailyChallengeLanding({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Word Tower is a beta-gated 3rd quest: only expand the bar to /3 and count it
-  // when the player actually sees the card. Ceiling: assumes the sole beta daily
-  // mode is Word Tower — revisit if another admin mode ships without a played
-  // signal (it would inflate `total` without ever completing).
-  const showsWordTower = questModes.some((mode) => mode.id === 'word-tower');
+  // Word Tower is the 3rd quest: only expand the bar to /3 and count it when the
+  // player actually sees the card. Read off the REGISTRY, not `questModes` — Word
+  // Tower is drawn with the shared QuestCard now, so it is deliberately absent
+  // from the generic registry-card list and checking there would silently drop
+  // the bar back to /2.
+  const showsWordTower = visibleDailyModes(canSeeInWorkModes).some((mode) => mode.id === 'word-tower');
+  const wordTowerHref = `/${currentLanguage}/daily/word-tower`;
   const totalQuests = 2 + (showsWordTower ? 1 : 0);
 
   // Completion count for progress bar
@@ -370,20 +373,105 @@ export function DailyChallengeLanding({
         />
       )}
 
-      {/* Registry-driven quest cards — chained into the quest path as the next
-          node so Word Tower reads as game 3, not a detached afterthought. Empty
-          only if every registry mode is gated away from this viewer. */}
-      {questModes.length > 0 && (
+      {/* Quest 3: Word Tower — same chain node, same box, same SPA nav as the two
+          quests above. It used to be drawn by the generic registry card (a hard-nav
+          `<a>`), which is why it read as a detached afterthought. */}
+      {showsWordTower && (
         <>
-          {/* ── Dotted connector line (Word Wheel → beta quest) ── */}
+          {/* ── Dotted connector line (Word Wheel → Word Tower) ── */}
           <div className="flex flex-col items-center gap-0 py-1">
             <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
             <div className={cn(
               'w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center',
-              wordTowerPlayed ? 'bg-neo-cyan' : 'bg-neo-navy-light'
+              wordWheelPlayed && wordTowerPlayed ? 'bg-neo-lime' : 'bg-neo-navy-light'
             )}>
-              {wordTowerPlayed && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
+              {wordWheelPlayed && wordTowerPlayed && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
             </div>
+            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
+          </div>
+
+          {wordTowerPlayed ? (
+            <m.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
+              className="w-full"
+              data-testid="word-tower-hero"
+            >
+              <button
+                type="button"
+                onClick={() => router.push(wordTowerHref)}
+                className={cn(
+                  'relative w-full rounded-xl border-3 border-neo-black',
+                  'shadow-hard overflow-hidden cursor-pointer p-4',
+                  'flex items-center gap-4',
+                  'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
+                  'transition-all duration-200 group',
+                  'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
+                )}
+              >
+                <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
+                <m.div
+                  data-testid="tower-cleared-badge"
+                  className={cn(
+                    'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
+                    'flex items-center justify-center shadow-hard-xs',
+                    'bg-neo-lime'
+                  )}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
+                >
+                  <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
+                </m.div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
+                    {t('wordTower.daily.questTitle')}
+                  </h2>
+                  <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
+                    <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />
+                    {t('daily.cleared')}
+                  </span>
+                </div>
+                <div className={cn(
+                  'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
+                  'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm',
+                  'active:translate-y-0.5 active:shadow-none transition-all',
+                  'flex items-center gap-1.5 group-hover:scale-105'
+                )}>
+                  <Eye className="w-4 h-4" />
+                  {t('daily.viewResults')}
+                </div>
+              </button>
+            </m.div>
+          ) : (
+            <QuestCard
+              challengeId="wordTower"
+              icon={<Building2 className="w-8 h-8" />}
+              title={t('wordTower.daily.questTitle')}
+              tagline={t('wordTower.daily.questDesc')}
+              color="cyan"
+              status="new"
+              onPlay={() => router.push(wordTowerHref)}
+              timeMode="relaxed"
+              timeModeLabel={t('daily.relaxedQuest')}
+              previewImageUrl="/daily/word-tower-mascot.jpg"
+              previewImageAlt={t('wordTower.daily.questTitle')}
+              buttonText={t('daily.startQuest')}
+              delay={0.3}
+            />
+          )}
+        </>
+      )}
+
+      {/* Registry-driven quest cards — everything still gated (Connections).
+          Empty for ordinary players; only admins/beta testers see this node. */}
+      {questModes.length > 0 && (
+        <>
+          {/* ── Dotted connector line (Word Tower → beta quest) ── */}
+          <div className="flex flex-col items-center gap-0 py-1">
+            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
+            <div className="w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center bg-neo-navy-light" />
             <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
           </div>
 
@@ -394,8 +482,7 @@ export function DailyChallengeLanding({
                 mode={mode}
                 locale={currentLanguage}
                 t={t}
-                played={mode.id === 'word-tower' ? wordTowerPlayed : false}
-                delay={0.3 + i * 0.05}
+                delay={0.35 + i * 0.05}
               />
             ))}
           </div>

@@ -6146,6 +6146,7 @@ const en = {
     "completedCount": "Completed",
     "nextQuestsIn": "Next Quests In",
     "timedQuest": "Timed Quest",
+    "relaxedQuest": "Relaxed Quest",
     "untimedQuest": "Untimed Quest",
     "startQuest": "START QUEST",
     "adminBeta": "Beta",

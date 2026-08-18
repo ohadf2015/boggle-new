@@ -6906,6 +6906,7 @@ const es = {
     "completedCount": "Completadas",
     "nextQuestsIn": "Próximas Misiones En",
     "timedQuest": "Misión con Tiempo",
+    "relaxedQuest": "Misión relajada",
     "untimedQuest": "Misión Libre",
     "startQuest": "INICIAR MISIÓN",
     "adminBeta": "Beta",

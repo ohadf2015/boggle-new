@@ -1,18 +1,34 @@
 /**
- * Word Tower is a PUBLIC daily quest card.
+ * Word Tower is a PUBLIC daily quest — rendered with the SAME `QuestCard` box as
+ * Word Hunt and Word Wheel, and wired into the quest chain the same way.
  *
- * Regression guard for the bug where Word Tower "still wasn't there" on the daily
- * hub: the card was rendered ONLY from `adminOnlyDailyModes()` behind
- * `canSeeInWorkModes`, so every ordinary player saw a two-card hub. These tests
- * render the hub with the real (signed-out ⇒ non-admin) AuthProvider and assert
- * the card is present anyway.
+ * Two regressions are guarded here:
+ *  1. The original one: the card was rendered ONLY from `adminOnlyDailyModes()`
+ *     behind `canSeeInWorkModes`, so every ordinary player saw a two-card hub.
+ *  2. The follow-up: Word Tower rendered through the generic `DailyModeQuestCard`
+ *     (a hard-nav `<a>` at `/word-tower?daily=1`), so it read as a detached
+ *     afterthought instead of quest 3. It now uses `QuestCard` + `router.push`
+ *     at `/daily/word-tower`, exactly like its two siblings.
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+
+const mockPush = vi.fn();
+
+vi.mock('next/navigation', async () => {
+  const actual = await vi.importActual<typeof import('next/navigation')>('next/navigation');
+  return {
+    ...actual,
+    useRouter: () => ({ push: mockPush, replace: vi.fn(), prefetch: vi.fn() }),
+    usePathname: () => '/en/daily',
+    useSearchParams: () => new URLSearchParams(''),
+  };
+});
 
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: vi.fn(() => false),
@@ -80,28 +96,45 @@ function renderHub() {
   );
 }
 
-describe('DailyChallengeLanding — Word Tower is public', () => {
+describe('DailyChallengeLanding — Word Tower is a first-class daily quest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockImplementation(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) }));
   });
 
-  it('renders the Word Tower quest card for a signed-out (non-admin) player', async () => {
+  it('renders Word Tower in the same QuestCard box as Word Hunt and Word Wheel', async () => {
     renderHub();
     await waitFor(() => {
-      expect(screen.getByTestId('daily-quest-card-word-tower')).toBeInTheDocument();
+      expect(screen.getByTestId('quest-card-wordTower')).toBeInTheDocument();
     });
+    // Same component as its two siblings — not the generic registry card.
+    expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-card-wordWheel')).toBeInTheDocument();
   });
 
-  it('links the card at the daily Word Tower run', async () => {
+  it('no longer renders Word Tower through the generic hard-nav registry card', async () => {
     renderHub();
-    const card = await screen.findByTestId('daily-quest-card-word-tower');
-    expect(card).toHaveAttribute('href', '/en/word-tower?daily=1');
+    await screen.findByTestId('quest-card-wordTower');
+    expect(screen.queryByTestId('daily-quest-card-word-tower')).not.toBeInTheDocument();
+  });
+
+  it('routes to the daily Word Tower run via the SPA router', async () => {
+    const user = userEvent.setup();
+    renderHub();
+    const card = await screen.findByTestId('quest-card-wordTower');
+    await user.click(within(card).getByRole('button'));
+    expect(mockPush).toHaveBeenCalledWith('/en/daily/word-tower');
+  });
+
+  it('counts Word Tower as the third quest in the progress bar', async () => {
+    renderHub();
+    const bar = await screen.findByTestId('xp-progress-bar');
+    expect(bar).toHaveAttribute('aria-valuemax', '3');
   });
 
   it('does NOT tag the public card as beta, and hides admin-only modes', async () => {
     renderHub();
-    const card = await screen.findByTestId('daily-quest-card-word-tower');
+    const card = await screen.findByTestId('quest-card-wordTower');
     expect(card.textContent).not.toMatch(/beta/i);
     expect(screen.queryByTestId('daily-quest-card-connections')).not.toBeInTheDocument();
   });

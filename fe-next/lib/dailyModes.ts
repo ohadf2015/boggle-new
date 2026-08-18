@@ -53,7 +53,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   },
   {
     id: 'word-tower',
-    path: '/word-tower?daily=1',
+    path: '/daily/word-tower',
     adminOnly: false,
     titleKey: 'wordTower.daily.questTitle',
     descKey: 'wordTower.daily.questDesc',
@@ -79,14 +79,16 @@ export function adminOnlyDailyModes(): DailyModeDef[] {
   return DAILY_MODES.filter((mode) => mode.adminOnly);
 }
 
-/** Modes the hub renders from the REGISTRY as quest cards.
+/** Modes the hub renders from the REGISTRY as generic quest cards.
  *
- *  Word Hunt + Word Wheel are excluded because the hub owns bespoke hero cards
- *  for them; everything else (Word Tower publicly, Connections still gated) is
- *  drawn generically. Splitting it here — instead of gating the section on
- *  `adminOnly` inside the hub — is what lets a mode graduate to public by
- *  flipping one boolean, which was the registry's whole point. */
-const HERO_CARD_MODES: readonly DailyModeId[] = ['word-hunt', 'word-wheel'];
+ *  Word Hunt, Word Wheel and Word Tower are excluded because the hub draws them
+ *  with the shared `QuestCard` box (same chrome, same quest chain, same SPA nav)
+ *  — Word Tower graduated out of the generic card once it went public, because a
+ *  first-class daily quest should not look different from its siblings.
+ *  Everything still gated (Connections) is drawn generically. Splitting it here —
+ *  instead of gating the section on `adminOnly` inside the hub — is what lets a
+ *  mode graduate to public by flipping one boolean. */
+const HERO_CARD_MODES: readonly DailyModeId[] = ['word-hunt', 'word-wheel', 'word-tower'];
 
 export function questCardModes(isAdmin: boolean): DailyModeDef[] {
   return visibleDailyModes(isAdmin).filter((mode) => !HERO_CARD_MODES.includes(mode.id));
