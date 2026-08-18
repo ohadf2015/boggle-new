@@ -594,7 +594,13 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     const loadMoreClass = 'w-full py-2 text-xs sm:text-sm font-bold text-neo-purple hover:text-neo-white flex items-center justify-center gap-1.5 transition-colors rounded-neo bg-neo-purple/10 hover:bg-neo-purple/20 border border-neo-purple/40';
 
     return (
-      <div className="space-y-2">
+      // The AdMob banner is fixed to the viewport bottom and was covering the
+      // "load more" button at the end of the list. --bottom-stack-height is the
+      // repo's own composed offset for exactly this (globals.css): it clamps each
+      // layer to 120px so a pathological Android 15+ safe-area inset cannot open a
+      // huge empty band, and it does not double-count safe-area the way
+      // admob-banner-height + mobile-bottom-safe would.
+      <div className="space-y-2 pb-[var(--bottom-stack-height)] md:pb-6">
         {/* Load more above */}
         {hasAbove && (
           <button type="button" onClick={loadAbove} className={loadMoreClass}>
