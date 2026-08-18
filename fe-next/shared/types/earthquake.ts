@@ -66,7 +66,7 @@ export interface UseEarthquakeFireRoundOptions {
   onTimerResume?: () => void;
 
   // Multiplayer-specific
-  socket?: Socket | null;
+  socket?: typeof Socket | null;
   isHost?: boolean;
   gameSessionId?: string | number;
 

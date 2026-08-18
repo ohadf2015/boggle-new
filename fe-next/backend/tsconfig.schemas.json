@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "lib": ["ES2022", "DOM"],
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "outDir": "./dist",
     "rootDir": "..",
     "strict": false,
@@ -19,10 +22,11 @@
     "noEmit": false,
     "noImplicitAny": false,
     "allowJs": false,
-    "baseUrl": "..",
-    "typeRoots": ["../node_modules/@types"],
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["../*"]
     }
   },
   "include": [
