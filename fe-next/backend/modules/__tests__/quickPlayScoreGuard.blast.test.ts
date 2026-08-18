@@ -46,7 +46,7 @@ function makeDb() {
   return { db: { rpc, from: vi.fn(() => chain) } as never };
 }
 
-describe('Blast Mode - Word Validation (Dictionary Only)', () => {
+describe('Blast Mode — server score guard (NOT word validation: the dictionary and adjacency checks are client-side)', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('accepts score up to perfect', async () => {

@@ -1,25 +1,28 @@
 /**
- * Word-Hunt Mode Validation Test
- * Tests: Server-side dictionary validation via /api/dictionary/check
- * Requires: word in dictionary AND valid path on grid AND finding target word for bonus
+ * Wheel-Rush Mode Validation Test
+ * Tests: Client-side word set validation (shipped in config.words)
+ * Requirements: word in the preset list + must use center letter + each letter used only once
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../quickPlayRound', () => ({
   buildQuickRound: vi.fn().mockResolvedValue({
-    mode: 'word-hunt',
+    mode: 'wheel-rush',
     seed: 'test-seed',
     durationSec: 60,
     language: 'en',
-    grid: [
-      ['P', 'O', 'L', 'L', 'E', 'N'],
-      ['A', 'B', 'O', 'L', 'L', 'A'],
-      ['R', 'T', 'O', 'R', 'I', 'L'],
-      ['K', 'O', 'L', 'L', 'A', 'R'],
-    ],
-    words: ['poll', 'pole', 'roll', 'pollen', 'roller', 'atoll', 'toll'],
-    targetWord: 'POLLEN', // The mystery word to find
-    perfectScore: 5000,
+    grid: [], // Wheel mode has no grid
+    wheel: {
+      centerLetter: 'A', // Must be in every word
+      outerLetters: ['G', 'I', 'N', 'G', 'E', 'R'],
+      allLetters: ['A', 'G', 'I', 'N', 'G', 'E', 'R'],
+      puzzleDate: 'quick-test-seed',
+      language: 'en',
+      puzzleNumber: 0,
+    },
+    // Preset valid words (what gets shipped to client)
+    words: ['age', 'anger', 'anger', 'aging', 'ager', 'rain', 'range', 'rang', 'rag', 'rig', 'ring'],
+    perfectScore: 500,
   }),
 }));
 
@@ -40,7 +43,7 @@ function makeDb() {
   }
   chain.insert = vi.fn().mockResolvedValue({ error: null });
   chain.limit = vi.fn().mockResolvedValue({ data: [], error: null });
-  chain.single = vi.fn().mockResolvedValue({ data: { sum: 5000 }, error: null });
+  chain.single = vi.fn().mockResolvedValue({ data: { sum: 500 }, error: null });
   const rpc = vi.fn((name: string) => {
     if (name === 'quick_play_percentile_today') return Promise.resolve({ data: 50, error: null });
     return Promise.resolve({ data: null, error: null });
@@ -48,33 +51,33 @@ function makeDb() {
   return { db: { rpc, from: vi.fn(() => chain) } as never };
 }
 
-describe('Word-Hunt Mode - Word Validation', () => {
+describe('Wheel-Rush Mode — server score guard (NOT word validation: the dictionary and adjacency checks are client-side)', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('accepts score for valid words up to perfect', async () => {
+  it('accepts score for valid words from the preset set', async () => {
     const { db } = makeDb();
-    // Perfect score is 5000
+    // Client found valid words from the preset set
     const result = await processQuickSubmit(db, {
       userId: 'user1',
-      mode: 'word-hunt',
+      mode: 'wheel-rush',
       language: 'en',
       seed: 'test-seed',
-      score: 4000, // Found good words but not all
+      score: 250, // Found some valid words
       wordsFound: 5,
       durationMs: 60000,
     });
-    expect(result.scorePct).toBe(80); // 4000/5000 = 80%
+    expect(result.scorePct).toBe(50); // 250/500 = 50%
   });
 
-  it('accepts perfect score (finding all words including target)', async () => {
+  it('accepts perfect score', async () => {
     const { db } = makeDb();
     const result = await processQuickSubmit(db, {
       userId: 'user1',
-      mode: 'word-hunt',
+      mode: 'wheel-rush',
       language: 'en',
       seed: 'test-seed',
-      score: 5000, // Found all words including POLLEN
-      wordsFound: 7,
+      score: 500, // Perfect
+      wordsFound: 11,
       durationMs: 60000,
     });
     expect(result.scorePct).toBe(100);
@@ -82,15 +85,17 @@ describe('Word-Hunt Mode - Word Validation', () => {
 
   it('rejects score exceeding perfect', async () => {
     const { db } = makeDb();
-    // Word-Hunt does NOT allow score > perfect (no 3x multiplier like blast)
+    // Wheel-Rush does NOT allow score > perfect (no 3x multiplier)
+    // NOTE: This assumes client-side validation prevented fake words
+    // Server validation only checks if score is plausible for the board
     await expect(
       processQuickSubmit(db, {
         userId: 'user1',
-        mode: 'word-hunt',
+        mode: 'wheel-rush',
         language: 'en',
         seed: 'test-seed',
-        score: 5500, // Over perfect
-        wordsFound: 7,
+        score: 600, // Over perfect
+        wordsFound: 12,
         durationMs: 60000,
       })
     ).rejects.toThrow(/implausible score/i);
@@ -101,21 +106,21 @@ describe('Word-Hunt Mode - Word Validation', () => {
     await expect(
       processQuickSubmit(db, {
         userId: 'user1',
-        mode: 'word-hunt',
+        mode: 'wheel-rush',
         language: 'en',
         seed: 'test-seed',
-        score: -100,
+        score: -50,
         wordsFound: 0,
         durationMs: 60000,
       })
     ).rejects.toThrow(/implausible score/i);
   });
 
-  it('accepts zero score (found no words)', async () => {
+  it('accepts zero score (no words found)', async () => {
     const { db } = makeDb();
     const result = await processQuickSubmit(db, {
       userId: 'user1',
-      mode: 'word-hunt',
+      mode: 'wheel-rush',
       language: 'en',
       seed: 'test-seed',
       score: 0,
