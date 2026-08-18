@@ -23,11 +23,12 @@ describe('teacher access email templates', () => {
     expect(out.html).toContain('Riverdale High');
   });
 
-  it('confirmation greets applicant + mentions approved access', () => {
+  it('confirmation greets applicant + says access is live, from Ohad personally', () => {
     const out = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
-    expect(out.subject.toLowerCase()).toContain('approved');
+    expect(out.subject.toLowerCase()).toContain('live');
     expect(out.html).toContain('Jane');
     expect(out.html).toContain('/teacher');
+    expect(out.html).toContain('ohadf2015@gmail.com');
   });
 
   it('decline is polite + reasoned + invites regular game', () => {

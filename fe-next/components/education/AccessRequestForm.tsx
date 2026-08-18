@@ -1,7 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import type { TeacherAccessSubmission, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
 /** Fun emoji per role — turns a boring dropdown into a tap-to-pick card grid. */
@@ -36,6 +38,8 @@ export function AccessRequestForm({
   knownEmail,
 }: { knownName?: string; knownEmail?: string } = {}) {
   const { t, language } = useLanguage();
+  const { refreshProfile } = useAuth();
+  const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
   const [role, setRole] = useState<TeacherAccessRole | null>(null);
   const [useCase, setUseCase] = useState('');
@@ -43,6 +47,21 @@ export function AccessRequestForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Access is granted the moment the POST succeeds — show the success beat
+  // briefly, then send the new teacher straight to their dashboard. The
+  // profile is refreshed BEFORE navigating so /teacher's role gate reads the
+  // freshly-promoted user_role instead of bouncing a stale 'student' home.
+  useEffect(() => {
+    if (!success) return;
+    let cancelled = false;
+    const go = async () => {
+      try { await refreshProfile(); } catch {}
+      if (!cancelled) router.push(`/${language}/teacher`);
+    };
+    const id = setTimeout(go, 1200);
+    return () => { cancelled = true; clearTimeout(id); };
+  }, [success, refreshProfile, router, language]);
 
   const firstName = (knownName ?? '').trim().split(/\s+/)[0] || '';
   const roleOk = role !== null;

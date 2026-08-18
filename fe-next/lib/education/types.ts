@@ -1,6 +1,6 @@
 export type TeacherAccessStatus = 'pending' | 'approved' | 'declined';
 export type TeacherAccessRole = 'teacher' | 'tutor' | 'admin' | 'parent' | 'researcher' | 'other';
-export type TeacherLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+export type TeacherLocale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 export interface TeacherAccessRequest {
   id: string;

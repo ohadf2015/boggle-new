@@ -11904,7 +11904,7 @@ const en = {
     },
     "access": {
       "h1": "Apply for free teacher access",
-      "lede": "Tell us a bit about your classroom. We review by email, typically within 24 hours.",
+      "lede": "Tell us a bit about your classroom. Access is granted instantly — no review wait.",
       "full_name": "Your full name",
       "email": "Email address",
       "role": "Your role",
@@ -11921,9 +11921,9 @@ const en = {
       "submitting": "Sending…",
       "submit_error": "Something went wrong. Please try again.",
       "rate_limited": "Too many requests. Please try again in 24 hours.",
-      "success_title": "Application sent!",
-      "success_body": "We will review and email you within 24 hours.",
-      "success_next": "We'll review your application and email you within 1-2 business days. You can close this page.",
+      "success_title": "You're in! 🎉",
+      "success_body": "Teacher access granted instantly.",
+      "success_next": "Taking you to your Teacher Dashboard…",
       "pending_title": "Your request is pending review",
       "pending_body": "We have received your application and will email you soon.",
       "declined_title": "Your request was not approved",
@@ -11960,10 +11960,10 @@ const en = {
       "next": {
         "step1_title": "Apply",
         "step1_body": "Fill the form below — takes 60 seconds.",
-        "step2_title": "We review",
-        "step2_body": "A real human reads every application, typically within 24h.",
+        "step2_title": "Instant approval",
+        "step2_body": "No manual review — verified teachers get access the moment they apply.",
         "step3_title": "You get access",
-        "step3_body": "We email confirmation; teacher tools unlock instantly."
+        "step3_body": "Your dashboard opens right away — plus a personal note from Ohad."
       },
       "regular_game_title": "Not a teacher? No worries.",
       "regular_game_body": "LexiClash is free to play for anyone. Try the regular game and come back if you want classroom features.",

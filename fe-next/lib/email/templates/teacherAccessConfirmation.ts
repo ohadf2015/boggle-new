@@ -5,7 +5,7 @@ interface Args {
   full_name: string;
   locale: TeacherLocale;
   message?: string;
-  /** ISO trial deadline — when present the email leads with activation urgency. */
+  /** ISO trial deadline — when present the email mentions the trial window in one line. */
   trialExpiresAt?: string | null;
 }
 
@@ -20,153 +20,158 @@ function escapeMultiline(s: string): string {
 
 const SITE = 'https://www.lexiclash.live';
 const HERO = `${SITE}/email/teacher-welcome.jpg`;
+const CONTACT = 'ohadf2015@gmail.com';
 
 interface Copy {
   subject: string;
-  /** Subject used when the approval carries a trial window (urgency framing). */
-  trialSubject: string;
   greeting: (n: string) => string;
+  /** "I'm Ohad, the creator of LexiClash — your access is live." */
   intro: string;
   whatTitle: string;
+  /** 3 short bullets — the same feature list as the original email, trimmed. */
   features: string[];
+  /** One line on the trial window — informational, no urgency framing. */
+  trialLine: (date: string) => string;
   cta: string;
-  fromTeam: string;
+  /** The explicit feedback/feature-request ask naming the contact address. */
+  ask: string;
+  signoff: string;
   messageLabel: string;
-  /** Trial countdown block copy. */
-  trialBadge: (days: number) => string;
-  trialTitle: string;
-  trialBody: (days: number, date: string) => string;
   dir: 'ltr' | 'rtl';
 }
 
 // Locale -> BCP-47 tag for date formatting (TeacherLocale tags are already valid).
 const DATE_LOCALE: Record<TeacherLocale, string> = {
-  en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES',
+  en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
 };
 
+// Short and personal: this email is from Ohad the creator, not "the team".
+// Approval is instant on form submit, so the copy is "it's live", never
+// "we'll review". Keep every locale under ~120 words of body copy.
 const COPY: Record<TeacherLocale, Copy> = {
   en: {
-    subject: "You're approved — welcome to LexiClash teaching",
-    trialSubject: 'Your LexiClash teacher trial just started',
+    subject: 'Your LexiClash teacher access is live 🎉',
     greeting: (n) => `Hi ${n},`,
-    intro: 'Great news — your teacher access is approved! Teacher mode turns LexiClash into a classroom tool: run live word games with your students, track their progress, and keep vocabulary practice fun.',
-    whatTitle: 'What you can do now',
+    intro: "I'm Ohad, the creator of LexiClash — thanks for joining as a teacher. Your access is live right now.",
+    whatTitle: 'What you can do',
     features: [
-      'Host Classroom Games — launch a live word battle your whole class joins from any device.',
-      'Run Vocabulary Duels & Brain Drills tuned for learning, not just play.',
-      'See student progress and results in your Teacher Dashboard.',
+      'Host live classroom word games — students join from any device',
+      'Run vocabulary duels & drills built for learning',
+      'Track progress in your Teacher Dashboard',
     ],
+    trialLine: (date) => `Your free trial runs until ${date}.`,
     cta: 'Open Teacher Dashboard',
-    fromTeam: '— The LexiClash Team',
+    ask: `Feedback or a feature request? Write me directly: ${CONTACT} — I read everything.`,
+    signoff: '— Ohad',
     messageLabel: 'A note from our team',
-    trialBadge: (d) => `${d}-day free trial — active now`,
-    trialTitle: 'Your trial clock has started ⏳',
-    trialBody: (d, date) => `Your full teacher access is unlocked for the next ${d} days — until ${date}. Don't let it slip by: set up your first class today and run a live game this week while it's free. Once the trial ends you'll need to renew to keep classroom mode.`,
     dir: 'ltr',
   },
   he: {
-    subject: 'אישרנו אותך — ברוך/ה הבא/ה למצב מורה ב-LexiClash',
-    trialSubject: 'תקופת הניסיון שלך כמורה ב-LexiClash התחילה',
+    subject: 'הגישה שלך כמורה ב-LexiClash פעילה 🎉',
     greeting: (n) => `שלום ${n},`,
-    intro: 'חדשות טובות — הגישה שלך כמורה אושרה! מצב מורה הופך את LexiClash לכלי כיתתי: הפעל/י משחקי מילים חיים עם התלמידים, עקוב/י אחר ההתקדמות שלהם, ושמור/י על תרגול אוצר מילים מהנה.',
-    whatTitle: 'מה אפשר לעשות עכשיו',
+    intro: 'אני אוהד, היוצר של LexiClash — תודה שהצטרפת כמורה. הגישה שלך פעילה עכשיו.',
+    whatTitle: 'מה אפשר לעשות',
     features: [
-      'לארח משחק כיתתי — להפעיל קרב מילים חי שכל הכיתה מצטרפת אליו מכל מכשיר.',
-      'להריץ דו-קרב אוצר מילים ותרגולי מוח המותאמים ללמידה.',
-      'לראות את התקדמות ותוצאות התלמידים בלוח הבקרה למורה.',
+      'להפעיל משחקי מילים חיים בכיתה — התלמידים מצטרפים מכל מכשיר',
+      'דו-קרבות אוצר מילים ותרגולים שבנויים ללמידה',
+      'לעקוב אחר ההתקדמות בלוח הבקרה למורה',
     ],
-    cta: 'פתח/י לוח בקרה למורה',
-    fromTeam: '— צוות LexiClash',
+    trialLine: (date) => `תקופת הניסיון בחינם נמשכת עד ${date}.`,
+    cta: 'פתח/י את לוח הבקרה למורה',
+    ask: `משוב או בקשת פיצ׳ר? כתוב/י לי ישירות: ${CONTACT} — אני קורא הכל.`,
+    signoff: '— אוהד',
     messageLabel: 'הערה מהצוות שלנו',
-    trialBadge: (d) => `ניסיון חינם ל-${d} ימים — פעיל עכשיו`,
-    trialTitle: 'שעון הניסיון שלך התחיל לתקתק ⏳',
-    trialBody: (d, date) => `הגישה המלאה למורה פתוחה עבורך ל-${d} הימים הקרובים — עד ${date}. אל תפספס/י: הקם/י את הכיתה הראשונה שלך עוד היום והפעל/י משחק חי השבוע בזמן שזה חינם. בסיום תקופת הניסיון יהיה צורך לחדש כדי לשמור על מצב הכיתה.`,
     dir: 'rtl',
   },
   sv: {
-    subject: 'Du är godkänd — välkommen till LexiClash för lärare',
-    trialSubject: 'Din lärarprövoperiod på LexiClash har börjat',
+    subject: 'Din lärarbehörighet på LexiClash är live 🎉',
     greeting: (n) => `Hej ${n},`,
-    intro: 'Bra nyheter — din lärarbehörighet är godkänd! Lärarläget gör LexiClash till ett klassrumsverktyg: kör live-ordspel med dina elever, följ deras framsteg och håll ordträningen rolig.',
-    whatTitle: 'Vad du kan göra nu',
+    intro: 'Jag är Ohad, skaparen av LexiClash — tack för att du gick med som lärare. Din behörighet är live nu.',
+    whatTitle: 'Vad du kan göra',
     features: [
-      'Var värd för Klassrumsspel — starta en live-orddust som hela klassen ansluter till från valfri enhet.',
-      'Kör Ordduellerna och Hjärnträning anpassade för lärande.',
-      'Se elevernas framsteg och resultat i din lärarpanel.',
+      'Kör live-ordspel i klassrummet — eleverna ansluter från valfri enhet',
+      'Orddueller och övningar byggda för lärande',
+      'Följ framstegen i din lärarpanel',
     ],
+    trialLine: (date) => `Din gratisperiod löper till ${date}.`,
     cta: 'Öppna lärarpanelen',
-    fromTeam: '— LexiClash-teamet',
+    ask: `Feedback eller en funktionsönskan? Skriv direkt till mig: ${CONTACT} — jag läser allt.`,
+    signoff: '— Ohad',
     messageLabel: 'En hälsning från vårt team',
-    trialBadge: (d) => `${d} dagars gratis prövoperiod — aktiv nu`,
-    trialTitle: 'Din prövoklocka har börjat ticka ⏳',
-    trialBody: (d, date) => `Din fulla lärarbehörighet är upplåst de kommande ${d} dagarna — till ${date}. Låt den inte rinna ut: skapa din första klass idag och kör ett live-spel den här veckan medan det är gratis. När prövoperioden tar slut behöver du förnya för att behålla klassrumsläget.`,
     dir: 'ltr',
   },
   ja: {
-    subject: '承認されました — LexiClash 教師モードへようこそ',
-    trialSubject: 'LexiClash 教師トライアルが始まりました',
+    subject: 'LexiClash 教師アクセスが有効になりました 🎉',
     greeting: (n) => `${n}様、`,
-    intro: '朗報です — 教師アクセスが承認されました！教師モードでは LexiClash が教室ツールになります。生徒とライブの単語ゲームを行い、進捗を確認し、語彙練習を楽しく続けられます。',
-    whatTitle: '今すぐできること',
+    intro: 'LexiClashの作者、Ohadです。教師としてご参加いただきありがとうございます。アクセスは有効になっています。',
+    whatTitle: 'できること',
     features: [
-      '教室ゲームをホスト — クラス全員がどの端末からでも参加できるライブ単語バトルを開始。',
-      '学習向けに調整された語彙対戦・脳トレを実施。',
-      '教師ダッシュボードで生徒の進捗と結果を確認。',
+      'クラスでライブ単語ゲームを開催 — 生徒はどの端末からでも参加',
+      '学習のための語彙対戦とドリル',
+      '教師ダッシュボードで進捗を確認',
     ],
+    trialLine: (date) => `無料トライアルは${date}までです。`,
     cta: '教師ダッシュボードを開く',
-    fromTeam: '— LexiClash チーム',
+    ask: `フィードバックや機能のリクエストは、${CONTACT} まで直接どうぞ。すべて読んでいます。`,
+    signoff: '— Ohad',
     messageLabel: '私たちのチームより',
-    trialBadge: (d) => `${d}日間の無料トライアル — 現在有効`,
-    trialTitle: 'トライアルのカウントダウンが始まりました ⏳',
-    trialBody: (d, date) => `教師アクセスはこれから${d}日間（${date}まで）フルに利用できます。お見逃しなく：今日のうちに最初のクラスを作成し、無料のうちに今週ライブゲームを実施しましょう。トライアル終了後は、教室モードを続けるには更新が必要です。`,
     dir: 'ltr',
   },
   es: {
-    subject: 'Estás aprobado — bienvenido al modo profesor de LexiClash',
-    trialSubject: 'Tu prueba de profesor en LexiClash acaba de empezar',
+    subject: 'Tu acceso de profesor en LexiClash está activo 🎉',
     greeting: (n) => `Hola ${n},`,
-    intro: 'Buenas noticias — ¡tu acceso de profesor ha sido aprobado! El modo profesor convierte LexiClash en una herramienta de aula: organiza juegos de palabras en vivo con tus estudiantes, sigue su progreso y mantén divertida la práctica de vocabulario.',
-    whatTitle: 'Lo que puedes hacer ahora',
+    intro: 'Soy Ohad, el creador de LexiClash — gracias por unirte como profesor. Tu acceso ya está activo.',
+    whatTitle: 'Qué puedes hacer',
     features: [
-      'Organiza Juegos de Aula — inicia una batalla de palabras en vivo a la que se une toda la clase desde cualquier dispositivo.',
-      'Ejecuta Duelos de Vocabulario y Entrenamiento Cerebral pensados para aprender.',
-      'Consulta el progreso y los resultados de los estudiantes en tu panel de profesor.',
+      'Organiza juegos de palabras en vivo — los estudiantes se unen desde cualquier dispositivo',
+      'Duelos de vocabulario y ejercicios pensados para aprender',
+      'Sigue el progreso en tu panel de profesor',
     ],
+    trialLine: (date) => `Tu prueba gratuita dura hasta el ${date}.`,
     cta: 'Abrir panel de profesor',
-    fromTeam: '— El equipo de LexiClash',
+    ask: `¿Comentarios o una función que te gustaría? Escríbeme directamente: ${CONTACT} — lo leo todo.`,
+    signoff: '— Ohad',
     messageLabel: 'Un mensaje de nuestro equipo',
-    trialBadge: (d) => `Prueba gratis de ${d} días — activa ahora`,
-    trialTitle: 'Tu cuenta atrás de prueba ya empezó ⏳',
-    trialBody: (d, date) => `Tu acceso completo de profesor está desbloqueado durante los próximos ${d} días — hasta el ${date}. No lo dejes pasar: crea tu primera clase hoy y organiza un juego en vivo esta semana mientras es gratis. Cuando termine la prueba tendrás que renovar para conservar el modo aula.`,
+    dir: 'ltr',
+  },
+  ru: {
+    subject: 'Ваш доступ учителя в LexiClash активен 🎉',
+    greeting: (n) => `Здравствуйте, ${n}!`,
+    intro: 'Я Охад, создатель LexiClash — спасибо, что присоединились как учитель. Ваш доступ уже активен.',
+    whatTitle: 'Что можно делать',
+    features: [
+      'Проводите живые словесные игры в классе — ученики подключаются с любого устройства',
+      'Словесные дуэли и упражнения, созданные для обучения',
+      'Отслеживайте прогресс в панели учителя',
+    ],
+    trialLine: (date) => `Бесплатный пробный период — до ${date}.`,
+    cta: 'Открыть панель учителя',
+    ask: `Отзыв или идея функции? Напишите мне напрямую: ${CONTACT} — я читаю всё.`,
+    signoff: '— Охад',
+    messageLabel: 'Заметка от нашей команды',
     dir: 'ltr',
   },
 };
 
 export function teacherAccessConfirmation({ full_name, locale, message, trialExpiresAt }: Args) {
-  const c = COPY[locale];
+  const c = COPY[locale] || COPY.en;
   const align = c.dir === 'rtl' ? 'right' : 'left';
   const trimmed = (message || '').trim();
 
-  // Trial urgency block — only when the approval carries a deadline. Day count
-  // is rounded up so "13 days and 23 hours left" still reads as the full window.
+  // One informational trial line — no countdown box, no urgency. Shown only
+  // while the trial is actually active.
   const trial = teacherTrialStatus(trialExpiresAt, Date.now());
-  const trialBlock = trial
+  const trialLine = trial && !trial.isExpired
     ? (() => {
-        const dateStr = new Date(trial.expiresAt).toLocaleDateString(DATE_LOCALE[locale], {
+        const dateStr = new Date(trial.expiresAt).toLocaleDateString(DATE_LOCALE[locale] || 'en-US', {
           year: 'numeric', month: 'long', day: 'numeric',
         });
-        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
-        <tr><td id="trial-urgency" style="background:#fff7d6;border:2px solid #1a1a2e;border-radius:8px;padding:16px;font-size:15px;line-height:1.55;color:#1a1a2e;">
-          <div style="display:inline-block;background:#BFFF00;border:2px solid #1a1a2e;border-radius:999px;padding:3px 12px;font-weight:800;font-size:13px;margin-bottom:10px;">${escape(c.trialBadge(trial.daysLeft))}</div>
-          <div style="font-weight:800;font-size:16px;margin-bottom:6px;">${escape(c.trialTitle)}</div>
-          <div>${escape(c.trialBody(trial.daysLeft, dateStr))}</div>
-        </td></tr>
-      </table>`;
+        return `<p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.trialLine(dateStr))}</p>`;
       })()
     : '';
 
   const features = c.features
-    .map((f) => `<li style="margin:0 0 8px 0;">${escape(f)}</li>`)
+    .map((f) => `<li style="margin:0 0 6px 0;">${escape(f)}</li>`)
     .join('');
 
   const messageBlock = trimmed
@@ -190,16 +195,17 @@ export function teacherAccessConfirmation({ full_name, locale, message, trialExp
         <tr><td dir="${c.dir}" align="${align}" style="padding:28px 28px 8px 28px;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;text-align:${align};">
           <p style="font-size:18px;font-weight:700;margin:0 0 12px 0;">${c.greeting(escape(full_name))}</p>
           <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.intro)}</p>
-          <p style="font-size:16px;font-weight:700;margin:0 0 10px 0;">${escape(c.whatTitle)}</p>
-          <ul style="font-size:15px;line-height:1.5;margin:0 0 8px 0;padding-${align === 'right' ? 'right' : 'left'}:20px;">${features}</ul>
+          ${trialLine}
+          <p style="font-size:15px;font-weight:700;margin:0 0 8px 0;">${escape(c.whatTitle)}</p>
+          <ul style="font-size:15px;line-height:1.5;margin:0 0 20px 0;padding-${align === 'right' ? 'right' : 'left'}:20px;">${features}</ul>
+          <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.ask)}</p>
         </td></tr>
-        <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px;text-align:${align};">${trialBlock}</td></tr>
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px;text-align:${align};">${messageBlock}</td></tr>
         <tr><td align="center" style="padding:8px 28px 28px 28px;">
           <a href="${SITE}/${locale}/teacher" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(c.cta)}</a>
         </td></tr>
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b7280;font-size:13px;text-align:${align};">
-          ${escape(c.fromTeam)}
+          ${escape(c.signoff)}
         </td></tr>
       </table>
     </td></tr>
@@ -207,5 +213,5 @@ export function teacherAccessConfirmation({ full_name, locale, message, trialExp
 </body>
 </html>`;
 
-  return { subject: trial ? c.trialSubject : c.subject, html };
+  return { subject: c.subject, html };
 }

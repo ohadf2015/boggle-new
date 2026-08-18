@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { teacherAccessConfirmation } from '../teacherAccessConfirmation';
 
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 describe('teacherAccessConfirmation email', () => {
   it('includes the welcome hero image', () => {
@@ -15,10 +15,34 @@ describe('teacherAccessConfirmation email', () => {
     expect(html).toContain('https://www.lexiclash.live/es/teacher');
   });
 
-  it('explains what teacher mode offers', () => {
+  it('is personal: from Ohad the creator, signed Ohad, with his contact address', () => {
     const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
-    // mentions at least one concrete teacher capability
-    expect(html.toLowerCase()).toMatch(/classroom|class|student|dashboard/);
+    // The template HTML-escapes apostrophes (I&#39;m) — assert the escaped form.
+    expect(html).toContain('I&#39;m Ohad, the creator of LexiClash');
+    expect(html).toContain('ohadf2015@gmail.com');
+    expect(html).toContain('— Ohad');
+    expect(html).not.toContain('The LexiClash Team');
+  });
+
+  it('asks for feedback / feature requests and promises Ohad reads everything', () => {
+    const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
+    expect(html).toMatch(/feedback/i);
+    expect(html).toMatch(/feature request/i);
+    expect(html).toMatch(/I read everything/i);
+  });
+
+  it('keeps the original email structure: what-you-can-do feature bullets', () => {
+    const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
+    expect(html).toContain('What you can do');
+    expect(html).toMatch(/classroom word games/i);
+    expect(html).toMatch(/Teacher Dashboard/i);
+  });
+
+  it.each(LOCALES)('is personal and asks for feedback in %s', (locale) => {
+    const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale });
+    // Every locale keeps the real contact address and a personal sign-off.
+    expect(html).toContain('ohadf2015@gmail.com');
+    expect(html).toMatch(/Ohad|Охад|אוהד/);
   });
 
   it('renders an admin custom message when provided', () => {
@@ -56,29 +80,46 @@ describe('teacherAccessConfirmation email', () => {
     expect(html.length).toBeGreaterThan(0);
   });
 
-  describe('trial urgency', () => {
-    // ~13.something days out → the email should show the rounded-up day count.
+  it('has real Russian copy for ru (no undefined COPY entry)', () => {
+    const { subject, html } = teacherAccessConfirmation({ full_name: 'Иван', locale: 'ru' });
+    expect(subject).toMatch(/[Ѐ-ӿ]/);
+    expect(html).toContain('Иван');
+    expect(html).toContain('https://www.lexiclash.live/ru/teacher');
+  });
+
+  it('keeps Hebrew RTL', () => {
+    const { html } = teacherAccessConfirmation({ full_name: 'יעל', locale: 'he' });
+    expect(html).toContain('dir="rtl"');
+    expect(html).toMatch(/[֐-׿]/);
+  });
+
+  describe('trial window line', () => {
     const trialExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000 - 60_000).toISOString();
 
-    it('renders a trial countdown block with the remaining day count', () => {
+    it('mentions the trial window in one line — no countdown/urgency block', () => {
       const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt });
-      expect(html).toContain('trial-urgency');
-      expect(html).toMatch(/14\s*day/i);
-    });
-
-    it('puts the trial framing in the subject line', () => {
-      const { subject } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt });
-      expect(subject.toLowerCase()).toContain('trial');
-    });
-
-    it.each(LOCALES)('renders the trial block for %s', (locale) => {
-      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale, trialExpiresAt });
-      expect(html).toContain('trial-urgency');
-    });
-
-    it('omits the trial block when no expiry is provided (back-compat)', () => {
-      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
+      expect(html).toMatch(/free trial runs until/i);
       expect(html).not.toContain('trial-urgency');
+    });
+
+    it.each(LOCALES)('renders the trial line for %s', (locale) => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale, trialExpiresAt });
+      // The line carries a formatted date — locale-independent check: some
+      // digit from the expiry date appears.
+      const year = new Date(trialExpiresAt).getFullYear();
+      expect(html).toContain(String(year));
+      expect(html).not.toContain('trial-urgency');
+    });
+
+    it('omits the trial line when no expiry is provided (back-compat)', () => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
+      expect(html).not.toMatch(/free trial runs until/i);
+    });
+
+    it('omits the trial line once the trial has expired', () => {
+      const expired = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt: expired });
+      expect(html).not.toMatch(/free trial runs until/i);
     });
   });
 });

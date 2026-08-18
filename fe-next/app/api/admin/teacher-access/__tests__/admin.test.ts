@@ -69,7 +69,7 @@ describe('admin teacher-access endpoints', () => {
     expect(res.status).toBe(200);
   });
 
-  it('approve stamps a trial deadline and the email leads with trial urgency', async () => {
+  it('approve stamps a trial deadline and the email mentions the trial window in one line', async () => {
     const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
     const sb = mockSupabase(adminProfile, row);
     (createClient as any).mockReturnValue(sb);
@@ -83,9 +83,10 @@ describe('admin teacher-access endpoints', () => {
     expect(typeof payload.trial_expires_at).toBe('string');
     expect(Date.parse(payload.trial_expires_at)).toBeGreaterThan(Date.now());
 
-    // Email reflects the trial.
+    // Email reflects the trial as a single informational line (no urgency block).
     const arg = (sendEmail as any).mock.calls[0][0];
-    expect(arg.html).toContain('trial-urgency');
+    expect(arg.html).toMatch(/free trial runs until/i);
+    expect(arg.html).not.toContain('trial-urgency');
   });
 
   it('approve forwards the admin custom message into the confirmation email', async () => {
