@@ -2854,7 +2854,7 @@ const ja = {
     "leaderboard": "リーダーボード",
     "noPlayersYet": "まだプレイヤーがいません",
     "wordTooShort": "短すぎ！（2文字以上必要）",
-    "wordTooShortMin": "単語が短すぎます！（最低${min}文字）",
+    "wordTooShortMin": "単語が短すぎます！（最低{min}文字）",
     "errorOccurred": "おっと！もう一回",
     "tooFast": "ゆっくり！送信が速すぎます",
     "me": "自分",

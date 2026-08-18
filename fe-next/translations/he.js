@@ -2899,7 +2899,7 @@ const he = {
     "leaderboard": "טבלת המובילים",
     "noPlayersYet": "אין שחקנים עדיין",
     "wordTooShort": "מילה קצרה מדי! (מינימום 2 אותיות)",
-    "wordTooShortMin": "מילה קצרה מדי! (מינימום ${min} אותיות)",
+    "wordTooShortMin": "מילה קצרה מדי! (מינימום {min} אותיות)",
     "errorOccurred": "אופס! נסו שוב",
     "tooFast": "לאט! שולח מהר מדי",
     "me": "אני",

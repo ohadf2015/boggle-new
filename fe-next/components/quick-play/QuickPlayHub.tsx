@@ -428,11 +428,15 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
           </span>
         </div>
         <div className="flex items-stretch divide-x-2 divide-black rtl:divide-x-reverse rounded-xl border-neo-thick border-black bg-neo-navy-elevated text-center font-neo-display text-xs font-semibold shadow-hard" data-testid="quick-header-stats">
+          {/* The tier name alone used to be enough when the tiers were metals —
+              "Gold" places you without help. The new names have voice but no
+              implied order, so the chip carries the points too. */}
           {totalPoints !== null && (
             <div className="px-3 py-2" data-testid="quick-rank-chip">
               <span className={quickRank(totalPoints).color}>
                 {t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}
               </span>
+              <b className="block text-base text-neo-cream">{totalPoints}</b>
             </div>
           )}
           <div className="px-3 py-2 text-neo-cream">

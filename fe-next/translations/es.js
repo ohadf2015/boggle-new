@@ -2915,7 +2915,7 @@ const es = {
     "leaderboard": "Clasificación",
     "noPlayersYet": "Aún no hay jugadores",
     "wordTooShort": "¡Palabra muy corta! (mín 2 letras)",
-    "wordTooShortMin": "¡Palabra muy corta! (mín ${min} letras)",
+    "wordTooShortMin": "¡Palabra muy corta! (mín {min} letras)",
     "errorOccurred": "¡Ups! Intenta de nuevo",
     "tooFast": "¡Más despacio! Enviando muy rápido",
     "me": "Yo",

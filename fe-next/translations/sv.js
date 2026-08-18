@@ -3144,7 +3144,7 @@ const sv = {
     "leaderboard": "Topplista",
     "noPlayersYet": "Inga spelare ännu",
     "wordTooShort": "Ordet för kort! (min 2 bokstäver)",
-    "wordTooShortMin": "Ordet för kort! (min ${min} bokstäver)",
+    "wordTooShortMin": "Ordet för kort! (min {min} bokstäver)",
     "errorOccurred": "Hoppsan! Försök igen",
     "tooFast": "Sakta ner! Skickar för snabbt",
     "me": "Jag",

@@ -2452,7 +2452,7 @@ const en = {
     "leaderboard": "Leaderboard",
     "noPlayersYet": "No players yet",
     "wordTooShort": "Too short! Need 2+ letters",
-    "wordTooShortMin": "Word too short! (min ${min} letters)",
+    "wordTooShortMin": "Word too short! (min {min} letters)",
     "errorOccurred": "Oops! Try again",
     "tooFast": "Slow down! Submitting too fast",
     "me": "Me",
