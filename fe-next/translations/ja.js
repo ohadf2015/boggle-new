@@ -8565,6 +8565,7 @@ const ja = {
       "dayStreak": "{days}日連続",
       "rewardsPending": "ログイン — {coins}コイン待機中",
       "pickNextMode": "次のラウンド",
+      "noWords": "今回は単語なし — 次のボードは60秒後。",
       "rankProgress": "{points} / {next}（{rank}まで）",
       "rankMax": "最高ランク到達",
       "rankGained": "このラウンドで+{pts}ランクポイント",

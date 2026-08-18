@@ -9516,6 +9516,7 @@ const sv = {
       "dayStreak": "{days} dagars rad",
       "rewardsPending": "Logga in — {coins} mynt väntar",
       "pickNextMode": "Nästa runda",
+      "noWords": "Inga ord den här gången – nästa bräde är 60 sekunder bort.",
       "rankProgress": "{points} / {next} till {rank}",
       "rankMax": "Högsta rangen nådd",
       "rankGained": "+{pts} rangpoäng denna runda",

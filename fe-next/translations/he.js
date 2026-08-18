@@ -9133,6 +9133,7 @@ const he = {
       "dayStreak": "{days} ימים ברציפות",
       "rewardsPending": "התחברו — {coins} מטבעות ממתינים",
       "pickNextMode": "הסיבוב הבא",
+      "noWords": "בלי מילים הפעם — הלוח הבא במרחק 60 שניות.",
       "rankProgress": "{points} / {next} עד {rank}",
       "rankMax": "הדרגה הגבוהה ביותר",
       "rankGained": "+{pts} נקודות דרגה בסיבוב הזה",

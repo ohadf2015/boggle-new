@@ -9236,6 +9236,7 @@ const es = {
       "dayStreak": "{days} días seguidos",
       "rewardsPending": "Inicia sesión — {coins} monedas esperando",
       "pickNextMode": "Siguiente ronda",
+      "noWords": "Sin palabras esta vez: el próximo tablero está a 60 segundos.",
       "rankProgress": "{points} / {next} para {rank}",
       "rankMax": "Rango máximo alcanzado",
       "rankGained": "+{pts} puntos de rango en esta ronda",

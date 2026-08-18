@@ -6294,6 +6294,7 @@ const ru = {
       "dayStreak": "{days} дней подряд",
       "rewardsPending": "Войдите — {coins} монет ждут",
       "pickNextMode": "Следующий раунд",
+      "noWords": "В этот раз без слов — следующее поле через 60 секунд.",
       "rankProgress": "{points} / {next} до ранга {rank}",
       "rankMax": "Максимальный ранг",
       "rankGained": "+{pts} очков ранга за раунд",
