@@ -83,23 +83,6 @@ const BAND_HUB: Record<PlacementQuality, string> = {
   miss: 'from-neo-red to-neo-red text-neo-white',
 };
 
-/** Aim-arc stroke per band (raw colours: this is an SVG stroke, not a class). */
-const AIM_STROKE: Record<PlacementQuality, string> = {
-  perfect: '#BFFF00',
-  good: '#00FFFF',
-  sloppy: '#FFE135',
-  miss: '#FF3366',
-};
-
-/** Fraction of the aim ring drawn per band — a full circle on a perfect shot,
- *  a stub on a miss, so quality is legible from arc length alone. */
-const AIM_ARC: Record<PlacementQuality, number> = {
-  perfect: 1,
-  good: 0.66,
-  sloppy: 0.34,
-  miss: 0.12,
-};
-
 export function WordTowerWheel({
   tray, selected, word, placing, aimBand = null, canBuild, gainPreview, intensity, accentHex, goldenLetter,
   reducedMotion = false, dir, t, onSelectTile, onDeselectTile, onSubmit, onDrop,
@@ -357,39 +340,13 @@ export function WordTowerWheel({
         );
       })}
 
-      {/* ── AIM RING ──
-            This slot used to hold a "crane steering dial": a rim with three
-            spokes that span up when a word was held. It steered nothing — it
-            implied a control the player did not have, which is exactly what made
-            the hand-off feel fake.
-
-            It now shows the crane's REAL live aim. The arc is the placement band
-            the drop would score this instant, mirrored from the same
-            `alignmentBand` call that scores the verdict, so it can never lie.
-            That closes the split where the player had to watch the crane at the
-            top of the screen while tapping at the bottom. */}
-      {placing && aimBand && (
-        <div className="pointer-events-none absolute inset-[6%]" aria-hidden>
-          <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
-            <circle cx={50} cy={50} r={45} fill="none" stroke="rgba(0,0,0,0.45)" strokeWidth={7} />
-            <circle
-              cx={50}
-              cy={50}
-              r={45}
-              fill="none"
-              stroke={AIM_STROKE[aimBand]}
-              strokeWidth={7}
-              strokeLinecap="round"
-              // The arc LENGTH is the quality: a full ring on perfect, a stub on
-              // a miss. Readable at a glance in peripheral vision, which is all
-              // the attention a thumb-side indicator can ask for.
-              strokeDasharray={`${AIM_ARC[aimBand] * 283} 283`}
-              transform="rotate(-90 50 50)"
-              style={{ transition: reducedMotion ? 'none' : 'stroke-dasharray 90ms linear, stroke 90ms linear' }}
-            />
-          </svg>
-        </div>
-      )}
+      {/* The AIM RING lived here: an arc whose colour AND length were the live
+          placement band, mirrored from the same `alignmentBand` call that scores
+          the verdict. It could not lie — that was the problem. It reported the
+          outcome while the player could still act on it, so the skill collapsed
+          into "hold until the ring fills", and the drop stopped being a judgement.
+          Removed along with the crane's lime reticle and band-tinted shadow; the
+          verdict now arrives after the beam lands, where it belongs. */}
 
       {/* Centre hub — the single action surface. While spelling it is the BUILD
           button (lifts the spelled word to the crane); once a word is held it
@@ -398,20 +355,19 @@ export function WordTowerWheel({
           and a drag-release still auto-builds via onSubmit. */}
       <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
         {placing ? (
-          // DROP — wears the crane's live aim so the release can be timed here,
-          // where the thumb already is, instead of by watching the crane sweep
-          // at the top of the screen.
+          // DROP — one constant appearance. It used to wear the live placement
+          // band, which made the button itself the spoiler.
           <button
             type="button"
             onClick={onDrop}
             aria-label={t('wordTower.crane.drop')}
             className={cn(
               'pointer-events-auto flex h-[70px] w-[70px] flex-col items-center justify-center rounded-full border-neo-thick border-black bg-gradient-to-b font-neo-display text-[11px] font-black uppercase leading-tight shadow-hard transition-[background-color,box-shadow] duration-100 active:translate-y-0.5',
-              BAND_HUB[aimBand ?? 'good'],
+              BAND_HUB.good,
               !reducedMotion && 'animate-neo-pop',
             )}
           >
-            <ChevronsDown className={cn('h-6 w-6', !reducedMotion && aimBand === 'perfect' && 'animate-bounce')} />
+            <ChevronsDown className="h-6 w-6" />
             {t('wordTower.crane.drop')}
           </button>
         ) : canBuild ? (

@@ -1068,7 +1068,8 @@ const sv = {
     "leaderboard": {
       "title": "Topptorn",
       "error": "Kunde inte ladda topplistan",
-      "empty": "Inga torn än — bli först!"
+      "empty": "Inga torn än — bli först!",
+      "floors": "{count} våningar"
     },
     "share": {
       "title": "Ordtorn",

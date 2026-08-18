@@ -98,30 +98,20 @@ interface WordTowerCraneProps {
   craneTopPx?: number;
 }
 
-/** Landing-shadow fill (CSS colour) matching the live band — projected on the
- *  drop guide so the player sees WHERE + HOW WELL the beam will land. */
-const BAND_SHADOW: Record<PlacementQuality, string> = {
-  perfect: 'rgba(191,255,0,0.55)',
-  good: 'rgba(0,255,255,0.4)',
-  sloppy: 'rgba(255,225,53,0.4)',
-  miss: 'rgba(255,51,102,0.4)',
-};
+/** Landing-shadow fill — a NEUTRAL cast shadow showing WHERE the beam will land.
+ *
+ *  It used to be keyed to the live placement band (lime on perfect, cyan/yellow/red
+ *  otherwise), which pre-announced the verdict before the player committed: line
+ *  the lime up, release, collect the multiplier. The judgement is meant to be the
+ *  player's, so the guide now reports position only. `alignmentBand` and
+ *  `evaluatePlacement` are untouched — the post-drop verdict pill still tells you
+ *  how you did, it just no longer tells you beforehand. */
+const NEUTRAL_SHADOW = 'rgba(12,18,32,0.45)';
 
-/** Soft jib glow colour keyed to the live placement band — a luminous trail
- *  that helps the player time the drop without repainting the carried block. */
-const BAND_GLOW: Record<PlacementQuality, string> = {
-  perfect: 'rgba(191,255,0,0.9)',
-  good: 'rgba(0,255,255,0.8)',
-  sloppy: 'rgba(255,225,53,0.75)',
-  miss: 'rgba(255,51,102,0.7)',
-};
-
-const BAND_GLOW_OPACITY: Record<PlacementQuality, number> = {
-  perfect: 0.85,
-  good: 0.55,
-  sloppy: 0.35,
-  miss: 0.2,
-};
+/** Soft jib glow — a luminous trail that helps time the drop. Constant for the
+ *  same reason as the shadow: brightness must not leak the band. */
+const NEUTRAL_GLOW = 'rgba(226,232,240,0.55)';
+const NEUTRAL_GLOW_OPACITY = 0.4;
 
 /** How far the trolley carriage slides along the jib (px from centre). */
 const TROLLEY_RANGE_PX = 110;
@@ -387,12 +377,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
         const previewDriftPx = (previewProjected - x) * TROLLEY_RANGE_PX;
         if (shadowElRef.current) {
           shadowElRef.current.style.transform = `translateX(calc(-50% + ${previewDriftPx}px))`;
-          shadowElRef.current.style.backgroundColor = BAND_SHADOW[band];
+          shadowElRef.current.style.backgroundColor = NEUTRAL_SHADOW;
         }
         if (glowElRef.current) {
           glowElRef.current.style.transform = `translateX(${x * TROLLEY_RANGE_PX}px)`;
-          glowElRef.current.style.background = `radial-gradient(circle at 50%, ${BAND_GLOW[band]} 0%, transparent 70%)`;
-          glowElRef.current.style.opacity = String(BAND_GLOW_OPACITY[band]);
+          glowElRef.current.style.background = `radial-gradient(circle at 50%, ${NEUTRAL_GLOW} 0%, transparent 70%)`;
+          glowElRef.current.style.opacity = String(NEUTRAL_GLOW_OPACITY);
         }
         prevPosRef.current = x;
       }
@@ -454,7 +444,6 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     ? landFeedback(droppedQuality, { reducedMotion, depthFloors: word.length })
     : null;
   const celebrating = falling && !reducedMotion && !!release?.celebrate;
-  const onSweetSpot = aiming && liveBand === 'perfect';
   // Hebrew: show the word-final letter in its sofit form and lay the beam RTL.
   const beamWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
   // Show the FULL word the crane is placing (founder: "show all the letters it
@@ -607,9 +596,6 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                     'flex flex-row items-stretch justify-center gap-[3px] rounded-none',
                     !reducedMotion && !falling && 'animate-neo-pop',
                     celebrating && release?.glow && 'crane-girder-perfect',
-                    // Perfect-release cue: a lime glow ring (NOT a face recolour) so
-                    // the skill shot stays readable while the colour stays honest.
-                    onSweetSpot && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                   )}
                   style={{
                     width: `${beamWPx}px`,
@@ -664,7 +650,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
               className="absolute left-1/2 z-0 h-2 w-14 -translate-x-1/2 rounded-[50%] blur-[1px] will-change-transform"
               style={{
                 top: `${CRANE_SHADOW_Y_PX - CRANE_SHADOW_VISUAL_NUDGE_PX}px`,
-                backgroundColor: BAND_SHADOW[liveBand],
+                backgroundColor: NEUTRAL_SHADOW,
               }}
               aria-hidden
             />
@@ -685,29 +671,27 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
               ref={glowElRef}
               className="absolute left-1/2 h-full w-40 -translate-x-1/2 will-change-transform"
               style={{
-                background: `radial-gradient(circle at 50%, ${BAND_GLOW[liveBand]} 0%, transparent 70%)`,
-                opacity: BAND_GLOW_OPACITY[liveBand],
+                background: `radial-gradient(circle at 50%, ${NEUTRAL_GLOW} 0%, transparent 70%)`,
+                opacity: NEUTRAL_GLOW_OPACITY,
               }}
             />
           </div>
         )}
 
-        {/* Drop-target guide — the bullseye the beam should land on. It SWINGS
+        {/* Drop-target guide — the build line the beam should land on. It SWINGS
             with the unstable tower-top (same offset that scores the drop), so the
-            player aims the beam at where the top actually is. Brighter ring makes
-            it a clear reticle, not just a faint dash. */}
+            player aims the beam at where the top actually is.
+
+            Deliberately NEUTRAL. It used to be lime, and go solid + hot + pulsing
+            once `liveBand === 'perfect'`, which meant the game showed you the
+            verdict while you could still act on it — aiming became "wait for the
+            green" rather than reading the swing. It marks the target; judging the
+            release is the player's job. */}
         <div
           ref={reticleElRef}
           className={cn(
             'absolute z-0 h-2 w-20 rounded-full border-neo border-dashed will-change-transform',
-            // On the sweet spot the reticle goes SOLID + bright + pulses, so the
-            // player can SEE the perfect release moment before letting go.
-            onSweetSpot
-              ? cn(
-                  'border-solid border-neo-lime bg-neo-lime/60 shadow-[0_0_10px_2px_rgba(191,255,0,0.7)]',
-                  !reducedMotion && 'crane-target-hot',
-                )
-              : 'border-neo-lime/70 bg-neo-lime/20',
+            'border-neo-cream/50 bg-neo-cream/10',
           )}
           style={{
             // Shares the shadow's landing line (trolley top + shadowY − nudge)

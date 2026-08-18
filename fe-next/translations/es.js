@@ -781,7 +781,8 @@ const es = {
     "leaderboard": {
       "title": "Torres principales",
       "error": "No se pudo cargar la clasificación",
-      "empty": "Aún no hay torres — ¡sé el primero!"
+      "empty": "Aún no hay torres — ¡sé el primero!",
+      "floors": "{count} pisos"
     },
     "share": {
       "title": "Torre de Palabras",

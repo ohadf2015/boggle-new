@@ -13,7 +13,8 @@ import {
 import { dailyTowerGameCode, DAILY_PLAYER_ID, utcDateKey } from '@/lib/wordTower/dailySeed';
 import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
-import { getWithAuth } from '@/utils/authFetch';
+import { getWithAuth, postWithAuth } from '@/utils/authFetch';
+import { getGuestFingerprint } from '@/utils/guestManager';
 import { WordTowerPlay } from './WordTowerPlay';
 
 // Modal, opened only on a button click — keep it (and the Avatar module it
@@ -150,12 +151,31 @@ export function WordTowerGame() {
   // Persist today's daily best so the minimap tick + next-attempt baseline reflect
   // prior climbs (the self-comparison loop).
   const persistDailyBest = useCallback((heightM: number) => {
+    let improved = false;
+    let merged = 0;
     try {
       const key = dailyBestKey(utcDateKey());
       const stored = Number(localStorage.getItem(key)) || 0;
-      localStorage.setItem(key, String(mergeDailyBest(stored, heightM)));
+      merged = mergeDailyBest(stored, heightM);
+      improved = merged > stored;
+      localStorage.setItem(key, String(merged));
     } catch { /* best-effort */ }
-  }, []);
+
+    // Submit only on a genuine improvement — the server keeps the max anyway, so
+    // this is purely to avoid a request per drop. Guests submit too (the daily
+    // leaderboard is not auth-gated, unlike the lifetime one). Fire-and-forget:
+    // a failed submit must never interrupt a climb.
+    if (!improved || merged <= 0) return;
+    void (async () => {
+      try {
+        await postWithAuth('/api/word-tower/daily/score', {
+          heightM: merged,
+          language,
+          guestFingerprint: getGuestFingerprint(),
+        });
+      } catch { /* best-effort — localStorage remains the source of truth for UI */ }
+    })();
+  }, [language]);
 
   const openLeaderboard = useCallback(() => setShowLeaderboard(true), []);
   const closeLeaderboard = useCallback(() => setShowLeaderboard(false), []);
@@ -210,7 +230,7 @@ export function WordTowerGame() {
         onNewDailyBest={persistDailyBest}
       />
 
-      {showLeaderboard && <WordTowerLeaderboard onClose={closeLeaderboard} t={t} dir={dir} />}
+      {showLeaderboard && <WordTowerLeaderboard onClose={closeLeaderboard} t={t} dir={dir} language={language} />}
     </>
   );
 }

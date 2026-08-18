@@ -779,7 +779,8 @@ const ja = {
     "leaderboard": {
       "title": "トップタワー",
       "error": "ランキングを読み込めません",
-      "empty": "まだ塔がありません — 最初の一人に！"
+      "empty": "まだ塔がありません — 最初の一人に！",
+      "floors": "{count}階"
     },
     "share": {
       "title": "ワードタワー",

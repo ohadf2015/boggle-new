@@ -132,6 +132,26 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
     expect(bar).toHaveAttribute('aria-valuemax', '3');
   });
 
+  it('renders the Word Tower box at exactly the size of its two siblings', async () => {
+    renderHub();
+    await screen.findByTestId('quest-card-wordTower');
+
+    // The visible box is the inner role="button"; its class list carries every
+    // size rule (min-h, padding, flex direction). Comparing the full string is
+    // deliberate — "same size" regressions here come from a card silently taking
+    // a different QuestCard branch (variant/preview), which shows up as a class
+    // diff long before it shows up as a pixel diff any jsdom test could measure.
+    const boxClasses = (id: string) => {
+      const root = screen.getByTestId(`quest-card-${id}`);
+      return (root.querySelector('[role="button"]') as HTMLElement).className;
+    };
+
+    expect(boxClasses('wordTower')).toBe(boxClasses('wordHunt'));
+    expect(boxClasses('wordTower')).toBe(boxClasses('wordWheel'));
+    expect(boxClasses('wordTower')).toContain('min-h-[170px]');
+    expect(boxClasses('wordTower')).toContain('md:min-h-[130px]');
+  });
+
   it('does NOT tag the public card as beta, and hides admin-only modes', async () => {
     renderHub();
     const card = await screen.findByTestId('quest-card-wordTower');
