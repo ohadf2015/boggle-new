@@ -13,6 +13,8 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
+import type { CollectedWord } from './QuickWordsCollected';
+import { recordGuestRound, quickCoinsFor, quickXpFor } from '@/lib/quickPlay/guestProgress';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
@@ -60,6 +62,9 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [challenge, setChallenge] = useState<ChallengeInfo | null>(null);
   const [answered, setAnswered] = useState<{ name: string; theirPct: number; yourPct: number } | null>(null);
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
+  const [collected, setCollected] = useState<CollectedWord[]>([]);
+  const [collectionTotal, setCollectionTotal] = useState(0);
+  const [dayStreak, setDayStreak] = useState(0);
   const [loadError, setLoadError] = useState(false);
   /** Resolved mode the lightning bolt is locked onto during loading. */
   const [strikeMode, setStrikeMode] = useState<QuickMode | null>(null);
@@ -173,7 +178,19 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       submitting.current = true;
       setResult(r);
       try {
-        let out: QuickSubmitOutcome = { scorePct: r.scorePct, coins: 0, xp: 0, percentileToday: 0, history: [], totalPoints: 0 };
+        // Local first: the day streak has no server home, and a signed-out
+        // player's whole progression lives here (submit is auth-gated, so it
+        // used to hand guests a row of zeros).
+        const local = recordGuestRound({ mode: r.mode, scorePct: r.scorePct });
+        setDayStreak(local.dayStreak);
+        let out: QuickSubmitOutcome = {
+          scorePct: r.scorePct,
+          coins: quickCoinsFor(r.scorePct),
+          xp: quickXpFor(r.scorePct),
+          percentileToday: 0,
+          history: local.history,
+          totalPoints: local.points,
+        };
         try {
           const res = await fetch('/api/quick-play/submit', {
             method: 'POST',
@@ -255,17 +272,30 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     [challenge, language, roundIndex, user?.id]
   );
 
-  const handleNextRound = useCallback(() => {
+  /**
+   * Back to the wheel — unless the player already named the mode they want on
+   * the results screen, in which case that choice IS the decision and a trip
+   * through the picker is a tax on it.
+   */
+  const handleNextRound = useCallback((mode?: QuickMode) => {
     setRoundIndex((i) => i + 1);
     setConfig(null);
     setResult(null);
     setOutcome(null);
     setRival(null);
     setChallenge(null); // challenge is a one-round contract
-    setSelection('random');
+    setCollected([]);
+    setSelection(mode ?? 'random');
     setStrikeMode(null);
-    setPhase('wheel');
+    if (mode) void handlePlayRef.current?.(mode, 'tap'); // it owns the phase from here
+    else setPhase('wheel');
   }, []);
+
+  // handlePlay is declared above but closes over `challenge`, which this
+  // callback clears — a direct dependency would rebuild it every round and
+  // re-fire the effects keyed on it. A ref keeps one stable identity.
+  const handlePlayRef = useRef<typeof handlePlay | null>(null);
+  handlePlayRef.current = handlePlay;
 
   const handleChallenge = useCallback(() => {
     if (result) void shareChallenge(result, language, t);
@@ -292,7 +322,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             <button
               type="button"
               data-testid="quick-round-error-retry"
-              onClick={handleNextRound}
+              onClick={() => handleNextRound()}
               className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-neo-black shadow-hard active:shadow-hard-pressed"
             >
               {t('common.retry', 'Try Again')}
@@ -311,6 +341,11 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         result={result}
         outcome={outcome}
         rival={rival}
+        rivals={config?.ghosts ?? []}
+        collected={collected}
+        collectionTotal={collectionTotal}
+        isGuest={!user?.id}
+        dayStreak={dayStreak}
         onNextRound={handleNextRound}
         onChallenge={handleChallenge}
       />

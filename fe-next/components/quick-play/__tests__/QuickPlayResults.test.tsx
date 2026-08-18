@@ -54,7 +54,7 @@ describe('QuickPlayResults redesign', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const pill = screen.getByText('quickPlay.solo.mode.blast');
+    const pill = screen.getByTestId('quick-mode-chip');
     expect(pill.className).toContain('bg-neo-pink');
   });
 
