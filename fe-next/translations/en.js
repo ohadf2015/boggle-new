@@ -7896,14 +7896,14 @@ const en = {
       "dragHint": "Drag the knob to pick a mode — or leave it on Random",
       "selected": "Selected:",
       "play": "PLAY",
-      "subCaption": "60-second round · no bots · you vs the perfect score",
+      "subCaption": "60-second round · three rivals · you vs the perfect score",
       "loading": "Building your board…",
       "blurb": {
         "classic": "Trace words through the letter grid. The longer the chain, the bigger the score.",
         "blast": "Chain letters to blow up tiles. Clear the board before the clock clears you.",
         "word-hunt": "One word is hidden in the grid. Find it — and everything else on the way.",
         "wheel-rush": "Every word has to use the centre letter. Spin the ring to find more.",
-        "random": "Let the wheel decide. 60 seconds, no bots, you against the perfect score."
+        "random": "Let the wheel decide. 60 seconds, three rivals, you against the perfect score."
       },
       "mode": {
         "classic": "Classic",

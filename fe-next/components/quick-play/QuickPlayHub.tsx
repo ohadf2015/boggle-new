@@ -15,6 +15,7 @@ import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor } from '@/lib/quickPlay/guestProgress';
+import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
@@ -129,11 +130,23 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   // Tapping a mode node or releasing the drag knob fires an electric strike
   // toward that mode, holds a visible loading state on the wheel, then enters
   // play after board fetch + a minimum hold (so fast APIs don't skip the beat).
-  const handlePlay = useCallback(async (sel: WheelSelection, method: 'drag' | 'tap') => {
+  const handlePlay = useCallback(async (
+    sel: WheelSelection,
+    method: 'drag' | 'tap',
+    /**
+     * The challenge in force for THIS round. Passed explicitly because the
+     * results screen clears the challenge and starts the next round in the
+     * same tick: a closed-over `challenge` is still the old one at that point,
+     * so tapping "Blast" after a challenge round replayed the challenge's mode
+     * AND seed. `undefined` means "whatever state says"; `null` means none.
+     */
+    challengeOverride?: ChallengeInfo | null
+  ) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
+    const activeChallenge = challengeOverride === undefined ? challenge : challengeOverride;
     const mode: QuickMode =
-      challenge?.mode ??
+      activeChallenge?.mode ??
       (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
         : sel);
@@ -141,7 +154,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     setSelection(mode);
     setStrikeMode(mode);
     posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
-    if (sel === 'random' && !challenge) {
+    if (sel === 'random' && !activeChallenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
     setPhase('loading');
@@ -152,7 +165,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode, language, seed: challenge?.seed }),
+        body: JSON.stringify({ mode, language, seed: activeChallenge?.seed }),
       });
       if (!res.ok) throw new Error(`round fetch ${res.status}`);
       const round = (await res.json()) as QuickRoundConfig;
@@ -183,6 +196,19 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         // used to hand guests a row of zeros).
         const local = recordGuestRound({ mode: r.mode, scorePct: r.scorePct });
         setDayStreak(local.dayStreak);
+
+        // Which of this round's words the player had never found before. Never
+        // fatal: a collection lookup that fails costs the ★ badges, not the
+        // results screen.
+        try {
+          const roundWords = r.words ?? [];
+          const progress = await getQuickPlayWordProgress(roundWords, user?.id ?? null);
+          const isNew = new Set(progress.new.map((w) => w.toLowerCase()));
+          setCollected(roundWords.map((w) => ({ ...w, isNew: isNew.has(w.word.toLowerCase()) })));
+          setCollectionTotal(progress.total);
+        } catch {
+          setCollected((r.words ?? []).map((w) => ({ ...w, isNew: false })));
+        }
         let out: QuickSubmitOutcome = {
           scorePct: r.scorePct,
           coins: quickCoinsFor(r.scorePct),
@@ -287,7 +313,9 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     setCollected([]);
     setSelection(mode ?? 'random');
     setStrikeMode(null);
-    if (mode) void handlePlayRef.current?.(mode, 'tap'); // it owns the phase from here
+    // `null`, not the state value: setChallenge above has not applied yet, and
+    // the stale one would replay the challenge's board under a new mode.
+    if (mode) void handlePlayRef.current?.(mode, 'tap', null); // it owns the phase from here
     else setPhase('wheel');
   }, []);
 

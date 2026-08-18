@@ -70,6 +70,8 @@ interface QuickPlayResultsProps {
   onChallenge: () => void;
 }
 
+/** Below this many leaderboard rows a percentile is noise, not information. */
+const MIN_BOARD_FOR_PERCENTILE = 5;
 const GAUGE_R = 54;
 const GAUGE_C = 2 * Math.PI * GAUGE_R;
 
@@ -121,9 +123,14 @@ export function QuickPlayResults({
   const rankBefore = quickRank(Math.max(0, outcome.totalPoints - result.scorePct));
   const rankedUp = rankNow.key !== rankBefore.key && outcome.totalPoints > 0;
   // A guest's percentile RPC always answered 0 ("better than 0% of today's
-  // scores" after every round). The public board answers the same question.
-  const percentileToday =
-    outcome.percentileToday > 0 ? outcome.percentileToday : percentileFromBoard(result.scorePct, board);
+  // scores" after every round). The public board answers the same question —
+  // but only once there are enough rows for the answer to mean anything: on a
+  // three-row board a mediocre round reads "better than 100%", which is worse
+  // than saying nothing. Capped at 99 for the same reason.
+  const boardPercentile =
+    board.length >= MIN_BOARD_FOR_PERCENTILE ? Math.min(99, percentileFromBoard(result.scorePct, board)) : null;
+  const percentileToday = outcome.percentileToday > 0 ? outcome.percentileToday : boardPercentile ?? 0;
+  const showPercentile = outcome.percentileToday > 0 || boardPercentile !== null;
 
   useEffect(() => {
     if (celebrated.current) return;
@@ -260,11 +267,13 @@ export function QuickPlayResults({
           </div>
 
           {/* Percentile comparison — pulled up from rank card */}
-          <div className="w-full border-t border-neo-white/20 pt-3">
-            <p className="text-center text-xs text-neo-cream font-bold">
-              {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
-            </p>
-          </div>
+          {showPercentile && (
+            <div className="w-full border-t border-neo-white/20 pt-3">
+              <p className="text-center text-xs text-neo-cream font-bold">
+                {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
+              </p>
+            </div>
+          )}
 
           {/* Target word indicator (word-hunt only) */}
           {result.mode === 'word-hunt' && result.targetWord && (

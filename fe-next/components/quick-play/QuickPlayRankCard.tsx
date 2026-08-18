@@ -64,8 +64,10 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
                   })}
                 </span>
               )}
+              {/* The rung you're on already says what the next one costs;
+                  repeating its own threshold there reads as a second score. */}
               <span className="w-14 shrink-0 text-right font-neo-display tabular-nums text-neo-white/60">
-                {safeToLocaleString(rung.at, language)}
+                {isCurrent ? '' : safeToLocaleString(rung.at, language)}
               </span>
             </li>
           );
@@ -94,10 +96,13 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
       </div>
 
       {/* Percentile rail — kept, but under the ladder: it answers "vs everyone
-          today", which is a different question from "how far up am I". */}
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss" aria-hidden="true">
-        <i className="block h-full bg-neo-cyan" style={{ width: `${percentileToday}%` }} />
-      </div>
+          today", which is a different question from "how far up am I". Hidden
+          when there is no percentile to draw, rather than shown empty. */}
+      {percentileToday > 0 && (
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss" aria-hidden="true">
+          <i className="block h-full bg-neo-cyan" style={{ width: `${percentileToday}%` }} />
+        </div>
+      )}
     </div>
   );
 }
