@@ -57,7 +57,10 @@ export function QuickPlayRankCard({ totalPoints, percentileToday, scorePct }: Qu
                 {t(`quickPlay.solo.rank.${rung.key}`)}
               </span>
               {isCurrent && rankNow.nextAt !== null && (
-                <span className="shrink-0 text-[11px] text-neo-white/70">
+                /* Not shrink-0: the tier names carry real words now, and in
+                   Hebrew — the primary locale — "בלתי ניתנים לעצירה" next to a
+                   long current rung would squeeze the rung name to nothing. */
+                <span className="min-w-0 max-w-[55%] truncate text-[11px] text-neo-white/70">
                   {t('quickPlay.solo.rankToNext', '{pts} to {rank}', {
                     pts: safeToLocaleString(toNext, language),
                     rank: t(`quickPlay.solo.rank.${QUICK_RANKS[idx + 1].key}`),
