@@ -12253,6 +12253,7 @@ const es = {
       "live": "EN VIVO",
       "selectClassroom": "Seleccionar Salón",
       "createClassroomFirst": "Crea un salón primero para rastrear tareas y actividad de duelos",
+      "reviewEmptyHint": "Crea tu primera clase para desbloquear analíticas, tareas e informes.",
       "analytics": "Analíticas",
       "insights": "DATOS",
       "viewReports": "Ver informes",
@@ -13101,7 +13102,18 @@ const es = {
     "onboarding": {
       "getStarted": "¡Empezar!",
       "of": "de",
-      "step": "Paso {{current}}"
+      "step": "Paso {{current}}",
+      "title": "Cómo funciona LexiClash en tu clase",
+      "subtitle": "Cinco pasos rápidos de cero a tu primer juego de palabras en vivo.",
+      "steps": {
+        "create": { "title": "Crea tu clase", "text": "Un toque: ponle nombre y listo." },
+        "share": { "title": "Comparte el código", "text": "Proyéctalo en la pizarra o envía el enlace." },
+        "join": { "title": "Los alumnos se unen", "text": "Desde cualquier dispositivo, sin cuentas." },
+        "play": { "title": "Juega en vivo", "text": "Elige una lección y pulsa empezar." },
+        "results": { "title": "Mira los resultados", "text": "Sigue el progreso de cada alumno en tu panel." }
+      },
+      "gotIt": "¡Entendido, a enseñar!",
+      "showTutorial": "Cómo funciona"
     },
     "practice": {
       "allVocabFound": "¡Encontraste todas las palabras!",

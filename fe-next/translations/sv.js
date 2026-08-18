@@ -12510,6 +12510,7 @@ const sv = {
       "live": "LIVE",
       "selectClassroom": "Välj klassrum",
       "createClassroomFirst": "Skapa ett klassrum först för att spåra uppgifter och duellaktivitet",
+      "reviewEmptyHint": "Skapa ditt första klassrum för att låsa upp analys, uppgifter och rapporter.",
       "analytics": "Analys",
       "insights": "INSIKTER",
       "viewReports": "Visa rapporter",
@@ -13337,7 +13338,18 @@ const sv = {
     "onboarding": {
       "getStarted": "Börja",
       "of": "av",
-      "step": "Steg {{current}}"
+      "step": "Steg {{current}}",
+      "title": "Så funkar LexiClash i ditt klassrum",
+      "subtitle": "Fem snabba steg från noll till ditt första live-ordspel.",
+      "steps": {
+        "create": { "title": "Skapa ditt klassrum", "text": "Ett tryck — namnge det och klart." },
+        "share": { "title": "Dela gå-med-koden", "text": "Projicera den på tavlan eller skicka länken." },
+        "join": { "title": "Eleverna ansluter", "text": "Från valfri enhet — inga konton behövs." },
+        "play": { "title": "Kör ett live-ordspel", "text": "Välj en lektion och tryck start." },
+        "results": { "title": "Se resultaten", "text": "Följ varje elevs framsteg i din instrumentpanel." }
+      },
+      "gotIt": "Fattat — kör igång!",
+      "showTutorial": "Så funkar det"
     },
     "practice": {
       "allVocabFound": "Alla ord hittade!",

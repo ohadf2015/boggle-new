@@ -84,14 +84,14 @@ export default function StudentPageClient() {
           <div className="flex gap-2 ps-1">
             <Link
               href={`/${language}/student/profile`}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-white/20 transition-colors"
+              className="flex min-h-[44px] items-center gap-1.5 px-4 py-2.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-white/20 transition-colors"
             >
               <User className="w-3.5 h-3.5" />
               {t('student.nav.profile')}
             </Link>
             <Link
               href={`/${language}/student/achievements`}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-white/20 transition-colors"
+              className="flex min-h-[44px] items-center gap-1.5 px-4 py-2.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-white/20 transition-colors"
             >
               <Award className="w-3.5 h-3.5" />
               {t('student.nav.achievements')}
@@ -105,7 +105,7 @@ export default function StudentPageClient() {
                   await signOut();
                   router.push(`/${language}/student/join`);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-neo-pink hover:text-neo-black transition-colors"
+                className="flex min-h-[44px] items-center gap-1.5 px-4 py-2.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-neo-pink hover:text-neo-black transition-colors"
               >
                 <UserX className="w-3.5 h-3.5" />
                 {t('student.notYou')}

@@ -27,7 +27,7 @@ import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
 import {
-  Gamepad2, BookOpen, BarChart3, FileText, Users, Swords,
+  Gamepad2, BookOpen, BarChart3, FileText, Users, Swords, HelpCircle, Plus,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -62,6 +62,7 @@ export default function TeacherDashboard() {
   const isRTL = language === 'he';
   const [activeTab, setActiveTab] = useState<Tab>('play');
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
@@ -103,7 +104,10 @@ export default function TeacherDashboard() {
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
       <EducationHeader />
-      <TeacherOnboarding />
+      <TeacherOnboarding
+        forceShow={showTutorial}
+        onDismiss={() => setShowTutorial(false)}
+      />
 
       <m.div
         className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1"
@@ -111,14 +115,32 @@ export default function TeacherDashboard() {
         initial="hidden"
         animate="visible"
       >
-        {/* Greeting */}
+        {/* Greeting + tutorial reopen */}
         <m.div variants={slideUp} className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white">
-            {t('teacher.dashboard.title')}
-          </h1>
-          <p className="text-sm text-neo-white font-neo-body mt-1">
-            {t('teacher.dashboard.subtitle')}
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white">
+                {t('teacher.dashboard.title')}
+              </h1>
+              <p className="text-sm text-neo-white font-neo-body mt-1">
+                {t('teacher.dashboard.subtitle')}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowTutorial(true)}
+              aria-label={t('education.onboarding.showTutorial')}
+              title={t('education.onboarding.showTutorial')}
+              className={cn(
+                'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
+                'border-2 border-black bg-neo-lime text-black shadow-hard-sm',
+                'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                'transition-all focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
+              )}
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
+          </div>
         </m.div>
 
         {/* Teacher Welcome Banner */}
@@ -145,7 +167,7 @@ export default function TeacherDashboard() {
                   aria-selected={isActive}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'relative flex items-center gap-2 px-4 py-2 rounded-neo font-neo-body font-bold text-sm transition-all',
+                    'relative flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-neo font-neo-body font-bold text-sm transition-all',
                     'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-1 focus-visible:ring-offset-neo-navy',
                     isActive
                       ? cn(tab.activeBg, tab.activeText, 'border-2 border-black shadow-hard-sm')
@@ -252,9 +274,29 @@ export default function TeacherDashboard() {
           {activeTab === 'review' && (
             <m.div key="review" {...fadeSlide} className="space-y-6">
               {classrooms.length === 0 ? (
-                <p className="text-neo-white font-neo-body font-bold text-center py-8">
-                  {t('teacher.dashboard.createClassroomFirst')}
-                </p>
+                <div className="rounded-neo border-3 border-black bg-neo-cream shadow-hard px-6 py-10 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-black bg-neo-lime shadow-hard-sm">
+                    <BarChart3 className="h-8 w-8 text-black" />
+                  </div>
+                  <p className="text-black font-neo-body font-black text-lg text-balance">
+                    {t('teacher.dashboard.createClassroomFirst')}
+                  </p>
+                  <p className="mt-1 text-sm font-bold text-black/60 text-pretty">
+                    {t('teacher.dashboard.reviewEmptyHint')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('prepare')}
+                    className={cn(
+                      'mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-neo px-6 py-2.5',
+                      'border-3 border-black bg-neo-cyan font-neo-display font-black text-black shadow-hard',
+                      'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all'
+                    )}
+                  >
+                    <Plus className="h-5 w-5" />
+                    {t('teacher.classroom.create')}
+                  </button>
+                </div>
               ) : (
                 <>
                   {/* Analytics */}

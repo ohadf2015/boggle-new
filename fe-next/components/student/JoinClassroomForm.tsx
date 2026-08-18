@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { ArrowLeft, LogIn, ClipboardPaste } from 'lucide-react';
@@ -49,6 +49,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeError, setCodeError] = useState(false);
   const [nameError, setNameError] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Handle paste from clipboard
   const handlePaste = async () => {
@@ -163,6 +164,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                   </Label>
                   <Input
                     id="student-name"
+                    ref={nameInputRef}
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value);
@@ -171,6 +173,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     required
                     maxLength={40}
                     autoComplete="off"
+                    autoFocus
                     placeholder={t('education.student.join.namePlaceholder')}
                     aria-invalid={nameError ? 'true' : undefined}
                     aria-describedby={nameError ? 'name-error' : 'name-hint'}
@@ -203,8 +206,14 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     id="classroom-code"
                     value={code}
                     onChange={(e) => {
-                      setCode(e.target.value.toUpperCase());
+                      const next = e.target.value.toUpperCase();
+                      setCode(next);
                       if (codeError) setCodeError(false);
+                      // Auto-advance: a full 6-char code moves a guest who still
+                      // needs a name straight to the name field.
+                      if (next.length === 6 && isGuest && !name.trim()) {
+                        nameInputRef.current?.focus();
+                      }
                     }}
                     required
                     placeholder="ABC123"
@@ -212,6 +221,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     pattern="[A-Za-z0-9]{6}"
                     inputMode="text"
                     autoComplete="off"
+                    autoFocus={!isGuest}
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
                     className={cn(

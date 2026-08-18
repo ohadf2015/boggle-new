@@ -1,8 +1,8 @@
 /**
  * TeacherOnboarding telemetry (F1 wiring)
  *
- * Each step navigation should emit edu_teacher_onboarding_step so we can
- * compute the funnel: signup → step 1 → step 2 → ... → complete vs skip.
+ * The infographic fires edu_teacher_onboarding_step so we can compute the
+ * funnel: signup → view → complete vs skip.
  */
 
 import React from 'react';
@@ -58,11 +58,10 @@ describe('TeacherOnboarding telemetry', () => {
     });
   });
 
-  it('fires "next" on step advance', () => {
+  it('fires "view" when the infographic opens', () => {
     render(<TeacherOnboarding />);
-    fireEvent.click(screen.getByRole('button', { name: /common\.next/i }));
     expect(mockTrack).toHaveBeenCalledWith(
-      expect.objectContaining({ step: 0, totalSteps: 4, action: 'next' }),
+      expect.objectContaining({ step: 0, totalSteps: 5, action: 'view' }),
     );
   });
 
@@ -70,16 +69,17 @@ describe('TeacherOnboarding telemetry', () => {
     render(<TeacherOnboarding />);
     fireEvent.click(screen.getByLabelText('common.skip'));
     expect(mockTrack).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'skip', step: 0 }),
+      expect.objectContaining({ action: 'skip', step: 0, totalSteps: 5 }),
     );
+    expect(onboardingState.skip).toHaveBeenCalled();
   });
 
-  it('fires "complete" on the last step', () => {
-    onboardingState.currentStep = 3;
+  it('fires "complete" on the primary CTA', () => {
     render(<TeacherOnboarding />);
-    fireEvent.click(screen.getByRole('button', { name: /onboarding\.getStarted/i }));
+    fireEvent.click(screen.getByRole('button', { name: /onboarding\.gotIt/i }));
     expect(mockTrack).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'complete', step: 3 }),
+      expect.objectContaining({ action: 'complete', step: 4, totalSteps: 5 }),
     );
+    expect(onboardingState.complete).toHaveBeenCalled();
   });
 });

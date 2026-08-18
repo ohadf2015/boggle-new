@@ -115,7 +115,7 @@ export function trackEduClassroomJoin(args: EduClassroomJoinArgs): void {
 export interface EduTeacherOnboardingStepArgs {
   step: number;
   totalSteps: number;
-  action: 'next' | 'skip' | 'complete' | 'back';
+  action: 'view' | 'next' | 'skip' | 'complete' | 'back';
 }
 
 export function trackEduTeacherOnboardingStep(args: EduTeacherOnboardingStepArgs): void {
