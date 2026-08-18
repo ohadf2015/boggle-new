@@ -461,6 +461,13 @@ afterEach(() => {
   // Clear localStorage
   localStorageMock.getItem.mockClear();
   localStorageMock.setItem.mockClear();
+  // jsdom defines localStorage as a non-configurable getter, so the `global.localStorage =
+  // localStorageMock` above does NOT always take — meaning some suites talk to jsdom's REAL
+  // store, which persists across tests in a file. Any key a component writes (ad cadence
+  // counters, one-shot prompt markers) then bleeds into every later case. vitest.setup.ts got
+  // this fix on 2026-08-18; jest also globs the vitest suites, so it needs the same clear.
+  // Harmless when the mock did take: `clear` is then a jest.fn no-op.
+  try { window.localStorage.clear(); } catch {}
 
   // Reset socket mock
   mockSocket.on.mockClear();
