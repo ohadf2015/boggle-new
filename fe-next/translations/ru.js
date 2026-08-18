@@ -2324,6 +2324,10 @@ const ru = {
     "wordHuntCtaDesc": "Ежедневный вызов ждёт!",
     "wordHuntAlreadyPlayed": "Уже сыграно сегодня",
     "wordHuntAlreadyPlayedDesc": "Приходи завтра!",
+    "firstSessionDailyTitle": "Начни дневную серию",
+    "firstSessionDailyBody": "Сегодняшний пазл уже ждёт. Завтра — день 2.",
+    "firstSessionDailyCta": "Играть сегодняшний Daily",
+    "firstSessionComeBack": "День 1 — возвращайся завтра",
     "encouragement": {
       "legendary": "Невероятно!",
       "great": "Хорошая работа!",

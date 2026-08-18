@@ -3206,6 +3206,10 @@ const en = {
     "wordHuntCtaDesc": "Today's daily challenge awaits!",
     "wordHuntAlreadyPlayed": "Already Played Today",
     "wordHuntAlreadyPlayedDesc": "Come back tomorrow!",
+    "firstSessionDailyTitle": "Start your daily streak",
+    "firstSessionDailyBody": "Today's puzzle is live. Come back tomorrow for Day 2.",
+    "firstSessionDailyCta": "Play today's Daily",
+    "firstSessionComeBack": "Day 1 — come back tomorrow",
     "encouragement": {
       "legendary": "Incredible!",
       "great": "Nice Work!",
