@@ -6298,15 +6298,7 @@ const ru = {
       "rankProgress": "{points} / {next} до ранга {rank}",
       "rankMax": "Максимальный ранг",
       "rankGained": "+{pts} очков ранга за раунд",
-      "rank": {
-        "rookie": "Новичок",
-        "bronze": "Бронза",
-        "silver": "Серебро",
-        "gold": "Золото",
-        "platinum": "Платина",
-        "diamond": "Алмаз",
-        "legend": "Легенда слов"
-      },
+      "rank": {"rookie": "Разогрев", "bronze": "Набирает ход", "silver": "Острый", "gold": "Опасный", "platinum": "Беспощадный", "diamond": "Неприкасаемый", "legend": "Легенда слов"},
       "shareTitle": "Быстрая игра LexiClash",
       "shareText": "Мой результат — {pct}% от идеала на этой доске. Та же доска — ваш ход:"
     },

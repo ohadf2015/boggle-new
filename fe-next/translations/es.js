@@ -9240,15 +9240,7 @@ const es = {
       "rankProgress": "{points} / {next} para {rank}",
       "rankMax": "Rango máximo alcanzado",
       "rankGained": "+{pts} puntos de rango en esta ronda",
-      "rank": {
-        "rookie": "Novato",
-        "bronze": "Bronce",
-        "silver": "Plata",
-        "gold": "Oro",
-        "platinum": "Platino",
-        "diamond": "Diamante",
-        "legend": "Leyenda"
-      },
+      "rank": {"rookie": "Calentando", "bronze": "Cogiendo ritmo", "silver": "Afilado", "gold": "Peligroso", "platinum": "Implacable", "diamond": "Intocable", "legend": "Leyenda"},
       "shareTitle": "Partida rápida de LexiClash",
       "shareText": "Logré el {pct}% del perfecto en este tablero. Mismo tablero, tu turno:"
     },

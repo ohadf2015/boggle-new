@@ -9137,15 +9137,7 @@ const he = {
       "rankProgress": "{points} / {next} עד {rank}",
       "rankMax": "הדרגה הגבוהה ביותר",
       "rankGained": "+{pts} נקודות דרגה בסיבוב הזה",
-      "rank": {
-        "rookie": "טירון",
-        "bronze": "ארד",
-        "silver": "כסף",
-        "gold": "זהב",
-        "platinum": "פלטינה",
-        "diamond": "יהלום",
-        "legend": "אגדת מילים"
-      },
+      "rank": {"rookie": "מתחממים", "bronze": "תופסים קצב", "silver": "חדים", "gold": "מסוכנים", "platinum": "חסרי רחמים", "diamond": "בלתי ניתנים לעצירה", "legend": "אגדת מילים"},
       "shareTitle": "משחק מהיר בלקסיקלאש",
       "shareText": "התוצאה שלי: {pct}% מהמושלם בלוח הזה. אותו לוח, תורכם:"
     },

@@ -7947,7 +7947,7 @@ const en = {
       "rankProgress": "{points} / {next} to {rank}",
       "rankMax": "Top rank reached",
       "rankGained": "+{pts} rank points this round",
-      "rank": {"rookie": "Rookie", "bronze": "Bronze", "silver": "Silver", "gold": "Gold", "platinum": "Platinum", "diamond": "Diamond", "legend": "Word Legend"},
+      "rank": {"rookie": "Warming Up", "bronze": "Getting Wordy", "silver": "Sharp", "gold": "Dangerous", "platinum": "Ruthless", "diamond": "Untouchable", "legend": "Word Legend"},
       "shareTitle": "LexiClash Quick Play",
       "shareText": "I hit {pct}% of perfect on this board. Same board, your turn:"
     },

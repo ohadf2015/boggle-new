@@ -9520,15 +9520,7 @@ const sv = {
       "rankProgress": "{points} / {next} till {rank}",
       "rankMax": "Högsta rangen nådd",
       "rankGained": "+{pts} rangpoäng denna runda",
-      "rank": {
-        "rookie": "Nybörjare",
-        "bronze": "Brons",
-        "silver": "Silver",
-        "gold": "Guld",
-        "platinum": "Platina",
-        "diamond": "Diamant",
-        "legend": "Ordlegend"
-      },
+      "rank": {"rookie": "Värmer upp", "bronze": "Hittar flyt", "silver": "Vass", "gold": "Farlig", "platinum": "Obarmhärtig", "diamond": "Orörbar", "legend": "Ordlegend"},
       "shareTitle": "LexiClash Snabbspel",
       "shareText": "Jag fick {pct}% av perfekt på den här brädan. Samma bräda, din tur:"
     },

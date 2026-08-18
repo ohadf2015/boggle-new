@@ -8569,15 +8569,7 @@ const ja = {
       "rankProgress": "{points} / {next}（{rank}まで）",
       "rankMax": "最高ランク到達",
       "rankGained": "このラウンドで+{pts}ランクポイント",
-      "rank": {
-        "rookie": "ルーキー",
-        "bronze": "ブロンズ",
-        "silver": "シルバー",
-        "gold": "ゴールド",
-        "platinum": "プラチナ",
-        "diamond": "ダイヤ",
-        "legend": "ワードレジェンド"
-      },
+      "rank": {"rookie": "ウォームアップ", "bronze": "調子が出てきた", "silver": "キレキレ", "gold": "危険な男", "platinum": "容赦なし", "diamond": "無敵", "legend": "言葉の伝説"},
       "shareTitle": "LexiClash クイックプレイ",
       "shareText": "このボードでパーフェクトの{pct}%を達成。同じボードで挑戦を:"
     },
