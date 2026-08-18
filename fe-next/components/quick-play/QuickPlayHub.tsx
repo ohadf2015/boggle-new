@@ -19,6 +19,7 @@ import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
+import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
 import { captureError } from '@/utils/sentry';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
@@ -450,6 +451,18 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             name: challenge.challengerName,
             pct: String(challenge.challengerScorePct),
           })}
+        </div>
+      )}
+
+      {/* Board build is a real wait (fetch + a held beat). A dancing mascot is
+          what the rest of the app puts on a loading surface — the static pose +
+          CSS dance, not the heavy animated loop. */}
+      {phase === 'loading' && (
+        <div className="relative z-[2] -mb-2 flex flex-col items-center gap-1" data-testid="quick-loading-mascot">
+          <LoadingDancer styleKey="arcade" className="h-20 w-20 sm:h-24 sm:w-24" />
+          <span className="font-neo-display text-xs tracking-wide text-neo-cream/80">
+            {t('quickPlay.solo.loading')}
+          </span>
         </div>
       )}
 

@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6156,
+    "totalKeysInCode": 6177,
     "keyCountByLanguage": {
-      "en": 11991,
-      "es": 12287,
-      "he": 12192,
-      "ja": 12246,
-      "ru": 12022,
-      "sv": 12242
+      "en": 12024,
+      "es": 12320,
+      "he": 12225,
+      "ja": 12279,
+      "ru": 12054,
+      "sv": 12275
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 315,
+      "templateLiterals": 316,
       "fallbackUsages": 1,
-      "variableKeys": 119
+      "variableKeys": 122
     }
   },
   "runtimeRisks": {
@@ -1332,14 +1332,14 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 189,
+        "line": 191,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}"
       },
       {
         "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 234,
+        "line": 235,
         "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
       },
       {
@@ -1724,43 +1724,57 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 78,
+        "line": 84,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 354,
+        "line": 420,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
       },
       {
-        "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
+        "pattern": "`quickPlay.solo.rank.${rung.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayRankCard.tsx",
-        "line": 32,
-        "context": "{t(`quickPlay.solo.rank.${rankNow.key}`)}"
+        "line": 57,
+        "context": "{t(`quickPlay.solo.rank.${rung.key}`)}"
       },
       {
-        "pattern": "`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`",
+        "pattern": "`quickPlay.solo.rank.${QUICK_RANKS[idx + 1].key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayRankCard.tsx",
-        "line": 39,
-        "context": "rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),"
+        "line": 63,
+        "context": "rank: t(`quickPlay.solo.rank.${QUICK_RANKS[idx + 1].key}`),"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${top.key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayRankCard.tsx",
+        "line": 93,
+        "context": "rank: t(`quickPlay.solo.rank.${top.key}`),"
       },
       {
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 149,
+        "line": 221,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 165,
+        "line": 257,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
+      },
+      {
+        "pattern": "`quickPlay.solo.mode.${mode}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayResults.tsx",
+        "line": 474,
+        "context": "{t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
@@ -1934,14 +1948,14 @@
         "pattern": "`wordcraft.difficulty.${d}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 98,
+        "line": 126,
         "context": "label={t(`wordcraft.difficulty.${d}`)}"
       },
       {
         "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 118,
+        "line": 147,
         "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {
@@ -2043,13 +2057,6 @@
         "context": "{t(`wordTower.error.${lastError}`)}"
       },
       {
-        "pattern": "`wordTower.biome.${r.highestBiome}`",
-        "type": "template_literal",
-        "file": "components/wordTower/WordTowerLeaderboard.tsx",
-        "line": 88,
-        "context": "<span className=\"text-xs opacity-70\">{t(`wordTower.biome.${r.highestBiome}`)}</span>"
-      },
-      {
         "pattern": "`wordTower.surprise.${meta.key}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerNoticeColumn.tsx",
@@ -2067,14 +2074,14 @@
         "pattern": "`wordTower.biome.${biomeId}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 373,
+        "line": 411,
         "context": "setZoneText(t(`wordTower.biome.${biomeId}`));"
       },
       {
         "pattern": "`wordTower.hazard.${hz.kind}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 808,
+        "line": 846,
         "context": "setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }))"
       },
       {
@@ -2566,6 +2573,30 @@
         "context": "{t(subtitleKey)}"
       },
       {
+        "pattern": "t(titleKey)",
+        "variable": "titleKey",
+        "type": "variable_key",
+        "file": "components/auth/InlineSignupCard.tsx",
+        "line": 71,
+        "context": "aria-label={t(titleKey)}"
+      },
+      {
+        "pattern": "t(titleKey)",
+        "variable": "titleKey",
+        "type": "variable_key",
+        "file": "components/auth/InlineSignupCard.tsx",
+        "line": 83,
+        "context": "{t(titleKey)}"
+      },
+      {
+        "pattern": "t(bodyKey)",
+        "variable": "bodyKey",
+        "type": "variable_key",
+        "file": "components/auth/InlineSignupCard.tsx",
+        "line": 87,
+        "context": "{t(bodyKey)}"
+      },
+      {
         "pattern": "t(key)",
         "variable": "key",
         "type": "variable_key",
@@ -2682,7 +2713,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 180,
+        "line": 181,
         "context": "{t(labelKey)}"
       },
       {
@@ -2690,7 +2721,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 215,
+        "line": 216,
         "context": "{t(labelKey)}"
       },
       {
@@ -2994,7 +3025,7 @@
         "variable": "encouragementKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 309,
+        "line": 331,
         "context": "{t(encouragementKey)}"
       },
       {
@@ -3002,7 +3033,7 @@
         "variable": "encouragementKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 313,
+        "line": 335,
         "context": "text={t(encouragementKey)}"
       },
       {
@@ -3010,7 +3041,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 365,
+        "line": 396,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -3507,6 +3538,7 @@
       "education.landing.furtherReading.guides",
       "education.landing.furtherReading.glossary",
       "education.landing.furtherReading.wordSolver",
+      "connections.daily.scoreLabel",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",

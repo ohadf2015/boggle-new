@@ -6,6 +6,7 @@
 import { buildQuickRound, type QuickMode } from './quickPlayRound';
 import { awardCoinsServer } from '../services/economy/awardCoins';
 import { updateRivalScore } from './ghostRivalManager';
+import { savePlayerWord } from './supabase/words';
 import logger from '../utils/logger';
 
 type SupabaseLike = {
@@ -22,6 +23,7 @@ export interface QuickSubmitInput {
   wordsFound: number;
   durationMs: number;
   challengeId?: string;
+  words?: Array<{ word: string; score: number }>;
 }
 
 export interface QuickSubmitOutcome {
@@ -51,7 +53,7 @@ export async function processQuickSubmit(
   db: SupabaseLike,
   input: QuickSubmitInput
 ): Promise<QuickSubmitOutcome> {
-  const { userId, mode, language, seed, score, challengeId } = input;
+  const { userId, mode, language, seed, score, challengeId, words } = input;
 
   const round = await buildQuickRound(mode, language, seed);
   const limit = mode === 'blast' ? round.perfectScore * BLAST_OVERSHOOT_LIMIT : round.perfectScore;
@@ -70,6 +72,25 @@ export async function processQuickSubmit(
     score_pct: scorePct,
   });
   if (insertError) throw new Error(`quick_play_results insert failed: ${insertError.message}`);
+
+  // Save words to player's collection (best-effort, non-blocking)
+  if (words && words.length > 0) {
+    try {
+      for (const w of words) {
+        // ponytail: savePlayerWord is async but we don't await; words save in background
+        savePlayerWord({
+          word: w.word,
+          language,
+          gameCode: `quick-${mode}`,
+          playerId: userId,
+        }).catch(err => {
+          logger.warn('QUICK_PLAY', `Failed to save word "${w.word}" for ${userId}: ${String(err)}`);
+        });
+      }
+    } catch (err) {
+      logger.warn('QUICK_PLAY', `Word collection save failed: ${String(err)}`);
+    }
+  }
 
   const coins = quickPlayCoinsFor(scorePct);
   await awardCoinsServer(userId, coins, 'quick_play_round', { mode, seed, scorePct });

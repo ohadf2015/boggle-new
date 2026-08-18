@@ -7943,6 +7943,7 @@ const en = {
       "dayStreak": "{days}-day streak",
       "rewardsPending": "Sign in to keep them — {coins} coins waiting",
       "pickNextMode": "Next round",
+      "noWords": "No words this time — the next board is 60 seconds away.",
       "rankProgress": "{points} / {next} to {rank}",
       "rankMax": "Top rank reached",
       "rankGained": "+{pts} rank points this round",

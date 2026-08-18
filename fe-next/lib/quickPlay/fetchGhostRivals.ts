@@ -5,7 +5,8 @@
  * config generator never reaches the client bundle.
  */
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { pickGhostRivals, type QuickGhostRival } from './ghostRivals';
+import { pickGhostRivals, GHOST_COUNT, type QuickGhostRival } from './ghostRivals';
+import { computeScoreBands, padRivalsWithSynthetic } from './syntheticRivals';
 
 /** How many recent rows to draw the cohort from. */
 const GHOST_CANDIDATE_LIMIT = 120;
@@ -15,11 +16,15 @@ type GhostDb = {
 };
 
 /**
- * Recent finishers on this mode, named from `public_profiles`.
+ * Recent finishers on this mode, named from `public_profiles`, padded with
+ * synthetic rivals to guarantee GHOST_COUNT total.
+ *
+ * Synthetic rivals anchor to the player's recent level so one is catchable
+ * and one is a stretch, rather than fixed bands that feel canned.
  *
  * Never throws: a ghost fetch that fails must not stop a round from starting.
- * It is reported (silent no-op on error is forbidden here) and the round simply
- * runs without rivals.
+ * It is reported (silent no-op on error is forbidden here) and the round always
+ * returns GHOST_COUNT rivals, synthetic if needed.
  */
 export async function fetchGhostRivals(
   db: GhostDb,
@@ -33,7 +38,14 @@ export async function fetchGhostRivals(
    * right now owns most of them, so post-filtering would spend the whole budget
    * on rows it discards and leave few real rivals. Null/undefined for guests.
    */
-  excludeUserId?: string | null
+  excludeUserId?: string | null,
+  language: string = 'en',
+  /**
+   * Player's trailing average score_pct (0 when unknown, e.g. first round).
+   * Used to anchor synthetic rival bands so one is clearly below, one near,
+   * one clearly above the player's level. Guests included via localStorage.
+   */
+  recentPct: number = 0
 ): Promise<QuickGhostRival[]> {
   try {
     let query = db
@@ -48,13 +60,20 @@ export async function fetchGhostRivals(
     if (error) throw new Error(error.message);
 
     const rows = (data ?? []) as Array<{ user_id: string; score_pct: number | string }>;
-    if (rows.length === 0) return [];
+
+    // Compute score bands from the real data for synthetic rival generation.
+    const bands = computeScoreBands(rows.map((r) => ({ scorePct: Number(r.score_pct) })));
 
     const picked = pickGhostRivals(
       rows.map((r) => ({ userId: r.user_id, name: '', scorePct: Number(r.score_pct) })),
       seed
     );
-    if (picked.length === 0) return [];
+
+    // If we have no real rivals, we still need to return something. Bail early
+    // and let the padding step return pure synthetics.
+    if (picked.length === 0) {
+      return padRivalsWithSynthetic([], GHOST_COUNT, seed, bands, language, recentPct);
+    }
 
     const { data: profiles } = await db
       .from('public_profiles')
@@ -70,7 +89,7 @@ export async function fetchGhostRivals(
       )
     );
 
-    return picked
+    const realRivals = picked
       .map((g): QuickGhostRival | null => {
         const p = byId.get(g.userId);
         if (!p?.username) return null;
@@ -85,8 +104,13 @@ export async function fetchGhostRivals(
         };
       })
       .filter((g): g is QuickGhostRival => g !== null);
+
+    // Pad with synthetic rivals to guarantee GHOST_COUNT total.
+    return padRivalsWithSynthetic(realRivals, GHOST_COUNT, seed, bands, language, recentPct);
   } catch (err) {
     onError?.(err instanceof Error ? err : new Error(String(err)));
-    return [];
+    // Even on error, return synthetic rivals so the round never fails.
+    const fallbackBands = computeScoreBands([]);
+    return padRivalsWithSynthetic([], GHOST_COUNT, seed, fallbackBands, language, recentPct);
   }
 }

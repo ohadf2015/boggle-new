@@ -77,6 +77,9 @@ interface QuickPlayResultsProps {
  * results deliberately dropped the overlay fanfare as "too distracting" (see
  * DailyWordHuntResults.mascot.test) and the same objection applies here.
  */
+/** The idle/reaction mascot (GIF set) — used for the scoreless round. */
+const InteractiveMascot = dynamic(() => import('@/components/ui/InteractiveMascot'), { ssr: false });
+
 const MascotCelebrationVideo = dynamic(
   () => import('@/components/mascot/MascotCelebrationVideo').then((m) => m.MascotCelebrationVideo),
   { ssr: false }
@@ -411,7 +414,21 @@ export function QuickPlayResults({
         />
       )}
 
-      <QuickWordsCollected words={collected} collectionTotal={collectionTotal} />
+      {collected.length > 0 ? (
+        <QuickWordsCollected words={collected} collectionTotal={collectionTotal} />
+      ) : (
+        /* A scoreless round used to leave this whole column empty — the screen
+           that has to sell one more round showing nothing at all. */
+        <div
+          className="flex items-center gap-3 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard"
+          data-testid="quick-no-words"
+        >
+          <InteractiveMascot variant="encouraging" sizeClassName="w-16 h-16 shrink-0" animated={false} />
+          <p className="font-neo-display text-sm text-neo-cream">
+            {t('quickPlay.solo.noWords', 'No words this time — the next board is 60 seconds away.')}
+          </p>
+        </div>
+      )}
 
       {/* Leaderboard: collapsed to one summary line by default — tap to expand. */}
       {board.length > 0 && (

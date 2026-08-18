@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     const mode = body?.mode as QuickMode;
     const language = typeof body?.language === 'string' && LANGUAGES.includes(body.language) ? body.language : 'en';
     const seed = typeof body?.seed === 'string' && body.seed.length <= 64 ? body.seed : undefined;
+    const recentPct = typeof body?.recentPct === 'number' ? Math.max(0, Math.min(100, body.recentPct)) : 0;
 
     if (!MODES.includes(mode)) {
       return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
@@ -50,7 +51,9 @@ export async function POST(request: NextRequest) {
       mode,
       round.seed,
       (err) => captureApiError(err, 'quick-play-round-ghosts'),
-      selfUserId
+      selfUserId,
+      language,
+      recentPct
     );
     const totalWords = round.words.length;
     return NextResponse.json({
