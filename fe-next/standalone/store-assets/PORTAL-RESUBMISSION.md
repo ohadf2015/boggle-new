@@ -57,6 +57,12 @@ v1 art is usable there if preferred — but consistent new art is recommended.)
 Both show real gameplay with accepted words, score and combo climbing. Portrait video opens
 on the menu (≈1.5 s) then plays — close enough to the "cover as opening frame" guideline.
 
+Regenerate either one with `node scripts/record-preview.mjs landscape|portrait|both` (after
+`npm run build`): it serves `dist/`, finds real traceable words by DFS against the bundle's own
+`en.dict.gz` so every submission is accepted, records the tab and remuxes to H.264 with no audio at
+the exact portal size. Both files are now committed — `**/*.mp4` in .gitignore is what lost the
+2026-08-10 pair, and `!fe-next/standalone/store-assets/*.mp4` now exempts them.
+
 ## 4. Screenshots (Poki / store page)
 
 shot-1-menu-1366x768.png, shot-2-gameplay-trace-1366x768.png,

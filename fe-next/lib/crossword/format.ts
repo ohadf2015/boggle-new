@@ -44,13 +44,29 @@ export function isNewspaperScale(slotCount: number): boolean {
 
 const FORMAT_KEY = 'lexiclash:crossword:format';
 
+/**
+ * What a player who has never touched the toggle gets. The full board IS the mode ("a real
+ * crossword"), so wherever the clue bank can fill one it opens by default — a first-time visitor
+ * landing on a 5×5 reads the whole feature as a mini and never finds the toggle. Locales without
+ * a full-capable bank still open on their mini.
+ *
+ * Deterministic from the locale alone (no storage, no window), so it is safe as SSR initial state.
+ */
+export function defaultFormat(locale: PuzzleLocale): CrosswordFormat {
+  return supportsFull(locale) ? 'full' : 'mini';
+}
+
 export function loadFormat(locale: PuzzleLocale): CrosswordFormat {
-  if (typeof window === 'undefined') return 'mini';
+  if (typeof window === 'undefined') return defaultFormat(locale);
   try {
     const raw = window.localStorage.getItem(FORMAT_KEY);
-    return raw === 'full' && supportsFull(locale) ? 'full' : 'mini';
+    // An explicit past choice wins — including a deliberate "mini". Only an absent/garbage value
+    // falls through to the default, so flipping the default can't override a player's pick.
+    if (raw === 'full') return supportsFull(locale) ? 'full' : 'mini';
+    if (raw === 'mini') return 'mini';
+    return defaultFormat(locale);
   } catch {
-    return 'mini';
+    return defaultFormat(locale);
   }
 }
 

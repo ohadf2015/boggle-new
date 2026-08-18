@@ -40,6 +40,8 @@ coverage/
 **/*.mov
 !fe-next/public/**/*.webm
 !fe-next/public/**/*.mp4
+# portal preview clips are DELIVERABLES, not build noise — the last pair was lost to this ignore rule
+!fe-next/standalone/store-assets/*.mp4
 /test-screenshots
 /screenshots
 fe-next/app-debug.apk
