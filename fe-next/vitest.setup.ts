@@ -452,8 +452,12 @@ afterEach(() => {
   localStorageMock.getItem.mockClear();
   localStorageMock.setItem.mockClear();
 
-  // Clear sessionStorage backing store between tests to prevent state bleed
+  // Clear both storage backing stores between tests to prevent state bleed.
+  // localStorage used to be left alone — only its spies were cleared — so any
+  // key a component persists (ad cadence counters, one-shot prompt markers)
+  // leaked into every later case in the same file.
   Object.keys(sessionStorageStore).forEach(k => delete sessionStorageStore[k]);
+  Object.keys(localStorageStore).forEach(k => delete localStorageStore[k]);
 
   mockSocket.on.mockClear();
   mockSocket.off.mockClear();

@@ -51,9 +51,6 @@ describe('AdMobProvider', () => {
     vi.clearAllMocks();
     social.tier = 'unknown';
     social.authResolved = true;
-    // The game-end counter is persisted now (lc_total_game_ends), so it would
-    // otherwise leak across cases in this file.
-    localStorage.clear();
   });
 
   it('does not initialize AdMob on web', async () => {
