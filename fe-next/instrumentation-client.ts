@@ -25,14 +25,14 @@ if (typeof window !== "undefined") {
 }
 
 // Required for Sentry to instrument navigations in Next.js 16+.
-// Stays sync per the Next convention: a no-op until the SDK has loaded
-// (navigation spans before idle-init are dropped — acceptable at
-// tracesSampleRate 0.1; error capture is unaffected).
+// Client tracing is tree-shaken out of the bundle (removeTracing in
+// next.config.mjs), so the export may be undefined — optional-call it.
+// Error capture is unaffected.
 export function onRouterTransitionStart(
   href: string,
   navigationType: "push" | "replace" | "traverse"
 ) {
-  getLoadedSentry()?.captureRouterTransitionStart(href, navigationType);
+  getLoadedSentry()?.captureRouterTransitionStart?.(href, navigationType);
 }
 
 // Hydration errors (#418/#423) are minified in production with no detail.

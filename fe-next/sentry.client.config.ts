@@ -12,7 +12,13 @@ Sentry.init({
   environment,
 
   sampleRate: 1.0,
-  tracesSampleRate: isProduction ? 0.1 : 1.0,
+  // Client perf tracing is OFF (2026-08-19): browserTracingIntegration with
+  // enableLongTask was the single largest main-thread cost on the landing
+  // page — the SDK chunk attributed 8.7-12s of work under Lighthouse 4x
+  // throttle because it processed every long task of the initial load burst.
+  // Errors are unaffected (GlobalHandlers). webpack.treeshake.removeTracing
+  // in next.config.mjs strips the tracing code from the bundle entirely.
+  tracesSampleRate: 0,
 
   release: process.env.NEXT_PUBLIC_SENTRY_RELEASE || process.env.VERCEL_GIT_COMMIT_SHA || undefined,
 
@@ -379,13 +385,6 @@ Sentry.init({
     /^safari-extension:\/\//i,
     /webkit-masked-url/i,
     /^resource:\/\//i,
-  ],
-
-  integrations: [
-    Sentry.browserTracingIntegration({
-      enableInp: true,
-      enableLongTask: true,
-    }),
   ],
 
   initialScope: {
