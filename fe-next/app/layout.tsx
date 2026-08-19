@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import Script from 'next/script';
 import { LazyMotionRoot } from './LazyMotionRoot';
 import { getAdSenseAccountMeta } from '@/lib/ads/adSensePolicy';
 
@@ -120,5 +121,11 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps): ReactNode {
-    return <LazyMotionRoot>{children}</LazyMotionRoot>;
+    return (
+        <>
+            <Script src="https://growthradar.app/gr.js" data-key="grw_fb2d7c376b18ced8cfb4742219d40ffa" strategy="afterInteractive" />
+            <Script src="https://growthradar.app/gr-extended.js" strategy="afterInteractive" />
+            <LazyMotionRoot>{children}</LazyMotionRoot>
+        </>
+    );
 }
