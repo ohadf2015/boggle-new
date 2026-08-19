@@ -529,7 +529,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const scheduleIdle = () => {
-      timeoutId = setTimeout(doPreload, 12000);
+      timeoutId = setTimeout(doPreload, 30000);
     };
 
     // Wait for full page load before scheduling the idle preload
