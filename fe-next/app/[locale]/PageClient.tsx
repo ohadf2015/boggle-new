@@ -16,7 +16,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 // Denylist: allow only Latin/accented/Hebrew/Hiragana/Katakana + space/apostrophe/hyphen
-const HOST_NAME_ALLOWED = /[^A-Za-z0-9 '\-À-ɏ֐-׿぀-ヿ]/g;
+const HOST_NAME_ALLOWED = /[^A-Za-z0-9 '\\-À-ɏ֐-׿぀-ヿ]/g;
 
 const sanitizeHostName = (raw: string): string => {
   if (!raw) return '';
@@ -64,8 +64,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // the friends activity feed) and drop straight into the MP lobby. New users
   // still flow through FTUE — `useInviteOnboardingMode` consumes the invite
   // from sessionStorage and routes after profile completion.
-  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null; qrRedirectUrl: string | null }>(() => {
-    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null, qrRedirectUrl: null };
+  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null; qrRedirectUrl: string | null; wordWheelRedirectUrl: string | null }>(() => {
+    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null, qrRedirectUrl: null, wordWheelRedirectUrl: null };
     const returning = hasCompletedOnboarding() || hasSupabaseSession();
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
@@ -81,14 +81,13 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         isFirstTimeUser: !returning,
       });
       if (returning) {
-        const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+        const localeMatch = window.location.pathname.match(/^\\/([a-z]{2})(\\/|$)/);
         const locale = localeMatch?.[1] || 'en';
         const redirectParams = new URLSearchParams({ room: roomCode });
         if (hostName) redirectParams.set('host', hostName);
         inviteRedirectUrl = `/${locale}/multiplayer?${redirectParams.toString()}`;
       }
     }
-
     // Printed QR / barcode landing (`?utm_source=barcode`) → warp straight to the
     // daily challenge with a witty "you scanned in" welcome. A live room invite
     // always wins (a QR could also be an invite poster), so only route to /daily
@@ -97,14 +96,21 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     // the admin dashboard even though we navigate away from the landing URL.
     let qrRedirectUrl: string | null = null;
     if (!roomCode && isQrScanArrival()) {
-      const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+      const localeMatch = window.location.pathname.match(/^\\/([a-z]{2})(\\/|$)/);
       const locale = localeMatch?.[1] || 'en';
       qrRedirectUrl = `/${locale}/daily?from=qr`;
     }
-
-    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode: roomCode, qrRedirectUrl };
+    // For returning visitors (completed onboarding or have Supabase session) with no invite or QR,
+    // auto-start today's daily word wheel.
+    let wordWheelRedirectUrl: string | null = null;
+    if (returning && !inviteRedirectUrl && !qrRedirectUrl) {
+      const localeMatch = window.location.pathname.match(/^\\/([a-z]{2})(\\/|$)/);
+      const locale = localeMatch?.[1] || 'en';
+      wordWheelRedirectUrl = `/${locale}/daily/word-wheel`;
+    }
+    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode, qrRedirectUrl, wordWheelRedirectUrl };
   });
-  const { isNewUser, inviteRedirectUrl, inviteRoomCode, qrRedirectUrl } = initialState;
+  const { isNewUser, inviteRedirectUrl, inviteRoomCode, qrRedirectUrl, wordWheelRedirectUrl } = initialState;
 
   const { variant: clarityVariant, trackExposure: trackClarityExposure } = useExperiment('exp-invite-arrival-clarity-v1');
   const { t } = useLanguage();
@@ -182,6 +188,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       trackGrowthEvent('return_visit', {});
     }
   }, [mounted, inviteRedirectUrl, qrRedirectUrl, isNewUser]);
+
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the
@@ -219,6 +226,14 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     }
   }, [qrRedirectUrl, router]);
 
+  // Auto-start daily word wheel for returning visitors with no invite or QR.
+  useEffect(() => {
+    if (wordWheelRedirectUrl) {
+      trackGrowthEvent('auto_start_word_wheel', {});
+      router.replace(wordWheelRedirectUrl);
+    }
+  }, [wordWheelRedirectUrl, router, trackGrowthEvent]);
+
   if (mounted && inviteRedirectUrl) {
     if (clarityVariant === 'status-card') {
       return (
@@ -251,6 +266,18 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-4 border-neo-cyan border-t-transparent animate-spin" />
           <span className="font-neo-body text-neo-cream text-sm">{t('daily.qrWelcome.warping')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Auto-start word wheel redirect
+  if (mounted && wordWheelRedirectUrl) {
+    return (
+      <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
+          <span className="font-neo-body text-neo-cream text-sm">{t('joinView.connectingToRoom')}</span>
         </div>
       </div>
     );
