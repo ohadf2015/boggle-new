@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/multiplayer-word-game-online`;
 
   return {
-    title: 'Multiplayer Word Game Online — Free Scrabble-Alternative, 2-20 Players | LexiClash',
-    description: 'Free Scrabble-alternative multiplayer word game online — everyone plays the same grid at once, not turn-based. Create a room, share a link, compete with 2-20+ friends. No download, no signup.',
+    title: 'Scrabble Online Free — Multiplayer Word Game | LexiClash',
+    description: 'Free multiplayer word game online — no signup, no download. Everyone plays the same grid at once. Create a room, invite 2–20+ friends. Start now →',
     keywords: 'multiplayer word game, word games multiplayer, word game online free, multiplayer word game online, scrabble alternative online, scrabble online multiplayer, online scrabble alternative free, online multiplayer word games like hanging with friends, word game with friends, free word games, online word battles, word games multiplayer online free, word battle game, word game for groups, word games for parties, competitive word game, word race online, real-time word battle, word games live with people, online multiplayer word find, word multiplayer',
     openGraph: {
       title: 'Free Multiplayer Word Game Online With Friends | LexiClash',
