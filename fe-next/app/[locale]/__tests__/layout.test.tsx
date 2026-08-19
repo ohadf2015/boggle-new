@@ -99,6 +99,9 @@ vi.mock('../../fonts', () => ({
     fredokaHebrew: { variable: 'fredoka-hebrew-var' },
     rubikLatin: { variable: 'rubik-latin-var' },
     rubikHebrew: { variable: 'rubik-hebrew-var' },
+    heeboHebrew: { variable: 'heebo-hebrew-var' },
+    fredokaCyrillic: { variable: 'fredoka-cyrillic-var' },
+    rubikCyrillic: { variable: 'rubik-cyrillic-var' },
 }));
 
 describe('LocaleLayout Hydration', () => {
@@ -124,14 +127,9 @@ describe('LocaleLayout Hydration', () => {
         // Check for skip link text which should always be present
         expect(container.textContent).toContain('Skip to main content');
 
-        // AdSense script must NOT load on localhost/dev/native WebView.
-        // GoogleAdSense.tsx gates itself on hostname + NODE_ENV + Capacitor, so
-        // under vitest (jsdom, localhost, NODE_ENV=test) no <script> should emit.
-        const scripts = document.querySelectorAll('script');
-        const adsenseScript = Array.from(scripts).find(s =>
-            s.getAttribute('src')?.includes('adsbygoogle.js')
-        );
-        expect(adsenseScript).toBeUndefined();
+        // No ad UNITS (manual <ins class="adsbygoogle"> placements) before approval.
+        const adUnits = document.querySelectorAll('ins.adsbygoogle');
+        expect(adUnits.length).toBe(0);
 
         // Check for hydration errors
         const hydrationErrors = consoleError.mock.calls.filter(call =>
@@ -164,5 +162,60 @@ describe('generateMetadata App Links (al:android)', () => {
         const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'he' }) } as Parameters<typeof generateMetadata>[0]);
 
         expect(metadata.other?.['al:android:url']).toBe('https://www.lexiclash.live/he');
+    });
+});
+
+describe('AdSense SSR loader (pre-approval verification + Funding Choices CMP)', () => {
+    // Walk the layout's returned element tree (not the DOM): React 19 hoists
+    // <script async src> into the real document.head exactly once per document
+    // per test process, which makes DOM-level assertions order-dependent.
+    type AnyElement = { type?: unknown; props?: Record<string, unknown> } | null | undefined;
+    function findAdsenseScript(node: unknown): { props: Record<string, unknown> } | null {
+        if (node == null || typeof node !== 'object') return null;
+        if (Array.isArray(node)) {
+            for (const child of node) {
+                const found = findAdsenseScript(child);
+                if (found) return found;
+            }
+            return null;
+        }
+        const el = node as AnyElement;
+        if (el?.type === 'script' && el.props?.id === 'adsbygoogle-init') {
+            return el as { props: Record<string, unknown> };
+        }
+        if (el?.props && typeof el.props === 'object' && 'children' in el.props) {
+            return findAdsenseScript(el.props.children);
+        }
+        return null;
+    }
+
+    it('renders the async adsbygoogle.js loader in <head> for every locale', async () => {
+        const LocaleLayout = (await import('../layout')).default;
+
+        for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+            const tree = await LocaleLayout({
+                children: <div>content</div>,
+                params: Promise.resolve({ locale }),
+            });
+
+            const script = findAdsenseScript(tree);
+            expect(script, `missing loader for locale ${locale}`).not.toBeNull();
+            expect(script!.props.src).toBe(
+                'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880'
+            );
+            expect(script!.props.async).toBe(true);
+            expect(script!.props.crossOrigin).toBe('anonymous');
+        }
+    });
+
+    it('is the only adsbygoogle.js source in the tree (no duplicate injection)', async () => {
+        const LocaleLayout = (await import('../layout')).default;
+        const tree = await LocaleLayout({
+            children: <div>content</div>,
+            params: Promise.resolve({ locale: 'en' }),
+        });
+        const html = JSON.stringify(tree);
+        const occurrences = html.split('adsbygoogle.js').length - 1;
+        expect(occurrences).toBe(1);
     });
 });
