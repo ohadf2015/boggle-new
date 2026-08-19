@@ -161,8 +161,8 @@ describe('InteractiveMascot - Lazy Loading', () => {
       expect(screen.getByTestId('interactive-mascot')).toBeInTheDocument();
     });
 
-    // Preloading is deferred via requestIdleCallback/setTimeout — advance timers
-    vi.advanceTimersByTime(5000);
+    // Preloading is deferred via a 12s post-load setTimeout — advance timers
+    vi.advanceTimersByTime(13000);
     await waitFor(() => {
       // Lazy preload: only hover (gaming) and click (celebration) variants should be preloaded
       expect(mockImageConstructorCalls.length).toBeGreaterThan(0);
