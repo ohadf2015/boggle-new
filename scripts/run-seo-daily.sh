@@ -1,7 +1,7 @@
 #!/bin/bash
 # Daily SEO Auto-Ship
 # Pulls GSC + Bing data, edits closest landing pages or ships a new one,
-# runs lint/test/build, pushes master directly (no branches per project pref).
+# runs lint/test/build, and ships a dated PR from a branch reset to origin/master.
 #
 # Usage:  ./scripts/run-seo-daily.sh
 # Cron:   loaded via ~/Library/LaunchAgents/com.claude.seo-daily.plist (optional)
@@ -9,6 +9,7 @@
 # Hard stops:
 #  - dirty git tree
 #  - missing GSC or Bing creds
+#  - unable to close superseded seo/daily PRs
 #  - >8 files changed (sanity cap)
 #  - lint/test/build fails after 2 fix attempts
 #  - self-audit flags fabricated content
@@ -20,6 +21,9 @@ LOG_DIR="$HOME/logs/claude-seo"
 DATE_TAG="$(date +%Y%m%d-%H%M%S)"
 LOG_FILE="$LOG_DIR/seo-daily-$DATE_TAG.log"
 TODAY="$(date +%Y-%m-%d)"
+BASE_BRANCH="master"
+BRANCH="seo/daily-$TODAY"
+PR_PREFIX="seo/daily-"
 
 GSC_SITE="${GSC_SITE:-sc-domain:lexiclash.com}"
 BING_SITE="${BING_SITE:-https://lexiclash.com/}"
@@ -27,6 +31,79 @@ BING_SITE="${BING_SITE:-https://lexiclash.com/}"
 mkdir -p "$LOG_DIR"
 
 log() { echo "$@" | tee -a "$LOG_FILE"; }
+
+close_superseded_prs() {
+  local keep_branch="$1"
+  local prs pr stale_branch
+
+  if ! command -v gh >/dev/null 2>&1; then
+    log "ERROR: gh CLI is required to close superseded ${PR_PREFIX}* PRs"
+    return 1
+  fi
+
+  if ! prs="$(gh pr list --state open --limit 100 --json number,headRefName \
+    --jq '.[] | select(.headRefName | startswith("'"$PR_PREFIX"'")) | select(.headRefName != "'"$keep_branch"'") | [.number, .headRefName] | @tsv')"; then
+    log "ERROR: unable to list open ${PR_PREFIX}* PRs"
+    return 1
+  fi
+
+  if [ -z "$prs" ]; then
+    log "No superseded ${PR_PREFIX}* PRs open"
+    return 0
+  fi
+
+  while IFS=$'\t' read -r pr stale_branch; do
+    [ -n "$pr" ] || continue
+    log "Closing superseded SEO PR #$pr ($stale_branch)"
+    if ! gh pr close "$pr" --comment "Superseded by \`$keep_branch\` — closing this stale SEO PR so only the fresh origin/$BASE_BRANCH-based run stays open."; then
+      log "ERROR: failed to close superseded SEO PR #$pr"
+      return 1
+    fi
+  done <<< "$prs"
+}
+
+sync_current_pr_branch() {
+  local ahead
+
+  ahead="$(git rev-list --count "origin/$BASE_BRANCH..$BRANCH")"
+  if [ "$ahead" = "0" ]; then
+    log "No commits on $BRANCH — empty night, no PR to sync"
+    return 0
+  fi
+
+  log "Syncing $BRANCH onto latest origin/$BASE_BRANCH..."
+  git fetch origin "$BASE_BRANCH" 2>&1 | tee -a "$LOG_FILE" || return 1
+
+  if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+    git fetch origin "$BRANCH" 2>&1 | tee -a "$LOG_FILE" || return 1
+    if ! git merge-base --is-ancestor "$BRANCH" "origin/$BRANCH"; then
+      git push origin "$BRANCH" 2>&1 | tee -a "$LOG_FILE" || return 1
+    fi
+  else
+    git push -u origin "$BRANCH" 2>&1 | tee -a "$LOG_FILE" || return 1
+  fi
+
+  git fetch origin "$BASE_BRANCH" "$BRANCH" 2>&1 | tee -a "$LOG_FILE" || return 1
+  git checkout -q -B "$BRANCH" "origin/$BRANCH" || return 1
+  if ! git rebase "origin/$BASE_BRANCH" 2>&1 | tee -a "$LOG_FILE"; then
+    git rebase --abort >/dev/null 2>&1 || true
+    log "ERROR: rebase of $BRANCH onto origin/$BASE_BRANCH conflicted"
+    return 1
+  fi
+
+  if ! git diff --quiet "origin/$BRANCH" "$BRANCH"; then
+    git push --force-with-lease origin "$BRANCH" 2>&1 | tee -a "$LOG_FILE" || return 1
+  fi
+
+  if ! gh pr view "$BRANCH" >/dev/null 2>&1; then
+    gh pr create \
+      --base "$BASE_BRANCH" \
+      --head "$BRANCH" \
+      --title "seo: daily landing improvements $TODAY" \
+      --body "Automated daily SEO improvements for $TODAY. See the branch commits for exact changes and validation notes." \
+      2>&1 | tee -a "$LOG_FILE" || return 1
+  fi
+}
 
 log "========================================"
 log "SEO Daily Auto-Ship :: $(date)"
@@ -50,18 +127,24 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   exit 1
 fi
 
-CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$CURRENT_BRANCH" != "master" ]; then
-  log "ERROR: not on master (on $CURRENT_BRANCH). Project pref = direct master."
-  exit 1
-fi
-
-log "Fetching latest master..."
-git fetch origin master 2>&1 | tee -a "$LOG_FILE"
-git pull --ff-only origin master 2>&1 | tee -a "$LOG_FILE" || {
-  log "ERROR: ff-only pull failed. Resolve divergence manually."
+log "Fetching latest origin/$BASE_BRANCH and resetting $BRANCH..."
+git fetch origin "$BASE_BRANCH" 2>&1 | tee -a "$LOG_FILE" || {
+  log "ERROR: git fetch origin $BASE_BRANCH failed"
   exit 1
 }
+
+# Always start today's work branch from the freshest protected base. This is the
+# invariant that prevents a new seo/daily PR from being opened on stale master.
+git checkout -q -B "$BRANCH" "origin/$BASE_BRANCH" || {
+  log "ERROR: unable to reset $BRANCH onto origin/$BASE_BRANCH"
+  exit 1
+}
+log "Work branch $BRANCH reset to origin/$BASE_BRANCH"
+
+if ! close_superseded_prs "$BRANCH"; then
+  log "ERROR: refusing to run while superseded SEO PRs may still be open"
+  exit 1
+fi
 
 PROMPT_FILE="$(mktemp -t seo-daily-prompt.XXXXXX)"
 trap 'rm -f "$PROMPT_FILE"' EXIT
@@ -69,6 +152,7 @@ trap 'rm -f "$PROMPT_FILE"' EXIT
 cat > "$PROMPT_FILE" <<'PROMPT_EOF'
 You are running the daily SEO auto-ship loop for LexiClash. Today: __TODAY__.
 Working dir: /Users/ohadfisher/git/boggle-new. Stay terse, act fast.
+Current branch: `seo/daily-__TODAY__`, already reset to `origin/master` by the wrapper. Stay on this branch.
 
 ═══ STEP 1 — Pull data ═══
 Invoke the `seo-daily` skill with these inputs:
@@ -76,7 +160,7 @@ Invoke the `seo-daily` skill with these inputs:
   --bing-site https://lexiclash.com/
   --repo /Users/ohadfisher/git/boggle-new
   --days 28
-  --no-pr            (CRITICAL: project disallows branches; we ship to master directly)
+  --no-pr            (report only; the wrapper manages the dated PR branch)
 
 This writes docs/seo-daily/__TODAY__.md. Read it.
 
@@ -131,7 +215,7 @@ npm run build
 
 If any fails: read the error, fix root cause, retry ONCE. Still failing → HARD STOP, write `docs/seo-daily/__TODAY__-FAILED.md` with the error, do not commit, exit non-zero.
 
-═══ STEP 7 — Sanity cap + commit + push ═══
+═══ STEP 7 — Sanity cap + commit + push PR branch ═══
 Run `git diff --stat` and count touched files. If >8 files → HARD STOP (probably ran wild). Print the diff stat and exit without committing.
 
 Otherwise (only files you intentionally changed; never `git add -A`):
@@ -146,18 +230,26 @@ Otherwise (only files you intentionally changed; never `git add -A`):
   (only list locales actually touched)
 
   Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
-  git push origin master
+  git push -u origin seo/daily-__TODAY__
+
+Open a ready PR if one does not already exist:
+  gh pr create --base master --head seo/daily-__TODAY__ \
+    --title "seo: daily landing improvements __TODAY__" \
+    --body "Automated daily SEO improvements for __TODAY__. See commit body for query-level rationale and validation notes."
+
+Do NOT push to master and do NOT merge the PR. The wrapper rebases the branch onto latest origin/master and closes superseded seo/daily PRs.
 
 ═══ STEP 8 — Summary ═══
 Final stdout (concise):
   • Report path: docs/seo-daily/__TODAY__.md
   • Files changed: <count>
-  • Commit pushed: <sha or "none">
+  • Commit pushed: <sha or "none"> on `seo/daily-__TODAY__`
+  • PR: <url or "existing PR">
   • Top 3 changes with expected CTR/rank uplift
   • Locales needing native review
 
 ═══ NON-NEGOTIABLES ═══
-  • NO branches — direct master.
+  • Stay on `seo/daily-__TODAY__`; never switch to or push master.
   • NO test mocking, lint suppression, or `--no-verify`.
   • NO new files outside the approved landing page + its translation entries.
   • NO fabricated features, stats, modes, or testimonials.
@@ -181,12 +273,30 @@ log "----------------------------------------"
 log "Completed: $(date) | exit=$EXIT_CODE"
 log "----------------------------------------"
 
-LOCAL_SHA="$(git rev-parse master)"
-REMOTE_SHA="$(git ls-remote origin master | awk '{print $1}')"
-if [ "$LOCAL_SHA" = "$REMOTE_SHA" ]; then
-  log "Master local==remote @ $LOCAL_SHA"
+if [ "$EXIT_CODE" -eq 0 ]; then
+  if ! sync_current_pr_branch; then
+    log "ERROR: unable to sync today's SEO PR branch onto origin/$BASE_BRANCH"
+    EXIT_CODE=1
+  fi
+  if ! close_superseded_prs "$BRANCH"; then
+    log "ERROR: unable to close superseded SEO PRs after today's run"
+    EXIT_CODE=1
+  fi
 else
-  log "WARN: local=$LOCAL_SHA remote=$REMOTE_SHA — push may have failed"
+  log "Skipping PR branch sync because Claude exited non-zero"
+fi
+
+# Leave the shared checkout on the protected base, never on the dated PR branch.
+git fetch origin "$BASE_BRANCH" 2>&1 | tee -a "$LOG_FILE" || true
+git checkout -q "$BASE_BRANCH" 2>/dev/null || true
+git reset --hard "origin/$BASE_BRANCH" 2>&1 | tee -a "$LOG_FILE" || true
+
+LOCAL_SHA="$(git rev-parse "$BASE_BRANCH")"
+REMOTE_SHA="$(git ls-remote origin "$BASE_BRANCH" | awk '{print $1}')"
+if [ "$LOCAL_SHA" = "$REMOTE_SHA" ]; then
+  log "Base branch local==remote @ $LOCAL_SHA"
+else
+  log "WARN: base local=$LOCAL_SHA remote=$REMOTE_SHA — checkout restore may have failed"
 fi
 
 ls -t "$LOG_DIR"/seo-daily-*.log 2>/dev/null | tail -n +31 | xargs -r rm
