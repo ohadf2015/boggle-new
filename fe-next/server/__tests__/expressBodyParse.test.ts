@@ -27,6 +27,19 @@ describe('shouldExpressParseJsonBody — teacher-access Next.js routes', () => {
 });
 
 /**
+ * Regression: POST /api/presence/heartbeat is a pure Express route (mounted in
+ * server/index.ts) whose handler 400s with "sessionId required" when req.body is
+ * empty. /api/presence was never added to EXPRESS_API_ROUTES, so Express skipped
+ * body parsing and EVERY heartbeat 400'd in production — 400s on a clean profile,
+ * confirmed by curl against prod. It has no Next counterpart, so pre-parsing is safe.
+ */
+describe('shouldExpressParseJsonBody — presence heartbeat', () => {
+  it('pre-parses the presence heartbeat body', () => {
+    expect(shouldExpressParseJsonBody('/api/presence/heartbeat')).toBe(true);
+  });
+});
+
+/**
  * Regression: POST /api/admin/connections-puzzles/reviews is a Next.js App
  * Router route (bulk-upsert connection-puzzle verdicts) with NO Express
  * counterpart. It reads its body via `await request.json()`. Express pre-parsing

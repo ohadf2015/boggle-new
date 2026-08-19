@@ -165,7 +165,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
             data-testid="quick-start-avatar"
             onClick={() => setIsBuilderOpen(true)}
             aria-label={t('onboarding.ftue.editAvatar', 'Customize avatar')}
-            className="relative shrink-0"
+            className="relative shrink-0 transition-transform active:scale-95"
           >
             <div className="h-16 w-16 overflow-hidden rounded-full border-3 border-neo-black bg-neo-white shadow-hard-sm">
               <Avatar customAvatar={avatar} size="lg" />
@@ -203,7 +203,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
             data-testid="quick-start-shuffle"
             onClick={handleShuffle}
             aria-label={t('onboarding.ftue.randomize', 'Randomize')}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white shadow-hard-sm transition-colors hover:bg-neo-yellow"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white shadow-hard-sm transition-all hover:bg-neo-yellow active:bg-neo-yellow active:shadow-hard-pressed"
           >
             <Shuffle className="h-5 w-5 text-neo-black" />
           </button>
@@ -253,7 +253,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
             type="button"
             data-testid="quick-start-how-to-play"
             onClick={onHowToPlay}
-            className="min-h-[44px] px-2 text-neo-black/70 underline underline-offset-2 transition-colors hover:text-neo-black"
+            className="min-h-[44px] px-2 text-neo-black/70 underline underline-offset-2 transition-colors hover:text-neo-black active:text-neo-black"
           >
             {t('onboarding.quickStart.howToPlay')}
           </button>

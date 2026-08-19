@@ -168,13 +168,12 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       // Per-language leaderboard: each language plays a DIFFERENT board, so players are
       // only ranked against — and only see the words of — others who played the same
       // language. The view's rank_position counts guests + replays, so we re-sort and
-      // renumber below.
+      // renumber below. Include both authenticated players and guests.
       const { data, error } = await supabase
         .from('daily_puzzle_leaderboard')
         .select('*')
         .eq('puzzle_date', date)
         .eq('language', language)
-        .not('player_id', 'is', null)
         .order('score', { ascending: false, nullsFirst: false })
         .order('word_count', { ascending: false, nullsFirst: false })
         .order('time_seconds', { ascending: true, nullsFirst: false })

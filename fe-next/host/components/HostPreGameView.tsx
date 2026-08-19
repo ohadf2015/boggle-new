@@ -224,6 +224,7 @@ function HostPreGameView({
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
+  const [startGameInFlight, setStartGameInFlight] = useState(false);
   // Source of truth for the host's intent is `hostSelectedGameMode` (preserved across
   // rounds). `gameMode` holds the resolved mode during gameplay and isn't a reliable
   // signal of intent post-round (a "random" pick gets replaced with the rolled value).
@@ -325,7 +326,9 @@ function HostPreGameView({
   // confirm dialog (Invite Friends vs Play with bots — see handleStartClick).
   // Only a missing timer / tournament-in-flight blocks it — never "no players
   // yet", which trapped new hosts behind a 40s wait.
-  const isStartDisabled = !timerValue || tournamentCreating || anyAdActive;
+  // startGameInFlight ensures the button shows disabled state while the emit completes,
+  // preventing the rage-click issue where players hammer an unresponsive-looking button.
+  const isStartDisabled = !timerValue || tournamentCreating || anyAdActive || startGameInFlight;
 
   // Auto-fill bots countdown
   const [botCountdown, setBotCountdown] = useState<number | null>(null);
@@ -384,6 +387,15 @@ function HostPreGameView({
   useEffect(() => () => {
     if (postFillStartRef.current) clearTimeout(postFillStartRef.current);
   }, []);
+
+  // Clear the in-flight state when the game transitions away from waiting.
+  // This ensures the Start button re-enables as soon as the game actually starts
+  // on the server (when we receive the startGame broadcast).
+  useEffect(() => {
+    if (gameState !== 'waiting' && startGameInFlight) {
+      setStartGameInFlight(false);
+    }
+  }, [gameState, startGameInFlight]);
 
   // Passive rescue for a solo host (alone-timer + Quick Play countdown).
   //
@@ -453,6 +465,24 @@ function HostPreGameView({
     // Hard guard (beyond the disabled button): never start while a player is
     // mid rewarded-ad — protects against any non-button start path too.
     if (anyAdActive) return;
+
+    // Set in-flight state immediately to provide visual feedback. This prevents
+    // the rage-click issue where players tap the button and see no response
+    // because the network emit is async. The debounce lock in useHostGameActions
+    // prevents double-submit, but the button itself must show disabled state
+    // for the player to know their click registered.
+    setStartGameInFlight(true);
+
+    // Reset in-flight state after a timeout to prevent getting stuck. The server
+    // should process startGame within 3s; if not, clear the button so the host
+    // can try again.
+    setTimeout(() => {
+      setStartGameInFlight(false);
+    }, 3000);
+
+    // Fire the start game handler. The in-flight state will be cleared when:
+    // (1) The game transitions away from 'lobby' state (server processes startGame), or
+    // (2) The 3s timeout above fires (failsafe).
     onStartGame();
   }, [anyAdActive, onStartGame]);
 

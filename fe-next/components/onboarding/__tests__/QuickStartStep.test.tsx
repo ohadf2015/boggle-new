@@ -55,8 +55,11 @@ vi.mock('../MiniGrid', () => ({
   default: () => <div data-testid="ftue-demo-grid" />,
 }));
 
+// Counter-mock so successive calls return different values, proving the shuffle
+// handler actually called suggestPlayerName and changed the name.
+let nameCallCount = 0;
 vi.mock('@/utils/onboardingNameSuggestions', () => ({
-  suggestPlayerName: () => 'WordWizard',
+  suggestPlayerName: () => `WordWizard${nameCallCount++}`,
 }));
 
 import QuickStartStep from '../QuickStartStep';
@@ -79,6 +82,7 @@ describe('QuickStartStep', () => {
 
   beforeEach(() => {
     mockSetLanguage.mockClear();
+    nameCallCount = 0;
   });
 
   // The whole point of the refactor: nothing is a gate. A player who reads
@@ -90,13 +94,13 @@ describe('QuickStartStep', () => {
 
     expect(onPlay).toHaveBeenCalledTimes(1);
     const [name, , nameEdited] = onPlay.mock.calls[0];
-    expect(name).toBe('WordWizard');
+    expect(name).toBe('WordWizard0');
     expect(nameEdited).toBe(false);
   });
 
   it('pre-fills the name field so identity is optional, not required', () => {
     setup();
-    expect(screen.getByTestId('quick-start-name')).toHaveValue('WordWizard');
+    expect(screen.getByTestId('quick-start-name')).toHaveValue('WordWizard0');
   });
 
   it('never disables the play button, even when the name is emptied', () => {
@@ -168,5 +172,42 @@ describe('QuickStartStep', () => {
     expect(screen.getByTestId('quick-start-play-sub')).toHaveTextContent(
       'onboarding.quickStart.playSub',
     );
+  });
+
+  // Gauntlet Safari FTUE fix: handlers must fire on first click (synchronously),
+  // and buttons must carry CSS classes that provide active-state visual feedback.
+  it('fires handlers on first click without async gates or disabled states', () => {
+    const { onHowToPlay } = setup();
+
+    // "How to play" button must invoke handler immediately
+    const howToPlayButton = screen.getByTestId('quick-start-how-to-play');
+    fireEvent.click(howToPlayButton);
+    expect(onHowToPlay).toHaveBeenCalledTimes(1);
+
+    // "Randomize" button must fire handler synchronously and change the name
+    onHowToPlay.mockClear();
+    const initialName = screen.getByTestId('quick-start-name') as HTMLInputElement;
+    const originalName = initialName.value;
+
+    const randomizeButton = screen.getByTestId('quick-start-shuffle');
+    fireEvent.click(randomizeButton);
+    // If handler ran, suggestPlayerName was called and name changed
+    const newName = initialName.value;
+    expect(newName).not.toBe(originalName);
+
+    // Avatar button must fire handler immediately
+    const avatarButton = screen.getByTestId('quick-start-avatar');
+    fireEvent.click(avatarButton);
+    expect(screen.getByTestId('avatar-builder')).toBeInTheDocument();
+  });
+
+  it('gives all three rage-clicked controls active-state CSS classes for pressed feedback', () => {
+    setup();
+    // The three controls hit by rage clicks must carry active: pseudo-class styling
+    // in their className. jsdom doesn't compute :active, so we assert the class
+    // string is present — proves the styling hook ships and fails if deleted.
+    expect(screen.getByTestId('quick-start-how-to-play').className).toMatch(/active:/);
+    expect(screen.getByTestId('quick-start-shuffle').className).toMatch(/active:/);
+    expect(screen.getByTestId('quick-start-avatar').className).toMatch(/active:/);
   });
 });

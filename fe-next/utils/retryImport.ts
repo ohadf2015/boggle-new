@@ -31,6 +31,24 @@ function isChunkLoadError(err: unknown): boolean {
   );
 }
 
+/** Clear all caches and unregister service workers to ensure a fresh build is fetched. */
+async function clearCachesAndReload(): Promise<void> {
+  // Clear all service worker caches
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map(name => caches.delete(name)));
+  }
+
+  // Unregister service workers to get fresh version
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(reg => reg.unregister()));
+  }
+
+  // Force hard reload (bypass cache)
+  window.location.reload();
+}
+
 /** Allow at most one reload per window so a permanently-broken chunk can't loop. */
 function shouldReloadOnce(): boolean {
   if (typeof window === 'undefined') return false;
@@ -52,8 +70,8 @@ export interface RetryImportOptions {
   retries?: number;
   /** Initial backoff in ms; doubles each retry (default 300). */
   interval?: number;
-  /** Injectable reload hook (defaults to `window.location.reload`). For tests. */
-  reload?: () => void;
+  /** Injectable reload hook (defaults to cache-clear + reload). For tests. */
+  reload?: () => void | Promise<void>;
 }
 
 /**
@@ -69,7 +87,14 @@ export function retryImport<T>(
   const reload =
     options.reload ??
     (() => {
-      if (typeof window !== 'undefined') window.location.reload();
+      if (typeof window !== 'undefined') {
+        // Clear caches and unregister SWs before reload so the fresh build
+        // is fetched, not the stale chunk from cache. error.tsx does this too.
+        clearCachesAndReload().catch((err) => {
+          logger.error('clearCachesAndReload failed, falling back to bare reload', err);
+          window.location.reload();
+        });
+      }
     });
 
   return () =>

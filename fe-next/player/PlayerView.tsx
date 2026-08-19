@@ -238,7 +238,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   });
 
   // Lobby state (loading indicator, name change, ready-up)
-  const { isGameLoading, handleNameChange, readyUsernames, isReady, toggleReady } = usePlayerLobby({
+  const { isGameLoading, handleNameChange, readyUsernames, isReady, toggleReady, readyInFlight } = usePlayerLobby({
     socket,
     gameActive,
     showModeReveal,
@@ -705,6 +705,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           readyUsernames={readyUsernames}
           isReady={isReady}
           onToggleReady={toggleReady}
+          readyInFlight={readyInFlight}
         />
     );
   }

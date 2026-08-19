@@ -14,7 +14,7 @@ import { httpLogger, httpLogSerializers } from './logger';
 // crazyGamesScriptInjector removed — now rendered via CrazyGamesScriptServer React component
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
-const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc'];
+const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc', '/api/presence'];
 
 // Next.js App Router admin POST routes that have NO Express counterpart — they
 // fall through `/api/admin` to the Next catch-all and parse JSON themselves via

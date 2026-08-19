@@ -48,6 +48,11 @@ const SNAP_RADIUS_PX = 32;
 // (reaching for a board cell off to the side). Without this, diagonal drags
 // where dx > dy never activated and the gesture felt "stuck".
 const UPWARD_ACTIVATE_PX = 6;
+// Horizontal swipe threshold. Used to distinguish between a tap with natural
+// finger drift vs. an intentional horizontal scroll. Below this, we assume the
+// horizontal motion is accidental and allow the click to fire. This prevents
+// rage clicks on tiles that have slight horizontal movement during a tap.
+const HORIZONTAL_SWIPE_THRESHOLD_PX = 16;
 
 /**
  * O(1) drop-cell resolution: ONE getBoundingClientRect on the board container
@@ -190,7 +195,7 @@ export function useWordCraftDrag({ onDrop, getEmptyCells }: UseWordCraftDragArgs
 
       // Only a non-upward horizontal sweep is a rack scroll; an upward
       // diagonal is a drag-to-board and must not be flagged as a swipe.
-      if (drag.pointerType === 'touch' && absDx >= 8 && absDx > absDy && dy > -UPWARD_ACTIVATE_PX) {
+      if (drag.pointerType === 'touch' && absDx >= HORIZONTAL_SWIPE_THRESHOLD_PX && absDx > absDy && dy > -UPWARD_ACTIVATE_PX) {
         horizontalSwipeRef.current = true;
       }
 

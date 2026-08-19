@@ -33,11 +33,18 @@ export function usePlayerLobby({
   // Whoever's name is in the server's ready list is ready (host is never listed).
   const isReady = username ? readyUsernames.includes(username) : false;
 
+  const [readyInFlight, setReadyInFlight] = useState(false);
+
   // Optimistic toggle — emit the OPPOSITE of current state. Server echoes the
   // authoritative `playersReadyUpdate`, so we don't locally mutate the list.
+  // The ready state itself provides visual feedback (button changes from outline
+  // to filled), but we need to prevent double-clicks during the emit.
   const toggleReady = useCallback(() => {
+    if (readyInFlight) return; // one emit per tap — a second tap before the echo is the rage click
+
+    setReadyInFlight(true);
     socket?.emit('lobbyReady', { ready: !isReady });
-  }, [socket, isReady]);
+  }, [socket, isReady, readyInFlight]);
 
   // Lobby ready: mirror the server's ready list during the waiting state, and
   // clear it on resetGame so a fresh round's lobby never shows stale entries.
@@ -46,8 +53,12 @@ export function usePlayerLobby({
 
     const handleLobbyReadyUpdate = (data: { readyCount: number; totalPlayers: number; readyUsernames?: string[] }) => {
       setReadyUsernames(data?.readyUsernames ?? []);
+      // The echo IS the acknowledgement — release the button so un-readying is
+      // instant. Ready is a toggle; holding the lock on a timer would lock a
+      // player out of changing their mind.
+      setReadyInFlight(false);
     };
-    const handleResetGame = () => { setReadyUsernames([]); };
+    const handleResetGame = () => { setReadyUsernames([]); setReadyInFlight(false); };
 
     socket.on('playersReadyUpdate', handleLobbyReadyUpdate);
     socket.on('resetGame', handleResetGame);
@@ -69,6 +80,7 @@ export function usePlayerLobby({
   useEffect(() => {
     if (showModeReveal || showStartAnimation || gameActive) {
       setIsGameLoading(false);
+      setReadyInFlight(false); // Also clear the ready button's in-flight state
     }
   }, [showModeReveal, showStartAnimation, gameActive]);
 
@@ -94,5 +106,5 @@ export function usePlayerLobby({
     return () => { socket.off('guestNameUpdated', handleNameUpdated); };
   }, [socket, onUsernameChange]);
 
-  return { isGameLoading, gameLanguage, setGameLanguage, handleNameChange, readyUsernames, isReady, toggleReady };
+  return { isGameLoading, gameLanguage, setGameLanguage, handleNameChange, readyUsernames, isReady, toggleReady, readyInFlight };
 }

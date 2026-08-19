@@ -65,6 +65,8 @@ interface PlayerWaitingViewProps {
   isReady?: boolean;
   /** Toggle local ready state (emits `lobbyReady`). Absent on host/spectator. */
   onToggleReady?: () => void;
+  /** Whether a ready toggle is currently in-flight (prevents double-click rage). */
+  readyInFlight?: boolean;
 }
 
 const MAX_PLAYERS = 8;
@@ -86,6 +88,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   readyUsernames = [],
   isReady = false,
   onToggleReady,
+  readyInFlight = false,
 }): React.ReactElement => {
   const { isAuthenticated, updateProfile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -245,15 +248,17 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               type="button"
               data-testid="ready-button"
               onClick={onToggleReady}
+              disabled={readyInFlight}
               whileTap={{ scale: 0.96 }}
               aria-pressed={isReady}
               className={cn(
                 'mt-3 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-neo border-3 font-black uppercase tracking-wide shadow-hard transition-colors',
-                isReady
+                readyInFlight && 'opacity-50 cursor-not-allowed',
+                !readyInFlight && (isReady
                   // Confirmed: solid lime fill + check — unmistakable "you're ready".
                   ? 'bg-neo-lime text-neo-black border-neo-black'
                   // Resting CTA: lime-outlined on navy — clearly a ready button asking for the tap.
-                  : 'bg-neo-navy border-neo-lime text-neo-lime hover:bg-neo-lime/10',
+                  : 'bg-neo-navy border-neo-lime text-neo-lime hover:bg-neo-lime/10'),
               )}
             >
               {isReady ? <Check className="w-5 h-5 stroke-[3]" /> : <Zap className="w-5 h-5" />}
