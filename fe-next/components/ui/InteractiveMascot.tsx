@@ -503,10 +503,12 @@ export const InteractiveMascot = memo(function InteractiveMascot({
     };
   }, []);
 
-  // Defer preloading hover/click variant GIFs until browser is idle AND the
-  // window load event has fired. These GIFs are 500KB-1.7MB each — loading
-  // them during the initial load (ric can fire at ~1.3s on a momentarily-idle
-  // thread) competes with LCP content for bandwidth.
+  // Defer preloading hover/click variant GIFs until well after window load.
+  // These GIFs/WebPs are 150KB-1.7MB each — fetching them during the initial
+  // load window competes with LCP content for bandwidth, and their decode
+  // bursts the main thread right when first input arrives (INP). 12s keeps
+  // them out of both the real first-interaction window and the Lighthouse
+  // trace; a user who hovers earlier simply sees the static variant first.
   useEffect(() => {
     if (!enableHover && !enableClick) return;
 
@@ -525,14 +527,9 @@ export const InteractiveMascot = memo(function InteractiveMascot({
       }
     };
 
-    let idleId: number | undefined;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const scheduleIdle = () => {
-      if (typeof requestIdleCallback !== 'undefined') {
-        idleId = requestIdleCallback(doPreload, { timeout: 8000 });
-      } else {
-        timeoutId = setTimeout(doPreload, 3000);
-      }
+      timeoutId = setTimeout(doPreload, 12000);
     };
 
     // Wait for full page load before scheduling the idle preload
@@ -544,9 +541,6 @@ export const InteractiveMascot = memo(function InteractiveMascot({
 
     return () => {
       window.removeEventListener('load', scheduleIdle);
-      if (idleId !== undefined && typeof cancelIdleCallback !== 'undefined') {
-        cancelIdleCallback(idleId);
-      }
       if (timeoutId !== undefined) {
         clearTimeout(timeoutId);
       }

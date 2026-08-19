@@ -6,8 +6,10 @@
  * throttle, the single biggest main-thread cost on the landing page). Every
  * boot-path consumer (logger, consoleOverride, ServiceWorkerRegistration,
  * CoinContext, instrumentation-client) now goes through this dynamic import so
- * the SDK splits into a lazy chunk — fetched on first error, or after
- * window-load + idle, whichever comes first.
+ * the SDK splits into a lazy chunk — fetched on first error, or ~12s after
+ * window-load, whichever comes first. (An earlier window-load+idle trigger
+ * still landed the SDK's ~490KB fetch and its multi-second init burst inside
+ * the first-interaction window and every Lighthouse trace.)
  *
  * Importing `@/sentry.client.config` first guarantees `Sentry.init()` has run
  * (module-eval side effect) before any capture call resolves, so even the very
