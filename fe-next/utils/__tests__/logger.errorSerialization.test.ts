@@ -8,7 +8,7 @@
  * into "{}" and dropping it through captureMessage.
  */
 
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
 
 const { captureException, captureMessage } = vi.hoisted(() => ({
   captureException: vi.fn(),
@@ -23,11 +23,16 @@ vi.mock('@sentry/nextjs', () => ({
 const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
 
 // Sentry capture is fire-and-forget async (lazy SDK load through several
-// dynamic-import rounds) — use vi.waitFor for positive assertions and a
-// generous multi-round flush before negative ones.
-const flush = async () => {
-  for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 0));
-};
+// dynamic-import rounds). A fixed setTimeout-round flush is NOT enough — the
+// import chain can take an arbitrary number of macrotasks under load, which
+// both starves the positive assertion AND leaks the late capture into the
+// NEXT test's cleared mocks ("expected 1, got 2"). Instead: vi.waitFor the
+// positive assertion. Because logger.error/warn fire exactly ONE capture per
+// call and both captureException/captureMessage ride the same
+// loadSentry().then() chain, once the expected capture has fired the chain
+// is settled — a negative assertion on the other mock is then race-free.
+const waitForCapture = (fn: () => void) =>
+  vi.waitFor(fn, { timeout: 5000, interval: 20 });
 
 async function loadLoggerInProduction() {
   vi.resetModules();
@@ -50,10 +55,9 @@ describe('logger error serialization (production)', () => {
 
     logger.error('useChurnSignals: failed to report signals', realError);
 
-    await flush();
+    await waitForCapture(() => expect(captureException).toHaveBeenCalledTimes(1));
 
     // The actual Error object must reach Sentry so the stack/grouping survive.
-    expect(captureException).toHaveBeenCalledTimes(1);
     expect(captureException.mock.calls[0][0]).toBe(realError);
 
     // It must NOT be funnelled through captureMessage as "... {}".
@@ -66,9 +70,8 @@ describe('logger error serialization (production)', () => {
 
     logger.error('Auth callback exception:', realError);
 
-    await flush();
+    await waitForCapture(() => expect(captureException).toHaveBeenCalledTimes(1));
 
-    expect(captureException).toHaveBeenCalledTimes(1);
     const [errArg, options] = captureException.mock.calls[0] as [unknown, Record<string, any>];
     expect(errArg).toBe(realError);
     const contextValues = JSON.stringify(options?.contexts ?? {});
@@ -80,10 +83,9 @@ describe('logger error serialization (production)', () => {
 
     logger.error('plain message', { code: 42 });
 
-    await flush();
+    await waitForCapture(() => expect(captureMessage).toHaveBeenCalledTimes(1));
 
     expect(captureException).not.toHaveBeenCalled();
-    expect(captureMessage).toHaveBeenCalledTimes(1);
   });
 
   it('captures the Error even when it is the first argument (existing behavior preserved)', async () => {
@@ -92,9 +94,8 @@ describe('logger error serialization (production)', () => {
 
     logger.error(realError, 'extra context');
 
-    await flush();
+    await waitForCapture(() => expect(captureException).toHaveBeenCalledTimes(1));
 
-    expect(captureException).toHaveBeenCalledTimes(1);
     expect(captureException.mock.calls[0][0]).toBe(realError);
     expect(captureMessage).not.toHaveBeenCalled();
   });
@@ -111,9 +112,8 @@ describe('logger warn serialization (production)', () => {
 
     logger.warn('[useLeaderboardSync] Failed to sync leaderboard:', realError);
 
-    await flush();
+    await waitForCapture(() => expect(captureException).toHaveBeenCalledTimes(1));
 
-    expect(captureException).toHaveBeenCalledTimes(1);
     expect(captureException.mock.calls[0][0]).toBe(realError);
     // level should be downgraded to warning
     const options = captureException.mock.calls[0][1] as Record<string, any>;
@@ -126,9 +126,8 @@ describe('logger warn serialization (production)', () => {
 
     logger.warn('plain warning', { detail: true });
 
-    await flush();
+    await waitForCapture(() => expect(captureMessage).toHaveBeenCalledTimes(1));
 
     expect(captureException).not.toHaveBeenCalled();
-    expect(captureMessage).toHaveBeenCalledTimes(1);
   });
 });
