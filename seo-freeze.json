@@ -1,0 +1,10 @@
+{
+  "_why": "Pages whose <title>/meta description must not change until the date given. The seo-daily routine (~/.claude/skills/seo-daily) drops these from its CTR opportunity list, so it cannot suggest an edit to them. A CTR change is graded by comparing 28 days before it shipped against 28 days after; this routine rewrote the pages below on 2026-07-29, 2026-08-15 AND 2026-08-18, so no window ever held one stable title and not one of those rewrites could be measured. Entries expire on their own `until` date — do not lift one early.",
+  "frozen": [
+    {
+      "path": "/es/juego-de-palabras-multijugador",
+      "until": "2026-09-17",
+      "why": "Growth Radar row 50: 62,054 impressions at 0.51% CTR, position 5.52 — the biggest single traffic lever in the portfolio. Frozen 2026-08-20 for one 28-day scoring window so we get one attributable CTR number."
+    }
+  ]
+}
