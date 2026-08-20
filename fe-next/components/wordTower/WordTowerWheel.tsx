@@ -83,6 +83,11 @@ const BAND_HUB: Record<PlacementQuality, string> = {
   miss: 'from-neo-red to-neo-red text-neo-white',
 };
 
+// Threshold before engaging drag from a tap (prevents accidental drag on normal
+// finger placement variance). If pointer hasn't moved >8px by the first pointermove
+// we receive, we don't pass it to the drag handler — the gesture stays a tap.
+const DRAG_ENGAGEMENT_THRESHOLD_PX = 8;
+
 export function WordTowerWheel({
   tray, selected, word, placing, aimBand = null, canBuild, gainPreview, intensity, accentHex, goldenLetter,
   reducedMotion = false, dir, t, onSelectTile, onDeselectTile, onSubmit, onDrop,
@@ -103,6 +108,11 @@ export function WordTowerWheel({
   // the exact moment a drag begins (see `onEngage` below) rather than on
   // pointerdown.
   const gestureRef = useRef<{ id: number; el: HTMLElement } | null>(null);
+
+  // Track pointer position at down to gate drag engagement on movement threshold.
+  // If the first pointermove is <8px away, we don't call the drag handler —
+  // the gesture stays a tap and its click fires on the button.
+  const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
 
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
@@ -136,13 +146,31 @@ export function WordTowerWheel({
   const onDown = (e: React.PointerEvent) => {
     if (placing) return;
     addedDuringDragRef.current = false;
+    // Remember pointer position at down to gate drag engagement on movement.
+    pointerDownRef.current = { x: e.clientX, y: e.clientY };
     // Remember what to capture; the claim itself waits until this is known to be
     // a drag (see `onEngage`), so a plain tap keeps its click.
     gestureRef.current = { id: e.pointerId, el: e.currentTarget as HTMLElement };
     handlePointerDown(e);
   };
 
+  const onMove = (e: React.PointerEvent) => {
+    if (placing) return;
+    const down = pointerDownRef.current;
+    if (!down) return;
+    // Only pass the move to the drag handler if we've moved beyond the threshold.
+    // This prevents accidental drag engagement on normal finger placement variance
+    // and ensures small accidental horizontal drift during a tap doesn't trigger
+    // pointer capture (which would retarget the click to the container).
+    const dx = e.clientX - down.x;
+    const dy = e.clientY - down.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < DRAG_ENGAGEMENT_THRESHOLD_PX) return;
+    handlePointerMove(e);
+  };
+
   const onUp = () => {
+    pointerDownRef.current = null;
     const g = gestureRef.current;
     gestureRef.current = null;
     if (g) { try { g.el.releasePointerCapture(g.id); } catch { /* never claimed */ } }
@@ -206,7 +234,7 @@ export function WordTowerWheel({
       // and tile sizes scale with the box, so it just gets proportionally smaller.
       className="relative mx-auto aspect-square w-full max-w-[230px] medium-short:max-w-[200px] short:max-w-[172px] touch-none select-none"
       onPointerDown={onDown}
-      onPointerMove={placing ? undefined : handlePointerMove}
+      onPointerMove={placing ? undefined : onMove}
       onPointerUp={placing ? undefined : onUp}
       onPointerCancel={placing ? undefined : onUp}
       // NO onPointerLeave — with pointer capture the pointer can legitimately be

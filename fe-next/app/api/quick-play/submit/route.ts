@@ -12,6 +12,11 @@ import { captureApiError } from '@/utils/sentry';
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
 
+// Word collection validation
+const MAX_WORDS_PER_ROUND = 200;
+const MAX_WORD_LENGTH = 30;
+const TOTAL_PAYLOAD_BYTES = 10_000;
+
 export async function POST(request: NextRequest) {
   const rateLimit = checkApiRateLimit(request, 'quick-play-submit', {
     maxRequests: 20,
@@ -32,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { mode, language, seed, score, wordsFound, durationMs, challengeId } = body ?? {};
+    const { mode, language, seed, score, wordsFound, durationMs, challengeId, words } = body ?? {};
 
     if (
       !MODES.includes(mode) ||
@@ -41,6 +46,35 @@ export async function POST(request: NextRequest) {
       typeof wordsFound !== 'number' || wordsFound < 0
     ) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    // Validate words array if present (optional for backwards compatibility)
+    let validatedWords: Array<{ word: string; score: number }> | undefined;
+    if (words !== undefined) {
+      if (!Array.isArray(words)) {
+        return NextResponse.json({ error: 'Words must be an array' }, { status: 400 });
+      }
+      if (words.length > MAX_WORDS_PER_ROUND) {
+        return NextResponse.json({ error: 'Too many words' }, { status: 400 });
+      }
+      // Validate each word
+      validatedWords = [];
+      for (const w of words) {
+        if (typeof w !== 'object' || !w.word || typeof w.score !== 'number') {
+          return NextResponse.json({ error: 'Invalid word format' }, { status: 400 });
+        }
+        const word = String(w.word).trim();
+        // Only allow alphabetic characters (ponytail: no cross-script validation)
+        if (word.length === 0 || word.length > MAX_WORD_LENGTH || !/^[a-zA-Z]+$/.test(word)) {
+          return NextResponse.json({ error: 'Invalid word' }, { status: 400 });
+        }
+        validatedWords.push({ word: word.toLowerCase(), score: w.score });
+      }
+      // Check total payload size
+      const payloadStr = JSON.stringify({ words: validatedWords });
+      if (Buffer.byteLength(payloadStr) > TOTAL_PAYLOAD_BYTES) {
+        return NextResponse.json({ error: 'Payload too large' }, { status: 400 });
+      }
     }
 
     const outcome = await processQuickSubmit(supabase as never, {
@@ -52,6 +86,7 @@ export async function POST(request: NextRequest) {
       wordsFound,
       durationMs: typeof durationMs === 'number' ? durationMs : 60_000,
       challengeId: typeof challengeId === 'string' ? challengeId : undefined,
+      words: validatedWords,
     });
 
     return NextResponse.json(outcome);

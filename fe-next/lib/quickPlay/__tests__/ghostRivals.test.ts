@@ -61,7 +61,8 @@ describe('pickGhostRivals', () => {
     ]);
   });
 
-  it('returns what it has when the pool is thin', () => {
+  it('returns what it has when the pool is thin — pickGhostRivals is pure', () => {
+    // pickGhostRivals returns only real rivals; padding happens upstream in fetchGhostRivals.
     expect(pickGhostRivals([rival('a', 5)], 's')).toHaveLength(1);
     expect(pickGhostRivals([], 's')).toEqual([]);
   });
@@ -177,7 +178,7 @@ describe('fetchGhostRivals', () => {
         calls.push(table);
         const rows = table === 'quick_play_results' ? results : profileRows;
         const chain: Record<string, unknown> = {};
-        for (const m of ['select', 'eq', 'gt', 'order', 'in']) {
+        for (const m of ['select', 'eq', 'gt', 'order', 'in', 'neq']) {
           chain[m] = () => chain;
         }
         chain.limit = () => Promise.resolve({ data: rows, error: null });
@@ -188,44 +189,127 @@ describe('fetchGhostRivals', () => {
     return db;
   }
 
-  it('resolves display names and avatars for the picked rivals', async () => {
+  it('resolves display names and avatars for the picked rivals, then pads to GHOST_COUNT', async () => {
     const db = fakeDb([
       { user_id: 'u1', score_pct: 40 },
       { user_id: 'u2', score_pct: 80 },
     ]);
-    const ghosts = await fetchGhostRivals(db as never, 'classic', 'seed-1');
-    expect(ghosts.map((g) => g.name).sort()).toEqual(['Ada', 'Bo']);
+    const ghosts = await fetchGhostRivals(db as never, 'classic', 'seed-1', undefined, null, 'en');
+    // Two real rivals plus one synthetic = GHOST_COUNT (3).
+    expect(ghosts).toHaveLength(3);
+    expect(ghosts.filter((g) => !g.userId.startsWith('synthetic:')).map((g) => g.name).sort()).toEqual([
+      'Ada',
+      'Bo',
+    ]);
     expect(ghosts.find((g) => g.name === 'Ada')?.customAvatar).toEqual({ skin: 2 });
   });
 
   it('gives an avatar-less player a deterministic face — a ghost must never render as a skeleton', async () => {
     const db = fakeDb([{ user_id: 'u2', score_pct: 60 }]);
-    const [bo] = await fetchGhostRivals(db as never, 'classic', 's');
+    const [bo] = await fetchGhostRivals(db as never, 'classic', 's', undefined, null, 'en');
     // Bo's profile has avatar_config: null. Avatar renders a skeleton when it has
     // neither a config nor a userId, and GameLeaderboard passes no userId.
     expect(bo.customAvatar).toBeTruthy();
 
-    const again = await fetchGhostRivals(fakeDb([{ user_id: 'u2', score_pct: 60 }]) as never, 'classic', 's');
+    const again = await fetchGhostRivals(
+      fakeDb([{ user_id: 'u2', score_pct: 60 }]) as never,
+      'classic',
+      's',
+      undefined,
+      null,
+      'en'
+    );
     expect(again[0].customAvatar).toEqual(bo.customAvatar);
   });
 
   it('skips players with no profile row rather than showing "undefined"', async () => {
     const db = fakeDb([{ user_id: 'ghosted', score_pct: 40 }], []);
-    expect(await fetchGhostRivals(db as never, 'classic', 's')).toEqual([]);
+    const ghosts = await fetchGhostRivals(db as never, 'classic', 's', undefined, null, 'en');
+    // Even though the real player has no profile, fetchGhostRivals now returns
+    // GHOST_COUNT synthetic rivals instead of empty.
+    expect(ghosts).toHaveLength(3);
+    expect(ghosts.every((g) => g.userId.startsWith('synthetic:'))).toBe(true);
   });
 
-  it('returns empty (never throws) when the query fails — a round must still start', async () => {
+  it('returns GHOST_COUNT synthetics when the query fails — a round must still start', async () => {
     const db = {
       from: () => {
         throw new Error('boom');
       },
     };
-    await expect(fetchGhostRivals(db as never, 'classic', 's')).resolves.toEqual([]);
+    const ghosts = await fetchGhostRivals(db as never, 'classic', 's', undefined, null, 'en');
+    // Never throws, and never returns empty — always GHOST_COUNT rivals.
+    expect(ghosts).toHaveLength(3);
+    expect(ghosts.every((g) => g.userId.startsWith('synthetic:'))).toBe(true);
+    expect(ghosts.every((g) => g.name && g.name.length > 0)).toBe(true);
   });
 
-  it('does not query profiles when there are no results to name', async () => {
+  it('pads thin real rivals to GHOST_COUNT with synthetics', async () => {
+    const db = fakeDb([{ user_id: 'u1', score_pct: 50 }]);
+    const ghosts = await fetchGhostRivals(db as never, 'classic', 'seed-1', undefined, null, 'en');
+    // One real rival + two synthetics = GHOST_COUNT.
+    expect(ghosts).toHaveLength(3);
+    expect(ghosts[0].userId).toBe('u1');
+    expect(ghosts[0].name).toBe('Ada');
+    expect(ghosts.slice(1).every((g) => g.userId.startsWith('synthetic:'))).toBe(true);
+  });
+
+  it('is deterministic for the same seed and mode', async () => {
+    const db = fakeDb([{ user_id: 'u1', score_pct: 50 }]);
+    const ghosts1 = await fetchGhostRivals(db as never, 'classic', 'seed-a', undefined, null, 'en');
+    const ghosts2 = await fetchGhostRivals(
+      fakeDb([{ user_id: 'u1', score_pct: 50 }]) as never,
+      'classic',
+      'seed-a',
+      undefined,
+      null,
+      'en'
+    );
+    // Same seed → same synthetic names and scores.
+    expect(ghosts1.map((g) => ({ name: g.name, scorePct: g.scorePct }))).toEqual(
+      ghosts2.map((g) => ({ name: g.name, scorePct: g.scorePct }))
+    );
+  });
+
+  it('picks different synthetics for different seeds', async () => {
+    const db = fakeDb([{ user_id: 'u1', score_pct: 50 }]);
+    const a = await fetchGhostRivals(db as never, 'classic', 'seed-aaa', undefined, null, 'en');
+    const b = await fetchGhostRivals(
+      fakeDb([{ user_id: 'u1', score_pct: 50 }]) as never,
+      'classic',
+      'seed-zzz',
+      undefined,
+      null,
+      'en'
+    );
+    const aNames = a.slice(1).map((g) => g.name).sort().join(',');
+    const bNames = b.slice(1).map((g) => g.name).sort().join(',');
+    expect(aNames).not.toBe(bNames);
+  });
+
+  it('does not query profiles when all synthetics are needed', async () => {
     const db = fakeDb([]);
-    expect(await fetchGhostRivals(db as never, 'classic', 's')).toEqual([]);
+    await fetchGhostRivals(db as never, 'classic', 's', undefined, null, 'en');
+    // Even with empty results, we still return GHOST_COUNT synthetics.
+    expect(db.calls).toContain('quick_play_results');
+    // But we should NOT query profiles since there are no real rivals.
     expect(db.calls).not.toContain('public_profiles');
+  });
+
+  it('respects language parameter for synthetic bot names', async () => {
+    const db = fakeDb([]);
+    const en = await fetchGhostRivals(db as never, 'classic', 'seed-1', undefined, null, 'en');
+    const he = await fetchGhostRivals(
+      fakeDb([]) as never,
+      'classic',
+      'seed-1',
+      undefined,
+      null,
+      'he'
+    );
+    // Same seed, different language → different bot names.
+    const enNames = en.map((g) => g.name).sort().join(',');
+    const heNames = he.map((g) => g.name).sort().join(',');
+    expect(enNames).not.toBe(heNames);
   });
 });

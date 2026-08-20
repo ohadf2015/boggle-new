@@ -5,7 +5,13 @@
 import { calculateWordScore } from '@/shared/utils/scoring';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 
-function base(score: number, wordsFound: number, cfg: QuickRoundConfig, durationMs?: number): QuickRoundResult {
+function base(
+  score: number,
+  wordsFound: number,
+  cfg: QuickRoundConfig,
+  durationMs?: number,
+  words?: Array<{ word: string; score: number }>
+): QuickRoundResult {
   const scorePct = cfg.perfectScore > 0
     ? Math.min(100, Math.round((score / cfg.perfectScore) * 100))
     : 0;
@@ -18,6 +24,7 @@ function base(score: number, wordsFound: number, cfg: QuickRoundConfig, duration
     wordsFound,
     totalWords: cfg.totalWords,
     durationMs: durationMs ?? cfg.durationSec * 1000,
+    ...(words ? { words } : {}),
   };
 }
 
@@ -25,7 +32,11 @@ export function fromWordWheel(
   r: { wordsFound: string[]; score: number; timeSeconds: number },
   cfg: QuickRoundConfig
 ): QuickRoundResult {
-  return base(r.score, r.wordsFound.length, cfg, r.timeSeconds * 1000);
+  const words = r.wordsFound.map(word => ({
+    word,
+    score: calculateWordScore(word, 0),
+  }));
+  return base(r.score, r.wordsFound.length, cfg, r.timeSeconds * 1000, words);
 }
 
 /**
@@ -36,9 +47,13 @@ export function fromSurvival(
   r: { wordsDiscovered: Array<{ word: string }> },
   cfg: QuickRoundConfig
 ): QuickRoundResult {
-  const score = r.wordsDiscovered.reduce((sum, d) => sum + calculateWordScore(d.word, 0), 0);
+  const words = r.wordsDiscovered.map(d => ({
+    word: d.word,
+    score: calculateWordScore(d.word, 0),
+  }));
+  const score = words.reduce((sum, w) => sum + w.score, 0);
   return {
-    ...base(score, r.wordsDiscovered.length, cfg),
+    ...base(score, r.wordsDiscovered.length, cfg, undefined, words),
     targetWord: cfg.targetWord,
     targetWordFound: cfg.targetWord
       ? r.wordsDiscovered.some(d => d.word.toLowerCase() === cfg.targetWord!.toLowerCase())
@@ -50,12 +65,20 @@ export function fromSinglePlayer(
   r: { score: number; wordsFound: string[] },
   cfg: QuickRoundConfig
 ): QuickRoundResult {
-  return base(r.score, r.wordsFound.length, cfg);
+  const words = r.wordsFound.map(word => ({
+    word,
+    score: calculateWordScore(word, 0),
+  }));
+  return base(r.score, r.wordsFound.length, cfg, undefined, words);
 }
 
 export function fromBlast(
   r: { score: number; wordsFound: string[] },
   cfg: QuickRoundConfig
 ): QuickRoundResult {
-  return base(r.score, r.wordsFound.length, cfg);
+  const words = r.wordsFound.map(word => ({
+    word,
+    score: calculateWordScore(word, 0),
+  }));
+  return base(r.score, r.wordsFound.length, cfg, undefined, words);
 }

@@ -88,4 +88,51 @@ describe('retryImport', () => {
 
     expect(reload).toHaveBeenCalledTimes(1);
   });
+
+  it('clears caches and unregisters service workers before reload on chunk error', async () => {
+    const chunkErr = new Error('Loading chunk 42 failed.');
+    chunkErr.name = 'ChunkLoadError';
+    const factory = vi.fn().mockRejectedValue(chunkErr);
+
+    const mockCachesDelete = vi.fn().mockResolvedValue(undefined);
+    const mockSWUnregister = vi.fn().mockResolvedValue(true);
+    const mockLocationReload = vi.fn();
+
+    Object.defineProperty(window, 'caches', {
+      configurable: true,
+      value: {
+        keys: vi.fn().mockResolvedValue(['cache1', 'cache2']),
+        delete: mockCachesDelete,
+      },
+    });
+
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        getRegistrations: vi
+          .fn()
+          .mockResolvedValue([
+            { unregister: mockSWUnregister },
+            { unregister: mockSWUnregister },
+          ]),
+      },
+    });
+
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...window.location, reload: mockLocationReload },
+    });
+
+    const wrapped = retryImport(factory, { retries: 0, interval: 10 });
+    wrapped().catch(() => {});
+
+    await vi.advanceTimersByTimeAsync(10);
+    // Give async cache operations time to settle
+    await vi.runAllTimersAsync();
+
+    // Verify caches were deleted before reload
+    expect(mockCachesDelete).toHaveBeenCalledTimes(2);
+    expect(mockSWUnregister).toHaveBeenCalledTimes(2);
+    expect(mockLocationReload).toHaveBeenCalledTimes(1);
+  });
 });

@@ -55,7 +55,7 @@ describe('fetchGhostRivals — never race yourself', () => {
   it('excludes the requesting user in the query when an id is supplied', async () => {
     const { db, calls } = makeDb(RESULTS, PROFILES);
 
-    await fetchGhostRivals(db as any, 'classic', 'seed-1', undefined, 'me');
+    await fetchGhostRivals(db as any, 'classic', 'seed-1', undefined, 'me', 'en');
 
     const resultsQuery = calls.find((c) => c.table === 'quick_play_results')!;
     expect(resultsQuery.neq).toContainEqual(['user_id', 'me']);
@@ -64,21 +64,26 @@ describe('fetchGhostRivals — never race yourself', () => {
   it('applies no exclusion for a guest (no user id)', async () => {
     const { db, calls } = makeDb(RESULTS, PROFILES);
 
-    await fetchGhostRivals(db as any, 'classic', 'seed-1', undefined, null);
+    await fetchGhostRivals(db as any, 'classic', 'seed-1', undefined, null, 'en');
 
     const resultsQuery = calls.find((c) => c.table === 'quick_play_results')!;
     expect(resultsQuery.neq).toHaveLength(0);
   });
 
-  it('still returns the other players as rivals', async () => {
+  it('still returns the other players as rivals, padded to GHOST_COUNT', async () => {
     const { db } = makeDb(
       RESULTS.filter((r) => r.user_id !== 'me'),
       PROFILES
     );
 
-    const ghosts = await fetchGhostRivals(db as any, 'classic', 'seed-1', undefined, 'me');
+    const ghosts = await fetchGhostRivals(db as any, 'classic', 'seed-1', undefined, 'me', 'en');
 
-    expect(ghosts.map((g) => g.name).sort()).toEqual(['Ada', 'Grace']);
+    // Two real rivals (Ada, Grace) plus one synthetic = GHOST_COUNT (3).
+    expect(ghosts.length).toBe(3);
+    expect(ghosts.filter((g) => !g.userId.startsWith('synthetic:')).map((g) => g.name).sort()).toEqual([
+      'Ada',
+      'Grace',
+    ]);
     expect(ghosts.some((g) => g.userId === 'me')).toBe(false);
   });
 });

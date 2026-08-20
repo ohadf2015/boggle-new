@@ -13,8 +13,12 @@ vi.mock('../../services/economy/awardCoins', () => ({
 vi.mock('../ghostRivalManager', () => ({
   updateRivalScore: vi.fn().mockResolvedValue(undefined),
 }));
+vi.mock('../supabase/words', () => ({
+  savePlayerWord: vi.fn().mockResolvedValue({ data: null, error: null, isNewWord: true }),
+}));
 
 import { processQuickSubmit, quickPlayCoinsFor } from '../quickPlaySubmit';
+import { savePlayerWord } from '../supabase/words';
 import { awardCoinsServer } from '../../services/economy/awardCoins';
 
 function makeDb() {
@@ -90,6 +94,40 @@ describe('processQuickSubmit', () => {
     await processQuickSubmit(db, { ...baseInput, challengeId: 'ch1' });
     expect(chain.update).toHaveBeenCalledWith(
       expect.objectContaining({ accepted_by: 'u1', accepted_score: 680 }));
+  });
+
+  it('saves words to player collection (best-effort)', async () => {
+    const { db } = makeDb();
+    const words = [
+      { word: 'apple', score: 10 },
+      { word: 'banana', score: 15 },
+    ];
+    await processQuickSubmit(db, { ...baseInput, words });
+    expect(vi.mocked(savePlayerWord)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        word: 'apple',
+        language: 'en',
+        gameCode: 'quick-classic',
+        playerId: 'u1',
+      })
+    );
+    expect(vi.mocked(savePlayerWord)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        word: 'banana',
+        language: 'en',
+        gameCode: 'quick-classic',
+        playerId: 'u1',
+      })
+    );
+  });
+
+  it('silently handles word save failures', async () => {
+    const { db } = makeDb();
+    vi.mocked(savePlayerWord).mockRejectedValue(new Error('Save failed'));
+    const words = [{ word: 'apple', score: 10 }];
+    // Should not throw
+    const out = await processQuickSubmit(db, { ...baseInput, words });
+    expect(out.scorePct).toBe(68); // Still processes normally
   });
 });
 

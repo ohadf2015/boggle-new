@@ -63,7 +63,7 @@ export default function PagePresenceReporter() {
           ? window.localStorage?.getItem('guestUsername') ?? null
           : null);
       try {
-        void fetch('/api/presence/heartbeat', {
+        fetch('/api/presence/heartbeat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           keepalive: true,
@@ -74,9 +74,13 @@ export default function PagePresenceReporter() {
             playerId: u?.id ?? null,
             isAuthenticated: !!u,
           }),
+        }).catch(() => {
+          // Silently ignore fetch failures (e.g., iOS Safari's keepalive limitations).
+          // Presence reporting is a best-effort signal; a failed heartbeat should not
+          // disrupt the player experience or bubble up to error tracking.
         });
       } catch {
-        /* ignore */
+        /* ignore synchronous errors during fetch creation */
       }
     };
 

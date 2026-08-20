@@ -53,6 +53,8 @@ export interface QuickRoundResult {
   /** word-hunt only: the seeded mystery word and whether the player found it */
   targetWord?: string;
   targetWordFound?: boolean;
+  /** Words found in this round, with their per-word scores */
+  words?: Array<{ word: string; score: number }>;
 }
 
 export interface QuickSubmitOutcome {

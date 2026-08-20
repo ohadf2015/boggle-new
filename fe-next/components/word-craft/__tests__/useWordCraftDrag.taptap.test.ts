@@ -256,7 +256,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     expect(result.current.drag).toBeNull();
   });
 
-  it('horizontal swipe sets consumeDropFlag so the trailing click is suppressed', () => {
+  it('horizontal swipe >= 16px sets consumeDropFlag so the trailing click is suppressed', () => {
     const onDrop = vi.fn();
     const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
@@ -266,17 +266,46 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     });
 
     act(() => {
-      const evt = createPointerEvent('pointermove', 'touch', 115, 100);
+      // 16px or more of horizontal movement triggers swipe flag
+      const evt = createPointerEvent('pointermove', 'touch', 120, 100);
       window.dispatchEvent(evt);
     });
 
     act(() => {
-      const evt = createPointerEvent('pointerup', 'touch', 115, 100);
+      const evt = createPointerEvent('pointerup', 'touch', 120, 100);
       window.dispatchEvent(evt);
     });
 
     expect(onDrop).not.toHaveBeenCalled();
     expect(result.current.consumeDropFlag()).toBe(true);
+    expect(result.current.consumeDropFlag()).toBe(false);
+  });
+
+  it('tap with <16px accidental horizontal drift does NOT suppress the click', () => {
+    // This is the fix for rage clicks: small horizontal movements during a tap
+    // should not suppress the subsequent click event. Only clear deliberate
+    // swipes (16px+) should suppress the click.
+    const onDrop = vi.fn();
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
+
+    act(() => {
+      const evt = createPointerEvent('pointerdown', 'touch', 100, 100);
+      result.current.begin('t-tap-drift', 'L', 1, evt as any);
+    });
+
+    act(() => {
+      // 10px horizontal drift + 8px vertical drift = accidental movement during tap
+      const evt = createPointerEvent('pointermove', 'touch', 110, 108);
+      window.dispatchEvent(evt);
+    });
+
+    act(() => {
+      const evt = createPointerEvent('pointerup', 'touch', 110, 108);
+      window.dispatchEvent(evt);
+    });
+
+    // The click should NOT be suppressed because the horizontal movement (10px)
+    // is below the 16px threshold for a swipe
     expect(result.current.consumeDropFlag()).toBe(false);
   });
 

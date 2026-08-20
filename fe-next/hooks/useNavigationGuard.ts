@@ -42,6 +42,30 @@ interface UseNavigationGuardOptions {
  *   }
  * });
  */
+/**
+ * Phantom pops this module has fired and not yet seen come back.
+ *
+ * The teardown below removes its own history entry with `history.go(-1)`, which
+ * is ASYNCHRONOUS: the popstate can land after the next round's guard has
+ * mounted, and that guard reads it as a back-button press. In Quick Play that
+ * meant word hunt opened "Leave the Hunt?" the moment the board appeared, with
+ * the grid unclickable behind it. Module scope, not per-hook: the guard that
+ * fires the pop is usually already unmounted when it lands.
+ */
+let pendingPhantomPops = 0;
+/** A pop that never arrives must not swallow a real back press later. */
+const PHANTOM_POP_TTL_MS = 1000;
+
+/**
+ * Test seam. The counter is module state that outlives a single `renderHook`,
+ * so a test whose guard unmounts leaves a claim behind that would swallow the
+ * NEXT test's synthetic popstate. Production has no equivalent: there the pop
+ * really does arrive (or the TTL drops it).
+ */
+export function resetPhantomPopStateForTests(): void {
+  pendingPhantomPops = 0;
+}
+
 export function useNavigationGuard({
   enabled,
   message = 'Are you sure you want to leave? You will lose your progress in the current game.',
@@ -126,6 +150,11 @@ export function useNavigationGuard({
     }
 
     const handlePopState = () => {
+      // Our own teardown's go(-1) coming home — not the user pressing back.
+      if (pendingPhantomPops > 0) {
+        pendingPhantomPops--;
+        return;
+      }
       // Prevent rapid-fire handling
       if (isHandlingBackRef.current) return;
       isHandlingBackRef.current = true;
@@ -167,7 +196,13 @@ export function useNavigationGuard({
       // same URL): pop the phantom so the back button behaves normally after.
       // Defensive: only pop if we're genuinely still on the phantom URL.
       if (typeof window !== 'undefined' && window.location.href === phantomHref) {
+        pendingPhantomPops++;
         window.history.go(-1);
+        // If the browser never delivers it (navigated away first), drop the
+        // claim so a later real back press is still guarded.
+        setTimeout(() => {
+          if (pendingPhantomPops > 0) pendingPhantomPops--;
+        }, PHANTOM_POP_TTL_MS);
       }
     };
   }, [enabled]); // Only re-run when enabled changes, not when callback changes

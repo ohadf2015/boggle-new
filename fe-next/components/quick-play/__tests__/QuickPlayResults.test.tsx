@@ -54,7 +54,7 @@ describe('QuickPlayResults redesign', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const pill = screen.getByText('quickPlay.solo.mode.blast');
+    const pill = screen.getByTestId('quick-mode-chip');
     expect(pill.className).toContain('bg-neo-pink');
   });
 
@@ -130,12 +130,14 @@ describe('QuickPlayResults redesign', () => {
     expect(hero).toHaveTextContent('340');
   });
 
-  it('does not display the wordsFound line', () => {
+  // Was "does not display the wordsFound line" — the hero deliberately carried
+  // no word count while the screen showed no words at all. It now lists the
+  // words you found, and "24 / 96" is the coverage context for that list.
+  it('displays how much of the board was cleared', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    // The specific wordsFound string should not appear
-    expect(screen.queryByText(/7 \/ 12 words found/)).not.toBeInTheDocument();
+    expect(screen.getByTestId('quick-hero-card')).toHaveTextContent('quickPlay.solo.wordsFound');
   });
 
   it('coins reward is not a full-width slab', () => {
@@ -241,5 +243,118 @@ describe('QuickPlayResults redesign', () => {
     const allText = screen.getByTestId('quick-play-results').textContent || '';
     const matches = (allText.match(/quickPlay\.solo\.betterThan/g) || []).length;
     expect(matches).toBe(1);
+  });
+});
+
+describe('QuickPlayResults — mascot, standings and words', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => ({ entries: [] }) })));
+  });
+
+  const flatResult: QuickRoundResult = { ...result, scorePct: 20, score: 100 };
+  // history where 20 is NOT a personal best and totalPoints stays inside one rank band
+  const flatOutcome: QuickSubmitOutcome = { ...outcome, scorePct: 20, history: [20, 55, 60], totalPoints: 60 };
+
+  it('plays no mascot after an ordinary round', () => {
+    render(
+      <QuickPlayResults
+        result={flatResult}
+        outcome={flatOutcome}
+        rival={null}
+        onNextRound={vi.fn()}
+        onChallenge={vi.fn()}
+      />
+    );
+    expect(screen.queryByTestId('quick-mascot')).toBeNull();
+  });
+
+  it('plays exactly one mascot, the champion clip, when the round crosses a rank', () => {
+    // 40 points before the round, 100 after → Rookie(0) → still Rookie... use a
+    // crossing: 260 before, 300 after → Bronze.
+    const rankUp: QuickSubmitOutcome = { ...outcome, scorePct: 40, history: [40], totalPoints: 300 };
+    render(
+      <QuickPlayResults
+        result={{ ...result, scorePct: 40 }}
+        outcome={rankUp}
+        rival={null}
+        onNextRound={vi.fn()}
+        onChallenge={vi.fn()}
+      />
+    );
+    const mascots = screen.getAllByTestId('quick-mascot');
+    expect(mascots).toHaveLength(1);
+    expect(mascots[0].getAttribute('data-mascot-kind')).toBe('champion');
+  });
+
+  it('shows the round standings with the rivals it actually raced', () => {
+    render(
+      <QuickPlayResults
+        result={flatResult}
+        outcome={flatOutcome}
+        rival={null}
+        rivals={[
+          { userId: 'synthetic:a', name: 'Sprout', scorePct: 10 },
+          { userId: 'synthetic:b', name: 'Vocab Vulture', scorePct: 60 },
+        ]}
+        onNextRound={vi.fn()}
+        onChallenge={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('quick-rivals-passed')).toBeTruthy();
+    // t() is mocked to return the key, so assert on the rows instead of the copy
+    expect(screen.getAllByTestId('quick-rival-row')).toHaveLength(2);
+    expect(screen.getByTestId('quick-rival-row-me')).toBeTruthy();
+  });
+
+  it('marks the words that are new to the collection and names the best one', () => {
+    render(
+      <QuickPlayResults
+        result={flatResult}
+        outcome={flatOutcome}
+        rival={null}
+        collected={[
+          { word: 'stone', score: 12, isNew: true },
+          { word: 'ten', score: 30, isNew: false },
+        ]}
+        collectionTotal={41}
+        onNextRound={vi.fn()}
+        onChallenge={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('quick-best-word').textContent).toBe('TEN');
+    expect(screen.getAllByTestId('quick-word-chip-new')).toHaveLength(1);
+  });
+
+  it('starts the chosen mode directly from the results screen', () => {
+    const onNextRound = vi.fn();
+    render(
+      <QuickPlayResults
+        result={flatResult}
+        outcome={flatOutcome}
+        rival={null}
+        onNextRound={onNextRound}
+        onChallenge={vi.fn()}
+      />
+    );
+    screen.getByTestId('quick-next-mode-blast').click();
+    expect(onNextRound).toHaveBeenCalledWith('blast');
+    screen.getByTestId('quick-results-next').click();
+    expect(onNextRound).toHaveBeenLastCalledWith();
+  });
+
+  it('fills the words column with the mascot when the round scored nothing', () => {
+    render(
+      <QuickPlayResults
+        result={{ ...flatResult, scorePct: 0, score: 0, wordsFound: 0 }}
+        outcome={{ ...flatOutcome, scorePct: 0 }}
+        rival={null}
+        collected={[]}
+        collectionTotal={12}
+        onNextRound={vi.fn()}
+        onChallenge={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('quick-no-words')).toBeTruthy();
+    expect(screen.queryByTestId('quick-words-collected')).toBeNull();
   });
 });

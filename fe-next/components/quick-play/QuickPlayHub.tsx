@@ -13,9 +13,14 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickPlayModePicker } from './QuickPlayModePicker';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
+import type { CollectedWord } from './QuickWordsCollected';
+import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
+import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
+import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
+import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
 import { captureError } from '@/utils/sentry';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
@@ -60,6 +65,9 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [challenge, setChallenge] = useState<ChallengeInfo | null>(null);
   const [answered, setAnswered] = useState<{ name: string; theirPct: number; yourPct: number } | null>(null);
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
+  const [collected, setCollected] = useState<CollectedWord[]>([]);
+  const [collectionTotal, setCollectionTotal] = useState(0);
+  const [dayStreak, setDayStreak] = useState(0);
   const [loadError, setLoadError] = useState(false);
   /** Resolved mode the lightning bolt is locked onto during loading. */
   const [strikeMode, setStrikeMode] = useState<QuickMode | null>(null);
@@ -124,11 +132,23 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   // Tapping a mode node or releasing the drag knob fires an electric strike
   // toward that mode, holds a visible loading state on the wheel, then enters
   // play after board fetch + a minimum hold (so fast APIs don't skip the beat).
-  const handlePlay = useCallback(async (sel: WheelSelection, method: 'drag' | 'tap') => {
+  const handlePlay = useCallback(async (
+    sel: WheelSelection,
+    method: 'drag' | 'tap',
+    /**
+     * The challenge in force for THIS round. Passed explicitly because the
+     * results screen clears the challenge and starts the next round in the
+     * same tick: a closed-over `challenge` is still the old one at that point,
+     * so tapping "Blast" after a challenge round replayed the challenge's mode
+     * AND seed. `undefined` means "whatever state says"; `null` means none.
+     */
+    challengeOverride?: ChallengeInfo | null
+  ) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
+    const activeChallenge = challengeOverride === undefined ? challenge : challengeOverride;
     const mode: QuickMode =
-      challenge?.mode ??
+      activeChallenge?.mode ??
       (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
         : sel);
@@ -136,7 +156,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     setSelection(mode);
     setStrikeMode(mode);
     posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
-    if (sel === 'random' && !challenge) {
+    if (sel === 'random' && !activeChallenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
     setPhase('loading');
@@ -147,7 +167,10 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode, language, seed: challenge?.seed }),
+        // recentPct lets the server aim the rival field at THIS player: without
+        // it a beginner passes nobody and a strong player passes everyone,
+        // every round. Local history, so guests are covered too; 0 = unknown.
+        body: JSON.stringify({ mode, language, seed: activeChallenge?.seed, recentPct: recentAveragePct() }),
       });
       if (!res.ok) throw new Error(`round fetch ${res.status}`);
       const round = (await res.json()) as QuickRoundConfig;
@@ -173,7 +196,44 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       submitting.current = true;
       setResult(r);
       try {
-        let out: QuickSubmitOutcome = { scorePct: r.scorePct, coins: 0, xp: 0, percentileToday: 0, history: [], totalPoints: 0 };
+        // Local first: the day streak has no server home, and a signed-out
+        // player's whole progression lives here (submit is auth-gated, so it
+        // used to hand guests a row of zeros).
+        const local = recordGuestRound({ mode: r.mode, scorePct: r.scorePct });
+        setDayStreak(local.dayStreak);
+        // The signup modal's teaser reads the SHARED guest ledger, not this
+        // one — quick rounds bumped its game count but never its score, so it
+        // pitched "9 games • 0 pts waiting to be saved" to a player who had
+        // scored thousands. Feed it the round too.
+        if (!user?.id) {
+          const longest = (r.words ?? []).reduce((best, w) => (w.word.length > best.length ? w.word : best), '');
+          updateGuestStatsAfterGame({
+            score: r.score,
+            wordCount: r.wordsFound,
+            longestWord: longest || undefined,
+          });
+        }
+
+        // Which of this round's words the player had never found before. Never
+        // fatal: a collection lookup that fails costs the ★ badges, not the
+        // results screen.
+        try {
+          const roundWords = r.words ?? [];
+          const progress = await getQuickPlayWordProgress(roundWords, user?.id ?? null);
+          const isNew = new Set(progress.new.map((w) => w.toLowerCase()));
+          setCollected(roundWords.map((w) => ({ ...w, isNew: isNew.has(w.word.toLowerCase()) })));
+          setCollectionTotal(progress.total);
+        } catch {
+          setCollected((r.words ?? []).map((w) => ({ ...w, isNew: false })));
+        }
+        let out: QuickSubmitOutcome = {
+          scorePct: r.scorePct,
+          coins: quickCoinsFor(r.scorePct),
+          xp: quickXpFor(r.scorePct),
+          percentileToday: 0,
+          history: local.history,
+          totalPoints: local.points,
+        };
         try {
           const res = await fetch('/api/quick-play/submit', {
             method: 'POST',
@@ -255,17 +315,32 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     [challenge, language, roundIndex, user?.id]
   );
 
-  const handleNextRound = useCallback(() => {
+  /**
+   * Back to the wheel — unless the player already named the mode they want on
+   * the results screen, in which case that choice IS the decision and a trip
+   * through the picker is a tax on it.
+   */
+  const handleNextRound = useCallback((mode?: QuickMode) => {
     setRoundIndex((i) => i + 1);
     setConfig(null);
     setResult(null);
     setOutcome(null);
     setRival(null);
     setChallenge(null); // challenge is a one-round contract
-    setSelection('random');
+    setCollected([]);
+    setSelection(mode ?? 'random');
     setStrikeMode(null);
-    setPhase('wheel');
+    // `null`, not the state value: setChallenge above has not applied yet, and
+    // the stale one would replay the challenge's board under a new mode.
+    if (mode) void handlePlayRef.current?.(mode, 'tap', null); // it owns the phase from here
+    else setPhase('wheel');
   }, []);
+
+  // handlePlay is declared above but closes over `challenge`, which this
+  // callback clears — a direct dependency would rebuild it every round and
+  // re-fire the effects keyed on it. A ref keeps one stable identity.
+  const handlePlayRef = useRef<typeof handlePlay | null>(null);
+  handlePlayRef.current = handlePlay;
 
   const handleChallenge = useCallback(() => {
     if (result) void shareChallenge(result, language, t);
@@ -292,7 +367,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             <button
               type="button"
               data-testid="quick-round-error-retry"
-              onClick={handleNextRound}
+              onClick={() => handleNextRound()}
               className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-neo-black shadow-hard active:shadow-hard-pressed"
             >
               {t('common.retry', 'Try Again')}
@@ -311,6 +386,11 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         result={result}
         outcome={outcome}
         rival={rival}
+        rivals={config?.ghosts ?? []}
+        collected={collected}
+        collectionTotal={collectionTotal}
+        isGuest={!user?.id}
+        dayStreak={dayStreak}
         onNextRound={handleNextRound}
         onChallenge={handleChallenge}
       />
@@ -348,11 +428,15 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
           </span>
         </div>
         <div className="flex items-stretch divide-x-2 divide-black rtl:divide-x-reverse rounded-xl border-neo-thick border-black bg-neo-navy-elevated text-center font-neo-display text-xs font-semibold shadow-hard" data-testid="quick-header-stats">
+          {/* The tier name alone used to be enough when the tiers were metals —
+              "Gold" places you without help. The new names have voice but no
+              implied order, so the chip carries the points too. */}
           {totalPoints !== null && (
             <div className="px-3 py-2" data-testid="quick-rank-chip">
               <span className={quickRank(totalPoints).color}>
                 {t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}
               </span>
+              <b className="block text-base text-neo-cream">{totalPoints}</b>
             </div>
           )}
           <div className="px-3 py-2 text-neo-cream">
@@ -384,6 +468,18 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             name: challenge.challengerName,
             pct: String(challenge.challengerScorePct),
           })}
+        </div>
+      )}
+
+      {/* Board build is a real wait (fetch + a held beat). A dancing mascot is
+          what the rest of the app puts on a loading surface — the static pose +
+          CSS dance, not the heavy animated loop. */}
+      {phase === 'loading' && (
+        <div className="relative z-[2] -mb-2 flex flex-col items-center gap-1" data-testid="quick-loading-mascot">
+          <LoadingDancer styleKey="arcade" className="h-20 w-20 sm:h-24 sm:w-24" />
+          <span className="font-neo-display text-xs tracking-wide text-neo-cream/80">
+            {t('quickPlay.solo.loading')}
+          </span>
         </div>
       )}
 

@@ -80,6 +80,31 @@ describe('usePlayerLobby — ready toggle', () => {
     expect(socket.emit).toHaveBeenCalledWith('lobbyReady', { ready: false });
   });
 
+  /**
+   * Rage-click regression (PostHog: "Ready Up!"/"Ready!" hammered in 6 sessions).
+   * A second tap before the server echo must not emit twice — but ready is a
+   * TOGGLE, so the echo has to release the lock immediately. An earlier fix held
+   * it on a 3s timer, which locked a player out of changing their mind.
+   */
+  it('swallows a second tap before the echo, then frees the toggle once the echo lands', () => {
+    const socket = makeMockSocket();
+    const { result } = renderHook(() => usePlayerLobby(baseParams(socket, 'me')));
+
+    act(() => result.current.toggleReady());
+    act(() => result.current.toggleReady()); // impatient second tap, no echo yet
+    expect(socket.emit).toHaveBeenCalledTimes(1);
+    expect(result.current.readyInFlight).toBe(true);
+
+    act(() => {
+      socket.__fire('playersReadyUpdate', { readyCount: 1, totalPlayers: 2, readyUsernames: ['me'] });
+    });
+    expect(result.current.readyInFlight).toBe(false);
+
+    act(() => result.current.toggleReady()); // changed their mind — must go through at once
+    expect(socket.emit).toHaveBeenCalledTimes(2);
+    expect(socket.emit).toHaveBeenLastCalledWith('lobbyReady', { ready: false });
+  });
+
   it('clears the ready list on resetGame', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() => usePlayerLobby(baseParams(socket, 'me')));

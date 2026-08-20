@@ -13,7 +13,7 @@
 
 import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useNavigationGuard } from '../useNavigationGuard';
+import { useNavigationGuard, resetPhantomPopStateForTests } from '../useNavigationGuard';
 
 describe('useNavigationGuard - Quit Confirmation Flow', () => {
   let mockPushState: any;
@@ -21,6 +21,7 @@ describe('useNavigationGuard - Quit Confirmation Flow', () => {
   let mockRemoveEventListener: any;
 
   beforeEach(() => {
+    resetPhantomPopStateForTests();
     // Mock window.history
     mockPushState = vi.spyOn(window.history, 'pushState').mockImplementation();
 

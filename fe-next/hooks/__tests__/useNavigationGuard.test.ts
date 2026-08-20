@@ -15,7 +15,7 @@
 
 import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useNavigationGuard } from '../useNavigationGuard';
+import { useNavigationGuard, resetPhantomPopStateForTests } from '../useNavigationGuard';
 
 const GAME_URL = 'http://localhost:3000/en/daily/word-hunt';
 
@@ -23,6 +23,7 @@ describe('useNavigationGuard', () => {
   let goSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    resetPhantomPopStateForTests();
     window.history.replaceState({}, '', GAME_URL);
     goSpy = vi.spyOn(window.history, 'go').mockImplementation(() => {});
   });
