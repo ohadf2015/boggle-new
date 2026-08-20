@@ -3,7 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const hasLiveEnv = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+// The enumeration probe needs a SIGNED-IN stranger, and anonymous sign-ins are disabled on
+// this project — so it mints and deletes a throwaway user, which needs the service-role key.
+const hasServiceRole = hasLiveEnv && !!SERVICE_ROLE_KEY;
 
 const anonClient = () => createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
 
@@ -63,13 +67,47 @@ describe.skipIf(!hasLiveEnv)('classrooms are not enumerable (live DB)', () => {
    * working key to every class. It only existed for the join-by-code path, which now goes
    * through the SECURITY DEFINER lookup_classroom_by_join_code() RPC instead.
    *
-   * anon stands in for "an account with no relationship to any classroom": neither member,
-   * nor teacher, nor admin.
+   * This MUST run as a SIGNED-IN account, not a bare anon key. The removed clause was
+   * `auth.uid() IS NOT NULL AND ...`, false for anon anyway — and the sibling clause calls
+   * is_classroom_member(), which anon has no EXECUTE on, so a bare-anon probe returns null
+   * under the holed policy exactly as it does under the fixed one. Such a test passes either
+   * way and guards nothing.
+   *
+   * signInAnonymously() is not an option — anonymous sign-ins are disabled on this project.
+   * So mint a throwaway email user with the service-role key, sign in as them (role
+   * `authenticated`, a real uid that is neither member, teacher, nor admin — precisely the
+   * account the old clause handed the whole directory to), probe, and delete them.
+   *
+   * Confirmed to discriminate: with the blanket clause temporarily restored on the live DB
+   * this assertion fails; it passes once the clause is dropped again.
    */
-  it('anon cannot list classrooms or harvest join codes', async () => {
-    const sb = anonClient();
-    const { data } = await sb.from('classrooms').select('id, name, join_code').limit(5);
-    expect(data ?? []).toEqual([]);
+  it.skipIf(!hasServiceRole)('a signed-in stranger cannot list classrooms or harvest join codes', async () => {
+    const admin = createClient(SUPABASE_URL!, SERVICE_ROLE_KEY!, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const email = `rls-stranger-${Date.now()}@example.com`;
+    const password = `pw-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+
+    const created = await admin.auth.admin.createUser({ email, password, email_confirm: true });
+    expect(created.error).toBeNull();
+    const strangerId = created.data.user!.id;
+
+    try {
+      const sb = anonClient();
+      const signIn = await sb.auth.signInWithPassword({ email, password });
+      expect(signIn.error).toBeNull();
+      expect(signIn.data.user?.id).toBe(strangerId);
+
+      // Sanity-check the probe is meaningful: there is at least one classroom to leak.
+      const { count } = await admin.from('classrooms').select('*', { count: 'exact', head: true });
+      expect(count).toBeGreaterThan(0);
+
+      const { data } = await sb.from('classrooms').select('id, name, join_code').limit(5);
+
+      expect(data ?? []).toEqual([]);
+    } finally {
+      await admin.auth.admin.deleteUser(strangerId);
+    }
   });
 });
 
