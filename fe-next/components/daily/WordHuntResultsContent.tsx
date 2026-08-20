@@ -42,6 +42,8 @@ import {
   StatsBlurb,
   PastPerformanceCompare,
   DailyWordHuntFacts,
+  EmojiShareCard,
+  type EmojiShareCardProps,
   ShareSection,
   CoinUnlockCard,
   MoreOptionsAccordion,
@@ -59,7 +61,7 @@ export interface WordHuntResultsContentProps {
   isNewCompletion?: boolean;
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
-  emojiWords: Array<{ word: string; found: boolean }>;
+  emojiWords: EmojiShareCardProps['words'];
   stats: WordHuntStats | null;
   shareHandlers: {
     handleNativeShare: () => void;
@@ -117,7 +119,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isNewCompletion: _isNewCompletion,
   survivalBonusTime,
   rarestWord,
-  emojiWords: _emojiWords,
+  emojiWords,
   stats,
   shareHandlers,
   coinActions,
@@ -364,6 +366,21 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     />
   );
 
+  /* The PRIMARY CTA on this screen: the emoji-grid share card. Sits directly
+     under the result hero, before every recap/promo block, in both the guest
+     and the full branch — the one-tap copy is what we want a finisher to do
+     next. (EmojiShareCard renders the attempt grid + Copy/Share buttons.) */
+  const shareCardNode = (
+    <EmojiShareCard
+      puzzleNumber={puzzleNumber}
+      score={result.efficiencyScore ?? 0}
+      solved={result.solved}
+      words={emojiWords}
+      language={language}
+      t={t}
+    />
+  );
+
   const leaderboardNode = (
     <>
       {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
@@ -400,6 +417,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     return (
       <div className="space-y-4">
         {heroNode}
+        {shareCardNode}
         {failStateNode}
         {leaderboardNode}
         {signupNode}
@@ -410,6 +428,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   return (
   <div className="space-y-4">
     {heroNode}
+    {shareCardNode}
 
     {/* Vs your own past plays — placement/score is above, this is the
         "how do I compare to how I usually do" the player cares about next.

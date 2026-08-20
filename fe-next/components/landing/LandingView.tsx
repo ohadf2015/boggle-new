@@ -19,6 +19,7 @@ import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
+import { useAutoStartDaily } from './useAutoStartDaily';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
@@ -102,6 +103,10 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   // (they shifted <LandingSEOSection>'s <section> against a client <div>).
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+
+  // Returning visitors (played Word Hunt here before) skip the brochure and
+  // go straight to today's puzzle — see useAutoStartDaily.
+  useAutoStartDaily({ language, authLoading, isAuthenticated });
 
   // No client-side skeleton gate for the cards. This tree is server-rendered
   // (PageClient is 'use client' but imports LandingView synchronously), so SSR
