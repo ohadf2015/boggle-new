@@ -51,7 +51,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     }
   } else {
     const r = await sb.from('teacher_access_allowlist').insert({
-      email: row.email,
+      // Normalised on write so redemption can match on a plain lowercase probe.
+      // Storing the address verbatim left mixed-case rows unredeemable.
+      email: row.email.toLowerCase(),
       approved_by: user.id,
       source_request_id: row.id,
       trial_expires_at: trialExpiresAt,

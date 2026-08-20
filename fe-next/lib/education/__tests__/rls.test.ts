@@ -23,7 +23,11 @@ describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
   it('anon CANNOT select rows', async () => {
     const sb = anonClient();
     const { data } = await sb.from('teacher_access_requests').select('*').limit(1);
-    expect(data).toEqual([]);
+    // Denial arrives as an ERROR here, not an empty set: the SELECT policy calls
+    // is_admin_user(), and EXECUTE on it is granted to authenticated/service_role but not
+    // to anon, so PostgREST returns 42501 with data:null. Assert the property that matters
+    // — no rows leak — rather than one of the two shapes denial can take.
+    expect(data ?? []).toEqual([]);
   });
 
   it('anon CANNOT update rows', async () => {
@@ -45,7 +49,47 @@ describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
       .eq('email', testEmail)
       .select();
 
-    // 3. RLS should block: no error, but zero rows returned.
-    expect(upd.data).toEqual([]);
+    // 3. RLS should block — either as zero rows updated or as a permission error (the
+    //    UPDATE policy calls is_admin_user(), which anon may not EXECUTE). Both are denial;
+    //    what must never happen is the row coming back changed.
+    expect(upd.data ?? []).toEqual([]);
+  });
+});
+
+describe.skipIf(!hasLiveEnv)('public_profiles view is read-only to the public key (live DB)', () => {
+  /**
+   * `public_profiles` is a view over `profiles` with security_invoker OFF — deliberately,
+   * because that is how teachers, leaderboards and friends read other players' names past
+   * the own-row-only RLS on profiles. But the view is auto-updatable, and INSERT/UPDATE/
+   * DELETE had been granted to anon and authenticated. Since the view bypasses RLS, any
+   * holder of the public anon key could rewrite any user's username, display name, avatar
+   * or score through it — reopening, via the view, the anon-write hole that was closed on
+   * profiles itself.
+   *
+   * Privileges were revoked. Reads must keep working; writes must not.
+   */
+  it('anon CAN still read (the whole point of the view)', async () => {
+    const sb = anonClient();
+    const { data, error } = await sb.from('public_profiles').select('id').limit(1);
+    expect(error).toBeNull();
+    expect(data?.length).toBe(1);
+  });
+
+  it('anon CANNOT update through the view', async () => {
+    const sb = anonClient();
+    const { data: victim } = await sb.from('public_profiles').select('id, username').limit(1).single();
+
+    const upd = await sb
+      .from('public_profiles')
+      .update({ username: `pwned-${Date.now()}` })
+      .eq('id', victim!.id)
+      .select();
+
+    expect(upd.error).not.toBeNull();
+
+    // Belt and braces: prove the row is untouched, since a swallowed error would look
+    // identical to a blocked write from the caller's side.
+    const { data: after } = await sb.from('public_profiles').select('username').eq('id', victim!.id).single();
+    expect(after!.username).toBe(victim!.username);
   });
 });

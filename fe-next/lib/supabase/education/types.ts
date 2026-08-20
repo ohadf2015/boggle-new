@@ -26,7 +26,13 @@ export function normalizeForStorage(word: string, language?: Language): string {
 }
 
 // Types matching database schema from migration 056
-export type Language = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
+//
+// The list is a VALUE, not just a type, because every consumer that re-enumerated it by
+// hand drifted: the classroom-create Zod schema sat at four languages and 400'd every
+// Spanish and Russian teacher, and the ClassroomManager dropdown offered the same four.
+// Import EDUCATION_LANGUAGES instead of retyping the members.
+export const EDUCATION_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
+export type Language = (typeof EDUCATION_LANGUAGES)[number];
 
 export interface Classroom {
   id: string;

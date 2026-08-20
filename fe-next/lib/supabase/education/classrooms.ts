@@ -333,11 +333,16 @@ export async function getClassroomStudents(
       return { data: [], error: null };
     }
 
-    // Then, fetch profiles for all student_ids
-    // profiles.id = auth.users.id = classroom_memberships.student_id
+    // Then, fetch profiles for all student_ids.
+    // public_profiles.id = profiles.id = auth.users.id = classroom_memberships.student_id
+    //
+    // Read through `public_profiles`, NOT `profiles`: RLS on profiles is own-row-only, so a
+    // teacher querying it for their own students gets 0 rows with error:null and every
+    // student renders nameless with a permanent avatar skeleton. See
+    // __tests__/studentProfileReads.test.ts.
     const studentIds = memberships.map(m => m.student_id);
     const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, username, avatar_config')
       .in('id', studentIds);
 

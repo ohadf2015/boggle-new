@@ -210,7 +210,7 @@ export async function getAssignmentCompletions(
     // Fetch profiles separately since FK goes to auth.users not profiles
     const studentIds = [...new Set((completions || []).map(c => c.student_id))];
     const { data: profiles } = studentIds.length > 0
-      ? await supabase.from('profiles').select('id, display_name, avatar_emoji').in('id', studentIds)
+      ? await supabase.from('public_profiles').select('id, display_name, avatar_emoji').in('id', studentIds)
       : { data: [] };
 
     const profileMap = new Map((profiles || []).map(p => [p.id, p]));

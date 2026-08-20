@@ -11,10 +11,19 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { Language } from '@/lib/supabase/education';
+import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
 import ClassroomStudentList from './ClassroomStudentList';
 import ClassLimitUpsellModal from './ClassLimitUpsellModal';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
+
+const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
+  en: 'languages.english',
+  he: 'languages.hebrew',
+  sv: 'languages.swedish',
+  ja: 'languages.japanese',
+  es: 'languages.spanish',
+  ru: 'languages.russian',
+};
 
 export default function ClassroomManager() {
   const { t, language } = useLanguage();
@@ -334,10 +343,9 @@ export default function ClassroomManager() {
                     'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                   )}
                 >
-                  <option value="en">{t('languages.english')}</option>
-                  <option value="he">{t('languages.hebrew')}</option>
-                  <option value="sv">{t('languages.swedish')}</option>
-                  <option value="ja">{t('languages.japanese')}</option>
+                  {EDUCATION_LANGUAGES.map((code) => (
+                    <option key={code} value={code}>{t(LANGUAGE_LABEL_KEYS[code])}</option>
+                  ))}
                 </select>
               </div>
 
