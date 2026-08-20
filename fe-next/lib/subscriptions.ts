@@ -7,6 +7,7 @@
  */
 
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { type TierConfig, getTierConfig } from './lemonsqueezy'
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing'
@@ -29,7 +30,12 @@ export interface TeacherSubscription {
 export async function checkTeacherSubscription(
   userId: string
 ): Promise<TeacherSubscription> {
-  const supabase = await createClient()
+  // `subscriptions` SELECT is own-row-only, but this is called with a userId the server has
+  // already authorised — self, or the teacher who owns a classroom someone is joining. In
+  // that second case the reader is the STUDENT, so on the request-scoped client the teacher's
+  // row is invisible and a Pro teacher silently degrades to the free 30-student cap.
+  // Entitlement limits are not user data; read them with service-role where available.
+  const supabase = createAdminClient() ?? (await createClient())
 
   const { data, error } = await supabase
     .from('subscriptions')
@@ -129,10 +135,28 @@ export async function canAddStudent(
   currentCount: number
   limit: number | null
 }> {
-  const supabase = await createClient()
+  // Service-role, not the request-scoped client. The only caller is the join route, where
+  // the person being counted is by definition NOT yet a member and not the teacher — and RLS
+  // answers such a user with nothing. `classroom_memberships` SELECT is
+  // `auth.uid() = student_id OR is_classroom_owner(...)`, so the count came back 0 for a
+  // classroom that has members and this cap never once fired. The `classrooms` read only
+  // resolved via a blanket "any signed-in user may read any classroom with a join_code"
+  // policy clause, which is exactly the enumeration hole we want to remove.
+  //
+  // This is a capacity check the server runs on the TEACHER's behalf, not a read the joining
+  // student is entitled to make.
+  const admin = createAdminClient()
+  if (!admin) {
+    return {
+      allowed: false,
+      reason: 'service role key not configured',
+      currentCount: 0,
+      limit: 30,
+    }
+  }
 
   // Get the classroom to find its teacher
-  const { data: classroomData, error: classroomError } = await supabase
+  const { data: classroomData, error: classroomError } = await admin
     .from('classrooms')
     .select('teacher_id')
     .eq('id', classroomId)
@@ -150,7 +174,7 @@ export async function canAddStudent(
   const subscription = await checkTeacherSubscription(teacherId)
 
   // Count current students in this classroom
-  const { count } = await supabase
+  const { count } = await admin
     .from('classroom_memberships')
     .select('*', { count: 'exact', head: true })
     .eq('classroom_id', classroomId)

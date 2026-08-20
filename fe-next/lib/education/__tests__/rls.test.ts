@@ -56,6 +56,23 @@ describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
   });
 });
 
+describe.skipIf(!hasLiveEnv)('classrooms are not enumerable (live DB)', () => {
+  /**
+   * The SELECT policy used to start with `auth.uid() IS NOT NULL AND join_code IS NOT NULL`,
+   * which handed any signed-in account the full classroom list — names and join codes, i.e. a
+   * working key to every class. It only existed for the join-by-code path, which now goes
+   * through the SECURITY DEFINER lookup_classroom_by_join_code() RPC instead.
+   *
+   * anon stands in for "an account with no relationship to any classroom": neither member,
+   * nor teacher, nor admin.
+   */
+  it('anon cannot list classrooms or harvest join codes', async () => {
+    const sb = anonClient();
+    const { data } = await sb.from('classrooms').select('id, name, join_code').limit(5);
+    expect(data ?? []).toEqual([]);
+  });
+});
+
 describe.skipIf(!hasLiveEnv)('public_profiles view is read-only to the public key (live DB)', () => {
   /**
    * `public_profiles` is a view over `profiles` with security_invoker OFF — deliberately,
