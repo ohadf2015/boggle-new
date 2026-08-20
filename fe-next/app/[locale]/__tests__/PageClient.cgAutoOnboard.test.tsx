@@ -64,7 +64,7 @@ describe('HomePageClient — CG auto-onboarding', () => {
     mockCgDetected = true;
     localStorage.setItem('lexiclash_onboarding_completed', 'true');
     render(<HomePageClient />);
-    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
+    // Returning CG users auto-start the daily puzzle instead of landing/FTUE.
     expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
   });
 });

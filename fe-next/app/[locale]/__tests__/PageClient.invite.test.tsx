@@ -70,11 +70,12 @@ describe('HomePageClient invite parsing', () => {
     expect(replaceMock).not.toHaveBeenCalled();
   });
 
-  it('does NOT redirect returning users when no ?room= param', () => {
+  it('auto-starts the daily puzzle for returning users when no ?room= param', () => {
     localStorage.setItem('lexiclash_onboarding_completed', 'true');
     setUrl('');
     render(<HomePageClient />);
-    expect(replaceMock).not.toHaveBeenCalled();
+    expect(replaceMock).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer'));
+    expect(replaceMock).toHaveBeenCalledWith('/en/daily/word-hunt?from=autostart');
   });
 
   // Regression #418: the server (no window) renders LandingView. The first CLIENT

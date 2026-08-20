@@ -1,7 +1,8 @@
 /**
- * The primary next-step CTA on the Word Hunt results screen is pinned to the
- * bottom of the scrollport, so "finish today's challenge" / "back to the daily
- * hub" stays reachable without scrolling past the whole recap.
+ * The primary CTA on the Word Hunt results screen is the SHARE CARD, pinned to
+ * the bottom of the scrollport (gauntlet-2: the emoji-grid result is the growth
+ * loop, so "share my result" is always one tap away). The wheel cross-promo /
+ * back-to-daily-hub next-step CTAs are demoted to inline below it.
  *
  * `position: sticky` (not `fixed`) is deliberate — every CTA sits inside a
  * Framer `m.div` transform ancestor, which turns `fixed` into `absolute`
@@ -161,19 +162,25 @@ describe('WordHuntResultsContent — sticky primary CTA', () => {
     mockIsGuest.mockReturnValue(false);
   });
 
-  it('pins the "finish today\'s challenge" CTA when the wheel is unplayed', () => {
+  it('pins the share card as the sticky primary CTA', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getByTestId('wordhunt-wheel-cta').className).toContain('sticky');
+    expect(screen.getByTestId('wordhunt-share-cta').className).toContain('sticky');
   });
 
-  it('pins the back-to-daily-hub CTA once the wheel is done', () => {
+  it('keeps the "finish today\'s challenge" CTA inline when the wheel is unplayed', () => {
+    render(<WordHuntResultsContent {...baseProps} />);
+    expect(screen.getByTestId('wordhunt-wheel-cta').className).not.toContain('sticky');
+  });
+
+  it('keeps the back-to-daily-hub CTA inline once the wheel is done', () => {
     mockWheelPlayed.mockReturnValue(true);
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getByTestId('wordhunt-back-to-daily-cta').className).toContain('sticky');
+    expect(screen.getByTestId('wordhunt-back-to-daily-cta').className).not.toContain('sticky');
   });
 
-  it('renders exactly one primary CTA per state', () => {
+  it('renders exactly one sticky primary CTA per state', () => {
     render(<WordHuntResultsContent {...baseProps} />);
+    expect(screen.getAllByTestId('wordhunt-share-cta')).toHaveLength(1);
     expect(screen.getAllByTestId('wordhunt-wheel-cta')).toHaveLength(1);
     expect(screen.queryByTestId('wordhunt-back-to-daily-cta')).toBeNull();
   });
@@ -181,6 +188,7 @@ describe('WordHuntResultsContent — sticky primary CTA', () => {
   it('gives a guest no sticky CTA — the signup card is their only one', () => {
     mockIsGuest.mockReturnValue(true);
     render(<WordHuntResultsContent {...baseProps} isAuthenticated={false} />);
+    expect(screen.queryByTestId('wordhunt-share-cta')).toBeNull();
     expect(screen.queryByTestId('wordhunt-wheel-cta')).toBeNull();
     expect(screen.queryByTestId('wordhunt-back-to-daily-cta')).toBeNull();
   });

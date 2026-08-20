@@ -7402,6 +7402,7 @@ const es = {
       "completeDailyDesc": "Juega Caza de Palabras para completar tu Reto Diario",
       "backToDaily": "Volver al Reto Diario",
       "backToDailyDesc": "Ver la tabla de clasificación de hoy",
+      "shareCtaBadge": "COMPARTE TU RESULTADO",
       "playerWordsTitle": "El camino de {{name}}",
       "youMissedWords": "Palabras que te perdiste",
       "tapPlayerHint": "Toca un jugador para ver su camino",

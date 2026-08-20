@@ -43,6 +43,7 @@ import {
   PastPerformanceCompare,
   DailyWordHuntFacts,
   ShareSection,
+  EmojiShareCard,
   CoinUnlockCard,
   MoreOptionsAccordion,
   StreakFreezeIndicator,
@@ -59,7 +60,7 @@ export interface WordHuntResultsContentProps {
   isNewCompletion?: boolean;
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
-  emojiWords: Array<{ word: string; found: boolean }>;
+  emojiWords: Array<{ word: string; found: boolean; feedback?: Array<{ letter: string; feedback: 'green' | 'yellow' | 'gray' }> }>;
   stats: WordHuntStats | null;
   shareHandlers: {
     handleNativeShare: () => void;
@@ -117,7 +118,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isNewCompletion: _isNewCompletion,
   survivalBonusTime,
   rarestWord,
-  emojiWords: _emojiWords,
+  emojiWords,
   stats,
   shareHandlers,
   coinActions,
@@ -195,10 +196,37 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     [language, puzzleDate],
   );
 
+  /* PRIMARY CTA on the finish screen: the share card (gauntlet-2). The
+     Wordle-style emoji grid IS the growth loop — it pins to the bottom of the
+     scrollport so "share my result" is always one tap away, and its copy
+     button writes the emoji-grid text in a single tap. The wheel/back-to-daily
+     next-step CTAs are demoted to inline below it. */
+  const shareCtaNode = (
+    <m.div
+      data-testid="wordhunt-share-cta"
+      className={STICKY_CTA_WORD_HUNT}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.18, type: 'spring', stiffness: 300, damping: 26 }}
+      onClick={() => trackGrowthEvent('share_primary_cta_impression_tap', { solved: result.solved, language })}
+    >
+      <span className="absolute -top-2 start-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-lime text-neo-black text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
+        {t('wordHunt.results.shareCtaBadge', 'SHARE YOUR RESULT')}
+      </span>
+      <EmojiShareCard
+        puzzleNumber={puzzleNumber}
+        score={result.efficiencyScore ?? 0}
+        solved={result.solved}
+        words={emojiWords}
+        language={language}
+        t={t}
+      />
+    </m.div>
+  );
+
   const wheelCtaNode = !wordWheelPlayed && (
     <m.div
       data-testid="wordhunt-wheel-cta"
-      className={STICKY_CTA_WORD_HUNT}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
@@ -242,13 +270,13 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     </m.div>
   );
 
-  // When the other game is already done, the primary CTA goes back to the
+  // When the other game is already done, the next-step CTA goes back to the
   // Daily Hub (which surfaces the combined leaderboard) instead of nagging
-  // the player to "complete the other challenge".
+  // the player to "complete the other challenge". Inline, not sticky — the
+  // share card owns the pinned primary slot now.
   const backToDailyCtaNode = wordWheelPlayed && (
     <m.div
       data-testid="wordhunt-back-to-daily-cta"
-      className={STICKY_CTA_WORD_HUNT}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
@@ -493,11 +521,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </m.div>
     )}
 
-    {/* Primary next-step: back-to-daily (wheel already done) or the wheel
-        cross-promo. Sticky-pinned to the bottom of the scrollport, so it stays
-        on screen through the leaderboard and the rest of the recap. It sits
-        here in DOM order so it lands right above "who else played" once the
-        player scrolls to the end and it unpins. */}
+    {/* Primary CTA: the share card, sticky-pinned to the bottom of the
+        scrollport so it stays on screen through the recap. The wheel
+        cross-promo / back-to-daily next-step is inline right below it. DOM
+        order here lands the pair just above "who else played" once the player
+        scrolls to the end and the sticky share card unpins. */}
+    {shareCtaNode}
     {backToDailyCtaNode}
     {wheelCtaNode}
 

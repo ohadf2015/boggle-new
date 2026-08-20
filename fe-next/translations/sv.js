@@ -7764,6 +7764,7 @@ const sv = {
       "completeDailyDesc": "Spela Ordjakt för att slutföra din dagliga utmaning",
       "backToDaily": "Tillbaka till dagliga utmaningar",
       "backToDailyDesc": "Se dagens topplista",
+      "shareCtaBadge": "DELA DITT RESULTAT",
       "playerWordsTitle": "{{name}}s väg",
       "youMissedWords": "Ord du missade",
       "tapPlayerHint": "Tryck på en spelare för att se deras väg",

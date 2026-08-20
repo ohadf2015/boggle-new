@@ -7442,6 +7442,7 @@ const he = {
       "completeDailyDesc": "שחק בציד מילים כדי להשלים את האתגר היומי",
       "backToDaily": "חזרה לאתגר היומי",
       "backToDailyDesc": "צפה בטבלת המובילים של היום",
+      "shareCtaBadge": "שתפו את התוצאה שלכם",
       "playerWordsTitle": "הנתיב של {{name}}",
       "youMissedWords": "מילים שהחמצת",
       "tapPlayerHint": "לחץ על שחקן כדי לראות את נתיבו",

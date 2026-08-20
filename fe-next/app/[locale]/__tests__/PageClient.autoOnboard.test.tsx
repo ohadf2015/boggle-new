@@ -52,17 +52,18 @@ describe('HomePageClient — auto-onboarding for new users', () => {
     expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
-  it('renders LandingView for returning users (onboarding completed)', () => {
+  it('auto-starts the daily puzzle for returning users (onboarding completed)', () => {
+    // Gauntlet-2: the homepage IS the game — returning visitors skip the
+    // brochure hero and warp straight into today's Word Hunt.
     localStorage.setItem('lexiclash_onboarding_completed', 'true');
     render(<HomePageClient />);
-    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
     expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
   });
 
   it('does not pass onStartOnboarding for returning users', () => {
     localStorage.setItem('lexiclash_onboarding_completed', 'true');
     render(<HomePageClient />);
-    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
     expect(screen.queryByTestId('play-cta')).not.toBeInTheDocument();
   });
 

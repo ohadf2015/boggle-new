@@ -6899,6 +6899,7 @@ const en = {
       "completeDailyDesc": "Play Word Hunt to complete your Daily Challenge",
       "backToDaily": "Back to Daily Hub",
       "backToDailyDesc": "See today's leaderboard",
+      "shareCtaBadge": "SHARE YOUR RESULT",
       "playerWordsTitle": "{{name}}'s path",
       "youMissedWords": "Words you missed",
       "tapPlayerHint": "Tap a player to see their path",

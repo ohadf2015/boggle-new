@@ -7525,6 +7525,7 @@ const ja = {
       "completeDailyDesc": "ワードハントをプレイしてデイリーチャレンジを達成",
       "backToDaily": "デイリーハブに戻る",
       "backToDailyDesc": "今日のリーダーボードを見る",
+      "shareCtaBadge": "結果をシェア",
       "playerWordsTitle": "{{name}}のルート",
       "youMissedWords": "見逃した単語",
       "tapPlayerHint": "プレイヤーをタップしてルートを確認",

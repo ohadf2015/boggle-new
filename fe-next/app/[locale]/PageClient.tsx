@@ -64,8 +64,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // the friends activity feed) and drop straight into the MP lobby. New users
   // still flow through FTUE — `useInviteOnboardingMode` consumes the invite
   // from sessionStorage and routes after profile completion.
-  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null; qrRedirectUrl: string | null }>(() => {
-    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null, qrRedirectUrl: null };
+  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null; qrRedirectUrl: string | null; dailyRedirectUrl: string | null }>(() => {
+    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null, qrRedirectUrl: null, dailyRedirectUrl: null };
     const returning = hasCompletedOnboarding() || hasSupabaseSession();
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
@@ -102,9 +102,22 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       qrRedirectUrl = `/${locale}/daily?from=qr`;
     }
 
-    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode: roomCode, qrRedirectUrl };
+    // Returning visitor with no invite/QR in play → auto-start today's daily
+    // puzzle (gauntlet-2: the homepage IS the game, NYT-style — the Word Hunt
+    // grid replaces the brochure hero for anyone who has played before).
+    // `returning` is localStorage-derived (hasCompletedOnboarding / Supabase
+    // session), so crawlers with empty storage never take this branch and keep
+    // indexing the SSR'd LandingView. Invite and QR redirects both outrank it.
+    let dailyRedirectUrl: string | null = null;
+    if (returning && !inviteRedirectUrl && !qrRedirectUrl) {
+      const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+      const locale = localeMatch?.[1] || 'en';
+      dailyRedirectUrl = `/${locale}/daily/word-hunt?from=autostart`;
+    }
+
+    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode: roomCode, qrRedirectUrl, dailyRedirectUrl };
   });
-  const { isNewUser, inviteRedirectUrl, inviteRoomCode, qrRedirectUrl } = initialState;
+  const { isNewUser, inviteRedirectUrl, inviteRoomCode, qrRedirectUrl, dailyRedirectUrl } = initialState;
 
   const { variant: clarityVariant, trackExposure: trackClarityExposure } = useExperiment('exp-invite-arrival-clarity-v1');
   const { t } = useLanguage();
@@ -175,13 +188,20 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // from Supabase, not PostHog). Fires on every landing page view for returning
   // users, so PostHog's retention/trends compute the daily active returning cohort.
   useEffect(() => {
-    if (!mounted || inviteRedirectUrl || qrRedirectUrl) return;
+    if (!mounted) return;
     if (isCrawler()) return;
-    trackGrowthEvent('landing_view', { is_new_user: isNewUser });
-    if (!isNewUser) {
-      trackGrowthEvent('return_visit', {});
+    // `return_visit` (the D1 retention funnel's terminal event) must fire even
+    // when we auto-start the daily puzzle — otherwise the very cohort this
+    // change is meant to lift becomes unmeasurable. `landing_view` is skipped
+    // on any redirect, as before.
+    const redirecting = inviteRedirectUrl || qrRedirectUrl || dailyRedirectUrl;
+    if (!redirecting) {
+      trackGrowthEvent('landing_view', { is_new_user: isNewUser });
     }
-  }, [mounted, inviteRedirectUrl, qrRedirectUrl, isNewUser]);
+    if (!isNewUser) {
+      trackGrowthEvent('return_visit', { auto_start_daily: !!dailyRedirectUrl });
+    }
+  }, [mounted, inviteRedirectUrl, qrRedirectUrl, dailyRedirectUrl, isNewUser]);
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the
@@ -219,6 +239,16 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     }
   }, [qrRedirectUrl, router]);
 
+  // Returning visitor → auto-start today's Word Hunt. `replace` so the landing
+  // URL never sits in history (back button from the puzzle leaves the site
+  // instead of bouncing back here and re-redirecting).
+  useEffect(() => {
+    if (dailyRedirectUrl) {
+      trackGrowthEvent('auto_start_daily', { target: 'word_hunt' });
+      router.replace(dailyRedirectUrl);
+    }
+  }, [dailyRedirectUrl, router]);
+
   if (mounted && inviteRedirectUrl) {
     if (clarityVariant === 'status-card') {
       return (
@@ -250,6 +280,20 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-4 border-neo-cyan border-t-transparent animate-spin" />
+          <span className="font-neo-body text-neo-cream text-sm">{t('daily.qrWelcome.warping')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Returning-visitor auto-start: alive feedback while router.replace →
+  // /daily/word-hunt resolves, so the brochure hero never flashes for players
+  // who are heading straight into today's grid.
+  if (mounted && dailyRedirectUrl) {
+    return (
+      <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
           <span className="font-neo-body text-neo-cream text-sm">{t('daily.qrWelcome.warping')}</span>
         </div>
       </div>
