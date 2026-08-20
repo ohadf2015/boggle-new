@@ -54,20 +54,32 @@ export async function POST(request: NextRequest) {
         userId = authData.user.id;
         isGuest = true;
 
-        // Create or update guest profile
+        // Create or update guest profile.
+        //
+        // No `is_guest` column is written: `profiles` has none, and naming a column that does
+        // not exist makes PostgREST reject the WHOLE upsert. That is what used to happen —
+        // the error was logged and the route carried on, so the guest joined with no profile
+        // row at all and showed up on the teacher's roster nameless and faceless. Supabase
+        // already records guest-ness as `auth.users.is_anonymous`, which signInAnonymously()
+        // sets, so there is nothing of ours to store.
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert(
             {
               id: userId,
               username: guestName,
-              is_guest: true,
             },
             { onConflict: 'id' }
           );
 
+        // Fail loudly. A membership whose student has no profile is a ghost in the classroom:
+        // the teacher sees a row with no name and no avatar and cannot tell who joined.
         if (profileError) {
           logger.error('Failed to create guest profile:', profileError);
+          return NextResponse.json(
+            { error: 'Failed to create guest profile' },
+            { status: 500 }
+          );
         }
       } catch {
         return NextResponse.json(

@@ -60,6 +60,63 @@ describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
   });
 });
 
+describe.skipIf(!hasServiceRole)('a guest student can join a classroom (live DB)', () => {
+  /**
+   * The guest path had three separate things wrong with it, stacked, each hiding the next:
+   *
+   *   1. anonymous sign-ins were disabled on the project, so the route 500'd immediately;
+   *   2. the guest profile upsert named an `is_guest` column that profiles does not have,
+   *      which makes PostgREST reject the whole write;
+   *   3. guard_profiles_privileged_columns ran with an empty search_path but cast to a bare
+   *      `'student'::user_role`, so the trigger itself raised `type "user_role" does not
+   *      exist` on every client-role INSERT — including the INSERT half of any upsert.
+   *
+   * Each fix only revealed the one behind it, and none of them was visible from unit tests
+   * because they all live in the database. So this walks the real thing, as a real anonymous
+   * user holding nothing but the public anon key.
+   */
+  it('signs in anonymously, gets a name the teacher can see, and still cannot self-promote', async () => {
+    const admin = createClient(SUPABASE_URL!, SERVICE_ROLE_KEY!, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const sb = anonClient();
+
+    const signIn = await sb.auth.signInAnonymously();
+    expect(signIn.error).toBeNull();
+    const guestId = signIn.data.user!.id;
+
+    try {
+      // The write the join route makes so the roster has a name to render.
+      const upsert = await sb
+        .from('profiles')
+        .upsert({ id: guestId, username: 'RLS guest probe' }, { onConflict: 'id' })
+        .select('id');
+      expect(upsert.error).toBeNull();
+
+      // And the teacher must actually be able to read that name back — via public_profiles,
+      // since profiles itself is own-row-only.
+      const seen = await admin.from('public_profiles').select('username').eq('id', guestId).single();
+      expect(seen.data?.username).toBe('RLS guest probe');
+
+      // Enabling anonymous auth must not hand a throwaway account any privilege. Both the
+      // update and the upsert route into the same guard.
+      const viaUpdate = await sb.from('profiles').update({ user_role: 'teacher' }).eq('id', guestId).select('id');
+      expect(viaUpdate.error).not.toBeNull();
+
+      const viaUpsert = await sb
+        .from('profiles')
+        .upsert({ id: guestId, username: 'x', user_role: 'teacher' }, { onConflict: 'id' })
+        .select('id');
+      expect(viaUpsert.error).not.toBeNull();
+
+      const stillStudent = await admin.from('profiles').select('user_role').eq('id', guestId).single();
+      expect(stillStudent.data?.user_role).toBe('student');
+    } finally {
+      await admin.auth.admin.deleteUser(guestId);
+    }
+  });
+});
+
 describe.skipIf(!hasLiveEnv)('classrooms are not enumerable (live DB)', () => {
   /**
    * The SELECT policy used to start with `auth.uid() IS NOT NULL AND join_code IS NOT NULL`,
