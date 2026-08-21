@@ -7,21 +7,45 @@ const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const hasLiveEnv = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 // The enumeration probe needs a SIGNED-IN stranger, and anonymous sign-ins are disabled on
 // this project — so it mints and deletes a throwaway user, which needs the service-role key.
-const hasServiceRole = hasLiveEnv && !!SERVICE_ROLE_KEY;
+// fe-next/.env ships the literal placeholder YOUR_SERVICE_ROLE_KEY_HERE, which is truthy. A
+// truthy-but-invalid key is worse than a missing one here: the write half of a test succeeds
+// (anon key is real) and only the cleanup half fails, which is exactly how 16 rows ended up in
+// production on 2026-08-20.
+const hasServiceRole =
+  hasLiveEnv && !!SERVICE_ROLE_KEY && !SERVICE_ROLE_KEY.startsWith('YOUR_');
 
 const anonClient = () => createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+const adminClient = () =>
+  createClient(SUPABASE_URL!, SERVICE_ROLE_KEY!, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+// These tests write to the LIVE teacher_access_requests table — the same one the admin queue
+// reads — so every row they create has to die with the test. RLS forbids anon DELETE, so the
+// undo needs the service role, which is why the writing tests are gated on it rather than on
+// hasLiveEnv: a run that cannot clean up must not run at all. The delete is asserted, not
+// fire-and-forget; a silent cleanup failure is what pollution looks like on the way in.
+async function dropRequest(email: string) {
+  const { error } = await adminClient().from('teacher_access_requests').delete().eq('email', email);
+  expect(error).toBeNull();
+}
 
 describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
-  it('anon CAN insert a new request', async () => {
+  it.skipIf(!hasServiceRole)('anon CAN insert a new request', async () => {
     const sb = anonClient();
-    const { error } = await sb.from('teacher_access_requests').insert({
-      email: `rls-test-${Date.now()}@example.com`,
-      full_name: 'RLS Test',
-      role: 'teacher',
-      locale: 'en',
-      use_case: 'integration test for RLS policy',
-    });
-    expect(error).toBeNull();
+    const testEmail = `rls-test-${Date.now()}@example.com`;
+    try {
+      const { error } = await sb.from('teacher_access_requests').insert({
+        email: testEmail,
+        full_name: 'RLS Test',
+        role: 'teacher',
+        locale: 'en',
+        use_case: 'integration test for RLS policy',
+      });
+      expect(error).toBeNull();
+    } finally {
+      await dropRequest(testEmail);
+    }
   });
 
   it('anon CANNOT select rows', async () => {
@@ -34,29 +58,33 @@ describe.skipIf(!hasLiveEnv)('teacher_access_requests RLS (live DB)', () => {
     expect(data ?? []).toEqual([]);
   });
 
-  it('anon CANNOT update rows', async () => {
+  it.skipIf(!hasServiceRole)('anon CANNOT update rows', async () => {
     const sb = anonClient();
     const testEmail = `rls-update-test-${Date.now()}@example.com`;
-    // 1. Insert a row as anon (allowed by RLS).
-    const ins = await sb.from('teacher_access_requests').insert({
-      email: testEmail,
-      full_name: 'Update Test',
-      role: 'teacher',
-      locale: 'en',
-      use_case: 'integration test for update RLS',
-    });
-    expect(ins.error).toBeNull();
+    try {
+      // 1. Insert a row as anon (allowed by RLS).
+      const ins = await sb.from('teacher_access_requests').insert({
+        email: testEmail,
+        full_name: 'Update Test',
+        role: 'teacher',
+        locale: 'en',
+        use_case: 'integration test for update RLS',
+      });
+      expect(ins.error).toBeNull();
 
-    // 2. Try to update that same row as anon.
-    const upd = await sb.from('teacher_access_requests')
-      .update({ status: 'approved' })
-      .eq('email', testEmail)
-      .select();
+      // 2. Try to update that same row as anon.
+      const upd = await sb.from('teacher_access_requests')
+        .update({ status: 'approved' })
+        .eq('email', testEmail)
+        .select();
 
-    // 3. RLS should block — either as zero rows updated or as a permission error (the
-    //    UPDATE policy calls is_admin_user(), which anon may not EXECUTE). Both are denial;
-    //    what must never happen is the row coming back changed.
-    expect(upd.data ?? []).toEqual([]);
+      // 3. RLS should block — either as zero rows updated or as a permission error (the
+      //    UPDATE policy calls is_admin_user(), which anon may not EXECUTE). Both are denial;
+      //    what must never happen is the row coming back changed.
+      expect(upd.data ?? []).toEqual([]);
+    } finally {
+      await dropRequest(testEmail);
+    }
   });
 });
 

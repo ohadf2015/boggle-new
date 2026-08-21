@@ -107,6 +107,7 @@ export function TeacherAccessQueue() {
                 }`}>{r.status}</span>
               </div>
               <div className="mt-1 text-sm text-slate-300 truncate">{r.email}</div>
+              {r.use_case && <div className="mt-1 text-sm text-slate-200 line-clamp-2">{r.use_case}</div>}
               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400">
                 <span>{r.role}</span>
                 <span>{r.locale}</span>
@@ -125,13 +126,18 @@ export function TeacherAccessQueue() {
             <th className="p-2">{t('admin.teacherAccess.col.name')}</th>
             <th className="p-2">{t('admin.teacherAccess.col.email')}</th>
             <th className="p-2">{t('admin.teacherAccess.col.role')}</th>
+            {/* The reason is the only field that says WHY, and it was drawer-only —
+                so the table read as a list of anonymous names and the drilldown had
+                nothing visibly worth opening. */}
+            <th className="p-2">{t('admin.teacherAccess.col.use_case', 'Reason')}</th>
             <th className="p-2">{t('admin.teacherAccess.col.locale')}</th>
             <th className="p-2">{t('admin.teacherAccess.col.country')}</th>
             <th className="p-2">{t('admin.teacherAccess.col.status')}</th>
             <th className="p-2">{t('admin.teacherAccess.col.submitted')}</th>
+            <th className="p-2" />
           </tr></thead>
           <tbody>
-            {loading ? <tr><td colSpan={7} className="p-6 text-center">…</td></tr> :
+            {loading ? <tr><td colSpan={9} className="p-6 text-center">…</td></tr> :
               rows.map((r) => (
                 <tr
                   key={r.id}
@@ -150,6 +156,9 @@ export function TeacherAccessQueue() {
                   <td className="p-2">{r.full_name}</td>
                   <td className="p-2">{r.email}</td>
                   <td className="p-2">{r.role}</td>
+                  <td className="max-w-[20rem] truncate p-2 text-slate-300" title={r.use_case}>
+                    {r.use_case || '—'}
+                  </td>
                   <td className="p-2">{r.locale}</td>
                   <td className="p-2">{r.country || '—'}</td>
                   <td className="p-2">
@@ -159,6 +168,10 @@ export function TeacherAccessQueue() {
                     }`}>{r.status}</span>
                   </td>
                   <td className="p-2">{new Date(r.created_at).toLocaleDateString()}</td>
+                  {/* Rows have always opened the drawer; nothing said so. */}
+                  <td className="p-2 text-end text-xs font-bold text-neo-lime whitespace-nowrap">
+                    {t('admin.teacherAccess.view', 'View')} →
+                  </td>
                 </tr>
               ))}
           </tbody>

@@ -3,7 +3,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { AlertTriangle } from 'lucide-react';
-import type { TeacherFunnelResult, TeacherFunnelRow, TeacherStage } from '@/lib/education/teacherFunnel';
+import { TeacherAccessDrawer } from './TeacherAccessDrawer';
+import type { TeacherAccessRequest } from '@/lib/education/types';
+import type {
+  TeacherFunnelResult,
+  TeacherFunnelRow,
+  TeacherStage,
+  UseCaseReason,
+} from '@/lib/education/teacherFunnel';
 
 const STAGE_STYLE: Record<TeacherStage, string> = {
   blocked: 'bg-neo-red text-neo-white',
@@ -29,6 +36,31 @@ function daysAgo(iso: string | null, t: (k: string, v?: Record<string, string>) 
   return t('admin.teacherFunnel.lastSeen.daysAgo', { days: String(days) });
 }
 
+/**
+ * The funnel row already carries everything the drawer renders, so the drilldown opens
+ * from the panel with no second fetch. Kept as an explicit mapping rather than widening
+ * the drawer's prop type — the drawer is the queue's component, and it stays that way.
+ */
+function toAccessRequest(r: TeacherFunnelRow): TeacherAccessRequest {
+  return {
+    id: r.requestId,
+    user_id: r.userId,
+    email: r.email,
+    full_name: r.fullName ?? r.email,
+    school_or_org: r.schoolOrOrg,
+    country: r.country,
+    role: (r.role ?? 'other') as TeacherAccessRequest['role'],
+    locale: (r.locale ?? 'en') as TeacherAccessRequest['locale'],
+    use_case: r.useCase ?? '',
+    status: r.status as TeacherAccessRequest['status'],
+    admin_note: r.adminNote,
+    reviewed_at: r.reviewedAt,
+    reviewed_by: null,
+    trial_expires_at: r.trialExpiresAt,
+    created_at: r.createdAt,
+  };
+}
+
 function Stat({ label, value, alert }: { label: string; value: number; alert?: boolean }) {
   return (
     <div
@@ -42,8 +74,87 @@ function Stat({ label, value, alert }: { label: string; value: number; alert?: b
   );
 }
 
+/**
+ * Every distinct answer to "what will you use this for?", verbatim, most-given first.
+ *
+ * No themes and no keyword buckets on purpose. A third of the corpus is the access
+ * form's own example chips tapped unchanged (see lib/education/useCaseChips.ts), so
+ * clustering would rank LexiClash's marketing copy as the top teacher demand. The
+ * chip/own-words split is the first thing this panel has to show, not a footnote.
+ */
+function ReasonsPanel({ reasons, t }: { reasons: UseCaseReason[]; t: (k: string, f?: any) => string }) {
+  const own = reasons.filter((r) => r.kind === 'free');
+  const chips = reasons.filter((r) => r.kind === 'chip');
+  const ownCount = own.reduce((n, r) => n + r.count, 0);
+  const chipCount = chips.reduce((n, r) => n + r.count, 0);
+
+  const Row = ({ r }: { r: UseCaseReason }) => (
+    <li className="flex items-start gap-2 border-b border-black/20 py-1.5 last:border-0">
+      <span className="mt-0.5 min-w-[1.75rem] rounded-neo border border-black bg-neo-cream px-1 text-center text-[11px] font-black tabular-nums text-black">
+        {r.count}
+      </span>
+      <span className="flex-1 text-neo-white/90">
+        {r.text}
+        {(r.roles.length > 0 || r.countries.length > 0) && (
+          <span className="ms-2 text-[11px] text-neo-white/40">
+            {[...r.roles, ...r.countries].join(' · ')}
+          </span>
+        )}
+      </span>
+    </li>
+  );
+
+  return (
+    <section className="mt-4 rounded-neo border-neo border-black bg-neo-navy-light p-3">
+      <h3 className="font-neo-display text-base font-black text-neo-white">
+        {t('admin.teacherFunnel.reasons.title', 'Why they say they want it')}
+      </h3>
+      <p className="mt-1 font-neo-body text-xs text-neo-white/50">
+        {t(
+          'admin.teacherFunnel.reasons.subtitle',
+          'Verbatim, not grouped into themes — the sample is too small to cluster honestly.',
+        )}
+      </p>
+
+      {reasons.length === 0 ? (
+        <p className="mt-3 font-neo-body text-sm text-neo-white/50">
+          {t('admin.teacherFunnel.reasons.empty', 'Nobody has stated a reason yet.')}
+        </p>
+      ) : (
+        <div className="mt-3 grid gap-4 font-neo-body text-sm lg:grid-cols-2">
+          <div>
+            <h4 className="text-[11px] font-bold uppercase text-neo-lime">
+              {t('admin.teacherFunnel.reasons.own', 'Their own words')} ({ownCount})
+            </h4>
+            <ul className="mt-1">
+              {own.map((r) => <Row key={r.text} r={r} />)}
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-[11px] font-bold uppercase text-neo-orange">
+              {t('admin.teacherFunnel.reasons.chips', 'Our example chips, tapped unchanged')} ({chipCount})
+            </h4>
+            <ul className="mt-1 opacity-70">
+              {chips.map((r) => <Row key={r.text} r={r} />)}
+            </ul>
+            {chipCount > 0 && (
+              <p className="mt-2 text-[11px] text-neo-white/40">
+                {t(
+                  'admin.teacherFunnel.reasons.chipsHint',
+                  'These are the form’s own suggestions. Treat them as engagement with the form, not as demand.',
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function TeacherFunnelPanel() {
   const { t } = useLanguage();
+  const [open, setOpen] = useState<TeacherFunnelRow | null>(null);
   const [data, setData] = useState<TeacherFunnelResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,7 +181,7 @@ export function TeacherFunnelPanel() {
   if (error) return <div className="p-4 font-neo-body text-neo-red">{error}</div>;
   if (!data) return null;
 
-  const { summary, rows } = data;
+  const { summary, rows, reasons } = data;
 
   return (
     <section className="p-4">
@@ -100,12 +211,40 @@ export function TeacherFunnelPanel() {
         <Stat label={t('admin.teacherFunnel.stat.assigned')} value={summary.assigned} />
       </div>
 
+      {/* The leak `blocked` cannot see. They can get in, they did come back, and they
+          still have not made a classroom — so the drop is discovery inside the app,
+          not the grant. The trial number is the clock on doing something about it. */}
+      {summary.returnedNoClassroom > 0 && (
+        <div className="mt-3 rounded-neo border-neo border-black bg-neo-orange p-3 text-black shadow-hard">
+          <p className="font-neo-body text-sm font-bold">
+            {t(
+              'admin.teacherFunnel.returnedNoClassroom',
+              `${summary.returnedNoClassroom} approved teachers came back to the app and still have no classroom (${summary.returnedNoClassroomTrialActive} with a trial still running).`,
+            )}
+          </p>
+        </div>
+      )}
+
+      {summary.excludedMachineRows > 0 && (
+        <p className="mt-2 font-neo-body text-xs text-neo-white/40">
+          {t(
+            'admin.teacherFunnel.excludedMachineRows',
+            `${summary.excludedMachineRows} machine-written rows (integration tests) excluded from every number above.`,
+          )}
+        </p>
+      )}
+
+      <ReasonsPanel reasons={reasons} t={t} />
+
       {/* Wide table on a narrow phone: scroll the table, never the page. */}
       <div className="mt-4 overflow-x-auto rounded-neo border-neo border-black bg-neo-navy-light">
         <table className="w-full min-w-[720px] text-start font-neo-body text-sm">
           <thead>
             <tr className="border-b border-black/40 text-[11px] uppercase text-neo-white/50">
               <th className="p-2 text-start font-bold">{t('admin.teacherFunnel.col.teacher')}</th>
+              <th className="p-2 text-start font-bold">
+                {t('admin.teacherFunnel.col.reason', 'Reason')}
+              </th>
               <th className="p-2 text-start font-bold">{t('admin.teacherFunnel.col.country')}</th>
               <th className="p-2 text-start font-bold">{t('admin.teacherFunnel.col.stage')}</th>
               <th className="p-2 text-start font-bold">{t('admin.teacherFunnel.col.trial')}</th>
@@ -118,16 +257,49 @@ export function TeacherFunnelPanel() {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className="p-4 text-center text-neo-white/50">
+                <td colSpan={9} className="p-4 text-center text-neo-white/50">
                   {t('admin.teacherFunnel.empty')}
                 </td>
               </tr>
             )}
             {rows.map((r: TeacherFunnelRow) => (
-              <tr key={r.requestId} className="border-b border-black/20 text-neo-white/90">
+              <tr
+                key={r.requestId}
+                onClick={() => setOpen(r)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setOpen(r);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={t('admin.teacherFunnel.rowOpen', 'Open request details')}
+                className="cursor-pointer border-b border-black/20 text-neo-white/90 hover:bg-black/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-inset"
+              >
                 <td className="p-2">
                   <div className="font-bold">{r.fullName || r.email}</div>
                   <div className="text-xs text-neo-white/50">{r.email}</div>
+                </td>
+                <td className="max-w-[22rem] p-2 align-top">
+                  {r.useCaseKind === 'empty' ? (
+                    <span className="text-neo-white/30">—</span>
+                  ) : (
+                    <>
+                      <span className="text-neo-white/80">{r.useCase}</span>
+                      {r.useCaseKind === 'chip' && (
+                        <span
+                          className="ms-2 inline-block rounded border border-black bg-neo-orange px-1 text-[10px] font-black uppercase text-black"
+                          title={t(
+                            'admin.teacherFunnel.chipTitle',
+                            'Verbatim example text offered by the form — not the applicant’s own words',
+                          )}
+                        >
+                          {t('admin.teacherFunnel.chipBadge', 'example')}
+                        </span>
+                      )}
+                    </>
+                  )}
                 </td>
                 <td className="p-2 text-neo-white/70">
                   {r.country || '—'}
@@ -154,6 +326,14 @@ export function TeacherFunnelPanel() {
       </div>
 
       <p className="mt-2 font-neo-body text-xs text-neo-white/40">{t('admin.teacherFunnel.pageviewHint')}</p>
+
+      {open && (
+        <TeacherAccessDrawer
+          row={toAccessRequest(open)}
+          onClose={() => setOpen(null)}
+          onActioned={() => { load(); }}
+        />
+      )}
     </section>
   );
 }
