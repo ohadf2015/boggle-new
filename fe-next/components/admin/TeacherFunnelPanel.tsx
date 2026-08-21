@@ -61,6 +61,27 @@ function toAccessRequest(r: TeacherFunnelRow): TeacherAccessRequest {
   };
 }
 
+/** Mirrors ACTIVITY_TABLES in app/api/admin/teacher-funnel/route.ts. */
+const ACTIVITY_KEYS = [
+  'classrooms',
+  'lessons',
+  'studentsJoined',
+  'assignments',
+  'lessonProgress',
+  'achievements',
+  'duels',
+] as const;
+
+const ACTIVITY_FALLBACK: Record<(typeof ACTIVITY_KEYS)[number], string> = {
+  classrooms: 'Classrooms',
+  lessons: 'Word lists',
+  studentsJoined: 'Students joined',
+  assignments: 'Assignments',
+  lessonProgress: 'Students practising',
+  achievements: 'Badges unlocked',
+  duels: 'Duels played',
+};
+
 function Stat({ label, value, alert }: { label: string; value: number; alert?: boolean }) {
   return (
     <div
@@ -82,7 +103,17 @@ function Stat({ label, value, alert }: { label: string; value: number; alert?: b
  * clustering would rank LexiClash's marketing copy as the top teacher demand. The
  * chip/own-words split is the first thing this panel has to show, not a footnote.
  */
-function ReasonsPanel({ reasons, t }: { reasons: UseCaseReason[]; t: (k: string, f?: any) => string }) {
+function ReasonsPanel({
+  reasons,
+  t,
+}: {
+  reasons: UseCaseReason[];
+  // Same shape as LanguageContext's t: second arg is a fallback string or interpolation
+  // params. Typed rather than `any` so a `t` that drops the fallback fails to compile —
+  // every string in this panel is fallback-only, so silently ignoring it would render
+  // raw `admin.teacherFunnel.*` keys on screen.
+  t: (k: string, f?: string | Record<string, string | number>) => string;
+}) {
   const own = reasons.filter((r) => r.kind === 'free');
   const chips = reasons.filter((r) => r.kind === 'chip');
   const ownCount = own.reduce((n, r) => n + r.count, 0);
@@ -181,7 +212,12 @@ export function TeacherFunnelPanel() {
   if (error) return <div className="p-4 font-neo-body text-neo-red">{error}</div>;
   if (!data) return null;
 
-  const { summary, rows, reasons } = data;
+  // `reasons` and `activity` arrived after the first version of this panel shipped. During a
+  // deploy window a cached client bundle can meet the old API (or vice versa), and
+  // `reasons.filter` on undefined white-screens the whole admin page — default them.
+  const { summary, rows } = data;
+  const reasons = data.reasons ?? [];
+  const activity = data.activity ?? {};
 
   return (
     <section className="p-4">
@@ -233,6 +269,33 @@ export function TeacherFunnelPanel() {
           )}
         </p>
       )}
+
+      {/* "Did they activate?" is above. This is "is anyone teaching?" — the question the
+          panel could not answer at all, because an empty module and a missing panel look
+          identical until you print the zeros. */}
+      <section className="mt-4 rounded-neo border-neo border-black bg-neo-navy-light p-3">
+        <h3 className="font-neo-display text-base font-black text-neo-white">
+          {t('admin.teacherFunnel.activity.title', 'What is happening inside the module')}
+        </h3>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+          {ACTIVITY_KEYS.map((k) => (
+            <div key={k} className="rounded-neo border border-black bg-neo-cream px-2 py-1.5 text-black">
+              <div className="font-neo-display text-xl font-black leading-none tabular-nums">
+                {activity[k] === null || activity[k] === undefined ? '—' : activity[k]}
+              </div>
+              <div className="mt-1 font-neo-body text-[10px] font-bold uppercase opacity-70">
+                {t(`admin.teacherFunnel.activity.${k}`, ACTIVITY_FALLBACK[k])}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 font-neo-body text-[11px] text-neo-white/40">
+          {t(
+            'admin.teacherFunnel.activity.hint',
+            'Whole-product totals, all time. A dash means the count failed, which is not the same as zero.',
+          )}
+        </p>
+      </section>
 
       <ReasonsPanel reasons={reasons} t={t} />
 
