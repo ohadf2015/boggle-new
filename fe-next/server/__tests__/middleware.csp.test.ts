@@ -51,3 +51,21 @@ describe('CSP allows the Supabase Storage CDN for offloaded audio', () => {
     expect(mediaSrc).toContain('https://*.supabase.co');
   });
 });
+
+describe('CSP allows the growth-radar tracker', () => {
+  // gr.js and gr-extended.js were on every page and blocked on every pageview: the requests
+  // failed with `:: csp` and nothing reached the collector, so lexiclash looked instrumented
+  // from the dashboard while sending nothing. Both directives matter — script-src without
+  // connect-src is a tracker that runs and then cannot report.
+  it('permits the tracker script in script-src', () => {
+    const csp = getCspHeader();
+    const scriptSrc = csp.split(';').find((d) => d.trim().startsWith('script-src')) ?? '';
+    expect(scriptSrc).toContain('https://growthradar.app');
+  });
+
+  it('permits the tracker to POST what it captures in connect-src', () => {
+    const csp = getCspHeader();
+    const connectSrc = csp.split(';').find((d) => d.trim().startsWith('connect-src')) ?? '';
+    expect(connectSrc).toContain('https://growthradar.app');
+  });
+});

@@ -110,6 +110,11 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
           'https://pagead2.googlesyndication.com',
           'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
           'https://*.doubleclick.net', 'https://*.posthog.com', 'https://eu.i.posthog.com',
+          // growth-radar's first-party tracker (gr.js + gr-extended.js), and the Umami SDK it
+          // loads. Absent here, BOTH were CSP-blocked on every pageview — the tags were on the
+          // page and correct, the requests died with `:: csp`, and lexiclash sent no first-party
+          // traffic at all while looking instrumented from the dashboard.
+          'https://growthradar.app',
           // Google Identity Services (One Tap / Sign In With Google)
           'https://accounts.google.com/gsi/client',
           // html2canvas, lazy-loaded by the feedback widget at capture time.
@@ -131,6 +136,9 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
           'https://*.googlesyndication.com', 'https://*.doubleclick.net',
           'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
           'https://*.posthog.com', 'https://eu.i.posthog.com',
+          // Loading the tracker is not enough — it also has to be allowed to POST what it
+          // captures. script-src without connect-src is a tracker that runs and reports nothing.
+          'https://growthradar.app',
           // Google Identity Services (One Tap / Sign In With Google)
           'https://accounts.google.com/gsi/',
           'ws:', 'wss:'],
