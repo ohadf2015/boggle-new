@@ -7096,6 +7096,7 @@ const sv = {
     "loading": "Laddar daglig utmaning...",
     "todaysPlayers": "Dagens spelare",
     "beFirstToPlay": "Bli först att spela dagens utmaning!",
+    "guestsSolvedSignIn": "{count} klarade dagens pussel — logga in för att synas på topplistan",
     "playerSingular": "spelare",
     "playersPlural": "spelare",
     "guestSingular": "gast",

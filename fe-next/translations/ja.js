@@ -6873,6 +6873,7 @@ const ja = {
     "loading": "デイリーチャレンジを読み込み中...",
     "todaysPlayers": "今日のプレイヤー",
     "beFirstToPlay": "今日のチャレンジに最初に挑戦しよう！",
+    "guestsSolvedSignIn": "本日{count}人がクリア — ログインするとランキングに表示されます",
     "playerSingular": "プレイヤー",
     "playersPlural": "プレイヤー",
     "guestSingular": "ゲスト",

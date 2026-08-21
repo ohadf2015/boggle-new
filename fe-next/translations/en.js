@@ -6221,6 +6221,7 @@ const en = {
     "loading": "Getting puzzle ready...",
     "todaysPlayers": "Today's Players",
     "beFirstToPlay": "Be the first today!",
+    "guestsSolvedSignIn": "{count} solved today — sign in to appear on the leaderboard",
     "playerSingular": "player",
     "playersPlural": "players",
     "guestSingular": "guest",

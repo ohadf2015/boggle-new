@@ -456,6 +456,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       : filteredAllTimeParticipants;
   const totalCount = activeTab === 'today' ? todayTotalCount : activeTab === 'friends' ? friendsParticipants.length : allTimeTotalCount;
   const totalSolvedCount = activeTab === 'today' ? todayTotalSolved : 0;
+  // How many people actually solved today, whether or not they are rankable. Guests are the whole
+  // point: they are recorded but filtered out of the board, so on a guest-heavy day the ranked list
+  // is empty while this is not. max() rather than a sum — a guest is already inside totalSolved when
+  // the server counted them there, and double-counting would turn an honest number into a new lie.
+  const todaySolversToday = Math.max(todayTotalSolved, todayGuestCount);
   const loading = activeTab === 'friends' ? todayLoading : activeTab === 'today' ? todayLoading : allTimeLoading;
   const error = activeTab === 'friends' ? todayError : activeTab === 'today' ? todayError : allTimeError;
 
@@ -583,7 +588,21 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
             {activeTab === 'friends'
               ? t('leaderboard.noFriendsPlayed')
               : activeTab === 'today'
-                ? t('daily.beFirstToPlay')
+                // "Be the first today!" was a lie on a GLOBAL board. Guests do get recorded —
+                // wordHuntRoutes.ts:208-212 writes their row under guest_fingerprint — but the
+                // leaderboard read filters `.not('player_id','is',null)` (:524), so every guest is
+                // stripped out before the response. The same handler already counts them and ships
+                // the number as guestPlayerCount (:589-596), which this component already stores.
+                // So the server knew people had solved today and we told the player nobody had.
+                // Say the true thing instead, and make the sign-in the reason it's worth doing.
+                // `t` here is a plain (key) => string prop, so the count is substituted after the
+                // lookup rather than passed in. Keeping {count} INSIDE the translated string (not
+                // concatenating a number in front of it, as the guest-count line below does) is
+                // what lets each language put the number where its own grammar needs it — Hebrew
+                // and Japanese do not place it first.
+                ? todaySolversToday > 0
+                  ? t('daily.guestsSolvedSignIn').replace('{count}', String(todaySolversToday))
+                  : t('daily.beFirstToPlay')
                 : t('wordHunt.leaderboard.noPlayersYet')}
           </p>
         </div>

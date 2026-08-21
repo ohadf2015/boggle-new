@@ -6736,6 +6736,7 @@ const he = {
     "loading": "טוען אתגר יומי...",
     "todaysPlayers": "השחקנים של היום",
     "beFirstToPlay": "היו הראשונים לשחק באתגר של היום!",
+    "guestsSolvedSignIn": "{count} פתרו היום — התחברו כדי להופיע בטבלת המובילים",
     "playerSingular": "שחקן",
     "playersPlural": "שחקנים",
     "guestSingular": "אורח",
