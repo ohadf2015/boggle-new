@@ -1,0 +1,31 @@
+-- public_profiles is a security-DEFINER-semantics view (security_invoker not set) over
+-- public.profiles. That is deliberate for READS: it is how teachers, leaderboards, friends
+-- and quick-play read other players' names and avatars past the own-row-only RLS on
+-- profiles.
+--
+-- But the view is also auto-updatable, and INSERT/UPDATE/DELETE were granted to anon and
+-- authenticated. Because the view bypasses RLS, any holder of the public anon key could
+-- UPDATE any user's profile row through it — username, display_name, avatar_config,
+-- total_score, ranked_mmr. Verified live before this migration:
+--
+--     set role anon;
+--     update public_profiles set username = username where id = '<any user>';
+--     -- 1 row affected
+--
+-- That reopened, through the view, the anon-write hole closed on public.profiles directly
+-- (see 20260812* / memory supabase-profiles-anon-write-hole-2026-08-07).
+--
+-- No application code writes through this view — every profile write targets
+-- public.profiles via the request-scoped or service-role client — so revoking writes is
+-- inert for the app. Reads are untouched, which is the whole point of the view.
+--
+-- A sweep of every view in the public schema found public_profiles was the ONLY one that is
+-- auto-updatable AND security_invoker-off AND write-granted to anon.
+--
+-- Regression guards: fe-next/lib/education/__tests__/rls.test.ts (live DB, skipped without
+-- NEXT_PUBLIC_SUPABASE_* env).
+REVOKE INSERT, UPDATE, DELETE ON public.public_profiles FROM anon, authenticated;
+
+-- Same hygiene on the practice-progress view. It already has security_invoker = true, so
+-- writes through it were RLS-checked rather than open, but nothing writes through it either.
+REVOKE INSERT, UPDATE, DELETE ON public.student_practice_progress FROM anon, authenticated;

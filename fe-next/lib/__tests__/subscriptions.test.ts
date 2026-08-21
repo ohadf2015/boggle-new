@@ -5,10 +5,14 @@ import {
   canAddStudent,
 } from '../subscriptions';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 // Mock Supabase
 vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn(),
+}));
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: vi.fn(),
 }));
 
 describe('Subscription tier limits', () => {
@@ -69,6 +73,10 @@ describe('Subscription tier limits', () => {
       });
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canCreateClass('user-123');
 
@@ -110,6 +118,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canCreateClass('user-123');
 
@@ -151,6 +163,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canCreateClass('user-123');
 
@@ -193,6 +209,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canCreateClass('user-123');
 
@@ -234,6 +254,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canCreateClass('user-123');
 
@@ -274,6 +298,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canCreateClass('user-123');
 
@@ -326,6 +354,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canAddStudent('classroom-123');
 
@@ -376,6 +408,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canAddStudent('classroom-123');
 
@@ -425,6 +461,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canAddStudent('classroom-123');
 
@@ -475,6 +515,10 @@ describe('Subscription tier limits', () => {
       };
 
       vi.mocked(createClient).mockResolvedValue(mockSupabase as any);
+      // canAddStudent/checkTeacherSubscription read entitlement state with the service-role
+      // client (RLS hides the teacher's rows from a joining student). Same fixture stands in
+      // for the database either way.
+      vi.mocked(createAdminClient).mockReturnValue(mockSupabase as any);
 
       const result = await canAddStudent('classroom-123');
 

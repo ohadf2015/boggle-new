@@ -4,11 +4,11 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canCreateClass } from '@/lib/subscriptions';
-import type { Language } from '@/lib/supabase/education';
+import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
 
 const createClassroomSchema = z.object({
   name: z.string().min(1).max(100),
-  language: z.enum(['en', 'he', 'sv', 'ja']),
+  language: z.enum(EDUCATION_LANGUAGES),
 });
 
 /**

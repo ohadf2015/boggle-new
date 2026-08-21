@@ -40,7 +40,7 @@ export async function getStudentsProgressSummary(
     const studentIds = memberships.map(m => m.student_id);
 
     const { data: profiles, error: profileError } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, display_name, avatar_emoji, avatar_config')
       .in('id', studentIds);
 

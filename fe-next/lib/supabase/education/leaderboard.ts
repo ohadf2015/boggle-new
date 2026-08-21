@@ -52,7 +52,7 @@ export async function getClassroomLeaderboard(
 
     // Fetch profiles for all student_ids separately (profiles.id = auth.users.id = student_id)
     const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, display_name, avatar_emoji, avatar_color')
       .in('id', studentIds);
 
@@ -232,7 +232,7 @@ export async function getFullClassroomLeaderboard(
 
     // Fetch profiles
     const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, display_name, avatar_emoji, avatar_color')
       .in('id', studentIds);
 

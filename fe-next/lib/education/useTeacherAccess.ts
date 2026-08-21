@@ -48,5 +48,23 @@ export function useTeacherAccess(): UseTeacherAccessResult {
 
   const trial = teacherTrialStatus(latestRequest?.trial_expires_at, nowMs);
 
-  return { hasAccess, status, latestRequest, trial, isLoading: authLoading || reqLoading };
+  // `hasAccess` reads `profile.user_role`, but `profile` and `loading` are separate pieces of
+  // auth state that do not resolve together — `useAuthInitialization` sets the user before
+  // awaiting the profile fetch, and TOKEN_REFRESHED / same-user INITIAL_SESSION reach
+  // setLoading(false) without one. In that window an approved teacher is indistinguishable
+  // from a stranger, and TeacherGate redirects them to the access-request form — where, since
+  // requests auto-approve, all they can do is re-request a role they already hold.
+  //
+  // So stay pessimistic until every source has resolved. This lives in the hook, not in
+  // TeacherGate, so the gate and TeacherDashboardInner (which hand-rolled the same guard)
+  // cannot drift apart again.
+  const profileLoading = !!user && !profile;
+
+  return {
+    hasAccess,
+    status,
+    latestRequest,
+    trial,
+    isLoading: authLoading || reqLoading || profileLoading,
+  };
 }

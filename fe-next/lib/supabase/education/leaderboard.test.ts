@@ -72,7 +72,7 @@ describe('leaderboard backend', () => {
             }),
           };
         }
-        if (table === 'profiles') {
+        if (table === 'public_profiles') {
           return {
             select: vi.fn().mockReturnValue({
               in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
@@ -123,7 +123,7 @@ describe('leaderboard backend', () => {
             }),
           };
         }
-        if (table === 'profiles') {
+        if (table === 'public_profiles') {
           return {
             select: vi.fn().mockReturnValue({
               in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
@@ -164,7 +164,7 @@ describe('leaderboard backend', () => {
             }),
           };
         }
-        if (table === 'profiles') {
+        if (table === 'public_profiles') {
           return {
             select: vi.fn().mockReturnValue({
               in: vi.fn().mockResolvedValue({ data: mockProfiles, error: null }),
@@ -205,7 +205,7 @@ describe('leaderboard backend', () => {
             }),
           };
         }
-        if (table === 'profiles') {
+        if (table === 'public_profiles') {
           return {
             select: vi.fn().mockReturnValue({
               in: vi.fn().mockResolvedValue({
@@ -271,7 +271,7 @@ describe('leaderboard backend', () => {
             }),
           };
         }
-        if (table === 'profiles') {
+        if (table === 'public_profiles') {
           return {
             select: vi.fn().mockReturnValue({
               in: vi.fn().mockResolvedValue({

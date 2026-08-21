@@ -33,7 +33,7 @@ export async function getStudentReportData(
   try {
     // Get student profile
     const { data: student, error: studentError } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, display_name, avatar_config')
       .eq('id', studentId)
       .single();
@@ -189,7 +189,7 @@ export async function getClassReportData(
     }
 
     const { data: teacherProfile } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('display_name')
       .eq('id', classroom.teacher_id)
       .maybeSingle();
@@ -211,7 +211,7 @@ export async function getClassReportData(
 
     const { data: studentProfiles } = studentIds.length > 0
       ? await supabase
-          .from('profiles')
+          .from('public_profiles')
           .select('id, display_name, avatar_config')
           .in('id', studentIds)
       : { data: [] as Array<{ id: string; display_name: string | null; avatar_config: Record<string, unknown> | null }> };
@@ -384,7 +384,7 @@ export async function getVocabularyHeatmapData(
     const studentIds = memberships.map(m => m.student_id);
 
     const { data: profiles, error: profileError } = await supabase
-      .from('profiles')
+      .from('public_profiles')
       .select('id, display_name')
       .in('id', studentIds);
 
