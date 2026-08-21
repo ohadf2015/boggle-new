@@ -125,7 +125,7 @@ const COMPARE_LINK_ANCHOR: Record<string, string> = {
 };
 
 type ResourceCard = { badge: string; title: string; desc: string };
-const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: ResourceCard; esl: ResourceCard; teachers: ResourceCard; spelling: ResourceCard; forSchools: ResourceCard }> = {
+const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: ResourceCard; esl: ResourceCard; teachers: ResourceCard; spelling: ResourceCard; sightWords: ResourceCard; forSchools: ResourceCard }> = {
   en: {
     heading: 'Teacher Guides',
     subhead: 'Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.',
@@ -133,6 +133,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'ESL Word Games Online', desc: 'CEFR-scaled (A1→C2), 6 dictionaries, no student signup.' },
     teachers: { badge: 'For Teachers', title: 'Word Games for Teachers', desc: 'Sub-day, brain-break, warm-up — zero prep, free 30-day trial.' },
     spelling: { badge: 'Spelling Bee', title: 'Spelling Bee Practice Online', desc: '4-week training plan, custom word lists, 1v1 duels — Scripps prep.' },
+    sightWords: { badge: 'Sight Words', title: 'Sight Words Practice (Dolch & Fry)', desc: 'Flashcards, matching & spelling drills built from your own Dolch/Fry list.' },
     forSchools: { badge: 'For Schools', title: 'LexiClash for Schools', desc: 'Free trial for teachers — school plans from $149/year, no student logins.' },
   },
   he: {
@@ -142,6 +143,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'אנגלית', title: 'משחקי מילים באנגלית כשפה זרה', desc: 'מדורג לפי CEFR (A1→C2), 6 מילונים, בלי הרשמת תלמידים.' },
     teachers: { badge: 'למורים', title: 'משחקי מילים למורים', desc: 'יום מילוי מקום, הפסקה מרעננת, חימום — אפס הכנה, ניסיון חינם 30 יום.' },
     spelling: { badge: 'איות', title: 'תרגול תחרות איות אונליין', desc: 'תוכנית אימון של 4 שבועות, רשימות מילים מותאמות, דואלי 1v1 — הכנה לתחרות.' },
+    sightWords: { badge: 'מילים נפוצות', title: 'תרגול Sight Words (Dolch ו-Fry)', desc: 'כרטיסיות, התאמות ואיות — מבוסס על רשימת המילים שלכם.' },
     forSchools: { badge: 'לבתי ספר', title: 'LexiClash לבתי ספר', desc: 'ניסיון חינם למורים — תוכניות בית ספר מ-$149/שנה, בלי הרשמת תלמידים.' },
   },
   sv: {
@@ -151,6 +153,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'Ordspel för engelska online', desc: 'CEFR-skalad (A1→C2), 6 ordböcker, ingen elevregistrering.' },
     teachers: { badge: 'För lärare', title: 'Ordspel för lärare', desc: 'Vikariedag, hjärnpaus, uppvärmning — noll förberedelse, 30 dagars gratis provperiod.' },
     spelling: { badge: 'Stavning', title: 'Stavningstävling online', desc: '4-veckors träningsplan, anpassade ordlistor, 1v1-dueller — tävlingsförberedelse.' },
+    sightWords: { badge: 'Sight Words', title: 'Träna sight words (Dolch & Fry)', desc: 'Flashcards, matchning och stavning från din egen ordlista.' },
     forSchools: { badge: 'För skolor', title: 'LexiClash för skolor', desc: 'Gratis provperiod för lärare — skolplaner från $149/år, ingen elevinloggning.' },
   },
   ja: {
@@ -160,6 +163,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'オンライン英語単語ゲーム', desc: 'CEFR準拠（A1→C2）、6つの辞書、生徒の登録不要。' },
     teachers: { badge: '教師向け', title: '教師のための単語ゲーム', desc: '代行日、頭の休憩、ウォームアップ — 準備ゼロ、30日間無料トライアル。' },
     spelling: { badge: 'スペリング', title: 'オンラインスペリング練習', desc: '4週間のトレーニングプラン、カスタム単語リスト、1対1デュエル — 大会対策。' },
+    sightWords: { badge: 'サイトワード', title: 'サイトワード練習 (Dolch & Fry)', desc: '自分の単語リストでフラッシュカード・マッチング・スペリング練習。' },
     forSchools: { badge: '学校向け', title: '学校向けLexiClash', desc: '教師向け無料トライアル — 学校プランは年$149から、生徒ログイン不要。' },
   },
   es: {
@@ -169,6 +173,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'Juegos de palabras en inglés online', desc: 'Escalado por CEFR (A1→C2), 6 diccionarios, sin registro de estudiantes.' },
     teachers: { badge: 'Para docentes', title: 'Juegos de palabras para docentes', desc: 'Día de sustitución, descanso mental, calentamiento — cero preparación, prueba gratis 30 días.' },
     spelling: { badge: 'Concurso de Ortografía', title: 'Práctica de concurso de ortografía online', desc: 'Plan de entrenamiento de 4 semanas, listas personalizadas, duelos 1v1 — preparación para concursos.' },
+    sightWords: { badge: 'Sight Words', title: 'Práctica de sight words (Dolch y Fry)', desc: 'Tarjetas, emparejamientos y deletreo desde tu propia lista.' },
     forSchools: { badge: 'Para escuelas', title: 'LexiClash para escuelas', desc: 'Prueba gratis para docentes — planes escolares desde $149/año, sin inicio de sesión de estudiantes.' },
   },
   ru: {
@@ -178,6 +183,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'Онлайн-игры по английским словам', desc: 'По шкале CEFR (A1→C2), 6 словарей, без регистрации учеников.' },
     teachers: { badge: 'Для учителей', title: 'Словесные игры для учителей', desc: 'День замены, перемена для мозга, разминка — ноль подготовки, бесплатно 30 дней.' },
     spelling: { badge: 'Орфография', title: 'Онлайн-практика орфографии', desc: '4-недельный план тренировок, свои списки слов, дуэли 1 на 1 — подготовка к конкурсу.' },
+    sightWords: { badge: 'Sight Words', title: 'Практика sight words (Dolch и Fry)', desc: 'Карточки, совпадения и правописание по вашему списку слов.' },
     forSchools: { badge: 'Для школ', title: 'LexiClash для школ', desc: 'Бесплатный пробный период для учителей — школьные планы от $149/год, без входа для учеников.' },
   },
 };
@@ -219,7 +225,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
       <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">
         {rc.subhead}
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href={`/${locale}/education/vocabulary-games-classroom`}
           className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
@@ -251,6 +257,14 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">{rc.spelling.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.spelling.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.spelling.desc}</p>
+        </Link>
+        <Link
+          href={`/${locale}/education/sight-words-practice`}
+          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <span className="inline-block border-2 border-neo-black bg-neo-lime px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.sightWords.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.sightWords.title}</h3>
+          <p className="mt-2 text-xs text-neo-gray-200">{rc.sightWords.desc}</p>
         </Link>
         <Link
           href={`/${locale}/education/for-schools`}
