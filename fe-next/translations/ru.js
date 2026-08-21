@@ -436,6 +436,7 @@ const ru = {
       "solved": "{count}/{total} решено",
       "share": "Поделиться результатом",
       "copied": "Скопировано!",
+      "scoreLabel": "Счёт",
       "guestName": "Игрок",
       "leaderboard": "Сегодняшний рейтинг",
       "loading": "Загружаю…",
