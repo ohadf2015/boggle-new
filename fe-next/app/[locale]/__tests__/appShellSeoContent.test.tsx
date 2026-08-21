@@ -49,10 +49,23 @@ describe('app-shell routes ship publisher content in the SSR HTML', () => {
     expect(text.split(/\s+/).filter(Boolean).length).toBeGreaterThan(100);
   });
 
-  it('falls back to English copy for a locale with no authored content', async () => {
-    // `ru` exists in multiplayer's map but not brain's — brain must not render empty.
+  it('/brain renders NO section for a locale with no authored copy, rather than English', async () => {
+    // `ru` is in the sitemap (/ru/brain) but absent from brain's seoContent map. Showing
+    // the English fallback visibly on a Russian page is a worse signal than showing
+    // nothing — the whole point of this change is to stop looking low-value.
     const text = await renderPage(BrainPage, 'ru');
-    expect(text).toContain('Memory Hunt');
+    expect(text).not.toContain('Memory Hunt');
+    expect(text).not.toContain('Lightning Round');
+  });
+
+  it('/multiplayer DOES have authored ru copy, so it still renders there', async () => {
+    const text = await renderPage(MultiplayerPage, 'ru');
+    expect(text).toContain('Мультиплеер');
+  });
+
+  it('/brain does not claim an h1 — PageClient renders the real one after hydration', async () => {
+    const { container } = render(await BrainPage({ params: Promise.resolve({ locale: 'en' }) }));
+    expect(container.querySelectorAll('h1')).toHaveLength(0);
   });
 
   it('renders the Spanish copy for es, not the English fallback', async () => {
