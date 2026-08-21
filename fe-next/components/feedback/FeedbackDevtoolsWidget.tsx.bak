@@ -44,6 +44,32 @@ const WIDGET_VERSION = '5';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
+// LexiClash brand tokens (see app/globals.css: --neo-yellow, --neo-navy,
+// --neo-abyss, --neo-navy-elevated). Dark theme values.
+const NEO_YELLOW = '#ffe135';
+const NEO_BLACK = '#3a322a';
+const NEO_NAVY = '#1a1a2e';
+const NEO_NAVY_ELEVATED = '#2a2a4e';
+const NEO_ABYSS = '#0a0a1a';
+
+// Full skin: launcher AND modal render neo-brutalist dark navy — yellow accent,
+// hard borders, Fredoka stack, 8px rounded-neo corners. Token contract lives in
+// feedback-devtools packages/widget/src/theme.ts.
+const LEXICLASH_THEME = JSON.stringify({
+    bg: NEO_NAVY,
+    fg: '#ffffff',
+    accent: NEO_YELLOW,
+    accentFg: NEO_BLACK,
+    muted: '#a8a8c0',
+    border: NEO_NAVY_ELEVATED,
+    inputBg: NEO_ABYSS,
+    radius: '8px',
+    font: 'Fredoka, Rubik, sans-serif',
+    launcherBorder: `3px solid ${NEO_BLACK}`,
+    launcherShadow: `2px 2px 0 ${NEO_BLACK}`,
+    launcherShadowHover: `3px 3px 0 ${NEO_BLACK}`,
+});
+
 export default function FeedbackDevtoolsWidget(): ReactNode {
     return (
         <Script
@@ -51,7 +77,7 @@ export default function FeedbackDevtoolsWidget(): ReactNode {
             src={`/widget.js?v=${WIDGET_VERSION}`}
             data-token="fdt_28ac691a628a0f801bdc8044d9783d105ec5d72bb85d62a2"
             data-side="left"
-            data-themePreset="lexiclash"
+            data-theme={LEXICLASH_THEME}
             data-dir="auto"
             data-app-version="web"
             strategy="afterInteractive"

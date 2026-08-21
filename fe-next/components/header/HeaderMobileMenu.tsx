@@ -11,7 +11,7 @@ import { usePlayerStyle } from '../../contexts/PlayerStyleContext';
 import { cn } from '../../lib/utils';
 import AuthButton from '../auth/AuthButton';
 import MusicControls from '../MusicControls';
-import { ReportBugModal } from '../feedback/ReportBugModal';
+import { openFeedbackWidget } from '../feedback/feedbackWidgetApi';
 import { scoreTier } from '@/lib/seasons/scoreTier';
 import { DrawerProfileHero } from './DrawerProfileHero';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
@@ -84,7 +84,6 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const { isLoading: cgLoading } = useCrazyGames();
     const queryClient = useQueryClient();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
-    const [showBugReport, setShowBugReport] = useState(false);
     const [lastSeenBadgeCount, setLastSeenBadgeCount] = useState<number>(() => {
         if (typeof window === 'undefined') return 0;
         const raw = window.localStorage.getItem('mobileMenu.lastSeenBadgeCount');
@@ -878,13 +877,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         <SectionLabel>{t('common.info')}</SectionLabel>
                                     </div>
 
-                                    {/* Report a Bug — promoted to a prominent full-width action so
-                                        players can flag issues from anywhere. Routes to /api/feedback
-                                        (Supabase + Telegram + email). */}
+                                    {/* Report a Bug — opens the feedback.devtools widget modal
+                                        (same SDK as the launcher FAB; lands in the feedback-devtools
+                                        dashboard + Telegram fan-out). */}
                                     <div>
                                         <button
                                             type="button"
-                                            onClick={() => { closeMenu(); setShowBugReport(true); }}
+                                            onClick={() => { closeMenu(); openFeedbackWidget(); }}
                                             className={cn(
                                                 "flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
                                                 "bg-linear-to-r from-neo-pink/30 to-neo-purple/20 text-neo-white",
@@ -988,8 +987,6 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                 </LazyMotion>,
                 document.body
             )}
-
-            <ReportBugModal isOpen={showBugReport} onClose={() => setShowBugReport(false)} />
         </>
     );
 });

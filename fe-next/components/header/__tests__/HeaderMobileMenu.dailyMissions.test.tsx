@@ -100,7 +100,6 @@ vi.mock('next/link', () => ({
 }));
 vi.mock('../../auth/AuthButton', () => ({ default: () => null }));
 vi.mock('../../MusicControls', () => ({ default: () => null }));
-vi.mock('../../feedback/ReportBugModal', () => ({ ReportBugModal: () => null }));
 vi.mock('../../CoinBalance', () => ({ CoinBalance: () => null }));
 vi.mock('../../seasons/RankTierChip', () => ({ RankTierChip: () => null }));
 vi.mock('@/lib/seasons/scoreTier', () => ({ scoreTier: () => 'bronze' }));
