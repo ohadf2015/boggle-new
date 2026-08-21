@@ -3,6 +3,8 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
+import { dailySeoContent } from './dailySeo.data';
 
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -292,11 +294,27 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * which can cause "Rendered fewer hooks than expected" errors without it.
  */
 export default async function DailyChallengePage({ params }: PageParams): Promise<React.JSX.Element> {
-  await params;
+  const { locale } = await params;
+
+  // The hub itself is a dynamic (client) import, so the server response for /<locale>/daily is
+  // chrome plus a loader — measured at 98 words on 2026-08-21, against 1066 for the homepage.
+  // Meanwhile dailySeo.data.ts already holds a description, seven features and four FAQs, written
+  // for six locales, and layout.tsx feeds them ONLY to <meta> and JSON-LD. So ~400 words of real
+  // copy per locale exist in this repo and are shown to nobody.
+  //
+  // HomepageContentSection was built for precisely this remediation (see its docblock: AdSense
+  // low-value-content, 2026-06-04) and its prop shape is identical to DailySeoEntry, so this is
+  // reuse rather than new copy: same component, same design system, RTL handled, zero client JS
+  // (the FAQ is native <details>). Nothing here is invented — if the words are wrong, fix them in
+  // dailySeo.data.ts, where the meta tags will pick up the same change.
+  const seo = dailySeoContent[locale as keyof typeof dailySeoContent] || dailySeoContent.en;
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <DailyRedirect />
-    </Suspense>
+    <>
+      <Suspense fallback={<LoadingFallback />}>
+        <DailyRedirect />
+      </Suspense>
+      <HomepageContentSection content={seo} locale={locale} />
+    </>
   );
 }
