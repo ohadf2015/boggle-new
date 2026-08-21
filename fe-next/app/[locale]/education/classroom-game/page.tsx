@@ -4,7 +4,8 @@ import Script from 'next/script';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { Suspense } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { buildEducationClassroomJsonLd } from '@/lib/seo/educationSubpageJsonLd';
+import { buildEducationClassroomJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import PageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function ClassroomGamePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const { howTo, resource, breadcrumb } = buildEducationClassroomJsonLd(locale);
+  const copy = getEducationSubpageContent('classroomGame', locale);
 
   return (
     <>
@@ -49,6 +51,18 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
       >
         <PageClient />
       </Suspense>
+      {/* Same shell + HowTo-mismatch fix as /education/duels: 17 visible words to a crawler
+          (measured 2026-08-21) under a HowTo that described three unseen steps. This route
+          matters more than its traffic suggests — it is the PRIMARY hero CTA of
+          /education/for-schools ("Play a class game free"), which is the $149/year schools
+          funnel, i.e. the one revenue path that needs no payment processor. Copy is
+          CLASSROOM_CONTENT, already authored in all 6 locales. */}
+      <GamePageSeoContent
+        title={copy.name}
+        description={copy.description}
+        features={copy.steps.map((s) => `${s.name} — ${s.text}`)}
+        asH1
+      />
       <section className="mx-auto max-w-3xl px-4 pb-12 text-center">
         <div className="rounded-neo border-neo-thick bg-neo-navy-light px-6 py-6 shadow-hard-lg">
           <p className="text-base text-neo-white/90">{FOR_SCHOOLS_FOOTER[locale] ?? FOR_SCHOOLS_FOOTER.en}</p>
