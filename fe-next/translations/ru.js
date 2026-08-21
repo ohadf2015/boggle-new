@@ -6479,6 +6479,7 @@ const ru = {
     "loading": "Готовим пазл...",
     "todaysPlayers": "Игроков Сегодня",
     "beFirstToPlay": "Будь первым сегодня!",
+    "guestsSolvedSignIn": "{count} решили сегодня — войдите, чтобы попасть в таблицу лидеров",
     "playerSingular": "игрок",
     "playersPlural": "игроки",
     "guestSingular": "гость",

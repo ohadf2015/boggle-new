@@ -6774,6 +6774,7 @@ const es = {
     "loading": "Cargando Desafío Diario...",
     "todaysPlayers": "Jugadores de hoy",
     "beFirstToPlay": "¡Sé el primero en jugar el desafío de hoy!",
+    "guestsSolvedSignIn": "{count} lo resolvieron hoy: inicia sesión para aparecer en la clasificación",
     "playerSingular": "jugador",
     "playersPlural": "jugadores",
     "guestSingular": "invitado",
