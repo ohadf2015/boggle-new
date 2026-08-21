@@ -64,11 +64,39 @@ describe('education subpages ship their HowTo steps as visible content', () => {
     }
   });
 
-  it.each([
-    ['duels', DuelsPage],
-    ['classroom-game', ClassroomPage],
-  ] as const)('/%s now has exactly one h1 (it had none)', async (_label, Page) => {
-    const { container } = await renderPage(Page, 'en');
+  // NOTE ON SCOPE: PageClient is stubbed to null above, so these assertions see the SERVER
+  // output only and CANNOT observe an h1 that the client half renders after hydration. That
+  // is why the two pages differ, and why the difference is asserted rather than assumed:
+  //   - classroom-game: client tree (ClassroomGameLobby, EducationHeader) emits no h1 in any
+  //     state, so the page had none at all -> asH1 supplies the missing one.
+  //   - duels: PageClient.tsx:114 renders <DuelHistory>, DuelHistory.tsx:127 emits an h1, so
+  //     asH1 would give a signed-in student two. Server output must stay at 0.
+  // A test cannot prove the client claim while the client is stubbed; the guard below pins
+  // the server side, and the static assertion after it pins the reason.
+  it('/classroom-game supplies the h1 the page never had', async () => {
+    const { container } = await renderPage(ClassroomPage, 'en');
     expect(container.querySelectorAll('h1')).toHaveLength(1);
+  });
+
+  it('/duels does NOT claim an h1 — its client half already renders one', async () => {
+    const { container } = await renderPage(DuelsPage, 'en');
+    expect(container.querySelectorAll('h1')).toHaveLength(0);
+  });
+
+  it('duels still routes through a client component that emits an h1', async () => {
+    // Pins the premise of the assertion above. If DuelHistory ever stops rendering an h1,
+    // or duels stops rendering DuelHistory, this fails and asH1 should be reconsidered.
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const pageClient = readFileSync(
+      join(process.cwd(), 'app/[locale]/education/duels/PageClient.tsx'),
+      'utf8'
+    );
+    const duelHistory = readFileSync(
+      join(process.cwd(), 'components/education/duels/DuelHistory.tsx'),
+      'utf8'
+    );
+    expect(pageClient).toMatch(/<DuelHistory\b/);
+    expect(duelHistory).toMatch(/<h1\b/);
   });
 });

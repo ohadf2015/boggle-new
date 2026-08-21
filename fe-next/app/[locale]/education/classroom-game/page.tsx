@@ -56,7 +56,11 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
           matters more than its traffic suggests — it is the PRIMARY hero CTA of
           /education/for-schools ("Play a class game free"), which is the $149/year schools
           funnel, i.e. the one revenue path that needs no payment processor. Copy is
-          CLASSROOM_CONTENT, already authored in all 6 locales. */}
+          CLASSROOM_CONTENT, already authored in all 6 locales.
+          asH1 IS safe here, and is NOT on the sibling /education/duels: this page's client
+          tree (ClassroomGameLobby, EducationHeader) emits no h1 at any state, so the page
+          genuinely had none. duels' does — see the note there. Checked the rendered
+          components, not just the PageClient files. */}
       <GamePageSeoContent
         title={copy.name}
         description={copy.description}
