@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import BrainTrainingPageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -135,6 +136,19 @@ export default async function BrainTrainingPage({ params }: { params: Promise<{ 
         ]}
       />
       <BrainTrainingPageClient />
+      {/* PageClient is client-only, so Googlebot's initial HTML was nav+footer chrome
+          (27 visible words on /en/brain, measured 2026-08-21) while this file already
+          carried authored title/description/features/faq in 5 locales that nothing ever
+          rendered. Render it visibly — same remediation as /leaderboard. Collapsible:
+          players came to train, not to read copy. */}
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+        asH1
+        collapsible
+      />
     </>
   );
 }

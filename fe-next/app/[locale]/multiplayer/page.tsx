@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import MultiplayerPageClient from './PageClient';
 
 export const revalidate = 3600;
@@ -86,6 +87,15 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
         ]}
       />
       <MultiplayerPageClient />
+      {/* PageClient is client-only, so the SSR HTML was nav+footer chrome (36 visible
+          words on /en/multiplayer, measured 2026-08-21). The authored per-locale copy
+          below already existed here but only ever reached JSON-LD, never the page.
+          Same remediation as /leaderboard; collapsible so the lobby stays above the fold. */}
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        collapsible
+      />
     </>
   );
 }
