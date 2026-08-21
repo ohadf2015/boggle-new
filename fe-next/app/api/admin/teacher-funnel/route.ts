@@ -21,6 +21,17 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { buildTeacherFunnel } from '@/lib/education/teacherFunnel';
 
+/** [label key, table] — the tables that hold evidence of teaching actually happening. */
+const ACTIVITY_TABLES = [
+  ['classrooms', 'classrooms'],
+  ['lessons', 'vocabulary_lessons'],
+  ['studentsJoined', 'classroom_memberships'],
+  ['assignments', 'teacher_assignments'],
+  ['lessonProgress', 'student_lesson_progress'],
+  ['achievements', 'student_achievements'],
+  ['duels', 'student_duels'],
+] as const;
+
 export async function GET(request: NextRequest) {
   const authResult = await verifyAdminAuth(request);
   if (!authResult.success) return authResult.response!;
@@ -62,6 +73,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: profilesRes.error.message }, { status: 500 });
   }
 
+  // What is actually HAPPENING inside the module, as opposed to who was let into it. The
+  // funnel answers "did they activate"; this answers "is anyone teaching". On 2026-08-21
+  // every one of these is 0–3, and that IS the finding — an empty module reads as a broken
+  // panel unless the emptiness is printed as a number. head:true so it costs a count, not
+  // the rows. A table that errors reports null rather than 0: "we could not count" and
+  // "there are none" are different answers and must not look alike.
+  const activityCounts = await Promise.all(
+    ACTIVITY_TABLES.map(async ([key, table]) => {
+      const { count, error } = await supabase.from(table).select('*', { count: 'exact', head: true });
+      return [key, error ? null : (count ?? 0)] as const;
+    }),
+  );
+
   const funnel = buildTeacherFunnel({
     requests,
     profiles: profilesRes.data ?? [],
@@ -71,5 +95,5 @@ export async function GET(request: NextRequest) {
     nowMs: Date.now(),
   });
 
-  return NextResponse.json(funnel);
+  return NextResponse.json({ ...funnel, activity: Object.fromEntries(activityCounts) });
 }

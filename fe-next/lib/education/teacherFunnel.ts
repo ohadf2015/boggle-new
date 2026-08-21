@@ -143,6 +143,12 @@ export interface TeacherFunnelResult {
   summary: TeacherFunnelSummary;
   /** Distinct stated reasons, most-given first. */
   reasons: UseCaseReason[];
+  /**
+   * Raw row counts for the tables that hold evidence of teaching actually happening,
+   * filled in by the route (buildTeacherFunnel is pure and does no IO). null for a table
+   * that could not be counted — "we could not count" must not render as "there are none".
+   */
+  activity?: Record<string, number | null>;
 }
 
 function trialStateOf(expiresAt: string | null, nowMs: number): TrialState {
