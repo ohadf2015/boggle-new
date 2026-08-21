@@ -14,6 +14,8 @@
  * joins are done in memory instead of adding an RPC or a migration.
  */
 
+import { isChipEcho, normalizeUseCase } from './useCaseChips';
+
 export type TeacherStage =
   | 'declined'
   | 'awaiting_signup'
@@ -21,6 +23,27 @@ export type TeacherStage =
   | 'approved'
   | 'created_class'
   | 'teaching';
+
+/**
+ * Where a stated reason came from. Counting these together is how a product ends up
+ * reading its own marketing copy as market research — see useCaseChips.ts.
+ */
+export type UseCaseKind = 'free' | 'chip' | 'empty';
+
+/**
+ * Machine-written rows: fe-next/lib/education/__tests__/rls.test.ts inserted 16 of these
+ * into production on 2026-08-20 (anon-insert is allowed by RLS, and the test had no
+ * cleanup), which put "RLS Test" at the top of the admin queue and inflated `requested`
+ * from 29 to 46.
+ *
+ * Deliberately exact, not a fuzzy `%test%`: that would also swallow contesta@, protest@,
+ * and any school with "test" in its name. The test now cleans up after itself, so this is
+ * only the second line of defence.
+ */
+export function isMachineRequest(email: string | null | undefined): boolean {
+  const e = (email ?? '').trim().toLowerCase();
+  return e.endsWith('@example.com') || e.startsWith('rls-test-') || e.startsWith('rls-update-test-');
+}
 
 export type TrialState = 'none' | 'active' | 'expired';
 
@@ -35,6 +58,11 @@ export interface TeacherFunnelInput {
     status: string;
     created_at: string;
     trial_expires_at: string | null;
+    use_case?: string | null;
+    reviewed_at?: string | null;
+    role?: string | null;
+    school_or_org?: string | null;
+    admin_note?: string | null;
   }>;
   profiles: Array<{ id: string; user_role: string | null; last_seen_at?: string | null }>;
   classrooms: Array<{ id: string; teacher_id: string | null }>;
@@ -51,6 +79,8 @@ export interface TeacherFunnelRow {
   locale: string | null;
   country: string | null;
   status: string;
+  /** What they called themselves: teacher | tutor | researcher | admin | parent | other. */
+  role: string | null;
   createdAt: string;
   trialExpiresAt: string | null;
   trialState: TrialState;
@@ -62,6 +92,26 @@ export interface TeacherFunnelRow {
   students: number;
   assignments: number;
   stage: TeacherStage;
+  /** What they said they wanted it for, verbatim. The one field that says WHY. */
+  useCase: string | null;
+  useCaseKind: UseCaseKind;
+  reviewedAt: string | null;
+  schoolOrOrg: string | null;
+  adminNote: string | null;
+}
+
+/**
+ * One distinct answer to "what will you use LexiClash for?", with how many people gave
+ * it. Verbatim on purpose — no keyword buckets, no themes. At n≈29, and with a third of
+ * the corpus being tapped example chips, a classifier would be inventing its categories
+ * and presenting them as demand.
+ */
+export interface UseCaseReason {
+  text: string;
+  count: number;
+  kind: UseCaseKind;
+  roles: string[];
+  countries: string[];
 }
 
 export interface TeacherFunnelSummary {
@@ -75,11 +125,24 @@ export interface TeacherFunnelSummary {
   blocked: number;
   awaitingSignup: number;
   trialExpired: number;
+  /**
+   * Approved, role granted, came back to the app since — and still has no classroom.
+   * The leak the original panel could not show: `blocked` reads 0 (the grant works),
+   * `approved` looks healthy, and yet nothing is being taught. These are the people
+   * worth an email today, and their trial is the clock.
+   */
+  returnedNoClassroom: number;
+  /** Same, filtered to a trial that has not run out yet. */
+  returnedNoClassroomTrialActive: number;
+  /** Machine rows dropped before any of the above was counted. Shown, not hidden. */
+  excludedMachineRows: number;
 }
 
 export interface TeacherFunnelResult {
   rows: TeacherFunnelRow[];
   summary: TeacherFunnelSummary;
+  /** Distinct stated reasons, most-given first. */
+  reasons: UseCaseReason[];
 }
 
 function trialStateOf(expiresAt: string | null, nowMs: number): TrialState {
@@ -87,8 +150,43 @@ function trialStateOf(expiresAt: string | null, nowMs: number): TrialState {
   return Date.parse(expiresAt) > nowMs ? 'active' : 'expired';
 }
 
+function useCaseKindOf(text: string | null | undefined): UseCaseKind {
+  if (!normalizeUseCase(text)) return 'empty';
+  return isChipEcho(text) ? 'chip' : 'free';
+}
+
+/**
+ * Distinct answers with their counts. Grouped by normalised text so one answer given
+ * twice (the form has no double-submit guard — two applicants submitted the same row
+ * 3s and 51s apart on 2026-08-21) reads as count 2, not as two data points.
+ */
+function buildReasons(rows: TeacherFunnelRow[]): UseCaseReason[] {
+  const byText = new Map<string, UseCaseReason>();
+  for (const r of rows) {
+    if (r.useCaseKind === 'empty') continue;
+    const key = normalizeUseCase(r.useCase);
+    const existing = byText.get(key);
+    if (existing) {
+      existing.count += 1;
+      if (r.role && !existing.roles.includes(r.role)) existing.roles.push(r.role);
+      if (r.country && !existing.countries.includes(r.country)) existing.countries.push(r.country);
+      continue;
+    }
+    byText.set(key, {
+      text: (r.useCase ?? '').replace(/\s+/g, ' ').trim(),
+      count: 1,
+      kind: r.useCaseKind,
+      roles: r.role ? [r.role] : [],
+      countries: r.country ? [r.country] : [],
+    });
+  }
+  return [...byText.values()].sort((a, b) => b.count - a.count || a.text.localeCompare(b.text));
+}
+
 export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResult {
-  const { requests, profiles, classrooms, memberships, assignments, nowMs } = input;
+  const { profiles, classrooms, memberships, assignments, nowMs } = input;
+  const requests = input.requests.filter((r) => !isMachineRequest(r.email));
+  const excludedMachineRows = input.requests.length - requests.length;
 
   const roleById = new Map(profiles.map((p) => [p.id, p.user_role]));
   const lastSeenById = new Map(profiles.map((p) => [p.id, p.last_seen_at ?? null]));
@@ -137,6 +235,7 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
       locale: r.locale,
       country: r.country,
       status: r.status,
+      role: r.role ?? null,
       createdAt: r.created_at,
       trialExpiresAt: r.trial_expires_at,
       trialState: trialStateOf(r.trial_expires_at, nowMs),
@@ -146,14 +245,33 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
       students,
       assignments: assignmentCount,
       stage,
+      useCase: r.use_case ?? null,
+      useCaseKind: useCaseKindOf(r.use_case),
+      reviewedAt: r.reviewed_at ?? null,
+      schoolOrOrg: r.school_or_org ?? null,
+      adminNote: r.admin_note ?? null,
     };
   });
 
   const approvedRows = rows.filter((r) => r.status === 'approved');
+  // "Came back" = seen in the app after we approved them. Falls back to the request date
+  // when reviewed_at is missing (older rows), which is the conservative direction: it can
+  // only under-count returns, never invent one.
+  const returned = approvedRows.filter(
+    (r) =>
+      r.roleGranted &&
+      r.classrooms === 0 &&
+      !!r.lastSeenAt &&
+      Date.parse(r.lastSeenAt) > Date.parse(r.reviewedAt ?? r.createdAt),
+  );
 
   return {
     rows,
+    reasons: buildReasons(rows),
     summary: {
+      returnedNoClassroom: returned.length,
+      returnedNoClassroomTrialActive: returned.filter((r) => r.trialState === 'active').length,
+      excludedMachineRows,
       requested: rows.length,
       approved: approvedRows.length,
       roleGranted: approvedRows.filter((r) => r.roleGranted).length,

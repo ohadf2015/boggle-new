@@ -123,3 +123,104 @@ describe('buildTeacherFunnel', () => {
     expect(out.rows.find((r) => r.requestId === 'r2')?.stage).toBe('declined');
   });
 });
+
+describe('machine rows', () => {
+  it('drops integration-test rows from every number and says how many', () => {
+    // rls.test.ts wrote 16 of these into production on 2026-08-20, which put "RLS Test"
+    // at the top of the queue and read as 46 requests instead of 29.
+    const out = buildTeacherFunnel(
+      input({
+        requests: [
+          req(),
+          req({ id: 'm1', user_id: null, email: 'rls-test-1787259577371@example.com' }),
+          req({ id: 'm2', user_id: null, email: 'rls-update-test-1787259578106@example.com' }),
+        ],
+      }),
+    );
+
+    expect(out.summary.requested).toBe(1);
+    expect(out.summary.excludedMachineRows).toBe(2);
+    expect(out.rows.map((r) => r.requestId)).toEqual(['r1']);
+  });
+
+  it('keeps a real applicant whose address merely contains "test"', () => {
+    // A fuzzy %test% filter would swallow contesta@, protest@, and any school with
+    // "test" in its name.
+    const out = buildTeacherFunnel(input({ requests: [req({ email: 'contesta@escuela.mx' })] }));
+
+    expect(out.summary.excludedMachineRows).toBe(0);
+    expect(out.summary.requested).toBe(1);
+  });
+});
+
+describe('returnedNoClassroom', () => {
+  const seen = (lastSeenAt: string | null) => ({ id: 'u1', user_role: 'teacher', last_seen_at: lastSeenAt });
+
+  it('counts a teacher who came back after approval and still has no classroom', () => {
+    // The leak `blocked` cannot see: the grant works, they did return, and nothing is
+    // being taught — so the drop is discovery inside the app, not the approval.
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ reviewed_at: '2026-08-02T00:00:00Z' })],
+        profiles: [seen('2026-08-09T00:00:00Z')],
+      }),
+    );
+
+    expect(out.summary.returnedNoClassroom).toBe(1);
+    expect(out.summary.returnedNoClassroomTrialActive).toBe(1);
+  });
+
+  it('does not count someone last seen before we approved them', () => {
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ reviewed_at: '2026-08-02T00:00:00Z' })],
+        profiles: [seen('2026-08-01T12:00:00Z')],
+      }),
+    );
+
+    expect(out.summary.returnedNoClassroom).toBe(0);
+  });
+
+  it('does not count a teacher who actually made a classroom', () => {
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ reviewed_at: '2026-08-02T00:00:00Z' })],
+        profiles: [seen('2026-08-09T00:00:00Z')],
+        classrooms: [{ id: 'c1', teacher_id: 'u1' }],
+      }),
+    );
+
+    expect(out.summary.returnedNoClassroom).toBe(0);
+  });
+});
+
+describe('reasons', () => {
+  it('separates the form’s own example chips from a teacher’s own words', () => {
+    // 10 of 29 real reasons on 2026-08-21 were use_case_ex1..3 tapped unchanged.
+    // Counting them together would rank our marketing copy as the top demand.
+    const out = buildTeacherFunnel(
+      input({
+        requests: [
+          req({ id: 'r1', use_case: 'Weekly vocabulary battles with my class', role: 'teacher' }),
+          req({ id: 'r2', use_case: 'weekly vocabulary battles with my class ', role: 'tutor', country: 'BR' }),
+          req({ id: 'r3', use_case: 'site word builder', role: 'teacher', country: 'US' }),
+        ],
+      }),
+    );
+
+    const chip = out.reasons.find((r) => r.kind === 'chip');
+    expect(chip?.count).toBe(2);
+    expect(chip?.roles).toEqual(expect.arrayContaining(['teacher', 'tutor']));
+
+    const free = out.reasons.filter((r) => r.kind === 'free');
+    expect(free).toHaveLength(1);
+    expect(free[0]).toMatchObject({ text: 'site word builder', count: 1, countries: ['US'] });
+  });
+
+  it('ignores a request with no stated reason', () => {
+    const out = buildTeacherFunnel(input({ requests: [req({ use_case: '   ' })] }));
+
+    expect(out.reasons).toEqual([]);
+    expect(out.rows[0].useCaseKind).toBe('empty');
+  });
+});

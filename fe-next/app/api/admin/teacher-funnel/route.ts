@@ -33,7 +33,11 @@ export async function GET(request: NextRequest) {
   const [requestsRes, classroomsRes, membershipsRes, assignmentsRes] = await Promise.all([
     supabase
       .from('teacher_access_requests')
-      .select('id, user_id, email, full_name, locale, country, status, created_at, trial_expires_at')
+      .select(
+        // school_or_org + admin_note are here only so the panel can open the shared
+        // TeacherAccessDrawer straight from a funnel row, without a second round-trip.
+        'id, user_id, email, full_name, locale, country, role, school_or_org, admin_note, status, created_at, reviewed_at, trial_expires_at, use_case',
+      )
       .order('created_at', { ascending: false }),
     supabase.from('classrooms').select('id, teacher_id'),
     supabase.from('classroom_memberships').select('classroom_id, student_id'),
