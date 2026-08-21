@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -45,6 +45,11 @@ export function AccessRequestForm({
   const [useCase, setUseCase] = useState('');
   const [school, setSchool] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  // Synchronous in-flight guard. `submitting` (which disables the button)
+  // only takes effect on the NEXT render — two submits fired in the same
+  // tick (e.g. Enter key + click) would both read the pre-update `canSubmit`
+  // and both fire. The ref flips immediately, so the second call always bails.
+  const inFlight = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -82,7 +87,8 @@ export function AccessRequestForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit || !role) return;
+    if (!canSubmit || !role || inFlight.current) return;
+    inFlight.current = true;
     setError(null);
     setSubmitting(true);
     try {
@@ -104,6 +110,7 @@ export function AccessRequestForm({
     } catch {
       setError(t('education.access.submit_error'));
     } finally {
+      inFlight.current = false;
       setSubmitting(false);
     }
   };

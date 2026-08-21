@@ -66,7 +66,12 @@ export async function POST(req: Request) {
 
   const payload: TeacherAccessFormPayload = { email, full_name, role, locale, use_case, school_or_org, country };
   const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
-  if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
+  // 23505 = unique_violation from uniq_tar_one_pending_per_user: a racing
+  // second submit hit the one-pending-request-per-user index. That is the
+  // idempotency guard doing its job — the first request's row is canonical,
+  // so fall through and let the approval below promote it. Every other
+  // insert error is real.
+  if (ins.error && ins.error.code !== '23505') return bad('insert failed: ' + ins.error.message, 500);
 
   // Access is granted INSTANTLY on submit — no manual review step. The insert
   // only records the request; approval promotes the account in the same
@@ -88,10 +93,24 @@ export async function POST(req: Request) {
     .eq('user_id', user.id)
     .eq('status', 'pending')
     .select('id');
-  // Approves every pending row this user has (at most a handful — the rate
-  // limit caps requests at 3 per 24h), including the one just inserted.
+  // Approves this user's pending row (exactly one can exist —
+  // uniq_tar_one_pending_per_user), whether this request inserted it or a
+  // racing duplicate did and we fell through on 23505.
   if (approve.error) return bad('approval failed: ' + approve.error.message, 500);
-  if (!approve.data?.length) return bad('request not approved', 500);
+  if (!approve.data?.length) {
+    // The racing twin request approved the row first — a double-submit
+    // converged on a single row. Confirm an approved request exists and
+    // report the same success instead of a bogus 500 (the twin owns the
+    // profile promotion and notification emails).
+    const { data: already } = await admin
+      .from('teacher_access_requests')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('status', 'approved')
+      .limit(1);
+    if (!already?.length) return bad('request not approved', 500);
+    return NextResponse.json({ ok: true, success: true });
+  }
 
   const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
   if (promoted.error) return bad('promotion failed: ' + promoted.error.message, 500);
