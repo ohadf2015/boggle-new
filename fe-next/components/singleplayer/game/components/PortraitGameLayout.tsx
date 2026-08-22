@@ -192,7 +192,7 @@ export function PortraitGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden h-full bg-neo-navy">
+    <div className="relative flex flex-col overflow-y-auto min-h-[100dvh] bg-neo-navy">
       {/* Dynamic Energy Background */}
       <DynamicEnergyBackground />
 
