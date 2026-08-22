@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import BrainTrainingPageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -135,6 +136,26 @@ export default async function BrainTrainingPage({ params }: { params: Promise<{ 
         ]}
       />
       <BrainTrainingPageClient />
+      {/* PageClient is client-only, so Googlebot's initial HTML was nav+footer chrome
+          (8 visible words of page copy on /en/brain, measured 2026-08-21) while this file
+          already carried authored title/description/features/faq that nothing ever
+          rendered. Render it visibly — same remediation as /leaderboard. Collapsible:
+          players came to train, not to read copy. No asH1: PageClient.tsx:84 renders the
+          real h1 after hydration, so claiming one here would ship two to every human —
+          /leaderboard omits it for the same reason.
+          Gated on ACTUALLY-AUTHORED copy, not the `content` fallback: `ru` is in the
+          sitemap (/ru/brain) but absent from seoContent, and a visibly English block on a
+          Russian page is a worse signal than a short one. JSON-LD above keeps the English
+          fallback, where a language mismatch is invisible to users. */}
+      {seoContent[locale] && (
+        <GamePageSeoContent
+          title={content.title}
+          description={content.description}
+          features={content.features}
+          faq={content.faq}
+          collapsible
+        />
+      )}
     </>
   );
 }
