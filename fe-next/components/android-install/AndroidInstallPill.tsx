@@ -29,6 +29,7 @@ import {
   persistInstallDismissal,
 } from '@/lib/androidInstall/installCooldown';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
+import { useInGameSurface } from '@/lib/inGameSurface';
 import {
   isCapacitorNative,
   isStandaloneDisplay,
@@ -96,8 +97,13 @@ export default function AndroidInstallPill() {
   // boards) must never be covered by a floating promo.
   const pathname = usePathname();
   const routeAllowed = isAllowedAdBannerRoute(pathname);
+  // …and the route gate is not enough. `/multiplayer` is deliberately off GAME_ROUTES so its
+  // passive lobby can still monetize, which also left this pill floating over a live board
+  // (measured over 4 of 36 tiles on /he, 2026-08-23). Reactive: the round usually starts long
+  // after this mounted, so a mount-time read would miss it.
+  const inGame = useInGameSurface();
 
-  const shown = pillVisible && eligible && !sessionHidden && routeAllowed;
+  const shown = pillVisible && eligible && !sessionHidden && routeAllowed && !inGame;
 
   // Track the impression once per appearance.
   useEffect(() => {

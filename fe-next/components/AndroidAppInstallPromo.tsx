@@ -26,6 +26,7 @@ import { usePathname } from 'next/navigation';
 import { Zap, WifiOff, Bell } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
+import { isInGameSurface } from '@/lib/inGameSurface';
 import { useExperiment } from '@/hooks/useExperiment';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import {
@@ -81,6 +82,7 @@ export default function AndroidAppInstallPromo() {
       isStandalone: isStandaloneDisplay(),
       isInstalled: false,
       isAllowedRoute: isAllowedAdBannerRoute(pathname),
+      inGame: isInGameSurface(),
       dismissedUntil: readInstallDismissedUntil(),
       sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
       now: Date.now(),
@@ -121,6 +123,10 @@ export default function AndroidAppInstallPromo() {
           if (!shouldShowAndroidInstallPromo({
             ...baseInput,
             isInstalled: installed,
+            // Re-read, not spread: the round the player is in almost never started at
+            // mount. A frozen `inGame: false` is exactly how the interstitial ended up
+            // over a live board. Failing here re-arms, so the promo lands after the round.
+            inGame: isInGameSurface(),
             dismissedUntil: readInstallDismissedUntil(),
             sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
             now: Date.now(),
