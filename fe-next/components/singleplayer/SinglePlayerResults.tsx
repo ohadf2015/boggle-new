@@ -472,7 +472,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="relative min-h-dvh bg-neo-navy text-white">
       {/* Victory flash on new high score */}
       {results.isNewHighScore && <ScreenFlashOverlay trigger={1} colorClass="bg-neo-lime" />}
-      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'px-2 pb-28 pt-2'}>
+      <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'px-2 pb-28 pt-2 overflow-y-auto max-h-[calc(100dvh-112px)]'}>
         {isDesktop ? (
           <>
             <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
