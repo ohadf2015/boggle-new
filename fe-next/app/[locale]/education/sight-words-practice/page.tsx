@@ -6,6 +6,7 @@ import { EducationHeroBanner } from '@/components/education/EducationHeroBanner'
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -36,11 +37,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
   const c = getSightWordsContent(locale);
-  // EN-only landing: the body is English everywhere (see content.ts), so only
-  // the EN version is indexed. Non-EN locales carry hreflang back to their
-  // /education fallback — the same fallback cluster the sitemap's
-  // educationLandings entries use — instead of pretending a translated twin
-  // of this page exists.
+  // EN-only landing: the body is English everywhere (see content.ts), so only the EN
+  // version is indexed, and the only alternate declared is the English one. Pointing the
+  // non-EN locales at their /education hub (what this used to do) does NOT express
+  // "no translated twin exists" to Google — hreflang is reciprocal or it is discarded,
+  // and the hub never points back. See the alternates block below.
   const isEnglish = locale === 'en';
   const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale] ?? OG_IMAGE.en}`;
   const ogLocale = OG_LOCALE[locale] ?? 'en_US';
@@ -62,18 +63,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: c.metaDescription,
       images: [ogImage],
     },
-    alternates: {
-      canonical: pageUrl,
-      languages: {
-        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
-        en: `${BASE_URL}/en${PAGE_PATH}`,
-        he: `${BASE_URL}/he/education`,
-        sv: `${BASE_URL}/sv/education`,
-        ja: `${BASE_URL}/ja/education`,
-        es: `${BASE_URL}/es/education`,
-        ru: `${BASE_URL}/ru/education`,
-      },
-    },
+    // This page is indexable in English only (see `robots` below), so it declares just the
+    // English alternate. The previous hand-written block pointed he/sv/ja/es/ru at
+    // /{locale}/education — a hub that does not point back — which makes the annotations
+    // unconfirmed. Google discards those, and a contradictory cluster devalues the en and
+    // x-default entries alongside them, so the page ended up with no usable hreflang at all.
+    // enOnlyAlternates is reciprocal by construction and is what the other en-only pages use.
+    alternates: enOnlyAlternates(PAGE_PATH),
     robots: isEnglish ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
