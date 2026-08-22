@@ -43,7 +43,7 @@ export default function AdventureFinishCTA({
           className={cn(
             // Centred, above the bottom HUD bar + AdMob banner, below modals.
             'fixed inset-x-0 z-[45] flex justify-center pointer-events-none',
-            'bottom-[calc(5.75rem+var(--admob-banner-height,0px))]'
+            'bottom-[calc(5.75rem+var(--adventure-bottom-inset,0px))]'
           )}
           dir={isRTL ? 'rtl' : 'ltr'}
         >

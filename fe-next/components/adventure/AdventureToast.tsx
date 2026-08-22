@@ -106,7 +106,7 @@ export function AdventureToast({
   }, []);
 
   return (
-    <div className="fixed bottom-[calc(6rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none">
+    <div className="fixed bottom-[calc(6rem+var(--adventure-bottom-inset,0px))] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 pointer-events-none">
       <AdaptiveAnimatePresence>
         {toasts.map(toast => (
           <AdaptiveMotion.div

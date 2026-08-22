@@ -13,9 +13,7 @@
  */
 
 import { useEffect, useCallback } from 'react';
-
-/** Elements where keyboard shortcuts should be suppressed */
-const INPUT_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface UseGameKeyboardShortcutsOptions {
   /** Called on Escape key */
@@ -38,8 +36,7 @@ export function useGameKeyboardShortcuts({
     if (!enabled) return;
 
     // Don't intercept when user is typing in an input
-    const target = e.target as HTMLElement;
-    if (INPUT_TAGS.has(target.tagName) || target.isContentEditable) return;
+    if (isTypingTarget(e)) return;
 
     const hasModifier = e.ctrlKey || e.metaKey || e.altKey;
 

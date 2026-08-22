@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface Props {
   turn: string;
@@ -31,8 +32,7 @@ export function useWordCraftKeyboardShortcuts(props: Props) {
   useEffect(() => {
     if (props.turn !== 'player') return;
     const onKey = (ev: KeyboardEvent) => {
-      const target = ev.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      if (isTypingTarget(ev)) {
         return;
       }
       if (ev.key === 'Escape') {
@@ -81,8 +81,7 @@ export function useWordCraftKeyboardShortcuts(props: Props) {
   useEffect(() => {
     if (props.turn !== 'player') return;
     const onKey = (ev: KeyboardEvent) => {
-      const target = ev.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      if (isTypingTarget(ev)) {
         return;
       }
       const isArrow = ev.key === 'ArrowUp' || ev.key === 'ArrowDown' || ev.key === 'ArrowLeft' || ev.key === 'ArrowRight';

@@ -661,7 +661,7 @@ const BossOverlay = memo<BossOverlayProps>(
                     Docked as a SOLID panel just above the player HP bar so it reads as
                     controls (legible + tappable) even where it meets the board edge on
                     tall, narrow phones, rather than transparent buttons over the tiles. */}
-                <div className="fixed bottom-[calc(8rem+var(--admob-banner-height,0px))] sm:bottom-[calc(9.5rem+var(--admob-banner-height,0px))] lg:bottom-[calc(4.5rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 px-2 py-1.5 rounded-neo bg-neo-navy/92 border-2 border-neo-black shadow-hard backdrop-blur-sm">
+                <div className="fixed bottom-[calc(8rem+var(--adventure-bottom-inset,0px))] sm:bottom-[calc(9.5rem+var(--adventure-bottom-inset,0px))] lg:bottom-[calc(4.5rem+var(--adventure-bottom-inset,0px))] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 px-2 py-1.5 rounded-neo bg-neo-navy/92 border-2 border-neo-black shadow-hard backdrop-blur-sm">
                   <WeaknessBadge labelKey={weaknessRule.labelKey} crit={weakCrit} t={t} />
                   <PlayerAbilityBar
                     abilities={combat.abilities}

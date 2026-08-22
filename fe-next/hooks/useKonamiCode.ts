@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { advanceKonami } from '@/utils/konamiSequence';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 /**
  * Fires `onUnlock` when the user enters the Konami code on a physical keyboard.
@@ -16,13 +17,7 @@ export function useKonamiCode(onUnlock: () => void): void {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable)
-      ) {
+      if (isTypingTarget(e)) {
         return;
       }
       const { progress, matched } = advanceKonami(progressRef.current, e.key);

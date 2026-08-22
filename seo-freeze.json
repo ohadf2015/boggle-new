@@ -4,7 +4,17 @@
     {
       "path": "/es/juego-de-palabras-multijugador",
       "until": "2026-09-17",
-      "why": "Growth Radar row 50: 62,054 impressions at 0.51% CTR, position 5.52 — the biggest single traffic lever in the portfolio. Frozen 2026-08-20 for one 28-day scoring window so we get one attributable CTR number."
+      "why": "Growth Radar row 50: 62,054 impressions at 0.51% CTR, position 5.52 — the biggest single traffic lever in the portfolio. Frozen 2026-08-20 for one 28-day scoring window so we get one attributable CTR number. Verified 2026-08-22: the page has genuinely held still since the freeze, so the window is live — leave it alone."
+    },
+    {
+      "path": "/sv/swedish-multiplayer-word-game",
+      "until": "2026-09-19",
+      "why": "Growth Radar row 51: 3,313 impressions at 0.54% CTR, position 5.18. The routine rewrote this page's meta on 2026-08-20, which is the same failure row 50 was frozen for — the snippet is already good (it leads with 'Scrabble & Alfapet Online på Svenska — Gratis'), so what it lacks is a window, not better words. Frozen 2026-08-22."
+    },
+    {
+      "path": "/en/competitive-word-games",
+      "until": "2026-09-19",
+      "why": "Growth Radar row 52: 1,049 impressions at 0.38% CTR, position 5.09. Same reason as the row above — freeze the current snippet long enough to get one number that can be attributed to it. Frozen 2026-08-22."
     }
   ]
 }

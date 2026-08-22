@@ -112,7 +112,7 @@ export default function AdventureTailOverlays({
       )}
       <ModeCoach mode="adventure" />
       {archetype === 'forge' && forgeEquippedRunes.length > 0 && (
-        <div className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-30">
+        <div className="fixed bottom-[var(--adventure-bottom-inset,0px)] inset-x-0 z-30">
           <RuneBar runes={forgeEquippedRunes} maxSlots={maxRuneSlots} />
         </div>
       )}

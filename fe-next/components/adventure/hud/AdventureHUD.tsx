@@ -138,7 +138,7 @@ export const AdventureHUD = memo<AdventureHUDProps>(
         <div
           data-testid="hud-bottom-bar"
           className={cn(
-            'fixed bottom-[var(--admob-banner-height,0px)] inset-x-0',
+            'fixed bottom-[var(--adventure-bottom-inset,0px)] inset-x-0',
             'flex items-end justify-between gap-2 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0.5rem))]',
             hudTheme.headerBg,
             'border-t-2', hudTheme.headerBorder,

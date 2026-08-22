@@ -13,6 +13,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useDismissedFlag } from '@/hooks/useLocalStorageState';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 // ==================== Types ====================
 
@@ -76,12 +77,7 @@ export function useKeyboardHelpState(
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ignore if user is typing in an input
-      const target = event.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (isTypingTarget(event)) {
         return;
       }
 

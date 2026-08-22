@@ -27,6 +27,7 @@ import {
   pickDailyModifier,
 } from '@/lib/solo/soloDaily';
 import { crosswordScore } from '@/lib/solo/soloReward';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -169,8 +170,7 @@ export function CrosswordView({
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       // Ignore typing inside the ClueScramble input (or any other input/textarea)
       // so the global handler doesn't race with the mini-game.
-      const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+      if (isTypingTarget(e)) {
         return;
       }
       const key = e.key;
