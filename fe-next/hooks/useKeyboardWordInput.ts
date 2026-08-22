@@ -21,6 +21,7 @@ import { useIsDesktop } from '@/hooks/useMediaQuery';
 import type { LetterGrid } from '@/types';
 import type { HighlightedCell } from '@/components/GridComponent';
 import type { Language } from '@/shared/types/game';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 // ==================== Types ====================
 
@@ -295,13 +296,8 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if typing in an input field
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      // Ignore if typing in an input field (shadow-DOM safe — see isTypingTarget)
+      if (isTypingTarget(e)) {
         return;
       }
 

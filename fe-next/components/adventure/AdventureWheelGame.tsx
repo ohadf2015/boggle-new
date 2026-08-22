@@ -151,7 +151,7 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
       style={{
         // Reserve space for the AdMob native banner so gameplay content (sticky
         // action buttons, found-words list) is never covered by the ad.
-        paddingBottom: 'var(--admob-banner-height, 0px)',
+        paddingBottom: 'var(--adventure-bottom-inset,0px)',
       }}
     >
       {/* Minimal adventure chrome: shared canonical exit button overlay */}

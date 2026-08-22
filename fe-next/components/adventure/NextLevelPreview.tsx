@@ -41,7 +41,7 @@ export function NextLevelPreview({
           exit={{ y: 200, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 1.5 }}
           data-testid="next-level-preview"
-          className="fixed bottom-[calc(1.5rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm"
+          className="fixed bottom-[calc(1.5rem+var(--adventure-bottom-inset,0px))] left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm"
         >
           <NeoPanel tone="navy" className="p-4">
             <div className="flex items-center justify-between mb-2">

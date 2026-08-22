@@ -2526,6 +2526,13 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     --bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 0px));
     /* AdMob banner height (incl. its own safe-area) — published by AnchoredNativeBanner. */
     --admob-banner-height: 0px;
+    /* Floor that bottom-anchored in-game UI must clear. Adventure used to anchor
+       straight to --admob-banner-height, which is 0px on the web (no AdMob), so on
+       an Android phone with an on-screen nav bar the action buttons rendered
+       underneath it and could not be pressed — the page is viewport-fit=cover, so
+       nothing else was reserving that band. max() rather than +: the banner height
+       already carries its own safe-area clearance, so adding would double-count. */
+    --adventure-bottom-inset: max(var(--admob-banner-height, 0px), env(safe-area-inset-bottom, 0px));
     /* WEB AdSense anchor-ad band height — published by WebAnchorAdObserver. The
        AdSense Auto-Ads anchor is injected outside the React tree as a fixed band
        pinned to the viewport bottom; AdMob's var stays 0 for it. On native AdMob

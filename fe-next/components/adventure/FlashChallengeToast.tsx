@@ -48,7 +48,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
         data-testid="challenge-dismiss"
         className={cn(
           // Bottom-right corner — avoids header and grid center
-          'fixed bottom-[calc(5.5rem+var(--admob-banner-height,0px))] sm:bottom-[calc(1.5rem+var(--admob-banner-height,0px))] inset-e-3 z-30',
+          'fixed bottom-[calc(5.5rem+var(--adventure-bottom-inset,0px))] sm:bottom-[calc(1.5rem+var(--adventure-bottom-inset,0px))] inset-e-3 z-30',
           'w-auto max-w-[240px]',
           'min-w-[44px] min-h-[44px]',
           'rounded-neo border-2 shadow-hard-sm',

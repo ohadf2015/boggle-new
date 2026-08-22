@@ -4,6 +4,7 @@
  * Extracted from CrazyGamesSDK.tsx.
  */
 import { useEffect } from 'react';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 export function useCrazyGamesScrollPrevention(enabled: boolean) {
   useEffect(() => {
@@ -58,12 +59,7 @@ export function useCrazyGamesScrollPrevention(enabled: boolean) {
     const preventKeyScroll = (event: KeyboardEvent) => {
       // Allow normal keyboard behavior in form controls (typing spaces, arrow navigation)
       const active = document.activeElement;
-      if (
-        active instanceof HTMLInputElement ||
-        active instanceof HTMLTextAreaElement ||
-        active instanceof HTMLSelectElement ||
-        (active as HTMLElement)?.isContentEditable
-      ) {
+      if (isTypingTarget(event)) {
         return;
       }
 

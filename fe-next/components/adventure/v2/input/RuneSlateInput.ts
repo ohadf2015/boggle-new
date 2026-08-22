@@ -1,4 +1,5 @@
 import type { Tile, TileId } from '@/lib/adventure/v2/types';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface Bridge {
   destroy: () => void;
@@ -22,8 +23,7 @@ const HE_LETTER_RE = /^[א-ת]$/; // base + final Hebrew letters
 
 export function attachKeyboardBridge(handlers: Handlers): Bridge {
   function onKeyDown(e: KeyboardEvent) {
-    const target = e.target as HTMLElement | null;
-    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+    if (isTypingTarget(e)) return;
 
     if (e.key === 'Enter') {
       e.preventDefault();
