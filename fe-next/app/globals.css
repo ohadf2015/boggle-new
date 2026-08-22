@@ -2530,8 +2530,17 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
        straight to --admob-banner-height, which is 0px on the web (no AdMob), so on
        an Android phone with an on-screen nav bar the action buttons rendered
        underneath it and could not be pressed — the page is viewport-fit=cover, so
-       nothing else was reserving that band. max() rather than +: the banner height
-       already carries its own safe-area clearance, so adding would double-count. */
+       nothing else was reserving that band.
+
+       max() rather than +, because the two inputs overlap on the platform that
+       reported this: AnchoredNativeBanner publishes h + safeArea.bottom on Android
+       (see the SizeChanged listener), so adding env(safe-area-inset-bottom) again
+       would double-count the nav band. On iOS it publishes h alone and lets the
+       plugin's own safeAreaLayoutGuide place the banner, so max() is the larger of
+       the two there rather than their sum — still never less than the old
+       var(--admob-banner-height) this replaced. Note --combined-safe-area-bottom in
+       animations.css sums them instead; that token is for elements that do NOT
+       already anchor to the banner. */
     --adventure-bottom-inset: max(var(--admob-banner-height, 0px), env(safe-area-inset-bottom, 0px));
     /* WEB AdSense anchor-ad band height — published by WebAnchorAdObserver. The
        AdSense Auto-Ads anchor is injected outside the React tree as a fixed band
