@@ -61,6 +61,8 @@ let roCallbacks: Array<() => void> = [];
 const fireResize = () => act(() => { roCallbacks.forEach(cb => cb()); });
 
 let boxSize = { width: 300, height: 300 };
+// The wheel can MOVE without resizing — the word-builder row above it wraps.
+let boxPos = { top: 0, left: 0 };
 
 beforeEach(() => {
   captured.graphicsInstances.length = 0;
@@ -69,13 +71,15 @@ beforeEach(() => {
   simTime = 0;
   roCallbacks = [];
   boxSize = { width: 300, height: 300 };
+  boxPos = { top: 0, left: 0 };
 
   vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => { rafCb = cb; return 1; });
   vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
   vi.spyOn(performance, 'now').mockImplementation(() => simTime);
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
-    width: boxSize.width, height: boxSize.height, top: 0, left: 0,
-    right: boxSize.width, bottom: boxSize.height, x: 0, y: 0, toJSON: () => ({}),
+    width: boxSize.width, height: boxSize.height, top: boxPos.top, left: boxPos.left,
+    right: boxPos.left + boxSize.width, bottom: boxPos.top + boxSize.height,
+    x: boxPos.left, y: boxPos.top, toJSON: () => ({}),
   } as DOMRect));
 
   vi.stubGlobal('ResizeObserver', class {
@@ -148,5 +152,65 @@ describe('WordWheelPixiRing — re-centres when the wheel box resizes', () => {
     // 240/2 = 120. A centre of 160 would mean the in-flight setup() won and the
     // canvas is drawing against a box that no longer exists.
     expect(lineGfx().circle.mock.calls.some(([x, y]) => x === 120 && y === 120)).toBe(true);
+  });
+});
+
+/**
+ * The wheel can MOVE without changing size. The word-builder row sits directly
+ * above it and is `flex-wrap`, so committing a letter that tips the built word
+ * onto a second line pushes the whole wheel down — the wheel's own box is capped
+ * by container queries and does not change. No ResizeObserver fires on a pure
+ * move and no scroll happens, so the cached canvasRect went stale by exactly one
+ * row height, and the live drag line (the only thing that reads the rect) drew
+ * that far off the letters.
+ */
+describe('WordWheelPixiRing — drag line survives the wheel being pushed down', () => {
+  const drag = (x: number, y: number) => ({
+    pointerPosRef: { current: { x, y } },
+    isDraggingRef: { current: true },
+  });
+
+  it('GIVEN the wheel moves with no resize WHEN a letter is added THEN the drag line uses the NEW rect', async () => {
+    const d = drag(150, 200);
+    const { rerender } = render(
+      <WordWheelPixiRing selectedIndices={[-1]} radius={100} combo={0} {...d} />,
+    );
+    await waitFor(() => expect(captured.graphicsInstances.length).toBeGreaterThanOrEqual(3));
+    tick(); // drag starts → schedules a refresh
+    tick(); // refresh consumed
+
+    // Rect still at top 0, so the pointer maps straight through.
+    expect(lineGfx().lineTo.mock.calls.some(([x, y]) => x === 150 && y === 200)).toBe(true);
+
+    // The builder row wraps: the wheel is pushed 40px down, same size as before.
+    // No resize event, no scroll — only a new letter in the word.
+    boxPos = { top: 40, left: 0 };
+    rerender(<WordWheelPixiRing selectedIndices={[-1, 2]} radius={100} combo={0} {...d} />);
+    lineGfx().lineTo.mockClear();
+    tick(); // selection changed → schedules a refresh
+    tick(); // refresh consumed, line redrawn against the moved rect
+
+    // Pointer is unchanged on screen, so its canvas-space y must drop by 40.
+    // The refresh is deliberately deferred one frame (so the read happens after
+    // the reflow it was scheduled for has landed), which is why the check is on
+    // the LAST line drawn rather than on every line since the move.
+    const calls = lineGfx().lineTo.mock.calls;
+    expect(calls[calls.length - 1]).toEqual([150, 160]);
+  });
+
+  it('GIVEN nothing changes THEN the rect is not re-read every frame', async () => {
+    const d = drag(150, 200);
+    render(<WordWheelPixiRing selectedIndices={[-1, 2]} radius={100} combo={0} {...d} />);
+    await waitFor(() => expect(captured.graphicsInstances.length).toBeGreaterThanOrEqual(3));
+    tick();
+    tick();
+
+    // The cached rect exists to avoid a forced reflow per frame during a drag.
+    const before = (Element.prototype.getBoundingClientRect as ReturnType<typeof vi.fn>).mock.calls.length;
+    tick();
+    tick();
+    tick();
+    const after = (Element.prototype.getBoundingClientRect as ReturnType<typeof vi.fn>).mock.calls.length;
+    expect(after).toBe(before);
   });
 });

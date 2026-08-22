@@ -1198,6 +1198,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           combo={combo}
           pointerPosRef={pointerPosRef}
           isDraggingRef={draggingRef}
+          outerCount={outerLetters.length}
           reducedMotion={prefersReducedMotion}
         />
         {/* Outer glow ring — breathing loop disabled under reduced-motion */}
@@ -1231,7 +1232,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             letter={letter}
             isCenter={false}
             tileSkin={equippedTileSkin}
-            angle={i * 60}
+            angle={i * (360 / outerLetters.length)}
             radius={wheelRadius}
             onPress={(l, _, el) => handleLetterPress(l, i, el)}
             isUsed={usedIndices.has(i)}
