@@ -119,6 +119,24 @@ export default function WordWheelPixiRing({
       let angle = 0;
       let lastTime = performance.now();
 
+      // canvasRect above is refreshed on scroll, on window resize, and by the
+      // ResizeObserver — which covers everything EXCEPT the wheel being MOVED
+      // without being resized. That happens on every wheel: the word-builder row
+      // sits directly above and is `flex-wrap`, so committing a letter that tips
+      // the built word onto a second line pushes the whole wheel down. The wheel's
+      // own box is capped by container queries and does not change, so no observer
+      // fires, no scroll happens — and the cached rect is stale by exactly one row
+      // height. Only the live drag line reads the rect, so that line, and nothing
+      // else, drew offset from the letters. Longer words wrap sooner, which is why
+      // it shows up on the English wheel before the Hebrew one.
+      //
+      // Refresh on the NEXT frame after the two moments layout can shift — a drag
+      // starting, and a letter being added or removed — rather than per frame,
+      // which is the forced reflow the cached rect exists to avoid.
+      let wasDragging = false;
+      let lastSelLen = -1;
+      let rectDirty = false;
+
       const frame = (time: number) => {
         // If the tab is hidden, pause the loop entirely rather than scheduling
         // continuous no-op frames. We resume on visibilitychange.
@@ -152,6 +170,17 @@ export default function WordWheelPixiRing({
         const dt = (time - lastTime) / 1000;
         lastTime = time;
         const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef, outerCount: oc } = stateRef.current;
+
+        // Consume a refresh requested by the previous frame, so the read happens
+        // after the reflow it was scheduled for has actually landed.
+        if (rectDirty) {
+          refreshRect();
+          rectDirty = false;
+        }
+        const dragging = dragRef?.current ?? false;
+        if ((dragging && !wasDragging) || sel.length !== lastSelLen) rectDirty = true;
+        wasDragging = dragging;
+        lastSelLen = sel.length;
         // Ambient motion is decorative: disable it when reduced motion is
         // preferred. Connection lines and drag trails still update below.
         if (!reducedMotion) angle += dt * 0.5;
@@ -209,8 +238,7 @@ export default function WordWheelPixiRing({
 
           // ── Live drag line: last committed letter → current pointer ──
           const pp = ppRef?.current ?? null;
-          const isDrag = dragRef?.current ?? false;
-          if (isDrag && pp) {
+          if (dragging && pp) {
             const lx = pp.x - canvasRect.left;
             const ly = pp.y - canvasRect.top;
             const last = pts[pts.length - 1];
