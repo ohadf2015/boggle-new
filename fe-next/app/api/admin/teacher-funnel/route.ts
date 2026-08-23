@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
         'id, user_id, email, full_name, locale, country, role, school_or_org, admin_note, status, created_at, reviewed_at, trial_expires_at, use_case',
       )
       .order('created_at', { ascending: false }),
-    supabase.from('classrooms').select('id, teacher_id'),
+    supabase.from('classrooms').select('id, teacher_id, name, join_code, language, created_at'),
     supabase.from('classroom_memberships').select('classroom_id, student_id'),
     supabase.from('teacher_assignments').select('teacher_id'),
   ]);
@@ -62,12 +62,26 @@ export async function GET(request: NextRequest) {
   }
 
   const requests = requestsRes.data ?? [];
-  const userIds = requests.map((r) => r.user_id).filter((id): id is string => !!id);
+  // Classroom owners are included alongside applicants: a classroom can be opened by
+  // someone who never filled in the access form (the 2026-01-24 one predates the form),
+  // and such a row would otherwise render with a blank owner. display_name/username are
+  // the only human labels on `profiles` — it has no email column.
+  const userIds = [
+    ...new Set(
+      [
+        ...requests.map((r) => r.user_id),
+        ...(classroomsRes.data ?? []).map((c) => c.teacher_id),
+      ].filter((id): id is string => !!id),
+    ),
+  ];
 
   // Only fetch the profiles we actually join against; `profiles` is the whole
-  // player base and this panel only cares about applicants.
+  // player base and this panel only cares about applicants and classroom owners.
   const profilesRes = userIds.length
-    ? await supabase.from('profiles').select('id, user_role, last_seen_at').in('id', userIds)
+    ? await supabase
+        .from('profiles')
+        .select('id, user_role, last_seen_at, display_name, username')
+        .in('id', userIds)
     : { data: [], error: null };
   if (profilesRes.error) {
     return NextResponse.json({ error: profilesRes.error.message }, { status: 500 });

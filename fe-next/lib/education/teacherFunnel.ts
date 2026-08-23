@@ -64,11 +64,48 @@ export interface TeacherFunnelInput {
     school_or_org?: string | null;
     admin_note?: string | null;
   }>;
-  profiles: Array<{ id: string; user_role: string | null; last_seen_at?: string | null }>;
-  classrooms: Array<{ id: string; teacher_id: string | null }>;
+  profiles: Array<{
+    id: string;
+    user_role: string | null;
+    last_seen_at?: string | null;
+    display_name?: string | null;
+    username?: string | null;
+  }>;
+  classrooms: Array<{
+    id: string;
+    teacher_id: string | null;
+    name?: string | null;
+    join_code?: string | null;
+    language?: string | null;
+    created_at?: string | null;
+  }>;
   memberships: Array<{ classroom_id: string; student_id: string }>;
   assignments: Array<{ teacher_id: string | null }>;
   nowMs: number;
+}
+
+/**
+ * One classroom, named, with whoever opened it. Listed CLASSROOM-first rather than
+ * teacher-first on purpose: the funnel rows only cover people who filled in the access
+ * form, so a classroom opened by anyone else (an admin, an early account, a manual grant)
+ * is invisible there. The 2026-01-24 classroom is exactly that case — it predates the
+ * access form and belongs to no request.
+ */
+export interface ClassroomRow {
+  id: string;
+  /** Empty/blank names are normalised to null so the UI can say "(unnamed)" rather than "". */
+  name: string | null;
+  joinCode: string | null;
+  language: string | null;
+  createdAt: string | null;
+  teacherId: string | null;
+  /** Best available human label: request full_name → profile display_name → username. */
+  teacherName: string | null;
+  /** Only known for teachers who came through the access form. */
+  teacherEmail: string | null;
+  /** False when the owner is not in `teacher_access_requests` — worth seeing, not hiding. */
+  teacherIsApplicant: boolean;
+  students: number;
 }
 
 export interface TeacherFunnelRow {
@@ -143,6 +180,12 @@ export interface TeacherFunnelResult {
   summary: TeacherFunnelSummary;
   /** Distinct stated reasons, most-given first. */
   reasons: UseCaseReason[];
+  /**
+   * Every classroom that exists, newest first — name + who opened it. Optional for the same
+   * reason `activity` is: during a deploy window a cached client bundle can meet the older
+   * API shape, and the panel defaults it rather than white-screening the whole admin page.
+   */
+  classrooms?: ClassroomRow[];
   /**
    * Raw row counts for the tables that hold evidence of teaching actually happening,
    * filled in by the route (buildTeacherFunnel is pure and does no IO). null for a table
@@ -271,9 +314,40 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
       Date.parse(r.lastSeenAt) > Date.parse(r.reviewedAt ?? r.createdAt),
   );
 
+  // Identity for a classroom owner, best effort. The applicant row is preferred because it
+  // carries a real email; profiles only has display_name/username. Neither is guaranteed,
+  // so the UI falls back to the raw id — a row with a blank owner is worse than an ugly one.
+  const requestByUserId = new Map(
+    requests.filter((r) => r.user_id).map((r) => [r.user_id as string, r]),
+  );
+  const profileById = new Map(profiles.map((p) => [p.id, p]));
+
+  const classroomRows: ClassroomRow[] = classrooms
+    .map((c) => {
+      const req = c.teacher_id ? requestByUserId.get(c.teacher_id) : undefined;
+      const prof = c.teacher_id ? profileById.get(c.teacher_id) : undefined;
+      const name = (c.name ?? '').trim();
+      return {
+        id: c.id,
+        name: name || null,
+        joinCode: c.join_code ?? null,
+        language: c.language ?? null,
+        createdAt: c.created_at ?? null,
+        teacherId: c.teacher_id ?? null,
+        teacherName:
+          req?.full_name?.trim() || prof?.display_name?.trim() || prof?.username?.trim() || null,
+        teacherEmail: req?.email ?? null,
+        teacherIsApplicant: !!req,
+        students: studentsByClassroom.get(c.id)?.size ?? 0,
+      };
+    })
+    // Newest first, with undated rows last instead of NaN-comparing into a random position.
+    .sort((a, b) => (a.createdAt ? Date.parse(a.createdAt) : -Infinity) < (b.createdAt ? Date.parse(b.createdAt) : -Infinity) ? 1 : -1);
+
   return {
     rows,
     reasons: buildReasons(rows),
+    classrooms: classroomRows,
     summary: {
       returnedNoClassroom: returned.length,
       returnedNoClassroomTrialActive: returned.filter((r) => r.trialState === 'active').length,

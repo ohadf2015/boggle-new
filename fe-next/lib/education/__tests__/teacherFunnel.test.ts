@@ -223,4 +223,70 @@ describe('reasons', () => {
     expect(out.reasons).toEqual([]);
     expect(out.rows[0].useCaseKind).toBe('empty');
   });
+
+  describe('classrooms list', () => {
+    it('names each classroom and who opened it, including an owner with no access request', () => {
+      // The case the funnel table structurally cannot show: prod has two classrooms and only
+      // ONE belongs to an applicant. The other predates the access form, so a teacher-first
+      // view drops it entirely and the admin sees "1" where the DB says 2.
+      const out = buildTeacherFunnel(
+        input({
+          profiles: [
+            { id: 'u1', user_role: 'teacher' },
+            { id: 'ghost', user_role: 'teacher', display_name: 'Early Adopter' },
+          ],
+          classrooms: [
+            { id: 'c1', teacher_id: 'u1', name: 'Grade 4 English', created_at: '2026-08-21T09:00:00Z' },
+            { id: 'c2', teacher_id: 'ghost', name: 'Pilot Class', created_at: '2026-01-24T09:00:00Z' },
+          ],
+          memberships: [{ classroom_id: 'c1', student_id: 's1' }],
+        }),
+      );
+
+      expect(out.classrooms).toHaveLength(2);
+      expect(out.classrooms[0]).toMatchObject({
+        name: 'Grade 4 English',
+        teacherName: 'A Teacher',
+        teacherEmail: 'a@school.org',
+        teacherIsApplicant: true,
+        students: 1,
+      });
+      // Named from the profile, flagged as having no request, and NOT silently dropped.
+      expect(out.classrooms[1]).toMatchObject({
+        name: 'Pilot Class',
+        teacherName: 'Early Adopter',
+        teacherEmail: null,
+        teacherIsApplicant: false,
+        students: 0,
+      });
+    });
+
+    it('orders newest first and puts an undated classroom last', () => {
+      const out = buildTeacherFunnel(
+        input({
+          classrooms: [
+            { id: 'old', teacher_id: 'u1', name: 'Old', created_at: '2026-01-01T00:00:00Z' },
+            { id: 'undated', teacher_id: 'u1', name: 'Undated' },
+            { id: 'new', teacher_id: 'u1', name: 'New', created_at: '2026-08-20T00:00:00Z' },
+          ],
+        }),
+      );
+
+      expect(out.classrooms.map((c) => c.id)).toEqual(['new', 'old', 'undated']);
+    });
+
+    it('normalises a blank classroom name to null so the UI can label it, and never blanks the owner', () => {
+      const out = buildTeacherFunnel(
+        input({
+          // No matching profile and no matching request: the owner is knowable only by id.
+          profiles: [],
+          classrooms: [{ id: 'c1', teacher_id: 'nobody', name: '   ' }],
+        }),
+      );
+
+      expect(out.classrooms[0].name).toBeNull();
+      expect(out.classrooms[0].teacherName).toBeNull();
+      expect(out.classrooms[0].teacherId).toBe('nobody');
+    });
+  });
 });

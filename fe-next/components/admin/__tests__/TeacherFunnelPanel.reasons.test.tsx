@@ -171,4 +171,50 @@ describe('<TeacherFunnelPanel>', () => {
     await screen.findByText('Ada Teacher');
     expect(screen.getByText(/Nobody has stated a reason yet/)).toBeInTheDocument();
   });
+
+  describe('classrooms section', () => {
+    // Shapes taken from the real prod rows (2026-08-23): one classroom owned by an
+    // applicant with no students, and one owned by an account that never filled in the
+    // access form — which holds the product's only student.
+    const classrooms = [
+      {
+        id: 'c1', name: '3RD GRADE', joinCode: 'ABC123', language: 'en',
+        createdAt: '2026-08-21T09:00:00Z', teacherId: 'u1', teacherName: 'Alexander Castro',
+        teacherEmail: 'alex@school.edu', teacherIsApplicant: true, students: 0,
+      },
+      {
+        id: 'c2', name: 'כיתה', joinCode: null, language: 'he',
+        createdAt: '2026-01-24T09:00:00Z', teacherId: 'ghost', teacherName: 'Fish',
+        teacherEmail: null, teacherIsApplicant: false, students: 1,
+      },
+    ];
+
+    it('names every classroom and who opened it, flagging an owner with no access request', async () => {
+      respondWith(payload({ classrooms }));
+      render(<TeacherFunnelPanel />);
+
+      expect(await screen.findByText('3RD GRADE')).toBeInTheDocument();
+      expect(screen.getByText('Alexander Castro')).toBeInTheDocument();
+      // The row a teacher-first view drops entirely — and it holds the only student.
+      expect(screen.getByText('כיתה')).toBeInTheDocument();
+      expect(screen.getByText('Fish')).toBeInTheDocument();
+      expect(screen.getByText(/no access request/)).toBeInTheDocument();
+    });
+
+    it('says so when no classroom has ever been opened', async () => {
+      respondWith(payload({ classrooms: [] }));
+      render(<TeacherFunnelPanel />);
+
+      expect(await screen.findByText(/No classroom has ever been opened/)).toBeInTheDocument();
+    });
+
+    it('survives an API response from before classrooms existed', async () => {
+      const { classrooms: _omitted, ...old } = payload({ classrooms });
+      respondWith(old);
+      render(<TeacherFunnelPanel />);
+
+      // Must not white-screen: the section renders its empty state instead.
+      expect(await screen.findByText(/No classroom has ever been opened/)).toBeInTheDocument();
+    });
+  });
 });
