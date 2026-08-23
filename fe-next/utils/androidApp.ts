@@ -109,6 +109,14 @@ export interface AndroidPromoGateInput {
   isInstalled: boolean;
   /** current route permits a promo (reuses the ad-banner route allowlist) */
   isAllowedRoute: boolean;
+  /**
+   * A fullscreen game surface is on screen right now (`body.screen-fit-locked`).
+   * The route allowlist cannot see this: `/multiplayer` is deliberately absent from
+   * GAME_ROUTES so its passive lobby keeps its banner, which also let the promo fire
+   * over a live board. This is the same OPT-OUT signal `shouldSuppressBanner()` uses,
+   * so every mode — including ones added later — is covered without a route edit.
+   */
+  inGame?: boolean;
   /** ms timestamp until which the user dismissed the promo, or null */
   dismissedUntil: number | null;
   /** promo already shown in this browser session */
@@ -136,6 +144,9 @@ export function shouldShowAndroidInstallPromo(input: AndroidPromoGateInput): boo
   if (input.isStandalone) return false;
   if (input.isInstalled) return false;
   if (!input.isAllowedRoute) return false;
+  // A live board outranks the route allowlist. Checked at FIRE time by the caller,
+  // so this delays the promo to the end of the round rather than suppressing it.
+  if (input.inGame) return false;
   if (input.sessionShown) return false;
   if (input.dismissedUntil != null && input.now < input.dismissedUntil) return false;
   // Engagement gate (variant only). `?? 0` so a missing count reads as NOT engaged —

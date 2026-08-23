@@ -40,6 +40,7 @@ const SETTLE = 2000;
 
 beforeEach(() => {
   vi.useFakeTimers();
+  document.body.classList.remove('screen-fit-locked');
   captureMock.mockClear();
   sessionStorage.clear();
   eligible = true;
@@ -74,6 +75,31 @@ describe('AndroidInstallPill', () => {
     render(<AndroidInstallPill />);
     settle();
     expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+  });
+
+  // The route gate above cannot cover /multiplayer: its passive lobby and its live round share
+  // one path, so the route stays allowed and the pill floated over the board mid-round
+  // (measured on www.lexiclash.live/he 2026-08-23, across 4 of 36 tiles). The runtime signal
+  // `body.screen-fit-locked` — the same one the ad banner already obeys — is what covers it,
+  // and it has to be watched, because the round starts long after this mounted.
+  it('hides on a banner-allowed route once a round starts, and returns when it ends', async () => {
+    pathname = '/he/multiplayer';
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
+
+    // `await act(async …)` because MutationObserver delivers on a microtask — a sync act()
+    // returns before the observer has run and the assertion reads the pre-change render.
+    await act(async () => {
+      document.body.classList.add('screen-fit-locked');
+    });
+    expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+
+    await act(async () => {
+      document.body.classList.remove('screen-fit-locked');
+    });
+    expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
   });
 
   it('renders nothing on an ineligible platform even if active', () => {

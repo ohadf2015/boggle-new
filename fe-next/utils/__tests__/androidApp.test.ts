@@ -107,6 +107,18 @@ describe('shouldShowAndroidInstallPromo', () => {
     expect(shouldShowAndroidInstallPromo(base)).toBe(true);
   });
 
+  // Regression: /multiplayer is deliberately OFF the GAME_ROUTES blocklist so its passive
+  // lobby keeps its banner, so `isAllowedRoute` is true during an active round there. Before
+  // this gate, a full-screen install interstitial and a floating pill painted over a live
+  // board on www.lexiclash.live/he (2026-08-23, pill across 4 of 36 tiles).
+  it('hides while a fullscreen game surface is on screen, even on an allowed route', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, isAllowedRoute: true, inGame: true })).toBe(false);
+  });
+
+  it('still shows on an allowed route once the round is over', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, isAllowedRoute: true, inGame: false })).toBe(true);
+  });
+
   it('hides inside the native Capacitor app', () => {
     expect(shouldShowAndroidInstallPromo({ ...base, isCapacitorNative: true })).toBe(false);
   });
