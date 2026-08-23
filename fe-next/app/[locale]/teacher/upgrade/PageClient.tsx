@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { Button } from '@/components/ui/button';
@@ -16,12 +15,13 @@ const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr
 
 export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
-  const { isAuthenticated } = useAuth();
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  // Checkout stays gated until the Polar org is live with production keys — keep the CTA inert.
-  // The API enforces this too (503); this just avoids showing a button that can't work.
+  // Live since 2026-08-23: the Polar till is open (Teacher Pro $9/mo, real card iframe) and this
+  // flag is set to 'true' on the Railway service. It is inlined at BUILD time, so it also needs
+  // `ARG NEXT_PUBLIC_CHECKOUT_ENABLED` in the builder stage of fe-next/Dockerfile — without that
+  // the bundle bakes it as undefined and the CTA silently no-ops. The API enforces this too (503).
   const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
 
   // Mark this page as a conversion surface to suppress modals that would block the CTA.

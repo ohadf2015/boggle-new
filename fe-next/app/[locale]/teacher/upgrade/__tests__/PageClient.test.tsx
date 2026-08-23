@@ -32,7 +32,19 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-global.fetch = vi.fn();
+const mockToastError = vi.fn();
+vi.mock('react-hot-toast', () => ({
+  default: { error: (...a: unknown[]) => mockToastError(...a), success: vi.fn() },
+}));
+
+// The CTA is gated on a BUILD-time inlined flag, so it must be 'true' before the
+// component module is imported — setting it inside a test is too late.
+process.env.NEXT_PUBLIC_CHECKOUT_ENABLED = 'true';
+
+// Assigned per-test, NOT at module scope: this project's vitest setup file installs its own
+// globalThis.fetch AFTER test modules are imported, so a module-level `global.fetch = …` is
+// silently overwritten and the component calls the setup's fetch instead of this mock.
+const mockFetch = vi.fn();
 
 import * as growthTracking from '@/utils/growthTracking';
 import UpgradePricingPageClient from '../PageClient';
@@ -44,6 +56,7 @@ describe('UpgradePricingPageClient', () => {
     vi.clearAllMocks();
     // Clean up any lingering conversion-surface class
     document.body.classList.remove('conversion-surface');
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   it('tracks iap_viewed with product teacher_pro on mount', () => {
@@ -67,22 +80,31 @@ describe('UpgradePricingPageClient', () => {
     expect(document.body.classList.contains('conversion-surface')).toBe(false);
   });
 
-  it('handles 401 response from checkout by showing auth modal', async () => {
-    // This test verifies the 401 handling path exists in handleUpgrade.
-    // The actual 401 response handling is tested via integration tests.
-    // For unit test: we verify that handleUpgrade attempts the checkout endpoint
-    // when NEXT_PUBLIC_CHECKOUT_ENABLED is true.
+  // A guest click returns 401 and retrying can never succeed, so the generic
+  // "checkoutError" ("please try again") is a lie. Measured on prod 2026-08-23.
+  // These two assert the 401 branch actually diverges — revert it and both fail.
+  it('a 401 from checkout asks the visitor to sign in, never "try again"', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 401 });
+    render(<UpgradePricingPageClient />);
 
-    const originalEnv = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED;
-    process.env.NEXT_PUBLIC_CHECKOUT_ENABLED = 'true';
+    fireEvent.click(screen.getByRole('button', { name: /upgradeNow/i }));
+    await vi.waitFor(() => expect(mockFetch).toHaveBeenCalled());
 
-    try {
-      render(<UpgradePricingPageClient />);
-      // Button is present and enabled when checkout is available
-      const upgradeButton = screen.getByRole('button', { name: /upgradeNow/i });
-      expect(upgradeButton).not.toBeDisabled();
-    } finally {
-      process.env.NEXT_PUBLIC_CHECKOUT_ENABLED = originalEnv;
-    }
+    expect(mockFetch).toHaveBeenCalledWith('/api/subscription/checkout', { method: 'POST' });
+    await vi.waitFor(() =>
+      expect(mockToastError).toHaveBeenCalledWith('teacher.subscription.signInRequired'),
+    );
+    expect(mockToastError).not.toHaveBeenCalledWith('teacher.subscription.checkoutError');
+  });
+
+  it('a non-401 failure still gets the generic checkout error', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 500 });
+    render(<UpgradePricingPageClient />);
+
+    fireEvent.click(screen.getByRole('button', { name: /upgradeNow/i }));
+    await vi.waitFor(() =>
+      expect(mockToastError).toHaveBeenCalledWith('teacher.subscription.checkoutError'),
+    );
+    expect(mockToastError).not.toHaveBeenCalledWith('teacher.subscription.signInRequired');
   });
 });
