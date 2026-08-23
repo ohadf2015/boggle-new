@@ -34,6 +34,8 @@ const mockTrackGrowthEvent = growthTracking.trackGrowthEvent as ReturnType<typeo
 describe('UpgradePricingPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Clean up any lingering conversion-surface class
+    document.body.classList.remove('conversion-surface');
   });
 
   it('tracks iap_viewed with product teacher_pro on mount', () => {
@@ -45,5 +47,15 @@ describe('UpgradePricingPageClient', () => {
     render(<UpgradePricingPageClient />);
     const cta = screen.getByRole('link', { name: /teacher\.subscription\.districtCta/i });
     expect(cta).toHaveAttribute('href', '/en/education/for-schools');
+  });
+
+  it('marks body as conversion-surface to suppress interstitial modals', () => {
+    expect(document.body.classList.contains('conversion-surface')).toBe(false);
+    const { unmount } = render(<UpgradePricingPageClient />);
+    // While component is mounted, conversion-surface should be present
+    expect(document.body.classList.contains('conversion-surface')).toBe(true);
+    // After unmount, conversion-surface should be removed
+    unmount();
+    expect(document.body.classList.contains('conversion-surface')).toBe(false);
   });
 });

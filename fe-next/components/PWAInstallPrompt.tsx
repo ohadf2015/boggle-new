@@ -50,6 +50,11 @@ export function PWAInstallPrompt() {
   const [iosHint, setIosHint] = useState(false);
 
   useEffect(() => {
+    // Suppress on conversion surfaces (e.g. checkout pages) where overlays block CTAs.
+    // Read at effect time so a page that adds conversion-surface after mount still
+    // prevents the prompt firing.
+    if (document.body.classList.contains('conversion-surface')) return;
+
     // On Android the native app promo (AndroidAppInstallPromo) owns the install
     // pitch — yield so the user never gets two install prompts. Desktop Chrome,
     // where there is no native app, still gets the PWA banner.

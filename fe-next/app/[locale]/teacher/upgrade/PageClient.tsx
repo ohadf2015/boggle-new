@@ -18,6 +18,17 @@ export default function UpgradePricingPageClient() {
   // The API enforces this too (503); this just avoids showing a button that can't work.
   const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
 
+  // Mark this page as a conversion surface to suppress modals that would block the CTA.
+  // This runtime signal is read by PWAInstallPrompt and ComebackBonusWrapper before
+  // they render, preventing them from creating overlays on a payment page.
+  // See: Route blocklists don't converge — use the runtime signal lesson.
+  useEffect(() => {
+    document.body.classList.add('conversion-surface');
+    return () => {
+      document.body.classList.remove('conversion-surface');
+    };
+  }, []);
+
   useEffect(() => {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);

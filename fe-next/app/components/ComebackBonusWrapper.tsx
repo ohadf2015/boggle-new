@@ -25,6 +25,8 @@ export default function ComebackBonusWrapper() {
     if (!user?.id) return;
     // Only check once per browser session
     if (checked.current || sessionStorage.getItem(SESSION_KEY)) return;
+    // Suppress on conversion surfaces (e.g. checkout pages) where overlays block CTAs
+    if (document.body.classList.contains('conversion-surface')) return;
 
     checked.current = true;
 

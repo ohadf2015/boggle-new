@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6177,
+    "totalKeysInCode": 6200,
     "keyCountByLanguage": {
-      "en": 12024,
-      "es": 12320,
-      "he": 12225,
-      "ja": 12279,
-      "ru": 12054,
-      "sv": 12275
+      "en": 12041,
+      "es": 12337,
+      "he": 12242,
+      "ja": 12296,
+      "ru": 12072,
+      "sv": 12292
     },
-    "missingFromEnglish": 13,
+    "missingFromEnglish": 36,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 316,
@@ -310,14 +310,14 @@
         "pattern": "`admin.teacherFunnel.stage.${r.stage}`",
         "type": "template_literal",
         "file": "components/admin/TeacherFunnelPanel.tsx",
-        "line": 140,
+        "line": 375,
         "context": "{t(`admin.teacherFunnel.stage.${r.stage}`)}"
       },
       {
         "pattern": "`admin.teacherFunnel.trial.${r.trialState}`",
         "type": "template_literal",
         "file": "components/admin/TeacherFunnelPanel.tsx",
-        "line": 144,
+        "line": 379,
         "context": "{t(`admin.teacherFunnel.trial.${r.trialState}`)}"
       },
       {
@@ -1276,7 +1276,7 @@
         "pattern": "`education.access.role_${value}`",
         "type": "template_literal",
         "file": "components/education/AccessRequestForm.tsx",
-        "line": 190,
+        "line": 216,
         "context": "<span className=\"text-sm\">{t(`education.access.role_${value}`)}</span>"
       },
       {
@@ -1724,14 +1724,14 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 84,
+        "line": 86,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 420,
+        "line": 437,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
       },
       {
@@ -1745,35 +1745,35 @@
         "pattern": "`quickPlay.solo.rank.${QUICK_RANKS[idx + 1].key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayRankCard.tsx",
-        "line": 63,
+        "line": 66,
         "context": "rank: t(`quickPlay.solo.rank.${QUICK_RANKS[idx + 1].key}`),"
       },
       {
         "pattern": "`quickPlay.solo.rank.${top.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayRankCard.tsx",
-        "line": 93,
+        "line": 96,
         "context": "rank: t(`quickPlay.solo.rank.${top.key}`),"
       },
       {
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 221,
+        "line": 224,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 257,
+        "line": 260,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 474,
+        "line": 491,
         "context": "{t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
@@ -1871,7 +1871,7 @@
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 156,
+        "line": 178,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
@@ -2186,7 +2186,7 @@
         "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
         "type": "template_literal",
         "file": "host/components/HostPreGameView.tsx",
-        "line": 652,
+        "line": 682,
         "context": "{t(`joinView.${"
       },
       {
@@ -3232,6 +3232,213 @@
   },
   "missingFromEnglish": [
     {
+      "key": "admin.teacherAccess.col.use_case",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 132
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.view",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessQueue.tsx",
+          "line": 173
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.achievements",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.assignments",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.classrooms",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.duels",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.hint",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 293
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.lessonProgress",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.lessons",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.studentsJoined",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.activity.title",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 278
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.chipBadge",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 361
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.chipTitle",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 356
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.col.reason",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 309
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.excludedMachineRows",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 266
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.reasons.chips",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 166
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.reasons.chipsHint",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 173
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.reasons.empty",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 152
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.reasons.own",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 158
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.reasons.subtitle",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 144
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.reasons.title",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.returnedNoClassroom",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 256
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.rowOpen",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 340
+        }
+      ]
+    },
+    {
       "key": "blast.fxFailed",
       "usages": [
         {
@@ -3538,7 +3745,6 @@
       "education.landing.furtherReading.guides",
       "education.landing.furtherReading.glossary",
       "education.landing.furtherReading.wordSolver",
-      "connections.daily.scoreLabel",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
