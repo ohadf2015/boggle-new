@@ -50,6 +50,11 @@ ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
 # dark despite NEXT_PUBLIC_ADSENSE_ENABLED=true in the runtime env.
 # (Publisher id is not forwarded: adSensePolicy.ts defaults to the correct ca-pub-… id.)
 ARG NEXT_PUBLIC_ADSENSE_ENABLED
+# Teacher Pro checkout gate. Same trap as AdSense above, and it bit: the Polar till for
+# Teacher Pro $9/mo is live and payable, but /teacher/upgrade's CTA no-ops because
+# PageClient.tsx:19 reads this at BUILD time and it was never forwarded, so the client
+# bundle bakes it as undefined. Declared here so Railway forwards the service var.
+ARG NEXT_PUBLIC_CHECKOUT_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
 # CDN base for heavy static media (music/sounds/showcase3d) — offloaded to Supabase Storage.
