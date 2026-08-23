@@ -567,6 +567,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* PostHog EU analytics — preconnect for faster first event */}
                 <link rel="preconnect" href="https://eu.i.posthog.com" />
                 <link rel="dns-prefetch" href="https://eu.i.posthog.com" />
+                {/* Google Tag Manager / GA4 — dns-prefetch the gtag origin so
+                    consent-gated/conditionally-loaded tags warm up faster. */}
+                <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+                <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+                {/* LogRocket — dns-prefetch the lazy-loaded recorder origin */}
+                <link rel="dns-prefetch" href="https://cdn.logrocket.io" />
+                <link rel="dns-prefetch" href="https://r.lr-in.com" />
+                <link rel="dns-prefetch" href="https://cdn.lr-in.com" />
+                {/* Social pixels — preconnect the FB/TikTok tag origins */}
+                <link rel="dns-prefetch" href="https://connect.facebook.net" />
+                <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
+                <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
+                <link rel="dns-prefetch" href="https://ads.tiktok.com" />
                 {/* AdSense / Google Ads — preconnect for ad script and ad serving origins */}
                 <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
                 <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
@@ -646,9 +659,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
-        {/* GA4 G-7VLG16BJQH — the property existed with no tag on the page, which measures nothing. */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" strategy="afterInteractive" />
-        <Script id="ga4-init" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
+        {/* GA4 G-7VLG16BJQH — deferred to lazyOnload so it never competes with
+            the hero/LCP paint. Google Consent Mode v2 defaults are already set
+            above, so tags respect the stored consent decision when this fires. */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" strategy="lazyOnload" />
+        <Script id="ga4-init" strategy="lazyOnload">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}
                 <script
                     dangerouslySetInnerHTML={{

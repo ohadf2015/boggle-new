@@ -18,13 +18,17 @@ import {
 } from '@/utils/cookieConsent';
 
 /**
- * Blocking cookie-consent modal (GDPR).
- * Centered, screen-covering overlay shown until the user makes a choice — it
- * cannot be dismissed by backdrop click or Escape, so a decision is required
- * (unlike a bottom banner most users reflexively close). "Accept All" is the
- * prominent primary CTA; "Decline All" and "Customize" stay equal-weight,
- * one-click buttons so reject is as easy as accept (ePrivacy dark-pattern rule).
- * Re-openable via the ManageCookiesButton component.
+ * Non-blocking cookie-consent bottom sheet (GDPR).
+ *
+ * Product decision t_01e346a5 (Option A): convert the full-screen backdrop-blur
+ * modal into a fixed bottom sheet. It does NOT block interaction with the page
+ * behind it, it does NOT lock body scroll, and it carries no backdrop-filter cost,
+ * so the hero/LCP element can paint and measure unimpeded. The same legal copy,
+ * Accept/Decline/Manage choices, and granular toggles are preserved.
+ *
+ * The sheet is still a persistent consent gate: it cannot be dismissed by
+ * backdrop click or Escape, and a choice is still required before non-essential
+ * scripts fire (ads/analytics are consent-gated independently).
  */
 export default function CookieConsent() {
   const { t, language } = useLanguage();
@@ -39,13 +43,10 @@ export default function CookieConsent() {
 
     let cancelShow = () => {};
     if (!hasConsentDecision()) {
-      // PERF: defer mounting the blocking modal until the underlying page has
-      // captured its LCP. Mounting immediately after hydration made this
-      // modal's text the LCP element — it painted last on a busy main thread
-      // (~16s mobile LCP). The gate itself is unchanged: still blocking, still
-      // requires a choice, and no non-essential scripts fire before a decision
-      // (ads/analytics are consent-gated independently). The modal simply
-      // appears ~1 idle slice later, once the hero has painted.
+      // Defer mounting the consent UI until the underlying page has captured its
+      // LCP. Mounting immediately after hydration made the consent text the LCP
+      // element on a busy main thread (~16s mobile LCP). The sheet simply
+      // appears once the browser is idle, after the hero has painted.
       if (typeof window.requestIdleCallback === 'function') {
         const id = window.requestIdleCallback(() => setVisible(true), { timeout: 1200 });
         cancelShow = () => window.cancelIdleCallback(id);
@@ -55,7 +56,7 @@ export default function CookieConsent() {
       }
     }
 
-    // Listen for consent resets (from ManageCookiesButton) — re-open the modal.
+    // Listen for consent resets (from ManageCookiesButton) — re-open the sheet.
     const unsubscribe = onConsentChange((state) => {
       if (state.timestamp === 0) {
         setVisible(true);
@@ -70,16 +71,10 @@ export default function CookieConsent() {
     };
   }, []);
 
-  // Lock background scroll while the blocking modal is up. Save/restore the
-  // prior inline value so we never clobber screen-fit's own overflow control.
-  useEffect(() => {
-    if (!visible || isOnCrazyGamesPlatform) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [visible, isOnCrazyGamesPlatform]);
+  // Intentionally NOT locking body scroll: this is a non-blocking bottom sheet.
+  // The page behind it remains scrollable and usable, satisfying the "non-blocking"
+  // requirement and removing the main-thread composite cost of a full-screen
+  // backdrop. Prior scroll-lock effect removed as part of Option A.
 
   // Load existing state when showing details
   useEffect(() => {
@@ -109,146 +104,141 @@ export default function CookieConsent() {
   }, [analytics, advertising]);
 
   const dialogRef = useRef<HTMLDivElement>(null);
-  // No onEscape handler: this is a blocking consent gate — Escape must NOT
-  // dismiss it, the user has to pick an option.
+  // Focus is managed for keyboard accessibility, but Escape does NOT dismiss —
+  // a choice is still required.
   useFocusTrap(dialogRef, visible);
 
   // CrazyGames embeds its own platform-level consent UI before our iframe loads.
-  // A second modal inside the iframe violates the embed UX expectation.
+  // A second banner inside the iframe violates the embed UX expectation.
   if (isOnCrazyGamesPlatform) return null;
   if (!visible) return null;
 
   const isRtl = language === 'he';
 
   return (
-    // Backdrop: covers the screen and captures all interaction. Intentionally
-    // has NO onClick — clicking outside must not dismiss (user must choose).
+    // Fixed bottom sheet. No full-screen backdrop, no backdrop-filter.
+    // A reserved min-height prevents layout shift when the sheet mounts.
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="false"
+      aria-label={t('cookieConsent.title')}
       className={cn(
-        'fixed inset-0 z-[110] flex items-center justify-center p-4',
-        'bg-neo-black/80 backdrop-blur-sm animate-fade-in-up'
+        'fixed bottom-0 left-0 right-0 z-[110]',
+        'w-full max-w-2xl mx-auto',
+        'min-h-[280px] max-h-[60vh] overflow-y-auto',
+        'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
+        'p-4 sm:p-5 animate-slide-up'
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('cookieConsent.title')}
-        className={cn(
-          'relative w-full max-w-md max-h-[90vh] overflow-y-auto',
-          'bg-neo-navy border-4 border-neo-black rounded-neo shadow-hard-lg',
-          'p-6 animate-neo-pop'
-        )}
-      >
-        {/* Mascot happily munching a cookie — decorative, brand personality */}
-        <Image
-          src="/cookie-consent-mascot.png"
-          alt={t('cookieConsent.mascotAlt')}
-          width={96}
-          height={96}
-          className="mx-auto mb-3 h-24 w-24 object-contain"
-        />
+      {/* Mascot happily munching a cookie — decorative, brand personality */}
+      <Image
+        src="/cookie-consent-mascot.png"
+        alt={t('cookieConsent.mascotAlt')}
+        width={80}
+        height={80}
+        className="mx-auto mb-2 h-20 w-20 object-contain"
+      />
 
-        <h2 className="mb-2 text-center text-xl font-bold font-neo-display text-neo-white">
-          {t('cookieConsent.title')}
-        </h2>
-        <p className="mb-5 text-center text-sm font-medium text-neo-white">
-          {t('cookieConsent.message')}{' '}
-          <a
-            href={`/${language}/legal/cookies`}
-            className="font-bold text-neo-cyan hover:underline"
-          >
-            {t('cookieConsent.learnMore')}
-          </a>
-        </p>
+      <h2 className="mb-2 text-center text-lg font-bold font-neo-display text-neo-white">
+        {t('cookieConsent.title')}
+      </h2>
+      <p className="mb-4 text-center text-sm font-medium text-neo-white">
+        {t('cookieConsent.message')}{' '}
+        <a
+          href={`/${language}/legal/cookies`}
+          className="font-bold text-neo-cyan hover:underline"
+        >
+          {t('cookieConsent.learnMore')}
+        </a>
+      </p>
 
-        {/* Actions. Accept = prominent primary (top, full-width, accent).
-            Decline + Customize = equal-weight one-click buttons below — reject
-            stays as easy as accept; only visual weight nudges toward Accept. */}
-        <div className="flex flex-col gap-2">
+      {/* Actions. Accept = prominent primary (top, full-width, accent).
+          Decline + Customize = equal-weight one-click buttons below — reject
+          stays as easy as accept; only visual weight nudges toward Accept. */}
+      <div className="flex flex-col gap-2 max-w-md mx-auto">
+        <button
+          type="button"
+          onClick={handleAcceptAll}
+          className={cn(
+            'w-full px-4 py-3 text-base font-bold uppercase',
+            'bg-accent text-accent-foreground',
+            'border-3 border-neo-black rounded-neo shadow-hard',
+            'hover:shadow-hard-lg active:shadow-hard-pressed',
+            'transition-all duration-100'
+          )}
+        >
+          {t('cookieConsent.accept')}
+        </button>
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleAcceptAll}
+            onClick={() => setShowDetails(!showDetails)}
             className={cn(
-              'w-full px-4 py-3 text-base font-bold uppercase',
-              'bg-accent text-accent-foreground',
-              'border-3 border-neo-black rounded-neo shadow-hard',
-              'hover:shadow-hard-lg active:shadow-hard-pressed',
+              'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
+              'text-neo-cyan hover:text-neo-white',
+              'border-2 border-neo-cyan/40 rounded-neo transition-colors duration-100'
+            )}
+          >
+            {t('cookieConsent.customize')}
+          </button>
+          <button
+            type="button"
+            onClick={handleDeclineAll}
+            className={cn(
+              'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
+              'text-neo-white hover:text-neo-white',
+              'border-2 border-neo-cream/30 rounded-neo transition-colors duration-100'
+            )}
+          >
+            {t('cookieConsent.decline')}
+          </button>
+        </div>
+      </div>
+
+      {/* Granular preferences panel */}
+      {showDetails && (
+        <div className="mt-5 pt-5 border-t-2 border-neo-cream/10 max-w-md mx-auto">
+          <div className="grid grid-cols-1 gap-3 mb-4">
+            {/* Essential — always on */}
+            <ConsentToggle
+              label={t('cookieConsent.categories.essential')}
+              description={t('cookieConsent.categories.essentialDesc')}
+              requiredLabel={t('cookieConsent.required')}
+              checked={true}
+              disabled
+            />
+            {/* Analytics */}
+            <ConsentToggle
+              label={t('cookieConsent.categories.analytics')}
+              description={t('cookieConsent.categories.analyticsDesc')}
+              checked={analytics}
+              onChange={setAnalytics}
+            />
+            {/* Advertising */}
+            <ConsentToggle
+              label={t('cookieConsent.categories.advertising')}
+              description={t('cookieConsent.categories.advertisingDesc')}
+              checked={advertising}
+              onChange={setAdvertising}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSavePreferences}
+            className={cn(
+              'w-full px-5 py-2 min-h-[44px] text-sm font-bold uppercase',
+              'bg-neo-cyan text-neo-black',
+              'border-3 border-neo-black rounded-neo shadow-hard-sm',
+              'hover:shadow-hard active:shadow-hard-pressed',
               'transition-all duration-100'
             )}
           >
-            {t('cookieConsent.accept')}
+            {t('cookieConsent.savePreferences')}
           </button>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowDetails(!showDetails)}
-              className={cn(
-                'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'text-neo-cyan hover:text-neo-white',
-                'border-2 border-neo-cyan/40 rounded-neo transition-colors duration-100'
-              )}
-            >
-              {t('cookieConsent.customize')}
-            </button>
-            <button
-              type="button"
-              onClick={handleDeclineAll}
-              className={cn(
-                'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'text-neo-white hover:text-neo-white',
-                'border-2 border-neo-cream/30 rounded-neo transition-colors duration-100'
-              )}
-            >
-              {t('cookieConsent.decline')}
-            </button>
-          </div>
         </div>
-
-        {/* Granular preferences panel */}
-        {showDetails && (
-          <div className="mt-5 pt-5 border-t-2 border-neo-cream/10">
-            <div className="grid grid-cols-1 gap-3 mb-4">
-              {/* Essential — always on */}
-              <ConsentToggle
-                label={t('cookieConsent.categories.essential')}
-                description={t('cookieConsent.categories.essentialDesc')}
-                requiredLabel={t('cookieConsent.required')}
-                checked={true}
-                disabled
-              />
-              {/* Analytics */}
-              <ConsentToggle
-                label={t('cookieConsent.categories.analytics')}
-                description={t('cookieConsent.categories.analyticsDesc')}
-                checked={analytics}
-                onChange={setAnalytics}
-              />
-              {/* Advertising */}
-              <ConsentToggle
-                label={t('cookieConsent.categories.advertising')}
-                description={t('cookieConsent.categories.advertisingDesc')}
-                checked={advertising}
-                onChange={setAdvertising}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleSavePreferences}
-              className={cn(
-                'w-full px-5 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'bg-neo-cyan text-neo-black',
-                'border-3 border-neo-black rounded-neo shadow-hard-sm',
-                'hover:shadow-hard active:shadow-hard-pressed',
-                'transition-all duration-100'
-              )}
-            >
-              {t('cookieConsent.savePreferences')}
-            </button>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

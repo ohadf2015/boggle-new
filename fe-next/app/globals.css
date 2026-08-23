@@ -499,6 +499,30 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   }
 }
 
+/* ── Cookie consent bottom-sheet entrance ────────────────────────────────
+   Slides up from below the viewport with a subtle fade. Used by the
+   non-blocking bottom-sheet variant (t_01e346a5 Option A). */
+@utility animate-slide-up {
+  animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* (wt-dial-spin removed with the "crane steering dial" it span. The dial
    implied a control the player never had — the hub now mirrors the crane's real
    placement band instead, which is information they can actually act on.) */
