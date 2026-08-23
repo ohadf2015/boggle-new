@@ -12443,15 +12443,15 @@ const sv = {
       "upgradePricingReassure": "Avsluta när du vill — dina klassrum, lektioner och elevdata är alltid säkra.",
       "pricePerDay": "Ungefär $0,30 per dag",
       "everythingInFree": "Allt i Free, plus:",
-      "freeStartNote": "Perfekt för att testa — men de flesta lärare växer snabbt ur gränsen på 2 klasser.",
+      "freeStartNote": "Perfekt för att testa — en klass med 10 elever. En riktig klass växer ur det första dagen.",
       "proCtaSubtext": "Klart på 30 sekunder · Avsluta när du vill",
       "trustCancel": "Avsluta när du vill, ingen bindningstid",
       "trustDataSafe": "Dina data är säkra",
       "trustReminder": "Påminnelse via e-post före varje betalning",
       "freePlanName": "Free",
       "freeForever": "Gratis för alltid, alltid tillgänglig",
-      "free2Classes": "Upp till 2 klasser",
-      "free30Students": "Upp till 30 elever per klass",
+      "freeClasses": "Upp till {count} klass",
+      "freeStudents": "Upp till {count} elever per klass",
       "basicWordTracking": "Grundläggande ordspårning",
       "dailyProgressReports": "Dagliga framstegsrapporter",
       "proPlanName": "Teacher Pro",
@@ -12463,7 +12463,7 @@ const sv = {
       "faqAutoRenew": "Dras betalningen automatiskt?",
       "faqAutoRenewAnswer": "Ja, din prenumeration förnyas varje månad. Du får ett påminnelsemail före varje förnyelse. Avsluta när du vill för att stoppa framtida betalningar.",
       "faqDataLoss": "Förlorar jag mina data om jag avslutar?",
-      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (2 klasser, 30 elever per klass).",
+      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (1 klass, 10 elever per klass).",
       "legalNote": "Genom att uppgradera godkänner du våra Användarvillkor och förstår vår Återbetalningspolicy.",
       "refundPolicy": "Återbetalningspolicy",
       "renewsOn": "Nästa förnyelse",
@@ -13240,7 +13240,7 @@ const sv = {
         },
         "q2": {
           "q": "Finns det en gratisplan?",
-          "a": "Ja — en gratis basplan för verifierade lärare: upp till 2 klasser, 30 elever var, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
+          "a": "Ja — en gratis basplan för verifierade lärare: upp till 1 klass med 10 elever, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
         },
         "q3": {
           "q": "Stöder LexiClash hebreiska, japanska, svenska och spanska?",

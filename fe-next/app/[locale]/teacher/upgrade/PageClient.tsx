@@ -7,6 +7,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { Check, X, ShieldCheck, BellRing, Lock, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -69,9 +70,23 @@ export default function UpgradePricingPageClient() {
 
   // Free tier is deliberately framed as a starting point: the two caps a
   // growing teacher hits first are shown as explicit "missing" rows (loss framing).
+  // The two caps are INTERPOLATED from the tier config, never retyped. They used to be
+  // baked into the copy as "2"/"30" in six locales, so tightening the paywall would have
+  // advertised one limit while enforcing another — on the only page in the portfolio that
+  // can take money. Change the numbers in lib/lemonsqueezy.ts and every locale follows.
   const freeFeatures = [
-    { label: t('teacher.subscription.free2Classes'), included: true },
-    { label: t('teacher.subscription.free30Students'), included: true },
+    {
+      label: t('teacher.subscription.freeClasses', {
+        count: String(FREE_TIER_LIMITS.classes),
+      }),
+      included: true,
+    },
+    {
+      label: t('teacher.subscription.freeStudents', {
+        count: String(FREE_TIER_LIMITS.studentsPerClass),
+      }),
+      included: true,
+    },
     { label: t('teacher.subscription.basicWordTracking'), included: true },
     { label: t('teacher.subscription.dailyProgressReports'), included: true },
     { label: t('teacher.subscription.unlimitedClasses'), included: false },

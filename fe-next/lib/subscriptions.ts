@@ -9,6 +9,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { type TierConfig, getTierConfig } from './lemonsqueezy'
+import { FREE_TIER_LIMITS } from './education/freeTierLimits'
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing'
 export type Tier = 'free' | 'pro'
@@ -33,7 +34,7 @@ export async function checkTeacherSubscription(
   // `subscriptions` SELECT is own-row-only, but this is called with a userId the server has
   // already authorised — self, or the teacher who owns a classroom someone is joining. In
   // that second case the reader is the STUDENT, so on the request-scoped client the teacher's
-  // row is invisible and a Pro teacher silently degrades to the free 30-student cap.
+  // row is invisible and a Pro teacher silently degrades to the free student cap.
   // Entitlement limits are not user data; read them with service-role where available.
   const supabase = createAdminClient() ?? (await createClient())
 
@@ -72,8 +73,9 @@ export async function checkTeacherSubscription(
  * Check if a teacher can create a new class.
  *
  * Grandfathering rule: caps apply only to NEW classes going forward.
- * A free teacher with 0-1 classes can create up to 2.
- * A free teacher at 2+ classes is blocked from adding more, but keeps their existing count.
+ * A free teacher under the class limit can create one more.
+ * At or over it they are blocked from adding, but keep every class they already have
+ * (grandfathering — tightening the tier must never delete someone's work).
  * (This is equivalent to: allow iff currentCount < freeLimit, since at enforcement time
  * currentCount is their actual existing count.)
  *
@@ -103,7 +105,7 @@ export async function canCreateClass(
     return { allowed: true, currentCount, limit: null }
   }
 
-  const limit = subscription.classes_limit ?? 2
+  const limit = subscription.classes_limit ?? FREE_TIER_LIMITS.classes
 
   // Grandfathering: allow creation only if under the free limit
   if (currentCount >= limit) {
@@ -123,7 +125,7 @@ export async function canCreateClass(
  *
  * Grandfathering rule: caps apply only to NEW students going forward.
  * A free teacher's classroom can have 0-29 students and accept one more.
- * A free teacher's classroom at 30+ students is blocked from adding more.
+ * A free teacher's classroom at or over the student limit is blocked from adding more.
  *
  * Returns { allowed, reason, currentCount, limit }.
  */
@@ -151,7 +153,7 @@ export async function canAddStudent(
       allowed: false,
       reason: 'service role key not configured',
       currentCount: 0,
-      limit: 30,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
     }
   }
 
@@ -166,7 +168,7 @@ export async function canAddStudent(
       allowed: false,
       reason: 'Classroom not found',
       currentCount: 0,
-      limit: 30,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
     }
   }
 
@@ -186,7 +188,7 @@ export async function canAddStudent(
     return { allowed: true, currentCount, limit: null }
   }
 
-  const limit = subscription.students_limit_per_class ?? 30
+  const limit = subscription.students_limit_per_class ?? FREE_TIER_LIMITS.studentsPerClass
 
   // Grandfathering: allow addition only if under the free limit
   if (currentCount >= limit) {

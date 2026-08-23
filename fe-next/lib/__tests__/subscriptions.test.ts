@@ -6,6 +6,7 @@ import {
 } from '../subscriptions';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
 // Mock Supabase
 vi.mock('@/utils/supabase/server', () => ({
@@ -16,6 +17,12 @@ vi.mock('@/utils/supabase/admin', () => ({
 }));
 
 describe('Subscription tier limits', () => {
+  // Asserted against the shared constant, never a retyped number: this suite pinned
+  // 2/30 and went red the moment the paywall was tightened on 2026-08-23. The scenarios
+  // below are expressed RELATIVE to the limit so the next change needs no edits here.
+  const CLASSES = FREE_TIER_LIMITS.classes;
+  const STUDENTS = FREE_TIER_LIMITS.studentsPerClass;
+
   describe('canCreateClass', () => {
     it('should allow free teacher under limit (0 classes)', async () => {
       const mockSupabase = {
@@ -82,10 +89,10 @@ describe('Subscription tier limits', () => {
 
       expect(result.allowed).toBe(true);
       expect(result.currentCount).toBe(0);
-      expect(result.limit).toBe(2);
+      expect(result.limit).toBe(CLASSES);
     });
 
-    it('should allow free teacher at limit - 1 (1 class, can create 1 more)', async () => {
+    it('should allow a free teacher one below the class limit', async () => {
       const mockSupabase = {
         from: vi.fn((table: string) => {
           if (table === 'subscriptions') {
@@ -108,7 +115,7 @@ describe('Subscription tier limits', () => {
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
-                  count: 1,
+                  count: CLASSES - 1,
                   error: null,
                 }),
               }),
@@ -126,11 +133,11 @@ describe('Subscription tier limits', () => {
       const result = await canCreateClass('user-123');
 
       expect(result.allowed).toBe(true);
-      expect(result.currentCount).toBe(1);
-      expect(result.limit).toBe(2);
+      expect(result.currentCount).toBe(CLASSES - 1);
+      expect(result.limit).toBe(CLASSES);
     });
 
-    it('should block free teacher at limit (2 classes)', async () => {
+    it('should block a free teacher at the class limit', async () => {
       const mockSupabase = {
         from: vi.fn((table: string) => {
           if (table === 'subscriptions') {
@@ -153,7 +160,7 @@ describe('Subscription tier limits', () => {
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
-                  count: 2,
+                  count: CLASSES,
                   error: null,
                 }),
               }),
@@ -172,8 +179,8 @@ describe('Subscription tier limits', () => {
 
       expect(result.allowed).toBe(false);
       expect(result.reason).toContain('free tier limit');
-      expect(result.currentCount).toBe(2);
-      expect(result.limit).toBe(2);
+      expect(result.currentCount).toBe(CLASSES);
+      expect(result.limit).toBe(CLASSES);
     });
 
     it('should block free teacher grandfathered over limit (5 classes, cannot add 6th)', async () => {
@@ -307,12 +314,12 @@ describe('Subscription tier limits', () => {
 
       // Non-active pro → treat as free
       expect(result.allowed).toBe(false);
-      expect(result.limit).toBe(2);
+      expect(result.limit).toBe(CLASSES);
     });
   });
 
   describe('canAddStudent', () => {
-    it('should allow adding student to free classroom under limit (10 members)', async () => {
+    it('should allow adding a student to an empty free classroom', async () => {
       const mockSupabase = {
         from: vi.fn((table: string) => {
           if (table === 'classrooms') {
@@ -344,7 +351,7 @@ describe('Subscription tier limits', () => {
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
-                  count: 10,
+                  count: 0,
                   error: null,
                 }),
               }),
@@ -362,11 +369,11 @@ describe('Subscription tier limits', () => {
       const result = await canAddStudent('classroom-123');
 
       expect(result.allowed).toBe(true);
-      expect(result.currentCount).toBe(10);
-      expect(result.limit).toBe(30);
+      expect(result.currentCount).toBe(0);
+      expect(result.limit).toBe(STUDENTS);
     });
 
-    it('should allow adding student to free classroom at limit - 1 (29 members)', async () => {
+    it('should allow adding a student one below the student limit', async () => {
       const mockSupabase = {
         from: vi.fn((table: string) => {
           if (table === 'classrooms') {
@@ -398,7 +405,7 @@ describe('Subscription tier limits', () => {
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
-                  count: 29,
+                  count: STUDENTS - 1,
                   error: null,
                 }),
               }),
@@ -416,10 +423,10 @@ describe('Subscription tier limits', () => {
       const result = await canAddStudent('classroom-123');
 
       expect(result.allowed).toBe(true);
-      expect(result.currentCount).toBe(29);
+      expect(result.currentCount).toBe(STUDENTS - 1);
     });
 
-    it('should block adding student to free classroom at limit (30 members)', async () => {
+    it('should block adding a student at the student limit', async () => {
       const mockSupabase = {
         from: vi.fn((table: string) => {
           if (table === 'classrooms') {
@@ -451,7 +458,7 @@ describe('Subscription tier limits', () => {
             return {
               select: vi.fn().mockReturnValue({
                 eq: vi.fn().mockResolvedValue({
-                  count: 30,
+                  count: STUDENTS,
                   error: null,
                 }),
               }),
@@ -469,8 +476,8 @@ describe('Subscription tier limits', () => {
       const result = await canAddStudent('classroom-123');
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toContain('30 students');
-      expect(result.currentCount).toBe(30);
+      expect(result.reason).toContain(`${STUDENTS} students`);
+      expect(result.currentCount).toBe(STUDENTS);
     });
 
     it('should allow pro teacher unlimited students in classroom', async () => {

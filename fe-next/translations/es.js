@@ -12207,15 +12207,15 @@ const es = {
       "upgradePricingReassure": "Cancela cuando quieras: tus aulas, lecciones y datos de estudiantes siempre están seguros.",
       "pricePerDay": "Unos $0,30 al día",
       "everythingInFree": "Todo lo del plan Free, y además:",
-      "freeStartNote": "Ideal para probar, pero la mayoría de docentes supera pronto el límite de 2 clases.",
+      "freeStartNote": "Ideal para probarlo: una clase de 10 estudiantes. Una clase real lo supera el primer día.",
       "proCtaSubtext": "Listo en 30 segundos · Cancela cuando quieras",
       "trustCancel": "Cancela cuando quieras, sin permanencia",
       "trustDataSafe": "Tus datos están a salvo",
       "trustReminder": "Correo de aviso antes de cada cobro",
       "freePlanName": "Free",
       "freeForever": "Gratis para siempre, siempre disponible",
-      "free2Classes": "Hasta 2 clases",
-      "free30Students": "Hasta 30 estudiantes por clase",
+      "freeClasses": "Hasta {count} clase",
+      "freeStudents": "Hasta {count} estudiantes por clase",
       "basicWordTracking": "Seguimiento básico de palabras",
       "dailyProgressReports": "Informes de progreso diarios",
       "proPlanName": "Teacher Pro",
@@ -12227,7 +12227,7 @@ const es = {
       "faqAutoRenew": "¿Se me cobrará automáticamente?",
       "faqAutoRenewAnswer": "Sí, tu suscripción se renueva cada mes. Recibirás un correo de recordatorio antes de cada renovación. Cancela cuando quieras para detener cobros futuros.",
       "faqDataLoss": "¿Perderé mis datos si cancelo?",
-      "faqDataLossAnswer": "No. Si cancelas, tus aulas, lecciones y datos de estudiantes siguen a salvo. Solo volverás a los límites del plan gratuito (2 clases, 30 estudiantes por clase).",
+      "faqDataLossAnswer": "No. Si cancelas, tus aulas, lecciones y datos de estudiantes siguen a salvo. Solo volverás a los límites del plan gratuito (1 clase, 10 estudiantes por clase).",
       "legalNote": "Al mejorar tu plan, aceptas nuestros Términos del servicio y entiendes nuestra Política de reembolsos.",
       "refundPolicy": "Política de reembolsos",
       "renewsOn": "Próxima renovación",
@@ -13004,7 +13004,7 @@ const es = {
         },
         "q2": {
           "q": "¿Hay un plan gratis?",
-          "a": "Sí — un plan básico gratis para docentes verificados: hasta 2 clases, 30 estudiantes cada una, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
+          "a": "Sí — un plan básico gratis para docentes verificados: hasta 1 clase de 10 estudiantes, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
         },
         "q3": {
           "q": "¿Soporta hebreo, japonés, sueco y español?",
