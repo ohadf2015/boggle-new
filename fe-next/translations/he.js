@@ -12054,6 +12054,7 @@ const he = {
       "autoRenew": "מתחדש אוטומטית מדי חודש. ניתן לבטל בכל עת.",
       "upgradeNow": "שדרגו ל-Pro עכשיו",
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
+      "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",
       "currentPlan": "אתם במסלול הזה",
       "upgradePricingTitle": "שדרוג ל-Teacher Pro",
       "upgradePricingSubtitle": "ניהול כיתות ותלמידים ללא הגבלה",

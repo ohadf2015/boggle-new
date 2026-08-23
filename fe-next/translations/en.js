@@ -11201,6 +11201,7 @@ const en = {
       "autoRenew": "Renews automatically each month. Cancel anytime.",
       "upgradeNow": "Upgrade to Pro Now",
       "checkoutError": "Failed to start checkout. Please try again.",
+      "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
       "upgradePricingTitle": "Upgrade to Teacher Pro",
       "upgradePricingSubtitle": "Manage unlimited classrooms and students",

@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import nextDynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { Button } from '@/components/ui/button';
@@ -10,10 +12,14 @@ import { Check, X, ShieldCheck, BellRing, Lock, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
+const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
+
 export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   // Checkout stays gated until the Polar org is live with production keys — keep the CTA inert.
   // The API enforces this too (503); this just avoids showing a button that can't work.
   const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
@@ -42,6 +48,12 @@ export default function UpgradePricingPageClient() {
       });
 
       if (!response.ok) {
+        // 401 means the user is not authenticated. Show the auth modal instead of a generic error.
+        if (response.status === 401) {
+          toast.error(t('teacher.subscription.signInRequired'));
+          setShowAuthModal(true);
+          return;
+        }
         toast.error(t('teacher.subscription.checkoutError'));
         return;
       }
@@ -336,6 +348,15 @@ export default function UpgradePricingPageClient() {
           </div>
         </div>
       </div>
+
+      {/* Auth modal for unauthenticated checkout attempts (401) */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signin"
+        />
+      )}
     </div>
   );
 }

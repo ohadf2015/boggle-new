@@ -12200,6 +12200,7 @@ const es = {
       "autoRenew": "Se renueva automáticamente cada mes. Cancela cuando quieras.",
       "upgradeNow": "Mejora a Pro ahora",
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+      "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
       "currentPlan": "Estás en este plan",
       "upgradePricingTitle": "Mejora a Teacher Pro",
       "upgradePricingSubtitle": "Gestiona aulas y estudiantes ilimitados",

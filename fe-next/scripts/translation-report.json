@@ -2313,7 +2313,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 273,
+        "line": 284,
         "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
@@ -2321,7 +2321,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 275,
+        "line": 286,
         "context": "{t(a)}"
       },
       {

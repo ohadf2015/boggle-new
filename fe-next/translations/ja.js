@@ -12198,6 +12198,7 @@ const ja = {
       "autoRenew": "毎月自動更新されます。いつでも解約できます。",
       "upgradeNow": "今すぐProにアップグレード",
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
+      "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",
       "currentPlan": "現在のプランです",
       "upgradePricingTitle": "Teacher Proにアップグレード",
       "upgradePricingSubtitle": "無制限のクラスと生徒を管理",

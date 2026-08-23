@@ -8899,6 +8899,7 @@ const ru = {
       "autoRenew": "Продлевается автоматически каждый месяц. Отмена в любой момент.",
       "upgradeNow": "Перейти на Pro",
       "checkoutError": "Не удалось начать оплату. Попробуйте ещё раз.",
+      "signInRequired": "Пожалуйста, войдите для перехода на Teacher Pro.",
       "currentPlan": "Ваш текущий план",
       "upgradePricingTitle": "Переход на Teacher Pro",
       "upgradePricingSubtitle": "Управляйте неограниченным числом классов и учеников",

@@ -12436,6 +12436,7 @@ const sv = {
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
       "upgradeNow": "Uppgradera till Pro nu",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
+      "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
       "upgradePricingTitle": "Uppgradera till Teacher Pro",
       "upgradePricingSubtitle": "Hantera obegränsat antal klassrum och elever",
