@@ -70,7 +70,7 @@ vi.mock('@/lib/apiRateLimit', () => ({
 }));
 
 vi.mock('@/utils/logger', () => ({
-  default: { log: vi.fn(), warn: vi.fn(), error: vi.fn() },
+  default: { log: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 vi.mock('@/lib/email', () => ({

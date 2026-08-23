@@ -42,11 +42,16 @@ describe('dailyModes registry', () => {
     expect(ids).toEqual(['connections']);
   });
 
-  it('exposes the registry-driven quest cards (everything but the two bespoke hero cards)', () => {
+  // Word Tower graduated OUT of the generic quest cards in 42bc4968a (2026-08-18,
+  // "render Word Tower with the shared daily QuestCard"): once it went public it is
+  // drawn with the same QuestCard chrome as Word Hunt and Word Wheel, so all three
+  // are excluded here. This test asserted the pre-graduation shape and had been red
+  // on master ever since.
+  it('exposes the registry-driven quest cards (everything but the bespoke hero cards)', () => {
     const publicIds = questCardModes(false).map((m) => m.id);
-    expect(publicIds).toEqual(['word-tower']);
+    expect(publicIds).toEqual([]);
     const adminIds = questCardModes(true).map((m) => m.id);
-    expect(adminIds).toEqual(['word-tower', 'connections']);
+    expect(adminIds).toEqual(['connections']);
   });
 
   it('registers Connections as an admin-gated daily card pointing at the daily route', () => {
@@ -58,9 +63,11 @@ describe('dailyModes registry', () => {
     expect(dailyModeHref(connections, 'he')).toBe('/he/connections/daily');
   });
 
-  it('prefixes the locale and preserves the daily query for the href', () => {
+  // Same commit moved Word Tower off the hard-nav query form (/word-tower?daily=1)
+  // onto the SPA daily route, so the href is a plain locale-prefixed path now.
+  it('prefixes the locale on the daily route href', () => {
     const tower = DAILY_MODES.find((m) => m.id === 'word-tower')!;
-    expect(dailyModeHref(tower, 'he')).toBe('/he/word-tower?daily=1');
+    expect(dailyModeHref(tower, 'he')).toBe('/he/daily/word-tower');
   });
 
   it('every mode carries i18n title + desc keys', () => {
