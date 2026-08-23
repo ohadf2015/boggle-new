@@ -53,6 +53,13 @@ vi.mock('@/utils/supabase/admin', () => ({
                       select: (cols: string) => adminSelectMock({ table, values, key, val, cols }),
                     }),
                   },
+            select: (cols: string) => ({
+              eq: (key: string, val: string) => ({
+                eq: (key2: string, val2: string) => ({
+                  limit: (n: number) => vi.fn(async () => ({ data: [], error: null }))(),
+                }),
+              }),
+            }),
           }),
         }
       : null,
