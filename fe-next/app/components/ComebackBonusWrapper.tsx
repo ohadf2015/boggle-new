@@ -25,7 +25,8 @@ export default function ComebackBonusWrapper() {
     if (!user?.id) return;
     // Only check once per browser session
     if (checked.current || sessionStorage.getItem(SESSION_KEY)) return;
-    // Suppress on conversion surfaces (e.g. checkout pages) where overlays block CTAs
+    // Cheap early-out on a conversion surface (checkout pages) — skips the fetch entirely.
+    // Not the guard that holds; see the render-time check below.
     if (document.body.classList.contains('conversion-surface')) return;
 
     checked.current = true;
@@ -48,6 +49,11 @@ export default function ComebackBonusWrapper() {
   }, [user?.id]);
 
   if (!status?.eligible || !status.tier) return null;
+  // The effect-time check can't cover the async gap: the /api/engagement/comeback fetch can
+  // resolve AFTER the visitor has navigated onto a conversion surface, and this component is
+  // mounted at the layout level so its effect doesn't re-run on that navigation. Re-read the
+  // signal on the render that would paint the modal.
+  if (typeof document !== 'undefined' && document.body.classList.contains('conversion-surface')) return null;
 
   return (
     <ComebackBonusModal
