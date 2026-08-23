@@ -28,34 +28,43 @@ const mockRpc = vi.fn();
 let unclaimed: Record<string, { id: string; xp_amount: number; coin_amount: number }> = {};
 
 vi.mock('@/utils/supabase/server', () => ({
-  createClient: vi.fn().mockResolvedValue({
-    rpc: (...a: unknown[]) => mockRpc(...a),
-    from: () => {
-      const filters: Record<string, unknown> = {};
-      let updating: Record<string, unknown> | null = null;
-      const chain = {
-        update(patch: Record<string, unknown>) { updating = patch; return chain; },
-        select() { return chain; },
-        eq(col: string, val: unknown) { filters[col] = val; return chain; },
-        async maybeSingle() {
-          const id = filters.id as string;
-          if (updating && updating.claimed === true) {
-            // The claim: only succeeds while the row is still unclaimed.
-            if (filters.claimed === false && unclaimed[id]) {
-              const row = unclaimed[id];
-              delete unclaimed[id];
-              return { data: row, error: null };
+  createRequestClient: vi.fn().mockResolvedValue({
+    supabase: {
+      rpc: (...a) => mockRpc(...a),
+      from: () => {
+        const filters: Record<string, unknown> = {};
+        let updating: Record<string, unknown> | null = null;
+        const chain = {
+          update: (patch: Record<string, unknown>) => { updating = patch; return chain; },
+          select: () => chain,
+          eq: (col: string, val: unknown) => { filters[col] = val; return chain; },
+          maybeSingle: async () => {
+            const id = filters.id as string;
+            if (updating && updating.claimed === true) {
+              // The claim: only succeeds while the row is still unclaimed.
+              if (filters.claimed === false && unclaimed[id]) {
+                const row = unclaimed[id];
+                delete unclaimed[id];
+                return { data: row, error: null };
+              }
+              return { data: null, error: null };
             }
-            return { data: null, error: null };
-          }
-          // The "was it already claimed?" read.
-          return { data: { id, claimed: !unclaimed[id] }, error: null };
-        },
-        then(resolve: (v: unknown) => void) { return Promise.resolve({ error: null }).then(resolve); },
-      };
-      return chain;
+            // The "was it already claimed?" read.
+            return { data: { id, claimed: !unclaimed[id] }, error: null };
+          },
+          then: (resolve: (v: unknown) => void) => Promise.resolve({ error: null }).then(resolve),
+        };
+        return chain;
+      },
+      auth: {
+        getUser: () => {
+          // We return a fixed user; we set mockGetAuthedUser to return the same in beforeEach.
+          return Promise.resolve({ data: { user: { id: 'player-1' } }, error: null });
+        }
+      }
     },
-  }),
+    token: 'mock-token'
+  })
 }));
 
 import { POST } from '../route';

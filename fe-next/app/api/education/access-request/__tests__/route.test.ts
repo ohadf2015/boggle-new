@@ -8,6 +8,7 @@ let mockUser:
 let recentCount = 0;
 let mockProfile: { display_name?: string | null; username?: string | null; country_code?: string | null } | null = null;
 let insertMock = vi.fn(async () => ({ data: { id: 'req-1' }, error: null }));
+let selectMock = vi.fn(async () => ({ data: [] }));
 let approveMock = vi.fn(async (_args?: any) => ({ data: [{ id: 'req-1' }], error: null }));
 let adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
 let adminAvailable = true;
@@ -33,29 +34,50 @@ vi.mock('@/utils/supabase/server', () => ({
 }));
 
 vi.mock('@/utils/supabase/admin', () => ({
-  createAdminClient: () =>
-    adminAvailable
-      ? {
-          from: (table: string) => ({
-            update: (values: any) =>
-              table === 'teacher_access_requests'
-                ? // Auto-approve: update(...).eq('user_id', ...).eq('status', 'pending').select('id')
-                  {
-                    eq: (key: string, val: string) => ({
-                      eq: (key2: string, val2: string) => ({
-                        select: (cols: string) => approveMock({ table, values, key, val, key2, val2, cols }),
-                      }),
-                    }),
-                  }
-                : // Promotion: update({ user_role: 'teacher' }).eq('id', user.id).select('id')
-                  {
-                    eq: (key: string, val: string) => ({
-                      select: (cols: string) => adminSelectMock({ table, values, key, val, cols }),
-                    }),
+  createAdminClient: () => {
+    if (!adminAvailable) return null;
+    return {
+      from: (table: string) => {
+        if (table === 'teacher_access_requests') {
+          return {
+            update: (values: any) => ({
+              eq: (key: string, val: string) => ({
+                eq: (key2: string, val2: string) => ({
+                  select: (cols: string) => {
+                    return Promise.resolve(approveMock({ table, values, key, val, key2, val2, cols }));
                   },
-          }),
+                }),
+              }),
+            }),
+            select: (cols: string) => ({
+              eq: (key: string, val: string) => ({
+                eq: (key2: string, val2: string) => ({
+                  limit: (count: number) => {
+                    return Promise.resolve(selectMock());
+                  },
+                }),
+              }),
+            }),
+          };
+        } else if (table === 'profiles') {
+          return {
+            update: (values: any) => ({
+              eq: (key: string, val: string) => ({
+                select: (cols: string) => {
+                  return Promise.resolve(adminSelectMock({ table, values, key, val, cols }));
+                },
+              }),
+            }),
+          };
         }
-      : null,
+        // For any other table, return an object that will cause the test to fail if used.
+        return {
+          update: () => { throw new Error(`Unexpected table ${table}`); },
+          select: () => { throw new Error(`Unexpected table ${table}`); },
+        };
+      },
+    };
+  },
 }));
 
 vi.mock('@/lib/email/send', () => ({

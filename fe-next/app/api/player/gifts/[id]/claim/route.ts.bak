@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRequestClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
-import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
-import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
 interface ClaimResult {
   success: boolean;
@@ -20,11 +18,17 @@ export async function POST(
 ) {
   try {
     const { id: giftId } = await params;
-    const { supabase } = await createRequestClient(request);
+    // Bearer-aware client: cookie-only auth silently 401s for clients whose
+    // session isn't in cookies (Capacitor webview, cookie-blocked browsers),
+    // which made gifts unclaimable for exactly the players receiving them.
+    const { supabase, token } = await createRequestClient(request);
 
-    // Authenticate using the helper (so the test can mock it)
-    const user = await getAuthedUser(request);
-    if (!user) {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token ?? undefined);
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -61,51 +65,6 @@ export async function POST(
       );
     }
 
-    // Award coins and XP (best-effort)
-    try {
-      await awardCoinsServer(user.id, gift.coin_amount, 'admin_gift', { giftId });
-    } catch (err) {
-      console.error('Failed to award coins:', err);
-      captureApiError(err instanceof Error ? err : new Error(String(err)), '/api/player/gifts/[id]/claim', {
-        method: 'POST',
-        userId: user.id,
-        statusCode: 500,
-        body: { giftId },
-      });
-    }
-
-    try {
-      await supabase.rpc('increment_player_xp', {
-        p_player_id: user.id,
-        p_xp_amount: gift.xp_amount,
-      });
-    } catch (err) {
-      console.error('Failed to award XP:', err);
-      captureApiError(err instanceof Error ? err : new Error(String(err)), '/api/player/gifts/[id]/claim', {
-        method: 'POST',
-        userId: user.id,
-        statusCode: 500,
-        body: { giftId },
-      });
-    }
-
-    // Mark gift as claimed (if not already marked by the RPC)
-    const { error: updateError } = await supabase
-      .from('admin_gift_messages')
-      .update({ claimed: true, claimed_at: new Date().toISOString() })
-      .eq('id', giftId);
-
-    if (updateError) {
-      console.error('Failed to mark gift as claimed:', updateError);
-      captureApiError(new Error(updateError.message), '/api/player/gifts/[id]/claim', {
-        method: 'POST',
-        userId: user.id,
-        statusCode: 500,
-        body: { giftId },
-      });
-      // We still return success because the awards were given.
-    }
-
     return NextResponse.json({
       success: true,
       xpAwarded: claimResult.xp_awarded,
@@ -120,7 +79,7 @@ export async function POST(
       { method: 'POST', statusCode: 500 }
     );
     return NextResponse.json(
-      { error: 'An unexpected error occurred. Please try again.' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

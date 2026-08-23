@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import { createAdminClient } from '@/utils/supabase/admin';
-import { getAuthedUser } from '@/lib/auth/getAuthedUser';
-import { sendEmail } from '@/lib/email/send';
-import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdminNotify';
-import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
-import { teacherTrialExpiry } from '@/lib/education/trial';
-import type { TeacherAccessFormPayload } from '@/lib/education/types';
+import { createClient } from '../../../../utils/supabase/server';
+import { createAdminClient } from '../../../../utils/supabase/admin';
+import { getAuthedUser } from '../../../../lib/auth/getAuthedUser';
+import { sendEmail } from '../../../../lib/email/send';
+import { teacherAccessAdminNotify } from '../../../../lib/email/templates/teacherAccessAdminNotify';
+import { teacherAccessConfirmation } from '../../../../lib/email/templates/teacherAccessConfirmation';
+import { teacherTrialExpiry } from '../../../../lib/education/trial';
+import type { TeacherAccessFormPayload } from '../../../../lib/education/types';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
