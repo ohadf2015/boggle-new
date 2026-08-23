@@ -567,6 +567,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* PostHog EU analytics — preconnect for faster first event */}
                 <link rel="preconnect" href="https://eu.i.posthog.com" />
                 <link rel="dns-prefetch" href="https://eu.i.posthog.com" />
+                {/* GrowthRadar first-party events — preconnect for lazyOnload scripts */}
+                <link rel="preconnect" href="https://growthradar.app" />
+                <link rel="dns-prefetch" href="https://growthradar.app" />
                 {/* Google Tag Manager / GA4 — dns-prefetch the gtag origin so
                     consent-gated/conditionally-loaded tags warm up faster. */}
                 <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Capacitor } from '@capacitor/core';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 
@@ -30,8 +31,18 @@ export const AdPlaceholder: React.FC<AdPlaceholderProps> = ({
   className,
   showPlaceholder = process.env.NODE_ENV === 'development',
 }) => {
-  if (!showPlaceholder) return null;
-  return <DevPlaceholder zone={zone} className={className} />;
+  if (Capacitor.isNativePlatform()) return null;
+  if (showPlaceholder) return <DevPlaceholder zone={zone} className={className} />;
+  // Production web: reserve a stable min-height so AdSense anchor/auto-ads
+  // slots cannot collapse to zero and then expand, causing CLS. The spacer
+  // is invisible and lightweight; the real ad overlays it when filled.
+  return (
+    <div
+      data-ad-zone={zone}
+      aria-hidden="true"
+      className={cn('ad-placeholder min-h-[100px] w-full', className)}
+    />
+  );
 };
 
 const DevPlaceholder: React.FC<{ zone: AdZoneType; className?: string }> = ({ zone, className }) => {

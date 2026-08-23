@@ -10,7 +10,7 @@
  * kept showing the old ones.
  */
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
@@ -66,7 +66,29 @@ vi.mock('@/utils/growthTracking', () => ({ trackModeSelected: vi.fn() }));
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false, isLoading: false }),
 }));
-vi.mock('next/dynamic', () => ({ default: () => () => <div /> }));
+vi.mock('next/dynamic', async () => {
+  const React = await vi.importActual<typeof import('react')>('react');
+  return {
+    default: (importFn: () => Promise<Record<string, unknown>>) => {
+      const LazyComponent = (props: Record<string, unknown>) => {
+        const [Component, setComponent] = React.useState<React.ComponentType<Record<string, unknown>> | null>(null);
+        React.useEffect(() => {
+          importFn().then((mod) => {
+          const Comp = (
+            typeof mod === 'function'
+              ? mod
+              : (mod.default || mod[Object.keys(mod)[0]])
+          ) as React.ComponentType<Record<string, unknown>>;
+          setComponent(() => Comp);
+          });
+        }, []);
+        return Component ? React.createElement(Component, props) : null;
+      };
+      return LazyComponent;
+    },
+    __esModule: true,
+  };
+});
 vi.mock('framer-motion', () => {
   const motionObj: Record<string, React.FC<React.PropsWithChildren<Record<string, unknown>>>> = new Proxy(
     {},
@@ -90,7 +112,18 @@ vi.mock('@/components/Header', () => ({ default: () => <header /> }));
 vi.mock('../LandingHero', () => ({ LandingHero: () => <div /> }));
 vi.mock('../LandingChallengeCards', () => ({ LandingChallengeCards: () => <div /> }));
 vi.mock('../LandingLeaderboardPreview', () => ({ LandingLeaderboardPreview: () => <div /> }));
+vi.mock('../LandingSocialProofBar', () => ({ LandingSocialProofBar: () => <div /> }));
+vi.mock('../LandingAvatarTeaser', () => ({ LandingAvatarTeaser: () => <div /> }));
+vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div /> }));
+vi.mock('../LandingBottomCTA', () => ({ LandingBottomCTA: () => <div /> }));
+vi.mock('../LandingYourRank', () => ({ LandingYourRank: () => <div /> }));
 vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
+vi.mock('@/components/events/EventBanner', () => ({ default: () => <div /> }));
+vi.mock('@/components/auth/AuthModal', () => ({ default: () => <div /> }));
+vi.mock('../ShareReferralModal', () => ({ ShareReferralModal: () => <div /> }));
+vi.mock('@/components/ui/PlayfulBackground', () => ({ PlayfulBackground: () => <div /> }));
+vi.mock('@/components/education/HomeEducationCardConnected', () => ({ HomeEducationCardConnected: () => <div /> }));
+vi.mock('@/components/CrazyGamesBanner', () => ({ default: () => <div /> }));
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -108,16 +141,16 @@ describe('LandingView — homepage blog section', () => {
     });
   });
 
-  it('renders the 3 newest blog post links (not the legacy stale set)', () => {
+  it('renders the 3 newest blog post links (not the legacy stale set)', async () => {
     const { container } = render(<LandingView />, { wrapper });
-    const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
 
-    // Newest 3 must be present — derived from same data source as the component
-    // so a blog-rewrite that bumps a post into the top 3 doesn't break the test
-    // (the regression we're guarding is duplicated/stale hardcoded slugs, not
-    // the identity of the newest posts themselves).
     const expectedSlugs = getRecentBlogPostsForLocale('en', 3).map((p) => `/en/blog/${p.slug}`);
-    expect(hrefs).toEqual(expect.arrayContaining(expectedSlugs));
+    await waitFor(() => {
+      const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
+      expect(hrefs).toEqual(expect.arrayContaining(expectedSlugs));
+    });
+
+    const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
 
     // The legacy slugs that were hardcoded in LandingSEOSection.blogLinks
     // must NOT leak through any other path on the homepage.
