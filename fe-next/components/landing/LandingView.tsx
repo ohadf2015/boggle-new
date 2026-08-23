@@ -19,8 +19,7 @@ import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
-import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
-import { LandingBlogSection } from './LandingBlogSection';
+import { ScrollIndicator } from './ScrollIndicator';
 import { LandingHero } from './LandingHero';
 // SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
@@ -30,10 +29,21 @@ const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m
   ssr: false,
   loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
+const LandingSEOSection = dynamic(() => import('./LandingSEOSection').then(m => m.LandingSEOSection), {
+  ssr: false,
+  loading: () => <div className="h-64 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40 animate-pulse" />,
+});
+const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), {
+  ssr: false,
+  loading: () => <div className="h-48 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40 animate-pulse" />,
+});
+const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), {
+  ssr: false,
+  loading: () => <div className="h-56 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40 animate-pulse" />,
+});
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { HomeHub } from './home/HomeHub';
 import { LandingSeasonHero } from './LandingSeasonHero';
-import { LandingBottomCTA } from './LandingBottomCTA';
 // Education entry point — self-gating: renders only for approved teachers (with a
 // live trial countdown) or students who've been added to a classroom.
 const HomeEducationCardConnected = dynamic(

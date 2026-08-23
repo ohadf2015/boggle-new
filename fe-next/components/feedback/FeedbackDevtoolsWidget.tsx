@@ -65,7 +65,10 @@ export default function FeedbackDevtoolsWidget(): ReactNode {
             data-theme={LEXICLASH_THEME}
             data-dir="auto"
             data-app-version="web"
-            strategy="afterInteractive"
+            // Non-critical feedback launcher — lazyOnload keeps it out of the
+            // landing first-paint window while still being available before the
+            // user scrolls far.
+            strategy="lazyOnload"
         />
     );
 }

@@ -3,13 +3,14 @@
 import { useParams } from 'next/navigation';
 import { type Variants } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { ChevronDown, MousePointerClick, Layers, Trophy, Target } from 'lucide-react';
+import { MousePointerClick, Layers, Trophy, Target } from 'lucide-react';
 import { Mascot } from '@/components/ui/Mascot';
 import { cn } from '@/lib/utils';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
 import { ModeShowcase } from './seo/ModeShowcase';
 import { WhoPlays } from './seo/WhoPlays';
 import { CommunityBand } from './seo/CommunityBand';
+import { ScrollIndicator } from './ScrollIndicator';
 
 /* ── Animation variants (visible-by-default — must never gate SSR content) ─── */
 
@@ -29,28 +30,6 @@ const staggerItem: Variants = {
   hidden: { opacity: 1, y: 0, scale: 1 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: easeOut } },
 };
-
-/* ── Scroll indicator (bouncing chevron — consumed by LandingView) ─────────── */
-
-export function ScrollIndicator() {
-  return (
-    <AdaptiveMotion.div
-      className="flex flex-col items-center gap-1 py-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.2, duration: 0.6 }}
-    >
-      <AdaptiveMotion.div
-        animate={{ y: [0, 6, 0] }}
-        transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <ChevronDown className="w-5 h-5 text-neo-black/30 dark:text-neo-white" />
-      </AdaptiveMotion.div>
-    </AdaptiveMotion.div>
-  );
-}
-
-/* ── How to Play steps ─────────────────────────────────────────────────────── */
 
 const STEP_ICONS = [MousePointerClick, Layers, Target, Trophy];
 const STEP_BG = ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-purple'] as const;
@@ -87,6 +66,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
       className={cn(
         'w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 sm:pb-16 relative z-20',
         'space-y-16 sm:space-y-24',
+        'content-visibility-auto',
         className
       )}
     >
@@ -170,3 +150,5 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
     </section>
   );
 }
+
+export { ScrollIndicator };

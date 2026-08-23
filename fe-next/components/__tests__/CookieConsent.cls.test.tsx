@@ -1,12 +1,10 @@
 /**
- * CookieConsent — blocking-modal layout guard.
+ * CookieConsent — non-blocking bottom-sheet layout guard.
  *
- * The consent prompt is a centered, screen-covering modal (not a bottom banner).
- * Being a `fixed inset-0` overlay it shifts nothing in document flow, so:
- *  - it must NEVER mutate body.style.paddingBottom (the old bottom-banner CLS
- *    offender that shoved the in-flow footer down), and
- *  - while open it locks background scroll via body.style.overflow, restoring
- *    the prior value on unmount so it never clobbers screen-fit's overflow.
+ * The consent prompt is now a fixed bottom sheet (Option A from t_01e346a5).
+ * It does NOT cover the screen, does NOT use backdrop-filter, and does NOT lock
+ * background scroll, so it cannot shift in-flow layout. It still defers its
+ * initial mount to an idle slice so the hero/LCP element is not delayed.
  */
 
 import React from 'react';
@@ -31,7 +29,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));
 
-// The consent modal defers its initial mount to an idle slice (post-LCP perf
+// The consent sheet defers its initial mount to an idle slice (post-LCP perf
 // fix). These tests assert behavior, not timing — run the idle callback
 // synchronously.
 vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
@@ -40,17 +38,19 @@ vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
 });
 vi.stubGlobal('cancelIdleCallback', () => {});
 
-describe('CookieConsent — blocking-modal layout guard', () => {
+describe('CookieConsent — non-blocking bottom-sheet layout guard', () => {
   beforeEach(() => {
     document.body.style.paddingBottom = '';
     document.body.style.overflow = '';
   });
 
-  it('renders as a blocking modal dialog', () => {
+  it('renders as a non-blocking dialog at the bottom of the viewport', () => {
     render(<CookieConsent />);
     const dialog = screen.getByRole('dialog');
     expect(dialog).toBeInTheDocument();
-    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(dialog).toHaveAttribute('aria-modal', 'false');
+    expect(dialog).toHaveClass('fixed');
+    expect(dialog).toHaveClass('bottom-0');
   });
 
   it('does NOT push the footer by mutating body paddingBottom on mount', () => {
@@ -59,13 +59,19 @@ describe('CookieConsent — blocking-modal layout guard', () => {
     expect(document.body.style.paddingBottom).toBe('');
   });
 
-  it('locks background scroll while open and restores it on unmount', () => {
+  it('does NOT lock background scroll (non-blocking sheet)', () => {
     const prior = 'scroll';
     document.body.style.overflow = prior;
     const { unmount } = render(<CookieConsent />);
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflow).toBe(prior);
     unmount();
     expect(document.body.style.overflow).toBe(prior);
+  });
+
+  it('reserves a fixed min-height so the sheet does not cause layout shift', () => {
+    render(<CookieConsent />);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveClass('min-h-[280px]');
   });
 
   it('defers the initial mount to an idle callback so it is not the LCP element', () => {

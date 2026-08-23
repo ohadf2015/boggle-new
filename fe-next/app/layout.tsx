@@ -123,8 +123,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps): ReactNode {
     return (
         <>
-            <Script src="https://growthradar.app/gr.js" data-key="grw_fb2d7c376b18ced8cfb4742219d40ffa" strategy="afterInteractive" />
-            <Script src="https://growthradar.app/gr-extended.js" strategy="afterInteractive" />
+            {/* GrowthRadar first-party events — lazyOnload so it never competes
+                with the hero/LCP paint. A preconnect hint lives in the locale
+                layout <head>. */}
+            <Script src="https://growthradar.app/gr.js" data-key="grw_fb2d7c376b18ced8cfb4742219d40ffa" strategy="lazyOnload" />
+            <Script src="https://growthradar.app/gr-extended.js" strategy="lazyOnload" />
             <LazyMotionRoot>{children}</LazyMotionRoot>
         </>
     );
