@@ -1,26 +1,26 @@
 /**
- * Homepage blog section: must surface the 3 NEWEST blog posts (the ones
- * authored most recently per LandingBlogSection's `recentPosts` array).
+ * SSR guard: the landing page's authored SEO copy (LandingSEOSection) and the
+ * /blog interlinks (LandingBlogSection) MUST be present in the SERVER HTML.
  *
- * Regression guard: the previous version of the homepage rendered three
- * stale slugs (science-behind-word-games / why-word-games-are-addictive /
- * daily-challenge-strategies) hardcoded inside LandingSEOSection's
- * `blogLinks`. That data path was duplicated and went unmaintained — so
- * even after `recentPosts` was updated to the new posts, the homepage
- * kept showing the old ones.
+ * Regression: a perf pass converted both to `dynamic(..., { ssr: false })`, so
+ * server HTML emitted an animate-pulse skeleton instead of the <h2> headings and
+ * the internal blog links — invisible to crawlers that don't execute JS. It
+ * shipped green because the sibling blogSection test resolves next/dynamic in a
+ * useEffect and asserts inside `waitFor`, which can't tell server HTML from
+ * post-hydration output.
  *
- * NOTE: this asserts POST-HYDRATION output (the next/dynamic stub resolves in a
- * useEffect, and the assertion is inside `waitFor`), so it cannot tell whether the
- * links are in the server HTML. That invariant lives in LandingView.ssr.test.tsx.
+ * renderToString runs no effects, so it reflects exactly what a crawler sees.
+ * The next/dynamic mock below is faithful on the one axis that matters:
+ * `ssr: false` renders ONLY the loading fallback.
  */
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderToString } from 'react-dom/server';
 import LandingView from '../LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getRecentBlogPostsForLocale } from '@/lib/blog/data';
+import { contentByLocale } from '../landingSEOContent';
 
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');
@@ -70,36 +70,44 @@ vi.mock('@/utils/growthTracking', () => ({ trackModeSelected: vi.fn() }));
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false, isLoading: false }),
 }));
+// The one mock that carries the assertion: honour the `ssr` option the way
+// next/dynamic does — `ssr: false` = absent from server HTML.
 vi.mock('next/dynamic', async () => {
   const React = await vi.importActual<typeof import('react')>('react');
+  const g = globalThis as unknown as { __ssrDynamicReady: Promise<unknown>[] };
+  g.__ssrDynamicReady = [];
+  type Opts = { ssr?: boolean; loading?: React.ComponentType };
   return {
-    default: (importFn: () => Promise<Record<string, unknown>>) => {
-      const LazyComponent = (props: Record<string, unknown>) => {
-        const [Component, setComponent] = React.useState<React.ComponentType<Record<string, unknown>> | null>(null);
-        React.useEffect(() => {
-          importFn().then((mod) => {
-          const Comp = (
-            typeof mod === 'function'
-              ? mod
-              : (mod.default || mod[Object.keys(mod)[0]])
-          ) as React.ComponentType<Record<string, unknown>>;
-          setComponent(() => Comp);
-          });
-        }, []);
-        return Component ? React.createElement(Component, props) : null;
-      };
-      return LazyComponent;
-    },
     __esModule: true,
+    default: (importFn: () => Promise<Record<string, unknown>>, options?: Opts) => {
+      if (options?.ssr === false) {
+        const NoSSR = () => (options.loading ? React.createElement(options.loading) : null);
+        NoSSR.displayName = 'DynamicNoSSR';
+        return NoSSR;
+      }
+      let Resolved: React.ComponentType<Record<string, unknown>> | null = null;
+      g.__ssrDynamicReady.push(
+        importFn().then((mod) => {
+          Resolved = (typeof mod === 'function'
+            ? mod
+            : mod.default || mod[Object.keys(mod)[0]]) as React.ComponentType<Record<string, unknown>>;
+        })
+      );
+      const Dynamic = (props: Record<string, unknown>) =>
+        Resolved ? React.createElement(Resolved, props) : null;
+      Dynamic.displayName = 'DynamicSSR';
+      return Dynamic;
+    },
   };
 });
 vi.mock('framer-motion', () => {
   const motionObj: Record<string, React.FC<React.PropsWithChildren<Record<string, unknown>>>> = new Proxy(
     {},
-    { get: () => ({ children, ...p }: React.PropsWithChildren<Record<string, unknown>>) => <div {...p}>{children}</div> }
+    { get: () => ({ children, ...p }: React.PropsWithChildren<Record<string, unknown>>) => <div>{children}</div> }
   ) as never;
   return {
-    m: motionObj, m: motionObj,
+    m: motionObj,
+    motion: motionObj,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     useMotionValue: () => ({ get: () => 0, set: () => {}, on: () => () => {} }),
     useSpring: (v: unknown) => v, useInView: () => true, useReducedMotion: () => false, animate: () => ({ stop: () => {} }),
@@ -110,7 +118,7 @@ vi.mock('next/link', () => ({
 }));
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @next/next/no-img-element
-  default: ({ alt, ...rest }: { alt: string }) => <img alt={alt} {...rest} />,
+  default: ({ alt, src }: { alt: string; src: string }) => <img alt={alt} src={typeof src === 'string' ? src : ''} />,
 }));
 vi.mock('@/components/Header', () => ({ default: () => <header /> }));
 vi.mock('../LandingHero', () => ({ LandingHero: () => <div /> }));
@@ -118,8 +126,6 @@ vi.mock('../LandingChallengeCards', () => ({ LandingChallengeCards: () => <div /
 vi.mock('../LandingLeaderboardPreview', () => ({ LandingLeaderboardPreview: () => <div /> }));
 vi.mock('../LandingSocialProofBar', () => ({ LandingSocialProofBar: () => <div /> }));
 vi.mock('../LandingAvatarTeaser', () => ({ LandingAvatarTeaser: () => <div /> }));
-vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div /> }));
-vi.mock('../LandingBottomCTA', () => ({ LandingBottomCTA: () => <div /> }));
 vi.mock('../LandingYourRank', () => ({ LandingYourRank: () => <div /> }));
 vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
 vi.mock('@/components/events/EventBanner', () => ({ default: () => <div /> }));
@@ -129,13 +135,17 @@ vi.mock('@/components/ui/PlayfulBackground', () => ({ PlayfulBackground: () => <
 vi.mock('@/components/education/HomeEducationCardConnected', () => ({ HomeEducationCardConnected: () => <div /> }));
 vi.mock('@/components/CrazyGamesBanner', () => ({ default: () => <div /> }));
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
-    {children}
-  </QueryClientProvider>
-);
+describe('LandingView — server HTML contains the SEO + blog interlink surface', () => {
+  beforeAll(async () => {
+    // Drain the dynamic() imports (resolving one may register nested ones).
+    const g = globalThis as unknown as { __ssrDynamicReady: Promise<unknown>[] };
+    for (let i = 0; i < 5; i++) {
+      const pending = g.__ssrDynamicReady.splice(0);
+      if (!pending.length) break;
+      await Promise.all(pending);
+    }
+  });
 
-describe('LandingView — homepage blog section', () => {
   beforeEach(() => {
     (useAuth as unknown as vi.Mock).mockReturnValue({ isAuthenticated: false, loading: false, profile: null });
     (useLanguage as unknown as vi.Mock).mockReturnValue({ t: (k: string) => k, language: 'en', dir: 'ltr' });
@@ -145,26 +155,16 @@ describe('LandingView — homepage blog section', () => {
     });
   });
 
-  it('renders the 3 newest blog post links (not the legacy stale set)', async () => {
-    const { container } = render(<LandingView />, { wrapper });
+  it('emits the authored SEO headings, not a skeleton', () => {
+    const html = renderToString(<LandingView />);
+    expect(html).toContain(contentByLocale.en.whatIsTitle);
+    expect(html).toContain(contentByLocale.en.howToPlayTitle);
+  });
 
-    const expectedSlugs = getRecentBlogPostsForLocale('en', 3).map((p) => `/en/blog/${p.slug}`);
-    await waitFor(() => {
-      const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
-      expect(hrefs).toEqual(expect.arrayContaining(expectedSlugs));
-    });
-
-    const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
-
-    // The legacy slugs that were hardcoded in LandingSEOSection.blogLinks
-    // must NOT leak through any other path on the homepage.
-    const legacy = [
-      '/en/blog/science-behind-word-games',
-      '/en/blog/why-word-games-are-addictive',
-      '/en/blog/daily-challenge-strategies',
-    ];
-    for (const stale of legacy) {
-      expect(hrefs).not.toContain(stale);
+  it('emits the internal /blog links', () => {
+    const html = renderToString(<LandingView />);
+    for (const post of getRecentBlogPostsForLocale('en', 3)) {
+      expect(html).toContain(`/en/blog/${post.slug}`);
     }
   });
 });

@@ -29,13 +29,16 @@ const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m
   ssr: false,
   loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
+// SSR enabled (code-split only): the authored SEO copy and the /blog interlinks are
+// the landing page's organic-search surface and MUST be in the server HTML — LandingSEOSection's
+// motion variants are visible-by-default for exactly this reason. Do NOT add `ssr: false` here; that ships an
+// animate-pulse skeleton to crawlers instead of the <h2>s and links.
+// Guarded by LandingView.ssr.test.tsx.
 const LandingSEOSection = dynamic(() => import('./LandingSEOSection').then(m => m.LandingSEOSection), {
-  ssr: false,
-  loading: () => <div className="h-64 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40 animate-pulse" />,
+  loading: () => <div className="h-64 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40" />,
 });
 const LandingBlogSection = dynamic(() => import('./LandingBlogSection').then(m => m.LandingBlogSection), {
-  ssr: false,
-  loading: () => <div className="h-48 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40 animate-pulse" />,
+  loading: () => <div className="h-48 w-full max-w-4xl mx-auto rounded-neo bg-neo-navy-light/40" />,
 });
 const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.LandingBottomCTA), {
   ssr: false,
