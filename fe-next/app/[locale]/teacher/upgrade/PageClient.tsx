@@ -1,22 +1,40 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import nextDynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { Check, X, ShieldCheck, BellRing, Lock, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+
+const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
-  // Checkout stays gated until the Polar org is live with production keys — keep the CTA inert.
-  // The API enforces this too (503); this just avoids showing a button that can't work.
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  // Live since 2026-08-23: the Polar till is open (Teacher Pro $9/mo, real card iframe) and this
+  // flag is set to 'true' on the Railway service. It is inlined at BUILD time, so it also needs
+  // `ARG NEXT_PUBLIC_CHECKOUT_ENABLED` in the builder stage of fe-next/Dockerfile — without that
+  // the bundle bakes it as undefined and the CTA silently no-ops. The API enforces this too (503).
   const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
+
+  // Mark this page as a conversion surface to suppress modals that would block the CTA.
+  // This runtime signal is read by PWAInstallPrompt and ComebackBonusWrapper before
+  // they render, preventing them from creating overlays on a payment page.
+  // See: Route blocklists don't converge — use the runtime signal lesson.
+  useEffect(() => {
+    document.body.classList.add('conversion-surface');
+    return () => {
+      document.body.classList.remove('conversion-surface');
+    };
+  }, []);
 
   useEffect(() => {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
@@ -31,6 +49,12 @@ export default function UpgradePricingPageClient() {
       });
 
       if (!response.ok) {
+        // 401 means the user is not authenticated. Show the auth modal instead of a generic error.
+        if (response.status === 401) {
+          toast.error(t('teacher.subscription.signInRequired'));
+          setShowAuthModal(true);
+          return;
+        }
         toast.error(t('teacher.subscription.checkoutError'));
         return;
       }
@@ -46,9 +70,23 @@ export default function UpgradePricingPageClient() {
 
   // Free tier is deliberately framed as a starting point: the two caps a
   // growing teacher hits first are shown as explicit "missing" rows (loss framing).
+  // The two caps are INTERPOLATED from the tier config, never retyped. They used to be
+  // baked into the copy as "2"/"30" in six locales, so tightening the paywall would have
+  // advertised one limit while enforcing another — on the only page in the portfolio that
+  // can take money. Change the numbers in lib/lemonsqueezy.ts and every locale follows.
   const freeFeatures = [
-    { label: t('teacher.subscription.free2Classes'), included: true },
-    { label: t('teacher.subscription.free30Students'), included: true },
+    {
+      label: t('teacher.subscription.freeClasses', {
+        count: String(FREE_TIER_LIMITS.classes),
+      }),
+      included: true,
+    },
+    {
+      label: t('teacher.subscription.freeStudents', {
+        count: String(FREE_TIER_LIMITS.studentsPerClass),
+      }),
+      included: true,
+    },
     { label: t('teacher.subscription.basicWordTracking'), included: true },
     { label: t('teacher.subscription.dailyProgressReports'), included: true },
     { label: t('teacher.subscription.unlimitedClasses'), included: false },
@@ -325,6 +363,15 @@ export default function UpgradePricingPageClient() {
           </div>
         </div>
       </div>
+
+      {/* Auth modal for unauthenticated checkout attempts (401) */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signin"
+        />
+      )}
     </div>
   );
 }

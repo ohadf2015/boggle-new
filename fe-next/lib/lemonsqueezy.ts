@@ -5,6 +5,7 @@
  */
 
 import { createHmac, timingSafeEqual } from 'crypto'
+import { FREE_TIER_LIMITS } from './education/freeTierLimits'
 
 // ---- Types ----
 
@@ -53,15 +54,19 @@ export interface TierConfig {
 }
 
 const TIER_CONFIGS: Record<TierId, TierConfig> = {
+  // The two caps come from lib/education/freeTierLimits.ts — the upgrade page renders them
+  // too and it is a client component, so they cannot live in this file. Do not retype them.
+  // Safe to tighten when it shipped (2026-08-23): max classrooms per teacher was 1 and max
+  // students per classroom was 1, so no existing free teacher was pushed over the new limit.
   free: {
     id: 'free',
     name: 'Free',
     price_monthly_usd: 0,
-    classes_limit: 2,
-    students_limit_per_class: 30,
+    classes_limit: FREE_TIER_LIMITS.classes,
+    students_limit_per_class: FREE_TIER_LIMITS.studentsPerClass,
     features: [
-      'Up to 2 classes',
-      '30 students per class',
+      `Up to ${FREE_TIER_LIMITS.classes} class`,
+      `${FREE_TIER_LIMITS.studentsPerClass} students per class`,
       'Basic word tracking',
       'Daily progress reports',
     ],

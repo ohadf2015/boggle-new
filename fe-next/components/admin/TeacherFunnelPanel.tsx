@@ -6,6 +6,7 @@ import { AlertTriangle } from 'lucide-react';
 import { TeacherAccessDrawer } from './TeacherAccessDrawer';
 import type { TeacherAccessRequest } from '@/lib/education/types';
 import type {
+  ClassroomRow,
   TeacherFunnelResult,
   TeacherFunnelRow,
   TeacherStage,
@@ -82,16 +83,52 @@ const ACTIVITY_FALLBACK: Record<(typeof ACTIVITY_KEYS)[number], string> = {
   duels: 'Duels played',
 };
 
-function Stat({ label, value, alert }: { label: string; value: number; alert?: boolean }) {
+function Stat({
+  label,
+  value,
+  alert,
+  drop,
+}: {
+  label: string;
+  value: number;
+  alert?: boolean;
+  /** People lost since the previous step. Undefined on the first step, which has no previous. */
+  drop?: number;
+}) {
   return (
     <div
       className={`rounded-neo border-neo px-3 py-2 shadow-hard-sm ${
         alert ? 'border-black bg-neo-red text-neo-white' : 'border-black bg-neo-cream text-black'
       }`}
     >
-      <div className="font-neo-display text-2xl font-black leading-none">{value}</div>
+      <div className="flex items-baseline gap-1.5">
+        <span className="font-neo-display text-2xl font-black leading-none">{value}</span>
+        {/* Six equal tiles hide WHERE people are lost. The drop is the whole point of a funnel. */}
+        {drop !== undefined && drop > 0 && (
+          <span className="font-neo-body text-xs font-bold text-neo-red">−{drop}</span>
+        )}
+      </div>
       <div className="mt-1 font-neo-body text-[11px] font-bold uppercase opacity-70">{label}</div>
     </div>
+  );
+}
+
+/** Consistent section chrome, so the panel reads as sections rather than a stack of blocks. */
+function Block({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-4 rounded-neo border-neo border-black bg-neo-navy-light p-3">
+      <h3 className="font-neo-display text-base font-black text-neo-white">{title}</h3>
+      {hint && <p className="mt-1 font-neo-body text-xs text-neo-white/50">{hint}</p>}
+      {children}
+    </section>
   );
 }
 
@@ -183,6 +220,96 @@ function ReasonsPanel({
   );
 }
 
+/**
+ * The classrooms themselves, named, with whoever opened each one. The counters above answer
+ * "how many" — this answers "which", which is the question you actually have when only two
+ * classrooms exist. Listed classroom-first rather than teacher-first so an owner who never
+ * filled in the access form still shows up; the funnel table below cannot show those at all.
+ */
+function ClassroomsPanel({
+  classrooms,
+  t,
+}: {
+  classrooms: ClassroomRow[];
+  t: (k: string, v?: Record<string, string> | string) => string;
+}) {
+  return (
+    <Block
+      title={`${t('admin.teacherFunnel.classrooms.title', 'Classrooms that exist')} (${classrooms.length})`}
+      hint={t(
+        'admin.teacherFunnel.classrooms.subtitle',
+        'Every classroom in the database, newest first — its name and who opened it.',
+      )}
+    >
+      {classrooms.length === 0 ? (
+        <p className="mt-3 font-neo-body text-sm text-neo-white/50">
+          {t('admin.teacherFunnel.classrooms.empty', 'No classroom has ever been opened.')}
+        </p>
+      ) : (
+        // Wide table on a narrow phone: scroll the table, never the page.
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse font-neo-body text-sm">
+            <thead>
+              <tr className="text-left text-[11px] font-bold uppercase text-neo-white/50">
+                <th className="py-1 pe-3">{t('admin.teacherFunnel.classrooms.name', 'Classroom')}</th>
+                <th className="py-1 pe-3">{t('admin.teacherFunnel.classrooms.teacher', 'Opened by')}</th>
+                <th className="py-1 pe-3 text-right">
+                  {t('admin.teacherFunnel.classrooms.students', 'Students')}
+                </th>
+                <th className="py-1 pe-3">{t('admin.teacherFunnel.classrooms.created', 'Created')}</th>
+              </tr>
+            </thead>
+            <tbody className="text-neo-white">
+              {classrooms.map((c) => (
+                <tr key={c.id} className="border-t border-neo-white/10 align-top">
+                  <td className="py-2 pe-3">
+                    <span className="font-bold">
+                      {c.name ?? (
+                        <span className="italic text-neo-white/40">
+                          {t('admin.teacherFunnel.classrooms.unnamed', '(unnamed)')}
+                        </span>
+                      )}
+                    </span>
+                    <span className="ms-2 text-[11px] text-neo-white/40">
+                      {[c.language, c.joinCode].filter(Boolean).join(' · ')}
+                    </span>
+                  </td>
+                  <td className="py-2 pe-3">
+                    {/* Never blank: name → email → raw id, in that order of usefulness. */}
+                    <span>{c.teacherName ?? c.teacherEmail ?? c.teacherId ?? '—'}</span>
+                    {c.teacherName && c.teacherEmail && (
+                      <span className="ms-2 text-[11px] text-neo-white/40">{c.teacherEmail}</span>
+                    )}
+                    {!c.teacherIsApplicant && (
+                      <span
+                        className="ms-2 rounded-neo bg-neo-navy px-1.5 py-0.5 text-[10px] font-bold uppercase text-neo-white/60"
+                        title={t(
+                          'admin.teacherFunnel.classrooms.notApplicantHint',
+                          'This owner never filled in the teacher access form, so they do not appear in the funnel table below.',
+                        )}
+                      >
+                        {t('admin.teacherFunnel.classrooms.notApplicant', 'no access request')}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2 pe-3 text-right tabular-nums">
+                    <span className={c.students === 0 ? 'text-neo-orange' : 'text-neo-lime'}>
+                      {c.students}
+                    </span>
+                  </td>
+                  <td className="py-2 pe-3 whitespace-nowrap text-neo-white/70">
+                    {c.createdAt ? c.createdAt.slice(0, 10) : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Block>
+  );
+}
+
 export function TeacherFunnelPanel() {
   const { t } = useLanguage();
   const [open, setOpen] = useState<TeacherFunnelRow | null>(null);
@@ -218,6 +345,7 @@ export function TeacherFunnelPanel() {
   const { summary, rows } = data;
   const reasons = data.reasons ?? [];
   const activity = data.activity ?? {};
+  const classrooms = data.classrooms ?? [];
 
   return (
     <section className="p-4">
@@ -234,17 +362,37 @@ export function TeacherFunnelPanel() {
         </div>
       )}
 
+      {/* Ordered left-to-right as the actual funnel, each tile showing what it lost from the
+          step before it. The interesting number here has never been a total — it is the step
+          where everyone disappears. */}
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label={t('admin.teacherFunnel.stat.requested')} value={summary.requested} />
-        <Stat label={t('admin.teacherFunnel.stat.approved')} value={summary.approved} />
+        <Stat
+          label={t('admin.teacherFunnel.stat.approved')}
+          value={summary.approved}
+          drop={summary.requested - summary.approved}
+        />
         <Stat
           label={t('admin.teacherFunnel.stat.roleGranted')}
           value={summary.roleGranted}
           alert={summary.blocked > 0}
+          drop={summary.approved - summary.roleGranted}
         />
-        <Stat label={t('admin.teacherFunnel.stat.createdClassroom')} value={summary.createdClassroom} />
-        <Stat label={t('admin.teacherFunnel.stat.gotStudents')} value={summary.gotStudents} />
-        <Stat label={t('admin.teacherFunnel.stat.assigned')} value={summary.assigned} />
+        <Stat
+          label={t('admin.teacherFunnel.stat.createdClassroom')}
+          value={summary.createdClassroom}
+          drop={summary.roleGranted - summary.createdClassroom}
+        />
+        <Stat
+          label={t('admin.teacherFunnel.stat.gotStudents')}
+          value={summary.gotStudents}
+          drop={summary.createdClassroom - summary.gotStudents}
+        />
+        <Stat
+          label={t('admin.teacherFunnel.stat.assigned')}
+          value={summary.assigned}
+          drop={summary.gotStudents - summary.assigned}
+        />
       </div>
 
       {/* The leak `blocked` cannot see. They can get in, they did come back, and they
@@ -270,13 +418,22 @@ export function TeacherFunnelPanel() {
         </p>
       )}
 
-      {/* "Did they activate?" is above. This is "is anyone teaching?" — the question the
-          panel could not answer at all, because an empty module and a missing panel look
-          identical until you print the zeros. */}
-      <section className="mt-4 rounded-neo border-neo border-black bg-neo-navy-light p-3">
-        <h3 className="font-neo-display text-base font-black text-neo-white">
-          {t('admin.teacherFunnel.activity.title', 'What is happening inside the module')}
-        </h3>
+      {/* WHICH classrooms, before any whole-product totals: when only two exist, "2" is
+          useless and their names tell you everything. */}
+      <ClassroomsPanel classrooms={classrooms} t={t} />
+
+      <ReasonsPanel reasons={reasons} t={t} />
+
+      {/* Demoted below the named data on purpose. These are all-time whole-product counts —
+          context, not the answer to "who is teaching". Kept because an empty module and a
+          missing panel look identical until you print the zeros. */}
+      <Block
+        title={t('admin.teacherFunnel.activity.title', 'What is happening inside the module')}
+        hint={t(
+          'admin.teacherFunnel.activity.hint',
+          'Whole-product totals, all time. A dash means the count failed, which is not the same as zero.',
+        )}
+      >
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
           {ACTIVITY_KEYS.map((k) => (
             <div key={k} className="rounded-neo border border-black bg-neo-cream px-2 py-1.5 text-black">
@@ -289,15 +446,7 @@ export function TeacherFunnelPanel() {
             </div>
           ))}
         </div>
-        <p className="mt-2 font-neo-body text-[11px] text-neo-white/40">
-          {t(
-            'admin.teacherFunnel.activity.hint',
-            'Whole-product totals, all time. A dash means the count failed, which is not the same as zero.',
-          )}
-        </p>
-      </section>
-
-      <ReasonsPanel reasons={reasons} t={t} />
+      </Block>
 
       {/* Wide table on a narrow phone: scroll the table, never the page. */}
       <div className="mt-4 overflow-x-auto rounded-neo border-neo border-black bg-neo-navy-light">

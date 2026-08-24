@@ -50,6 +50,11 @@ export function PWAInstallPrompt() {
   const [iosHint, setIosHint] = useState(false);
 
   useEffect(() => {
+    // Cheap early-out on a conversion surface (checkout pages) — skips registering the
+    // listener at all when we mount straight onto one. This is NOT the guard that holds;
+    // the render-time check further down is. See the comment there.
+    if (document.body.classList.contains('conversion-surface')) return;
+
     // On Android the native app promo (AndroidAppInstallPromo) owns the install
     // pitch — yield so the user never gets two install prompts. Desktop Chrome,
     // where there is no native app, still gets the PWA banner.
@@ -144,6 +149,11 @@ export function PWAInstallPrompt() {
   };
 
   if (isOnCrazyGamesPlatform) return null;
+  // The effect-time check below can't hold on its own: this component mounts once at the
+  // layout level, so a client-side navigation INTO /teacher/upgrade never re-runs it, and
+  // beforeinstallprompt fires long after mount. Re-read the signal here, on the very render
+  // that would paint the overlay — that render happens while the visitor is on the page.
+  if (typeof document !== 'undefined' && document.body.classList.contains('conversion-surface')) return null;
   const showAndroidChromePrompt = showPrompt && Boolean(deferredPrompt);
   if (!showAndroidChromePrompt && !iosHint) return null;
 
