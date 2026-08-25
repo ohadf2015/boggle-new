@@ -93,13 +93,21 @@ export default function UpgradePricingPageClient() {
     { label: t('teacher.subscription.unlimitedStudents'), included: false },
   ];
 
-  // Pro leads with the two things Free can't do — the reason to switch first.
+  // Pro leads with outcome-driven value propositions, not just features.
+  // These are reordered from feature-speak to outcome-speak: what a teacher can *do*,
+  // not what they *get*. The first two are the pain points Free can't address.
   const proFeatures = [
-    t('teacher.subscription.unlimitedClasses'),
-    t('teacher.subscription.unlimitedStudents'),
-    t('teacher.subscription.basicWordTracking'),
-    t('teacher.subscription.dailyProgressReports'),
+    t('teacher.subscription.featureOutcome1'), // Unlimited classes without cap worry
+    t('teacher.subscription.featureOutcome2'), // Add students without waiting/headaches
+    t('teacher.subscription.featureOutcome3'), // Real-time progress tracking
+    t('teacher.subscription.featureOutcome4'), // Daily reports showing what works
   ];
+
+  // ponytail: no per-student anchor here on purpose. Dividing the Pro price by the
+  // FREE tier's student cap quotes the worst per-student rate Pro can have — Pro is
+  // unlimited, so a real class of 30 is $0.30 and a hundred is $0.09. It anchored
+  // against the sale. "About $0.30 a day" below is true, simpler, and already the
+  // strongest framing on the card; a second anchor only competed with it.
 
   const trustChips = [
     { icon: ShieldCheck, label: t('teacher.subscription.trustCancel') },
@@ -117,13 +125,13 @@ export default function UpgradePricingPageClient() {
         {/* Header */}
         <div className="text-center mb-10 sm:mb-14">
           <h1
-            className="text-4xl md:text-5xl font-neo-display font-black text-neo-white mb-4"
+            className="text-4xl md:text-5xl font-neo-display font-black text-neo-white mb-2"
             style={{ textWrap: 'balance' }}
           >
             {t('teacher.subscription.upgradePricingTitle')}
           </h1>
-          <p className="text-xl text-neo-cyan font-bold mb-3">
-            {t('teacher.subscription.upgradePricingSubtitle')}
+          <p className="text-xl text-neo-lime font-black mb-4">
+            {t('teacher.subscription.valueHeadline')}
           </p>
           <p className="text-base text-neo-white/80 font-bold max-w-xl mx-auto">
             {t('teacher.subscription.upgradePricingReassure')}
@@ -224,15 +232,20 @@ export default function UpgradePricingPageClient() {
             </div>
 
             <div className="mb-7 pb-7 border-b-3 border-black">
-              <p className="text-5xl font-neo-display font-black text-neo-black leading-none">
+              <p className="text-4xl sm:text-5xl font-neo-display font-black text-neo-black leading-none">
                 $9
-                <span className="text-base text-neo-black/80 font-bold ms-2">
+                <span className="text-sm sm:text-base text-neo-black/80 font-bold ms-2">
                   {t('teacher.subscription.perMonth')}
                 </span>
               </p>
-              <p className="inline-block mt-3 bg-neo-black text-neo-cyan text-xs font-black px-2.5 py-1 rounded-neo border-2 border-black">
-                {t('teacher.subscription.pricePerDay')}
-              </p>
+              <div className="flex flex-col gap-2 mt-3">
+                <p className="inline-block bg-neo-black text-neo-cyan text-xs font-black px-2.5 py-1 rounded-neo border-2 border-black w-fit">
+                  {t('teacher.subscription.pricePerDay')}
+                </p>
+                <p className="text-xs font-bold text-neo-black/80">
+                  {t('teacher.subscription.priceTaxNote')}
+                </p>
+              </div>
             </div>
 
             <div className="mb-4">

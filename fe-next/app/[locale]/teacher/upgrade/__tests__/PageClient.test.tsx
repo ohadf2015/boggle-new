@@ -107,4 +107,65 @@ describe('UpgradePricingPageClient', () => {
     );
     expect(mockToastError).not.toHaveBeenCalledWith('teacher.subscription.signInRequired');
   });
+
+  it('mobile: Pro card appears first in document order (order-1), Free second (order-2)', () => {
+    render(<UpgradePricingPageClient />);
+
+    // Get both card containers
+    const proPlanCard = screen.getByText('teacher.subscription.proPlanName').closest('div')?.parentElement;
+    const freePlanCard = screen.getByText('teacher.subscription.freePlanName').closest('div')?.parentElement;
+
+    expect(proPlanCard).toHaveClass('order-1');
+    expect(freePlanCard).toHaveClass('order-2');
+
+    // On desktop (md:), Pro should be second (order-2) and Free first (order-1)
+    expect(proPlanCard).toHaveClass('md:order-2');
+    expect(freePlanCard).toHaveClass('md:order-1');
+  });
+
+  it('redirects to checkout URL on successful checkout', async () => {
+    const checkoutUrl = 'https://polar.example.com/checkout/abc123';
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: checkoutUrl }),
+    });
+
+    // Mock window.location.href assignment
+    const originalLocation = window.location;
+    delete (window as any).location;
+    window.location = { href: '' } as any;
+
+    render(<UpgradePricingPageClient />);
+    fireEvent.click(screen.getByRole('button', { name: /upgradeNow/i }));
+
+    await vi.waitFor(() => {
+      expect(window.location.href).toBe(checkoutUrl);
+    });
+
+    // Restore location
+    window.location = originalLocation;
+  });
+
+  it('renders outcome-driven Pro features instead of feature-speak', () => {
+    render(<UpgradePricingPageClient />);
+
+    // Check that outcome-driven keys are used (which will render as the keys themselves in the test)
+    expect(screen.getByText('teacher.subscription.featureOutcome1')).toBeInTheDocument();
+    expect(screen.getByText('teacher.subscription.featureOutcome2')).toBeInTheDocument();
+    expect(screen.getByText('teacher.subscription.featureOutcome3')).toBeInTheDocument();
+    expect(screen.getByText('teacher.subscription.featureOutcome4')).toBeInTheDocument();
+
+    // Verify these are in the Pro card (which is on the page)
+    const proPlanCard = screen.getByText('teacher.subscription.proPlanName').closest('div')?.parentElement;
+    expect(proPlanCard).toBeInTheDocument();
+  });
+
+  it('displays price-per-student anchor alongside price-per-day', () => {
+    render(<UpgradePricingPageClient />);
+
+    // Both anchoring mechanisms should be present
+    expect(screen.getByText('teacher.subscription.pricePerDay')).toBeInTheDocument();
+    // The price per student is interpolated, so we check for the key + amount
+    expect(screen.getByText(/teacher.subscription.pricePerStudent/)).toBeInTheDocument();
+  });
 });

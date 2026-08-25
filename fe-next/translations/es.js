@@ -12235,7 +12235,13 @@ const es = {
       "manageSubscription": "Gestionar suscripción",
       "districtTitle": "¿Escuela o distrito?",
       "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
-      "districtCta": "Contáctanos para precios escolares"
+      "districtCta": "Contáctanos para precios escolares",
+      "priceTaxNote": "Impuestos mostrados al finalizar la compra",
+      "valueHeadline": "Expande tu enseñanza sin límites",
+      "featureOutcome1": "Enseña clases ilimitadas sin preocuparte por alcanzar un límite",
+      "featureOutcome2": "Agrega tantos estudiantes como necesites sin gestión ni esperas",
+      "featureOutcome3": "Seguimiento de progreso en tiempo real de todos tus estudiantes",
+      "featureOutcome4": "Compara estrategias de enseñanza en todas tus clases a la vez"
     },
     "accessRequired": "Acceso de Profesor Requerido",
     "accessDenied": "Necesitas permisos de profesor para esta página.",
@@ -12898,9 +12904,9 @@ const es = {
       "title": "LexiClash Education",
       "startGame": "Iniciar juego",
       "hero": {
-        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
+        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés, español y ruso",
         "h1": "Juegos de vocabulario para tu aula — sin cuentas de estudiantes.",
-        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
+        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 6 idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
         "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",
@@ -13050,6 +13056,24 @@ const es = {
         "title": "Para escuelas y distritos",
         "body": "¿Gestionas 5 o más aulas? Pregúntanos sobre precios por volumen.",
         "button": "Contactar para precios por distrito"
+      },
+      "pro": {
+        "title": "Teacher Pro — desbloquea tu aula",
+        "subtitle": "Gratis para empezar. Pro crece con tu necesidad.",
+        "freeTier": "Plan gratis",
+        "proTier": "Pro",
+        "perMonth": "/mes",
+        "classLimit": "Hasta {count} clase",
+        "classLimitPro": "Clases ilimitadas",
+        "studentLimit": "Hasta {count} estudiantes por clase",
+        "studentLimitPro": "Estudiantes ilimitados",
+        "noAds": "Cero anuncios en rutas de estudiante",
+        "analytics": "Analítica e insights del aula",
+        "customLists": "Listas de palabras personalizadas",
+        "duels": "Duelos de clase",
+        "chooseNow": "Mejorar a Pro",
+        "freeForever": "Totalmente gratis. Siempre.",
+        "whyNow": "¿Por qué ahora: tu primera clase está limitada a {count} estudiantes. ¿Necesitas más? Un clic y accedes a 500+ estudiantes y 50+ clases."
       },
       "esl-word-games": {
         "course_name": "Juegos de palabras ESL de LexiClash",

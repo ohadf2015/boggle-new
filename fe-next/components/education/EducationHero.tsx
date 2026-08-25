@@ -9,7 +9,7 @@ import { EducationModeMock } from './EducationModeMock';
 
 /**
  * Design tokens (from frontend-design skill):
- * - Hero uses neo-cream/neo-navy gradient for warmth + professional tone
+ * - Hero: dark neo-navy background with neo-lime primary CTA
  * - Single primary CTA: oversized bg-neo-lime button with shadow-hard-xl, an
  *   animated arrow, and a reassurance note. We deliberately keep ONE CTA so the
  *   teacher's next action is unmistakable (clicks tracked via growth analytics).
@@ -68,7 +68,7 @@ export function EducationHero() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-neo-cream to-neo-white">
+    <section className="relative overflow-hidden bg-neo-navy">
       {/* Decorative background dots */}
       <div
         ref={dotsRef}
@@ -95,13 +95,13 @@ export function EducationHero() {
           </p>
           <h1
             data-hero-item
-            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-navy md:text-6xl"
+            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-cream md:text-6xl"
           >
             {t('education.landing.hero.h1')}
           </h1>
           <p
             data-hero-item
-            className="education-hero-sub mt-5 text-base sm:text-lg text-neo-navy/70"
+            className="education-hero-sub mt-5 text-base sm:text-lg text-neo-cream/80"
           >
             {t('education.landing.hero.sub')}
           </p>
@@ -123,21 +123,24 @@ export function EducationHero() {
                 →
               </span>
             </Link>
-            <p className="text-xs font-bold uppercase tracking-wider text-neo-navy/60">
+            <p className="text-xs font-bold uppercase tracking-wider text-neo-cream/70">
               {t('education.landing.hero.cta_note')}
             </p>
             <Link
               href={`/${language}/education/for-schools`}
               onClick={() => trackLandingCtaClick('hero_for_schools')}
-              className="text-xs font-bold text-neo-navy/70 underline underline-offset-2 hover:text-neo-navy transition-colors"
+              className="text-xs font-bold text-neo-cream/80 underline underline-offset-2 hover:text-neo-cream transition-colors"
             >
               {t('education.landing.hero.cta_schools')}
             </Link>
           </div>
         </div>
 
-        {/* Right column: live product mock */}
-        <div data-hero-item className="order-first lg:order-none">
+        {/* Right column: live product mock. No `order-*` here on purpose — the
+            mock is already the second grid child, so it sits right on desktop
+            by source order, and any unprefixed `order-first` would hoist it
+            above the h1 and the CTA on every viewport under lg. */}
+        <div data-hero-item>
           <EducationModeMock />
         </div>
       </div>

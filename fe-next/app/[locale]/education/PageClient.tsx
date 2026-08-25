@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationHero } from '@/components/education/EducationHero';
 import { MoatTrifectaSection } from '@/components/education/MoatTrifectaSection';
+import { ProFramingSection } from '@/components/education/ProFramingSection';
 import { SixModeTour } from '@/components/education/SixModeTour';
 import { ComparisonStrip } from '@/components/education/ComparisonStrip';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
@@ -168,11 +169,12 @@ export function PageClient() {
         </>
       )}
 
-      {/* Marketing landing for unauthenticated and student views */}
-      {!hasTeacherAccess && (
+      {/* Marketing landing for unauthenticated and student views — gate on !loading to avoid flash */}
+      {!loading && !hasTeacherAccess && (
         <>
           <EducationHero />
           <MoatTrifectaSection />
+          <ProFramingSection />
           <div id="modes">
             <SixModeTour />
           </div>
@@ -180,8 +182,8 @@ export function PageClient() {
         </>
       )}
 
-      {/* Role cards for unauthenticated users only */}
-      {!hasTeacherAccess && (
+      {/* Role cards for unauthenticated users only — gate on !loading */}
+      {!loading && !hasTeacherAccess && (
         <section className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Teacher card */}
@@ -224,8 +226,8 @@ export function PageClient() {
         </section>
       )}
 
-      {/* Social proof for unauthenticated users */}
-      {!hasTeacherAccess && (
+      {/* Social proof for unauthenticated users — gate on !loading */}
+      {!loading && !hasTeacherAccess && (
         <section className="mx-auto max-w-3xl px-4 py-8 text-center">
           <p className="text-neo-white">
             {t('education.landing.socialProof')}
@@ -233,7 +235,7 @@ export function PageClient() {
         </section>
       )}
 
-      {!hasTeacherAccess && (
+      {!loading && !hasTeacherAccess && (
         <>
           <DistrictUpsellStrip />
           <section className="mx-auto max-w-3xl px-4 py-12 sm:py-16">

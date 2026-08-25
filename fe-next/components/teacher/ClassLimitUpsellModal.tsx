@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -26,6 +26,17 @@ export default function ClassLimitUpsellModal({
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const isRTL = language === 'he';
+
+  // Track the upgrade surface when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      trackGrowthEvent('iap_viewed', {
+        source: 'class_limit',
+        currentCount,
+        limit,
+      });
+    }
+  }, [isOpen, currentCount, limit]);
 
   const handleUpgrade = async () => {
     setIsLoading(true);

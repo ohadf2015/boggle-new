@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-17T17:52:06.394Z",
+  "generatedAt": "2026-08-25T09:56:55.917Z",
   "commits": [
     {
-      "sha": "69621908c3adc675e7c12a47a0fff6ce3117153b",
-      "shortSha": "6962190",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-17",
+      "sha": "baf78c10e88bebef418e59554e15b2206f31337d",
+      "shortSha": "baf78c1",
+      "subject": "fix(education): stop duplicate teacher requests, unblock activation",
       "author": "Ohad Fisher",
-      "date": "2026-08-17T05:39:08+03:00"
+      "date": "2026-08-25T12:18:47+03:00"
     },
     {
-      "sha": "089626637ea765b6032aef1ac486a949cecab7a9",
-      "shortSha": "0896266",
-      "subject": "fix(images): stop the 30s Express cap from permanently poisoning image variants",
+      "sha": "825e69db4688f6e0a6de393b822330556747c779",
+      "shortSha": "825e69d",
+      "subject": "fix(ui): dim placeholders so a blank field stops reading as filled",
       "author": "Ohad Fisher",
-      "date": "2026-08-16T22:56:41+03:00"
+      "date": "2026-08-25T11:56:26+03:00"
     },
     {
-      "sha": "b907e9cbd2e0b9168057fd40eee0d205e0bb92b0",
-      "shortSha": "b907e9c",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-16",
+      "sha": "20f090e34ab22138b7df7eea39b9f7b09a6727e4",
+      "shortSha": "20f090e",
+      "subject": "fix(multiplayer): surface dead-room join failures instead of swallowing them",
       "author": "Ohad Fisher",
-      "date": "2026-08-16T03:57:47+03:00"
+      "date": "2026-08-25T11:56:06+03:00"
     },
     {
-      "sha": "0a7784811cac7848fca50e842ff97a80ff794b09",
-      "shortSha": "0a77848",
-      "subject": "chore(i18n): refresh translation report for the new blast tile keys",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T21:57:08+03:00"
+      "sha": "0e3aad22eee2151ad5d8a78ce67a7f646e38ea65",
+      "shortSha": "0e3aad2",
+      "subject": "SEO daily meta",
+      "author": "ohadf2015",
+      "date": "2026-08-25T10:36:11+03:00"
     },
     {
-      "sha": "0163a06be5090664478d30f2069abfc55c8325eb",
-      "shortSha": "0163a06",
-      "subject": "fix(sentry): bots found no words in Russian, and a zero-word round crashed your own results",
+      "sha": "5992d8626ca9d75df00d13a7389e94ba0d6c257a",
+      "shortSha": "5992d86",
+      "subject": "fix(layout): stop AdSense shifting React's <head> mid-hydration",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T21:34:53+03:00"
+      "date": "2026-08-25T09:47:57+03:00"
     },
     {
-      "sha": "b78edfb032c2f8dae37064cbaf6691d5b1bd7217",
-      "shortSha": "b78edfb",
-      "subject": "fix(quick-play): words scored nothing, the results CTA was dead, and you raced yourself",
+      "sha": "0e927ea53ffa389a7e872d99d4a0c7047d431ab3",
+      "shortSha": "0e927ea",
+      "subject": "perf: prerender locale routes, move dictionary Set into the worker, restore daily cross-promo",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T18:25:48+03:00"
+      "date": "2026-08-25T09:29:41+03:00"
     },
     {
-      "sha": "e607320a0ddeb967d8a9a7c66eb0103e27b5b2e5",
-      "shortSha": "e607320",
-      "subject": "fix(sitemap): the biggest page on the site was never in the sitemap",
+      "sha": "1ef3259a87e08887662e2731cca1e3bd1f6dcfaa",
+      "shortSha": "1ef3259",
+      "subject": "fix(word-tower): give the daily challenge a \"today\", real rivals, and completion credit",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T15:24:25+03:00"
+      "date": "2026-08-25T09:17:05+03:00"
     },
     {
-      "sha": "c993aaa7db697d14c834f6e778da31c9e095a1de",
-      "shortSha": "c993aaa",
-      "subject": "test(seo): the hreflang guard only checked the pages, not the sitemap",
+      "sha": "1114377e7cbbac4da098c86ee5e83f5e248406b4",
+      "shortSha": "1114377",
+      "subject": "chore(nightly): post-run residue 2026-08-25",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T15:22:20+03:00"
+      "date": "2026-08-25T05:28:47+03:00"
     },
     {
-      "sha": "eb8d2c7c76a68042a5a90bdc70158ca9783879a4",
-      "shortSha": "eb8d2c7",
-      "subject": "fix(seo): hreflang was telling Google these 31 pages were translations of each other",
+      "sha": "54a9d3561694172540580065c97d5cf1adadf3cf",
+      "shortSha": "54a9d35",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-25",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T15:12:56+03:00"
+      "date": "2026-08-25T05:28:13+03:00"
     },
     {
-      "sha": "65599d522c1fa5cce48a0ff61b687941bb66db94",
-      "shortSha": "65599d5",
-      "subject": "fix(quick-play): mode picker keycaps, bottom-band clearance, version toast",
+      "sha": "10359c43cc04aff9a61036d0521aabcdf2b52704",
+      "shortSha": "10359c4",
+      "subject": "merge: teacher-tier limits, checkout 401/modal guards, word-wheel drag fix, education admin classroom list",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T14:49:54+03:00"
+      "date": "2026-08-25T00:01:46+03:00"
     },
     {
-      "sha": "f755ce2722053b9fbccfa46c50070c742c480458",
-      "shortSha": "f755ce2",
-      "subject": "feat(quick-play): solo rounds run the MP boards and race real players",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T14:48:52+03:00"
+      "sha": "fe1f3b2fa7180d71dc3e870948a9b1d71b044e82",
+      "shortSha": "fe1f3b2",
+      "subject": "SEO: daily meta tag improvements (2026-08-24) (#847)",
+      "author": "ohadf2015",
+      "date": "2026-08-24T23:30:46+03:00"
     },
     {
-      "sha": "9a20d02acd8d8cfdf0d7f1b3ea237c3c24ea3661",
-      "shortSha": "9a20d02",
-      "subject": "fix(multiplayer): invite timing read the clock where React says not to",
-      "author": "Ohad Fisher",
-      "date": "2026-08-15T13:33:07+03:00"
+      "sha": "7faa1f390bb46427c81744a82177e2466d6b2b32",
+      "shortSha": "7faa1f3",
+      "subject": "perf(lexiclash): remaining PSI levers for landing >60 (#846)",
+      "author": "ohadf2015",
+      "date": "2026-08-24T00:27:51+03:00"
     },
     {
-      "sha": "b901d3729254f4b1cfff816ef4b9b158c7f07e28",
-      "shortSha": "b901d37",
-      "subject": "fix(practice): the daily results chain CTA was still pointing at retired urls",
+      "sha": "1c9fe11edfab2ba564c27037df1ac21accfb7ffd",
+      "shortSha": "1c9fe11",
+      "subject": "perf(lexiclash): remaining PSI levers — defer GrowthRadar/Feedback scripts, reserve AdSense anchor height, fix landing blog test",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:21:58+03:00"
+      "date": "2026-08-23T21:26:43Z"
     },
     {
-      "sha": "5afa38b1b274cc5bf01d50cea5ce92869a69e9b7",
-      "shortSha": "5afa38b",
-      "subject": "fix(analytics): the funnel was dropping the events it existed to measure",
+      "sha": "6e5ecfccc6a8d40606de74ff6e4ed0b57cde09b1",
+      "shortSha": "6e5ecfc",
+      "subject": "WIP: LexiClash perf levers (t_63d9f85a)",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:20:26+03:00"
+      "date": "2026-08-23T21:11:00Z"
     },
     {
-      "sha": "970d5b7c9a96eadf6ceb6793fbdb7c03bf48efee",
-      "shortSha": "970d5b7",
-      "subject": "fix(quick-play): Word Hunt told players to watch an ad to play again today",
+      "sha": "c10b121439e596e61b1ada37363d6d990f9769b2",
+      "shortSha": "c10b121",
+      "subject": "feat(pricing): tighten the free teacher tier to 1 class / 10 students",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:19:01+03:00"
+      "date": "2026-08-23T13:02:56+03:00"
     },
     {
-      "sha": "46b8d52908ca30b8b20036c9254b8426b957d0ec",
-      "shortSha": "46b8d52",
-      "subject": "fix(quick-play): boards were uniform random, so Q was as likely as E",
+      "sha": "59df42db025a2c6c4eccef8a88c8c4b2798de103",
+      "shortSha": "59df42d",
+      "subject": "feat(education/admin): show WHICH classrooms exist, named, with who opened each",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:18:33+03:00"
+      "date": "2026-08-23T12:53:15+03:00"
     },
     {
-      "sha": "9836339877137bc83a4ea8dac0fef98e2aa8ab90",
-      "shortSha": "9836339",
-      "subject": "feat(quick-play): the hub asked you to drag a dial at four unlabelled glyphs",
+      "sha": "9af5054c86c63ed961ac0a343e7fb5654239073c",
+      "shortSha": "9af5054",
+      "subject": "fix(checkout): ComebackBonusWrapper had the same effect-time-only guard",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T12:17:20+03:00"
+      "date": "2026-08-23T12:23:51+03:00"
     },
     {
-      "sha": "ba73c02cdcb2eb58f72689c23f456f463a245772",
-      "shortSha": "ba73c02",
-      "subject": "chore(practice): delete the code the retired routes were the only caller of",
+      "sha": "89a7ae23aac80ee356f2b50dad744c81d64a9fd5",
+      "shortSha": "89a7ae2",
+      "subject": "fix(checkout): the interstitial guard only held on first mount, and the 401 test was a placebo",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T11:49:02+03:00"
+      "date": "2026-08-23T12:15:33+03:00"
     },
     {
-      "sha": "54b07afd3621ba35fabf0afd78db125f17b7bfe4",
-      "shortSha": "54b07af",
-      "subject": "feat(ftue): retire the /practice routes behind permanent redirects",
+      "sha": "8b15297624ec334e096f2fb28e3eb8c557828318",
+      "shortSha": "8b15297",
+      "subject": "fix: show auth modal instead of generic error on 401 Unauthorized from checkout",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T11:30:19+03:00"
+      "date": "2026-08-23T12:04:30+03:00"
     },
     {
-      "sha": "712e2475dc2f46876e6d436deab83d7efffa3c54",
-      "shortSha": "712e247",
-      "subject": "feat(ftue): take practice off the hub, and give single-player a stuck coach",
+      "sha": "2ac62784884d56de075cf8bd3c1b870e28312ae0",
+      "shortSha": "2ac6278",
+      "subject": "fix: suppress interstitial modals on Teacher Pro upgrade checkout page",
       "author": "Ohad Fisher",
-      "date": "2026-08-15T10:53:32+03:00"
+      "date": "2026-08-23T11:56:07+03:00"
     }
   ]
 }

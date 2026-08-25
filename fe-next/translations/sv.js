@@ -12471,7 +12471,13 @@ const sv = {
       "manageSubscription": "Hantera prenumeration",
       "districtTitle": "Skola eller kommun?",
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
-      "districtCta": "Kontakta oss för skolpriser"
+      "districtCta": "Kontakta oss för skolpriser",
+      "priceTaxNote": "Skatt visas i kassan",
+      "valueHeadline": "Skalera din undervisning utan gränser",
+      "featureOutcome1": "Undervisa obegränsat många klasser utan att oroa dig för gränser",
+      "featureOutcome2": "Lägg till hur många elever som helst — utan krångel och väntan",
+      "featureOutcome3": "Realtidsspårning av framsteg för alla dina elever",
+      "featureOutcome4": "Jämför undervisningsstrategier över alla dina klasser samtidigt"
     },
     "teacher": {
       "activeGames": "Aktiva spel",
@@ -13134,9 +13140,9 @@ const sv = {
       "title": "LexiClash Utbildning",
       "startGame": "Starta spel",
       "hero": {
-        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
+        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska, spanska och ryska",
         "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
-        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 6 språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
         "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
@@ -13286,6 +13292,24 @@ const sv = {
         "title": "För skolor och distrikt",
         "body": "Hanterar du 5+ klassrum? Kontakta oss för volympriser.",
         "button": "Kontakta oss för distriktspris"
+      },
+      "pro": {
+        "title": "Teacher Pro — lås upp ditt klassrum",
+        "subtitle": "Gratis att starta. Pro växer med dina behov.",
+        "freeTier": "Gratis plan",
+        "proTier": "Pro",
+        "perMonth": "/månad",
+        "classLimit": "Upp till {count} klassrum",
+        "classLimitPro": "Obegränsade klassrum",
+        "studentLimit": "Upp till {count} elever per klassrum",
+        "studentLimitPro": "Obegränsade elever",
+        "noAds": "Noll annonser på elevvägar",
+        "analytics": "Klassanalys och insikter",
+        "customLists": "Anpassade ordlistor",
+        "duels": "Klassdueller",
+        "chooseNow": "Uppgradera till Pro",
+        "freeForever": "Helt gratis. Alltid.",
+        "whyNow": "Varför nu: Ditt första klassrum är begränsat till {count} elever. Behöver du fler? Ett klick för 500+ elever och 50+ klassrum."
       },
       "esl-word-games": {
         "course_name": "Ordspel för ESL och språkundervisning",

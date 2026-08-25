@@ -63,7 +63,11 @@ describe('free tier limits', () => {
   it.each(locales)('%s advertises the caps by interpolation, never a literal', (file) => {
     const src = readFileSync(join(TRANSLATIONS, file), 'utf8');
 
-    for (const key of ['freeClasses', 'freeStudents']) {
+    // `classLimit`/`studentLimit` belong to the Pro-framing block on the education landing
+    // page, added after this test was written — it advertises the same caps from a second
+    // place, which is how the original bug happened. Each of these key names is unique
+    // across the file, so the first match is the right one.
+    for (const key of ['freeClasses', 'freeStudents', 'classLimit', 'studentLimit']) {
       const match = src.match(new RegExp(`"${key}":\\s*"([^"]*)"`));
       expect(match, `${file} is missing "${key}"`).not.toBeNull();
       const value = match![1];
@@ -72,6 +76,18 @@ describe('free tier limits', () => {
       // …and must not ALSO carry a hardcoded quantity that would contradict it.
       expect(value, `${file} "${key}" still hardcodes a number`).not.toMatch(/\d/);
     }
+
+    // `whyNow` names the student cap inside a sentence, so it cannot use the no-digits rule
+    // above — it legitimately carries the Pro figures ("500+", "50+"). It must still take the
+    // cap by interpolation, and must not restate it as a literal beside the interpolated one.
+    const whyNow = src.match(/"whyNow":\s*"([^"]*)"/);
+    expect(whyNow, `${file} is missing "whyNow"`).not.toBeNull();
+    expect(whyNow![1], `${file} "whyNow" must interpolate {count}`).toContain('{count}');
+    const bareCap = new RegExp(`(?<!\\d)${FREE_TIER_LIMITS.studentsPerClass}(?!\\d)`);
+    expect(
+      whyNow![1].replace('{count}', ''),
+      `${file} "whyNow" hardcodes the student cap`,
+    ).not.toMatch(bareCap);
 
     // The retired keys must be gone, or a stale bundle could render the old promise.
     expect(src, `${file} still has the pre-2026-08-23 key free2Classes`).not.toContain(

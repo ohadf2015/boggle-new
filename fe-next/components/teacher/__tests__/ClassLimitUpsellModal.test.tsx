@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ClassLimitUpsellModal from '../ClassLimitUpsellModal';
 
 const mockTrackGrowthEvent = vi.fn();
@@ -55,6 +56,26 @@ describe('ClassLimitUpsellModal', () => {
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', {
       cta: 'district_upsell',
       source: 'class_limit_modal',
+    });
+  });
+
+  it('emits iap_viewed event when modal opens', () => {
+    // GIVEN — modal is closed
+    mockTrackGrowthEvent.mockClear();
+    const { rerender } = render(
+      <ClassLimitUpsellModal isOpen={false} onClose={vi.fn()} currentCount={2} limit={2} />
+    );
+
+    // WHEN — modal opens
+    rerender(
+      <ClassLimitUpsellModal isOpen={true} onClose={vi.fn()} currentCount={2} limit={2} />
+    );
+
+    // THEN — iap_viewed event is emitted with source and limit info
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
+      source: 'class_limit',
+      currentCount: 2,
+      limit: 2,
     });
   });
 });

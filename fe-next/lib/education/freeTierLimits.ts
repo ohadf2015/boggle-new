@@ -1,5 +1,5 @@
 /**
- * The free-tier caps — the paywall, in one place.
+ * The free-tier caps and Teacher Pro pricing — the paywall, in one place.
  *
  * Lives in its own module, not in lib/lemonsqueezy.ts, because the upgrade PAGE has to
  * render these numbers and it is a client component: importing the tier config directly
@@ -18,3 +18,6 @@ export const FREE_TIER_LIMITS = {
   /** Students per classroom on the free tier. */
   studentsPerClass: 10,
 } as const;
+
+/** Teacher Pro monthly price in USD. Used by client-side upgrade/landing pages. */
+export const TEACHER_PRO_PRICE_USD = 9;

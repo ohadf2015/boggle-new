@@ -11241,7 +11241,13 @@ const en = {
       "manageSubscription": "Manage Subscription",
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
-      "districtCta": "Get in touch for school pricing"
+      "districtCta": "Get in touch for school pricing",
+      "priceTaxNote": "Taxes shown at checkout",
+      "valueHeadline": "Scale your teaching without limits",
+      "featureOutcome1": "Teach unlimited classes without worrying about hitting a cap",
+      "featureOutcome2": "Add as many students as you need — no waiting or management headaches",
+      "featureOutcome3": "Real-time progress tracking across all your students",
+      "featureOutcome4": "Compare teaching strategies across all your classes at once"
     }
   },
   "education": {
@@ -11472,9 +11478,9 @@ const en = {
       "title": "LexiClash Education",
       "startGame": "Start Game",
       "hero": {
-        "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
+        "eyebrow": "For teachers in EN / HE / SV / JA / ES / RU classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 6 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Approved in ~24h",
@@ -11624,6 +11630,24 @@ const en = {
         "title": "For schools & districts",
         "body": "Running 5+ classrooms? Ask us about bulk & district pricing.",
         "button": "Contact for District Pricing"
+      },
+      "pro": {
+        "title": "Teacher Pro — unlock your classroom",
+        "subtitle": "Free gets you started. Pro scales with your growth.",
+        "freeTier": "Free Plan",
+        "proTier": "Pro",
+        "perMonth": "/month",
+        "classLimit": "Up to {count} class",
+        "classLimitPro": "Unlimited classes",
+        "studentLimit": "Up to {count} students per class",
+        "studentLimitPro": "Unlimited students",
+        "noAds": "Zero ads on student routes",
+        "analytics": "Class analytics & insights",
+        "customLists": "Custom word lists",
+        "duels": "Classroom duels",
+        "chooseNow": "Upgrade to Pro",
+        "freeForever": "Totally free. Always.",
+        "whyNow": "Why now: Your first class is capped at {count} students. Hit the wall fast? One click to 500+ students and 50+ classes."
       },
       "esl-word-games": {
         "course_name": "LexiClash ESL Word Games",
