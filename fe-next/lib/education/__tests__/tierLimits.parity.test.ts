@@ -15,8 +15,71 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { FREE_TIER_LIMITS } from '../freeTierLimits';
 import { getTierConfig } from '../../lemonsqueezy';
+// @ts-expect-error — translations are untyped .js bundles
+import { en } from '../../../translations/en';
 
 const TRANSLATIONS = join(__dirname, '../../../translations');
+const UPGRADE_PAGE = join(__dirname, '../../../app/[locale]/teacher/upgrade/PageClient.tsx');
+
+/**
+ * Quantity nouns are stoplisted: "1 class" on the free side and "Unlimited classes" on the Pro
+ * side SHOULD share the word "class" — that is the upsell, not a contradiction. Short words go
+ * too, so "for"/"and" cannot make two unrelated bullets look like the same promise.
+ */
+const STOPWORDS = new Set([
+  'class', 'classes', 'classroom', 'student', 'students', 'teacher', 'teachers',
+  'your', 'with', 'from', 'that', 'this', 'they', 'them', 'each', 'every',
+  'more', 'plan', 'free', 'everything', 'unlimited', 'count',
+]);
+
+/** Lowercase content words, singularised crudely so "report"/"reports" collide. */
+function contentWords(text: string): string[] {
+  return [
+    ...new Set(
+      text
+        .toLowerCase()
+        .split(/[^a-z]+/)
+        .filter((w) => w.length > 3)
+        .map((w) => (w.endsWith('s') ? w.slice(0, -1) : w))
+        .filter((w) => !STOPWORDS.has(w) && !STOPWORDS.has(`${w}s`)),
+    ),
+  ];
+}
+
+/** Walk a dotted t() key through the English bundle. Returns '' if the key is absent. */
+function englishFor(key: string): string {
+  let node: unknown = en;
+  for (const part of key.split('.')) {
+    if (typeof node !== 'object' || node === null) return '';
+    node = (node as Record<string, unknown>)[part];
+  }
+  return typeof node === 'string' ? node : '';
+}
+
+/**
+ * The free column as the page actually renders it: every `t('…')` in the `freeFeatures` array
+ * paired with the `included` flag that decides whether it draws a tick or a cross. Reading the
+ * source is crude, but the alternative is rendering a client component that needs auth,
+ * routing and a language provider to say something this test could just look up.
+ */
+function freeRowsOnUpgradePage(): Array<{ key: string; text: string; included: boolean }> {
+  const src = readFileSync(UPGRADE_PAGE, 'utf8');
+  const start = src.indexOf('const freeFeatures = [');
+  expect(start, 'upgrade page no longer declares freeFeatures').toBeGreaterThan(-1);
+  const block = src.slice(start, src.indexOf('\n  ];', start));
+
+  const rows: Array<{ key: string; text: string; included: boolean }> = [];
+  for (const [, key, included] of block.matchAll(
+    /t\('([^']+)'[\s\S]*?included:\s*(true|false)/g,
+  )) {
+    const text = englishFor(key);
+    expect(text, `upgrade page renders t('${key}') but en.js has no such key`).not.toBe('');
+    // Interpolated count rows carry no feature claim — the interpolation tests below own them.
+    if (text.includes('{count}')) continue;
+    rows.push({ key, text, included: included === 'true' });
+  }
+  return rows;
+}
 
 describe('free tier limits', () => {
   it('enforces exactly the shared constant, not a retyped copy of it', () => {
@@ -69,6 +132,54 @@ describe('free tier limits', () => {
       const src = readFileSync(join(__dirname, site), 'utf8');
       expect(src, `${site} renders AnalyticsDashboard`).toContain('AnalyticsDashboard');
       expect(src, `${site} renders AnalyticsDashboard without a ProGate`).toContain('ProGate');
+    }
+  });
+
+  it('does not give away on the pricing page what ProGate refuses in the product', () => {
+    // The third surface. `getTierConfig` and ProFramingSection agreed with each other; the
+    // pricing page — the largest of the three and the only one with a Buy button — was never
+    // read by this test, so it drifted alone. It listed "Daily progress reports" as a FREE
+    // bullet while its own Pro column sold reporting, and while 2026-08-25 moved analytics and
+    // printable reports behind ProGate. A teacher reads the free bullet, upgrades nothing,
+    // opens the dashboard and meets an upsell for the thing the pricing page promised.
+    //
+    // The forbidden words are derived from the Pro config at runtime, never hardcoded: a test
+    // that bans the literal "reports" goes stale the moment Pro sells something else, which is
+    // exactly the hand-maintained-list failure it exists to prevent.
+    const rows = freeRowsOnUpgradePage();
+    expect(rows.length, 'could not parse freeFeatures out of the upgrade page').toBeGreaterThan(0);
+
+    const proSells = getTierConfig('pro')
+      .features.filter((f) => !/^Unlimited /.test(f) && f !== 'Everything in Free')
+      .flatMap(contentWords);
+    expect(proSells.length, 'Pro sells no nameable feature to check against').toBeGreaterThan(0);
+
+    for (const row of rows.filter((r) => r.included)) {
+      const shared = contentWords(row.text).filter((w) => proSells.includes(w));
+      expect(
+        shared,
+        `the upgrade page gives away "${row.text}" for free, but Pro sells ${JSON.stringify(shared)}`,
+      ).toEqual([]);
+    }
+  });
+
+  it('advertises every free feature the config actually ships', () => {
+    // The other half: drift can drop a real free feature as easily as invent one. Custom word
+    // lists, duels and no-ads are what get a teacher to a first lesson — leaving them off the
+    // free column makes the free tier look thinner than it is and the $9 harder to justify,
+    // because the reader cannot see what the money adds ON TOP of.
+    const shown = freeRowsOnUpgradePage()
+      .filter((r) => r.included)
+      .flatMap((r) => contentWords(r.text));
+
+    const shipped = getTierConfig('free').features.filter((f) => !f.includes('{count}'));
+    for (const feature of shipped) {
+      const words = contentWords(feature);
+      if (words.length === 0) continue; // a pure count row, covered by the interpolation tests
+      expect(
+        words.some((w) => shown.includes(w)),
+        `free tier ships "${feature}" but the upgrade page never says so`,
+      ).toBe(true);
     }
   });
 
@@ -129,5 +240,12 @@ describe('free tier limits', () => {
     expect(src, `${file} still has the pre-2026-08-23 key free30Students`).not.toContain(
       'free30Students',
     );
+
+    // Retired 2026-08-25 with the free/Pro contradiction on the pricing page. Left in the
+    // bundle they are live ammunition: a future edit reaches for a plausible-sounding
+    // `dailyProgressReports` and re-promises for free the reporting ProGate refuses.
+    for (const key of ['basicWordTracking', 'dailyProgressReports']) {
+      expect(src, `${file} still has the retired key ${key}`).not.toContain(key);
+    }
   });
 });

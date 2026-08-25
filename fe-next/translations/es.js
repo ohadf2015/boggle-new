@@ -12225,8 +12225,6 @@ const es = {
       "freeForever": "Gratis para siempre, siempre disponible",
       "freeClasses": "Hasta {count} clase",
       "freeStudents": "Hasta {count} estudiantes por clase",
-      "basicWordTracking": "Seguimiento básico de palabras",
-      "dailyProgressReports": "Informes de progreso diarios",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Todo lo que necesitas para crecer",
       "popular": "Más popular",
@@ -12250,7 +12248,20 @@ const es = {
       "featureOutcome1": "Enseña clases ilimitadas sin preocuparte por alcanzar un límite",
       "featureOutcome2": "Agrega tantos estudiantes como necesites sin gestión ni esperas",
       "featureOutcome3": "Seguimiento de progreso en tiempo real de todos tus estudiantes",
-      "featureOutcome4": "Compara estrategias de enseñanza en todas tus clases a la vez"
+      "featureOutcome4": "Compara estrategias de enseñanza en todas tus clases a la vez",
+      "matrix": {
+        "title": "Compara los planes",
+        "featureColumn": "Qué incluye",
+        "unlimited": "Ilimitado",
+        "classes": "Clases",
+        "studentsPerClass": "Alumnos por clase",
+        "customLists": "Listas de palabras propias",
+        "duels": "Duelos de clase",
+        "noAds": "Sin anuncios para los alumnos",
+        "analytics": "Analíticas e informes imprimibles",
+        "included": "Incluido",
+        "notIncluded": "No incluido"
+      }
     },
     "accessRequired": "Acceso de Profesor Requerido",
     "accessDenied": "Necesitas permisos de profesor para esta página.",

@@ -1,6 +1,62 @@
 {
-  "generatedAt": "2026-08-25T09:56:55.917Z",
+  "generatedAt": "2026-08-25T14:08:20.719Z",
   "commits": [
+    {
+      "sha": "85832ea0a0fc61bb65d4d160ece4882d0debcbb0",
+      "shortSha": "85832ea",
+      "subject": "wip(education): gauntlet round — student-facing cap copy, contrast + layout tests, asset cull",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T16:33:15+03:00"
+    },
+    {
+      "sha": "bf34c7d01d2faa9a60759427e27cb56eab8c3c06",
+      "shortSha": "bf34c7d",
+      "subject": "feat(education): give Teacher Pro something free teachers can't have",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T16:21:55+03:00"
+    },
+    {
+      "sha": "fcb68fedf73647b473abcf6b8eca5ac5f1e628e9",
+      "shortSha": "fcb68fe",
+      "subject": "feat(revenue): ask the teacher for the $9 at the one moment it makes sense — trial expiry (#849)",
+      "author": "ohadf2015",
+      "date": "2026-08-25T15:18:08+03:00"
+    },
+    {
+      "sha": "2b43cdadf807f6576f2f69315a9b817b2ab3540e",
+      "shortSha": "2b43cda",
+      "subject": "fix(education): make the Pro pricing card readable",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T14:42:45+03:00"
+    },
+    {
+      "sha": "729ff57bdc10ea67f50940f8487f2e677191b5d4",
+      "shortSha": "729ff57",
+      "subject": "fix(education): let students actually join a classroom",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T14:24:50+03:00"
+    },
+    {
+      "sha": "9334517e523dac706604ae569848483e7a7860b6",
+      "shortSha": "9334517",
+      "subject": "feat(education): surface create-classroom CTA and curriculum lists to new teachers",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T13:52:22+03:00"
+    },
+    {
+      "sha": "6bfd490b21db7855bb7ddd8ffd7616ccf75f40e7",
+      "shortSha": "6bfd490",
+      "subject": "fix(teacher): let the server own the checkout gate; derive the hero's locale count",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T13:52:14+03:00"
+    },
+    {
+      "sha": "d955ff25756538c638248906820791c72203ee98",
+      "shortSha": "d955ff2",
+      "subject": "feat(education): sell Teacher Pro on the landing page, sourced from the caps",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T12:58:19+03:00"
+    },
     {
       "sha": "baf78c10e88bebef418e59554e15b2206f31337d",
       "shortSha": "baf78c1",
@@ -84,62 +140,6 @@
       "subject": "perf(lexiclash): remaining PSI levers for landing >60 (#846)",
       "author": "ohadf2015",
       "date": "2026-08-24T00:27:51+03:00"
-    },
-    {
-      "sha": "1c9fe11edfab2ba564c27037df1ac21accfb7ffd",
-      "shortSha": "1c9fe11",
-      "subject": "perf(lexiclash): remaining PSI levers — defer GrowthRadar/Feedback scripts, reserve AdSense anchor height, fix landing blog test",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T21:26:43Z"
-    },
-    {
-      "sha": "6e5ecfccc6a8d40606de74ff6e4ed0b57cde09b1",
-      "shortSha": "6e5ecfc",
-      "subject": "WIP: LexiClash perf levers (t_63d9f85a)",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T21:11:00Z"
-    },
-    {
-      "sha": "c10b121439e596e61b1ada37363d6d990f9769b2",
-      "shortSha": "c10b121",
-      "subject": "feat(pricing): tighten the free teacher tier to 1 class / 10 students",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T13:02:56+03:00"
-    },
-    {
-      "sha": "59df42db025a2c6c4eccef8a88c8c4b2798de103",
-      "shortSha": "59df42d",
-      "subject": "feat(education/admin): show WHICH classrooms exist, named, with who opened each",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T12:53:15+03:00"
-    },
-    {
-      "sha": "9af5054c86c63ed961ac0a343e7fb5654239073c",
-      "shortSha": "9af5054",
-      "subject": "fix(checkout): ComebackBonusWrapper had the same effect-time-only guard",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T12:23:51+03:00"
-    },
-    {
-      "sha": "89a7ae23aac80ee356f2b50dad744c81d64a9fd5",
-      "shortSha": "89a7ae2",
-      "subject": "fix(checkout): the interstitial guard only held on first mount, and the 401 test was a placebo",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T12:15:33+03:00"
-    },
-    {
-      "sha": "8b15297624ec334e096f2fb28e3eb8c557828318",
-      "shortSha": "8b15297",
-      "subject": "fix: show auth modal instead of generic error on 401 Unauthorized from checkout",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T12:04:30+03:00"
-    },
-    {
-      "sha": "2ac62784884d56de075cf8bd3c1b870e28312ae0",
-      "shortSha": "2ac6278",
-      "subject": "fix: suppress interstitial modals on Teacher Pro upgrade checkout page",
-      "author": "Ohad Fisher",
-      "date": "2026-08-23T11:56:07+03:00"
     }
   ]
 }

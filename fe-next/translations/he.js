@@ -12079,8 +12079,6 @@ const he = {
       "freeForever": "חינם לתמיד, תמיד זמין",
       "freeClasses": "עד {count} כיתה",
       "freeStudents": "עד {count} תלמידים בכיתה",
-      "basicWordTracking": "מעקב מילים בסיסי",
-      "dailyProgressReports": "דוחות התקדמות יומיים",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "כל מה שצריך כדי לצמוח",
       "popular": "הכי פופולרי",
@@ -12104,7 +12102,20 @@ const he = {
       "featureOutcome1": "לימדו מספר בלתי מוגבל של כיתות ללא חשש מגבול",
       "featureOutcome2": "הוסיפו כמה תלמידים שתצטרכו — ללא צרור ניהול",
       "featureOutcome3": "מעקב התקדמות בזמן אמת בכל התלמידים שלכם",
-      "featureOutcome4": "השוו אסטרטגיות הוראה בכל הכיתות שלכם בו זמנית"
+      "featureOutcome4": "השוו אסטרטגיות הוראה בכל הכיתות שלכם בו זמנית",
+      "matrix": {
+        "title": "השוואת מסלולים",
+        "featureColumn": "מה כלול",
+        "unlimited": "ללא הגבלה",
+        "classes": "כיתות",
+        "studentsPerClass": "תלמידים בכיתה",
+        "customLists": "רשימות מילים משלכם",
+        "duels": "דו-קרב כיתתי",
+        "noAds": "בלי פרסומות לתלמידים",
+        "analytics": "נתונים ודוחות להדפסה",
+        "included": "כלול",
+        "notIncluded": "לא כלול"
+      }
     },
     "teacher": {
       "activeGames": "משחקים פעילים",

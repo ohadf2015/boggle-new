@@ -12223,8 +12223,6 @@ const ja = {
       "freeForever": "ずっと無料、いつでも利用可能",
       "freeClasses": "最大{count}クラス",
       "freeStudents": "クラスあたり最大{count}人",
-      "basicWordTracking": "基本的な単語トラッキング",
-      "dailyProgressReports": "毎日の進捗レポート",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "拡大に必要なすべて",
       "popular": "一番人気",
@@ -12248,7 +12246,20 @@ const ja = {
       "featureOutcome1": "クラス数の制限を気にせず無制限のクラスを教えられます",
       "featureOutcome2": "生徒数に制限なく追加でき、管理の手間が省けます",
       "featureOutcome3": "すべての生徒の進捗をリアルタイムで追跡できます",
-      "featureOutcome4": "すべてのクラスの指導戦略を同時に比較できます"
+      "featureOutcome4": "すべてのクラスの指導戦略を同時に比較できます",
+      "matrix": {
+        "title": "プラン比較",
+        "featureColumn": "含まれるもの",
+        "unlimited": "無制限",
+        "classes": "クラス数",
+        "studentsPerClass": "1クラスの生徒数",
+        "customLists": "オリジナル単語リスト",
+        "duels": "クラス対戦",
+        "noAds": "生徒に広告なし",
+        "analytics": "分析と印刷用レポート",
+        "included": "あり",
+        "notIncluded": "なし"
+      }
     },
     "teacher": {
       "activeGames": "進行中のゲーム",

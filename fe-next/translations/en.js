@@ -11231,8 +11231,6 @@ const en = {
       "freeForever": "Forever free, always available",
       "freeClasses": "Up to {count} class",
       "freeStudents": "Up to {count} students per class",
-      "basicWordTracking": "Basic word tracking",
-      "dailyProgressReports": "Daily progress reports",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
       "popular": "Most Popular",
@@ -11256,7 +11254,20 @@ const en = {
       "featureOutcome1": "Teach unlimited classes without worrying about hitting a cap",
       "featureOutcome2": "Add as many students as you need — no waiting or management headaches",
       "featureOutcome3": "Real-time progress tracking across all your students",
-      "featureOutcome4": "Compare teaching strategies across all your classes at once"
+      "featureOutcome4": "Compare teaching strategies across all your classes at once",
+      "matrix": {
+        "title": "Compare plans",
+        "featureColumn": "What you get",
+        "unlimited": "Unlimited",
+        "classes": "Classrooms",
+        "studentsPerClass": "Students per classroom",
+        "customLists": "Custom word lists",
+        "duels": "Classroom duels",
+        "noAds": "Zero ads for students",
+        "analytics": "Analytics & printable reports",
+        "included": "Included",
+        "notIncluded": "Not included"
+      }
     }
   },
   "education": {

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { PlanComparisonMatrix } from '@/components/teacher/PlanComparisonMatrix';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
@@ -97,10 +98,25 @@ export default function UpgradePricingPageClient() {
       }),
       included: true,
     },
-    { label: t('teacher.subscription.basicWordTracking'), included: true },
-    { label: t('teacher.subscription.dailyProgressReports'), included: true },
+    // These three are the real free tier — the same three the landing page's free card lists,
+    // both sourced from getTierConfig('free'). They are deliberately generous: word lists,
+    // duels and no-ads are what get a teacher to a first lesson, and a teacher who never runs
+    // a lesson never buys anything.
+    //
+    // The `education.landing.pro.*` namespace is borrowed rather than duplicated here. These
+    // are the same five sentences about the same two tiers, already translated into six
+    // locales; a parallel `teacher.subscription.*` copy would be one more place to drift.
+    { label: t('education.landing.pro.customLists'), included: true },
+    { label: t('education.landing.pro.duels'), included: true },
+    { label: t('education.landing.pro.noAds'), included: true },
     { label: t('teacher.subscription.unlimitedClasses'), included: false },
     { label: t('teacher.subscription.unlimitedStudents'), included: false },
+    // The one crossed-out FEATURE, and the reason the $9 is legible at all. Until 2026-08-25
+    // this column instead promised "Basic word tracking" and "Daily progress reports" as free
+    // — while the Pro column beside it sold reporting, and while ProGate refuses analytics in
+    // the product. The page sold the same thing on both sides of its own table, then the
+    // dashboard upsold what the pricing page had already given away.
+    { label: t('education.landing.pro.analytics'), included: false },
   ];
 
   // Pro leads with outcome-driven value propositions, not just features.
@@ -110,7 +126,7 @@ export default function UpgradePricingPageClient() {
     t('teacher.subscription.featureOutcome1'), // Unlimited classes without cap worry
     t('teacher.subscription.featureOutcome2'), // Add students without waiting/headaches
     t('teacher.subscription.featureOutcome3'), // Real-time progress tracking
-    t('teacher.subscription.featureOutcome4'), // Daily reports showing what works
+    t('teacher.subscription.featureOutcome4'), // Compare strategies across all your classes
   ];
 
   // ponytail: no per-student anchor here on purpose. Dividing the Pro price by the
@@ -322,6 +338,11 @@ export default function UpgradePricingPageClient() {
             </div>
           ))}
         </div>
+
+        {/* The same two tiers as the cards above, with the rows aligned. It sits AFTER the
+            cards and the risk-reversal chips on purpose: a teacher who has already decided
+            never needs it, and a teacher who has not is the one who wants to read across. */}
+        <PlanComparisonMatrix />
 
         {/* FAQ Section */}
         <div className="bg-neo-navy-light border-3 border-black rounded-neo p-7 sm:p-8 mb-12 shadow-hard">

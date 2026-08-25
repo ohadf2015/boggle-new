@@ -32,6 +32,21 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({
   useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
 }));
 
+/**
+ * The dashboard on this page sits behind ProGate as of 2026-08-25, so a teacher's Pro state now
+ * decides whether it renders at all. Without this mock ProGate ran the real hook, which fetches
+ * and starts `loading: true` — and ProGate deliberately renders NOTHING while loading, so every
+ * assertion below looked like "the dashboard is broken" when it was "the teacher hasn't been
+ * told they're paid up yet".
+ *
+ * Default is Pro so the rendering tests keep testing rendering. The gate itself is covered
+ * explicitly at the bottom of this file, in both directions.
+ */
+const teacherPro = { hasPro: true, loading: false };
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => teacherPro,
+}));
+
 // Mock all analytics components
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
   AnalyticsDashboard: ({ classroomId }: any) => (
@@ -69,7 +84,11 @@ vi.mock('@/components/teacher/analytics/LiveActivityIndicator', () => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
-    locale: 'en',
+    // `language` is what the real context exposes (contexts/LanguageContext.tsx) and what every
+    // consumer destructures. This mock used to offer `locale` instead — a key the context does
+    // not have — so anything building a localised href under it got `/undefined/…` and no test
+    // noticed, because none of them asserted an href.
+    language: 'en',
   }),
 }));
 
@@ -124,6 +143,45 @@ describe('AnalyticsPageClient', () => {
     expect(screen.getByText('education.analytics.viewStudents')).toBeInTheDocument();
     expect(screen.getByText('education.analytics.viewLessons')).toBeInTheDocument();
     expect(screen.getByText('education.analytics.viewVocabulary')).toBeInTheDocument();
+  });
+
+  // ============================================
+  // PAYWALL
+  // ============================================
+
+  describe('Teacher Pro gate', () => {
+    afterEach(() => {
+      teacherPro.hasPro = true;
+      teacherPro.loading = false;
+    });
+
+    it('withholds the dashboard from a teacher without Pro, and offers the upgrade', () => {
+      teacherPro.hasPro = false;
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      expect(screen.queryByTestId('analytics-dashboard')).not.toBeInTheDocument();
+      // The gate must SELL, not just refuse — a bare "not available" is the version of this
+      // paywall that loses the sale it exists to make.
+      expect(screen.getByText('teacher.proGate.analytics.title')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'teacher.proGate.cta' })).toHaveAttribute(
+        'href',
+        '/en/teacher/upgrade',
+      );
+    });
+
+    it('shows neither the dashboard nor the upsell until Pro state resolves', () => {
+      // Fail-closed without flashing. Painting the dashboard and yanking it away is the
+      // Class-1 optimistic-default bug; painting the upsell tells a PAYING teacher to pay
+      // again, which is worse. The only correct first paint is nothing.
+      teacherPro.hasPro = false;
+      teacherPro.loading = true;
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      expect(screen.queryByTestId('analytics-dashboard')).not.toBeInTheDocument();
+      expect(screen.queryByText('teacher.proGate.analytics.title')).not.toBeInTheDocument();
+    });
   });
 
   it('should render back button with correct link', () => {

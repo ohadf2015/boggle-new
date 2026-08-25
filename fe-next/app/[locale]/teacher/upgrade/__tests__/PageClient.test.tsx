@@ -124,9 +124,15 @@ describe('UpgradePricingPageClient', () => {
   it('mobile: Pro card appears first in document order (order-1), Free second (order-2)', () => {
     render(<UpgradePricingPageClient />);
 
-    // Get both card containers
-    const proPlanCard = screen.getByText('teacher.subscription.proPlanName').closest('div')?.parentElement;
-    const freePlanCard = screen.getByText('teacher.subscription.freePlanName').closest('div')?.parentElement;
+    // Get both card containers. Queried by HEADING, not by text: each plan name also
+    // appears as a column header in the comparison matrix further down the page, so a bare
+    // getByText matches two nodes. The card is the one that titles a section.
+    const proPlanCard = screen
+      .getByRole('heading', { name: 'teacher.subscription.proPlanName' })
+      .closest('div')?.parentElement;
+    const freePlanCard = screen
+      .getByRole('heading', { name: 'teacher.subscription.freePlanName' })
+      .closest('div')?.parentElement;
 
     expect(proPlanCard).toHaveClass('order-1');
     expect(freePlanCard).toHaveClass('order-2');
@@ -169,7 +175,9 @@ describe('UpgradePricingPageClient', () => {
     expect(screen.getByText('teacher.subscription.featureOutcome4')).toBeInTheDocument();
 
     // Verify these are in the Pro card (which is on the page)
-    const proPlanCard = screen.getByText('teacher.subscription.proPlanName').closest('div')?.parentElement;
+    const proPlanCard = screen
+      .getByRole('heading', { name: 'teacher.subscription.proPlanName' })
+      .closest('div')?.parentElement;
     expect(proPlanCard).toBeInTheDocument();
   });
 

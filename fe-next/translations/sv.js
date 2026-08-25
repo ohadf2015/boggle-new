@@ -12461,8 +12461,6 @@ const sv = {
       "freeForever": "Gratis för alltid, alltid tillgänglig",
       "freeClasses": "Upp till {count} klass",
       "freeStudents": "Upp till {count} elever per klass",
-      "basicWordTracking": "Grundläggande ordspårning",
-      "dailyProgressReports": "Dagliga framstegsrapporter",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Allt du behöver för att växa",
       "popular": "Populärast",
@@ -12486,7 +12484,20 @@ const sv = {
       "featureOutcome1": "Undervisa obegränsat många klasser utan att oroa dig för gränser",
       "featureOutcome2": "Lägg till hur många elever som helst — utan krångel och väntan",
       "featureOutcome3": "Realtidsspårning av framsteg för alla dina elever",
-      "featureOutcome4": "Jämför undervisningsstrategier över alla dina klasser samtidigt"
+      "featureOutcome4": "Jämför undervisningsstrategier över alla dina klasser samtidigt",
+      "matrix": {
+        "title": "Jämför planer",
+        "featureColumn": "Det här ingår",
+        "unlimited": "Obegränsat",
+        "classes": "Klasser",
+        "studentsPerClass": "Elever per klass",
+        "customLists": "Egna ordlistor",
+        "duels": "Klassdueller",
+        "noAds": "Inga annonser för elever",
+        "analytics": "Analys och utskrivbara rapporter",
+        "included": "Ingår",
+        "notIncluded": "Ingår inte"
+      }
     },
     "teacher": {
       "activeGames": "Aktiva spel",
