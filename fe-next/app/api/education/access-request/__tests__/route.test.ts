@@ -6,7 +6,8 @@ let mockUser:
   | { id: string; email: string | null; email_confirmed_at: string | null; user_metadata?: Record<string, unknown> }
   | null = null;
 let recentCount = 0;
-let mockProfile: { display_name?: string | null; username?: string | null; country_code?: string | null } | null = null;
+let mockProfile: { display_name?: string | null; username?: string | null; country_code?: string | null; user_role?: string | null; is_admin?: boolean | null } | null = null;
+let profileFetchError: any = null;
 let insertMock = vi.fn(async () => ({ data: { id: 'req-1' }, error: null }));
 let approveMock = vi.fn(async (_args?: any) => ({ data: [{ id: 'req-1' }], error: null }));
 let adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
@@ -24,7 +25,7 @@ vi.mock('@/utils/supabase/server', () => ({
           gte: vi.fn(async () => ({ data: [], count: recentCount, error: null })),
           // Profile lookup for server-derived name/country
           maybeSingle: vi.fn(async () =>
-            table === 'profiles' ? { data: mockProfile, error: null } : { data: null, error: null }
+            table === 'profiles' ? { data: mockProfile, error: profileFetchError } : { data: null, error: null }
           ),
         })),
       })),
@@ -96,6 +97,7 @@ describe('POST /api/education/access-request', () => {
     mockUser = verifiedUser();
     recentCount = 0;
     mockProfile = { display_name: 'Jane Doe', username: 'janed', country_code: 'US' };
+    profileFetchError = null;
     insertMock = vi.fn(async () => ({ data: { id: 'req-1' }, error: null }));
     approveMock = vi.fn(async () => ({ data: [{ id: 'req-1' }], error: null }));
     adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
@@ -169,6 +171,77 @@ describe('POST /api/education/access-request', () => {
     expect(res.status).toBe(429);
     expect(insertMock).not.toHaveBeenCalled();
     expect(approveMock).not.toHaveBeenCalled();
+  });
+
+  describe('profile fetch error handling: fail-closed on genuine errors', () => {
+    it('500s and does not insert when profile fetch returns an error', async () => {
+      profileFetchError = { code: 'CONNECTION_TIMEOUT', message: 'Connection timeout' };
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(500);
+      expect(insertMock).not.toHaveBeenCalled();
+      expect(approveMock).not.toHaveBeenCalled();
+    });
+
+    it('allows normal filing when profile fetch returns null with no error (brand-new user)', async () => {
+      profileFetchError = null;
+      mockProfile = null;
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      expect(insertMock).toHaveBeenCalledTimes(1);
+      expect(approveMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('idempotency guard: already-teacher short-circuit', () => {
+    it('returns 200 and does not insert when profile already has user_role=teacher', async () => {
+      mockProfile = { display_name: 'Jane Doe', username: 'janed', country_code: 'US', user_role: 'teacher', is_admin: false };
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+      expect(json.alreadyApproved).toBe(true);
+      expect(insertMock).not.toHaveBeenCalled();
+      expect(approveMock).not.toHaveBeenCalled();
+      expect(adminSelectMock).not.toHaveBeenCalled();
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    });
+
+    it('returns 200 and does not insert when profile already has user_role=admin', async () => {
+      mockProfile = { display_name: 'Jane Doe', username: 'janed', country_code: 'US', user_role: 'admin', is_admin: false };
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+      expect(json.alreadyApproved).toBe(true);
+      expect(insertMock).not.toHaveBeenCalled();
+      expect(approveMock).not.toHaveBeenCalled();
+      expect(adminSelectMock).not.toHaveBeenCalled();
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    });
+
+    it('returns 200 and does not insert when profile already has is_admin=true', async () => {
+      mockProfile = { display_name: 'Jane Doe', username: 'janed', country_code: 'US', user_role: 'student', is_admin: true };
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+      expect(json.alreadyApproved).toBe(true);
+      expect(insertMock).not.toHaveBeenCalled();
+      expect(approveMock).not.toHaveBeenCalled();
+      expect(adminSelectMock).not.toHaveBeenCalled();
+      expect(sendEmailMock).not.toHaveBeenCalled();
+    });
+
+    it('still files normally for a student without teacher access', async () => {
+      mockProfile = { display_name: 'Jane Doe', username: 'janed', country_code: 'US', user_role: 'student', is_admin: false };
+      const res = await POST(mkReq(validPayload));
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.ok).toBe(true);
+      expect(insertMock).toHaveBeenCalledTimes(1);
+      expect(approveMock).toHaveBeenCalledTimes(1);
+      expect(adminSelectMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('instant auto-approval', () => {

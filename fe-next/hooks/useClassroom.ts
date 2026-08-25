@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
 import {
@@ -51,9 +51,17 @@ export function useClassrooms(): UseClassroomsReturn {
     error: null,
   });
 
+  // Depend on the user ID, not the user OBJECT. `fetchClassrooms` is a dependency of the
+  // initial-fetch effect below, so if this callback's identity changes on every render the
+  // effect refires on every render and the hook fetches in a loop. Today `AuthContext`
+  // memoises its value so `user` is reference-stable and that does not happen — but the hook
+  // should not be one refactor of that memo away from hammering the DB. The ID is all this
+  // callback actually reads.
+  const userId = user?.id;
+
   // Fetch all classrooms for the current teacher
   const fetchClassrooms = useCallback(async () => {
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userId) {
       setState(prev => ({
         ...prev,
         classrooms: [],
@@ -63,7 +71,7 @@ export function useClassrooms(): UseClassroomsReturn {
     }
 
     try {
-      const { data, error } = await getClassrooms(user.id);
+      const { data, error } = await getClassrooms(userId);
 
       if (isMounted.current) {
         setState({
@@ -82,7 +90,7 @@ export function useClassrooms(): UseClassroomsReturn {
         }));
       }
     }
-  }, [isAuthenticated, user, isMounted]);
+  }, [isAuthenticated, userId, isMounted]);
 
   // Refresh classroom list
   const refresh = useCallback(async () => {
@@ -210,6 +218,55 @@ export function useClassrooms(): UseClassroomsReturn {
       });
     }
   }, [isAuthenticated, fetchClassrooms]);
+
+  // Refetch when the teacher comes back to the dashboard, so member counts are not stale.
+  // (A student joining is otherwise invisible: the initial fetch runs once per auth change.)
+  //
+  // Both guards live in REFS, and `state.isLoading` is deliberately NOT a dependency. Holding
+  // them in the effect body instead is subtly broken: `isLoading` in the deps makes this effect
+  // re-run twice per fetch, and a `let` declared inside the effect resets on every re-run — so
+  // the debounce collapsed in exactly the case it exists for (focus + visibilitychange arriving
+  // together: the first refetch flips isLoading, the effect re-runs, the timestamp resets to 0,
+  // and the second event refetches again). Reading `isLoading` from the closure was stale too.
+  const lastRefetchAtRef = useRef(0);
+  const refetchInFlightRef = useRef(false);
+
+  useEffect(() => {
+    if (!isAuthenticated || !userId) {
+      return; // No listeners for signed-out visitors.
+    }
+
+    const REFETCH_DEBOUNCE_MS = 1000;
+
+    const maybeRefetch = async () => {
+      if (refetchInFlightRef.current) return;
+      const now = Date.now();
+      if (now - lastRefetchAtRef.current < REFETCH_DEBOUNCE_MS) return;
+      lastRefetchAtRef.current = now;
+      refetchInFlightRef.current = true;
+      try {
+        await refresh();
+      } finally {
+        refetchInFlightRef.current = false;
+      }
+    };
+
+    // Only a transition INTO visible is interesting — hiding the tab must not fetch.
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') void maybeRefetch();
+    };
+    const handleFocus = () => {
+      void maybeRefetch();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isAuthenticated, userId, refresh]);
 
   return {
     ...state,

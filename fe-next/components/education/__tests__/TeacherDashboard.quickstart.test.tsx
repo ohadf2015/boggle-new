@@ -78,9 +78,21 @@ vi.mock('@/components/teacher/dashboard', () => ({
   DuelMonitoringPanel: () => <div data-testid="duel-monitoring-panel" />,
 }));
 
-// ── useClassrooms ────────────────────────────────────────────────────────────
+// ── useClassrooms (controlled per test) ────────────────────────────────────────
+const mockClassroomsState = {
+  classrooms: [],
+};
+
 vi.mock('@/hooks/useClassroom', () => ({
-  useClassrooms: () => ({ classrooms: [] }),
+  useClassrooms: () => ({
+    classrooms: mockClassroomsState.classrooms,
+    isLoading: false,
+    error: null,
+    refresh: vi.fn(),
+    createClassroom: vi.fn(),
+    updateClassroom: vi.fn(),
+    deleteClassroom: vi.fn(),
+  }),
 }));
 
 // ── useRecentGameSettings (controlled per test) ──────────────────────────────
@@ -119,6 +131,8 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
     mockPush.mockClear();
     mockGetMostRecent.mockReset();
     mockHasRecentConfig.value = false;
+    // Reset classrooms for each test
+    mockClassroomsState.classrooms = [];
   });
 
   describe('conditional rendering', () => {
@@ -134,10 +148,22 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
       expect(screen.queryByText('Quick Start')).not.toBeInTheDocument();
     });
 
-    it('should render QuickStartButton when a recent config exists', () => {
-      // GIVEN — there is a saved game configuration
+    it('should render QuickStartButton when a recent config exists AND classrooms exist', () => {
+      // GIVEN — there is a saved game configuration AND at least one classroom
+      // (QuickStart is now gated on classrooms.length > 0 to prevent dead-ending)
       mockHasRecentConfig.value = true;
       mockGetMostRecent.mockReturnValue(makeConfig());
+      mockClassroomsState.classrooms = [
+        {
+          id: 'cls-1',
+          name: 'Math Class',
+          language: 'en',
+          teacher_id: 'user1',
+          join_code: 'ABC123',
+          created_at: '2026-01-01',
+          member_count: 5,
+        },
+      ];
 
       // WHEN
       render(<TeacherDashboard />);
@@ -150,6 +176,17 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
       // GIVEN
       mockHasRecentConfig.value = true;
       mockGetMostRecent.mockReturnValue(makeConfig({ classroomName: 'Science Lab' }));
+      mockClassroomsState.classrooms = [
+        {
+          id: 'cls-1',
+          name: 'Math Class',
+          language: 'en',
+          teacher_id: 'user1',
+          join_code: 'ABC123',
+          created_at: '2026-01-01',
+          member_count: 5,
+        },
+      ];
 
       // WHEN
       render(<TeacherDashboard />);
@@ -164,6 +201,17 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
       // GIVEN
       mockHasRecentConfig.value = true;
       mockGetMostRecent.mockReturnValue(makeConfig({ lessonIds: ['lesson-42'] }));
+      mockClassroomsState.classrooms = [
+        {
+          id: 'cls-1',
+          name: 'Math Class',
+          language: 'en',
+          teacher_id: 'user1',
+          join_code: 'ABC123',
+          created_at: '2026-01-01',
+          member_count: 5,
+        },
+      ];
 
       render(<TeacherDashboard />);
 
@@ -181,6 +229,17 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
       // GIVEN — language is 'en' (from mock)
       mockHasRecentConfig.value = true;
       mockGetMostRecent.mockReturnValue(makeConfig({ lessonIds: ['lesson-99'] }));
+      mockClassroomsState.classrooms = [
+        {
+          id: 'cls-1',
+          name: 'Math Class',
+          language: 'en',
+          teacher_id: 'user1',
+          join_code: 'ABC123',
+          created_at: '2026-01-01',
+          member_count: 5,
+        },
+      ];
 
       render(<TeacherDashboard />);
 
@@ -197,6 +256,17 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
       // GIVEN — edge case: config exists but lesson list is empty
       mockHasRecentConfig.value = true;
       mockGetMostRecent.mockReturnValue(makeConfig({ lessonIds: [] }));
+      mockClassroomsState.classrooms = [
+        {
+          id: 'cls-1',
+          name: 'Math Class',
+          language: 'en',
+          teacher_id: 'user1',
+          join_code: 'ABC123',
+          created_at: '2026-01-01',
+          member_count: 5,
+        },
+      ];
 
       render(<TeacherDashboard />);
 

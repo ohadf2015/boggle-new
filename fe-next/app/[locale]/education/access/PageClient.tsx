@@ -12,7 +12,7 @@ import { isReducedMotionPreferred } from '@/utils/accessibility';
 
 export function PageClient() {
   const { t, language } = useLanguage();
-  const { status, latestRequest, hasAccess, trial } = useTeacherAccess();
+  const { status, latestRequest, hasAccess, trial, isLoading } = useTeacherAccess();
 
   // Hero (h1 + lede): GSAP timeline on mount.
   const heroRef = useRef<HTMLDivElement>(null);
@@ -91,7 +91,15 @@ export function PageClient() {
           </p>
         </div>
 
-        {hasAccess && (
+        {isLoading && (
+          <div
+            ref={statusRef}
+            aria-hidden="true"
+            className="mt-6 h-40 animate-pulse rounded-neo bg-neo-navy/40"
+          />
+        )}
+
+        {!isLoading && (hasAccess || status === 'approved') && (
           <div
             ref={statusRef}
             className="mt-6 rounded-neo border-neo bg-neo-lime p-6 text-neo-navy shadow-hard"
@@ -111,7 +119,7 @@ export function PageClient() {
           </div>
         )}
 
-        {!hasAccess && status === 'pending' && (
+        {!isLoading && status === 'pending' && (
           <div
             ref={statusRef}
             className="mt-6 rounded-neo border-neo bg-neo-cyan p-6 text-neo-navy shadow-hard"
@@ -126,7 +134,7 @@ export function PageClient() {
           </div>
         )}
 
-        {!hasAccess && status === 'declined' && (
+        {!isLoading && status === 'declined' && (
           <div
             ref={statusRef}
             className="mt-6 rounded-neo border-neo bg-neo-pink p-6 text-neo-white shadow-hard"
@@ -141,12 +149,28 @@ export function PageClient() {
           </div>
         )}
 
-        {!hasAccess && status !== 'pending' && status !== 'declined' && (
+        {!isLoading && status === 'none' && (
           <div
             ref={statusRef}
             className="mt-6 rounded-neo border-neo-thick bg-neo-navy-light p-6 text-neo-white shadow-hard-lg"
           >
             <AccessRequestGate />
+          </div>
+        )}
+
+        {!isLoading && status !== 'pending' && status !== 'declined' && status !== 'approved' && status !== 'none' && (
+          <div
+            ref={statusRef}
+            className="mt-6 rounded-neo border-neo bg-neo-purple p-6 text-neo-white shadow-hard"
+          >
+            <h2 className="text-xl font-bold font-neo-display">{t('education.access.status_unknown_title')}</h2>
+            <p className="mt-2 text-neo-white">{t('education.access.status_unknown_body')}</p>
+            <Link
+              href={`/${language}/teacher`}
+              className="mt-4 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+            >
+              {t('education.access.go_to_teacher')}
+            </Link>
           </div>
         )}
 
