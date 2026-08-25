@@ -11206,6 +11206,7 @@ const en = {
       "autoRenew": "Renews automatically each month. Cancel anytime.",
       "upgradeNow": "Upgrade to Pro Now",
       "checkoutError": "Failed to start checkout. Please try again.",
+      "checkoutUnavailable": "Teacher Pro isn’t open for purchase yet. Nothing went wrong on your end.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
       "upgradePricingTitle": "Upgrade to Teacher Pro",
@@ -11480,7 +11481,7 @@ const en = {
       "hero": {
         "eyebrow": "For teachers in EN / HE / SV / JA / ES / RU classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 6 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Approved in ~24h",

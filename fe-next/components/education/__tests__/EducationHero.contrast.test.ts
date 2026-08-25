@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { locales } from '@/lib/i18n';
 
 /**
  * Two independent ways the teacher-acquisition hero can ship broken. Both are
@@ -67,6 +68,47 @@ describe('EducationHero', () => {
       dimmedNavy,
       `dimmed navy copy on a navy ground: ${dimmedNavy.join(', ')}`,
     ).toEqual([]);
+  });
+
+  it('derives its language claim from the shipped locale list', () => {
+    // The hero advertised "EN / HE / SV / JA / ES" and "Built natively for 5
+    // languages" while `lib/i18n.js` shipped six locales including `ru`. A Russian
+    // teacher read a list that excluded them, on the page whose only job is getting
+    // them to request access. Same hand-maintained-list shape as the classroom-create
+    // Zod enum that 400'd every `es` teacher.
+    //
+    // Asserting "contains RU" would just restart the clock on the next locale, so the
+    // requirement is that the claim is computed from `locales`, never spelled out.
+    // Scoped to the two education-hero lines on purpose. `en.js` carries roughly ten
+    // more "5 languages" claims in SEO descriptions and the about page; those are a
+    // separate sweep and a whole-file assertion would fail on them.
+    const en = fs
+      .readFileSync(path.resolve(__dirname, '../../../translations/en.js'), 'utf8')
+      .split('\n');
+
+    const eyebrow = en.find((l) => l.includes('"eyebrow"') && /teacher/i.test(l));
+    const sub = en.find((l) => l.includes('"sub"') && /classroom|word list/i.test(l));
+    expect(eyebrow, 'could not locate the education hero eyebrow in en.js').toBeTruthy();
+    expect(sub, 'could not locate the education hero sub in en.js').toBeTruthy();
+
+    // The count is interpolated, so it can never disagree with what ships.
+    expect(sub!, 'hero sub must interpolate {count}, not hardcode a number').toContain(
+      '{count}',
+    );
+    expect(sub!, 'hero sub still hardcodes a language count').not.toMatch(
+      /\b\d+ languages\b/i,
+    );
+    expect(src, 'hero must read the locale count from lib/i18n').toMatch(/\blocales\b/);
+
+    // Tripwire. The eyebrow names the languages in each locale's own words
+    // ("עברית, אנגלית…", "英語・ヘブライ語…"), which reads better than injected
+    // ASCII codes — so it stays hand-written, and this fails when a seventh
+    // locale ships so somebody has to go update that copy on purpose.
+    expect(
+      locales.length,
+      'a locale was added or removed: update education.landing.hero.eyebrow in all '
+      + `${locales.length} translation files, then bump this number`,
+    ).toBe(6);
   });
 
   it('renders the copy before the product mock on mobile', () => {

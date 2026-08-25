@@ -19,11 +19,15 @@ export default function UpgradePricingPageClient() {
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  // Live since 2026-08-23: the Polar till is open (Teacher Pro $9/mo, real card iframe) and this
-  // flag is set to 'true' on the Railway service. It is inlined at BUILD time, so it also needs
-  // `ARG NEXT_PUBLIC_CHECKOUT_ENABLED` in the builder stage of fe-next/Dockerfile — without that
-  // the bundle bakes it as undefined and the CTA silently no-ops. The API enforces this too (503).
-  const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
+  // ponytail: no client-side checkout flag. There used to be one
+  // (`NEXT_PUBLIC_CHECKOUT_ENABLED === 'true'`) and it shipped the only revenue button in the
+  // product as `disabled` in production while the server was ready to sell — `NEXT_PUBLIC_*` is
+  // inlined at BUILD time, so the bundle held a frozen copy of a value the API re-reads on every
+  // request. Two readers of one value, and the stale one won the render.
+  //
+  // /api/subscription/checkout already refuses with 503 when the till is shut, and that gate sits
+  // BEFORE its auth check, so nobody can reach Polar past it. One gate, server-side, always fresh.
+  // A 503 is surfaced below instead of being pre-empted here.
 
   // Mark this page as a conversion surface to suppress modals that would block the CTA.
   // This runtime signal is read by PWAInstallPrompt and ComebackBonusWrapper before
@@ -41,7 +45,6 @@ export default function UpgradePricingPageClient() {
   }, []);
 
   const handleUpgrade = async () => {
-    if (!checkoutEnabled) return;
     setIsLoading(true);
     try {
       const response = await fetch('/api/subscription/checkout', {
@@ -53,6 +56,12 @@ export default function UpgradePricingPageClient() {
         if (response.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
           setShowAuthModal(true);
+          return;
+        }
+        // 503 is the server's own "till is shut" refusal. Retrying cannot fix it, so the generic
+        // "please try again" would loop the teacher forever.
+        if (response.status === 503) {
+          toast.error(t('teacher.subscription.checkoutUnavailable'));
           return;
         }
         toast.error(t('teacher.subscription.checkoutError'));
@@ -268,7 +277,7 @@ export default function UpgradePricingPageClient() {
 
             <Button
               onClick={handleUpgrade}
-              disabled={isLoading || !checkoutEnabled}
+              disabled={isLoading}
               className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
             >
               {isLoading

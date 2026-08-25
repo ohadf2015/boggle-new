@@ -58,4 +58,29 @@ describe('EducationHero', () => {
     fireEvent.click(screen.getByRole('link', { name: /education\.landing\.hero\.cta_schools/ }));
     expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('hero_for_schools');
   });
+
+  it('ensures h1 and primary CTA precede the product mock in source order (mobile-first)', () => {
+    const { container } = render(<EducationHero />);
+    const h1 = screen.getByRole('heading', { level: 1 });
+    const primaryCTA = screen.getByRole('link', { name: 'education.landing.hero.cta_primary' });
+    const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
+
+    // H1 should come before CTA (semantic order)
+    expect(h1.compareDocumentPosition(primaryCTA) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // Both should come before mock in DOM order (prevents mobile reflow pushing CTA off-screen)
+    expect(h1.compareDocumentPosition(mockElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(primaryCTA.compareDocumentPosition(mockElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('does not apply unprefixed order-* classes to the mock (prevents mobile reflow)', () => {
+    const { container } = render(<EducationHero />);
+    const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
+    const className = mockElement?.className ?? '';
+
+    // Unprefixed `order-first` at every breakpoint would hoist mock above copy on mobile
+    expect(className).not.toMatch(/\border-first\b/);
+    expect(className).not.toMatch(/\border-last\b/);
+    expect(className).not.toMatch(/\border-\d+\b/);
+  });
 });

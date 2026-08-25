@@ -160,12 +160,65 @@ describe('UpgradePricingPageClient', () => {
     expect(proPlanCard).toBeInTheDocument();
   });
 
-  it('displays price-per-student anchor alongside price-per-day', () => {
+  it('anchors on price-per-day and states where tax appears', () => {
     render(<UpgradePricingPageClient />);
 
-    // Both anchoring mechanisms should be present
     expect(screen.getByText('teacher.subscription.pricePerDay')).toBeInTheDocument();
-    // The price per student is interpolated, so we check for the key + amount
-    expect(screen.getByText(/teacher.subscription.pricePerStudent/)).toBeInTheDocument();
+    // Kahoot says "All prices include Tax" twice above the fold; silence on tax is a
+    // surprise for a teacher spending their own money. We say where it shows up rather
+    // than claiming it's included, because the checkout's tax handling isn't ours to
+    // promise.
+    expect(screen.getByText('teacher.subscription.priceTaxNote')).toBeInTheDocument();
+  });
+
+  // The single most expensive bug on this page: the CTA shipped `disabled` in production
+  // while the server was ready to take money. `NEXT_PUBLIC_*` is inlined at BUILD time, so
+  // the client held a frozen copy of a value the server re-reads every request — Class 1
+  // dual-source-of-truth, and the stale reader won the render. Proof the server was live:
+  // an anonymous POST to /api/subscription/checkout returned 401, and the route's 503 gate
+  // sits BEFORE its auth check, so 401 is only reachable once the gate has passed.
+  //
+  // So the server is the only gate. These two assert the client no longer holds a second one.
+  it('never gates the CTA on a build-time flag', () => {
+    // Read at render time, so deleting it here genuinely exercises the un-baked bundle.
+    delete process.env.NEXT_PUBLIC_CHECKOUT_ENABLED;
+    render(<UpgradePricingPageClient />);
+
+    const cta = screen.getByRole('button', { name: /upgradeNow/i });
+    expect(
+      cta,
+      'CTA is disabled when the flag is missing from the bundle — this is the production bug',
+    ).not.toBeDisabled();
+
+    fireEvent.click(cta);
+    expect(mockFetch, 'click did not reach the server; a client gate swallowed it').toHaveBeenCalledWith(
+      '/api/subscription/checkout',
+      { method: 'POST' },
+    );
+
+    process.env.NEXT_PUBLIC_CHECKOUT_ENABLED = 'true';
+  });
+
+  it('a 503 says checkout is not open yet rather than "try again"', async () => {
+    // The server's own "not available yet" refusal. Retrying can never fix it, so the
+    // generic checkoutError ("please try again") sends the teacher into a loop.
+    mockFetch.mockResolvedValue({ ok: false, status: 503 });
+    render(<UpgradePricingPageClient />);
+
+    fireEvent.click(screen.getByRole('button', { name: /upgradeNow/i }));
+    await vi.waitFor(() =>
+      expect(mockToastError).toHaveBeenCalledWith('teacher.subscription.checkoutUnavailable'),
+    );
+    expect(mockToastError).not.toHaveBeenCalledWith('teacher.subscription.checkoutError');
+  });
+
+  it('does not quote a per-student rate derived from the free-tier cap', () => {
+    render(<UpgradePricingPageClient />);
+
+    // Pro is unlimited students, so dividing $9 by the FREE cap (10) advertises the
+    // worst per-student rate Pro can have — a real class of 30 is $0.30, a hundred is
+    // $0.09. It anchored against the sale, so it's gone deliberately; this guards it
+    // from coming back.
+    expect(screen.queryByText(/pricePerStudent/)).not.toBeInTheDocument();
   });
 });

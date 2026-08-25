@@ -12200,6 +12200,7 @@ const es = {
       "autoRenew": "Se renueva automáticamente cada mes. Cancela cuando quieras.",
       "upgradeNow": "Mejora a Pro ahora",
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+      "checkoutUnavailable": "Teacher Pro aún no está disponible para comprar. No has hecho nada mal.",
       "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
       "currentPlan": "Estás en este plan",
       "upgradePricingTitle": "Mejora a Teacher Pro",
@@ -12906,7 +12907,7 @@ const es = {
       "hero": {
         "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés, español y ruso",
         "h1": "Juegos de vocabulario para tu aula — sin cuentas de estudiantes.",
-        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 6 idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
+        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para {count} idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
         "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",

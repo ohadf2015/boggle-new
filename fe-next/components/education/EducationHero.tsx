@@ -5,7 +5,23 @@ import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
+import { locales } from '@/lib/i18n';
 import { EducationModeMock } from './EducationModeMock';
+
+/**
+ * The hero's language *count* is derived from the shipped locale list rather than
+ * written into the copy. It read "Built natively for 5 languages" while
+ * `lib/i18n.js` already shipped `ru`, so a Russian teacher landed on
+ * /ru/education and was told the product didn't speak their language.
+ *
+ * The eyebrow's language *list* stays hand-written per locale on purpose: every
+ * non-English locale names the languages in its own words ("עברית, אנגלית…",
+ * "英語・ヘブライ語…"), which reads far better than injecting uppercase ASCII
+ * codes. `EducationHero.contrast.test.ts` carries a tripwire on
+ * `locales.length` so locale number seven has to revisit that copy instead of
+ * silently shipping a short list.
+ */
+const LANGUAGE_COUNT = String(locales.length);
 
 /**
  * Design tokens (from frontend-design skill):
@@ -103,7 +119,7 @@ export function EducationHero() {
             data-hero-item
             className="education-hero-sub mt-5 text-base sm:text-lg text-neo-cream/80"
           >
-            {t('education.landing.hero.sub')}
+            {t('education.landing.hero.sub', undefined, { count: LANGUAGE_COUNT })}
           </p>
 
           <div

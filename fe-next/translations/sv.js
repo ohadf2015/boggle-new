@@ -12436,6 +12436,7 @@ const sv = {
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
       "upgradeNow": "Uppgradera till Pro nu",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
+      "checkoutUnavailable": "Teacher Pro går inte att köpa än. Inget gick fel hos dig.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
       "upgradePricingTitle": "Uppgradera till Teacher Pro",
@@ -13142,7 +13143,7 @@ const sv = {
       "hero": {
         "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska, spanska och ryska",
         "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
-        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 6 språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
         "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
