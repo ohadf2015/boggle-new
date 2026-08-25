@@ -20,7 +20,9 @@ import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanne
 import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
+import PlayTabFirstRunCard from './PlayTabFirstRunCard';
 import QuickStartButton from './QuickStartButton';
+import StudentsPresentStrip from './StudentsPresentStrip';
 import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecentGameSettings';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
@@ -64,7 +66,7 @@ export default function TeacherDashboard() {
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
-  const { classrooms } = useClassrooms();
+  const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
 
   // Check if user has teacher access
@@ -186,32 +188,82 @@ export default function TeacherDashboard() {
         <AnimatePresence mode="wait">
           {activeTab === 'play' && (
             <m.div key="play" {...fadeSlide} className="space-y-6">
-              {/* Start Game CTA */}
-              <m.button
-                onClick={() => router.push(`/${language}/education/classroom-game`)}
-                whileHover={{ y: -3, boxShadow: '6px 6px 0px black' }}
-                whileTap={{ scale: 0.98, y: 1, boxShadow: '2px 2px 0px black' }}
-                className={cn(
-                  'w-full flex items-center gap-5 p-6 rounded-neo border-3 border-black',
-                  'bg-neo-cyan shadow-hard-lg text-left',
-                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
-                )}
-              >
-                <div className="w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm shrink-0">
-                  <Gamepad2 className="w-7 h-7 text-neo-cyan" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-neo-display font-black text-black uppercase tracking-tight">
-                    {t('education.classroomGame.startGame')}
-                  </h2>
-                  <p className="text-sm text-black/70 font-neo-body font-bold mt-0.5">
-                    {t('education.classroomGame.startGameDescription')}
+              {/* Start Game CTA — four-way branch: error, loading, empty, has classrooms */}
+              {classroomsError ? (
+                // Error state: show error card with retry (pessimistic — never show CTA or empty card).
+                // Solid cream card, matching the review-tab empty state below: the dashboard root is
+                // bg-neo-navy, so a translucent bg-neo-red/5 stays dark and the text-black copy would
+                // sit at ~1.3:1 against it. The red border carries the error semantic for free.
+                <m.div
+                  variants={fadeSlide}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  data-testid="play-tab-error-card"
+                  className="rounded-neo border-3 border-neo-red bg-neo-cream shadow-hard px-6 py-8 text-center"
+                >
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-neo-red bg-neo-red/10 shadow-hard-sm">
+                    <BarChart3 className="h-8 w-8 text-neo-red" />
+                  </div>
+                  <p className="text-black font-neo-body font-black text-lg text-balance">
+                    {t('teacher.dashboard.classroomLoadError')}
                   </p>
-                </div>
-              </m.button>
+                  <p className="mt-1 text-sm font-bold text-black/60 text-pretty">
+                    {t('teacher.dashboard.classroomLoadErrorHint')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => refreshClassrooms()}
+                    data-testid="play-tab-error-retry-button"
+                    className={cn(
+                      'mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-neo px-6 py-2.5',
+                      'border-3 border-black bg-neo-cyan font-neo-display font-black text-black shadow-hard',
+                      'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all',
+                      'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
+                    )}
+                  >
+                    {t('teacher.dashboard.retry')}
+                  </button>
+                </m.div>
+              ) : classroomsLoading ? (
+                // Loading: show neutral skeleton
+                <div className="w-full h-24 rounded-neo bg-neo-white/10 border-3 border-black/10 shadow-hard-sm animate-pulse" />
+              ) : classrooms.length === 0 ? (
+                // Empty state: show first-run card
+                <PlayTabFirstRunCard onCreateClassroom={() => setActiveTab('prepare')} />
+              ) : (
+                // Has classrooms: show students present strip + Start Game CTA
+                <>
+                  <m.div variants={fadeSlide}>
+                    <StudentsPresentStrip classrooms={classrooms} />
+                  </m.div>
+                  <m.button
+                  onClick={() => router.push(`/${language}/education/classroom-game`)}
+                  whileHover={{ y: -3, boxShadow: '6px 6px 0px black' }}
+                  whileTap={{ scale: 0.98, y: 1, boxShadow: '2px 2px 0px black' }}
+                  className={cn(
+                    'w-full flex items-center gap-5 p-6 rounded-neo border-3 border-black',
+                    'bg-neo-cyan shadow-hard-lg text-left',
+                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
+                  )}
+                >
+                  <div className="w-14 h-14 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm shrink-0">
+                    <Gamepad2 className="w-7 h-7 text-neo-cyan" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-neo-display font-black text-black uppercase tracking-tight">
+                      {t('education.classroomGame.startGame')}
+                    </h2>
+                    <p className="text-sm text-black/70 font-neo-body font-bold mt-0.5">
+                      {t('education.classroomGame.startGameDescription')}
+                    </p>
+                  </div>
+                </m.button>
+                </>
+              )}
 
-              {/* Quick Start */}
-              {hasRecentConfig && (
+              {/* Quick Start — gated on having classrooms (prevents dead-end with zero classrooms + recent config) */}
+              {hasRecentConfig && classrooms.length > 0 && (
                 <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
               )}
 

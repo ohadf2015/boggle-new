@@ -6,6 +6,7 @@ import { sendEmail } from '@/lib/email/send';
 import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdminNotify';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 import { teacherTrialExpiry } from '@/lib/education/trial';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
@@ -42,11 +43,19 @@ export async function POST(req: Request) {
   // Name and country are already captured at signup — never re-asked in the
   // form. Derive them from the account/profile so the stored request stays
   // consistent with the verified identity (single source of truth).
-  const { data: profile } = await sb
+  // Also fetch user_role and is_admin for the idempotency guard: if this
+  // account already has teacher access, short-circuit the request without
+  // inserting, updating, or emailing (idempotent success).
+  const { data: profile, error: profileError } = await sb
     .from('profiles')
-    .select('display_name, username, country_code')
+    .select('display_name, username, country_code, user_role, is_admin')
     .eq('id', user.id)
     .maybeSingle();
+
+  // Fail CLOSED on genuine profile fetch errors. maybeSingle() returns
+  // { data: null, error: null } when the row simply does not exist (legitimate
+  // for brand-new users); only a non-null error means "cannot verify, refuse to write".
+  if (profileError) return bad('profile fetch failed: ' + profileError.message, 500);
   const metaName =
     (user.user_metadata?.full_name as string | undefined) ||
     (user.user_metadata?.name as string | undefined) ||
@@ -55,6 +64,14 @@ export async function POST(req: Request) {
     .toString()
     .slice(0, 120);
   const country = profile?.country_code || undefined;
+
+  // Idempotency guard: if this account already has teacher access, return success
+  // without inserting, updating, or emailing. This prevents duplicate requests from
+  // racing to insert and then both approving the same row, and handles the case
+  // where a teacher re-submits after their first request auto-approved.
+  if (isTeacherProfile(profile)) {
+    return NextResponse.json({ ok: true, success: true, alreadyApproved: true });
+  }
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const recent = await sb
@@ -66,12 +83,9 @@ export async function POST(req: Request) {
 
   const payload: TeacherAccessFormPayload = { email, full_name, role, locale, use_case, school_or_org, country };
   const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
-  // 23505 = unique_violation from uniq_tar_one_pending_per_user: a racing
-  // second submit hit the one-pending-request-per-user index. That is the
-  // idempotency guard doing its job — the first request's row is canonical,
-  // so fall through and let the approval below promote it. Every other
-  // insert error is real.
-  if (ins.error && ins.error.code !== '23505') return bad('insert failed: ' + ins.error.message, 500);
+  // The idempotency guard (short-circuit above) protects against most duplicate
+  // submits, so insert errors are real and should not be silently tolerated.
+  if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
 
   // Access is granted INSTANTLY on submit — no manual review step. The insert
   // only records the request; approval promotes the account in the same
@@ -93,9 +107,8 @@ export async function POST(req: Request) {
     .eq('user_id', user.id)
     .eq('status', 'pending')
     .select('id');
-  // Approves this user's pending row (exactly one can exist —
-  // uniq_tar_one_pending_per_user), whether this request inserted it or a
-  // racing duplicate did and we fell through on 23505.
+  // Approves this user's pending row. This insert just created exactly one
+  // (or the idempotency guard short-circuited), so the approval should match.
   if (approve.error) return bad('approval failed: ' + approve.error.message, 500);
   if (!approve.data?.length) {
     // The racing twin request approved the row first — a double-submit
