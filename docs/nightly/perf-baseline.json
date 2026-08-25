@@ -1,36 +1,22 @@
 {
-  "date": "2026-08-17",
-  "note": "supabase MCP not used this run -- time budget spent on the frontend fix + impact-check verdict; STEP 1 backend deferred again (unindexed_foreign_keys on vocabulary_lessons and auth_db_connections_absolute carried unchanged, both non-actionable without MCP execute_sql/apply_migration). Frontend: brief's candidate routes (esl-word-games n=2, word-craft n=10, /he n=11, / n=20) were ALL below the mandatory 50-sample floor -- no regression verdict written for any of them, per sample-gate rule. Did a code-level pass instead (founder SPEED priority stands regardless of stats) and found a real bug: EducationHeroBanner's above-fold hero <img> (first content element on every /education/* page, incl. esl-word-games) had loading=\"lazy\" -- a lazy-loaded above-fold image is a textbook LCP delay (browser defers fetch start pending layout/intersection check instead of starting it immediately). Fixed to loading=\"eager\" + fetchPriority=\"high\". Also ran the brief's IMPACT CHECK for the 08-14 /friends LCP tween-removal: n=0 web_vitals events in the last 24h on /friends -- no-exposure, verdict written as neutral with an explicit no-exposure note (per learnings, never call a zero-denominator read a real confirmation).",
+  "date": "2026-08-25",
+  "note": "Impact-check focus night per brief. Both flagged shipped changes (word-tower ES daily LCP split 08-15, singleplayer dynamic-import 08-16) re-measured IMPROVED vs baseline, though both below the 50-sample floor (n=17, n=41) so treat as directional not conclusive. Backend: brief's only item (auth_db_connections_absolute) is a dashboard config toggle, not code -- non-actionable, unchanged from prior nights. Frontend brief routes (multiplayer variants, word-tower) were code-inspected: MultiplayerPageClient's MultiplayerFlow is already ssr:true with hero-image preload (fixed 08-21/08-22 per in-code comments), and the ES juego-de-palabras-multijugador hero already has next/image priority+sizes set. No new regression found worth a same-night edit; several of tonight's other touched files (multiplayer/page.tsx, dictionaryWorker.ts, useDictionaryCache.ts) are mid-edit by concurrent lanes -- left untouched per concurrent-session doctrine. No build run (time-budget discipline, no .next present to diff against).",
   "backend": {
-    "mcp_status": "not used this run -- time spent on frontend fix + impact verdict instead",
-    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- carried, non-actionable per learnings doc (small table, 5+ nights confirmed)",
-    "auth_db_connections_advisor": "dashboard config toggle, not a code/migration fix -- deferred to human queue"
+    "mcp_status": "supabase MCP did not connect within lane window -- not used this run",
+    "auth_db_connections_advisor": "dashboard config toggle, not a code/migration fix -- deferred to human queue, unchanged"
   },
   "frontend": {
-    "by_route_from_brief_sample_check": [
-      { "route": "/en/education/esl-word-games", "p75_lcp": 8460, "n": 2, "status": "below 50-sample floor -- no regression verdict; fixed the underlying code bug anyway (lazy hero image)" },
-      { "route": "/en/word-craft", "p75_lcp": 5712, "n": 10, "status": "below 50-sample floor -- not investigated this run, no obvious above-fold image/heavy-import issue found (game logic already dynamic-imported with ssr:false)" },
-      { "route": "/he", "p75_lcp": 4780, "n": 11, "status": "below 50-sample floor -- not investigated this run" },
-      { "route": "/", "p75_lcp": 1902, "n": 20, "status": "below 50-sample floor -- also no longer looks slow (1902ms vs brief's stale 4788ms), likely noise from a prior small-n snapshot" }
+    "impact_checks": [
+      { "verdict_for": "02-perf-2026-08-15-wordtower-leaderboard-split", "verdict": "improved", "measured_p75_lcp_ms": 6516, "n": 17, "baseline": 18176, "window": "7d (24h had n=3, below floor)" },
+      { "verdict_for": "02-perf-2026-08-16-singleplayer-lcp-dynamic-import", "verdict": "improved", "measured_p75_lcp_ms": 2910, "n": 41, "baseline": 7324, "window": "7d" }
     ],
-    "shipped_fix": {
-      "route": "all /[locale]/education/* pages using EducationHeroBanner (esl-word-games, for-schools, vocabulary-games-classroom, etc.)",
-      "file": "fe-next/components/education/EducationHeroBanner.tsx",
-      "change": "hero <img> (first content element after <main>, the LCP candidate on every education landing page) had loading=\"lazy\" -- switched to loading=\"eager\" + fetchPriority=\"high\". Left the <picture>/webp-source markup untouched (minimal diff, avoids breaking 2 existing tests that assert picture/source presence).",
-      "verified": "eslint run on the changed file (see report for result)"
-    },
-    "impact_check_result": {
-      "verdict_for": "02-perf-2026-08-14-friends-lcp-tween",
-      "verdict": "neutral",
-      "measured": 0,
-      "note": "n=0 in last 24h -- no-exposure, not a real re-measurement"
-    }
+    "brief_routes_code_reviewed_no_change": [
+      "es/multiplayer?quickPlay=true, en/multiplayer -- MultiplayerFlow already ssr:true + hero preload (prior fix)",
+      "es/juego-de-palabras-multijugador -- HeroAnimated already uses next/image priority+sizes"
+    ]
   },
   "bundle": {
-    "note": "not re-measured tonight -- no new imports/deps added, single one-line attribute change, no full build run (time-budget discipline)",
-    "carried_from_08-13": {
-      "total_chunks_kb": 31482,
-      "total_chunk_files": 964
-    }
+    "note": "not measured tonight -- no .next build present, skipped full build per time-budget rule",
+    "carried_from_08-17": { "total_chunks_kb": 31482, "total_chunk_files": 964 }
   }
 }
