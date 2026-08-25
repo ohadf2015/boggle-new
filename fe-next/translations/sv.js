@@ -12444,6 +12444,7 @@ const sv = {
       "upgradeNow": "Uppgradera till Pro nu",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "checkoutUnavailable": "Teacher Pro går inte att köpa än. Inget gick fel hos dig.",
+      "proHeroAlt": "En klass spelar LexiClash tillsammans, varje elev på sin egen enhet.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
       "upgradePricingTitle": "Uppgradera till Teacher Pro",
@@ -13317,6 +13318,7 @@ const sv = {
         "customLists": "Anpassade ordlistor",
         "duels": "Klassdueller",
         "chooseNow": "Uppgradera till Pro",
+        "comparisonAlt": "Gratisplan: ett enda låst klassrum. Teacher Pro: alla klassrum öppna och fulla.",
         "freeForever": "Helt gratis. Alltid.",
         "whyNow": "Varför nu: Ditt första klassrum är begränsat till {count} elever. Behöver du fler? Ett klick för 500+ elever och 50+ klassrum."
       },
@@ -13484,7 +13486,7 @@ const sv = {
     },
     "student": {
       "join": {
-        "alreadyMember": "Du är redan med i den här klassen",
+        "classroomFull": "Klassen är full – fråga din lärare.",
         "button": "Gå med",
         "clipboardError": "Kunde inte läsa urklipp",
         "codeHint": "6 bokstäver från din lärare",

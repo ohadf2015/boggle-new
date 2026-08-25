@@ -12206,6 +12206,7 @@ const ja = {
       "upgradeNow": "今すぐProにアップグレード",
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
       "checkoutUnavailable": "Teacher Pro はまだ購入できません。お客様側の問題ではありません。",
+      "proHeroAlt": "クラス全員がそれぞれの端末で一緒に LexiClash をプレイしている様子。",
       "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",
       "currentPlan": "現在のプランです",
       "upgradePricingTitle": "Teacher Proにアップグレード",
@@ -13079,6 +13080,7 @@ const ja = {
         "customLists": "カスタム単語リスト",
         "duels": "クラス対戦",
         "chooseNow": "Proにアップグレード",
+        "comparisonAlt": "無料プラン：施錠された教室が1つ。Teacher Pro：すべての教室が開放され、満員に。",
         "freeForever": "完全無料。永遠に。",
         "whyNow": "今すぐの理由：最初のクラスは{count}人の生徒に制限されています。もっと必要ですか？ 1クリックで500+人の生徒と50+クラスへ。"
       },
@@ -13233,7 +13235,7 @@ const ja = {
     "students": "生徒",
     "student": {
       "join": {
-        "alreadyMember": "すでにこのクラスのメンバーです",
+        "classroomFull": "このクラスは満員です。先生に連絡してください。",
         "button": "クラスに参加",
         "clipboardError": "クリップボードを読み取れませんでした",
         "codeHint": "6文字のクラスコードを先生に聞いてね",

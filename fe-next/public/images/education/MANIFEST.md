@@ -1,70 +1,53 @@
 # Education Pro Assets Manifest
 
-## Overview
-Three visual assets for `/teacher/upgrade` page and `ClassLimitUpsellModal`. All follow neo-brutalist design (dark navy ground #1a1a2e, hard-edged pixel shadows, solid black borders, electric colors: lime #BFFF00, cyan #00FFFF, pink #FF1493, purple #8B5CF6). **ZERO baked text** across all assets — all UI copy lives in page HTML via `t()` localization.
+Two static images. Both are wired into components; nothing here is unused.
 
-## Assets
+Every size and measurement below was taken from the file on disk on 2026-08-25
+(`wc -c`, `ffprobe`, `ffmpeg ssim`). An earlier version of this manifest quoted
+sizes and a motion figure that no shipped file ever had — see "Dropped assets".
 
-### pro-hero (Classroom Celebration Loop)
-**Purpose**: Decorative hero video for `/teacher/upgrade` page. Energetic classroom scene showing students celebrating Pro features.
+Neo-brutalist ground rules both follow: dark navy #1a1a2e, hard-edged pixel
+shadows (zero blur), solid black borders, electric lime #BFFF00 / cyan #00FFFF /
+pink #FF1493. **Zero baked text**, which is the whole reason one file can serve
+all six locales — meaning arrives through `alt={t(...)}` and the surrounding copy.
+Keep it that way if either is ever regenerated.
 
-**Files**:
-- `pro-hero.mp4` (234 KB, 960×540, 4s, h264 preset fast crf 28)
-- `pro-hero.webm` (270 KB, VP9 preset fast crf 32)
-- `pro-hero-poster.webp` (12 KB, first frame as poster)
+## pro-unlocks.webp — free-vs-Pro comparison
 
-**Description**: Dark navy isometric classroom, bright students with hands raised high in genuine upward motion celebrating, letter tiles actively falling from top with visible motion trails in lime and cyan colors, kawaii mascot in center bouncing with raised arms in celebration. Hard-edged pixel art style, solid black borders, no gradients.
+- 66,658 bytes, 1168×880
+- Used by `components/education/ProFramingSection.tsx`, above the two tier cards
+- Alt: `education.landing.pro.comparisonAlt`
 
-**Motion verification**: Palindrome loop (first 2s forward + reversed) measured SSIM 0.418 (frame 0 vs frame 2s midpoint), confirming visible real motion well below 0.92 threshold.
+Split composition. Left: stacked classrooms behind padlocks, desaturated. Right:
+more classrooms, open, full of students, lime and cyan. It makes the same argument
+the cards make below it, in one glance.
 
-**Localization**: No text, no numbers, no UI chrome. All copy supplied by page.
+## pro-hero-poster.webp — classroom mid-game
 
----
+- 54,540 bytes, 960×540
+- Used by `app/[locale]/teacher/upgrade/PageClient.tsx`, above the pricing cards,
+  with `priority` (it is above the fold on the one page that takes payment)
+- Alt: `teacher.subscription.proHeroAlt`
 
-### cap-hit (Free-Tier Limit Unlock)
-**Purpose**: Compact dashboard modal asset shown in `ClassLimitUpsellModal` when teacher hits free-tier class limit. Communicates opportunity contrast: what's blocked vs what's on the other side.
+Isometric classroom, students at their own devices, letter tiles, mascot centre.
+Despite the `-poster` name it is a plain still — see below for why.
 
-**Files**:
-- `cap-hit.mp4` (54 KB, 512×512, 3s, h264 preset fast crf 28)
-- `cap-hit.webm` (79 KB, VP9 preset fast crf 32)
-- `cap-hit-poster.webp` (2 KB, first frame as poster)
+## Dropped assets (2026-08-25)
 
-**Description**: Dark navy #1a1a2e background. Bright pink/magenta door frame on left side (solid black outline, hard 2px offset shadow) swings open with visible motion. Reveals packed classroom overflowing with many students at desks learning, colorful lime and cyan geometric book/papers floating. Flat vector style: solid black outlines, hard offset shadows (zero blur), no gradients, no glow. Semantic reading: the cap wall opens onto abundance, not emptiness.
+`pro-hero.mp4`, `pro-hero.webm`, `cap-hit.mp4`, `cap-hit.webm`, `cap-hit-poster.webp`
+were deleted. Measured, not assumed:
 
-**Motion verification**: Palindrome loop (first 1.5s forward + reversed) measured SSIM 0.805 (frame 0 vs frame 1.5s midpoint), confirming visible real motion below 0.92 threshold.
+- **`pro-hero` had no motion.** Frames extracted across its four seconds are the
+  same picture: SSIM frame-0 vs frame-2s = **0.990** (1.000 is identical). The
+  previous manifest claimed 0.418 "confirming visible real motion" — that figure
+  does not describe this file. 189 KB of MP4+WebM to deliver what the 54 KB
+  poster already delivers, so the poster ships alone.
+- **`cap-hit` was static too** (SSIM 0.978), and its doors are already open in
+  frame 0, so the "doors swing open" beat it was generated for never happens.
+  It also shows *empty* seats — the wrong argument for "unlimited students" — and
+  is dominated by `neo-yellow`, which the design system reserves for
+  celebration/gold, not generic chrome.
 
-**Localization**: No text, no numbers, no UI chrome. All copy supplied by modal.
-
----
-
-### pro-unlocks (Feature Comparison Infographic)
-**Purpose**: Static infographic for upgrade page comparison: what's included in free tier vs Pro tier.
-
-**Files**:
-- `pro-unlocks.webp` (65 KB, 1168×880, cwebp -q 85)
-
-**Description**: Hard-edged split composition on dark navy background. Left side: 2 stacked limited classrooms with padlocks (desaturated grey, muted colors, limited capability visual). Right side: 4 stacked unlimited classrooms with visible students (lime and cyan bright, energetic, abundant). All shapes use solid black borders and hard 2px offset shadows (zero blur). No text, no soft effects, no glow.
-
-**Localization**: No text, no numbers, no UI chrome. All feature list labels supplied by page via HTML.
-
----
-
-## Weight Budget
-- Pro-hero total: 516 KB (mp4 + webm + poster)
-- Cap-hit total: 135 KB (mp4 + webm + poster)
-- Pro-unlocks: 65 KB
-- **Grand total: 716 KB** (under 900 KB budget)
-
-## Encoding Notes
-- **Video codecs**: h264 mp4 (preset fast, crf 28), VP9 webm (preset fast, crf 32, b:v 0)
-- **Still format**: WebP (cwebp -q 85)
-- **Resolution**: Pro-hero 960×540 (16:9), Cap-hit 512×512 (1:1), Pro-unlocks 1168×880
-- **Seamless loops**: Pro-hero and cap-hit use palindrome structure (forward + reversed to eliminate loop seam) with verified motion SSIM ≤ 0.92
-- **Posters**: Extracted from actual video first frame to guarantee consistency
-
-## Usage Notes
-- All three assets are **purely decorative** (pro-hero) **or informational** (cap-hit, pro-unlocks)
-- No pixel-coordinate overlay regions — all text flows normally in page/modal HTML
-- All copy localization via `t()` in component code, never embedded in images
-- Videos use flexbox/max-width responsive scaling, posters scale with container
-- No hard-coded dimensions for text overlay or positioning
+If motion is wanted here later, generate it and verify the same way before
+wiring it: extract frames, look at them, and measure. A generation prompt asking
+for motion is not evidence that motion arrived.

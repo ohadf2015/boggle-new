@@ -78,6 +78,22 @@ describe('ProFramingSection', () => {
     expect(upgradeLink).toHaveAttribute('href', expect.stringContaining('/teacher/upgrade'));
   });
 
+  it('illustrates the free-vs-Pro comparison with localized alt text', () => {
+    renderComponent();
+
+    const art = screen.getByRole('img', { name: /./ });
+    expect(art.getAttribute('src') ?? '', 'comparison art is not wired to pro-unlocks').toContain(
+      'pro-unlocks',
+    );
+
+    // The artwork carries no baked-in text, which is what lets one file serve all six
+    // locales — but that only holds if the alt comes from t(). A raw key here means the
+    // image is announced to a screen reader as "education.landing.pro.comparisonAlt".
+    const alt = art.getAttribute('alt') ?? '';
+    expect(alt.length, 'comparison art has an empty alt').toBeGreaterThan(0);
+    expect(alt, 'alt is a raw translation key, not copy').not.toContain('education.landing');
+  });
+
   it('uses translation keys for all user-facing text', () => {
     // This is a structure check — the component should use t() for all copy.
     // If this test passes (component renders), it means t() is being called.

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -24,6 +25,20 @@ export function ProFramingSection() {
           {t('education.landing.pro.subtitle')}
         </p>
       </div>
+
+      {/* The same argument the two cards make below, in one glance: locked single room on
+          the left, every room open and full on the right. The artwork bakes in NO text,
+          which is what lets one file serve all six locales — the meaning arrives through
+          the alt string and the cards, both of which come from t(). Keep it that way if it
+          is ever regenerated. */}
+      <Image
+        src="/images/education/pro-unlocks.webp"
+        alt={t('education.landing.pro.comparisonAlt')}
+        width={1168}
+        height={880}
+        sizes="(max-width: 768px) 100vw, 640px"
+        className="mx-auto mb-10 w-full max-w-2xl rounded-neo border-neo border-black shadow-hard"
+      />
 
       {/* Two-column tier comparison */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -82,21 +97,24 @@ export function ProFramingSection() {
         </div>
 
         {/* Pro Tier */}
-        <div className="rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light p-6 shadow-hard-lg relative md:scale-105">
+        <div className="rounded-neo border-neo-thick border-black bg-neo-lime p-6 shadow-hard-lg relative md:scale-105">
           <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-neo-pink px-4 py-1 border-2 border-black rounded-neo">
             <span className="font-neo-display font-black text-black text-sm">
               ⭐ {t('teacher.subscription.popular')}
             </span>
           </div>
 
-          <h3 className="text-2xl font-neo-display font-black text-neo-white mb-4 mt-2">
+          {/* Navy ink, not white: this card's ground is lime. The white came from when the
+              card was navy — keeping it through the recolour is how the 1.32:1 original
+              happened in the first place. */}
+          <h3 className="text-2xl font-neo-display font-black text-neo-navy mb-4 mt-2">
             {t('education.landing.pro.proTier')}
           </h3>
 
-          <div className="mb-6 pb-6 border-b border-neo-white/20">
-            <p className="text-5xl font-neo-display font-black text-neo-white leading-none">
+          <div className="mb-6 pb-6 border-b border-neo-navy/20">
+            <p className="text-5xl font-neo-display font-black text-neo-navy leading-none">
               ${TEACHER_PRO_PRICE_USD}
-              <span className="text-base text-neo-white/80 font-bold ms-2">
+              <span className="text-base text-neo-navy/80 font-bold ms-2">
                 {t('education.landing.pro.perMonth')}
               </span>
             </p>
@@ -104,26 +122,28 @@ export function ProFramingSection() {
 
           <ul className="space-y-3 mb-6">
             <li className="flex items-start gap-3">
-              <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy">
                 {t('education.landing.pro.everythingInFree')}
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white font-bold">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
                 {t('education.landing.pro.classLimitPro')}
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white font-bold">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
                 {t('education.landing.pro.studentLimitPro')}
               </span>
             </li>
+            {/* customLists and duels deliberately absent — both ship free (see the free card).
+                Listing them here is what made the table say "$9 buys you the same thing". */}
             <li className="flex items-start gap-3">
-              <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white font-bold">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
                 {t('education.landing.pro.analytics')}
               </span>
             </li>
@@ -131,7 +151,7 @@ export function ProFramingSection() {
 
           <Link
             href={`/${language}/teacher/upgrade`}
-            className="inline-block w-full text-center rounded-neo bg-neo-cyan text-neo-navy font-bold py-3 border-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+            className="inline-block w-full text-center rounded-neo bg-neo-navy text-neo-lime font-bold py-3 border-neo border-black shadow-hard hover:shadow-hard-lg transition-shadow"
           >
             {t('education.landing.pro.chooseNow')}
           </Link>

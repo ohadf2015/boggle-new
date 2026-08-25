@@ -11214,6 +11214,7 @@ const en = {
       "upgradeNow": "Upgrade to Pro Now",
       "checkoutError": "Failed to start checkout. Please try again.",
       "checkoutUnavailable": "Teacher Pro isn’t open for purchase yet. Nothing went wrong on your end.",
+      "proHeroAlt": "A class playing LexiClash together, each student on their own device.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
       "upgradePricingTitle": "Upgrade to Teacher Pro",
@@ -11655,6 +11656,7 @@ const en = {
         "customLists": "Custom word lists",
         "duels": "Classroom duels",
         "chooseNow": "Upgrade to Pro",
+        "comparisonAlt": "Free plan: a single locked classroom. Teacher Pro: every classroom open and full.",
         "freeForever": "Totally free. Always.",
         "whyNow": "Why now: Your first class is capped at {count} students. Hit the wall fast? One click to 500+ students and 50+ classes."
       },
@@ -11823,7 +11825,7 @@ const en = {
     },
     "student": {
       "join": {
-        "alreadyMember": "Already in this class!",
+        "classroomFull": "This class is full — ask your teacher.",
         "button": "Join",
         "clipboardError": "Couldn't read clipboard",
         "codeHint": "6 characters from your teacher",

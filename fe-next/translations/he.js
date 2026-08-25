@@ -12062,6 +12062,7 @@ const he = {
       "upgradeNow": "שדרגו ל-Pro עכשיו",
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
       "checkoutUnavailable": "מנוי Teacher Pro עדיין לא פתוח לרכישה. לא עשיתם שום דבר לא תקין.",
+      "proHeroAlt": "כיתה משחקת ב-LexiClash יחד, כל תלמיד במכשיר שלו.",
       "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",
       "currentPlan": "אתם במסלול הזה",
       "upgradePricingTitle": "שדרוג ל-Teacher Pro",
@@ -12935,6 +12936,7 @@ const he = {
         "customLists": "רשימות מילים מותאמות",
         "duels": "דווקים כיתתיים",
         "chooseNow": "שדרגו ל-Pro",
+        "comparisonAlt": "תוכנית חינם: כיתה אחת נעולה. Teacher Pro: כל הכיתות פתוחות ומלאות.",
         "freeForever": "לגמרי חינם. תמיד.",
         "whyNow": "למה עכשיו: הכיתה הראשונה שלך מוגבלת ל-{count} תלמידים. צריכים עוד? קליק אחד וקבלו 500+ תלמידים ו-50+ כיתות."
       },
@@ -13102,7 +13104,7 @@ const he = {
     },
     "student": {
       "join": {
-        "alreadyMember": "כבר בכיתה!",
+        "classroomFull": "הכיתה מלאה — פנו למורה.",
         "button": "הצטרף",
         "clipboardError": "לא ניתן לקרוא מהלוח",
         "codeHint": "6 תווים מהמורה",

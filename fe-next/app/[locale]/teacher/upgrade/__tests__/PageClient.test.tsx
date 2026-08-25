@@ -26,6 +26,19 @@ vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
 
+// `priority` sends next/image down its preload path, which builds a `new URL(src)` with no
+// base — happy-dom's URL constructor rejects a relative path and the whole component throws,
+// taking every test in the file with it. An environment artifact, not a product bug: the same
+// component renders fine under the education suite's Image (no `priority`) and in a browser.
+// Renders a real <img> so `getByRole('img')` and `src` assert the actual contract.
+// Same approach as host/components/pre-game/__tests__/MobileShareSection.test.tsx.
+vi.mock('next/image', () => ({
+  default: ({ src, alt }: { src: string; alt: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} />
+  ),
+}));
+
 vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
@@ -210,6 +223,15 @@ describe('UpgradePricingPageClient', () => {
       expect(mockToastError).toHaveBeenCalledWith('teacher.subscription.checkoutUnavailable'),
     );
     expect(mockToastError).not.toHaveBeenCalledWith('teacher.subscription.checkoutError');
+  });
+
+  it('shows the classroom artwork above the plans', () => {
+    // This page was entirely text and bordered cards. The art is a real classroom mid-game,
+    // which is the thing being sold; the plans are only the price of it.
+    render(<UpgradePricingPageClient />);
+
+    const art = screen.getByRole('img', { name: /proHeroAlt/i });
+    expect(art.getAttribute('src') ?? '').toContain('pro-hero-poster');
   });
 
   it('does not quote a per-student rate derived from the free-tier cap', () => {

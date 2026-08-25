@@ -18,7 +18,8 @@ const joinClassroomSchema = z.object({
  * - 400: Invalid input or classroom not found
  * - 401: Unauthorized
  * - 403: Classroom at student limit (error code: STUDENT_LIMIT_REACHED)
- * - 409: Already a member
+ * - 200: Already a member (idempotent — an earlier version of this comment claimed 409,
+ *        which no branch below ever returns; callers treat a re-join as a success)
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {

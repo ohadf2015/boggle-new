@@ -107,18 +107,18 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
         toast.success(t('education.student.join.success'));
         // Redirect to student dashboard
         router.push(`/${language}/student`);
+      } else if (result.code === 'STUDENT_LIMIT_REACHED') {
+        // Full class. `result.error` is the server's English reason and names our free
+        // tier — never render it; the student can neither read it in their locale nor
+        // act on it.
+        trackEduClassroomJoin({ result: 'error' });
+        toast.error(t('education.student.join.classroomFull'));
+        setCodeError(true);
       } else {
-        // Handle specific error cases
-        if (result.error?.includes('already')) {
-          trackEduClassroomJoin({ result: 'success' });
-          toast.error(t('education.student.join.alreadyMember'));
-        } else if (result.error?.includes('not found')) {
-          trackEduClassroomJoin({ result: 'not_found' });
-          toast.error(t('education.student.join.invalidCode'));
-        } else {
-          trackEduClassroomJoin({ result: 'error' });
-          toast.error(result.error || t('education.student.join.invalidCode'));
-        }
+        // Everything else is a code the server could not resolve. Branching on the code
+        // rather than on English prose is what keeps this correct in all six locales.
+        trackEduClassroomJoin({ result: result.code === 'INVALID_CODE' ? 'not_found' : 'error' });
+        toast.error(t('education.student.join.invalidCode'));
         setCodeError(true);
       }
     } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -146,6 +147,20 @@ export default function UpgradePricingPageClient() {
             {t('teacher.subscription.upgradePricingReassure')}
           </p>
         </div>
+
+        {/* The thing being sold, before the price of it. This page was entirely text and
+            bordered cards; a teacher deciding whether to spend their own money should see a
+            class mid-game first. `priority` because it sits above the fold on the one page
+            that takes payment — a lazy-loaded hero here would pop in after the CTA. */}
+        <Image
+          src="/images/education/pro-hero-poster.webp"
+          alt={t('teacher.subscription.proHeroAlt')}
+          width={960}
+          height={540}
+          priority
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="mx-auto mb-10 sm:mb-14 w-full max-w-3xl rounded-neo border-neo border-black shadow-hard-lg"
+        />
 
         {/* Pricing Cards — Pro leads on mobile, sits right on desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start mb-8">

@@ -260,7 +260,10 @@ export function PageClient() {
 
           <EducationFAQ />
 
-          <section className="mt-8 border-t border-neo-white/20 pt-8">
+          {/* Same container as the sections above it. Without one this sat at left:0 across
+              the full 1440px viewport, so "Explore More" and its three links ran flush into
+              the edge of the screen while every neighbour was centred. */}
+          <section className="mx-auto max-w-3xl px-4 mt-8 border-t border-neo-white/20 pt-8 pb-12">
             <h2 className="text-xl font-neo-display font-bold text-neo-white mb-4">
               {t('education.landing.furtherReading.title')}
             </h2>

@@ -430,6 +430,22 @@ export function useClassroom(classroomId: string | undefined): UseClassroomRetur
 // =============================================
 
 /**
+ * Why `code` exists alongside `error`: the route's failure prose is written on the
+ * server, in English, and is not translatable at the point it reaches a student. The
+ * caller needs something stable to branch on — the same shape the class-limit path
+ * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
+ * and for the generic fallback; it is not fit to render on its own.
+ */
+export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE';
+
+export interface JoinClassroomResult {
+  success: boolean;
+  classroomId?: string;
+  code?: JoinClassroomErrorCode;
+  error?: string;
+}
+
+/**
  * Hook for students to join a classroom
  */
 export function useJoinClassroom() {
@@ -438,7 +454,7 @@ export function useJoinClassroom() {
   const joinClassroom = useCallback(async (
     joinCode: string,
     options?: { guestName?: string }
-  ): Promise<{ success: boolean; classroomId?: string; error?: string }> => {
+  ): Promise<JoinClassroomResult> => {
     try {
       // Account-less path: a logged-out student who supplied a name joins as an
       // anonymous guest. We mint the anon identity and await the trigger-created
@@ -472,16 +488,25 @@ export function useJoinClassroom() {
 
       if (response.status === 403) {
         const data = await response.json();
-        // Don't show upgrade message to students joining - it's not in their control
+        // The class is full. The student can do nothing about it and must not be shown
+        // the server's reason — it names our free-tier limit. Hand back the code; the
+        // caller renders a localized, student-appropriate line.
         return {
           success: false,
-          error: data.message || 'This classroom has reached its capacity. Please contact your teacher.',
+          code: 'STUDENT_LIMIT_REACHED',
+          error: data.message,
         };
       }
 
       if (!response.ok) {
         const data = await response.json();
-        return { success: false, error: data.error || 'Failed to join classroom' };
+        // Every 400 this route emits is a bad code (malformed JSON, failed Zod parse, or
+        // no such classroom); a missing guest name is a 401, so it does not land here.
+        return {
+          success: false,
+          ...(response.status === 400 ? { code: 'INVALID_CODE' as const } : {}),
+          error: data.error || 'Failed to join classroom',
+        };
       }
 
       const { classroomId } = await response.json();
