@@ -21,6 +21,7 @@ import * as Comlink from 'comlink';
 import type { Language } from '@/shared/types/game';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { DictionaryWorkerApi } from '@/workers/dictionaryWorker';
+import { buildWordSet } from '@/lib/dictionary/buildWordSet';
 
 // IndexedDB configuration
 const DB_NAME = 'lexiclash-dictionary';
@@ -150,9 +151,13 @@ async function fetchViaWorker(language: Language): Promise<Set<string> | null> {
 
   try {
     await proxy.load(language);
-    const words = await proxy.getWords(language);
+    // Text, not string[] — see dictionaryWorker.getWordsText. Cloning ~900k
+    // individual strings across the Comlink boundary is a single unchunkable
+    // main-thread task that undoes the point of loading off-thread.
+    const text = await proxy.getWordsText(language);
+    const words = text ? text.split('\n').filter((w) => w.length > 0) : [];
     if (words.length === 0) return null;
-    return new Set(words);
+    return await buildWordSet(words);
   } catch {
     return null;
   }
@@ -203,7 +208,7 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
     // Try IndexedDB cache first
     const cached = await getCachedDictionary(language);
     if (cached) {
-      const wordSet = new Set(cached);
+      const wordSet = await buildWordSet(cached);
       memoryCache.set(language, wordSet);
       return wordSet;
     }
@@ -223,7 +228,7 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
 
     const text = await response.text();
     const words = text.split('\n').filter(w => w.length > 0);
-    const wordSet = new Set(words);
+    const wordSet = await buildWordSet(words);
 
     // Cache in memory
     memoryCache.set(language, wordSet);

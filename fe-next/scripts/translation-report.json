@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6200,
+    "totalKeysInCode": 6211,
     "keyCountByLanguage": {
-      "en": 12041,
-      "es": 12337,
-      "he": 12242,
-      "ja": 12296,
-      "ru": 12072,
-      "sv": 12292
+      "en": 12042,
+      "es": 12338,
+      "he": 12243,
+      "ja": 12297,
+      "ru": 12073,
+      "sv": 12293
     },
-    "missingFromEnglish": 36,
+    "missingFromEnglish": 46,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 316,
@@ -135,7 +135,7 @@
         "pattern": "`rank.tier.${navTier}`",
         "type": "template_literal",
         "file": "components/GlobalBottomNav.tsx",
-        "line": 483,
+        "line": 491,
         "context": "aria-label={t(`rank.tier.${navTier}`)}"
       },
       {
@@ -310,14 +310,14 @@
         "pattern": "`admin.teacherFunnel.stage.${r.stage}`",
         "type": "template_literal",
         "file": "components/admin/TeacherFunnelPanel.tsx",
-        "line": 375,
+        "line": 524,
         "context": "{t(`admin.teacherFunnel.stage.${r.stage}`)}"
       },
       {
         "pattern": "`admin.teacherFunnel.trial.${r.trialState}`",
         "type": "template_literal",
         "file": "components/admin/TeacherFunnelPanel.tsx",
-        "line": 379,
+        "line": 528,
         "context": "{t(`admin.teacherFunnel.trial.${r.trialState}`)}"
       },
       {
@@ -2074,14 +2074,14 @@
         "pattern": "`wordTower.biome.${biomeId}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 411,
+        "line": 431,
         "context": "setZoneText(t(`wordTower.biome.${biomeId}`));"
       },
       {
         "pattern": "`wordTower.hazard.${hz.kind}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 846,
+        "line": 866,
         "context": "setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }))"
       },
       {
@@ -2313,7 +2313,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 284,
+        "line": 311,
         "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
@@ -2321,7 +2321,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 286,
+        "line": 313,
         "context": "{t(a)}"
       },
       {
@@ -2937,7 +2937,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 610,
+        "line": 615,
         "context": "return t(key, params);"
       },
       {
@@ -3254,7 +3254,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3263,7 +3263,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3272,7 +3272,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3281,7 +3281,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3290,7 +3290,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 293
+          "line": 432
         }
       ]
     },
@@ -3299,7 +3299,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3308,7 +3308,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3317,7 +3317,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 287
+          "line": 444
         }
       ]
     },
@@ -3326,7 +3326,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 278
+          "line": 431
         }
       ]
     },
@@ -3335,7 +3335,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 361
+          "line": 510
         }
       ]
     },
@@ -3344,7 +3344,97 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 356
+          "line": 505
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.created",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 259
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.empty",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 246
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.name",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 254
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.notApplicant",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 291
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.notApplicantHint",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.students",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 257
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.subtitle",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 239
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.teacher",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 255
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.title",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.classrooms.unnamed",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 269
         }
       ]
     },
@@ -3353,7 +3443,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 309
+          "line": 458
         }
       ]
     },
@@ -3362,7 +3452,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 266
+          "line": 414
         }
       ]
     },
@@ -3371,7 +3461,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 166
+          "line": 203
         }
       ]
     },
@@ -3380,7 +3470,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 173
+          "line": 210
         }
       ]
     },
@@ -3389,7 +3479,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 152
+          "line": 189
         }
       ]
     },
@@ -3398,7 +3488,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 158
+          "line": 195
         }
       ]
     },
@@ -3407,7 +3497,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 144
+          "line": 181
         }
       ]
     },
@@ -3416,7 +3506,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 141
+          "line": 178
         }
       ]
     },
@@ -3425,7 +3515,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 256
+          "line": 404
         }
       ]
     },
@@ -3434,7 +3524,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 340
+          "line": 489
         }
       ]
     },

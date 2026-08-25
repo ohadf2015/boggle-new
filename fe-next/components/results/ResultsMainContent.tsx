@@ -25,6 +25,9 @@ import SeriesStandingsBanner from '@/components/results/SeriesStandingsBanner';
 import type { CoinReward } from '@/components/results/CoinRewardDisplay';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
+import NextStepPrompt from '@/components/results/NextStepPrompt';
+import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { NearMiss } from '@/components/results/NearMissCard';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
@@ -183,6 +186,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   shareCardStats,
   detailsSlot,
   onStartGame: _onStartGame,
+  onExit,
 }) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
@@ -192,6 +196,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   // Resolution-aware: `isAuthenticated` alone would flash the guest layout at a
   // logged-in player on first paint (rules/60 Class 1).
   const isGuest = useIsGuest(isAuthenticated);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Derived data
   const winnerScore = sortedScores[0]?.score ?? 0;
@@ -706,6 +711,35 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
             </div>
           )}
         </div>
+      )}
+
+      {/* 7. CROSS-SURFACE EXITS — the only routes off this screen that aren't
+          "play another multiplayer round" or "leave". Deliberately LAST: the
+          rematch/ready controls above are the primary action and must not be
+          out-competed.
+
+          Suppressed entirely on CrazyGames: multiplayer is the only mode
+          published there, so a daily-challenge CTA points at a surface that
+          platform doesn't have, and the Play Store isn't its distribution
+          channel. This guard came from `ResultsCtaSection`, which held both
+          CTAs and was imported by nothing but its own test — which is why the
+          daily challenge had no entry point from the busiest surface in the
+          product (4,963 mp_results_viewed/14d against 151 daily opens). */}
+      {!isOnCrazyGamesPlatform && (
+        <>
+          <NextStepPrompt
+            currentMode="multiplayer-bots"
+            onBackToLobby={onExit}
+            variant="mobile"
+            hideBackButton
+          />
+
+          {/* A game just finished — the highest-intent moment for the install
+              ask. Existing durable row, not a new surface: it self-gates to
+              platforms that can install and renders inline, so it cannot repeat
+              #842 (promo painting over a live board). */}
+          <GetAppMenuRow source="results" />
+        </>
       )}
       </div>
     </div>

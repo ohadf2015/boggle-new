@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import {
     Home, Swords, ScrollText, Users,
@@ -170,7 +170,6 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { isOnCrazyGamesPlatform } = useCrazyGames();
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const safeArea = useSafeArea();
     const { user, profile } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
@@ -180,8 +179,17 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     // Refs with fresh values so onMessage callback can decide whether to toast
     const pathnameRef = useRef(pathname);
     pathnameRef.current = pathname;
-    const searchParamsRef = useRef(searchParams);
-    searchParamsRef.current = searchParams;
+    // NOT `useSearchParams()`. This component is rendered by
+    // app/[locale]/layout.tsx, so that hook opted EVERY route under `[locale]`
+    // out of static rendering — 453 of 456 routes built as ƒ (Dynamic) and
+    // production answered `cache-control: no-store` on all of them, `revalidate`
+    // included. The value is only ever read inside the incoming-message toast
+    // callback below, never during render, so reading it from the URL at call
+    // time costs nothing and is if anything fresher than a render-time ref.
+    const readSearchParams = useCallback((): URLSearchParams | null => {
+        if (typeof window === 'undefined') return null;
+        return new URLSearchParams(window.location.search);
+    }, []);
     const currentUserIdRef = useRef(user?.id);
     currentUserIdRef.current = user?.id;
     const friendsRef = useRef(friends);
@@ -193,7 +201,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
         // Suppress when the user is already viewing this exact thread
         const path = pathnameRef.current || '';
-        const sp = searchParamsRef.current;
+        const sp = readSearchParams();
         const onFriends = path.includes('/friends');
         const onMessagesTab = sp?.get('tab') === 'messages';
         const viewingThisFriend = sp?.get('friendUserId') === message.fromUserId;
@@ -218,7 +226,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 },
             }
         );
-    }, [t, router, language]);
+    }, [t, router, language, readSearchParams]);
 
     const { unreadCount } = useFriendMessages(undefined, handleIncomingMessage);
     const socialBadgeCount = pendingRequests.length + pendingChallenges.length + unreadCount;

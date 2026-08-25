@@ -16,7 +16,15 @@
 
 import posthog from '@/lib/analytics/lazyPosthog';
 
-export type InstallSource = 'auto_popup' | 'menu' | 'pill';
+/**
+ * `results` is the post-game placement (see GetAppMenuRow.source.test.tsx): the
+ * same durable row, rendered on the results screen instead of the header drawer.
+ * It is a separate source because its intent profile is nothing like the header's.
+ */
+export type InstallSource = 'auto_popup' | 'menu' | 'pill' | 'results';
+
+/** Placements that render the durable, user-initiated row. */
+export type MenuRowSource = Extract<InstallSource, 'menu' | 'results'>;
 
 export function trackInstallPromoShown(source: InstallSource): void {
   posthog.capture('android_install_promo_shown', { source });
@@ -42,8 +50,8 @@ export function trackInstallPillDismissed(): void {
   posthog.capture('android_install_pill_dismissed');
 }
 
-export function trackInstallMenuClick(): void {
-  posthog.capture('android_install_menu_click');
+export function trackInstallMenuClick(source: MenuRowSource = 'menu'): void {
+  posthog.capture('android_install_menu_click', { source });
 }
 
 /**

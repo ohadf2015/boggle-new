@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Bot, ArrowLeft, ArrowRight, Sparkles, Trophy, Swords, Infinity as InfinityIcon } from 'lucide-react';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { getCloseLossMessage } from '@/shared/utils/closeLossDetector';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots' | 'blast' | 'word-hunt';
 
@@ -34,10 +35,15 @@ interface NextStepPromptProps {
   hideBackButton?: boolean;
 }
 
+/** Where the CTA sends the player. Reported as the `to` prop on both events. */
+type NextStepDestination = 'daily' | 'multiplayer' | 'solo-bots';
+
 interface ModeConfig {
   titleKey: string;
   descKey: string;
   href: string;
+  /** Analytics destination — keep in sync with `href`. */
+  destination: NextStepDestination;
   icon: React.ReactNode;
   gradient: string;
   iconBg: string;
@@ -71,7 +77,8 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const router = useRouter();
 
   // Handle navigation with session cleanup OR direct action callback
-  const handleNavigate = useCallback((href: string) => {
+  const handleNavigate = useCallback((href: string, destination: NextStepDestination) => {
+    trackGrowthEvent('next_step_clicked', { from: currentMode, to: destination, variant });
     // If onAction callback is provided, use it instead of navigation
     if (onAction) {
       onAction();
@@ -80,7 +87,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
     // Clear current session before navigating to prevent being stuck on results page
     clearSessionPreservingUsername();
     router.push(href);
-  }, [router, onAction]);
+  }, [router, onAction, currentMode, variant]);
 
   // Configure next step based on current mode
   const getNextStepConfig = (): ModeConfig => {
@@ -90,6 +97,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           titleKey: 'nextStep.challengeBots',
           descKey: 'nextStep.challengeBotsDesc',
           href: `/${language}/singleplayer?preset=bots`,
+          destination: 'solo-bots' as const,
           icon: <Bot className="w-6 h-6 sm:w-7 sm:h-7" />,
           gradient: 'from-neo-cyan to-neo-cyan-dark',
           iconBg: 'bg-neo-navy text-neo-cyan',
@@ -99,6 +107,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           titleKey: 'nextStep.tryDailyChallenge',
           descKey: 'nextStep.tryDailyChallengeDesc',
           href: `/${language}/daily`,
+          destination: 'daily' as const,
           icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
           gradient: 'from-amber-400 to-amber-600',
           iconBg: 'bg-neo-navy text-amber-400',
@@ -108,6 +117,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           titleKey: 'nextStep.goMultiplayerFromDaily',
           descKey: 'nextStep.goMultiplayerFromDailyDesc',
           href: `/${language}/multiplayer`,
+          destination: 'multiplayer' as const,
           icon: <InfinityIcon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />,
           gradient: 'from-neo-pink to-neo-pink-dark',
           iconBg: 'bg-neo-navy text-neo-pink',
@@ -118,6 +128,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           titleKey: 'nextStep.tryDailyChallenge',
           descKey: 'nextStep.tryDailyChallengeDesc',
           href: `/${language}/daily`,
+          destination: 'daily' as const,
           icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
           gradient: 'from-amber-400 to-amber-600',
           iconBg: 'bg-neo-navy text-amber-400',
@@ -127,6 +138,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           titleKey: 'nextStep.tryDailyChallenge',
           descKey: 'nextStep.tryDailyChallengeDesc',
           href: `/${language}/daily`,
+          destination: 'daily' as const,
           icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
           gradient: 'from-amber-400 to-amber-600',
           iconBg: 'bg-neo-navy text-amber-400',
@@ -136,6 +148,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           titleKey: 'nextStep.goMultiplayerFromDaily',
           descKey: 'nextStep.goMultiplayerFromDailyDesc',
           href: `/${language}/multiplayer`,
+          destination: 'multiplayer' as const,
           icon: <InfinityIcon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />,
           gradient: 'from-neo-pink to-neo-pink-dark',
           iconBg: 'bg-neo-navy text-neo-pink',
@@ -147,6 +160,17 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const title = t(config.titleKey) || config.titleKey;
   const description = t(config.descKey) || config.descKey;
   const backText = t('nextStep.backToLobby');
+
+  // Impression, once per mount. The close-loss branch below renders a rematch
+  // card instead of the cross-mode CTA, so it must not count as one — otherwise
+  // the click-through rate is diluted by a surface that has no such CTA.
+  const isCloseLossCard = isCloseLossProp && scoreDifference != null;
+  const impressionSent = useRef(false);
+  useEffect(() => {
+    if (isCloseLossCard || impressionSent.current) return;
+    impressionSent.current = true;
+    trackGrowthEvent('next_step_shown', { from: currentMode, to: config.destination, variant });
+  }, [isCloseLossCard, currentMode, config.destination, variant]);
 
   // Close loss rematch prompt - overrides normal flow
   if (isCloseLossProp && scoreDifference != null) {
@@ -223,7 +247,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
       <div className={cn('flex flex-col gap-2', className)}>
         <button
           type="button"
-          onClick={() => handleNavigate(config.href)}
+          onClick={() => handleNavigate(config.href, config.destination)}
           className={cn(
             'relative flex items-center gap-3 p-3',
             'bg-linear-to-r', config.gradient,
@@ -262,7 +286,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
       <div className={cn('flex flex-col gap-3', className)}>
         <button
           type="button"
-          onClick={() => handleNavigate(config.href)}
+          onClick={() => handleNavigate(config.href, config.destination)}
           className={cn(
             'relative block p-4',
             'bg-linear-to-br', config.gradient,
@@ -378,7 +402,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         {/* Primary CTA Button */}
         <button
           type="button"
-          onClick={() => handleNavigate(config.href)}
+          onClick={() => handleNavigate(config.href, config.destination)}
           className={cn(
             'relative inline-flex items-center justify-center gap-3',
             'w-full sm:w-auto min-w-[200px]',

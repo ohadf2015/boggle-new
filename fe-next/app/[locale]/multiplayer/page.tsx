@@ -5,8 +5,19 @@ import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import MultiplayerPageClient from './PageClient';
+import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 
 export const revalidate = 3600;
+
+/**
+ * See app/[locale]/(home)/page.tsx — without generateStaticParams the enclosing
+ * `[locale]` segment forces this route to build as ƒ (Dynamic) and serve
+ * `no-store`, so the `revalidate` above was inert. The lobby shell has no
+ * searchParams and no per-request data, so it prerenders cleanly.
+ */
+export function generateStaticParams(): Array<{ locale: string }> {
+  return SUPPORTED_LOCALES.map((locale) => ({ locale }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;

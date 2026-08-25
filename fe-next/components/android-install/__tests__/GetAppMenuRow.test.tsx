@@ -42,6 +42,8 @@ describe('GetAppMenuRow', () => {
     expect(s.open).toBe(true);
     expect(s.source).toBe('menu');
     expect(onNavigate).toHaveBeenCalledTimes(1);
-    expect(captureMock).toHaveBeenCalledWith('android_install_menu_click');
+    // `source` distinguishes the header drawer from the post-game row
+    // (GetAppMenuRow.source.test.tsx); the header keeps the historical default.
+    expect(captureMock).toHaveBeenCalledWith('android_install_menu_click', { source: 'menu' });
   });
 });

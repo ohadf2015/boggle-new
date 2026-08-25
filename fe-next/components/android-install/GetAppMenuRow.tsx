@@ -19,9 +19,20 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 import { isAndroidInstallEntryEligible } from '@/lib/androidInstall/installEligibility';
 import { isCapacitorNative, isStandaloneDisplay } from '@/utils/androidApp';
-import { trackInstallMenuClick } from '@/lib/androidInstall/installTracking';
+import { trackInstallMenuClick, type MenuRowSource } from '@/lib/androidInstall/installTracking';
 
-export default function GetAppMenuRow({ onNavigate }: { onNavigate?: () => void }) {
+interface GetAppMenuRowProps {
+  onNavigate?: () => void;
+  /**
+   * Which placement this row is. `menu` (default) is the header drawer;
+   * `results` is the post-game screen, where intent is far higher. Both the
+   * click event and the promo modal it opens are tagged with it, so the two
+   * placements never share a funnel.
+   */
+  source?: MenuRowSource;
+}
+
+export default function GetAppMenuRow({ onNavigate, source = 'menu' }: GetAppMenuRowProps) {
   const { t } = useLanguage();
   const openPromo = useAndroidInstallStore((s) => s.openPromo);
 
@@ -39,9 +50,9 @@ export default function GetAppMenuRow({ onNavigate }: { onNavigate?: () => void 
   if (!eligible) return null;
 
   const handleClick = () => {
-    trackInstallMenuClick();
+    trackInstallMenuClick(source);
     onNavigate?.();
-    openPromo('menu');
+    openPromo(source);
   };
 
   return (

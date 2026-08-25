@@ -70,6 +70,15 @@ export default function AndroidAppInstallPromo() {
 
   // exp-install-promo-after-first-game-v1 — auto-popup timing only. The pill and the
   // menu entry (both user-initiated) are untouched by this experiment.
+  //
+  // KEEP RUNNING — do NOT ship the variant on CTR alone. 30d, per unique person:
+  // control 185 shown → 10 install clicks (5.4%); after-first-game 24 → 7 (29%).
+  // The CTR is 5x better, but the gate is *what* shrinks reach, so at 100% the
+  // variant projects to FEWER absolute installs than today's mix (~14/30d vs 28).
+  // A 5x CTR that halves installs is not a win when installs are the goal.
+  // Also unresolved: 234 of 443 shown-people land in a null flag bucket, so
+  // attribution is unreliable on more than half the traffic — fix exposure
+  // tagging before calling this experiment either way.
   const { variant: promoTimingVariant, trackExposure: trackPromoTimingExposure } =
     useExperiment('exp-install-promo-after-first-game-v1');
   const requireEngagement = promoTimingVariant === 'after-first-game';

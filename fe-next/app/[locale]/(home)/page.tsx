@@ -6,6 +6,7 @@ import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
+import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 
 /**
  * Main landing page - Game mode selection
@@ -15,6 +16,26 @@ import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
  * so this route is safely static-renderable.
  */
 export const revalidate = 300;
+
+/**
+ * `[locale]` is a dynamic segment, so without these params Next cannot
+ * prerender anything beneath it and the `revalidate` above is inert — which is
+ * why `next build` reported 453 of 456 routes as ƒ (Dynamic) and production
+ * answered `cache-control: private, no-store` on every page, SEO pages
+ * included (verified live on /en, /en/faq, /en/tools, /en/blog/*).
+ *
+ * Necessary but NOT yet sufficient, measured 2026-08-25: with these params the
+ * build prerenders 214 pages (it previously aborted here — see the
+ * GlobalBottomNav fix), but the route table still prints ƒ for this route. The
+ * remaining dynamic signal is almost certainly `fetchCache = 'force-no-store'`
+ * on app/[locale]/layout.tsx, which is a deliberate workaround for the Next 16
+ * memory leak (vercel/next.js#90433) and cannot simply be dropped. When that
+ * lands upstream, removing it should flip these routes to ● with no further
+ * work here.
+ */
+export function generateStaticParams(): Array<{ locale: string }> {
+  return SUPPORTED_LOCALES.map((locale) => ({ locale }));
+}
 
 interface PageProps {
   params: Promise<{ locale: string }>;

@@ -202,6 +202,15 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
 // 2026-07-20 → OOM). Forcing fetches to no-store bypasses the Data Cache tee.
 // Cascades to all [locale] routes. Landing data is still amortized by the
 // in-process TTL cache (lib/cache/ttlCache). REMOVE once #90433 is fixed upstream.
+// COSTS: this also appears to be what keeps every `[locale]` route classified
+// ƒ (Dynamic). Measured 2026-08-25 — 453 of 456 routes built dynamic and
+// production served `cache-control: private, no-cache, no-store, max-age=0,
+// must-revalidate` on ALL of them, including `revalidate = 86400` SEO pages, so
+// nothing is cacheable by the browser or by a CDN. Adding
+// `generateStaticParams` (home + multiplayer) makes the build prerender 214
+// pages but does NOT flip the classification, which points here. Dropping this
+// line is the single highest-leverage TTFB change available — but only once
+// #90433 is fixed, since it is the OOM guard.
 export const fetchCache = 'force-no-store';
 
 export const viewport = {

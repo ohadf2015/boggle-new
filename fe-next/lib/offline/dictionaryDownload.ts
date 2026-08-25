@@ -19,6 +19,7 @@ import {
   decryptText,
   type EncryptedBlob,
 } from './dictionaryCrypto';
+import { buildWordSet } from '@/lib/dictionary/buildWordSet';
 
 export interface StoredDict extends EncryptedBlob {
   wordCount: number;
@@ -111,7 +112,7 @@ export async function loadOfflineDictionary(
   const key = await deps.keyStore.getKey();
   if (!key) return null;
   const text = await decryptText(key, { iv: rec.iv, data: rec.data });
-  return new Set(splitWords(text));
+  return buildWordSet(splitWords(text));
 }
 
 export async function listDownloads(

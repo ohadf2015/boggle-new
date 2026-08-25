@@ -106,6 +106,22 @@ const workerApi = {
     const dict = dictionaries.get(language);
     return dict ? Array.from(dict) : [];
   },
+
+  /**
+   * Same words, as ONE newline-delimited string.
+   *
+   * `getWords` defeats the point of the worker: Comlink structured-clones the
+   * array, so the main thread pays a per-element deserialization for ~900k
+   * individual strings (Spanish) — a single unchunkable task, on top of the Set
+   * build. A string is one buffer copy, and `split('\n')` on the other side is
+   * native. Prefer this; `getWords` stays for callers that want the array.
+   */
+  getWordsText(language: string): string {
+    const dict = dictionaries.get(language);
+    if (!dict) return '';
+    // Join inside the worker — off the main thread, where the cost belongs.
+    return Array.from(dict).join('\n');
+  },
 };
 
 // IndexedDB helpers (self-contained in worker)

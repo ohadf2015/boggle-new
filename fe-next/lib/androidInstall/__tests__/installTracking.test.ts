@@ -35,6 +35,7 @@ describe('installTracking', () => {
     expect(captureMock).toHaveBeenCalledWith('android_install_pill_shown');
     expect(captureMock).toHaveBeenCalledWith('android_install_pill_click');
     expect(captureMock).toHaveBeenCalledWith('android_install_pill_dismissed');
-    expect(captureMock).toHaveBeenCalledWith('android_install_menu_click');
+    // Defaults to the header drawer; the post-game row passes `results`.
+    expect(captureMock).toHaveBeenCalledWith('android_install_menu_click', { source: 'menu' });
   });
 });
