@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6240,
+    "totalKeysInCode": 6243,
     "keyCountByLanguage": {
-      "en": 12072,
-      "es": 12368,
-      "he": 12273,
-      "ja": 12327,
-      "ru": 12107,
-      "sv": 12323
+      "en": 12087,
+      "es": 12383,
+      "he": 12288,
+      "ja": 12342,
+      "ru": 12122,
+      "sv": 12338
     },
     "missingFromEnglish": 46,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 316,
+      "templateLiterals": 319,
       "fallbackUsages": 1,
       "variableKeys": 122
     }
@@ -1868,10 +1868,31 @@
         "context": "{t(`catalystTeaser.${c.id}.desc`)}"
       },
       {
+        "pattern": "`teacher.subscription.matrix.${row.key}`",
+        "type": "template_literal",
+        "file": "components/teacher/PlanComparisonMatrix.tsx",
+        "line": 101,
+        "context": "{t(`teacher.subscription.matrix.${row.key}`)}"
+      },
+      {
+        "pattern": "`teacher.proGate.${feature}.title`",
+        "type": "template_literal",
+        "file": "components/teacher/ProGate.tsx",
+        "line": 50,
+        "context": "{t(`teacher.proGate.${feature}.title`)}"
+      },
+      {
+        "pattern": "`teacher.proGate.${feature}.body`",
+        "type": "template_literal",
+        "file": "components/teacher/ProGate.tsx",
+        "line": 53,
+        "context": "{t(`teacher.proGate.${feature}.body`)}"
+      },
+      {
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 181,
+        "line": 182,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
@@ -2313,7 +2334,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 333,
+        "line": 369,
         "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
@@ -2321,7 +2342,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 335,
+        "line": 371,
         "context": "{t(a)}"
       },
       {
