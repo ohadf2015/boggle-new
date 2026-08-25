@@ -1474,11 +1474,15 @@ export const trackOnboardingSkipped = (
 
 /**
  * Onboarding quick-play — fires when the user takes the FTUE fast lane that
- * lands them in an auto-started classic practice game with zero extra taps:
- * the one-screen quickStart PLAY, the "Skip → Play Now" escape on any FTUE
- * step, or style-step completion (all route to /practice/classic?play=1&firstGame=1).
- * `source` discriminates which entry fired it. This is the D1-retention
- * experiment metric — pair with the return_visit funnel from t_cce75cc7.
+ * lands them in an auto-started practice game with zero extra taps: the
+ * one-screen quickStart PLAY, the "Skip → Play Now" escape on any FTUE step,
+ * or style-step completion. `source` discriminates which entry fired it.
+ * This is the D1-retention experiment metric — pair with the return_visit
+ * funnel from t_cce75cc7.
+ *
+ * Does NOT fire when "Skip → Play Now" is used while a room invite is
+ * pending — that exit lands in the room, not practice, and is tracked via
+ * `trackInviteConsumed({ path: 'quick_play' })` instead.
  */
 export const trackOnboardingQuickPlay = (
   extras: { source: 'quick_start' | 'ftue_skip' | 'style_complete' } & Record<string, unknown>,
@@ -1730,7 +1734,7 @@ export const trackInviteTutorialSkipped = (props: InviteTutorialSkippedProps): v
 
 interface InviteConsumedProps {
   roomCode: string;
-  path: 'tutorial' | 'skip' | 'direct';
+  path: 'tutorial' | 'skip' | 'direct' | 'quick_play';
   totalSeconds: number;
 }
 
