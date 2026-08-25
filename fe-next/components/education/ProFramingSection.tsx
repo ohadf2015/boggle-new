@@ -84,14 +84,14 @@ export function ProFramingSection() {
             </span>
           </div>
 
-          <h3 className="text-2xl font-neo-display font-black text-neo-black mb-4 mt-2">
+          <h3 className="text-2xl font-neo-display font-black text-neo-white mb-4 mt-2">
             {t('education.landing.pro.proTier')}
           </h3>
 
-          <div className="mb-6 pb-6 border-b border-neo-black/20">
-            <p className="text-5xl font-neo-display font-black text-neo-black leading-none">
+          <div className="mb-6 pb-6 border-b border-neo-white/20">
+            <p className="text-5xl font-neo-display font-black text-neo-white leading-none">
               ${TEACHER_PRO_PRICE_USD}
-              <span className="text-base text-neo-black/80 font-bold ms-2">
+              <span className="text-base text-neo-white/80 font-bold ms-2">
                 {t('education.landing.pro.perMonth')}
               </span>
             </p>
@@ -99,28 +99,28 @@ export function ProFramingSection() {
 
           <ul className="space-y-3 mb-6">
             <li className="flex items-start gap-3">
-              <span className="text-neo-black font-bold mt-0.5">✓</span>
-              <span className="text-neo-black font-bold">
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white font-bold">
                 {t('education.landing.pro.classLimitPro')}
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-neo-black font-bold mt-0.5">✓</span>
-              <span className="text-neo-black font-bold">
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white font-bold">
                 {t('education.landing.pro.studentLimitPro')}
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-neo-black font-bold mt-0.5">✓</span>
-              <span className="text-neo-black">{t('education.landing.pro.analytics')}</span>
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white">{t('education.landing.pro.analytics')}</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-neo-black font-bold mt-0.5">✓</span>
-              <span className="text-neo-black">{t('education.landing.pro.customLists')}</span>
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white">{t('education.landing.pro.customLists')}</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-neo-black font-bold mt-0.5">✓</span>
-              <span className="text-neo-black">{t('education.landing.pro.duels')}</span>
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white">{t('education.landing.pro.duels')}</span>
             </li>
           </ul>
 

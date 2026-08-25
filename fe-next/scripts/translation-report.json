@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6211,
+    "totalKeysInCode": 6240,
     "keyCountByLanguage": {
-      "en": 12042,
-      "es": 12338,
-      "he": 12243,
-      "ja": 12297,
-      "ru": 12073,
-      "sv": 12293
+      "en": 12072,
+      "es": 12368,
+      "he": 12273,
+      "ja": 12327,
+      "ru": 12107,
+      "sv": 12323
     },
     "missingFromEnglish": 46,
     "problematicFlatKeys": 0,
@@ -1871,7 +1871,7 @@
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 178,
+        "line": 181,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
@@ -2313,7 +2313,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 311,
+        "line": 333,
         "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
@@ -2321,7 +2321,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 313,
+        "line": 335,
         "context": "{t(a)}"
       },
       {
@@ -3831,10 +3831,6 @@
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
-      "education.landing.furtherReading.title",
-      "education.landing.furtherReading.guides",
-      "education.landing.furtherReading.glossary",
-      "education.landing.furtherReading.wordSolver",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
