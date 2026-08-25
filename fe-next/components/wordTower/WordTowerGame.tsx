@@ -12,7 +12,20 @@ import {
 } from '@/lib/wordTower/wordTowerManager';
 import { dailyTowerGameCode, DAILY_PLAYER_ID, utcDateKey } from '@/lib/wordTower/dailySeed';
 import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
+import {
+  dayStartKey,
+  parseDayStart,
+  serializeDayStart,
+  resolveDayStart,
+  lockDayStart,
+  type DayStart,
+} from '@/lib/wordTower/dayStart';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
+import {
+  rivalsFromLeaderboard,
+  type RivalMarker,
+  type LeaderboardRivalRow,
+} from '@/lib/wordTower/rivals';
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { WordTowerPlay } from './WordTowerPlay';
@@ -26,9 +39,40 @@ const WordTowerLeaderboard = dynamic(
 
 const SUPPORTED: SupportedLocale[] = ['en', 'he', 'sv', 'es', 'ja'];
 
+/** The UTC day the daily score switched from cumulative tower height to today's
+ *  climb. Rows already written for this date are on the old scale. */
+const CUMULATIVE_SCORE_CUTOVER = '2026-08-25';
+
 interface LoadedProgress {
   initialGame: WordTowerPlayerState;
+  /** LIFETIME best height — the bar a personal record has to clear. */
   personalBestM: number;
+  dayStartHeightM: number;
+  dayStartFloors: number;
+}
+
+/**
+ * Today's baseline, read/written through localStorage only.
+ *
+ * Deliberately NOT part of the tower save blob: that blob has two sources (the
+ * local session and the DB `current_state`) which resolve at different times,
+ * and a baseline arriving from the slower one would be stale (Class 1). Keeping
+ * it here gives it a single owner, and `resolveDayStart` leaves it re-stampable
+ * until the first floor lands so the late DB swap can still raise it safely.
+ */
+function loadDayStart(dateKey: string): DayStart | null {
+  try { return parseDayStart(localStorage.getItem(dayStartKey(dateKey))); } catch { return null; }
+}
+
+function saveDayStart(ds: DayStart): void {
+  try { localStorage.setItem(dayStartKey(ds.dayKey), serializeDayStart(ds)); } catch { /* best-effort */ }
+}
+
+/** Resolve + persist today's baseline against the tower as currently resolved. */
+function stampDayStart(game: WordTowerPlayerState): DayStart {
+  const ds = resolveDayStart(loadDayStart(utcDateKey()), utcDateKey(), game.heightM, game.floors.length);
+  saveDayStart(ds);
+  return ds;
 }
 
 interface SavedSession {
@@ -115,8 +159,6 @@ export function WordTowerGame() {
     const dict = dictRef.current;
 
     const opts = { gameCode: dailyTowerGameCode(), playerId: DAILY_PLAYER_ID, language, avoidWeakAnchor: true, dict };
-    let best = 0;
-    try { best = Number(localStorage.getItem(`wt-daily-best-${utcDateKey()}`)) || 0; } catch { /* */ }
 
     // Resume the in-progress daily tower (if any) so the player lands exactly
     // where they left off, including the same wheel letters.
@@ -124,7 +166,19 @@ export function WordTowerGame() {
     const initialGame = saved?.state
       ? restoreWordTowerState(opts, saved.state)
       : restoreWordTowerState(opts, null);
-    setProgress({ initialGame, personalBestM: best });
+
+    // The record bar is the LIFETIME high-water mark. It used to be read from
+    // `wt-daily-best-<today>`, which is absent each morning and so evaluated to
+    // 0 — against a tower that had carried over at (say) 334m. Every returning
+    // player therefore "beat their best" at mount, before placing a word.
+    const best = initialGame.heightHighWaterM || 0;
+    const ds = stampDayStart(initialGame);
+    setProgress({
+      initialGame,
+      personalBestM: best,
+      dayStartHeightM: ds.startHeightM,
+      dayStartFloors: ds.startFloors,
+    });
 
     // Also try to load from the DB (authenticated users) — the server progress
     // may be ahead of the local session (e.g. played on another device).
@@ -137,7 +191,17 @@ export function WordTowerGame() {
         const serverState = data.progress.current_state as WordTowerSaveState;
         const serverGame = restoreWordTowerState(opts, serverState);
         if (serverGame.floors.length > initialGame.floors.length || serverGame.heightM > initialGame.heightM) {
-          setProgress({ initialGame: serverGame, personalBestM: Math.max(best, data.progress.best_height_m ?? 0) });
+          // Re-stamp against the tower we are actually adopting. The baseline is
+          // still unlocked here (no floor placed yet this session), so it follows
+          // the swap instead of crediting the player with metres they built on
+          // another device.
+          const serverDs = stampDayStart(serverGame);
+          setProgress({
+            initialGame: serverGame,
+            personalBestM: Math.max(best, serverGame.heightHighWaterM || 0, Number(data.progress.best_height_m) || 0),
+            dayStartHeightM: serverDs.startHeightM,
+            dayStartFloors: serverDs.startFloors,
+          });
         }
       }).catch(() => { /* ignore — local session is the fallback */ });
     }).catch(() => { /* ignore — local session is the fallback */ });
@@ -148,15 +212,24 @@ export function WordTowerGame() {
     [],
   );
 
-  // Persist today's daily best so the minimap tick + next-attempt baseline reflect
-  // prior climbs (the self-comparison loop).
-  const persistDailyBest = useCallback((heightM: number) => {
+  // Persist today's CLIMB — metres built today, not the lifetime tower height.
+  //
+  // Submitting `game.heightM` made the daily board a lifetime board: two
+  // returning players re-posted an unchanged height on a later day (334 -> 334,
+  // 99 -> 99, 2026-08-19..25) while a newcomer's first word ranked 2m against
+  // 453m. Ranking the delta puts everyone on the same scale every morning.
+  //
+  // `floors` and `longestWord` are sent for the first time. The route has always
+  // read them off the body, but this call never supplied them — which is why all
+  // 20 rows in `daily_word_tower_attempts` carry `floors = 0` and a NULL
+  // `longest_word`, and the leaderboard renders "0" floors for every player.
+  const persistDailyClimb = useCallback((result: { climbM: number; floors: number; longestWord: string }) => {
     let improved = false;
     let merged = 0;
     try {
       const key = dailyBestKey(utcDateKey());
       const stored = Number(localStorage.getItem(key)) || 0;
-      merged = mergeDailyBest(stored, heightM);
+      merged = mergeDailyBest(stored, result.climbM);
       improved = merged > stored;
       localStorage.setItem(key, String(merged));
     } catch { /* best-effort */ }
@@ -170,12 +243,59 @@ export function WordTowerGame() {
       try {
         await postWithAuth('/api/word-tower/daily/score', {
           heightM: merged,
+          floors: result.floors,
+          longestWord: result.longestWord || null,
           language,
           guestFingerprint: getGuestFingerprint(),
         });
       } catch { /* best-effort — localStorage remains the source of truth for UI */ }
     })();
   }, [language]);
+
+  // First floor of the day: freeze the baseline (it is re-stampable until now)
+  // and credit the streak. `recordPlay` is idempotent downstream.
+  const onDailyEngaged = useCallback(() => {
+    const stored = loadDayStart(utcDateKey());
+    if (stored && !stored.locked) saveDayStart(lockDayStart(stored));
+    recordPlay();
+  }, [recordPlay]);
+
+  // Rivals — ghost record-lines for the other players on today's board.
+  //
+  // This was `rivals={[]}`, hardcoded, and Word Tower is daily-only (the endless
+  // run was retired), so the rival system was invisible for the ENTIRE mode: no
+  // ghost lines, no "next rival" chip, nobody to chase. `rivalsFromLeaderboard`
+  // and the whole rail were already built and wired downstream.
+  //
+  // Rival heights are today's CLIMBS, but the rail positions against absolute
+  // tower altitude, so each is rebased onto the viewer's own baseline: a rival
+  // who climbed 12m today draws at the altitude the viewer reaches by climbing
+  // 12m today. Same scale for a newcomer and a 400m veteran.
+  const [rivals, setRivals] = useState<RivalMarker[]>([]);
+  const dayStartHeightM = progress?.dayStartHeightM;
+  useEffect(() => {
+    if (dayStartHeightM === undefined) return;
+    let cancelled = false;
+    const params = new URLSearchParams({ language, guestFingerprint: getGuestFingerprint() ?? '' });
+    getWithAuth(`/api/word-tower/daily/score?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.leaderboard) return;
+        // Rows written before the cutover hold CUMULATIVE tower heights, not
+        // climbs, so rebasing them would hang ghost lines hundreds of metres
+        // above a new player's head. Skip the rail for that one puzzle_date; it
+        // expires by itself at the UTC rollover and touches no player data.
+        if (data.puzzleDate === CUMULATIVE_SCORE_CUTOVER) return;
+        setRivals(
+          rivalsFromLeaderboard(data.leaderboard as LeaderboardRivalRow[]).map((r) => ({
+            ...r,
+            heightM: dayStartHeightM + r.heightM,
+          })),
+        );
+      })
+      .catch(() => { /* no rivals is the old behaviour — never block a climb */ });
+    return () => { cancelled = true; };
+  }, [language, dayStartHeightM]);
 
   const openLeaderboard = useCallback(() => setShowLeaderboard(true), []);
   const closeLeaderboard = useCallback(() => setShowLeaderboard(false), []);
@@ -220,14 +340,16 @@ export function WordTowerGame() {
         language={language}
         isInDictionary={isInDictionary}
         dictionary={dictRef.current}
-        rivals={[]}
+        rivals={rivals}
         initialGame={progress!.initialGame}
         personalBestM={progress!.personalBestM}
         onOpenLeaderboard={openLeaderboard}
         daily={daily}
-        onDailyEngaged={recordPlay}
+        onDailyEngaged={onDailyEngaged}
         perkSeed={dailyTowerGameCode()}
-        onNewDailyBest={persistDailyBest}
+        dayStartHeightM={progress!.dayStartHeightM}
+        dayStartFloors={progress!.dayStartFloors}
+        onDailyClimb={persistDailyClimb}
       />
 
       {showLeaderboard && <WordTowerLeaderboard onClose={closeLeaderboard} t={t} dir={dir} language={language} />}

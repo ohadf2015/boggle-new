@@ -67,6 +67,7 @@ import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
 import { perkMilestoneAt, reducedTopple, combineModifiers, PERKS } from '@/lib/wordTower/perks';
 import { beatsDailyBest } from '@/lib/wordTower/dailyBest';
+import { todayClimbM, todayFloors } from '@/lib/wordTower/dayStart';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -91,7 +92,7 @@ import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { applyAsyncWrecks, type PendingWreck } from '@/lib/wordTower/asyncWreck';
 import { asyncWreckDamageFloors } from '@/lib/wordTower/sabotage';
-import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
+import { trackGameStart, trackGameEnd, trackGrowthEvent } from '@/utils/growthTracking';
 
 /** How long a transient celebration toast holds before it auto-dismisses. Kept
  *  short + uniform so banners clear quickly and never pile up / "stick" on
@@ -174,7 +175,12 @@ interface PlayProps {
   perkSeed?: string;
   /** Fires (daily mode) the first time the climb beats today's stored best —
    *  the wrapper persists the new best. */
-  onNewDailyBest?: (heightM: number) => void;
+  /** Tower height (metres) at which today's climb began — see lib/wordTower/dayStart. */
+  dayStartHeightM?: number;
+  /** Floor count at which today's climb began. */
+  dayStartFloors?: number;
+  /** Reports TODAY'S climb (not the lifetime tower height) for daily submission. */
+  onDailyClimb?: (result: { climbM: number; floors: number; longestWord: string }) => void;
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -194,7 +200,7 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '', onNewDailyBest }: PlayProps) {
+export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '', dayStartHeightM = 0, dayStartFloors = 0, onDailyClimb }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
@@ -205,20 +211,34 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const gameRef = useRef(game);
   gameRef.current = game;
 
+  // The daily tower PERSISTS across sessions, so a returning player mounts with
+  // floors already built. Baseline them once, or "did they play?" is true the
+  // instant the page opens — which is how the daily streak came to be credited,
+  // and the "NEW BEST!" confetti fired, for a resumed tower and zero words.
+  const floorsAtStartRef = useRef(initialGame.floors.length);
+  /** Floors placed in THIS visit — the mode's real "did something happen" test. */
+  const floorsThisVisit = Math.max(0, game.floors.length - floorsAtStartRef.current);
+
   // Session funnel. Word Tower shipped with ZERO telemetry across its 25
   // components: PostHog held no word-tower event at all, so "6 players ever"
   // (word_tower_progress, 2026-08-17) could not be told apart from "hundreds
-  // open it and bounce before floor 1". Endless mode has no completion, so the
-  // pair is start-on-mount / abandon-on-exit carrying the height reached —
-  // that distribution IS the cliff. Reuses the same helpers every other mode
+  // open it and bounce before floor 1". Reuses the same helpers every other mode
   // calls, so the mode lands in the existing funnels for free (trackGameStart
   // also arms the pagehide abandon, which covers a closed tab).
+  //
+  // A session that PLACED A FLOOR counts as completed. This used to be a
+  // hardcoded `false` ("endless mode has no completion"), which read as
+  // 24 starts / 0 completions / 24 abandons over 14 days (2026-08-25) — but the
+  // damage was not the missing event. `trackGameEnd` gates every lifetime credit
+  // on `completed`, so Word Tower players never received incrementGamesPlayed,
+  // total_games_played, last_played_at, first_mode_played or
+  // markFirstGameActivation: a player whose FIRST LexiClash game was Word Tower
+  // was invisible to activation tracking. Building a floor is this mode's unit
+  // of success; a true bounce still has floorsBuilt === 0 and still books as
+  // abandoned, so the cliff signal is preserved.
   useEffect(() => {
     const startedAt = Date.now();
-    // The daily tower PERSISTS across sessions, so a returning player mounts with
-    // floors already built. Baseline them, or every resumed session would report
-    // "reached floor 1" without the player having placed anything this visit.
-    const floorsAtStart = gameRef.current.floors.length;
+    const floorsAtStart = floorsAtStartRef.current;
     trackGameStart('word-tower', { daily, floorsAtStart });
     return () => {
       const g = gameRef.current;
@@ -227,7 +247,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         'word-tower',
         Math.round(g.heightM),
         Math.max(0, floorsBuilt),
-        false,
+        floorsBuilt > 0,
         Math.round((Date.now() - startedAt) / 1000),
         {
           floors: g.floors.length,
@@ -1018,28 +1038,49 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [save]);
 
-  // Daily engagement → grow the streak. Fires once the first floor lands (a real
-  // attempt, not a mount), and is idempotent downstream so repeats are harmless.
+  // Daily engagement → grow the streak. Gated on floors placed THIS VISIT, not on
+  // `floorsCount >= 1`: the tower persists, so a returning player already has
+  // floors at mount and that test credited the streak for merely opening the page.
+  // Idempotent downstream, so repeats are harmless.
   useEffect(() => {
-    if (daily && floorsCount >= 1) onDailyEngaged?.();
-  }, [daily, floorsCount, onDailyEngaged]);
+    if (daily && floorsThisVisit >= 1) onDailyEngaged?.();
+  }, [daily, floorsThisVisit, onDailyEngaged]);
 
-  // Daily best → the self-comparison routine beat. Fires once the moment the
-  // climb first passes the best this run started with; the wrapper persists it.
+  // Today's climb — metres built since the day's baseline. The tower is a
+  // LIFETIME height, so this is the only number that means "what I did today".
+  // Reported on every change; the wrapper merges and only POSTs on improvement.
+  const todayClimb = useMemo(
+    () => todayClimbM(game.heightM, dayStartHeightM),
+    [game.heightM, dayStartHeightM],
+  );
+  useEffect(() => {
+    if (!daily || floorsThisVisit < 1) return;
+    onDailyClimb?.({
+      climbM: todayClimb,
+      floors: todayFloors(game.floors.length, dayStartFloors),
+      longestWord: game.longestWord,
+    });
+  }, [daily, floorsThisVisit, todayClimb, game.floors.length, dayStartFloors, game.longestWord, onDailyClimb]);
+
+  // Personal-record beat. Gated on a floor placed THIS VISIT and measured against
+  // the LIFETIME best, not a per-day best that resets to 0 each morning: the tower
+  // carries over, so the old test (`fresh 0` vs `restored 334m`) was true at mount
+  // and fired a 120-particle burst plus "NEW BEST!" for placing nothing. A record
+  // has to be rare to feel like one.
   const [newBestShown, setNewBestShown] = useState(false);
   const [newBestText, setNewBestText] = useState<string | null>(null);
   useEffect(() => {
-    if (!daily || newBestShown || !beatsDailyBest(personalBestM, game.heightM)) return;
+    if (!daily || newBestShown || floorsThisVisit < 1) return;
+    if (!beatsDailyBest(personalBestM, game.heightM)) return;
     setNewBestShown(true);
     setNewBestText(t('wordTower.daily.newBest'));
-    onNewDailyBest?.(game.heightM);
     // A personal record is THE self-comparison payoff — celebrate it bigger
     // than any single drop (wide gold-heavy burst + the level-complete buzz).
     haptics.levelComplete();
     if (!reducedMotion) {
       fireConfetti({ particleCount: 120, spread: 120, startVelocity: 45, origin: { y: 0.4 } });
     }
-  }, [daily, newBestShown, personalBestM, game.heightM, onNewDailyBest]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [daily, newBestShown, personalBestM, game.heightM, floorsThisVisit]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(newBestText, () => setNewBestText(null), TOAST_MS);
   useEffect(() => { if (game.heightM > 0) save(false, { force: true }); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1116,13 +1157,35 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // free (onReroll, the soft-lock escape). The button is disabled when broke, so
   // a fired tap here always has a banked scramble or affordable coins.
   const handleScramble = useCallback(() => {
-    if (gameRef.current.scramblesLeft > 0) { haptics.selection(); tower.scramble(); return; }
+    if (gameRef.current.scramblesLeft > 0) {
+      haptics.selection();
+      trackGrowthEvent('wordtower_scramble_used', { source: 'banked', floors: gameRef.current.floors.length });
+      tower.scramble();
+      return;
+    }
     if (spendCoins(WORD_TOWER_SCRAMBLE_COIN_COST, 'wordtower_scramble')) {
       setCoinBalance(getCoins());
       haptics.success();
+      trackGrowthEvent('wordtower_scramble_used', { source: 'bought', floors: gameRef.current.floors.length });
       tower.scramblePaid();
     }
   }, [haptics, tower]);
+
+  // The wall: no banked scramble AND not enough coins, so the scramble button is
+  // disabled. Emitted once per session — this is the state a player is in when
+  // the ring has no word left for them and the mode offers no way forward.
+  const wallReported = useRef(false);
+  const atWall = game.scramblesLeft <= 0 && coinBalance < WORD_TOWER_SCRAMBLE_COIN_COST;
+  useEffect(() => {
+    if (!atWall || wallReported.current) return;
+    wallReported.current = true;
+    trackGrowthEvent('wordtower_wall_reached', {
+      floors: gameRef.current.floors.length,
+      floorsThisVisit,
+      coins: coinBalance,
+      daily,
+    });
+  }, [atWall]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // keyboard
   useEffect(() => {
@@ -1173,16 +1236,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           *viewed* altitude so panning down reveals the marks at that height. */}
       <WordTowerLandmarkRail viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
-      {/* Rival rail + chase chip — the read-only leaderboard-ghost meta belongs to
-          the (retired) endless mode. The tower is daily-only now, so these never
-          render (displayRivals is empty in daily anyway); gating them out also
-          clears the top-right rival chip that overlapped the header. */}
-      {!daily && (
-        <>
-          <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
-          <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
-        </>
-      )}
+      {/* Rival rail + chase chip — the ghost record-lines of the other players on
+          today's board, and the "↑ +12m to pass X" chase target.
+
+          These were gated behind `!daily`, and `daily` is unconditionally true, so
+          they never rendered — on the reasoning that "displayRivals is empty in
+          daily anyway", which was true only because the parent hardcoded
+          `rivals={[]}`. That is now real data (rebased onto the viewer's day
+          baseline), and a chase target is the whole reason to keep climbing, so
+          the gate is gone. Both layers are `pointer-events-none` and the chip sits
+          at top-[30%], clear of the header it once overlapped. */}
+      <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
+      <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
 
       {/* ── Left utility rail ── persistent state chips (steady-hands streak,
           owned perks) stack in ONE flex column on the start side, below the top

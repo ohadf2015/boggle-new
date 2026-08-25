@@ -7,10 +7,17 @@
  *
  * The daily run has no end (the tower persists across UTC days and a miss never
  * ends it), so there is no "final score" moment to submit. The score is instead
- * BEST HEIGHT TODAY — which the client already maintains at
- * `wt-daily-best-${utcDateKey()}`. Every new personal best for the day is
- * submitted and the row keeps the maximum, so the leaderboard converges on the
- * same number whether you climb in one sitting or five.
+ * BEST CLIMB TODAY — metres built since the day's baseline — which the client
+ * maintains at `wt-daily-climb-${utcDateKey()}`. Every new personal best for the
+ * day is submitted and the row keeps the maximum, so the leaderboard converges on
+ * the same number whether you climb in one sitting or five.
+ *
+ * `heightM` is a DELTA, not the tower height. It used to be the tower height,
+ * which made this a lifetime board wearing a daily label: returning players
+ * re-posted an unchanged number on a later day (334 -> 334, 99 -> 99 across
+ * 2026-08-19..25) while a newcomer's first word ranked 2m against 453m. Rows
+ * written before 2026-08-25 hold cumulative values and will out-rank real climbs
+ * until their `puzzle_date` rolls over.
  *
  * Follows the per-mode triplet convention (`daily_word_wheel_attempts` +
  * `_leaderboard` view), NOT the legacy `daily_puzzle_attempts` table — that one

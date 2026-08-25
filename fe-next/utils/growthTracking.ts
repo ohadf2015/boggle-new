@@ -55,6 +55,18 @@ export type GrowthEvent =
   | 'game_abandoned'
   | 'game_abandon_attempted'
   | 'mode_selected'
+  | 'wordcraft_card_pick_shown'
+  | 'wordcraft_card_picked'
+  // Word Tower wheel economy. The tunables file says "balance pass happens in
+  // Phase 5 from PostHog telemetry" — but no in-mode event was ever wired, so
+  // the pass was never possible. These two make the wheel economy measurable:
+  // wordtower_scramble_used: a fresh ring, props { source: 'banked' | 'bought' }.
+  // wordtower_wall_reached: the player has 0 banked scrambles AND cannot afford
+  //   a spin, so the scramble button is DISABLED. The ring is reused and letters
+  //   are never consumed, so that is a dead end with no legal move — the leading
+  //   candidate for "11 of 20 daily players placed one word and left".
+  | 'wordtower_scramble_used'
+  | 'wordtower_wall_reached'
   | 'results_viewed'
   | 'replay_countdown_shown'
   | 'results_autoplay_cancelled'
@@ -77,6 +89,14 @@ export type GrowthEvent =
   | 'streak_ignition_shown'
   | 'tomorrow_card_shown'
   | 'save_streak_clicked'
+  // NextStepPrompt — the only cross-mode CTA in the product, and until now it
+  // emitted nothing, so a 151/14d `daily_puzzle_opened` count could not be told
+  // apart from "the CTA is never shown". `to` is the destination mode, `from`
+  // the surface it was shown on.
+  //   Props: { from: NextStepMode, to: 'daily' | 'multiplayer' | 'solo-bots',
+  //             variant: 'desktop' | 'mobile' | 'landscape' }.
+  | 'next_step_shown'
+  | 'next_step_clicked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
@@ -335,7 +355,17 @@ export type GrowthEvent =
   // exp-mp-round-issue-probe-v1 triage chip selection.
   //   Fires when player picks a follow-up chip after bad/ok mp_round rating.
   //   Props: { issue: 'bots_too_strong' | 'technical_issue', language: string }.
-  | 'mp_round_issue_selected';
+  | 'mp_round_issue_selected'
+  // Word Craft Run card-pick funnel — was fully uninstrumented (rageclicks on
+  // /word-craft had no signal to attribute). Also verifies the 2026-08-24
+  // rarity-weighted draw change actually shifted the served rarity mix.
+  //   wordcraft_card_pick_shown: fires when CardPickScreen mounts.
+  //     Props: { rarities: string[] } — the 3 offered cards' rarities, e.g.
+  //     ['common','common','rare']. Denominator for pick-rate + rarity-mix checks.
+  //   wordcraft_card_picked: fires when player selects a card.
+  //     Props: { cardId: string, rarity: string }. Numerator for pick-rate by rarity.
+  | 'wordcraft_card_pick_shown'
+  | 'wordcraft_card_picked';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

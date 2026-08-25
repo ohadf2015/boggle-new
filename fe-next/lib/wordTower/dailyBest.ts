@@ -7,9 +7,17 @@
  * when you first climb past the best you started the run with.
  */
 
-/** Per-day localStorage slot for today's best height. */
+/**
+ * Per-day localStorage slot for today's best CLIMB (metres built today).
+ *
+ * Renamed from `wt-daily-best-*`, which held a cumulative tower height. The key
+ * had to change with the meaning: a device still holding yesterday's cumulative
+ * value (e.g. 334) would fail `merged > stored` against a real climb of 2m and
+ * silently suppress every submit for the rest of the day. A new key starts empty,
+ * so the first climb submits. Orphaned `wt-daily-best-*` entries are harmless.
+ */
 export function dailyBestKey(dateKey: string): string {
-  return `wt-daily-best-${dateKey}`;
+  return `wt-daily-climb-${dateKey}`;
 }
 
 /**

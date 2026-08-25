@@ -3,7 +3,10 @@ import { dailyBestKey, mergeDailyBest, beatsDailyBest, isDailyTowerPlayed } from
 
 describe('dailyBestKey — per-day localStorage slot', () => {
   it('namespaces today\'s best by the UTC day', () => {
-    expect(dailyBestKey('2026-05-29')).toBe('wt-daily-best-2026-05-29');
+    // Renamed with the meaning: the slot holds today's CLIMB, not a cumulative
+    // tower height. A stale cumulative value under the old key would have
+    // suppressed every submit for a day (see dailyBestKey).
+    expect(dailyBestKey('2026-05-29')).toBe('wt-daily-climb-2026-05-29');
   });
 });
 
