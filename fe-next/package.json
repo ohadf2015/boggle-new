@@ -39,6 +39,7 @@
     "test:vitest:components": "vitest run --config vitest.config.ts components/",
     "test:all": "npm run test:backend && npm run test:vitest",
     "test:e2e": "echo 'Use playwriter CLI for E2E testing (see /e2e-test command)'",
+    "test:e2e:playwright": "playwright test",
     "lighthouse:ci:mobile": "lhci autorun --config=./lighthouserc.mobile.cjs",
     "lighthouse:ci:desktop": "lhci autorun --config=./lighthouserc.desktop.cjs",
     "lighthouse:ci": "npm run lighthouse:ci:mobile && npm run lighthouse:ci:desktop",
