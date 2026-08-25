@@ -209,7 +209,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 className={cn(
                   'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
                   'border-b-3 pb-1.5 outline-hidden transition-colors',
-                  'placeholder:text-neo-white',
+                  'placeholder:text-neo-white/50',
                   nameError
                     ? 'border-red-500 animate-neo-shake'
                     : nameFocused
@@ -275,7 +275,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={MAX_ROOM_LENGTH}
               placeholder={generateRoomName(username || 'Your')}
-              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
+              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/50 outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
             />
           </Reveal>
 

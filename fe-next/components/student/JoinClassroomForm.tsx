@@ -225,7 +225,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
                     className={cn(
-                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pe-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white",
+                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pe-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
                       codeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                     )}
                   />

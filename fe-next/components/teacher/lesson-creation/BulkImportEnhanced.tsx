@@ -220,7 +220,7 @@ export default function BulkImportEnhanced({
                   'w-full h-40 px-4 py-3 bg-neo-black/50 border-neo border-neo-black',
                   'text-neo-white font-neo-body shadow-hard-sm resize-none',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
-                  'placeholder:text-neo-white'
+                  'placeholder:text-neo-white/50'
                 )}
               />
             </div>

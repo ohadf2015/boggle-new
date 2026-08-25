@@ -403,7 +403,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
                 placeholder={type === 'feature' ? t('bugReport.placeholderFeature', t('bugReport.placeholder')) : t('bugReport.placeholder')}
                 rows={5}
                 dir={dir}
-                className="w-full p-3 bg-neo-navy-light text-neo-white border-2 border-neo-black/60 rounded-neo resize-none focus:outline-none focus:border-neo-pink placeholder:text-neo-white"
+                className="w-full p-3 bg-neo-navy-light text-neo-white border-2 border-neo-black/60 rounded-neo resize-none focus:outline-none focus:border-neo-pink placeholder:text-neo-white/50"
               />
 
               {message.trim().length > 0 && message.trim().length < MIN_MESSAGE_LENGTH && (

@@ -4641,6 +4641,18 @@ html[data-cosy='true'] .text-neo-white {
   color: rgb(var(--neo-black)) !important;
 }
 
+/* The rule above matches the CLASS `.text-neo-white`. Tailwind compiles the
+   `placeholder:` variant to a different class — `.placeholder\:text-neo-white`
+   (and `…\/50`) — so placeholders were never rescued and rendered white-on-sand,
+   i.e. invisible, for every cosy user. Match on the class *substring* so the
+   whole variant family (with or without an alpha suffix) is covered.
+   0.8 charcoal ≈ 4.84:1 on the sand backdrop — clears AA while still reading
+   lighter than body ink (7.86:1), which is the whole point of a placeholder. */
+html[data-cosy='true'] [class*='placeholder:text-neo-white']::placeholder,
+html[data-cosy='true'] [class*='placeholder:text-white']::placeholder {
+  color: rgb(var(--neo-black) / 0.8) !important;
+}
+
 /* SAFETY: error red stays hot, so its text must stay WHITE (charcoal-on-red
    fails AA). Two-class selector outweighs the single-class flip above. */
 html[data-cosy='true'] .bg-neo-red .text-white,

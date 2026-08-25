@@ -150,7 +150,7 @@ export function SeedWordTags({
           className={cn(
             'flex-1 min-w-[80px] bg-transparent text-neo-white',
             'font-neo-body text-sm outline-hidden',
-            'placeholder:text-neo-white'
+            'placeholder:text-neo-white/50'
           )}
         />
       </div>

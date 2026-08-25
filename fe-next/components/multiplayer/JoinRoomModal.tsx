@@ -169,7 +169,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 aria-invalid={!!nameError}
                 aria-describedby={nameError ? 'join-username-error' : undefined}
                 className={cn(
-                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white focus-visible:ring-neo-pink',
+                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white/50 focus-visible:ring-neo-pink',
                   nameError && 'border-neo-red animate-neo-shake'
                 )}
                 placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}

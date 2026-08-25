@@ -113,7 +113,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
               autoFocus
               className={cn(
                 'font-bold text-lg bg-neo-navy/60 border-neo-black text-neo-white',
-                'placeholder:text-neo-white',
+                'placeholder:text-neo-white/50',
                 nameError && 'border-red-500'
               )}
               placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
