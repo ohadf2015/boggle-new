@@ -11,7 +11,17 @@
  * URL (leaving `/multiplayer?utm_source=solo-confirm&...`), and the visitor
  * stared at a bare "NO BATTLES IN PROGRESS" lobby with no idea the room had
  * expired. This reverses that choice for invite follows — they now get a clear
- * message — while keeping silent dismissal for stale lobby taps.
+ * message.
+ *
+ * 2026-08-25: the silent branch that survived that fix is gone too. It only
+ * covered "stale lobby tap", but PageClient strips `room=` from the URL after
+ * the first failure, so an invite follower's SECOND attempt arrived with
+ * `cameFromInvite: false` and fell into it — re-opening the same regression
+ * from the retry side. 14d of prod: 46 users hit a gone-room error 232 times
+ * (5.2 attempts each) and 42 of 54 error sessions had no `room=` left in the
+ * URL. `/multiplayer` is the product's #1 rageclick page. Every branch now
+ * returns feedback; the call site dedupes by toast id so a run of dead-room
+ * taps collapses to one message.
  *
  * Pure: no `toast`, `t`, or `window` access. The call site supplies the inputs
  * and renders the returned key/params.
@@ -34,7 +44,7 @@ interface RoomGoneInput {
   roomCode: string;
 }
 
-export function roomGoneFeedback(input: RoomGoneInput): RoomGoneToast | null {
+export function roomGoneFeedback(input: RoomGoneInput): RoomGoneToast {
   if (input.wasActive) {
     return { key: 'multiplayerFlow.roomTimedOut', icon: '⏱️' };
   }
@@ -43,5 +53,13 @@ export function roomGoneFeedback(input: RoomGoneInput): RoomGoneToast | null {
       ? { key: 'invite.toast.notFound', params: { code: input.roomCode }, icon: '🔍' }
       : { key: 'invite.toast.expired', icon: '🔍' };
   }
-  return null;
+  // Stale lobby tap, or an invite follow re-tapping after `room=` was stripped
+  // (see the test file for the 14-day prod numbers). Never silent: the only
+  // other feedback is the dead row disappearing from the list, and 46 people
+  // read that as "nothing happened" and tapped 5.2 times each.
+  // `invite.toast.notFound` is worded generically ("Room {code} is no longer
+  // available"), so it carries both populations without a new key.
+  return input.roomCode
+    ? { key: 'invite.toast.notFound', params: { code: input.roomCode }, icon: '🔍' }
+    : { key: 'multiplayerFlow.roomTimedOut', icon: '⏱️' };
 }

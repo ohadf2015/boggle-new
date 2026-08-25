@@ -364,10 +364,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         // "empty page" report (invite → dead room → room= stripped → bare
         // "NO BATTLES IN PROGRESS" lobby with zero explanation). Stale lobby
         // taps (not active, no invite) stay silent as before.
+        // Always renders — `roomGoneFeedback` no longer returns null, so a
+        // stale lobby tap can't end in silence. The shared `roomGone` toast id
+        // collapses a run of dead-room taps into one message instead of a stack.
         const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
-        if (feedback) {
-          toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
-        }
+        toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
         if (!isActive && cameFromInvite) {
           trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
         }
