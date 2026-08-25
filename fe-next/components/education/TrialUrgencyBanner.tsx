@@ -33,12 +33,17 @@ export function TrialUrgencyBanner({ trial, href }: Props) {
         <h3 data-testid="trial-title" className="text-lg font-black font-neo-display">
           {t('education.trial.expired_title')}
         </h3>
-        <p className="mt-1 text-sm">{t('education.trial.expired_body')}</p>
+        <p className="mt-1 text-sm">{t('teacher.subscription.upgradeProDescription')}</p>
+        {/* The expired CTA used to point at /education/access — the free access
+            request form, which auto-approves. So the one screen where a teacher
+            has just lost something sent them to ask for more free access instead
+            of to the $9/mo page, and nothing in the product ever asked for the
+            money. Both strings already exist in every locale. */}
         <Link
-          href={`/${language}/education/access`}
+          href={`/${language}/teacher/upgrade`}
           className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
         >
-          {t('education.trial.renew_cta')}
+          {t('teacher.subscription.upgradeNow')}
         </Link>
       </div>
     );
