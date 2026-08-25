@@ -28,6 +28,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
+import { CurriculumWordListBrowser } from './curriculum/CurriculumWordListBrowser';
 import {
   Gamepad2, BookOpen, BarChart3, FileText, Users, Swords, HelpCircle, Plus,
 } from 'lucide-react';
@@ -59,7 +60,7 @@ const slideUp = {
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const router = useRouter();
   const isRTL = language === 'he';
   const [activeTab, setActiveTab] = useState<Tab>('play');
@@ -319,6 +320,22 @@ export default function TeacherDashboard() {
                   </h2>
                 </div>
                 <LessonBuilder />
+              </section>
+
+              {/* Curriculum word lists — 138 curated grade-level lists that had no in-app
+                  entry point before this. Grade bands are the most concrete thing teachers
+                  named on the access-request form. */}
+              <section>
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText className="w-4 h-4 text-neo-lime" />
+                  <h2 className="text-lg font-neo-display font-bold text-neo-white">
+                    {t('teacher.curriculum.title')}
+                  </h2>
+                </div>
+                <CurriculumWordListBrowser
+                  teacherId={user?.id}
+                  classroomId={selectedClassroomId || undefined}
+                />
               </section>
             </m.div>
           )}
