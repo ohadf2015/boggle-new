@@ -14,6 +14,11 @@
  *   carry the same user id (already authenticated) — don't reload those.
  * - skip on the OAuth callback route: it performs its own `router.replace`, so a
  *   blind reload there would fight / duplicate that navigation.
+ * - skip anonymous sessions: `signInAnonymously()` also emits `SIGNED_IN` with no
+ *   prior user, so it looks exactly like a sign-up. But that is guest *creation*,
+ *   not the guest → registered upgrade this reload is for, and it happens midway
+ *   through a flow that is still running (guest classroom-join mints the session,
+ *   then POSTs, then navigates). Reloading there destroys the rest of that flow.
  */
 const CALLBACK_PATH_RE = /\/auth\/callback(\/|$|\?|#)/;
 
@@ -22,11 +27,14 @@ export interface ReloadDecisionContext {
   wasUnauthenticated: boolean;
   /** Current `window.location.pathname`. */
   pathname: string;
+  /** True when the newly signed-in user is a Supabase anonymous (guest) user. */
+  isAnonymous?: boolean;
 }
 
 export function shouldReloadAfterSignIn(event: string, ctx: ReloadDecisionContext): boolean {
   if (event !== 'SIGNED_IN') return false;
   if (!ctx.wasUnauthenticated) return false;
   if (CALLBACK_PATH_RE.test(ctx.pathname)) return false;
+  if (ctx.isAnonymous) return false;
   return true;
 }

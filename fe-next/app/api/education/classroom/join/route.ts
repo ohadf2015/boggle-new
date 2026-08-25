@@ -23,73 +23,11 @@ const joinClassroomSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
-    // Get authenticated user (or create guest session)
-    let userId: string | undefined;
-    let isGuest = false;
-
-    const user = await getAuthedUser(request);
-    if (user) {
-      userId = user.id;
-    } else {
-      // Guest path: body should contain guestName
-      try {
-        const body = await request.json();
-        const guestName = body.guestName?.trim();
-        if (!guestName) {
-          return NextResponse.json(
-            { error: 'Not authenticated' },
-            { status: 401 }
-          );
-        }
-        // Create guest session
-        const supabase = await createClient();
-        const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
-        if (authError || !authData.user) {
-          logger.error('Failed to create guest session:', authError);
-          return NextResponse.json(
-            { error: 'Failed to create guest session' },
-            { status: 500 }
-          );
-        }
-        userId = authData.user.id;
-        isGuest = true;
-
-        // Create or update guest profile.
-        //
-        // No `is_guest` column is written: `profiles` has none, and naming a column that does
-        // not exist makes PostgREST reject the WHOLE upsert. That is what used to happen —
-        // the error was logged and the route carried on, so the guest joined with no profile
-        // row at all and showed up on the teacher's roster nameless and faceless. Supabase
-        // already records guest-ness as `auth.users.is_anonymous`, which signInAnonymously()
-        // sets, so there is nothing of ours to store.
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert(
-            {
-              id: userId,
-              username: guestName,
-            },
-            { onConflict: 'id' }
-          );
-
-        // Fail loudly. A membership whose student has no profile is a ghost in the classroom:
-        // the teacher sees a row with no name and no avatar and cannot tell who joined.
-        if (profileError) {
-          logger.error('Failed to create guest profile:', profileError);
-          return NextResponse.json(
-            { error: 'Failed to create guest profile' },
-            { status: 500 }
-          );
-        }
-      } catch {
-        return NextResponse.json(
-          { error: 'Not authenticated' },
-          { status: 401 }
-        );
-      }
-    }
-
-    // Parse and validate join code
+    // Read the body ONCE, up front. It carries both `guestName` (guest path) and
+    // `joinCode` (everyone), and a Request body is single-use: the guest path used
+    // to read it here and the join code read it again below, which threw "Body is
+    // unusable" and 400'd the guest — after their auth user and profile row had
+    // already been written. Orphaned identity, no membership.
     let body: unknown;
     try {
       body = await request.json();
@@ -97,6 +35,63 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
+    // Get authenticated user (or create guest session)
+    let userId: string | undefined;
+
+    const user = await getAuthedUser(request);
+    if (user) {
+      userId = user.id;
+    } else {
+      // Guest path: body should contain guestName
+      const guestName = (body as { guestName?: string } | null)?.guestName?.trim();
+      if (!guestName) {
+        return NextResponse.json(
+          { error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      // Create guest session
+      const supabase = await createClient();
+      const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
+      if (authError || !authData.user) {
+        logger.error('Failed to create guest session:', authError);
+        return NextResponse.json(
+          { error: 'Failed to create guest session' },
+          { status: 500 }
+        );
+      }
+      userId = authData.user.id;
+
+      // Create or update guest profile.
+      //
+      // No `is_guest` column is written: `profiles` has none, and naming a column that does
+      // not exist makes PostgREST reject the WHOLE upsert. That is what used to happen —
+      // the error was logged and the route carried on, so the guest joined with no profile
+      // row at all and showed up on the teacher's roster nameless and faceless. Supabase
+      // already records guest-ness as `auth.users.is_anonymous`, which signInAnonymously()
+      // sets, so there is nothing of ours to store.
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: userId,
+            username: guestName,
+          },
+          { onConflict: 'id' }
+        );
+
+      // Fail loudly. A membership whose student has no profile is a ghost in the classroom:
+      // the teacher sees a row with no name and no avatar and cannot tell who joined.
+      if (profileError) {
+        logger.error('Failed to create guest profile:', profileError);
+        return NextResponse.json(
+          { error: 'Failed to create guest profile' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Validate join code
     const parsed = joinClassroomSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(

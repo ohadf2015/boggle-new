@@ -79,6 +79,26 @@ describe('POST /api/education/classroom/join — guest path', () => {
     expect(row).not.toHaveProperty('is_guest');
   });
 
+  /**
+   * The route read the body twice: once in the guest branch for `guestName`, then again
+   * below for `joinCode`. A Request body is single-use, so the second `request.json()`
+   * throws "Body is unusable: Body has already been read" and the guest is turned away
+   * with 400 Invalid JSON — *after* an anonymous auth user and a profile row have already
+   * been written for them. Every guest join left an orphaned identity and no membership.
+   *
+   * The two tests above never caught it because both assert on state written before the
+   * second read.
+   */
+  it('joins a guest instead of 400ing on a body it already consumed', async () => {
+    const client = makeClient(PROFILE_COLUMNS);
+    (createClient as any).mockResolvedValue(client);
+
+    const res = await POST(req({ joinCode: 'ABC123', guestName: 'Dana' }));
+
+    expect(res.status).not.toBe(400);
+    expect(res.status).toBe(200);
+  });
+
   it('does not join a guest whose profile write failed, leaving a nameless member', async () => {
     // Only `id` accepted, so writing a username fails — stands for any schema drift.
     const client = makeClient(['id']);

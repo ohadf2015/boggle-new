@@ -42,6 +42,30 @@ describe('shouldReloadAfterSignIn', () => {
     ).toBe(false);
   });
 
+  it('does NOT reload when the new session is anonymous (guest CREATION, not guest → registered)', () => {
+    // `signInAnonymously()` emits SIGNED_IN with wasUnauthenticated=true, which is
+    // indistinguishable from a real sign-up unless we look at is_anonymous. Reloading
+    // here tears down the in-flight flow that just minted the guest — e.g. the
+    // classroom-join POST and its success navigation.
+    expect(
+      shouldReloadAfterSignIn('SIGNED_IN', {
+        wasUnauthenticated: true,
+        pathname: '/en/join/4HCDMS',
+        isAnonymous: true,
+      })
+    ).toBe(false);
+  });
+
+  it('still reloads when an anonymous guest upgrades to a real account', () => {
+    expect(
+      shouldReloadAfterSignIn('SIGNED_IN', {
+        wasUnauthenticated: true,
+        pathname: '/en',
+        isAnonymous: false,
+      })
+    ).toBe(true);
+  });
+
   it('reloads regardless of locale prefix on normal routes', () => {
     for (const p of ['/en', '/he/multiplayer', '/ja/daily', '/es/singleplayer']) {
       expect(shouldReloadAfterSignIn('SIGNED_IN', { wasUnauthenticated: true, pathname: p })).toBe(

@@ -121,3 +121,41 @@ play-tab state matrix is covered by the concurrent session's
 Both fixes address teacher→classroom. The stage after it is untested at any volume:
 **1 student has ever joined a classroom.** Nothing about student join has been measured
 because there was never enough upstream volume to see it. Measure that before building more.
+
+## Addendum — student join was broken, not just unused
+
+Written after the above. "Measure it before building" was the wrong call: three defects sat
+on the path, and #2 means a guest student could not join at all.
+
+1. **The join API 400'd any guest reaching its guest branch.** `route.ts` read
+   `request.json()` twice — once in the guest branch for `guestName`, once below for
+   `joinCode`. A `Request` body is single-use, so the second read threw `Body is unusable:
+   Body has already been read` and returned `400 Invalid JSON` — *after* the route had
+   already minted an anonymous auth user and written them a profile row: an orphaned
+   identity and no membership. The two existing guest tests both asserted on state written
+   *before* the second read, so the suite was green.
+   **Scope, stated honestly:** this was almost certainly never hit in production.
+   `useJoinClassroom` mints the guest session client-side and then POSTs *with* it, so
+   `getAuthedUser` returns a user and the server guest branch is skipped — and the authed
+   path only ever read the body once. Real bug, live trust boundary, but not the thing that
+   was breaking joins. Fixed because the branch exists and is reachable by any caller that
+   POSTs without a session.
+2. **A hard reload tore down the join mid-flight.** `signInAnonymously()` emits `SIGNED_IN`
+   with no prior user, which `shouldReloadAfterSignIn` could not tell apart from a real
+   sign-up, so it fired `window.location.reload()`. But that event is guest *creation*, not
+   the guest→registered upgrade the reload exists for — and the client mints the guest
+   session as step one of joining. The reload raced the POST that followed it.
+3. **The invite link demanded an account.** `/join/[code]` — exactly what
+   `ClassroomManager` builds for teachers to hand out — bounced anonymous visitors to the
+   homepage. Its sibling `/student/join` renders the same guest-capable form ungated. Same
+   destination, opposite behaviour: recurring-pitfall **Class 3**.
+
+Fixed all three. #2 is the one that was breaking live joins, and note its shape: a race
+(Class 1 — `signInAnonymously()` resolving into a listener that could not tell creation from
+upgrade) that failed *silently* (Class 4 — a reload looks like a page load, not an error), in
+a flow whose low numbers were read as *low demand*. **A funnel stage with near-zero
+conversion is a bug report until proven otherwise.**
+
+What is still unverified: whether a guest join now completes end-to-end against the live
+database. The three fixes are unit-verified, not integration-verified — the first real
+student to use an invite link is the test.

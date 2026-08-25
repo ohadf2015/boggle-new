@@ -339,6 +339,7 @@ async function handleAuthStateChange(
               shouldReloadAfterSignIn('SIGNED_IN', {
                 wasUnauthenticated,
                 pathname: window.location.pathname,
+                isAnonymous: sessionUser.is_anonymous === true,
               })
             ) {
               // Fresh guest → authenticated: hard reload so EVERY page (server

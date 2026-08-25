@@ -119,8 +119,16 @@ describe('JoinWithCodePage - Bug Reproduction', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  test('EXPECTED: should redirect unauthenticated user after loading completes', async () => {
-    // GIVEN: Auth loading completes, user is not authenticated
+  /**
+   * This replaces an earlier `should redirect unauthenticated user after loading
+   * completes` test. That assertion encoded the bug rather than a requirement:
+   * `JoinClassroomForm` has supported guest join since it shipped (it renders a
+   * name field when `!user`), and the sibling route /student/join renders it
+   * ungated — but /join/[code], the link teachers actually paste, bounced every
+   * logged-out student to the homepage and demanded a signup first.
+   */
+  test('EXPECTED: shows the join form to a logged-out student instead of bouncing them', async () => {
+    // GIVEN: Auth loading completes, visitor is not authenticated
     mockUseAuth.mockReturnValue({
       user: null,
       profile: null,
@@ -132,10 +140,29 @@ describe('JoinWithCodePage - Bug Reproduction', () => {
     // WHEN: Page renders
     render(<JoinWithCodePage />);
 
-    // THEN: Should save code and redirect to landing page
+    // THEN: The form renders, pre-filled, and nobody is sent to the landing page
     await waitFor(() => {
-      expect(sessionStorage.setItem).toHaveBeenCalledWith('joinClassroomReturnCode', '4HCDMS');
-      expect(mockPush).toHaveBeenCalledWith('/en');
+      expect(screen.getByTestId('join-form')).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Join Form: 4HCDMS/)).toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  test('EXPECTED: still stashes the code so a student who picks sign-in comes back here', async () => {
+    // The return path (useAuthInitialization reads this key on SIGNED_IN) stays
+    // intact for students who choose an account over a guest session.
+    mockUseAuth.mockReturnValue({
+      user: null,
+      profile: null,
+      isAuthenticated: false,
+      loading: false,
+      isSupabaseEnabled: true,
+    } as any);
+
+    render(<JoinWithCodePage />);
+
+    await waitFor(() => {
+      expect(sessionStorage.getItem('joinClassroomReturnCode')).toBe('4HCDMS');
     });
   });
 });

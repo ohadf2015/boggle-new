@@ -1,15 +1,19 @@
 /**
  * Join Classroom via Shareable Link
  *
- * Dynamic route that accepts a classroom code in the URL.
- * Pre-fills the join form with the code from the URL.
- * Redirects unauthenticated users to sign in first.
+ * Dynamic route that accepts a classroom code in the URL — this is the link
+ * `ClassroomManager` builds for teachers to hand out.
+ *
+ * Anyone can use it, signed in or not: `JoinClassroomForm` asks a logged-out
+ * student for a display name and joins them as a guest. Requiring an account
+ * first (what this page used to do) put a signup wall in front of the one
+ * action the link exists for.
  */
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -17,46 +21,32 @@ import JoinClassroomForm from '@/components/student/JoinClassroomForm';
 
 export default function JoinWithCodePageClient() {
   const params = useParams();
-  const router = useRouter();
   const { isAuthenticated, loading } = useAuth();
-  const { t, language } = useLanguage();
-  const [isChecking, setIsChecking] = useState(true);
+  const { t } = useLanguage();
 
   // Extract code from URL params and normalize to uppercase
   const rawCode = params?.code as string;
   const code = rawCode?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) || '';
 
   useEffect(() => {
-    // Wait for auth to finish loading before checking authentication
-    if (loading) {
-      return; // Still loading, don't make any decisions yet
+    if (loading) return;
+    // Not signed in: keep the code so a student who picks "sign in" over a guest
+    // session lands back on this page afterwards (useAuthInitialization reads
+    // this key on SIGNED_IN). No redirect — the form below handles guests.
+    if (!isAuthenticated && typeof window !== 'undefined' && code) {
+      sessionStorage.setItem('joinClassroomReturnCode', code);
     }
+  }, [isAuthenticated, loading, code]);
 
-    // Check authentication (only after loading completes)
-    if (!isAuthenticated) {
-      // Store return URL so user can come back after login
-      if (typeof window !== 'undefined' && code) {
-        sessionStorage.setItem('joinClassroomReturnCode', code);
-      }
-      router.push(`/${language}`);
-      return;
-    }
-
-    setIsChecking(false);
-  }, [isAuthenticated, loading, router, language, code]);
-
-  // Show loader during auth check or while auth is loading
-  if (isChecking || loading) {
+  // Wait for auth to resolve before rendering: the form branches on `user` to
+  // decide whether to ask for a guest name, and rendering early would flash the
+  // name field at an already-signed-in student.
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neo-navy">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
-  }
-
-  // Don't render if not authenticated (redirect will happen)
-  if (!isAuthenticated) {
-    return null;
   }
 
   // Validate code format (should be 6 alphanumeric characters)
