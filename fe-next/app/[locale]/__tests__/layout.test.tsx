@@ -180,7 +180,10 @@ describe('AdSense SSR loader (pre-approval verification + Funding Choices CMP)',
             return null;
         }
         const el = node as AnyElement;
-        if (el?.type === 'script' && el.props?.id === 'adsbygoogle-init') {
+        // Matched by id, not by `type === 'script'`: the loader is a next/script <Script>, whose
+        // type is a component reference. It became one because a raw SSR'd <script async> in
+        // <head> raced hydration — see headScriptsHydration.test.ts.
+        if (el?.props?.id === 'adsbygoogle-init') {
             return el as { props: Record<string, unknown> };
         }
         if (el?.props && typeof el.props === 'object' && 'children' in el.props) {
@@ -189,7 +192,7 @@ describe('AdSense SSR loader (pre-approval verification + Funding Choices CMP)',
         return null;
     }
 
-    it('renders the async adsbygoogle.js loader in <head> for every locale', async () => {
+    it('renders the lazyOnload adsbygoogle.js loader for every locale', async () => {
         const LocaleLayout = (await import('../layout')).default;
 
         for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
@@ -203,7 +206,11 @@ describe('AdSense SSR loader (pre-approval verification + Funding Choices CMP)',
             expect(script!.props.src).toBe(
                 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880'
             );
-            expect(script!.props.async).toBe(true);
+            // lazyOnload, not async/afterInteractive: it is the only strategy that cannot land
+            // before hydration finishes, and landing early is what shifted React's <head>
+            // children and threw #418 in 50 sessions a week.
+            expect(script!.props.strategy).toBe('lazyOnload');
+            expect(script!.props.async).toBeUndefined();
             expect(script!.props.crossOrigin).toBe('anonymous');
         }
     });

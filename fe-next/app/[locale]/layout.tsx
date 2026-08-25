@@ -597,21 +597,39 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
                 <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
                 <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
-                {/* AdSense loader — SSR'd unconditionally, site-wide and in every
-                    locale, so the AdSense review crawler and the Funding Choices
-                    CMP can verify the domain. (The crawler never grants cookie
-                    consent, so the consent-gated client-side AdSenseLoader never
-                    fires for it; the privacy-neutral `google-adsense-account`
-                    meta in the root layout is kept as belt-and-suspenders.)
-                    async + crossorigin per Google's snippet — non-render-blocking.
-                    No ad units are placed until approval (post-approval card).
-                    The id matches AdSenseLoader's injection guard so the
-                    consent-gated path never double-injects the script. */}
-                <script
+                {/* AdSense loader — lazyOnload, NOT an SSR'd `<script async>`.
+                    It used to be the latter, and that was the site's single
+                    biggest source of client-side errors: 56 React #418 hydration
+                    errors across 50 sessions in 7 days on `/` alone, plus every
+                    other locale root. Cause, from the unminified dev diff: this
+                    script starts fetching with the HTML, and adsbygoogle.js
+                    inserts its own `pagead/managed/js/adsense/…/show_ads_impl`
+                    script near the TOP of <head> — index 1, right after
+                    <meta charSet> — while React is still hydrating. React
+                    reconciles <head> children BY POSITION and does not key
+                    them, so every React-owned head child shifts by one and the
+                    first inline script (STORAGE_SHIM_SCRIPT) gets compared
+                    against Google's injected node. Nothing here is wrong; the
+                    container is just mutated underneath React mid-hydration.
+                    lazyOnload is the fix because it is the only strategy that
+                    cannot land before hydration finishes (`afterInteractive` is
+                    documented as "after SOME hydration occurs", which is the
+                    same race with a smaller window). It also matches what every
+                    other third party in this file already does — gtag,
+                    GrowthRadar and LogRocket are all lazyOnload — and keeps the
+                    ad loader off the LCP critical path.
+                    Domain verification does not depend on this tag: the
+                    privacy-neutral `google-adsense-account` meta in the root
+                    layout is the always-present ownership signal, and a
+                    JS-executing review crawler still sees this script once the
+                    page is interactive. The id still matches AdSenseLoader's
+                    injection guard, so the consent-gated path cannot
+                    double-inject. */}
+                <Script
                     id="adsbygoogle-init"
-                    async
                     src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(getAdSenseClient())}`}
                     crossOrigin="anonymous"
+                    strategy="lazyOnload"
                 />
                 {/* CrazyGames SDK — preconnect for game-distribution builds */}
                 <link rel="preconnect" href="https://sdk.crazygames.com" />
