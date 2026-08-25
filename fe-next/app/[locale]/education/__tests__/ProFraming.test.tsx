@@ -57,6 +57,21 @@ describe('ProFramingSection', () => {
     expect(studentMatches.length).toBeGreaterThan(0);
   });
 
+  it('does not print the same benefit on both cards', () => {
+    // `education.landing.pro.analytics` was rendered on the FREE card and the Pro card, so the
+    // comparison table's job — showing what $9 buys — was answered "the same thing, twice".
+    renderComponent();
+    const analytics = screen.getAllByText(en.education.landing.pro.analytics);
+    expect(analytics).toHaveLength(1);
+  });
+
+  it('lists analytics on the Pro side of the table, not the free side', () => {
+    renderComponent();
+    const analytics = screen.getByText(en.education.landing.pro.analytics);
+    const card = analytics.closest('div.rounded-neo');
+    expect(card?.textContent).toContain(en.education.landing.pro.proTier);
+  });
+
   it('links to /teacher/upgrade for checkout', () => {
     renderComponent();
     const upgradeLink = screen.getByRole('link', { name: /upgrade/i });

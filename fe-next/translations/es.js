@@ -12188,6 +12188,13 @@ const es = {
     }
   },
   "teacher": {
+    "proGate": {
+      "analytics": {
+        "title": "Las analíticas son una función de Teacher Pro",
+        "body": "Descubre quién se queda atrás, qué palabras falla la clase una y otra vez y qué lecciones funcionaron de verdad, con informes imprimibles para familias y dirección."
+      },
+      "cta": "Desbloquear por {price} $/mes"
+    },
     "subscription": {
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
@@ -13069,7 +13076,8 @@ const es = {
         "studentLimit": "Hasta {count} estudiantes por clase",
         "studentLimitPro": "Estudiantes ilimitados",
         "noAds": "Cero anuncios en rutas de estudiante",
-        "analytics": "Analítica e insights del aula",
+        "everythingInFree": "Todo lo del plan gratuito",
+        "analytics": "Analíticas de clase e informes imprimibles",
         "customLists": "Listas de palabras personalizadas",
         "duels": "Duelos de clase",
         "chooseNow": "Mejorar a Pro",

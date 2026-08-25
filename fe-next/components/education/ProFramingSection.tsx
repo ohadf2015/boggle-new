@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
-import { m } from 'framer-motion';
 
 /**
  * Pro framing section — positioned on the landing page to show the value
@@ -14,7 +13,6 @@ import { m } from 'framer-motion';
  */
 export function ProFramingSection() {
   const { t, language } = useLanguage();
-  const isRTL = language === 'he';
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
@@ -61,13 +59,20 @@ export function ProFramingSection() {
                 })}
               </span>
             </li>
+            {/* Everything below this line used to appear on the Pro card too, which answered
+                "what does $9 buy?" with "the same list". Word lists and duels are free because
+                they are what gets a teacher to a first lesson; analytics is the paid line. */}
             <li className="flex items-start gap-3">
               <span className="text-neo-lime font-bold mt-0.5">✓</span>
               <span className="text-neo-white">{t('education.landing.pro.noAds')}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white">{t('education.landing.pro.analytics')}</span>
+              <span className="text-neo-white">{t('education.landing.pro.customLists')}</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white">{t('education.landing.pro.duels')}</span>
             </li>
           </ul>
 
@@ -100,6 +105,12 @@ export function ProFramingSection() {
           <ul className="space-y-3 mb-6">
             <li className="flex items-start gap-3">
               <span className="text-neo-lime font-bold mt-0.5">✓</span>
+              <span className="text-neo-white">
+                {t('education.landing.pro.everythingInFree')}
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-lime font-bold mt-0.5">✓</span>
               <span className="text-neo-white font-bold">
                 {t('education.landing.pro.classLimitPro')}
               </span>
@@ -112,15 +123,9 @@ export function ProFramingSection() {
             </li>
             <li className="flex items-start gap-3">
               <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white">{t('education.landing.pro.analytics')}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white">{t('education.landing.pro.customLists')}</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-neo-lime font-bold mt-0.5">✓</span>
-              <span className="text-neo-white">{t('education.landing.pro.duels')}</span>
+              <span className="text-neo-white font-bold">
+                {t('education.landing.pro.analytics')}
+              </span>
             </li>
           </ul>
 

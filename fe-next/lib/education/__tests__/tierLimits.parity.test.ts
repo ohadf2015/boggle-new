@@ -39,6 +39,39 @@ describe('free tier limits', () => {
     expect(FREE_TIER_LIMITS.classes).toBeLessThan(2);
   });
 
+  it('sells nothing on Pro that the free tier already ships ungated', () => {
+    // The reason the free tier felt "too generous": `has_pro` gated the two COUNTS and
+    // nothing else, while the Pro card advertised analytics, custom word lists and classroom
+    // duels — all three of which every free teacher already had. A Pro bullet is only a Pro
+    // bullet if something in the codebase refuses it to a free teacher.
+    const gated = readFileSync(join(__dirname, '../../../components/teacher/ProGate.tsx'), 'utf8');
+    const pro = getTierConfig('pro').features;
+    const countBullets = pro.filter((f) => /^Unlimited /.test(f));
+    const featureBullets = pro.filter((f) => !countBullets.includes(f) && f !== 'Everything in Free');
+
+    expect(countBullets.length, 'Pro must still sell the count headroom').toBe(2);
+    expect(featureBullets.length, 'Pro must sell at least one real feature').toBeGreaterThan(0);
+    for (const bullet of featureBullets) {
+      // Each non-count Pro bullet names a `feature` key ProGate knows how to refuse.
+      const key = bullet.toLowerCase().split(' ')[0];
+      expect(gated, `Pro advertises "${bullet}" but ProGate cannot refuse it`).toContain(key);
+    }
+  });
+
+  it('refuses the analytics dashboard to free teachers everywhere it renders', () => {
+    // Two render sites, and a gate on only one of them is the asymmetric-path bug this repo
+    // keeps shipping: the dashboard tab would paywall while the direct URL stayed open.
+    const sites = [
+      '../../../components/teacher/TeacherDashboard.tsx',
+      '../../../app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx',
+    ];
+    for (const site of sites) {
+      const src = readFileSync(join(__dirname, site), 'utf8');
+      expect(src, `${site} renders AnalyticsDashboard`).toContain('AnalyticsDashboard');
+      expect(src, `${site} renders AnalyticsDashboard without a ProGate`).toContain('ProGate');
+    }
+  });
+
   it('has no hardcoded fallback limit left in the enforcement path', () => {
     // The hole this test was added for. lib/subscriptions.ts carried its OWN copies of the
     // caps as `?? 2` / `?? 30` / `limit: 30` fallbacks, taken whenever the subscription row

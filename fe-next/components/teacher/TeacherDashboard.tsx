@@ -28,6 +28,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
+import { ProGate } from './ProGate';
 import { CurriculumWordListBrowser } from './curriculum/CurriculumWordListBrowser';
 import {
   Gamepad2, BookOpen, BarChart3, FileText, Users, Swords, HelpCircle, Plus,
@@ -378,13 +379,15 @@ export default function TeacherDashboard() {
                     </div>
                     {classroomSelect}
                     {selectedClassroomId && (
-                      <AnalyticsDashboard
-                        classroomId={selectedClassroomId}
-                        onCreateReviewLesson={(words) => {
-                          const wordsParam = encodeURIComponent(words.join(','));
-                          router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
-                        }}
-                      />
+                      <ProGate feature="analytics">
+                        <AnalyticsDashboard
+                          classroomId={selectedClassroomId}
+                          onCreateReviewLesson={(words) => {
+                            const wordsParam = encodeURIComponent(words.join(','));
+                            router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
+                          }}
+                        />
+                      </ProGate>
                     )}
                   </section>
 

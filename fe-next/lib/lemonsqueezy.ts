@@ -67,11 +67,19 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
     features: [
       `Up to ${FREE_TIER_LIMITS.classes} class`,
       `${FREE_TIER_LIMITS.studentsPerClass} students per class`,
-      'Basic word tracking',
-      'Daily progress reports',
+      'Custom word lists & lesson builder',
+      'Classroom duels',
+      'Zero ads for students',
     ],
     variantId: undefined,
   },
+  // Every bullet here must be something a free teacher CANNOT have. Until 2026-08-25 three of
+  // them ("Advanced analytics", "Custom word lists", "Classroom duel mode") shipped ungated —
+  // `has_pro` gated the two counts and nothing else — so the card was selling what it was
+  // already giving away. Word lists and duels moved down to free (they are what gets a teacher
+  // to a first lesson); analytics moved behind components/teacher/ProGate.tsx and is the one
+  // paid feature. tierLimits.parity.test.ts fails if a bullet lands here that ProGate cannot
+  // refuse.
   pro: {
     id: 'pro',
     name: 'Teacher Pro',
@@ -79,11 +87,10 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
     classes_limit: null,
     students_limit_per_class: null,
     features: [
+      'Everything in Free',
       'Unlimited classes',
       'Unlimited students',
-      'Advanced analytics',
-      'Custom word lists',
-      'Classroom duel mode',
+      'Analytics & printable reports',
     ],
     variantId: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
   },

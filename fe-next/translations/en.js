@@ -11194,6 +11194,13 @@ const en = {
       "standard": "Curriculum Standard",
       "lastUpdated": "Last Updated"
     },
+    "proGate": {
+      "analytics": {
+        "title": "Analytics is a Teacher Pro feature",
+        "body": "See who is falling behind, which words your class keeps missing, and which lessons actually worked — plus printable reports for parents and admin."
+      },
+      "cta": "Unlock for ${price}/month"
+    },
     "subscription": {
       "classLimitTitle": "You've Reached Your Class Limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
@@ -11643,7 +11650,8 @@ const en = {
         "studentLimit": "Up to {count} students per class",
         "studentLimitPro": "Unlimited students",
         "noAds": "Zero ads on student routes",
-        "analytics": "Class analytics & insights",
+        "everythingInFree": "Everything in the Free plan",
+        "analytics": "Class analytics & printable reports",
         "customLists": "Custom word lists",
         "duels": "Classroom duels",
         "chooseNow": "Upgrade to Pro",

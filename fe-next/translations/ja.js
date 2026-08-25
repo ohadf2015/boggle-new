@@ -12186,6 +12186,13 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "proGate": {
+      "analytics": {
+        "title": "分析は Teacher Pro の機能です",
+        "body": "つまずいている生徒、クラスが繰り返し間違える単語、実際に効果があったレッスンがわかります。保護者や管理者向けの印刷用レポート付き。"
+      },
+      "cta": "月額 {price} ドルで解除"
+    },
     "subscription": {
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
@@ -13067,7 +13074,8 @@ const ja = {
         "studentLimit": "クラスあたり最大{count}人",
         "studentLimitPro": "生徒数無制限",
         "noAds": "生徒向けページに広告ゼロ",
-        "analytics": "クラス分析と洞察",
+        "everythingInFree": "無料プランのすべての機能",
+        "analytics": "クラス分析と印刷可能なレポート",
         "customLists": "カスタム単語リスト",
         "duels": "クラス対戦",
         "chooseNow": "Proにアップグレード",

@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
 import { AnalyticsDashboard } from '@/components/teacher/analytics/AnalyticsDashboard';
+import { ProGate } from '@/components/teacher/ProGate';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
 import dynamic from 'next/dynamic';
 const LessonEffectivenessChart = dynamic(
@@ -154,11 +155,13 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
         {/* Metrics Dashboard */}
         <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
-          <AnalyticsDashboard
-            classroomId={classroomId}
-            onViewStudents={handleViewStudents}
-            onCreateReviewLesson={handleCreateReviewLesson}
-          />
+          <ProGate feature="analytics">
+            <AnalyticsDashboard
+              classroomId={classroomId}
+              onViewStudents={handleViewStudents}
+              onCreateReviewLesson={handleCreateReviewLesson}
+            />
+          </ProGate>
         </div>
 
         {/* Detailed Views Tabs */}

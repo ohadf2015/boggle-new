@@ -12424,6 +12424,13 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
+    "proGate": {
+      "analytics": {
+        "title": "Analys ingår i Teacher Pro",
+        "body": "Se vem som kämpar, vilka ord klassen missar gång på gång och vilka lektioner som faktiskt fungerade — plus utskrivbara rapporter till vårdnadshavare och skolledning."
+      },
+      "cta": "Lås upp för {price} $/mån"
+    },
     "subscription": {
       "classLimitTitle": "Du har nått din klassgräns",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
@@ -13305,7 +13312,8 @@ const sv = {
         "studentLimit": "Upp till {count} elever per klassrum",
         "studentLimitPro": "Obegränsade elever",
         "noAds": "Noll annonser på elevvägar",
-        "analytics": "Klassanalys och insikter",
+        "everythingInFree": "Allt i gratisplanen",
+        "analytics": "Klassanalys och utskrivbara rapporter",
         "customLists": "Anpassade ordlistor",
         "duels": "Klassdueller",
         "chooseNow": "Uppgradera till Pro",
