@@ -51,4 +51,12 @@ describe('TrialUrgencyBanner', () => {
     expect(screen.getByTestId('trial-title')).toHaveTextContent('education.trial.expired_title');
     expect(screen.queryByTestId('trial-count')).toBeNull();
   });
+
+  // The expired banner is the only in-app moment a teacher is asked to pay. It
+  // used to link to the free access-request form, so the ask never happened.
+  it('sends an expired teacher to the paid upgrade page, not back to the free form', () => {
+    render(<TrialUrgencyBanner trial={mk({ isExpired: true, daysLeft: 0, hoursLeft: 0 })} />);
+    const cta = screen.getByRole('link');
+    expect(cta).toHaveAttribute('href', expect.stringContaining('/teacher/upgrade'));
+  });
 });
