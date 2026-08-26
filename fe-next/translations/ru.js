@@ -917,7 +917,11 @@ const ru = {
       "play_wordhunt": {
         "title": "На охоту",
         "desc": "Сыграй сегодняшнюю охоту за словами"
-      }
+      },
+      "play_wordwheel": {
+        "title": "Крутани барабан",
+        "desc": "Сыграй сегодняшнее Колесо слов"
+      },
     },
     "reward": {
       "xp": "+{{xp}} опыта",
@@ -6397,6 +6401,11 @@ const ru = {
   "wordRejected": "Слово невалидно",
   "opponentReconnected": "Противник переподключился!",
   "daily": {
+    "todaysPuzzles": "Головоломки дня",
+    "results": {
+      "fullRecap": "Подробный итог",
+      "fullRecapSummary": "Твои слова, твоя статистика и во что сыграть дальше"
+    },
     "title": "Ежедневный Вызов",
     "badge": "ДЕНЬ",
     "chooseChallengeHint": "Выбери квест",

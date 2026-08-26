@@ -6685,6 +6685,11 @@ const he = {
     "online": "מחוברים"
   },
   "daily": {
+    "todaysPuzzles": "החידות של היום",
+    "results": {
+      "fullRecap": "הסיכום המלא",
+      "fullRecapSummary": "המילים שלך, הנתונים שלך, ומה כדאי לשחק עכשיו"
+    },
     "title": "אתגר יומי",
     "badge": "אתגר יומי",
     "puzzleNumber": "יומי #{number}",
@@ -13726,7 +13731,11 @@ const he = {
       "play_wordhunt": {
         "title": "יוצאים לציד",
         "desc": "שחקו ציד מילים היומי"
-      }
+      },
+      "play_wordwheel": {
+        "title": "סיבוב אחד",
+        "desc": "שחקו את גלגל המילים של היום"
+      },
     },
     "reward": {
       "xp": "XP {{xp}}+",

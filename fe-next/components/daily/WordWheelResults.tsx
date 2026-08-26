@@ -21,6 +21,8 @@ import WordWheelSignupCta from './WordWheelSignupCta';
 import WordWheelReplayCta from './WordWheelReplayCta';
 import CatchUpSuggestion from './CatchUpSuggestion';
 import { STICKY_CTA_WORD_WHEEL } from './stickyCta';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import MpModeCrossPromo from './MpModeCrossPromo';
 import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
@@ -395,22 +397,34 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         <span className="text-neo-white/80 text-xs">{t('wordWheel.results.wordsFound')}</span>
       </m.div>
 
-      {/* Daily Insight Cards — personalized analytics on challenge performance.
-          Guests have no play history to analyse, and their screen is trimmed to
-          score + leaderboard + signup CTA. */}
-      {!isGuest && <m.div
-        className="w-full z-10"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <DailyInsightStack mode="word_wheel" date={puzzleDate} />
-      </m.div>}
-
-      {/* Returning-player anti-bounce: terminal 'already-played' view gets a
-          practice-wheel CTA so an engaged returner has an instant next game
-          instead of a dead-end. Experiment-gated (wheel-replay-cta-v1). */}
-      {!isPractice && alreadyPlayed && <WordWheelReplayCta />}
+      {/* The shareable artifact, sitting right under the verdict where the bar
+          puts it. A blind review of this screen named the same gap twice: the
+          result had no way out of the app, while the reference card's emoji grid
+          is the whole reason its puzzles spread. Reuses the card the
+          singleplayer results already ship — its `classic` shape (puzzle number,
+          score, word list) is exactly a wheel run — rather than adding a second
+          share component. Hidden on an empty run: nobody posts a blank grid. */}
+      {result.wordsFound.length > 0 && (
+        <div className="w-full z-10">
+          <GameEmojiShareCard
+            data={{
+              mode: 'classic',
+              puzzleNumber,
+              score: result.score,
+              words: result.wordsFound,
+            }}
+            t={t}
+            language={language}
+            onShareClick={(method) => trackGrowthEvent('cross_promo_click', {
+              target: 'share',
+              source: 'word_wheel_results',
+              placement: 'emoji_card',
+              method,
+              language,
+            })}
+          />
+        </div>
+      )}
 
       {/* Guest signup conversion — Word Wheel bypasses the generic guest-stats
           signup gate, so this restores a value-led signup surface for the mode.
@@ -426,18 +440,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           rank={currentRank}
           totalPlayers={totalPlayers}
         />
-      )}
-
-      {/* Catch-up suggestion: nudge the player to replay other missed dailies */}
-      {!isPractice && !isGuest && (
-        <m.div
-          className="w-full z-10"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 26 }}
-        >
-          <CatchUpSuggestion mode="word-wheel" excludeDate={puzzleDate} />
-        </m.div>
       )}
 
       {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
@@ -550,48 +552,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* Multiplayer cross-promo — only once today's daily pair is complete, so it
-          never competes with the "finish today's challenge" daily↔daily CTA. */}
-      {!isPractice && hasPlayedWordHunt && !isGuest && (
-        <m.div
-          className="w-full z-10"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.58, type: 'spring', stiffness: 300, damping: 26 }}
-        >
-          <MpModeCrossPromo language={language} source="word_wheel_results" t={t} />
-        </m.div>
-      )}
-
-      {/* Words found list — the score + words-found pill above already carry the
-          verdict for a guest; the full chip list is recap. */}
-      {result.wordsFound.length > 0 && !isGuest && (
-        <m.div
-          className="w-full z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
-          <h3 className="text-neo-white text-xs font-bold uppercase mb-2">
-            {t('wordWheel.foundWords')}
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {result.wordsFound.map((word, i) => (
-              <m.span
-                key={word}
-                className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white text-xs font-semibold shadow-hard-xs"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.7 + i * 0.05 }}
-              >
-                {gameLang === 'he' ? applyHebrewFinalLetters(word) : word}{' '}
-                <span className="text-neo-lime">+{scoreWord(word)}</span>
-              </m.span>
-            ))}
-          </div>
-        </m.div>
-      )}
-
       {/* Hint: tap a player row to see diff */}
       {!isPractice && result.wordsFound.length > 0 && (
         <p className="text-xs text-neo-white text-center font-medium -mb-1">
@@ -622,6 +582,54 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             onParticipantCountChange={setTotalPlayers}
           />
         </m.div>
+      )}
+
+      {/* Everything past the verdict, the next-step CTA and the leaderboard is
+          recap: useful, but not what the player came back for. It stays one tap
+          away instead of being cut, so no behaviour — and no analytics event —
+          is lost. Impression events inside now fire when the recap is OPENED,
+          which is a truer impression than firing on mount while off-screen. */}
+      {!isPractice && !isGuest && (
+        <CollapsibleSection
+          title={t('daily.results.fullRecap', 'Full recap')}
+          summary={t('daily.results.fullRecapSummary', 'Your words, your insights, and what to play next')}
+          className="w-full z-10"
+        >
+          <div className="flex flex-col gap-3">
+            <DailyInsightStack mode="word_wheel" date={puzzleDate} />
+
+            {/* Returning-player anti-bounce: an engaged returner gets an instant
+                next game instead of a dead end. Experiment-gated. */}
+            {alreadyPlayed && <WordWheelReplayCta />}
+
+            <CatchUpSuggestion mode="word-wheel" excludeDate={puzzleDate} />
+
+            {/* Only once today's pair is done, so it never competes with the
+                "finish today's challenge" daily<->daily CTA above. */}
+            {hasPlayedWordHunt && (
+              <MpModeCrossPromo language={language} source="word_wheel_results" t={t} />
+            )}
+
+            {result.wordsFound.length > 0 && (
+              <div>
+                <h3 className="text-neo-white text-xs font-bold uppercase mb-2">
+                  {t('wordWheel.foundWords')}
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {result.wordsFound.map((word) => (
+                    <span
+                      key={word}
+                      className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white text-xs font-semibold shadow-hard-xs"
+                    >
+                      {gameLang === 'he' ? applyHebrewFinalLetters(word) : word}{' '}
+                      <span className="text-neo-lime">+{scoreWord(word)}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </CollapsibleSection>
       )}
 
     </m.div>

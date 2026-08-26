@@ -6704,6 +6704,11 @@ const es = {
     "online": "en línea"
   },
   "daily": {
+    "todaysPuzzles": "Los retos de hoy",
+    "results": {
+      "fullRecap": "Resumen completo",
+      "fullRecapSummary": "Tus palabras, tus estadísticas y qué jugar después"
+    },
     "title": "Desafío Diario",
     "badge": "DESAFÍO DIARIO",
     "flow": {
@@ -14128,7 +14133,11 @@ const es = {
       "play_wordhunt": {
         "title": "¡A Cazar!",
         "desc": "Juega la Caza de Palabras diaria"
-      }
+      },
+      "play_wordwheel": {
+        "title": "Dale una vuelta",
+        "desc": "Juega la Rueda de Palabras de hoy"
+      },
     },
     "reward": {
       "xp": "+{{xp}} XP",

@@ -7,6 +7,7 @@ import {
   QUEST_PUBLIC_MODES,
   QUEST_BETA_MODES,
   isQuestEligibleMode,
+  questResultForWordWheel,
   type DailyQuest,
   type QuestGameResult,
   type QuestConditionType,
@@ -97,7 +98,13 @@ describe('quest achievability — href must route to a seam that credits its con
       'longWord', 'score', 'wordsInGame', 'combo', 'mpWin', 'beatHuman', 'playMode',
     ]),
     '/brain': new Set<QuestConditionType>(['score', 'wordsInGame', 'playMode']),
-    '/daily': new Set<QuestConditionType>(['playMode']),
+    /* The daily seams report a word list, so they credit longWord and
+       wordsInGame for real — see the emptyQuestResult call in
+       backend/routes/dailyChallenge/wordHuntRoutes.ts and questResultForWordWheel.
+       `score` is deliberately NOT listed: the wheel does report a score, but the
+       pool's score targets (300/500) are calibrated for the classic socket game
+       and are unreachable on a daily board, so this keeps steering them away. */
+    '/daily': new Set<QuestConditionType>(['playMode', 'longWord', 'wordsInGame']),
     '/singleplayer': new Set<QuestConditionType>([]),
   };
 
@@ -117,6 +124,8 @@ describe('quest achievability — href must route to a seam that credits its con
       multiplayer: '/multiplayer',
       brain: '/brain',
       'word-hunt': '/daily',
+      // Word Wheel is a public daily game on the same hub.
+      'word-wheel': '/daily',
     };
     for (const quest of DAILY_QUEST_POOL.filter(q => q.type === 'playMode')) {
       expect(quest.href).toBe(MODE_ROUTE[quest.mode as string]);
@@ -202,5 +211,64 @@ describe('isQuestEligibleMode — beta modes never credit quest progress', () =>
   it('fails open — an unknown/new mode credits by default (blocklist, not allowlist)', () => {
     expect(isQuestEligibleMode('some-future-public-mode')).toBe(true);
     expect(isQuestEligibleMode(undefined)).toBe(true);
+  });
+});
+
+/**
+ * The daily hub advertises "Daily Missions" above three daily games, so the
+ * quests it shows have to be about those games and finishable inside them.
+ *
+ * Two things were wrong. Finishing the daily Word Wheel credited the WEEKLY
+ * `dailyChallengesCompleted` counter but never called the daily-quest seam at
+ * all, so it moved no mission. And the pool steered almost every quest to
+ * /multiplayer or /brain — a player standing on /daily was being told to leave.
+ */
+describe('daily quests are reachable from the daily challenges', () => {
+  it('accepts the daily game modes as quest-eligible', () => {
+    // These are public daily games on the hub, not beta experiments.
+    expect(isQuestEligibleMode('word-hunt')).toBe(true);
+    expect(isQuestEligibleMode('word-wheel')).toBe(true);
+  });
+
+  it('offers a discovery quest for each public daily game', () => {
+    const dailyModes = DAILY_QUEST_POOL
+      .filter((q) => q.type === 'playMode')
+      .map((q) => q.mode);
+
+    expect(dailyModes).toContain('word-hunt');
+    expect(dailyModes).toContain('word-wheel');
+  });
+
+  it('points every quest a daily game can satisfy at /daily', () => {
+    // What the daily seams actually report: a mode, a word count and a longest
+    // word. Not score, not combo — so score/combo quests correctly stay away.
+    const satisfiableByDaily: QuestConditionType[] = ['longWord', 'wordsInGame'];
+
+    const misdirected = DAILY_QUEST_POOL
+      .filter((q) => satisfiableByDaily.includes(q.type))
+      .filter((q) => !q.href.startsWith('/daily'));
+
+    expect(misdirected.map((q) => q.id)).toEqual([]);
+  });
+
+  it('builds a quest result from a finished Word Wheel run', () => {
+    const result = questResultForWordWheel({
+      score: 64,
+      wordsFound: ['CAT', 'BRIDGE', 'TRAIN'],
+    });
+
+    expect(result.mode).toBe('word-wheel');
+    expect(result.wordsFound).toBe(3);
+    expect(result.longestWordLength).toBe(6);
+    expect(result.score).toBe(64);
+    // A solo daily run is never a PvP win, whatever the score.
+    expect(result.isMultiplayer).toBe(false);
+    expect(result.beatHumanOpponent).toBe(false);
+  });
+
+  it('survives a Word Wheel run that found nothing', () => {
+    const result = questResultForWordWheel({ score: 0, wordsFound: [] });
+    expect(result.wordsFound).toBe(0);
+    expect(result.longestWordLength).toBe(0);
   });
 });

@@ -17,8 +17,8 @@ export interface QuestCardProps {
   title: string;
   tagline: string;
   details?: string;
-  /** `yellow` and `cyan` both render the cyan chrome below — kept distinct so
-   *  callers name their own accent; only `orange` branches. */
+  /** Each value renders its own accent, icon, glow and art scrim — one owned
+   *  colour per daily game, which is what makes the hub scannable. */
   color: 'orange' | 'yellow' | 'cyan';
   status: 'new' | 'won' | 'lost' | 'unavailable';
   isLoadingStatus?: boolean;
@@ -80,25 +80,49 @@ export function QuestCard({
   const isNew = status === 'new';
   const isSecondary = variant === 'secondary';
 
-  const colorConfig = color === 'orange'
-    ? {
-        text: 'text-neo-orange',
-        bg: 'bg-neo-orange',
-        pill: 'bg-neo-orange/20 border-neo-orange text-neo-orange',
-        iconBg: 'bg-neo-orange',
-        gradient: 'from-neo-orange/15',
-        accent: 'bg-neo-orange',
-        glow: 'bg-neo-orange/30',
-      }
-    : {
-        text: 'text-neo-cyan',
-        bg: 'bg-neo-cyan',
-        pill: 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan',
-        iconBg: 'bg-neo-cyan',
-        gradient: 'from-neo-cyan/15',
-        accent: 'bg-neo-cyan',
-        glow: 'bg-neo-cyan/30',
-      };
+  /* One owned colour per game — the hub is scanned, not read, and colour is how a
+     returning player finds the game they want without parsing three titles.
+     `yellow` used to fall through to the cyan branch, which made two of the three
+     daily games visually interchangeable.
+
+     Tailwind only emits a class when the literal string appears in source, so
+     these are spelled out in full rather than composed as `bg-neo-${color}`. */
+  const COLOR_CONFIGS = {
+    orange: {
+      text: 'text-neo-orange',
+      bg: 'bg-neo-orange',
+      pill: 'bg-neo-orange/20 border-neo-orange text-neo-orange',
+      iconBg: 'bg-neo-orange',
+      gradient: 'from-neo-orange/15',
+      accent: 'bg-neo-orange',
+      glow: 'bg-neo-orange/30',
+      // Scrim keeps the art legible but carries the game's hue, so the card reads
+      // as "the orange one" at a glance instead of as generic dark slate.
+      scrim: 'from-neo-navy via-neo-navy/85 to-neo-orange/45',
+    },
+    yellow: {
+      text: 'text-neo-yellow',
+      bg: 'bg-neo-yellow',
+      pill: 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow',
+      iconBg: 'bg-neo-yellow',
+      gradient: 'from-neo-yellow/15',
+      accent: 'bg-neo-yellow',
+      glow: 'bg-neo-yellow/30',
+      scrim: 'from-neo-navy via-neo-navy/85 to-neo-yellow/45',
+    },
+    cyan: {
+      text: 'text-neo-cyan',
+      bg: 'bg-neo-cyan',
+      pill: 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan',
+      iconBg: 'bg-neo-cyan',
+      gradient: 'from-neo-cyan/15',
+      accent: 'bg-neo-cyan',
+      glow: 'bg-neo-cyan/30',
+      scrim: 'from-neo-navy via-neo-navy/85 to-neo-cyan/45',
+    },
+  } as const;
+
+  const colorConfig = COLOR_CONFIGS[color] ?? COLOR_CONFIGS.cyan;
 
   const handleClick = () => {
     if (isUnavailable && onRequestChallenge) {
@@ -148,7 +172,12 @@ export function QuestCard({
           'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
           'transition-shadow duration-200 group',
           requestState === 'loading' && 'opacity-50 cursor-not-allowed',
-          isCompleted && 'opacity-85',
+          /* A finished game steps back so the eye lands on what is still waiting
+             today. `opacity-85` alone was a 15% drop — invisible in practice, which
+             left all three cards at identical weight. Desaturating the artwork is
+             what actually reads at a glance, and it makes the hub look different as
+             the day progresses. */
+          isCompleted && 'opacity-70 grayscale-[0.85] saturate-50',
           isUnavailable && 'opacity-60'
         )}
         style={{
@@ -162,7 +191,10 @@ export function QuestCard({
       >
         {/* Accent strip */}
         {!isSecondary && (
-          <div className={cn('absolute inset-e-0 top-0 bottom-0 w-2', colorConfig.accent)} />
+          <div
+            data-testid="quest-card-accent"
+            className={cn('absolute inset-e-0 top-0 bottom-0 w-2', colorConfig.accent)}
+          />
         )}
 
         {/* Gradient overlay */}
@@ -175,7 +207,10 @@ export function QuestCard({
         {!isSecondary && previewImageUrl && (
           <div
             data-testid="quest-card-image-overlay"
-            className="absolute inset-0 bg-gradient-to-t from-slate-900/98 via-slate-900/70 to-slate-900/30 pointer-events-none"
+            className={cn(
+              'absolute inset-0 bg-linear-to-t pointer-events-none',
+              colorConfig.scrim,
+            )}
           />
         )}
 
@@ -280,13 +315,23 @@ export function QuestCard({
         <div className={cn('relative z-10', isSecondary ? 'flex-1 min-w-0' : 'space-y-1 md:flex-1 md:min-w-0')}>
           <h2 className={cn(
             'font-neo-display font-black leading-none',
-            colorConfig.text,
+            /* The scrim now carries the game's hue, so tinting the title too puts
+               orange on orange over busy artwork — below WCAG AA. Identity still
+               reads from the accent strip, the icon and the button. */
+            previewImageUrl ? 'text-neo-white' : colorConfig.text,
             isSecondary ? 'text-lg' : 'text-2xl'
           )}>
             {title}
           </h2>
           {!isSecondary && (
-            <p className="text-[13px] text-slate-400 line-clamp-2">
+            <p className={cn(
+              'text-[13px] line-clamp-2',
+              /* A blind craft review measured this line at roughly 4.5:1 over the
+                 tinted card art — the AA threshold exactly, which is a floor, not a
+                 target. slate-400 was tuned for a flat dark card, not for artwork
+                 with a colour wash over it. */
+              previewImageUrl ? 'text-neo-white/90' : 'text-slate-400',
+            )}>
               {tagline}
             </p>
           )}

@@ -7,7 +7,7 @@
  * word-by-word list are recap for players who already have an account.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import WordWheelResults from '../WordWheelResults';
 import type { WordWheelGameResult } from '../WordWheelGame';
 
@@ -93,8 +93,16 @@ describe('WordWheelResults — guest simplification', () => {
     expect(screen.queryByText('wordWheel.foundWords')).toBeNull();
   });
 
-  it('keeps the full recap for a registered player', () => {
+  /* The recap still belongs to registered players — it just moved behind one tap
+     so the first paint is the verdict, the next step and the leaderboard. Asserting
+     it is reachable (not that it is immediately visible) is what this test was
+     always protecting: a guest gets no recap, a registered player does. */
+  it('keeps the full recap for a registered player, one tap away', () => {
     renderResults(true);
+    expect(screen.queryByTestId('insight-stack')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /full recap/i }));
+
     expect(screen.getByTestId('insight-stack')).toBeInTheDocument();
     expect(screen.getByTestId('catch-up')).toBeInTheDocument();
     expect(screen.getByText('wordWheel.foundWords')).toBeInTheDocument();

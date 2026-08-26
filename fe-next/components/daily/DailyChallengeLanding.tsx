@@ -17,13 +17,11 @@ import { questCardModes, visibleDailyModes } from '@/lib/dailyModes';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
-import { QrWelcomeBanner } from './QrWelcomeBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
+import { DailyHubHeader } from './landing/DailyHubHeader';
 import { QuestCard } from './landing/QuestCard';
 import { DailyModeQuestCard } from './landing/DailyModeQuestCard';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
-import { ConfettiBackground } from './landing/ConfettiBackground';
-import { FloatingDecorations } from './landing/FloatingDecorations';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
 import DailyInsightStack from './DailyInsightStack';
@@ -180,12 +178,8 @@ export function DailyChallengeLanding({
       transition={{ type: 'spring', stiffness: 280, damping: 26 }}
       className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-2 pb-bottom-stack sm:pb-2 max-w-3xl mx-auto w-full relative gap-3"
     >
-      {/* Ambient effects */}
-      <ConfettiBackground />
-      <FloatingDecorations />
-
-      {/* QR / barcode arrival: witty "you scanned in" welcome */}
-      <QrWelcomeBanner show={cameFromQrScan} t={t} />
+      {/* Hub Header: Today's Puzzles + date */}
+      <DailyHubHeader todayIso={todayIso} />
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
@@ -286,20 +280,6 @@ export function DailyChallengeLanding({
         />
       )}
 
-      {/* ── Dotted connector line (Word Hunt → Word Wheel) ── keyed to THIS pair,
-          not the aggregate count (which now includes beta Word Tower and would
-          otherwise light this node when Hunt+Tower are done but Wheel isn't). */}
-      <div className="flex flex-col items-center gap-0 py-1">
-        <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
-        <div className={cn(
-          'w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center',
-          wordHuntStatus === 'won' && wordWheelPlayed ? 'bg-neo-lime' : 'bg-neo-navy-light'
-        )}>
-          {wordHuntStatus === 'won' && wordWheelPlayed && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
-        </div>
-        <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
-      </div>
-
       {/* Quest 2: Word Wheel */}
       {wordWheelPlayed ? (
         <m.div
@@ -378,18 +358,6 @@ export function DailyChallengeLanding({
           `<a>`), which is why it read as a detached afterthought. */}
       {showsWordTower && (
         <>
-          {/* ── Dotted connector line (Word Wheel → Word Tower) ── */}
-          <div className="flex flex-col items-center gap-0 py-1">
-            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
-            <div className={cn(
-              'w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center',
-              wordWheelPlayed && wordTowerPlayed ? 'bg-neo-lime' : 'bg-neo-navy-light'
-            )}>
-              {wordWheelPlayed && wordTowerPlayed && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
-            </div>
-            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
-          </div>
-
           {wordTowerPlayed ? (
             <m.div
               initial={{ opacity: 0, y: 16 }}
@@ -468,13 +436,6 @@ export function DailyChallengeLanding({
           Empty for ordinary players; only admins/beta testers see this node. */}
       {questModes.length > 0 && (
         <>
-          {/* ── Dotted connector line (Word Tower → beta quest) ── */}
-          <div className="flex flex-col items-center gap-0 py-1">
-            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
-            <div className="w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center bg-neo-navy-light" />
-            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
-          </div>
-
           <div className="w-full flex flex-col gap-2" data-testid="daily-quest-modes">
             {questModes.map((mode, i) => (
               <DailyModeQuestCard
