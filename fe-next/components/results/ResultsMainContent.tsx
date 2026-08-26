@@ -37,6 +37,7 @@ import { deriveBragCardData, deriveBragShareText } from '@/lib/results/bragCard'
 import { getBragShareUrl, trackShareCompleted } from '@/utils/share';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import InlineSignupCard from '@/components/auth/InlineSignupCard';
+import ReferralShareBanner from '@/components/referral/ReferralShareBanner';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -558,6 +559,15 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           them, so the recap below is empty or meaningless. One signup CTA takes
           the place of the whole secondary stack. */}
       {isGuest && <InlineSignupCard isAuthenticated={isAuthenticated} />}
+
+      {/* ── 3c. AUTHENTICATED PLAYERS — the incentivized referral CTA (code +
+          coin/XP reward) that previously only reached players who opted into
+          visiting the leaderboard page. Every finished game is now an
+          impression at the highest-intent moment. Mirrors InlineSignupCard's
+          guard above (`!isGuest`, the auth-resolved flag) so the two CTAs
+          never double up mid-resolution; the component self-gates further on
+          having a referral code loaded. */}
+      {!isGuest && <ReferralShareBanner />}
 
       {/* ── 4. WHAT YOU EARNED — XP / level / streak. ImprovementPanel renders
           nothing for guests w/ no progress. Coins no longer get their own
