@@ -12271,7 +12271,10 @@ const es = {
         "play": "Jugar",
         "prepare": "Preparar",
         "review": "Revisar"
-      }
+      },
+      "classroomLoadError": "No se pudieron cargar tus clases",
+      "classroomLoadErrorHint": "Revisa tu conexión e inténtalo de nuevo",
+      "retry": "Reintentar"
     },
     "game": {
       "qrCode": "Mostrar Código QR",
@@ -12338,7 +12341,29 @@ const es = {
       "language": "Idioma",
       "created": "Creado {{date}}",
       "noClassrooms": "Sin aulas aún",
-      "createFirst": "Crea tu primera aula para empezar"
+      "createFirst": "Crea tu primera aula para empezar",
+      "inviteStudents": "Invitar alumnos",
+      "share": "Compartir",
+      "shareInviteText": "Únete a {{name}} en LexiClash con el código {{code}}",
+      "createdBannerTitle": "¡Clase lista!",
+      "createdBannerBody": "Comparte este código con tus alumnos.",
+      "dismissBanner": "Listo",
+      "wizard": {
+        "title": "Tres pasos y listo",
+        "subtitle": "En un minuto tienes el código.",
+        "step1": {
+          "title": "Crea la clase",
+          "body": "Ponle nombre y elige el idioma."
+        },
+        "step2": {
+          "title": "Agarra el código",
+          "body": "El código de acceso aparece al toque."
+        },
+        "step3": {
+          "title": "Compártelo con tus alumnos",
+          "body": "Mándales el código. Sin cuentas."
+        }
+      }
     },
     "classrooms": {
       "students": {
@@ -13056,6 +13081,7 @@ const es = {
       },
       "welcomeBack": "¡Bienvenido!",
       "openDashboard": "Abrir panel de maestro",
+      "createClassroom": "Crear clase",
       "furtherReading": {
         "title": "Explorar más",
         "guides": "Guías de estrategia",

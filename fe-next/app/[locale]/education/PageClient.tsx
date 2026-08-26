@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Script from 'next/script';
 import { m, useReducedMotion } from 'framer-motion';
+import { Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
@@ -110,14 +111,23 @@ export function PageClient() {
                     {profile?.display_name}
                   </p>
                 </div>
-                <a
-                  href={`/${language}/teacher`}
-                  data-testid="go-to-dashboard-link"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
-                >
-                  {t('education.landing.openDashboard')}
-                  <span>→</span>
-                </a>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <a
+                    href={`/${language}/teacher`}
+                    data-testid="create-classroom-shortcut"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-yellow text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
+                  >
+                    {t('education.landing.createClassroom', 'Create classroom')}
+                  </a>
+                  <a
+                    href={`/${language}/teacher`}
+                    data-testid="go-to-dashboard-link"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+                  >
+                    {t('education.landing.openDashboard')}
+                    <span aria-hidden="true">→</span>
+                  </a>
+                </div>
               </div>
             </m.div>
 
