@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6243,
+    "totalKeysInCode": 6245,
     "keyCountByLanguage": {
-      "en": 12087,
-      "es": 12383,
-      "he": 12288,
-      "ja": 12342,
-      "ru": 12122,
-      "sv": 12338
+      "en": 12060,
+      "es": 12356,
+      "he": 12261,
+      "ja": 12315,
+      "ru": 12091,
+      "sv": 12311
     },
-    "missingFromEnglish": 46,
+    "missingFromEnglish": 81,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -1892,7 +1892,7 @@
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 182,
+        "line": 208,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
@@ -3649,6 +3649,215 @@
       ]
     },
     {
+      "key": "education.access.status_unknown_body",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "key": "education.access.status_unknown_title",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 166
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.analytics",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 119
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 147
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.chooseNow",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.classLimit",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.classLimitPro",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.comparisonAlt",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.customLists",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 109
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.duels",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 110
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.everythingInFree",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.freeForever",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.freeTier",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.noAds",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 111
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.perMonth",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 55
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.proTier",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.studentLimit",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.studentLimitPro",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 139
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.subtitle",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.title",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.whyNow",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.classroomFull",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 115
+        }
+      ]
+    },
+    {
       "key": "footer.spellingBeePractice",
       "usages": [
         {
@@ -3663,6 +3872,132 @@
         {
           "file": "components/sealedBid/SealedBidTable.tsx",
           "line": 83
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.studentsPresentDescription",
+      "usages": [
+        {
+          "file": "components/teacher/StudentsPresentStrip.tsx",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.studentsPresentTitle",
+      "usages": [
+        {
+          "file": "components/teacher/StudentsPresentStrip.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "teacher.proGate.cta",
+      "usages": [
+        {
+          "file": "components/teacher/ProGate.tsx",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.checkoutUnavailable",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome1",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome2",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome3",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome4",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.matrix.featureColumn",
+      "usages": [
+        {
+          "file": "components/teacher/PlanComparisonMatrix.tsx",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.matrix.title",
+      "usages": [
+        {
+          "file": "components/teacher/PlanComparisonMatrix.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.matrix.unlimited",
+      "usages": [
+        {
+          "file": "components/teacher/PlanComparisonMatrix.tsx",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.priceTaxNote",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.proHeroAlt",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 173
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.valueHeadline",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 160
         }
       ]
     }
@@ -3852,6 +4187,10 @@
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
+      "education.landing.furtherReading.title",
+      "education.landing.furtherReading.guides",
+      "education.landing.furtherReading.glossary",
+      "education.landing.furtherReading.wordSolver",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
