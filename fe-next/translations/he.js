@@ -12147,7 +12147,10 @@ const he = {
         "play": "שחק",
         "prepare": "הכן",
         "review": "סקור"
-      }
+      },
+      "classroomLoadError": "לא הצלחנו לטעון את הכיתות",
+      "classroomLoadErrorHint": "בדקו את החיבור ונסו שוב",
+      "retry": "נסו שוב"
     },
     "game": {
       "qrCode": "הצג קוד QR",
@@ -12198,6 +12201,28 @@ const he = {
       "created": "נוצר ב-{{date}}",
       "noClassrooms": "אין כיתות עדיין",
       "createFirst": "צרו את הכיתה הראשונה שלכם",
+      "inviteStudents": "הזמינו תלמידים",
+      "share": "שיתוף",
+      "shareInviteText": "הצטרפו ל-{{name}} ב-LexiClash עם הקוד {{code}}",
+      "createdBannerTitle": "הכיתה מוכנה!",
+      "createdBannerBody": "שתפו את הקוד עם התלמידים.",
+      "dismissBanner": "סגור",
+      "wizard": {
+        "title": "שלושה צעדים לכיתה",
+        "subtitle": "תוך דקה יש לכם קוד הצטרפות.",
+        "step1": {
+          "title": "צרו כיתה",
+          "body": "תנו שם ובחרו שפה."
+        },
+        "step2": {
+          "title": "קבלו קוד",
+          "body": "קוד קצר מופיע מיד."
+        },
+        "step3": {
+          "title": "שתפו עם התלמידים",
+          "body": "שולחים את הקוד. בלי הרשמה."
+        }
+      },
       "validation": {
         "nameRequired": "שם הכיתה נדרש"
       },
@@ -12911,6 +12936,7 @@ const he = {
       },
       "welcomeBack": "ברוך שובך",
       "openDashboard": "פתח לוח מורה",
+      "createClassroom": "צרו כיתה",
       "furtherReading": {
         "title": "עוד באתר",
         "guides": "מדריכי אסטרטגיה",

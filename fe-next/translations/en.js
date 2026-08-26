@@ -10827,7 +10827,10 @@ const en = {
         "play": "Play",
         "prepare": "Prepare",
         "review": "Review"
-      }
+      },
+      "classroomLoadError": "Could not load your classrooms",
+      "classroomLoadErrorHint": "Check your connection and try again",
+      "retry": "Retry"
     },
     "game": {
       "qrCode": "Show QR Code",
@@ -10878,6 +10881,28 @@ const en = {
       "created": "Created {{date}}",
       "noClassrooms": "No classrooms yet",
       "createFirst": "Create your first classroom to get started",
+      "inviteStudents": "Invite students",
+      "share": "Share",
+      "shareInviteText": "Join {{name}} on LexiClash with code {{code}}",
+      "createdBannerTitle": "Classroom ready!",
+      "createdBannerBody": "Share this code with your students.",
+      "dismissBanner": "Got it",
+      "wizard": {
+        "title": "Get students in 3 steps",
+        "subtitle": "You'll have a join code in under a minute.",
+        "step1": {
+          "title": "Create class",
+          "body": "Name it and pick a language."
+        },
+        "step2": {
+          "title": "Get code",
+          "body": "A short join code appears instantly."
+        },
+        "step3": {
+          "title": "Share with students",
+          "body": "Send the code. No student logins needed."
+        }
+      },
       "validation": {
         "nameRequired": "Classroom name is required"
       },
@@ -11631,6 +11656,7 @@ const en = {
       },
       "welcomeBack": "Welcome back",
       "openDashboard": "Open Teacher Dashboard",
+      "createClassroom": "Create classroom",
       "furtherReading": {
         "title": "Explore More",
         "guides": "Strategy Guides",

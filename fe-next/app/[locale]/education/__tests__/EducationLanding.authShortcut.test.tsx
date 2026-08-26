@@ -97,6 +97,28 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     expect(link).toHaveAttribute('href', '/en/teacher');
   });
 
+  it('shows always-visible create classroom shortcut for teachers', () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      profile: { display_name: 'Mr. Smith', user_role: 'teacher' },
+    });
+    render(<EducationPageClient />);
+    const shortcut = screen.getByTestId('create-classroom-shortcut');
+    expect(shortcut).toHaveAttribute('href', '/en/teacher');
+    expect(shortcut).toHaveTextContent('education.landing.createClassroom');
+  });
+
+  it('does NOT show create classroom shortcut when unauthenticated', () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      loading: false,
+      profile: null,
+    });
+    render(<EducationPageClient />);
+    expect(screen.queryByTestId('create-classroom-shortcut')).not.toBeInTheDocument();
+  });
+
   it('shows teacher dashboard link when is_admin flag is set', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
