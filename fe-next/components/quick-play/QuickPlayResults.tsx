@@ -21,6 +21,7 @@ import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
 import { QuickRivalsPassed } from './QuickRivalsPassed';
 import { QuickWordsCollected, type CollectedWord } from './QuickWordsCollected';
+import { QuickLeaderboardCard } from './QuickLeaderboardCard';
 import { ModeGlyph } from './ModeGlyph';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
@@ -105,7 +106,6 @@ export function QuickPlayResults({
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
-  const [showFullBoard, setShowFullBoard] = useState(false);
   const celebrated = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -398,18 +398,20 @@ export function QuickPlayResults({
 
       {/* Rival compare: the challenge / weekly rivalry, a different axis from
           the round's own field above. */}
-      {rival && (
+      {rival && rival.avatarUserId && (
         <RivalCompareCard
           rivalName={rival.name}
           rivalEmoji={rival.emoji}
           rivalScore={rival.theirValue}
           myScore={rival.myValue}
-          rivalAvatar={
-            rival.avatarUserId
-              ? { userId: rival.avatarUserId, customAvatar: rival.avatarConfig ?? null }
-              : undefined
-          }
-          myAvatar={user?.id ? { userId: user.id, customAvatar: profile?.avatar_config ?? null } : undefined}
+          rivalAvatar={{
+            userId: rival.avatarUserId,
+            customAvatar: rival.avatarConfig ?? undefined,
+          }}
+          myAvatar={user?.id ? {
+            userId: user.id,
+            customAvatar: profile?.avatar_config ?? undefined,
+          } : undefined}
           t={t}
         />
       )}
@@ -430,43 +432,8 @@ export function QuickPlayResults({
         </div>
       )}
 
-      {/* Leaderboard: collapsed to one summary line by default — tap to expand. */}
-      {board.length > 0 && (
-        <div className="overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated shadow-hard">
-          {!showFullBoard ? (
-            <button
-              type="button"
-              onClick={() => setShowFullBoard(true)}
-              className="flex h-[44px] w-full items-center justify-center text-sm font-bold tracking-wide text-neo-cyan"
-            >
-              {t('quickPlay.solo.seeLeaderboard')}
-            </button>
-          ) : (
-            board.map((e) => {
-              const isMe = e.userId === user?.id;
-              return (
-                <div
-                  key={e.userId}
-                  className={`flex items-center gap-3 border-b-2 border-black/40 px-4 py-2 text-sm last:border-b-0 ${
-                    isMe ? 'bg-neo-cozy/15 text-neo-cream' : 'text-neo-cream'
-                  }`}
-                >
-                  <span className="w-5 text-center font-neo-display font-bold text-neo-white/55">{e.rank}</span>
-                  <Avatar
-                    userId={e.userId}
-                    customAvatar={e.customAvatar ?? undefined}
-                    size="sm"
-                    disableEffects
-                    tierMarker={e.rank <= 3}
-                  />
-                  <span className="flex-1 truncate">{e.name}</span>
-                  <span className="font-neo-display font-semibold">{e.bestScorePct}%</span>
-                </div>
-              );
-            })
-          )}
-        </div>
-      )}
+      {/* Leaderboard card component (extracted for line-count management) */}
+      <QuickLeaderboardCard entries={board} />
       </div>
       </div>
 
