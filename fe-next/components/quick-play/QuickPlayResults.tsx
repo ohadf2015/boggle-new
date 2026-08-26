@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
@@ -344,7 +345,8 @@ export function QuickPlayResults({
       </div>
 
       {/* Rewards — small chips, not full-width slabs. Signed out, the same
-          numbers are shown as held rather than as a row of zeros. */}
+          numbers are shown as held rather than as a row of zeros. Animated
+          counters make the reveal feel like a payoff. */}
       <div
         className={`flex flex-col items-center gap-1 ${rewardsAnimation}`}
         style={{ '--delay': staggerDelay.rewards } as React.CSSProperties}
@@ -356,7 +358,7 @@ export function QuickPlayResults({
             }`}
             data-testid="quick-coins-reward"
           >
-            ◉ +{outcome.coins}
+            ◉ +<AnimatedCounter value={outcome.coins} size="sm" variant="gold" delay={400} />
           </div>
           <div
             className={`inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 font-neo-display text-sm font-bold ${
@@ -364,7 +366,7 @@ export function QuickPlayResults({
             }`}
             data-testid="quick-xp-reward"
           >
-            ★ +{outcome.xp}
+            ★ +<AnimatedCounter value={outcome.xp} size="sm" variant="default" delay={400} />
           </div>
         </div>
         {isGuest && (
