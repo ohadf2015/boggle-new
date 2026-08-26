@@ -7960,7 +7960,8 @@ const en = {
     "play": "Play Now",
     "seconds": "~{{count}}s",
     "seekingMatch": "Finding a match…",
-    "seekingMatchSub": "Setting up your game"
+    "seekingMatchSub": "Setting up your game",
+    "browseInstead": "Browse rooms instead"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",

@@ -490,7 +490,12 @@ describe('MultiplayerFlow', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
 
       // Join path: not host mode, targets the existing room's code, no quickPlay flag.
-      expect(handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, expect.any(String));
+      // The consolidation branch now carries `quickPlay: true` as well, so the
+      // successful match-into-an-existing-room path reports its conversion. It
+      // previously omitted the flag, which made the BEST outcome the unreported one.
+      expect(handleJoin).toHaveBeenCalledWith(
+        false, null, 'ROOM01', undefined, expect.any(String), { quickPlay: true },
+      );
       const createCalls = handleJoin.mock.calls.filter((call) => call[0] === true);
       expect(createCalls).toHaveLength(0);
     });

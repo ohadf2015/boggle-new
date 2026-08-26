@@ -269,6 +269,9 @@ export type GrowthEvent =
   | 'mp_quickplay_eager_shown'
   | 'mp_quickplay_socket_wait'
   | 'mp_quickplay_seeking'
+  // Player backed out of the Quick Play wait to browse the lobby instead. Pairs
+  // with 'mp_quickplay_seeking' to show how often the wait is worth abandoning.
+  | 'mp_quickplay_seeking_dismissed'
   | 'mp_quickplay_joined'
   // mp_quickplay_rapid_click — Quick Play tapped again while a join was
   // already in flight (control-arm rage-click signature on /multiplayer).

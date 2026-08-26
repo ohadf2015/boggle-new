@@ -244,6 +244,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   // Split players: top 3 for podium, 4th+ for consolation rows
   const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
   const consolationPlayers = useMemo(() => sortedScores.slice(3), [sortedScores]);
+  /**
+   * Above four players the podium alone hides most of the room: at fourteen it
+   * shows the top 3 and the player's own row, erasing ranks 4–13. Rooms really do
+   * run that big (Supabase `game_sessions`: 13→14→15→15→15→14 over six rounds), so
+   * past four we list the whole remaining field. At four or fewer, podium + you IS
+   * everyone and the single trimmed row stays.
+   */
+  const showFullField = sortedScores.length > 4;
 
   // Assign consolation crowns to 4th+ players
   const consolationCrowns = useMemo(() => {
@@ -512,12 +520,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           onReaction={onPodiumReaction}
         />
       )}
-      {showPodium && currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
+      {showPodium && consolationPlayers.length > 0
+        && (showFullField || (currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username))) && (
         <ConsolationRows
-          players={consolationPlayers.filter(p => p.username === username)}
+          players={showFullField ? consolationPlayers : consolationPlayers.filter(p => p.username === username)}
           crowns={consolationCrowns}
           currentUsername={username}
-          startRank={currentPlayerRank}
+          startRank={showFullField ? 4 : currentPlayerRank}
+          showAddFriend={!showFullField}
           t={t}
         />
       )}

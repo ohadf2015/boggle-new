@@ -9533,7 +9533,8 @@ const sv = {
     "play": "Spela nu",
     "seconds": "~{{count}}s",
     "seekingMatch": "Söker en match…",
-    "seekingMatchSub": "Sätter upp ditt spel"
+    "seekingMatchSub": "Sätter upp ditt spel",
+    "browseInstead": "Bläddra bland rum i stället"
   },
   "theme": {
     "sundayFunday": "Söndagsmys",

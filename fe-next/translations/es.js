@@ -9253,7 +9253,8 @@ const es = {
     "play": "Jugar ahora",
     "seconds": "~{{count}}s",
     "seekingMatch": "Buscando partida…",
-    "seekingMatchSub": "Preparando tu juego"
+    "seekingMatchSub": "Preparando tu juego",
+    "browseInstead": "Mejor busco yo una sala"
   },
   "theme": {
     "sundayFunday": "Domingo de diversión",

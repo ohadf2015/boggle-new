@@ -108,19 +108,23 @@ describe('windowAroundUser', () => {
 });
 
 describe('GameLeaderboard — windowed rows', () => {
-  it('renders only three rows centred on the current player', () => {
+  // CHANGED 2026-08-26: rooms above 4 players now get a wider window (4 rows here)
+  // plus a pinned rank-1 row. Previously this asserted exactly 3 rows and that P1
+  // was NOT rendered — that was the old small-room-only behaviour, and it made the
+  // leader invisible in every crowded room. See GameLeaderboard.bigRoom.test.tsx.
+  it('renders a widened window centred on the current player, with the leader pinned', () => {
     render(<GameLeaderboard leaderboard={roster()} username="P4" isHost={false} t={mockT} dir="ltr" />);
-
-    const rows = screen.getAllByRole('listitem');
-    expect(rows).toHaveLength(3);
 
     // Neighbours of P4 are shown…
     expect(screen.getByText('P3')).toBeInTheDocument();
     expect(screen.getByText('P4')).toBeInTheDocument();
     expect(screen.getByText('P5')).toBeInTheDocument();
-    // …distant players are hidden.
-    expect(screen.queryByText('P1')).not.toBeInTheDocument();
-    expect(screen.queryByText('P6')).not.toBeInTheDocument();
+    // …the leader is pinned so "who is winning" is answerable…
+    expect(screen.getByText('P1')).toBeInTheDocument();
+    // …and is never duplicated.
+    expect(screen.getAllByText('P1')).toHaveLength(1);
+    // P2 remains summarised by the "+N above" cue.
+    expect(screen.queryByText('P2')).not.toBeInTheDocument();
   });
 
   it('preserves the real rank number of the windowed player', () => {
@@ -130,13 +134,15 @@ describe('GameLeaderboard — windowed rows', () => {
     expect(within(p4Row as HTMLElement).getByText('#4')).toBeInTheDocument();
   });
 
-  it('shows hidden-count indicators above and below the window', () => {
+  // CHANGED 2026-08-26: with a 4-row window at 6 players the window reaches the
+  // bottom of the roster, and the pinned leader is no longer counted as hidden.
+  it('excludes the pinned leader from the hidden-count cue', () => {
     render(<GameLeaderboard leaderboard={roster()} username="P4" isHost={false} t={mockT} dir="ltr" />);
 
-    const above = screen.getByTestId('leaderboard-more-above');
-    const below = screen.getByTestId('leaderboard-more-below');
-    expect(above).toHaveTextContent('2'); // P1, P2 hidden above
-    expect(below).toHaveTextContent('1'); // P6 hidden below
+    // P1 is pinned (on screen) and P3..P6 are in the window, so only P2 is hidden.
+    expect(screen.getByTestId('leaderboard-more-above')).toHaveTextContent('1');
+    // The window now reaches P6, so nothing is hidden below.
+    expect(screen.queryByTestId('leaderboard-more-below')).not.toBeInTheDocument();
   });
 
   it('does not render hidden-count indicators when nothing is hidden', () => {

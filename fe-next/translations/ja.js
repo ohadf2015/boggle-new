@@ -8582,7 +8582,8 @@ const ja = {
     "play": "今すぐプレイ",
     "seconds": "約{{count}}秒",
     "seekingMatch": "マッチを探しています…",
-    "seekingMatchSub": "ゲームを準備中"
+    "seekingMatchSub": "ゲームを準備中",
+    "browseInstead": "ルーム一覧から選ぶ"
   },
   "theme": {
     "sundayFunday": "日曜日のお楽しみ",

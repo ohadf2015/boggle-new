@@ -28,11 +28,16 @@ describe('ResultsMainContent declutter', () => {
     expect(source).toMatch(/<ResultsRevengeSection/);
   });
 
-  it('passes the current player\'s true rank to ConsolationRows via startRank', () => {
+  // CHANGED 2026-08-26: the trim is now size-aware, so this can no longer be a
+  // literal source match. Rooms bigger than four list the whole remaining field
+  // from rank 4; four or fewer keep the single row at `currentPlayerRank`. The
+  // real behaviour of both branches is asserted in
+  // ResultsMainContent.bigRoomField.test.tsx — a source grep cannot see a render.
+  it('still numbers ConsolationRows by real rank, never by list index', () => {
     const block = source.slice(source.indexOf('<ConsolationRows'));
-    const close = block.indexOf('/>');
-    const props = block.slice(0, close);
-    expect(props).toMatch(/startRank=\{currentPlayerRank\}/);
+    const props = block.slice(0, block.indexOf('/>'));
+    expect(props).toMatch(/startRank=\{/);
+    expect(props).toMatch(/currentPlayerRank/);
   });
 
   it('renders ConsolationRows with only the current player\'s row', () => {

@@ -9154,7 +9154,8 @@ const he = {
     "wordHunt": "ציד מילים",
     "seconds": "~{{count}} שניות",
     "seekingMatch": "מחפש משחק…",
-    "seekingMatchSub": "מכין את המשחק שלך"
+    "seekingMatchSub": "מכין את המשחק שלך",
+    "browseInstead": "עדיף לחפש חדר לבד"
   },
   "theme": {
     "sundayFunday": "כיף של יום ראשון",

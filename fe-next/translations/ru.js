@@ -6322,7 +6322,8 @@ const ru = {
     "play": "Играй сейчас",
     "seconds": "~{{count}}s",
     "seekingMatch": "Ищу матч…",
-    "seekingMatchSub": "Подготавливаю твою игру"
+    "seekingMatchSub": "Подготавливаю твою игру",
+    "browseInstead": "Лучше выберу комнату сам"
   },
   "splash": {
     "loadingText1": "Затачиваю карандаши…",

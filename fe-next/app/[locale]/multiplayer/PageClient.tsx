@@ -303,7 +303,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setShouldAutoJoin(false);
       setIsJoining(false);
       setPrefilledRoomCode('');
-      if (quickPlay) trackGrowthEvent('mp_quickplay_joined', { asHost: data.isHost, language: data.language ?? language });
+      // `mp_quickplay_joined` moved into useMultiplayerJoin, which knows the join
+      // was a Quick Play from `options.quickPlay` rather than inferring it from a
+      // `?quickPlay=true` URL param. The param is absent for the in-lobby "Quick
+      // Start" button, so this emit could never fire for those users and reported
+      // every one of them as an abandon.
       // Track invite consumed for returning users who arrived via ?room= invite redirect.
       // New-user path fires this in useInviteOnboardingMode instead.
       if (prefilledRoomCode) reportInviteConsumed(prefilledRoomCode);
