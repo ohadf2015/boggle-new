@@ -82,7 +82,11 @@ function setupDbMocks({
   rpcError = null as { message?: string } | null,
   rpcInsufficientFunds = false,
   partsUpdateError = null as { message?: string } | null,
+  lockConflict = false,
 } = {}) {
+  // Captures the second .eq() call on the parts update — the optimistic lock predicate
+  const mockUpdateLockEq = vi.fn();
+
   // Mock profiles.select for initial fetch
   mockFrom.mockImplementation((table: string) => {
     if (table === 'profiles') {
@@ -95,11 +99,20 @@ function setupDbMocks({
             }),
           }),
         }),
-        update: vi.fn().mockReturnValue({
-          eq: vi.fn().mockResolvedValue({
-            error: partsUpdateError,
+        update: vi.fn((updateData: Record<string, unknown>) => ({
+          eq: vi.fn().mockReturnValue({
+            eq: mockUpdateLockEq.mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                maybeSingle: vi.fn().mockResolvedValue({
+                  data: partsUpdateError || lockConflict
+                    ? null
+                    : { premium_avatar_parts: updateData.premium_avatar_parts },
+                  error: partsUpdateError,
+                }),
+              }),
+            }),
           }),
-        }),
+        })),
       };
     }
     return {};
@@ -124,6 +137,8 @@ function setupDbMocks({
     }
     return Promise.resolve({ data: null, error: null });
   });
+
+  return { mockUpdateLockEq };
 }
 
 // ---------- Tests ----------
@@ -213,6 +228,24 @@ describe('POST /api/avatar/purchase-part', () => {
     const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
     expect(res.status).toBe(400);
     expect(res.data.error).toBe('Insufficient coins');
+  });
+
+  // ===== OPTIMISTIC LOCK (concurrent double-charge race) =====
+  it('locks the parts update on the pre-purchase premium_avatar_parts snapshot', async () => {
+    const { mockUpdateLockEq } = setupDbMocks({ gold: 200, premiumParts: ['accessory:crown'] });
+    await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
+    expect(mockUpdateLockEq).toHaveBeenCalledWith('premium_avatar_parts', ['accessory:crown']);
+  });
+
+  it('returns 409 and refunds coins when a concurrent purchase wins the optimistic lock', async () => {
+    setupDbMocks({ gold: 200, premiumParts: [], lockConflict: true });
+    const res = await POST(makeRequest({ category: 'eyes', partId: 'laser' }));
+    expect(res.status).toBe(409);
+    expect(res.data.error).toBe('Purchase conflict, please retry');
+    // Verify refund RPC was called (second rpc call) since sync_coins already deducted
+    expect(mockRpc).toHaveBeenCalledTimes(2);
+    expect(mockRpc.mock.calls[1][0]).toBe('sync_coins');
+    expect(mockRpc.mock.calls[1][1].p_amount).toBe(75); // refund amount
   });
 
   // ===== PARTS SAVE FAILURE (triggers refund) =====

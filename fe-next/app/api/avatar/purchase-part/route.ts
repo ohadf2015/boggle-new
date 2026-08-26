@@ -127,14 +127,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: coinRow?.error_message || 'Insufficient gold' }, { status: 400 });
     }
 
-    // Update premium parts separately (coins already deducted atomically)
-    const { error: partsError } = await supabase
+    // Update premium parts separately (coins already deducted atomically).
+    // Optimistic lock on the pre-purchase snapshot: if a concurrent request already
+    // changed premium_avatar_parts, this matches 0 rows instead of clobbering that write.
+    const { data: updatedProfile, error: partsError } = await supabase
       .from('profiles')
       .update({
         premium_avatar_parts: newParts,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id);
+      .eq('id', user.id)
+      .eq('premium_avatar_parts', currentParts)
+      .select('premium_avatar_parts')
+      .maybeSingle();
 
     if (partsError) {
       // Refund coins since parts save failed
@@ -148,10 +153,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save purchase' }, { status: 500 });
     }
 
+    if (!updatedProfile) {
+      // Optimistic lock lost the race — a concurrent purchase already moved premium_avatar_parts.
+      // Coins were already deducted above, so refund them and let the client retry.
+      console.error('[AVATAR PURCHASE API] Optimistic lock conflict, refunding:', { userId: user.id, category, partId });
+      await supabase.rpc('sync_coins', {
+        p_user_id: user.id,
+        p_amount: price,
+        p_reason: 'Avatar Purchase Refund',
+        p_metadata: { category, partId, refundReason: 'lock_conflict' },
+      });
+      return NextResponse.json({ error: 'Purchase conflict, please retry' }, { status: 409 });
+    }
+
     return NextResponse.json({
       success: true,
       gold: coinRow.new_balance,
-      premiumAvatarParts: newParts,
+      premiumAvatarParts: updatedProfile.premium_avatar_parts,
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/avatar/purchase-part', { method: 'POST' });
