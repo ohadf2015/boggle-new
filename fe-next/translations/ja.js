@@ -3329,7 +3329,7 @@ const ja = {
         "classic": "全部の単語を探そう",
         "blast": "タイルを爆破しよう",
         "wordHunt": "隠れた単語を狩ろう",
-        "wheelRush": "回して単語を奪え",
+        "wheelRush": "ホイールでライバルと対戦",
         "wordTower": "タワーを積もう",
         "shiritori": "単語をつなげよう",
         "sealedBid": "全員を出し抜け",
@@ -12186,13 +12186,6 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
-    "proGate": {
-      "analytics": {
-        "title": "分析は Teacher Pro の機能です",
-        "body": "つまずいている生徒、クラスが繰り返し間違える単語、実際に効果があったレッスンがわかります。保護者や管理者向けの印刷用レポート付き。"
-      },
-      "cta": "月額 {price} ドルで解除"
-    },
     "subscription": {
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
@@ -12205,8 +12198,6 @@ const ja = {
       "autoRenew": "毎月自動更新されます。いつでも解約できます。",
       "upgradeNow": "今すぐProにアップグレード",
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
-      "checkoutUnavailable": "Teacher Pro はまだ購入できません。お客様側の問題ではありません。",
-      "proHeroAlt": "クラス全員がそれぞれの端末で一緒に LexiClash をプレイしている様子。",
       "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",
       "currentPlan": "現在のプランです",
       "upgradePricingTitle": "Teacher Proにアップグレード",
@@ -12223,6 +12214,8 @@ const ja = {
       "freeForever": "ずっと無料、いつでも利用可能",
       "freeClasses": "最大{count}クラス",
       "freeStudents": "クラスあたり最大{count}人",
+      "basicWordTracking": "基本的な単語トラッキング",
+      "dailyProgressReports": "毎日の進捗レポート",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "拡大に必要なすべて",
       "popular": "一番人気",
@@ -12240,26 +12233,7 @@ const ja = {
       "manageSubscription": "サブスクリプションを管理",
       "districtTitle": "学校または学区ですか？",
       "districtSubtitle": "複数の教師や教室を管理していますか？学校や学区向けに柔軟な料金プランをご用意しています。",
-      "districtCta": "学校向け料金についてお問い合わせ",
-      "priceTaxNote": "税は決済時に表示されます",
-      "valueHeadline": "制限なく教育を拡大できます",
-      "featureOutcome1": "クラス数の制限を気にせず無制限のクラスを教えられます",
-      "featureOutcome2": "生徒数に制限なく追加でき、管理の手間が省けます",
-      "featureOutcome3": "すべての生徒の進捗をリアルタイムで追跡できます",
-      "featureOutcome4": "すべてのクラスの指導戦略を同時に比較できます",
-      "matrix": {
-        "title": "プラン比較",
-        "featureColumn": "含まれるもの",
-        "unlimited": "無制限",
-        "classes": "クラス数",
-        "studentsPerClass": "1クラスの生徒数",
-        "customLists": "オリジナル単語リスト",
-        "duels": "クラス対戦",
-        "noAds": "生徒に広告なし",
-        "analytics": "分析と印刷用レポート",
-        "included": "あり",
-        "notIncluded": "なし"
-      }
+      "districtCta": "学校向け料金についてお問い合わせ"
     },
     "teacher": {
       "activeGames": "進行中のゲーム",
@@ -12308,15 +12282,10 @@ const ja = {
       "selectClassroom": "クラスを選択",
       "createClassroomFirst": "課題とデュエルアクティビティを追跡するには、まずクラスを作成してください",
       "reviewEmptyHint": "最初のクラスを作成すると、分析・課題・レポートが使えます。",
-      "classroomLoadError": "クラスを読み込めませんでした",
-      "classroomLoadErrorHint": "接続を確認してもう一度試してください",
-      "retry": "もう一度試す",
       "analytics": "アナリティクス",
       "insights": "インサイト",
       "viewReports": "レポートを見る",
       "viewReportsDesc": "クラスの詳細なレポートと分析を表示",
-      "studentsPresentTitle": "{{classroom}}に{{count}}人の学生がいます",
-      "studentsPresentDescription": "ゲームを開始して、学生をプレイさせましょう",
       "tab": {
         "play": "プレイ",
         "prepare": "準備",
@@ -12922,9 +12891,9 @@ const ja = {
       "title": "LexiClash 教育",
       "startGame": "ゲーム開始",
       "hero": {
-        "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語・ロシア語対応",
+        "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語対応",
         "h1": "教室向けの語彙ゲーム — 生徒のログイン不要。",
-        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。{count}言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
+        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。5言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
         "cta_primary": "先生アクセスを申請する",
         "cta_secondary": "デモを見る",
         "cta_note": "無料プランで開始 • 約24時間で承認",
@@ -13074,26 +13043,6 @@ const ja = {
         "title": "学校・学区向け",
         "body": "5クラス以上をお持ちですか？一括・学区割引についてお問い合わせください。",
         "button": "学区向け料金をお問い合わせ"
-      },
-      "pro": {
-        "title": "Teacher Pro — クラスをアンロック",
-        "subtitle": "無料で開始。Proで成長に応じて拡張。",
-        "freeTier": "無料プラン",
-        "proTier": "Pro",
-        "perMonth": "/月",
-        "classLimit": "最大{count}クラス",
-        "classLimitPro": "クラス無制限",
-        "studentLimit": "クラスあたり最大{count}人",
-        "studentLimitPro": "生徒数無制限",
-        "noAds": "生徒向けページに広告ゼロ",
-        "everythingInFree": "無料プランのすべての機能",
-        "analytics": "クラス分析と印刷可能なレポート",
-        "customLists": "カスタム単語リスト",
-        "duels": "クラス対戦",
-        "chooseNow": "Proにアップグレード",
-        "comparisonAlt": "無料プラン：施錠された教室が1つ。Teacher Pro：すべての教室が開放され、満員に。",
-        "freeForever": "完全無料。永遠に。",
-        "whyNow": "今すぐの理由：最初のクラスは{count}人の生徒に制限されています。もっと必要ですか？ 1クリックで500+人の生徒と50+クラスへ。"
       },
       "esl-word-games": {
         "course_name": "ESL 英語クラス用ワードゲーム",
@@ -13246,7 +13195,7 @@ const ja = {
     "students": "生徒",
     "student": {
       "join": {
-        "classroomFull": "このクラスは満員です。先生に連絡してください。",
+        "alreadyMember": "すでにこのクラスのメンバーです",
         "button": "クラスに参加",
         "clipboardError": "クリップボードを読み取れませんでした",
         "codeHint": "6文字のクラスコードを先生に聞いてね",
@@ -13432,8 +13381,6 @@ const ja = {
       "declined_reapply": "いつでも再申請できます。ご質問があればお気軽にお問い合わせください。",
       "submitted_on": "申請日時",
       "already_approved_title": "認可済みです。さあ始めましょう！",
-      "status_unknown_title": "ステータスが確認できません",
-      "status_unknown_body": "申し訳ございません。教師アクセスのステータスが確認できません。ページを再度読み込むか、サポートにお問い合わせください。",
       "go_to_teacher": "ダッシュボードへ",
       "auth_required_title": "教師アクセスの申請には登録が必要です",
       "auth_required_body": "教師アクセスは認証済みアカウントに紐づきます。無料アカウントを作成するかログインすると、このまま続けられます。",

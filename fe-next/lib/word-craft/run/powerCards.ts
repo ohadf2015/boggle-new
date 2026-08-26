@@ -95,16 +95,31 @@ export const POWER_CARD_POOL: readonly PowerCard[] = [
   { id: 'letterHoard', rarity: 'legendary', roundSetup: { rackSize: 10 } },
 ];
 
+// Legendary pulls only feel special if they're actually rare — a plain shuffle
+// gave every rarity equal odds, so a "legendary" was indistinguishable from a coin flip.
+const RARITY_WEIGHT: Record<CardRarity, number> = { common: 10, rare: 4, legendary: 1 };
+
 export function drawCardChoices(
   seed: number,
   excludeIds: readonly string[],
   n: number,
 ): PowerCard[] {
   const rng = mulberry32(seed);
-  const pool = POWER_CARD_POOL.filter((c) => !excludeIds.includes(c.id));
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
+  const remaining = POWER_CARD_POOL.filter((c) => !excludeIds.includes(c.id));
+  const result: PowerCard[] = [];
+  while (result.length < n && remaining.length > 0) {
+    const totalWeight = remaining.reduce((sum, c) => sum + RARITY_WEIGHT[c.rarity], 0);
+    let roll = rng() * totalWeight;
+    let pickIndex = remaining.length - 1;
+    for (let i = 0; i < remaining.length; i++) {
+      roll -= RARITY_WEIGHT[remaining[i].rarity];
+      if (roll < 0) {
+        pickIndex = i;
+        break;
+      }
+    }
+    result.push(remaining[pickIndex]);
+    remaining.splice(pickIndex, 1);
   }
-  return pool.slice(0, Math.min(n, pool.length));
+  return result;
 }

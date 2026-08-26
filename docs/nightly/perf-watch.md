@@ -252,3 +252,22 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 
 ## 2026-08-09 — brief item is structurally unmeasurable (3rd night, same route pattern)
 `/multiplayer?room=XXX` invite URLs scored high in tonight's brief (LCP 5876ms, 5556ms). These are per-room unique URLs (room code in query string) -- each individual URL can never reach n>=50 samples, so per-URL LCP is pure noise by construction. The `/multiplayer` route in aggregate has n=52/24h (clears floor) -- if this route needs perf work, measure THAT, not the per-room URL variants the brief surfaces. Recommend: fix the nightly brief generator to group PostHog LCP by route template (strip query params) instead of exact URL, so this stops re-surfacing as a false top-scored item. 3rd consecutive night wasting lane budget on this same noise pattern (2026-08-07, 2026-08-08, 2026-08-09).
+
+## 2026-08-26 — word-wheel daily LCP is CSR-gated, not an image/priority fix
+
+`/en/daily/word-wheel` brief item: p75 LCP 12280ms. Code-inspected (`fe-next/app/[locale]/daily/word-wheel/page.tsx`
++ `fe-next/components/daily/DailyLoadingFallback.tsx`): the entire `WordWheelChallenge` is `next/dynamic`-imported
+and wrapped in `<Suspense fallback={<LoadingFallback />}>`. The loading fallback itself is `'use client'` and gated
+on `useLanguage()` context — nothing paints (not even the loading text) until JS hydrates and `LanguageContext`
+resolves. No `<img>`/`next/image` LCP candidate exists on this route; the LCP element is almost certainly the
+`PageLoader` text or the first game-shell paint, both blocked on hydration.
+
+**Fix needed (not attempted tonight — blast radius too high for remaining budget):**
+1. SSR a static, locale-agnostic loading shell (skip `useLanguage()` in the fallback, or pass server-resolved text)
+   so *something* paints before hydration.
+2. Consider `ssr: true` for `WordWheelChallenge`'s outer shell (game canvas can stay CSR) similar to the
+   `MultiplayerFlow` fix noted in the 08-25 baseline.
+
+**Not fixed tonight:** `WordWheelChallenge.tsx` is 500+ lines of live-tested daily-game logic (streak, catch-up,
+rewarded-ad gating, server sync) — not safe to touch blind within a single lane's time budget. Human/lane-05
+review recommended.

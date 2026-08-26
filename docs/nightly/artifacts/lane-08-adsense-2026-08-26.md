@@ -1,0 +1,3 @@
+status: research-only
+files_touched: none
+next_steps: site is in good AdSense shape now — no action cleared the bar tonight. Checked (all clean): prod word-count audit (all informational pages >=365 words except /ja, a CJK tokenizer artifact per standing note), dead_pages.py noindex candidates ('f' already in DEAD_LETTERS, no new candidates), JSON-LD coverage (Breadcrumb/FAQ present on about/contact/faq/how-to-play/rules/glossary/guides/blog/leaderboard/legal/*), internal linking to education sub-pages (footer + hub + comparison pages + guides already link all 3 sub-routes). Re-submission call is still the operator's — worth checking GSC 28d trend for whether word counts + noindex work from prior nights moved impressions before next re-submit.

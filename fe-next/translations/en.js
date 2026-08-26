@@ -2863,7 +2863,7 @@ const en = {
         "classic": "Spot every word",
         "blast": "Explode the tiles",
         "wordHunt": "Hunt the hidden word",
-        "wheelRush": "Spin & steal words",
+        "wheelRush": "Race rivals on the wheel",
         "wordTower": "Stack the tower",
         "shiritori": "Chain the words",
         "sealedBid": "Outbid the room",
@@ -10818,15 +10818,10 @@ const en = {
       "selectClassroom": "Select Classroom",
       "createClassroomFirst": "Create a classroom first to track assignments and duel activity",
       "reviewEmptyHint": "Create your first classroom to unlock analytics, assignments and reports.",
-      "classroomLoadError": "Could not load your classrooms",
-      "classroomLoadErrorHint": "Check your connection and try again",
-      "retry": "Retry",
       "analytics": "Analytics",
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
       "viewReportsDesc": "View detailed reports and analytics for your classrooms",
-      "studentsPresentTitle": "{{count}} students are in {{classroom}}",
-      "studentsPresentDescription": "Start a game to get them playing",
       "tab": {
         "play": "Play",
         "prepare": "Prepare",
@@ -11194,13 +11189,6 @@ const en = {
       "standard": "Curriculum Standard",
       "lastUpdated": "Last Updated"
     },
-    "proGate": {
-      "analytics": {
-        "title": "Analytics is a Teacher Pro feature",
-        "body": "See who is falling behind, which words your class keeps missing, and which lessons actually worked — plus printable reports for parents and admin."
-      },
-      "cta": "Unlock for ${price}/month"
-    },
     "subscription": {
       "classLimitTitle": "You've Reached Your Class Limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
@@ -11213,8 +11201,6 @@ const en = {
       "autoRenew": "Renews automatically each month. Cancel anytime.",
       "upgradeNow": "Upgrade to Pro Now",
       "checkoutError": "Failed to start checkout. Please try again.",
-      "checkoutUnavailable": "Teacher Pro isn’t open for purchase yet. Nothing went wrong on your end.",
-      "proHeroAlt": "A class playing LexiClash together, each student on their own device.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
       "upgradePricingTitle": "Upgrade to Teacher Pro",
@@ -11231,6 +11217,8 @@ const en = {
       "freeForever": "Forever free, always available",
       "freeClasses": "Up to {count} class",
       "freeStudents": "Up to {count} students per class",
+      "basicWordTracking": "Basic word tracking",
+      "dailyProgressReports": "Daily progress reports",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
       "popular": "Most Popular",
@@ -11248,26 +11236,7 @@ const en = {
       "manageSubscription": "Manage Subscription",
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
-      "districtCta": "Get in touch for school pricing",
-      "priceTaxNote": "Taxes shown at checkout",
-      "valueHeadline": "Scale your teaching without limits",
-      "featureOutcome1": "Teach unlimited classes without worrying about hitting a cap",
-      "featureOutcome2": "Add as many students as you need — no waiting or management headaches",
-      "featureOutcome3": "Real-time progress tracking across all your students",
-      "featureOutcome4": "Compare teaching strategies across all your classes at once",
-      "matrix": {
-        "title": "Compare plans",
-        "featureColumn": "What you get",
-        "unlimited": "Unlimited",
-        "classes": "Classrooms",
-        "studentsPerClass": "Students per classroom",
-        "customLists": "Custom word lists",
-        "duels": "Classroom duels",
-        "noAds": "Zero ads for students",
-        "analytics": "Analytics & printable reports",
-        "included": "Included",
-        "notIncluded": "Not included"
-      }
+      "districtCta": "Get in touch for school pricing"
     }
   },
   "education": {
@@ -11498,9 +11467,9 @@ const en = {
       "title": "LexiClash Education",
       "startGame": "Start Game",
       "hero": {
-        "eyebrow": "For teachers in EN / HE / SV / JA / ES / RU classrooms",
+        "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Approved in ~24h",
@@ -11650,26 +11619,6 @@ const en = {
         "title": "For schools & districts",
         "body": "Running 5+ classrooms? Ask us about bulk & district pricing.",
         "button": "Contact for District Pricing"
-      },
-      "pro": {
-        "title": "Teacher Pro — unlock your classroom",
-        "subtitle": "Free gets you started. Pro scales with your growth.",
-        "freeTier": "Free Plan",
-        "proTier": "Pro",
-        "perMonth": "/month",
-        "classLimit": "Up to {count} class",
-        "classLimitPro": "Unlimited classes",
-        "studentLimit": "Up to {count} students per class",
-        "studentLimitPro": "Unlimited students",
-        "noAds": "Zero ads on student routes",
-        "everythingInFree": "Everything in the Free plan",
-        "analytics": "Class analytics & printable reports",
-        "customLists": "Custom word lists",
-        "duels": "Classroom duels",
-        "chooseNow": "Upgrade to Pro",
-        "comparisonAlt": "Free plan: a single locked classroom. Teacher Pro: every classroom open and full.",
-        "freeForever": "Totally free. Always.",
-        "whyNow": "Why now: Your first class is capped at {count} students. Hit the wall fast? One click to 500+ students and 50+ classes."
       },
       "esl-word-games": {
         "course_name": "LexiClash ESL Word Games",
@@ -11836,7 +11785,7 @@ const en = {
     },
     "student": {
       "join": {
-        "classroomFull": "This class is full — ask your teacher.",
+        "alreadyMember": "Already in this class!",
         "button": "Join",
         "clipboardError": "Couldn't read clipboard",
         "codeHint": "6 characters from your teacher",
@@ -12010,8 +11959,6 @@ const en = {
       "declined_reapply": "You can submit another application anytime. Let us know if you have questions.",
       "submitted_on": "Submitted",
       "already_approved_title": "You already have teacher access.",
-      "status_unknown_title": "Can't read your status right now",
-      "status_unknown_body": "We couldn't determine your teacher access status. Please reload the page or contact support if the problem persists.",
       "go_to_teacher": "Open Teacher Dashboard",
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",

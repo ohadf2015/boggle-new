@@ -2235,3 +2235,7 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred — not investigated this run (time budget)
   - why: reach=1, generic network-fetch error, needs stack before root-causing
   - recommended owner: self (tomorrow)
+- [Lane 03] `exp-homepage-click-feedback-v1` inconclusive after 6+ weeks at 100% rollout
+  - status: flagged for human review — homepage rageclicks (brief item #1, reach=10 last 24h) persist despite this fix being live since 2026-07-14
+  - why: variant `click-feedback` (350ms brightness-drop press feedback, `LandingModeCubes.tsx` Cube component, wired+active) was meant to kill the exact rageclick pattern (20/27 null el_text on mode-card clicks). Flag is live, wiring verified correct (`pressHighlight` reaches every Cube). Either the variant isn't moving the metric (needs a decision: keep control, retire flag) or today's rageclicks are a DIFFERENT element (hero CTA / daily banner, not mode cards) — needs an el_text breakdown on today's rageclick events before deciding.
+  - recommended owner: self (tomorrow) — pull `posthog-query.sh hogql` on rageclick events' `$el_text`/`$el_selector` for lexiclash.live/ last 24h, compare click-feedback vs control variant split

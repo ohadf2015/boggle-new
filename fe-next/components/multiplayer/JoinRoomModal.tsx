@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Users, Swords, Eye } from 'lucide-react';
+import { Users, Swords, Eye, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -169,7 +169,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 aria-invalid={!!nameError}
                 aria-describedby={nameError ? 'join-username-error' : undefined}
                 className={cn(
-                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white/50 focus-visible:ring-neo-pink',
+                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white focus-visible:ring-neo-pink',
                   nameError && 'border-neo-red animate-neo-shake'
                 )}
                 placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
@@ -207,7 +207,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 disabled={isJoining}
                 className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
               >
-                <Eye className="w-5 h-5" />
+                {isJoining ? <Loader2 className="w-5 h-5 animate-spin" /> : <Eye className="w-5 h-5" />}
                 {t('multiplayerFlow.joinModal.spectateButton')}
               </Button>
             </>
@@ -219,7 +219,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               disabled={isJoining}
               className="w-full bg-neo-pink hover:bg-neo-pink-light text-neo-black font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
             >
-              <Swords className="w-5 h-5" />
+              {isJoining ? <Loader2 className="w-5 h-5 animate-spin" /> : <Swords className="w-5 h-5" />}
               {isJoining
                 ? t('multiplayerFlow.joinModal.joining')
                 : t('multiplayerFlow.joinModal.joinButton')}

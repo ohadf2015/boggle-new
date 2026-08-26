@@ -127,7 +127,6 @@ export default defineConfig({
       '**/CookieConsent.mascot.test.tsx',
       '**/gridAriaLabel.i18n.test.ts',
       '**/loading-layout.test.tsx',
-      '**/MultiplayerFlow.guestJoinViaLink.test.tsx',
       '**/chain-builder.test.ts',
       '**/CrazyGamesSDK.authOutcome.test.tsx',
       '**/CrazyGamesSDK.embedSticky.test.tsx',

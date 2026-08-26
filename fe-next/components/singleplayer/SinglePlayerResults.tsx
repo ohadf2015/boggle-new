@@ -390,7 +390,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       {!autoPlayCancelled ? (
         <AutoPlayCountdown
           onComplete={onPlayAgain}
-          onCancel={() => setAutoPlayCancelled(true)}
+          onCancel={() => {
+            trackGrowthEvent('results_autoplay_cancelled', { mode });
+            setAutoPlayCancelled(true);
+          }}
           duration={5}
         />
       ) : (

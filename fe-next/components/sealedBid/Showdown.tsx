@@ -29,7 +29,10 @@ export default function Showdown({
   const { t } = useLanguage();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [bannerVisible, setBannerVisible] = useState(reducedMotion);
+  const [tensionDrained, setTensionDrained] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Card-flip cadence — also the reveal wait the tension bar drains across.
+  const bannerDelay = bots.length * 400 + 550;
 
   const outcome = settlement.outcome; // unique | clash | none
 
@@ -79,10 +82,15 @@ export default function Showdown({
     });
 
     // wait for last card to finish flipping before showing outcome
-    const bannerDelay = bots.length * 400 + 550;
     const revealTimeout = setTimeout(() => setBannerVisible(true), bannerDelay);
-    return () => clearTimeout(revealTimeout);
-  }, [reducedMotion, bots.length]);
+    // One tick after mount so the browser paints the bar at 100% first —
+    // otherwise the width jumps straight to 0 with no visible drain.
+    const tensionTimeout = setTimeout(() => setTensionDrained(true), 20);
+    return () => {
+      clearTimeout(revealTimeout);
+      clearTimeout(tensionTimeout);
+    };
+  }, [reducedMotion, bots.length, bannerDelay]);
 
   useEffect(() => {
     if (reducedMotion || settlement.outcome !== 'unique' || !bannerVisible) return;
@@ -174,13 +182,28 @@ export default function Showdown({
       className="flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-1 py-2"
       dir={dir}
     >
-      {/* Suspense pulse while bot cards flip */}
+      {/* Suspense pulse + draining tension bar while bot cards flip */}
       {!bannerVisible && !reducedMotion && (
-        <div
-          data-testid="showdown-suspense"
-          className="animate-pulse text-center font-neo-display text-sm font-black uppercase tracking-widest text-neo-cream/60"
-        >
-          {t('sealedBid.revealing')}
+        <div className="flex w-full max-w-[10rem] flex-col items-center gap-1.5">
+          <div
+            data-testid="showdown-suspense"
+            className="animate-pulse text-center font-neo-display text-sm font-black uppercase tracking-widest text-neo-cream/60"
+          >
+            {t('sealedBid.revealing')}
+          </div>
+          <div
+            data-testid="showdown-tension-bar"
+            className="h-2 w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy-light"
+          >
+            <div
+              data-testid="showdown-tension-fill"
+              className="h-full bg-neo-red"
+              style={{
+                width: tensionDrained ? '0%' : '100%',
+                transition: `width ${bannerDelay}ms linear`,
+              }}
+            />
+          </div>
         </div>
       )}
 

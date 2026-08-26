@@ -34,6 +34,7 @@ export type LocaleContent = {
   relatedVocabLink: string;
   relatedEslLink: string;
   relatedEducationLink: string;
+  relatedForSchoolsLink: string;
 };
 
 export const EDUCATION_LOCALES = ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const;
@@ -117,6 +118,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     relatedVocabLink: '→ Classroom Vocabulary Games',
     relatedEslLink: '→ ESL Word Games',
     relatedEducationLink: '→ Education Hub',
+    relatedForSchoolsLink: '→ For Schools & Districts',
   },
   he: {
     metaTitle: 'משחקי מילים חינמיים למורים — בלי הכנה, עם אנליטיקה | LexiClash',
@@ -195,6 +197,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     relatedVocabLink: '→ משחקי אוצר מילים לכיתה',
     relatedEslLink: '→ משחקי מילים ESL',
     relatedEducationLink: '→ מרכז החינוך',
+    relatedForSchoolsLink: '→ לבתי ספר ומחוזות',
   },
   es: {
     metaTitle: 'Juegos gratis para maestros — Sin preparación, análisis | LexiClash',
@@ -273,6 +276,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     relatedVocabLink: '→ Juegos de vocabulario en el aula',
     relatedEslLink: '→ Juegos de palabras ESL',
     relatedEducationLink: '→ Centro de educación',
+    relatedForSchoolsLink: '→ Para escuelas y distritos',
   },
   sv: {
     metaTitle: 'Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash',
@@ -351,6 +355,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     relatedVocabLink: '→ Ordförrådsord för klassrum',
     relatedEslLink: '→ ESL-ordspel',
     relatedEducationLink: '→ Utbildningscentral',
+    relatedForSchoolsLink: '→ För skolor och kommuner',
   },
   ja: {
     metaTitle: '無料単語ゲーム — 先生向け、準備なし | LexiClash',
@@ -429,6 +434,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     relatedVocabLink: '→ クラスルーム語彙ゲーム',
     relatedEslLink: '→ ESL単語ゲーム',
     relatedEducationLink: '→ 教育ハブ',
+    relatedForSchoolsLink: '→ 学校・教育委員会向け',
   },
   ru: {
     metaTitle: 'Бесплатные словесные игры для учителей — Без подготовки, аналитика | LexiClash',
@@ -507,6 +513,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
     relatedVocabLink: '→ Игры на словарный запас в классе',
     relatedEslLink: '→ Игры на английском языке',
     relatedEducationLink: '→ Образовательный центр',
+    relatedForSchoolsLink: '→ Для школ и округов',
   },
 };
 

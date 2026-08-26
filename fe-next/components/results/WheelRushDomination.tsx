@@ -160,54 +160,14 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
             </h3>
           </div>
 
-          <div className="flex items-end justify-between gap-3 mb-2">
-            <div className="min-w-0">
+          <div className="flex items-end justify-center mb-1">
+            <div className="min-w-0 text-center">
               <div className="text-[10px] font-bold uppercase tracking-wider text-neo-white">
                 {t('wheelRush.results.totalLocks')}
               </div>
               <div className="text-4xl font-black text-neo-cyan tabular-nums leading-none drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]">
                 <ScoreCountUp to={matchRecap.totalLocks} duration={1400} delay={prefersReduced ? 0 : 300} />
               </div>
-            </div>
-            <div className="shrink-0 flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-neo-white">
-                <Swords className="w-3 h-3" />
-                {t('wheelRush.results.stealRate')}
-              </div>
-              <div className="w-20 h-2 rounded-full bg-neo-black/60 border border-neo-white/15 overflow-hidden">
-                <m.div
-                  className={`h-full rounded-full ${matchRecap.stealRate >= 50 ? 'bg-linear-to-r from-neo-pink to-neo-red' : 'bg-linear-to-r from-neo-cyan to-neo-lime'}`}
-                  initial={prefersReduced ? { width: `${matchRecap.stealRate}%` } : { width: 0 }}
-                  animate={{ width: `${matchRecap.stealRate}%` }}
-                  transition={{ duration: 1.1, delay: 0.4 }}
-                />
-              </div>
-              <span className="text-[10px] tabular-nums text-neo-white">{matchRecap.stealRate}%</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t-2 border-neo-black/40">
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-1 text-neo-lime">
-                <Lock className="w-3 h-3" />
-                <span className="text-sm font-black tabular-nums">
-                  <ScoreCountUp to={matchRecap.totalLocks} duration={900} delay={prefersReduced ? 0 : 500} />
-                </span>
-              </div>
-              <span className="text-[9px] uppercase tracking-wider text-neo-white">
-                {t('wheelRush.results.locks')}
-              </span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-1 text-neo-red">
-                <Swords className="w-3 h-3" />
-                <span className="text-sm font-black tabular-nums">
-                  <ScoreCountUp to={matchRecap.totalSteals} duration={900} delay={prefersReduced ? 0 : 600} />
-                </span>
-              </div>
-              <span className="text-[9px] uppercase tracking-wider text-neo-white">
-                {t('wheelRush.results.steals')}
-              </span>
             </div>
           </div>
         </div>

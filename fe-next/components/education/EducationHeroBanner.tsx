@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useScrollReveal } from '@/lib/animation/useScrollReveal';
 
@@ -38,7 +37,8 @@ export function EducationHeroBanner({ title, subtitle, cta }: Props) {
           src={imageSet.jpg}
           alt={title}
           className="absolute inset-0 h-full w-full object-cover"
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
         />
       </picture>
 

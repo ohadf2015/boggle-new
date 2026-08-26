@@ -13,7 +13,7 @@ import {
 } from '@/utils/profileStorage';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { trackGrowthEvent } from '@/utils/growthTracking';
+import { trackGrowthEvent, trackGuestJoin } from '@/utils/growthTracking';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
@@ -221,6 +221,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       if (hasProfile()) {
         // Auto-join directly - no modal needed
         const profile = getProfileData();
+        if (!isAuthenticated) {
+          trackGuestJoin(profile.username, roomCode, defaultLanguage);
+        }
         setGameCode(roomCode);
         setUsername(profile.username);
         // Classroom host flow: teacher pre-generated gameCode upstream, so we
@@ -251,7 +254,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         setFlowState('join-modal');
       }
     },
-    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host]
+    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated]
   );
 
   // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.

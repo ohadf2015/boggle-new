@@ -1,18 +1,17 @@
 {
-  "date": "2026-08-25",
-  "note": "Impact-check focus night per brief. Both flagged shipped changes (word-tower ES daily LCP split 08-15, singleplayer dynamic-import 08-16) re-measured IMPROVED vs baseline, though both below the 50-sample floor (n=17, n=41) so treat as directional not conclusive. Backend: brief's only item (auth_db_connections_absolute) is a dashboard config toggle, not code -- non-actionable, unchanged from prior nights. Frontend brief routes (multiplayer variants, word-tower) were code-inspected: MultiplayerPageClient's MultiplayerFlow is already ssr:true with hero-image preload (fixed 08-21/08-22 per in-code comments), and the ES juego-de-palabras-multijugador hero already has next/image priority+sizes set. No new regression found worth a same-night edit; several of tonight's other touched files (multiplayer/page.tsx, dictionaryWorker.ts, useDictionaryCache.ts) are mid-edit by concurrent lanes -- left untouched per concurrent-session doctrine. No build run (time-budget discipline, no .next present to diff against).",
+  "date": "2026-08-26",
+  "note": "Impact-check + diagnosis night. Brief IMPACT CHECK item (education-hero eager LCP, 08-17) re-measured IMPROVED: 8460ms baseline -> 2608ms (n=43/30d, near-floor, directionally conclusive). Backend: supabase MCP did not connect within lane window (2nd consecutive night) -- both brief backend items (auth_db_connections_absolute dashboard toggle, vocabulary_lessons unindexed FK) deferred, unactionable without execute_sql/apply_migration. Frontend: word-wheel daily (12280ms LCP, brief item) code-inspected -- page.tsx already wraps WordWheelChallenge in next/dynamic + Suspense with DailyLoadingFallback; the fallback itself is a 'use client' component gated on useLanguage() context resolution, so nothing paints until JS hydrates + LanguageContext resolves -- this is an architectural CSR-gate issue (no LCP image/priority fix applies), not a same-night-safe edit given WordWheelChallenge is 500+ lines of tested live game logic. Logged to perf-watch.md for a dedicated lane-05/11 pass rather than a blind edit. No .next build present -- bundle diff skipped per time-budget rule.",
   "backend": {
-    "mcp_status": "supabase MCP did not connect within lane window -- not used this run",
-    "auth_db_connections_advisor": "dashboard config toggle, not a code/migration fix -- deferred to human queue, unchanged"
+    "mcp_status": "supabase MCP did not connect within lane window (2nd consecutive night, 08-25 + 08-26) -- not used this run",
+    "auth_db_connections_advisor": "dashboard config toggle, not a code/migration fix -- deferred to human queue, unchanged",
+    "unindexed_fk_vocabulary_lessons": "vocabulary_lessons_classroom_id_fkey -- needs EXPLAIN ANALYZE via execute_sql before adding index (hard rule: no speculative indexes); deferred, MCP unavailable"
   },
   "frontend": {
     "impact_checks": [
-      { "verdict_for": "02-perf-2026-08-15-wordtower-leaderboard-split", "verdict": "improved", "measured_p75_lcp_ms": 6516, "n": 17, "baseline": 18176, "window": "7d (24h had n=3, below floor)" },
-      { "verdict_for": "02-perf-2026-08-16-singleplayer-lcp-dynamic-import", "verdict": "improved", "measured_p75_lcp_ms": 2910, "n": 41, "baseline": 7324, "window": "7d" }
+      { "verdict_for": "02-perf-2026-08-17-education-hero-lazy-lcp", "verdict": "improved", "measured_p75_lcp_ms": 2608, "n": 43, "baseline": 8460, "window": "30d (7d had n=2, below floor)" }
     ],
-    "brief_routes_code_reviewed_no_change": [
-      "es/multiplayer?quickPlay=true, en/multiplayer -- MultiplayerFlow already ssr:true + hero preload (prior fix)",
-      "es/juego-de-palabras-multijugador -- HeroAnimated already uses next/image priority+sizes"
+    "brief_routes_diagnosed_deferred": [
+      "en/daily/word-wheel (12280ms LCP) -- CSR-gated behind dynamic()+Suspense, loading fallback itself needs client hydration + LanguageContext resolution before paint; needs SSR-shell fix, not a blind same-night edit. Logged to perf-watch.md."
     ]
   },
   "bundle": {

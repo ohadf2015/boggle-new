@@ -308,6 +308,16 @@ describe('exp-results-replay-cta-v1', () => {
     });
   });
 
+  describe('results_autoplay_cancelled instrumentation', () => {
+    it('tracks results_autoplay_cancelled when the auto-play countdown is cancelled', async () => {
+      await act(async () => { renderResults(); });
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+        'results_autoplay_cancelled',
+        expect.objectContaining({ mode: 'practice' }),
+      );
+    });
+  });
+
   describe('control variant', () => {
     it('does NOT render quick-replay button', async () => {
       experimentVariant = 'control';

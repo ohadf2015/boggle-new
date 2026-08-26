@@ -69,4 +69,27 @@ describe('Showdown staggered reveal', () => {
     expect(screen.getByTestId('showdown-outcome')).toBeInTheDocument();
     expect(screen.queryByTestId('showdown-suspense')).not.toBeInTheDocument();
   });
+
+  it('starts the tension bar full, then drains it toward zero while waiting', async () => {
+    render(<Showdown {...makeProps()} />);
+    const fill = screen.getByTestId('showdown-tension-fill');
+    expect(fill).toHaveStyle({ width: '100%' });
+    await act(async () => {
+      vi.advanceTimersByTime(20);
+    });
+    expect(fill).toHaveStyle({ width: '0%' });
+  });
+
+  it('hides the tension bar once the outcome banner reveals', async () => {
+    render(<Showdown {...makeProps()} />);
+    await act(async () => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(screen.queryByTestId('showdown-tension-bar')).not.toBeInTheDocument();
+  });
+
+  it('skips the tension bar in reduced-motion mode', () => {
+    render(<Showdown {...makeProps({ reducedMotion: true })} />);
+    expect(screen.queryByTestId('showdown-tension-bar')).not.toBeInTheDocument();
+  });
 });

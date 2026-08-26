@@ -201,6 +201,7 @@ export default async function Page({ params }: PageProps) {
           <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.relatedVocabLink}</Link>
           <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.relatedEslLink}</Link>
           <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.relatedEducationLink}</Link>
+          <Link href={`/${locale}/education/for-schools`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-yellow transition-all hover:bg-neo-navy">{c.relatedForSchoolsLink}</Link>
         </nav>
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-purple p-8 text-neo-white shadow-hard-xl sm:p-12">

@@ -1,0 +1,3 @@
+status: research-only
+files_touched: docs/nightly/triage-queue.md, docs/nightly/reports/2026-08-26.md (docs only, no code)
+next_steps: pull $el_text/$el_selector breakdown on lexiclash.live/ rageclick events (last 24h) split by exp-homepage-click-feedback-v1 variant — confirms whether the already-live click-feedback fix is underperforming (conclude/retire) or today's rageclicks hit an untreated element (hero CTA / daily banner, needs new wiring). Flag hygiene sweep is clean (21/21 wired experiments have live flags) — no re-sweep needed tomorrow unless a new exp-* key is added to lib/experiments.ts.

@@ -3615,7 +3615,7 @@ const sv = {
         "classic": "Hitta varje ord",
         "blast": "Spräng brickorna",
         "wordHunt": "Jaga det dolda ordet",
-        "wheelRush": "Snurra & stjäl ord",
+        "wheelRush": "Tävla mot rivaler på hjulet",
         "wordTower": "Bygg tornet",
         "shiritori": "Kedja orden",
         "sealedBid": "Övertrumfa rummet",
@@ -12424,13 +12424,6 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
-    "proGate": {
-      "analytics": {
-        "title": "Analys ingår i Teacher Pro",
-        "body": "Se vem som kämpar, vilka ord klassen missar gång på gång och vilka lektioner som faktiskt fungerade — plus utskrivbara rapporter till vårdnadshavare och skolledning."
-      },
-      "cta": "Lås upp för {price} $/mån"
-    },
     "subscription": {
       "classLimitTitle": "Du har nått din klassgräns",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
@@ -12443,8 +12436,6 @@ const sv = {
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
       "upgradeNow": "Uppgradera till Pro nu",
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
-      "checkoutUnavailable": "Teacher Pro går inte att köpa än. Inget gick fel hos dig.",
-      "proHeroAlt": "En klass spelar LexiClash tillsammans, varje elev på sin egen enhet.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
       "upgradePricingTitle": "Uppgradera till Teacher Pro",
@@ -12461,6 +12452,8 @@ const sv = {
       "freeForever": "Gratis för alltid, alltid tillgänglig",
       "freeClasses": "Upp till {count} klass",
       "freeStudents": "Upp till {count} elever per klass",
+      "basicWordTracking": "Grundläggande ordspårning",
+      "dailyProgressReports": "Dagliga framstegsrapporter",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Allt du behöver för att växa",
       "popular": "Populärast",
@@ -12478,26 +12471,7 @@ const sv = {
       "manageSubscription": "Hantera prenumeration",
       "districtTitle": "Skola eller kommun?",
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
-      "districtCta": "Kontakta oss för skolpriser",
-      "priceTaxNote": "Skatt visas i kassan",
-      "valueHeadline": "Skalera din undervisning utan gränser",
-      "featureOutcome1": "Undervisa obegränsat många klasser utan att oroa dig för gränser",
-      "featureOutcome2": "Lägg till hur många elever som helst — utan krångel och väntan",
-      "featureOutcome3": "Realtidsspårning av framsteg för alla dina elever",
-      "featureOutcome4": "Jämför undervisningsstrategier över alla dina klasser samtidigt",
-      "matrix": {
-        "title": "Jämför planer",
-        "featureColumn": "Det här ingår",
-        "unlimited": "Obegränsat",
-        "classes": "Klasser",
-        "studentsPerClass": "Elever per klass",
-        "customLists": "Egna ordlistor",
-        "duels": "Klassdueller",
-        "noAds": "Inga annonser för elever",
-        "analytics": "Analys och utskrivbara rapporter",
-        "included": "Ingår",
-        "notIncluded": "Ingår inte"
-      }
+      "districtCta": "Kontakta oss för skolpriser"
     },
     "teacher": {
       "activeGames": "Aktiva spel",
@@ -12546,15 +12520,10 @@ const sv = {
       "selectClassroom": "Välj klassrum",
       "createClassroomFirst": "Skapa ett klassrum först för att spåra uppgifter och duellaktivitet",
       "reviewEmptyHint": "Skapa ditt första klassrum för att låsa upp analys, uppgifter och rapporter.",
-      "classroomLoadError": "Kunde inte ladda dina klassrum",
-      "classroomLoadErrorHint": "Kontrollera din anslutning och försök igen",
-      "retry": "Försök igen",
       "analytics": "Analys",
       "insights": "INSIKTER",
       "viewReports": "Visa rapporter",
       "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum",
-      "studentsPresentTitle": "{{count}} elever är i {{classroom}}",
-      "studentsPresentDescription": "Starta ett spel för att få dem att spela",
       "tab": {
         "play": "Spela",
         "prepare": "Förbered",
@@ -13160,9 +13129,9 @@ const sv = {
       "title": "LexiClash Utbildning",
       "startGame": "Starta spel",
       "hero": {
-        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska, spanska och ryska",
+        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
         "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
-        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
         "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
@@ -13312,26 +13281,6 @@ const sv = {
         "title": "För skolor och distrikt",
         "body": "Hanterar du 5+ klassrum? Kontakta oss för volympriser.",
         "button": "Kontakta oss för distriktspris"
-      },
-      "pro": {
-        "title": "Teacher Pro — lås upp ditt klassrum",
-        "subtitle": "Gratis att starta. Pro växer med dina behov.",
-        "freeTier": "Gratis plan",
-        "proTier": "Pro",
-        "perMonth": "/månad",
-        "classLimit": "Upp till {count} klassrum",
-        "classLimitPro": "Obegränsade klassrum",
-        "studentLimit": "Upp till {count} elever per klassrum",
-        "studentLimitPro": "Obegränsade elever",
-        "noAds": "Noll annonser på elevvägar",
-        "everythingInFree": "Allt i gratisplanen",
-        "analytics": "Klassanalys och utskrivbara rapporter",
-        "customLists": "Anpassade ordlistor",
-        "duels": "Klassdueller",
-        "chooseNow": "Uppgradera till Pro",
-        "comparisonAlt": "Gratisplan: ett enda låst klassrum. Teacher Pro: alla klassrum öppna och fulla.",
-        "freeForever": "Helt gratis. Alltid.",
-        "whyNow": "Varför nu: Ditt första klassrum är begränsat till {count} elever. Behöver du fler? Ett klick för 500+ elever och 50+ klassrum."
       },
       "esl-word-games": {
         "course_name": "Ordspel för ESL och språkundervisning",
@@ -13497,7 +13446,7 @@ const sv = {
     },
     "student": {
       "join": {
-        "classroomFull": "Klassen är full – fråga din lärare.",
+        "alreadyMember": "Du är redan med i den här klassen",
         "button": "Gå med",
         "clipboardError": "Kunde inte läsa urklipp",
         "codeHint": "6 bokstäver från din lärare",
@@ -13670,8 +13619,6 @@ const sv = {
       "declined_reapply": "Du kan ansöka igen senare. Fler frågor? Mejla oss.",
       "submitted_on": "Skickad",
       "already_approved_title": "Du är redan godkänd!",
-      "status_unknown_title": "Vi kunde inte läsa din status just nu",
-      "status_unknown_body": "Vi kan inte fastställa din läraråtkomststatus. Ladda om sidan eller kontakta support om problemet kvarstår.",
       "go_to_teacher": "Till lärarpanelen",
       "auth_required_title": "Registrera dig för att ansöka om läraråtkomst",
       "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",

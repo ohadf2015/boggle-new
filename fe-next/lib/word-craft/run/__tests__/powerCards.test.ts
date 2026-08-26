@@ -93,4 +93,18 @@ describe('drawCardChoices', () => {
     const owned = POWER_CARD_POOL.slice(0, 11).map((c) => c.id);
     expect(drawCardChoices(1, owned, 3).length).toBe(1);
   });
+
+  it('weights draws so legendary cards appear far less often than common', () => {
+    const rarityCounts: Record<string, number> = { common: 0, rare: 0, legendary: 0 };
+    for (let seed = 0; seed < 500; seed++) {
+      for (const c of drawCardChoices(seed, [], 3)) rarityCounts[c.rarity]++;
+    }
+    const commonPool = POWER_CARD_POOL.filter((c) => c.rarity === 'common').length;
+    const legendaryPool = POWER_CARD_POOL.filter((c) => c.rarity === 'legendary').length;
+    // Per-card appearance rate for legendary must be well below common's —
+    // a uniform shuffle would make them roughly equal despite the pool-size difference.
+    const commonRate = rarityCounts.common / commonPool;
+    const legendaryRate = rarityCounts.legendary / legendaryPool;
+    expect(legendaryRate).toBeLessThan(commonRate * 0.5);
+  });
 });
