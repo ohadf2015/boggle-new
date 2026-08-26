@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
-import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { Switch } from '@/components/ui/switch';
 import {
   hasConsentDecision,
@@ -103,10 +102,11 @@ export default function CookieConsent() {
     setShowDetails(false);
   }, [analytics, advertising]);
 
-  const dialogRef = useRef<HTMLDivElement>(null);
-  // Focus is managed for keyboard accessibility, but Escape does NOT dismiss —
-  // a choice is still required.
-  useFocusTrap(dialogRef, visible);
+  // Deliberately no focus trap here: this is a non-blocking sheet (see header
+  // comment) — trapping Tab/Shift+Tab would fully block keyboard-only users
+  // from the rest of the page while pointer users remain unaffected, which is
+  // the opposite of the "non-blocking" goal. Keyboard users can Tab past the
+  // sheet the same way pointer users can click past it.
 
   // CrazyGames embeds its own platform-level consent UI before our iframe loads.
   // A second banner inside the iframe violates the embed UX expectation.
@@ -119,7 +119,6 @@ export default function CookieConsent() {
     // Fixed bottom sheet. No full-screen backdrop, no backdrop-filter.
     // A reserved min-height prevents layout shift when the sheet mounts.
     <div
-      ref={dialogRef}
       role="dialog"
       aria-modal="false"
       aria-label={t('cookieConsent.title')}

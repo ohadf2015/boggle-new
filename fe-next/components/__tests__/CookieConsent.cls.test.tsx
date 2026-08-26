@@ -15,7 +15,6 @@ import CookieConsent from '../CookieConsent';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
-vi.mock('@/hooks/useFocusTrap', () => ({ useFocusTrap: () => {} }));
 vi.mock('@/utils/cookieConsent', () => ({
   hasConsentDecision: () => false,
   getConsentState: () => ({ analytics: false, advertising: false, timestamp: 0 }),
