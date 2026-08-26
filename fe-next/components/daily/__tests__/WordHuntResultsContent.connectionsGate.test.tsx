@@ -4,7 +4,7 @@
  * Mirrors the wheel/hunt gating ("don't show a card for a mode already played").
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Wheel done → Connections cross-promo is eligible (en/he, after wheel).
@@ -103,9 +103,16 @@ const baseProps: WordHuntResultsContentProps = {
 describe('WordHuntResultsContent — Connections cross-promo gating', () => {
   beforeEach(() => { vi.clearAllMocks(); window.localStorage.clear(); });
 
-  it('shows the Connections cross-promo when it has NOT been played today', () => {
+  /* The cross-promo now lives inside the "Full recap" disclosure rather than on
+     the first paint — the gating this test protects (offer it only when today's
+     Connections is unplayed) is unchanged, so the assertion opens the recap
+     first instead of expecting it immediately visible. */
+  it('offers the Connections cross-promo when it has NOT been played today', () => {
     mockHasPlayedConnections.mockReturnValue(false);
     render(<WordHuntResultsContent {...baseProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /full recap/i }));
+
     expect(screen.getByTestId('daily-connections-cross-promo')).toBeInTheDocument();
   });
 

@@ -34,6 +34,9 @@ vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard(
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({ default: function MockInlineSignup() { return <div data-testid="inline-signup" />; } }));
 vi.mock('../WatchAdButton', () => ({ default: function MockWatchAdButton() { return <div data-testid="watch-ad" />; } }));
 vi.mock('@/components/ads/WatchAdForRevealButton', () => ({ default: function MockWatchAdForReveal() { return <div data-testid="watch-ad-reveal" />; } }));
+vi.mock('@/components/ui/Collapsible', () => ({
+  Collapsible: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 

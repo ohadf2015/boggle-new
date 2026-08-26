@@ -6137,6 +6137,11 @@ const en = {
     "online": "online"
   },
   "daily": {
+    "todaysPuzzles": "Today's Puzzles",
+    "results": {
+      "fullRecap": "Full recap",
+      "fullRecapSummary": "Your words, your insights, and what to play next"
+    },
     "title": "Daily Challenge",
     "badge": "DAILY",
     "chooseChallengeHint": "Pick your quest",
@@ -12418,7 +12423,8 @@ const en = {
       "beat_human": { "title": "Rival Crusher", "desc": "Beat a real human opponent" },
       "play_mp": { "title": "Enter the Arena", "desc": "Play a multiplayer match" },
       "play_brain": { "title": "Brain Boost", "desc": "Finish a Brain Drill session" },
-      "play_wordhunt": { "title": "On the Hunt", "desc": "Play today's Word Hunt" }
+      "play_wordhunt": { "title": "On the Hunt", "desc": "Play today's Word Hunt" },
+      "play_wordwheel": { "title": "Give It a Spin", "desc": "Play today's Word Wheel" }
     },
     "reward": {
       "xp": "+{{xp}} XP",

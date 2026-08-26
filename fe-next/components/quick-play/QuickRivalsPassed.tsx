@@ -32,10 +32,10 @@ export function QuickRivalsPassed({ rivals, myScorePct, myName, myUserId, myAvat
       name: r.name,
       pct: r.scorePct,
       userId: r.userId,
-      avatar: r.customAvatar ?? undefined,
+      customAvatar: r.customAvatar ?? undefined,
       isMe: false,
     })),
-    { key: '__me', name: myName, pct: myScorePct, userId: myUserId, avatar: myAvatar ?? undefined, isMe: true },
+    { key: '__me', name: myName, pct: myScorePct, userId: myUserId ?? 'quick-guest', customAvatar: myAvatar ?? undefined, isMe: true },
   ].sort((a, b) => b.pct - a.pct);
 
   return (
@@ -64,7 +64,7 @@ export function QuickRivalsPassed({ rivals, myScorePct, myName, myUserId, myAvat
             }`}
           >
             <span className="w-4 text-center font-neo-display text-xs font-bold text-neo-white/45">{i + 1}</span>
-            <Avatar userId={row.userId} customAvatar={row.avatar} size="sm" disableEffects />
+            <Avatar userId={row.userId} customAvatar={row.customAvatar} size="sm" disableEffects />
             <span className="min-w-0 flex-1 truncate">{row.name}</span>
             {!row.isMe && myScorePct > row.pct && (
               <span className="shrink-0 rounded-md border-2 border-black bg-neo-lime px-1.5 text-[10px] font-bold uppercase tracking-wide text-black">

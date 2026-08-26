@@ -6764,6 +6764,11 @@ const ja = {
     "online": "オンライン"
   },
   "daily": {
+    "todaysPuzzles": "今日のパズル",
+    "results": {
+      "fullRecap": "くわしい結果",
+      "fullRecapSummary": "見つけた単語、データ、次に遊べるゲーム"
+    },
     "title": "デイリーチャレンジ",
     "chooseQuest": "今日のクエストを選ぼう",
     "dailyMissions": "デイリーミッション",
@@ -13820,7 +13825,11 @@ const ja = {
       "play_wordhunt": {
         "title": "狩猟開始",
         "desc": "今日のワードハントをプレイ"
-      }
+      },
+      "play_wordwheel": {
+        "title": "ホイールを回そう",
+        "desc": "今日のワードホイールで遊ぶ"
+      },
     },
     "reward": {
       "xp": "+{{xp}} XP",

@@ -7003,6 +7003,11 @@ const sv = {
     "online": "online"
   },
   "daily": {
+    "todaysPuzzles": "Dagens pussel",
+    "results": {
+      "fullRecap": "Hela sammanfattningen",
+      "fullRecapSummary": "Dina ord, din statistik och vad du kan spela härnäst"
+    },
     "title": "Daglig utmaning",
     "badge": "DAGLIG UTMANING",
     "puzzleNumber": "Daglig #{number}",
@@ -14109,7 +14114,11 @@ const sv = {
       "play_wordhunt": {
         "title": "I jakt",
         "desc": "Spela dagens ordjakt"
-      }
+      },
+      "play_wordwheel": {
+        "title": "Ta ett varv",
+        "desc": "Spela dagens Ordhjul"
+      },
     },
     "reward": {
       "xp": "+{{xp}} XP",
