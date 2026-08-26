@@ -12528,7 +12528,10 @@ const sv = {
         "play": "Spela",
         "prepare": "Förbered",
         "review": "Granska"
-      }
+      },
+      "classroomLoadError": "Kunde inte ladda dina klassrum",
+      "classroomLoadErrorHint": "Kolla uppkopplingen och försök igen",
+      "retry": "Försök igen"
     },
     "game": {
       "qrCode": "Visa QR-kod",
@@ -12579,6 +12582,28 @@ const sv = {
       "created": "Skapad {{date}}",
       "noClassrooms": "Inga klassrum än",
       "createFirst": "Skapa ditt första klassrum för att börja",
+      "inviteStudents": "Bjud in elever",
+      "share": "Dela",
+      "shareInviteText": "Gå med i {{name}} på LexiClash med koden {{code}}",
+      "createdBannerTitle": "Klassrummet är redo!",
+      "createdBannerBody": "Dela koden med dina elever.",
+      "dismissBanner": "Okej",
+      "wizard": {
+        "title": "Tre steg till klassrum",
+        "subtitle": "Du har en kod på under en minut.",
+        "step1": {
+          "title": "Skapa klass",
+          "body": "Ge den ett namn och välj språk."
+        },
+        "step2": {
+          "title": "Få koden",
+          "body": "En kort kod dyker upp direkt."
+        },
+        "step3": {
+          "title": "Dela med eleverna",
+          "body": "Skicka koden. Inga konton behövs."
+        }
+      },
       "validation": {
         "nameRequired": "Klassrumsnamn krävs"
       },
@@ -13292,6 +13317,7 @@ const sv = {
       },
       "welcomeBack": "Välkommen tillbaka!",
       "openDashboard": "Öppna lärarpanelen",
+      "createClassroom": "Skapa klassrum",
       "furtherReading": {
         "title": "Utforska mer",
         "guides": "Strategiguider",

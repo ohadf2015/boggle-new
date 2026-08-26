@@ -12290,7 +12290,10 @@ const ja = {
         "play": "プレイ",
         "prepare": "準備",
         "review": "レビュー"
-      }
+      },
+      "classroomLoadError": "クラスを読み込めませんでした",
+      "classroomLoadErrorHint": "接続を確認して、もう一度試してください",
+      "retry": "再試行"
     },
     "game": {
       "qrCode": "QRコードを表示",
@@ -12341,6 +12344,28 @@ const ja = {
       "created": "{{date}}に作成",
       "noClassrooms": "まだクラスがありません",
       "createFirst": "最初のクラスを作成しましょう",
+      "inviteStudents": "生徒を招待",
+      "share": "シェア",
+      "shareInviteText": "LexiClashの「{{name}}」にコード {{code}} で参加しよう",
+      "createdBannerTitle": "クラス完成！",
+      "createdBannerBody": "このコードを生徒にシェアしよう。",
+      "dismissBanner": "OK",
+      "wizard": {
+        "title": "3ステップでクラス準備",
+        "subtitle": "1分で参加コードが手に入る。",
+        "step1": {
+          "title": "クラスを作る",
+          "body": "名前と言語を決めるだけ。"
+        },
+        "step2": {
+          "title": "コードをゲット",
+          "body": "短い参加コードがすぐ出る。"
+        },
+        "step3": {
+          "title": "生徒にシェア",
+          "body": "コードを送るだけ。ログイン不要。"
+        }
+      },
       "validation": {
         "nameRequired": "クラス名が必要です"
       },
@@ -13054,6 +13079,7 @@ const ja = {
       },
       "welcomeBack": "おかえりなさい、先生！",
       "openDashboard": "ダッシュボードを開く",
+      "createClassroom": "クラスを作成",
       "furtherReading": {
         "title": "もっと見る",
         "guides": "攻略ガイド",

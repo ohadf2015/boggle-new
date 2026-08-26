@@ -67,9 +67,16 @@ export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('play');
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [openCreateClassroom, setOpenCreateClassroom] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
+
+  useEffect(() => {
+    if (activeTab !== 'prepare') {
+      setOpenCreateClassroom(false);
+    }
+  }, [activeTab]);
 
   // Check if user has teacher access
   const hasTeacherAccess = profile?.user_role === 'teacher' || profile?.is_admin === true;
@@ -130,20 +137,39 @@ export default function TeacherDashboard() {
                 {t('teacher.dashboard.subtitle')}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowTutorial(true)}
-              aria-label={t('education.onboarding.showTutorial')}
-              title={t('education.onboarding.showTutorial')}
-              className={cn(
-                'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
-                'border-2 border-black bg-neo-lime text-black shadow-hard-sm',
-                'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                'transition-all focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
-              )}
-            >
-              <HelpCircle className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                data-testid="create-classroom-shortcut"
+                onClick={() => {
+                  setActiveTab('prepare');
+                  setOpenCreateClassroom(true);
+                }}
+                className={cn(
+                  'inline-flex min-h-11 items-center gap-1.5 rounded-neo px-3 sm:px-4',
+                  'border-3 border-black bg-neo-yellow text-black font-neo-display font-black shadow-hard',
+                  'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all',
+                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
+                )}
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {t('teacher.classroom.create', 'Create classroom')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowTutorial(true)}
+                aria-label={t('education.onboarding.showTutorial')}
+                title={t('education.onboarding.showTutorial')}
+                className={cn(
+                  'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
+                  'border-2 border-black bg-neo-lime text-black shadow-hard-sm',
+                  'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+                  'transition-all focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
+                )}
+              >
+                <HelpCircle className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </m.div>
 
@@ -309,7 +335,7 @@ export default function TeacherDashboard() {
                     {t('teacher.dashboard.classrooms')}
                   </h2>
                 </div>
-                <ClassroomManager />
+                <ClassroomManager autoOpenCreate={openCreateClassroom} />
               </section>
 
               {/* Lessons */}
