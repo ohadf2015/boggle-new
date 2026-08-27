@@ -9112,6 +9112,9 @@ const ru = {
       "share": "Поделиться",
       "shareInviteText": "Присоединяйтесь к «{{name}}» в LexiClash по коду {{code}}",
       "createdBannerTitle": "Класс готов!",
+      "googleClassroom": "Опубликовать в Google Classroom",
+      "googleClassroomTitle": "Присоединяйтесь к «{{name}}» в LexiClash",
+      "googleClassroomBody": "Нажмите на ссылку, чтобы войти в класс. Аккаунт не нужен — просто выберите имя.",
       "createdBannerBody": "Поделитесь этим кодом с учениками.",
       "dismissBanner": "Понятно",
       "wizard": {

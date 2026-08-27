@@ -12376,6 +12376,9 @@ const ja = {
       "share": "シェア",
       "shareInviteText": "LexiClashの「{{name}}」にコード {{code}} で参加しよう",
       "createdBannerTitle": "クラス完成！",
+      "googleClassroom": "Google Classroom に投稿",
+      "googleClassroomTitle": "LexiClash の「{{name}}」に参加しよう",
+      "googleClassroomBody": "リンクをタップしてクラスに参加。アカウントは不要、名前を決めるだけです。",
       "createdBannerBody": "このコードを生徒にシェアしよう。",
       "dismissBanner": "OK",
       "wizard": {

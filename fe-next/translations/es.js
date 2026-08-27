@@ -12374,6 +12374,9 @@ const es = {
       "share": "Compartir",
       "shareInviteText": "Únete a {{name}} en LexiClash con el código {{code}}",
       "createdBannerTitle": "¡Clase lista!",
+      "googleClassroom": "Publicar en Google Classroom",
+      "googleClassroomTitle": "Únete a {{name}} en LexiClash",
+      "googleClassroomBody": "Toca el enlace para entrar a nuestra clase. No hace falta cuenta: solo elige un nombre.",
       "createdBannerBody": "Comparte este código con tus alumnos.",
       "dismissBanner": "Listo",
       "wizard": {

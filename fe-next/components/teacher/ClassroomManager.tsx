@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Plus, Copy, Share2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Copy, Share2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp, GraduationCap } from 'lucide-react';
+import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import toast from 'react-hot-toast';
 import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
 import ClassroomStudentList from './ClassroomStudentList';
@@ -155,6 +156,35 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
     }
   };
 
+  /**
+   * Google's own share dialog, pre-filled with this classroom's join link.
+   *
+   * A teacher's real blocker is not creating the class — that is 3 clicks — it is getting 28
+   * children to type six characters. Their class already exists in Google Classroom and every
+   * student is already signed in to it, so posting the join link to that Stream skips the code
+   * entirely. Google prompts them inside its own dialog; we never learn which class they chose,
+   * which is why this needs no OAuth, no scopes and no student data.
+   * See docs/2026-08-27-google-classroom-integration.md.
+   *
+   * Returns null on the server (no window.location.origin) and if the URL cannot be built, so a
+   * bad value can never reach an anchor's href.
+   */
+  const googleClassroomHref = (name: string, code: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return buildGoogleClassroomShareUrl({
+        joinUrl: `${window.location.origin}/${language}/join/${code}`,
+        title: t('teacher.classroom.googleClassroomTitle', 'Join {{name}} on LexiClash', { name }),
+        body: t(
+          'teacher.classroom.googleClassroomBody',
+          'Tap the link to join our class. No account needed — just pick a name.',
+        ),
+      });
+    } catch {
+      return null;
+    }
+  };
+
   const openCreateDialog = () => {
     setFormData({ name: '', language: language as Language });
     setIsCreateDialogOpen(true);
@@ -222,6 +252,17 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                 <Share2 className="w-4 h-4 me-2" />
                 {t('teacher.classroom.share', 'Share')}
               </Button>
+              {googleClassroomHref(createdClassroom.name, createdClassroom.join_code) && (
+                <a
+                  href={googleClassroomHref(createdClassroom.name, createdClassroom.join_code)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-white px-4 py-2 text-sm font-black text-black shadow-hard-sm transition-all hover:-translate-y-0.5"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
+                </a>
+              )}
               <Button
                 type="button"
                 onClick={() => setCreatedClassroom(null)}
@@ -303,6 +344,18 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                         {t('teacher.classroom.share', 'Share')}
                       </Button>
                     </div>
+                    {googleClassroomHref(classroom.name, classroom.join_code) && (
+                      <a
+                        href={googleClassroomHref(classroom.name, classroom.join_code)!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-testid="share-to-google-classroom"
+                        className="mt-2 flex min-h-11 items-center justify-center gap-2 rounded-neo border-2 border-black bg-neo-white px-3 text-sm font-black text-black shadow-hard-sm transition-all hover:-translate-y-0.5"
+                      >
+                        <GraduationCap className="w-4 h-4" />
+                        {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
+                      </a>
+                    )}
                   </div>
 
                   {/* View Students Button */}

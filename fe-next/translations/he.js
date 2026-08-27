@@ -12232,6 +12232,9 @@ const he = {
       "share": "שיתוף",
       "shareInviteText": "הצטרפו ל-{{name}} ב-LexiClash עם הקוד {{code}}",
       "createdBannerTitle": "הכיתה מוכנה!",
+      "googleClassroom": "פרסום ב-Google Classroom",
+      "googleClassroomTitle": "הצטרפו ל{{name}} ב-LexiClash",
+      "googleClassroomBody": "הקישו על הקישור כדי להצטרף לכיתה. בלי חשבון — פשוט בוחרים שם.",
       "createdBannerBody": "שתפו את הקוד עם התלמידים.",
       "dismissBanner": "סגור",
       "wizard": {

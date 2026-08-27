@@ -12614,6 +12614,9 @@ const sv = {
       "share": "Dela",
       "shareInviteText": "Gå med i {{name}} på LexiClash med koden {{code}}",
       "createdBannerTitle": "Klassrummet är redo!",
+      "googleClassroom": "Publicera i Google Classroom",
+      "googleClassroomTitle": "Gå med i {{name}} på LexiClash",
+      "googleClassroomBody": "Tryck på länken för att gå med i klassen. Inget konto behövs – välj bara ett namn.",
       "createdBannerBody": "Dela koden med dina elever.",
       "dismissBanner": "Okej",
       "wizard": {

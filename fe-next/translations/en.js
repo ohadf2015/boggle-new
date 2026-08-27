@@ -10901,6 +10901,9 @@ const en = {
       "share": "Share",
       "shareInviteText": "Join {{name}} on LexiClash with code {{code}}",
       "createdBannerTitle": "Classroom ready!",
+      "googleClassroom": "Post to Google Classroom",
+      "googleClassroomTitle": "Join {{name}} on LexiClash",
+      "googleClassroomBody": "Tap the link to join our class. No account needed — just pick a name.",
       "createdBannerBody": "Share this code with your students.",
       "dismissBanner": "Got it",
       "wizard": {
