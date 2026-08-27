@@ -15251,6 +15251,7 @@ const he = {
     "adminBadge": "ארגז חול למנהלים · לוח מילים תחרותי",
     "you": "אתה",
     "bot": "WordBot",
+    "rival": "יריב",
     "tied": "תיקו",
     "yourTurn": "התור שלך",
     "botTurn": "WordBot חושב…",

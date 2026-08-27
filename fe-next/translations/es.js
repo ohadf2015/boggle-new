@@ -15208,6 +15208,7 @@ const es = {
     "adminBadge": "Sandbox de admin · Tablero de palabras",
     "you": "Tú",
     "bot": "WordBot",
+    "rival": "Rival",
     "tied": "Empate",
     "yourTurn": "Tu turno",
     "botTurn": "WordBot está pensando…",

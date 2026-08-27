@@ -15343,6 +15343,7 @@ const sv = {
     "adminBadge": "Admin-sandlåda · Tävlings-ordbräde",
     "you": "Du",
     "bot": "WordBot",
+    "rival": "Rival",
     "tied": "Oavgjort",
     "yourTurn": "Din tur",
     "botTurn": "WordBot tänker…",

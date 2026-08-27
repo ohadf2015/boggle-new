@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Bot, Play, Send, Sparkles, Users } from 'lucide-react';
 import { BOT_DIFFICULTIES } from '@/lib/word-craft/botDifficulty';
 import { WORDCRAFT_MODIFIERS, modifierLabelKey, type WordCraftModifier } from '@/lib/word-craft/modifiers';
@@ -55,12 +55,24 @@ export interface WordCraftSetupProps {
  */
 export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
   const [choice, setChoice] = useState<WordCraftSetupChoice>(initial);
+  const setOpponent = useCallback((opponent: WordCraftSetupChoice['opponent']) => {
+    setChoice((c) => ({
+      ...c,
+      opponent,
+      // Solo vs Rival always starts on easy; friend/hotseat keep the current tune.
+      difficulty: opponent === 'bot' ? 'easy' : c.difficulty,
+    }));
+  }, []);
   const twists: Array<WordCraftModifier | 'surprise'> = [
     'surprise',
     ...WORDCRAFT_MODIFIERS.filter((m) => m !== 'none'),
   ];
-  // Hotseat has no bot to tune; bot + friend (async duel vs bot) both do.
-  const showDifficulty = choice.opponent !== 'hotseat';
+  // Solo vs Rival shortcut: selecting the bot defaults to easy and hides the
+  // advanced tuning (difficulty + twist) for a one-tap start. Hotseat has no
+  // bot to tune; friend (async duel vs bot) keeps the full tuning surface.
+  const isSoloRival = choice.opponent === 'bot';
+  const showDifficulty = choice.opponent === 'friend';
+  const showAdvancedOptions = !isSoloRival;
 
   return (
     <div
@@ -81,32 +93,32 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         role="radiogroup"
         aria-label={t('wordcraft.setup.opponent.label')}
         className="grid grid-cols-3 gap-2 shrink-0 [@media(max-height:520px)]:col-start-1 [@media(max-height:520px)]:row-start-1"
-        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.opponent, ['bot', 'hotseat', 'friend'] as const, (opponent) => setChoice((c) => ({ ...c, opponent })))}
+        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.opponent, ['bot', 'hotseat', 'friend'] as const, (opponent) => setOpponent(opponent))}
       >
         <OpponentCard
           selected={choice.opponent === 'bot'}
-          onSelect={() => setChoice((c) => ({ ...c, opponent: 'bot' }))}
+          onSelect={() => setOpponent('bot')}
           icon={<Bot className="w-5 h-5 [@media(min-height:700px)]:w-6 [@media(min-height:700px)]:h-6" strokeWidth={2.5} />}
           label={t('wordcraft.setup.opponent.bot')}
           desc={t('wordcraft.setup.opponent.botDesc')}
         />
         <OpponentCard
           selected={choice.opponent === 'hotseat'}
-          onSelect={() => setChoice((c) => ({ ...c, opponent: 'hotseat' }))}
+          onSelect={() => setOpponent('hotseat')}
           icon={<Users className="w-5 h-5 [@media(min-height:700px)]:w-6 [@media(min-height:700px)]:h-6" strokeWidth={2.5} />}
           label={t('wordcraft.setup.opponent.hotseat')}
           desc={t('wordcraft.setup.opponent.hotseatDesc')}
         />
         <OpponentCard
           selected={choice.opponent === 'friend'}
-          onSelect={() => setChoice((c) => ({ ...c, opponent: 'friend' }))}
+          onSelect={() => setOpponent('friend')}
           icon={<Send className="w-5 h-5 [@media(min-height:700px)]:w-6 [@media(min-height:700px)]:h-6" strokeWidth={2.5} />}
           label={t('wordcraft.setup.opponent.friend')}
           desc={t('wordcraft.setup.opponent.friendDesc')}
         />
       </div>
 
-      {/* Bot difficulty — only when there is a bot to tune */}
+      {/* Bot difficulty — only for friend duels where the bot tuning matters */}
       {showDifficulty ? (
         <div
           role="radiogroup"
@@ -130,53 +142,55 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         </div>
       ) : null}
 
-      {/* Twist (modifier) */}
-      <div
-        role="radiogroup"
-        aria-label={t('wordcraft.setup.twist.label')}
-        className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-2 [@media(max-height:520px)]:row-start-1 [@media(max-height:520px)]:row-span-2"
-        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.modifier, twists, (modifier) => setChoice((c) => ({ ...c, modifier })))}
-      >
-        <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
-          {t('wordcraft.setup.twist.label')}
-        </span>
-        <div className="grid grid-cols-2 gap-1.5 [@media(min-height:700px)]:gap-2 [@media(max-height:520px)]:grid-cols-3 [@media(max-height:520px)]:gap-1">
-          {twists.map((m) => {
-            const isSurprise = m === 'surprise';
-            const label = isSurprise ? t('wordcraft.setup.twist.surprise') : t(modifierLabelKey(m));
-            const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);
-            return (
-              <button
-                key={m}
-                type="button"
-                role="radio"
-                aria-checked={choice.modifier === m}
-                aria-label={label}
-                title={desc}
-                onClick={() => setChoice((c) => ({ ...c, modifier: m }))}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-1.5 [@media(min-height:700px)]:py-2 [@media(max-height:520px)]:py-1 rounded-neo border-neo-thick border-black text-start',
-                  'transition-colors',
-                  choice.modifier === m
-                    ? 'bg-neo-purple text-white shadow-hard'
-                    : 'bg-neo-navy-light text-neo-white/85 shadow-hard-sm hover:bg-neo-navy-light/70',
-                )}
-                data-twist={m}
-              >
-                {isSurprise ? <Sparkles className="w-4 h-4 shrink-0" strokeWidth={2.5} aria-hidden /> : null}
-                <span className="flex flex-col min-w-0">
-                  <span className="text-xs font-neo-display font-black truncate">{label}</span>
-                  {desc ? (
-                    <span className="hidden [@media(min-height:640px)]:block text-[10px] font-neo-body opacity-75 truncate">
-                      {desc}
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            );
-          })}
+      {/* Twist (modifier) — hidden in Solo vs Rival shortcut mode */}
+      {showAdvancedOptions ? (
+        <div
+          role="radiogroup"
+          aria-label={t('wordcraft.setup.twist.label')}
+          className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-2 [@media(max-height:520px)]:row-start-1 [@media(max-height:520px)]:row-span-2"
+          onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.modifier, twists, (modifier) => setChoice((c) => ({ ...c, modifier })))}
+        >
+          <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
+            {t('wordcraft.setup.twist.label')}
+          </span>
+          <div className="grid grid-cols-2 gap-1.5 [@media(min-height:700px)]:gap-2 [@media(max-height:520px)]:grid-cols-3 [@media(max-height:520px)]:gap-1">
+            {twists.map((m) => {
+              const isSurprise = m === 'surprise';
+              const label = isSurprise ? t('wordcraft.setup.twist.surprise') : t(modifierLabelKey(m));
+              const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={choice.modifier === m}
+                  aria-label={label}
+                  title={desc}
+                  onClick={() => setChoice((c) => ({ ...c, modifier: m }))}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-1.5 [@media(min-height:700px)]:py-2 [@media(max-height:520px)]:py-1 rounded-neo border-neo-thick border-black text-start',
+                    'transition-colors',
+                    choice.modifier === m
+                      ? 'bg-neo-purple text-white shadow-hard'
+                      : 'bg-neo-navy-light text-neo-white/85 shadow-hard-sm hover:bg-neo-navy-light/70',
+                  )}
+                  data-twist={m}
+                >
+                  {isSurprise ? <Sparkles className="w-4 h-4 shrink-0" strokeWidth={2.5} aria-hidden /> : null}
+                  <span className="flex flex-col min-w-0">
+                    <span className="text-xs font-neo-display font-black truncate">{label}</span>
+                    {desc ? (
+                      <span className="hidden [@media(min-height:640px)]:block text-[10px] font-neo-body opacity-75 truncate">
+                        {desc}
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/* Start */}
       <button

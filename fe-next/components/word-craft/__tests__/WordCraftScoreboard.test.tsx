@@ -6,7 +6,7 @@ import type { PlayerState } from '@/lib/word-craft/types';
 // Avatar pulls heavy avatar-rendering deps; the scoreboard logic under test
 // (scores, bag, territory) doesn't depend on it.
 vi.mock('@/components/Avatar', () => ({
-  default: () => <div data-testid="avatar" />,
+  default: ({ className }: { className?: string }) => <div data-testid="avatar" data-class={className} />,
 }));
 
 const player: PlayerState = { score: 120, rack: [] } as unknown as PlayerState;
@@ -15,6 +15,7 @@ const bot: PlayerState = { score: 80, rack: [] } as unknown as PlayerState;
 const labels = {
   you: 'You',
   bot: 'Bot',
+  rival: 'Rival',
   yourTurn: 'Your turn',
   botTurn: 'Bot turn',
   gameOver: 'Game over',
@@ -53,5 +54,20 @@ describe('WordCraftScoreboard (Conquest)', () => {
     expect(screen.queryByText('80')).toBeNull();
     // Territory label shows in the meta row.
     expect(screen.getByText('Territory')).toBeTruthy();
+  });
+
+  it('labels the bot opponent as Rival and gives the avatar a ghost class', () => {
+    renderBoard({ isBot: true });
+    expect(screen.getByText('Rival')).toBeTruthy();
+    expect(screen.queryByText('Bot')).toBeNull();
+    const avatars = screen.getAllByTestId('avatar');
+    const rivalAvatar = avatars[avatars.length - 1];
+    expect(rivalAvatar.getAttribute('data-class')).toMatch(/grayscale/);
+  });
+
+  it('keeps the bot label when isBot is not set', () => {
+    renderBoard();
+    expect(screen.getByText('Bot')).toBeTruthy();
+    expect(screen.queryByText('Rival')).toBeNull();
   });
 });

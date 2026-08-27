@@ -18,9 +18,12 @@ export interface WordCraftScoreboardProps {
   playerSeed?: string;
   opponentAvatar?: CustomAvatarConfig | null;
   opponentSeed?: string;
+  /** When the on-board opponent is the bot, render a shadow-rival ghost and label it "Rival". */
+  isBot?: boolean;
   labels: {
     you: string;
     bot: string;
+    rival?: string;
     yourTurn: string;
     botTurn: string;
     gameOver: string;
@@ -61,6 +64,7 @@ function WordCraftScoreboardImpl({
   playerSeed,
   opponentAvatar,
   opponentSeed,
+  isBot = false,
   labels,
   territory,
 }: WordCraftScoreboardProps) {
@@ -74,6 +78,7 @@ function WordCraftScoreboardImpl({
   const dampened = total < 8 ? 50 + (rawPct - 50) * (total / 8) : rawPct;
   const pct = Math.max(10, Math.min(90, dampened));
 
+  const opponentName = isBot ? (labels.rival ?? 'Rival') : labels.bot;
   const status =
     turn === 'over' ? labels.gameOver : turn === 'player' ? labels.yourTurn : labels.botTurn;
   const turnTone =
@@ -112,10 +117,14 @@ function WordCraftScoreboardImpl({
         <div className="flex items-center gap-2 flex-row-reverse min-w-0">
           <Avatar
             customAvatar={opponentAvatar ?? null}
-            userId={opponentSeed || labels.bot}
+            userId={opponentSeed || opponentName}
             size="sm"
             mode="multiplayer"
             disableEffects
+            className={cn(
+              isBot &&
+                'opacity-75 grayscale-[0.5] drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]',
+            )}
           />
           <span
             data-score-value="bot"
@@ -124,7 +133,7 @@ function WordCraftScoreboardImpl({
             {bScore}
           </span>
           <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white truncate">
-            {labels.bot}
+            {opponentName}
           </span>
         </div>
       </div>
@@ -132,7 +141,7 @@ function WordCraftScoreboardImpl({
       {/* Kinetic split bar — the cyan/pink boundary IS the territory balance. */}
       <div
         role="img"
-        aria-label={`${territory?.label ?? ''} ${labels.you} ${pScore} · ${labels.bot} ${bScore}`}
+        aria-label={`${territory?.label ?? ''} ${labels.you} ${pScore} · ${opponentName} ${bScore}`}
         className="relative h-3 sm:h-3.5 bg-neo-pink border-neo border-black rounded-neo overflow-hidden shadow-hard-sm"
       >
         <div
