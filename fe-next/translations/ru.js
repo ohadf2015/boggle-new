@@ -11435,6 +11435,7 @@ const ru = {
     "adminBadge": "Админ-сэндбокс · Турнирная сетка",
     "you": "Ты",
     "bot": "WordBot",
+    "rival": "Соперник",
     "tied": "Ничья",
     "yourTurn": "Твой ход",
     "botTurn": "WordBot думает…",

@@ -13822,6 +13822,7 @@ const en = {
     "adminBadge": "Admin sandbox · Tournament word grid",
     "you": "You",
     "bot": "WordBot",
+    "rival": "Rival",
     "tied": "Tied",
     "yourTurn": "Your turn",
     "botTurn": "WordBot is thinking…",

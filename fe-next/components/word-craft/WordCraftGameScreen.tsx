@@ -927,9 +927,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           playerSeed={challengerIdentity.name}
           opponentAvatar={scoreboardOpponent.avatar}
           opponentSeed={scoreboardOpponent.seed}
+          isBot={scoreboardOpponent.isBot}
           labels={{
             you: hotseat ? t('wordcraft.player1') : t('wordcraft.you'),
             bot: hotseat ? t('wordcraft.player2') : t('wordcraft.bot'),
+            rival: t('wordcraft.rival'),
             yourTurn: hotseat ? t('wordcraft.player1Turn') : t('wordcraft.yourTurn'),
             botTurn: hotseat ? t('wordcraft.player2Turn') : t('wordcraft.botTurn'),
             gameOver: t('wordcraft.gameOver'),

@@ -15055,6 +15055,7 @@ const ja = {
     "adminBadge": "管理者サンドボックス · 単語グリッド",
     "you": "あなた",
     "bot": "WordBot",
+    "rival": "ライバル",
     "tied": "引き分け",
     "yourTurn": "あなたの番",
     "botTurn": "WordBotが考え中…",
