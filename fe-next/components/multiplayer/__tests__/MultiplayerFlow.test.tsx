@@ -447,9 +447,11 @@ describe('MultiplayerFlow', () => {
         />
       );
 
-      // useLanguage falls back through translation cache; assert the EN string
-      // for `education.classroomGame.waitingForPlayers`.
-      expect(screen.getByText(/waiting for players/i)).toBeInTheDocument();
+      // This screen is the transient join step, not the lobby a teacher waits on:
+      // MultiplayerFlow only renders while `!isActive`, and HostView takes over
+      // once the room is joined. The copy says what is actually happening rather
+      // than claiming we are waiting for players who were never asked yet.
+      expect(screen.getByText(/setting up your classroom game/i)).toBeInTheDocument();
     });
 
     it('should still auto-create classroom host room via prefilledRoom', async () => {

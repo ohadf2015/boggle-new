@@ -2187,7 +2187,9 @@ const en = {
     "waitingForPlayers": "Waiting for Players...",
     "seconds": "seconds",
     "switchToPlayer": "Switch to Player Mode",
-    "viewOnlyBadge": "TV Mode · View Only"
+    "viewOnlyBadge": "TV Mode · View Only",
+    "tryPracticeRound": "Try a Practice Round (Bots)",
+    "practiceRoundFailed": "Could not add practice players. Check your connection and try again."
   },
   "tvResults": {
     "installHeading": "TAKE IT HOME 📱",
@@ -11430,6 +11432,7 @@ const en = {
       "yesterday": "Yesterday"
     },
     "classroomGame": {
+      "classCode": "Game Code",
       "classroomNotFound": "Classroom not found",
       "classroomSession": "Classroom Session",
       "createClassroom": "Create Classroom",
@@ -11437,11 +11440,14 @@ const en = {
       "deselectAll": "Deselect All",
       "gameCreated": "Game created!",
       "gameSettings": "Game Settings",
+      "joinedStudents": "Joined Students",
       "lessonsSelected": "{{count}} lessons selected",
       "missingRequirements": "Missing requirements",
+      "more": "more",
       "multiLessonHelp": "Combine lessons for variety",
       "noClassrooms": "No classrooms yet",
       "noLessonsAvailable": "No lessons available",
+      "noStudentsYet": "No students have joined yet",
       "reviewAndStart": "Review & Start",
       "scanToJoin": "Scan to Join",
       "selectAllLessons": "Select All",
@@ -11454,8 +11460,11 @@ const en = {
       "startGame": "Start Game",
       "createRoom": "Create Room",
       "startGameDescription": "Launch the classroom game",
+      "studentCount": "{{count}} Students Joined",
+      "studentsCanScan": "Students can scan the QR code to join",
       "title": "Classroom Game",
-      "waitingForPlayers": "Waiting for players...",
+      "waitingForPlayers": "Setting up your classroom game...",
+      "waitingForStudents": "Waiting for Students",
       "words": "{{count}} words"
     },
     "header": {
@@ -11851,14 +11860,22 @@ const en = {
       "subtitle": "Ready-made vocab sets",
       "useThisPack": "Use This Pack",
       "academicVocab": {
-        "name": "Academic Vocabulary"
+        "name": "Academic Vocabulary",
+        "description": "Academic and analytical terms for advanced learners"
       },
       "beginnerHebrew": {
-        "name": "Beginner Hebrew"
+        "name": "Beginner Hebrew",
+        "description": "Essential Hebrew words for beginners"
       },
       "commonEnglish": {
-        "name": "Common English"
+        "name": "Common English",
+        "description": "Everyday English words for all levels"
       }
+    },
+    "lesson": {
+      "creationFailed": "Couldn't create lesson. Please try again.",
+      "created": "Lesson created successfully!",
+      "preferCustom": "Or create your own custom vocabulary list:"
     },
     "student": {
       "join": {

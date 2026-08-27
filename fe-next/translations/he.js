@@ -2635,7 +2635,9 @@ const he = {
     "waitingForPlayers": "...ממתינים לשחקנים",
     "seconds": "שניות",
     "switchToPlayer": "מעבר למצב שחקן",
-    "viewOnlyBadge": "מצב TV · צפייה בלבד"
+    "viewOnlyBadge": "מצב TV · צפייה בלבד",
+    "tryPracticeRound": "ניסיון סיבוב תרגול (בוטים)",
+    "practiceRoundFailed": "לא הצלחנו להוסיף שחקני תרגול. בדקו את החיבור ונסו שוב."
   },
   "tvResults": {
     "installHeading": "📱 קחו הביתה",
@@ -12710,6 +12712,7 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "classCode": "קוד המשחק",
       "classroomNotFound": "הכיתה לא נמצאה",
       "classroomSession": "שיעור בכיתה",
       "createClassroom": "צור כיתה",
@@ -12717,11 +12720,14 @@ const he = {
       "deselectAll": "בטל בחירה",
       "gameCreated": "המשחק נוצר! 🎮",
       "gameSettings": "הגדרות משחק",
+      "joinedStudents": "תלמידים שהצטרפו",
       "lessonsSelected": "{{count}} שיעורים נבחרו",
       "missingRequirements": "חסרים פרטים",
+      "more": "עוד",
       "multiLessonHelp": "שלבו שיעורים למגוון",
       "noClassrooms": "עדיין אין כיתות",
       "noLessonsAvailable": "אין שיעורים זמינים",
+      "noStudentsYet": "עדיין אף תלמיד לא הצטרף",
       "reviewAndStart": "סקירה והתחלה",
       "scanToJoin": "סרקו להצטרפות",
       "selectAllLessons": "בחר הכל",
@@ -12734,8 +12740,11 @@ const he = {
       "startGame": "התחל משחק",
       "createRoom": "צור חדר",
       "startGameDescription": "הפעלת משחק כיתתי",
+      "studentCount": "{{count}} תלמידים הצטרפו",
+      "studentsCanScan": "התלמידים יכולים לסרוק את קוד ה-QR להצטרפות",
       "title": "משחק כיתתי",
-      "waitingForPlayers": "ממתין לשחקנים...",
+      "waitingForPlayers": "מכינים את משחק הכיתה שלך...",
+      "waitingForStudents": "ממתין לתלמידים",
       "words": "{{count}} מילים"
     },
     "header": {
@@ -13130,14 +13139,22 @@ const he = {
       "subtitle": "סטים מוכנים של אוצר מילים",
       "useThisPack": "השתמש בחבילה",
       "academicVocab": {
-        "name": "אוצר מילים אקדמי"
+        "name": "אוצר מילים אקדמי",
+        "description": "מונחים אקדמיים וניתוח לתלמידים מתקדמים"
       },
       "beginnerHebrew": {
-        "name": "עברית למתחילים"
+        "name": "עברית למתחילים",
+        "description": "מילים בעברית בסיסיות למתחילים"
       },
       "commonEnglish": {
-        "name": "אנגלית נפוצה"
+        "name": "אנגלית נפוצה",
+        "description": "מילים נפוצות באנגלית לכל הרמות"
       }
+    },
+    "lesson": {
+      "creationFailed": "לא ניתן ליצור שיעור. נסו שוב.",
+      "created": "שיעור נוצר בהצלחה!",
+      "preferCustom": "או יוצרים רשימת אוצר מילים מותאמת:"
     },
     "student": {
       "join": {

@@ -15,13 +15,16 @@ import { BookOpen, School } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { getLessons, getClassrooms, type VocabularyLesson, type Classroom } from '@/lib/supabase/education';
+import { getLessons, getClassrooms, createLesson as createLessonAPI, type VocabularyLesson, type Classroom } from '@/lib/supabase/education';
 import toast from 'react-hot-toast';
 import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomSetupStep } from './ClassroomSetupStep';
+import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
+import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
 import type { GameMode } from '@/shared/types/game';
+import type { Language } from '@/lib/supabase/education/types';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
@@ -44,6 +47,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('classic');
+  const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
 
   // Teacher-configurable lobby settings — were hardcoded, now part of the
   // wizard so the room is created with the teacher's final choices instead of
@@ -151,6 +155,50 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     return [...new Set(words)];
   }, [selectedLessons]);
 
+  const handleSelectStarterPack = useCallback(
+    async (pack: { name: string; description: string; language: string; words: any[] }) => {
+      if (!user) {
+        toast.error(t('errors.loadFailed'));
+        return;
+      }
+
+      setIsCreatingFromPack(true);
+      try {
+        const vocabularyWords = convertPackWordsToLessonWords(pack.words);
+
+        const { data: newLesson, error } = await createLessonAPI({
+          teacher_id: user.id,
+          classroom_id: null,
+          name: pack.name,
+          description: pack.description,
+          language: pack.language as Language,
+          words: vocabularyWords,
+          is_public: false,
+          source_game_code: null,
+        });
+
+        if (error || !newLesson) {
+          logger.error('Failed to create lesson from starter pack:', error);
+          toast.error(error?.message || t('education.lesson.creationFailed'));
+          setIsCreatingFromPack(false);
+          return;
+        }
+
+        // Add the new lesson to state and select it
+        setLessons([newLesson, ...lessons]);
+        setSelectedLessonIds([newLesson.id]);
+        toast.success(t('education.lesson.created'));
+        setIsCreatingFromPack(false);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        logger.error('Exception creating lesson from starter pack:', errorMsg);
+        toast.error(t('education.lesson.creationFailed'));
+        setIsCreatingFromPack(false);
+      }
+    },
+    [user, t, lessons]
+  );
+
   const handleStartGame = useCallback(() => {
     if (!user || !socket || selectedLessonIds.length === 0 || !selectedClassroomId) {
       toast.error(t('education.classroomGame.missingRequirements'));
@@ -223,19 +271,36 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     );
   }
 
-  // No lessons
+  // No lessons - show starter packs
   if (lessons.length === 0) {
     return (
-      <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
-        <BookOpen className="w-12 h-12 text-neo-white mx-auto mb-4" />
-        <p className="text-neo-white font-neo-body mb-4">
-          {t('education.classroomGame.noLessonsAvailable')}
-        </p>
-        <div className="flex items-center justify-center gap-3">
-          <button type="button" onClick={onBack} className={cn('px-6 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all')}>
+      <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard">
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={onBack}
+            className={cn('px-4 py-2 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all text-sm')}
+          >
             {t('common.back')}
           </button>
-          <button type="button" onClick={() => router.push(`/${language}/teacher`)} className={cn('px-6 py-3 font-bold bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}>
+        </div>
+        <div className={isCreatingFromPack ? 'opacity-50 pointer-events-none' : ''}>
+          <StarterPacksSection onSelectPack={handleSelectStarterPack} />
+        </div>
+        {isCreatingFromPack && (
+          <div className="mt-4 text-center">
+            <PageLoader text={t('teacher.classroom.settingUp')} size="sm" nested />
+          </div>
+        )}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-neo-white font-neo-body mb-3">
+            {t('education.lesson.preferCustom')}
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push(`/${language}/teacher`)}
+            className={cn('px-6 py-3 font-bold bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}
+          >
             {t('education.classroomGame.createLesson')}
           </button>
         </div>

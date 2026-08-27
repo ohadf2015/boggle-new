@@ -8,7 +8,7 @@
  * Provides both game settings state and game runtime state.
  */
 
-import { useState, useCallback, useMemo, useRef, useEffect, MutableRefObject } from 'react';
+import { useState, useCallback, useMemo, useRef, MutableRefObject } from 'react';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/utils/consts';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
@@ -122,6 +122,8 @@ export interface UseHostViewStateOptions {
   initialPlayers?: Player[];
   roomLanguage?: Language;
   defaultLanguage?: Language;
+  /** Lesson data indicates classroom game — force TV mode (hostPlaying=false) for projecting teacher */
+  hasLessonData?: boolean;
 }
 
 export interface UseHostViewStateReturn {
@@ -217,7 +219,8 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   const {
     initialPlayers = [],
     roomLanguage: roomLanguageProp,
-    defaultLanguage = 'en'
+    defaultLanguage = 'en',
+    hasLessonData = false,
   } = options;
 
   const resolvedRoomLanguage = (roomLanguageProp || defaultLanguage) as Language;
@@ -229,18 +232,35 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   const [minWordLength, setMinWordLength] = useState<number>(DEFAULT_MIN_WORD_LENGTH);
   const [timerValue, setTimerValue] = useState<number>(1.5); // 1:30 default (minutes)
   const [timerDirection, setTimerDirection] = useState<number>(0);
-  const [hostPlayingEnabled, setHostPlayingEnabled] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
+  // Classroom teachers must project to a screen (TV mode, hostPlaying=false).
+  // This is a HARD REQUIREMENT, not a default — override any prior session's preference.
+  // Dual-source-of-truth bug (repo pitfall #1): localStorage holds prior sessions' TV-mode
+  // toggles. A teacher who previously hosted gets stored hostPlayingEnabled=true, which
+  // overrides defaults. Solution: when hasLessonData=true, force hostPlaying=false regardless
+  // of stored value. Never write TV mode back into localStorage for classroom games.
+  const [hostPlayingStoredValue, setHostPlayingStoredValue] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
 
-  // On mobile devices, TV mode (broadcast) should always be off — force hostPlaying=true
-  // This prevents a desktop TV-mode toggle from carrying over to mobile via localStorage
+  // Mobile override: on phone, TV mode is meaningless (screen is phone-sized), force player mode
   const isMobileRef = useRef(
     typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
   );
-  useEffect(() => {
-    if (isMobileRef.current && !hostPlayingEnabled) {
-      setHostPlayingEnabled(true);
+
+  // Priority: classroom (hasLessonData) > mobile > localStorage
+  const hostPlayingEnabled = (() => {
+    if (hasLessonData) return false; // Classroom: teacher projects (TV mode)
+    if (isMobileRef.current) return true; // Mobile: player mode only
+    return hostPlayingStoredValue; // Desktop, non-classroom: use preference
+  })();
+
+  // Memoized: this feeds a downstream useMemo, and a fresh identity each render
+  // would invalidate it every time.
+  const setHostPlayingEnabled = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
+    // Only write to localStorage for non-classroom, non-mobile cases
+    if (!hasLessonData && !isMobileRef.current) {
+      const newVal = typeof value === 'function' ? value(hostPlayingStoredValue) : value;
+      setHostPlayingStoredValue(newVal);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hasLessonData, hostPlayingStoredValue, setHostPlayingStoredValue]);
 
   const [gameType, setGameType] = useState<'regular' | 'tournament'>('regular');
   const [tournamentRounds, setTournamentRounds] = useState<number>(3);
