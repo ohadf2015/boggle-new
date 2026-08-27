@@ -74,7 +74,12 @@ describe('ProFramingSection', () => {
 
   it('links to /teacher/upgrade for checkout', () => {
     renderComponent();
-    const upgradeLink = screen.getByRole('link', { name: /upgrade/i });
+    // By the CTA's own copy key, not a /upgrade/i name match: the route is named
+    // "upgrade" but the button never has to say so, and in five of six locales it
+    // does not — matching on the English word pinned copy, not the destination.
+    const upgradeLink = screen.getByRole('link', {
+      name: en.education.landing.pro.chooseNow,
+    });
     expect(upgradeLink).toHaveAttribute('href', expect.stringContaining('/teacher/upgrade'));
   });
 

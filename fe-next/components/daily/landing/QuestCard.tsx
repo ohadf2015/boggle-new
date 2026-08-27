@@ -137,7 +137,12 @@ export function QuestCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
-      className={cn('relative', isNew && showEffects && 'animate-breathing')}
+      // `w-full` is load-bearing: the daily hub stacks these in a
+      // `flex flex-col items-center` column, which shrinks any child that does
+      // not opt out to its intrinsic content width. Without it the chain
+      // rendered three different widths (Wheel 219px, Tower 349px, played hero
+      // 360px) purely from how long each tagline happened to be.
+      className={cn('relative w-full', isNew && showEffects && 'animate-breathing')}
       data-testid={`quest-card-${challengeId}`}
     >
       {/* Glow ring for new challenges */}

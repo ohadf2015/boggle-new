@@ -101,10 +101,10 @@ vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
 }));
 
 vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({
-  default: ({ onCreateClassroom }: { onCreateClassroom: () => void }) => (
+  default: () => (
     <div data-testid="play-tab-first-run-card">
       <p>Create a classroom first to track assignments and duel activity</p>
-      <button onClick={onCreateClassroom} data-testid="play-tab-create-button">
+      <button data-testid="play-tab-create-button">
         Create Classroom
       </button>
     </div>
@@ -314,23 +314,6 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       // THEN — QuickStartButton is NOT rendered (gated on classrooms.length > 0)
       // This prevents dead-ending at /education/classroom-game with no classroom context
       expect(screen.queryByTestId('quick-start-button')).not.toBeInTheDocument();
-    });
-
-    it('should route to prepare tab when create button is clicked', () => {
-      // GIVEN — zero classrooms are loaded
-      mockClassroomsState.isLoading = false;
-      mockClassroomsState.classrooms = [];
-      mockClassroomsState.error = null;
-
-      render(<TeacherDashboard />);
-
-      // WHEN — teacher clicks the create button on the first-run card
-      const createButton = screen.getByTestId('play-tab-create-button');
-      fireEvent.click(createButton);
-
-      // THEN — the prepare tab should be visible
-      // (ClassroomManager only renders in the prepare tab)
-      expect(screen.getByTestId('classroom-manager')).toBeInTheDocument();
     });
   });
 

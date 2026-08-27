@@ -589,10 +589,19 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           away instead of being cut, so no behaviour — and no analytics event —
           is lost. Impression events inside now fire when the recap is OPENED,
           which is a truer impression than firing on mount while off-screen. */}
+      {/* Catch-up dailies — a missed daily is another GAME, not a detail about
+          this one, so it stays outside the disclosure (it renders nothing when
+          there is nothing to catch up). Mirrors the Word Hunt results screen. */}
+      {!isPractice && !isGuest && (
+        <div className="w-full z-10">
+          <CatchUpSuggestion mode="word-wheel" excludeDate={puzzleDate} />
+        </div>
+      )}
+
       {!isPractice && !isGuest && (
         <CollapsibleSection
           title={t('daily.results.fullRecap', 'Full recap')}
-          summary={t('daily.results.fullRecapSummary', 'Your words, your insights, and what to play next')}
+          summary={t('daily.results.fullRecapSummary', 'Your rank, your rarest word, your coins — and who you beat')}
           className="w-full z-10"
         >
           <div className="flex flex-col gap-3">
@@ -601,8 +610,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             {/* Returning-player anti-bounce: an engaged returner gets an instant
                 next game instead of a dead end. Experiment-gated. */}
             {alreadyPlayed && <WordWheelReplayCta />}
-
-            <CatchUpSuggestion mode="word-wheel" excludeDate={puzzleDate} />
 
             {/* Only once today's pair is done, so it never competes with the
                 "finish today's challenge" daily<->daily CTA above. */}

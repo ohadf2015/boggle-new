@@ -99,7 +99,23 @@ describe('free tier limits', () => {
     // 30 per class the cap could never bind. If someone raises it back above a class size,
     // the free tier silently becomes the product again.
     expect(FREE_TIER_LIMITS.studentsPerClass).toBeLessThan(25);
-    expect(FREE_TIER_LIMITS.classes).toBeLessThan(2);
+  });
+
+  it('does not trap a teacher on their very first classroom', () => {
+    // Owner decision 2026-08-27, replacing an earlier `classes < 2` assertion here.
+    //
+    // `canCreateClass` allows iff currentCount < limit, so `classes: 1` meant a teacher's
+    // first classroom was also their last: making a throwaway "Test" class while finding
+    // your feet permanently blocked the real one. Production had 35 approved teachers and
+    // 2 classrooms in total, and no approved teacher has ever been active on a second day —
+    // a trap sprung at first use is sprung at the only use we get.
+    //
+    // KNOWN AND ACCEPTED: 3 classes x 10 students means a teacher COULD split 30 kids across
+    // three free classrooms. That buys them three join codes, three leaderboards and three
+    // separate analytics views, and it cannot produce one whole-class game — which is the
+    // thing the module is actually for. The upsell lives in `studentsPerClass`, asserted
+    // above; it does not need this line to survive.
+    expect(FREE_TIER_LIMITS.classes).toBeGreaterThan(1);
   });
 
   it('sells nothing on Pro that the free tier already ships ungated', () => {

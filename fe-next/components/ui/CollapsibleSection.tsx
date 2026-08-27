@@ -119,14 +119,17 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           type="button"
           onClick={handleToggle}
           className={cn(
-            'w-full px-3 py-2 text-xs text-slate-300 border-t border-white/5 text-start',
-            'bg-linear-to-r from-neo-cyan/4 via-transparent to-neo-pink/4',
-            'hover:from-neo-cyan/8 hover:to-neo-pink/8 transition-colors cursor-pointer',
+            'w-full px-3 py-2.5 text-xs text-neo-cream border-t border-white/10 text-start',
+            'bg-linear-to-r from-neo-cyan/12 via-transparent to-neo-pink/12',
+            'hover:from-neo-cyan/20 hover:to-neo-pink/20 transition-colors cursor-pointer',
             styles.content,
           )}
         >
-          <span className="opacity-70">{summary}</span>
-          <span className="text-neo-cyan/60 ms-1.5 text-[10px] font-black uppercase tracking-widest">
+          {/* The teaser IS the reason to tap. At slate-300/70 it read as
+              disabled helper text and nobody opened the section \u2014 it needs to
+              look like the promise it is. */}
+          <span className="font-medium">{summary}</span>
+          <span className="text-neo-cyan ms-1.5 text-[10px] font-black uppercase tracking-widest">
             {'\u2022\u2022\u2022'}
           </span>
         </button>

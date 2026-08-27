@@ -632,6 +632,13 @@ const ru = {
       "playZone": "Играть",
       "learnZone": "Учиться"
     },
+    "welcome": {
+      "title": "Добро пожаловать в свой класс!",
+      "subtitle": "Выбери первый вызов",
+      "dailyChallenge": "Попробуй ежедневный вызов",
+      "dailyChallengeDesc": "Попробуй сегодняшнюю словесную игру",
+      "rewards": "Заработай очки и создай свою серию"
+    },
     "nav": {
       "profile": "Мой профиль",
       "achievements": "Достижения"
@@ -668,6 +675,8 @@ const ru = {
       "randomLesson": "Случайный урок",
       "quickDuel": "Быстрый поединок",
       "challengeClassmate": "Вызвать одноклассника",
+      "soloPractice": "Сольная практика",
+      "soloPracticeDesc": "Практикуйся в любое время",
       "streakCalendar": "Твоя серия",
       "activity": {
         "wonDuel": "выиграл поединок",
@@ -1463,6 +1472,26 @@ const ru = {
       "trial_ended": "Пробный период истёк"
     },
     "landing": {
+      "pro": {
+        "title": "Два тарифа. Без подвоха.",
+        "subtitle": "Всё, что нужно для первого урока, — бесплатно. Pro снимает ограничения.",
+        "comparisonAlt": "Сравнение бесплатного тарифа и Teacher Pro",
+        "freeTier": "Бесплатно",
+        "perMonth": "/месяц",
+        "classLimit": "До {count} класса",
+        "studentLimit": "До {count} учеников в нём",
+        "noAds": "Никакой рекламы для учеников",
+        "customLists": "Свои списки слов",
+        "duels": "Словесные дуэли в реальном времени",
+        "freeForever": "Бесплатно навсегда. Без карты и без таймера пробного периода.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Всё из бесплатного тарифа",
+        "classLimitPro": "Классов без ограничений",
+        "studentLimitPro": "Учеников без ограничений",
+        "analytics": "Аналитика прогресса по каждому ученику",
+        "chooseNow": "Подключить Teacher Pro",
+        "whyNow": "Начните бесплатно — серьёзно. Pro нужен тогда, когда {count} учеников в одном классе уже мало."
+      },
       "duelTeaser": {
         "cta": "Вызови друга",
         "headline": "Словесные поединки",
@@ -1655,6 +1684,12 @@ const ru = {
       "welcomeBack": "Добро пожаловать",
       "openDashboard": "Открыть панель учителя",
       "createClassroom": "Создать класс",
+      "furtherReading": {
+        "title": "Смотрите также",
+        "guides": "Гайды по стратегии",
+        "glossary": "Словарь игры",
+        "wordSolver": "Помощник по словам"
+      }
     },
     "leaderboard": {
       "allTime": "Всё время",
@@ -1818,6 +1853,10 @@ const ru = {
         "nameLabel": "Твоё имя",
         "namePlaceholder": "например, Майя",
         "pasteButton": "Вставить",
+        "preview": {
+          "label": "Присоединяешься к:",
+          "confirm": "Это твой класс"
+        },
         "subtitle": "Введи код твоего учителя",
         "success": "Ты в классе!",
         "title": "Присоединись к классу"
@@ -6405,7 +6444,7 @@ const ru = {
     "todaysPuzzles": "Головоломки дня",
     "results": {
       "fullRecap": "Подробный итог",
-      "fullRecapSummary": "Твои слова, твоя статистика и во что сыграть дальше"
+      "fullRecapSummary": "Твоё место, самое редкое слово, монеты — и кого ты обошёл"
     },
     "title": "Ежедневный Вызов",
     "badge": "ДЕНЬ",
@@ -6459,6 +6498,7 @@ const ru = {
       "yesterday": "Вчерашний пазл",
       "daysAgo": "{count} дней назад",
       "watchAd": "Смотри рекламу чтобы играть",
+      "adBadge": "Реклама",
       "appTitle": "Пропустили пару дней?",
       "appSubtitle": "У вас {count} непройденных за последние дни. Переигрывайте прошлые ежедневки в приложении LexiClash для Android.",
       "appCta": "Установить в Google Play"
@@ -9038,6 +9078,7 @@ const ru = {
         "large": "Большая (6×6)"
       },
       "create": "Создать класс",
+      "defaultName": "Мой класс",
       "edit": "Редактировать класс",
       "delete": "Удалить класс",
       "confirmDelete": "Удалить этот класс? Ученики потеряют доступ к урокам.",

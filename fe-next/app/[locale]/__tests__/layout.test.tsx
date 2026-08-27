@@ -192,7 +192,7 @@ describe('AdSense SSR loader (pre-approval verification + Funding Choices CMP)',
         return null;
     }
 
-    it('renders the lazyOnload adsbygoogle.js loader for every locale', async () => {
+    it('renders no AdSense script of its own, for any locale', async () => {
         const LocaleLayout = (await import('../layout')).default;
 
         for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
@@ -201,28 +201,18 @@ describe('AdSense SSR loader (pre-approval verification + Funding Choices CMP)',
                 params: Promise.resolve({ locale }),
             });
 
-            const script = findAdsenseScript(tree);
-            expect(script, `missing loader for locale ${locale}`).not.toBeNull();
-            expect(script!.props.src).toBe(
-                'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880'
-            );
-            // lazyOnload, not async/afterInteractive: it is the only strategy that cannot land
-            // before hydration finishes, and landing early is what shifted React's <head>
-            // children and threw #418 in 50 sessions a week.
-            expect(script!.props.strategy).toBe('lazyOnload');
-            expect(script!.props.async).toBeUndefined();
-            expect(script!.props.crossOrigin).toBe('anonymous');
+            // The layout used to render this unconditionally, which (a) stamped next/script's
+            // `data-nscript` that AdSense rejects and (b) claimed the `adsbygoogle-init` id
+            // before AdSenseLoader could, permanently short-circuiting its consent/tier/FTUE
+            // gates via the loader's own `getElementById` guard.
+            expect(findAdsenseScript(tree), `stray loader for locale ${locale}`).toBeNull();
+            expect(JSON.stringify(tree)).not.toContain('adsbygoogle.js');
         }
     });
 
-    it('is the only adsbygoogle.js source in the tree (no duplicate injection)', async () => {
-        const LocaleLayout = (await import('../layout')).default;
-        const tree = await LocaleLayout({
-            children: <div>content</div>,
-            params: Promise.resolve({ locale: 'en' }),
-        });
-        const html = JSON.stringify(tree);
-        const occurrences = html.split('adsbygoogle.js').length - 1;
-        expect(occurrences).toBe(1);
-    });
+    // Dropped: an `occurrences === 1` check that called itself "no duplicate injection" and
+    // passed throughout the actual duplicate-injection bug. AdSenseLoader injects from a
+    // `useEffect`, so it never appears in the SSR element tree — a tree scan can only ever
+    // see one of the two injectors, making the count vacuous. That the loader stays mounted
+    // is pinned at source level in headScriptsHydration.test.ts instead.
 });

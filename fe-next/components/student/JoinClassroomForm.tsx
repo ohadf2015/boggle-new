@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { ArrowLeft, LogIn, ClipboardPaste } from 'lucide-react';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useJoinClassroom } from '@/hooks/useClassroom';
@@ -16,21 +17,11 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { trackEduClassroomJoin } from '@/lib/education/telemetry';
+import { lookupClassroomPreview, type ClassroomPreview } from '@/lib/education/classroomPreview';
+import ClassroomPreviewCard from './ClassroomPreviewCard';
 
-/**
- * JoinClassroomForm - Student classroom join form
- *
- * Allows students to join a teacher's classroom using a 6-character code.
- * Features:
- * - Clipboard paste support
- * - Real-time validation
- * - Neo-brutalist design
- * - RTL support
- * - Optional initialCode prop for shareable invite links
- */
-
+// Student classroom join form: code entry + confirmation + guest name input
 interface JoinClassroomFormProps {
-  /** Optional pre-filled code from shareable invite link */
   initialCode?: string;
 }
 
@@ -40,8 +31,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const { joinClassroom } = useJoinClassroom();
   const { user } = useAuth();
 
-  // Logged-out students join as an anonymous guest by typing a name — no
-  // email/password account required. The session then persists on this device.
+  // Logged-out guests join by typing a name (no email/password needed).
   const isGuest = !user;
 
   const [code, setCode] = useState(initialCode);
@@ -49,9 +39,34 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeError, setCodeError] = useState(false);
   const [nameError, setNameError] = useState(false);
+  const [preview, setPreview] = useState<ClassroomPreview | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastPreviewCodeRef = useRef<string>('');
 
-  // Handle paste from clipboard
+  useEffect(() => {
+    const normalized = code.trim().toUpperCase();
+    if (normalized.length !== 6) {
+      setPreview(null);
+      return;
+    }
+    if (normalized === lastPreviewCodeRef.current) return;
+    if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+    setIsLoadingPreview(true);
+    previewTimeoutRef.current = setTimeout(async () => {
+      lastPreviewCodeRef.current = normalized;
+      const result = await lookupClassroomPreview(normalized);
+      setPreview(result);
+      setIsLoadingPreview(false);
+    }, 300);
+    // Block body, not a concise `&&` expression: an arrow returning `a && clearTimeout(b)` is
+    // typed `void | null`, which is not a valid EffectCallback cleanup and fails tsc.
+    return () => {
+      if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
+    };
+  }, [code]);
+
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -64,19 +79,16 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
         toast.error(t('education.student.join.emptyClipboard'));
       }
     } catch {
-      // Clipboard API not available or permission denied
       toast.error(t('education.student.join.clipboardError'));
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedCode = code.trim();
     const trimmedName = name.trim();
 
-    // Validate code format (6 alphanumeric characters)
     if (!trimmedCode || trimmedCode.length !== 6) {
       setCodeError(true);
       trackEduClassroomJoin({ result: 'invalid_code' });
@@ -84,7 +96,6 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       return;
     }
 
-    // Guests must supply a name (becomes their display name + in-game username).
     if (isGuest && !trimmedName) {
       setNameError(true);
       toast.error(t('education.student.join.nameLabel'));
@@ -108,15 +119,10 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
         // Redirect to student dashboard
         router.push(`/${language}/student`);
       } else if (result.code === 'STUDENT_LIMIT_REACHED') {
-        // Full class. `result.error` is the server's English reason and names our free
-        // tier — never render it; the student can neither read it in their locale nor
-        // act on it.
         trackEduClassroomJoin({ result: 'error' });
         toast.error(t('education.student.join.classroomFull'));
         setCodeError(true);
       } else {
-        // Everything else is a code the server could not resolve. Branching on the code
-        // rather than on English prose is what keeps this correct in all six locales.
         trackEduClassroomJoin({ result: result.code === 'INVALID_CODE' ? 'not_found' : 'error' });
         toast.error(t('education.student.join.invalidCode'));
         setCodeError(true);
@@ -153,8 +159,9 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Name Input — guests only (account-less join) */}
-              {isGuest && (
+                {preview && <ClassroomPreviewCard name={preview.name} language={preview.language} isLoading={isLoadingPreview} />}
+
+              {isGuest && preview && (
                 <div className="space-y-2">
                   <Label
                     htmlFor="student-name"
@@ -209,9 +216,8 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                       const next = e.target.value.toUpperCase();
                       setCode(next);
                       if (codeError) setCodeError(false);
-                      // Auto-advance: a full 6-char code moves a guest who still
-                      // needs a name straight to the name field.
-                      if (next.length === 6 && isGuest && !name.trim()) {
+                      if (next.length < 6) setPreview(null);
+                      if (next.length === 6 && preview && isGuest && !name.trim()) {
                         nameInputRef.current?.focus();
                       }
                     }}
@@ -259,10 +265,15 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 )}
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button — enabled only if preview confirmed + (for guests) name entered */}
               <Button
                 type="submit"
-                disabled={isSubmitting || !code.trim() || code.length !== 6 || (isGuest && !name.trim())}
+                // The preview is a courtesy — it tells a student which room they are about to
+                // enter. It must NEVER gate the join. Gating on `!preview` meant a failed, slow,
+                // or rate-limited preview lookup left a student holding a valid code with a dead
+                // button, and a class of 30 joining from one school IP would exhaust the preview
+                // rate limit and lock out everyone after the first few.
+                disabled={isSubmitting || code.trim().length !== 6 || (isGuest && !name.trim())}
                 size="lg"
                 className="w-full h-14 text-lg font-black uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -282,7 +293,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 disabled={isSubmitting}
                 className="flex items-center gap-2 text-sm text-neo-white hover:text-neo-cyan transition-colors disabled:opacity-50"
               >
-                <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
                 {t('common.back')}
               </button>
             </div>

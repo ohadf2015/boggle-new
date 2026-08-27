@@ -6140,7 +6140,7 @@ const en = {
     "todaysPuzzles": "Today's Puzzles",
     "results": {
       "fullRecap": "Full recap",
-      "fullRecapSummary": "Your words, your insights, and what to play next"
+      "fullRecapSummary": "Your rank, your rarest word, your coins — and who you beat"
     },
     "title": "Daily Challenge",
     "badge": "DAILY",
@@ -6194,6 +6194,7 @@ const en = {
       "yesterday": "Yesterday's puzzle",
       "daysAgo": "{count} days ago",
       "watchAd": "Watch a quick ad to play",
+      "adBadge": "Ad",
       "appTitle": "Missed a few days?",
       "appSubtitle": "You've got {count} unplayed from the last few days. Replay past dailies in the LexiClash Android app.",
       "appCta": "Get it on Google Play"
@@ -10665,6 +10666,13 @@ const en = {
       "playZone": "Play",
       "learnZone": "Learn"
     },
+    "welcome": {
+      "title": "Welcome to Your Classroom!",
+      "subtitle": "Choose your first challenge",
+      "dailyChallenge": "Try Daily Challenge",
+      "dailyChallengeDesc": "Try today's word game",
+      "rewards": "Earn points and build your streak"
+    },
     "nav": {
       "profile": "My Profile",
       "achievements": "Achievements"
@@ -10701,6 +10709,8 @@ const en = {
       "randomLesson": "Random Lesson",
       "quickDuel": "Quick Duel",
       "challengeClassmate": "Challenge a Classmate",
+      "soloPractice": "Solo Practice",
+      "soloPracticeDesc": "Practice anytime, anywhere",
       "streakCalendar": "Your Streak",
       "activity": {
         "wonDuel": "won a duel",
@@ -10868,6 +10878,7 @@ const en = {
         "large": "Large (6×6)"
       },
       "create": "Create Classroom",
+      "defaultName": "My Class",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
       "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
@@ -11470,6 +11481,26 @@ const en = {
       "trial_ended": "Trial ended"
     },
     "landing": {
+      "pro": {
+        "title": "Two plans. No tricks.",
+        "subtitle": "Everything that gets you to a first lesson is free. Pro lifts the caps.",
+        "comparisonAlt": "Side-by-side comparison of the Free plan and Teacher Pro",
+        "freeTier": "Free",
+        "perMonth": "/month",
+        "classLimit": "Up to {count} classroom",
+        "studentLimit": "Up to {count} students in it",
+        "noAds": "No ads for your students",
+        "customLists": "Your own word lists",
+        "duels": "Live word duels",
+        "freeForever": "Free forever. No card, no trial clock.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Everything in Free",
+        "classLimitPro": "Unlimited classrooms",
+        "studentLimitPro": "Unlimited students",
+        "analytics": "Per-student progress analytics",
+        "chooseNow": "Get Teacher Pro",
+        "whyNow": "Start free — really. Pro is for when {count} students in one class stops being enough."
+      },
       "duelTeaser": {
         "cta": "Challenge a Friend",
         "headline": "Word Duels",
@@ -11831,6 +11862,10 @@ const en = {
         "nameLabel": "Your Name",
         "namePlaceholder": "e.g. Maya",
         "pasteButton": "Paste",
+        "preview": {
+          "label": "Joining:",
+          "confirm": "This is your classroom"
+        },
         "subtitle": "Enter your teacher's code",
         "success": "You're in!",
         "title": "Join a Class"

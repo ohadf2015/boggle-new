@@ -40,12 +40,25 @@ describe('<head> scripts cannot race hydration', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('loads the AdSense script via next/script on lazyOnload', () => {
-    const tag = SOURCE.match(/<Script\b[\s\S]*?adsbygoogle\.js[\s\S]*?\/>/)?.[0];
-    expect(tag, 'the AdSense loader should be a <Script>, not a raw <script>').toBeDefined();
-    expect(tag).toContain('strategy="lazyOnload"');
-    // AdSenseLoader's guard keys off this id; losing it lets the consent path double-inject.
-    expect(tag).toContain('id="adsbygoogle-init"');
+  /**
+   * This layout used to ALSO load adsbygoogle.js through `<Script strategy="lazyOnload">`,
+   * which was wrong twice over. next/script stamps `data-nscript` on the tag and AdSense
+   * rejects it — 405 warnings, 8 users (Sentry JAVASCRIPT-NEXTJS-1PQ). And because the tag
+   * was rendered UNCONDITIONALLY, it beat `AdSenseLoader` to the shared `adsbygoogle-init`
+   * id, so the loader's `getElementById` guard returned early forever: the advertising-consent,
+   * child-tier, native/CrazyGames and FTUE gates it exists to enforce were all dead code while
+   * the script itself loaded for everyone regardless.
+   *
+   * AdSenseLoader is the single injector now: a plain `<script>` (no `data-nscript`) appended
+   * from a `useEffect`, which is strictly later than lazyOnload and so keeps the hydration
+   * property this file pins.
+   */
+  it('does not load AdSense from the layout at all — AdSenseLoader owns it', () => {
+    // Tags only. Prose naming the script is how this file explains itself.
+    const scriptTags: string[] = SOURCE.match(/<[Ss]cript\b[^>]*>/g) ?? [];
+    expect(scriptTags.filter((t) => t.includes('adsbygoogle'))).toEqual([]);
+    // The consent-gated component must still be mounted, or web ads go dark entirely.
+    expect(SOURCE).toContain('<AdSenseLoader />');
   });
 
   it('still keeps the storage shim as a same-document inline script, which must be first', () => {
@@ -53,9 +66,10 @@ describe('<head> scripts cannot race hydration', () => {
     // positional — which is exactly why nothing else in <head> may shift it.
     const headStart = SOURCE.indexOf('<head>');
     const shimAt = SOURCE.indexOf('STORAGE_SHIM_SCRIPT', headStart);
-    const adsenseAt = SOURCE.indexOf('adsbygoogle.js', headStart);
+    const firstNextScriptAt = SOURCE.indexOf('<Script', headStart);
     expect(headStart).toBeGreaterThan(-1);
     expect(shimAt).toBeGreaterThan(headStart);
-    expect(shimAt).toBeLessThan(adsenseAt);
+    // No next/script tag may be emitted ahead of the shim and shift it.
+    expect(shimAt).toBeLessThan(firstNextScriptAt);
   });
 });

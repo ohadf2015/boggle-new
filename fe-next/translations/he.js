@@ -6688,7 +6688,7 @@ const he = {
     "todaysPuzzles": "החידות של היום",
     "results": {
       "fullRecap": "הסיכום המלא",
-      "fullRecapSummary": "המילים שלך, הנתונים שלך, ומה כדאי לשחק עכשיו"
+      "fullRecapSummary": "הדירוג שלך, המילה הנדירה שמצאת, המטבעות — ואת מי ניצחת"
     },
     "title": "אתגר יומי",
     "badge": "אתגר יומי",
@@ -6705,6 +6705,7 @@ const he = {
       "yesterday": "החידה של אתמול",
       "daysAgo": "לפני {count} ימים",
       "watchAd": "צפו בפרסומת קצרה כדי לשחק",
+      "adBadge": "פרסומת",
       "appTitle": "פספסתם כמה ימים?",
       "appSubtitle": "יש לכם {count} מהימים האחרונים שעדיין לא שיחקתם. שחקו חידות עבר באפליקציית LexiClash לאנדרואיד.",
       "appCta": "הורידו מ-Google Play"
@@ -11936,6 +11937,13 @@ const he = {
       "playZone": "שחק",
       "learnZone": "למד"
     },
+    "welcome": {
+      "title": "!ברוך הבא לכיתה שלך",
+      "subtitle": "בחר את האתגר הראשון שלך",
+      "dailyChallenge": "נסה אתגר יומי",
+      "dailyChallengeDesc": "נסה את משחק המילים של היום",
+      "rewards": "צברו נקודות ובנו את הנתיב שלכם"
+    },
     "nav": {
       "profile": "הפרופיל שלי",
       "achievements": "הישגים"
@@ -11969,6 +11977,8 @@ const he = {
       "randomLesson": "שיעור אקראי",
       "quickDuel": "דו קרב מהיר",
       "challengeClassmate": "אתגר חבר לכיתה",
+      "soloPractice": "תרגול בודד",
+      "soloPracticeDesc": "תרגול בכל עת",
       "streakCalendar": "הרצף שלך",
       "activity": {
         "wonDuel": "ניצח בדו קרב",
@@ -12188,6 +12198,7 @@ const he = {
         "large": "גדול (6×6)"
       },
       "create": "צור כיתה",
+      "defaultName": "הכיתה שלי",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",
       "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
@@ -12750,6 +12761,26 @@ const he = {
       "trial_ended": "הניסיון הסתיים"
     },
     "landing": {
+      "pro": {
+        "title": "שתי תוכניות. בלי טריקים.",
+        "subtitle": "כל מה שצריך כדי להעביר שיעור ראשון — חינם. Pro מסיר את המגבלות.",
+        "comparisonAlt": "השוואה בין התוכנית החינמית לבין Teacher Pro",
+        "freeTier": "חינם",
+        "perMonth": "לחודש",
+        "classLimit": "עד {count} כיתה",
+        "studentLimit": "עד {count} תלמידים בכיתה",
+        "noAds": "בלי פרסומות לתלמידים",
+        "customLists": "רשימות מילים משלכם",
+        "duels": "קרבות מילים בזמן אמת",
+        "freeForever": "חינם לתמיד. בלי כרטיס אשראי, בלי שעון ניסיון.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "כל מה שיש בתוכנית החינמית",
+        "classLimitPro": "כיתות ללא הגבלה",
+        "studentLimitPro": "תלמידים ללא הגבלה",
+        "analytics": "מעקב התקדמות לכל תלמיד",
+        "chooseNow": "לשדרג ל-Teacher Pro",
+        "whyNow": "התחילו חינם, באמת. Pro מיועד לרגע ש-{count} תלמידים בכיתה אחת כבר לא מספיקים."
+      },
       "duelTeaser": {
         "cta": "אתגר חבר",
         "headline": "דו-קרב מילים",
@@ -13110,6 +13141,10 @@ const he = {
         "nameLabel": "השם שלך",
         "namePlaceholder": "למשל מאיה",
         "pasteButton": "הדבק",
+        "preview": {
+          "label": "מצטרף אל:",
+          "confirm": "זו הכיתה שלך"
+        },
         "subtitle": "הכנס את הקוד מהמורה",
         "success": "נכנסת!",
         "title": "הצטרף לכיתה"

@@ -6707,7 +6707,7 @@ const es = {
     "todaysPuzzles": "Los retos de hoy",
     "results": {
       "fullRecap": "Resumen completo",
-      "fullRecapSummary": "Tus palabras, tus estadísticas y qué jugar después"
+      "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas — y a quién ganaste"
     },
     "title": "Desafío Diario",
     "badge": "DESAFÍO DIARIO",
@@ -6747,6 +6747,7 @@ const es = {
       "yesterday": "El reto de ayer",
       "daysAgo": "Hace {count} días",
       "watchAd": "Mira un anuncio corto para jugar",
+      "adBadge": "Anuncio",
       "appTitle": "¿Te perdiste algunos días?",
       "appSubtitle": "Tienes {count} sin jugar de los últimos días. Juega los retos anteriores en la app de LexiClash para Android.",
       "appCta": "Disponible en Google Play"
@@ -12082,6 +12083,13 @@ const es = {
       "playZone": "Jugar",
       "learnZone": "Aprender"
     },
+    "welcome": {
+      "title": "¡Bienvenido a tu aula!",
+      "subtitle": "Elige tu primer desafío",
+      "dailyChallenge": "Prueba el Desafío Diario",
+      "dailyChallengeDesc": "Intenta el juego de palabras de hoy",
+      "rewards": "Gana puntos y construye tu racha"
+    },
     "nav": {
       "profile": "Mi perfil",
       "achievements": "Logros"
@@ -12102,6 +12110,8 @@ const es = {
       "randomLesson": "Lección al Azar",
       "quickDuel": "Duelo Rápido",
       "challengeClassmate": "Reta a un Compañero",
+      "soloPractice": "Practica Solo",
+      "soloPracticeDesc": "Practica en cualquier momento",
       "streakCalendar": "Tu Racha",
       "activity": {
         "wonDuel": "ganó un duelo",
@@ -12313,6 +12323,7 @@ const es = {
         "large": "Grande (6×6)"
       },
       "create": "Crear Aula",
+      "defaultName": "Mi Clase",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",
       "confirmDelete": "¿Eliminar aula? Los estudiantes perderán acceso.",
@@ -12896,6 +12907,26 @@ const es = {
       "trial_ended": "Prueba finalizada"
     },
     "landing": {
+      "pro": {
+        "title": "Dos planes. Sin trucos.",
+        "subtitle": "Todo lo que necesitas para dar tu primera clase es gratis. Pro quita los límites.",
+        "comparisonAlt": "Comparación entre el plan Gratis y Teacher Pro",
+        "freeTier": "Gratis",
+        "perMonth": "/mes",
+        "classLimit": "Hasta {count} clase",
+        "studentLimit": "Hasta {count} estudiantes en ella",
+        "noAds": "Sin anuncios para tus estudiantes",
+        "customLists": "Tus propias listas de palabras",
+        "duels": "Duelos de palabras en vivo",
+        "freeForever": "Gratis para siempre. Sin tarjeta y sin cuenta atrás.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Todo lo del plan Gratis",
+        "classLimitPro": "Clases ilimitadas",
+        "studentLimitPro": "Estudiantes ilimitados",
+        "analytics": "Analíticas de progreso por estudiante",
+        "chooseNow": "Obtener Teacher Pro",
+        "whyNow": "Empieza gratis, en serio. Pro es para cuando {count} estudiantes en una clase se te quedan cortos."
+      },
       "duelTeaser": {
         "cta": "Reta a un amigo",
         "headline": "Duelos de Palabras",
@@ -13250,6 +13281,10 @@ const es = {
         "button": "Unirme",
         "joining": "Entrando...",
         "pasteButton": "Pegar código",
+        "preview": {
+          "label": "Te unes a:",
+          "confirm": "Este es tu aula"
+        },
         "success": "¡Ya estás dentro!",
         "invalidCode": "Ese código no funciona",
         "alreadyMember": "Ya estás en esta aula",

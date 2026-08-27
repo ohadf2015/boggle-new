@@ -11,7 +11,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
-import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen } from 'lucide-react';
+import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import { useIsGuest } from '@/hooks/useIsGuest';
@@ -33,7 +33,7 @@ import { useExperiment } from '@/hooks/useExperiment';
 import RivalCompareCard from './RivalCompareCard';
 import { useDailyRivalCompare } from '@/hooks/useDailyRivalCompare';
 import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
-import { Collapsible } from '@/components/ui/Collapsible';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -465,12 +465,20 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {/* Leaderboard — who else played, and how you stack up. */}
     {leaderboardNode}
 
-    {/* Full recap — all details moved into collapsed section */}
-    <Collapsible
-      label={t('daily.results.fullRecap', 'Full recap')}
+    {/* Catch-up dailies — the one card here that offers ANOTHER GAME, so it
+        stays out of the recap disclosure. It self-hides when there is nothing
+        to catch up, so it costs no height on the screens it does not apply to. */}
+    <CatchUpSuggestion excludeDate={puzzleDate} />
+
+    {/* Full recap — the long tail. `CollapsibleSection` (not `Collapsible`)
+        because it takes a `summary`: a bare chevron labelled "Full recap" gives
+        the player no reason to tap it. Same disclosure the wheel results use. */}
+    <CollapsibleSection
+      title={t('daily.results.fullRecap', 'Full recap')}
+      summary={t('daily.results.fullRecapSummary', 'Your rank, your rarest word, your coins — and who you beat')}
+      icon={<Sparkles className="w-4 h-4" />}
       defaultExpanded={false}
-      variant="default"
-      bordered={false}
+      variant="primary"
     >
       <div className="space-y-4">
         {/* Vs your own past plays */}
@@ -561,9 +569,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           <MpModeCrossPromo language={language} source="word_hunt_results" t={t} />
         )}
 
-        {/* Catch-up dailies */}
-        <CatchUpSuggestion excludeDate={puzzleDate} />
-
         {/* Fail state (reveal target) */}
         {failStateNode}
 
@@ -645,7 +650,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           t={t}
         />
       </div>
-    </Collapsible>
+    </CollapsibleSection>
 
   </div>
   );

@@ -6767,7 +6767,7 @@ const ja = {
     "todaysPuzzles": "今日のパズル",
     "results": {
       "fullRecap": "くわしい結果",
-      "fullRecapSummary": "見つけた単語、データ、次に遊べるゲーム"
+      "fullRecapSummary": "順位、いちばん珍しかった単語、コイン、そして誰に勝ったか"
     },
     "title": "デイリーチャレンジ",
     "chooseQuest": "今日のクエストを選ぼう",
@@ -6830,6 +6830,7 @@ const ja = {
       "yesterday": "昨日のパズル",
       "daysAgo": "{count}日前",
       "watchAd": "短い広告を見てプレイ",
+      "adBadge": "広告",
       "appTitle": "数日逃しちゃった？",
       "appSubtitle": "直近で未プレイが{count}件。過去のデイリーはLexiClashのAndroidアプリで遊べます。",
       "appCta": "Google Playで入手"
@@ -12080,6 +12081,13 @@ const ja = {
       "playZone": "プレイ",
       "learnZone": "学ぶ"
     },
+    "welcome": {
+      "title": "クラスへようこそ！",
+      "subtitle": "最初のチャレンジを選んでください",
+      "dailyChallenge": "デイリーチャレンジを試す",
+      "dailyChallengeDesc": "今日のワードゲームをやってみる",
+      "rewards": "ポイントを獲得して連続記録を作ろう"
+    },
     "nav": {
       "profile": "マイプロフィール",
       "achievements": "実績"
@@ -12113,6 +12121,8 @@ const ja = {
       "randomLesson": "ランダムレッスン",
       "quickDuel": "クイック決闘",
       "challengeClassmate": "クラスメイトに挑戦",
+      "soloPractice": "ソロ練習",
+      "soloPracticeDesc": "いつでも練習できます",
       "streakCalendar": "連続記録",
       "activity": {
         "wonDuel": "決闘に勝利",
@@ -12332,6 +12342,7 @@ const ja = {
         "large": "大 (6×6)"
       },
       "create": "クラス作成",
+      "defaultName": "私のクラス",
       "edit": "クラス編集",
       "delete": "クラス削除",
       "confirmDelete": "クラスを削除しますか？生徒はレッスンにアクセスできなくなります",
@@ -12894,6 +12905,26 @@ const ja = {
       "trial_ended": "トライアル終了"
     },
     "landing": {
+      "pro": {
+        "title": "プランは2つ。裏はありません。",
+        "subtitle": "最初の授業に必要なものはすべて無料です。Pro は上限を外すためのプラン。",
+        "comparisonAlt": "無料プランと Teacher Pro の比較",
+        "freeTier": "無料",
+        "perMonth": "/月",
+        "classLimit": "クラス {count} つまで",
+        "studentLimit": "生徒 {count} 人まで",
+        "noAds": "生徒には広告なし",
+        "customLists": "自分だけの単語リスト",
+        "duels": "リアルタイムの単語バトル",
+        "freeForever": "ずっと無料。カード登録も試用期限もありません。",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "無料プランの全機能",
+        "classLimitPro": "クラス数は無制限",
+        "studentLimitPro": "生徒数は無制限",
+        "analytics": "生徒ごとの学習進捗分析",
+        "chooseNow": "Teacher Pro を始める",
+        "whyNow": "まずは無料で。1クラス {count} 人では足りなくなったときが Pro の出番です。"
+      },
       "duelTeaser": {
         "cta": "友達に挑戦",
         "headline": "ワードデュエル",
@@ -13241,6 +13272,10 @@ const ja = {
         "nameLabel": "あなたの名前",
         "namePlaceholder": "例: マヤ",
         "pasteButton": "貼り付け",
+        "preview": {
+          "label": "参加先:",
+          "confirm": "このクラスへ参加します"
+        },
         "subtitle": "先生からもらったコードを入力してね",
         "success": "クラスに参加しました！",
         "title": "クラスに参加"
