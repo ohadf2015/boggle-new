@@ -1,15 +1,20 @@
 // @vitest-environment happy-dom
 /**
- * /brain and /multiplayer are app-shell routes: their PageClient is client-only,
- * so a crawler (and a human AdSense reviewer) that does not execute the app JS saw
- * nav + footer chrome and nothing else — measured 2026-08-21 against production:
- * /en/brain 27 visible words, /en/multiplayer 36, against a site median of 888.
+ * HISTORY (2026-08-21): /brain, /multiplayer and /daily are app-shell routes whose
+ * PageClient is client-only, so a crawler saw nav + footer chrome and nothing else.
+ * Each page grew a visible marketing/FAQ card (GamePageSeoContent / HomepageContentSection)
+ * rendered from copy that until then only reached JSON-LD.
  *
- * Both files already carried authored per-locale copy; it only ever reached JSON-LD
- * metadata, never the rendered page. These tests pin that the copy is in the SSR
- * output even when the client half renders nothing — which is exactly the crawler's
- * view, hence the deliberate PageClient stub. Remove the GamePageSeoContent call
- * from either page and these fail.
+ * REVERSED (2026-08-27, user request): "this should take the whole screen and not show
+ * the faq in any game related screen including main lobby". The card was a sibling flex
+ * child of the lobby's `flex-1` root inside `body.screen-fit` (min-height:100dvh), so its
+ * presence is exactly what stopped the lobby filling the viewport — the same complaint as
+ * 2026-08-08, when it was capped at 60dvh instead of removed.
+ *
+ * These tests pin the ABSENCE on play surfaces so a future SEO pass cannot silently
+ * re-add it. The copy itself is untouched in each page's `seoContent` map and still feeds
+ * <meta> + JSON-LD, and the dedicated landing pages (/multiplayer-word-game-online,
+ * /brain-training-word-games, /faq, /how-to-play, /rules) still render it visibly.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
@@ -17,60 +22,65 @@ import { render } from '@testing-library/react';
 // Stand in for the client-only app shell: renders nothing, like a crawler sees.
 vi.mock('../brain/PageClient', () => ({ default: () => null }));
 vi.mock('../multiplayer/PageClient', () => ({ default: () => null }));
+vi.mock('@/components/daily/DailyRedirect', () => ({ default: () => null }));
 
 import BrainPage from '../brain/page';
 import MultiplayerPage from '../multiplayer/page';
+import DailyPage from '../daily/page';
 
-const renderPage = async (
-  Page: (p: { params: Promise<{ locale: string }> }) => Promise<React.JSX.Element>,
-  locale: string
-) => {
-  const { container } = render(await Page({ params: Promise.resolve({ locale }) }));
-  // Strip JSON-LD on a CLONE: metadata is not what a reviewer reads, and it was
-  // never the gap. Mutating the live container breaks React's own unmount.
+type ServerPage = (p: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
+}) => Promise<React.JSX.Element>;
+
+const renderPage = async (Page: ServerPage, locale: string) => {
+  const { container } = render(
+    await Page({ params: Promise.resolve({ locale }), searchParams: Promise.resolve({}) })
+  );
+  // Strip JSON-LD on a CLONE: the copy is SUPPOSED to survive there, it is the
+  // rendered page we are asserting about. Mutating the live container breaks unmount.
   const clone = container.cloneNode(true) as HTMLElement;
   clone.querySelectorAll('script').forEach((s) => s.remove());
-  return clone.textContent ?? '';
+  return clone;
 };
 
-describe('app-shell routes ship publisher content in the SSR HTML', () => {
-  it('/brain renders its authored features and FAQ, not just JSON-LD', async () => {
-    const text = await renderPage(BrainPage, 'en');
-    expect(text).toContain('Memory Hunt');
-    expect(text).toContain('Lightning Round');
-    // The FAQ answers were authored in this file and previously rendered nowhere.
-    expect(text).toContain('Are these brain training word games free?');
-    expect(text.split(/\s+/).filter(Boolean).length).toBeGreaterThan(150);
+describe('play surfaces render no marketing/FAQ card', () => {
+  it('/multiplayer (the main lobby) ships no SEO section', async () => {
+    const el = await renderPage(MultiplayerPage as ServerPage, 'en');
+    expect(el.querySelector('section')).toBeNull();
+    expect(el.querySelector('details')).toBeNull();
+    expect(el.textContent).not.toContain('Wheel Rush');
   });
 
-  it('/multiplayer renders its authored description', async () => {
-    const text = await renderPage(MultiplayerPage, 'en');
-    expect(text).toContain('Wheel Rush');
-    expect(text.split(/\s+/).filter(Boolean).length).toBeGreaterThan(100);
+  it('/multiplayer stays clean in Hebrew too (the reported screen)', async () => {
+    const el = await renderPage(MultiplayerPage as ServerPage, 'he');
+    expect(el.querySelector('details')).toBeNull();
+    expect(el.textContent?.trim()).toBe('');
   });
 
-  it('/brain renders NO section for a locale with no authored copy, rather than English', async () => {
-    // `ru` is in the sitemap (/ru/brain) but absent from brain's seoContent map. Showing
-    // the English fallback visibly on a Russian page is a worse signal than showing
-    // nothing — the whole point of this change is to stop looking low-value.
-    const text = await renderPage(BrainPage, 'ru');
-    expect(text).not.toContain('Memory Hunt');
-    expect(text).not.toContain('Lightning Round');
+  it('/brain ships no SEO section', async () => {
+    const el = await renderPage(BrainPage as ServerPage, 'en');
+    expect(el.querySelector('section')).toBeNull();
+    expect(el.textContent).not.toContain('Memory Hunt');
+    expect(el.textContent).not.toContain('Are these brain training word games free?');
   });
 
-  it('/multiplayer DOES have authored ru copy, so it still renders there', async () => {
-    const text = await renderPage(MultiplayerPage, 'ru');
-    expect(text).toContain('Мультиплеер');
+  it('/daily ships no SEO section', async () => {
+    const el = await renderPage(DailyPage as ServerPage, 'en');
+    expect(el.querySelector('section')).toBeNull();
+    expect(el.querySelector('details')).toBeNull();
   });
 
-  it('/brain does not claim an h1 — PageClient renders the real one after hydration', async () => {
-    const { container } = render(await BrainPage({ params: Promise.resolve({ locale: 'en' }) }));
-    expect(container.querySelectorAll('h1')).toHaveLength(0);
-  });
-
-  it('renders the Spanish copy for es, not the English fallback', async () => {
-    const text = await renderPage(BrainPage, 'es');
-    expect(text).toContain('Caza de memoria');
-    expect(text).not.toContain('Memory Hunt');
+  it('the copy still exists for <meta>/JSON-LD — removal was render-only', async () => {
+    const { container } = render(
+      await (MultiplayerPage as ServerPage)({
+        params: Promise.resolve({ locale: 'en' }),
+        searchParams: Promise.resolve({}),
+      })
+    );
+    const jsonLd = Array.from(container.querySelectorAll('script'))
+      .map((s) => s.textContent ?? '')
+      .join(' ');
+    expect(jsonLd).toContain('Wheel Rush');
   });
 });
