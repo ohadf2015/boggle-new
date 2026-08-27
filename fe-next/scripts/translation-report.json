@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6245,
+    "totalKeysInCode": 6278,
     "keyCountByLanguage": {
-      "en": 12060,
-      "es": 12356,
-      "he": 12261,
-      "ja": 12315,
-      "ru": 12091,
-      "sv": 12311
+      "en": 12108,
+      "es": 12404,
+      "he": 12309,
+      "ja": 12363,
+      "ru": 12143,
+      "sv": 12359
     },
-    "missingFromEnglish": 81,
+    "missingFromEnglish": 79,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -1759,21 +1759,21 @@
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 224,
+        "line": 225,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 260,
+        "line": 261,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 491,
+        "line": 460,
         "context": "{t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
@@ -1815,13 +1815,13 @@
         "pattern": "`results.crowns.${crown.id}`",
         "type": "template_literal",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 127,
+        "line": 137,
         "context": "{t(`results.crowns.${crown.id}`) || crown.name}"
       },
       {
         "pattern": "results.crowns.${crown.id}",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 127,
+        "line": 137,
         "context": "{t(`results.crowns.${crown.id}`) || crown.name}",
         "type": "template_literal"
       },
@@ -1892,7 +1892,7 @@
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 208,
+        "line": 209,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
@@ -1966,17 +1966,17 @@
         "context": "const note = t(`wordcraft.modifier.desc.${modifier}`, p.note);"
       },
       {
-        "pattern": "`wordcraft.difficulty.${d}`",
+        "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 126,
-        "context": "label={t(`wordcraft.difficulty.${d}`)}"
+        "line": 174,
+        "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {
         "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 147,
+        "line": 225,
         "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {
@@ -2958,7 +2958,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 615,
+        "line": 625,
         "context": "return t(key, params);"
       },
       {
@@ -3667,184 +3667,161 @@
       ]
     },
     {
-      "key": "education.landing.pro.analytics",
+      "key": "education.lesson.autoPronounce",
       "usages": [
         {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 119
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 400
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.classicMode",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 295
         },
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 147
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 358
         }
       ]
     },
     {
-      "key": "education.landing.pro.chooseNow",
+      "key": "education.lesson.contextualExamples",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 156
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.classLimit",
-      "usages": [
-        {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 64
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.classLimitPro",
-      "usages": [
-        {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 133
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.comparisonAlt",
-      "usages": [
-        {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 36
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.customLists",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "file": "components/practice/VocabularyCardEnriched.tsx",
           "line": 109
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.definition",
+      "usages": [
+        {
+          "file": "components/practice/VocabularyCardEnriched.tsx",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.dontKnow",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 232
         },
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 86
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.duels",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 110
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 233
         },
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 90
+          "file": "components/practice/SwipeFeedbackOverlay.tsx",
+          "line": 69
         }
       ]
     },
     {
-      "key": "education.landing.pro.everythingInFree",
+      "key": "education.lesson.enrichingContent",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 127
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 172
         }
       ]
     },
     {
-      "key": "education.landing.pro.freeForever",
+      "key": "education.lesson.examples",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 95
+          "file": "components/practice/VocabularyCardEnriched.tsx",
+          "line": 81
         }
       ]
     },
     {
-      "key": "education.landing.pro.freeTier",
+      "key": "education.lesson.gotIt",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 48
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.noAds",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 111
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 232
         },
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 82
-        }
-      ]
-    },
-    {
-      "key": "education.landing.pro.perMonth",
-      "usages": [
-        {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 55
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 233
         },
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 118
+          "file": "components/practice/SwipeFeedbackOverlay.tsx",
+          "line": 52
         }
       ]
     },
     {
-      "key": "education.landing.pro.proTier",
+      "key": "education.lesson.pronounce",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 111
+          "file": "components/practice/PronunciationButton.tsx",
+          "line": 66
         }
       ]
     },
     {
-      "key": "education.landing.pro.studentLimit",
+      "key": "education.lesson.pronunciationFallback",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 72
+          "file": "components/practice/PronunciationButton.tsx",
+          "line": 93
         }
       ]
     },
     {
-      "key": "education.landing.pro.studentLimitPro",
+      "key": "education.lesson.speaking",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 139
+          "file": "components/practice/PronunciationButton.tsx",
+          "line": 66
         }
       ]
     },
     {
-      "key": "education.landing.pro.subtitle",
+      "key": "education.lesson.swipeMode",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 25
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 304
+        },
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 367
         }
       ]
     },
     {
-      "key": "education.landing.pro.title",
+      "key": "education.lesson.tapToReveal",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 22
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 212
         }
       ]
     },
     {
-      "key": "education.landing.pro.whyNow",
+      "key": "education.lesson.word",
       "usages": [
         {
-          "file": "components/education/ProFramingSection.tsx",
-          "line": 167
+          "file": "components/education/MultiLessonSelector.tsx",
+          "line": 150
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.words",
+      "usages": [
+        {
+          "file": "components/education/MultiLessonSelector.tsx",
+          "line": 151
         }
       ]
     },
@@ -3853,7 +3830,7 @@
       "usages": [
         {
           "file": "components/student/JoinClassroomForm.tsx",
-          "line": 115
+          "line": 123
         }
       ]
     },
@@ -3863,6 +3840,15 @@
         {
           "file": "components/Footer.tsx",
           "line": 94
+        }
+      ]
+    },
+    {
+      "key": "hostView.demoBotsFailed",
+      "usages": [
+        {
+          "file": "host/hooks/useHostGameActions.ts",
+          "line": 319
         }
       ]
     },
@@ -3948,33 +3934,6 @@
       ]
     },
     {
-      "key": "teacher.subscription.matrix.featureColumn",
-      "usages": [
-        {
-          "file": "components/teacher/PlanComparisonMatrix.tsx",
-          "line": 76
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.matrix.title",
-      "usages": [
-        {
-          "file": "components/teacher/PlanComparisonMatrix.tsx",
-          "line": 62
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.matrix.unlimited",
-      "usages": [
-        {
-          "file": "components/teacher/PlanComparisonMatrix.tsx",
-          "line": 35
-        }
-      ]
-    },
-    {
       "key": "teacher.subscription.priceTaxNote",
       "usages": [
         {
@@ -3998,6 +3957,33 @@
         {
           "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
           "line": 160
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.setup.hideAdvanced",
+      "usages": [
+        {
+          "file": "components/word-craft/WordCraftSetup.tsx",
+          "line": 268
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.setup.showAdvanced",
+      "usages": [
+        {
+          "file": "components/word-craft/WordCraftSetup.tsx",
+          "line": 268
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.setup.tagline",
+      "usages": [
+        {
+          "file": "components/word-craft/WordCraftSetup.tsx",
+          "line": 92
         }
       ]
     }
@@ -4187,10 +4173,6 @@
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
-      "education.landing.furtherReading.title",
-      "education.landing.furtherReading.guides",
-      "education.landing.furtherReading.glossary",
-      "education.landing.furtherReading.wordSolver",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
