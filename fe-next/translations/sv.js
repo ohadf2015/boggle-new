@@ -12468,8 +12468,6 @@ const sv = {
       "freeForever": "Gratis för alltid, alltid tillgänglig",
       "freeClasses": "Upp till {count} klass",
       "freeStudents": "Upp till {count} elever per klass",
-      "basicWordTracking": "Grundläggande ordspårning",
-      "dailyProgressReports": "Dagliga framstegsrapporter",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Allt du behöver för att växa",
       "popular": "Populärast",
@@ -12487,7 +12485,20 @@ const sv = {
       "manageSubscription": "Hantera prenumeration",
       "districtTitle": "Skola eller kommun?",
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
-      "districtCta": "Kontakta oss för skolpriser"
+      "districtCta": "Kontakta oss för skolpriser",
+      "matrix": {
+        "title": "Jämför planer",
+        "featureColumn": "Funktion",
+        "unlimited": "Obegränsat",
+        "included": "Ingår",
+        "notIncluded": "Ingår inte",
+        "classes": "Klasser",
+        "studentsPerClass": "Elever per klass",
+        "customLists": "Egna ordlistor",
+        "duels": "Dueller mot varandra",
+        "noAds": "Reklamfritt för eleverna",
+        "analytics": "Analys och utskrivbara rapporter"
+      }
     },
     "teacher": {
       "activeGames": "Aktiva spel",
@@ -14153,7 +14164,7 @@ const sv = {
       "play_wordwheel": {
         "title": "Ta ett varv",
         "desc": "Spela dagens Ordhjul"
-      },
+      }
     },
     "reward": {
       "xp": "+{{xp}} XP",

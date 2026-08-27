@@ -12230,8 +12230,6 @@ const ja = {
       "freeForever": "ずっと無料、いつでも利用可能",
       "freeClasses": "最大{count}クラス",
       "freeStudents": "クラスあたり最大{count}人",
-      "basicWordTracking": "基本的な単語トラッキング",
-      "dailyProgressReports": "毎日の進捗レポート",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "拡大に必要なすべて",
       "popular": "一番人気",
@@ -12249,7 +12247,20 @@ const ja = {
       "manageSubscription": "サブスクリプションを管理",
       "districtTitle": "学校または学区ですか？",
       "districtSubtitle": "複数の教師や教室を管理していますか？学校や学区向けに柔軟な料金プランをご用意しています。",
-      "districtCta": "学校向け料金についてお問い合わせ"
+      "districtCta": "学校向け料金についてお問い合わせ",
+      "matrix": {
+        "title": "プラン比較",
+        "featureColumn": "機能",
+        "unlimited": "無制限",
+        "included": "含む",
+        "notIncluded": "含まない",
+        "classes": "クラス数",
+        "studentsPerClass": "1クラスあたりの生徒数",
+        "customLists": "オリジナル単語リスト",
+        "duels": "対戦デュエル",
+        "noAds": "生徒には広告なし",
+        "analytics": "分析と印刷できるレポート"
+      }
     },
     "teacher": {
       "activeGames": "進行中のゲーム",
@@ -13864,7 +13875,7 @@ const ja = {
       "play_wordwheel": {
         "title": "ホイールを回そう",
         "desc": "今日のワードホイールで遊ぶ"
-      },
+      }
     },
     "reward": {
       "xp": "+{{xp}} XP",

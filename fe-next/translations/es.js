@@ -12232,8 +12232,6 @@ const es = {
       "freeForever": "Gratis para siempre, siempre disponible",
       "freeClasses": "Hasta {count} clase",
       "freeStudents": "Hasta {count} estudiantes por clase",
-      "basicWordTracking": "Seguimiento básico de palabras",
-      "dailyProgressReports": "Informes de progreso diarios",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Todo lo que necesitas para crecer",
       "popular": "Más popular",
@@ -12251,7 +12249,20 @@ const es = {
       "manageSubscription": "Gestionar suscripción",
       "districtTitle": "¿Escuela o distrito?",
       "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
-      "districtCta": "Contáctanos para precios escolares"
+      "districtCta": "Contáctanos para precios escolares",
+      "matrix": {
+        "title": "Comparar planes",
+        "featureColumn": "Función",
+        "unlimited": "Ilimitado",
+        "included": "Incluido",
+        "notIncluded": "No incluido",
+        "classes": "Clases",
+        "studentsPerClass": "Alumnos por clase",
+        "customLists": "Tus propias listas de palabras",
+        "duels": "Duelos cara a cara",
+        "noAds": "Sin anuncios para el alumnado",
+        "analytics": "Analíticas e informes imprimibles"
+      }
     },
     "accessRequired": "Acceso de Profesor Requerido",
     "accessDenied": "Necesitas permisos de profesor para esta página.",
@@ -14173,7 +14184,7 @@ const es = {
       "play_wordwheel": {
         "title": "Dale una vuelta",
         "desc": "Juega la Rueda de Palabras de hoy"
-      },
+      }
     },
     "reward": {
       "xp": "+{{xp}} XP",

@@ -930,7 +930,7 @@ const ru = {
       "play_wordwheel": {
         "title": "Крутани барабан",
         "desc": "Сыграй сегодняшнее Колесо слов"
-      },
+      }
     },
     "reward": {
       "xp": "+{{xp}} опыта",
@@ -8966,8 +8966,6 @@ const ru = {
       "freeForever": "Бесплатно навсегда, всегда доступно",
       "freeClasses": "До {count} класса",
       "freeStudents": "До {count} учеников в классе",
-      "basicWordTracking": "Базовое отслеживание слов",
-      "dailyProgressReports": "Ежедневные отчёты о прогрессе",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Всё необходимое для роста",
       "popular": "Самый популярный",
@@ -8985,7 +8983,20 @@ const ru = {
       "manageSubscription": "Управление подпиской",
       "districtTitle": "Школа или округ?",
       "districtSubtitle": "Управляете несколькими учителями или классами? Мы предлагаем гибкое ценообразование для школ и округов.",
-      "districtCta": "Связаться по вопросам цен для школ"
+      "districtCta": "Связаться по вопросам цен для школ",
+      "matrix": {
+        "title": "Сравнение тарифов",
+        "featureColumn": "Возможность",
+        "unlimited": "Без ограничений",
+        "included": "Включено",
+        "notIncluded": "Не включено",
+        "classes": "Классы",
+        "studentsPerClass": "Учеников в классе",
+        "customLists": "Свои списки слов",
+        "duels": "Дуэли один на один",
+        "noAds": "Без рекламы для учеников",
+        "analytics": "Аналитика и отчёты для печати"
+      }
     },
     "teacher": {
       "activeGames": "Активные игры",

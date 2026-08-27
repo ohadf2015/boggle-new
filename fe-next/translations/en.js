@@ -11259,8 +11259,6 @@ const en = {
       "freeForever": "Forever free, always available",
       "freeClasses": "Up to {count} class",
       "freeStudents": "Up to {count} students per class",
-      "basicWordTracking": "Basic word tracking",
-      "dailyProgressReports": "Daily progress reports",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
       "popular": "Most Popular",
@@ -11278,7 +11276,20 @@ const en = {
       "manageSubscription": "Manage Subscription",
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
-      "districtCta": "Get in touch for school pricing"
+      "districtCta": "Get in touch for school pricing",
+      "matrix": {
+        "title": "Compare plans",
+        "featureColumn": "Feature",
+        "unlimited": "Unlimited",
+        "included": "Included",
+        "notIncluded": "Not included",
+        "classes": "Classrooms",
+        "studentsPerClass": "Students per class",
+        "customLists": "Your own word lists",
+        "duels": "Head-to-head duels",
+        "noAds": "Ad-free for students",
+        "analytics": "Analytics & printable reports"
+      }
     }
   },
   "education": {
@@ -11489,7 +11500,7 @@ const en = {
         "perMonth": "/month",
         "classLimit": "Up to {count} classroom",
         "studentLimit": "Up to {count} students in it",
-        "noAds": "No ads for your students",
+        "noAds": "No advertising for your students",
         "customLists": "Your own word lists",
         "duels": "Live word duels",
         "freeForever": "Free forever. No card, no trial clock.",
