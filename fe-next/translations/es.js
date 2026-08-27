@@ -2653,7 +2653,9 @@ const es = {
     "waitingForPlayers": "Esperando jugadores...",
     "seconds": "segundos",
     "switchToPlayer": "Cambiar a modo jugador",
-    "viewOnlyBadge": "Modo TV · Solo visualización"
+    "viewOnlyBadge": "Modo TV · Solo visualización",
+    "tryPracticeRound": "Probar una ronda de práctica (Bots)",
+    "practiceRoundFailed": "No se pudieron añadir jugadores de práctica. Revisa tu conexión e inténtalo de nuevo."
   },
   "tvResults": {
     "installHeading": "LLÉVATELO 📱",
@@ -12856,6 +12858,7 @@ const es = {
       "yesterday": "Ayer"
     },
     "classroomGame": {
+      "classCode": "Código del juego",
       "classroomNotFound": "Clase no encontrada",
       "classroomSession": "Sesión de clase",
       "createClassroom": "Nueva clase",
@@ -12863,11 +12866,14 @@ const es = {
       "deselectAll": "Deseleccionar todo",
       "gameCreated": "¡Juego lanzado! Comparte el código.",
       "gameSettings": "Configuración del juego",
+      "joinedStudents": "Estudiantes unidos",
       "lessonsSelected": "{{count}} lecciones elegidas",
       "missingRequirements": "Faltan requisitos",
+      "more": "más",
       "multiLessonHelp": "Mezcla lecciones para más variedad",
       "noClassrooms": "Aún no has creado clases",
       "noLessonsAvailable": "Sin lecciones. Crea una primero.",
+      "noStudentsYet": "Ningún estudiante se ha unido aún",
       "reviewAndStart": "Revisar e iniciar",
       "scanToJoin": "Escanea para entrar",
       "selectAllLessons": "Seleccionar todas",
@@ -12880,8 +12886,11 @@ const es = {
       "startGame": "Iniciar juego",
       "createRoom": "Crear sala",
       "startGameDescription": "Lanza el juego en vivo",
+      "studentCount": "{{count}} Estudiantes unidos",
+      "studentsCanScan": "Los estudiantes pueden escanear el código QR para unirse",
       "title": "Juego en vivo",
-      "waitingForPlayers": "Esperando que entren estudiantes...",
+      "waitingForPlayers": "Preparando tu juego de clase...",
+      "waitingForStudents": "Esperando a los estudiantes",
       "words": "{{count}} palabras"
     },
     "header": {
@@ -13276,14 +13285,22 @@ const es = {
       "subtitle": "Listas de vocabulario listas para usar",
       "useThisPack": "Usar este paquete",
       "commonEnglish": {
-        "name": "Inglés cotidiano"
+        "name": "Inglés cotidiano",
+        "description": "Palabras cotidianas en inglés para todos los niveles"
       },
       "academicVocab": {
-        "name": "Vocabulario académico"
+        "name": "Vocabulario académico",
+        "description": "Términos académicos y analíticos para estudiantes avanzados"
       },
       "beginnerHebrew": {
-        "name": "Hebreo para principiantes"
+        "name": "Hebreo para principiantes",
+        "description": "Palabras esenciales de hebreo para principiantes"
       }
+    },
+    "lesson": {
+      "creationFailed": "No se pudo crear la lección. Inténtalo de nuevo.",
+      "created": "¡Lección creada exitosamente!",
+      "preferCustom": "O crea tu propia lista de vocabulario personalizada:"
     },
     "students": "estudiantes",
     "student": {

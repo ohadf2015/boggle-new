@@ -79,6 +79,7 @@ interface UseHostGameActionsOptions {
 export interface UseHostGameActionsReturn {
   startGame: () => void;
   confirmSoloStart: () => void;
+  startSoloDemoWithBots: () => (() => void);
   stopGame: () => void;
   handleExitRoom: () => void;
   confirmExitRoom: () => void;
@@ -304,6 +305,34 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     executeStartGame();
   }, [executeStartGame, setShowSoloConfirm]);
 
+  /**
+   * Classroom teacher demo: fill the room with bots and then start the game.
+   * This is distinct from confirmSoloStart because:
+   * - confirmSoloStart expects playersCount to already pass the guard (host is playing)
+   * - For a non-playing teacher (TV mode), playersCount must be > 0 BEFORE starting
+   * - So we emit setAutoFill first, wait for roster update, then call startGame
+   * Emits 'setAutoFill' to the server. Returns a callback to call when bots are seated.
+   */
+  const startSoloDemoWithBots = useCallback((): (() => void) => {
+    // Classroom teacher must be non-playing (hostPlaying=false)
+    if (hostPlaying) {
+      neoErrorToast(t('hostView.demoBotsFailed') || 'Demo unavailable in player mode', { icon: TOAST_ICONS.alertTriangle });
+      return () => {}; // no-op
+    }
+
+    // Emit setAutoFill to the server; it will broadcast an updated roster with bots
+    // Copy from HostPreGameView.tsx:422 — established pattern for this product
+    socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
+
+    // Returned callback is invoked by the caller only once the roster actually
+    // shows seated bots. Do NOT re-check playersCount in here: this closure is
+    // created at click time, so it would capture the pre-fill count (0) and
+    // refuse forever. The live count is the caller's effect dependency.
+    return () => {
+      executeStartGame();
+    };
+  }, [hostPlaying, socket, executeStartGame, t]);
+
   const stopGame = useCallback(() => {
     socket?.emit('endGame', { gameCode });
     setRemainingTime(null);
@@ -489,6 +518,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   return {
     startGame,
     confirmSoloStart,
+    startSoloDemoWithBots,
     stopGame,
     handleExitRoom,
     confirmExitRoom,

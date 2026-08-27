@@ -2881,7 +2881,9 @@ const sv = {
     "waitingForPlayers": "Väntar på spelare...",
     "seconds": "sekunder",
     "switchToPlayer": "Byt till spelarläge",
-    "viewOnlyBadge": "TV-läge · Endast visning"
+    "viewOnlyBadge": "TV-läge · Endast visning",
+    "tryPracticeRound": "Testa en träningsrunda (Bots)",
+    "practiceRoundFailed": "Kunde inte lägga till träningsspelare. Kontrollera anslutningen och försök igen."
   },
   "tvResults": {
     "installHeading": "TA MED HEM 📱",
@@ -13092,6 +13094,7 @@ const sv = {
       "yesterday": "Igår"
     },
     "classroomGame": {
+      "classCode": "Spelkod",
       "classroomNotFound": "Klassrummet hittades inte",
       "classroomSession": "Klassrumsspel",
       "createClassroom": "Nytt klassrum",
@@ -13099,11 +13102,14 @@ const sv = {
       "deselectAll": "Avmarkera alla",
       "gameCreated": "Spelet är skapat!",
       "gameSettings": "Spelinställningar",
+      "joinedStudents": "Elever som gick med",
       "lessonsSelected": "{{count}} lektioner valda",
       "missingRequirements": "Det saknas något",
+      "more": "fler",
       "multiLessonHelp": "Blanda lektioner för mer variation",
       "noClassrooms": "Inga klassrum ännu",
       "noLessonsAvailable": "Inga lektioner tillgängliga",
+      "noStudentsYet": "Ingen elev har gått med ännu",
       "reviewAndStart": "Granska och starta",
       "scanToJoin": "Skanna för att gå med",
       "selectAllLessons": "Markera alla",
@@ -13116,8 +13122,11 @@ const sv = {
       "startGame": "Starta spelet",
       "createRoom": "Starta spel",
       "startGameDescription": "Starta klassrumsspelet",
+      "studentCount": "{{count}} elever gick med",
+      "studentsCanScan": "Elever kan skanna QR-koden för att gå med",
       "title": "Klassrumsspel",
-      "waitingForPlayers": "Väntar på spelare...",
+      "waitingForPlayers": "Förbereder klassrumsspelet...",
+      "waitingForStudents": "Väntar på elever",
       "words": "{{count}} ord"
     },
     "header": {
@@ -13512,14 +13521,22 @@ const sv = {
       "subtitle": "Färdiga ordsamlingar",
       "useThisPack": "Använd det här paketet",
       "academicVocab": {
-        "name": "Akademiska ord"
+        "name": "Akademiska ord",
+        "description": "Akademiska och analytiska termer för avancerade elever"
       },
       "beginnerHebrew": {
-        "name": "Hebreiska för nybörjare"
+        "name": "Hebreiska för nybörjare",
+        "description": "Grundläggande hebreiska ord för nybörjare"
       },
       "commonEnglish": {
-        "name": "Vanlig engelska"
+        "name": "Vanlig engelska",
+        "description": "Vardagliga engelska ord för alla nivåer"
       }
+    },
+    "lesson": {
+      "creationFailed": "Kunde inte skapa lektionen. Försök igen.",
+      "created": "Lektionen skapades framgångsrikt!",
+      "preferCustom": "Eller skapa din egen anpassade ordlista:"
     },
     "student": {
       "join": {

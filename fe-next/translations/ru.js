@@ -1407,6 +1407,7 @@ const ru = {
       "yesterday": "Вчера"
     },
     "classroomGame": {
+      "classCode": "Код игры",
       "classroomNotFound": "Класс не найден",
       "classroomSession": "Сеанс класса",
       "createClassroom": "Создать класс",
@@ -1414,11 +1415,14 @@ const ru = {
       "deselectAll": "Снять выделение со всех",
       "gameCreated": "Игра создана!",
       "gameSettings": "Настройки игры",
+      "joinedStudents": "Присоединившиеся ученики",
       "lessonsSelected": "{{count}} уроков выбрано",
       "missingRequirements": "Не выполнены требования",
+      "more": "ещё",
       "multiLessonHelp": "Объедини уроки для разнообразия",
       "noClassrooms": "Нет классов",
       "noLessonsAvailable": "Нет доступных уроков",
+      "noStudentsYet": "Ученики ещё не присоединились",
       "reviewAndStart": "Проверить и начать",
       "scanToJoin": "Отсканируй, чтобы присоединиться",
       "selectAllLessons": "Выбрать все",
@@ -1431,8 +1435,11 @@ const ru = {
       "startGame": "Начать игру",
       "createRoom": "Создать комнату",
       "startGameDescription": "Запустить игру класса",
+      "studentCount": "{{count}} учеников присоединилось",
+      "studentsCanScan": "Ученики могут отсканировать QR-код для присоединения",
       "title": "Игра класса",
-      "waitingForPlayers": "Ждём игроков...",
+      "waitingForPlayers": "Подготовка к игре класса...",
+      "waitingForStudents": "Ожидание учеников",
       "words": "{{count}} слов"
     },
     "header": {
@@ -1828,14 +1835,22 @@ const ru = {
       "subtitle": "Готовые наборы лексики",
       "useThisPack": "Использовать этот пакет",
       "academicVocab": {
-        "name": "Академическая лексика"
+        "name": "Академическая лексика",
+        "description": "Академические и аналитические термины для продвинутых учащихся"
       },
       "beginnerHebrew": {
-        "name": "Иврит для начинающих"
+        "name": "Иврит для начинающих",
+        "description": "Основные еврейские слова для начинающих"
       },
       "commonEnglish": {
-        "name": "Распространённый английский"
+        "name": "Распространённый английский",
+        "description": "Повседневные английские слова для всех уровней"
       }
+    },
+    "lesson": {
+      "creationFailed": "Не удалось создать урок. Пожалуйста, попробуйте снова.",
+      "created": "Урок успешно создан!",
+      "preferCustom": "Или создайте свой собственный пользовательский список лексики:"
     },
     "student": {
       "join": {
@@ -8910,7 +8925,9 @@ const ru = {
     "waitingForPlayers": "Ожидание игроков...",
     "seconds": "секунды",
     "switchToPlayer": "Переключиться на режим игрока",
-    "viewOnlyBadge": "Режим ТВ · Только просмотр"
+    "viewOnlyBadge": "Режим ТВ · Только просмотр",
+    "tryPracticeRound": "Попробуйте практический раунд (Боты)",
+    "practiceRoundFailed": "Не удалось добавить тренировочных игроков. Проверьте соединение и попробуйте снова."
   },
   "autoPlay": {
     "nextGameIn": "Следующая игра через {{seconds}}...",

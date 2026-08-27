@@ -68,7 +68,7 @@ function boardSizeLabel(size?: string): string {
  * mode, timer, board size, late join, lesson name, and word count.
  */
 export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: ClassroomModeBannerProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [joinUrl, setJoinUrl] = useState('');
 
@@ -82,9 +82,9 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
 
   useEffect(() => {
     if (gameCode && typeof window !== 'undefined') {
-      setJoinUrl(`${window.location.origin}/join?code=${gameCode}`);
+      setJoinUrl(`${window.location.origin}/${language}/join/${gameCode}`);
     }
-  }, [gameCode]);
+  }, [gameCode, language]);
 
   const handleCopy = useCallback(async () => {
     if (!gameCode) return;
@@ -167,7 +167,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
               </div>
 
               {joinUrl && (
-                <div className="flex flex-col items-center gap-2 mt-4">
+                <div className="flex flex-col items-center gap-2 mt-4" data-testid="qr-code-wrapper">
                   <p className="text-xs text-neo-white font-neo-body">
                     {t('education.classroomGame.scanToJoin')}
                   </p>

@@ -167,6 +167,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     initialPlayers,
     roomLanguage: roomLanguageProp,
     defaultLanguage: language as Language,
+    hasLessonData: !!lessonData,
   });
 
   // Mode-specific state from Zustand store (for TV broadcast).
@@ -754,6 +755,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           onExitRoom={actions.handleExitRoom}
           tournamentCreating={tournament.tournamentCreating}
           setHostPlaying={state.setHostPlaying}
+          onStartSoloDemoWithBots={actions.startSoloDemoWithBots}
         />
       )}
 

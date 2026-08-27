@@ -2592,7 +2592,9 @@ const ja = {
     "waitingForPlayers": "プレイヤーを待っています...",
     "seconds": "秒",
     "switchToPlayer": "プレイヤーモードに切替",
-    "viewOnlyBadge": "TVモード · 閲覧のみ"
+    "viewOnlyBadge": "TVモード · 閲覧のみ",
+    "tryPracticeRound": "練習ラウンドを試す (ボット)",
+    "practiceRoundFailed": "練習用プレイヤーを追加できませんでした。接続を確認してもう一度お試しください。"
   },
   "tvResults": {
     "installHeading": "スマホでも 📱",
@@ -12854,6 +12856,7 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "classCode": "ゲームコード",
       "classroomNotFound": "クラスが見つかりません",
       "classroomSession": "教室セッション",
       "createClassroom": "教室を作成",
@@ -12861,11 +12864,14 @@ const ja = {
       "deselectAll": "選択解除",
       "gameCreated": "ゲーム作成完了！",
       "gameSettings": "ゲーム設定",
+      "joinedStudents": "参加した生徒",
       "lessonsSelected": "{{count}}個選択中",
       "missingRequirements": "必要項目が足りません",
+      "more": "さらに表示",
       "multiLessonHelp": "レッスンを組み合わせてバリエーションUP",
       "noClassrooms": "まだ教室がありません",
       "noLessonsAvailable": "レッスンがありません",
+      "noStudentsYet": "まだ生徒が参加していません",
       "reviewAndStart": "確認して開始",
       "scanToJoin": "スキャンして参加",
       "selectAllLessons": "すべて選択",
@@ -12878,8 +12884,11 @@ const ja = {
       "startGame": "ゲーム開始",
       "createRoom": "ルームを作成",
       "startGameDescription": "クラスゲームをスタート",
+      "studentCount": "{{count}}人の生徒が参加",
+      "studentsCanScan": "生徒はQRコードをスキャンして参加できます",
       "title": "クラスゲーム",
-      "waitingForPlayers": "プレイヤーを待っています...",
+      "waitingForPlayers": "クラスゲームの準備中...",
+      "waitingForStudents": "生徒を待機中",
       "words": "{{count}}語"
     },
     "header": {
@@ -13335,17 +13344,25 @@ const ja = {
     },
     "starterPacks": {
       "academicVocab": {
-        "name": "学術語彙"
+        "name": "学術語彙",
+        "description": "高度な学習者向けの学術語彙と分析用語"
       },
       "beginnerHebrew": {
-        "name": "ヘブライ語入門"
+        "name": "ヘブライ語入門",
+        "description": "初心者向けのヘブライ語基本単語"
       },
       "commonEnglish": {
-        "name": "基本英単語"
+        "name": "基本英単語",
+        "description": "全レベル向けの日常英単語"
       },
       "subtitle": "すぐに使える語彙セット",
       "title": "スターターパック",
       "useThisPack": "このパックを使う"
+    },
+    "lesson": {
+      "creationFailed": "レッスンを作成できませんでした。もう一度お試しください。",
+      "created": "レッスンが正常に作成されました！",
+      "preferCustom": "または、独自のカスタム語彙リストを作成します："
     },
     "teacher": {
       "activeGames": "今プレイ中のゲーム",
