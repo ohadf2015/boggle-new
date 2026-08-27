@@ -114,18 +114,22 @@ export default function ClassLimitUpsellModal({
                   the highest-intent teacher in the product got a generic "try again"
                   toast and retried forever. One checkout implementation, not two that
                   drift: send them to the page that owns it. */}
-              <Link
-                href={`/${language}/teacher/upgrade`}
-                onClick={() =>
-                  trackGrowthEvent('landing_cta_clicked', {
-                    cta: 'teacher_pro',
-                    source: 'class_limit_modal',
-                  })
-                }
-                className="flex-1 inline-flex items-center justify-center rounded-neo bg-neo-cyan px-4 py-2 text-sm text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+              <Button
+                asChild
+                className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
               >
-                {t('teacher.subscription.upgradeNow')}
-              </Link>
+                <Link
+                  href={`/${language}/teacher/upgrade`}
+                  onClick={() =>
+                    trackGrowthEvent('landing_cta_clicked', {
+                      cta: 'teacher_pro',
+                      source: 'class_limit_modal',
+                    })
+                  }
+                >
+                  {t('teacher.subscription.upgradeNow')}
+                </Link>
+              </Button>
               <Button
                 onClick={onClose}
                 variant="outline"
