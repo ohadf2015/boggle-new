@@ -11470,6 +11470,26 @@ const en = {
       "trial_ended": "Trial ended"
     },
     "landing": {
+      "pro": {
+        "title": "Two plans. No tricks.",
+        "subtitle": "Everything that gets you to a first lesson is free. Pro lifts the caps.",
+        "comparisonAlt": "Side-by-side comparison of the Free plan and Teacher Pro",
+        "freeTier": "Free",
+        "perMonth": "/month",
+        "classLimit": "Up to {count} classroom",
+        "studentLimit": "Up to {count} students in it",
+        "noAds": "No ads for your students",
+        "customLists": "Your own word lists",
+        "duels": "Live word duels",
+        "freeForever": "Free forever. No card, no trial clock.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Everything in Free",
+        "classLimitPro": "Unlimited classrooms",
+        "studentLimitPro": "Unlimited students",
+        "analytics": "Per-student progress analytics",
+        "chooseNow": "Get Teacher Pro",
+        "whyNow": "Start free — really. Pro is for when {count} students in one class stops being enough."
+      },
       "duelTeaser": {
         "cta": "Challenge a Friend",
         "headline": "Word Duels",

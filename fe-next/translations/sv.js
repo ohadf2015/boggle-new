@@ -13132,6 +13132,26 @@ const sv = {
       "trial_ended": "Provperioden är slut"
     },
     "landing": {
+      "pro": {
+        "title": "Två planer. Inga trick.",
+        "subtitle": "Allt du behöver för din första lektion är gratis. Pro tar bort taken.",
+        "comparisonAlt": "Jämförelse mellan gratisplanen och Teacher Pro",
+        "freeTier": "Gratis",
+        "perMonth": "/månad",
+        "classLimit": "Upp till {count} klass",
+        "studentLimit": "Upp till {count} elever i den",
+        "noAds": "Inga annonser för dina elever",
+        "customLists": "Dina egna ordlistor",
+        "duels": "Orddueller i realtid",
+        "freeForever": "Gratis för alltid. Inget kort, ingen provperiod som tickar.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Allt i gratisplanen",
+        "classLimitPro": "Obegränsat antal klasser",
+        "studentLimitPro": "Obegränsat antal elever",
+        "analytics": "Framstegsstatistik per elev",
+        "chooseNow": "Skaffa Teacher Pro",
+        "whyNow": "Börja gratis, på riktigt. Pro är för när {count} elever i en klass inte räcker längre."
+      },
       "duelTeaser": {
         "cta": "Utmana en vän",
         "headline": "Orddueller",

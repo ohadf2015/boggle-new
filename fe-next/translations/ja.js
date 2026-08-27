@@ -12894,6 +12894,26 @@ const ja = {
       "trial_ended": "トライアル終了"
     },
     "landing": {
+      "pro": {
+        "title": "プランは2つ。裏はありません。",
+        "subtitle": "最初の授業に必要なものはすべて無料です。Pro は上限を外すためのプラン。",
+        "comparisonAlt": "無料プランと Teacher Pro の比較",
+        "freeTier": "無料",
+        "perMonth": "/月",
+        "classLimit": "クラス {count} つまで",
+        "studentLimit": "生徒 {count} 人まで",
+        "noAds": "生徒には広告なし",
+        "customLists": "自分だけの単語リスト",
+        "duels": "リアルタイムの単語バトル",
+        "freeForever": "ずっと無料。カード登録も試用期限もありません。",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "無料プランの全機能",
+        "classLimitPro": "クラス数は無制限",
+        "studentLimitPro": "生徒数は無制限",
+        "analytics": "生徒ごとの学習進捗分析",
+        "chooseNow": "Teacher Pro を始める",
+        "whyNow": "まずは無料で。1クラス {count} 人では足りなくなったときが Pro の出番です。"
+      },
       "duelTeaser": {
         "cta": "友達に挑戦",
         "headline": "ワードデュエル",

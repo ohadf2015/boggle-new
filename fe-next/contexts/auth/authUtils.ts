@@ -162,14 +162,24 @@ export interface SupabaseAuthError {
 }
 
 /**
+ * These fields are TYPED `string?` but arrive as whatever the rejected promise carried —
+ * PostgREST errors use a numeric `code`, and a thrown non-auth object can hold anything.
+ * `?.` only guards null/undefined, so `code.toLowerCase()` threw and the predicate meant to
+ * CLASSIFY a failure became the failure (Sentry JAVASCRIPT-NEXTJS-21K, unhandled rejection).
+ */
+function lower(value: unknown): string {
+  return typeof value === 'string' ? value.toLowerCase() : '';
+}
+
+/**
  * Check if error is a refresh token error
  */
 export function isRefreshTokenError(
   error: SupabaseAuthError | null | undefined
 ): boolean {
   if (!error) return false;
-  const errorCode = error.code?.toLowerCase() || '';
-  const errorMessage = error.message?.toLowerCase() || '';
+  const errorCode = lower(error.code);
+  const errorMessage = lower(error.message);
   return (
     errorCode === 'refresh_token_not_found' ||
     errorMessage.includes('refresh token not found') ||
@@ -188,7 +198,7 @@ export function isNetworkError(
   error: SupabaseAuthError | null | undefined
 ): boolean {
   if (!error) return false;
-  const errorMessage = error.message?.toLowerCase() || '';
+  const errorMessage = lower(error.message);
   return (
     errorMessage.includes('network') ||
     errorMessage.includes('fetch') ||

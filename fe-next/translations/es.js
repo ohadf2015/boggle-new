@@ -12896,6 +12896,26 @@ const es = {
       "trial_ended": "Prueba finalizada"
     },
     "landing": {
+      "pro": {
+        "title": "Dos planes. Sin trucos.",
+        "subtitle": "Todo lo que necesitas para dar tu primera clase es gratis. Pro quita los límites.",
+        "comparisonAlt": "Comparación entre el plan Gratis y Teacher Pro",
+        "freeTier": "Gratis",
+        "perMonth": "/mes",
+        "classLimit": "Hasta {count} clase",
+        "studentLimit": "Hasta {count} estudiantes en ella",
+        "noAds": "Sin anuncios para tus estudiantes",
+        "customLists": "Tus propias listas de palabras",
+        "duels": "Duelos de palabras en vivo",
+        "freeForever": "Gratis para siempre. Sin tarjeta y sin cuenta atrás.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Todo lo del plan Gratis",
+        "classLimitPro": "Clases ilimitadas",
+        "studentLimitPro": "Estudiantes ilimitados",
+        "analytics": "Analíticas de progreso por estudiante",
+        "chooseNow": "Obtener Teacher Pro",
+        "whyNow": "Empieza gratis, en serio. Pro es para cuando {count} estudiantes en una clase se te quedan cortos."
+      },
       "duelTeaser": {
         "cta": "Reta a un amigo",
         "headline": "Duelos de Palabras",

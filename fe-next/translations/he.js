@@ -12750,6 +12750,26 @@ const he = {
       "trial_ended": "הניסיון הסתיים"
     },
     "landing": {
+      "pro": {
+        "title": "שתי תוכניות. בלי טריקים.",
+        "subtitle": "כל מה שצריך כדי להעביר שיעור ראשון — חינם. Pro מסיר את המגבלות.",
+        "comparisonAlt": "השוואה בין התוכנית החינמית לבין Teacher Pro",
+        "freeTier": "חינם",
+        "perMonth": "לחודש",
+        "classLimit": "עד {count} כיתה",
+        "studentLimit": "עד {count} תלמידים בכיתה",
+        "noAds": "בלי פרסומות לתלמידים",
+        "customLists": "רשימות מילים משלכם",
+        "duels": "קרבות מילים בזמן אמת",
+        "freeForever": "חינם לתמיד. בלי כרטיס אשראי, בלי שעון ניסיון.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "כל מה שיש בתוכנית החינמית",
+        "classLimitPro": "כיתות ללא הגבלה",
+        "studentLimitPro": "תלמידים ללא הגבלה",
+        "analytics": "מעקב התקדמות לכל תלמיד",
+        "chooseNow": "לשדרג ל-Teacher Pro",
+        "whyNow": "התחילו חינם, באמת. Pro מיועד לרגע ש-{count} תלמידים בכיתה אחת כבר לא מספיקים."
+      },
       "duelTeaser": {
         "cta": "אתגר חבר",
         "headline": "דו-קרב מילים",
