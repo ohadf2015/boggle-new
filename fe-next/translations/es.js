@@ -6707,7 +6707,7 @@ const es = {
     "todaysPuzzles": "Los retos de hoy",
     "results": {
       "fullRecap": "Resumen completo",
-      "fullRecapSummary": "Tus palabras, tus estadísticas y qué jugar después"
+      "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas — y a quién ganaste"
     },
     "title": "Desafío Diario",
     "badge": "DESAFÍO DIARIO",
@@ -6747,6 +6747,7 @@ const es = {
       "yesterday": "El reto de ayer",
       "daysAgo": "Hace {count} días",
       "watchAd": "Mira un anuncio corto para jugar",
+      "adBadge": "Anuncio",
       "appTitle": "¿Te perdiste algunos días?",
       "appSubtitle": "Tienes {count} sin jugar de los últimos días. Juega los retos anteriores en la app de LexiClash para Android.",
       "appCta": "Disponible en Google Play"

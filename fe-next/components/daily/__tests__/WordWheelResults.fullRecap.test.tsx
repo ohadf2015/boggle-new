@@ -55,6 +55,11 @@ vi.mock('@/hooks/useMediaQuery', () => ({
   useMediaQuery: () => false,
 }));
 
+vi.mock('../CatchUpSuggestion', () => ({
+  __esModule: true,
+  default: () => <div data-testid="catch-up" />,
+}));
+
 vi.mock('../DailyInsightStack', () => ({
   __esModule: true,
   default: () => <div data-testid="insight-stack" />,
@@ -94,6 +99,15 @@ describe('WordWheelResults — full recap disclosure', () => {
   it('still shows the leaderboard up front — this game is competitive', () => {
     renderResults();
     expect(screen.getByTestId('leaderboard-stub')).toBeInTheDocument();
+  });
+
+  // A missed daily is another GAME to play, not a statistic about the one just
+  // finished. Filed behind the disclosure it was invisible: it renders nothing
+  // at all when there is nothing to catch up, so it costs no height on the
+  // screens where it does not apply.
+  it('keeps the catch-up nudge on first paint, outside the disclosure', () => {
+    renderResults();
+    expect(screen.getByTestId('catch-up')).toBeInTheDocument();
   });
 });
 

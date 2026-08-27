@@ -6140,7 +6140,7 @@ const en = {
     "todaysPuzzles": "Today's Puzzles",
     "results": {
       "fullRecap": "Full recap",
-      "fullRecapSummary": "Your words, your insights, and what to play next"
+      "fullRecapSummary": "Your rank, your rarest word, your coins — and who you beat"
     },
     "title": "Daily Challenge",
     "badge": "DAILY",
@@ -6194,6 +6194,7 @@ const en = {
       "yesterday": "Yesterday's puzzle",
       "daysAgo": "{count} days ago",
       "watchAd": "Watch a quick ad to play",
+      "adBadge": "Ad",
       "appTitle": "Missed a few days?",
       "appSubtitle": "You've got {count} unplayed from the last few days. Replay past dailies in the LexiClash Android app.",
       "appCta": "Get it on Google Play"

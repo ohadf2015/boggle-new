@@ -7006,7 +7006,7 @@ const sv = {
     "todaysPuzzles": "Dagens pussel",
     "results": {
       "fullRecap": "Hela sammanfattningen",
-      "fullRecapSummary": "Dina ord, din statistik och vad du kan spela härnäst"
+      "fullRecapSummary": "Din placering, ditt ovanligaste ord, dina mynt — och vem du slog"
     },
     "title": "Daglig utmaning",
     "badge": "DAGLIG UTMANING",
@@ -7023,6 +7023,7 @@ const sv = {
       "yesterday": "Gårdagens pussel",
       "daysAgo": "{count} dagar sedan",
       "watchAd": "Se en kort annons för att spela",
+      "adBadge": "Annons",
       "appTitle": "Missade du några dagar?",
       "appSubtitle": "Du har {count} ospelade från de senaste dagarna. Spela tidigare dagliga i LexiClash-appen för Android.",
       "appCta": "Hämta på Google Play"

@@ -6688,7 +6688,7 @@ const he = {
     "todaysPuzzles": "החידות של היום",
     "results": {
       "fullRecap": "הסיכום המלא",
-      "fullRecapSummary": "המילים שלך, הנתונים שלך, ומה כדאי לשחק עכשיו"
+      "fullRecapSummary": "הדירוג שלך, המילה הנדירה שמצאת, המטבעות — ואת מי ניצחת"
     },
     "title": "אתגר יומי",
     "badge": "אתגר יומי",
@@ -6705,6 +6705,7 @@ const he = {
       "yesterday": "החידה של אתמול",
       "daysAgo": "לפני {count} ימים",
       "watchAd": "צפו בפרסומת קצרה כדי לשחק",
+      "adBadge": "פרסומת",
       "appTitle": "פספסתם כמה ימים?",
       "appSubtitle": "יש לכם {count} מהימים האחרונים שעדיין לא שיחקתם. שחקו חידות עבר באפליקציית LexiClash לאנדרואיד.",
       "appCta": "הורידו מ-Google Play"

@@ -6767,7 +6767,7 @@ const ja = {
     "todaysPuzzles": "今日のパズル",
     "results": {
       "fullRecap": "くわしい結果",
-      "fullRecapSummary": "見つけた単語、データ、次に遊べるゲーム"
+      "fullRecapSummary": "順位、いちばん珍しかった単語、コイン、そして誰に勝ったか"
     },
     "title": "デイリーチャレンジ",
     "chooseQuest": "今日のクエストを選ぼう",
@@ -6830,6 +6830,7 @@ const ja = {
       "yesterday": "昨日のパズル",
       "daysAgo": "{count}日前",
       "watchAd": "短い広告を見てプレイ",
+      "adBadge": "広告",
       "appTitle": "数日逃しちゃった？",
       "appSubtitle": "直近で未プレイが{count}件。過去のデイリーはLexiClashのAndroidアプリで遊べます。",
       "appCta": "Google Playで入手"

@@ -69,13 +69,13 @@ export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggesti
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.24, type: 'spring', stiffness: 300, damping: 26 }}
-        className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan-muted p-4 shadow-hard"
+        className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-4 shadow-hard-lg"
       >
         <div className="mb-1 flex items-center gap-2">
-          <span aria-hidden className="text-xl">🗓️</span>
-          <h3 className="font-neo-display text-lg text-neo-black">{t('daily.catchUp.appTitle')}</h3>
+          <span aria-hidden className="text-2xl">🗓️</span>
+          <h3 className="font-neo-display text-lg font-black text-neo-black">{t('daily.catchUp.appTitle')}</h3>
         </div>
-        <p dir="auto" className="mb-3 font-neo-body text-sm text-neo-black/80">
+        <p dir="auto" className="mb-3 font-neo-body text-sm font-medium text-neo-black/80">
           {t('daily.catchUp.appSubtitle', { count: items.length })}
         </p>
         <a
@@ -101,13 +101,16 @@ export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggesti
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.24, type: 'spring', stiffness: 300, damping: 26 }}
-      className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan-muted p-4 shadow-hard"
+      className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-4 shadow-hard-lg"
     >
       <div className="mb-1 flex items-center gap-2">
-        <span aria-hidden className="text-xl">🗓️</span>
-        <h3 className="font-neo-display text-lg text-neo-black">{t('daily.catchUp.title')}</h3>
+        <span aria-hidden className="text-2xl">🗓️</span>
+        <h3 className="font-neo-display text-lg font-black text-neo-black">{t('daily.catchUp.title')}</h3>
+        <span className="ms-auto rounded-full border-neo border-neo-black bg-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black text-neo-cyan">
+          {items.length}
+        </span>
       </div>
-      <p className="mb-3 font-neo-body text-sm text-neo-black/80">
+      <p className="mb-3 font-neo-body text-sm font-medium text-neo-black/80">
         {t('daily.catchUp.subtitle', { count: items.length })}
       </p>
       <p className="mb-3 flex items-center gap-1.5 font-neo-body text-xs font-semibold text-neo-black/70">
@@ -122,13 +125,23 @@ export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggesti
             <Link
               key={item.date}
               href={`/${language}/daily/${mode || 'word-hunt'}?date=${item.date}`}
-              className="flex items-center justify-between rounded-neo border-neo border-neo-black bg-neo-cream px-3 py-2 font-neo-body text-neo-black shadow-hard-sm transition-transform hover:-translate-y-px active:translate-y-px"
+              className="flex items-center justify-between gap-2 rounded-neo border-neo border-neo-black bg-neo-cream px-3 py-2.5 font-neo-body text-neo-black shadow-hard-sm transition-transform hover:-translate-y-px active:translate-y-px active:shadow-hard-pressed"
             >
-              <span className="font-semibold">{label}</span>
-              <span className="flex items-center gap-1 text-sm">
-                #{item.puzzleNumber}
-                <span aria-hidden>▶</span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-neo-display font-black leading-tight">{label}</span>
+                <span className="block text-xs font-semibold text-neo-black/60">#{item.puzzleNumber}</span>
               </span>
+              {/* The ad is the price of THIS replay, so it is priced on the
+                  button. A header sentence is read once; a badge is read on
+                  every row, by the player about to tap it. */}
+              <span
+                data-testid="catch-up-ad-badge"
+                className="flex shrink-0 items-center gap-1 rounded-full border-neo border-neo-black bg-neo-black px-2.5 py-1 font-neo-display text-[10px] font-black uppercase tracking-wide text-neo-cyan"
+              >
+                <span aria-hidden>📺</span>
+                {t('daily.catchUp.adBadge')}
+              </span>
+              <span aria-hidden className="shrink-0 font-neo-display text-lg font-black rtl:rotate-180">▶</span>
             </Link>
           );
         })}
