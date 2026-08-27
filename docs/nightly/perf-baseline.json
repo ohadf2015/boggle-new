@@ -1,17 +1,21 @@
 {
-  "date": "2026-08-26",
-  "note": "Impact-check + diagnosis night. Brief IMPACT CHECK item (education-hero eager LCP, 08-17) re-measured IMPROVED: 8460ms baseline -> 2608ms (n=43/30d, near-floor, directionally conclusive). Backend: supabase MCP did not connect within lane window (2nd consecutive night) -- both brief backend items (auth_db_connections_absolute dashboard toggle, vocabulary_lessons unindexed FK) deferred, unactionable without execute_sql/apply_migration. Frontend: word-wheel daily (12280ms LCP, brief item) code-inspected -- page.tsx already wraps WordWheelChallenge in next/dynamic + Suspense with DailyLoadingFallback; the fallback itself is a 'use client' component gated on useLanguage() context resolution, so nothing paints until JS hydrates + LanguageContext resolves -- this is an architectural CSR-gate issue (no LCP image/priority fix applies), not a same-night-safe edit given WordWheelChallenge is 500+ lines of tested live game logic. Logged to perf-watch.md for a dedicated lane-05/11 pass rather than a blind edit. No .next build present -- bundle diff skipped per time-budget rule.",
+  "date": "2026-08-27",
+  "note": "Impact-check night. Brief IMPACT CHECK item (education-hero eager LCP, 08-17) re-measured IMPROVED: 8460ms baseline -> 2859ms (n=36/14d, still below 50-floor but consistent direction 3 nights running). Backend: supabase MCP did not connect within lane window (3rd consecutive night, 08-25/08-26/08-27) -- backend items unactionable without execute_sql/apply_migration, unchanged from last night. Frontend: brief's multiplayer/singleplayer LCP items were per-room/query-param URLs (n<50 individually); regrouped by route+host instead -- /en/multiplayer now GOOD (2141ms, n=362, first clean >n20 reading) but /es/multiplayer still POOR-adjacent (3378ms, n=154). Code-inspected PageClient.tsx (692 lines): no <img>/next/image on page, confirms LCP element is DOM/socket-driven not image-driven -- same root cause already logged in perf-watch.md (game client/socket handshake as LCP target, needs SSR lobby-skeleton, ~4-6h scoped fix, not same-night). No .next build present -- bundle diff skipped per time-budget rule.",
   "backend": {
-    "mcp_status": "supabase MCP did not connect within lane window (2nd consecutive night, 08-25 + 08-26) -- not used this run",
+    "mcp_status": "supabase MCP did not connect within lane window (3rd consecutive night, 08-25 + 08-26 + 08-27) -- not used this run",
     "auth_db_connections_advisor": "dashboard config toggle, not a code/migration fix -- deferred to human queue, unchanged",
     "unindexed_fk_vocabulary_lessons": "vocabulary_lessons_classroom_id_fkey -- needs EXPLAIN ANALYZE via execute_sql before adding index (hard rule: no speculative indexes); deferred, MCP unavailable"
   },
   "frontend": {
     "impact_checks": [
-      { "verdict_for": "02-perf-2026-08-17-education-hero-lazy-lcp", "verdict": "improved", "measured_p75_lcp_ms": 2608, "n": 43, "baseline": 8460, "window": "30d (7d had n=2, below floor)" }
+      { "verdict_for": "02-perf-2026-08-17-education-hero-lazy-lcp", "verdict": "improved", "measured_p75_lcp_ms": 2859, "n": 36, "baseline": 8460, "window": "14d (below 50-floor, 3rd consecutive improved reading)" }
+    ],
+    "by_route": [
+      { "route": "/en/multiplayer", "p75_lcp": 2141, "n": 362, "window": "7d", "status": "GOOD" },
+      { "route": "/es/multiplayer", "p75_lcp": 3378, "n": 154, "window": "7d", "status": "POOR-adjacent, no prior same-route baseline to delta against" }
     ],
     "brief_routes_diagnosed_deferred": [
-      "en/daily/word-wheel (12280ms LCP) -- CSR-gated behind dynamic()+Suspense, loading fallback itself needs client hydration + LanguageContext resolution before paint; needs SSR-shell fix, not a blind same-night edit. Logged to perf-watch.md."
+      "es/multiplayer + en/singleplayer autoStart=bots (brief items) -- per-query-param URLs below n=50 floor individually; regrouped by route, /es/multiplayer confirmed real (n=154) but root cause is the pre-existing socket-handshake LCP item in perf-watch.md, not a new regression. SSR lobby-skeleton fix still not attempted (692-line live game client, out of scope for a same-night edit)."
     ]
   },
   "bundle": {
