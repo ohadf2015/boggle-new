@@ -12083,6 +12083,13 @@ const es = {
       "playZone": "Jugar",
       "learnZone": "Aprender"
     },
+    "welcome": {
+      "title": "¡Bienvenido a tu aula!",
+      "subtitle": "Elige tu primer desafío",
+      "dailyChallenge": "Prueba el Desafío Diario",
+      "dailyChallengeDesc": "Intenta el juego de palabras de hoy",
+      "rewards": "Gana puntos y construye tu racha"
+    },
     "nav": {
       "profile": "Mi perfil",
       "achievements": "Logros"
@@ -12103,6 +12110,8 @@ const es = {
       "randomLesson": "Lección al Azar",
       "quickDuel": "Duelo Rápido",
       "challengeClassmate": "Reta a un Compañero",
+      "soloPractice": "Practica Solo",
+      "soloPracticeDesc": "Practica en cualquier momento",
       "streakCalendar": "Tu Racha",
       "activity": {
         "wonDuel": "ganó un duelo",
@@ -12314,6 +12323,7 @@ const es = {
         "large": "Grande (6×6)"
       },
       "create": "Crear Aula",
+      "defaultName": "Mi Clase",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",
       "confirmDelete": "¿Eliminar aula? Los estudiantes perderán acceso.",
@@ -13271,6 +13281,10 @@ const es = {
         "button": "Unirme",
         "joining": "Entrando...",
         "pasteButton": "Pegar código",
+        "preview": {
+          "label": "Te unes a:",
+          "confirm": "Este es tu aula"
+        },
         "success": "¡Ya estás dentro!",
         "invalidCode": "Ese código no funciona",
         "alreadyMember": "Ya estás en esta aula",

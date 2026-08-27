@@ -11937,6 +11937,13 @@ const he = {
       "playZone": "שחק",
       "learnZone": "למד"
     },
+    "welcome": {
+      "title": "!ברוך הבא לכיתה שלך",
+      "subtitle": "בחר את האתגר הראשון שלך",
+      "dailyChallenge": "נסה אתגר יומי",
+      "dailyChallengeDesc": "נסה את משחק המילים של היום",
+      "rewards": "צברו נקודות ובנו את הנתיב שלכם"
+    },
     "nav": {
       "profile": "הפרופיל שלי",
       "achievements": "הישגים"
@@ -11970,6 +11977,8 @@ const he = {
       "randomLesson": "שיעור אקראי",
       "quickDuel": "דו קרב מהיר",
       "challengeClassmate": "אתגר חבר לכיתה",
+      "soloPractice": "תרגול בודד",
+      "soloPracticeDesc": "תרגול בכל עת",
       "streakCalendar": "הרצף שלך",
       "activity": {
         "wonDuel": "ניצח בדו קרב",
@@ -12189,6 +12198,7 @@ const he = {
         "large": "גדול (6×6)"
       },
       "create": "צור כיתה",
+      "defaultName": "הכיתה שלי",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",
       "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
@@ -13131,6 +13141,10 @@ const he = {
         "nameLabel": "השם שלך",
         "namePlaceholder": "למשל מאיה",
         "pasteButton": "הדבק",
+        "preview": {
+          "label": "מצטרף אל:",
+          "confirm": "זו הכיתה שלך"
+        },
         "subtitle": "הכנס את הקוד מהמורה",
         "success": "נכנסת!",
         "title": "הצטרף לכיתה"

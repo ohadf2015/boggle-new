@@ -19,6 +19,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { StudentHubPlayZone } from '@/components/student/StudentHubPlayZone';
 import { StudentHubProgressZone } from '@/components/student/StudentHubProgressZone';
 import { StudentHubLearnZone } from '@/components/student/StudentHubLearnZone';
+import { StudentWelcomeSurface } from '@/components/student/StudentWelcomeSurface';
 import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
 import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -138,6 +139,15 @@ export default function StudentPageClient() {
               {t('student.joinClassroom')}
             </Link>
           </m.div>
+        )}
+
+        {/* Welcome Surface (on first classroom join) */}
+        {classroomId && (
+          <StudentWelcomeSurface
+            classroomId={classroomId}
+            userId={user.id}
+            isNewJoin={true}
+          />
         )}
 
         {/* ZONE 1: Play */}

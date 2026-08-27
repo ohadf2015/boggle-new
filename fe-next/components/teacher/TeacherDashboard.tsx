@@ -68,6 +68,7 @@ export default function TeacherDashboard() {
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [openCreateClassroom, setOpenCreateClassroom] = useState(false);
+  const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
@@ -256,9 +257,12 @@ export default function TeacherDashboard() {
               ) : classroomsLoading ? (
                 // Loading: show neutral skeleton
                 <div className="w-full h-24 rounded-neo bg-neo-white/10 border-3 border-black/10 shadow-hard-sm animate-pulse" />
-              ) : classrooms.length === 0 ? (
-                // Empty state: show first-run card
-                <PlayTabFirstRunCard onCreateClassroom={() => setActiveTab('prepare')} />
+              ) : classrooms.length === 0 || newlyCreatedJoinCode ? (
+                // Empty state: show first-run card (or after creation, show join code)
+                <PlayTabFirstRunCard
+                  onJoinCodeCreated={setNewlyCreatedJoinCode}
+                  initialJoinCode={newlyCreatedJoinCode}
+                />
               ) : (
                 // Has classrooms: show students present strip + Start Game CTA
                 <>

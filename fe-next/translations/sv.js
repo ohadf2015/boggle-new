@@ -12319,6 +12319,13 @@ const sv = {
       "playZone": "Spela",
       "learnZone": "Lär dig"
     },
+    "welcome": {
+      "title": "Välkommen till ditt klassrum!",
+      "subtitle": "Välj din första utmaning",
+      "dailyChallenge": "Prova daglig utmaning",
+      "dailyChallengeDesc": "Prova dagens ordspel",
+      "rewards": "Tjäna poäng och bygg din serie"
+    },
     "nav": {
       "profile": "Min profil",
       "achievements": "Prestationer"
@@ -12352,6 +12359,8 @@ const sv = {
       "randomLesson": "Slumpmässig lektion",
       "quickDuel": "Snabb duell",
       "challengeClassmate": "Utmana klasskamrat",
+      "soloPractice": "Solöva",
+      "soloPracticeDesc": "Öva när som helst",
       "streakCalendar": "Din serie",
       "activity": {
         "wonDuel": "vann en duell",
@@ -12571,6 +12580,7 @@ const sv = {
         "large": "Stor (6×6)"
       },
       "create": "Skapa klassrum",
+      "defaultName": "Min klass",
       "edit": "Redigera klassrum",
       "delete": "Ta bort klassrum",
       "confirmDelete": "Ta bort klassrummet? Elever förlorar tillgång.",
@@ -13513,6 +13523,10 @@ const sv = {
         "nameLabel": "Ditt namn",
         "namePlaceholder": "t.ex. Maya",
         "pasteButton": "Klistra",
+        "preview": {
+          "label": "Går med i:",
+          "confirm": "Det här är ditt klassrum"
+        },
         "subtitle": "Fråga din lärare om koden",
         "success": "Du är med!",
         "title": "Gå med i klassrummet"

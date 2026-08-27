@@ -632,6 +632,13 @@ const ru = {
       "playZone": "Играть",
       "learnZone": "Учиться"
     },
+    "welcome": {
+      "title": "Добро пожаловать в свой класс!",
+      "subtitle": "Выбери первый вызов",
+      "dailyChallenge": "Попробуй ежедневный вызов",
+      "dailyChallengeDesc": "Попробуй сегодняшнюю словесную игру",
+      "rewards": "Заработай очки и создай свою серию"
+    },
     "nav": {
       "profile": "Мой профиль",
       "achievements": "Достижения"
@@ -668,6 +675,8 @@ const ru = {
       "randomLesson": "Случайный урок",
       "quickDuel": "Быстрый поединок",
       "challengeClassmate": "Вызвать одноклассника",
+      "soloPractice": "Сольная практика",
+      "soloPracticeDesc": "Практикуйся в любое время",
       "streakCalendar": "Твоя серия",
       "activity": {
         "wonDuel": "выиграл поединок",
@@ -1675,6 +1684,12 @@ const ru = {
       "welcomeBack": "Добро пожаловать",
       "openDashboard": "Открыть панель учителя",
       "createClassroom": "Создать класс",
+      "furtherReading": {
+        "title": "Смотрите также",
+        "guides": "Гайды по стратегии",
+        "glossary": "Словарь игры",
+        "wordSolver": "Помощник по словам"
+      }
     },
     "leaderboard": {
       "allTime": "Всё время",
@@ -1838,6 +1853,10 @@ const ru = {
         "nameLabel": "Твоё имя",
         "namePlaceholder": "например, Майя",
         "pasteButton": "Вставить",
+        "preview": {
+          "label": "Присоединяешься к:",
+          "confirm": "Это твой класс"
+        },
         "subtitle": "Введи код твоего учителя",
         "success": "Ты в классе!",
         "title": "Присоединись к классу"
@@ -9059,6 +9078,7 @@ const ru = {
         "large": "Большая (6×6)"
       },
       "create": "Создать класс",
+      "defaultName": "Мой класс",
       "edit": "Редактировать класс",
       "delete": "Удалить класс",
       "confirmDelete": "Удалить этот класс? Ученики потеряют доступ к урокам.",

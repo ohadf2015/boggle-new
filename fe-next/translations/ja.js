@@ -12081,6 +12081,13 @@ const ja = {
       "playZone": "プレイ",
       "learnZone": "学ぶ"
     },
+    "welcome": {
+      "title": "クラスへようこそ！",
+      "subtitle": "最初のチャレンジを選んでください",
+      "dailyChallenge": "デイリーチャレンジを試す",
+      "dailyChallengeDesc": "今日のワードゲームをやってみる",
+      "rewards": "ポイントを獲得して連続記録を作ろう"
+    },
     "nav": {
       "profile": "マイプロフィール",
       "achievements": "実績"
@@ -12114,6 +12121,8 @@ const ja = {
       "randomLesson": "ランダムレッスン",
       "quickDuel": "クイック決闘",
       "challengeClassmate": "クラスメイトに挑戦",
+      "soloPractice": "ソロ練習",
+      "soloPracticeDesc": "いつでも練習できます",
       "streakCalendar": "連続記録",
       "activity": {
         "wonDuel": "決闘に勝利",
@@ -12333,6 +12342,7 @@ const ja = {
         "large": "大 (6×6)"
       },
       "create": "クラス作成",
+      "defaultName": "私のクラス",
       "edit": "クラス編集",
       "delete": "クラス削除",
       "confirmDelete": "クラスを削除しますか？生徒はレッスンにアクセスできなくなります",
@@ -13262,6 +13272,10 @@ const ja = {
         "nameLabel": "あなたの名前",
         "namePlaceholder": "例: マヤ",
         "pasteButton": "貼り付け",
+        "preview": {
+          "label": "参加先:",
+          "confirm": "このクラスへ参加します"
+        },
         "subtitle": "先生からもらったコードを入力してね",
         "success": "クラスに参加しました！",
         "title": "クラスに参加"

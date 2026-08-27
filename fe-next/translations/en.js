@@ -10666,6 +10666,13 @@ const en = {
       "playZone": "Play",
       "learnZone": "Learn"
     },
+    "welcome": {
+      "title": "Welcome to Your Classroom!",
+      "subtitle": "Choose your first challenge",
+      "dailyChallenge": "Try Daily Challenge",
+      "dailyChallengeDesc": "Try today's word game",
+      "rewards": "Earn points and build your streak"
+    },
     "nav": {
       "profile": "My Profile",
       "achievements": "Achievements"
@@ -10702,6 +10709,8 @@ const en = {
       "randomLesson": "Random Lesson",
       "quickDuel": "Quick Duel",
       "challengeClassmate": "Challenge a Classmate",
+      "soloPractice": "Solo Practice",
+      "soloPracticeDesc": "Practice anytime, anywhere",
       "streakCalendar": "Your Streak",
       "activity": {
         "wonDuel": "won a duel",
@@ -10869,6 +10878,7 @@ const en = {
         "large": "Large (6×6)"
       },
       "create": "Create Classroom",
+      "defaultName": "My Class",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
       "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
@@ -11852,6 +11862,10 @@ const en = {
         "nameLabel": "Your Name",
         "namePlaceholder": "e.g. Maya",
         "pasteButton": "Paste",
+        "preview": {
+          "label": "Joining:",
+          "confirm": "This is your classroom"
+        },
         "subtitle": "Enter your teacher's code",
         "success": "You're in!",
         "title": "Join a Class"
