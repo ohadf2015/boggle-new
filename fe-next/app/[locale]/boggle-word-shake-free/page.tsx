@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import BoggleWordShakeGameClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -114,7 +115,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
           4x4, 5x5, or 6x6 grids with combo scoring for extra challenge.
         </p>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <section className="mb-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={`/${locale}/singleplayer`}
             className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
@@ -134,7 +135,14 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
             Daily Word Wheel
           </Link>
         </section>
+      </div>
 
+      {/* Live playable Boggle Word Shake game — rendered immediately on this URL */}
+      <section aria-label="Play Boggle Word Shake" className="relative flex h-[650px] min-h-[650px] w-full flex-col lg:h-[750px]">
+        <BoggleWordShakeGameClient />
+      </section>
+
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
             How to Play Boggle Word Shake Online
