@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, Zap } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 interface ClassLimitUpsellModalProps {
   isOpen: boolean;
@@ -24,8 +23,6 @@ export default function ClassLimitUpsellModal({
   limit,
 }: ClassLimitUpsellModalProps) {
   const { t, language } = useLanguage();
-  const [isLoading, setIsLoading] = useState(false);
-  const isRTL = language === 'he';
 
   // Track the upgrade surface when modal opens
   useEffect(() => {
@@ -37,27 +34,6 @@ export default function ClassLimitUpsellModal({
       });
     }
   }, [isOpen, currentCount, limit]);
-
-  const handleUpgrade = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/subscription/checkout', {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        toast.error(t('teacher.subscription.checkoutError'));
-        return;
-      }
-
-      const { url } = await response.json();
-      window.location.href = url;
-    } catch (err) {
-      toast.error(t('teacher.subscription.checkoutError'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
@@ -132,13 +108,24 @@ export default function ClassLimitUpsellModal({
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button
-                onClick={handleUpgrade}
-                disabled={isLoading}
-                className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+              {/* This modal used to POST /api/subscription/checkout itself — a second,
+                  degraded copy of the upgrade page's handler that was missing its 401
+                  (sign-in) and 503 (checkout kill switch) branches. With the switch off
+                  the highest-intent teacher in the product got a generic "try again"
+                  toast and retried forever. One checkout implementation, not two that
+                  drift: send them to the page that owns it. */}
+              <Link
+                href={`/${language}/teacher/upgrade`}
+                onClick={() =>
+                  trackGrowthEvent('landing_cta_clicked', {
+                    cta: 'teacher_pro',
+                    source: 'class_limit_modal',
+                  })
+                }
+                className="flex-1 inline-flex items-center justify-center rounded-neo bg-neo-cyan px-4 py-2 text-sm text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
               >
-                {isLoading ? t('common.loading') : t('teacher.subscription.upgradeNow')}
-              </Button>
+                {t('teacher.subscription.upgradeNow')}
+              </Link>
               <Button
                 onClick={onClose}
                 variant="outline"
