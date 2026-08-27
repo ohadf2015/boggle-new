@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import MultiplayerPageClient from './PageClient';
 import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 
@@ -97,16 +96,14 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
           { name: content.title, url: `${origin}/${locale}/multiplayer` },
         ]}
       />
+      {/* No GamePageSeoContent here. The lobby root is `flex-1` inside `body.screen-fit`
+          (min-height:100dvh, flex column): any content-sized sibling pushes the page past
+          the viewport, so flex-grow has no free space left and the lobby renders clipped
+          instead of full-screen. Capping the card at 60dvh (2026-08-08) did not fix that;
+          removed 2026-08-27 on the same report. `content` below still feeds JSON-LD, and
+          the copy has visible homes on /multiplayer-word-game-online, /hebrew-multiplayer-
+          word-game and /free-multiplayer-word-game. Pinned by __tests__/appShellSeoContent. */}
       <MultiplayerPageClient />
-      {/* PageClient is client-only, so the SSR HTML was nav+footer chrome (36 visible
-          words on /en/multiplayer, measured 2026-08-21). The authored per-locale copy
-          below already existed here but only ever reached JSON-LD, never the page.
-          Same remediation as /leaderboard; collapsible so the lobby stays above the fold. */}
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        collapsible
-      />
     </>
   );
 }
