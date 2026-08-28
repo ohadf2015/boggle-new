@@ -276,3 +276,75 @@ Both scout agents overclaimed in their closing summaries. Verified against disk:
 
 Lesson for the next run: a subagent's closing summary is a claim, not evidence.
 Check the artifact.
+
+---
+
+## F7 — THE results-screen bug: a promo interstitial covers the reward (SCORING round)
+
+Captured on a REAL scoring round (90 pts, 8 words), not the empty state.
+`docs/baseline/results-SCORING-mobile-nocookie.png`.
+
+The instant the round ends, a full-screen "GET THE LEXICLASH APP" install modal
+mounts OVER the results screen. Behind it sit the things the player just earned —
+the collected-word chips (`+20`, `SET`, `TEA`, "8 new / 8 collected"), the rank
+bar, the rival table. The player must dismiss an ad to see their own score.
+
+On mobile 390x844 it is worse still: the app interstitial AND the cookie dialog
+stack, and "Round complete / 0%" is clipped at the top edge behind both.
+Dismissing cookies does NOT reveal the results — the app modal remains.
+
+This, not card stacking, is the "bad result screen".
+
+## F8 — The score contradicts itself four ways on the same screen
+
+Same round: **90 pts, 8 / 500 words found**. The screen simultaneously says:
+- hero: **"0%" of perfect**
+- rank: **"+0 rank points this round"**
+- rivals: **"Passed 0 of 3"**, with You at **0%**, last behind 66% / 35% / 1%
+
+So a player who found 8 words and scored 90 is told, in four places, that they
+scored nothing. The percentage is score ÷ perfect-score-over-ALL-solvable-words
+(500 here, 276 on another board), so any realistic 60-second round rounds to 0%.
+The denominator makes the headline number structurally incapable of rewarding.
+
+Rivals are on the same broken scale yet show 66% / 35%, which implies the ghost
+rivals are NOT scored against the same denominator the player is. Worth checking:
+if ghosts get a percentile and the human gets score/perfect, the comparison is
+not like-for-like and the player is guaranteed to look last.
+
+## Verified-capture discipline note
+My own first mobile capture was a byte-identical duplicate of the desktop one —
+`agent-browser`'s viewport command is `set viewport <w> <h>`, not `viewport`, and
+the bare form fails with "Unknown command" while the screenshot still succeeds at
+the old size. Always assert `window.innerWidth` before trusting a viewport label.
+The earlier "desktop 1440x900" captures were actually 1280x633.
+
+## All four modes DO load (correcting the earlier "not testable" claim)
+
+Each mode reaches its own stage from the hub. The earlier report that Blast /
+Hunt / Wheel could not be driven was wrong — they load fine:
+- `quick-stage-blast` — 6x6 board, specials, "CLOSE RACE" rival panel, timer 0:55
+- `quick-stage-word-hunt` — grid + "these letters 100/100"
+- `quick-stage-wheel-rush` — letter ring, SUBMIT, "FOUND WORDS (0)"
+Captures: `docs/baseline/mode-{blast,word-hunt,wheel-rush}-desktop.png`.
+
+## F9 — Blast calls a 2,340-point gap a "CLOSE RACE"
+
+`mode-blast-desktop.png`. The rival panel is headed **CLOSE RACE** while showing:
+1 Boggle Buddy 2,340 (+2340 to catch) · 2 Tiny Thinker 1,273 · 3 אוהד 34 · 4 you 0.
+
+Two problems:
+- Calling a 2,340-vs-0 gap "close" is not credible, and it is the same dishonesty
+  as the Classic results screen insisting 90 points is 0%. The player is told the
+  race is close while being shown they are hopelessly last.
+- The ghost scores are not plausible against each other: 2,340 and 1,273 next to
+  34 is two orders of magnitude apart inside one 60-second round. Ghost rival
+  score generation for blast looks unscaled. (Related known history: ghost rivals
+  have been generated from per-round seeds before and shipped wrong.)
+
+## F10 — Blast's special-tile tooltip covers the board while the clock runs
+
+Same capture, timer already at 0:55: a "Rainbow — copies the best special in your
+word and doubles it" tooltip is overlaid across the TOP ROW of the grid, hiding
+four tiles including a special. It is not modal and the round has started, so the
+player loses board real estate and time to an explainer.
