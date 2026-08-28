@@ -42,7 +42,7 @@ interface PageProps {
 }
 
 const titleMap: Record<string, string> = {
-  en: 'Play Free Multiplayer Word Games Online — LexiClash 2026',
+  en: 'Play Boggle Online Free — Multiplayer Word Game | LexiClash',
   he: 'משחקי מילים אונליין · מרובה משתתפים בעברית חינם | LexiClash',
   sv: 'Spela Gratis Ordspel Online — Multiplayer | LexiClash',
   ja: '無料オンラインワードゲーム｜友達と対戦・日本語対応 LexiClash',
@@ -60,7 +60,7 @@ const keywordsMap: Record<string, string> = {
 };
 
 const descriptionMap: Record<string, string> = {
-  en: 'Free multiplayer word game — no signup, no download. Real-time Boggle-style battles, daily word wheel, 6 modes, 5 languages. Play in browser. Start now →',
+  en: 'Play Boggle online free with friends — no signup, no download. Real-time word battles, daily word wheel, 6 modes. Play in browser. Start now →',
   he: 'משחק מילים מרובה משתתפים חינם בעברית — ללא הורדה. בוגל בזמן אמת עם חברים, גלגל מילים יומי, 6 מצבי משחק, 10,000+ מילים. שחק עכשיו בדפדפן ←',
   sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids ordstrider, dagligt ordhjul, 6 spellägen, 5 språk. Som Alfapet möter Boggle. Spela nu →',
   ja: '友達と無料マルチプレイヤーワードゲーム — 登録不要・ダウンロード不要。リアルタイム単語バトル、毎日のワードホイール、6モード、5言語対応。今すぐブラウザで開始 →',
