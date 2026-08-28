@@ -12,8 +12,14 @@ import topPaths from './fixtures/top-paths.json';
  *
  * Re-generate the fixture whenever traffic shifts; the test list follows it with no code change.
  *
- * Against production:
- *   CI=1 E2E_BASE_URL=https://www.lexiclash.live npx playwright test top-paths --project=chromium
+ * Against production: `npm run test:e2e:prod`.
+ *
+ * Standing result, 2026-08-28: 12 of 14 pass. `/es` and `/es/multiplayer` — 217 sessions between
+ * them, the Spanish landing and the Spanish multiplayer entry — throw React #418, a hydration
+ * mismatch (`args[]=text` and `args[]=HTML`). Not a test artefact: PostHog error tracking has the
+ * same minified #418 as its top active issue, 12 occurrences over 4 sessions since 2026-08-22. It
+ * is intermittent — an earlier run of this same file passed all 14 — which is exactly why it wants
+ * a suite rather than a spot check.
  */
 
 /**
@@ -31,13 +37,18 @@ const IGNORED_ERRORS = [
 const isOurs = (message: string) => !IGNORED_ERRORS.some((re) => re.test(message));
 
 /**
- * Serial, with a 90s budget, because of what the first run measured rather than by preference:
- * against production these 14 pages ALL time out at the default 30s with 4 workers, and all 14 pass
- * one at a time. Cold TTFB on `/` was 33.7s in the same window (`/en` 2.0s, `/en/multiplayer` 2.9s),
- * so the single Railway instance cannot serve four concurrent page loads — that is a capacity
- * finding, not a flake, and it is why this file must not be parallelised back.
+ * Budget, and why it is generous: the first run against production timed out 12 of these 14 pages
+ * at Playwright's default 30s with 4 workers. The cause is COLD START, not a concurrency ceiling —
+ * measured both ways: first byte on a cold `/` took 33.7s, while four concurrent requests against a
+ * warm instance all returned 200 in 0.85s. A parallel run is simply four browsers queued behind one
+ * cold boot. So the suite runs one page at a time (`--workers=1` in `npm run test:e2e:prod`) and
+ * allows 90s, which absorbs a cold boot without hiding a genuinely broken page.
+ *
+ * Deliberately NOT `describe.configure({ mode: 'serial' })`: serial mode SKIPS every later test in
+ * the group once one fails, which would turn "3 of my top paths are broken" into "1 broken, 13
+ * unknown". A smoke suite exists to report the whole list.
  */
-test.describe.configure({ mode: 'serial', timeout: 90_000 });
+test.describe.configure({ timeout: 90_000 });
 
 test.describe('top real-traffic paths', () => {
   for (const { path, sessions } of topPaths.paths) {
