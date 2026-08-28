@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-08-28T08:58:07.215Z",
+  "source": "umami:lexiclash.live",
+  "window_days": 30,
+  "paths": [
+    {
+      "path": "/en/multiplayer",
+      "sessions": 240,
+      "hits": 499
+    },
+    {
+      "path": "/en",
+      "sessions": 166,
+      "hits": 369
+    },
+    {
+      "path": "/es/multiplayer",
+      "sessions": 128,
+      "hits": 263
+    },
+    {
+      "path": "/en/singleplayer",
+      "sessions": 117,
+      "hits": 142
+    },
+    {
+      "path": "/es/juego-de-palabras-multijugador",
+      "sessions": 92,
+      "hits": 161
+    },
+    {
+      "path": "/es",
+      "sessions": 89,
+      "hits": 175
+    },
+    {
+      "path": "/en/play-boggle-online-free",
+      "sessions": 89,
+      "hits": 134
+    },
+    {
+      "path": "/",
+      "sessions": 82,
+      "hits": 131
+    },
+    {
+      "path": "/es/singleplayer",
+      "sessions": 58,
+      "hits": 81
+    },
+    {
+      "path": "/en/online-word-games-with-friends",
+      "sessions": 40,
+      "hits": 55
+    },
+    {
+      "path": "/en/education/access",
+      "sessions": 39,
+      "hits": 92
+    },
+    {
+      "path": "/he",
+      "sessions": 37,
+      "hits": 76
+    },
+    {
+      "path": "/he/daily",
+      "sessions": 31,
+      "hits": 73
+    },
+    {
+      "path": "/en/daily",
+      "sessions": 29,
+      "hits": 74
+    }
+  ]
+}

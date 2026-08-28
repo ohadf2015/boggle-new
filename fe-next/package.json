@@ -86,7 +86,8 @@
     "render:cinematic": "npx tsx scripts/render-cinematics.ts",
     "enrich:dictionary": "tsx scripts/enrich-hebrew-dictionary.ts",
     "enrich:dictionary:verify": "tsx scripts/enrich-hebrew-dictionary.ts --verify-only",
-    "enrich:dictionary:promote": "tsx scripts/enrich-hebrew-dictionary.ts --promote-only"
+    "enrich:dictionary:promote": "tsx scripts/enrich-hebrew-dictionary.ts --promote-only",
+    "test:e2e:prod": "CI=1 E2E_BASE_URL=${E2E_BASE_URL:-https://www.lexiclash.live} playwright test top-paths --project=chromium --workers=1 --retries=0"
   },
   "dependencies": {
     "@arvidbt/swedish-words": "^1.0.6",
