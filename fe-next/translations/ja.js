@@ -12204,6 +12204,9 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "proGate": {
+      "cta": "Pro で解除 — 月額 ${{price}}"
+    },
     "subscription": {
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
@@ -12250,6 +12253,14 @@ const ja = {
       "districtTitle": "学校または学区ですか？",
       "districtSubtitle": "複数の教師や教室を管理していますか？学校や学区向けに柔軟な料金プランをご用意しています。",
       "districtCta": "学校向け料金についてお問い合わせ",
+      "checkoutUnavailable": "現在お支払いを受け付けていません。請求は発生していません。しばらくしてからお試しください。",
+      "featureOutcome1": "担当するクラスをすべて運営（上限なし）",
+      "featureOutcome2": "最初の10人だけでなく、名簿全員を追加",
+      "featureOutcome3": "誰がどの単語でつまずいているかリアルタイムで把握",
+      "featureOutcome4": "すべてのクラスの進捗を比較",
+      "priceTaxNote": "お支払い時に税が加算される場合があります。",
+      "proHeroAlt": "生徒が席からプレイする中、教師が黒板のライブ順位表を見ている様子。",
+      "valueHeadline": "クラス無制限、生徒無制限、進捗はリアルタイム。",
       "matrix": {
         "title": "プラン比較",
         "featureColumn": "機能",
@@ -12315,6 +12326,8 @@ const ja = {
       "insights": "インサイト",
       "viewReports": "レポートを見る",
       "viewReportsDesc": "クラスの詳細なレポートと分析を表示",
+      "studentsPresentTitle": "いま {classroom} に {count} 人の生徒がいます",
+      "studentsPresentDescription": "ゲームを始めればそのまま参加します。",
       "tab": {
         "play": "プレイ",
         "prepare": "準備",
@@ -12919,6 +12932,10 @@ const ja = {
     "home": {
       "badge_teacher": "先生",
       "badge_student": "クラス",
+      "badge_promo": "クラスモード",
+      "promo_title": "LexiClash で授業を — 無料",
+      "promo_subtitle": "クラスで単語ゲーム。自分の単語リストを作り、誰がつまずいているかも分かります。",
+      "promo_cta": "クラスモードを見る",
       "teacher_title": "クラスの準備ができました",
       "teacher_subtitle": "クラスを作成し、ゲームを割り当て、生徒の進捗を確認しましょう。",
       "teacher_cta": "先生ダッシュボードを開く",
@@ -12978,7 +12995,7 @@ const ja = {
       "hero": {
         "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語対応",
         "h1": "教室向けの語彙ゲーム — 生徒のログイン不要。",
-        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。5言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
+        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。{count}言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
         "cta_primary": "先生アクセスを申請する",
         "cta_secondary": "デモを見る",
         "cta_note": "無料プランで開始 • 約24時間で承認",
@@ -13282,6 +13299,7 @@ const ja = {
     "student": {
       "join": {
         "alreadyMember": "すでにこのクラスのメンバーです",
+        "classroomFull": "このクラスは満員です。先生に空きを作ってもらってください。",
         "button": "クラスに参加",
         "clipboardError": "クリップボードを読み取れませんでした",
         "codeHint": "6文字のクラスコードを先生に聞いてね",
@@ -13362,7 +13380,9 @@ const ja = {
     "lesson": {
       "creationFailed": "レッスンを作成できませんでした。もう一度お試しください。",
       "created": "レッスンが正常に作成されました！",
-      "preferCustom": "または、独自のカスタム語彙リストを作成します："
+      "preferCustom": "または、独自のカスタム語彙リストを作成します：",
+      "word": "語",
+      "words": "語"
     },
     "teacher": {
       "activeGames": "今プレイ中のゲーム",
@@ -13480,6 +13500,8 @@ const ja = {
       "submitted_on": "申請日時",
       "already_approved_title": "認可済みです。さあ始めましょう！",
       "go_to_teacher": "ダッシュボードへ",
+      "status_unknown_title": "アクセス状況を読み取れませんでした",
+      "status_unknown_body": "こちら側で問題が発生しました。ティーチャーダッシュボードを開くか、ページを再読み込みしてもう一度お試しください。",
       "auth_required_title": "教師アクセスの申請には登録が必要です",
       "auth_required_body": "教師アクセスは認証済みアカウントに紐づきます。無料アカウントを作成するかログインすると、このまま続けられます。",
       "auth_required_cta": "登録またはログイン",

@@ -10840,6 +10840,8 @@ const en = {
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
       "viewReportsDesc": "View detailed reports and analytics for your classrooms",
+      "studentsPresentTitle": "{count} students are in {classroom} right now",
+      "studentsPresentDescription": "Start a game and they drop straight in.",
       "tab": {
         "play": "Play",
         "prepare": "Prepare",
@@ -11236,6 +11238,9 @@ const en = {
       "standard": "Curriculum Standard",
       "lastUpdated": "Last Updated"
     },
+    "proGate": {
+      "cta": "Unlock this with Pro — ${{price}}/month"
+    },
     "subscription": {
       "classLimitTitle": "You've Reached Your Class Limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
@@ -11282,6 +11287,14 @@ const en = {
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
       "districtCta": "Get in touch for school pricing",
+      "checkoutUnavailable": "Checkout is closed right now — nothing was charged. Please try again shortly.",
+      "featureOutcome1": "Run every class you teach — no cap",
+      "featureOutcome2": "Add the whole roster, not the first ten",
+      "featureOutcome3": "See who is stuck, word by word, live",
+      "featureOutcome4": "Compare progress across all your classes",
+      "priceTaxNote": "Taxes may be added at checkout.",
+      "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
+      "valueHeadline": "Unlimited classes, unlimited students, live progress.",
       "matrix": {
         "title": "Compare plans",
         "featureColumn": "Feature",
@@ -11495,6 +11508,10 @@ const en = {
     "home": {
       "badge_teacher": "Teacher",
       "badge_student": "Classroom",
+      "badge_promo": "Classroom mode",
+      "promo_title": "Teach with LexiClash — free",
+      "promo_subtitle": "Run word games with your class, set your own word lists, see who is stuck.",
+      "promo_cta": "See classroom mode",
       "teacher_title": "Your classroom is ready",
       "teacher_subtitle": "Create classes, assign games, and track student progress.",
       "teacher_cta": "Open teacher dashboard",
@@ -11554,7 +11571,7 @@ const en = {
       "hero": {
         "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Approved in ~24h",
@@ -11875,11 +11892,14 @@ const en = {
     "lesson": {
       "creationFailed": "Couldn't create lesson. Please try again.",
       "created": "Lesson created successfully!",
-      "preferCustom": "Or create your own custom vocabulary list:"
+      "preferCustom": "Or create your own custom vocabulary list:",
+      "word": "word",
+      "words": "words"
     },
     "student": {
       "join": {
         "alreadyMember": "Already in this class!",
+        "classroomFull": "This class is full — ask your teacher to make room.",
         "button": "Join",
         "clipboardError": "Couldn't read clipboard",
         "codeHint": "6 characters from your teacher",
@@ -12058,6 +12078,8 @@ const en = {
       "submitted_on": "Submitted",
       "already_approved_title": "You already have teacher access.",
       "go_to_teacher": "Open Teacher Dashboard",
+      "status_unknown_title": "We couldn't read your access status",
+      "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Sign up or sign in",

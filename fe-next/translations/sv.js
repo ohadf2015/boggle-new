@@ -12442,6 +12442,9 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
+    "proGate": {
+      "cta": "Lås upp med Pro — ${{price}}/månad"
+    },
     "subscription": {
       "classLimitTitle": "Du har nått din klassgräns",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
@@ -12488,6 +12491,14 @@ const sv = {
       "districtTitle": "Skola eller kommun?",
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
       "districtCta": "Kontakta oss för skolpriser",
+      "checkoutUnavailable": "Kassan är stängd just nu — inget har debiterats. Försök igen om en stund.",
+      "featureOutcome1": "Kör alla klasser du undervisar, utan tak",
+      "featureOutcome2": "Lägg till hela klasslistan, inte bara de tio första",
+      "featureOutcome3": "Se vem som fastnar, ord för ord, i realtid",
+      "featureOutcome4": "Jämför framsteg över alla dina klasser",
+      "priceTaxNote": "Moms kan tillkomma i kassan.",
+      "proHeroAlt": "En lärare tittar på klassens live-topplista på tavlan medan eleverna spelar från sina platser.",
+      "valueHeadline": "Obegränsade klasser, obegränsade elever, framsteg i realtid.",
       "matrix": {
         "title": "Jämför planer",
         "featureColumn": "Funktion",
@@ -12553,6 +12564,8 @@ const sv = {
       "insights": "INSIKTER",
       "viewReports": "Visa rapporter",
       "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum",
+      "studentsPresentTitle": "{count} elever är i {classroom} just nu",
+      "studentsPresentDescription": "Starta ett spel så hoppar de rakt in.",
       "tab": {
         "play": "Spela",
         "prepare": "Förbered",
@@ -13157,6 +13170,10 @@ const sv = {
     "home": {
       "badge_teacher": "Lärare",
       "badge_student": "Klassrum",
+      "badge_promo": "Klassläge",
+      "promo_title": "Undervisa med LexiClash — gratis",
+      "promo_subtitle": "Kör ordspel med klassen, gör egna ordlistor och se vem som fastnar.",
+      "promo_cta": "Se klassläget",
       "teacher_title": "Ditt klassrum är redo",
       "teacher_subtitle": "Skapa klasser, tilldela spel och följ elevernas framsteg.",
       "teacher_cta": "Öppna lärarpanelen",
@@ -13216,7 +13233,7 @@ const sv = {
       "hero": {
         "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
         "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
-        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
         "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
@@ -13536,11 +13553,14 @@ const sv = {
     "lesson": {
       "creationFailed": "Kunde inte skapa lektionen. Försök igen.",
       "created": "Lektionen skapades framgångsrikt!",
-      "preferCustom": "Eller skapa din egen anpassade ordlista:"
+      "preferCustom": "Eller skapa din egen anpassade ordlista:",
+      "word": "ord",
+      "words": "ord"
     },
     "student": {
       "join": {
         "alreadyMember": "Du är redan med i den här klassen",
+        "classroomFull": "Klassen är full — be din lärare göra plats.",
         "button": "Gå med",
         "clipboardError": "Kunde inte läsa urklipp",
         "codeHint": "6 bokstäver från din lärare",
@@ -13718,6 +13738,8 @@ const sv = {
       "submitted_on": "Skickad",
       "already_approved_title": "Du är redan godkänd!",
       "go_to_teacher": "Till lärarpanelen",
+      "status_unknown_title": "Vi kunde inte läsa din åtkomststatus",
+      "status_unknown_body": "Något gick fel hos oss. Öppna lärarpanelen eller ladda om sidan för att kolla igen.",
       "auth_required_title": "Registrera dig för att ansöka om läraråtkomst",
       "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",
       "auth_required_cta": "Registrera dig eller logga in",
