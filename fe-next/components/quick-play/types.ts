@@ -10,6 +10,9 @@ export type QuickMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
 
 export const QUICK_MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 
+/** Duration of quick play rounds in seconds. Source of truth: backend/modules/quickPlayRound.ts */
+export const QUICK_ROUND_SECONDS = 60;
+
 export interface QuickWheelPuzzle {
   centerLetter: string;
   outerLetters: string[];

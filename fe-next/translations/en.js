@@ -7890,6 +7890,11 @@ const en = {
   },
   "quickPlay": {
 "solo": {
+      "durationLabel": "Duration",
+      "durationUnit": "seconds",
+      "wordBreakdown": "Score breakdown",
+      "wordDetails": "Word details",
+      "totalWords": "{count} words",
       "title": "Quick Play",
       "round": "Round",
       "random": "Random",
@@ -10859,6 +10864,8 @@ const en = {
         "large": "Large (6×6)"
       },
       "create": "Create Classroom",
+      "createAnother": "Create Another Classroom",
+      "creating": "Creating...",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
       "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
@@ -10874,7 +10881,8 @@ const en = {
       "noMembers": "No students yet",
       "settingUp": "Setting up your classroom...",
       "language": "Language",
-      "created": "Created {{date}}",
+      "created": "{{classroomName}} created! Share the code to get started.",
+      "shareCode": "Share this code with your students",
       "noClassrooms": "No classrooms yet",
       "createFirst": "Create your first classroom to get started",
       "validation": {
@@ -10888,11 +10896,21 @@ const en = {
       "error": {
         "createFailed": "Failed to create classroom",
         "updateFailed": "Failed to update classroom",
-        "deleteFailed": "Failed to delete classroom"
+        "deleteFailed": "Failed to delete classroom",
+        "copyFailed": "Failed to copy code. Please try again."
       },
       "dialog": {
         "createDescription": "Create a new classroom with name and language settings",
         "editDescription": "Edit classroom name and language settings"
+      },
+      "presenter": {
+        "present": "Present",
+        "visitUrl": "Visit:",
+        "orEnterCode": "Or enter code:",
+        "scanQr": "Scan QR code:",
+        "shareTip": "Share this code with your students via Google Classroom, email, or text message",
+        "pressEscape": "Press ESC to exit",
+        "exit": "Exit Presentation"
       }
     },
     "classrooms": {

@@ -26,8 +26,9 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ModeGlyph } from './ModeGlyph';
+import { RandomGlyph } from './RandomGlyph';
 import { NODE_COLORS } from './modeColors';
-import type { QuickMode } from './types';
+import { QUICK_ROUND_SECONDS, type QuickMode } from './types';
 import type { WheelSelection } from './wheelGeometry';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
@@ -119,12 +120,36 @@ export function QuickPlayModePicker({
     }
   }, [focusedIndex]);
 
+  // Prefers-reduced-motion check
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
+
   return (
     <div
       ref={containerRef}
       className="relative mx-auto flex w-full max-w-5xl flex-col gap-3 px-3 py-4 sm:gap-4 sm:px-4 sm:py-6"
       data-testid="quick-play-mode-picker"
     >
+      {/* Duration banner — shared across all four modes. Neo-brutalist
+          with bold numeral: hard-shadowed slab in the hero's color. */}
+      <div
+        className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy-elevated px-3 py-2 sm:px-4 sm:py-3"
+        data-testid="duration-banner"
+        id={`${uid}-duration`}
+      >
+        <span className="font-neo-body text-sm text-neo-cream sm:text-base">
+          {t('quickPlay.solo.durationLabel')}
+        </span>
+        <span className="font-neo-display text-xl font-bold text-neo-lime shadow-hard-sm sm:text-2xl">
+          {QUICK_ROUND_SECONDS}
+        </span>
+        <span className="font-neo-body text-sm text-neo-cream sm:text-base">
+          {t('quickPlay.solo.durationUnit')}
+        </span>
+      </div>
+
       {/* Both topologies tile exactly: 2×2 below lg, 4×2 at lg+ (hero 2×2,
           two 1×1 siblings on the top-right, Wheel 2×1 across the bottom). */}
       <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -134,6 +159,9 @@ export function QuickPlayModePicker({
           const isSelected = selection === mode;
           const isPending = pendingMode === mode;
           const isSiblingDimmed = isLoading && !isPending;
+
+          // Staggered entrance animation delay
+          const animationDelay = prefersReducedMotion ? undefined : idx * 60; // 0ms, 60ms, 120ms, 180ms
 
           return (
             <button
@@ -147,14 +175,20 @@ export function QuickPlayModePicker({
               // whole reason a first-timer can tell these modes apart — was
               // announced to nobody.
               aria-labelledby={`${uid}-${mode}-name`}
-              aria-describedby={`${uid}-${mode}-blurb`}
+              aria-describedby={`${uid}-${mode}-blurb ${uid}-duration`}
               data-testid={`mode-card-${mode}`}
+              style={
+                animationDelay !== undefined
+                  ? { animationDelay: `${animationDelay}ms` }
+                  : undefined
+              }
               className={`
                 group relative flex min-h-[9rem] min-w-0 flex-col items-start justify-between gap-3 overflow-hidden rounded-neo border-neo-thick border-black text-start transition-all duration-200
                 ${mode === HERO ? 'lg:justify-center lg:gap-5' : ''}
+                ${mode === HERO || mode === 'wheel-rush' ? 'col-span-2' : ''}
                 ${GRID_SPANS[mode]}
                 p-3 sm:p-4 lg:p-5
-                ${colors.bg} shadow-hard
+                ${colors.bg} shadow-hard animate-neo-pop
                 ${isPending ? 'ring-4 ring-white ring-offset-2 ring-offset-black' : ''}
                 ${isSiblingDimmed ? 'opacity-50' : 'opacity-100'}
                 ${!isLoading ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-hard-lg motion-reduce:hover:translate-y-0' : ''}
@@ -194,7 +228,8 @@ export function QuickPlayModePicker({
       </div>
 
       {/* Random — a secondary bar the width of the grid, so the composition
-          closes instead of trailing off into a floating centred pill. */}
+          closes instead of trailing off into a floating centred pill. Has glyph
+          parity with the mode cards: keycap + name + blurb, same styling language. */}
       <button
         onClick={handleRandomClick}
         onKeyDown={(e) => handleKeyDown(e, MODES.length)}
@@ -203,16 +238,25 @@ export function QuickPlayModePicker({
         aria-describedby={`${uid}-random-blurb`}
         data-testid="random-button"
         className={`
-          group flex w-full min-w-0 flex-col items-start gap-0.5 rounded-neo border-2 border-black bg-neo-navy-elevated px-4 py-3 text-start text-neo-cream transition-all duration-200 sm:flex-row sm:items-baseline sm:gap-3 sm:px-5
-          ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-neo-navy-light'}
-          focus:outline-none focus:ring-2 focus:ring-neo-cream focus:ring-offset-2 focus:ring-offset-black active:shadow-hard-pressed
+          group flex w-full min-w-0 flex-col items-start gap-3 rounded-neo border-neo border-black bg-neo-navy-elevated text-start transition-all duration-200 sm:flex-row sm:items-center sm:gap-4 p-3 sm:p-4
+          ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-hard-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0'}
+          active:shadow-hard-pressed active:translate-y-0
+          focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-black
         `}
       >
-        <span id={`${uid}-random-name`} className="font-neo-display text-sm font-semibold tracking-wide sm:text-base">
-          {t('quickPlay.solo.random')}
+        {/* Glyph keycap — matches mode card styling */}
+        <span className="flex flex-shrink-0 items-center justify-center rounded-[6px] border-2 border-black bg-black/10 p-1.5 text-black transition-transform duration-200 group-active:scale-95">
+          <RandomGlyph size={40} className="h-9 w-9 sm:h-10 sm:w-10" />
         </span>
-        <span id={`${uid}-random-blurb`} className="font-neo-body text-[11px] font-normal text-neo-cream/75 sm:text-xs">
-          {t('quickPlay.solo.blurb.random')}
+
+        {/* Name + promise */}
+        <span className="flex min-w-0 flex-col gap-0.5">
+          <span id={`${uid}-random-name`} className="font-neo-display font-bold tracking-wide text-neo-cream text-sm sm:text-base">
+            {t('quickPlay.solo.random')}
+          </span>
+          <span id={`${uid}-random-blurb`} className="font-neo-body font-normal leading-snug text-neo-cream text-[11px] sm:text-sm max-w-[38ch] break-words">
+            {t('quickPlay.solo.blurb.random')}
+          </span>
         </span>
       </button>
     </div>

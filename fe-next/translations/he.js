@@ -9080,6 +9080,11 @@ const he = {
   },
   "quickPlay": {
     "solo": {
+      "durationLabel": "משך",
+      "durationUnit": "שניות",
+      "wordBreakdown": "פירוט הניקוד",
+      "wordDetails": "פרטי המילים",
+      "totalWords": "{count} מילים",
       "title": "משחק מהיר",
       "round": "סיבוב",
       "random": "אקראי",
@@ -12179,6 +12184,8 @@ const he = {
         "large": "גדול (6×6)"
       },
       "create": "צור כיתה",
+      "createAnother": "צור כיתה נוספת",
+      "creating": "יוצר...",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",
       "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
@@ -12194,7 +12201,8 @@ const he = {
       "noMembers": "אין תלמידים עדיין",
       "settingUp": "מכין את הכיתה שלך...",
       "language": "שפה",
-      "created": "נוצר ב-{{date}}",
+      "created": "{{classroomName}} נוצרה! שתף את הקוד כדי להתחיל.",
+      "shareCode": "שתף את הקוד הזה עם התלמידים שלך",
       "noClassrooms": "אין כיתות עדיין",
       "createFirst": "צרו את הכיתה הראשונה שלכם",
       "validation": {
@@ -12213,6 +12221,15 @@ const he = {
       "dialog": {
         "createDescription": "צור כיתה חדשה עם שם והגדרות שפה",
         "editDescription": "ערוך שם כיתה והגדרות שפה"
+      },
+      "presenter": {
+        "present": "הצג על המסך",
+        "visitUrl": "בקר ב:",
+        "orEnterCode": "או הזן קוד:",
+        "scanQr": "סרוק קוד QR:",
+        "shareTip": "שתוף קוד זה עם התלמידים שלך דרך Google Classroom, דוא״ל או SMS",
+        "pressEscape": "לחץ ESC כדי לצאת",
+        "exit": "יציאה מההצגה"
       }
     },
     "classrooms": {

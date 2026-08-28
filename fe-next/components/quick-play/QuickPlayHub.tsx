@@ -19,6 +19,7 @@ import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
+import { resolveQuickAvatar } from './quickAvatar';
 import { BackButton } from '@/components/ui/BackButton';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
@@ -75,6 +76,13 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const submitting = useRef(false);
   const loadingRef = useRef(false);
   const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
+  // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
+  // If an adapter timer fires onQuit after the game has ended (phase !== 'playing'),
+  // the call should be ignored so results don't auto-dismiss.
+  const phaseRef = useRef<HubPhase>('wheel');
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   // Phase changes swap the whole screen with no page navigation, so screen
   // readers get no automatic signal and sighted keyboard focus is stranded
@@ -271,9 +279,10 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             theirValue: challenge.challengerScorePct,
             myValue: r.scorePct,
             type: 'challenge',
-            // Deterministic avatar from the challenge id so the rival reads as a
-            // real player, not a bare target emoji.
+            // Real player ID for the avatar — seed a deterministic config if
+            // the server didn't provide a custom_avatar (both methods render as "custom")
             avatarUserId: challenge.id,
+            avatarConfig: null,
           });
           if (r.scorePct > challenge.challengerScorePct) {
             posthog.capture('quick_play_rival_beaten', { mode: r.mode, rivalType: 'challenge' });
@@ -319,8 +328,14 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
    * Back to the wheel — unless the player already named the mode they want on
    * the results screen, in which case that choice IS the decision and a trip
    * through the picker is a tax on it.
+   *
+   * Guard: onQuit calls from adapters should only work during gameplay. If the
+   * adapter's timer fires after results appear (phase !== 'playing'), ignore it
+   * so results don't auto-dismiss while the player is reading their score.
    */
   const handleNextRound = useCallback((mode?: QuickMode) => {
+    // Ignore stale quit calls after the game ends.
+    if (!mode && phaseRef.current !== 'playing') return;
     setRoundIndex((i) => i + 1);
     setConfig(null);
     setResult(null);

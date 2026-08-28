@@ -335,7 +335,10 @@ describe('QuickPlayModePicker', () => {
     for (const mode of ['classic', 'blast', 'word-hunt', 'wheel-rush'] as QuickMode[]) {
       const card = screen.getByTestId(`mode-card-${mode}`);
       expect(card).toHaveAccessibleName(`quickPlay.solo.mode.${mode}`);
-      expect(card).toHaveAccessibleDescription(`quickPlay.solo.blurb.${mode}`);
+      // Description now includes both the blurb AND the duration
+      const description = card.getAttribute('aria-describedby') ?? '';
+      expect(description).toContain(`${mode}-blurb`);
+      expect(description).toContain('duration');
     }
     const random = screen.getByTestId('random-button');
     expect(random).toHaveAccessibleName('quickPlay.solo.random');
@@ -355,5 +358,71 @@ describe('QuickPlayModePicker', () => {
       />
     );
     expect(screen.queryByTestId('quick-picker-bottom-spacer')).toBeNull();
+  });
+
+  /**
+   * Duration tests — all four modes are 60 seconds.
+   * (a) Duration appears once on the grid, not four times (one badge per card).
+   * (b) Each card's aria-describedby includes the duration announcement.
+   */
+
+  it('displays a duration banner above the grid showing "60 seconds"', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    const banner = screen.getByTestId('duration-banner');
+    expect(banner).toBeInTheDocument();
+    // The duration number "60" appears in the banner
+    expect(banner.textContent).toContain('60');
+  });
+
+  it('each mode card includes duration in its aria-describedby', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    const modes: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
+    for (const mode of modes) {
+      const card = screen.getByTestId(`mode-card-${mode}`);
+      const describedBy = card.getAttribute('aria-describedby') ?? '';
+      expect(describedBy).toMatch(/duration/i);
+    }
+  });
+
+  it('each mode card announces blurb + duration together', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    const modes: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
+    for (const mode of modes) {
+      const card = screen.getByTestId(`mode-card-${mode}`);
+      const description = card.getAttribute('aria-describedby') ?? '';
+      // Should have at least two space-separated IDs: the blurb and the duration
+      const ids = description.split(/\s+/).filter(Boolean);
+      expect(ids.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('duration announcement contains "60"', () => {
+    render(
+      <QuickPlayModePicker
+        selection="random"
+        pendingMode={null}
+        onSelect={handlePlay}
+      />
+    );
+    const durationElement = screen.getByTestId('duration-banner');
+    expect(durationElement.textContent).toContain('60');
   });
 });

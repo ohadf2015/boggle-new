@@ -9463,6 +9463,11 @@ const sv = {
   },
   "quickPlay": {
     "solo": {
+      "durationLabel": "Speltid",
+      "durationUnit": "sekunder",
+      "wordBreakdown": "Poänguppdelning",
+      "wordDetails": "Orddetaljer",
+      "totalWords": "{count} ord",
       "title": "Snabbspel",
       "round": "Runda",
       "random": "Slumpa",
@@ -9473,11 +9478,11 @@ const sv = {
       "subCaption": "60 sekunder · tre rivaler · du mot det perfekta resultatet",
       "loading": "Bygger din bräda…",
       "blurb": {
-        "classic": "Dra streck mellan bokstäverna och bygg ord. Längre ord ger mer poäng.",
-        "blast": "Kedja ihop bokstäver och spräng brickor. Rensa brädet innan tiden rensar dig.",
-        "word-hunt": "Ett ord gömmer sig i rutnätet. Hitta det – och allt annat på vägen.",
-        "wheel-rush": "Varje ord måste innehålla mittbokstaven. Snurra ringen och hitta fler.",
-        "random": "Låt hjulet bestämma. 60 sekunder, tre rivaler, du mot full pott."
+        "classic": "Dra mellan bokstäverna. Bygg kedjor, samla poäng. Rent spel.",
+        "blast": "Stava fort, spräng brickor. Slå klockan innan den slår dig.",
+        "word-hunt": "Ett ord gömmer sig — gå på jakt och samla allt.",
+        "wheel-rush": "Mittbokstaven styr. Snurra ringen och låsa upp kedjor.",
+        "random": "Hjulet väljer ödet. Samma bräda, tre rivaler, kör!"
       },
       "mode": {
         "classic": "Klassiskt",
@@ -9485,6 +9490,8 @@ const sv = {
         "word-hunt": "Jakt",
         "wheel-rush": "Hjul"
       },
+      "durationLabel": "Runda:",
+      "durationUnit": "sekunder",
       "roundComplete": "Rundan klar",
       "ofPerfect": "av perfekt",
       "points": "poäng",
@@ -9514,6 +9521,9 @@ const sv = {
       "wordsTotal": "{count} samlade",
       "bestWord": "Bästa",
       "wordsShowAll": "Visa alla {count}",
+      "wordBreakdown": "Poängfördelning",
+      "wordDetails": "Orddetaljer",
+      "totalWords": "{count} ord",
       "dayStreak": "{days} dagars rad",
       "rewardsPending": "Logga in för att börja samla mynt och XP",
       "pickNextMode": "Nästa runda",
@@ -12332,6 +12342,11 @@ const sv = {
       "playerCount": "{{count}} spelare i spelet",
       "teacherStarted": "{{teacher}} startade ett spel"
     },
+    "quickStart": {
+      "title": "Börja lära dig",
+      "subtitle": "Öva ordförråd från dina lektioner",
+      "action": "Börja nu"
+    },
     "dashboard": {
       "title": "Mina lektioner",
       "subtitle": "Öva glosor och följ dina framsteg",
@@ -12561,6 +12576,8 @@ const sv = {
         "large": "Stor (6×6)"
       },
       "create": "Skapa klassrum",
+      "createAnother": "Skapa ett annat klassrum",
+      "creating": "Skapar...",
       "edit": "Redigera klassrum",
       "delete": "Ta bort klassrum",
       "confirmDelete": "Ta bort klassrummet? Elever förlorar tillgång.",
@@ -12571,12 +12588,13 @@ const sv = {
       "codeCopied": "Koden kopierad!",
       "copyLink": "Kopiera inbjudningslänk",
       "linkCopied": "Inbjudningslänken har kopierats!",
+      "shareCode": "Dela den här koden med dina elever",
       "members": "{{count}} elever",
       "member": "1 elev",
       "noMembers": "Inga elever än",
       "settingUp": "Förbereder ditt klassrum...",
       "language": "Språk",
-      "created": "Skapad {{date}}",
+      "created": "{{classroomName}} skapad! Dela koden för att börja.",
       "noClassrooms": "Inga klassrum än",
       "createFirst": "Skapa ditt första klassrum för att börja",
       "validation": {
@@ -12590,11 +12608,21 @@ const sv = {
       "error": {
         "createFailed": "Kunde inte skapa klassrum",
         "updateFailed": "Kunde inte uppdatera klassrum",
-        "deleteFailed": "Kunde inte radera klassrum"
+        "deleteFailed": "Kunde inte radera klassrum",
+        "copyFailed": "Kunde inte kopiera koden. Försök igen."
       },
       "dialog": {
         "createDescription": "Skapa ett nytt klassrum med namn och språkinställningar",
         "editDescription": "Redigera klassrumsnamn och språkinställningar"
+      },
+      "presenter": {
+        "present": "Presentera",
+        "visitUrl": "Besök:",
+        "orEnterCode": "Eller ange kod:",
+        "scanQr": "Skanna QR-kod:",
+        "shareTip": "Dela den här koden med dina elever via Google Classroom, e-post eller textmeddelande",
+        "pressEscape": "Tryck ESC för att avsluta",
+        "exit": "Avsluta presentation"
       }
     },
     "classrooms": {
@@ -13448,10 +13476,13 @@ const sv = {
       "join": {
         "alreadyMember": "Du är redan med i den här klassen",
         "button": "Gå med",
+        "classroomFull": "Det här klassrummet är fullt",
         "clipboardError": "Kunde inte läsa urklipp",
         "codeHint": "6 bokstäver från din lärare",
         "codeLabel": "Klasskod",
+        "codeNotRecognised": "Vi kunde inte känna igen den koden",
         "codePasted": "Klistrad!",
+        "codePlaceholder": "6 bokstäver",
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
         "invalidCode": "Koden är inte giltig",
@@ -13459,6 +13490,7 @@ const sv = {
         "nameHint": "Inget konto behövs – välj bara ett namn",
         "nameLabel": "Ditt namn",
         "namePlaceholder": "t.ex. Maya",
+        "nameRequired": "Ange ditt namn",
         "pasteButton": "Klistra",
         "subtitle": "Fråga din lärare om koden",
         "success": "Du är med!",
@@ -15275,6 +15307,7 @@ const sv = {
     "youWon": "Du vann! 🏆",
     "opponentWon": "{name} vann",
     "closeGame": "Jämnt!",
+    "domination": "Total dominans! 👑",
     "playAgain": "Spela igen",
     "home": "Hem",
     "finalTiles": "Sista brickorna!",
