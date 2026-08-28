@@ -151,6 +151,21 @@ const nextConfig = {
   poweredByHeader: false,
 
   // SEO: Redirect non-www to www and ensure consistent URLs
+  // Apple fetches the app-site-association file from exactly one URL and does not
+  // look anywhere else: https://<domain>/.well-known/apple-app-site-association.
+  // The handler lives under app/api/, which the App Router serves at
+  // /api/.well-known/... — so without this rewrite the URL iOS asks for is a 404
+  // and Universal Links never validate. (They never did; see
+  // __tests__/config/wellKnownRewrites.test.ts.)
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/apple-app-site-association',
+        destination: '/api/.well-known/apple-app-site-association',
+      },
+    ];
+  },
+
   async redirects() {
     return [
       // Practice is retired (FTUE and the hub now lead straight into the real
@@ -216,8 +231,10 @@ const nextConfig = {
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
       // This is a fallback for any requests that slip through.
       // Exempt assetlinks.json + ad-network verification file (verifiers refuse redirects).
+      // The Apple AASA file is exempt for the same reason: iOS does NOT follow
+      // redirects when fetching it, so a 308 to www reads as "no association".
       {
-        source: '/:path((?!\\.well-known/assetlinks\\.json$|d41d650cb226c9b4c235\\.txt$).*)',
+        source: '/:path((?!\\.well-known/assetlinks\\.json$|\\.well-known/apple-app-site-association$|d41d650cb226c9b4c235\\.txt$).*)',
         has: [
           {
             type: 'host',

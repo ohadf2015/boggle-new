@@ -7,7 +7,8 @@ import { vi, type Mock, } from 'vitest';
 // Mock NextResponse before importing route
 vi.mock('next/server', () => ({
   NextResponse: {
-    json: (body: unknown, init?: { headers?: Record<string, string> }) => ({
+    json: (body: unknown, init?: { status?: number; headers?: Record<string, string> }) => ({
+      status: init?.status ?? 200,
       json: () => Promise.resolve(body),
       headers: new Map(Object.entries(init?.headers || {})),
     }),
@@ -65,5 +66,31 @@ describe('AASA route', () => {
 
     expect(body.webcredentials).toBeDefined();
     expect(body.webcredentials.apps).toContain('TEAM123456.live.lexiclash.app');
+  });
+
+  // Production served `appID: ".live.lexiclash.app"` — APPLE_TEAM_ID was never set
+  // in the deployed env. iOS caches the AASA it fetches, so publishing a malformed
+  // one is worse than publishing none: a 5xx makes iOS retry later, a bad appID
+  // sticks. Every other test in this file sets the env var, which is exactly why
+  // the unset case shipped broken.
+  describe('when APPLE_TEAM_ID is not configured', () => {
+    beforeEach(() => {
+      process.env = { ...originalEnv };
+      delete process.env.APPLE_TEAM_ID;
+    });
+
+    it('does not serve an appID with an empty team prefix', async () => {
+      const response = await GET();
+      const body = await response.json();
+
+      const appID = body?.applinks?.details?.[0]?.appID;
+      expect(appID).not.toBe('.live.lexiclash.app');
+      expect(appID ?? '').not.toMatch(/^\./);
+    });
+
+    it('responds 503 so iOS retries instead of caching a broken association', async () => {
+      const response = await GET();
+      expect(response.status).toBe(503);
+    });
   });
 });
