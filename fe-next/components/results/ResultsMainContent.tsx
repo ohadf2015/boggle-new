@@ -563,11 +563,16 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       {/* ── 3c. AUTHENTICATED PLAYERS — the incentivized referral CTA (code +
           coin/XP reward) that previously only reached players who opted into
           visiting the leaderboard page. Every finished game is now an
-          impression at the highest-intent moment. Mirrors InlineSignupCard's
-          guard above (`!isGuest`, the auth-resolved flag) so the two CTAs
-          never double up mid-resolution; the component self-gates further on
-          having a referral code loaded. */}
-      {!isGuest && <ReferralShareBanner />}
+          impression at the highest-intent moment. Gated on `isAuthenticated`,
+          NOT `!isGuest`: useIsGuest is `!loading && !isAuthenticated`, so
+          `!isGuest` is true while auth is still resolving and would flash this
+          banner at guests for a frame. That hook exists for UI *removed* from
+          guests, where "show it" is the pessimistic state; this banner is
+          *added* for registered players, so the pessimistic state is hidden.
+          Still can't double up with InlineSignupCard above — that renders only
+          when isGuest, which requires isAuthenticated false. The component
+          self-gates further on having a referral code loaded. */}
+      {isAuthenticated && <ReferralShareBanner />}
 
       {/* ── 4. WHAT YOU EARNED — XP / level / streak. ImprovementPanel renders
           nothing for guests w/ no progress. Coins no longer get their own
