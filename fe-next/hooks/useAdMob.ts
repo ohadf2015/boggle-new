@@ -29,6 +29,27 @@ export const REWARD_PREPARE_TIMEOUT_MS = 12000;
 // well before it fires.
 export const REWARD_SAFETY_TIMEOUT_MS = 90000;
 
+// Interstitial stall watchdogs. Two SEPARATE budgets, re-armed at the phase
+// boundary — a single timer armed up-front has to cover prepare AND the user's
+// whole viewing time, and the sum is routinely larger than either. Production:
+// prepare ran 2.1s and 4.0s on cold loads, ads sat on screen 6-9s before
+// dismissal; one 15s budget across both fires MID-AD, resolving the awaiting MP
+// host so round 2 starts BEHIND a live fullscreen ad and the repaint kick lands
+// on a surface the ad Activity still owns.
+export const INTERSTITIAL_PREPARE_TIMEOUT_MS = 15000;
+export const INTERSTITIAL_SHOW_TIMEOUT_MS = 30000;
+
+/**
+ * Worst-case wall time `showInterstitial()` can take before it settles itself.
+ *
+ * Any caller that renders a cover over the ad (the MP host's brand overlay)
+ * MUST derive its own safety release from this, not a second hardcoded number:
+ * an overlay that expires before the ad does exposes exactly the white
+ * teardown frame it exists to hide.
+ */
+export const INTERSTITIAL_MAX_WAIT_MS =
+  INTERSTITIAL_PREPARE_TIMEOUT_MS + INTERSTITIAL_SHOW_TIMEOUT_MS;
+
 // Immersive mode OFF. A prior session enabled it speculatively (close button
 // under the edge-to-edge status bar) — but immersive mode is the root cause of
 // the universal "Reward in 30 seconds frozen at 30, ad plays fine, never grants,
@@ -277,8 +298,8 @@ export function useAdMob() {
   // doesn't fire while a fullscreen overlay is still in front of the player
   // — that's what previously stranded the player on a blank white screen
   // when AdMob's prepare → show pipeline finished after results had painted.
-  // Safety timeout caps the wait in case Dismissed never arrives.
-  const INTERSTITIAL_SAFETY_TIMEOUT_MS = 15000;
+  // Safety timeout caps the wait in case Dismissed never arrives — see the
+  // INTERSTITIAL_*_TIMEOUT_MS constants at module scope.
   const showInterstitial = useCallback(async (): Promise<void> => {
     recordGameEnd();
     if (!shouldShowInterstitial()) {
@@ -346,12 +367,18 @@ export function useAdMob() {
         })
         .catch(() => { /* listener registration is best-effort */ });
 
-      timer = setTimeout(() => {
-        // No terminal event arrived in time — the native ad stalled. This
-        // breadcrumb is the tell for a hung show (vs a clean dismiss).
-        trackInterstitialLifecycle('safety_timeout');
-        settle();
-      }, INTERSTITIAL_SAFETY_TIMEOUT_MS);
+      // Arm (or re-arm) the stall watchdog for the phase we're entering.
+      const armWatchdog = (ms: number) => {
+        if (settled) return;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          // No terminal event arrived in time — the native ad stalled. This
+          // breadcrumb is the tell for a hung show (vs a clean dismiss).
+          trackInterstitialLifecycle('safety_timeout');
+          settle();
+        }, ms);
+      };
+      armWatchdog(INTERSTITIAL_PREPARE_TIMEOUT_MS);
 
       (async () => {
         try {
@@ -378,6 +405,9 @@ export function useAdMob() {
           // show, when fill was unknown — a no-fill silently burned a slot.)
           recordInterstitialShown();
           trackInterstitialLifecycle('show_called');
+          // The ad is about to own the screen — restart the budget so the
+          // watchdog bounds a HUNG show, not the user watching a working one.
+          armWatchdog(INTERSTITIAL_SHOW_TIMEOUT_MS);
           await AdMob.showInterstitial();
           trackInterstitialLifecycle('show_resolved');
         } catch {

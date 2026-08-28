@@ -58,16 +58,25 @@ export interface ChildDirectedAdInit {
 
 /**
  * Resolve the child-directed AdMob init config for a tier. Anyone not KNOWN to
- * be an adult is treated as child-directed (non-personalized + TFUA); the
- * content-rating cap is always General (G) since the Play listing includes
- * children.
+ * be an adult is treated as child-directed (non-personalized + TFUA).
+ *
+ * Content-rating cap follows the tier. It used to be General (G) for everyone,
+ * on the premise that "the Play listing includes children" — that premise died
+ * on 2026-06-08 when the app EXITED the Families program: Play target age is now
+ * 13-15 / 16-17 / 18+ and the AdMob console is capped at TEEN account-wide (see
+ * .claude/notes/android-release-status.md). A blanket G cap therefore no longer
+ * matched the listing and only starved the auction — G-only inventory is a thin,
+ * low-quality slice, which is what an interstitial that fills but renders as a
+ * near-empty creative looks like. Known adults now get Teen (still under the
+ * account cap); anyone who might be a child keeps G.
  */
 export function resolveChildDirectedAdInit(tier: SocialTier): ChildDirectedAdInit {
   const treatAsChild = tier !== 'adult';
   return {
     tagForChildDirectedTreatment: treatAsChild,
     tagForUnderAgeOfConsent: treatAsChild,
-    // Runtime value of MaxAdContentRating.General; cast lets us stay type-only.
-    maxAdContentRating: 'General' as MaxAdContentRating,
+    // Runtime values of MaxAdContentRating.General / .Teen; the cast lets this
+    // module stay type-only (no runtime AdMob dependency).
+    maxAdContentRating: (treatAsChild ? 'General' : 'Teen') as MaxAdContentRating,
   };
 }
