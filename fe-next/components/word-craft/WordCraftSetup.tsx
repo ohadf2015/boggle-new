@@ -120,8 +120,8 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         />
       </div>
 
-      {/* Advanced options */}
-      <div className={cn('flex flex-col gap-3 shrink-0', !showAdvanced && 'hidden')}>
+      {/* Advanced options — not rendered at all for bot (isSoloRival) so radiogroups are absent from the DOM */}
+      {showAdvancedOptions && <div className={cn('flex flex-col gap-3 shrink-0', !showAdvanced && 'hidden')}>
         {showDifficulty ? (
           <div
             role="radiogroup"
@@ -191,15 +191,15 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
             })}
           </div>
         </div>
-      </div>
+      </div>}
 
-      <button
+      {showAdvancedOptions && <button
         type="button"
         onClick={() => setShowAdvanced((s) => !s)}
         className="text-xs text-neo-white/50 font-neo-body underline decoration-dotted underline-offset-4 self-center shrink-0 hover:text-neo-white/75"
       >
         {showAdvanced ? t('wordcraft.setup.hideAdvanced', 'Hide advanced') : t('wordcraft.setup.showAdvanced', 'Advanced options')}
-      </button>
+      </button>}
 
       {/* Start */}
       <button
