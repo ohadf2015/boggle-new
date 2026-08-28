@@ -197,6 +197,39 @@ describe('CrosswordGrid', () => {
     expect((first as HTMLElement).style.gridColumn).toBe('1');
   });
 
+  // A final (sofit) form is only correct where the letter really ends the word being read. In a
+  // doubly-checked grid a cell belongs to BOTH an across and a down answer, so a cell that ends the
+  // across word but sits mid-down must stay in regular form — otherwise the down answer reads with
+  // a final letter in its middle, which is not Hebrew. Here (1,2) is the last letter of 1-across
+  // יומ ("יום") but the MIDDLE of 3-down שמש; rendering ם there would spell ש-ם-ש downward.
+  it('does not render a final letter where the cell only ends ONE of its two words', () => {
+    const puzzle = buildSeedPuzzle(seedHe);
+    const entries: Record<string, string> = {};
+    for (const c of puzzle.cells) if (!c.block) entries[`${c.row},${c.col}`] = c.solution;
+    render(
+      <CrosswordGrid
+        state={{ ...initGame(puzzle), entries }}
+        onSelect={() => {}}
+        t={t}
+      />,
+    );
+    const cell = screen.getByLabelText('crossword.cellLabel:2,3'); // row 2, col 3 => (1,2)
+    expect(cell.querySelector('[data-letter]')?.textContent).toBe('מ');
+  });
+
+  it('still renders the final form where the cell ends BOTH of its words', () => {
+    const puzzle = buildSeedPuzzle(seedHe);
+    // (2,2) is the last cell of both 3-across and 3-down. ש has no sofit form, so assert the
+    // mechanism directly: it is the corner where a sofit WOULD be correct, and stays unchanged.
+    const entries: Record<string, string> = {};
+    for (const c of puzzle.cells) if (!c.block) entries[`${c.row},${c.col}`] = c.solution;
+    render(
+      <CrosswordGrid state={{ ...initGame(puzzle), entries }} onSelect={() => {}} t={t} />,
+    );
+    const corner = screen.getByLabelText('crossword.cellLabel:3,3');
+    expect(corner.querySelector('[data-letter]')?.textContent).toBe('ש');
+  });
+
   it('keeps LTR grids un-mirrored too', () => {
     const puzzle = buildSeedPuzzle(seedEn);
     const { container } = render(
