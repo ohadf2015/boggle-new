@@ -79,7 +79,7 @@ describe('AdMobProvider', () => {
     // Families: child-directed init config travels across the bridge to the
     // native plugin. Default test tier is 'unknown' → treated as child-directed.
     expect(AdMob.initialize).toHaveBeenCalledWith({
-      initializeForTesting: true,
+      initializeForTesting: false,
       tagForChildDirectedTreatment: true,
       tagForUnderAgeOfConsent: true,
       maxAdContentRating: 'General',
@@ -114,10 +114,10 @@ describe('AdMobProvider', () => {
       );
     });
     expect(AdMob.initialize).toHaveBeenCalledWith({
-      initializeForTesting: true,
+      initializeForTesting: false,
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
-      maxAdContentRating: 'General',
+      maxAdContentRating: 'Teen',
     });
   });
 
@@ -424,10 +424,10 @@ describe('AdMobProvider', () => {
       );
     });
     expect(AdMob.initialize).toHaveBeenCalledWith({
-      initializeForTesting: true,
+      initializeForTesting: false,
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
-      maxAdContentRating: 'General',
+      maxAdContentRating: 'Teen',
     });
   });
 
