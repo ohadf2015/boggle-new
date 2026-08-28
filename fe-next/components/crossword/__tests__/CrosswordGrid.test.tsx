@@ -177,4 +177,33 @@ describe('CrosswordGrid', () => {
     const grid = container.querySelector('[role="grid"]');
     expect(grid?.getAttribute('dir')).toBe('rtl');
   });
+
+  // RTL must be applied EXACTLY ONCE. The grid container carries dir="rtl", which already reverses
+  // the CSS grid inline axis so column line 1 is the right edge; a cell that ALSO mirrors its own
+  // column index flips a second time and the board comes out left-to-right — Hebrew across answers
+  // read backwards. lib/crossword/viewport.ts assumes this same dir-only convention, so the cell is
+  // the piece that has to stay un-mirrored.
+  it('does not mirror cell columns on top of dir="rtl" (double-flip would undo RTL)', () => {
+    const puzzle = buildSeedPuzzle(seedHe);
+    const { container } = render(
+      <CrosswordGrid state={initGame(puzzle)} onSelect={() => {}} t={t} />,
+    );
+    const grid = container.querySelector('[role="grid"]');
+    expect(grid?.getAttribute('dir')).toBe('rtl');
+
+    // Logical col 0 is the FIRST letter of 1-across; under dir="rtl" that is grid column line 1.
+    const first = screen.getAllByRole('gridcell')[0];
+    expect(first.getAttribute('aria-label')).toBe('crossword.cellLabel:1,1'); // row 1, col 1
+    expect((first as HTMLElement).style.gridColumn).toBe('1');
+  });
+
+  it('keeps LTR grids un-mirrored too', () => {
+    const puzzle = buildSeedPuzzle(seedEn);
+    const { container } = render(
+      <CrosswordGrid state={initGame(puzzle)} onSelect={() => {}} t={t} />,
+    );
+    expect(container.querySelector('[role="grid"]')?.getAttribute('dir')).toBe('ltr');
+    const first = screen.getAllByRole('gridcell')[0];
+    expect((first as HTMLElement).style.gridColumn).toBe('1');
+  });
 });

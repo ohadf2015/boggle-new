@@ -141,8 +141,6 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
                 key={key}
                 cell={cell}
                 letter={state.entries[key] ?? ''}
-                size={size}
-                rtl={puzzle.rtl}
                 locale={puzzle.locale}
                 isActive={active.row === cell.row && active.col === cell.col}
                 inActiveSlot={activeSlotCells.has(key)}

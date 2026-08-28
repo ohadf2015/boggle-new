@@ -13,22 +13,43 @@
  * because heavy blocking satisfies the run constraints trivially.
  *
  * Usage: npx tsx scripts/crossword/search-templates.ts [--size=11] [--want=400] [--keep=8]
+ *                                                      [--locale=en|he] [--minRun=3] [--maxRun=5]
+ *
+ * The run bounds are per-LOCALE, not universal. They must track what the clue bank can actually
+ * supply: en is five-letter-heavy (1,360 of 2,400) so 3-5 is right, while he has only 189
+ * five-letter answers against 513 three- and 387 four-letter ones. Searching he at 3-5 produces
+ * patterns needing 24 five-letter words apiece, and none of them fill. he wants 3-4, which is a
+ * denser block lattice - and denser is what real Hebrew newspaper grids look like anyway.
  */
 import { buildDictIndex, fillGrid } from '../../lib/crossword/generate.core';
 import { isRealCrossword } from '../../lib/crossword/templates';
 import { buildGrid } from '../../lib/crossword/grid';
-import clueBankJson from '../../lib/crossword/data/clueBank.en.json';
+import { isRtlLocale } from '../../lib/crossword/format';
+import type { PuzzleLocale } from '../../lib/crossword/types';
+import enClueBankJson from '../../lib/crossword/data/clueBank.en.json';
+import heClueBankJson from '../../lib/crossword/data/clueBank.he.json';
 
-const clueBank = clueBankJson as unknown as Record<string, { score: number }>;
+type Bank = Record<string, { score: number }>;
+const BANKS: Record<string, Bank> = {
+  en: enClueBankJson as unknown as Bank,
+  he: heClueBankJson as unknown as Bank,
+};
 
-const MIN_RUN = 3;
-const MAX_RUN = 5;
+// Set from --minRun/--maxRun in main() before the search runs. Module-level because the DFS
+// helpers below are recursive and threading two constants through every frame buys nothing.
+let MIN_RUN = 3;
+let MAX_RUN = 5;
 
 type Pt = [number, number];
 
 function arg(name: string, dflt: number): number {
   const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
   return hit ? Number(hit.split('=')[1]) : dflt;
+}
+
+function strArg(name: string, dflt: string): string {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.split('=')[1] : dflt;
 }
 
 /** Every row pattern of width n whose white runs are all 3–5 long. true = block. */
@@ -143,6 +164,16 @@ function main() {
   const want = arg('want', 400);
   const keep = arg('keep', 8);
   const attempts = arg('attempts', 8);
+  const locale = strArg('locale', 'en') as PuzzleLocale;
+  const clueBank = BANKS[locale];
+  if (!clueBank) {
+    console.error(`No clue bank bundled for locale "${locale}" - add it to BANKS.`);
+    process.exit(1);
+  }
+  const rtl = isRtlLocale(locale);
+  MIN_RUN = arg('minRun', 3);
+  MAX_RUN = arg('maxRun', 5);
+  console.log(`locale=${locale} rtl=${rtl} runs=${MIN_RUN}..${MAX_RUN}`);
 
   const words = Object.keys(clueBank);
   const idx = buildDictIndex(words);
@@ -160,7 +191,7 @@ function main() {
     .map((rows) => {
       const blocks = toBlocks(rows, size);
       const solution = rows.map((r) => r.map((b) => (b ? null : 'a')));
-      const { slots } = buildGrid({ rtl: false, solution });
+      const { slots } = buildGrid({ rtl, solution });
       return { rows, blocks, slots: slots.length, blockFrac: blocks.length / cells };
     })
     .filter((c) => c.blockFrac >= arg('minBlack', 0.18) && c.blockFrac <= arg('maxBlack', 0.36) && c.slots >= size * 3)
@@ -173,12 +204,12 @@ function main() {
     let ok = 0;
     const t0 = Date.now();
     for (let a = 0; a < attempts; a++) {
-      const g = fillGrid({ size, rtl: false, blocks: cand.blocks }, idx, {
+      const g = fillGrid({ size, rtl, blocks: cand.blocks }, idx, {
         rng: mulberry32(9000 + a * 77),
         maxSteps: 30000,
         prefer,
       });
-      if (g && isRealCrossword(g, false)) ok++;
+      if (g && isRealCrossword(g, rtl)) ok++;
     }
     const entry = { ...cand, ok, ms: Math.round((Date.now() - t0) / attempts) };
     scored.push(entry);
@@ -193,14 +224,14 @@ function main() {
   const winners = scored.filter((s) => s.ok >= Math.ceil(attempts / 2)).slice(0, keep);
 
   console.log(`\n// ${winners.length} templates, each filling ≥50% of seeds from the live bank`);
-  console.log(`export const EN_TEMPLATES_${size}: BlockTemplate[] = [`);
+  console.log(`export const ${locale.toUpperCase()}_TEMPLATES_${size}: BlockTemplate[] = [`);
   winners.forEach((w, i) => {
     console.log(
       `  // ${w.slots} slots, ${w.blocks.length} blocks (${Math.round(w.blockFrac * 100)}% black), ` +
         `fill ${w.ok}/${attempts} @ ${w.ms}ms`,
     );
     console.log(
-      `  { label: '${size}x${size}-${i + 1}', size: ${size}, blocks: ${JSON.stringify(w.blocks)} },`,
+      `  { label: '${locale}-${size}x${size}-${i + 1}', size: ${size}, blocks: ${JSON.stringify(w.blocks)} },`,
     );
   });
   console.log('];');
