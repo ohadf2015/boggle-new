@@ -21,6 +21,7 @@ import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useErrorShake } from '@/hooks/useErrorShake';
+import { acquireModalOpen, releaseModalOpen } from '@/lib/native/modalOpenSignal';
 
 /** Quick fade+slide entrance for a validation error appearing under a field. */
 const ERROR_ENTER = {
@@ -108,6 +109,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
       if (otpIntervalRef.current) clearInterval(otpIntervalRef.current);
     };
   }, []);
+
+  // Raise the ref-counted html.modal-open flag while open. The shared <Dialog>
+  // does this via <ModalOpenFlag>, but this modal is a hand-rolled portal and so
+  // was invisible to the native banner coordinator: on native the AdMob banner is
+  // a SurfaceView composited ABOVE the WebView, so the z-100 backdrop cannot cover
+  // it and it sat on top of the sign-in form. Ref-counted, so stacking with a
+  // Dialog is safe (see lib/native/modalOpenSignal).
+  useEffect(() => {
+    if (!isOpen) return;
+    acquireModalOpen();
+    return () => releaseModalOpen();
+  }, [isOpen]);
 
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
 
@@ -236,11 +249,49 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           setError(result.error.message);
         }
         setIsLoading(null);
-      } else if (authMode === 'signup') {
+        return;
+      }
+
+      const data = result.data as { session?: unknown; user?: { identities?: unknown[] } } | undefined;
+
+      // supabase-js does NOT error on a duplicate signup while email confirmation
+      // is on — it returns a success-shaped response with an obfuscated user and
+      // an EMPTY identities array (deliberate, so signup can't be used to probe
+      // which emails exist). Without this branch the `already registered` check
+      // above is dead for that config and we tell a returning user to check an
+      // inbox that never receives anything.
+      if (authMode === 'signup' && Array.isArray(data?.user?.identities) && data.user.identities.length === 0) {
+        setError(t('auth.inlineSignup.emailInUse'));
+        setAuthMode('signin');
+        setIsLoading(null);
+        return;
+      }
+
+      // A session means the user is signed in RIGHT NOW: always true for a
+      // successful password sign-in, and also true for signup when the Supabase
+      // project has email confirmation off. Nothing else in the app closes this
+      // modal on that transition — OAuth closes via its own onSuccess and OTP
+      // calls onClose directly — so closing here is what ends the flow. Before
+      // this, sign-in success matched no branch at all: isLoading stayed 'email'
+      // and the button span forever behind a modal that never went away.
+      if (data?.session) {
+        if (authMode === 'signup') trackEvent('funnel_sign_up', { method: 'password' });
+        setIsLoading(null);
+        onClose();
+        return;
+      }
+
+      if (authMode === 'signup') {
         trackEvent('funnel_sign_up', { method: 'password' });
         setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
+        return;
       }
+
+      // Sign-in that returned neither a session nor an error. Shouldn't happen,
+      // but surface it rather than leaving the spinner running with no outcome.
+      setError(t('auth.invalidCredentials'));
+      setIsLoading(null);
     } catch (err) {
       setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
