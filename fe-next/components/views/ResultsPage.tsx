@@ -56,6 +56,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { INTERSTITIAL_MAX_WAIT_MS } from '@/hooks/useAdMob';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
@@ -742,6 +743,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   const startGameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const overlayReleaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Slack on top of the interstitial's own worst case, so the cover always
+  // outlives the ad Activity's teardown rather than racing it.
+  const OVERLAY_RELEASE_MARGIN_MS = 5000;
   useEffect(() => () => {
     if (startGameTimeoutRef.current) clearTimeout(startGameTimeoutRef.current);
     if (overlayReleaseTimerRef.current) clearTimeout(overlayReleaseTimerRef.current);
@@ -755,12 +759,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     // Brand overlay covers the interstitial-Activity teardown frame and the
     // post-Dismissed → game-mount socket gap so the user never sees a white
-    // WebView paint. Released after 15s as a safety hatch in case the round
-    // never starts (server unreachable, etc.). Ref-based so unmount cleanup
-    // clears the timer instead of firing setState on a dead component.
+    // WebView paint. Safety hatch in case the round never starts (server
+    // unreachable, etc.). Ref-based so unmount cleanup clears the timer instead
+    // of firing setState on a dead component.
+    //
+    // The release MUST outlast the ad itself — derived from the interstitial's
+    // own worst-case budget, never a second hardcoded number. A cover that
+    // expires first exposes exactly the white teardown frame it exists to hide.
     setIsStartingNextRound(true);
     if (overlayReleaseTimerRef.current) clearTimeout(overlayReleaseTimerRef.current);
-    overlayReleaseTimerRef.current = setTimeout(() => setIsStartingNextRound(false), 15000);
+    overlayReleaseTimerRef.current = setTimeout(
+      () => setIsStartingNextRound(false),
+      INTERSTITIAL_MAX_WAIT_MS + OVERLAY_RELEASE_MARGIN_MS,
+    );
 
     // Awaiting the interstitial gates `startGame` so the other players stay
     // on results while the host watches their ad — without this gate they
