@@ -1,0 +1,17 @@
+name: keep-alive
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping LexiClash health endpoint
+        run: |
+          curl -sS -o /dev/null -w "health %{http_code} ttfb=%{time_starttransfer}s\n" \
+            https://www.lexiclash.live/health

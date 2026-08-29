@@ -34,6 +34,8 @@ import type { Language } from '@/shared/types/game';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
 import Script from "next/script";
+import { headers } from 'next/headers';
+import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
 
 // Install prompts, cookie banner, version checker, churn tracker and the
 // seasonal countdown all live in DeferredLayoutWidgets. They were declared here
@@ -231,6 +233,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
+    const headerList = await headers();
+    const rumCountryCode = headerList.get('x-country-code') || headerList.get('cf-ipcountry') || headerList.get('x-vercel-ip-country') || '';
+    const rumPostHogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY || '';
+    const rumBeaconScript = rumPostHogKey ? getRumBeaconScript(rumCountryCode, rumPostHogKey) : '';
     const schemaStrings = getLocalizedSchemaStrings(validLocale);
 
     // Locale-aware font preloading: Hebrew pages get all 4 font variables,
@@ -549,6 +555,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <html lang={validLocale} dir={dir} className={`dark ${fontClasses}`} suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
+                {rumBeaconScript && (
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: rumBeaconScript,
+                        }}
+                    />
+                )}
                 {/* Must be the first script — see STORAGE_SHIM_SCRIPT comment above */}
                 <script
                     dangerouslySetInnerHTML={{

@@ -444,8 +444,14 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // Keeping the import for reference; middleware is no longer mounted.
 
   // IP Geolocation
+  // NOTE: '/' is intentionally excluded. The root path is rewritten to a
+  // localized page by server/localeRedirect.ts and then rendered by Next.js.
+  // Blocking the root on an external ip-api.com lookup (up to 3s, and a
+  // hard dependency during Railway cold-start) was making '/' cold TTFB ~30s
+  // while '/en' stayed ~2s. Geo is still available on the routes that actually
+  // consume it: the geolocation API and analytics API routes.
   app.use(geolocationMiddleware({
     skipPaths: ['/health', '/metrics', '/_next', '/favicon.ico'],
-    pathFilter: ['/', '/api/geolocation', '/api/analytics']
+    pathFilter: ['/api/geolocation', '/api/analytics']
   }));
 }
