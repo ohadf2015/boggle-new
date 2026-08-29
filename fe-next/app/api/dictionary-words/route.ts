@@ -13,8 +13,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { gzipSync } from 'zlib';
+import { gzipSync, brotliCompressSync, constants } from 'zlib';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
+import { acceptsEncoding } from '@/lib/http/acceptEncoding';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
 import {
@@ -28,7 +29,10 @@ import {
 // deploy). Once built, ALL requests are served from here — the intermediate word
 // array is NOT retained, so the full list only lives in the shared sets, not a
 // second time as a per-route array (see lib/server/sharedWordSets.ts, OOM 2026-08-06).
-const gzippedPayloads: Record<string, { gzip: Buffer; raw: string; count: number } | null> = {
+const gzippedPayloads: Record<
+  string,
+  { gzip: Buffer; brotli?: Buffer; raw: string; count: number } | null
+> = {
   en: null,
   es: null,
   he: null,
@@ -109,8 +113,34 @@ export async function GET(request: NextRequest) {
       'Vary': 'Accept-Encoding',
     };
 
-    const acceptsGzip = (request.headers.get('accept-encoding') || '').includes('gzip');
-    if (acceptsGzip) {
+    const accept = request.headers.get('accept-encoding');
+
+    // Measured on the real lists 2026-08-29 (es: 6.73MB raw / 1.39MB gzip-6):
+    //   br q=5  1.214MB  -13%   153ms      <- here
+    //   br q=9  1.186MB  -15%   818ms
+    //   br q=11 0.936MB  -33%  12405ms
+    // The buffer is cached for the process lifetime, but it is built on the
+    // FIRST request, so quality is capped by what one player will sit through.
+    // ponytail: q=5 because 12s of first-request stall buys 0.28MB; the way to
+    // actually get q=11 is to precompress at build time, not to raise this.
+    //
+    // This branch is also load-bearing, not just an optimisation: preferBrotli()
+    // in server/middleware.ts rewrites Accept-Encoding to `br`, so without it
+    // the gzip check below would miss and every browser would get 6.73MB raw.
+    if (acceptsEncoding(accept, 'br')) {
+      payload.brotli ??= brotliCompressSync(payload.raw, {
+        params: {
+          [constants.BROTLI_PARAM_QUALITY]: 5,
+          [constants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(payload.raw),
+        },
+      });
+      return new NextResponse(new Uint8Array(payload.brotli), {
+        status: 200,
+        headers: { ...cacheHeaders, 'Content-Encoding': 'br' },
+      });
+    }
+
+    if (acceptsEncoding(accept, 'gzip')) {
       return new NextResponse(new Uint8Array(payload.gzip), {
         status: 200,
         headers: { ...cacheHeaders, 'Content-Encoding': 'gzip' },
