@@ -22,7 +22,7 @@ const SinglePlayerView = nextDynamic(() => import('@/components/singleplayer/Sin
 export default function BoggleWordShakeGameClient(): React.JSX.Element {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <SinglePlayerView />
+      <SinglePlayerView preset="standard" embedded />
     </Suspense>
   );
 }
