@@ -68,3 +68,58 @@ describe('GET /api/dictionary-words content negotiation', () => {
     expect(res.headers.get('Vary')).toBe('Accept-Encoding');
   });
 });
+
+describe('GET /api/dictionary-words conditional requests', () => {
+  it('answers 304 with no body when the client already has this representation', async () => {
+    const first = await call('br');
+    const etag = first.headers.get('ETag')!;
+    expect(etag).toBeTruthy();
+
+    const second = await GET({
+      url: 'http://localhost/api/dictionary-words?lang=en',
+      headers: {
+        get: (n: string) => {
+          const k = n.toLowerCase();
+          if (k === 'accept-encoding') return 'br';
+          if (k === 'if-none-match') return etag;
+          return null;
+        },
+      },
+    });
+
+    expect(second.status).toBe(304);
+    expect((await second.arrayBuffer()).byteLength).toBe(0);
+    // Validators must still be present so the client can refresh its freshness.
+    expect(second.headers.get('ETag')).toBe(etag);
+    expect(second.headers.get('Cache-Control')).toBeTruthy();
+  });
+
+  it('gives brotli and gzip DIFFERENT etags — they are different representations', async () => {
+    // Sharing one etag across encodings lets a cache hand a gzip-cached client a
+    // 304 for a body it never had, and vice versa.
+    const br = await call('br');
+    const gz = await call('gzip, deflate');
+    expect(br.headers.get('ETag')).toBeTruthy();
+    expect(br.headers.get('ETag')).not.toBe(gz.headers.get('ETag'));
+  });
+
+  it('does not 304 a client holding the etag for a different encoding', async () => {
+    const gz = await call('gzip, deflate');
+    const gzEtag = gz.headers.get('ETag')!;
+
+    const res = await GET({
+      url: 'http://localhost/api/dictionary-words?lang=en',
+      headers: {
+        get: (n: string) => {
+          const k = n.toLowerCase();
+          if (k === 'accept-encoding') return 'br';
+          if (k === 'if-none-match') return gzEtag;
+          return null;
+        },
+      },
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Encoding')).toBe('br');
+  });
+});

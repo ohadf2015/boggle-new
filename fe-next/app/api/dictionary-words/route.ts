@@ -79,6 +79,20 @@ async function loadWords(language: string): Promise<string[]> {
   }
 }
 
+/**
+ * RFC 9110 If-None-Match: a comma-separated list of entity-tags, or `*`.
+ * Browsers echo back exactly what they were given, but caches and proxies do
+ * send lists, and some prepend the weak marker.
+ */
+function matchesIfNoneMatch(header: string | null, etag: string): boolean {
+  if (!header) return false;
+  if (header.trim() === '*') return true;
+  return header
+    .split(',')
+    .map((t) => t.trim().replace(/^W\//, ''))
+    .includes(etag);
+}
+
 // Node.js runtime for dictionary caching efficiency
 export const runtime = 'nodejs';
 
@@ -104,16 +118,40 @@ export async function GET(request: NextRequest) {
     }
     const payload = gzippedPayloads[language]!;
 
+    const accept = request.headers.get('accept-encoding');
+    const encoding = acceptsEncoding(accept, 'br')
+      ? 'br'
+      : acceptsEncoding(accept, 'gzip')
+        ? 'gzip'
+        : 'identity';
+
+    // The ETag has to name the ENCODING too. An ETag identifies a
+    // representation, and gzip/brotli/identity are three different ones — with a
+    // single shared tag, a shared cache can answer a gzip-cached client with a
+    // 304 for bytes it never had.
+    const etag = `"${language}-${payload.count}-${encoding}"`;
+
     const cacheHeaders: Record<string, string> = {
       'Content-Type': 'text/plain; charset=utf-8',
       // Aggressive caching - dictionary rarely changes
       'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
-      // ETag for conditional requests
-      'ETag': `"${language}-${payload.count}"`,
+      'ETag': etag,
       'Vary': 'Accept-Encoding',
     };
 
-    const accept = request.headers.get('accept-encoding');
+    // The route emitted an ETag but never read If-None-Match, so a revalidation
+    // (which `stale-while-revalidate` triggers in the background every day) got
+    // the full body back — 1.21MB of Spanish, to say "unchanged".
+    if (matchesIfNoneMatch(request.headers.get('if-none-match'), etag)) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          'Cache-Control': cacheHeaders['Cache-Control'],
+          'ETag': etag,
+          'Vary': 'Accept-Encoding',
+        },
+      });
+    }
 
     // Measured on the real lists 2026-08-29 (es: 6.73MB raw / 1.39MB gzip-6):
     //   br q=5  1.214MB  -13%   153ms      <- here
