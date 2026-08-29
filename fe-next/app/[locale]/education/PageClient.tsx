@@ -111,22 +111,25 @@ export function PageClient() {
                     {profile?.display_name}
                   </p>
                 </div>
+                {/* Link, never a raw <a>: a document navigation reboots the
+                    Supabase auth bootstrap on /teacher, which reads to the
+                    teacher as "the button just refreshed the page". */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <a
+                  <Link
                     href={`/${language}/teacher`}
                     data-testid="create-classroom-shortcut"
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-yellow text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
                   >
                     {t('education.landing.createClassroom', 'Create classroom')}
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href={`/${language}/teacher`}
                     data-testid="go-to-dashboard-link"
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
                   >
                     {t('education.landing.openDashboard')}
                     <span aria-hidden="true">→</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </m.div>
@@ -137,12 +140,12 @@ export function PageClient() {
               className="bg-neo-navy-light border-b border-neo-white/10 px-4 py-3"
             >
               <div className="mx-auto max-w-3xl">
-                <a
+                <Link
                   href={`/${language}/multiplayer`}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
                 >
                   {t('education.landing.startGame')}
-                </a>
+                </Link>
               </div>
             </m.div>
           </m.div>

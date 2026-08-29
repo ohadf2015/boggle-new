@@ -14,8 +14,12 @@ vi.mock('framer-motion', () => {
         { children, className, style, animate, ...rest }: any,
         ref: any
       ) {
-        // For score bar, extract width from animate prop
-        const animatedStyle = animate?.width ? { width: animate.width } : {};
+        // For score bar, surface the animated fill from the animate prop.
+        const animatedStyle = animate?.width
+          ? { width: animate.width }
+          : typeof animate?.scaleX === 'number'
+            ? { transform: `scaleX(${animate.scaleX})` }
+            : {};
         return (
           <div
             ref={ref}
@@ -106,23 +110,23 @@ describe('TvPlayerCard score bar', () => {
     vi.useRealTimers();
   });
 
-  it('renders score bar with correct width percentage', () => {
+  it('renders score bar filled to the correct proportion', () => {
     render(<TvPlayerCard {...defaultProps} score={100} leaderScore={200} rank={2} />);
     const bar = screen.getByTestId('score-bar');
     expect(bar).toBeInTheDocument();
-    expect(bar.style.width).toBe('50%');
+    expect(bar.style.transform).toBe('scaleX(0.5)');
   });
 
   it('score bar is 100% for rank 1', () => {
     render(<TvPlayerCard {...defaultProps} score={200} leaderScore={200} rank={1} />);
     const bar = screen.getByTestId('score-bar');
-    expect(bar.style.width).toBe('100%');
+    expect(bar.style.transform).toBe('scaleX(1)');
   });
 
   it('score bar scales proportionally for other ranks', () => {
     render(<TvPlayerCard {...defaultProps} score={50} leaderScore={200} rank={4} />);
     const bar = screen.getByTestId('score-bar');
-    expect(bar.style.width).toBe('25%');
+    expect(bar.style.transform).toBe('scaleX(0.25)');
   });
 
   it('score bar color is neo-yellow for rank 1', () => {
@@ -179,6 +183,6 @@ describe('TvPlayerCard score bar', () => {
   it('handles leaderScore of 0 gracefully', () => {
     render(<TvPlayerCard {...defaultProps} score={0} leaderScore={0} />);
     const bar = screen.getByTestId('score-bar');
-    expect(bar.style.width).toBe('0%');
+    expect(bar.style.transform).toBe('scaleX(0)');
   });
 });

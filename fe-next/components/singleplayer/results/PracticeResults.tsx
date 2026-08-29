@@ -111,14 +111,20 @@ function useCountUp(target: number, duration = 1.2, delay = 0.3) {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
+    // Hoisted so the effect's own cleanup can stop it. A cleanup returned from
+    // the setTimeout callback would be discarded, leaving the animation running
+    // after unmount.
+    let controls: { stop: () => void } | null = null;
     const timeout = setTimeout(() => {
-      const controls = animate(motionVal, target, {
+      controls = animate(motionVal, target, {
         duration,
         ease: [0.16, 1, 0.3, 1],
       });
-      return () => controls.stop();
     }, delay * 1000);
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      controls?.stop();
+    };
   }, [target, duration, delay, motionVal]);
 
   useEffect(() => {

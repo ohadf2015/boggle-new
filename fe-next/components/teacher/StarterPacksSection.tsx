@@ -8,7 +8,7 @@ import { BookOpen, GraduationCap, Globe, Sparkles } from 'lucide-react';
 import type { LessonWord } from '@/types/education';
 
 interface StarterPacksSectionProps {
-  onSelectPack: (pack: { name: string; description: string; words: LessonWord[] }) => void;
+  onSelectPack: (pack: { name: string; description: string; language: string; words: LessonWord[] }) => void;
 }
 
 const categoryIcons = {
@@ -93,6 +93,7 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
       onSelectPack({
         name: t(pack.nameKey),
         description: t(pack.descriptionKey),
+        language: pack.language,
         words: pack.words,
       });
     },

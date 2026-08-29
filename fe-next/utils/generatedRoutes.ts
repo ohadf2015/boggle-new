@@ -176,6 +176,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/word-games-online-free",
   "/word-of-the-day",
   "/word-tower",
+  "/word-tower-v2",
   "/words",
   "/words-with-friends-alternative"
 ];

@@ -51,13 +51,26 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     return s;
   }, [state, puzzle.slots]);
 
-  // Cells that are the last letter of any word (for Hebrew sofit rendering).
+  // Cells that end EVERY word running through them (for Hebrew sofit rendering).
+  //
+  // Every white cell in a doubly-checked grid belongs to both an across and a down answer, and one
+  // glyph has to serve both readings. A final form is only correct where the letter genuinely ends
+  // the word — so "ends ANY word" is wrong: a cell finishing the across answer while sitting
+  // mid-down would print a sofit inside the down answer (יום crossing שמש renders ש-ם-ש, which is
+  // not Hebrew). Requiring it to end ALL of its words keeps the sofit at true corners and leaves
+  // the regular form everywhere it is contested — which is also how Israeli newspapers print.
   const wordEndCells = useMemo(() => {
-    const s = new Set<string>();
+    const through = new Map<string, number>();
+    const ending = new Map<string, number>();
     for (const sl of puzzle.slots) {
-      const last = sl.cells[sl.cells.length - 1];
-      if (last) s.add(`${last.row},${last.col}`);
+      sl.cells.forEach((c, i) => {
+        const key = `${c.row},${c.col}`;
+        through.set(key, (through.get(key) ?? 0) + 1);
+        if (i === sl.cells.length - 1) ending.set(key, (ending.get(key) ?? 0) + 1);
+      });
     }
+    const s = new Set<string>();
+    for (const [key, ends] of ending) if (ends === through.get(key)) s.add(key);
     return s;
   }, [puzzle.slots]);
 
@@ -141,8 +154,6 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
                 key={key}
                 cell={cell}
                 letter={state.entries[key] ?? ''}
-                size={size}
-                rtl={puzzle.rtl}
                 locale={puzzle.locale}
                 isActive={active.row === cell.row && active.col === cell.col}
                 inActiveSlot={activeSlotCells.has(key)}

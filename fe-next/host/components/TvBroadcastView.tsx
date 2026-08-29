@@ -87,6 +87,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   // Core props
   gameCode,
   username,
+  roomLanguage,
   roomName,
   t,
 
@@ -311,6 +312,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           gameCode={gameCode}
           roomName={roomName}
           playerCount={leaderboardData.length}
+          language={roomLanguage}
           t={t}
         />
       </m.div>

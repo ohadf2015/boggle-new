@@ -1,7 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient, type SupabaseClient, type User } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
-import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { bearerToken } from '@/lib/auth/verifyJwt'
 
 export async function createClient(): Promise<SupabaseClient> {

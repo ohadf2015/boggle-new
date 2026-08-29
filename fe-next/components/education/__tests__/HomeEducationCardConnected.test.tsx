@@ -25,6 +25,7 @@ const auth = (over: Record<string, unknown> = {}) => ({
   isAuthenticated: true,
   isTeacher: false,
   isAdmin: false,
+  loading: false,
   ...over,
 });
 
@@ -48,6 +49,7 @@ const studentClassroom = (over: Record<string, unknown> = {}) => ({
 
 describe('HomeEducationCardConnected', () => {
   beforeEach(() => {
+    localStorage.clear();
     useAuthMock.mockReset();
     useTeacherAccessMock.mockReset();
     useStudentClassroomMock.mockReset();
@@ -55,15 +57,40 @@ describe('HomeEducationCardConnected', () => {
     useStudentClassroomMock.mockReturnValue(studentClassroom());
   });
 
-  it('renders nothing for a signed-out visitor', () => {
+  // Promo branch: everyone who is neither a teacher nor an enrolled student used to get
+  // `null` here, which meant education was advertised to exactly the people who had already
+  // found it. These four cover the one-shot promo that replaces that dead branch.
+  it('promotes education once to a signed-out visitor', () => {
     useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
+    render(<HomeEducationCardConnected />);
+    expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
+  });
+
+  it('promotes education once to an authed user with no classroom membership', () => {
+    useAuthMock.mockReturnValue(auth());
+    useStudentClassroomMock.mockReturnValue(studentClassroom());
+    render(<HomeEducationCardConnected />);
+    expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
+  });
+
+  it('marks the promo seen at show time, not on dismiss', () => {
+    // Pitfall Class 1: a dismiss-time marker means reload-without-dismiss re-pops forever.
+    useAuthMock.mockReturnValue(auth());
+    render(<HomeEducationCardConnected />);
+    expect(localStorage.getItem('edu_home_promo_seen_v1')).not.toBeNull();
+  });
+
+  it('does not promote education a second time', () => {
+    localStorage.setItem('edu_home_promo_seen_v1', '1');
+    useAuthMock.mockReturnValue(auth());
     const { container } = render(<HomeEducationCardConnected />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders nothing for an authed user with no classroom membership', () => {
-    useAuthMock.mockReturnValue(auth());
-    useStudentClassroomMock.mockReturnValue(studentClassroom());
+  it('renders nothing while auth is still resolving', () => {
+    // isAuthenticated starts false — without the loading gate this frame shows the guest promo
+    // to a signed-in teacher.
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false, loading: true }));
     const { container } = render(<HomeEducationCardConnected />);
     expect(container.firstChild).toBeNull();
   });

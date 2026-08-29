@@ -93,7 +93,9 @@ export async function performMobileOAuth(
     if (!BrowserPlugin) {
       // Last resort: open in system browser
       logger.log('[MobileOAuth] No Browser plugin, falling back to window.open');
-      window.open(data.url, '_blank');
+      // 'noopener' — without it the OAuth page keeps a `window.opener` handle and
+      // can redirect this tab (reverse tabnabbing).
+      window.open(data.url, '_blank', 'noopener');
       return { success: true };
     }
 

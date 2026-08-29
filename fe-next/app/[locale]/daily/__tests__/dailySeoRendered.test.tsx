@@ -10,11 +10,13 @@ import { dailySeoContent } from '../dailySeo.data';
  * site for "Low value content". The copy was never missing: dailySeo.data.ts carries a description,
  * seven features and four FAQs per locale, and layout.tsx fed them ONLY to <meta> and JSON-LD.
  *
- * page.tsx now renders that same data through HomepageContentSection, which exists for exactly this
- * remediation. What this test pins is the coupling that makes the reuse safe: DailySeoEntry must
- * stay prop-compatible with the section, and the words must actually reach the DOM. If someone adds
- * a locale with no `faq`, or renames a field, this fails instead of silently shipping an empty
- * publisher block to the reviewer who rejected the site.
+ * page.tsx rendered that same data through HomepageContentSection until 2026-08-27, when the user
+ * asked for no marketing/FAQ card on any game screen (it was also what kept the hub from filling
+ * the viewport — see app/[locale]/__tests__/appShellSeoContent.test.tsx). This test is deliberately
+ * kept: it renders the section DIRECTLY, so what it still pins is the data contract — DailySeoEntry
+ * stays prop-compatible with the section, every locale carries a description and a non-empty FAQ,
+ * and those words reach a DOM. That data is live: layout.tsx feeds it to <meta> + JSON-LD, and the
+ * section is the render path if the copy is ever surfaced on a non-play page.
  */
 describe('daily hub SEO copy is rendered, not just meta', () => {
   const locales = Object.keys(dailySeoContent);

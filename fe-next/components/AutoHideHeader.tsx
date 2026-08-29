@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Header from './Header';
 import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -16,10 +16,37 @@ interface AutoHideHeaderProps {
    * (e.g. the daily Word Hunt) where the reserved-but-empty band reads as a blank
    * gap at the top. Safe there because entering the game happens behind a user tap,
    * so the upward content shift falls inside the input-exclusion window (no CLS hit).
-   * Leave OFF (default) on pages like /multiplayer where collapsing the spacer
-   * regressed CLS to 0.29.
+   *
+   * - `false` (default): always keep the spacer.
+   * - `true`: always collapse it. Only for surfaces entered exclusively by tap.
+   * - `'user-initiated'`: collapse ONLY when the header hides right after real user
+   *   input. /multiplayer needs this third option because both absolutes are wrong
+   *   there — always keeping the spacer leaves an empty band above the room lobby's
+   *   own sticky header, and always collapsing it regressed CLS to 0.979 on
+   *   reconnect, where `isInGame` flips ~200ms after mount with no input at all.
    */
-  collapseSpacerWhenHidden?: boolean;
+  collapseSpacerWhenHidden?: boolean | 'user-initiated';
+}
+
+/**
+ * Whether the user has interacted with this page at all — i.e. whether a layout
+ * shift now is plausibly the consequence of their own tap.
+ *
+ * Deliberately `hasBeenActive` (sticky for the page lifetime) and NOT `isActive`
+ * (a transient ~5s window). Joining a room is a socket round-trip, so by the time
+ * `isInGame` flips the transient activation may already have expired — reading
+ * `isActive` would keep the spacer on exactly the tap path this is meant to
+ * collapse, and the empty band would survive with every test still green. The two
+ * cases we must separate are "user tapped into a room" (interaction happened) and
+ * "socket reconnected ~200ms after a fresh page load" (no interaction possible
+ * yet), and stickiness answers that correctly.
+ *
+ * Absent in older browsers → false → spacer kept, i.e. today's behaviour. Never worse.
+ */
+function hasUserInteracted(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return !!(navigator as Navigator & { userActivation?: { hasBeenActive: boolean } })
+    .userActivation?.hasBeenActive;
 }
 
 /**
@@ -40,6 +67,23 @@ export function AutoHideHeader({ className, onVisibilityChange, collapseSpacerWh
   const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   const isVisible = !isOnCrazyGamesPlatform && !isTvFullscreen && !isInGame;
+  const isHidden = isTvFullscreen || isInGame;
+
+  // Latched in state, not read live: userActivation is a browser-only read (so it
+  // cannot happen during SSR/first render) and `hasBeenActive` must be sampled at
+  // the moment the header hides — re-reading it later would let the spacer pop
+  // back in mid-game and cause the very shift this exists to avoid.
+  const [userInitiatedCollapse, setUserInitiatedCollapse] = useState(false);
+  useEffect(() => {
+    setUserInitiatedCollapse(
+      isHidden && collapseSpacerWhenHidden === 'user-initiated' && hasUserInteracted(),
+    );
+  }, [isHidden, collapseSpacerWhenHidden]);
+
+  // `true` stays synchronous — routing it through the effect would render the
+  // spacer for one frame before collapsing, adding a visible blip to surfaces
+  // (the daily game) that collapse cleanly today.
+  const collapseSpacer = collapseSpacerWhenHidden === true || userInitiatedCollapse;
 
   // Report visibility from an effect, never from the render body: the parent
   // typically setStates in this callback, and calling it during render is a
@@ -61,10 +105,10 @@ export function AutoHideHeader({ className, onVisibilityChange, collapseSpacerWh
   // TV fullscreen or active gameplay: hide the visible header but keep the spacer div.
   // Header uses fixed+spacer pattern — removing both causes CLS 0.29 on /en/multiplayer
   // as the spacer-height slot collapses and content shifts up by 60–124px.
-  if (isTvFullscreen || isInGame) {
+  if (isHidden) {
     // Focused full-screen game surfaces opt out of the reserved spacer so the
     // hidden header leaves no empty band at the top (see prop docs above).
-    if (collapseSpacerWhenHidden) {
+    if (collapseSpacer) {
       return null;
     }
     return (

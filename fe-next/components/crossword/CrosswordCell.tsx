@@ -7,8 +7,6 @@ import type { Cell, PuzzleLocale } from '@/lib/crossword/types';
 export interface CrosswordCellProps {
   cell: Cell;
   letter: string;
-  size: number;
-  rtl: boolean;
   locale: PuzzleLocale;
   isActive: boolean;
   inActiveSlot: boolean;
@@ -27,8 +25,6 @@ export interface CrosswordCellProps {
 function CrosswordCellBase({
   cell,
   letter,
-  size,
-  rtl,
   locale,
   isActive,
   inActiveSlot,
@@ -42,8 +38,10 @@ function CrosswordCellBase({
   enter = false,
   enterDelay = 0,
 }: CrosswordCellProps) {
-  // Column mirroring is the entire RTL story: logical col 0 renders on the right.
-  const gridColumn = rtl ? size - cell.col : cell.col + 1;
+  // RTL is handled ONCE, by dir="rtl" on the grid container (CrosswordGrid): that reverses the CSS
+  // grid inline axis, so column line 1 already lands on the right and logical col 0 renders there.
+  // Mirroring the index here as well flipped it a second time and rendered Hebrew boards LTR.
+  const gridColumn = cell.col + 1;
   const gridRow = cell.row + 1;
 
   if (cell.block) {

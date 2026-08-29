@@ -135,7 +135,15 @@ export const FAQS = [
   },
   {
     q: '¿Dónde puedo jugar Scrabble en línea gratis en español?',
-    a: 'En LexiClash. Es una alternativa a Scrabble en línea, gratis y en español, jugable directamente en el navegador sin descargas ni registro. Más de 10,000 palabras en español validadas, salas multijugador en tiempo real (2-20 jugadores) y desafíos diarios con clasificación global. Para jugar Scrabble gratis en línea con amigos, simplemente comparte el enlace de tu sala.',
+    a: 'En LexiClash. Es una alternativa a Scrabble en línea, gratis y en español, jugable directamente en el navegador sin descargas ni registro. Más de 10,000 palabras en español validadas, salas multijugador en tiempo real (2-50 jugadores) y desafíos diarios con clasificación global. Para jugar Scrabble gratis en línea con amigos, simplemente comparte el enlace de tu sala.',
+  },
+  {
+    q: '¿Cuántos jugadores pueden jugar en la misma sala?',
+    a: 'De 2 a 50 jugadores en la misma sala, todos en tiempo real sobre el mismo tablero. No hay turnos: todos buscan palabras a la vez durante la partida. Funciona igual de bien para un duelo entre dos personas que para una clase entera o una fiesta.',
+  },
+  {
+    q: '¿Necesito descargar una app para jugar?',
+    a: 'No. LexiClash se juega directamente en el navegador del móvil, la tablet o el ordenador. No hay que instalar nada, ni en Android ni en iPhone ni en PC. Abre lexiclash.live y ya estás jugando. Si quieres, puedes añadirlo a la pantalla de inicio como aplicación web (PWA).',
   },
   {
     q: '¿Cuál es la mejor alternativa a Scrabble online en español?',

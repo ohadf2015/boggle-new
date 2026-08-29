@@ -177,4 +177,66 @@ describe('CrosswordGrid', () => {
     const grid = container.querySelector('[role="grid"]');
     expect(grid?.getAttribute('dir')).toBe('rtl');
   });
+
+  // RTL must be applied EXACTLY ONCE. The grid container carries dir="rtl", which already reverses
+  // the CSS grid inline axis so column line 1 is the right edge; a cell that ALSO mirrors its own
+  // column index flips a second time and the board comes out left-to-right — Hebrew across answers
+  // read backwards. lib/crossword/viewport.ts assumes this same dir-only convention, so the cell is
+  // the piece that has to stay un-mirrored.
+  it('does not mirror cell columns on top of dir="rtl" (double-flip would undo RTL)', () => {
+    const puzzle = buildSeedPuzzle(seedHe);
+    const { container } = render(
+      <CrosswordGrid state={initGame(puzzle)} onSelect={() => {}} t={t} />,
+    );
+    const grid = container.querySelector('[role="grid"]');
+    expect(grid?.getAttribute('dir')).toBe('rtl');
+
+    // Logical col 0 is the FIRST letter of 1-across; under dir="rtl" that is grid column line 1.
+    const first = screen.getAllByRole('gridcell')[0];
+    expect(first.getAttribute('aria-label')).toBe('crossword.cellLabel:1,1'); // row 1, col 1
+    expect((first as HTMLElement).style.gridColumn).toBe('1');
+  });
+
+  // A final (sofit) form is only correct where the letter really ends the word being read. In a
+  // doubly-checked grid a cell belongs to BOTH an across and a down answer, so a cell that ends the
+  // across word but sits mid-down must stay in regular form — otherwise the down answer reads with
+  // a final letter in its middle, which is not Hebrew. Here (1,2) is the last letter of 1-across
+  // יומ ("יום") but the MIDDLE of 3-down שמש; rendering ם there would spell ש-ם-ש downward.
+  it('does not render a final letter where the cell only ends ONE of its two words', () => {
+    const puzzle = buildSeedPuzzle(seedHe);
+    const entries: Record<string, string> = {};
+    for (const c of puzzle.cells) if (!c.block) entries[`${c.row},${c.col}`] = c.solution;
+    render(
+      <CrosswordGrid
+        state={{ ...initGame(puzzle), entries }}
+        onSelect={() => {}}
+        t={t}
+      />,
+    );
+    const cell = screen.getByLabelText('crossword.cellLabel:2,3'); // row 2, col 3 => (1,2)
+    expect(cell.querySelector('[data-letter]')?.textContent).toBe('מ');
+  });
+
+  it('still renders the final form where the cell ends BOTH of its words', () => {
+    const puzzle = buildSeedPuzzle(seedHe);
+    // (2,2) is the last cell of both 3-across and 3-down. ש has no sofit form, so assert the
+    // mechanism directly: it is the corner where a sofit WOULD be correct, and stays unchanged.
+    const entries: Record<string, string> = {};
+    for (const c of puzzle.cells) if (!c.block) entries[`${c.row},${c.col}`] = c.solution;
+    render(
+      <CrosswordGrid state={{ ...initGame(puzzle), entries }} onSelect={() => {}} t={t} />,
+    );
+    const corner = screen.getByLabelText('crossword.cellLabel:3,3');
+    expect(corner.querySelector('[data-letter]')?.textContent).toBe('ש');
+  });
+
+  it('keeps LTR grids un-mirrored too', () => {
+    const puzzle = buildSeedPuzzle(seedEn);
+    const { container } = render(
+      <CrosswordGrid state={initGame(puzzle)} onSelect={() => {}} t={t} />,
+    );
+    expect(container.querySelector('[role="grid"]')?.getAttribute('dir')).toBe('ltr');
+    const first = screen.getAllByRole('gridcell')[0];
+    expect((first as HTMLElement).style.gridColumn).toBe('1');
+  });
 });

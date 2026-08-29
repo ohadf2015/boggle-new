@@ -10,6 +10,9 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: mockRouterReplace, push: mockRouterReplace }),
   usePathname: () => '/en/teacher/curriculum',
 }));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+}));
 
 import { TeacherGate } from '../TeacherGate';
 
@@ -27,9 +30,18 @@ describe('<TeacherGate>', () => {
     expect(screen.queryByText('INSIDE')).toBeNull();
   });
 
-  it('renders nothing while loading', () => {
+  // A blank page while auth resolves reads as "the dashboard failed to load" —
+  // the children's own loader is below this gate and never gets to mount.
+  it('shows a loader (not a blank page, not the children) while loading', () => {
     mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: true });
     const { container } = render(<TeacherGate><div>INSIDE</div></TeacherGate>);
     expect(container.textContent).not.toContain('INSIDE');
+    expect(screen.getByText('common.loading')).toBeInTheDocument();
+  });
+
+  it('does not redirect while loading', () => {
+    mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: true });
+    render(<TeacherGate><div>INSIDE</div></TeacherGate>);
+    expect(mockRouterReplace).not.toHaveBeenCalled();
   });
 });

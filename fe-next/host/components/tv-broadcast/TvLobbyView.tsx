@@ -16,6 +16,9 @@ import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
+/** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
+const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
+
 interface PlayerData {
   username: string;
   avatar?: AvatarType | null;
@@ -40,6 +43,8 @@ interface TvLobbyViewProps {
   tournamentCreating: boolean;
   /** Toggle back to phone/player mode */
   setHostPlaying?: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Fill room with 3 bots then start game (classroom teacher demo with zero students) */
+  onStartSoloDemoWithBots?: () => (() => void);
 }
 
 /**
@@ -50,7 +55,7 @@ interface TvLobbyViewProps {
  */
 const TvLobbyView = memo<TvLobbyViewProps>(({
   gameCode,
-  roomLanguage: _roomLanguage,
+  roomLanguage,
   username,
   t,
   playersReady,
@@ -62,6 +67,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   onExitRoom: _onExitRoom,
   tournamentCreating,
   setHostPlaying,
+  onStartSoloDemoWithBots,
 }) => {
   const { isAdmin } = useAuth();
   // Display the server-owned auto-start countdown on the TV screen too, with a
@@ -99,12 +105,49 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     setHostSelectedGameMode(mode);
   }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
 
+  // Solo demo flow: teacher presses button → emit setAutoFill → wait for bots to seat → call startGame
+  const [soloDemoInProgress, setSoloDemoInProgress] = useState(false);
+  const [soloDemoCallback, setSoloDemoCallback] = useState<(() => void) | null>(null);
+
+  const [soloDemoFailed, setSoloDemoFailed] = useState(false);
+
+  // When bots are seated (playerCount > 0), invoke the callback to start the game
+  useEffect(() => {
+    if (soloDemoInProgress && soloDemoCallback && playerCount > 0) {
+      soloDemoCallback();
+      setSoloDemoInProgress(false);
+      setSoloDemoCallback(null);
+    }
+  }, [soloDemoInProgress, soloDemoCallback, playerCount]);
+
+  // If the fill never lands, say so instead of leaving the button disabled
+  // forever — a silently stuck control is the failure mode this repo keeps
+  // shipping, and a teacher standing at a projector deserves a reason.
+  useEffect(() => {
+    if (!soloDemoInProgress) return;
+    const timeout = setTimeout(() => {
+      setSoloDemoInProgress(false);
+      setSoloDemoCallback(null);
+      setSoloDemoFailed(true);
+    }, SOLO_DEMO_FILL_TIMEOUT_MS);
+    return () => clearTimeout(timeout);
+  }, [soloDemoInProgress]);
+
+  const handleSoloDemoClick = () => {
+    if (!onStartSoloDemoWithBots) return;
+    setSoloDemoFailed(false);
+    setSoloDemoInProgress(true);
+    const callback = onStartSoloDemoWithBots();
+    setSoloDemoCallback(() => callback);
+  };
+
   return (
     <div data-testid="tv-lobby-view" className="flex flex-col h-full min-h-screen bg-neo-navy">
       {/* Join bar — QR + code at the top */}
       <TvJoinBar
         gameCode={gameCode}
         playerCount={playerCount}
+        language={roomLanguage}
         t={t}
       />
 
@@ -197,6 +240,29 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             t={t}
             className="text-2xl"
           />
+
+          {/* Solo demo button — practice round with stand-in players (teacher testing alone) */}
+          {onStartSoloDemoWithBots && (
+            <button
+              data-testid="solo-demo-button"
+              onClick={handleSoloDemoClick}
+              disabled={playerCount > 0 || soloDemoInProgress}
+              className="flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-lime bg-neo-lime/10 text-neo-lime hover:bg-neo-lime/20 hover:border-neo-lime disabled:opacity-50 disabled:cursor-not-allowed text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all"
+            >
+              <Zap className="w-5 h-5 shrink-0" />
+              {soloDemoInProgress ? t('common.loading') : t('tvLobby.tryPracticeRound')}
+            </button>
+          )}
+
+          {soloDemoFailed && (
+            <p
+              data-testid="solo-demo-failed"
+              role="status"
+              className="text-center text-base font-bold text-neo-pink"
+            >
+              {t('tvLobby.practiceRoundFailed')}
+            </p>
+          )}
 
           {/* Exit TV mode → switch back to phone/player mode. Prominent so a host
               who landed here by mistake can clearly find the way out. */}

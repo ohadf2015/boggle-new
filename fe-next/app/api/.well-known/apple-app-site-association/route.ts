@@ -10,6 +10,19 @@ const APP_BUNDLE_ID = 'live.lexiclash.app';
 
 export async function GET() {
   const teamId = process.env.APPLE_TEAM_ID || '';
+
+  // Without a team ID the appID would be ".live.lexiclash.app", which iOS rejects
+  // — and iOS CACHES the association it fetches, so serving a malformed one is
+  // strictly worse than serving none. A 5xx leaves it to retry once the env var
+  // is actually configured. (Production served the malformed form: APPLE_TEAM_ID
+  // was never set in the deployed environment.)
+  if (!teamId) {
+    return NextResponse.json(
+      { error: 'APPLE_TEAM_ID is not configured' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
   const appId = `${teamId}.${APP_BUNDLE_ID}`;
 
   const aasa = {

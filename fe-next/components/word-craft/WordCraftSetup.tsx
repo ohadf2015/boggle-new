@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Bot, Play, Send, Sparkles, Users } from 'lucide-react';
 import { BOT_DIFFICULTIES } from '@/lib/word-craft/botDifficulty';
 import { WORDCRAFT_MODIFIERS, modifierLabelKey, type WordCraftModifier } from '@/lib/word-craft/modifiers';
@@ -55,145 +55,177 @@ export interface WordCraftSetupProps {
  */
 export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
   const [choice, setChoice] = useState<WordCraftSetupChoice>(initial);
+  const setOpponent = useCallback((opponent: WordCraftSetupChoice['opponent']) => {
+    setChoice((c) => ({
+      ...c,
+      opponent,
+      // Solo vs Rival always starts on easy; friend/hotseat keep the current tune.
+      difficulty: opponent === 'bot' ? 'easy' : c.difficulty,
+    }));
+  }, []);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const twists: Array<WordCraftModifier | 'surprise'> = [
     'surprise',
     ...WORDCRAFT_MODIFIERS.filter((m) => m !== 'none'),
   ];
-  // Hotseat has no bot to tune; bot + friend (async duel vs bot) both do.
-  const showDifficulty = choice.opponent !== 'hotseat';
+  // Solo vs Rival shortcut: selecting the bot defaults to easy and hides the
+  // advanced tuning (difficulty + twist) for a one-tap start. Hotseat has no
+  // bot to tune; friend (async duel vs bot) keeps the full tuning surface.
+  const isSoloRival = choice.opponent === 'bot';
+  const showDifficulty = choice.opponent === 'friend';
+  const showAdvancedOptions = !isSoloRival;
 
   return (
     <div
       className={cn(
-        'flex-1 min-h-0 w-full max-w-md mx-auto px-4 py-2 flex flex-col gap-2.5 [@media(min-height:760px)]:gap-4 overflow-y-auto',
-        // Landscape phones (~360px tall): two-column grid — opponent +
-        // difficulty left, twists right, START across the bottom. Wider box,
-        // title dropped (the page keeps its sr-only h1).
-        '[@media(max-height:520px)]:grid [@media(max-height:520px)]:grid-cols-2 [@media(max-height:520px)]:content-start [@media(max-height:520px)]:max-w-2xl [@media(max-height:520px)]:gap-2',
+        'flex-1 min-h-0 w-full max-w-md mx-auto px-4 py-3 [@media(min-height:760px)]:py-5 flex flex-col gap-4 [@media(min-height:760px)]:gap-6 [@media(min-height:760px)]:overflow-visible overflow-y-auto',
       )}
     >
-      <h2 className="text-lg [@media(min-height:700px)]:text-xl font-neo-display font-black text-neo-white text-center shrink-0 [@media(max-height:520px)]:hidden">
-        {t('wordcraft.setup.title')}
-      </h2>
+      <div className="text-center shrink-0 space-y-1">
+        <h2 className="text-xl [@media(min-height:700px)]:text-2xl font-neo-display font-black text-neo-white leading-tight">
+          {t('wordcraft.setup.title')}
+        </h2>
+        <p className="text-sm [@media(min-height:700px)]:text-base text-neo-white/60 font-neo-body">
+          {t('wordcraft.setup.tagline', 'Place words. Claim territory. Outsmart the bot.')}
+        </p>
+      </div>
 
       {/* Opponent */}
       <div
         role="radiogroup"
         aria-label={t('wordcraft.setup.opponent.label')}
-        className="grid grid-cols-3 gap-2 shrink-0 [@media(max-height:520px)]:col-start-1 [@media(max-height:520px)]:row-start-1"
-        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.opponent, ['bot', 'hotseat', 'friend'] as const, (opponent) => setChoice((c) => ({ ...c, opponent })))}
+        className="grid grid-cols-3 gap-2.5 shrink-0"
+        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.opponent, ['bot', 'hotseat', 'friend'] as const, (opponent) => setOpponent(opponent))}
       >
         <OpponentCard
           selected={choice.opponent === 'bot'}
-          onSelect={() => setChoice((c) => ({ ...c, opponent: 'bot' }))}
+          onSelect={() => setOpponent('bot')}
           icon={<Bot className="w-5 h-5 [@media(min-height:700px)]:w-6 [@media(min-height:700px)]:h-6" strokeWidth={2.5} />}
           label={t('wordcraft.setup.opponent.bot')}
           desc={t('wordcraft.setup.opponent.botDesc')}
         />
         <OpponentCard
           selected={choice.opponent === 'hotseat'}
-          onSelect={() => setChoice((c) => ({ ...c, opponent: 'hotseat' }))}
+          onSelect={() => setOpponent('hotseat')}
           icon={<Users className="w-5 h-5 [@media(min-height:700px)]:w-6 [@media(min-height:700px)]:h-6" strokeWidth={2.5} />}
           label={t('wordcraft.setup.opponent.hotseat')}
           desc={t('wordcraft.setup.opponent.hotseatDesc')}
         />
         <OpponentCard
           selected={choice.opponent === 'friend'}
-          onSelect={() => setChoice((c) => ({ ...c, opponent: 'friend' }))}
+          onSelect={() => setOpponent('friend')}
           icon={<Send className="w-5 h-5 [@media(min-height:700px)]:w-6 [@media(min-height:700px)]:h-6" strokeWidth={2.5} />}
           label={t('wordcraft.setup.opponent.friend')}
           desc={t('wordcraft.setup.opponent.friendDesc')}
         />
       </div>
 
-      {/* Bot difficulty — only when there is a bot to tune */}
-      {showDifficulty ? (
+      {/* Advanced options — collapsed behind the disclosure, and not rendered at
+          all in the Solo vs Rival shortcut. Unmounted rather than hidden there:
+          a `hidden` class still leaves the radiogroups in the accessibility tree
+          and reachable, which is not what "one-tap start" means. */}
+      {showAdvancedOptions ? (
+      <div className={cn('flex flex-col gap-3 shrink-0', !showAdvanced && 'hidden')}>
+        {/* Bot difficulty — only for friend duels where the bot tuning matters */}
+        {showDifficulty ? (
+          <div
+            role="radiogroup"
+            aria-label={t('wordcraft.setup.difficulty.label')}
+            className="flex flex-col gap-1.5"
+            onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.difficulty, BOT_DIFFICULTIES, (difficulty) => setChoice((c) => ({ ...c, difficulty })))}
+          >
+            <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70">
+              {t('wordcraft.setup.difficulty.label')}
+            </span>
+            <div className="grid grid-cols-3 gap-2">
+              {BOT_DIFFICULTIES.map((d) => (
+                <Pill
+                  key={d}
+                  selected={choice.difficulty === d}
+                  onSelect={() => setChoice((c) => ({ ...c, difficulty: d }))}
+                  label={t(`wordcraft.difficulty.${d}`)}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div
           role="radiogroup"
-          aria-label={t('wordcraft.setup.difficulty.label')}
-          className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-1 [@media(max-height:520px)]:row-start-2"
-          onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.difficulty, BOT_DIFFICULTIES, (difficulty) => setChoice((c) => ({ ...c, difficulty })))}
+          aria-label={t('wordcraft.setup.twist.label')}
+          className="flex flex-col gap-1.5"
+          onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.modifier, twists, (modifier) => setChoice((c) => ({ ...c, modifier })))}
         >
-          <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
-            {t('wordcraft.setup.difficulty.label')}
+          <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70">
+            {t('wordcraft.setup.twist.label')}
           </span>
-          <div className="grid grid-cols-3 gap-2 [@media(max-height:520px)]:gap-1.5">
-            {BOT_DIFFICULTIES.map((d) => (
-              <Pill
-                key={d}
-                selected={choice.difficulty === d}
-                onSelect={() => setChoice((c) => ({ ...c, difficulty: d }))}
-                label={t(`wordcraft.difficulty.${d}`)}
-              />
-            ))}
+          <div className="grid grid-cols-2 gap-1.5 [@media(min-height:700px)]:gap-2">
+            {twists.map((m) => {
+              const isSurprise = m === 'surprise';
+              const label = isSurprise ? t('wordcraft.setup.twist.surprise') : t(modifierLabelKey(m));
+              const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={choice.modifier === m}
+                  aria-label={label}
+                  title={desc}
+                  onClick={() => setChoice((c) => ({ ...c, modifier: m }))}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2 rounded-neo border-neo-thick border-black text-start',
+                    'transition-colors',
+                    choice.modifier === m
+                      ? 'bg-neo-purple text-white shadow-hard'
+                      : 'bg-neo-navy-light text-neo-white/85 shadow-hard-sm hover:bg-neo-navy-light/70',
+                  )}
+                  data-twist={m}
+                >
+                  {isSurprise ? <Sparkles className="w-4 h-4 shrink-0" strokeWidth={2.5} aria-hidden /> : null}
+                  <span className="flex flex-col min-w-0">
+                    <span className="text-xs font-neo-display font-black truncate">{label}</span>
+                    {desc ? (
+                      <span className="text-[10px] font-neo-body opacity-75 truncate">
+                        {desc}
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
+      </div>
       ) : null}
 
-      {/* Twist (modifier) */}
-      <div
-        role="radiogroup"
-        aria-label={t('wordcraft.setup.twist.label')}
-        className="flex flex-col gap-1 shrink-0 [@media(max-height:520px)]:col-start-2 [@media(max-height:520px)]:row-start-1 [@media(max-height:520px)]:row-span-2"
-        onKeyDown={(e) => handleRadiogroupKeyDown(e, choice.modifier, twists, (modifier) => setChoice((c) => ({ ...c, modifier })))}
-      >
-        <span className="text-[11px] font-neo-display font-black uppercase tracking-wider text-neo-white/70 [@media(max-height:520px)]:hidden">
-          {t('wordcraft.setup.twist.label')}
-        </span>
-        <div className="grid grid-cols-2 gap-1.5 [@media(min-height:700px)]:gap-2 [@media(max-height:520px)]:grid-cols-3 [@media(max-height:520px)]:gap-1">
-          {twists.map((m) => {
-            const isSurprise = m === 'surprise';
-            const label = isSurprise ? t('wordcraft.setup.twist.surprise') : t(modifierLabelKey(m));
-            const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);
-            return (
-              <button
-                key={m}
-                type="button"
-                role="radio"
-                aria-checked={choice.modifier === m}
-                aria-label={label}
-                title={desc}
-                onClick={() => setChoice((c) => ({ ...c, modifier: m }))}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-1.5 [@media(min-height:700px)]:py-2 [@media(max-height:520px)]:py-1 rounded-neo border-neo-thick border-black text-start',
-                  'transition-colors',
-                  choice.modifier === m
-                    ? 'bg-neo-purple text-white shadow-hard'
-                    : 'bg-neo-navy-light text-neo-white/85 shadow-hard-sm hover:bg-neo-navy-light/70',
-                )}
-                data-twist={m}
-              >
-                {isSurprise ? <Sparkles className="w-4 h-4 shrink-0" strokeWidth={2.5} aria-hidden /> : null}
-                <span className="flex flex-col min-w-0">
-                  <span className="text-xs font-neo-display font-black truncate">{label}</span>
-                  {desc ? (
-                    <span className="hidden [@media(min-height:640px)]:block text-[10px] font-neo-body opacity-75 truncate">
-                      {desc}
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Solo vs Rival is meant to be one tap, so the disclosure itself goes
+          away there rather than offering a panel with nothing worth tuning. */}
+      {showAdvancedOptions ? (
+        <button
+          type="button"
+          onClick={() => setShowAdvanced((s) => !s)}
+          className="text-xs text-neo-white/50 font-neo-body underline decoration-dotted underline-offset-4 self-center shrink-0 hover:text-neo-white/75"
+        >
+          {showAdvanced ? t('wordcraft.setup.hideAdvanced', 'Hide advanced') : t('wordcraft.setup.showAdvanced', 'Advanced options')}
+        </button>
+      ) : null}
 
       {/* Start */}
       <button
         type="button"
         onClick={() => onStart(choice)}
         className={cn(
-          'mt-auto h-12 [@media(min-height:700px)]:h-14 shrink-0 rounded-neo border-neo-thick border-black',
-          '[@media(max-height:520px)]:col-span-2 [@media(max-height:520px)]:h-10 [@media(max-height:520px)]:mt-0',
-          'bg-neo-lime text-neo-navy font-neo-display font-black text-lg uppercase tracking-wide',
+          'mt-auto h-14 [@media(min-height:700px)]:h-16 shrink-0 rounded-neo border-neo-thick border-black',
+          'bg-neo-lime text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide',
           'shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed hover:-translate-y-0.5 transition-transform',
           'flex items-center justify-center gap-2',
         )}
       >
-        <Play className="w-6 h-6" strokeWidth={3} aria-hidden />
+        <Play className="w-7 h-7" strokeWidth={3} aria-hidden />
         {t('wordcraft.setup.start')}
       </button>
-      <p className="hidden [@media(min-height:700px)]:block text-[11px] text-neo-white/55 font-neo-body text-center shrink-0 pb-[max(4px,env(safe-area-inset-bottom))]">
+      <p className="text-[11px] text-neo-white/55 font-neo-body text-center shrink-0 pb-[max(4px,env(safe-area-inset-bottom))]">
         {t('wordcraft.setup.challengeHint')}
       </p>
     </div>

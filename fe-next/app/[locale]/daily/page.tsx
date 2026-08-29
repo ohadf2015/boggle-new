@@ -3,8 +3,6 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
-import { dailySeoContent } from './dailySeo.data';
 
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -293,28 +291,17 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * Wrapped in Suspense boundary to properly handle useSearchParams
  * which can cause "Rendered fewer hooks than expected" errors without it.
  */
-export default async function DailyChallengePage({ params }: PageParams): Promise<React.JSX.Element> {
-  const { locale } = await params;
-
-  // The hub itself is a dynamic (client) import, so the server response for /<locale>/daily is
-  // chrome plus a loader — measured at 98 words on 2026-08-21, against 1066 for the homepage.
-  // Meanwhile dailySeo.data.ts already holds a description, seven features and four FAQs, written
-  // for six locales, and layout.tsx feeds them ONLY to <meta> and JSON-LD. So ~400 words of real
-  // copy per locale exist in this repo and are shown to nobody.
-  //
-  // HomepageContentSection was built for precisely this remediation (see its docblock: AdSense
-  // low-value-content, 2026-06-04) and its prop shape is identical to DailySeoEntry, so this is
-  // reuse rather than new copy: same component, same design system, RTL handled, zero client JS
-  // (the FAQ is native <details>). Nothing here is invented — if the words are wrong, fix them in
-  // dailySeo.data.ts, where the meta tags will pick up the same change.
-  const seo = dailySeoContent[locale as keyof typeof dailySeoContent] || dailySeoContent.en;
-
+export default async function DailyChallengePage(_props: PageParams): Promise<React.JSX.Element> {
+  // No HomepageContentSection here. It rendered dailySeo.data.ts copy visibly below the hub
+  // (2026-08-21, AdSense low-value-content remediation), but the hub is a `flex-1` child of
+  // `body.screen-fit` (min-height:100dvh, flex column) — a content-sized sibling below it means
+  // flex-grow has no free space and the game surface renders short. Removed 2026-08-27 with
+  // /multiplayer and /brain: "not show the faq in any game related screen". The copy is
+  // untouched in dailySeo.data.ts and still feeds <meta> + JSON-LD via layout.tsx.
+  // Pinned by app/[locale]/__tests__/appShellSeoContent.test.tsx.
   return (
-    <>
-      <Suspense fallback={<LoadingFallback />}>
-        <DailyRedirect />
-      </Suspense>
-      <HomepageContentSection content={seo} locale={locale} />
-    </>
+    <Suspense fallback={<LoadingFallback />}>
+      <DailyRedirect />
+    </Suspense>
   );
 }

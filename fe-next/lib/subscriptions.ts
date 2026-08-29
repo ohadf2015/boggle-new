@@ -229,7 +229,10 @@ export async function upsertSubscription({
   currentPeriodEnd?: string | null
   cancelAtPeriodEnd?: boolean
 }): Promise<void> {
-  const supabase = await createClient()
+  // Called only from the payment webhooks, where there is no user session — the
+  // request-scoped client is `anon` there, and `subscriptions` grants writes to
+  // service_role only, so this upsert was refused by RLS and threw.
+  const supabase = createAdminClient() ?? (await createClient())
 
   const { error } = await supabase.from('subscriptions').upsert(
     {
@@ -265,7 +268,10 @@ export async function logSubscriptionEvent({
   subscriptionId?: string | null
   payload: Record<string, unknown>
 }): Promise<void> {
-  const supabase = await createClient()
+  // Service-role for the same reason as upsertSubscription. This insert used to
+  // succeed on the anon client only because the table's policy was mistakenly
+  // granted to PUBLIC — the hole that also let anyone forge billing events.
+  const supabase = createAdminClient() ?? (await createClient())
 
   const { error } = await supabase.from('subscription_events').insert({
     user_id: userId ?? null,

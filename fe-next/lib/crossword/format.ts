@@ -17,14 +17,24 @@ export type CrosswordFormat = 'mini' | 'full';
 export const FULL_SIZE = 11;
 
 /**
- * Locales whose clue bank can fill a full-size grid. en has ~2,400 clued answers; sv (786),
- * he (1,206) and es (623) cannot fill 40+ doubly-checked slots, and offering a format that
- * silently falls back to a mini is worse than not offering it.
+ * Locales whose clue bank can fill a full-size grid, i.e. the ones with a baked `grids.<l>11.json`
+ * pool. en (~2,400 clued answers) and he (1,206, of which 1,089 are the 3–5 letters a full grid
+ * needs). sv (786) and es (623) still cannot fill 40+ doubly-checked slots, and offering a format
+ * that silently falls back to a mini is worse than not offering it.
  */
-const FULL_LOCALES: ReadonlySet<string> = new Set(['en']);
+const FULL_LOCALES: ReadonlySet<string> = new Set(['en', 'he']);
 
 export function supportsFull(locale: PuzzleLocale): boolean {
   return FULL_LOCALES.has(locale);
+}
+
+/**
+ * Whether a locale's across answers run right-to-left. Single source of truth: the generator, the
+ * offline baker and the baked-pool loader must all agree, or an across answer baked left-to-right
+ * is read back reversed (and vice versa).
+ */
+export function isRtlLocale(locale: PuzzleLocale): boolean {
+  return locale === 'he';
 }
 
 /** Grid dimension for a (locale, format). Falls back to the mini where full isn't supported. */

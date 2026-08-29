@@ -13,8 +13,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { gzipSync } from 'zlib';
+import { gzipSync, brotliCompressSync, constants } from 'zlib';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
+import { acceptsEncoding } from '@/lib/http/acceptEncoding';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
 import {
@@ -28,7 +29,10 @@ import {
 // deploy). Once built, ALL requests are served from here — the intermediate word
 // array is NOT retained, so the full list only lives in the shared sets, not a
 // second time as a per-route array (see lib/server/sharedWordSets.ts, OOM 2026-08-06).
-const gzippedPayloads: Record<string, { gzip: Buffer; raw: string; count: number } | null> = {
+const gzippedPayloads: Record<
+  string,
+  { gzip: Buffer; brotli?: Buffer; raw: string; count: number } | null
+> = {
   en: null,
   es: null,
   he: null,
@@ -75,6 +79,20 @@ async function loadWords(language: string): Promise<string[]> {
   }
 }
 
+/**
+ * RFC 9110 If-None-Match: a comma-separated list of entity-tags, or `*`.
+ * Browsers echo back exactly what they were given, but caches and proxies do
+ * send lists, and some prepend the weak marker.
+ */
+function matchesIfNoneMatch(header: string | null, etag: string): boolean {
+  if (!header) return false;
+  if (header.trim() === '*') return true;
+  return header
+    .split(',')
+    .map((t) => t.trim().replace(/^W\//, ''))
+    .includes(etag);
+}
+
 // Node.js runtime for dictionary caching efficiency
 export const runtime = 'nodejs';
 
@@ -100,17 +118,67 @@ export async function GET(request: NextRequest) {
     }
     const payload = gzippedPayloads[language]!;
 
+    const accept = request.headers.get('accept-encoding');
+    const encoding = acceptsEncoding(accept, 'br')
+      ? 'br'
+      : acceptsEncoding(accept, 'gzip')
+        ? 'gzip'
+        : 'identity';
+
+    // The ETag has to name the ENCODING too. An ETag identifies a
+    // representation, and gzip/brotli/identity are three different ones — with a
+    // single shared tag, a shared cache can answer a gzip-cached client with a
+    // 304 for bytes it never had.
+    const etag = `"${language}-${payload.count}-${encoding}"`;
+
     const cacheHeaders: Record<string, string> = {
       'Content-Type': 'text/plain; charset=utf-8',
       // Aggressive caching - dictionary rarely changes
       'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
-      // ETag for conditional requests
-      'ETag': `"${language}-${payload.count}"`,
+      'ETag': etag,
       'Vary': 'Accept-Encoding',
     };
 
-    const acceptsGzip = (request.headers.get('accept-encoding') || '').includes('gzip');
-    if (acceptsGzip) {
+    // The route emitted an ETag but never read If-None-Match, so a revalidation
+    // (which `stale-while-revalidate` triggers in the background every day) got
+    // the full body back — 1.21MB of Spanish, to say "unchanged".
+    if (matchesIfNoneMatch(request.headers.get('if-none-match'), etag)) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          'Cache-Control': cacheHeaders['Cache-Control'],
+          'ETag': etag,
+          'Vary': 'Accept-Encoding',
+        },
+      });
+    }
+
+    // Measured on the real lists 2026-08-29 (es: 6.73MB raw / 1.39MB gzip-6):
+    //   br q=5  1.214MB  -13%   153ms      <- here
+    //   br q=9  1.186MB  -15%   818ms
+    //   br q=11 0.936MB  -33%  12405ms
+    // The buffer is cached for the process lifetime, but it is built on the
+    // FIRST request, so quality is capped by what one player will sit through.
+    // ponytail: q=5 because 12s of first-request stall buys 0.28MB; the way to
+    // actually get q=11 is to precompress at build time, not to raise this.
+    //
+    // This branch is also load-bearing, not just an optimisation: preferBrotli()
+    // in server/middleware.ts rewrites Accept-Encoding to `br`, so without it
+    // the gzip check below would miss and every browser would get 6.73MB raw.
+    if (acceptsEncoding(accept, 'br')) {
+      payload.brotli ??= brotliCompressSync(payload.raw, {
+        params: {
+          [constants.BROTLI_PARAM_QUALITY]: 5,
+          [constants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(payload.raw),
+        },
+      });
+      return new NextResponse(new Uint8Array(payload.brotli), {
+        status: 200,
+        headers: { ...cacheHeaders, 'Content-Encoding': 'br' },
+      });
+    }
+
+    if (acceptsEncoding(accept, 'gzip')) {
       return new NextResponse(new Uint8Array(payload.gzip), {
         status: 200,
         headers: { ...cacheHeaders, 'Content-Encoding': 'gzip' },
