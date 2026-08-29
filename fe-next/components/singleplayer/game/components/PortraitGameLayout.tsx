@@ -192,7 +192,13 @@ export function PortraitGameLayout({
       : highlightedPath;
 
   return (
-    <div className="relative flex flex-col overflow-y-auto min-h-[100dvh] bg-neo-navy">
+    // Definite height, not a minimum. The board slot below is a
+    // `container-type: size` element, and cqh/cqb only resolve to a real number
+    // when every ancestor has a definite height. Under a content-driven minimum
+    // they computed 0px, `min(100cqw, 94cqh)` collapsed to 0, and the board
+    // frame fell back to viewport math inside a zero-width box → tall clipped
+    // grid with a dead gap above it.
+    <div className="relative flex flex-col overflow-hidden h-[100dvh] bg-neo-navy">
       {/* Dynamic Energy Background */}
       <DynamicEnergyBackground />
 
