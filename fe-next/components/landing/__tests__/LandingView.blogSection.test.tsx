@@ -8,6 +8,10 @@
  * `blogLinks`. That data path was duplicated and went unmaintained — so
  * even after `recentPosts` was updated to the new posts, the homepage
  * kept showing the old ones.
+ *
+ * NOTE: this asserts POST-HYDRATION output (the next/dynamic stub resolves in a
+ * useEffect, and the assertion is inside `waitFor`), so it cannot tell whether the
+ * links are in the server HTML. That invariant lives in LandingView.ssr.test.tsx.
  */
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';

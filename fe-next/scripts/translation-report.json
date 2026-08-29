@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6243,
+    "totalKeysInCode": 6286,
     "keyCountByLanguage": {
-      "en": 12087,
-      "es": 12383,
-      "he": 12288,
-      "ja": 12342,
-      "ru": 12122,
-      "sv": 12338
+      "en": 12130,
+      "es": 12426,
+      "he": 12331,
+      "ja": 12385,
+      "ru": 12165,
+      "sv": 12381
     },
-    "missingFromEnglish": 46,
+    "missingFromEnglish": 66,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -1339,7 +1339,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 235,
+        "line": 243,
         "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
       },
       {
@@ -1759,21 +1759,21 @@
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 224,
+        "line": 225,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 260,
+        "line": 261,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 491,
+        "line": 460,
         "context": "{t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
@@ -1815,13 +1815,13 @@
         "pattern": "`results.crowns.${crown.id}`",
         "type": "template_literal",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 127,
+        "line": 137,
         "context": "{t(`results.crowns.${crown.id}`) || crown.name}"
       },
       {
         "pattern": "results.crowns.${crown.id}",
         "file": "components/results/ConsolationRows.tsx",
-        "line": 127,
+        "line": 137,
         "context": "{t(`results.crowns.${crown.id}`) || crown.name}",
         "type": "template_literal"
       },
@@ -1892,7 +1892,7 @@
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 182,
+        "line": 209,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
@@ -1969,14 +1969,14 @@
         "pattern": "`wordcraft.difficulty.${d}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 126,
+        "line": 146,
         "context": "label={t(`wordcraft.difficulty.${d}`)}"
       },
       {
         "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 147,
+        "line": 166,
         "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {
@@ -2734,7 +2734,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 181,
+        "line": 189,
         "context": "{t(labelKey)}"
       },
       {
@@ -2742,7 +2742,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 216,
+        "line": 224,
         "context": "{t(labelKey)}"
       },
       {
@@ -2958,7 +2958,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 615,
+        "line": 640,
         "context": "return t(key, params);"
       },
       {
@@ -3622,6 +3622,15 @@
       ]
     },
     {
+      "key": "common.beta",
+      "usages": [
+        {
+          "file": "components/wordTowerV2/WordTowerV2.tsx",
+          "line": 223
+        }
+      ]
+    },
+    {
       "key": "daily.qrWelcome.badge",
       "usages": [
         {
@@ -3649,6 +3658,147 @@
       ]
     },
     {
+      "key": "education.lesson.autoPronounce",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 400
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.classicMode",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 295
+        },
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 358
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.contextualExamples",
+      "usages": [
+        {
+          "file": "components/practice/VocabularyCardEnriched.tsx",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.definition",
+      "usages": [
+        {
+          "file": "components/practice/VocabularyCardEnriched.tsx",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.dontKnow",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 232
+        },
+        {
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 233
+        },
+        {
+          "file": "components/practice/SwipeFeedbackOverlay.tsx",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.enrichingContent",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 172
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.examples",
+      "usages": [
+        {
+          "file": "components/practice/VocabularyCardEnriched.tsx",
+          "line": 81
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.gotIt",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 232
+        },
+        {
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 233
+        },
+        {
+          "file": "components/practice/SwipeFeedbackOverlay.tsx",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.pronounce",
+      "usages": [
+        {
+          "file": "components/practice/PronunciationButton.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.pronunciationFallback",
+      "usages": [
+        {
+          "file": "components/practice/PronunciationButton.tsx",
+          "line": 93
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.speaking",
+      "usages": [
+        {
+          "file": "components/practice/PronunciationButton.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.swipeMode",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 304
+        },
+        {
+          "file": "components/practice/FlashcardReview.tsx",
+          "line": 367
+        }
+      ]
+    },
+    {
+      "key": "education.lesson.tapToReveal",
+      "usages": [
+        {
+          "file": "components/practice/FlashcardSwipeStack.tsx",
+          "line": 212
+        }
+      ]
+    },
+    {
       "key": "footer.spellingBeePractice",
       "usages": [
         {
@@ -3658,11 +3808,65 @@
       ]
     },
     {
+      "key": "hostView.demoBotsFailed",
+      "usages": [
+        {
+          "file": "host/hooks/useHostGameActions.ts",
+          "line": 319
+        }
+      ]
+    },
+    {
       "key": "sealedBid.yourWord",
       "usages": [
         {
           "file": "components/sealedBid/SealedBidTable.tsx",
           "line": 83
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.setup.hideAdvanced",
+      "usages": [
+        {
+          "file": "components/word-craft/WordCraftSetup.tsx",
+          "line": 210
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.setup.showAdvanced",
+      "usages": [
+        {
+          "file": "components/word-craft/WordCraftSetup.tsx",
+          "line": 210
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.setup.tagline",
+      "usages": [
+        {
+          "file": "components/word-craft/WordCraftSetup.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "wordTowerV2.drop",
+      "usages": [
+        {
+          "file": "components/wordTowerV2/WordTowerV2.tsx",
+          "line": 280
+        }
+      ]
+    },
+    {
+      "key": "wordTowerV2.hoist",
+      "usages": [
+        {
+          "file": "components/wordTowerV2/WordTowerV2.tsx",
+          "line": 271
         }
       ]
     }
@@ -3883,6 +4087,8 @@
       "sealedBidLegacy.round",
       "sealedBidLegacy.youWin",
       "sealedBidLegacy.continue",
+      "wordTowerV2.cardTitle",
+      "wordTowerV2.cardDesc",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
@@ -4909,6 +5115,8 @@
       "sealedBid.yourWord"
     ],
     "sv": [
+      "modeCoach.wordTowerV2.cardTitle",
+      "modeCoach.wordTowerV2.cardDesc",
       "leadChange.tookTheLeadVerb",
       "leadChange.tookLeadWitty_0",
       "leadChange.tookLeadWitty_1",

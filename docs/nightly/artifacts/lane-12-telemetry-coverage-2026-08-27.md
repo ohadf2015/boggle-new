@@ -1,0 +1,4 @@
+status: research-only
+attempted: run coverage audit (DEAD/CRATERED), resolve IMPACT CHECK for room_joined_via_link, triage + fix one high-value event gap
+files_touched: docs/nightly/impact-ledger.ndjson (verdict line), docs/nightly/reports/2026-08-27.md, docs/nightly/artifacts/lane-12-telemetry-coverage-2026-08-27.md — no fe-next/ code changed
+next_steps: 13 real DEAD events after filtering classifier false-positives (banked/won/daily/desktop/solo_results are comment prop-values, not events — classifier regex needs a fix to stop matching inside comments). Investigated next_step_clicked (correctly wired, 0% CTR, not a bug) and connections completion (correctly wired, thin sample). NEVER-WIRED backlog: room_joined_via_code, replay_countdown_shown (0 call sites) — wire one of these next run via TDD. Also worth a look: wordtower_scramble_used/wordtower_wall_reached both 0/14d on a graduated public mode — not yet checked for reachability.

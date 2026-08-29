@@ -115,6 +115,20 @@ describe('CatchUpSuggestion', () => {
       expect(screen.getByText('daily.catchUp.watchAd')).toBeInTheDocument();
     });
 
+    // The ad is the price of the replay, so it is priced ON the button, not in a
+    // sentence above a list of buttons. One badge per row: a player who taps a
+    // row without having read the header still knows what happens next.
+    it('prices every replay row with its own ad badge', () => {
+      render(<CatchUpSuggestion />);
+      expect(screen.getAllByTestId('catch-up-ad-badge')).toHaveLength(2);
+    });
+
+    it('puts the ad badge inside the row the player taps', () => {
+      render(<CatchUpSuggestion />);
+      const [firstRow] = screen.getAllByRole('link');
+      expect(firstRow.querySelector('[data-testid="catch-up-ad-badge"]')).not.toBeNull();
+    });
+
     it('still shows missed replay links on today\'s results (excludeDate = today)', () => {
       const iso = (offsetDays: number) => {
         const d = new Date();

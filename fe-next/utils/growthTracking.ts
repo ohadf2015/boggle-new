@@ -269,6 +269,9 @@ export type GrowthEvent =
   | 'mp_quickplay_eager_shown'
   | 'mp_quickplay_socket_wait'
   | 'mp_quickplay_seeking'
+  // Player backed out of the Quick Play wait to browse the lobby instead. Pairs
+  // with 'mp_quickplay_seeking' to show how often the wait is worth abandoning.
+  | 'mp_quickplay_seeking_dismissed'
   | 'mp_quickplay_joined'
   // mp_quickplay_rapid_click — Quick Play tapped again while a join was
   // already in flight (control-arm rage-click signature on /multiplayer).
@@ -1474,11 +1477,15 @@ export const trackOnboardingSkipped = (
 
 /**
  * Onboarding quick-play — fires when the user takes the FTUE fast lane that
- * lands them in an auto-started classic practice game with zero extra taps:
- * the one-screen quickStart PLAY, the "Skip → Play Now" escape on any FTUE
- * step, or style-step completion (all route to /practice/classic?play=1&firstGame=1).
- * `source` discriminates which entry fired it. This is the D1-retention
- * experiment metric — pair with the return_visit funnel from t_cce75cc7.
+ * lands them in an auto-started practice game with zero extra taps: the
+ * one-screen quickStart PLAY, the "Skip → Play Now" escape on any FTUE step,
+ * or style-step completion. `source` discriminates which entry fired it.
+ * This is the D1-retention experiment metric — pair with the return_visit
+ * funnel from t_cce75cc7.
+ *
+ * Does NOT fire when "Skip → Play Now" is used while a room invite is
+ * pending — that exit lands in the room, not practice, and is tracked via
+ * `trackInviteConsumed({ path: 'quick_play' })` instead.
  */
 export const trackOnboardingQuickPlay = (
   extras: { source: 'quick_start' | 'ftue_skip' | 'style_complete' } & Record<string, unknown>,
@@ -1730,7 +1737,7 @@ export const trackInviteTutorialSkipped = (props: InviteTutorialSkippedProps): v
 
 interface InviteConsumedProps {
   roomCode: string;
-  path: 'tutorial' | 'skip' | 'direct';
+  path: 'tutorial' | 'skip' | 'direct' | 'quick_play';
   totalSeconds: number;
 }
 

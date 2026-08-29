@@ -51,3 +51,48 @@ export function pickTrialReminder(
   }
   return null;
 }
+
+/**
+ * Collapse a due-list to one entry per teacher.
+ *
+ * Reminder idempotency is stored per ROW (`trial_reminders_sent`), which is wrong per PERSON:
+ * a teacher who submitted the access form twice owns two approved rows, and each would be
+ * reminded independently. Production held five such addresses, one with three rows — so the
+ * first cron run would have sent that teacher three identical emails. Duplicate mail is the
+ * fastest route to a reputation-flagged sending domain, which would break every transactional
+ * email the product sends.
+ *
+ * Deduping here rather than deleting rows keeps a teacher's own records intact and also covers
+ * any duplicate created in future.
+ *
+ * When rows collide, the one with the most recent `trial_expires_at` wins: a teacher who
+ * re-requested has a fresher trial, and reminding them about the stale one would tell them
+ * their trial had ended while it is still running.
+ */
+export function dedupeDueByEmail<
+  T extends { row: { email: string; trial_expires_at: string | null } },
+>(due: T[]): T[] {
+  const bestByEmail = new Map<string, T>();
+  const order: string[] = [];
+
+  for (const entry of due) {
+    const key = (entry.row.email ?? '').trim().toLowerCase();
+    const incumbent = bestByEmail.get(key);
+    if (!incumbent) {
+      bestByEmail.set(key, entry);
+      order.push(key);
+      continue;
+    }
+    // A parseable date always beats a missing or unparseable one.
+    const score = (v: string | null) => {
+      const t = v ? Date.parse(v) : NaN;
+      return Number.isNaN(t) ? -Infinity : t;
+    };
+    if (score(entry.row.trial_expires_at) > score(incumbent.row.trial_expires_at)) {
+      bestByEmail.set(key, entry);
+    }
+  }
+
+  // Preserve first-seen order so the send sequence stays stable and diffable run to run.
+  return order.map((k) => bestByEmail.get(k)!);
+}

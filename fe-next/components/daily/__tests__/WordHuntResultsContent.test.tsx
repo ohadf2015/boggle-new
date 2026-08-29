@@ -34,6 +34,13 @@ vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard(
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({ default: function MockInlineSignup() { return <div data-testid="inline-signup" />; } }));
 vi.mock('../WatchAdButton', () => ({ default: function MockWatchAdButton() { return <div data-testid="watch-ad" />; } }));
 vi.mock('@/components/ads/WatchAdForRevealButton', () => ({ default: function MockWatchAdForReveal() { return <div data-testid="watch-ad-reveal" />; } }));
+// Pass-through disclosure: this file asserts that the recap CONTENT exists, not
+// that it is collapsed on first paint. WordHuntResultsContent.catchUp.test.tsx
+// renders the real one and owns the collapsed-by-default behaviour.
+vi.mock('@/components/ui/CollapsibleSection', () => ({
+  __esModule: true,
+  default: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 

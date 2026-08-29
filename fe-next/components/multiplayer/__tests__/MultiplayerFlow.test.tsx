@@ -447,9 +447,11 @@ describe('MultiplayerFlow', () => {
         />
       );
 
-      // useLanguage falls back through translation cache; assert the EN string
-      // for `education.classroomGame.waitingForPlayers`.
-      expect(screen.getByText(/waiting for players/i)).toBeInTheDocument();
+      // This screen is the transient join step, not the lobby a teacher waits on:
+      // MultiplayerFlow only renders while `!isActive`, and HostView takes over
+      // once the room is joined. The copy says what is actually happening rather
+      // than claiming we are waiting for players who were never asked yet.
+      expect(screen.getByText(/setting up your classroom game/i)).toBeInTheDocument();
     });
 
     it('should still auto-create classroom host room via prefilledRoom', async () => {
@@ -490,7 +492,12 @@ describe('MultiplayerFlow', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
 
       // Join path: not host mode, targets the existing room's code, no quickPlay flag.
-      expect(handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, expect.any(String));
+      // The consolidation branch now carries `quickPlay: true` as well, so the
+      // successful match-into-an-existing-room path reports its conversion. It
+      // previously omitted the flag, which made the BEST outcome the unreported one.
+      expect(handleJoin).toHaveBeenCalledWith(
+        false, null, 'ROOM01', undefined, expect.any(String), { quickPlay: true },
+      );
       const createCalls = handleJoin.mock.calls.filter((call) => call[0] === true);
       expect(createCalls).toHaveLength(0);
     });

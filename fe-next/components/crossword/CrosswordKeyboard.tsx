@@ -5,7 +5,12 @@ import type { PuzzleLocale } from '@/lib/crossword/types';
 
 const LAYOUTS: Partial<Record<PuzzleLocale, string[]>> = {
   en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
-  he: ['קראטוןםפ', 'שדגכעיחלךף', 'זסבהנמצתץ'],
+  // Standard Israeli layout MINUS the five final forms (ךםןףץ). Crossword answers are stored in
+  // regular form — no answer in clueBank.he.json contains a sofit — and normalizeCell folds a typed
+  // sofit back to its regular letter, so those keys could only ever produce the letter next to them.
+  // Dropping them removes five dead keys and lets the remaining ones grow (10→9 and 9→7 per row).
+  // Final forms are still RENDERED at word ends by answer.displayLetter; this is input only.
+  he: ['קראטופ', 'שדגכעיחל', 'זסבהנמצת'],
   // Spanish keyboard = QWERTY + ñ. Grids are accent-folded (see answer.foldEsAccents) so no
   // accented vowel keys are needed; ñ is a distinct letter and must be typeable.
   es: ['qwertyuiop', 'asdfghjklñ', 'zxcvbnm'],

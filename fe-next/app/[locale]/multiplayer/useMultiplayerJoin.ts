@@ -171,7 +171,10 @@ export function useMultiplayerJoin({
       // mismatch is exactly the defect this event exists to correct in
       // `mp_lobby_join_attempted`.
       let joinOutcomeEmitted = false;
-      const emitJoinOutcome = (outcome: string): void => {
+      /** True only for the first terminal outcome — see emitJoinOutcome. */
+      let isFirstOutcome = false;
+      const emitJoinOutcome = (outcome: string, reason?: string): void => {
+        isFirstOutcome = !joinOutcomeEmitted;
         if (joinOutcomeEmitted) return;
         joinOutcomeEmitted = true;
         trackGrowthEvent('mp_join_outcome', {
@@ -179,6 +182,8 @@ export function useMultiplayerJoin({
           wait_ms: Date.now() - joinStartedAt,
           isHostMode,
           quickPlay: !!options?.quickPlay,
+          // Only on failures — a `reason` on a success would just be noise.
+          ...(reason ? { reason } : {}),
         });
       };
 
@@ -297,21 +302,53 @@ export function useMultiplayerJoin({
       // .on + explicit .off of ALL four events so no stale listener leaks
       // across attempts — .once only auto-removes the one that fired, leaving
       // the other three registered forever (slow accumulation on retries).
-      const resolveJoin = (result: 'joined' | 'error' | 'joinedAsSpectator' | 'rateLimited'): void => {
+      const resolveJoin = (
+        result: 'joined' | 'error' | 'joinedAsSpectator' | 'rateLimited',
+        reason?: string,
+      ): void => {
         clearTimeout(safetyTimeout);
         releaseInFlight();
         trackGrowthEvent('mp_lobby_join_resolved', { result });
         // The server answered — THIS is the attempt's real outcome. One emit
         // here covers the create and join branches identically so they cannot
         // drift (Class 3 in .claude/rules/60-recurring-pitfalls.md).
-        emitJoinOutcome(result);
+        emitJoinOutcome(result, reason);
+        // Quick Play conversion is emitted HERE, from the intent, not from a
+        // `?quickPlay=true` URL param in PageClient. The param is only present on
+        // the landing auto-fire path, but `handleQuickPlay()` also runs for the
+        // in-lobby "Quick Start" button — so lobby taps counted as initiations that
+        // could never convert, and the funnel read 46.8% when it was really 96.4%.
+        // Guarded by isFirstOutcome for the same reason emitJoinOutcome is: one
+        // conversion per attempt, even if the server answers more than once.
+        if (isFirstOutcome && options?.quickPlay && (result === 'joined' || result === 'joinedAsSpectator')) {
+          trackGrowthEvent('mp_quickplay_joined', {
+            asHost: isHostMode,
+            language: roomLang || language,
+            asSpectator: result === 'joinedAsSpectator',
+          });
+        }
         socket.off('joined', onJoined);
         socket.off('error', onError);
         socket.off('joinedAsSpectator', onSpectator);
         socket.off('rateLimited', onRateLimited);
       };
       const onJoined = (): void => resolveJoin('joined');
-      const onError = (): void => resolveJoin('error');
+      // Keep the server's reason. This handler used to drop the payload, which is
+      // why 291 `outcome:'error'` events (58 people, ~5 attempts each) carry no
+      // attributable cause and the biggest join-failure bucket is undebuggable.
+      // Falls back to 'unknown' rather than omitting the field: an absent property
+      // cannot distinguish "server sent nothing" from "client dropped it".
+      const onError = (payload?: unknown): void => {
+        // Prefer `code` (e.g. GAME_NOT_FOUND): it is bounded, groupable, and
+        // survives copy and i18n edits. `message` is user-facing prose that can
+        // interpolate a room code or username — unbounded cardinality in
+        // analytics, and a PII risk. Only fall back to it when there is no code.
+        const p = payload as { code?: string; message?: string; error?: string } | undefined;
+        const reason = typeof payload === 'string'
+          ? payload
+          : p?.code ?? p?.message ?? p?.error;
+        resolveJoin('error', reason || 'unknown');
+      };
       const onSpectator = (): void => resolveJoin('joinedAsSpectator');
       const onRateLimited = (): void => resolveJoin('rateLimited');
       socket.on('joined', onJoined);

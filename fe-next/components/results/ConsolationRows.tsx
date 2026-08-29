@@ -18,6 +18,13 @@ interface ConsolationRowsProps {
   t: (key: string) => string | undefined;
   /** Starting rank (e.g. 4 when top 3 are on the podium) */
   startRank?: number;
+  /**
+   * Whether rows may show the add-friend badge. Off for the full-field list in a
+   * big room: the badge mounts `useFriends()`, which has no shared cache — every
+   * instance runs its own fetch, its own online-status interval and nine socket
+   * listeners, so ten rows means ten of each on results mount.
+   */
+  showAddFriend?: boolean;
 }
 
 function formatScore(score: number): string {
@@ -40,7 +47,9 @@ const rowVariants = {
       type: 'spring' as const,
       stiffness: 250,
       damping: 18,
-      delay: 0.6 + i * 0.08,
+      // Capped: a full 14-player field would otherwise take 1.4s to finish
+      // arriving, so the last few rows land after the player has stopped looking.
+      delay: 0.6 + Math.min(i, 6) * 0.08,
     },
   }),
 };
@@ -51,6 +60,7 @@ export default function ConsolationRows({
   currentUsername,
   t,
   startRank = 4,
+  showAddFriend = true,
 }: ConsolationRowsProps) {
   const reducedMotion = useReducedMotion();
   if (!players.length) return null;
@@ -134,7 +144,7 @@ export default function ConsolationRows({
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              {!isCurrent && (
+              {showAddFriend && !isCurrent && (
                 <AddFriendBadge username={player.username} isBot={(player as { isBot?: boolean }).isBot} />
               )}
               <span

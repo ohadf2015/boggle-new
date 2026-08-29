@@ -1,4 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
+import { submitRealWord } from '../helpers/grid-solver';
 
 /**
  * Page Object for the multiplayer flow.
@@ -81,7 +82,12 @@ export class MultiplayerPage {
     this.playerRoster = page.locator('[class*="roster"], [class*="player-list"]');
 
     // In-Game
-    this.gameGrid = page.locator('[class*="grid-container"], [data-testid*="grid"]');
+    // The board renders as `[role="grid"]` with `[role="gridcell"]` children
+    // (see components/GridComponent.tsx) — no data-testid on either. Keep the
+    // looser class/testid probe as a fallback for older/alternate layouts.
+    this.gameGrid = page
+      .locator('[role="grid"]')
+      .or(page.locator('[class*="grid-container"], [data-testid*="grid"]'));
     this.wordInput = page.locator('input[type="text"][placeholder*="word"], [class*="word-input"]');
     this.submitWordButton = page.getByRole('button', { name: /submit|שלח/i });
     this.leaderboard = page.locator('[class*="leaderboard"]');
@@ -151,5 +157,15 @@ export class MultiplayerPage {
   /** Wait for results to appear */
   async waitForResults() {
     await expect(this.resultsView).toBeVisible({ timeout: 60_000 });
+  }
+
+  /** The live found-words ladder row for a given word (components/multiplayer/desktop/WordsLadder.tsx) */
+  wordLadderRow(word: string): Locator {
+    return this.page.locator(`[data-testid="ladder-row-${word}"]`);
+  }
+
+  /** Read the current board, ask the solver for a real word, and submit it via a drag gesture */
+  async submitRealWord(baseURL: string, language = 'en'): Promise<string> {
+    return submitRealWord(this.page, baseURL, language);
   }
 }

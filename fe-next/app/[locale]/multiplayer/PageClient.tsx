@@ -303,7 +303,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setShouldAutoJoin(false);
       setIsJoining(false);
       setPrefilledRoomCode('');
-      if (quickPlay) trackGrowthEvent('mp_quickplay_joined', { asHost: data.isHost, language: data.language ?? language });
+      // `mp_quickplay_joined` moved into useMultiplayerJoin, which knows the join
+      // was a Quick Play from `options.quickPlay` rather than inferring it from a
+      // `?quickPlay=true` URL param. The param is absent for the in-lobby "Quick
+      // Start" button, so this emit could never fire for those users and reported
+      // every one of them as an abandon.
       // Track invite consumed for returning users who arrived via ?room= invite redirect.
       // New-user path fires this in useInviteOnboardingMode instead.
       if (prefilledRoomCode) reportInviteConsumed(prefilledRoomCode);
@@ -666,12 +670,17 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             )
           ) : (
             // AutoHideHeader manages visibility via isInGame (= isActive || showResults):
-            // lobby → full header; gameplay/results → spacer only.
-            // Spacer must ALWAYS render here — the prior `? null` caused CLS 0.979 on
-            // reconnect: isActive flips in ~200ms post-socket-connect, collapsing the
-            // spacer-height slot while still inside the CLS measurement window.
-            // collapseSpacerWhenHidden defaults false for this page (by design).
-            <AutoHideHeader />
+            // room list → full header; room lobby/gameplay/results → header hidden.
+            //
+            // The spacer cannot be unconditional OR unconditionally collapsed:
+            //  - Always on: the room lobby renders its own sticky header, so the
+            //    reserved 80px sits above it as a visibly empty dark band.
+            //  - Always off (the prior `? null`): CLS 0.979 on reconnect, where
+            //    isActive flips ~200ms post-socket-connect with no user input,
+            //    collapsing the slot inside the CLS measurement window.
+            // 'user-initiated' keeps the spacer for the reconnect flip and drops it
+            // when the user tapped into the room, where the shift is input-excluded.
+            <AutoHideHeader collapseSpacerWhenHidden="user-initiated" />
           )}
           {renderView()}
           <HostLeftGraceModal

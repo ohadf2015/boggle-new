@@ -37,6 +37,7 @@ import { deriveBragCardData, deriveBragShareText } from '@/lib/results/bragCard'
 import { getBragShareUrl, trackShareCompleted } from '@/utils/share';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import InlineSignupCard from '@/components/auth/InlineSignupCard';
+import ReferralShareBanner from '@/components/referral/ReferralShareBanner';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -244,6 +245,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   // Split players: top 3 for podium, 4th+ for consolation rows
   const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
   const consolationPlayers = useMemo(() => sortedScores.slice(3), [sortedScores]);
+  /**
+   * Above four players the podium alone hides most of the room: at fourteen it
+   * shows the top 3 and the player's own row, erasing ranks 4–13. Rooms really do
+   * run that big (Supabase `game_sessions`: 13→14→15→15→15→14 over six rounds), so
+   * past four we list the whole remaining field. At four or fewer, podium + you IS
+   * everyone and the single trimmed row stays.
+   */
+  const showFullField = sortedScores.length > 4;
 
   // Assign consolation crowns to 4th+ players
   const consolationCrowns = useMemo(() => {
@@ -512,12 +521,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           onReaction={onPodiumReaction}
         />
       )}
-      {showPodium && currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
+      {showPodium && consolationPlayers.length > 0
+        && (showFullField || (currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username))) && (
         <ConsolationRows
-          players={consolationPlayers.filter(p => p.username === username)}
+          players={showFullField ? consolationPlayers : consolationPlayers.filter(p => p.username === username)}
           crowns={consolationCrowns}
           currentUsername={username}
-          startRank={currentPlayerRank}
+          startRank={showFullField ? 4 : currentPlayerRank}
+          showAddFriend={!showFullField}
           t={t}
         />
       )}
@@ -548,6 +559,20 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           them, so the recap below is empty or meaningless. One signup CTA takes
           the place of the whole secondary stack. */}
       {isGuest && <InlineSignupCard isAuthenticated={isAuthenticated} />}
+
+      {/* ── 3c. AUTHENTICATED PLAYERS — the incentivized referral CTA (code +
+          coin/XP reward) that previously only reached players who opted into
+          visiting the leaderboard page. Every finished game is now an
+          impression at the highest-intent moment. Gated on `isAuthenticated`,
+          NOT `!isGuest`: useIsGuest is `!loading && !isAuthenticated`, so
+          `!isGuest` is true while auth is still resolving and would flash this
+          banner at guests for a frame. That hook exists for UI *removed* from
+          guests, where "show it" is the pessimistic state; this banner is
+          *added* for registered players, so the pessimistic state is hidden.
+          Still can't double up with InlineSignupCard above — that renders only
+          when isGuest, which requires isAuthenticated false. The component
+          self-gates further on having a referral code loaded. */}
+      {isAuthenticated && <ReferralShareBanner />}
 
       {/* ── 4. WHAT YOU EARNED — XP / level / streak. ImprovementPanel renders
           nothing for guests w/ no progress. Coins no longer get their own

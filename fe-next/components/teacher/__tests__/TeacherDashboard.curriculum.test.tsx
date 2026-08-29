@@ -104,7 +104,13 @@ describe('<TeacherDashboard> curriculum word lists', () => {
   it('surfaces the curriculum browser on the prepare tab', () => {
     render(<TeacherDashboard />);
 
-    fireEvent.click(screen.getByText('go-to-prepare'));
+    // Navigate the way a teacher actually does — the Prepare tab in the tab bar.
+    // This used to go through PlayTabFirstRunCard's `onCreateClassroom`, which switched tabs as a
+    // side effect. That prop is gone by design: the first-run card now creates the classroom
+    // inline and shows the join code without leaving the Play tab, so there is no longer a
+    // "create sends you to Prepare" hop to ride. The assertion below is unchanged — the curriculum
+    // browser must live on Prepare and nowhere else.
+    fireEvent.click(screen.getByText('teacher.dashboard.tab.prepare'));
 
     expect(screen.getByText('CurriculumWordListBrowser')).toBeInTheDocument();
   });

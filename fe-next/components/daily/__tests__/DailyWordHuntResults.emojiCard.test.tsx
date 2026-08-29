@@ -280,9 +280,14 @@ describe('DailyWordHuntResults - EmojiShareCard', () => {
     vi.clearAllMocks();
   });
 
-  it('does NOT render EmojiShareCard (removed from results)', () => {
+  /* Reversed deliberately (2026-08-27). The card was pulled from results once and
+     this test pinned its absence. It is back, and it is now the hero of the screen:
+     the emoji grid IS the shareable artifact, the thing a player posts and the
+     reason anyone else hears about the puzzle. Leaving it unrendered left the
+     component reachable from nothing but the barrel export and this test. */
+  it('renders EmojiShareCard as the shareable artifact', () => {
     render(<DailyWordHuntResults {...baseProps} />);
-    expect(screen.queryByTestId('emoji-share-card')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('emoji-share-card').length).toBeGreaterThan(0);
   });
 
   it('passes onChallengeShare to ShareSection when solved=true', () => {

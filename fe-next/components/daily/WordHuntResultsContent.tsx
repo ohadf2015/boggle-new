@@ -11,7 +11,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
-import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen } from 'lucide-react';
+import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import { useIsGuest } from '@/hooks/useIsGuest';
@@ -33,6 +33,7 @@ import { useExperiment } from '@/hooks/useExperiment';
 import RivalCompareCard from './RivalCompareCard';
 import { useDailyRivalCompare } from '@/hooks/useDailyRivalCompare';
 import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
+import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -46,6 +47,7 @@ import {
   CoinUnlockCard,
   MoreOptionsAccordion,
   StreakFreezeIndicator,
+  EmojiShareCard,
   type WordHuntStats,
   type CoinReward,
 } from './results';
@@ -117,7 +119,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isNewCompletion: _isNewCompletion,
   survivalBonusTime,
   rarestWord,
-  emojiWords: _emojiWords,
+  emojiWords,
   stats,
   shareHandlers,
   coinActions,
@@ -400,6 +402,14 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     return (
       <div className="space-y-4">
         {heroNode}
+        <EmojiShareCard
+          puzzleNumber={puzzleNumber}
+          score={result.efficiencyScore ?? 0}
+          solved={result.solved}
+          words={emojiWords}
+          language={language}
+          t={t}
+        />
         {failStateNode}
         {leaderboardNode}
         {signupNode}
@@ -411,271 +421,236 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   <div className="space-y-4">
     {heroNode}
 
-    {/* Vs your own past plays — placement/score is above, this is the
-        "how do I compare to how I usually do" the player cares about next.
-        Also carries a small randomized celebratory flourish (variable reward). */}
-    <PastPerformanceCompare
-      currentScore={result.efficiencyScore ?? 0}
+    <EmojiShareCard
+      puzzleNumber={puzzleNumber}
+      score={result.efficiencyScore ?? 0}
       solved={result.solved}
-      past={pastPerformance}
+      words={emojiWords}
+      language={language}
       t={t}
     />
 
-    {/* Head-to-head: a friend challenged you — did you beat their score? */}
-    {rival && (
-      <m.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.08, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <RivalCompareCard
-          rivalName={rival.name}
-          rivalEmoji={rival.emoji}
-          rivalScore={rival.score}
-          myScore={result.efficiencyScore ?? 0}
-          t={t}
-        />
-      </m.div>
-    )}
-
-    {/* Streak freeze shields indicator */}
-    {(freezesAvailable > 0 || isStreakProtected) && (
-      <StreakFreezeIndicator
-        freezesAvailable={freezesAvailable}
-        isProtected={isStreakProtected}
-        t={t}
-      />
-    )}
-
-    {/* WIN state: Performance breakdown with 3 bars */}
-    {result.solved && (
-      <m.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <PerformanceSection
-          coinReward={coinActions.coinReward}
-          coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
-          survivalBonusTime={survivalBonusTime}
-          rarestWord={rarestWord}
-          solved={result.solved}
-          efficiencyScore={result.efficiencyScore || 0}
-          lifeRemaining={result.lifeRemaining || 0}
-          wordsDiscovered={result.wordsDiscovered?.length || 0}
-          guessesUsed={result.attemptsUsed}
-          extraTries={result.extraTries}
-          t={t}
-          language={language}
-        />
-      </m.div>
-    )}
-
-    {/* Rank badge - shows for both WIN and FAIL */}
-    {stats && (
-      <m.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <RankBadge stats={stats} t={t} />
-      </m.div>
-    )}
-
-    {/* Single-stat narrative blurb — one compelling number in a sentence */}
-    {stats && (
-      <m.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.18, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <StatsBlurb stats={stats} solved={result.solved} t={t} />
-      </m.div>
-    )}
-
-    {/* Primary next-step: back-to-daily (wheel already done) or the wheel
-        cross-promo. Sticky-pinned to the bottom of the scrollport, so it stays
-        on screen through the leaderboard and the rest of the recap. It sits
-        here in DOM order so it lands right above "who else played" once the
-        player scrolls to the end and it unpins. */}
-    {backToDailyCtaNode}
+    {/* Primary CTA — one or the other, never both */}
+    {/* Exactly ONE primary CTA renders: these two are guarded by `!wordWheelPlayed`
+        and `wordWheelPlayed`, so they can never both be truthy. Dropping the wheel
+        CTA to satisfy "one CTA" left the majority branch — players who have not
+        played the wheel yet — with no next step at all, and took its
+        `cross_promo_click` with it. */}
     {wheelCtaNode}
+    {backToDailyCtaNode}
 
-    {/* Leaderboard — who else played, and how you stack up. Sits with
-        rank/placement/vs-past so the "what matters" cluster (score,
-        placement, vs others, vs your past) is together before promo/CTA noise. */}
+    {/* Share and retry sit with the emoji grid, NOT inside the recap. The grid
+        is the shareable artifact and this is how it leaves the app — burying the
+        share action behind a disclosure is the opposite of the goal. */}
+    <ShareSection
+      solved={result.solved}
+      onShare={shareHandlers.handleNativeShare}
+      onChallengeShare={shareHandlers.handleChallengeShare}
+      onRetry={coinActions.handleRetryChallenge}
+      onRetryFree={onRetryFree}
+      canAffordRetry={coinActions.canAffordRetry}
+      retryCost={coinActions.retryCost}
+      currentCoins={coinActions.currentCoins}
+      onWhatsApp={shareHandlers.handleWhatsApp}
+      onTwitter={shareHandlers.handleTwitter}
+      onTelegram={shareHandlers.handleTelegram}
+      onCopy={shareHandlers.handleCopy}
+      onDownloadImage={shareHandlers.handleDownloadShareImage}
+      copied={shareHandlers.copied}
+      isGeneratingImage={shareHandlers.isGeneratingImage}
+      onSpendStart={onSpendStart}
+      t={t}
+    />
+
+    {/* Leaderboard — who else played, and how you stack up. */}
     {leaderboardNode}
 
-    {/* Actionable "score more next time" insight — guess-efficiency aware.
-        attemptsToFind = guesses used; a fast solve gets a positive nudge, a blind
-        solve learns the word→clue loop, a slow solve learns to trust its clues. */}
-    {(() => {
-      const words = result.wordsDiscovered ?? [];
-      const lengths = words.map((w) => w.word.length);
-      const avgWordLength = lengths.length
-        ? Math.round((lengths.reduce((a, b) => a + b, 0) / lengths.length) * 10) / 10
-        : 0;
-      return (
-        <m.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-          className="mx-auto max-w-xs"
-        >
-          <WordHuntTipBadge stats={{
-            score: result.efficiencyScore || 0,
-            survived: result.solved,
-            lifeRemaining: result.lifeRemaining || 0,
-            discoveryWords: words.length,
-            foundTarget: result.solved,
-            isFirstFinder: false,
-            totalPlayers: 1,
-            rank: 1,
-            validWordCount: words.length,
-            invalidWordCount: 0,
-            avgWordLength,
-            longestWordLength: lengths.length ? Math.max(...lengths) : 0,
-            attemptsToFind: result.attemptsUsed,
-          }} />
-        </m.div>
-      );
-    })()}
-
-    {/* Daily Insight Cards — personalized analytics on challenge performance */}
-    <DailyInsightStack mode="word_hunt" date={puzzleDate} />
-
-    {/* Multiplayer cross-promo — surfaced once today's daily pair is complete, so
-        it never competes with the daily↔daily "finish today's challenge" CTA. */}
-    {wordWheelPlayed && (
-      <MpModeCrossPromo language={language} source="word_hunt_results" t={t} />
-    )}
-
-    {/* Catch up dailies missed in the last 3 days — nudge after finishing one. */}
+    {/* Catch-up dailies — the one card here that offers ANOTHER GAME, so it
+        stays out of the recap disclosure. It self-hides when there is nothing
+        to catch up, so it costs no height on the screens it does not apply to. */}
     <CatchUpSuggestion excludeDate={puzzleDate} />
 
-    {failStateNode}
-
-    {/* Share/Retry Section */}
-    <m.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.28, type: 'spring', stiffness: 300, damping: 26 }}
+    {/* Full recap — the long tail. `CollapsibleSection` (not `Collapsible`)
+        because it takes a `summary`: a bare chevron labelled "Full recap" gives
+        the player no reason to tap it. Same disclosure the wheel results use. */}
+    <CollapsibleSection
+      title={t('daily.results.fullRecap', 'Full recap')}
+      summary={t('daily.results.fullRecapSummary', 'Your rank, your rarest word, your coins — and who you beat')}
+      icon={<Sparkles className="w-4 h-4" />}
+      defaultExpanded={false}
+      variant="primary"
     >
-      <ShareSection
-        solved={result.solved}
-        onShare={shareHandlers.handleNativeShare}
-        onChallengeShare={shareHandlers.handleChallengeShare}
-        onRetry={coinActions.handleRetryChallenge}
-        onRetryFree={onRetryFree}
-        canAffordRetry={coinActions.canAffordRetry}
-        retryCost={coinActions.retryCost}
-        currentCoins={coinActions.currentCoins}
-        onWhatsApp={shareHandlers.handleWhatsApp}
-        onTwitter={shareHandlers.handleTwitter}
-        onTelegram={shareHandlers.handleTelegram}
-        onCopy={shareHandlers.handleCopy}
-        onDownloadImage={shareHandlers.handleDownloadShareImage}
-        copied={shareHandlers.copied}
-        isGeneratingImage={shareHandlers.isGeneratingImage}
-        onSpendStart={onSpendStart}
-        t={t}
-      />
-    </m.div>
+      <div className="space-y-4">
+        {/* Vs your own past plays */}
+        <PastPerformanceCompare
+          currentScore={result.efficiencyScore ?? 0}
+          solved={result.solved}
+          past={pastPerformance}
+          t={t}
+        />
 
-    {/* Inline signup for guests (only reachable here while auth is still
-        resolving — a resolved guest gets the simplified branch above). */}
-    {signupNode}
+        {/* Head-to-head rival */}
+        {rival && (
+          <RivalCompareCard
+            rivalName={rival.name}
+            rivalEmoji={rival.emoji}
+            rivalScore={rival.score}
+            myScore={result.efficiencyScore ?? 0}
+            t={t}
+          />
+        )}
 
-    {/* Daily complete badge — shown once both games done */}
-    {wordWheelPlayed && (
-      <m.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.32, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <div className="flex items-center gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg">
-          <CheckCircle2 className="w-6 h-6 text-neo-black shrink-0" />
-          <div>
-            <span className="font-neo-display font-black text-neo-black text-sm">
-              {t('wordWheel.results.dailyComplete', 'Daily Challenge complete!')}
-            </span>
-            <p className="text-neo-black/70 text-xs">
-              {t('wordWheel.results.dailyCompleteDesc', 'Both games done. Come back tomorrow!')}
-            </p>
-          </div>
-        </div>
-      </m.div>
-    )}
+        {/* Streak freeze shields */}
+        {(freezesAvailable > 0 || isStreakProtected) && (
+          <StreakFreezeIndicator
+            freezesAvailable={freezesAvailable}
+            isProtected={isStreakProtected}
+            t={t}
+          />
+        )}
 
-    {/* Word Bridge (Connections) cross-promo — EN/HE only, after daily complete.
-        Hidden once today's Connections is itself played (no already-played nag). */}
-    {wordWheelPlayed && !connectionsPlayed && (language === 'en' || language === 'he') && (
-      <m.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.34, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <Link
-          href={`/${language}/connections/pyramid`}
-          data-testid="daily-connections-cross-promo"
-          onClick={() =>
-            trackGrowthEvent('cross_promo_click', {
-              target: 'connections',
-              source: 'word_hunt_results',
-              placement: 'post_daily_complete',
-              language,
-            })
-          }
-          className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
-              ↔
+        {/* WIN state: Performance breakdown */}
+        {result.solved && (
+          <PerformanceSection
+            coinReward={coinActions.coinReward}
+            coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
+            survivalBonusTime={survivalBonusTime}
+            rarestWord={rarestWord}
+            solved={result.solved}
+            efficiencyScore={result.efficiencyScore || 0}
+            lifeRemaining={result.lifeRemaining || 0}
+            wordsDiscovered={result.wordsDiscovered?.length || 0}
+            guessesUsed={result.attemptsUsed}
+            extraTries={result.extraTries}
+            t={t}
+            language={language}
+          />
+        )}
+
+        {/* Rank badge */}
+        {stats && <RankBadge stats={stats} t={t} />}
+
+        {/* Stats blurb */}
+        {stats && <StatsBlurb stats={stats} solved={result.solved} t={t} />}
+
+        {/* Tip badge */}
+        {(() => {
+          const words = result.wordsDiscovered ?? [];
+          const lengths = words.map((w) => w.word.length);
+          const avgWordLength = lengths.length
+            ? Math.round((lengths.reduce((a, b) => a + b, 0) / lengths.length) * 10) / 10
+            : 0;
+          return (
+            <div className="mx-auto max-w-xs">
+              <WordHuntTipBadge stats={{
+                score: result.efficiencyScore || 0,
+                survived: result.solved,
+                lifeRemaining: result.lifeRemaining || 0,
+                discoveryWords: words.length,
+                foundTarget: result.solved,
+                isFirstFinder: false,
+                totalPlayers: 1,
+                rank: 1,
+                validWordCount: words.length,
+                invalidWordCount: 0,
+                avgWordLength,
+                longestWordLength: lengths.length ? Math.max(...lengths) : 0,
+                attemptsToFind: result.attemptsUsed,
+              }} />
             </div>
+          );
+        })()}
+
+        {/* Daily Insights */}
+        <DailyInsightStack mode="word_hunt" date={puzzleDate} />
+
+        {/* MP cross-promo */}
+        {wordWheelPlayed && (
+          <MpModeCrossPromo language={language} source="word_hunt_results" t={t} />
+        )}
+
+        {/* Fail state (reveal target) */}
+        {failStateNode}
+
+
+        {/* Inline signup */}
+        {signupNode}
+
+        {/* Daily complete badge */}
+        {wordWheelPlayed && (
+          <div className="flex items-center gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg">
+            <CheckCircle2 className="w-6 h-6 text-neo-black shrink-0" />
             <div>
-              <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
-                {t('connections.landing.crossPromoTitle', language === 'he' ? 'נסה ראש זנב' : 'Try Word Bridge')}
+              <span className="font-neo-display font-black text-neo-black text-sm">
+                {t('wordWheel.results.dailyComplete', 'Daily Challenge complete!')}
               </span>
-              <p className="text-neo-white text-xs mt-0.5">
-                {t('connections.landing.crossPromoBody', language === 'he' ? 'שתי מילים, גשר אחד. חינם.' : 'Two words. One bridge. Free.')}
+              <p className="text-neo-black/70 text-xs">
+                {t('wordWheel.results.dailyCompleteDesc', 'Both games done. Come back tomorrow!')}
               </p>
             </div>
           </div>
-          <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
-        </Link>
-      </m.div>
-    )}
+        )}
 
-    {/* Back-to-daily CTA lives above the leaderboard now (see primary CTA block). */}
+        {/* Connections cross-promo */}
+        {wordWheelPlayed && !connectionsPlayed && (language === 'en' || language === 'he') && (
+          <Link
+            href={`/${language}/connections/pyramid`}
+            data-testid="daily-connections-cross-promo"
+            onClick={() =>
+              trackGrowthEvent('cross_promo_click', {
+                target: 'connections',
+                source: 'word_hunt_results',
+                placement: 'post_daily_complete',
+                language,
+              })
+            }
+            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
+                ↔
+              </div>
+              <div>
+                <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
+                  {t('connections.landing.crossPromoTitle', language === 'he' ? 'נסה ראש זנב' : 'Try Word Bridge')}
+                </span>
+                <p className="text-neo-white text-xs mt-0.5">
+                  {t('connections.landing.crossPromoBody', language === 'he' ? 'שתי מילים, גשר אחד. חינם.' : 'Two words. One bridge. Free.')}
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
+          </Link>
+        )}
 
-    {/* Witty facts — supplementary, below the fold */}
-    {stats && (
-      <m.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
-      >
-        <DailyWordHuntFacts result={result} stats={stats} t={t} />
-      </m.div>
-    )}
+        {/* Word Hunt facts */}
+        {stats && (
+          <m.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+          >
+            <DailyWordHuntFacts result={result} stats={stats} t={t} />
+          </m.div>
+        )}
 
-    {/* Appeal a word the dictionary refused this round — parity with multiplayer,
-        which has had this since WordPointsGroup. Renders nothing if nothing was
-        rejected. See docs/2026-08-02-word-game-player-complaints-research.md. */}
-    <RejectedWordAppeal language={language} t={t} />
+        {/* Word appeal */}
+        <RejectedWordAppeal language={language} t={t} />
 
-    {/* Suggest tomorrow's word — community contribution */}
-    <SuggestWordCard language={language} playerId={profile?.id} guestFingerprint={guestFingerprint} />
+        {/* Suggest word */}
+        <SuggestWordCard language={language} playerId={profile?.id} guestFingerprint={guestFingerprint} />
 
-    {/* Create Your Own Board + Language Options — visible, not collapsed */}
-    <MoreOptionsAccordion
-      isAuthenticated={isAuthenticated}
-      solved={result.solved}
-      currentLanguage={language}
-      onCreatePuzzle={onShowCreatePuzzle}
-      onGameLanguageChange={onGameLanguageChange}
-      t={t}
-    />
+        {/* More options */}
+        <MoreOptionsAccordion
+          isAuthenticated={isAuthenticated}
+          solved={result.solved}
+          currentLanguage={language}
+          onCreatePuzzle={onShowCreatePuzzle}
+          onGameLanguageChange={onGameLanguageChange}
+          t={t}
+        />
+      </div>
+    </CollapsibleSection>
 
   </div>
   );

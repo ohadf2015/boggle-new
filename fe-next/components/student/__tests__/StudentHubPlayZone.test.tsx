@@ -85,4 +85,32 @@ describe('StudentHubPlayZone', () => {
     );
     expect(mockT).toHaveBeenCalledWith('student.hub.playZone');
   });
+
+  it('renders Solo Practice card', () => {
+    render(
+      <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
+    );
+    expect(screen.getByText('student.dashboard.soloPractice')).toBeInTheDocument();
+  });
+
+  it('navigates to quick-play on Solo Practice click', () => {
+    render(
+      <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
+    );
+    // Find the Solo Practice card by its text content
+    const soloPracticeText = screen.getByText('student.dashboard.soloPractice');
+    const soloPracticeCard = soloPracticeText.closest('div[class*="rounded-neo"]');
+    expect(soloPracticeCard).toBeInTheDocument();
+    fireEvent.click(soloPracticeCard!);
+    expect(mockPush).toHaveBeenCalledWith('/en/quick-play');
+  });
+
+  it('renders three cards: Play with Class, Solo Practice, and Quick Duel', () => {
+    render(
+      <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
+    );
+    expect(screen.getByTestId('play-with-class')).toBeInTheDocument();
+    expect(screen.getByText('student.dashboard.soloPractice')).toBeInTheDocument();
+    expect(screen.getByText('student.dashboard.quickDuel')).toBeInTheDocument();
+  });
 });

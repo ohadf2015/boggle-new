@@ -11,7 +11,6 @@ import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import AdSenseLoader from '@/components/ads/AdSenseLoader';
-import { getAdSenseClient } from '@/lib/ads/adSensePolicy';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
@@ -542,7 +541,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 byDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
             },
         },
-        // FAQPage JSON-LD lives on the homepage only (lib/seo/homepageFaqJsonLd.ts)
+        // FAQPage JSON-LD lives on the homepage only (app/[locale]/(home)/seoContent.ts)
         // to avoid Google "Duplicate field 'FAQPage'" on landing pages with own FAQ.
     ];
 
@@ -597,40 +596,24 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
                 <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
                 <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
-                {/* AdSense loader — lazyOnload, NOT an SSR'd `<script async>`.
-                    It used to be the latter, and that was the site's single
-                    biggest source of client-side errors: 56 React #418 hydration
-                    errors across 50 sessions in 7 days on `/` alone, plus every
-                    other locale root. Cause, from the unminified dev diff: this
-                    script starts fetching with the HTML, and adsbygoogle.js
-                    inserts its own `pagead/managed/js/adsense/…/show_ads_impl`
-                    script near the TOP of <head> — index 1, right after
-                    <meta charSet> — while React is still hydrating. React
-                    reconciles <head> children BY POSITION and does not key
-                    them, so every React-owned head child shifts by one and the
-                    first inline script (STORAGE_SHIM_SCRIPT) gets compared
-                    against Google's injected node. Nothing here is wrong; the
-                    container is just mutated underneath React mid-hydration.
-                    lazyOnload is the fix because it is the only strategy that
-                    cannot land before hydration finishes (`afterInteractive` is
-                    documented as "after SOME hydration occurs", which is the
-                    same race with a smaller window). It also matches what every
-                    other third party in this file already does — gtag,
-                    GrowthRadar and LogRocket are all lazyOnload — and keeps the
-                    ad loader off the LCP critical path.
-                    Domain verification does not depend on this tag: the
-                    privacy-neutral `google-adsense-account` meta in the root
-                    layout is the always-present ownership signal, and a
-                    JS-executing review crawler still sees this script once the
-                    page is interactive. The id still matches AdSenseLoader's
-                    injection guard, so the consent-gated path cannot
-                    double-inject. */}
-                <Script
-                    id="adsbygoogle-init"
-                    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(getAdSenseClient())}`}
-                    crossOrigin="anonymous"
-                    strategy="lazyOnload"
-                />
+                {/* No AdSense tag here — `AdSenseLoader` (mounted below) is the sole
+                    injector. This layout used to render one too, and it was wrong twice.
+                    (1) next/script stamps `data-nscript` on the tag, which adsbygoogle.js
+                    rejects: 405 warnings across 8 users (Sentry JAVASCRIPT-NEXTJS-1PQ).
+                    (2) It rendered UNCONDITIONALLY and won the race for the shared
+                    `adsbygoogle-init` id, so AdSenseLoader's `getElementById` guard
+                    early-returned on every page load ever — its advertising-consent,
+                    child-tier, native/CrazyGames and FTUE gates were dead code while the
+                    script itself loaded for everybody. Loading AdSense without consent is
+                    the actual severity here; the console warning was just the symptom that
+                    surfaced.
+                    The hydration property that put a `<Script strategy="lazyOnload">` here
+                    in the first place is preserved and then some: AdSenseLoader appends a
+                    plain `<script>` from a `useEffect`, which cannot run until after
+                    hydration completes — strictly later than lazyOnload. See
+                    `headScriptsHydration.test.ts`. Domain verification is unaffected: the
+                    `google-adsense-account` meta in the root layout is the ownership
+                    signal, not this tag. */}
                 {/* CrazyGames SDK — preconnect for game-distribution builds */}
                 <link rel="preconnect" href="https://sdk.crazygames.com" />
                 <link rel="dns-prefetch" href="https://sdk.crazygames.com" />

@@ -65,11 +65,14 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
     classes_limit: FREE_TIER_LIMITS.classes,
     students_limit_per_class: FREE_TIER_LIMITS.studentsPerClass,
     features: [
-      `Up to ${FREE_TIER_LIMITS.classes} class`,
+      // `as number` because FREE_TIER_LIMITS is `as const`, so tsc narrows `.classes` to the
+      // literal 3 and rejects the comparison as provably false. The plural still has to be
+      // computed, not hardcoded — this read "Up to 3 class" the moment the cap moved off 1.
+      `Up to ${FREE_TIER_LIMITS.classes} ${(FREE_TIER_LIMITS.classes as number) === 1 ? 'class' : 'classes'}`,
       `${FREE_TIER_LIMITS.studentsPerClass} students per class`,
       'Custom word lists & lesson builder',
       'Classroom duels',
-      'Zero ads for students',
+      'No advertising for your students',
     ],
     variantId: undefined,
   },

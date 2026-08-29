@@ -158,7 +158,17 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     }
   }, []);
   useEffect(() => clearQuickPlayPendingTimeout, [clearQuickPlayPendingTimeout]);
-  const isSeekingOverlay = quickPlay && isJoining && seekingVariant === 'match-seeking';
+  // Dismissing the seeking overlay returns the lobby to the player. It does not
+  // abort the in-flight join: `isJoining` is a prop with no setter here, and the
+  // socket listeners are owned by useMultiplayerJoin. If the join then lands, the
+  // player enters the room they asked for — which beats being held on a spinner
+  // they cannot leave. A true abort needs a cancel path through the join hook.
+  const [seekingDismissed, setSeekingDismissed] = useState(false);
+  useEffect(() => {
+    if (!isJoining) setSeekingDismissed(false); // re-arm for the next attempt
+  }, [isJoining]);
+  const isSeekingOverlay =
+    quickPlay && isJoining && seekingVariant === 'match-seeking' && !seekingDismissed;
   useEffect(() => {
     if (!isSeekingOverlay) return;
     trackSeekingExposure();
@@ -397,7 +407,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       setGameCode(matchRoom.gameCode);
       setUsername(quickPlayUsername);
       // Join as a player (not host) via the same fast-join path as a room tap.
-      handleJoin(false, null, matchRoom.gameCode, undefined, quickPlayUsername);
+      // `quickPlay: true` must be passed here too — this is the SUCCESSFUL branch
+      // (a real room was found), and omitting it made the best outcome the one that
+      // went unreported, while the create-a-room fallback below did report.
+      handleJoin(false, null, matchRoom.gameCode, undefined, quickPlayUsername, { quickPlay: true });
       return;
     }
 
@@ -497,7 +510,15 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   }
 
   if (isSeekingOverlay) {
-    return <QuickPlaySeekingOverlay t={t as (key: string) => string} />;
+    return (
+      <QuickPlaySeekingOverlay
+        t={t as (key: string) => string}
+        onCancel={() => {
+          trackGrowthEvent('mp_quickplay_seeking_dismissed', {});
+          setSeekingDismissed(true);
+        }}
+      />
+    );
   }
 
   // Always show RoomListView as base, with modals as overlays

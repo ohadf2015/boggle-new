@@ -3,7 +3,7 @@ import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
 import { sendEmail } from '@/lib/email/send';
 import { teacherTrialReminder } from '@/lib/email/templates/teacherTrialReminder';
-import { pickTrialReminder } from '@/lib/education/trialReminders';
+import { pickTrialReminder, dedupeDueByEmail } from '@/lib/education/trialReminders';
 import type { TeacherLocale } from '@/lib/education/types';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
@@ -22,6 +22,12 @@ import { withCronLock } from '@/backend/redis/locking';
  * a bucket is appended after a confirmed send, and pickTrialReminder never
  * returns a bucket that is already in it. Running this twice in a day, or
  * catching up after a missed day, sends nothing extra.
+ *
+ * That array is per ROW, which is not the same as per PERSON — a teacher who submitted the
+ * access form twice owns two approved rows and would be reminded once per row. So the due list
+ * is passed through `dedupeDueByEmail` before anything is sent, and the number collapsed is
+ * logged rather than swallowed: if it starts climbing, duplicate access requests are being
+ * created again and the real fix belongs upstream at the form.
  *
  * Security: CRON_SECRET via x-cron-secret header or Authorization: Bearer.
  * `?dry=1` returns exactly who would be emailed and sends nothing.
@@ -66,11 +72,23 @@ export async function POST(request: NextRequest) {
       if (error) throw new Error(`teacher_access_requests select failed: ${error.message}`);
 
       const now = Date.now();
-      const due = (data as Row[])
+      const dueRows = (data as Row[])
         .map((row) => ({ row, bucket: pickTrialReminder(row.trial_expires_at, row.trial_reminders_sent, now) }))
         .filter((d): d is { row: Row; bucket: NonNullable<ReturnType<typeof pickTrialReminder>> } => d.bucket !== null);
 
-      logger.log(`[Trial Cron] ${due.length} teachers due a trial reminder${dry ? ' (dry run)' : ''}`);
+      // One teacher, one email. `trial_reminders_sent` makes this idempotent per ROW, which is
+      // wrong per PERSON: a teacher who submitted the access form twice owns two approved rows
+      // and would be reminded once per row. Five addresses in production have duplicates, one
+      // with three.
+      const due = dedupeDueByEmail(dueRows);
+      const collapsed = dueRows.length - due.length;
+
+      logger.log(
+        `[Trial Cron] ${due.length} teachers due a trial reminder${dry ? ' (dry run)' : ''}` +
+          // Never let deduplication be silent — if this number climbs, duplicate access
+          // requests are being created again and the fix belongs upstream at the form.
+          (collapsed > 0 ? ` (${collapsed} duplicate row(s) collapsed)` : ''),
+      );
 
       if (dry) {
         return {

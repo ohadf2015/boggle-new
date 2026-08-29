@@ -4,6 +4,8 @@
  */
 
 import express, { Request, Response, Router } from 'express';
+import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
+import { questResultForWordWheel } from '../../../shared/dailyQuestPool';
 import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
 import logger from '../../utils/logger';
 
@@ -196,6 +198,17 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     if (shouldCreditDailyChallengeQuest({ mode: 'word_wheel', playerId, wordCount })) {
       updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
         logger.error('API', `[WordWheel] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
+      });
+
+      // Credit TODAY'S quests too. This seam only ever bumped the weekly
+      // `dailyChallengesCompleted` counter, so finishing the daily Word Wheel
+      // moved no daily mission at all — the hub advertised "Daily Missions"
+      // above a game that could not advance one. Non-fatal, same as above.
+      completeDailyQuestsForResult(
+        playerId as string,
+        questResultForWordWheel({ score, wordsFound }),
+      ).catch((err) => {
+        logger.error('API', `[WordWheel] daily quest update failed for ${playerId}: ${(err as Error).message}`);
       });
     }
 

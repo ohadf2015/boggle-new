@@ -27,7 +27,7 @@ export type QuestConditionType =
 export type QuestFamily = 'skill' | 'pvp' | 'discovery';
 
 /** Public mode labels a `playMode` quest may reference. NO beta modes. */
-export const QUEST_PUBLIC_MODES = ['multiplayer', 'brain', 'word-hunt'] as const;
+export const QUEST_PUBLIC_MODES = ['multiplayer', 'brain', 'word-hunt', 'word-wheel'] as const;
 export type QuestPublicMode = (typeof QUEST_PUBLIC_MODES)[number];
 
 /**
@@ -134,6 +134,30 @@ const q = (
   ...(mode ? { mode } : {}),
 });
 
+
+/**
+ * Quest facts for a finished daily Word Wheel run.
+ *
+ * The wheel route credited the WEEKLY `dailyChallengesCompleted` counter but
+ * never called the daily-quest seam, so completing it moved no daily mission.
+ * Kept pure and separate from the route so it is testable without Supabase.
+ *
+ * A daily run is always solo: no human opponents, so it can never satisfy the
+ * PvP conditions no matter how high the score.
+ */
+export function questResultForWordWheel(run: {
+  score?: number | null;
+  wordsFound?: readonly string[] | null;
+}): QuestGameResult {
+  const words = Array.isArray(run.wordsFound) ? run.wordsFound : [];
+  return emptyQuestResult({
+    mode: 'word-wheel',
+    score: run.score ?? 0,
+    wordsFound: words.length,
+    longestWordLength: words.reduce((m, w) => Math.max(m, w?.length ?? 0), 0),
+  });
+}
+
 export const DAILY_QUEST_POOL: DailyQuest[] = [
   // SKILL — achieve something inside the gameplay. All steer to /multiplayer:
   // the classic socket seam (gameResults.ts) is the ONLY game-end that credits
@@ -144,10 +168,20 @@ export const DAILY_QUEST_POOL: DailyQuest[] = [
   // there left them silently uncompletable.
   // Longest-word target capped at 6: a 7+ letter word was too hard for the
   // casual audience (many games' best word never hits 7). 6 stays achievable.
-  q('long_word_6', 'longWord', 6, 'skill', '/multiplayer', '📏'),
+  // longWord and wordsInGame ARE reported by the daily seams (word-hunt and
+  // word-wheel both send a word list), so these steer to /daily: the hub
+  // advertises "Daily Missions" above the daily games, and sending a player who
+  // is standing there off to another mode to finish them is the bug this fixes.
+  q('long_word_6', 'longWord', 6, 'skill', '/daily', '📏'),
+  // score and combo are NOT reported by any daily seam, so these stay on the
+  // classic socket path, which is the only game-end that credits them.
   q('score_300', 'score', 300, 'skill', '/multiplayer', '🎯'),
   q('score_500', 'score', 500, 'skill', '/multiplayer', '🚀'),
-  q('words_15', 'wordsInGame', 15, 'skill', '/multiplayer', '⚡'),
+  // Verified against 1,115 real Word Wheel runs before moving this: median run
+  // finds 16 words, 55.9% clear 15, and 27.4% land a 6-letter word. The older
+  // warning in this file about "can't guarantee 15 words" was about Word Hunt,
+  // which is a different board — the wheel comfortably supports both targets.
+  q('words_15', 'wordsInGame', 15, 'skill', '/daily', '⚡'),
   q('combo_4', 'combo', 4, 'skill', '/multiplayer', '🔥'),
   q('combo_6', 'combo', 6, 'skill', '/multiplayer', '💥'),
   // PVP — same-language is guaranteed by matchmaking; beating a human is rare/brag-worthy
@@ -157,6 +191,7 @@ export const DAILY_QUEST_POOL: DailyQuest[] = [
   q('play_mp', 'playMode', 1, 'discovery', '/multiplayer', '🎮', 'multiplayer'),
   q('play_brain', 'playMode', 1, 'discovery', '/brain', '🧠', 'brain'),
   q('play_wordhunt', 'playMode', 1, 'discovery', '/daily', '🔎', 'word-hunt'),
+  q('play_wordwheel', 'playMode', 1, 'discovery', '/daily', '🎡', 'word-wheel'),
 ];
 
 // LCG shuffle with Murmur3 finalizer to diffuse consecutive integer seeds.

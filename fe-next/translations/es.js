@@ -451,6 +451,10 @@ const es = {
     "dismiss": "Cerrar",
     "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
+  "wordTowerV2": {
+    "cardTitle": "Torre de Palabras v2",
+    "cardDesc": "Física real: versión beta"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "GIRO DE HOY",
@@ -2653,7 +2657,9 @@ const es = {
     "waitingForPlayers": "Esperando jugadores...",
     "seconds": "segundos",
     "switchToPlayer": "Cambiar a modo jugador",
-    "viewOnlyBadge": "Modo TV · Solo visualización"
+    "viewOnlyBadge": "Modo TV · Solo visualización",
+    "tryPracticeRound": "Probar una ronda de práctica (Bots)",
+    "practiceRoundFailed": "No se pudieron añadir jugadores de práctica. Revisa tu conexión e inténtalo de nuevo."
   },
   "tvResults": {
     "installHeading": "LLÉVATELO 📱",
@@ -6704,6 +6710,11 @@ const es = {
     "online": "en línea"
   },
   "daily": {
+    "todaysPuzzles": "Los retos de hoy",
+    "results": {
+      "fullRecap": "Resumen completo",
+      "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas — y a quién ganaste"
+    },
     "title": "Desafío Diario",
     "badge": "DESAFÍO DIARIO",
     "flow": {
@@ -6742,6 +6753,7 @@ const es = {
       "yesterday": "El reto de ayer",
       "daysAgo": "Hace {count} días",
       "watchAd": "Mira un anuncio corto para jugar",
+      "adBadge": "Anuncio",
       "appTitle": "¿Te perdiste algunos días?",
       "appSubtitle": "Tienes {count} sin jugar de los últimos días. Juega los retos anteriores en la app de LexiClash para Android.",
       "appCta": "Disponible en Google Play"
@@ -9258,7 +9270,8 @@ const es = {
     "play": "Jugar ahora",
     "seconds": "~{{count}}s",
     "seekingMatch": "Buscando partida…",
-    "seekingMatchSub": "Preparando tu juego"
+    "seekingMatchSub": "Preparando tu juego",
+    "browseInstead": "Mejor busco yo una sala"
   },
   "theme": {
     "sundayFunday": "Domingo de diversión",
@@ -12081,6 +12094,13 @@ const es = {
       "playZone": "Jugar",
       "learnZone": "Aprender"
     },
+    "welcome": {
+      "title": "¡Bienvenido a tu aula!",
+      "subtitle": "Elige tu primer desafío",
+      "dailyChallenge": "Prueba el Desafío Diario",
+      "dailyChallengeDesc": "Intenta el juego de palabras de hoy",
+      "rewards": "Gana puntos y construye tu racha"
+    },
     "nav": {
       "profile": "Mi perfil",
       "achievements": "Logros"
@@ -12101,6 +12121,8 @@ const es = {
       "randomLesson": "Lección al Azar",
       "quickDuel": "Duelo Rápido",
       "challengeClassmate": "Reta a un Compañero",
+      "soloPractice": "Practica Solo",
+      "soloPracticeDesc": "Practica en cualquier momento",
       "streakCalendar": "Tu Racha",
       "activity": {
         "wonDuel": "ganó un duelo",
@@ -12193,6 +12215,9 @@ const es = {
     }
   },
   "teacher": {
+    "proGate": {
+      "cta": "Desbloquéalo con Pro: ${{price}}/mes"
+    },
     "subscription": {
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
@@ -12221,8 +12246,6 @@ const es = {
       "freeForever": "Gratis para siempre, siempre disponible",
       "freeClasses": "Hasta {count} clase",
       "freeStudents": "Hasta {count} estudiantes por clase",
-      "basicWordTracking": "Seguimiento básico de palabras",
-      "dailyProgressReports": "Informes de progreso diarios",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Todo lo que necesitas para crecer",
       "popular": "Más popular",
@@ -12240,7 +12263,28 @@ const es = {
       "manageSubscription": "Gestionar suscripción",
       "districtTitle": "¿Escuela o distrito?",
       "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
-      "districtCta": "Contáctanos para precios escolares"
+      "districtCta": "Contáctanos para precios escolares",
+      "checkoutUnavailable": "El pago está cerrado ahora mismo; no se ha cobrado nada. Inténtalo de nuevo en un rato.",
+      "featureOutcome1": "Da todas las clases que enseñas, sin tope",
+      "featureOutcome2": "Añade la lista entera, no solo los diez primeros",
+      "featureOutcome3": "Mira quién se atasca, palabra a palabra, en directo",
+      "featureOutcome4": "Compara el progreso de todas tus clases",
+      "priceTaxNote": "Pueden añadirse impuestos al pagar.",
+      "proHeroAlt": "Una profesora mira la clasificación de la clase en directo en la pizarra mientras el alumnado juega desde sus sitios.",
+      "valueHeadline": "Clases ilimitadas, alumnos ilimitados, progreso en directo.",
+      "matrix": {
+        "title": "Comparar planes",
+        "featureColumn": "Función",
+        "unlimited": "Ilimitado",
+        "included": "Incluido",
+        "notIncluded": "No incluido",
+        "classes": "Clases",
+        "studentsPerClass": "Alumnos por clase",
+        "customLists": "Tus propias listas de palabras",
+        "duels": "Duelos cara a cara",
+        "noAds": "Sin anuncios para el alumnado",
+        "analytics": "Analíticas e informes imprimibles"
+      }
     },
     "accessRequired": "Acceso de Profesor Requerido",
     "accessDenied": "Necesitas permisos de profesor para esta página.",
@@ -12272,11 +12316,16 @@ const es = {
       "insights": "DATOS",
       "viewReports": "Ver informes",
       "viewReportsDesc": "Ver informes detallados y análisis de tus aulas",
+      "studentsPresentTitle": "{count} alumnos están en {classroom} ahora mismo",
+      "studentsPresentDescription": "Empieza una partida y entrarán directamente.",
       "tab": {
         "play": "Jugar",
         "prepare": "Preparar",
         "review": "Revisar"
-      }
+      },
+      "classroomLoadError": "No se pudieron cargar tus clases",
+      "classroomLoadErrorHint": "Revisa tu conexión e inténtalo de nuevo",
+      "retry": "Reintentar"
     },
     "game": {
       "qrCode": "Mostrar Código QR",
@@ -12311,6 +12360,7 @@ const es = {
       "create": "Crear Aula",
       "createAnother": "Crear Otra Aula",
       "creating": "Creando...",
+      "defaultName": "Mi Clase",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",
       "confirmDelete": "¿Eliminar aula? Los estudiantes perderán acceso.",
@@ -12355,7 +12405,32 @@ const es = {
       "created": "¡{{classroomName}} creada! Comparte el código para comenzar.",
       "shareCode": "Comparte este código con tus estudiantes",
       "noClassrooms": "Sin aulas aún",
-      "createFirst": "Crea tu primera aula para empezar"
+      "createFirst": "Crea tu primera aula para empezar",
+      "inviteStudents": "Invitar alumnos",
+      "share": "Compartir",
+      "shareInviteText": "Únete a {{name}} en LexiClash con el código {{code}}",
+      "createdBannerTitle": "¡Clase lista!",
+      "googleClassroom": "Publicar en Google Classroom",
+      "googleClassroomTitle": "Únete a {{name}} en LexiClash",
+      "googleClassroomBody": "Toca el enlace para entrar a nuestra clase. No hace falta cuenta: solo elige un nombre.",
+      "createdBannerBody": "Comparte este código con tus alumnos.",
+      "dismissBanner": "Listo",
+      "wizard": {
+        "title": "Tres pasos y listo",
+        "subtitle": "En un minuto tienes el código.",
+        "step1": {
+          "title": "Crea la clase",
+          "body": "Ponle nombre y elige el idioma."
+        },
+        "step2": {
+          "title": "Agarra el código",
+          "body": "El código de acceso aparece al toque."
+        },
+        "step3": {
+          "title": "Compártelo con tus alumnos",
+          "body": "Mándales el código. Sin cuentas."
+        }
+      }
     },
     "classrooms": {
       "students": {
@@ -12817,6 +12892,7 @@ const es = {
       "yesterday": "Ayer"
     },
     "classroomGame": {
+      "classCode": "Código del juego",
       "classroomNotFound": "Clase no encontrada",
       "classroomSession": "Sesión de clase",
       "createClassroom": "Nueva clase",
@@ -12824,11 +12900,14 @@ const es = {
       "deselectAll": "Deseleccionar todo",
       "gameCreated": "¡Juego lanzado! Comparte el código.",
       "gameSettings": "Configuración del juego",
+      "joinedStudents": "Estudiantes unidos",
       "lessonsSelected": "{{count}} lecciones elegidas",
       "missingRequirements": "Faltan requisitos",
+      "more": "más",
       "multiLessonHelp": "Mezcla lecciones para más variedad",
       "noClassrooms": "Aún no has creado clases",
       "noLessonsAvailable": "Sin lecciones. Crea una primero.",
+      "noStudentsYet": "Ningún estudiante se ha unido aún",
       "reviewAndStart": "Revisar e iniciar",
       "scanToJoin": "Escanea para entrar",
       "selectAllLessons": "Seleccionar todas",
@@ -12841,8 +12920,11 @@ const es = {
       "startGame": "Iniciar juego",
       "createRoom": "Crear sala",
       "startGameDescription": "Lanza el juego en vivo",
+      "studentCount": "{{count}} Estudiantes unidos",
+      "studentsCanScan": "Los estudiantes pueden escanear el código QR para unirse",
       "title": "Juego en vivo",
-      "waitingForPlayers": "Esperando que entren estudiantes...",
+      "waitingForPlayers": "Preparando tu juego de clase...",
+      "waitingForStudents": "Esperando a los estudiantes",
       "words": "{{count}} palabras"
     },
     "header": {
@@ -12873,6 +12955,10 @@ const es = {
     "home": {
       "badge_teacher": "Profesor",
       "badge_student": "Clase",
+      "badge_promo": "Modo clase",
+      "promo_title": "Enseña con LexiClash — gratis",
+      "promo_subtitle": "Juega con tu clase, crea tus listas de palabras y mira quién se atasca.",
+      "promo_cta": "Ver el modo clase",
       "teacher_title": "Tu clase está lista",
       "teacher_subtitle": "Crea clases, asigna partidas y sigue el progreso de tus alumnos.",
       "teacher_cta": "Abrir panel del profesor",
@@ -12882,6 +12968,26 @@ const es = {
       "trial_ended": "Prueba finalizada"
     },
     "landing": {
+      "pro": {
+        "title": "Dos planes. Sin trucos.",
+        "subtitle": "Todo lo que necesitas para dar tu primera clase es gratis. Pro quita los límites.",
+        "comparisonAlt": "Comparación entre el plan Gratis y Teacher Pro",
+        "freeTier": "Gratis",
+        "perMonth": "/mes",
+        "classLimit": "Hasta {count} clase",
+        "studentLimit": "Hasta {count} estudiantes en ella",
+        "noAds": "Sin anuncios para tus estudiantes",
+        "customLists": "Tus propias listas de palabras",
+        "duels": "Duelos de palabras en vivo",
+        "freeForever": "Gratis para siempre. Sin tarjeta y sin cuenta atrás.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Todo lo del plan Gratis",
+        "classLimitPro": "Clases ilimitadas",
+        "studentLimitPro": "Estudiantes ilimitados",
+        "analytics": "Analíticas de progreso por estudiante",
+        "chooseNow": "Obtener Teacher Pro",
+        "whyNow": "Empieza gratis, en serio. Pro es para cuando {count} estudiantes en una clase se te quedan cortos."
+      },
       "duelTeaser": {
         "cta": "Reta a un amigo",
         "headline": "Duelos de Palabras",
@@ -12912,7 +13018,7 @@ const es = {
       "hero": {
         "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
         "h1": "Juegos de vocabulario para tu aula — sin cuentas de estudiantes.",
-        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
+        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para {count} idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
         "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",
@@ -13073,6 +13179,7 @@ const es = {
       },
       "welcomeBack": "¡Bienvenido!",
       "openDashboard": "Abrir panel de maestro",
+      "createClassroom": "Crear clase",
       "furtherReading": {
         "title": "Explorar más",
         "guides": "Guías de estrategia",
@@ -13216,14 +13323,24 @@ const es = {
       "subtitle": "Listas de vocabulario listas para usar",
       "useThisPack": "Usar este paquete",
       "commonEnglish": {
-        "name": "Inglés cotidiano"
+        "name": "Inglés cotidiano",
+        "description": "Palabras cotidianas en inglés para todos los niveles"
       },
       "academicVocab": {
-        "name": "Vocabulario académico"
+        "name": "Vocabulario académico",
+        "description": "Términos académicos y analíticos para estudiantes avanzados"
       },
       "beginnerHebrew": {
-        "name": "Hebreo para principiantes"
+        "name": "Hebreo para principiantes",
+        "description": "Palabras esenciales de hebreo para principiantes"
       }
+    },
+    "lesson": {
+      "creationFailed": "No se pudo crear la lección. Inténtalo de nuevo.",
+      "created": "¡Lección creada exitosamente!",
+      "preferCustom": "O crea tu propia lista de vocabulario personalizada:",
+      "word": "palabra",
+      "words": "palabras"
     },
     "students": "estudiantes",
     "student": {
@@ -13235,9 +13352,14 @@ const es = {
         "button": "Unirme",
         "joining": "Entrando...",
         "pasteButton": "Pegar código",
+        "preview": {
+          "label": "Te unes a:",
+          "confirm": "Este es tu aula"
+        },
         "success": "¡Ya estás dentro!",
         "invalidCode": "Ese código no funciona",
         "alreadyMember": "Ya estás en esta aula",
+        "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "codePasted": "¡Código pegado!",
         "emptyClipboard": "No hay nada copiado",
         "clipboardError": "No se pudo leer el portapapeles",
@@ -13394,6 +13516,8 @@ const es = {
       "submitted_on": "Enviada el",
       "already_approved_title": "¡Ya tienes acceso!",
       "go_to_teacher": "Ir al panel",
+      "status_unknown_title": "No pudimos leer el estado de tu acceso",
+      "status_unknown_body": "Algo falló por nuestra parte. Abre tu panel de profesor o recarga esta página para volver a comprobarlo.",
       "auth_required_title": "Regístrate para solicitar acceso docente",
       "auth_required_body": "El acceso docente está vinculado a una cuenta verificada. Crea una cuenta gratis o inicia sesión y seguimos justo aquí.",
       "auth_required_cta": "Registrarse o iniciar sesión",
@@ -14119,6 +14243,10 @@ const es = {
       "play_wordhunt": {
         "title": "¡A Cazar!",
         "desc": "Juega la Caza de Palabras diaria"
+      },
+      "play_wordwheel": {
+        "title": "Dale una vuelta",
+        "desc": "Juega la Rueda de Palabras de hoy"
       }
     },
     "reward": {
@@ -15140,6 +15268,7 @@ const es = {
     "adminBadge": "Sandbox de admin · Tablero de palabras",
     "you": "Tú",
     "bot": "WordBot",
+    "rival": "Rival",
     "tied": "Empate",
     "yourTurn": "Tu turno",
     "botTurn": "WordBot está pensando…",

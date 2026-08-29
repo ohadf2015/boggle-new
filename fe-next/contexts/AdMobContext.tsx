@@ -105,29 +105,53 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // so the consuming wrapper re-renders when it flips).
   const [ageGatePromptOpportunity, setAgeGatePromptOpportunity] = useState(false);
   const initPromise = useRef<Promise<void> | null>(null);
-  const initStarted = useRef(false);
+  // UMP consent is a one-time user-facing FORM — gathered once per session even
+  // when the SDK is re-initialized below.
+  const consentPromise = useRef<Promise<void> | null>(null);
+  // Serialized ad-policy config currently applied to the SDK. `null` = never
+  // initialized. Keying on the CONFIG (not a one-shot "started" latch) is what
+  // makes a tier change re-apply it — see the effect below.
+  const appliedAdInitKey = useRef<string | null>(null);
   // Interstitial preload state (app-scoped, resets per provider). A "warm" ad
   // shows with zero latency; `inFlight` dedupes concurrent prepares.
   const interstitialReady = useRef(false);
   const interstitialReadyAt = useRef(0);
   const interstitialInFlight = useRef<Promise<void> | null>(null);
 
-  // Defer init until auth has SETTLED. The child-directed config baked into
-  // AdMob.initialize() depends on `tier`, and `tier` reads 'unknown' until the
-  // profile loads — initializing on first render would child-direct (and
-  // de-personalize) a logged-in adult for the entire session. Gating on
-  // `authResolved` means a known adult inits with the adult config, while a
-  // genuine guest (terminal 'unknown') still inits child-directed. Runs once.
+  // Defer init until auth has SETTLED, then RE-init whenever the resolved
+  // ad-policy config changes.
+  //
+  // Recurring-pitfall Class 1 (dual source of truth + async resolution): the
+  // child-directed config baked into AdMob.initialize() depends on `tier`, and
+  // `tier` is not terminal at mount. A brand-new guest is 'unknown' → the SDK
+  // initialized CHILD-DIRECTED, and the age gate then flipped that same guest to
+  // 'adult' — which is precisely what makes them eligible for interstitials. The
+  // old one-shot `initStarted` latch meant every interstitial they ever saw was
+  // still served with tagForChildDirectedTreatment + TFUA + a G-only content cap:
+  // non-personalized, mediation disabled, thin remnant inventory. That is the
+  // configuration behind "interstitials barely serve, and when they do they're
+  // blank".
+  //
+  // Re-initializing is the fix and it is safe: the plugin runs
+  // `setRequestConfiguration(call)` UNCONDITIONALLY at the top of every
+  // initialize() call (node_modules/@capacitor-community/admob/android/.../AdMob.java:67),
+  // before the once-only MobileAds.initialize(), so a second call re-applies the
+  // tags even though MobileAds itself no-ops.
   useEffect(() => {
-    if (initStarted.current) return;
     if (!authResolved) return;
-    initStarted.current = true;
+
+    const adInit = resolveChildDirectedAdInit(tier);
+    const adInitKey = JSON.stringify(adInit);
+    if (appliedAdInitKey.current === adInitKey) return; // nothing changed
+    const isReinit = appliedAdInitKey.current !== null;
+    appliedAdInitKey.current = adInitKey;
 
     // EU/GDPR: gather UMP consent BEFORE initialize. The plugin itself geo-gates
     // (returns NOT_REQUIRED outside EEA), so no client-side EEA check needed.
     // Errors in the consent flow must NOT block ads — fall through to initialize
     // either way so non-EEA traffic stays unaffected if UMP backend is flaky.
-    const consentReady = isAvailable
+    // Cached: the form is user-facing, so a re-init must never re-prompt.
+    consentPromise.current ??= isAvailable
       ? AdMob.requestConsentInfo()
           .then(async (info) => {
             if (
@@ -142,14 +166,29 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
           })
       : Promise.resolve();
 
-    initPromise.current = consentReady.then(() =>
+    // Any warm interstitial was loaded under the OLD policy config. Drop it so
+    // the next show re-loads under the new one instead of spending a session
+    // slot on a stale child-directed creative.
+    if (isReinit) {
+      interstitialReady.current = false;
+      interstitialReadyAt.current = 0;
+    }
+
+    initPromise.current = consentPromise.current.then(() =>
       isAvailable
         ? AdMob.initialize({
-            initializeForTesting: process.env.NODE_ENV !== 'production',
+            // Explicit opt-in only. `NODE_ENV !== 'production'` is the exact
+            // pattern capacitor.config.ts:67-70 documents as having shipped
+            // Google TEST ads to every build where NODE_ENV was merely unset.
+            // `=== 'development'` keeps local device testing on test ads without
+            // that failure mode.
+            initializeForTesting:
+              process.env.NEXT_PUBLIC_ADMOB_TEST_MODE === 'true' ||
+              process.env.NODE_ENV === 'development',
             // Families Self-Certified Ads SDK config. JS-deployable on this
             // remote-URL Capacitor app — the v8 native plugin reads these off
             // the bridge. Anyone not KNOWN to be an adult is child-directed.
-            ...resolveChildDirectedAdInit(tier),
+            ...adInit,
           })
             .then(() => undefined)
             .catch((err) => {

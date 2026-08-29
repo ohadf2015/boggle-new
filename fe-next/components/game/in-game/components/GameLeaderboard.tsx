@@ -62,28 +62,53 @@ interface LeaderboardRowProps {
 const LEADERBOARD_WINDOW = 3;
 
 /**
+ * How many rows the window holds, scaled to the size of the room.
+ *
+ * Rooms genuinely reach 14–15 players (Supabase `game_sessions`: room QV57D3 ran
+ * 13→14→15→15→15→14 over six rounds) and big rooms retain BETTER than small ones,
+ * so a crowded room is the product working — it deserves more than three rows.
+ * Small rooms keep the original tight window; there is nothing to page through.
+ */
+export function leaderboardWindowSize(playerCount: number): number {
+  if (playerCount <= 4) return LEADERBOARD_WINDOW;
+  if (playerCount <= 8) return 4;
+  return 5;
+}
+
+/**
  * Window the (pre-sorted) roster down to `size` rows centred on the current
  * player so their position is always visible without scrolling. Returns the
  * visible slice plus how many players are hidden above/below so the UI can show
  * a "+N" cue. When the player isn't on the board (spectator) the window falls
  * back to the top of the roster.
+ *
+ * With `pinLeader`, rank 1 is lifted out and returned separately whenever it would
+ * otherwise be hidden above the window. A window centred on YOU answers "am I
+ * gaining on my neighbours" but not "who is actually winning" — in a 14-player room
+ * the leader is off-screen for everyone except the top few. `pinnedLeader` is null
+ * when the leader is already visible (you are the leader, or the window clamped to
+ * the top), so the row is never duplicated.
  */
 export function windowAroundUser<T>(
   players: T[],
   meIndex: number,
   size = LEADERBOARD_WINDOW,
-): { slice: T[]; start: number; hiddenAbove: number; hiddenBelow: number } {
+  pinLeader = false,
+): { slice: T[]; start: number; hiddenAbove: number; hiddenBelow: number; pinnedLeader: T | null } {
   if (players.length <= size) {
-    return { slice: players, start: 0, hiddenAbove: 0, hiddenBelow: 0 };
+    return { slice: players, start: 0, hiddenAbove: 0, hiddenBelow: 0, pinnedLeader: null };
   }
   const half = Math.floor((size - 1) / 2);
   const anchor = meIndex < 0 ? 0 : meIndex - half;
   const start = Math.min(Math.max(anchor, 0), players.length - size);
+  const leaderHidden = pinLeader && start > 0;
   return {
     slice: players.slice(start, start + size),
     start,
-    hiddenAbove: start,
+    // The pinned leader is on screen, so it must not also be counted as hidden.
+    hiddenAbove: leaderHidden ? start - 1 : start,
     hiddenBelow: players.length - (start + size),
+    pinnedLeader: leaderHidden ? players[0] : null,
   };
 }
 
@@ -162,10 +187,12 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         )}
       </div>
 
-      {/* Avatar */}
+      {/* Avatar — userId is required: without it a player who has no avatar_config
+          renders a permanent skeleton instead of a face. */}
       <Avatar
         customAvatar={player.avatar?.customAvatar ?? undefined}
         avatarImage={player.avatar?.avatarImage}
+        userId={player.username}
         size="md"
         disableEffects tierMarker
         mood={avatarMood}
@@ -287,8 +314,14 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
     () => memoizedLeaderboard.findIndex((p) => p.isMe),
     [memoizedLeaderboard],
   );
-  const { slice: visiblePlayers, hiddenAbove, hiddenBelow } = useMemo(
-    () => windowAroundUser(memoizedLeaderboard, myIndex, LEADERBOARD_WINDOW),
+  const { slice: visiblePlayers, hiddenAbove, hiddenBelow, pinnedLeader } = useMemo(
+    () =>
+      windowAroundUser(
+        memoizedLeaderboard,
+        myIndex,
+        leaderboardWindowSize(memoizedLeaderboard.length),
+        true,
+      ),
     [memoizedLeaderboard, myIndex],
   );
 
@@ -364,10 +397,24 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
         </div>
       )}
 
-      {/* Content — only a 3-row window around the current player is shown; the
-          "+N" chevron cues summarise everyone ranked further above/below. */}
+      {/* Content — a window around the current player (wider in bigger rooms); the
+          "+N" chevron cues summarise everyone ranked further above/below. In a
+          crowded room the leader is pinned on top so "who is winning" is always
+          answerable, not just "how am I doing against my neighbours". */}
       <div className={cn('p-2.5', compact ? 'overflow-y-auto custom-scrollbar' : 'overflow-y-auto flex-1 custom-scrollbar')}>
         <div className="space-y-1.5" role="list">
+          {pinnedLeader && (
+            <LeaderboardRow
+              key={pinnedLeader.username}
+              player={pinnedLeader}
+              isHost={isHost}
+              dir={dir}
+              t={t}
+              rankChange={changes.get(pinnedLeader.username)?.rankChange ?? 0}
+              scoreChange={changes.get(pinnedLeader.username)?.scoreChange ?? 0}
+            />
+          )}
+
           {hiddenAbove > 0 && (
             <div
               data-testid="leaderboard-more-above"

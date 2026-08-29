@@ -9,11 +9,14 @@
 
 import type { LessonWord } from '@/types/education';
 
+import type { Language } from '@/lib/supabase/education/types';
+
 export interface StarterLessonPack {
   nameKey: string;        // i18n key for lesson name
   descriptionKey: string; // i18n key for description
   category: 'general' | 'academic' | 'language';
   targetLevel: 'beginner' | 'intermediate' | 'advanced';
+  language: Language;     // Language of this pack
   words: LessonWord[];
   settings: {
     gridSize: 4 | 5;
@@ -129,6 +132,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     descriptionKey: 'education.starterPacks.commonEnglish.description',
     category: 'general',
     targetLevel: 'beginner',
+    language: 'en',
     words: commonEnglishWords,
     settings: {
       gridSize: 4,
@@ -142,6 +146,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     descriptionKey: 'education.starterPacks.academicVocab.description',
     category: 'academic',
     targetLevel: 'intermediate',
+    language: 'en',
     words: academicVocabulary,
     settings: {
       gridSize: 5,
@@ -155,6 +160,7 @@ export const STARTER_LESSON_PACKS: StarterLessonPack[] = [
     descriptionKey: 'education.starterPacks.beginnerHebrew.description',
     category: 'language',
     targetLevel: 'beginner',
+    language: 'he',
     words: beginnerHebrew,
     settings: {
       gridSize: 4,

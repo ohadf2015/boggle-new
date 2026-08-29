@@ -452,6 +452,10 @@ const he = {
     "dismiss": "סגירה",
     "issueProbe": {"prompt": "מה גרם לתחושה הזו?", "botsStrong": "הבוטים חזקים מדי", "technical": "בעיה טכנית"}
   },
+  "wordTowerV2": {
+    "cardTitle": "מגדל מילים 2",
+    "cardDesc": "פיזיקה אמיתית — גרסת בטא"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "הטוויסט של היום",
@@ -2635,7 +2639,9 @@ const he = {
     "waitingForPlayers": "...ממתינים לשחקנים",
     "seconds": "שניות",
     "switchToPlayer": "מעבר למצב שחקן",
-    "viewOnlyBadge": "מצב TV · צפייה בלבד"
+    "viewOnlyBadge": "מצב TV · צפייה בלבד",
+    "tryPracticeRound": "ניסיון סיבוב תרגול (בוטים)",
+    "practiceRoundFailed": "לא הצלחנו להוסיף שחקני תרגול. בדקו את החיבור ונסו שוב."
   },
   "tvResults": {
     "installHeading": "📱 קחו הביתה",
@@ -6685,6 +6691,11 @@ const he = {
     "online": "מחוברים"
   },
   "daily": {
+    "todaysPuzzles": "החידות של היום",
+    "results": {
+      "fullRecap": "הסיכום המלא",
+      "fullRecapSummary": "הדירוג שלך, המילה הנדירה שמצאת, המטבעות — ואת מי ניצחת"
+    },
     "title": "אתגר יומי",
     "badge": "אתגר יומי",
     "puzzleNumber": "יומי #{number}",
@@ -6700,6 +6711,7 @@ const he = {
       "yesterday": "החידה של אתמול",
       "daysAgo": "לפני {count} ימים",
       "watchAd": "צפו בפרסומת קצרה כדי לשחק",
+      "adBadge": "פרסומת",
       "appTitle": "פספסתם כמה ימים?",
       "appSubtitle": "יש לכם {count} מהימים האחרונים שעדיין לא שיחקתם. שחקו חידות עבר באפליקציית LexiClash לאנדרואיד.",
       "appCta": "הורידו מ-Google Play"
@@ -9159,7 +9171,8 @@ const he = {
     "wordHunt": "ציד מילים",
     "seconds": "~{{count}} שניות",
     "seekingMatch": "מחפש משחק…",
-    "seekingMatchSub": "מכין את המשחק שלך"
+    "seekingMatchSub": "מכין את המשחק שלך",
+    "browseInstead": "עדיף לחפש חדר לבד"
   },
   "theme": {
     "sundayFunday": "כיף של יום ראשון",
@@ -11935,6 +11948,13 @@ const he = {
       "playZone": "שחק",
       "learnZone": "למד"
     },
+    "welcome": {
+      "title": "!ברוך הבא לכיתה שלך",
+      "subtitle": "בחר את האתגר הראשון שלך",
+      "dailyChallenge": "נסה אתגר יומי",
+      "dailyChallengeDesc": "נסה את משחק המילים של היום",
+      "rewards": "צברו נקודות ובנו את הנתיב שלכם"
+    },
     "nav": {
       "profile": "הפרופיל שלי",
       "achievements": "הישגים"
@@ -11968,6 +11988,8 @@ const he = {
       "randomLesson": "שיעור אקראי",
       "quickDuel": "דו קרב מהיר",
       "challengeClassmate": "אתגר חבר לכיתה",
+      "soloPractice": "תרגול בודד",
+      "soloPracticeDesc": "תרגול בכל עת",
       "streakCalendar": "הרצף שלך",
       "activity": {
         "wonDuel": "ניצח בדו קרב",
@@ -12047,6 +12069,9 @@ const he = {
     "notYou": "זה לא אתם? התחילו מחדש"
   },
   "teacher": {
+    "proGate": {
+      "cta": "לפתוח עם Pro — ${{price}} לחודש"
+    },
     "subscription": {
       "classLimitTitle": "הגעת למגבלת הכיתות",
       "classLimitMessage": "יצרת {{current}} מתוך {{limit}} כיתות בחינם. שדרגו ל-Pro לכיתות ותלמידים ללא הגבלה.",
@@ -12075,8 +12100,6 @@ const he = {
       "freeForever": "חינם לתמיד, תמיד זמין",
       "freeClasses": "עד {count} כיתה",
       "freeStudents": "עד {count} תלמידים בכיתה",
-      "basicWordTracking": "מעקב מילים בסיסי",
-      "dailyProgressReports": "דוחות התקדמות יומיים",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "כל מה שצריך כדי לצמוח",
       "popular": "הכי פופולרי",
@@ -12094,7 +12117,28 @@ const he = {
       "manageSubscription": "ניהול מנוי",
       "districtTitle": "בית ספר או רשות?",
       "districtSubtitle": "מנהלים כמה מורים או כיתות? אנחנו מציעים תמחור גמיש לבתי ספר ורשויות חינוך.",
-      "districtCta": "צרו קשר לתמחור לבתי ספר"
+      "districtCta": "צרו קשר לתמחור לבתי ספר",
+      "checkoutUnavailable": "התשלום סגור כרגע ולא חויבתם. נסו שוב עוד מעט.",
+      "featureOutcome1": "להעביר כל כיתה שאתם מלמדים, בלי תקרה",
+      "featureOutcome2": "להוסיף את כל הרשימה, לא רק עשרה ראשונים",
+      "featureOutcome3": "לראות בזמן אמת מי נתקע, מילה־מילה",
+      "featureOutcome4": "להשוות התקדמות בין כל הכיתות שלכם",
+      "priceTaxNote": "ייתכן שיתווספו מסים בתשלום.",
+      "proHeroAlt": "מורה מסתכלת על טבלת מובילים חיה של הכיתה על הלוח בזמן שהתלמידים משחקים מהמקום.",
+      "valueHeadline": "כיתות ללא הגבלה, תלמידים ללא הגבלה, התקדמות בזמן אמת.",
+      "matrix": {
+        "title": "השוואת מסלולים",
+        "featureColumn": "מה כלול",
+        "unlimited": "ללא הגבלה",
+        "included": "כלול",
+        "notIncluded": "לא כלול",
+        "classes": "כיתות",
+        "studentsPerClass": "תלמידים בכיתה",
+        "customLists": "רשימות מילים משלכם",
+        "duels": "דו-קרב בין תלמידים",
+        "noAds": "בלי פרסומות לתלמידים",
+        "analytics": "נתונים ודוחות להדפסה"
+      }
     },
     "teacher": {
       "activeGames": "משחקים פעילים",
@@ -12147,11 +12191,16 @@ const he = {
       "insights": "תובנות",
       "viewReports": "צפה בדוחות",
       "viewReportsDesc": "צפה בדוחות מפורטים ואנליטיקה עבור הכיתות שלך",
+      "studentsPresentTitle": "{count} תלמידים נמצאים עכשיו ב-{classroom}",
+      "studentsPresentDescription": "התחילו משחק והם ייכנסו ישר.",
       "tab": {
         "play": "שחק",
         "prepare": "הכן",
         "review": "סקור"
-      }
+      },
+      "classroomLoadError": "לא הצלחנו לטעון את הכיתות",
+      "classroomLoadErrorHint": "בדקו את החיבור ונסו שוב",
+      "retry": "נסו שוב"
     },
     "game": {
       "qrCode": "הצג קוד QR",
@@ -12186,6 +12235,7 @@ const he = {
       "create": "צור כיתה",
       "createAnother": "צור כיתה נוספת",
       "creating": "יוצר...",
+      "defaultName": "הכיתה שלי",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",
       "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
@@ -12205,6 +12255,31 @@ const he = {
       "shareCode": "שתף את הקוד הזה עם התלמידים שלך",
       "noClassrooms": "אין כיתות עדיין",
       "createFirst": "צרו את הכיתה הראשונה שלכם",
+      "inviteStudents": "הזמינו תלמידים",
+      "share": "שיתוף",
+      "shareInviteText": "הצטרפו ל-{{name}} ב-LexiClash עם הקוד {{code}}",
+      "createdBannerTitle": "הכיתה מוכנה!",
+      "googleClassroom": "פרסום ב-Google Classroom",
+      "googleClassroomTitle": "הצטרפו ל{{name}} ב-LexiClash",
+      "googleClassroomBody": "הקישו על הקישור כדי להצטרף לכיתה. בלי חשבון — פשוט בוחרים שם.",
+      "createdBannerBody": "שתפו את הקוד עם התלמידים.",
+      "dismissBanner": "סגור",
+      "wizard": {
+        "title": "שלושה צעדים לכיתה",
+        "subtitle": "תוך דקה יש לכם קוד הצטרפות.",
+        "step1": {
+          "title": "צרו כיתה",
+          "body": "תנו שם ובחרו שפה."
+        },
+        "step2": {
+          "title": "קבלו קוד",
+          "body": "קוד קצר מופיע מיד."
+        },
+        "step3": {
+          "title": "שתפו עם התלמידים",
+          "body": "שולחים את הקוד. בלי הרשמה."
+        }
+      },
       "validation": {
         "nameRequired": "שם הכיתה נדרש"
       },
@@ -12671,6 +12746,7 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "classCode": "קוד המשחק",
       "classroomNotFound": "הכיתה לא נמצאה",
       "classroomSession": "שיעור בכיתה",
       "createClassroom": "צור כיתה",
@@ -12678,11 +12754,14 @@ const he = {
       "deselectAll": "בטל בחירה",
       "gameCreated": "המשחק נוצר! 🎮",
       "gameSettings": "הגדרות משחק",
+      "joinedStudents": "תלמידים שהצטרפו",
       "lessonsSelected": "{{count}} שיעורים נבחרו",
       "missingRequirements": "חסרים פרטים",
+      "more": "עוד",
       "multiLessonHelp": "שלבו שיעורים למגוון",
       "noClassrooms": "עדיין אין כיתות",
       "noLessonsAvailable": "אין שיעורים זמינים",
+      "noStudentsYet": "עדיין אף תלמיד לא הצטרף",
       "reviewAndStart": "סקירה והתחלה",
       "scanToJoin": "סרקו להצטרפות",
       "selectAllLessons": "בחר הכל",
@@ -12695,8 +12774,11 @@ const he = {
       "startGame": "התחל משחק",
       "createRoom": "צור חדר",
       "startGameDescription": "הפעלת משחק כיתתי",
+      "studentCount": "{{count}} תלמידים הצטרפו",
+      "studentsCanScan": "התלמידים יכולים לסרוק את קוד ה-QR להצטרפות",
       "title": "משחק כיתתי",
-      "waitingForPlayers": "ממתין לשחקנים...",
+      "waitingForPlayers": "מכינים את משחק הכיתה שלך...",
+      "waitingForStudents": "ממתין לתלמידים",
       "words": "{{count}} מילים"
     },
     "header": {
@@ -12727,6 +12809,10 @@ const he = {
     "home": {
       "badge_teacher": "מורה",
       "badge_student": "כיתה",
+      "badge_promo": "מצב כיתה",
+      "promo_title": "ללמד עם LexiClash — בחינם",
+      "promo_subtitle": "משחקי מילים עם הכיתה, רשימות מילים משלכם, ורואים מי נתקע.",
+      "promo_cta": "לראות את מצב הכיתה",
       "teacher_title": "הכיתה שלך מוכנה",
       "teacher_subtitle": "צרו כיתות, שבצו משחקים ועקבו אחר התקדמות התלמידים.",
       "teacher_cta": "פתחו את לוח המורה",
@@ -12736,6 +12822,26 @@ const he = {
       "trial_ended": "הניסיון הסתיים"
     },
     "landing": {
+      "pro": {
+        "title": "שתי תוכניות. בלי טריקים.",
+        "subtitle": "כל מה שצריך כדי להעביר שיעור ראשון — חינם. Pro מסיר את המגבלות.",
+        "comparisonAlt": "השוואה בין התוכנית החינמית לבין Teacher Pro",
+        "freeTier": "חינם",
+        "perMonth": "לחודש",
+        "classLimit": "עד {count} כיתה",
+        "studentLimit": "עד {count} תלמידים בכיתה",
+        "noAds": "בלי פרסומות לתלמידים",
+        "customLists": "רשימות מילים משלכם",
+        "duels": "קרבות מילים בזמן אמת",
+        "freeForever": "חינם לתמיד. בלי כרטיס אשראי, בלי שעון ניסיון.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "כל מה שיש בתוכנית החינמית",
+        "classLimitPro": "כיתות ללא הגבלה",
+        "studentLimitPro": "תלמידים ללא הגבלה",
+        "analytics": "מעקב התקדמות לכל תלמיד",
+        "chooseNow": "לשדרג ל-Teacher Pro",
+        "whyNow": "התחילו חינם, באמת. Pro מיועד לרגע ש-{count} תלמידים בכיתה אחת כבר לא מספיקים."
+      },
       "duelTeaser": {
         "cta": "אתגר חבר",
         "headline": "דו-קרב מילים",
@@ -12766,7 +12872,7 @@ const he = {
       "hero": {
         "eyebrow": "למורים בכיתות בעברית, אנגלית, שוודית, יפנית וספרדית",
         "h1": "משחקי אוצר מילים לכיתה שלכם — בלי חשבונות לתלמידים.",
-        "sub": "משחקי מילים רב-משתתפים לכל הכיתה עם רשימות המילים שלכם. בלי חשבונות, בלי פרסומות, בלי הורדות — משחקים בכל דפדפן. נבנה במקור ל-5 שפות. מסלול בסיסי חינם למורים; מסלול Teacher Pro עולה $9 לחודש לכיתות ותלמידים ללא הגבלה.",
+        "sub": "משחקי מילים רב-משתתפים לכל הכיתה עם רשימות המילים שלכם. בלי חשבונות, בלי פרסומות, בלי הורדות — משחקים בכל דפדפן. נבנה במקור ל-{count} שפות. מסלול בסיסי חינם למורים; מסלול Teacher Pro עולה $9 לחודש לכיתות ותלמידים ללא הגבלה.",
         "cta_primary": "בקשו גישת מורה",
         "cta_secondary": "צפו בהדגמה",
         "cta_note": "מסלול חינם להתחלה • אישור תוך כ-24 שעות",
@@ -12853,7 +12959,7 @@ const he = {
           "wordwall": "Wordwall"
         },
         "row": {
-          "native_multilingual": "תמיכה ילידית בכל שפה (עברית RTL, IME יפני)",
+          "native_multilingual": "תמיכה מלאה בכל שפה (עברית RTL, IME יפני)",
           "ad_free_students": "אפס פרסומות לתלמידים",
           "live_multiplayer": "משחק רב-משתתפים חי",
           "brain_training": "אימוני מוח",
@@ -12879,7 +12985,7 @@ const he = {
         },
         "q3": {
           "q": "זה עובד בעברית, יפנית, שוודית וספרדית?",
-          "a": "כן. עברית RTL, יפנית עם קאנה ו-IME, הכל ילידי. לא תרגום."
+          "a": "כן. עברית RTL, יפנית עם קאנה ו-IME, הכל מהיסוד. לא תרגום."
         },
         "q4": {
           "q": "מה קורה עם פרטיות התלמידים?",
@@ -12891,7 +12997,7 @@ const he = {
         },
         "q6": {
           "q": "מה מבדיל אתכם מ-Kahoot, Quizlet או Wordwall?",
-          "a": "תמיכה ילידית בכל שפה (לא תרגום), אפס פרסומות, 6 מצבי משחק בפלטפורמה אחת, ואוצר מילים מההקשר המקומי שלכם."
+          "a": "תמיכה מלאה בכל שפה (לא תרגום), אפס פרסומות, 6 מצבי משחק בפלטפורמה אחת, ואוצר מילים מההקשר המקומי שלכם."
         },
         "q7": {
           "q": "אפשר לעקוב אחר ההתקדמות של כל תלמיד?",
@@ -12927,6 +13033,7 @@ const he = {
       },
       "welcomeBack": "ברוך שובך",
       "openDashboard": "פתח לוח מורה",
+      "createClassroom": "צרו כיתה",
       "furtherReading": {
         "title": "עוד באתר",
         "guides": "מדריכי אסטרטגיה",
@@ -13070,18 +13177,29 @@ const he = {
       "subtitle": "סטים מוכנים של אוצר מילים",
       "useThisPack": "השתמש בחבילה",
       "academicVocab": {
-        "name": "אוצר מילים אקדמי"
+        "name": "אוצר מילים אקדמי",
+        "description": "מונחים אקדמיים וניתוח לתלמידים מתקדמים"
       },
       "beginnerHebrew": {
-        "name": "עברית למתחילים"
+        "name": "עברית למתחילים",
+        "description": "מילים בעברית בסיסיות למתחילים"
       },
       "commonEnglish": {
-        "name": "אנגלית נפוצה"
+        "name": "אנגלית נפוצה",
+        "description": "מילים נפוצות באנגלית לכל הרמות"
       }
+    },
+    "lesson": {
+      "creationFailed": "לא ניתן ליצור שיעור. נסו שוב.",
+      "created": "שיעור נוצר בהצלחה!",
+      "preferCustom": "או יוצרים רשימת אוצר מילים מותאמת:",
+      "word": "מילה",
+      "words": "מילים"
     },
     "student": {
       "join": {
         "alreadyMember": "כבר בכיתה!",
+        "classroomFull": "הכיתה מלאה — בקשו מהמורה לפנות מקום.",
         "button": "הצטרף",
         "clipboardError": "לא ניתן לקרוא מהלוח",
         "codeHint": "6 תווים מהמורה",
@@ -13095,6 +13213,10 @@ const he = {
         "nameLabel": "השם שלך",
         "namePlaceholder": "למשל מאיה",
         "pasteButton": "הדבק",
+        "preview": {
+          "label": "מצטרף אל:",
+          "confirm": "זו הכיתה שלך"
+        },
         "subtitle": "הכנס את הקוד מהמורה",
         "success": "נכנסת!",
         "title": "הצטרף לכיתה"
@@ -13255,6 +13377,8 @@ const he = {
       "submitted_on": "תאריך הגשה",
       "already_approved_title": "אתם כבר מאושרים! 🎉",
       "go_to_teacher": "ללוח המורה",
+      "status_unknown_title": "לא הצלחנו לקרוא את סטטוס הגישה שלך",
+      "status_unknown_body": "משהו השתבש אצלנו. אפשר לפתוח את לוח המורה או לרענן את הדף ולבדוק שוב.",
       "auth_required_title": "הירשמו כדי לבקש גישת מורה",
       "auth_required_body": "גישת מורה מחוברת לחשבון מאומת. פִּתחו חשבון חינם או התחברו, ונמשיך בדיוק מכאן.",
       "auth_required_cta": "הרשמה או התחברות",
@@ -13717,6 +13841,10 @@ const he = {
       "play_wordhunt": {
         "title": "יוצאים לציד",
         "desc": "שחקו ציד מילים היומי"
+      },
+      "play_wordwheel": {
+        "title": "סיבוב אחד",
+        "desc": "שחקו את גלגל המילים של היום"
       }
     },
     "reward": {
@@ -15183,6 +15311,7 @@ const he = {
     "adminBadge": "ארגז חול למנהלים · לוח מילים תחרותי",
     "you": "אתה",
     "bot": "WordBot",
+    "rival": "יריב",
     "tied": "תיקו",
     "yourTurn": "התור שלך",
     "botTurn": "WordBot חושב…",

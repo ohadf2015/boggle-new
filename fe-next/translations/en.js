@@ -377,6 +377,10 @@ const en = {
     "share": {"copy": "Copy result","copied": "Copied!","emojiRowAria": "Emoji summary of your run","captionPerfect": "Flawless transmutation! 🧪","captionWild": "The catalyst came in clutch! 🔮","captionGood": "Solid alchemy! 🌡️","captionHard": "The elements fought back today 😅"}
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
+  "wordTowerV2": {
+    "cardTitle": "Word Tower v2",
+    "cardDesc": "Real physics — beta preview"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "TODAY'S TWIST",
@@ -2187,7 +2191,9 @@ const en = {
     "waitingForPlayers": "Waiting for Players...",
     "seconds": "seconds",
     "switchToPlayer": "Switch to Player Mode",
-    "viewOnlyBadge": "TV Mode · View Only"
+    "viewOnlyBadge": "TV Mode · View Only",
+    "tryPracticeRound": "Try a Practice Round (Bots)",
+    "practiceRoundFailed": "Could not add practice players. Check your connection and try again."
   },
   "tvResults": {
     "installHeading": "TAKE IT HOME 📱",
@@ -6137,6 +6143,11 @@ const en = {
     "online": "online"
   },
   "daily": {
+    "todaysPuzzles": "Today's Puzzles",
+    "results": {
+      "fullRecap": "Full recap",
+      "fullRecapSummary": "Your rank, your rarest word, your coins — and who you beat"
+    },
     "title": "Daily Challenge",
     "badge": "DAILY",
     "chooseChallengeHint": "Pick your quest",
@@ -6189,6 +6200,7 @@ const en = {
       "yesterday": "Yesterday's puzzle",
       "daysAgo": "{count} days ago",
       "watchAd": "Watch a quick ad to play",
+      "adBadge": "Ad",
       "appTitle": "Missed a few days?",
       "appSubtitle": "You've got {count} unplayed from the last few days. Replay past dailies in the LexiClash Android app.",
       "appCta": "Get it on Google Play"
@@ -7965,7 +7977,8 @@ const en = {
     "play": "Play Now",
     "seconds": "~{{count}}s",
     "seekingMatch": "Finding a match…",
-    "seekingMatchSub": "Setting up your game"
+    "seekingMatchSub": "Setting up your game",
+    "browseInstead": "Browse rooms instead"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -10664,6 +10677,13 @@ const en = {
       "playZone": "Play",
       "learnZone": "Learn"
     },
+    "welcome": {
+      "title": "Welcome to Your Classroom!",
+      "subtitle": "Choose your first challenge",
+      "dailyChallenge": "Try Daily Challenge",
+      "dailyChallengeDesc": "Try today's word game",
+      "rewards": "Earn points and build your streak"
+    },
     "nav": {
       "profile": "My Profile",
       "achievements": "Achievements"
@@ -10700,6 +10720,8 @@ const en = {
       "randomLesson": "Random Lesson",
       "quickDuel": "Quick Duel",
       "challengeClassmate": "Challenge a Classmate",
+      "soloPractice": "Solo Practice",
+      "soloPracticeDesc": "Practice anytime, anywhere",
       "streakCalendar": "Your Streak",
       "activity": {
         "wonDuel": "won a duel",
@@ -10827,11 +10849,16 @@ const en = {
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
       "viewReportsDesc": "View detailed reports and analytics for your classrooms",
+      "studentsPresentTitle": "{count} students are in {classroom} right now",
+      "studentsPresentDescription": "Start a game and they drop straight in.",
       "tab": {
         "play": "Play",
         "prepare": "Prepare",
         "review": "Review"
-      }
+      },
+      "classroomLoadError": "Could not load your classrooms",
+      "classroomLoadErrorHint": "Check your connection and try again",
+      "retry": "Retry"
     },
     "game": {
       "qrCode": "Show QR Code",
@@ -10866,6 +10893,7 @@ const en = {
       "create": "Create Classroom",
       "createAnother": "Create Another Classroom",
       "creating": "Creating...",
+      "defaultName": "My Class",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
       "confirmDelete": "Delete this classroom? Students will lose access to lessons.",
@@ -10885,6 +10913,31 @@ const en = {
       "shareCode": "Share this code with your students",
       "noClassrooms": "No classrooms yet",
       "createFirst": "Create your first classroom to get started",
+      "inviteStudents": "Invite students",
+      "share": "Share",
+      "shareInviteText": "Join {{name}} on LexiClash with code {{code}}",
+      "createdBannerTitle": "Classroom ready!",
+      "googleClassroom": "Post to Google Classroom",
+      "googleClassroomTitle": "Join {{name}} on LexiClash",
+      "googleClassroomBody": "Tap the link to join our class. No account needed — just pick a name.",
+      "createdBannerBody": "Share this code with your students.",
+      "dismissBanner": "Got it",
+      "wizard": {
+        "title": "Get students in 3 steps",
+        "subtitle": "You'll have a join code in under a minute.",
+        "step1": {
+          "title": "Create class",
+          "body": "Name it and pick a language."
+        },
+        "step2": {
+          "title": "Get code",
+          "body": "A short join code appears instantly."
+        },
+        "step3": {
+          "title": "Share with students",
+          "body": "Send the code. No student logins needed."
+        }
+      },
       "validation": {
         "nameRequired": "Classroom name is required"
       },
@@ -11207,6 +11260,9 @@ const en = {
       "standard": "Curriculum Standard",
       "lastUpdated": "Last Updated"
     },
+    "proGate": {
+      "cta": "Unlock this with Pro — ${{price}}/month"
+    },
     "subscription": {
       "classLimitTitle": "You've Reached Your Class Limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
@@ -11235,8 +11291,6 @@ const en = {
       "freeForever": "Forever free, always available",
       "freeClasses": "Up to {count} class",
       "freeStudents": "Up to {count} students per class",
-      "basicWordTracking": "Basic word tracking",
-      "dailyProgressReports": "Daily progress reports",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
       "popular": "Most Popular",
@@ -11254,7 +11308,28 @@ const en = {
       "manageSubscription": "Manage Subscription",
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
-      "districtCta": "Get in touch for school pricing"
+      "districtCta": "Get in touch for school pricing",
+      "checkoutUnavailable": "Checkout is closed right now — nothing was charged. Please try again shortly.",
+      "featureOutcome1": "Run every class you teach — no cap",
+      "featureOutcome2": "Add the whole roster, not the first ten",
+      "featureOutcome3": "See who is stuck, word by word, live",
+      "featureOutcome4": "Compare progress across all your classes",
+      "priceTaxNote": "Taxes may be added at checkout.",
+      "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
+      "valueHeadline": "Unlimited classes, unlimited students, live progress.",
+      "matrix": {
+        "title": "Compare plans",
+        "featureColumn": "Feature",
+        "unlimited": "Unlimited",
+        "included": "Included",
+        "notIncluded": "Not included",
+        "classes": "Classrooms",
+        "studentsPerClass": "Students per class",
+        "customLists": "Your own word lists",
+        "duels": "Head-to-head duels",
+        "noAds": "Ad-free for students",
+        "analytics": "Analytics & printable reports"
+      }
     }
   },
   "education": {
@@ -11392,6 +11467,7 @@ const en = {
       "yesterday": "Yesterday"
     },
     "classroomGame": {
+      "classCode": "Game Code",
       "classroomNotFound": "Classroom not found",
       "classroomSession": "Classroom Session",
       "createClassroom": "Create Classroom",
@@ -11399,11 +11475,14 @@ const en = {
       "deselectAll": "Deselect All",
       "gameCreated": "Game created!",
       "gameSettings": "Game Settings",
+      "joinedStudents": "Joined Students",
       "lessonsSelected": "{{count}} lessons selected",
       "missingRequirements": "Missing requirements",
+      "more": "more",
       "multiLessonHelp": "Combine lessons for variety",
       "noClassrooms": "No classrooms yet",
       "noLessonsAvailable": "No lessons available",
+      "noStudentsYet": "No students have joined yet",
       "reviewAndStart": "Review & Start",
       "scanToJoin": "Scan to Join",
       "selectAllLessons": "Select All",
@@ -11416,8 +11495,11 @@ const en = {
       "startGame": "Start Game",
       "createRoom": "Create Room",
       "startGameDescription": "Launch the classroom game",
+      "studentCount": "{{count}} Students Joined",
+      "studentsCanScan": "Students can scan the QR code to join",
       "title": "Classroom Game",
-      "waitingForPlayers": "Waiting for players...",
+      "waitingForPlayers": "Setting up your classroom game...",
+      "waitingForStudents": "Waiting for Students",
       "words": "{{count}} words"
     },
     "header": {
@@ -11448,6 +11530,10 @@ const en = {
     "home": {
       "badge_teacher": "Teacher",
       "badge_student": "Classroom",
+      "badge_promo": "Classroom mode",
+      "promo_title": "Teach with LexiClash — free",
+      "promo_subtitle": "Run word games with your class, set your own word lists, see who is stuck.",
+      "promo_cta": "See classroom mode",
       "teacher_title": "Your classroom is ready",
       "teacher_subtitle": "Create classes, assign games, and track student progress.",
       "teacher_cta": "Open teacher dashboard",
@@ -11457,6 +11543,26 @@ const en = {
       "trial_ended": "Trial ended"
     },
     "landing": {
+      "pro": {
+        "title": "Two plans. No tricks.",
+        "subtitle": "Everything that gets you to a first lesson is free. Pro lifts the caps.",
+        "comparisonAlt": "Side-by-side comparison of the Free plan and Teacher Pro",
+        "freeTier": "Free",
+        "perMonth": "/month",
+        "classLimit": "Up to {count} classroom",
+        "studentLimit": "Up to {count} students in it",
+        "noAds": "No advertising for your students",
+        "customLists": "Your own word lists",
+        "duels": "Live word duels",
+        "freeForever": "Free forever. No card, no trial clock.",
+        "proTier": "Teacher Pro",
+        "everythingInFree": "Everything in Free",
+        "classLimitPro": "Unlimited classrooms",
+        "studentLimitPro": "Unlimited students",
+        "analytics": "Per-student progress analytics",
+        "chooseNow": "Get Teacher Pro",
+        "whyNow": "Start free — really. Pro is for when {count} students in one class stops being enough."
+      },
       "duelTeaser": {
         "cta": "Challenge a Friend",
         "headline": "Word Duels",
@@ -11487,7 +11593,7 @@ const en = {
       "hero": {
         "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Approved in ~24h",
@@ -11648,6 +11754,7 @@ const en = {
       },
       "welcomeBack": "Welcome back",
       "openDashboard": "Open Teacher Dashboard",
+      "createClassroom": "Create classroom",
       "furtherReading": {
         "title": "Explore More",
         "guides": "Strategy Guides",
@@ -11792,18 +11899,29 @@ const en = {
       "subtitle": "Ready-made vocab sets",
       "useThisPack": "Use This Pack",
       "academicVocab": {
-        "name": "Academic Vocabulary"
+        "name": "Academic Vocabulary",
+        "description": "Academic and analytical terms for advanced learners"
       },
       "beginnerHebrew": {
-        "name": "Beginner Hebrew"
+        "name": "Beginner Hebrew",
+        "description": "Essential Hebrew words for beginners"
       },
       "commonEnglish": {
-        "name": "Common English"
+        "name": "Common English",
+        "description": "Everyday English words for all levels"
       }
+    },
+    "lesson": {
+      "creationFailed": "Couldn't create lesson. Please try again.",
+      "created": "Lesson created successfully!",
+      "preferCustom": "Or create your own custom vocabulary list:",
+      "word": "word",
+      "words": "words"
     },
     "student": {
       "join": {
         "alreadyMember": "Already in this class!",
+        "classroomFull": "This class is full — ask your teacher to make room.",
         "button": "Join",
         "clipboardError": "Couldn't read clipboard",
         "codeHint": "6 characters from your teacher",
@@ -11817,6 +11935,10 @@ const en = {
         "nameLabel": "Your Name",
         "namePlaceholder": "e.g. Maya",
         "pasteButton": "Paste",
+        "preview": {
+          "label": "Joining:",
+          "confirm": "This is your classroom"
+        },
         "subtitle": "Enter your teacher's code",
         "success": "You're in!",
         "title": "Join a Class"
@@ -11978,6 +12100,8 @@ const en = {
       "submitted_on": "Submitted",
       "already_approved_title": "You already have teacher access.",
       "go_to_teacher": "Open Teacher Dashboard",
+      "status_unknown_title": "We couldn't read your access status",
+      "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Sign up or sign in",
@@ -12409,7 +12533,8 @@ const en = {
       "beat_human": { "title": "Rival Crusher", "desc": "Beat a real human opponent" },
       "play_mp": { "title": "Enter the Arena", "desc": "Play a multiplayer match" },
       "play_brain": { "title": "Brain Boost", "desc": "Finish a Brain Drill session" },
-      "play_wordhunt": { "title": "On the Hunt", "desc": "Play today's Word Hunt" }
+      "play_wordhunt": { "title": "On the Hunt", "desc": "Play today's Word Hunt" },
+      "play_wordwheel": { "title": "Give It a Spin", "desc": "Play today's Word Wheel" }
     },
     "reward": {
       "xp": "+{{xp}} XP",
@@ -13758,6 +13883,7 @@ const en = {
     "adminBadge": "Admin sandbox · Tournament word grid",
     "you": "You",
     "bot": "WordBot",
+    "rival": "Rival",
     "tied": "Tied",
     "yourTurn": "Your turn",
     "botTurn": "WordBot is thinking…",

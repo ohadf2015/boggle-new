@@ -73,6 +73,31 @@ export const EN_TEMPLATES_11: BlockTemplate[] = [
   },
 ];
 
+// 11×11 Hebrew "full" — a SEPARATE pattern set, because the EN ones are unfillable in Hebrew.
+// The EN templates demand 24 five-letter answers each; en has 1,360 of them, he has 189 against
+// 513 three- and 387 four-letter ones. Every EN template failed 24/24 fill attempts on the Hebrew
+// bank. These were found by re-running search-templates.ts with --minRun=3 --maxRun=4, matching
+// where the Hebrew bank is actually deep.
+//
+// Capping the run at 4 forces a denser lattice: ~40% black and 38 slots, versus en's 26% and 42.
+// That is not a compromise — Israeli newspaper crosswords are built exactly this way, because
+// Hebrew's unwritten vowels make its common words short. All six fill 7-8 of 8 seeds in 0.1-0.9s,
+// comfortably faster than the EN set's 2-5s.
+export const HE_TEMPLATES_11: BlockTemplate[] = [
+  // 38 slots, 48 blocks (40% black), fill 8/8 @ 932ms
+  { label: 'he-11x11-1', size: 11, blocks: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 0], [3, 5], [3, 6], [4, 0], [4, 1], [4, 2], [4, 3], [4, 8], [4, 9], [4, 10], [5, 0], [5, 1], [5, 2], [5, 3], [5, 7], [5, 8], [5, 9], [5, 10], [6, 0], [6, 1], [6, 2], [6, 7], [6, 8], [6, 9], [6, 10], [7, 4], [7, 5], [7, 10], [8, 4], [8, 5], [8, 6], [9, 4], [9, 5], [9, 6], [10, 3], [10, 4], [10, 5], [10, 6]] },
+  // 38 slots, 50 blocks (41% black), fill 7/8 @ 579ms
+  { label: 'he-11x11-2', size: 11, blocks: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [1, 7], [2, 4], [2, 5], [2, 6], [3, 0], [3, 5], [3, 6], [4, 0], [4, 1], [4, 2], [4, 3], [4, 8], [4, 9], [4, 10], [5, 0], [5, 1], [5, 2], [5, 3], [5, 7], [5, 8], [5, 9], [5, 10], [6, 0], [6, 1], [6, 2], [6, 7], [6, 8], [6, 9], [6, 10], [7, 4], [7, 5], [7, 10], [8, 4], [8, 5], [8, 6], [9, 3], [9, 4], [9, 5], [9, 6], [10, 3], [10, 4], [10, 5], [10, 6]] },
+  // 38 slots, 52 blocks (43% black), fill 7/8 @ 299ms
+  { label: 'he-11x11-3', size: 11, blocks: [[0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 0], [3, 4], [3, 5], [3, 10], [4, 0], [4, 1], [4, 2], [4, 7], [4, 8], [4, 9], [4, 10], [5, 0], [5, 1], [5, 2], [5, 3], [5, 7], [5, 8], [5, 9], [5, 10], [6, 0], [6, 1], [6, 2], [6, 3], [6, 8], [6, 9], [6, 10], [7, 0], [7, 5], [7, 6], [7, 10], [8, 4], [8, 5], [8, 6], [9, 4], [9, 5], [9, 6], [10, 3], [10, 4], [10, 5], [10, 6], [10, 7]] },
+  // 38 slots, 52 blocks (43% black), fill 7/8 @ 397ms
+  { label: 'he-11x11-4', size: 11, blocks: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [1, 7], [2, 4], [2, 5], [2, 6], [3, 0], [3, 1], [3, 5], [3, 6], [4, 0], [4, 1], [4, 2], [4, 3], [4, 8], [4, 9], [4, 10], [5, 0], [5, 1], [5, 2], [5, 3], [5, 7], [5, 8], [5, 9], [5, 10], [6, 0], [6, 1], [6, 2], [6, 7], [6, 8], [6, 9], [6, 10], [7, 4], [7, 5], [7, 9], [7, 10], [8, 4], [8, 5], [8, 6], [9, 3], [9, 4], [9, 5], [9, 6], [10, 3], [10, 4], [10, 5], [10, 6]] },
+  // 38 slots, 52 blocks (43% black), fill 7/8 @ 110ms
+  { label: 'he-11x11-5', size: 11, blocks: [[0, 3], [0, 4], [0, 5], [0, 6], [1, 3], [1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 0], [3, 4], [3, 5], [3, 10], [4, 0], [4, 1], [4, 2], [4, 7], [4, 8], [4, 9], [4, 10], [5, 0], [5, 1], [5, 2], [5, 3], [5, 7], [5, 8], [5, 9], [5, 10], [6, 0], [6, 1], [6, 2], [6, 3], [6, 8], [6, 9], [6, 10], [7, 0], [7, 5], [7, 6], [7, 10], [8, 4], [8, 5], [8, 6], [9, 4], [9, 5], [9, 6], [9, 7], [10, 4], [10, 5], [10, 6], [10, 7]] },
+  // 38 slots, 52 blocks (43% black), fill 7/8 @ 472ms
+  { label: 'he-11x11-6', size: 11, blocks: [[0, 3], [0, 4], [0, 5], [0, 6], [1, 3], [1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5], [3, 9], [3, 10], [4, 0], [4, 1], [4, 2], [4, 7], [4, 8], [4, 9], [4, 10], [5, 0], [5, 1], [5, 2], [5, 3], [5, 7], [5, 8], [5, 9], [5, 10], [6, 0], [6, 1], [6, 2], [6, 3], [6, 8], [6, 9], [6, 10], [7, 0], [7, 1], [7, 5], [7, 6], [8, 4], [8, 5], [8, 6], [9, 4], [9, 5], [9, 6], [9, 7], [10, 4], [10, 5], [10, 6], [10, 7]] },
+];
+
 // 4×4 minis. Diagonal block pair gives mixed 3/4-letter runs, all doubly checked. Pure geometry —
 // used by he (RTL) and es. (Spanish fills a 4×4 only with accent-folded keys; its 5×5 pool is too
 // thin. The HE_ name is kept for back-compat; MINI_TEMPLATES_4 is the locale-neutral alias.)
@@ -92,6 +117,9 @@ export function defaultSize(locale: PuzzleLocale): number {
 
 /** Templates available for a (locale, size). Empty array = unsupported combination. */
 export function templatesFor(locale: PuzzleLocale, size: number): BlockTemplate[] {
+  // he has BOTH a 4×4 mini and its own 11×11 full set — check the full size before the mini gate,
+  // which would otherwise swallow it as a mini-only locale.
+  if (locale === 'he' && size === 11) return HE_TEMPLATES_11;
   if (MINI_4_LOCALES.has(locale)) return size === 4 ? MINI_TEMPLATES_4 : [];
   // en + en-fallback locales
   if (size === 11) return EN_TEMPLATES_11;

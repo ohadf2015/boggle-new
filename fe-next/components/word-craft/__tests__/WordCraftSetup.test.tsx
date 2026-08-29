@@ -5,37 +5,64 @@ import { DEFAULT_SETUP } from '@/lib/word-craft/setupPrefs';
 
 const t = (k: string) => k; // key-echo test translator
 
+const FRIEND_INITIAL = { ...DEFAULT_SETUP, opponent: 'friend' as const };
+
+function getRadio(name: RegExp) {
+  return screen.getByRole('radio', { name });
+}
+
+function queryGroup(name: RegExp) {
+  return screen.queryByRole('radiogroup', { name });
+}
+
 describe('WordCraftSetup', () => {
   it('renders opponent cards, difficulty control, twist picker, start CTA', () => {
-    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={vi.fn()} t={t} />);
-    expect(screen.getByRole('radio', { name: /setup\.opponent\.bot/ })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: /setup\.opponent\.hotseat/ })).toBeTruthy();
-    expect(screen.getByRole('radiogroup', { name: /setup\.difficulty\.label/ })).toBeTruthy();
-    expect(screen.getByRole('radiogroup', { name: /setup\.twist\.label/ })).toBeTruthy();
+    render(<WordCraftSetup initial={FRIEND_INITIAL} onStart={vi.fn()} t={t} />);
+    expect(getRadio(/setup\.opponent\.bot/)).toBeTruthy();
+    expect(getRadio(/setup\.opponent\.hotseat/)).toBeTruthy();
+    expect(queryGroup(/setup\.difficulty\.label/)).toBeTruthy();
+    expect(queryGroup(/setup\.twist\.label/)).toBeTruthy();
     expect(screen.getByRole('button', { name: /setup\.start/ })).toBeTruthy();
   });
 
   it('starts with the assembled choice', () => {
     const onStart = vi.fn();
-    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={onStart} t={t} />);
-    fireEvent.click(screen.getByRole('radio', { name: /difficulty\.hard/ }));
-    fireEvent.click(screen.getByRole('radio', { name: /modifier\.land_grab/ }));
+    render(<WordCraftSetup initial={FRIEND_INITIAL} onStart={onStart} t={t} />);
+    fireEvent.click(getRadio(/difficulty\.hard/));
+    fireEvent.click(getRadio(/modifier\.land_grab/));
     fireEvent.click(screen.getByRole('button', { name: /setup\.start/ }));
-    expect(onStart).toHaveBeenCalledWith({ opponent: 'bot', difficulty: 'hard', modifier: 'land_grab' });
+    expect(onStart).toHaveBeenCalledWith({ opponent: 'friend', difficulty: 'hard', modifier: 'land_grab' });
+  });
+
+  it('Solo vs Rival shortcut: selecting bot defaults difficulty to easy and hides advanced options', () => {
+    const onStart = vi.fn();
+    render(
+      <WordCraftSetup
+        initial={{ opponent: 'friend', difficulty: 'hard', modifier: 'land_grab' }}
+        onStart={onStart}
+        t={t}
+      />,
+    );
+    fireEvent.click(getRadio(/setup\.opponent\.bot/));
+    expect(queryGroup(/setup\.difficulty\.label/)).toBeNull();
+    expect(queryGroup(/setup\.twist\.label/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /setup\.start/ }));
+    expect(onStart).toHaveBeenCalledWith({ opponent: 'bot', difficulty: 'easy', modifier: 'land_grab' });
   });
 
   it('hides the difficulty control when hotseat is selected (no bot to tune)', () => {
     render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={vi.fn()} t={t} />);
-    fireEvent.click(screen.getByRole('radio', { name: /setup\.opponent\.hotseat/ }));
-    expect(screen.queryByRole('radiogroup', { name: /setup\.difficulty\.label/ })).toBeNull();
+    fireEvent.click(getRadio(/setup\.opponent\.hotseat/));
+    expect(queryGroup(/setup\.difficulty\.label/)).toBeNull();
   });
 
   it('offers a remote Challenge-a-Friend opponent and passes it through START', () => {
     const onStart = vi.fn();
     render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={onStart} t={t} />);
-    fireEvent.click(screen.getByRole('radio', { name: /setup\.opponent\.friend/ }));
-    // Friend games still run vs the bot (async duel) — difficulty stays tunable.
-    expect(screen.getByRole('radiogroup', { name: /setup\.difficulty\.label/ })).toBeTruthy();
+    fireEvent.click(getRadio(/setup\.opponent\.friend/));
+    // Friend games still run vs the bot (async duel) — full tuning surface is visible.
+    expect(queryGroup(/setup\.difficulty\.label/)).toBeTruthy();
+    expect(queryGroup(/setup\.twist\.label/)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: /setup\.start/ }));
     expect(onStart).toHaveBeenCalledWith({ ...DEFAULT_SETUP, opponent: 'friend' });
   });
@@ -51,9 +78,9 @@ describe('WordCraftSetup', () => {
     const onStart = vi.fn();
     render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={onStart} t={t} />);
     const opponentGroup = screen.getByRole('radiogroup', { name: /setup\.opponent\.label/ });
-    const botCard = screen.getByRole('radio', { name: /setup\.opponent\.bot/ });
-    const hotseatCard = screen.getByRole('radio', { name: /setup\.opponent\.hotseat/ });
-    const friendCard = screen.getByRole('radio', { name: /setup\.opponent\.friend/ });
+    const botCard = getRadio(/setup\.opponent\.bot/);
+    const hotseatCard = getRadio(/setup\.opponent\.hotseat/);
+    const friendCard = getRadio(/setup\.opponent\.friend/);
 
     // Start with bot selected
     expect(botCard).toHaveAttribute('aria-checked', 'true');
@@ -80,11 +107,11 @@ describe('WordCraftSetup', () => {
   });
 
   it('difficulty radiogroup supports arrow key navigation', () => {
-    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={vi.fn()} t={t} />);
+    render(<WordCraftSetup initial={FRIEND_INITIAL} onStart={vi.fn()} t={t} />);
     const difficultyGroup = screen.getByRole('radiogroup', { name: /setup\.difficulty\.label/ });
-    const easyButton = screen.getByRole('radio', { name: /difficulty\.easy/ });
-    const mediumButton = screen.getByRole('radio', { name: /difficulty\.medium/ });
-    const hardButton = screen.getByRole('radio', { name: /difficulty\.hard/ });
+    const easyButton = getRadio(/difficulty\.easy/);
+    const mediumButton = getRadio(/difficulty\.medium/);
+    const hardButton = getRadio(/difficulty\.hard/);
 
     // Start with easy selected (default)
     expect(easyButton).toHaveAttribute('aria-checked', 'true');
@@ -99,7 +126,7 @@ describe('WordCraftSetup', () => {
   });
 
   it('twist radiogroup supports arrow key navigation', () => {
-    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={vi.fn()} t={t} />);
+    render(<WordCraftSetup initial={FRIEND_INITIAL} onStart={vi.fn()} t={t} />);
     const twistGroup = screen.getByRole('radiogroup', { name: /setup\.twist\.label/ });
     const surpriseButton = screen.getAllByRole('radio').find((r) => r.getAttribute('aria-label')?.includes('surprise'));
 
