@@ -95,7 +95,7 @@ export interface SinglePlayerResultsData {
  * SinglePlayerView - Main orchestrator for single player modes
  * Handles state transitions between lobby, playing, and results phases
  */
-const SinglePlayerView: React.FC = () => {
+const SinglePlayerView: React.FC<{ forceAutoStart?: 'bots' | 'practice' | 'challenge' }> = ({ forceAutoStart }) => {
   const { language: uiLanguage, t } = useLanguage();
   const searchParams = useSearchParams();
   const isPractice = usePracticeFlag();
@@ -108,7 +108,7 @@ const SinglePlayerView: React.FC = () => {
     handlePlayAgain,
     handleQuickRematch,
     handleBackToLobby,
-  } = useSinglePlayerConfig({ searchParams });
+  } = useSinglePlayerConfig({ searchParams, forceAutoStart });
 
   const setIsInGame = useHideNavigation();
   const { user, isAuthenticated } = useAuth();
@@ -367,10 +367,10 @@ const SinglePlayerView: React.FC = () => {
   );
 };
 
-function SinglePlayerViewWithErrorBoundary() {
+function SinglePlayerViewWithErrorBoundary({ forceAutoStart }: { forceAutoStart?: 'bots' | 'practice' | 'challenge' }) {
   return (
     <FeatureErrorBoundary featureName="Single Player" showHomeButton={true}>
-      <SinglePlayerView />
+      <SinglePlayerView forceAutoStart={forceAutoStart} />
     </FeatureErrorBoundary>
   );
 }

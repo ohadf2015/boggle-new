@@ -104,6 +104,8 @@ export function generateBotsForPreset(count: number, difficulty: 'easy' | 'mediu
 
 interface UseSinglePlayerConfigOptions {
   searchParams: ReturnType<typeof import('next/navigation').useSearchParams>;
+  /** When set, behave as if the URL contained `?autoStart=<mode>` even without search params. */
+  forceAutoStart?: 'bots' | 'practice' | 'challenge';
 }
 
 interface UseSinglePlayerConfigResult {
@@ -120,20 +122,20 @@ interface UseSinglePlayerConfigResult {
   wasFirstTimerPracticeRef: React.MutableRefObject<boolean>;
 }
 
-export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOptions): UseSinglePlayerConfigResult {
+export function useSinglePlayerConfig({ searchParams, forceAutoStart }: UseSinglePlayerConfigOptions): UseSinglePlayerConfigResult {
   const { language: uiLanguage } = useLanguage();
   const { unlockAudio } = useMusic();
   const router = useRouter();
   const { isAuthenticated, profile } = useAuth();
 
   const returnTo = searchParams?.get('returnTo') || null;
-  const autoStart = searchParams?.get('autoStart') || null;
+  const autoStart = searchParams?.get('autoStart') || forceAutoStart || null;
   const presetParam = searchParams?.get('preset') || null;
   const boardCode = searchParams?.get('boardCode') || null;
   const mpHandoff = searchParams?.get('mpHandoff') === '1';
 
   const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
-    const hasAutoStart = searchParams?.get('autoStart');
+    const hasAutoStart = searchParams?.get('autoStart') || forceAutoStart;
     const hasPreset = searchParams?.get('preset');
     if (hasAutoStart || hasPreset) return 'playing';
     const isNewPlayer = shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
@@ -151,15 +153,63 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     }
   }, [phase, isAuthenticated, profile]);
 
-  const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
-    mode: 'solo-bots',
-    difficulty: 'MEDIUM',
-    language: (uiLanguage as Language) || 'en',
-    grid: null,
-    timerSeconds: 120,
-    bots: [DEFAULT_MEDIUM_BOT],
-    minWordLength: 2,
-  }));
+  const [gameState, setGameState] = useState<SinglePlayerGameState>(() => {
+    const language: Language = (uiLanguage as Language) || 'en';
+
+    if (forceAutoStart === 'challenge') {
+      return {
+        mode: 'challenge',
+        difficulty: 'MEDIUM',
+        language,
+        grid: null,
+        timerSeconds: 120,
+        bots: [],
+        minWordLength: getMinWordLength(uiLanguage, 'MEDIUM'),
+      };
+    }
+
+    if (forceAutoStart === 'practice') {
+      const practicePreset = getDefaultPreset('practice');
+      if (practicePreset) {
+        return {
+          mode: 'practice',
+          difficulty: practicePreset.settings.difficulty,
+          language,
+          grid: null,
+          timerSeconds: practicePreset.settings.timerSeconds,
+          bots: [],
+          minWordLength: getMinWordLength(uiLanguage, practicePreset.settings.difficulty),
+        };
+      }
+    }
+
+    if (forceAutoStart === 'bots') {
+      const botsPreset = getDefaultPreset('solo-bots');
+      if (botsPreset) {
+        const { config } = firstWinConfigFor(botsPreset.settings);
+        const bots = generateBotsForPreset(config.bots, config.botDifficulty);
+        return {
+          mode: 'solo-bots',
+          difficulty: config.difficulty,
+          language,
+          grid: null,
+          timerSeconds: config.timerSeconds,
+          bots,
+          minWordLength: getMinWordLength(uiLanguage, config.difficulty),
+        };
+      }
+    }
+
+    return {
+      mode: 'solo-bots',
+      difficulty: 'MEDIUM',
+      language,
+      grid: null,
+      timerSeconds: 120,
+      bots: [DEFAULT_MEDIUM_BOT],
+      minWordLength: 2,
+    };
+  });
 
   const hasAutoStartedRef = useRef(false);
   const wasFirstTimerPracticeRef = useRef(false);
