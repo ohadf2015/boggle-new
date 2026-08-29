@@ -452,6 +452,10 @@ const ja = {
     "dismiss": "閉じる",
     "issueProbe": {"prompt": "なぜそう感じましたか？", "botsStrong": "ボットが強すぎる", "technical": "技術的な問題"}
   },
+  "wordTowerV2": {
+    "cardTitle": "ワードタワー v2",
+    "cardDesc": "本物の物理演算 — ベータ版"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "今日のひねり",

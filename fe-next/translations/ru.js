@@ -2599,6 +2599,10 @@ const ru = {
   "sendChallenge": "Отправить вызов",
   "opponentScore": "Результат соперника",
   "forfeit": "Сдаться",
+  "wordTowerV2": {
+    "cardTitle": "Башня слов v2",
+    "cardDesc": "Настоящая физика — бета"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "СЕГОДНЯШНИЙ ПОВОРОТ",

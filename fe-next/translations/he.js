@@ -452,6 +452,10 @@ const he = {
     "dismiss": "סגירה",
     "issueProbe": {"prompt": "מה גרם לתחושה הזו?", "botsStrong": "הבוטים חזקים מדי", "technical": "בעיה טכנית"}
   },
+  "wordTowerV2": {
+    "cardTitle": "מגדל מילים 2",
+    "cardDesc": "פיזיקה אמיתית — גרסת בטא"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "הטוויסט של היום",

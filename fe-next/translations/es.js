@@ -451,6 +451,10 @@ const es = {
     "dismiss": "Cerrar",
     "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
+  "wordTowerV2": {
+    "cardTitle": "Torre de Palabras v2",
+    "cardDesc": "Física real: versión beta"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "GIRO DE HOY",

@@ -377,6 +377,10 @@ const en = {
     "share": {"copy": "Copy result","copied": "Copied!","emojiRowAria": "Emoji summary of your run","captionPerfect": "Flawless transmutation! 🧪","captionWild": "The catalyst came in clutch! 🔮","captionGood": "Solid alchemy! 🌡️","captionHard": "The elements fought back today 😅"}
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
+  "wordTowerV2": {
+    "cardTitle": "Word Tower v2",
+    "cardDesc": "Real physics — beta preview"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "TODAY'S TWIST",

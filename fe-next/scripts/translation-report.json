@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 6278,
+    "totalKeysInCode": 6281,
     "keyCountByLanguage": {
       "en": 12108,
       "es": 12404,
@@ -9,7 +9,7 @@
       "ru": 12143,
       "sv": 12359
     },
-    "missingFromEnglish": 79,
+    "missingFromEnglish": 81,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -1339,7 +1339,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 235,
+        "line": 243,
         "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
       },
       {
@@ -1966,17 +1966,17 @@
         "context": "const note = t(`wordcraft.modifier.desc.${modifier}`, p.note);"
       },
       {
-        "pattern": "`wordcraft.modifier.desc.${m}`",
+        "pattern": "`wordcraft.difficulty.${d}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 174,
-        "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
+        "line": 146,
+        "context": "label={t(`wordcraft.difficulty.${d}`)}"
       },
       {
         "pattern": "`wordcraft.modifier.desc.${m}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftSetup.tsx",
-        "line": 225,
+        "line": 166,
         "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
       },
       {
@@ -2734,7 +2734,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 181,
+        "line": 189,
         "context": "{t(labelKey)}"
       },
       {
@@ -2742,7 +2742,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 216,
+        "line": 224,
         "context": "{t(labelKey)}"
       },
       {
@@ -2958,7 +2958,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 625,
+        "line": 640,
         "context": "return t(key, params);"
       },
       {
@@ -3965,7 +3965,7 @@
       "usages": [
         {
           "file": "components/word-craft/WordCraftSetup.tsx",
-          "line": 268
+          "line": 210
         }
       ]
     },
@@ -3974,7 +3974,7 @@
       "usages": [
         {
           "file": "components/word-craft/WordCraftSetup.tsx",
-          "line": 268
+          "line": 210
         }
       ]
     },
@@ -3983,7 +3983,25 @@
       "usages": [
         {
           "file": "components/word-craft/WordCraftSetup.tsx",
-          "line": 92
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "wordTowerV2.drop",
+      "usages": [
+        {
+          "file": "components/wordTowerV2/WordTowerV2.tsx",
+          "line": 273
+        }
+      ]
+    },
+    {
+      "key": "wordTowerV2.hoist",
+      "usages": [
+        {
+          "file": "components/wordTowerV2/WordTowerV2.tsx",
+          "line": 264
         }
       ]
     }

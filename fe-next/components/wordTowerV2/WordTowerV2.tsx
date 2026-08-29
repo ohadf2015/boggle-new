@@ -213,8 +213,15 @@ export default function WordTowerV2() {
       />
 
       <div className="pointer-events-none absolute left-4 top-4 flex flex-col gap-1">
-        <div className="rounded-lg border-4 border-neo-navy bg-neo-lime px-3 py-1 font-fredoka text-2xl font-bold text-neo-navy shadow-[4px_4px_0_0_#12162b]">
-          {heightM.toFixed(1)}m
+        <div className="flex items-center gap-2">
+          <div className="rounded-lg border-4 border-neo-navy bg-neo-lime px-3 py-1 font-fredoka text-2xl font-bold text-neo-navy shadow-[4px_4px_0_0_#12162b]">
+            {heightM.toFixed(1)}m
+          </div>
+          {/* This mode is a beta preview — say so on the screen, not just in
+              the route gate, so testers know what they are reporting on. */}
+          <div className="rounded-md border-2 border-neo-navy bg-neo-pink px-2 py-0.5 font-fredoka text-xs font-bold uppercase tracking-widest text-neo-white shadow-[3px_3px_0_0_#12162b]">
+            {t('common.beta', 'Beta')}
+          </div>
         </div>
         <div className="font-fredoka text-lg font-bold text-neo-white">{score}</div>
         {stats ? (

@@ -126,7 +126,11 @@ const sv = {
       "step2": "Rensa ord för att utlösa kedjor",
       "scoreTip": "Kedja sprängningar för jackpot!"
     },
-    "wordTower": {
+    "wordTowerV2": {
+    "cardTitle": "Ordtornet v2",
+    "cardDesc": "Äkta fysik – betaversion"
+  },
+  "wordTower": {
       "title": "Bygg tornet",
       "step1": "Tryck för att släppa blocket",
       "step2": "Centrera blocket för att stapla högt",
