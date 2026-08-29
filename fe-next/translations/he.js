@@ -12291,7 +12291,8 @@ const he = {
       "error": {
         "createFailed": "יצירת הכיתה נכשלה",
         "updateFailed": "עדכון הכיתה נכשל",
-        "deleteFailed": "מחיקת הכיתה נכשלה"
+        "deleteFailed": "מחיקת הכיתה נכשלה",
+        "copyFailed": "העתקת הקוד נכשלה. נסו שוב."
       },
       "dialog": {
         "createDescription": "צור כיתה חדשה עם שם והגדרות שפה",
