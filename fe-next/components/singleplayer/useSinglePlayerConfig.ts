@@ -104,6 +104,7 @@ export function generateBotsForPreset(count: number, difficulty: 'easy' | 'mediu
 
 interface UseSinglePlayerConfigOptions {
   searchParams: ReturnType<typeof import('next/navigation').useSearchParams>;
+  presetOverride?: string | null;
 }
 
 interface UseSinglePlayerConfigResult {
@@ -120,7 +121,7 @@ interface UseSinglePlayerConfigResult {
   wasFirstTimerPracticeRef: React.MutableRefObject<boolean>;
 }
 
-export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOptions): UseSinglePlayerConfigResult {
+export function useSinglePlayerConfig({ searchParams, presetOverride }: UseSinglePlayerConfigOptions): UseSinglePlayerConfigResult {
   const { language: uiLanguage } = useLanguage();
   const { unlockAudio } = useMusic();
   const router = useRouter();
@@ -128,13 +129,13 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
 
   const returnTo = searchParams?.get('returnTo') || null;
   const autoStart = searchParams?.get('autoStart') || null;
-  const presetParam = searchParams?.get('preset') || null;
+  const presetParam = presetOverride ?? searchParams?.get('preset') ?? null;
   const boardCode = searchParams?.get('boardCode') || null;
   const mpHandoff = searchParams?.get('mpHandoff') === '1';
 
   const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
     const hasAutoStart = searchParams?.get('autoStart');
-    const hasPreset = searchParams?.get('preset');
+    const hasPreset = presetOverride ?? searchParams?.get('preset');
     if (hasAutoStart || hasPreset) return 'playing';
     const isNewPlayer = shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
     return isNewPlayer ? 'pre-game' : 'playing';

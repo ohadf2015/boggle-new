@@ -91,11 +91,19 @@ export interface SinglePlayerResultsData {
   maxCombo?: number; // Highest combo reached in this game
 }
 
+interface SinglePlayerViewProps {
+  preset?: string;
+  embedded?: boolean;
+}
+
 /**
  * SinglePlayerView - Main orchestrator for single player modes
  * Handles state transitions between lobby, playing, and results phases
  */
-const SinglePlayerView: React.FC = () => {
+const SinglePlayerView: React.FC<SinglePlayerViewProps> = ({
+  preset,
+  embedded = false,
+}) => {
   const { language: uiLanguage, t } = useLanguage();
   const searchParams = useSearchParams();
   const isPractice = usePracticeFlag();
@@ -108,7 +116,7 @@ const SinglePlayerView: React.FC = () => {
     handlePlayAgain,
     handleQuickRematch,
     handleBackToLobby,
-  } = useSinglePlayerConfig({ searchParams });
+  } = useSinglePlayerConfig({ searchParams, presetOverride: preset });
 
   const setIsInGame = useHideNavigation();
   const { user, isAuthenticated } = useAuth();
@@ -125,24 +133,26 @@ const SinglePlayerView: React.FC = () => {
   const isInGameRef = useRef(false);
   const isMountedRef = useRef(true);
 
-  // Hide bottom navigation during gameplay and pre-game tutorial
+  // Hide bottom navigation during gameplay and pre-game tutorial (skip when
+  // embedded inline on a landing page so the site nav stays visible).
   useEffect(() => {
+    if (embedded) return;
     const shouldBeInGame = phase === 'pre-game' || phase === 'playing' || phase === 'results';
     if (isMountedRef.current && isInGameRef.current !== shouldBeInGame) {
       isInGameRef.current = shouldBeInGame;
       setIsInGame(shouldBeInGame);
     }
-  }, [phase, setIsInGame]);
+  }, [phase, setIsInGame, embedded]);
 
   // Cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-      setIsInGame(false);
+      if (!embedded) setIsInGame(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [embedded]);
 
   // Map SinglePlayerPhase to GamePhase for the music hook
   const musicPhase: GamePhase = (phase === 'playing' || phase === 'pre-game') ? 'waiting' : phase;
@@ -294,12 +304,22 @@ const SinglePlayerView: React.FC = () => {
   // sits below the grid (relative children) and never touches tile readability.
   const seasonSkin = useMemo(() => getCurrentSeasonDynamic().gridSkinClass, []);
 
+  // When embedded on a landing page, "back to lobby" should restart the same
+  // round in-place instead of navigating away from the marketing page.
+  const onBackToLobby = useCallback(() => {
+    if (embedded) {
+      handlePlayAgain();
+    } else {
+      handleBackToLobby();
+    }
+  }, [embedded, handlePlayAgain, handleBackToLobby]);
+
   return (
     <div
       className={`flex flex-col bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${phase === 'playing' ? `h-full overflow-hidden ${seasonSkin}` : 'min-h-full'}`}
-      {...pullToRefreshHandlers}
+      {...(embedded ? {} : pullToRefreshHandlers)}
     >
-      {phase === 'results' && (
+      {!embedded && phase === 'results' && (
         <PullToRefreshIndicator
           pullDistance={pullState.pullDistance}
           isRefreshing={pullState.isRefreshing}
@@ -307,7 +327,7 @@ const SinglePlayerView: React.FC = () => {
         />
       )}
 
-      <AutoHideHeader />
+      {!embedded && <AutoHideHeader />}
 
       {phase === 'pre-game' && (
         <PreGameTutorial onComplete={handleTutorialComplete} sessionId={sessionId} />
@@ -324,7 +344,7 @@ const SinglePlayerView: React.FC = () => {
             settings={gameState}
             targetHighScore={currentHighScore?.score || null}
             onGameEnd={handleGameEnd}
-            onQuit={handleBackToLobby}
+            onQuit={onBackToLobby}
           />
         )}
 
@@ -338,7 +358,7 @@ const SinglePlayerView: React.FC = () => {
                 key={resultsData.gameSessionId || 'results'}
                 results={resultsData}
                 onPlayAgain={handlePlayAgain}
-                onBackToLobby={handleBackToLobby}
+                onBackToLobby={onBackToLobby}
               />
             ) : (
               <SinglePlayerResults
@@ -350,7 +370,7 @@ const SinglePlayerView: React.FC = () => {
                 mode={gameState.mode}
                 onPlayAgain={handlePlayAgain}
                 onQuickRematch={handleQuickRematch}
-                onBackToLobby={handleBackToLobby}
+                onBackToLobby={onBackToLobby}
               />
             )}
             {returnTo === 'daily' && (
@@ -367,10 +387,10 @@ const SinglePlayerView: React.FC = () => {
   );
 };
 
-function SinglePlayerViewWithErrorBoundary() {
+function SinglePlayerViewWithErrorBoundary({ preset, embedded }: SinglePlayerViewProps) {
   return (
     <FeatureErrorBoundary featureName="Single Player" showHomeButton={true}>
-      <SinglePlayerView />
+      <SinglePlayerView preset={preset} embedded={embedded} />
     </FeatureErrorBoundary>
   );
 }
