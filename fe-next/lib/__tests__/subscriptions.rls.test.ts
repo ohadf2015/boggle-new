@@ -59,7 +59,7 @@ const mockAdminClient = (
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 
-import { canAddStudent } from '../subscriptions';
+import { canAddStudent, upsertSubscription, logSubscriptionEvent } from '../subscriptions';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 
@@ -129,5 +129,50 @@ describe('canAddStudent counts through the service-role client', () => {
 
     expect(out.allowed).toBe(false);
     expect(out.reason).toContain('not found');
+  });
+});
+
+/**
+ * Both writers are called only from the payment webhooks (Polar, LemonSqueezy), where there
+ * is no user session — so the request-scoped client acts as `anon`.
+ *
+ * `subscriptions` grants writes to `service_role` only, so the upsert was refused by RLS and
+ * threw. `subscription_events` only accepted the insert because its policy was mistakenly
+ * granted to PUBLIC (the same policy that let anyone forge billing events); once that is
+ * scoped to service_role, an anon-key insert fails too.
+ */
+describe('webhook writers use the service-role client', () => {
+  const writeClient = () => {
+    const insert = vi.fn(async () => ({ error: null }));
+    const upsert = vi.fn(async () => ({ error: null }));
+    return { insert, upsert, from: vi.fn(() => ({ insert, upsert })) };
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('upserts the subscription through the admin client, not the request client', async () => {
+    const request = writeClient();
+    const admin = writeClient();
+    (createClient as any).mockResolvedValue(request);
+    (createAdminClient as any).mockReturnValue(admin);
+
+    await upsertSubscription({ userId: 'u-1', tier: 'pro', status: 'active' } as never);
+
+    expect(admin.upsert).toHaveBeenCalled();
+    expect(request.from).not.toHaveBeenCalled();
+  });
+
+  it('logs the subscription event through the admin client, not the request client', async () => {
+    const request = writeClient();
+    const admin = writeClient();
+    (createClient as any).mockResolvedValue(request);
+    (createAdminClient as any).mockReturnValue(admin);
+
+    await logSubscriptionEvent({ userId: 'u-1', eventType: 'created', payload: {} });
+
+    expect(admin.insert).toHaveBeenCalled();
+    expect(request.from).not.toHaveBeenCalled();
   });
 });
