@@ -41,4 +41,19 @@ describe('teacherGoodwillExtension', () => {
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
   });
+  it('leads with the apology and states the gift as already applied', () => {
+    // "Feels like a reward" is the brief: no claim step, no coupon, no
+    // "contact support to activate" — the days are already on the account.
+    const { html } = teacherGoodwillExtension({ full_name: 'Dana', locale: 'en', newExpiresAt: NEW_EXPIRY });
+    expect(html).toMatch(/sorry/i);
+    expect(html).toContain('14 free days');
+    expect(html).toMatch(/already added/i);
+    expect(html).toMatch(/Nothing to claim/i);
+  });
+
+  it('asks for feedback with a reply, not a survey link', () => {
+    const { html } = teacherGoodwillExtension({ full_name: 'Dana', locale: 'en', newExpiresAt: NEW_EXPIRY });
+    expect(html).toMatch(/hit reply/i);
+    expect(html).not.toMatch(/survey|typeform|forms\.gle/i);
+  });
 });
