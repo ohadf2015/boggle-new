@@ -126,10 +126,6 @@ const sv = {
       "step2": "Rensa ord för att utlösa kedjor",
       "scoreTip": "Kedja sprängningar för jackpot!"
     },
-    "wordTowerV2": {
-    "cardTitle": "Ordtornet v2",
-    "cardDesc": "Äkta fysik – betaversion"
-  },
   "wordTower": {
       "title": "Bygg tornet",
       "step1": "Tryck för att släppa blocket",
@@ -744,6 +740,10 @@ const sv = {
     "thanks": "Tack för din feedback!",
     "dismiss": "Stäng",
     "issueProbe": {"prompt": "Vad fick det att kännas så?", "botsStrong": "Bottar för starka", "technical": "Tekniskt problem"}
+  },
+  "wordTowerV2": {
+    "cardTitle": "Ordtornet v2",
+    "cardDesc": "Äkta fysik – betaversion"
   },
   "wordTower": {
     "mutator": {

@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6281,
+    "totalKeysInCode": 6286,
     "keyCountByLanguage": {
-      "en": 12108,
-      "es": 12404,
-      "he": 12309,
-      "ja": 12363,
-      "ru": 12143,
-      "sv": 12359
+      "en": 12130,
+      "es": 12426,
+      "he": 12331,
+      "ja": 12385,
+      "ru": 12165,
+      "sv": 12381
     },
-    "missingFromEnglish": 81,
+    "missingFromEnglish": 66,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -3622,6 +3622,15 @@
       ]
     },
     {
+      "key": "common.beta",
+      "usages": [
+        {
+          "file": "components/wordTowerV2/WordTowerV2.tsx",
+          "line": 223
+        }
+      ]
+    },
+    {
       "key": "daily.qrWelcome.badge",
       "usages": [
         {
@@ -3645,24 +3654,6 @@
         {
           "file": "app/[locale]/PageClient.tsx",
           "line": 253
-        }
-      ]
-    },
-    {
-      "key": "education.access.status_unknown_body",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 167
-        }
-      ]
-    },
-    {
-      "key": "education.access.status_unknown_title",
-      "usages": [
-        {
-          "file": "app/[locale]/education/access/PageClient.tsx",
-          "line": 166
         }
       ]
     },
@@ -3808,33 +3799,6 @@
       ]
     },
     {
-      "key": "education.lesson.word",
-      "usages": [
-        {
-          "file": "components/education/MultiLessonSelector.tsx",
-          "line": 150
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.words",
-      "usages": [
-        {
-          "file": "components/education/MultiLessonSelector.tsx",
-          "line": 151
-        }
-      ]
-    },
-    {
-      "key": "education.student.join.classroomFull",
-      "usages": [
-        {
-          "file": "components/student/JoinClassroomForm.tsx",
-          "line": 123
-        }
-      ]
-    },
-    {
       "key": "footer.spellingBeePractice",
       "usages": [
         {
@@ -3858,105 +3822,6 @@
         {
           "file": "components/sealedBid/SealedBidTable.tsx",
           "line": 83
-        }
-      ]
-    },
-    {
-      "key": "teacher.dashboard.studentsPresentDescription",
-      "usages": [
-        {
-          "file": "components/teacher/StudentsPresentStrip.tsx",
-          "line": 68
-        }
-      ]
-    },
-    {
-      "key": "teacher.dashboard.studentsPresentTitle",
-      "usages": [
-        {
-          "file": "components/teacher/StudentsPresentStrip.tsx",
-          "line": 62
-        }
-      ]
-    },
-    {
-      "key": "teacher.proGate.cta",
-      "usages": [
-        {
-          "file": "components/teacher/ProGate.tsx",
-          "line": 60
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.checkoutUnavailable",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 66
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.featureOutcome1",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 126
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.featureOutcome2",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 127
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.featureOutcome3",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 128
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.featureOutcome4",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 129
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.priceTaxNote",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 286
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.proHeroAlt",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 173
-        }
-      ]
-    },
-    {
-      "key": "teacher.subscription.valueHeadline",
-      "usages": [
-        {
-          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-          "line": 160
         }
       ]
     },
@@ -3992,7 +3857,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 273
+          "line": 280
         }
       ]
     },
@@ -4001,7 +3866,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 264
+          "line": 271
         }
       ]
     }
@@ -4222,6 +4087,8 @@
       "sealedBidLegacy.round",
       "sealedBidLegacy.youWin",
       "sealedBidLegacy.continue",
+      "wordTowerV2.cardTitle",
+      "wordTowerV2.cardDesc",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
@@ -5248,6 +5115,8 @@
       "sealedBid.yourWord"
     ],
     "sv": [
+      "modeCoach.wordTowerV2.cardTitle",
+      "modeCoach.wordTowerV2.cardDesc",
       "leadChange.tookTheLeadVerb",
       "leadChange.tookLeadWitty_0",
       "leadChange.tookLeadWitty_1",
