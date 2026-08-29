@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
-    title: 'Scrabble Online Gratis en Español — Multijugador | LexiClash',
-    description: 'Scrabble online en español gratis con hasta 50 amigos — sin registro, sin descarga. Crea tu sala en 10 segundos y juega en tiempo real. →',
+    title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
+    description: 'Juega Scrabble en español gratis — sin registro, sin app. Hasta 50 amigos en tiempo real. Crea sala en 10 segundos. →',
     keywords: 'jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
       title: 'Juega Scrabble Online en Español — Gratis, Sin Registro | LexiClash',
