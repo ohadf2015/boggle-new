@@ -19,7 +19,6 @@ import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
-import { resolveQuickAvatar } from './quickAvatar';
 import { BackButton } from '@/components/ui/BackButton';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
