@@ -5,7 +5,8 @@
  * Following TDD: Write tests FIRST, then implement.
  */
 
-import { renderHook, act } from '@testing-library/react';
+import { StrictMode } from 'react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAdventureSelection } from '../useAdventureSelection';
 import type { GridTileState } from '@/types/adventure';
 
@@ -643,6 +644,34 @@ describe('useAdventureSelection', () => {
       // THEN - Standard tiles should be selected
       expect(result.current.selectedIndices).toEqual([0, 4, 5]);
       expect(result.current.currentWord).toBe('CDO');
+    });
+  });
+
+  describe('click-to-submit purity', () => {
+    // React re-invokes state updater callbacks under StrictMode (and may replay
+    // them under concurrent rendering). Scheduling the submit from inside the
+    // updater therefore submitted the same word twice.
+    it('submits the word exactly once when the updater is re-invoked', async () => {
+      const tiles = createTestGrid();
+      const onClickSubmit = vi.fn();
+      const { result } = renderHook(
+        () => useAdventureSelection({ tiles, gridSize: 4, onClickSubmit }),
+        { wrapper: StrictMode }
+      );
+
+      act(() => {
+        result.current.selectTile(0); // C
+        result.current.selectTile(1); // A
+      });
+      act(() => {
+        result.current.selectTile(1); // click last tile again -> submit "CA"
+      });
+
+      await waitFor(() => {
+        expect(onClickSubmit).toHaveBeenCalled();
+      });
+      expect(onClickSubmit).toHaveBeenCalledTimes(1);
+      expect(onClickSubmit).toHaveBeenCalledWith('CA', [0, 1]);
     });
   });
 });

@@ -45,6 +45,10 @@ export function useStreakFreeze() {
   const [freezeCount, setFreezeCount] = useState<number>(() => loadFreezeData().count);
   const countRef = useRef(freezeCount);
   const { user, isAuthenticated } = useAuth();
+  // Read the id once so the callbacks below close over a primitive. Depending on
+  // `user?.id` while reading `user.id` makes the React Compiler infer the wider
+  // `user` and refuse to preserve the memoization.
+  const userId = user?.id;
   const hasSyncedRef = useRef(false);
 
   // Keep ref in sync
@@ -52,13 +56,13 @@ export function useStreakFreeze() {
 
   // Fetch from Supabase on mount when authenticated
   useEffect(() => {
-    if (!isAuthenticated || !user?.id || hasSyncedRef.current || !supabase) return;
+    if (!isAuthenticated || !userId || hasSyncedRef.current || !supabase) return;
     hasSyncedRef.current = true;
 
     supabase
       .from('profiles')
       .select('streak_freeze_count')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single()
       .then(({ data, error }) => {
         if (error || !data) return;
@@ -67,32 +71,29 @@ export function useStreakFreeze() {
         setFreezeCount(serverCount);
         countRef.current = serverCount;
       }, () => {});
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, userId]);
 
+  // Persistence runs here, not inside the setState updater: React may invoke an
+  // updater more than once (StrictMode double-invoke, concurrent replay), which
+  // duplicated the Supabase write. `countRef` mirrors the state and is advanced
+  // synchronously, so back-to-back calls in one tick still compound correctly.
   const earnFreeze = useCallback(() => {
-    setFreezeCount((prev) => {
-      const next = Math.min(prev + 1, MAX_FREEZES);
-      saveFreezeData({ count: next });
-      countRef.current = next;
-      if (isAuthenticated && user?.id) syncFreezeToSupabase(user.id, next);
-      return next;
-    });
-  }, [isAuthenticated, user?.id]);
+    const next = Math.min(countRef.current + 1, MAX_FREEZES);
+    countRef.current = next;
+    saveFreezeData({ count: next });
+    if (isAuthenticated && userId) syncFreezeToSupabase(userId, next);
+    setFreezeCount(next);
+  }, [isAuthenticated, userId]);
 
   const consumeFreeze = useCallback((): boolean => {
     if (countRef.current <= 0) return false;
-    setFreezeCount((prev) => {
-      if (prev > 0) {
-        const next = prev - 1;
-        saveFreezeData({ count: next });
-        countRef.current = next;
-        if (isAuthenticated && user?.id) syncFreezeToSupabase(user.id, next);
-        return next;
-      }
-      return prev;
-    });
+    const next = countRef.current - 1;
+    countRef.current = next;
+    saveFreezeData({ count: next });
+    if (isAuthenticated && userId) syncFreezeToSupabase(userId, next);
+    setFreezeCount(next);
     return true;
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, userId]);
 
   return { freezeCount, earnFreeze, consumeFreeze };
 }

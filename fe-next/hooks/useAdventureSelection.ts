@@ -5,7 +5,7 @@
  * Handles path building, deselection, and coordinate conversion.
  */
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { GridTileState } from '@/types/adventure';
 
 // ==============================================
@@ -88,6 +88,9 @@ export function useAdventureSelection({
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const lastClickTimeRef = useRef(0);
   const lastClickIndexRef = useRef<number | null>(null);
+  // Set by the selection updater when a click completes a word; flushed once
+  // after commit so a re-invoked updater cannot submit the same word twice.
+  const pendingSubmitRef = useRef<{ word: string; indices: number[] } | null>(null);
 
   // Build current word from selected tiles
   const currentWord = useMemo(() => {
@@ -175,8 +178,10 @@ export function useAdventureSelection({
         if (index === lastIndex && prev.length >= 2) {
           if (onClickSubmit) {
             const word = prev.map(i => tiles[i]?.letter || '').join('');
-            // Submit async (after state update) to avoid stale closure
-            setTimeout(() => onClickSubmit(word, prev), 0);
+            // Record, don't dispatch: React may invoke this updater more than
+            // once, and scheduling the submit here submitted the word twice.
+            // The flush effect below fires it exactly once, after the commit.
+            pendingSubmitRef.current = { word, indices: prev };
           }
           return [];
         }
@@ -185,7 +190,7 @@ export function useAdventureSelection({
         if (isDoubleClick && prev.includes(index) && prev.length >= 2) {
           if (onClickSubmit) {
             const word = prev.map(i => tiles[i]?.letter || '').join('');
-            setTimeout(() => onClickSubmit(word, prev), 0);
+            pendingSubmitRef.current = { word, indices: prev };
           }
           return [];
         }
@@ -211,6 +216,19 @@ export function useAdventureSelection({
     },
     [disabled, tiles, onClickSubmit]
   );
+
+  // Flush a completed word once the selection commit has landed. Runs after the
+  // state update (which is what the previous setTimeout(…, 0) was reaching for)
+  // and, because the ref write is idempotent, exactly once per submitted word.
+  useEffect(() => {
+    const pending = pendingSubmitRef.current;
+    if (!pending) return;
+    pendingSubmitRef.current = null;
+    // Keep the original macrotask deferral so the cleared board paints before the
+    // submit handler runs; the ref is already nulled, so this fires exactly once.
+    const id = setTimeout(() => onClickSubmit?.(pending.word, pending.indices), 0);
+    return () => clearTimeout(id);
+  }, [selectedIndices, onClickSubmit]);
 
   // Clear all selections
   const clearSelection = useCallback(() => {
