@@ -12386,7 +12386,8 @@ const es = {
       "error": {
         "createFailed": "No se pudo crear la clase",
         "updateFailed": "No se pudo actualizar la clase",
-        "deleteFailed": "No se pudo eliminar la clase"
+        "deleteFailed": "No se pudo eliminar la clase",
+        "copyFailed": "No se pudo copiar el código. Inténtalo de nuevo."
       },
       "dialog": {
         "createDescription": "Crea una nueva clase para tus estudiantes",
