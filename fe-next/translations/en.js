@@ -11591,7 +11591,7 @@ const en = {
       "title": "LexiClash Education",
       "startGame": "Start Game",
       "hero": {
-        "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
+        "eyebrow": "For teachers in English, Hebrew, Swedish, Japanese, Spanish and Russian classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
         "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
@@ -11698,7 +11698,7 @@ const en = {
         "title": "Frequently asked questions",
         "q1": {
           "q": "How do teachers get access?",
-          "a": "Apply at /education/access — we review by email and typically respond within 24 hours."
+          "a": "Fill in the short form at /education/access — access is granted the moment you submit it, and your dashboard opens straight away."
         },
         "q2": {
           "q": "Is there a free plan?",
@@ -11731,7 +11731,7 @@ const en = {
       },
       "cta": {
         "title": "Ready to bring LexiClash to your classroom?",
-        "body": "Apply for teacher access — takes 60 seconds, typically approved within 24 hours.",
+        "body": "Request teacher access — 60 seconds, and you are in as soon as you submit it.",
         "button": "Request Teacher Access"
       },
       "teacherLeadCta": {

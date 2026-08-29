@@ -12386,7 +12386,8 @@ const es = {
       "error": {
         "createFailed": "No se pudo crear la clase",
         "updateFailed": "No se pudo actualizar la clase",
-        "deleteFailed": "No se pudo eliminar la clase"
+        "deleteFailed": "No se pudo eliminar la clase",
+            "copyFailed": "No se pudo copiar el código. Inténtalo de nuevo."
       },
       "dialog": {
         "createDescription": "Crea una nueva clase para tus estudiantes",
@@ -13016,7 +13017,7 @@ const es = {
       "title": "LexiClash Education",
       "startGame": "Iniciar juego",
       "hero": {
-        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
+        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés, español y ruso",
         "h1": "Juegos de vocabulario para tu aula — sin cuentas de estudiantes.",
         "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para {count} idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
@@ -13123,7 +13124,7 @@ const es = {
         "title": "Preguntas frecuentes",
         "q1": {
           "q": "¿Cómo solicito acceso de docente?",
-          "a": "Ingresa en /education/access. Revisamos manualmente. Respuesta en menos de 24 horas."
+          "a": "Rellena el breve formulario en /education/access: el acceso se concede en el momento de enviarlo y tu panel se abre al instante."
         },
         "q2": {
           "q": "¿Hay un plan gratis?",
@@ -13156,7 +13157,7 @@ const es = {
       },
       "cta": {
         "title": "¿Listo para traer LexiClash a tu aula?",
-        "body": "Solicita acceso de docente. 60 segundos. Aprobado en menos de 24 horas.",
+        "body": "Solicita acceso de docente: 60 segundos y entras en cuanto lo envías.",
         "button": "Solicitar acceso como docente"
       },
       "teacherLeadCta": {

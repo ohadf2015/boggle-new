@@ -13263,7 +13263,7 @@ const sv = {
       "title": "LexiClash Utbildning",
       "startGame": "Starta spel",
       "hero": {
-        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
+        "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska, spanska och ryska",
         "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
         "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
@@ -13370,7 +13370,7 @@ const sv = {
         "title": "Vanliga frågor från lärare",
         "q1": {
           "q": "Hur får jag lärargång?",
-          "a": "Ansök på education/access — det tar två minuter. Vi granskar och svarar oftast inom 24 timmar."
+          "a": "Fyll i det korta formuläret på /education/access — åtkomsten ges direkt när du skickar in, och panelen öppnas på en gång."
         },
         "q2": {
           "q": "Finns det en gratisplan?",
@@ -13403,7 +13403,7 @@ const sv = {
       },
       "cta": {
         "title": "Redo att börja?",
-        "body": "Två minuter att ansöka. Svar oftast samma dag. Sedan får du tillgång till alla lärarverktyg.",
+        "body": "Två minuter att ansöka — du är inne så fort du skickar in.",
         "button": "Ansök nu"
       },
       "teacherLeadCta": {
