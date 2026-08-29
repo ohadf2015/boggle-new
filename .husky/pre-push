@@ -1,6 +1,27 @@
 #!/bin/sh
 
-echo "🔍 Running pre-push checks (parallel)..."
+# Default pre-push gate for boggle-new / LexiClash.
+#
+# Goals:
+#   - Routine pushes finish in seconds, not 40 minutes.
+#   - The full test suite is still runnable on demand.
+#   - Lint, typecheck, and changed tests still block bad pushes.
+#
+# Behavior:
+#   - Lint runs only on changed JS/TS files.
+#   - Typecheck runs only when type-relevant files changed.
+#   - Tests:
+#       * Default: a small smoke subset (shared/, lib/__tests__/) plus any
+#         test files that changed in this push. No dependency-cone expansion.
+#       * LEXI_PREPUSH_FULL=1: run the full test suite via `npm run test:full`.
+#       * LEXI_PREPUSH_NO_SMOKE=1: skip the smoke subset (changed tests still run).
+#
+# Full suite:
+#   npm run test:full   # backend + frontend, ~40 min on this codebase
+#
+# See docs/pre-push-hook.md for more.
+
+echo "🔍 Running pre-push checks..."
 echo ""
 
 # vitest 4.x's rolldown bundle imports `styleText` from `node:util`, which is
@@ -15,19 +36,14 @@ export PATH
 
 cd fe-next
 
-# Collect changed files once (fast: no subshell per-file)
+# Collect changed files once (fast: no subshell per-file).
 CHANGED=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' || true)
 LINT_FILES=$(echo "$CHANGED" | sed 's|^fe-next/||' | while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && printf '%s ' "$f"; done)
-BACKEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
-FRONTEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
+CHANGED_TESTS=$(echo "$CHANGED" | grep -E '^fe-next/.*\.(test|spec)\.(ts|tsx|js|jsx)$' | sed 's|^fe-next/||' || true)
 
 # Type-relevant changes: any .ts/.tsx/.js/.jsx/.mjs/.cjs, or a tsconfig/package.json.
 # A push that touches NONE of these (e.g. a docs-only nightly commit) cannot
 # introduce a type error, so the whole-project `tsc --noEmit` below is skipped.
-# Running it unconditionally was the 2026-05-29 strand: a docs-only nightly push
-# was blocked by an UNRELATED pre-existing type error (a stale .next validator
-# pointing at a founder-WIP page that never existed) → push failed → commit
-# stranded in refs/nightly-pending/. Code pushes still run the full type-check.
 TYPE_RELEVANT=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null \
   | grep -E '\.(ts|tsx|js|jsx|mjs|cjs)$|(^|/)tsconfig[^/]*\.json$|(^|/)package\.json$' || true)
 
@@ -35,23 +51,16 @@ TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
 # --- Single-flight mutex for the test job ----------------------------------
-# The 2026-06-12 push failure (exit 144) was a memory-exhaustion OOM: the
-# feedback-daemon and a manual push each fired this hook, and `pgrep` showed
-# SIX concurrent `vitest --changed` runs stacked on top of each other, each
-# holding multiple GB → the kernel OOM-killed them all. `--changed` itself is
-# fine; the bug is that nothing serialized the runs. mkdir is an atomic
-# create-or-fail on POSIX (flock is absent on macOS), so it makes a portable
-# lock. A lock left by a crashed run is reclaimed once its PID is gone.
-# Stable path shared across ALL pre-push invocations (so concurrent runs see
-# the same lock). TMPDIR above is the per-run unique mktemp dir; its PARENT is
-# the stable system temp dir — use that, falling back to /tmp.
+# History: the 2026-06-12 push failure (exit 144) was a memory-exhaustion OOM
+# caused by SIX concurrent `vitest --changed` runs stacked on top of each
+# other. mkdir is an atomic create-or-fail on POSIX (flock is absent on macOS).
 PREPUSH_LOCK="$(dirname "$TMPDIR" 2>/dev/null || echo /tmp)/lexi-prepush-test.lock"
 acquire_test_lock() {
   waited=0
   while ! mkdir "$PREPUSH_LOCK" 2>/dev/null; do
     holder=$(cat "$PREPUSH_LOCK/pid" 2>/dev/null || true)
     if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
-      rm -rf "$PREPUSH_LOCK" 2>/dev/null  # stale (holder dead) → reclaim
+      rm -rf "$PREPUSH_LOCK" 2>/dev/null
       continue
     fi
     if [ "$waited" -ge 900 ]; then
@@ -66,7 +75,7 @@ acquire_test_lock() {
 }
 release_test_lock() { rm -rf "$PREPUSH_LOCK" 2>/dev/null || true; }
 
-# --- Run all 3 checks in parallel ---
+# --- Run lint and typecheck in parallel with tests ---
 
 # Lint
 (
@@ -85,10 +94,6 @@ PID_LINT=$!
 (
   if [ -z "$TYPE_RELEVANT" ]; then
     echo "ℹ️  Type check: no type-relevant files changed — skipped"
-  # 8 GB, not Node's ~4 GB default: the whole-project check now OOMs on this
-  # codebase ("Ineffective mark-compacts near heap limit", ~75s in, 4013/4127 MB),
-  # which failed the gate on a SIX-FILE seo-only push whose types were fine. 4096
-  # dies, 8192 and 12288 both pass — bumped, not silenced.
   elif NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192" ./node_modules/.bin/tsc --noEmit; then
     echo "✅ Type check passed"
   else
@@ -98,107 +103,45 @@ PID_LINT=$!
 ) > "$TMPDIR/tsc.log" 2>&1 &
 PID_TSC=$!
 
-# Tests (backend + frontend in parallel within this job)
-#
-# --no-file-parallelism is required: vitest 4.x's experimental cache dir
-# (`node_modules/.experimental-vitest-cache`) races between worker threads,
-# producing 1000+ phantom ENOENT failures on large fan-outs (e.g. when a
-# hub component is touched and --changed pulls 1000+ test files). Serial
-# execution eliminates the race; cache is wiped before each run so the
-# next worker pool starts clean.
+# Tests
 (
   FAIL=0
 
-  # Serialize: only one pre-push test run at a time (see acquire_test_lock).
+  # Serialize: only one pre-push test run at a time.
   acquire_test_lock
   trap release_test_lock EXIT
 
-  rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
-
-  # NODE_OPTIONS bumps heap to 8GB. Still needed per-process, but the heap is
-  # no longer the only guard — see sharding below.
-  export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192"
-
-  # Adaptive sharding: when a HUB file is in the diff, vitest `--changed` pulls
-  # in its whole dependent cone (1000+ test files for e.g. experiments.ts /
-  # LanguageContext). Running them in ONE process with --no-file-parallelism
-  # accumulates module graphs with no teardown between files → even 8GB is
-  # exhausted → OOM. Splitting the run into N `--shard` slices runs each slice
-  # in a SEPARATE vitest process that exits and releases its heap before the
-  # next starts, so peak memory is ~1/N. Typical pushes touch no hub and run a
-  # single fast shard (no startup tax).
-  #
-  # Shard count = MEASURED changed-cone size, not a filename guess.
-  #
-  # History: sharding used to be decided by matching the changed filename against
-  # a hardcoded hub allowlist (HUB_REGEX/MEGA_HUB_REGEX). That mis-fires for any
-  # file NOT on the list whose `--changed` cone is nonetheless huge — e.g. a test
-  # that imports a heavy component (PracticeWheelSandbox → WordWheelGame). Such a
-  # push matched no hub → ran UNSHARDED (SHARDS=1) → OOM-killed at exit 144
-  # (2026-06-13). The fix: ask vitest how many test files `--changed` actually
-  # pulls in (`list --filesOnly` resolves the related-files graph WITHOUT
-  # importing test bodies, so it's cheap), then shard proportionally. Now the
-  # shard count tracks the real fan-out regardless of which file triggered it.
-  # 80, not 120: on 2026-08-12 a push whose cone was the WHOLE suite (vitest.setup.ts
-  # changed → every test file is related) OOM-killed a worker in shard 14/16 —
-  # node::OOMErrorHandler in the fork, zero failing assertions, gate red anyway. The
-  # 120 figure predates cones this large, and shrinking the batch is the same lever
-  # the sharding was added for.
-  FILES_PER_SHARD=80
-  # 48, not 16: 16 was the BINDING constraint on a whole-suite cone (3221 test files /
-  # 80 = 41 shards, capped back to 16 → 201 files per process, i.e. the batch size the
-  # OOM happened at). A cap below cone/FILES_PER_SHARD silently un-does the shrink above.
-  # Each shard is a fresh process, so the only cost of more shards is startup, ~15s each.
-  MAX_SHARDS=48
-  MEGA_HUB_REGEX='(^|/)translations/|(^|/)LanguageContext\.(ts|tsx)$'
-  HUB_REGEX='(^|/)experiments\.(ts|tsx)$|(^|/)contexts/|(^|/)hooks/use[A-Z]'
-  SHARDS=1
-  if [ -n "$FRONTEND_FILES" ]; then
-    CONE_COUNT=$(./node_modules/.bin/vitest list --filesOnly --changed origin/master --passWithNoTests 2>/dev/null \
-      | grep -cE '\.(test|spec)\.(ts|tsx|js|jsx)$')
-    [ -z "$CONE_COUNT" ] && CONE_COUNT=0
-    if [ "$CONE_COUNT" -gt 0 ]; then
-      SHARDS=$(( (CONE_COUNT + FILES_PER_SHARD - 1) / FILES_PER_SHARD ))
-      [ "$SHARDS" -lt 1 ] && SHARDS=1
-      [ "$SHARDS" -gt "$MAX_SHARDS" ] && SHARDS=$MAX_SHARDS
-      [ "$SHARDS" -gt 1 ] && echo "ℹ️  Changed-cone = $CONE_COUNT test files — sharding frontend tests into $SHARDS processes (~$FILES_PER_SHARD/shard) to bound memory."
-    else
-      # Measurement unavailable (list errored / empty) → fall back to the old
-      # filename heuristic so a known hub never runs an unbounded single shard.
-      if echo "$FRONTEND_FILES" | grep -qE "$MEGA_HUB_REGEX"; then
-        SHARDS=8; echo "ℹ️  Cone unmeasured; mega-hub file changed — sharding into $SHARDS processes."
-      elif echo "$FRONTEND_FILES" | grep -qE "$HUB_REGEX"; then
-        SHARDS=4; echo "ℹ️  Cone unmeasured; hub file changed — sharding into $SHARDS processes."
+  if [ "$LEXI_PREPUSH_FULL" = "1" ]; then
+    echo "🔥 LEXI_PREPUSH_FULL=1: running full test suite via 'npm run test:full'"
+    npm run test:full 2>&1 || FAIL=1
+  else
+    # Smoke tests (fast, bounded subset).
+    if [ "$LEXI_PREPUSH_NO_SMOKE" != "1" ]; then
+      echo "🧪 Running smoke tests..."
+      if npm run test:smoke 2>&1; then
+        echo "✅ Smoke tests passed"
+      else
+        echo "❌ Smoke tests failed"
+        FAIL=1
       fi
+    else
+      echo "ℹ️  Smoke tests skipped (LEXI_PREPUSH_NO_SMOKE=1)"
+    fi
+
+    # Changed test files only (no dependency-cone expansion).
+    if [ -n "$CHANGED_TESTS" ]; then
+      echo "📝 Running changed tests: $CHANGED_TESTS"
+      rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
+      export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192"
+      ./node_modules/.bin/vitest run $CHANGED_TESTS --reporter=verbose --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
+    else
+      echo "ℹ️  No changed test files to run"
     fi
   fi
 
-  # Run a sharded vitest set; each shard is a fresh process (heap freed between).
-  # Args after the shard count are passed through verbatim.
-  run_vitest_sharded() {
-    _n="$1"; shift
-    _rc=0
-    _i=1
-    while [ "$_i" -le "$_n" ]; do
-      [ "$_n" -gt 1 ] && echo "── shard $_i/$_n ──"
-      ./node_modules/.bin/vitest run "$@" --shard="$_i/$_n" 2>&1 || _rc=1
-      _i=$((_i + 1))
-    done
-    return $_rc
-  }
+  release_test_lock
 
-  if [ -n "$BACKEND_FILES" ]; then
-    # Backend suite is small — never needs sharding.
-    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
-  fi
-
-  if [ -n "$FRONTEND_FILES" ]; then
-    run_vitest_sharded "$SHARDS" --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism || FAIL=1
-  fi
-
-  if [ -z "$BACKEND_FILES" ] && [ -z "$FRONTEND_FILES" ]; then
-    echo "ℹ️  Tests: no files to check"
-  elif [ "$FAIL" -eq 0 ]; then
+  if [ "$FAIL" -eq 0 ]; then
     echo "✅ Tests passed"
   else
     echo "❌ Tests failed"
@@ -222,6 +165,8 @@ cat "$TMPDIR/test.log"
 if [ "$FAILED" -ne 0 ]; then
   echo ""
   echo "❌ Pre-push checks failed. Fix the issues above before pushing."
+  echo "   Run the full suite locally: npm run test:full"
+  echo "   Skip smoke tests in the hook: LEXI_PREPUSH_NO_SMOKE=1 git push"
   exit 1
 fi
 

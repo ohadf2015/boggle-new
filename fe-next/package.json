@@ -24,6 +24,8 @@
     "seo:daily:install": "launchctl unload /Users/ohadfisher/Library/LaunchAgents/com.claude.seo-daily.plist 2>/dev/null; launchctl load /Users/ohadfisher/Library/LaunchAgents/com.claude.seo-daily.plist && echo 'Loaded — runs daily at 08:00 local'",
     "seo:daily:uninstall": "launchctl unload /Users/ohadfisher/Library/LaunchAgents/com.claude.seo-daily.plist && echo 'Unloaded'",
     "test": "npm run test:backend && npm run test:frontend",
+    "test:full": "npm run test",
+    "test:smoke": "vitest run --config vitest.smoke.config.ts --reporter=dot",
     "test:changed": "vitest run --config vitest.config.ts --changed && vitest run --config backend/vitest.config.ts --changed",
     "test:backend": "NODE_OPTIONS=--max-old-space-size=8192 vitest run --config backend/vitest.config.ts",
     "test:frontend": "NODE_OPTIONS=--max-old-space-size=8192 vitest run --config vitest.config.ts",
