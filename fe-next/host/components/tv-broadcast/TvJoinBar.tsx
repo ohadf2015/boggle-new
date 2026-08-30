@@ -5,6 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Users } from 'lucide-react';
 import { m } from 'framer-motion';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
+import { tvJoinAddress } from '../../../lib/education/tvJoinAddress';
 
 interface TvJoinBarProps {
   gameCode: string;
@@ -47,8 +48,11 @@ const TvJoinBar = memo<TvJoinBarProps>(({
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
               {t('tvBroadcast.joinAt')}
             </p>
-            <p className="text-neo-cream text-2xl md:text-3xl font-black uppercase tracking-wide">
-              lexiclash.live
+            {/* The address must carry the code. A bare "lexiclash.live" has no
+                game-code input anywhere on it, so a student who cannot scan the
+                QR had the code and nowhere to type it. */}
+            <p className="text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all">
+              {tvJoinAddress(baseUrl, language, gameCode)}
             </p>
           </div>
 

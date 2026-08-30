@@ -123,9 +123,14 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
         toast.error(t('education.student.join.classroomFull'));
         setCodeError(true);
       } else {
-        trackEduClassroomJoin({ result: result.code === 'INVALID_CODE' ? 'not_found' : 'error' });
-        toast.error(t('education.student.join.invalidCode'));
-        setCodeError(true);
+        // Only say "that code is wrong" when the code really was wrong. Every
+        // other failure (guest sign-in refused, network, server fault) used to
+        // render the same line, which sends a student to re-check a code that
+        // was fine and hides the real fault from us.
+        const badCode = result.code === 'INVALID_CODE';
+        trackEduClassroomJoin({ result: badCode ? 'not_found' : 'error' });
+        toast.error(t(badCode ? 'education.student.join.invalidCode' : 'common.error'));
+        setCodeError(badCode);
       }
     } catch (error) {
       trackEduClassroomJoin({ result: 'error' });
