@@ -105,6 +105,18 @@ describe.each(PAGES)('$slug content', ({ slug, get }) => {
     }
   });
 
+  it('uses only section kinds the renderer knows', () => {
+    // vitest strips types, so an invalid `kind` slips through every test here
+    // and only surfaces in `next build` twelve minutes later. One editor shipped
+    // `kind: 'faqs'` this way. This is the cheap version of that check.
+    const KINDS = new Set(['cards', 'features', 'steps', 'wordlist', 'table', 'prose']);
+    for (const locale of LOCALES) {
+      for (const s of get(locale).sections) {
+        expect(KINDS.has(s.kind), `${slug}/${locale} unknown section kind "${s.kind}"`).toBe(true);
+      }
+    }
+  });
+
   it('uses only renderable icon names', () => {
     for (const locale of LOCALES) {
       for (const s of get(locale).sections) {

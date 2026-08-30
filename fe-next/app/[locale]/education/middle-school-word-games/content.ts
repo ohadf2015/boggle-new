@@ -182,40 +182,6 @@ const EN: EducationLandingContent = {
         },
       ],
     },
-    {
-      kind: 'faqs',
-      title: 'FAQs',
-      items: [
-        {
-          title: 'Do they really need emails?',
-          desc: 'No. For live class games, students join with a code only. No signup.',
-        },
-        {
-          title: 'How do I track who learned what?',
-          desc: 'The teacher dashboard shows per-student word accuracy, attempt counts, and patterns across the class. Export data if you need it for records.',
-        },
-        {
-          title: 'Can I use words from my curriculum?',
-          desc: 'Yes. Upload any word list—novel vocabulary, test prep, subject-specific terms. LexiClash builds games from your words.',
-        },
-        {
-          title: 'Does competition demotivate weaker readers?',
-          desc: 'If leaderboards are public and permanent, yes—some students tune out. LexiClash lets you choose: show only top scorers, group by level, or hide rankings entirely. Also, games move fast enough that a low score doesn\'t sting the way a failed test does.',
-        },
-        {
-          title: 'How long does a game take?',
-          desc: 'Most games are 5–15 minutes. Enough for a bell-ringer, not a whole period.',
-        },
-        {
-          title: 'Will they see inappropriate content from other players?',
-          desc: 'No. There is no chat or messaging during games, and no links to external sites. Classroom games are closed to your students only.',
-        },
-        {
-          title: 'What if our school blocks gaming sites?',
-          desc: 'LexiClash is educational and usually whitelisted, but contact your IT department if you hit a block. We can help with the business case.',
-        },
-      ],
-    },
   ],
   faqs: [
     {
