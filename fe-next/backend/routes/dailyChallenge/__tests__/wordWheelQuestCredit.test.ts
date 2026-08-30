@@ -15,18 +15,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
-
-const { completeDailyQuestsForResult, updateQuestProgress } = vi.hoisted(() => ({
-  completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined),
-  updateQuestProgress: vi.fn().mockResolvedValue(undefined),
-}));
+import * as dailyMissionsManager from '../../../modules/dailyMissionsManager';
+import * as weeklyQuestManager from '../../../modules/weeklyQuestManager';
 
 vi.mock('../../../modules/dailyMissionsManager', () => ({
-  completeDailyQuestsForResult: (...args: unknown[]) => completeDailyQuestsForResult(...args),
+  completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../../../modules/weeklyQuestManager', () => ({
-  updateQuestProgress: (...args: unknown[]) => updateQuestProgress(...args),
+  updateQuestProgress: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../profileStats', () => ({
@@ -93,18 +90,18 @@ const submission = {
 
 describe('POST /submit — daily quest credit', () => {
   beforeEach(() => {
-    completeDailyQuestsForResult.mockClear();
-    updateQuestProgress.mockClear();
+    vi.mocked(dailyMissionsManager.completeDailyQuestsForResult).mockClear();
+    vi.mocked(weeklyQuestManager.updateQuestProgress).mockClear();
   });
 
-  it('credits TODAY\'S quests, not just the weekly counter', async () => {
+  it('credits TODAY\'s quests, not just the weekly counter', async () => {
     const app = await makeApp();
 
     await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
 
-    expect(completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
+    expect(dailyMissionsManager.completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
 
-    const [playerId, result] = completeDailyQuestsForResult.mock.calls[0];
+    const [playerId, result] = vi.mocked(dailyMissionsManager.completeDailyQuestsForResult).mock.calls[0];
     expect(playerId).toBe('player-1');
     expect(result).toMatchObject({
       mode: 'word-wheel',
@@ -119,7 +116,7 @@ describe('POST /submit — daily quest credit', () => {
 
     await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
 
-    expect(updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
+    expect(weeklyQuestManager.updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
   });
 
   it('credits nothing for a guest — there is no account to credit', async () => {
@@ -129,6 +126,6 @@ describe('POST /submit — daily quest credit', () => {
       .post('/api/daily-challenge/word-wheel/submit')
       .send({ ...submission, playerId: undefined, guestFingerprint: 'guest-abc' });
 
-    expect(completeDailyQuestsForResult).not.toHaveBeenCalled();
+    expect(dailyMissionsManager.completeDailyQuestsForResult).not.toHaveBeenCalled();
   });
 });
