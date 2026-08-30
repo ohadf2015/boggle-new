@@ -168,6 +168,55 @@ So solo keeps its own local orchestrator, feeds the same Zustand stores
 satisfies "use MP as a base, no separate UI" **without** making offline/native
 practice depend on Socket.IO.
 
+### The UI unification is feasible — here is the executable prop mapping
+
+This is the part that answers "not a separate UI". Verified feasible, not yet built.
+
+`PortraitLayout` takes ~60 props, ~37 required. `SinglePlayerGame`'s `commonProps`
+(`SinglePlayerGame.tsx:289`) already computes most of them. Neither `*Connected`
+wrapper needs a socket — `WordFormingAreaConnected` reads `useSelectionStore` (which
+SP already uses) and `ComboDisplayConnected` reads `useComboTimer`. Both are local UI
+stores, so the shell renders with no transport.
+
+Adapter (`components/singleplayer/game/SinglePlayerShell.tsx`), SP → MP prop map:
+
+| PortraitLayout prop | source |
+|---|---|
+| `letterGrid` | `core.grid` |
+| `playerScore` | `core.score` |
+| `remainingTime` / `timerValue` | `core.timer.remainingTime` |
+| `gameActive` / `isPlaying` | `!core.isPaused && !core.isGameOver` |
+| `comboLevel` | `core.combo.comboLevel` |
+| `foundWords` | `core.foundWords` (shape-map to `FoundWord[]`) |
+| `currentFeedback` | `core.currentFeedback` |
+| `highlightedCells` | `core.revealState.highlightedPath` |
+| `lastWordTime` / `lastWordFoundTime` | `core.lastWordFoundTimeRef` |
+| `fireRoundActive` / `fireRoundRemaining` | same names on `core` |
+| `earthquakeState` | `core.earthquakeState` |
+| `gameLanguage` | `settings.language` |
+| `minWordLength` | `settings.minWordLength` |
+| `totalBoardWords` | `core.totalBoardWords` |
+| `gameStatsRef` | `core.gameStatsRef` |
+| `onWordSubmit` / `onPathSubmit` / `onWordChange` | `wrappedWordSubmit` / `wrappedPathSubmit` / `wrappedWordChange` |
+| `onExitRoom` | `core.handleQuitRequest` |
+| **`deferredLeaderboard`** | **`settings.bots`** (`{name, score}`) + the player — this is the win: solo gains the live MP leaderboard instead of bot cards only at results |
+| `playerRank` | derived from that leaderboard |
+| `username` | auth display name, else `t('common.you')` |
+| `gameCode` / `isHost` / `tournamentData` / `showStartAnimation` / `gameplayFocusMode` | `''` / `true` / `null` / `false` / `false` |
+
+**The gap to close first: `PortraitLayout` has no pause, coins badge, `0/N` progress
+bar, or practice `TrainingProgressBar`** — MP has no pause by design. Make the shell a
+superset (render those from its `children` slot or behind flags) *before* swapping, or
+solo silently loses them.
+
+Note `settings.bots` is mutated in place by the bot simulation, so the leaderboard must
+read it reactively — see the stale-bot-state pitfall in `.claude/rules/60-recurring-pitfalls.md`.
+
+Do this as: (1) extend `PortraitLayout` with the four SP-only affordances,
+(2) add the adapter, (3) swap SP's portrait branch, browser-verify solo-bots /
+practice / challenge, (4) then landscape + desktop, (5) then delete
+`PortraitGameLayout` (593), `LandscapeGameLayout` (424), `DesktopGameLayout` (394).
+
 ### Corrected scope — the route comment undercounts the entry points
 
 A sweep of every `/singleplayer?…` URL the codebase constructs:
@@ -186,6 +235,23 @@ That is six live entry points spanning onboarding, friend challenges, training,
 offline PWA, UGC boards and a results CTA — not the "four thin params" the route
 comment implies. **Finishing this is a multi-session job**, and each entry point
 wants its own commit.
+
+### Blocked: the bots FTUE cannot be retired without building an MP config surface
+
+Retiring `autoStart=bots` / `preset=bots` looked like a one-liner. It is not, and the
+reason is concrete: the FTUE path applies `FIRST_WIN_CONFIG`
+(`useSinglePlayerConfig.ts:41`) — **EASY, 60s, 1 easy bot** — on a device that has
+never completed a game. `/multiplayer?quickPlay=true` has **no surface to express
+any of that**: a grep for `autoFill|addBot|fillBots|botCount|difficulty` across
+`components/multiplayer/` and `app/[locale]/multiplayer/` returns nothing.
+
+So the options are (a) redirect and silently drop the tuned first game, which changes
+onboarding difficulty for every new user, or (b) add bot-count/bot-difficulty/timer
+config to Quick Play (client **and** server bot spawning) first. (b) is the correct
+one and is its own piece of work.
+
+This is why the UI unification above is the better route to "no separate UI": it
+leaves routing, FTUE tuning and activation completely untouched.
 
 ### The bots entries are already mostly migrated
 
