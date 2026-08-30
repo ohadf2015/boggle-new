@@ -15,15 +15,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
-import * as dailyMissionsManager from '../../../modules/dailyMissionsManager';
-import * as weeklyQuestManager from '../../../modules/weeklyQuestManager';
+import type { MockedFunction } from 'vitest';
+
+const h = vi.hoisted(() => {
+  const row = { id: 1, score: 64, word_count: 3, words_found: ['CAT', 'BRIDGE', 'TRAIN'] };
+  const builder: Record<string, unknown> = {};
+  const chain = () => builder;
+  Object.assign(builder, {
+    select: chain, insert: chain, upsert: chain, update: chain, delete: chain,
+    eq: chain, neq: chain, gt: chain, gte: chain, lt: chain, lte: chain,
+    not: chain, is: chain, in: chain, order: chain, limit: chain, range: chain,
+    single: () => Promise.resolve({ data: row, error: null }),
+    maybeSingle: () => Promise.resolve({ data: null, error: null }),
+    then: (resolve: (v: unknown) => unknown) =>
+      Promise.resolve({ data: [row], error: null, count: 0 }).then(resolve),
+  });
+
+  const completeDailyQuestsForResult = vi.fn().mockResolvedValue(undefined);
+  const updateQuestProgress = vi.fn().mockResolvedValue(undefined);
+
+  return {
+    completeDailyQuestsForResult,
+    updateQuestProgress,
+    supabaseMock: { from: vi.fn(() => builder) },
+  };
+});
 
 vi.mock('../../../modules/dailyMissionsManager', () => ({
-  completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined),
+  completeDailyQuestsForResult: (...args: unknown[]) => h.completeDailyQuestsForResult(...args),
 }));
 
 vi.mock('../../../modules/weeklyQuestManager', () => ({
-  updateQuestProgress: vi.fn().mockResolvedValue(undefined),
+  updateQuestProgress: (...args: unknown[]) => h.updateQuestProgress(...args),
 }));
 
 vi.mock('../profileStats', () => ({
@@ -42,38 +65,12 @@ vi.mock('../../../utils/logger', () => ({
   default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-/**
- * Minimal PostgREST-ish stub. The submit path inserts a row and selects it back;
- * every builder method returns `this` so any chain length resolves.
- */
-function makeSupabaseStub() {
-  const row = { id: 1, score: 64, word_count: 3, words_found: ['CAT', 'BRIDGE', 'TRAIN'] };
-  const builder: Record<string, unknown> = {};
-  const chain = () => builder;
-  Object.assign(builder, {
-    select: chain, insert: chain, upsert: chain, update: chain, delete: chain,
-    eq: chain, neq: chain, gt: chain, gte: chain, lt: chain, lte: chain,
-    not: chain, is: chain, in: chain, order: chain, limit: chain, range: chain,
-    single: () => Promise.resolve({ data: row, error: null }),
-    maybeSingle: () => Promise.resolve({ data: null, error: null }),
-    then: (resolve: (v: unknown) => unknown) =>
-      Promise.resolve({ data: [row], error: null, count: 0 }).then(resolve),
-  });
-  return { from: () => builder };
-}
-
 vi.mock('../../../modules/supabaseServer', () => ({
   isSupabaseConfigured: () => true,
-  getSupabase: () => makeSupabaseStub(),
+  getSupabase: () => h.supabaseMock,
 }));
 
-async function makeApp() {
-  const { default: router } = await import('../wordWheelRoutes');
-  const app = express();
-  app.use(express.json());
-  app.use('/api/daily-challenge/word-wheel', router);
-  return app;
-}
+import router from '../wordWheelRoutes';
 
 const submission = {
   puzzleDate: '2026-05-18',
@@ -90,18 +87,20 @@ const submission = {
 
 describe('POST /submit — daily quest credit', () => {
   beforeEach(() => {
-    vi.mocked(dailyMissionsManager.completeDailyQuestsForResult).mockClear();
-    vi.mocked(weeklyQuestManager.updateQuestProgress).mockClear();
+    h.completeDailyQuestsForResult.mockClear();
+    h.updateQuestProgress.mockClear();
   });
 
   it('credits TODAY\'s quests, not just the weekly counter', async () => {
-    const app = await makeApp();
+    const app = express();
+    app.use(express.json());
+    app.use('/api/daily-challenge/word-wheel', router);
 
     await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
 
-    expect(dailyMissionsManager.completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
+    expect(h.completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
 
-    const [playerId, result] = vi.mocked(dailyMissionsManager.completeDailyQuestsForResult).mock.calls[0];
+    const [playerId, result] = (h.completeDailyQuestsForResult as MockedFunction<typeof h.completeDailyQuestsForResult>).mock.calls[0];
     expect(playerId).toBe('player-1');
     expect(result).toMatchObject({
       mode: 'word-wheel',
@@ -112,20 +111,24 @@ describe('POST /submit — daily quest credit', () => {
   });
 
   it('still credits the weekly counter — the original behaviour is intact', async () => {
-    const app = await makeApp();
+    const app = express();
+    app.use(express.json());
+    app.use('/api/daily-challenge/word-wheel', router);
 
     await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
 
-    expect(weeklyQuestManager.updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
+    expect(h.updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
   });
 
   it('credits nothing for a guest — there is no account to credit', async () => {
-    const app = await makeApp();
+    const app = express();
+    app.use(express.json());
+    app.use('/api/daily-challenge/word-wheel', router);
 
     await request(app)
       .post('/api/daily-challenge/word-wheel/submit')
       .send({ ...submission, playerId: undefined, guestFingerprint: 'guest-abc' });
 
-    expect(dailyMissionsManager.completeDailyQuestsForResult).not.toHaveBeenCalled();
+    expect(h.completeDailyQuestsForResult).not.toHaveBeenCalled();
   });
 });

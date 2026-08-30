@@ -195,7 +195,6 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     // Credit the `daily_challenges` weekly quest — non-fatal. This path only runs
     // on a fresh insert (a duplicate submit returns early above), so it can never
     // double-count.
-    console.log('[DEBUG wordWheelRoutes] credit check', { playerId, wordCount, should: shouldCreditDailyChallengeQuest({ mode: 'word_wheel', playerId, wordCount }) });
     if (shouldCreditDailyChallengeQuest({ mode: 'word_wheel', playerId, wordCount })) {
       updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
         logger.error('API', `[WordWheel] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
