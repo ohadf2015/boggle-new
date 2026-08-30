@@ -78,6 +78,14 @@ export function ClassroomSetupStep({
 }: ClassroomSetupStepProps) {
   const { t } = useLanguage();
 
+  // A lesson can be selected and still yield nothing playable — every word
+  // filtered out by canIntegrate. Starting then produces a game with no
+  // vocabulary and no explanation, so gate on the words themselves.
+  const cannotStart =
+    selectedLessonIds.length === 0 ||
+    !selectedClassroomId ||
+    allPlayableWords.length === 0;
+
   return (
     <WizardStep
       currentStep={1}
@@ -87,7 +95,7 @@ export function ClassroomSetupStep({
       onNext={onNext}
       onBack={onBack}
       nextLabel={t('education.classroomGame.createRoom')}
-      nextDisabled={selectedLessonIds.length === 0 || !selectedClassroomId}
+      nextDisabled={cannotStart}
       isLoading={isStarting}
     >
       <div className="space-y-6">

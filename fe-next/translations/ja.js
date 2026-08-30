@@ -452,6 +452,10 @@ const ja = {
     "dismiss": "閉じる",
     "issueProbe": {"prompt": "なぜそう感じましたか？", "botsStrong": "ボットが強すぎる", "technical": "技術的な問題"}
   },
+  "wordTowerV2": {
+    "cardTitle": "ワードタワー v2",
+    "cardDesc": "本物の物理演算 — ベータ版"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "今日のひねり",
@@ -2592,7 +2596,9 @@ const ja = {
     "waitingForPlayers": "プレイヤーを待っています...",
     "seconds": "秒",
     "switchToPlayer": "プレイヤーモードに切替",
-    "viewOnlyBadge": "TVモード · 閲覧のみ"
+    "viewOnlyBadge": "TVモード · 閲覧のみ",
+    "tryPracticeRound": "練習ラウンドを試す (ボット)",
+    "practiceRoundFailed": "練習用プレイヤーを追加できませんでした。接続を確認してもう一度お試しください。"
   },
   "tvResults": {
     "installHeading": "スマホでも 📱",
@@ -8518,6 +8524,11 @@ const ja = {
   },
   "quickPlay": {
     "solo": {
+      "durationLabel": "制限時間",
+      "durationUnit": "秒",
+      "wordBreakdown": "スコアの内訳",
+      "wordDetails": "単語の詳細",
+      "totalWords": "{count}語",
       "title": "クイックプレイ",
       "round": "ラウンド",
       "random": "ランダム",
@@ -8528,11 +8539,11 @@ const ja = {
       "subCaption": "60秒ラウンド・ライバル3人・パーフェクトに挑戦",
       "loading": "ボードを準備中…",
       "blurb": {
-        "classic": "文字をなぞって単語をつくろう。長くつなぐほど高得点。",
-        "blast": "文字をつないでタイルを破壊。時間切れになる前に盤面を空に。",
-        "word-hunt": "盤面のどこかに単語がひとつ。それを見つけ、ついでに周りも拾おう。",
-        "wheel-rush": "どの単語にも中央の文字が必要。リングを回してもっと探そう。",
-        "random": "ホイールにおまかせ。60秒、ライバル3人、満点との勝負。"
+        "classic": "文字をなぞって、つないで、スコア稼ぎ。シンプルは最強。",
+        "blast": "速く書いて、タイルを破壊。時間に抜かされるな。",
+        "word-hunt": "ひとつの単語を探す。見つけたら、すべてを狩ろう。",
+        "wheel-rush": "中央の文字が支配する。リング回して新しいチェーン。",
+        "random": "ホイールが選ぶ。同じボード、ライバル3人、さあ行け！"
       },
       "mode": {
         "classic": "クラシック",
@@ -8540,6 +8551,8 @@ const ja = {
         "word-hunt": "ハント",
         "wheel-rush": "ホイール"
       },
+      "durationLabel": "ラウンド:",
+      "durationUnit": "秒",
       "roundComplete": "ラウンド終了",
       "ofPerfect": "パーフェクト比",
       "points": "点",
@@ -8569,6 +8582,9 @@ const ja = {
       "wordsTotal": "{count}獲得",
       "bestWord": "最高",
       "wordsShowAll": "全{count}を表示",
+      "wordBreakdown": "スコア内訳",
+      "wordDetails": "単語の詳細",
+      "totalWords": "{count}語",
       "dayStreak": "{days}日連続",
       "rewardsPending": "サインインしてコインとXPを貯めよう",
       "pickNextMode": "次のラウンド",
@@ -12108,6 +12124,11 @@ const ja = {
       "playerCount": "{{count}}人がプレイ中",
       "teacherStarted": "{{teacher}}がゲームを開始しました"
     },
+    "quickStart": {
+      "title": "学習を始めよう",
+      "subtitle": "レッスンから単語を練習する",
+      "action": "今すぐ始める"
+    },
     "dashboard": {
       "title": "マイレッスン",
       "subtitle": "語彙を練習して上達しよう",
@@ -12202,6 +12223,9 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "proGate": {
+      "cta": "Pro で解除 — 月額 ${{price}}"
+    },
     "subscription": {
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
@@ -12248,6 +12272,14 @@ const ja = {
       "districtTitle": "学校または学区ですか？",
       "districtSubtitle": "複数の教師や教室を管理していますか？学校や学区向けに柔軟な料金プランをご用意しています。",
       "districtCta": "学校向け料金についてお問い合わせ",
+      "checkoutUnavailable": "現在お支払いを受け付けていません。請求は発生していません。しばらくしてからお試しください。",
+      "featureOutcome1": "担当するクラスをすべて運営（上限なし）",
+      "featureOutcome2": "最初の10人だけでなく、名簿全員を追加",
+      "featureOutcome3": "誰がどの単語でつまずいているかリアルタイムで把握",
+      "featureOutcome4": "すべてのクラスの進捗を比較",
+      "priceTaxNote": "お支払い時に税が加算される場合があります。",
+      "proHeroAlt": "生徒が席からプレイする中、教師が黒板のライブ順位表を見ている様子。",
+      "valueHeadline": "クラス無制限、生徒無制限、進捗はリアルタイム。",
       "matrix": {
         "title": "プラン比較",
         "featureColumn": "機能",
@@ -12313,6 +12345,8 @@ const ja = {
       "insights": "インサイト",
       "viewReports": "レポートを見る",
       "viewReportsDesc": "クラスの詳細なレポートと分析を表示",
+      "studentsPresentTitle": "いま {classroom} に {count} 人の生徒がいます",
+      "studentsPresentDescription": "ゲームを始めればそのまま参加します。",
       "tab": {
         "play": "プレイ",
         "prepare": "準備",
@@ -12353,6 +12387,8 @@ const ja = {
         "large": "大 (6×6)"
       },
       "create": "クラス作成",
+      "createAnother": "別のクラスを作成",
+      "creating": "作成中...",
       "defaultName": "私のクラス",
       "edit": "クラス編集",
       "delete": "クラス削除",
@@ -12364,12 +12400,13 @@ const ja = {
       "codeCopied": "参加コードをコピーしました！",
       "copyLink": "招待リンクをコピー",
       "linkCopied": "招待リンクがコピーされました！",
+      "shareCode": "生徒にこのコードを共有してください",
       "members": "{{count}}人の生徒",
       "member": "1人の生徒",
       "noMembers": "まだ生徒がいません",
       "settingUp": "教室を準備しています...",
       "language": "言語",
-      "created": "{{date}}に作成",
+      "created": "{{classroomName}}を作成しました！コードを共有して開始してください。",
       "noClassrooms": "まだクラスがありません",
       "createFirst": "最初のクラスを作成しましょう",
       "inviteStudents": "生徒を招待",
@@ -12408,11 +12445,21 @@ const ja = {
       "error": {
         "createFailed": "クラスの作成に失敗しました",
         "updateFailed": "クラスの更新に失敗しました",
-        "deleteFailed": "クラスの削除に失敗しました"
+        "deleteFailed": "クラスの削除に失敗しました",
+        "copyFailed": "コードのコピーに失敗しました。もう一度試してください。"
       },
       "dialog": {
         "createDescription": "名前と言語設定で新しいクラスを作成",
         "editDescription": "クラス名と言語設定を編集"
+      },
+      "presenter": {
+        "present": "画面に表示",
+        "visitUrl": "訪問:",
+        "orEnterCode": "またはコードを入力:",
+        "scanQr": "QRコードをスキャン:",
+        "shareTip": "このコードをGoogle Classroom、メール、またはテキストメッセージで生徒と共有してください",
+        "pressEscape": "ESCを押して終了",
+        "exit": "プレゼンテーションを終了"
       }
     },
     "classrooms": {
@@ -12854,6 +12901,7 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "classCode": "ゲームコード",
       "classroomNotFound": "クラスが見つかりません",
       "classroomSession": "教室セッション",
       "createClassroom": "教室を作成",
@@ -12861,11 +12909,14 @@ const ja = {
       "deselectAll": "選択解除",
       "gameCreated": "ゲーム作成完了！",
       "gameSettings": "ゲーム設定",
+      "joinedStudents": "参加した生徒",
       "lessonsSelected": "{{count}}個選択中",
       "missingRequirements": "必要項目が足りません",
+      "more": "さらに表示",
       "multiLessonHelp": "レッスンを組み合わせてバリエーションUP",
       "noClassrooms": "まだ教室がありません",
       "noLessonsAvailable": "レッスンがありません",
+      "noStudentsYet": "まだ生徒が参加していません",
       "reviewAndStart": "確認して開始",
       "scanToJoin": "スキャンして参加",
       "selectAllLessons": "すべて選択",
@@ -12878,8 +12929,11 @@ const ja = {
       "startGame": "ゲーム開始",
       "createRoom": "ルームを作成",
       "startGameDescription": "クラスゲームをスタート",
+      "studentCount": "{{count}}人の生徒が参加",
+      "studentsCanScan": "生徒はQRコードをスキャンして参加できます",
       "title": "クラスゲーム",
-      "waitingForPlayers": "プレイヤーを待っています...",
+      "waitingForPlayers": "クラスゲームの準備中...",
+      "waitingForStudents": "生徒を待機中",
       "words": "{{count}}語"
     },
     "header": {
@@ -12910,6 +12964,10 @@ const ja = {
     "home": {
       "badge_teacher": "先生",
       "badge_student": "クラス",
+      "badge_promo": "クラスモード",
+      "promo_title": "LexiClash で授業を — 無料",
+      "promo_subtitle": "クラスで単語ゲーム。自分の単語リストを作り、誰がつまずいているかも分かります。",
+      "promo_cta": "クラスモードを見る",
       "teacher_title": "クラスの準備ができました",
       "teacher_subtitle": "クラスを作成し、ゲームを割り当て、生徒の進捗を確認しましょう。",
       "teacher_cta": "先生ダッシュボードを開く",
@@ -12967,9 +13025,9 @@ const ja = {
       "title": "LexiClash 教育",
       "startGame": "ゲーム開始",
       "hero": {
-        "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語対応",
+        "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語・ロシア語に対応",
         "h1": "教室向けの語彙ゲーム — 生徒のログイン不要。",
-        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。5言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
+        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。{count}言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
         "cta_primary": "先生アクセスを申請する",
         "cta_secondary": "デモを見る",
         "cta_note": "無料プランで開始 • 約24時間で承認",
@@ -13074,7 +13132,7 @@ const ja = {
         "title": "よくある質問",
         "q1": {
           "q": "申請はどうやるの？",
-          "a": "/education/access で情報を入力。60秒で完了。通常24時間以内にメールで承認をお知らせします。"
+          "a": "/education/access の短いフォームに記入するだけ。送信した瞬間にアクセスが有効になり、ダッシュボードがすぐ開きます。"
         },
         "q2": {
           "q": "無料プランはありますか？",
@@ -13107,7 +13165,7 @@ const ja = {
       },
       "cta": {
         "title": "さあ、始めましょう",
-        "body": "先生アクセスを申請。60秒で完了。通常24時間以内に使い始められます。",
+        "body": "先生アクセスを申請。60秒で完了し、送信したらすぐ使えます。",
         "button": "先生アクセスを申請する"
       },
       "teacherLeadCta": {
@@ -13273,11 +13331,15 @@ const ja = {
     "student": {
       "join": {
         "alreadyMember": "すでにこのクラスのメンバーです",
+        "classroomFull": "このクラスは満員です。先生に空きを作ってもらってください。",
         "button": "クラスに参加",
+        "classroomFull": "このクラスは満員です",
         "clipboardError": "クリップボードを読み取れませんでした",
         "codeHint": "6文字のクラスコードを先生に聞いてね",
         "codeLabel": "クラスコード",
+        "codeNotRecognised": "そのコードは認識できません",
         "codePasted": "コードを貼り付けました！",
+        "codePlaceholder": "6文字",
         "emptyClipboard": "クリップボードが空です",
         "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
         "invalidCode": "無効なクラスコードです",
@@ -13285,6 +13347,7 @@ const ja = {
         "nameHint": "アカウントは不要 — 名前を入力するだけ",
         "nameLabel": "あなたの名前",
         "namePlaceholder": "例: マヤ",
+        "nameRequired": "名前を入力してください",
         "pasteButton": "貼り付け",
         "preview": {
           "label": "参加先:",
@@ -13335,17 +13398,27 @@ const ja = {
     },
     "starterPacks": {
       "academicVocab": {
-        "name": "学術語彙"
+        "name": "学術語彙",
+        "description": "高度な学習者向けの学術語彙と分析用語"
       },
       "beginnerHebrew": {
-        "name": "ヘブライ語入門"
+        "name": "ヘブライ語入門",
+        "description": "初心者向けのヘブライ語基本単語"
       },
       "commonEnglish": {
-        "name": "基本英単語"
+        "name": "基本英単語",
+        "description": "全レベル向けの日常英単語"
       },
       "subtitle": "すぐに使える語彙セット",
       "title": "スターターパック",
       "useThisPack": "このパックを使う"
+    },
+    "lesson": {
+      "creationFailed": "レッスンを作成できませんでした。もう一度お試しください。",
+      "created": "レッスンが正常に作成されました！",
+      "preferCustom": "または、独自のカスタム語彙リストを作成します：",
+      "word": "語",
+      "words": "語"
     },
     "teacher": {
       "activeGames": "今プレイ中のゲーム",
@@ -13463,6 +13536,8 @@ const ja = {
       "submitted_on": "申請日時",
       "already_approved_title": "認可済みです。さあ始めましょう！",
       "go_to_teacher": "ダッシュボードへ",
+      "status_unknown_title": "アクセス状況を読み取れませんでした",
+      "status_unknown_body": "こちら側で問題が発生しました。ティーチャーダッシュボードを開くか、ページを再読み込みしてもう一度お試しください。",
       "auth_required_title": "教師アクセスの申請には登録が必要です",
       "auth_required_body": "教師アクセスは認証済みアカウントに紐づきます。無料アカウントを作成するかログインすると、このまま続けられます。",
       "auth_required_cta": "登録またはログイン",
@@ -15055,6 +15130,7 @@ const ja = {
     "adminBadge": "管理者サンドボックス · 単語グリッド",
     "you": "あなた",
     "bot": "WordBot",
+    "rival": "ライバル",
     "tied": "引き分け",
     "yourTurn": "あなたの番",
     "botTurn": "WordBotが考え中…",
@@ -15072,6 +15148,7 @@ const ja = {
     "youWon": "勝利！🏆",
     "opponentWon": "{name} の勝ち",
     "closeGame": "惜しい！",
+    "domination": "圧勝！👑",
     "playAgain": "もう一度",
     "home": "ホーム",
     "finalTiles": "最後のタイル!",

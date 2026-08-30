@@ -131,11 +131,6 @@ function slotsInClueOrder(puzzle: CrosswordPuzzle): Slot[] {
   );
 }
 
-/** True when every cell of the slot already has an entry. */
-function slotFilled(slot: Slot, entries: Record<string, string>): boolean {
-  return slot.cells.every((c) => entries[k(c.row, c.col)]);
-}
-
 /**
  * First blank cell of the next slot (clue order, wrapping) that still has a
  * blank, skipping `from`. Returns null when nothing is left to fill — the
@@ -160,9 +155,14 @@ function nextUnfilledSlotStart(
 /**
  * Type a letter into the active cell, then move the cursor like a newspaper:
  *  - to the next blank cell still inside the current word, else
- *  - if the word is now complete, hop to the first blank of the next unfilled
- *    clue (flipping direction as needed), else
- *  - to the immediate next cell (mirrors the prior in-slot behavior).
+ *  - WRAPPING to a blank earlier in that same word, else
+ *  - the word is now complete, so hop to the first blank of the next unfilled
+ *    clue (flipping direction as needed).
+ *
+ * The wrap is the whole point. Looking only FORWARD leaves the cursor with nowhere to go once you
+ * are on the last cell of a word whose gap is behind you — it then sits still and the next
+ * keypress silently overwrites the letter you just typed. Never park on a filled cell while the
+ * word still has a blank.
  */
 export function inputLetter(state: GameState, raw: string): GameState {
   const letter = normalizeCell(raw, state.puzzle.locale);
@@ -173,18 +173,17 @@ export function inputLetter(state: GameState, raw: string): GameState {
   const slot = currentSlot(state);
   if (slot) {
     const i = activeIndex(state, slot);
-    const after = slot.cells.slice(i + 1);
-    const emptyNext = after.find((c) => !entries[k(c.row, c.col)]);
-    if (emptyNext) {
-      active = { row: emptyNext.row, col: emptyNext.col };
-    } else if (slotFilled(slot, entries)) {
+    const blank = (c: { row: number; col: number }) => !entries[k(c.row, c.col)];
+    const target = slot.cells.slice(i + 1).find(blank) ?? slot.cells.find(blank);
+    if (target) {
+      active = { row: target.row, col: target.col };
+    } else {
+      // No blank anywhere in the word => it is complete. (slotFilled is that same statement.)
       const jump = nextUnfilledSlotStart(state.puzzle, slot, entries);
       if (jump) {
         active = { row: jump.row, col: jump.col };
         dir = jump.dir;
       }
-    } else if (after[0]) {
-      active = { row: after[0].row, col: after[0].col };
     }
   }
   const next = {

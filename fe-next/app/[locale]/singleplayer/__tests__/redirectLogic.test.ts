@@ -22,8 +22,13 @@ describe('shouldRedirectBareSingleplayer', () => {
     expect(shouldRedirectBareSingleplayer({ boardCode: 'abc123' })).toBe(false);
   });
 
-  it('does NOT redirect when returnTo is present (Daily)', () => {
-    expect(shouldRedirectBareSingleplayer({ returnTo: 'daily' })).toBe(false);
+  // returnTo was retired 2026-08-30: nothing in the codebase ever constructed
+  // `?returnTo=…`. It was read in three places (this predicate, the config hook,
+  // and SinglePlayerView's post-results redirect) and written in none, so the
+  // daily-replay branch it gated was unreachable. Any stale external link now
+  // degrades to Quick Play rather than 404ing.
+  it('redirects when only returnTo is present — that entry point is retired', () => {
+    expect(shouldRedirectBareSingleplayer({ returnTo: 'daily' })).toBe(true);
   });
 
   it('does NOT redirect when practice flag is present', () => {

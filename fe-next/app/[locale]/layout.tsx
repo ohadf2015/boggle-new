@@ -541,7 +541,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 byDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
             },
         },
-        // FAQPage JSON-LD lives on the homepage only (lib/seo/homepageFaqJsonLd.ts)
+        // FAQPage JSON-LD lives on the homepage only (app/[locale]/(home)/seoContent.ts)
         // to avoid Google "Duplicate field 'FAQPage'" on landing pages with own FAQ.
     ];
 

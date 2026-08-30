@@ -125,6 +125,13 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
     Icon: Gavel, variant: 'cyan', badge: 'ADMIN', category: 'calm', genIcon: '/modes/cubes/sealedbid.png',
   },
+  // Word Tower v2 — the physics rebuild (matter-js rigid bodies, emergent
+  // collapse). Beta preview; v1 stays the public Word Tower until this replaces
+  // it, so both cubes can be on the hub at once for a tester.
+  wordTowerV2: {
+    titleKey: 'wordTowerV2.cardTitle', descKey: 'wordTowerV2.cardDesc', path: '/word-tower-v2',
+    Icon: Building2, variant: 'purple', badge: 'BETA', genIcon: '/modes/cubes/wordtower.png',
+  },
   // Wordfall = Blast V2 (falling-tile blast). Admin/beta dev preview. Shares the
   // blast cube art (same game family) until a bespoke Wordfall sticker exists.
   wordfall: {

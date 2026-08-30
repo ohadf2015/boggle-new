@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, Pause, Play } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import HintButton from '@/components/HintButton';
 import type { HintsState, TranslationFn } from '../types';
@@ -10,6 +10,12 @@ import type { HintsState, TranslationFn } from '../types';
 interface GameHeaderProps {
   onExitRoom?: () => void;
   onShowTutorial?: () => void;
+  /**
+   * Single-player only. Live MP has no pause, so MP call sites omit this and
+   * render nothing — the header is a superset, not a behaviour change.
+   */
+  onPauseToggle?: () => void;
+  isPaused?: boolean;
   hints?: HintsState;
   gameActive: boolean;
   t: TranslationFn;
@@ -23,6 +29,8 @@ interface GameHeaderProps {
 export const GameHeader = memo<GameHeaderProps>(function GameHeader({
   onExitRoom,
   onShowTutorial,
+  onPauseToggle,
+  isPaused = false,
   hints,
   gameActive,
   t,
@@ -50,6 +58,19 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
               aria-label={t('help.viewTutorial')}
             >
               <HelpCircle className="w-5 h-5 text-neo-white" />
+            </AdaptiveMotion.button>
+          )}
+          {onPauseToggle && (
+            <AdaptiveMotion.button
+              data-testid="game-header-pause"
+              onClick={onPauseToggle}
+              whileTap={{ scale: 0.95 }}
+              className="w-11 h-11 bg-neo-navy-light border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
+              aria-label={isPaused ? t('common.resume') : t('common.pause')}
+            >
+              {isPaused
+                ? <Play className="w-5 h-5 text-neo-white" />
+                : <Pause className="w-5 h-5 text-neo-white" />}
             </AdaptiveMotion.button>
           )}
         </div>

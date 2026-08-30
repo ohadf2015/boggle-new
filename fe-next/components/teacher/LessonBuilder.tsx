@@ -20,6 +20,8 @@ import { Plus, CheckCircle, AlertCircle, Pencil, Play, Settings, Clock, Share2 }
 import toast from 'react-hot-toast';
 import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/education';
 import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
+import { StarterPacksSection } from './StarterPacksSection';
+import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
 
 export default function LessonBuilder() {
   const { t, language } = useLanguage();
@@ -52,6 +54,7 @@ export default function LessonBuilder() {
   const [isTemplateSaving, setIsTemplateSaving] = useState(false);
 
   const [assigningLesson, setAssigningLesson] = useState<VocabularyLesson | null>(null);
+  const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
 
   const { templates, createTemplate, updateTemplate, getDefaultTemplate } = useTemplates(selectedLesson?.id);
 
@@ -112,6 +115,35 @@ export default function LessonBuilder() {
   const handleStartGame = (lesson: VocabularyLesson) => {
     router.push(`/${language}/education/classroom-game?lessonId=${lesson.id}`);
   };
+
+  const handleSelectStarterPack = useCallback(
+    async (pack: { name: string; description: string; language: string; words: any[] }) => {
+      setIsCreatingFromPack(true);
+      try {
+        const vocabularyWords = convertPackWordsToLessonWords(pack.words);
+
+        const result = await createLesson({
+          name: pack.name,
+          description: pack.description,
+          language: pack.language as Language,
+          words: vocabularyWords,
+        });
+
+        if (result.success && result.data) {
+          toast.success(t('education.lesson.created'));
+          // Reset and show the new lesson in the list
+        } else {
+          toast.error(result.error || t('education.lesson.creationFailed'));
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        toast.error(t('education.lesson.creationFailed'));
+      } finally {
+        setIsCreatingFromPack(false);
+      }
+    },
+    [createLesson, t]
+  );
 
   const getLessonDefaultTemplate = (lessonId: string) => {
     return templates.find((t) => t.is_default && t.lesson_id === lessonId);
@@ -187,21 +219,38 @@ export default function LessonBuilder() {
 
       {/* Lessons Grid */}
       {lessons.length === 0 ? (
-        <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
-          <CardContent className="py-12 text-center">
-            <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
-              {t('teacher.lesson.noLessons')}
-            </h3>
-            <p className="text-neo-white mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
-            <Button
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-            >
-              <Plus className="w-5 h-5 me-2" />
-              {t('teacher.lesson.create')}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className={isCreatingFromPack ? 'opacity-50 pointer-events-none' : ''}>
+          <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50 mb-6">
+            <CardContent className="p-6">
+              <StarterPacksSection onSelectPack={handleSelectStarterPack} />
+            </CardContent>
+          </Card>
+          {isCreatingFromPack && (
+            <div className="text-center mb-6">
+              <div className="inline-block">
+                <div className="animate-spin">
+                  <Plus className="w-6 h-6 text-neo-cyan" />
+                </div>
+              </div>
+              <p className="text-neo-white mt-2">{t('teacher.classroom.settingUp')}</p>
+            </div>
+          )}
+          <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
+            <CardContent className="py-12 text-center">
+              <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
+                {t('teacher.lesson.noLessons')}
+              </h3>
+              <p className="text-neo-white mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
+              <Button
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
+              >
+                <Plus className="w-5 h-5 me-2" />
+                {t('teacher.lesson.create')}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {lessons.map((lesson) => {

@@ -10,6 +10,7 @@ interface TvJoinBarProps {
   gameCode: string;
   roomName?: string;
   playerCount: number;
+  language: string;
   baseUrl?: string;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
@@ -22,13 +23,14 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   gameCode,
   roomName,
   playerCount,
+  language,
   baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live',
   t,
 }) => {
-  // Generate join URL
+  // Generate join URL with locale prefix
   const joinUrl = useMemo(() => {
-    return `${baseUrl}/join?code=${gameCode}`;
-  }, [baseUrl, gameCode]);
+    return `${baseUrl}/${language}/join/${gameCode}`;
+  }, [baseUrl, gameCode, language]);
 
   return (
     <m.div

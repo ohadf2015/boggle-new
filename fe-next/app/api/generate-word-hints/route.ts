@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { z } from 'zod';
+import { ANY_LANGUAGE_WORD_PATTERN } from '@/shared/utils/wordNormalization';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,7 @@ const RATE_LIMIT_CONFIG = {
 
 // Input validation schema
 const generateHintsSchema = z.object({
-  targetWord: z.string().min(2).max(20).regex(/^[a-zA-Z\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FAF\u00C0-\u017F]+$/),
+  targetWord: z.string().min(2).max(20).regex(ANY_LANGUAGE_WORD_PATTERN),
   language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de']).default('en'),
 });
 

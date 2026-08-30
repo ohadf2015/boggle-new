@@ -91,11 +91,12 @@ const FullWidthBannerLayout = memo<FullWidthBannerLayoutProps>(({
         </m.div>
       </div>
 
-      {/* Animated accent line */}
+      {/* Animated accent line — scaleX rather than width so the 5s drain runs on the
+          compositor instead of forcing a layout pass every frame. */}
       <m.div
-        className="absolute bottom-0 left-0 h-1 bg-neo-cream/50"
-        initial={{ width: '100%' }}
-        animate={{ width: '0%' }}
+        className="absolute bottom-0 left-0 h-1 w-full origin-left bg-neo-cream/50"
+        initial={{ scaleX: 1 }}
+        animate={{ scaleX: 0 }}
         transition={{ duration: 5, ease: 'linear' }}
       />
     </m.div>

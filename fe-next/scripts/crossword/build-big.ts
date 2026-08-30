@@ -14,6 +14,11 @@
  * into already-baked puzzles for free.
  *
  * Usage: npx tsx scripts/crossword/build-big.ts [--count=200] [--size=11] [--steps=200000]
+ *                                              [--locale=en|he]
+ *
+ * The 11×11 block patterns are pure geometry (every white run is 3–5 long), so they are reused
+ * across locales — only the clue bank and the across-direction change. `rtl` MUST match what
+ * bigPool.toPuzzle passes to buildGrid at load time, or every across answer comes back reversed.
  */
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -21,16 +26,35 @@ import { buildDictIndex, fillGrid } from '../../lib/crossword/generate.core';
 import { isRealCrossword, templatesFor } from '../../lib/crossword/templates';
 import { buildGrid } from '../../lib/crossword/grid';
 import { mulberry32 } from '../../lib/rng/seededRandom';
-import clueBankJson from '../../lib/crossword/data/clueBank.en.json';
+import { isRtlLocale } from '../../lib/crossword/format';
+import type { PuzzleLocale } from '../../lib/crossword/types';
+import enClueBankJson from '../../lib/crossword/data/clueBank.en.json';
+import heClueBankJson from '../../lib/crossword/data/clueBank.he.json';
 
-const clueBank = clueBankJson as unknown as Record<string, { clue: string; score: number }>;
+type ClueBank = Record<string, { clue: string; score: number }>;
+const BANKS: Record<string, ClueBank> = {
+  en: enClueBankJson as unknown as ClueBank,
+  he: heClueBankJson as unknown as ClueBank,
+};
 
 function arg(name: string, dflt: number): number {
   const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
   return hit ? Number(hit.split('=')[1]) : dflt;
 }
 
+function strArg(name: string, dflt: string): string {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.split('=')[1] : dflt;
+}
+
 function main() {
+  const locale = strArg('locale', 'en') as PuzzleLocale;
+  const clueBank = BANKS[locale];
+  if (!clueBank) {
+    console.error(`No clue bank bundled for locale "${locale}" — add it to BANKS.`);
+    process.exit(1);
+  }
+  const rtl = isRtlLocale(locale);
   const size = arg('size', 11);
   const target = arg('count', 200);
   const maxSteps = arg('steps', 30000);
@@ -39,7 +63,7 @@ function main() {
   // keeps their outputs apart for merging.
   const shard = arg('shard', 0);
 
-  const templates = templatesFor('en', size);
+  const templates = templatesFor(locale, size);
   if (!templates.length) {
     console.error(`No ${size}×${size} templates registered — run search-templates.ts first.`);
     process.exit(1);
@@ -59,7 +83,12 @@ function main() {
   // Counted, not silent: a filter that rejects everything looks exactly like a slow run, and
   // "produced zero and said nothing" is the failure mode that costs the most time here.
   const rejected = { fill: 0, gate: 0, unclued: 0, obscure: 0, dupe: 0 };
-  const RARITY_LIMIT = arg('rarity', 0.7);
+  // The rarity gate is an absolute rank cut, so its right value scales with BANK SIZE, not taste.
+  // en ranks 2,400 words and 0.7 leaves ~720 of headroom; he ranks 1,206 of which only 1,089 are
+  // the 3–5 letters a grid can use, so 0.7 puts the cut at rank 844 and every one of 38 slots has
+  // to dodge the top-tail — it rejected 411 of 500 valid fills and baked ZERO. Keep the gate for
+  // genuinely broken grids and let the mean-commonness sort below do the actual quality work.
+  const RARITY_LIMIT = arg('rarity', locale === 'he' ? 0.97 : 0.7);
 
   // Spend a fixed attempt budget and keep the BEST `target`, rather than stopping at the first
   // `target` that pass. Oversampling is what makes the commonness ranking mean anything — stop
@@ -67,7 +96,7 @@ function main() {
   const budget = arg('attempts', target * 6);
   for (let attempt = 0; attempt < budget; attempt++) {
     const tpl = templates[attempt % templates.length];
-    const grid = fillGrid({ size: tpl.size, rtl: false, blocks: tpl.blocks }, idx, {
+    const grid = fillGrid({ size: tpl.size, rtl, blocks: tpl.blocks }, idx, {
       rng: mulberry32(0x9e3779b9 ^ ((attempt + shard * 100000) * 2654435761)),
       maxSteps,
       prefer,
@@ -76,12 +105,12 @@ function main() {
       rejected.fill++;
       continue;
     }
-    if (!isRealCrossword(grid, false)) {
+    if (!isRealCrossword(grid, rtl)) {
       rejected.gate++;
       continue;
     }
 
-    const { slots } = buildGrid({ rtl: false, solution: grid });
+    const { slots } = buildGrid({ rtl, solution: grid });
     if (slots.some((s) => !clueBank[s.answer]?.clue)) {
       rejected.unclued++;
       continue; // unclued answer — unusable
@@ -124,7 +153,7 @@ function main() {
   const pool = kept.slice(0, target);
   const out = { size, grids: pool.map((k) => k.rows) };
   const suffix = shard ? `.shard${shard}` : '';
-  const path = join(__dirname, `../../lib/crossword/data/grids.en${size}${suffix}.json`);
+  const path = join(__dirname, `../../lib/crossword/data/grids.${locale}${size}${suffix}.json`);
   writeFileSync(path, JSON.stringify(out));
   console.log(
     `wrote ${kept.length} grids → ${path} ` +

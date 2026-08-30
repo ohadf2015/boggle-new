@@ -59,6 +59,33 @@ describe('ClassLimitUpsellModal', () => {
     });
   });
 
+  it('sends the Pro CTA to the upgrade page instead of running its own checkout', () => {
+    // GIVEN — a Free teacher who has just hit the class cap
+    render(
+      <ClassLimitUpsellModal isOpen={true} onClose={vi.fn()} currentCount={2} limit={2} />
+    );
+
+    // THEN — the Pro CTA is a link to the one page that owns checkout (and its
+    // 401 / 503 handling), not a button that fires /api/subscription/checkout here.
+    expect(screen.getByRole('link', { name: 'Upgrade now' })).toHaveAttribute(
+      'href',
+      '/en/teacher/upgrade'
+    );
+  });
+
+  it('tracks the Pro CTA click with a payload comparable to the district link', () => {
+    render(
+      <ClassLimitUpsellModal isOpen={true} onClose={vi.fn()} currentCount={2} limit={2} />
+    );
+
+    fireEvent.click(screen.getByRole('link', { name: 'Upgrade now' }));
+
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', {
+      cta: 'teacher_pro',
+      source: 'class_limit_modal',
+    });
+  });
+
   it('emits iap_viewed event when modal opens', () => {
     // GIVEN — modal is closed
     mockTrackGrowthEvent.mockClear();

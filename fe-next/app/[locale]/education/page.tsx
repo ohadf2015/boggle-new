@@ -29,7 +29,7 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
   const webAppSchema = buildEducationWebApplicationJsonLd(locale);
   // Safe: schemas built from static seoContent + locale enum, not user input.
   // JSON.stringify escapes content for <script> context; same pattern as
-  // app/[locale]/guides/page.tsx:73 and lib/seo/homepageFaqJsonLd.ts.
+  // app/[locale]/guides/page.tsx:73 and components/seo/FaqPageJsonLd.tsx.
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />

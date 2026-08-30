@@ -1,13 +1,11 @@
 'use client';
 
 /**
- * Quick Play page shell — beta/admin gate (mirrors /adventure), then the hub.
- * Gate renders nothing until the profile resolves: never flash the beta UI
- * at non-beta users (dual-source-of-truth pitfall).
+ * Quick Play page shell — renders the solo arcade wheel hub.
+ * Ungated and available to all players as the default mode after onboarding.
  */
-import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { QuickPlayHub } from '@/components/quick-play/QuickPlayHub';
 
@@ -16,25 +14,8 @@ function LoadingFallback() {
 }
 
 function QuickPlayGate() {
-  const { canSeeInWorkModes, loading } = useAuth();
   const { language } = useLanguageSafe();
-  const router = useRouter();
   const searchParams = useSearchParams();
-
-  const isDev = process.env.NODE_ENV === 'development';
-  // Wait for auth to finish resolving before deciding: on a hard-load straight
-  // to /quick-play the profile (hence canSeeInWorkModes) lands a beat after
-  // first paint, and redirecting on that transient `false` bounced even admins
-  // back home. Only redirect once we KNOW the user can't see in-work modes.
-  useEffect(() => {
-    if (!loading && !canSeeInWorkModes && !isDev) {
-      router.replace(`/${language}`);
-    }
-  }, [loading, canSeeInWorkModes, isDev, language, router]);
-
-  if (!canSeeInWorkModes && !isDev) {
-    return <LoadingFallback />;
-  }
 
   return <QuickPlayHub challengeId={searchParams.get('challenge')} />;
 }

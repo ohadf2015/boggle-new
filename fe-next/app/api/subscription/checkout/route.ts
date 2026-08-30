@@ -10,15 +10,21 @@ import logger from '@/utils/logger';
  * Response:
  * - 200: { url: string } — redirect to this URL
  * - 401: Unauthorized
+ * - 503: Checkout disabled because Polar is not configured
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
   try {
-    // Checkout gate: a real user must not reach a checkout that can't take their money.
-    // Enabled only when NEXT_PUBLIC_CHECKOUT_ENABLED is exactly 'true' (set it once the
-    // Polar org is live + production keys are in).
-    if (process.env.NEXT_PUBLIC_CHECKOUT_ENABLED !== 'true') {
-      return NextResponse.json({ error: 'Checkout is not available yet' }, { status: 503 });
+    // Checkout gate: keep the till shut while Polar wiring is missing.
+    // This is a runtime check, so it auto-opens the moment env vars are set
+    // and stays shut with a clear message if they are not.
+    const polarAccessToken = process.env.POLAR_ACCESS_TOKEN;
+    const polarProductId = process.env.POLAR_PRO_PRODUCT_ID;
+    if (!polarAccessToken || !polarProductId) {
+      return NextResponse.json(
+        { error: 'Checkout is not available yet — Polar billing is not configured' },
+        { status: 503 }
+      );
     }
 
     const user = await getAuthedUser(request);

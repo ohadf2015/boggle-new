@@ -167,6 +167,37 @@ describe('AuthModal', () => {
       expect(container.innerHTML).toBe('');
     });
 
+    // AuthModal is a hand-rolled portal rather than the shared <Dialog>, so it
+    // never joined the ref-counted html.modal-open flag that the native banner
+    // coordinator watches. On native the AdMob banner is a SurfaceView composited
+    // ABOVE the WebView, so it cannot be covered by the modal's z-100 backdrop —
+    // it sits on top of the sign-in form until the flag is raised.
+    describe('native modal-open flag', () => {
+      it('flags html.modal-open while open', () => {
+        render(<AuthModal isOpen onClose={vi.fn()} />);
+        expect(document.documentElement.classList.contains('modal-open')).toBe(true);
+      });
+
+      it('does not flag html.modal-open when closed', () => {
+        render(<AuthModal isOpen={false} onClose={vi.fn()} />);
+        expect(document.documentElement.classList.contains('modal-open')).toBe(false);
+      });
+
+      it('clears the flag on unmount', () => {
+        const { unmount } = render(<AuthModal isOpen onClose={vi.fn()} />);
+        expect(document.documentElement.classList.contains('modal-open')).toBe(true);
+        unmount();
+        expect(document.documentElement.classList.contains('modal-open')).toBe(false);
+      });
+
+      it('clears the flag when the modal closes without unmounting', () => {
+        const { rerender } = render(<AuthModal isOpen onClose={vi.fn()} />);
+        expect(document.documentElement.classList.contains('modal-open')).toBe(true);
+        rerender(<AuthModal isOpen={false} onClose={vi.fn()} />);
+        expect(document.documentElement.classList.contains('modal-open')).toBe(false);
+      });
+    });
+
     it('renders dialog when isOpen is true', () => {
       renderModal();
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -471,6 +502,99 @@ describe('AuthModal', () => {
       await waitFor(() => {
         expect(screen.getByText('Email already registered.')).toBeInTheDocument();
       });
+    });
+
+    // A successful password sign-in returns a session and no error. Nothing else
+    // in the app closes this modal (OAuth closes via its own onSuccess, OTP calls
+    // onClose directly), so the modal itself has to.
+    it('closes the modal after a successful password sign-in', async () => {
+      const onClose = vi.fn();
+      mockSignInWithEmail.mockResolvedValue({
+        data: { session: { access_token: 'tok' }, user: { id: 'u1' } },
+        error: null,
+      });
+      renderModal({ onClose });
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(onClose).toHaveBeenCalled();
+      });
+    });
+
+    // Regression: the submit handler had no success branch for sign-in, so
+    // isLoading stayed 'email' forever and the button spun with no outcome.
+    it('clears the loading state after a successful password sign-in', async () => {
+      mockSignInWithEmail.mockResolvedValue({
+        data: { session: { access_token: 'tok' }, user: { id: 'u1' } },
+        error: null,
+      });
+      renderModal();
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(mockSignInWithEmail).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+      });
+    });
+
+    // When the Supabase project has email confirmation OFF, signUp returns a live
+    // session immediately — the user is already signed in, so "check your email"
+    // is a lie and the modal must close instead.
+    it('closes the modal when signup returns a session (email confirmation off)', async () => {
+      const onClose = vi.fn();
+      mockSignUpWithEmail.mockResolvedValue({
+        data: { session: { access_token: 'tok' }, user: { id: 'u1', identities: [{ id: 'i1' }] } },
+        error: null,
+      });
+      renderModal({ initialMode: 'signup', onClose });
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(onClose).toHaveBeenCalled();
+      });
+      expect(screen.queryByText('Check your email to verify your account!')).not.toBeInTheDocument();
+    });
+
+    // supabase-js does not error on a duplicate signup when confirmations are on —
+    // it returns a success-shaped response with an obfuscated user and an EMPTY
+    // identities array. Without this check the user is told to check an inbox that
+    // will never receive anything.
+    it('treats an empty identities array as email-already-registered', async () => {
+      mockSignUpWithEmail.mockResolvedValue({
+        data: { session: null, user: { id: 'obfuscated', identities: [] } },
+        error: null,
+      });
+      renderModal({ initialMode: 'signup' });
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(screen.getByText('Email already registered.')).toBeInTheDocument();
+      });
+      expect(screen.queryByText('Check your email to verify your account!')).not.toBeInTheDocument();
+    });
+
+    // Confirmation-required signup: no session, real identity → the "check your
+    // email" message is correct and the modal stays open to show it.
+    it('keeps the modal open and shows check-email when signup needs confirmation', async () => {
+      const onClose = vi.fn();
+      mockSignUpWithEmail.mockResolvedValue({
+        data: { session: null, user: { id: 'u1', identities: [{ id: 'i1' }] } },
+        error: null,
+      });
+      renderModal({ initialMode: 'signup', onClose });
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(screen.getByText('Check your email to verify your account!')).toBeInTheDocument();
+      });
+      expect(onClose).not.toHaveBeenCalled();
     });
   });
 

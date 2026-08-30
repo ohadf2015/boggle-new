@@ -533,7 +533,14 @@ export const Mascot = memo(function Mascot({
   const isVideo = isVideoVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
-  const shouldPrioritize = priority ?? (variant === 'happy');
+  // NOT `priority ?? (variant === 'happy')` — `priority` is defaulted to false
+  // above, so `false ?? x` is always false and that fallback never ran. Measured
+  // 2026-08-29 before removing it: the LCP element on the landing page is
+  // /modes/cubes/arena.png, not a mascot, and an interleaved A/B on production
+  // showed stripping the mascot preload moves LCP by 92ms — inside run-to-run
+  // noise. So reviving the fallback would preload more non-LCP images for no
+  // measured gain; callers that want priority pass it explicitly.
+  const shouldPrioritize = priority;
   const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
 
   const { shape, border, bg } = getAutoStyle(variant, clipShape, clipBorder, clipBg);
@@ -600,7 +607,14 @@ export const MascotWithEntrance = memo(function MascotWithEntrance({
   const isVideo = isVideoVariant(variant);
   const altText = alt || `Lexi mascot - ${variant}`;
 
-  const shouldPrioritize = priority ?? (variant === 'happy');
+  // NOT `priority ?? (variant === 'happy')` — `priority` is defaulted to false
+  // above, so `false ?? x` is always false and that fallback never ran. Measured
+  // 2026-08-29 before removing it: the LCP element on the landing page is
+  // /modes/cubes/arena.png, not a mascot, and an interleaved A/B on production
+  // showed stripping the mascot preload moves LCP by 92ms — inside run-to-run
+  // noise. So reviving the fallback would preload more non-LCP images for no
+  // measured gain; callers that want priority pass it explicitly.
+  const shouldPrioritize = priority;
   const loadingStrategy = shouldPrioritize ? undefined : 'lazy';
 
   const { shape, border, bg } = getAutoStyle(variant, clipShape, clipBorder, clipBg);

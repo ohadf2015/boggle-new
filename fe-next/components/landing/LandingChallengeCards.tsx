@@ -61,6 +61,7 @@ type LandingCardKey =
   | 'sealedBid'
   | 'crossword'
   | 'wordfall'
+  | 'wordTowerV2'
   | 'quickPlay';
 
 /** Default card order when no server data available */
@@ -75,6 +76,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTower',
   'shiritori', 'sealedBid', 'crossword', 'wordfall',
+  'wordTowerV2', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
   'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
   'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
@@ -161,11 +163,14 @@ export function LandingChallengeCards({
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
+    // Word Tower v2 — beta preview of the physics rebuild, routes to
+    // /word-tower-v2. v1 stays public alongside it.
+    if (canSeeInWorkModes && !next.includes('wordTowerV2')) next.push('wordTowerV2');
     // Quick Play — beta-only solo arcade hub (wheel picker, /quick-play).
     if (canSeeInWorkModes && !next.includes('quickPlay')) next.push('quickPlay');
     // Adventure is a beta/admin-only preview for now — hide it from the public
     // hub (the route guard in adventure/PageClient blocks direct navigation too).
-    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay');
+    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay' && m !== 'wordTowerV2');
     return gated;
   })();
   // Bump Blast up the hub: it sits directly after the multiplayer ('arena')
@@ -198,7 +203,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'shiritori', 'sealedBid', 'crossword', 'wordfall', 'quickPlay']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'shiritori', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer

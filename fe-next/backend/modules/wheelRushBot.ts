@@ -10,13 +10,11 @@
  */
 
 import type { Server } from 'socket.io';
-import type { Language } from '@/shared/types/game';
-import type { WheelRushModeState } from '@/shared/types/game';
+import type { Language, WheelRushModeState } from '@/shared/types/game';
 import { WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import { getCachedTrie, getTrieNode } from './boggleSolver';
-import { getGame, updateGame } from './gameStateManager';
+import { getGame, updateGame, updatePlayerScore, addPlayerWord } from './gameStateManager';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
-import { updatePlayerScore, addPlayerWord } from './gameStateManager';
 import logger from '../utils/logger';
 
 interface PendingSubmission {

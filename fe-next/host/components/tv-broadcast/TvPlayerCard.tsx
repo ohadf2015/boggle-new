@@ -359,11 +359,13 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         </div>
       </div>
 
-      {/* Score Bar */}
+      {/* Score Bar — scaleX, not width: this re-animates on every score update for
+          every player card on screen, and animating width forces a full layout pass
+          per frame. origin-left keeps it growing from the left exactly as before. */}
       <m.div
         data-testid="score-bar"
-        className={cn('absolute bottom-0 left-0 h-1 rounded-b-neo', barColor)}
-        animate={{ width: `${barPercentage}%` }}
+        className={cn('absolute bottom-0 left-0 h-1 w-full origin-left rounded-b-neo', barColor)}
+        animate={{ scaleX: barPercentage / 100 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       />
     </m.div>

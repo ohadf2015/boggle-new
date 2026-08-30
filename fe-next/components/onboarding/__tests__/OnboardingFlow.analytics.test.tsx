@@ -59,8 +59,9 @@ vi.mock('@/utils/profileStorage', () => ({
   getStoredCustomAvatar: vi.fn(() => null),
 }));
 
+const pushMock = vi.fn();
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: pushMock }),
   usePathname: () => '/en',
 }));
 
@@ -148,11 +149,13 @@ import {
   trackOnboardingStart,
   trackOnboardingStep,
   trackOnboardingQuickPlay,
+  trackInviteConsumed,
 } from '@/utils/growthTracking';
 
 describe('OnboardingFlow analytics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    pushMock.mockClear();
     mockHasPendingRoom.mockReturnValue(false);
     mockConsumePendingRoom.mockReturnValue(null);
   });
@@ -221,13 +224,27 @@ describe('OnboardingFlow analytics', () => {
     expect(trackOnboardingQuickPlay).toHaveBeenCalledWith({ source: 'quick_start' });
   });
 
-  it('fires onboarding_quick_play (source=ftue_skip) when Play Now bails out of the language step', () => {
-    // Pending room invite forces the language-first flow, where the
-    // "Skip → Play Now" escape lives.
+  // Regression test: a user who arrived via a room-invite link and taps
+  // "Skip → Play Now" on the language step must still land in the room they
+  // were invited to — NOT solo practice. Silently dropping the invite here
+  // was the exact "rage-click hotspot" this flow exists to fix: an escape
+  // hatch that discards the destination the player actually came for
+  // (Class 3, .claude/rules/60-recurring-pitfalls.md).
+  it('preserves the pending room invite when Play Now bails out of the language step', () => {
     mockGetPendingRoom.mockReturnValue({ code: 'ROOM1', hostName: 'Host' });
+    mockConsumePendingRoom.mockReturnValue('ROOM1');
     render(<OnboardingFlow onComplete={vi.fn()} />);
     fireEvent.click(screen.getByTestId('lang-play-now'));
-    expect(trackOnboardingQuickPlay).toHaveBeenCalledTimes(1);
-    expect(trackOnboardingQuickPlay).toHaveBeenCalledWith({ source: 'ftue_skip', at_step: 'language' });
+
+    // Routes to the room, not the practice-game fallback.
+    expect(pushMock).toHaveBeenCalledWith('/en/multiplayer?room=ROOM1');
+    // Consumed (not just peeked) so the invite doesn't leak into a later flow.
+    expect(mockConsumePendingRoom).toHaveBeenCalled();
+    // Tracked distinctly from the practice-game quick-play funnel so it isn't
+    // miscounted as a "landed in practice" completion.
+    expect(trackInviteConsumed).toHaveBeenCalledWith(
+      expect.objectContaining({ roomCode: 'ROOM1', path: 'quick_play' }),
+    );
+    expect(trackOnboardingQuickPlay).not.toHaveBeenCalled();
   });
 });

@@ -210,14 +210,33 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
-  /** 🎯 "Play Now" — skip all remaining FTUE steps and jump straight into a practice game. */
+  /**
+   * 🎯 "Play Now" — skip all remaining FTUE steps and jump straight into a
+   * game. A pending room invite wins over the practice-game fallback: this is
+   * the escape hatch for players who arrived via a friend's link, and
+   * discarding the room here would silently strand them in solo practice
+   * with no way back to what they actually came for (Class 3,
+   * .claude/rules/60-recurring-pitfalls.md — the other exits from this flow,
+   * handleSkipOnboarding and handleStyleComplete, already preserve it).
+   */
   const handlePlayNow = useCallback(() => {
     if (isNavigating) return;
     setIsNavigating(true);
     markOnboardingSkipped();
     emitSkipped(step);
-    trackOnboardingQuickPlay({ source: 'ftue_skip', at_step: step });
-    router.push(firstGameRoute(language));
+    const pendingRoom = consumePendingRoomInvite();
+    if (pendingRoom) {
+      const landedTs = Number(sessionStorage.getItem('invite_landed_ts') || '0');
+      trackInviteConsumed({
+        roomCode: pendingRoom,
+        path: 'quick_play',
+        totalSeconds: landedTs ? Math.round((Date.now() - landedTs) / 1000) : 0,
+      });
+      router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+    } else {
+      trackOnboardingQuickPlay({ source: 'ftue_skip', at_step: step });
+      router.push(firstGameRoute(language));
+    }
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 

@@ -39,6 +39,58 @@ function resolvePreferredLocale(explicit: string | null): string {
 }
 
 /**
+ * Turn an incoming deep-link URL into the in-app route to navigate to.
+ *
+ * Pure (locale context is passed in) so the path arithmetic is unit-testable
+ * without a Capacitor bridge — see components/__tests__/deepLinkRoute.test.ts.
+ *
+ * The subtlety this exists for: the app is a WebView on https://www.lexiclash.live
+ * (capacitor.config.ts `server.url`), so every URL a user actually shares is a
+ * full site URL and therefore ALREADY carries a locale segment — `/en/daily`,
+ * `/he/join/ABC`. Blindly prefixing the app's current locale produced
+ * `/en/en/daily`, which 404s, so every shared link dropped the user on the home
+ * page. Custom-scheme links (`lexiclash://daily`) carry the first segment in the
+ * hostname and usually have no locale, so both shapes are normalised to a
+ * segment list before the locale is decided.
+ */
+export function buildDeepLinkRoute(
+  rawUrl: string,
+  ambientLocale: string,
+): { route: string; isAuthCallback: boolean } | null {
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    return null;
+  }
+
+  const isHttpLike = url.protocol === 'https:' || url.protocol === 'http:';
+  // Custom scheme: `lexiclash://join/ABC` parses as hostname 'join', pathname '/ABC'.
+  const rawPath = isHttpLike ? url.pathname : `${url.hostname}${url.pathname}`;
+  const segments = rawPath.split('/').filter(Boolean);
+
+  // A leading locale segment belongs to the link, not to the path — pull it out
+  // so it can win over the locale the app happens to be showing. A player who
+  // shares /he/daily should open the Hebrew board on the recipient's device.
+  const localeFromLink = isValidLocale(segments[0]) ? segments.shift() : undefined;
+  const path = segments.join('/');
+
+  const searchParams = new URLSearchParams(url.search);
+  const explicitLocale = searchParams.get('locale');
+  searchParams.delete('locale');
+  searchParams.delete('from_app');
+
+  const locale = isValidLocale(explicitLocale)
+    ? explicitLocale
+    : (localeFromLink ?? ambientLocale);
+
+  const queryString = searchParams.toString();
+  const route = `/${locale}${path ? `/${path}` : ''}${queryString ? `?${queryString}` : ''}`;
+
+  return { route, isAuthCallback: path.includes('auth/callback') };
+}
+
+/**
  * DeepLinkHandler Component
  *
  * Handles deep link navigation for OAuth callbacks and other app links on Capacitor (mobile).
@@ -88,17 +140,13 @@ export default function DeepLinkHandler() {
       try {
         logger.log('Deep link received:', event.url);
 
-        const url = new URL(event.url);
-        const isHttpsAppLink = url.protocol === 'https:';
-
-        let path: string;
-        if (isHttpsAppLink) {
-          path = url.pathname.replace(/^\//, '');
-        } else {
-          path = url.hostname + url.pathname;
+        const target = buildDeepLinkRoute(event.url, resolvePreferredLocale(null));
+        if (!target) {
+          logger.error('Deep link URL could not be parsed:', event.url);
+          return;
         }
+        const { route: finalRoute, isAuthCallback } = target;
 
-        const isAuthCallback = path.includes('auth/callback');
         if (isAuthCallback) {
           const BrowserPlugin = getSyncBrowserPlugin() ?? await getBrowserPlugin();
           if (BrowserPlugin) {
@@ -110,14 +158,6 @@ export default function DeepLinkHandler() {
             }
           }
         }
-
-        const searchParams = new URLSearchParams(url.search);
-        const validLocale = resolvePreferredLocale(searchParams.get('locale'));
-        searchParams.delete('locale');
-        searchParams.delete('from_app');
-
-        const queryString = searchParams.toString();
-        const finalRoute = `/${validLocale}/${path}${queryString ? `?${queryString}` : ''}`;
 
         logger.log('Deep link routing to:', finalRoute);
         router.replace(finalRoute);

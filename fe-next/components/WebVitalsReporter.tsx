@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { useReportWebVitals } from 'next/web-vitals';
+import { onINP } from 'web-vitals/attribution';
+import { summarizeInpAttribution } from '@/lib/webVitals/inpAttribution';
 import { trackEvent } from './GoogleAnalytics';
 import { getPerfVariant } from '@/utils/perfVariant';
 
@@ -85,8 +87,82 @@ function getSessionId(): string {
   return newSessionId;
 }
 
+/**
+ * Persist one metric to `public.web_vitals`.
+ *
+ * Extracted so the INP path can reuse it: INP is reported through
+ * `web-vitals/attribution` rather than `useReportWebVitals`, because Next
+ * bundles its own copy of web-vitals with attribution stripped out — there is no
+ * way to merge the two after the fact (the metric `id`s come from different
+ * library instances and do not match).
+ */
+interface ReportableMetric {
+  name: string;
+  value: number;
+  rating?: string;
+  delta: number;
+  id: string;
+  navigationType?: string;
+}
+
+function sendToSupabase(
+  metric: ReportableMetric,
+  perfVariant: string | null | undefined,
+  extraMetadata?: Record<string, unknown>,
+): void {
+  const data = {
+    metric_name: metric.name,
+    metric_value: metric.value,
+    metric_rating: metric.rating || 'poor',
+    page_url: window.location.href,
+    page_path: window.location.pathname,
+    device_type: getDeviceType(),
+    connection_type: getConnectionType(),
+    navigation_type: metric.navigationType,
+    session_id: getSessionId(),
+    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    metadata: {
+      id: metric.id,
+      navigationType: metric.navigationType,
+      delta: metric.delta,
+      perfVariant,
+      navigationTiming: getNavigationTiming(),
+      ...extraMetadata,
+    },
+  };
+
+  // Fire and forget - don't block user experience
+  fetch('/api/web-vitals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    keepalive: true,
+  }).catch(() => {
+    // Silently fail - tracking should never break the app
+  });
+}
+
 export function WebVitalsReporter() {
   const reported = useRef<Set<string>>(new Set());
+
+  // INP with attribution. `useReportWebVitals` cannot supply this — Next bundles
+  // web-vitals without the attribution build — so INP is reported from here
+  // instead, and skipped in the callback below.
+  useEffect(() => {
+    try {
+      onINP((metric) => {
+        const key = `INP-${metric.id}`;
+        if (reported.current.has(key)) return;
+        reported.current.add(key);
+        sendToSupabase(metric, getPerfVariant(), {
+          inpAttribution: summarizeInpAttribution(metric.attribution),
+        });
+      });
+    } catch {
+      // Older browsers lack the entry types web-vitals needs; INP simply goes
+      // unreported rather than breaking the page.
+    }
+  }, []);
 
   useReportWebVitals((metric) => {
     const perfVariant = getPerfVariant();
@@ -117,35 +193,10 @@ export function WebVitalsReporter() {
     if (!reported.current.has(metricKey)) {
       reported.current.add(metricKey);
 
-      const data = {
-        metric_name: metric.name,
-        metric_value: metric.value,
-        metric_rating: metric.rating || 'poor',
-        page_url: window.location.href,
-        page_path: window.location.pathname,
-        device_type: getDeviceType(),
-        connection_type: getConnectionType(),
-        navigation_type: metric.navigationType,
-        session_id: getSessionId(),
-        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        metadata: {
-          id: metric.id,
-          navigationType: metric.navigationType,
-          delta: metric.delta,
-          perfVariant,
-          navigationTiming: getNavigationTiming(),
-        }
-      };
-
-      // Fire and forget - don't block user experience
-      fetch('/api/web-vitals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        keepalive: true
-      }).catch(() => {
-        // Silently fail - tracking should never break the app
-      });
+      // INP is reported by the attribution effect below, which carries the
+      // interaction target and phase breakdown. Skip it here or the row lands
+      // twice, once without attribution.
+      if (metric.name !== 'INP') sendToSupabase(metric, perfVariant);
     }
 
     // Send to custom endpoint if configured (for advanced analytics)

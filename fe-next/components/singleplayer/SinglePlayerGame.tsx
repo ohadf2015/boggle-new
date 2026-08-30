@@ -12,10 +12,9 @@ import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogE
 const DEAD_TIME_THRESHOLD_MS = 15000;
 import {
   useSinglePlayerCore,
-  LandscapeGameLayout,
-  DesktopGameLayout,
-  PortraitGameLayout,
+  SinglePlayerShell,
 } from './game';
+
 import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
@@ -452,66 +451,61 @@ function SinglePlayerGame({
     <StuckCoachOverlay coach={stuckCoach} grid={core.grid} language={settings.language} />
   );
 
-  // Landscape layout
-  if (core.isLandscape) {
-    return (
-      <div className="relative h-full" translate="no">
-        {encouragementBanner}
-        {scorePopupElement}
-        {practicePromptElement}
-        {practiceCoachElement}
-        {modeCoachElement}
-      {stuckCoachElement}
-        <LandscapeGameLayout
-          {...commonProps}
-          progressBarExpanded={core.progressBarExpanded}
-          onToggleProgressBar={core.handleToggleProgressBar}
-          showLandscapeTutorial={core.showLandscapeTutorial}
-          onDismissLandscapeTutorial={core.dismissLandscapeTutorial}
-        />
-      </div>
-    );
-  }
-
-  // Desktop/TV layout
-  if (core.isDesktop || core.isTv) {
-    return (
-      <div className="relative h-full" translate="no">
-        {encouragementBanner}
-        {scorePopupElement}
-        {practicePromptElement}
-        {practiceCoachElement}
-        {modeCoachElement}
-      {stuckCoachElement}
-        <DesktopGameLayout
-          {...commonProps}
-          targetHighScore={core.targetHighScore}
-          totalBoardWords={core.totalBoardWords}
-          progressBarExpanded={core.progressBarExpanded}
-          onToggleProgressBar={core.handleToggleProgressBar}
-          isTv={core.isTv}
-        />
-      </div>
-    );
-  }
-
-  // Portrait layout (default)
+  // One shell for portrait, landscape, desktop and TV.
+  //
+  // Single player used to branch into three bespoke layouts here —
+  // LandscapeGameLayout (424 lines) and DesktopGameLayout (394) alongside the
+  // already-deleted PortraitGameLayout (593). Multiplayer never needed that
+  // split: PortraitLayout is responsive and takes `isDesktop`, so the branch
+  // itself was the duplication. All that differs now is that one flag.
+  //
+  // `fixed inset-0`, not `h-[100dvh]`: the shell is `flex-1 min-h-0` over a
+  // `container-type: size` board slot, so it needs a definite height (see
+  // gameShellSizing.contract.test.ts) — but a 100dvh box that STARTS below the
+  // app header is 100dvh tall and ends one header past the fold. Measured in
+  // landscape: wrapper y=74, board bottom 425 in a 384 viewport, page scrollH
+  // 554. Pinning to the viewport makes the height both definite and correctly
+  // positioned. In-game is a fullscreen surface anyway — the bottom nav is
+  // already hidden during play and the shell carries its own Exit button.
+  //
+  // z-70 clears the app header (fixed, z-60, 80px tall), which otherwise covered
+  // the top of the shell's side rails on desktop and stole 80px from the board on
+  // every surface. Modals stay above (AuthModal z-100, WinnerOnboarding z-110).
   return (
-    <div className="relative h-full" translate="no">
+    <div className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy pt-[env(safe-area-inset-top,0px)]" translate="no">
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}
+      {practiceCoachElement}
       {modeCoachElement}
       {stuckCoachElement}
-      <PortraitGameLayout
-        {...commonProps}
-        targetHighScore={core.targetHighScore}
+      <SinglePlayerShell
+        grid={core.grid as LetterGrid}
+        language={settings.language}
+        score={core.score}
+        remainingTime={core.timer.remainingTime}
+        isPaused={core.isPaused}
+        isGameOver={core.isGameOver}
+        minWordLength={settings.minWordLength}
+        bots={settings.bots}
+        playerName={commonProps.t('common.you')}
+        foundWords={core.foundWords}
+        comboLevel={core.combo.comboLevel}
+        fireRoundActive={core.fireRoundActive}
+        fireRoundRemaining={core.fireRoundRemaining}
+        earthquakeState={core.earthquakeState}
+        currentFeedback={core.currentFeedback}
+        highlightedPath={core.revealState.highlightedPath ?? []}
+        lastWordFoundTime={core.lastWordFoundTimeRef.current ?? 0}
         totalBoardWords={core.totalBoardWords}
-        progressBarExpanded={core.progressBarExpanded}
-        onToggleProgressBar={core.handleToggleProgressBar}
+        isDesktop={core.isDesktop || core.isTv}
+        onWordSubmit={wrappedWordSubmit}
+        onWordChange={wrappedWordChange}
+        onPathSubmit={wrappedPathSubmit}
+        onExit={core.handleQuitRequest}
+        onPauseToggle={core.handlePauseToggle}
         gameStatsRef={core.gameStatsRef}
-        scoreBadgeRef={scoreBadgeRef}
-        wordAreaRef={wordAreaRef}
+        t={commonProps.t}
       />
     </div>
   );

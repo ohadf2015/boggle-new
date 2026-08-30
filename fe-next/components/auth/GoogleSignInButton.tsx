@@ -51,6 +51,12 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
     if (!google?.accounts?.id) return;
 
     await ensureGoogleIdInitialized(google, clientId);
+    // Re-read the ref: init is async, and a component that unmounted while it was
+    // in flight (auth modal closed, route changed) nulls the ref out. Passing that
+    // null to renderButton is what logs `[GSI_LOGGER]: Failed to render button
+    // because there is no parent or options set.` to Sentry.
+    const container = containerRef.current;
+    if (!container) return;
     renderedRef.current = true;
     // 'outline' = white button (white bg, dark text). The colored "G" can't be
     // recolored — Google's branding rules forbid a monochrome logo, so a black G
@@ -61,7 +67,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
     // locales). Auto-sizing keeps the button snug to its content so the content
     // stays centered; the full-width white frame below supplies the full-width
     // look. An explicit `width` prop still wins for callers that need a fixed size.
-    google.accounts.id.renderButton(containerRef.current, {
+    google.accounts.id.renderButton(container, {
       type: 'standard',
       theme: 'outline',
       size: 'large',
