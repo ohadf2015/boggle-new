@@ -35,9 +35,9 @@ describe('GameHeader pause affordance', () => {
     const { rerender } = render(
       <GameHeader gameActive t={t} onPauseToggle={vi.fn()} isPaused={false} />,
     );
-    expect(screen.getByTestId('game-header-pause').getAttribute('aria-label')).toBe('game.pause');
+    expect(screen.getByTestId('game-header-pause').getAttribute('aria-label')).toBe('common.pause');
 
     rerender(<GameHeader gameActive t={t} onPauseToggle={vi.fn()} isPaused />);
-    expect(screen.getByTestId('game-header-pause').getAttribute('aria-label')).toBe('game.resume');
+    expect(screen.getByTestId('game-header-pause').getAttribute('aria-label')).toBe('common.resume');
   });
 });

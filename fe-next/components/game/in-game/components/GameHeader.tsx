@@ -66,7 +66,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
               onClick={onPauseToggle}
               whileTap={{ scale: 0.95 }}
               className="w-11 h-11 bg-neo-navy-light border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
-              aria-label={isPaused ? t('game.resume') : t('game.pause')}
+              aria-label={isPaused ? t('common.resume') : t('common.pause')}
             >
               {isPaused
                 ? <Play className="w-5 h-5 text-neo-white" />
