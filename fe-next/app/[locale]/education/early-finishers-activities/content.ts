@@ -279,36 +279,36 @@ const HE: EducationLandingContent = {
   ],
   faqs: [
     {
-      q: 'הם יחיפזו בעבודה הראשונה כדי לשחק?',
-      a: 'חלקם יעשו, בתחילה. קבעו כללים ברורים: "צריך לסיים את העבודה כמו שצריך לפני משחק." השתמשו בתבנית כדי שידעו מה "סיים" אומר. אחרי שבוע זה נורמלי. רוב המורים אומרים שהמשחק למעשה מוטיב עובדים איטיים כי הם רואים עמיתים משחקים.',
+      q: 'האם הם ימהרו בעבודה הראשונה כדי לשחק?',
+      a: "חלקם כן, בתחילה. קבעו כללים ברורים: \"צריך לסיים את העבודה כראוי לפני משחק.\" השתמשו בתבנית כדי שידעו מה \"סיים\" אומר. אחרי שבוע זה הופך לנורמה. רוב המורים אומרים שהמשחק למעשה מעודד תלמידים איטיים כי הם רואים חברים משחקים.",
     },
     {
-      q: 'זה בטוח? יש צ\'ט או קישורים?',
-      a: 'אף צ\'ט, אף הודעות פרטיות, אף קישורים חיצוניים. זה משחק מילים בלבד. תלמידים רואים שמות ותוצאות של שחקנים אחרים בלוח תוצאות, וזה הכל. אף מידע אישי.',
+      q: "זה בטוח? יש צ'ט או קישורים?",
+      a: "בלי צ'ט, בלי הודעות פרטיות, בלי קישורים חיצוניים. זה משחק מילים בלבד. תלמידים רואים שמות ותוצאות של שחקנים אחרים בלוח תוצאות, וזה הכל. בלי מידע אישי.",
     },
     {
       q: 'מה עם זמן מסך?',
-      a: 'כל סיבוב הוא 2–4 דקות. אם תלמיד סיים 10 דקות מוקדם, הוא משחק סיבוב אחד, לא שישה. המשחק עוצר אותו כשהזמן נגמר. זה קצר יותר מסרטון הפסקה.',
+      a: "כל סיבוב הוא 2–4 דקות. אם תלמיד סיים 10 דקות מוקדם, הוא משחק סיבוב אחד, לא שישה. המשחק עוצר אותו כשהזמן נגמר. זה קצר יותר מסרטון הפסקה.",
     },
     {
       q: 'צריך ללמד אותם איך משחקים?',
-      a: 'הדגמה של שתי דקות עם כל הכיתה. הראה את הרשת, בחר מילה, תן להם למצוא אחת. זהו. הם לומדים משחק.',
+      a: "הדגמה של שתי דקות עם כל הכיתה. הראה את הרשת, בחר מילה, תן להם למצוא אחת. זהו. הם לומדים באמצעות משחק.",
     },
     {
-      q: 'אין לי חכם בכיתה?',
-      a: 'צריך חכם אחד לפחות (טלפון או לוח) לתלמידים שמסיימים לשתף. רוב הכיתות יש כרומביוק או אייפד. LexiClash עובד בכל.',
+      q: 'אין לי מכשירים בכיתה?',
+      a: 'צריך מכשיר אחד לפחות (טלפון או טבלט) לתלמידים שמסיימים לשתף. רוב הכיתות יש כרומבוק או אייפד. LexiClash עובד בכל.',
     },
     {
-      q: 'אני יכול להשתמש באותו קוד כל שנה?',
-      a: 'כן, אותו קוד כל שנה. תלמידים לא צריכים לזכור—אתה כותב אותו על הלוח פעם אחת, וזה נשאר שם. הם משתמשים בו כל פעם שמסיימים מוקדם.',
+      q: 'אני יכול להשתמש באותו קוד כל השנה?',
+      a: "כן, אותו קוד כל השנה. תלמידים לא צריכים לזכור—אתה כותב אותו על הלוח פעם אחת, וזה נשאר שם. הם משתמשים בו כל פעם שמסיימים מוקדם.",
     },
     {
       q: 'אני אראה מה הם משחקו?',
-      a: 'כן. לוח המורה שלך מראה תוצאות, אילו מילים הם מצאו, ואילו החמיצו. השתמש בזה לחר מילים לשבוע הבא.',
+      a: "כן. לוח המורה שלך מראה תוצאות, אילו מילים הם מצאו, ואילו החמיצו. השתמש בזה לבחירת מילים לשבוע הבא.",
     },
     {
-      q: 'אם הם מהירים אבל קשים בלמידה, מה?',
-      a: 'תן להם מילים קשות או מטרה גבוהה יותר. LexiClash משתנה לרמות שונות. או סובבו: חלקם משחקים, חלקם קוראים, חלקם עושים מתמטיקה. המשחק היא תחנה אחת.',
+      q: 'אם הם מהירים אבל לא תמיד רוצים ללמוד, מה?',
+      a: "תן להם מילים קשות או מטרה גבוהה יותר. LexiClash משתנה לרמות שונות. או סובבו תחנות: חלקם משחקים, חלקם קוראים, חלקם עושים מתמטיקה. המשחק היא תחנה אחת בסיבוב שלך.",
     },
   ],
   labels: {
@@ -382,13 +382,13 @@ const ES: EducationLandingContent = {
       kind: 'table',
       title: 'Juegos de palabras para cada materia',
       intro: 'Combina cualquier lección con una actividad de 4 minutos. Elige la que coincida con lo que acabas de enseñar.',
-      columns: ['Materia', 'Actividad de palabras', 'Lo que refuerza', 'Prep del docente'],
+      columns: ['Materia', 'Actividad de palabras', 'Lo que refuerza', 'Preparación del docente'],
       rows: [
         ['Lectura y lenguaje', 'Busca palabras de vocabulario en una cuadrícula de letras', 'Reconocimiento de palabras, patrones de ortografía', 'Ninguna—los estudiantes escriben palabras que aprendieron'],
         ['Matemáticas', 'Deletrea números y términos matemáticos', 'Vocabulario de operaciones, formas, conceptos', 'Ninguna—se adapta a cualquier número que enseñaste'],
         ['Ciencias', 'Localiza términos clave de la unidad', 'Vocabulario científico, retención', 'Ninguna—funciona con cualquier tema'],
         ['Historia y Estudios Sociales', 'Busca personas, lugares, eventos', 'Vocabulario histórico, recordación', 'Ninguna—funciona en cualquier período'],
-        ['Idioma extranjero', 'Crucigramas en el idioma objetivo', 'Patrones de vocabulario, ortografía', 'Ninguna—compatible con todos los idiomas'],
+        ['Idioma extranjero', 'Sopas de letras en el idioma objetivo', 'Patrones de vocabulario, ortografía', 'Ninguna—compatible con todos los idiomas'],
         ['Arte y Diseño', 'Juego de vocabulario de colores y técnicas', 'Lenguaje de diseño, palabras descriptivas', 'Ninguna—funciona en todos los estilos'],
       ],
     },
@@ -447,7 +447,7 @@ const ES: EducationLandingContent = {
   ],
   faqs: [
     {
-      q: '¿Se apresuraranán en el trabajo principal para llegar al juego?',
+      q: '¿Se apresurarán en el trabajo principal para llegar al juego?',
       a: 'Algunos lo harán, al principio. Establece reglas claras: "Debes terminar el trabajo correctamente antes de jugar." Usa una lista de verificación para que sepan qué significa "terminado". Después de una semana, se vuelve normal. La mayoría de los docentes dicen que el juego motiva a los estudiantes más lentos porque ven a sus compañeros jugando.',
     },
     {
@@ -508,7 +508,7 @@ const SV: EducationLandingContent = {
   accent: 'lime',
   meta: {
     title: 'Aktiviteter för elever som är klara först | LexiClash',
-    description: 'Självstyrda ordspel för elever som arbetar snabbt. Ingen övervaking varje dag, eleverna spelar och lär samtidigt.',
+    description: 'Självstyrda ordspel för elever som arbetar snabbt. Ingen övervakning varje dag, eleverna spelar och lär samtidigt.',
     keywords: [
       'aktiviteter för elever som är klara först',
       'snabba elevers uppgifter',
@@ -516,7 +516,7 @@ const SV: EducationLandingContent = {
       'självständiga aktiviteter',
       'vad gör man när eleverna är klara',
       'ordspel för elever',
-      'vocabulär spel klassrum',
+      'ordförråd spel klassrum',
     ],
   },
   hero: {
@@ -550,9 +550,9 @@ const SV: EducationLandingContent = {
       kind: 'table',
       title: 'Ordspel för varje ämne',
       intro: 'Kombinera vilken lektion som helst med en 4-minuters aktivitet. Välj den som passar det du just lärde ut.',
-      columns: ['Ämne', 'Ordspelsaktivitet', 'Förstärker', 'Lärares förberedelse'],
+      columns: ['Ämne', 'Ordspelsaktivitet', 'Förstärker', "Lärarens förberedelse"],
       rows: [
-        ['Läsning och svenska', 'Hitta vokabulär från texten i ett bokstavnät', 'Ordkännedom, stavningsörnster', 'Ingen—eleverna skriver ord de lärt sig'],
+        ['Läsning och svenska', 'Hitta vokabulär från texten i ett bokstavsrutnät', 'Ordkännedom, stavningsmönster', 'Ingen—eleverna skriver ord de lärt sig'],
         ['Matematik', 'Stava tal och matematiska termer', 'Namn på operationer, former, begrepp', 'Ingen—anpassas till vilka tal du undervisade'],
         ['Naturvetenskap', 'Hitta nyckeltermer från enheten', 'Vetenskaplig vokabulär, minne', 'Ingen—fungerar med vilket ämne som helst'],
         ['Historia och samhälle', 'Sök efter människor, platser, händelser', 'Historisk vokabulär, återkallande', 'Ingen—fungerar i vilken period som helst'],
@@ -588,7 +588,7 @@ const SV: EducationLandingContent = {
       items: [
         {
           icon: 'timer',
-          text: 'Tidsbegränsade omgångar (2–4 min) håller elever på sina platser, ingen vållning omkring.',
+          text: 'Tidsbegränsade omgångar (2–4 min) håller elever på sina platser, inget springande omkring.',
         },
         {
           icon: 'users',
@@ -616,7 +616,7 @@ const SV: EducationLandingContent = {
   faqs: [
     {
       q: 'Skyndar de sig genom huvudarbetet bara för att få spela?',
-      a: 'Vissa gör det, till en början. Sätt tydliga regler: "Du måste göra arbetet ordentligt innan du spelar." Använd en checklista så de vet vad "klar" betyder. Efter en vecka blir det normalt. De flesta lärare säger att spelet faktiskt motiverar långsammare arbeten eftersom de ser kamrater spela.',
+      a: 'Vissa gör det, till en början. Sätt tydliga regler: "Du måste göra arbetet ordentligt innan du spelar." Använd en checklista så de vet vad "klar" betyder. Efter en vecka blir det normalt. De flesta lärare säger att spelet faktiskt motiverar elever som arbetar långsammare eftersom de ser kamrater spela.',
     },
     {
       q: 'Är det säkert? Finns det chatt eller externa länkar?',
@@ -624,14 +624,14 @@ const SV: EducationLandingContent = {
     },
     {
       q: 'Vad sägs om skärmtid?',
-      a: 'Varje omgång är 2–4 minuter. Om en elev blir klar 10 minuter tidigare spelar de en omgång, inte sex. Spelet stoppar dem när tiden är ute. Det är kortare än en vilovideouppspelning.',
+      a: 'Varje omgång är 2–4 minuter. Om en elev blir klar 10 minuter tidigare spelar de en omgång, inte sex. Spelet stoppar dem när tiden är ute. Det är kortare än en rastvideo.',
     },
     {
       q: 'Behöver jag lära dem hur man spelar?',
       a: '2-minuters demo med hela klassen. Visa dem nätet, peka på ett ord, låt dem hitta ett. Det räcker. De lär sig genom att spela. Ingen handledning behövs.',
     },
     {
-      q: 'Vad om jag inte har enheter i klassrummet?',
+      q: 'Vad händer om jag inte har enheter i klassrummet?',
       a: 'Du behöver minst en enhet (en telefon eller surfplatta) för elever som är klara att dela. Många klassrum har en uppsättning Chromebooks eller en delad iPad. LexiClash fungerar på alla.',
     },
     {
@@ -643,7 +643,7 @@ const SV: EducationLandingContent = {
       a: 'Ja. Din lärarpanel visar poäng, vilka ord de hittade och vilka de missade. Använd det för att välja vokabulär för nästa veckas lektion.',
     },
     {
-      q: 'Vad om elever som är klara först bara är en störning, inte ett lärgap?',
+      q: 'Vad om elever som är klara först bara är en störning, inte en kunskapslucka?',
       a: 'Ge dem svårare ord eller sätt ett högre poängmål. LexiClash anpassas till olika nivåer. Eller rotera: några spelar ordspelet, andra läser, andra gör matte. Spelet är en station i ditt system.',
     },
   ],
@@ -653,7 +653,7 @@ const SV: EducationLandingContent = {
   },
   related: [
     { href: '/education/brain-breaks-word-games', label: 'Hjärnpauser med ordspel', accent: 'lime' },
-    { href: '/education/vocabulary-games-classroom', label: 'OrdförrådsSpel för klassrummet', accent: 'cyan' },
+    { href: '/education/vocabulary-games-classroom', label: 'Ordförrådsspel för klassrummet', accent: 'cyan' },
     { href: '/education/spelling-bee-practice', label: 'Stavningsövningsspel', accent: 'purple' },
     { href: '/education/middle-school-word-games', label: 'Ordspel för högstadiet', accent: 'pink' },
     { href: '/education', label: 'Alla resurser', accent: 'pink' },
@@ -698,7 +698,7 @@ const JA: EducationLandingContent = {
       highlight: '退屈させず、楽しませる',
       part2: '',
     },
-    subtitle: 'ひとりでに進むゲーム。授業計画は不要。クリックするだけで始まる。',
+    subtitle: 'ひとりでに進むゲームです。授業計画は不要です。クリックするだけで始まります。',
     primaryCta: {
       label: 'クラスを作成',
       href: '/education/classroom-game',
@@ -730,8 +730,8 @@ const JA: EducationLandingContent = {
     },
     {
       kind: 'steps',
-      title: '1回設定すれば、1年中使える',
-      intro: '初日に3ステップ。その後は勝手に進む。',
+      title: '1回設定すれば、1年中使えます',
+      intro: '初日に3ステップ。その後は自動で進みます。',
       items: [
         {
           step: 'ステップ1：クラスを作成',
@@ -756,47 +756,47 @@ const JA: EducationLandingContent = {
       items: [
         {
           icon: 'timer',
-          text: 'タイム制のゲーム（2～4分）で生徒が席に座る。うろつかない。',
+          text: 'タイム制のゲーム（2～4分）で生徒が席に座っています。うろつきません。',
         },
         {
           icon: 'users',
-          text: 'ひとり、またはクラスメートと一緒に遊ぶ。チャットなし、邪魔なし、画面時間オーバーなし。',
+          text: 'ひとり、またはクラスメートと一緒に遊べます。チャットなし、邪魔なし、画面時間が増えません。',
         },
         {
           icon: 'graduation',
-          text: '見つけた単語すべてが授業から。学習は止まらない。',
+          text: '見つけた単語すべてが授業からです。学習が止まりません。',
         },
         {
           icon: 'monitor',
-          text: 'Chromebook、タブレット、スマートフォン対応。インストール不要。',
+          text: 'Chromebook、タブレット、スマートフォンに対応しています。インストール不要です。',
         },
         {
           icon: 'book',
-          text: '先生ダッシュボードで各生徒が見落とした単語が分かる。来週の授業で教えられる。',
+          text: '先生ダッシュボードで各生徒が見落とした単語が分かります。来週の授業で教えられます。',
         },
         {
           icon: 'zap',
-          text: '邪魔がない。初日で生徒がルールを覚える。質問なし。',
+          text: '邪魔がありません。初日で生徒がルールを覚えます。質問はなしです。',
         },
       ],
     },
   ],
   faqs: [
     {
-      q: 'ゲームのために課題を急いでしてしまわないか？',
-      a: '最初はするかもしれません。明確なルール：「遊ぶ前に課題をちゃんと終わらせること」。チェックリストで「完了」の意味を明確に。1週間でふつうになります。ほとんどの先生は、友達がゲームしてるのを見ると遅い生徒もやる気になると言います。',
+      q: 'ゲームのために課題を急いでしてしまわないでしょうか？',
+      a: '最初はするかもしれません。明確なルール：「遊ぶ前に課題をちゃんと終わらせてください」。チェックリストで「完了」の意味を明確にします。1週間でふつうになります。ほとんどの先生は、友達がゲームしているのを見ると遅い生徒もやる気になると言います。',
     },
     {
       q: 'セキュリティは大丈夫？チャットや外部リンクは？',
       a: 'チャットなし、DM機能なし、外部リンクなし。ゲームだけです。他の生徒の名前とスコアがランキングに出ますが、それだけ。個人情報は共有されません。',
     },
     {
-      q: '画面時間は大丈夫？',
-      a: '1ゲーム2～4分です。10分早く終わった生徒なら1ゲームやります。タイマーで自動停止。動画より短い。',
+      q: '画面時間は大丈夫でしょうか？',
+      a: '1ゲーム2～4分です。10分早く終わった生徒なら1ゲームをします。タイマーで自動停止します。動画より短いです。',
     },
     {
-      q: 'やり方を教える必要がある？',
-      a: '2分間全クラスでデモ。グリッド見せて、単語を指して、1個探させる。それで十分。ゲームで覚える。',
+      q: 'やり方を教える必要がありますか？',
+      a: '2分間全クラスでデモをします。グリッドを見せて、単語を指して、1個探させます。それで十分です。ゲームで覚えます。',
     },
     {
       q: '教室にデバイスがない場合は？',
@@ -811,8 +811,8 @@ const JA: EducationLandingContent = {
       a: 'はい。先生ダッシュボードで得点、見つけた単語、見落とした単語がわかります。来週の授業の語彙選択に使えます。',
     },
     {
-      q: '早い生徒が学習できていない場合は？',
-      a: 'もっと難しい単語にするか、高いスコア目標を設定する。LexiClashはレベルに合わせられます。または、何人かはゲーム、何人かは読書、何人かは算数。ゲームはステーションの1つ。',
+      q: '早い生徒が学習できていない場合はどうしますか？',
+      a: 'もっと難しい単語にするか、高いスコア目標を設定します。LexiClashはレベルに合わせられます。または、何人かはゲーム、何人かは読書、何人かは算数をします。ゲームは活動の一つです。',
     },
   ],
   labels: {
@@ -866,7 +866,7 @@ const RU: EducationLandingContent = {
       highlight: 'закончивших раньше',
       part2: '',
     },
-    subtitle: 'Игра, которая работает сама по себе. Без плана урока. Просто нажми и начни.',
+    subtitle: 'Игра, которая работает сама по себе. Без плана урока. Просто нажмите и начните.',
     primaryCta: {
       label: 'Создать класс',
       href: '/education/classroom-game',
@@ -888,12 +888,12 @@ const RU: EducationLandingContent = {
       intro: 'Добавьте 4-минутное занятие к любому уроку. Выберите то, что соответствует тому, что вы только что преподавали.',
       columns: ['Предмет', 'Словесная игра', 'Что укрепляет', 'Подготовка учителя'],
       rows: [
-        ['Чтение и литература', 'Найди слова из текста в сетке букв', 'Узнавание слов, орфография', 'Никакой—ученики пишут слова, которые учили'],
-        ['Математика', 'Напиши цифры и математические термины', 'Названия операций, форм, понятий', 'Никакой—адаптируется к любым числам'],
-        ['Естественные науки', 'Найди ключевые термины из раздела', 'Научная лексика, закрепление', 'Никакой—работает с любой темой'],
-        ['История и обществознание', 'Поиск людей, мест, событий', 'Историческая лексика, повторение', 'Никакой—работает в любой эпохе'],
-        ['Иностранный язык', 'Словесные головоломки на целевом языке', 'Словесные паттерны, написание', 'Никакой—поддерживает все языки'],
-        ['Искусство и дизайн', 'Игра со словами о цветах и техниках', 'Язык дизайна, описательные слова', 'Никакой—работает во всех стилях'],
+        ['Чтение и литература', 'Найдите слова из текста в сетке букв', 'Узнавание слов, орфография', 'Не нужна—ученики пишут слова, которые учили'],
+        ['Математика', 'Напишите цифры и математические термины', 'Названия операций, форм, понятий', 'Не нужна—адаптируется к любым числам'],
+        ['Естественные науки', 'Найдите ключевые термины из раздела', 'Научная лексика, закрепление', 'Не нужна—работает с любой темой'],
+        ['История и обществознание', 'Поиск людей, мест, событий', 'Историческая лексика, повторение', 'Не нужна—работает в любой период'],
+        ['Иностранный язык', 'Словесные головоломки на изучаемом языке', 'Словесные паттерны, написание', 'Не нужна—поддерживает все языки'],
+        ['Искусство и дизайн', 'Игра со словами о цветах и техниках', 'Язык дизайна, описательные слова', 'Не нужна—работает во всех стилях'],
       ],
     },
     {
@@ -902,18 +902,18 @@ const RU: EducationLandingContent = {
       intro: 'Три шага в первый день. Потом работает само.',
       items: [
         {
-          step: 'Шаг 1: Создай свой класс',
-          focus: 'Выбери код класса. Ученики присоединяются по коду.',
+          step: 'Шаг 1: Создайте свой класс',
+          focus: 'Выберите код класса. Ученики присоединяются по коду.',
           activity: '60 секунд. Без списка email. Один код работает весь год.',
         },
         {
-          step: 'Шаг 2: Покажи одну игру всему классу',
+          step: 'Шаг 2: Покажите одну игру всему классу',
           focus: '2-минутная демонстрация, чтобы они знали, что делать.',
-          activity: 'Сыграй один раунд вместе. Покажи сетку, как найти слово, что происходит при выигрыше. Всё.',
+          activity: 'Сыграйте один раунд вместе. Покажите сетку, как найти слово, что происходит при выигрыше. Всё.',
         },
         {
           step: 'Шаг 3: Карточка с инструкциями в классе',
-          focus: 'Напечатай или проецируй три слова: "Закончил? Играй в LexiClash."',
+          focus: 'Напечатайте или проецируйте три слова: "Закончил? Играй в LexiClash."',
           activity: 'Ученики, закончившие работу, идут к устройству и присоединяются с кодом класса. Играют. Без перерывов.',
         },
       ],
@@ -932,7 +932,7 @@ const RU: EducationLandingContent = {
         },
         {
           icon: 'graduation',
-          text: 'Каждое найденное слово из твоего урока—обучение продолжается, не прерывается.',
+          text: 'Каждое найденное слово из вашего урока—обучение продолжается, не прерывается.',
         },
         {
           icon: 'monitor',
@@ -940,7 +940,7 @@ const RU: EducationLandingContent = {
         },
         {
           icon: 'book',
-          text: 'Панель учителя показывает, какие слова пропустил каждый ученик—можешь преподавать их на следующей неделе.',
+          text: 'Панель учителя показывает, какие слова пропустил каждый ученик—вы можете преподавать их на следующей неделе.',
         },
         {
           icon: 'zap',
@@ -952,7 +952,7 @@ const RU: EducationLandingContent = {
   faqs: [
     {
       q: 'Будут ли они торопиться с основной работой, чтобы поиграть?',
-      a: 'Некоторые будут, поначалу. Установи чёткие правила: "Ты должен закончить работу правильно, прежде чем играть." Используй контрольный список, чтобы они знали, что значит "закончено". После недели это становится нормой. Большинство учителей говорят, что игра мотивирует медленных учеников, потому что они видят, как играют одноклассники.',
+      a: 'Некоторые будут, поначалу. Установите чёткие правила: "Вы должны закончить работу правильно, прежде чем играть." Используйте контрольный список, чтобы они знали, что значит "закончено". После недели это становится нормой. Большинство учителей говорят, что игра мотивирует медленных учеников, потому что они видят, как играют одноклассники.',
     },
     {
       q: 'Это безопасно? Есть ли чат или внешние ссылки?',
@@ -968,19 +968,19 @@ const RU: EducationLandingContent = {
     },
     {
       q: 'Что если у меня нет устройств в классе?',
-      a: 'Тебе нужно хотя бы одно устройство (телефон или планшет), которым ученики могут делиться. Многие классы имеют набор Chromebook или общий iPad. LexiClash работает на всех.',
+      a: 'Вам нужно хотя бы одно устройство (телефон или планшет), которым ученики могут делиться. Многие классы имеют набор Chromebook или общий iPad. LexiClash работает на всех.',
     },
     {
       q: 'Могу ли я использовать один и тот же код весь год?',
-      a: 'Да, один и тот же код весь год. Ученикам не нужно его запоминать—ты пишешь его на доске один раз, и он остаётся там. Они используют его каждый раз, когда закончат раньше.',
+      a: 'Да, один и тот же код весь год. Ученикам не нужно его запоминать—вы пишете его на доске один раз, и он остаётся там. Они используют его каждый раз, когда закончат раньше.',
     },
     {
-      q: 'Я вижу, что они играют?',
-      a: 'Да. Твоя панель учителя показывает баллы, какие слова они нашли и какие пропустили. Используй это для выбора лексики на следующую неделю.',
+      q: 'Смогу ли я увидеть, во что они играли?',
+      a: 'Да. Ваша панель учителя показывает баллы, какие слова они нашли и какие пропустили. Используйте это для выбора лексики на следующую неделю.',
     },
     {
       q: 'Что если ученики, закончившие раньше, просто отвлекают, а не учебный пробел?',
-      a: 'Дай им более сложные слова или установи более высокий показатель баллов. LexiClash адаптируется к разным уровням. Или чередуй: некоторые играют, другие читают, третьи занимаются математикой. Игра—одна из станций в твоей системе.',
+      a: 'Дайте им более сложные слова или установите более высокий показатель баллов. LexiClash адаптируется к разным уровням. Или чередуйте: некоторые играют, другие читают, третьи занимаются математикой. Игра—одна из станций в вашей системе.',
     },
   ],
   labels: {

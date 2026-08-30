@@ -31,8 +31,8 @@ const content: Record<EducationLocale, LocaleContent> = {
     metaDescription: 'Free ESL vocabulary games online, scaled by CEFR level (A1–C2) for English learners. Build spelling, phonics, and vocabulary with live multiplayer competition and a teacher dashboard — no app, no per-student fees.',
     ogTitle: 'Free ESL Word Games for English Learners',
     ogDescription: 'Live multiplayer word games for the classroom. Free student accounts, 5 dictionaries, teacher dashboard.',
-    twitterDescription: 'Free ESL/EFL word games for the classroom. Live multiplayer, 5 languages, teacher dashboard.',
-    heroTag: '★ ESL / EFL ★ Free Forever ★',
+    twitterDescription: 'Free ESL/EFL word games for the classroom. Live multiplayer, 6 languages, teacher dashboard.',
+    heroTag: '★ ESL / EFL ★ Free To Start ★',
     heroH1: {
       highlight: 'ESL',
       rest1: 'Word Games.',
@@ -44,12 +44,12 @@ const content: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '🌍', text: 'Five built-in dictionaries: English, Spanish, Hebrew (RTL), Swedish, Japanese' },
       { icon: '⚡', text: 'Free student accounts — quick one-time setup, then tracks progress forever' },
-      { icon: '👥', text: 'Live multiplayer up to 30 students; pair-up duels for 2-by-2 practice' },
+      { icon: '👥', text: 'Live multiplayer a whole class; pair-up duels for 2-by-2 practice' },
       { icon: '📈', text: 'Per-student accuracy + class-wide missed-word patterns' },
       { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Works on any phone, tablet, Chromebook, or laptop browser' },
       { icon: '⏱️', text: '5-minute warm-up format fits any lesson plan' },
-      { icon: '💸', text: 'Free to play — no per-seat fee, no student logins' },
+      { icon: '💸', text: 'Free to start — no student logins; free tier covers 3 classes of 10' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Beginner', desc: '3-4 letter words, longer timer, sight-word focus. Use the Word Wheel mode for guided practice.' },
@@ -97,7 +97,7 @@ const content: Record<EducationLocale, LocaleContent> = {
     ogTitle: 'משחקי אנגלית חינמיים',
     ogDescription: 'משחקי אנגלית בזמן אמת. חשבונות חינמיים, 5 מילונים, לוח מורה.',
     twitterDescription: 'משחקי אנגלית מרובי משתתפים לכיתה, בחינם.',
-    heroTag: '★ אנגלית כשפה זרה ★ חינם לתמיד ★',
+    heroTag: '★ אנגלית כשפה זרה ★ חינם להתחלה ★',
     heroH1: {
       highlight: 'אנגלית',
       rest1: 'משחקי מילים.',
@@ -109,7 +109,7 @@ const content: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '🌍', text: '5 מילונים: אנגלית, ספרדית, עברית (RTL), שוודית, יפנית' },
       { icon: '⚡', text: 'חשבונות חינמיים — הגדרה מהירה, ואז מעקב התקדמות' },
-      { icon: '👥', text: 'ריבוי משתתפים חי — עד 30 תלמידים; דו־קרבות בזוגות' },
+      { icon: '👥', text: 'ריבוי משתתפים חי — כל הכיתה; דו־קרבות בזוגות' },
       { icon: '📈', text: 'דיוק לכל תלמיד + מילים קשות לכל הכיתה' },
       { icon: '🎯', text: '3 משחקים: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'טלפון, טאבלט, Chromebook, כל דפדפן' },
@@ -158,7 +158,7 @@ const content: Record<EducationLocale, LocaleContent> = {
   },
   es: {
     metaTitle: 'Juegos de Vocabulario en Inglés Gratis Online — ESL | LexiClash',
-    metaDescription: 'Juegos de vocabulario en inglés gratis y en vivo — ortografía, lectura, fluidez. Gratis para estudiantes. Sala en 10 seg, sin descarga, 5 idiomas.',
+    metaDescription: 'Juegos de vocabulario en inglés gratis y en vivo — ortografía, lectura, fluidez. Gratis para estudiantes. Sala en 10 seg, sin descarga, 6 idiomas.',
     ogTitle: 'Juegos de Vocabulario en Inglés Gratis',
     ogDescription: 'Juegos de palabras en vivo para estudiantes de inglés. Cuentas gratis, 5 diccionarios, panel de maestro.',
     twitterDescription: 'Juegos de inglés multijugador gratis para la clase.',
@@ -174,12 +174,12 @@ const content: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '🌍', text: '5 diccionarios: inglés, español, hebreo (RTL), sueco, japonés' },
       { icon: '⚡', text: 'Cuentas gratis — solo una vez, luego sigue el progreso' },
-      { icon: '👥', text: 'Multijugador — hasta 30 estudiantes; duelos de parejas' },
+      { icon: '👥', text: 'Multijugador — toda la clase; duelos de parejas' },
       { icon: '📈', text: 'Precisión por alumno + palabras difíciles de la clase' },
       { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Teléfono, tableta, Chromebook, cualquier navegador' },
       { icon: '⏱️', text: 'Calentamiento de 5 minutos — cualquier plan' },
-      { icon: '💸', text: 'Gratis para jugar — sin cargo por alumno, sin cuentas' },
+      { icon: '💸', text: 'Gratis para empezar — sin cuentas de alumnado; 3 clases de 10 en el plan gratuito' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Principiante', desc: 'Palabras cortas, tiempo largo, palabras de vista. Word Wheel para práctica guiada.' },
@@ -242,13 +242,13 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Vanliga Frågor',
     features: [
       { icon: '🌍', text: '5 ordböcker: engelska, spanska, hebreiska (RTL), svenska, japanska' },
-      { icon: '⚡', text: 'Gratis konton — snabb setup, sedan förlopp för alltid' },
-      { icon: '👥', text: 'Flerspelar — upp till 30 elever; pardueller' },
+      { icon: '⚡', text: 'Gratis konton — snabb setup, sedan sparas framstegen' },
+      { icon: '👥', text: 'Flerspelar — hela klassen; pardueller' },
       { icon: '📈', text: 'Noggrannhet per elev + klassens svåra ord' },
       { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Telefon, surfplatta, Chromebook, vilken webbläsare som helst' },
       { icon: '⏱️', text: 'Uppvärmning på 5 minuter — vilken lektion som helst' },
-      { icon: '💸', text: 'Gratis att spela — ingen avgift per elev, inga konton' },
+      { icon: '💸', text: 'Gratis att börja — inga elevkonton; 3 klasser med 10 elever i gratisnivån' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Nybörjare', desc: 'Korta ord, längre timer, sight-ord. Word Wheel för guidad övning.' },
@@ -291,7 +291,7 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   ja: {
-    metaTitle: '無料英語ゲーム — マルチプレイヤー、5言語 | LexiClash',
+    metaTitle: '無料英語ゲーム — マルチプレイヤー、6言語 | LexiClash',
     metaDescription: '教室向け無料英語ゲーム。リアルタイムマルチプレイヤー、1v1、自分のリスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語。どのブラウザでも。',
     ogTitle: '無料英語学習ゲーム',
     ogDescription: '英語学習者向けマルチプレイヤーゲーム。無料、5つの辞書、先生用ダッシュボード。',
@@ -378,7 +378,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: 'Три игровых режима: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Работает на любом телефоне, планшете, Chromebook или веб-браузере' },
       { icon: '⏱️', text: 'Формат 5 минут подходит для любого плана урока' },
-      { icon: '💸', text: 'Бесплатно играть — без платы за ученика, без аккаунтов' },
+      { icon: '💸', text: 'Бесплатный старт — без аккаунтов учеников; 3 класса по 10 в бесплатном тарифе' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Начинающий', desc: 'Слова из 3–4 букв, более длительный таймер, обычные слова. Word Wheel для направленной практики.' },

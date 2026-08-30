@@ -190,3 +190,17 @@ describe('buildEducationLandingJsonLd', () => {
     expect(provider['@id']).toBe(`${EDUCATION_BASE_URL}/en/education#org`);
   });
 });
+
+describe('hreflang agreement between the page and the sitemap', () => {
+  it('emits exactly the alternates the sitemap declares for the same path', async () => {
+    // Two sources of truth for the same annotation is the bug this whole file
+    // exists to prevent. The sitemap advertises regional variants (en-GB, es-MX,
+    // ru-RU ...); if the page's own <link rel="alternate"> set is narrower,
+    // the annotations disagree and Google discards the cluster.
+    const { hreflangAlternates } = await import('../hreflang');
+    const m = buildEducationLandingMetadata({ locale: 'en', path: PATH, content: content() });
+    const fromPage = Object.keys(m.alternates?.languages as Record<string, string>).sort();
+    const fromSitemap = Object.keys(hreflangAlternates(PATH)).sort();
+    expect(fromPage).toEqual(fromSitemap);
+  });
+});

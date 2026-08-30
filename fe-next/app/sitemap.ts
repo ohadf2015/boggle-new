@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { hreflangAlternates } from '@/lib/seo/hreflang';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
@@ -18,28 +19,11 @@ type SitemapOpts = {
   images?: string[];
 };
 
-// Helper: generate hreflang alternates for a given path
+// Helper: generate hreflang alternates for a given path.
+// Delegates to lib/seo/hreflang so the sitemap and each page's own
+// <link rel="alternate"> set can never drift apart again.
 function langAlternates(path: string): Record<string, string> {
-  const alts: Record<string, string> = { 'x-default': `${BASE_URL}/en${path}` };
-  LOCALES.forEach((l) => { alts[l] = `${BASE_URL}/${l}${path}`; });
-  alts['en-IL'] = `${BASE_URL}/en${path}`;
-  alts['he-IL'] = `${BASE_URL}/he${path}`;
-  alts['en-US'] = `${BASE_URL}/en${path}`;
-  alts['es-US'] = `${BASE_URL}/es${path}`;
-  alts['en-GB'] = `${BASE_URL}/en${path}`;
-  alts['en-SE'] = `${BASE_URL}/en${path}`;
-  alts['sv-SE'] = `${BASE_URL}/sv${path}`;
-  alts['en-JP'] = `${BASE_URL}/en${path}`;
-  alts['ja-JP'] = `${BASE_URL}/ja${path}`;
-  alts['en-ES'] = `${BASE_URL}/en${path}`;
-  alts['es-ES'] = `${BASE_URL}/es${path}`;
-  alts['en-MX'] = `${BASE_URL}/en${path}`;
-  alts['es-MX'] = `${BASE_URL}/es${path}`;
-  alts['en-AU'] = `${BASE_URL}/en${path}`;
-  alts['es-AR'] = `${BASE_URL}/es${path}`;
-  alts['es-CO'] = `${BASE_URL}/es${path}`;
-  alts['ru-RU'] = `${BASE_URL}/ru${path}`;
-  return alts;
+  return hreflangAlternates(path);
 }
 
 // Helper: add a route for all locales

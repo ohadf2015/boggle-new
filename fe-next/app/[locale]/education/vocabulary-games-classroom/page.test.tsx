@@ -14,7 +14,7 @@ describe('vocabulary-games-classroom page', () => {
       // Assert Hebrew content is rendered
       // Updated to match actual polished content: features now say "דו־קרבות 1v1"
       expect(text).toContain('דו־קרבות 1v1');
-      expect(text).toContain('5 שפות'); // Five languages from metadataLabels
+      expect(text).toContain('6 שפות'); // Six locales ship: en he sv ja es ru
       expect(text).toContain('דו־קרבות'); // 1v1 duels
 
       // Assert English hardcoded strings are NOT present (these would indicate hardcoding)
@@ -32,8 +32,8 @@ describe('vocabulary-games-classroom page', () => {
 
       // Assert Spanish content is rendered
       expect(text).toContain('Cuentas de estudiantes gratis');
-      // Updated to match polished content: "5 idiomas" not "Cinco idiomas"
-      expect(text).toContain('5 idiomas');
+      // Six locales ship (en he sv ja es ru) — this used to assert "5 idiomas"
+      expect(text).toContain('6 idiomas');
       // Updated to match actual feature text: "Duelos 1v1"
       expect(text).toContain('Duelos 1v1');
     });

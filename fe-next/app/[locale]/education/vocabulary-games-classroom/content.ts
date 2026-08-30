@@ -45,13 +45,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   en: {
     metaTitle: 'Free Classroom Vocabulary Games — Live Multiplayer, 5 Languages | LexiClash',
     metaDescription:
-      'Free vocabulary games for the classroom. Live whole-class multiplayer, 1v1 vocabulary duels, and custom curriculum word lists. Supports English, Spanish, Hebrew, Swedish, and Japanese. Runs in any browser. Free forever.',
+      'Free vocabulary games for the classroom. Live whole-class multiplayer, 1v1 vocabulary duels, and custom curriculum word lists. Supports English, Spanish, Hebrew, Swedish, and Japanese. Runs in any browser. Free to start.',
     ogTitle: 'Free Vocabulary Games for Classrooms',
     ogDescription:
-      'Live multiplayer vocabulary games for teachers. Whole-class challenges, 1v1 duels, custom word lists, 5 languages. Student accounts always free.',
+      'Live multiplayer vocabulary games for teachers. Whole-class challenges, 1v1 duels, custom word lists, 6 languages. Student accounts always free.',
     twitterDescription:
-      'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, five languages — student accounts are always free.',
-    heroTag: '★ For Teachers ★ Free Forever ★',
+      'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, six languages — student accounts are always free.',
+    heroTag: '★ For Teachers ★ Free To Start ★',
     heroH1: {
       line1: 'Free',
       highlight: 'Vocabulary',
@@ -59,14 +59,14 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'Free accounts.',
     },
     heroSubtitle:
-      'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, five languages — student accounts are always free.',
+      'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, six languages — student accounts are always free.',
     ctaSubLabel: 'Free · Student accounts free',
     whyTitle: 'Why teachers pick LexiClash',
     whyPoints: [
       'Free student accounts. Quick signup, then tracks XP and progress forever.',
       'Word-formation, not flashcards. Beats Quizlet for spelling + recall.',
-      'Five languages with full dictionaries. ESL, Hebrew immersion, Spanish bilingual — all native.',
-      'Free tier = full features. No premium upsell, no ads in classroom.',
+      'Six languages with full dictionaries. ESL, Hebrew immersion, Spanish bilingual — all native.',
+      'Free tier: 3 classes, 10 students each. No ads in the classroom.',
     ],
     faqTitle: 'Frequently Asked Questions',
     faqs: [
@@ -98,12 +98,12 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '⚡', text: 'Free student accounts — quick signup, tracks XP and progress across sessions' },
       { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
-      { icon: '👥', text: 'Live multiplayer up to 30 students per session' },
+      { icon: '👥', text: 'Live multiplayer a whole class per session' },
       { icon: '⚔️', text: '1v1 vocabulary duels for paired practice or sub-team rounds' },
       { icon: '📚', text: 'Upload your own curriculum word lists — any unit, any subject' },
-      { icon: '🌍', text: 'Five languages: English, Hebrew (RTL), Spanish, Swedish, Japanese' },
+      { icon: '🌍', text: 'Six languages: English, Hebrew (RTL), Spanish, Swedish, Japanese, Russian' },
       { icon: '📊', text: 'Teacher dashboard: per-student accuracy + missed-word patterns' },
-      { icon: '💸', text: 'Free tier covers everything — no premium upsell' },
+      { icon: '💸', text: 'Free tier: 3 classes of 10 — Teacher Pro ($9/mo) lifts the student cap' },
     ],
     compareRows: [
       ['Free tier (full features)', '✓', 'Limited', '✓ basic', 'Limited'],
@@ -111,7 +111,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['Word-formation gameplay', '✓ Boggle/Wheel/Anagram', '✗ flashcards', '✗ templates', '✗ quizzes'],
       ['Live whole-class multiplayer', '✓', '✓ paid', '✗', '✓'],
       ['1v1 vocabulary duels', '✓', '✓ paid', '✗', '✗'],
-      ['5 languages incl. RTL', '✓', '✗', '✗', '✗'],
+      ['6 languages incl. RTL', '✓', '✗', '✗', '✗'],
       ['Custom word lists', '✓', '✓', '✓', '✓'],
       ['Class analytics dashboard', '✓ free', '✓ paid', 'Basic', '✓ paid'],
     ],
@@ -126,7 +126,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Start Classroom Game',
     ctaSecondaryButtonLabel: 'See Education Hub',
     metadataLabels: {
-      languages: '5 languages',
+      languages: '6 languages',
       gradeLevel: 'K-12 + adult ESL',
       accounts: 'free student accounts',
       duration: '5-min sessions',
@@ -140,15 +140,15 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   },
 
   he: {
-    metaTitle: 'משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 5 שפות | LexiClash',
+    metaTitle: 'משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 6 שפות | LexiClash',
     metaDescription:
       'משחקי אוצר מילים חינמיים לכיתה. ריבוי משתתפים חי בכיתה שלמה, דו־קרבות אוצר מילים 1v1, ורשימות מילים מהתוכנית. אנגלית, ספרדית, עברית, שוודית, יפנית. כל דפדפן. לתמיד חינם.',
     ogTitle: 'משחקי אוצר מילים חינמיים לכיתה',
     ogDescription:
-      'משחקי ריבוי משתתפים חיים למורים. אתגרים לכיתה שלמה, דו־קרבות 1v1, רשימות מילים משלכם, 5 שפות. חשבונות תלמידים תמיד חינמיים.',
+      'משחקי ריבוי משתתפים חיים למורים. אתגרים לכיתה שלמה, דו־קרבות 1v1, רשימות מילים משלכם, 6 שפות. חשבונות תלמידים תמיד חינמיים.',
     twitterDescription:
-      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 5 שפות — חשבונות תלמידים חינמיים לתמיד.',
-    heroTag: '★ למורים ★ חינם לתמיד ★',
+      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 6 שפות — חשבונות תלמידים חינמיים לתמיד.',
+    heroTag: '★ למורים ★ חינם להתחלה ★',
     heroH1: {
       line1: 'חינם',
       highlight: 'אוצר מילים',
@@ -156,13 +156,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'חשבונות חינמיים.',
     },
     heroSubtitle:
-      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 5 שפות — חשבונות תלמידים חינמיים לתמיד.',
+      'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 6 שפות — חשבונות תלמידים חינמיים לתמיד.',
     ctaSubLabel: 'חינם · חשבונות תלמידים חינמיים',
     whyTitle: 'למה מורים בוחרים ב־LexiClash',
     whyPoints: [
       'חשבונות תלמידים חינמיים. הרשמה של 30 שניות, ואז מעקב אחר ההתקדמות לתמיד.',
       'משחקי בניית מילים, לא כרטיסיות. עדיף מ־Quizlet לאיות ולזיכרון.',
-      '5 שפות עם מילונים מלאים. ESL, הטמעת עברית, ספרדית דו־לשונית — הכל בשפת אם.',
+      '6 שפות עם מילונים מלאים. ESL, הטמעת עברית, ספרדית דו־לשונית — הכל בשפת אם.',
       'כל התכונות בחינם. בלי פרימיום, בלי פרסומות בכיתה.',
     ],
     faqTitle: 'שאלות נפוצות',
@@ -195,10 +195,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '⚡', text: 'חשבונות חינמיים — הרשמה של 30 שניות, ומעקב מלא אחר ההתקדמות בכל משחק' },
       { icon: '🎯', text: '3 משחקים: Boggle, Word Hunt, Word Wheel' },
-      { icon: '👥', text: 'ריבוי משתתפים חי — עד 30 תלמידים במשחק אחד' },
+      { icon: '👥', text: 'ריבוי משתתפים חי — כל הכיתה במשחק אחד' },
       { icon: '⚔️', text: 'דו־קרבות 1v1 לתרגול בזוגות או בסבבי קבוצות' },
       { icon: '📚', text: 'העלו את רשימות המילים שלכם — כל יחידה, כל מקצוע' },
-      { icon: '🌍', text: '5 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית' },
+      { icon: '🌍', text: '6 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית' },
       { icon: '📊', text: 'לוח מורה: דיוק לכל תלמיד + אנליטיקה של מילים קשות' },
       { icon: '💸', text: 'הכל בחינם — אין פרמיום' },
     ],
@@ -208,7 +208,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['משחקי יצירת מילים', '✓ Boggle/Wheel/Anagram', '✗ כרטיסיות', '✗ תבניות', '✗ חידונים'],
       ['ריבוי משתתפים חי', '✓', '✓ בתשלום', '✗', '✓'],
       ['דו־קרבות 1v1', '✓', '✓ בתשלום', '✗', '✗'],
-      ['5 שפות + RTL', '✓', '✗', '✗', '✗'],
+      ['6 שפות + RTL', '✓', '✗', '✗', '✗'],
       ['רשימות מילים משלכם', '✓', '✓', '✓', '✓'],
       ['לוח אנליטיקה למורה', '✓ חינם', '✓ בתשלום', 'בסיסי', '✓ בתשלום'],
     ],
@@ -223,7 +223,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ התחילו משחק כיתה',
     ctaSecondaryButtonLabel: 'למרכז החינוך',
     metadataLabels: {
-      languages: '5 שפות',
+      languages: '6 שפות',
       gradeLevel: 'כל הגילאים',
       accounts: 'חשבונות תלמידים חינמיים',
       duration: 'סשנים של 5 דקות',
@@ -237,14 +237,14 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   },
 
   es: {
-    metaTitle: 'Juegos de vocabulario gratis para el aula — Multijugador en vivo, 5 idiomas | LexiClash',
+    metaTitle: 'Juegos de vocabulario gratis para el aula — Multijugador en vivo, 6 idiomas | LexiClash',
     metaDescription:
       'Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. Inglés, español, hebreo, sueco, japonés. Cualquier navegador. Gratis siempre.',
     ogTitle: 'Juegos de vocabulario gratis para el aula',
     ogDescription:
-      'Juegos de vocabulario en vivo para maestros. Desafíos para toda la clase, duelos 1v1, tus listas, 5 idiomas. Cuentas de estudiantes siempre gratis.',
+      'Juegos de vocabulario en vivo para maestros. Desafíos para toda la clase, duelos 1v1, tus listas, 6 idiomas. Cuentas de estudiantes gratis para empezar.',
     twitterDescription:
-      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 5 idiomas — cuentas de estudiantes siempre gratis.',
+      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 6 idiomas — cuentas de estudiantes gratis para empezar.',
     heroTag: '★ Para Maestros ★ Gratis Siempre ★',
     heroH1: {
       line1: 'Gratis',
@@ -253,13 +253,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'Cuentas gratis.',
     },
     heroSubtitle:
-      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 5 idiomas — cuentas de estudiantes siempre gratis.',
+      'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 6 idiomas — cuentas de estudiantes gratis para empezar.',
     ctaSubLabel: 'Gratis · Cuentas de estudiantes gratis',
     whyTitle: 'Por qué los maestros eligen LexiClash',
     whyPoints: [
       'Cuentas gratis. Registro en 30 segundos, luego sigue el progreso para siempre.',
       'Formar palabras, no tarjetas. Mejor que Quizlet para ortografía y memoria.',
-      '5 idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.',
+      '6 idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.',
       'Todo gratis. Sin premium, sin anuncios en clase.',
     ],
     faqTitle: 'Preguntas Frecuentes',
@@ -292,10 +292,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '⚡', text: 'Cuentas gratis — registro rápido, sigue el progreso en todas las sesiones' },
       { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
-      { icon: '👥', text: 'Multijugador en vivo — hasta 30 estudiantes por sesión' },
+      { icon: '👥', text: 'Multijugador en vivo — toda la clase por sesión' },
       { icon: '⚔️', text: 'Duelos 1v1 para parejas o equipos' },
       { icon: '📚', text: 'Carga tus listas — cualquier unidad, cualquier materia' },
-      { icon: '🌍', text: '5 idiomas: inglés, hebreo (RTL), español, sueco, japonés' },
+      { icon: '🌍', text: '6 idiomas: inglés, hebreo (RTL), español, sueco, japonés, ruso' },
       { icon: '📊', text: 'Panel de maestro: precisión por alumno + palabras difíciles' },
       { icon: '💸', text: 'Todo gratis — sin premium' },
     ],
@@ -305,7 +305,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['Juegos de palabras', '✓ Boggle/Wheel/Anagrama', '✗ tarjetas', '✗ plantillas', '✗ cuestionarios'],
       ['Multijugador', '✓', '✓ pago', '✗', '✓'],
       ['Duelos 1v1', '✓', '✓ pago', '✗', '✗'],
-      ['5 idiomas + RTL', '✓', '✗', '✗', '✗'],
+      ['6 idiomas + RTL', '✓', '✗', '✗', '✗'],
       ['Tus listas', '✓', '✓', '✓', '✓'],
       ['Panel analítico', '✓ gratis', '✓ pago', 'Básico', '✓ pago'],
     ],
@@ -320,7 +320,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Iniciar juego de clase',
     ctaSecondaryButtonLabel: 'Ver Hub educativo',
     metadataLabels: {
-      languages: '5 idiomas',
+      languages: '6 idiomas',
       gradeLevel: 'Grados 4-12 + ESL adultos',
       accounts: 'cuentas de estudiantes gratis',
       duration: 'sesiones de 5 minutos',
@@ -336,7 +336,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   sv: {
     metaTitle: 'Gratis ordförråd spel för klassrummet — Live multiplayer, 5 språk | LexiClash',
     metaDescription:
-      'Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. Engelska, spanska, hebreiska, svenska, japanska. Vilken webbläsare som helst. Gratis för alltid.',
+      'Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. Engelska, spanska, hebreiska, svenska, japanska. Vilken webbläsare som helst. Gratis att börja.',
     ogTitle: 'Gratis ordförråd spel för klassrummet',
     ogDescription:
       'Live multiplayer ordförråd spel för lärare. Helklassutmaningar, 1v1 dueller, dina ordlistor, 5 språk. Studentkonton alltid gratis.',
@@ -354,7 +354,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaSubLabel: 'Gratis · Studentkonton gratis',
     whyTitle: 'Varför lärare väljer LexiClash',
     whyPoints: [
-      'Gratis studentkonton. Registrering på 30 sekunder, sedan framsteg för alltid.',
+      'Gratis studentkonton. Registrering på 30 sekunder, sedan framstegen sparas.',
       'Ordbildning, inte flashkort. Bättre än Quizlet för stavning och minne.',
       '5 språk med kompletta ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.',
       'Allt gratis. Ingen premium, inga annonser i klassrummet.',
@@ -389,10 +389,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '⚡', text: 'Gratis konton — registrering på 30 sekunder, spårar framsteg alltid' },
       { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
-      { icon: '👥', text: 'Live multiplayer — upp till 30 elever per spel' },
+      { icon: '👥', text: 'Live multiplayer — hela klassen per spel' },
       { icon: '⚔️', text: '1v1 dueller för par eller lag' },
       { icon: '📚', text: 'Dina ordlistor — vilken enhet, vilket ämne som helst' },
-      { icon: '🌍', text: '5 språk: engelska, hebreiska (RTL), spanska, svenska, japanska' },
+      { icon: '🌍', text: '5 språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska' },
       { icon: '📊', text: 'Lärarpanel: precision per elev + vilka ord som är svåra' },
       { icon: '💸', text: 'Allt gratis — ingen premium' },
     ],
@@ -431,14 +431,14 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   },
 
   ja: {
-    metaTitle: '無料の教室向け語彙ゲーム — ライブマルチプレイヤー、5言語 | LexiClash',
+    metaTitle: '無料の教室向け語彙ゲーム — ライブマルチプレイヤー、6言語 | LexiClash',
     metaDescription:
       '無料で使える教室向けの語彙ゲーム。ライブマルチプレイヤー、1v1デュエル、自分の単語リスト。英語、スペイン語、ヘブライ語、スウェーデン語、日本語対応。どのブラウザでも動作。ずっと無料。',
     ogTitle: '無料の教室向け語彙ゲーム',
     ogDescription:
-      '先生向けのライブ語彙ゲーム。クラス全体チャレンジ、1v1デュエル、自分の単語リスト、5言語。学生アカウントはいつも無料。',
+      '先生向けのライブ語彙ゲーム。クラス全体チャレンジ、1v1デュエル、自分の単語リスト、6言語。学生アカウントはいつも無料。',
     twitterDescription:
-      '先生が実際に使う教室向け語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、5言語 — 学生アカウントはいつも無料。',
+      '先生が実際に使う教室向け語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、6言語 — 学生アカウントはいつも無料。',
     heroTag: '★ 先生向け ★ ずっと無料 ★',
     heroH1: {
       line1: '無料の',
@@ -447,14 +447,14 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: '無料アカウント。',
     },
     heroSubtitle:
-      '先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、5言語 — 学生アカウントはいつも無料。',
+      '先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、6言語 — 学生アカウントはいつも無料。',
     ctaSubLabel: '無料 · 学生アカウント無料',
     whyTitle: 'LexiClashが選ばれる理由',
     whyPoints: [
       '無料。30秒で登録して、あとはずっと成績が記録される。',
       '単語を作るゲーム。フラッシュカードじゃない。スペリングと記憶で Quizlet より優れている。',
-      '5言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。',
-      'すべて無料。プレミアムなし、授業中に広告なし。',
+      '6言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。',
+      '無料プランは3クラス・各10人まで。授業中に広告は出ません。',
     ],
     faqTitle: 'よくある質問',
     faqs: [
@@ -489,17 +489,17 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       { icon: '👥', text: 'ライブマルチプレイヤー — 1セッション最大30人' },
       { icon: '⚔️', text: '1v1 デュエル — ペアや小グループ練習向け' },
       { icon: '📚', text: 'あなたの単語リスト — どの単元、どの科目でも' },
-      { icon: '🌍', text: '5言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語' },
+      { icon: '🌍', text: '6言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語' },
       { icon: '📊', text: '先生用ダッシュボード：生徒ごとの成績 + 苦手な単語がわかる' },
-      { icon: '💸', text: 'すべて無料 — プレミアムなし' },
+      { icon: '💸', text: '無料プランは3クラス・各10人 — Teacher Pro（月$9）で上限解除' },
     ],
     compareRows: [
-      ['すべて無料', '✓', '限定的', '✓ 基本', '限定的'],
+      ['無料プランあり', '✓', '限定的', '✓ 基本', '限定的'],
       ['無料アカウント', '✓ いつも', '✗ 有料', '✗ 有料', '✗ 有料'],
       ['単語ゲーム', '✓ Boggle/Wheel/Anagram', '✗ カード', '✗ テンプレート', '✗ クイズ'],
       ['ライブマルチプレイヤー', '✓', '✓ 有料', '✗', '✓'],
       ['1v1デュエル', '✓', '✓ 有料', '✗', '✗'],
-      ['5言語 + RTL', '✓', '✗', '✗', '✗'],
+      ['6言語 + RTL', '✓', '✗', '✗', '✗'],
       ['自分のリスト', '✓', '✓', '✓', '✓'],
       ['ダッシュボード', '✓ 無料', '✓ 有料', '基本', '✓ 有料'],
     ],
@@ -514,7 +514,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ クラスルームゲームを開始',
     ctaSecondaryButtonLabel: '教育ハブを見る',
     metadataLabels: {
-      languages: '5言語',
+      languages: '6言語',
       gradeLevel: '4-12年生 + 成人ESL',
       accounts: '無料の生徒アカウント',
       duration: '5分間のセッション',
@@ -530,13 +530,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
   ru: {
     metaTitle: 'Бесплатные словарные игры для класса — Живой мультиплеер, 6 языков | LexiClash',
     metaDescription:
-      'Бесплатные словарные игры для класса. Живой мультиплеер, дуэли 1v1, ваши списки слов. Английский, испанский, иврит, шведский, японский, русский. Любой браузер. Всегда бесплатно.',
+      'Бесплатные словарные игры для класса. Живой мультиплеер, дуэли 1v1, ваши списки слов. Английский, испанский, иврит, шведский, японский, русский. Любой браузер. Бесплатный старт.',
     ogTitle: 'Бесплатные словарные игры для класса',
     ogDescription:
       'Живые словарные игры для учителей. Конкурсы для целого класса, дуэли 1v1, ваши списки, 6 языков. Ученические аккаунты всегда бесплатны.',
     twitterDescription:
       'Словарная игра, которую действительно используют учителя. Живой мультиплеер, дуэли, ваши списки, 6 языков — ученические аккаунты всегда бесплатны.',
-    heroTag: '★ Для учителей ★ Всегда бесплатно ★',
+    heroTag: '★ Для учителей ★ Бесплатный старт ★',
     heroH1: {
       line1: 'Бесплатные',
       highlight: 'словарные',
@@ -583,7 +583,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     features: [
       { icon: '⚡', text: 'Бесплатные аккаунты — регистрация за 30 секунд, отслеживание прогресса всегда' },
       { icon: '🎯', text: '3 игры: Boggle, Word Hunt, Word Wheel' },
-      { icon: '👥', text: 'Живой мультиплеер — до 30 учеников за сеанс' },
+      { icon: '👥', text: 'Живой мультиплеер — весь класс за сеанс' },
       { icon: '⚔️', text: 'Дуэли 1v1 для парной практики или командных раундов' },
       { icon: '📚', text: 'Загружайте свои списки — любая тема, любой предмет' },
       { icon: '🌍', text: '6 языков: английский, иврит (RTL), испанский, шведский, японский, русский' },

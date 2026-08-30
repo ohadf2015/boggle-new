@@ -27,7 +27,7 @@ const en: LocaleContent = {
   metaTitle: 'Word Games for the Classroom — Free, No Login, No Download (2026) | LexiClash',
   metaDescription: 'Free word games for the classroom with no login and no download. Students join live multiplayer games with a 4-digit code in seconds. Use your own word lists, 6 languages, works on any device. Zero prep for teachers.',
   ogTitle: 'Word Games for the Classroom — Free, No Login',
-  ogDescription: 'Live multiplayer word games students join with a code. No download, no signup. Any device. Free forever.',
+  ogDescription: 'Live multiplayer word games students join with a code. No download, no signup. Any device. Free to start.',
   twitterTitle: 'Word Games for the Classroom — Free',
   twitterDescription: 'Live multiplayer word games. No login, no download. Free.',
   heroTitle: 'Word games for the classroom — no login, no download, no prep.',
@@ -97,7 +97,7 @@ const en: LocaleContent = {
     },
     {
       q: 'How much does it cost?',
-      a: 'Free to start — no ads, no login wall, no per-seat fees. Basic classroom play stays free for individual teachers; Teacher Pro ($9/mo) adds unlimited classes.'
+      a: 'Free to start — no ads and no login wall. Basic classroom play stays free for individual teachers; Teacher Pro ($9/mo) adds unlimited classes.'
     },
     {
       q: 'Will it work on our school WiFi?',
@@ -333,7 +333,7 @@ const es: LocaleContent = {
   metaTitle: 'Juegos de palabras para el aula — Gratis, Sin inicio de sesion, Sin descargas | LexiClash',
   metaDescription: 'Juegos de palabras gratuitos para el aula sin inicio de sesion y sin descargas. Los estudiantes se unen a juegos multijugador en vivo con un codigo de 4 digitos en segundos. Utilice sus propias listas de palabras, 6 idiomas, funciona en cualquier dispositivo. Cero preparacion para los maestros.',
   ogTitle: 'Juegos de palabras para el aula — Gratis, Sin inicio de sesion',
-  ogDescription: 'Juegos de palabras multijugador en vivo a los que se unen con un codigo. Sin descarga, sin registro. Cualquier dispositivo. Siempre gratis.',
+  ogDescription: 'Juegos de palabras multijugador en vivo a los que se unen con un codigo. Sin descarga, sin registro. Cualquier dispositivo. Gratis para empezar.',
   twitterTitle: 'Juegos de palabras para el aula — Gratis',
   twitterDescription: 'Juegos de palabras multijugador en vivo. Sin inicio de sesion, sin descargas. Gratis.',
   heroTitle: 'Juegos de palabras para el aula — sin inicio de sesion, sin descargas, sin preparacion.',
@@ -537,7 +537,7 @@ const ru: LocaleContent = {
   metaTitle: 'Словесные игры для класса — Бесплатно, без входа, без загрузки | LexiClash',
   metaDescription: 'Бесплатные словесные игры для класса без входа и загрузки. Ученики присоединяются к живым многопользовательским играм с 4-значным кодом за считанные секунды. Используйте собственные списки слов, 6 языков, работает на любом устройстве. Нулевая подготовка для учителей.',
   ogTitle: 'Словесные игры для класса — Бесплатно, без входа',
-  ogDescription: 'Живые многопользовательские словесные игры, к которым присоединяются по коду. Без загрузки, без регистрации. Любое устройство. Всегда бесплатно.',
+  ogDescription: 'Живые многопользовательские словесные игры, к которым присоединяются по коду. Без загрузки, без регистрации. Любое устройство. Бесплатный старт.',
   twitterTitle: 'Словесные игры для класса — Бесплатно',
   twitterDescription: 'Живые многопользовательские словесные игры. Без входа, без загрузки. Бесплатно.',
   heroTitle: 'Словесные игры для класса — без входа, без загрузки, без подготовки.',

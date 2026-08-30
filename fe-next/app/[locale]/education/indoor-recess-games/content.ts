@@ -432,7 +432,7 @@ const ES: EducationLandingContent = {
       'juegos para toda la clase',
       'actividades cuando llueve',
       'juegos educativos gratuitos',
-      'pausas cerebrales para niños',
+      'pausas activas para niños',
     ],
   },
   hero: {
@@ -450,7 +450,7 @@ const ES: EducationLandingContent = {
   answer: {
     question: '¿Qué juegos para recreo cubierto funcionan sin equipo?',
     answer:
-      'LexiClash ofrece juegos de palabras gratuitos en cualquier navegador—proyector, tablet o teléfono—con juego multiplayer de toda la clase, sin emails de estudiantes, y un plan estructurado de 20 minutos. Los maestros controlan el aula en tiempo real y pueden enseñar junto a los estudiantes.',
+      'LexiClash ofrece juegos de palabras gratuitos en cualquier navegador—proyector, tablet o teléfono—con juego multijugador de toda la clase, sin correos del alumnado, y un plan estructurado de 20 minutos. Los docentes controlan el aula en tiempo real y pueden enseñar junto al alumnado.',
   },
   sections: [
     {
@@ -593,8 +593,8 @@ const ES: EducationLandingContent = {
       a: 'Solo uno. Proyector y una computadora, tablet o pizarra inteligente. Tú lo controlas. Los demás miran y gritan respuestas.',
     },
     {
-      q: '¿Qué si el internet está caído?',
-      a: 'Estos juegos necesitan internet. Si el tuyo está caído, usa los juegos de papel silencioso de arriba, o salta a juegos de pared: Ahorcado, 20 Preguntas, o Cadena de Rimas.',
+      q: '¿Y si se cae el internet?',
+      a: 'Estos juegos necesitan internet. Si el tuyo se cae, usa los juegos de papel silencioso de arriba, o salta a juegos de pared: Ahorcado, 20 Preguntas, o Cadena de Rimas.',
     },
     {
       q: '¿Tengo que llevar la puntuación?',
@@ -602,7 +602,7 @@ const ES: EducationLandingContent = {
     },
     {
       q: '¿Puedo usar estos juegos para algo más que recreo?',
-      a: 'Absolutamente. Pausas cerebrales, final de clase, días lluviosos, o relleno de cinco minutos. El mismo plan de 20 minutos funciona.',
+      a: 'Absolutamente. Pausas activas, final de clase, días lluviosos, o relleno de cinco minutos. El mismo plan de 20 minutos funciona.',
     },
   ],
   labels: {
@@ -612,7 +612,7 @@ const ES: EducationLandingContent = {
   related: [
     {
       href: '/education/brain-breaks-word-games',
-      label: 'Pausas cerebrales con juegos de palabras',
+      label: 'Pausas activas con juegos de palabras',
       accent: 'lime',
     },
     { href: '/education/games-for-teachers', label: 'Juegos para maestros', accent: 'purple' },
@@ -648,7 +648,7 @@ const SV: EducationLandingContent = {
       'hela klassens spel',
       'aktiviteter när det regnar',
       'gratis klassrumsspel',
-      'hjärnuppvärmning för barn',
+      'hjärnpauser för barn',
     ],
   },
   hero: {
@@ -659,19 +659,19 @@ const SV: EducationLandingContent = {
       part2: 'Gör kaos till organiserat spel',
     },
     subtitle:
-      'En verklig 20-minutersplan för innerastaktiviteter som håller en hel klass sysselsatt, helt utan bråk eller priser.',
-    primaryCta: { label: 'Börja lära', href: '/education/classroom-game' },
+      'En verklig 20-minutersplan för inomhusrast som håller en hel klass sysselsatt, helt utan bråk eller priser.',
+    primaryCta: { label: 'Börja undervisa', href: '/education/classroom-game' },
     secondaryCta: { label: 'Se det live', href: '/multiplayer' },
   },
   answer: {
     question: 'Vilka inomhusspel för rast fungerar bäst i klassrummet?',
     answer:
-      'LexiClash är kostnadsfritt ordspel som fungerar i alla webbläsare—projektor, surfplatta eller telefon—med hela klassens multiplayer, ingen e-post krävd, och en strukturerad 20-minutersplan. Lärare styr klassrummet i realtid och kan instruera samtidigt som eleverna spelar.',
+      'LexiClash är ett kostnadsfritt ordspel som fungerar i alla webbläsare—projektor, surfplatta eller telefon—med hela klassens multiplayer, ingen e-post krävd, och en strukturerad 20-minutersplan. Lärare styr klassrummet i realtid och kan instruera samtidigt som eleverna spelar.',
   },
   sections: [
     {
       kind: 'steps',
-      title: '20-minutersblocket för inne-rast',
+      title: '20-minutersblocket för inomhusrast',
       intro:
         'Den här strukturen fungerar oavsett om du har trettio barn i gymnastikhallen eller tio i klassrummet. Starta en timer. Håll dig till tidsplanen. Kaoset minskar.',
       items: [
@@ -685,19 +685,19 @@ const SV: EducationLandingContent = {
           step: '2–3 min: Förklaring och demo',
           focus: 'Visa dem rutnätet eller pusslet, inte reglerna.',
           activity:
-            'Klicka på första bokstaven på tavlan. Dra till nästa. Säg ordet. Säg det igen. "Tresiffriga ord, fyrsiffriga ord, alla håll." Be tre elever peka på ord på rutnätet. Läs inte regelhandboken. Visa dem hur det går till.',
+            'Klicka på första bokstaven på tavlan. Dra till nästa. Säg ordet. Säg det igen. "Trestaviga ord, fyrstaviga ord, alla håll." Be tre elever peka på ord på rutnätet. Läs inte regelhandboken. Visa dem hur det går till.',
         },
         {
           step: '3–16 min: Spel',
           focus: 'Det här är deras rast. Du spelar inte.',
           activity:
-            'Låt dem skrika svar, hitta ord, tävla eller samarbeta efter vad som hände de första tre minuterna. Om någon fastnar, be dem hitta ett tresiffrigt ord. Gå omkring i klassrummet. Skratta åt kaoset. Tussa inte.',
+            'Låt dem skrika svar, hitta ord, tävla eller samarbeta efter vad som hände de första tre minuterna. Om någon fastnar, be dem hitta ett trestävigt ord. Gå omkring i klassrummet. Skratta åt kaoset. Döm inte.',
         },
         {
           step: '16–19 min: Avslutning',
           focus: 'Sluta innan energin tar slut.',
           activity:
-            'Tillkännage sista ronden. Ge en kategori: "Bara fyrsiffriga ord denna sista minut" eller "Okej, sista 60 sekunderna, skrika ut det längsta ordet ni hittar." Avsluta på höga tonen.',
+            'Ropa ut sista omgången. Ge en kategori: "Bara fyrstaviga ord denna sista minut" eller "Okej, sista 60 sekunderna, skrik ut det längsta ordet ni hittar." Avsluta på topp.',
         },
         {
           step: '19–20 min: Avsluta',
@@ -726,7 +726,7 @@ const SV: EducationLandingContent = {
           'För mycket prat. Sätt en regel om att inte hjälpa andra par eller de mister fokus.',
         ],
         [
-          '10–20 (standard klass)',
+          '10–20 (standardklass)',
           'Projektor + smartboard, hela klassen på en skärm',
           'Ett lag, alla elever skriker svar. Du skriver eller drar. Resultattavlan är klassrummet.',
           'För många röster på en gång. Räck upp handen för att skrika eller får ingen poäng. Eller spela omgångar och byt vem som skriker.',
@@ -735,7 +735,7 @@ const SV: EducationLandingContent = {
           '20–30 (dubbelklass eller idrottshall)',
           'En projektor + två surfplattor för poängräkning',
           'Dela in i två lag. Varje lag har en person vid kontrollerna, roterar varje minut. Hela rummet är högljudt och det är okej.',
-          'Kontrollrotationen är långsam. Välj spelledarna innan och håll dem sittande. Eller: en lagledarе kontrollerar alla 13 minuter, byt vid avslutningen.',
+          'Kontrollrotationen är långsam. Välj spelledarna innan och håll dem sittande. Eller: en lagledare kontrollerar alla 13 minuter, byt vid avslutningen.',
         ],
         [
           '30+ (hela årskursen)',
@@ -769,7 +769,7 @@ const SV: EducationLandingContent = {
     },
     {
       kind: 'cards',
-      title: 'Tyst inne-rast',
+      title: 'Tyst inomhusrast',
       intro:
         'Regndagar betyder ibland trötta barn, inte kaos. Här är spelen och uppställningarna som fungerar i tystnad.',
       items: [
@@ -786,7 +786,7 @@ const SV: EducationLandingContent = {
         {
           tag: 'Individuell',
           title: 'Dagligt pussel solo',
-          desc: 'Varje elev får en flik i webbläsaren. Ett litet ordpussel. De löser det på sin egen tid. Ingen tävling. Bara tanke.',
+          desc: 'Varje elev får en flik i webbläsaren. Ett litet ordpussel. De löser det på sin egen tid. Ingen tävling. Bara tänka.',
         },
       ],
     },
@@ -818,7 +818,7 @@ const SV: EducationLandingContent = {
     },
     {
       q: 'Kan jag använda dessa spel för något annat än rast?',
-      a: 'Absolut. Hjärnuppvärmning, lektionsslut, regndagar, eller femminutersfyllare. Samma 20-minutersplan fungerar.',
+      a: 'Absolut. Hjärnpauser, lektionsslut, regndagar, eller femminutersfyllare. Samma 20-minutersplan fungerar.',
     },
   ],
   labels: {
@@ -828,7 +828,7 @@ const SV: EducationLandingContent = {
   related: [
     {
       href: '/education/brain-breaks-word-games',
-      label: 'Hjärnuppvärmning med ordspel',
+      label: 'Hjärnpauser med ordspel',
       accent: 'lime',
     },
     { href: '/education/games-for-teachers', label: 'Spel för lärare', accent: 'purple' },
@@ -864,7 +864,7 @@ const JA: EducationLandingContent = {
       '無料の教室ゲーム',
       '静かな室内ゲーム',
       '単語ゲーム',
-      '脳トレーニング活動',
+      '気分転換活動',
     ],
   },
   hero: {
@@ -878,7 +878,7 @@ const JA: EducationLandingContent = {
   answer: {
     question: '教室で使える道具なしの室内休み時間ゲームは？',
     answer:
-      'LexiClashは、プロジェクター・タブレット・スマートフォンなどどのブラウザでも動く無料の単語ゲーム。クラス全体でマルチプレイでき、学生のメールアドレスは不要。構造化された20分プランで、先生がリアルタイムに授業をコントロールできます。',
+      'LexiClashは、プロジェクター・タブレット・スマートフォンなどどのブラウザでも動く無料の単語ゲーム。クラス全体でマルチプレイでき、生徒のメールアドレスは不要。構造化された20分プランで、先生がリアルタイムに授業をコントロールできます。',
   },
   sections: [
     {
@@ -983,7 +983,7 @@ const JA: EducationLandingContent = {
       kind: 'cards',
       title: '静かな室内休み時間',
       intro:
-        '雨の日は子どもたちが疲れているという意味がある場合があります。グチャグチャではなく。黙ってうまくいくゲームです。',
+        '雨の日は子どもたちが疲れていることもあります。ごちゃごちゃしたゲームではなく、静かにできるゲームをご紹介します。',
       items: [
         {
           tag: 'クラス全体',
@@ -1030,7 +1030,7 @@ const JA: EducationLandingContent = {
     },
     {
       q: '休み時間以外にこれらのゲームを使用できますか？',
-      a: 'もちろん。脳トレーニング、レッスン終了、雨の日、または5分フィラー。同じ20分プランが機能します。',
+      a: 'もちろん。気分転換、レッスン終了、雨の日、または5分フィラー。同じ20分プランが機能します。',
     },
   ],
   labels: {
@@ -1040,7 +1040,7 @@ const JA: EducationLandingContent = {
   related: [
     {
       href: '/education/brain-breaks-word-games',
-      label: '単語ゲームを使った脳トレーニング',
+      label: '単語ゲームを使った気分転換',
       accent: 'lime',
     },
     { href: '/education/games-for-teachers', label: '先生向けゲーム', accent: 'purple' },
@@ -1087,14 +1087,14 @@ const RU: EducationLandingContent = {
       part2: 'Превратите хаос в игру',
     },
     subtitle:
-      'Настоящий 20-минутный план домашней переменки, который займет весь класс. Без суеты, без призов, без беспорядка.',
+      'Настоящий 20-минутный план переменки в помещении, который займет весь класс. Без суеты, без призов, без беспорядка.',
     primaryCta: { label: 'Начать учить', href: '/education/classroom-game' },
     secondaryCta: { label: 'Посмотреть вживую', href: '/multiplayer' },
   },
   answer: {
-    question: 'Какие игры для домашней переменки хорошо работают без оборудования?',
+    question: 'Какие игры для переменки в помещении хорошо работают без оборудования?',
     answer:
-      'LexiClash предлагает бесплатные словесные игры в любом браузере—проектор, планшет или телефон—с игрой всего класса, без email студентов и структурированным 20-минутным плаоном. Учителя контролируют класс в режиме реального времени и могут преподавать вместе со студентами.',
+      'LexiClash предлагает бесплатные словесные игры в любом браузере—проектор, планшет или телефон—с игрой всего класса, без email студентов и структурированным 20-минутным планом. Учителя контролируют класс в режиме реального времени и могут преподавать вместе со студентами.',
   },
   sections: [
     {
@@ -1197,7 +1197,7 @@ const RU: EducationLandingContent = {
     },
     {
       kind: 'cards',
-      title: 'Тихая домашняя переменка',
+      title: 'Тихая переменка в помещении',
       intro:
         'Дождливые дни иногда означают усталых детей, а не хаос. Вот игры и конфигурации, которые работают в тишине.',
       items: [
@@ -1246,15 +1246,15 @@ const RU: EducationLandingContent = {
     },
     {
       q: 'Можно ли использовать эти игры для чего-то кроме переменки?',
-      a: 'Конечно. Мозговые перерывы, конец урока, дождливые дни или пятиминутные заполнители. Один план из 20 минут работает.',
+      a: 'Конечно. Динамические паузы, конец урока, дождливые дни или пятиминутные заполнители. Один план из 20 минут работает.',
     },
   ],
   labels: {
-    faqTitle: 'Вопросы о домашней переменке',
+    faqTitle: 'Вопросы о переменке в помещении',
     relatedTitle: 'Связанные ресурсы',
   },
   related: [
-    { href: '/education/brain-breaks-word-games', label: 'Мозговые перерывы со словесными играми', accent: 'lime' },
+    { href: '/education/brain-breaks-word-games', label: 'Динамические паузы со словесными играми', accent: 'lime' },
     { href: '/education/games-for-teachers', label: 'Игры для учителей', accent: 'purple' },
     { href: '/education/classroom-game', label: 'Игры для всего класса', accent: 'pink' },
     { href: '/education', label: 'Центр образования', accent: 'cyan' },
@@ -1262,7 +1262,7 @@ const RU: EducationLandingContent = {
   breadcrumb: {
     home: 'Дом',
     hub: 'Образование',
-    current: 'Домашние игры на переменах',
+    current: 'Игры для переменки в помещении',
   },
   learning: {
     educationalUse: ['Classroom Activity'],

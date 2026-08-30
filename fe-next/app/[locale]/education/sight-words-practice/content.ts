@@ -88,7 +88,7 @@ const content: LocaleContent = {
     },
     {
       title: 'Live Classroom Word Game',
-      desc: 'Run a whole-class word hunt on a shared letter grid. Up to 30 students join with a 4-digit code — no student accounts, no logins.',
+      desc: 'Run a whole-class word hunt on a shared letter grid. A whole class join with a 4-digit code — no student accounts, no logins.',
     },
   ],
   practiceNowLabel: 'Practice now →',

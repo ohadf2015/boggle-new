@@ -93,7 +93,7 @@ export default async function Page({ params }: PageProps) {
     name: 'LexiClash Education',
     url: `${BASE_URL}/en/education`,
     description:
-      'Multiplayer vocabulary games for schools — 5 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free 30-day trial for teachers; school plans from $149/year.',
+      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free 30-day trial for teachers; school plans from $149/year.',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
     offers: [

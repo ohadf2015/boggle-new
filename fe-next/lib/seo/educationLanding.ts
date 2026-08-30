@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { hreflangAlternates } from './hreflang';
 
 /**
  * Shared SEO/GEO plumbing for every education landing page.
@@ -120,8 +121,8 @@ export function buildEducationLandingMetadata({ locale, path, content }: BuildAr
   const image = heroImage(locale);
   const { meta } = content;
 
-  const languages: Record<string, string> = { 'x-default': localeUrl('en', path) };
-  for (const loc of EDUCATION_LOCALES) languages[loc] = localeUrl(loc, path);
+  // Same map the sitemap emits — see lib/seo/hreflang.ts for why that matters.
+  const languages = hreflangAlternates(path);
 
   return {
     title: meta.title,
