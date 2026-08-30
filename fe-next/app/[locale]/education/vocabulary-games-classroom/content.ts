@@ -66,7 +66,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Free student accounts. Quick signup, then tracks XP and progress forever.',
       'Word-formation, not flashcards. Beats Quizlet for spelling + recall.',
       'Six languages with full dictionaries. ESL, Hebrew immersion, Spanish bilingual — all native.',
-      'Free tier: 3 classes, 10 students each. No ads in the classroom.',
+      'Free: 3 classes of up to 50 students. No ads in the classroom.',
     ],
     faqTitle: 'Frequently Asked Questions',
     faqs: [
@@ -103,7 +103,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'Upload your own curriculum word lists — any unit, any subject' },
       { icon: '🌍', text: 'Six languages: English, Hebrew (RTL), Spanish, Swedish, Japanese, Russian' },
       { icon: '📊', text: 'Teacher dashboard: per-student accuracy + missed-word patterns' },
-      { icon: '💸', text: 'Free tier: 3 classes of 10 — Teacher Pro ($9/mo) lifts the student cap' },
+      { icon: '💸', text: 'Free: 3 classes of up to 50 students — Pro ($9/mo) adds printable reports' },
     ],
     compareRows: [
       ['Free tier (full features)', '✓', 'Limited', '✓ basic', 'Limited'],
@@ -163,7 +163,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'חשבונות תלמידים חינמיים. הרשמה של 30 שניות, ואז מעקב אחר ההתקדמות לתמיד.',
       'משחקי בניית מילים, לא כרטיסיות. עדיף מ־Quizlet לאיות ולזיכרון.',
       '6 שפות עם מילונים מלאים. ESL, הטמעת עברית, ספרדית דו־לשונית — הכל בשפת אם.',
-      'שכבה חינמית: 3 כיתות, עד 10 תלמידים. Teacher Pro ($9/חודש) ללא מגבלות.',
+      'כל הכיתה בחינם: 3 כיתות של עד 50 תלמידים. Teacher Pro ($9/חודש) מוסיף כיתות ללא הגבלה ודוחות.',
     ],
     faqTitle: 'שאלות נפוצות',
     faqs: [
@@ -200,7 +200,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'העלו את רשימות המילים שלכם — כל יחידה, כל מקצוע' },
       { icon: '🌍', text: '6 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית, רוסית' },
       { icon: '📊', text: 'לוח מורה: דיוק לכל תלמיד + אנליטיקה של מילים קשות' },
-      { icon: '💸', text: 'שכבה חינמית: 3 כיתות, 10 תלמידים. Teacher Pro ($9/חודש) ללא מגבלות' },
+      { icon: '💸', text: 'חינם: 3 כיתות של עד 50 תלמידים. Teacher Pro ($9/חודש) מוסיף דוחות' },
     ],
     compareRows: [
       ['כל התכונות בחינם', '✓', 'מוגבל', '✓ בסיסי', 'מוגבל'],
@@ -260,7 +260,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Cuentas gratis. Registro en 30 segundos, luego sigue el progreso para siempre.',
       'Formar palabras, no tarjetas. Mejor que Quizlet para ortografía y memoria.',
       '6 idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.',
-      'Gratis: 3 clases, hasta 10 estudiantes. Teacher Pro ($9/mes) sin límites.',
+      'Toda tu clase gratis: 3 clases de hasta 50. Pro ($9/mes) añade informes.',
     ],
     faqTitle: 'Preguntas Frecuentes',
     faqs: [
@@ -297,7 +297,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'Carga tus listas — cualquier unidad, cualquier materia' },
       { icon: '🌍', text: '6 idiomas: inglés, hebreo (RTL), español, sueco, japonés, ruso' },
       { icon: '📊', text: 'Panel de maestro: precisión por alumno + palabras difíciles' },
-      { icon: '💸', text: 'Gratis: 3 clases, 10 estudiantes. Teacher Pro ($9/mes) desbloquea todo' },
+      { icon: '💸', text: 'Gratis: 3 clases de hasta 50 alumnos. Pro ($9/mes) añade informes' },
     ],
     compareRows: [
       ['Todo gratis', '✓', 'Limitado', '✓ básico', 'Limitado'],
@@ -357,7 +357,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Gratis studentkonton. Registrering på 30 sekunder, sedan framstegen sparas.',
       'Ordbildning, inte flashkort. Bättre än Quizlet för stavning och minne.',
       '6 språk med kompletta ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.',
-      'Gratis: 3 klasser, upp till 10 elever. Teacher Pro ($9/månad) utan begränsningar.',
+      'Hela klassen gratis: 3 klasser med upp till 50 elever. Teacher Pro ($9/månad) lägger till obegränsade klasser och rapporter.',
     ],
     faqTitle: 'Vanliga Frågor',
     faqs: [
@@ -454,7 +454,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       '無料。30秒で登録して、あとはずっと成績が記録される。',
       '単語を作るゲーム。フラッシュカードじゃない。スペリングと記憶で Quizlet より優れている。',
       '6言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。',
-      '無料プランは3クラス・各10人まで。授業中に広告は出ません。',
+      '無料プランは3クラス・各50人まで。クラス全員が参加できます。授業中に広告は出ません。',
     ],
     faqTitle: 'よくある質問',
     faqs: [
@@ -491,7 +491,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'あなたの単語リスト — どの単元、どの科目でも' },
       { icon: '🌍', text: '6言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語' },
       { icon: '📊', text: '先生用ダッシュボード：生徒ごとの成績 + 苦手な単語がわかる' },
-      { icon: '💸', text: '無料プランは3クラス・各10人 — Teacher Pro（月$9）で上限解除' },
+      { icon: '💸', text: '無料プランは3クラス・各50人 — Teacher Pro（月$9）でレポート追加' },
     ],
     compareRows: [
       ['無料プランあり', '✓', '限定的', '✓ 基本', '限定的'],

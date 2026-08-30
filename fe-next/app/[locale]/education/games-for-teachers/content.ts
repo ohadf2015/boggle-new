@@ -74,7 +74,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📊', text: 'Per-student accuracy + class-wide missed-word patterns' },
       { icon: '👥', text: 'Live multiplayer a whole class; 1v1 duels for paired practice' },
       { icon: '🌍', text: 'Six languages: English, Hebrew (RTL), Spanish, Swedish, Japanese, Russian' },
-      { icon: '💸', text: 'Free tier: 3 classes, 10 students each — Teacher Pro ($9/mo) lifts the cap' },
+      { icon: '💸', text: 'Your whole class free — 3 classes of up to 50. Pro ($9/mo) adds reports' },
       { icon: '🔒', text: 'Student-safe: no chat, no DMs, no external links during play' },
     ],
     sections: {
@@ -232,7 +232,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📊', text: 'Precisión por alumno + palabras difíciles' },
       { icon: '👥', text: 'Multijugador — hasta 30; duelos de parejas' },
       { icon: '🌍', text: '6 idiomas: inglés, hebreo (RTL), español, sueco, japonés, ruso' },
-      { icon: '💸', text: 'Gratis: 3 clases, hasta 10 estudiantes. Teacher Pro ($9/mes) sin límites' },
+      { icon: '💸', text: 'Toda tu clase gratis: 3 clases de hasta 50. Pro ($9/mes) añade informes' },
       { icon: '🔒', text: 'Seguro: sin chat, sin DM, sin enlaces externos' },
     ],
     sections: {
@@ -469,7 +469,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📊', text: 'Точность по каждому ученику + общие пробелы по словам для класса' },
       { icon: '👥', text: 'Живая игра весь класс; дуэли в парах для практики' },
       { icon: '🌍', text: 'Шесть языков: английский, иврит (RTL), испанский, шведский, японский, русский' },
-      { icon: '💸', text: 'Бесплатный тариф: 3 класса по 10 учеников — Teacher Pro ($9/мес) снимает лимит' },
+      { icon: '💸', text: 'Весь класс бесплатно: 3 класса по 50 учеников — Teacher Pro ($9/мес) добавляет отчёты' },
       { icon: '🔒', text: 'Безопасно: без чата, без личных сообщений, без внешних ссылок во время игры' },
     ],
     sections: {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
 /**
  * The teacher-moment pages get their claims checked by
@@ -44,8 +45,16 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     /no premium tier|No premium upsell|no premium upsell|Free tier covers everything|Free tier = full features|fully free, no premium|no per-seat fee|no per-seat license|sin plan premium|sin versión premium|プレミアムなし|プレミアム版なし|בלי גרסת פרימיום|без премиума|no participant cap|no player or student cap/,
   ],
   [
-    'advertises a student cap the free tier (10 per class) does not deliver',
-    /up to 30 students|Up to 30 students|עד 30 תלמידים|hasta 30 (alumnos|estudiantes)|upp till 30 elever|最大30人の生徒|до 30 учеников/,
+    `advertises a per-class student number that is not FREE_TIER_LIMITS.studentsPerClass (${FREE_TIER_LIMITS.studentsPerClass})`,
+    // Any "<n> students per class" style claim where n is NOT the enforced cap. Built from
+    // the real constant so raising or lowering the tier fails this test until the copy in all
+    // six locales is updated with it — the drift that produced 140+ false claims last time.
+    new RegExp(
+      String.raw`\b(?!${FREE_TIER_LIMITS.studentsPerClass}\b)\d{1,3}\s?(students per class|students each|per classroom)`
+      + String.raw`|(?!${FREE_TIER_LIMITS.studentsPerClass})\b\d{1,3} תלמידים בכיתה`
+      + String.raw`|hasta (?!${FREE_TIER_LIMITS.studentsPerClass})\d{1,3} (alumnos|estudiantes) por clase`
+      + String.raw`|upp till (?!${FREE_TIER_LIMITS.studentsPerClass})\d{1,3} elever per klass`,
+    ),
   ],
   [
     'says the join code is 4 digits — ClassroomGameLobby.tsx:141 and utils/utils.ts:118 both emit six characters',

@@ -179,7 +179,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Teléfono, tableta, Chromebook, cualquier navegador' },
       { icon: '⏱️', text: 'Calentamiento de 5 minutos — cualquier plan' },
-      { icon: '💸', text: 'Gratis para empezar — sin cuentas de alumnado; 3 clases de 10 en el plan gratuito' },
+      { icon: '💸', text: 'Sin cuentas de alumnado; 3 clases de hasta 50 alumnos en el plan gratuito' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Principiante', desc: 'Palabras cortas, tiempo largo, palabras de vista. Word Wheel para práctica guiada.' },
@@ -248,7 +248,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Telefon, surfplatta, Chromebook, vilken webbläsare som helst' },
       { icon: '⏱️', text: 'Uppvärmning på 5 minuter — vilken lektion som helst' },
-      { icon: '💸', text: 'Gratis att börja — inga elevkonton; 3 klasser med 10 elever i gratisnivån' },
+      { icon: '💸', text: 'Inga elevkonton; 3 klasser med upp till 50 elever i gratisnivån' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Nybörjare', desc: 'Korta ord, längre timer, sight-ord. Word Wheel för guidad övning.' },
@@ -378,7 +378,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: 'Три игровых режима: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Работает на любом телефоне, планшете, Chromebook или веб-браузере' },
       { icon: '⏱️', text: 'Формат 5 минут подходит для любого плана урока' },
-      { icon: '💸', text: 'Бесплатный старт — без аккаунтов учеников; 3 класса по 10 в бесплатном тарифе' },
+      { icon: '💸', text: 'Без аккаунтов учеников; 3 класса по 50 учеников в бесплатном тарифе' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Начинающий', desc: 'Слова из 3–4 букв, более длительный таймер, обычные слова. Word Wheel для направленной практики.' },

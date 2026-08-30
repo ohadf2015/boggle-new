@@ -94,11 +94,18 @@ describe('free tier limits', () => {
     expect(pro.students_limit_per_class).toBeNull();
   });
 
-  it('is restrictive enough that a real class cannot run for free', () => {
-    // A real class is 25-30 students. This is the whole reason the tier was tightened: at
-    // 30 per class the cap could never bind. If someone raises it back above a class size,
-    // the free tier silently becomes the product again.
-    expect(FREE_TIER_LIMITS.studentsPerClass).toBeLessThan(25);
+  it('lets a real class run for free, because the paywall now sits after the lesson', () => {
+    // REVERSED 2026-08-31. This assertion used to read `toBeLessThan(25)` — the tier was
+    // tightened in 2026-08-23 precisely so a class of 25-30 could not fit for free.
+    //
+    // It bound as designed and monetized nothing: 35 approved teachers, 2 classrooms, and no
+    // approved teacher ever active on a second day. A paywall that trips before the first
+    // successful lesson removes the teacher rather than converting them.
+    //
+    // Verified first-party 2026-08-30, the category charges on the other side of the lesson:
+    // Blooket free = 60 players, Gimkit free = unlimited on featured modes, and BOTH sell
+    // reporting. Teacher Pro still sells analytics (ProGate) and unlimited classes.
+    expect(FREE_TIER_LIMITS.studentsPerClass).toBeGreaterThanOrEqual(30);
   });
 
   it('does not trap a teacher on their very first classroom', () => {
