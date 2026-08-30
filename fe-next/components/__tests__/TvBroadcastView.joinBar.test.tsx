@@ -123,7 +123,10 @@ describe('TvBroadcastView - Join Bar Visibility', () => {
 
     // THEN: Join bar elements should be visible
     expect(screen.getByText('Join at')).toBeInTheDocument();
-    expect(screen.getByText('lexiclash.live')).toBeInTheDocument();
+    // The address has to CARRY the code. A bare "lexiclash.live" has no
+    // game-code input anywhere on it (verified on production 2026-08-30), so a
+    // student who could not scan the QR had the code and nowhere to type it.
+    expect(screen.getByText(/\/join\/TEST123$/)).toBeInTheDocument();
     expect(screen.getByText('Game Code')).toBeInTheDocument();
     expect(screen.getByText('TEST123')).toBeInTheDocument();
   });
@@ -141,7 +144,10 @@ describe('TvBroadcastView - Join Bar Visibility', () => {
 
     // THEN: Join bar SHOULD remain visible (this was the bug - join bar was hidden)
     expect(screen.getByText('Join at')).toBeInTheDocument();
-    expect(screen.getByText('lexiclash.live')).toBeInTheDocument();
+    // The address has to CARRY the code. A bare "lexiclash.live" has no
+    // game-code input anywhere on it (verified on production 2026-08-30), so a
+    // student who could not scan the QR had the code and nowhere to type it.
+    expect(screen.getByText(/\/join\/TEST123$/)).toBeInTheDocument();
     expect(screen.getByText('Game Code')).toBeInTheDocument();
     expect(screen.getByText('TEST123')).toBeInTheDocument();
   });
