@@ -118,14 +118,14 @@ export function PageClient() {
                   <Link
                     href={`/${language}/teacher`}
                     data-testid="create-classroom-shortcut"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-yellow text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
                   >
                     {t('education.landing.createClassroom', 'Create classroom')}
                   </Link>
                   <Link
                     href={`/${language}/teacher`}
                     data-testid="go-to-dashboard-link"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-cyan text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow"
                   >
                     {t('education.landing.openDashboard')}
                     <span aria-hidden="true">→</span>

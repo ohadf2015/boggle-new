@@ -11,6 +11,13 @@ import {
 } from '@/lib/seo/educationJsonLd';
 import { PageClient as EducationPageClient } from './PageClient';
 import { educationSeoContent } from './seoContent';
+import { getBrainBreaksContent } from './brain-breaks-word-games/content';
+import { getIndoorRecessContent } from './indoor-recess-games/content';
+import { getEndOfYearContent } from './end-of-year-classroom-activities/content';
+import { getIcebreakersContent } from './first-day-of-school-icebreakers/content';
+import { getEarlyFinishersContent } from './early-finishers-activities/content';
+import { getMiddleSchoolContent } from './middle-school-word-games/content';
+
 
 // The hub renders from a static content object keyed by locale — no cookies(),
 // headers() or searchParams anywhere in the tree, so there is nothing to make it
@@ -64,7 +71,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'Pick the right format for your classroom — quick 1v1 duels or live whole-class multiplayer.',
     cards: {
       duels: { title: 'Vocabulary Duels (1v1)', desc: 'Pair students for 2-3 minute head-to-head word battles.' },
-      classroom: { title: 'Live Classroom Game', desc: 'Whole-class multiplayer; up to 30 students join with a 4-digit code.' },
+      classroom: { title: 'Live Classroom Game', desc: 'Whole-class multiplayer; students join with a class code, no email needed.' },
     },
   },
   he: {
@@ -72,7 +79,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'בחרו את הפורמט המתאים לכיתה — דואלי 1v1 מהירים או רב-משתתפים חי לכל הכיתה.',
     cards: {
       duels: { title: 'דואלי אוצר מילים (1v1)', desc: 'התאימו תלמידים לקרבות מילים של 2-3 דקות פנים מול פנים.' },
-      classroom: { title: 'משחק כיתתי חי', desc: 'רב-משתתפים לכל הכיתה; עד 30 תלמידים מצטרפים עם קוד בן 4 ספרות.' },
+      classroom: { title: 'משחק כיתתי חי', desc: 'רב-משתתפים לכל הכיתה; התלמידים מצטרפים עם קוד כיתה, בלי אימייל.' },
     },
   },
   sv: {
@@ -80,7 +87,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'Välj rätt format för ditt klassrum — snabba 1v1-dueller eller live-multiplayer för hela klassen.',
     cards: {
       duels: { title: 'Ordförrådsdueller (1v1)', desc: 'Para ihop elever för 2-3 minuters ordstrider mot varandra.' },
-      classroom: { title: 'Live klassrumsspel', desc: 'Multiplayer för hela klassen; upp till 30 elever ansluter med en 4-siffrig kod.' },
+      classroom: { title: 'Live klassrumsspel', desc: 'Multiplayer för hela klassen; eleverna ansluter med en klasskod, ingen e-post behövs.' },
     },
   },
   ja: {
@@ -88,7 +95,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'クラスに最適なフォーマットを選択 — クイック1対1デュエルまたはクラス全体のライブマルチプレイヤー。',
     cards: {
       duels: { title: '語彙デュエル (1対1)', desc: '生徒をペアリングして2〜3分の単語バトルを実施。' },
-      classroom: { title: 'ライブクラスルームゲーム', desc: 'クラス全体のマルチプレイヤー; 最大30人の生徒が4桁のコードで参加。' },
+      classroom: { title: 'ライブクラスルームゲーム', desc: 'クラス全体のマルチプレイヤー。生徒はクラスコードで参加でき、メールアドレスは不要です。' },
     },
   },
   es: {
@@ -96,7 +103,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'Elige el formato adecuado para tu aula — duelos 1v1 rápidos o multijugador en vivo para toda la clase.',
     cards: {
       duels: { title: 'Duelos de vocabulario (1v1)', desc: 'Empareja estudiantes para batallas de palabras cara a cara de 2-3 minutos.' },
-      classroom: { title: 'Juego de aula en vivo', desc: 'Multijugador para toda la clase; hasta 30 estudiantes se unen con un código de 4 dígitos.' },
+      classroom: { title: 'Juego de aula en vivo', desc: 'Multijugador para toda la clase; el alumnado entra con un código de clase, sin correo electrónico.' },
     },
   },
   ru: {
@@ -104,7 +111,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'Выберите подходящий формат для класса — быстрые дуэли 1 на 1 или живой мультиплеер для всего класса.',
     cards: {
       duels: { title: 'Словарные дуэли (1 на 1)', desc: 'Объедините учеников в пары для словесных баталий по 2–3 минуты один на один.' },
-      classroom: { title: 'Живая игра для класса', desc: 'Мультиплеер для всего класса; до 30 учеников подключаются по 4-значному коду.' },
+      classroom: { title: 'Живая игра для класса', desc: 'Мультиплеер для всего класса; ученики заходят по коду класса, без электронной почты.' },
     },
   },
 };
@@ -211,7 +218,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         >
           <h3 className="font-neo-display text-lg font-black uppercase text-neo-white">{t.cards.duels.title}</h3>
           <p className="mt-2 text-sm text-neo-white">{t.cards.duels.desc}</p>
-          <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow">→</span>
+          <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-lime">→</span>
         </Link>
         <Link
           href={`/${locale}/education/classroom-game`}
@@ -234,7 +241,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/vocabulary-games-classroom`}
           className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.vocab.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.vocab.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.vocab.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.vocab.desc}</p>
         </Link>
@@ -281,6 +288,8 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         </Link>
       </div>
 
+      <TeacherMomentLinks locale={locale} lang={lang} />
+
       <p className="mt-6 text-sm text-neo-gray-300">
         {(() => {
           const full = COMPARE_LINK_TEXT[lang] ?? COMPARE_LINK_TEXT.en;
@@ -298,5 +307,64 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         })()}
       </p>
     </section>
+  );
+}
+
+// ─── Teacher-moment landings ───
+// These six pages were orphans: reachable from the sitemap but linked from
+// nowhere, which is a weak discovery signal and passes no internal PageRank.
+// Labels come from each page's own localized content file rather than a new
+// translation block, so there is exactly one place the copy lives.
+const MOMENTS_HEADING: Record<string, { heading: string; subhead: string }> = {
+  en: { heading: 'Pick your moment', subhead: 'Not a feature list — the specific situations teachers actually search for, each with a plan you can run today.' },
+  he: { heading: 'בחרו את הרגע', subhead: 'לא רשימת תכונות — המצבים האמיתיים שמורים מחפשים, כל אחד עם תוכנית שאפשר להפעיל היום.' },
+  sv: { heading: 'Välj ditt läge', subhead: 'Ingen funktionslista — de faktiska situationer lärare söker på, var och en med en plan du kan köra idag.' },
+  ja: { heading: '場面から選ぶ', subhead: '機能一覧ではなく、先生が実際に検索する場面ごとに、今日すぐ使える進行プランを用意しました。' },
+  es: { heading: 'Elige tu momento', subhead: 'No es una lista de funciones: son las situaciones que el profesorado busca de verdad, cada una con un plan para hoy.' },
+  ru: { heading: 'Выберите момент', subhead: 'Не список функций — реальные ситуации, которые ищут учителя, и готовый план для каждой.' },
+};
+
+const MOMENT_ACCENT: Record<string, string> = {
+  'brain-breaks-word-games': 'text-neo-lime',
+  'indoor-recess-games': 'text-neo-cyan',
+  'end-of-year-classroom-activities': 'text-neo-pink',
+  'first-day-of-school-icebreakers': 'text-neo-purple',
+  'early-finishers-activities': 'text-neo-lime',
+  'middle-school-word-games': 'text-neo-pink',
+};
+
+function TeacherMomentLinks({ locale, lang }: { locale: string; lang: string }) {
+  const copy = MOMENTS_HEADING[lang] ?? MOMENTS_HEADING.en;
+  const moments = [
+    { slug: 'brain-breaks-word-games', c: getBrainBreaksContent(locale) },
+    { slug: 'indoor-recess-games', c: getIndoorRecessContent(locale) },
+    { slug: 'end-of-year-classroom-activities', c: getEndOfYearContent(locale) },
+    { slug: 'first-day-of-school-icebreakers', c: getIcebreakersContent(locale) },
+    { slug: 'early-finishers-activities', c: getEarlyFinishersContent(locale) },
+    { slug: 'middle-school-word-games', c: getMiddleSchoolContent(locale) },
+  ];
+
+  return (
+    <>
+      <h2 className="mt-12 font-neo-display text-2xl font-black uppercase text-neo-white sm:text-3xl">
+        {copy.heading}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm text-neo-gray-200 sm:text-base">{copy.subhead}</p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {moments.map(({ slug, c }) => (
+          <Link
+            key={slug}
+            href={`/${locale}/education/${slug}`}
+            className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5"
+          >
+            <h3 className={`font-neo-display text-base font-black uppercase ${MOMENT_ACCENT[slug]}`}>
+              {c.breadcrumb.current}
+            </h3>
+            {/* The answer-first question doubles as the card's promise. */}
+            <p className="mt-2 text-xs leading-relaxed text-neo-gray-200">{c.answer.question}</p>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
