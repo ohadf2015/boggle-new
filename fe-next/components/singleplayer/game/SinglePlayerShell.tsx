@@ -14,6 +14,7 @@
  * wires refs, handlers and the solo-only chrome slot.
  */
 import React, { useMemo, useRef } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { PortraitLayout } from '@/components/game/in-game/components/PortraitLayout';
 import { toShellProps } from './toShellProps';
 import type { LetterGrid, Language } from '@/shared/types/game';
@@ -53,7 +54,8 @@ export interface SinglePlayerShellProps {
 
   gameStatsRef: React.RefObject<HTMLDivElement | null>;
   t: React.ComponentProps<typeof PortraitLayout>['t'];
-  dir: 'rtl' | 'ltr';
+  /** Defaults to the app language direction. */
+  dir?: 'rtl' | 'ltr';
 
   /** Coins badge, 0/N progress, practice training bar — solo-only chrome. */
   soloChrome?: React.ReactNode;
@@ -68,9 +70,12 @@ export function SinglePlayerShell(props: SinglePlayerShellProps) {
     bots, playerName, foundWords, comboLevel, fireRoundActive, fireRoundRemaining,
     earthquakeState, currentFeedback, highlightedPath, lastWordFoundTime,
     totalBoardWords, isDesktop, onWordSubmit, onWordChange, onPathSubmit,
-    onSingleTapDetected = NOOP_TAP, onExit, onPauseToggle, gameStatsRef, t, dir,
+    onSingleTapDetected = NOOP_TAP, onExit, onPauseToggle, gameStatsRef, t, dir: dirProp,
     soloChrome, children,
   } = props;
+
+  const { dir: contextDir } = useLanguage();
+  const dir = dirProp ?? (contextDir as 'rtl' | 'ltr');
 
   const helpRef = useRef(false);
 

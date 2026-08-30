@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 6284,
+    "totalKeysInCode": 6282,
     "keyCountByLanguage": {
       "en": 12146,
       "es": 12442,
@@ -9,7 +9,7 @@
       "ru": 12187,
       "sv": 12404
     },
-    "missingFromEnglish": 68,
+    "missingFromEnglish": 66,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -3804,24 +3804,6 @@
         {
           "file": "components/Footer.tsx",
           "line": 94
-        }
-      ]
-    },
-    {
-      "key": "game.pause",
-      "usages": [
-        {
-          "file": "components/game/in-game/components/GameHeader.tsx",
-          "line": 69
-        }
-      ]
-    },
-    {
-      "key": "game.resume",
-      "usages": [
-        {
-          "file": "components/game/in-game/components/GameHeader.tsx",
-          "line": 69
         }
       ]
     },
