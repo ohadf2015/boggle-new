@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuickPlayHub } from '../QuickPlayHub';
 
@@ -36,20 +37,30 @@ vi.mock('../lightningPath', async (importOriginal) => {
   };
 });
 vi.mock('../adapters/QuickModeAdapter', () => ({
-  QuickModeAdapter: ({ config, onDone }: any) => (
-    <button
-      data-testid="mock-finish"
-      onClick={() =>
-        onDone({
-          mode: config.mode, seed: config.seed, score: 340, perfectScore: 500,
-          scorePct: 68, wordsFound: 7, totalWords: 12, durationMs: 60000,
-        })
-      }
-    >
-      finish
-    </button>
-  ),
+  QuickModeAdapter: ({ config, onDone, onQuit }: any) => {
+    // Simulate a real adapter: onDone on user action, but schedule onQuit
+    // after the round duration (typically ~60s). This reproduces the bug
+    // where results auto-dismiss after the timer fires.
+    React.useEffect(() => {
+      const timeoutId = setTimeout(() => onQuit(), config.durationSec * 1000);
+      return () => clearTimeout(timeoutId);
+    }, [onQuit, config.durationSec]);
+    return (
+      <button
+        data-testid="mock-finish"
+        onClick={() =>
+          onDone({
+            mode: config.mode, seed: config.seed, score: 340, perfectScore: 500,
+            scorePct: 68, wordsFound: 7, totalWords: 12, durationMs: 60000,
+          })
+        }
+      >
+        finish
+      </button>
+    );
+  },
 }));
+
 vi.mock('../QuickPlayResults', () => ({
   QuickPlayResults: ({ onNextRound }: any) => (
     <div data-testid="mock-results">
@@ -209,5 +220,24 @@ describe('QuickPlayHub', () => {
     await waitFor(() => screen.getByTestId('mock-finish'));
     const roundCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/round'));
     expect(JSON.parse(roundCall![1].body as string)).toMatchObject({ mode: 'classic', seed: 'shared-seed' });
+  });
+
+  it('results screen persists until player explicitly leaves (no auto-dismiss after timer)', async () => {
+    vi.useFakeTimers();
+    try {
+      render(<QuickPlayHub />);
+      fireEvent.click(screen.getByTestId('mock-play'));
+      await waitFor(() => screen.getByTestId('mock-finish'));
+      // Finish the round — moves to results screen
+      fireEvent.click(screen.getByTestId('mock-finish'));
+      await waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
+      // Advance time well past the round duration (60s)
+      vi.advanceTimersByTime(70_000);
+      // Results screen MUST still be visible — player decides when to leave
+      expect(screen.getByTestId('mock-results')).toBeTruthy();
+      expect(screen.queryByTestId('mock-picker')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

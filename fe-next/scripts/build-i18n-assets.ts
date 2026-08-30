@@ -21,6 +21,7 @@
  */
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync, readdirSync, rmSync, existsSync } from 'node:fs';
+import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -42,7 +43,7 @@ mkdirSync(path.dirname(MANIFEST), { recursive: true });
 // Stale hashed files would accumulate across builds and ship in the image.
 if (existsSync(OUT_DIR)) {
   for (const f of readdirSync(OUT_DIR)) {
-    if (f.endsWith('.js')) rmSync(path.join(OUT_DIR, f));
+    if (f.endsWith('.js') || f.endsWith('.js.br')) rmSync(path.join(OUT_DIR, f));
   }
 }
 
@@ -58,12 +59,25 @@ for (const lang of LOCALES) {
   const hash = createHash('sha256').update(json).digest('hex').slice(0, 8);
   const file = `${lang}.${hash}.js`;
 
-  writeFileSync(
-    path.join(OUT_DIR, file),
-    `globalThis.${GLOBAL}=Object.assign(globalThis.${GLOBAL}||{},{${JSON.stringify(lang)}:${json}});\n`,
-  );
+  const source = `globalThis.${GLOBAL}=Object.assign(globalThis.${GLOBAL}||{},{${JSON.stringify(lang)}:${json}});\n`;
+  writeFileSync(path.join(OUT_DIR, file), source);
+
+  // This asset is render-blocking in <head>, so it is the one worth paying
+  // quality 11 for. Measured on en: 171kB gzip / 158kB brotli-5 (recompressed
+  // per request) / 137kB here, once, at build time. Served by
+  // server/precompressedI18n.ts, which falls back to gzip if this is missing.
+  const brotli = brotliCompressSync(Buffer.from(source), {
+    params: {
+      [zlibConstants.BROTLI_PARAM_QUALITY]: 11,
+      [zlibConstants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(source),
+    },
+  });
+  writeFileSync(path.join(OUT_DIR, `${file}.br`), brotli);
+
   manifest[lang] = `/i18n/${file}`;
-  process.stdout.write(`  i18n ${lang} → ${file} (${(json.length / 1024).toFixed(0)}kB)\n`);
+  process.stdout.write(
+    `  i18n ${lang} → ${file} (${(json.length / 1024).toFixed(0)}kB, br ${(brotli.length / 1024).toFixed(0)}kB)\n`,
+  );
 }
 
 writeFileSync(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);

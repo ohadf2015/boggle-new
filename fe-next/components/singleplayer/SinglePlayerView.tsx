@@ -96,14 +96,14 @@ export interface SinglePlayerResultsData {
  * Handles state transitions between lobby, playing, and results phases
  */
 const SinglePlayerView: React.FC = () => {
-  const { language: uiLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const isPractice = usePracticeFlag();
 
   const {
     phase, setPhase,
     gameState, setGameState,
-    returnTo, boardCode,
+    boardCode,
     handleTutorialComplete,
     handlePlayAgain,
     handleQuickRematch,
@@ -159,16 +159,8 @@ const SinglePlayerView: React.FC = () => {
     enabled: phase !== 'playing',
   });
 
-  // Auto-redirect to daily challenge after game ends when returnTo=daily
-  useEffect(() => {
-    if (phase === 'results' && returnTo === 'daily' && resultsData) {
-      const timer = setTimeout(() => {
-        window.location.href = `/${uiLanguage}/daily`;
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [phase, returnTo, resultsData, uiLanguage]);
+  // The `?returnTo=daily` post-results redirect was removed 2026-08-30 — nothing
+  // in the codebase ever constructed that URL, so this branch was unreachable.
 
   // Get current high score for challenge mode
   const currentHighScore = useMemo(() => {
@@ -352,13 +344,6 @@ const SinglePlayerView: React.FC = () => {
                 onQuickRematch={handleQuickRematch}
                 onBackToLobby={handleBackToLobby}
               />
-            )}
-            {returnTo === 'daily' && (
-              <div className="fixed bottom-[calc(1rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-50">
-                <div className="bg-neo-orange text-neo-black px-4 py-2 rounded-full shadow-hard-sm border-2 border-neo-black text-sm font-medium animate-pulse">
-                  {t('daily.trainingSuggestion.redirecting')}
-                </div>
-              </div>
             )}
           </>
         )}

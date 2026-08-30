@@ -27,6 +27,7 @@ vi.mock('@/components/practice/PracticeCoachTip', () => ({
 }));
 
 vi.mock('../game', () => ({
+  SinglePlayerShell: () => <div data-testid="layout-portrait" />,
   useSinglePlayerCore: () => ({
     grid: [['A', 'B'], ['C', 'D']],
     foundWords: [],
@@ -79,7 +80,6 @@ vi.mock('../game', () => ({
   }),
   LandscapeGameLayout: () => <div data-testid="layout-landscape" />,
   DesktopGameLayout: () => <div data-testid="layout-desktop" />,
-  PortraitGameLayout: () => <div data-testid="layout-portrait" />,
 }));
 
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => null }));

@@ -4,12 +4,16 @@
  */
 
 import crypto from 'crypto';
+import path from 'node:path';
+import { constants as zlibConstants } from 'zlib';
 import compression from 'compression';
 import cors, { type CorsOptions } from 'cors';
 import express, { Application, Request, Response, NextFunction, RequestHandler } from 'express';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
+import { normalizeAcceptEncoding } from '../lib/http/acceptEncoding';
+import { precompressedAssets } from './precompressedAssets';
 import { httpLogger, httpLogSerializers } from './logger';
 // crazyGamesScriptInjector removed — now rendered via CrazyGamesScriptServer React component
 
@@ -214,6 +218,36 @@ function cacheHeaders(): RequestHandler {
 }
 
 /**
+ * Force brotli for every client that accepts it — see normalizeAcceptEncoding
+ * in lib/http/acceptEncoding for why the header has to be collapsed rather than
+ * merely preferred.
+ *
+ * Worth it because HTML here is served `no-store` (see the Next 16 fetchCache
+ * workaround in app/[locale]/layout.tsx), so every page view re-downloads it:
+ * /en is 45.5kB at gzip-6 vs 33.2kB at brotli-5 — ~27% off the critical path
+ * for the same ~0.1ms of CPU once warm. Static JS/CSS gains a further 10-17% on
+ * first visit, and the render-blocking /i18n/<lang>.<hash>.js catalogue drops
+ * from 171kB to 158kB.
+ *
+ * Any route that inspects Accept-Encoding itself must go through
+ * `acceptsEncoding` — a naive `.includes('gzip')` sees the rewritten `br`
+ * header, concludes the client wants no compression, and ships the raw body.
+ */
+export function preferBrotli(): RequestHandler {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    // Socket.IO long-polling is excluded from compression entirely (see
+    // configureMiddleware) — don't touch its headers either.
+    if (!req.url?.startsWith('/socket.io')) {
+      const current = req.headers['accept-encoding'];
+      if (typeof current === 'string') {
+        req.headers['accept-encoding'] = normalizeAcceptEncoding(current) as string;
+      }
+    }
+    next();
+  };
+}
+
+/**
  * Request timeout middleware
  *
  * IMPORTANT: Next.js App Router routes (app/api/*) have their own timeout
@@ -397,7 +431,25 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   // Compression middleware (gzip/brotli)
   // Skip compression for Socket.IO paths to prevent chunked encoding errors
+  //
+  // ORDER MATTERS: preferBrotli() destructively rewrites Accept-Encoding, so it
+  // must sit immediately before compression() — after it, the original client
+  // header is gone. Anything inserted below that reads Accept-Encoding sees
+  // `br`, not what the browser sent (see app/api/dictionary-words/route.ts).
+  app.use(preferBrotli());
+
+  // Must sit after preferBrotli (it reads the normalised header) and before
+  // compression (it sets Content-Encoding itself, which compression skips).
+  app.use(precompressedAssets([
+    { urlPrefix: '/i18n/', dir: path.join(process.cwd(), 'public', 'i18n') },
+    { urlPrefix: '/_next/static/', dir: path.join(process.cwd(), '.next', 'static') },
+  ]));
+
   app.use(compression({
+    // `compression`'s brotli default is quality 4. Quality 5 is ~6% smaller for
+    // the same wall-clock as gzip-6 on our HTML; 11 is 35% smaller but 312ms,
+    // far too slow for dynamically rendered responses.
+    brotli: { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } },
     filter: (req: Request, res: Response) => {
       if (req.headers['x-no-compression']) {
         return false;

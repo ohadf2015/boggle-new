@@ -24,6 +24,7 @@ import { wordErrorToast } from '@/components/NeoToast';
 import { awardComboCoins } from '@/utils/coinManager';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { recordNotInDictionary } from '@/utils/invalidWordTracker';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
@@ -267,6 +268,9 @@ export function useSinglePlayerCore({
     return canonicalWordScore(word, currentComboLevel, getScoreMultiplier());
   }, [getScoreMultiplier]);
 
+  // Client-side dictionary cache for instant validation
+  const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(settings.language);
+
   const handleWordSubmit = useCallback((word: string) => {
     const normalizedWord = word.toLowerCase().trim();
     const minWordLength = settings.minWordLength ?? 2;
@@ -325,6 +329,64 @@ export function useSinglePlayerCore({
     setFoundWords(foundWordsRef.current);
     wordPace.recordWord();
 
+    // Helper: Handle accepted word (extracted for reuse)
+    const handleValidWord = () => {
+      const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
+      const scoreWithoutMultiplier = canonicalWordScore(normalizedWord, currentCombo, 1);
+      const multiplier = getScoreMultiplier();
+      const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
+
+      foundWordsRef.current = foundWordsRef.current.map(fw =>
+        fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus } : fw
+      );
+      setFoundWords(foundWordsRef.current);
+      wordPace.recordWord();
+      setScore(prev => prev + fullScore);
+      playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
+      effects.lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
+      combo.incrementCombo(true);
+      trainingAnalysisTrackValidWord(normalizedWord.length);
+      trainingTrackValidWord(normalizedWord.length);
+      if (combo.validWordCount > 1) playComboSound(currentCombo + 1);
+      setCurrentFeedback({
+        id: `accept-${now}`, type: 'accepted', word: normalizedWord.toUpperCase(),
+        score: fullScore, fireRoundActive, fireRoundBonus, timestamp: now,
+      });
+      announceWordResult(normalizedWord, true, fullScore);
+      announceCombo(currentCombo + 1);
+
+      const validatedWords = foundWordsRef.current
+        .filter(fw => fw.isValid === true)
+        .map(fw => ({ word: fw.word, score: fw.score, timestamp: fw.timestamp, timeSinceStart: fw.timeSinceStart, isValid: true, comboBonus: fw.comboBonus }));
+      const newAchievements = checkLiveAchievements(
+        achievementStateRef.current, validatedWords, normalizedWord, true, timeSinceStart, currentCombo + 1, settings.timerSeconds
+      );
+      if (newAchievements.length > 0) setLiveAchievements(prev => [...prev, ...newAchievements]);
+    };
+
+    // Helper: Handle invalid word (not in dictionary)
+    const handleInvalidWord = () => {
+      combo.resetCombo();
+      foundWordsRef.current = foundWordsRef.current.map(fw =>
+        fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
+      );
+      setFoundWords(foundWordsRef.current);
+      wordPace.recordWord();
+      const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
+      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
+      recordNotInDictionary(normalizedWord, settings.language, 'single_player');
+    };
+
+    // CACHE HIT SHORT-CIRCUIT: If dictionary is loaded and word is in cache, accept IMMEDIATELY
+    // (synchronously, with no network latency). Community-validated words bypass the base dict,
+    // so a cache miss doesn't mean invalid — we still need to check the server.
+    if (isDictionaryCacheLoaded && checkWordInCache(normalizedWord)) {
+      handleValidWord();
+      return;
+    }
+
+    // Cache miss or not loaded yet: fetch from server for verification
     fetch('/api/dictionary/check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word: normalizedWord, language: settings.language }),
@@ -332,62 +394,24 @@ export function useSinglePlayerCore({
       .then(res => res.ok ? res.json() : { isValid: false, source: 'error' })
       .then(result => {
         if (result.isValid) {
-          const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
-          const scoreWithoutMultiplier = canonicalWordScore(normalizedWord, currentCombo, 1);
-          const multiplier = getScoreMultiplier();
-          const fireRoundBonus = multiplier > 1 ? scoreWithoutMultiplier : 0;
-
-          foundWordsRef.current = foundWordsRef.current.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus } : fw
-          );
-          setFoundWords(foundWordsRef.current);
-    wordPace.recordWord();
-          setScore(prev => prev + fullScore);
-          playWordAcceptedSound(); hapticForWordScore(normalizedWord.length);
-          effects.lastWordFoundTimeRef.current = Date.now(); setShowHintPrompt(false);
-          combo.incrementCombo(true);
-          trainingAnalysisTrackValidWord(normalizedWord.length);
-          trainingTrackValidWord(normalizedWord.length);
-          if (combo.validWordCount > 1) playComboSound(currentCombo + 1);
-          setCurrentFeedback({
-            id: `accept-${now}`, type: 'accepted', word: normalizedWord.toUpperCase(),
-            score: fullScore, fireRoundActive, fireRoundBonus, timestamp: now,
-          });
-          announceWordResult(normalizedWord, true, fullScore);
-          announceCombo(currentCombo + 1);
-
-          const validatedWords = foundWordsRef.current
-            .filter(fw => fw.isValid === true)
-            .map(fw => ({ word: fw.word, score: fw.score, timestamp: fw.timestamp, timeSinceStart: fw.timeSinceStart, isValid: true, comboBonus: fw.comboBonus }));
-          const newAchievements = checkLiveAchievements(
-            achievementStateRef.current, validatedWords, normalizedWord, true, timeSinceStart, currentCombo + 1, settings.timerSeconds
-          );
-          if (newAchievements.length > 0) setLiveAchievements(prev => [...prev, ...newAchievements]);
+          handleValidWord();
         } else {
-          combo.resetCombo();
-          foundWordsRef.current = foundWordsRef.current.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
-          );
-          setFoundWords(foundWordsRef.current);
-    wordPace.recordWord();
-          const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
-          setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
-          playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
-          recordNotInDictionary(normalizedWord, settings.language, 'single_player');
+          handleInvalidWord();
         }
       })
       .catch(() => {
+        // Treat network errors as invalid
         combo.resetCombo();
         foundWordsRef.current = foundWordsRef.current.map(fw =>
           fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
         );
         setFoundWords(foundWordsRef.current);
-    wordPace.recordWord();
+        wordPace.recordWord();
         const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
         setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
         playWordRejectedSound(); hapticError();
       });
-  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playWordRejectedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace]);
+  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playWordRejectedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace, isDictionaryCacheLoaded, checkWordInCache]);
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,

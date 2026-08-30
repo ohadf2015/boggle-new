@@ -451,6 +451,10 @@ const es = {
     "dismiss": "Cerrar",
     "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
+  "wordTowerV2": {
+    "cardTitle": "Torre de Palabras v2",
+    "cardDesc": "Física real: versión beta"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "GIRO DE HOY",
@@ -9191,6 +9195,11 @@ const es = {
   },
   "quickPlay": {
     "solo": {
+      "durationLabel": "Duración",
+      "durationUnit": "segundos",
+      "wordBreakdown": "Desglose de puntos",
+      "wordDetails": "Detalle de palabras",
+      "totalWords": "{count} palabras",
       "title": "Partida rápida",
       "round": "Ronda",
       "random": "Aleatorio",
@@ -12206,6 +12215,9 @@ const es = {
     }
   },
   "teacher": {
+    "proGate": {
+      "cta": "Desbloquéalo con Pro: ${{price}}/mes"
+    },
     "subscription": {
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
@@ -12252,6 +12264,14 @@ const es = {
       "districtTitle": "¿Escuela o distrito?",
       "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
       "districtCta": "Contáctanos para precios escolares",
+      "checkoutUnavailable": "El pago está cerrado ahora mismo; no se ha cobrado nada. Inténtalo de nuevo en un rato.",
+      "featureOutcome1": "Da todas las clases que enseñas, sin tope",
+      "featureOutcome2": "Añade la lista entera, no solo los diez primeros",
+      "featureOutcome3": "Mira quién se atasca, palabra a palabra, en directo",
+      "featureOutcome4": "Compara el progreso de todas tus clases",
+      "priceTaxNote": "Pueden añadirse impuestos al pagar.",
+      "proHeroAlt": "Una profesora mira la clasificación de la clase en directo en la pizarra mientras el alumnado juega desde sus sitios.",
+      "valueHeadline": "Clases ilimitadas, alumnos ilimitados, progreso en directo.",
       "matrix": {
         "title": "Comparar planes",
         "featureColumn": "Función",
@@ -12296,6 +12316,8 @@ const es = {
       "insights": "DATOS",
       "viewReports": "Ver informes",
       "viewReportsDesc": "Ver informes detallados y análisis de tus aulas",
+      "studentsPresentTitle": "{count} alumnos están en {classroom} ahora mismo",
+      "studentsPresentDescription": "Empieza una partida y entrarán directamente.",
       "tab": {
         "play": "Jugar",
         "prepare": "Preparar",
@@ -12336,6 +12358,8 @@ const es = {
         "large": "Grande (6×6)"
       },
       "create": "Crear Aula",
+      "createAnother": "Crear Otra Aula",
+      "creating": "Creando...",
       "defaultName": "Mi Clase",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",
@@ -12362,14 +12386,25 @@ const es = {
       "error": {
         "createFailed": "No se pudo crear la clase",
         "updateFailed": "No se pudo actualizar la clase",
-        "deleteFailed": "No se pudo eliminar la clase"
+        "deleteFailed": "No se pudo eliminar la clase",
+            "copyFailed": "No se pudo copiar el código. Inténtalo de nuevo."
       },
       "dialog": {
         "createDescription": "Crea una nueva clase para tus estudiantes",
         "editDescription": "Edita los detalles de tu clase"
       },
+      "presenter": {
+        "present": "Presentar",
+        "visitUrl": "Visita:",
+        "orEnterCode": "O ingresa el código:",
+        "scanQr": "Escanea el código QR:",
+        "shareTip": "Comparte este código con tus estudiantes a través de Google Classroom, correo electrónico o mensaje de texto",
+        "pressEscape": "Presiona ESC para salir",
+        "exit": "Salir de la presentación"
+      },
       "language": "Idioma",
-      "created": "Creado {{date}}",
+      "created": "¡{{classroomName}} creada! Comparte el código para comenzar.",
+      "shareCode": "Comparte este código con tus estudiantes",
       "noClassrooms": "Sin aulas aún",
       "createFirst": "Crea tu primera aula para empezar",
       "inviteStudents": "Invitar alumnos",
@@ -12921,6 +12956,10 @@ const es = {
     "home": {
       "badge_teacher": "Profesor",
       "badge_student": "Clase",
+      "badge_promo": "Modo clase",
+      "promo_title": "Enseña con LexiClash — gratis",
+      "promo_subtitle": "Juega con tu clase, crea tus listas de palabras y mira quién se atasca.",
+      "promo_cta": "Ver el modo clase",
       "teacher_title": "Tu clase está lista",
       "teacher_subtitle": "Crea clases, asigna partidas y sigue el progreso de tus alumnos.",
       "teacher_cta": "Abrir panel del profesor",
@@ -12978,9 +13017,9 @@ const es = {
       "title": "LexiClash Education",
       "startGame": "Iniciar juego",
       "hero": {
-        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
+        "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés, español y ruso",
         "h1": "Juegos de vocabulario para tu aula — sin cuentas de estudiantes.",
-        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
+        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para {count} idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
         "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",
@@ -13085,7 +13124,7 @@ const es = {
         "title": "Preguntas frecuentes",
         "q1": {
           "q": "¿Cómo solicito acceso de docente?",
-          "a": "Ingresa en /education/access. Revisamos manualmente. Respuesta en menos de 24 horas."
+          "a": "Rellena el breve formulario en /education/access: el acceso se concede en el momento de enviarlo y tu panel se abre al instante."
         },
         "q2": {
           "q": "¿Hay un plan gratis?",
@@ -13118,7 +13157,7 @@ const es = {
       },
       "cta": {
         "title": "¿Listo para traer LexiClash a tu aula?",
-        "body": "Solicita acceso de docente. 60 segundos. Aprobado en menos de 24 horas.",
+        "body": "Solicita acceso de docente: 60 segundos y entras en cuanto lo envías.",
         "button": "Solicitar acceso como docente"
       },
       "teacherLeadCta": {
@@ -13300,7 +13339,9 @@ const es = {
     "lesson": {
       "creationFailed": "No se pudo crear la lección. Inténtalo de nuevo.",
       "created": "¡Lección creada exitosamente!",
-      "preferCustom": "O crea tu propia lista de vocabulario personalizada:"
+      "preferCustom": "O crea tu propia lista de vocabulario personalizada:",
+      "word": "palabra",
+      "words": "palabras"
     },
     "students": "estudiantes",
     "student": {
@@ -13319,6 +13360,7 @@ const es = {
         "success": "¡Ya estás dentro!",
         "invalidCode": "Ese código no funciona",
         "alreadyMember": "Ya estás en esta aula",
+        "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "codePasted": "¡Código pegado!",
         "emptyClipboard": "No hay nada copiado",
         "clipboardError": "No se pudo leer el portapapeles",
@@ -13475,6 +13517,8 @@ const es = {
       "submitted_on": "Enviada el",
       "already_approved_title": "¡Ya tienes acceso!",
       "go_to_teacher": "Ir al panel",
+      "status_unknown_title": "No pudimos leer el estado de tu acceso",
+      "status_unknown_body": "Algo falló por nuestra parte. Abre tu panel de profesor o recarga esta página para volver a comprobarlo.",
       "auth_required_title": "Regístrate para solicitar acceso docente",
       "auth_required_body": "El acceso docente está vinculado a una cuenta verificada. Crea una cuenta gratis o inicia sesión y seguimos justo aquí.",
       "auth_required_cta": "Registrarse o iniciar sesión",

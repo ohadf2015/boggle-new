@@ -1161,7 +1161,18 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // orbit radius is min(w,h)-based and caps at ~140px, so the box never
         // needs to grow past md:w-96 (384px) — bigger only floats the ring away
         // from the centred letters. Keep it contained & centred on desktop.
-        className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] short:max-w-[max(132px,min(calc(100cqb-72px),46svh))] short:max-h-[max(132px,min(calc(100cqb-72px),46svh))] shrink-0 flex items-center justify-center touch-none"
+        //
+        // Every cap is wrapped in min(100cqb, …) because this box is shrink-0
+        // inside the flex-1 cluster — these caps are the ONLY thing keeping it
+        // inside its container. A bare `max(176px, …)` floor WINS when the
+        // container is smaller than the floor, which happens for real on
+        // Android: an anchored AdMob banner feeds --bottom-stack-height, the
+        // cluster is squeezed to ~126px, the orbit floors at 176px, and the
+        // cluster overflows by ~64px — Submit lands on top of the found-words
+        // chips (measured 60px overlap) and the board is crushed into the top
+        // of the screen. min(100cqb, …) is inert on normal viewports, where
+        // 100cqb is already the largest term.
+        className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[min(100cqb,max(176px,calc(100cqb-116px)))] max-h-[min(100cqb,max(176px,calc(100cqb-116px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-72px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-72px),46svh)))] shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -1391,12 +1402,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     <div
       ref={gameContainerRef}
       className={cn(
-        // Defense in depth: parent (WordWheelChallenge playing wrapper) already
-        // reserves --bottom-stack-height, but if banner ever paints anyway
-        // (Android mid-nav race, future routes), the found-words list below
-        // the sticky action bar would bleed into reserved zone. pb-bottom-stack
-        // here keeps the list above any banner overlap.
-        'relative flex flex-col items-center w-full flex-1 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-3 sm:px-4 pb-bottom-stack rounded-neo',
+        // No bottom-stack padding here. `body.screen-fit-locked` already reserves
+        // --bottom-stack-height, and padding is additive, not idempotent: this
+        // used to reserve it a third time (body + challenge playing wrapper +
+        // here). On Android with an AdMob banner that is 3 x 154px = 462px lost
+        // from an 832px viewport — the board was crushed into the top third and
+        // Submit sat on top of the found-words chips. The action bar is no
+        // longer sticky (it moved inside the wheel cluster), so the original
+        // "defence in depth" reason no longer applies either.
+        'relative flex flex-col items-center w-full flex-1 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-3 sm:px-4 rounded-neo',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
       translate="no"

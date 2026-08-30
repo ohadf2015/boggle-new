@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import PracticeResults from '../PracticeResults';
 import type { SinglePlayerResultsData } from '../../SinglePlayerView';
 
@@ -76,6 +76,9 @@ vi.mock('@/hooks/useReducedMotion', () => ({
   default: () => true, // Disable animations in tests
 }));
 
+// Handle returned by the mocked `animate()`; asserted by the cleanup test below.
+const mockAnimationStop = vi.fn();
+
 // Mock framer-motion to render plain elements
 vi.mock('framer-motion', () => {
   const MockDiv = React.forwardRef<HTMLDivElement, React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>>(
@@ -101,7 +104,7 @@ vi.mock('framer-motion', () => {
   },
   useMotionValue: () => ({ on: () => () => {} }),
   useTransform: () => ({ on: () => () => {} }),
-  animate: vi.fn(),
+  animate: vi.fn(() => ({ stop: mockAnimationStop })),
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 };});
 
@@ -339,6 +342,27 @@ describe('PracticeResults — Celebratory Redesign', () => {
     it('does not render "Play with Friends" suggestion', () => {
       render(<PracticeResults {...defaultProps} />);
       expect(screen.queryByText('practiceResults.tryMultiplayer')).not.toBeInTheDocument();
+    });
+  });
+
+  // ── Count-up animation cleanup ──
+
+  describe('count-up cleanup', () => {
+    // The count-up starts inside a setTimeout. A cleanup returned from that
+    // callback is discarded — only the useEffect's own return runs — so
+    // unmounting after the delay used to leave animate() controls running.
+    it('stops the count-up animation when unmounted after the start delay', () => {
+      vi.useFakeTimers();
+      try {
+        const { unmount } = render(<PracticeResults {...defaultProps} />);
+        act(() => {
+          vi.advanceTimersByTime(5000);
+        });
+        unmount();
+        expect(mockAnimationStop).toHaveBeenCalled();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

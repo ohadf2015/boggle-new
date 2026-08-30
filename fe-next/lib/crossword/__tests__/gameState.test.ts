@@ -122,6 +122,32 @@ describe('inputLetter auto-advance', () => {
     expect(s.dir).toBe('across');
     expect(s.active).toEqual({ row: 0, col: 1 }); // normal in-slot advance
   });
+
+  // The reported bug: on the LAST cell of a word whose blank is EARLIER, every forward-looking
+  // branch missed and the cursor sat still, so the next keypress overwrote the cell just typed
+  // instead of moving on.
+  it('wraps to an earlier blank in the word instead of parking on the last cell', () => {
+    let s = initGame(puzzle);
+    // 1-across "bird": fill (0,1)(0,2) and leave (0,0) blank, then type into the last cell.
+    s = focusCell(s, 0, 1);
+    s = inputLetter(s, 'i');
+    s = inputLetter(s, 'r');
+    s = inputLetter(s, 'd'); // now at the last cell (0,3) — this fills it
+    expect(s.entries['0,3']).toBe('d');
+    // Only (0,0) is blank, and it is BEHIND the cursor. Wrap to it.
+    expect(s.active).toEqual({ row: 0, col: 0 });
+    expect(s.dir).toBe('across');
+  });
+
+  it('never overwrites a filled cell when a blank remains in the word', () => {
+    let s = initGame(puzzle);
+    s = focusCell(s, 0, 3);
+    s = inputLetter(s, 'd'); // last cell of 1-across; (0,0..2) blank
+    const before = s.entries['0,3'];
+    s = inputLetter(s, 'b'); // must land in a blank, not re-write (0,3)
+    expect(s.entries['0,3']).toBe(before);
+    expect(s.entries['0,0']).toBe('b');
+  });
 });
 
 describe('backspace', () => {

@@ -8,11 +8,21 @@
  * reaches it, so its scroll-viewport bottom sat behind the ad.
  *
  * Current layout: action-bar lives INSIDE the flex-1 wheel cluster (glued
- * to the wheel, no sticky). Clearance is owned solely by the playing
- * wrapper's `pb-bottom-stack` reservation. The container's own
- * `pb-bottom-stack` + the inline-submit-chip near the word-builder cover
- * the case where the found-words list scrolls the inline action-bar out of
- * view.
+ * to the wheel, no sticky).
+ *
+ * Clearance is reserved EXACTLY ONCE, by `body.screen-fit-locked` in
+ * globals.css. This file used to also require the game container to carry
+ * `pb-bottom-stack` "for defence in depth" — but padding is additive, not
+ * idempotent, so body + challenge playing wrapper + game container reserved
+ * the band three times. Measured on Android-sized viewport with an AdMob
+ * banner (--bottom-stack-height 154px): 3 x 154 = 462px lost from an 832px
+ * viewport. The wheel cluster collapsed 434px -> 126px, its shrink-0 orbit
+ * overflowed by 64px, and Submit rendered 60px on top of the found-words
+ * chips. After reserving once: overlap 0, content bottom 678/832.
+ *
+ * So the assertion below is inverted on purpose: the game container must NOT
+ * re-reserve. The inline-submit-chip near the word-builder still covers the
+ * case where the found-words list scrolls the action-bar out of view.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -78,7 +88,7 @@ beforeEach(() => {
 });
 
 describe('WordWheelGame action-bar banner clearance', () => {
-  it('action-bar is inline (not sticky); container reserves --bottom-stack-height', () => {
+  it('action-bar is inline (not sticky) and the container does NOT re-reserve the bottom stack', () => {
     render(
       <WordWheelGame
         puzzle={puzzle}
@@ -101,10 +111,16 @@ describe('WordWheelGame action-bar banner clearance', () => {
     expect(cls).not.toMatch(/bottom-\[var\(--bottom-stack-height/);
     expect(bar.style.bottom).toBe('');
 
-    // Game container reserves bottom-stack height so the inline bar (and the
-    // found-words list below it) clear the AdMob banner.
-    const container = bar.closest('div.pb-bottom-stack') as HTMLElement | null;
-    expect(container).not.toBeNull();
+    // The bottom stack is reserved once, by body.screen-fit-locked. Nothing in
+    // this component may reserve it again — see the file header for the 462px
+    // triple-reservation this guards against.
+    const doubleReserved = bar.closest('div.pb-bottom-stack') as HTMLElement | null;
+    expect(
+      doubleReserved,
+      'WordWheelGame re-reserves --bottom-stack-height; body.screen-fit-locked ' +
+        'already does. Padding is additive — this compounds into hundreds of ' +
+        'lost px on Android with an AdMob banner.',
+    ).toBeNull();
   });
 
   it('inline-submit-chip remains accessible as a primary CTA when word is built', async () => {

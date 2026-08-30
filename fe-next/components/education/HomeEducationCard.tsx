@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { GraduationCap, BookOpen, ArrowRight } from 'lucide-react';
+import { GraduationCap, BookOpen, Sparkles, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { TrialStatus } from '@/lib/education/trial';
 
-export type EducationHomeRole = 'teacher' | 'student';
+export type EducationHomeRole = 'teacher' | 'student' | 'promo';
 
 interface HomeEducationCardProps {
   /** Which dashboard this user belongs to. */
@@ -18,30 +18,49 @@ interface HomeEducationCardProps {
 }
 
 /**
- * Homepage entry point for users who have education access — a teacher (with a
- * live trial countdown) or a student who's been added to a classroom. Purely
- * presentational: the connected wrapper decides whether to render it at all and
- * feeds the role/trial/classroom. Keeps education one tap from the main home
- * surface so approved teachers and enrolled students don't have to remember the
- * /teacher or /student URLs.
+ * Homepage entry point for education — a teacher (with a live trial countdown), a student
+ * who's been added to a classroom, or the one-shot `promo` pitch for everyone else. Purely
+ * presentational: the connected wrapper decides whether to render it at all and feeds the
+ * role/trial/classroom. Keeps education one tap from the main home surface so approved
+ * teachers and enrolled students don't have to remember the /teacher or /student URLs —
+ * and so everyone else learns the classroom mode exists at least once.
  */
 export function HomeEducationCard({ role, trial, classroomName }: HomeEducationCardProps) {
   const { t, language } = useLanguage();
   const isTeacher = role === 'teacher';
+  const isPromo = role === 'promo';
 
-  const target = `/${language}/${isTeacher ? 'teacher' : 'student'}`;
-  const Icon = isTeacher ? GraduationCap : BookOpen;
+  // The promo lands on the public /education page, not a dashboard the viewer can't open.
+  const target = `/${language}/${isPromo ? 'education' : isTeacher ? 'teacher' : 'student'}`;
+  const Icon = isPromo ? Sparkles : isTeacher ? GraduationCap : BookOpen;
 
-  const title = isTeacher ? t('education.home.teacher_title') : t('education.home.student_title');
-  const subtitle = isTeacher
-    ? t('education.home.teacher_subtitle')
-    : classroomName || t('education.home.student_subtitle');
-  const cta = isTeacher ? t('education.home.teacher_cta') : t('education.home.student_cta');
-  const badge = isTeacher ? t('education.home.badge_teacher') : t('education.home.badge_student');
+  // Keys stay literal rather than built from `role` — the education i18n guardrail
+  // (app/[locale]/education/__tests__/educationTranslationKeys.test.ts) can only see
+  // statically-written keys, and a template literal would silently opt out of it.
+  const title = isPromo
+    ? t('education.home.promo_title')
+    : isTeacher
+      ? t('education.home.teacher_title')
+      : t('education.home.student_title');
+  const subtitle = isPromo
+    ? t('education.home.promo_subtitle')
+    : isTeacher
+      ? t('education.home.teacher_subtitle')
+      : classroomName || t('education.home.student_subtitle');
+  const cta = isPromo
+    ? t('education.home.promo_cta')
+    : isTeacher
+      ? t('education.home.teacher_cta')
+      : t('education.home.student_cta');
+  const badge = isPromo
+    ? t('education.home.badge_promo')
+    : isTeacher
+      ? t('education.home.badge_teacher')
+      : t('education.home.badge_student');
 
-  // Icon tile + accent per role. Teacher = cyan, student = lime — matches the
-  // education header/menu color language.
-  const accent = isTeacher ? 'bg-neo-cyan' : 'bg-neo-lime';
+  // Icon tile + accent per role. Teacher = cyan, student = lime, promo = purple — matches
+  // the education header/menu color language.
+  const accent = isPromo ? 'bg-neo-purple' : isTeacher ? 'bg-neo-cyan' : 'bg-neo-lime';
 
   return (
     <Link

@@ -377,6 +377,10 @@ const en = {
     "share": {"copy": "Copy result","copied": "Copied!","emojiRowAria": "Emoji summary of your run","captionPerfect": "Flawless transmutation! 🧪","captionWild": "The catalyst came in clutch! 🔮","captionGood": "Solid alchemy! 🌡️","captionHard": "The elements fought back today 😅"}
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss","issueProbe":{"prompt":"What made it feel that way?","botsStrong":"Bots too strong","technical":"Technical issue"}},
+  "wordTowerV2": {
+    "cardTitle": "Word Tower v2",
+    "cardDesc": "Real physics — beta preview"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "TODAY'S TWIST",
@@ -7898,6 +7902,11 @@ const en = {
   },
   "quickPlay": {
 "solo": {
+      "durationLabel": "Duration",
+      "durationUnit": "seconds",
+      "wordBreakdown": "Score breakdown",
+      "wordDetails": "Word details",
+      "totalWords": "{count} words",
       "title": "Quick Play",
       "round": "Round",
       "random": "Random",
@@ -10840,6 +10849,8 @@ const en = {
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
       "viewReportsDesc": "View detailed reports and analytics for your classrooms",
+      "studentsPresentTitle": "{count} students are in {classroom} right now",
+      "studentsPresentDescription": "Start a game and they drop straight in.",
       "tab": {
         "play": "Play",
         "prepare": "Prepare",
@@ -10880,6 +10891,8 @@ const en = {
         "large": "Large (6×6)"
       },
       "create": "Create Classroom",
+      "createAnother": "Create Another Classroom",
+      "creating": "Creating...",
       "defaultName": "My Class",
       "edit": "Edit Classroom",
       "delete": "Delete Classroom",
@@ -10896,7 +10909,8 @@ const en = {
       "noMembers": "No students yet",
       "settingUp": "Setting up your classroom...",
       "language": "Language",
-      "created": "Created {{date}}",
+      "created": "{{classroomName}} created! Share the code to get started.",
+      "shareCode": "Share this code with your students",
       "noClassrooms": "No classrooms yet",
       "createFirst": "Create your first classroom to get started",
       "inviteStudents": "Invite students",
@@ -10935,11 +10949,21 @@ const en = {
       "error": {
         "createFailed": "Failed to create classroom",
         "updateFailed": "Failed to update classroom",
-        "deleteFailed": "Failed to delete classroom"
+        "deleteFailed": "Failed to delete classroom",
+        "copyFailed": "Failed to copy code. Please try again."
       },
       "dialog": {
         "createDescription": "Create a new classroom with name and language settings",
         "editDescription": "Edit classroom name and language settings"
+      },
+      "presenter": {
+        "present": "Present",
+        "visitUrl": "Visit:",
+        "orEnterCode": "Or enter code:",
+        "scanQr": "Scan QR code:",
+        "shareTip": "Share this code with your students via Google Classroom, email, or text message",
+        "pressEscape": "Press ESC to exit",
+        "exit": "Exit Presentation"
       }
     },
     "classrooms": {
@@ -11236,6 +11260,9 @@ const en = {
       "standard": "Curriculum Standard",
       "lastUpdated": "Last Updated"
     },
+    "proGate": {
+      "cta": "Unlock this with Pro — ${{price}}/month"
+    },
     "subscription": {
       "classLimitTitle": "You've Reached Your Class Limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
@@ -11282,6 +11309,14 @@ const en = {
       "districtTitle": "School or district?",
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
       "districtCta": "Get in touch for school pricing",
+      "checkoutUnavailable": "Checkout is closed right now — nothing was charged. Please try again shortly.",
+      "featureOutcome1": "Run every class you teach — no cap",
+      "featureOutcome2": "Add the whole roster, not the first ten",
+      "featureOutcome3": "See who is stuck, word by word, live",
+      "featureOutcome4": "Compare progress across all your classes",
+      "priceTaxNote": "Taxes may be added at checkout.",
+      "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
+      "valueHeadline": "Unlimited classes, unlimited students, live progress.",
       "matrix": {
         "title": "Compare plans",
         "featureColumn": "Feature",
@@ -11495,6 +11530,10 @@ const en = {
     "home": {
       "badge_teacher": "Teacher",
       "badge_student": "Classroom",
+      "badge_promo": "Classroom mode",
+      "promo_title": "Teach with LexiClash — free",
+      "promo_subtitle": "Run word games with your class, set your own word lists, see who is stuck.",
+      "promo_cta": "See classroom mode",
       "teacher_title": "Your classroom is ready",
       "teacher_subtitle": "Create classes, assign games, and track student progress.",
       "teacher_cta": "Open teacher dashboard",
@@ -11552,9 +11591,9 @@ const en = {
       "title": "LexiClash Education",
       "startGame": "Start Game",
       "hero": {
-        "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
+        "eyebrow": "For teachers in English, Hebrew, Swedish, Japanese, Spanish and Russian classrooms",
         "h1": "Vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for {count} languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
         "cta_note": "Free plan to start • Approved in ~24h",
@@ -11659,7 +11698,7 @@ const en = {
         "title": "Frequently asked questions",
         "q1": {
           "q": "How do teachers get access?",
-          "a": "Apply at /education/access — we review by email and typically respond within 24 hours."
+          "a": "Fill in the short form at /education/access — access is granted the moment you submit it, and your dashboard opens straight away."
         },
         "q2": {
           "q": "Is there a free plan?",
@@ -11692,7 +11731,7 @@ const en = {
       },
       "cta": {
         "title": "Ready to bring LexiClash to your classroom?",
-        "body": "Apply for teacher access — takes 60 seconds, typically approved within 24 hours.",
+        "body": "Request teacher access — 60 seconds, and you are in as soon as you submit it.",
         "button": "Request Teacher Access"
       },
       "teacherLeadCta": {
@@ -11875,11 +11914,14 @@ const en = {
     "lesson": {
       "creationFailed": "Couldn't create lesson. Please try again.",
       "created": "Lesson created successfully!",
-      "preferCustom": "Or create your own custom vocabulary list:"
+      "preferCustom": "Or create your own custom vocabulary list:",
+      "word": "word",
+      "words": "words"
     },
     "student": {
       "join": {
         "alreadyMember": "Already in this class!",
+        "classroomFull": "This class is full — ask your teacher to make room.",
         "button": "Join",
         "clipboardError": "Couldn't read clipboard",
         "codeHint": "6 characters from your teacher",
@@ -12058,6 +12100,8 @@ const en = {
       "submitted_on": "Submitted",
       "already_approved_title": "You already have teacher access.",
       "go_to_teacher": "Open Teacher Dashboard",
+      "status_unknown_title": "We couldn't read your access status",
+      "status_unknown_body": "Something went wrong on our side. Open your teacher dashboard, or reload this page to check again.",
       "auth_required_title": "Sign up to request teacher access",
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Sign up or sign in",

@@ -82,6 +82,9 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
 
   useEffect(() => {
     if (gameCode && typeof window !== 'undefined') {
+      // `/[locale]/join/[code]` is the only join route that resolves — the
+      // bare `/join?code=` form redirects to a locale and then 404s, which is
+      // what every scanned QR did.
       setJoinUrl(`${window.location.origin}/${language}/join/${gameCode}`);
     }
   }, [gameCode, language]);

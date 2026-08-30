@@ -51,7 +51,11 @@ describe('shouldSuppressInterstitialForTier', () => {
  * Child-directed SDK config passed to AdMob.initialize() — the
  * "Families Self-Certified Ads SDK" half of the rejection. Every user we don't
  * KNOW is an adult is treated as child-directed (non-personalized, TFUA).
- * `maxAdContentRating` is always General (G) for the whole children-inclusive app.
+ * `maxAdContentRating` follows the tier: G for anyone who might be a child, Teen
+ * for known adults. The app EXITED the Families program on 2026-06-08 (Play
+ * target age is 13-15 / 16-17 / 18+, AdMob console is capped at TEEN account-wide
+ * — see .claude/notes/android-release-status.md), so a blanket G cap no longer
+ * matches the listing and only starves the auction.
  */
 describe('resolveChildDirectedAdInit', () => {
   it('tags child-directed + under-age-of-consent for a known child', () => {
@@ -70,11 +74,11 @@ describe('resolveChildDirectedAdInit', () => {
     });
   });
 
-  it('does NOT child-direct known adults, but still caps content rating at G', () => {
+  it('does NOT child-direct known adults and caps their content rating at Teen', () => {
     expect(resolveChildDirectedAdInit('adult')).toEqual({
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
-      maxAdContentRating: 'General',
+      maxAdContentRating: 'Teen',
     });
   });
 });

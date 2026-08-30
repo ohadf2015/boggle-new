@@ -180,15 +180,23 @@ const PodiumScoreCounter: React.FC<{ target: number; delay: number; className?: 
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
+    // Handles are hoisted so the effect's own cleanup can release them. A
+    // cleanup returned from the setTimeout callback would be discarded, leaving
+    // the animation and subscription live after unmount.
+    let controls: { stop: () => void } | null = null;
+    let unsub: (() => void) | null = null;
     const timeout = setTimeout(() => {
-      const controls = animate(motionVal, target, {
+      controls = animate(motionVal, target, {
         duration: 1.4,
         ease: [0.16, 1, 0.3, 1],
       });
-      const unsub = rounded.on('change', (v) => setDisplay(v));
-      return () => { controls.stop(); unsub(); };
+      unsub = rounded.on('change', (v) => setDisplay(v));
     }, delay * 1000);
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      controls?.stop();
+      unsub?.();
+    };
   }, [target, delay, motionVal, rounded]);
 
   return <span className={className}>{display}</span>;

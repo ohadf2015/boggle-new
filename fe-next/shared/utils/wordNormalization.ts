@@ -257,6 +257,20 @@ export function sanitizeWord(word: string, language?: Language): string {
 // ============================================================
 
 /**
+ * Every letter, across every supported language, that may appear in a single
+ * word — Latin, Latin-1 Supplement + Extended-A (sv/es/fr/de), Hebrew, Cyrillic,
+ * Kana and CJK. Script-agnostic on purpose: request schemas validate the shape
+ * of a word without asserting it matches the caller's declared language.
+ *
+ * Keep this in step with the `Language` union. It once omitted Cyrillic while
+ * the hint API's own language enum accepted 'ru', so every Russian hint request
+ * 400'd (Sentry: `[HintGenerator] API error: 400`).
+ */
+export const ANY_LANGUAGE_WORD_PATTERN =
+  // Latin · Latin-1 Supplement + Extended-A/B (skipping × ÷) · Cyrillic · Hebrew · Kana · CJK
+  /^[a-zA-ZÀ-ÖØ-öø-ɏЀ-ӿ֐-׿぀-ヿ一-龯]+$/;
+
+/**
  * Language-specific regex patterns for valid characters
  */
 const LANGUAGE_PATTERNS: Record<Language, RegExp> = {

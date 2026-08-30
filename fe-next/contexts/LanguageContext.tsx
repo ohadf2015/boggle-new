@@ -355,7 +355,15 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }
 
         return typeof current === 'string' ? interpolate(current, params) : interpolate(fallback || path, params);
-    }, [language]);
+        // `translationsReady` is not read above — translations come from the ref.
+        // It is here to change `t`'s IDENTITY when the dictionary lands. Without
+        // it, any memoized subtree that painted during the async load window keeps
+        // its stale `t` and renders raw key paths forever, because nothing ever
+        // re-renders it. Components with a ticking prop healed themselves and hid
+        // this for a long time; static ones (PracticeCoachTip, the swipe hint) did
+        // not. Costs one extra render per consumer, once, when translations arrive.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language, translationsReady]);
 
     // Memoize context value — depends on translationsReady (boolean) not currentTranslations (object).
     // This means consumers re-render at most once per language switch (false→true), not on every
