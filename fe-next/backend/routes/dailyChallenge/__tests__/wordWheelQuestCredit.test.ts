@@ -64,6 +64,7 @@ vi.mock('../../../modules/supabaseServer', () => ({
 
 import { completeDailyQuestsForResult } from '../../../modules/dailyMissionsManager';
 import { updateQuestProgress } from '../../../modules/weeklyQuestManager';
+import logger from '../../../utils/logger';
 import router from '../wordWheelRoutes';
 
 const submission = {
@@ -90,7 +91,9 @@ describe('POST /submit — daily quest credit', () => {
     app.use(express.json());
     app.use('/api/daily-challenge/word-wheel', router);
 
-    await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
+    const res = await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
+    expect(res.status).toBe(200);
+    expect(logger.error).not.toHaveBeenCalled();
 
     expect(completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
 
@@ -109,7 +112,8 @@ describe('POST /submit — daily quest credit', () => {
     app.use(express.json());
     app.use('/api/daily-challenge/word-wheel', router);
 
-    await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
+    const res2 = await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
+    expect(res2.status).toBe(200);
 
     expect(updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
   });
