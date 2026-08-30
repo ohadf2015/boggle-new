@@ -17,6 +17,13 @@ const DEMO_GRID: string[][] = [
   ['P', 'M', 'A', 'D'],
 ];
 
+const SCORING_RULES = [
+  { len: '3 letters', pts: '1 pt' },
+  { len: '4 letters', pts: '2 pts' },
+  { len: '5 letters', pts: '3 pts' },
+  { len: '6+ letters', pts: '5 pts' },
+];
+
 function HeaderButton({
   children,
   variant = 'neutral',
@@ -62,7 +69,7 @@ function CircularTimerShell(): React.JSX.Element {
           cx="40"
           cy="40"
           r="32"
-          stroke="var(--neo-black)"
+          stroke="rgb(var(--neo-black))"
           strokeWidth="4"
           fill="transparent"
         />
@@ -85,6 +92,38 @@ function CircularTimerShell(): React.JSX.Element {
   );
 }
 
+function InfoPanel(): React.JSX.Element {
+  return (
+    <div className="relative z-10 mx-auto w-full max-w-[440px] px-4 pb-2">
+      <div className="grid grid-cols-2 gap-3">
+        {/* Daily puzzle card */}
+        <div className="rounded-xl border-3 border-neo-black bg-neo-cyan/20 p-3 shadow-hard-sm">
+          <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-cyan">
+            Daily Wordshake
+          </div>
+          <div className="text-sm font-black text-neo-white">Daily Puzzle</div>
+          <div className="mt-1 text-[10px] text-neo-white/70">Same board for everyone today</div>
+        </div>
+
+        {/* Scoring rules card */}
+        <div className="rounded-xl border-3 border-neo-black bg-neo-navy-elevated/60 p-3 shadow-hard-sm">
+          <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-lime">
+            Scoring
+          </div>
+          <ul className="space-y-0.5 text-[10px] text-neo-white/80">
+            {SCORING_RULES.map((rule) => (
+              <li key={rule.len} className="flex justify-between">
+                <span>{rule.len}</span>
+                <span className="font-bold text-neo-white">{rule.pts}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function StaticGameShell(): React.JSX.Element {
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-neo-navy">
@@ -101,6 +140,9 @@ export default function StaticGameShell(): React.JSX.Element {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-4 pb-1 pt-3">
         <HeaderButton variant="neutral">← Quit</HeaderButton>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-black uppercase tracking-widest text-neo-white/90">
+          Current Game
+        </div>
         <HeaderButton variant="secondary">Pause</HeaderButton>
       </header>
 
@@ -111,7 +153,7 @@ export default function StaticGameShell(): React.JSX.Element {
         aria-label="Game status"
       >
         <ScoreBadge label="Coins" value={0} align="left" />
-        <ScoreBadge label="Score" value={0} align="right" />
+        <ScoreBadge label="Your Score" value={0} align="right" />
       </div>
 
       {/* Timer + word-forming area */}
@@ -133,6 +175,8 @@ export default function StaticGameShell(): React.JSX.Element {
           0/0
         </span>
       </div>
+
+      <InfoPanel />
 
       {/* Static letter grid */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 pb-4">
