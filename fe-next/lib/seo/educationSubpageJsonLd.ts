@@ -97,7 +97,7 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
     steps: [
       { name: 'Create a session', text: 'Pick a word list, time limit, and game mode (Boggle grid, Word Hunt, or Wheel), then press Create Room.' },
       { name: 'Share the join code', text: 'Your projector view shows the join address and the 6-character code. Students open it on any phone or laptop browser — no login.' },
-      { name: 'Play and review', text: 'Up to 50 students compete in real time. Live leaderboard shows who is ahead. After the round, the dashboard shows class accuracy and which words tripped the most students.' },
+      { name: 'Play and review', text: 'The class competes in real time and a live leaderboard shows who is ahead. After the round, the dashboard shows class accuracy and which words tripped the most students.' },
     ],
     audience: 'K-12 classrooms, ESL/EFL programs, after-school clubs, substitute-teacher activities.',
     educationalUse: ['Vocabulary Building', 'Whole-Class Activity', 'Formative Assessment', 'ESL Practice', 'Brain Break'],
