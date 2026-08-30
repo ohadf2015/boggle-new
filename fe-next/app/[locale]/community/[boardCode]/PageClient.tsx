@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function BoardPlayPageClient({ boardCode }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const goBack = useBackOneLevel();
   const [board, setBoard] = useState<BoardCardBoard | null>(null);
@@ -58,7 +58,10 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
   }[board.difficulty];
 
   const handlePlay = () => {
-    router.push(`/singleplayer?boardCode=${boardCode}`);
+    // Locale-prefixed like every other /singleplayer call site. proxy.ts does
+    // carry the query through its 301 (targetPath includes `search`), so the
+    // bare path worked — this just skips the redirect hop.
+    router.push(`/${language}/singleplayer?boardCode=${boardCode}`);
   };
 
   return (

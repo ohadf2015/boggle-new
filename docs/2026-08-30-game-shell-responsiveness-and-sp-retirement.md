@@ -98,6 +98,15 @@ Measured at 384x832 with the banner simulated:
 
 678 = 832 − 154, i.e. exactly one correct reservation.
 
+**The ready/results screens double-reserve too, and that is deliberately left alone.**
+Measured on the ready screen with the banner simulated: `body.screen-fit` pb=154px
+*and* `WordWheelChallenge:587` pb=154px — reserved twice. But that screen is an
+`overflow-y-auto` scroller, so the surplus becomes scroll space rather than
+compressing anything: deepest content bottom 830 of 832. Only the *locked,
+non-scrolling* playing screen turns the surplus into lost layout. Same for the
+results recap at `:734`. Evaluated, not overlooked — revisit if either stops
+scrolling.
+
 Guard: `components/daily/__tests__/wordWheelOrbitClamp.contract.test.ts`.
 `WordWheelGame.bannerClearance.test.tsx` asserted the *buggy* intent (it required the
 game container to carry `pb-bottom-stack`); its assertion is inverted with the
@@ -192,10 +201,20 @@ difficulty. Deleting it changes onboarding/activation, which is a product call, 
 refactor. Either port that tuning into the Quick Play launch or accept the change
 knowingly.
 
-Cheapest-first order for what is left: `preset` → `boardCode` → `autoStart=bots` →
-`autoStart=challenge` → practice last (it needs `TrainingProgressBar`, skills/hints
-state and its own `PracticeResults`, none of which the 1408-line MP `ResultsPage`
-models).
+`preset` is **not** independently migratable: `preset=bots` is the only value anything
+constructs, and it hits the same `hasPlayedBotsGame()` gate, so it is part of the FTUE
+product call above rather than a separate task.
+
+Cheapest-first order for what is left: **`boardCode`** (the only genuinely independent
+one) → `autoStart=challenge` → the bots/FTUE product call → practice last (it needs
+`TrainingProgressBar`, skills/hints state and its own `PracticeResults`, none of which
+the 1408-line MP `ResultsPage` models).
+
+`boardCode` routing is **not** broken today, despite `community/[boardCode]` pushing a
+bare `/singleplayer?boardCode=…`: `proxy.ts:141` builds its 301 target as
+`` `/${locale}${pathname}${search}` ``, so the query survives and the param keeps the
+request off the Quick Play redirect. The call site is now locale-prefixed anyway, to
+match the other six and skip the hop.
 
 **Two side effects are business logic, not UI, and are exactly what a shell swap
 drops silently** — both need a test that fails if they stop firing:
