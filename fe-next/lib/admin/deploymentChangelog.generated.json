@@ -1,6 +1,41 @@
 {
-  "generatedAt": "2026-08-30T19:42:41.474Z",
+  "generatedAt": "2026-08-30T21:55:40.964Z",
   "commits": [
+    {
+      "sha": "b6624e204f0ea380f99597388b9a58653d42c93c",
+      "shortSha": "b6624e2",
+      "subject": "feat(education): lead with the one differentiator a quiz platform cannot copy",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T00:53:14+03:00"
+    },
+    {
+      "sha": "8e997017b6ad97809e52b4f2b540a18d1a374751",
+      "shortSha": "8e99701",
+      "subject": "fix(education): stop misstating a competitor, and stop overclaiming about ourselves",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T00:52:10+03:00"
+    },
+    {
+      "sha": "cd7640750e581372074aaafdfd97757dffb5e7be",
+      "shortSha": "cd76407",
+      "subject": "feat(education): let the whole class play free — move the paywall past first value",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T00:46:26+03:00"
+    },
+    {
+      "sha": "449f194054a9a34bea170353beb220161d4d110d",
+      "shortSha": "449f194",
+      "subject": "docs: record why the phonics page was rejected, with the specific bad words",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T22:59:41+03:00"
+    },
+    {
+      "sha": "559408338c66688c4a434f3bdde41e3d59f2c8ef",
+      "shortSha": "5594083",
+      "subject": "chore(education): close out the open items — dead code, hub IA, verified pricing",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T22:58:30+03:00"
+    },
     {
       "sha": "71e37967b9a70695d780896e8186b4f39aaeef27",
       "shortSha": "71e3796",
@@ -105,41 +140,6 @@
       "subject": "feat(education): six teacher-moment landing pages, all six locales",
       "author": "Ohad Fisher",
       "date": "2026-08-30T20:52:23+03:00"
-    },
-    {
-      "sha": "10abe1f9cb4c3abc4fc2c7bb6733f17992706b29",
-      "shortSha": "10abe1f",
-      "subject": "fix(education): keep the classroom join code on screen, correct launcher copy",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T20:48:40+03:00"
-    },
-    {
-      "sha": "80f82b3953bb4a363c802c1e5b026bb56913c808",
-      "shortSha": "80f82b3",
-      "subject": "feat(education): shared landing template + fix hreflang, GEO copy, hub perf",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T20:22:28+03:00"
-    },
-    {
-      "sha": "b1a327d764c123fd5d25679ccb75c1a44dc1a79d",
-      "shortSha": "b1a327d",
-      "subject": "fix(boggle-word-shake-free): server-render playable Boggle shell instead of spinner",
-      "author": "ohadf2015",
-      "date": "2026-08-30T10:59:38+03:00"
-    },
-    {
-      "sha": "30f9b58fe13868df7a84a384083fddae612c89c1",
-      "shortSha": "30f9b58",
-      "subject": "merge: unify the game shell and fix board sizing across all three surfaces",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T09:52:03+03:00"
-    },
-    {
-      "sha": "4068917931480cd87834f5109e3b12980e24a7a3",
-      "shortSha": "4068917",
-      "subject": "fix(sentry): ru hints, classroom preview, GSI button, MP usernames",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T09:44:59+03:00"
     }
   ]
 }
