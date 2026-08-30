@@ -203,6 +203,20 @@ Two defects found and fixed while doing it:
 `showLandscapeTutorial` needed no porting: `LandscapeGameLayout` destructured it as
 `_showLandscapeTutorial`, i.e. it was already dead.
 
+
+### Pre-existing test failure, NOT caused by this branch
+
+`components/results/__tests__/WheelRushResultsScene.test.tsx > shows all three stat
+tiles` fails (`expected length 3, got 1`). Two independent checks say it is not ours:
+
+1. `git diff origin/master -- fe-next/components/results/` is **empty** — this branch
+   never touches that component or its test.
+2. It fails identically with the `LanguageContext` `t` dep change temporarily
+   reverted, which is the only file this branch shares with it.
+
+So it is red on `origin/master` too. Don't re-investigate it as fallout from the
+shell swap.
+
 ### The i18n bug this uncovered (app-wide, not shell-specific)
 
 `LanguageContext`'s `t` reads translations from a **ref**, and was memoized on
