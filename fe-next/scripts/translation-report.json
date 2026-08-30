@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6272,
+    "totalKeysInCode": 6271,
     "keyCountByLanguage": {
-      "en": 12146,
-      "es": 12442,
-      "he": 12347,
-      "ja": 12408,
-      "ru": 12187,
-      "sv": 12404
+      "en": 12151,
+      "es": 12447,
+      "he": 12352,
+      "ja": 12413,
+      "ru": 12192,
+      "sv": 12409
     },
     "missingFromEnglish": 66,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 319,
+      "templateLiterals": 321,
       "fallbackUsages": 1,
       "variableKeys": 119
     }
@@ -25,6 +25,20 @@
         "file": "app/[locale]/adventure/boss-rush/BossRushPageClient.tsx",
         "line": 273,
         "context": "{currentWorldConfig && t(`adventure.worlds.${currentWorldConfig.name}`)}"
+      },
+      {
+        "pattern": "`education.access.${key}`",
+        "type": "template_literal",
+        "file": "app/[locale]/education/access/PageClient.tsx",
+        "line": 151,
+        "context": "{t(`education.access.${key}`)}"
+      },
+      {
+        "pattern": "`education.access.${key}`",
+        "type": "template_literal",
+        "file": "app/[locale]/education/access/PageClient.tsx",
+        "line": 227,
+        "context": "{t(`education.access.${key}`)}"
       },
       {
         "pattern": "`showcase3d.rail${i}`",

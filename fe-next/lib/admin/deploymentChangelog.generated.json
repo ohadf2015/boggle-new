@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-29T16:29:45.267Z",
+  "generatedAt": "2026-08-30T18:08:49.169Z",
   "commits": [
     {
-      "sha": "87677a253f73671cc2bf09cb430bb8ba59fdc707",
-      "shortSha": "87677a2",
-      "subject": "fix(ads): re-init AdMob when the age tier flips, so interstitials stop serving child-directed",
+      "sha": "9952d5ce7180ec17b18df85f5443612553585477",
+      "shortSha": "9952d5c",
+      "subject": "fix(education): unblock the student join and give the projector a typeable address",
       "author": "Ohad Fisher",
-      "date": "2026-08-29T00:53:11+03:00"
+      "date": "2026-08-30T21:07:36+03:00"
     },
     {
-      "sha": "a9e7231403741f2ef33ef6e21739fb06168b8df8",
-      "shortSha": "a9e7231",
-      "subject": "fix(game-screens): drop the SEO/FAQ card so play surfaces fill the screen",
+      "sha": "10abe1f9cb4c3abc4fc2c7bb6733f17992706b29",
+      "shortSha": "10abe1f",
+      "subject": "fix(education): keep the classroom join code on screen, correct launcher copy",
       "author": "Ohad Fisher",
-      "date": "2026-08-27T15:44:29+03:00"
+      "date": "2026-08-30T20:48:40+03:00"
     },
     {
-      "sha": "11e6b612d833ebf0a820c5b374a31dc8f3e2fb88",
-      "shortSha": "11e6b61",
-      "subject": "feat(quick-play): animated reward counters for richer payoff",
+      "sha": "30f9b58fe13868df7a84a384083fddae612c89c1",
+      "shortSha": "30f9b58",
+      "subject": "merge: unify the game shell and fix board sizing across all three surfaces",
       "author": "Ohad Fisher",
-      "date": "2026-08-27T00:14:39+03:00"
+      "date": "2026-08-30T09:52:03+03:00"
     },
     {
-      "sha": "3b218c0a12dcf5dc2acc46c9bac292b2d28fc631",
-      "shortSha": "3b218c0",
-      "subject": "fix(quick-play): remove avatar gaming and ensure honest provenance",
+      "sha": "4068917931480cd87834f5109e3b12980e24a7a3",
+      "shortSha": "4068917",
+      "subject": "fix(sentry): ru hints, classroom preview, GSI button, MP usernames",
       "author": "Ohad Fisher",
-      "date": "2026-08-27T00:09:53+03:00"
+      "date": "2026-08-30T09:44:59+03:00"
     },
     {
-      "sha": "835c00e7cec14aa5163a02c373b84cdceae308f7",
-      "shortSha": "835c00e",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-26",
+      "sha": "2100b2691cd4a9858ebcb4ca54bbb046115946cc",
+      "shortSha": "2100b26",
+      "subject": "docs: record the pre-existing WheelRushResultsScene failure so it is not re-chased",
       "author": "Ohad Fisher",
-      "date": "2026-08-26T10:43:05+03:00"
+      "date": "2026-08-30T09:42:08+03:00"
     },
     {
-      "sha": "68f6629a40eb1b4bb52e7715ff30e2efd3a9ad98",
-      "shortSha": "68f6629",
-      "subject": "SEO: daily meta tag improvements (2026-08-26) (#850)",
-      "author": "ohadf2015",
-      "date": "2026-08-26T10:35:06+03:00"
-    },
-    {
-      "sha": "cc5f83f2ac88c145e766f80548bae2cc67db1aab",
-      "shortSha": "cc5f83f",
-      "subject": "chore(i18n): refresh the translation report for the matrix keys",
+      "sha": "cb71c8a8d19dc6d936b78dd1872d95bbc85d3d24",
+      "shortSha": "cb71c8a",
+      "subject": "feat(singleplayer): delete the last two bespoke layouts, one shell for every surface",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T18:28:02+03:00"
+      "date": "2026-08-30T09:16:27+03:00"
     },
     {
-      "sha": "8fa3a5bc1617c3799604eda24ff14c4236f2af8b",
-      "shortSha": "8fa3a5b",
-      "subject": "feat(education): give the upgrade page a real plan comparison, derived from the caps",
+      "sha": "4b39a2abcfa7d35d8f7d02f77922e7d6698bb095",
+      "shortSha": "4b39a2a",
+      "subject": "feat(singleplayer): drop the bespoke portrait layout, render solo on the shared shell",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T17:55:51+03:00"
+      "date": "2026-08-30T05:32:59+03:00"
     },
     {
-      "sha": "85832ea0a0fc61bb65d4d160ece4882d0debcbb0",
-      "shortSha": "85832ea",
-      "subject": "wip(education): gauntlet round — student-facing cap copy, contrast + layout tests, asset cull",
+      "sha": "b4ea660c7d29620f2c6a6e17f848f3eeb7e098ba",
+      "shortSha": "b4ea660",
+      "subject": "feat(singleplayer): render solo through the MP shell behind ?shell=mp",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T16:33:15+03:00"
+      "date": "2026-08-30T05:04:05+03:00"
     },
     {
-      "sha": "bf34c7d01d2faa9a60759427e27cb56eab8c3c06",
-      "shortSha": "bf34c7d",
-      "subject": "feat(education): give Teacher Pro something free teachers can't have",
+      "sha": "e91b85568a7c0f8ecbb455922a96f6507a49eae3",
+      "shortSha": "e91b855",
+      "subject": "fix(i18n): reuse common.pause/common.resume instead of inventing two new keys",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T16:21:55+03:00"
+      "date": "2026-08-30T04:50:15+03:00"
     },
     {
-      "sha": "fcb68fedf73647b473abcf6b8eca5ac5f1e628e9",
-      "shortSha": "fcb68fe",
-      "subject": "feat(revenue): ask the teacher for the $9 at the one moment it makes sense — trial expiry (#849)",
-      "author": "ohadf2015",
-      "date": "2026-08-25T15:18:08+03:00"
-    },
-    {
-      "sha": "2b43cdadf807f6576f2f69315a9b817b2ab3540e",
-      "shortSha": "2b43cda",
-      "subject": "fix(education): make the Pro pricing card readable",
+      "sha": "47350e1761993f21b70b3b609054a1280fc710f4",
+      "shortSha": "47350e1",
+      "subject": "feat(singleplayer): make the MP shell a superset and add the solo adapter",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T14:42:45+03:00"
+      "date": "2026-08-30T04:49:14+03:00"
     },
     {
-      "sha": "729ff57bdc10ea67f50940f8487f2e677191b5d4",
-      "shortSha": "729ff57",
-      "subject": "fix(education): let students actually join a classroom",
+      "sha": "ef30af0dc211aef607461e0319e955487f3b87f4",
+      "shortSha": "ef30af0",
+      "subject": "docs(singleplayer): executable prop mapping for the UI unification, and the FTUE blocker",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T14:24:50+03:00"
+      "date": "2026-08-30T04:42:10+03:00"
     },
     {
-      "sha": "9334517e523dac706604ae569848483e7a7860b6",
-      "shortSha": "9334517",
-      "subject": "feat(education): surface create-classroom CTA and curriculum lists to new teachers",
+      "sha": "1e11df0c5f6283c292e27e95721a1168c0b0483e",
+      "shortSha": "1e11df0",
+      "subject": "fix(ugc): locale-prefix the community board play link, and record two verified negatives",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T13:52:22+03:00"
+      "date": "2026-08-30T04:37:57+03:00"
     },
     {
-      "sha": "6bfd490b21db7855bb7ddd8ffd7616ccf75f40e7",
-      "shortSha": "6bfd490",
-      "subject": "fix(teacher): let the server own the checkout gate; derive the hero's locale count",
+      "sha": "ae03c6abfe842dfd6196c3a266ddaff378fca5f2",
+      "shortSha": "ae03c6a",
+      "subject": "docs(singleplayer): record the measured shape of the remaining SP retirement",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T13:52:14+03:00"
+      "date": "2026-08-30T04:26:42+03:00"
     },
     {
-      "sha": "d955ff25756538c638248906820791c72203ee98",
-      "shortSha": "d955ff2",
-      "subject": "feat(education): sell Teacher Pro on the landing page, sourced from the caps",
+      "sha": "69b0feff6a817276fb6493262d87e394a6e26a6f",
+      "shortSha": "69b0fef",
+      "subject": "refactor(singleplayer): retire the ?returnTo entry point, which nothing ever linked to",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T12:58:19+03:00"
+      "date": "2026-08-30T04:25:29+03:00"
     },
     {
-      "sha": "baf78c10e88bebef418e59554e15b2206f31337d",
-      "shortSha": "baf78c1",
-      "subject": "fix(education): stop duplicate teacher requests, unblock activation",
+      "sha": "d4f66ebff11c5ebba28eba9c97587765e17822d3",
+      "shortSha": "d4f66eb",
+      "subject": "fix(wheel): reserve the bottom stack once, and stop the orbit escaping its container",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T12:18:47+03:00"
+      "date": "2026-08-30T04:18:34+03:00"
     },
     {
-      "sha": "825e69db4688f6e0a6de393b822330556747c779",
-      "shortSha": "825e69d",
-      "subject": "fix(ui): dim placeholders so a blank field stops reading as filled",
+      "sha": "fe3f5eb07136a91886cb2aa29f62d6466ffcade7",
+      "shortSha": "fe3f5eb",
+      "subject": "fix(game): give the single-player shell a definite height so the board stops collapsing",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T11:56:26+03:00"
+      "date": "2026-08-30T02:22:40+03:00"
     },
     {
-      "sha": "20f090e34ab22138b7df7eea39b9f7b09a6727e4",
-      "shortSha": "20f090e",
-      "subject": "fix(multiplayer): surface dead-room join failures instead of swallowing them",
+      "sha": "a4d11763afec477d5d6a79042e5da3d844ba6cbe",
+      "shortSha": "a4d1176",
+      "subject": "docs: record the react-doctor audit and what its 191 errors actually were",
       "author": "Ohad Fisher",
-      "date": "2026-08-25T11:56:06+03:00"
+      "date": "2026-08-29T21:26:08+03:00"
     },
     {
-      "sha": "0e3aad22eee2151ad5d8a78ce67a7f646e38ea65",
-      "shortSha": "0e3aad2",
-      "subject": "SEO daily meta",
-      "author": "ohadf2015",
-      "date": "2026-08-25T10:36:11+03:00"
+      "sha": "b30f0dc3736d4cd9df083e26b9ffee8bac074e47",
+      "shortSha": "b30f0dc",
+      "subject": "perf(tv): animate score bars with transform, and drop two dead files",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T21:25:36+03:00"
+    },
+    {
+      "sha": "91e39dc1767862b480f89c3987b0933afc92f6ed",
+      "shortSha": "91e39dc",
+      "subject": "fix(security): stop anon writing subscription_events, route webhook writes through service role",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T21:24:59+03:00"
+    },
+    {
+      "sha": "643cf33eb05a8a75b32a832498f6c9e65273d885",
+      "shortSha": "643cf33",
+      "subject": "fix(react): release effect cleanups and keep state updaters pure",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T21:23:59+03:00"
     }
   ]
 }

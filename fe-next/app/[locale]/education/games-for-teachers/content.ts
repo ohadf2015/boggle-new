@@ -44,9 +44,9 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
   en: {
     metaTitle: 'Free Word Games for Teachers — Zero Prep, Class Analytics | LexiClash',
     metaDescription:
-      'Free browser-based word games built for real classrooms: zero prep, custom vocabulary lists, per-student progress tracking. Use as 5-min warm-up, brain break, or sub-day activity. Free forever.',
+      'Free browser-based word games built for real classrooms: zero prep, custom vocabulary lists, per-student progress tracking. Use as 5-min warm-up, brain break, or sub-day activity. Free to start.',
     ogTitle: 'Free Word Games for Teachers',
-    ogDescription: 'Built for the teacher with 5 minutes left in class and 30 students who need to move.',
+    ogDescription: 'Built for the teacher with 5 minutes left in class. Pick a list, students log in, play.',
     twitterDescription:
       'Free word games for classrooms. Pick a list, students log in, play. Dashboard tracks progress. Zero prep.',
     heroTag: '★ For Teachers ★ Zero Prep ★',
@@ -56,7 +56,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: 'No prep.',
     },
     heroSubtitle:
-      'Built for the teacher who has 5 minutes left in class and 30 students who need to move. Pick a list, students log in, play. The dashboard does the rest.',
+      'Built for the teacher who has 5 minutes left in class. Pick a list, students log in, play. The dashboard does the rest.',
     ctaSubLabel: 'Free account required • No credit card',
     faqTitle: 'Questions about classroom word games?',
     useCases: [
@@ -73,8 +73,8 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'Upload custom curriculum word lists — any subject, any grade' },
       { icon: '📊', text: 'Per-student accuracy + class-wide missed-word patterns' },
       { icon: '👥', text: 'Live multiplayer up to 30 students; 1v1 duels for paired practice' },
-      { icon: '🌍', text: 'Five languages: English, Hebrew (RTL), Spanish, Swedish, Japanese' },
-      { icon: '💸', text: 'Free forever — no premium tier, no per-seat fee' },
+      { icon: '🌍', text: 'Six languages: English, Hebrew (RTL), Spanish, Swedish, Japanese, Russian' },
+      { icon: '💸', text: 'Free tier: 3 classes, 10 students each. Teacher Pro ($9/mo) lifts caps' },
       { icon: '🔒', text: 'Student-safe: no chat, no DMs, no external links during play' },
     ],
     sections: {
@@ -123,9 +123,9 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
   he: {
     metaTitle: 'משחקי מילים חינמיים למורים — בלי הכנה, עם אנליטיקה | LexiClash',
     metaDescription:
-      'משחקי מילים בחינם לכיתה. בלי הכנה, עם הרשימות שלכם ומעקב התקדמות. ל-5 דקות, להפסקה או ליום מילוי מקום. חינם לתמיד.',
+      'משחקי מילים בחינם לכיתה. בלי הכנה, עם הרשימות שלכם ומעקב התקדמות. ל-5 דקות, להפסקה או ליום מילוי מקום. חינם להתחלה.',
     ogTitle: 'משחקי מילים חינמיים למורים',
-    ogDescription: 'למורה שנשארו לו 5 דקות ו-30 תלמידים שצריך להעסיק.',
+    ogDescription: 'למורה שנשארו לו 5 דקות בשיעור. בוחרים רשימה, התלמידים משחקים, לוח המורה עוקב.',
     twitterDescription:
       'משחקי מילים חינמיים. בוחרים רשימה, התלמידים משחקים, לוח המורה עוקב. בלי הכנה.',
     heroTag: '★ למורים ★ בלי הכנה ★',
@@ -135,7 +135,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: 'בלי הכנה.',
     },
     heroSubtitle:
-      'למורה שנשארו לו 5 דקות בשיעור ו-30 תלמידים שצריך להעסיק. בוחרים רשימה, התלמידים משחקים, ולוח המורה עושה את כל השאר.',
+      'למורה שנשארו לו 5 דקות בשיעור. בוחרים רשימה, התלמידים משחקים, ולוח המורה עושה את כל השאר.',
     ctaSubLabel: 'חשבון חינם • בלי כרטיס אשראי',
     faqTitle: 'שאלות על משחקי מילים בכיתה?',
     useCases: [
@@ -152,8 +152,8 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'הרשימות שלכם — כל נושא, כל כיתה' },
       { icon: '📊', text: 'דיוק לכל תלמיד + מילים קשות לכיתה' },
       { icon: '👥', text: 'ריבוי משתתפים חי — עד 30 תלמידים; דו־קרבות בזוגות' },
-      { icon: '🌍', text: '5 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית' },
-      { icon: '💸', text: 'הכל חינם — בלי פרימיום' },
+      { icon: '🌍', text: '6 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית, רוסית' },
+      { icon: '💸', text: 'שכבה חינמית: 3 כיתות, עד 10 תלמידים. Teacher Pro ($9/חודש) ללא מגבלות' },
       { icon: '🔒', text: 'בטוח: בלי צ\'אט, בלי הודעות פרטיות ובלי קישורים חיצוניים בזמן המשחק' },
     ],
     sections: {
@@ -202,9 +202,9 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
   es: {
     metaTitle: 'Juegos gratis para maestros — Sin preparación, análisis | LexiClash',
     metaDescription:
-      'Juegos de palabras gratis para aulas. Sin preparación, tus listas, sigue el progreso. 5 minutos, descanso o día de sustituto. Gratis siempre.',
+      'Juegos de palabras gratis para aulas. Sin preparación, tus listas, sigue el progreso. 5 minutos, descanso o día de sustituto. Gratis para empezar.',
     ogTitle: 'Juegos de palabras gratis para maestros',
-    ogDescription: 'Para el maestro con 5 minutos y 30 estudiantes que necesitan moverse.',
+    ogDescription: 'Para el maestro con 5 minutos. Elige una lista, los estudiantes juegan, el panel hace el resto.',
     twitterDescription:
       'Juegos gratis. Elige lista, estudiantes juegan. Panel rastrea. Sin preparación.',
     heroTag: '★ Para Maestros ★ Sin Preparación ★',
@@ -214,7 +214,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: 'Sin esfuerzo.',
     },
     heroSubtitle:
-      'Para el maestro con 5 minutos y 30 estudiantes que necesitan moverse. Elige una lista, estudiantes juegan. El panel hace el resto.',
+      'Para el maestro con 5 minutos. Elige una lista, estudiantes juegan. El panel hace el resto.',
     ctaSubLabel: 'Cuenta gratis • Sin tarjeta de crédito',
     faqTitle: '¿Preguntas sobre juegos?',
     useCases: [
@@ -231,8 +231,8 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'Tus listas — cualquier materia, cualquier grado' },
       { icon: '📊', text: 'Precisión por alumno + palabras difíciles' },
       { icon: '👥', text: 'Multijugador — hasta 30; duelos de parejas' },
-      { icon: '🌍', text: '5 idiomas: inglés, hebreo (RTL), español, sueco, japonés' },
-      { icon: '💸', text: 'Gratis siempre — sin premium' },
+      { icon: '🌍', text: '6 idiomas: inglés, hebreo (RTL), español, sueco, japonés, ruso' },
+      { icon: '💸', text: 'Gratis: 3 clases, hasta 10 estudiantes. Teacher Pro ($9/mes) sin límites' },
       { icon: '🔒', text: 'Seguro: sin chat, sin DM, sin enlaces externos' },
     ],
     sections: {
@@ -281,9 +281,9 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
   sv: {
     metaTitle: 'Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash',
     metaDescription:
-      'Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis alltid.',
+      'Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis att börja.',
     ogTitle: 'Gratis ordspel för lärare',
-    ogDescription: 'För läraren med 5 minuter och 30 elever som behöver röra sig.',
+    ogDescription: 'För läraren med 5 minuter. Välj lista, elever spelar, panelen gör resten.',
     twitterDescription:
       'Gratis ordspel. Välj lista, elever spelar. Panel spårar. Ingen förberedelse.',
     heroTag: '★ För Lärare ★ Ingen Förberedelse ★',
@@ -293,7 +293,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: 'Utan ansträngning.',
     },
     heroSubtitle:
-      'För läraren med 5 minuter och 30 elever som behöver röra sig. Välj lista, elever spelar. Panelen gör resten.',
+      'För läraren med 5 minuter. Välj lista, elever spelar. Panelen gör resten.',
     ctaSubLabel: 'Gratis konto • Inget kreditkort',
     faqTitle: 'Frågor om ordspel?',
     useCases: [
@@ -310,8 +310,8 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'Ladda upp anpassade läroplanordslistor - vilken ämne, vilken årskurs som helst' },
       { icon: '📊', text: 'Noggrannhet per elev + klassomfattande mönster för förlorade ord' },
       { icon: '👥', text: 'Liveflerspelar upp till 30 elever; 1v1-dueller för parövning' },
-      { icon: '🌍', text: 'Fem språk: engelska, hebreiska (RTL), spanska, svenska, japanska' },
-      { icon: '💸', text: 'Gratis för alltid - ingen premiumtier, ingen kostnad per säte' },
+      { icon: '🌍', text: 'Sex språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska' },
+      { icon: '💸', text: 'Gratis: 3 klasser, upp till 10 elever. Teacher Pro ($9/månad) utan begränsningar' },
       { icon: '🔒', text: 'Elevssäker: ingen chatt, inga DM, inga externa länkar under spel' },
     ],
     sections: {
@@ -360,9 +360,9 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
   ja: {
     metaTitle: '無料単語ゲーム — 先生向け、準備なし | LexiClash',
     metaDescription:
-      '教室向けの無料ゲーム。準備なし、あなたのリスト、進度追跡。5分、休憩、代講。ずっと無料。',
+      '教室向けの無料ゲーム。準備なし、あなたのリスト、進度追跡。5分、休憩、代講。無料で始められる。',
     ogTitle: '無料単語ゲーム',
-    ogDescription: '5分残った先生と、30人が必要な先生向け。',
+    ogDescription: '5分残った先生向け。リスト選んで、生徒がプレイ、ダッシュボードが残りをやる。',
     twitterDescription:
       '無料ゲーム。リスト選んで、生徒がプレイ。ダッシュボード追跡。準備なし。',
     heroTag: '★先生向け ★ 準備なし ★',
@@ -372,7 +372,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       part2: '簡単。',
     },
     heroSubtitle:
-      '5分残った先生と、30人が動く必要があります。リスト選んで、生徒がプレイ。ダッシュボードが残りをやる。',
+      '5分残った先生向け。リスト選んで、生徒がプレイ。ダッシュボードが残りをやる。',
     ctaSubLabel: '無料アカウント • クレジットカード不要',
     faqTitle: 'ゲームについて？',
     useCases: [
@@ -389,8 +389,8 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📚', text: 'カスタムカリキュラム語彙リストをアップロード — 任意の科目、任意のグレード' },
       { icon: '📊', text: '学生ごとの精度 + クラス全体の単語ミスパターン' },
       { icon: '👥', text: '最大30人の生徒のリアルタイムマルチプレイヤー; ペア練習用の1v1デュエル' },
-      { icon: '🌍', text: '5つの言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語' },
-      { icon: '💸', text: '永遠に無料 — プレミアム層なし、座席当たりのコストなし' },
+      { icon: '🌍', text: '6つの言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語' },
+      { icon: '💸', text: '無料版：3つのクラス、最大10人の生徒。Teacher Pro（$9/月）で制限なし' },
       { icon: '🔒', text: '生徒向け安全：チャットなし、DM なし、プレイ中の外部リンクなし' },
     ],
     sections: {
