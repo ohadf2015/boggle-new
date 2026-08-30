@@ -12,10 +12,9 @@
  * drives the real HTTP route and asserts the seam was invoked.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 import express from 'express';
 import request from 'supertest';
-import type { MockedFunction } from 'vitest';
 
 const h = vi.hoisted(() => {
   const row = { id: 1, score: 64, word_count: 3, words_found: ['CAT', 'BRIDGE', 'TRAIN'] };
