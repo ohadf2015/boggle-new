@@ -145,6 +145,65 @@ z-index vs missing height reservation vs the chips row overflowing its slot.
 
 ## Part 2 — retiring the separate single-player mode
 
+### The architectural decision (measured, not guessed)
+
+**Reuse `PortraitLayout`, not `InGameScreen`.**
+
+| component | role | socket refs | verdict |
+|---|---|---|---|
+| `game/in-game/components/PortraitLayout.tsx` (760L) | the shell | 2 — **both in comments** | store-driven, reusable with no transport |
+| `game/InGameScreen.tsx` (696L) | the orchestrator | 20, incl. `socket.on('roundEventStart'…)` | genuinely socket-bound |
+
+So solo keeps its own local orchestrator, feeds the same Zustand stores
+(`useSelectionStore`, the `*Connected` wrappers), and renders the MP shell. That
+satisfies "use MP as a base, no separate UI" **without** making offline/native
+practice depend on Socket.IO.
+
+### Corrected scope — the route comment undercounts the entry points
+
+A sweep of every `/singleplayer?…` URL the codebase constructs:
+
+| entry | constructed by | status |
+|---|---|---|
+| `autoStart=bots` | `lib/onboarding/firstGameRoute.ts:23` | **live — every new user's first game** |
+| `autoStart=challenge` | `FriendChallengeLandingClient` x2, `FriendsList` | live — friend challenges |
+| `autoStart=practice` | `TrainingAnalysisModal`, `OnboardingFlow` | live |
+| `practice=1` | `lib/offline/offlineCapableModes.ts:67` | live — offline PWA entry |
+| `boardCode` | `app/[locale]/community/[boardCode]/PageClient.tsx:61` | live |
+| `preset=bots` | `components/results/NextStepPrompt.tsx:99` | live |
+| `returnTo=daily` | **nothing** | **retired `69b0feff6`** |
+
+That is six live entry points spanning onboarding, friend challenges, training,
+offline PWA, UGC boards and a results CTA — not the "four thin params" the route
+comment implies. **Finishing this is a multi-session job**, and each entry point
+wants its own commit.
+
+### The bots entries are already mostly migrated
+
+`useSinglePlayerConfig.ts:171-179` holds a "returning-player gate": once
+`hasPlayedBotsGame()` is true, **both `autoStart=bots` and `preset=bots` already
+`router.replace` to `/multiplayer?quickPlay=true`**. SP-vs-bots is FTUE-only — only a
+user's first-ever bots game renders the SP shell.
+
+So retiring those two is a one-line change (drop the `hasPlayedBotsGame()` condition)
+— **but do not make it unilaterally.** The FTUE path runs `firstWinConfigFor()` and
+`trackFirstWinConfigApplied('autoStart=bots')`: a deliberately tuned first-win
+difficulty. Deleting it changes onboarding/activation, which is a product call, not a
+refactor. Either port that tuning into the Quick Play launch or accept the change
+knowingly.
+
+Cheapest-first order for what is left: `preset` → `boardCode` → `autoStart=bots` →
+`autoStart=challenge` → practice last (it needs `TrainingProgressBar`, skills/hints
+state and its own `PracticeResults`, none of which the 1408-line MP `ResultsPage`
+models).
+
+**Two side effects are business logic, not UI, and are exactly what a shell swap
+drops silently** — both need a test that fails if they stop firing:
+`SinglePlayerView` awards `awardCreatorCoins('BOARD_PLAYED', { boardCode })` and
+POSTs `/api/ugc/boards/{boardCode}/play` (creator payouts + play counts).
+
+### Original scope notes
+
 **This migration is already underway upstream and is further along than expected.**
 
 `app/[locale]/singleplayer/page.tsx` documents a "Phase 5 soft delete": bare
