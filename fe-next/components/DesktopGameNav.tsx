@@ -6,7 +6,6 @@ import { Home, Swords, Zap, Calendar, Trophy, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
 
@@ -48,14 +47,13 @@ export const QUICK_PLAY_SOLO_HREF = '/quick-play';
 export const DesktopGameNav = memo(function DesktopGameNav() {
   const { t, language } = useLanguage();
   const { isInGame } = useNavigation();
-  const { canSeeInWorkModes } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isVeteran = useIsPracticeVeteran();
   const router = useRouter();
   const pathname = usePathname();
 
-  // Beta/admin get the solo wheel hub we polished; public keeps the MP flow.
-  const quickPlayHref = canSeeInWorkModes ? QUICK_PLAY_SOLO_HREF : QUICK_PLAY_PUBLIC_HREF;
+  // Quick Play is now the public default solo arcade wheel hub.
+  const quickPlayHref = QUICK_PLAY_SOLO_HREF;
 
   const activeId = useMemo(() => {
     const cleanPath = pathname.replace(`/${language}`, '') || '/';

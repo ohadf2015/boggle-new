@@ -8522,11 +8522,11 @@ const ja = {
       "subCaption": "60秒ラウンド・ライバル3人・パーフェクトに挑戦",
       "loading": "ボードを準備中…",
       "blurb": {
-        "classic": "文字をなぞって単語をつくろう。長くつなぐほど高得点。",
-        "blast": "文字をつないでタイルを破壊。時間切れになる前に盤面を空に。",
-        "word-hunt": "盤面のどこかに単語がひとつ。それを見つけ、ついでに周りも拾おう。",
-        "wheel-rush": "どの単語にも中央の文字が必要。リングを回してもっと探そう。",
-        "random": "ホイールにおまかせ。60秒、ライバル3人、満点との勝負。"
+        "classic": "文字をなぞって、つないで、スコア稼ぎ。シンプルは最強。",
+        "blast": "速く書いて、タイルを破壊。時間に抜かされるな。",
+        "word-hunt": "ひとつの単語を探す。見つけたら、すべてを狩ろう。",
+        "wheel-rush": "中央の文字が支配する。リング回して新しいチェーン。",
+        "random": "ホイールが選ぶ。同じボード、ライバル3人、さあ行け！"
       },
       "mode": {
         "classic": "クラシック",
@@ -8534,6 +8534,8 @@ const ja = {
         "word-hunt": "ハント",
         "wheel-rush": "ホイール"
       },
+      "durationLabel": "ラウンド:",
+      "durationUnit": "秒",
       "roundComplete": "ラウンド終了",
       "ofPerfect": "パーフェクト比",
       "points": "点",
@@ -8563,6 +8565,9 @@ const ja = {
       "wordsTotal": "{count}獲得",
       "bestWord": "最高",
       "wordsShowAll": "全{count}を表示",
+      "wordBreakdown": "スコア内訳",
+      "wordDetails": "単語の詳細",
+      "totalWords": "{count}語",
       "dayStreak": "{days}日連続",
       "rewardsPending": "サインインしてコインとXPを貯めよう",
       "pickNextMode": "次のラウンド",
@@ -12094,6 +12099,11 @@ const ja = {
       "playerCount": "{{count}}人がプレイ中",
       "teacherStarted": "{{teacher}}がゲームを開始しました"
     },
+    "quickStart": {
+      "title": "学習を始めよう",
+      "subtitle": "レッスンから単語を練習する",
+      "action": "今すぐ始める"
+    },
     "dashboard": {
       "title": "マイレッスン",
       "subtitle": "語彙を練習して上達しよう",
@@ -12323,6 +12333,8 @@ const ja = {
         "large": "大 (6×6)"
       },
       "create": "クラス作成",
+      "createAnother": "別のクラスを作成",
+      "creating": "作成中...",
       "edit": "クラス編集",
       "delete": "クラス削除",
       "confirmDelete": "クラスを削除しますか？生徒はレッスンにアクセスできなくなります",
@@ -12333,12 +12345,13 @@ const ja = {
       "codeCopied": "参加コードをコピーしました！",
       "copyLink": "招待リンクをコピー",
       "linkCopied": "招待リンクがコピーされました！",
+      "shareCode": "生徒にこのコードを共有してください",
       "members": "{{count}}人の生徒",
       "member": "1人の生徒",
       "noMembers": "まだ生徒がいません",
       "settingUp": "教室を準備しています...",
       "language": "言語",
-      "created": "{{date}}に作成",
+      "created": "{{classroomName}}を作成しました！コードを共有して開始してください。",
       "noClassrooms": "まだクラスがありません",
       "createFirst": "最初のクラスを作成しましょう",
       "validation": {
@@ -12352,11 +12365,21 @@ const ja = {
       "error": {
         "createFailed": "クラスの作成に失敗しました",
         "updateFailed": "クラスの更新に失敗しました",
-        "deleteFailed": "クラスの削除に失敗しました"
+        "deleteFailed": "クラスの削除に失敗しました",
+        "copyFailed": "コードのコピーに失敗しました。もう一度試してください。"
       },
       "dialog": {
         "createDescription": "名前と言語設定で新しいクラスを作成",
         "editDescription": "クラス名と言語設定を編集"
+      },
+      "presenter": {
+        "present": "画面に表示",
+        "visitUrl": "訪問:",
+        "orEnterCode": "またはコードを入力:",
+        "scanQr": "QRコードをスキャン:",
+        "shareTip": "このコードをGoogle Classroom、メール、またはテキストメッセージで生徒と共有してください",
+        "pressEscape": "ESCを押して終了",
+        "exit": "プレゼンテーションを終了"
       }
     },
     "classrooms": {
@@ -13197,10 +13220,13 @@ const ja = {
       "join": {
         "alreadyMember": "すでにこのクラスのメンバーです",
         "button": "クラスに参加",
+        "classroomFull": "このクラスは満員です",
         "clipboardError": "クリップボードを読み取れませんでした",
         "codeHint": "6文字のクラスコードを先生に聞いてね",
         "codeLabel": "クラスコード",
+        "codeNotRecognised": "そのコードは認識できません",
         "codePasted": "コードを貼り付けました！",
+        "codePlaceholder": "6文字",
         "emptyClipboard": "クリップボードが空です",
         "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
         "invalidCode": "無効なクラスコードです",
@@ -13208,6 +13234,7 @@ const ja = {
         "nameHint": "アカウントは不要 — 名前を入力するだけ",
         "nameLabel": "あなたの名前",
         "namePlaceholder": "例: マヤ",
+        "nameRequired": "名前を入力してください",
         "pasteButton": "貼り付け",
         "subtitle": "先生からもらったコードを入力してね",
         "success": "クラスに参加しました！",
@@ -14987,6 +15014,7 @@ const ja = {
     "youWon": "勝利！🏆",
     "opponentWon": "{name} の勝ち",
     "closeGame": "惜しい！",
+    "domination": "圧勝！👑",
     "playAgain": "もう一度",
     "home": "ホーム",
     "finalTiles": "最後のタイル!",
@@ -16026,6 +16054,7 @@ const ja = {
     "roundLabel": "ラウンド {n}/{total}",
     "chipStack": "チップ: {chips}",
     "speedBonus": "スピード ×{n}",
+    "luckyStreak": "✨ ラッキーストリーク ×2!",
     "shareCard": {
       "header": "🎯 シールドビッド — {score}pt",
       "row": "{round} {emoji} {playerWord} vs {botWord}{points}",

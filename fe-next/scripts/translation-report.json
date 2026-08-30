@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6243,
+    "totalKeysInCode": 6256,
     "keyCountByLanguage": {
-      "en": 12087,
-      "es": 12383,
-      "he": 12288,
-      "ja": 12342,
-      "ru": 12122,
-      "sv": 12338
+      "en": 12053,
+      "es": 12348,
+      "he": 12253,
+      "ja": 12321,
+      "ru": 12093,
+      "sv": 12317
     },
-    "missingFromEnglish": 46,
+    "missingFromEnglish": 95,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 319,
@@ -1724,14 +1724,14 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 86,
+        "line": 94,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 437,
+        "line": 452,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
       },
       {
@@ -1759,21 +1759,21 @@
         "pattern": "`quickPlay.solo.mode.${result.mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 224,
+        "line": 225,
         "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
       },
       {
         "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 260,
+        "line": 261,
         "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
       },
       {
         "pattern": "`quickPlay.solo.mode.${mode}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayResults.tsx",
-        "line": 491,
+        "line": 460,
         "context": "{t(`quickPlay.solo.mode.${mode}`)}"
       },
       {
@@ -2214,7 +2214,7 @@
         "pattern": "`tvResults.${labelKey}`",
         "type": "template_literal",
         "file": "host/components/tv-results/TvResultsWinnersPodium.tsx",
-        "line": 266,
+        "line": 274,
         "context": "{t(`tvResults.${labelKey}`)}"
       },
       {
@@ -3046,7 +3046,7 @@
         "variable": "encouragementKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 331,
+        "line": 337,
         "context": "{t(encouragementKey)}"
       },
       {
@@ -3054,7 +3054,7 @@
         "variable": "encouragementKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 335,
+        "line": 341,
         "context": "text={t(encouragementKey)}"
       },
       {
@@ -3062,7 +3062,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 396,
+        "line": 402,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -3649,6 +3649,246 @@
       ]
     },
     {
+      "key": "education.access.status_unknown_body",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "key": "education.access.status_unknown_title",
+      "usages": [
+        {
+          "file": "app/[locale]/education/access/PageClient.tsx",
+          "line": 166
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.analytics",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 119
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 147
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.chooseNow",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.classLimit",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.classLimitPro",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.comparisonAlt",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.customLists",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 109
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.duels",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 110
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.everythingInFree",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.freeForever",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.freeTier",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.noAds",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 111
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.perMonth",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 55
+        },
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.proTier",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.studentLimit",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.studentLimitPro",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 139
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.subtitle",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.title",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "key": "education.landing.pro.whyNow",
+      "usages": [
+        {
+          "file": "components/education/ProFramingSection.tsx",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.classroomFull",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.codeNotRecognised",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 270
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.codePlaceholder",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 231
+        }
+      ]
+    },
+    {
+      "key": "education.student.join.nameRequired",
+      "usages": [
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 92
+        },
+        {
+          "file": "components/student/JoinClassroomForm.tsx",
+          "line": 194
+        }
+      ]
+    },
+    {
       "key": "footer.spellingBeePractice",
       "usages": [
         {
@@ -3658,11 +3898,236 @@
       ]
     },
     {
+      "key": "quickPlay.solo.durationLabel",
+      "usages": [
+        {
+          "file": "components/quick-play/QuickPlayModePicker.tsx",
+          "line": 143
+        }
+      ]
+    },
+    {
+      "key": "quickPlay.solo.durationUnit",
+      "usages": [
+        {
+          "file": "components/quick-play/QuickPlayModePicker.tsx",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "key": "quickPlay.solo.totalWords",
+      "usages": [
+        {
+          "file": "components/quick-play/QuickWordsDetailDialog.tsx",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "key": "quickPlay.solo.wordBreakdown",
+      "usages": [
+        {
+          "file": "components/quick-play/QuickWordsDetailDialog.tsx",
+          "line": 34
+        }
+      ]
+    },
+    {
+      "key": "quickPlay.solo.wordDetails",
+      "usages": [
+        {
+          "file": "components/quick-play/QuickWordsDetailDialog.tsx",
+          "line": 40
+        }
+      ]
+    },
+    {
       "key": "sealedBid.yourWord",
       "usages": [
         {
           "file": "components/sealedBid/SealedBidTable.tsx",
           "line": 83
+        }
+      ]
+    },
+    {
+      "key": "student.quickStart.action",
+      "usages": [
+        {
+          "file": "components/student/QuickStartCard.tsx",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "key": "student.quickStart.subtitle",
+      "usages": [
+        {
+          "file": "components/student/QuickStartCard.tsx",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "key": "student.quickStart.title",
+      "usages": [
+        {
+          "file": "components/student/QuickStartCard.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.classroomLoadError",
+      "usages": [
+        {
+          "file": "components/teacher/TeacherDashboard.tsx",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.classroomLoadErrorHint",
+      "usages": [
+        {
+          "file": "components/teacher/TeacherDashboard.tsx",
+          "line": 214
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.retry",
+      "usages": [
+        {
+          "file": "components/teacher/TeacherDashboard.tsx",
+          "line": 227
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.studentsPresentDescription",
+      "usages": [
+        {
+          "file": "components/teacher/StudentsPresentStrip.tsx",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "key": "teacher.dashboard.studentsPresentTitle",
+      "usages": [
+        {
+          "file": "components/teacher/StudentsPresentStrip.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "teacher.proGate.cta",
+      "usages": [
+        {
+          "file": "components/teacher/ProGate.tsx",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.checkoutUnavailable",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome1",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome2",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome3",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.featureOutcome4",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.matrix.featureColumn",
+      "usages": [
+        {
+          "file": "components/teacher/PlanComparisonMatrix.tsx",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.matrix.title",
+      "usages": [
+        {
+          "file": "components/teacher/PlanComparisonMatrix.tsx",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.matrix.unlimited",
+      "usages": [
+        {
+          "file": "components/teacher/PlanComparisonMatrix.tsx",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.priceTaxNote",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.proHeroAlt",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 173
+        }
+      ]
+    },
+    {
+      "key": "teacher.subscription.valueHeadline",
+      "usages": [
+        {
+          "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+          "line": 160
         }
       ]
     }
@@ -3700,6 +4165,7 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
+      "teacher.classroom.error.copyFailed",
       "vs.feature",
       "vs.gamesPerDay",
       "vs.multiplayer",
@@ -3770,6 +4236,7 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
+      "teacher.classroom.error.copyFailed",
       "sealedBid.shareCard.title",
       "sealedBid.shareCard.cta",
       "sealedBid.shareCard.copied",
@@ -3852,6 +4319,10 @@
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
+      "education.landing.furtherReading.title",
+      "education.landing.furtherReading.guides",
+      "education.landing.furtherReading.glossary",
+      "education.landing.furtherReading.wordSolver",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
@@ -4653,6 +5124,11 @@
       "wordHunt.mp.dailyChallengeAction",
       "wordHunt.survival.mpResults.boardCleared",
       "wordHunt.score.mpResults.boardCleared",
+      "quickPlay.solo.durationLabel",
+      "quickPlay.solo.durationUnit",
+      "quickPlay.solo.wordBreakdown",
+      "quickPlay.solo.wordDetails",
+      "quickPlay.solo.totalWords",
       "admin.welcome",
       "admin.nav.players",
       "admin.sidebar.guests",
@@ -4751,6 +5227,13 @@
       "adventure.gestureTutorial",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
+      "student.quickStart.title",
+      "student.quickStart.subtitle",
+      "student.quickStart.action",
+      "education.student.join.classroomFull",
+      "education.student.join.codeNotRecognised",
+      "education.student.join.codePlaceholder",
+      "education.student.join.nameRequired",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "asyncChallenge.pending",
@@ -4858,12 +5341,22 @@
       "reengagement.coins",
       "reengagement.streakFreeze",
       "reengagement.premiumDays",
-      "wordForge.perfectCraft"
+      "wordForge.perfectCraft",
+      "wordcraft.domination"
     ],
     "ru": [
+      "student.quickStart.title",
+      "student.quickStart.subtitle",
+      "student.quickStart.action",
+      "education.student.join.classroomFull",
+      "education.student.join.codeNotRecognised",
+      "education.student.join.codePlaceholder",
+      "education.student.join.nameRequired",
       "wordTower.surprise.echo",
       "wordTower.surprise.meteorStrike",
       "wordTower.surprise.phantomFloor",
+      "quickPlay.solo.durationLabel",
+      "quickPlay.solo.durationUnit",
       "daily.flow.startLabel",
       "daily.flow.introHint",
       "daily.flow.startHint",
@@ -5116,8 +5609,20 @@
       "admin.moderation.cheatSignals",
       "admin.moderation.flaggedPlayers",
       "admin.moderation.noFlags",
+      "quickPlay.solo.durationLabel",
+      "quickPlay.solo.durationUnit",
+      "quickPlay.solo.wordBreakdown",
+      "quickPlay.solo.wordDetails",
+      "quickPlay.solo.totalWords",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
+      "student.quickStart.title",
+      "student.quickStart.subtitle",
+      "student.quickStart.action",
+      "education.student.join.classroomFull",
+      "education.student.join.codeNotRecognised",
+      "education.student.join.codePlaceholder",
+      "education.student.join.nameRequired",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "asyncChallenge.pending",
@@ -5224,7 +5729,8 @@
       "reengagement.bonusRewards",
       "reengagement.coins",
       "reengagement.streakFreeze",
-      "reengagement.premiumDays"
+      "reengagement.premiumDays",
+      "wordcraft.domination"
     ]
   }
 }

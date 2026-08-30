@@ -1,6 +1,62 @@
 {
-  "generatedAt": "2026-08-25T14:08:20.719Z",
+  "generatedAt": "2026-08-29T09:35:48.594Z",
   "commits": [
+    {
+      "sha": "87677a253f73671cc2bf09cb430bb8ba59fdc707",
+      "shortSha": "87677a2",
+      "subject": "fix(ads): re-init AdMob when the age tier flips, so interstitials stop serving child-directed",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T00:53:11+03:00"
+    },
+    {
+      "sha": "a9e7231403741f2ef33ef6e21739fb06168b8df8",
+      "shortSha": "a9e7231",
+      "subject": "fix(game-screens): drop the SEO/FAQ card so play surfaces fill the screen",
+      "author": "Ohad Fisher",
+      "date": "2026-08-27T15:44:29+03:00"
+    },
+    {
+      "sha": "11e6b612d833ebf0a820c5b374a31dc8f3e2fb88",
+      "shortSha": "11e6b61",
+      "subject": "feat(quick-play): animated reward counters for richer payoff",
+      "author": "Ohad Fisher",
+      "date": "2026-08-27T00:14:39+03:00"
+    },
+    {
+      "sha": "3b218c0a12dcf5dc2acc46c9bac292b2d28fc631",
+      "shortSha": "3b218c0",
+      "subject": "fix(quick-play): remove avatar gaming and ensure honest provenance",
+      "author": "Ohad Fisher",
+      "date": "2026-08-27T00:09:53+03:00"
+    },
+    {
+      "sha": "835c00e7cec14aa5163a02c373b84cdceae308f7",
+      "shortSha": "835c00e",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-26",
+      "author": "Ohad Fisher",
+      "date": "2026-08-26T10:43:05+03:00"
+    },
+    {
+      "sha": "68f6629a40eb1b4bb52e7715ff30e2efd3a9ad98",
+      "shortSha": "68f6629",
+      "subject": "SEO: daily meta tag improvements (2026-08-26) (#850)",
+      "author": "ohadf2015",
+      "date": "2026-08-26T10:35:06+03:00"
+    },
+    {
+      "sha": "cc5f83f2ac88c145e766f80548bae2cc67db1aab",
+      "shortSha": "cc5f83f",
+      "subject": "chore(i18n): refresh the translation report for the matrix keys",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T18:28:02+03:00"
+    },
+    {
+      "sha": "8fa3a5bc1617c3799604eda24ff14c4236f2af8b",
+      "shortSha": "8fa3a5b",
+      "subject": "feat(education): give the upgrade page a real plan comparison, derived from the caps",
+      "author": "Ohad Fisher",
+      "date": "2026-08-25T17:55:51+03:00"
+    },
     {
       "sha": "85832ea0a0fc61bb65d4d160ece4882d0debcbb0",
       "shortSha": "85832ea",
@@ -84,62 +140,6 @@
       "subject": "SEO daily meta",
       "author": "ohadf2015",
       "date": "2026-08-25T10:36:11+03:00"
-    },
-    {
-      "sha": "5992d8626ca9d75df00d13a7389e94ba0d6c257a",
-      "shortSha": "5992d86",
-      "subject": "fix(layout): stop AdSense shifting React's <head> mid-hydration",
-      "author": "Ohad Fisher",
-      "date": "2026-08-25T09:47:57+03:00"
-    },
-    {
-      "sha": "0e927ea53ffa389a7e872d99d4a0c7047d431ab3",
-      "shortSha": "0e927ea",
-      "subject": "perf: prerender locale routes, move dictionary Set into the worker, restore daily cross-promo",
-      "author": "Ohad Fisher",
-      "date": "2026-08-25T09:29:41+03:00"
-    },
-    {
-      "sha": "1ef3259a87e08887662e2731cca1e3bd1f6dcfaa",
-      "shortSha": "1ef3259",
-      "subject": "fix(word-tower): give the daily challenge a \"today\", real rivals, and completion credit",
-      "author": "Ohad Fisher",
-      "date": "2026-08-25T09:17:05+03:00"
-    },
-    {
-      "sha": "1114377e7cbbac4da098c86ee5e83f5e248406b4",
-      "shortSha": "1114377",
-      "subject": "chore(nightly): post-run residue 2026-08-25",
-      "author": "Ohad Fisher",
-      "date": "2026-08-25T05:28:47+03:00"
-    },
-    {
-      "sha": "54a9d3561694172540580065c97d5cf1adadf3cf",
-      "shortSha": "54a9d35",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-25",
-      "author": "Ohad Fisher",
-      "date": "2026-08-25T05:28:13+03:00"
-    },
-    {
-      "sha": "10359c43cc04aff9a61036d0521aabcdf2b52704",
-      "shortSha": "10359c4",
-      "subject": "merge: teacher-tier limits, checkout 401/modal guards, word-wheel drag fix, education admin classroom list",
-      "author": "Ohad Fisher",
-      "date": "2026-08-25T00:01:46+03:00"
-    },
-    {
-      "sha": "fe1f3b2fa7180d71dc3e870948a9b1d71b044e82",
-      "shortSha": "fe1f3b2",
-      "subject": "SEO: daily meta tag improvements (2026-08-24) (#847)",
-      "author": "ohadf2015",
-      "date": "2026-08-24T23:30:46+03:00"
-    },
-    {
-      "sha": "7faa1f390bb46427c81744a82177e2466d6b2b32",
-      "shortSha": "7faa1f3",
-      "subject": "perf(lexiclash): remaining PSI levers for landing >60 (#846)",
-      "author": "ohadf2015",
-      "date": "2026-08-24T00:27:51+03:00"
     }
   ]
 }

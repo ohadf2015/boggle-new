@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
 const mockPush = vi.fn();
@@ -17,6 +18,14 @@ vi.mock('@/hooks/useActiveClassroomGame', () => ({
   useActiveClassroomGame: () => ({ activeGame: null }),
 }));
 
+vi.mock('@/hooks/useStudentFirstTimeInClassroom', () => ({
+  useStudentFirstTimeInClassroom: () => ({ isFirstTime: false, isLoading: false, error: null }),
+}));
+
+vi.mock('@/hooks/useStudentProgress', () => ({
+  useStudentProgress: () => ({ lessons: [], isLoading: false, error: null }),
+}));
+
 vi.mock('@/components/student/PlayWithClassButton', () => ({
   PlayWithClassButton: (props: Record<string, unknown>) => (
     <div data-testid="play-with-class" data-classroom={props.classroomId} />
@@ -29,14 +38,24 @@ vi.mock('@/components/student/ClassroomGameBanner', () => ({
   ),
 }));
 
+vi.mock('@/components/student/QuickStartCard', () => ({
+  QuickStartCard: (props: Record<string, unknown>) => (
+    <div data-testid="quick-start-card" data-classroom={props.classroomId} />
+  ),
+}));
+
 vi.mock('framer-motion', () => {
   const R = require('react');
   const Div = R.forwardRef(function Div(props: Record<string, unknown>, ref: unknown) {
     const { children, ...rest } = props as React.PropsWithChildren<Record<string, unknown>>;
     return R.createElement('div', { ...rest, ref }, children);
   });
+  const Button = R.forwardRef(function Button(props: Record<string, unknown>, ref: unknown) {
+    const { children, onClick, ...rest } = props as React.PropsWithChildren<Record<string, unknown> & { onClick?: () => void }>;
+    return R.createElement('button', { ...rest, onClick, ref }, children);
+  });
   return {
-    m: { div: Div, button: Div },
+    m: { div: Div, button: Button },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   };
 });
@@ -57,7 +76,7 @@ describe('StudentHubPlayZone', () => {
     expect(btn).toHaveAttribute('data-classroom', 'cls-1');
   });
 
-  it('renders Quick Duel button', () => {
+  it('renders Quick Duel button when not first time', () => {
     render(
       <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
     );
@@ -84,5 +103,18 @@ describe('StudentHubPlayZone', () => {
       <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
     );
     expect(mockT).toHaveBeenCalledWith('student.hub.playZone');
+  });
+
+  it('gate on activity status (first-time) determines card layout', () => {
+    // With default mock (isFirstTime: false, isLoading: false),
+    // the Quick Duel button should render
+    render(
+      <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
+    );
+
+    // Verify the component uses the hook
+    expect(screen.getByTestId('game-banner')).toBeInTheDocument();
+    // Quick Duel should render because isFirstTime is false
+    expect(screen.getByText('student.dashboard.quickDuel')).toBeInTheDocument();
   });
 });

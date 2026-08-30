@@ -9,11 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Loader } from '@/components/ui/Loader';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp, Monitor } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
 import ClassroomStudentList from './ClassroomStudentList';
 import ClassLimitUpsellModal from './ClassLimitUpsellModal';
+import ClassroomInvitePresenter from './ClassroomInvitePresenter';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 
 const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
@@ -40,6 +41,7 @@ export default function ClassroomManager() {
   const [formData, setFormData] = useState({ name: '', language: language as Language });
   const [isSaving, setIsSaving] = useState(false);
   const [upsellData, setUpsellData] = useState<{ currentCount: number; limit: number } | null>(null);
+  const [presenterClassroomId, setPresenterClassroomId] = useState<string | null>(null);
 
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId);
 
@@ -145,26 +147,61 @@ export default function ClassroomManager() {
         </Button>
       </div>
 
-      {/* Classroom Grid */}
+      {/* Classroom Grid / Zero-State */}
       {classrooms.length === 0 ? (
-        <div className="border-3 border-black rounded-neo bg-neo-cream shadow-hard py-12 text-center">
-          <div className="w-16 h-16 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
-            <Users className="w-9 h-9 text-black" />
+        <div className="border-3 border-black rounded-neo bg-neo-cream shadow-hard p-8">
+          <div className="text-center mb-8 max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center mx-auto mb-4 shadow-hard-sm">
+              <Users className="w-9 h-9 text-black" />
+            </div>
+            <h3 className="text-xl font-neo-display font-black text-black mb-2 text-balance">
+              {t('teacher.classroom.noClassrooms')}
+            </h3>
+            <p className="text-black/60 font-bold text-pretty">{t('teacher.classroom.createFirst')}</p>
           </div>
-          <h3 className="text-xl font-neo-display font-black text-black mb-2 text-balance">
-            {t('teacher.classroom.noClassrooms')}
-          </h3>
-          <p className="text-black/60 font-bold mb-6 text-pretty">{t('teacher.classroom.createFirst')}</p>
-          <Button
-            onClick={() => {
-              setFormData({ name: '', language: language as Language });
-              setIsCreateDialogOpen(true);
-            }}
-            className="bg-neo-cyan text-black font-black border-3 border-black shadow-hard hover:-translate-y-0.5 transition-all"
-          >
-            <Plus className="w-5 h-5 me-2" />
-            {t('teacher.classroom.create')}
-          </Button>
+
+          {/* Inline Create Form - Zero State */}
+          <div className="space-y-4 max-w-md mx-auto">
+            <div>
+              <label className="block text-sm font-neo-body font-black text-black mb-2">
+                {t('teacher.classroom.name')}
+              </label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder={t('teacher.classroom.namePlaceholder')}
+                className="border-2 border-black shadow-hard-sm font-bold w-full"
+                autoFocus
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-neo-body font-black text-black mb-2">
+                {t('teacher.classroom.language')}
+              </label>
+              <select
+                value={formData.language}
+                onChange={(e) => setFormData({ ...formData, language: e.target.value as Language })}
+                className={cn(
+                  'w-full px-4 py-2 bg-neo-cream border-2 border-black',
+                  'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
+                )}
+              >
+                {EDUCATION_LANGUAGES.map((code) => (
+                  <option key={code} value={code}>{t(LANGUAGE_LABEL_KEYS[code])}</option>
+                ))}
+              </select>
+            </div>
+
+            <Button
+              onClick={handleCreate}
+              disabled={isSaving || !formData.name.trim()}
+              className="w-full bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+            >
+              {isSaving ? t('common.loading') : t('teacher.classroom.create')}
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -260,15 +297,23 @@ export default function ClassroomManager() {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
+                      onClick={() => setPresenterClassroomId(classroom.id)}
+                      className="flex-1 bg-neo-lime text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
+                      aria-label={t('teacher.classroom.presenter.present')}
+                    >
+                      <Monitor className="w-4 h-4 me-2" />
+                      {t('teacher.classroom.presenter.present')}
+                    </Button>
+                    <Button
+                      size="sm"
                       onClick={() => {
                         setSelectedClassroomId(classroom.id);
                         setFormData({ name: classroom.name, language: classroom.language });
                         setIsEditDialogOpen(true);
                       }}
-                      className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
+                      className="bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
                     >
-                      <Edit2 className="w-4 h-4 me-2" />
-                      {t('teacher.classroom.edit')}
+                      <Edit2 className="w-4 h-4" />
                     </Button>
                     <Button
                       size="sm"
@@ -431,6 +476,20 @@ export default function ClassroomManager() {
           onClose={() => setIsUpsellModalOpen(false)}
           currentCount={upsellData.currentCount}
           limit={upsellData.limit}
+        />
+      )}
+
+      {/* Classroom Invite Presenter */}
+      {presenterClassroomId && (
+        <ClassroomInvitePresenter
+          joinCode={classrooms.find((c) => c.id === presenterClassroomId)?.join_code || ''}
+          joinUrl={
+            typeof window !== 'undefined'
+              ? `${window.location.origin}/${language}/student/join/${classrooms.find((c) => c.id === presenterClassroomId)?.join_code || ''}`
+              : ''
+          }
+          classroomName={classrooms.find((c) => c.id === presenterClassroomId)?.name || ''}
+          onClose={() => setPresenterClassroomId(null)}
         />
       )}
     </div>

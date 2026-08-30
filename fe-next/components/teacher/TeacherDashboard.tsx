@@ -68,7 +68,7 @@ export default function TeacherDashboard() {
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
-  const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
+  const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms, createClassroom } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
 
   // Check if user has teacher access
@@ -231,8 +231,8 @@ export default function TeacherDashboard() {
                 // Loading: show neutral skeleton
                 <div className="w-full h-24 rounded-neo bg-neo-white/10 border-3 border-black/10 shadow-hard-sm animate-pulse" />
               ) : classrooms.length === 0 ? (
-                // Empty state: show first-run card
-                <PlayTabFirstRunCard onCreateClassroom={() => setActiveTab('prepare')} />
+                // Empty state: show first-run card with inline creation flow
+                <PlayTabFirstRunCard createClassroom={createClassroom} />
               ) : (
                 // Has classrooms: show students present strip + Start Game CTA
                 <>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { QuickWordsDetailDialog } from './QuickWordsDetailDialog';
 
 export interface CollectedWord {
   word: string;
@@ -54,6 +55,10 @@ export function QuickWordsCollected({ words, collectionTotal }: QuickWordsCollec
           )}
           {t('quickPlay.solo.wordsTotal', '{count} collected', { count: String(collectionTotal) })}
         </span>
+      </div>
+
+      <div className="mb-2">
+        <QuickWordsDetailDialog words={words} />
       </div>
 
       <div className="mb-2 flex items-baseline gap-2 rounded-lg border-2 border-black bg-neo-abyss/60 px-2.5 py-1.5">

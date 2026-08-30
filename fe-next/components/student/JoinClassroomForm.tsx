@@ -9,9 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useJoinClassroom } from '@/hooks/useClassroom';
+import { sanitizeClassroomCode } from '@/components/student/classroomCode';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -55,7 +57,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      const cleaned = text.trim().replace(/[^A-Za-z0-9]/g, '').slice(0, 6).toUpperCase();
+      const cleaned = sanitizeClassroomCode(text);
       if (cleaned) {
         setCode(cleaned);
         if (codeError) setCodeError(false);
@@ -73,11 +75,11 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const trimmedCode = code.trim();
     const trimmedName = name.trim();
 
     // Validate code format (6 alphanumeric characters)
-    if (!trimmedCode || trimmedCode.length !== 6) {
+    const sanitizedCode = sanitizeClassroomCode(code);
+    if (!sanitizedCode) {
       setCodeError(true);
       trackEduClassroomJoin({ result: 'invalid_code' });
       toast.error(t('education.student.join.invalidCode'));
@@ -87,7 +89,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     // Guests must supply a name (becomes their display name + in-game username).
     if (isGuest && !trimmedName) {
       setNameError(true);
-      toast.error(t('education.student.join.nameLabel'));
+      toast.error(t('education.student.join.nameRequired'));
       return;
     }
 
@@ -95,7 +97,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
 
     try {
       const result = await joinClassroom(
-        trimmedCode.toUpperCase(),
+        sanitizedCode,
         isGuest ? { guestName: trimmedName } : undefined
       );
 
@@ -177,17 +179,19 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     placeholder={t('education.student.join.namePlaceholder')}
                     aria-invalid={nameError ? 'true' : undefined}
                     aria-describedby={nameError ? 'name-error' : 'name-hint'}
+                    autoCapitalize="words"
+                    autoCorrect="off"
                     className={cn(
                       "h-14 text-lg font-bold bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
-                      nameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                      nameError && "border-neo-red bg-neo-red/10 focus-visible:ring-neo-red"
                     )}
                   />
                   <p id="name-hint" className="text-xs text-neo-lime">
                     {t('education.student.join.nameHint')}
                   </p>
                   {nameError && (
-                    <p id="name-error" className="text-xs text-red-400" role="alert">
-                      {t('education.student.join.nameLabel')}
+                    <p id="name-error" className="text-xs text-neo-red font-bold" role="alert">
+                      {t('education.student.join.nameRequired')}
                     </p>
                   )}
                 </div>
@@ -204,29 +208,38 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 <div className="relative">
                   <Input
                     id="classroom-code"
+                    dir="ltr"
                     value={code}
                     onChange={(e) => {
-                      const next = e.target.value.toUpperCase();
-                      setCode(next);
-                      if (codeError) setCodeError(false);
-                      // Auto-advance: a full 6-char code moves a guest who still
-                      // needs a name straight to the name field.
-                      if (next.length === 6 && isGuest && !name.trim()) {
-                        nameInputRef.current?.focus();
+                      const sanitized = sanitizeClassroomCode(e.target.value);
+                      if (sanitized) {
+                        setCode(sanitized);
+                        if (codeError) setCodeError(false);
+                        // Auto-advance: a full 6-char code moves a guest who still
+                        // needs a name straight to the name field.
+                        if (isGuest && !name.trim()) {
+                          nameInputRef.current?.focus();
+                        }
+                      } else {
+                        // Keep the raw value for partial entry (user still typing)
+                        const partial = e.target.value.toUpperCase();
+                        setCode(partial);
+                        if (codeError) setCodeError(false);
                       }
                     }}
                     required
-                    placeholder="ABC123"
+                    placeholder={t('education.student.join.codePlaceholder')}
                     maxLength={6}
-                    pattern="[A-Za-z0-9]{6}"
                     inputMode="text"
                     autoComplete="off"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
                     autoFocus={!isGuest}
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
                     className={cn(
                       "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pe-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
-                      codeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                      codeError && "border-neo-red bg-neo-red/10 focus-visible:ring-neo-red"
                     )}
                   />
                   <TooltipProvider>
@@ -253,8 +266,8 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                   {t('education.student.join.codeHint')}
                 </p>
                 {codeError && (
-                  <p id="code-error" className="text-xs text-red-400" role="alert">
-                    {t('education.student.join.invalidCode')}
+                  <p id="code-error" className="text-xs text-neo-red font-bold" role="alert">
+                    {t('education.student.join.codeNotRecognised')}
                   </p>
                 )}
               </div>
@@ -282,7 +295,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 disabled={isSubmitting}
                 className="flex items-center gap-2 text-sm text-neo-white hover:text-neo-cyan transition-colors disabled:opacity-50"
               >
-                <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
                 {t('common.back')}
               </button>
             </div>

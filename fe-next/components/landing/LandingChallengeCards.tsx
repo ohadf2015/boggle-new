@@ -154,6 +154,8 @@ export function LandingChallengeCards({
     if (!next.includes('wordCraft')) next.push('wordCraft');
     // Word Tower is public (shipped 2026-08-14 alongside its daily quest card).
     if (!next.includes('wordTower')) next.push('wordTower');
+    // Quick Play is public — solo arcade wheel hub (wheel picker, /quick-play).
+    if (!next.includes('quickPlay')) next.push('quickPlay');
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
     if (canSeeInWorkModes && !next.includes('shiritori')) next.push('shiritori');
@@ -161,11 +163,9 @@ export function LandingChallengeCards({
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
-    // Quick Play — beta-only solo arcade hub (wheel picker, /quick-play).
-    if (canSeeInWorkModes && !next.includes('quickPlay')) next.push('quickPlay');
     // Adventure is a beta/admin-only preview for now — hide it from the public
     // hub (the route guard in adventure/PageClient blocks direct navigation too).
-    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay');
+    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure');
     return gated;
   })();
   // Bump Blast up the hub: it sits directly after the multiplayer ('arena')

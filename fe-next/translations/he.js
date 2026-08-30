@@ -11926,6 +11926,11 @@ const he = {
     }
   },
   "student": {
+    "quickStart": {
+      "title": "מתחילים ללמוד",
+      "subtitle": "תרגלו מילים מהשיעורים שלכם",
+      "action": "יאללה, מתחילים"
+    },
     "hub": {
       "playZone": "שחק",
       "learnZone": "למד"
@@ -12179,6 +12184,8 @@ const he = {
         "large": "גדול (6×6)"
       },
       "create": "צור כיתה",
+      "createAnother": "צור כיתה נוספת",
+      "creating": "יוצר...",
       "edit": "ערוך כיתה",
       "delete": "מחק כיתה",
       "confirmDelete": "למחוק את הכיתה? התלמידים יאבדו גישה לשיעורים.",
@@ -12194,7 +12201,8 @@ const he = {
       "noMembers": "אין תלמידים עדיין",
       "settingUp": "מכין את הכיתה שלך...",
       "language": "שפה",
-      "created": "נוצר ב-{{date}}",
+      "created": "{{classroomName}} נוצרה! שתף את הקוד כדי להתחיל.",
+      "shareCode": "שתף את הקוד הזה עם התלמידים שלך",
       "noClassrooms": "אין כיתות עדיין",
       "createFirst": "צרו את הכיתה הראשונה שלכם",
       "validation": {
@@ -12208,11 +12216,21 @@ const he = {
       "error": {
         "createFailed": "יצירת הכיתה נכשלה",
         "updateFailed": "עדכון הכיתה נכשל",
-        "deleteFailed": "מחיקת הכיתה נכשלה"
+        "deleteFailed": "מחיקת הכיתה נכשלה",
+        "copyFailed": "העתקת הקוד נכשלה. נסו שוב."
       },
       "dialog": {
         "createDescription": "צור כיתה חדשה עם שם והגדרות שפה",
         "editDescription": "ערוך שם כיתה והגדרות שפה"
+      },
+      "presenter": {
+        "present": "הצג על המסך",
+        "visitUrl": "בקר ב:",
+        "orEnterCode": "או הזן קוד:",
+        "scanQr": "סרוק קוד QR:",
+        "shareTip": "שתוף קוד זה עם התלמידים שלך דרך Google Classroom, דוא״ל או SMS",
+        "pressEscape": "לחץ ESC כדי לצאת",
+        "exit": "יציאה מההצגה"
       }
     },
     "classrooms": {
@@ -15961,6 +15979,7 @@ const he = {
     "roundLabel": "סבב {n} מתוך {total}",
     "chipStack": "אסימונים: {chips}",
     "speedBonus": "מהירות ×{n}",
+    "luckyStreak": "✨ רצף מזל ×2!",
     "shareCard": {
       "header": "🎯 הימור סגור — {score} נקודות",
       "row": "{round} {emoji} {playerWord} נגד {botWord}{points}",

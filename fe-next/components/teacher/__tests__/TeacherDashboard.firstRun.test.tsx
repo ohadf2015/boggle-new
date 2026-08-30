@@ -101,10 +101,15 @@ vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
 }));
 
 vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({
-  default: ({ onCreateClassroom }: { onCreateClassroom: () => void }) => (
+  default: ({ createClassroom }: { createClassroom: (name: string, language: string) => Promise<any> }) => (
     <div data-testid="play-tab-first-run-card">
       <p>Create a classroom first to track assignments and duel activity</p>
-      <button onClick={onCreateClassroom} data-testid="play-tab-create-button">
+      <button
+        onClick={async () => {
+          await createClassroom('Test Classroom', 'en');
+        }}
+        data-testid="play-tab-create-button"
+      >
         Create Classroom
       </button>
     </div>
@@ -328,9 +333,9 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       const createButton = screen.getByTestId('play-tab-create-button');
       fireEvent.click(createButton);
 
-      // THEN — the prepare tab should be visible
-      // (ClassroomManager only renders in the prepare tab)
-      expect(screen.getByTestId('classroom-manager')).toBeInTheDocument();
+      // THEN — the classroom creation is handled inline on the play tab
+      // (no tab switch needed, form and code display all on play tab)
+      expect(screen.getByTestId('play-tab-first-run-card')).toBeInTheDocument();
     });
   });
 

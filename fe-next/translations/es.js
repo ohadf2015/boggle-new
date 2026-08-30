@@ -12072,6 +12072,11 @@ const es = {
     }
   },
   "student": {
+    "quickStart": {
+      "title": "Comienza a aprender",
+      "subtitle": "Practica vocabulario de tus lecciones",
+      "action": "Comenzar"
+    },
     "hub": {
       "playZone": "Jugar",
       "learnZone": "Aprender"
@@ -12304,6 +12309,8 @@ const es = {
         "large": "Grande (6×6)"
       },
       "create": "Crear Aula",
+      "createAnother": "Crear Otra Aula",
+      "creating": "Creando...",
       "edit": "Editar Aula",
       "delete": "Eliminar Aula",
       "confirmDelete": "¿Eliminar aula? Los estudiantes perderán acceso.",
@@ -12329,14 +12336,25 @@ const es = {
       "error": {
         "createFailed": "No se pudo crear la clase",
         "updateFailed": "No se pudo actualizar la clase",
-        "deleteFailed": "No se pudo eliminar la clase"
+        "deleteFailed": "No se pudo eliminar la clase",
+        "copyFailed": "No se pudo copiar el código. Inténtalo de nuevo."
       },
       "dialog": {
         "createDescription": "Crea una nueva clase para tus estudiantes",
         "editDescription": "Edita los detalles de tu clase"
       },
+      "presenter": {
+        "present": "Presentar",
+        "visitUrl": "Visita:",
+        "orEnterCode": "O ingresa el código:",
+        "scanQr": "Escanea el código QR:",
+        "shareTip": "Comparte este código con tus estudiantes a través de Google Classroom, correo electrónico o mensaje de texto",
+        "pressEscape": "Presiona ESC para salir",
+        "exit": "Salir de la presentación"
+      },
       "language": "Idioma",
-      "created": "Creado {{date}}",
+      "created": "¡{{classroomName}} creada! Comparte el código para comenzar.",
+      "shareCode": "Comparte este código con tus estudiantes",
       "noClassrooms": "Sin aulas aún",
       "createFirst": "Crea tu primera aula para empezar"
     },
@@ -16040,6 +16058,7 @@ const es = {
     "roundLabel": "Ronda {n} de {total}",
     "chipStack": "Fichas: {chips}",
     "speedBonus": "Velocidad ×{n}",
+    "luckyStreak": "✨ ¡Racha de suerte ×2!",
     "lockIn": "Cerrar puja",
     "youWin": "¡Ganaste!",
     "youLose": "Choque",

@@ -11,6 +11,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { LandingChallengeCards } from '../LandingChallengeCards';
+import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 vi.mock('@/utils/growthTracking', () => ({
   trackModeSelected: vi.fn(),
@@ -246,7 +247,7 @@ describe('LandingChallengeCards — Crossword admin dev-preview gate', () => {
 describe('LandingChallengeCards — Adventure beta/admin gate', () => {
   // Adventure ships in the server card order; the client gate hides it unless
   // the user can see in-work modes (admin OR beta tester).
-  const withAdventure = { ...baseProps, cardOrder: ['daily', 'arena', 'blast', 'adventure', 'practice'] as const };
+  const withAdventure = { ...baseProps, cardOrder: ['daily', 'arena', 'blast', 'adventure', 'practice'] as LandingGameMode[] };
 
   it('does NOT render the Adventure card for a non-beta/non-admin user', () => {
     mockIsAdmin.mockReturnValue(false);
@@ -264,6 +265,47 @@ describe('LandingChallengeCards — Adventure beta/admin gate', () => {
     const card = container.querySelector('[data-cube-key="adventure"]');
     expect(card).toBeInTheDocument();
     expect(card?.getAttribute('href')).toBe('/en/adventure');
+  });
+});
+
+describe('LandingChallengeCards — Quick Play public ungating + other in-work modes stay gated', () => {
+  it('REGRESSION: renders the Quick Play card for a NON-admin user (mode is now public)', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="quickPlay"]');
+    expect(card, 'Quick Play card missing for non-admin user').toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/quick-play');
+  });
+
+  it('REGRESSION: all 7 other in-work modes (shiritori, sealedBid, wordfall, crossword, adventure, wordTower, wordCraft) are STILL gated for non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+
+    // These 7 modes must stay gated to in-work access (admin OR beta)
+    const inWorkOnlyModes = ['shiritori', 'sealedBid', 'wordfall', 'crossword'];
+    for (const mode of inWorkOnlyModes) {
+      const card = container.querySelector(`[data-cube-key="${mode}"]`);
+      expect(card, `leaked admin card to non-admin: ${mode}`).toBeNull();
+    }
+
+    // Adventure also stays gated
+    const withAdventure = { ...baseProps, cardOrder: ['daily', 'arena', 'blast', 'adventure', 'practice'] as LandingGameMode[] };
+    const { container: containerAdv } = render(<LandingChallengeCards {...withAdventure} />);
+    expect(containerAdv.querySelector('[data-cube-key="adventure"]')).toBeNull();
+
+    // NOTE: wordTower shipped publicly 2026-08-14, so it's NOT in this list
+    // NOTE: wordCraft is public (territory + Card Run), Gem Hunt is admin-only URL sub-mode, not a card
+  });
+
+  it('renders Quick Play for an admin too (still works after ungating)', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="quickPlay"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/quick-play');
   });
 });
 

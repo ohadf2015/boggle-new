@@ -19,16 +19,28 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { firstGameRoute } from '../firstGameRoute';
+import { firstGameRoute, FIRST_GAME_MODE } from '../firstGameRoute';
+import { QUICK_MODES } from '@/components/quick-play/types';
 
 describe('firstGameRoute', () => {
-  it('sends a new player into a real auto-started game', () => {
-    expect(firstGameRoute('en')).toBe('/en/singleplayer?autoStart=bots');
+  it('sends a new player into Quick Play (the default mode for all players)', () => {
+    expect(firstGameRoute('en')).toContain('/en/quick-play');
+  });
+
+  it('auto-picks the first game instead of parking the newcomer on the mode picker', () => {
+    // A first-timer should be playing, not choosing. The picker is a decision
+    // between four unfamiliar mechanics, and this FTUE has already lost half its
+    // starters once to a destination that asked for a choice before a first word.
+    expect(firstGameRoute('en')).toBe(`/en/quick-play?autoStart=${FIRST_GAME_MODE}`);
+  });
+
+  it('auto-starts a mode that actually exists', () => {
+    expect(QUICK_MODES).toContain(FIRST_GAME_MODE);
   });
 
   it('keeps the player in their own language', () => {
-    expect(firstGameRoute('he')).toBe('/he/singleplayer?autoStart=bots');
-    expect(firstGameRoute('ja')).toBe('/ja/singleplayer?autoStart=bots');
+    expect(firstGameRoute('he')).toBe(`/he/quick-play?autoStart=${FIRST_GAME_MODE}`);
+    expect(firstGameRoute('ja')).toBe(`/ja/quick-play?autoStart=${FIRST_GAME_MODE}`);
   });
 
   it('never routes into practice', () => {

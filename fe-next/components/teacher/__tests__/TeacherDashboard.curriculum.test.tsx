@@ -72,9 +72,9 @@ vi.mock('@/components/teacher/QuickStartButton', () => ({
 }));
 
 vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({
-  default: ({ onCreateClassroom }: { onCreateClassroom: () => void }) => (
-    <button onClick={onCreateClassroom}>go-to-prepare</button>
-  ),
+  // The first-run card now creates the classroom inline; it no longer routes
+  // the teacher to the prepare tab, so this test drives the tab bar instead.
+  default: () => <div>PlayTabFirstRunCard</div>,
 }));
 
 vi.mock('@/components/teacher/StudentsPresentStrip', () => ({
@@ -104,7 +104,7 @@ describe('<TeacherDashboard> curriculum word lists', () => {
   it('surfaces the curriculum browser on the prepare tab', () => {
     render(<TeacherDashboard />);
 
-    fireEvent.click(screen.getByText('go-to-prepare'));
+    fireEvent.click(screen.getByRole('tab', { name: /teacher\.dashboard\.tab\.prepare/ }));
 
     expect(screen.getByText('CurriculumWordListBrowser')).toBeInTheDocument();
   });
