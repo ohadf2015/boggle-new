@@ -8,6 +8,7 @@ export * from './hooks';
 
 // Components
 export * from './components';
+export { SinglePlayerShell } from './SinglePlayerShell';
 
 // Types
 export * from './types';

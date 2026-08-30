@@ -19,6 +19,7 @@ vi.mock('@/lib/auth/googleOneTap', () => ({
   ensureGoogleIdInitialized: vi.fn().mockResolvedValue(undefined),
 }));
 
+import { ensureGoogleIdInitialized } from '@/lib/auth/googleOneTap';
 import GoogleSignInButton from '../GoogleSignInButton';
 
 /** Install a spyable window.google so the render effect actually calls renderButton. */
@@ -115,5 +116,24 @@ describe('GoogleSignInButton', () => {
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', '');
     render(<GoogleSignInButton />);
     expect(screen.queryByTestId('gsi-button-container')).toBeNull();
+  });
+
+  // Sentry `[GSI_LOGGER]: Failed to render button because there is no parent or
+  // options set.` — the container ref was checked BEFORE awaiting GIS init and
+  // dereferenced again after, so a component that unmounted during the await
+  // (auth modal closed, route changed) handed Google a null parent.
+  it('does not hand Google a null parent when it unmounts during GIS init', async () => {
+    let releaseInit: () => void = () => {};
+    vi.mocked(ensureGoogleIdInitialized).mockReturnValueOnce(
+      new Promise<void>((resolve) => { releaseInit = () => resolve(); }),
+    );
+    const renderButton = stubGoogleId();
+
+    const { unmount } = render(<GoogleSignInButton />);
+    unmount();
+    releaseInit();
+    await Promise.resolve();
+
+    expect(renderButton).not.toHaveBeenCalled();
   });
 });

@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN } from '../constants/namePattern';
+import { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN, USERNAME_SOCKET_MAX } from '../constants/namePattern';
 import { customAvatarSchema } from '../types/customAvatar';
 import { BLAST_COMBO_TYPES } from '../types/blast';
 
@@ -106,7 +106,7 @@ export const GuestTokenHashSchema = z.string()
 
 export const UsernameSchema = z.string()
   .min(1, 'Username is required')
-  .max(30, 'Username must be at most 30 characters')
+  .max(USERNAME_SOCKET_MAX, `Username must be at most ${USERNAME_SOCKET_MAX} characters`)
   // Same pattern the client validates with (NAME_VALID_PATTERN): any Unicode
   // letter or number, plus space . _ -. This used to be a hand-written list of
   // script ranges and had already been patched five times from Sentry

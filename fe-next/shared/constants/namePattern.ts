@@ -17,5 +17,13 @@
  */
 export const NAME_VALID_PATTERN = /^[\p{L}\p{M}\p{N}\s._-]+$/u;
 
+/**
+ * Longest username the socket contract accepts (UsernameSchema). Lives here, next
+ * to the pattern, because the same drift bit us twice: the client only ever
+ * length-checked names a human typed (USERNAME_MAX_LENGTH), while account display
+ * names arrived from OAuth and blew past this server-side.
+ */
+export const USERNAME_SOCKET_MAX = 30;
+
 /** Control chars, zero-width joiners/spaces, BOM, and bidi overrides (display spoofing). */
 export const NAME_UNSAFE_PATTERN = /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/;
