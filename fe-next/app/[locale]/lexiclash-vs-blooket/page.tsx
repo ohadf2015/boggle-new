@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Blooket — Free Word-Game Alternative for Classrooms (2026) | LexiClash',
-    description: 'LexiClash vs Blooket compared: pre-built word-formation games vs build-your-own quiz game shows. No student signup, no question-writing, vocabulary-focused, 5 languages. The free Blooket alternative for word and vocabulary review.',
+    description: 'LexiClash vs Blooket compared: pre-built word-formation games vs build-your-own quiz game shows. No student signup, no question-writing, vocabulary-focused, 6 languages. The free Blooket alternative for word and vocabulary review.',
     keywords: 'lexiclash vs blooket, blooket alternative, free blooket alternative, blooket alternative free, blooket vs lexiclash, alternatives to blooket, blooket for vocabulary, classroom word game, word game like blooket, vocabulary review game',
     openGraph: {
       title: 'LexiClash vs Blooket — The Free Word-Game Alternative',
-      description: 'Pre-built word games beat building quiz sets from scratch. No student signup. 5 languages. Free forever.',
+      description: 'Pre-built word games beat building quiz sets from scratch. No student signup. 6 languages. Whole class free.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: 'Is LexiClash a free alternative to Blooket?', a: 'Yes — LexiClash is fully free with no premium tier. Blooket has a free plan but gates higher player caps, hosting history, and some game modes behind Blooket Plus (a paid subscription). LexiClash never locks classroom features behind a paywall.' },
+  { q: 'Is LexiClash a free alternative to Blooket?', a: 'Yes — LexiClash runs a whole class of up to 50 students free, on 3 classes. Teacher Pro ($9/mo) adds unlimited classes and printable reports. Blooket has a free plan but gates higher player caps, hosting history, and some game modes behind Blooket Plus (a paid subscription). LexiClash never locks classroom features behind a paywall.' },
   { q: 'Do students need accounts to play LexiClash?', a: 'No. Students join with a 6-character code shown by the teacher — no email, no signup. Blooket lets students join a live game with a code too, but creating sets, saving stats, and homework assignments are tied to teacher (and sometimes student) accounts.' },
   { q: 'What is the difference between LexiClash and Blooket?', a: 'Blooket is a build-your-own quiz platform — you write question-and-answer sets, then students play them through arcade-style game modes. LexiClash is a ready-to-play word game: students find words on Boggle-style grids, anagrams, and word wheels. No question-writing required, and it is purpose-built for vocabulary and spelling, not generic trivia.' },
   { q: 'Can I use Blooket for vocabulary practice?', a: 'You can, but you have to author every term-definition question yourself, and the gameplay rewards fast clicking on multiple-choice answers rather than actually producing words. LexiClash drills spelling, recall, and letter patterns directly through word-formation gameplay — closer to the skill you are teaching.' },
@@ -56,14 +56,14 @@ const faqs = [
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full classroom features)', '✓ Everything free', 'Free plan; Plus is paid'],
+  ['Free tier (full classroom features)', '✓ Whole class free (50)', 'Free plan; Plus is paid'],
   ['No student signup', '✓ 6-character join code', '✓ Join code (accounts for full features)'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Trivia quiz + arcade game modes'],
   ['Content setup', 'Built-in or upload word list', 'Write your own question sets'],
   ['Vocabulary / spelling focus', '✓ Purpose-built', 'Generic — depends on your questions'],
   ['Live whole-class multiplayer', '✓ Free, up to 30', '✓ (player cap higher on Plus)'],
   ['1v1 duels with student pairing', '✓', '✗'],
-  ['5 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'No built-in language validation'],
+  ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'No built-in language validation'],
   ['Class analytics dashboard', '✓ Free', 'Reports (some gated on Plus)'],
   ['Best for', 'Word + vocabulary review games', 'Any-subject quiz review shows'],
   ['Setup time', 'Under 60 seconds', '5–15 minutes (build a set)'],
@@ -106,7 +106,7 @@ export default async function Page({ params }: PageProps) {
           starts the same way: you write a question set. For teachers running <strong>vocabulary and word review</strong>,
           that&apos;s a lot of authoring for a game that still rewards multiple-choice clicking over actually producing
           words. LexiClash is the opposite — pre-built word-formation gameplay (Boggle grids, anagrams, word wheels),
-          no question-writing, no student signup, five languages. Same competitive energy, zero prep.
+          no question-writing, no student signup, six languages. Same competitive energy, zero prep.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -154,7 +154,7 @@ export default async function Page({ params }: PageProps) {
               { title: 'Actually practices words', desc: 'Blooket gameplay rewards fast multiple-choice clicking. LexiClash makes students spell and form words under time pressure — the skill you are actually teaching.' },
               { title: 'Purpose-built for vocabulary', desc: 'Blooket is subject-agnostic trivia. LexiClash is a word game with real dictionaries, so every round reinforces spelling, recall, and letter patterns.' },
               { title: '5 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA. Blooket only knows the answers you typed.' },
-              { title: 'Everything free', desc: 'Blooket caps players and gates some modes/reports on Blooket Plus. LexiClash classroom features are free and full, up to 30 students.' },
+              { title: 'Whole class free', desc: 'Blooket caps players and gates some modes/reports on Blooket Plus. LexiClash classroom features are free and full, up to 30 students.' },
               { title: 'Faster to live', desc: 'Reuse-a-set still means finding the right Blooket set. LexiClash goes from idea to join code in under a minute.' },
             ].map((item) => (
               <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">

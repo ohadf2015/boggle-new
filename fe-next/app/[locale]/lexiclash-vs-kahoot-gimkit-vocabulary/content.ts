@@ -48,14 +48,14 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   en: {
     metaTitle: 'Best Free Classroom Vocabulary Game: LexiClash vs Kahoot, Gimkit & Vocabulary.com (2026) | LexiClash',
     metaDescription:
-      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com for classrooms, compared honestly. See the free-tier caps (Kahoot 40 players, Gimkit 5 students, Vocabulary.com $199/classroom) and why LexiClash is free for the whole class — no student logins, 5 languages, 1v1 duels.',
+      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com for classrooms, compared honestly. See the free-tier caps (Kahoot 10-40 players, Gimkit gates Pro modes, Vocabulary.com $199/classroom) and why LexiClash is free for the whole class — no student logins, 6 languages, 1v1 duels.',
     ogTitle: 'LexiClash vs Kahoot, Gimkit & Vocabulary.com — for Classrooms',
-    ogDescription: 'The honest free-tier comparison. No player caps, no per-student fee, 5 languages, no student logins.',
+    ogDescription: 'The honest free-tier comparison. No player caps, no per-student fee, 6 languages, no student logins.',
     twitterTitle: 'Best Free Classroom Vocabulary Game (2026)',
     twitterDescription: 'LexiClash vs Kahoot, Gimkit & Vocabulary.com — honest comparison.',
     heroTitle: 'The free classroom vocabulary game your whole class can use — no caps, no logins.',
     intro:
-      'Kahoot, Gimkit and Vocabulary.com are all good tools — but each one caps or prices its free tier in a way that bites a real classroom. Kahoot limits live players, Gimkit cuts the free tier to 5 students, and Vocabulary.com has no real free classroom tier at all. LexiClash takes a different stance: the classroom game is free for every teacher, with no player cap, no student logins, 1v1 duels, and native dictionaries in five languages. Here is the honest, side-by-side comparison.',
+      'Kahoot, Gimkit and Vocabulary.com are all good tools — but each one caps or prices its free tier in a way that bites a real classroom. Kahoot limits live players, Gimkit gates its Pro modes and reports behind Gimkit Pro, and Vocabulary.com has no real free classroom tier at all. LexiClash takes a different stance: the classroom game is free for every teacher, with no player cap, no student logins, 1v1 duels, and native dictionaries in six languages. Here is the honest, side-by-side comparison.',
     ctaPlayClass: 'Play a Class Game Free',
     ctaForSchools: 'For Schools & Districts',
 
@@ -73,14 +73,14 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Setup time', 'Under 60 seconds', '2–5 min/quiz', '2–5 min/kit', 'Account + list setup'],
     ] as const,
     comparePricingFooter:
-      'Pricing as of 2026, from public pricing pages: Kahoot free tier caps live players with Kahoot+ for advanced features; Gimkit free tier limited to 5 students, school plans ~$650–$1,000/yr; Vocabulary.com from ~$199/classroom/yr with no free classroom tier. Always confirm current pricing on each vendor\'s site.',
+      'Pricing as of 2026, from public pricing pages: Kahoot free tier caps live players with Kahoot+ for advanced features; Gimkit Basic is free and unlimited on its rotating featured modes, but gates Pro modes and reports; Vocabulary.com from ~$199/classroom/yr with no free classroom tier. Always confirm current pricing on each vendor\'s site.',
 
     whyTitle: 'Why teachers reach for LexiClash',
     whyCards: [
       { title: 'Free for the whole class', desc: 'No 40-player ceiling, no 5-student wall, no $199 entry. Every teacher plays free with a full class — that does not change.' },
       { title: 'No student logins', desc: 'Students join with a code. Nothing to provision, no student data to manage — the easiest tool to roll out school-wide.' },
       { title: 'Word games, not quizzes', desc: 'For vocabulary, spelling and language practice, students find and build words instead of picking A/B/C/D. A better fit for the goal.' },
-      { title: '5 languages incl. Hebrew RTL', desc: 'Native dictionaries for EN/HE/SV/JA/ES — built for ESL, bilingual and immersion classrooms the others don\'t serve.' },
+      { title: '6 languages incl. Hebrew RTL', desc: 'Native dictionaries for EN/HE/SV/JA/ES — built for ESL, bilingual and immersion classrooms the others don\'t serve.' },
       { title: '1v1 vocabulary duels', desc: 'Pair students for 2–3 minute head-to-head word battles — a mode none of these three offer.' },
       { title: 'Scales to your school', desc: 'Free for teachers, with optional district tooling (admin dashboard, analytics, content libraries, ad-free, SSO) on the For Schools page.' },
     ],
@@ -95,15 +95,15 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: 'What is the best free vocabulary game for the classroom?',
-        a: 'For word and vocabulary practice specifically, LexiClash is free for the whole class with no player cap, no student logins, and native dictionaries in 5 languages (English, Hebrew RTL, Spanish, Swedish, Japanese). Kahoot, Gimkit and Vocabulary.com are strong tools but cap or price their free tiers: Kahoot limits live players, Gimkit limits the free tier to 5 students, and Vocabulary.com has no real free classroom tier ($199/classroom to start).',
+        a: 'For word and vocabulary practice specifically, LexiClash is free for the whole class with no player cap, no student logins, and native dictionaries in 6 languages (English, Hebrew RTL, Spanish, Swedish, Japanese). Kahoot, Gimkit and Vocabulary.com are strong tools but cap or price their free tiers: Kahoot limits live players, Gimkit gates its Pro modes and reports behind Gimkit Pro, and Vocabulary.com has no real free classroom tier ($199/classroom to start).',
       },
       {
         q: 'Is LexiClash a free alternative to Gimkit?',
-        a: 'Yes. Gimkit\'s free tier is limited to 5 students per game and its school plans run roughly $650–$1,000 per year. LexiClash places no student cap on a class game and is free for every teacher — so you can run a full 30-student class without hitting a paywall. Gimkit\'s game-economy mechanic is fun for review; LexiClash is purpose-built for word-formation and vocabulary.',
+        a: 'Yes. Gimkit Basic is free and unlimited on featured modes, with Pro modes and reports paid and its school plans run roughly $650–$1,000 per year. LexiClash places no student cap on a class game and is free for every teacher — so you can run a full 30-student class without hitting a paywall. Gimkit\'s game-economy mechanic is fun for review; LexiClash is purpose-built for word-formation and vocabulary.',
       },
       {
         q: 'Is LexiClash a free alternative to Vocabulary.com?',
-        a: 'Vocabulary.com is a strong adaptive-vocabulary platform, but it has no real free classroom tier — pricing starts around $199 per classroom per year. LexiClash is free for every teacher and class, with multiplayer word games, 1v1 duels and 5 languages. For curriculum-aligned adaptive drilling Vocabulary.com is excellent; for free, fun, multiplayer vocabulary practice LexiClash fits better.',
+        a: 'Vocabulary.com is a strong adaptive-vocabulary platform, but it has no real free classroom tier — pricing starts around $199 per classroom per year. LexiClash is free for every teacher and class, with multiplayer word games, 1v1 duels and 6 languages. For curriculum-aligned adaptive drilling Vocabulary.com is excellent; for free, fun, multiplayer vocabulary practice LexiClash fits better.',
       },
       {
         q: 'How does LexiClash compare to Kahoot for vocabulary?',
@@ -147,7 +147,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     twitterDescription: 'LexiClash vs Kahoot, Gimkit & Vocabulary.com — ärlig jämförelse.',
     heroTitle: 'Det gratis ordspelet för klassrummet som hela klassen kan använda — utan begränsningar, utan loggning.',
     intro:
-      'Kahoot, Gimkit och Vocabulary.com är alla bra verktyg — men var och en begränsar eller prissätter sin gratisversion på ett sätt som påverkar riktiga klassrum. Kahoot begränsar antalet direktspelare, Gimkit reducerar gratisversionen till 5 elever, och Vocabulary.com har ingen gratis klassrumsversion alls. LexiClash tar en annan ståndpunkt: klassrumsspelet är gratis för varje lärare, utan spelbegränsningar, utan elevloggning, med 1v1-dueller och ordböcker på fem språk. Här är den ärliga jämförelsen sida vid sida.',
+      'Kahoot, Gimkit och Vocabulary.com är alla bra verktyg — men var och en begränsar eller prissätter sin gratisversion på ett sätt som påverkar riktiga klassrum. Kahoot begränsar antalet direktspelare, Gimkit reducerar gratisversionen till 5 elever, och Vocabulary.com har ingen gratis klassrumsversion alls. LexiClash tar en annan ståndpunkt: klassrumsspelet är gratis för varje lärare, utan spelbegränsningar, utan elevloggning, med 1v1-dueller och ordböcker på sex språk. Här är den ärliga jämförelsen sida vid sida.',
     ctaPlayClass: 'Spela ett klassrumsspel gratis',
     ctaForSchools: 'För skolor och distrikt',
 
@@ -324,14 +324,14 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   es: {
     metaTitle: 'Mejor juego de vocabulario gratuito para el aula: LexiClash vs Kahoot, Gimkit y Vocabulary.com (2026) | LexiClash',
     metaDescription:
-      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com para aulas, comparación honesta. Consulta los límites de versión gratuita (Kahoot 40 jugadores, Gimkit 5 estudiantes, Vocabulary.com $199/aula) y por qué LexiClash es gratuito para toda la clase — sin inicio de sesión de estudiantes, 5 idiomas, duelos 1v1.',
+      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com para aulas, comparación honesta. Consulta los límites de versión gratuita (Kahoot 40 jugadores, Gimkit 5 estudiantes, Vocabulary.com $199/aula) y por qué LexiClash es gratuito para toda la clase — sin inicio de sesión de estudiantes, 6 idiomas, duelos 1v1.',
     ogTitle: 'LexiClash vs Kahoot, Gimkit y Vocabulary.com — para aulas',
-    ogDescription: 'La comparación honesta de versiones gratuitas. Sin límites de jugadores, sin cuotas por estudiante, 5 idiomas, sin inicio de sesión de estudiantes.',
+    ogDescription: 'La comparación honesta de versiones gratuitas. Sin límites de jugadores, sin cuotas por estudiante, 6 idiomas, sin inicio de sesión de estudiantes.',
     twitterTitle: 'Mejor juego de vocabulario gratuito para el aula (2026)',
     twitterDescription: 'LexiClash vs Kahoot, Gimkit y Vocabulary.com — comparación honesta.',
     heroTitle: 'El juego de palabras gratuito para el aula que puede usar toda la clase — sin límites, sin inicio de sesión.',
     intro:
-      'Kahoot, Gimkit y Vocabulary.com son herramientas valiosas — pero cada una limita o fija el precio de su versión gratuita de una manera que afecta a las aulas reales. Kahoot limita los jugadores en vivo, Gimkit reduce la versión gratuita a 5 estudiantes, y Vocabulary.com no tiene una versión de aula verdaderamente gratuita. LexiClash adopta una posición diferente: el juego del aula es gratuito para todos los maestros, sin límite de jugadores, sin inicio de sesión de estudiantes, duelos 1v1 y diccionarios nativos en cinco idiomas. Aquí está la comparación honesta lado a lado.',
+      'Kahoot, Gimkit y Vocabulary.com son herramientas valiosas — pero cada una limita o fija el precio de su versión gratuita de una manera que afecta a las aulas reales. Kahoot limita los jugadores en vivo, Gimkit reduce la versión gratuita a 5 estudiantes, y Vocabulary.com no tiene una versión de aula verdaderamente gratuita. LexiClash adopta una posición diferente: el juego del aula es gratuito para todos los maestros, sin límite de jugadores, sin inicio de sesión de estudiantes, duelos 1v1 y diccionarios nativos en seis idiomas. Aquí está la comparación honesta lado a lado.',
     ctaPlayClass: 'Juega un juego de clase gratis',
     ctaForSchools: 'Para escuelas y distritos',
 
@@ -356,7 +356,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'Gratuito para toda la clase', desc: 'Sin techo de 40 jugadores, sin pared de 5 estudiantes, sin entrada de $199. Todo maestro juega gratis con una clase completa — eso no cambia.' },
       { title: 'Sin inicio de sesión de estudiantes', desc: 'Los estudiantes se unen con un código. Nada que configurar, sin datos de estudiantes que administrar — la herramienta más fácil para implementar en toda la escuela.' },
       { title: 'Juegos de palabras, no cuestionarios', desc: 'Para vocabulario, ortografía y práctica del idioma, los estudiantes encuentran y construyen palabras en lugar de elegir A/B/C/D. Mejor adaptación al objetivo.' },
-      { title: '5 idiomas incl. hebreo RTL', desc: 'Diccionarios nativos para EN/HE/SV/JA/ES — diseñados para aulas de ESL, bilingües e inmersión que los otros no atienden.' },
+      { title: '6 idiomas incl. hebreo RTL', desc: 'Diccionarios nativos para EN/HE/SV/JA/ES — diseñados para aulas de ESL, bilingües e inmersión que los otros no atienden.' },
       { title: 'Duelos de vocabulario 1v1', desc: 'Empareja estudiantes para batallas de palabras cara a cara de 2–3 minutos — un modo que ninguno de estos tres ofrece.' },
       { title: 'Se escala a tu escuela', desc: 'Gratuito para maestros, con herramientas de distrito opcionales (panel de administrador, análisis, bibliotecas de contenido, sin anuncios, SSO) en la página Para escuelas.' },
     ],
@@ -371,7 +371,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: '¿Cuál es el mejor juego de vocabulario gratuito para el aula?',
-        a: 'Para práctica de palabras y vocabulario específicamente, LexiClash es gratuito para toda la clase sin límite de jugadores, sin inicio de sesión de estudiantes, y con diccionarios nativos en 5 idiomas (inglés, hebreo RTL, español, sueco, japonés). Kahoot, Gimkit y Vocabulary.com son herramientas sólidas pero limitan o fijan el precio de sus versiones gratuitas: Kahoot limita los jugadores en vivo, Gimkit limita la versión gratuita a 5 estudiantes, y Vocabulary.com no tiene una versión de aula verdaderamente gratuita ($199/aula para comenzar).',
+        a: 'Para práctica de palabras y vocabulario específicamente, LexiClash es gratuito para toda la clase sin límite de jugadores, sin inicio de sesión de estudiantes, y con diccionarios nativos en 6 idiomas (inglés, hebreo RTL, español, sueco, japonés). Kahoot, Gimkit y Vocabulary.com son herramientas sólidas pero limitan o fijan el precio de sus versiones gratuitas: Kahoot limita los jugadores en vivo, Gimkit limita la versión gratuita a 5 estudiantes, y Vocabulary.com no tiene una versión de aula verdaderamente gratuita ($199/aula para comenzar).',
       },
       {
         q: '¿Es LexiClash una alternativa gratuita a Gimkit?',
@@ -379,7 +379,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: '¿Es LexiClash una alternativa gratuita a Vocabulary.com?',
-        a: 'Vocabulary.com es una plataforma de vocabulario adaptativa sólida, pero no tiene una versión de aula verdaderamente gratuita — la fijación de precios comienza alrededor de $199 por aula por año. LexiClash es gratuito para todos los maestros y clases, con juegos de palabras multijugador, duelos 1v1 e idiomas en 5 idiomas. Para ejercicios adaptativos alineados con el currículo, Vocabulary.com es excelente; para práctica de vocabulario gratuita, divertida y multijugador, LexiClash encaja mejor.',
+        a: 'Vocabulary.com es una plataforma de vocabulario adaptativa sólida, pero no tiene una versión de aula verdaderamente gratuita — la fijación de precios comienza alrededor de $199 por aula por año. LexiClash es gratuito para todos los maestros y clases, con juegos de palabras multijugador, duelos 1v1 e idiomas en 6 idiomas. Para ejercicios adaptativos alineados con el currículo, Vocabulary.com es excelente; para práctica de vocabulario gratuita, divertida y multijugador, LexiClash encaja mejor.',
       },
       {
         q: '¿Cómo compara LexiClash con Kahoot para vocabulario?',

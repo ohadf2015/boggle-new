@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Popple — Which Grid Word Game Wins? | LexiClash',
-    description: 'LexiClash vs Popple compared: 30+ game modes vs single-grid format, multiplayer rooms with friends, 5 languages, brain training, adventure RPG. Which word game fits your play style?',
+    description: 'LexiClash vs Popple compared: 30+ game modes vs single-grid format, multiplayer rooms with friends, 6 languages, brain training, adventure RPG. Which word game fits your play style?',
     keywords: 'lexiclash vs popple, popple alternative, real-time multiplayer word game, grid word puzzle, word games like popple, free multiplayer word game, best word game 2026, popple vs lexiclash',
     openGraph: {
       title: 'LexiClash vs Popple — Which Word Game Wins in 2026?',
@@ -70,7 +70,7 @@ const faqs = [
   },
   {
     q: 'What about languages and accessibility?',
-    a: 'LexiClash: 5 languages (English, Hebrew with full RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility. Popple is English-only. If you play in Hebrew or other languages, LexiClash is the only choice. LexiClash also fully supports reduced-motion preferences (important for people sensitive to animations).',
+    a: 'LexiClash: 6 languages (English, Hebrew with full RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility. Popple is English-only. If you play in Hebrew or other languages, LexiClash is the only choice. LexiClash also fully supports reduced-motion preferences (important for people sensitive to animations).',
   },
 ];
 
@@ -241,7 +241,7 @@ export default async function LexiClashVsPopplePage({ params }: PageProps) {
             Popple is a fantastic game. If you love the tactile swipe input, the combo strategy, and especially the attack system (fog, tornado, freeze, mirror), that&apos;s your game. Period. The sabotage mechanic is genuinely unique and excellent.
           </p>
           <p className="mt-4 text-neo-gray-200">
-            LexiClash is for people who want more: the same multiplayer rush, but also story campaigns, brain training, daily challenges, five languages, party games, and the freedom to play as much as they want. It&apos;s bigger, deeper, and weird in the best way.
+            LexiClash is for people who want more: the same multiplayer rush, but also story campaigns, brain training, daily challenges, six languages, party games, and the freedom to play as much as they want. It&apos;s bigger, deeper, and weird in the best way.
           </p>
           <p className="mt-4 text-neo-gray-200">
             Both are free. Both are real multiplayer. You honestly can&apos;t go wrong. But if you&apos;re scrolling this page, you probably want to see what LexiClash offers beyond the single-grid puzzle format. Here&apos;s your shot.

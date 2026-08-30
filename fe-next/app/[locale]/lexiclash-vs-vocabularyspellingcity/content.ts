@@ -38,15 +38,15 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   en: {
     metaTitle: 'LexiClash vs VocabularySpellingCity — Free Multiplayer Alternative (2026) | LexiClash',
     metaDescription:
-      'LexiClash vs VocabularySpellingCity compared: live whole-class multiplayer word games vs individual spelling drills. No student login, free, 5 languages, custom word lists. The free SpellingCity alternative for spelling and vocabulary.',
+      'LexiClash vs VocabularySpellingCity compared: live whole-class multiplayer word games vs individual spelling drills. No student login, free, 6 languages, custom word lists. The free SpellingCity alternative for spelling and vocabulary.',
     ogTitle: 'LexiClash vs VocabularySpellingCity — The Free Alternative',
     ogDescription:
-      'Live multiplayer word games beat solo spelling drills for engagement. No login. 5 languages. Free forever.',
+      'Live multiplayer word games beat solo spelling drills for engagement. No login. 6 languages. Whole class free.',
     twitterTitle: 'LexiClash vs SpellingCity — Free Alternative',
-    twitterDescription: 'Multiplayer spelling + vocabulary games. No login. 5 languages. Free.',
+    twitterDescription: 'Multiplayer spelling + vocabulary games. No login. 6 languages. Free.',
     heroTitle: 'SpellingCity drills alone. LexiClash plays the whole class.',
     intro:
-      'VocabularySpellingCity built a deep library of spelling and vocabulary games students work through one device at a time. It works — but it\'s a solo, log-in, mostly-Premium model. LexiClash takes the same custom word lists and turns them into live, no-login multiplayer: whole-class games and 1v1 duels on Boggle-style grids, anagrams, and wheels, free, in five languages. Practice the same words; replace solo drilling with competitive review.',
+      'VocabularySpellingCity built a deep library of spelling and vocabulary games students work through one device at a time. It works — but it\'s a solo, log-in, mostly-Premium model. LexiClash takes the same custom word lists and turns them into live, no-login multiplayer: whole-class games and 1v1 duels on Boggle-style grids, anagrams, and wheels, free, in six languages. Practice the same words; replace solo drilling with competitive review.',
     ctaStart: 'Try LexiClash Free',
     ctaSpelling: 'Spelling Practice',
     ctaDuels: 'Vocabulary Duels',
@@ -54,14 +54,14 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     compareFootnote:
       'VocabularySpellingCity tier features and pricing as of 2026 — check the vendor for current Premium plans.',
     compareRows: [
-      ['Free tier (full features)', '✓ Everything free', '✗ Premium for most games'],
+      ['Free tier (full features)', '✓ Whole class free (50)', '✗ Premium for most games'],
       ['No student login', '✓ 6-character join code', '✗ Student accounts'],
       ['Core format', 'Live multiplayer word games', 'Individual self-paced games'],
       ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ Solo practice model'],
       ['1v1 duels with student pairing', '✓', '✗'],
       ['Spelling + vocabulary focus', '✓ Word game core', '✓ Spelling-first'],
       ['Custom curriculum word lists', '✓', '✓'],
-      ['5 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'English spelling-first'],
+      ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'English spelling-first'],
       ['Class analytics dashboard', '✓ Free', '✓ (Premium)'],
       ['Best grade band', 'Upper-elem → adult ESL', 'K-5 heavy'],
       ['Best for', 'Engaging review games', 'Individual spelling practice'],
@@ -101,7 +101,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Is LexiClash a free alternative to VocabularySpellingCity?',
-        a: 'Yes — LexiClash is fully free with no premium tier. VocabularySpellingCity (part of the Learning A-Z / Vocabulary A-Z family) has a free tier but locks most games, recordkeeping, and class management behind a paid Premium membership. LexiClash never gates classroom features.',
+        a: 'Yes — LexiClash runs a whole class of up to 50 students free, on 3 classes. Teacher Pro ($9/mo) adds unlimited classes and printable reports. VocabularySpellingCity (part of the Learning A-Z / Vocabulary A-Z family) has a free tier but locks most games, recordkeeping, and class management behind a paid Premium membership. LexiClash never gates classroom features.',
       },
       {
         q: 'What is the main difference?',
@@ -138,15 +138,15 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   he: {
     metaTitle: 'LexiClash מול VocabularySpellingCity — חלופה ללא תשלום מרובה שחקנים (2026) | LexiClash',
     metaDescription:
-      'השוואה בין LexiClash ו-VocabularySpellingCity: משחקי מילים בחיים ולכל הכיתה מול תרגול כתיב אישי. ללא התחברות תלמיד, בחינם, 5 שפות, רשימות מילים מותאמות. החלופה החינמית של SpellingCity לכתיב ולאוצר מילים.',
+      'השוואה בין LexiClash ו-VocabularySpellingCity: משחקי מילים בחיים ולכל הכיתה מול תרגול כתיב אישי. ללא התחברות תלמיד, בחינם, 6 שפות, רשימות מילים מותאמות. החלופה החינמית של SpellingCity לכתיב ולאוצר מילים.',
     ogTitle: 'LexiClash מול VocabularySpellingCity — החלופה החינמית',
     ogDescription:
-      'משחקי מילים בחיים מרובי שחקנים עוקפים תרגול כתיב בודד בהתאמה. ללא התחברות. 5 שפות. בחינם לנצח.',
+      'משחקי מילים בחיים מרובי שחקנים עוקפים תרגול כתיב בודד בהתאמה. ללא התחברות. 6 שפות. בחינם לנצח.',
     twitterTitle: 'LexiClash מול SpellingCity — חלופה חינמית',
-    twitterDescription: 'משחקי כתיב + אוצר מילים מרובי שחקנים. ללא התחברות. 5 שפות. בחינם.',
+    twitterDescription: 'משחקי כתיב + אוצר מילים מרובי שחקנים. ללא התחברות. 6 שפות. בחינם.',
     heroTitle: 'SpellingCity תורגל לבד. LexiClash משחק כל כיתה.',
     intro:
-      'VocabularySpellingCity בנתה ספריה עמוקה של משחקי כתיב ואוצר מילים שתלמידים עובדים דרכם הכשב אחד. זה עובד — אבל זה מודל בודד, כניסה לחשבון, בעיקר Premium. LexiClash לוקח את אותן רשימות מילים מותאמות והופכן למשחקי מרובי שחקנים בחיים ללא התחברות: משחקי כיתה שלמה ודו-קרבות 1v1 בגרידים דמויי Boggle, אנגרמות וגלגלים, בחינם, ב-5 שפות. תרגול של אותן מילים; החליפו תרגול בודד בביקורת תחרותית.',
+      'VocabularySpellingCity בנתה ספריה עמוקה של משחקי כתיב ואוצר מילים שתלמידים עובדים דרכם הכשב אחד. זה עובד — אבל זה מודל בודד, כניסה לחשבון, בעיקר Premium. LexiClash לוקח את אותן רשימות מילים מותאמות והופכן למשחקי מרובי שחקנים בחיים ללא התחברות: משחקי כיתה שלמה ודו-קרבות 1v1 בגרידים דמויי Boggle, אנגרמות וגלגלים, בחינם, ב-6 שפות. תרגול של אותן מילים; החליפו תרגול בודד בביקורת תחרותית.',
     ctaStart: 'נסו את LexiClash בחינם',
     ctaSpelling: 'תרגול כתיב',
     ctaDuels: 'דו-קרבות אוצר מילים',
@@ -161,7 +161,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['דו-קרבות 1v1 עם זיווג תלמידים', '✓', '✗'],
       ['מיקוד כתיב + אוצר מילים', '✓ ליבת משחק מילים', '✓ כתיב ראשון'],
       ['רשימות מילים של תכנית לימודים מותאמות', '✓', '✓'],
-      ['5 שפות עם מילונים מקוריים', '✓ EN/HE/SV/JA/ES', 'כתיב אנגלית ראשון'],
+      ['6 שפות עם מילונים מקוריים', '✓ EN/HE/SV/JA/ES', 'כתיב אנגלית ראשון'],
       ['לוח מחוונים של ניתוח כיתה', '✓ בחינם', '✓ (Premium)'],
       ['רצועת כיתה הטובה ביותר', 'חטיבה עליונה → ESL למבוגרים', 'כיתות א-ה כבדות'],
       ['הטוב ביותר עבור', 'משחקי ביקורת משכנעים', 'תרגול כתיב אישי'],
@@ -190,7 +190,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
         desc: 'מילונים מסולמי CEFR A1–C2 משתלבים בחטיבה ו-ESL למבוגרים, לא רק כתיב כיתות ייסוד.',
       },
       {
-        title: '5 שפות עם מילונים מקוריים',
+        title: '6 שפות עם מילונים מקוריים',
         desc: 'אימות מילים EN/HE/ES/SV/JA לתוכניות דו-לשוניות ותוכניות שפה. SpellingCity הוא כתיב אנגלית ראשון.',
       },
     ],
@@ -438,15 +438,15 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   es: {
     metaTitle: 'LexiClash vs VocabularySpellingCity — Alternativa gratuita multijugador (2026) | LexiClash',
     metaDescription:
-      'LexiClash vs VocabularySpellingCity comparacion: juegos de palabras multijugador en vivo de toda la clase versus ejercicios de ortografia individual. Sin inicio de sesion de estudiante, gratis, 5 idiomas, listas de palabras personalizadas. La alternativa gratuita de SpellingCity para ortografia y vocabulario.',
+      'LexiClash vs VocabularySpellingCity comparacion: juegos de palabras multijugador en vivo de toda la clase versus ejercicios de ortografia individual. Sin inicio de sesion de estudiante, gratis, 6 idiomas, listas de palabras personalizadas. La alternativa gratuita de SpellingCity para ortografia y vocabulario.',
     ogTitle: 'LexiClash vs VocabularySpellingCity — La alternativa gratuita',
     ogDescription:
-      'Los juegos de palabras multijugador en vivo vencen los ejercicios de ortografia en solitario para el compromiso. Sin inicio de sesion. 5 idiomas. Gratis por siempre.',
+      'Los juegos de palabras multijugador en vivo vencen los ejercicios de ortografia en solitario para el compromiso. Sin inicio de sesion. 6 idiomas. Gratis por siempre.',
     twitterTitle: 'LexiClash vs SpellingCity — Alternativa gratuita',
-    twitterDescription: 'Juegos de ortografia + vocabulario multijugador. Sin inicio de sesion. 5 idiomas. Gratis.',
+    twitterDescription: 'Juegos de ortografia + vocabulario multijugador. Sin inicio de sesion. 6 idiomas. Gratis.',
     heroTitle: 'SpellingCity practica solo. LexiClash juega toda la clase.',
     intro:
-      'VocabularySpellingCity construyo una biblioteca profunda de juegos de ortografia y vocabulario por los que los estudiantes trabajan de uno en uno en sus dispositivos. Funciona — pero es un modelo solo, inicio de sesion, principalmente Premium. LexiClash toma las mismas listas de palabras personalizadas y las convierte en multijugador en vivo, sin inicio de sesion: juegos de clase completa y duelos 1v1 en cuadriculas de estilo Boggle, anagramas y ruedas, gratis, en cinco idiomas. Practica las mismas palabras; reemplaza la practica solo con revision competitiva.',
+      'VocabularySpellingCity construyo una biblioteca profunda de juegos de ortografia y vocabulario por los que los estudiantes trabajan de uno en uno en sus dispositivos. Funciona — pero es un modelo solo, inicio de sesion, principalmente Premium. LexiClash toma las mismas listas de palabras personalizadas y las convierte en multijugador en vivo, sin inicio de sesion: juegos de clase completa y duelos 1v1 en cuadriculas de estilo Boggle, anagramas y ruedas, gratis, en seis idiomas. Practica las mismas palabras; reemplaza la practica solo con revision competitiva.',
     ctaStart: 'Prueba LexiClash gratis',
     ctaSpelling: 'Practica de ortografia',
     ctaDuels: 'Duelos de vocabulario',
@@ -461,7 +461,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Duelos 1v1 con emparejamiento de estudiantes', 'ok', 'x'],
       ['Foco de ortografia + vocabulario', 'Nucleo de juego de palabras', 'Ortografia primero'],
       ['Listas de palabras curriculares personalizadas', 'ok', 'ok'],
-      ['5 idiomas con diccionarios nativos', 'EN/HE/SV/JA/ES', 'Ortografia inglesa primero'],
+      ['6 idiomas con diccionarios nativos', 'EN/HE/SV/JA/ES', 'Ortografia inglesa primero'],
       ['Panel de analisis de clase', 'Gratis', 'Premium'],
       ['Mejor banda de grado', 'Primaria superior → ESL adulto', 'Primaria pesada'],
       ['Mejor para', 'Juegos de revision atractivos', 'Practica de ortografia individual'],
@@ -490,7 +490,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
         desc: 'Los diccionarios escalados por MCER A1–C2 se ajustan a la escuela secundaria y ESL adulto, no solo a la ortografia de primaria.',
       },
       {
-        title: '5 idiomas con diccionarios nativos',
+        title: '6 idiomas con diccionarios nativos',
         desc: 'Validacion de palabras EN/HE/ES/SV/JA para programas bilingues y de idiomas. SpellingCity es ortografia inglesa primero.',
       },
     ],
@@ -538,12 +538,12 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   ru: {
     metaTitle: 'LexiClash vs VocabularySpellingCity — бесплатная альтернатива для многопользовательской игры (2026) | LexiClash',
     metaDescription:
-      'LexiClash vs VocabularySpellingCity сравнение: живые многопользовательские словесные игры всего класса против индивидуальных упражнений по орфографии. Без входа учащегося, бесплатно, 5 языков, пользовательские списки слов. Бесплатная альтернатива SpellingCity для орфографии и словарного запаса.',
+      'LexiClash vs VocabularySpellingCity сравнение: живые многопользовательские словесные игры всего класса против индивидуальных упражнений по орфографии. Без входа учащегося, бесплатно, 6 языков, пользовательские списки слов. Бесплатная альтернатива SpellingCity для орфографии и словарного запаса.',
     ogTitle: 'LexiClash vs VocabularySpellingCity — бесплатная альтернатива',
     ogDescription:
-      'Живые многопользовательские словесные игры превосходят отдельные упражнения по орфографии в плане вовлечения. Без входа. 5 языков. Бесплатно навсегда.',
+      'Живые многопользовательские словесные игры превосходят отдельные упражнения по орфографии в плане вовлечения. Без входа. 6 языков. Бесплатно навсегда.',
     twitterTitle: 'LexiClash vs SpellingCity — бесплатная альтернатива',
-    twitterDescription: 'Многопользовательские игры орфографии + словарного запаса. Без входа. 5 языков. Бесплатно.',
+    twitterDescription: 'Многопользовательские игры орфографии + словарного запаса. Без входа. 6 языков. Бесплатно.',
     heroTitle: 'SpellingCity тренируется в одиночку. LexiClash играет весь класс.',
     intro:
       'VocabularySpellingCity создала обширную библиотеку игр по орфографии и словарному запасу, через которые учащиеся работают один за другим на своих устройствах. Это работает — но это модель для одного пользователя, с входом, в основном платный. LexiClash берет те же пользовательские списки слов и превращает их в живую многопользовательскую игру без входа: игры для всего класса и дуэли 1v1 на сетках в стиле Boggle, анаграммы и колеса, бесплатно, на пяти языках. Практикуйте одни и те же слова; замените отдельные упражнения на конкурентный обзор.',
@@ -561,7 +561,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Дуэли 1v1 с парованием учащихся', '✓', '✗'],
       ['Фокус на орфографию + словарный запас', '✓ Суть словесной игры', '✓ Орфография в первую очередь'],
       ['Пользовательские списки слов программы', '✓', '✓'],
-      ['5 языков с собственными словарями', '✓ EN/HE/SV/JA/ES', 'Английская орфография в первую очередь'],
+      ['6 языков с собственными словарями', '✓ EN/HE/SV/JA/ES', 'Английская орфография в первую очередь'],
       ['Панель аналитики класса', '✓ Бесплатно', '✓ (Premium)'],
       ['Лучший диапазон классов', 'Старшие классы начальной школы → ESL для взрослых', 'Начальные классы, основной акцент'],
       ['Лучше всего для', 'Увлекательные игры на повторение', 'Отдельные упражнения по орфографии'],
@@ -590,7 +590,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
         desc: 'Словари с масштабированием CEFR A1–C2 подходят для средней школы и ESL для взрослых, а не только для орфографии начальной школы.',
       },
       {
-        title: '5 языков с собственными словарями',
+        title: '6 языков с собственными словарями',
         desc: 'Проверка слов EN/HE/ES/SV/JA для двуязычных и языковых программ. SpellingCity это орфография на английском языке в первую очередь.',
       },
     ],

@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: 'lexiclash vs freerice, freerice alternative, free vocabulary game classroom, freerice for teachers, multiplayer vocabulary game, no login word game, free word game classroom, freerice vs lexiclash, vocabulary game like freerice',
     openGraph: {
       title: 'LexiClash vs Freerice — Free, No-Login Word Games',
-      description: 'Both free, both no-login — LexiClash adds live multiplayer, duels, custom lists, and word formation. Free forever.',
+      description: 'Both free, both no-login — LexiClash adds live multiplayer, duels, custom lists, and word formation. Whole class free.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Freerice — Free Word Games',
-      description: 'Live multiplayer vocabulary games. No login. 5 languages. Free.',
+      description: 'Live multiplayer vocabulary games. No login. 6 languages. Free.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: 'Is LexiClash free and no-login like Freerice?', a: 'Yes — LexiClash is fully free and students join classroom games with a 6-character code, no signup. Freerice is also free and no-login. The difference is what happens after you join: Freerice is a solo multiple-choice vocabulary quiz, while LexiClash is live word-formation multiplayer with a teacher dashboard.' },
+  { q: 'Is LexiClash free and no-login like Freerice?', a: 'Yes — LexiClash is free for a whole class of up to 50, and students join classroom games with a 6-character code, no signup. Freerice is also free and no-login. The difference is what happens after you join: Freerice is a solo multiple-choice vocabulary quiz, while LexiClash is live word-formation multiplayer with a teacher dashboard.' },
   { q: 'What is the main difference between LexiClash and Freerice?', a: 'Freerice is a solo game — you answer multiple-choice vocabulary questions, and the World Food Programme donates rice for correct answers. LexiClash is a real-time classroom game: students form and spell words on Boggle-style grids and wheels, competing live against the whole class or 1v1. Freerice is great for solo practice with a charitable hook; LexiClash is built for whole-class engagement and teacher visibility.' },
   { q: 'Can teachers track progress on LexiClash?', a: 'Yes — LexiClash has a teacher dashboard showing per-student accuracy, missed words, and class-wide patterns. Freerice is anonymous and solo by design, with no class roster or per-student reporting.' },
   { q: 'Can I use my own vocabulary words?', a: 'Yes — LexiClash teachers upload custom word lists from any unit. Freerice draws from its own fixed question banks; you choose a category, not your own list.' },
@@ -104,7 +104,7 @@ export default async function Page({ params }: PageProps) {
           Freerice is a lovely idea — answer vocabulary questions, the World Food Programme donates rice, and it&apos;s free with
           no login. But it&apos;s a <strong>solo, multiple-choice</strong> quiz with no teacher view. LexiClash keeps the free,
           no-login part and adds what a classroom needs: live whole-class multiplayer and 1v1 duels, word-formation gameplay
-          (spell and build real words, not pick a definition), custom word lists, a teacher dashboard, and five languages.
+          (spell and build real words, not pick a definition), custom word lists, a teacher dashboard, and six languages.
           Different jobs — keep Freerice for solo do-good practice, run LexiClash for the live review game.
         </p>
 

@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Flocabulary — Free Vocabulary-Game Alternative (2026) | LexiClash',
-    description: 'LexiClash vs Flocabulary compared: active word-formation gameplay vs hip-hop vocabulary videos. No subscription, no student signup, live multiplayer, 5 languages. The free Flocabulary alternative for vocabulary practice.',
+    description: 'LexiClash vs Flocabulary compared: active word-formation gameplay vs hip-hop vocabulary videos. No subscription, no student signup, live multiplayer, 6 languages. The free Flocabulary alternative for vocabulary practice.',
     keywords: 'lexiclash vs flocabulary, flocabulary alternative, free flocabulary alternative, flocabulary alternative free, flocabulary vs lexiclash, alternatives to flocabulary, vocabulary game alternative, classroom vocabulary game, free vocabulary practice',
     openGraph: {
       title: 'LexiClash vs Flocabulary — The Free Vocabulary Alternative',
-      description: 'Active word games beat watching vocabulary videos for recall. No subscription. 5 languages. Free forever.',
+      description: 'Active word games beat watching vocabulary videos for recall. No subscription. 6 languages. Whole class free.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Flocabulary — Free Alternative',
-      description: 'Play vocabulary, don’t just watch it. No signup. 5 languages. Free.',
+      description: 'Play vocabulary, don’t just watch it. No signup. 6 languages. Free.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: 'Is LexiClash a free alternative to Flocabulary?', a: 'Yes — LexiClash is fully free with no subscription. Flocabulary is a paid product (individual and school plans, billed annually). LexiClash never gates classroom features behind a paywall.' },
+  { q: 'Is LexiClash a free alternative to Flocabulary?', a: 'Yes — LexiClash is free for a whole class of up to 50 with no subscription. Flocabulary is a paid product (individual and school plans, billed annually). LexiClash never gates classroom features behind a paywall.' },
   { q: 'How is LexiClash different from Flocabulary?', a: 'Flocabulary teaches vocabulary through hip-hop videos plus follow-up activities like vocab cards and Lyric Lab — students mostly watch and respond. LexiClash is an active word game: students find and form words on Boggle-style grids, anagrams, and wheels in live rounds. Different cognitive load — production and recall under time pressure rather than reception.' },
   { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code shown by the teacher — no email or signup. Flocabulary student access is tied to class rosters and accounts.' },
   { q: 'Is LexiClash good for ESL / English language learners?', a: 'Yes. LexiClash has native dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese with CEFR-scaled difficulty (A1–C2). Flocabulary is English-content-first (its songs and lessons are in English).' },
@@ -56,14 +56,14 @@ const faqs = [
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full features)', '✓ Everything free', '✗ Paid subscription'],
+  ['Free tier (full features)', '✓ Whole class free (50)', '✗ Paid subscription'],
   ['No student signup', '✓ 6-character join code', '✗ Roster / account access'],
   ['Core format', 'Active word-formation games', 'Hip-hop videos + activities'],
   ['Student action', 'Produce & form words', 'Watch, then respond'],
   ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ (interactive lessons, not live PvP)'],
   ['1v1 duels with student pairing', '✓', '✗'],
   ['Vocabulary / spelling focus', '✓ Word game core', '✓ Vocabulary-first content'],
-  ['5 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'English content-first'],
+  ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'English content-first'],
   ['Custom curriculum word lists', '✓', 'Within its activity model'],
   ['Class analytics dashboard', '✓ Free', '✓ (paid)'],
   ['Best for', 'Active recall + review games', 'Vocabulary introduction via video'],
@@ -106,7 +106,7 @@ export default async function Page({ params }: PageProps) {
           Flocabulary nailed vocabulary hooks — its hip-hop videos make terms stick, and students enjoy them. But it&apos;s a
           reception-first model: watch the song, then do the activity. For teachers who want <strong>active recall and
           review</strong> on a zero budget, LexiClash flips it. Students form and spell real words on Boggle-style grids,
-          anagrams, and wheels in live rounds — no subscription, no student signup, five languages. Many teachers introduce
+          anagrams, and wheels in live rounds — no subscription, no student signup, six languages. Many teachers introduce
           words with Flocabulary and <em>review</em> them with LexiClash.
         </p>
 

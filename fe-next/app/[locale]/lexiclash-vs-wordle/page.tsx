@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Wordle vs LexiClash 2026 — I Played Both Daily, Here\'s My Verdict',
-    description: 'I played Wordle and LexiClash side-by-side for 30 days. Wordle: 1 puzzle, 6 guesses, done in 90 seconds. LexiClash: unlimited rounds, multiplayer, 5 languages, adventure mode. Honest comparison from someone who used to be a Wordle purist.',
+    description: 'I played Wordle and LexiClash side-by-side for 30 days. Wordle: 1 puzzle, 6 guesses, done in 90 seconds. LexiClash: unlimited rounds, multiplayer, 6 languages, adventure mode. Honest comparison from someone who used to be a Wordle purist.',
     keywords: 'lexiclash vs wordle, wordle alternative, wordle multiplayer, word games like wordle, wordle with friends, unlimited wordle, best word games 2026, wordle vs boggle, word game comparison',
     openGraph: {
       title: 'LexiClash vs Wordle — Full Comparison 2026',
@@ -109,7 +109,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
         locale={locale}
         h1="Wordle Is Brilliant. LexiClash Is What You Play After."
         intro={[
-          'Let’s get this out of the way: Wordle is a masterpiece of game design. One puzzle, five letters, six tries, done. It turned the entire internet into word nerds and that rules. But if you’ve ever finished your daily Wordle at 8:03 AM and thought "now what?" — that’s where LexiClash comes in. Unlimited rounds, live multiplayer, a full adventure mode with boss fights, and support for five languages. Same word-game brain, completely different animal.',
+          'Let’s get this out of the way: Wordle is a masterpiece of game design. One puzzle, five letters, six tries, done. It turned the entire internet into word nerds and that rules. But if you’ve ever finished your daily Wordle at 8:03 AM and thought "now what?" — that’s where LexiClash comes in. Unlimited rounds, live multiplayer, a full adventure mode with boss fights, and support for six languages. Same word-game brain, completely different animal.',
         ]}
         quickCtas={[
           { href: `/${locale}/singleplayer`, label: 'Try LexiClash Free', variant: 'lime' },

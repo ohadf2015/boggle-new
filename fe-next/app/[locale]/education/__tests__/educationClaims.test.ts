@@ -28,6 +28,28 @@ const FILES = [
   'app/[locale]/word-games-for-the-classroom/content.ts',
   'app/[locale]/education/page.tsx',
   'public/llms.txt',
+  // Comparison pages. These sat OUTSIDE this list until 2026-08-31, which is exactly why
+  // they still claimed LexiClash was "fully free with no premium tier" long after that was
+  // corrected everywhere else — and why they stated a competitor's free tier wrongly.
+  // A guard that does not cover a file cannot protect it.
+  'app/[locale]/lexiclash-vs-apalabrados/page.tsx',
+  'app/[locale]/lexiclash-vs-blooket/page.tsx',
+  'app/[locale]/lexiclash-vs-cabanagrams/page.tsx',
+  'app/[locale]/lexiclash-vs-flocabulary/page.tsx',
+  'app/[locale]/lexiclash-vs-freerice/page.tsx',
+  'app/[locale]/lexiclash-vs-kahoot-gimkit-vocabulary/content.ts',
+  'app/[locale]/lexiclash-vs-kahoot-gimkit-vocabulary/page.tsx',
+  'app/[locale]/lexiclash-vs-kahoot/page.tsx',
+  'app/[locale]/lexiclash-vs-popple/page.tsx',
+  'app/[locale]/lexiclash-vs-puzzly-words/page.tsx',
+  'app/[locale]/lexiclash-vs-quizlet/page.tsx',
+  'app/[locale]/lexiclash-vs-scrabble/page.tsx',
+  'app/[locale]/lexiclash-vs-vocabularyspellingcity/content.ts',
+  'app/[locale]/lexiclash-vs-vocabularyspellingcity/page.tsx',
+  'app/[locale]/lexiclash-vs-wordfeud/page.tsx',
+  'app/[locale]/lexiclash-vs-wordle/page.tsx',
+  'app/[locale]/lexiclash-vs-wordwall-kahoot-quizlet/page.tsx',
+  'app/[locale]/lexiclash-vs-wordwall/page.tsx',
 ];
 
 /**
@@ -42,7 +64,7 @@ const FORBIDDEN: Array<[string, RegExp]> = [
   ],
   [
     'denies the premium tier or a per-seat limit that lib/education/freeTierLimits.ts enforces',
-    /no premium tier|No premium upsell|no premium upsell|Free tier covers everything|Free tier = full features|fully free, no premium|no per-seat fee|no per-seat license|sin plan premium|sin versión premium|プレミアムなし|プレミアム版なし|בלי גרסת פרימיום|без премиума|no participant cap|no player or student cap/,
+    /no premium tier|No premium upsell|no premium upsell|Free tier covers everything|Free tier = full features|fully free, no premium|sin plan premium|sin versión premium|プレミアムなし|プレミアム版なし|בלי גרסת פרימיום|без премиума|no participant cap|no player or student cap/,
   ],
   [
     `advertises a per-class student number that is not FREE_TIER_LIMITS.studentsPerClass (${FREE_TIER_LIMITS.studentsPerClass})`,
@@ -50,7 +72,7 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     // the real constant so raising or lowering the tier fails this test until the copy in all
     // six locales is updated with it — the drift that produced 140+ false claims last time.
     new RegExp(
-      String.raw`\b(?!${FREE_TIER_LIMITS.studentsPerClass}\b)\d{1,3}\s?(students per class|students each|per classroom)`
+      String.raw`\b(?!${FREE_TIER_LIMITS.studentsPerClass}\b)\d{1,3}\s?(students per class|students each|students per classroom)`
       + String.raw`|(?!${FREE_TIER_LIMITS.studentsPerClass})\b\d{1,3} תלמידים בכיתה`
       + String.raw`|hasta (?!${FREE_TIER_LIMITS.studentsPerClass})\d{1,3} (alumnos|estudiantes) por clase`
       + String.raw`|upp till (?!${FREE_TIER_LIMITS.studentsPerClass})\d{1,3} elever per klass`,

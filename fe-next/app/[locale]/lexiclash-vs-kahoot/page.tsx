@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Kahoot — Free Kahoot Alternative for Vocabulary (2026) | LexiClash',
-    description: 'LexiClash vs Kahoot compared: free word-formation games vs quiz-show format. No student signup, no Kahoot+ subscription, 5 languages, full multiplayer. The free Kahoot alternative for vocabulary and language teachers.',
+    description: 'LexiClash vs Kahoot compared: free word-formation games vs quiz-show format. No student signup, no Kahoot+ subscription, 6 languages, full multiplayer. The free Kahoot alternative for vocabulary and language teachers.',
     keywords: 'lexiclash vs kahoot, kahoot alternative, free kahoot alternative, kahoot vs lexiclash, alternatives to kahoot, free quiz game alternative, kahoot for free, classroom multiplayer free, vocabulary kahoot alternative, kahoot for teachers free',
     openGraph: {
       title: 'LexiClash vs Kahoot — The Free Alternative',
-      description: 'Word games beat quiz format for vocabulary. No student signup. No Kahoot+ paywall. 5 languages.',
+      description: 'Word games beat quiz format for vocabulary. No student signup. No Kahoot+ paywall. 6 languages.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -47,22 +47,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: 'Is LexiClash a free alternative to Kahoot?', a: 'Yes — LexiClash is fully free with no premium tier, no per-seat fee, and no district license required. Kahoot has a free tier (up to 40 players, basic features) but most classroom-quality features (advanced reports, slide layouts, larger games) require Kahoot+ at $4-15/month per teacher.' },
+  { q: 'Is LexiClash a free alternative to Kahoot?', a: 'Yes — LexiClash is free for your whole class: 3 classes of up to 50 students, no per-seat fee and no district licence required. Teacher Pro ($9/mo) adds unlimited classes and printable reports. Kahoot has a free tier (10-40 players depending on account type, basic features) but most classroom-quality features (advanced reports, slide layouts, larger games) require Kahoot+ at $4-15/month per teacher.' },
   { q: 'Do students need accounts on LexiClash?', a: 'No. Students join with a 6-character code (just like Kahoot’s PIN system). The difference: LexiClash student accounts are entirely optional, while Kahoot increasingly pushes students toward sign-in for progress tracking.' },
   { q: 'Is LexiClash like Kahoot?', a: 'Different category. Kahoot is a quiz-show platform — students answer multiple-choice questions on a shared timer, often projected on screen. LexiClash is a word-formation game — students search for words on Boggle-style grids, anagrams, or word wheels. Better for vocabulary, spelling, and language practice than multiple-choice trivia.' },
   { q: 'Can I use Kahoot quizzes in LexiClash?', a: 'No — different formats. But you can upload your vocabulary lists from any source (Quizlet exports, CSV, manual entry) and use them in LexiClash word games. For trivia-style quizzes, Kahoot remains the right tool; for word/vocabulary practice, LexiClash is purpose-built.' },
-  { q: 'Does LexiClash have multiplayer up to 30+ students?', a: 'Yes — LexiClash supports up to 30 students per classroom session, all in real time, all free. Kahoot’s free tier supports up to 40 players, but advanced game modes and analytics are Kahoot+ only.' },
+  { q: 'Does LexiClash have multiplayer for a whole class?', a: 'Yes — LexiClash supports up to 50 students per classroom session, all in real time, and a whole class of that size is free. Kahoot's free tier supports 10-40 players depending on account type, but advanced game modes and analytics are Kahoot+ only.' },
   { q: 'What about ESL or language classrooms?', a: 'LexiClash has built-in dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese — so vocabulary games work natively in each language. Kahoot supports any language for question text but doesn’t have native word-game mechanics tied to language dictionaries.' },
   { q: 'How long is a LexiClash classroom session?', a: 'A whole-class round runs 5-10 minutes. A 1v1 vocabulary duel runs 2-3 minutes. Most teachers use it as a 5-minute warm-up, mid-lesson brain break, or end-of-class review — same use cases Kahoot fills, but with word-formation gameplay instead of quiz format.' },
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full features)', '✓ Everything free', '✗ Kahoot+ $4-15/mo'],
+  ['Free tier (full features)', '✓ Whole class free (50)', '✗ Kahoot+ $4-15/mo'],
   ['No student signup', '✓ 6-character join code', '✓ PIN code'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Quiz / multiple choice'],
   ['Best for', 'Vocabulary, spelling, ESL', 'Trivia, fact recall, review quizzes'],
   ['1v1 duels', '✓ Built-in', '✗'],
-  ['5 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'Question text any language; no dictionaries'],
+  ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'Question text any language; no dictionaries'],
   ['Custom curriculum content', '✓ Word lists', '✓ Quiz questions'],
   ['Class analytics', '✓ Free', 'Limited free; Kahoot+ for full'],
   ['Ad-free in classroom', '✓ Free', 'Free shows promos; Kahoot+ ad-free'],
@@ -106,7 +106,7 @@ export default async function Page({ params }: PageProps) {
           Kahoot owns the quiz-show classroom moment — that&apos;s their genre and they&apos;re great at it. But for
           vocabulary, spelling, and language practice, the right tool isn&apos;t a quiz with multiple-choice answers
           — it&apos;s a word-formation game where students actually search for, build, and recognize words. LexiClash
-          is built for exactly that. Free forever (no Kahoot+ subscription), no student signup required, five languages
+          is built for exactly that. Whole class free (no Kahoot+ subscription), no student signup required, six languages
           with native dictionaries, and the same 5-minute classroom flow Kahoot pioneered.
         </p>
 
@@ -144,7 +144,7 @@ export default async function Page({ params }: PageProps) {
               </tbody>
             </table>
           </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Kahoot pricing as of 2026: free for K-12 teachers (up to 40 players, limited features); Kahoot+ Premier $7.99/month and Kahoot+ Max $11.99/month per teacher.</p>
+          <p className="mt-3 text-xs text-neo-gray-300">Kahoot pricing as of 2026: free for K-12 teachers (10-40 players depending on account type, limited features); Kahoot+ Premier $7.99/month and Kahoot+ Max $11.99/month per teacher.</p>
         </section>
 
         <section className="mb-12">
@@ -153,7 +153,7 @@ export default async function Page({ params }: PageProps) {
             {[
               { title: 'Word games, not quizzes', desc: 'For vocabulary, spelling, and language practice, students need to find, build, and recognize words — not pick from A/B/C/D. Different cognitive workout, better fit for the goal.' },
               { title: 'Free, no Kahoot+ ceiling', desc: 'Kahoot pushes you to Kahoot+ for advanced reports, larger games, and certain modes. LexiClash gives you everything in the free tier — no upgrade screen, ever.' },
-              { title: 'Native multilingual dictionaries', desc: 'For ESL/EFL, Hebrew immersion, Spanish bilingual classrooms — LexiClash has full dictionaries in 5 languages. Kahoot supports any text but doesn’t have language-game mechanics.' },
+              { title: 'Native multilingual dictionaries', desc: 'For ESL/EFL, Hebrew immersion, Spanish bilingual classrooms — LexiClash has full dictionaries in 6 languages. Kahoot supports any text but doesn’t have language-game mechanics.' },
               { title: '1v1 vocabulary duels', desc: 'Pair students for 2-3 minute head-to-head word battles. Kahoot’s format doesn’t support paired-student practice the same way.' },
               { title: 'Faster setup', desc: 'Kahoot quizzes take 2-5 minutes per quiz to author. LexiClash word lists upload in under a minute, and many teachers use built-in lists for instant play.' },
               { title: 'Ad-free classroom', desc: 'Free Kahoot occasionally surfaces promos to students. LexiClash classroom mode is ad-free in all tiers.' },

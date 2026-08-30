@@ -61,7 +61,7 @@ const faqs = [
   },
   {
     q: 'What about languages and accessibility?',
-    a: 'LexiClash: 5 languages (English, Hebrew with RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility standards. Cabanagrams: 11 languages supported, including many European and Asian languages. Cabanagrams has broader language reach; LexiClash uniquely supports Hebrew RTL and combines language with 30+ game modes.',
+    a: 'LexiClash: 6 languages (English, Hebrew with RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility standards. Cabanagrams: 11 languages supported, including many European and Asian languages. Cabanagrams has broader language reach; LexiClash uniquely supports Hebrew RTL and combines language with 30+ game modes.',
   },
   {
     q: 'How is progression different?',
@@ -165,7 +165,7 @@ export default async function LexiClashVsCabanagramsPage({ params }: PageProps) 
               { title: '30+ Game Modes', desc: 'Connections, Wordle-style daily, Blast action mode, party games, ranked competitive, and more. Same skill set, wildly different feels.' },
               { title: 'Native Android App', desc: 'Play from your home screen. Cabanagrams is web-only; LexiClash has a proper Android app with offline access and shortcuts.' },
               { title: 'Ranked Competitive Play', desc: 'ELO ladder, ranked seasons, leaderboards. Cabanagrams is casual drop-in; LexiClash has infrastructure for serious players.' },
-              { title: 'Cross-Locale Progression', desc: '5 languages (EN, HE, SV, JA, ES) with full progression sync. Hebrew speakers get a full RTL experience.' },
+              { title: 'Cross-Locale Progression', desc: '6 languages (EN, HE, SV, JA, ES) with full progression sync. Hebrew speakers get a full RTL experience.' },
             ].map((item) => (
               <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
                 <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>

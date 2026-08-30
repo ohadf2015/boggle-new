@@ -18,11 +18,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Wordwall — Free Wordwall Alternative for Word Games (2026) | LexiClash',
-    description: 'LexiClash vs Wordwall compared: dedicated word-formation gameplay vs templated activities. Free forever, no Wordwall subscription, no student signup, 5 native dictionaries. The free Wordwall alternative for vocabulary teachers.',
+    description: 'LexiClash vs Wordwall compared: dedicated word-formation gameplay vs templated activities. Whole class free, no Wordwall subscription, no student signup, 6 native dictionaries. The free Wordwall alternative for vocabulary teachers.',
     keywords: 'lexiclash vs wordwall, wordwall alternative, free wordwall alternative, wordwall vs lexiclash, alternatives to wordwall, free wordwall replacement, wordwall for free, classroom word game wordwall, vocabulary tool wordwall, wordwall classroom multiplayer',
     openGraph: {
       title: 'LexiClash vs Wordwall — The Free Alternative',
-      description: 'Dedicated word games beat templated activities. No subscription. 5 languages. Free forever.',
+      description: 'Dedicated word games beat templated activities. No subscription. 6 languages. Whole class free.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Wordwall — Free Alternative',
-      description: 'Word games for the classroom. No subscription. 5 languages.',
+      description: 'Word games for the classroom. No subscription. 6 languages.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: 'Is LexiClash a free alternative to Wordwall?', a: 'Yes — LexiClash is fully free with no premium tier. Wordwall has a free tier (limited to 5 active activities, basic templates) and paid plans starting at £4-9/month for unlimited activities and advanced templates. LexiClash never gates features behind a paywall.' },
+  { q: 'Is LexiClash a free alternative to Wordwall?', a: 'Yes — LexiClash runs a whole class of up to 50 students free, on 3 classes. Teacher Pro ($9/mo) adds unlimited classes and printable reports. Wordwall has a free tier (limited to 5 active activities, basic templates) and paid plans starting at £4-9/month for unlimited activities and advanced templates. LexiClash never gates features behind a paywall.' },
   { q: 'How is LexiClash different from Wordwall?', a: 'Wordwall is a templated activity platform — teachers fill in word lists and get pre-built activities (match-up, anagram, balloon pop, quiz). LexiClash is a dedicated word-formation game — students play actual Boggle-style grids, anagrams, and word wheels with real multiplayer mechanics. Wordwall favors variety of templates; LexiClash favors depth of word-game experience.' },
   { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code. Wordwall activities are typically student-account-free too (just a link), but Wordwall gates leaderboards, time limits, and tracking behind teacher accounts and paid tiers.' },
   { q: 'Can teachers upload their own word lists?', a: 'Yes on both. LexiClash word lists upload as plain CSV or paste-in. Wordwall has a similar workflow but requires you to pick a template + redo for each new activity type.' },
@@ -56,7 +56,7 @@ const faqs = [
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full features)', '✓ Everything free', '✗ 5 activity limit free'],
+  ['Free tier (full features)', '✓ Whole class free (50)', '✗ 5 activity limit free'],
   ['Pricing', '$0 forever', 'Pro £4-9/mo, Plus £15/mo'],
   ['No student signup', '✓ 6-character join code', '✓ link-based'],
   ['Game type', 'Dedicated word-formation games', 'Templated activities (match/quiz/spin)'],
@@ -105,8 +105,8 @@ export default async function Page({ params }: PageProps) {
           quiz games, the works. Great breadth. But for vocabulary teachers who specifically want word-formation
           gameplay (find words on a grid, build anagrams, spin word wheels), Wordwall&apos;s anagram template is
           shallow compared to a purpose-built word-game platform. LexiClash trades template variety for depth in
-          the one category teachers reach for most: word games. Free forever, no Wordwall subscription, no student
-          signup, five languages with native dictionaries.
+          the one category teachers reach for most: word games. Whole class free, no Wordwall subscription, no student
+          signup, six languages with native dictionaries.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -154,7 +154,7 @@ export default async function Page({ params }: PageProps) {
               { title: 'Real-time multiplayer in free tier', desc: 'Wordwall\'s live multiplayer modes are mostly Pro features. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
               { title: '5 native-dictionary languages', desc: 'For ESL, Hebrew immersion, Spanish bilingual — LexiClash has full dictionaries in EN/HE/ES/SV/JA. Wordwall is text-only multilingual, no language-game depth.' },
               { title: '1v1 vocabulary duels', desc: 'Pair students for head-to-head 2-3 minute word battles. Wordwall doesn\'t have a paired-student game format.' },
-              { title: 'No 5-activity limit', desc: 'Wordwall\'s free tier caps you at 5 active activities. LexiClash has no activity cap — make as many word lists as you want, free forever.' },
+              { title: 'No 5-activity limit', desc: 'Wordwall\'s free tier caps you at 5 active activities. LexiClash has no activity cap — make as many word lists as you want, at no cost — custom lists are a free-tier feature.' },
               { title: 'Faster setup for word games', desc: 'Wordwall: pick template, paste words, configure. LexiClash: pick a list, share the code. Under 60 seconds vs 2-5 minutes per activity.' },
             ].map((item) => (
               <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">

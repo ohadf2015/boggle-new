@@ -19,11 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Quizlet — Free Quizlet Alternative for Classrooms (2026) | LexiClash',
-    description: 'LexiClash vs Quizlet compared: free word-formation games vs flashcard-based learning. No student signup, multiplayer for the whole class, 5 languages. The free Quizlet alternative for vocabulary teachers.',
+    description: 'LexiClash vs Quizlet compared: free word-formation games vs flashcard-based learning. No student signup, multiplayer for the whole class, 6 languages. The free Quizlet alternative for vocabulary teachers.',
     keywords: 'lexiclash vs quizlet, quizlet alternative, free quizlet alternative, quizlet alternative free, quizlet vs lexiclash, alternatives to quizlet, free flashcard alternative, vocabulary game vs quizlet, classroom vocabulary tool, quizlet for teachers free',
     openGraph: {
       title: 'LexiClash vs Quizlet — The Free Alternative',
-      description: 'Word-formation games beat flashcards for spelling + recall. No student signup. 5 languages. Free forever.',
+      description: 'Word-formation games beat flashcards for spelling + recall. No student signup. 6 languages. Whole class free.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Quizlet — Free Alternative',
-      description: 'Word games for the classroom. No signup. 5 languages. Free.',
+      description: 'Word games for the classroom. No signup. 6 languages. Free.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: 'Is LexiClash a free alternative to Quizlet?', a: 'Yes — LexiClash is fully free with no premium tier. Quizlet has a free tier but locks key features (offline mode, ad-free, custom images, advanced study modes) behind Quizlet Plus ($35.99/year). LexiClash never gates features behind a paywall.' },
+  { q: 'Is LexiClash a free alternative to Quizlet?', a: 'Yes — LexiClash runs a whole class of up to 50 students free, on 3 classes. Teacher Pro ($9/mo) adds unlimited classes and printable reports. Quizlet has a free tier but locks key features (offline mode, ad-free, custom images, advanced study modes) behind Quizlet Plus ($35.99/year). LexiClash never gates features behind a paywall.' },
   { q: 'Do students need to create accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code displayed by the teacher. Quizlet requires an account (or parental consent for under-13 students) and an email address per student.' },
   { q: 'Is LexiClash like Quizlet?', a: 'Different category. Quizlet is flashcard-based — students drill term-definition pairs. LexiClash is a word-formation game — students search for words on Boggle-style grids, anagrams, and word wheels. Better for spelling, recall, and pattern recognition than memorization-focused flashcards.' },
   { q: 'Can teachers use their own word lists?', a: 'Yes on both platforms. LexiClash teachers upload custom vocabulary lists from any unit or curriculum and use them in 1v1 duels, whole-class games, or assigned practice. No import format restrictions.' },
@@ -57,12 +57,12 @@ const faqs = [
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free tier (full features)', '✓ Everything free', '✗ Quizlet Plus $36/yr'],
+  ['Free tier (full features)', '✓ Whole class free (50)', '✗ Quizlet Plus $36/yr'],
   ['No student signup', '✓ 6-character join code', '✗ Account required'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Flashcards + multiple-choice'],
   ['Live whole-class multiplayer', '✓ Free', '✓ Quizlet Plus'],
   ['1v1 duels with student pairing', '✓', '✗'],
-  ['5 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'User-generated decks only'],
+  ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'User-generated decks only'],
   ['Custom curriculum word lists', '✓', '✓'],
   ['Class analytics dashboard', '✓ Free', 'Limited free; paid for full'],
   ['Ads in classroom mode', '✗ None', 'Free tier shows ads'],
@@ -107,7 +107,7 @@ export default async function Page({ params }: PageProps) {
           Quizlet built the modern flashcard standard, and millions of students use it every day. But for teachers
           running classroom vocabulary review with no budget, no IT permissions, and no time to set up student
           accounts, LexiClash is built differently. Word-formation gameplay (not flashcards), no student signup
-          (6-character join code), live whole-class multiplayer in the free tier, and five languages with native
+          (6-character join code), live whole-class multiplayer in the free tier, and six languages with native
           dictionaries. Same vocabulary goal, opposite philosophy.
         </p>
 

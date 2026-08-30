@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Puzzly Words — Which Real-Time Word Game Wins? | LexiClash',
-    description: 'LexiClash vs Puzzly Words compared: simultaneous multiplayer, 30+ game modes, 5 languages vs Scrabble-style rack gameplay. Free comparison for serious word game players.',
+    description: 'LexiClash vs Puzzly Words compared: simultaneous multiplayer, 30+ game modes, 6 languages vs Scrabble-style rack gameplay. Free comparison for serious word game players.',
     keywords: 'lexiclash vs puzzly words, puzzly words alternative, real-time multiplayer word game, word games like puzzly, simultaneous word game, free multiplayer word game, best word game 2026, puzzly words vs lexiclash',
     openGraph: {
       title: 'LexiClash vs Puzzly Words — Which Word Game Wins in 2026?',
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash vs Puzzly Words — Which Is Better?',
-      description: 'Real-time multiplayer, 30+ modes, 5 languages. Full comparison inside.',
+      description: 'Real-time multiplayer, 30+ modes, 6 languages. Full comparison inside.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
@@ -68,7 +68,7 @@ const faqs = [
   },
   {
     q: 'What about languages and accessibility?',
-    a: 'LexiClash: 5 languages (English, Hebrew with RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility standards. Puzzly Words is English-only as far as we know. If you play in Hebrew or other languages, LexiClash is the only choice.',
+    a: 'LexiClash: 6 languages (English, Hebrew with RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility standards. Puzzly Words is English-only as far as we know. If you play in Hebrew or other languages, LexiClash is the only choice.',
   },
 ];
 
@@ -151,7 +151,7 @@ export default async function LexiClashVsPuzzlyWordsPage({ params }: PageProps) 
     title: 'So Which One?',
     body: [
       'Puzzly Words is a fantastic game. If you love the rack-building, word-placement puzzle of Scrabble and want it live with real players and a 60-second fuse, that\'s exactly what you get. Period.',
-      'LexiClash is for people who want more variety: the same multiplayer rush, but also story campaigns, brain training, daily challenges, five languages, and the freedom to play as much as they want. It\'s bigger, deeper, and weird in the best way.',
+      'LexiClash is for people who want more variety: the same multiplayer rush, but also story campaigns, brain training, daily challenges, six languages, and the freedom to play as much as they want. It\'s bigger, deeper, and weird in the best way.',
       'Both are free. Both are real multiplayer. You honestly can\'t go wrong. But if you\'re scrolling this page, you probably want to see what LexiClash is about. Here\'s your shot.',
     ],
     href: `/${locale}/multiplayer`,
