@@ -14,19 +14,9 @@ import {
   useSinglePlayerCore,
   LandscapeGameLayout,
   DesktopGameLayout,
-  PortraitGameLayout,
+  SinglePlayerShell,
 } from './game';
-import { SinglePlayerShell } from './game/SinglePlayerShell';
 
-/**
- * Render solo through the shared multiplayer shell instead of the bespoke
- * PortraitGameLayout. Behind a URL flag (`?shell=mp`) only while the swap is
- * being verified mode-by-mode in a real browser — jsdom cannot validate the
- * board sizing this depends on. Flip the default, then delete the old layouts.
- */
-const USE_SHARED_SHELL =
-  typeof window !== 'undefined' &&
-  new URLSearchParams(window.location.search).get('shell') === 'mp';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
@@ -512,58 +502,41 @@ function SinglePlayerGame({
     // board slot, so it needs a DEFINITE height above it — `h-full` here
     // resolved against an indefinite parent (measured 96px) and collapsed the
     // board to cqb=0. Same contract as gameShellSizing.contract.test.ts.
-    <div
-      className={USE_SHARED_SHELL
-        ? 'relative h-[100dvh] flex flex-col overflow-hidden'
-        : 'relative h-full'}
-      translate="no"
-    >
+    <div className="relative h-[100dvh] flex flex-col overflow-hidden" translate="no">
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}
       {modeCoachElement}
       {stuckCoachElement}
-      {USE_SHARED_SHELL ? (
-        <SinglePlayerShell
-          grid={core.grid as LetterGrid}
-          language={settings.language}
-          score={core.score}
-          remainingTime={core.timer.remainingTime}
-          isPaused={core.isPaused}
-          isGameOver={core.isGameOver}
-          minWordLength={settings.minWordLength}
-          bots={settings.bots}
-          playerName={commonProps.t('common.you')}
-          foundWords={core.foundWords}
-          comboLevel={core.combo.comboLevel}
-          fireRoundActive={core.fireRoundActive}
-          fireRoundRemaining={core.fireRoundRemaining}
-          earthquakeState={core.earthquakeState}
-          currentFeedback={core.currentFeedback}
-          highlightedPath={core.revealState.highlightedPath ?? []}
-          lastWordFoundTime={core.lastWordFoundTimeRef.current ?? 0}
-          totalBoardWords={core.totalBoardWords}
-          isDesktop={false}
-          onWordSubmit={wrappedWordSubmit}
-          onWordChange={wrappedWordChange}
-          onPathSubmit={wrappedPathSubmit}
-          onExit={core.handleQuitRequest}
-          onPauseToggle={core.handlePauseToggle}
-          gameStatsRef={core.gameStatsRef}
-          t={commonProps.t}
-        />
-      ) : (
-        <PortraitGameLayout
-          {...commonProps}
-          targetHighScore={core.targetHighScore}
-          totalBoardWords={core.totalBoardWords}
-          progressBarExpanded={core.progressBarExpanded}
-          onToggleProgressBar={core.handleToggleProgressBar}
-          gameStatsRef={core.gameStatsRef}
-          scoreBadgeRef={scoreBadgeRef}
-          wordAreaRef={wordAreaRef}
-        />
-      )}
+      <SinglePlayerShell
+        grid={core.grid as LetterGrid}
+        language={settings.language}
+        score={core.score}
+        remainingTime={core.timer.remainingTime}
+        isPaused={core.isPaused}
+        isGameOver={core.isGameOver}
+        minWordLength={settings.minWordLength}
+        bots={settings.bots}
+        playerName={commonProps.t('common.you')}
+        foundWords={core.foundWords}
+        comboLevel={core.combo.comboLevel}
+        fireRoundActive={core.fireRoundActive}
+        fireRoundRemaining={core.fireRoundRemaining}
+        earthquakeState={core.earthquakeState}
+        currentFeedback={core.currentFeedback}
+        highlightedPath={core.revealState.highlightedPath ?? []}
+        lastWordFoundTime={core.lastWordFoundTimeRef.current ?? 0}
+        totalBoardWords={core.totalBoardWords}
+        isDesktop={false}
+        onWordSubmit={wrappedWordSubmit}
+        onWordChange={wrappedWordChange}
+        onPathSubmit={wrappedPathSubmit}
+        onExit={core.handleQuitRequest}
+        onPauseToggle={core.handlePauseToggle}
+        gameStatsRef={core.gameStatsRef}
+        t={commonProps.t}
+      />
+
     </div>
   );
 }

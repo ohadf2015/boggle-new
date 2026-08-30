@@ -19,6 +19,7 @@ vi.mock('@/utils/growthTracking', () => ({
 }));
 
 vi.mock('../game', () => ({
+  SinglePlayerShell: () => <div data-testid="layout-portrait" />,
   useSinglePlayerCore: () => ({
     grid: null,
     foundWords: [],
@@ -71,7 +72,6 @@ vi.mock('../game', () => ({
   }),
   LandscapeGameLayout: () => null,
   DesktopGameLayout: () => null,
-  PortraitGameLayout: () => null,
 }));
 
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => null }));
