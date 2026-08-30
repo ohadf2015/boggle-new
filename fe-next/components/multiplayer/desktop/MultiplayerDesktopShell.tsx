@@ -33,14 +33,18 @@ export const MultiplayerDesktopShell = memo<MultiplayerDesktopShellProps>(({ slo
     <div className={`@container w-full h-full ${seasonSkin}`} data-mp-shell-root>
       <div
         data-mp-shell
-        className="grid gap-4 p-4 h-full grid-cols-1 @[960px]:grid-cols-[minmax(200px,1fr)_minmax(500px,720px)_minmax(200px,1fr)]"
+        className="grid gap-3 p-3 h-full grid-cols-1 @[960px]:grid-cols-[minmax(200px,1fr)_minmax(500px,720px)_minmax(200px,1fr)]"
       >
         {/* Left rail. min-h-0 + overflow-hidden bound the column to the shell
             height; only the flex-1 roster scrolls, so the badge (timer) stays
-            pinned at the top and the stats card at the bottom — no page scroll. */}
-        <aside className="flex flex-col gap-3 min-w-0 min-h-0 overflow-hidden" data-slot="left">
+            pinned at the top and the stats card at the bottom — no page scroll.
+            The roster/ladder wrappers are flex parents rather than scrollers:
+            the panel inside claims the height (ThemedPanel `fill`) and scrolls
+            its own body. Scrolling on the wrapper instead left a short panel
+            floating above an empty column — the dead-gutter look at 1440. */}
+        <aside className="flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden" data-slot="left">
           <div data-slot="left-mode-badge">{slots.left.modeBadge}</div>
-          <div data-slot="left-roster" className="flex-1 min-h-0 overflow-y-auto">{slots.left.roster}</div>
+          <div data-slot="left-roster" className="flex-1 min-h-0 flex">{slots.left.roster}</div>
           <div data-slot="left-secondary" aria-hidden={!slots.left.secondary}>
             {slots.left.secondary ?? <span className="opacity-60">—</span>}
           </div>
@@ -53,8 +57,8 @@ export const MultiplayerDesktopShell = memo<MultiplayerDesktopShellProps>(({ slo
 
         {/* Right rail. Same bounding as the left: the words ladder scrolls in
             place while the activity stream / chat stay pinned and visible. */}
-        <aside className="flex flex-col gap-3 min-w-0 min-h-0 overflow-hidden" data-slot="right">
-          <div data-slot="right-ladder" className="flex-1 min-h-0 overflow-y-auto">{slots.right.wordsLadder}</div>
+        <aside className="flex flex-col gap-2 min-w-0 min-h-0 overflow-hidden" data-slot="right">
+          <div data-slot="right-ladder" className="flex-1 min-h-0 flex">{slots.right.wordsLadder}</div>
           {slots.right.activityStream ? (
             <div data-slot="right-stream">{slots.right.activityStream}</div>
           ) : null}

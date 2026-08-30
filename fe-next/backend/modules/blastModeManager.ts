@@ -58,9 +58,29 @@ export function hashStringToSeed(str: string): number {
 }
 
 /**
+ * Tiles that obstruct normal play: require multiple hits or special handling to clear.
+ * At high density, these must be capped to keep boards playable.
+ * Note: frozen, locked, magma, anchor are in BLAST_RETIRED_SPECIAL_TYPES and never spawn,
+ * but we cap conservatively here so un-retiring any would be safe.
+ */
+const OBSTRUCTIVE_TILE_TYPES: Set<BlastTileType> = new Set([
+  'ice',      // Takes 2 hits to clear
+  'frozen',   // Takes 2 hits; retired but defensively capped
+  'locked',   // Requires key to unlock; retired
+]);
+
+/**
+ * Obstructive tiles should not exceed this share of the board to maintain playability.
+ * At 40% base density, this keeps obstructive share ~6-8% of cells (2-3 tiles on 6×6).
+ */
+const MAX_OBSTRUCTIVE_SHARE = 0.15;
+
+/**
  * Generate blast tile overlay for a grid using wave-aware tile distribution.
  * For each cell, rolls using rollSpecialType with the wave's distribution so
  * tile availability matches singleplayer progression (e.g., diamond only wave 4+).
+ * Enforces a cap on obstructive tiles (ice, frozen, locked) so high-density boards
+ * remain playable.
  *
  * @param grid - The letter grid
  * @param specialChance - Base probability of a special tile [0, 1]
@@ -80,16 +100,55 @@ export function generateBlastOverlay(
   const distribution = getWaveDistribution(waveConfig);
   const rng = seed !== undefined ? createSeededRandom(seed) : Math.random;
 
+  const boardSize = grid.length * grid[0].length;
+  const maxObstructiveCells = Math.ceil(boardSize * MAX_OBSTRUCTIVE_SHARE);
+  let obstructiveCount = 0;
+
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[row].length; col++) {
       const tileType = rollSpecialType(specialChance, distribution, 0, rng);
+
       if (tileType !== 'standard') {
-        overlay.push({ row, col, type: tileType as BlastTileType });
+        // Cap obstructive tiles to maintain playability
+        if (OBSTRUCTIVE_TILE_TYPES.has(tileType)) {
+          if (obstructiveCount >= maxObstructiveCells) {
+            // Swap to a beneficial type by rerolling with modified distribution
+            const beneficialDist = { ...distribution };
+            for (const obsType of OBSTRUCTIVE_TILE_TYPES) {
+              beneficialDist[obsType as string] = 0;
+            }
+            const normalizedDist = normalizeDistribution(beneficialDist);
+            const swappedType = rollSpecialType(1.0, normalizedDist, 0, rng);
+            if (swappedType !== 'standard') {
+              overlay.push({ row, col, type: swappedType as BlastTileType });
+            }
+          } else {
+            overlay.push({ row, col, type: tileType as BlastTileType });
+            obstructiveCount++;
+          }
+        } else {
+          overlay.push({ row, col, type: tileType as BlastTileType });
+        }
       }
     }
   }
 
   return overlay;
+}
+
+/**
+ * Normalize a distribution so it sums to 1.0.
+ * Used internally to ensure obstructive-cap rerolls are properly weighted.
+ */
+function normalizeDistribution(dist: Record<string, number>): Record<string, number> {
+  const sum = Object.values(dist).reduce((a, b) => a + b, 0);
+  if (sum <= 0 || Math.abs(sum - 1.0) < 0.001) return dist;
+
+  const normalized: Record<string, number> = {};
+  for (const [key, value] of Object.entries(dist)) {
+    normalized[key] = value / sum;
+  }
+  return normalized;
 }
 
 /**

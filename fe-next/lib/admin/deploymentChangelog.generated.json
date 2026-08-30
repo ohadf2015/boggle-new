@@ -1,40 +1,19 @@
 {
-  "generatedAt": "2026-08-30T18:21:02.364Z",
+  "generatedAt": "2026-08-30T18:08:49.169Z",
   "commits": [
     {
-      "sha": "4127d0ee34d778171fbf7704151589eb086c7889",
-      "shortSha": "4127d0e",
-      "subject": "fix(education): drop an invalid section kind the test suite could not see",
+      "sha": "9952d5ce7180ec17b18df85f5443612553585477",
+      "shortSha": "9952d5c",
+      "subject": "fix(education): unblock the student join and give the projector a typeable address",
       "author": "Ohad Fisher",
-      "date": "2026-08-30T21:20:45+03:00"
+      "date": "2026-08-30T21:07:36+03:00"
     },
     {
-      "sha": "43cf99a9457e7b12437f7c60ce67d35039863cd4",
-      "shortSha": "43cf99a",
-      "subject": "fix(education): correct 140+ false pricing/capacity claims across 6 languages",
+      "sha": "10abe1f9cb4c3abc4fc2c7bb6733f17992706b29",
+      "shortSha": "10abe1f",
+      "subject": "fix(education): keep the classroom join code on screen, correct launcher copy",
       "author": "Ohad Fisher",
-      "date": "2026-08-30T21:10:21+03:00"
-    },
-    {
-      "sha": "98a94d75c19d3332da47bf8aeefe4f84603f6f36",
-      "shortSha": "98a94d7",
-      "subject": "feat(education): six teacher-moment landing pages, all six locales",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T20:52:23+03:00"
-    },
-    {
-      "sha": "80f82b3953bb4a363c802c1e5b026bb56913c808",
-      "shortSha": "80f82b3",
-      "subject": "feat(education): shared landing template + fix hreflang, GEO copy, hub perf",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T20:22:28+03:00"
-    },
-    {
-      "sha": "b1a327d764c123fd5d25679ccb75c1a44dc1a79d",
-      "shortSha": "b1a327d",
-      "subject": "fix(boggle-word-shake-free): server-render playable Boggle shell instead of spinner",
-      "author": "ohadf2015",
-      "date": "2026-08-30T10:59:38+03:00"
+      "date": "2026-08-30T20:48:40+03:00"
     },
     {
       "sha": "30f9b58fe13868df7a84a384083fddae612c89c1",
@@ -140,6 +119,27 @@
       "subject": "docs: record the react-doctor audit and what its 191 errors actually were",
       "author": "Ohad Fisher",
       "date": "2026-08-29T21:26:08+03:00"
+    },
+    {
+      "sha": "b30f0dc3736d4cd9df083e26b9ffee8bac074e47",
+      "shortSha": "b30f0dc",
+      "subject": "perf(tv): animate score bars with transform, and drop two dead files",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T21:25:36+03:00"
+    },
+    {
+      "sha": "91e39dc1767862b480f89c3987b0933afc92f6ed",
+      "shortSha": "91e39dc",
+      "subject": "fix(security): stop anon writing subscription_events, route webhook writes through service role",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T21:24:59+03:00"
+    },
+    {
+      "sha": "643cf33eb05a8a75b32a832498f6c9e65273d885",
+      "shortSha": "643cf33",
+      "subject": "fix(react): release effect cleanups and keep state updaters pure",
+      "author": "Ohad Fisher",
+      "date": "2026-08-29T21:23:59+03:00"
     }
   ]
 }

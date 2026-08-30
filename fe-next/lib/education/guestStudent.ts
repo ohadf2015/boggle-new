@@ -67,14 +67,38 @@ const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve,
 export async function waitForProfile(
   supabase: SupabaseClient,
   userId: string,
-  opts: { tries?: number; delayMs?: number } = {},
+  opts: { tries?: number; delayMs?: number; timeoutMs?: number } = {},
 ): Promise<boolean> {
   const tries = opts.tries ?? 10;
   const delayMs = opts.delayMs ?? 150;
+  // Hard deadline. `joinClassroom` awaits this BEFORE it posts to the join
+  // route, so an unsettled query here means the student presses JOIN and
+  // nothing happens at all — no request, no toast, no error. That is exactly
+  // what a first-time guest hit on 2026-08-30: the anonymous auth user was
+  // created but no membership followed, and a second press worked. The join
+  // route needs only the session, so this wait is a convenience and must
+  // never be able to block the join.
+  const timeoutMs = opts.timeoutMs ?? 3000;
+  const deadline = Date.now() + timeoutMs;
+
   for (let i = 0; i < tries; i++) {
-    const { data } = await supabase.from('profiles').select('id').eq('id', userId).maybeSingle();
-    if (data) return true;
-    if (i < tries - 1 && delayMs > 0) await sleep(delayMs);
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) return false;
+
+    const query = supabase.from('profiles').select('id').eq('id', userId).maybeSingle();
+    // A PostgREST call can stall through the post-sign-in token swap; race it
+    // so a stuck request costs the deadline, not the whole join.
+    const settled = await Promise.race([
+      Promise.resolve(query).then((r) => r as { data: unknown } | null),
+      sleep(remaining).then(() => null),
+    ]);
+    if (settled?.data) return true;
+    if (settled === null) return false; // deadline won
+
+    if (i < tries - 1 && delayMs > 0) {
+      if (Date.now() + delayMs >= deadline) return false;
+      await sleep(delayMs);
+    }
   }
   return false;
 }

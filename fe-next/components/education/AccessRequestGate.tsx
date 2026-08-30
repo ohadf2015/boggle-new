@@ -1,18 +1,28 @@
 'use client';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Mail, LogIn, MailCheck } from 'lucide-react';
+import { Mail, MailCheck, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { resendEmailVerification } from '@/lib/supabase';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { AccessRequestForm } from './AccessRequestForm';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 const CTA_CLASS =
-  'inline-flex items-center gap-2 rounded-neo border-neo-thick bg-neo-lime px-4 py-3 ' +
+  'inline-flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-3 ' +
   'font-bold text-neo-navy font-neo-display shadow-hard hover:shadow-hard-sm ' +
   'active:shadow-hard-pressed disabled:opacity-50 disabled:cursor-not-allowed transition-all';
+
+/** The one action this page exists for — sized and weighted accordingly. */
+const PRIMARY_CTA_CLASS =
+  'group flex w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-black ' +
+  // text-base on phones: the longer locales (es/ru/sv) wrap badly at 18px in a
+  // ~290px content box. text-balance keeps the wrap even when it does happen.
+  'bg-neo-lime px-5 py-4 font-neo-display text-base font-black tracking-[-0.01em] text-neo-navy ' +
+  'text-balance shadow-hard-lg transition-all hover:-translate-y-0.5 hover:shadow-hard-xl ' +
+  'active:translate-y-0 active:shadow-hard-pressed sm:px-6 sm:text-xl';
 
 /**
  * Auth + email-verification gate in front of the teacher-access request form.
@@ -37,15 +47,20 @@ export function AccessRequestGate() {
   if (!user) {
     return (
       <div className="text-neo-white">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-neo border-neo bg-neo-cyan text-neo-navy shadow-hard-sm">
-          <LogIn className="h-6 w-6" />
-        </div>
-        <h2 className="text-xl font-bold font-neo-display">{t('education.access.auth_required_title')}</h2>
-        <p className="mt-2 text-neo-white/85">{t('education.access.auth_required_body')}</p>
-        <button type="button" onClick={() => setShowAuth(true)} className={`mt-4 ${CTA_CLASS}`}>
-          <LogIn className="h-5 w-5" />
+        <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
+          {t('education.access.auth_required_title')}
+        </h2>
+        <p className="mt-2 text-neo-white/80">{t('education.access.auth_required_body')}</p>
+        <button type="button" onClick={() => setShowAuth(true)} className={`mt-5 ${PRIMARY_CTA_CLASS}`}>
           {t('education.access.auth_required_cta')}
+          <DirectionalIcon
+            icon={ArrowRight}
+            className="h-5 w-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
+          />
         </button>
+        <p className="mt-3 text-center text-sm font-semibold text-neo-white/60">
+          {t('education.access.cta_micro')}
+        </p>
         {showAuth && <AuthModal isOpen onClose={() => setShowAuth(false)} initialMode="signup" />}
       </div>
     );

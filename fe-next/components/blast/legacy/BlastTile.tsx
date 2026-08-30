@@ -347,12 +347,22 @@ export const BlastTile = memo(function BlastTile({
       <span className="relative z-10" style={visual.text === 'text-white' ? TILE_TEXT_SHADOW_LIGHT_STYLE : TILE_TEXT_SHADOW_STYLE}>{letter}</span>
       {visual.indicator && (
         <span className={`absolute top-0.5 inset-e-0.5 leading-none pointer-events-none ${visual.text ?? ''}`} aria-hidden="true">
-          <visual.indicator className="w-[clamp(11px,2.9cqw,17px)] h-[clamp(11px,2.9cqw,17px)]" strokeWidth={2.25} />
+          {/* Sized up from clamp(11px,2.9cqw,17px) — the cqw term never binds (measured 15px on an 88px cell), so the floor is what matters. MP blast now spawns specials
+              on ~40% of cells, and at an 84px desktop tile an 11px mark could not
+              carry type identity — colour was doing all the work, which PRODUCT.md
+              forbids ("must not rely on color alone"). Heavier stroke too: the
+              glyph has to hold against both the white standard fill and the
+              saturated special fills. */}
+          <visual.indicator className="w-[clamp(20px,6cqw,28px)] h-[clamp(20px,6cqw,28px)]" strokeWidth={2.75} />
         </span>
       )}
       {hitsRemaining != null && hitsRemaining > 0 && (
         <span
-          className="absolute bottom-0.5 inset-s-0.5 text-[clamp(0.4rem,1.5cqw,0.55rem)] font-neo-body font-semibold bg-white/60 rounded px-0.5 leading-tight"
+          // Was clamp(0.4rem,…,0.55rem) — about 6-9px, i.e. present but unreadable.
+          // The hit count is the difference between "one more tap" and "three", so
+          // it has to survive a glance on a dense board. Solid backing + border so
+          // it reads on any tile fill.
+          className="absolute bottom-0.5 inset-s-0.5 text-[clamp(0.6rem,2.2cqw,0.85rem)] font-neo-body font-black bg-white/85 text-neo-navy border border-black/50 rounded px-1 leading-tight tabular-nums"
           aria-label={`${hitsRemaining} hits remaining`}
         >
           {hitsRemaining}

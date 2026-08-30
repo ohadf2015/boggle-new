@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
-import { DistrictUpsellBanner } from '@/components/teacher/DistrictUpsellBanner';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
@@ -25,17 +25,22 @@ function TeacherDashboardInner() {
     }
   }, [isAdmin]);
 
+  // At most one banner above the dashboard. This page used to stack a trial
+  // countdown, a district-pricing upsell and a Pro strip before the thing the
+  // teacher opened it for. District pricing keeps its home on the classroom-game
+  // launcher, which already links to "LexiClash for schools".
+  const banner = pickTeacherBanner({ hasTrial: !!trial, isAdmin });
+
   return (
     <>
-      {trial && (
+      {banner === 'trial' && trial && (
         <div className="bg-neo-navy px-4 pt-4">
           <div className="mx-auto max-w-5xl">
             <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
           </div>
         </div>
       )}
-      <DistrictUpsellBanner t={t} language={language} />
-      {!isAdmin && (
+      {banner === 'pro' && (
         <div className="bg-neo-navy border-b border-black/20 px-4 py-2">
           <div className="mx-auto max-w-5xl flex items-center justify-between">
             <span className="text-neo-white/60 text-sm font-neo-body">{t('teacher.upgradePro.body')}</span>

@@ -88,6 +88,7 @@ export function BlastDesktopAdapter(props: BlastDesktopAdapterProps) {
           variant="rail"
           header={t('mp.insights.foundHeader')}
           headerRight={`${props.foundWords.length}`}
+          fill
           testId="blast-ladder"
         >
           <LatestScoreTickBanner mode="blast" meId={props.meId} leaderboard={props.leaderboard} />

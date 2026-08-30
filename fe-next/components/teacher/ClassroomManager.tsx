@@ -18,6 +18,7 @@ import CreateClassroomWizard from './CreateClassroomWizard';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { shareWithFallback } from '@/utils/shareWithFallback';
+import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 
 const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
   en: 'languages.english',
@@ -134,8 +135,16 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
   };
 
   const copyJoinCode = (code: string) => {
-    navigator.clipboard.writeText(code).catch(() => {});
-    toast.success(t('teacher.classroom.codeCopied'));
+    // Copy the code AND the page that accepts it. A bare six characters pasted
+    // into WhatsApp or Google Classroom leaves the student holding a code with
+    // nowhere to type it — lexiclash.live has no code box.
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    navigator.clipboard
+      .writeText(classroomInvitePayload(origin, language, code))
+      .then(() => toast.success(t('teacher.classroom.codeCopied')))
+      // Claiming success on a rejected write is how a teacher pastes nothing
+      // into a class chat and never finds out.
+      .catch(() => toast.error(t('share.codeCopyError')));
   };
 
   const shareInvite = async (name: string, code: string) => {

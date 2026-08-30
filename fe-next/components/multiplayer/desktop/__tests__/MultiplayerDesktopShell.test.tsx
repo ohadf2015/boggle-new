@@ -51,7 +51,7 @@ describe('MultiplayerDesktopShell', () => {
     );
     expect(tpl).toBeTruthy();
     const [, leftMin, centerMin, rightMin] = tpl!.map(Number);
-    const INTERNAL_GAP_PAD = 16 * 2 + 16 * 2; // gap-4 (x2 gaps) + p-4 (x2 sides)
+    const INTERNAL_GAP_PAD = 12 * 2 + 12 * 2; // gap-3 (x2 gaps) + p-3 (x2 sides)
     expect(leftMin + centerMin + rightMin + INTERNAL_GAP_PAD).toBeLessThanOrEqual(
       containerAtMount,
     );
@@ -95,13 +95,22 @@ describe('MultiplayerDesktopShell', () => {
     }
   });
 
-  it('scrolls the long lists inside their column (roster + ladder), keeping fixed panels visible', () => {
+  it('stretches the long lists to fill their column (roster + ladder), keeping fixed panels visible', () => {
+    // Scrolling moved from these wrappers INTO the panel (ThemedPanel `fill`),
+    // so the panel claims the whole column and scrolls its own body. When the
+    // wrapper scrolled instead, a short panel — "FOUND: no words yet" — sat as a
+    // small card above ~550px of empty column at 1440x900, which read as a dead
+    // gutter. The invariant that still matters is height-bounding: the wrapper
+    // must stay min-h-0 and flex so it can neither grow the page nor collapse.
+    // See ThemedPanel.fill.test.tsx for the panel half of this contract.
     const { container } = render(<MultiplayerDesktopShell slots={mkSlots()} />);
     const roster = container.querySelector('[data-slot="left-roster"]') as HTMLElement;
     const ladder = container.querySelector('[data-slot="right-ladder"]') as HTMLElement;
     for (const el of [roster, ladder]) {
       expect(el.className).toMatch(/\bmin-h-0\b/);
-      expect(el.className).toMatch(/\boverflow-y-auto\b/);
+      expect(el.className).toMatch(/\bflex-1\b/);
+      expect(el.className).toMatch(/\bflex\b/);
+      expect(el.className).not.toMatch(/\boverflow-y-auto\b/);
     }
   });
 });

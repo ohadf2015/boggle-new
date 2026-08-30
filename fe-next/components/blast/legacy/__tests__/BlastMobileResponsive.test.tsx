@@ -28,13 +28,13 @@ describe('Blast Mobile Responsive', () => {
       const button = screen.getByRole('button');
       const svg = button.querySelector('svg');
       expect(svg).toBeTruthy();
-      expect(svg?.getAttribute('class') ?? '').toContain('w-[clamp(11px,2.9cqw,17px)]');
+      expect(svg?.getAttribute('class') ?? '').toContain('w-[clamp(20px,6cqw,28px)]');
     });
 
     it('renders hits remaining with cqw-based clamp sizing', () => {
       render(<BlastTile {...baseTileProps} type="ice" hitsRemaining={2} />);
       const hitsEl = screen.getByLabelText('2 hits remaining');
-      expect(hitsEl.className).toContain('text-[clamp(0.4rem,1.5cqw,0.55rem)]');
+      expect(hitsEl.className).toContain('text-[clamp(0.6rem,2.2cqw,0.85rem)]');
     });
 
     it('renders multiplier badge with cqw-based clamp sizing', () => {

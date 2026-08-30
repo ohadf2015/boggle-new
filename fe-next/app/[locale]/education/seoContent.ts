@@ -65,7 +65,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
   },
   ja: {
     title: '教室向け無料語彙ゲーム — 生徒のログイン不要',
-    description: '教室で使える無料の単語・語彙ゲーム。生徒のアカウント不要、広告なし、ダウンロードなし。自分の単語リストを使い、どのブラウザでもクラス全体でマルチプレイ。ヘブライ語や日本語を含む6言語で語彙を教えられます。先生はずっと無料。',
+    description: '教室で使える無料の単語・語彙ゲーム。生徒のアカウント不要、広告なし、ダウンロードなし。自分の単語リストを使い、どのブラウザでもクラス全体でマルチプレイ。ヘブライ語や日本語を含む6言語で語彙を教えられます。無料で始められる。',
     features: [
       '生徒の参加と学習成果のために設計されたクラスルームワードゲーム',
       '競争的で楽しい復習のための生徒間語彙デュエル',
@@ -106,7 +106,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       { question: 'Hur fungerar ordförrådsduellerna?', answer: 'Två eller fler elever tävlar mot varandra för att hitta ord från en gemensam bräda så snabbt som möjligt. Den första som når målpoängen vinner. Lärare kan begränsa ordlistor till aktuell lektionsvokabulär.' },
       { question: 'Behöver elever ett konto för att spela?', answer: 'Nej. Elever ansluter till en klassrumssession med en kod på sex tecken och spelar direkt i valfri webbläsare. Endast läraren behöver ett konto för att hantera klassrum och ordlistor.' },
       { question: 'Är LexiClash Education verkligen gratis?', answer: 'Gratis att börja, och gratisplanen är en riktig plan: en klass med upp till 10 elever, alla ordspel, ordförrådsdueller, klassrumsmultiplayer, egna ordlistor och inga annonser. Teacher Pro kostar 9 USD/månad och lägger bara till obegränsat antal klasser och elever samt analyspanelen.' },
-      { question: 'Hur jämförs LexiClash med Quizlet, Kahoot eller Wordwall?', answer: 'LexiClash fokuserar på ordbildningsspel (Boggle-liknande brädor, anagram, ordhjul) snarare än flashcards eller frågesporter. Det fungerar utan elevkonton, stöder 5 språk inklusive hebreiska RTL och japanska, och lägger till realtidsmultiplayer för hela klassen — allt på en gratisnivå.' },
+      { question: 'Hur jämförs LexiClash med Quizlet, Kahoot eller Wordwall?', answer: 'LexiClash fokuserar på ordbildningsspel (Boggle-liknande brädor, anagram, ordhjul) snarare än flashcards eller frågesporter. Det fungerar utan elevkonton, stöder 6 språk inklusive hebreiska RTL och japanska, och lägger till realtidsmultiplayer för hela klassen — allt på en gratisnivå.' },
       { question: 'Vilka språk stöder LexiClash Education?', answer: 'Engelska, hebreiska (med fullständig höger-till-vänster-layout), svenska, japanska och spanska. Varje språk har sin egen ordbok, vilket gör LexiClash lämpligt för ESL/EFL-klassrum, hebreiska immersionsprogram och flerspråkiga skolor.' },
       { question: 'Hur lång är en typisk klassrumssession?', answer: 'En ordförrådsduell tar 2–3 minuter. Ett ordspel för hela klassen pågår 5–10 minuter. De flesta lärare använder LexiClash som en 5-minuters uppvärmning, hjärnpaus mitt i lektionen eller granskningsaktivitet vid lektionens slut.' },
       { question: 'Kan jag använda min egen ordlista?', answer: 'Ja. Bygg en anpassad ordlista från din egen läroplan eller klistra in valfri orduppsättning, så spelar eleverna ordspelen med exakt de ord du undervisar den veckan — du är inte låst till någon fast ordbank.' },
@@ -115,7 +115,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
   },
   es: {
     title: 'Juegos de vocabulario gratis para el aula — sin cuentas de estudiantes',
-    description: 'Juegos de palabras y vocabulario gratis para el aula — sin cuentas de estudiantes, sin anuncios y sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase en cualquier navegador y enseña vocabulario en 6 idiomas, incluidos hebreo y japonés. Hecho para docentes, gratis para siempre.',
+    description: 'Juegos de palabras y vocabulario gratis para el aula — sin cuentas de estudiantes, sin anuncios y sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase en cualquier navegador y enseña vocabulario en 6 idiomas, incluidos hebreo y japonés. Hecho para docentes, gratis para empezar.',
     features: [
       'Juegos de palabras para el aula diseñados para la participación y el aprendizaje de los alumnos',
       'Duelos de vocabulario entre estudiantes para sesiones de repaso competitivas y divertidas',
@@ -140,7 +140,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
   },
   ru: {
     title: 'Бесплатные игры для расширения словарного запаса в классе — без аккаунтов учащихся',
-    description: 'Бесплатные словесные и словарные игры для класса — без аккаунтов учащихся, без объявлений и без загрузок. Используйте свои собственные списки слов, играйте с группой в любом браузере и преподавайте словарный запас на 5 языках, включая иврит и японский. Разработано для учителей, бесплатно всегда.',
+    description: 'Бесплатные словесные и словарные игры для класса — без аккаунтов учащихся, без объявлений и без загрузок. Используйте свои собственные списки слов, играйте с группой в любом браузере и преподавайте словарный запас на 6 языках, включая иврит и японский. Разработано для учителей, бесплатно для старта.',
     features: [
       'Словесные игры для класса, разработанные для участия и результатов обучения учащихся',
       'Словарные дуэли между учащимися для увлекательных и конкурентных повторений',

@@ -183,6 +183,24 @@ const nextConfig = {
         permanent: true,
       },
       // Legal page aliases: AdSense reviewers and ad verifiers routinely probe
+      // Classroom join links written by hand. Only `/[locale]/join/[code]`
+      // resolves; the query-string shape 404s (measured on production
+      // 2026-08-30: `/join?code=X` -> 308 -> 404, `/en/join?code=X` -> 404).
+      // Nothing in the app emits that shape, but it is what a person types or
+      // reconstructs from a half-remembered link, and a 404 there costs a
+      // student the whole lesson.
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/join',
+        has: [{ type: 'query', key: 'code' }],
+        destination: '/:locale/join/:code',
+        permanent: false,
+      },
+      {
+        source: '/join',
+        has: [{ type: 'query', key: 'code' }],
+        destination: '/join/:code',
+        permanent: false,
+      },
       // /privacy, /terms, /cookies at the locale root. These used to 404 —
       // redirect them to the canonical /legal/* pages.
       {

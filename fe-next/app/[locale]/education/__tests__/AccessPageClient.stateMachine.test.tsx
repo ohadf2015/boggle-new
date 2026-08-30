@@ -162,6 +162,46 @@ describe('<PageClient> (access page state machine)', () => {
     });
   });
 
+  describe('the sign-up pitch is gated on status, not on the page', () => {
+    // A teacher who is already approved / pending / declined must never be sold
+    // teacher access again — the pitch belongs to the pre-application state only.
+    const pitchKeys = [
+      'education.access.trust_instant',
+      'education.access.trust_free',
+      'education.access.trust_nologins',
+    ];
+
+    it('renders the pitch when status is none', () => {
+      mockTeacherAccessState.status = 'none';
+      render(<PageClient />);
+      pitchKeys.forEach((k) => expect(screen.getByText(k)).toBeInTheDocument());
+      expect(screen.getByRole('img', { name: 'education.access.hero_alt' })).toBeInTheDocument();
+    });
+
+    it('does NOT render the pitch when hasAccess resolves before any request row exists', () => {
+      // Direct grant: the profile carries teacher access but no access_requests
+      // row exists, so status stays 'none'. Without gating on hasAccess this
+      // renders the approved card AND a full pitch to sign up for what they have.
+      mockTeacherAccessState.hasAccess = true;
+      mockTeacherAccessState.status = 'none';
+      render(<PageClient />);
+      expect(screen.getByText('education.access.already_approved_title')).toBeInTheDocument();
+      pitchKeys.forEach((k) => expect(screen.queryByText(k)).not.toBeInTheDocument());
+      expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
+    });
+
+    it.each(['approved', 'pending', 'declined'] as const)(
+      'does NOT render the pitch when status is %s',
+      (status) => {
+        mockTeacherAccessState.status = status;
+        mockTeacherAccessState.hasAccess = status === 'approved';
+        render(<PageClient />);
+        pitchKeys.forEach((k) => expect(screen.queryByText(k)).not.toBeInTheDocument());
+        expect(screen.queryByRole('img', { name: 'education.access.hero_alt' })).not.toBeInTheDocument();
+      },
+    );
+  });
+
   describe('issue 3: loading skeleton should not drop page content (jank regression)', () => {
     it('renders step cards while loading (no early return that drops content)', () => {
       mockTeacherAccessState.isLoading = true;

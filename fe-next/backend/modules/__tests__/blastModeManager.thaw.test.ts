@@ -18,6 +18,24 @@ const GRID = [
   ['B', 'I', 'N'],
 ];
 
+/**
+ * These tests plant a tile and then clear an adjacent word. They must pin the
+ * PATH tiles to `standard` as well as the planted one.
+ *
+ * `initBlastModeState` generates a seeded special-tile overlay, so whatever the
+ * spawn rate happens to be decides what lands on the path. At the old 15% rate,
+ * seed 4242 left the path plain and the tests passed by luck. Raising the rate to
+ * 40% for multiplayer put an area-effect special (bomb/lightning) on the path, and
+ * its blast radius cleared the planted tile — the assertion then read `standard`
+ * instead of `frozen`. That is correct game behaviour, not a regression: the bug
+ * was a test whose setup depended on the density constant.
+ */
+function makePathPlain(board: { tileStates: { type: string }[][] }, cells: Array<[number, number]>) {
+  for (const [row, col] of cells) {
+    board.tileStates[row][col] = { ...board.tileStates[row][col], type: 'standard' };
+  }
+}
+
 describe('cascadeBlastWord — ice/frozen thaw (MP)', () => {
   it('thaws a frozen tile adjacent to the submitted word path', () => {
     const state = initBlastModeState(GRID, ['alice'], 1, 4242);
@@ -34,6 +52,7 @@ describe('cascadeBlastWord — ice/frozen thaw (MP)', () => {
 
     // Play a 2-tile word along the middle row: (1,0)+(1,1). (1,0) is directly
     // above the frozen tile at (2,0) → frozen must thaw.
+    makePathPlain(alice, [[1, 0], [1, 1]]);
     cascadeBlastWord(alice, [{ row: 1, col: 0 }, { row: 1, col: 1 }], 'DO', 1, 'en');
 
     // Frozen tile sits at the bottom row; the cleared cell is above it, so gravity
@@ -55,6 +74,7 @@ describe('cascadeBlastWord — ice/frozen thaw (MP)', () => {
       isCleared: false,
     };
 
+    makePathPlain(alice, [[2, 1], [2, 2]]);
     cascadeBlastWord(alice, [{ row: 2, col: 1 }, { row: 2, col: 2 }], 'IN', 1, 'en');
 
     // The ice tile (now possibly fallen, but column 0 unchanged by a col 1/2
@@ -76,6 +96,7 @@ describe('cascadeBlastWord — ice/frozen thaw (MP)', () => {
     };
 
     // Path (1,1)+(1,2); (1,2) is directly above frozen (2,2).
+    makePathPlain(alice, [[1, 1], [1, 2]]);
     cascadeBlastWord(alice, [{ row: 1, col: 1 }, { row: 1, col: 2 }], 'OG', 1, 'en');
 
     const frozen = alice.tileStates[2][2];

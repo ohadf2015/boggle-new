@@ -37,7 +37,7 @@ const FILES = [
 const FORBIDDEN: Array<[string, RegExp]> = [
   [
     'promises the product is free forever, but Teacher Pro is a real paid tier',
-    /Free Forever|free forever|Free forever|חינם לתמיד|för alltid gratis|gratis för alltid|[Ss]iempre gratis|永久無料|навсегда бесплатн|Всегда бесплатно/,
+    /Free Forever|free forever|Free forever|חינם לתמיד|för alltid gratis|gratis för alltid|[Ss]iempre gratis|gratis para siempre|para siempre gratis|[Gg]ratis siempre|永久無料|ずっと無料|навсегда бесплатн|[Вв]сегда бесплатн/,
   ],
   [
     'denies the premium tier or a per-seat limit that lib/education/freeTierLimits.ts enforces',
