@@ -69,9 +69,16 @@ FORBID the 4-digit claim rather than forbidding any length.
 
 4. **Topics researched but not built**: phonics K-2 (biggest remaining gap), SAT/ACT vocabulary,
    partner/pair-work games, reading comprehension. Hebrew rated the strongest market (~90% win).
-   ATTEMPTED 2026-08-30 and deliberately abandoned: a `/education/phonics-games-classroom` page
-   was scaffolded and fully wired (sitemap, guards, hub link, llms.txt) but the content agent
-   produced nothing, and the wiring was reverted rather than left dangling. The blocker is real:
+   ATTEMPTED 2026-08-30 and REJECTED on content quality. A `/education/phonics-games-classroom`
+   page was scaffolded and fully wired (sitemap, guards, hub link, llms.txt); the generated
+   content arrived but its decodable word lists were largely fabricated, so the page and its
+   wiring were removed. Concrete examples, so the next attempt knows what to check:
+     sv — "batt/patt/tatt/nen/ven" are not Swedish words; "fit/git/kit/wit/dot/jot/hot" are
+          English; "brød" is Danish; "kjär/sjöl/skjud/tjing/flår" do not exist
+     ru — bare syllables ("та", "па", "ка", "те", "пе") presented as words
+     he — "תת"/"סן"/"מן" listed as vocalised CVC while written unvocalised
+     ja — mostly real (あさ, いぬ, さくら) but "きゃきゃ" is not a word
+   English was fine. The blocker is real:
    a phonics page's whole value is its decodable word lists, and those must be grounded in how
    each country actually teaches early reading (he ניקוד/הברות · ja ひらがな 清音/濁音/拗音 ·
    sv ljudning · ru слоговое чтение · es sílabas trabadas). An invented decodable list is
