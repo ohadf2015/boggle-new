@@ -48,6 +48,10 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     /up to 30 students|Up to 30 students|עד 30 תלמידים|hasta 30 (alumnos|estudiantes)|upp till 30 elever|最大30人の生徒|до 30 учеников/,
   ],
   [
+    'says the join code is 4 digits — ClassroomGameLobby.tsx:141 and utils/utils.ts:118 both emit six characters',
+    /4-digit|4 digit code|4 ספרות|4-siffrig|4桁|4 dígitos|4-значн/,
+  ],
+  [
     'says five languages — the app ships six (en, he, sv, ja, es, ru)',
     /\bfive languages\b|\bFive languages\b|\b5 languages\b|\b5 idiomas\b|\bcinco idiomas\b|\b[Ff]em språk\b|5つの言語|\b5言語\b|\b5 שפות\b|\b5 языков\b/,
   ],

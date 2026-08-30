@@ -76,7 +76,7 @@ const faqs = [
     },
     {
         q: '¿Puedo jugar específicamente con amigos o solo contra desconocidos?',
-        a: 'Ambas opciones. Crea una sala y comparte el código de 4 dígitos por WhatsApp, SMS o código QR — tus amigos entran al instante. También puedes unirte a salas públicas para enfrentarte a jugadores aleatorios. Apalabrados requiere agregar rivales por nombre de usuario o Facebook.',
+        a: 'Ambas opciones. Crea una sala y comparte el código de 6 caracteres por WhatsApp, SMS o código QR — tus amigos entran al instante. También puedes unirte a salas públicas para enfrentarte a jugadores aleatorios. Apalabrados requiere agregar rivales por nombre de usuario o Facebook.',
     },
     {
         q: '¿Hay un modo aula para profesores?',
@@ -146,7 +146,7 @@ export default async function LexiClashVsApalabradosPage({ params }: PageProps) 
                                     ['Cuenta requerida', 'No (opcional)', 'Sí'],
                                     ['Plataformas', 'Web + Android', 'Solo app'],
                                     ['Juego en navegador', 'Sí', 'Limitado'],
-                                    ['Invitar amigos', 'Código de 4 dígitos / QR / enlace', 'Usuario / Facebook'],
+                                    ['Invitar amigos', 'Código de 6 caracteres / QR / enlace', 'Usuario / Facebook'],
                                     ['Precio', 'Gratis (con anuncios)', 'Gratis (con anuncios)'],
                                     ['Pay-to-win', 'No', 'Existen potenciadores de pago'],
                                     ['Desafío diario', 'Sí (estilo Wordle + Daily Buzz)', 'No es el foco'],

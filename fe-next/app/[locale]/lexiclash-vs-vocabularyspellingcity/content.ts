@@ -55,7 +55,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'VocabularySpellingCity tier features and pricing as of 2026 — check the vendor for current Premium plans.',
     compareRows: [
       ['Free tier (full features)', '✓ Everything free', '✗ Premium for most games'],
-      ['No student login', '✓ 4-digit join code', '✗ Student accounts'],
+      ['No student login', '✓ 6-character join code', '✗ Student accounts'],
       ['Core format', 'Live multiplayer word games', 'Individual self-paced games'],
       ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ Solo practice model'],
       ['1v1 duels with student pairing', '✓', '✗'],
@@ -75,7 +75,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'No student logins',
-        desc: 'A 4-digit join code means no account provisioning. Every student plays in seconds, including those without rostered logins.',
+        desc: 'A 6-character join code means no account provisioning. Every student plays in seconds, including those without rostered logins.',
       },
       {
         title: 'Free, full features',
@@ -109,7 +109,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Do students need logins on LexiClash?',
-        a: 'No. Students join with a 4-digit code shown by the teacher — no individual accounts. SpellingCity students typically log into assigned accounts to track their practice.',
+        a: 'No. Students join with a 6-character code shown by the teacher — no individual accounts. SpellingCity students typically log into assigned accounts to track their practice.',
       },
       {
         q: 'Can I use my own spelling lists?',
@@ -155,7 +155,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'תכונות רמה וקביעת מחיר של VocabularySpellingCity עד 2026 — בדוקו אצל הספק לתוכניות Premium נוכחיות.',
     compareRows: [
       ['רמה חינמית (כל התכונות)', '✓ הכל בחינם', '✗ Premium לרוב המשחקים'],
-      ['ללא התחברות תלמיד', '✓ קוד הצטרפות ל-4 ספרות', '✗ חשבונות תלמידים'],
+      ['ללא התחברות תלמיד', '✓ קוד הצטרפות ל-6 תווים', '✗ חשבונות תלמידים'],
       ['פורמט ליבה', 'משחקי מילים בחיים מרובי שחקנים', 'משחקים אישיים בקצב עצמי'],
       ['מרובה שחקנים בחיים לכל הכיתה', '✓ בחינם, עד 30', '✗ מודל תרגול בודד'],
       ['דו-קרבות 1v1 עם זיווג תלמידים', '✓', '✗'],
@@ -175,7 +175,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'ללא התחברות תלמיד',
-        desc: 'קוד הצטרפות ל-4 ספרות פירושו ללא הספקת חשבון. כל תלמיד משחק תוך שניות, כולל אלה ללא התחברות רשומה.',
+        desc: 'קוד הצטרפות ל-6 תווים פירושו ללא הספקת חשבון. כל תלמיד משחק תוך שניות, כולל אלה ללא התחברות רשומה.',
       },
       {
         title: 'בחינם, כל התכונות',
@@ -209,7 +209,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'האם תלמידים צריכים התחברות ב-LexiClash?',
-        a: 'לא. תלמידים מצטרפים עם קוד ל-4 ספרות המוצג על ידי המורה — ללא חשבונות אישיים. תלמידי SpellingCity בדרך כלל מתחברים לחשבונות מוקצים לתחקור התרגול שלהם.',
+        a: 'לא. תלמידים מצטרפים עם קוד ל-6 תווים המוצג על ידי המורה — ללא חשבונות אישיים. תלמידי SpellingCity בדרך כלל מתחברים לחשבונות מוקצים לתחקור התרגול שלהם.',
       },
       {
         q: 'האם אוכל להשתמש ברשימות הכתיב שלי?',
@@ -255,7 +255,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'VocabularySpellingCity nivaafunktioner och prisstättning fran 2026 — kontrollera leverantoren for aktuella Premium-planer.',
     compareRows: [
       ['Gratis niva (alla funktioner)', '✓ Allt gratis', '✗ Premium for de flesta spel'],
-      ['Ingen elevloggning', '✓ 4-siffrig anslutningskod', '✗ Elevkonton'],
+      ['Ingen elevloggning', '✓ Anslutningskod på sex tecken', '✗ Elevkonton'],
       ['Kärnformat', 'Live multiplayer-ordspel', 'Individuella självstudier'],
       ['Live helklassmultiplayer', '✓ Gratis, upp till 30', '✗ Solo-övningsmodell'],
       ['1v1-dueller med elevparning', '✓', '✗'],
@@ -275,7 +275,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Ingen elevloggning',
-        desc: 'En 4-siffrig anslutningskod betyder ingen kontoprovisioning. Varje elev spelar pa sekunder, inklusive de utan rostered loggning.',
+        desc: 'En anslutningskod på sex tecken betyder ingen kontoprovisioning. Varje elev spelar pa sekunder, inklusive de utan rostered loggning.',
       },
       {
         title: 'Gratis, alla funktioner',
@@ -309,7 +309,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Behover elever loggning pa LexiClash?',
-        a: 'Nej. Elever ansluter med en 4-siffrig kod som visas av lararen — inga individuella konton. SpellingCity-elever loggar vanligtvis in pa tilldelade konton for att spara sin traning.',
+        a: 'Nej. Elever ansluter med en kod på sex tecken som visas av lararen — inga individuella konton. SpellingCity-elever loggar vanligtvis in pa tilldelade konton for att spara sin traning.',
       },
       {
         q: 'Kan jag anvanda mina egna stavningslistor?',
@@ -455,7 +455,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'Caracteristicas de nivel de VocabularySpellingCity y precios a partir de 2026 — verifique con el proveedor los planes Premium actuales.',
     compareRows: [
       ['Nivel gratuito (todas las caracteristicas)', 'Todo gratis', 'Premium para la mayoria de juegos'],
-      ['Sin inicio de sesion de estudiante', 'Codigo de union de 4 digitos', 'Cuentas de estudiante'],
+      ['Sin inicio de sesion de estudiante', 'Codigo de union de 6-characteros', 'Cuentas de estudiante'],
       ['Formato central', 'Juegos de palabras multijugador en vivo', 'Juegos individuales a su propio ritmo'],
       ['Multijugador de clase completa en vivo', 'Gratis, hasta 30', 'Modelo de practica solo'],
       ['Duelos 1v1 con emparejamiento de estudiantes', 'ok', 'x'],
@@ -475,7 +475,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Sin inicio de sesion de estudiante',
-        desc: 'Un codigo de union de 4 digitos significa sin aprovisionamiento de cuentas. Todos los estudiantes juegan en segundos, incluidos los sin inicios de sesion registrados.',
+        desc: 'Un codigo de union de 6-characteros significa sin aprovisionamiento de cuentas. Todos los estudiantes juegan en segundos, incluidos los sin inicios de sesion registrados.',
       },
       {
         title: 'Gratis, todas las caracteristicas',
@@ -509,7 +509,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Los estudiantes necesitan inicios de sesion en LexiClash?',
-        a: 'No. Los estudiantes se unen con un codigo de 4 digitos mostrado por el maestro — sin cuentas individuales. Los estudiantes de SpellingCity generalmente inician sesion en cuentas asignadas para rastrear su practica.',
+        a: 'No. Los estudiantes se unen con un codigo de 6-characteros mostrado por el maestro — sin cuentas individuales. Los estudiantes de SpellingCity generalmente inician sesion en cuentas asignadas para rastrear su practica.',
       },
       {
         q: 'Puedo usar mis propias listas de ortografia?',
@@ -555,7 +555,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'Функции уровня VocabularySpellingCity и цены по состоянию на 2026 — проверьте у поставщика текущие планы Premium.',
     compareRows: [
       ['Бесплатный уровень (все функции)', '✓ Всё бесплатно', '✗ Premium для большинства игр'],
-      ['Без входа учащегося', '✓ 4-значный код присоединения', '✗ Учетные записи учащихся'],
+      ['Без входа учащегося', '✓ код из 6 символов присоединения', '✗ Учетные записи учащихся'],
       ['Основной формат', 'Живые многопользовательские словесные игры', 'Индивидуальные игры с собственным темпом'],
       ['Живая многопользовательская игра для всего класса', '✓ Бесплатно, до 30', '✗ Модель отдельных упражнений'],
       ['Дуэли 1v1 с парованием учащихся', '✓', '✗'],
@@ -575,7 +575,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Без входа учащегося',
-        desc: '4-значный код присоединения означает отсутствие необходимости в подготовке учетной записи. Каждый ученик может начать играть за секунды, включая тех, кто не зарегистрирован в системе.',
+        desc: 'код из 6 символов присоединения означает отсутствие необходимости в подготовке учетной записи. Каждый ученик может начать играть за секунды, включая тех, кто не зарегистрирован в системе.',
       },
       {
         title: 'Бесплатно, все функции',
@@ -609,7 +609,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Нужны ли учащимся учетные записи для входа в LexiClash?',
-        a: 'Нет. Учащиеся присоединяются по 4-значному коду, который показывает учитель — без отдельных учетных записей. Учащиеся SpellingCity обычно входят в назначенные им учетные записи для отслеживания своих упражнений.',
+        a: 'Нет. Учащиеся присоединяются по коду из 6 символов, который показывает учитель — без отдельных учетных записей. Учащиеся SpellingCity обычно входят в назначенные им учетные записи для отслеживания своих упражнений.',
       },
       {
         q: 'Могу ли я использовать свои списки слов по орфографии?',

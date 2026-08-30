@@ -4,7 +4,7 @@
 
 ## About
 
-LexiClash is a free online multiplayer word game and an alternative to Words With Friends, Scrabble, Boggle, and Wordle. Unlike turn-based games like Words With Friends, every player searches the same letter grid simultaneously, so a full match takes 2–3 minutes instead of days. Players join rooms via 4-digit codes, share links or QR codes, and compete for the highest score by connecting adjacent letters into words. The longer the word, the more points earned. Available in English, Hebrew (with full RTL support), Swedish, Japanese, Spanish, and Russian. Built with Next.js 16, featuring real-time WebSocket multiplayer, daily challenges, and single-player modes.
+LexiClash is a free online multiplayer word game and an alternative to Words With Friends, Scrabble, Boggle, and Wordle. Unlike turn-based games like Words With Friends, every player searches the same letter grid simultaneously, so a full match takes 2–3 minutes instead of days. Players join rooms via 6-character codes, share links or QR codes, and compete for the highest score by connecting adjacent letters into words. The longer the word, the more points earned. Available in English, Hebrew (with full RTL support), Swedish, Japanese, Spanish, and Russian. Built with Next.js 16, featuring real-time WebSocket multiplayer, daily challenges, and single-player modes.
 
 Website: https://www.lexiclash.live
 Sitemap: https://www.lexiclash.live/sitemap.xml
@@ -13,7 +13,7 @@ Sitemap: https://www.lexiclash.live/sitemap.xml
 
 ### Multiplayer
 - Real-time word battles with 2-20+ players
-- Create or join rooms with 4-digit codes
+- Create or join rooms with 6-character codes
 - Share via link or QR code
 - Perfect for parties, team building, classrooms, and family game nights
 - URL: https://www.lexiclash.live/en/multiplayer
@@ -362,12 +362,12 @@ Landing Pages (per-locale content, SEO-optimized):
 - /education/spelling-bee-practice — SEO: free spelling bee practice online, Scripps training drills, Boggle/word-wheel/anagram practice
 
 Teacher Workflows:
-1. **Build a classroom**: teacher dashboard → create class → invite students via 4-digit join code (students need NO account)
+1. **Build a classroom**: teacher dashboard → create class → invite students via 6-character join code (students need NO account)
 2. **Launch a game**: pick a word list (built-in or custom curriculum), set mode + time limit, students join with code
 3. **Track progress**: per-student accuracy, per-class missed-word heatmaps, leaderboards, export for grading
 
 Student Experience:
-- Join with 4-digit code only (no signup, no password)
+- Join with 6-character code only (no signup, no password)
 - Play in any modern browser (Chrome, Safari, Firefox, Edge)
 - No app download, no data entry, instant play
 - Works on phones, tablets, desktops, Chromebooks
@@ -393,7 +393,7 @@ Grade Coverage:
 - Adult ESL/EFL: no childish UI, real competitive multiplayer
 
 Why Teachers Choose LexiClash over Quizlet/Kahoot/Wordwall:
-- **No student accounts**: join with 4-digit code (Quizlet/Kahoot require logins)
+- **No student accounts**: join with 6-character code (Quizlet/Kahoot require logins)
 - **No per-seat cost**: completely free (Kahoot+ $15-25/mo, Quizlet+ $36/yr, Wordwall £4-9/mo)
 - **Word-formation, not Q&A**: Boggle-style grids, anagrams, word wheels vs flashcards/multiple-choice
 - **6 languages with native dictionaries**: Hebrew RTL, Japanese, Swedish, Spanish, Russian (most competitors US-English only)

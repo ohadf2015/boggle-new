@@ -15,7 +15,7 @@ LexiClash is a free online word game inspired by Boggle, Scrabble, and Wordle. P
 ## Game Modes
 
 ### Multiplayer (2-20+ players)
-Real-time word battles. Create or join rooms with 4-digit codes. Share via link or QR code. Perfect for parties, team building, classrooms, and family game nights. All players see the same letter grid and race to find words simultaneously. Words found by multiple players are marked as duplicates and don't count — rewarding unique word discovery.
+Real-time word battles. Create or join rooms with 6-character codes. Share via link or QR code. Perfect for parties, team building, classrooms, and family game nights. All players see the same letter grid and race to find words simultaneously. Words found by multiple players are marked as duplicates and don't count — rewarding unique word discovery.
 
 URL: https://www.lexiclash.live/en/multiplayer
 
@@ -179,7 +179,7 @@ Vocabulary duel format:
 - 2–3 minutes per duel — fits any class period
 
 Live classroom game format:
-- Teacher hosts, students join via 4-digit code on any device
+- Teacher hosts, students join via a 6-character code on any device
 - All students search the same grid simultaneously in real time
 - Live leaderboard projects on classroom screen
 - Words found by multiple players don't count — rewards unique vocabulary

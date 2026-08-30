@@ -1522,6 +1522,7 @@ const ru = {
       "socialProof": "Ты не одна учишься.",
       "student": "Ученик",
       "studentCta": "Начать учёбу",
+      "studentJoinCta": "Войти по коду класса",
       "studentDesc": "Развивай словарный запас через игру",
       "studentFeature1": "Отслеживай прогресс",
       "studentFeature2": "Зарабатывай XP и значки",

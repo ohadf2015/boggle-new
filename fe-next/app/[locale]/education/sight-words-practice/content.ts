@@ -67,7 +67,7 @@ const content: LocaleContent = {
   h1Part3: 'That Kids',
   h1Part4: 'Ask For.',
   mainParagraph:
-    'Sight words stick through repetition — and kids repeat what feels like play. LexiClash turns your Dolch or Fry list into flashcard reviews, word-matching rounds, spelling challenges, and live multiplayer word games. Works on any browser, students join with a 4-digit code, and every practice mode runs on the exact words you are teaching this week.',
+    'Sight words stick through repetition — and kids repeat what feels like play. LexiClash turns your Dolch or Fry list into flashcard reviews, word-matching rounds, spelling challenges, and live multiplayer word games. Works on any browser, students join with a 6-character code, and every practice mode runs on the exact words you are teaching this week.',
   startWordHuntLabel: '▶ Try the Daily Word Hunt',
   freeLabel: 'Free · in the browser',
   duelLabel: '⚔ 1v1 Word Duel',
@@ -88,7 +88,7 @@ const content: LocaleContent = {
     },
     {
       title: 'Live Classroom Word Game',
-      desc: 'Run a whole-class word hunt on a shared letter grid. A whole class join with a 4-digit code — no student accounts, no logins.',
+      desc: 'Run a whole-class word hunt on a shared letter grid. A whole class join with a 6-character code — no student accounts, no logins.',
     },
   ],
   practiceNowLabel: 'Practice now →',
@@ -118,7 +118,7 @@ const content: LocaleContent = {
       step: 'Step 4',
       focus: 'Make it social (2 min)',
       activity:
-        'Pair two students for a 1v1 word duel, or run the list as a whole-class game with a 4-digit join code. Kids who beg for "one more round" are doing the repetition for you.',
+        'Pair two students for a 1v1 word duel, or run the list as a whole-class game with a 6-character join code. Kids who beg for "one more round" are doing the repetition for you.',
     },
   ],
   faqHeading: 'Sight-words FAQ.',
@@ -133,7 +133,7 @@ const content: LocaleContent = {
     },
     {
       q: 'Do students need accounts or downloads to play?',
-      a: 'No. Students join a classroom session with a 4-digit code and play instantly in any browser — Chromebooks, tablets, phones, or desktops. There is no app to install and no student login to manage. Only the adult creating the word list needs an account.',
+      a: 'No. Students join a classroom session with a 6-character code and play instantly in any browser — Chromebooks, tablets, phones, or desktops. There is no app to install and no student login to manage. Only the adult creating the word list needs an account.',
     },
     {
       q: 'Which LexiClash game modes help with sight-word recognition?',

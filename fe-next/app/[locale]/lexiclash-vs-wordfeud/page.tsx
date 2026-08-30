@@ -71,7 +71,7 @@ const faqs = [
     },
     {
         q: 'Kan jag spela mot vänner specifikt, eller bara slumpmässiga motståndare?',
-        a: 'Båda. Skapa ett rum och dela 4-siffrig kod via SMS, WhatsApp eller QR-kod — dina vänner går med direkt. Du kan också gå med i öppna rum för att möta okända spelare. Wordfeud kräver att du adderar motståndare via användarnamn eller Facebook.',
+        a: 'Båda. Skapa ett rum och dela kod på sex tecken via SMS, WhatsApp eller QR-kod — dina vänner går med direkt. Du kan också gå med i öppna rum för att möta okända spelare. Wordfeud kräver att du adderar motståndare via användarnamn eller Facebook.',
     },
     {
         q: 'Finns det ett klassrumsläge för lärare?',
@@ -140,7 +140,7 @@ export default async function LexiClashVsWordfeudPage({ params }: PageProps) {
                                     ['Konto krävs', 'Nej (valfritt)', 'Ja'],
                                     ['Plattformar', 'Webb + Android', 'Endast app'],
                                     ['Webbläsarspel', 'Ja', 'Begränsat'],
-                                    ['Bjud in vänner', '4-siffrig kod / QR / länk', 'Användarnamn / Facebook'],
+                                    ['Bjud in vänner', 'kod på sex tecken / QR / länk', 'Användarnamn / Facebook'],
                                     ['Pris', 'Gratis (annonser)', 'Gratis (annonser)'],
                                     ['Pay-to-win', 'Nej', 'Powerups via köp finns'],
                                     ['Daglig utmaning', 'Ja (Wordle-stil + Daily Buzz)', 'Inte primärt'],

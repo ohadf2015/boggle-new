@@ -226,14 +226,27 @@ export function PageClient() {
                 {t('education.landing.districtCta.title')} →
               </Link>
             </div>
-            {/* Student card */}
-            <div className="rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">
-              <h3 className="text-2xl font-neo-display font-black text-neo-cyan">
-                {t('education.landing.student')}
-              </h3>
-              <p className="mt-3 text-neo-white">
-                {t('education.landing.studentCta')}
-              </p>
+            {/* Student card. The teacher card has two routes out; this one had
+                none, so a student who read it had nowhere to go. /student/join
+                is the real entry point — it takes the class code the teacher
+                projects. */}
+            <div className="flex flex-col gap-4 rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">
+              <div>
+                <h3 className="text-2xl font-neo-display font-black text-neo-cyan">
+                  {t('education.landing.student')}
+                </h3>
+                <p className="mt-3 text-neo-white">
+                  {t('education.landing.studentCta')}
+                </p>
+              </div>
+              <Link
+                href={`/${language}/student/join`}
+                data-testid="student-card-join-link"
+                onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'student_card_join' })}
+                className="self-start rounded-neo border-neo border-neo-cyan bg-neo-cyan/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-cyan/30 hover:shadow-hard"
+              >
+                {t('education.landing.studentJoinCta')}
+              </Link>
             </div>
           </div>
         </section>

@@ -48,8 +48,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: '¿Cuáles son los mejores juegos de vocabulario gratis para el aula?', a: 'LexiClash está diseñado específicamente para aulas: los estudiantes se unen con un código de 4 dígitos (sin registro), el profesor elige una lista de palabras, y toda la clase juega multijugador en vivo durante 5-10 minutos. Funciona en cualquier navegador y soporta español, inglés, hebreo, sueco y japonés — útil para clases ESL e inmersión bilingüe.' },
-  { q: '¿Necesitan los estudiantes crear cuentas?', a: 'No. Los estudiantes introducen un código de 4 dígitos que el profesor muestra y juegan al instante. Solo los profesores crean cuentas (gratis) para guardar listas de palabras y ver paneles de progreso.' },
+  { q: '¿Cuáles son los mejores juegos de vocabulario gratis para el aula?', a: 'LexiClash está diseñado específicamente para aulas: los estudiantes se unen con un código de 6 caracteres (sin registro), el profesor elige una lista de palabras, y toda la clase juega multijugador en vivo durante 5-10 minutos. Funciona en cualquier navegador y soporta español, inglés, hebreo, sueco y japonés — útil para clases ESL e inmersión bilingüe.' },
+  { q: '¿Necesitan los estudiantes crear cuentas?', a: 'No. Los estudiantes introducen un código de 6 caracteres que el profesor muestra y juegan al instante. Solo los profesores crean cuentas (gratis) para guardar listas de palabras y ver paneles de progreso.' },
   { q: '¿Puedo importar mi propia lista de vocabulario?', a: 'Sí. Los profesores pueden subir listas personalizadas de cualquier unidad, libro de texto o currículo. Úsalas en duelos 1v1, juegos de palabras para toda la clase o práctica asignada.' },
   { q: '¿En qué se diferencia de Quizlet, Kahoot o Wordwall?', a: 'Esas herramientas se basan en tarjetas didácticas o cuestionarios. LexiClash es un juego de formación de palabras: los estudiantes buscan palabras en una cuadrícula estilo Boggle, rueda de letras desordenadas o tablero de anagramas. Mejor para ortografía, recuerdo y reconocimiento de patrones que los cuestionarios de opción múltiple. Además, sin cuentas de estudiante y nivel gratuito completo.' },
   { q: '¿Cuánto dura una sesión de aula?', a: 'Un duelo de vocabulario 1v1 dura 2-3 minutos. Una ronda multijugador para toda la clase dura 5-10 minutos. La mayoría de los profesores lo usan como calentamiento de 5 minutos, descanso mental a mitad de lección o repaso al final de la clase.' },
@@ -59,7 +59,7 @@ const faqs = [
 ];
 
 const features = [
-  { icon: '⚡', text: 'Los estudiantes se unen en 5 segundos con un código de 4 dígitos — sin inicio de sesión, sin email' },
+  { icon: '⚡', text: 'Los estudiantes se unen en 5 segundos con un código de 6 caracteres — sin inicio de sesión, sin email' },
   { icon: '🎯', text: 'Tres modos de juego: cuadrícula Boggle, Búsqueda de Palabras, Rueda de Palabras' },
   { icon: '👥', text: 'Multijugador en vivo hasta 30 estudiantes por sesión' },
   { icon: '⚔️', text: 'Duelos de vocabulario 1v1 para práctica en parejas o rondas de subgrupo' },

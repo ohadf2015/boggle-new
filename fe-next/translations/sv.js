@@ -13249,6 +13249,7 @@ const sv = {
       "socialProof": "Du är inte ensam — tusentals spelar redan.",
       "student": "Elev",
       "studentCta": "Börja nu",
+      "studentJoinCta": "Gå med via klasskod",
       "studentDesc": "Lär dig ord genom spel",
       "studentFeature1": "Se dina framsteg",
       "studentFeature2": "Tjäna märken och XP",

@@ -11577,6 +11577,7 @@ const en = {
       "socialProof": "You're not the only one studying.",
       "student": "Student",
       "studentCta": "Start Learning",
+      "studentJoinCta": "Join with a class code",
       "studentDesc": "Build vocabulary through play",
       "studentFeature1": "Track your progress",
       "studentFeature2": "Earn XP & badges",

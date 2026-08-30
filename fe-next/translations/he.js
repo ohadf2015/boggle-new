@@ -12857,6 +12857,7 @@ const he = {
       "socialProof": "לא רק אתם לומדים פה.",
       "student": "תלמיד",
       "studentCta": "התחל ללמוד",
+      "studentJoinCta": "הצטרפות עם קוד כיתה",
       "studentDesc": "בנו אוצר מילים דרך משחק",
       "studentFeature1": "עקבו אחר ההתקדמות",
       "studentFeature2": "צברו XP ותגים",

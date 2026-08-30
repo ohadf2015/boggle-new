@@ -1,6 +1,6 @@
 # Education landing pages + SEO/GEO — handoff (2026-08-30)
 
-Branch `worktree-edu-landing-seo`, 4 commits, **not pushed**.
+Branch `worktree-edu-landing-seo`. See `git log` for the full series.
 `80f82b395` template+fixes · `98a94d75c` six pages · `43cf99a94` false claims · `4127d0ee3` bad section kind
 
 ## Shipped
@@ -18,40 +18,43 @@ Branch `worktree-edu-landing-seo`, 4 commits, **not pushed**.
 - Guards: `app/[locale]/education/__tests__/teacherMomentContent.test.ts` (57) and
   `educationClaims.test.ts` (48, reads raw source of 12 legacy files + llms.txt).
 
+## RESOLVED since first draft
+
+**Join-code length — settled, was "4-digit", is SIX characters.**
+`components/education/ClassroomGameLobby.tsx:141` generates the classroom game code:
+six chars from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`. `utils/utils.ts:118` does the same for
+rooms (its own comment reads "vs 10,000 combinations for 4-digit numeric codes" — the
+4-digit form was deliberately superseded), and the SQL `generate_join_code()` uses the same
+alphabet. `backend/utils/gameUtils.ts:143` still exports a 4-digit generator but **nothing
+imports it — dead code, safe to delete.**
+197 "4-digit" claims across 22 files (6 languages, incl. all `lexiclash-vs-*` comparison
+pages, `llms.txt` and `llms-full.txt`) were corrected to "6-character". Both guards now
+FORBID the 4-digit claim rather than forbidding any length.
+
+**Student role card dead end — fixed.** Now links to `/[locale]/student/join` with a new
+`education.landing.studentJoinCta` key in all six translation files.
+
 ## OPEN — needs a decision, do not guess
 
-1. **~90 "4-digit code" claims across the older education pages.**
-   Two generators exist: `backend/utils/gameUtils.ts:143` returns a 4-digit number;
-   `utils/utils.ts:118` and SQL `generate_join_code()` return 6 alphanumeric chars.
-   Neither is reachable from the `/education/classroom-game` flow via
-   `backend/modules/classroomGameManager.ts` — it receives `gameCode`, never generates it.
-   **Find who generates the code the classroom flow shows**, then either delete the claims or
-   let new copy state the length too. New pages currently say only "a join code".
-   `educationClaims.test.ts` deliberately does NOT guard this yet.
-
-2. **Watch GSC coverage on `/education/*` for ~2 weeks.**
+1. **Watch GSC coverage on `/education/*` for ~2 weeks.**
    The cluster went from 6 sitemapped URLs to 72, plus regional hreflang (en-GB, es-MX, ru-RU…).
    The pages all `index`, so this should be correct — but `addForLocaleOnly` exists because a
    similar widening on 2026-05-20 sent Google into ~900 noindexed URLs. If coverage errors spike
    on /education/*, this change is the cause.
 
-3. **Student role card on the education hub has no CTA** (`app/[locale]/education/PageClient.tsx`,
-   "Student card"). Dead end. Not fixed because the right destination is unknown —
-   `/join?code=X` 308s then 404s; only `/join/X` resolves.
-
-4. **Non-English word lists on `middle-school-word-games` are translated English**, not sourced
+2. **Non-English word lists on `middle-school-word-games` are translated English**, not sourced
    from each country's curriculum. Now idiomatic and valid (12 Hebrew + 1 Swedish word corrected)
    but not what a Swedish or Japanese teacher sees in their own materials. No page claims
    curriculum alignment, so this is a quality ceiling, not a false claim.
 
-5. **Hub structural redesign not attempted.** Reserved-accent violations (`neo-yellow` on generic
+3. **Hub structural redesign not attempted.** Reserved-accent violations (`neo-yellow` on generic
    CTAs) and a two-lime CTA collision were fixed; the stacked card-grid structure was left alone.
 
-6. **Competitor free-tier numbers conflict between sources.** Only "Kahoot ≈ 10 free participants"
+4. **Competitor free-tier numbers conflict between sources.** Only "Kahoot ≈ 10 free participants"
    is corroborated across searches. Verify each vendor's own pricing page before publishing any
    comparison content.
 
-7. **Topics researched but not built** (deliberately — publish in batches, watch 2-4 weeks first):
+5. **Topics researched but not built** (deliberately — publish in batches, watch 2-4 weeks first):
    phonics K-2 (biggest remaining gap), SAT/ACT vocabulary, partner/pair-work games,
    reading comprehension. Hebrew rated the strongest market (~90% win likelihood).
 
@@ -59,10 +62,15 @@ Branch `worktree-edu-landing-seo`, 4 commits, **not pushed**.
 
 - 890 tests green across 98 files at commit `43cf99a94`; 57 on the content guard after `4127d0ee3`.
 - lint clean on all touched files.
-- **`next build` was still running when the session ended.** It failed once and caught a real
-  defect (`kind: 'faqs'`) that vitest could not see, because vitest strips types. That is fixed
-  and guarded. **Re-run one build to confirm the six routes appear in the route table** and to
-  see whether `/[locale]/education` renders `ƒ` or `●` after the `force-dynamic` → `revalidate`
-  change. Log pattern: `/tmp/edu-rebuild-*.log`.
+- **`next build` VERIFIED.** All six new routes appear in the route table; zero type errors;
+  fresh `.next/BUILD_ID`; 469 routes total (was 456). It failed once first and caught a real
+  defect (`kind: 'faqs'`) that vitest could not see because vitest strips types — fixed and
+  now guarded by a runtime section-kind assertion.
+- **Perf claim corrected.** `/[locale]/education` still builds `ƒ (Dynamic)`, not `●`. So does
+  everything else: **461 of 465 routes are ƒ, 3 static, 1 SSG.** Dropping `force-dynamic` is
+  still a real gain (the route no longer opts out of caching entirely), but the pages cannot
+  prerender because **`app/[locale]` has no `generateStaticParams`** — a repo-wide condition,
+  not something these pages can fix. Making the locale segment static is the actual lever for
+  site-wide render performance, and it is a separate, higher-blast-radius change.
 - Do NOT gate a build on `pgrep -f "next build"` — another session in this repo almost always has
   one running, so the guard never exits. Use `NEXT_BUILD_DIR` to isolate instead.

@@ -13011,6 +13011,7 @@ const ja = {
       "socialProof": "世界中の先生と生徒が、毎日学んでいます。",
       "student": "生徒向け",
       "studentCta": "遊んで学ぼう",
+      "studentJoinCta": "クラスコードで参加",
       "studentDesc": "ゲームで語彙力を磨く",
       "studentFeature1": "成長を可視化",
       "studentFeature2": "XPとバッジを獲得",

@@ -42,12 +42,12 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
   en: {
     metaTitle: 'Free Word Games for Classrooms — Live Group Games, Vocabulary Duels, No Login | LexiClash',
     metaDescription:
-      'Free word games built for classrooms. Students join with a 4-digit code (no login, no accounts). Live classroom games, vocabulary duels, custom word lists, and real-time dashboards. Works in any browser. A whole class.',
+      'Free word games built for classrooms. Students join with a 6-character code (no login, no accounts). Live classroom games, vocabulary duels, custom word lists, and real-time dashboards. Works in any browser. A whole class.',
     ogTitle: 'Classroom Word Games — Free, No Login, No Accounts',
     ogDescription:
       'Join with a code, play immediately. Live vocabulary games, spelling practice, no accounts needed. Works on any device.',
     twitterTitle: 'Free Classroom Word Games — LexiClash',
-    twitterDescription: 'Live word games for classrooms. 4-digit join code, no login, real vocabulary practice, a whole class.',
+    twitterDescription: 'Live word games for classrooms. 6-character join code, no login, real vocabulary practice, a whole class.',
     heroTag: '★ FOR TEACHERS ★ FREE TO START ★',
     heroPart1: 'Word ',
     heroHighlight1: 'games',
@@ -60,7 +60,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'What you ',
     featuresTitleHighlight: 'get',
     features: [
-      { icon: '⚡', text: 'Students join in 5 seconds with a 4-digit code — no login, no email' },
+      { icon: '⚡', text: 'Students join in 5 seconds with a 6-character code — no login, no email' },
       { icon: '🎯', text: 'Three game modes: letter grid, word hunt, word wheel' },
       { icon: '👥', text: 'Live multiplayer — a whole class together' },
       { icon: '⚔️', text: 'Head-to-head vocabulary duels — for pair or small-group practice' },
@@ -80,8 +80,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: 'Questions for ',
     faqTitleHighlight: 'teachers',
     faqs: [
-      { q: 'What are the best word games for a classroom?', a: 'LexiClash is built for classrooms: students join with a 4-digit code (no signup), the teacher picks a word list, and the whole class plays together live in 5–10 minutes. The game works in any browser and supports English, Hebrew, Spanish, Swedish, Japanese, and Russian — so it works for Hebrew classrooms, ESL classrooms, and foreign-language classrooms too.' },
-      { q: 'Do students need to open an account?', a: 'No. Students type a 4-digit code the teacher displays and start playing immediately. Only teachers open a free account — to save word lists and track class progress.' },
+      { q: 'What are the best word games for a classroom?', a: 'LexiClash is built for classrooms: students join with a 6-character code (no signup), the teacher picks a word list, and the whole class plays together live in 5–10 minutes. The game works in any browser and supports English, Hebrew, Spanish, Swedish, Japanese, and Russian — so it works for Hebrew classrooms, ESL classrooms, and foreign-language classrooms too.' },
+      { q: 'Do students need to open an account?', a: 'No. Students type a 6-character code the teacher displays and start playing immediately. Only teachers open a free account — to save word lists and track class progress.' },
       { q: 'Can I upload my own vocabulary list?', a: 'Yes. Upload any word list — from a lesson, a chapter, or your curriculum — and play it as head-to-head duels, a whole-class round, or individual practice assigned to students.' },
       { q: 'How is it different from Quizlet, Kahoot, or Wordwall?', a: 'Quizlet, Kahoot, and Wordwall are based on flashcards and multiple-choice quizzes. LexiClash is a word-building game: students build words on a letter grid, word wheel, or anagram board. That means they practice spelling, retrieval, and pattern recognition — not just choosing from given answers. Plus: no student accounts, and it is all free.' },
       { q: 'How long does a classroom session take?', a: 'A vocabulary duel runs 2–3 minutes. A whole-class round runs 5–10 minutes. Most teachers run it as a five-minute class opener, a mid-lesson brain break, or a quick review before the bell.' },
@@ -117,7 +117,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'מה ',
     featuresTitleHighlight: 'מקבלים',
     features: [
-      { icon: '⚡', text: 'התלמידים מצטרפים תוך 5 שניות עם קוד בן 4 ספרות — בלי התחברות ובלי אימייל' },
+      { icon: '⚡', text: 'התלמידים מצטרפים תוך 5 שניות עם קוד בן 6 תווים — בלי התחברות ובלי אימייל' },
       { icon: '🎯', text: 'שלושה מצבי משחק: לוח אותיות, ציד מילים וגלגל מילים' },
       { icon: '👥', text: 'משחק רב-משתתפים חי — כל הכיתה יחד' },
       { icon: '⚔️', text: 'דו-קרבות אוצר מילים אחד-על-אחד — לתרגול בזוגות או בקבוצות קטנות' },
@@ -137,8 +137,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: 'שאלות ',
     faqTitleHighlight: 'למורים',
     faqs: [
-      { q: 'מה הם משחקי המילים הטובים ביותר לכיתה בעברית?', a: 'LexiClash Education נבנה במיוחד לכיתות בעברית: התלמידים מצטרפים בקוד בן 4 ספרות (בלי הרשמה), המורה בוחר רשימת מילים, וכל הכיתה משחקת יחד בזמן אמת 5–10 דקות. המשחק עובד בכל דפדפן ותומך בעברית, אנגלית, ספרדית, שוודית, יפנית ורוסית — ולכן מתאים גם לכיתות עברית כשפה שנייה ולשיעורי שפה.' },
-      { q: 'האם התלמידים צריכים לפתוח חשבון?', a: 'לא. התלמידים מקלידים קוד בן 4 ספרות שהמורה מציג על המסך ומתחילים לשחק מיד. רק המורים פותחים חשבון — בחינם — כדי לשמור רשימות מילים ולעקוב אחרי ההתקדמות של הכיתה.' },
+      { q: 'מה הם משחקי המילים הטובים ביותר לכיתה בעברית?', a: 'LexiClash Education נבנה במיוחד לכיתות בעברית: התלמידים מצטרפים בקוד בן 6 תווים (בלי הרשמה), המורה בוחר רשימת מילים, וכל הכיתה משחקת יחד בזמן אמת 5–10 דקות. המשחק עובד בכל דפדפן ותומך בעברית, אנגלית, ספרדית, שוודית, יפנית ורוסית — ולכן מתאים גם לכיתות עברית כשפה שנייה ולשיעורי שפה.' },
+      { q: 'האם התלמידים צריכים לפתוח חשבון?', a: 'לא. התלמידים מקלידים קוד בן 6 תווים שהמורה מציג על המסך ומתחילים לשחק מיד. רק המורים פותחים חשבון — בחינם — כדי לשמור רשימות מילים ולעקוב אחרי ההתקדמות של הכיתה.' },
       { q: 'אפשר לייבא רשימת אוצר מילים משלי?', a: 'כן. אפשר להעלות כל רשימת מילים — מיחידת לימוד, מספר לימוד או מתכנית הלימודים — ולשחק איתה בדו-קרבות אחד-על-אחד, במשחק לכל הכיתה או בתרגול אישי שמוקצה לתלמידים.' },
       { q: 'במה זה שונה מ-Quizlet, Kahoot או Wordwall?', a: 'Quizlet, Kahoot ו-Wordwall בנויים על כרטיסיות ועל חידוני רב-ברירה. LexiClash הוא משחק בניית מילים: התלמידים מרכיבים מילים על לוח אותיות, גלגל אותיות או אנגרמה. כך מתאמנים על איות, שליפה וזיהוי דפוסים — לא רק בחירה מתוך תשובות מוכנות. ובנוסף: בלי חשבונות לתלמידים, והכול חינם.' },
       { q: 'כמה זמן אורך מפגש כיתתי?', a: 'דו-קרב אוצר מילים אורך 2–3 דקות. סיבוב לכל הכיתה אורך 5–10 דקות. רוב המורים מריצים את זה כפעילות פתיחה של חמש דקות, כאתנחתא באמצע השיעור או כחזרה לקראת סוף השיעור.' },
@@ -214,11 +214,11 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
   ja: {
     metaTitle: '教室向け無料単語ゲーム — ライブグループゲーム・単語デュエル・ログイン不要 | LexiClash',
     metaDescription:
-      '教室向けに設計された無料単語ゲーム。生徒は4桁のコードで参加（ログイン不要、アカウント不要）。ライブ教室ゲーム、単語デュエル、カスタム単語リスト、リアルタイムダッシュボード。どのブラウザでも動作。クラス全員。',
+      '教室向けに設計された無料単語ゲーム。生徒は6文字のコードで参加（ログイン不要、アカウント不要）。ライブ教室ゲーム、単語デュエル、カスタム単語リスト、リアルタイムダッシュボード。どのブラウザでも動作。クラス全員。',
     ogTitle: '教室向け単語ゲーム — 無料・ログイン不要',
     ogDescription: 'コードで参加してすぐに遊べます。ライブ単語ゲーム、スペル練習、アカウント不要。どの端末でも動作します。',
     twitterTitle: '無料の教室向け単語ゲーム — LexiClash',
-    twitterDescription: '教室向けライブ単語ゲーム。4桁のコードで参加、ログイン不要、ほんもののボキャブラリー練習、クラス全員。',
+    twitterDescription: '教室向けライブ単語ゲーム。6文字のコードで参加、ログイン不要、ほんもののボキャブラリー練習、クラス全員。',
     heroTag: '★ 先生向け ★ 無料で開始 ★',
     heroPart1: '単語 ',
     heroHighlight1: 'ゲーム',
@@ -231,7 +231,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'あなたが ',
     featuresTitleHighlight: '得られるもの',
     features: [
-      { icon: '⚡', text: '生徒は4桁のコードで5秒で参加 — ログインなし、メールなし' },
+      { icon: '⚡', text: '生徒は6文字のコードで5秒で参加 — ログインなし、メールなし' },
       { icon: '🎯', text: '3つのゲームモード：文字グリッド、単語ハント、単語ホイール' },
       { icon: '👥', text: 'リアルタイムマルチプレイヤー — クラス全員が一緒に' },
       { icon: '⚔️', text: '1対1の単語デュエル — ペアと小グループ練習用' },
@@ -251,8 +251,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: '先生向け ',
     faqTitleHighlight: 'よくある質問',
     faqs: [
-      { q: '教室に最適な単語ゲームは？', a: 'LexiClashは教室向けに構築：生徒が4桁のコードで参加（登録なし）し、先生が単語リストを選んで、クラス全体が5～10分でライブプレイします。ゲームはどのブラウザでも動作し、英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語をサポート——ヘブライ語クラス、ESLクラス、外国語クラスにも対応。' },
-      { q: '生徒はアカウントを開く必要がありますか？', a: 'いいえ。生徒は先生が表示した4桁のコードを入力してすぐに遊び始めます。先生だけが無料アカウントを開きます——単語リストを保存し、クラスの進歩を追跡するため。' },
+      { q: '教室に最適な単語ゲームは？', a: 'LexiClashは教室向けに構築：生徒が6文字のコードで参加（登録なし）し、先生が単語リストを選んで、クラス全体が5～10分でライブプレイします。ゲームはどのブラウザでも動作し、英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語をサポート——ヘブライ語クラス、ESLクラス、外国語クラスにも対応。' },
+      { q: '生徒はアカウントを開く必要がありますか？', a: 'いいえ。生徒は先生が表示した6文字のコードを入力してすぐに遊び始めます。先生だけが無料アカウントを開きます——単語リストを保存し、クラスの進歩を追跡するため。' },
       { q: '自分の単語リストをアップロードできますか？', a: 'はい。任意の単語リストをアップロード——レッスン・章・カリキュラムから——1対1デュエル・全クラスラウンド・生徒に割り当てられた個別練習としてプレイできます。' },
       { q: 'Quizlet、Kahoot、Wordwallとの違いは？', a: 'Quizlet、Kahoot、Wordwallはフラッシュカードと多肢選択クイズベース。LexiClashは単語構築ゲーム：生徒が文字グリッド・単語ホイール・アナグラムボードで単語を構築します。つまりスペル・リトリーバル・パターン認識を練習——与えられた選択肢から選ぶだけではない。さらに：生徒アカウントなし、完全無料。' },
       { q: '教室セッションはどのくらい長いですか？', a: '1つの単語デュエルは2～3分。全クラスラウンドは5～10分。ほとんどの先生は5分のクラスオープナー・授業中の頭のリセット・終了前の素早い復習として実行。' },
@@ -271,11 +271,11 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
   es: {
     metaTitle: 'Juegos de palabras gratis para aulas — Juegos en vivo, duelos de vocabulario, sin registro | LexiClash',
     metaDescription:
-      'Juegos de palabras gratis diseñados para el aula. Los alumnos se unen con un código de 4 dígitos (sin registro, sin cuentas). Juegos de aula en vivo, duelos de vocabulario, listas de palabras personalizadas y tableros en tiempo real. Funciona en cualquier navegador. Toda la clase.',
+      'Juegos de palabras gratis diseñados para el aula. Los alumnos se unen con un código de 6 caracteres (sin registro, sin cuentas). Juegos de aula en vivo, duelos de vocabulario, listas de palabras personalizadas y tableros en tiempo real. Funciona en cualquier navegador. Toda la clase.',
     ogTitle: 'Juegos de palabras para aula — gratis, sin registro',
     ogDescription: 'Únete con un código y juega al instante. Juegos en vivo, práctica de ortografía, sin cuentas necesarias. Funciona en cualquier dispositivo.',
     twitterTitle: 'Juegos de palabras gratis para aula — LexiClash',
-    twitterDescription: 'Juegos en vivo para aula. Código de 4 dígitos para unirse, sin registro, práctica real de vocabulario, toda la clase.',
+    twitterDescription: 'Juegos en vivo para aula. Código de 6 caracteres para unirse, sin registro, práctica real de vocabulario, toda la clase.',
     heroTag: '★ PARA MAESTROS ★ GRATIS PARA EMPEZAR ★',
     heroPart1: 'Juegos de ',
     heroHighlight1: 'palabras',
@@ -288,7 +288,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'Lo que ',
     featuresTitleHighlight: 'obtienes',
     features: [
-      { icon: '⚡', text: 'Los alumnos se unen en 5 segundos con un código de 4 dígitos — sin registro, sin correo' },
+      { icon: '⚡', text: 'Los alumnos se unen en 5 segundos con un código de 6 caracteres — sin registro, sin correo' },
       { icon: '🎯', text: 'Tres modos de juego: cuadrícula de letras, búsqueda de palabras, rueda de palabras' },
       { icon: '👥', text: 'Multijugador en vivo — toda la clase a la vez' },
       { icon: '⚔️', text: 'Duelos de vocabulario cara a cara — para práctica en parejas o pequeños grupos' },
@@ -308,8 +308,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: 'Preguntas de ',
     faqTitleHighlight: 'maestros',
     faqs: [
-      { q: '¿Cuáles son los mejores juegos de palabras para un aula?', a: 'LexiClash está diseñado para aulas: los alumnos se unen con un código de 4 dígitos (sin registro), el maestro elige una lista de palabras, y toda la clase juega en vivo en 5–10 minutos. El juego funciona en cualquier navegador y admite inglés, hebreo, español, sueco, japonés y ruso — así que también funciona para aulas de hebreo, aulas de ESL y aulas de idiomas extranjeros.' },
-      { q: '¿Necesitan los alumnos abrir una cuenta?', a: 'No. Los alumnos escriben un código de 4 dígitos que el maestro muestra y comienzan a jugar inmediatamente. Solo los maestros abren una cuenta gratis — para guardar listas de palabras y seguir el progreso de la clase.' },
+      { q: '¿Cuáles son los mejores juegos de palabras para un aula?', a: 'LexiClash está diseñado para aulas: los alumnos se unen con un código de 6 caracteres (sin registro), el maestro elige una lista de palabras, y toda la clase juega en vivo en 5–10 minutos. El juego funciona en cualquier navegador y admite inglés, hebreo, español, sueco, japonés y ruso — así que también funciona para aulas de hebreo, aulas de ESL y aulas de idiomas extranjeros.' },
+      { q: '¿Necesitan los alumnos abrir una cuenta?', a: 'No. Los alumnos escriben un código de 6 caracteres que el maestro muestra y comienzan a jugar inmediatamente. Solo los maestros abren una cuenta gratis — para guardar listas de palabras y seguir el progreso de la clase.' },
       { q: '¿Puedo subir mi propia lista de vocabulario?', a: 'Sí. Sube cualquier lista de palabras — de una lección, un capítulo o tu plan de estudios — y juega como duelos uno a uno, una ronda de toda la clase, o práctica individual asignada a alumnos.' },
       { q: '¿Cómo se diferencia de Quizlet, Kahoot o Wordwall?', a: 'Quizlet, Kahoot y Wordwall se basan en tarjetas didácticas y cuestionarios de opción múltiple. LexiClash es un juego de construcción de palabras: los alumnos construyen palabras en una cuadrícula de letras, rueda de palabras o tablero de anagramas. Eso significa que practican ortografía, recuperación y reconocimiento de patrones — no solo elegir entre respuestas dadas. Además: sin cuentas de alumnos, y es completamente gratis.' },
       { q: '¿Cuánto dura una sesión de aula?', a: 'Un duelo de vocabulario toma 2–3 minutos. Una ronda de toda la clase toma 5–10 minutos. La mayoría de los maestros lo ejecutan como un inicio de clase de cinco minutos, un descanso mental a mitad de la lección o una rápida revisión antes de la campana.' },
@@ -328,11 +328,11 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
   ru: {
     metaTitle: 'Бесплатные словесные игры для класса — живые игры, словарные дуэли, без входа | LexiClash',
     metaDescription:
-      'Бесплатные словесные игры для урока. Ученики присоединяются по 4-значному коду (без входа, без аккаунтов). Живые классные игры, дуэли по словарю, свои списки слов, панели в реальном времени. Работает в браузере. Весь класс.',
+      'Бесплатные словесные игры для урока. Ученики присоединяются по коду из 6 символов (без входа, без аккаунтов). Живые классные игры, дуэли по словарю, свои списки слов, панели в реальном времени. Работает в браузере. Весь класс.',
     ogTitle: 'Словесные игры для класса — бесплатно, без входа',
     ogDescription: 'Введи код и играй. Живые игры, практика орфографии, аккаунты не нужны. Работает на любом устройстве.',
     twitterTitle: 'Бесплатные словесные игры для урока — LexiClash',
-    twitterDescription: 'Живые игры по словам. 4-значный код, без входа, реальная практика лексики, весь класс.',
+    twitterDescription: 'Живые игры по словам. код из 6 символов, без входа, реальная практика лексики, весь класс.',
     heroTag: '★ ДЛЯ УЧИТЕЛЕЙ ★ БЕСПЛАТНО НАЧАТЬ ★',
     heroPart1: 'Словесные ',
     heroHighlight1: 'игры',
@@ -345,7 +345,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'Что вы ',
     featuresTitleHighlight: 'получаете',
     features: [
-      { icon: '⚡', text: 'Ученики присоединяются за 5 секунд — вводят 4-значный код, без входа и почты' },
+      { icon: '⚡', text: 'Ученики присоединяются за 5 секунд — вводят код из 6 символов, без входа и почты' },
       { icon: '🎯', text: 'Три режима игры: буквенная сетка, охота за словами, колесо слов' },
       { icon: '👥', text: 'Живой мультиплеер — весь класс одновременно' },
       { icon: '⚔️', text: 'Лексические дуэли один на один — для работы в парах и малых группах' },
@@ -365,8 +365,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: 'Вопросы ',
     faqTitleHighlight: 'учителей',
     faqs: [
-      { q: 'Какие самые лучшие словесные игры для класса?', a: 'LexiClash специально для класса: ученики присоединяются по 4-значному коду (без входа), учитель выбирает список слов, весь класс играет живьём 5–10 минут. Работает в любом браузере, поддерживает английский, иврит, испанский, шведский, японский и русский — подходит для классов иврита, ESL и иностранных языков.' },
-      { q: 'Ученикам нужны аккаунты?', a: 'Нет. Ученики вводят 4-значный код, который показывает учитель, и сразу играют. Аккаунт открывает только учитель — бесплатно, чтобы сохранять списки и следить за прогрессом класса.' },
+      { q: 'Какие самые лучшие словесные игры для класса?', a: 'LexiClash специально для класса: ученики присоединяются по коду из 6 символов (без входа), учитель выбирает список слов, весь класс играет живьём 5–10 минут. Работает в любом браузере, поддерживает английский, иврит, испанский, шведский, японский и русский — подходит для классов иврита, ESL и иностранных языков.' },
+      { q: 'Ученикам нужны аккаунты?', a: 'Нет. Ученики вводят код из 6 символов, который показывает учитель, и сразу играют. Аккаунт открывает только учитель — бесплатно, чтобы сохранять списки и следить за прогрессом класса.' },
       { q: 'Смогу ли я загрузить свой список слов?', a: 'Да. Загрузите любой список — из урока, главы или программы — и играйте дуэли один на один, раунд со всем классом или назначьте персональную практику ученикам.' },
       { q: 'Чем это лучше Quizlet, Kahoot или Wordwall?', a: 'Quizlet, Kahoot и Wordwall — это карточки и викторины с выбором ответа. LexiClash — игра на построение слов: ученики составляют слова на сетке букв, колесе или анаграмме. Они практикуют орфографию, вспоминание и узнавание паттернов — не просто выбор из готовых вариантов. Плюс: без аккаунтов учеников, полностью бесплатно.' },
       { q: 'Сколько времени занимает игровой сеанс?', a: 'Один лексический дуэль — 2–3 минуты. Раунд со всем классом — 5–10 минут. Большинство учителей запускают как 5-минутное начало урока, перерыв посередине или быструю проверку перед звонком.' },

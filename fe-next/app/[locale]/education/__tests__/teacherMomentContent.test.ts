@@ -45,12 +45,14 @@ const ICONS = new Set([
  * 3 classrooms x 10 students with a $9/mo Teacher Pro tier, the app ships six
  * locales, and two different join-code generators exist (4-digit numeric in
  * backend/utils/gameUtils.ts, 6-char alphanumeric in utils/utils.ts and the SQL
- * function) so no page may state a code length at all.
+ * function) — RESOLVED: ClassroomGameLobby.tsx:141 and utils/utils.ts:118 both
+ * emit SIX characters, and the 4-digit generator in backend/utils/gameUtils.ts is
+ * exported but imported nowhere. So "4-digit" is simply wrong.
  */
 const FORBIDDEN: Array<[RegExp, string]> = [
   [/free forever|חינם לתמיד|gratis para siempre|gratis för alltid|永久に無料|навсегда бесплатн/i, 'promises "free forever" — a paid Teacher Pro tier exists'],
   [/no premium|premium tier|per-seat|sin plan premium|utan premium/i, 'denies the premium tier'],
-  [/\b\d-digit\b|\b\d\s?digit code|4 ספרות|4-siffrig|4桁|4 dígitos|4-значн/i, 'states a join-code length (unresolved in code)'],
+  [/\b4-digit\b|\b4 digit\b|4 ספרות|4-siffrig|4桁|4 dígitos|4-значн/i, 'says the join code is 4 digits — every code users see is 6 characters'],
   [/\bup to \d+ students\b|\b30 students\b|30 תלמידים|30 elever|30人の生徒|30 estudiantes|30 учеников/i, 'states a student cap the free tier does not deliver'],
   [/\bfive languages\b|\b5 languages\b|5 idiomas|fem språk|5つの言語|5 שפות|5 языков/i, 'says five languages — there are six'],
 ];

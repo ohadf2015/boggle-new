@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const faqs = [
   { q: 'Is LexiClash a free alternative to Blooket?', a: 'Yes — LexiClash is fully free with no premium tier. Blooket has a free plan but gates higher player caps, hosting history, and some game modes behind Blooket Plus (a paid subscription). LexiClash never locks classroom features behind a paywall.' },
-  { q: 'Do students need accounts to play LexiClash?', a: 'No. Students join with a 4-digit code shown by the teacher — no email, no signup. Blooket lets students join a live game with a code too, but creating sets, saving stats, and homework assignments are tied to teacher (and sometimes student) accounts.' },
+  { q: 'Do students need accounts to play LexiClash?', a: 'No. Students join with a 6-character code shown by the teacher — no email, no signup. Blooket lets students join a live game with a code too, but creating sets, saving stats, and homework assignments are tied to teacher (and sometimes student) accounts.' },
   { q: 'What is the difference between LexiClash and Blooket?', a: 'Blooket is a build-your-own quiz platform — you write question-and-answer sets, then students play them through arcade-style game modes. LexiClash is a ready-to-play word game: students find words on Boggle-style grids, anagrams, and word wheels. No question-writing required, and it is purpose-built for vocabulary and spelling, not generic trivia.' },
   { q: 'Can I use Blooket for vocabulary practice?', a: 'You can, but you have to author every term-definition question yourself, and the gameplay rewards fast clicking on multiple-choice answers rather than actually producing words. LexiClash drills spelling, recall, and letter patterns directly through word-formation gameplay — closer to the skill you are teaching.' },
   { q: 'Does LexiClash work for ESL and multilingual classrooms?', a: 'Yes. LexiClash has native dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese, with CEFR-scaled difficulty (A1–C2). Blooket content is whatever you type in — it has no built-in multilingual word validation.' },
@@ -57,7 +57,7 @@ const faqs = [
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Free tier (full classroom features)', '✓ Everything free', 'Free plan; Plus is paid'],
-  ['No student signup', '✓ 4-digit join code', '✓ Join code (accounts for full features)'],
+  ['No student signup', '✓ 6-character join code', '✓ Join code (accounts for full features)'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Trivia quiz + arcade game modes'],
   ['Content setup', 'Built-in or upload word list', 'Write your own question sets'],
   ['Vocabulary / spelling focus', '✓ Purpose-built', 'Generic — depends on your questions'],

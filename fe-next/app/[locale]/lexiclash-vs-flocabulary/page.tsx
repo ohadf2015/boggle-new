@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 const faqs = [
   { q: 'Is LexiClash a free alternative to Flocabulary?', a: 'Yes — LexiClash is fully free with no subscription. Flocabulary is a paid product (individual and school plans, billed annually). LexiClash never gates classroom features behind a paywall.' },
   { q: 'How is LexiClash different from Flocabulary?', a: 'Flocabulary teaches vocabulary through hip-hop videos plus follow-up activities like vocab cards and Lyric Lab — students mostly watch and respond. LexiClash is an active word game: students find and form words on Boggle-style grids, anagrams, and wheels in live rounds. Different cognitive load — production and recall under time pressure rather than reception.' },
-  { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 4-digit code shown by the teacher — no email or signup. Flocabulary student access is tied to class rosters and accounts.' },
+  { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code shown by the teacher — no email or signup. Flocabulary student access is tied to class rosters and accounts.' },
   { q: 'Is LexiClash good for ESL / English language learners?', a: 'Yes. LexiClash has native dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese with CEFR-scaled difficulty (A1–C2). Flocabulary is English-content-first (its songs and lessons are in English).' },
   { q: 'Can I use my own vocabulary words?', a: 'Yes — LexiClash teachers upload custom word lists from any unit and use them in duels, whole-class games, or practice. Flocabulary centers on its produced song-and-lesson library; custom word lists feed its activities differently.' },
   { q: 'Does LexiClash have multiplayer?', a: 'Yes — real-time, free, whole-class multiplayer for up to 30 students, plus 1v1 vocabulary duels. Flocabulary has interactive activities but is not built around live head-to-head multiplayer.' },
@@ -57,7 +57,7 @@ const faqs = [
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Free tier (full features)', '✓ Everything free', '✗ Paid subscription'],
-  ['No student signup', '✓ 4-digit join code', '✗ Roster / account access'],
+  ['No student signup', '✓ 6-character join code', '✗ Roster / account access'],
   ['Core format', 'Active word-formation games', 'Hip-hop videos + activities'],
   ['Student action', 'Produce & form words', 'Watch, then respond'],
   ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ (interactive lessons, not live PvP)'],
@@ -153,7 +153,7 @@ export default async function Page({ params }: PageProps) {
             {[
               { title: 'Free, no subscription', desc: 'Flocabulary is a paid annual plan. LexiClash classroom features are free and full — useful when there is no budget line for another license.' },
               { title: 'Active recall, not reception', desc: 'Watching a song builds recognition. Forming and spelling words under time pressure builds production and retrieval — the harder, stickier skill.' },
-              { title: 'No student accounts', desc: 'A 4-digit join code means any class plays instantly, including students without emails or rostered logins.' },
+              { title: 'No student accounts', desc: 'A 6-character join code means any class plays instantly, including students without emails or rostered logins.' },
               { title: 'Live multiplayer + duels', desc: 'Whole-class real-time games and 1v1 vocabulary duels add competitive energy Flocabulary’s lesson model doesn’t.' },
               { title: '5 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA. Flocabulary content is English-first.' },
               { title: 'Instant setup', desc: 'Pick a list, project the code, go. No lesson to assign, no roster to manage.' },

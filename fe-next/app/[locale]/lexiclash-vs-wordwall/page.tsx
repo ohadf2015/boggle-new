@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 const faqs = [
   { q: 'Is LexiClash a free alternative to Wordwall?', a: 'Yes — LexiClash is fully free with no premium tier. Wordwall has a free tier (limited to 5 active activities, basic templates) and paid plans starting at £4-9/month for unlimited activities and advanced templates. LexiClash never gates features behind a paywall.' },
   { q: 'How is LexiClash different from Wordwall?', a: 'Wordwall is a templated activity platform — teachers fill in word lists and get pre-built activities (match-up, anagram, balloon pop, quiz). LexiClash is a dedicated word-formation game — students play actual Boggle-style grids, anagrams, and word wheels with real multiplayer mechanics. Wordwall favors variety of templates; LexiClash favors depth of word-game experience.' },
-  { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 4-digit code. Wordwall activities are typically student-account-free too (just a link), but Wordwall gates leaderboards, time limits, and tracking behind teacher accounts and paid tiers.' },
+  { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code. Wordwall activities are typically student-account-free too (just a link), but Wordwall gates leaderboards, time limits, and tracking behind teacher accounts and paid tiers.' },
   { q: 'Can teachers upload their own word lists?', a: 'Yes on both. LexiClash word lists upload as plain CSV or paste-in. Wordwall has a similar workflow but requires you to pick a template + redo for each new activity type.' },
   { q: 'Which is better for ESL or language classes?', a: 'LexiClash has built-in dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese — vocabulary games run natively in each language. Wordwall supports any language for activity text but doesn’t have native word-game mechanics tied to language dictionaries.' },
   { q: 'Does LexiClash have whole-class multiplayer?', a: 'Yes — real-time, up to 30 students per session, all free. Wordwall’s "Race The Clock" and similar live modes are mostly Wordwall Pro/Plus features.' },
@@ -58,7 +58,7 @@ const faqs = [
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Free tier (full features)', '✓ Everything free', '✗ 5 activity limit free'],
   ['Pricing', '$0 forever', 'Pro £4-9/mo, Plus £15/mo'],
-  ['No student signup', '✓ 4-digit join code', '✓ link-based'],
+  ['No student signup', '✓ 6-character join code', '✓ link-based'],
   ['Game type', 'Dedicated word-formation games', 'Templated activities (match/quiz/spin)'],
   ['Word-game depth (Boggle/Wheel/Anagram)', '✓ Native mechanics', 'Anagram template only'],
   ['Live whole-class multiplayer', '✓ Free', '✓ Pro tier'],

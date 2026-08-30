@@ -13003,6 +13003,7 @@ const es = {
       "socialProof": "Miles de docentes ya lo usan.",
       "student": "Estudiante",
       "studentCta": "Empezar a aprender",
+      "studentJoinCta": "Entrar con el código de clase",
       "studentDesc": "Aprende vocabulario jugando multijugador",
       "studentFeature1": "Ve tu progreso en tiempo real",
       "studentFeature2": "Gana XP, insignias y rachas",
