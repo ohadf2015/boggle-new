@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6286,
+    "totalKeysInCode": 6283,
     "keyCountByLanguage": {
-      "en": 12130,
-      "es": 12426,
-      "he": 12331,
-      "ja": 12385,
-      "ru": 12165,
-      "sv": 12381
+      "en": 12146,
+      "es": 12442,
+      "he": 12347,
+      "ja": 12408,
+      "ru": 12187,
+      "sv": 12404
     },
     "missingFromEnglish": 66,
     "problematicFlatKeys": 0,
@@ -1332,7 +1332,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 191,
+        "line": 194,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}"
       },
       {
@@ -1724,14 +1724,14 @@
         "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 86,
+        "line": 93,
         "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
       },
       {
         "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
         "type": "template_literal",
         "file": "components/quick-play/QuickPlayHub.tsx",
-        "line": 437,
+        "line": 451,
         "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
       },
       {
@@ -2214,7 +2214,7 @@
         "pattern": "`tvResults.${labelKey}`",
         "type": "template_literal",
         "file": "host/components/tv-results/TvResultsWinnersPodium.tsx",
-        "line": 266,
+        "line": 274,
         "context": "{t(`tvResults.${labelKey}`)}"
       },
       {
@@ -3014,7 +3014,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 296,
+        "line": 300,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3022,7 +3022,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 296,
+        "line": 300,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3046,7 +3046,7 @@
         "variable": "encouragementKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 331,
+        "line": 337,
         "context": "{t(encouragementKey)}"
       },
       {
@@ -3054,7 +3054,7 @@
         "variable": "encouragementKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 335,
+        "line": 341,
         "context": "text={t(encouragementKey)}"
       },
       {
@@ -3062,7 +3062,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/singleplayer/results/PracticeResults.tsx",
-        "line": 396,
+        "line": 402,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -4087,8 +4087,6 @@
       "sealedBidLegacy.round",
       "sealedBidLegacy.youWin",
       "sealedBidLegacy.continue",
-      "wordTowerV2.cardTitle",
-      "wordTowerV2.cardDesc",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
@@ -4957,6 +4955,12 @@
       "adventure.gestureTutorial",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
+      "student.quickStart.title",
+      "student.quickStart.subtitle",
+      "student.quickStart.action",
+      "education.student.join.codeNotRecognised",
+      "education.student.join.codePlaceholder",
+      "education.student.join.nameRequired",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "asyncChallenge.pending",
@@ -5064,9 +5068,16 @@
       "reengagement.coins",
       "reengagement.streakFreeze",
       "reengagement.premiumDays",
-      "wordForge.perfectCraft"
+      "wordForge.perfectCraft",
+      "wordcraft.domination"
     ],
     "ru": [
+      "student.quickStart.title",
+      "student.quickStart.subtitle",
+      "student.quickStart.action",
+      "education.student.join.codeNotRecognised",
+      "education.student.join.codePlaceholder",
+      "education.student.join.nameRequired",
       "wordTower.surprise.echo",
       "wordTower.surprise.meteorStrike",
       "wordTower.surprise.phantomFloor",
@@ -5115,8 +5126,6 @@
       "sealedBid.yourWord"
     ],
     "sv": [
-      "modeCoach.wordTowerV2.cardTitle",
-      "modeCoach.wordTowerV2.cardDesc",
       "leadChange.tookTheLeadVerb",
       "leadChange.tookLeadWitty_0",
       "leadChange.tookLeadWitty_1",
@@ -5326,6 +5335,12 @@
       "admin.moderation.noFlags",
       "blast.results.mpResults.boardCleared",
       "blast.tutorial.mpResults.boardCleared",
+      "student.quickStart.title",
+      "student.quickStart.subtitle",
+      "student.quickStart.action",
+      "education.student.join.codeNotRecognised",
+      "education.student.join.codePlaceholder",
+      "education.student.join.nameRequired",
       "education.teacher.activeGames",
       "education.teacher.noActiveGames",
       "asyncChallenge.pending",
@@ -5432,7 +5447,8 @@
       "reengagement.bonusRewards",
       "reengagement.coins",
       "reengagement.streakFreeze",
-      "reengagement.premiumDays"
+      "reengagement.premiumDays",
+      "wordcraft.domination"
     ]
   }
 }

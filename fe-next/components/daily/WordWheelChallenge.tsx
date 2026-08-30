@@ -691,7 +691,9 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'playing' && puzzle && (
           <m.div
             key="playing"
-            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-bottom-stack lg:items-stretch lg:pt-0 relative z-20 overflow-y-auto overscroll-contain"
+            // No pb-bottom-stack: body.screen-fit-locked already reserves
+            // --bottom-stack-height for this screen, and padding is additive.
+            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 lg:items-stretch lg:pt-0 relative z-20 overflow-y-auto overscroll-contain"
             // Paint the board INSTANTLY on mount. With AnimatePresence mode="wait"
             // the playing layer only mounts after the ready layer finishes exiting;
             // a fade-in-from-opacity-0 here then leaves the bg-neo-navy parent fully

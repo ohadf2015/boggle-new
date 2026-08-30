@@ -64,7 +64,50 @@ real behaviour was verified in Chrome.
 
 Went RED on `PortraitGameLayout.tsx` only, GREEN after the fix.
 
-### Screen 3 — Word Wheel: diagnosed down to two ruled-out causes, not yet fixed
+### Screen 3 — Word Wheel: FIXED (two defects, both measured)
+
+**It only reproduces with an anchored ad banner.** On plain web at 384x832 the wheel
+is fine — I checked LTR and RTL at four heights with words on the board and found no
+overlap. Setting `has-admob-banner` + `--admob-banner-height: 90px` (the real Android
+condition, and visible in the user's screenshot) reproduced both symptoms exactly.
+
+**Defect 1 — `--bottom-stack-height` was reserved three times.** `body.screen-fit-locked`
+reserves it in globals.css, then `WordWheelChallenge`'s playing wrapper reserved it
+again, then `WordWheelGame`'s mobile root reserved it a third time. `WordWheelGame`'s
+own comment called this "defence in depth" — but padding is **additive, not
+idempotent**. With a 154px stack that is 3 x 154 = **462px lost from an 832px
+viewport**: content ended at y=370 (44%) with a huge dead band beneath, which is the
+"content only fills the top half" complaint. Removed both nested reservations.
+
+**Defect 2 — the wheel orbit's cap could exceed its container.** The orbit is
+`shrink-0` inside the `flex-1` cluster, so its own `max-w`/`max-h` are the only thing
+holding it in. They read `max(176px, calc(100cqb - 116px))`, and that **176px floor
+wins whenever the container is smaller than the floor**. Wrapped each cap in
+`min(100cqb, …)` — inert on normal viewports (100cqb is already the largest term),
+binding only when space is scarce.
+
+Measured at 384x832 with the banner simulated:
+
+| | before | after |
+|---|---|---|
+| wheel cluster | 360 x **126** | 360 x **434** |
+| orbit | 176 (floored, overflowing) | 256 x 256 |
+| Submit ↔ chips overlap | **60px** | **0** |
+| cluster overflow | 64px | **0** |
+| content bottom | **370** / 832 | **678** / 832 |
+
+678 = 832 − 154, i.e. exactly one correct reservation.
+
+Guard: `components/daily/__tests__/wordWheelOrbitClamp.contract.test.ts`.
+`WordWheelGame.bannerClearance.test.tsx` asserted the *buggy* intent (it required the
+game container to carry `pb-bottom-stack`); its assertion is inverted with the
+measurement recorded in the file header.
+
+Harness note: found-word chips sit at Framer Motion's `initial` state
+(`transform: matrix(0,…)`, `opacity: 0`) in a headless tab because rAF is throttled.
+`offsetHeight` is correct (28px), so layout is fine — do not chase this as a bug.
+
+### Superseded — earlier analysis kept for the reasoning trail
 
 Reproduced at 384×832 `/he/daily/word-wheel`. Here the height chain is **healthy**
 (`100cqb` = 548px, `scrollH == innerH`), so it is *not* the screen-1 bug.
