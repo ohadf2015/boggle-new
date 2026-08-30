@@ -16,7 +16,7 @@ import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vites
 import express from 'express';
 import request from 'supertest';
 
-const h = vi.hoisted(() => {
+const supabaseMock = vi.hoisted(() => {
   const row = { id: 1, score: 64, word_count: 3, words_found: ['CAT', 'BRIDGE', 'TRAIN'] };
   const builder: Record<string, unknown> = {};
   const chain = () => builder;
@@ -30,22 +30,15 @@ const h = vi.hoisted(() => {
       Promise.resolve({ data: [row], error: null, count: 0 }).then(resolve),
   });
 
-  const completeDailyQuestsForResult = vi.fn().mockResolvedValue(undefined);
-  const updateQuestProgress = vi.fn().mockResolvedValue(undefined);
-
-  return {
-    completeDailyQuestsForResult,
-    updateQuestProgress,
-    supabaseMock: { from: vi.fn(() => builder) },
-  };
+  return { from: vi.fn(() => builder) };
 });
 
 vi.mock('../../../modules/dailyMissionsManager', () => ({
-  completeDailyQuestsForResult: (...args: unknown[]) => h.completeDailyQuestsForResult(...args),
+  completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../../../modules/weeklyQuestManager', () => ({
-  updateQuestProgress: (...args: unknown[]) => h.updateQuestProgress(...args),
+  updateQuestProgress: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../profileStats', () => ({
@@ -66,9 +59,11 @@ vi.mock('../../../utils/logger', () => ({
 
 vi.mock('../../../modules/supabaseServer', () => ({
   isSupabaseConfigured: () => true,
-  getSupabase: () => h.supabaseMock,
+  getSupabase: () => supabaseMock,
 }));
 
+import { completeDailyQuestsForResult } from '../../../modules/dailyMissionsManager';
+import { updateQuestProgress } from '../../../modules/weeklyQuestManager';
 import router from '../wordWheelRoutes';
 
 const submission = {
@@ -86,8 +81,8 @@ const submission = {
 
 describe('POST /submit — daily quest credit', () => {
   beforeEach(() => {
-    h.completeDailyQuestsForResult.mockClear();
-    h.updateQuestProgress.mockClear();
+    (completeDailyQuestsForResult as MockedFunction<typeof completeDailyQuestsForResult>).mockClear();
+    (updateQuestProgress as MockedFunction<typeof updateQuestProgress>).mockClear();
   });
 
   it('credits TODAY\'s quests, not just the weekly counter', async () => {
@@ -97,9 +92,9 @@ describe('POST /submit — daily quest credit', () => {
 
     await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
 
-    expect(h.completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
+    expect(completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
 
-    const [playerId, result] = (h.completeDailyQuestsForResult as MockedFunction<typeof h.completeDailyQuestsForResult>).mock.calls[0];
+    const [playerId, result] = (completeDailyQuestsForResult as MockedFunction<typeof completeDailyQuestsForResult>).mock.calls[0];
     expect(playerId).toBe('player-1');
     expect(result).toMatchObject({
       mode: 'word-wheel',
@@ -116,7 +111,7 @@ describe('POST /submit — daily quest credit', () => {
 
     await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
 
-    expect(h.updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
+    expect(updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
   });
 
   it('credits nothing for a guest — there is no account to credit', async () => {
@@ -128,6 +123,6 @@ describe('POST /submit — daily quest credit', () => {
       .post('/api/daily-challenge/word-wheel/submit')
       .send({ ...submission, playerId: undefined, guestFingerprint: 'guest-abc' });
 
-    expect(h.completeDailyQuestsForResult).not.toHaveBeenCalled();
+    expect(completeDailyQuestsForResult).not.toHaveBeenCalled();
   });
 });
