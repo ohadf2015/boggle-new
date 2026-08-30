@@ -135,7 +135,7 @@ export default async function Page({ params }: PageProps) {
       { '@type': 'HowToStep', position: 1, name: 'Load this week\'s list', text: 'Paste 5-15 Dolch or Fry words into a custom word list in the LexiClash teacher dashboard. Bulk import takes under a minute.' },
       { '@type': 'HowToStep', position: 2, name: 'Flashcard warm-up', text: 'Run one 3-minute flashcard round over the list. Students see each word and hear it with the built-in pronunciation.' },
       { '@type': 'HowToStep', position: 3, name: 'Game round', text: 'Play a 5-minute word-matching or spelling-challenge round on the same list, or open the daily Word Hunt grid and race to spot familiar words.' },
-      { '@type': 'HowToStep', position: 4, name: 'Make it social', text: 'Pair two students for a 1v1 word duel, or run the list as a whole-class game with a 4-digit join code.' },
+      { '@type': 'HowToStep', position: 4, name: 'Make it social', text: 'Pair two students for a 1v1 word duel, or run the list as a whole-class game with a 6-character join code.' },
     ],
   };
 

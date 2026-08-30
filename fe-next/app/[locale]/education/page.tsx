@@ -60,7 +60,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
     subhead: 'Pick the right format for your classroom — quick 1v1 duels or live whole-class multiplayer.',
     cards: {
       duels: { title: 'Vocabulary Duels (1v1)', desc: 'Pair students for 2-3 minute head-to-head word battles.' },
-      classroom: { title: 'Live Classroom Game', desc: 'Whole-class multiplayer; up to 30 students join with a 4-digit code.' },
+      classroom: { title: 'Live Classroom Game', desc: 'Whole-class multiplayer; up to 30 students join with a 6-character code.' },
     },
   },
   he: {

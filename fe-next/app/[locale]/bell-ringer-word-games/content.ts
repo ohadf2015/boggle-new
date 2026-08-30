@@ -35,14 +35,14 @@ const contentMap: Record<BellRingerLocale, LocaleContent> = {
   en: {
     metaTitle: 'Bell Ringer Word Games — Free 5-Minute ELA Warm-Ups (2026) | LexiClash',
     metaDescription:
-      'Free bell ringer word games for ELA. A 5-minute start-of-class warm-up students join with a 4-digit code — no login, no prep. Vocabulary and spelling word-formation games, your word lists, any device.',
+      'Free bell ringer word games for ELA. A 5-minute start-of-class warm-up students join with a 6-character code — no login, no prep. Vocabulary and spelling word-formation games, your word lists, any device.',
     ogTitle: 'Bell Ringer Word Games — Free 5-Minute Warm-Ups',
     ogDescription: 'Start class with a live word game. Join with a code, no login, no prep. Your word lists. Free.',
     twitterTitle: 'Bell Ringer Word Games — Free',
     twitterDescription: '5-minute start-of-class word games. No login, no prep. Free.',
     heroTitle: 'A bell ringer the whole class is playing before the bell stops.',
     intro:
-      'The best bell ringer is the one you can actually run every day. LexiClash is a 5-minute, no-login, no-prep word game: project a 4-digit code, students join on any device, and a live word-formation round opens class with real vocabulary and spelling practice. Reuse this week\'s word list as the daily warm-up, or grab a built-in one for zero prep. Free, browser-based, and predictable enough to become a routine — productive, not just a time-filler.',
+      'The best bell ringer is the one you can actually run every day. LexiClash is a 5-minute, no-login, no-prep word game: project a 6-character code, students join on any device, and a live word-formation round opens class with real vocabulary and spelling practice. Reuse this week\'s word list as the daily warm-up, or grab a built-in one for zero prep. Free, browser-based, and predictable enough to become a routine — productive, not just a time-filler.',
     ctaStart: 'Start a Warm-Up Free',
     ctaClassroom: 'All Classroom Word Games',
     ctaDuels: '1v1 Duel Warm-Up',
@@ -57,14 +57,14 @@ const contentMap: Record<BellRingerLocale, LocaleContent> = {
     ],
     stepsTitle: 'The 5-minute routine',
     steps: [
-      { t: 'Project the code', d: 'As students walk in, the 4-digit join code is already on the board.' },
+      { t: 'Project the code', d: 'As students walk in, the 6-character join code is already on the board.' },
       { t: 'They join and play', d: 'No login, any device. The round starts as the bell finishes ringing.' },
       { t: 'Transition warm', d: 'Five minutes later the room is awake and primed — move straight into the lesson.' },
     ],
     faqTitle: 'Frequently asked questions',
     faqs: [
-      { q: 'What makes a good bell ringer word game?', a: 'It starts instantly, runs in about 5 minutes, and needs zero prep so it works every single day. LexiClash fits: project a 4-digit code, students join on any device with no login, and a live word-formation round fills the first five minutes of class with vocabulary or spelling practice.' },
-      { q: 'Do students need to log in for the warm-up?', a: 'No. A 4-digit join code means students are playing in seconds — critical for a bell ringer, where any login friction eats the whole activity.' },
+      { q: 'What makes a good bell ringer word game?', a: 'It starts instantly, runs in about 5 minutes, and needs zero prep so it works every single day. LexiClash fits: project a 6-character code, students join on any device with no login, and a live word-formation round fills the first five minutes of class with vocabulary or spelling practice.' },
+      { q: 'Do students need to log in for the warm-up?', a: 'No. A 6-character join code means students are playing in seconds — critical for a bell ringer, where any login friction eats the whole activity.' },
       { q: 'Can I tie the bell ringer to my current unit?', a: 'Yes. Upload your unit vocabulary once and reuse it all week as a warm-up, or use a built-in list when you want true zero prep. Same word list can power Monday\'s warm-up and Friday\'s review.' },
       { q: 'Is it free?', a: 'Yes — fully free, no premium tier, no per-class limit beyond 30 students in a live game.' },
       { q: 'What skills does it practice?', a: 'Word formation on Boggle-style grids, anagrams, and wheels drills spelling, vocabulary recall, and letter patterns — a productive academic warm-up, not just a time-filler.' },

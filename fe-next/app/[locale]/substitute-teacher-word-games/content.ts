@@ -37,7 +37,7 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
   en: {
     metaTitle: 'Substitute Teacher Word Games — Free, Zero-Prep, No Login (2026) | LexiClash',
     metaDescription:
-      'Free zero-prep word games for substitute teachers. Students join a live game with a 4-digit code — no login, no accounts, no setup. Works on any device with built-in word lists. Perfect emergency sub plans and fillers.',
+      'Free zero-prep word games for substitute teachers. Students join a live game with a 6-character code — no login, no accounts, no setup. Works on any device with built-in word lists. Perfect emergency sub plans and fillers.',
     ogTitle: 'Substitute Teacher Word Games — Free, Zero-Prep',
     ogDescription:
       'No login, no accounts, no setup. Project a code, students play. The emergency sub plan that always works. Free.',
@@ -45,14 +45,14 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
     twitterDescription: 'Zero-prep, no-login word games for sub days. Project a code, students play. Free.',
     heroTitle: 'The sub-day plan that needs nothing from you.',
     intro:
-      'Sub plans fail when they assume prep, logins, or knowing the class. LexiClash assumes none of it. A substitute projects a 4-digit code, students join on any device with no account, and a live word game runs from a built-in list — zero prep, zero login, zero roster. It holds a class better than a worksheet, keeps things academic (real spelling and vocabulary practice), and scales from a five-minute filler to most of a period when plans fall through. Free, browser-based, and reliable in a room the sub has never seen.',
+      'Sub plans fail when they assume prep, logins, or knowing the class. LexiClash assumes none of it. A substitute projects a 6-character code, students join on any device with no account, and a live word game runs from a built-in list — zero prep, zero login, zero roster. It holds a class better than a worksheet, keeps things academic (real spelling and vocabulary practice), and scales from a five-minute filler to most of a period when plans fall through. Free, browser-based, and reliable in a room the sub has never seen.',
     ctaStart: 'Start a Game Free',
     ctaClassroom: 'Classroom Word Games',
     ctaDuels: '1v1 Duels',
     fitsTitle: 'Why subs reach for it',
     fits: [
       { title: 'Nothing to prep', desc: 'Built-in word lists mean a sub starts a real game with zero preparation. The emergency plan that works when nothing was left.' },
-      { title: 'No login, no roster', desc: 'A 4-digit join code means the sub doesn’t need accounts, names, or a seating chart — students just join and play.' },
+      { title: 'No login, no roster', desc: 'A 6-character join code means the sub doesn’t need accounts, names, or a seating chart — students just join and play.' },
       { title: 'Works on any device', desc: 'Browser only — Chromebooks, tablets, phones, the room’s laptops. Nothing to install in an unfamiliar room.' },
       { title: 'Keeps the class engaged', desc: 'Live, competitive word rounds hold attention far better than a worksheet — fewer behavior problems on a sub day.' },
       { title: 'Actually academic', desc: 'Students practice spelling and vocabulary, so the regular teacher comes back to learning, not lost time.' },
@@ -61,7 +61,7 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
     stepsTitle: 'Running it cold, in 3 steps',
     steps: [
       { t: 'Open a built-in list', d: 'No prep needed — pick a ready word list and a time limit.' },
-      { t: 'Project the code', d: 'Students type the 4-digit code on any device. No accounts, no names needed.' },
+      { t: 'Project the code', d: 'Students type the 6-character code on any device. No accounts, no names needed.' },
       { t: 'Play, repeat', d: 'Run one round as a filler or several to cover the period. Live leaderboard keeps focus.' },
     ],
     regularTitle: 'For the regular teacher',
@@ -69,8 +69,8 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
       'Leaving a sub plan? Drop the LexiClash join link and a word list in your sub notes. Your students get academic word practice instead of a movie or busywork, the sub gets a plan that can’t fail, and you come back to a class that actually reviewed vocabulary while you were out — no make-up grading, no chaos to clean up.',
     faqTitle: 'Frequently asked questions',
     faqs: [
-      { q: 'Why is this good for substitute teachers?', a: 'Because it needs nothing from you. There’s no login, no account setup, no materials to prep, and no class roster to know. A sub projects a 4-digit code, students join on any device, and a live word game runs — even with no prior knowledge of the class or subject.' },
-      { q: 'Do students or the sub need accounts?', a: 'No. Students join with a 4-digit code, and a sub can start a game from a built-in word list without any account at all. Zero friction is the whole point for an unfamiliar room.' },
+      { q: 'Why is this good for substitute teachers?', a: 'Because it needs nothing from you. There’s no login, no account setup, no materials to prep, and no class roster to know. A sub projects a 6-character code, students join on any device, and a live word game runs — even with no prior knowledge of the class or subject.' },
+      { q: 'Do students or the sub need accounts?', a: 'No. Students join with a 6-character code, and a sub can start a game from a built-in word list without any account at all. Zero friction is the whole point for an unfamiliar room.' },
       { q: 'Is any prep required?', a: 'None. Built-in word lists mean a sub can start a full game with no preparation — ideal for emergency sub plans dropped in that morning. If the regular teacher wants it tied to the unit, they can leave a custom word list ready to play.' },
       { q: 'Is it free?', a: 'Yes — fully free, no premium tier. Up to 30 students per live game.' },
       { q: 'What grades does it suit?', a: 'Strongest for upper-elementary through high school and adult ESL. CEFR-scaled difficulty (A1–C2) lets a sub pick a level that fits whatever class they walk into.' },

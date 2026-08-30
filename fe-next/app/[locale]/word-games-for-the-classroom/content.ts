@@ -25,13 +25,13 @@ export interface LocaleContent {
 
 const en: LocaleContent = {
   metaTitle: 'Word Games for the Classroom — Free, No Login, No Download (2026) | LexiClash',
-  metaDescription: 'Free word games for the classroom with no login and no download. Students join live multiplayer games with a 4-digit code in seconds. Use your own word lists, 6 languages, works on any device. Zero prep for teachers.',
+  metaDescription: 'Free word games for the classroom with no login and no download. Students join live multiplayer games with a 6-character code in seconds. Use your own word lists, 6 languages, works on any device. Zero prep for teachers.',
   ogTitle: 'Word Games for the Classroom — Free, No Login',
   ogDescription: 'Live multiplayer word games students join with a code. No download, no signup. Any device. Free forever.',
   twitterTitle: 'Word Games for the Classroom — Free',
   twitterDescription: 'Live multiplayer word games. No login, no download. Free.',
   heroTitle: 'Word games for the classroom — no login, no download, no prep.',
-  intro: 'Most classroom games want student accounts, an app install, or both. LexiClash wants a 4-digit code. Project it, students type it on any device, and the whole class is playing a live word game in seconds — free, browser-based, nothing to install. Word-formation gameplay (find and spell real words on Boggle-style grids, anagrams, and wheels) makes it perfect for vocabulary review, spelling, and brain breaks. Bring your own word list or use a built-in one for true zero prep.',
+  intro: 'Most classroom games want student accounts, an app install, or both. LexiClash wants a 6-character code. Project it, students type it on any device, and the whole class is playing a live word game in seconds — free, browser-based, nothing to install. Word-formation gameplay (find and spell real words on Boggle-style grids, anagrams, and wheels) makes it perfect for vocabulary review, spelling, and brain breaks. Bring your own word list or use a built-in one for true zero prep.',
   ctaStart: 'Start a Class Game Free',
   ctaCduel: 'Run a 1v1 Duel',
   ctaMiddleSchool: 'Middle School Games',
@@ -70,7 +70,7 @@ const en: LocaleContent = {
     },
     {
       t: 'Project the code',
-      d: 'You get a 4-digit room code. Throw it on the board, screen, or say it aloud. Students type it in to join.'
+      d: 'You get a 6-character room code. Throw it on the board, screen, or say it aloud. Students type it in to join.'
     },
     {
       t: 'Play + review',
@@ -81,7 +81,7 @@ const en: LocaleContent = {
   faqs: [
     {
       q: 'Do students need to create an account?',
-      a: 'No. They just type the 4-digit room code on the join screen. Zero friction, zero setup.'
+      a: 'No. They just type the 6-character room code on the join screen. Zero friction, zero setup.'
     },
     {
       q: 'What if students don\'t have a device?',

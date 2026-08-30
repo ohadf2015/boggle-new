@@ -55,7 +55,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'VocabularySpellingCity tier features and pricing as of 2026 — check the vendor for current Premium plans.',
     compareRows: [
       ['Free tier (full features)', '✓ Everything free', '✗ Premium for most games'],
-      ['No student login', '✓ 4-digit join code', '✗ Student accounts'],
+      ['No student login', '✓ 6-character join code', '✗ Student accounts'],
       ['Core format', 'Live multiplayer word games', 'Individual self-paced games'],
       ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ Solo practice model'],
       ['1v1 duels with student pairing', '✓', '✗'],
@@ -75,7 +75,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'No student logins',
-        desc: 'A 4-digit join code means no account provisioning. Every student plays in seconds, including those without rostered logins.',
+        desc: 'A 6-character join code means no account provisioning. Every student plays in seconds, including those without rostered logins.',
       },
       {
         title: 'Free, full features',
@@ -109,7 +109,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Do students need logins on LexiClash?',
-        a: 'No. Students join with a 4-digit code shown by the teacher — no individual accounts. SpellingCity students typically log into assigned accounts to track their practice.',
+        a: 'No. Students join with a 6-character code shown by the teacher — no individual accounts. SpellingCity students typically log into assigned accounts to track their practice.',
       },
       {
         q: 'Can I use my own spelling lists?',

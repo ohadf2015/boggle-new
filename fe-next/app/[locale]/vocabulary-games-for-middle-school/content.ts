@@ -35,7 +35,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   en: {
     metaTitle: 'Vocabulary Games for Middle School — Free, No-Login Multiplayer (2026) | LexiClash',
     metaDescription:
-      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 4-digit code — no logins, no signup. Use your own word lists, CEFR-scaled for ESL, ready in under a minute.',
+      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 6-character code — no logins, no signup. Use your own word lists, CEFR-scaled for ESL, ready in under a minute.',
     ogTitle: 'Vocabulary Games for Middle School — Free & No-Login',
     ogDescription:
       'Live multiplayer vocabulary games for grades 6–8. Join with a code, no signup. Your word lists. Free forever.',
@@ -43,7 +43,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     twitterDescription: 'Live multiplayer vocabulary games, grades 6–8. No login. Free.',
     heroTitle: 'Vocabulary games middle schoolers actually want to play.',
     intro:
-      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 4-digit code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty scales A1–C2 for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
+      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 6-character code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty scales A1–C2 for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
     ctaStart: 'Start a Class Game Free',
     ctaDuels: 'Run a 1v1 Duel',
     ctaMore: 'All Classroom Games',
@@ -51,7 +51,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     fits: [
       {
         title: 'No logins to slow you down',
-        desc: 'A 4-digit join code beats provisioning 30 accounts. Perfect for 1:1 Chromebook carts and BYOD where students don\'t all have school emails.'
+        desc: 'A 6-character join code beats provisioning 30 accounts. Perfect for 1:1 Chromebook carts and BYOD where students don\'t all have school emails.'
       },
       {
         title: 'Your word list, not ours',
@@ -82,7 +82,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         t: 'Project the code',
-        d: 'Students open the link and type the 4-digit join code. No accounts, any device.'
+        d: 'Students open the link and type the 6-character join code. No accounts, any device.'
       },
       {
         t: 'Play + review',
@@ -97,7 +97,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: 'Do my middle schoolers need accounts or logins?',
-        a: 'No. Students join a classroom game with a 4-digit code you project — no email, no signup, no rostering. That removes the biggest setup friction for 1:1 and BYOD classrooms.'
+        a: 'No. Students join a classroom game with a 6-character code you project — no email, no signup, no rostering. That removes the biggest setup friction for 1:1 and BYOD classrooms.'
       },
       {
         q: 'Can I use my own vocabulary words?',
@@ -320,7 +320,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   ja: {
     metaTitle: 'Vocabulary Games for Middle School — Free, No-Login Multiplayer (2026) | LexiClash',
     metaDescription:
-      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 4-digit code — no logins, no signup. Use your own word lists, CEFR-scaled for ESL, ready in under a minute.',
+      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 6-character code — no logins, no signup. Use your own word lists, CEFR-scaled for ESL, ready in under a minute.',
     ogTitle: 'Vocabulary Games for Middle School — Free & No-Login',
     ogDescription:
       'Live multiplayer vocabulary games for grades 6–8. Join with a code, no signup. Your word lists. Free forever.',
@@ -328,7 +328,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     twitterDescription: 'Live multiplayer vocabulary games, grades 6–8. No login. Free.',
     heroTitle: '中学生が本当にやりたい語彙ゲーム。',
     intro:
-      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 4-digit code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty scales A1–C2 for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
+      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 6-character code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty scales A1–C2 for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
     ctaStart: 'クラスゲームを無料で開始',
     ctaDuels: '1v1デュエルを実行',
     ctaMore: 'すべてのクラスルームゲーム',
@@ -336,7 +336,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     fits: [
       {
         title: 'ログインの手間がない',
-        desc: 'A 4-digit join code beats provisioning 30 accounts. Perfect for 1:1 Chromebook carts and BYOD where students don\'t all have school emails.'
+        desc: 'A 6-character join code beats provisioning 30 accounts. Perfect for 1:1 Chromebook carts and BYOD where students don\'t all have school emails.'
       },
       {
         title: 'あなたの単語リスト、私たちのではなく',
@@ -367,7 +367,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         t: 'コードを表示',
-        d: 'Students open the link and type the 4-digit join code. No accounts, any device.'
+        d: 'Students open the link and type the 6-character join code. No accounts, any device.'
       },
       {
         t: 'プレイ+レビュー',
@@ -382,7 +382,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: '中学生はアカウントまたはログインが必要ですか？',
-        a: 'No. Students join a classroom game with a 4-digit code you project — no email, no signup, no rostering. That removes the biggest setup friction for 1:1 and BYOD classrooms.'
+        a: 'No. Students join a classroom game with a 6-character code you project — no email, no signup, no rostering. That removes the biggest setup friction for 1:1 and BYOD classrooms.'
       },
       {
         q: '自分の語彙を使用できますか？',

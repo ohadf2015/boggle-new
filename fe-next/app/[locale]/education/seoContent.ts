@@ -15,7 +15,7 @@ export type EducationSeoEntry = {
 export const educationSeoContent: Record<string, EducationSeoEntry> = {
   en: {
     title: 'Free Vocabulary Games for the Classroom — No Student Logins',
-    description: 'Free word and vocabulary games for your classroom — no student accounts, no downloads, and no per-seat fees. Bring your own word lists, run whole-class multiplayer in any browser, and teach vocabulary in 5 languages including Hebrew and Japanese. Free 30-day trial for teachers; school plans from $149/year.',
+    description: 'Free word and vocabulary games for your classroom — no student accounts, no downloads, and no per-seat fees. Bring your own word lists, run whole-class multiplayer in any browser, and teach vocabulary in 6 languages including Hebrew and Japanese. Free 30-day trial for teachers; school plans from $149/year.',
     features: [
       'Classroom word games designed for student engagement and learning outcomes',
       'Vocabulary duels between students for competitive, fun review sessions',
@@ -29,18 +29,18 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       { question: 'Is LexiClash an educational word game for students of all ages?', answer: 'Yes. Difficulty and word lists are customizable per assignment, making it suitable for primary, middle, and high school students as well as adult learners.' },
       { question: 'Can I use LexiClash as a vocabulary game for teachers?', answer: 'Absolutely. The teacher hub lets you build custom word lists from your curriculum, schedule game sessions, view class-wide analytics, and export results for grading.' },
       { question: 'How does the vocabulary duel format work?', answer: 'Two or more students compete head-to-head to find words from a shared board as fast as possible. First to hit the target score wins. Teachers can restrict word lists to vocabulary from current lessons.' },
-      { question: 'Do students need an account to play?', answer: 'No. Students join a classroom session with a 4-digit code and play instantly in any browser. Only the teacher needs an account to manage classrooms and word lists.' },
+      { question: 'Do students need an account to play?', answer: 'No. Students join a classroom session with a 6-character code and play instantly in any browser. Only the teacher needs an account to manage classrooms and word lists.' },
       { question: 'Is LexiClash Education really free?', answer: 'Free to start, and the free plan is a real one: a class of up to 10 students, every word game, vocabulary duels, classroom multiplayer, your own word lists, and no ads. Teacher Pro is $9/month and only adds unlimited classes, unlimited students, and the progress analytics dashboard.' },
-      { question: 'How does LexiClash compare to Quizlet, Kahoot, or Wordwall?', answer: 'LexiClash focuses on word-formation gameplay (Boggle-style grids, anagrams, word wheels) rather than flashcards or quizzes. It runs without student accounts, supports 5 languages including Hebrew RTL and Japanese, and adds real-time multiplayer for the whole class — all on a free tier.' },
+      { question: 'How does LexiClash compare to Quizlet, Kahoot, or Wordwall?', answer: 'LexiClash focuses on word-formation gameplay (Boggle-style grids, anagrams, word wheels) rather than flashcards or quizzes. It runs without student accounts, supports 6 languages including Hebrew RTL and Japanese, and adds real-time multiplayer for the whole class — all on a free tier.' },
       { question: 'What languages does LexiClash Education support?', answer: 'English, Hebrew (with full right-to-left layout), Swedish, Japanese, and Spanish. Each language has its own dictionary, making LexiClash suitable for ESL/EFL classrooms, Hebrew immersion programs, and multilingual schools.' },
       { question: 'How long is a typical classroom session?', answer: 'A vocabulary duel takes 2–3 minutes. A whole-class word game runs 5–10 minutes. Most teachers use LexiClash as a 5-minute warm-up, mid-lesson brain break, or end-of-class review activity.' },
       { question: 'Can I use my own vocabulary or word list?', answer: 'Yes. Build a custom word list from your own curriculum or paste any vocabulary set, and students play the word games using exactly the words you are teaching that week — there is no fixed word bank you are stuck with.' },
-      { question: 'Do students need to download or install anything?', answer: 'No. LexiClash runs in any browser — Chromebooks, tablets, phones, or desktops — with no app, plugin, or install to manage. Students join with a 4-digit code and start playing instantly.' },
+      { question: 'Do students need to download or install anything?', answer: 'No. LexiClash runs in any browser — Chromebooks, tablets, phones, or desktops — with no app, plugin, or install to manage. Students join with a 6-character code and start playing instantly.' },
     ],
   },
   he: {
     title: 'משחקי אוצר מילים חינמיים לכיתה — בלי חשבונות לתלמידים',
-    description: 'משחקי מילים ואוצר מילים חינמיים לכיתה — בלי חשבונות לתלמידים, בלי פרסומות ובלי הורדות. מביאים רשימת מילים משלכם, מריצים משחק לכל הכיתה מכל דפדפן, ומלמדים אוצר מילים ב-5 שפות, כולל עברית ויפנית. נבנה למורים, וחינם לתמיד.',
+    description: 'משחקי מילים ואוצר מילים חינמיים לכיתה — בלי חשבונות לתלמידים, בלי פרסומות ובלי הורדות. מביאים רשימת מילים משלכם, מריצים משחק לכל הכיתה מכל דפדפן, ומלמדים אוצר מילים ב-6 שפות, כולל עברית ויפנית. נבנה למורים, וחינם להתחלה.',
     features: [
       'משחקי מילים לכיתה שמייצרים מעורבות ומחזקים את הלמידה',
       'דו-קרבות אוצר מילים בין תלמידים — חזרה על החומר שמרגישה כמו משחק',
@@ -56,7 +56,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       { question: 'איך עובד פורמט דו-קרב אוצר המילים?', answer: 'שני תלמידים או יותר מתחרים על אותו לוח ומנסים למצוא מילים כמה שיותר מהר. הראשון שמגיע לניקוד היעד מנצח. אפשר להגביל את המילים בדיוק לאוצר המילים של השיעור הנוכחי.' },
       { question: 'האם תלמידים צריכים חשבון כדי לשחק?', answer: 'לא. התלמידים מצטרפים למשחק עם קוד בן 4 ספרות ומתחילים מיד, מכל דפדפן. רק המורה צריך חשבון כדי לנהל את הכיתות ורשימות המילים.' },
       { question: 'האם LexiClash Education באמת חינמי?', answer: 'מתחילים בחינם, והמסלול החינמי אמיתי: כיתה אחת של עד 10 תלמידים, כל משחקי המילים, דו-קרבות אוצר מילים, משחק כיתתי, רשימות מילים משלכם ובלי פרסומות. מסלול Teacher Pro עולה 9$ לחודש ומוסיף רק כיתות ותלמידים ללא הגבלה ולוח ניתוח ההתקדמות.' },
-      { question: 'במה LexiClash שונה מ-Quizlet, Kahoot או Wordwall?', answer: 'במקום כרטיסיות או חידונים, ב-LexiClash בונים מילים — לוחות בסגנון Boggle, אנגרמות וגלגלי מילים. הוא רץ בלי חשבונות לתלמידים, תומך ב-5 שפות כולל עברית מימין לשמאל ויפנית, ומוסיף משחק לכל הכיתה בזמן אמת — והכל בחינם.' },
+      { question: 'במה LexiClash שונה מ-Quizlet, Kahoot או Wordwall?', answer: 'במקום כרטיסיות או חידונים, ב-LexiClash בונים מילים — לוחות בסגנון Boggle, אנגרמות וגלגלי מילים. הוא רץ בלי חשבונות לתלמידים, תומך ב-6 שפות כולל עברית מימין לשמאל ויפנית, ומוסיף משחק לכל הכיתה בזמן אמת — והכל בחינם.' },
       { question: 'באילו שפות LexiClash Education תומך?', answer: 'אנגלית, עברית (עם פריסה מלאה מימין לשמאל), שוודית, יפנית וספרדית. לכל שפה מילון משלה, כך ש-LexiClash מתאים לכיתות אנגלית כשפה זרה, לתוכניות עברית כשפה שנייה ולבתי ספר רב-לשוניים.' },
       { question: 'כמה זמן אורך מפגש כיתתי טיפוסי?', answer: 'דו-קרב אוצר מילים לוקח 2–3 דקות, ומשחק לכל הכיתה רץ 5–10 דקות. רוב המורים מנצלים את זה לחימום של 5 דקות בתחילת השיעור, להפסקה קצרה באמצע, או לחזרה בסוף.' },
       { question: 'אפשר להשתמש ברשימת המילים שלי?', answer: 'כן. בונים רשימת מילים מתוכנית הלימודים שלכם או פשוט מדביקים אוסף מילים, והתלמידים משחקים בדיוק עם המילים שאתם מלמדים השבוע. אתם לא תקועים עם מאגר מילים קבוע.' },
@@ -65,7 +65,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
   },
   ja: {
     title: '教室向け無料語彙ゲーム — 生徒のログイン不要',
-    description: '教室で使える無料の単語・語彙ゲーム。生徒のアカウント不要、広告なし、ダウンロードなし。自分の単語リストを使い、どのブラウザでもクラス全体でマルチプレイ。ヘブライ語や日本語を含む5言語で語彙を教えられます。先生はずっと無料。',
+    description: '教室で使える無料の単語・語彙ゲーム。生徒のアカウント不要、広告なし、ダウンロードなし。自分の単語リストを使い、どのブラウザでもクラス全体でマルチプレイ。ヘブライ語や日本語を含む6言語で語彙を教えられます。無料で始められる。',
     features: [
       '生徒の参加と学習成果のために設計されたクラスルームワードゲーム',
       '競争的で楽しい復習のための生徒間語彙デュエル',
@@ -106,7 +106,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       { question: 'Hur fungerar ordförrådsduellerna?', answer: 'Två eller fler elever tävlar mot varandra för att hitta ord från en gemensam bräda så snabbt som möjligt. Den första som når målpoängen vinner. Lärare kan begränsa ordlistor till aktuell lektionsvokabulär.' },
       { question: 'Behöver elever ett konto för att spela?', answer: 'Nej. Elever ansluter till en klassrumssession med en 4-siffrig kod och spelar direkt i valfri webbläsare. Endast läraren behöver ett konto för att hantera klassrum och ordlistor.' },
       { question: 'Är LexiClash Education verkligen gratis?', answer: 'Gratis att börja, och gratisplanen är en riktig plan: en klass med upp till 10 elever, alla ordspel, ordförrådsdueller, klassrumsmultiplayer, egna ordlistor och inga annonser. Teacher Pro kostar 9 USD/månad och lägger bara till obegränsat antal klasser och elever samt analyspanelen.' },
-      { question: 'Hur jämförs LexiClash med Quizlet, Kahoot eller Wordwall?', answer: 'LexiClash fokuserar på ordbildningsspel (Boggle-liknande brädor, anagram, ordhjul) snarare än flashcards eller frågesporter. Det fungerar utan elevkonton, stöder 5 språk inklusive hebreiska RTL och japanska, och lägger till realtidsmultiplayer för hela klassen — allt på en gratisnivå.' },
+      { question: 'Hur jämförs LexiClash med Quizlet, Kahoot eller Wordwall?', answer: 'LexiClash fokuserar på ordbildningsspel (Boggle-liknande brädor, anagram, ordhjul) snarare än flashcards eller frågesporter. Det fungerar utan elevkonton, stöder 6 språk inklusive hebreiska RTL och japanska, och lägger till realtidsmultiplayer för hela klassen — allt på en gratisnivå.' },
       { question: 'Vilka språk stöder LexiClash Education?', answer: 'Engelska, hebreiska (med fullständig höger-till-vänster-layout), svenska, japanska och spanska. Varje språk har sin egen ordbok, vilket gör LexiClash lämpligt för ESL/EFL-klassrum, hebreiska immersionsprogram och flerspråkiga skolor.' },
       { question: 'Hur lång är en typisk klassrumssession?', answer: 'En ordförrådsduell tar 2–3 minuter. Ett ordspel för hela klassen pågår 5–10 minuter. De flesta lärare använder LexiClash som en 5-minuters uppvärmning, hjärnpaus mitt i lektionen eller granskningsaktivitet vid lektionens slut.' },
       { question: 'Kan jag använda min egen ordlista?', answer: 'Ja. Bygg en anpassad ordlista från din egen läroplan eller klistra in valfri orduppsättning, så spelar eleverna ordspelen med exakt de ord du undervisar den veckan — du är inte låst till någon fast ordbank.' },
@@ -115,7 +115,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
   },
   es: {
     title: 'Juegos de vocabulario gratis para el aula — sin cuentas de estudiantes',
-    description: 'Juegos de palabras y vocabulario gratis para el aula — sin cuentas de estudiantes, sin anuncios y sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase en cualquier navegador y enseña vocabulario en 5 idiomas, incluidos hebreo y japonés. Hecho para docentes, gratis para siempre.',
+    description: 'Juegos de palabras y vocabulario gratis para el aula — sin cuentas de estudiantes, sin anuncios y sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase en cualquier navegador y enseña vocabulario en 6 idiomas, incluidos hebreo y japonés. Hecho para docentes, gratis para empezar.',
     features: [
       'Juegos de palabras para el aula diseñados para la participación y el aprendizaje de los alumnos',
       'Duelos de vocabulario entre estudiantes para sesiones de repaso competitivas y divertidas',
@@ -131,7 +131,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       { question: '¿Cómo funciona el formato de duelo de vocabulario?', answer: 'Dos o más estudiantes compiten en el mismo tablero para encontrar palabras lo más rápido posible. El primero en alcanzar la puntuación objetivo gana. El profesor puede limitar las palabras al vocabulario de la lección actual.' },
       { question: '¿Necesitan los estudiantes una cuenta para jugar?', answer: 'No. Los estudiantes se unen a una sesión de aula con un código de 4 dígitos y juegan al instante en cualquier navegador. Solo el profesor necesita una cuenta para gestionar aulas y listas de palabras.' },
       { question: '¿LexiClash Education es realmente gratis?', answer: 'Gratis para empezar, y el plan gratuito es real: una clase de hasta 10 estudiantes, todos los juegos de palabras, duelos de vocabulario, multijugador de aula, tus propias listas y sin anuncios. Teacher Pro cuesta 9 USD/mes y solo añade clases y estudiantes ilimitados y el panel de analíticas.' },
-      { question: '¿Cómo se compara LexiClash con Quizlet, Kahoot o Wordwall?', answer: 'LexiClash se centra en juegos de formación de palabras (cuadrículas estilo Boggle, anagramas, ruedas de palabras) en lugar de tarjetas didácticas o cuestionarios. Funciona sin cuentas de estudiantes, admite 5 idiomas incluyendo hebreo RTL y japonés, y añade multijugador en tiempo real para toda la clase — todo en un nivel gratuito.' },
+      { question: '¿Cómo se compara LexiClash con Quizlet, Kahoot o Wordwall?', answer: 'LexiClash se centra en juegos de formación de palabras (cuadrículas estilo Boggle, anagramas, ruedas de palabras) en lugar de tarjetas didácticas o cuestionarios. Funciona sin cuentas de estudiantes, admite 6 idiomas incluyendo hebreo RTL y japonés, y añade multijugador en tiempo real para toda la clase — todo en un nivel gratuito.' },
       { question: '¿Qué idiomas admite LexiClash Education?', answer: 'Inglés, hebreo (con diseño completo de derecha a izquierda), sueco, japonés y español. Cada idioma tiene su propio diccionario, lo que hace que LexiClash sea adecuado para aulas ESL/EFL, programas de inmersión en hebreo y escuelas multilingües.' },
       { question: '¿Cuánto dura una sesión de aula típica?', answer: 'Un duelo de vocabulario dura 2–3 minutos. Un juego de palabras para toda la clase dura 5–10 minutos. La mayoría de los profesores usan LexiClash como calentamiento de 5 minutos, descanso mental a mitad de lección o actividad de repaso al final de la clase.' },
       { question: '¿Puedo usar mi propia lista de vocabulario o de palabras?', answer: 'Sí. Crea una lista de palabras personalizada desde tu propio currículo o pega cualquier conjunto de vocabulario, y los estudiantes juegan con exactamente las palabras que enseñas esa semana — no estás atado a un banco de palabras fijo.' },
@@ -140,7 +140,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
   },
   ru: {
     title: 'Бесплатные игры для расширения словарного запаса в классе — без аккаунтов учащихся',
-    description: 'Бесплатные словесные и словарные игры для класса — без аккаунтов учащихся, без объявлений и без загрузок. Используйте свои собственные списки слов, играйте с группой в любом браузере и преподавайте словарный запас на 5 языках, включая иврит и японский. Разработано для учителей, бесплатно всегда.',
+    description: 'Бесплатные словесные и словарные игры для класса — без аккаунтов учащихся, без объявлений и без загрузок. Используйте свои собственные списки слов, играйте с группой в любом браузере и преподавайте словарный запас на 6 языках, включая иврит и японский. Разработано для учителей, бесплатно для старта.',
     features: [
       'Словесные игры для класса, разработанные для участия и результатов обучения учащихся',
       'Словарные дуэли между учащимися для увлекательных и конкурентных повторений',
@@ -156,7 +156,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       { question: 'Как работает формат словарных дуэлей?', answer: 'Два или более учащихся соревнуются на одной доске, чтобы найти слова как можно быстрее. Первый, кто достигнет целевого количества баллов, побеждает. Учитель может ограничить слова только словарью текущего урока.' },
       { question: 'Нужен ли учащимся аккаунт для игры?', answer: 'Нет. Учащиеся присоединяются к классной сессии по 4-значному коду и играют сразу же в любом браузере. Только учителю нужен аккаунт для управления классами и списками слов.' },
       { question: 'LexiClash Education действительно бесплатна?', answer: 'Начать можно бесплатно, и бесплатный план настоящий: класс до 10 учеников, все словесные игры, словарные дуэли, игра всем классом, свои списки слов и без рекламы. Teacher Pro стоит 9 $ в месяц и добавляет только неограниченное число классов и учеников и панель аналитики прогресса.' },
-      { question: 'Чем LexiClash отличается от Quizlet, Kahoot или Wordwall?', answer: 'LexiClash сосредоточена на словесных играх с составлением слов (сетки в стиле Boggle, анаграммы, словесные колёса), а не на флэш-картах или викторинах. Работает без аккаунтов учащихся, поддерживает 5 языков, включая иврит с RTL и японский, и добавляет многопользовательскую игру в реальном времени для всего класса — всё на бесплатном уровне.' },
+      { question: 'Чем LexiClash отличается от Quizlet, Kahoot или Wordwall?', answer: 'LexiClash сосредоточена на словесных играх с составлением слов (сетки в стиле Boggle, анаграммы, словесные колёса), а не на флэш-картах или викторинах. Работает без аккаунтов учащихся, поддерживает 6 языков, включая иврит с RTL и японский, и добавляет многопользовательскую игру в реальном времени для всего класса — всё на бесплатном уровне.' },
       { question: 'Какие языки поддерживает LexiClash Education?', answer: 'Английский, иврит (с полным расположением справа налево), шведский, японский и русский. Каждый язык имеет собственный словарь, что делает LexiClash подходящей для классов ESL/EFL, программ иммерсии на иврите и многоязычных школ.' },
       { question: 'Какова длительность типичной школьной сессии?', answer: 'Словарный дуэль длится 2–3 минуты. Словесная игра для всего класса длится 5–10 минут. Большинство учителей используют LexiClash как 5-минутную разминку, перерыв для мозга в середине урока или повторение в конце занятия.' },
       { question: 'Могу ли я использовать мой собственный список слов?', answer: 'Да. Создайте пользовательский список слов из вашей программы или просто вставьте любой набор слов, и учащиеся будут играть с именно теми словами, которые вы преподаёте на этой неделе — вы не привязаны к фиксированному словарю.' },

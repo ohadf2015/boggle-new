@@ -48,17 +48,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const faqs = [
   { q: 'Is LexiClash a free alternative to Quizlet?', a: 'Yes — LexiClash is fully free with no premium tier. Quizlet has a free tier but locks key features (offline mode, ad-free, custom images, advanced study modes) behind Quizlet Plus ($35.99/year). LexiClash never gates features behind a paywall.' },
-  { q: 'Do students need to create accounts on LexiClash?', a: 'No. Students join a classroom session with a 4-digit code displayed by the teacher. Quizlet requires an account (or parental consent for under-13 students) and an email address per student.' },
+  { q: 'Do students need to create accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code displayed by the teacher. Quizlet requires an account (or parental consent for under-13 students) and an email address per student.' },
   { q: 'Is LexiClash like Quizlet?', a: 'Different category. Quizlet is flashcard-based — students drill term-definition pairs. LexiClash is a word-formation game — students search for words on Boggle-style grids, anagrams, and word wheels. Better for spelling, recall, and pattern recognition than memorization-focused flashcards.' },
   { q: 'Can teachers use their own word lists?', a: 'Yes on both platforms. LexiClash teachers upload custom vocabulary lists from any unit or curriculum and use them in 1v1 duels, whole-class games, or assigned practice. No import format restrictions.' },
   { q: 'Which is better for ESL or English language learners?', a: 'LexiClash has built-in dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese — useful for ESL, Hebrew immersion, and bilingual programs. Quizlet supports many languages for user-generated decks but the platform UI is English-first and doesn’t have multilingual classroom multiplayer.' },
-  { q: 'Does LexiClash have multiplayer like Quizlet Live?', a: 'Yes — but with key differences. LexiClash multiplayer is real-time, free, and requires zero student accounts (4-digit join code). Quizlet Live requires student accounts and is gated behind Quizlet Plus for full features.' },
+  { q: 'Does LexiClash have multiplayer like Quizlet Live?', a: 'Yes — but with key differences. LexiClash multiplayer is real-time, free, and requires zero student accounts (6-character join code). Quizlet Live requires student accounts and is gated behind Quizlet Plus for full features.' },
   { q: 'How do I track student progress?', a: 'LexiClash teacher dashboard shows per-student accuracy, missed words, and class-wide patterns (which words tripped the most students). Quizlet has its own analytics but key views (mastery tracking, individual progress reports) are paid features.' },
 ];
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Free tier (full features)', '✓ Everything free', '✗ Quizlet Plus $36/yr'],
-  ['No student signup', '✓ 4-digit join code', '✗ Account required'],
+  ['No student signup', '✓ 6-character join code', '✗ Account required'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Flashcards + multiple-choice'],
   ['Live whole-class multiplayer', '✓ Free', '✓ Quizlet Plus'],
   ['1v1 duels with student pairing', '✓', '✗'],
@@ -107,7 +107,7 @@ export default async function Page({ params }: PageProps) {
           Quizlet built the modern flashcard standard, and millions of students use it every day. But for teachers
           running classroom vocabulary review with no budget, no IT permissions, and no time to set up student
           accounts, LexiClash is built differently. Word-formation gameplay (not flashcards), no student signup
-          (4-digit join code), live whole-class multiplayer in the free tier, and five languages with native
+          (6-character join code), live whole-class multiplayer in the free tier, and five languages with native
           dictionaries. Same vocabulary goal, opposite philosophy.
         </p>
 
@@ -152,7 +152,7 @@ export default async function Page({ params }: PageProps) {
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Quizlet</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { title: 'No student accounts required', desc: 'A teacher with 30 students who don’t have email addresses (or parental consent for under-13s) can’t use Quizlet without setup friction. LexiClash uses a 4-digit join code — students play instantly.' },
+              { title: 'No student accounts required', desc: 'A teacher with 30 students who don’t have email addresses (or parental consent for under-13s) can’t use Quizlet without setup friction. LexiClash uses a 6-character join code — students play instantly.' },
               { title: 'Spelling + word-pattern practice', desc: 'Flashcards drill memorization. Word-formation games drill spelling, letter patterns, and recall under time pressure — different cognitive skills, both useful.' },
               { title: 'Free whole-class multiplayer', desc: 'Quizlet Live full features need Quizlet Plus. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
               { title: '5 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash has full dictionaries in EN/HE/ES/SV/JA. Quizlet relies on user-generated decks for non-English content.' },

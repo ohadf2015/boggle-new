@@ -34,7 +34,7 @@ export const WORDLE_ROW_DEFS: readonly ComparisonRowDef[] = [
 // Freerice row defs (featureKey camelCase identifiers only; no English feature strings here)
 export const FREERICE_ROW_DEFS: readonly ComparisonRowDef[] = [
   { featureKey: 'free', lexi: '✓', competitor: '✓' },
-  { featureKey: 'noStudentLogin', lexi: '✓ 4-digit join code', competitor: '✓ Anonymous play' },
+  { featureKey: 'noStudentLogin', lexi: '✓ 6-character join code', competitor: '✓ Anonymous play' },
   { featureKey: 'coreFormat', lexi: 'Live word-formation games', competitor: 'Solo multiple-choice quiz' },
   { featureKey: 'liveWholeClassMultiplayer', lexi: '✓ Free, up to 30', competitor: '✗ Solo (group totals only)' },
   { featureKey: 'oneVOneDuels', lexi: '✓', competitor: '✗' },

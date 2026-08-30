@@ -153,7 +153,7 @@ export function buildEducationBreadcrumbJsonLd(locale: string) {
 // resolve one entity, not a parallel org node.
 const WEBAPP_FEATURES: Record<string, string[]> = {
   en: [
-    'No student signup — join a class with a 4-digit code',
+    'No student signup — join a class with a 6-character code',
     'Multiplayer vocabulary duels (1v1) and live whole-class games',
     'Teacher dashboard: custom word lists, progress tracking, class analytics',
     '5 languages including Hebrew (RTL) and Japanese, each with its own dictionary',

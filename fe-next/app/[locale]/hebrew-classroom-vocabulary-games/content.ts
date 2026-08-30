@@ -42,12 +42,12 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
   en: {
     metaTitle: 'Free Word Games for Classrooms — Live Group Games, Vocabulary Duels, No Login | LexiClash',
     metaDescription:
-      'Free word games built for classrooms. Students join with a 4-digit code (no login, no accounts). Live classroom games, vocabulary duels, custom word lists, and real-time dashboards. Works in any browser. Up to 30 students.',
+      'Free word games built for classrooms. Students join with a 6-character code (no login, no accounts). Live classroom games, vocabulary duels, custom word lists, and real-time dashboards. Works in any browser. Up to 30 students.',
     ogTitle: 'Classroom Word Games — Free, No Login, No Accounts',
     ogDescription:
       'Join with a code, play immediately. Live vocabulary games, spelling practice, no accounts needed. Works on any device.',
     twitterTitle: 'Free Classroom Word Games — LexiClash',
-    twitterDescription: 'Live word games for classrooms. 4-digit join code, no login, real vocabulary practice, up to 30 students.',
+    twitterDescription: 'Live word games for classrooms. 6-character join code, no login, real vocabulary practice, up to 30 students.',
     heroTag: '★ FOR TEACHERS ★ FREE TO START ★',
     heroPart1: 'Word ',
     heroHighlight1: 'games',
@@ -60,7 +60,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'What you ',
     featuresTitleHighlight: 'get',
     features: [
-      { icon: '⚡', text: 'Students join in 5 seconds with a 4-digit code — no login, no email' },
+      { icon: '⚡', text: 'Students join in 5 seconds with a 6-character code — no login, no email' },
       { icon: '🎯', text: 'Three game modes: letter grid, word hunt, word wheel' },
       { icon: '👥', text: 'Live multiplayer — up to 30 students together' },
       { icon: '⚔️', text: 'Head-to-head vocabulary duels — for pair or small-group practice' },
@@ -80,8 +80,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: 'Questions for ',
     faqTitleHighlight: 'teachers',
     faqs: [
-      { q: 'What are the best word games for a classroom?', a: 'LexiClash is built for classrooms: students join with a 4-digit code (no signup), the teacher picks a word list, and the whole class plays together live in 5–10 minutes. The game works in any browser and supports English, Hebrew, Spanish, Swedish, Japanese, and Russian — so it works for Hebrew classrooms, ESL classrooms, and foreign-language classrooms too.' },
-      { q: 'Do students need to open an account?', a: 'No. Students type a 4-digit code the teacher displays and start playing immediately. Only teachers open a free account — to save word lists and track class progress.' },
+      { q: 'What are the best word games for a classroom?', a: 'LexiClash is built for classrooms: students join with a 6-character code (no signup), the teacher picks a word list, and the whole class plays together live in 5–10 minutes. The game works in any browser and supports English, Hebrew, Spanish, Swedish, Japanese, and Russian — so it works for Hebrew classrooms, ESL classrooms, and foreign-language classrooms too.' },
+      { q: 'Do students need to open an account?', a: 'No. Students type a 6-character code the teacher displays and start playing immediately. Only teachers open a free account — to save word lists and track class progress.' },
       { q: 'Can I upload my own vocabulary list?', a: 'Yes. Upload any word list — from a lesson, a chapter, or your curriculum — and play it as head-to-head duels, a whole-class round, or individual practice assigned to students.' },
       { q: 'How is it different from Quizlet, Kahoot, or Wordwall?', a: 'Quizlet, Kahoot, and Wordwall are based on flashcards and multiple-choice quizzes. LexiClash is a word-building game: students build words on a letter grid, word wheel, or anagram board. That means they practice spelling, retrieval, and pattern recognition — not just choosing from given answers. Plus: no student accounts, and it is all free.' },
       { q: 'How long does a classroom session take?', a: 'A vocabulary duel runs 2–3 minutes. A whole-class round runs 5–10 minutes. Most teachers run it as a five-minute class opener, a mid-lesson brain break, or a quick review before the bell.' },

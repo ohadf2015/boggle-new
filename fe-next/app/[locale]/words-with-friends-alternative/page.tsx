@@ -50,7 +50,7 @@ const faqs = [
   },
   {
     q: 'Can I play word games with friends free online?',
-    a: 'Yes. LexiClash is 100% free to play online with friends — no download, no signup, no pay-to-win. Create a room, share the 4-digit code or QR, and your friends are in the game in seconds. Works in any modern browser on phone, tablet, or laptop.',
+    a: 'Yes. LexiClash is 100% free to play online with friends — no download, no signup, no pay-to-win. Create a room, share the 6-character code or QR, and your friends are in the game in seconds. Works in any modern browser on phone, tablet, or laptop.',
   },
   {
     q: "What's the best free Words With Friends multiplayer alternative?",
@@ -144,7 +144,7 @@ const howToJsonLd = JSON.stringify({
   totalTime: 'PT30S',
   step: [
     { '@type': 'HowToStep', name: 'Open LexiClash multiplayer', text: 'Visit lexiclash.live/en/multiplayer in any browser. No download, no signup, no app store.', url: 'https://www.lexiclash.live/en/multiplayer' },
-    { '@type': 'HowToStep', name: 'Create or join a room', text: 'Click Create Room to get a 4-digit code, or paste a friend\'s code to join. Share the room link or QR code with up to 20 players.' },
+    { '@type': 'HowToStep', name: 'Create or join a room', text: 'Click Create Room to get a 6-character code, or paste a friend\'s code to join. Share the room link or QR code with up to 20 players.' },
     { '@type': 'HowToStep', name: 'Find words simultaneously', text: 'Everyone plays the same letter grid at the same time. Connect adjacent letters to form words. Longer words and faster combos score more points.' },
     { '@type': 'HowToStep', name: 'Highest score wins', text: 'After 2-3 minutes, the highest scorer wins. Words found by multiple players don\'t count for anyone — uniqueness is rewarded.' },
   ],
@@ -442,7 +442,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
           <ol className="grid gap-5 sm:grid-cols-3">
             {[
               { n: '01', title: 'Open lexiclash.live', desc: 'Any browser, any device. No download. No account.', mascot: '/mascot/explorer.webp', tint: 'border-neo-cyan' },
-              { n: '02', title: 'Create or join', desc: 'Get a 4-digit room code. Share via link or QR. Friends drop in instantly.', mascot: '/mascot/dj.webp', tint: 'border-neo-pink' },
+              { n: '02', title: 'Create or join', desc: 'Get a 6-character room code. Share via link or QR. Friends drop in instantly.', mascot: '/mascot/dj.webp', tint: 'border-neo-pink' },
               { n: '03', title: 'Find words. Win.', desc: 'Same grid for everyone. Race the clock and friends. Highest score wins.', mascot: '/mascot/flexing.webp', tint: 'border-neo-lime' },
             ].map((s) => (
               <li key={s.n} className={`relative rounded-neo border-4 ${s.tint} bg-neo-navy-light p-6 shadow-hard`}>

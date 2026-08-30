@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const faqs = [
   { q: 'Is LexiClash a free alternative to Kahoot?', a: 'Yes — LexiClash is fully free with no premium tier, no per-seat fee, and no district license required. Kahoot has a free tier (up to 40 players, basic features) but most classroom-quality features (advanced reports, slide layouts, larger games) require Kahoot+ at $4-15/month per teacher.' },
-  { q: 'Do students need accounts on LexiClash?', a: 'No. Students join with a 4-digit code (just like Kahoot’s PIN system). The difference: LexiClash student accounts are entirely optional, while Kahoot increasingly pushes students toward sign-in for progress tracking.' },
+  { q: 'Do students need accounts on LexiClash?', a: 'No. Students join with a 6-character code (just like Kahoot’s PIN system). The difference: LexiClash student accounts are entirely optional, while Kahoot increasingly pushes students toward sign-in for progress tracking.' },
   { q: 'Is LexiClash like Kahoot?', a: 'Different category. Kahoot is a quiz-show platform — students answer multiple-choice questions on a shared timer, often projected on screen. LexiClash is a word-formation game — students search for words on Boggle-style grids, anagrams, or word wheels. Better for vocabulary, spelling, and language practice than multiple-choice trivia.' },
   { q: 'Can I use Kahoot quizzes in LexiClash?', a: 'No — different formats. But you can upload your vocabulary lists from any source (Quizlet exports, CSV, manual entry) and use them in LexiClash word games. For trivia-style quizzes, Kahoot remains the right tool; for word/vocabulary practice, LexiClash is purpose-built.' },
   { q: 'Does LexiClash have multiplayer up to 30+ students?', a: 'Yes — LexiClash supports up to 30 students per classroom session, all in real time, all free. Kahoot’s free tier supports up to 40 players, but advanced game modes and analytics are Kahoot+ only.' },
@@ -58,7 +58,7 @@ const faqs = [
 
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Free tier (full features)', '✓ Everything free', '✗ Kahoot+ $4-15/mo'],
-  ['No student signup', '✓ 4-digit join code', '✓ PIN code'],
+  ['No student signup', '✓ 6-character join code', '✓ PIN code'],
   ['Game type', 'Word-formation (Boggle/Wheel/Anagram)', 'Quiz / multiple choice'],
   ['Best for', 'Vocabulary, spelling, ESL', 'Trivia, fact recall, review quizzes'],
   ['1v1 duels', '✓ Built-in', '✗'],

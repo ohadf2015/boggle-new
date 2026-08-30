@@ -8,6 +8,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
+import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
@@ -657,14 +658,19 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           )}
           {isClassroomMode ? (
             // Hide header + banner during active gameplay to maximize grid space;
-            // show in lobby and results
-            isActive && !showResults ? null : (
+            // show in lobby and results.
+            //
+            // Gated on `gameActive`, NOT `isActive`: `onJoined` sets `isActive`
+            // the moment the host lands in the LOBBY, so the old predicate hid
+            // the join code exactly when the teacher needed to put it on a
+            // projector. See lib/education/classroomLobbyChrome.ts.
+            hideClassroomChrome({ gameActive, showResults }) ? null : (
               <>
                 <EducationHeader showBackButton title={t('education.classroomGame.title')} />
                 <ClassroomModeBanner
                   lessonData={lessonDataState}
-                  gameCode={gameCode}
-                  expanded={!isActive}
+                  gameCode={gameCode || prefilledRoomCode}
+                  expanded={classroomPanelExpanded({ gameActive })}
                 />
               </>
             )

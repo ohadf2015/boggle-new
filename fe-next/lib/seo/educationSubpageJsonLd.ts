@@ -93,11 +93,11 @@ const DUELS_CONTENT: Record<string, SubpageContent> = {
 const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
   en: {
     name: 'How to Run a Whole-Class Word Game',
-    description: 'Live multiplayer word game for the whole class. Students join via a 4-digit code. No accounts required for students.',
+    description: 'Live multiplayer word game for the whole class. Students join via a 6-character code. No accounts required for students.',
     steps: [
-      { name: 'Create a session', text: 'Click "Start classroom game". Pick a word list, time limit, and game mode (Boggle grid, Word Hunt, or Wheel).' },
-      { name: 'Share the join code', text: 'Display the 4-digit code or QR on your projector. Students join from any phone or laptop browser — no login.' },
-      { name: 'Play and review', text: 'Up to 30 students compete in real time. Live leaderboard shows who is ahead. After the round, the dashboard shows class accuracy and which words tripped the most students.' },
+      { name: 'Create a session', text: 'Pick a word list, time limit, and game mode (Boggle grid, Word Hunt, or Wheel), then press Create Room.' },
+      { name: 'Share the join code', text: 'Your projector view shows the join address and the 6-character code. Students open it on any phone or laptop browser — no login.' },
+      { name: 'Play and review', text: 'Up to 50 students compete in real time. Live leaderboard shows who is ahead. After the round, the dashboard shows class accuracy and which words tripped the most students.' },
     ],
     audience: 'K-12 classrooms, ESL/EFL programs, after-school clubs, substitute-teacher activities.',
     educationalUse: ['Vocabulary Building', 'Whole-Class Activity', 'Formative Assessment', 'ESL Practice', 'Brain Break'],
