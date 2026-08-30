@@ -33,7 +33,10 @@ function WordsLadderImpl({ words, meId }: WordsLadderProps) {
 
   if (sorted.length === 0) {
     return (
-      <div data-testid="ladder-empty" className="p-4 text-center opacity-70 text-sm">
+      // h-full + centring: the rail panel now claims the whole column, so a
+      // top-aligned empty line left a tall blank below it. Centred, the empty
+      // state reads as a deliberate resting state rather than a layout gap.
+      <div data-testid="ladder-empty" className="h-full min-h-[8rem] flex items-center justify-center p-4 text-center opacity-70 text-sm">
         {t('mp.ladder.empty')}
       </div>
     );

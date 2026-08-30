@@ -80,6 +80,7 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
           variant="rail"
           header={t('mp.insights.foundHeader')}
           headerRight={`${props.foundWords.length}`}
+          fill
           testId="hunt-ladder"
         >
           <LatestScoreTickBanner mode="word-hunt" meId={props.meId} leaderboard={props.leaderboard} />

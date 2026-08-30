@@ -98,6 +98,7 @@ export function WheelRushDesktopAdapter(props: WheelRushDesktopAdapterProps) {
           variant="rail"
           header={t('mp.insights.foundHeader')}
           headerRight={`${props.foundWords.length}`}
+          fill
           testId="wr-ladder"
         >
           <LatestScoreTickBanner mode="wheel-rush" meId={props.meId} leaderboard={props.leaderboard} />

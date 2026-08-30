@@ -104,6 +104,7 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
         variant="rail"
         header={t('mp.insights.foundHeader')}
         headerRight={`${foundWords.length}`}
+        fill
         testId="standard-ladder"
       >
         <LatestScoreTickBanner mode="classic" meId={meId} leaderboard={leaderboard} />

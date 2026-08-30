@@ -6,7 +6,7 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '@/shared/types/blast';
 
 export const BLAST_BONUS_MOVE_COMBO_THRESHOLD = 3;
-export const BLAST_SPECIAL_TILE_CHANCE = 0.15;
+export const BLAST_SPECIAL_TILE_CHANCE = 0.40;
 
 // Re-export canonical type for backward compat (consumers should prefer @/shared/types/blast)
 export type { BlastTileType } from '@/shared/types/blast';

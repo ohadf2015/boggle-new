@@ -57,6 +57,7 @@ function DesktopRivalsRosterRailImpl({
         variant="rail"
         header={t('mp.insights.rosterHeader')}
         headerRight={`${leaderboard.length}`}
+        fill
         testId={rosterTestId}
       >
         <RosterRail players={leaderboard} />

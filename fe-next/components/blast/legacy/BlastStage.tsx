@@ -320,6 +320,10 @@ export const BlastStage = memo(function BlastStage({
         isMultiplayer={isMultiplayer}
         remainingTime={remainingTime}
         totalTime={totalTime}
+        // Without this the HUD defaults to false and draws its own countdown on
+        // top of the shell's ShellBadgeTimer. The two tick independently, so the
+        // ring and the pill disagreed by a second on screen.
+        isDesktopCanvas={isDesktopCanvas}
         coins={coins}
         gems={gems}
         t={t}

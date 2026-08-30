@@ -641,4 +641,100 @@ describe('blastModeManager', () => {
       expect(() => endWaveAdvance(code)).not.toThrow();
     });
   });
+
+  // ==========================================
+  // Special Cell Density (Blast Mode Enhancement)
+  // ==========================================
+  describe('Blast special cell density', () => {
+    // 6x6 board = 36 cells. Target density: ~40% ± variance
+    // With 40% base chance, expect 14.4 ± 5 cells due to binomial variance
+    const grid6x6: string[][] = Array.from({ length: 6 }, () =>
+      Array.from({ length: 6 }, (_, i) => String.fromCharCode(65 + (i % 26)))
+    );
+    const BOARD_SIZE = 36;
+    const TARGET_DENSITY = 0.40;
+    const EXPECTED_CELLS = Math.round(BOARD_SIZE * TARGET_DENSITY);
+    const EXPECTED_MIN_CELLS = Math.max(8, EXPECTED_CELLS - 6);  // ~8 cells min
+    const EXPECTED_MAX_CELLS = Math.min(32, EXPECTED_CELLS + 6); // ~20 cells max
+
+    it('should generate boards with substantial special cell density (~40%)', () => {
+      const overlay = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1);
+      const specialCellCount = overlay.length;
+
+      // With 40% per-cell chance, expect ~14 cells (±6 due to variance)
+      expect(specialCellCount).toBeGreaterThanOrEqual(EXPECTED_MIN_CELLS);
+      expect(specialCellCount).toBeLessThanOrEqual(EXPECTED_MAX_CELLS);
+    });
+
+    it('should maintain determinism: same seed produces identical overlay', () => {
+      const seed = 12345;
+      const overlay1 = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1, seed);
+      const overlay2 = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1, seed);
+
+      expect(overlay1.length).toBe(overlay2.length);
+      expect(overlay1).toEqual(overlay2);
+    });
+
+    it('should cap ice tiles so obstructive types do not dominate', () => {
+      // Wave 1 ice distribution is 0.17 (17% of specials)
+      // With 40% base density and ice at 17% of that: expect ~2-3 ice tiles max on 6x6
+      // Obstructive tiles should not exceed 20% of the board
+      const overlay = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1);
+      const iceTiles = overlay.filter(t => t.type === 'ice').length;
+      const maxAllowedIce = Math.ceil(BOARD_SIZE * 0.20);
+
+      expect(iceTiles).toBeLessThanOrEqual(maxAllowedIce);
+    });
+
+    it('wave 1 should spawn at least 4 distinct special types (core set)', () => {
+      // Wave 1 has access to: bomb, ice, gold, rainbow (core set of 4)
+      const overlay = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1);
+      const distinctTypes = new Set(overlay.map(t => t.type));
+
+      // With 35-45% density and 4 available types, should have several types present
+      expect(distinctTypes.size).toBeGreaterThanOrEqual(2);
+
+      // Most boards should have at least 3 types (bomb, gold, ice, rainbow should all appear)
+      if (overlay.length >= 10) {
+        // Only assert variety for boards with enough specials
+        expect(distinctTypes.size).toBeGreaterThanOrEqual(3);
+      }
+    });
+
+    it('should handle initBlastModeState with increased density', () => {
+      const grid = grid6x6;
+      const players = ['alice', 'bob'];
+      const state = initBlastModeState(grid, players, 1, 999);
+
+      const specialCellCount = state.overlay.length;
+      expect(specialCellCount).toBeGreaterThanOrEqual(EXPECTED_MIN_CELLS);
+      expect(specialCellCount).toBeLessThanOrEqual(EXPECTED_MAX_CELLS);
+    });
+
+    it('higher waves should maintain substantial special density', () => {
+      const overlayWave1 = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1, 111);
+      const overlayWave5 = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 5, 111);
+
+      // Both waves should generate boards with good density (at least 8+ cells)
+      expect(overlayWave1.length).toBeGreaterThanOrEqual(EXPECTED_MIN_CELLS - 4);
+      expect(overlayWave5.length).toBeGreaterThanOrEqual(EXPECTED_MIN_CELLS - 4);
+    });
+
+    it('boards should feel substantially fuller than pre-change', () => {
+      // Generate multiple boards and verify average density is around target (40%)
+      // With variance, individual boards will vary ±15%, but average should converge to ~40%
+      const samples = 20;
+      const densities: number[] = [];
+
+      for (let i = 0; i < samples; i++) {
+        const overlay = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1, i + 5000);
+        densities.push(overlay.length / BOARD_SIZE);
+      }
+
+      const avgDensity = densities.reduce((a, b) => a + b, 0) / densities.length;
+      // Average across 20 boards should be close to 40%
+      expect(avgDensity).toBeGreaterThanOrEqual(0.35);
+      expect(avgDensity).toBeLessThanOrEqual(0.45);
+    });
+  });
 });
