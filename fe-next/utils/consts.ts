@@ -8,6 +8,7 @@
 
 import type { DifficultySettings, MinWordLengthOption } from '@/types';
 import { japaneseHiragana } from '@/shared/constants/japaneseLetters';
+import { USERNAME_SOCKET_MAX } from '@/shared/constants/namePattern';
 
 // ==================== Re-exports from Shared Constants ====================
 // Single source of truth: shared/constants/gameConstants.ts
@@ -179,7 +180,7 @@ export const PASSWORD_STRENGTH_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 // Re-exported from shared/ so the client and the server socket schemas cannot
 // drift apart again (Sentry 1Y8/1YJ/1YK: names in scripts the server had not
 // enumerated passed validation here and were rejected server-side).
-export { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN } from '../shared/constants/namePattern';
+export { NAME_VALID_PATTERN, NAME_UNSAFE_PATTERN, USERNAME_SOCKET_MAX } from '../shared/constants/namePattern';
 
 // Global-flagged twin of NAME_UNSAFE_PATTERN, for stripping rather than testing.
 // \s in JS already covers \uFEFF and the ASCII whitespace controls, but not the
@@ -197,4 +198,17 @@ export function sanitizeRoomName(name: string): string {
     .replace(NAME_UNSAFE_GLOBAL, '')
     .replace(/[^\p{L}\p{M}\p{N}\s._-]/gu, '')
     .trim();
+}
+
+/**
+ * Same strip as sanitizeRoomName, plus the socket schema's length cap.
+ *
+ * Usernames are not only typed by hand: the multiplayer emit falls back to the
+ * account display name (profile.display_name, OAuth full_name, email prefix), and
+ * those arrive with apostrophes, emoji and real-world lengths the server's
+ * UsernameSchema rejects outright — the room then never opens. Returns '' when
+ * nothing valid survives, so callers can fall back to a generated name.
+ */
+export function sanitizeUsername(name: string): string {
+  return sanitizeRoomName(name).slice(0, USERNAME_SOCKET_MAX).trim();
 }

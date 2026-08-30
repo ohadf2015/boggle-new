@@ -109,6 +109,14 @@ interface PortraitLayoutProps {
   // Callbacks
   onExitRoom?: () => void;
   onShowTutorial?: () => void;
+  /**
+   * Single-player superset. Live MP has no pause and no coin/progress/training
+   * chrome, so MP call sites omit these and render exactly what they did before.
+   * Solo supplies them so it can drop its bespoke layouts and use this shell.
+   */
+  onPauseToggle?: () => void;
+  isPaused?: boolean;
+  soloChrome?: ReactNode;
   onWordSubmit: (word: string) => void;
   onPathSubmit?: (cells: Array<{ row: number; col: number; letter: string }>) => void;
   onWordChange: (word: string, count: number) => void;
@@ -207,6 +215,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   totalGamesPlayed,
   onExitRoom,
   onShowTutorial,
+  onPauseToggle,
+  isPaused,
+  soloChrome,
   onWordSubmit,
   onPathSubmit,
   onWordChange,
@@ -395,6 +406,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         <GameHeader
           onExitRoom={onExitRoom}
           onShowTutorial={onShowTutorial}
+          onPauseToggle={onPauseToggle}
+          isPaused={isPaused}
           hints={hints}
           gameActive={gameActive}
           t={t}
@@ -424,6 +437,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               aria-label="Game status"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
+              {/* Single-player chrome (coins, 0/N progress, practice training bar).
+                  Empty for MP — `empty:hidden` keeps it from adding a gap there. */}
+              {soloChrome && (
+                <div className="w-full shrink-0 empty:hidden">{soloChrome}</div>
+              )}
+
               {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
               {isPlaying && (
                 <div

@@ -15,7 +15,7 @@ import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaul
 import { getOrCreateStoredUsername, getStoredAvatarId, getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { sanitizeRoomName } from '@/utils/consts';
+import { sanitizeRoomName, sanitizeUsername } from '@/utils/consts';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { setRejoinIntent } from '@/utils/socketRejoin';
@@ -279,6 +279,14 @@ export function useMultiplayerJoin({
         generatedAvatar = avatar;
         setGuestAvatar(avatar);
       }
+
+      // Sanitize at the emit chokepoint, same as the game code and room name
+      // below: this name is usually NOT typed by a human — it falls back to
+      // profile.display_name / the OAuth full_name / the email prefix, none of
+      // which agreed to the socket's UsernameSchema. An apostrophe, an emoji or a
+      // long real name made createGame/join fail validation and the room never
+      // opened (Sentry 1YP/22D/22E/22F "at most 30 characters", 20B pattern).
+      effectiveUsername = sanitizeUsername(effectiveUsername) || getOrCreateStoredUsername(language);
 
       if (effectiveUsername !== liveUsername) {
         setUsername(effectiveUsername);

@@ -225,15 +225,20 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
           className="flex-1 min-h-0 px-1 relative overflow-hidden flex items-center justify-center"
           style={{ containerType: 'size' }}
         >
-          {/* Grid frame: square that fits the container. Cap raises on desktop so the
-              board fills more of the central column (was 440 → looked small at ≥1024px).
+          {/* Grid frame: square that fits the container.
               `flex` (NOT items-center) is load-bearing: it lets the flex-1 SurvivalGridSection
               fill this square on BOTH axes (width via flex-1, height via default stretch).
               Without it the height chain collapses to auto, the inner .game-board-frame's
               `max-height: min(--board-size, 100%)` clamp goes inert, and the viewport-based
-              --board-size overflows the slot → top/bottom rows clip under the chrome. */}
+              --board-size overflows the slot → top/bottom rows clip under the chrome.
+
+              The 100cqw/100cqh terms already clamp the board to its slot, so the px
+              term only ever shrinks it further. At 440 it left ~40px of usable width
+              unspent on anything wider than ~440 (measured: a 440 grid in a 480x540
+              slot). One 560 cap below xl lets the container govern instead; that
+              also lifts tablet portrait (768w) from 440 to its slot size. */}
           <div
-            className="wordhunt-grid-container relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,440px)] min-[1024px]:[--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
+            className="wordhunt-grid-container relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
             style={{
               width: 'var(--wh-grid-size)',
               height: 'var(--wh-grid-size)',
