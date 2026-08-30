@@ -111,7 +111,6 @@ interface UseSinglePlayerConfigResult {
   setPhase: (phase: SinglePlayerPhase) => void;
   gameState: SinglePlayerGameState;
   setGameState: React.Dispatch<React.SetStateAction<SinglePlayerGameState>>;
-  returnTo: string | null;
   boardCode: string | null;
   handleTutorialComplete: () => void;
   handlePlayAgain: () => void;
@@ -126,7 +125,6 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const router = useRouter();
   const { isAuthenticated, profile } = useAuth();
 
-  const returnTo = searchParams?.get('returnTo') || null;
   const autoStart = searchParams?.get('autoStart') || null;
   const presetParam = searchParams?.get('preset') || null;
   const boardCode = searchParams?.get('boardCode') || null;
@@ -424,7 +422,6 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     setPhase,
     gameState,
     setGameState,
-    returnTo,
     boardCode,
     handleTutorialComplete,
     handlePlayAgain,
