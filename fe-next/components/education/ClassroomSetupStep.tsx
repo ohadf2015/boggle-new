@@ -1,30 +1,11 @@
-import { School, BookOpen, LayoutGrid, Search, Zap, RotateCw, Timer, Grid3x3 } from 'lucide-react';
+import { School, BookOpen, Timer, Grid3x3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { WizardStep } from '@/components/ui/WizardStep';
 import { MultiLessonSelector } from './MultiLessonSelector';
+import { ClassroomModeSettings } from './ClassroomModeSettings';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
 import type { GameMode } from '@/shared/types/game';
-
-// Translation keys are camelCase but canonical GameMode wire values are kebab.
-const MODE_KEY_MAP: Record<GameMode, string> = {
-  classic: 'classic',
-  blast: 'blast',
-  'word-hunt': 'wordHunt',
-  'wheel-rush': 'wheelRush',
-  'word-tower': 'wordTower',
-  shiritori: 'shiritori',
-  'sealed-bid': 'sealedBid',
-  crossword: 'crossword',
-  wordcraft: 'wordcraft',
-};
-
-const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
-  { key: 'classic', icon: LayoutGrid, color: 'neo-cyan' },
-  { key: 'word-hunt', icon: Search, color: 'neo-lime' },
-  { key: 'blast', icon: Zap, color: 'neo-pink' },
-  { key: 'wheel-rush', icon: RotateCw, color: 'neo-purple' },
-];
 
 interface ClassroomSetupStepProps {
   classrooms: Classroom[];
@@ -33,12 +14,16 @@ interface ClassroomSetupStepProps {
   selectedLessonIds: string[];
   allPlayableWords: string[];
   gameMode: GameMode;
+  targetWord: string;
+  minWordLength: number;
   timerMinutes: number;
   boardSize: 'small' | 'medium' | 'large';
   isStarting: boolean;
   onSelectClassroom: (id: string) => void;
   onSelectLessons: (ids: string[]) => void;
   onGameModeChange: (mode: GameMode) => void;
+  onTargetWordChange: (word: string) => void;
+  onMinWordLengthChange: (length: number) => void;
   onTimerChange: (minutes: number) => void;
   onBoardSizeChange: (size: 'small' | 'medium' | 'large') => void;
   onNext: () => void;
@@ -65,12 +50,16 @@ export function ClassroomSetupStep({
   selectedLessonIds,
   allPlayableWords,
   gameMode,
+  targetWord,
+  minWordLength,
   timerMinutes,
   boardSize,
   isStarting,
   onSelectClassroom,
   onSelectLessons,
   onGameModeChange,
+  onTargetWordChange,
+  onMinWordLengthChange,
   onTimerChange,
   onBoardSizeChange,
   onNext,
@@ -228,42 +217,15 @@ export function ClassroomSetupStep({
           </div>
         </div>
 
-        {/* Game Mode */}
-        <div>
-          <div id="classroom-gamemode-label" className="block text-neo-white font-bold mb-3">
-            {t('teacher.classroom.gameModes.title')}
-          </div>
-          <div
-            role="radiogroup"
-            aria-labelledby="classroom-gamemode-label"
-            className="grid grid-cols-2 sm:grid-cols-4 gap-3"
-          >
-            {GAME_MODES.map(({ key, icon: Icon, color }) => {
-              const isSelected = gameMode === key;
-              const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  aria-label={label}
-                  onClick={() => onGameModeChange(key)}
-                  className={cn(
-                    'flex flex-col items-center gap-2 px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
-                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-                    isSelected
-                      ? `bg-${color} text-neo-black shadow-hard`
-                      : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
-                  )}
-                >
-                  <Icon className="w-6 h-6" />
-                  <span className="text-sm">{label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <ClassroomModeSettings
+          gameMode={gameMode}
+          targetWord={targetWord}
+          minWordLength={minWordLength}
+          allPlayableWords={allPlayableWords}
+          onGameModeChange={onGameModeChange}
+          onTargetWordChange={onTargetWordChange}
+          onMinWordLengthChange={onMinWordLengthChange}
+        />
       </div>
     </WizardStep>
   );

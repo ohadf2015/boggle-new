@@ -68,6 +68,7 @@ const BlastResultsScene = dynamic(() => import('@/components/results/BlastResult
 const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRushResultsScene'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
+const ClassroomResultsCard = dynamic(() => import('@/components/education/ClassroomResultsCard').then(m => m.ClassroomResultsCard), { ssr: false });
 
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 
@@ -248,7 +249,9 @@ function DesktopResultsLayout({
             <ResultsSectionReveal index={6}>
               <PostGameEngagement />
             </ResultsSectionReveal>
-            {postGameWordReview && !isGuest && (
+            {/* Guest-gating is decided by the parent (see postGameWordReviewNode)
+                — a classroom recap must reach account-less students. */}
+            {postGameWordReview && (
               <ResultsSectionReveal index={8}>
                 {postGameWordReview}
               </ResultsSectionReveal>
@@ -305,7 +308,7 @@ function DesktopResultsLayout({
   );
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, onExitToLobby, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, onExitToLobby, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary, classroomSummary }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, user } = useAuth();
   // Resolution-aware guest check — see hooks/useIsGuest (rules/60 Class 1).
@@ -517,8 +520,29 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using .length to avoid re-firing on array reference changes; ref guard prevents double-play
   }, [sortedScores.length, isCurrentUserWinner, playVictorySound, playDefeatSound, playEpicVictorySound]);
 
-  // Word review card for classroom games (shared between mobile + desktop)
-  const postGameWordReviewNode = lessonGameData ? (
+  // Lesson recap for classroom games (shared between mobile + desktop).
+  //
+  // `classroomSummary` is server-built and rides the shared results payload, so
+  // it exists for EVERY player. `lessonGameData` is the teacher's own
+  // sessionStorage — kept only as the fallback for the legacy ?fromLesson
+  // deeplink, and never the primary source: on that path the whole class saw
+  // nothing.
+  // The guest gate hides ACCOUNT-gated content. A lesson recap is not that, and
+  // a classroom student is account-less by design (they join with a code and a
+  // name) — so `!isGuest` hid the lesson from exactly the people it is for.
+  // Mobile never gated it; desktop is the classroom's main screen.
+  const postGameWordReviewNode = classroomSummary ? (
+    <ClassroomResultsCard
+      summary={classroomSummary}
+      username={username}
+      isTeacher={isHost}
+      onPractice={
+        classroomSummary.lessonIds[0]
+          ? () => router.push(`/${language}/student/lessons/${classroomSummary.lessonIds[0]}?mode=flashcard`)
+          : undefined
+      }
+    />
+  ) : lessonGameData && !isGuest ? (
     <PostGameWordReview
       vocabularyWords={lessonGameData.vocabularyWords}
       wordsFound={currentPlayerValidWords.map((w: { word: string }) => w.word)}
@@ -642,10 +666,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     clearSessionPreservingUsername(username);
 
-    // Classroom flow: lessonGameData (sessionStorage) signals this was a teacher-launched
-    // classroom game — route back to /education so we don't bounce back into the
-    // classroom lobby (which would happen on a same-URL reset that keeps ?classroom=true).
-    const isClassroomFlow = !!lessonGameData;
+    // Classroom flow: send the TEACHER back to /education so a same-URL reset
+    // doesn't bounce them into the classroom lobby again (?classroom=true
+    // survives the reset). Students must NOT go there — /education is the
+    // teacher landing page — so they fall through to the normal lobby exit.
+    const isClassroomFlow = (!!lessonGameData || !!classroomSummary) && isHost;
     try {
       sessionStorage.removeItem('lessonGameData');
     } catch {}
@@ -1314,7 +1339,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   isSeriesComplete={isSeriesComplete}
                   seriesWinnerUsername={seriesWinnerUsername}
                   onNewSeries={handleNewSeries}
-                  isClassroom={!!lessonGameData}
+                  isClassroom={!!lessonGameData || !!classroomSummary}
                 />
               </div>
             </m.div>

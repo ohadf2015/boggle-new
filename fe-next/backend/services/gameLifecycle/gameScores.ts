@@ -23,6 +23,8 @@ import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
 import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
+import { getClassroomGame } from '../../modules/classroomGameManager';
+import { buildClassroomSummary } from '../../modules/classroomSummary';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import type { UserData } from './types';
 import logger from '../../utils/logger';
@@ -204,6 +206,36 @@ export async function calculateAndBroadcastFinalScores(
     playerStats: wheelRushState.playerStats ?? {},
   } : undefined;
 
+  // Build the classroom summary if a teacher launched this room. Derived here,
+  // not on the client: `lessonGameData` only exists in the TEACHER's
+  // sessionStorage, so a client-side version is empty for every student.
+  let classroomSummary;
+  try {
+    const classroomGame = await getClassroomGame(gameCode);
+    if (classroomGame) {
+      classroomSummary = buildClassroomSummary({
+        language,
+        teacherName: classroomGame.teacherName,
+        lessonNames: classroomGame.lessonNames,
+        lessonIds: classroomGame.lessonIds,
+        vocabularyWords: classroomGame.vocabularyWords,
+        players: resultsWithIconAchievements.map((p) => ({
+          username: p.username,
+          // Bots are in finalScores; a bot finding a lesson word must not take
+          // it off the teacher's reteach list.
+          isBot: !!game.users?.[p.username]?.isBot,
+          wordDetails: (p.wordDetails || []) as Array<{
+            word: string; validated: boolean; isDuplicate?: boolean;
+          }>,
+        })),
+      }) ?? undefined;
+    }
+  } catch (err) {
+    // Never let a Redis hiccup swallow the results broadcast — but say so, so
+    // "students saw no lesson recap" is diagnosable instead of silent.
+    logger.warn('CLASSROOM_GAME', `Failed to build classroom summary for ${gameCode}: ${(err as Error).message}`);
+  }
+
   // Broadcast results to all clients
   // Host expects 'validationComplete', players expect 'validatedScores'
   // Include duplicateRuleDisabled flag so frontend can display a notice
@@ -270,6 +302,7 @@ export async function calculateAndBroadcastFinalScores(
     wordHuntSummary,
     blastSummary,
     wheelRushSummary,
+    classroomSummary,
     tvMode: game.tvMode ?? false,
     isRanked,
     mmrChanges: mmrByUsername,

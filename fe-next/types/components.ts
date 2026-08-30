@@ -1,3 +1,4 @@
+import type { ClassroomSummary } from '@/shared/types/classroom';
 /**
  * Component Prop Type Definitions
  * Types for major view components
@@ -105,6 +106,12 @@ export interface ResultsPageProps {
   playerCount?: number;
   /** Whether the current user is the host */
   isHost?: boolean;
+  /**
+   * Server-built lesson recap for a teacher-launched classroom game. Comes down
+   * the shared results payload so every student sees it, not just the teacher
+   * (whose sessionStorage used to be the only source).
+   */
+  classroomSummary?: ClassroomSummary;
   /** Room language for starting new games */
   roomLanguage?: Language;
   /** Grid size for cognitive scoring */

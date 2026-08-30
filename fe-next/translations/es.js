@@ -12344,6 +12344,19 @@ const es = {
         "blast": "Blast",
         "wheelRush": "Carrera de Ruleta"
       },
+      "huntTarget": {
+        "title": "Palabra objetivo",
+        "description": "Fija la palabra que buscará tu clase, o deja que el juego elija.",
+        "random": "Sorprende a la clase",
+        "noneEligible": "Ninguna palabra de esta lección se puede buscar: el objetivo debe tener entre {{min}} y {{max}} letras. El juego elegirá una."
+      },
+      "minWordLength": {
+        "title": "Palabra más corta que cuenta",
+        "len2": "2 letras",
+        "len3": "3 letras",
+        "len4": "4 letras",
+        "len5": "5 letras"
+      },
       "timer": {
         "title": "Temporizador",
         "min1": "1 min",
@@ -12353,9 +12366,9 @@ const es = {
       },
       "board": {
         "title": "Tamaño del Tablero",
-        "small": "Pequeño (4×4)",
-        "medium": "Mediano (5×5)",
-        "large": "Grande (6×6)"
+        "small": "Pequeño (5×5)",
+        "medium": "Mediano (6×6)",
+        "large": "Grande (7×7)"
       },
       "create": "Crear Aula",
       "createAnother": "Crear Otra Aula",
@@ -12750,6 +12763,14 @@ const es = {
     }
   },
   "education": {
+    "results": {
+      "title": "Resumen de la lección",
+      "yourMastery": "Encontraste {{found}} de {{total}} palabras de la lección",
+      "classCoverage": "La clase encontró {{found}} de {{total}} palabras de la lección",
+      "reteach": "Nadie encontró estas",
+      "allFound": "La clase encontró todas las palabras de la lección.",
+      "practiceMissed": "Practicar estas palabras"
+    },
     "nav": {
       "section": "Docentes",
       "forTeachers": "Para docentes",

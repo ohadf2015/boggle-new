@@ -10877,6 +10877,19 @@ const en = {
         "blast": "Blast",
         "wheelRush": "Wheel Rush"
       },
+      "huntTarget": {
+        "title": "Hunted Word",
+        "description": "Pin the word your class hunts, or let the game choose one.",
+        "random": "Surprise the class",
+        "noneEligible": "None of this lesson's words can be hunted — a target has to be {{min}}–{{max}} letters. The game will pick one."
+      },
+      "minWordLength": {
+        "title": "Shortest word that counts",
+        "len2": "2 letters",
+        "len3": "3 letters",
+        "len4": "4 letters",
+        "len5": "5 letters"
+      },
       "timer": {
         "title": "Timer",
         "min1": "1 min",
@@ -10886,9 +10899,9 @@ const en = {
       },
       "board": {
         "title": "Board Size",
-        "small": "Small (4×4)",
-        "medium": "Medium (5×5)",
-        "large": "Large (6×6)"
+        "small": "Small (5×5)",
+        "medium": "Medium (6×6)",
+        "large": "Large (7×7)"
       },
       "create": "Create Classroom",
       "createAnother": "Create Another Classroom",
@@ -11333,6 +11346,14 @@ const en = {
     }
   },
   "education": {
+    "results": {
+      "title": "Lesson recap",
+      "yourMastery": "You found {{found}} of {{total}} lesson words",
+      "classCoverage": "The class found {{found}} of {{total}} lesson words",
+      "reteach": "Nobody found these",
+      "allFound": "The class found every lesson word.",
+      "practiceMissed": "Practise these words"
+    },
     "nav": {
       "section": "Teachers",
       "forTeachers": "For teachers",

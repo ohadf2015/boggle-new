@@ -12611,6 +12611,19 @@ const sv = {
         "blast": "Blast",
         "wheelRush": "Hjulrush"
       },
+      "huntTarget": {
+        "title": "Jaktord",
+        "description": "Välj ordet klassen ska jaga, eller låt spelet välja.",
+        "random": "Överraska klassen",
+        "noneEligible": "Inget ord i den här lektionen går att jaga — ett målord måste vara {{min}}–{{max}} bokstäver. Spelet väljer ett."
+      },
+      "minWordLength": {
+        "title": "Kortaste ordet som räknas",
+        "len2": "2 bokstäver",
+        "len3": "3 bokstäver",
+        "len4": "4 bokstäver",
+        "len5": "5 bokstäver"
+      },
       "timer": {
         "title": "Timer",
         "min1": "1 min",
@@ -12620,9 +12633,9 @@ const sv = {
       },
       "board": {
         "title": "Brädstorlek",
-        "small": "Liten (4×4)",
-        "medium": "Mellan (5×5)",
-        "large": "Stor (6×6)"
+        "small": "Liten (5×5)",
+        "medium": "Mellan (6×6)",
+        "large": "Stor (7×7)"
       },
       "create": "Skapa klassrum",
       "createAnother": "Skapa ett annat klassrum",
@@ -12996,6 +13009,14 @@ const sv = {
     }
   },
   "education": {
+    "results": {
+      "title": "Lektionssammanfattning",
+      "yourMastery": "Du hittade {{found}} av {{total}} lektionsord",
+      "classCoverage": "Klassen hittade {{found}} av {{total}} lektionsord",
+      "reteach": "Ingen hittade de här",
+      "allFound": "Klassen hittade alla lektionsord.",
+      "practiceMissed": "Öva de här orden"
+    },
     "nav": {
       "section": "Lärare",
       "forTeachers": "För lärare",
