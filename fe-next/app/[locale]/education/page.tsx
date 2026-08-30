@@ -12,7 +12,11 @@ import {
 import { PageClient as EducationPageClient } from './PageClient';
 import { educationSeoContent } from './seoContent';
 
-export const dynamic = 'force-dynamic';
+// The hub renders from a static content object keyed by locale — no cookies(),
+// headers() or searchParams anywhere in the tree, so there is nothing to make it
+// per-request. `force-dynamic` arrived incidentally in 506600208 (a Connections
+// commit) and cost every visitor a server render. ISR matches /education/for-schools.
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;

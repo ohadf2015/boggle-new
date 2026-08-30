@@ -45,6 +45,57 @@ describe('sitemap', () => {
     }
   });
 
+  /**
+   * The education landing pages set `robots: index` and self-referencing
+   * hreflang for all six locales in their own generateMetadata. The sitemap
+   * used to list only /en and point he/sv/ja/es hreflang at *different* URLs —
+   * conflicting annotations Google discards, plus 30 indexable non-English URLs
+   * that appeared in no sitemap at all. These two tests pin them together.
+   */
+  const EDUCATION_LANDINGS = [
+    '/education/vocabulary-games-classroom',
+    '/education/esl-word-games',
+    '/education/games-for-teachers',
+    '/education/spelling-bee-practice',
+    '/education/sight-words-practice',
+    '/education/for-schools',
+    // Teacher-moment landings
+    '/education/brain-breaks-word-games',
+    '/education/indoor-recess-games',
+    '/education/end-of-year-classroom-activities',
+    '/education/first-day-of-school-icebreakers',
+    '/education/early-finishers-activities',
+    '/education/middle-school-word-games',
+  ];
+  const ALL_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+
+  it('lists every education landing in every locale the page itself indexes', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    for (const path of EDUCATION_LANDINGS) {
+      for (const locale of ALL_LOCALES) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}${path}`),
+          `sitemap missing /${locale}${path}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('declares self-referencing education hreflang that matches the page metadata', () => {
+    const entries = sitemap();
+    for (const path of EDUCATION_LANDINGS) {
+      const entry = entries.find((e) => e.url === `https://www.lexiclash.live/en${path}`);
+      expect(entry, `no sitemap entry for /en${path}`).toBeDefined();
+      const langs = entry!.alternates?.languages as Record<string, string>;
+      for (const locale of ALL_LOCALES) {
+        expect(langs[locale], `${path} hreflang ${locale} must self-reference`).toBe(
+          `https://www.lexiclash.live/${locale}${path}`,
+        );
+      }
+      expect(langs['x-default']).toBe(`https://www.lexiclash.live/en${path}`);
+    }
+  });
+
   it('includes English commercial-intent doorway pages (WWF / multiplayer / free-online targets)', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     const required = [

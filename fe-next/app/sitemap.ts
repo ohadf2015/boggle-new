@@ -180,8 +180,14 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // surface had no crawl path (added 2026-07-29).
   addForAllLocales(routes, '/teacher/upgrade', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
-  // ─── Education SEO landings (English-only target; non-EN noindexed via robots in metadata) ───
-  // Each targets a high-volume teacher/ESL keyword cluster; non-EN locales hreflang back to /education.
+  // ─── Education SEO landings ───
+  // These pages ship fully localized copy and set `robots: { index: true }` for
+  // all six locales in their own generateMetadata, with self-referencing
+  // hreflang. This block used to emit /en only and point he/sv/ja/es hreflang at
+  // *different* pages — annotations that contradicted the page's own <link
+  // rel="alternate">, so Google discarded the cluster, and 30 indexable
+  // non-English URLs were in no sitemap at all. addForAllLocales emits exactly
+  // what the pages declare.
   const educationLandings = [
     '/education/vocabulary-games-classroom',
     '/education/esl-word-games',
@@ -189,26 +195,21 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     '/education/spelling-bee-practice',
     '/education/sight-words-practice',
     '/education/for-schools',
+    // Teacher-moment landings: each targets a specific moment in the school day
+    // rather than a product feature, and each carries its own artifact (a word
+    // list, a timed plan, a comparison table) so the set is not near-duplicate.
+    '/education/brain-breaks-word-games',
+    '/education/indoor-recess-games',
+    '/education/end-of-year-classroom-activities',
+    '/education/first-day-of-school-icebreakers',
+    '/education/early-finishers-activities',
+    '/education/middle-school-word-games',
   ];
   educationLandings.forEach((path) => {
-    routes.push({
-      url: `${BASE_URL}/en${path}`,
+    addForAllLocales(routes, path, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'weekly',
       priority: 0.85,
-      alternates: {
-        languages: {
-          'x-default': `${BASE_URL}/en${path}`,
-          en: `${BASE_URL}/en${path}`,
-          he: `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
-          sv: `${BASE_URL}/sv/education`,
-          ja: `${BASE_URL}/ja/education`,
-          es: `${BASE_URL}/es/juegos-vocabulario-aula`,
-          'en-US': `${BASE_URL}/en${path}`,
-          'en-GB': `${BASE_URL}/en${path}`,
-          'en-IL': `${BASE_URL}/en${path}`,
-        },
-      },
       images: [`${BASE_URL}/og-image-en.webp`],
     });
   });

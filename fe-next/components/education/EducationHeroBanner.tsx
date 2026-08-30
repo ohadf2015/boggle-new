@@ -14,6 +14,8 @@ const HERO_IMAGES: Record<string, { webp: string; jpg: string }> = {
   sv: { webp: '/images/education-hero-sv.webp', jpg: '/images/education-hero-sv.jpg' },
   ja: { webp: '/images/education-hero-ja.webp', jpg: '/images/education-hero-ja.jpg' },
   es: { webp: '/images/education-hero-es.webp', jpg: '/images/education-hero-es.jpg' },
+  // No bespoke Russian asset shipped — reuse the English hero rather than 404.
+  ru: { webp: '/images/education-hero-en.webp', jpg: '/images/education-hero-en.jpg' },
 };
 
 /**
@@ -35,9 +37,14 @@ export function EducationHeroBanner({ title, subtitle, cta }: Props) {
         <source srcSet={imageSet.webp} type="image/webp" />
         <img
           src={imageSet.jpg}
-          alt={title}
+          // Decorative: the heading beside it already carries the meaning, and
+          // duplicating it here made screen readers announce the title twice.
+          alt=""
+          width={1200}
+          height={675}
           className="absolute inset-0 h-full w-full object-cover"
           loading="eager"
+          decoding="async"
           fetchPriority="high"
         />
       </picture>

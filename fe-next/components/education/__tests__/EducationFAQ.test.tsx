@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -16,9 +16,18 @@ import { EducationFAQ } from '../EducationFAQ';
 
 describe('<EducationFAQ>', () => {
   it('renders 8 questions', () => {
-    render(<EducationFAQ />);
-    const items = screen.getAllByRole('button');
-    expect(items).toHaveLength(8);
+    const { container } = render(<EducationFAQ />);
+    expect(container.querySelectorAll('details summary')).toHaveLength(8);
+  });
+
+  it('ships every answer in the initial HTML, not only once expanded', () => {
+    // Native <details> keeps collapsed answers in the DOM. The previous
+    // `{isOpen && ...}` markup omitted them entirely, so crawlers and AI answer
+    // engines reading the served HTML saw eight questions and zero answers.
+    const { container } = render(<EducationFAQ />);
+    const answers = container.querySelectorAll('details > div');
+    expect(answers).toHaveLength(8);
+    expect(answers[0].textContent).toContain('education.landing.faq.q1.a');
   });
 
   it('emits FAQPage JSON-LD script tag', () => {
