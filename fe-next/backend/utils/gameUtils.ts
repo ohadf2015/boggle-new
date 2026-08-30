@@ -138,13 +138,6 @@ export const validSpanishLettersSet = new Set<string>([
 // ==========================================
 
 /**
- * Generate a random 4-digit room code
- */
-export function generateRoomCode(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString();
-}
-
-/**
  * Filter a Hebrew word to only include valid letters
  */
 export function filterHebrewWord(word: string): string {

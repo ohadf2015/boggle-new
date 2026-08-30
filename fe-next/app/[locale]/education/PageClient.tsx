@@ -187,7 +187,11 @@ export function PageClient() {
         <>
           <EducationHero />
           <MoatTrifectaSection />
-          <ProFramingSection />
+          {/* Pricing used to sit here, third, before a first-time visitor had seen
+              what the product actually does — and it was the first of two upsells
+              (this and DistrictUpsellStrip) shown to someone who has not signed up.
+              Moved below the role cards so the order is: what it is → the modes →
+              how it compares → pick your role → what it costs. */}
           <div id="modes">
             <SixModeTour />
           </div>
@@ -263,6 +267,9 @@ export function PageClient() {
 
       {!loading && !hasTeacherAccess && (
         <>
+          {/* Pricing lands here, after the visitor has chosen a role — not third
+              on the page. See the note by SixModeTour above. */}
+          <ProFramingSection />
           <DistrictUpsellStrip />
           <section className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
             <h2 className="text-3xl font-neo-display font-black text-neo-white">

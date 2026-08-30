@@ -1,6 +1,97 @@
 {
-  "generatedAt": "2026-08-30T18:08:49.169Z",
+  "generatedAt": "2026-08-30T19:42:41.474Z",
   "commits": [
+    {
+      "sha": "71e37967b9a70695d780896e8186b4f39aaeef27",
+      "shortSha": "71e3796",
+      "subject": "merge: reconcile education copy with the parallel fixes on master",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T22:42:17+03:00"
+    },
+    {
+      "sha": "fa094f051644ece65c2c07574a12b9c97b94a41b",
+      "shortSha": "fa094f0",
+      "subject": "fix(server): a client hanging up must not kill the process",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T22:34:18+03:00"
+    },
+    {
+      "sha": "19feff46b7cd9a27585c0293b62db2a524733d58",
+      "shortSha": "19feff4",
+      "subject": "fix(education): count six languages and stop promising free forever",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T22:33:03+03:00"
+    },
+    {
+      "sha": "64881f2243d65378b77a8cb2897980f3a835ae0b",
+      "shortSha": "64881f2",
+      "subject": "feat(mp-desktop): fill the rails, one clock, readable blast tiles",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:56:57+03:00"
+    },
+    {
+      "sha": "781e889945e36bbdb7ca42413aa32a45fc981681",
+      "shortSha": "781e889",
+      "subject": "test(education): assert the TV join address carries the game code",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:42:45+03:00"
+    },
+    {
+      "sha": "944d24ec43003cdfa9042ce7a99ca41a8cc3d60d",
+      "shortSha": "944d24e",
+      "subject": "fix(education): join code is 6 characters, not 4 digits — 197 claims corrected",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:32:58+03:00"
+    },
+    {
+      "sha": "789d42b199702cb4c87d48f691d8e312f769bc1b",
+      "shortSha": "789d42b",
+      "subject": "docs: education landing SEO handoff — open questions and verification state",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:26:31+03:00"
+    },
+    {
+      "sha": "b84487f1fb8af72497dcd2533f628749e8a22741",
+      "shortSha": "b84487f",
+      "subject": "feat(education): rebuild the access landing around one signup CTA",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:23:37+03:00"
+    },
+    {
+      "sha": "70e069341f3fe19c023ec96428779ece14f321e8",
+      "shortSha": "70e0693",
+      "subject": "Merge remote-tracking branch 'origin/master'",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:22:56+03:00"
+    },
+    {
+      "sha": "4127d0ee34d778171fbf7704151589eb086c7889",
+      "shortSha": "4127d0e",
+      "subject": "fix(education): drop an invalid section kind the test suite could not see",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:20:45+03:00"
+    },
+    {
+      "sha": "785aed9abb3b6cd3d7734f481b1002ebd44974ca",
+      "shortSha": "785aed9",
+      "subject": "fix(education): drop the student-count claim from the launcher steps",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:14:51+03:00"
+    },
+    {
+      "sha": "b5ba51143a63e4fd15c9319f0b2ff8753a767d33",
+      "shortSha": "b5ba511",
+      "subject": "fix(education): make the invite actionable and stop stacking upsells on teachers",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:12:48+03:00"
+    },
+    {
+      "sha": "43cf99a9457e7b12437f7c60ce67d35039863cd4",
+      "shortSha": "43cf99a",
+      "subject": "fix(education): correct 140+ false pricing/capacity claims across 6 languages",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T21:10:21+03:00"
+    },
     {
       "sha": "9952d5ce7180ec17b18df85f5443612553585477",
       "shortSha": "9952d5c",
@@ -9,11 +100,32 @@
       "date": "2026-08-30T21:07:36+03:00"
     },
     {
+      "sha": "98a94d75c19d3332da47bf8aeefe4f84603f6f36",
+      "shortSha": "98a94d7",
+      "subject": "feat(education): six teacher-moment landing pages, all six locales",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T20:52:23+03:00"
+    },
+    {
       "sha": "10abe1f9cb4c3abc4fc2c7bb6733f17992706b29",
       "shortSha": "10abe1f",
       "subject": "fix(education): keep the classroom join code on screen, correct launcher copy",
       "author": "Ohad Fisher",
       "date": "2026-08-30T20:48:40+03:00"
+    },
+    {
+      "sha": "80f82b3953bb4a363c802c1e5b026bb56913c808",
+      "shortSha": "80f82b3",
+      "subject": "feat(education): shared landing template + fix hreflang, GEO copy, hub perf",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T20:22:28+03:00"
+    },
+    {
+      "sha": "b1a327d764c123fd5d25679ccb75c1a44dc1a79d",
+      "shortSha": "b1a327d",
+      "subject": "fix(boggle-word-shake-free): server-render playable Boggle shell instead of spinner",
+      "author": "ohadf2015",
+      "date": "2026-08-30T10:59:38+03:00"
     },
     {
       "sha": "30f9b58fe13868df7a84a384083fddae612c89c1",
@@ -28,118 +140,6 @@
       "subject": "fix(sentry): ru hints, classroom preview, GSI button, MP usernames",
       "author": "Ohad Fisher",
       "date": "2026-08-30T09:44:59+03:00"
-    },
-    {
-      "sha": "2100b2691cd4a9858ebcb4ca54bbb046115946cc",
-      "shortSha": "2100b26",
-      "subject": "docs: record the pre-existing WheelRushResultsScene failure so it is not re-chased",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T09:42:08+03:00"
-    },
-    {
-      "sha": "cb71c8a8d19dc6d936b78dd1872d95bbc85d3d24",
-      "shortSha": "cb71c8a",
-      "subject": "feat(singleplayer): delete the last two bespoke layouts, one shell for every surface",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T09:16:27+03:00"
-    },
-    {
-      "sha": "4b39a2abcfa7d35d8f7d02f77922e7d6698bb095",
-      "shortSha": "4b39a2a",
-      "subject": "feat(singleplayer): drop the bespoke portrait layout, render solo on the shared shell",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T05:32:59+03:00"
-    },
-    {
-      "sha": "b4ea660c7d29620f2c6a6e17f848f3eeb7e098ba",
-      "shortSha": "b4ea660",
-      "subject": "feat(singleplayer): render solo through the MP shell behind ?shell=mp",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T05:04:05+03:00"
-    },
-    {
-      "sha": "e91b85568a7c0f8ecbb455922a96f6507a49eae3",
-      "shortSha": "e91b855",
-      "subject": "fix(i18n): reuse common.pause/common.resume instead of inventing two new keys",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:50:15+03:00"
-    },
-    {
-      "sha": "47350e1761993f21b70b3b609054a1280fc710f4",
-      "shortSha": "47350e1",
-      "subject": "feat(singleplayer): make the MP shell a superset and add the solo adapter",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:49:14+03:00"
-    },
-    {
-      "sha": "ef30af0dc211aef607461e0319e955487f3b87f4",
-      "shortSha": "ef30af0",
-      "subject": "docs(singleplayer): executable prop mapping for the UI unification, and the FTUE blocker",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:42:10+03:00"
-    },
-    {
-      "sha": "1e11df0c5f6283c292e27e95721a1168c0b0483e",
-      "shortSha": "1e11df0",
-      "subject": "fix(ugc): locale-prefix the community board play link, and record two verified negatives",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:37:57+03:00"
-    },
-    {
-      "sha": "ae03c6abfe842dfd6196c3a266ddaff378fca5f2",
-      "shortSha": "ae03c6a",
-      "subject": "docs(singleplayer): record the measured shape of the remaining SP retirement",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:26:42+03:00"
-    },
-    {
-      "sha": "69b0feff6a817276fb6493262d87e394a6e26a6f",
-      "shortSha": "69b0fef",
-      "subject": "refactor(singleplayer): retire the ?returnTo entry point, which nothing ever linked to",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:25:29+03:00"
-    },
-    {
-      "sha": "d4f66ebff11c5ebba28eba9c97587765e17822d3",
-      "shortSha": "d4f66eb",
-      "subject": "fix(wheel): reserve the bottom stack once, and stop the orbit escaping its container",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T04:18:34+03:00"
-    },
-    {
-      "sha": "fe3f5eb07136a91886cb2aa29f62d6466ffcade7",
-      "shortSha": "fe3f5eb",
-      "subject": "fix(game): give the single-player shell a definite height so the board stops collapsing",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T02:22:40+03:00"
-    },
-    {
-      "sha": "a4d11763afec477d5d6a79042e5da3d844ba6cbe",
-      "shortSha": "a4d1176",
-      "subject": "docs: record the react-doctor audit and what its 191 errors actually were",
-      "author": "Ohad Fisher",
-      "date": "2026-08-29T21:26:08+03:00"
-    },
-    {
-      "sha": "b30f0dc3736d4cd9df083e26b9ffee8bac074e47",
-      "shortSha": "b30f0dc",
-      "subject": "perf(tv): animate score bars with transform, and drop two dead files",
-      "author": "Ohad Fisher",
-      "date": "2026-08-29T21:25:36+03:00"
-    },
-    {
-      "sha": "91e39dc1767862b480f89c3987b0933afc92f6ed",
-      "shortSha": "91e39dc",
-      "subject": "fix(security): stop anon writing subscription_events, route webhook writes through service role",
-      "author": "Ohad Fisher",
-      "date": "2026-08-29T21:24:59+03:00"
-    },
-    {
-      "sha": "643cf33eb05a8a75b32a832498f6c9e65273d885",
-      "shortSha": "643cf33",
-      "subject": "fix(react): release effect cleanups and keep state updaters pure",
-      "author": "Ohad Fisher",
-      "date": "2026-08-29T21:23:59+03:00"
     }
   ]
 }

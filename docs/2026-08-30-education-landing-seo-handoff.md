@@ -42,21 +42,44 @@ FORBID the 4-digit claim rather than forbidding any length.
    similar widening on 2026-05-20 sent Google into ~900 noindexed URLs. If coverage errors spike
    on /education/*, this change is the cause.
 
-2. **Non-English word lists on `middle-school-word-games` are translated English**, not sourced
-   from each country's curriculum. Now idiomatic and valid (12 Hebrew + 1 Swedish word corrected)
-   but not what a Swedish or Japanese teacher sees in their own materials. No page claims
-   curriculum alignment, so this is a quality ceiling, not a false claim.
+2. **Hub information architecture — partly addressed 2026-08-30.** `ProFramingSection` (pricing)
+   was showing third on the page to logged-out visitors, before they had seen what the product
+   does, and was the first of two upsells (with `DistrictUpsellStrip`) aimed at someone who had
+   not signed up. Moved below the role cards: what it is → modes → comparison → pick a role →
+   what it costs. NOT addressed: the guest hub still stacks ~11 sections including five separate
+   card grids, which is the "same-size cards as page structure" anti-pattern. A real redesign is
+   still open, and note another session is actively reworking education UI, so coordinate.
 
-3. **Hub structural redesign not attempted.** Reserved-accent violations (`neo-yellow` on generic
-   CTAs) and a two-lime CTA collision were fixed; the stacked card-grid structure was left alone.
+3. **Competitor free tiers — VERIFIED first-party 2026-08-30. Read this before writing any
+   comparison page; it is worse for us than the secondary sources implied.**
 
-4. **Competitor free-tier numbers conflict between sources.** Only "Kahoot ≈ 10 free participants"
-   is corroborated across searches. Verify each vendor's own pricing page before publishing any
-   comparison content.
+   | Vendor | Free tier | Source |
+   |---|---|---|
+   | **LexiClash** | **10 students per classroom** (3 classrooms) | `lib/education/freeTierLimits.ts` |
+   | Blooket | **up to 60 players** | help.blooket.com "Is Blooket Free?" |
+   | Gimkit | Basic = unlimited on featured modes; 60 hard cap on 2D modes | help.gimkit.com "Player maximums" |
+   | Kahoot | 10-40 depending on account category | support.kahoot.com "How many participants" |
+   | Quizizz | **UNVERIFIED** — only found the *for Work* trial (30) | — |
 
-5. **Topics researched but not built** (deliberately — publish in batches, watch 2-4 weeks first):
-   phonics K-2 (biggest remaining gap), SAT/ACT vocabulary, partner/pair-work games,
-   reading comprehension. Hebrew rated the strongest market (~90% win likelihood).
+   Our 10-student free cap is at the BOTTOM of this field, not in the middle. Earlier
+   third-party listicles claimed Blooket capped at 5 — that is wrong; their own help centre
+   says 60. Do NOT publish a comparison page claiming a free-tier advantage. The defensible
+   differentiators are word-formation gameplay (everyone else is multiple-choice), six languages
+   with native dictionaries incl. Hebrew RTL, and no student email — not price or capacity.
+
+4. **Topics researched but not built**: phonics K-2 (biggest remaining gap), SAT/ACT vocabulary,
+   partner/pair-work games, reading comprehension. Hebrew rated the strongest market (~90% win).
+   ATTEMPTED 2026-08-30 and deliberately abandoned: a `/education/phonics-games-classroom` page
+   was scaffolded and fully wired (sitemap, guards, hub link, llms.txt) but the content agent
+   produced nothing, and the wiring was reverted rather than left dangling. The blocker is real:
+   a phonics page's whole value is its decodable word lists, and those must be grounded in how
+   each country actually teaches early reading (he ניקוד/הברות · ja ひらがな 清音/濁音/拗音 ·
+   sv ljudning · ru слоговое чтение · es sílabas trabadas). An invented decodable list is
+   actively harmful to a teacher, so this needs sourced lists, not a generation pass.
+
+5. **Middle-school word lists still translated, not curriculum-sourced** (was item 2). A second
+   attempt on 2026-08-30 also produced nothing. Unchanged from the original note: the words are
+   valid and idiomatic, just not what a Swedish or Japanese teacher sees in their own materials.
 
 ## Verification status
 
@@ -66,11 +89,18 @@ FORBID the 4-digit claim rather than forbidding any length.
   fresh `.next/BUILD_ID`; 469 routes total (was 456). It failed once first and caught a real
   defect (`kind: 'faqs'`) that vitest could not see because vitest strips types — fixed and
   now guarded by a runtime section-kind assertion.
-- **Perf claim corrected.** `/[locale]/education` still builds `ƒ (Dynamic)`, not `●`. So does
-  everything else: **461 of 465 routes are ƒ, 3 static, 1 SSG.** Dropping `force-dynamic` is
-  still a real gain (the route no longer opts out of caching entirely), but the pages cannot
-  prerender because **`app/[locale]` has no `generateStaticParams`** — a repo-wide condition,
-  not something these pages can fix. Making the locale segment static is the actual lever for
-  site-wide render performance, and it is a separate, higher-blast-radius change.
+- **Perf: CORRECTED AGAIN — do not "fix" this.** `/[locale]/education` builds `ƒ (Dynamic)`, as do
+  461 of 465 routes. My earlier note blamed a missing `generateStaticParams`. That is WRONG, and
+  `app/[locale]/layout.tsx:204-213` already documents the truth: `fetchCache = 'force-no-store'`
+  is what keeps every `[locale]` route dynamic, and adding `generateStaticParams` "makes the build
+  prerender 214 pages but does NOT flip the classification".
+  That line is an **OOM guard** for Next.js issue #90433 (a ~7.7MB-per-render leak retained by
+  `cacheController`, confirmed by heap-snapshot diff 2026-07-20). Checked 2026-08-30: #90433 is
+  still OPEN and was reproduced as recently as `16.2.0-canary.51`; this repo runs Next 16.2.6.
+  **Removing `fetchCache` is the single highest-leverage TTFB change available AND will OOM the
+  server until #90433 lands.** Re-check the issue before touching it; do not treat the `ƒ`
+  classification as a bug to fix locally.
+- Dead code removed: `backend/utils/gameUtils.ts` exported a 4-digit `generateRoomCode` that
+  nothing imported (`friendChallengeHandler` defines its own 6-char local copy). Deleted.
 - Do NOT gate a build on `pgrep -f "next build"` — another session in this repo almost always has
   one running, so the guard never exits. Use `NEXT_BUILD_DIR` to isolate instead.
