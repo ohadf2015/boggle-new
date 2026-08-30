@@ -22,6 +22,7 @@ import * as gameStateManager from '../backend/modules/gameStateManager';
 import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronScheduler';
 import { initCronQueue, registerAllCronJobs, shutdownCronQueue } from '../backend/queues/cronQueue';
 import type { ScheduledTask } from 'node-cron';
+import { isClientDisconnectError } from './clientDisconnect';
 
 /**
  * Shutdown handler function type
@@ -302,6 +303,20 @@ export function registerProcessErrorHandlers(): void {
 
   // Capture uncaught exceptions
   process.on('uncaughtException', (error: Error) => {
+    // A client vanishing mid-request (closed tab, navigation during a slow
+    // response, reload) surfaces here as an uncaught exception because the
+    // request stream errors with no listener. That is routine network
+    // behaviour, not corrupted process state, so it must not exit and must not
+    // page anyone — previously a single browser navigating away could take the
+    // server down, which reads as an unexplained restart in production.
+    if (isClientDisconnectError(error)) {
+      lifecycleLogger.warn(
+        { err: error, code: (error as NodeJS.ErrnoException).code },
+        'Client disconnected mid-request (non-fatal)',
+      );
+      return;
+    }
+
     lifecycleLogger.fatal({ err: error }, 'Uncaught Exception');
 
     // Fire-and-forget crash alert (best-effort within the 2s pre-exit window
