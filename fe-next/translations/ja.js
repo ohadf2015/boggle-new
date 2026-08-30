@@ -12373,6 +12373,19 @@ const ja = {
         "blast": "ブラスト",
         "wheelRush": "ホイールラッシュ"
       },
+      "huntTarget": {
+        "title": "ターゲットの単語",
+        "description": "クラスが探す単語を指定するか、ゲームに選ばせます。",
+        "random": "おまかせ",
+        "noneEligible": "このレッスンには使える単語がありません。ターゲットは{{min}}〜{{max}}文字である必要があります。ゲームが選びます。"
+      },
+      "minWordLength": {
+        "title": "有効な最短の単語",
+        "len2": "2文字",
+        "len3": "3文字",
+        "len4": "4文字",
+        "len5": "5文字"
+      },
       "timer": {
         "title": "タイマー",
         "min1": "1分",
@@ -12382,9 +12395,9 @@ const ja = {
       },
       "board": {
         "title": "盤サイズ",
-        "small": "小 (4×4)",
-        "medium": "中 (5×5)",
-        "large": "大 (6×6)"
+        "small": "小 (5×5)",
+        "medium": "中 (6×6)",
+        "large": "大 (7×7)"
       },
       "create": "クラス作成",
       "createAnother": "別のクラスを作成",
@@ -12758,6 +12771,14 @@ const ja = {
     }
   },
   "education": {
+    "results": {
+      "title": "レッスンのまとめ",
+      "yourMastery": "レッスンの単語 {{total}} 個のうち {{found}} 個を発見",
+      "classCoverage": "クラスはレッスンの単語 {{total}} 個のうち {{found}} 個を発見",
+      "reteach": "誰も見つけられなかった単語",
+      "allFound": "クラスはすべての単語を見つけました。",
+      "practiceMissed": "この単語を練習する"
+    },
     "nav": {
       "section": "教師向け",
       "forTeachers": "教師の方へ",

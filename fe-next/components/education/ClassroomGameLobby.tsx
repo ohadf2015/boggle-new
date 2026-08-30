@@ -23,6 +23,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomSetupStep } from './ClassroomSetupStep';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
+import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
 import type { GameMode } from '@/shared/types/game';
 import type { Language } from '@/lib/supabase/education/types';
 
@@ -47,6 +48,11 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>('classic');
+  // Word Hunt only: the lesson word the teacher pinned as the hunted target.
+  // '' means "let the game choose".
+  const [targetWord, setTargetWord] = useState<string>('');
+  // Shortest word that scores — the teacher's grade-level dial.
+  const [minWordLength, setMinWordLength] = useState<number>(3);
   const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
 
   // Teacher-configurable lobby settings — were hardcoded, now part of the
@@ -119,7 +125,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
         if (data.success) {
           toast.success(t('education.classroomGame.gameCreated'));
-          router.push(`/${language}/multiplayer?room=${data.gameCode}&classroom=true&host=true`);
+          router.push(classroomMultiplayerPath(language, data.gameCode));
         }
       });
       socketInstance.on('classroomGameError', (data: { error: string }) => {
@@ -219,10 +225,11 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       vocabularyWords: allPlayableWords,
       language,
       gameMode,
+      targetWord,
       templateSettings: {
         timerSeconds: settings.timerMinutes * 60,
         difficulty: settings.boardSize,
-        minWordLength: 3,
+        minWordLength,
         allowLateJoin: settings.allowLateJoin,
       },
     }));
@@ -240,11 +247,12 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
         boardSize: settings.boardSize,
         allowLateJoin: settings.allowLateJoin,
         gameMode,
+        targetWord: targetWord || undefined,
       },
     });
   }, [
     user, socket, selectedLessonIds, selectedClassroomId, gameCode,
-    classrooms, selectedLessons, allPlayableWords, settings, gameMode, profile, language, t,
+    classrooms, selectedLessons, allPlayableWords, settings, gameMode, targetWord, minWordLength, profile, language, t,
   ]);
 
   if (isLoading) {
@@ -316,12 +324,16 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       selectedLessonIds={selectedLessonIds}
       allPlayableWords={allPlayableWords}
       gameMode={gameMode}
+      targetWord={targetWord}
+      minWordLength={minWordLength}
       timerMinutes={timerMinutes}
       boardSize={boardSize}
       isStarting={isStarting}
       onSelectClassroom={setSelectedClassroomId}
       onSelectLessons={setSelectedLessonIds}
       onGameModeChange={setGameMode}
+      onTargetWordChange={setTargetWord}
+      onMinWordLengthChange={setMinWordLength}
       onTimerChange={setTimerMinutes}
       onBoardSizeChange={setBoardSize}
       onNext={handleStartGame}

@@ -14,6 +14,7 @@ import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
+import { classroomHostPreset } from '@/lib/education/classroomHostPreset';
 import { StartButton } from './pre-game/StartButton';
 import { MobileShareSection } from './pre-game/MobileShareSection';
 import { SoloPlayPrompt } from './pre-game/SoloPlayPrompt';
@@ -248,16 +249,27 @@ function HostPreGameView({
     setHostSelectedGameMode(mode);
   }, [selectedGameMode, setStoreGameMode, setHostSelectedGameMode]);
 
-  // Apply default preset on mount
+  // Apply default preset on mount.
+  //
+  // A classroom teacher already answered these in the setup wizard, so the
+  // 'fast' preset must not overwrite them — it silently reset every classroom
+  // game to 1 minute on a MEDIUM board no matter what the teacher chose.
   useEffect(() => {
     if (!hasInitialized) {
-      const preset = GAME_PRESETS['fast'];
-      setTimerValue(preset.timer);
-      setDifficulty(preset.difficulty);
-      setMinWordLength(2);
+      const classroomPreset = classroomHostPreset(lessonData?.templateSettings);
+      if (classroomPreset) {
+        setTimerValue(classroomPreset.timerMinutes);
+        setDifficulty(classroomPreset.difficulty);
+        setMinWordLength(classroomPreset.minWordLength);
+      } else {
+        const preset = GAME_PRESETS['fast'];
+        setTimerValue(preset.timer);
+        setDifficulty(preset.difficulty);
+        setMinWordLength(2);
+      }
       setHasInitialized(true);
     }
-  }, [hasInitialized, setTimerValue, setDifficulty, setMinWordLength]);
+  }, [hasInitialized, lessonData, setTimerValue, setDifficulty, setMinWordLength]);
 
   // TV tutorial trigger on toggle
   const prevHostPlayingRef = useRef(hostPlaying);

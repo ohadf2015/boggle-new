@@ -45,6 +45,10 @@ const createClassroomGameSchema = z.object({
     boardSize: z.enum(['small', 'medium', 'large']).optional(),
     allowLateJoin: z.boolean().optional(),
     gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush']).optional(),
+    // Word Hunt: teacher-pinned target. Length/charset is re-checked against the
+    // lesson at game start (shared/utils/classroomHuntTarget), so this bound is
+    // only a payload-size guard.
+    targetWord: z.string().max(100).optional(),
   }).optional(),
 });
 
@@ -116,7 +120,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     const payload = validation.data as {
       classroomId: string; teacherId: string; teacherName: string; gameCode: string;
       lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[];
-      settings?: { timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean; gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' };
+      settings?: { timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean; gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush'; targetWord?: string };
     };
 
     // Auth check: teacherId MUST match authenticated user (mandatory, not optional)
@@ -153,6 +157,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           boardSize: payload.settings?.boardSize,
           allowLateJoin: payload.settings?.allowLateJoin,
           gameMode: payload.settings?.gameMode || 'classic',
+          targetWord: payload.settings?.targetWord,
         },
       };
 

@@ -53,6 +53,7 @@ import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback, selectCleanCommonTarget, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
+import { resolveTeacherHuntTarget } from '@/shared/utils/classroomHuntTarget';
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
 import { initVersusMatch } from '@/lib/wordTower/versusMatch';
 import { initShiritoriState } from '../modules/shiritoriManager.js';
@@ -672,13 +673,27 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       // so it matches both the embedded grid and the tile-derived player guesses
       // — validateTargetGuess only lowercases, so a natural-form he target with a
       // final letter would never match the normalized board word.
-      const cleanTargetRaw = vocabToEmbed.length > 0
-        ? null
-        : selectCleanCommonTarget(gameLang, recentTargets);
+      //
+      // A classroom teacher may pin the hunted word to one of their own lesson
+      // words. That pick wins over both the curated pool and the solve-based
+      // fallback, and takes the embed path below so it is guaranteed findable —
+      // a pinned target that isn't on the board is worse than no pin at all.
+      const teacherTarget = resolveTeacherHuntTarget(
+        classroomGame?.settings?.targetWord,
+        classroomGame?.vocabularyWords ?? [],
+      );
+      const cleanTargetRaw = teacherTarget
+        ?? (vocabToEmbed.length > 0 ? null : selectCleanCommonTarget(gameLang, recentTargets));
       const cleanTarget = cleanTargetRaw ? normalizeWordForLanguage(cleanTargetRaw, gameLang) : null;
       if (cleanTarget) {
+        // Target first so it wins the embed if the board can't fit everything —
+        // but keep the rest of the lesson vocabulary, or pinning a target would
+        // silently strip the other words the teacher chose to practise.
+        const wordsToEmbed = [cleanTarget, ...vocabToEmbed.filter(
+          (w) => w.toUpperCase() !== cleanTarget.toUpperCase(),
+        )];
         letterGrid = generateRichBoard(
-          () => generateRandomTable(gridRows, gridCols, gameLang, [cleanTarget]),
+          () => generateRandomTable(gridRows, gridCols, gameLang, wordsToEmbed),
           gameLang,
           gridRows,
           gridCols,

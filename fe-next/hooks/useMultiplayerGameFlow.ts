@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
+import type { ClassroomSummary } from '@/shared/types/classroom';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
 import { useGameStore } from '@/hooks/gameState/store';
 import type { Language } from '@/shared/types/game';
@@ -25,6 +26,7 @@ interface ResultsData {
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, any> };
   wheelRushSummary?: { playerStats?: Record<string, any> };
+  classroomSummary?: ClassroomSummary;
 }
 
 interface GameStartData {

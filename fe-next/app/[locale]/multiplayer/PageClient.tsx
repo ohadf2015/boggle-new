@@ -560,6 +560,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             wordHuntSummary={resultsData?.wordHuntSummary}
             blastSummary={resultsData?.blastSummary}
             wheelRushSummary={resultsData?.wheelRushSummary}
+            classroomSummary={resultsData?.classroomSummary}
           />
         </FeatureErrorBoundary>
       );

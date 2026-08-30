@@ -11,6 +11,7 @@ import { getStoredUsername } from '@/utils/profileStorage';
 import { getAvatarForName, getRandomDefaultNameWithAvatar } from '@/utils/defaultNames';
 import logger from '@/utils/logger';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
+import { shouldLoadLessonData } from '@/lib/education/classroomGameHandoff';
 import type { Language, GameMode } from '@/shared/types/game';
 
 interface LessonData {
@@ -101,7 +102,10 @@ export function useMultiplayerSession(
       // source so the prefilled code displays and joins cleanly (Sentry 1NE).
       const rawRoomFromUrl = urlParams.get('room');
       const roomFromUrl = rawRoomFromUrl ? sanitizeGameCode(rawRoomFromUrl) : rawRoomFromUrl;
-      const fromLesson = urlParams.get('fromLesson') === 'true';
+      // A teacher-launched classroom room arrives as `?classroom=true`; the
+      // legacy lesson deeplink used `?fromLesson=true`. Gating on fromLesson
+      // alone silently dropped every classroom game's vocabulary and mode.
+      const fromLesson = shouldLoadLessonData(window.location.search);
       logger.log(
         '[Init] URL search:',
         window.location.search,

@@ -30,6 +30,12 @@ export interface ClassroomGameSettings {
   boardSize?: 'small' | 'medium' | 'large';
   allowLateJoin?: boolean;
   gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
+  /**
+   * Word Hunt only: the lesson word the teacher pinned as the hunted target.
+   * Empty/absent means "let the game pick". Re-validated against the lesson at
+   * game start — never trusted from the socket payload alone.
+   */
+  targetWord?: string;
 }
 
 export interface ClassroomGame {
