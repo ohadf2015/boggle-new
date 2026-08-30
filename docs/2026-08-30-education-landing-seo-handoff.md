@@ -50,22 +50,28 @@ FORBID the 4-digit claim rather than forbidding any length.
    card grids, which is the "same-size cards as page structure" anti-pattern. A real redesign is
    still open, and note another session is actively reworking education UI, so coordinate.
 
-3. **Competitor free tiers — VERIFIED first-party 2026-08-30. Read this before writing any
-   comparison page; it is worse for us than the secondary sources implied.**
+3. **Competitor free tiers — verified first-party, and ACTED ON 2026-08-31.**
 
    | Vendor | Free tier | Source |
    |---|---|---|
-   | **LexiClash** | **10 students per classroom** (3 classrooms) | `lib/education/freeTierLimits.ts` |
-   | Blooket | **up to 60 players** | help.blooket.com "Is Blooket Free?" |
-   | Gimkit | Basic = unlimited on featured modes; 60 hard cap on 2D modes | help.gimkit.com "Player maximums" |
-   | Kahoot | 10-40 depending on account category | support.kahoot.com "How many participants" |
-   | Quizizz | **UNVERIFIED** — only found the *for Work* trial (30) | — |
+   | **LexiClash** | **50 students per classroom** (3 classrooms) — raised from 10 on 08-31 | `lib/education/freeTierLimits.ts` |
+   | Blooket | up to 60 players | help.blooket.com "Is Blooket Free?" |
+   | Gimkit | Basic unlimited on featured modes; 5-player cap applies to Pro-EXCLUSIVE modes only | help.gimkit.com "Player maximums" |
+   | Kahoot | 10-40 depending on account category | support.kahoot.com |
+   | Quizizz | 30 (third-party; not confirmed on their own site) | — |
 
-   Our 10-student free cap is at the BOTTOM of this field, not in the middle. Earlier
-   third-party listicles claimed Blooket capped at 5 — that is wrong; their own help centre
-   says 60. Do NOT publish a comparison page claiming a free-tier advantage. The defensible
-   differentiators are word-formation gameplay (everyone else is multiple-choice), six languages
-   with native dictionaries incl. Hebrew RTL, and no student email — not price or capacity.
+   At 10 we had the least usable free tier in the category. Raised to 50
+   (= MAX_PLAYERS_PER_ROOM) so a real class fits, moving the paywall to where Blooket and
+   Gimkit both put it: analytics/printable reports (ProGate) and unlimited classes.
+   **This is a revenue-model change and is reversible in one constant** —
+   `FREE_TIER_LIMITS.studentsPerClass`. Both `freeTierLimits.test.ts` and
+   `tierLimits.parity.test.ts` carry the reasoning for the old and new positions, so a
+   reversal has to argue with it rather than edit a literal.
+
+   The comparison pages had also been stating **Gimkit's free tier as "5 students per game"**,
+   which is wrong — that cap is Pro-exclusive modes only. Corrected, and
+   `educationClaims.test.ts` now covers all 18 `lexiclash-vs-*` files; it did not before,
+   which is why 17 variants of "fully free with no premium tier" survived every prior sweep.
 
 4. **Topics researched but not built**: phonics K-2 (biggest remaining gap), SAT/ACT vocabulary,
    partner/pair-work games, reading comprehension. Hebrew rated the strongest market (~90% win).

@@ -1,6 +1,20 @@
 {
-  "generatedAt": "2026-08-30T21:55:40.964Z",
+  "generatedAt": "2026-08-30T22:03:32.530Z",
   "commits": [
+    {
+      "sha": "8ea42cdddd414befd3042b1677e0cc2fc0950caf",
+      "shortSha": "8ea42cd",
+      "subject": "Merge remote-tracking branch 'origin/master' into worktree-edu-landing-seo",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T01:02:39+03:00"
+    },
+    {
+      "sha": "a026032070895d0d2007ed5f6773bbc77001f4af",
+      "shortSha": "a026032",
+      "subject": "fix(education): repair a string my own scripted edit broke, and one more 5-language list",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T01:02:33+03:00"
+    },
     {
       "sha": "b6624e204f0ea380f99597388b9a58653d42c93c",
       "shortSha": "b6624e2",
@@ -21,6 +35,13 @@
       "subject": "feat(education): let the whole class play free — move the paywall past first value",
       "author": "Ohad Fisher",
       "date": "2026-08-31T00:46:26+03:00"
+    },
+    {
+      "sha": "54b13ec7aabbc02ba027e65ce0eef4cee64e873f",
+      "shortSha": "54b13ec",
+      "subject": "feat(education): make the teacher's lesson actually reach the board and the class",
+      "author": "Ohad Fisher",
+      "date": "2026-08-30T23:29:41+03:00"
     },
     {
       "sha": "449f194054a9a34bea170353beb220161d4d110d",
@@ -119,27 +140,6 @@
       "subject": "fix(education): make the invite actionable and stop stacking upsells on teachers",
       "author": "Ohad Fisher",
       "date": "2026-08-30T21:12:48+03:00"
-    },
-    {
-      "sha": "43cf99a9457e7b12437f7c60ce67d35039863cd4",
-      "shortSha": "43cf99a",
-      "subject": "fix(education): correct 140+ false pricing/capacity claims across 6 languages",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:10:21+03:00"
-    },
-    {
-      "sha": "9952d5ce7180ec17b18df85f5443612553585477",
-      "shortSha": "9952d5c",
-      "subject": "fix(education): unblock the student join and give the projector a typeable address",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:07:36+03:00"
-    },
-    {
-      "sha": "98a94d75c19d3332da47bf8aeefe4f84603f6f36",
-      "shortSha": "98a94d7",
-      "subject": "feat(education): six teacher-moment landing pages, all six locales",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T20:52:23+03:00"
     }
   ]
 }
