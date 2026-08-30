@@ -168,6 +168,62 @@ So solo keeps its own local orchestrator, feeds the same Zustand stores
 satisfies "use MP as a base, no separate UI" **without** making offline/native
 practice depend on Socket.IO.
 
+### DONE — single player has no separate UI left
+
+All three bespoke layouts are deleted (1411 lines): `PortraitGameLayout` (593),
+`LandscapeGameLayout` (424), `DesktopGameLayout` (394). Solo renders the MP
+`PortraitLayout` on every surface.
+
+**The branch itself was the duplication.** Multiplayer never split by orientation —
+`PortraitLayout` is responsive and takes `isDesktop`. Single player had three
+layouts plus an `isLandscape` / `isDesktop || isTv` branch to pick between them. All
+that survives is one flag.
+
+Verified in Chrome, default path, practice + solo-vs-bots:
+
+| viewport | board | overflow | raw keys |
+|---|---|---|---|
+| 384x832 portrait | 339x352 | none (`scrollH == innerH`) | none |
+| 832x384 landscape | 300x300, fully inside | none | none |
+| 1440x900 desktop | 522x522, 3-column rails | none | none |
+
+Two defects found and fixed while doing it:
+
+1. **`h-[100dvh]` is wrong for a surface that does not start at the viewport top.**
+   The wrapper sat 74px below the fixed app header, so a 100dvh box ended one header
+   past the fold — landscape board bottom 425 in a 384 viewport, page `scrollH` 554.
+   Now `fixed inset-0 z-[70]`, which is both definite AND correctly positioned. z-70
+   clears the header (fixed, z-60, 80px); modals stay above (AuthModal z-100). This
+   also reclaimed those 80px for the board on every surface, and portrait's page
+   overflow (951 vs 832) is gone.
+
+2. **`t`'s identity never changed when the dictionary loaded** — see below. That was
+   the real cause of the "shell renders raw keys" scare.
+
+`showLandscapeTutorial` needed no porting: `LandscapeGameLayout` destructured it as
+`_showLandscapeTutorial`, i.e. it was already dead.
+
+### The i18n bug this uncovered (app-wide, not shell-specific)
+
+`LanguageContext`'s `t` reads translations from a **ref**, and was memoized on
+`[language]` alone. Any memoized subtree that painted during the async dictionary
+load kept its stale `t` and rendered **raw key paths forever** — nothing re-rendered
+it. Components with a ticking prop (score, timer) healed themselves, which is exactly
+why this went unnoticed. Static ones did not: `practice.coach.label`,
+`practice.coach.dismiss`, `playerView.swipeHintShort`. All of those keys exist in
+`translations/en.js`; copy was never missing.
+
+Fix: add `translationsReady` to the `t` dep array. It is not read inside `t` — it
+exists to change the callback identity once when the dictionary lands. Guard:
+`contexts/__tests__/LanguageContext.tIdentity.test.tsx`, asserted at source level
+because jsdom bundles the translations so `translationsReady` starts true and a
+render-based test would pass either way.
+
+**This likely explains other raw-key reports in this codebase**, including the cookie
+banner — worth re-checking them against this fix rather than hunting for missing copy.
+
+### The original prop mapping (kept for reference)
+
 ### The UI unification is feasible — here is the executable prop mapping
 
 This is the part that answers "not a separate UI". Verified feasible, not yet built.

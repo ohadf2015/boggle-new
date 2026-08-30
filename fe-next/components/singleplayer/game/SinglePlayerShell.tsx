@@ -13,7 +13,7 @@
  * Prop plumbing lives in `toShellProps` (pure, unit-tested). This file only
  * wires refs, handlers and the solo-only chrome slot.
  */
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PortraitLayout } from '@/components/game/in-game/components/PortraitLayout';
 import { toShellProps } from './toShellProps';
@@ -74,23 +74,8 @@ export function SinglePlayerShell(props: SinglePlayerShellProps) {
     soloChrome, children,
   } = props;
 
-  const languageCtx = useLanguage();
-  const contextDir = languageCtx.dir;
+  const { dir: contextDir } = useLanguage();
 
-  // LanguageContext's `t` reads the dictionary from a ref, so its identity never
-  // changes when translations finish loading. PortraitLayout and its children are
-  // memoized, so anything that rendered during the load window keeps showing raw
-  // key paths forever (observed: playerView.swipeHintShort). Re-wrapping `t` when
-  // the dictionary lands gives those memo boundaries a changed prop, so they
-  // re-render once with real copy — no remount, no game state lost.
-  //
-  // The context VALUE object is memoized on `translationsReady`, so depending on
-  // it is exactly the "dictionary just arrived" signal, even though the flag
-  // itself is not exposed on the context.
-  const tReady = useCallback<typeof t>(
-    (...args) => languageCtx.t(...args),
-    [languageCtx],
-  );
   const dir = dirProp ?? (contextDir as 'rtl' | 'ltr');
 
   const helpRef = useRef(false);
@@ -113,7 +98,7 @@ export function SinglePlayerShell(props: SinglePlayerShellProps) {
       {...core}
       deferredLeaderboard={core.deferredLeaderboard as unknown as ExtendedLeaderboardPlayer[]}
       username={playerName}
-      t={tReady}
+      t={t}
       dir={dir}
       foundWords={foundWords as unknown as ShellFoundWord[]}
       comboLevel={comboLevel}

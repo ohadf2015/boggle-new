@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 6282,
+    "totalKeysInCode": 6275,
     "keyCountByLanguage": {
       "en": 12146,
       "es": 12442,
@@ -14,7 +14,7 @@
     "runtimeRisks": {
       "templateLiterals": 319,
       "fallbackUsages": 1,
-      "variableKeys": 122
+      "variableKeys": 121
     }
   },
   "runtimeRisks": {
@@ -2999,14 +2999,6 @@
         "type": "variable_key",
         "file": "components/singleplayer/game/components/LandscapeGameLayout.tsx",
         "line": 160,
-        "context": "const tSafe = React.useCallback((key: string) => t(key) || key, [t]);"
-      },
-      {
-        "pattern": "t(key)",
-        "variable": "key",
-        "type": "variable_key",
-        "file": "components/singleplayer/game/components/PortraitGameLayout.tsx",
-        "line": 181,
         "context": "const tSafe = React.useCallback((key: string) => t(key) || key, [t]);"
       },
       {
