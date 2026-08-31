@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateReengagementEmailHtml } from '@/lib/reengagementEmail';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 /**
  * GET /api/admin/reengagement-email-preview?language=en
  * Returns rendered HTML preview of the re-engagement email template
  */
+const SUPPORTED_LOCALES = ['he', 'sv', 'ja', 'es', 'en'];
+const escapeHtml = (s: string): string =>
+  s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
 export async function GET(request: NextRequest) {
-  const language = request.nextUrl.searchParams.get('language') || 'en';
+  const authResult = await verifyAdminAuth(request);
+  if (!authResult.success) return authResult.response!;
+
+  // Clamp to the supported-locale allowlist at the source: this value is reflected
+  // into the preview HTML below, so an unclamped query param would be reflected XSS.
+  const rawLanguage = request.nextUrl.searchParams.get('language') || 'en';
+  const language = SUPPORTED_LOCALES.includes(rawLanguage) ? rawLanguage : 'en';
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
-  const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
+  const locale = language;
 
   const previewNames: Record<string, string> = {
     he: 'Fish', sv: 'Erik', ja: 'Yuki', es: 'Carlos',
@@ -45,7 +56,7 @@ export async function GET(request: NextRequest) {
     '<body>',
     `<body>
   <div style="background: linear-gradient(90deg, #FF1493, #00FFFF); color: #000; text-align: center; padding: 10px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-    RE-ENGAGEMENT EMAIL PREVIEW — Language: ${language.toUpperCase()}
+    RE-ENGAGEMENT EMAIL PREVIEW — Language: ${escapeHtml(language.toUpperCase())}
   </div>`
   );
 

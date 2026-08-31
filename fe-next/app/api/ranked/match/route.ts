@@ -7,6 +7,7 @@
  * Calculates ELO changes and records the match.
  */
 
+import { timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
@@ -55,11 +56,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
+    const expectedSecret = process.env.RANKED_SERVER_SECRET;
+    if (!expectedSecret) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 503 });
+    }
+
     const body: MatchPayload = await request.json();
 
-    // Validate server secret (backend-to-API auth)
-    const expectedSecret = process.env.RANKED_SERVER_SECRET;
-    if (expectedSecret && body.serverSecret !== expectedSecret) {
+    // Fail-closed backend-to-API auth: header x-ranked-secret OR body.serverSecret
+    const providedSecret = request.headers.get('x-ranked-secret') || body.serverSecret;
+    if (!providedSecret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const providedBuf = Buffer.from(providedSecret);
+    const expectedBuf = Buffer.from(expectedSecret);
+    if (
+      providedBuf.length !== expectedBuf.length ||
+      !timingSafeEqual(providedBuf, expectedBuf)
+    ) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

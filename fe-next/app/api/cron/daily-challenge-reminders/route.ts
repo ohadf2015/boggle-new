@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import logger from '@/utils/logger';
 import { getSmartDailyChallengePushRecipients, markDailyPushSentBatch } from '@/lib/pushReminders';
 import { notifyDailyChallengeReminder } from '@/backend/modules/pushNotificationTriggers';
@@ -24,15 +25,7 @@ import { withCronLock } from '@/backend/redis/locking';
  * reintroduce per-recipient getUserLocale or markDailyPushSent calls here.
  */
 export async function POST(request: NextRequest) {
-  const cronSecret =
-    request.headers.get('x-cron-secret') || request.headers.get('authorization');
-  const expectedSecret = process.env.CRON_SECRET;
-
-  if (
-    expectedSecret &&
-    cronSecret !== expectedSecret &&
-    cronSecret !== `Bearer ${expectedSecret}`
-  ) {
+  if (!isAuthorizedCronRequest(request)) {
     logger.debug('[Push Cron] Unauthorized request attempted');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
