@@ -13,6 +13,9 @@ export type LocaleContent = {
   };
   heroSubtitle: string;
   ctaSubLabel: string;
+  /** Secondary hero button + related-links nav. Previously hardcoded English. */
+  duelCta: { label: string; note: string };
+  related: { label: string; esl: string; teachers: string; hub: string };
   whyTitle: string;
   whyPoints: [string, string, string, string];
   faqTitle: string;
@@ -61,6 +64,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     heroSubtitle:
       'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, six languages — student accounts are always free.',
     ctaSubLabel: 'Free · Student accounts free',
+    duelCta: { label: '⚔ Run a 1v1 Duel', note: 'Pair students head-to-head' },
+    related: {
+      label: 'Related education resources',
+      esl: '→ ESL Word Games',
+      teachers: '→ Games for Teachers',
+      hub: '→ Education Hub',
+    },
     whyTitle: 'Why teachers pick LexiClash',
     whyPoints: [
       'Free student accounts. Quick signup, then tracks XP and progress forever.',
@@ -158,6 +168,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     heroSubtitle:
       'משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 6 שפות — חשבונות תלמידים חינמיים תמיד.',
     ctaSubLabel: 'חינם · חשבונות תלמידים חינמיים',
+    duelCta: { label: '⚔ הפעילו דו-קרב 1 על 1', note: 'שבצו תלמידים זה מול זה' },
+    related: {
+      label: 'משאבי הוראה נוספים',
+      esl: '→ משחקי אנגלית ESL',
+      teachers: '→ משחקים למורים',
+      hub: '→ מרכז ההוראה',
+    },
     whyTitle: 'למה מורים בוחרים ב־LexiClash',
     whyPoints: [
       'חשבונות תלמידים חינמיים. הרשמה של 30 שניות, ואז מעקב אחר ההתקדמות לתמיד.',
@@ -255,6 +272,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     heroSubtitle:
       'El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 6 idiomas — cuentas de estudiantes gratis para empezar.',
     ctaSubLabel: 'Gratis · Cuentas de estudiantes gratis',
+    duelCta: { label: '⚔ Iniciar un duelo 1 vs 1', note: 'Enfrenta a los estudiantes de a dos' },
+    related: {
+      label: 'Recursos educativos relacionados',
+      esl: '→ Juegos de palabras ESL',
+      teachers: '→ Juegos para profesores',
+      hub: '→ Centro educativo',
+    },
     whyTitle: 'Por qué los maestros eligen LexiClash',
     whyPoints: [
       'Cuentas gratis. Registro en 30 segundos, luego sigue el progreso para siempre.',
@@ -352,6 +376,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     heroSubtitle:
       'Ordförråds spelet som lärare använder. Live multiplayer, dueller, dina ordlistor, 5 språk — studentkonton gratis alltid.',
     ctaSubLabel: 'Gratis · Studentkonton gratis',
+    duelCta: { label: '⚔ Kör en 1-mot-1-duell', note: 'Ställ elever mot varandra' },
+    related: {
+      label: 'Relaterade lärarresurser',
+      esl: '→ ESL-ordspel',
+      teachers: '→ Spel för lärare',
+      hub: '→ Utbildningshubben',
+    },
     whyTitle: 'Varför lärare väljer LexiClash',
     whyPoints: [
       'Gratis studentkonton. Registrering på 30 sekunder, sedan framstegen sparas.',
@@ -449,6 +480,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     heroSubtitle:
       '先生が実際に使う語彙ゲーム。ライブマルチプレイヤー、デュエル、あなたのリスト、6言語 — 学生アカウントはいつも無料。',
     ctaSubLabel: '無料 · 学生アカウント無料',
+    duelCta: { label: '⚔ 1対1のデュエルを開始', note: '生徒どうしを対戦させる' },
+    related: {
+      label: '関連する教育リソース',
+      esl: '→ ESL 英単語ゲーム',
+      teachers: '→ 先生向けゲーム',
+      hub: '→ 教育ハブ',
+    },
     whyTitle: 'LexiClashが選ばれる理由',
     whyPoints: [
       '無料。30秒で登録して、あとはずっと成績が記録される。',
@@ -546,6 +584,13 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     heroSubtitle:
       'Словарная игра, которую действительно используют учителя. Живой мультиплеер, дуэли, ваши списки, 6 языков — ученические аккаунты бесплатны.',
     ctaSubLabel: 'Бесплатно · Ученические аккаунты бесплатны',
+    duelCta: { label: '⚔ Запустить дуэль 1 на 1', note: 'Ставьте учеников друг против друга' },
+    related: {
+      label: 'Похожие материалы для учителей',
+      esl: '→ Игры со словами ESL',
+      teachers: '→ Игры для учителей',
+      hub: '→ Образовательный центр',
+    },
     whyTitle: 'Почему учителя выбирают LexiClash',
     whyPoints: [
       'Бесплатные ученические аккаунты. Регистрация за 30 секунд, потом отслеживание прогресса навсегда.',

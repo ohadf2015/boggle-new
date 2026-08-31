@@ -12965,7 +12965,7 @@ const es = {
         "student": "Estudiante",
         "teacher": "Docente"
       },
-      "educationHome": "Inicio",
+      "educationHome": "Portal educativo",
       "homeLink": "Inicio",
       "menu": "Menú",
       "navigation": "Navegación",
@@ -13513,6 +13513,9 @@ const es = {
     "access": {
       "h1": "Solicitar acceso de maestro",
       "lede": "Cuéntanos sobre tu aula. El acceso se concede al instante — sin esperar revisión.",
+      "redirect_title": "Esa página necesita acceso de maestro",
+      "redirect_body": "Ibas a {{dest}}. La aprobación es instantánea: el formulario de abajo la desbloquea.",
+      "redirect_dest_fallback": "tus herramientas de clase",
       "full_name": "Tu nombre completo",
       "email": "Tu email",
       "role": "¿Cuál es tu rol?",

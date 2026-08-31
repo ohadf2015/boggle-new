@@ -146,12 +146,12 @@ export default async function Page({ params }: PageProps) {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-                <span className="block text-base sm:text-lg">▶ Run an ESL Game</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">Whole-class · 5 minutes</span>
+                <span className="block text-base sm:text-lg">{c.heroCtas.primary}</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.heroCtas.primaryNote}</span>
               </Link>
               <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
-                <span className="block text-base sm:text-lg">⚔ Pair-up Duels</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">2-by-2 practice</span>
+                <span className="block text-base sm:text-lg">{c.heroCtas.secondary}</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">{c.heroCtas.secondaryNote}</span>
               </Link>
             </div>
           </div>
@@ -204,10 +204,10 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
-        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">→ Classroom Vocabulary Games</Link>
-          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">→ Games for Teachers</Link>
-          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">→ Education Hub</Link>
+        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={c.related.label}>
+          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.related.vocabulary}</Link>
+          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.related.teachers}</Link>
+          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.related.hub}</Link>
         </nav>
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-cyan p-8 text-neo-navy shadow-hard-xl sm:p-12">

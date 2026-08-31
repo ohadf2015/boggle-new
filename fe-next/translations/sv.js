@@ -13770,6 +13770,9 @@ const sv = {
     "access": {
       "h1": "Begär gratis lärargång",
       "lede": "Berätta lite om ditt klassrum. Åtkomst ges direkt — ingen väntan på granskning.",
+      "redirect_title": "Den sidan kräver lärarbehörighet",
+      "redirect_body": "Du var på väg till {{dest}}. Godkännandet sker direkt — det korta formuläret nedan låser upp den.",
+      "redirect_dest_fallback": "dina klassrumsverktyg",
       "full_name": "Dit namn",
       "email": "Din e-postadress",
       "role": "Din roll",

@@ -12096,6 +12096,9 @@ const en = {
     "access": {
       "h1": "Apply for free teacher access",
       "lede": "Tell us a bit about your classroom. Access is granted instantly — no review wait.",
+      "redirect_title": "Teacher access unlocks that page",
+      "redirect_body": "You were heading to {{dest}}. Teachers are approved instantly — the short form below opens it.",
+      "redirect_dest_fallback": "your classroom tools",
       "full_name": "Your full name",
       "email": "Email address",
       "role": "Your role",

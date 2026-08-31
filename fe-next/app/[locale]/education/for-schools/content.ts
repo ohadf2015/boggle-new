@@ -31,6 +31,8 @@ export interface ForSchoolsContent {
   why: { title: string; body: string }[];
   compareTitle: string;
   compareIntro: string;
+  /** Comparison-table column headers. Previously hardcoded English. */
+  compareHeaders: { tool: string; theirFreeTier: string };
   compareRows: ForSchoolsCompareRow[];
   comingTitle: string;
   comingIntro: string;
@@ -68,6 +70,7 @@ const EN: ForSchoolsContent = {
     { title: 'Zero prep', body: 'Pick a word list, pick a mode, share the code. A 5-minute warm-up or an end-of-unit review with no setup.' },
   ],
   compareTitle: 'How the free tiers actually compare',
+  compareHeaders: { tool: 'Tool', theirFreeTier: 'Their free tier' },
   compareIntro:
     'Most "free" classroom game tools cap the free tier so low it breaks a real class, then charge per teacher or per student. Here is the honest comparison - all during our free trial.',
   compareRows: [
@@ -129,6 +132,7 @@ const RU: ForSchoolsContent = {
     { title: 'Без подготовки', body: 'Выберите список слов, выберите режим, поделитесь кодом. 5-минутная разминка или повтор в конце темы без подготовки.' },
   ],
   compareTitle: 'Честное сравнение бесплатных версий',
+  compareHeaders: { tool: 'Сервис', theirFreeTier: 'Их бесплатный тариф' },
   compareIntro:
     'Большинство "бесплатных" инструментов для уроков так ограничивают бесплатные версии, что они не работают для полного класса, а потом берут плату за учителя или ученика. Вот честное сравнение — все во время нашего пробного периода.',
   compareRows: [
@@ -190,6 +194,7 @@ const HE: ForSchoolsContent = {
     { title: 'אפס הכנה', body: 'בחרו רשימת מילים, בחרו מצב משחק, שתפו את הקוד. חימום של 5 דקות או חזרה בסוף יחידה — בלי שום הכנה.' },
   ],
   compareTitle: 'איך באמת נראית ההשוואה בין המסלולים החינמיים',
+  compareHeaders: { tool: 'כלי', theirFreeTier: 'המסלול החינמי שלהם' },
   compareIntro:
     'רוב הכלים ה"חינמיים" למשחקי כיתה מגבילים את המסלול החינמי כל כך נמוך שהוא נשבר בכיתה אמיתית, ואז גובים לפי מורה או לפי תלמיד. הנה ההשוואה הכנה — הכול במהלך הניסיון החינם שלנו.',
   compareRows: [
@@ -251,6 +256,7 @@ const SV: ForSchoolsContent = {
     { title: 'Noll förberedelse', body: 'Välj en ordlista, välj ett läge, dela koden. En 5-minuters uppvärmning eller en repetition i slutet av ett avsnitt — utan extra arbete.' },
   ],
   compareTitle: 'Hur de fria versionerna faktiskt jämförs',
+  compareHeaders: { tool: 'Verktyg', theirFreeTier: 'Deras gratisversion' },
   compareIntro:
     'De flesta "gratis" klassrumsspelverktyg begränsar gratisversionen så mycket att den inte fungerar för en verklig klass, sedan debiterar de per lärare eller elev. Här är den ärliga jämförelsen — allt under vår provperiod.',
   compareRows: [
@@ -312,6 +318,7 @@ const JA: ForSchoolsContent = {
     { title: '準備ゼロ', body: '単語リストを選び、モードを選び、コードを共有するだけ。5分のウォーミングアップにも、準備なしの単元末レビューにも使えます。' },
   ],
   compareTitle: '無料プランを正直に比較',
+  compareHeaders: { tool: 'ツール', theirFreeTier: '他社の無料プラン' },
   compareIntro:
     '「無料」のクラスルームゲームツールのほとんどは、無料プランをあまりに低く制限して実際のクラスでは機能させず、その後教師や学生ごとに課金します。以下が正直な比較です — すべて当社の無料トライアル期間中の内容です。',
   compareRows: [
@@ -373,6 +380,7 @@ const ES: ForSchoolsContent = {
     { title: 'Cero preparación', body: 'Elige una lista de palabras, elige un modo, comparte el código. Un calentamiento de 5 minutos o un repaso de fin de unidad sin preparación.' },
   ],
   compareTitle: 'Cómo se comparan de verdad los niveles gratuitos',
+  compareHeaders: { tool: 'Herramienta', theirFreeTier: 'Su versión gratuita' },
   compareIntro:
     'La mayoría de las herramientas de juegos "gratuitas" para el aula limitan el nivel gratuito tan bajo que se rompe con una clase real, y luego cobran por maestro o por estudiante. Aquí está la comparación honesta — todo durante nuestra prueba gratuita.',
   compareRows: [

@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { getSightWordsContent } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
+import { HighlightedHeading } from '@/components/education/HighlightedHeading';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
@@ -193,12 +194,11 @@ export default async function Page({ params }: PageProps) {
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.modesHeading.split(/drill sight words/).map((part, i) => (
-              <span key={i}>
-                {part}
-                {i === 0 && <span className="text-neo-lime">drill sight words</span>}
-              </span>
-            ))}
+            <HighlightedHeading
+              text={c.modesHeading}
+              highlight="drill sight words"
+              highlightClassName="text-neo-lime"
+            />
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {c.modes.map((m, idx) => {
@@ -220,12 +220,11 @@ export default async function Page({ params }: PageProps) {
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.routineHeading.split(/sight-word routine/).map((part, i) => (
-              <span key={i}>
-                {part}
-                {i === 0 && <span className="text-neo-cyan">sight-word routine</span>}
-              </span>
-            ))}
+            <HighlightedHeading
+              text={c.routineHeading}
+              highlight="sight-word routine"
+              highlightClassName="text-neo-cyan"
+            />
           </h2>
           <p className="mb-6 max-w-2xl text-sm text-neo-gray-200">{c.routineIntro}</p>
           <div className="space-y-3">

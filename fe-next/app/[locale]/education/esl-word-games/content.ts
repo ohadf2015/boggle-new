@@ -8,6 +8,24 @@ export type LocaleContent = {
   heroH1: { highlight: string; rest1: string; rest2: string };
   heroSubtitle: string;
   ctaLabel: string;
+  /**
+   * Hero buttons. These used to be hardcoded English in page.tsx, so an es-PE
+   * teacher arriving from Google read a Spanish headline above English CTAs
+   * (LogRocket, 2026-08-31). Keeping them in this per-locale record means the
+   * compiler refuses a locale that forgets one.
+   */
+  heroCtas: {
+    primary: string;
+    primaryNote: string;
+    secondary: string;
+    secondaryNote: string;
+  };
+  related: {
+    label: string;
+    vocabulary: string;
+    teachers: string;
+    hub: string;
+  };
   faqTitle: string;
   faqs: Array<{ q: string; a: string }>;
   features: Array<{ icon: string; text: string }>;
@@ -40,6 +58,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     },
     heroSubtitle: 'Word-formation games designed for English language learners. Free student accounts, five dictionaries, and a teacher dashboard that surfaces which words tripped which students.',
     ctaLabel: 'Create Free Classroom',
+    heroCtas: {
+      primary: '▶ Run an ESL Game',
+      primaryNote: 'Whole-class · 5 minutes',
+      secondary: '⚔ Pair-up Duels',
+      secondaryNote: '2-by-2 practice',
+    },
+    related: {
+      label: 'Related education resources',
+      vocabulary: '→ Classroom Vocabulary Games',
+      teachers: '→ Games for Teachers',
+      hub: '→ Education Hub',
+    },
     faqTitle: 'Frequently Asked Questions',
     features: [
       { icon: '🌍', text: 'Five built-in dictionaries: English, Spanish, Hebrew (RTL), Swedish, Japanese' },
@@ -105,6 +135,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     },
     heroSubtitle: 'משחקי בניית מילים לתלמידי אנגלית. חשבונות חינמיים, 5 מילונים, ולוח מורה שמראה אילו מילים קשות.',
     ctaLabel: 'פתחו כיתה בחינם',
+    heroCtas: {
+      primary: '▶ הפעילו משחק אנגלית',
+      primaryNote: 'כל הכיתה · 5 דקות',
+      secondary: '⚔ דו-קרב בזוגות',
+      secondaryNote: 'תרגול בזוגות',
+    },
+    related: {
+      label: 'משאבי הוראה נוספים',
+      vocabulary: '→ משחקי אוצר מילים לכיתה',
+      teachers: '→ משחקים למורים',
+      hub: '→ מרכז ההוראה',
+    },
     faqTitle: 'שאלות נפוצות',
     features: [
       { icon: '🌍', text: '5 מילונים: אנגלית, ספרדית, עברית (RTL), שוודית, יפנית' },
@@ -170,6 +212,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     },
     heroSubtitle: 'Juegos para aprender inglés. Cuentas gratis, 5 diccionarios, panel del maestro que muestra qué palabras les cuestan.',
     ctaLabel: 'Crear Aula Gratis',
+    heroCtas: {
+      primary: '▶ Iniciar juego de inglés',
+      primaryNote: 'Toda la clase · 5 minutos',
+      secondary: '⚔ Duelos en parejas',
+      secondaryNote: 'Práctica de dos en dos',
+    },
+    related: {
+      label: 'Recursos educativos relacionados',
+      vocabulary: '→ Juegos de vocabulario para el aula',
+      teachers: '→ Juegos para profesores',
+      hub: '→ Centro educativo',
+    },
     faqTitle: 'Preguntas Frecuentes',
     features: [
       { icon: '🌍', text: '5 diccionarios: inglés, español, hebreo (RTL), sueco, japonés' },
@@ -239,6 +293,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     },
     heroSubtitle: 'Ordbildningsspel för engelskastudenter. Gratis konton, 5 ordböcker, lärarpanel som visar vilka ord som är svåra.',
     ctaLabel: 'Skapa Gratis Klassrum',
+    heroCtas: {
+      primary: '▶ Starta ett engelskaspel',
+      primaryNote: 'Hela klassen · 5 minuter',
+      secondary: '⚔ Parduellet',
+      secondaryNote: 'Träning två och två',
+    },
+    related: {
+      label: 'Relaterade lärarresurser',
+      vocabulary: '→ Ordförrådsspel för klassrummet',
+      teachers: '→ Spel för lärare',
+      hub: '→ Utbildningshubben',
+    },
     faqTitle: 'Vanliga Frågor',
     features: [
       { icon: '🌍', text: '5 ordböcker: engelska, spanska, hebreiska (RTL), svenska, japanska' },
@@ -304,6 +370,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     },
     heroSubtitle: '英語学習者向けのゲーム。無料アカウント、5つの辞書、先生用ダッシュボードで苦手な単語がわかる。',
     ctaLabel: '無料クラスルームを作成',
+    heroCtas: {
+      primary: '▶ 英語ゲームを始める',
+      primaryNote: 'クラス全体 · 5分',
+      secondary: '⚔ ペア対戦',
+      secondaryNote: '2人1組の練習',
+    },
+    related: {
+      label: '関連する教育リソース',
+      vocabulary: '→ 教室向け語彙ゲーム',
+      teachers: '→ 先生向けゲーム',
+      hub: '→ 教育ハブ',
+    },
     faqTitle: 'よくある質問',
     features: [
       { icon: '🌍', text: '5つの辞書：英語、スペイン語、ヘブライ語（RTL）、スウェーデン語、日本語' },
@@ -369,6 +447,18 @@ const content: Record<EducationLocale, LocaleContent> = {
     },
     heroSubtitle: 'Словесные игры для учащихся английского языка. Бесплатные учетные записи, 6 словарей и панель учителя, которая показывает, какие слова вызывают сложность.',
     ctaLabel: 'Создать бесплатный класс',
+    heroCtas: {
+      primary: '▶ Запустить игру по английскому',
+      primaryNote: 'Весь класс · 5 минут',
+      secondary: '⚔ Дуэли в парах',
+      secondaryNote: 'Практика по двое',
+    },
+    related: {
+      label: 'Похожие материалы для учителей',
+      vocabulary: '→ Игры со словарём для класса',
+      teachers: '→ Игры для учителей',
+      hub: '→ Образовательный центр',
+    },
     faqTitle: 'Часто задаваемые вопросы',
     features: [
       { icon: '🌍', text: 'Шесть встроенных словарей: Английский, Испанский, Иврит (RTL), Шведский, Японский, Русский' },

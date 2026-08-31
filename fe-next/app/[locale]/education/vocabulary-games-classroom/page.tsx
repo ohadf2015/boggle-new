@@ -166,8 +166,8 @@ export default async function Page({ params }: PageProps) {
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.ctaSubLabel}</span>
               </Link>
               <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
-                <span className="block text-base sm:text-lg">⚔ Run a 1v1 Duel</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">Pair students head-to-head</span>
+                <span className="block text-base sm:text-lg">{c.duelCta.label}</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">{c.duelCta.note}</span>
               </Link>
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
@@ -267,10 +267,10 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
-        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
-          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">→ ESL Word Games</Link>
-          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">→ Games for Teachers</Link>
-          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">→ Education Hub</Link>
+        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={c.related.label}>
+          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.related.esl}</Link>
+          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.related.teachers}</Link>
+          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.related.hub}</Link>
         </nav>
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">

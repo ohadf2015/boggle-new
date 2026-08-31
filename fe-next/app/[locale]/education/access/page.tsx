@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { PageClient } from './PageClient';
 
 const META: Record<string, { title: string; description: string }> = {
@@ -18,5 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function Page() {
-  return <PageClient />;
+  // PageClient reads `?from=` via useSearchParams, which needs a boundary here.
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-neo-navy" />}>
+      <PageClient />
+    </Suspense>
+  );
 }

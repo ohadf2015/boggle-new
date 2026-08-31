@@ -1,8 +1,10 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Zap, Gift, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
@@ -18,6 +20,9 @@ const TRUST = [
 export function PageClient() {
   const { t, language } = useLanguage();
   const { status, latestRequest, hasAccess, trial, isLoading } = useTeacherAccess();
+  // TeacherGate encodes the page it blocked as `?from=`. Reading it back is what
+  // turns a silent teleport into an explanation — see AccessRedirectNotice.
+  const redirectedFrom = useSearchParams()?.get('from') ?? null;
 
   // The sign-up pitch (hero art, trust row, wide layout) belongs to the
   // pre-application state ONLY. An approved / pending / declined teacher gets a
@@ -137,6 +142,14 @@ export function PageClient() {
             <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">
               {t('education.access.lede')}
             </p>
+
+            {/* Only for someone who still has to apply — an approved teacher who
+                happens to carry a `from` needs their status, not this. */}
+            {showPitch && (
+              <div className="mt-6 max-w-[62ch]">
+                <AccessRedirectNotice from={redirectedFrom} />
+              </div>
+            )}
 
             {showPitch && (
               <ul className="mt-6 flex flex-col gap-3">

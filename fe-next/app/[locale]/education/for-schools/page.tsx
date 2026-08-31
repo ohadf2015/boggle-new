@@ -146,8 +146,8 @@ export default async function Page({ params }: PageProps) {
             <table className="w-full border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b-3 border-neo-black font-neo-display">
-                  <th className="p-3">Tool</th>
-                  <th className="p-3">Their free tier</th>
+                  <th className="p-3">{c.compareHeaders.tool}</th>
+                  <th className="p-3">{c.compareHeaders.theirFreeTier}</th>
                   <th className="p-3 text-neo-lime">LexiClash</th>
                 </tr>
               </thead>

@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { getSpellingBeeContent, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
+import { HighlightedHeading } from '@/components/education/HighlightedHeading';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 
@@ -180,12 +181,11 @@ export default async function Page({ params }: PageProps) {
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.drillModesHeading.split(/drill modes/).map((part, i) => (
-              <span key={i}>
-                {part}
-                {i === 0 && <span className="text-neo-lime">drill modes</span>}
-              </span>
-            ))}
+            <HighlightedHeading
+              text={c.drillModesHeading}
+              highlight="drill modes"
+              highlightClassName="text-neo-lime"
+            />
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {c.drillModes.map((m, idx) => {
@@ -204,12 +204,11 @@ export default async function Page({ params }: PageProps) {
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.trainingPlanHeading.split(/training plan/).map((part, i) => (
-              <span key={i}>
-                {part}
-                {i === 0 && <span className="text-neo-cyan">training plan</span>}
-              </span>
-            ))}
+            <HighlightedHeading
+              text={c.trainingPlanHeading}
+              highlight="training plan"
+              highlightClassName="text-neo-cyan"
+            />
           </h2>
           <p className="mb-6 max-w-2xl text-sm text-neo-gray-200">{c.trainingPlanIntro}</p>
           <div className="space-y-3">
