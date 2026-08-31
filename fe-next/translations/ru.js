@@ -1147,6 +1147,8 @@ const ru = {
     "goMultiplayerDesc": "Настоящие люди, настоящая конкуренция, настоящие права хвастать",
     "goMultiplayerFromDaily": "Почему остановиться на одной?",
     "goMultiplayerFromDailyDesc": "Неограниченные игры, реальные противники — не жди до завтра",
+    "goMultiplayerFromBots": "Play Real Opponents",
+    "goMultiplayerFromBotsDesc": "Bots were just practice — live players are waiting",
     "brainTraining": "Мозговой спортзал",
     "brainTrainingDesc": "Прокачай свою умственную игру"
   },

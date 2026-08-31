@@ -3682,6 +3682,8 @@ const he = {
     "goMultiplayerDesc": "בני אדם אמיתיים, תחרות אמיתית, גאווה אמיתית",
     "goMultiplayerFromDaily": "למה לעצור באחד?",
     "goMultiplayerFromDailyDesc": "משחקים ללא הגבלה, יריבים אמיתיים — בלי לחכות למחר",
+    "goMultiplayerFromBots": "שחקו נגד אנשים אמיתיים",
+    "goMultiplayerFromBotsDesc": "הבוטים היו רק אימון — שחקנים אמיתיים מחכים",
     "brainTraining": "אימון מוחי",
     "brainTrainingDesc": "שדרגו את המוח"
   },

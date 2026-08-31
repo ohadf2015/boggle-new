@@ -45,6 +45,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'nextStep.goMultiplayerDesc': 'Compete with real players',
         'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
         'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
+        'nextStep.goMultiplayerFromBots': 'Play Real Opponents',
+        'nextStep.goMultiplayerFromBotsDesc': 'Bots were just practice — live players are waiting',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -185,6 +187,40 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
           : screen.getByText('Why Stop at One?');
+
+        await user.click(navButton);
+
+        // Verify session was cleared BEFORE navigation
+        expect(mockClearSession).toHaveBeenCalledTimes(1);
+        expect(mockRouterPush).toHaveBeenCalledWith('/en/multiplayer');
+
+        // Verify correct order
+        const clearCallOrder = mockClearSession.mock.invocationCallOrder[0];
+        const pushCallOrder = mockRouterPush.mock.invocationCallOrder[0];
+        expect(clearCallOrder).toBeLessThan(pushCallOrder);
+      });
+    });
+  });
+
+  describe('Solo-Bots-to-MP Mode → Go Multiplayer', () => {
+    const testVariants = ['desktop', 'mobile', 'landscape'] as const;
+
+    testVariants.forEach((variant) => {
+      it(`should clear session and navigate to /en/multiplayer (${variant})`, async () => {
+        const user = userEvent.setup();
+
+        render(
+          <NextStepPrompt
+            currentMode="solo-bots-to-mp"
+            onBackToLobby={mockOnBackToLobby}
+            variant={variant}
+          />
+        );
+
+        // Find and click the navigation button
+        const navButton = variant === 'desktop'
+          ? screen.getByRole('button', { name: /let's go/i })
+          : screen.getByText('Play Real Opponents');
 
         await user.click(navButton);
 

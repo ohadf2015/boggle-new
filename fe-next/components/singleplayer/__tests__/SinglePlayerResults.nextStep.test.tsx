@@ -106,6 +106,14 @@ vi.mock('@/hooks/useWordHuntPromo', () => ({
   }),
 }));
 
+vi.mock('@/hooks/usePostHogFlag', () => ({
+  usePostHogFlag: () => 'control',
+}));
+
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
+}));
+
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     enableComplexAnimations: false,
@@ -306,7 +314,7 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
     mockRouterPush.mockClear();
   });
 
-  it('should navigate to /daily when clicking next step prompt in bot game results, NOT trigger quick rematch', async () => {
+  it('should navigate to /multiplayer when clicking next step prompt in bot game results, NOT trigger quick rematch', async () => {
     const user = userEvent.setup();
 
     render(
@@ -319,13 +327,12 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
       />
     );
 
-    // In desktop variant, "Try Daily Challenge" is a non-interactive h3 text
-    // The clickable element is the "Let's Go!" button
+    // In desktop variant, the clickable element is the "Let's Go!" button
     const letsGoButtons = screen.getAllByText("Let's Go!");
     await user.click(letsGoButtons[0]);
 
-    // Should navigate to daily challenge, NOT call onQuickRematch
-    expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
+    // Should navigate to multiplayer, NOT call onQuickRematch
+    expect(mockRouterPush).toHaveBeenCalledWith('/en/multiplayer');
     expect(mockOnQuickRematch).not.toHaveBeenCalled();
   });
 
