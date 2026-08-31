@@ -141,14 +141,18 @@ export default function WordSolverPageClient() {
             />
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={handleSolve}
                 disabled={letters.length < 2 || isLoading}
                 className={cn(
                   'px-6 py-3 font-neo-display font-bold text-lg',
                   'bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo',
-                  'shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]',
-                  'transition-all duration-100 active:animate-neo-press',
-                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard disabled:hover:translate-x-0 disabled:hover:translate-y-0'
+                  // Shadow-only press feedback: hover/active translate + neo-press
+                  // move the hit target, so the first Find Words tap often missed
+                  // (pointerup landed off-button) and needed a second press.
+                  'shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed',
+                  'transition-shadow duration-100',
+                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard'
                 )}
               >
                 {isLoading ? content.searchingText : content.solveButton}

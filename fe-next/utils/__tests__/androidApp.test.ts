@@ -163,6 +163,16 @@ describe('shouldShowAndroidInstallPromo', () => {
       shouldShowAndroidInstallPromo({ ...base, dismissedUntil: 1_000_000, now: 2_000_000 })
     ).toBe(true);
   });
+
+  // Regression: first-visit GET THE LEXICLASH APP Dialog sat over the cookie
+  // sheet so ACCEPT ALL was unclickable until NOT NOW. Auto-popup must wait.
+  it('hides while cookie consent is still pending', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, consentPending: true })).toBe(false);
+  });
+
+  it('shows once cookie consent has been decided', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, consentPending: false })).toBe(true);
+  });
 });
 
 describe('shouldShowAndroidInstallPromo — exp-install-promo-after-first-game-v1', () => {

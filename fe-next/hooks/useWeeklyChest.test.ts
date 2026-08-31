@@ -15,6 +15,9 @@ import { renderHook, waitFor } from '@testing-library/react';
 vi.mock('@/utils/authFetch', () => ({
   getWithAuth: (...a: unknown[]) => (global.fetch as (...x: unknown[]) => unknown)(...a),
 }));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: true, loading: false }),
+}));
 
 const okStatus = () => ({
   ok: true,

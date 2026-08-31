@@ -36,6 +36,7 @@ import {
   playStoreUrlWithReferrer,
   shouldShowAndroidInstallPromo,
 } from '@/utils/androidApp';
+import { hasConsentDecision } from '@/utils/cookieConsent';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 import {
   readInstallDismissedUntil,
@@ -141,6 +142,10 @@ export default function AndroidAppInstallPromo() {
             now: Date.now(),
             requireEngagement,
             gamesCompleted: readGamesCompletedCount(),
+            // Cookie sheet first: the Dialog portals above the in-tree consent UI and
+            // traps focus, so ACCEPT ALL is unreachable until NOT NOW. Re-arm until
+            // the visitor decides (same pattern as inGame).
+            consentPending: !hasConsentDecision(),
           })) {
             timer = undefined;
             arm();

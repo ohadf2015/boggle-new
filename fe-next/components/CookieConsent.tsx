@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -115,7 +116,11 @@ export default function CookieConsent() {
 
   const isRtl = language === 'he';
 
-  return (
+  // Portal to <body> at z-[200]: the Android install Dialog portals to body at
+  // z-90, and an in-tree z-[110] sheet loses the stacking contest to that portal
+  // (layout ancestors create stacking contexts). Body-level z-[200] keeps ACCEPT
+  // ALL clickable even if another modal races the first visit.
+  const sheet = (
     // Fixed bottom sheet. No full-screen backdrop, no backdrop-filter.
     // A reserved min-height prevents layout shift when the sheet mounts.
     <div
@@ -123,11 +128,11 @@ export default function CookieConsent() {
       aria-modal="false"
       aria-label={t('cookieConsent.title')}
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-[110]',
+        'fixed bottom-0 left-0 right-0 z-[200]',
         'w-full max-w-2xl mx-auto',
         'min-h-[280px] max-h-[60vh] overflow-y-auto',
         'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
-        'p-4 sm:p-5 animate-slide-up'
+        'p-4 sm:p-5 animate-slide-up pointer-events-auto'
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
@@ -240,6 +245,9 @@ export default function CookieConsent() {
       )}
     </div>
   );
+
+  if (typeof document === 'undefined') return sheet;
+  return createPortal(sheet, document.body);
 }
 
 // ─── Toggle component ───────────────────────

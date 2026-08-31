@@ -79,6 +79,15 @@ describe('DailyMissionsHeader', () => {
     expect(dateCard).toBeInTheDocument();
   });
 
+  test('date card uses the UTC calendar day (matches getDailyChallengeDate)', () => {
+    // Americas evening: local is still Aug 30 while UTC has rolled to Aug 31.
+    vi.setSystemTime(new Date('2026-08-31T02:00:00Z'));
+    renderWithProviders(<DailyMissionsHeader completedCount={0} />);
+    const dateCard = screen.getByTestId('date-card');
+    expect(dateCard).toHaveTextContent('AUG');
+    expect(dateCard).toHaveTextContent('31');
+  });
+
   test('renders completion count text', () => {
     renderWithProviders(<DailyMissionsHeader completedCount={1} />);
 
