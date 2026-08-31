@@ -11,6 +11,15 @@ vi.mock('next/dynamic', () => ({
     },
 }));
 
+// Mock next/headers — the layout reads geo headers for the cold-start RUM beacon,
+// and `headers()` throws "headers was called outside a request scope" when the
+// component is rendered directly by a unit test instead of by the Next router.
+// Empty headers is the realistic default: the beacon falls back to '' for country.
+vi.mock('next/headers', () => ({
+    __esModule: true,
+    headers: async () => new Headers(),
+}));
+
 // Mock next/script - render as script tag for testing
 vi.mock('next/script', () => ({
     __esModule: true,
