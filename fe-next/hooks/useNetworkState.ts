@@ -50,6 +50,7 @@ export function useNetworkState(): NetworkState {
 
   useEffect(() => {
     const refresh = () => setState(snapshotWeb());
+    let cancelled = false;
 
     if (typeof window !== 'undefined') {
       window.addEventListener('online', refresh);
@@ -57,20 +58,26 @@ export function useNetworkState(): NetworkState {
       const conn = getNavigatorConnection() as (NavigatorConnection & EventTarget) | undefined;
       conn?.addEventListener?.('change', refresh);
 
+      const applyProbe = (probe: { reachable: boolean; rttMs: number | null }) => {
+        // Probe is async: Node/vitest may tear down jsdom (window gone) before it
+        // resolves. React 19 setState then throws ReferenceError: window is not defined.
+        if (cancelled || typeof window === 'undefined') return;
+        if (!probe.reachable) {
+          setState((prev) => ({ ...prev, online: false, type: 'none' }));
+          return;
+        }
+        setState((prev) => ({
+          ...prev,
+          online: true,
+          rttMs: probe.rttMs,
+          slow: classifySlowFromRtt(probe.rttMs) || prev.slow,
+        }));
+      };
+
       const runProbe = () => {
+        if (typeof window === 'undefined') return;
         if (typeof navigator !== 'undefined' && !navigator.onLine) return;
-        void probeReachability().then((probe) => {
-          if (!probe.reachable) {
-            setState((prev) => ({ ...prev, online: false, type: 'none' }));
-            return;
-          }
-          setState((prev) => ({
-            ...prev,
-            online: true,
-            rttMs: probe.rttMs,
-            slow: classifySlowFromRtt(probe.rttMs) || prev.slow,
-          }));
-        });
+        void probeReachability().then(applyProbe);
       };
       runProbe();
       window.addEventListener('online', runProbe);
@@ -82,12 +89,14 @@ export function useNetworkState(): NetworkState {
           try {
             const { Network } = await import('@capacitor/network');
             const status = await Network.getStatus();
+            if (cancelled || typeof window === 'undefined') return;
             setState((prev) => ({
               ...prev,
               online: status.connected,
               type: (status.connectionType as NetworkType) ?? prev.type,
             }));
             const listener = await Network.addListener('networkStatusChange', (s) => {
+              if (cancelled || typeof window === 'undefined') return;
               setState((prev) => ({
                 ...prev,
                 online: s.connected,
@@ -103,15 +112,20 @@ export function useNetworkState(): NetworkState {
       }
 
       return () => {
-        window.removeEventListener('online', refresh);
-        window.removeEventListener('offline', refresh);
-        window.removeEventListener('online', runProbe);
-        window.removeEventListener('focus', runProbe);
+        cancelled = true;
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('online', refresh);
+          window.removeEventListener('offline', refresh);
+          window.removeEventListener('online', runProbe);
+          window.removeEventListener('focus', runProbe);
+        }
         conn?.removeEventListener?.('change', refresh);
         nativeRemove?.();
       };
     }
-    return undefined;
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return state;
