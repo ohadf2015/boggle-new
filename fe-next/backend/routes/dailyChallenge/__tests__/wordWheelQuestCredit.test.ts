@@ -16,8 +16,25 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 
-const completeDailyQuestsForResult = vi.fn().mockResolvedValue(undefined);
-const updateQuestProgress = vi.fn().mockResolvedValue(undefined);
+const { completeDailyQuestsForResult, updateQuestProgress, makeSupabaseStub } = vi.hoisted(() => {
+  const row = { id: 1, score: 64, word_count: 3, words_found: ['CAT', 'BRIDGE', 'TRAIN'] };
+  const builder: Record<string, unknown> = {};
+  const chain = () => builder;
+  Object.assign(builder, {
+    select: chain, insert: chain, upsert: chain, update: chain, delete: chain,
+    eq: chain, neq: chain, gt: chain, gte: chain, lt: chain, lte: chain,
+    not: chain, is: chain, in: chain, order: chain, limit: chain, range: chain,
+    single: () => Promise.resolve({ data: row, error: null }),
+    maybeSingle: () => Promise.resolve({ data: null, error: null }),
+    then: (resolve: (v: unknown) => unknown) =>
+      Promise.resolve({ data: [row], error: null, count: 0 }).then(resolve),
+  });
+  return {
+    completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined),
+    updateQuestProgress: vi.fn().mockResolvedValue(undefined),
+    makeSupabaseStub: () => ({ from: () => builder }),
+  };
+});
 
 vi.mock('../../../modules/dailyMissionsManager', () => ({
   completeDailyQuestsForResult: (...args: unknown[]) => completeDailyQuestsForResult(...args),
@@ -43,36 +60,20 @@ vi.mock('../../../utils/logger', () => ({
   default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-/**
- * Minimal PostgREST-ish stub. The submit path inserts a row and selects it back;
- * every builder method returns `this` so any chain length resolves.
- */
-function makeSupabaseStub() {
-  const row = { id: 1, score: 64, word_count: 3, words_found: ['CAT', 'BRIDGE', 'TRAIN'] };
-  const builder: Record<string, unknown> = {};
-  const chain = () => builder;
-  Object.assign(builder, {
-    select: chain, insert: chain, upsert: chain, update: chain, delete: chain,
-    eq: chain, neq: chain, gt: chain, gte: chain, lt: chain, lte: chain,
-    not: chain, is: chain, in: chain, order: chain, limit: chain, range: chain,
-    single: () => Promise.resolve({ data: row, error: null }),
-    maybeSingle: () => Promise.resolve({ data: null, error: null }),
-    then: (resolve: (v: unknown) => unknown) =>
-      Promise.resolve({ data: [row], error: null, count: 0 }).then(resolve),
-  });
-  return { from: () => builder };
-}
-
 vi.mock('../../../modules/supabaseServer', () => ({
   isSupabaseConfigured: () => true,
   getSupabase: () => makeSupabaseStub(),
 }));
 
-async function makeApp() {
-  const { default: router } = await import('../wordWheelRoutes');
+import wordWheelRoutes from '../wordWheelRoutes';
+
+function makeApp() {
   const app = express();
   app.use(express.json());
-  app.use('/api/daily-challenge/word-wheel', router);
+  // Mount at `/` like the other dailyChallenge route tests. Express 5 does not
+  // match POST /api/.../submit against a router mounted at that prefix in this
+  // suite (the handler never ran; supertest got 200 {}).
+  app.use('/', wordWheelRoutes);
   return app;
 }
 
@@ -96,9 +97,9 @@ describe('POST /submit — daily quest credit', () => {
   });
 
   it('credits TODAY\'S quests, not just the weekly counter', async () => {
-    const app = await makeApp();
+    const app = makeApp();
 
-    await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
+    await request(app).post('/submit').send(submission);
 
     expect(completeDailyQuestsForResult).toHaveBeenCalledTimes(1);
 
@@ -113,18 +114,18 @@ describe('POST /submit — daily quest credit', () => {
   });
 
   it('still credits the weekly counter — the original behaviour is intact', async () => {
-    const app = await makeApp();
+    const app = makeApp();
 
-    await request(app).post('/api/daily-challenge/word-wheel/submit').send(submission);
+    await request(app).post('/submit').send(submission);
 
     expect(updateQuestProgress).toHaveBeenCalledWith('player-1', { dailyChallengesCompleted: 1 });
   });
 
   it('credits nothing for a guest — there is no account to credit', async () => {
-    const app = await makeApp();
+    const app = makeApp();
 
     await request(app)
-      .post('/api/daily-challenge/word-wheel/submit')
+      .post('/submit')
       .send({ ...submission, playerId: undefined, guestFingerprint: 'guest-abc' });
 
     expect(completeDailyQuestsForResult).not.toHaveBeenCalled();

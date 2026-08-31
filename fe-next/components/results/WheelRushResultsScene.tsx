@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { gsap } from 'gsap';
-import { Crown, Lock, Sparkles, Swords, Trophy } from 'lucide-react';
+import { Crown, Lock, Percent, Sparkles, Swords, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ScoreCountUp } from '@/components/results/shared';
 import Avatar from '@/components/Avatar';
@@ -250,7 +250,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
       </div>
 
       {/* Stats row */}
-      <div className="relative z-10 flex justify-center px-3 pb-3 pt-1">
+      <div className="relative z-10 flex justify-center gap-2 px-3 pb-3 pt-1">
         <StatTile
           icon={<Lock className="w-3 h-3" />}
           label={t('wheelRush.results.totalLocks')}
@@ -258,6 +258,22 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
           tone="text-neo-lime"
           countUp
           delay={prefersReduced ? 0 : 1100}
+        />
+        <StatTile
+          icon={<Swords className="w-3 h-3" />}
+          label={t('wheelRush.results.steals')}
+          value={recap.totalSteals}
+          tone="text-neo-red"
+          countUp
+          delay={prefersReduced ? 0 : 1200}
+        />
+        <StatTile
+          icon={<Percent className="w-3 h-3" />}
+          label={t('wheelRush.results.stealRate')}
+          value={`${recap.stealRate}%`}
+          tone="text-neo-cyan"
+          countUp={false}
+          delay={prefersReduced ? 0 : 1300}
         />
       </div>
 
