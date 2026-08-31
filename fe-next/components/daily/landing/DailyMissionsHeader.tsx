@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
+import { getSecondsUntilNextDaily, getDailyChallengeDisplayParts } from '@/utils/dailyChallenge/dateUtils';
 import { formatTimeHHMMSS } from '@/shared/utils';
 import { cn } from '@/lib/utils';
 
@@ -33,10 +33,11 @@ export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissions
   });
 
   useEffect(() => {
-    const now = new Date();
+    // Same UTC calendar day as getDailyChallengeDate / Word Hunt puzzleDate.
+    const parts = getDailyChallengeDisplayParts();
     setDateLabel({
-      monthAbbr: now.toLocaleString('en', { month: 'short' }).toUpperCase(),
-      dayNum: now.getDate(),
+      monthAbbr: parts.monthAbbr,
+      dayNum: parts.dayNum,
     });
     setCountdown(getSecondsUntilNextDaily());
     const interval = setInterval(() => {

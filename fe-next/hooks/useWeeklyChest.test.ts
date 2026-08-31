@@ -16,6 +16,10 @@ vi.mock('@/utils/authFetch', () => ({
   getWithAuth: (...a: unknown[]) => (global.fetch as (...x: unknown[]) => unknown)(...a),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: true, loading: false }),
+}));
+
 const okStatus = () => ({
   ok: true,
   json: () => Promise.resolve({ daysCompleted: 3, currentStreak: 3, isClaimable: false }),

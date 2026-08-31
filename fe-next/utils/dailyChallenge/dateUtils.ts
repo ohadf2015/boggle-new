@@ -1,18 +1,58 @@
 /**
  * Daily Challenge Date Utilities
  *
- * All date-related calculations for daily challenges
+ * All date-related calculations for daily challenges.
+ *
+ * Calendar-day convention: UTC (YYYY-MM-DD). Puzzle identity, storage keys,
+ * streaks, leaderboards, and server routes share one global midnight-UTC reset
+ * so every player is on the same puzzle. Hub and game-screen labels must be
+ * derived from this UTC key (getUTC* / timeZone: 'UTC') — never local
+ * getDate() — or Asia/Jerusalem 00:00–02:59 and Americas evenings disagree.
  */
 
 import { formatTimeHHMMSS } from '@/shared/utils';
 import { DAILY_CHALLENGE_EPOCH } from './constants';
 
 /**
- * Get today's date in UTC as YYYY-MM-DD string
- * Daily challenges reset at midnight UTC for all users globally
+ * Today's daily-puzzle date key in UTC as YYYY-MM-DD.
+ * Daily challenges reset at midnight UTC for all users globally.
  */
-export function getDailyChallengeDate(): string {
-  return new Date().toISOString().split('T')[0];
+export function getDailyChallengeDate(now: Date = new Date()): string {
+  return now.toISOString().split('T')[0];
+}
+
+export interface DailyChallengeDisplayParts {
+  /** Same value as getDailyChallengeDate(now). */
+  iso: string;
+  /** EN short month of the UTC calendar day, uppercased (e.g. "AUG"). */
+  monthAbbr: string;
+  /** UTC day-of-month (1–31). */
+  dayNum: number;
+}
+
+/**
+ * Display parts for the same UTC calendar day as getDailyChallengeDate.
+ * Use this on the daily hub date card so it cannot drift from the puzzle key.
+ */
+export function getDailyChallengeDisplayParts(now: Date = new Date()): DailyChallengeDisplayParts {
+  return {
+    iso: getDailyChallengeDate(now),
+    monthAbbr: now.toLocaleString('en', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
+    dayNum: now.getUTCDate(),
+  };
+}
+
+/**
+ * Format a YYYY-MM-DD puzzle key as a locale date string of that UTC day.
+ * Passing timeZone UTC avoids `Date(iso + 'T00:00:00Z')` rendering as the
+ * previous local day in UTC− zones.
+ */
+export function formatDailyPuzzleDate(
+  isoDate: string,
+  formatter: (date: Date, options: Intl.DateTimeFormatOptions) => string,
+  options: Intl.DateTimeFormatOptions = {},
+): string {
+  return formatter(new Date(isoDate + 'T00:00:00Z'), { ...options, timeZone: 'UTC' });
 }
 
 /**

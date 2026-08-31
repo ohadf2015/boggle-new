@@ -120,10 +120,13 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
   const formattedDate = useMemo(() => {
     try {
+      // puzzleDate is a UTC calendar day (getDailyChallengeDate). timeZone UTC
+      // keeps this label on the same day as the hub date card.
       return safeToLocaleDateString(new Date(puzzleDate + 'T00:00:00Z'), language, {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
+        timeZone: 'UTC',
       });
     } catch {
       return puzzleDate;

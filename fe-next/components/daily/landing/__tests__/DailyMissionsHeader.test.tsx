@@ -6,6 +6,11 @@ import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 
 vi.mock('@/utils/dailyChallenge/dateUtils', () => ({
   getSecondsUntilNextDaily: vi.fn(() => 3661),
+  getDailyChallengeDisplayParts: vi.fn(() => ({
+    iso: '2026-08-30',
+    monthAbbr: 'AUG',
+    dayNum: 30,
+  })),
 }));
 
 vi.mock('@/shared/utils', () => ({
@@ -77,6 +82,9 @@ describe('DailyMissionsHeader', () => {
 
     const dateCard = screen.getByTestId('date-card');
     expect(dateCard).toBeInTheDocument();
+    // Date card reads getDailyChallengeDisplayParts (UTC key), not local getDate().
+    expect(dateCard).toHaveTextContent('AUG');
+    expect(dateCard).toHaveTextContent('30');
   });
 
   test('renders completion count text', () => {
