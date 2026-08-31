@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { render } from '@react-email/components';
 import WelcomeEmail, { getWelcomeSubject } from '@/emails/welcome';
 import { getWelcomeEmailModes } from '@/lib/email/welcomeModes';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 /**
  * GET /api/admin/welcome-email-preview?language=en
@@ -12,6 +13,9 @@ const escapeHtml = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
 export async function GET(request: NextRequest) {
+  const authResult = await verifyAdminAuth(request);
+  if (!authResult.success) return authResult.response!;
+
   // Clamp to the supported-locale allowlist at the source: this value is reflected
   // into the preview HTML below, so an unclamped query param would be reflected XSS.
   const rawLanguage = request.nextUrl.searchParams.get('language') || 'en';
