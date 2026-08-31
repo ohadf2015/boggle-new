@@ -53,9 +53,12 @@ describe('wordCollection', () => {
     });
   });
 
-  describe('guest word progress — critical ordering bug', () => {
-    it('FAILS: merge-before-detect loses all new words', async () => {
-      // This test EXPOSES the bug: merging BEFORE detecting new words returns []
+  describe('guest word progress — merge-before-detect ordering', () => {
+    it('detects new words before merging into guest collection', async () => {
+      // Regression test for the merge-before-detect ordering bug.
+      // The implementation must detect new words against the pre-merge collection
+      // before saving the merged result; otherwise every new word would already
+      // be present in the collection and progress.new would always be empty.
       mockLocalStorage.clear();
       mockLocalStorage.setItem('quick_play_guest_words', JSON.stringify(['apple']));
 
@@ -66,11 +69,6 @@ describe('wordCollection', () => {
 
       const progress = await getQuickPlayWordProgress(roundWords, null);
 
-      // BUG: progress.new is [] because merge() added banana to collection first,
-      // then getNewWordsFromRound compares against a set that already contains it
-      console.log('BUGGY OUTPUT:', { collected: progress.collected, new: progress.new });
-
-      // THIS WILL FAIL with current code (bug is real)
       expect(progress.new).toContain('banana');
       expect(progress.new).not.toContain('apple');
     });
