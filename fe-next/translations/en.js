@@ -1591,7 +1591,15 @@ const en = {
     "button": "Back to the Board",
     "mascotTooltip": "That's not a word!"
   },
+  "joinByCode": {
+    "title": "Join your game",
+    "subtitle": "Enter the code your teacher or host gave you.",
+    "placeholder": "Enter your code",
+    "submit": "Join"
+  },
   "validation": {
+    "gameCodeRequired": "Enter a game code to join.",
+    "gameCodeInvalid": "That code should be 6-10 letters or numbers.",
     "enterGameCode": "Got a code? Drop it here!",
     "usernameRequired": "Name is required!",
     "usernameTooShort": "Too short! Need 2+ chars",

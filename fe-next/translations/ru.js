@@ -8934,7 +8934,15 @@ const ru = {
     "claimBonus": "Получить бонус",
     "dismiss": "Может быть позже"
   },
+  "joinByCode": {
+    "title": "Присоединиться к игре",
+    "subtitle": "Введите код, который дал учитель или организатор.",
+    "placeholder": "Введите код",
+    "submit": "Войти"
+  },
   "validation": {
+    "gameCodeRequired": "Введите код игры, чтобы войти.",
+    "gameCodeInvalid": "Код должен содержать от 6 до 10 букв или цифр.",
     "enterGameCode": "Есть код? Бросьте сюда!",
     "usernameRequired": "Имя требуется!",
     "usernameTooShort": "Слишком коротко! Нужно 2+ символов",

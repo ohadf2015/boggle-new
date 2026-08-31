@@ -1995,7 +1995,15 @@ const he = {
     "button": "חזרה ללוח",
     "mascotTooltip": "זו לא מילה!"
   },
+  "joinByCode": {
+    "title": "הצטרפו למשחק",
+    "subtitle": "הזינו את הקוד שקיבלתם מהמורה או מהמארח.",
+    "placeholder": "הזינו את הקוד",
+    "submit": "הצטרפו"
+  },
   "validation": {
+    "gameCodeRequired": "הזינו קוד משחק כדי להצטרף.",
+    "gameCodeInvalid": "הקוד צריך להיות 6 עד 10 אותיות או ספרות.",
     "enterGameCode": "יש קוד? הכניסו כאן",
     "usernameRequired": "צריך לבחור שם!",
     "usernameTooShort": "צריך לפחות 2 תווים",

@@ -2056,7 +2056,15 @@ const es = {
     "button": "Volver al tablero",
     "mascotTooltip": "¡Eso no es palabra!"
   },
+  "joinByCode": {
+    "title": "Únete a la partida",
+    "subtitle": "Introduce el código que te dio tu profe o el anfitrión.",
+    "placeholder": "Introduce tu código",
+    "submit": "Entrar"
+  },
   "validation": {
+    "gameCodeRequired": "Introduce un código para entrar.",
+    "gameCodeInvalid": "El código debe tener entre 6 y 10 letras o números.",
     "enterGameCode": "¿Tienes código? Ponlo aquí",
     "usernameRequired": "¡Se necesita un nombre!",
     "usernameTooShort": "Necesitas al menos 2 caracteres",

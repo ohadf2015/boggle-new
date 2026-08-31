@@ -1995,7 +1995,15 @@ const ja = {
     "button": "ボードに戻る",
     "mascotTooltip": "それ単語じゃない！"
   },
+  "joinByCode": {
+    "title": "ゲームに参加",
+    "subtitle": "先生またはホストから受け取ったコードを入力してください。",
+    "placeholder": "コードを入力",
+    "submit": "参加する"
+  },
   "validation": {
+    "gameCodeRequired": "ゲームコードを入力してください。",
+    "gameCodeInvalid": "コードは英数字6〜10文字です。",
     "enterGameCode": "コードある？ここに入力",
     "usernameRequired": "名前を入力してね！",
     "usernameTooShort": "2文字以上必要だよ",

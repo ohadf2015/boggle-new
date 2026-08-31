@@ -113,6 +113,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/igra-v-assotsiatsii-onlayn",
   "/igry-v-slova-onlayn",
   "/japanese-word-game",
+  "/join",
   "/juego-de-palabras-multijugador",
   "/juegos-vocabulario-aula",
   "/leaderboard",

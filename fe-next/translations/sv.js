@@ -2284,7 +2284,15 @@ const sv = {
     "button": "Tillbaka till brädet",
     "mascotTooltip": "Det är inget ord!"
   },
+  "joinByCode": {
+    "title": "Gå med i spelet",
+    "subtitle": "Ange koden du fick av din lärare eller värd.",
+    "placeholder": "Ange din kod",
+    "submit": "Gå med"
+  },
   "validation": {
+    "gameCodeRequired": "Ange en spelkod för att gå med.",
+    "gameCodeInvalid": "Koden ska vara 6–10 bokstäver eller siffror.",
     "enterGameCode": "Har du en kod? Ange den här",
     "usernameRequired": "Namn krävs!",
     "usernameTooShort": "Behöver minst 2 tecken",
