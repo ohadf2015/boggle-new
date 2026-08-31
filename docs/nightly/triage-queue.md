@@ -2239,3 +2239,19 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: flagged for human review — homepage rageclicks (brief item #1, reach=10 last 24h) persist despite this fix being live since 2026-07-14
   - why: variant `click-feedback` (350ms brightness-drop press feedback, `LandingModeCubes.tsx` Cube component, wired+active) was meant to kill the exact rageclick pattern (20/27 null el_text on mode-card clicks). Flag is live, wiring verified correct (`pressHighlight` reaches every Cube). Either the variant isn't moving the metric (needs a decision: keep control, retire flag) or today's rageclicks are a DIFFERENT element (hero CTA / daily banner, not mode cards) — needs an el_text breakdown on today's rageclick events before deciding.
   - recommended owner: self (tomorrow) — pull `posthog-query.sh hogql` on rageclick events' `$el_text`/`$el_selector` for lexiclash.live/ last 24h, compare click-feedback vs control variant split
+
+## 2026-08-31
+- [Restore] Stale drop 20260817-010002 (6 files: multiplayer PageClient/JoinRoomModal/MultiplayerFlow, EducationHeroBanner, GemHunt gems x2)
+  - dropped 2026-08-17, gate error: growthTracking.ts GrowthEvent union lacked 'mp_room_join_rate_limited' at gate time
+  - status: deferred (NOT restored)
+  - why: all 7 target files have DIVERGED from the backup over the last 14 nights (confirmed via diff) — a blind rsync restore would clobber 2 weeks of unrelated work in those same files. Needs a manual 3-way merge of the rate-limit feature onto current file versions, not a plain restore.
+  - recommended owner: self (next dedicated session) — do NOT auto-retry plain restore-salvaged-code.sh on this tag again.
+- [Restore] Stale drop 20260827-010001 (8 files: word-craft PageClient/setupPrefs/telemetry/GameOverScene, results WheelRush x2, best-online-word-games page, lib/experiments.ts)
+  - dropped 2026-08-27, gate error: word-craft PageClient referenced unexported setupPrefs/telemetry members + an experiment variant not in the lib/experiments.ts union
+  - status: deferred (NOT restored)
+  - why: all 8 target files have DIVERGED from the backup (confirmed via diff) — same clobber risk as above.
+  - recommended owner: self (next dedicated session) — needs 3-way merge, not plain restore.
+- [Supabase] public_profiles Security Definer View advisor flag
+  - status: reviewed, no action (false positive / intentional)
+  - why: migration 20260815100000_friends_read_public_profiles.sql explicitly documents definer semantics as BY DESIGN — setting security_invoker=on silently re-breaks friends/DM cross-player reads (own-row RLS on profiles). Do not remediate.
+  - recommended owner: self (closed)
