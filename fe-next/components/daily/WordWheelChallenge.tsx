@@ -654,16 +654,13 @@ const WordWheelChallenge: React.FC = () => {
               })}
             </div>
 
-            <m.button
+            <button
               type="button"
               onClick={handleStart}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-lg shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)] active:shadow-hard-pressed active:translate-x-px active:translate-y-px transition-all"
-              whileTap={{ scale: 0.95 }}
-              animate={{ scale: [1, 1.03, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="px-8 py-3 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-lg shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)] active:shadow-hard-pressed transition-shadow"
             >
               {t('daily.play')}
-            </m.button>
+            </button>
 
             {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
             <div className="w-full max-w-md lg:max-w-lg xl:max-w-2xl mt-2">

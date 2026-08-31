@@ -129,6 +129,14 @@ export interface AndroidPromoGateInput {
   requireEngagement?: boolean;
   /** Completed games on this device — `readGamesCompletedCount()`. */
   gamesCompleted?: number;
+  /**
+   * Cookie consent has not been decided yet. The install Dialog is a Radix
+   * modal (z-90 overlay + focus trap); the cookie sheet is z-[110] in-tree.
+   * Even when the sheet paints above the overlay, Radix sets pointer-events:none
+   * on the rest of the document, so ACCEPT ALL is unreachable until the modal
+   * is dismissed. Auto-popup must wait — same re-arm pattern as `inGame`.
+   */
+  consentPending?: boolean;
   /** current time in ms */
   now: number;
 }
@@ -153,5 +161,8 @@ export function shouldShowAndroidInstallPromo(input: AndroidPromoGateInput): boo
   // the safe direction: it withholds a prompt rather than firing one on a visitor who
   // has seen nothing of the game.
   if (input.requireEngagement && (input.gamesCompleted ?? 0) < 1) return false;
+  // Cookie-consent gate. Re-armed by the caller (same pattern as inGame) so the
+  // promo lands after ACCEPT / DECLINE rather than stacking over the sheet.
+  if (input.consentPending) return false;
   return true;
 }

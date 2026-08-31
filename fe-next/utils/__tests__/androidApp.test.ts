@@ -163,6 +163,15 @@ describe('shouldShowAndroidInstallPromo', () => {
       shouldShowAndroidInstallPromo({ ...base, dismissedUntil: 1_000_000, now: 2_000_000 })
     ).toBe(true);
   });
+
+  it('hides while cookie consent is still pending (first-visit cookie sheet)', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, consentPending: true })).toBe(false);
+  });
+
+  it('shows once cookie consent is resolved (field omitted or false)', () => {
+    expect(shouldShowAndroidInstallPromo(base)).toBe(true);
+    expect(shouldShowAndroidInstallPromo({ ...base, consentPending: false })).toBe(true);
+  });
 });
 
 describe('shouldShowAndroidInstallPromo — exp-install-promo-after-first-game-v1', () => {

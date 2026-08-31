@@ -21,6 +21,7 @@
  */
 
 import { useEffect } from 'react';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Zap, WifiOff, Bell } from 'lucide-react';
@@ -36,6 +37,7 @@ import {
   playStoreUrlWithReferrer,
   shouldShowAndroidInstallPromo,
 } from '@/utils/androidApp';
+import { hasConsentDecision } from '@/utils/cookieConsent';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 import {
   readInstallDismissedUntil,
@@ -61,6 +63,11 @@ const SHOW_DELAY_MS = 12_000;
 export default function AndroidAppInstallPromo() {
   const { t, language } = useLanguage();
   const pathname = usePathname();
+  // Hold the auto-popup (and any store-driven open) until cookie consent is
+  // resolved. EmailCaptureModal / PushNotificationPrompt already do this; the
+  // install Dialog is the same z-90 Radix modal that would trap pointer events
+  // behind the z-[110] cookie sheet.
+  const consentDecided = useConsentDecided();
 
   const open = useAndroidInstallStore((s) => s.open);
   const source = useAndroidInstallStore((s) => s.source);
@@ -141,6 +148,9 @@ export default function AndroidAppInstallPromo() {
             now: Date.now(),
             requireEngagement,
             gamesCompleted: readGamesCompletedCount(),
+            // Re-read at fire time (not frozen at mount): the visitor can still
+            // be staring at the cookie sheet when the 12s timer elapses.
+            consentPending: !hasConsentDecision(),
           })) {
             timer = undefined;
             arm();
@@ -208,7 +218,7 @@ export default function AndroidAppInstallPromo() {
   ];
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
+    <Dialog open={open && consentDecided} onOpenChange={(next) => !next && handleDismiss()}>
       <DialogContent
         thickBorder
         noDescription

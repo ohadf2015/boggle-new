@@ -2,6 +2,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AndroidAppInstallPromo from '../AndroidAppInstallPromo';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
+import { acceptAll } from '@/utils/cookieConsent';
 
 const captureMock = vi.fn();
 
@@ -50,6 +51,12 @@ beforeEach(() => {
   captureMock.mockClear();
   localStorage.clear();
   sessionStorage.clear();
+  // Existing tests assume a returning visitor. Persist a consent decision so
+  // the first-visit cookie gate (consentPending) does not hide the promo.
+  localStorage.setItem(
+    'cookie-consent-v2',
+    JSON.stringify({ essential: true, analytics: true, advertising: true, timestamp: Date.now() }),
+  );
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
   mockNative = false;
   mockPromoVariant = 'control';
@@ -260,5 +267,39 @@ describe('exp-install-promo-after-first-game-v1', () => {
     localStorage.setItem('games_completed_count', '1');
     await act(async () => { vi.advanceTimersByTime(12_000); });
     expect(exposureMock).toHaveBeenCalled();
+  });
+});
+
+describe('AndroidAppInstallPromo — cookie consent gate', () => {
+  // Same helper as the engagement-variant tests: advance a SINGLE delay.
+  // runAllTimersAsync loops forever here because consentPending re-arms.
+  const tapAndRun = async (ms: number) => {
+    act(() => { fireEvent.pointerDown(window); });
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { vi.advanceTimersByTime(ms); });
+  };
+
+  it('withholds the auto-popup while cookie consent is unresolved', async () => {
+    localStorage.removeItem('cookie-consent-v2');
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    expect(screen.queryByText('androidAppPromo.title')).not.toBeInTheDocument();
+    expect(useAndroidInstallStore.getState().open).toBe(false);
+  });
+
+  it('opens after consent is recorded (re-arm, same pattern as inGame)', async () => {
+    localStorage.removeItem('cookie-consent-v2');
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    expect(useAndroidInstallStore.getState().open).toBe(false);
+
+    // acceptAll persists AND dispatches cookie-consent-change so useConsentDecided
+    // flips (localStorage alone would leave the Dialog still gated).
+    act(() => { acceptAll(); });
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(true);
+    expect(screen.getByText('androidAppPromo.title')).toBeInTheDocument();
   });
 });

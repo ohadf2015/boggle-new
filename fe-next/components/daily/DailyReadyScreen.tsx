@@ -254,15 +254,17 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         {/* PRIMARY PLAY BUTTON — inline on desktop, sticky on mobile */}
         {/* Desktop inline button */}
         <m.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+          // Opacity-only + no delay: a y-slide + breathing scale moved the PLAY
+          // hit target on first press so the CTA needed a second tap.
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 26 }}
           className="hidden sm:block w-full max-w-sm mx-auto"
         >
           <button
             type="button"
             onClick={onStart}
-            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-shadow duration-200 hover:shadow-hard-lg active:shadow-hard-pressed flex items-center justify-center gap-2"
           >
             <Target className="w-6 h-6" />
             {t('daily.playButton')}
@@ -429,15 +431,16 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         createPortal(
           <div className="sm:hidden fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
             <m.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+              // Opacity-only + no delay — see desktop PLAY comment above.
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
               className="max-w-sm mx-auto pointer-events-auto"
             >
               <button
                 type="button"
                 onClick={onStart}
-                className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+                className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-shadow duration-200 active:shadow-hard-pressed flex items-center justify-center gap-2"
               >
                 <Target className="w-6 h-6" />
                 {t('daily.playButton')}

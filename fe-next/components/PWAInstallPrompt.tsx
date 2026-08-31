@@ -10,6 +10,7 @@ import { isAndroidBrowser } from '@/utils/androidApp';
 import { isNative } from '@/utils/platform';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { isIOSSafari, shouldShowIOSInstallHint } from '@/utils/iosInstall';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 
 const PWA_DISMISS_KEY = 'pwa_install_dismissed_until';
 const PWA_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -43,6 +44,9 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAInstallPrompt() {
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // Same modal-coordination rule as EmailCaptureModal / AndroidAppInstallPromo:
+  // do not paint an install overlay while cookie consent is still unresolved.
+  const consentDecided = useConsentDecided();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   // iOS Safari can't fire beforeinstallprompt — this shows the manual
@@ -149,6 +153,7 @@ export function PWAInstallPrompt() {
   };
 
   if (isOnCrazyGamesPlatform) return null;
+  if (!consentDecided) return null;
   // The effect-time check below can't hold on its own: this component mounts once at the
   // layout level, so a client-side navigation INTO /teacher/upgrade never re-runs it, and
   // beforeinstallprompt fires long after mount. Re-read the signal here, on the very render

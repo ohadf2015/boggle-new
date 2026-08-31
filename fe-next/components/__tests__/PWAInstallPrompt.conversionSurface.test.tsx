@@ -29,6 +29,7 @@ vi.mock('@/utils/platform', () => ({ isNative: () => false }));
 // Past the "show after 2nd game" threshold, so the only thing standing between the
 // beforeinstallprompt event and a visible overlay is the conversion-surface guard.
 vi.mock('@/utils/gamesCompletedCount', () => ({ readGamesCompletedCount: () => 5 }));
+vi.mock('@/hooks/useConsentDecided', () => ({ useConsentDecided: () => true }));
 
 /** Fire the real event the component listens for, then let its state settle. */
 async function firePromptable() {
