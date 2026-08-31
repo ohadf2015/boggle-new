@@ -3,6 +3,7 @@ import {
   generateAndroidReleaseLaunchHtml,
   PLAY_STORE_URL,
 } from '@/lib/androidReleaseLaunchEmail';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
 
@@ -11,6 +12,9 @@ const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
  * Returns rendered HTML preview of the Android release announcement email.
  */
 export async function GET(request: NextRequest) {
+  const authResult = await verifyAdminAuth(request);
+  if (!authResult.success) return authResult.response!;
+
   const languageParam = request.nextUrl.searchParams.get('language') || 'en';
   const language = ALLOWED_LANGUAGES.includes(languageParam) ? languageParam : 'en';
 

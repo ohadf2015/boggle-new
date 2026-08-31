@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
 import { sendEmail } from '@/lib/email/send';
@@ -23,15 +24,7 @@ import { withCronLock } from '@/backend/redis/locking';
  * writes nothing.
  */
 export async function POST(request: NextRequest) {
-  const cronSecret =
-    request.headers.get('x-cron-secret') || request.headers.get('authorization');
-  const expectedSecret = process.env.CRON_SECRET;
-
-  if (
-    expectedSecret &&
-    cronSecret !== expectedSecret &&
-    cronSecret !== `Bearer ${expectedSecret}`
-  ) {
+  if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

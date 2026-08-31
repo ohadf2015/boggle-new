@@ -1,11 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 /**
  * GET /api/admin/email-preview
  * Returns an HTML preview of the daily challenge email template
  * This endpoint is used by the admin dashboard to preview emails
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authResult = await verifyAdminAuth(request);
+  if (!authResult.success) return authResult.response!;
+
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
 
   // Calculate puzzle number (days since launch)

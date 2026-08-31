@@ -3,6 +3,7 @@ import {
   generateAndroidBetaLaunchHtml,
   PLAY_STORE_URL,
 } from '@/lib/androidBetaLaunchEmail';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
 
@@ -11,6 +12,9 @@ const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
  * Returns rendered HTML preview of the Android beta launch email.
  */
 export async function GET(request: NextRequest) {
+  const authResult = await verifyAdminAuth(request);
+  if (!authResult.success) return authResult.response!;
+
   const languageParam = request.nextUrl.searchParams.get('language') || 'en';
   const language = ALLOWED_LANGUAGES.includes(languageParam)
     ? languageParam
