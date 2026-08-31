@@ -381,10 +381,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         setGameCode(''); setPrefilledRoomCode(''); setIsActive(false); setIsHost(false); setIsPrivate(false);
         setAttemptingReconnect(false); setShouldAutoJoin(false); clearSession();
         socket?.emit('getActiveRooms');
+        // Strip classroom/host too, not just room: leaving them re-enters the
+        // classroom HOST boot path and silently creates another room.
         if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('room');
-          window.history.replaceState({}, '', url.pathname + (url.search || ''));
+          window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
         }
       } else if (kind === 'codeExists') {
         setError(t('errors.gameCodeExists'));
@@ -640,11 +640,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // Mark intentional exit — tightens the auto-rejoin freshness guard
             // so even a same-second F5 stays on the lobby, not back in-game.
             try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
-            // Clean ?room= so a back/forward nav doesn't auto-rejoin.
+            // Clean the exit-trap params so a back/forward nav doesn't auto-rejoin
+            // — and so a classroom host is not dropped back onto
+            // `?classroom=true&host=true`, which just makes them another room.
             if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
-              const url = new URL(window.location.href);
-              url.searchParams.delete('room');
-              window.history.replaceState({}, '', url.pathname + (url.search || ''));
+              window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
             }
             toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
           }} /> : <ConnectionDot />}

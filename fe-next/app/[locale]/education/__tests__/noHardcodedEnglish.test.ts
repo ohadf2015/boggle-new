@@ -31,22 +31,24 @@ function pageFiles(dir: string): string[] {
 }
 
 /**
- * A JSX text node with two or more word-like runs is prose meant for a human.
- * One word ("Free", an icon, a number) is left alone — those are usually
- * symbols or already-localized fragments, and flagging them buys noise.
+ * A JSX text node is prose meant for a human when it has two or more
+ * whitespace-separated chunks containing a letter AND at least 5 ASCII letters
+ * overall.
  *
- * KNOWN BLIND SPOT: it needs two runs of 3+ ASCII letters, so short-token copy
- * slips past — "2-by-2 practice", "1v1 duel", "Free · No ads" all read as one
- * word. This test passing is evidence against regression, NOT proof a page is
- * clean. Read new hero/CTA copy by eye as well.
+ * The earlier rule required two runs of 3+ letters, which silently exempted the
+ * exact copy this repo writes on CTAs: "2-by-2 practice", "1v1 duel",
+ * "Free · No ads" all read as a single word to it. Counting letter-bearing
+ * chunks instead catches those while still ignoring "5 minutes", "Lvl 2", and
+ * bare symbols, where only one chunk carries letters.
  */
 function prosyTextNodes(source: string): Array<{ line: number; text: string }> {
   const found: Array<{ line: number; text: string }> = [];
   source.split('\n').forEach((line, i) => {
     for (const raw of line.match(/>([^<>{}\n]+)</g) ?? []) {
       const text = raw.slice(1, -1).trim();
-      const words = text.match(/[A-Za-z]{3,}/g) ?? [];
-      if (words.length >= 2) found.push({ line: i + 1, text });
+      const letterChunks = text.split(/\s+/).filter((c) => /[A-Za-z]/.test(c));
+      const letterCount = (text.match(/[A-Za-z]/g) ?? []).length;
+      if (letterChunks.length >= 2 && letterCount >= 5) found.push({ line: i + 1, text });
     }
   });
   return found;
@@ -75,5 +77,20 @@ describe('education landing pages carry no hardcoded English', () => {
     // Proves the detector is not vacuous — a common failure mode for source scans.
     expect(prosyTextNodes('  <span>Run an ESL Game</span>')).toHaveLength(1);
     expect(prosyTextNodes('  <span>{c.heroCtas.primary}</span>')).toHaveLength(0);
+  });
+
+  it('catches the short-token copy the previous rule exempted', () => {
+    // Every one of these actually shipped on an education page.
+    expect(prosyTextNodes('<span>2-by-2 practice</span>')).toHaveLength(1);
+    expect(prosyTextNodes('<span>1v1 duel</span>')).toHaveLength(1);
+    expect(prosyTextNodes('<span>Free · No ads</span>')).toHaveLength(1);
+  });
+
+  it('still ignores fragments that are not prose', () => {
+    // Only one chunk carries letters, or there are too few letters to be a sentence.
+    expect(prosyTextNodes('<span>· 5 minutes</span>')).toHaveLength(0);
+    expect(prosyTextNodes('<span>Lvl 2</span>')).toHaveLength(0);
+    expect(prosyTextNodes('<span>A1 C2</span>')).toHaveLength(0);
+    expect(prosyTextNodes('<span>→ ★ ✓</span>')).toHaveLength(0);
   });
 });

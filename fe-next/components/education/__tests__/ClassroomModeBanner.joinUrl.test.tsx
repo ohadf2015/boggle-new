@@ -106,4 +106,45 @@ describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
     // that actually resolves — /[locale]/join/[code] is the only one.
     expect(container.textContent).toContain('/en/join/TESTABC');
   });
+
+  /**
+   * The copy button used to put the BARE game code on the clipboard. A teacher
+   * pasting that into Google Classroom, Teams, or a parent email sent six
+   * characters and no way to use them — the same dead end as the QR-only banner,
+   * just via a different channel. The clipboard has to carry something a student
+   * can act on, and the URL already contains the code.
+   */
+  it('copies a usable join link, not a bare code that cannot be clicked', async () => {
+    mockUseLanguage.mockReturnValue({
+      language: 'en',
+      t: (key: string) => key,
+      dir: 'ltr',
+      setLanguage: vi.fn(),
+      currentFlag: '🇺🇸',
+    });
+    vi.spyOn(LanguageContext, 'useLanguage').mockImplementation(mockUseLanguage);
+
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    // navigator.clipboard is getter-only under happy-dom — assign via defineProperty.
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+
+    const { getByLabelText } = render(
+      <ClassroomModeBanner
+        lessonData={{ lessonId: '1', lessonName: 'L', vocabularyWords: [], language: 'en' as const }}
+        gameCode="TESTABC"
+        expanded={true}
+      />
+    );
+
+    getByLabelText('share.copyLink').click();
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
+
+    const copied = writeText.mock.calls[0][0] as string;
+    expect(copied).toContain('/en/join/TESTABC');
+    // Regression: the old behaviour wrote exactly the code and nothing else.
+    expect(copied).not.toBe('TESTABC');
+  });
 });

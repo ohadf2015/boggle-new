@@ -89,17 +89,21 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
     }
   }, [gameCode, language]);
 
+  // Copy the LINK, not the bare code. A teacher pastes this into Google Classroom,
+  // Teams, or a parent email — six characters there are a dead end, and the URL
+  // already carries the code for anyone who prefers to read it out.
   const handleCopy = useCallback(async () => {
-    if (!gameCode) return;
+    const payload = joinUrl || gameCode;
+    if (!payload) return;
     try {
-      await navigator.clipboard.writeText(gameCode);
+      await navigator.clipboard.writeText(payload);
       setCopied(true);
-      toast.success(t('share.codeCopied'));
+      toast.success(t(joinUrl ? 'share.linkCopied' : 'share.codeCopied'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error(t('share.codeCopyError'));
     }
-  }, [gameCode, t]);
+  }, [gameCode, joinUrl, t]);
 
   const showPanel = expanded && !!gameCode;
 
@@ -163,7 +167,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                     'shadow-hard hover:shadow-hard-lg transition-all',
                     copied && 'bg-neo-lime'
                   )}
-                  aria-label={t('share.copy')}
+                  aria-label={t('share.copyLink')}
                 >
                   {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                 </button>
