@@ -78,7 +78,7 @@ const faqs = [
   },
   {
     q: 'What are the best free browser word games in 2026?',
-    a: 'The best free browser word games of 2026 that need no download or install: LexiClash (real-time multiplayer, 8 game modes, 5 languages — our top pick), Wordle (one 5-letter puzzle per day), NYT Connections (group 16 words into themes), NYT Strands (themed word search), and Semantle (AI-semantic guessing). LexiClash is the only one that supports 2–20 players in the same browser room with no account required.',
+    a: 'The best free browser word games of 2026 that need no download or install: LexiClash (real-time multiplayer, 8 game modes, 6 languages — our top pick), Wordle (one 5-letter puzzle per day), NYT Connections (group 16 words into themes), NYT Strands (themed word search), and Semantle (AI-semantic guessing). LexiClash is the only one that supports 2–20 players in the same browser room with no account required.',
   },
   {
     q: 'Which word games have global leaderboards and competitive play?',
@@ -107,7 +107,7 @@ const lexiclashVideoGameJsonLd = JSON.stringify({
   '@type': 'VideoGame',
   name: 'LexiClash',
   url: 'https://www.lexiclash.live/en/multiplayer',
-  description: 'Free real-time multiplayer word game with 8 modes: Multiplayer Grid Battle, Word Hunt Survival, Daily Word Wheel, Adventure, Blast, Brain Drills, Vocabulary Duels, and Party Games. 2-20+ players, browser-based, no download, no signup, no pay-to-win. Available in 5 languages.',
+  description: 'Free real-time multiplayer word game with 8 modes: Multiplayer Grid Battle, Word Hunt Survival, Daily Word Wheel, Adventure, Blast, Brain Drills, Vocabulary Duels, and Party Games. 2-20+ players, browser-based, no download, no signup, no pay-to-win. Available in 6 languages.',
   image: 'https://www.lexiclash.live/og-image-en.webp',
   genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Casual', 'Educational', 'Roguelike'],
   gamePlatform: ['Web Browser', 'iOS', 'Android', 'PWA'],
@@ -129,7 +129,7 @@ const itemListJsonLd = JSON.stringify({
   numberOfItems: 9,
   itemListOrder: 'https://schema.org/ItemListOrderAscending',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'LexiClash', url: 'https://www.lexiclash.live/en/multiplayer', description: 'Free real-time multiplayer word game with 8 modes. 2-20+ players, browser-based, 5 languages. Best for parties, classrooms, family game nights, and Words With Friends replacement.' },
+    { '@type': 'ListItem', position: 1, name: 'LexiClash', url: 'https://www.lexiclash.live/en/multiplayer', description: 'Free real-time multiplayer word game with 8 modes. 2-20+ players, browser-based, 6 languages. Best for parties, classrooms, family game nights, and Words With Friends replacement.' },
     { '@type': 'ListItem', position: 2, name: 'Wordle', url: 'https://www.nytimes.com/games/wordle', description: 'Daily 5-letter word guessing puzzle from the New York Times. One puzzle per day, no multiplayer, perfect 2-minute ritual.' },
     { '@type': 'ListItem', position: 3, name: 'NYT Connections', url: 'https://www.nytimes.com/games/connections', description: 'Group 16 words into 4 hidden categories. Daily puzzle, no multiplayer, addictive group-table game.' },
     { '@type': 'ListItem', position: 4, name: 'NYT Strands', url: 'https://www.nytimes.com/games/strands', description: 'Themed word search with a spangram mechanic. Daily puzzle from NYT.' },
@@ -161,7 +161,7 @@ const games = [
     tagline: 'Eight modes, one browser tab',
     blurb: 'LexiClash scratches an itch that other word games don&apos;t. The real-time multiplayer is genuinely thrilling — finding words while racing against actual humans feels completely different from taking turns. But the wild thing is the depth: adventure mode with roguelike boss battles, daily Word Hunt Survival (Wordle×Boggle hybrid), Word Wheel daily, Blast cascading combos, brain drills, vocabulary duels for classrooms, and TV+phone party games. Most word games are one mode. This is eight.',
     modes: ['Multiplayer Grid Battle (2-20 players, real-time)', 'Word Hunt Survival (Wordle-style daily, 10 attempts)', 'Daily Word Wheel (global leaderboard)', 'Adventure (roguelike, boss battles, abilities)', 'Blast (cascading combos, juice effects)', 'Brain Drills (60-sec vocabulary sprints)', 'Vocabulary Duels (1v1, teacher dashboard)', 'Party Games (TV + phone hybrid)'],
-    pros: ['Unlimited free play, no catches', 'Real-time multiplayer with up to 20+ players', 'Works in the browser — just share a link', 'Eight game modes, not just one', 'Adventure mode gives you actual progression', '5 languages including Hebrew (RTL) and Japanese'],
+    pros: ['Unlimited free play, no catches', 'Real-time multiplayer with up to 20+ players', 'Works in the browser — just share a link', 'Eight game modes, not just one', 'Adventure mode gives you actual progression', '6 languages including Hebrew (RTL) and Japanese'],
     cons: ['Smaller player base than the big names (growing fast though)', 'No turn-based async mode if that&apos;s your thing'],
     type: 'Grid word-finding + 7 more modes',
     multiplayer: 'Real-time, 2-20+ players',

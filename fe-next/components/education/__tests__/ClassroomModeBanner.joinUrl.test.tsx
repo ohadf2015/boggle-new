@@ -75,4 +75,35 @@ describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
     const settingsCard = container.querySelector('[class*="neo-navy"]');
     expect(settingsCard).toBeInTheDocument();
   });
+
+  /**
+   * The banner used to render the QR code and NOTHING else derived from joinUrl,
+   * so a student who could not scan it — no phone, a Chromebook, or simply too
+   * far from the projector — had a 6-character game code and nowhere to type it.
+   * That is the 2026-08-30 incident; `tvJoinAddress` fixed it for the TV surface
+   * only, and this desktop host banner still had the gap. A real ChromiumOS
+   * session appears in the education replays, and a Chromebook cannot scan a QR.
+   */
+  it('shows the join address as readable text, not only as a QR code', () => {
+    mockUseLanguage.mockReturnValue({
+      language: 'en',
+      t: (key: string) => key,
+      dir: 'ltr',
+      setLanguage: vi.fn(),
+      currentFlag: '🇺🇸',
+    });
+    vi.spyOn(LanguageContext, 'useLanguage').mockImplementation(mockUseLanguage);
+
+    const { container } = render(
+      <ClassroomModeBanner
+        lessonData={{ lessonId: '1', lessonName: 'L', vocabularyWords: [], language: 'en' as const }}
+        gameCode="TESTABC"
+        expanded={true}
+      />
+    );
+
+    // The address a student reads off the wall and types. Must contain the route
+    // that actually resolves — /[locale]/join/[code] is the only one.
+    expect(container.textContent).toContain('/en/join/TESTABC');
+  });
 });

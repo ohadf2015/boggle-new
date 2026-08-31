@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
@@ -15,6 +15,28 @@ import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
  */
 const ROOT = join(__dirname, '..', '..', '..', '..');
 
+/**
+ * Comparison pages are DISCOVERED, not listed. The hardcoded list below was
+ * extended by hand on 2026-08-31 after these pages were found making false
+ * claims — but a hand-maintained list only protects the files someone
+ * remembered, and the next `lexiclash-vs-*` page ships unguarded by default.
+ * A real teacher (LogRocket 2026-08-29, our most engaged one) spent 50 minutes
+ * reading exactly these pages while comparing us to competitors.
+ */
+function comparisonPages(): string[] {
+  const localeDir = join(ROOT, 'app', '[locale]');
+  const found: string[] = [];
+  for (const name of readdirSync(localeDir)) {
+    if (!/^lexiclash-vs-|^best-online-word-games$/.test(name)) continue;
+    for (const file of readdirSync(join(localeDir, name))) {
+      if (file === 'page.tsx' || file === 'content.ts') {
+        found.push(`app/[locale]/${name}/${file}`);
+      }
+    }
+  }
+  return found.sort();
+}
+
 const FILES = [
   'app/[locale]/education/seoContent.ts',
   'app/[locale]/education/esl-word-games/content.ts',
@@ -28,33 +50,17 @@ const FILES = [
   'app/[locale]/word-games-for-the-classroom/content.ts',
   'app/[locale]/education/page.tsx',
   'public/llms.txt',
-  // Comparison pages. These sat OUTSIDE this list until 2026-08-31, which is exactly why
-  // they still claimed LexiClash was "fully free with no premium tier" long after that was
-  // corrected everywhere else — and why they stated a competitor's free tier wrongly.
-  // A guard that does not cover a file cannot protect it.
-  'app/[locale]/lexiclash-vs-apalabrados/page.tsx',
-  'app/[locale]/lexiclash-vs-blooket/page.tsx',
-  'app/[locale]/lexiclash-vs-cabanagrams/page.tsx',
-  'app/[locale]/lexiclash-vs-flocabulary/page.tsx',
-  'app/[locale]/lexiclash-vs-freerice/page.tsx',
-  'app/[locale]/lexiclash-vs-kahoot-gimkit-vocabulary/content.ts',
-  'app/[locale]/lexiclash-vs-kahoot-gimkit-vocabulary/page.tsx',
-  'app/[locale]/lexiclash-vs-kahoot/page.tsx',
-  'app/[locale]/lexiclash-vs-popple/page.tsx',
-  'app/[locale]/lexiclash-vs-puzzly-words/page.tsx',
-  'app/[locale]/lexiclash-vs-quizlet/page.tsx',
-  'app/[locale]/lexiclash-vs-scrabble/page.tsx',
-  'app/[locale]/lexiclash-vs-vocabularyspellingcity/content.ts',
-  'app/[locale]/lexiclash-vs-vocabularyspellingcity/page.tsx',
-  'app/[locale]/lexiclash-vs-wordfeud/page.tsx',
-  'app/[locale]/lexiclash-vs-wordle/page.tsx',
-  'app/[locale]/lexiclash-vs-wordwall-kahoot-quizlet/page.tsx',
-  'app/[locale]/lexiclash-vs-wordwall/page.tsx',
+  // Comparison pages sat OUTSIDE this guard until 2026-08-31, which is exactly why they
+  // still claimed LexiClash was "fully free with no premium tier" long after that was
+  // corrected everywhere else. A guard that does not cover a file cannot protect it —
+  // so these are now discovered, not listed.
+  ...comparisonPages(),
 ];
 
 /**
  * Ground truth, all verified in code:
- *   lib/education/freeTierLimits.ts → 3 classes, 10 students/class, $9/mo Pro
+ *   lib/education/freeTierLimits.ts → 3 classes, 50 students/class, $9/mo Pro
+ *   components/teacher/ProGate.tsx  → analytics + reports ARE behind the paywall
  *   i18n/config.ts                  → six locales
  */
 const FORBIDDEN: Array<[string, RegExp]> = [
@@ -81,6 +87,14 @@ const FORBIDDEN: Array<[string, RegExp]> = [
   [
     'says the join code is 4 digits — ClassroomGameLobby.tsx:141 and utils/utils.ts:118 both emit six characters',
     /4-digit|4 digit code|4 ספרות|4-siffrig|4桁|4 dígitos|4-значн/,
+  ],
+  [
+    'claims no classroom feature is paywalled — a 4th class and reports/analytics both are',
+    // Found on lexiclash-vs-blooket, in the SAME sentence that advertised "Teacher Pro
+    // ($9/mo) adds unlimited classes and printable reports". A claim can contradict itself
+    // inside one string and still read as persuasive; only the code settles it.
+    // FREE_TIER_LIMITS.classes caps free classrooms and ProGate('analytics') gates reports.
+    /never locks? classroom features behind a paywall|no classroom features? (are )?(locked|paywalled)|nothing is locked behind a paywall|never paywall/i,
   ],
   [
     'says five languages — the app ships six (en, he, sv, ja, es, ru)',

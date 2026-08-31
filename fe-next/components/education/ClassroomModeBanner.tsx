@@ -177,6 +177,16 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                   <div className="p-2 bg-neo-cream rounded-neo border-neo border-neo-black shadow-hard-sm">
                     <QRCodeCanvas value={joinUrl} size={150} bgColor="#ffffff" fgColor="#000000" level="M" />
                   </div>
+                  {/* A QR alone strands every student who cannot scan it — no phone,
+                      a Chromebook, or just too far from the projector. They need an
+                      address they can read and type. `/[locale]/join/[code]` is the
+                      only route that resolves, so print exactly that. */}
+                  <p
+                    className="max-w-full break-all text-center font-neo-body text-xs font-bold text-neo-white/90"
+                    dir="ltr"
+                  >
+                    {joinUrl.replace(/^https?:\/\/(www\.)?/, '')}
+                  </p>
                 </div>
               )}
             </div>
