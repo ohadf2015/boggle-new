@@ -55,8 +55,10 @@ export function DailyModeQuestCard({ mode, locale, t, played = false, delay = 0.
   return (
     <m.a
       href={dailyModeHref(mode, locale)}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
+      // Opacity-only — y-slide moved the hit target on first press (same class
+      // of bug as QuestCard START QUEST).
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
       data-testid={`daily-quest-card-${mode.id}`}
       className={cn(

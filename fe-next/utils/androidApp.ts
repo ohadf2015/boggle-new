@@ -129,6 +129,12 @@ export interface AndroidPromoGateInput {
   requireEngagement?: boolean;
   /** Completed games on this device — `readGamesCompletedCount()`. */
   gamesCompleted?: number;
+  /**
+   * Cookie consent has not been decided yet. The install Dialog portals above
+   * the in-tree cookie sheet and traps focus, so auto-popup must wait — otherwise
+   * first-visit ACCEPT ALL is unreachable until the visitor dismisses the promo.
+   */
+  consentPending?: boolean;
   /** current time in ms */
   now: number;
 }
@@ -153,5 +159,8 @@ export function shouldShowAndroidInstallPromo(input: AndroidPromoGateInput): boo
   // the safe direction: it withholds a prompt rather than firing one on a visitor who
   // has seen nothing of the game.
   if (input.requireEngagement && (input.gamesCompleted ?? 0) < 1) return false;
+  // Cookie-consent gate. Re-armed by the caller (same pattern as inGame) so the
+  // promo lands after ACCEPT / DECLINE rather than stacking over the sheet.
+  if (input.consentPending) return false;
   return true;
 }

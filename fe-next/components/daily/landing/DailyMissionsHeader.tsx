@@ -33,10 +33,14 @@ export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissions
   });
 
   useEffect(() => {
+    // Product convention: dailies reset at midnight UTC (see getDailyChallengeDate).
+    // Local getDate() drifted from the hub ISO / Word Hunt puzzle date for Americas
+    // evenings (and Israel early morning) — the badge said "today" while the
+    // puzzle page labeled the previous UTC day.
     const now = new Date();
     setDateLabel({
-      monthAbbr: now.toLocaleString('en', { month: 'short' }).toUpperCase(),
-      dayNum: now.getDate(),
+      monthAbbr: now.toLocaleString('en', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
+      dayNum: now.getUTCDate(),
     });
     setCountdown(getSecondsUntilNextDaily());
     const interval = setInterval(() => {

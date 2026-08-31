@@ -134,20 +134,24 @@ export function QuestCard({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      // Opacity-only entrance: a y-transform moves the hit target during the
+      // spring, so the first START QUEST tap landed on empty space. Keep the
+      // card interactive from the first paint of the animation.
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
       // `w-full` is load-bearing: the daily hub stacks these in a
       // `flex flex-col items-center` column, which shrinks any child that does
       // not opt out to its intrinsic content width. Without it the chain
       // rendered three different widths (Wheel 219px, Tower 349px, played hero
       // 360px) purely from how long each tagline happened to be.
-      className={cn('relative w-full', isNew && showEffects && 'animate-breathing')}
+      className="relative w-full"
       data-testid={`quest-card-${challengeId}`}
     >
-      {/* Glow ring for new challenges */}
+      {/* Glow ring for new challenges — breathing lives here (not on the
+          clickable card) so the CSS scale transform cannot displace the CTA. */}
       {isNew && (
-        <div className={cn('absolute -inset-0.5 rounded-xl -z-10', colorConfig.glow)} />
+        <div className={cn('absolute -inset-0.5 rounded-xl -z-10 pointer-events-none', colorConfig.glow, showEffects && 'animate-breathing')} />
       )}
 
       <div
@@ -156,9 +160,8 @@ export function QuestCard({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseMove={tiltHandlers.onMouseMove}
-        onTouchStart={tiltHandlers.onTouchStart}
-        onTouchMove={tiltHandlers.onTouchMove}
-        onTouchEnd={tiltHandlers.onTouchEnd}
+        // No touch tilt: the first-touch scale(1.03) moved the card under the
+        // finger so pointerup missed and START QUEST needed a second press.
         role="button"
         tabIndex={0}
         onKeyDown={(e: React.KeyboardEvent) => {

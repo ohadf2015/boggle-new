@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useWeeklyChest, _resetWeeklyChestCache } from '../useWeeklyChest'
 
+const authState = { isAuthenticated: true, loading: false }
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => authState,
+}))
+
 const makeFetch = (body: object) =>
   vi.fn().mockResolvedValue({ ok: true, json: async () => body })
 
@@ -9,7 +14,12 @@ describe('useWeeklyChest', () => {
   // Reset the module-level dedup cache between tests — without this, a cached
   // status from one test leaks into the next (within the 4s TTL) and shifts the
   // mocked-fetch call sequence.
-  beforeEach(() => { vi.clearAllMocks(); _resetWeeklyChestCache() })
+  beforeEach(() => {
+    vi.clearAllMocks()
+    _resetWeeklyChestCache()
+    authState.isAuthenticated = true
+    authState.loading = false
+  })
 
   it('is loading initially', () => {
     global.fetch = makeFetch({ daysCompleted: 3, isClaimable: false, completedDates: [], cycleStart: '2026-05-10', cycleNumber: 1, pendingChest: null })
@@ -75,6 +85,17 @@ describe('useWeeklyChest', () => {
     expect(Array.isArray(result.current.completedDates)).toBe(true)
     expect(typeof result.current.cycleStart).toBe('string')
     expect(result.current.isClaimable).toBe(false)
+  })
+
+
+  it('skips the status request for guests (no 401 noise on public home)', async () => {
+    authState.isAuthenticated = false
+    authState.loading = false
+    global.fetch = makeFetch({ daysCompleted: 3 })
+    const { result } = renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(global.fetch).not.toHaveBeenCalled()
+    expect(result.current.cycleStart).toBe('')
   })
 
   it('treats network failure as safe defaults (not undefined)', async () => {

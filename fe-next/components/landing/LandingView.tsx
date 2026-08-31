@@ -132,8 +132,8 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   // real consecutive run across ALL daily modes (Hunt/Wheel/Puzzle) + freezes,
   // so it can't disagree with the chest's own day dots. `useDailyChallengeStatus`
   // alone only knew the Word-Hunt streak (`word_hunt_player_stats`), which is why
-  // the surfaces drifted apart. Guests/offline (chest 401 → no cycleStart) fall
-  // back to the local/Hunt value so they still see their own streak.
+  // the surfaces drifted apart. Guests/offline (hook skips the request → no
+  // cycleStart) fall back to the local/Hunt value so they still see their own streak.
   const weeklyChest = useWeeklyChest();
   const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
   const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5, {

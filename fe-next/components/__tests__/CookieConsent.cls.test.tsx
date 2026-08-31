@@ -52,6 +52,15 @@ describe('CookieConsent — non-blocking bottom-sheet layout guard', () => {
     expect(dialog).toHaveClass('bottom-0');
   });
 
+  it('portals to document.body above Dialog overlays (z-[200] > z-90)', () => {
+    // Regression: in-tree z-[110] lost to the portaled Android install Dialog
+    // (z-90 on body), so ACCEPT ALL was unclickable under GET THE LEXICLASH APP.
+    render(<CookieConsent />);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveClass('z-[200]');
+    expect(dialog.parentElement).toBe(document.body);
+  });
+
   it('does NOT push the footer by mutating body paddingBottom on mount', () => {
     render(<CookieConsent />);
     // The old bottom-banner CLS bug set this to '140px' in a post-paint effect.

@@ -60,6 +60,7 @@ vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 
 import { canAddStudent, upsertSubscription, logSubscriptionEvent } from '../subscriptions';
+import { FREE_TIER_LIMITS } from '../education/freeTierLimits';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 
@@ -70,13 +71,14 @@ describe('canAddStudent counts through the service-role client', () => {
   });
 
   it('sees the real membership count, not the zero RLS shows a non-member', async () => {
-    (createAdminClient as any).mockReturnValue(mockAdminClient({ members: 30 }));
+    (createAdminClient as any).mockReturnValue(mockAdminClient({ members: FREE_TIER_LIMITS.studentsPerClass }));
 
     const out = await canAddStudent('c-1');
 
-    // 30 of 30 on the free tier — the cap must fire. On the request-scoped client the count
-    // read 0 and this returned allowed:true forever.
-    expect(out.currentCount).toBe(30);
+    // At the free-tier cap (FREE_TIER_LIMITS, currently 50) the cap must fire. Hardcoding 30
+    // went stale when the paywall moved off 30: 30 is now under the cap so allowed is true.
+    // On the request-scoped client the count read 0 and this returned allowed:true forever.
+    expect(out.currentCount).toBe(FREE_TIER_LIMITS.studentsPerClass);
     expect(out.allowed).toBe(false);
   });
 

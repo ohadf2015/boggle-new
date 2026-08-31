@@ -16,6 +16,12 @@ vi.mock('@/hooks/useExperiment', () => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
+// Default: consent already decided so existing auto-popup tests keep firing.
+// Flip to false in the cookie-gating regression below.
+let mockHasConsentDecision = true;
+vi.mock('@/utils/cookieConsent', () => ({
+  hasConsentDecision: () => mockHasConsentDecision,
+}));
 vi.mock('next/image', () => ({
   default: ({ alt, src }: { alt: string; src: string }) => (
     // eslint-disable-next-line @next/next/no-img-element
@@ -53,6 +59,7 @@ beforeEach(() => {
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
   mockNative = false;
   mockPromoVariant = 'control';
+  mockHasConsentDecision = true;
   exposureMock.mockClear();
   setUA(ANDROID_UA);
   Object.defineProperty(window, 'location', {
@@ -191,6 +198,22 @@ describe('AndroidAppInstallPromo', () => {
     expect(captureMock).not.toHaveBeenCalledWith('android_install_promo_shown', {
       source: 'auto_popup',
     });
+  });
+
+  it('withholds the auto-popup while cookie consent is still pending', async () => {
+    // Same re-arm loop as the engagement variant — advance by SHOW_DELAY_MS,
+    // never runAllTimersAsync (that would chase the infinite re-arm forever).
+    mockHasConsentDecision = false;
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    act(() => { fireEvent.pointerDown(window); });
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(false);
+    // After the visitor decides, the next re-arm cycle should fire the promo.
+    mockHasConsentDecision = true;
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(true);
   });
 
   it('LCP guard: never opens for a passive visitor, opens after first interaction', async () => {

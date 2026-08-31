@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWithAuth } from '@/utils/authFetch'
+import { useAuth } from '@/contexts/AuthContext'
 
 export interface PendingChest {
   tier: 'bronze' | 'silver' | 'gold'
@@ -132,6 +133,7 @@ function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null>
 }
 
 export function useWeeklyChest(): WeeklyChestState {
+  const { isAuthenticated, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(DEFAULTS)
   const mountedRef = useRef(true)
@@ -149,9 +151,18 @@ export function useWeeklyChest(): WeeklyChestState {
 
   useEffect(() => {
     mountedRef.current = true
+    // Public home mounted this hook for guests too, which fired
+    // GET /api/daily/weekly-chest/status → 401 on every pageview. Wait for auth
+    // to resolve, then skip the request entirely for guests (UI already falls
+    // back to local streak when cycleStart is empty).
+    if (authLoading) return
+    if (!isAuthenticated) {
+      setLoading(false)
+      return () => { mountedRef.current = false }
+    }
     refresh()
     return () => { mountedRef.current = false }
-  }, [refresh])
+  }, [refresh, isAuthenticated, authLoading])
 
   const claim = useCallback(async (): Promise<PendingChest | null> => {
     const res = await fetch('/api/daily/weekly-chest/claim', { method: 'POST' })
