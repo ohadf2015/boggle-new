@@ -16,8 +16,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 
-const completeDailyQuestsForResult = vi.fn().mockResolvedValue(undefined);
-const updateQuestProgress = vi.fn().mockResolvedValue(undefined);
+const { completeDailyQuestsForResult, updateQuestProgress } = vi.hoisted(() => ({
+  completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined),
+  updateQuestProgress: vi.fn().mockResolvedValue(undefined),
+}));
 
 vi.mock('../../../modules/dailyMissionsManager', () => ({
   completeDailyQuestsForResult: (...args: unknown[]) => completeDailyQuestsForResult(...args),
