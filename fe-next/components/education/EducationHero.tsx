@@ -7,6 +7,7 @@ import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { locales } from '@/lib/i18n';
 import { EducationModeMock } from './EducationModeMock';
+import Mascot from '@/components/ui/Mascot';
 
 /**
  * The hero's language *count* is derived from the shipped locale list rather than
@@ -156,8 +157,23 @@ export function EducationHero() {
             mock is already the second grid child, so it sits right on desktop
             by source order, and any unprefixed `order-first` would hoist it
             above the h1 and the CTA on every viewport under lg. */}
-        <div data-hero-item>
+        <div data-hero-item className="relative">
           <EducationModeMock />
+          {/* Lexi studying next to the live mock — the one genuinely animated
+              element in the hero (scholar.webp is a 98-frame loop, not a still).
+              `clipShape` is not decoration: scholar.webp has an OPAQUE dark
+              background, so unclipped it punches a dark rectangle through the
+              mock's leaderboard card. Clipped to a bordered circle it reads as a
+              deliberate badge instead.
+              Decorative and aria-hidden — the h1 carries the meaning, and the
+              component's fallback alt is an untranslated English string.
+              Hidden under sm so it never crowds the mock on a phone. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-6 -start-6 hidden sm:block"
+          >
+            <Mascot variant="scholar" size="md" clipShape="circle" clipBorder="lime" />
+          </div>
         </div>
       </div>
     </section>

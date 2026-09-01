@@ -73,6 +73,22 @@ describe('EducationHero', () => {
     expect(primaryCTA.compareDocumentPosition(mockElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it('renders the animated scholar mascot so the hero has real motion, not a still', () => {
+    render(<EducationHero />);
+    const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
+      (img.getAttribute('src') ?? '').includes('scholar'),
+    );
+    expect(mascot).toBeTruthy();
+  });
+
+  it('keeps the mascot decorative — hidden from assistive tech, copy carries the meaning', () => {
+    render(<EducationHero />);
+    const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
+      (img.getAttribute('src') ?? '').includes('scholar'),
+    );
+    expect(mascot?.closest('[aria-hidden="true"]')).toBeTruthy();
+  });
+
   it('does not apply unprefixed order-* classes to the mock (prevents mobile reflow)', () => {
     const { container } = render(<EducationHero />);
     const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');

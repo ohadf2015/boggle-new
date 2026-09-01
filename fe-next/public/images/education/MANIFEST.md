@@ -2,6 +2,11 @@
 
 Two static images. Both are wired into components; nothing here is unused.
 
+> **2026-09-01 — the whole education art set was regenerated.** Read
+> "Education hero set" at the bottom before regenerating anything here: the seven
+> shipped files were drawn with **six different mascots**, none of them Lexi, and
+> four had garbled text baked in. The rules below exist because of that.
+
 Every size and measurement below was taken from the file on disk on 2026-08-25
 (`wc -c`, `ffprobe`, `ffmpeg ssim`). An earlier version of this manifest quoted
 sizes and a motion figure that no shipped file ever had — see "Dropped assets".
@@ -24,7 +29,8 @@ the cards make below it, in one glance.
 
 ## pro-hero-poster.webp — classroom mid-game
 
-- 54,540 bytes, 960×540
+- 69,260 bytes, 960×540 (regenerated 2026-09-01; was 54,540 bytes and showed a
+  **green pixel robot** instead of Lexi)
 - Used by `app/[locale]/teacher/upgrade/PageClient.tsx`, above the pricing cards,
   with `priority` (it is above the fold on the one page that takes payment)
 - Alt: `teacher.subscription.proHeroAlt`
@@ -51,3 +57,48 @@ were deleted. Measured, not assumed:
 If motion is wanted here later, generate it and verify the same way before
 wiring it: extract frames, look at them, and measure. A generation prompt asking
 for motion is not evidence that motion arrived.
+
+**Motion on the education landing is now solved without new assets:** the hero's
+right column carries `<Mascot variant="scholar">` (`/mascot/scholar.webp`, 98
+frames, 181 KB, already in the shipped mascot set). It is clipped to a circle on
+purpose — that file has an OPAQUE dark background and unclipped it punches a
+dark rectangle through the mock's leaderboard card.
+
+## Education hero set (one directory up, in `public/images/`)
+
+Regenerated 2026-09-01. `education-hero-{en,he,sv,ja,es}.{webp,jpg}` +
+`education-access-hero.webp`. Every one of them previously showed a **different**
+character — a green blob, a cat, a blue tile-person, a cube-head — and none was
+Lexi. Four had garbled text baked in: the Hebrew board read as nonsense
+(`דן כותץ`, `שול מח ישוברם`), the Spanish said `SPANISH EDUCTA!` over a fake word
+grid, the Japanese page carried `KOREAN` and `PLIDY`.
+
+| File | Bytes | Dimensions | Lexi's pose |
+|---|---|---|---|
+| `education-hero-en` | 60,192 webp / 111,035 jpg | 1200×675 | reading, glasses |
+| `education-hero-he` | 66,738 / 118,143 | 1200×675 | cheering at a lime cube |
+| `education-hero-sv` | 74,148 / 124,478 | 1200×675 | at the board with chalk |
+| `education-hero-ja` | 78,512 / 133,361 | 1200×675 | grad cap, mid-jump |
+| `education-hero-es` | 75,868 / 132,546 | 1200×675 | holding a trophy |
+| `education-access-hero` | 63,626 webp | 918×880 | grad cap, waving on a podium |
+
+Rules for anyone regenerating these:
+
+- **Locale variants differ by POSE, never by glyph.** No Hebrew, Japanese, or
+  Swedish characters in the art. These files are also the OpenGraph/Twitter cards
+  for ~14 SEO routes, so a garbled glyph gets scraped and cached by Google and
+  Facebook — which is how the last set's nonsense Hebrew ended up as the share
+  card. Letter cubes carry single capital **Latin** letters only.
+- **Composition must survive a brutal crop.** `EducationHeroBanner.tsx` renders
+  the `<img>` as `absolute inset-0 object-cover` inside a `<picture>` that
+  contributes zero height, so the section's height comes from its text block
+  (~350 px at ~1150 px wide ≈ 4:1). Only the middle horizontal band is visible
+  on the page; the full 16:9 frame is only ever seen as an OG card. Put Lexi
+  vertically centred and right of centre, fill the left half with classroom, and
+  keep the extreme top and bottom edges free of anything load-bearing.
+- **Both formats.** `<source srcSet={webp}>` with an `<img src={jpg}>` fallback —
+  replacing only the webp leaves the old art being served to some clients.
+- **Byte budget is real.** That `<img>` is `loading="eager" fetchPriority="high"`,
+  the LCP element on 9+ pages. Stay at or under the numbers above.
+- `ru` has no bespoke asset and deliberately reuses `en` (see
+  `EducationHeroBanner.tsx` and `heroImage()` in `lib/seo/educationLanding.ts`).
