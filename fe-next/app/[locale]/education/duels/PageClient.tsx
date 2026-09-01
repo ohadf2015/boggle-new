@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Swords, Trophy, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,8 +15,7 @@ type Tab = 'lobby' | 'history' | 'classmates';
 
 function DuelsPageClientInner() {
   const { user } = useAuth();
-  const { t, language } = useLanguage();
-  const router = useRouter();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<Tab>('lobby');
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
@@ -25,10 +23,9 @@ function DuelsPageClientInner() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      router.push(`/${language}/education`);
-      return;
-    }
+    // Guests / no-user stay on this route and see the join-classroom empty
+    // state. Do not redirect to /education (teacher marketing) or /access.
+    if (!user) return;
 
     async function loadData() {
       setLoading(true);
@@ -52,23 +49,25 @@ function DuelsPageClientInner() {
       }
     }
     loadData();
-  }, [user, router, language]);
+  }, [user]);
 
-  if (!user) return null;
+  const joinClassroomEmpty = (
+    <div className="flex-1 flex flex-col items-center justify-center bg-neo-navy min-h-dvh p-8">
+      <Swords className="w-16 h-16 text-neo-white mb-4" />
+      <p className="text-neo-white font-neo-body text-lg text-center">
+        {t('education.duels.joinClassroomToDuel')}
+      </p>
+    </div>
+  );
+
+  if (!user) return joinClassroomEmpty;
 
   if (loading) {
     return <PageLoader text={t('education.duels.findingClassmates')} size="lg" nested mascotVariant="knight" />;
   }
 
   if (!classroom) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-neo-navy min-h-dvh p-8">
-        <Swords className="w-16 h-16 text-neo-white mb-4" />
-        <p className="text-neo-white font-neo-body text-lg text-center">
-          {t('education.duels.joinClassroomToDuel')}
-        </p>
-      </div>
-    );
+    return joinClassroomEmpty;
   }
 
   const tabs: { id: Tab; label: string; icon: typeof Swords }[] = [
@@ -128,6 +127,7 @@ function DuelsPageClientInner() {
 
 export default function DuelsPage() {
   // Students (including anonymous guests after classroom join) must reach the
-  // lobby. A teacher-only gate redirected them to /education/access.
+  // lobby. Guests with no session stay here with the join-classroom empty
+  // state — never redirect to /education or /education/access.
   return <DuelsPageClientInner />;
 }
