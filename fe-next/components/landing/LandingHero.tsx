@@ -128,7 +128,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
             </div>
           )}
 
-          {showHeroCta && (
+          {showHeroCta && !showClassroomHero && (
             <Link
               href={`/${language}/daily`}
               prefetch={false}
@@ -146,7 +146,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
             </Link>
           )}
 
-          {showQuickPlay && (
+          {showQuickPlay && !showClassroomHero && (
             <Link
               href={`/${language}/multiplayer`}
               prefetch={false}

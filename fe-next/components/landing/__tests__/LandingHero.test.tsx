@@ -7,8 +7,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
+let mockIsOnCG = false;
 vi.mock('@/components/CrazyGamesSDK', () => ({
-  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false, isLoading: false }),
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG, isLoading: false }),
 }));
 
 vi.mock('framer-motion', () => {
@@ -41,7 +42,10 @@ const player = { id: '1', username: 'alice', displayName: 'Alice', totalScore: 1
 describe('LandingHero', () => {
   const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false };
 
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    mockIsOnCG = false;
+    vi.clearAllMocks();
+  });
 
   it('renders mascot and classroom title on the web homepage', () => {
     render(<LandingHero {...baseProps} />);
@@ -56,6 +60,14 @@ describe('LandingHero', () => {
     const teachers = screen.getByTestId('landing-for-teachers-cta');
     expect(teachers).toHaveAttribute('href', '/en/education');
     expect(screen.getByTestId('landing-play-cta')).toHaveAttribute('href', '/en/multiplayer');
+  });
+
+  it('keeps consumer copy on CrazyGames (no teacher CTA)', () => {
+    mockIsOnCG = true;
+    render(<LandingHero {...baseProps} />);
+    expect(screen.getByText('landing.welcomeTitle')).toBeInTheDocument();
+    expect(screen.queryByText('landing.classroomHeroTitle')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('landing-for-teachers-cta')).not.toBeInTheDocument();
   });
 
   it('shows leaderboard preview on desktop', () => {
