@@ -1866,6 +1866,7 @@ const en = {
       "yourName": "Call me...",
       "namePlaceholder": "Your battle name",
       "roomNameLabel": "Room Name",
+      "roomNamePlaceholder": "{{name}}'s Room",
       "optional": "optional",
       "createButton": "Start Battle",
       "creating": "Setting up arena...",
@@ -1890,6 +1891,12 @@ const en = {
       "tapToChange": "Tap to switch",
       "continueButton": "Next",
       "selectAvatar": "Pick Avatar"
+    },
+    "waitingRoomInvite": {
+      "prompt": "Waiting for friends...",
+      "copy": "Copy invite link",
+      "copied": "Link copied!",
+      "share": "Share"
     },
     "createForm": {
       "title": "Almost There!",
@@ -2721,7 +2728,8 @@ const en = {
     "banner": {
       "host": "Joining {hostName}'s room",
       "yourFriend": "Your friend",
-      "skipCTA": "Skip & Join now"
+      "skipCTA": "Skip & Join now",
+      "copyCode": "Copy room code"
     },
     "profile": {
       "header": "Joining {hostName}'s room"

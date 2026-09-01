@@ -2356,7 +2356,13 @@ const es = {
       "continueButton": "Siguiente",
       "selectAvatar": "Elige Avatar"
     },
-    "createForm": {
+        "waitingRoomInvite": {
+      "prompt": "Esperando a tus amigos...",
+      "copy": "Copiar enlace de invitación",
+      "copied": "¡Enlace copiado!",
+      "share": "Compartir"
+    },
+"createForm": {
       "title": "¡Ya casi!",
       "progress": "Paso 2 de 2",
       "profileLabel": "Tú",
@@ -5295,7 +5301,8 @@ const es = {
     "banner": {
       "host": "Te unes a la sala de {hostName}",
       "yourFriend": "Tu amigo",
-      "skipCTA": "Saltar y unirme"
+      "skipCTA": "Saltar y unirme",
+      "copyCode": "Copiar código de sala"
     },
     "profile": {
       "header": "Uniéndote a la sala de {hostName}"

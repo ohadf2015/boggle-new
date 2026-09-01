@@ -32,12 +32,17 @@ const InviteContextBanner: React.FC<Props> = ({ roomCode, hostName, onSkip }) =>
         {roomCode?.trim() && (
           <>
             {' '}
-            <span
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(roomCode).catch(() => {});
+              }}
               data-testid="invite-banner-code"
-              className="font-mono bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo"
+              className="font-mono bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo border-2 border-neo-black active:translate-y-px"
+              aria-label={t('invite.banner.copyCode')}
             >
               {roomCode}
-            </span>
+            </button>
           </>
         )}
       </p>

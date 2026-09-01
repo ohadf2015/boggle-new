@@ -372,11 +372,12 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Use letterGrid or shufflingGrid
   const effectiveGrid = letterGrid || shufflingGrid;
 
-  // Show placeholder if no grid
+  // Show placeholder if no grid — non-interactive skeleton so users don't
+  // rage-click inert tiles while startGame is in flight.
   if (!effectiveGrid) {
     return (
       <div className={getMpInGamePlaceholderClass()}>
-        <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
+        <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4 pointer-events-none" aria-label="Loading board">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={`placeholder-${i}`}
