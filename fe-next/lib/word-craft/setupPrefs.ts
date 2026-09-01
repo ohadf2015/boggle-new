@@ -42,6 +42,15 @@ export function loadSetupPrefs(): WordCraftSetupChoice {
   }
 }
 
+/** True only for a returning player who has actually saved a choice before. */
+export function hasStoredSetupPrefs(): boolean {
+  try {
+    return window.localStorage.getItem(KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
 export function saveSetupPrefs(c: WordCraftSetupChoice): void {
   try {
     window.localStorage.setItem(KEY, JSON.stringify(c));

@@ -3,7 +3,13 @@
 import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+
+// Dynamic — PlayfulBackground pulls in framer-motion, which otherwise blocks
+// first paint before the SinglePlayerView chunk even starts downloading.
+const PlayfulBackground = nextDynamic(
+  () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
+  { ssr: false }
+);
 
 // Loading fallback component with playful design
 function LoadingFallback(): React.JSX.Element {

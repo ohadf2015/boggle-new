@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import { Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
@@ -106,11 +107,28 @@ export default function MemoryHunt({
             {t('brain.drills.round')} {game.round}/5
           </div>
         </div>
-        <div aria-live="polite" className={cn(
-          'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          'bg-neo-purple text-neo-white'
-        )}>
-          {game.score} {t('brain.drills.points')}
+        <div className="flex items-center gap-2">
+          {/* Streak badge — variable-reward layer, only surfaces once a real streak is on */}
+          <AdaptiveAnimatePresence>
+            {game.comboLevel >= 2 && (
+              <AdaptiveMotion.div
+                key={game.comboLevel}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                aria-live="polite"
+                className="px-2 py-1 rounded-neo border-2 border-neo-black text-xs font-bold bg-neo-orange text-neo-black"
+              >
+                🔥 {t('brain.drills.comboStreak', '{{n}}x streak!', { n: game.comboLevel })}
+              </AdaptiveMotion.div>
+            )}
+          </AdaptiveAnimatePresence>
+          <div aria-live="polite" className={cn(
+            'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
+            'bg-neo-purple text-neo-white'
+          )}>
+            {game.score} {t('brain.drills.points')}
+          </div>
         </div>
       </div>
 

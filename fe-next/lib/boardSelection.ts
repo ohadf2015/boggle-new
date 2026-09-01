@@ -64,7 +64,7 @@ export function scoreBoardHeuristic(grid: Grid, language: string): number {
 export function pickRichestBoardClient<G extends Grid>(
   generate: () => G,
   language: string,
-  k: number = 6
+  k: number = 3
 ): G {
   if (k <= 1) return generate();
 

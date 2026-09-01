@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { Zap, Gift, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
@@ -10,6 +11,7 @@ import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip'
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const TRUST = [
   { key: 'trust_instant', Icon: Zap, chip: 'bg-neo-lime' },
@@ -23,6 +25,17 @@ export function PageClient() {
   // TeacherGate encodes the page it blocked as `?from=`. Reading it back is what
   // turns a silent teleport into an explanation — see AccessRedirectNotice.
   const redirectedFrom = useSearchParams()?.get('from') ?? null;
+
+  // Guardrail for exp-teacher-gate-redirect-clarity-v1: confirms the
+  // TeacherGate → /education/access redirect actually lands, regardless of
+  // which variant the gate showed while the hop was in flight.
+  useEffect(() => {
+    if (redirectedFrom) {
+      trackGrowthEvent('education_access_redirect_landed', { from: redirectedFrom });
+    }
+    // Fires once per arrival — `redirectedFrom` is read from the URL that mounted us.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // The sign-up pitch (hero art, trust row, wide layout) belongs to the
   // pre-application state ONLY. An approved / pending / declined teacher gets a

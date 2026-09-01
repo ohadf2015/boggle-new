@@ -23,6 +23,16 @@ export interface Settlement {
   stake: number;
   multiplier: number;
   delta: number;
+  /** Rare bonus roll on a unique win — delta already reflects the multiplier. */
+  lucky?: boolean;
+}
+
+/** Payout multiplier applied when a unique win rolls a lucky streak. */
+export const LUCKY_STREAK_MULTIPLIER = 2;
+
+/** ~15% chance, mirrors RareGems' rollLuckyGem — injectable for deterministic tests. */
+export function rollLuckyStreak(rng: () => number = Math.random): boolean {
+  return rng() < 0.15;
 }
 
 /**

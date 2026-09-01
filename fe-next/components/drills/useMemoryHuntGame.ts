@@ -4,6 +4,11 @@ import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
+import { useComboSystem } from '@/hooks/useComboSystem';
+
+// Streak bonus per level above 1 — same variable-reward shape as LightningRound's
+// combo layer, just applied on top of Memory Hunt's existing round multiplier.
+const STREAK_BONUS_PER_LEVEL = 5;
 
 // Level configurations
 export const LEVEL_CONFIGS = [
@@ -58,7 +63,14 @@ export function useMemoryHuntGame({
   language,
   onComplete,
 }: UseMemoryHuntGameProps) {
-  const { playErrorSound, playWordAcceptedSound } = useSoundEffects();
+  const { playErrorSound, playWordAcceptedSound, playComboMilestoneSound } = useSoundEffects();
+
+  // Variable-reward streak layer — no break sound wired so a paused streak
+  // stays neutral, not punitive (same choice LightningRound made).
+  const combo = useComboSystem({
+    trackMaxCombo: false,
+    onComboMilestone: (lvl) => playComboMilestoneSound(lvl),
+  });
 
   // Get level config
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
@@ -211,8 +223,9 @@ export function useMemoryHuntGame({
     setRound(1);
     setHintsRemaining(FREE_CLUES);
     setStartTime(Date.now());
+    combo.resetAll();
     startRound();
-  }, [levelConfig.lives, startRound]);
+  }, [levelConfig.lives, startRound, combo]);
 
   // Grant extra clues (from a rewarded ad, or the free fallback when no ad is
   // available). Marks the unlock used so the UI shows the offer once per game.
@@ -263,7 +276,9 @@ export function useMemoryHuntGame({
       updatedTargets[targetIndex].found = true;
       setTargetWords(updatedTargets);
 
-      const wordPoints = calculateWordScore(word) * round;
+      const newComboLevel = combo.incrementCombo();
+      const streakBonus = newComboLevel >= 2 ? (newComboLevel - 1) * STREAK_BONUS_PER_LEVEL : 0;
+      const wordPoints = calculateWordScore(word) * round + streakBonus;
       setScore(prev => prev + wordPoints);
       playWordAcceptedSound();
 
@@ -301,6 +316,7 @@ export function useMemoryHuntGame({
         return;
       }
 
+      combo.resetCombo();
       setLives(prev => {
         const newLives = prev - 1;
         setTimeout(() => {
@@ -318,7 +334,7 @@ export function useMemoryHuntGame({
       setPhase('feedback');
       playErrorSound?.();
     }
-  }, [phase, targetWords, round, startRound, grid, language, playErrorSound, playWordAcceptedSound, firstMissUsedThisRound]);
+  }, [phase, targetWords, round, startRound, grid, language, playErrorSound, playWordAcceptedSound, firstMissUsedThisRound, combo]);
 
   // Calculate final results
   const results = useMemo(() => {
@@ -369,6 +385,7 @@ export function useMemoryHuntGame({
     levelConfig,
     results,
     remainingWords,
+    comboLevel: combo.comboLevel,
     startGame,
     skipStudyPhase,
     finishGame,

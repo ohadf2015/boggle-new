@@ -90,6 +90,9 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
   const totalSquares = playerScore + botScore;
   const margin = Math.abs(playerScore - botScore);
   const isCloseGame = !isTie && totalSquares > 0 && margin / totalSquares <= 0.1;
+  // Blowout-win surprise: the opposite extreme from close-game tension — a
+  // rare escalated payoff so a dominant win feels like MORE than just a win.
+  const isBlowout = playerWon && totalSquares > 0 && margin / totalSquares >= 0.6;
 
   // Full-screen modal: a small bottom banner was easy to miss, so players were
   // unsure the game had actually ended. A dim backdrop + centered card makes the
@@ -123,6 +126,12 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         {isCloseGame ? (
           <div className="animate-neo-pop px-3 py-1 bg-neo-orange border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-sm font-neo-display font-black uppercase tracking-wider text-xs">
             🔥 {t('wordcraft.closeGame', 'So close!')}
+          </div>
+        ) : null}
+
+        {isBlowout ? (
+          <div className="animate-neo-pop scale-110 px-3 py-1 bg-neo-yellow border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider text-xs">
+            👑 {t('wordcraft.domination', 'Domination!')}
           </div>
         ) : null}
 

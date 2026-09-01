@@ -15,6 +15,7 @@ import { demoConfigs } from './demoConfigs';
 import { NeoPanel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/types';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export interface QuickStartStepProps {
   /** Start the game. Called with whatever identity the player happens to have. */
@@ -77,6 +78,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
     const next = suggestPlayerName(language);
     suggestionRef.current = next;
     setName(next);
+    trackGrowthEvent('quickstart_shuffle_clicked', {});
   }, [language, setName]);
 
   // One tap applies the language in place. `skipNavigation` keeps the router
@@ -97,6 +99,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
     const live = getLiveName();
     // An empty field is not an error. Fall back to the suggestion and go.
     const finalName = live.length > 0 ? live : suggestionRef.current;
+    trackGrowthEvent('quickstart_play_clicked', {});
     onPlay(finalName, avatar, finalName !== suggestionRef.current.trim());
   }, [getLiveName, avatar, onPlay]);
 

@@ -230,6 +230,14 @@ export default function Showdown({
           <div className="font-neo-body text-xs font-bold uppercase opacity-80">
             {t('sealedBid.chips')}
           </div>
+          {settlement.lucky && (
+            <div
+              data-testid="showdown-lucky"
+              className="animate-neo-wobble font-neo-display text-sm font-black uppercase tracking-wide text-neo-yellow"
+            >
+              {t('sealedBid.luckyStreak')}
+            </div>
+          )}
           {/* Connects the odds board the player was staring at while bidding to
               the number they just got paid. Without it "+60" is a magic number. */}
           {outcome === 'unique' && settlement.multiplier > 0 && (

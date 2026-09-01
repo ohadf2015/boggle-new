@@ -94,7 +94,7 @@ describe('boostHandler', () => {
       // updateGame must NOT be called — game state unchanged.
       expect(mockUpdateGame).not.toHaveBeenCalled();
       expect(socket.emit).toHaveBeenCalledWith('error', expect.objectContaining({
-        error: 'BOOST_ALREADY_CLAIMED',
+        code: 'BOOST_ALREADY_CLAIMED',
       }));
     });
 

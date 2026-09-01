@@ -208,7 +208,9 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
               >
                 {isJoining ? <Loader2 className="w-5 h-5 animate-spin" /> : <Eye className="w-5 h-5" />}
-                {t('multiplayerFlow.joinModal.spectateButton')}
+                {isJoining
+                  ? t('multiplayerFlow.joinModal.joining')
+                  : t('multiplayerFlow.joinModal.spectateButton')}
               </Button>
             </>
           ) : (

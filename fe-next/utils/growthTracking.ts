@@ -57,6 +57,10 @@ export type GrowthEvent =
   | 'mode_selected'
   | 'wordcraft_card_pick_shown'
   | 'wordcraft_card_picked'
+  // FTUE quick-start screen (props/multiplayer entry). Rageclicks were showing
+  // up on /multiplayer, /ja, /sv/multiplayer with no event to attribute them to.
+  | 'quickstart_play_clicked'
+  | 'quickstart_shuffle_clicked'
   // Word Tower wheel economy. The tunables file says "balance pass happens in
   // Phase 5 from PostHog telemetry" — but no in-mode event was ever wired, so
   // the pass was never possible. These two make the wheel economy measurable:
@@ -206,6 +210,9 @@ export type GrowthEvent =
   // for whether these sessions ever complete the round-trip).
   | 'ftue_redirect_landed'
   | 'ftue_redirect_resumed'
+  // Guardrail for exp-teacher-gate-redirect-clarity-v1: confirms the
+  // TeacherGate → /education/access redirect actually lands.
+  | 'education_access_redirect_landed'
   // Modals / confirmation dialogs
   | 'modal_interaction'
   // Friction / engagement
@@ -359,6 +366,10 @@ export type GrowthEvent =
   //   Fires when player picks a follow-up chip after bad/ok mp_round rating.
   //   Props: { issue: 'bots_too_strong' | 'technical_issue', language: string }.
   | 'mp_round_issue_selected'
+  // mp_room_join_rate_limited — a direct-invite JoinRoomModal join tripped the
+  // 50msg/10s socket limiter, quantifying the rage-click-into-lockout path the
+  // Join button's loading spinner is meant to reduce.
+  | 'mp_room_join_rate_limited'
   // Word Craft Run card-pick funnel — was fully uninstrumented (rageclicks on
   // /word-craft had no signal to attribute). Also verifies the 2026-08-24
   // rarity-weighted draw change actually shifted the served rarity mix.

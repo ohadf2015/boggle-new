@@ -5,6 +5,10 @@ const mockUseTeacherAccess = vi.fn();
 vi.mock('@/lib/education/useTeacherAccess', () => ({
   useTeacherAccess: () => mockUseTeacherAccess(),
 }));
+let mockRedirectVariant = 'control';
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: mockRedirectVariant, trackExposure: vi.fn() }),
+}));
 const mockRouterReplace = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: mockRouterReplace, push: mockRouterReplace }),
@@ -43,5 +47,22 @@ describe('<TeacherGate>', () => {
     mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: true });
     render(<TeacherGate><div>INSIDE</div></TeacherGate>);
     expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  // exp-teacher-gate-redirect-clarity-v1: control renders null during the
+  // redirect hop (status quo, matches the rage-click signal on /en/teacher).
+  it('control variant renders nothing while redirecting', () => {
+    mockRedirectVariant = 'control';
+    mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: false });
+    const { container } = render(<TeacherGate><div>INSIDE</div></TeacherGate>);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('redirect-status variant shows a loader instead of a blank screen while redirecting', () => {
+    mockRedirectVariant = 'redirect-status';
+    mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: false });
+    render(<TeacherGate><div>INSIDE</div></TeacherGate>);
+    expect(screen.getByText('common.loading')).toBeInTheDocument();
+    mockRedirectVariant = 'control';
   });
 });

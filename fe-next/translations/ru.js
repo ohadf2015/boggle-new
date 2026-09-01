@@ -10020,6 +10020,7 @@ const ru = {
     "eloRating": "Рейтинг"
   },
   "sealedBid": {
+    "luckyStreak": "СЧАСТЛИВАЯ СЕРИЯ!",
     "allIn": "Всё на кон",
     "currentStake": "Текущая ставка",
     "balance": "Баланс",
@@ -11542,6 +11543,7 @@ const ru = {
   "forfeitDescription": "Ты проиграешь эту дуэль и твой противник победит. Это не отменяется.",
   "realtimeDuel": "Дуэль в Реальном Времени",
   "wordcraft": {
+    "domination": "Доминирование!",
     "combo": "КОМБО",
     "title": "WordCraft",
     "adminBadge": "Админ-сэндбокс · Турнирная сетка",

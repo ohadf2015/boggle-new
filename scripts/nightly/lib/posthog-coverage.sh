@@ -24,13 +24,18 @@ nightly_extract_growth_events() { # <file>
   local file="$1"
   [ -f "$file" ] || return 1
   awk '
-    /export[ \t]+type[ \t]+GrowthEvent[ \t]*=/ { inunion=1 }
+    /export[ \t]+type[ \t]+GrowthEvent[ \t]*=/ { inunion=1; next }
     inunion {
-      if (match($0, /'\''[a-zA-Z0-9_:.-]+'\''/)) {
-        lit = substr($0, RSTART+1, RLENGTH-2)
+      line = $0
+      sub(/^[ \t]*/, "", line)
+      # Only real union-member lines: leading "|" then the quoted literal.
+      # Comment lines (// ...) never match, so embedded quotes/semicolons in
+      # doc comments cannot contaminate or truncate extraction.
+      if (line ~ /^\|/ && match(line, /'\''[a-zA-Z0-9_:.-]+'\''/)) {
+        lit = substr(line, RSTART+1, RLENGTH-2)
         print lit
+        if (line ~ /;[ \t]*(\/\/.*)?$/) exit
       }
-      if (index($0, ";") > 0) exit
     }
   ' "$file" | awk '!seen[$0]++'
 }

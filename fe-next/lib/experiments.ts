@@ -779,6 +779,56 @@ export const EXPERIMENTS = {
     description:
       'MP lobby Quick Play button eager-disable. eager-disable = button disables and shows spinner immediately on click (local state), before async isJoining propagates from parent. Reduces rage clicks from the click→response gap. Primary metric: rage click rate on /multiplayer. 2026-07-28.',
   }),
+
+  /**
+   * Targets the homepage → game-start funnel gap (2026-08-27 nightly: only
+   * ~23-35% of visitors who view a page start a game). Word Craft makes every
+   * returning player re-confirm opponent/difficulty/twist on every single
+   * visit even though their last choice is already persisted in
+   * localStorage (`loadSetupPrefs`) — one extra tap-through per session.
+   *
+   * control = current: setup screen always shown first.
+   * quick-resume = for a RETURNING player only (has a stored choice, no
+   *   duel/deep-link) skip straight to play with the saved choice. New
+   *   players (no stored prefs) are unaffected in both arms — the setup
+   *   screen still introduces the mode on their first visit.
+   *
+   * Primary metric: wordcraft_setup_start + wordcraft_quick_resume_start
+   *   (combined "reached play") ÷ wordcraft_setup_shown.
+   * Guardrail: word_craft_abandoned rate must not rise (removing the
+   *   confirm step should not make players start with an unwanted mode).
+   * PostHog flag key = 'exp-wordcraft-quick-resume-v1', 50/50 rollout.
+   */
+  'exp-wordcraft-quick-resume-v1': defineExperiment({
+    variants: ['control', 'quick-resume'] as const,
+    default: 'control',
+    description:
+      'Word Craft returning-player quick resume. quick-resume = players with a saved setup choice skip the setup screen and start play immediately with that choice; new players (no stored prefs) see the setup screen either way. Targets the homepage→game-start funnel drop by removing a re-confirmation tap for returning players. 2026-08-27.',
+  }),
+
+  /**
+   * Teacher gate redirect clarity. PostHog rage-click signal on /en/teacher
+   * (2026-08-31, score 0.51). TeacherGate renders `null` while `!hasAccess`
+   * and a `router.replace` to /education/access is in flight (useEffect,
+   * not synchronous) — a blank navy page for one render tick reads as "the
+   * dashboard failed to load", same class of bug already fixed for invite
+   * arrival (exp-invite-arrival-clarity-v1).
+   *
+   * control = current: renders null during the redirect hop.
+   * redirect-status = shows the same PageLoader used for the isLoading
+   *   state (with a "redirecting" copy) instead of null.
+   *
+   * Conversion: rage-click rate on /teacher falls.
+   * Guardrail: education_access_redirect_landed must not fall (redirect
+   *   must still complete, this only changes what's shown while it does).
+   * PostHog flag key = 'exp-teacher-gate-redirect-clarity-v1', 50/50 rollout.
+   */
+  'exp-teacher-gate-redirect-clarity-v1': defineExperiment({
+    variants: ['control', 'redirect-status'] as const,
+    default: 'control',
+    description:
+      'TeacherGate no-access redirect state. control = renders null while router.replace to /education/access is in flight. redirect-status = shows PageLoader instead of a blank screen. Targets /en/teacher rage-click signal (score 0.51, 2026-08-31). Conversion = rage-click rate on /teacher falls. Guardrail = education_access_redirect_landed stable.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

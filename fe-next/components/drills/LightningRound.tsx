@@ -229,10 +229,12 @@ export default function LightningRound({
         'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
-          {/* Timer */}
+          {/* Timer — pulses in the final 5s so the urgency is felt, not just read.
+              motion-safe: honors prefers-reduced-motion. */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            'bg-neo-navy-elevated'
+            'bg-neo-navy-elevated',
+            timeRemaining <= 5 && timeRemaining > 0 && 'motion-safe:animate-pulse border-neo-red'
           )}>
             <Clock className={cn('w-4 h-4', getTimeColor())} />
             <span role="status" className={cn('font-black text-lg tabular-nums', getTimeColor())}>

@@ -121,8 +121,11 @@ export default function PuzzleCard({
 
   useEffect(() => {
     if (state.status === 'wrong' && prevStatus.current !== 'wrong') {
+      // Escalate with each miss so the last life before game-over feels
+      // riskier than the first — flat intensity made every wrong guess feel identical.
+      const intensity = reducedMotion ? 0 : Math.min(1 + state.wrongAttempts * 0.2, 1.7);
       shakeControls.start({
-        x: reducedMotion ? 0 : [0, -14, 14, -11, 11, -7, 7, -3, 3, 0],
+        x: [0, -14, 14, -11, 11, -7, 7, -3, 3, 0].map((v) => v * intensity),
         transition: reducedMotion ? { duration: 0 } : { duration: 0.5, ease: 'easeInOut' },
       });
     }

@@ -16168,6 +16168,7 @@ const ja = {
     }
   },
   "sealedBid": {
+    "luckyStreak": "ラッキーストリーク！",
     "allIn": "全て投入",
     "clear": "クリア",
     "currentStake": "現在の賭け金",

@@ -26,6 +26,9 @@ export type GrowthEvent =
   // Acquisition
   | 'page_view'
   | 'room_joined_via_code'
+  // wordtower_scramble_used: a fresh ring, props { source: 'banked' | 'bought' }.
+  // Props: { hoursRemaining: number; pointsGap: number | null }.
+  | 'wordtower_scramble_used'
   // Lifecycle
   | 'game_started'
   | 'game_completed' // dual-emitted canonical
@@ -43,12 +46,16 @@ assert "extracts member with trailing comment" \
   "echo \"\$EV\" | grep -qx 'game_completed'"
 assert "extracts the final (semicolon) member" \
   "echo \"\$EV\" | grep -qx 'friend_added'"
+assert "extracts member past a comment-embedded semicolon" \
+  "echo \"\$EV\" | grep -qx 'wordtower_scramble_used'"
 assert "ignores code literals outside the union" \
   "! echo \"\$EV\" | grep -q 'not_an_event'"
 assert "ignores GrowthEventData literals after the union closes" \
   "! echo \"\$EV\" | grep -q 'whatsapp'"
-assert "extracts exactly 5 members" \
-  "[ \"\$(echo \"\$EV\" | grep -c .)\" = 5 ]"
+assert "ignores quoted prop-value literals inside union comments" \
+  "! echo \"\$EV\" | grep -qx 'banked'"
+assert "extracts exactly 6 members" \
+  "[ \"\$(echo \"\$EV\" | grep -c .)\" = 6 ]"
 
 # --- nightly_coverage_classify -----------------------------------------------
 # code events = source of truth; live = 'event<TAB>d7<TAB>prev7' (both bare and growth: rows)

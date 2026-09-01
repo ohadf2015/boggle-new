@@ -45,6 +45,28 @@ export function trackWordCraftSetupStart(params: {
 }
 
 /**
+ * Fired when the setup screen actually renders. Denominator for the
+ * setup→start conversion rate — previously only the START side was
+ * instrumented, so the funnel's own drop-off had no numerator/denominator.
+ */
+export function trackWordCraftSetupShown(): void {
+  safeCapture('wordcraft_setup_shown', {});
+}
+
+/**
+ * Fired when `exp-wordcraft-quick-resume-v1`'s quick-resume arm skips the
+ * setup screen for a returning player and starts play with their saved
+ * choice directly.
+ */
+export function trackWordCraftQuickResumeStart(params: {
+  opponent: string;
+  difficulty: string;
+  modifier: string;
+}): void {
+  safeCapture('wordcraft_quick_resume_start', { ...params });
+}
+
+/**
  * Fired when a player leaves word-craft mid-game (fewer than 3 player turns
  * completed). High rate = early abandonment / confusion signal.
  */

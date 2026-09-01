@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6271,
+    "totalKeysInCode": 6289,
     "keyCountByLanguage": {
-      "en": 12151,
-      "es": 12447,
-      "he": 12352,
-      "ja": 12413,
-      "ru": 12192,
-      "sv": 12409
+      "en": 12180,
+      "es": 12476,
+      "he": 12381,
+      "ja": 12441,
+      "ru": 12221,
+      "sv": 12437
     },
     "missingFromEnglish": 66,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 321,
+      "templateLiterals": 322,
       "fallbackUsages": 1,
-      "variableKeys": 119
+      "variableKeys": 120
     }
   },
   "runtimeRisks": {
@@ -30,14 +30,14 @@
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
         "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 151,
+        "line": 177,
         "context": "{t(`education.access.${key}`)}"
       },
       {
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
         "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 227,
+        "line": 253,
         "context": "{t(`education.access.${key}`)}"
       },
       {
@@ -93,7 +93,7 @@
         "pattern": "`sealedBid.outcome.${settlement.outcome}`",
         "type": "template_literal",
         "file": "app/[locale]/sealed-bid/page.tsx",
-        "line": 278,
+        "line": 284,
         "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
       },
       {
@@ -1122,7 +1122,7 @@
         "pattern": "`connections.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/connections/PuzzleCard.tsx",
-        "line": 188,
+        "line": 191,
         "context": "{t(`connections.difficulty.${puzzle.difficulty}`)}"
       },
       {
@@ -1346,15 +1346,22 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 194,
+        "line": 208,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}"
       },
       {
         "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
         "type": "template_literal",
-        "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 243,
+        "file": "components/education/ClassroomModeSettings.tsx",
+        "line": 95,
         "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
+      },
+      {
+        "pattern": "`teacher.classroom.minWordLength.len${len}`",
+        "type": "template_literal",
+        "file": "components/education/ClassroomModeSettings.tsx",
+        "line": 198,
+        "context": "const label = t(`teacher.classroom.minWordLength.len${len}`);"
       },
       {
         "pattern": "`education.landing.mock.${p.nameKey}`",
@@ -2221,7 +2228,7 @@
         "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
         "type": "template_literal",
         "file": "host/components/HostPreGameView.tsx",
-        "line": 682,
+        "line": 694,
         "context": "{t(`joinView.${"
       },
       {
@@ -2294,6 +2301,14 @@
         "file": "app/[locale]/community/PageClient.tsx",
         "line": 319,
         "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "app/[locale]/join/PageClient.tsx",
+        "line": 69,
+        "context": "{t(errorKey)}"
       },
       {
         "pattern": "t(locale)",
@@ -2748,7 +2763,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 189,
+        "line": 178,
         "context": "{t(labelKey)}"
       },
       {
@@ -2756,7 +2771,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 224,
+        "line": 213,
         "context": "{t(labelKey)}"
       },
       {
@@ -5058,8 +5073,7 @@
       "reengagement.coins",
       "reengagement.streakFreeze",
       "reengagement.premiumDays",
-      "wordForge.perfectCraft",
-      "wordcraft.domination"
+      "wordForge.perfectCraft"
     ],
     "ru": [
       "student.quickStart.title",
@@ -5437,8 +5451,7 @@
       "reengagement.bonusRewards",
       "reengagement.coins",
       "reengagement.streakFreeze",
-      "reengagement.premiumDays",
-      "wordcraft.domination"
+      "reengagement.premiumDays"
     ]
   }
 }

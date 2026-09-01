@@ -16167,6 +16167,7 @@ const sv = {
     "errorGeneric": "Nedladdningen misslyckades. Försök igen."
   },
   "sealedBid": {
+    "luckyStreak": "TURSVIT!",
     "allIn": "Allt in",
     "clear": "Rensa",
     "currentStake": "Nuvarande insats",

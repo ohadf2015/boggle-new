@@ -25,7 +25,7 @@ import { SealedBidSessionSummary } from '@/components/sealedBid/SealedBidSession
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { dealRounds, type SbRackDeal } from '@/lib/sealedBid/sp/rackPool';
 import { initWallet, clampStake, applyDelta, cashOutCoins, type ChipWallet } from '@/lib/sealedBid/sp/chipWallet';
-import { settleBid, type Settlement } from '@/lib/sealedBid/sp/wager';
+import { settleBid, rollLuckyStreak, LUCKY_STREAK_MULTIPLIER, type Settlement } from '@/lib/sealedBid/sp/wager';
 import { getSoloDateISO, isSoloDailyClaimed, markSoloDailyClaimed } from '@/lib/solo/soloDaily';
 import { SEALED_BID_ASSETS } from '@/components/sealedBid/sealedBidAssets';
 
@@ -136,10 +136,16 @@ export default function SealedBidPage() {
     });
 
     // Apply speed bonus: unique bids submitted quickly earn a larger delta
-    const finalSett =
+    const speedSett =
       sett.outcome === 'unique' && speedMult > 1.01
         ? { ...sett, delta: Math.round(sett.delta * speedMult) }
         : sett;
+
+    // Rare lucky-streak roll on a unique win: surprise 2x, mirrors RareGems' Lucky Gem
+    const lucky = speedSett.outcome === 'unique' && rollLuckyStreak();
+    const finalSett = lucky
+      ? { ...speedSett, delta: speedSett.delta * LUCKY_STREAK_MULTIPLIER, lucky: true }
+      : speedSett;
 
     const newWallet = applyDelta(wallet, finalSett.delta);
     setWallet(newWallet);
@@ -150,7 +156,7 @@ export default function SealedBidPage() {
     if (finalSett.outcome === 'unique') {
       playSound('wordAccepted');
       SharedFxApp.spawnBurst('sparkle-gold', window.innerWidth / 2, window.innerHeight / 3, {
-        count: 16,
+        count: lucky ? 32 : 16,
       });
     } else {
       playSound('wordRejected');

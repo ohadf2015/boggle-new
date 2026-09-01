@@ -13918,6 +13918,7 @@ const en = {
     "belowYourNorm": "{{delta}}% below your average"
   },
   "wordcraft": {
+    "domination": "Domination!",
     "combo": "COMBO",
     "title": "WordCraft",
     "adminBadge": "Admin sandbox · Tournament word grid",
@@ -15177,6 +15178,7 @@ const en = {
     "bestFor": "Best for"
   },
   "sealedBid": {
+    "luckyStreak": "LUCKY STREAK!",
     "allIn": "All in",
     "clear": "Clear",
     "currentStake": "Current stake",

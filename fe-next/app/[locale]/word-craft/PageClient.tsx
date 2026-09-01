@@ -1,14 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Header from '@/components/Header';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { parseDuel } from '@/lib/word-craft/duel';
 import { WordCraftSetup } from '@/components/word-craft/WordCraftSetup';
 import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
-import { loadSetupPrefs, saveSetupPrefs, type WordCraftSetupChoice } from '@/lib/word-craft/setupPrefs';
-import { trackWordCraftSetupStart } from '@/components/word-craft/wordCraftTelemetry';
+import { hasStoredSetupPrefs, loadSetupPrefs, saveSetupPrefs, type WordCraftSetupChoice } from '@/lib/word-craft/setupPrefs';
+import {
+  trackWordCraftQuickResumeStart,
+  trackWordCraftSetupShown,
+  trackWordCraftSetupStart,
+} from '@/components/word-craft/wordCraftTelemetry';
+import { useExperiment } from '@/hooks/useExperiment';
 import { cn } from '@/lib/utils';
 
 type WordCraftPhase = { name: 'setup' } | { name: 'playing'; choice: WordCraftSetupChoice };
@@ -41,6 +46,16 @@ export default function WordCraftPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
 
+  // exp-wordcraft-quick-resume-v1: seeded synchronously from a cookie for a
+  // user already bucketed on a prior visit, so this is safe to read inside
+  // the lazy `phase` initializer below (unassigned users fall back to
+  // 'control' — the same always-show-setup behaviour as today).
+  const { variant: quickResumeVariant, trackExposure: trackQuickResumeExposure } =
+    useExperiment('exp-wordcraft-quick-resume-v1');
+  useEffect(() => {
+    trackQuickResumeExposure();
+  }, [trackQuickResumeExposure]);
+
   // Hide the global bottom nav for BOTH phases (setup + game): the page is a
   // no-scroll h-svh surface, and the nav would overlap the setup footer.
   // Owned here (not in the game view) so START's remount can't flicker it.
@@ -65,10 +80,37 @@ export default function WordCraftPageClient() {
     return { duel: parsedDuel, seed: parsedSeed };
   });
 
+  // Set inside the `phase` lazy initializer below when the quick-resume arm
+  // auto-skips setup, so the telemetry effect can fire the right event
+  // exactly once per mount without re-deriving the decision.
+  const quickResumedRef = useRef(false);
+
   const [phase, setPhase] = useState<WordCraftPhase>(() => {
     if (typeof window === 'undefined') return { name: 'setup' };
-    return resolveInitialWordCraftPhase(new URLSearchParams(window.location.search), !!duel, loadSetupPrefs());
+    const params = new URLSearchParams(window.location.search);
+    const resolved = resolveInitialWordCraftPhase(params, !!duel, loadSetupPrefs());
+    if (
+      resolved.name === 'setup' &&
+      quickResumeVariant === 'quick-resume' &&
+      hasStoredSetupPrefs()
+    ) {
+      quickResumedRef.current = true;
+      return { name: 'playing', choice: loadSetupPrefs() };
+    }
+    return resolved;
   });
+  useEffect(() => {
+    if (phase.name === 'setup') {
+      trackWordCraftSetupShown();
+    } else if (quickResumedRef.current) {
+      trackWordCraftQuickResumeStart({
+        opponent: phase.choice.opponent,
+        difficulty: phase.choice.difficulty,
+        modifier: phase.choice.modifier,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once for the initial phase only, not on later setPhase(playing) via startGame
+  }, []);
   // Bumped on every START so the game view (and its one-shot reducer init)
   // remounts with the fresh choice.
   const [gameInstance, setGameInstance] = useState(0);

@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { useExperiment } from '@/hooks/useExperiment';
 
 /**
  * The single role gate for every /teacher surface.
@@ -19,6 +20,9 @@ export function TeacherGate({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
+  const { variant: redirectVariant, trackExposure: trackRedirectExposure } = useExperiment(
+    'exp-teacher-gate-redirect-clarity-v1',
+  );
 
   useEffect(() => {
     if (!isLoading && !hasAccess && pathname) {
@@ -28,6 +32,12 @@ export function TeacherGate({ children }: { children: React.ReactNode }) {
     }
   }, [hasAccess, isLoading, pathname, router]);
 
+  useEffect(() => {
+    if (!isLoading && !hasAccess && redirectVariant === 'redirect-status') {
+      trackRedirectExposure();
+    }
+  }, [isLoading, hasAccess, redirectVariant, trackRedirectExposure]);
+
   if (isLoading) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
@@ -35,6 +45,15 @@ export function TeacherGate({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (!hasAccess) return null;
+  if (!hasAccess) {
+    if (redirectVariant === 'redirect-status') {
+      return (
+        <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
+          <PageLoader size="lg" text={t('common.loading')} />
+        </div>
+      );
+    }
+    return null;
+  }
   return <>{children}</>;
 }

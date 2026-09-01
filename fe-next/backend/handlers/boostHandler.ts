@@ -49,7 +49,7 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
     // Validate payload
     const validation = validatePayload(boostApplySchema, data);
     if (!validation.success) {
-      socket.emit('error', { error: 'INVALID_PAYLOAD', message: validation.error });
+      socket.emit('error', { code: 'INVALID_PAYLOAD', message: validation.error });
       return;
     }
 
@@ -59,14 +59,14 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
       // Get game state
       const game = getGame(gameCode);
       if (!game) {
-        socket.emit('error', { error: 'GAME_NOT_FOUND', message: 'Game not found' });
+        socket.emit('error', { code: 'GAME_NOT_FOUND', message: 'Game not found' });
         return;
       }
 
       // Get player username from socket
       const username = getUsernameBySocketId(socket.id);
       if (!username) {
-        socket.emit('error', { error: 'NOT_IN_GAME', message: 'You are not in this game' });
+        socket.emit('error', { code: 'NOT_IN_GAME', message: 'You are not in this game' });
         return;
       }
 
@@ -74,7 +74,7 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
       const verification = verifyBoostToken(token, sessionId);
       if (!verification.valid) {
         socket.emit('error', {
-          error: 'INVALID_BOOST_TOKEN',
+          code: 'INVALID_BOOST_TOKEN',
           message: `Token validation failed: ${verification.reason}`,
         });
         logger.warn('BOOST', `Invalid token for ${username} in game ${gameCode}: ${verification.reason}`);
@@ -91,7 +91,7 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
       const existing = game.playerBoosts[username];
       if (existing && existing.sessionId === sessionId) {
         socket.emit('error', {
-          error: 'BOOST_ALREADY_CLAIMED',
+          code: 'BOOST_ALREADY_CLAIMED',
           message: 'A boost was already claimed for this session',
         });
         logger.warn('BOOST', `Duplicate boost claim for ${username} in game ${gameCode} (session ${sessionId})`);
@@ -111,7 +111,7 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
     } catch (err) {
       const error = err as Error;
       logger.error('BOOST', `Failed to apply boost: ${error.message}`);
-      socket.emit('error', { error: 'INTERNAL_ERROR', message: 'Failed to apply boost' });
+      socket.emit('error', { code: 'INTERNAL_ERROR', message: 'Failed to apply boost' });
     }
   });
 }

@@ -88,6 +88,10 @@ const faqs = [
     q: 'What are the best competitive word games with global leaderboards?',
     a: 'LexiClash is the best competitive word game with global leaderboards in 2026. It offers daily, weekly, and all-time rankings across five game modes, real-time 1v20 rooms, and per-language leaderboards for English, Hebrew, Swedish, Japanese, and Spanish — all free in the browser with no app required. No other free word game offers the same depth of global competition.',
   },
+  {
+    q: 'What are the best browser word games for building vocabulary?',
+    a: 'LexiClash is the best free browser word game for building vocabulary — real-time multiplayer rounds put you head-to-head with real opponents, so recall gets tested under time pressure instead of a static list. Wordle and NYT Spelling Bee build vocabulary through daily solo puzzles. Teachers running a classroom or ESL group can spin up a shared LexiClash room in seconds through our free education tools for schools.',
+  },
 ];
 
 // Static JSON-LD — all content is hardcoded string literals, not user input

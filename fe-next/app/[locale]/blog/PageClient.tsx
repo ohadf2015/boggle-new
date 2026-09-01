@@ -15,6 +15,17 @@ import { blogPostsContent, getSortedBlogPosts, type BlogPost } from '@/lib/blog/
 
 // Blog post metadata (non-localized)
 
+// Contextual link to the education hub — teachers reading vocabulary/word-game
+// posts are a natural audience for the classroom tools, and this page had no
+// internal link to /education at all.
+const educationCta: Record<string, string> = {
+  en: 'Teaching a class? Try our free classroom word games',
+  he: 'מלמדים כיתה? נסו את משחקי המילים החינמיים לכיתה',
+  sv: 'Undervisar du en klass? Prova våra gratis ordspel för klassrummet',
+  ja: '授業で使いたい先生へ — 無料のクラス向けワードゲームはこちら',
+  es: '¿Enseñas en un aula? Prueba nuestros juegos de palabras gratuitos para la clase',
+};
+
 export default function BlogIndexPageClient(): React.ReactElement {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
@@ -147,6 +158,17 @@ export default function BlogIndexPageClient(): React.ReactElement {
         )}>
           <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-600')}>
             {content.footerText}
+          </p>
+          <p className={cn('text-sm mt-3', isDarkMode ? 'text-gray-500' : 'text-gray-600')}>
+            <Link
+              href={`/${locale}/education`}
+              className={cn(
+                'underline underline-offset-2 font-semibold',
+                isDarkMode ? 'text-neo-yellow hover:text-neo-yellow/80' : 'text-neo-black hover:text-neo-pink'
+              )}
+            >
+              {educationCta[locale] || educationCta.en}
+            </Link>
           </p>
         </div>
       </div>

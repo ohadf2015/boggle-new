@@ -15347,6 +15347,7 @@ const he = {
     "belowYourNorm": "{{delta}}% מתחת לממוצע שלך"
   },
   "wordcraft": {
+    "domination": "שליטה מוחלטת!",
     "combo": "קומבו",
     "title": "WordCraft",
     "adminBadge": "ארגז חול למנהלים · לוח מילים תחרותי",
@@ -16088,6 +16089,7 @@ const he = {
     "bestFor": "הכי מתאים ל"
   },
   "sealedBid": {
+    "luckyStreak": "רצף מזל!",
     "allIn": "הכל פנימה",
     "clear": "נקה",
     "currentStake": "ההימור הנוכחי",

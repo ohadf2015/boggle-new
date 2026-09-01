@@ -15304,6 +15304,7 @@ const es = {
     "belowYourNorm": "{{delta}}% bajo tu promedio"
   },
   "wordcraft": {
+    "domination": "¡Dominación!",
     "combo": "COMBO",
     "title": "WordCraft",
     "adminBadge": "Sandbox de admin · Tablero de palabras",
@@ -16222,6 +16223,7 @@ const es = {
     "errorGeneric": "Fallo en la descarga. Intenta de nuevo."
   },
   "sealedBid": {
+    "luckyStreak": "¡RACHA DE SUERTE!",
     "title": "Puja sellada",
     "badge": "Puja sellada",
     "roundLabel": "Ronda {n} de {total}",
