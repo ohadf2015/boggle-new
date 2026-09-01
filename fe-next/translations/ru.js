@@ -10962,6 +10962,7 @@ const ru = {
       "yourName": "Называй меня...",
       "namePlaceholder": "Твоё боевое имя",
       "roomNameLabel": "Имя Комнаты",
+      "roomNamePlaceholder": "Комната {{name}}",
       "optional": "опционально",
       "createButton": "Начать Битву",
       "creating": "Подготавливаем арену...",

@@ -2270,6 +2270,7 @@ const he = {
       "yourName": "קוראים לי...",
       "namePlaceholder": "שם הקרב שלך",
       "roomNameLabel": "שם החדר",
+      "roomNamePlaceholder": "החדר של {{name}}",
       "optional": "אופציונלי",
       "createButton": "התחל קרב",
       "creating": "מכין זירה...",

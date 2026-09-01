@@ -2559,6 +2559,7 @@ const sv = {
       "yourName": "Kalla mig...",
       "namePlaceholder": "Ditt stridsnamn",
       "roomNameLabel": "Rumsnamn",
+      "roomNamePlaceholder": "{{name}}s rum",
       "optional": "valfritt",
       "createButton": "Starta striden!",
       "creating": "Förbereder arenan...",

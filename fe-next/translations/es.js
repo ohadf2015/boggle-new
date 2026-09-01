@@ -2331,6 +2331,7 @@ const es = {
       "yourName": "Me dicen...",
       "namePlaceholder": "Tu nombre de batalla",
       "roomNameLabel": "Nombre de sala",
+      "roomNamePlaceholder": "Sala de {{name}}",
       "optional": "opcional",
       "createButton": "¡A darle!",
       "creating": "Preparando arena...",

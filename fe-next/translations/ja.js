@@ -2269,6 +2269,7 @@ const ja = {
       "yourName": "呼び名は...",
       "namePlaceholder": "バトルネーム",
       "roomNameLabel": "ルーム名",
+      "roomNamePlaceholder": "{{name}}のルーム",
       "optional": "任意",
       "createButton": "バトル開始！",
       "creating": "アリーナ準備中...",
