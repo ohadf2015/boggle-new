@@ -13,6 +13,7 @@ function Cell({ value, lead }: { value: CompareCell; lead: boolean }) {
         )}
       >
         <Check className="h-4 w-4" strokeWidth={3.5} aria-hidden />
+        <span className="sr-only">Sí</span>
       </span>
     );
   }
@@ -23,6 +24,7 @@ function Cell({ value, lead }: { value: CompareCell; lead: boolean }) {
         className="mx-auto grid h-7 w-7 place-items-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-white shadow-hard-sm"
       >
         <X className="h-4 w-4" strokeWidth={3.5} aria-hidden />
+        <span className="sr-only">No</span>
       </span>
     );
   }

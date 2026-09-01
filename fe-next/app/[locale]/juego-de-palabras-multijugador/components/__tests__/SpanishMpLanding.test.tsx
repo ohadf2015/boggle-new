@@ -43,7 +43,8 @@ vi.mock('next/image', () => ({
 describe('Spanish MP landing — composition', () => {
   it('HeroAnimated renders title, all hero tiles, both CTAs and stats', () => {
     render(<HeroAnimated locale="es" />);
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading).toHaveTextContent('Juega Scrabble online gratis en español');
     HERO_TILES.forEach((tile, i) => {
       // Each tile letter shows up — match by exact text in a span
       const matches = screen.getAllByText(tile.ch);
