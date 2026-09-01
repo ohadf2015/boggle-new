@@ -6486,7 +6486,7 @@ const en = {
     "hero": {
       "title": "Daily Word Wheel",
       "subtitle": "Free Daily Word Puzzle",
-      "description": "A new word wheel puzzle every day. Find words from a wheel of letters, compete for the world record, and track your daily streak. Free, no download.",
+      "description": "LexiClash's Daily Word Wheel is a free daily word puzzle: spin the wheel, find every word containing today's center letter. New puzzle every day, streak tracking, global leaderboard, no download.",
       "cta": "Play Today's Word Wheel",
       "leaderboard": "View World Record"
     },
