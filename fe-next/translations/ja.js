@@ -3647,6 +3647,8 @@ const ja = {
     "goMultiplayerDesc": "リアルな人間、リアルな勝負、リアルな自慢",
     "goMultiplayerFromDaily": "1回で終わり？",
     "goMultiplayerFromDailyDesc": "無制限の対戦、リアルな相手 — 明日まで待つ必要なし",
+    "goMultiplayerFromBots": "Play Real Opponents",
+    "goMultiplayerFromBotsDesc": "Bots were just practice — live players are waiting",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "集中トレーニングで認知能力を向上"
   },

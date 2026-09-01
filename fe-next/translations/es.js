@@ -3419,6 +3419,8 @@ const es = {
     "goMultiplayerDesc": "Humanos reales, competencia real, presume de verdad",
     "goMultiplayerFromDaily": "¿Solo una partida?",
     "goMultiplayerFromDailyDesc": "Partidas ilimitadas, rivales reales — sin esperar hasta mañana",
+    "goMultiplayerFromBots": "Play Real Opponents",
+    "goMultiplayerFromBotsDesc": "Bots were just practice — live players are waiting",
     "brainTraining": "Gym Cerebral",
     "brainTrainingDesc": "Mejora tus habilidades cognitivas con ejercicios enfocados"
   },

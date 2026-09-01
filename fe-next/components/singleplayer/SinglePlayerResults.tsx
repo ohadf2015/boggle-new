@@ -155,7 +155,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     gridSize: results.grid?.length ?? 4,
   });
 
-  const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';
+  const nextStepMode: NextStepMode = mode === 'practice'
+    ? 'practice'
+    : (mode === 'solo-bots' ? 'solo-bots-to-mp' : 'daily');
 
   const playerAvatar = useMemo(() => {
     if (!profile) return undefined;

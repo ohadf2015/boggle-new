@@ -3936,6 +3936,8 @@ const sv = {
     "goMultiplayerDesc": "Riktiga motståndare, riktig tävling, riktigt skryt",
     "goMultiplayerFromDaily": "Varför nöja sig med en?",
     "goMultiplayerFromDailyDesc": "Obegränsat med matcher, riktiga motståndare — ingen väntan till imorgon",
+    "goMultiplayerFromBots": "Play Real Opponents",
+    "goMultiplayerFromBotsDesc": "Bots were just practice — live players are waiting",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Vässa hjärnan"
   },

@@ -12,7 +12,7 @@ import { getCloseLossMessage } from '@/shared/utils/closeLossDetector';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
-export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots' | 'blast' | 'word-hunt';
+export type NextStepMode = 'practice' | 'solo-bots' | 'solo-bots-to-mp' | 'daily' | 'multiplayer-bots' | 'blast' | 'word-hunt';
 
 interface NextStepPromptProps {
   /** Current game mode to determine next suggestion */
@@ -111,6 +111,16 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
           gradient: 'from-amber-400 to-amber-600',
           iconBg: 'bg-neo-navy text-amber-400',
+        };
+      case 'solo-bots-to-mp':
+        return {
+          titleKey: 'nextStep.goMultiplayerFromBots',
+          descKey: 'nextStep.goMultiplayerFromBotsDesc',
+          href: `/${language}/multiplayer`,
+          destination: 'multiplayer' as const,
+          icon: <InfinityIcon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.5} />,
+          gradient: 'from-neo-pink to-neo-pink-dark',
+          iconBg: 'bg-neo-navy text-neo-pink',
         };
       case 'daily':
         return {

@@ -3184,6 +3184,8 @@ const en = {
     "goMultiplayerDesc": "Real humans, real competition, real bragging rights",
     "goMultiplayerFromDaily": "Why Stop at One?",
     "goMultiplayerFromDailyDesc": "Unlimited games, real opponents — no waiting until tomorrow",
+    "goMultiplayerFromBots": "Play Real Opponents",
+    "goMultiplayerFromBotsDesc": "Bots were just practice — live players are waiting",
     "brainTraining": "Brain Gym",
     "brainTrainingDesc": "Level up your mental game"
   },
