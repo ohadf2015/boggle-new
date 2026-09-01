@@ -11354,7 +11354,7 @@ const en = {
       "title": "Lesson recap",
       "yourMastery": "You found {{found}} of {{total}} lesson words",
       "classCoverage": "The class found {{found}} of {{total}} lesson words",
-      "teacherMoat": "These were your vocabulary words — hidden in the board. That's what makes LexiClash different.",
+      "teacherMoat": "These were the words from your lesson — hidden inside the board your class just played. That's what makes LexiClash different.",
       "reteach": "Nobody found these",
       "allFound": "The class found every lesson word.",
       "practiceMissed": "Practise these words"

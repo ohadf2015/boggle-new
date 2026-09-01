@@ -13017,7 +13017,7 @@ const sv = {
       "title": "Lektionssammanfattning",
       "yourMastery": "Du hittade {{found}} av {{total}} lektionsord",
       "classCoverage": "Klassen hittade {{found}} av {{total}} lektionsord",
-      "teacherMoat": "Dessa var dina ordförrådsord — gömda på brädet. Det är vad som gör LexiClash annorlunda.",
+      "teacherMoat": "Det här var orden från din lektion — gömda inuti brädet. Det är det som gör LexiClash annorlunda.",
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
       "practiceMissed": "Öva de här orden"

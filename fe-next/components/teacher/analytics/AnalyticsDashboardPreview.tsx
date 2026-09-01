@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomAnalytics } from '@/hooks/useClassroomAnalytics';
 import { MetricCard } from './MetricCard';
@@ -15,11 +16,12 @@ import { cn } from '@/lib/utils';
 export interface AnalyticsDashboardPreviewProps {
   /** Classroom ID to fetch analytics for */
   classroomId: string;
-  /** Callback when viewing filtered student list */
-  onViewStudents?: (filter: 'struggling') => void;
-  /** Callback when creating review lesson with mistake words */
+  /** Callback when creating review lesson with mistake words. Free for every teacher. */
   onCreateReviewLesson?: (words: string[]) => void;
 }
+// Deliberately no `onViewStudents`: in preview mode the per-student table is not rendered at
+// all, so any handler an caller threads in would act on something absent. Accepting the prop
+// only made it possible to wire this button to nothing, which is what happened.
 
 // ============================================
 // COMPONENT
@@ -46,19 +48,19 @@ export interface AnalyticsDashboardPreviewProps {
  */
 export function AnalyticsDashboardPreview({
   classroomId,
-  onViewStudents,
   onCreateReviewLesson,
 }: AnalyticsDashboardPreviewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const router = useRouter();
   const { metrics, isLoading, error, refresh } = useClassroomAnalytics({ classroomId });
-  const studentTableRef = useRef<HTMLDivElement>(null);
 
+  // The count is free; WHICH students are struggling is the paid half, and the table is
+  // deliberately not rendered here. An earlier cut scrolled to a ref on an empty div, so this
+  // button took a free teacher precisely nowhere — the dead end this preview exists to remove.
+  // Asking "who?" is the moment of most interest, so send her to the thing that answers it.
   const handleViewStudents = useCallback(() => {
-    if (typeof studentTableRef.current?.scrollIntoView === 'function') {
-      studentTableRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-    onViewStudents?.('struggling');
-  }, [onViewStudents]);
+    router.push(`/${language}/teacher/upgrade`);
+  }, [router, language]);
 
   // ==================== LOADING STATE ====================
 
@@ -219,8 +221,6 @@ export function AnalyticsDashboardPreview({
           </p>
         </div>
       </div>
-
-      <div ref={studentTableRef} />
     </div>
   );
 }

@@ -12771,7 +12771,7 @@ const es = {
       "title": "Resumen de la lección",
       "yourMastery": "Encontraste {{found}} de {{total}} palabras de la lección",
       "classCoverage": "La clase encontró {{found}} de {{total}} palabras de la lección",
-      "teacherMoat": "Estas fueron tus palabras de vocabulario — ocultas en el tablero. Eso es lo que hace diferente a LexiClash.",
+      "teacherMoat": "Estas eran las palabras de tu lección — escondidas dentro del tablero. Eso es lo que hace que LexiClash sea diferente.",
       "reteach": "Nadie encontró estas",
       "allFound": "La clase encontró todas las palabras de la lección.",
       "practiceMissed": "Practicar estas palabras"

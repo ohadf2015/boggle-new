@@ -159,7 +159,6 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             feature="analytics"
             preview={true}
             classroomId={classroomId}
-            onViewStudents={handleViewStudents}
             onCreateReviewLesson={handleCreateReviewLesson}
           >
             <AnalyticsDashboard

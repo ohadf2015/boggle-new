@@ -12779,7 +12779,7 @@ const ja = {
       "title": "レッスンのまとめ",
       "yourMastery": "レッスンの単語 {{total}} 個のうち {{found}} 個を発見",
       "classCoverage": "クラスはレッスンの単語 {{total}} 個のうち {{found}} 個を発見",
-      "teacherMoat": "これらはあなたの語彙の単語でした — ボードに隠されていました。それがLexiClashを異なるものにしています。",
+      "teacherMoat": "これらは先生の授業の単語です — ボードの中に隠されていました。そこがLexiClashならではの特長です。",
       "reteach": "誰も見つけられなかった単語",
       "allFound": "クラスはすべての単語を見つけました。",
       "practiceMissed": "この単語を練習する"

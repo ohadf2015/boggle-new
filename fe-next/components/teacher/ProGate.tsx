@@ -40,8 +40,6 @@ interface ProGateProps {
   preview?: boolean;
   /** Classroom ID - required when preview=true and feature='analytics' */
   classroomId?: string;
-  /** Callback when viewing filtered students - passed to preview */
-  onViewStudents?: (filter: 'struggling') => void;
   /** Callback when creating review lesson - passed to preview */
   onCreateReviewLesson?: (words: string[]) => void;
 }
@@ -51,7 +49,6 @@ export function ProGate({
   children,
   preview = false,
   classroomId,
-  onViewStudents,
   onCreateReviewLesson,
 }: ProGateProps) {
   const { t, language } = useLanguage();
@@ -76,7 +73,6 @@ export function ProGate({
         {feature === 'analytics' && classroomId && (
           <AnalyticsDashboardPreview
             classroomId={classroomId}
-            onViewStudents={onViewStudents}
             onCreateReviewLesson={onCreateReviewLesson}
           />
         )}
