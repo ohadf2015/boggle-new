@@ -7,7 +7,7 @@
  * a class-wide view while each student sees their own.
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ClassroomResultsCard } from '../ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -86,5 +86,35 @@ describe('ClassroomResultsCard', () => {
   it('handles a student who found nothing without crashing on a missing mastery row', () => {
     render(<ClassroomResultsCard summary={summary} username="LateJoiner" isTeacher={false} />);
     expect(screen.getByText(/yourMastery.*"found":0.*"total":3/)).toBeInTheDocument();
+  });
+
+  it('offers the teacher a reteach round on exactly the missed words', () => {
+    const onReteach = vi.fn();
+    render(
+      <ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher onReteach={onReteach} />
+    );
+    const button = screen.getByTestId('play-reteach-round');
+    fireEvent.click(button);
+    expect(onReteach).toHaveBeenCalledTimes(1);
+  });
+
+  it('never offers a student the reteach round — only the teacher drives the class', () => {
+    render(
+      <ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} onReteach={vi.fn()} />
+    );
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+
+  it('offers no reteach round when the class found every word', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(
+      <ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher onReteach={vi.fn()} />
+    );
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+
+  it('renders no reteach button without a handler, e.g. for a non-host viewer', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
   });
 });

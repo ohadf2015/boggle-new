@@ -12790,7 +12790,8 @@ const ja = {
       "classCoverage": "クラスはレッスンの単語 {{total}} 個のうち {{found}} 個を発見",
       "reteach": "誰も見つけられなかった単語",
       "allFound": "クラスはすべての単語を見つけました。",
-      "practiceMissed": "この単語を練習する"
+      "practiceMissed": "この単語を練習する",
+      "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ"
     },
     "nav": {
       "section": "教師向け",

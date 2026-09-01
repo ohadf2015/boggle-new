@@ -11365,7 +11365,8 @@ const en = {
       "classCoverage": "The class found {{found}} of {{total}} lesson words",
       "reteach": "Nobody found these",
       "allFound": "The class found every lesson word.",
-      "practiceMissed": "Practise these words"
+      "practiceMissed": "Practise these words",
+      "playReteachRound": "Play reteach round — missed words only"
     },
     "nav": {
       "section": "Teachers",
