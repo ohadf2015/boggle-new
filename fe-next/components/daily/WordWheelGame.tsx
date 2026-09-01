@@ -1099,10 +1099,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               key={toast.id}
               className="px-3 py-1.5 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.6)] flex items-center gap-1.5 whitespace-nowrap"
               initial={{ opacity: 0, y: -20, scale: 0.6, rotate: -4 }}
-              animate={prefersReducedMotion
-                ? { opacity: 1, y: i * 4, scale: 1, rotate: 0 }
-                : { opacity: 1, y: i * 4, scale: [0.6, 1.15, 1], rotate: [-4, 2, 0] }
-              }
+              // Springs support 2 keyframes max — a [0.6, 1.15, 1] array here
+              // logged "Only two keyframes currently supported with spring..."
+              // in real browsers. The underdamped spring overshoots on its own.
+              animate={{ opacity: 1, y: i * 4, scale: 1, rotate: 0 }}
               exit={{ opacity: 0, y: -10, scale: 0.7 }}
               transition={prefersReducedMotion
                 ? { duration: 0.2 }
@@ -1345,10 +1345,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               : 'bg-neo-navy-light border-neo-black',
           )}
           initial={{ scale: 0, opacity: 0 }}
-          animate={word === lastFoundWord && !prefersReducedMotion
-            ? { scale: [0, 1.15, 1], opacity: 1 }
-            : { scale: 1, opacity: 1 }
-          }
+          // Springs support 2 keyframes max — a [0, 1.15, 1] array here logged
+          // "Only two keyframes currently supported with spring..." in real
+          // browsers (growth-radar #2699). stiffness 500 with default damping
+          // is underdamped, so the pop overshoot happens on its own.
+          animate={{ scale: 1, opacity: 1 }}
           transition={prefersReducedMotion ? { duration: 0.2 } : { type: 'spring', stiffness: 500 }}
         >
           {displayWord(word)} <span className="text-neo-lime font-black">+{scoreWord(word)}</span>

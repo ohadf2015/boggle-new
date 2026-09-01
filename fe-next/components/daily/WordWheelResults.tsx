@@ -325,7 +325,11 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           data-testid="word-wheel-streak-chip"
           className="z-10 flex items-center gap-1.5 px-3 py-1 rounded-neo border-3 border-neo-black bg-neo-orange text-neo-black shadow-hard"
           initial={{ scale: 0, y: -6 }}
-          animate={{ scale: [0, 1.15, 1], y: 0 }}
+          // Spring from 0 -> 1 overshoots naturally (stiffness 360 / damping 16
+          // is underdamped, ~1.2 peak) — passing [0, 1.15, 1] keyframes to a
+          // spring logs "Only two keyframes currently supported with spring and
+          // inertia animations" in real browsers (growth-radar #2699).
+          animate={{ scale: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.45, type: 'spring', stiffness: 360, damping: 16 }}
         >
           <Flame className="w-4 h-4" strokeWidth={2.5} aria-hidden />
@@ -343,7 +347,9 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           data-testid="word-wheel-perfect-banner"
           className="z-10 flex items-center gap-2 px-4 py-1.5 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(191,255,0,0.55)]"
           initial={{ scale: 0, y: -6 }}
-          animate={{ scale: [0, 1.18, 1], y: 0 }}
+          // See streak chip above — springs take 2 keyframes max; the
+          // underdamped spring produces the 1.18 overshoot on its own.
+          animate={{ scale: 1, y: 0 }}
           transition={{ delay: 1.0, duration: 0.55, type: 'spring', stiffness: 380, damping: 16 }}
         >
           <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
@@ -367,7 +373,9 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               : 'bg-neo-purple text-neo-white',
           )}
           initial={{ scale: 0, y: -6 }}
-          animate={{ scale: [0, 1.15, 1], y: 0 }}
+          // See streak chip above — springs take 2 keyframes max; the
+          // underdamped spring produces the overshoot on its own.
+          animate={{ scale: 1, y: 0 }}
           transition={{ delay: 1.1, duration: 0.5, type: 'spring', stiffness: 360, damping: 16 }}
         >
           <span className="flex items-center gap-1.5 font-neo-display font-black text-xs sm:text-sm tracking-wide uppercase">

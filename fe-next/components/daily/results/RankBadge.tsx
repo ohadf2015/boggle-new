@@ -89,11 +89,11 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
       {showPercentile && (
         <m.div
           initial={{ opacity: 0, scale: 0.5, y: 8 }}
-          animate={
-            percentile <= 5
-              ? { opacity: 1, scale: [0.5, 1.2, 1], y: 0 }
-              : { opacity: 1, scale: 1, y: 0 }
-          }
+          // Springs support 2 keyframes max — a [0.5, 1.2, 1] array here logged
+          // "Only two keyframes currently supported with spring..." in real
+          // browsers. damping 18 / stiffness 300 is underdamped, so the
+          // glow-pop overshoot happens on its own.
+          animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 1.1, type: 'spring', stiffness: 300, damping: 18 }}
           className={
             percentile <= 5
