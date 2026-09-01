@@ -1,0 +1,123 @@
+/**
+ * Class missed-word gap share — the parent/Slack companion to ClassroomResultsCard.
+ *
+ * The reteach round (#896) is for the room. This is the thing a teacher pastes into
+ * Slack or a parent chat: a URL whose OG unfurl shows today's class coverage and the
+ * words nobody found. CLASS-level only — student names never leave the results screen.
+ */
+
+export const CLASS_GAP_ORIGIN = 'https://www.lexiclash.live';
+
+export const MAX_MISSED_WORDS = 12;
+export const MAX_WORD_LENGTH = 32;
+export const MAX_LESSON_LENGTH = 80;
+export const MAX_TEACHER_LENGTH = 40;
+
+const LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
+
+export interface ClassGapShareInput {
+  locale: string;
+  lessonNames: string[];
+  teacherName: string;
+  found: number;
+  total: number;
+  missedWords: string[];
+}
+
+export interface ClassGapSharePayload {
+  locale: string;
+  lesson: string;
+  teacher: string;
+  found: number;
+  total: number;
+  missedWords: string[];
+}
+
+export function normalizeLocale(locale: string | undefined | null): string {
+  const l = (locale || 'en').toLowerCase().split('-')[0];
+  return LOCALES.has(l) ? l : 'en';
+}
+
+function sanitizeText(value: string, max: number): string {
+  return value
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
+function sanitizeWord(value: string): string {
+  return sanitizeText(value, MAX_WORD_LENGTH);
+}
+
+function clampInt(value: unknown): number {
+  const n = typeof value === 'number' ? value : parseInt(String(value ?? '0'), 10);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(Math.floor(n), 9999);
+}
+
+export function toClassGapPayload(input: ClassGapShareInput): ClassGapSharePayload {
+  return {
+    locale: normalizeLocale(input.locale),
+    lesson: sanitizeText((input.lessonNames || []).filter(Boolean).join(', '), MAX_LESSON_LENGTH),
+    teacher: sanitizeText(input.teacherName || '', MAX_TEACHER_LENGTH),
+    found: clampInt(input.found),
+    total: clampInt(input.total),
+    missedWords: (input.missedWords || [])
+      .map(sanitizeWord)
+      .filter(Boolean)
+      .slice(0, MAX_MISSED_WORDS),
+  };
+}
+
+function applyParams(url: URL, payload: ClassGapSharePayload): void {
+  if (payload.lesson) url.searchParams.set('lesson', payload.lesson);
+  if (payload.teacher) url.searchParams.set('teacher', payload.teacher);
+  url.searchParams.set('found', String(payload.found));
+  url.searchParams.set('total', String(payload.total));
+  if (payload.missedWords.length > 0) {
+    url.searchParams.set('missed', payload.missedWords.join(','));
+  }
+  url.searchParams.set('lang', payload.locale);
+}
+
+export function buildClassGapShareUrl(input: ClassGapShareInput): string {
+  const payload = toClassGapPayload(input);
+  const url = new URL(`/${payload.locale}/education/class-gap`, CLASS_GAP_ORIGIN);
+  applyParams(url, payload);
+  return url.toString();
+}
+
+export function buildClassGapOgImageUrl(input: ClassGapShareInput): string {
+  const payload = toClassGapPayload(input);
+  const url = new URL('/api/og/class-gap', CLASS_GAP_ORIGIN);
+  applyParams(url, payload);
+  return url.toString();
+}
+
+export function parseClassGapShareParams(searchParams: URLSearchParams): ClassGapSharePayload {
+  const missedRaw = searchParams.get('missed') || '';
+  return {
+    locale: normalizeLocale(searchParams.get('lang') || searchParams.get('locale')),
+    lesson: sanitizeText(searchParams.get('lesson') || '', MAX_LESSON_LENGTH),
+    teacher: sanitizeText(searchParams.get('teacher') || '', MAX_TEACHER_LENGTH),
+    found: clampInt(searchParams.get('found')),
+    total: clampInt(searchParams.get('total')),
+    missedWords: missedRaw
+      .split(',')
+      .map(sanitizeWord)
+      .filter(Boolean)
+      .slice(0, MAX_MISSED_WORDS),
+  };
+}
+
+export function searchRecordToParams(
+  query: Record<string, string | string[] | undefined>,
+): URLSearchParams {
+  const sp = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    const s = Array.isArray(value) ? value[0] : value;
+    if (s) sp.set(key, s);
+  }
+  return sp;
+}

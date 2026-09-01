@@ -12791,7 +12791,15 @@ const es = {
       "reteach": "Nadie encontró estas",
       "allFound": "La clase encontró todas las palabras de la lección.",
       "practiceMissed": "Practicar estas palabras",
-      "playReteachRound": "Jugar ronda de repaso — solo las palabras que faltan"
+      "playReteachRound": "Jugar ronda de repaso — solo las palabras que faltan",
+      "shareGap": "Compartir el hueco de la clase",
+      "shareGapCopied": "Enlace copiado — pégalo en Slack o en el chat de padres",
+      "shareGapTitle": "Hueco de vocabulario de la clase",
+      "shareGapText": "{{lesson}} — la clase encontró {{found}} de {{total}} palabras. Para practicar: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}} — la clase encontró todas las palabras de la lección.",
+      "shareGapCta": "Jugar una partida de clase",
+      "shareGapEyebrow": "El hueco de hoy",
+      "shareGapPracticeHome": "Palabras para practicar en casa"
     },
     "nav": {
       "section": "Docentes",

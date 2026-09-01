@@ -13037,7 +13037,15 @@ const sv = {
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
       "practiceMissed": "Öva de här orden",
-      "playReteachRound": "Spela repetitionsrunda — bara missade ord"
+      "playReteachRound": "Spela repetitionsrunda — bara missade ord",
+      "shareGap": "Dela klassens lucka",
+      "shareGapCopied": "Länk kopierad — klistra in i Slack eller föräldrachatten",
+      "shareGapTitle": "Klassens ordförrådslucka",
+      "shareGapText": "{{lesson}} — klassen hittade {{found}} av {{total}} lektionsord. Öva: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}} — klassen hittade alla lektionsord.",
+      "shareGapCta": "Spela ett klassspel",
+      "shareGapEyebrow": "Dagens klasslucka",
+      "shareGapPracticeHome": "Ord att öva hemma"
     },
     "nav": {
       "section": "Lärare",
