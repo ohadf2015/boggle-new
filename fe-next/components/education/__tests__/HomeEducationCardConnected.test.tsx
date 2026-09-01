@@ -57,9 +57,8 @@ describe('HomeEducationCardConnected', () => {
     useStudentClassroomMock.mockReturnValue(studentClassroom());
   });
 
-  // Promo branch: everyone who is neither a teacher nor an enrolled student used to get
-  // `null` here, which meant education was advertised to exactly the people who had already
-  // found it. Education stays on every homepage visit — it is the revenue path.
+  // Promo branch: guests and unenrolled players always see the education entry
+  // so classroom mode is discoverable on every homepage visit.
   it('promotes education to a signed-out visitor', () => {
     useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
     render(<HomeEducationCardConnected />);
@@ -73,11 +72,17 @@ describe('HomeEducationCardConnected', () => {
     expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
   });
 
-  it('still promotes education on a later visit (no one-shot localStorage gate)', () => {
+  it('keeps promoting education on later visits', () => {
     localStorage.setItem('edu_home_promo_seen_v1', '1');
     useAuthMock.mockReturnValue(auth());
     render(<HomeEducationCardConnected />);
     expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
+  });
+
+  it('does not write a one-shot seen marker', () => {
+    useAuthMock.mockReturnValue(auth());
+    render(<HomeEducationCardConnected />);
+    expect(localStorage.getItem('edu_home_promo_seen_v1')).toBeNull();
   });
 
   it('renders nothing while auth is still resolving', () => {

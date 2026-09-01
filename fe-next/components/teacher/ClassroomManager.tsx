@@ -19,6 +19,7 @@ import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSk
 import { fireConfetti } from '@/utils/confettiUtils';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
 const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
   en: 'languages.english',
@@ -91,7 +92,7 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
       }
     } else if (result.code === 'CLASS_LIMIT_REACHED' && result.currentCount !== undefined && result.limit !== undefined) {
       // Show upsell modal for class limit
-      setUpsellData({ currentCount: result.currentCount, limit: result.limit ?? 2 });
+      setUpsellData({ currentCount: result.currentCount, limit: result.limit ?? FREE_TIER_LIMITS.classes });
       setIsUpsellModalOpen(true);
       setIsCreateDialogOpen(false);
     } else {

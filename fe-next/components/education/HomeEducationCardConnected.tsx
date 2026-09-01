@@ -13,10 +13,6 @@ import { HomeEducationCard } from './HomeEducationCard';
  * an approved teacher who also sits in a class still lands on the teacher
  * dashboard.
  *
- * Guests and un-enrolled authed users always see the education promo (every
- * visit). Education is the revenue path; a one-shot localStorage card hid it
- * after the first paint.
- *
  * The role split is deliberate for load reasons: the teacher branch is gated on
  * the cheap profile signal (user_role / is_admin — already in auth context) so
  * the trial fetch (an API route with a server auth round-trip) only fires for
@@ -24,6 +20,9 @@ import { HomeEducationCard } from './HomeEducationCard';
  * 'student' for everyone, so enrolment can't be read off the profile — only a
  * classroom-membership lookup proves a student was added, and that lookup is a
  * single indexed client-side point read.
+ *
+ * Guests and unenrolled players always see the promo — education stays on the
+ * homepage every visit, not a one-shot that vanishes after the first paint.
  */
 export function HomeEducationCardConnected() {
   const { isAuthenticated, isTeacher, isAdmin } = useAuth();
@@ -48,7 +47,8 @@ function TeacherHomeCard() {
 
 /** Non-teacher authed user: show the card only once we've confirmed a classroom
  * membership. Nothing renders (pessimistic default, pitfall Class 1) while the
- * lookup is in flight; un-enrolled users still get the education promo. */
+ * lookup is in flight or when the user isn't enrolled. Unenrolled players fall
+ * through to the always-on promo. */
 function StudentHomeCard() {
   const { classroomId, classroom, isLoading } = useStudentClassroom();
   if (isLoading) return null;
@@ -56,7 +56,9 @@ function StudentHomeCard() {
   return <HomeEducationCard role="student" classroomName={classroom?.name ?? null} />;
 }
 
-/** Persistent pitch for everyone education has never converted: every homepage visit. */
+/** Always-on pitch for everyone education has never enrolled: guests and
+ * unenrolled players. Shown on every homepage visit so teachers can find
+ * classroom mode without having seen it "once" in a previous session. */
 function EducationPromoCard() {
   return <HomeEducationCard role="promo" />;
 }

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import Link from 'next/link';
-import { Flame } from 'lucide-react';
+import { Flame, GraduationCap } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import AuthButton from '../auth/AuthButton';
@@ -8,6 +8,7 @@ import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import MusicControls from '../MusicControls';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { teacherMenuEntry } from '@/lib/education/teacherRole';
 
 interface HeaderDesktopControlsProps {
     unclaimedCount: number;
@@ -23,12 +24,27 @@ interface HeaderDesktopControlsProps {
 // with HeaderMobileMenu — gift surfacing happens inside the side drawer.
 const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading, profile } = useAuth();
+    const teacherEntry = teacherMenuEntry(profile);
     const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
     const engagementStatus = useEngagementStatus();
 
     return (
         <div className="hidden sm:flex items-center gap-3 shrink-0">
+            {/* Persistent For Teachers — acquisition entry on every header, not
+                buried in the drawer. Teachers land on their dashboard; everyone
+                else on the public education page. Hidden on CrazyGames. */}
+            {!cgLoading && !isOnCrazyGamesPlatform && (
+                <Link
+                    href={`/${language}${teacherEntry.href}`}
+                    data-testid="header-for-teachers"
+                    className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-lime px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-neo-navy shadow-hard-sm hover:-translate-y-px hover:shadow-hard transition-all"
+                >
+                    <GraduationCap className="w-3.5 h-3.5" aria-hidden="true" />
+                    {t(teacherEntry.labelKey)}
+                </Link>
+            )}
+
             {/* Streak indicator */}
             {isAuthenticated && engagementStatus.streak > 0 && (
                 <Link

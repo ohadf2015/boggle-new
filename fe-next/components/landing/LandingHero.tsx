@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useExperiment } from '@/hooks/useExperiment';
 import { HeroStyleMascot } from './HeroStyleMascot';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 import posthog from '@/lib/analytics/lazyPosthog';
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // SSR enabled: receives players from server initialData → above-the-fold sidebar paints with data, not skeleton.
 const LandingLeaderboardPreview = dynamic(
@@ -60,8 +60,9 @@ function FloatingTiles() {
 // `isMobilePortrait` only feeds behavior props on the mascot (hover/click).
 export function LandingHero({ players, playersLoading, isMobilePortrait, energetic, activePlayers = 0 }: LandingHeroProps) {
   const { t, language } = useLanguage();
-  const { isOnCrazyGamesPlatform } = useCrazyGames();
-  const showClassroomHero = !isOnCrazyGamesPlatform;
+  const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
+  // Still-resolving counts as embedded so the classroom hero never flashes on CrazyGames.
+  const showClassroomHero = !cgLoading && !isOnCrazyGamesPlatform;
   const showLivePill = energetic && activePlayers > 10;
   const { variant: heroVariant, trackExposure } = useExperiment('landing-variant-homepage-v1');
   const showHeroCta = heroVariant === 'variant';
@@ -96,35 +97,38 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
             </div>
             <h1 className="font-black uppercase tracking-tight text-neo-white text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl sm:mt-3 sm:mb-2 neo-title animate-[fadeInUp_0.4s_ease-out_0s_both]">
               <span className="sr-only">LexiClash — </span>
-              {showClassroomHero ? t('landing.classroomTitle') : t('landing.welcomeTitle')}
+              {showClassroomHero ? t('landing.classroomHeroTitle') : t('landing.welcomeTitle')}
             </h1>
           </div>
 
-          {energetic && (
+          {(showClassroomHero || energetic) && (
             <p className="mt-1 max-w-md font-neo-body text-sm text-neo-white/80 sm:text-base animate-[fadeInUp_0.4s_ease-out_0.25s_both]">
-              {showClassroomHero ? t('landing.classroomSubtitle') : t('landing.welcomeSubtitle')}
+              {showClassroomHero ? t('landing.classroomHeroSubtitle') : t('landing.welcomeSubtitle')}
             </p>
           )}
 
           {showClassroomHero && (
-            <Link
-              href={`/${language}/education`}
-              prefetch={false}
-              className="mt-4 inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed animate-[fadeInUp_0.4s_ease-out_0.3s_both]"
-              onClick={() => {
-                try {
-                  (posthog.capture as (e: string, p?: Record<string, unknown>) => void)(
-                    'landing_hero_cta_clicked',
-                    { variant: 'education', destination: 'education' },
-                  );
-                } catch { /* posthog not loaded */ }
-              }}
-            >
-              {t('landing.forTeachersCta')}
-            </Link>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3 lg:justify-start animate-[fadeInUp_0.4s_ease-out_0.3s_both]">
+              <Link
+                href={`/${language}/education`}
+                prefetch={false}
+                data-testid="landing-for-teachers-cta"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+              >
+                {t('landing.forTeachers')}
+              </Link>
+              <Link
+                href={`/${language}/multiplayer`}
+                prefetch={false}
+                data-testid="landing-play-cta"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-navy px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+              >
+                {t('landing.playNowFree')}
+              </Link>
+            </div>
           )}
 
-          {showHeroCta && !showClassroomHero && (
+          {showHeroCta && (
             <Link
               href={`/${language}/daily`}
               prefetch={false}
