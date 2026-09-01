@@ -155,7 +155,13 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
         {/* Metrics Dashboard */}
         <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
-          <ProGate feature="analytics">
+          <ProGate
+            feature="analytics"
+            preview={true}
+            classroomId={classroomId}
+            onViewStudents={handleViewStudents}
+            onCreateReviewLesson={handleCreateReviewLesson}
+          >
             <AnalyticsDashboard
               classroomId={classroomId}
               onViewStudents={handleViewStudents}

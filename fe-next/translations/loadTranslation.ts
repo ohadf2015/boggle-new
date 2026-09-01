@@ -18,6 +18,9 @@ export type TranslationData = Record<string, unknown>;
 // Cache for loaded translations (avoids re-importing on switch back)
 const cache = new Map<Language, TranslationData>();
 
+// Dev-only: track if we've already warned about missing i18n assets so we don't spam
+let hasWarnedAboutMissingAssets = false;
+
 /**
  * Global assigned by the hashed `public/i18n/<lang>.<hash>.js` asset that the
  * locale layout loads in <head>. Catalogues used to travel as a prop from the
@@ -35,6 +38,33 @@ function readGlobalMessages(lang: Language): TranslationData | undefined {
     | Record<string, TranslationData>
     | undefined;
   return bag?.[lang];
+}
+
+/**
+ * Dev-only warning: tells developers to run `npm run build:i18n` when the
+ * i18n assets are missing. This prevents silent hydration mismatches where
+ * `t()` returns raw key paths instead of translated text.
+ *
+ * The warning fires only once per page load and only in development.
+ */
+function warnMissingI18nAssets(): void {
+  // Suppress in production and in non-browser environments
+  if (typeof window === 'undefined' || process.env.NODE_ENV !== 'development') {
+    return;
+  }
+
+  // Warn only once per page load to avoid spam
+  if (hasWarnedAboutMissingAssets) {
+    return;
+  }
+
+  hasWarnedAboutMissingAssets = true;
+
+  console.warn(
+    '[LexiClash i18n] Translation assets missing — public/i18n/ was not generated.\n' +
+    'This causes hydration mismatches where `t()` returns raw key paths instead of translated text.\n' +
+    'Fix: run `npm run build:i18n` (this runs automatically in production builds).'
+  );
 }
 
 /**
@@ -97,6 +127,15 @@ export function getCachedTranslation(lang: Language): TranslationData | undefine
   if (fromGlobal) {
     cache.set(lang, fromGlobal);
     return fromGlobal;
+  }
+
+  // Dev-only: warn if we're in a browser and the global is missing.
+  // This prevents silent hydration mismatches where t() returns raw key paths.
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    // The global is missing, which means the <head> script either 404'd or hasn't
+    // run yet. In dev, this is almost always because public/i18n/ wasn't generated
+    // by npm run build:i18n (which only runs during npm run build, not npm run dev).
+    warnMissingI18nAssets();
   }
 
   // In test/server environments, load synchronously via require()

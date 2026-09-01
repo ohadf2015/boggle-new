@@ -409,7 +409,15 @@ export default function TeacherDashboard() {
                     </div>
                     {classroomSelect}
                     {selectedClassroomId && (
-                      <ProGate feature="analytics">
+                      <ProGate
+                        feature="analytics"
+                        preview={true}
+                        classroomId={selectedClassroomId}
+                        onCreateReviewLesson={(words) => {
+                          const wordsParam = encodeURIComponent(words.join(','));
+                          router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
+                        }}
+                      >
                         <AnalyticsDashboard
                           classroomId={selectedClassroomId}
                           onCreateReviewLesson={(words) => {

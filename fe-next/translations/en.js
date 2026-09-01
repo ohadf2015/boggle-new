@@ -11274,7 +11274,11 @@ const en = {
       "lastUpdated": "Last Updated"
     },
     "proGate": {
-      "cta": "Unlock this with Pro — ${{price}}/month"
+      "cta": "Unlock this with Pro — ${{price}}/month",
+      "analytics": {
+        "title": "Unlock Full Analytics",
+        "body": "See detailed progress per student, lesson effectiveness charts, vocabulary heatmaps, and export reports — everything you need to teach smarter."
+      }
     },
     "subscription": {
       "classLimitTitle": "You've Reached Your Class Limit",
@@ -11295,7 +11299,7 @@ const en = {
       "upgradePricingReassure": "Cancel anytime — your classrooms, lessons and student data always stay safe.",
       "pricePerDay": "About $0.30 a day",
       "everythingInFree": "Everything in Free, plus:",
-      "freeStartNote": "Great for trying it out — one class of 10 students. A real class outgrows it on day one.",
+      "freeStartNote": "Great for trying it out — up to 3 classes with 50 students each. That's a full-size class, completely free.",
       "proCtaSubtext": "Set up in 30 seconds · Cancel anytime",
       "trustCancel": "Cancel anytime, no lock-in",
       "trustDataSafe": "Your data stays safe",
@@ -11313,7 +11317,7 @@ const en = {
       "faqAutoRenew": "Will I be charged automatically?",
       "faqAutoRenewAnswer": "Yes, your subscription renews monthly. You'll receive a reminder email before each renewal. Cancel anytime to stop future charges.",
       "faqDataLoss": "Will I lose my data if I cancel?",
-      "faqDataLossAnswer": "No. If you cancel, your classrooms, lessons, and student data remain safe. You'll just revert to free-plan limits (1 class, 10 students per class).",
+      "faqDataLossAnswer": "No. If you cancel, your classrooms, lessons, and student data remain safe. You'll just revert to free-plan limits (3 classes, 50 students per class).",
       "legalNote": "By upgrading, you agree to our Terms of Service and understand our Refund Policy.",
       "refundPolicy": "Refund Policy",
       "renewsOn": "Next renewal",
@@ -11350,6 +11354,7 @@ const en = {
       "title": "Lesson recap",
       "yourMastery": "You found {{found}} of {{total}} lesson words",
       "classCoverage": "The class found {{found}} of {{total}} lesson words",
+      "teacherMoat": "These were your vocabulary words — hidden in the board. That's what makes LexiClash different.",
       "reteach": "Nobody found these",
       "allFound": "The class found every lesson word.",
       "practiceMissed": "Practise these words"
@@ -11485,7 +11490,8 @@ const en = {
       "viewStudents": "View Students",
       "viewVocabulary": "View Vocabulary",
       "vocabularyMastery": "Vocabulary Mastery",
-      "yesterday": "Yesterday"
+      "yesterday": "Yesterday",
+      "previewLocked": "Detailed analytics below — upgrade to Pro to unlock"
     },
     "classroomGame": {
       "classCode": "Game Code",
@@ -11521,7 +11527,8 @@ const en = {
       "title": "Classroom Game",
       "waitingForPlayers": "Setting up your classroom game...",
       "waitingForStudents": "Waiting for Students",
-      "words": "{{count}} words"
+      "words": "{{count}} words",
+      "vocabularyEmbedding": "These words will be hidden in the board when your class plays"
     },
     "header": {
       "breadcrumbs": {
@@ -11724,7 +11731,7 @@ const en = {
         },
         "q2": {
           "q": "Is there a free plan?",
-          "a": "Yes — a free basic plan for verified teachers: up to 1 class of 10 students, no ads on student-facing routes. Teacher Pro ($9/month) unlocks unlimited classes and students."
+          "a": "Yes — a free basic plan for verified teachers: up to 3 classes of 50 students each, no ads on student-facing routes. Teacher Pro ($9/month) unlocks unlimited classes and students."
         },
         "q3": {
           "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?",
@@ -12181,7 +12188,7 @@ const en = {
       "hours_left": "hours left",
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
-      "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",
+      "expired_body": "Your free 14-day trial is over. Keep unlimited classroom access with Pro — $9/month, cancel anytime.",
       "renew_cta": "Renew teacher access"
     },
     "forSchools": {

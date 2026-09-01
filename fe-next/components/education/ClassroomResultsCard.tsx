@@ -60,6 +60,13 @@ export function ClassroomResultsCard({
         </div>
       </div>
 
+      {isTeacher && (
+        <p className="text-neo-lime font-bold text-sm mb-3 flex items-start gap-2">
+          <span className="flex-shrink-0">📚</span>
+          <span>{t('education.results.teacherMoat')}</span>
+        </p>
+      )}
+
       <p className="text-neo-white font-bold mb-3">
         {isTeacher
           ? t('education.results.classCoverage', {

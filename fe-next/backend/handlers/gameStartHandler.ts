@@ -447,8 +447,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Check if this is a classroom game
     const classroomGame = await getClassroomGame(gameCode);
+    // CRITICAL: Normalize lesson vocabulary using the SAME normalization as board embedding
+    // (see gameUtils.ts generateTableWithEmbeddedWords). For Hebrew, this collapses final
+    // letters to regular forms; for Spanish, removes accents; for Russian, folds ё→е.
+    // Without this normalization, a student finding "שלו" on the board won't match the
+    // set containing "שלום" (the teacher's un-normalized input).
     const lessonVocabulary = classroomGame?.vocabularyWords
-      ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
+      ? new Set(classroomGame.vocabularyWords.map(w => normalizeWordForLanguage(w, gameLang).toUpperCase()))
       : undefined;
 
     // SECURITY: Regenerate grid server-side for ALL multiplayer games (2+ players).

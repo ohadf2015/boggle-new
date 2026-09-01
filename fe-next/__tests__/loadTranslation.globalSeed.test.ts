@@ -48,4 +48,71 @@ describe('getCachedTranslation — global seed', () => {
     // to the async import rather than receiving another language's strings.
     expect(mod.getCachedTranslation('sv')).not.toEqual({ nav: { howToPlay: 'איך משחקים' } });
   });
+
+  it('warns once when i18n assets are missing in development (browser)', () => {
+    // Simulate a browser environment in development where the global is not set
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      // stubEnv, not direct assignment: NODE_ENV is typed readonly, and a raw
+      // assignment fails `next build`'s typecheck even though vitest tolerates it.
+      vi.stubEnv('NODE_ENV', 'development');
+      // Make sure we're treating this as a browser (typeof window !== 'undefined' is true in jsdom)
+
+      // First call should warn
+      mod.getCachedTranslation('en');
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Translation assets missing')
+      );
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('npm run build:i18n')
+      );
+
+      const callCountAfterFirst = warnSpy.mock.calls.length;
+
+      // Second call should NOT warn again (once-per-page guard)
+      mod.getCachedTranslation('he');
+      expect(warnSpy.mock.calls.length).toBe(callCountAfterFirst);
+    } finally {
+      vi.unstubAllEnvs();
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('does not warn when i18n assets are missing in production', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      vi.stubEnv('NODE_ENV', 'production');
+
+      mod.getCachedTranslation('en');
+      // Should not warn in production
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining('Translation assets missing')
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('does not warn when global is present', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      vi.stubEnv('NODE_ENV', 'development');
+      (globalThis as Record<string, unknown>)[GLOBAL] = {
+        en: { nav: { howToPlay: 'How to Play' } },
+      };
+
+      mod.getCachedTranslation('en');
+      // Should not warn when the global is present
+      expect(warnSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining('Translation assets missing')
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      warnSpy.mockRestore();
+    }
+  });
 });

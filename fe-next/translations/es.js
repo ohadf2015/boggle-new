@@ -12216,7 +12216,11 @@ const es = {
   },
   "teacher": {
     "proGate": {
-      "cta": "Desbloquéalo con Pro: ${{price}}/mes"
+      "cta": "Desbloquéalo con Pro: ${{price}}/mes",
+      "analytics": {
+        "title": "Desbloquea Análisis Completos",
+        "body": "Ve el progreso detallado por estudiante, gráficos de efectividad de lecciones, mapas de calor de vocabulario y exporta reportes — todo lo que necesitas para enseñar mejor."
+      }
     },
     "subscription": {
       "classLimitTitle": "Has alcanzado el límite de clases",
@@ -12237,7 +12241,7 @@ const es = {
       "upgradePricingReassure": "Cancela cuando quieras: tus aulas, lecciones y datos de estudiantes siempre están seguros.",
       "pricePerDay": "Unos $0,30 al día",
       "everythingInFree": "Todo lo del plan Free, y además:",
-      "freeStartNote": "Ideal para probarlo: una clase de 10 estudiantes. Una clase real lo supera el primer día.",
+      "freeStartNote": "Ideal para probarlo: hasta 3 clases de 50 estudiantes cada una. Esa es una clase de tamaño completo, completamente gratis.",
       "proCtaSubtext": "Listo en 30 segundos · Cancela cuando quieras",
       "trustCancel": "Cancela cuando quieras, sin permanencia",
       "trustDataSafe": "Tus datos están a salvo",
@@ -12255,7 +12259,7 @@ const es = {
       "faqAutoRenew": "¿Se me cobrará automáticamente?",
       "faqAutoRenewAnswer": "Sí, tu suscripción se renueva cada mes. Recibirás un correo de recordatorio antes de cada renovación. Cancela cuando quieras para detener cobros futuros.",
       "faqDataLoss": "¿Perderé mis datos si cancelo?",
-      "faqDataLossAnswer": "No. Si cancelas, tus aulas, lecciones y datos de estudiantes siguen a salvo. Solo volverás a los límites del plan gratuito (1 clase, 10 estudiantes por clase).",
+      "faqDataLossAnswer": "No. Si cancelas, tus aulas, lecciones y datos de estudiantes permanecen seguros. Solo volverás a los límites del plan gratuito (3 clases, 50 estudiantes por clase).",
       "legalNote": "Al mejorar tu plan, aceptas nuestros Términos del servicio y entiendes nuestra Política de reembolsos.",
       "refundPolicy": "Política de reembolsos",
       "renewsOn": "Próxima renovación",
@@ -12767,6 +12771,7 @@ const es = {
       "title": "Resumen de la lección",
       "yourMastery": "Encontraste {{found}} de {{total}} palabras de la lección",
       "classCoverage": "La clase encontró {{found}} de {{total}} palabras de la lección",
+      "teacherMoat": "Estas fueron tus palabras de vocabulario — ocultas en el tablero. Eso es lo que hace diferente a LexiClash.",
       "reteach": "Nadie encontró estas",
       "allFound": "La clase encontró todas las palabras de la lección.",
       "practiceMissed": "Practicar estas palabras"
@@ -12911,7 +12916,8 @@ const es = {
       "viewStudents": "Estudiantes",
       "viewVocabulary": "Vocabulario",
       "vocabularyMastery": "Dominio de vocabulario",
-      "yesterday": "Ayer"
+      "yesterday": "Ayer",
+      "previewLocked": "Análisis detallados a continuación — actualiza a Pro para desbloquear"
     },
     "classroomGame": {
       "classCode": "Código del juego",
@@ -12947,7 +12953,8 @@ const es = {
       "title": "Juego en vivo",
       "waitingForPlayers": "Preparando tu juego de clase...",
       "waitingForStudents": "Esperando a los estudiantes",
-      "words": "{{count}} palabras"
+      "words": "{{count}} palabras",
+      "vocabularyEmbedding": "Estas palabras estarán ocultas en el tablero cuando tu clase juegue"
     },
     "header": {
       "breadcrumbs": {
@@ -13150,7 +13157,7 @@ const es = {
         },
         "q2": {
           "q": "¿Hay un plan gratis?",
-          "a": "Sí — un plan básico gratis para docentes verificados: hasta 1 clase de 10 estudiantes, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
+          "a": "Sí — un plan básico gratuito para docentes verificados: hasta 3 clases de 50 estudiantes cada una, sin anuncios en las rutas de estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
         },
         "q3": {
           "q": "¿Soporta hebreo, japonés, sueco y español?",
@@ -13598,7 +13605,7 @@ const es = {
       "hours_left": "horas restantes",
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
-      "expired_body": "Tu periodo de prueba gratis ha terminado. Vuelve a solicitarlo o escríbenos para conservar el modo aula.",
+      "expired_body": "Tu periodo de prueba gratis de 14 días ha terminado. Mantén el acceso ilimitado al aula con Pro — $9/mes, cancela en cualquier momento.",
       "renew_cta": "Renovar acceso de profesor"
     },
     "forSchools": {

@@ -12224,7 +12224,11 @@ const ja = {
   },
   "teacher": {
     "proGate": {
-      "cta": "Pro で解除 — 月額 ${{price}}"
+      "cta": "Pro で解除 — 月額 ${{price}}",
+      "analytics": {
+        "title": "完全な分析を解除",
+        "body": "学生別の詳細な進捗、レッスン効果のグラフ、語彙のヒートマップ、レポートのエクスポート — より良い教学に必要なすべてをご覧ください。"
+      }
     },
     "subscription": {
       "classLimitTitle": "クラスの上限に達しました",
@@ -12245,7 +12249,7 @@ const ja = {
       "upgradePricingReassure": "いつでも解約可能 — クラス、レッスン、生徒データは常に安全に保たれます。",
       "pricePerDay": "1日あたり約$0.30",
       "everythingInFree": "無料プランのすべてに加えて：",
-      "freeStartNote": "お試しに最適 — 1クラス10人まで。実際のクラスは初日で上限を超えます。",
+      "freeStartNote": "お試しに最適 — 最大3クラス、各クラス50人まで。完全なサイズのクラス、完全に無料です。",
       "proCtaSubtext": "30秒で設定 · いつでも解約可能",
       "trustCancel": "いつでも解約、契約の縛りなし",
       "trustDataSafe": "データは安全に保たれます",
@@ -12263,7 +12267,7 @@ const ja = {
       "faqAutoRenew": "自動的に請求されますか？",
       "faqAutoRenewAnswer": "はい、サブスクリプションは毎月更新されます。更新前にリマインダーメールが届きます。いつでも解約して今後の請求を停止できます。",
       "faqDataLoss": "解約するとデータは失われますか？",
-      "faqDataLossAnswer": "いいえ。解約しても、クラス、レッスン、生徒データは安全に保たれます。無料プランの上限（1クラス、1クラス10人）に戻るだけです。",
+      "faqDataLossAnswer": "いいえ。解約しても、クラス、レッスン、生徒データは安全に保たれます。無料プランの上限（3クラス、各クラス50人）に戻るだけです。",
       "legalNote": "アップグレードすると、利用規約に同意し、返金ポリシーを理解したものとみなされます。",
       "refundPolicy": "返金ポリシー",
       "renewsOn": "次回の更新",
@@ -12775,6 +12779,7 @@ const ja = {
       "title": "レッスンのまとめ",
       "yourMastery": "レッスンの単語 {{total}} 個のうち {{found}} 個を発見",
       "classCoverage": "クラスはレッスンの単語 {{total}} 個のうち {{found}} 個を発見",
+      "teacherMoat": "これらはあなたの語彙の単語でした — ボードに隠されていました。それがLexiClashを異なるものにしています。",
       "reteach": "誰も見つけられなかった単語",
       "allFound": "クラスはすべての単語を見つけました。",
       "practiceMissed": "この単語を練習する"
@@ -12919,7 +12924,8 @@ const ja = {
       "viewStudents": "生徒を見る",
       "viewVocabulary": "語彙を見る",
       "vocabularyMastery": "語彙の習熟度",
-      "yesterday": "昨日"
+      "yesterday": "昨日",
+      "previewLocked": "詳細な分析は以下です — Pro にアップグレードしてロック解除"
     },
     "classroomGame": {
       "classCode": "ゲームコード",
@@ -12955,7 +12961,8 @@ const ja = {
       "title": "クラスゲーム",
       "waitingForPlayers": "クラスゲームの準備中...",
       "waitingForStudents": "生徒を待機中",
-      "words": "{{count}}語"
+      "words": "{{count}}語",
+      "vocabularyEmbedding": "クラスがプレイするときに、これらの単語がボードに隠されます"
     },
     "header": {
       "breadcrumbs": {
@@ -13158,7 +13165,7 @@ const ja = {
         },
         "q2": {
           "q": "無料プランはありますか？",
-          "a": "はい — 認定教師向けの無料基本プラン：最大1クラス、10人まで、生徒への広告なし。Teacher Pro（月$9）でクラスと生徒数が無制限になります。"
+          "a": "はい — 認定教師向けの無料基本プラン：最大3クラス、各クラス50人まで、生徒向けページへの広告なし。Teacher Pro（月$9）でクラスと生徒数が無制限になります。"
         },
         "q3": {
           "q": "本当にヘブライ語・日本語・スウェーデン語・スペイン語に対応していますか？",
@@ -13617,7 +13624,7 @@ const ja = {
       "hours_left": "時間残り",
       "cta": "最初のクラスを作成",
       "expired_title": "教師トライアルが終了しました",
-      "expired_body": "無料トライアル期間が終了しました。教室モードを続けるには、再申請またはお問い合わせください。",
+      "expired_body": "14日間の無料トライアル期間が終了しました。Pro で無制限の教室アクセスを保つ — 月額 9 ドル、いつでもキャンセル可能。",
       "renew_cta": "教師アクセスを更新"
     },
     "forSchools": {

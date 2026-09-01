@@ -12462,7 +12462,11 @@ const sv = {
   },
   "teacher": {
     "proGate": {
-      "cta": "Lås upp med Pro — ${{price}}/månad"
+      "cta": "Lås upp med Pro — ${{price}}/månad",
+      "analytics": {
+        "title": "Lås upp fullständig analys",
+        "body": "Se detaljerad progress för varje elev, diagrammen över lektionseffektivitet, ordförrådsvärmekartorna och exportera rapporter — allt du behöver för att undervisa bättre."
+      }
     },
     "subscription": {
       "classLimitTitle": "Du har nått din klassgräns",
@@ -12483,7 +12487,7 @@ const sv = {
       "upgradePricingReassure": "Avsluta när du vill — dina klassrum, lektioner och elevdata är alltid säkra.",
       "pricePerDay": "Ungefär $0,30 per dag",
       "everythingInFree": "Allt i Free, plus:",
-      "freeStartNote": "Perfekt för att testa — en klass med 10 elever. En riktig klass växer ur det första dagen.",
+      "freeStartNote": "Perfekt för att testa — upp till 3 klasser med 50 elever varje. Det är en klass i full storlek, helt gratis.",
       "proCtaSubtext": "Klart på 30 sekunder · Avsluta när du vill",
       "trustCancel": "Avsluta när du vill, ingen bindningstid",
       "trustDataSafe": "Dina data är säkra",
@@ -12501,7 +12505,7 @@ const sv = {
       "faqAutoRenew": "Dras betalningen automatiskt?",
       "faqAutoRenewAnswer": "Ja, din prenumeration förnyas varje månad. Du får ett påminnelsemail före varje förnyelse. Avsluta när du vill för att stoppa framtida betalningar.",
       "faqDataLoss": "Förlorar jag mina data om jag avslutar?",
-      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (1 klass, 10 elever per klass).",
+      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (3 klasser, 50 elever per klass).",
       "legalNote": "Genom att uppgradera godkänner du våra Användarvillkor och förstår vår Återbetalningspolicy.",
       "refundPolicy": "Återbetalningspolicy",
       "renewsOn": "Nästa förnyelse",
@@ -13013,6 +13017,7 @@ const sv = {
       "title": "Lektionssammanfattning",
       "yourMastery": "Du hittade {{found}} av {{total}} lektionsord",
       "classCoverage": "Klassen hittade {{found}} av {{total}} lektionsord",
+      "teacherMoat": "Dessa var dina ordförrådsord — gömda på brädet. Det är vad som gör LexiClash annorlunda.",
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
       "practiceMissed": "Öva de här orden"
@@ -13157,7 +13162,8 @@ const sv = {
       "viewStudents": "Se elever",
       "viewVocabulary": "Se ordförråd",
       "vocabularyMastery": "Ordförrådsbehärskning",
-      "yesterday": "Igår"
+      "yesterday": "Igår",
+      "previewLocked": "Detaljerad analys nedan — uppgradera till Pro för att låsa upp"
     },
     "classroomGame": {
       "classCode": "Spelkod",
@@ -13193,7 +13199,8 @@ const sv = {
       "title": "Klassrumsspel",
       "waitingForPlayers": "Förbereder klassrumsspelet...",
       "waitingForStudents": "Väntar på elever",
-      "words": "{{count}} ord"
+      "words": "{{count}} ord",
+      "vocabularyEmbedding": "Dessa ord kommer att vara dolda på brädet när din klass spelar"
     },
     "header": {
       "breadcrumbs": {
@@ -13396,7 +13403,7 @@ const sv = {
         },
         "q2": {
           "q": "Finns det en gratisplan?",
-          "a": "Ja — en gratis basplan för verifierade lärare: upp till 1 klass med 10 elever, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
+          "a": "Ja — en gratis basplan för verifierade lärare: upp till 3 klasser med 50 elever varje, inga annonser på studentfärdiga vägar. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
         },
         "q3": {
           "q": "Stöder LexiClash hebreiska, japanska, svenska och spanska?",
@@ -13855,7 +13862,7 @@ const sv = {
       "hours_left": "timmar kvar",
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprövoperiod har tagit slut",
-      "expired_body": "Din gratis prövoperiod är slut. Ansök igen eller kontakta oss för att behålla klassrumsläget.",
+      "expired_body": "Din 14-dagars gratisprov är slut. Behåll obegränsad klassrumåtkomst med Pro — 9 USD/månad, avsluta när som helst.",
       "renew_cta": "Förnya lärarbehörighet"
     },
     "forSchools": {

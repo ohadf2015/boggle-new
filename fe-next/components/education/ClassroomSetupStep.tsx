@@ -139,10 +139,18 @@ export function ClassroomSetupStep({
           />
 
           {selectedLessonIds.length > 0 && (
-            <div className="mt-4 p-3 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30">
-              <p className="text-neo-white font-bold text-center">
-                {t('education.classroomGame.words', { count: allPlayableWords.length })}
-              </p>
+            <div className="space-y-3">
+              <div className="p-3 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30">
+                <p className="text-neo-white font-bold text-center">
+                  {t('education.classroomGame.words', { count: allPlayableWords.length })}
+                </p>
+              </div>
+              <div className="p-3 bg-neo-lime/10 rounded-neo border border-neo-lime/30 flex items-start gap-2">
+                <span className="text-lg flex-shrink-0">📚</span>
+                <p className="text-neo-white text-sm">
+                  {t('education.classroomGame.vocabularyEmbedding')}
+                </p>
+              </div>
             </div>
           )}
         </div>
