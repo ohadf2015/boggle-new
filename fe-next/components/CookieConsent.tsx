@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -37,6 +37,7 @@ export default function CookieConsent() {
   const [showDetails, setShowDetails] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [advertising, setAdvertising] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -75,6 +76,37 @@ export default function CookieConsent() {
   // The page behind it remains scrollable and usable, satisfying the "non-blocking"
   // requirement and removing the main-thread composite cost of a full-screen
   // backdrop. Prior scroll-lock effect removed as part of Option A.
+
+  // Non-blocking is not enough on its own: the sheet is a FIXED band at the
+  // viewport bottom, and it covered bottom CTAs (seen live on the Arena hub —
+  // the sheet hid Multiplayer QUICK START / CREATE PRIVATE BATTLE behind
+  // "Care for a cookie?"). Reserve its measured height exactly like the bottom
+  // nav / ad banner do: `has-cookie-consent` on <html> + `--cookie-consent-height`
+  // feed the body.screen-fit padding-bottom rule in globals.css, so page content
+  // shifts up clear of the sheet instead of sliding under it. ResizeObserver
+  // tracks the sheet growing (the Customize panel) and viewport resizes; the
+  // reservation is removed the moment a consent choice hides the sheet.
+  useEffect(() => {
+    if (!visible) return;
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+    const root = document.documentElement;
+    const apply = () => {
+      root.style.setProperty('--cookie-consent-height', `${sheet.offsetHeight}px`);
+    };
+    apply();
+    root.classList.add('has-cookie-consent');
+    const observer =
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(apply) : null;
+    observer?.observe(sheet);
+    window.addEventListener('resize', apply);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', apply);
+      root.classList.remove('has-cookie-consent');
+      root.style.removeProperty('--cookie-consent-height');
+    };
+  }, [visible]);
 
   // Load existing state when showing details
   useEffect(() => {
@@ -124,6 +156,7 @@ export default function CookieConsent() {
     // Fixed bottom sheet. No full-screen backdrop, no backdrop-filter.
     // A reserved min-height prevents layout shift when the sheet mounts.
     <div
+      ref={sheetRef}
       role="dialog"
       aria-modal="false"
       aria-label={t('cookieConsent.title')}
