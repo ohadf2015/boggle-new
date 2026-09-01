@@ -2255,3 +2255,22 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: reviewed, no action (false positive / intentional)
   - why: migration 20260815100000_friends_read_public_profiles.sql explicitly documents definer semantics as BY DESIGN — setting security_invoker=on silently re-breaks friends/DM cross-player reads (own-row RLS on profiles). Do not remediate.
   - recommended owner: self (closed)
+
+## 2026-09-01
+- [Restore] 20260817-010002 (10 files, dropped 2026-08-17, STALE 15 nights) and 20260827-010001 (8 files, dropped 2026-08-27) not yet restored — ran out of time budget this lane
+  - status: deferred
+  - why: time budget consumed by 20260831-010002 restore+fix; each restore needs its own root-cause review before re-shipping
+  - recommended owner: self (lane 01, tomorrow — highest priority, older stale restore first)
+- [Sentry] ReferenceError: Can't find variable: EmptyRanges — 3 occurrences/24h
+  - link: https://eu.posthog.com/project/151059/error_tracking/01a057f0-856c-7282-b788-deec78a83695
+  - status: deferred
+  - why: not reached, time budget spent on restore
+  - recommended owner: self (lane 01, tomorrow)
+- [Sentry] FedCM GSI_LOGGER NotSupportedError (JAVASCRIPT-NEXTJS-1RE) and "Error: Game hasn't started yet" (JAVASCRIPT-NEXTJS-1Y8) — not investigated
+  - status: deferred
+  - why: not reached
+  - recommended owner: self (lane 01, tomorrow)
+- [Supabase] Security Definer View on public.public_profiles — advisor flagged
+  - status: deferred
+  - why: not reached; also ambiguous root cause (security_invoker unset per memory education-module-audit-2026-08-20) — needs read of the view definition before a REVOKE/ALTER, borderline DEFER side of matrix
+  - recommended owner: self (lane 01, tomorrow) or backend review
