@@ -2278,6 +2278,7 @@ const he = {
       "yourName": "קוראים לי...",
       "namePlaceholder": "שם הקרב שלך",
       "roomNameLabel": "שם החדר",
+      "roomNamePlaceholder": "החדר של {{name}}",
       "optional": "אופציונלי",
       "createButton": "התחל קרב",
       "creating": "מכין זירה...",
@@ -2303,7 +2304,13 @@ const he = {
       "continueButton": "הבא",
       "selectAvatar": "בחר אווטאר"
     },
-    "createForm": {
+        "waitingRoomInvite": {
+      "prompt": "ממתין לחברים...",
+      "copy": "העתק קישור הזמנה",
+      "copied": "הקישור הועתק!",
+      "share": "שתף"
+    },
+"createForm": {
       "title": "כמעט שם!",
       "progress": "2 מתוך 2",
       "profileLabel": "אתה",
@@ -3235,7 +3242,8 @@ const he = {
     "banner": {
       "host": "מצטרפים לחדר של {hostName}",
       "yourFriend": "החבר שלך",
-      "skipCTA": "דלג והצטרף"
+      "skipCTA": "דלג והצטרף",
+      "copyCode": "העתק קוד חדר"
     },
     "profile": {
       "header": "מצטרף לחדר של {hostName}"

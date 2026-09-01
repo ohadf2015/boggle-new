@@ -2567,6 +2567,7 @@ const sv = {
       "yourName": "Kalla mig...",
       "namePlaceholder": "Ditt stridsnamn",
       "roomNameLabel": "Rumsnamn",
+      "roomNamePlaceholder": "{{name}}s rum",
       "optional": "valfritt",
       "createButton": "Starta striden!",
       "creating": "Förbereder arenan...",
@@ -2592,7 +2593,13 @@ const sv = {
       "continueButton": "Nästa",
       "selectAvatar": "Välj Avatar"
     },
-    "createForm": {
+        "waitingRoomInvite": {
+      "prompt": "Väntar på vänner...",
+      "copy": "Kopiera inbjudningslänk",
+      "copied": "Länk kopierad!",
+      "share": "Dela"
+    },
+"createForm": {
       "title": "Nästan där!",
       "progress": "2 av 2",
       "profileLabel": "Du",
@@ -3481,7 +3488,8 @@ const sv = {
     "banner": {
       "host": "Du går med i {hostName}s rum",
       "yourFriend": "Din kompis",
-      "skipCTA": "Hoppa över och gå med"
+      "skipCTA": "Hoppa över och gå med",
+      "copyCode": "Kopiera rumskod"
     },
     "profile": {
       "header": "Går med i {hostName}s rum"

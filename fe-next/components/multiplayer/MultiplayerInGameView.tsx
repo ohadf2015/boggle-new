@@ -414,7 +414,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           aria-busy="true"
           aria-label={t('common.loading')}
         >
-          <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
+          <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4 pointer-events-none" aria-label="Loading board">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={`tile-${i}`}

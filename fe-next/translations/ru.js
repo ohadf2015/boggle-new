@@ -3934,7 +3934,8 @@ const ru = {
     "banner": {
       "host": "Присоединяюсь к комнате {hostName}",
       "yourFriend": "Твой друг",
-      "skipCTA": "Пропустить и присоединиться сейчас"
+      "skipCTA": "Пропустить и присоединиться сейчас",
+      "copyCode": "Скопировать код комнаты"
     },
     "profile": {
       "header": "Присоединяюсь к комнате {hostName}"
@@ -10974,6 +10975,7 @@ const ru = {
       "yourName": "Называй меня...",
       "namePlaceholder": "Твоё боевое имя",
       "roomNameLabel": "Имя Комнаты",
+      "roomNamePlaceholder": "Комната {{name}}",
       "optional": "опционально",
       "createButton": "Начать Битву",
       "creating": "Подготавливаем арену...",
@@ -10999,7 +11001,13 @@ const ru = {
       "continueButton": "Дальше",
       "selectAvatar": "Выбери Аватар"
     },
-    "createForm": {
+        "waitingRoomInvite": {
+      "prompt": "Ждем друзей...",
+      "copy": "Скопировать ссылку-приглашение",
+      "copied": "Ссылка скопирована!",
+      "share": "Поделиться"
+    },
+"createForm": {
       "title": "Почти Готово!",
       "progress": "2 из 2",
       "profileLabel": "Ты",

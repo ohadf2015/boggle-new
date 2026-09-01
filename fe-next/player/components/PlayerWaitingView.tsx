@@ -307,7 +307,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 className="shrink-0 flex flex-col items-center gap-1.5"
               >
                 <div
-                  className="relative animate-avatar-float"
+                  className="relative animate-avatar-float pointer-events-none"
                   style={{ animationDelay: `${index * 200}ms` }}
                 >
                   {isHostPlayer && (

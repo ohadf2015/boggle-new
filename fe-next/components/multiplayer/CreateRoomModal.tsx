@@ -107,8 +107,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     const sanitized = hostName
       .replace(/[‎‏؜‪-‮⁦-⁩​-‍﻿']/g, '')
       .trim();
-    return `${sanitized} Room`;
-  }, []);
+    return t('multiplayerFlow.createModal.roomNamePlaceholder', { name: sanitized });
+  }, [t]);
 
   const handleCreate = useCallback(() => {
     setHasAttemptedSubmit(true);
@@ -273,6 +273,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               id="create-room-name"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               maxLength={MAX_ROOM_LENGTH}
               placeholder={generateRoomName(username || 'Your')}
               className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/50 outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"

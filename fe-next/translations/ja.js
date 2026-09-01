@@ -2277,6 +2277,7 @@ const ja = {
       "yourName": "呼び名は...",
       "namePlaceholder": "バトルネーム",
       "roomNameLabel": "ルーム名",
+      "roomNamePlaceholder": "{{name}}のルーム",
       "optional": "任意",
       "createButton": "バトル開始！",
       "creating": "アリーナ準備中...",
@@ -2302,7 +2303,13 @@ const ja = {
       "continueButton": "次へ",
       "selectAvatar": "アバター選択"
     },
-    "createForm": {
+        "waitingRoomInvite": {
+      "prompt": "友達を待っています...",
+      "copy": "招待リンクをコピー",
+      "copied": "リンクをコピーしました！",
+      "share": "共有"
+    },
+"createForm": {
       "title": "もうすぐ！",
       "progress": "2/2",
       "profileLabel": "あなた",
@@ -3192,7 +3199,8 @@ const ja = {
     "banner": {
       "host": "{hostName}さんのルームに参加:",
       "yourFriend": "お友達",
-      "skipCTA": "スキップして参加"
+      "skipCTA": "スキップして参加",
+      "copyCode": "ルームコードをコピー"
     },
     "profile": {
       "header": "{hostName}さんのルームに参加中"

@@ -295,7 +295,7 @@ export function useMultiplayerSocket(
           reconnectFallbackTimerRef.current = null;
           logger.log('[SOCKET.IO] Requesting game state (startGame not received after join/reconnect)');
           socketInstance.emit('requestGameState');
-        }, 5000);
+        }, 2500);
         reconnectFallbackTimerRef.current = fallbackTimer;
         // The fallback is cancelled in the main startGame/resetGame handlers below
         // via reconnectFallbackTimerRef — no once() listeners needed, which avoids
