@@ -13,7 +13,7 @@ import { fetchWithAuth } from '@/utils/authFetch';
 import { ComebackBonusModal } from '@/components/engagement/ComebackBonusModal';
 import type { ComebackStatus } from '@/shared/types/engagement';
 
-const SESSION_KEY = 'comeback_bonus_checked';
+const SESSION_KEY = 'comeback_bonus_checked_v2';
 
 export default function ComebackBonusWrapper() {
   const { user, profile } = useAuth();
