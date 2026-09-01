@@ -38,8 +38,9 @@ function readString(catalogue: unknown, path: string, fallback: string): string 
 
 async function payloadFrom(props: PageProps): Promise<ClassGapSharePayload> {
   const [{ locale }, query] = await Promise.all([props.params, props.searchParams]);
-  const parsed = parseClassGapShareParams(searchRecordToParams(query));
-  return { ...parsed, locale: parsed.locale || locale };
+  const sp = searchRecordToParams(query);
+  if (!sp.get('lang') && !sp.get('locale')) sp.set('lang', locale);
+  return parseClassGapShareParams(sp);
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {

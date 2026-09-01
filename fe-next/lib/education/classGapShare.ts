@@ -13,7 +13,10 @@ export const MAX_WORD_LENGTH = 32;
 export const MAX_LESSON_LENGTH = 80;
 export const MAX_TEACHER_LENGTH = 40;
 
-const LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
+
+export type ClassGapLocale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
+
+const LOCALES = new Set<ClassGapLocale>(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 export interface ClassGapShareInput {
   locale: string;
@@ -25,7 +28,7 @@ export interface ClassGapShareInput {
 }
 
 export interface ClassGapSharePayload {
-  locale: string;
+  locale: ClassGapLocale;
   lesson: string;
   teacher: string;
   found: number;
@@ -33,8 +36,8 @@ export interface ClassGapSharePayload {
   missedWords: string[];
 }
 
-export function normalizeLocale(locale: string | undefined | null): string {
-  const l = (locale || 'en').toLowerCase().split('-')[0];
+export function normalizeLocale(locale: string | undefined | null): ClassGapLocale {
+  const l = (locale || 'en').toLowerCase().split('-')[0] as ClassGapLocale;
   return LOCALES.has(l) ? l : 'en';
 }
 
