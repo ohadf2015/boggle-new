@@ -90,7 +90,7 @@ export async function recordLogin(playerId: string): Promise<LoginResult> {
   const longestStreak = Math.max(newStreak, engagement.longest_streak || 0);
 
   await supabase.from('player_engagement').update({
-    current_streak: newStreak, longest_streak: longestStreak, last_login_date: today, last_played_at: new Date().toISOString(), games_today: 0,
+    current_streak: newStreak, longest_streak: longestStreak, last_login_date: today, games_today: 0,
   }).eq('player_id', playerId);
 
   const newMilestones: StreakBonusWithDays[] = [];
