@@ -80,23 +80,25 @@ describe('Banner suppress/restore — integration', () => {
     );
 
     // Initial show fires (anchor registers its request).
-    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
     hideBannerSpy.mockClear();
     showBannerSpy.mockClear();
     resumeBannerSpy.mockClear();
 
     // Drawer opens → suppress → native hide. Poll: the MutationObserver that
     // detects the class and the controller's serialized queue both resolve
-    // asynchronously, and a single flush can race them under CI load.
+    // asynchronously, and a single flush can race them under CI load. Timeouts
+    // are 15s (not the 5s default used before) because a loaded CI shard can
+    // stall the jsdom task queue well past 5s — that flake failed test (3).
     document.documentElement.classList.add('mobile-drawer-open');
-    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
 
     // Drawer closes → release → banner returns, visibility restored FIRST.
     document.documentElement.classList.remove('mobile-drawer-open');
     await waitFor(() => {
       expect(resumeBannerSpy).toHaveBeenCalled(); // un-hide the GONE AdView
       expect(showBannerSpy).toHaveBeenCalled();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
   });
 
   it('hides while a modal is open (html.modal-open) and restores when it closes', async () => {
@@ -111,21 +113,21 @@ describe('Banner suppress/restore — integration', () => {
       </>,
     );
 
-    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
     hideBannerSpy.mockClear();
     showBannerSpy.mockClear();
     resumeBannerSpy.mockClear();
 
     // A dialog opens (the shared DialogContent ref-counts this class) → suppress.
     document.documentElement.classList.add('modal-open');
-    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
 
     // Dialog closes → banner returns (visibility restored first, then re-show).
     document.documentElement.classList.remove('modal-open');
     await waitFor(() => {
       expect(resumeBannerSpy).toHaveBeenCalled();
       expect(showBannerSpy).toHaveBeenCalled();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
   });
 
   it('hides while the feedback widget modal is open (html.fdw-modal-open)', async () => {
@@ -142,18 +144,18 @@ describe('Banner suppress/restore — integration', () => {
       </>,
     );
 
-    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
     hideBannerSpy.mockClear();
     showBannerSpy.mockClear();
     resumeBannerSpy.mockClear();
 
     document.documentElement.classList.add('fdw-modal-open');
-    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
 
     document.documentElement.classList.remove('fdw-modal-open');
     await waitFor(() => {
       expect(resumeBannerSpy).toHaveBeenCalled();
       expect(showBannerSpy).toHaveBeenCalled();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
   });
 });
