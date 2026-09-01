@@ -7,6 +7,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
+let mockIsOnCG = false;
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG }),
+}));
+
 vi.mock('framer-motion', () => {
   const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
     const safe = { ...props };
@@ -37,12 +42,30 @@ const player = { id: '1', username: 'alice', displayName: 'Alice', totalScore: 1
 describe('LandingHero', () => {
   const baseProps = { players: [player], playersLoading: false, isMobilePortrait: false };
 
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    mockIsOnCG = false;
+    vi.clearAllMocks();
+  });
 
-  it('renders mascot and title', () => {
+  it('renders mascot and classroom title on web', () => {
     render(<LandingHero {...baseProps} />);
     expect(screen.getByTestId('mascot')).toBeInTheDocument();
+    expect(screen.getByText('landing.classroomTitle')).toBeInTheDocument();
+    expect(screen.queryByText('landing.welcomeTitle')).not.toBeInTheDocument();
+  });
+
+  it('always shows For Teachers CTA on web', () => {
+    render(<LandingHero {...baseProps} />);
+    const cta = screen.getByText('landing.forTeachersCta');
+    expect(cta.closest('a')).toHaveAttribute('href', '/en/education');
+  });
+
+  it('keeps consumer copy on CrazyGames (no teacher CTA)', () => {
+    mockIsOnCG = true;
+    render(<LandingHero {...baseProps} />);
     expect(screen.getByText('landing.welcomeTitle')).toBeInTheDocument();
+    expect(screen.queryByText('landing.classroomTitle')).not.toBeInTheDocument();
+    expect(screen.queryByText('landing.forTeachersCta')).not.toBeInTheDocument();
   });
 
   it('does not render welcome subtitle', () => {
