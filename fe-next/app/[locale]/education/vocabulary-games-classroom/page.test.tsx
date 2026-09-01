@@ -46,4 +46,15 @@ describe('vocabulary-games-classroom page', () => {
       expect(meta.description).toContain('Free vocabulary games for the classroom');
     });
   });
+
+  describe('guest CTAs', () => {
+    it('hit playable student practice, not teacher-only classroom-game', async () => {
+      const { container } = render(
+        await Page({ params: Promise.resolve({ locale: 'en' }) })
+      );
+      const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href') || '');
+      expect(hrefs.some((h) => h.includes('classroom-game'))).toBe(false);
+      expect(hrefs.some((h) => h.includes('/daily/word-hunt'))).toBe(true);
+    });
+  });
 });

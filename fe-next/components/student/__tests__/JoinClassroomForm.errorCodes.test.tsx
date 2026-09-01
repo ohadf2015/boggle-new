@@ -84,4 +84,28 @@ describe('JoinClassroomForm — server error codes', () => {
     await waitFor(() => expect(toast.error).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith('education.student.join.invalidCode');
   });
+
+  it('shows a visible error for a bad code, not only a toast', async () => {
+    mockJoin.mockResolvedValue({
+      success: false,
+      code: 'INVALID_CODE',
+      error: 'Classroom not found. Please check the code with your teacher.',
+    });
+
+    submitCode();
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toContain('education.student.join.invalidCode');
+    });
+  });
+
+  it('lands a successful join on /en/student', async () => {
+    mockJoin.mockResolvedValue({ success: true, classroomId: 'class-1' });
+
+    submitCode();
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/en/student');
+    });
+  });
 });

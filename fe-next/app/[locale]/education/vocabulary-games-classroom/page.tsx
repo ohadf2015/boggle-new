@@ -161,7 +161,7 @@ export default async function Page({ params }: PageProps) {
               {c.heroSubtitle}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+              <Link href={`/${locale}/daily/word-hunt`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">{c.ctaPrimaryButtonLabel}</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.ctaSubLabel}</span>
               </Link>
@@ -279,7 +279,7 @@ export default async function Page({ params }: PageProps) {
             <br /><span className="bg-neo-navy px-3 text-neo-yellow">{c.ctaSubtitle}</span>
           </h2>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
+            <Link href={`/${locale}/daily/word-hunt`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
               {c.ctaPrimaryButtonLabel}
             </Link>
             <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
