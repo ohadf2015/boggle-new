@@ -12,6 +12,7 @@ import { getGuestStats } from '@/utils/guestManager';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { trackSignupFunnel } from '@/utils/growthTracking';
+import { isGameActive } from '@/utils/abandonOnPagehide';
 
 // Session storage key for tracking if signup prompt was shown
 const SIGNUP_PROMPT_SHOWN_KEY = 'boggle_sp_signup_shown';
@@ -95,6 +96,12 @@ export function useSignupPrompt({
     const qualifiesAsFirstWin = signupVariant !== 'after-third-game' && wins >= 1;
 
     const timer = setTimeout(() => {
+      // Never interrupt live gameplay: if the player already started another
+      // round, a mid-game modal gets reflex-dismissed (or worse, drives an
+      // abandon). Defer WITHOUT latching the once-per-session flag — the next
+      // `guestStatsChanged` (i.e. that game's results screen) re-runs this
+      // effect and shows the prompt at a natural pause.
+      if (isGameActive()) return;
       setIsFirstWin(qualifiesAsFirstWin);
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');

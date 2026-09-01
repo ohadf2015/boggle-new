@@ -31,7 +31,7 @@ export function SignupPromptHost() {
   const pathname = usePathname();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
 
-  const { showSignupModal, dismissSignupModal } = useSignupPrompt({
+  const { showSignupModal, dismissSignupModal, isFirstWin } = useSignupPrompt({
     isAuthenticated,
     hasUser: !!user,
     authLoading,
@@ -42,7 +42,11 @@ export function SignupPromptHost() {
     <FirstWinSignupModal
       isOpen={showSignupModal}
       onClose={dismissSignupModal}
-      variant="multiGames"
+      // Honor the hook's first-win classification. This used to be hardcoded
+      // to "multiGames", so first-time winners — the largest prompt population
+      // under the default after-first-win variant — got generic copy and no
+      // celebration. PostHog 14d ordered path: prompt 145 → completed 3.
+      variant={isFirstWin ? 'firstWin' : 'multiGames'}
     />
   );
 }

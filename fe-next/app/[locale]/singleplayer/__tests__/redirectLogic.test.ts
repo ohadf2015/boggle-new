@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { shouldRedirectBareSingleplayer } from '../redirectLogic';
+import { shouldRedirectBareSingleplayer, bareSingleplayerRedirectTarget } from '../redirectLogic';
 
 describe('shouldRedirectBareSingleplayer', () => {
   it('redirects when no params are present', () => {
@@ -37,5 +37,21 @@ describe('shouldRedirectBareSingleplayer', () => {
 
   it('handles array values from Next.js searchParams shape', () => {
     expect(shouldRedirectBareSingleplayer({ autoStart: ['practice'] })).toBe(false);
+  });
+});
+
+describe('bareSingleplayerRedirectTarget', () => {
+  it('drops bare entries straight into a solo bots game (clear path into play)', () => {
+    // Cold SEO traffic (e.g. /es/singleplayer, 100% bounce when dumped into MP
+    // Quick Play with strangers) gets the first-win-fast solo game instantly.
+    // Returning players are re-routed to MP Quick Play client-side by
+    // useSinglePlayerConfig's hasPlayedBotsGame gate, preserving the Phase-5
+    // soft-delete intent for the audience it was designed for.
+    expect(bareSingleplayerRedirectTarget('es')).toBe('/es/singleplayer?autoStart=bots');
+  });
+
+  it('preserves the locale segment', () => {
+    expect(bareSingleplayerRedirectTarget('he')).toBe('/he/singleplayer?autoStart=bots');
+    expect(bareSingleplayerRedirectTarget('en')).toBe('/en/singleplayer?autoStart=bots');
   });
 });

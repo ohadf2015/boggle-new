@@ -29,3 +29,21 @@ export function shouldRedirectBareSingleplayer(
     return value !== undefined && value !== '';
   });
 }
+
+/**
+ * Where a bare /singleplayer entry lands.
+ *
+ * Was `/multiplayer?quickPlay=true` (Phase 5 soft delete), which dumped cold
+ * solo-intent SEO traffic into an auto-match with strangers — /es/singleplayer
+ * measured a 100% bounce on that path. Now the entry goes straight into the
+ * first-win-fast solo bots game (`autoStart=bots`: EASY 60s vs 1 easy bot for
+ * new players) — a clear path into play with zero socket wait.
+ *
+ * Returning players are unaffected: useSinglePlayerConfig's hasPlayedBotsGame
+ * gate still re-routes `autoStart=bots` to MP Quick Play client-side, so the
+ * Phase-5 "SP-vs-bots is FTUE-only" intent survives for the audience it was
+ * designed for.
+ */
+export function bareSingleplayerRedirectTarget(locale: string): string {
+  return `/${locale}/singleplayer?autoStart=bots`;
+}

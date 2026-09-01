@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { permanentRedirect } from 'next/navigation';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { shouldRedirectBareSingleplayer } from './redirectLogic';
+import { shouldRedirectBareSingleplayer, bareSingleplayerRedirectTarget } from './redirectLogic';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,17 +18,17 @@ interface SinglePlayerPageProps {
 }
 
 /**
- * Phase 5 soft delete: bare /singleplayer (no recognized params) used to drop
- * visitors directly into a 1v1 vs WordBot. The new UX replaces that with
- * /multiplayer?quickPlay=true. We 308-redirect to preserve SEO link equity from
- * blog posts and SEO landing pages while keeping the route alive for Practice,
- * UGC community boards, daily-replay, and preset auto-launch.
+ * Bare /singleplayer (no recognized params) gets a clear path into play:
+ * first-win-fast solo bots game via `autoStart=bots` (see redirectLogic for
+ * the /es/singleplayer 100%-bounce evidence). Returning players are re-routed
+ * to MP Quick Play client-side. The route stays alive for Practice, UGC
+ * community boards, and preset auto-launch.
  */
 export default async function SinglePlayerPage({ params, searchParams }: SinglePlayerPageProps) {
   const [{ locale }, query] = await Promise.all([params, searchParams]);
 
   if (shouldRedirectBareSingleplayer(query)) {
-    permanentRedirect(`/${locale}/multiplayer?quickPlay=true`);
+    permanentRedirect(bareSingleplayerRedirectTarget(locale));
   }
 
   return <SinglePlayerPageClient />;
