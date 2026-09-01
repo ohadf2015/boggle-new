@@ -37,11 +37,12 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   // day as done/undone differently from the chest. Guests/offline (no cycle) fall
   // back to the local last-7-days completion so they still see their own progress.
   const chest = useWeeklyChest();
-  // `useDailyChallengeStats` derives the puzzle number/countdown from the date on
-  // the client, so SSR (preloaded "loading" 0) ≠ first client render (real #173)
-  // → hydration mismatch (incl. the `aria-label`). Gate the date-derived values
-  // behind mount: SSR + first client render both paint the loading zero-state,
-  // real values commit after mount.
+  // `useDailyChallengeStats` derives the puzzle number from the UTC date alone
+  // (pure math — same value on server and client), so it needs NO mount gate and
+  // is always the real number, never "Puzzle #0" in SSR HTML. The countdown and
+  // win/loss outcome DO depend on client-only state (localStorage, server
+  // snapshot), so those stay gated behind mount: SSR + first client render both
+  // paint the loading zero-state, real values commit after mount.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const countdown = mounted ? stats.countdown : '';
@@ -57,7 +58,11 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   // (all daily modes + freezes) so the fire icon matches the weekly chest; fall
   // back to the hook's localStorage value when no preloaded streak is supplied.
   const streak = mounted ? (preloadedStats?.currentStreak ?? stats.streak) : 0;
-  const puzzleNumber = mounted ? stats.puzzleNumber : 0;
+  // No mount gate: the hook seeds the real UTC-derived puzzle number on both
+  // server and client, so this never renders "Puzzle #0" (the old `mounted ?
+  // stats.puzzleNumber : 0` gate painted #0 into the SSR HTML and the first
+  // client frame, and stranded there if the chunk failed to hydrate).
+  const puzzleNumber = stats.puzzleNumber;
   // Progress strip = the chest's current 7-day cycle, each cell filled when that
   // day's daily was completed (any mode) per the server — identical to the chest's
   // dots. Falls back to local completion for guests / before the chest resolves.

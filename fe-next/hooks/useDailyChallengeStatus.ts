@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { prefetchDailyStatus, getQuickDailyStatus } from '@/utils/dailyChallenge/prefetch';
+import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils';
 import type { DailyChallengeStatus } from '@/utils/playerStats/types';
 import type { Language } from '@/types';
 
@@ -39,12 +40,15 @@ export function useDailyChallengeStatus(language: Language): UseDailyChallengeSt
   // reading localStorage or playerId here would diverge from SSR output and cause
   // React hydration error #418 (server renders the loading badge, client doesn't).
   // The useEffect below immediately overlays real localStorage/server data.
+  // puzzleNumber is the exception: it derives from the UTC date alone (pure math,
+  // no localStorage), so server and client compute the SAME number — seeding 0
+  // here is what painted "Puzzle #0" into SSR HTML until the effect resolved.
   const [status, setStatus] = useState<DailyChallengeStatus>(() => ({
     hasPlayed: false,
     hasSolved: null,
     currentStreak: 0,
     longestStreak: 0,
-    puzzleNumber: 0,
+    puzzleNumber: getPuzzleNumber(),
     puzzleDate: '',
     loading: true,
     fromServer: false,

@@ -264,30 +264,15 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
           topPlayersLoading={topPlayersLoading}
         />
 
-        {/* ===== DESKTOP / TABLET: classic landing arrangement (unchanged), hidden
-            on mobile where the Home Hub takes over. ===== */}
+        {/* ===== DESKTOP / TABLET: play-first arrangement, hidden on mobile where
+            the Home Hub takes over. The MODE HUB LEADS: the daily hero + mode
+            cubes are the first content below the header, so a new visitor is one
+            tap from a game without scrolling (the marketing hero, stats, SEO
+            copy and FAQ all live below the fold). The mode-cube image is already
+            the page's LCP element (see the preload in (home)/page.tsx) — leading
+            with the cubes aligns the visual order with that. ===== */}
         <div className="hidden w-full flex-col gap-6 sm:gap-8 md:flex">
-          {/* Season strip — slim countdown + leaderboard CTA, sits above the hero */}
-          <LandingSeasonHero />
-
-          {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
-          <LandingHero
-            players={topPlayers}
-            playersLoading={topPlayersLoading}
-            isMobilePortrait={isMobilePortrait}
-            energetic
-            activePlayers={activePlayers}
-          />
-
-          {/* Social Proof Bar — compact stats, immediately below hero */}
-          <LandingSocialProofBar
-            activePlayers={activePlayers}
-            gamesToday={gamesToday}
-            gameModes={gameModes}
-            languages={langCount}
-          />
-
-          {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
+          {/* ===== GAME MODES — THE PRIMARY CONTENT, ABOVE THE FOLD ===== */}
           {/* Always rendered (SSR + client). LandingChallengeCards is the cubes bento;
               it self-manages auth/personalization, so no client-side skeleton swap. */}
           <LandingChallengeCards
@@ -301,6 +286,27 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
             t={t}
             dailyChallengeStats={dailyChallengeStats}
             cardOrder={initialData?.cardOrder}
+          />
+
+          {/* Season strip — slim countdown + leaderboard CTA, below the mode hub */}
+          <LandingSeasonHero />
+
+          {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) — brand warmth
+              BELOW the play surfaces, not in front of them */}
+          <LandingHero
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
+            energetic
+            activePlayers={activePlayers}
+          />
+
+          {/* Social Proof Bar — compact stats, below hero */}
+          <LandingSocialProofBar
+            activePlayers={activePlayers}
+            gamesToday={gamesToday}
+            gameModes={gameModes}
+            languages={langCount}
           />
 
           {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}

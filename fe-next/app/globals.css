@@ -3767,6 +3767,31 @@ html.has-global-bottom-nav .page-content-safe {
   }
 }
 
+/* Cookie-consent bottom sheet (web): while visible it is a fixed band pinned to
+   the viewport bottom, so reserve its measured height the same way the bottom
+   nav / ad banner are reserved — otherwise it covers bottom CTAs (seen live:
+   "Care for a cookie?" hid Multiplayer QUICK START / CREATE PRIVATE BATTLE on
+   the Arena hub). CookieConsent.tsx sets --cookie-consent-height from the
+   sheet's live offsetHeight (ResizeObserver) and toggles has-cookie-consent;
+   both are removed when a consent choice hides the sheet. Not media-gated: the
+   sheet renders on desktop too, and screen-fit pages (multiplayer lobby) need
+   the reservation there as well. Placed AFTER the bottom-stack block so this
+   wins the cascade when both apply — and it re-adds --bottom-stack-height so
+   the nav/banner reservation is never lost. The sheet mounts post-LCP by
+   design (requestIdleCallback), so this padding snaps in with the sheet
+   itself, not during first paint. */
+html.has-cookie-consent body.screen-fit,
+html.has-cookie-consent body.screen-fit-locked {
+  padding-bottom: calc(
+    var(--bottom-stack-height, 0px) + var(--cookie-consent-height, 0px)
+  );
+}
+html.has-cookie-consent {
+  scroll-padding-bottom: calc(
+    var(--bottom-stack-height, 0px) + var(--cookie-consent-height, 0px)
+  );
+}
+
 /* Landscape PHONE compaction.
    A phone in landscape is ~360px tall but ~800px WIDE, so it crosses the `md`
    (768px) breakpoint and renders the DESKTOP header band — the app header bar

@@ -98,7 +98,7 @@ const DailyChallenge: React.FC = () => {
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
   const [showTutorial, setShowTutorial] = useState(false);
   const [puzzleDate, setPuzzleDate] = useState<string>('');
-  const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
+  const [puzzleNumber, setPuzzleNumber] = useState<number>(() => getPuzzleNumber());
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [targetWord, setTargetWord] = useState<string>('');
   const [meaning, setMeaning] = useState<string | null>(null);

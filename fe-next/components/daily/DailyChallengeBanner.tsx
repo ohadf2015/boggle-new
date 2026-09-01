@@ -70,7 +70,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
   const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
   const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
-  const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber ?? 0);
+  // Seed the REAL puzzle number (pure UTC date math, SSR-safe — server and
+  // client derive the same number). Seeding 0 rendered "#0" in server HTML
+  // until the mount effect resolved the real value.
+  const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber || getPuzzleNumber());
   const [isClient, setIsClient] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();

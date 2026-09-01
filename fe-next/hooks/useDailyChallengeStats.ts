@@ -56,7 +56,12 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
   const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
   const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
   const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
-  const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber ?? 0);
+  // Seed with the REAL puzzle number, not 0. getPuzzleNumber() is pure UTC date
+  // math (no localStorage/window), so it is SSR-safe and identical between the
+  // server render and the client's first render — both derive from the same UTC
+  // day. Seeding 0 painted "Puzzle #0" into the server HTML (and the first
+  // client frame) until the mount effect resolved the real number.
+  const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber || getPuzzleNumber());
   const [isClient, setIsClient] = useState(false);
   // Outcome-resolution flag. Seeds pessimistically to `true` so SSR + the first
   // client frame both paint the not-yet-known state; the mount effect flips it to
