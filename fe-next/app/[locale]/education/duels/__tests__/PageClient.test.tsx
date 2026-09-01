@@ -16,6 +16,16 @@ const mockGetLessons = vi.fn();
 const mockGetClassroomStudents = vi.fn();
 const mockPush = vi.fn();
 
+const mockAuthState: {
+  user: { id: string; email: string } | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+} = {
+  user: { id: 'student-1', email: 'test@example.com' },
+  isAuthenticated: true,
+  loading: false,
+};
+
 vi.mock('@/lib/supabase/education', () => ({
   getStudentClassroom: (...args: unknown[]) => mockGetStudentClassroom(...args),
   getLessons: (...args: unknown[]) => mockGetLessons(...args),
@@ -26,11 +36,7 @@ vi.mock('@/lib/supabase/education', () => ({
 mockGetClassroomStudents.mockResolvedValue({ data: [], error: null });
 
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: { id: 'student-1', email: 'test@example.com' },
-    isAuthenticated: true,
-    loading: false,
-  }),
+  useAuth: () => mockAuthState,
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -68,6 +74,9 @@ vi.mock('@/components/education/TeacherGate', () => ({
 describe('DuelsPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.user = { id: 'student-1', email: 'test@example.com' };
+    mockAuthState.isAuthenticated = true;
+    mockAuthState.loading = false;
   });
 
   it('should show loading spinner while loading data', () => {
@@ -137,8 +146,26 @@ describe('DuelsPageClient', () => {
     });
   });
 
+  it('guest/no-user stays on duels with join empty state and does not redirect to /education', () => {
+    mockAuthState.user = null;
+    mockAuthState.isAuthenticated = false;
+
+    render(<DuelsPageClientInner />);
+
+    expect(screen.getByText('education.duels.joinClassroomToDuel')).toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(mockGetStudentClassroom).not.toHaveBeenCalled();
+    expect(mockGetLessons).not.toHaveBeenCalled();
+
+    const educationRedirects = mockPush.mock.calls.filter(
+      ([url]) => typeof url === 'string' && /\/education(\/|$)/.test(url) && !url.includes('/education/duels')
+    );
+    expect(educationRedirects).toHaveLength(0);
+  });
+
   it('does not wrap the student lobby in a teacher-only gate', () => {
     const src = readFileSync(path.join(__dirname, '../PageClient.tsx'), 'utf8');
     expect(src).not.toMatch(/TeacherGate/);
+    expect(src).not.toMatch(/router\.push\(`\/\$\{language\}\/education`\)/);
   });
 });
