@@ -658,12 +658,29 @@ describe('blastModeManager', () => {
     const EXPECTED_MAX_CELLS = Math.min(32, EXPECTED_CELLS + 6); // ~20 cells max
 
     it('should generate boards with substantial special cell density (~40%)', () => {
-      const overlay = generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1);
-      const specialCellCount = overlay.length;
+      // Use fixed seeds so the run is deterministic — an unseeded
+      // Binomial(36, 0.4) draw lands outside the ±6 band ~2% of the time,
+      // which made this test flaky in CI.
+      const seeds = Array.from({ length: 25 }, (_, i) => i + 1);
+      const counts = seeds.map(
+        (seed) => generateBlastOverlay(grid6x6, BLAST_SPECIAL_TILE_CHANCE, 1, seed).length
+      );
+      const average = counts.reduce((sum, c) => sum + c, 0) / counts.length;
 
-      // With 40% per-cell chance, expect ~14 cells (±6 due to variance)
-      expect(specialCellCount).toBeGreaterThanOrEqual(EXPECTED_MIN_CELLS);
-      expect(specialCellCount).toBeLessThanOrEqual(EXPECTED_MAX_CELLS);
+      // Average across boards should track the 40% target (~14 cells).
+      // Over 25 boards the standard error is ~0.6 cells, so ±2 is a >3σ
+      // band — tight on the statistic that matters, immune to single-board
+      // variance.
+      expect(average).toBeGreaterThanOrEqual(EXPECTED_CELLS - 2);
+      expect(average).toBeLessThanOrEqual(EXPECTED_CELLS + 2);
+
+      // Per-board sanity band: wide enough that no seeded board can flake
+      // (Binomial(36, 0.4) lands inside [4, 25] with overwhelming margin),
+      // narrow enough to catch a broken generator.
+      for (const specialCellCount of counts) {
+        expect(specialCellCount).toBeGreaterThanOrEqual(4);
+        expect(specialCellCount).toBeLessThanOrEqual(25);
+      }
     });
 
     it('should maintain determinism: same seed produces identical overlay', () => {
