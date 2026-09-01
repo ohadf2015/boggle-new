@@ -36,12 +36,12 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           <div className="mb-6 inline-flex items-center gap-2 rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-3 py-1 shadow-hard-pink">
             <span className="h-2 w-2 animate-pulse rounded-full bg-neo-pink" />
             <span className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-pink">
-              Multijugador en vivo · Gratis
+              Sin registro · Sin descarga · Multijugador
             </span>
           </div>
 
           <h1 className="mb-5 font-neo-display text-4xl font-black leading-[1.05] sm:text-6xl lg:text-7xl">
-            <span className="block text-neo-white">Alternativa a</span>
+            <span className="block text-neo-white">Juega</span>{' '}
             <span className="relative inline-block">
               <span className="bg-gradient-to-br from-neo-pink via-neo-pink to-neo-cyan bg-clip-text text-transparent">
                 Scrabble online
@@ -50,27 +50,28 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
                 aria-hidden
                 className="absolute inset-x-0 -bottom-1 h-2 -skew-x-6 bg-neo-pink/40"
               />
-            </span>
-            <span className="mt-2 flex flex-wrap items-end gap-2 sm:gap-3">
-              {HERO_TILES.map((tile, i) => (
-                <m.span
-                  key={`${tile.ch}-${i}`}
-                  data-hero-tile
-                  initial={false}
-                  className={cn(
-                    'inline-flex h-10 w-10 items-center justify-center rounded-neo border-3 border-neo-black font-neo-display text-lg font-black shadow-hard sm:h-14 sm:w-14 sm:text-2xl lg:h-16 lg:w-16 lg:text-3xl',
-                    tile.color,
-                    tile.rotate
-                  )}
-                >
-                  {tile.ch}
-                </m.span>
-              ))}
-            </span>
+            </span>{' '}
+            <span className="block text-neo-white">gratis en español</span>
           </h1>
+          <div className="mt-2 flex flex-wrap items-end gap-2 sm:gap-3" aria-hidden>
+            {HERO_TILES.map((tile, i) => (
+              <m.span
+                key={`${tile.ch}-${i}`}
+                data-hero-tile
+                initial={false}
+                className={cn(
+                  'inline-flex h-10 w-10 items-center justify-center rounded-neo border-3 border-neo-black font-neo-display text-lg font-black shadow-hard sm:h-14 sm:w-14 sm:text-2xl lg:h-16 lg:w-16 lg:text-3xl',
+                  tile.color,
+                  tile.rotate
+                )}
+              >
+                {tile.ch}
+              </m.span>
+            ))}
+          </div>
 
           <p className="mb-8 max-w-2xl font-neo-body text-base leading-relaxed text-neo-white sm:text-lg">
-            Crea una sala, comparte el enlace y compite en tiempo real. <strong className="text-neo-white">Más de 10.000 palabras</strong> en español, sin descargas, sin registro, sin esperas.
+            Juega <strong className="text-neo-white">Scrabble online gratis en español</strong>: crea una sala, comparte el enlace y compite en tiempo real. Más de 10.000 palabras, sin descargas, sin registro, sin esperas.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -104,7 +105,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-gradient-to-br from-neo-navy-light to-neo-navy shadow-hard-xl">
             <Image
               src="/es-mp-hero-mascots.webp"
-              alt="Dos mascotas de LexiClash compitiendo en una rejilla de palabras multijugador"
+              alt="Dos mascotas de LexiClash compitiendo en Scrabble online gratis en español"
               width={760}
               height={760}
               priority

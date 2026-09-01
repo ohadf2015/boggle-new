@@ -27,12 +27,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
-    title: 'Scrabble Online Gratis en Español — Multijugador | LexiClash',
-    description: 'Scrabble online gratis en español — sin registro, sin descarga. Sala lista en 10 segundos, hasta 50 jugadores en tiempo real. La mejor alternativa gratuita a Scrabble. →',
-    keywords: 'jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
+    title: 'Scrabble Online Gratis en Español — Sin Registro | LexiClash',
+    description: 'Juega Scrabble online gratis en español: crea una sala en 10 segundos, invita hasta 50 amigos y compite en tiempo real. Sin registro, sin descarga.',
+    keywords: 'scrabble online gratis, scrabble juego online, scrabble español online, jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
-      title: 'Juega Scrabble Online en Español — Gratis, Sin Registro | LexiClash',
-      description: 'Scrabble online gratis en español — sin registro ni descarga. Crea sala, invita amigos, compite con 2–50 jugadores en tiempo real.',
+      title: 'Scrabble Online Gratis en Español — Sin Registro | LexiClash',
+      description: 'Crea una sala en 10 segundos, invita hasta 50 amigos y compite en español en tiempo real. Sin registro ni descarga.',
       locale: 'es_ES',
       type: 'website',
       url: pageUrl,
@@ -47,8 +47,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Juega Scrabble Online en Español Gratis — Sin Registro, Sin Descarga | LexiClash',
-      description: 'Scrabble online gratis en español — sin registro, sin descarga. Crea sala en 10 segundos, invita amigos y juega en tiempo real. Hasta 50 jugadores.',
+      title: 'Scrabble Online Gratis en Español — Sin Registro | LexiClash',
+      description: 'Sala en 10 segundos, hasta 50 jugadores en tiempo real. Sin registro ni descarga.',
       images: [`${BASE_URL}/og-image-es-multiplayer.webp`],
     },
     alternates: {
@@ -165,7 +165,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               LexiClash es la alternativa moderna al Scrabble online en español: combina la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados (también conocido como Cruzaletras). Diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
             </p>
             <p>
-              Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una partida rápida de 15 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz funciona en escritorio y móvil, así que puedes jugar en cualquier lugar.
+              Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una partida rápida de 2-3 minutos o una sesión competitiva más larga, LexiClash se adapta a tu ritmo. La interfaz funciona en escritorio y móvil, así que puedes jugar en cualquier lugar.
             </p>
             <p>
               Compite en{' '}

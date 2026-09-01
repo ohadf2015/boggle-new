@@ -28,6 +28,7 @@ describe('ComparisonTable', () => {
       0,
     );
     expect(screen.getAllByLabelText('Sí')).toHaveLength(trueCount);
+    expect(screen.getAllByText('Sí')).toHaveLength(trueCount);
   });
 
   it('renders an accessible No marker for each boolean-false cell', () => {
@@ -37,6 +38,7 @@ describe('ComparisonTable', () => {
       0,
     );
     expect(screen.getAllByLabelText('No')).toHaveLength(falseCount);
+    expect(screen.getAllByText('No')).toHaveLength(falseCount);
   });
 
   it('renders text cells verbatim (e.g. the 2-50 multiplayer value)', () => {
