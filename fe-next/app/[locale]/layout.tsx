@@ -22,6 +22,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
+import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
@@ -566,6 +567,20 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <script
                     dangerouslySetInnerHTML={{
                         __html: STORAGE_SHIM_SCRIPT,
+                    }}
+                />
+                {/* Pre-hydration stale-chunk guard — must run before any app
+                    chunk loads (i.e. inline, here in <head>): if the page's own
+                    /_next/static chunk 404s at boot (stale cached HTML / mixed
+                    rolling deploy), React never mounts and ChunkErrorRecovery's
+                    useEffect listeners never register — this is the only handler
+                    that can self-heal that case ("Loading chunk 14850 failed",
+                    growth-radar #2700/#1870). First-party inline script, no
+                    hydration-shift risk (see headScriptsHydration.test.ts).
+                    Runs after the storage shim so sessionStorage is safe. */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: CHUNK_BOOT_GUARD_SCRIPT,
                     }}
                 />
                 {/* Message catalogue. A classic, non-deferred script so
