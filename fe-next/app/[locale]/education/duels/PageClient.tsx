@@ -126,8 +126,8 @@ function DuelsPageClientInner() {
   );
 }
 
-import { TeacherGate } from '@/components/education/TeacherGate';
-
 export default function DuelsPage() {
-  return <TeacherGate><DuelsPageClientInner /></TeacherGate>;
+  // Students (including anonymous guests after classroom join) must reach the
+  // lobby. A teacher-only gate redirected them to /education/access.
+  return <DuelsPageClientInner />;
 }

@@ -39,6 +39,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeError, setCodeError] = useState(false);
   const [nameError, setNameError] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [preview, setPreview] = useState<ClassroomPreview | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +103,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       return;
     }
 
+    setSubmitError(null);
     setIsSubmitting(true);
 
     try {
@@ -120,7 +122,9 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
         router.push(`/${language}/student`);
       } else if (result.code === 'STUDENT_LIMIT_REACHED') {
         trackEduClassroomJoin({ result: 'error' });
-        toast.error(t('education.student.join.classroomFull'));
+        const msg = t('education.student.join.classroomFull');
+        toast.error(msg);
+        setSubmitError(msg);
         setCodeError(true);
       } else {
         // Only say "that code is wrong" when the code really was wrong. Every
@@ -128,13 +132,17 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
         // render the same line, which sends a student to re-check a code that
         // was fine and hides the real fault from us.
         const badCode = result.code === 'INVALID_CODE';
+        const msg = t(badCode ? 'education.student.join.invalidCode' : 'common.error');
         trackEduClassroomJoin({ result: badCode ? 'not_found' : 'error' });
-        toast.error(t(badCode ? 'education.student.join.invalidCode' : 'common.error'));
-        setCodeError(badCode);
+        toast.error(msg);
+        setSubmitError(msg);
+        setCodeError(true);
       }
     } catch (error) {
       trackEduClassroomJoin({ result: 'error' });
-      toast.error(t('common.error'));
+      const msg = t('common.error');
+      toast.error(msg);
+      setSubmitError(msg);
       setCodeError(true);
     } finally {
       setIsSubmitting(false);
@@ -166,7 +174,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             <form onSubmit={handleSubmit} className="space-y-5">
                 {preview && <ClassroomPreviewCard name={preview.name} language={preview.language} isLoading={isLoadingPreview} />}
 
-              {isGuest && preview && (
+              {isGuest && code.trim().length === 6 && (
                 <div className="space-y-2">
                   <Label
                     htmlFor="student-name"
@@ -221,6 +229,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                       const next = e.target.value.toUpperCase();
                       setCode(next);
                       if (codeError) setCodeError(false);
+                      if (submitError) setSubmitError(null);
                       if (next.length < 6) setPreview(null);
                       if (next.length === 6 && preview && isGuest && !name.trim()) {
                         nameInputRef.current?.focus();
@@ -263,9 +272,9 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 <p id="code-hint" className="text-xs text-neo-white">
                   {t('education.student.join.codeHint')}
                 </p>
-                {codeError && (
+                {(codeError || submitError) && (
                   <p id="code-error" className="text-xs text-red-400" role="alert">
-                    {t('education.student.join.invalidCode')}
+                    {submitError || t('education.student.join.invalidCode')}
                   </p>
                 )}
               </div>

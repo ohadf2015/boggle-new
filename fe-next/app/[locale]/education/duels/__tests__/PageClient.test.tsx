@@ -4,6 +4,8 @@
  */
 
 import React from 'react';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { render, screen, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import DuelsPageClientInner from '../PageClient';
@@ -133,5 +135,10 @@ describe('DuelsPageClient', () => {
       // The empty state should appear instead
       expect(screen.getByText('education.duels.joinClassroomToDuel')).toBeInTheDocument();
     });
+  });
+
+  it('does not wrap the student lobby in a teacher-only gate', () => {
+    const src = readFileSync(path.join(__dirname, '../PageClient.tsx'), 'utf8');
+    expect(src).not.toMatch(/TeacherGate/);
   });
 });

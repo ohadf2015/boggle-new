@@ -202,10 +202,9 @@ export default async function Page({ params }: PageProps) {
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {c.modes.map((m, idx) => {
-              // List-driven drills (flashcards, matching, spelling) live in the
-              // teacher dashboard behind a custom word list; the classroom game
-              // has its own landing. No retired /practice/* hops here.
-              const hrefMap = ['/teacher', '/teacher', '/teacher', '/education/classroom-game'];
+              // Guest-playable drills — same destinations spelling-bee-practice
+              // lands on (via retired /practice/* redirects). Never TeacherGate.
+              const hrefMap = ['/daily/word-hunt', '/daily/word-wheel', '/singleplayer', '/education/duels'];
               const accentMap = ['border-neo-lime', 'border-neo-cyan', 'border-neo-pink', 'border-neo-purple'];
               return (
                 <Link key={idx} href={`/${locale}${hrefMap[idx]}`} className={`group relative rounded-neo border-3 ${accentMap[idx]} bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg`}>
@@ -269,7 +268,7 @@ export default async function Page({ params }: PageProps) {
           </h2>
           <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">{c.noAppText}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/teacher`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-yellow shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
+            <Link href={`/${locale}/daily/word-hunt`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-yellow shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
               {c.startPracticingLabel}
             </Link>
             <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">

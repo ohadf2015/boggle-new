@@ -125,8 +125,9 @@ describe('JoinClassroomForm — classroom preview (code entry with confirmation)
       expect(screen.queryByText(/Joining/i)).not.toBeInTheDocument();
     });
 
-    // Name field should not appear
-    expect(screen.queryByLabelText('education.student.join.nameLabel')).not.toBeInTheDocument();
+    // Preview must never gate join: guests still get a name field at 6 chars
+    // so they can submit and see a real error from the join API.
+    expect(screen.getByLabelText('education.student.join.nameLabel')).toBeInTheDocument();
   });
 
   it('requires name for guest when joining after preview confirmation', async () => {
