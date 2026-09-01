@@ -19,11 +19,11 @@ interface HomeEducationCardProps {
 
 /**
  * Homepage entry point for education — a teacher (with a live trial countdown), a student
- * who's been added to a classroom, or the one-shot `promo` pitch for everyone else. Purely
+ * who's been added to a classroom, or the always-on `promo` pitch for everyone else. Purely
  * presentational: the connected wrapper decides whether to render it at all and feeds the
  * role/trial/classroom. Keeps education one tap from the main home surface so approved
  * teachers and enrolled students don't have to remember the /teacher or /student URLs —
- * and so everyone else learns the classroom mode exists at least once.
+ * and so everyone else can find classroom mode on every homepage visit.
  */
 export function HomeEducationCard({ role, trial, classroomName }: HomeEducationCardProps) {
   const { t, language } = useLanguage();

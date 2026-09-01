@@ -121,6 +121,7 @@ describe('DesktopGameNav navigation targets', () => {
       ['nav.daily', '/en/daily'],
       ['nav.leaderboard', '/en/leaderboard'],
       ['nav.friends', '/en/friends'],
+      ['education.nav.forTeachers', '/en/education'],
     ];
     for (const [label, expected] of cases) {
       mockPush.mockClear();

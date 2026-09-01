@@ -32,7 +32,7 @@ export function ClassroomWaitingRoom({
 
   // Limit display to last 10 joined students for readability
   const displayStudents = useMemo(() => {
-    return students
+    return [...students]
       .sort((a, b) => (b.joinedAt ?? 0) - (a.joinedAt ?? 0))
       .slice(0, 10);
   }, [students]);

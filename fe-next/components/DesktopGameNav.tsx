@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Swords, Zap, Calendar, Trophy, Users } from 'lucide-react';
+import { Home, Swords, Zap, Calendar, Trophy, Users, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
@@ -35,6 +35,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'daily', labelKey: 'nav.daily', icon: Calendar, route: '/daily', color: 'text-neo-white', activeColor: 'text-neo-yellow border-neo-yellow' },
   { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, route: '/leaderboard', color: 'text-neo-white', activeColor: 'text-neo-yellow border-neo-yellow' },
   { id: 'friends', labelKey: 'nav.friends', icon: Users, route: '/friends', color: 'text-neo-white', activeColor: 'text-neo-pink border-neo-pink' },
+  { id: 'teachers', labelKey: 'education.nav.forTeachers', icon: GraduationCap, route: '/education', color: 'text-neo-white', activeColor: 'text-neo-lime border-neo-lime' },
 ];
 
 /** Public MP quick-play. Beta/admin solo arcade wheel lives at /quick-play. */
