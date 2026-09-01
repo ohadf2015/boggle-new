@@ -208,7 +208,7 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
         hero={{
           title: resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'),
           subtitle: resolve('dailyWordWheelLanding.hero.subtitle', 'Free Daily Word Puzzle'),
-          description: resolve('dailyWordWheelLanding.hero.description', 'A new word wheel puzzle every day.'),
+          description: resolve('dailyWordWheelLanding.hero.description', "LexiClash's Daily Word Wheel is a free daily word puzzle: spin the wheel, find every word containing today's center letter."),
           cta: resolve('dailyWordWheelLanding.hero.cta', "Play Today's Word Wheel"),
           leaderboard: resolve('dailyWordWheelLanding.hero.leaderboard', 'View World Record'),
         }}

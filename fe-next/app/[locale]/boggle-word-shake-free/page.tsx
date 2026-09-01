@@ -108,6 +108,10 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
           Boggle Shake Free Online — Play in Browser, No Download
         </h1>
 
+        <p className="mb-4 text-lg font-bold leading-relaxed text-neo-lime">
+          LexiClash is a free online Boggle Word Shake game: shake a letter grid, find hidden words, and compete live with friends — no download, no signup.
+        </p>
+
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
           Miss the classic Boggle Shake game? LexiClash brings the same scramble-and-find gameplay to your browser —
           completely free, no download required. Shake up a grid of letters, find as many words as you can, and compete
