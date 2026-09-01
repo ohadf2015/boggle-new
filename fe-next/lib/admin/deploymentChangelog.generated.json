@@ -1,6 +1,20 @@
 {
-  "generatedAt": "2026-08-30T22:03:32.530Z",
+  "generatedAt": "2026-09-01T10:59:05.456Z",
   "commits": [
+    {
+      "sha": "41726d002f32d9aadc41332cc3665ccde749bea8",
+      "shortSha": "41726d0",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-31",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T04:59:58+03:00"
+    },
+    {
+      "sha": "72a29ee4b498392ed888750e0851eadddc01b527",
+      "shortSha": "72a29ee",
+      "subject": "docs: record the free-tier decision and its reasoning in the handoff",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T01:10:48+03:00"
+    },
     {
       "sha": "8ea42cdddd414befd3042b1677e0cc2fc0950caf",
       "shortSha": "8ea42cd",
@@ -126,20 +140,6 @@
       "subject": "fix(education): drop an invalid section kind the test suite could not see",
       "author": "Ohad Fisher",
       "date": "2026-08-30T21:20:45+03:00"
-    },
-    {
-      "sha": "785aed9abb3b6cd3d7734f481b1002ebd44974ca",
-      "shortSha": "785aed9",
-      "subject": "fix(education): drop the student-count claim from the launcher steps",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:14:51+03:00"
-    },
-    {
-      "sha": "b5ba51143a63e4fd15c9319f0b2ff8753a767d33",
-      "shortSha": "b5ba511",
-      "subject": "fix(education): make the invite actionable and stop stacking upsells on teachers",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:12:48+03:00"
     }
   ]
 }

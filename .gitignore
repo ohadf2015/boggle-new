@@ -91,3 +91,9 @@ docs/marketing/*-frames/
 docs/marketing/*-film/
 docs/marketing/**/*-frames/
 docs/marketing/**/*-film/
+
+# Stray screenshots dropped at the repo root by browser-verification runs.
+# Transient proof-of-render, never referenced by code or docs. Ignored rather
+# than deleted so a concurrent session's in-flight capture is not destroyed.
+/test.png
+/live-*-tooltip.png

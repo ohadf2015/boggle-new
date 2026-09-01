@@ -3,6 +3,7 @@
  * Renders correct tile badges on grid cells
  */
 
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BlastMultiplayerOverlay } from '../BlastMultiplayerOverlay';
 import type { BlastTileOverlay } from '@/shared/types/game';
@@ -72,9 +73,12 @@ describe('BlastMultiplayerOverlay', () => {
     const bombTile = screen.getByTestId('blast-tile-0-1');
     const iceTile = screen.getByTestId('blast-tile-0-2');
 
-    // Each tile type should have distinct content
-    expect(goldTile.textContent).not.toBe(bombTile.textContent);
-    expect(bombTile.textContent).not.toBe(iceTile.textContent);
+    // The point of the overlay is that you can tell the types apart at a
+    // glance, so assert the badges differ — not merely that they exist.
+    // This is a decorative, pointer-events-none layer: each badge is a
+    // <span> icon, never an interactive control.
+    expect(goldTile.textContent).toBeTruthy();
+    expect(new Set([goldTile.textContent, bombTile.textContent, iceTile.textContent]).size).toBe(3);
   });
 
   it('should handle all tile types without errors', () => {
@@ -131,15 +135,20 @@ describe('BlastMultiplayerOverlay', () => {
   });
 
   it('should not render a badge for standard tile type', () => {
+    // A standard tile carries no special mechanic, so it gets no badge —
+    // the component drops any type with no icon (`if (!icon) return null`).
+    // The bomb alongside it proves the absence is type-driven, not a
+    // failure to render the overlay at all.
     const overlay: BlastTileOverlay[] = [
       { row: 0, col: 0, type: 'standard' as any },
+      { row: 0, col: 1, type: 'bomb' },
     ];
 
-    const { container } = render(
+    render(
       <BlastMultiplayerOverlay overlay={overlay} gridSize={gridSize} />
     );
 
-    const badges = container.querySelectorAll('[data-testid^="blast-tile-"]');
-    expect(badges.length).toBe(0);
+    expect(screen.queryByTestId('blast-tile-0-0')).not.toBeInTheDocument();
+    expect(screen.getByTestId('blast-tile-0-1')).toBeInTheDocument();
   });
 });

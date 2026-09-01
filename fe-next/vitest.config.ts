@@ -99,7 +99,14 @@ export default defineConfig({
       'node_modules',
       'backend',
       '.next',
+      '.next-*/**',
       'dist',
+      // Nested agent checkouts under .claude/worktrees/ contain a full copy of
+      // every test file. Without this, a bare `vitest run <path>` matches the
+      // copies too — and any worktree missing node_modules fails the whole run
+      // with "Cannot find package '@testing-library/react'" on files that are
+      // fine here. Tests in a worktree belong to that worktree's own run.
+      '**/.claude/worktrees/**',
       '**/LandingView.botLaunch.test.tsx',
       '**/PresetSelector.simplified.test.tsx',
       '**/PresetSelector.featureGates.test.tsx',
