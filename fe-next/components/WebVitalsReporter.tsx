@@ -7,6 +7,22 @@ import { summarizeInpAttribution } from '@/lib/webVitals/inpAttribution';
 import { trackEvent } from './GoogleAnalytics';
 import { getPerfVariant } from '@/utils/perfVariant';
 
+// Backgrounded-tab tracker. A tab opened in the background does not paint until
+// it is first shown, so Chrome stamps LCP with the time since NAVIGATION — we
+// recorded real rows of 3,403,116ms (56 min) and 471,600ms where TTFB was ~250ms
+// and loadEventEnd ~2.4s. Those rows are not load-speed signal; a handful of
+// them single-handedly pushed the homepage field p75 to a fake 68s (growth-radar
+// opportunity #2274). Any hidden period before the LCP entry invalidates the
+// value, so LCP is simply not reported for such page views (CLS/INP/FCP/TTFB are
+// unaffected — layout shifts and input don't happen while hidden).
+const pageHiddenTracker = { wasHidden: false };
+if (typeof document !== 'undefined') {
+  pageHiddenTracker.wasHidden = document.visibilityState === 'hidden';
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') pageHiddenTracker.wasHidden = true;
+  });
+}
+
 /**
  * Web Vitals Reporter Component
  *
@@ -165,6 +181,8 @@ export function WebVitalsReporter() {
   }, []);
 
   useReportWebVitals((metric) => {
+    // Drop backgrounded-tab LCP entirely (GA + Supabase) — see pageHiddenTracker.
+    if (metric.name === 'LCP' && pageHiddenTracker.wasHidden) return;
     const perfVariant = getPerfVariant();
     // Send to Google Analytics
     trackEvent('web_vitals', {
