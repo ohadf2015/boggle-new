@@ -13028,7 +13028,8 @@ const sv = {
       "classCoverage": "Klassen hittade {{found}} av {{total}} lektionsord",
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
-      "practiceMissed": "Öva de här orden"
+      "practiceMissed": "Öva de här orden",
+      "playReteachRound": "Spela repetitionsrunda — bara missade ord"
     },
     "nav": {
       "section": "Lärare",

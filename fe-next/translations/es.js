@@ -12782,7 +12782,8 @@ const es = {
       "classCoverage": "La clase encontró {{found}} de {{total}} palabras de la lección",
       "reteach": "Nadie encontró estas",
       "allFound": "La clase encontró todas las palabras de la lección.",
-      "practiceMissed": "Practicar estas palabras"
+      "practiceMissed": "Practicar estas palabras",
+      "playReteachRound": "Jugar ronda de repaso — solo las palabras que faltan"
     },
     "nav": {
       "section": "Docentes",

@@ -70,6 +70,8 @@ const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), 
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 const ClassroomResultsCard = dynamic(() => import('@/components/education/ClassroomResultsCard').then(m => m.ClassroomResultsCard), { ssr: false });
 
+import { buildReteachLessonData } from '@/lib/education/classroomGameHandoff';
+
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 
 // ==============================================
@@ -531,11 +533,37 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // a classroom student is account-less by design (they join with a code and a
   // name) — so `!isGuest` hid the lesson from exactly the people it is for.
   // Mobile never gated it; desktop is the classroom's main screen.
+  // Reteach round (teacher/host only): restage the lesson payload narrowed to
+  // exactly the words the class missed, then reload so the multiplayer session
+  // rehydrates it — the sessionStorage read is mount-time only, and the
+  // teacher's URL already carries ?classroom=true&host=true, so the reload
+  // auto-rejoins the SAME room (students stay put) with a board that embeds
+  // only the missed words. Kahoot can't copy a production game straight into
+  // a reteach; this one-click loop is the wedge.
+  const handleReteachRound = useCallback(() => {
+    if (!classroomSummary || classroomSummary.missedWords.length === 0) return;
+    try {
+      const raw = sessionStorage.getItem('lessonGameData');
+      const previous = raw ? JSON.parse(raw) : null;
+      const reteach = buildReteachLessonData(previous, classroomSummary);
+      if (!reteach) return;
+      sessionStorage.setItem('lessonGameData', JSON.stringify(reteach));
+    } catch (err) {
+      // Storage blocked/unreadable — a reload would rehydrate the ORIGINAL
+      // full lesson (or none), so stay on results instead of starting the
+      // wrong round.
+      logger.warn('[RESULTS] Could not stage reteach round:', err);
+      return;
+    }
+    window.location.reload();
+  }, [classroomSummary]);
+
   const postGameWordReviewNode = classroomSummary ? (
     <ClassroomResultsCard
       summary={classroomSummary}
       username={username}
       isTeacher={isHost}
+      onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
       onPractice={
         classroomSummary.lessonIds[0]
           ? () => router.push(`/${language}/student/lessons/${classroomSummary.lessonIds[0]}?mode=flashcard`)

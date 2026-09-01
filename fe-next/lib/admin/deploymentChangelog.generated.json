@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-01T10:59:05.456Z",
+  "generatedAt": "2026-09-01T19:31:19.068Z",
   "commits": [
+    {
+      "sha": "e814c1a69cbcc7225586adfccb6dd5bb63afe63b",
+      "shortSha": "e814c1a",
+      "subject": "feat(fe-next): play-first home + cookie consent never covers Quick Start (#890)",
+      "author": "ohadf2015",
+      "date": "2026-09-01T11:43:21-07:00"
+    },
+    {
+      "sha": "e6694a87923af5052e58e8ab3f5ee5c30a2235bf",
+      "shortSha": "e6694a8",
+      "subject": "Education GTM: persistent For Teachers, classroom hero (#888)",
+      "author": "ohadf2015",
+      "date": "2026-09-01T11:26:31-07:00"
+    },
+    {
+      "sha": "b3378fe9757f2f587dc617e9b21ef9c358a4afbc",
+      "shortSha": "b3378fe",
+      "subject": "fix(fe-next): cookie consent mascot has two hands (#887)",
+      "author": "ohadf2015",
+      "date": "2026-09-01T06:18:50-07:00"
+    },
+    {
+      "sha": "56e6165a83633d3f484c8eeed7b3ead695b2ece2",
+      "shortSha": "56e6165",
+      "subject": "fix(education): keep guests on /education/duels join empty state (#886)",
+      "author": "ohadf2015",
+      "date": "2026-09-01T04:50:03-07:00"
+    },
+    {
+      "sha": "9e2f7434ecac6179d3e8f20f9909016e9889e3a3",
+      "shortSha": "9e2f743",
+      "subject": "chore: land in-flight test-collection and ignore fixes",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T14:19:26+03:00"
+    },
+    {
+      "sha": "d8da1e5c4ddb5a8f26bfabb7f11dd7336ad47825",
+      "shortSha": "d8da1e5",
+      "subject": "fix(education): put the real mascot on every education page image",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T14:09:27+03:00"
+    },
+    {
+      "sha": "538519c902112f633e3fd1826e4e3c3d16723f0c",
+      "shortSha": "538519c",
+      "subject": "chore(nightly): land five nights of salvaged lane code (2026-08-27 → 09-01)",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T13:38:08+03:00"
+    },
+    {
+      "sha": "5e89843987eae17b3760045a144c94c08fa66fbf",
+      "shortSha": "5e89843",
+      "subject": "fix(education): send student vocab practice to playable drills, not TeacherGate (#885)",
+      "author": "ohadf2015",
+      "date": "2026-09-01T03:36:55-07:00"
+    },
+    {
+      "sha": "6628a0a558dc7edc5f29b987f252933ac1ceac14",
+      "shortSha": "6628a0a",
+      "subject": "feat(singleplayer): route solo-bots results to multiplayer first (#881)",
+      "author": "ohadf2015",
+      "date": "2026-09-01T00:40:56-07:00"
+    },
+    {
+      "sha": "f57a7b270f613e0df0a24b877863f731a100d7f2",
+      "shortSha": "f57a7b2",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-01",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T05:32:48+03:00"
+    },
+    {
+      "sha": "7ebf5e8255a0755dc54800bc77e01a1605480a78",
+      "shortSha": "7ebf5e8",
+      "subject": "feat(join): give /join a code entry page instead of a 404",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T02:07:54+03:00"
+    },
+    {
+      "sha": "c17005d8fee6d4d68bfadbdbcc6ccd90ff47e803",
+      "shortSha": "c17005d",
+      "subject": "fix(education): stop classroom exits from silently creating another room",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T02:01:18+03:00"
+    },
+    {
+      "sha": "39ff9559a55404f993b25287e5a8d3220465b866",
+      "shortSha": "39ff955",
+      "subject": "fix(education): print the join address, not just a QR; guard comparison-page claims",
+      "author": "Ohad Fisher",
+      "date": "2026-09-01T01:09:16+03:00"
+    },
+    {
+      "sha": "3913b0579e628a4c26e7b5b03edeaece510638c1",
+      "shortSha": "3913b05",
+      "subject": "Merge remote-tracking branch 'origin/master' into worktree-edu-logrocket-ux",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T23:42:42+03:00"
+    },
+    {
+      "sha": "0d24ff63e04e08a9e5ad3726ee61a19318e67874",
+      "shortSha": "0d24ff6",
+      "subject": "fix(education): explain the teacher-access redirect, and unhardcode 5 landing pages",
+      "author": "Ohad Fisher",
+      "date": "2026-08-31T23:42:21+03:00"
+    },
+    {
+      "sha": "bc26c5957d483fc17ff653c572e66352b8a7bb3d",
+      "shortSha": "bc26c59",
+      "subject": "fix(security): fail-closed auth on ranked, crons, and admin email previews (#879)",
+      "author": "ohadf2015",
+      "date": "2026-08-31T17:29:39+03:00"
+    },
+    {
+      "sha": "9d4a6ba5bcd3cf709a7737a024da38e0fb4e5e03",
+      "shortSha": "9d4a6ba",
+      "subject": "fix(fe-next): first-visit cookie usable, CTAs clickable, UTC daily date, guest chest quiet (#876)",
+      "author": "ohadf2015",
+      "date": "2026-08-31T14:52:12+03:00"
+    },
+    {
+      "sha": "912979ff95fe5898b8ab977ceea6d312e17e606e",
+      "shortSha": "912979f",
+      "subject": "fix(fe-next): remove root-path geo block and add cold-start RUM beacon",
+      "author": "ohadf2015",
+      "date": "2026-08-31T10:56:02+03:00"
+    },
+    {
+      "sha": "e2f76345d7242a3f3007818b25f6def279a8e0fd",
+      "shortSha": "e2f7634",
+      "subject": "feat(seo): daily meta description improvements 2026-08-31 (#874)",
+      "author": "ohadf2015",
+      "date": "2026-08-31T10:37:45+03:00"
+    },
     {
       "sha": "41726d002f32d9aadc41332cc3665ccde749bea8",
       "shortSha": "41726d0",
       "subject": "chore(nightly): autonomous improvement loop 2026-08-31",
       "author": "Ohad Fisher",
       "date": "2026-08-31T04:59:58+03:00"
-    },
-    {
-      "sha": "72a29ee4b498392ed888750e0851eadddc01b527",
-      "shortSha": "72a29ee",
-      "subject": "docs: record the free-tier decision and its reasoning in the handoff",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T01:10:48+03:00"
-    },
-    {
-      "sha": "8ea42cdddd414befd3042b1677e0cc2fc0950caf",
-      "shortSha": "8ea42cd",
-      "subject": "Merge remote-tracking branch 'origin/master' into worktree-edu-landing-seo",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T01:02:39+03:00"
-    },
-    {
-      "sha": "a026032070895d0d2007ed5f6773bbc77001f4af",
-      "shortSha": "a026032",
-      "subject": "fix(education): repair a string my own scripted edit broke, and one more 5-language list",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T01:02:33+03:00"
-    },
-    {
-      "sha": "b6624e204f0ea380f99597388b9a58653d42c93c",
-      "shortSha": "b6624e2",
-      "subject": "feat(education): lead with the one differentiator a quiz platform cannot copy",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T00:53:14+03:00"
-    },
-    {
-      "sha": "8e997017b6ad97809e52b4f2b540a18d1a374751",
-      "shortSha": "8e99701",
-      "subject": "fix(education): stop misstating a competitor, and stop overclaiming about ourselves",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T00:52:10+03:00"
-    },
-    {
-      "sha": "cd7640750e581372074aaafdfd97757dffb5e7be",
-      "shortSha": "cd76407",
-      "subject": "feat(education): let the whole class play free — move the paywall past first value",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T00:46:26+03:00"
-    },
-    {
-      "sha": "54b13ec7aabbc02ba027e65ce0eef4cee64e873f",
-      "shortSha": "54b13ec",
-      "subject": "feat(education): make the teacher's lesson actually reach the board and the class",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T23:29:41+03:00"
-    },
-    {
-      "sha": "449f194054a9a34bea170353beb220161d4d110d",
-      "shortSha": "449f194",
-      "subject": "docs: record why the phonics page was rejected, with the specific bad words",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T22:59:41+03:00"
-    },
-    {
-      "sha": "559408338c66688c4a434f3bdde41e3d59f2c8ef",
-      "shortSha": "5594083",
-      "subject": "chore(education): close out the open items — dead code, hub IA, verified pricing",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T22:58:30+03:00"
-    },
-    {
-      "sha": "71e37967b9a70695d780896e8186b4f39aaeef27",
-      "shortSha": "71e3796",
-      "subject": "merge: reconcile education copy with the parallel fixes on master",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T22:42:17+03:00"
-    },
-    {
-      "sha": "fa094f051644ece65c2c07574a12b9c97b94a41b",
-      "shortSha": "fa094f0",
-      "subject": "fix(server): a client hanging up must not kill the process",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T22:34:18+03:00"
-    },
-    {
-      "sha": "19feff46b7cd9a27585c0293b62db2a524733d58",
-      "shortSha": "19feff4",
-      "subject": "fix(education): count six languages and stop promising free forever",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T22:33:03+03:00"
-    },
-    {
-      "sha": "64881f2243d65378b77a8cb2897980f3a835ae0b",
-      "shortSha": "64881f2",
-      "subject": "feat(mp-desktop): fill the rails, one clock, readable blast tiles",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:56:57+03:00"
-    },
-    {
-      "sha": "781e889945e36bbdb7ca42413aa32a45fc981681",
-      "shortSha": "781e889",
-      "subject": "test(education): assert the TV join address carries the game code",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:42:45+03:00"
-    },
-    {
-      "sha": "944d24ec43003cdfa9042ce7a99ca41a8cc3d60d",
-      "shortSha": "944d24e",
-      "subject": "fix(education): join code is 6 characters, not 4 digits — 197 claims corrected",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:32:58+03:00"
-    },
-    {
-      "sha": "789d42b199702cb4c87d48f691d8e312f769bc1b",
-      "shortSha": "789d42b",
-      "subject": "docs: education landing SEO handoff — open questions and verification state",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:26:31+03:00"
-    },
-    {
-      "sha": "b84487f1fb8af72497dcd2533f628749e8a22741",
-      "shortSha": "b84487f",
-      "subject": "feat(education): rebuild the access landing around one signup CTA",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:23:37+03:00"
-    },
-    {
-      "sha": "70e069341f3fe19c023ec96428779ece14f321e8",
-      "shortSha": "70e0693",
-      "subject": "Merge remote-tracking branch 'origin/master'",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:22:56+03:00"
-    },
-    {
-      "sha": "4127d0ee34d778171fbf7704151589eb086c7889",
-      "shortSha": "4127d0e",
-      "subject": "fix(education): drop an invalid section kind the test suite could not see",
-      "author": "Ohad Fisher",
-      "date": "2026-08-30T21:20:45+03:00"
     }
   ]
 }

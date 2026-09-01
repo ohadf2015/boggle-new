@@ -12636,7 +12636,8 @@ const he = {
       "classCoverage": "הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור",
       "reteach": "אף אחד לא מצא את אלה",
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
-      "practiceMissed": "תרגלו את המילים האלה"
+      "practiceMissed": "תרגלו את המילים האלה",
+      "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו"
     },
     "nav": {
       "section": "מורים",

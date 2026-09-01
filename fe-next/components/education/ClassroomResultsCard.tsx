@@ -15,7 +15,7 @@
 
 'use client';
 
-import { GraduationCap, Check, X, RotateCcw } from 'lucide-react';
+import { GraduationCap, Check, X, RotateCcw, Play } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -26,6 +26,8 @@ export interface ClassroomResultsCardProps {
   isTeacher: boolean;
   /** Sends the player into flashcard practice on this lesson. */
   onPractice?: () => void;
+  /** Teacher-only: starts a new round on exactly the words the class missed. */
+  onReteach?: () => void;
 }
 
 export function ClassroomResultsCard({
@@ -33,6 +35,7 @@ export function ClassroomResultsCard({
   username,
   isTeacher,
   onPractice,
+  onReteach,
 }: ClassroomResultsCardProps) {
   const { t } = useLanguage();
 
@@ -115,6 +118,21 @@ export function ClassroomResultsCard({
             <p className="text-neo-white/80 font-neo-body text-sm">
               {summary.missedWords.join(', ')}
             </p>
+            {onReteach && (
+              <button
+                type="button"
+                data-testid="play-reteach-round"
+                onClick={onReteach}
+                className={cn(
+                  'mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <Play className="w-4 h-4" aria-hidden />
+                {t('education.results.playReteachRound')}
+              </button>
+            )}
           </div>
         ) : (
           <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">
