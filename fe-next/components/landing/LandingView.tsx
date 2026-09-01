@@ -262,44 +262,47 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
           topPlayersLoading={topPlayersLoading}
         />
 
-        {/* ===== DESKTOP / TABLET: play-first arrangement, hidden on mobile where
-            the Home Hub takes over. The MODE HUB LEADS: the daily hero + mode
-            cubes are the first content below the header, so a new visitor is one
-            tap from a game without scrolling (the marketing hero, stats, SEO
-            copy and FAQ all live below the fold). The mode-cube image is already
-            the page's LCP element (see the preload in (home)/page.tsx) — leading
-            with the cubes aligns the visual order with that. ===== */}
+        {/* ===== DESKTOP / TABLET =====
+            Web: classroom hero + For Teachers CTA lead (Education is the revenue
+            path). CrazyGames stays play-first via CSS order so the embed is not
+            redirected off-platform. Order is applied only after mount so SSR and
+            the first client paint match (CG SDK starts isLoading=true). ===== */}
         <div className="hidden w-full flex-col gap-6 sm:gap-8 md:flex">
-          {/* ===== GAME MODES — THE PRIMARY CONTENT, ABOVE THE FOLD ===== */}
+          {/* Hero first in source order = web above-the-fold classroom pitch. */}
+          <div className={mounted && isOnCrazyGamesPlatform ? 'order-3' : 'order-1'}>
+            <LandingHero
+              players={topPlayers}
+              playersLoading={topPlayersLoading}
+              isMobilePortrait={isMobilePortrait}
+              energetic
+              activePlayers={activePlayers}
+            />
+          </div>
+
           {/* Always rendered (SSR + client). LandingChallengeCards is the cubes bento;
               it self-manages auth/personalization, so no client-side skeleton swap. */}
-          <LandingChallengeCards
-            language={language}
-            isAdmin={isAdmin}
-            hasBlastAccess={true}
-            activePlayers={liveRoomStats.activePlayers}
-            openRooms={liveRoomStats.openRooms}
-            totalPlayers={liveRoomStats.totalPlayers}
-            playerAllTimeBest={playerAllTimeBest}
-            t={t}
-            dailyChallengeStats={dailyChallengeStats}
-            cardOrder={initialData?.cardOrder}
-          />
+          <div className={mounted && isOnCrazyGamesPlatform ? 'order-1' : 'order-2'}>
+            <LandingChallengeCards
+              language={language}
+              isAdmin={isAdmin}
+              hasBlastAccess={true}
+              activePlayers={liveRoomStats.activePlayers}
+              openRooms={liveRoomStats.openRooms}
+              totalPlayers={liveRoomStats.totalPlayers}
+              playerAllTimeBest={playerAllTimeBest}
+              t={t}
+              dailyChallengeStats={dailyChallengeStats}
+              cardOrder={initialData?.cardOrder}
+            />
+          </div>
 
-          {/* Season strip — slim countdown + leaderboard CTA, below the mode hub */}
-          <LandingSeasonHero />
-
-          {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) — brand warmth
-              BELOW the play surfaces, not in front of them */}
-          <LandingHero
-            players={topPlayers}
-            playersLoading={topPlayersLoading}
-            isMobilePortrait={isMobilePortrait}
-            energetic
-            activePlayers={activePlayers}
-          />
+          {/* Season strip — slim countdown + leaderboard CTA, after the lead surface */}
+          <div className={mounted && isOnCrazyGamesPlatform ? 'order-2' : 'order-3'}>
+            <LandingSeasonHero />
+          </div>
 
           {/* Social Proof Bar — compact stats, below hero */}
+          <div className="order-4">
           <LandingSocialProofBar
             activePlayers={activePlayers}
             gamesToday={gamesToday}
@@ -317,6 +320,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
                 <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>
