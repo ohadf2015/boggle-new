@@ -9,6 +9,7 @@ import {
   MAX_WORD_LENGTH,
   buildClassGapOgImageUrl,
   buildClassGapShareUrl,
+  interpClassGapTemplate,
   parseClassGapShareParams,
   toClassGapPayload,
 } from '../classGapShare';
@@ -92,5 +93,43 @@ describe('classGapShare', () => {
     const url = new URL(buildClassGapShareUrl({ ...input, missedWords: [], found: 3 }));
     expect(url.searchParams.has('missed')).toBe(false);
     expect(url.searchParams.get('found')).toBe('3');
+  });
+});
+
+describe('interpClassGapTemplate', () => {
+  it('fills ICU {key} placeholders (post-normalizeMessages)', () => {
+    expect(
+      interpClassGapTemplate('The class found {found} of {total} lesson words', {
+        found: 8,
+        total: 12,
+      }),
+    ).toBe('The class found 8 of 12 lesson words');
+  });
+
+  it('still fills legacy {{key}} placeholders', () => {
+    expect(
+      interpClassGapTemplate('{{lesson}} — {{found}}/{{total}}. Practice: {{missed}}', {
+        lesson: 'Animals',
+        found: 8,
+        total: 12,
+        missed: 'CAT, DOG',
+      }),
+    ).toBe('Animals — 8/12. Practice: CAT, DOG');
+  });
+
+  it('does not leave share-card meta placeholders behind', () => {
+    const out = interpClassGapTemplate(
+      '{lesson} — the class found {found} of {total} lesson words. Practice: {missed}',
+      {
+        lesson: 'Animals',
+        found: 8,
+        total: 12,
+        missed: 'CAT, DOG, BIRD',
+      },
+    );
+    expect(out).toBe(
+      'Animals — the class found 8 of 12 lesson words. Practice: CAT, DOG, BIRD',
+    );
+    expect(out).not.toMatch(/\{[a-z]+\}/);
   });
 });
