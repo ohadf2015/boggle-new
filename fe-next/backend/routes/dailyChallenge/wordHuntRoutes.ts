@@ -606,17 +606,6 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    const { count, error: countError } = await supabase
-      .from('daily_word_hunt_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .eq('solved', true);
-
-    if (countError) {
-      logger.warn('API', `Word Hunt leaderboard count error: ${countError.message || countError.code || 'Unknown'}`, { code: countError.code, details: countError.details, hint: countError.hint });
-    }
-
     const { count: totalPlayersCount, error: totalPlayersError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
@@ -627,6 +616,9 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
     }
 
+    // Also feeds totalParticipants below: with the player_id filter gone (guests
+    // included), this and "how many solved rows exist" are the exact same query
+    // — one round trip instead of two.
     const { count: totalSolvedCount, error: totalSolvedError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
@@ -660,10 +652,9 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     );
 
     const dataLength = rerankedData.length;
-    const queryCount = count ?? 0;
-    const totalParticipants = Math.max(queryCount, dataLength);
-    const totalPlayers = totalPlayersCount ?? 0;
     const totalSolved = totalSolvedCount ?? 0;
+    const totalParticipants = Math.max(totalSolved, dataLength);
+    const totalPlayers = totalPlayersCount ?? 0;
     const guestPlayerCount = guestSolvedCount ?? 0;
 
     logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}, guests=${guestPlayerCount}`);
