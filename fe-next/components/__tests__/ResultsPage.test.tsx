@@ -128,6 +128,7 @@ vi.mock('@/hooks/usePostHogFlag', () => ({
 vi.mock('@/utils/growthTracking', () => ({
   trackGameCompletion: vi.fn(),
   trackStreakMilestone: vi.fn(),
+  trackGrowthEvent: vi.fn(),
 }));
 
 vi.mock('@/utils/ThemeContext', () => ({
