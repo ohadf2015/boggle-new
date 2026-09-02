@@ -25,15 +25,20 @@ type PageProps = {
 const BASE = 'https://www.lexiclash.live';
 
 function interp(template: string, params: Record<string, string | number>): string {
-  return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(params[key] ?? ''));
+  let out = template;
+  for (const key of Object.keys(params)) {
+    out = out.replace(new RegExp('\\{\\{' + key + '\\}\\}', 'g'), String(params[key] ?? ''));
+  }
+  return out;
 }
 
 function readString(catalogue: unknown, path: string, fallback: string): string {
-  const value = path.split('.').reduce<unknown>(
-    (node, part) => (node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined),
-    catalogue,
-  );
-  return typeof value === 'string' ? value : fallback;
+  let node: unknown = catalogue;
+  for (const part of path.split('.')) {
+    if (!node || typeof node !== 'object') return fallback;
+    node = (node as Record<string, unknown>)[part];
+  }
+  return typeof node === 'string' ? node : fallback;
 }
 
 async function payloadFrom(props: PageProps): Promise<ClassGapSharePayload> {
