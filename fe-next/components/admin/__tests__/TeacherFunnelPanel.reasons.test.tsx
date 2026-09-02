@@ -96,8 +96,31 @@ const payload = (over: Partial<TeacherFunnelResult> = {}): TeacherFunnelResult =
   ...over,
 });
 
+const emptyDetails = {
+  teacher: {
+    id: 'u1',
+    email: 'ada@school.edu',
+    fullName: 'Ada Teacher',
+    displayName: 'Ada D',
+    username: 'ada',
+    roleGranted: true,
+    lastSeenAt: '2026-08-10T00:00:00Z',
+    trialExpiresAt: '2026-09-01T00:00:00Z',
+    status: 'approved',
+  },
+  classrooms: [],
+  wordlists: [],
+  assignments: [],
+  completions: [],
+};
+
 function respondWith(body: unknown) {
-  fetchWithAuth.mockResolvedValue({ ok: true, json: async () => body });
+  fetchWithAuth.mockImplementation((url: string) => {
+    if (String(url).includes('/details')) {
+      return Promise.resolve({ ok: true, json: async () => emptyDetails });
+    }
+    return Promise.resolve({ ok: true, json: async () => body });
+  });
 }
 
 describe('<TeacherFunnelPanel>', () => {
@@ -148,7 +171,7 @@ describe('<TeacherFunnelPanel>', () => {
     expect(screen.getByText('Duels played').previousSibling).toHaveTextContent('—');
   });
 
-  it('opens the drilldown when a funnel row is clicked', async () => {
+  it('opens the activity drawer when an approved granted row is clicked', async () => {
     const user = userEvent.setup();
     respondWith(payload());
     render(<TeacherFunnelPanel />);
@@ -156,9 +179,46 @@ describe('<TeacherFunnelPanel>', () => {
     await screen.findByText('Ada Teacher');
     await user.click(screen.getByText('Ada Teacher'));
 
-    // The drawer is the only place the full use_case and the school are readable.
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument());
-    expect(screen.getByText('Ganado ISD')).toBeInTheDocument();
+    expect(await screen.findByText('Teacher activity')).toBeInTheDocument();
+    expect(fetchWithAuth.mock.calls.some((c) => String(c[0]).includes('/u1/details'))).toBe(true);
+  });
+
+  it('opens the access drawer when a pending row is clicked', async () => {
+    const user = userEvent.setup();
+    respondWith(
+      payload({
+        rows: [
+          row({
+            requestId: 'pending-1',
+            userId: 'u-pending',
+            email: 'wait@school.edu',
+            fullName: 'Wait Please',
+            status: 'pending',
+            roleGranted: false,
+            stage: 'declined',
+            schoolOrOrg: 'Pending ISD',
+          }),
+        ],
+      }),
+    );
+    render(<TeacherFunnelPanel />);
+
+    await screen.findByText('Wait Please');
+    await user.click(screen.getByText('Wait Please'));
+
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument());
+    expect(screen.getByText('Pending ISD')).toBeInTheDocument();
+    expect(screen.queryByText('Teacher activity')).not.toBeInTheDocument();
+  });
+
+  it('shows a visible View button on each funnel row', async () => {
+    respondWith(payload());
+    render(<TeacherFunnelPanel />);
+
+    await screen.findByText('Ada Teacher');
+    const viewButtons = screen.getAllByRole('button', { name: 'View' });
+    expect(viewButtons.length).toBeGreaterThan(0);
   });
 
   it('survives an API response from before reasons/activity existed', async () => {
