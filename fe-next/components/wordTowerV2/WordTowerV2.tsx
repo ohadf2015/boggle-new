@@ -53,6 +53,7 @@ export default function WordTowerV2() {
   const dictRef = useRef<Set<string> | null>(null);
 
   const [dictReady, setDictReady] = useState(false);
+  const [dictError, setDictError] = useState(false);
   const [wheel, setWheel] = useState<string[]>([]);
   const [typed, setTyped] = useState('');
   const [phase, setPhase] = useState<Phase>('composing');
@@ -70,13 +71,21 @@ export default function WordTowerV2() {
     let cancelled = false;
     // Language covers more locales than the word-craft dictionary ships; an
     // unsupported one simply never resolves and the Hoist button stays disabled.
+    setDictError(false);
     loadWordCraftDictionary(language as Parameters<typeof loadWordCraftDictionary>[0])
       .then((set) => {
         if (cancelled) return;
         dictRef.current = set;
         setDictReady(true);
       })
-      .catch(() => setDictReady(false));
+      .catch(() => {
+        // Without this the Hoist button just stays disabled forever with no
+        // explanation — the screen reads as broken rather than as "retry me".
+        if (!cancelled) {
+          setDictReady(false);
+          setDictError(true);
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -262,14 +271,24 @@ export default function WordTowerV2() {
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={submitWord}
-              disabled={!dictReady}
-              className="rounded-xl border-4 border-neo-navy bg-neo-lime px-8 py-3 font-fredoka text-xl font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#12162b] disabled:opacity-50"
-            >
-              {t('wordTowerV2.hoist', 'Hoist')}
-            </button>
+            {dictError ? (
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="rounded-xl border-4 border-neo-navy bg-neo-red px-8 py-3 font-fredoka text-base font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#12162b]"
+              >
+                {t('wordTower.loadError')}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={submitWord}
+                disabled={!dictReady}
+                className="rounded-xl border-4 border-neo-navy bg-neo-lime px-8 py-3 font-fredoka text-xl font-bold uppercase text-neo-navy shadow-[5px_5px_0_0_#12162b] disabled:opacity-50"
+              >
+                {t('wordTowerV2.hoist', 'Hoist')}
+              </button>
+            )}
           </>
         ) : (
           <button
