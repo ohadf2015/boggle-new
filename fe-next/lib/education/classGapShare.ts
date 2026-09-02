@@ -124,3 +124,24 @@ export function searchRecordToParams(
   }
   return sp;
 }
+
+/**
+ * Fill catalogue strings for the class-gap page / metadata.
+ *
+ * `loadTranslation` runs messages through `normalizeMessages`, which converts
+ * legacy `{{var}}` / `${var}` into ICU `{var}`. Prefer `{key}`; still accept
+ * `{{key}}` so raw catalogue fallbacks keep working.
+ */
+export function interpClassGapTemplate(
+  template: string,
+  params: Record<string, string | number>,
+): string {
+  let out = template;
+  for (const key of Object.keys(params)) {
+    const value = String(params[key] ?? '');
+    const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    out = out.replace(new RegExp('\\{\\{' + escaped + '\\}\\}', 'g'), value);
+    out = out.replace(new RegExp('\\{' + escaped + '\\}', 'g'), value);
+  }
+  return out;
+}

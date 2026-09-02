@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { loadTranslation } from '@/translations/loadTranslation';
 import {
   buildClassGapOgImageUrl,
+  interpClassGapTemplate,
   parseClassGapShareParams,
   searchRecordToParams,
   type ClassGapSharePayload,
@@ -23,14 +24,6 @@ type PageProps = {
 };
 
 const BASE = 'https://www.lexiclash.live';
-
-function interp(template: string, params: Record<string, string | number>): string {
-  let out = template;
-  for (const key of Object.keys(params)) {
-    out = out.replace(new RegExp('\\{\\{' + key + '\\}\\}', 'g'), String(params[key] ?? ''));
-  }
-  return out;
-}
 
 function readString(catalogue: unknown, path: string, fallback: string): string {
   let node: unknown = catalogue;
@@ -53,13 +46,13 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const t = await loadTranslation(payload.locale);
   const lesson = payload.lesson || readString(t, 'education.results.title', 'Lesson recap');
   const title = payload.missedWords.length
-    ? interp(readString(t, 'education.results.shareGapText', '{{lesson}} — {{found}}/{{total}}'), {
+    ? interpClassGapTemplate(readString(t, 'education.results.shareGapText', '{{lesson}} — {{found}}/{{total}}'), {
         lesson,
         found: payload.found,
         total: payload.total,
         missed: payload.missedWords.join(', '),
       })
-    : interp(readString(t, 'education.results.shareGapAllFoundText', '{{lesson}} — every word found'), {
+    : interpClassGapTemplate(readString(t, 'education.results.shareGapAllFoundText', '{{lesson}} — every word found'), {
         lesson,
       });
   const ogTitle = readString(t, 'education.results.shareGapTitle', 'Class vocabulary gap');
@@ -101,7 +94,7 @@ export default async function ClassGapPage(props: PageProps) {
   const t = await loadTranslation(payload.locale);
   const dir = payload.locale === 'he' ? 'rtl' : 'ltr';
   const lesson = payload.lesson || readString(t, 'education.results.title', 'Lesson recap');
-  const coverage = interp(readString(t, 'education.results.classCoverage', '{{found}} / {{total}}'), {
+  const coverage = interpClassGapTemplate(readString(t, 'education.results.classCoverage', '{{found}} / {{total}}'), {
     found: payload.found,
     total: payload.total,
   });
