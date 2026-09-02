@@ -14,7 +14,7 @@
  * - Feedback state management
  */
 
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { validateWordLocally, isWordOnBoard, buildPositionsMap } from '@/utils/clientWordValidator';
 import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
@@ -135,7 +135,13 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
   // Refs
   const foundWordsSetRef = useRef<Set<string>>(new Set());
-  const gameStartTimeRef = useRef<number>(Date.now());
+  // Seeded in an effect, not in the initializer: Date.now() during render is
+  // impure (react-hooks/purity) and drifts across re-renders until the first
+  // commit. Its only read is inside submitWord, long after mount.
+  const gameStartTimeRef = useRef<number>(0);
+  useEffect(() => {
+    gameStartTimeRef.current = Date.now();
+  }, []);
   const lastWordTimeRef = useRef<number | null>(null);
   const submissionTimestampsRef = useRef<number[]>([]);
   const spamCooldownUntilRef = useRef<number>(0);
@@ -412,13 +418,15 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       isValid: null,
     }]);
 
-    // Step 5a: Try client-side dictionary cache (instant, no network)
-    if (isDictionaryCacheLoaded) {
-      if (checkWordInCache(normalizedWord)) {
-        handleValidWord(normalizedWord, now, currentCombo);
-      } else {
-        handleInvalidWord(normalizedWord, now);
-      }
+    // Step 5a: Try client-side dictionary cache (instant, no network).
+    // Only short-circuit on a cache HIT, mirroring the singleplayer hook. A miss
+    // used to be a hard reject with no network fallback, which made this hook
+    // only as correct as the cache: an empty-but-"loaded" dictionary called every
+    // real word invalid, with the player seeing a plain "Not a valid word".
+    // A miss now falls through to prevalidation / the API, which is authoritative
+    // anyway (it also knows community-approved words the client copy lacks).
+    if (isDictionaryCacheLoaded && checkWordInCache(normalizedWord)) {
+      handleValidWord(normalizedWord, now, currentCombo);
       return;
     }
 

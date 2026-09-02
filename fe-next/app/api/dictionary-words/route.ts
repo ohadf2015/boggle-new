@@ -113,6 +113,17 @@ export async function GET(request: NextRequest) {
     // this the intermediate word array is dropped — only the payload is retained.
     if (!gzippedPayloads[language]) {
       const words = await loadWords(language);
+      // Never memoise an empty list. This cache lives for the whole process, so
+      // a single bad build — a missing backend/*.txt (getHebrewWordSet and
+      // getSwedishWordSet skip absent files without a word), a failed dynamic
+      // import — would serve an empty 200 to every client until the next deploy.
+      // Clients treat a 200 as authoritative and cache it themselves, so the
+      // blast radius is much larger than the request that built it. 503 instead:
+      // callers already retry or fall back on a non-OK status.
+      if (words.length === 0) {
+        console.error(`[dictionary-words] ${language} loaded 0 words — refusing to cache an empty dictionary`);
+        return NextResponse.json({ error: 'Dictionary unavailable' }, { status: 503 });
+      }
       const raw = words.join('\n');
       gzippedPayloads[language] = { gzip: gzipSync(raw, { level: 6 }), raw, count: words.length };
     }

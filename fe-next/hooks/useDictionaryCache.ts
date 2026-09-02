@@ -205,9 +205,11 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
       return downloaded;
     }
 
-    // Try IndexedDB cache first
+    // Try IndexedDB cache first. `cached.length > 0` is load-bearing: an empty
+    // array was previously accepted and promoted straight into the memory cache,
+    // so one poisoned write kept every word wrong across reloads.
     const cached = await getCachedDictionary(language);
-    if (cached) {
+    if (cached && cached.length > 0) {
       const wordSet = await buildWordSet(cached);
       memoryCache.set(language, wordSet);
       return wordSet;
@@ -227,7 +229,25 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
     }
 
     const text = await response.text();
-    const words = text.split('\n').filter(w => w.length > 0);
+    // Trim before the emptiness check: a whitespace-only body would otherwise
+    // pass as a one-word dictionary of "   ", which is the empty case wearing a
+    // hat. One pass, because this runs over ~275k lines.
+    const words: string[] = [];
+    for (const line of text.split('\n')) {
+      const w = line.trim();
+      if (w) words.push(w);
+    }
+    // A 200 with an empty body is a FAILURE, not an empty dictionary. Consumers
+    // read `isLoaded` as "this Set is authoritative" and hard-reject a miss
+    // (hooks/useWordSubmission.ts), so an empty Set marked loaded rejects every
+    // real word — and the two lines below would have cached that in memory AND
+    // IndexedDB, making it survive reloads. Throwing leaves `isLoaded` false, so
+    // submission falls through to /api/validate-word instead.
+    // /api/dictionary-words memoises its payload for the process lifetime, so a
+    // single bad build there is exactly how this arrives.
+    if (words.length === 0) {
+      throw new Error(`Dictionary for "${language}" came back empty`);
+    }
     const wordSet = await buildWordSet(words);
 
     // Cache in memory
