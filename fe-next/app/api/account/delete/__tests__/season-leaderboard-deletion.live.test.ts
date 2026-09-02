@@ -63,6 +63,15 @@ describe.skipIf(!hasServiceRole)('account deletion with an archived season_leade
     expect(archived.error).toBeNull();
     const rowId = archived.data!.id;
 
+    // 3b. list_past_seasons() must keep counting this row after anonymization — it uses
+    //     COUNT(*), not COUNT(player_id), specifically so a null player_id (this migration's
+    //     doing) doesn't make it silently undercount or drop the whole season. Snapshot the
+    //     count with the row present (real player_id) as the baseline to compare after delete.
+    const seasonsBeforeDelete = await admin.rpc('list_past_seasons');
+    expect(seasonsBeforeDelete.error).toBeNull();
+    const season1Before = seasonsBeforeDelete.data?.find((s: { season_id: number }) => s.season_id === 1);
+    expect(season1Before).toBeDefined();
+
     try {
       // 4. The actual call /api/account/delete makes. Before the fix this returns
       //    "Database error deleting user" (23502 underneath).
@@ -89,6 +98,14 @@ describe.skipIf(!hasServiceRole)('account deletion with an archived season_leade
       // The historical stats themselves are untouched.
       expect(rowAfter.data?.total_score).toBe(1234);
       expect(rowAfter.data?.rank_position).toBe(999999);
+
+      // 7. list_past_seasons' entry_count for season 1 must be UNCHANGED from the pre-delete
+      //    baseline (which already included this row via its real player_id) — proving the
+      //    anonymized row is still counted, not silently dropped by COUNT(player_id).
+      const seasonsAfterDelete = await admin.rpc('list_past_seasons');
+      expect(seasonsAfterDelete.error).toBeNull();
+      const season1After = seasonsAfterDelete.data?.find((s: { season_id: number }) => s.season_id === 1);
+      expect(season1After?.entry_count).toBe(season1Before.entry_count);
     } finally {
       // Cleanup: the row has no player_id to filter by anymore once anonymized, so key off
       // its own id regardless of whether the assertions above passed.

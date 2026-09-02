@@ -61,6 +61,20 @@
 -- season is fine, and the ON CONFLICT (season_id, player_id) upserts in
 -- process_season_reset / season_score_from_events simply never match a
 -- null-player row -- correct, since a deleted player can't re-earn a slot.
+--
+-- list_past_seasons() (20260812210000_fix_leaderboard_rpcs_rls_and_avatars.sql)
+-- counts `COUNT(sl.player_id)` specifically so its own comment's promise --
+-- "entry_count counts the same total_score > 0 set get_past_season_leaderboard
+-- renders, so the badge matches the row count" -- holds. COUNT() of a column
+-- skips NULLs, so the moment this migration makes player_id nullable, every
+-- anonymized row would silently vanish from entry_count while still being
+-- rendered by get_past_season_leaderboard (LEFT JOIN, no player_id filter) --
+-- reopening the exact "Season 4 · 292 above 59 rows" desync that migration
+-- fixed, and for a season whose only scorers all delete, dropping the whole
+-- season out of the list (HAVING COUNT(sl.player_id) > 0) while its board
+-- still returns rows. Switched to COUNT(*): the join is already INNER and
+-- already filters total_score > 0, so COUNT(*) counts exactly the same rows
+-- get_past_season_leaderboard renders, independent of player_id.
 -- =============================================
 
 BEGIN;
@@ -104,5 +118,33 @@ COMMENT ON COLUMN public.season_leaderboards.player_id IS
 
 COMMENT ON COLUMN public.admin_gift_messages.sender_id IS
   'Nullable: ON DELETE SET NULL when the sending admin''s profile is deleted. The row belongs to recipient_id (ON DELETE CASCADE); a null sender just means "an admin, no longer identifiable" -- no denormalized sender name exists to scrub.';
+
+-- Keep list_past_seasons() correct once player_id can be null (see NOTE above).
+-- Verbatim copy of the live definition (confirmed via pg_get_functiondef) except
+-- COUNT(sl.player_id) -> COUNT(*) in the SELECT and the HAVING.
+CREATE OR REPLACE FUNCTION public.list_past_seasons()
+RETURNS TABLE(
+    season_id integer,
+    name text,
+    start_date timestamp with time zone,
+    end_date timestamp with time zone,
+    entry_count bigint
+)
+LANGUAGE sql
+STABLE
+SET search_path TO 'public'
+AS $function$
+  SELECT s.id AS season_id, s.name, s.start_date, s.end_date, COUNT(*) AS entry_count
+  FROM seasons s
+  JOIN season_leaderboards sl
+    ON sl.season_id = s.id
+   AND COALESCE(sl.total_score, 0) > 0
+  GROUP BY s.id, s.name, s.start_date, s.end_date
+  HAVING COUNT(*) > 0
+  ORDER BY s.id DESC;
+$function$;
+
+COMMENT ON FUNCTION public.list_past_seasons() IS
+    'Past seasons that have at least one scoring player. entry_count counts the same total_score > 0 set get_past_season_leaderboard renders, so the badge matches the row count. COUNT(*), not COUNT(player_id): season_leaderboards.player_id can be null (anonymized on account deletion) and those rows still render.';
 
 COMMIT;
