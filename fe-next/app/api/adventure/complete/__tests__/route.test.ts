@@ -26,12 +26,15 @@ vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
-// Mock supabase server client (auth + data queries on the same client)
+// Mock supabase server client (auth + data queries on the same client).
+// Use a plain async factory — NOT vi.fn().mockResolvedValue — so vitest
+// `clearMocks: true` / vi.clearAllMocks() cannot wipe the client and leave
+// `supabase.from(...)` undefined (processCompletion.ts:101 `.select`).
 const mockGetUser = vi.fn();
 const mockFrom = vi.fn();
-const mockRpc = vi.fn().mockResolvedValue({ data: null, error: null });
+const mockRpc = vi.fn();
 vi.mock('@/utils/supabase/server', () => ({
-  createClient: vi.fn().mockResolvedValue({
+  createClient: async () => ({
     auth: { getUser: () => mockGetUser() },
     from: (...args: unknown[]) => mockFrom(...args),
     rpc: (...args: unknown[]) => mockRpc(...args),
@@ -256,10 +259,15 @@ describe('POST /api/adventure/complete', () => {
     vi.clearAllMocks();
     mockGetUpgradeEffect.mockReturnValue(0);
     mockGetUpgradeTier.mockReturnValue(0);
+    mockRpc.mockResolvedValue({ data: null, error: null });
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
       error: null,
     });
+    // Default chainable from() so any test that reaches processCompletion
+    // has `.select` defined. Tests that need custom table behavior still
+    // call setupDbMocks() / mockFrom.mockImplementation() afterwards.
+    setupDbMocks();
   });
 
   // ===== AUTH =====
@@ -293,8 +301,10 @@ describe('POST /api/adventure/complete', () => {
 
     it('does not reject world 0 as invalid (endless mode sentinel)', async () => {
       const res = await POST(makeRequest({ ...validBody, world: 0 }));
-      // World 0 should pass validation (not 400); downstream errors are mock artifacts
-      expect(res.status).not.toBe(400);
+      // World 0 must pass validation AND complete — a missing supabase.from()
+      // mock used to 500 here with "Cannot read properties of undefined (reading 'select')".
+      expect(res.status).toBe(200);
+      expect(res.data.success).toBe(true);
     });
 
     it('rejects world out of range (11)', async () => {

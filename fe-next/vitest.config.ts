@@ -138,7 +138,6 @@ export default defineConfig({
       '**/CrazyGamesSDK.authOutcome.test.tsx',
       '**/CrazyGamesSDK.embedSticky.test.tsx',
       '**/ChallengeResults.test.tsx',
-      '**/processCompletion.test.ts',
       '**/BlastFxOverlay.test.tsx',
       '**/BoardClearedCard.test.tsx',
     ],
