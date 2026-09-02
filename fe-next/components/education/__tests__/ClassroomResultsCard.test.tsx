@@ -7,16 +7,22 @@
  * a class-wide view while each student sees their own.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClassroomResultsCard } from '../ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
+    language: 'en',
     t: (key: string, params?: Record<string, string | number>) =>
       params ? `${key}:${JSON.stringify(params)}` : key,
   }),
+}));
+
+vi.mock('@/utils/shareWithFallback', () => ({
+  shareWithFallback: vi.fn().mockResolvedValue('copied'),
 }));
 
 const summary: ClassroomSummary = {
@@ -38,6 +44,11 @@ const summary: ClassroomSummary = {
 };
 
 describe('ClassroomResultsCard', () => {
+  beforeEach(() => {
+    vi.mocked(shareWithFallback).mockClear();
+    vi.mocked(shareWithFallback).mockResolvedValue('copied');
+  });
+
   it('names the lesson and teacher so a student knows whose class this was', () => {
     render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
     expect(screen.getByText(/Physics 101/)).toBeInTheDocument();
@@ -116,5 +127,39 @@ describe('ClassroomResultsCard', () => {
   it('renders no reteach button without a handler, e.g. for a non-host viewer', () => {
     render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
+  });
+
+  it('lets a teacher share the class gap with parents/Slack', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('share-class-gap'));
+    await waitFor(() => {
+      expect(shareWithFallback).toHaveBeenCalledTimes(1);
+    });
+    const arg = vi.mocked(shareWithFallback).mock.calls[0][0];
+    expect(arg.url).toContain('https://www.lexiclash.live/en/education/class-gap');
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
+    expect(arg.url).not.toContain('Noa');
+    expect(arg.url).not.toContain('lexiclash.com');
+  });
+
+  it('lets a student send the same class-level gap to a parent', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.getByTestId('share-class-gap')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('share-class-gap'));
+    await waitFor(() => {
+      expect(shareWithFallback).toHaveBeenCalled();
+    });
+    const arg = vi.mocked(shareWithFallback).mock.calls[0][0];
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
+  });
+
+  it('confirms when the gap link was copied for Slack/parent chat', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('share-class-gap'));
+    await waitFor(() => {
+      expect(screen.getByText('education.results.shareGapCopied')).toBeInTheDocument();
+    });
   });
 });

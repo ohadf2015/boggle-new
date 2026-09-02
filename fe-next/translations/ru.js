@@ -1287,7 +1287,15 @@ const ru = {
       "reteach": "Эти слова не нашёл никто",
       "allFound": "Класс нашёл все слова урока.",
       "practiceMissed": "Потренировать эти слова",
-      "playReteachRound": "Сыграть раунд повторения — только пропущенные слова"
+      "playReteachRound": "Сыграть раунд повторения — только пропущенные слова",
+      "shareGap": "Поделиться пробелом класса",
+      "shareGapCopied": "Ссылка скопирована — вставьте в Slack или родительский чат",
+      "shareGapTitle": "Словарный пробел класса",
+      "shareGapText": "{{lesson}} — класс нашёл {{found}} из {{total}} слов урока. Для практики: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}} — класс нашёл все слова урока.",
+      "shareGapCta": "Сыграть классную игру",
+      "shareGapEyebrow": "Пробел класса за сегодня",
+      "shareGapPracticeHome": "Слова для практики дома"
     },
     "nav": {
       "section": "Учителям",

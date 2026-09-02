@@ -11374,7 +11374,15 @@ const en = {
       "reteach": "Nobody found these",
       "allFound": "The class found every lesson word.",
       "practiceMissed": "Practise these words",
-      "playReteachRound": "Play reteach round — missed words only"
+      "playReteachRound": "Play reteach round — missed words only",
+      "shareGap": "Share class gap",
+      "shareGapCopied": "Link copied — paste in Slack or a parent chat",
+      "shareGapTitle": "Class vocabulary gap",
+      "shareGapText": "{{lesson}} — the class found {{found}} of {{total}} lesson words. Practice: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}} — the class found every lesson word.",
+      "shareGapCta": "Play a class game",
+      "shareGapEyebrow": "Today's class gap",
+      "shareGapPracticeHome": "Words to practice at home"
     },
     "nav": {
       "section": "Teachers",

@@ -11,13 +11,18 @@
  * Two audiences, one card:
  *  - a student sees their own hits and misses,
  *  - the teacher sees class-wide coverage and the reteach list.
+ *
+ * Either can share the CLASS-level gap (no student names) with parents / Slack.
  */
 
 'use client';
 
-import { GraduationCap, Check, X, RotateCcw, Play } from 'lucide-react';
+import { useState } from 'react';
+import { GraduationCap, Check, X, RotateCcw, Play, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
 export interface ClassroomResultsCardProps {
@@ -37,7 +42,8 @@ export function ClassroomResultsCard({
   onPractice,
   onReteach,
 }: ClassroomResultsCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
 
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
@@ -48,6 +54,33 @@ export function ClassroomResultsCard({
 
   const foundByMe = (word: { foundBy: string[] }) =>
     word.foundBy.some((n) => n.toLowerCase() === username.toLowerCase());
+
+  const handleShareGap = async () => {
+    const lesson = summary.lessonNames.join(', ');
+    const url = buildClassGapShareUrl({
+      locale: language,
+      lessonNames: summary.lessonNames,
+      teacherName: summary.teacherName,
+      found: summary.classFoundCount,
+      total: summary.totalWords,
+      missedWords: summary.missedWords,
+    });
+    const text = summary.missedWords.length
+      ? t('education.results.shareGapText', {
+          lesson,
+          found: summary.classFoundCount,
+          total: summary.totalWords,
+          missed: summary.missedWords.join(', '),
+        })
+      : t('education.results.shareGapAllFoundText', { lesson });
+    const result = await shareWithFallback({
+      title: t('education.results.shareGapTitle'),
+      text,
+      url,
+      clipboardText: `${text}\n${url}`,
+    });
+    if (result === 'copied' || result === 'shared') setShareState(result);
+  };
 
   return (
     <div className="p-5 rounded-neo border-neo border-neo-black bg-neo-navy shadow-hard">
@@ -139,6 +172,29 @@ export function ClassroomResultsCard({
             {t('education.results.allFound')}
           </p>
         ))}
+
+      <button
+        type="button"
+        data-testid="share-class-gap"
+        onClick={handleShareGap}
+        className={cn(
+          'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+          'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
+          'shadow-hard hover:shadow-hard-lg transition-all'
+        )}
+      >
+        {shareState === 'idle' ? (
+          <>
+            <Share2 className="w-5 h-5" aria-hidden />
+            {t('education.results.shareGap')}
+          </>
+        ) : (
+          <>
+            <Check className="w-5 h-5" aria-hidden />
+            {t('education.results.shareGapCopied')}
+          </>
+        )}
+      </button>
 
       {onPractice && (
         <button

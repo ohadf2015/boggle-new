@@ -12799,7 +12799,15 @@ const ja = {
       "reteach": "誰も見つけられなかった単語",
       "allFound": "クラスはすべての単語を見つけました。",
       "practiceMissed": "この単語を練習する",
-      "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ"
+      "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ",
+      "shareGap": "クラスの抜けをシェア",
+      "shareGapCopied": "リンクをコピーしました — Slackや保護者チャットに貼ってください",
+      "shareGapTitle": "クラスの語彙ギャップ",
+      "shareGapText": "{{lesson}} — クラスは {{total}} 語のうち {{found}} 語を見つけました。練習: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}} — クラスはすべての単語を見つけました。",
+      "shareGapCta": "クラスゲームをプレイ",
+      "shareGapEyebrow": "今日のクラスギャップ",
+      "shareGapPracticeHome": "家庭で練習する単語"
     },
     "nav": {
       "section": "教師向け",

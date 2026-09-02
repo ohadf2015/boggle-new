@@ -12645,7 +12645,15 @@ const he = {
       "reteach": "אף אחד לא מצא את אלה",
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
       "practiceMissed": "תרגלו את המילים האלה",
-      "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו"
+      "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו",
+      "shareGap": "שיתוף פער הכיתה",
+      "shareGapCopied": "הקישור הועתק — הדביקו ב-Slack או בצ'אט הורים",
+      "shareGapTitle": "פער אוצר המילים של הכיתה",
+      "shareGapText": "{{lesson}} — הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור. לתרגול: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}} — הכיתה מצאה את כל מילות השיעור.",
+      "shareGapCta": "שחקו משחק כיתה",
+      "shareGapEyebrow": "פער הכיתה מהיום",
+      "shareGapPracticeHome": "מילים לתרגול בבית"
     },
     "nav": {
       "section": "מורים",
