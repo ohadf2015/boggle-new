@@ -9,9 +9,9 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { useGemHunt } from '@/lib/word-craft/gems/useGemHunt';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
+import { DictStatusChip } from '@/components/word-craft/DictStatusChip';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftBoard } from '@/components/word-craft/WordCraftBoard';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
@@ -52,6 +52,7 @@ export default function GemHuntPageClient() {
   }, [setIsInGame]);
 
   const [dict, setDict] = useState<Set<string> | null>(null);
+  const [dictError, setDictError] = useState(false);
   const [ruleHintDismissed, setRuleHintDismissed] = useState(false);
   useEffect(() => {
     if (window.localStorage.getItem('wordcraft_gems_rule_hint_dismissed') === '1') setRuleHintDismissed(true);
@@ -62,10 +63,13 @@ export default function GemHuntPageClient() {
   }, []);
   useEffect(() => {
     let cancelled = false;
+    setDictError(false);
     loadWordCraftDictionary(locale).then((d) => {
       if (!cancelled) setDict(d);
     }).catch(() => {
-      if (!cancelled) setDict(new Set());
+      // NOT setDict(new Set()): an empty dictionary rejects every real word as
+      // "not in the dictionary". Stay unloaded and offer a retry instead.
+      if (!cancelled) setDictError(true);
     });
     return () => { cancelled = true; };
   }, [locale]);
@@ -289,12 +293,11 @@ export default function GemHuntPageClient() {
           </h1>
         </div>
 
-        {!dict ? (
-          <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
-            <PageLoader size="sm" />
-            <span className="text-xs text-neo-white">{t('wordcraft.loadingDict')}</span>
-          </div>
-        ) : null}
+        <DictStatusChip
+          loading={!dict && !dictError}
+          error={dictError}
+          onRetry={() => window.location.reload()}
+        />
 
         <GemHuntRuleHint
           text={t('wordcraft.gems.ruleHint')}
