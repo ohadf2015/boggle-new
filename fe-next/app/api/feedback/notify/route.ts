@@ -57,7 +57,11 @@ function getSupabaseAdmin() {
  * bug is fixed is a retention message, not cold mail. Anonymous reporters simply
  * have no address and are marked as such rather than silently dropped.
  */
-export async function resolveRecipient(
+// NOT exported: a Next.js route module may only export the HTTP verbs and a
+// fixed set of config fields, and `next build` rejects anything else with
+// "is not a valid Route export field". `tsc --noEmit` does not check that —
+// only the real build does.
+async function resolveRecipient(
   supabase: ReturnType<typeof getSupabaseAdmin>,
   report: { email: string | null; user_id: string | null },
 ): Promise<string | null> {
