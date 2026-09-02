@@ -30,6 +30,11 @@ export function markGameInactive(): void {
   active = null;
 }
 
+/** Whether a game is currently in progress (set by trackGameStart/trackGameEnd). */
+export function isGameActive(): boolean {
+  return active !== null;
+}
+
 function emitAbandonIfActive() {
   if (!active || alreadyEmitted) return;
   const durationMs = Date.now() - active.startedAt;

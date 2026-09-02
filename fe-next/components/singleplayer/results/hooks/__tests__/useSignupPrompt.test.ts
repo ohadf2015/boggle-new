@@ -31,6 +31,13 @@ vi.mock('@/hooks/useConsentDecided', () => ({
   useConsentDecided: () => mockConsentDecided(),
 }));
 
+// Active-game gate: the prompt must never interrupt live gameplay. Default
+// false (no active game) so all pre-existing behaviour tests are unaffected.
+const mockIsGameActive = vi.fn<() => boolean>();
+vi.mock('@/utils/abandonOnPagehide', () => ({
+  isGameActive: () => mockIsGameActive(),
+}));
+
 import { useSignupPrompt } from '../useSignupPrompt';
 
 const flushTimer = async (ms = 3600): Promise<void> => {
@@ -44,6 +51,7 @@ beforeEach(() => {
   mockFlag.mockReturnValue('after-first-win');
   mockStats.mockReturnValue({ games: 0, wins: 0 });
   mockConsentDecided.mockReturnValue(true);
+  mockIsGameActive.mockReturnValue(false);
   mockTrackSignupFunnel.mockClear();
   if (typeof window !== 'undefined') {
     window.sessionStorage.clear();
@@ -277,6 +285,42 @@ describe('useSignupPrompt — impression telemetry', () => {
     rerender();
     await flushTimer();
     expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useSignupPrompt — active-game deferral', () => {
+  it('does NOT interrupt live gameplay: defers show + telemetry while a game is active', async () => {
+    mockIsGameActive.mockReturnValue(true);
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+    expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
+    // Crucially the once-per-session flag must NOT be latched during gameplay,
+    // or the prompt would be lost for the whole session.
+    expect(window.sessionStorage.getItem('boggle_sp_signup_shown')).toBeNull();
+  });
+
+  it('shows after the game ends and stats change again', async () => {
+    mockIsGameActive.mockReturnValue(true);
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+
+    // Game ends → no active game → next stats-change re-evaluates and shows.
+    mockIsGameActive.mockReturnValue(false);
+    mockStats.mockReturnValue({ games: 2, wins: 1 });
+    await act(async () => {
+      window.dispatchEvent(new Event('guestStatsChanged'));
+    });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
   });
 });
 

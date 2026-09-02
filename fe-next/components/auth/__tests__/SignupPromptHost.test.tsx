@@ -20,9 +20,13 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('next/dynamic', () => ({
   default: () => {
-    const Stub = (props: { isOpen: boolean }) =>
+    const Stub = (props: { isOpen: boolean; variant?: string }) =>
       props.isOpen
-        ? React.createElement('div', { 'data-testid': 'first-win-signup-modal' }, 'modal')
+        ? React.createElement(
+            'div',
+            { 'data-testid': 'first-win-signup-modal', 'data-variant': props.variant },
+            'modal'
+          )
         : null;
     return Stub;
   },
@@ -33,7 +37,7 @@ import { SignupPromptHost } from '../SignupPromptHost';
 describe('SignupPromptHost', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseSignupPrompt.mockReturnValue({ showSignupModal: false, setShowSignupModal: vi.fn() });
+    mockUseSignupPrompt.mockReturnValue({ showSignupModal: false, setShowSignupModal: vi.fn(), isFirstWin: false });
     mockUsePathname.mockReturnValue('/he');
     mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, loading: false });
   });
@@ -44,9 +48,24 @@ describe('SignupPromptHost', () => {
   });
 
   it('renders modal when guest hook signals show', () => {
-    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn() });
+    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn(), isFirstWin: false });
     render(<SignupPromptHost />);
     expect(screen.getByTestId('first-win-signup-modal')).toBeInTheDocument();
+  });
+
+  it('uses the firstWin celebration variant when the hook flags a first win', () => {
+    // Regression: the host used to hardcode variant="multiGames", so the
+    // hook's isFirstWin was computed but never consumed — first-time winners
+    // (the prompt's largest population) got generic copy and no confetti.
+    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn(), isFirstWin: true });
+    render(<SignupPromptHost />);
+    expect(screen.getByTestId('first-win-signup-modal')).toHaveAttribute('data-variant', 'firstWin');
+  });
+
+  it('keeps the multiGames variant for non-first-win prompts', () => {
+    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn(), isFirstWin: false });
+    render(<SignupPromptHost />);
+    expect(screen.getByTestId('first-win-signup-modal')).toHaveAttribute('data-variant', 'multiGames');
   });
 
   it('disables hook on multiplayer routes (delegated to useMultiplayerSignupNudge)', () => {
