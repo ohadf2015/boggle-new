@@ -270,7 +270,18 @@ export function getAllGuestDailyResults(): Array<{
     }
   }
 
-  return allResults;
+  // syncGuestDailyResultsToAccount replays these through /submit, and the
+  // update_word_hunt_player_stats() DB trigger derives current_streak by
+  // comparing each row's puzzle_date to the PREVIOUS row's last_played_date
+  // (see migration 067) — it assumes rows arrive in chronological order.
+  // getAllWordHuntResults() returns each language newest-first, and this loop
+  // then concatenates language by language, so the combined list here was
+  // date-scrambled (e.g. today's `en` row before yesterday's `he` row).
+  // Replaying in that order corrupts the streak the guest is about to see —
+  // exactly the wrong moment for it to reset. Sort oldest-first so replay
+  // reproduces the same day-by-day history the trigger would have seen if
+  // the player had been authenticated all along.
+  return allResults.sort((a, b) => a.puzzleDate.localeCompare(b.puzzleDate));
 }
 
 /**
