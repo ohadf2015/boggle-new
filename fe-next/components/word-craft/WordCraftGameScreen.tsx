@@ -13,6 +13,7 @@ import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { useAdMob } from '@/hooks/useAdMob';
 import { isNative } from '@/utils/platform';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
+import { DictStatusChip } from '@/components/word-craft/DictStatusChip';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
@@ -135,14 +136,18 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // it covers the setup phase too and START's remount can't flicker it.
 
   const [dict, setDict] = useState<Set<string> | null>(null);
+  const [dictError, setDictError] = useState(false);
 
   // Load locale dictionary
   useEffect(() => {
     let cancelled = false;
+    setDictError(false);
     loadWordCraftDictionary(locale).then((d) => {
       if (!cancelled) { setDict(d); trackWordCraftGameStarted({ locale }); }
     }).catch(() => {
-      if (!cancelled) setDict(new Set());
+      // NOT setDict(new Set()): an empty dictionary rejects every real word as
+      // "not in the dictionary". Stay unloaded and offer a retry instead.
+      if (!cancelled) setDictError(true);
     });
     return () => { cancelled = true; };
   }, [locale]);
@@ -229,7 +234,14 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   // --- Telemetry plumbing ---
   // turnIdRef persists for the whole turn so every event tied to one turn
   // lands with the same key. Bumps on each successful commit / pass.
-  const turnIdRef = useRef(`t-${Date.now()}-0`);
+  // Seeded in an effect, not in the initializer: Date.now() during render is
+  // impure (react-hooks/purity) and its value would drift across re-renders
+  // until the first commit. Every read is from an event handler or a callback,
+  // never from render, so the effect has always run by the time it matters.
+  const turnIdRef = useRef('t-0-0');
+  useEffect(() => {
+    turnIdRef.current = `t-${Date.now()}-0`;
+  }, []);
   const turnIndexRef = useRef(0);
   // Per-turn count of dispatch sites — fed into `inputMethod` heuristic on
   // turn_submitted so we know which gesture dominated the turn.
@@ -911,12 +923,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           />
         </div>
 
-        {!dict ? (
-          <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
-            <PageLoader size="sm" />
-            <span className="text-xs text-neo-white">{t('wordcraft.loadingDict')}</span>
-          </div>
-        ) : null}
+        <DictStatusChip
+          loading={!dict && !dictError}
+          error={dictError}
+          onRetry={() => window.location.reload()}
+        />
 
         <WordCraftScoreboard
           player={game.state.player}

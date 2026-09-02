@@ -31,12 +31,16 @@ export function RunPageClient() {
   // Random seed per run — prevents every run from being the same board.
   const [seed] = useState(() => Math.floor(Math.random() * 1_000_000));
   const [dict, setDict] = useState<Set<string> | null>(null);
+  const [dictError, setDictError] = useState(false);
   useEffect(() => {
     let cancelled = false;
+    setDictError(false);
     loadWordCraftDictionary(locale).then((d) => {
       if (!cancelled) setDict(d);
     }).catch(() => {
-      if (!cancelled) setDict(new Set());
+      // NOT setDict(new Set()): an empty dictionary rejects every real word as
+      // "not in the dictionary". Stay unloaded and offer a retry instead.
+      if (!cancelled) setDictError(true);
     });
     return () => { cancelled = true; };
   }, [locale]);
@@ -95,6 +99,21 @@ export function RunPageClient() {
     const id = setTimeout(() => setWordPop(null), 1300);
     return () => clearTimeout(id);
   }, [state.lastWordScore]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (dictError) {
+    return (
+      <div className="flex flex-col items-center gap-4 p-6 text-center">
+        <p className="font-neo-display text-lg text-neo-red">{t('wordTower.loadError')}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="rounded-neo border-neo border-black bg-neo-cyan px-6 py-3 font-neo-display text-sm font-black uppercase text-black shadow-hard active:translate-y-px"
+        >
+          {t('common.retry')}
+        </button>
+      </div>
+    );
+  }
 
   if (!dict) {
     return <div className="p-6 text-center font-neo-body text-neo-white">{t('common.loading')}</div>;

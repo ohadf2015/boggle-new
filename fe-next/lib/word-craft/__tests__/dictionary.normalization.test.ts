@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loadWordCraftDictionary } from '../dictionary';
+import { loadWordCraftDictionary, DictionaryLoadError } from '../dictionary';
 
 const fetchMock = vi.fn();
 
@@ -51,9 +51,12 @@ describe('loadWordCraftDictionary — Spanish accent normalization', () => {
 });
 
 describe('loadWordCraftDictionary — robustness', () => {
-  it('returns an empty set when the API responds non-ok', async () => {
+  // This used to assert `dict.size === 0`, which pinned the defect: an empty
+  // dictionary is not a degraded dictionary, it is one in which no word is a
+  // word, and Word Tower/Word Craft happily start on it and reject everything
+  // the player types as "not in the dictionary" (reported 2026-09-02, "ice").
+  it('throws rather than resolving to an empty set when the API responds non-ok', async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 500 });
-    const dict = await loadWordCraftDictionary('ja');
-    expect(dict.size).toBe(0);
+    await expect(loadWordCraftDictionary('ja')).rejects.toThrow(DictionaryLoadError);
   });
 });
