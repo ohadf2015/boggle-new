@@ -22,6 +22,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { KPICards } from '@/components/admin/overview/KPICards';
+import { TeacherHealthCard } from '@/components/admin/overview/TeacherHealthCard';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
 import { MpModeBreakdown } from '@/components/admin/overview/MpModeBreakdown';
@@ -118,6 +119,10 @@ export default function AdminPageClient() {
 
           {/* KPI Cards + System Health (glanceable, deep tools live in System) */}
           <KPICards stats={stats} />
+
+          {/* Teacher health summary — actionable, glanceable, links to full funnel */}
+          <TeacherHealthCard />
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <SystemHealth health={health} />
