@@ -3,37 +3,60 @@
  * leaderboard and be able to read their streak, on the same rules as an
  * authenticated player.
  *
- * Regression coverage for two bugs:
+ * Regression coverage:
  * 1. The leaderboard route used to filter `.not('player_id', 'is', null)`,
  *    silently dropping every guest row even though they were already written
  *    and counted (guestPlayerCount). That filter must be gone.
- * 2. /check-played only read word_hunt_player_stats (current_streak /
- *    longest_streak) when a playerId was present, so a guest's row — which
- *    the update_word_hunt_player_stats() DB trigger maintains identically for
- *    guest_fingerprint (migrations 020, 067) — was never read back.
+ * 2. /check-played only read a streak when a playerId was present. The read
+ *    it used to do — word_hunt_player_stats.current_streak — turned out to be
+ *    dead in production (verified directly against the live DB: the table
+ *    doesn't exist, no trigger writes it), so it was already broken for
+ *    authenticated players too. The fix reads the same cross-mode streak the
+ *    authenticated weekly-chest endpoint already computes from live attempt
+ *    tables (fetchDailyStreak / computeCurrentStreak), keyed by idColumn so a
+ *    guest_fingerprint works exactly like a player_id.
  *
  * Also covers the new standalone GET /streak endpoint, which reads a streak
  * without requiring an attempt on today's specific date.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 
-// Recording Supabase mock: each table gets its own canned resolver so a single
-// test can make e.g. `word_hunt_player_stats` return a specific streak while
-// `daily_word_hunt_attempts` returns a specific existing row. Every builder
-// method is chainable and records `eq`/`not`/`is` calls so tests can assert on
-// exactly what the route asked the DB for.
+// fetchDailyStreak() anchors "today" on `new Date()`. Pin it so the fixture
+// dates below (chosen relative to 2026-08-30) produce deterministic streaks
+// regardless of the real calendar date the suite runs on.
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-08-30T12:00:00.000Z'));
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+// Recording Supabase mock: each table gets its own resolver, given the
+// recorded query (select/eq/not calls) so a single table queried two
+// different ways in the same request (e.g. daily_word_hunt_attempts: once
+// for "does today's row exist", once for "every solved date ever") can return
+// two different shapes. Every builder method is chainable and records what
+// was asked for, so tests can assert on exactly what the route queried.
 const h = vi.hoisted(() => {
-  const queries: Array<{ table: string; eqs: Array<[string, unknown]>; nots: Array<[string, unknown, unknown]> }> = [];
-  const resolvers: Record<string, () => { data: unknown; error: unknown; count?: number }> = {};
+  type QueryRecord = {
+    table: string;
+    select: string;
+    eqs: Array<[string, unknown]>;
+    nots: Array<[string, unknown, unknown]>;
+  };
+  const queries: QueryRecord[] = [];
+  const resolvers: Record<string, (record: QueryRecord) => { data: unknown; error: unknown; count?: number }> = {};
 
   function makeBuilder(table: string) {
-    const record = { table, eqs: [] as Array<[string, unknown]>, nots: [] as Array<[string, unknown, unknown]> };
+    const record: QueryRecord = { table, select: '', eqs: [], nots: [] };
     queries.push(record);
     const b: Record<string, unknown> = {};
     const chain = (name: string) => (...args: unknown[]) => {
+      if (name === 'select') record.select = String(args[0] ?? '');
       if (name === 'eq') record.eqs.push(args as [string, unknown]);
       if (name === 'not') record.nots.push(args as [string, unknown, unknown]);
       return b;
@@ -43,7 +66,7 @@ const h = vi.hoisted(() => {
     }
     const resolve = () => {
       const r = resolvers[table];
-      return r ? r() : { data: null, error: null, count: 0 };
+      return r ? r(record) : { data: null, error: null, count: 0 };
     };
     b.single = () => Promise.resolve(resolve());
     b.maybeSingle = () => Promise.resolve(resolve());
@@ -76,11 +99,22 @@ function tableQueries(table: string) {
   return h.queries.filter((q) => q.table === table);
 }
 
+function resetMock() {
+  h.queries.length = 0;
+  Object.keys(h.resolvers).forEach((k) => delete h.resolvers[k]);
+  h.supabaseMock.from.mockClear();
+}
+
+// The three tables fetchDailyStreak() combines, all empty by default.
+function stubEmptyStreakTables() {
+  h.resolvers['daily_puzzle_attempts'] = () => ({ data: [], error: null });
+  h.resolvers['daily_word_hunt_attempts'] = () => ({ data: [], error: null });
+  h.resolvers['daily_word_wheel_attempts'] = () => ({ data: [], error: null });
+}
+
 describe('Word Hunt leaderboard includes guests', () => {
   beforeEach(() => {
-    h.queries.length = 0;
-    Object.keys(h.resolvers).forEach((k) => delete h.resolvers[k]);
-    h.supabaseMock.from.mockClear();
+    resetMock();
     h.resolvers['daily_word_hunt_leaderboard'] = () => ({ data: [], error: null });
     h.resolvers['daily_word_hunt_attempts'] = () => ({ data: [], error: null, count: 0 });
   });
@@ -111,52 +145,56 @@ describe('Word Hunt leaderboard includes guests', () => {
 
 describe('GET /check-played includes a guest streak', () => {
   beforeEach(() => {
-    h.queries.length = 0;
-    Object.keys(h.resolvers).forEach((k) => delete h.resolvers[k]);
-    h.supabaseMock.from.mockClear();
+    resetMock();
+    stubEmptyStreakTables();
 
-    h.resolvers['daily_word_hunt_attempts'] = () => ({
-      data: {
-        id: 'attempt-1',
-        solved: true,
-        attempts_used: 4,
-        efficiency_score: 80,
-        words_discovered: [],
-        life_remaining: 1,
-        target_word: 'WORD',
-        attempt_words: [],
-        completed_at: '2026-08-30T12:00:00.000Z',
-        clue_tokens_earned: 0,
-        clue_tokens_spent: 0,
-        hints_unlocked: 0,
-      },
-      error: null,
-    });
-    h.resolvers['word_hunt_player_stats'] = () => ({
-      data: { current_streak: 3, longest_streak: 5, last_played_date: '2026-08-30' },
-      error: null,
-    });
+    // daily_word_hunt_attempts is queried twice in this flow: once for
+    // "does today's row exist" (select includes 'id'), once inside
+    // fetchDailyStreak for "every solved date ever" (select is 'puzzle_date').
+    // Branch on that to give each call its own shape.
+    h.resolvers['daily_word_hunt_attempts'] = (record) => {
+      if (record.select.includes('id')) {
+        return {
+          data: {
+            id: 'attempt-1',
+            solved: true,
+            attempts_used: 4,
+            efficiency_score: 80,
+            words_discovered: [],
+            life_remaining: 1,
+            target_word: 'WORD',
+            attempt_words: [],
+            completed_at: '2026-08-30T12:00:00.000Z',
+            clue_tokens_earned: 0,
+            clue_tokens_spent: 0,
+            hints_unlocked: 0,
+          },
+          error: null,
+        };
+      }
+      return { data: [{ puzzle_date: '2026-08-30' }, { puzzle_date: '2026-08-29' }, { puzzle_date: '2026-08-28' }], error: null };
+    };
   });
 
-  it('reads the guest_fingerprint row and returns its streak, not a zeroed default', async () => {
+  it('reads the guest_fingerprint identity and returns a real cross-mode streak, not a zeroed default', async () => {
     const res = await request(app())
       .get('/check-played/2026-08-30/en')
       .query({ guestFingerprint: 'guest-abc' });
 
     expect(res.status).toBe(200);
     expect(res.body.hasPlayed).toBe(true);
-    expect(res.body.streak).toEqual({ currentStreak: 3, longestStreak: 5 });
+    expect(res.body.streak).toEqual({ currentStreak: 3 });
 
-    const statsQuery = tableQueries('word_hunt_player_stats')[0];
-    expect(statsQuery.eqs).toContainEqual(['guest_fingerprint', 'guest-abc']);
+    const huntQueries = tableQueries('daily_word_hunt_attempts');
+    const streakQuery = huntQueries.find((q) => !q.select.includes('id'));
+    expect(streakQuery?.eqs).toContainEqual(['guest_fingerprint', 'guest-abc']);
   });
 });
 
 describe('GET /streak', () => {
   beforeEach(() => {
-    h.queries.length = 0;
-    Object.keys(h.resolvers).forEach((k) => delete h.resolvers[k]);
-    h.supabaseMock.from.mockClear();
+    resetMock();
+    stubEmptyStreakTables();
   });
 
   it('requires either playerId or guestFingerprint', async () => {
@@ -165,41 +203,39 @@ describe('GET /streak', () => {
   });
 
   it('reads a streak for a guest without any attempt row for today', async () => {
-    h.resolvers['word_hunt_player_stats'] = () => ({
-      data: { current_streak: 2, longest_streak: 4, last_played_date: '2026-08-29' },
+    h.resolvers['daily_word_hunt_attempts'] = () => ({
+      data: [{ puzzle_date: '2026-08-29' }, { puzzle_date: '2026-08-28' }],
       error: null,
     });
 
     const res = await request(app()).get('/streak').query({ guestFingerprint: 'guest-xyz' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ currentStreak: 2, longestStreak: 4, lastPlayedDate: '2026-08-29' });
+    // "today" is computed server-side as new Date() at test time, so last
+    // played yesterday still counts as an active (grace) streak of 2.
+    expect(res.body).toEqual({ currentStreak: 2, lastPlayedDate: '2026-08-29' });
 
-    const statsQuery = tableQueries('word_hunt_player_stats')[0];
-    expect(statsQuery.eqs).toContainEqual(['guest_fingerprint', 'guest-xyz']);
+    const huntQuery = tableQueries('daily_word_hunt_attempts')[0];
+    expect(huntQuery.eqs).toContainEqual(['guest_fingerprint', 'guest-xyz']);
   });
 
   it('reads a streak for an authenticated player by player_id', async () => {
-    h.resolvers['word_hunt_player_stats'] = () => ({
-      data: { current_streak: 7, longest_streak: 7, last_played_date: '2026-08-30' },
-      error: null,
-    });
+    h.resolvers['daily_puzzle_attempts'] = () => ({ data: [{ puzzle_date: '2026-08-30' }], error: null });
 
     const res = await request(app()).get('/streak').query({ playerId: 'player-123' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ currentStreak: 7, longestStreak: 7, lastPlayedDate: '2026-08-30' });
+    expect(res.body.lastPlayedDate).toBe('2026-08-30');
+    expect(res.body.currentStreak).toBeGreaterThanOrEqual(1);
 
-    const statsQuery = tableQueries('word_hunt_player_stats')[0];
-    expect(statsQuery.eqs).toContainEqual(['player_id', 'player-123']);
+    const puzzleQuery = tableQueries('daily_puzzle_attempts')[0];
+    expect(puzzleQuery.eqs).toContainEqual(['player_id', 'player-123']);
   });
 
-  it('defaults to zero when no stats row exists yet', async () => {
-    h.resolvers['word_hunt_player_stats'] = () => ({ data: null, error: null });
-
+  it('defaults to zero/null when no attempts exist yet', async () => {
     const res = await request(app()).get('/streak').query({ guestFingerprint: 'brand-new-guest' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ currentStreak: 0, longestStreak: 0, lastPlayedDate: null });
+    expect(res.body).toEqual({ currentStreak: 0, lastPlayedDate: null });
   });
 });

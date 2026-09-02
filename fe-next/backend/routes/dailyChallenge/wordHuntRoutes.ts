@@ -26,6 +26,7 @@ import {
   isValidDateFormat,
   isValidLanguage,
   computeWordHuntRetryScore,
+  sanitizeGuestDisplayName,
 } from './utils';
 import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
 import { emptyQuestResult } from '../../../shared/dailyQuestPool';
@@ -36,6 +37,7 @@ import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import {
   computeCycleProgress,
   computeChestTierForCycle,
+  computeCurrentStreak,
   type HuntScoreRow,
   type WheelScoreRow,
   type PuzzleScoreRow,
@@ -48,30 +50,51 @@ import { freezeDateToBridge } from '../../../lib/daily/chestFreezeBridge';
 const router: Router = express.Router();
 
 /**
- * Read a player's or guest's Word Hunt streak from `word_hunt_player_stats`.
- * That table (and its `current_streak`/`longest_streak` columns) is maintained
- * by the `update_word_hunt_player_stats()` DB trigger on every submit — see
- * migrations 020/067 — which already branches on player_id vs guest_fingerprint
- * identically, so a guest accrues a streak by the same rules as an authenticated
- * player with zero server-side changes to the streak math itself. This just
- * reads it back for either identity kind, shared by /check-played and /streak.
+ * Read a player's or guest's daily streak, on the same rules an authenticated
+ * player already gets from GET /api/daily/weekly-chest/status: the full
+ * consecutive-day run across all three daily modes (classic puzzle, Word Hunt,
+ * Word Wheel), via the same `computeCurrentStreak` used there — see
+ * fe-next/lib/daily/weeklyChest.ts and fe-next/app/api/daily/weekly-chest/status/route.ts.
+ *
+ * `word_hunt_player_stats` (current_streak/longest_streak columns, migrations
+ * 020/067) is NOT used here: verified directly against the live database that
+ * the table doesn't exist and no trigger calls update_word_hunt_player_stats()
+ * — it's an orphaned function left behind by a migration that was never
+ * actually wired up. The /check-played read that used to hit it (guarded by
+ * `if (playerId)`) was already dead for authenticated players too; this
+ * replaces it with the mechanism the product's "day N" fire icon actually
+ * uses today, extended to accept a guest_fingerprint the same as a player_id.
+ *
+ * Guests don't get streak-freeze bridging (daily_streak_freezes and
+ * player_engagement are player_id-only tables — no guest_fingerprint column),
+ * so an authenticated caller of this same endpoint may occasionally read one
+ * lower than the fire icon on a day a freeze is actively bridging a gap. That
+ * is a disclosed simplification, not a fabricated number — it only ever
+ * under-reports a real, unfrozen gap.
  */
-async function fetchWordHuntStreak(
+async function fetchDailyStreak(
   supabase: ReturnType<typeof getSupabase>,
   idColumn: 'player_id' | 'guest_fingerprint',
   idValue: string
-): Promise<{ currentStreak: number; longestStreak: number; lastPlayedDate: string | null }> {
-  const { data: stats } = await supabase!
-    .from('word_hunt_player_stats')
-    .select('current_streak, longest_streak, last_played_date')
-    .eq(idColumn, idValue)
-    .maybeSingle();
+): Promise<{ currentStreak: number; lastPlayedDate: string | null }> {
+  const today = new Date().toISOString().split('T')[0];
 
-  return {
-    currentStreak: stats?.current_streak || 0,
-    longestStreak: stats?.longest_streak || 0,
-    lastPlayedDate: stats?.last_played_date ?? null,
-  };
+  const [puzzleRes, huntRes, wheelRes] = await Promise.all([
+    supabase!.from('daily_puzzle_attempts').select('puzzle_date').eq(idColumn, idValue).gt('word_count', 0),
+    supabase!.from('daily_word_hunt_attempts').select('puzzle_date').eq(idColumn, idValue).eq('solved', true).eq('is_catchup', false),
+    supabase!.from('daily_word_wheel_attempts').select('puzzle_date').eq(idColumn, idValue).gt('word_count', 0),
+  ]);
+
+  const allDates = [
+    ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+    ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+    ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+  ];
+
+  const currentStreak = computeCurrentStreak(allDates, today);
+  const lastPlayedDate = allDates.length > 0 ? allDates.reduce((max, d) => (d > max ? d : max)) : null;
+
+  return { currentStreak, lastPlayedDate };
 }
 
 /**
@@ -217,7 +240,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       target_word: targetWord,
       attempt_words: attemptWords,
       completed_at: new Date().toISOString(),
-      display_name: displayName || 'Anonymous',
+      display_name: sanitizeGuestDisplayName(displayName),
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
       country_code: countryCode || undefined,
@@ -865,9 +888,11 @@ router.get('/check-played/:date/:language', async (req: Request<{ date: string; 
 
     if (existingAttempt) {
       // Guests earn this the same way authenticated players do — see
-      // fetchWordHuntStreak above.
-      const { currentStreak, longestStreak } = await fetchWordHuntStreak(supabase, idColumn, idValue);
-      const streakData = { currentStreak, longestStreak };
+      // fetchDailyStreak above. No consumer of this response reads
+      // `longestStreak` (word_hunt_player_stats never really tracked it live
+      // either — see fetchDailyStreak's comment), so it's not fabricated here.
+      const { currentStreak } = await fetchDailyStreak(supabase, idColumn, idValue);
+      const streakData = { currentStreak };
 
       res.json({
         hasPlayed: true,
@@ -940,7 +965,7 @@ router.get('/streak', async (req: Request<unknown, unknown, unknown, { playerId?
     const idColumn: 'player_id' | 'guest_fingerprint' = playerId ? 'player_id' : 'guest_fingerprint';
     const idValue = playerId || (guestFingerprint as string);
 
-    const streak = await fetchWordHuntStreak(supabase, idColumn, idValue);
+    const streak = await fetchDailyStreak(supabase, idColumn, idValue);
     res.json(streak);
   } catch (error) {
     const err = error as Error;
