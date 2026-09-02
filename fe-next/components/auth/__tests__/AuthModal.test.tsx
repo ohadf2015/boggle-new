@@ -522,6 +522,42 @@ describe('AuthModal', () => {
       });
     });
 
+    // The upgrade page resumes checkout immediately after an in-modal sign-in
+    // instead of leaving the teacher to press "Upgrade Now" a second time
+    // (fix/teacher-funnel). onAuthSuccess is additive — it must never replace onClose.
+    it('calls onAuthSuccess (in addition to onClose) after a successful password sign-in', async () => {
+      const onClose = vi.fn();
+      const onAuthSuccess = vi.fn();
+      mockSignInWithEmail.mockResolvedValue({
+        data: { session: { access_token: 'tok' }, user: { id: 'u1' } },
+        error: null,
+      });
+      renderModal({ onClose, onAuthSuccess });
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(onAuthSuccess).toHaveBeenCalled();
+      });
+      expect(onClose).toHaveBeenCalled();
+    });
+
+    // onAuthSuccess is optional — omitting it must not throw or block onClose.
+    it('does not throw when onAuthSuccess is omitted on a successful sign-in', async () => {
+      const onClose = vi.fn();
+      mockSignInWithEmail.mockResolvedValue({
+        data: { session: { access_token: 'tok' }, user: { id: 'u1' } },
+        error: null,
+      });
+      renderModal({ onClose });
+      const { emailInput } = fillPasswordForm();
+      fireEvent.submit(emailInput.closest('form')!);
+
+      await waitFor(() => {
+        expect(onClose).toHaveBeenCalled();
+      });
+    });
+
     // Regression: the submit handler had no success branch for sign-in, so
     // isLoading stayed 'email' forever and the button spun with no outcome.
     it('clears the loading state after a successful password sign-in', async () => {

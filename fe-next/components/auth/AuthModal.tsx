@@ -51,6 +51,16 @@ interface AuthModalProps {
   onClose: () => void;
   showGuestStats?: boolean;
   initialMode?: 'signin' | 'signup';
+  /**
+   * Fired whenever this modal establishes a session itself — OAuth, password
+   * sign-in/sign-up with email confirmation off, or OTP verify. NOT fired for
+   * magic-link / email-confirmation-link sends, which hand off to a redirect
+   * instead (the caller resumes there, e.g. via a localStorage flag it reads
+   * once the user lands back on the page already authenticated).
+   * Called alongside onClose, not instead of it — callers that don't need it
+   * can omit it and get the old close-only behavior.
+   */
+  onAuthSuccess?: () => void;
 }
 
 interface GuestStats {
@@ -67,7 +77,7 @@ interface Provider {
 
 type AuthMode = 'signin' | 'signup';
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats = false, initialMode = 'signin' }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats = false, initialMode = 'signin', onAuthSuccess }) => {
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +136,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
 
   // OAuth sign-in with native SDK priority (Google/Apple native → in-app browser → redirect)
   const handleOAuthError = useCallback((msg: string) => setError(msg), []);
-  const handleOAuthSuccess = useCallback(() => onClose(), [onClose]);
+  const handleOAuthSuccess = useCallback(() => { onClose(); onAuthSuccess?.(); }, [onClose, onAuthSuccess]);
   const { signIn: oauthSignIn, loadingProvider: oauthLoadingProvider } = useOAuthSignIn({
     onError: handleOAuthError,
     onSuccess: handleOAuthSuccess,
@@ -278,6 +288,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         if (authMode === 'signup') trackEvent('funnel_sign_up', { method: 'password' });
         setIsLoading(null);
         onClose();
+        onAuthSuccess?.();
         return;
       }
 
@@ -375,6 +386,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         setError(result.error.message);
       } else {
         onClose();
+        onAuthSuccess?.();
       }
       setIsLoading(null);
     } catch (err) {

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import nextDynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PlanComparisonMatrix } from '@/components/teacher/PlanComparisonMatrix';
@@ -16,9 +17,49 @@ import Link from 'next/link';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
+// A guest who hits the 401 checkout wall proves intent to buy before the wall ever
+// shows up — they already clicked "Upgrade Now". Losing that click to a second manual
+// click after they finish signing in is the wall this flag removes: it survives a full
+// page reload (localStorage, not React state) so it also covers a magic-link or
+// email-confirmation click, which authenticates in a fresh navigation, not inside the
+// modal. Timestamped and capped at 15 minutes so a teacher who abandons the auth flow
+// and logs in hours/days later for an unrelated reason never gets an unsolicited
+// redirect to Polar checkout the next time they happen to land on this page.
+const RESUME_CHECKOUT_KEY = 'lc_resume_checkout_after_auth';
+const RESUME_CHECKOUT_TTL_MS = 15 * 60 * 1000;
+
+function markResumeCheckoutIntent() {
+  try {
+    localStorage.setItem(RESUME_CHECKOUT_KEY, String(Date.now()));
+  } catch {
+    // localStorage unavailable (private mode, etc.) — the teacher just clicks twice.
+  }
+}
+
+function clearResumeCheckoutIntent() {
+  try {
+    localStorage.removeItem(RESUME_CHECKOUT_KEY);
+  } catch {
+    // no-op
+  }
+}
+
+function consumeResumeCheckoutIntent(): boolean {
+  try {
+    const raw = localStorage.getItem(RESUME_CHECKOUT_KEY);
+    if (!raw) return false;
+    localStorage.removeItem(RESUME_CHECKOUT_KEY);
+    const setAt = Number(raw);
+    return Number.isFinite(setAt) && Date.now() - setAt < RESUME_CHECKOUT_TTL_MS;
+  } catch {
+    return false;
+  }
+}
+
 export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
+  const { user, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   // ponytail: no client-side checkout flag. There used to be one
@@ -46,7 +87,7 @@ export default function UpgradePricingPageClient() {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/subscription/checkout', {
@@ -57,6 +98,7 @@ export default function UpgradePricingPageClient() {
         // 401 means the user is not authenticated. Show the auth modal instead of a generic error.
         if (response.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
+          markResumeCheckoutIntent();
           setShowAuthModal(true);
           return;
         }
@@ -70,6 +112,7 @@ export default function UpgradePricingPageClient() {
         return;
       }
 
+      clearResumeCheckoutIntent();
       const { url } = await response.json();
       window.location.href = url;
     } catch (err) {
@@ -77,7 +120,23 @@ export default function UpgradePricingPageClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+
+  // Resumes checkout once the teacher is authenticated and a resume flag is pending.
+  // This is the mechanism of record — it survives BOTH ways auth can leave this
+  // component: a magic-link / email-confirmation click (navigates to /auth/callback,
+  // which redirects back to this exact page via its `next` param, remounting it with
+  // a fresh session) and the plain window.location.reload() that
+  // useAuthInitialization fires on every guest -> authenticated sign-in on this page
+  // (see the AuthModal usage below). AuthModal's onAuthSuccess is only a fast-path
+  // attempt for when no reload intervenes; this effect is what actually guarantees
+  // the resume.
+  useEffect(() => {
+    if (authLoading || !user) return;
+    if (!consumeResumeCheckoutIntent()) return;
+    setShowAuthModal(false);
+    handleUpgrade();
+  }, [user, authLoading, handleUpgrade]);
 
   // Free tier is deliberately framed as a starting point: the two caps a
   // growing teacher hits first are shown as explicit "missing" rows (loss framing).
@@ -422,12 +481,24 @@ export default function UpgradePricingPageClient() {
         </div>
       </div>
 
-      {/* Auth modal for unauthenticated checkout attempts (401) */}
+      {/* Auth modal for unauthenticated checkout attempts (401). onAuthSuccess is a
+          fast-path retry for the paths that authenticate inside the modal (OAuth,
+          password, OTP) instead of leaving the teacher to press "Upgrade Now" a second
+          time. It is NOT the only path: a genuine guest -> authenticated sign-in on
+          this page also fires useAuthInitialization's one-shot window.location.reload()
+          (contexts/auth/hooks/useAuthInitialization.ts), which can race and cancel
+          this fetch. That's fine — the resume effect above survives the reload (the
+          flag lives in localStorage, not React state) and finishes the job once the
+          page comes back with a session. Cancelling the modal deliberately does NOT
+          clear the flag: it only clears once checkout actually succeeds, so a reload
+          mid-flow can't strand the teacher short one click. The 15-minute TTL bounds
+          the cost of that choice. */}
       {showAuthModal && (
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           initialMode="signin"
+          onAuthSuccess={handleUpgrade}
         />
       )}
     </div>
