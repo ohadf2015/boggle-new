@@ -6,6 +6,7 @@
 import { getSupabase } from './client';
 
 import logger from '../../utils/logger';
+import { canAccessFeature } from '../../utils/featureFlags';
 
 export interface WordApprovalInput {
   word: string;
@@ -27,10 +28,13 @@ export type InvalidWordReason = 'not_on_board' | 'not_in_dictionary' | 'peer_rej
 
 // Word-mastery write path is opt-in. The `record_word_mastery_event` RPC is
 // created by the player_word_mastery migration, which must be applied before
-// this can run, and the feature itself is A/B-gated at rollout 0. Computing
-// once at module load keeps the word-submit hot path free of per-call env
-// lookups and, while disabled, free of the extra DB round-trip entirely.
+// this can run. It fires when EITHER the global env flag is on (enables the
+// feature for everyone) OR the specific player passes the word_mastery_v1
+// feature-flag check (admins and any future allowlisted/rolled-out users) —
+// so we can dogfood the feature for individual accounts before public rollout
+// without touching the word-submit hot path for everyone else.
 const WORD_MASTERY_RPC_ENABLED = process.env.NEXT_PUBLIC_WORD_MASTERY === '1';
+const WORD_MASTERY_FLAG = 'word_mastery_v1';
 
 /**
  * Save a host-approved word that wasn't in the dictionary to Supabase
@@ -115,11 +119,15 @@ export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: u
     logger.debug('SUPABASE', `${row.out_is_new_word ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${row.out_times_submitted}`);
 
     // Fire-and-forget mastery bump — never await on the word-submit path.
-    // Skipped entirely unless the word-mastery feature is explicitly enabled
-    // (env flag) AND its migration has been applied.
-    if (playerId && WORD_MASTERY_RPC_ENABLED) {
+    // Fires only when the global env flag is on OR this specific player has
+    // word_mastery_v1 access (admins / allowlisted / rolled-out users). The
+    // per-player check is fire-and-forget and the flag is cached ~60s, so it
+    // stays off the critical response path.
+    if (playerId) {
       void (async () => {
         try {
+          const enabled = WORD_MASTERY_RPC_ENABLED || await canAccessFeature(playerId, WORD_MASTERY_FLAG);
+          if (!enabled) return;
           const { error: masteryError } = await client.rpc('record_word_mastery_event', {
             p_player_id: playerId,
             p_word: normalizedWord,
