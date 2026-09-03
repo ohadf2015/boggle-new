@@ -24,6 +24,8 @@ export interface QuickStartStepProps {
   onHowToPlay: () => void;
   /** Sign-in shortcut. Omitted on platforms without external auth (CrazyGames). */
   onHaveAccount?: () => void;
+  /** Exit the FTUE takeover back to the homepage without playing. */
+  onSkip?: () => void;
 }
 
 /**
@@ -52,7 +54,7 @@ export interface QuickStartStepProps {
  *   result screen, where there is finally something to sign up FOR.
  * See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
  */
-const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, onHaveAccount }) => {
+const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, onHaveAccount, onSkip }) => {
   const { t, dir, language, setLanguage } = useLanguage();
 
   // Snapshot the suggestion so we can tell later whether the player edited it.
@@ -271,6 +273,17 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
             </button>
           )}
         </div>
+
+        {onSkip && (
+          <button
+            type="button"
+            data-testid="quick-start-skip"
+            onClick={onSkip}
+            className="mt-2 min-h-[44px] w-full px-2 text-neo-black/60 underline underline-offset-2 transition-colors hover:text-neo-black"
+          >
+            {t('common.backToMenu')}
+          </button>
+        )}
       </NeoPanel>
     </div>
   );

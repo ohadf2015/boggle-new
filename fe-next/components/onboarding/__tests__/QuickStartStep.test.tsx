@@ -210,4 +210,16 @@ describe('QuickStartStep', () => {
     expect(screen.getByTestId('quick-start-shuffle').className).toMatch(/active:/);
     expect(screen.getByTestId('quick-start-avatar').className).toMatch(/active:/);
   });
+
+  it('shouldOfferAHomeExitSoTheFtueDoesNotTrapThePlayer', () => {
+    // GIVEN the one-screen FTUE (a full-screen takeover of the homepage)
+    const onSkip = vi.fn();
+    setup({ onSkip });
+
+    // WHEN the player wants out without playing
+    fireEvent.click(screen.getByTestId('quick-start-skip'));
+
+    // THEN skip-to-home fires (parent routes to `/${language}`)
+    expect(onSkip).toHaveBeenCalledTimes(1);
+  });
 });

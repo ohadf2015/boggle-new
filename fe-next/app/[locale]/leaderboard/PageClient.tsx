@@ -172,6 +172,20 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   return (
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
       <div className={cn('py-4')}>
+        <div className="mb-4">
+          <Button
+            data-testid="leaderboard-home"
+            onClick={() => router.push(`/${language}`)}
+            variant="outline"
+            size="sm"
+            className="min-h-[44px]"
+            haptic
+          >
+            <ArrowLeft className="me-2 rtl:rotate-180" />
+            {t('common.backToMenu')}
+          </Button>
+        </div>
+
         {/* Page Title */}
         <m.div
           initial={{ opacity: 1, y: 0 }}
@@ -408,7 +422,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <LeaderboardPlayCta language={language} />
           {/* Top-3 Podium — celebratory crown for the leaders */}
           {leaderboard.length > 0 && (
-            <div className="mb-6 px-2">
+            <div className="mb-6 px-2 overflow-x-auto">
               <LeaderboardPodium
                 entries={leaderboard.slice(0, 3)}
                 language={language}
@@ -420,25 +434,30 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           {/* Referral Share Banner — invite friends for rewards */}
           {profile && <div className="mb-6"><ReferralShareBanner /></div>}
 
-          {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above) */}
+          {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above).
+              Horizontal scroll on narrow viewports keeps rank/player/score/games
+              in one row instead of stacking avatars and scores. */}
           {leaderboard.length > 3 && (
+          <div data-testid="leaderboard-table-scroll" className="overflow-x-auto -mx-1 px-1">
           <div
+            data-testid="leaderboard-table"
             className={cn(
-              'rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard',
+              'rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard min-w-[36rem]',
               isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             {/* Table Header */}
             <div
+              data-testid="leaderboard-table-header"
               className={cn(
-                'hidden sm:grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold uppercase tracking-wide',
+                'grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold uppercase tracking-wide',
                 isDarkMode ? 'bg-neo-navy-elevated/50 text-gray-300' : 'bg-gray-50 text-gray-600'
               )}
             >
-              <div className="col-span-1 text-center">{t('leaderboard.rank')}</div>
-              <div className="col-span-5">{t('leaderboard.player')}</div>
-              <div className="col-span-2 text-right">{t('leaderboard.score')}</div>
-              <div className="col-span-2 text-right">{t('leaderboard.games')}</div>
+              <div className="col-span-1 min-w-[3rem] text-center">{t('leaderboard.rank')}</div>
+              <div className="col-span-5 min-w-[10rem]">{t('leaderboard.player')}</div>
+              <div className="col-span-2 min-w-[4.5rem] text-right">{t('leaderboard.score')}</div>
+              <div className="col-span-2 min-w-[4.5rem] text-right">{t('leaderboard.games')}</div>
             </div>
 
             {/* Table Body */}
@@ -450,8 +469,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 return (
                   <div
                     key={entry.player_id}
+                    data-testid="leaderboard-row"
                     className={cn(
-                      'flex flex-col sm:grid sm:grid-cols-10 gap-1 sm:gap-3 px-3 py-3 items-start sm:items-center transition-all duration-150',
+                      'grid grid-cols-10 gap-3 px-3 py-3 items-center transition-all duration-150',
                       isCurrentUser
                         ? isDarkMode
                           ? 'bg-cyan-900/20'
@@ -461,9 +481,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                           : 'hover:bg-gray-50'
                     )}
                   >
-                    <div className="hidden sm:block sm:col-span-1 text-center">{getRankIcon(rank)}</div>
-                    <div className="flex items-center gap-2 w-full sm:w-auto sm:col-span-5">
-                      <div className="sm:hidden shrink-0 w-6 text-center">{getRankIcon(rank)}</div>
+                    <div className="col-span-1 min-w-[3rem] text-center">{getRankIcon(rank)}</div>
+                    <div className="flex min-w-0 items-center gap-2 col-span-5">
                       <Avatar
                         customAvatar={entry.avatar_config}
                         userId={entry.player_id}
@@ -489,28 +508,23 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         size="xs"
                         animated={isCurrentUser}
                       />
-                      <div className={cn(
-                        'sm:hidden font-semibold text-sm',
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                      )}>
-                        {safeToLocaleString(entry.total_score ?? 0, language)}
-                      </div>
                     </div>
                     <div
                       className={cn(
-                        'hidden sm:block sm:col-span-2 text-right font-semibold text-sm',
+                        'col-span-2 min-w-[4.5rem] text-right font-semibold text-sm',
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       )}
                     >
                       {safeToLocaleString(entry.total_score ?? 0, language)}
                     </div>
-                    <div className={cn('hidden sm:block sm:col-span-2 text-right text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
+                    <div className={cn('col-span-2 min-w-[4.5rem] text-right text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
                       {entry.games_played || 0}
                     </div>
                   </div>
                 );
               })}
             </div>
+          </div>
           </div>
           )}
         </PageStateHandler>

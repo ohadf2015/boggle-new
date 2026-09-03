@@ -107,6 +107,13 @@ describe('HowToPlay Neo-Brutalist Design', () => {
       fireEvent.click(closeBtn);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
+
+    it('shouldMeetThe44pxTapTargetSoCloseIsNotUnresponsiveOnMobile', () => {
+      renderWithLanguage(<HowToPlay onClose={mockOnClose} />);
+      const closeBtn = screen.getByRole('button', { name: /close/i });
+      expect(closeBtn.className).toMatch(/min-h-\[44px\]/);
+      expect(closeBtn.className).toMatch(/min-w-\[44px\]/);
+    });
   });
 
   describe('Step Content', () => {

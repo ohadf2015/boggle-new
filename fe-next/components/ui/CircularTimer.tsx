@@ -58,13 +58,21 @@ const CircularTimer = memo<CircularTimerProps>(({
 }) => {
   const family = COLOR_FAMILIES[colorFamily];
 
-  // Build color stops: normal → warning → critical
+  // Hold the normal color until warningAt — interpolating from `duration`
+  // down to `warningAt` painted the ring orange for most of the match.
   const colors = useMemo(() => {
-    return [family.normal, WARNING_COLOR, CRITICAL_COLOR] as [`#${string}`, `#${string}`, `#${string}`];
+    return [family.normal, family.normal, WARNING_COLOR, CRITICAL_COLOR] as [
+      `#${string}`,
+      `#${string}`,
+      `#${string}`,
+      `#${string}`,
+    ];
   }, [family.normal]);
 
   const colorsTime = useMemo((): { 0: number } & { 1: number } & number[] => {
-    return [duration, warningAt, criticalAt];
+    const warn = Math.min(Math.max(warningAt, 0), duration);
+    const crit = Math.min(Math.max(criticalAt, 0), warn);
+    return [duration, warn, Math.max(crit, warn - 0.01), crit];
   }, [duration, warningAt, criticalAt]);
 
   const handleComplete = useCallback(() => {
@@ -88,11 +96,10 @@ const CircularTimer = memo<CircularTimerProps>(({
         onComplete={handleComplete}
       >
         {({ remainingTime }) => {
-          const mins = Math.floor(remainingTime / 60);
-          const secs = remainingTime % 60;
-          const display = mins > 0
-            ? `${mins}:${secs.toString().padStart(2, '0')}`
-            : `${secs}`;
+          const total = Math.max(0, Math.floor(remainingTime));
+          const mins = Math.floor(total / 60);
+          const secs = total % 60;
+          const display = `${mins}:${secs.toString().padStart(2, '0')}`;
 
           return (
             <span

@@ -127,11 +127,12 @@ vi.mock('../StyleSelectStep', () => ({
 // The whole base FTUE, collapsed onto one screen.
 vi.mock('../QuickStartStep', () => ({
   __esModule: true,
-  default: ({ onPlay, onHowToPlay, onHaveAccount }: any) => (
+  default: ({ onPlay, onHowToPlay, onHaveAccount, onSkip }: any) => (
     <div data-testid="quick-start-step">
       <button onClick={() => onPlay('Player1', {}, false)}>Play</button>
       <button onClick={onHowToPlay}>How To Play</button>
       {onHaveAccount && <button onClick={onHaveAccount}>Have Account</button>}
+      {onSkip && <button data-testid="quick-start-skip" onClick={onSkip}>Skip to home</button>}
     </div>
   ),
 }));
@@ -364,6 +365,15 @@ describe('OnboardingFlow', () => {
       fireEvent.click(screen.getByText('Skip'));
       expect(mockPush).toHaveBeenCalledWith('/en');
       expect(mockPush).not.toHaveBeenCalledWith('/en/multiplayer');
+    });
+
+    it('lets a player exit to home from the quick-start screen', () => {
+      mockConsumePendingRoom.mockReturnValue(null);
+      render(<OnboardingFlow {...defaultProps} />);
+      advanceToQuickStart();
+      fireEvent.click(screen.getByTestId('quick-start-skip'));
+      expect(mockPush).toHaveBeenCalledWith('/en');
+      expect(defaultProps.onComplete).toHaveBeenCalled();
     });
 
     it('still honors a pending room invite on skip (joins multiplayer room)', () => {

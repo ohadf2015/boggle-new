@@ -40,13 +40,15 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
   const prevStateRef = useRef<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const config = SIZES[size];
 
-  // Calculate the progress percentage
-  const progress = totalTime > 0 ? (remainingTime / totalTime) * 100 : 0;
+  // Remaining clamped so a reconnect tick > total cannot invert the ring
+  // (negative dashoffset looks like time is filling up, not counting down).
+  const clampedRemaining = Math.max(0, Math.min(remainingTime, Math.max(totalTime, 0)));
+  const progress = totalTime > 0 ? clampedRemaining / totalTime : 0;
 
   // Calculate the stroke dash offset for the circular progress
   const radius = config.radius;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+  const strokeDashoffset = circumference * (1 - progress);
 
   // Urgency escalation — clamped to 'normal' under cosy / calm mode.
   const { state: currentState, isLowTime, isVeryLowTime, isCriticalTime } =

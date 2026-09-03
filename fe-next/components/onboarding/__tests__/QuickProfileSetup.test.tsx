@@ -338,4 +338,18 @@ describe('QuickProfileSetup', () => {
       expect(screen.queryByTestId('invite-banner')).not.toBeInTheDocument();
     });
   });
+
+  describe('Play Now skip contrast', () => {
+    it('shouldUseDarkTextOnTheCreamPanelSoSkipIsTappable', () => {
+      // GIVEN the profile card (cream panel) with a Play Now skip
+      render(<QuickProfileSetup onComplete={() => {}} onPlayNow={() => {}} />);
+
+      // WHEN the skip control is inspected
+      const skip = screen.getByTestId('play-now-skip');
+
+      // THEN it is not white-on-cream (invisible / "unresponsive")
+      expect(skip.className).not.toMatch(/text-neo-white/);
+      expect(skip.className).toMatch(/text-neo-black/);
+    });
+  });
 });

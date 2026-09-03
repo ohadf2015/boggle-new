@@ -77,4 +77,20 @@ describe('LeaderboardPodium', () => {
     expect(screen.getByText('Ben').closest('a')).toHaveAttribute('href', '/en/player/b');
     expect(screen.getByText('Cy').closest('a')).toHaveAttribute('href', '/en/player/c');
   });
+
+  it('shouldKeepPodiumColumnsFromOverflowingOnNarrowViewports', () => {
+    // GIVEN three podium steps on a phone-width row
+    render(<LeaderboardPodium entries={entries} language="en" />);
+    const root = screen.getByLabelText('leaderboard.topThree');
+    const steps = screen.getAllByTestId('podium-step');
+
+    // THEN the row can shrink and each step is width-capped (no awkward wrap)
+    expect(root.className).toMatch(/flex/);
+    expect(root.className).toMatch(/items-end/);
+    expect(steps).toHaveLength(3);
+    steps.forEach((step) => {
+      expect(step.className).toMatch(/min-w-0/);
+      expect(step.className).toMatch(/max-w-/);
+    });
+  });
 });

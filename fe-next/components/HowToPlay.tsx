@@ -386,7 +386,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 bg-neo-navy-light border-2 border-slate-600 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
+            className="min-h-[44px] min-w-[44px] bg-neo-navy-light border-2 border-slate-600 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
             aria-label={t('common.close')}
           >
             <X className="w-4 h-4" strokeWidth={2.5} />
