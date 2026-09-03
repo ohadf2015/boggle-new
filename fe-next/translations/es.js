@@ -12268,7 +12268,7 @@ const es = {
       "checkoutError": "No se pudo iniciar el pago. Inténtalo de nuevo.",
       "signInRequired": "Inicia sesión para mejorar a Teacher Pro.",
       "currentPlan": "Estás en este plan",
-      "upgradePricingTitle": "Mejora a Teacher Pro",
+      "upgradePricingTitle": "Ve quién entendió — antes del timbre.",
       "upgradePricingSubtitle": "Gestiona aulas y estudiantes ilimitados",
       "upgradePricingReassure": "Cancela cuando quieras: tus aulas, lecciones y datos de estudiantes siempre están seguros.",
       "pricePerDay": "Unos $0,30 al día",
@@ -12307,7 +12307,7 @@ const es = {
       "featureOutcome4": "Compara el progreso de todas tus clases",
       "priceTaxNote": "Pueden añadirse impuestos al pagar.",
       "proHeroAlt": "Una profesora mira la clasificación de la clase en directo en la pizarra mientras el alumnado juega desde sus sitios.",
-      "valueHeadline": "Clases ilimitadas, alumnos ilimitados, progreso en directo.",
+      "valueHeadline": "Ideal para el repaso diario y tickets de salida. Comprueba a toda la clase en una ronda.",
       "matrix": {
         "title": "Comparar planes",
         "featureColumn": "Función",

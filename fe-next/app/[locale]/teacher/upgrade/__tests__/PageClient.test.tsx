@@ -323,4 +323,33 @@ describe('UpgradePricingPageClient', () => {
     // from coming back.
     expect(screen.queryByText(/pricePerStudent/)).not.toBeInTheDocument();
   });
+
+  // Headline + value prop only. Kahoot's schools/plans H1 is an outcome
+  // ("Achieve awesome classroom results with Kahoot!+") plus a "Best for"
+  // use-case under each plan. Ours used to lead with a checkout command
+  // ("Upgrade to Teacher Pro") — product-name-as-H1, no classroom moment.
+  // The H1 is the outcome; the product name sits in an eyebrow so the fold
+  // still names what is for sale without making the sale the headline.
+  it('leads with an outcome H1 and a best-for value line, product name as eyebrow', () => {
+    render(<UpgradePricingPageClient />);
+
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1).toHaveTextContent('teacher.subscription.upgradePricingTitle');
+    expect(screen.getByTestId('upgrade-value-prop')).toHaveTextContent(
+      'teacher.subscription.valueHeadline',
+    );
+    expect(screen.getByTestId('upgrade-value-eyebrow')).toHaveTextContent(
+      'teacher.subscription.proPlanName',
+    );
+    expect(h1.textContent).not.toMatch(/upgradeNow/i);
+  });
+
+  it('EN H1 is a classroom result, not a free-cap contrast', async () => {
+    const { en } = await import('@/translations/en');
+    const title = en.teacher.subscription.upgradePricingTitle;
+    const value = en.teacher.subscription.valueHeadline;
+    expect(title).not.toMatch(/first ten/i);
+    expect(value).toMatch(/Best for/i);
+    expect(value).toMatch(/review|exit ticket|whole-class/i);
+  });
 });
