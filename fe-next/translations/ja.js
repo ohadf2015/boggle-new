@@ -12276,7 +12276,7 @@ const ja = {
       "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
       "signInRequired": "Teacher Proにアップグレードするにはサインインしてください。",
       "currentPlan": "現在のプランです",
-      "upgradePricingTitle": "Teacher Proにアップグレード",
+      "upgradePricingTitle": "授業が終わる前に、誰が理解したか分かる。",
       "upgradePricingSubtitle": "無制限のクラスと生徒を管理",
       "upgradePricingReassure": "いつでも解約可能 — クラス、レッスン、生徒データは常に安全に保たれます。",
       "pricePerDay": "1日あたり約$0.30",
@@ -12315,7 +12315,7 @@ const ja = {
       "featureOutcome4": "すべてのクラスの進捗を比較",
       "priceTaxNote": "お支払い時に税が加算される場合があります。",
       "proHeroAlt": "生徒が席からプレイする中、教師が黒板のライブ順位表を見ている様子。",
-      "valueHeadline": "クラス無制限、生徒無制限、進捗はリアルタイム。",
+      "valueHeadline": "毎日の復習と出口チケットに最適。1ラウンドでクラス全員を確認。",
       "matrix": {
         "title": "プラン比較",
         "featureColumn": "機能",
