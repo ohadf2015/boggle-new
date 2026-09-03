@@ -28,8 +28,9 @@ export interface WordWheelPuzzle {
 // ==========================================
 // Nine-letter source words per language
 // ==========================================
-// These words provide the 9 unique letters for each puzzle.
-// Players don't need to find the source word — it's just the seed.
+// These words seed the wheel. Ranking URL (letterCount 9) uses the
+// source as a 9-letter anagram and keeps repeats. Daily default (7)
+// still unique-ifies. Players don't need to find the source word.
 
 const NINE_LETTER_SOURCES: Record<Language, string[]> = {
   en: [
@@ -80,6 +81,25 @@ const NINE_LETTER_SOURCES: Record<Language, string[]> = {
   ],
 };
 
+function normalizeWheelChar(char: string, language?: Language): string | null {
+  const upper = char.toUpperCase();
+  if (upper === ' ') return null;
+  return language === 'he' ? normalizeHebrewLetter(upper) : upper;
+}
+
+/**
+ * Letters of a source word as a multiset (repeats kept).
+ * Ranking-URL 9-letter wheels are anagrams, like Lovatts Free Play.
+ */
+function getSourceLetters(word: string, language?: Language): string[] {
+  const letters: string[] = [];
+  for (const char of word) {
+    const normalized = normalizeWheelChar(char, language);
+    if (normalized) letters.push(normalized);
+  }
+  return letters;
+}
+
 /**
  * Extract unique letters from a source word.
  * For languages like Japanese, characters are treated individually.
@@ -88,11 +108,8 @@ function getUniqueLetters(word: string, language?: Language): string[] {
   const seen = new Set<string>();
   const unique: string[] = [];
   for (const char of word) {
-    const upper = char.toUpperCase();
-    if (upper === ' ') continue;
-    // Normalize Hebrew final forms (sofit) so tiles show regular letter forms
-    const normalized = language === 'he' ? normalizeHebrewLetter(upper) : upper;
-    if (seen.has(normalized)) continue;
+    const normalized = normalizeWheelChar(char, language);
+    if (!normalized || seen.has(normalized)) continue;
     seen.add(normalized);
     unique.push(normalized);
   }
@@ -122,8 +139,12 @@ export function generateWordWheelPuzzle(
   const sourceIndex = Math.floor(random() * sources.length);
   const sourceWord = sources[sourceIndex];
 
-  // Extract unique letters (trim or pad to letterCount)
-  let letters = getUniqueLetters(sourceWord, language);
+  // Ranking URL (9): keep repeats so the wheel is a 9-letter anagram.
+  // Daily default (7): still unique-ify — do not change that generator.
+  let letters =
+    letterCount === 9
+      ? getSourceLetters(sourceWord, language)
+      : getUniqueLetters(sourceWord, language);
   if (letters.length > letterCount) letters = letters.slice(0, letterCount);
 
   // If fewer unique letters than requested, pad with common letters

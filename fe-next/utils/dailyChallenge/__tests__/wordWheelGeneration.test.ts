@@ -16,6 +16,21 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     expect(puzzle.allLetters).toHaveLength(7);
     expect(puzzle.outerLetters).toHaveLength(6);
   });
+
+  it('keeps repeated letters on the 9-letter ranking wheel (anagram, not unique tiles)', () => {
+    const dates: string[] = [];
+    for (let month = 1; month <= 12; month++) {
+      for (let day = 1; day <= 28; day++) {
+        dates.push(`2026-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+      }
+    }
+    const withRepeats = dates
+      .map((date) => generateWordWheelPuzzle(date, 'en', { letterCount: 9 }))
+      .filter((puzzle) => new Set(puzzle.allLetters).size < puzzle.allLetters.length);
+    expect(withRepeats.length).toBeGreaterThan(0);
+    expect(withRepeats[0].allLetters).toHaveLength(9);
+    expect(withRepeats[0].outerLetters).toHaveLength(8);
+  });
 });
 
 describe('generateWordWheelPuzzle - Hebrew final letter normalization', () => {
