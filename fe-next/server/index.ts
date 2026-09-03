@@ -26,6 +26,7 @@ import { configureMiddleware } from './middleware';
 import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } from './socketSetup';
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
+import { applyOfflineShellCacheHeader } from './offlineShellCache';
 import { errorHandler, notFoundHandler } from './errorMiddleware';
 import { httpRateLimitMiddleware } from '../backend/middleware/rateLimiterRedis';
 import {
@@ -209,6 +210,13 @@ async function start(): Promise<void> {
         const redirectResult = handleLocaleRedirect(req, res, parsedUrl);
         if (redirectResult) return;
       }
+
+      // Offline shells (home + offline-capable modes): let the WebView
+      // cache the document so a cold-start offline launch boots from the
+      // HTTP cache (SW precache does NOT cover cold-start navigations in
+      // the Android WebView — device-verified 2026-09-03). See
+      // server/offlineShellCache.ts for the safety invariants.
+      applyOfflineShellCacheHeader(req, res, pathname ?? '');
 
       await handle(req, res, parsedUrl);
     } catch (err) {
