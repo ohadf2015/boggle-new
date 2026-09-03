@@ -207,15 +207,28 @@ export default function UpgradePricingPageClient() {
       <EducationHeader showBackButton />
 
       <div className="flex-1 w-full max-w-5xl mx-auto px-4 py-12 sm:py-16">
-        {/* Header */}
+        {/* Header — outcome first, product name as eyebrow. Kahoot's bar is
+            "Achieve awesome classroom results with Kahoot!+" then a "Best for"
+            use-case under each plan. A checkout-command H1 ("Upgrade to…") lost
+            that comparison before the teacher ever reached the price. */}
         <div className="text-center mb-10 sm:mb-14">
+          <p
+            data-testid="upgrade-value-eyebrow"
+            className="text-sm font-black uppercase tracking-widest text-neo-cyan mb-3"
+          >
+            {t('teacher.subscription.proPlanName')}
+          </p>
           <h1
-            className="text-4xl md:text-5xl font-neo-display font-black text-neo-white mb-2"
+            className="text-4xl md:text-5xl font-neo-display font-black text-neo-white mb-3"
             style={{ textWrap: 'balance' }}
           >
             {t('teacher.subscription.upgradePricingTitle')}
           </h1>
-          <p className="text-xl text-neo-lime font-black mb-4">
+          <p
+            data-testid="upgrade-value-prop"
+            className="text-xl text-neo-lime font-black mb-4 max-w-2xl mx-auto"
+            style={{ textWrap: 'balance' }}
+          >
             {t('teacher.subscription.valueHeadline')}
           </p>
           <p className="text-base text-neo-white/80 font-bold max-w-xl mx-auto">

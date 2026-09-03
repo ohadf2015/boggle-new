@@ -11326,7 +11326,7 @@ const en = {
       "checkoutError": "Failed to start checkout. Please try again.",
       "signInRequired": "Please sign in to upgrade to Teacher Pro.",
       "currentPlan": "You're on this plan",
-      "upgradePricingTitle": "Upgrade to Teacher Pro",
+      "upgradePricingTitle": "See the whole class play — not the first ten.",
       "upgradePricingSubtitle": "Manage unlimited classrooms and students",
       "upgradePricingReassure": "Cancel anytime — your classrooms, lessons and student data always stay safe.",
       "pricePerDay": "About $0.30 a day",
@@ -11365,7 +11365,7 @@ const en = {
       "featureOutcome4": "Compare progress across all your classes",
       "priceTaxNote": "Taxes may be added at checkout.",
       "proHeroAlt": "A teacher watching a live class leaderboard on the board while students play from their seats.",
-      "valueHeadline": "Unlimited classes, unlimited students, live progress.",
+      "valueHeadline": "Best for a live vocabulary lesson: every student on the board, every stuck word visible.",
       "matrix": {
         "title": "Compare plans",
         "featureColumn": "Feature",

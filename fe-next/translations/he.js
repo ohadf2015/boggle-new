@@ -12122,7 +12122,7 @@ const he = {
       "checkoutError": "התשלום לא הצליח להתחיל. נסו שוב.",
       "signInRequired": "אנא התחברו כדי לשדרג ל-Teacher Pro.",
       "currentPlan": "אתם במסלול הזה",
-      "upgradePricingTitle": "שדרוג ל-Teacher Pro",
+      "upgradePricingTitle": "כל הכיתה משחקת — לא רק העשרה הראשונים.",
       "upgradePricingSubtitle": "ניהול כיתות ותלמידים ללא הגבלה",
       "upgradePricingReassure": "אפשר לבטל בכל עת — הכיתות, השיעורים ונתוני התלמידים שלכם תמיד נשמרים.",
       "pricePerDay": "בערך ‎$0.30‎ ליום",
@@ -12161,7 +12161,7 @@ const he = {
       "featureOutcome4": "להשוות התקדמות בין כל הכיתות שלכם",
       "priceTaxNote": "ייתכן שיתווספו מסים בתשלום.",
       "proHeroAlt": "מורה מסתכלת על טבלת מובילים חיה של הכיתה על הלוח בזמן שהתלמידים משחקים מהמקום.",
-      "valueHeadline": "כיתות ללא הגבלה, תלמידים ללא הגבלה, התקדמות בזמן אמת.",
+      "valueHeadline": "הכי מתאים לשיעור אוצר מילים חי: כל תלמיד על הלוח, כל מילה תקועה נראית.",
       "matrix": {
         "title": "השוואת מסלולים",
         "featureColumn": "מה כלול",

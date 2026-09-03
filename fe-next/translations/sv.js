@@ -12514,7 +12514,7 @@ const sv = {
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
-      "upgradePricingTitle": "Uppgradera till Teacher Pro",
+      "upgradePricingTitle": "Hela klassen spelar — inte bara de första tio.",
       "upgradePricingSubtitle": "Hantera obegränsat antal klassrum och elever",
       "upgradePricingReassure": "Avsluta när du vill — dina klassrum, lektioner och elevdata är alltid säkra.",
       "pricePerDay": "Ungefär $0,30 per dag",
@@ -12553,7 +12553,7 @@ const sv = {
       "featureOutcome4": "Jämför framsteg över alla dina klasser",
       "priceTaxNote": "Moms kan tillkomma i kassan.",
       "proHeroAlt": "En lärare tittar på klassens live-topplista på tavlan medan eleverna spelar från sina platser.",
-      "valueHeadline": "Obegränsade klasser, obegränsade elever, framsteg i realtid.",
+      "valueHeadline": "Bäst för en live-lektion i ordförråd: varje elev på tavlan, varje fastnat ord synligt.",
       "matrix": {
         "title": "Jämför planer",
         "featureColumn": "Funktion",
