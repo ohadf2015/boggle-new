@@ -4745,6 +4745,21 @@ const es = {
     "viewPublicProfile": "Ver perfil público",
     "games": "Partidas"
   },
+  "wordMastery": {
+    "title": "Dominio de palabras",
+    "subtitle": "Palabras que ya aplastaste — y las que siguen en entrenamiento.",
+    "mastered": "Dominadas",
+    "learning": "En entrenamiento",
+    "emptyMastered": "Aún no hay palabras dominadas. Encuéntralas rápido, sin pistas.",
+    "emptyLearning": "Aún no hay palabras en entrenamiento. Fallos y pistas aparecen aquí.",
+    "emptyAll": "Juega unas rondas y empezaremos a seguir las palabras que encuentres.",
+    "practiceCta": "Practicar estas",
+    "practiceHint": "Empieza una ronda con tus palabras más débiles.",
+    "signIn": "Inicia sesión para ver tu dominio de palabras.",
+    "gated": "El dominio de palabras se está lanzando. Vuelve pronto.",
+    "error": "No se pudo cargar el dominio de palabras. Inténtalo de nuevo.",
+    "count": "{count} palabras"
+  },
   "playerProfile": {
     "title": "Perfil de Jugador",
     "notFound": "Jugador no encontrado",

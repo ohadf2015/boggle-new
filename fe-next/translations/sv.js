@@ -5044,6 +5044,21 @@ const sv = {
     "viewPublicProfile": "Visa offentlig profil",
     "games": "Spel"
   },
+  "wordMastery": {
+    "title": "Ordmästerskap",
+    "subtitle": "Orden du krossat — och de som fortfarande tränas.",
+    "mastered": "Bemästrade",
+    "learning": "Tränas",
+    "emptyMastered": "Inga bemästrade ord än. Hitta ord snabbt, utan ledtrådar.",
+    "emptyLearning": "Inga träningsord än. Missar och ledtrådar syns här.",
+    "emptyAll": "Spela några rundor så börjar vi spåra orden du hittar.",
+    "practiceCta": "Öva på de här",
+    "practiceHint": "Starta en runda med dina svagaste ord.",
+    "signIn": "Logga in för att se ditt ordmästerskap.",
+    "gated": "Ordmästerskap rullas ut. Kika tillbaka snart.",
+    "error": "Kunde inte ladda ordmästerskap. Försök igen.",
+    "count": "{count} ord"
+  },
   "playerProfile": {
     "title": "Spelarprofil",
     "notFound": "Spelare hittades inte",

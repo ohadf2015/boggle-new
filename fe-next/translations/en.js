@@ -4735,6 +4735,21 @@ const en = {
     "viewPublicProfile": "View Public Profile",
     "games": "Games"
   },
+  "wordMastery": {
+    "title": "Word Mastery",
+    "subtitle": "Words you've crushed — and the ones still in training.",
+    "mastered": "Mastered",
+    "learning": "Learning",
+    "emptyMastered": "No mastered words yet. Solve words fast, without hints.",
+    "emptyLearning": "No learning words yet. Misses and hinted solves show up here.",
+    "emptyAll": "Play a few rounds and we'll start tracking the words you find.",
+    "practiceCta": "Practice these",
+    "practiceHint": "Start a custom round seeded with your weakest words.",
+    "signIn": "Sign in to see your word mastery.",
+    "gated": "Word mastery is rolling out. Check back soon.",
+    "error": "Couldn't load word mastery. Try again.",
+    "count": "{count} words"
+  },
   "playerProfile": {
     "notFound": "Player not found",
     "error": "Couldn't load profile",

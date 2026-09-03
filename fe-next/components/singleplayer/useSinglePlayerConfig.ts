@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { isFirstSessionPlayer } from '@/lib/retention/firstWin';
+import { consumeMasteryPracticeRound } from '@/lib/wordMastery/practiceStorage';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import type {
   SinglePlayerMode,
@@ -129,6 +130,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const presetParam = searchParams?.get('preset') || null;
   const boardCode = searchParams?.get('boardCode') || null;
   const mpHandoff = searchParams?.get('mpHandoff') === '1';
+  const masteryPractice = searchParams?.get('mastery') === '1';
 
   const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
     const hasAutoStart = searchParams?.get('autoStart');
@@ -185,6 +187,11 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
       const practicePreset = getDefaultPreset('practice');
       if (practicePreset) {
         const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
+        let seededGrid: LetterGrid | null = null;
+        if (masteryPractice && typeof window !== 'undefined') {
+          const round = consumeMasteryPracticeRound();
+          if (round?.grid) seededGrid = round.grid as LetterGrid;
+        }
         setGameState(prev => ({
           ...prev,
           mode: 'practice',
@@ -192,13 +199,13 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
           timerSeconds: practicePreset.settings.timerSeconds,
           bots: [],
           language: (uiLanguage as Language) || 'en',
-          grid: null,
+          grid: seededGrid,
           minWordLength,
         }));
         setPhase('playing');
       }
     }
-  }, [autoStart, uiLanguage]);
+  }, [autoStart, uiLanguage, masteryPractice]);
 
   // Auto-start bot game (autoStart=bots)
   useEffect(() => {
