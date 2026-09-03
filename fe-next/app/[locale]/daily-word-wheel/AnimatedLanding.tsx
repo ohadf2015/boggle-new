@@ -7,6 +7,8 @@ import { CalendarDays, Search, Timer, Trophy, type LucideIcon } from 'lucide-rea
 interface AnimatedLandingProps {
   locale: string;
   hero: { title: string; subtitle: string; description: string; cta: string; leaderboard: string };
+  rulesHeading?: string;
+  rules?: string[];
   steps: Array<{ step: string; title: string; desc: string }>;
   stepsHeading: string;
   faqHeading: string;
@@ -104,21 +106,19 @@ function HeroWheel({ reducedMotion = false }: { reducedMotion?: boolean }) {
   );
 }
 
-export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading, faqItems, finalCta }: AnimatedLandingProps) {
+export function AnimatedLanding({ locale, hero, rulesHeading, rules, steps, stepsHeading, faqHeading, faqItems, finalCta }: AnimatedLandingProps) {
   const isRtl = locale === 'he';
   const prefersReduced = useReducedMotion();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* Hero */}
+      {/* Hero — H1 + lead + rules first so the first 60 words answer the query */}
       <m.section
         className="mb-12 text-center"
         variants={stagger}
         initial="hidden"
         animate="visible"
       >
-        <HeroWheel reducedMotion={!!prefersReduced} />
-
         <m.div
           className="mb-2 inline-block rounded-full border-2 border-neo-lime/40 bg-neo-lime/10 px-4 py-1"
           variants={scaleIn}
@@ -136,11 +136,26 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
         </m.h1>
 
         <m.p
-          className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-neo-white"
+          className="mx-auto mb-6 max-w-2xl text-lg leading-relaxed text-neo-white"
           variants={fadeUp}
         >
           {hero.description}
         </m.p>
+
+        {rules && rules.length > 0 ? (
+          <m.div className="mx-auto mb-8 max-w-2xl text-left" variants={fadeUp}>
+            {rulesHeading ? (
+              <h2 className="mb-3 font-neo-display text-2xl font-bold sm:text-3xl">{rulesHeading}</h2>
+            ) : null}
+            <ul className="list-disc space-y-2 pl-6 text-base leading-relaxed text-neo-white">
+              {rules.map((rule) => (
+                <li key={rule}>{rule}</li>
+              ))}
+            </ul>
+          </m.div>
+        ) : null}
+
+        <HeroWheel reducedMotion={!!prefersReduced} />
 
         <m.div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4" variants={fadeUp}>
           <Link

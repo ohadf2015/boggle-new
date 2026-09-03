@@ -3,6 +3,10 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { AnimatedLanding } from './AnimatedLanding';
+import {
+  buildDailyWordWheelJsonLd,
+  dailyWordWheelEn,
+} from './seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -107,9 +111,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ogLocaleMap: Record<string, string> = { en: 'en_US', he: 'he_IL', sv: 'sv_SE', ja: 'ja_JP', es: 'es_ES', ru: 'ru_RU' };
 
   const fallback = META_FALLBACK[validLocale];
+  const isEn = validLocale === 'en';
   return {
-    title: resolve('meta.dailyWordWheel.title', fallback.title),
-    description: resolve('meta.dailyWordWheel.description', fallback.description),
+    title: isEn ? dailyWordWheelEn.metaTitle : resolve('meta.dailyWordWheel.title', fallback.title),
+    description: isEn ? dailyWordWheelEn.metaDescription : resolve('meta.dailyWordWheel.description', fallback.description),
     keywords: KEYWORDS[validLocale],
     openGraph: {
       title: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle),
@@ -139,17 +144,23 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
   const validLocale = (LOCALES.includes(locale as Locale) ? locale : 'en') as Locale;
   const t = await loadTranslation(validLocale as Language) as Record<string, unknown>;
   const resolve = (key: string, fallback: string) => getNestedValue(t, key) || fallback;
-  const faqItems = getNestedArray(t, 'dailyWordWheelLanding.faq.items');
+  const isEn = validLocale === 'en';
+  const faqItems = isEn
+    ? dailyWordWheelEn.faqs.map((faq) => ({ q: faq.q, a: faq.a }))
+    : getNestedArray(t, 'dailyWordWheelLanding.faq.items');
 
-  const steps = [
+  const steps = isEn
+    ? dailyWordWheelEn.steps.map((s) => ({ step: s.step, title: s.title, desc: s.desc }))
+    : [
     { step: '1', title: resolve('dailyWordWheelLanding.steps.1.title', 'New puzzle daily'), desc: resolve('dailyWordWheelLanding.steps.1.desc', 'A fresh wheel of letters appears every day at midnight UTC.') },
     { step: '2', title: resolve('dailyWordWheelLanding.steps.2.title', 'Find words'), desc: resolve('dailyWordWheelLanding.steps.2.desc', 'Form words using the wheel letters.') },
     { step: '3', title: resolve('dailyWordWheelLanding.steps.3.title', 'Beat the clock'), desc: resolve('dailyWordWheelLanding.steps.3.desc', 'Find as many words as possible before time runs out.') },
     { step: '4', title: resolve('dailyWordWheelLanding.steps.4.title', 'Compare globally'), desc: resolve('dailyWordWheelLanding.steps.4.desc', 'See how you rank on the daily leaderboard.') },
   ];
 
-  // All content below is from static translation constants — safe for structured data injection
-  const structuredDataPayload = [
+  const structuredDataPayload = isEn
+    ? buildDailyWordWheelJsonLd()
+    : [
     {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
@@ -206,20 +217,22 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
       <AnimatedLanding
         locale={validLocale}
         hero={{
-          title: resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'),
+          title: isEn ? dailyWordWheelEn.h1 : resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'),
           subtitle: resolve('dailyWordWheelLanding.hero.subtitle', 'Free Daily Word Puzzle'),
-          description: resolve('dailyWordWheelLanding.hero.description', "LexiClash's Daily Word Wheel is a free daily word puzzle: spin the wheel, find every word containing today's center letter."),
-          cta: resolve('dailyWordWheelLanding.hero.cta', "Play Today's Word Wheel"),
-          leaderboard: resolve('dailyWordWheelLanding.hero.leaderboard', 'View World Record'),
+          description: isEn ? dailyWordWheelEn.lead : resolve('dailyWordWheelLanding.hero.description', "LexiClash's Daily Word Wheel is a free daily word puzzle: spin the wheel, find every word containing today's center letter."),
+          cta: isEn ? dailyWordWheelEn.cta : resolve('dailyWordWheelLanding.hero.cta', "Play Today's Word Wheel"),
+          leaderboard: isEn ? dailyWordWheelEn.leaderboard : resolve('dailyWordWheelLanding.hero.leaderboard', 'View World Record'),
         }}
+        rulesHeading={isEn ? dailyWordWheelEn.rulesHeading : undefined}
+        rules={isEn ? [...dailyWordWheelEn.rules] : undefined}
         steps={steps}
-        stepsHeading={resolve('dailyWordWheelLanding.steps.heading', 'How the Daily Word Wheel Works')}
-        faqHeading={resolve('dailyWordWheelLanding.faq.heading', 'Frequently Asked Questions')}
+        stepsHeading={isEn ? dailyWordWheelEn.stepsHeading : resolve('dailyWordWheelLanding.steps.heading', 'How the Daily Word Wheel Works')}
+        faqHeading={isEn ? dailyWordWheelEn.faqHeading : resolve('dailyWordWheelLanding.faq.heading', 'Frequently Asked Questions')}
         faqItems={faqItems}
         finalCta={{
-          heading: resolve('dailyWordWheelLanding.finalCta.heading', "Play Today's Puzzle"),
-          description: resolve('dailyWordWheelLanding.finalCta.description', 'The Daily Word Wheel resets every day.'),
-          button: resolve('dailyWordWheelLanding.finalCta.button', 'Play Daily Word Wheel Now'),
+          heading: isEn ? dailyWordWheelEn.finalHeading : resolve('dailyWordWheelLanding.finalCta.heading', "Play Today's Puzzle"),
+          description: isEn ? dailyWordWheelEn.finalDescription : resolve('dailyWordWheelLanding.finalCta.description', 'The Daily Word Wheel resets every day.'),
+          button: isEn ? dailyWordWheelEn.finalButton : resolve('dailyWordWheelLanding.finalCta.button', 'Play Daily Word Wheel Now'),
         }}
       />
     </main>
