@@ -125,6 +125,9 @@ describe('offlineCapableModes', () => {
       expect(isOfflineCapable('/he/crossword')).toBe(true);
       // /blast/v2 resolves to the blast segment, which is offline-capable.
       expect(isOfflineCapable('/en/blast/v2')).toBe(true);
+      // Pyramid is a connections sub-route — gate by first segment, so it
+      // stays playable offline even though the shell URL is deeper.
+      expect(isOfflineCapable('/he/connections/pyramid')).toBe(true);
     });
 
     it('handles trailing slashes and query strings', () => {

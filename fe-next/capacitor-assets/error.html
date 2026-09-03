@@ -86,15 +86,6 @@
         }
         window.addEventListener("online", recover);
 
-        (function attemptOfflineBootstrap() {
-          try {
-            if (navigator.onLine !== false) return;
-            if (sessionStorage.getItem("lc_offline_boot") === "1") return;
-            sessionStorage.setItem("lc_offline_boot", "1");
-            recovered = true;
-            location.href = HOME;
-          } catch (e) { /* sessionStorage blocked */ }
-        })();
         var pollTimer = setInterval(function () {
           if (recovered) { clearInterval(pollTimer); return; }
           if (navigator.onLine === false) return;

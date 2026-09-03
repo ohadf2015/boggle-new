@@ -34,10 +34,13 @@ import { offlineCapableRoutes } from '@/lib/offline/offlineCapableModes';
 export const OFFLINE_SHELL_CACHE_CONTROL =
   'private, max-age=300, stale-while-revalidate=86400';
 
+const EXTRA_SHELL_SEGMENTS = ['connections/pyramid'] as const;
+
 const SHELL_PATHS: ReadonlySet<string> = new Set([
   '/',
   ...locales.map((l) => `/${l}`),
   ...offlineCapableRoutes().map((route) => route.split(/[?#]/)[0] ?? ''),
+  ...locales.flatMap((l) => EXTRA_SHELL_SEGMENTS.map((seg) => `/${l}/${seg}`)),
 ]);
 
 export function isOfflineShellPath(pathname: string): boolean {

@@ -32,4 +32,11 @@ describe('capacitor-assets/error.html', () => {
       expect(html).toContain(`${loc}:`);
     }
   });
+
+  it('does not auto-redirect to the remote host while navigator.onLine is false', () => {
+    // The previous bootstrap did location.href = HOME while offline, which
+    // re-triggered Chromium's stock interstitial. Stay on this page instead.
+    expect(html).not.toMatch(/lc_offline_boot/);
+    expect(html).not.toMatch(/attemptOfflineBootstrap/);
+  });
 });
