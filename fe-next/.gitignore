@@ -82,6 +82,7 @@ public/logos-png-backup/
 !/android/app/src/main/java/live/lexiclash/app/
 !/android/app/src/main/java/live/lexiclash/app/MainActivity.java
 !/android/app/src/main/java/live/lexiclash/app/LexiClashApplication.java
+!/android/app/src/main/java/live/lexiclash/app/OfflineAwareWebViewClient.java
 # Brand assets: splash, app icon, shortcuts, theme — must survive cap sync + fresh clones
 !/android/app/src/main/res/
 

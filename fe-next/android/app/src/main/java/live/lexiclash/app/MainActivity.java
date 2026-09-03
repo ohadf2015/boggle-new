@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebSettings;
@@ -45,22 +48,79 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         WebView webView = getBridge() != null ? getBridge().getWebView() : null;
         if (webView != null) webView.setBackgroundColor(0xFF1A1A2E);
 
-        // Cold-start offline: the WebView does NOT serve cold-start navigations
-        // from service-worker cache (device-verified 2026-09-03 — SW precache
-        // works mid-session, but the first navigation of a fresh launch fails
-        // straight into Capacitor's errorPath). LOAD_CACHE_ELSE_NETWORK makes
-        // the WebView fall back to its HTTP cache whenever the network fails;
-        // the server now marks the offline-shell routes cacheable
-        // (server/offlineShellCache.ts: private, max-age=300, SWR=1d), so an
-        // offline launch boots the cached shell and the app's offline launcher
-        // takes over. Online behaviour is unchanged: the cache is only used
-        // when the network request fails. Network-first semantics, cache fallback.
-        if (webView != null) {
-            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        }
-
         ensureDefaultNotificationChannel();
         handleDeepLinkIntent(getIntent());
+    }
+
+    /**
+     * BridgeActivity.load() constructs the Bridge, which immediately
+     * {@code loadUrl(server.url)}. Cache-mode and our WebViewClient MUST be
+     * installed in this override (right after super.load) — putting them in
+     * onCreate after super.onCreate is too late: the first remote navigation
+     * has already been dispatched with Capacitor's default client, which
+     * calls {@code super.onReceivedError} and lets Chromium paint its stock
+     * interstitial (device screenshot 2026-09-03, URL
+     * {@code /he/connections/pyramid}).
+     */
+    @Override
+    protected void load() {
+        super.load();
+        WebView webView = getBridge() != null ? getBridge().getWebView() : null;
+        if (webView == null) return;
+
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        // Never persist/restore the last remote URL. Android's default WebView
+        // save/restore relaunches into a deep route (e.g. /he/connections/pyramid)
+        // which is uncached and paints Chromium's stock interstitial offline.
+        webView.setSaveEnabled(false);
+        getBridge().setWebViewClient(new OfflineAwareWebViewClient(getBridge()));
+
+        if (!isNetworkAvailable()) {
+            String errorUrl = getBridge().getErrorUrl();
+            if (errorUrl != null) {
+                try {
+                    webView.stopLoading();
+                } catch (Throwable ignored) {}
+                // super.load() already dispatched loadUrl(server.url) with
+                // Capacitor's default client. Post so we replace that
+                // navigation (and any Chromium interstitial) on the next
+                // looper turn, after our client is installed.
+                webView.post(() -> {
+                    try {
+                        webView.loadUrl(errorUrl);
+                    } catch (Throwable t) {
+                        android.util.Log.w("MainActivity", "offline fallback: " + t.getMessage());
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Fail OPEN (return true) on any lookup error so a permission/OEM glitch
+     * never traps an online user on error.html. Airplane mode / no active
+     * network → false → load bundled error.html instead of the remote URL.
+     */
+    private boolean isNetworkAvailable() {
+        try {
+            ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return true;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network net = cm.getActiveNetwork();
+                if (net == null) return false;
+                NetworkCapabilities caps = cm.getNetworkCapabilities(net);
+                if (caps == null) return false;
+                return caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                    || caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                    || caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                    || caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN);
+            }
+            android.net.NetworkInfo info = cm.getActiveNetworkInfo();
+            return info != null && info.isConnected();
+        } catch (Throwable t) {
+            return true;
+        }
     }
 
     @Override
@@ -68,6 +128,18 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         super.onNewIntent(intent);
         setIntent(intent);
         handleDeepLinkIntent(intent);
+    }
+
+    /**
+     * Skip default view-hierarchy restore. A remote-URL Capacitor WebView
+     * otherwise relaunches into the last deep route (device: /he/connections/pyramid)
+     * which is not in the HTTP cache and shows ERR_INTERNET_DISCONNECTED.
+     * Plugin state is restored separately via Bridge.restoreInstanceState.
+     */
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // do not call super — drops WebView URL restore only (no other
+        // native widgets hold instance state in this activity).
     }
 
     /**

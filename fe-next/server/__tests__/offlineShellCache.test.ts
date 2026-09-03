@@ -46,7 +46,7 @@ function makeReq(headers: Record<string, string> = {}): Request {
 }
 
 describe('isOfflineShellPath', () => {
-  it.each(['/', '/en', '/he', '/en/party', '/he/party', '/en/blast/v2', '/en/sealed-bid'])(
+  it.each(['/', '/en', '/he', '/en/party', '/he/party', '/en/blast/v2', '/en/sealed-bid', '/en/crossword', '/he/connections/pyramid'])(
     'accepts shell route %s',
     (p) => expect(isOfflineShellPath(p)).toBe(true),
   );
