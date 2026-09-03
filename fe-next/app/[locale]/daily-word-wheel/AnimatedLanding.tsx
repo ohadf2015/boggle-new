@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { m } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { CalendarDays, Search, Timer, Trophy, type LucideIcon } from 'lucide-react';
 import { RankingPlayEmbed } from './RankingPlayEmbed';
 
@@ -31,6 +31,7 @@ const STEP_ACCENTS = [
 
 export function AnimatedLanding({ locale, hero, rulesHeading, rules, steps, stepsHeading, faqHeading, faqItems, finalCta }: AnimatedLandingProps) {
   const isRtl = locale === 'he';
+  const prefersReduced = useReducedMotion();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8" dir={isRtl ? 'rtl' : 'ltr'}>
