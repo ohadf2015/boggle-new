@@ -268,6 +268,10 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     // Include word hunt state for reconnecting players
     if (game.gameMode === 'word-hunt' && game.wordHuntState) {
       reconnectPayload.wordHuntTargetLength = game.wordHuntState.targetWordLength ?? 0;
+      // Keep this block field-for-field identical to the late-join one below:
+      // both restore the SAME round state, and the category (the "hunt an
+      // animal" hint) was the one field only late-joiners received.
+      reconnectPayload.wordHuntTargetCategory = game.wordHuntState.targetCategory ?? null;
       reconnectPayload.wordHuntEliminatedPlayers = game.wordHuntState.eliminatedPlayers || [];
       reconnectPayload.wordHuntPlayerLives = game.wordHuntState.playerLives || {};
     }
