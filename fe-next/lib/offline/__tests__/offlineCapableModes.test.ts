@@ -31,12 +31,22 @@ describe('offlineCapableModes', () => {
       expect(OFFLINE_CAPABLE_MODES).toContain('blast');
     });
 
+    it('includes pass-and-play party plus the extra client-side solos', () => {
+      expect(OFFLINE_CAPABLE_MODES).toContain('party');
+      expect(OFFLINE_CAPABLE_MODES).toContain('word-tower');
+      expect(OFFLINE_CAPABLE_MODES).toContain('sealed-bid');
+      expect(OFFLINE_MODES.length).toBeGreaterThanOrEqual(12);
+    });
+
     it('does NOT include multiplayer or other server-only modes', () => {
       expect(OFFLINE_CAPABLE_MODES).not.toContain('multiplayer');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('friends');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('community');
-      expect(OFFLINE_CAPABLE_MODES).not.toContain('party');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('custom');
+      expect(OFFLINE_CAPABLE_MODES).not.toContain('challenge');
+      expect(OFFLINE_CAPABLE_MODES).not.toContain('quick-play');
+      expect(OFFLINE_CAPABLE_MODES).not.toContain('shiritori');
+      expect(OFFLINE_CAPABLE_MODES).not.toContain('anagram');
     });
   });
 
@@ -76,6 +86,16 @@ describe('offlineCapableModes', () => {
       expect(wf).toBeDefined();
       expect(wf.segment).toBe('blast');
       expect(wf.entry('en')).toBe('/en/blast/v2');
+    });
+
+    it('party / word-tower / sealed-bid entries resolve to their play routes', () => {
+      const party = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playParty')!;
+      expect(party.segment).toBe('party');
+      expect(party.entry('he')).toBe('/he/party');
+      const tower = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playWordTower')!;
+      expect(tower.entry('en')).toBe('/en/word-tower');
+      const sb = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playSealedBid')!;
+      expect(sb.entry('es')).toBe('/es/sealed-bid');
     });
   });
 
@@ -123,8 +143,10 @@ describe('offlineCapableModes', () => {
       expect(isOfflineCapable('/he/friends')).toBe(false);
       expect(isOfflineCapable('/en/community')).toBe(false);
       expect(isOfflineCapable('/es/account')).toBe(false);
-      expect(isOfflineCapable('/en/party')).toBe(false);
       expect(isOfflineCapable('/en/custom')).toBe(false);
+      expect(isOfflineCapable('/en/challenge')).toBe(false);
+      expect(isOfflineCapable('/en/quick-play')).toBe(false);
+      expect(isOfflineCapable('/en/shiritori')).toBe(false);
     });
 
     it('returns false for the locale home page and bare root', () => {
@@ -157,6 +179,9 @@ describe('offlineCapableModes', () => {
       expect(routes).toContain('/en/crossword');
       expect(routes).toContain('/en/blast/v2');
       expect(routes).toContain('/ru/daily');
+      expect(routes).toContain('/en/party');
+      expect(routes).toContain('/en/word-tower');
+      expect(routes).toContain('/en/sealed-bid');
       // One route per (locale × offline mode entry) — derived from the sources so
       // it never drifts when a locale or a mode is added (7 original modes +
       // crossword + wordfall = OFFLINE_MODES entries).

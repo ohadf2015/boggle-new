@@ -26,6 +26,14 @@
  *                   /blast/v2 shell. Levels build client-side from the bundled chain packs via
  *                   lib/blast/v2/offlineLevelResolver (zero network), guests persist progress
  *                   to localStorage, authed clears queue for replay on reconnect.
+ *  - party        — same-screen pass-and-play Boggle (lib/party). Shared board per round,
+ *                   sequential unique-word scoring, localStorage resume. No Socket.IO /
+ *                   no Supabase during play; words via the offline dict path.
+ *  - word-tower   — client-generated daily tower + loadWordCraftDictionary (same offline
+ *                   dict as word-craft). Progress persists to localStorage; server writes
+ *                   are fire-and-forget and not required to play.
+ *  - sealed-bid   — bundled rack pool (lib/sealedBid/sp/rackPool) + chip wallet. Word check
+ *                   is offline-first (memory cache → offline store → live API).
  *
  * Both crossword and wordfall were previously admin-only `force-dynamic` routes (404 for
  * non-admins → no precache-able shell). Their play routes now render for everyone, so the SW
@@ -75,6 +83,9 @@ export const OFFLINE_MODES: readonly OfflineMode[] = [
     labelKey: 'native.offline.playWordfall',
     entry: (locale) => `/${locale}/blast/v2`,
   },
+  { segment: 'party', labelKey: 'native.offline.playParty', entry: localePath('party') },
+  { segment: 'word-tower', labelKey: 'native.offline.playWordTower', entry: localePath('word-tower') },
+  { segment: 'sealed-bid', labelKey: 'native.offline.playSealedBid', entry: localePath('sealed-bid') },
 ] as const;
 
 /** Segment list — preserved for backward compatibility with existing callers. */
