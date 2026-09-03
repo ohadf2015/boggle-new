@@ -6,21 +6,23 @@ import {
   isValidWordWheelWord,
   type WordWheelPuzzle,
 } from '@/utils/dailyChallenge/wordWheelGeneration';
-import { fastValidateWord } from '@/hooks/fastValidateWord';
 import type { Language } from '@/types';
+import { listedHuntProgress, toListedHuntTargets } from './listedHunt';
 
 const MIN_LEN = 3;
 
 export interface RankingPlayEmbedProps {
   locale?: string;
   puzzle?: WordWheelPuzzle;
+  /** @deprecated listed hunt ignores open-dictionary validation */
   validateWord?: (word: string) => Promise<boolean>;
+  targetWords?: string[];
 }
 
 export function RankingPlayEmbed({
   locale = 'en',
   puzzle: puzzleProp,
-  validateWord,
+  targetWords: targetWordsProp,
 }: RankingPlayEmbedProps) {
   const language = (locale as Language) || 'en';
   const puzzle = useMemo(
@@ -28,10 +30,22 @@ export function RankingPlayEmbed({
     [puzzleProp, language],
   );
 
+  const targetWords = useMemo(
+    () =>
+      toListedHuntTargets(
+        targetWordsProp ?? puzzle.targetWords ?? [],
+        puzzle.centerLetter,
+        puzzle.allLetters,
+      ),
+    [targetWordsProp, puzzle],
+  );
+  const targetSet = useMemo(() => new Set(targetWords), [targetWords]);
+
   const [current, setCurrent] = useState<string[]>([]);
   const [usedIndices, setUsedIndices] = useState<Set<number>>(() => new Set());
   const [found, setFound] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
+
+  const progress = listedHuntProgress(targetWords, found);
 
   const tap = useCallback((letter: string, index: number) => {
     setUsedIndices((prev) => {
@@ -48,9 +62,9 @@ export function RankingPlayEmbed({
     setUsedIndices(new Set());
   }, []);
 
-  const submit = useCallback(async () => {
+  const submit = useCallback(() => {
     const word = current.join('').toUpperCase();
-    if (busy || word.length < MIN_LEN) return;
+    if (word.length < MIN_LEN) return;
     if (found.includes(word)) {
       resetBuild();
       return;
@@ -59,18 +73,9 @@ export function RankingPlayEmbed({
       resetBuild();
       return;
     }
-    setBusy(true);
-    const check = validateWord ?? ((w: string) => fastValidateWord(w, language));
-    let ok = false;
-    try {
-      ok = await check(word);
-    } catch {
-      ok = word.length >= MIN_LEN;
-    }
-    setBusy(false);
-    if (ok) setFound((f) => [...f, word]);
+    if (targetSet.has(word)) setFound((f) => [...f, word]);
     resetBuild();
-  }, [busy, current, found, language, puzzle, resetBuild, validateWord]);
+  }, [current, found, puzzle, resetBuild, targetSet]);
 
   const outer = puzzle.outerLetters;
   const radius = 72;
@@ -81,8 +86,21 @@ export function RankingPlayEmbed({
       className="mx-auto mb-8 flex max-w-md flex-col items-center gap-4"
     >
       <p className="font-neo-display text-sm font-bold uppercase tracking-wider text-neo-lime">
-        <span data-testid="found-count">{found.length}</span> words
+        <span data-testid="found-count">
+          {progress.found}/{progress.total}
+        </span>
       </p>
+      <div className="flex flex-wrap justify-center gap-2" data-testid="length-buckets">
+        {progress.buckets.map((bucket) => (
+          <span
+            key={bucket.length}
+            data-testid={`length-bucket-${bucket.length}`}
+            className="rounded-neo border-2 border-neo-cream/30 px-2 py-1 font-neo-display text-xs font-bold text-neo-cream"
+          >
+            {bucket.length}:{bucket.found}/{bucket.total}
+          </span>
+        ))}
+      </div>
       <div className="relative h-44 w-44 sm:h-52 sm:w-52">
         <button
           type="button"
@@ -137,10 +155,10 @@ export function RankingPlayEmbed({
           type="button"
           data-testid="ranking-wheel-submit"
           onClick={submit}
-          disabled={busy || current.length < MIN_LEN}
+          disabled={current.length < MIN_LEN}
           className="rounded-neo border-4 border-neo-lime bg-neo-lime px-5 py-2 font-bold text-neo-navy disabled:opacity-40"
         >
-          Enter
+          CHECK
         </button>
       </div>
     </div>

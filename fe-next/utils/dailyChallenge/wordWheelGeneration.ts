@@ -23,6 +23,8 @@ export interface WordWheelPuzzle {
   puzzleDate: string;
   language: Language;
   puzzleNumber: number;
+  /** Finite listed-hunt targets (4–9 letters). Ranking URL only. */
+  targetWords?: string[];
 }
 
 // ==========================================
@@ -171,14 +173,25 @@ export function generateWordWheelPuzzle(
   // For simplicity: use the first letter after shuffle (deterministic)
   const centerLetter = letters[0];
   const outerLetters = letters.slice(1, letterCount);
+  const allLetters = [centerLetter, ...outerLetters];
+
+  const targetWords =
+    letterCount === 9
+      ? [sourceWord.toUpperCase()].filter((word) =>
+          isValidWordWheelWord(word, centerLetter, allLetters) &&
+          word.length >= 4 &&
+          word.length <= 9,
+        )
+      : undefined;
 
   return {
     centerLetter,
     outerLetters,
-    allLetters: [centerLetter, ...outerLetters],
+    allLetters,
     puzzleDate: date,
     language,
     puzzleNumber,
+    targetWords,
   };
 }
 
