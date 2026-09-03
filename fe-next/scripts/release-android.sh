@@ -17,7 +17,10 @@ for arg in "$@"; do
   esac
 done
 
-: "${ANDROID_KEYSTORE_PATH:=$ROOT/android/lexiclash-release.keystore}"
+# Play expects the UPLOAD key (SHA1 B8:46:6E:...), not the original release keystore that still
+# sits next to it. Defaulting to lexiclash-release.keystore produced AABs Play rejects with
+# "signed with the wrong key" — and the failure only shows up at upload, minutes into a release.
+: "${ANDROID_KEYSTORE_PATH:=$ROOT/android/lexiclash-upload-v2.keystore}"
 : "${ANDROID_KEY_ALIAS:?set ANDROID_KEY_ALIAS}"
 : "${ANDROID_KEYSTORE_PASSWORD:?set ANDROID_KEYSTORE_PASSWORD}"
 : "${ANDROID_KEY_PASSWORD:?set ANDROID_KEY_PASSWORD}"
