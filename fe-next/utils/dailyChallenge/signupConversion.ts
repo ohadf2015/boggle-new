@@ -19,7 +19,6 @@ import {
   WORD_HUNT_STORAGE_KEY,
   DAILY_STREAK_KEY,
   GUEST_DAILY_PLAYER_KEY,
-  GUEST_FINGERPRINT_KEY,
 } from './constants';
 import { getAllWordHuntResults } from './storage';
 import { getGuestDailyPlayer } from './guestPlayer';
@@ -277,6 +276,19 @@ export function getAllGuestDailyResults(): Array<{
  * Sync all guest daily challenge results to authenticated account
  * Should be called after signup to ensure all progress is transferred
  * Returns the number of results successfully synced
+ *
+ * IMPORTANT: /submit only accepts today plus the last CATCH_UP_WINDOW_DAYS
+ * (3) days (isSubmittableDate) — anything older 400s and is silently skipped
+ * below. A guest with e.g. 20 days of local history will only ever migrate
+ * ~4 of them this way; the rest stay unsynced. clearAllGuestDailyResults()
+ * (below) is deliberately keyed on exactly which (date, language) pairs
+ * *actually* synced, and never removes GUEST_FINGERPRINT_KEY, so: (a) the
+ * unsynced local results are NOT deleted just because signup happened, and
+ * (b) the fingerprint that still owns the rest of this guest's history in
+ * daily_word_hunt_attempts stays reachable rather than being severed the
+ * moment any single day succeeds. It's still not a full merge (see the
+ * fetchDailyStreak/no-fingerprint-merge reasoning), but it stops actively
+ * discarding the only handle to what didn't make the migration window.
  */
 export async function syncGuestDailyResultsToAccount(
   userId: string,
@@ -295,6 +307,7 @@ export async function syncGuestDailyResultsToAccount(
     // Get guest player info for fallback
     const guestPlayer = await getGuestDailyPlayer();
     let successCount = 0;
+    const syncedKeys: Array<{ puzzleDate: string; language: Language }> = [];
 
     // Submit each result to the backend
     for (const { result, puzzleNumber, puzzleDate, language } of allGuestResults) {
@@ -348,15 +361,18 @@ export async function syncGuestDailyResultsToAccount(
 
         if (response.ok) {
           successCount++;
+          syncedKeys.push({ puzzleDate, language });
         }
       } catch {
         // Continue with next result
       }
     }
 
-    // Clear guest daily results from localStorage after successful sync
-    if (successCount > 0) {
-      clearAllGuestDailyResults();
+    // Only remove what actually made it to the server — see the doc comment
+    // above for why leftover (out-of-window) results and the fingerprint
+    // itself must survive a partial sync.
+    if (syncedKeys.length > 0) {
+      clearSyncedGuestDailyResults(syncedKeys);
     }
 
     return successCount;
@@ -366,37 +382,23 @@ export async function syncGuestDailyResultsToAccount(
 }
 
 /**
- * Clear all guest daily challenge results from localStorage
- * Should be called after syncing to authenticated account
+ * Remove only the guest Word Hunt results that were confirmed synced to the
+ * new account, plus the local-only streak/identity scaffolding that's safe
+ * to drop regardless (DAILY_STREAK_KEY and GUEST_DAILY_PLAYER_KEY back no DB
+ * rows — see the module doc comment on syncGuestDailyResultsToAccount for why
+ * GUEST_FINGERPRINT_KEY is deliberately NOT included here).
  */
-function clearAllGuestDailyResults(): void {
+function clearSyncedGuestDailyResults(synced: Array<{ puzzleDate: string; language: Language }>): void {
   if (typeof window === 'undefined') return;
 
   try {
-    const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
-
-    for (const language of languages) {
-      // Find and remove all Word Hunt results for this language
-      const prefix = `${WORD_HUNT_STORAGE_KEY}_${language}_`;
-      const keysToRemove: string[] = [];
-
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith(prefix)) {
-          keysToRemove.push(key);
-        }
-      }
-
-      // Remove all found keys
-      for (const key of keysToRemove) {
-        localStorage.removeItem(key);
-      }
+    for (const { puzzleDate, language } of synced) {
+      localStorage.removeItem(`${WORD_HUNT_STORAGE_KEY}_${language}_${puzzleDate}`);
     }
 
-    // Also clear streak data and other guest daily-related data
+    // Local-only bookkeeping — safe to clear unconditionally, backs no DB row.
     localStorage.removeItem(DAILY_STREAK_KEY);
     localStorage.removeItem(GUEST_DAILY_PLAYER_KEY);
-    localStorage.removeItem(GUEST_FINGERPRINT_KEY);
   } catch {
     // Ignore errors
   }

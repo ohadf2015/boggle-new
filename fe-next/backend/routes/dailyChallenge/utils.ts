@@ -99,3 +99,32 @@ export function computeWordHuntRetryScore(
   const finalScore = Math.max(0, Math.round(input.rawEfficiency) - penaltyApplied);
   return { finalScore, penaltyApplied, isPaidRetry };
 }
+
+/**
+ * Clamp + strip a client-supplied display name before it's stored and
+ * rendered on the daily leaderboard.
+ *
+ * This only ever bites the guest path: an authenticated player's rendered
+ * name comes from `profiles` (daily_word_hunt_leaderboard COALESCEs
+ * p.display_name ahead of the submitted dwa.display_name), but a guest row
+ * has no profile to fall back to, so whatever string arrives in the submit
+ * body is exactly what shows up on the public board. Nothing upstream
+ * validates length or content today (the same gap exists in
+ * custom-puzzle/create's creator_display_name), so this is a deliberately
+ * minimal guard — a length clamp and a control-character strip, not a
+ * profanity filter, which is a separate, larger feature.
+ */
+export function sanitizeGuestDisplayName(raw: unknown, fallback = 'Anonymous'): string {
+  if (typeof raw !== 'string') return fallback;
+  // Code-point filter rather than a regex control-char class: ASCII control
+  // codes are 0-31 plus DEL (127); printable text starts at 32 (space).
+  const withoutControlChars = Array.from(raw)
+    .filter((ch) => {
+      const code = ch.codePointAt(0) ?? 0;
+      return code > 31 && code !== 127;
+    })
+    .join('');
+  const stripped = withoutControlChars.trim();
+  if (!stripped) return fallback;
+  return stripped.slice(0, 40);
+}

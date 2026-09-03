@@ -26,6 +26,7 @@ import {
   isValidDateFormat,
   isValidLanguage,
   computeWordHuntRetryScore,
+  sanitizeGuestDisplayName,
 } from './utils';
 import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
 import { emptyQuestResult } from '../../../shared/dailyQuestPool';
@@ -36,6 +37,7 @@ import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import {
   computeCycleProgress,
   computeChestTierForCycle,
+  computeCurrentStreak,
   type HuntScoreRow,
   type WheelScoreRow,
   type PuzzleScoreRow,
@@ -46,6 +48,54 @@ import { isSubmittableDate, isCatchUpDate } from '../../../utils/dailyChallenge/
 import { freezeDateToBridge } from '../../../lib/daily/chestFreezeBridge';
 
 const router: Router = express.Router();
+
+/**
+ * Read a player's or guest's daily streak, on the same rules an authenticated
+ * player already gets from GET /api/daily/weekly-chest/status: the full
+ * consecutive-day run across all three daily modes (classic puzzle, Word Hunt,
+ * Word Wheel), via the same `computeCurrentStreak` used there — see
+ * fe-next/lib/daily/weeklyChest.ts and fe-next/app/api/daily/weekly-chest/status/route.ts.
+ *
+ * `word_hunt_player_stats` (current_streak/longest_streak columns, migrations
+ * 020/067) is NOT used here: verified directly against the live database that
+ * the table doesn't exist and no trigger calls update_word_hunt_player_stats()
+ * — it's an orphaned function left behind by a migration that was never
+ * actually wired up. The /check-played read that used to hit it (guarded by
+ * `if (playerId)`) was already dead for authenticated players too; this
+ * replaces it with the mechanism the product's "day N" fire icon actually
+ * uses today, extended to accept a guest_fingerprint the same as a player_id.
+ *
+ * Guests don't get streak-freeze bridging (daily_streak_freezes and
+ * player_engagement are player_id-only tables — no guest_fingerprint column),
+ * so an authenticated caller of this same endpoint may occasionally read one
+ * lower than the fire icon on a day a freeze is actively bridging a gap. That
+ * is a disclosed simplification, not a fabricated number — it only ever
+ * under-reports a real, unfrozen gap.
+ */
+async function fetchDailyStreak(
+  supabase: ReturnType<typeof getSupabase>,
+  idColumn: 'player_id' | 'guest_fingerprint',
+  idValue: string
+): Promise<{ currentStreak: number; lastPlayedDate: string | null }> {
+  const today = new Date().toISOString().split('T')[0];
+
+  const [puzzleRes, huntRes, wheelRes] = await Promise.all([
+    supabase!.from('daily_puzzle_attempts').select('puzzle_date').eq(idColumn, idValue).gt('word_count', 0),
+    supabase!.from('daily_word_hunt_attempts').select('puzzle_date').eq(idColumn, idValue).eq('solved', true).eq('is_catchup', false),
+    supabase!.from('daily_word_wheel_attempts').select('puzzle_date').eq(idColumn, idValue).gt('word_count', 0),
+  ]);
+
+  const allDates = [
+    ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+    ...(huntRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+    ...(wheelRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),
+  ];
+
+  const currentStreak = computeCurrentStreak(allDates, today);
+  const lastPlayedDate = allDates.length > 0 ? allDates.reduce((max, d) => (d > max ? d : max)) : null;
+
+  return { currentStreak, lastPlayedDate };
+}
 
 /**
  * POST /api/daily-challenge/word-hunt/submit
@@ -190,7 +240,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       target_word: targetWord,
       attempt_words: attemptWords,
       completed_at: new Date().toISOString(),
-      display_name: displayName || 'Anonymous',
+      display_name: sanitizeGuestDisplayName(displayName),
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
       country_code: countryCode || undefined,
@@ -515,13 +565,16 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     // so players are only ranked against — and only see the discovered words of —
     // others who played the same language. The view's rank_position is per-language,
     // but it also counts guests + replays, so we still re-sort and renumber below.
+    // Guests ARE included: they're recorded under guest_fingerprint (submit above)
+    // with a stable per-guest display_name/avatar already assigned client-side
+    // (getGuestDailyPlayer), so there's no "Guest" name collision to solve here —
+    // dropping the player_id filter that used to hide them is the whole fix.
     const { data, error } = await supabase
       .from('daily_word_hunt_leaderboard')
       .select('*')
       .eq('puzzle_date', date)
       .eq('language', language)
       .eq('solved', true)
-      .not('player_id', 'is', null)
       .order('efficiency_score', { ascending: false, nullsFirst: false })
       .order('attempts_used', { ascending: true, nullsFirst: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
@@ -553,18 +606,6 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    const { count, error: countError } = await supabase
-      .from('daily_word_hunt_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .eq('solved', true)
-      .not('player_id', 'is', null);
-
-    if (countError) {
-      logger.warn('API', `Word Hunt leaderboard count error: ${countError.message || countError.code || 'Unknown'}`, { code: countError.code, details: countError.details, hint: countError.hint });
-    }
-
     const { count: totalPlayersCount, error: totalPlayersError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
@@ -575,6 +616,9 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
     }
 
+    // Also feeds totalParticipants below: with the player_id filter gone (guests
+    // included), this and "how many solved rows exist" are the exact same query
+    // — one round trip instead of two.
     const { count: totalSolvedCount, error: totalSolvedError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
@@ -608,10 +652,9 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     );
 
     const dataLength = rerankedData.length;
-    const queryCount = count ?? 0;
-    const totalParticipants = Math.max(queryCount, dataLength);
-    const totalPlayers = totalPlayersCount ?? 0;
     const totalSolved = totalSolvedCount ?? 0;
+    const totalParticipants = Math.max(totalSolved, dataLength);
+    const totalPlayers = totalPlayersCount ?? 0;
     const guestPlayerCount = guestSolvedCount ?? 0;
 
     logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}, guests=${guestPlayerCount}`);
@@ -816,17 +859,15 @@ router.get('/check-played/:date/:language', async (req: Request<{ date: string; 
       return;
     }
 
+    const idColumn: 'player_id' | 'guest_fingerprint' = playerId ? 'player_id' : 'guest_fingerprint';
+    const idValue = playerId || (guestFingerprint as string);
+
     let query = supabase
       .from('daily_word_hunt_attempts')
       .select('id, solved, attempts_used, efficiency_score, words_discovered, life_remaining, target_word, attempt_words, completed_at, clue_tokens_earned, clue_tokens_spent, hints_unlocked')
       .eq('puzzle_date', date)
-      .eq('language', language);
-
-    if (playerId) {
-      query = query.eq('player_id', playerId);
-    } else {
-      query = query.eq('guest_fingerprint', guestFingerprint);
-    }
+      .eq('language', language)
+      .eq(idColumn, idValue);
 
     const { data: existingAttempt, error } = await query.single();
 
@@ -837,22 +878,12 @@ router.get('/check-played/:date/:language', async (req: Request<{ date: string; 
     }
 
     if (existingAttempt) {
-      let streakData = { currentStreak: 0, longestStreak: 0 };
-
-      if (playerId) {
-        const { data: playerStats } = await supabase
-          .from('word_hunt_player_stats')
-          .select('current_streak, longest_streak')
-          .eq('player_id', playerId)
-          .single();
-
-        if (playerStats) {
-          streakData = {
-            currentStreak: playerStats.current_streak || 0,
-            longestStreak: playerStats.longest_streak || 0
-          };
-        }
-      }
+      // Guests earn this the same way authenticated players do — see
+      // fetchDailyStreak above. No consumer of this response reads
+      // `longestStreak` (word_hunt_player_stats never really tracked it live
+      // either — see fetchDailyStreak's comment), so it's not fabricated here.
+      const { currentStreak } = await fetchDailyStreak(supabase, idColumn, idValue);
+      const streakData = { currentStreak };
 
       res.json({
         hasPlayed: true,
@@ -877,6 +908,59 @@ router.get('/check-played/:date/:language', async (req: Request<{ date: string; 
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Check played error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/daily-challenge/word-hunt/streak
+ *
+ * Standalone streak read — independent of any single day's attempt, unlike
+ * /check-played/:date/:language which only returns a streak as a side effect
+ * of an existing row for that exact date. This is what lets a hub/landing
+ * surface show "you're on day 3" to a guest (or player) who hasn't played
+ * today yet, instead of that being visible only after submitting a score.
+ *
+ * Trust note: like /check-played and /stats above, this is a read of data
+ * keyed on whatever playerId/guestFingerprint the caller passes — there is no
+ * session check anywhere in this router (submit trusts the same fields to
+ * WRITE). That's a pre-existing trust boundary for the whole daily-challenge
+ * API, not something this endpoint introduces: it can only be used to look up
+ * a streak, never to move or inflate one, so it doesn't add new spoofing
+ * surface. Forging someone else's guest_fingerprint to inflate an attempt
+ * count would have to go through /submit, which already accepts any
+ * client-supplied identifier today — that's an existing gap, out of scope
+ * here.
+ */
+router.get('/streak', async (req: Request<unknown, unknown, unknown, { playerId?: string; guestFingerprint?: string }>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Service not available' });
+      return;
+    }
+
+    const playerId = req.query.playerId as string | undefined;
+    const guestFingerprint = req.query.guestFingerprint as string | undefined;
+
+    if (!playerId && !guestFingerprint) {
+      res.status(400).json({ error: 'Either playerId or guestFingerprint is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
+
+    const idColumn: 'player_id' | 'guest_fingerprint' = playerId ? 'player_id' : 'guest_fingerprint';
+    const idValue = playerId || (guestFingerprint as string);
+
+    const streak = await fetchDailyStreak(supabase, idColumn, idValue);
+    res.json(streak);
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Hunt streak error: ${err.message}`);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
