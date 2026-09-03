@@ -351,6 +351,13 @@ function resetGameForNewRound(gameCode: string): boolean {
   // Also clear host reconnection timeout
   timerManager.clearTimer(`hostReconnect:${gameCode}`);
 
+  // Per-game state holders (rush tiles, round events, earthquake, hint, word
+  // hunt) also clear on reset. Every one of them registered an `onGameReset`
+  // handler that nothing had ever emitted, so their timers and maps only ever
+  // got swept by `emitGameEnd` — leaving them live whenever a reset arrived
+  // from a state that never reached `endGame` (see the defensive branch above).
+  gameCleanupEmitter.emitGameReset(gameCode);
+
   game.earthquakeTriggered = false;
   game.letterGrid = null;
   game.minWordLength = undefined;
@@ -359,6 +366,42 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.wordHuntState = null;
   game.blastModeState = null;
   game.wheelRushState = null;
+  game.shiritoriState = null;
+  game.sealedBidState = null;
+  game.crosswordMpState = null;
+  game.wordTowerVersusState = null;
+  // ---- Round-scoped scoring state ----
+  // These are all written behind a MODE branch at round start — the round-event
+  // and rush-tile pair only for `classic` with 2+ players (gameStartHandler),
+  // the versus match only for `word-tower`, `specialWords` from a best-effort
+  // async pick that silently keeps the old list when it yields nothing — or, for
+  // `fireRoundActive`, only by an earthquake timer that the game-end sweep
+  // cancels. A round that ends mid-effect therefore leaves the flag set, and the
+  // next round in a mode whose start path never re-initialises it scores against
+  // last round's state: a permanent 2x fire multiplier, a lightning event that
+  // never ended, rush bonuses on tile positions from a board that no longer
+  // exists, and special words already marked `foundBy` so nobody can claim them.
+  // The reset is unconditional so no mode can miss it.
+  game.fireRoundActive = false;
+  game.activeRoundEvent = null;
+  game.roundEventSchedule = null;
+  game.rushTiles = [];
+  game.rushTilesActive = false;
+  game.specialWords = [];
+  game.goldenLetters = [];
+  game.totalBoardWords = 0;
+  // Results from the round that just finished. `endGame` flips gameState to
+  // 'finished' BEFORE it computes the new payload, so a client reconnecting (or
+  // firing its 15s `requestResults` watchdog) inside that window would be served
+  // the PREVIOUS round's scores as terminal `validatedScores`/`validationComplete`.
+  game.cachedResultsPayload = null;
+  // Boost claims are PER GAME (the signed token is minted against a per-game
+  // sessionId), and `calculateAndBroadcastFinalScores` re-applies whatever sits
+  // in playerBoosts at the end of EVERY round. Left uncleared, one purchased
+  // boost kept paying out for the whole life of the room — and, because the
+  // startGame path keys its idempotency guard on the room's `gameCode`, the
+  // stale entry also blocked a genuinely re-purchased boost from registering.
+  game.playerBoosts = {};
   // firstFinderMap is cleared by scoreManager.resetScoresForNewRound above
   game.playerCombos = {};
   game.gameSessionId = (game.gameSessionId || 0) + 1;

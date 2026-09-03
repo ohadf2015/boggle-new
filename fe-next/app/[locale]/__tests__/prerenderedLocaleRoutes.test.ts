@@ -2,6 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 
 /**
+ * Brain Gym and Connections were added here after a mode-polish audit: both are
+ * public mode landing pages whose server output is fully deterministic per
+ * locale (static SEO copy + JSON-LD, no cookies/headers/searchParams/fetch), yet
+ * both declared `force-dynamic` — so every request re-rendered them and no CDN
+ * or ISR cache could hold them. They prerender on exactly the multiplayer
+ * pattern below.
+ *
  * `next build` reported 453 of 456 routes as ƒ (Dynamic) — only /robots.txt was
  * static. Every page, including the ones that declare `revalidate`, rendered per
  * request and shipped `cache-control: private, no-cache, no-store, max-age=0,
@@ -20,6 +27,8 @@ describe('prerendered locale routes', () => {
   it.each([
     ['home', () => import('../(home)/page')],
     ['multiplayer', () => import('../multiplayer/page')],
+    ['brain', () => import('../brain/page')],
+    ['connections', () => import('../connections/page')],
   ])('%s enumerates every shipped locale', async (_name, load) => {
     const mod = (await load()) as { generateStaticParams?: () => Array<{ locale: string }> };
 
@@ -32,6 +41,8 @@ describe('prerendered locale routes', () => {
   it.each([
     ['home', () => import('../(home)/page')],
     ['multiplayer', () => import('../multiplayer/page')],
+    ['brain', () => import('../brain/page')],
+    ['connections', () => import('../connections/page')],
   ])('%s does not opt out of static rendering', async (_name, load) => {
     const mod = (await load()) as { dynamic?: string; revalidate?: number };
 

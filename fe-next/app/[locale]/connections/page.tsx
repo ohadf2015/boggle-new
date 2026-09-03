@@ -6,8 +6,24 @@ import {
   getConnectionsLandingCopy,
   isSupportedLandingLocale,
 } from './content';
+import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
+
+/**
+ * Was `force-dynamic`, which re-rendered this page on every request and made it
+ * uncacheable — for no gain: the landing copy, OG tags and JSON-LD below are all
+ * deterministic per locale, with no cookies, headers, searchParams or
+ * request-time fetch. The daily puzzle is fetched by the client component.
+ *
+ * `generateStaticParams` is required for the `revalidate` above to do anything:
+ * the enclosing `[locale]` segment is dynamic, so without it Next cannot
+ * prerender the route and serves `no-store`. See
+ * app/[locale]/__tests__/prerenderedLocaleRoutes.test.ts.
+ */
+export function generateStaticParams(): Array<{ locale: string }> {
+  return SUPPORTED_LOCALES.map((locale) => ({ locale }));
+}
 
 const BASE_URL = 'https://www.lexiclash.live';
 

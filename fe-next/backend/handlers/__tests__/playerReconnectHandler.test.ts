@@ -399,6 +399,38 @@ describe('handleReconnection', () => {
     expect(payload.blastSeed).toBe(999);
   });
 
+  // Reconnect vs late-join payload parity (recurring pitfall Class 3).
+  // handleLateJoin sends the full word-hunt block; handleReconnection sent every
+  // field of it EXCEPT the target category — the hint that tells the player what
+  // kind of word they are hunting. A player who dropped and came back kept the
+  // target LENGTH but lost the category, so the two paths into the same round
+  // state produced different HUDs.
+  it('includes wordHuntTargetCategory on reconnect, matching the late-join payload', () => {
+    const game = makeGame({
+      gameState: 'in-progress',
+      gameMode: 'word-hunt',
+      letterGrid: [['A', 'B'], ['C', 'D']],
+      remainingTime: 60,
+      wordHuntState: {
+        targetWordLength: 5,
+        targetCategory: 'animals',
+        eliminatedPlayers: [],
+        playerLives: { Player1: 3 },
+      },
+    });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    const startGameCall = (socket.emit as Mock).mock.calls.find((c: any[]) => c[0] === 'startGame');
+    expect(startGameCall).toBeTruthy();
+    const payload = startGameCall![1];
+    expect(payload.wordHuntTargetLength).toBe(5);
+    expect(payload.wordHuntTargetCategory).toBe('animals');
+    expect(payload.wordHuntPlayerLives).toEqual({ Player1: 3 });
+  });
+
   // 8. Game state NOT sent when game not in progress
   it('does not emit startGame when game is not in progress', () => {
     const game = makeGame({ gameState: 'waiting' });

@@ -349,6 +349,118 @@ describe('gameStateManager', () => {
       expect(gsm.getGame('G1').gameSessionId).toBe(2);
     });
 
+    // ─── Cross-round carryover (recurring pitfall Class 2) ───
+    // Every one of these fields is written behind a MODE branch at round start
+    // (`resolvedMode === 'classic' && players >= 2` for the round-event/rush pair,
+    // `=== 'word-tower'` for the versus match, a best-effort async IIFE for
+    // specialWords) or only by a timer that the game-end sweep cancels
+    // (`fireRoundActive`). A round that ends mid-effect therefore leaves the flag
+    // set, and the next round — in a mode whose start path never re-initialises it —
+    // scores against last round's state. The reset must be unconditional.
+    it('clears fireRoundActive so a round ending mid-fire-round does not 2x the next round', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      // Earthquake's fire round is live; its `fireEnd` timer is cancelled by the
+      // game-end sweep before it can flip the flag back.
+      gsm.updateGame('G1', { fireRoundActive: true });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').fireRoundActive).toBe(false);
+    });
+
+    it('clears the round-event schedule so a stale lightning event cannot score the next round', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', {
+        activeRoundEvent: 'lightning',
+        roundEventSchedule: { eventType: 'lightning', triggerAtPercent: 0.5 },
+      });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      const game = gsm.getGame('G1');
+      expect(game.activeRoundEvent).toBeNull();
+      expect(game.roundEventSchedule).toBeNull();
+    });
+
+    it('clears rush tiles so last round\'s tile positions cannot bonus the new grid', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', {
+        rushTiles: [{ row: 0, col: 1 }],
+        rushTilesActive: true,
+      });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      const game = gsm.getGame('G1');
+      expect(game.rushTiles).toEqual([]);
+      expect(game.rushTilesActive).toBe(false);
+    });
+
+    it('clears specialWords so an already-claimed word cannot block the next round', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', { specialWords: [{ word: 'PUZZLE', foundBy: 'P1' }] });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').specialWords).toEqual([]);
+    });
+
+    it('clears cachedResultsPayload so a reconnect cannot be served last round\'s scores', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', { cachedResultsPayload: { scores: [{ username: 'P1', totalScore: 42 }] } });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').cachedResultsPayload).toBeNull();
+    });
+
+    it('clears wordTowerVersusState alongside its blast/wheel/word-hunt siblings', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', { wordTowerVersusState: { matchId: 'm1' } });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').wordTowerVersusState).toBeNull();
+    });
+
+    it('clears playerBoosts so a boost bought for one round does not re-apply free every round after', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.addUserToGame('G1', 'P1', 's1');
+      gsm.transitionGameState('G1', 'START');
+      // A boost claimed for THIS round. calculateAndBroadcastFinalScores applies
+      // game.playerBoosts at the end of every round, so an uncleared claim keeps
+      // paying out for the whole life of the room.
+      gsm.updateGame('G1', { playerBoosts: { P1: { sessionId: 'G1', token: 'tok' } } });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').playerBoosts).toEqual({});
+    });
+
+    it('clears totalBoardWords so the next round cannot report a stale board count', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', { totalBoardWords: 137 });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').totalBoardWords).toBe(0);
+    });
+
     it('works from waiting state (no-op transition)', () => {
       gsm.createGame('G1', defaultCreationData());
       const result = gsm.resetGameForNewRound('G1');

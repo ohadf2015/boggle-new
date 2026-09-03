@@ -3,8 +3,25 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BrainTrainingPageClient from './PageClient';
+import { SUPPORTED_LOCALES } from '@/lib/localeResolution';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
+
+/**
+ * Was `force-dynamic`, which re-rendered this page on every request and made it
+ * uncacheable — for no gain: everything the server emits here (metadata, the
+ * static per-locale SEO copy below, the JSON-LD) is deterministic per locale,
+ * with no cookies, headers, searchParams or request-time fetch. The drills
+ * themselves live in the client component.
+ *
+ * `generateStaticParams` is required for the `revalidate` above to do anything:
+ * the enclosing `[locale]` segment is dynamic, so without it Next cannot
+ * prerender the route and serves `no-store`. See
+ * app/[locale]/__tests__/prerenderedLocaleRoutes.test.ts.
+ */
+export function generateStaticParams(): Array<{ locale: string }> {
+  return SUPPORTED_LOCALES.map((locale) => ({ locale }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
