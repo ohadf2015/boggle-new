@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.SystemBarStyle;
@@ -43,6 +44,20 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         getWindow().setBackgroundDrawable(new ColorDrawable(0xFF1A1A2E));
         WebView webView = getBridge() != null ? getBridge().getWebView() : null;
         if (webView != null) webView.setBackgroundColor(0xFF1A1A2E);
+
+        // Cold-start offline: the WebView does NOT serve cold-start navigations
+        // from service-worker cache (device-verified 2026-09-03 — SW precache
+        // works mid-session, but the first navigation of a fresh launch fails
+        // straight into Capacitor's errorPath). LOAD_CACHE_ELSE_NETWORK makes
+        // the WebView fall back to its HTTP cache whenever the network fails;
+        // the server now marks the offline-shell routes cacheable
+        // (server/offlineShellCache.ts: private, max-age=300, SWR=1d), so an
+        // offline launch boots the cached shell and the app's offline launcher
+        // takes over. Online behaviour is unchanged: the cache is only used
+        // when the network request fails. Network-first semantics, cache fallback.
+        if (webView != null) {
+            webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        }
 
         ensureDefaultNotificationChannel();
         handleDeepLinkIntent(getIntent());
