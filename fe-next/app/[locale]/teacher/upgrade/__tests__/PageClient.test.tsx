@@ -14,12 +14,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// Reassignable per-test (mockUseAuth) so the fix/teacher-funnel resume-checkout tests
+// can exercise the unauthenticated -> authenticated transition; every pre-existing
+// test keeps the original always-authenticated default via beforeEach below.
+const mockUseAuth = vi.fn();
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: { id: 'test-user' },
-    isAuthenticated: true,
-    profile: null,
-  }),
+  useAuth: () => mockUseAuth(),
 }));
 
 vi.mock('@/components/education/EducationHeader', () => ({
@@ -67,9 +67,11 @@ const mockTrackGrowthEvent = growthTracking.trackGrowthEvent as ReturnType<typeo
 describe('UpgradePricingPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({ user: { id: 'test-user' }, isAuthenticated: true, profile: null, loading: false });
     // Clean up any lingering conversion-surface class
     document.body.classList.remove('conversion-surface');
     vi.stubGlobal('fetch', mockFetch);
+    localStorage.clear();
   });
 
   it('tracks iap_viewed with product teacher_pro on mount', () => {
@@ -119,6 +121,76 @@ describe('UpgradePricingPageClient', () => {
       expect(mockToastError).toHaveBeenCalledWith('teacher.subscription.checkoutError'),
     );
     expect(mockToastError).not.toHaveBeenCalledWith('teacher.subscription.signInRequired');
+  });
+
+  // fix/teacher-funnel: a guest who hits the 401 wall already proved intent by
+  // clicking Upgrade. The wall this closes is the SECOND click a teacher used to need
+  // after finishing sign-in (password/OTP/OAuth in-modal, or a magic-link /
+  // email-confirmation round trip that reloads or redirects back to this exact page).
+  // Must match RESUME_CHECKOUT_KEY in PageClient.tsx — there's no export for it
+  // because the flag is an internal implementation detail, not a public contract.
+  const RESUME_CHECKOUT_KEY = 'lc_resume_checkout_after_auth';
+
+  describe('resumes checkout automatically once authenticated', () => {
+    it('marks resume intent in localStorage when checkout 401s', async () => {
+      mockFetch.mockResolvedValue({ ok: false, status: 401 });
+      render(<UpgradePricingPageClient />);
+
+      fireEvent.click(screen.getByRole('button', { name: /upgradeNow/i }));
+      await vi.waitFor(() => expect(localStorage.getItem(RESUME_CHECKOUT_KEY)).not.toBeNull());
+    });
+
+    it('auto-retries checkout on mount when the teacher is authenticated and a fresh resume flag is pending', async () => {
+      localStorage.setItem(RESUME_CHECKOUT_KEY, String(Date.now()));
+      mockFetch.mockResolvedValue({ ok: true, json: async () => ({ url: 'https://polar.sh/checkout/resumed' }) });
+
+      render(<UpgradePricingPageClient />);
+
+      await vi.waitFor(() =>
+        expect(mockFetch).toHaveBeenCalledWith('/api/subscription/checkout', { method: 'POST' }),
+      );
+      // No click fired — this is the whole point of the fix.
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('consumes the resume flag so mounting twice does not double-fire checkout', async () => {
+      localStorage.setItem(RESUME_CHECKOUT_KEY, String(Date.now()));
+      mockFetch.mockResolvedValue({ ok: true, json: async () => ({ url: 'https://polar.sh/checkout/resumed' }) });
+
+      render(<UpgradePricingPageClient />);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
+
+      expect(localStorage.getItem(RESUME_CHECKOUT_KEY)).toBeNull();
+    });
+
+    it('does not auto-fire checkout when no resume flag is set', async () => {
+      render(<UpgradePricingPageClient />);
+      // Give any stray effect a tick to (not) fire before asserting the negative.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it('does not auto-fire checkout when the resume flag is stale (older than 15 minutes)', async () => {
+      const sixteenMinutesAgo = Date.now() - 16 * 60 * 1000;
+      localStorage.setItem(RESUME_CHECKOUT_KEY, String(sixteenMinutesAgo));
+
+      render(<UpgradePricingPageClient />);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(mockFetch).not.toHaveBeenCalled();
+      // A stale flag is discarded on read, not left to be misread again later.
+      expect(localStorage.getItem(RESUME_CHECKOUT_KEY)).toBeNull();
+    });
+
+    it('does not auto-fire checkout while auth is still loading, even with a fresh flag', async () => {
+      mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false, profile: null, loading: true });
+      localStorage.setItem(RESUME_CHECKOUT_KEY, String(Date.now()));
+
+      render(<UpgradePricingPageClient />);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
   });
 
   it('mobile: Pro card appears first in document order (order-1), Free second (order-2)', () => {
