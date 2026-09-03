@@ -427,6 +427,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             onPlay={handleQuickStartPlay}
             onHowToPlay={() => setShowHowToPlay(true)}
             onHaveAccount={isOnCrazyGamesPlatform ? undefined : handleHaveAccount}
+            onSkip={handleSkipOnboarding}
           />
         );
       case 'language':

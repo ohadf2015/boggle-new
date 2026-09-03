@@ -422,9 +422,10 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
           {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above) */}
           {leaderboard.length > 3 && (
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <div
             className={cn(
-              'rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard',
+              'min-w-[640px] rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard',
               isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
@@ -511,6 +512,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 );
               })}
             </div>
+          </div>
           </div>
           )}
         </PageStateHandler>

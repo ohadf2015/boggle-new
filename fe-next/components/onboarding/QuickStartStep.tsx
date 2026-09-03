@@ -2,7 +2,7 @@
 
 import React, { useCallback, useRef, useState } from 'react';
 import { m } from 'framer-motion';
-import { Play, Shuffle, Pencil } from 'lucide-react';
+import { Play, Shuffle, Pencil, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SUPPORTED_GAME_LANGUAGES, LANGUAGE_CONFIG } from '@/lib/languageConfig';
 import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
@@ -24,6 +24,8 @@ export interface QuickStartStepProps {
   onHowToPlay: () => void;
   /** Sign-in shortcut. Omitted on platforms without external auth (CrazyGames). */
   onHaveAccount?: () => void;
+  /** Skip FTUE and return to the homepage. */
+  onSkip?: () => void;
 }
 
 /**
@@ -52,7 +54,7 @@ export interface QuickStartStepProps {
  *   result screen, where there is finally something to sign up FOR.
  * See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
  */
-const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, onHaveAccount }) => {
+const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, onHaveAccount, onSkip }) => {
   const { t, dir, language, setLanguage } = useLanguage();
 
   // Snapshot the suggestion so we can tell later whether the player edited it.
@@ -105,6 +107,19 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4 lg:max-w-md" dir={dir}>
+      {onSkip && (
+        <div className="w-full flex justify-end">
+          <button
+            type="button"
+            data-testid="quick-start-skip"
+            onClick={onSkip}
+            aria-label={t('common.close')}
+            className="flex h-9 w-9 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-white text-neo-black shadow-hard-sm transition-all hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
       {/* Brand hero */}
       <m.h1
         initial={{ opacity: 0, y: -12 }}
