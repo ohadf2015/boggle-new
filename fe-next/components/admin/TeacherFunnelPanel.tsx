@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { AlertTriangle } from 'lucide-react';
 import { TeacherAccessDrawer } from './TeacherAccessDrawer';
+import { TeacherActivityDrawer } from './TeacherActivityDrawer';
 import type { TeacherAccessRequest } from '@/lib/education/types';
 import type {
   ClassroomRow,
@@ -310,12 +311,28 @@ function ClassroomsPanel({
   );
 }
 
+/** Granted teachers get the activity drill-down; everyone else still needs the access queue. */
+function isActivityRow(r: TeacherFunnelRow): boolean {
+  return r.status === 'approved' && r.roleGranted && !!r.userId;
+}
+
 export function TeacherFunnelPanel() {
   const { t } = useLanguage();
-  const [open, setOpen] = useState<TeacherFunnelRow | null>(null);
+  const [accessOpen, setAccessOpen] = useState<TeacherFunnelRow | null>(null);
+  const [activityOpen, setActivityOpen] = useState<TeacherFunnelRow | null>(null);
   const [data, setData] = useState<TeacherFunnelResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  function openRow(r: TeacherFunnelRow) {
+    if (isActivityRow(r)) {
+      setAccessOpen(null);
+      setActivityOpen(r);
+    } else {
+      setActivityOpen(null);
+      setAccessOpen(r);
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -464,12 +481,13 @@ export function TeacherFunnelPanel() {
               <th className="p-2 text-end font-bold">{t('admin.teacherFunnel.col.classes')}</th>
               <th className="p-2 text-end font-bold">{t('admin.teacherFunnel.col.students')}</th>
               <th className="p-2 text-end font-bold">{t('admin.teacherFunnel.col.assignments')}</th>
+              <th className="p-2 text-end font-bold">{t('admin.teacherFunnel.col.view', 'View')}</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={9} className="p-4 text-center text-neo-white/50">
+                <td colSpan={10} className="p-4 text-center text-neo-white/50">
                   {t('admin.teacherFunnel.empty')}
                 </td>
               </tr>
@@ -477,16 +495,20 @@ export function TeacherFunnelPanel() {
             {rows.map((r: TeacherFunnelRow) => (
               <tr
                 key={r.requestId}
-                onClick={() => setOpen(r)}
+                onClick={() => openRow(r)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    setOpen(r);
+                    openRow(r);
                   }
                 }}
                 tabIndex={0}
                 role="button"
-                aria-label={t('admin.teacherFunnel.rowOpen', 'Open request details')}
+                aria-label={
+                  isActivityRow(r)
+                    ? t('admin.teacherFunnel.rowOpenActivity', 'Open teacher activity')
+                    : t('admin.teacherFunnel.rowOpen', 'Open request details')
+                }
                 className="cursor-pointer border-b border-black/20 text-neo-white/90 hover:bg-black/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-inset"
               >
                 <td className="p-2">
@@ -531,6 +553,18 @@ export function TeacherFunnelPanel() {
                 <td className="p-2 text-end tabular-nums">{r.classrooms}</td>
                 <td className="p-2 text-end tabular-nums">{r.students}</td>
                 <td className="p-2 text-end tabular-nums">{r.assignments}</td>
+                <td className="p-2 text-end">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openRow(r);
+                    }}
+                    className="rounded-neo border border-black bg-neo-cream px-2 py-0.5 text-[11px] font-black uppercase text-black"
+                  >
+                    {t('admin.teacherFunnel.view', 'View')}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -539,11 +573,17 @@ export function TeacherFunnelPanel() {
 
       <p className="mt-2 font-neo-body text-xs text-neo-white/40">{t('admin.teacherFunnel.pageviewHint')}</p>
 
-      {open && (
+      {accessOpen && (
         <TeacherAccessDrawer
-          row={toAccessRequest(open)}
-          onClose={() => setOpen(null)}
+          row={toAccessRequest(accessOpen)}
+          onClose={() => setAccessOpen(null)}
           onActioned={() => { load(); }}
+        />
+      )}
+      {activityOpen && (
+        <TeacherActivityDrawer
+          row={activityOpen}
+          onClose={() => setActivityOpen(null)}
         />
       )}
     </section>
