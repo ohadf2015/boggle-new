@@ -8,6 +8,7 @@ import { defaultLocale, locales } from '@/lib/i18n';
 import { isNative } from '@/utils/platform';
 import { setupPushListeners } from '@/utils/pushNotifications/tokenRegistration';
 import { handlePushData } from '@/utils/pushNotifications/handlePushData';
+import { withoutCapacitorThenable } from '@/lib/native/withoutCapacitorThenable';
 
 const isValidLocale = (locale: string | null | undefined): locale is string =>
   !!locale && locales.includes(locale);
@@ -126,14 +127,27 @@ export default function DeepLinkHandler() {
 
     async function getAppPlugin(): Promise<CapAppPlugin | null> {
       const legacy = getSyncAppPlugin();
-      if (legacy) return legacy;
-      try { return (await import('@capacitor/app')).App as unknown as CapAppPlugin; } catch { return null; }
+      if (legacy) return withoutCapacitorThenable(legacy);
+      try {
+        // Must strip `.then` before returning: Capacitor's plugin proxy is a
+        // thenable, so `return App` from this async fn calls App.then() and
+        // leaks `"App.then()" is not implemented on web` (UNIMPLEMENTED).
+        return withoutCapacitorThenable(
+          (await import('@capacitor/app')).App as unknown as CapAppPlugin,
+        );
+      } catch {
+        return null;
+      }
     }
 
     async function getBrowserPlugin() {
       const legacy = getSyncBrowserPlugin();
-      if (legacy) return legacy;
-      try { return (await import('@capacitor/browser')).Browser; } catch { return null; }
+      if (legacy) return withoutCapacitorThenable(legacy);
+      try {
+        return withoutCapacitorThenable((await import('@capacitor/browser')).Browser);
+      } catch {
+        return null;
+      }
     }
 
     const handleAppUrlOpen = async (event: { url: string }) => {
