@@ -25,6 +25,13 @@ export interface PlayerWordInput {
 /** Valid reasons for invalid word submissions */
 export type InvalidWordReason = 'not_on_board' | 'not_in_dictionary' | 'peer_rejected';
 
+// Word-mastery write path is opt-in. The `record_word_mastery_event` RPC is
+// created by the player_word_mastery migration, which must be applied before
+// this can run, and the feature itself is A/B-gated at rollout 0. Computing
+// once at module load keeps the word-submit hot path free of per-call env
+// lookups and, while disabled, free of the extra DB round-trip entirely.
+const WORD_MASTERY_RPC_ENABLED = process.env.NEXT_PUBLIC_WORD_MASTERY === '1';
+
 /**
  * Save a host-approved word that wasn't in the dictionary to Supabase
  */
@@ -108,7 +115,9 @@ export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: u
     logger.debug('SUPABASE', `${row.out_is_new_word ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${row.out_times_submitted}`);
 
     // Fire-and-forget mastery bump — never await on the word-submit path.
-    if (playerId) {
+    // Skipped entirely unless the word-mastery feature is explicitly enabled
+    // (env flag) AND its migration has been applied.
+    if (playerId && WORD_MASTERY_RPC_ENABLED) {
       void (async () => {
         try {
           const { error: masteryError } = await client.rpc('record_word_mastery_event', {
