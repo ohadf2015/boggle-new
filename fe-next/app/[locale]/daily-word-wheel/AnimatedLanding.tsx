@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CalendarDays, Search, Timer, Trophy, type LucideIcon } from 'lucide-react';
+import { RankingPlayEmbed } from './RankingPlayEmbed';
 
 interface AnimatedLandingProps {
   locale: string;
@@ -28,87 +29,8 @@ const STEP_ACCENTS = [
   { border: 'border-neo-purple/60', ring: 'border-neo-purple', text: 'text-neo-purple', glow: '0 0 24px rgba(139,92,246,0.28)' },
 ] as const;
 
-// Deterministic 4x4 mosaic — censors the glyph while staying SSR-stable.
-function PixelMask({ seed }: { seed: number }) {
-  const cells = Array.from({ length: 16 }, (_, i) => (seed * 31 + i * 7 + 3) % 3);
-  return (
-    <div className="grid h-full w-full grid-cols-4 grid-rows-4 overflow-hidden rounded-full" aria-hidden>
-      {cells.map((bucket, i) => {
-        const bg = bucket === 0 ? 'bg-neo-navy' : bucket === 1 ? 'bg-neo-navy-light' : 'bg-neo-cream/30';
-        return <span key={i} className={bg} />;
-      })}
-    </div>
-  );
-}
-
-// Decorative spinning wheel for the hero
-function HeroWheel({ reducedMotion = false }: { reducedMotion?: boolean }) {
-  const letters = ['D', 'A', 'I', 'L', 'Y', '!'];
-  return (
-    <div className="relative mx-auto mb-6 h-36 w-36 sm:h-44 sm:w-44">
-      {/* Outer glow ring — slow rotate for ambient motion (paused when reduced motion is preferred) */}
-      <m.div
-        className="absolute inset-0 rounded-full border-2 border-dashed border-neo-lime/40"
-        style={{ boxShadow: '0 0 40px rgba(191,255,0,0.15)' }}
-        animate={reducedMotion ? { rotate: 0 } : { rotate: 360 }}
-        transition={reducedMotion ? { duration: 0 } : { duration: 24, repeat: Infinity, ease: 'linear' }}
-      />
-
-      {/* Center letter */}
-      <m.div
-        className="absolute left-1/2 top-1/2 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-lime font-neo-display text-xl font-black text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
-        style={{ x: '-50%', y: '-50%' }}
-        animate={reducedMotion ? { scale: 1 } : { scale: [1, 1.1, 1] }}
-        transition={reducedMotion ? { duration: 0 } : { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        W
-      </m.div>
-
-      {/* Rotating wheel containing orbital letters — this makes the wheel actually spin */}
-      <m.div
-        className="absolute inset-0"
-        animate={reducedMotion ? { rotate: 0 } : { rotate: 360 }}
-        transition={reducedMotion ? { duration: 0 } : { duration: 18, repeat: Infinity, ease: 'linear' }}
-      >
-        {letters.map((letter, i) => {
-          const angle = i * 60;
-          const rad = (angle * Math.PI) / 180;
-          const r = 55;
-          const x = Math.sin(rad) * r;
-          const y = -Math.cos(rad) * r;
-          return (
-            <m.div
-              key={`${letter}-${i}`}
-              className="absolute left-1/2 top-1/2 flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-neo-black bg-neo-white shadow-[2px_2px_0px_black]"
-              initial={{ x: '-50%', y: '-50%', scale: 0, opacity: 0 }}
-              animate={{
-                x: `calc(-50% + ${x}px)`,
-                y: `calc(-50% + ${y}px)`,
-                scale: 1,
-                opacity: 1,
-              }}
-              transition={{ delay: 0.3 + i * 0.08, type: 'spring', stiffness: 400, damping: 15 }}
-              aria-label="hidden letter"
-            >
-              {/* Censored — pixel mosaic instead of glyph. Counter-rotate keeps mask grid axis-aligned. */}
-              <m.span
-                className="block h-full w-full"
-                animate={reducedMotion ? { rotate: 0 } : { rotate: -360 }}
-                transition={reducedMotion ? { duration: 0 } : { duration: 18, repeat: Infinity, ease: 'linear' }}
-              >
-                <PixelMask seed={i + 1} />
-              </m.span>
-            </m.div>
-          );
-        })}
-      </m.div>
-    </div>
-  );
-}
-
 export function AnimatedLanding({ locale, hero, rulesHeading, rules, steps, stepsHeading, faqHeading, faqItems, finalCta }: AnimatedLandingProps) {
   const isRtl = locale === 'he';
-  const prefersReduced = useReducedMotion();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8" dir={isRtl ? 'rtl' : 'ltr'}>
@@ -155,7 +77,7 @@ export function AnimatedLanding({ locale, hero, rulesHeading, rules, steps, step
           </m.div>
         ) : null}
 
-        <HeroWheel reducedMotion={!!prefersReduced} />
+        <RankingPlayEmbed locale={locale} />
 
         <m.div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4" variants={fadeUp}>
           <Link

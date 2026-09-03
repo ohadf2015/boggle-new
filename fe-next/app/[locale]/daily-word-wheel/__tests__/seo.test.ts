@@ -76,4 +76,10 @@ describe('daily-word-wheel discovery', () => {
     expect(landing).toContain('<ul');
     expect(landing).toContain('rules.map');
   });
+
+  it('plays on this URL instead of only linking away', () => {
+    const landing = readFileSync(join(__dirname, '..', 'AnimatedLanding.tsx'), 'utf8');
+    expect(landing).toContain('RankingPlayEmbed');
+    expect(landing).toContain('/daily/word-wheel');
+  });
 });
