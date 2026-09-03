@@ -257,6 +257,17 @@ export const EXPERIMENTS = {
       'ohadf2015@gmail.com': 'on',
     },
   }),
+  /**
+   * Personalized word mastery. control hides /profile/words; enabled shows
+   * mastered vs learning lists plus a practice CTA seeded from weakest words.
+   * Also gated by NEXT_PUBLIC_WORD_MASTERY=1 and the word_mastery_v1 DB flag.
+   */
+  'word-mastery-v1': defineExperiment({
+    variants: ['control', 'enabled'] as const,
+    default: 'control',
+    description:
+      'Personalized word-mastery profile. control = hidden, enabled = /profile/words lists mastered vs learning words and a practice CTA seeded from weakest words.',
+  }),
   'landing-variant-homepage-v1': defineExperiment({
     variants: ['control', 'variant'] as const,
     default: 'control',

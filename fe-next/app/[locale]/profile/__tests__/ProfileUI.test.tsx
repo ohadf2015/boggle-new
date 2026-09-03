@@ -17,6 +17,10 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 // Stub the rewarded-ad gold button — its AdMob/useRewardedAd machinery is
 // irrelevant to these title-sizing assertions and pulls in unmocked context.
 vi.mock('@/components/ads/RewardedAdGoldButton', () => ({ __esModule: true, default: () => null, RewardedAdGoldButton: () => null }));
+vi.mock('@/components/profile/WordMasteryCard', () => ({ WordMasteryCard: () => null }));
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
+}));
 
 const createWrapper = () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });

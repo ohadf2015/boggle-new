@@ -48,6 +48,7 @@ import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
 import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
 import { ProfileStyleCard } from '@/components/playerStyle/ProfileStyleCard';
 import { PlayGamesCard } from '@/components/playGames/PlayGamesCard';
+import { WordMasteryCard } from '@/components/profile/WordMasteryCard';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
@@ -357,6 +358,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 <ProfileStyleCard isDarkMode={isDarkMode} delay={0.18} />
                 <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact onProfileRefresh={refreshProfile} />
                 <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
+                <WordMasteryCard />
                 <CreatorProfileStats stats={getCreatorStats()} className="mt-4" />
                 <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
               </m.div>
@@ -449,6 +451,8 @@ export default function ProfilePageClient(): React.JSX.Element {
             <ProfileXpSection profile={profile} isDarkMode={isDarkMode} delay={0.15} onProfileRefresh={refreshProfile} />
             <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} delay={0.18} />
           </div>
+
+          <WordMasteryCard />
 
           {/* 3b. XP by Mode — where your XP came from */}
           <XpByModeBreakdown xpByMode={xpByMode} delay={0.19} />

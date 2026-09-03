@@ -106,6 +106,28 @@ export async function savePlayerWord(params: PlayerWordInput): Promise<{ data: u
 
     const row = (Array.isArray(rpcRows) ? rpcRows[0] : rpcRows) as { out_id: string; out_times_submitted: number; out_is_new_word: boolean };
     logger.debug('SUPABASE', `${row.out_is_new_word ? 'Saved new' : 'Updated'} player word "${normalizedWord}" (${language}) - times submitted: ${row.out_times_submitted}`);
+
+    // Fire-and-forget mastery bump — never await on the word-submit path.
+    if (playerId) {
+      void (async () => {
+        try {
+          const { error: masteryError } = await client.rpc('record_word_mastery_event', {
+            p_player_id: playerId,
+            p_word: normalizedWord,
+            p_language: language,
+            p_outcome: 'solved',
+            p_used_hint: false,
+            p_duration_ms: null,
+          });
+          if (masteryError) {
+            logger.debug('SUPABASE', `word mastery record skipped: ${masteryError.message}`);
+          }
+        } catch {
+          // Non-blocking: mastery cache must not affect word submit.
+        }
+      })();
+    }
+
     return { data: { id: row.out_id, times_submitted: row.out_times_submitted }, error: null, isNewWord: row.out_is_new_word };
 
   } catch (err: unknown) {

@@ -12,6 +12,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+vi.mock('@/components/profile/WordMasteryCard', () => ({ WordMasteryCard: () => null }));
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
+}));
+
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({

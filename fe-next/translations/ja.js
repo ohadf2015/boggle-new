@@ -4832,6 +4832,21 @@ const ja = {
     "viewPublicProfile": "公開プロフィールを見る",
     "games": "ゲーム"
   },
+  "wordMastery": {
+    "title": "単語マスター",
+    "subtitle": "攻略した単語と、まだ練習中の単語。",
+    "mastered": "マスター",
+    "learning": "練習中",
+    "emptyMastered": "まだマスターした単語はありません。ヒントなしで素早く見つけましょう。",
+    "emptyLearning": "まだ練習中の単語はありません。失敗やヒントはここに出ます。",
+    "emptyAll": "数ラウンド遊ぶと、見つけた単語の記録が始まります。",
+    "practiceCta": "この単語を練習",
+    "practiceHint": "苦手な単語でカスタムラウンドを開始します。",
+    "signIn": "ログインすると単語マスターを確認できます。",
+    "gated": "単語マスターは順次公開中です。もう少しお待ちください。",
+    "error": "単語マスターを読み込めませんでした。もう一度お試しください。",
+    "count": "{count}語"
+  },
   "playerProfile": {
     "title": "プレイヤープロフィール",
     "notFound": "プレイヤーが見つかりません",
