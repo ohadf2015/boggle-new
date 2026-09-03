@@ -27,11 +27,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
-    title: 'Scrabble Online Gratis en Español — Multijugador | LexiClash',
-    description: 'Scrabble online gratis en español — sin registro, sin descarga. Sala en 10 s, hasta 50 jugadores en tiempo real. Empieza gratis →',
+    title: 'Jugar Scrabble Online Gratis en Español | LexiClash',
+    description: 'Juega Scrabble en español con amigos en tiempo real — gratis, sin registro, sin descargas. Crea tu sala en 10 segundos. Hasta 50 jugadores. ¡Empieza ya! →',
     keywords: 'scrabble online gratis, scrabble juego online, scrabble español online, jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
-      title: 'Scrabble Online Gratis en Español — Multijugador | LexiClash',
+      title: 'Jugar Scrabble Online Gratis en Español | LexiClash',
       description: 'Crea sala en 10 segundos, invita hasta 50 amigos y compite en español en tiempo real. Sin registro ni descarga.',
       locale: 'es_ES',
       type: 'website',
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble Online Gratis en Español — Multijugador | LexiClash',
+      title: 'Jugar Scrabble Online Gratis en Español | LexiClash',
       description: 'Sala en 10 segundos, hasta 50 jugadores en tiempo real. Sin registro ni descarga.',
       images: [`${BASE_URL}/og-image-es-multiplayer.webp`],
     },
