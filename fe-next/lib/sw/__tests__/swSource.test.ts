@@ -23,6 +23,10 @@ describe('swSource', () => {
     }
   });
 
+  it('precaches the bare / home shell (native WebView start URL)', () => {
+    expect(SW_SOURCE).toMatch(/OFFLINE_SHELL_ROUTES = \["\/"/);
+  });
+
   it('registers the three SW lifecycle handlers', () => {
     expect(SW_SOURCE).toContain("addEventListener('install'");
     expect(SW_SOURCE).toContain("addEventListener('activate'");

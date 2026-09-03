@@ -24,25 +24,11 @@ import Showdown from '@/components/sealedBid/Showdown';
 import { SealedBidSessionSummary } from '@/components/sealedBid/SealedBidSessionSummary';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { dealRounds, type SbRackDeal } from '@/lib/sealedBid/sp/rackPool';
+import { dictCheck } from '@/lib/sealedBid/sp/dictCheck';
 import { initWallet, clampStake, applyDelta, cashOutCoins, type ChipWallet } from '@/lib/sealedBid/sp/chipWallet';
 import { settleBid, rollLuckyStreak, LUCKY_STREAK_MULTIPLIER, type Settlement } from '@/lib/sealedBid/sp/wager';
 import { getSoloDateISO, isSoloDailyClaimed, markSoloDailyClaimed } from '@/lib/solo/soloDaily';
 import { SEALED_BID_ASSETS } from '@/components/sealedBid/sealedBidAssets';
-
-async function dictCheck(word: string, lang: string): Promise<boolean> {
-  try {
-    const res = await fetch('/api/dictionary/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word, language: lang }),
-    });
-    if (!res.ok) return false;
-    const data: { isValid?: boolean } = await res.json();
-    return !!data.isValid;
-  } catch {
-    return false;
-  }
-}
 
 interface RoundRecord {
   deal: SbRackDeal;

@@ -145,6 +145,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/multiplayer",
   "/multiplayer-word-game-online",
   "/online-word-games-with-friends",
+  "/party",
   "/play-boggle-online-free",
   "/profile",
   "/profile/words",

@@ -6,15 +6,19 @@
     <title>LexiClash</title>
     <style>
       * { box-sizing: border-box; }
-      html, body { margin: 0; padding: 0; height: 100%; background: #1a1a2e; color: #fffef0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-      main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
-      .card { max-width: 28rem; background: #16213e; border: 3px solid #000; border-radius: 12px; box-shadow: 4px 4px 0 #000; padding: 2rem 1.5rem; }
+      html, body { margin: 0; padding: 0; min-height: 100%; background: #1a1a2e; color: #fffef0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+      main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center; }
+      .card { max-width: 28rem; width: 100%; background: #16213e; border: 3px solid #000; border-radius: 12px; box-shadow: 4px 4px 0 #000; padding: 2rem 1.5rem; }
       [dir="rtl"] .card { box-shadow: -4px 4px 0 #000; }
       h1 { font-size: 1.75rem; margin: 0 0 0.75rem; letter-spacing: 0.02em; color: #bfff00; }
+      h2 { font-size: 1.1rem; margin: 0 0 0.5rem; color: #bfff00; }
       p { font-size: 1rem; line-height: 1.55; margin: 0 0 1.25rem; color: #fffef0cc; }
-      button { background: #bfff00; color: #000; border: 3px solid #000; border-radius: 8px; padding: 0.85rem 1.5rem; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; box-shadow: 3px 3px 0 #000; }
-      [dir="rtl"] button { box-shadow: -3px 3px 0 #000; }
-      button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+      button, .link { display: inline-block; background: #bfff00; color: #000; border: 3px solid #000; border-radius: 8px; padding: 0.85rem 1.5rem; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; box-shadow: 3px 3px 0 #000; text-decoration: none; }
+      [dir="rtl"] button, [dir="rtl"] .link { box-shadow: -3px 3px 0 #000; }
+      button:active, .link:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+      .play { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 2px solid #000; }
+      .links { display: flex; flex-direction: column; gap: 0.6rem; }
+      .links .link { background: #00ffff; }
       small { display: block; margin-top: 1.5rem; color: #fffef080; font-size: 0.8rem; }
     </style>
   </head>
@@ -24,17 +28,33 @@
         <h1 id="title">Can't reach LexiClash</h1>
         <p id="desc">Looks like the connection dropped. Check Wi-Fi or mobile data, then try again.</p>
         <button id="retry" type="button" onclick="location.href='https://www.lexiclash.live'">Retry</button>
+        <section class="play" id="offline-play">
+          <h2 id="playTitle">Play offline</h2>
+          <p id="playDesc">If you've opened the app online before, cached games still work.</p>
+          <div class="links" id="links"></div>
+        </section>
         <small id="hint">If this keeps happening, reopen the app or reinstall.</small>
       </div>
     </main>
     <script>
       (function () {
         var strings = {
-          en: { title: "Can't reach LexiClash", desc: "Looks like the connection dropped. Check Wi-Fi or mobile data, then try again.", retry: "Retry", hint: "If this keeps happening, reopen the app or reinstall." },
-          he: { title: "לא מצליחים להתחבר ל-LexiClash", desc: "נראה שהחיבור נפל. בדקו Wi-Fi או נתונים סלולריים ונסו שוב.", retry: "נסו שוב", hint: "אם זה ממשיך, פתחו מחדש את האפליקציה או התקינו מחדש." },
-          sv: { title: "Kan inte nå LexiClash", desc: "Anslutningen verkar ha brutits. Kontrollera Wi-Fi eller mobildata och försök igen.", retry: "Försök igen", hint: "Om det upprepas, öppna appen igen eller installera om." },
-          ja: { title: "LexiClashに接続できません", desc: "接続が切れたようです。Wi-Fiまたはモバイルデータを確認して、もう一度お試しください。", retry: "再試行", hint: "繰り返し発生する場合は、アプリを再起動するか再インストールしてください。" },
-          es: { title: "No se puede conectar con LexiClash", desc: "Parece que se perdió la conexión. Verifica el Wi-Fi o los datos móviles e inténtalo de nuevo.", retry: "Reintentar", hint: "Si sigue ocurriendo, reabre la aplicación o reinstálala." }
+          en: { title: "Can't reach LexiClash", desc: "Looks like the connection dropped. Check Wi-Fi or mobile data, then try again.", retry: "Retry", hint: "If this keeps happening, reopen the app or reinstall.", playTitle: "Play offline", playDesc: "If you've opened the app online before, cached games still work.", playBlast: "Blast", playConnections: "Connections", playDaily: "Daily", playAdventure: "Adventure", playBrain: "Brain", playClassic: "Classic", playWordCraft: "WordCraft", playCrossword: "Crossword", playWordfall: "Wordfall", playParty: "Party", playWordTower: "Word Tower", playSealedBid: "Sealed Bid" },
+          he: { title: "לא מצליחים להתחבר ל-LexiClash", desc: "נראה שהחיבור נפל. בדקו Wi-Fi או נתונים סלולריים ונסו שוב.", retry: "נסו שוב", hint: "אם זה ממשיך, פתחו מחדש את האפליקציה או התקינו מחדש.", playTitle: "שחקו בלי רשת", playDesc: "אם כבר פתחתם את האפליקציה אונליין, משחקים שמורים עדיין עובדים.", playBlast: "בלאסט", playConnections: "חיבורים", playDaily: "יומי", playAdventure: "הרפתקה", playBrain: "מוח", playClassic: "קלאסי", playWordCraft: "וורדקראפט", playCrossword: "תשבץ", playWordfall: "Wordfall", playParty: "מסיבה", playWordTower: "מגדל מילים", playSealedBid: "הצעה חתומה" },
+          sv: { title: "Kan inte nå LexiClash", desc: "Anslutningen verkar ha brutits. Kontrollera Wi-Fi eller mobildata och försök igen.", retry: "Försök igen", hint: "Om det upprepas, öppna appen igen eller installera om.", playTitle: "Spela offline", playDesc: "Om du öppnat appen online tidigare fungerar cachade spel.", playBlast: "Blast", playConnections: "Connections", playDaily: "Daglig", playAdventure: "Äventyr", playBrain: "Hjärna", playClassic: "Klassisk", playWordCraft: "WordCraft", playCrossword: "Korsord", playWordfall: "Wordfall", playParty: "Party", playWordTower: "Ordtornet", playSealedBid: "Slutet bud" },
+          ja: { title: "LexiClashに接続できません", desc: "接続が切れたようです。Wi-Fiまたはモバイルデータを確認して、もう一度お試しください。", retry: "再試行", hint: "繰り返し発生する場合は、アプリを再起動するか再インストールしてください。", playTitle: "オフラインでプレイ", playDesc: "以前オンラインで開いていれば、キャッシュしたゲームで遊べます。", playBlast: "ブラスト", playConnections: "コネクションズ", playDaily: "デイリー", playAdventure: "アドベンチャー", playBrain: "脳トレ", playClassic: "クラシック", playWordCraft: "ワードクラフト", playCrossword: "クロスワード", playWordfall: "Wordfall", playParty: "パーティー", playWordTower: "ワードタワー", playSealedBid: "シールドビッド" },
+          es: { title: "No se puede conectar con LexiClash", desc: "Parece que se perdió la conexión. Verifica el Wi-Fi o los datos móviles e inténtalo de nuevo.", retry: "Reintentar", hint: "Si sigue ocurriendo, reabre la aplicación o reinstálala.", playTitle: "Jugar sin conexión", playDesc: "Si abriste la app en línea antes, los juegos en caché siguen funcionando.", playBlast: "Blast", playConnections: "Conexiones", playDaily: "Diario", playAdventure: "Aventura", playBrain: "Mente", playClassic: "Clásico", playWordCraft: "WordCraft", playCrossword: "Crucigrama", playWordfall: "Wordfall", playParty: "Fiesta", playWordTower: "Torre de palabras", playSealedBid: "Puja cerrada" },
+          ru: { title: "Не удаётся связаться с LexiClash", desc: "Похоже, соединение пропало. Проверьте Wi-Fi или мобильные данные и попробуйте снова.", retry: "Повторить", hint: "Если это повторяется, переоткройте приложение или переустановите его.", playTitle: "Играть офлайн", playDesc: "Если вы уже открывали приложение онлайн, кэшированные игры всё ещё работают.", playBlast: "Бласт", playConnections: "Связи", playDaily: "Ежедневная", playAdventure: "Приключение", playBrain: "Мозг", playClassic: "Классика", playWordCraft: "WordCraft", playCrossword: "Кроссворд", playWordfall: "Wordfall", playParty: "Вечеринка", playWordTower: "Башня слов", playSealedBid: "Закрытая ставка" }
+        };
+        var HOST = "https://www.lexiclash.live";
+        var LABELS = ["playBlast","playConnections","playDaily","playAdventure","playBrain","playClassic","playWordCraft","playCrossword","playWordfall","playParty","playWordTower","playSealedBid"];
+        var ROUTES = {
+          en: ["/en/blast","/en/connections","/en/daily","/en/adventure","/en/brain","/en/singleplayer?practice=1","/en/word-craft","/en/crossword","/en/blast/v2","/en/party","/en/word-tower","/en/sealed-bid"],
+          he: ["/he/blast","/he/connections","/he/daily","/he/adventure","/he/brain","/he/singleplayer?practice=1","/he/word-craft","/he/crossword","/he/blast/v2","/he/party","/he/word-tower","/he/sealed-bid"],
+          sv: ["/sv/blast","/sv/connections","/sv/daily","/sv/adventure","/sv/brain","/sv/singleplayer?practice=1","/sv/word-craft","/sv/crossword","/sv/blast/v2","/sv/party","/sv/word-tower","/sv/sealed-bid"],
+          ja: ["/ja/blast","/ja/connections","/ja/daily","/ja/adventure","/ja/brain","/ja/singleplayer?practice=1","/ja/word-craft","/ja/crossword","/ja/blast/v2","/ja/party","/ja/word-tower","/ja/sealed-bid"],
+          es: ["/es/blast","/es/connections","/es/daily","/es/adventure","/es/brain","/es/singleplayer?practice=1","/es/word-craft","/es/crossword","/es/blast/v2","/es/party","/es/word-tower","/es/sealed-bid"],
+          ru: ["/ru/blast","/ru/connections","/ru/daily","/ru/adventure","/ru/brain","/ru/singleplayer?practice=1","/ru/word-craft","/ru/crossword","/ru/blast/v2","/ru/party","/ru/word-tower","/ru/sealed-bid"]
         };
         var lang = (navigator.language || "en").slice(0, 2).toLowerCase();
         var s = strings[lang] || strings.en;
@@ -44,13 +64,20 @@
         document.getElementById("desc").textContent = s.desc;
         document.getElementById("retry").textContent = s.retry;
         document.getElementById("hint").textContent = s.hint;
+        document.getElementById("playTitle").textContent = s.playTitle;
+        document.getElementById("playDesc").textContent = s.playDesc;
         document.title = "LexiClash — " + s.title;
+        var box = document.getElementById("links");
+        var hrefs = ROUTES[lang] || ROUTES.en;
+        for (var i = 0; i < hrefs.length; i++) {
+          var a = document.createElement("a");
+          a.className = "link";
+          a.href = HOST + hrefs[i];
+          a.textContent = s[LABELS[i]] || hrefs[i];
+          box.appendChild(a);
+        }
 
-        // Auto-recover: the moment connectivity returns, reload straight into
-        // the app instead of making the user tap Retry. Guarded so we only fire
-        // once. (The app itself handles offline play once it has loaded; this
-        // screen only appears when the WebView couldn't reach the host at all.)
-        var HOME = "https://www.lexiclash.live";
+        var HOME = HOST;
         var recovered = false;
         function recover() {
           if (recovered) return;
@@ -59,24 +86,15 @@
         }
         window.addEventListener("online", recover);
 
-        // Cold-start offline bootstrap: Capacitor's errorPath can fire before
-        // the registered service worker gets a chance to serve the cached app
-        // shell. If we're offline and a SW is registered for the host origin,
-        // re-navigate to the host ONCE — the SW's navigation fallback then
-        // serves a cached locale shell so offline-capable modes still open.
-        // sessionStorage guards against an error.html -> host -> error.html loop
-        // when the SW genuinely can't serve (then we just show this screen).
         (function attemptOfflineBootstrap() {
           try {
-            if (navigator.onLine !== false) return;            // only when offline
-            if (sessionStorage.getItem("lc_offline_boot") === "1") return; // already tried
+            if (navigator.onLine !== false) return;
+            if (sessionStorage.getItem("lc_offline_boot") === "1") return;
             sessionStorage.setItem("lc_offline_boot", "1");
-            recovered = true;                                   // suppress other handlers
-            location.href = HOME;                               // SW (if controlling) serves cache
-          } catch (e) { /* sessionStorage blocked — fall through to manual UI */ }
+            recovered = true;
+            location.href = HOME;
+          } catch (e) { /* sessionStorage blocked */ }
         })();
-        // Belt-and-suspenders: poll, since the 'online' event is unreliable in
-        // some WebViews. Cheap HEAD probe; navigate on first success.
         var pollTimer = setInterval(function () {
           if (recovered) { clearInterval(pollTimer); return; }
           if (navigator.onLine === false) return;

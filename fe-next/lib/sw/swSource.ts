@@ -34,7 +34,7 @@ import { locales } from '@/i18n/config';
  */
 const BUILD_STAMP =
   (process.env.NEXT_PUBLIC_BUILD_TIME || '').replace(/\D/g, '').slice(0, 14) || '20260605';
-export const SW_CACHE_NAME = `lexiclash-v7-${BUILD_STAMP}`;
+export const SW_CACHE_NAME = `lexiclash-v8-${BUILD_STAMP}`;
 
 /**
  * Route shells to precache so a cold (offline) launch has a cached document to
@@ -42,10 +42,13 @@ export const SW_CACHE_NAME = `lexiclash-v7-${BUILD_STAMP}`;
  * is the navigation-fallback target when the uncacheable `/`→`/{locale}`
  * redirect can't be served offline).
  */
-// Locale homes first: the navigation-fallback loop serves the first cached
-// entry, and landing a cold offline launch on the home (with its offline
-// launcher) is friendlier than dropping mid-mode.
+// Bare `/` + locale homes first: the navigation-fallback loop serves the first
+// cached entry, and landing a cold offline launch on the home (with its offline
+// launcher) is friendlier than dropping mid-mode. `/` is the native WebView
+// start URL; without it a cold offline launch hits error.html before the SW
+// can serve anything.
 const OFFLINE_SHELL_ROUTES: string[] = [
+  '/',
   ...locales.map((l) => `/${l}`),
   ...offlineCapableRoutes(),
 ];
