@@ -24,7 +24,7 @@ export function RankingPlayEmbed({
 }: RankingPlayEmbedProps) {
   const language = (locale as Language) || 'en';
   const puzzle = useMemo(
-    () => puzzleProp ?? generateWordWheelPuzzle(undefined, language),
+    () => puzzleProp ?? generateWordWheelPuzzle(undefined, language, { letterCount: 9 }),
     [puzzleProp, language],
   );
 

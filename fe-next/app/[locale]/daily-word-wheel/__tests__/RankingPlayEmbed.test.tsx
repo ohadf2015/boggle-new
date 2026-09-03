@@ -10,14 +10,23 @@ import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration
 
 const puzzle: WordWheelPuzzle = {
   centerLetter: 'A',
-  outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'],
-  allLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+  outerLetters: ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+  allLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
   puzzleDate: '2026-09-03',
   language: 'en',
   puzzleNumber: 1,
 };
 
 describe('RankingPlayEmbed', () => {
+  it('defaults to a 9-letter centre wheel (1 required centre + 8 outer)', () => {
+    render(<RankingPlayEmbed locale="en" validateWord={async () => true} />);
+    const play = screen.getByTestId('ranking-wheel-play');
+    const tiles = play.querySelectorAll('[data-wheel-letter]');
+    expect(tiles).toHaveLength(9);
+    expect(play.querySelector('[data-wheel-index="0"]')).toBeTruthy();
+    expect(play.querySelectorAll('[data-wheel-index]')).toHaveLength(9);
+  });
+
   it('shows every wheel letter including the center', () => {
     render(<RankingPlayEmbed puzzle={puzzle} validateWord={async () => true} />);
     expect(screen.getByTestId('ranking-wheel-play')).toBeTruthy();

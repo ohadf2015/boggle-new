@@ -16,8 +16,8 @@ vi.mock('next/link', () => ({
 
 const puzzle: WordWheelPuzzle = {
   centerLetter: 'A',
-  outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'],
-  allLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+  outerLetters: ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+  allLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
   puzzleDate: '2026-09-03',
   language: 'en',
   puzzleNumber: 1,
@@ -61,6 +61,9 @@ describe('AnimatedLanding', () => {
     render(<AnimatedLanding {...props} />);
     expect(screen.getByRole('heading', { name: 'Daily Word Wheel' })).toBeTruthy();
     expect(screen.getByTestId('ranking-wheel-play')).toBeTruthy();
+    expect(
+      screen.getByTestId('ranking-wheel-play').querySelectorAll('[data-wheel-letter]'),
+    ).toHaveLength(9);
   });
 
   it('lets a first-time visitor tap letters and submit a word without following the CTA', async () => {

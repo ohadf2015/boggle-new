@@ -3,6 +3,21 @@ import { generateWordWheelPuzzle } from '../wordWheelGeneration';
 
 const HEBREW_FINAL_FORMS = new Set(['ך', 'ם', 'ן', 'ף', 'ץ']);
 
+describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
+  it('returns 1 centre + 8 outer when letterCount is 9', () => {
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en', { letterCount: 9 });
+    expect(puzzle.allLetters).toHaveLength(9);
+    expect(puzzle.outerLetters).toHaveLength(8);
+    expect(puzzle.allLetters[0]).toBe(puzzle.centerLetter);
+  });
+
+  it('still returns 7 letters by default so the daily generator is unchanged', () => {
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en');
+    expect(puzzle.allLetters).toHaveLength(7);
+    expect(puzzle.outerLetters).toHaveLength(6);
+  });
+});
+
 describe('generateWordWheelPuzzle - Hebrew final letter normalization', () => {
   it('should not contain final-form Hebrew letters on any wheel tile', () => {
     // Hebrew source words (e.g. 'מחשבונים') end with final forms like ם.

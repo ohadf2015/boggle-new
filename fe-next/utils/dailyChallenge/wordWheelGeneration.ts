@@ -105,10 +105,12 @@ function getUniqueLetters(word: string, language?: Language): string[] {
  */
 export function generateWordWheelPuzzle(
   dateString?: string,
-  language: Language = 'en'
+  language: Language = 'en',
+  options?: { letterCount?: number }
 ): WordWheelPuzzle {
   const date = dateString || getDailyChallengeDate();
   const puzzleNumber = getPuzzleNumber(date);
+  const letterCount = options?.letterCount ?? 7;
 
   // Seed PRNG — different namespace from Word Hunt
   const seedStr = `word-wheel-${SEED_SALT}-${date}-${language}`;
@@ -120,19 +122,19 @@ export function generateWordWheelPuzzle(
   const sourceIndex = Math.floor(random() * sources.length);
   const sourceWord = sources[sourceIndex];
 
-  // Extract unique letters (take first 7 if more)
+  // Extract unique letters (trim or pad to letterCount)
   let letters = getUniqueLetters(sourceWord, language);
-  if (letters.length > 7) letters = letters.slice(0, 7);
+  if (letters.length > letterCount) letters = letters.slice(0, letterCount);
 
-  // If fewer than 7 unique letters, pad with common letters
-  if (letters.length < 7) {
+  // If fewer unique letters than requested, pad with common letters
+  if (letters.length < letterCount) {
     const commonLetters = language === 'he'
       ? ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ח', 'י', 'כ', 'ל', 'מ', 'נ', 'ר', 'ש', 'ת']
       : language === 'ja'
         ? ['日', '月', '火', '水', '木', '金', '土', '人', '大', '小', '上', '下']
         : ['E', 'T', 'A', 'O', 'I', 'N', 'S', 'H', 'R', 'D', 'L', 'C', 'U', 'M'];
     const available = commonLetters.filter(l => !letters.includes(l));
-    while (letters.length < 7 && available.length > 0) {
+    while (letters.length < letterCount && available.length > 0) {
       const idx = Math.floor(random() * available.length);
       letters.push(available.splice(idx, 1)[0]);
     }
@@ -147,7 +149,7 @@ export function generateWordWheelPuzzle(
   // Center letter is the most "useful" — pick one that appears most in common words
   // For simplicity: use the first letter after shuffle (deterministic)
   const centerLetter = letters[0];
-  const outerLetters = letters.slice(1, 7);
+  const outerLetters = letters.slice(1, letterCount);
 
   return {
     centerLetter,
