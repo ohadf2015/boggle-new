@@ -272,6 +272,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
   const stepIndex = useMemo(() => displaySteps.indexOf(step), [step, displaySteps]);
 
+  // Never call skip during render — React discards the update and the player
+  // is left on a blank inviteTutorial screen (Class 4 silent failure).
+  useEffect(() => {
+    if (step === 'inviteTutorial' && !inviteAtMount) {
+      handleSkipOnboarding();
+    }
+  }, [step, inviteAtMount, handleSkipOnboarding]);
+
   // Profile complete → advance to the style step (non-invite), or straight into
   // the invite teaser if a room invite is pending. Persist the avatar now so it
   // survives even if the player bails before the style step finishes. The actual
@@ -427,6 +435,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             onPlay={handleQuickStartPlay}
             onHowToPlay={() => setShowHowToPlay(true)}
             onHaveAccount={isOnCrazyGamesPlatform ? undefined : handleHaveAccount}
+            onSkip={handleSkipOnboarding}
           />
         );
       case 'language':
@@ -449,7 +458,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         );
       case 'inviteTutorial': {
         if (!inviteAtMount) {
-          handleSkipOnboarding();
           return null;
         }
         return (

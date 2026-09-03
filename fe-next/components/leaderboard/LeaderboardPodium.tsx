@@ -57,7 +57,7 @@ const LeaderboardPodium = memo<LeaderboardPodiumProps>(({ entries, language, cur
 
   return (
     <div
-      className={cn('flex items-end justify-center gap-2 sm:gap-3', className)}
+      className={cn('flex items-end justify-center gap-2 sm:gap-3 overflow-x-auto', className)}
       aria-label={t('leaderboard.topThree')}
     >
       {visual.map(({ entry, rank }, idx) => {

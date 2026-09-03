@@ -103,14 +103,15 @@ export function TimerUrgency({
   const config = URGENCY_CONFIG[urgencyLevel];
   const percentage = Math.max(0, Math.min(100, (timeRemaining / totalTime) * 100));
 
-  // Format time
+  // Format time — floor so a float remaining value never renders as "1:29.7"
   const formattedTime = useMemo(() => {
-    if (formatAsMinutes && timeRemaining >= 60) {
-      const mins = Math.floor(timeRemaining / 60);
-      const secs = timeRemaining % 60;
+    const total = Math.max(0, Math.floor(timeRemaining));
+    if (formatAsMinutes) {
+      const mins = Math.floor(total / 60);
+      const secs = total % 60;
       return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
-    return `${timeRemaining}`;
+    return `${total}`;
   }, [timeRemaining, formatAsMinutes]);
 
   // Trigger callbacks

@@ -339,9 +339,10 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
         {/* 🎯 "Play Now" skip — jump straight into a game, skip style step */}
         {onPlayNow && (
           <button
+            type="button"
             data-testid="play-now-skip"
             onClick={onPlayNow}
-            className="mt-3 text-neo-white/40 hover:text-neo-lime text-xs font-neo-body underline underline-offset-2 transition-colors w-full text-center"
+            className="mt-3 text-neo-black/50 hover:text-neo-black text-xs font-neo-body underline underline-offset-2 transition-colors w-full text-center min-h-[44px]"
           >
             {t('onboarding.ftue.playNow', 'Skip → Play Now')}
           </button>

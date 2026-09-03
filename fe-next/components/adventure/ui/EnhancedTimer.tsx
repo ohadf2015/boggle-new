@@ -40,6 +40,12 @@ interface FlipDigitProps {
 const WARNING_THRESHOLD = 30;
 const DANGER_THRESHOLD = 10;
 const CRITICAL_THRESHOLD = 5;
+// Rounded rect in viewBox 0 0 100 100: x=2,y=2,w=96,h=96,rx=8
+// perimeter = 2*(w+h-4r) + 2πr
+const RING_W = 96;
+const RING_H = 96;
+const RING_R = 8;
+const RING_PERIMETER = 2 * (RING_W + RING_H - 4 * RING_R) + 2 * Math.PI * RING_R;
 
 // ==============================================
 // FLIP DIGIT COMPONENT
@@ -106,7 +112,9 @@ export const EnhancedTimer = memo(function EnhancedTimer({
   }
 
   const urgencyState = getUrgencyState();
-  const progress = (timeRemaining / totalTime) * 100;
+  const progress = totalTime > 0
+    ? Math.max(0, Math.min(1, timeRemaining / totalTime))
+    : 0;
 
   // Size classes
   const sizeClasses = {
@@ -189,8 +197,8 @@ export const EnhancedTimer = memo(function EnhancedTimer({
           fill="none"
           stroke={styles.progressColor}
           strokeWidth="4"
-          strokeDasharray="384 384"
-          strokeDashoffset={384 - (384 * progress) / 100}
+          strokeDasharray={`${RING_PERIMETER} ${RING_PERIMETER}`}
+          strokeDashoffset={RING_PERIMETER * (1 - progress)}
           className="transition-all duration-1000"
         />
       </svg>
