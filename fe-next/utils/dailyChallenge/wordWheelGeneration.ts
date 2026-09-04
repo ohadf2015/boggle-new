@@ -11,6 +11,8 @@ import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+/** Crossword-curated everyday English 4–9. Not a frequency-sliced popular dump. */
+import enWheelHuntPool from './wheelHuntPool.en.json';
 
 // ==========================================
 // Word Wheel Puzzle Types
@@ -23,13 +25,16 @@ export interface WordWheelPuzzle {
   puzzleDate: string;
   language: Language;
   puzzleNumber: number;
+  /** Finite listed-hunt targets (4–9 letters). Ranking URL only. */
+  targetWords?: string[];
 }
 
 // ==========================================
 // Nine-letter source words per language
 // ==========================================
-// These words provide the 9 unique letters for each puzzle.
-// Players don't need to find the source word — it's just the seed.
+// These words seed the wheel. Ranking URL (letterCount 9) uses the
+// source as a 9-letter anagram and keeps repeats. Daily default (7)
+// still unique-ifies. Players don't need to find the source word.
 
 const NINE_LETTER_SOURCES: Record<Language, string[]> = {
   en: [
@@ -80,6 +85,25 @@ const NINE_LETTER_SOURCES: Record<Language, string[]> = {
   ],
 };
 
+function normalizeWheelChar(char: string, language?: Language): string | null {
+  const upper = char.toUpperCase();
+  if (upper === ' ') return null;
+  return language === 'he' ? normalizeHebrewLetter(upper) : upper;
+}
+
+/**
+ * Letters of a source word as a multiset (repeats kept).
+ * Ranking-URL 9-letter wheels are anagrams, like Lovatts Free Play.
+ */
+function getSourceLetters(word: string, language?: Language): string[] {
+  const letters: string[] = [];
+  for (const char of word) {
+    const normalized = normalizeWheelChar(char, language);
+    if (normalized) letters.push(normalized);
+  }
+  return letters;
+}
+
 /**
  * Extract unique letters from a source word.
  * For languages like Japanese, characters are treated individually.
@@ -88,11 +112,8 @@ function getUniqueLetters(word: string, language?: Language): string[] {
   const seen = new Set<string>();
   const unique: string[] = [];
   for (const char of word) {
-    const upper = char.toUpperCase();
-    if (upper === ' ') continue;
-    // Normalize Hebrew final forms (sofit) so tiles show regular letter forms
-    const normalized = language === 'he' ? normalizeHebrewLetter(upper) : upper;
-    if (seen.has(normalized)) continue;
+    const normalized = normalizeWheelChar(char, language);
+    if (!normalized || seen.has(normalized)) continue;
     seen.add(normalized);
     unique.push(normalized);
   }
@@ -106,7 +127,7 @@ function getUniqueLetters(word: string, language?: Language): string[] {
 export function generateWordWheelPuzzle(
   dateString?: string,
   language: Language = 'en',
-  options?: { letterCount?: number }
+  options?: { letterCount?: number; candidateWords?: string[] }
 ): WordWheelPuzzle {
   const date = dateString || getDailyChallengeDate();
   const puzzleNumber = getPuzzleNumber(date);
@@ -122,8 +143,12 @@ export function generateWordWheelPuzzle(
   const sourceIndex = Math.floor(random() * sources.length);
   const sourceWord = sources[sourceIndex];
 
-  // Extract unique letters (trim or pad to letterCount)
-  let letters = getUniqueLetters(sourceWord, language);
+  // Ranking URL (9): keep repeats so the wheel is a 9-letter anagram.
+  // Daily default (7): still unique-ify — do not change that generator.
+  let letters =
+    letterCount === 9
+      ? getSourceLetters(sourceWord, language)
+      : getUniqueLetters(sourceWord, language);
   if (letters.length > letterCount) letters = letters.slice(0, letterCount);
 
   // If fewer unique letters than requested, pad with common letters
@@ -150,14 +175,25 @@ export function generateWordWheelPuzzle(
   // For simplicity: use the first letter after shuffle (deterministic)
   const centerLetter = letters[0];
   const outerLetters = letters.slice(1, letterCount);
+  const allLetters = [centerLetter, ...outerLetters];
+
+  const targetWords =
+    letterCount === 9
+      ? listWheelHuntTargets(
+          [...(options?.candidateWords ?? wheelHuntPoolFor(language)), sourceWord],
+          centerLetter,
+          allLetters,
+        )
+      : undefined;
 
   return {
     centerLetter,
     outerLetters,
-    allLetters: [centerLetter, ...outerLetters],
+    allLetters,
     puzzleDate: date,
     language,
     puzzleNumber,
+    targetWords,
   };
 }
 
@@ -189,4 +225,31 @@ export function isValidWordWheelWord(
   }
 
   return true;
+}
+
+const WHEEL_HUNT_POOLS: Partial<Record<Language, string[]>> = {
+  en: enWheelHuntPool as string[],
+};
+
+function wheelHuntPoolFor(language: Language): string[] {
+  return WHEEL_HUNT_POOLS[language] ?? [];
+}
+
+/** Every 4–9 letter word that can be formed on the wheel (centre required, tile multiset). */
+export function listWheelHuntTargets(
+  words: string[],
+  centerLetter: string,
+  allLetters: string[],
+): string[] {
+  const seen = new Set<string>();
+  const targets: string[] = [];
+  for (const word of words) {
+    const upper = word.toUpperCase();
+    if (upper.length < 4 || upper.length > 9) continue;
+    if (!isValidWordWheelWord(upper, centerLetter, allLetters)) continue;
+    if (seen.has(upper)) continue;
+    seen.add(upper);
+    targets.push(upper);
+  }
+  return targets;
 }
