@@ -7,9 +7,15 @@ import { useAssignments } from '@/hooks/useAssignments';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { cn } from '@/lib/utils';
 import * as Dialog from '@radix-ui/react-dialog';
-import { X, Calendar, Swords, BookOpen, ChevronDown } from 'lucide-react';
+import { X, Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
+import {
+  VOCAB_FOCUSES,
+  MIN_WORDS_PER_FOCUS,
+  availableFocuses,
+  type PracticeFocusSetting,
+} from '@/lib/education/vocabFocus';
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -35,8 +41,12 @@ export default function AssignmentCreator({
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
   const [instructions, setInstructions] = useState<string>('');
+  const [focus, setFocus] = useState<PracticeFocusSetting>('any');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const selectedLesson = lessons.find(l => l.id === selectedLessonId);
+  const supportedFocuses = selectedLesson ? availableFocuses(selectedLesson.words || []) : [];
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -45,8 +55,18 @@ export default function AssignmentCreator({
       setSelectedLessonId('');
       setDueDate('');
       setInstructions('');
+      setFocus('any');
     }
   }, [isOpen]);
+
+  // A focus the newly chosen lesson cannot support falls back to "any"
+  useEffect(() => {
+    if (focus !== 'any' && !supportedFocuses.includes(focus)) {
+      setFocus('any');
+    }
+    // supportedFocuses is derived from selectedLessonId; keying on the id avoids a new array each render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLessonId, focus]);
 
   const handleQuickDate = (days: number) => {
     const date = new Date();
@@ -70,6 +90,7 @@ export default function AssignmentCreator({
       assignment_type: selectedType,
       due_date: dueDate,
       instructions: instructions || null,
+      practice_focus: selectedType === 'practice' ? focus : null,
     });
 
     setIsSubmitting(false);
@@ -82,8 +103,6 @@ export default function AssignmentCreator({
       toast.error(result.error || t('teacher.assignment.error'));
     }
   };
-
-  const selectedLesson = lessons.find(l => l.id === selectedLessonId);
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
@@ -157,6 +176,69 @@ export default function AssignmentCreator({
                 ))}
               </select>
             </div>
+
+            {/* Vocabulary focus (practice only, once a lesson is chosen) */}
+            {selectedType === 'practice' && selectedLesson && (
+              <div>
+                <label className="block text-sm font-neo-body text-neo-white mb-1">
+                  {t('teacher.assignment.focus.label')}
+                </label>
+                <p className="text-xs text-neo-white/70 font-neo-body mb-2 text-pretty">
+                  {t('teacher.assignment.focus.help')}
+                </p>
+                <div
+                  role="radiogroup"
+                  aria-label={t('teacher.assignment.focus.label')}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                >
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={focus === 'any'}
+                    onClick={() => setFocus('any')}
+                    className={cn(
+                      'min-h-12 p-3 rounded-neo border-neo text-start transition-all',
+                      focus === 'any'
+                        ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
+                        : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
+                    )}
+                  >
+                    <span className="font-bold block">{t('teacher.assignment.focus.any')}</span>
+                    <span className="text-xs opacity-80 block">{t('teacher.assignment.focus.anyHint')}</span>
+                  </button>
+                  {VOCAB_FOCUSES.map((option) => {
+                    const supported = supportedFocuses.includes(option);
+                    const active = focus === option;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        disabled={!supported}
+                        onClick={() => supported && setFocus(option)}
+                        className={cn(
+                          'min-h-12 p-3 rounded-neo border-neo text-start transition-all',
+                          active && 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm',
+                          !active && supported && 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80',
+                          !supported && 'bg-neo-navy/30 border-neo-black/40 text-neo-white/50 cursor-not-allowed'
+                        )}
+                      >
+                        <span className="font-bold flex items-center gap-1.5">
+                          {supported ? <Crosshair className="w-4 h-4" aria-hidden="true" /> : <Lock className="w-4 h-4" aria-hidden="true" />}
+                          {t(`education.vocabFocus.focus.${option}`)}
+                        </span>
+                        <span className="text-xs opacity-80 block">
+                          {supported
+                            ? t(`education.vocabFocus.instructions.${option}`)
+                            : t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Due Date Picker */}
             <div>

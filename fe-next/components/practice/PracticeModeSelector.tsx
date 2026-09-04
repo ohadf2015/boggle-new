@@ -17,9 +17,13 @@ import {
   Target,
   Shuffle,
   PenLine,
-  Timer
+  Timer,
+  Crosshair,
+  Lock
 } from 'lucide-react';
 import type { PracticeType, MasteryLevel } from '@/hooks/usePracticeSession';
+import type { VocabularyWord } from '@/lib/supabase/education/types';
+import { VOCAB_FOCUSES, MIN_WORDS_PER_FOCUS, availableFocuses, type VocabFocus } from '@/lib/education/vocabFocus';
 
 interface PracticeModeOption {
   type: PracticeType;
@@ -43,8 +47,10 @@ interface PracticeModeSelectorProps {
       blitz_sessions: number;
     } | null;
   };
-  onSelectMode: (mode: PracticeType) => void;
+  onSelectMode: (mode: PracticeType, options?: { focus?: VocabFocus }) => void;
   onBack: () => void;
+  /** Lesson words — enables the "Vocabulary focus" card and decides which focuses are unlocked. */
+  words?: VocabularyWord[];
 }
 
 export default function PracticeModeSelector({
@@ -53,8 +59,10 @@ export default function PracticeModeSelector({
   progress,
   onSelectMode,
   onBack,
+  words,
 }: PracticeModeSelectorProps) {
   const mastery = progress.mastery;
+  const unlockedFocuses = words ? availableFocuses(words) : [];
   const sessionsCompleted = progress.progress
     ? {
         flashcard: progress.progress.flashcard_sessions,
@@ -64,8 +72,9 @@ export default function PracticeModeSelector({
         matching: progress.progress.matching_sessions,
         spelling: progress.progress.spelling_sessions,
         blitz: progress.progress.blitz_sessions,
+        vocab_focus: 0,
       }
-    : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0, matching: 0, spelling: 0, blitz: 0 };
+    : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0, matching: 0, spelling: 0, blitz: 0, vocab_focus: 0 };
   const { t } = useLanguage();
 
   const practiceOptions: PracticeModeOption[] = [
@@ -148,6 +157,7 @@ export default function PracticeModeSelector({
       matching: { title: 'education.practice.matching', desc: 'education.practice.matchingDesc' },
       spelling: { title: 'education.practice.spelling', desc: 'education.practice.spellingDesc' },
       blitz: { title: 'education.practice.blitz', desc: 'education.practice.blitzDesc' },
+      vocab_focus: { title: 'education.vocabFocus.title', desc: 'education.vocabFocus.desc' },
     };
     return map[type][key];
   };
@@ -298,6 +308,63 @@ export default function PracticeModeSelector({
             );
           })}
         </AdaptiveMotion.div>
+
+        {/* Vocabulary focus — pick ONE skill to drill */}
+        {words && (
+          <AdaptiveMotion.div
+            data-testid="practice-mode-vocab_focus"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.5 }}
+            className="mt-4 rounded-neo border-3 border-black shadow-hard bg-neo-cream overflow-hidden"
+          >
+            <div className="h-1.5 bg-black/20" />
+            <div className="p-5">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 rounded-neo border-2 border-black bg-neo-yellow flex items-center justify-center shadow-hard-sm shrink-0">
+                  <Crosshair className="w-8 h-8 text-black" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-neo-display font-black text-black uppercase">
+                    {t('education.vocabFocus.title')}
+                  </h3>
+                  <p className="text-sm font-neo-body font-bold text-black/60 mt-0.5">
+                    {t('education.vocabFocus.desc')}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {VOCAB_FOCUSES.map((focus) => {
+                  const unlocked = unlockedFocuses.includes(focus);
+                  return (
+                    <button
+                      key={focus}
+                      type="button"
+                      disabled={!unlocked}
+                      onClick={() => unlocked && onSelectMode('vocab_focus', { focus })}
+                      className={cn(
+                        'min-h-14 px-4 py-2 rounded-neo border-3 border-black text-start transition-all',
+                        unlocked
+                          ? 'bg-neo-yellow text-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-0.5'
+                          : 'bg-black/5 text-black/50 border-black/30 cursor-not-allowed'
+                      )}
+                    >
+                      <span className="flex items-center gap-2 font-neo-display font-black">
+                        {!unlocked && <Lock className="w-4 h-4 shrink-0" aria-hidden="true" />}
+                        {t(`education.vocabFocus.focus.${focus}`)}
+                      </span>
+                      <span className="block text-xs font-neo-body font-bold text-black/60 mt-0.5">
+                        {unlocked
+                          ? t(`education.vocabFocus.instructions.${focus}`)
+                          : t(`education.vocabFocus.unlock.${focus}`, { min: MIN_WORDS_PER_FOCUS })}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </AdaptiveMotion.div>
+        )}
       </div>
     </div>
   );

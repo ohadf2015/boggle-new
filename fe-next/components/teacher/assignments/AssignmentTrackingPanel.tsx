@@ -5,7 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAssignments } from '@/hooks/useAssignments';
 import type { TeacherAssignment, AssignmentStatus } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
-import { Plus, BookOpen, Swords, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, BookOpen, Swords, ChevronDown, ChevronUp, Crosshair } from 'lucide-react';
+import { readAssignmentFocus } from '@/lib/education/vocabFocus';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import CompletionTracker from './CompletionTracker';
@@ -49,6 +50,7 @@ function AssignmentCard({
   const fallback = { label: assignment.assignment_type ?? '?', icon: BookOpen, color: 'bg-neo-navy' };
   const assignmentTypeConfig = typeConfig[assignment.assignment_type] ?? fallback;
   const TypeIcon = assignmentTypeConfig.icon;
+  const practiceFocus = readAssignmentFocus(assignment);
 
   return (
     <div className="rounded-neo border-neo border-neo-black bg-neo-navy/50 overflow-hidden">
@@ -70,6 +72,15 @@ function AssignmentCard({
                 <TypeIcon className="w-3 h-3" />
                 {assignmentTypeConfig.label}
               </div>
+              {practiceFocus && (
+                <div
+                  data-testid="assignment-focus-badge"
+                  className="px-2 py-1 rounded text-xs font-bold border-neo bg-neo-yellow text-neo-black flex items-center gap-1"
+                >
+                  <Crosshair className="w-3 h-3" />
+                  {t(`education.vocabFocus.focus.${practiceFocus}`)}
+                </div>
+              )}
               <div
                 className={cn(
                   'w-2 h-2 rounded-full',

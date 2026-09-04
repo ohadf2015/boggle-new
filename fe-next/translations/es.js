@@ -12320,6 +12320,27 @@ const es = {
     }
   },
   "teacher": {
+    "wordDetails": {
+      "more": "Más",
+      "level": "Nivel",
+      "levelSupport": "Apoyo",
+      "levelCore": "Básico",
+      "levelChallenge": "Reto",
+      "synonyms": "Sinónimos",
+      "synonymsPlaceholder": "Sinónimos separados por comas (p. ej. contento, alegre)",
+      "antonyms": "Antónimos",
+      "antonymsPlaceholder": "Antónimos separados por comas (p. ej. triste)",
+      "example": "Oración de ejemplo",
+      "examplePlaceholder": "Una oración que use la palabra",
+      "exampleHelp": "Escribe ___ donde va la palabra — p. ej. 'El perro ___ ladró.'",
+      "summary": "{{count}} palabras · {{definitions}} con definición · {{synonyms}} con sinónimos · {{antonyms}} con antónimos · {{examples}} con ejemplo",
+      "aiFill": "Completar definiciones, sinónimos y ejemplos que faltan (IA, revisa antes de guardar)",
+      "aiFilling": "Escribiendo sugerencias…",
+      "aiFilledNote": "Los campos resaltados los sugirió la IA: revísalos antes de guardar.",
+      "aiError": "No pudimos obtener sugerencias ahora. Inténtalo de nuevo en un minuto.",
+      "importFormatHelp": "Extras opcionales después de una barra |: syn: para sinónimos, ant: para antónimos, ex: para una oración de ejemplo (usa ___ en lugar de la palabra), level: support / core / challenge.",
+      "importFormatExample": "feliz - que siente alegría | syn: contento, alegre | ant: triste | ex: El perro ___ movía la cola. | level: core"
+    },
     "levels": {
       "label": "Nivel",
       "support": "Apoyo",
@@ -12870,6 +12891,12 @@ const es = {
       "body": "Desbloquea clases y alumnos ilimitados"
     },
     "assignment": {
+      "focus": {
+        "label": "Enfoque de vocabulario",
+        "help": "Elige una habilidad para practicar o deja que el alumnado elija. Solo están disponibles las habilidades para las que la lección tiene suficientes palabras.",
+        "any": "Cualquier práctica",
+        "anyHint": "Cada estudiante elige su modo"
+      },
       "createTitle": "Crear Tarea",
       "create": "Crear Tarea",
       "creating": "Creando...",
@@ -12928,6 +12955,48 @@ const es = {
     }
   },
   "education": {
+    "vocabFocus": {
+      "title": "Enfoque de vocabulario",
+      "desc": "Practica una habilidad a la vez",
+      "focus": {
+        "definition": "Definiciones",
+        "synonym": "Sinónimos",
+        "antonym": "Antónimos",
+        "context": "Pistas de contexto"
+      },
+      "instructions": {
+        "definition": "Lee el significado y elige la palabra",
+        "synonym": "Elige la palabra que significa lo mismo",
+        "antonym": "Elige la palabra que significa lo contrario",
+        "context": "Elige la palabra que completa el hueco"
+      },
+      "promptLabel": {
+        "definition": "¿Qué palabra significa…",
+        "synonym": "Significa lo mismo que…",
+        "antonym": "Lo contrario de…",
+        "context": "Completa el hueco"
+      },
+      "unlock": {
+        "definition": "Añade definiciones a {{min}} palabras o más para desbloquear",
+        "synonym": "Añade sinónimos a {{min}} palabras o más para desbloquear",
+        "antonym": "Añade antónimos a {{min}} palabras o más para desbloquear",
+        "context": "Añade oraciones de ejemplo a {{min}} palabras o más para desbloquear"
+      },
+      "notEnough": {
+        "definition": "Esta lección necesita definiciones en al menos 4 palabras para esta práctica. ¡Pídeselas a tu profe!",
+        "synonym": "Esta lección necesita sinónimos en al menos 4 palabras para esta práctica. ¡Pídeselos a tu profe!",
+        "antonym": "Esta lección necesita antónimos en al menos 4 palabras para esta práctica. ¡Pídeselos a tu profe!",
+        "context": "Esta lección necesita oraciones de ejemplo en al menos 4 palabras para esta práctica. ¡Pídeselas a tu profe!"
+      },
+      "progress": "{{current}} de {{total}}",
+      "progressLabel": "Progreso de las preguntas",
+      "correct": "¡Bien! Es correcto.",
+      "wrong": "Casi.",
+      "answerWas": "La respuesta es: {{answer}}",
+      "next": "Siguiente",
+      "finish": "Ver resultados",
+      "startAssigned": "Practicar {{focus}}"
+    },
     "liveControls": {
       "title": "Controles del docente",
       "pause": "Pausar",

@@ -12566,6 +12566,27 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
+    "wordDetails": {
+      "more": "Mer",
+      "level": "Nivå",
+      "levelSupport": "Stöd",
+      "levelCore": "Bas",
+      "levelChallenge": "Utmaning",
+      "synonyms": "Synonymer",
+      "synonymsPlaceholder": "Synonymer, kommaseparerade (t.ex. glad, munter)",
+      "antonyms": "Motsatsord",
+      "antonymsPlaceholder": "Motsatsord, kommaseparerade (t.ex. ledsen)",
+      "example": "Exempelmening",
+      "examplePlaceholder": "En mening som använder ordet",
+      "exampleHelp": "Skriv ___ där ordet ska stå — t.ex. 'Den ___ hunden skällde.'",
+      "summary": "{{count}} ord · {{definitions}} med definition · {{synonyms}} med synonymer · {{antonyms}} med motsatsord · {{examples}} med exempel",
+      "aiFill": "Fyll i saknade definitioner, synonymer och exempel (AI – granska innan du sparar)",
+      "aiFilling": "Skriver förslag…",
+      "aiFilledNote": "Markerade fält är AI-förslag – kontrollera dem innan du sparar.",
+      "aiError": "Kunde inte hämta förslag just nu. Försök igen om en minut.",
+      "importFormatHelp": "Valfria tillägg efter ett |-tecken: syn: för synonymer, ant: för motsatsord, ex: för en exempelmening (skriv ___ i stället för ordet), level: support / core / challenge.",
+      "importFormatExample": "glad - som känner glädje | syn: munter, lycklig | ant: ledsen | ex: Den ___ hunden viftade på svansen. | level: core"
+    },
     "levels": {
       "label": "Nivå",
       "support": "Stöd",
@@ -12975,6 +12996,12 @@ const sv = {
       }
     },
     "assignment": {
+      "focus": {
+        "label": "Ordförrådsfokus",
+        "help": "Välj en färdighet att öva, eller låt eleverna välja själva. Bara färdigheter som lektionen har tillräckligt många ord för går att välja.",
+        "any": "Valfri övning",
+        "anyHint": "Eleverna väljer läge själva"
+      },
       "createTitle": "Skapa uppgift",
       "create": "Skapa uppgift",
       "creating": "Skapar...",
@@ -13174,6 +13201,48 @@ const sv = {
     }
   },
   "education": {
+    "vocabFocus": {
+      "title": "Ordförrådsfokus",
+      "desc": "Öva en färdighet i taget",
+      "focus": {
+        "definition": "Definitioner",
+        "synonym": "Synonymer",
+        "antonym": "Motsatsord",
+        "context": "Ledtrådar i sammanhanget"
+      },
+      "instructions": {
+        "definition": "Läs betydelsen och välj ordet",
+        "synonym": "Välj ordet som betyder samma sak",
+        "antonym": "Välj ordet som betyder motsatsen",
+        "context": "Välj ordet som passar i luckan"
+      },
+      "promptLabel": {
+        "definition": "Vilket ord betyder…",
+        "synonym": "Betyder samma som…",
+        "antonym": "Motsatsen till…",
+        "context": "Fyll i luckan"
+      },
+      "unlock": {
+        "definition": "Lägg till definitioner på minst {{min}} ord för att låsa upp",
+        "synonym": "Lägg till synonymer på minst {{min}} ord för att låsa upp",
+        "antonym": "Lägg till motsatsord på minst {{min}} ord för att låsa upp",
+        "context": "Lägg till exempelmeningar på minst {{min}} ord för att låsa upp"
+      },
+      "notEnough": {
+        "definition": "Lektionen behöver definitioner på minst 4 ord för den här övningen. Be din lärare lägga till!",
+        "synonym": "Lektionen behöver synonymer på minst 4 ord för den här övningen. Be din lärare lägga till!",
+        "antonym": "Lektionen behöver motsatsord på minst 4 ord för den här övningen. Be din lärare lägga till!",
+        "context": "Lektionen behöver exempelmeningar på minst 4 ord för den här övningen. Be din lärare lägga till!"
+      },
+      "progress": "{{current}} av {{total}}",
+      "progressLabel": "Frågeförlopp",
+      "correct": "Snyggt! Rätt svar.",
+      "wrong": "Inte riktigt.",
+      "answerWas": "Rätt svar: {{answer}}",
+      "next": "Nästa",
+      "finish": "Visa resultat",
+      "startAssigned": "Öva {{focus}}"
+    },
     "liveControls": {
       "title": "Lärarkontroller",
       "pause": "Pausa",

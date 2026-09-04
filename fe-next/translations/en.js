@@ -10835,6 +10835,27 @@ const en = {
     }
   },
   "teacher": {
+    "wordDetails": {
+      "more": "More",
+      "level": "Level",
+      "levelSupport": "Support",
+      "levelCore": "Core",
+      "levelChallenge": "Challenge",
+      "synonyms": "Synonyms",
+      "synonymsPlaceholder": "Synonyms, comma-separated (e.g. glad, cheerful)",
+      "antonyms": "Antonyms",
+      "antonymsPlaceholder": "Antonyms, comma-separated (e.g. sad)",
+      "example": "Example sentence",
+      "examplePlaceholder": "A sentence that uses the word",
+      "exampleHelp": "Use ___ where the word goes — e.g. 'The ___ dog barked.'",
+      "summary": "{{count}} words · {{definitions}} with definitions · {{synonyms}} with synonyms · {{antonyms}} with antonyms · {{examples}} with examples",
+      "aiFill": "Fill in missing definitions, synonyms & examples (AI, review before saving)",
+      "aiFilling": "Writing suggestions…",
+      "aiFilledNote": "Highlighted fields were suggested by AI — check them before you save.",
+      "aiError": "Couldn't get suggestions right now. Try again in a minute.",
+      "importFormatHelp": "Optional extras after a | pipe: syn: for synonyms, ant: for antonyms, ex: for an example sentence (use ___ for the word), level: support / core / challenge.",
+      "importFormatExample": "happy - feeling joy | syn: glad, cheerful | ant: sad | ex: The ___ dog wagged its tail. | level: core"
+    },
     "levels": {
       "label": "Level",
       "support": "Support",
@@ -11170,6 +11191,12 @@ const en = {
       }
     },
     "assignment": {
+      "focus": {
+        "label": "Vocabulary focus",
+        "help": "Pick one skill to drill, or let students choose. Only skills this lesson has enough words for are available.",
+        "any": "Any practice",
+        "anyHint": "Students pick their own mode"
+      },
       "createTitle": "Create Assignment",
       "create": "Create Assignment",
       "creating": "Creating...",
@@ -11443,6 +11470,48 @@ const en = {
     }
   },
   "education": {
+    "vocabFocus": {
+      "title": "Vocabulary focus",
+      "desc": "Drill one skill at a time",
+      "focus": {
+        "definition": "Definition match",
+        "synonym": "Synonyms",
+        "antonym": "Antonyms",
+        "context": "Context clues"
+      },
+      "instructions": {
+        "definition": "Read the meaning, pick the word",
+        "synonym": "Pick the word that means the same",
+        "antonym": "Pick the word that means the opposite",
+        "context": "Pick the word that fits the blank"
+      },
+      "promptLabel": {
+        "definition": "Which word means…",
+        "synonym": "Same meaning as…",
+        "antonym": "Opposite of…",
+        "context": "Fill in the blank"
+      },
+      "unlock": {
+        "definition": "Add definitions to {{min}}+ words to unlock",
+        "synonym": "Add synonyms to {{min}}+ words to unlock",
+        "antonym": "Add antonyms to {{min}}+ words to unlock",
+        "context": "Add example sentences to {{min}}+ words to unlock"
+      },
+      "notEnough": {
+        "definition": "This lesson needs definitions on at least 4 words for this practice. Ask your teacher to add some!",
+        "synonym": "This lesson needs synonyms on at least 4 words for this practice. Ask your teacher to add some!",
+        "antonym": "This lesson needs antonyms on at least 4 words for this practice. Ask your teacher to add some!",
+        "context": "This lesson needs example sentences on at least 4 words for this practice. Ask your teacher to add some!"
+      },
+      "progress": "{{current}} of {{total}}",
+      "progressLabel": "Question progress",
+      "correct": "Nice! That's right.",
+      "wrong": "Not quite.",
+      "answerWas": "The answer is: {{answer}}",
+      "next": "Next",
+      "finish": "See results",
+      "startAssigned": "Practice {{focus}}"
+    },
     "liveControls": {
       "title": "Teacher controls",
       "pause": "Pause",

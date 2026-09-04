@@ -12328,6 +12328,27 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "wordDetails": {
+      "more": "詳細",
+      "level": "レベル",
+      "levelSupport": "サポート",
+      "levelCore": "基本",
+      "levelChallenge": "チャレンジ",
+      "synonyms": "類義語",
+      "synonymsPlaceholder": "類義語をカンマ区切りで（例：うれしい、楽しい）",
+      "antonyms": "対義語",
+      "antonymsPlaceholder": "対義語をカンマ区切りで（例：悲しい）",
+      "example": "例文",
+      "examplePlaceholder": "その単語を使った文",
+      "exampleHelp": "単語の位置に ___ を書きます。例：「___な犬がほえた。」",
+      "summary": "{{count}}語 · 定義あり {{definitions}} · 類義語あり {{synonyms}} · 対義語あり {{antonyms}} · 例文あり {{examples}}",
+      "aiFill": "足りない定義・類義語・例文をAIで補う（保存前に確認）",
+      "aiFilling": "提案を作成中…",
+      "aiFilledNote": "ハイライトされた項目はAIの提案です。保存前に確認してください。",
+      "aiError": "今は提案を取得できませんでした。1分ほどしてからもう一度お試しください。",
+      "importFormatHelp": "| の後ろに追加情報を書けます：syn: 類義語、ant: 対義語、ex: 例文（単語の位置は ___）、level: support / core / challenge。",
+      "importFormatExample": "うれしい - 喜びを感じている | syn: 楽しい, 幸せ | ant: 悲しい | ex: ___犬がしっぽを振った。 | level: core"
+    },
     "levels": {
       "label": "レベル",
       "support": "サポート",
@@ -12737,6 +12758,12 @@ const ja = {
       }
     },
     "assignment": {
+      "focus": {
+        "label": "語彙フォーカス",
+        "help": "集中して練習するスキルを1つ選ぶか、生徒に任せます。このレッスンに十分な単語があるスキルだけ選べます。",
+        "any": "自由に練習",
+        "anyHint": "生徒が自分でモードを選びます"
+      },
       "createTitle": "課題を作成",
       "create": "課題を作成",
       "creating": "作成中...",
@@ -12936,6 +12963,48 @@ const ja = {
     }
   },
   "education": {
+    "vocabFocus": {
+      "title": "語彙フォーカス",
+      "desc": "スキルを1つずつ集中練習",
+      "focus": {
+        "definition": "意味あわせ",
+        "synonym": "類義語",
+        "antonym": "対義語",
+        "context": "文脈のヒント"
+      },
+      "instructions": {
+        "definition": "意味を読んで単語を選ぼう",
+        "synonym": "同じ意味の単語を選ぼう",
+        "antonym": "反対の意味の単語を選ぼう",
+        "context": "空欄に合う単語を選ぼう"
+      },
+      "promptLabel": {
+        "definition": "この意味の単語は…",
+        "synonym": "同じ意味…",
+        "antonym": "反対の意味…",
+        "context": "空欄をうめよう"
+      },
+      "unlock": {
+        "definition": "{{min}}語以上に定義を追加すると使えます",
+        "synonym": "{{min}}語以上に類義語を追加すると使えます",
+        "antonym": "{{min}}語以上に対義語を追加すると使えます",
+        "context": "{{min}}語以上に例文を追加すると使えます"
+      },
+      "notEnough": {
+        "definition": "この練習には4語以上の定義が必要です。先生に追加をお願いしよう！",
+        "synonym": "この練習には4語以上の類義語が必要です。先生に追加をお願いしよう！",
+        "antonym": "この練習には4語以上の対義語が必要です。先生に追加をお願いしよう！",
+        "context": "この練習には4語以上の例文が必要です。先生に追加をお願いしよう！"
+      },
+      "progress": "{{total}}問中 {{current}}問目",
+      "progressLabel": "問題の進み具合",
+      "correct": "やったね！正解！",
+      "wrong": "おしい！",
+      "answerWas": "正解は：{{answer}}",
+      "next": "次へ",
+      "finish": "結果を見る",
+      "startAssigned": "{{focus}}を練習"
+    },
     "liveControls": {
       "title": "先生用コントロール",
       "pause": "一時停止",

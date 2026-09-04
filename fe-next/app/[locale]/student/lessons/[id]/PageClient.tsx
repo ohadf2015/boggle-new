@@ -12,7 +12,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLesson } from '@/hooks/useVocabularyLesson';
-import { usePracticeProgress, type PracticeType } from '@/hooks/usePracticeSession';
+import { usePracticeProgress, usePracticeWords, type PracticeType } from '@/hooks/usePracticeSession';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import {
@@ -24,7 +24,9 @@ import {
   WordMatchingPractice,
   SpellingChallengePractice,
   TimedBlitzPractice,
+  VocabFocusPractice,
 } from '@/components/practice';
+import { availableFocuses, parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
 import {
   PracticeSessionProvider,
   usePracticeSession,
@@ -37,7 +39,7 @@ import { cn } from '@/lib/utils';
 /**
  * Inner practice content component that uses XP session context
  */
-const VALID_PRACTICE_TYPES: PracticeType[] = ['flashcard', 'solo_board', 'word_list', 'warmup', 'matching', 'spelling', 'blitz'];
+const VALID_PRACTICE_TYPES: PracticeType[] = ['flashcard', 'solo_board', 'word_list', 'warmup', 'matching', 'spelling', 'blitz', 'vocab_focus'];
 
 function PracticeContent({
   lesson,
@@ -49,6 +51,7 @@ function PracticeContent({
   startSession,
   router,
   initialMode,
+  initialFocus,
 }: {
   lesson: NonNullable<ReturnType<typeof useLesson>['lesson']>;
   user: NonNullable<ReturnType<typeof useAuth>['user']>;
@@ -59,18 +62,24 @@ function PracticeContent({
   startSession: ReturnType<typeof usePracticeProgress>['startSession'];
   router: ReturnType<typeof useRouter>;
   initialMode: PracticeType | null;
+  /** vocab_focus only: skill pinned by the teacher's assignment / deep link. */
+  initialFocus: VocabFocus | null;
 }) {
   const { t } = useLanguage();
   const [selectedMode, setSelectedMode] = useState<PracticeType | null>(initialMode);
+  const [selectedFocus, setSelectedFocus] = useState<VocabFocus | null>(initialFocus);
   const [hasInitialized, setHasInitialized] = useState(false);
+  // Per-student differentiation: every practice mode below takes its words from here
+  // (filtered by the student's classroom level), never from raw `lesson.words`.
+  const { words: practiceWords } = usePracticeWords(lesson.words);
 
   // Auto-start session if we have an initial mode from URL
   useEffect(() => {
     if (initialMode && !hasInitialized) {
       setHasInitialized(true);
-      startSession(initialMode);
+      startSession(initialMode, initialFocus ? { focus: initialFocus } : undefined);
     }
-  }, [initialMode, hasInitialized, startSession]);
+  }, [initialMode, initialFocus, hasInitialized, startSession]);
 
   // Access XP context
   const {
@@ -84,9 +93,10 @@ function PracticeContent({
   } = usePracticeSession();
 
   // Handle mode selection
-  const handleSelectMode = useCallback(async (mode: PracticeType) => {
+  const handleSelectMode = useCallback(async (mode: PracticeType, options?: { focus?: VocabFocus }) => {
     setSelectedMode(mode);
-    await startSession(mode);
+    setSelectedFocus(options?.focus ?? null);
+    await startSession(mode, options);
   }, [startSession]);
 
   // Handle back to mode selector
@@ -126,11 +136,11 @@ function PracticeContent({
 
   // Render the selected practice mode
   const renderPracticeMode = () => {
-    if (!selectedMode || !lesson.words) return null;
+    if (!selectedMode || practiceWords.length === 0) return null;
 
     const commonProps = {
       lessonName: lesson.name,
-      words: lesson.words,
+      words: practiceWords,
       language: lesson.language,
       onBack: handleBack,
     };
@@ -139,7 +149,7 @@ function PracticeContent({
       case 'flashcard':
         return (
           <FlashcardReview
-            words={lesson.words}
+            words={practiceWords}
             onComplete={handleFlashcardComplete}
             onBack={handleBack}
             xpSessionData={xpSessionData}
@@ -173,7 +183,7 @@ function PracticeContent({
       case 'matching':
         return (
           <WordMatchingPractice
-            words={lesson.words}
+            words={practiceWords}
             onComplete={async (results) => {
               await completePracticeSession({
                 type: 'matching',
@@ -188,7 +198,7 @@ function PracticeContent({
       case 'spelling':
         return (
           <SpellingChallengePractice
-            words={lesson.words}
+            words={practiceWords}
             onComplete={async (results) => {
               await completePracticeSession({
                 type: 'spelling',
@@ -203,7 +213,7 @@ function PracticeContent({
       case 'blitz':
         return (
           <TimedBlitzPractice
-            words={lesson.words}
+            words={practiceWords}
             onComplete={async (results) => {
               await completePracticeSession({
                 type: 'blitz',
@@ -215,6 +225,25 @@ function PracticeContent({
             xpSessionData={xpSessionData}
           />
         );
+      case 'vocab_focus': {
+        const focus = selectedFocus ?? availableFocuses(practiceWords)[0] ?? 'definition';
+        return (
+          <VocabFocusPractice
+            words={practiceWords}
+            focus={focus}
+            onComplete={async (results) => {
+              await completePracticeSession({
+                type: 'vocab_focus',
+                focus: results.focus,
+                cardsReviewed: results.total,
+                cardsCorrect: results.correct,
+              });
+            }}
+            onBack={handleBack}
+            xpSessionData={xpSessionData}
+          />
+        );
+      }
       default:
         return null;
     }
@@ -268,10 +297,11 @@ function PracticeContent({
 
         <PracticeModeSelector
           lessonName={lesson.name}
-          wordCount={lesson.words?.length || 0}
+          wordCount={practiceWords.length}
           progress={{ mastery, progress }}
           onSelectMode={handleSelectMode}
           onBack={() => router.push(`/${language}/student`)}
+          words={practiceWords}
         />
       </div>
 
@@ -298,6 +328,7 @@ export default function LessonPracticePageClient() {
     modeParam && VALID_PRACTICE_TYPES.includes(modeParam as PracticeType)
       ? (modeParam as PracticeType)
       : null;
+  const initialFocus = parseFocusParam(searchParams?.get('focus'));
   const { lesson, isLoading: isLoadingLesson } = useLesson(lessonId);
   const { progress, mastery, startSession, isLoading: isLoadingProgress } = usePracticeProgress(lessonId, user?.id);
 
@@ -350,6 +381,7 @@ export default function LessonPracticePageClient() {
         startSession={startSession}
         router={router}
         initialMode={initialMode}
+        initialFocus={initialFocus}
       />
     </PracticeSessionProvider>
   );

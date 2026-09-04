@@ -6,6 +6,7 @@ import logger from '@/utils/logger';
 import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/educationXpManager';
 import { updateEducationChallengeProgress } from '@/lib/supabase/education/challengeProgress';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 
 function tooManyRequests(retryAfter: number | undefined) {
   return NextResponse.json(
@@ -15,11 +16,14 @@ function tooManyRequests(retryAfter: number | undefined) {
 }
 
 // Validation schemas
-const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz']);
+const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz', 'vocab_focus']);
+const vocabFocusSchema = z.enum(VOCAB_FOCUSES as [string, ...string[]]);
 
 const startSessionSchema = z.object({
   lessonId: z.string().uuid(),
   practiceType: practiceTypeSchema,
+  // vocab_focus only — which skill is drilled; persisted in `mode` + `results.focus`
+  focus: vocabFocusSchema.optional(),
 });
 
 const updateSessionSchema = z.object({
@@ -214,7 +218,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { lessonId, practiceType } = parseResult.data;
+    const { lessonId, practiceType, focus } = parseResult.data;
 
     // Verify student has access to this lesson (assigned via classroom membership)
     const { data: hasAccess } = await supabase
@@ -245,14 +249,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create practice session
+    // Create practice session. Targeted vocab practice also records WHICH
+    // skill was drilled (mode + results JSON) so teachers can see it later.
+    const insertData: Record<string, unknown> = {
+      student_id: user.id,
+      lesson_id: lessonId,
+      practice_type: practiceType,
+    };
+    if (practiceType === 'vocab_focus' && focus) {
+      insertData.mode = practiceType;
+      insertData.results = { focus };
+    }
     const { data: session, error } = await supabase
       .from('practice_sessions')
-      .insert({
-        student_id: user.id,
-        lesson_id: lessonId,
-        practice_type: practiceType,
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -356,6 +366,7 @@ export async function PATCH(request: NextRequest) {
         : practiceType === 'matching' ? 'matching'
         : practiceType === 'spelling' ? 'spelling'
         : practiceType === 'blitz' ? 'blitz'
+        : practiceType === 'vocab_focus' ? 'flashcard' // 4-choice quiz → cards reviewed/correct
         : 'flashcard';
 
       const xpSession: PracticeSessionXp = {

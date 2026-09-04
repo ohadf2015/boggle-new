@@ -48,7 +48,9 @@ export interface LevelUpPayload {
 }
 
 export interface CompletePracticeSessionData {
-  type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz';
+  type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz' | 'vocab_focus';
+  /** vocab_focus only: which skill was drilled. */
+  focus?: 'definition' | 'synonym' | 'antonym' | 'context';
   cardsReviewed?: number;
   cardsCorrect?: number;
   vocabularyWordsFound?: string[];
@@ -201,8 +203,12 @@ export function PracticeSessionProvider({
       try {
         // Build session data for XP calculation
         const xpSessionData: Record<string, unknown> = {};
+        // vocab_focus is a 4-choice quiz: same shape (cards reviewed/correct) and
+        // XP formula as flashcards. The server mirrors this mapping.
+        const isCardQuiz = sessionData.type === 'flashcard' || sessionData.type === 'vocab_focus';
+        const xpType = sessionData.type === 'vocab_focus' ? 'flashcard' : sessionData.type;
 
-        if (sessionData.type === 'flashcard') {
+        if (isCardQuiz) {
           xpSessionData.cardsReviewed = sessionData.cardsReviewed;
           xpSessionData.cardsCorrect = sessionData.cardsCorrect;
         } else if (sessionData.type === 'solo_board') {
@@ -214,7 +220,7 @@ export function PracticeSessionProvider({
 
         // Award XP via hook
         const result = await awardPracticeXp({
-          type: sessionData.type,
+          type: xpType,
           sessionData: xpSessionData as Parameters<typeof awardPracticeXp>[0]['sessionData'],
           streakDays: streak.currentStreak,
         });
@@ -241,7 +247,7 @@ export function PracticeSessionProvider({
 
         // Track total words mastered (estimate from flashcard correct answers)
         let newWordsMastered = totalWordsMastered;
-        if (sessionData.type === 'flashcard' && sessionData.cardsCorrect) {
+        if (isCardQuiz && sessionData.cardsCorrect) {
           newWordsMastered = totalWordsMastered + sessionData.cardsCorrect;
           setTotalWordsMastered(newWordsMastered);
         }
@@ -255,7 +261,7 @@ export function PracticeSessionProvider({
         // perfectGames: increment if 100% accuracy on flashcard session
         let newPerfectGames = perfectGames;
         if (
-          sessionData.type === 'flashcard' &&
+          isCardQuiz &&
           sessionData.cardsReviewed &&
           sessionData.cardsReviewed > 0 &&
           sessionData.cardsCorrect === sessionData.cardsReviewed

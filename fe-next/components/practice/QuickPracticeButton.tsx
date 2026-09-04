@@ -16,6 +16,8 @@ interface SessionCounts {
   matching: number;
   spelling: number;
   blitz: number;
+  /** Targeted vocab practice — not surfaced in the quick menu, counted for completeness. */
+  vocab_focus?: number;
 }
 
 interface QuickPracticeButtonProps {
@@ -87,6 +89,7 @@ export function QuickPracticeButton({
       matching: t('education.practice.matching'),
       spelling: t('education.practice.spelling'),
       blitz: t('education.practice.blitz'),
+      vocab_focus: t('education.vocabFocus.title'),
     };
     return labels[type];
   };
