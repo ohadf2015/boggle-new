@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateWordWheelPuzzle } from '../wordWheelGeneration';
+import { generateWordWheelPuzzle, isValidWordWheelWord } from '../wordWheelGeneration';
 
 const HEBREW_FINAL_FORMS = new Set(['ך', 'ם', 'ן', 'ף', 'ץ']);
 
@@ -30,6 +30,41 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     expect(withRepeats.length).toBeGreaterThan(0);
     expect(withRepeats[0].allLetters).toHaveLength(9);
     expect(withRepeats[0].outerLetters).toHaveLength(8);
+  });
+
+  it('lists every formable 4–9 candidate on the ranking wheel, not only the source', () => {
+    const seed = generateWordWheelPuzzle('2026-09-03', 'en', { letterCount: 9 });
+    const extras = seed.outerLetters;
+    const crafted: string[] = [];
+    for (let i = 0; i <= extras.length - 3; i++) {
+      crafted.push(`${seed.centerLetter}${extras[i]}${extras[i + 1]}${extras[i + 2]}`);
+    }
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en', {
+      letterCount: 9,
+      candidateWords: [...crafted, 'ZZZZ', 'QQ'],
+    });
+    expect(puzzle.targetWords).toEqual(expect.arrayContaining(crafted.map((w) => w.toUpperCase())));
+    expect(puzzle.targetWords).not.toContain('ZZZZ');
+    expect(puzzle.targetWords!.length).toBeGreaterThanOrEqual(crafted.length);
+    expect(puzzle.targetWords!.length).not.toBe(1);
+    for (const word of puzzle.targetWords!) {
+      expect(isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)).toBe(true);
+      expect(word.length).toBeGreaterThanOrEqual(4);
+      expect(word.length).toBeLessThanOrEqual(9);
+    }
+  });
+
+  it('default ranking 9-letter hunt N is tens of 4–9 words with populated length buckets', () => {
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en', { letterCount: 9 });
+    expect(puzzle.targetWords).toBeDefined();
+    expect(puzzle.targetWords!.length).toBeGreaterThanOrEqual(10);
+    const totals = [4, 5, 6, 7, 8, 9].map(
+      (len) => puzzle.targetWords!.filter((w) => w.length === len).length,
+    );
+    const populated = totals.filter((n) => n > 0).length;
+    expect(populated).toBeGreaterThan(1);
+    expect(totals[5]).toBeGreaterThanOrEqual(0); // 9-letter bucket may be 1
+    expect(puzzle.targetWords!.some((w) => w.length < 9)).toBe(true);
   });
 });
 
