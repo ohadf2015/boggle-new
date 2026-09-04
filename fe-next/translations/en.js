@@ -11443,6 +11443,21 @@ const en = {
     }
   },
   "education": {
+    "liveControls": {
+      "title": "Teacher controls",
+      "pause": "Pause",
+      "resume": "Resume",
+      "addTime": "+{{seconds}}s",
+      "endRound": "End round",
+      "endRoundConfirm": "Tap again to end",
+      "skipWord": "Skip word",
+      "pausedTitle": "Paused",
+      "pausedBody": "Your teacher paused the game. Sit tight — it'll start again soon.",
+      "pausedBodyHost": "The class is frozen. Tap Resume when you're ready to keep going.",
+      "timeAddedToast": "Your teacher added {{seconds}} seconds",
+      "wordSkippedToast": "Your teacher picked a new word to hunt",
+      "controlFailedToast": "Couldn't do that right now"
+    },
     "wordBank": {
       "title": "Word bank ({{count}})",
       "hint": "These words are hidden in the board. Tap to close.",

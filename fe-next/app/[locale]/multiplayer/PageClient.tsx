@@ -8,6 +8,9 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
+import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
+import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
+import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
@@ -272,6 +275,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const seriesTracker = useSeriesTracker();
 
   const gameActive = useGameActive();
+  // Resolved mode of the running round — decides whether "Skip word" is offered.
+  const liveGameMode = useGameStore((s) => s.gameMode);
   usePlayerJoinLeaveNotifications({
     players: playersInRoom,
     currentUsername: username,
@@ -288,6 +293,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const {
     socket, isConnected, roomsLoading, attemptingReconnect,
     setAttemptingReconnect, refreshRooms, signalIntentionalLeave,
+    isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
+    classroomLevel, classroomWordBank,
   } = useMultiplayerSocket({
     language: language as Language, gameCode, username, roomName,
     isActive, isHost, roomLanguage,
@@ -690,6 +697,29 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             <AutoHideHeader collapseSpacerWhenHidden="user-initiated" />
           )}
           {renderView()}
+          {/* Teacher live controls (classroom rooms). Overlay for everyone while
+              paused; the floating bar only for the host. Both gated on a live
+              round so a stale flag can never surface on lobby/results. */}
+          {isActive && gameActive && !showResults && isPaused && (
+            <GamePausedOverlay isHost={isHost} />
+          )}
+          {/* Differentiation scaffold: a word bank for support-level students, a
+              longer-word target for challenge-level ones, nothing for everyone
+              else — the component decides, so the mount is unconditional. */}
+          {isActive && gameActive && !showResults && (
+            <StudentWordBank level={classroomLevel} words={classroomWordBank} />
+          )}
+          {isActive && gameActive && !showResults && isHost && isClassroomMode && (
+            <TeacherLiveControls
+              isPaused={isPaused}
+              gameMode={liveGameMode}
+              onPause={pauseGame}
+              onResume={resumeGame}
+              onExtendTime={extendTime}
+              onEndRound={endRoundNow}
+              onSkipWord={skipTargetWord}
+            />
+          )}
           <HostLeftGraceModal
             isOpen={!!hostLeftState}
             seconds={10}

@@ -12928,6 +12928,21 @@ const es = {
     }
   },
   "education": {
+    "liveControls": {
+      "title": "Controles del docente",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "addTime": "+{{seconds}} s",
+      "endRound": "Terminar ronda",
+      "endRoundConfirm": "Toca otra vez para terminar",
+      "skipWord": "Saltar palabra",
+      "pausedTitle": "En pausa",
+      "pausedBody": "Tu profe pausó el juego. Espera un momento, enseguida seguimos.",
+      "pausedBodyHost": "La clase está en pausa. Toca Reanudar cuando quieras continuar.",
+      "timeAddedToast": "Tu profe añadió {{seconds}} segundos",
+      "wordSkippedToast": "Tu profe eligió una palabra nueva para buscar",
+      "controlFailedToast": "No se pudo hacer eso ahora mismo"
+    },
     "wordBank": {
       "title": "Banco de palabras ({{count}})",
       "hint": "Estas palabras están escondidas en el tablero. Toca para cerrar.",

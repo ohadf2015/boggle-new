@@ -13174,6 +13174,21 @@ const sv = {
     }
   },
   "education": {
+    "liveControls": {
+      "title": "Lärarkontroller",
+      "pause": "Pausa",
+      "resume": "Fortsätt",
+      "addTime": "+{{seconds}} s",
+      "endRound": "Avsluta rundan",
+      "endRoundConfirm": "Tryck igen för att avsluta",
+      "skipWord": "Hoppa över ordet",
+      "pausedTitle": "Pausat",
+      "pausedBody": "Din lärare har pausat spelet. Häng kvar – vi fortsätter snart.",
+      "pausedBodyHost": "Klassen är pausad. Tryck på Fortsätt när du vill köra vidare.",
+      "timeAddedToast": "Din lärare lade till {{seconds}} sekunder",
+      "wordSkippedToast": "Din lärare valde ett nytt ord att leta efter",
+      "controlFailedToast": "Det gick inte just nu"
+    },
     "wordBank": {
       "title": "Ordbank ({{count}})",
       "hint": "De här orden gömmer sig i brädet. Tryck för att stänga.",

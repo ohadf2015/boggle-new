@@ -12936,6 +12936,21 @@ const ja = {
     }
   },
   "education": {
+    "liveControls": {
+      "title": "先生用コントロール",
+      "pause": "一時停止",
+      "resume": "再開",
+      "addTime": "+{{seconds}}秒",
+      "endRound": "ラウンド終了",
+      "endRoundConfirm": "もう一度タップで終了",
+      "skipWord": "単語をスキップ",
+      "pausedTitle": "一時停止中",
+      "pausedBody": "先生がゲームを一時停止しました。もうすぐ再開するので、そのまま待っていてね。",
+      "pausedBodyHost": "クラス全員が停止中です。続けるときは「再開」をタップしてください。",
+      "timeAddedToast": "先生が{{seconds}}秒追加しました",
+      "wordSkippedToast": "先生が新しいお題の単語を選びました",
+      "controlFailedToast": "今は実行できませんでした"
+    },
     "wordBank": {
       "title": "単語バンク（{{count}}）",
       "hint": "これらの単語はボードに隠れています。タップで閉じる。",

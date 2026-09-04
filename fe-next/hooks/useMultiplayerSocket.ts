@@ -16,8 +16,12 @@ import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils
 import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
+import { isVocabularyLevel } from '@/lib/education/differentiation';
+import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
+import { setTeacherPaused, useTeacherPaused } from '@/hooks/useTeacherPause';
+import { useGameStore } from '@/hooks/gameState/store';
 
 const SOCKET_CONFIG = {
   RECONNECTION_ATTEMPTS: 10,
@@ -81,10 +85,22 @@ interface UseMultiplayerSocketReturn {
   isConnected: boolean;
   roomsLoading: boolean;
   attemptingReconnect: boolean;
+  // ---- Classroom differentiation (per-socket, from server `classroomContext`) ----
+  /** This player's tier in the classroom that owns the room. 'core' outside classroom games. */
+  classroomLevel: VocabularyLevel;
+  /** Lesson vocabulary embedded in the board (classroom games only; [] otherwise). */
+  classroomWordBank: string[];
   setAttemptingReconnect: (value: boolean) => void;
   setRoomsLoading: (value: boolean) => void;
   refreshRooms: () => void;
   signalIntentionalLeave: () => void;
+  /** Teacher live controls (classroom rooms). Server-authoritative pause flag + host emitters. */
+  isPaused: boolean;
+  pauseGame: () => void;
+  resumeGame: () => void;
+  extendTime: (seconds: number) => void;
+  endRoundNow: () => void;
+  skipTargetWord: () => void;
 }
 
 /**
@@ -101,6 +117,9 @@ export function useMultiplayerSocket(
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  // ---- Classroom differentiation state (see `classroomContext` listener) ----
+  const [classroomLevel, setClassroomLevel] = useState<VocabularyLevel>('core');
+  const [classroomWordBank, setClassroomWordBank] = useState<string[]>([]);
   const [roomsLoading, setRoomsLoading] = useState<boolean>(true);
   const [attemptingReconnect, setAttemptingReconnect] = useState<boolean>(false);
 
@@ -176,6 +195,14 @@ export function useMultiplayerSocket(
       'playerKicked',
       'afkWarning',
       'pong',
+      // Classroom differentiation — owned solely by this hook.
+      'classroomContext',
+      // Teacher live controls — owned solely by this hook.
+      'gamePaused',
+      'gameResumed',
+      'timeExtended',
+      'wordHuntTargetSkipped',
+      'teacherControlRejected',
     ];
     eventNames.forEach((event) => socketInstance.off(event));
 
@@ -260,6 +287,11 @@ export function useMultiplayerSocket(
     // Game events
     socketInstance.on('joined', (data) => {
       logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
+      // Classroom context is per-room: reset so a previous classroom room's level /
+      // word bank never leaks into this one. The server re-sends `classroomContext`
+      // right after `joined` for classroom games.
+      setClassroomLevel('core');
+      setClassroomWordBank([]);
       // Forward-only: persist a GUEST's chosen room name so it reaches analytics
       // (game_completed metadata.guest_name via getGuestName). Without this the
       // admin game log can only show a guest's session-id fragment, never their
@@ -447,11 +479,60 @@ export function useMultiplayerSocket(
         timerSeconds: data.timerSeconds,
         gridSize: data.letterGrid?.length,
       });
+      // Teacher pause rides on EVERY startGame (fresh round, `join` reconnect,
+      // `requestGameState` recovery): a student reconnecting mid-pause lands on
+      // the pause, and a fresh round (no flag) clears a stale one from the
+      // previous round. Derive, never keep — one source of truth.
+      setTeacherPaused(!!data.isPaused);
       optionsRef.current.onGameStart(data);
+    });
+
+    // ---- Teacher live controls (classroom rooms) ----
+    socketInstance.on('gamePaused', () => {
+      setTeacherPaused(true);
+    });
+
+    socketInstance.on('gameResumed', () => {
+      setTeacherPaused(false);
+    });
+
+    socketInstance.on('timeExtended', (data: { addedSeconds?: number }) => {
+      // The clock itself snaps via the immediate `timeUpdate` the server sends
+      // alongside; this is just the "why did my timer jump" explanation.
+      const seconds = data?.addedSeconds ?? 0;
+      if (seconds > 0) {
+        toast(optionsRef.current.t('education.liveControls.timeAddedToast', { seconds }), { icon: '⏱️', duration: 3000 });
+      }
+    });
+
+    socketInstance.on('wordHuntTargetSkipped', (data: { wordHuntTargetLength?: number; wordHuntTargetCategory?: string | null }) => {
+      const store = useGameStore.getState();
+      if (typeof data?.wordHuntTargetLength === 'number') store.setWordHuntTargetLength(data.wordHuntTargetLength);
+      store.setWordHuntTargetCategory(data?.wordHuntTargetCategory ?? null);
+      toast(optionsRef.current.t('education.liveControls.wordSkippedToast'), { icon: '⏭️', duration: 3500 });
+    });
+
+    // Host-only: an authorized control that could not be applied (already
+    // paused, no alternative target, …). Silent no-ops are pitfall #4.
+    socketInstance.on('teacherControlRejected', () => {
+      toast.error(optionsRef.current.t('education.liveControls.controlFailedToast'), { duration: 3000 });
+    });
+
+    // ---- Classroom differentiation: per-socket, emitted from the server `join`
+    // path (first join, late join, reconnect) — never from the `startGame` broadcast.
+    socketInstance.on('classroomContext', (data: { classroomLevel?: unknown; classroomWordBank?: unknown }) => {
+      setClassroomLevel(isVocabularyLevel(data?.classroomLevel) ? data.classroomLevel : 'core');
+      setClassroomWordBank(
+        Array.isArray(data?.classroomWordBank)
+          ? data.classroomWordBank.filter((w): w is string => typeof w === 'string')
+          : []
+      );
     });
 
     socketInstance.on('resetGame', () => {
       logger.log('[SOCKET.IO] Game reset - staying in room for new game');
+      // Back to the lobby — nothing is paused between rounds.
+      setTeacherPaused(false);
       // Cancel reconnect fallback timer — game was reset, no need to request state
       if (reconnectFallbackTimerRef.current) {
         clearTimeout(reconnectFallbackTimerRef.current);
@@ -709,14 +790,31 @@ export function useMultiplayerSocket(
     }
   }, [socket, isConnected]);
 
+  // ---- Teacher live controls (host, classroom rooms) ----
+  // Authorization lives server-side (host + isClassroom); these are thin emitters.
+  const isPaused = useTeacherPaused();
+  const pauseGame = useCallback(() => { socketRef.current?.emit('pauseGame'); }, []);
+  const resumeGame = useCallback(() => { socketRef.current?.emit('resumeGame'); }, []);
+  const extendTime = useCallback((seconds: number) => { socketRef.current?.emit('extendTime', { seconds }); }, []);
+  const endRoundNow = useCallback(() => { socketRef.current?.emit('endRoundNow'); }, []);
+  const skipTargetWord = useCallback(() => { socketRef.current?.emit('skipTargetWord'); }, []);
+
   return {
     socket,
     isConnected,
     roomsLoading,
     attemptingReconnect,
+    classroomLevel,
+    classroomWordBank,
     setAttemptingReconnect,
     setRoomsLoading,
     refreshRooms,
     signalIntentionalLeave,
+    isPaused,
+    pauseGame,
+    resumeGame,
+    extendTime,
+    endRoundNow,
+    skipTargetWord,
   };
 }

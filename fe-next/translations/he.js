@@ -12782,6 +12782,21 @@ const he = {
     }
   },
   "education": {
+    "liveControls": {
+      "title": "פקדי מורה",
+      "pause": "השהיה",
+      "resume": "המשך",
+      "addTime": "+{{seconds}} שנ׳",
+      "endRound": "סיום הסיבוב",
+      "endRoundConfirm": "לחצו שוב לסיום",
+      "skipWord": "דלגו על המילה",
+      "pausedTitle": "המשחק מושהה",
+      "pausedBody": "המורה השהה את המשחק. רגע של סבלנות — ממשיכים בקרוב.",
+      "pausedBodyHost": "הכיתה מוקפאת. לחצו על ״המשך״ כשתהיו מוכנים להמשיך.",
+      "timeAddedToast": "המורה הוסיף {{seconds}} שניות",
+      "wordSkippedToast": "המורה בחר מילה חדשה לחיפוש",
+      "controlFailedToast": "לא ניתן לבצע זאת כרגע"
+    },
     "wordBank": {
       "title": "בנק מילים ({{count}})",
       "hint": "המילים האלה מסתתרות בלוח. הקישו כדי לסגור.",
