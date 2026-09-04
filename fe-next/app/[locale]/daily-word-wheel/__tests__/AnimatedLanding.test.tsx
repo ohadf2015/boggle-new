@@ -21,6 +21,7 @@ const puzzle: WordWheelPuzzle = {
   puzzleDate: '2026-09-03',
   language: 'en',
   puzzleNumber: 1,
+  targetWords: ['BEAD', 'FACE', 'CAFE', 'IDEA', 'CADGE'],
 };
 
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', async (importOriginal) => {
@@ -69,13 +70,14 @@ describe('AnimatedLanding', () => {
   it('lets a first-time visitor tap letters and submit a word without following the CTA', async () => {
     render(<AnimatedLanding {...props} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'C' }));
+    fireEvent.click(screen.getByRole('button', { name: 'F' }));
     fireEvent.click(screen.getByRole('button', { name: 'A' }));
-    fireEvent.click(screen.getByRole('button', { name: 'B' }));
+    fireEvent.click(screen.getByRole('button', { name: 'C' }));
+    fireEvent.click(screen.getByRole('button', { name: 'E' }));
     fireEvent.click(screen.getByTestId('ranking-wheel-submit'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('found-count')).toHaveTextContent('1');
+      expect(screen.getByTestId('found-count')).toHaveTextContent('1/5');
     });
     expect(screen.getByRole('link', { name: 'Play full game' }).getAttribute('href')).toBe(
       '/en/daily/word-wheel',

@@ -11,6 +11,8 @@ import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+/** Crossword-curated everyday English 4–9. Not a frequency-sliced popular dump. */
+import enWheelHuntPool from './wheelHuntPool.en.json';
 
 // ==========================================
 // Word Wheel Puzzle Types
@@ -23,6 +25,8 @@ export interface WordWheelPuzzle {
   puzzleDate: string;
   language: Language;
   puzzleNumber: number;
+  /** Finite listed-hunt targets (4–9 letters). Ranking URL only. */
+  targetWords?: string[];
 }
 
 // ==========================================
@@ -123,7 +127,7 @@ function getUniqueLetters(word: string, language?: Language): string[] {
 export function generateWordWheelPuzzle(
   dateString?: string,
   language: Language = 'en',
-  options?: { letterCount?: number }
+  options?: { letterCount?: number; candidateWords?: string[] }
 ): WordWheelPuzzle {
   const date = dateString || getDailyChallengeDate();
   const puzzleNumber = getPuzzleNumber(date);
@@ -171,14 +175,25 @@ export function generateWordWheelPuzzle(
   // For simplicity: use the first letter after shuffle (deterministic)
   const centerLetter = letters[0];
   const outerLetters = letters.slice(1, letterCount);
+  const allLetters = [centerLetter, ...outerLetters];
+
+  const targetWords =
+    letterCount === 9
+      ? listWheelHuntTargets(
+          [...(options?.candidateWords ?? wheelHuntPoolFor(language)), sourceWord],
+          centerLetter,
+          allLetters,
+        )
+      : undefined;
 
   return {
     centerLetter,
     outerLetters,
-    allLetters: [centerLetter, ...outerLetters],
+    allLetters,
     puzzleDate: date,
     language,
     puzzleNumber,
+    targetWords,
   };
 }
 
@@ -210,4 +225,31 @@ export function isValidWordWheelWord(
   }
 
   return true;
+}
+
+const WHEEL_HUNT_POOLS: Partial<Record<Language, string[]>> = {
+  en: enWheelHuntPool as string[],
+};
+
+function wheelHuntPoolFor(language: Language): string[] {
+  return WHEEL_HUNT_POOLS[language] ?? [];
+}
+
+/** Every 4–9 letter word that can be formed on the wheel (centre required, tile multiset). */
+export function listWheelHuntTargets(
+  words: string[],
+  centerLetter: string,
+  allLetters: string[],
+): string[] {
+  const seen = new Set<string>();
+  const targets: string[] = [];
+  for (const word of words) {
+    const upper = word.toUpperCase();
+    if (upper.length < 4 || upper.length > 9) continue;
+    if (!isValidWordWheelWord(upper, centerLetter, allLetters)) continue;
+    if (seen.has(upper)) continue;
+    seen.add(upper);
+    targets.push(upper);
+  }
+  return targets;
 }
