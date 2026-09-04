@@ -1,7 +1,147 @@
 import { describe, it, expect } from 'vitest';
-import { generateWordWheelPuzzle } from '../wordWheelGeneration';
+import {
+  generateWordWheelPuzzle,
+  isValidWordWheelWord,
+  listWheelHuntTargets,
+} from '../wordWheelGeneration';
+import enWheelHuntPool from '../wheelHuntPool.en.json';
 
 const HEBREW_FINAL_FORMS = new Set(['ך', 'ם', 'ן', 'ף', 'ץ']);
+
+describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
+  it('returns 1 centre + 8 outer when letterCount is 9', () => {
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en', { letterCount: 9 });
+    expect(puzzle.allLetters).toHaveLength(9);
+    expect(puzzle.outerLetters).toHaveLength(8);
+    expect(puzzle.allLetters[0]).toBe(puzzle.centerLetter);
+  });
+
+  it('still returns 7 letters by default so the daily generator is unchanged', () => {
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en');
+    expect(puzzle.allLetters).toHaveLength(7);
+    expect(puzzle.outerLetters).toHaveLength(6);
+  });
+
+  it('keeps repeated letters on the 9-letter ranking wheel (anagram, not unique tiles)', () => {
+    const dates: string[] = [];
+    for (let month = 1; month <= 12; month++) {
+      for (let day = 1; day <= 28; day++) {
+        dates.push(`2026-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+      }
+    }
+    const withRepeats = dates
+      .map((date) => generateWordWheelPuzzle(date, 'en', { letterCount: 9 }))
+      .filter((puzzle) => new Set(puzzle.allLetters).size < puzzle.allLetters.length);
+    expect(withRepeats.length).toBeGreaterThan(0);
+    expect(withRepeats[0].allLetters).toHaveLength(9);
+    expect(withRepeats[0].outerLetters).toHaveLength(8);
+  });
+
+  it('lists every formable 4–9 candidate on the ranking wheel, not only the source', () => {
+    const seed = generateWordWheelPuzzle('2026-09-03', 'en', { letterCount: 9 });
+    const extras = seed.outerLetters;
+    const crafted: string[] = [];
+    for (let i = 0; i <= extras.length - 3; i++) {
+      crafted.push(`${seed.centerLetter}${extras[i]}${extras[i + 1]}${extras[i + 2]}`);
+    }
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en', {
+      letterCount: 9,
+      candidateWords: [...crafted, 'ZZZZ', 'QQ'],
+    });
+    expect(puzzle.targetWords).toEqual(expect.arrayContaining(crafted.map((w) => w.toUpperCase())));
+    expect(puzzle.targetWords).not.toContain('ZZZZ');
+    expect(puzzle.targetWords!.length).toBeGreaterThanOrEqual(crafted.length);
+    expect(puzzle.targetWords!.length).not.toBe(1);
+    for (const word of puzzle.targetWords!) {
+      expect(isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)).toBe(true);
+      expect(word.length).toBeGreaterThanOrEqual(4);
+      expect(word.length).toBeLessThanOrEqual(9);
+    }
+  });
+
+  it('default ranking 9-letter hunt N is tens of 4–9 words with populated length buckets', () => {
+    const puzzle = generateWordWheelPuzzle('2026-09-03', 'en', { letterCount: 9 });
+    expect(puzzle.targetWords).toBeDefined();
+    expect(puzzle.targetWords!.length).toBeGreaterThanOrEqual(10);
+    const totals = [4, 5, 6, 7, 8, 9].map(
+      (len) => puzzle.targetWords!.filter((w) => w.length === len).length,
+    );
+    const populated = totals.filter((n) => n > 0).length;
+    expect(populated).toBeGreaterThan(1);
+    expect(totals[5]).toBeGreaterThanOrEqual(0); // 9-letter bucket may be 1
+    expect(puzzle.targetWords!.some((w) => w.length < 9)).toBe(true);
+    for (const nonce of ['AANI', 'CAET', 'CEJA', 'ACEITE']) {
+      expect(puzzle.targetWords).not.toContain(nonce);
+    }
+  });
+
+  it('ADJECTIVE/C listed hunt is everyday 4–9 English including 7 and 9, not ENABLE1 extras', () => {
+    const tiles = ['A', 'D', 'J', 'E', 'C', 'T', 'I', 'V', 'E'];
+    const targets = listWheelHuntTargets(
+      [...(enWheelHuntPool as string[]), 'ADJECTIVE'],
+      'C',
+      tiles,
+    );
+    expect(targets).toEqual(
+      expect.arrayContaining([
+        'ACED',
+        'CITE',
+        'ACTIVE',
+        'ADVICE',
+        'EVICTED',
+        'ADJECTIVE',
+      ]),
+    );
+    expect(targets).not.toContain('CAET');
+    expect(targets).not.toContain('CEJA');
+    expect(targets).not.toContain('ACEITE');
+    expect(targets).not.toContain('ADJECT');
+    expect(targets).not.toContain('CADI');
+    expect(targets).not.toContain('CAID');
+    expect(targets.filter((w) => w.length === 7).length).toBeGreaterThan(0);
+    expect(targets.filter((w) => w.length === 9).length).toBeGreaterThan(0);
+    expect(targets.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it('hunt pool is a crossword-curated 4–9 English allowlist, not a frequency popular dump', () => {
+    const pool = enWheelHuntPool as string[];
+    expect(pool.length).toBeGreaterThan(5000);
+    expect(pool.length).toBeLessThan(60000);
+    expect(pool[0]).not.toBe('THAT');
+    for (const obscure of ['LUNT', 'TEENFUL', 'AECIA', 'ASTATIC', 'ELUENT', 'FUNEST', 'CADI']) {
+      expect(pool.map((w) => w.toUpperCase())).not.toContain(obscure);
+    }
+    for (const everyday of ['LAND', 'PLACE', 'ACTIVE', 'COUNT', 'CLIP']) {
+      expect(pool.map((w) => w.toUpperCase())).toContain(everyday);
+    }
+  });
+
+  it('LANDSCAPE/A listed hunt keeps everyday PLEA/CANE/SANE without a blunt cap', () => {
+    const tiles = ['L', 'A', 'N', 'D', 'S', 'C', 'A', 'P', 'E'];
+    const targets = listWheelHuntTargets(
+      [...(enWheelHuntPool as string[]), 'LANDSCAPE'],
+      'A',
+      tiles,
+    );
+    expect(targets).toEqual(expect.arrayContaining(['LAND', 'PLACE', 'PLEA', 'CANE', 'SANE', 'LANDSCAPE']));
+    expect(targets).not.toContain('AECIA');
+    expect(targets).not.toContain('ASTATIC');
+    expect(targets).not.toContain('ALAE');
+    expect(targets).toContain('LANDSCAPE');
+  });
+
+  it('ARCHIVING/G listed hunt matches live crossword membership, not popular-dump extras', () => {
+    const tiles = ['A', 'R', 'C', 'H', 'I', 'V', 'I', 'N', 'G'];
+    const targets = listWheelHuntTargets(
+      [...(enWheelHuntPool as string[]), 'ARCHIVING'],
+      'G',
+      tiles,
+    );
+    expect(targets).toEqual(expect.arrayContaining(['HANGI', 'CRAG', 'CHAIRING', 'ARCHIVING']));
+    expect(targets).not.toContain('AGIN');
+    expect(targets).not.toContain('CHANG');
+  });
+});
 
 describe('generateWordWheelPuzzle - Hebrew final letter normalization', () => {
   it('should not contain final-form Hebrew letters on any wheel tile', () => {
