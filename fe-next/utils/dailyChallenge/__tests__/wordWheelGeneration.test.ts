@@ -101,13 +101,13 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     expect(targets.filter((w) => w.length === 7).length).toBeGreaterThan(0);
     expect(targets.filter((w) => w.length === 9).length).toBeGreaterThan(0);
     expect(targets.length).toBeGreaterThanOrEqual(20);
-    expect(targets.length).toBeLessThanOrEqual(45);
   });
 
-  it('hunt pool is tens of thousands of everyday 4–9 English, not the ENABLE1 dump', () => {
+  it('hunt pool is a crossword-curated 4–9 English allowlist, not a frequency popular dump', () => {
     const pool = enWheelHuntPool as string[];
     expect(pool.length).toBeGreaterThan(5000);
-    expect(pool.length).toBeLessThan(30000);
+    expect(pool.length).toBeLessThan(60000);
+    expect(pool[0]).not.toBe('THAT');
     for (const obscure of ['LUNT', 'TEENFUL', 'AECIA', 'ASTATIC', 'ELUENT', 'FUNEST', 'CADI']) {
       expect(pool.map((w) => w.toUpperCase())).not.toContain(obscure);
     }
@@ -116,20 +116,30 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     }
   });
 
-  it('LANDSCAPE/A listed hunt N is tens-wide like the live bar, not an ENABLE1 dump of 229', () => {
+  it('LANDSCAPE/A listed hunt keeps everyday PLEA/CANE/SANE without a blunt cap', () => {
     const tiles = ['L', 'A', 'N', 'D', 'S', 'C', 'A', 'P', 'E'];
     const targets = listWheelHuntTargets(
       [...(enWheelHuntPool as string[]), 'LANDSCAPE'],
       'A',
       tiles,
     );
-    expect(targets).toEqual(expect.arrayContaining(['LAND', 'PLACE', 'LANDSCAPE']));
+    expect(targets).toEqual(expect.arrayContaining(['LAND', 'PLACE', 'PLEA', 'CANE', 'SANE', 'LANDSCAPE']));
     expect(targets).not.toContain('AECIA');
     expect(targets).not.toContain('ASTATIC');
     expect(targets).not.toContain('ALAE');
-    expect(targets.length).toBeGreaterThanOrEqual(20);
-    expect(targets.length).toBeLessThanOrEqual(45);
     expect(targets).toContain('LANDSCAPE');
+  });
+
+  it('ARCHIVING/G listed hunt matches live crossword membership, not popular-dump extras', () => {
+    const tiles = ['A', 'R', 'C', 'H', 'I', 'V', 'I', 'N', 'G'];
+    const targets = listWheelHuntTargets(
+      [...(enWheelHuntPool as string[]), 'ARCHIVING'],
+      'G',
+      tiles,
+    );
+    expect(targets).toEqual(expect.arrayContaining(['HANGI', 'CRAG', 'CHAIRING', 'ARCHIVING']));
+    expect(targets).not.toContain('AGIN');
+    expect(targets).not.toContain('CHANG');
   });
 });
 

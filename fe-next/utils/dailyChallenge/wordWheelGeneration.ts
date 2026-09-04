@@ -11,11 +11,8 @@ import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
-/** Everyday English 4–9 (dolph/dictionary popular, freq-sorted). Not ENABLE1. */
+/** Crossword-curated everyday English 4–9. Not a frequency-sliced popular dump. */
 import enWheelHuntPool from './wheelHuntPool.en.json';
-
-/** Live Lovatts bar N is tens (observed 22–44). Dense wheels cap here. */
-export const MAX_WHEEL_HUNT_TARGETS = 44;
 
 // ==========================================
 // Word Wheel Puzzle Types
@@ -254,17 +251,5 @@ export function listWheelHuntTargets(
     seen.add(upper);
     targets.push(upper);
   }
-  return capWheelHuntTargets(targets);
-}
-
-/** Keep pangrams; fill remaining slots in pool order (freq-sorted everyday list). */
-export function capWheelHuntTargets(
-  targets: string[],
-  max = MAX_WHEEL_HUNT_TARGETS,
-): string[] {
-  if (targets.length <= max) return targets;
-  const nines = targets.filter((w) => w.length === 9);
-  const rest = targets.filter((w) => w.length !== 9);
-  const room = Math.max(0, max - nines.length);
-  return [...rest.slice(0, room), ...nines];
+  return targets;
 }
