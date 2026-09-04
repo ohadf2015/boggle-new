@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { generateWordWheelPuzzle, isValidWordWheelWord } from '../wordWheelGeneration';
+import {
+  generateWordWheelPuzzle,
+  isValidWordWheelWord,
+  listWheelHuntTargets,
+} from '../wordWheelGeneration';
+import enWheelHuntPool from '../wheelHuntPool.en.json';
 
 const HEBREW_FINAL_FORMS = new Set(['ך', 'ם', 'ן', 'ף', 'ץ']);
 
@@ -65,6 +70,38 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     expect(populated).toBeGreaterThan(1);
     expect(totals[5]).toBeGreaterThanOrEqual(0); // 9-letter bucket may be 1
     expect(puzzle.targetWords!.some((w) => w.length < 9)).toBe(true);
+    for (const nonce of ['AANI', 'CAET', 'CEJA', 'ACEITE']) {
+      expect(puzzle.targetWords).not.toContain(nonce);
+    }
+  });
+
+  it('ADJECTIVE/C listed hunt is real 4–9 English including 7 and 9, not nonce', () => {
+    const tiles = ['A', 'D', 'J', 'E', 'C', 'T', 'I', 'V', 'E'];
+    const targets = listWheelHuntTargets(
+      [...(enWheelHuntPool as string[]), 'ADJECTIVE'],
+      'C',
+      tiles,
+    );
+    expect(targets).toEqual(
+      expect.arrayContaining([
+        'ACED',
+        'CITE',
+        'CADE',
+        'CEDE',
+        'ACTIVE',
+        'ADVICE',
+        'EVICTED',
+        'ADJECTIVE',
+      ]),
+    );
+    expect(targets).not.toContain('CAET');
+    expect(targets).not.toContain('CEJA');
+    expect(targets).not.toContain('ACEITE');
+    expect(targets).not.toContain('ADJECT');
+    expect(targets.filter((w) => w.length === 7).length).toBeGreaterThan(0);
+    expect(targets.filter((w) => w.length === 9).length).toBeGreaterThan(0);
+    expect(targets.length).toBeGreaterThanOrEqual(20);
+    expect(targets.length).toBeLessThan(80);
   });
 });
 

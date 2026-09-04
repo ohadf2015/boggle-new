@@ -11,6 +11,7 @@ import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+/** ENABLE1 public-domain English, lengths 4–9. Not the nonce dump. */
 import enWheelHuntPool from './wheelHuntPool.en.json';
 
 // ==========================================
