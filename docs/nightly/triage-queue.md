@@ -2274,3 +2274,21 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: not reached; also ambiguous root cause (security_invoker unset per memory education-module-audit-2026-08-20) — needs read of the view definition before a REVOKE/ALTER, borderline DEFER side of matrix
   - recommended owner: self (lane 01, tomorrow) or backend review
+
+## 2026-09-04
+- [Restore] 20260901-010005 restored (24 files) and eslint-verified; full test/build pending tonight's gate
+  - status: shipped (pending gate)
+  - why: original drop was infra SETUP failure, not code — safe to reland
+  - recommended owner: review-by-eod
+- [Restore] 20260817-010002 (18 nights stale, 10 files) and 20260827-010001 (8 nights stale, 8 files) still unresolved
+  - status: deferred (not attempted tonight — kept tonight's change scoped to one restore)
+  - why: time budget; avoid stacking 3 unverified restores in one gate run
+  - recommended owner: self (next 01-triage run)
+- [Engagement] es/singleplayer?autoStart=bots rageclick (score 0.744, reach 4) — root cause hypothesis + instrumentation shipped, UI fix NOT shipped
+  - status: deferred (evidence-gathering shipped tonight; fix needs a human/next-lane call)
+  - why: `useSinglePlayerConfig.ts:173-181` — a RETURNING player (hasPlayedBotsGame=true) landing on `/singleplayer?autoStart=bots` gets silently `router.replace()`d to `/multiplayer?quickPlay=true`. The source page stays on the interactive 'pre-game' mode-picker screen (no loading/disabled state — `SinglePlayerPhase` has no 'loading' value) while the redirect + MP socket-connect happens in the background — matches Class 5 (silent effect swap, no visual feedback) from `.claude/rules/60-recurring-pitfalls.md`. Shipped `singleplayer_bots_stale_redirect` event (utils/growthTracking.ts) at the redirect call site to size how much of the rageclick this explains; join against existing `mp_quickplay_initiated{trigger:'url_param'}` on the destination.
+  - recommended owner: self (lane 03 or 05, next run with data) — if the new event confirms the hypothesis, the fix is a `SinglePlayerPhase` loading state (or an early return rendering a spinner) gated on the same `isBotsEntry && hasPlayedBotsGame()` branch.
+- [Engagement] `exp-practice-wheel-cta-v1` flag is active/100% rollout in PostHog but 0 non-test call sites in fe-next — serves a variant that changes nothing
+  - status: deferred (not wired tonight — time budget)
+  - why: per nightly-learnings STEP 3b hard precondition, did not touch the flag; needs either wiring the practice-wheel CTA experiment or deleting the dead flag
+  - recommended owner: self (lane 03, next run)

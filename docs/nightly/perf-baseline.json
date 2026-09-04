@@ -1,41 +1,36 @@
 {
-  "date": "2026-09-01",
-  "note": "Backend: supabase MCP connected this run. Confirmed advisor's unindexed-FK finding via pg_indexes (vocabulary_lessons.classroom_id had ZERO index, only pkey + teacher_id) and shipped the btree index -- no EXPLAIN ANALYZE needed since the absence of any index on an FK column is unconditionally suboptimal for the ON DELETE SET NULL cascade + any classroom-scoped lookup. Checked idx_word_pacts_player2_id (advisor 'unused index'): confirmed idx_scan=0 via pg_stat_user_indexes, but table is 16kB -- dropping saves nothing, skipped as not worth the change. auth_db_connections_absolute advisor is a dashboard toggle, not a migration -- deferred to human queue, unchanged. Frontend: re-ran the brief's PostHog LCP items through the mandatory sample gate grouped by route (stripping query params, filtering $host LIKE lexiclash) -- EVERY route fails n>=50 tonight, including /en/multiplayer itself (n=45, just under floor, down from 08-31's n=59). The brief's top-scored items (tryshopli.com, stoquant.com, imposketch.io) are OTHER apps sharing this PostHog project (memory: PostHog is shared by ~12 apps) -- not LexiClash, correctly ignored. The lexiclash.live/es/multiplayer?room=QF96CJ brief item is a single invite-room URL, same per-query-param noise pattern flagged since 2026-08-07 -- brief generator still needs to strip query params before scoring. No frontend code change shipped tonight: the MP lobby hero (RoomListView) already has a ReactDOM.preload+srcset LCP fix from a prior lane (multiplayer/page.tsx:66-81), and no other route cleared the sample floor to justify a new change under the no-regression-without-signal principle. Bundle: .next is still the 2026-08-30 23:45 build (BUILD_ID unchanged) -- top chunks byte-identical to 08-31's snapshot, confirming no build has run since; not a same-day signal, carried forward unchanged.",
+  "date": "2026-09-04",
+  "note": "Backend: brief's two items (unindexed_foreign_keys on vocabulary_lessons, auth_db_connections_absolute) are stale-reused duplicates of 2026-09-01 -- brief explicitly flagged supabase source as STALE this run (last-good reused). The FK index (idx_vocabulary_lessons_classroom_id) already shipped 09-01; auth connection strategy is a dashboard config toggle, not code -- still deferred to human queue. No new backend query audit run tonight (brief-first contract: don't re-run discovery on a stale/duplicate slice). Frontend: re-ran the brief's PostHog LCP items through the mandatory sample gate, grouped by route with query params stripped. ALL routes fail n>=50 tonight -- highest is /es/multiplayer at n=26 (was n=14 on 09-01, trending up but still under floor). The brief's growthradar.app/imposketch.io items are OTHER apps on the shared PostHog project (memory: PostHog is shared by ~12 apps), correctly excluded. /en/education/access (brief LCP 5843ms) has n=8 -- checked PageClient.tsx anyway per SPEED priority: the hero image already deliberately omits `priority` with an inline comment explaining phone-viewport LCP is the h1, not the image -- already perf-considered, no change needed. Note: PageClient.tsx has unrelated uncommitted WIP from another session (redirect-notice removal) -- left untouched, not a perf lane concern. Bundle: fresh build present (BUILD_ID BdWceyiy4EZSt6dMpGroB, 2026-09-03 19:46), top-10 chunks flat vs 09-01 baseline (+424KB total across all 10, largest single delta +8KB) -- pure hash/content churn, no chunk crossed the 50KB-heavier threshold, no regression.",
   "backend": {
-    "advisor_warnings_count": 3,
-    "shipped": [
-      { "migration": "add_index_vocabulary_lessons_classroom_id", "table": "public.vocabulary_lessons", "index": "idx_vocabulary_lessons_classroom_id (classroom_id)", "why": "FK vocabulary_lessons_classroom_id_fkey had no covering index (advisor: unindexed_foreign_keys); confirmed via pg_indexes before applying" }
-    ],
+    "advisor_warnings_count": 2,
+    "shipped": [],
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue",
-      "unused_index_word_pacts_player2_id": "idx_scan=0 confirmed via pg_stat_user_indexes, but index is 16kB on a tiny table -- not worth dropping, closed as low-value"
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
+      "unindexed_foreign_keys_vocabulary_lessons": "already shipped 09-01 as idx_vocabulary_lessons_classroom_id -- brief item is a stale reuse of the same advisor warning, not a new finding"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp": 2136, "n": 45, "window": "24h", "status": "DEFERRED -- n=45, below 50-sample floor (was n=59 on 08-31)" },
-      { "route": "/", "p75_lcp": 1658, "n": 21, "window": "24h", "status": "DEFERRED -- low n=21" },
-      { "route": "/es/multiplayer", "p75_lcp": 5444, "n": 14, "window": "24h", "status": "DEFERRED -- low n=14" }
+      { "route": "/es/multiplayer", "p75_lcp": 3840, "n": 26, "window": "24h", "status": "DEFERRED -- n=26, below 50-sample floor (was n=14 on 09-01)" },
+      { "route": "/en/multiplayer", "p75_lcp": 1113, "n": 12, "window": "24h", "status": "DEFERRED -- low n=12" },
+      { "route": "/en/education/access", "p75_lcp": 8228, "n": 8, "window": "24h", "status": "DEFERRED -- low n=8; page already perf-considered (deliberate no-priority hero image, documented in code)" }
     ],
-    "brief_routes_diagnosed_deferred": [
-      "lexiclash.live/es/multiplayer?room=QF96CJ (brief item, LCP 6236ms) -- single invite-room URL, n well under floor when grouped, same per-query-param noise pattern flagged repeatedly since 2026-08-07. tryshopli.com/stoquant.com/imposketch.io brief items are OTHER apps on the shared PostHog project, not LexiClash -- correctly excluded."
-    ],
-    "no_change_shipped": "no route cleared the n>=50 sample floor tonight; MP lobby hero already has a preload+srcset LCP fix from a prior lane (app/[locale]/multiplayer/page.tsx:66-81) -- verified still in place, no further action"
+    "no_change_shipped": "no route cleared the n>=50 sample floor tonight; no actionable regression"
   },
   "bundle": {
-    "note": "no fresh build tonight -- .next BUILD_ID still 2026-08-30 23:45, top chunks byte-identical to 08-31 snapshot, carried forward unchanged",
-    "total_kb": 43624,
+    "note": "fresh build present, top chunks flat vs 09-01 (+424KB total across top-10, max single-chunk delta +8KB) -- pure churn, no regression",
+    "total_kb": 44048,
     "top_chunks": [
-      { "name": "69979-d038ae87ed2b931b.js", "kb": 866 },
-      { "name": "64789.be86df581036a6df.js", "kb": 752 },
-      { "name": "53169.9a603cc7c58f8813.js", "kb": 666 },
-      { "name": "39299.b9d40ea8f45ea51a.js", "kb": 606 },
-      { "name": "82745.a93919a573302371.js", "kb": 584 },
-      { "name": "62972.ac3ed4966d1b8d89.js", "kb": 539 },
-      { "name": "45477.d7d30ecea5784cdc.js", "kb": 514 },
-      { "name": "95782.b7db2f59936094f3.js", "kb": 489 },
-      { "name": "956.ca3ea3377a9e557b.js", "kb": 488 },
-      { "name": "65990-60c86e942cd3f586.js", "kb": 466 }
+      { "name": "69979-d038ae87ed2b931b.js", "kb": 868 },
+      { "name": "64789.ae68706724bca9c0.js", "kb": 760 },
+      { "name": "53169.9a603cc7c58f8813.js", "kb": 668 },
+      { "name": "39299.1581bff69485bf45.js", "kb": 612 },
+      { "name": "82745.5d617f732b2577a6.js", "kb": 592 },
+      { "name": "62972.df4116ee65fca098.js", "kb": 544 },
+      { "name": "45477.28120f7cec61591b.js", "kb": 520 },
+      { "name": "95782.b7db2f59936094f3.js", "kb": 492 },
+      { "name": "956.577df8cce4708344.js", "kb": 488 },
+      { "name": "65990-60c86e942cd3f586.js", "kb": 468 }
     ]
   }
 }
