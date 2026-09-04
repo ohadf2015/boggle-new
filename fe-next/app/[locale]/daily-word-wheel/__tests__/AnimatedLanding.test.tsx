@@ -16,11 +16,12 @@ vi.mock('next/link', () => ({
 
 const puzzle: WordWheelPuzzle = {
   centerLetter: 'A',
-  outerLetters: ['B', 'C', 'D', 'E', 'F', 'G'],
-  allLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+  outerLetters: ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+  allLetters: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
   puzzleDate: '2026-09-03',
   language: 'en',
   puzzleNumber: 1,
+  targetWords: ['BEAD', 'FACE', 'CAFE', 'IDEA', 'CADGE'],
 };
 
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', async (importOriginal) => {
@@ -61,18 +62,22 @@ describe('AnimatedLanding', () => {
     render(<AnimatedLanding {...props} />);
     expect(screen.getByRole('heading', { name: 'Daily Word Wheel' })).toBeTruthy();
     expect(screen.getByTestId('ranking-wheel-play')).toBeTruthy();
+    expect(
+      screen.getByTestId('ranking-wheel-play').querySelectorAll('[data-wheel-letter]'),
+    ).toHaveLength(9);
   });
 
   it('lets a first-time visitor tap letters and submit a word without following the CTA', async () => {
     render(<AnimatedLanding {...props} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'C' }));
+    fireEvent.click(screen.getByRole('button', { name: 'F' }));
     fireEvent.click(screen.getByRole('button', { name: 'A' }));
-    fireEvent.click(screen.getByRole('button', { name: 'B' }));
+    fireEvent.click(screen.getByRole('button', { name: 'C' }));
+    fireEvent.click(screen.getByRole('button', { name: 'E' }));
     fireEvent.click(screen.getByTestId('ranking-wheel-submit'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('found-count')).toHaveTextContent('1');
+      expect(screen.getByTestId('found-count')).toHaveTextContent('1/5');
     });
     expect(screen.getByRole('link', { name: 'Play full game' }).getAttribute('href')).toBe(
       '/en/daily/word-wheel',
