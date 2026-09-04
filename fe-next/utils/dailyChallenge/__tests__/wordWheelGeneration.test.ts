@@ -75,7 +75,7 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     }
   });
 
-  it('ADJECTIVE/C listed hunt is real 4–9 English including 7 and 9, not nonce', () => {
+  it('ADJECTIVE/C listed hunt is everyday 4–9 English including 7 and 9, not ENABLE1 extras', () => {
     const tiles = ['A', 'D', 'J', 'E', 'C', 'T', 'I', 'V', 'E'];
     const targets = listWheelHuntTargets(
       [...(enWheelHuntPool as string[]), 'ADJECTIVE'],
@@ -86,8 +86,6 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
       expect.arrayContaining([
         'ACED',
         'CITE',
-        'CADE',
-        'CEDE',
         'ACTIVE',
         'ADVICE',
         'EVICTED',
@@ -98,10 +96,40 @@ describe('generateWordWheelPuzzle - ranking URL 9-letter wheel', () => {
     expect(targets).not.toContain('CEJA');
     expect(targets).not.toContain('ACEITE');
     expect(targets).not.toContain('ADJECT');
+    expect(targets).not.toContain('CADI');
+    expect(targets).not.toContain('CAID');
     expect(targets.filter((w) => w.length === 7).length).toBeGreaterThan(0);
     expect(targets.filter((w) => w.length === 9).length).toBeGreaterThan(0);
     expect(targets.length).toBeGreaterThanOrEqual(20);
-    expect(targets.length).toBeLessThan(80);
+    expect(targets.length).toBeLessThanOrEqual(45);
+  });
+
+  it('hunt pool is tens of thousands of everyday 4–9 English, not the ENABLE1 dump', () => {
+    const pool = enWheelHuntPool as string[];
+    expect(pool.length).toBeGreaterThan(5000);
+    expect(pool.length).toBeLessThan(30000);
+    for (const obscure of ['LUNT', 'TEENFUL', 'AECIA', 'ASTATIC', 'ELUENT', 'FUNEST', 'CADI']) {
+      expect(pool.map((w) => w.toUpperCase())).not.toContain(obscure);
+    }
+    for (const everyday of ['LAND', 'PLACE', 'ACTIVE', 'COUNT', 'CLIP']) {
+      expect(pool.map((w) => w.toUpperCase())).toContain(everyday);
+    }
+  });
+
+  it('LANDSCAPE/A listed hunt N is tens-wide like the live bar, not an ENABLE1 dump of 229', () => {
+    const tiles = ['L', 'A', 'N', 'D', 'S', 'C', 'A', 'P', 'E'];
+    const targets = listWheelHuntTargets(
+      [...(enWheelHuntPool as string[]), 'LANDSCAPE'],
+      'A',
+      tiles,
+    );
+    expect(targets).toEqual(expect.arrayContaining(['LAND', 'PLACE', 'LANDSCAPE']));
+    expect(targets).not.toContain('AECIA');
+    expect(targets).not.toContain('ASTATIC');
+    expect(targets).not.toContain('ALAE');
+    expect(targets.length).toBeGreaterThanOrEqual(20);
+    expect(targets.length).toBeLessThanOrEqual(45);
+    expect(targets).toContain('LANDSCAPE');
   });
 });
 
