@@ -72,11 +72,17 @@ describe('StudentHubPlayZone', () => {
     expect(mockPush).toHaveBeenCalledWith('/en/education/duels?classroomId=cls-1');
   });
 
-  it('renders ClassroomGameBanner', () => {
+  /**
+   * The live-game banner was deliberately hoisted OUT of this zone and up to the student
+   * hub itself. When the teacher's game is running it is the only thing that matters, and
+   * inside this zone it rendered below the section heading and three sibling cards — two
+   * scrolls down from the top of the page. Pinned here so it does not drift back in.
+   */
+  it('does NOT render the live-game banner — the page owns it now', () => {
     render(
       <StudentHubPlayZone classroomId="cls-1" userId="u-1" username="Alice" />
     );
-    expect(screen.getByTestId('game-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('game-banner')).toBeNull();
   });
 
   it('renders section title using t()', () => {

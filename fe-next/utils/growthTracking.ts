@@ -1101,10 +1101,14 @@ export const markFirstGameActivation = (args: {
       // endpoint had never been called by anything — 0 milestone rewards had ever
       // been granted. It no-ops server-side for players who weren't referred.
       // Fire-and-forget: a reward report must never block the end-of-game path.
+      // `requireSession`: a referral reward is credited against a profile, so this endpoint
+      // is meaningless without a session — and most first games are played logged out. It
+      // fired anyway and 401'd, which is the single most common network error in session
+      // replay (103 sessions in one week).
       void postWithAuth('/api/referral/milestone', {
         milestone: 'first_game_played',
         metadata: { totalScore: score },
-      }).catch(() => {});
+      }, { requireSession: true }).catch(() => {});
     }
     if (won && !localStorage.getItem(wonKey)) {
       localStorage.setItem(wonKey, '1');

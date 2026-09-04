@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { ArrowLeft, LogIn, ClipboardPaste } from 'lucide-react';
@@ -118,8 +119,14 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
           classroomId: result.classroomId,
         });
         toast.success(t('education.student.join.success'));
-        // Redirect to student dashboard
-        router.push(`/${language}/student`);
+        // A student who typed the LIVE GAME code came to PLAY, not to be enrolled. Walk them
+        // straight into the room; the enrolment already happened server-side. Dropping them on
+        // the hub instead was the last step of the dead end this whole path used to be.
+        router.push(
+          result.gameCode
+            ? `/${language}/multiplayer?room=${result.gameCode}&classroom=true`
+            : `/${language}/student`
+        );
       } else if (result.code === 'STUDENT_LIMIT_REACHED') {
         trackEduClassroomJoin({ result: 'error' });
         const msg = t('education.student.join.classroomFull');
@@ -159,6 +166,16 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
           transition={{ duration: 0.3 }}
           className="w-full max-w-md"
         >
+        {/* Decorative only — the heading below carries the meaning. */}
+        <Image
+          src="/images/education/join-hero.webp"
+          alt=""
+          aria-hidden="true"
+          width={448}
+          height={250}
+          priority
+          className="mx-auto mb-4 w-full max-w-sm h-auto select-none"
+        />
         <Card className="border-3 border-neo-black shadow-hard">
           <CardContent className="p-6 sm:p-8">
             {/* Header */}
@@ -172,7 +189,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-                {preview && <ClassroomPreviewCard name={preview.name} language={preview.language} isLoading={isLoadingPreview} />}
+                {preview && <ClassroomPreviewCard name={preview.name} kind={preview.kind} isLoading={isLoadingPreview} />}
 
               {isGuest && code.trim().length === 6 && (
                 <div className="space-y-2">

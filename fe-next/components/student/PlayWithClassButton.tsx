@@ -26,15 +26,17 @@ export function PlayWithClassButton({
   const router = useRouter();
   const { activeGame } = useActiveClassroomGame(classroomId);
 
+  // Only ever called when a game is running — see `hasGame` below.
   const handleClick = () => {
-    if (activeGame) {
-      router.push(`/${language}/multiplayer?code=${activeGame.gameCode}&classroom=true`);
-    } else {
-      router.push(`/${language}/multiplayer?classroom=true&autoCreate=true`);
-    }
+    if (!activeGame) return;
+    // `room`, not `code`: useMultiplayerSession reads ONLY `?room=` to prefill and
+    // auto-join. `?code=` left the room empty, so auto-join never fired and
+    // `?classroom=true` parked the student on a spinner forever.
+    router.push(`/${language}/multiplayer?room=${activeGame.gameCode}&classroom=true`);
   };
 
   const hasGame = !!activeGame;
+  const Wrapper = hasGame ? m.button : m.div;
 
   return (
     <m.div
@@ -46,10 +48,16 @@ export function PlayWithClassButton({
         hasGame ? 'bg-neo-pink' : 'bg-neo-pink/80'
       )}
     >
-      <m.button
-        onClick={handleClick}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+      {/*
+        A button only when there is a game to join. Students do not start class games —
+        the teacher does — so with no game running this is a status line, not an action.
+        It used to navigate to `?classroom=true&autoCreate=true`: no room to join and
+        nothing to create, which left the student on a spinner that never resolved.
+      */}
+      <Wrapper
+        {...(hasGame
+          ? { onClick: handleClick, whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 } }
+          : {})}
         className="w-full p-4 sm:p-6 text-left"
       >
         <div className="flex items-center gap-4">
@@ -90,7 +98,7 @@ export function PlayWithClassButton({
             )}
           </div>
         </div>
-      </m.button>
+      </Wrapper>
 
       {hasGame && (
         <m.div

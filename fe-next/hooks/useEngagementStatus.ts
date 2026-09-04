@@ -107,14 +107,21 @@ export function useEngagementStatus(): EngagementStatusData {
         return;
       }
 
-      // Fetch engagement + profile in parallel
+      // Fetch engagement + profile in parallel.
+      //
+      // `maybeSingle`, NOT `single`: `single()` makes PostgREST answer **406** when the row
+      // does not exist, which is the normal state for a player who has not played yet — no
+      // `player_engagement` row is written until their first game. Every such visitor threw
+      // a 406 (49 sessions in one week, the 4th-noisiest error in session replay) for a case
+      // the code below already handles: every read is `?? 0`, so a missing row is expected,
+      // not exceptional. `maybeSingle()` returns `{ data: null, error: null }` instead.
       const [engagementRes, profileRes] = await Promise.all([
         supabase.from('player_engagement')
           .select('current_streak, longest_streak, streak_freezes_available, games_today')
-          .eq('player_id', playerId).single(),
+          .eq('player_id', playerId).maybeSingle(),
         supabase.from('profiles')
           .select('total_xp, current_level, total_coins')
-          .eq('id', playerId).single(),
+          .eq('id', playerId).maybeSingle(),
       ]);
 
       if (!isMounted.current) return;

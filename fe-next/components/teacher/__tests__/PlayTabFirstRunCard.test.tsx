@@ -36,7 +36,15 @@ describe('PlayTabFirstRunCard', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCreateClassroom.mockResolvedValue({ success: true, data: { id: '123', name: 'My Class' }, code: 'ABC123' });
+    // The REAL shape `useClassrooms().createClassroom` resolves with on success
+    // (hooks/useClassroom.ts). It never sets a top-level `code` on success — `code` is only
+    // populated on the 403 failure branch, where it carries 'CLASS_LIMIT_REACHED'. This mock
+    // used to invent `code: 'ABC123'`, which is why the card reading `result.code` looked
+    // fine here and showed a first-time teacher NO join code in production.
+    mockCreateClassroom.mockResolvedValue({
+      success: true,
+      data: { id: '123', name: 'My Class', join_code: 'ABC123' },
+    });
 
     vi.mocked(useClassroomHook.useClassrooms).mockReturnValue({
       classrooms: [],

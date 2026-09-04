@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { resolveDisplayName } from '@/lib/displayName';
 import type {
   LeaderboardEntry,
   ClassroomLeaderboardData,
@@ -141,7 +142,9 @@ export async function getClassroomLeaderboard(
 
       return {
         userId: m.student_id,
-        displayName: profile?.display_name || 'Unknown Student',
+        // `|| 'Unknown Student'` never fires for a placeholder: 'Player_570b3674' is a
+        // truthy string. A whole class saw each other as hex ids on the leaderboard.
+        displayName: resolveDisplayName([profile?.display_name], 'Unknown Student'),
         avatarUrl,
         totalXp,
         currentLevel,
@@ -325,7 +328,9 @@ export async function getFullClassroomLeaderboard(
 
       return {
         userId: m.student_id,
-        displayName: profile?.display_name || 'Unknown Student',
+        // `|| 'Unknown Student'` never fires for a placeholder: 'Player_570b3674' is a
+        // truthy string. A whole class saw each other as hex ids on the leaderboard.
+        displayName: resolveDisplayName([profile?.display_name], 'Unknown Student'),
         avatarUrl,
         totalXp,
         currentLevel,

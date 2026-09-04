@@ -12404,6 +12404,7 @@ const sv = {
       "action": "Börja nu"
     },
     "dashboard": {
+      "greeting": "Hej {{name}}",
       "title": "Mina lektioner",
       "subtitle": "Öva glosor och följ dina framsteg",
       "defaultName": "Elev",
@@ -13679,7 +13680,9 @@ const sv = {
         "pasteButton": "Klistra",
         "preview": {
           "label": "Går med i:",
-          "confirm": "Det här är ditt klassrum"
+          "confirm": "Det här är ditt klassrum",
+          "gameLabel": "Live-spel:",
+          "gameConfirm": "Din klass spelar nu – du hoppar in direkt"
         },
         "subtitle": "Fråga din lärare om koden",
         "success": "Du är med!",

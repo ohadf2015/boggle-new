@@ -6,6 +6,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Play, X, Users, Radio } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
 
@@ -139,7 +140,8 @@ export function ClassroomGameBanner({
     });
 
     // Navigate to game
-    router.push(`/${language}/multiplayer?code=${activeGame.gameCode}&classroom=true`);
+    // `room`, not `code` — see PlayWithClassButton. Nothing reads `?code=`.
+    router.push(`/${language}/multiplayer?room=${activeGame.gameCode}&classroom=true`);
   };
 
   const handleDismiss = () => {
@@ -185,6 +187,15 @@ export function ClassroomGameBanner({
             {t('student.activeGame.idleHint')}
           </span>
         </div>
+        {/* Decorative only: the strip already says everything in text. */}
+        <Image
+          src="/images/education/waiting-for-teacher.webp"
+          alt=""
+          aria-hidden="true"
+          width={112}
+          height={63}
+          className="pointer-events-none absolute end-2 bottom-0 h-full w-auto opacity-70 select-none"
+        />
       </m.div>
     );
   }
@@ -201,8 +212,18 @@ export function ClassroomGameBanner({
         className="relative rounded-neo border-3 border-black shadow-hard overflow-hidden"
       >
         {/* Vivid top bar */}
-        <div className="bg-neo-cyan px-6 pt-5 pb-4">
-          <div className="flex items-start justify-between gap-4">
+        <div className="relative bg-neo-cyan px-6 pt-5 pb-4 overflow-hidden">
+          {/* Decorative only — never carries meaning the text does not already carry. */}
+          <Image
+            src="/images/education/class-live.webp"
+            alt=""
+            aria-hidden="true"
+            width={200}
+            height={112}
+            priority={false}
+            className="pointer-events-none absolute end-0 -top-2 h-[140%] w-auto opacity-25 select-none"
+          />
+          <div className="relative flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-neo bg-black border-2 border-black flex items-center justify-center shadow-hard-sm">
                 <Play className="w-5 h-5 text-neo-cyan animate-pulse" />

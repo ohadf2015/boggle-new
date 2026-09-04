@@ -42,7 +42,9 @@ function createChain(data: Record<string, unknown> | null, error: unknown = null
   return {
     select: vi.fn().mockReturnValue({
       eq: vi.fn().mockReturnValue({
-        single: vi.fn().mockResolvedValue({ data, error }),
+        // `maybeSingle`, matching the hook: `single()` 406s when the row is absent, which
+        // is the normal state for a player who has not finished a game yet.
+        maybeSingle: vi.fn().mockResolvedValue({ data, error }),
       }),
     }),
   };

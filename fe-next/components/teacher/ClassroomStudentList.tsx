@@ -8,6 +8,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { Users, Mail, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '@/components/Avatar';
+import { resolveDisplayName } from '@/lib/displayName';
 
 interface ClassroomStudentListProps {
   classroomId: string;
@@ -80,7 +81,13 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
       {students.map((student, idx) => {
         // Handle Supabase returning profiles as array or object
         const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles;
-        const username = profile?.username || t('teacher.classrooms.students.unknown');
+        // `username` is a DB placeholder ('Player_<8hex>') for anyone who never picked a
+        // handle, and it is truthy — so `username || fallback` never fired and a teacher
+        // saw "Player_570b3674" for a student whose display_name said "Victoria Delong".
+        const username = resolveDisplayName(
+          [profile?.display_name, profile?.username],
+          t('teacher.classrooms.students.unknown')
+        );
         const email = profile?.email || '';
         const avatarConfig = profile?.avatar_config;
         const joinedAt = formatDistanceToNow(new Date(student.joined_at), { addSuffix: true });

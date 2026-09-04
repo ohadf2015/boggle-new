@@ -10744,6 +10744,7 @@ const en = {
       "teacherStarted": "{{teacher}} started a game"
     },
     "dashboard": {
+      "greeting": "Hi {{name}}",
       "title": "My Lessons",
       "subtitle": "Practice vocabulary and track your progress",
       "defaultName": "Student",
@@ -12004,7 +12005,9 @@ const en = {
         "pasteButton": "Paste",
         "preview": {
           "label": "Joining:",
-          "confirm": "This is your classroom"
+          "confirm": "This is your classroom",
+          "gameLabel": "Live game:",
+          "gameConfirm": "Your class is playing now \u2014 you'll join straight in"
         },
         "subtitle": "Enter your teacher's code",
         "success": "You're in!",

@@ -14,6 +14,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { subscribeToClassroomProgress, type ClassroomProgressUpdate } from '@/lib/supabaseRealtime';
+import { getClassroomStudents } from '@/lib/supabase/education';
+import { resolveDisplayName } from '@/lib/displayName';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -71,6 +73,28 @@ export function useRealtimeClassroomProgress({
   const [activeStudents, setActiveStudents] = useState<Map<string, Date>>(new Map());
   const [recentActivity, setRecentActivity] = useState<RecentActivityItem[]>([]);
 
+  // Realtime payloads carry only `student_id`. The feed used to read `data.student_name`, a
+  // column `student_lesson_progress` does not have anywhere in this codebase — so the
+  // fallback fired every time and the teacher's Live Activity listed raw UUIDs. Names come
+  // from the roster instead, resolved once per classroom.
+  const namesRef = useRef<Map<string, string>>(new Map());
+  useEffect(() => {
+    if (!enabled || !classroomId) return;
+    let cancelled = false;
+    getClassroomStudents(classroomId).then(({ data }) => {
+      if (cancelled || !data) return;
+      const next = new Map<string, string>();
+      for (const row of data) {
+        const p = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+        const id = row.student_id;
+        if (!id) continue;
+        next.set(id, resolveDisplayName([p?.display_name, p?.username], ''));
+      }
+      namesRef.current = next;
+    }).catch(() => { /* roster unavailable — fall back to the short id below */ });
+    return () => { cancelled = true; };
+  }, [classroomId, enabled]);
+
   // Use ref for callback to avoid re-subscription
   const onStudentActivityRef = useRef(onStudentActivity);
   useEffect(() => {
@@ -107,7 +131,9 @@ export function useRealtimeClassroomProgress({
     setRecentActivity(prev => {
       const newActivity: RecentActivityItem = {
         studentId,
-        studentName: data?.student_name || studentId,
+        // Never the bare UUID: it tells a teacher nothing and leaks an internal id. A short
+        // prefix at least distinguishes two unnamed students from each other.
+        studentName: namesRef.current.get(studentId) || `#${studentId.slice(0, 4)}`,
         activity,
         timestamp: now,
       };

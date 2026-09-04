@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
+import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { cn } from '@/lib/utils';
 import { m } from 'framer-motion';
 import { Copy, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { Language } from '@/lib/supabase/education/types';
+import Image from 'next/image';
 
 interface PlayTabFirstRunCardProps {
   onJoinCodeCreated?: (code: string) => void;
@@ -52,11 +54,21 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
     setIsLoading(false);
 
     if (result.success) {
-      const joinCode = result.code;
+      // `result.data.join_code`, NOT `result.code`. On success the hook returns
+      // `{ success: true, data: classroom }`; `code` is set ONLY on the 403 failure branch,
+      // where it carries 'CLASS_LIMIT_REACHED'. Reading `code` here meant `joinCode` was
+      // always undefined, the `if` never ran, and a teacher creating their first classroom
+      // was shown neither the success toast nor the join code — the one thing this card
+      // exists to produce.
+      const joinCode = result.data?.join_code;
       if (joinCode) {
         setCreatedJoinCode(joinCode);
         onJoinCodeCreated?.(joinCode);
         toast.success(t('teacher.classroom.success.created'));
+      } else {
+        // Created, but with no code to hand out. Say so rather than rendering nothing —
+        // a silent no-op here is indistinguishable from the button not working.
+        toast.error(t('teacher.classroom.error.createFailed'));
       }
     } else {
       toast.error(result.error || t('teacher.classroom.error.createFailed'));
@@ -64,10 +76,15 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
   };
 
   const copyJoinCode = () => {
-    if (createdJoinCode) {
-      navigator.clipboard.writeText(createdJoinCode).catch(() => {});
-      toast.success(t('teacher.classroom.codeCopied'));
-    }
+    if (!createdJoinCode) return;
+    // Copy the LINK, not the bare six characters — same reasoning as ClassroomManager's
+    // copy button. A teacher pastes this into Google Classroom or WhatsApp, and "ABC123"
+    // alone is a dead end for the student who receives it.
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    navigator.clipboard
+      .writeText(classroomInvitePayload(origin, language, createdJoinCode))
+      .catch(() => {});
+    toast.success(t('teacher.classroom.codeCopied'));
   };
 
   // After creation: show join code
@@ -88,6 +105,15 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
           <p className="text-sm font-neo-body text-black/70 mb-6">
             {t('teacher.classroom.createdBannerBody')}
           </p>
+          {/* Decorative only. */}
+          <Image
+            src="/images/education/share-code.webp"
+            alt=""
+            aria-hidden="true"
+            width={320}
+            height={180}
+            className="mx-auto mb-5 w-full max-w-[260px] h-auto select-none"
+          />
 
           {/* Join Code Display */}
           <div className="inline-block mb-4">

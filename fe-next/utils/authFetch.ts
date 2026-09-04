@@ -26,6 +26,16 @@ import logger from '@/utils/logger';
 interface FetchWithAuthOptions extends RequestInit {
   headers?: HeadersInit;
   skipAuthRefresh?: boolean; // Set to true to disable auto-refresh (for auth endpoints)
+  /**
+   * "No session, no request."
+   *
+   * Without this, a caller with no session still sends the request unauthenticated. For a
+   * public-shaped read that is right. For an endpoint that only exists for signed-in users
+   * it is a guaranteed 401 whose only product is a red line in session replay — and it can
+   * burn a caller's one-shot chance to report something. Opt in and the helper answers 401
+   * locally, so the caller's own error handling is unchanged but nothing leaves the device.
+   */
+  requireSession?: boolean;
 }
 
 /**
@@ -45,6 +55,10 @@ export async function fetchWithAuth(
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
   if (sessionError || !session?.access_token) {
+    if (options.requireSession) {
+      logger.debug(`No session - skipping authenticated-only request to ${url}`);
+      return new Response(null, { status: 401, statusText: 'Unauthorized' });
+    }
     // Downgraded warn → debug: fires for every guest request, not actionable.
     logger.debug('No valid session found - making unauthenticated request');
     return fetch(url, options);

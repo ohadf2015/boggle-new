@@ -498,9 +498,16 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // run (handleInvitationAutoJoin fires from prefilledRoom), so the host's room
   // is created/joined the same way — only the UI is replaced with a waiting
   // loader. The ClassroomModeBanner upstream already shows the share code + QR.
-  if (isClassroomMode) {
+  //
+  // Guarded on `prefilledRoom`: the loader is only honest while a real room is being
+  // joined or created. A student who pressed "Play with class" with no game running
+  // arrived as `?classroom=true&autoCreate=true` with NO `room=` — nothing to join,
+  // nothing to create, and this branch returned before the create modal could render.
+  // They sat on a spinner that could never resolve. Without a room, fall through to the
+  // normal lobby so there is always something to act on.
+  if (isClassroomMode && prefilledRoom) {
     return (
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
+      <div className="flex-1 flex items-center justify-center px-4 py-8" data-testid="classroom-waiting">
         <div className="flex flex-col items-center gap-3 text-neo-white font-neo-body">
           <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
           <p className="text-sm sm:text-base">{t('education.classroomGame.waitingForPlayers')}</p>

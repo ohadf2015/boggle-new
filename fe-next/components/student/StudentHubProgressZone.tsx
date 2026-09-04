@@ -4,10 +4,15 @@
  * StudentHubProgressZone — Progress zone for student hub (Zone 2)
  *
  * Compact hero card: XP bar + level badge + streak + rank + milestone tracker.
- * Extracted from the original StudentProgress in PageClient.
+ *
+ * Deliberately has NO celebration modal. Crossing a level used to throw a full-screen
+ * MilestoneCelebration over the hub the moment the XP query resolved — an interruption a
+ * student had to dismiss before they could reach their teacher's lesson, fired by a value
+ * arriving from the network rather than by anything they just did. The MilestoneTracker
+ * below shows the same progress without taking the screen.
  */
 
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
@@ -15,8 +20,6 @@ import { useWinStreak } from '@/hooks/useWinStreak';
 import { getXpProgress } from '@/backend/modules/xpManager';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import { MilestoneTracker } from '@/components/education/milestones/MilestoneTracker';
-import { MilestoneCelebration, type MilestonePayload } from '@/components/education/milestones/MilestoneCelebration';
-import { checkMilestoneCrossed, getMilestoneRewards } from '@/lib/supabase/education/milestones';
 import { Trophy, Zap, Flame } from 'lucide-react';
 
 interface StudentHubProgressZoneProps {
@@ -78,23 +81,6 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
   const rank = userEntry?.rank ?? '-';
   const totalXP = userEntry?.totalXp ?? 0;
   const xpProgress = useMemo(() => getXpProgress(totalXP), [totalXP]);
-
-  // Milestone celebration
-  const [milestonePayload, setMilestonePayload] = useState<MilestonePayload | null>(null);
-  const prevLevelRef = useRef(xpProgress.currentLevel);
-
-  useEffect(() => {
-    const oldLevel = prevLevelRef.current;
-    const newLevel = xpProgress.currentLevel;
-    if (newLevel > oldLevel) {
-      const crossed = checkMilestoneCrossed(oldLevel, newLevel);
-      if (crossed && crossed.isMajor) {
-        const rewards = getMilestoneRewards(crossed.level);
-        setMilestonePayload({ level: crossed.level, isMajor: crossed.isMajor, rewards });
-      }
-    }
-    prevLevelRef.current = newLevel;
-  }, [xpProgress.currentLevel]);
 
   const mascotVariant = useMemo(() => {
     if (currentStreak >= 7) return 'trophy' as const;
@@ -239,10 +225,6 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
           </div>
         </div>
       </m.div>
-      <MilestoneCelebration
-        milestone={milestonePayload}
-        onClose={() => setMilestonePayload(null)}
-      />
     </>
   );
 }

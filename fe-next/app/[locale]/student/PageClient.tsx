@@ -1,9 +1,20 @@
 /**
- * Student Dashboard — 3-Zone Hub Layout
+ * Student hub.
  *
- * Zone 1: Play (Play with Class + Quick Duel)
- * Zone 2: Progress (XP, rank, streak, milestones)
- * Zone 3: Learn (review, WOTD, challenges, lessons, leaderboard)
+ * A class of thirty lands here. In order, the page answers:
+ *
+ *   1. Is my class playing RIGHT NOW?  → the live banner, first, above everything.
+ *   2. What did my teacher give me?    → the lesson words.
+ *   3. Anything else                   → below that.
+ *
+ * It previously answered none of them first. The top of the page was a permanently mounted
+ * gradient "welcome" card — `isNewJoin` was hardcoded `true`, so it never went away — whose
+ * only button routed to `/daily`, OUT of the classroom. Under it came a Play zone of three
+ * equal-weight cards, then an XP/streak/rank hero, and only seventh, below all of it, the
+ * teacher's actual lesson. The live-game banner was buried inside the Play zone, so the one
+ * thing that is urgent was two scrolls down.
+ *
+ * The zones themselves are unchanged components; what changed is what leads.
  */
 
 'use client';
@@ -19,12 +30,17 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { StudentHubPlayZone } from '@/components/student/StudentHubPlayZone';
 import { StudentHubProgressZone } from '@/components/student/StudentHubProgressZone';
 import { StudentHubLearnZone } from '@/components/student/StudentHubLearnZone';
-import { StudentWelcomeSurface } from '@/components/student/StudentWelcomeSurface';
+import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
 import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
 import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { UserPlus, User, Award, UserX } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+
+const NAV_LINK =
+  'flex min-h-[44px] items-center gap-1.5 px-3 py-2 rounded-neo border border-neo-white/20 ' +
+  'bg-white/10 text-neo-white font-bold text-xs hover:bg-white/20 transition-colors';
 
 export default function StudentPageClient() {
   const { user, loading, profile } = useAuth();
@@ -32,7 +48,7 @@ export default function StudentPageClient() {
   const router = useRouter();
   const isRTL = language === 'he';
   const [isChecking, setIsChecking] = useState(true);
-  const { classroomId } = useStudentClassroom();
+  const { classroomId, classroom } = useStudentClassroom();
 
   useEffect(() => {
     if (loading) return;
@@ -60,40 +76,39 @@ export default function StudentPageClient() {
 
   if (!user) return null;
 
+  const studentName = resolveStudentDisplayName(profile, user, t('student.dashboard.defaultName'));
+
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
       <EducationHeader />
 
       <div className="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 flex-1 space-y-6">
-        {/* Page title + inline nav */}
-        <m.div
-          initial={{ opacity: 0, y: 12 }}
+        {/*
+          One header line, and it names the CLASS. "Student Dashboard" told a student nothing
+          they did not already know; their teacher's class name tells them they are in the
+          right place — the same question the join screen's preview card answers.
+        */}
+        <m.header
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
+          transition={{ duration: 0.25 }}
+          className="flex flex-wrap items-center justify-between gap-3"
         >
-          <div className="flex items-center gap-3 mb-1">
-            <span className="text-3xl">🎓</span>
-            <h1 className="text-3xl font-neo-display font-black text-neo-white text-balance">
-              {t('student.dashboard.title')}
+          <div className="min-w-0">
+            <p className="text-sm font-neo-body text-neo-white/70">
+              {t('student.dashboard.greeting', { name: studentName })}
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white text-balance truncate">
+              {classroom?.name ?? t('student.dashboard.title')}
             </h1>
           </div>
-          <p className="text-neo-white font-neo-body text-pretty ps-1 mb-3">
-            {t('student.dashboard.subtitle')}
-          </p>
 
-          {/* Compact inline nav */}
-          <div className="flex gap-2 ps-1">
-            <Link
-              href={`/${language}/student/profile`}
-              className="flex min-h-[44px] items-center gap-1.5 px-4 py-2.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-white/20 transition-colors"
-            >
+          <nav className="flex gap-2 shrink-0" aria-label={t('student.nav.profile')}>
+            <Link href={`/${language}/student/profile`} className={NAV_LINK}>
               <User className="w-3.5 h-3.5" />
               {t('student.nav.profile')}
             </Link>
-            <Link
-              href={`/${language}/student/achievements`}
-              className="flex min-h-[44px] items-center gap-1.5 px-4 py-2.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-white/20 transition-colors"
-            >
+            <Link href={`/${language}/student/achievements`} className={NAV_LINK}>
               <Award className="w-3.5 h-3.5" />
               {t('student.nav.achievements')}
             </Link>
@@ -106,16 +121,29 @@ export default function StudentPageClient() {
                   await signOut();
                   router.push(`/${language}/student/join`);
                 }}
-                className="flex min-h-[44px] items-center gap-1.5 px-4 py-2.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-neo-pink hover:text-neo-black transition-colors"
+                className={cn(NAV_LINK, 'hover:bg-neo-pink hover:text-neo-black')}
               >
                 <UserX className="w-3.5 h-3.5" />
                 {t('student.notYou')}
               </button>
             )}
-          </div>
-        </m.div>
+          </nav>
+        </m.header>
 
-        {/* Join Classroom CTA (when no classroom) */}
+        {/*
+          1. LIVE NOW. Hoisted out of the Play zone: when the teacher has a game running,
+          nothing else on this page matters, and it must not sit below three other cards.
+          The banner renders its own quiet "listening" state when no game is active.
+        */}
+        {classroomId && (
+          <ClassroomGameBanner
+            classroomId={classroomId}
+            userId={user.id}
+            username={studentName}
+          />
+        )}
+
+        {/* No class yet — the only thing worth showing. */}
         {!classroomId && (
           <m.div
             className="bg-neo-lime text-neo-black border-3 border-black rounded-neo shadow-hard p-6"
@@ -132,6 +160,15 @@ export default function StudentPageClient() {
             <p className="font-neo-body text-neo-black/70 mb-4">
               {t('student.joinClassroomDescription')}
             </p>
+            {/* Decorative only. */}
+            <Image
+              src="/images/education/no-class-yet.webp"
+              alt=""
+              aria-hidden="true"
+              width={360}
+              height={202}
+              className="mb-4 w-full max-w-xs h-auto select-none"
+            />
             <Link
               href={`/${language}/student/join`}
               className="inline-block px-6 py-3 bg-neo-black text-neo-lime font-neo-display font-bold rounded-neo border-3 border-black shadow-hard-sm hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
@@ -141,31 +178,22 @@ export default function StudentPageClient() {
           </m.div>
         )}
 
-        {/* Welcome Surface (on first classroom join) */}
-        {classroomId && (
-          <StudentWelcomeSurface
-            classroomId={classroomId}
-            userId={user.id}
-            isNewJoin={true}
-          />
-        )}
+        {/* 2. What the teacher gave them: lessons, and the words due for review. */}
+        <StudentHubLearnZone userId={user.id} classroomId={classroomId ?? undefined} />
 
-        {/* ZONE 1: Play */}
+        {/* 3. Ways to play. */}
         {classroomId && (
           <StudentHubPlayZone
             classroomId={classroomId}
             userId={user.id}
-            username={resolveStudentDisplayName(profile, user, t('student.dashboard.defaultName'))}
+            username={studentName}
           />
         )}
 
-        {/* ZONE 2: Progress */}
+        {/* 4. Their standing. Last: it is a reward for work already done, not a next action. */}
         {classroomId && (
           <StudentHubProgressZone classroomId={classroomId} userId={user.id} />
         )}
-
-        {/* ZONE 3: Learn */}
-        <StudentHubLearnZone userId={user.id} classroomId={classroomId ?? undefined} />
       </div>
     </div>
   );

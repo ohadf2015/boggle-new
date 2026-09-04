@@ -12166,6 +12166,7 @@ const ja = {
       "action": "今すぐ始める"
     },
     "dashboard": {
+      "greeting": "{{name}} さん、こんにちは",
       "title": "マイレッスン",
       "subtitle": "語彙を練習して上達しよう",
       "defaultName": "生徒",
@@ -13418,7 +13419,9 @@ const ja = {
         "pasteButton": "貼り付け",
         "preview": {
           "label": "参加先:",
-          "confirm": "このクラスへ参加します"
+          "confirm": "このクラスへ参加します",
+          "gameLabel": "ライブゲーム:",
+          "gameConfirm": "クラスが今プレイ中です — そのまま参加します"
         },
         "subtitle": "先生からもらったコードを入力してね",
         "success": "クラスに参加しました！",

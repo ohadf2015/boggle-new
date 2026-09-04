@@ -441,6 +441,8 @@ export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE';
 export interface JoinClassroomResult {
   success: boolean;
   classroomId?: string;
+  /** Set when the code the student typed was a LIVE GAME code — the room to enter now. */
+  gameCode?: string;
   code?: JoinClassroomErrorCode;
   error?: string;
 }
@@ -509,9 +511,12 @@ export function useJoinClassroom() {
         };
       }
 
-      const { classroomId } = await response.json();
+      // `gameCode` is present only when the student joined by typing the LIVE GAME code
+      // (the one on the projector) rather than the permanent roster code. It is the room
+      // they should walk straight into — being on the roster is not the thing they came for.
+      const { classroomId, gameCode } = await response.json();
 
-      return { success: true, classroomId };
+      return { success: true, classroomId, ...(gameCode ? { gameCode } : {}) };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to join classroom';
       logger.error('Exception in joinClassroom:', error);

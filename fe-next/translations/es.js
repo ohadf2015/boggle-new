@@ -12145,6 +12145,7 @@ const es = {
     "joinClassroomDescription": "Ingresa el código que te dio tu profe para entrar al aula",
     "notYou": "¿No eres tú? Empieza de nuevo",
     "dashboard": {
+      "greeting": "Hola {{name}}",
       "title": "Mis Lecciones",
       "subtitle": "Practica vocabulario y sigue tu progreso",
       "defaultName": "Estudiante",
@@ -13422,7 +13423,9 @@ const es = {
         "pasteButton": "Pegar código",
         "preview": {
           "label": "Te unes a:",
-          "confirm": "Este es tu aula"
+          "confirm": "Este es tu aula",
+          "gameLabel": "Partida en vivo:",
+          "gameConfirm": "Tu clase está jugando ahora: entrarás directamente"
         },
         "success": "¡Ya estás dentro!",
         "invalidCode": "Ese código no funciona",
