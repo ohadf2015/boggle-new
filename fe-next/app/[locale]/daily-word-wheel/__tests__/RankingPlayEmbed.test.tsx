@@ -76,4 +76,13 @@ describe('RankingPlayEmbed', () => {
     });
     expect(validateWord).not.toHaveBeenCalled();
   });
+
+  it('locale-only mount uses a tens-wide 4–9 list, not 0/1', () => {
+    render(<RankingPlayEmbed locale="en" />);
+    const label = screen.getByTestId('found-count').textContent || '';
+    const total = Number(label.split('/')[1]);
+    expect(total).toBeGreaterThanOrEqual(10);
+    const four = screen.getByTestId('length-bucket-4').textContent || '';
+    expect(four).not.toBe('4:0/0');
+  });
 });
