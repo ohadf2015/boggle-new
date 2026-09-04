@@ -3,8 +3,11 @@
 /**
  * StudentHubPlayZone — Play zone for student hub (Zone 1)
  *
- * Three cards: "Play with Class", "Solo Practice", and "Quick Duel"
- * Plus the ClassroomGameBanner when an active game exists.
+ * Three cards: "Play with Class", "Solo Practice", and "Quick Duel".
+ *
+ * The live-game banner used to live here. It was hoisted to the page itself: when the
+ * teacher's game is running that is the only thing that matters, and inside this zone it sat
+ * below the header and three sibling cards.
  *
  * Solo Practice is unconditional — it works with no teacher setup,
  * no active game, and no classmates. This ensures students always
@@ -16,7 +19,6 @@ import { m } from 'framer-motion';
 import { Swords, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PlayWithClassButton } from '@/components/student/PlayWithClassButton';
-import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
 
 interface StudentHubPlayZoneProps {
   classroomId: string;
@@ -39,14 +41,6 @@ export function StudentHubPlayZone({ classroomId, userId, username }: StudentHub
       <h2 className="text-lg font-neo-display font-black text-neo-lime mb-3 uppercase tracking-wide">
         {t('student.hub.playZone')}
       </h2>
-
-      <div className="mb-3">
-        <ClassroomGameBanner
-          classroomId={classroomId}
-          userId={userId}
-          username={username}
-        />
-      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <PlayWithClassButton

@@ -85,14 +85,18 @@ describe('PlayWithClassButton', () => {
     expect(screen.getByText((text) => text.includes('student.playWithClass.playerCount'))).toBeInTheDocument();
   });
 
-  it('navigates to multiplayer with autoCreate when no active game clicked', () => {
+  /**
+   * Students do not start class games — teachers do. With no game running this used to
+   * navigate to `?classroom=true&autoCreate=true`, which carries no room to join and
+   * nothing to create, and parked the student on a spinner. It is not an action, so it
+   * must not be a button: it is a status line, and Solo Practice sits beside it.
+   */
+  it('is not clickable when no game is running', () => {
     mockUseActiveClassroomGame.mockReturnValue({ activeGame: null, isConnected: true });
     render(<PlayWithClassButton {...defaultProps} />);
 
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
-    expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?classroom=true&autoCreate=true');
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it('navigates to multiplayer with game code when active game clicked', () => {
@@ -111,7 +115,12 @@ describe('PlayWithClassButton', () => {
     const button = screen.getByRole('button');
     fireEvent.click(button);
 
-    expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?code=ABC123&classroom=true');
+    // `room`, NOT `code`. The multiplayer session only ever reads `?room=`
+    // (hooks/useMultiplayerSession.ts) — nothing anywhere reads `?code=`. With
+    // `?code=` the prefilled room stayed empty, auto-join never fired, and
+    // `?classroom=true` short-circuited the flow to a spinner that never
+    // resolved. Every student who pressed "Play with class" parked there.
+    expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123&classroom=true');
   });
 
   it('passes classroomId to useActiveClassroomGame', () => {

@@ -343,7 +343,11 @@ export async function getClassroomStudents(
     const studentIds = memberships.map(m => m.student_id);
     const { data: profiles, error: profilesError } = await supabase
       .from('public_profiles')
-      .select('id, username, avatar_config')
+      // `display_name` as well as `username`: `username` defaults to the DB placeholder
+      // `'Player_' || substr(id, 1, 8)`, so a roster built on it alone showed a teacher
+      // "Player_570b3674" for a student whose display_name said "Victoria Delong".
+      // Callers resolve with `resolveDisplayName([display_name, username], fallback)`.
+      .select('id, username, display_name, avatar_config')
       .in('id', studentIds);
 
     if (profilesError) {

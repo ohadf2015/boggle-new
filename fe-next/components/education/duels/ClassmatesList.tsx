@@ -19,6 +19,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { ChallengeButton } from './ChallengeButton';
 import Avatar from '@/components/Avatar';
 import type { ClassroomStudent } from '@/lib/supabase/education';
+import { resolveDisplayName } from '@/lib/displayName';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -81,7 +82,12 @@ export function ClassmatesList({
           ? classmate.profiles[0]
           : classmate.profiles;
 
-        const displayName = profile?.username || t('common.unknown');
+        // Same roster source as the teacher's list — and the same placeholder problem:
+        // a classmate showed up as 'Player_<hex>' rather than by name.
+        const displayName = resolveDisplayName(
+          [profile?.display_name, profile?.username],
+          t('common.unknown')
+        );
         return (
           <div
             key={classmate.id}

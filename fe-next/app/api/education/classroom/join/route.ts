@@ -4,6 +4,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canAddStudent } from '@/lib/subscriptions';
+import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 
 const joinClassroomSchema = z.object({
   joinCode: z.string().min(1).max(10),
@@ -135,9 +136,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const classroom = Array.isArray(classroomResult)
+    let classroom = Array.isArray(classroomResult)
       ? classroomResult[0]
       : classroomResult;
+
+    // Not a roster code? Try the code the student is far more likely to be holding: the LIVE
+    // GAME code on the projector. Two systems mint six-character codes into the same
+    // `/join/[code]` URL, and only the roster one used to resolve — so the common case, a
+    // student typing what is on the board, answered "Classroom not found".
+    //
+    // Resolving it here enrols them AND hands back the room to walk into, which is the whole
+    // journey ("join the class and play") in one request.
+    let liveGameCode: string | null = null;
+    if (!classroom) {
+      try {
+        const game = await lookupLiveClassroomGame(normalizedCode);
+        if (game) {
+          classroom = { id: game.classroomId };
+          liveGameCode = normalizedCode;
+        }
+      } catch (gameLookupError) {
+        // Redis down. Fall through to the not-found answer below rather than 500 — the
+        // student's next action is the same either way (re-check the code).
+        logger.error('Live game lookup failed during join:', gameLookupError);
+      }
+    }
 
     if (!classroom) {
       return NextResponse.json(
@@ -160,6 +183,7 @@ export async function POST(request: NextRequest) {
         {
           message: 'Already a member of this classroom',
           classroomId: classroom.id,
+          ...(liveGameCode ? { gameCode: liveGameCode } : {}),
         },
         { status: 200 }
       );
@@ -199,6 +223,7 @@ export async function POST(request: NextRequest) {
       {
         message: 'Successfully joined classroom',
         classroomId: classroom.id,
+        ...(liveGameCode ? { gameCode: liveGameCode } : {}),
       },
       { status: 200 }
     );

@@ -6,6 +6,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { resolveDisplayName } from '@/lib/displayName';
 import type {
   WordsAttemptedRecord,
   StudentProgressSummary,
@@ -120,7 +121,10 @@ export async function getStudentsProgressSummary(
       const isStruggling = totalAttempts > 0 && overallAccuracy < 60;
 
       summaries.push({
-        studentId, displayName: profile.display_name || 'Unknown',
+        studentId,
+        // Placeholder display names ('Player_<hex>') are truthy, so the `|| 'Unknown'`
+        // guard never fired and the teacher's progress table listed hex ids.
+        displayName: resolveDisplayName([profile.display_name], 'Unknown'),
         avatarUrl: profile.avatar_config || profile.avatar_emoji || null, totalXp, currentLevel, vocabularyMastery,
         overallAccuracy, wordsAttempted, wordsMastered, lastPracticeDate,
         isStruggling, currentStreak,

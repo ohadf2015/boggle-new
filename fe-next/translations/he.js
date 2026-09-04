@@ -12012,6 +12012,7 @@ const he = {
       "teacherStarted": "{{teacher}} התחיל משחק"
     },
     "dashboard": {
+      "greeting": "היי {{name}}",
       "title": "השיעורים שלי",
       "subtitle": "תרגלו מילים ועקבו אחר ההתקדמות",
       "defaultName": "תלמיד",
@@ -13283,7 +13284,9 @@ const he = {
         "pasteButton": "הדבק",
         "preview": {
           "label": "מצטרף אל:",
-          "confirm": "זו הכיתה שלך"
+          "confirm": "זו הכיתה שלך",
+          "gameLabel": "משחק פעיל:",
+          "gameConfirm": "הכיתה שלך משחקת עכשיו — תצטרפו ישר"
         },
         "subtitle": "הכנס את הקוד מהמורה",
         "success": "נכנסת!",

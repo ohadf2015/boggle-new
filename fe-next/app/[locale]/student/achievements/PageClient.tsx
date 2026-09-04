@@ -21,6 +21,7 @@ import type { AchievementCategory } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import Image from 'next/image';
 
 export default function StudentAchievementsPageClient() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -133,9 +134,20 @@ export default function StudentAchievementsPageClient() {
         </Link>
 
         {/* Page Title */}
-        <h1 className="text-3xl font-neo-display font-black text-neo-white mb-6">
-          {t('student.dashboard.achievements')}
-        </h1>
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <h1 className="text-3xl font-neo-display font-black text-neo-white">
+            {t('student.dashboard.achievements')}
+          </h1>
+          {/* Decorative only. */}
+          <Image
+            src="/images/education/words-mastered.webp"
+            alt=""
+            aria-hidden="true"
+            width={200}
+            height={112}
+            className="hidden sm:block w-40 h-auto shrink-0 select-none"
+          />
+        </div>
 
         {/* Achievement Grid */}
         {isLoadingAchievements ? (

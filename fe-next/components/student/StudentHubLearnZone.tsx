@@ -3,11 +3,13 @@
 /**
  * StudentHubLearnZone — Learn zone for student hub (Zone 3)
  *
- * ReviewDueBadge, WordOfTheDay, ChallengePanel, StudentLessonView,
- * and a collapsible ClassroomLeaderboard.
+ * Ordered by whose material it is. The teacher's lessons lead, preceded only by the review
+ * badge — which is itself the teacher's words, the ones due today. Word of the Day and the
+ * generic challenge panel follow: they are the app's content, not the class's, and they used
+ * to sit above the lesson list and push it off the first screen.
  */
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
@@ -20,6 +22,7 @@ import { WordOfTheDay } from '@/components/education/animations/WordOfTheDay';
 import { ChallengePanel } from '@/components/education/challenges/ChallengePanel';
 import StudentLessonView from '@/components/student/StudentLessonView';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
+import { pickWordOfTheDay } from '@/lib/education/wordOfTheDay';
 
 interface StudentHubLearnZoneProps {
   userId: string;
@@ -50,15 +53,10 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
   );
   const { wordsForToday } = useSpacedRepetition(words, lessonId);
 
-  // Stable random WOTD — pick once per mount
-  const wotdIndexRef = useRef<number | null>(null);
-  const wotdWord = useMemo(() => {
-    if (words.length === 0) return null;
-    if (wotdIndexRef.current === null) {
-      wotdIndexRef.current = Math.floor(Math.random() * words.length);
-    }
-    return words[wotdIndexRef.current % words.length];
-  }, [words]);
+  // Deterministic per day + lesson. It used to be `Math.random()` cached in a ref, so it was
+  // stable only within one mount: a student navigating away and back got a different "word
+  // of the day" several times an afternoon, and no two classmates saw the same one.
+  const wotdWord = useMemo(() => pickWordOfTheDay(words, lessonId), [words, lessonId]);
 
   return (
     <section aria-label={t('student.hub.learnZone')} className="space-y-4 relative">
@@ -72,7 +70,11 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-3 px-5 py-3 rounded-neo border-neo-thick border-black bg-neo-lime text-black font-neo-display font-black shadow-hard-lg"
+            // Inline, in the flow — NOT `fixed ... z-[80]`. A fixed banner across the top of
+            // the viewport sits over whatever the student is reading and, at that z-index,
+            // swallows taps on everything beneath it. It says "you earned XP"; that never
+            // justifies covering the page.
+            className="flex items-center gap-3 px-5 py-3 rounded-neo border-neo-thick border-black bg-neo-lime text-black font-neo-display font-black shadow-hard-lg"
           >
             <Sparkles className="w-6 h-6" aria-hidden="true" />
             <span className="text-lg uppercase tracking-wide">
@@ -101,14 +103,6 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
         />
       )}
 
-      {/* Word of the Day */}
-      {wotdWord && (
-        <WordOfTheDay word={wotdWord} />
-      )}
-
-      {/* Challenges */}
-      <ChallengePanel playerId={userId} />
-
       {/* Lessons */}
       <m.div
         initial={{ opacity: 0, y: 20 }}
@@ -118,6 +112,14 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
       >
         <StudentLessonView />
       </m.div>
+
+      {/* Word of the Day */}
+      {wotdWord && (
+        <WordOfTheDay word={wotdWord} />
+      )}
+
+      {/* Challenges */}
+      <ChallengePanel playerId={userId} />
 
       {/* Collapsible Leaderboard */}
       {classroomId && (
