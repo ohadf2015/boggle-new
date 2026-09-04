@@ -7,6 +7,7 @@ import {
   deleteAssignment as deleteAssignmentAPI,
 } from '@/lib/supabase/education/assignments';
 import type { TeacherAssignment, AssignmentStatus, AssignmentType } from '@/lib/supabase/education/types';
+import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '@/utils/logger';
 
 interface UseAssignmentsState {
@@ -24,6 +25,7 @@ interface UseAssignmentsActions {
     due_date?: string | null;
     title?: string | null;
     instructions?: string | null;
+    practice_focus?: PracticeFocusSetting | null;
   }) => Promise<{ success: boolean; error?: string }>;
   deleteAssignment: (assignmentId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -85,6 +87,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       due_date?: string | null;
       title?: string | null;
       instructions?: string | null;
+      practice_focus?: PracticeFocusSetting | null;
     }): Promise<{ success: boolean; error?: string }> => {
       // Optimistic update: add temporary assignment
       const tempId = `temp-${Date.now()}`;

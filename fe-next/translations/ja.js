@@ -8699,6 +8699,73 @@ const ja = {
     "daysAgo": "{n}日前"
   },
   "admin": {
+    "teacherPro": {
+      "title": "Teacher Pro をプレゼント",
+      "subtitle": "メールアドレスで先生に Pro を付与します。カード不要、トライアルなし、受け取り手続きも不要です。",
+      "form": {
+        "email": "先生のメールアドレス",
+        "fullName": "お名前（任意）",
+        "fullNameHint": "空欄なら申請またはプロフィールの名前を使います",
+        "duration": "期間",
+        "until": "{date} まで有効",
+        "locale": "メールの言語",
+        "note": "個人的なメッセージ（任意）",
+        "noteHint": "率直な一言・二言。そのままメールに載ります。",
+        "reason": "内部メモ（任意）",
+        "reasonHint": "例：2026-09-04 の授業が中断 — メールには載りません",
+        "submit": "Pro を付与してメールを送る",
+        "submitting": "付与中…",
+        "preview": "メールをプレビュー",
+        "previewTitle": "メールのプレビュー",
+        "help": "Pro はすぐに有効になります。このアドレスのアカウントがまだ無い場合は、初回ログイン時に有効になります。",
+        "days": {
+          "30": "30日",
+          "90": "3か月",
+          "180": "6か月",
+          "365": "1年",
+          "730": "2年"
+        }
+      },
+      "result": {
+        "toast": "Pro を付与しました",
+        "active": "完了 — {email} は {date} まで Teacher Pro です。",
+        "pending_signup": "予約済み — {email} にはまだアカウントがありません。このアドレスでログインした瞬間に Pro が有効になります（{date} まで）。",
+        "emailSent": "ギフトメールを送信しました。",
+        "emailFailed": "付与は有効ですが、メールは送信されませんでした。手動で連絡してください。"
+      },
+      "error": {
+        "already_paid": "この先生はすでに Pro を購入しています。変更はありません。クレジットは Polar で対応してください。",
+        "invalid_email": "有効なメールアドレスではありません。",
+        "generic": "Pro を付与できませんでした："
+      },
+      "status": {
+        "active": "有効",
+        "pending_signup": "登録待ち",
+        "expired": "期限切れ",
+        "revoked": "取り消し"
+      },
+      "list": {
+        "title": "付与一覧",
+        "refresh": "更新",
+        "loading": "読み込み中…",
+        "empty": "まだ付与はありません。",
+        "loadError": "付与一覧を読み込めませんでした。",
+        "col": {
+          "teacher": "先生",
+          "status": "状態",
+          "until": "期限",
+          "email": "メール",
+          "granted": "付与日"
+        },
+        "daysCount": "{count}日",
+        "sent": "送信済み",
+        "notSent": "未送信",
+        "seenInApp": "アプリで確認済み",
+        "revoke": "取り消す",
+        "revokeConfirm": "{email} の Pro を今すぐ終了しますか？無料プランに戻ります。",
+        "revoked": "付与を取り消しました"
+      }
+    },
     "teacherFunnel": {
       "title": "教師ファネル",
       "subtitle": "承認された教師がその後どう動いたか。",
@@ -8789,6 +8856,7 @@ const ja = {
     "loadingSession": "セキュアセッションを確立しています...",
     "sessionError": "セッションエラー",
     "nav": {
+      "teacherPro": "Teacher Pro ギフト",
       "players": "プレイヤー",
       "dictionary": "辞書",
       "invalidWords": "無効な単語",
@@ -12260,10 +12328,70 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "levels": {
+      "label": "レベル",
+      "support": "サポート",
+      "core": "基本",
+      "challenge": "チャレンジ",
+      "legend": "サポート：ライブ対戦中に単語バンクが表示され、サポート＋基本の単語を練習 · 基本：標準設定 · チャレンジ：チャレンジ単語を含む全単語を練習し、より長い単語が目標になります",
+      "saved": "レベルを保存しました",
+      "saveFailed": "レベルを保存できませんでした。もう一度お試しください"
+    },
+    "lastGame": {
+      "title": "前回のクラス対戦",
+      "loading": "前回の対戦を読み込み中…",
+      "error": "前回の対戦結果を読み込めませんでした。",
+      "retry": "再試行",
+      "emptyTitle": "まだクラス対戦がありません",
+      "emptyHint": "「プレイ」タブから対戦を始めると、クラスが見つけた単語・見つけられなかった単語がここに表示されます。",
+      "previousGames": "過去の対戦",
+      "playersPlayed": "{{count}}人の生徒が参加",
+      "studentFallback": "生徒",
+      "coverage": "クラスが見つけた単語の割合",
+      "nobodyFound": "誰も見つけられなかった単語",
+      "avgAccuracy": "平均正答率（レッスン単語）",
+      "wordsToReview": "復習したい単語",
+      "nothingToReview": "復習は不要です。クラスはレッスンの単語をすべて見つけました。",
+      "missedBy": "未発見",
+      "student": "生徒",
+      "score": "スコア",
+      "found": "発見",
+      "missed": "未発見",
+      "lessonWords": "レッスン単語",
+      "practiceCta": "これらの単語を練習する",
+      "mode": {
+        "classic": "クラシック",
+        "blast": "ブラスト",
+        "wordHunt": "ワードハント",
+        "wheelRush": "ホイールラッシュ"
+      }
+    },
+    "proWelcome": {
+      "title": "Teacher Pro が有効になりました",
+      "until": "{date} まであなたのものです。手続きもカードも不要。",
+      "perk": {
+        "analytics": "毎回のゲーム後に、クラスが苦手だった単語がわかる",
+        "reports": "印刷できるクラス・生徒レポート",
+        "unlimited": "クラスも生徒も無制限"
+      },
+      "noCard": "終了後は無料プランに戻るだけです。あなたが選ばない限り、請求することはありません。",
+      "cta": "はじめる"
+    },
+    "plan": {
+      "pro": "Pro",
+      "free": "無料プラン",
+      "upgrade": "アップグレード",
+      "giftedUntil": "ギフト · {date} まで",
+      "renewsOn": "{date} に更新",
+      "giftEnded": "Pro ギフトは終了しました"
+    },
     "proGate": {
       "cta": "Pro で解除 — 月額 ${{price}}"
     },
     "subscription": {
+      "giftedNoCard": "カード登録も自動更新もありません。期限が来たら無料プランに戻るだけです。",
+      "giftedUntil": "無償 Pro の期限",
+      "giftedBadge": "ギフト",
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
       "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
@@ -12808,6 +12936,71 @@ const ja = {
     }
   },
   "education": {
+    "wordBank": {
+      "title": "単語バンク（{{count}}）",
+      "hint": "これらの単語はボードに隠れています。タップで閉じる。",
+      "challengeBadge": "チャレンジ：{{min}}文字以上の単語をねらおう"
+    },
+    "studentPreview": {
+      "button": "生徒に見える画面をプレビュー",
+      "buttonHint": "授業の前に、参加画面・待機ルーム・サンプルボードを順に確認できます。",
+      "disabledHint": "プレビューするには、クラスとレッスンを1つ以上選んでください。",
+      "title": "生徒画面のプレビュー",
+      "subtitle": "生徒のスマホに表示される画面を、そのまま順番に確認します。",
+      "close": "プレビューを閉じる",
+      "stepsLabel": "プレビューの手順",
+      "stepOf": "ステップ {current}/{total}：",
+      "steps": {
+        "join": "参加",
+        "waiting": "待機ルーム",
+        "game": "ゲーム"
+      },
+      "next": "次へ",
+      "back": "戻る",
+      "done": "完了",
+      "join": {
+        "caption": "生徒はこのリンクを開くか、参加ページでクラスコードを入力します：",
+        "classroomHint": "これは {name} の固定コードです。ゲーム開始後は、同じように使えるルームコードもプロジェクターに表示されます。"
+      },
+      "waiting": {
+        "title": "先生がスタートするのを待っています",
+        "subtitle": "この画面を開いたままにしてください。ゲームは自動で始まります。",
+        "settingsTitle": "今回のラウンド",
+        "teacherHint": "生徒はあなたが「スタート」を押すまでここで待ちます。選んだモード・時間・ボードサイズはすでに生徒にも見えています。"
+      },
+      "settings": {
+        "mode": "モード",
+        "timer": "時間",
+        "board": "ボード",
+        "minLength": "最短の単語",
+        "minutes": "{count}分",
+        "letters": "{count}文字"
+      },
+      "game": {
+        "timeLeft": "残り時間",
+        "boardLabel": "サンプルの文字ボード",
+        "samplePath": "ハイライト：{word}",
+        "minLength": "単語は{count}文字以上必要です。",
+        "hiddenWords": "このボードに隠れている単語",
+        "noneHidden": "選んだ単語はどれも、このサイズのボードには入りません。"
+      },
+      "shuffle": "サンプルボードをシャッフル",
+      "freshBoardNote": "これはサンプルです。実際のボードはゲーム開始時に新しく生成され、単語の組み合わせも変わります。",
+      "skipped": {
+        "title": "ボードに入らない単語",
+        "subtitle": "レッスンでは引き続き練習できますが、文字グリッド上でなぞることはできません。",
+        "none": "選んだ単語はすべてボードに隠せます。",
+        "reason": {
+          "empty": "空の項目",
+          "multiWord": "スペースやハイフンを含む",
+          "tooShort": "3文字未満",
+          "tooLong": "12文字を超えている",
+          "notInDictionary": "ゲームの辞書にない",
+          "tooLongForBoard": "このボードサイズには長すぎます（最大{max}文字）。大きいボードを選んでください。",
+          "notInSample": "このサンプルには入りませんでした。実際のボードには出る可能性があります。"
+        }
+      }
+    },
     "results": {
       "title": "レッスンのまとめ",
       "yourMastery": "レッスンの単語 {{total}} 個のうち {{found}} 個を発見",

@@ -23,8 +23,9 @@ import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
 import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
-import { getClassroomGame } from '../../modules/classroomGameManager';
+import { getClassroomGame, updateClassroomGameStatus, type ClassroomGame } from '../../modules/classroomGameManager';
 import { buildClassroomSummary } from '../../modules/classroomSummary';
+import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import type { UserData } from './types';
 import logger from '../../utils/logger';
@@ -210,8 +211,9 @@ export async function calculateAndBroadcastFinalScores(
   // not on the client: `lessonGameData` only exists in the TEACHER's
   // sessionStorage, so a client-side version is empty for every student.
   let classroomSummary;
+  let classroomGame: ClassroomGame | null = null;
   try {
-    const classroomGame = await getClassroomGame(gameCode);
+    classroomGame = await getClassroomGame(gameCode);
     if (classroomGame) {
       classroomSummary = buildClassroomSummary({
         language,
@@ -325,5 +327,30 @@ export async function calculateAndBroadcastFinalScores(
       }
     }
     await recordGameResultsToSupabase(io, gameCode, resultsWithIconAchievements, game, mmrDeltasByPlayerId);
+  }
+
+  // Teacher-hosted room: record each student's lesson progress + XP and tell the
+  // classroom room about its rewards. This lived only behind two socket events
+  // (`endClassroomGame`, `classroomGameEnd`) that no client ever emitted, so a
+  // real class of five played on 2026-09-04 and nothing was written — no
+  // practice session, no word progress, no XP, empty analytics. The server's
+  // own end-of-round path is the one place every classroom game passes through.
+  // Runs AFTER the results broadcast so a slow database never delays scores;
+  // `persistClassroomGameScores` is idempotent (Redis SET NX), so the legacy
+  // handlers stay safe if a client ever does emit them.
+  if (classroomGame) {
+    try {
+      await updateClassroomGameStatus(gameCode, 'finished');
+      const rewards = await persistClassroomGameScores(
+        classroomGame,
+        playerScoresFromGameResults(
+          resultsWithIconAchievements,
+          (game.users ?? {}) as Record<string, { authUserId?: string | null; isBot?: boolean } | undefined>,
+        ),
+      );
+      io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameEnded', { gameCode, rewards });
+    } catch (err) {
+      logger.error('CLASSROOM_GAME', `Failed to persist classroom game ${gameCode}: ${(err as Error).message}`);
+    }
   }
 }

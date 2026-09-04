@@ -10,6 +10,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { type TierConfig, getTierConfig } from './lemonsqueezy'
 import { FREE_TIER_LIMITS } from './education/freeTierLimits'
+import { resolveProEntitlement, type SubscriptionSource } from './education/proGrant'
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing'
 export type Tier = 'free' | 'pro'
@@ -22,6 +23,10 @@ export interface TeacherSubscription {
   current_period_end: string | null
   cancel_at_period_end: boolean
   has_pro: boolean
+  /** Who owns the row's lifecycle: the payment provider, or an admin grant with a hard deadline. */
+  source: SubscriptionSource
+  /** Set only for an admin grant whose deadline has passed (the row still says pro/active). */
+  grant_expired: boolean
 }
 
 /**
@@ -55,17 +60,26 @@ export async function checkTeacherSubscription(
       current_period_end: null,
       cancel_at_period_end: false,
       has_pro: false,
+      source: 'polar',
+      grant_expired: false,
     }
   }
+
+  // One rule for "is this teacher Pro": provider rows on tier+status, admin grants
+  // also on their deadline (nothing renews a grant). See lib/education/proGrant.ts.
+  const entitlement = resolveProEntitlement(data, Date.now())
+  const freeConfig = getTierConfig('free')
 
   return {
     tier: data.tier as Tier,
     status: data.status as SubscriptionStatus,
-    classes_limit: data.tier === 'pro' ? null : getTierConfig('free').classes_limit,
-    students_limit_per_class: data.tier === 'pro' ? null : getTierConfig('free').students_limit_per_class,
+    classes_limit: entitlement.hasPro ? null : freeConfig.classes_limit,
+    students_limit_per_class: entitlement.hasPro ? null : freeConfig.students_limit_per_class,
     current_period_end: data.current_period_end,
     cancel_at_period_end: data.cancel_at_period_end,
-    has_pro: data.tier === 'pro' && data.status === 'active',
+    has_pro: entitlement.hasPro,
+    source: entitlement.source,
+    grant_expired: entitlement.expired,
   }
 }
 
@@ -244,6 +258,11 @@ export async function upsertSubscription({
       lemon_squeezy_variant_id: providerProductId ?? null,
       current_period_end: currentPeriodEnd ?? null,
       cancel_at_period_end: cancelAtPeriodEnd ?? false,
+      // A paid subscription replaces any complimentary grant on the same row and
+      // takes over its lifecycle — otherwise the grant's deadline would keep
+      // applying to a teacher who is now paying.
+      source: 'polar',
+      grant_id: null,
     },
     { onConflict: 'user_id' }
   )

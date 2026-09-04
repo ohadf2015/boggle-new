@@ -8508,6 +8508,73 @@ const es = {
     "daysAgo": "hace {n}d"
   },
   "admin": {
+    "teacherPro": {
+      "title": "Regalar Teacher Pro",
+      "subtitle": "Da Pro a un profesor por correo: sin tarjeta, sin prueba, nada que canjear.",
+      "form": {
+        "email": "Correo del profesor",
+        "fullName": "Nombre (opcional)",
+        "fullNameHint": "Déjalo vacío para usar el nombre de su solicitud o perfil",
+        "duration": "Durante",
+        "until": "Válido hasta el {date}",
+        "locale": "Idioma del correo",
+        "note": "Nota personal (opcional)",
+        "noteHint": "Una o dos líneas sinceras. Va en el correo tal cual.",
+        "reason": "Motivo interno (opcional)",
+        "reasonHint": "p. ej. clase arruinada el 04/09/2026 — no se envía",
+        "submit": "Conceder Pro y enviar correo",
+        "submitting": "Concediendo…",
+        "preview": "Ver el correo",
+        "previewTitle": "Vista previa del correo",
+        "help": "Pro se activa al instante. Si aún no hay cuenta con este correo, se activa en su primer inicio de sesión.",
+        "days": {
+          "30": "30 días",
+          "90": "3 meses",
+          "180": "6 meses",
+          "365": "1 año",
+          "730": "2 años"
+        }
+      },
+      "result": {
+        "toast": "Pro concedido",
+        "active": "Listo: {email} tiene Teacher Pro hasta el {date}.",
+        "pending_signup": "Reservado: {email} aún no tiene cuenta. Pro se activará en cuanto inicie sesión con este correo (hasta el {date}).",
+        "emailSent": "Correo de regalo enviado.",
+        "emailFailed": "La concesión está activa, pero el correo NO se envió: escríbele a mano."
+      },
+      "error": {
+        "already_paid": "Este profesor ya paga Pro. No se cambió nada; gestiona los créditos en Polar.",
+        "invalid_email": "Ese correo no es válido.",
+        "generic": "No se pudo conceder Pro:"
+      },
+      "status": {
+        "active": "Activo",
+        "pending_signup": "Pendiente de registro",
+        "expired": "Caducado",
+        "revoked": "Revocado"
+      },
+      "list": {
+        "title": "Concesiones",
+        "refresh": "Actualizar",
+        "loading": "Cargando…",
+        "empty": "Todavía no hay concesiones.",
+        "loadError": "No se pudieron cargar las concesiones.",
+        "col": {
+          "teacher": "Profesor",
+          "status": "Estado",
+          "until": "Hasta",
+          "email": "Correo",
+          "granted": "Concedido"
+        },
+        "daysCount": "{count} días",
+        "sent": "Enviado",
+        "notSent": "No enviado",
+        "seenInApp": "Visto en la app",
+        "revoke": "Revocar",
+        "revokeConfirm": "¿Terminar el Pro de {email} ahora? Volverá al plan gratuito.",
+        "revoked": "Concesión revocada"
+      }
+    },
     "teacherFunnel": {
       "title": "Embudo de docentes",
       "subtitle": "Qué hicieron realmente los docentes aprobados.",
@@ -8598,6 +8665,7 @@ const es = {
     "loadingSession": "Estableciendo sesión segura...",
     "sessionError": "Error de Sesión",
     "nav": {
+      "teacherPro": "Regalos Teacher Pro",
       "players": "Jugadores",
       "dictionary": "Diccionario",
       "invalidWords": "Palabras Inválidas",
@@ -12252,10 +12320,70 @@ const es = {
     }
   },
   "teacher": {
+    "levels": {
+      "label": "Nivel",
+      "support": "Apoyo",
+      "core": "Base",
+      "challenge": "Reto",
+      "legend": "Apoyo: ve un banco de palabras en las partidas en vivo y practica palabras de apoyo y base · Base: por defecto · Reto: practica todas las palabras, incluidas las de reto, con un objetivo de palabras más largas",
+      "saved": "Nivel guardado",
+      "saveFailed": "No se pudo guardar el nivel. Inténtalo de nuevo."
+    },
+    "lastGame": {
+      "title": "Última partida de la clase",
+      "loading": "Cargando la última partida…",
+      "error": "No pudimos cargar los resultados de la última partida.",
+      "retry": "Reintentar",
+      "emptyTitle": "Aún no hay partidas de clase",
+      "emptyHint": "Inicia una desde la pestaña Jugar: aquí verás qué palabras encontró y cuáles se le escaparon a la clase.",
+      "previousGames": "Partidas anteriores",
+      "playersPlayed": "{{count}} estudiantes jugaron",
+      "studentFallback": "Estudiante",
+      "coverage": "Palabras de la lección que encontró la clase",
+      "nobodyFound": "Palabras que nadie encontró",
+      "avgAccuracy": "Precisión media en palabras de la lección",
+      "wordsToReview": "Palabras para repasar",
+      "nothingToReview": "Nada que repasar: la clase encontró todas las palabras de la lección.",
+      "missedBy": "no la encontraron",
+      "student": "Estudiante",
+      "score": "Puntos",
+      "found": "Encontradas",
+      "missed": "Sin encontrar",
+      "lessonWords": "Palabras de la lección",
+      "practiceCta": "Practicar estas palabras",
+      "mode": {
+        "classic": "Clásico",
+        "blast": "Blast",
+        "wordHunt": "Caza de palabras",
+        "wheelRush": "Rueda veloz"
+      }
+    },
+    "proWelcome": {
+      "title": "Tienes Teacher Pro",
+      "until": "Tuyo hasta el {date}: nada que canjear, sin tarjeta.",
+      "perk": {
+        "analytics": "Ver qué palabras costaron a la clase, después de cada partida",
+        "reports": "Informes imprimibles de clase y de alumno",
+        "unlimited": "Clases y alumnos ilimitados"
+      },
+      "noCard": "Cuando termine, vuelves al plan gratuito sin más. Nunca te cobraremos sin que tú lo elijas.",
+      "cta": "¡Vamos!"
+    },
+    "plan": {
+      "pro": "Pro",
+      "free": "Plan gratuito",
+      "upgrade": "Mejorar",
+      "giftedUntil": "Regalo · hasta el {date}",
+      "renewsOn": "Se renueva el {date}",
+      "giftEnded": "El regalo Pro terminó"
+    },
     "proGate": {
       "cta": "Desbloquéalo con Pro: ${{price}}/mes"
     },
     "subscription": {
+      "giftedNoCard": "Sin tarjeta ni renovación: simplemente termina y vuelves al plan gratuito.",
+      "giftedUntil": "Pro de cortesía hasta",
+      "giftedBadge": "Regalo",
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
       "upgradeProDescription": "Pro te da aulas ilimitadas y estudiantes ilimitados por clase, sin límites para hacer crecer tu enseñanza.",
@@ -12800,6 +12928,71 @@ const es = {
     }
   },
   "education": {
+    "wordBank": {
+      "title": "Banco de palabras ({{count}})",
+      "hint": "Estas palabras están escondidas en el tablero. Toca para cerrar.",
+      "challengeBadge": "Reto: busca palabras de {{min}}+ letras"
+    },
+    "studentPreview": {
+      "button": "Ver lo que verán los alumnos",
+      "buttonHint": "Recorre la pantalla de acceso, la sala de espera y un tablero de muestra antes de la clase.",
+      "disabledHint": "Elige una clase y al menos una lección para ver la vista previa.",
+      "title": "Vista previa del alumno",
+      "subtitle": "Exactamente lo que ve un alumno en su móvil, paso a paso.",
+      "close": "Cerrar la vista previa",
+      "stepsLabel": "Pasos de la vista previa",
+      "stepOf": "Paso {current} de {total}:",
+      "steps": {
+        "join": "Unirse",
+        "waiting": "Sala de espera",
+        "game": "Partida"
+      },
+      "next": "Siguiente",
+      "back": "Atrás",
+      "done": "Listo",
+      "join": {
+        "caption": "Los alumnos abren este enlace o escriben el código de la clase en la página de acceso:",
+        "classroomHint": "Este es el código permanente de {name}. Cuando empiece la partida, el proyector mostrará también un código de sala que funciona igual."
+      },
+      "waiting": {
+        "title": "Esperando a que tu profe empiece",
+        "subtitle": "Deja esta pantalla abierta. La partida empieza sola.",
+        "settingsTitle": "Esta ronda",
+        "teacherHint": "Los alumnos esperan aquí hasta que pulses Empezar. Ya pueden ver el modo, el tiempo y el tamaño del tablero que elegiste."
+      },
+      "settings": {
+        "mode": "Modo",
+        "timer": "Tiempo",
+        "board": "Tablero",
+        "minLength": "Palabra más corta",
+        "minutes": "{count} min",
+        "letters": "{count} letras"
+      },
+      "game": {
+        "timeLeft": "Tiempo restante",
+        "boardLabel": "Tablero de letras de muestra",
+        "samplePath": "Resaltada: {word}",
+        "minLength": "Las palabras necesitan al menos {count} letras.",
+        "hiddenWords": "Palabras escondidas en este tablero",
+        "noneHidden": "Ninguna de las palabras elegidas cabe en un tablero de este tamaño."
+      },
+      "shuffle": "Mezclar tablero de muestra",
+      "freshBoardNote": "Esto es una muestra. El tablero real se genera de nuevo al empezar la partida, con otra combinación de tus palabras.",
+      "skipped": {
+        "title": "Palabras que no estarán en el tablero",
+        "subtitle": "Los alumnos siguen practicándolas en las lecciones; simplemente no se pueden trazar en una cuadrícula de letras.",
+        "none": "Todas las palabras elegidas pueden esconderse en el tablero.",
+        "reason": {
+          "empty": "Entrada vacía",
+          "multiWord": "Tiene un espacio o un guion",
+          "tooShort": "Menos de 3 letras",
+          "tooLong": "Más de 12 letras",
+          "notInDictionary": "No está en el diccionario del juego",
+          "tooLongForBoard": "Demasiado larga para este tamaño de tablero (máx. {max} letras). Elige un tablero más grande.",
+          "notInSample": "No cupo en esta muestra. Puede aparecer en el tablero real."
+        }
+      }
+    },
     "results": {
       "title": "Resumen de la lección",
       "yourMastery": "Encontraste {{found}} de {{total}} palabras de la lección",

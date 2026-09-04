@@ -1,9 +1,11 @@
-import { School, BookOpen, Timer, Grid3x3 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { School, BookOpen, Timer, Grid3x3, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { WizardStep } from '@/components/ui/WizardStep';
 import { MultiLessonSelector } from './MultiLessonSelector';
 import { ClassroomModeSettings } from './ClassroomModeSettings';
+import { StudentViewPreview } from './StudentViewPreview';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
 import type { GameMode } from '@/shared/types/game';
 
@@ -74,6 +76,19 @@ export function ClassroomSetupStep({
     selectedLessonIds.length === 0 ||
     !selectedClassroomId ||
     allPlayableWords.length === 0;
+
+  // "Preview what students will see" — needs a classroom (for its real join
+  // code) and at least one lesson (for words to hide in the sample board).
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const canPreview = Boolean(selectedClassroomId) && selectedLessonIds.length > 0;
+  const selectedClassroom = useMemo(
+    () => classrooms.find((c) => c.id === selectedClassroomId) ?? null,
+    [classrooms, selectedClassroomId]
+  );
+  const selectedLessons = useMemo(
+    () => lessons.filter((l) => selectedLessonIds.includes(l.id)),
+    [lessons, selectedLessonIds]
+  );
 
   return (
     <WizardStep
@@ -226,7 +241,41 @@ export function ClassroomSetupStep({
           onTargetWordChange={onTargetWordChange}
           onMinWordLengthChange={onMinWordLengthChange}
         />
+
+        {/* Student preview */}
+        <div className="rounded-neo border-neo border-neo-black bg-neo-navy/50 p-4">
+          <button
+            type="button"
+            onClick={() => setIsPreviewOpen(true)}
+            disabled={!canPreview}
+            className={cn(
+              'flex w-full items-center justify-center gap-2 px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+              'bg-neo-cream text-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
+              'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+              'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-hard'
+            )}
+          >
+            <Eye className="w-5 h-5 text-neo-cyan" aria-hidden="true" />
+            {t('education.studentPreview.button')}
+          </button>
+          <p className="mt-2 text-center text-sm text-neo-white/70 font-neo-body">
+            {canPreview
+              ? t('education.studentPreview.buttonHint')
+              : t('education.studentPreview.disabledHint')}
+          </p>
+        </div>
       </div>
+
+      <StudentViewPreview
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        classroom={selectedClassroom}
+        lessons={selectedLessons}
+        gameMode={gameMode}
+        timerMinutes={timerMinutes}
+        boardSize={boardSize}
+        minWordLength={minWordLength}
+      />
     </WizardStep>
   );
 }

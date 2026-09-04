@@ -9,17 +9,27 @@
  *
  * District pricing is not dropped, it moves to where it is relevant: the
  * classroom-game launcher already carries a "LexiClash for schools" link.
+ *
+ * A Pro teacher (paid or gifted) never sees the upgrade strip: "Upgrade to Pro"
+ * above a Pro dashboard reads as "your Pro did not take". While the entitlement
+ * is still loading we show nothing rather than an upsell a later answer retracts
+ * (recurring pitfall class 1).
  */
 export type TeacherBanner = 'trial' | 'pro' | 'none';
 
 export function pickTeacherBanner({
   hasTrial,
   isAdmin,
+  hasPro = false,
+  proLoading = false,
 }: {
   hasTrial: boolean;
   isAdmin: boolean;
+  hasPro?: boolean;
+  proLoading?: boolean;
 }): TeacherBanner {
   if (hasTrial) return 'trial';
   if (isAdmin) return 'none';
+  if (proLoading || hasPro) return 'none';
   return 'pro';
 }

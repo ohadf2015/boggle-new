@@ -64,6 +64,7 @@ import { OpponentWordFeedConnected } from '@/components/multiplayer/OpponentWord
 import { useGameMode, useGameStore } from '@/hooks/gameState/store';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameTimer } from '@/hooks/useGameTimer';
+import { useTeacherPaused } from '@/hooks/useTeacherPause';
 
 // ==================== Types ====================
 
@@ -267,9 +268,12 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Server-authoritative timer: the prop carries the latest `timeUpdate`, but we
   // mirror it through useGameTimer so the display ticks smoothly between 1 Hz
   // server broadcasts and snaps back into sync after reconnect / background tab.
+  // Teacher live controls: while the classroom round is paused the server
+  // stops ticking, so the smoothing tick must stop too or the display drifts.
+  const teacherPaused = useTeacherPaused();
   const { remainingTime: syncedRemainingTime, setTime: setSyncedTime } = useGameTimer({
     initialTime: totalTime ?? remainingTime ?? 180,
-    isPaused: !gameActive || remainingTime == null,
+    isPaused: !gameActive || remainingTime == null || teacherPaused,
     autoStart: false,
     onTimeUp: () => {
       // The server owns game end; this local callback is only for display safety.

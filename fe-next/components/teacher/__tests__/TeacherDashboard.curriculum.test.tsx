@@ -98,6 +98,7 @@ vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
   CurriculumWordListBrowser: () => <div>CurriculumWordListBrowser</div>,
 }));
 
+vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div data-testid="last-game-insights" /> }));
 import TeacherDashboard from '../TeacherDashboard';
 
 describe('<TeacherDashboard> curriculum word lists', () => {

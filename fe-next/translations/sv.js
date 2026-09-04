@@ -8788,6 +8788,73 @@ const sv = {
     "daysAgo": "{n}d sedan"
   },
   "admin": {
+    "teacherPro": {
+      "title": "Ge bort Teacher Pro",
+      "subtitle": "Ge en lärare Pro via e-post – inget kort, ingen provperiod, inget att lösa in.",
+      "form": {
+        "email": "Lärarens e-post",
+        "fullName": "Namn (valfritt)",
+        "fullNameHint": "Lämna tomt för att använda namnet från ansökan eller profilen",
+        "duration": "Hur länge",
+        "until": "Gäller till {date}",
+        "locale": "Språk i mejlet",
+        "note": "Personlig hälsning (valfritt)",
+        "noteHint": "En eller två ärliga rader. Hamnar i mejlet exakt som skrivet.",
+        "reason": "Intern anledning (valfritt)",
+        "reasonHint": "t.ex. lektion förstörd 2026-09-04 – skickas aldrig",
+        "submit": "Ge Pro & skicka mejl",
+        "submitting": "Ger…",
+        "preview": "Förhandsgranska mejl",
+        "previewTitle": "Förhandsgranskning",
+        "help": "Pro slås på direkt. Finns inget konto med den här adressen ännu slås det på vid första inloggningen.",
+        "days": {
+          "30": "30 dagar",
+          "90": "3 månader",
+          "180": "6 månader",
+          "365": "1 år",
+          "730": "2 år"
+        }
+      },
+      "result": {
+        "toast": "Pro tilldelat",
+        "active": "Klart – {email} har Teacher Pro till {date}.",
+        "pending_signup": "Reserverat – {email} har inget konto ännu. Pro slås på så fort de loggar in med den adressen (till {date}).",
+        "emailSent": "Gåvomejlet skickat.",
+        "emailFailed": "Tilldelningen gäller, men mejlet gick INTE iväg – skriv till dem manuellt."
+      },
+      "error": {
+        "already_paid": "Den här läraren betalar redan för Pro. Inget ändrades – hantera krediter i Polar.",
+        "invalid_email": "Det är ingen giltig e-postadress.",
+        "generic": "Kunde inte ge Pro:"
+      },
+      "status": {
+        "active": "Aktiv",
+        "pending_signup": "Väntar på registrering",
+        "expired": "Utgången",
+        "revoked": "Återkallad"
+      },
+      "list": {
+        "title": "Tilldelningar",
+        "refresh": "Uppdatera",
+        "loading": "Laddar…",
+        "empty": "Inga tilldelningar ännu.",
+        "loadError": "Kunde inte ladda tilldelningar.",
+        "col": {
+          "teacher": "Lärare",
+          "status": "Status",
+          "until": "Till",
+          "email": "Mejl",
+          "granted": "Tilldelad"
+        },
+        "daysCount": "{count} dagar",
+        "sent": "Skickat",
+        "notSent": "Inte skickat",
+        "seenInApp": "Sett i appen",
+        "revoke": "Återkalla",
+        "revokeConfirm": "Avsluta Pro för {email} nu? De går tillbaka till gratisplanen.",
+        "revoked": "Tilldelning återkallad"
+      }
+    },
     "teacherFunnel": {
       "title": "Lärartratt",
       "subtitle": "Vad godkända lärare faktiskt gjorde sedan.",
@@ -8878,6 +8945,7 @@ const sv = {
     "loadingSession": "Etablerar säker session...",
     "sessionError": "Sessionsfel",
     "nav": {
+      "teacherPro": "Teacher Pro-gåvor",
       "players": "Spelare",
       "dictionary": "Ordbok",
       "invalidWords": "Ogiltiga Ord",
@@ -12498,10 +12566,70 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
+    "levels": {
+      "label": "Nivå",
+      "support": "Stöd",
+      "core": "Bas",
+      "challenge": "Utmaning",
+      "legend": "Stöd: ser en ordbank under livespel och övar på stöd- och basord · Bas: standard · Utmaning: övar på alla ord inkl. utmaningsord och får ett mål med längre ord",
+      "saved": "Nivån sparades",
+      "saveFailed": "Nivån kunde inte sparas – försök igen"
+    },
+    "lastGame": {
+      "title": "Senaste klasspelet",
+      "loading": "Laddar senaste spelet…",
+      "error": "Vi kunde inte ladda resultaten från senaste spelet.",
+      "retry": "Försök igen",
+      "emptyTitle": "Inget klasspel ännu",
+      "emptyHint": "Starta ett från fliken Spela – orden klassen hittar och missar visas här.",
+      "previousGames": "Tidigare spel",
+      "playersPlayed": "{{count}} elever spelade",
+      "studentFallback": "Elev",
+      "coverage": "Lektionsord klassen hittade",
+      "nobodyFound": "Ord ingen hittade",
+      "avgAccuracy": "Genomsnittlig träffsäkerhet på lektionsord",
+      "wordsToReview": "Ord att repetera",
+      "nothingToReview": "Inget att repetera – klassen hittade alla lektionsord.",
+      "missedBy": "missades av",
+      "student": "Elev",
+      "score": "Poäng",
+      "found": "Hittade",
+      "missed": "Missade",
+      "lessonWords": "Lektionsord",
+      "practiceCta": "Öva på de här orden",
+      "mode": {
+        "classic": "Klassiskt",
+        "blast": "Blast",
+        "wordHunt": "Ordjakt",
+        "wheelRush": "Hjulrush"
+      }
+    },
+    "proWelcome": {
+      "title": "Du har Teacher Pro",
+      "until": "Ditt till {date} – inget att lösa in, inget kort.",
+      "perk": {
+        "analytics": "Se vilka ord klassen hade svårt med, efter varje omgång",
+        "reports": "Utskrivbara klass- och elevrapporter",
+        "unlimited": "Obegränsat antal klasser och elever"
+      },
+      "noCard": "När det tar slut går du helt enkelt tillbaka till gratisplanen. Vi debiterar dig aldrig utan att du själv väljer det.",
+      "cta": "Kör!"
+    },
+    "plan": {
+      "pro": "Pro",
+      "free": "Gratisplan",
+      "upgrade": "Uppgradera",
+      "giftedUntil": "Gåva · till {date}",
+      "renewsOn": "Förnyas {date}",
+      "giftEnded": "Pro-gåvan har tagit slut"
+    },
     "proGate": {
       "cta": "Lås upp med Pro — ${{price}}/månad"
     },
     "subscription": {
+      "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
+      "giftedUntil": "Kostnadsfritt Pro till",
+      "giftedBadge": "Gåva",
       "classLimitTitle": "Du har nått din klassgräns",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
       "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass — inga gränser för att växa din undervisning.",
@@ -13046,6 +13174,71 @@ const sv = {
     }
   },
   "education": {
+    "wordBank": {
+      "title": "Ordbank ({{count}})",
+      "hint": "De här orden gömmer sig i brädet. Tryck för att stänga.",
+      "challengeBadge": "Utmaning: sikta på ord med {{min}}+ bokstäver"
+    },
+    "studentPreview": {
+      "button": "Förhandsgranska vad eleverna ser",
+      "buttonHint": "Gå igenom anslutningsskärmen, väntrummet och ett exempelbräde före lektionen.",
+      "disabledHint": "Välj en klass och minst en lektion för att förhandsgranska.",
+      "title": "Elevvy",
+      "subtitle": "Precis det en elev ser på sin mobil, steg för steg.",
+      "close": "Stäng förhandsgranskningen",
+      "stepsLabel": "Steg i förhandsgranskningen",
+      "stepOf": "Steg {current} av {total}:",
+      "steps": {
+        "join": "Gå med",
+        "waiting": "Väntrum",
+        "game": "Spel"
+      },
+      "next": "Nästa",
+      "back": "Tillbaka",
+      "done": "Klar",
+      "join": {
+        "caption": "Eleverna öppnar den här länken eller skriver in klasskoden på anslutningssidan:",
+        "classroomHint": "Det här är den fasta koden för {name}. När spelet startar visar projektorn även en rumskod som fungerar på samma sätt."
+      },
+      "waiting": {
+        "title": "Väntar på att läraren startar",
+        "subtitle": "Låt skärmen vara öppen. Spelet startar av sig självt.",
+        "settingsTitle": "Den här omgången",
+        "teacherHint": "Eleverna väntar här tills du trycker på Starta. De ser redan läget, tiden och brädstorleken du valt."
+      },
+      "settings": {
+        "mode": "Läge",
+        "timer": "Tid",
+        "board": "Bräde",
+        "minLength": "Kortaste ord",
+        "minutes": "{count} min",
+        "letters": "{count} bokstäver"
+      },
+      "game": {
+        "timeLeft": "Tid kvar",
+        "boardLabel": "Exempel på bokstavsbräde",
+        "samplePath": "Markerat: {word}",
+        "minLength": "Ord måste ha minst {count} bokstäver.",
+        "hiddenWords": "Ord gömda i det här brädet",
+        "noneHidden": "Inget av de valda orden får plats på ett bräde i den här storleken."
+      },
+      "shuffle": "Blanda exempelbrädet",
+      "freshBoardNote": "Det här är ett exempel. Det riktiga brädet skapas på nytt när du startar spelet, med en annan blandning av dina ord.",
+      "skipped": {
+        "title": "Ord som inte hamnar på brädet",
+        "subtitle": "Eleverna övar fortfarande på dem i lektionerna; de går bara inte att dra på ett bokstavsrutnät.",
+        "none": "Alla valda ord kan gömmas i brädet.",
+        "reason": {
+          "empty": "Tom rad",
+          "multiWord": "Innehåller mellanslag eller bindestreck",
+          "tooShort": "Kortare än 3 bokstäver",
+          "tooLong": "Längre än 12 bokstäver",
+          "notInDictionary": "Finns inte i spelets ordlista",
+          "tooLongForBoard": "För långt för den här brädstorleken (max {max} bokstäver). Välj ett större bräde.",
+          "notInSample": "Fick inte plats i det här exemplet. Det kan dyka upp på det riktiga brädet."
+        }
+      }
+    },
     "results": {
       "title": "Lektionssammanfattning",
       "yourMastery": "Du hittade {{found}} av {{total}} lektionsord",

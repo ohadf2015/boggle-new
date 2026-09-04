@@ -10835,6 +10835,63 @@ const en = {
     }
   },
   "teacher": {
+    "levels": {
+      "label": "Level",
+      "support": "Support",
+      "core": "Core",
+      "challenge": "Challenge",
+      "legend": "Support: sees a word bank during live games and practises support + core words · Core: default · Challenge: practises all words incl. challenge, gets a longer-word target",
+      "saved": "Level saved",
+      "saveFailed": "Couldn't save the level — please try again"
+    },
+    "lastGame": {
+      "title": "Last class game",
+      "loading": "Loading the last game…",
+      "error": "We couldn't load the last game's results.",
+      "retry": "Try again",
+      "emptyTitle": "No class game yet",
+      "emptyHint": "Start one from the Play tab — the words your class finds and misses will show up here.",
+      "previousGames": "Previous games",
+      "playersPlayed": "{{count}} students played",
+      "studentFallback": "Student",
+      "coverage": "Lesson words the class found",
+      "nobodyFound": "Words nobody found",
+      "avgAccuracy": "Average lesson-word accuracy",
+      "wordsToReview": "Words to review",
+      "nothingToReview": "Nothing to review — the class found every lesson word.",
+      "missedBy": "missed by",
+      "student": "Student",
+      "score": "Score",
+      "found": "Found",
+      "missed": "Missed",
+      "lessonWords": "Lesson words",
+      "practiceCta": "Practice these words",
+      "mode": {
+        "classic": "Classic",
+        "blast": "Blast",
+        "wordHunt": "Word Hunt",
+        "wheelRush": "Wheel Rush"
+      }
+    },
+    "proWelcome": {
+      "title": "You're on Teacher Pro",
+      "until": "Yours until {date} — nothing to claim, no card.",
+      "perk": {
+        "analytics": "See which words the class struggled with, after every game",
+        "reports": "Printable class and student reports",
+        "unlimited": "Unlimited classes and students"
+      },
+      "noCard": "When it ends you simply go back to the free plan. We will never charge you without you choosing to.",
+      "cta": "Let's go"
+    },
+    "plan": {
+      "pro": "Pro",
+      "free": "Free plan",
+      "upgrade": "Upgrade",
+      "giftedUntil": "Gifted · until {date}",
+      "renewsOn": "Renews {date}",
+      "giftEnded": "Pro gift ended"
+    },
     "teacher": {
       "activeGames": "Active Games",
       "noActiveGames": "No active games"
@@ -11314,6 +11371,9 @@ const en = {
       "cta": "Unlock this with Pro — ${{price}}/month"
     },
     "subscription": {
+      "giftedNoCard": "No card on file, no renewal — it just ends, and you go back to Free.",
+      "giftedUntil": "Complimentary Pro until",
+      "giftedBadge": "Gift",
       "classLimitTitle": "You've Reached Your Class Limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
       "upgradeProDescription": "Pro gives you unlimited classrooms and unlimited students per class — no limits to grow your teaching.",
@@ -11383,6 +11443,71 @@ const en = {
     }
   },
   "education": {
+    "wordBank": {
+      "title": "Word bank ({{count}})",
+      "hint": "These words are hidden in the board. Tap to close.",
+      "challengeBadge": "Challenge: aim for {{min}}+ letter words"
+    },
+    "studentPreview": {
+      "button": "Preview what students will see",
+      "buttonHint": "Walk through the join screen, the waiting room and a sample board before class.",
+      "disabledHint": "Choose a classroom and at least one lesson to preview.",
+      "title": "Student preview",
+      "subtitle": "Exactly what a student sees on their phone, step by step.",
+      "close": "Close preview",
+      "stepsLabel": "Preview steps",
+      "stepOf": "Step {current} of {total}:",
+      "steps": {
+        "join": "Join",
+        "waiting": "Waiting room",
+        "game": "Game"
+      },
+      "next": "Next",
+      "back": "Back",
+      "done": "Done",
+      "join": {
+        "caption": "Students open this link, or type the class code on the join page:",
+        "classroomHint": "This is the permanent code for {name}. Once the game starts, the projector also shows a room code that works the same way."
+      },
+      "waiting": {
+        "title": "Waiting for your teacher to start",
+        "subtitle": "Keep this screen open. The game starts on its own.",
+        "settingsTitle": "This round",
+        "teacherHint": "Students sit here until you press Start. They can already see the mode, the time and the board size you chose."
+      },
+      "settings": {
+        "mode": "Mode",
+        "timer": "Time",
+        "board": "Board",
+        "minLength": "Shortest word",
+        "minutes": "{count} min",
+        "letters": "{count} letters"
+      },
+      "game": {
+        "timeLeft": "Time left",
+        "boardLabel": "Sample letter board",
+        "samplePath": "Highlighted: {word}",
+        "minLength": "Words need at least {count} letters.",
+        "hiddenWords": "Words hidden in this board",
+        "noneHidden": "None of the selected words fit a board this size."
+      },
+      "shuffle": "Shuffle sample board",
+      "freshBoardNote": "This is a sample. The real board is generated fresh when you start the game, with a different mix of your words.",
+      "skipped": {
+        "title": "Words that won't be on the board",
+        "subtitle": "Students still practise these in lessons; they just can't be traced on a letter grid.",
+        "none": "Every selected word can be hidden in the board.",
+        "reason": {
+          "empty": "Blank entry",
+          "multiWord": "Has a space or hyphen",
+          "tooShort": "Shorter than 3 letters",
+          "tooLong": "Longer than 12 letters",
+          "notInDictionary": "Not in the game dictionary",
+          "tooLongForBoard": "Too long for this board size (max {max} letters). Pick a bigger board.",
+          "notInSample": "Didn't fit this sample. It may appear on the real board."
+        }
+      }
+    },
     "results": {
       "title": "Lesson recap",
       "yourMastery": "You found {{found}} of {{total}} lesson words",
@@ -14419,6 +14544,73 @@ const en = {
     }
   },
   "admin": {
+    "teacherPro": {
+      "title": "Gift Teacher Pro",
+      "subtitle": "Give a teacher Pro by email — no card, no trial, nothing for them to claim.",
+      "form": {
+        "email": "Teacher's email",
+        "fullName": "Name (optional)",
+        "fullNameHint": "Leave blank to use their access request or profile name",
+        "duration": "How long",
+        "until": "Runs until {date}",
+        "locale": "Email language",
+        "note": "Personal note (optional)",
+        "noteHint": "One or two honest lines. Goes in the email exactly as written.",
+        "reason": "Internal reason (optional)",
+        "reasonHint": "e.g. class period broken on 2026-09-04 — never emailed",
+        "submit": "Grant Pro & send email",
+        "submitting": "Granting…",
+        "preview": "Preview email",
+        "previewTitle": "Email preview",
+        "help": "Pro switches on immediately. If there is no account with this email yet, it switches on at their first sign-in.",
+        "days": {
+          "30": "30 days",
+          "90": "3 months",
+          "180": "6 months",
+          "365": "1 year",
+          "730": "2 years"
+        }
+      },
+      "result": {
+        "toast": "Pro granted",
+        "active": "Done — {email} is on Teacher Pro until {date}.",
+        "pending_signup": "Reserved — {email} has no account yet. Pro switches on the moment they sign in with this address (until {date}).",
+        "emailSent": "Gift email sent.",
+        "emailFailed": "The grant is live, but the email did NOT send — write to them by hand."
+      },
+      "error": {
+        "already_paid": "This teacher already pays for Pro. Nothing was changed — handle credits in Polar.",
+        "invalid_email": "That is not a valid email address.",
+        "generic": "Could not grant Pro:"
+      },
+      "status": {
+        "active": "Active",
+        "pending_signup": "Awaiting sign-up",
+        "expired": "Expired",
+        "revoked": "Revoked"
+      },
+      "list": {
+        "title": "Grants",
+        "refresh": "Refresh",
+        "loading": "Loading…",
+        "empty": "No grants yet.",
+        "loadError": "Could not load grants.",
+        "col": {
+          "teacher": "Teacher",
+          "status": "Status",
+          "until": "Until",
+          "email": "Email",
+          "granted": "Granted"
+        },
+        "daysCount": "{count} days",
+        "sent": "Sent",
+        "notSent": "Not sent",
+        "seenInApp": "Seen in app",
+        "revoke": "Revoke",
+        "revokeConfirm": "End Pro for {email} now? They go back to the free plan.",
+        "revoked": "Grant revoked"
+      }
+    },
     "teacherFunnel": {
       "title": "Teacher funnel",
       "subtitle": "What approved teachers actually did next.",
@@ -14663,6 +14855,7 @@ const en = {
       "title": "Moderation"
     },
     "nav": {
+      "teacherPro": "Teacher Pro gifts",
       "dailyChallenge": "Daily Challenge",
       "dictionary": "Dictionary",
       "email": "Email",

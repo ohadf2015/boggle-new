@@ -89,6 +89,17 @@ export interface GameState {
   timerSeconds: number;
   remainingTime?: number;
   gameDuration?: number;
+  /**
+   * Teacher live controls (classroom rooms). The round clock is a timestamp-
+   * based interval, so its end lives HERE (not in the interval closure) so
+   * pause/resume/extend can move it. `timerLaunchedAt` + `timerElapsedOffsetMs`
+   * let the word-hunt life drain count play-time only across a pause.
+   */
+  timerEndTimestamp?: number | null;
+  timerLaunchedAt?: number | null;
+  timerElapsedOffsetMs?: number;
+  isPaused?: boolean;
+  pausedRemainingMs?: number | null;
   minWordLength?: number;
   difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
   gameStartedAt?: number;
