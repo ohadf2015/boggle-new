@@ -11,6 +11,7 @@ import { SEED_SALT } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+/** Crossword-curated everyday English 4–9. Not a frequency-sliced popular dump. */
 import enWheelHuntPool from './wheelHuntPool.en.json';
 
 // ==========================================
