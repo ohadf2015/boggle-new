@@ -4,10 +4,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClassGapReteachLiveCta } from '../ClassGapReteachLiveCta';
-import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
 import {
   CLASS_GAP_RETEACH_LIVE_LESSON_ID,
   CLASS_GAP_RETEACH_TIMER_SECONDS,
+  type ClassGapSharePayload,
 } from '@/lib/education/classGapShare';
 
 const push = vi.fn();
