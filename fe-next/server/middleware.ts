@@ -54,6 +54,16 @@ const NEXT_ADMIN_BODY_ROUTES: string[] = [
   // stream → the save hung → admin "mark bad riddles" silently failed. Prefix
   // covers /api/admin/connections-puzzles/reviews.
   '/api/admin/connections-puzzles',
+  // Teacher Pro grant (POST /api/admin/teacher-pro reads request.json(); the
+  // GET list and the [id]/revoke POST have no body but share the prefix) is a
+  // Next.js route with no Express counterpart. Missing from this list, every
+  // grant request hung until the CLIENT gave up minutes later ("client has
+  // closed the request before the server could send a response" in Railway's
+  // http logs) — the route's own withRouteTimeout 25s cap never got a chance
+  // to fire because request.json() never resolves nor rejects, and it lives
+  // inside the same handler that timeout wraps. Prefix covers
+  // /api/admin/teacher-pro and /api/admin/teacher-pro/:id/revoke.
+  '/api/admin/teacher-pro',
 ];
 
 export function shouldExpressParseJsonBody(path: string): boolean {
