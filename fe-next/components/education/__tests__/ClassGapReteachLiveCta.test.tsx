@@ -48,20 +48,23 @@ describe('ClassGapReteachLiveCta', () => {
   });
 
   it('does not navigate when sessionStorage is blocked', () => {
-    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    const setItem = vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
       throw new Error('blocked');
     });
-    render(
-      <ClassGapReteachLiveCta
-        payload={payload}
-        reteachLabel="Start reteach Live"
-        educationHref="/en/education"
-        educationLabel="Play a class game"
-      />,
-    );
-    fireEvent.click(screen.getByTestId('start-reteach-live'));
-    expect(push).not.toHaveBeenCalled();
-    setItem.mockRestore();
+    try {
+      render(
+        <ClassGapReteachLiveCta
+          payload={payload}
+          reteachLabel="Start reteach Live"
+          educationHref="/en/education"
+          educationLabel="Play a class game"
+        />,
+      );
+      fireEvent.click(screen.getByTestId('start-reteach-live'));
+      expect(push).not.toHaveBeenCalled();
+    } finally {
+      setItem.mockRestore();
+    }
   });
 
   it('falls back to the education CTA when every word was found', () => {

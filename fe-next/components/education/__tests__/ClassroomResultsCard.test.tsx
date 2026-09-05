@@ -176,7 +176,6 @@ describe('ClassroomResultsCard', () => {
       expect(screen.getByText('education.results.shareGapCopied')).toBeInTheDocument();
     });
   });
-}
 
   it('offers the teacher a real Google Classroom link for a 3-min reteach Live', () => {
     render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
