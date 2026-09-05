@@ -3,6 +3,8 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { sendEmail } from '@/lib/email/send';
 import { teacherProGift } from '@/lib/email/templates/teacherProGift';
 import type { TeacherLocale } from '@/lib/education/types';
+import { findUserIdByEmail } from '@/lib/supabase/findUserIdByEmail';
+import { migrationPendingHint } from '@/lib/supabase/migrationPendingHint';
 import {
   PRO_GRANT_DEFAULT_DAYS,
   isPaidProviderSubscription,
@@ -102,11 +104,12 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
   const nowIso = new Date(nowMs).toISOString();
   const setPhase = (phase: GrantPhase) => { if (deps?.phaseRef) deps.phaseRef.current = phase; };
 
-  // Email -> user id. SECURITY DEFINER function, execute limited to service_role.
+  // Email -> user id via the Admin Auth API (see findUserIdByEmail) — no SQL
+  // function or migration required, unlike the old find_user_id_by_email RPC.
   setPhase('lookup-user');
-  const lookup = await admin.rpc('find_user_id_by_email', { p_email: email });
-  if (lookup.error) return { ok: false, error: `user lookup failed: ${lookup.error.message}` };
-  const userId: string | null = (lookup.data as string | null) ?? null;
+  const lookup = await findUserIdByEmail(admin, email);
+  if (lookup.error) return { ok: false, error: `user lookup failed: ${lookup.error}` };
+  const userId: string | null = lookup.userId;
 
   if (userId) {
     setPhase('read-subscription');
@@ -166,7 +169,10 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
     })
     .select('id')
     .single();
-  if (grantErr || !grant) return { ok: false, error: `grant insert failed: ${grantErr?.message || 'no row'}` };
+  if (grantErr || !grant) {
+    const hint = migrationPendingHint(grantErr);
+    return { ok: false, error: hint || `grant insert failed: ${grantErr?.message || 'no row'}` };
+  }
   const grantId = (grant as { id: string }).id;
 
   if (userId) {
@@ -233,7 +239,7 @@ async function applyGrantToUser(
       { onConflict: 'user_id' },
     )
     .select('user_id');
-  if (up.error) return { error: `subscription upsert failed: ${up.error.message}` };
+  if (up.error) return { error: migrationPendingHint(up.error) || `subscription upsert failed: ${up.error.message}` };
   if (!up.data?.length) return { error: 'subscription upsert affected no rows' };
 
   // Pro implies teacher access. Admins keep their admin role.
@@ -243,7 +249,7 @@ async function applyGrantToUser(
     .eq('id', userId)
     .neq('user_role', 'admin')
     .select('id');
-  if (promoted.error) return { error: `profile promotion failed: ${promoted.error.message}` };
+  if (promoted.error) return { error: migrationPendingHint(promoted.error) || `profile promotion failed: ${promoted.error.message}` };
 
   return {};
 }
@@ -278,7 +284,7 @@ export async function applyPendingProGrants(
     .gt('expires_at', nowIso)
     .order('expires_at', { ascending: false })
     .limit(1);
-  if (error) return { applied: false, error: error.message };
+  if (error) return { applied: false, error: migrationPendingHint(error) || error.message };
   const grant = (data as Array<{ id: string; expires_at: string }> | null)?.[0];
   if (!grant) return { applied: false };
 
@@ -297,7 +303,7 @@ export async function applyPendingProGrants(
     .update({ user_id: userId, applied_at: nowIso })
     .eq('id', grant.id)
     .select('id');
-  if (stamped.error) return { applied: false, error: stamped.error.message };
+  if (stamped.error) return { applied: false, error: migrationPendingHint(stamped.error) || stamped.error.message };
   if (!stamped.data?.length) return { applied: false, error: 'grant not marked applied' };
 
   return { applied: true, grantId: grant.id, expiresAt: grant.expires_at };
@@ -316,7 +322,7 @@ export async function revokeProGrant(
     .select('id, user_id, revoked_at')
     .eq('id', grantId)
     .maybeSingle();
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: migrationPendingHint(error) || error.message };
   const g = grant as { id: string; user_id: string | null; revoked_at: string | null } | null;
   if (!g) return { ok: false, error: 'not found' };
   if (g.revoked_at) return { ok: true };
@@ -326,7 +332,7 @@ export async function revokeProGrant(
     .update({ revoked_at: nowIso, revoked_by: revokedBy })
     .eq('id', grantId)
     .select('id');
-  if (stamped.error) return { ok: false, error: stamped.error.message };
+  if (stamped.error) return { ok: false, error: migrationPendingHint(stamped.error) || stamped.error.message };
 
   if (g.user_id) {
     // Only the row this grant wrote. A paid subscription that has since replaced
@@ -337,7 +343,7 @@ export async function revokeProGrant(
       .eq('user_id', g.user_id)
       .eq('grant_id', grantId)
       .select('user_id');
-    if (down.error) return { ok: false, error: down.error.message };
+    if (down.error) return { ok: false, error: migrationPendingHint(down.error) || down.error.message };
   }
   return { ok: true };
 }

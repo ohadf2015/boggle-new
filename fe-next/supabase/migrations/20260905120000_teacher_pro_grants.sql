@@ -18,9 +18,17 @@
 --   * `teacher_pro_grants` is the audit trail + the sign-up bridge: a grant for
 --     an email with no account yet waits with `user_id IS NULL` and is claimed
 --     on first sign-in (same bridge pattern as teacher_access_allowlist).
---   * `find_user_id_by_email` lets the service-role grant route resolve an
---     address to a user without paging auth.admin.listUsers. Execute is
---     service_role only — it must never be callable from a browser.
+--   * `find_user_id_by_email` was meant to let the service-role grant route
+--     resolve an address to a user id without paging auth.admin.listUsers. In
+--     practice this migration itself sat unapplied in production for months
+--     (the migrations workflow's Supabase CLI token had expired since
+--     2026-07-06 — see #938/#940/#941), which meant the function did not
+--     exist either — every grant failed at the very first step, chasing a
+--     dependency that could never resolve until the migration ran. The app
+--     no longer calls this function: `lib/supabase/findUserIdByEmail.ts` pages
+--     `auth.admin.listUsers` instead, which needs no migration and can never
+--     be "still pending". The function stays defined here for any future
+--     direct-SQL use, but nothing in the app depends on it existing.
 --
 -- RLS: teacher reads own grant (the dashboard shows "gifted until …"), admins
 -- read all; every write goes through the service-role client in the API.
