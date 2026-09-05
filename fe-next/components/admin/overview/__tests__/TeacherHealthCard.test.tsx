@@ -126,3 +126,23 @@ describe('TeacherHealthCard', () => {
     expect(push).toHaveBeenCalledWith('/en/admin/teacher-access');
   });
 });
+
+/**
+ * The Pro-gift page lives under People in the sidebar, which only unfolds once
+ * you are already inside that bucket — so from the admin home it was invisible.
+ * The card that summarises teachers is where an admin decides to gift one.
+ */
+describe('TeacherHealthCard — Gift Pro shortcut', () => {
+  beforeEach(() => {
+    push.mockClear();
+    fetchWithAuth.mockResolvedValue({ ok: true, json: async () => payload() });
+  });
+
+  it('offers a Gift Pro button that opens the teacher-pro admin page', async () => {
+    const user = userEvent.setup();
+    render(<TeacherHealthCard />);
+    const gift = await screen.findByRole('button', { name: /Gift Pro/ });
+    await user.click(gift);
+    expect(push).toHaveBeenCalledWith('/en/admin/teacher-pro');
+  });
+});

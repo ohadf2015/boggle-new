@@ -5837,6 +5837,7 @@ const ru = {
       "ok": "ОК"
     },
     "teacherAccess": {
+      "giftPro": "Подарить Pro",
       "count": {"pending":"В ожидании","approved":"Одобрено","declined":"Отклонено","total":"Всего"},
       "approveSuccess": "Запрос успешно одобрен",
       "approveError": "Ошибка при одобрении запроса",

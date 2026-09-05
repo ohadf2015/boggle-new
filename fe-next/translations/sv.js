@@ -8986,6 +8986,7 @@ const sv = {
       }
     },
     "teacherAccess": {
+      "giftPro": "Ge Pro i gåva",
       "empty": "Inga begäranden",
       "title": "Lägaråtkomstbegäranden",
       "count": {
