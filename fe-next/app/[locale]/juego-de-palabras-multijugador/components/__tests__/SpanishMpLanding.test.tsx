@@ -52,7 +52,7 @@ describe('Spanish MP landing — composition', () => {
       void i;
     });
     expect(screen.getByRole('link', { name: /crear sala/i })).toHaveAttribute('href', '/es/multiplayer');
-    expect(screen.getByRole('link', { name: /probar solo/i })).toHaveAttribute('href', '/es/singleplayer');
+    expect(screen.getByRole('link', { name: /probar solo/i })).toHaveAttribute('href', '/es/singleplayer?autoStart=bots');
     STATS.forEach((s) => {
       expect(screen.getByText(s.num)).toBeInTheDocument();
     });

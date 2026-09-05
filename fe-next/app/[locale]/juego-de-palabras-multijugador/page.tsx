@@ -184,7 +184,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
                 modo multijugador en tiempo real
               </Link>{' '}
               contra amigos, o practica vocabulario en{' '}
-              <Link href={`/${locale}/singleplayer`} className="text-neo-lime underline">
+              <Link href={`/${locale}/singleplayer?autoStart=bots`} className="text-neo-lime underline">
                 modo individual
               </Link>
 . El{' '}

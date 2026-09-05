@@ -29,7 +29,7 @@ export function UnfinishedBoardCardConnected() {
   if (!board || board.grid.length === 0) return null;
 
   const handleResume = () => {
-    router.push(`/${language}/singleplayer`);
+    router.push(`/${language}/singleplayer?autoStart=bots`);
   };
 
   return (

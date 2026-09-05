@@ -222,7 +222,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link
-                href={`/${locale}/singleplayer`}
+                href={`/${locale}/singleplayer?autoStart=bots`}
                 className="group rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
               >
                 <span className="block text-base sm:text-lg">▶ Play Free Now</span>
@@ -511,7 +511,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href={`/${locale}/singleplayer`}
+                  href={`/${locale}/singleplayer?autoStart=bots`}
                   className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg"
                 >
                   ▶ Play Boggle Now
