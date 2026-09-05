@@ -275,6 +275,13 @@ export function requestTimeout(): RequestHandler {
     '/api/admin/android-release-launch-preview',
     // Bulk send loops over all eligible users — easily exceeds the 30s global cap.
     '/api/admin/send-bulk-email',
+    // Same shape as the admin email routes above: Express adminAuth (~1-2s),
+    // then the Next route chains several sequential Supabase reads/writes
+    // (user lookup, subscription read, access-request/profile read, grant
+    // insert, subscription upsert, profile promotion) and a Resend send.
+    // The 30s global cap fired mid-grant and 408'd while the DB write (and
+    // sometimes the email) was still in flight — see route.ts maxDuration=60.
+    '/api/admin/teacher-pro',
     // Non-critical analytics; route owns a 4s wall-clock cap (see route.ts).
     // Was hanging 30s before its own cap was added — see Railway logs 2026-05-01.
     '/api/analytics/guest-session',
