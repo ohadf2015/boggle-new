@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/online-word-games-with-friends`;
 
   return {
-    title: 'Words With Friends Online — Play Free, Real-Time | LexiClash',
-    description: 'Free Words With Friends alternative — real-time multiplayer for 2–50 players. No download, no signup. Share a link, everyone joins in seconds →',
+    title: 'Words With Friends Online Free — No App Needed | LexiClash',
+    description: 'Play Words With Friends online free — real-time multiplayer for 2–50 players. No app, no signup. Share a link and everyone joins instantly →',
     keywords: 'online word games with friends, play word games with friends, multiplayer word game online, word games for groups, word game with friends free, online multiplayer word games like hanging with friends, word battle with friends, party word game online, word game for groups no download, online free word cloud game multiplayer, word games live with people',
     openGraph: {
       title: 'Play Word Games With Friends Online — Free | LexiClash',
