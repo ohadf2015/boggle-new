@@ -248,16 +248,20 @@ export async function upsertSubscription({
   // service_role only, so this upsert was refused by RLS and threw.
   const supabase = createAdminClient() ?? (await createClient())
 
+  const legacyRow = {
+    user_id: userId,
+    tier,
+    status,
+    lemon_squeezy_subscription_id: providerSubscriptionId ?? null,
+    lemon_squeezy_order_id: providerOrderId ?? null,
+    lemon_squeezy_variant_id: providerProductId ?? null,
+    current_period_end: currentPeriodEnd ?? null,
+    cancel_at_period_end: cancelAtPeriodEnd ?? false,
+  }
+
   const { error } = await supabase.from('subscriptions').upsert(
     {
-      user_id: userId,
-      tier,
-      status,
-      lemon_squeezy_subscription_id: providerSubscriptionId ?? null,
-      lemon_squeezy_order_id: providerOrderId ?? null,
-      lemon_squeezy_variant_id: providerProductId ?? null,
-      current_period_end: currentPeriodEnd ?? null,
-      cancel_at_period_end: cancelAtPeriodEnd ?? false,
+      ...legacyRow,
       // A paid subscription replaces any complimentary grant on the same row and
       // takes over its lifecycle — otherwise the grant's deadline would keep
       // applying to a teacher who is now paying.
@@ -267,10 +271,37 @@ export async function upsertSubscription({
     { onConflict: 'user_id' }
   )
 
+  if (error && isMissingColumnError(error)) {
+    // The app is deployed ahead of its schema: 20260905120000 (source/grant_id)
+    // has not reached this database. supabase-migrations.yml has been failing on
+    // an empty SUPABASE_ACCESS_TOKEN since July, so this is a real state, not a
+    // hypothetical. A webhook that throws here stops recording every payment;
+    // write the row the old way and shout, so the gap is visible in the logs.
+    console.error(
+      '[Subscription] subscriptions.source/grant_id missing — migration 20260905120000 not applied; writing legacy row',
+      error
+    )
+    const retry = await supabase.from('subscriptions').upsert(legacyRow, { onConflict: 'user_id' })
+    if (retry.error) {
+      console.error('[Subscription] Failed to upsert (legacy row):', retry.error)
+      throw retry.error
+    }
+    return
+  }
+
   if (error) {
     console.error('[Subscription] Failed to upsert:', error)
     throw error
   }
+}
+
+/**
+ * PostgREST reports a column the schema cache does not know as PGRST204; the
+ * database itself says 42703. Either means "this migration has not landed here".
+ */
+function isMissingColumnError(error: { code?: string; message?: string }): boolean {
+  if (error.code === 'PGRST204' || error.code === '42703') return true
+  return /column .* does not exist|could not find the '.*' column/i.test(error.message ?? '')
 }
 
 /**

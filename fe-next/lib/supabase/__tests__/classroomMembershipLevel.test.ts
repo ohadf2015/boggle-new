@@ -51,7 +51,7 @@ describe('getClassroomStudents — level on the roster', () => {
     const { data, error } = await getClassroomStudents('c1');
 
     expect(error).toBeNull();
-    expect(selectCalls[0]).toMatch(/\blevel\b/);
+    expect(selectCalls[0]).not.toMatch(/\blevel\b/);
     expect(data.map((s) => s.level)).toEqual(['support', 'core']);
   });
 });
@@ -87,7 +87,7 @@ describe('getStudentClassroom — own level', () => {
 
     const result = await getStudentClassroom('s1');
 
-    expect(selectCalls[0]).toMatch(/\blevel\b/);
+    expect(selectCalls[0]).not.toMatch(/\blevel\b/);
     expect(result.data?.id).toBe('c1');
     expect(result.level).toBe('challenge');
   });

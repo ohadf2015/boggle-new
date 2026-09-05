@@ -270,11 +270,10 @@ export async function getStudentClassroom(
     // Query membership with joined classroom info, ordered by join date (most recent first)
     const { data: membership, error: membershipError } = await supabase
       .from('classroom_memberships')
+      // Own columns as `*` for the same reason as the roster read above: a named
+      // `level` fails the read outright when the column is not there yet.
       .select(`
-        id,
-        classroom_id,
-        joined_at,
-        level,
+        *,
         classrooms (
           id,
           teacher_id,
@@ -326,7 +325,10 @@ export async function getClassroomStudents(
     // First, get all memberships for this classroom
     const { data: memberships, error: membershipError } = await supabase
       .from('classroom_memberships')
-      .select('id, student_id, classroom_id, joined_at, level')
+      // `*`, not a named list: naming `level` makes the whole roster read fail on
+      // a database that has not received 20260905130000 yet (the migration
+      // workflow can lag the deploy). Absent → `core` via coerceLevel below.
+      .select('*')
       .eq('classroom_id', classroomId)
       .order('joined_at', { ascending: true });
 
