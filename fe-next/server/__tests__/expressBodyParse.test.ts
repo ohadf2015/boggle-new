@@ -51,3 +51,25 @@ describe('shouldExpressParseJsonBody — connections-puzzles review Next.js rout
     expect(shouldExpressParseJsonBody('/api/admin/connections-puzzles/reviews')).toBe(false);
   });
 });
+
+/**
+ * Regression: POST /api/admin/teacher-pro (grant) is a Next.js App Router
+ * route with NO Express counterpart — it reads its body via `await
+ * request.json()`. Same class of bug as teacher-access/connections-puzzles
+ * above: Express pre-parsing drains the stream, so the Next handler's own
+ * request.json() never resolves nor rejects. Unlike those routes, this one
+ * was never added to the exclusion list, so every grant request hung until
+ * the client itself gave up (observed in prod: 300s client-abort, "client has
+ * closed the request before the server could send a response") — the route's
+ * own withRouteTimeout 25s cap never got a chance to fire because it lives
+ * inside the handler that request.json() never let start. MUST be excluded.
+ */
+describe('shouldExpressParseJsonBody — teacher-pro grant Next.js route', () => {
+  it('does NOT pre-parse the teacher-pro grant POST body', () => {
+    expect(shouldExpressParseJsonBody('/api/admin/teacher-pro')).toBe(false);
+  });
+
+  it('does NOT pre-parse the teacher-pro revoke POST body', () => {
+    expect(shouldExpressParseJsonBody('/api/admin/teacher-pro/abc-123/revoke')).toBe(false);
+  });
+});
