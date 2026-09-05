@@ -29,10 +29,14 @@ describe('markFirstGameActivation → referral milestone', () => {
   it('reports the first-game milestone so the referrer gets their reward', () => {
     markFirstGameActivation(args);
 
-    expect(postMock).toHaveBeenCalledWith('/api/referral/milestone', {
-      milestone: 'first_game_played',
-      metadata: { totalScore: 120 },
-    });
+    expect(postMock).toHaveBeenCalledWith(
+      '/api/referral/milestone',
+      {
+        milestone: 'first_game_played',
+        metadata: { totalScore: 120 },
+      },
+      { requireSession: true },
+    );
   });
 
   it('fires only on the genuine first game, never again on this device', () => {
