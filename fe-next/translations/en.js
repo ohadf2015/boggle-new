@@ -15072,6 +15072,7 @@ const en = {
       "ok": "OK"
     },
     "teacherAccess": {
+      "giftPro": "Gift Pro",
       "count": {"pending":"Pending","approved":"Approved","declined":"Declined","total":"Total"},
       "approveSuccess": "Request approved successfully",
       "approveError": "Failed to approve request",

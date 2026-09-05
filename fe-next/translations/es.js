@@ -8706,6 +8706,7 @@ const es = {
       }
     },
     "teacherAccess": {
+      "giftPro": "Regalar Pro",
       "title": "Solicitudes de acceso de maestro",
       "empty": "Sin solicitudes",
       "count": {

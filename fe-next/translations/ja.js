@@ -8897,6 +8897,7 @@ const ja = {
       }
     },
     "teacherAccess": {
+      "giftPro": "Proを贈る",
       "empty": "リクエストはありません",
       "title": "先生アクセスリクエスト",
       "count": {

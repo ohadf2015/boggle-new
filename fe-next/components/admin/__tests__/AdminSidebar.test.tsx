@@ -95,3 +95,17 @@ describe('AdminSidebar', () => {
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
 });
+
+describe('AdminSidebar — Teacher Pro gifts under People', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPathname = '/en/admin/teacher-access';
+  });
+
+  it('lists the Teacher Pro gifts page as a People child and navigates to it', () => {
+    render(<AdminSidebar />);
+    const child = screen.getByText('admin.nav.teacherPro');
+    fireEvent.click(child);
+    expect(mockPush).toHaveBeenCalledWith('/en/admin/teacher-pro');
+  });
+});

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, AlertTriangle, Users, BookOpen, ArrowRight } from 'lucide-react';
+import { GraduationCap, AlertTriangle, Users, BookOpen, ArrowRight, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import type { TeacherFunnelResult } from '@/lib/education/teacherFunnel';
@@ -83,14 +83,24 @@ export function TeacherHealthCard() {
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => router.push(`/${language}/admin/teacher-access`)}
-          className="inline-flex items-center gap-1 rounded bg-neo-lime px-3 py-1.5 text-sm font-bold text-neo-navy hover:opacity-90"
-        >
-          {t('admin.teacherHealth.view', 'View')}
-          <ArrowRight className="h-4 w-4" aria-hidden />
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => router.push(`/${language}/admin/teacher-pro`)}
+            className="inline-flex items-center gap-1 rounded border border-neo-lime/40 px-3 py-1.5 text-sm font-bold text-neo-lime hover:bg-neo-lime/10"
+          >
+            <Gift className="h-4 w-4" aria-hidden />
+            {t('admin.teacherAccess.giftPro', 'Gift Pro')}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(`/${language}/admin/teacher-access`)}
+            className="inline-flex items-center gap-1 rounded bg-neo-lime px-3 py-1.5 text-sm font-bold text-neo-navy hover:opacity-90"
+          >
+            {t('admin.teacherHealth.view', 'View')}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
       </div>
 
       {loading && (

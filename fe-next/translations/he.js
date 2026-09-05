@@ -8621,6 +8621,7 @@ const he = {
       }
     },
     "teacherAccess": {
+      "giftPro": "הענקת Pro",
       "title": "בקשות גישת מורה",
       "empty": "אין בקשות",
       "count": {

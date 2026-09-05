@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
+import { Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { TeacherAccessDrawer } from './TeacherAccessDrawer';
@@ -7,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { TeacherAccessRequest, TeacherAccessStatus } from '@/lib/education/types';
 
 export function TeacherAccessQueue() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [rows, setRows] = useState<TeacherAccessRequest[]>([]);
   const [counts, setCounts] = useState({ pending: 0, approved: 0, declined: 0, total: 0 });
   const [status, setStatus] = useState<TeacherAccessStatus | ''>('');
@@ -42,7 +44,16 @@ export function TeacherAccessQueue() {
 
   return (
     <div className="mx-auto max-w-6xl p-6">
-      <h1 className="text-3xl font-extrabold text-neo-white">{t('admin.teacherAccess.title')}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-extrabold text-neo-white">{t('admin.teacherAccess.title')}</h1>
+        <Link
+          href={`/${language}/admin/teacher-pro`}
+          className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-lime px-3 py-1.5 text-sm font-bold text-neo-navy shadow-hard-sm hover:opacity-90"
+        >
+          <Gift className="h-4 w-4" aria-hidden />
+          {t('admin.teacherAccess.giftPro')}
+        </Link>
+      </div>
       <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
         {(['pending', 'approved', 'declined', 'total'] as const).map((k) => (
           <div key={k} className="rounded-neo border-neo border-2 bg-neo-navy-light p-3">

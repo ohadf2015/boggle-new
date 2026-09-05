@@ -81,3 +81,12 @@ describe('<TeacherAccessQueue>', () => {
     });
   });
 });
+
+describe('<TeacherAccessQueue> — Gift Pro entry point', () => {
+  it('links to the Teacher Pro gifts page from the header', async () => {
+    render(<TeacherAccessQueue />);
+    await waitFor(() => screen.getAllByText('a@x.com')[0]);
+    const link = screen.getByRole('link', { name: /admin\.teacherAccess\.giftPro/ });
+    expect(link).toHaveAttribute('href', '/en/admin/teacher-pro');
+  });
+});
