@@ -163,3 +163,26 @@ describe('ClassroomResultsCard', () => {
     });
   });
 });
+
+  it('offers the teacher a Google Classroom post for a 3-min reteach Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('post-reteach-google-classroom');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/class-gap'));
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
+  it('never offers a student the Google Classroom reteach post', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom reteach post when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
+  });

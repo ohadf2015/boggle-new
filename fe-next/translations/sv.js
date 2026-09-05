@@ -13339,7 +13339,11 @@ const sv = {
       "shareGapAllFoundText": "{{lesson}} — klassen hittade alla lektionsord.",
       "shareGapCta": "Spela ett klassspel",
       "shareGapEyebrow": "Dagens klasslucka",
-      "shareGapPracticeHome": "Ord att öva hemma"
+      "shareGapPracticeHome": "Ord att öva hemma",
+      "startReteachLive": "Starta 3-minuters reteach Live",
+      "postReteachGoogleClassroom": "Publicera 3-minuters reteach i Google Classroom",
+      "postReteachGoogleClassroomTitle": "3-minuters reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Öppna länken och starta 3-minuters Live på de missade orden: {{missed}}. Eleverna går med från Stream."
     },
     "nav": {
       "section": "Lärare",

@@ -1418,7 +1418,11 @@ const ru = {
       "shareGapAllFoundText": "{{lesson}} — класс нашёл все слова урока.",
       "shareGapCta": "Сыграть классную игру",
       "shareGapEyebrow": "Пробел класса за сегодня",
-      "shareGapPracticeHome": "Слова для практики дома"
+      "shareGapPracticeHome": "Слова для практики дома",
+      "startReteachLive": "Начать 3-минутный reteach Live",
+      "postReteachGoogleClassroom": "Опубликовать 3-мин reteach в Google Classroom",
+      "postReteachGoogleClassroomTitle": "3-мин reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream."
     },
     "nav": {
       "section": "Учителям",
