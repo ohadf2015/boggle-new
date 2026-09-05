@@ -28,8 +28,12 @@ export function pickTeacherBanner({
   hasPro?: boolean;
   proLoading?: boolean;
 }): TeacherBanner {
+  // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
+  // teacher keeps the trial deadline she was granted Pro to replace; checking
+  // `hasTrial` first put a trial countdown over a Pro dashboard, and turned it
+  // into an "Upgrade to Pro" card the day that dead deadline passed.
+  if (proLoading || hasPro) return 'none';
   if (hasTrial) return 'trial';
   if (isAdmin) return 'none';
-  if (proLoading || hasPro) return 'none';
   return 'pro';
 }

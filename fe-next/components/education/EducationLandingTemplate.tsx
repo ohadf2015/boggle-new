@@ -4,6 +4,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ACCENT, EducationSectionRenderer } from '@/components/education/EducationLandingSections';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import {
   buildEducationLandingJsonLd,
   type EducationLandingContent,
@@ -142,19 +143,18 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           </section>
         )}
 
-        {content.related.length > 0 && (
-          <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={content.labels.relatedTitle}>
-            {content.related.map((r) => (
-              <Link
-                key={r.href}
-                href={`/${locale}${r.href}`}
-                className={`rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 ${ACCENT[r.accent].text} transition-colors hover:bg-neo-navy`}
-              >
-                {r.label}
-              </Link>
-            ))}
-          </nav>
-        )}
+        {/*
+          The page's own curated links render first; `EducationRelatedLinks` tops
+          the rail up from the shared rotation so no landing page is an orphan.
+          Curation alone produced a one-way silo — the six teacher-moment pages
+          were linked from nowhere, footer and hub included.
+        */}
+        <EducationRelatedLinks
+          locale={locale}
+          slug={path.replace('/education/', '')}
+          extra={content.related.map((r) => ({ href: r.href, label: r.label, accent: r.accent }))}
+          count={Math.max(3, content.related.length + 3)}
+        />
 
         <TeacherAccessCTA />
         <DistrictUpsellStrip hideTeacherCta />

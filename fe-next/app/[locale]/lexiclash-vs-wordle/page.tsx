@@ -125,7 +125,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           { title: 'Multiplayer That Gets Competitive', desc: 'Same board, same timer, everyone racing at once. It turns out word games are way more fun when you can watch your friend panic in real time.' },
           { title: 'A Different Kind of Word Brain', desc: 'Wordle is logic and elimination — genuinely satisfying. LexiClash is pattern recognition and speed. You’re scanning a grid, chaining letters, finding words your brain didn’t know it knew.' },
           { title: 'A Whole Adventure Mode', desc: '100+ levels across 10 worlds, each with a boss that has unique mechanics. Upgrades, loot, progression. It’s a word game with an actual campaign, which sounds absurd until you’re hooked.' },
-          { title: 'Play in Your Language', desc: 'English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and grid generation. Wordle is English-only (though fan-made clones exist for other languages).' },
+          { title: 'Play in Your Language', desc: 'English, Hebrew, Swedish, Japanese, Spanish, and Russian. Each language has its own dictionary and grid generation. Wordle is English-only (though fan-made clones exist for other languages).' },
           { title: 'No Subscription Creep', desc: 'Wordle got absorbed into the NYT Games bundle — still playable free, but the upsell is always there. LexiClash is free, no account needed, no "unlock premium" popups. Ever.' },
         ]}
         featuresStyle="positive"

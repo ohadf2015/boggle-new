@@ -54,7 +54,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       {/* Progress Bar */}
       <div className="relative h-6 bg-neo-navy-light border border-neo-black rounded-full overflow-hidden mb-3" data-testid="progress-bar">
         <m.div
-          className="absolute inset-y-0 left-0 bg-neo-cyan"
+          className="absolute inset-y-0 start-0 bg-neo-cyan"
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(progress, 100)}%` }}
           transition={{ type: 'spring', stiffness: 100 }}

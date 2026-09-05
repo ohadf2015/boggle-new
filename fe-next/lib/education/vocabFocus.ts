@@ -4,25 +4,68 @@
  * A teacher enters per-word data (definition, synonyms, antonyms, an example
  * sentence with `___` for the blank) and can then target ONE skill:
  *
- *   definition — prompt: definition,        choices: lesson words
- *   synonym    — prompt: word,              choices: 1 true synonym + 3 synonyms of other words
- *   antonym    — prompt: word,              choices: 1 true antonym + 3 antonyms of other words
- *   context    — prompt: sentence w/ blank, choices: the word + 3 other lesson words
+ *   definition       — prompt: definition,        choices: lesson words
+ *   synonym          — prompt: word,              choices: 1 true synonym + 3 synonyms of other words
+ *   antonym          — prompt: word,              choices: 1 true antonym + 3 antonyms of other words
+ *   context          — prompt: sentence w/ blank, choices: the word + 3 other lesson words
+ *   multiple_meaning — prompt: two senses,        choices: lesson words
+ *   roots_affixes    — prompt: word part or word, choices: meanings or word parts
+ *
+ * The last two are drafted in `vocabFocusSkills.ts`; everything else lives here.
  *
  * Everything here is deterministic for a given seed so a question set can be
  * rebuilt (restart, tests) without storing it.
  */
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import {
+  draftMultipleMeaning,
+  draftRootsAffixes,
+  hasMorphology,
+  hasMultipleMeanings,
+  type SkillDraft,
+} from './vocabFocusSkills';
 
-export type VocabFocus = 'definition' | 'synonym' | 'antonym' | 'context';
+export type VocabFocus =
+  | 'definition'
+  | 'synonym'
+  | 'antonym'
+  | 'context'
+  | 'multiple_meaning'
+  | 'roots_affixes';
 /** What a teacher can pin on an assignment. `any` = student picks. */
 export type PracticeFocusSetting = VocabFocus | 'any';
 
-export const VOCAB_FOCUSES: readonly VocabFocus[] = ['definition', 'synonym', 'antonym', 'context'];
+export const VOCAB_FOCUSES: readonly VocabFocus[] = [
+  'definition',
+  'synonym',
+  'antonym',
+  'context',
+  'multiple_meaning',
+  'roots_affixes',
+];
 export const PRACTICE_FOCUS_SETTINGS: readonly PracticeFocusSetting[] = ['any', ...VOCAB_FOCUSES];
 
-/** A focus needs this many usable words before it can build 4-choice questions. */
+/**
+ * A focus needs this many usable words before it can build 4-choice questions.
+ * The original four draw every distractor from other lesson words, so they need
+ * a full set. The two newer skills can top up from a built-in bank, so one or
+ * two well-filled words are already worth practising.
+ */
 export const MIN_WORDS_PER_FOCUS = 4;
+export const MIN_WORDS_PER_SKILL_FOCUS = 2;
+
+const FOCUS_MIN_WORDS: Record<VocabFocus, number> = {
+  definition: MIN_WORDS_PER_FOCUS,
+  synonym: MIN_WORDS_PER_FOCUS,
+  antonym: MIN_WORDS_PER_FOCUS,
+  context: MIN_WORDS_PER_FOCUS,
+  multiple_meaning: MIN_WORDS_PER_SKILL_FOCUS,
+  roots_affixes: MIN_WORDS_PER_SKILL_FOCUS,
+};
+
+export function minWordsForFocus(focus: VocabFocus): number {
+  return FOCUS_MIN_WORDS[focus] ?? MIN_WORDS_PER_FOCUS;
+}
 export const CHOICES_PER_QUESTION = 4;
 export const DEFAULT_QUESTION_COUNT = 10;
 export const BLANK = '___';
@@ -43,6 +86,11 @@ export interface FocusQuestion {
 export interface BuildOptions {
   count?: number;
   seed: number | string;
+  /**
+   * Lesson language. Only English lessons top distractors up from the built-in
+   * banks — an English fallback in a Hebrew lesson gives the answer away.
+   */
+  language?: string;
 }
 
 export interface LessonWordStats {
@@ -51,6 +99,10 @@ export interface LessonWordStats {
   withSynonyms: number;
   withAntonyms: number;
   withExamples: number;
+  /** Words carrying 2+ distinct senses (multiple-meaning practice). */
+  withMeanings: number;
+  /** Words carrying at least one word part (roots/affixes practice). */
+  withMorphology: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -103,6 +155,10 @@ export function usableForFocus(word: VocabularyWord, focus: VocabFocus): boolean
       return cleanList(word.antonyms).length > 0;
     case 'context':
       return withBlank(word.example, word.word) !== null;
+    case 'multiple_meaning':
+      return hasMultipleMeanings(word);
+    case 'roots_affixes':
+      return hasMorphology(word);
     default:
       return false;
   }
@@ -112,9 +168,40 @@ export function usableWords(words: VocabularyWord[], focus: VocabFocus): Vocabul
   return words.filter((w) => usableForFocus(w, focus));
 }
 
-/** Focuses that have enough data to build a full 4-choice question set. */
-export function availableFocuses(words: VocabularyWord[]): VocabFocus[] {
-  return VOCAB_FOCUSES.filter((focus) => usableWords(words, focus).length >= MIN_WORDS_PER_FOCUS);
+/** Fixed seed so readiness and its badge never disagree with each other. */
+export const READINESS_SEED = 'readiness';
+
+export interface FocusScanOptions {
+  language?: string;
+  seed?: number | string;
+  count?: number;
+}
+
+/**
+ * How many questions each focus can actually produce, straight from the
+ * builder. Readiness and the count a student sees must never be two
+ * independent calculations — that is how they drift apart.
+ */
+export function focusQuestionCounts(
+  words: VocabularyWord[],
+  options: FocusScanOptions = {}
+): Record<VocabFocus, number> {
+  const seed = options.seed ?? READINESS_SEED;
+  const counts = {} as Record<VocabFocus, number>;
+  for (const focus of VOCAB_FOCUSES) {
+    counts[focus] = buildFocusQuestions(words, focus, {
+      seed,
+      language: options.language,
+      count: options.count,
+    }).length;
+  }
+  return counts;
+}
+
+/** Focuses the lesson can actually drive — i.e. that produce at least one question. */
+export function availableFocuses(words: VocabularyWord[], options: FocusScanOptions = {}): VocabFocus[] {
+  const counts = focusQuestionCounts(words, options);
+  return VOCAB_FOCUSES.filter((focus) => counts[focus] > 0);
 }
 
 export function lessonWordStats(words: VocabularyWord[]): LessonWordStats {
@@ -124,6 +211,8 @@ export function lessonWordStats(words: VocabularyWord[]): LessonWordStats {
     withSynonyms: words.filter((w) => cleanList(w.synonyms).length > 0).length,
     withAntonyms: words.filter((w) => cleanList(w.antonyms).length > 0).length,
     withExamples: words.filter((w) => clean(w.example).length > 0).length,
+    withMeanings: words.filter(hasMultipleMeanings).length,
+    withMorphology: words.filter(hasMorphology).length,
   };
 }
 
@@ -180,14 +269,22 @@ function uniqueCi(items: string[]): string[] {
 // Question building
 // ---------------------------------------------------------------------------
 
-interface Draft {
-  prompt: string;
-  answer: string;
-  /** Candidate distractors, already excluding anything that would be a second right answer. */
-  pool: string[];
-}
+type Draft = SkillDraft;
 
-function draftFor(target: VocabularyWord, focus: VocabFocus, all: VocabularyWord[], rng: () => number): Draft | null {
+const lessonOnly = (prompt: string, answer: string, pool: string[]): Draft => ({
+  prompt,
+  answer,
+  pool,
+  fallbackPool: [],
+});
+
+function draftFor(
+  target: VocabularyWord,
+  focus: VocabFocus,
+  all: VocabularyWord[],
+  rng: () => number,
+  options: BuildOptions
+): Draft | null {
   const others = all.filter((w) => w !== target && clean(w.word).length > 0);
   const targetWord = clean(target.word);
   const exclude = new Set<string>([targetWord.toLowerCase()]);
@@ -196,12 +293,12 @@ function draftFor(target: VocabularyWord, focus: VocabFocus, all: VocabularyWord
     case 'definition': {
       const definition = clean(target.definition);
       if (!definition) return null;
-      return { prompt: definition, answer: targetWord, pool: uniqueCi(others.map((w) => clean(w.word))) };
+      return lessonOnly(definition, targetWord, uniqueCi(others.map((w) => clean(w.word))));
     }
     case 'context': {
       const prompt = withBlank(target.example, target.word);
       if (!prompt) return null;
-      return { prompt, answer: targetWord, pool: uniqueCi(others.map((w) => clean(w.word))) };
+      return lessonOnly(prompt, targetWord, uniqueCi(others.map((w) => clean(w.word))));
     }
     case 'synonym':
     case 'antonym': {
@@ -211,11 +308,33 @@ function draftFor(target: VocabularyWord, focus: VocabFocus, all: VocabularyWord
       own.forEach((s) => exclude.add(s.toLowerCase()));
       const answer = pick(own, rng);
       const pool = uniqueCi(others.flatMap((w) => cleanList(w[key]))).filter((s) => !exclude.has(s.toLowerCase()));
-      return { prompt: targetWord, answer, pool };
+      return lessonOnly(targetWord, answer, pool);
     }
+    case 'multiple_meaning':
+      return draftMultipleMeaning(target, others, rng, { language: options.language });
+    case 'roots_affixes':
+      return draftRootsAffixes(target, others, rng, { language: options.language });
     default:
       return null;
   }
+}
+
+/**
+ * Fill the choice slots: the lesson's own material first, the built-in bank
+ * only for what is left over.
+ */
+function chooseDistractors(draft: Draft, rng: () => number): string[] | null {
+  const needed = CHOICES_PER_QUESTION - 1;
+  const taken = new Set<string>([draft.answer.toLowerCase()]);
+  const out: string[] = [];
+  for (const candidate of [...shuffle(draft.pool, rng), ...shuffle(draft.fallbackPool, rng)]) {
+    const key = candidate.toLowerCase();
+    if (!candidate || taken.has(key)) continue;
+    taken.add(key);
+    out.push(candidate);
+    if (out.length === needed) return out;
+  }
+  return null;
 }
 
 /**
@@ -228,19 +347,21 @@ export function buildFocusQuestions(
   options: BuildOptions
 ): FocusQuestion[] {
   const usable = usableWords(words, focus);
-  if (usable.length < MIN_WORDS_PER_FOCUS) return [];
+  if (usable.length < minWordsForFocus(focus)) return [];
 
   const rng = createRng(`${focus}:${String(options.seed)}`);
   const count = Math.min(options.count ?? DEFAULT_QUESTION_COUNT, usable.length);
+  // Distractors may come from any lesson word, not only the ones usable for
+  // this focus (a word with no synonyms is still a fine "wrong word" choice).
   const order = shuffle(usable, rng);
   const questions: FocusQuestion[] = [];
 
   for (const target of order) {
     if (questions.length >= count) break;
-    const draft = draftFor(target, focus, usable, rng);
+    const draft = draftFor(target, focus, words, rng, options);
     if (!draft) continue;
-    const distractors = shuffle(draft.pool, rng).slice(0, CHOICES_PER_QUESTION - 1);
-    if (distractors.length < CHOICES_PER_QUESTION - 1) continue;
+    const distractors = chooseDistractors(draft, rng);
+    if (!distractors) continue;
     const choices = shuffle([draft.answer, ...distractors], rng);
     const definition = clean(target.definition) || undefined;
     questions.push({

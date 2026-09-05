@@ -75,13 +75,14 @@ describe('ChallengeButton', () => {
       expect(button).toHaveTextContent('challengePlayer');
     });
 
-    it('opens modal when clicked', () => {
+    it('opens modal when clicked', async () => {
       render(<ChallengeButton {...mockProps} />);
 
       const button = screen.getByTestId('challenge-button');
       fireEvent.click(button);
 
-      expect(screen.getByTestId('duel-challenge-modal')).toBeInTheDocument();
+      // next/dynamic: the modal chunk resolves a tick after the click.
+      expect(await screen.findByTestId('duel-challenge-modal')).toBeInTheDocument();
     });
 
     it('shows success state after modal closes', async () => {
@@ -92,7 +93,7 @@ describe('ChallengeButton', () => {
       fireEvent.click(button);
 
       // Close modal
-      const closeButton = screen.getByText('Close');
+      const closeButton = await screen.findByText('Close');
       fireEvent.click(closeButton);
 
       // Success state
@@ -108,7 +109,7 @@ describe('ChallengeButton', () => {
       const button = screen.getByTestId('challenge-button');
       fireEvent.click(button);
 
-      const closeButton = screen.getByText('Close');
+      const closeButton = await screen.findByText('Close');
       fireEvent.click(closeButton);
 
       // Button disabled
@@ -147,13 +148,13 @@ describe('ChallengeButton', () => {
       expect(button).toHaveAttribute('aria-label', 'challengePlayer');
     });
 
-    it('opens modal when clicked', () => {
+    it('opens modal when clicked', async () => {
       render(<ChallengeButton {...mockProps} variant="icon" />);
 
       const button = screen.getByTestId('challenge-button-icon');
       fireEvent.click(button);
 
-      expect(screen.getByTestId('duel-challenge-modal')).toBeInTheDocument();
+      expect(await screen.findByTestId('duel-challenge-modal')).toBeInTheDocument();
     });
 
     it('applies icon-specific styling', () => {
@@ -179,7 +180,7 @@ describe('ChallengeButton', () => {
       expect(screen.getByText('Modal for John Doe')).toBeInTheDocument();
     });
 
-    it('closes modal when onClose is called', () => {
+    it('closes modal when onClose is called', async () => {
       render(<ChallengeButton {...mockProps} />);
 
       // Open modal
@@ -187,7 +188,7 @@ describe('ChallengeButton', () => {
       fireEvent.click(button);
 
       // Modal visible
-      expect(screen.getByTestId('duel-challenge-modal')).toBeInTheDocument();
+      expect(await screen.findByTestId('duel-challenge-modal')).toBeInTheDocument();
 
       // Close modal
       const closeButton = screen.getByText('Close');

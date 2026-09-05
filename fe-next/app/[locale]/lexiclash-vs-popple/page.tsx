@@ -70,7 +70,7 @@ const faqs = [
   },
   {
     q: 'What about languages and accessibility?',
-    a: 'LexiClash: 6 languages (English, Hebrew with full RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility. Popple is English-only. If you play in Hebrew or other languages, LexiClash is the only choice. LexiClash also fully supports reduced-motion preferences (important for people sensitive to animations).',
+    a: 'LexiClash: 6 languages (English, Hebrew with full RTL support, Swedish, Japanese, Spanish, Russian), WCAG 2.1 AA accessibility. Popple is English-only. If you play in Hebrew or other languages, LexiClash is the only choice. LexiClash also fully supports reduced-motion preferences (important for people sensitive to animations).',
   },
 ];
 
@@ -162,7 +162,7 @@ export default async function LexiClashVsPopplePage({ params }: PageProps) {
             {[
               { title: 'Adventure Campaign', desc: '100+ levels across 10 worlds with boss battles, upgrades, and loot. A full story mode that turns word hunting into a journey.' },
               { title: 'Brain Training Drills', desc: '5 dedicated modes (Memory Hunt, Combo Master, etc.) that sharpen specific cognitive skills. Gameplay designed around learning, not just winning.' },
-              { title: 'Multilingual & RTL', desc: 'English, Hebrew (full RTL), Swedish, Japanese, Spanish. Play word games in your language. Hebrew speakers especially — this is the only option.' },
+              { title: 'Multilingual & RTL', desc: 'English, Hebrew (full RTL), Swedish, Japanese, Spanish, Russian. Play word games in your language. Hebrew speakers especially — this is the only option.' },
               { title: 'Unlimited Game Modes', desc: '30+ modes including Connections, Wordle-style daily, Blast (action), Party games, and more. Same core skill set, wildly different experiences.' },
               { title: 'Global Leaderboards', desc: 'Daily challenges with worldwide rankings. Integrated into adventure progression and multiple game types.' },
               { title: 'No App Required', desc: 'Runs in your browser. Open a link, play immediately. Popple has apps, which is nice, but a web game is always faster to jump into.' },

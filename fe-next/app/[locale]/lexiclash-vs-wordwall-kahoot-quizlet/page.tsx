@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // on purpose — a balanced table is what AI engines cite.
 type Tool = 'lexi' | 'wordwall' | 'kahoot' | 'quizlet';
 const rows: { label: string; marks: Record<Tool, boolean> }[] = [
-  { label: 'מנוע ילידי לחמש שפות (עברית RTL, יפנית IME)', marks: { lexi: true, wordwall: false, kahoot: false, quizlet: false } },
+  { label: 'מנוע ילידי לשש שפות (עברית RTL, יפנית IME)', marks: { lexi: true, wordwall: false, kahoot: false, quizlet: false } },
   { label: 'משחקי בניית-מילים לאוצר מילים', marks: { lexi: true, wordwall: false, kahoot: false, quizlet: false } },
   { label: 'משחק רב-משתתפים חי לכל הכיתה', marks: { lexi: true, wordwall: false, kahoot: true, quizlet: false } },
   { label: 'ללא חשבון לתלמיד — מצטרפים בקוד', marks: { lexi: true, wordwall: true, kahoot: true, quizlet: false } },

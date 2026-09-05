@@ -3,6 +3,7 @@
 import { useCallback, useRef } from 'react';
 import Script from 'next/script';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
 import { supabase } from '@/lib/supabase';
 import {
@@ -26,6 +27,7 @@ const GSI_SRC = 'https://accounts.google.com/gsi/client';
  */
 export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
+  const { language } = useLanguage();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
 
@@ -48,9 +50,11 @@ export default function GoogleOneTapInitializer() {
 
   if (!enabled) return null;
 
+  // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
+  // without it, One Tap falls back to the browser/OS locale instead of the site's.
   return (
     <Script
-      src={GSI_SRC}
+      src={`${GSI_SRC}?hl=${language}`}
       // lazyOnload: the gsi client + its iframe + Google Sans font (~200KB,
       // plus main-thread init) were competing with LCP on the landing page.
       // One Tap appearing a few seconds later is an acceptable tradeoff.

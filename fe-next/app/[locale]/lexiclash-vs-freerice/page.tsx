@@ -55,7 +55,7 @@ const faqs = [
   { q: 'What is the main difference between LexiClash and Freerice?', a: 'Freerice is a solo game — you answer multiple-choice vocabulary questions, and the World Food Programme donates rice for correct answers. LexiClash is a real-time classroom game: students form and spell words on Boggle-style grids and wheels, competing live against the whole class or 1v1. Freerice is great for solo practice with a charitable hook; LexiClash is built for whole-class engagement and teacher visibility.' },
   { q: 'Can teachers track progress on LexiClash?', a: 'Yes — LexiClash has a teacher dashboard showing per-student accuracy, missed words, and class-wide patterns. Freerice is anonymous and solo by design, with no class roster or per-student reporting.' },
   { q: 'Can I use my own vocabulary words?', a: 'Yes — LexiClash teachers upload custom word lists from any unit. Freerice draws from its own fixed question banks; you choose a category, not your own list.' },
-  { q: 'Does LexiClash support multiple languages?', a: 'Yes — native dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese with CEFR-scaled difficulty (A1–C2). Freerice also offers several language and subject categories, but as solo quizzes rather than multiplayer word games.' },
+  { q: 'Does LexiClash support multiple languages?', a: 'Yes — native dictionaries for English, Hebrew (RTL), Spanish, Swedish, Japanese, and Russian with difficulty the teacher sets. Freerice also offers several language and subject categories, but as solo quizzes rather than multiplayer word games.' },
   { q: 'Should I use both Freerice and LexiClash?', a: 'They serve different moments. Freerice is a calm, solo, do-good activity — good for early finishers or independent practice. LexiClash is the loud, competitive, whole-class review game. Using both gives you a solo option and a multiplayer option, both free and login-free.' },
 ];
 
@@ -153,7 +153,7 @@ export default async function Page({ params }: PageProps) {
               { title: 'Teacher visibility', desc: 'Freerice is anonymous. LexiClash shows per-student accuracy, missed words, and which words tripped the whole class.' },
               { title: 'Your own word lists', desc: 'Freerice uses fixed question banks. LexiClash plays this week’s unit vocabulary — upload it in under a minute.' },
               { title: 'Word formation, not multiple choice', desc: 'Freerice asks you to pick a definition. LexiClash makes students spell and build real words — active production, not recognition.' },
-              { title: '5 native-dictionary languages', desc: 'EN/HE/ES/SV/JA word validation with CEFR difficulty for ESL and bilingual classes.' },
+              { title: '6 native-dictionary languages', desc: 'EN/HE/ES/SV/JA/RU word validation with difficulty the teacher sets for ESL and bilingual classes.' },
               { title: 'Still free, still no login', desc: 'You keep everything that makes Freerice easy to start — and add classroom structure on top.' },
             ].map((item) => (
               <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">

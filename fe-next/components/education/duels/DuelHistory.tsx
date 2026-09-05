@@ -213,9 +213,9 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 className={cn(
                   'p-4 rounded-neo border-neo shadow-hard flex items-center gap-4',
                   'bg-neo-navy',
-                  isWin && 'border-l-4 border-l-green-500',
-                  isLoss && 'border-l-4 border-l-red-500',
-                  isDraw && 'border-l-4 border-l-yellow-500'
+                  isWin && 'border-s-4 border-s-green-500',
+                  isLoss && 'border-s-4 border-s-red-500',
+                  isDraw && 'border-s-4 border-s-yellow-500'
                 )}
                 data-testid={
                   isDraw

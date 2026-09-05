@@ -7,6 +7,14 @@ import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { hreflangAlternates } from '@/lib/seo/hreflang';
+import {
+  educationBreadcrumbJsonLd,
+  educationFaqJsonLd,
+  educationLearningResourceJsonLd,
+} from '@/lib/seo/educationLanding';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -14,6 +22,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/games-for-teachers';
+const SLUG = 'games-for-teachers';
 
 const OG_IMAGE: Record<string, string> = {
   en: 'education-hero-en.webp',
@@ -49,17 +58,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: c.twitterDescription,
       images: [ogImage],
     },
+    // hreflangAlternates, not a hand-written seven: `app/sitemap.ts` emits the ~24-entry
+    // map (regional variants included) from the same helper, and Google discards any
+    // annotation the other side does not reciprocate.
     alternates: {
       canonical: pageUrl,
-      languages: {
-        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
-        en: `${BASE_URL}/en${PAGE_PATH}`,
-        he: `${BASE_URL}/he${PAGE_PATH}`,
-        sv: `${BASE_URL}/sv${PAGE_PATH}`,
-        ja: `${BASE_URL}/ja${PAGE_PATH}`,
-        es: `${BASE_URL}/es${PAGE_PATH}`,
-        ru: `${BASE_URL}/ru${PAGE_PATH}`,
-      },
+      languages: hreflangAlternates(PAGE_PATH),
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -71,44 +75,26 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getGamesForTeachersContent(locale);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
+  const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
-  const learningResourceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#resource`,
+  const learningResourceJsonLd = educationLearningResourceJsonLd({
+    locale,
+    path: PAGE_PATH,
     name: c.metaTitle,
-    url: `${BASE_URL}/${locale}${PAGE_PATH}`,
-    inLanguage: 'en',
+    description: c.metaDescription,
     learningResourceType: 'Activity',
     educationalUse: ['Classroom Activity', 'Formative Assessment', 'Vocabulary Building', 'Brain Break', 'Substitute Teacher Activity'],
     educationalLevel: ['Primary', 'Secondary', 'Adult Education'],
     typicalAgeRange: '8-99',
-    isAccessibleForFree: true,
     teaches: 'Vocabulary, spelling, word recognition, contextual usage',
-    audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
-    provider: {
-      '@type': 'EducationalOrganization',
-      '@id': `${BASE_URL}/en/education#org`,
-      name: 'LexiClash Education',
-      url: `${BASE_URL}/en/education`,
-    },
-  };
+    educationalRole: 'teacher',
+  });
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: 'Games for Teachers', item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const breadcrumbJsonLd = educationBreadcrumbJsonLd({
+    locale,
+    path: PAGE_PATH,
+    current: educationPageLabel(SLUG, locale),
+  });
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
@@ -197,12 +183,16 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
-        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={c.relatedResourcesAriaLabel}>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.relatedVocabLink}</Link>
-          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.relatedEslLink}</Link>
-          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.relatedEducationLink}</Link>
-          <Link href={`/${locale}/education/for-schools`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-yellow transition-all hover:bg-neo-navy">{c.relatedForSchoolsLink}</Link>
-        </nav>
+        <EducationRelatedLinks
+          locale={locale}
+          slug={SLUG}
+          extra={[
+            { href: '/education/vocabulary-games-classroom', label: c.relatedVocabLink, accent: 'lime' },
+            { href: '/education/esl-word-games', label: c.relatedEslLink, accent: 'cyan' },
+            { href: '/education/for-schools', label: c.relatedForSchoolsLink, accent: 'pink' },
+          ]}
+          count={6}
+        />
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-purple p-8 text-neo-white shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">

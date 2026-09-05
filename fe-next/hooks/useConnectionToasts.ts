@@ -9,6 +9,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
  * Hook that shows toast notifications for connection status changes
  * Shows toasts for disconnect, reconnecting, and reconnected events
  * Safely handles cases where SocketContext is not available
+ *
+ * Fallbacks are passed as `t`'s SECOND argument, never as `t('x') || 'y'`.
+ * `t` echoes the key path when the dictionary has not loaded, and a key path
+ * is truthy — so the `||` form is dead code that guarantees the raw key on
+ * screen. A reconnect toast is precisely when the dictionary may be missing:
+ * the socket reconnects on its own schedule and can beat the i18n fetch.
  */
 export function useConnectionToasts() {
   const socketContext = useSocketOptional();
@@ -39,7 +45,7 @@ export function useConnectionToasts() {
       }
 
       disconnectToastIdRef.current = toast.error(
-        t('common.connectionLost') || 'Connection lost',
+        t('common.connectionLost', 'Connection lost'),
         {
           id: 'connection-lost',
           duration: 10000,
@@ -56,7 +62,7 @@ export function useConnectionToasts() {
       }
 
       disconnectToastIdRef.current = toast.loading(
-        t('common.reconnecting') || 'Reconnecting...',
+        t('common.reconnecting', 'Reconnecting...'),
         {
           id: 'connection-reconnecting',
           duration: Infinity,
@@ -76,7 +82,7 @@ export function useConnectionToasts() {
       disconnectToastIdRef.current = null;
 
       toast.error(
-        t('common.reconnectFailed') || 'Connection lost. Please refresh.',
+        t('common.reconnectFailed', 'Connection lost. Please refresh.'),
         {
           id: 'connection-failed',
           duration: 6000,
@@ -94,7 +100,7 @@ export function useConnectionToasts() {
       }
 
       toast.success(
-        t('common.reconnected') || 'Connected!',
+        t('common.reconnected', 'Connected!'),
         {
           id: 'connection-reconnected',
           duration: 3000,

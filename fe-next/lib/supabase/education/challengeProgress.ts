@@ -3,7 +3,7 @@
  * Event-driven progress updates for daily challenges
  */
 
-import { supabase } from '@/lib/supabase';
+import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
 import type { DailyChallengeRow, WeeklyQuestRow } from './types';
 
@@ -61,13 +61,30 @@ export async function updateEducationChallengeProgress(
   value: number
 ): Promise<{ updated: number }> {
   try {
-    if (!supabase) return { updated: 0 };
+    // Service-role client, deliberately NOT the module-level browser client from
+    // '@/lib/supabase'. This runs inside a Next API route, where that client
+    // carries no session and acts as `anon` — and `daily_challenges` /
+    // `weekly_quests` grant SELECT only to the owning `authenticated` user and
+    // writes only `TO service_role` (migration 20260317100000, whose own comment
+    // reads "Allow the server (via admin client) to insert/update challenges").
+    // Through the anon client the fetch below returned 0 rows with `error: null`
+    // and nothing was ever written: a silent no-op that froze every student's
+    // daily challenges and weekly quests. Mirrors `getWriteClient()` in
+    // ./challenges.ts, minus that helper's anon fallback — falling back here
+    // silently restores exactly this bug, so a missing key is an error instead.
+    const db = createAdminClient();
+    if (!db) {
+      logger.error(
+        'Challenge progress skipped: no service-role Supabase client (SUPABASE_SERVICE_ROLE_KEY unset or placeholder). Daily challenges and weekly quests will not advance.'
+      );
+      return { updated: 0 };
+    }
 
     const today = getToday();
     const challengeType = EVENT_TO_CHALLENGE_TYPE[eventType];
 
     // Fetch today's incomplete challenges for this player
-    const { data: challenges, error: fetchError } = await supabase
+    const { data: challenges, error: fetchError } = await db
       .from('daily_challenges')
       .select('*')
       .eq('player_id', playerId)
@@ -85,37 +102,52 @@ export async function updateEducationChallengeProgress(
 
     let updatedCount = 0;
 
-    for (const challenge of matching) {
-      const newValue = challenge.current_value + value;
-      const isCompleted = newValue >= challenge.target_value;
+    // PERF: one batched write instead of an awaited UPDATE per row. Each row
+    // carries its own incremented value, so this is an upsert keyed on the
+    // primary key rather than a single UPDATE ... IN (...).
+    if (matching.length > 0) {
+      const rows = matching.map(challenge => {
+        const newValue = challenge.current_value + value;
+        const isCompleted = newValue >= challenge.target_value;
+        return {
+          // Conflict key + every NOT NULL column, so the row is still valid on
+          // the INSERT branch if the id has vanished.
+          id: challenge.id,
+          player_id: challenge.player_id,
+          challenge_date: challenge.challenge_date,
+          challenge_type: challenge.challenge_type,
+          challenge_tier: challenge.challenge_tier,
+          title: challenge.title,
+          description: challenge.description,
+          target_value: challenge.target_value,
+          xp_reward: challenge.xp_reward,
+          // The three columns this function owns. Present on EVERY row: PostgREST
+          // rejects a bulk upsert whose objects have differing key sets. And
+          // `claimed` / `claimed_at` / `bonus_reward` are omitted, so ON CONFLICT
+          // DO UPDATE leaves them alone — a claim landing between the read above
+          // and this write is not clobbered.
+          current_value: newValue,
+          completed: isCompleted ? true : challenge.completed,
+          completed_at: isCompleted ? new Date().toISOString() : challenge.completed_at,
+        };
+      });
 
-      const updatePayload: Record<string, unknown> = {
-        current_value: newValue,
-      };
-
-      if (isCompleted) {
-        updatePayload.completed = true;
-        updatePayload.completed_at = new Date().toISOString();
-      }
-
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('daily_challenges')
-        .update(updatePayload)
-        .eq('id', challenge.id);
+        .upsert(rows, { onConflict: 'id' });
 
       if (updateError) {
         logger.error('Error updating challenge progress:', updateError);
-        continue;
+      } else {
+        updatedCount += rows.length;
       }
-
-      updatedCount += 1;
     }
 
     // ----- Weekly quest progress -----
     // Fetch this week's incomplete weekly quests, filter by quest_type,
     // and increment current_progress[challengeType] (canonical key shape).
     const weekStart = getCurrentWeekStart();
-    const { data: weeklyQuests, error: weeklyFetchError } = await supabase
+    const { data: weeklyQuests, error: weeklyFetchError } = await db
       .from('weekly_quests')
       .select('*')
       .eq('player_id', playerId)
@@ -131,33 +163,42 @@ export async function updateEducationChallengeProgress(
       q => q.quest_type === challengeType
     );
 
-    for (const quest of matchingWeekly) {
-      const requirements = (quest.requirements ?? {}) as Record<string, number>;
-      const currentProgress = (quest.current_progress ?? {}) as Record<string, number>;
-      const target = requirements[challengeType] ?? 0;
-      const prev = currentProgress[challengeType] ?? 0;
-      const newValue = prev + value;
-      const isCompleted = target > 0 && newValue >= target;
+    // PERF: same batching as the daily challenges above — one write per table.
+    if (matchingWeekly.length > 0) {
+      const questRows = matchingWeekly.map(quest => {
+        const requirements = (quest.requirements ?? {}) as Record<string, number>;
+        const currentProgress = (quest.current_progress ?? {}) as Record<string, number>;
+        const target = requirements[challengeType] ?? 0;
+        const prev = currentProgress[challengeType] ?? 0;
+        const newValue = prev + value;
+        const isCompleted = target > 0 && newValue >= target;
 
-      const updatePayload: Record<string, unknown> = {
-        current_progress: { ...currentProgress, [challengeType]: newValue },
-      };
-      if (isCompleted) {
-        updatePayload.completed = true;
-        updatePayload.completed_at = new Date().toISOString();
-      }
+        return {
+          // Same shape rule as the daily rows above: conflict key + NOT NULLs +
+          // only the columns this function owns, identical keys on every row.
+          id: quest.id,
+          player_id: quest.player_id,
+          week_start: quest.week_start,
+          quest_type: quest.quest_type,
+          title: quest.title,
+          description: quest.description,
+          requirements: quest.requirements,
+          xp_reward: quest.xp_reward,
+          current_progress: { ...currentProgress, [challengeType]: newValue },
+          completed: isCompleted ? true : quest.completed,
+          completed_at: isCompleted ? new Date().toISOString() : quest.completed_at,
+        };
+      });
 
-      const { error: weeklyUpdateError } = await supabase
+      const { error: weeklyUpdateError } = await db
         .from('weekly_quests')
-        .update(updatePayload)
-        .eq('id', quest.id);
+        .upsert(questRows, { onConflict: 'id' });
 
       if (weeklyUpdateError) {
         logger.error('Error updating weekly quest progress:', weeklyUpdateError);
-        continue;
+      } else {
+        updatedCount += questRows.length;
       }
-
-      updatedCount += 1;
     }
 
     return { updated: updatedCount };

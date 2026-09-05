@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, createRequestClient } from '@/utils/supabase/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
@@ -25,7 +25,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: challenges, error } = await getDailyChallenges(user.id);
+    // Read as the REQUEST's authenticated user, not through the module-level
+    // browser client. That client is `anon` inside an API route, and RLS on this
+    // table grants SELECT only to the owning `authenticated` user — so the read
+    // returned 0 rows with `error: null` and the student saw nothing.
+    // `createRequestClient` covers the Bearer-token case (Capacitor webview,
+    // cookie-blocking browsers) as well as cookies. RLS still scopes the rows to
+    // this user; an admin client would not.
+    const { supabase: userClient } = await createRequestClient(request);
+
+    const { data: challenges, error } = await getDailyChallenges(user.id, undefined, userClient);
     if (error) {
       logger.error('GET daily challenges error:', error);
       return NextResponse.json({ error: 'Failed to fetch challenges' }, { status: 500 });

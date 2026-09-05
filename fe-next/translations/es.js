@@ -1,5 +1,62 @@
 // Es translations
 const es = {
+  "vocabQuiz": {
+    "progress": "Pregunta {current} de {total}",
+    "timeLeft": "Quedan {seconds} segundos",
+    "paused": "Tu profe puso el test en pausa",
+    "waiting": "Prepárate: la primera pregunta ya viene.",
+    "lockedIn": "Respuesta enviada. Espera al resto de la clase.",
+    "streak": {
+      "label": "{count} seguidas"
+    },
+    "answers": {
+      "label": "Elige una respuesta",
+      "option": "{option}",
+      "correctOption": "{option}: la respuesta correcta"
+    },
+    "focus": {
+      "any": "Mezcla",
+      "definition": "Definiciones",
+      "synonym": "Sinónimos",
+      "antonym": "Antónimos",
+      "context": "Pistas de contexto",
+      "multiple_meaning": "Palabras polisémicas",
+      "roots_affixes": "Raíces y afijos"
+    },
+    "feedback": {
+      "correct": "¡Bien! Ganaste {points} puntos",
+      "wrong": "Casi: era {answer}",
+      "noAnswer": "Se acabó el tiempo: era {answer}",
+      "breakdown": "{base} de base · {speed} por rapidez · {streak} por la racha"
+    },
+    "standings": {
+      "title": "Clasificación",
+      "empty": "Todavía no hay puntos."
+    },
+    "finished": {
+      "title": "¡Se acabó!",
+      "yourScore": "Tu puntuación: {score}."
+    },
+    "host": {
+      "joinCode": "Código",
+      "waiting": "Esperando la primera pregunta…"
+    },
+    "setup": {
+      "focusTitle": "¿Qué quieres practicar en este test?",
+      "focusDescription": "Cada opción indica cuántas preguntas se pueden armar con las palabras que elegiste.",
+      "questionsAvailable": "{count} preguntas",
+      "focusLocked": "Faltan datos de las palabras",
+      "noQuestions": "Con estas palabras todavía no se puede armar un test. Añade una definición a por lo menos cuatro de ellas en el editor de listas y vuelve.",
+      "enrichHint": "Las opciones en gris necesitan datos que tu lista aún no tiene. Añade sinónimos, antónimos o una frase de ejemplo a tus palabras en el editor de listas para desbloquearlas.",
+      "questionCount": "¿Cuántas preguntas?",
+      "cappedNotice": "Con estas palabras salen {count} preguntas, así que esa será la duración de la ronda.",
+      "secondsPerQuestion": "Tiempo por pregunta",
+      "seconds": "{seconds} s"
+    },
+    "errors": {
+      "noQuestions": "Esta lección todavía no tiene palabras listas para un test."
+    }
+  },
   "pricing": {
     "title": "Elige tu plan",
     "subtitle": "Funciones de aula para profes y colegios",
@@ -952,7 +1009,7 @@ const es = {
     },
     "about": {
       "title": "Sobre LexiClash - Nuestra Historia, Mision y Equipo",
-      "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 5 idiomas.",
+      "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 6 idiomas.",
       "ogTitle": "Sobre LexiClash - Innovación en Juegos de Palabras",
       "ogDescription": "La historia detrás de LexiClash: hacer el aprendizaje de idiomas divertido y competitivo a través de batallas de palabras en tiempo real."
     },
@@ -1230,9 +1287,9 @@ const es = {
     },
     "educationHub": {
       "title": "Juegos de vocabulario gratis para el aula — sin cuentas de estudiantes",
-      "description": "Juegos de palabras y vocabulario gratis para tu clase — sin cuentas de estudiantes, sin anuncios, sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase, en 5 idiomas.",
+      "description": "Juegos de palabras y vocabulario gratis para tu clase — sin cuentas de estudiantes, sin anuncios, sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase, en 6 idiomas.",
       "ogTitle": "Juegos de vocabulario gratis para el aula",
-      "ogDescription": "Sin cuentas de estudiantes, sin anuncios — usa tus listas de palabras y juega con toda la clase en 5 idiomas."
+      "ogDescription": "Sin cuentas de estudiantes, sin anuncios — usa tus listas de palabras y juega con toda la clase en 6 idiomas."
     },
     "educationDuels": {
       "title": "Duelos de Vocabulario — Estudiante vs Estudiante",
@@ -4529,7 +4586,7 @@ const es = {
       "story": {
         "title": "Nuestra Historia",
         "content": "LexiClash nació en 2024 en Israel a partir de una idea simple pero poderosa: ¿y si los juegos de palabras pudieran ser tan emocionantes y competitivos como los esports, y al mismo tiempo ayudar a las personas a aprender nuevos idiomas? Nuestro fundador, Ohad Fisher, creció jugando juegos de palabras con familia y amigos en múltiples idiomas. Notó que aunque había muchos juegos de palabras disponibles, ninguno combinaba verdaderamente el juego competitivo en tiempo real con un aprendizaje de idiomas significativo a través de diferentes sistemas de escritura y direcciones de texto.",
-        "content2": "Partiendo de un pequeño prototipo, el equipo construyó LexiClash desde cero con soporte multilingüe en su núcleo — incluyendo soporte completo de derecha a izquierda (RTL) para hebreo. En el primer año, LexiClash creció para admitir cinco idiomas (hebreo, inglés, sueco, japonés y español), introdujo múltiples modos de juego originales y construyó una comunidad creciente de jugadores de más de 30 países que compiten diariamente en batallas de palabras."
+        "content2": "Partiendo de un pequeño prototipo, el equipo construyó LexiClash desde cero con soporte multilingüe en su núcleo — incluyendo soporte completo de derecha a izquierda (RTL) para hebreo. En el primer año, LexiClash creció para admitir seis idiomas (hebreo, inglés, sueco, japonés y español), introdujo múltiples modos de juego originales y construyó una comunidad creciente de jugadores de más de 30 países que compiten diariamente en batallas de palabras."
       },
       "mission": {
         "title": "Nuestra Misión",
@@ -4545,7 +4602,7 @@ const es = {
         },
         "multilingual": {
           "title": "Verdadero Soporte Multilingüe",
-          "content": "Admitimos 5 idiomas incluyendo hebreo con soporte completo de diseño de derecha a izquierda. Cada modo de juego, cada elemento de la interfaz y cada retroalimentación funciona perfectamente en todos los idiomas admitidos. Los jugadores pueden cambiar de idioma instantáneamente e incluso practicar vocabulario en diferentes idiomas."
+          "content": "Admitimos 6 idiomas incluyendo hebreo con soporte completo de diseño de derecha a izquierda. Cada modo de juego, cada elemento de la interfaz y cada retroalimentación funciona perfectamente en todos los idiomas admitidos. Los jugadores pueden cambiar de idioma instantáneamente e incluso practicar vocabulario en diferentes idiomas."
         },
         "education": {
           "title": "Integración Educativa",
@@ -5105,7 +5162,7 @@ const es = {
       "tagline": "En Vivo",
       "title": "Juega.",
       "titleAccent": "Gana.",
-      "howTo": "Toca letras conectadas para formar palabras. Palabras más largas = más puntos. Reto diario y multijugador en vivo en cinco idiomas.",
+      "howTo": "Toca letras conectadas para formar palabras. Palabras más largas = más puntos. Reto diario y multijugador en vivo en seis idiomas.",
       "playDaily": "Reto Diario",
       "playPractice": "Práctica",
       "playMultiplayer": "Multijugador",
@@ -6217,7 +6274,7 @@ const es = {
     "seo": {
       "showcase3d": {
         "title": "LexiClash — Un Mundo de Palabras | Juego Multijugador Gratis",
-        "description": "Sumérgete en un mundo de palabras: traza palabras en el tablero, encadena combos, vence a la sala en batallas 1v3 en tiempo real y corona tu victoria. Gratis, en navegador, 5 idiomas — sin descargar."
+        "description": "Sumérgete en un mundo de palabras: traza palabras en el tablero, encadena combos, vence a la sala en batallas 1v3 en tiempo real y corona tu victoria. Gratis, en navegador, 6 idiomas — sin descargar."
       },
       "stepLabel": "Paso",
       "whatIsTitle": "Que es LexiClash?",
@@ -6230,7 +6287,7 @@ const es = {
       "feature2Desc": "El mismo puzzle para todos en el mundo, cada dia. Sigue tu racha y comparte resultados con emojis — como Wordle.",
       "feature3Title": "Modo aventura",
       "feature3Desc": "100 niveles en 10 mundos tematicos. Fichas especiales, batallas contra jefes y potenciadores.",
-      "feature4Title": "5 idiomas",
+      "feature4Title": "6 idiomas",
       "feature4Desc": "Juega en ingles, hebreo, sueco, japones o espanol. Cambia en cualquier momento y desafia a amigos en diferentes idiomas.",
       "feature4TitleShort": "Modo Blast",
       "modeTagMultiplayer": "2-20 jugadores",
@@ -6258,7 +6315,7 @@ const es = {
       "gameModesDaily": "Desafío diario — Un puzle nuevo cada día, idéntico para todos los jugadores del mundo. Complétalo para mantener tu racha y compara tu puntuación con la comunidad global. Comparte tus resultados con cuadrículas de emojis, igual que Wordle.",
       "gameModesAdventure": "Modo aventura — Viaja a través de 10 mundos temáticos con 100 niveles de dificultad creciente. Encuentra tipos especiales de fichas como hielo, fuego, bombas y fichas arcoíris. Derrota jefes usando el poder de las palabras y desbloquea nuevos mundos a medida que avanzas.",
       "educationTitle": "Diseñado para el aprendizaje",
-      "educationContent": "Los juegos de palabras son una de las formas más efectivas de construir vocabulario y mejorar la ortografía. Investigaciones publicadas en AIMS Neuroscience muestran que los puzles de palabras activan múltiples regiones cerebrales simultáneamente — incluyendo áreas responsables del procesamiento del lenguaje, la memoria de trabajo y las funciones ejecutivas. LexiClash va más allá al ofrecer juego en cinco idiomas, convirtiéndolo en una herramienta práctica para estudiantes de idiomas. Profesores usan LexiClash en aulas de tres continentes para hacer que los ejercicios de vocabulario sean atractivos. El formato multijugador crea una competencia saludable que motiva a los estudiantes a ampliar su conocimiento de palabras de forma natural.",
+      "educationContent": "Los juegos de palabras son una de las formas más efectivas de construir vocabulario y mejorar la ortografía. Investigaciones publicadas en AIMS Neuroscience muestran que los puzles de palabras activan múltiples regiones cerebrales simultáneamente — incluyendo áreas responsables del procesamiento del lenguaje, la memoria de trabajo y las funciones ejecutivas. LexiClash va más allá al ofrecer juego en seis idiomas, convirtiéndolo en una herramienta práctica para estudiantes de idiomas. Profesores usan LexiClash en aulas de tres continentes para hacer que los ejercicios de vocabulario sean atractivos. El formato multijugador crea una competencia saludable que motiva a los estudiantes a ampliar su conocimiento de palabras de forma natural.",
       "faqTitle": "Preguntas frecuentes",
       "faq1Q": "¿LexiClash es realmente gratis?",
       "faq1A": "Sí, completamente gratis. Sin muros de pago ocultos, sin suscripciones premium. Mantenemos el juego mediante publicidad discreta que respeta tu privacidad.",
@@ -6273,7 +6330,7 @@ const es = {
       "faq6Q": "¿Puedo crear mi propio tablero?",
       "faq6A": "¡Sí! Usa el Constructor de Tableros Comunitarios para diseñar cuadrículas de letras personalizadas. Publícalos para que otros jugadores jueguen, califiquen y compitan. Los mejores tableros aparecen en la página principal.",
       "communityTitle": "Aquí todos amamos las palabras.",
-      "communityContent": "Los jugadores de LexiClash abarcan más de 40 países y cinco idiomas. Únete a la comunidad para competir en clasificaciones globales, compartir resultados del desafío diario y descubrir nuevas estrategias de palabras. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y eventos de la comunidad."
+      "communityContent": "Los jugadores de LexiClash abarcan más de 40 países y seis idiomas. Únete a la comunidad para competir en clasificaciones globales, compartir resultados del desafío diario y descubrir nuevas estrategias de palabras. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y eventos de la comunidad."
     },
     "firstTimer": {
       "exploreModes": "Explorar modos",
@@ -9223,7 +9280,7 @@ const es = {
       "churnTotal": "Total en riesgo",
       "noChurnRisk": "No se detectó riesgo de abandono",
       "games": "juegos"
-    },
+      },
     "moderation": {
       "title": "Moderación",
       "queueTitle": "Cola de moderación",
@@ -12212,6 +12269,11 @@ const es = {
     },
     "joinClassroom": "Unirse a un aula",
     "joinClassroomDescription": "Ingresa el código que te dio tu profe para entrar al aula",
+    "profileStalled": {
+      "title": "No pudimos cargar tu perfil",
+      "body": "Algo falló de nuestro lado. Vuelve a intentarlo: tu clase y tu progreso están a salvo.",
+      "retry": "Volver a intentar"
+    },
     "notYou": "¿No eres tú? Empieza de nuevo",
     "dashboard": {
       "greeting": "Hola {{name}}",
@@ -12248,6 +12310,7 @@ const es = {
       "review": "Repasar",
       "playGame": "Jugar",
       "playGameHint": "Practica con un juego multijugador usando este vocabulario",
+      "wordsAtYourLevel": "{{mine}} de tu nivel · {{total}} en la lección",
       "empty": {
         "title": "Sin lecciones asignadas",
         "subtitle": "Únete a un aula para empezar a practicar",
@@ -12339,8 +12402,22 @@ const es = {
       "aiFilling": "Escribiendo sugerencias…",
       "aiFilledNote": "Los campos resaltados los sugirió la IA: revísalos antes de guardar.",
       "aiError": "No pudimos obtener sugerencias ahora. Inténtalo de nuevo en un minuto.",
-      "importFormatHelp": "Extras opcionales después de una barra |: syn: para sinónimos, ant: para antónimos, ex: para una oración de ejemplo (usa ___ en lugar de la palabra), level: support / core / challenge.",
-      "importFormatExample": "feliz - que siente alegría | syn: contento, alegre | ant: triste | ex: El perro ___ movía la cola. | level: core"
+      "meanings": "Otros significados",
+      "meaningsPlaceholder": "Significados, separados por ; (p. ej. la orilla del río; un lugar para el dinero)",
+      "meaningsHelp": "Con dos significados o más, esta palabra sirve para preguntas de varios significados.",
+      "morphology": "Partes de la palabra",
+      "morphologyHelp": "Rellena una raíz o un afijo y esta palabra servirá para practicar raíces y afijos.",
+      "prefix": "Prefijo",
+      "prefixPlaceholder": "des",
+      "root": "Raíz",
+      "rootPlaceholder": "acua",
+      "rootMeaning": "La raíz significa",
+      "rootMeaningPlaceholder": "agua",
+      "suffix": "Sufijo",
+      "suffixPlaceholder": "oso",
+      "summarySkills": "{{meanings}} con dos significados · {{morphology}} con partes de palabra",
+      "importFormatHelp": "Extras opcionales después de una barra |: syn: para sinónimos, ant: para antónimos, ex: para una oración de ejemplo (usa ___ en lugar de la palabra), level: support / core / challenge, mean: para otros significados separados por ;, y root: / pre: / suf: para las partes de la palabra (root: acua = agua fija la raíz y su significado).",
+      "importFormatExample": "feliz - que siente alegría | syn: contento, alegre | ant: triste | ex: El perro ___ movía la cola. | level: core\nbanco - lugar donde se guarda el dinero | mean: asiento largo; lugar donde se guarda el dinero | root: banc = banco de madera"
     },
     "levels": {
       "label": "Nivel",
@@ -12377,7 +12454,59 @@ const es = {
         "classic": "Clásico",
         "blast": "Blast",
         "wordHunt": "Caza de palabras",
-        "wheelRush": "Rueda veloz"
+        "wheelRush": "Rueda veloz",
+        "vocabQuiz": "Concurso de palabras"
+      }
+    },
+    "classReport": {
+      "title": "Palabra por estudiante",
+      "hint": "Cada palabra de la lección frente a cada estudiante. Las más difíciles arriba: esa es tu lista de repaso.",
+      "word": "Palabra",
+      "classMiss": "La clase falló",
+      "accuracy": "Acierto",
+      "didNotPlay": "No jugó",
+      "quizCaveat": "Un concurso solo pregunta algunas palabras de la lección, y las que no preguntó cuentan aquí como falladas. Revisa la lista antes de repasar.",
+      "empty": "Nadie jugó esta partida",
+      "emptyHint": "Cuando tus estudiantes entren a una partida de clase, sus palabras aparecerán aquí una a una.",
+      "copy": "Copiar para mis notas",
+      "copied": "Copiado",
+      "copyFallback": "Copia este texto:",
+      "print": "Imprimir",
+      "trendTitle": "En tus últimas partidas",
+      "trendEmpty": "Vuelve a jugar esta lección para ver si la clase mejora en estas palabras.",
+      "trendBarsLabel": "{word}: fallada por el {first}% en la primera partida y el {last}% en la última.",
+      "state": {
+        "found": "La encontró",
+        "missed": "La falló",
+        "absent": "No jugó",
+        "quizFound": "Respondió bien",
+        "quizMissed": "No respondió bien"
+      },
+      "drilldown": {
+        "title": "Detalle del estudiante",
+        "missedCount": "{count} palabras falladas",
+        "noneMissed": "Encontró todas las palabras de la lección.",
+        "absentHint": "Este estudiante no tiene resultado en esta partida. Ponlo al día antes de la próxima.",
+        "suggested": "Siguiente paso:",
+        "assign": "Practicar estas palabras",
+        "close": "Cerrar"
+      },
+      "practice": {
+        "flashcard": "Primero el significado: tarjetas y luego un test",
+        "spelling": "Un ejercicio corto de ortografía con las palabras que falló",
+        "none": "Nada que repasar: dale la siguiente lista",
+        "absent": "Ponlo al día uno a uno antes de la próxima partida"
+      },
+      "notes": {
+        "title": "Partida de clase",
+        "playedAt": "Jugaron",
+        "reteach": "Repasar primero",
+        "checkIn": "Hablar con",
+        "absent": "No jugaron",
+        "nobodyFound": "nadie la encontró",
+        "allFound": "La clase encontró todas las palabras de la lección.",
+        "everyoneOk": "Nadie bajó de la mitad.",
+        "missedBy": "fallada por"
       }
     },
     "proWelcome": {
@@ -12424,7 +12553,7 @@ const es = {
       "upgradePricingReassure": "Cancela cuando quieras: tus aulas, lecciones y datos de estudiantes siempre están seguros.",
       "pricePerDay": "Unos $0,30 al día",
       "everythingInFree": "Todo lo del plan Free, y además:",
-      "freeStartNote": "Ideal para probarlo: una clase de 10 estudiantes. Una clase real lo supera el primer día.",
+      "freeStartNote": "Caben clases reales: hasta 3 clases de 50 estudiantes cada una. Pro es para más secciones o para los informes.",
       "proCtaSubtext": "Listo en 30 segundos · Cancela cuando quieras",
       "trustCancel": "Cancela cuando quieras, sin permanencia",
       "trustDataSafe": "Tus datos están a salvo",
@@ -12442,7 +12571,7 @@ const es = {
       "faqAutoRenew": "¿Se me cobrará automáticamente?",
       "faqAutoRenewAnswer": "Sí, tu suscripción se renueva cada mes. Recibirás un correo de recordatorio antes de cada renovación. Cancela cuando quieras para detener cobros futuros.",
       "faqDataLoss": "¿Perderé mis datos si cancelo?",
-      "faqDataLossAnswer": "No. Si cancelas, tus aulas, lecciones y datos de estudiantes siguen a salvo. Solo volverás a los límites del plan gratuito (1 clase, 10 estudiantes por clase).",
+      "faqDataLossAnswer": "No. Si cancelas, tus aulas, lecciones y datos de estudiantes siguen a salvo. Solo volverás a los límites del plan gratuito (3 clases, 50 estudiantes por clase).",
       "legalNote": "Al mejorar tu plan, aceptas nuestros Términos del servicio y entiendes nuestra Política de reembolsos.",
       "refundPolicy": "Política de reembolsos",
       "renewsOn": "Próxima renovación",
@@ -12453,7 +12582,7 @@ const es = {
       "districtCta": "Contáctanos para precios escolares",
       "checkoutUnavailable": "El pago está cerrado ahora mismo; no se ha cobrado nada. Inténtalo de nuevo en un rato.",
       "featureOutcome1": "Da todas las clases que enseñas, sin tope",
-      "featureOutcome2": "Añade la lista entera, no solo los diez primeros",
+      "featureOutcome2": "Añade todas las secciones que enseñas, no solo las primeras 3 clases",
       "featureOutcome3": "Mira quién se atasca, palabra a palabra, en directo",
       "featureOutcome4": "Compara el progreso de todas tus clases",
       "priceTaxNote": "Pueden añadirse impuestos al pagar.",
@@ -12529,7 +12658,8 @@ const es = {
         "classic": "Clásico",
         "wordHunt": "Caza de palabras",
         "blast": "Blast",
-        "wheelRush": "Carrera de Ruleta"
+        "wheelRush": "Carrera de Ruleta",
+        "vocabQuiz": "Test de Vocabulario"
       },
       "huntTarget": {
         "title": "Palabra objetivo",
@@ -12697,6 +12827,10 @@ const es = {
       "bulkImportLabel": "Pega las palabras aquí",
       "bulkImportPlaceholder": "Pega palabras, una por línea. Usa 'palabra - definición' para definiciones.",
       "bulkImportDetected": "{{count}} palabras detectadas",
+      "bulkImportUnreadable": "No se pudieron leer {{count}} fila(s) (fila {{rows}}): no tienen palabra, así que se dejaron fuera. Revisa si sobra un | o falta la palabra.",
+      "bulkImportOneWordPerLine": "La fila {{rows}} parece tener varias palabras en una sola línea. Escribe una palabra por línea e importa de nuevo.",
+      "savedAndAssigned": "Lección guardada y asignada a {{classroom}}: tus estudiantes ya la ven.",
+      "savedNotAssigned": "La lección se guardó, pero no pudimos asignarla a {{classroom}}. Inténtalo con el botón Asignar a clase de la lección.",
       "bulkImportButton": "Importar",
       "templates": "Plantillas de Lecciones",
       "category": {
@@ -12708,6 +12842,8 @@ const es = {
         "everyday": "Cotidiano"
       },
       "resumeDraft": "¿Continuar Borrador?",
+      "reviewSetName": "Palabras que se nos escaparon",
+      "reviewSetDescription": "Las palabras que tu clase encontró menos en la última partida.",
       "draftFound": "Tienes un borrador de lección sin guardar de {{time}}",
       "resumeDraftButton": "Continuar",
       "discardDraftButton": "Descartar",
@@ -12810,7 +12946,13 @@ const es = {
         "pdf": "Exportar PDF",
         "downloading": "Descargando..."
       },
+      "teacherLabel": "Profesor/a",
+      "generatedBy": "Generado por LexiClash",
       "columns": {
+        "rank": "Puesto",
+        "student": "Estudiante",
+        "score": "Puntos",
+        "words": "Palabras",
         "word": "Palabra",
         "status": "Estado",
         "accuracy": "Precisión",
@@ -12896,7 +13038,8 @@ const es = {
         "label": "Enfoque de vocabulario",
         "help": "Elige una habilidad para practicar o deja que el alumnado elija. Solo están disponibles las habilidades para las que la lección tiene suficientes palabras.",
         "any": "Cualquier práctica",
-        "anyHint": "Cada estudiante elige su modo"
+        "anyHint": "Cada estudiante elige su modo",
+        "questionCount": "{{count}} preguntas · {{skill}}"
       },
       "createTitle": "Crear Tarea",
       "create": "Crear Tarea",
@@ -12956,6 +13099,49 @@ const es = {
     }
   },
   "education": {
+    "errors": {
+      "serverUnavailable": "Ahora mismo no podemos acceder a la lista de la clase. Es un problema nuestro, no tuyo: inténtalo de nuevo en un momento."
+    },
+    "classroomModeBlurb": {
+      "classic": "Une letras contiguas en un tablero compartido",
+      "wordHunt": "Descifra la palabra oculta en diez intentos",
+      "blast": "Encadena palabras para despejar fichas en combos",
+      "wheelRush": "Forma palabras con una sola rueda de letras",
+      "vocabQuiz": "Preguntas de cuatro opciones con tus propias palabras"
+    },
+    "practicePicker": {
+      "title": "Elige tu práctica",
+      "readyCount": "{{ready}} de {{total}} listas para jugar",
+      "questions": "{{count}} preguntas",
+      "words": "{{count}} palabras",
+      "lockedBadge": "Bloqueado",
+      "played": "jugada {{count}} veces",
+      "nothingReady": "Esta lección todavía no tiene palabras. Pídeselas a tu profe y vuelve.",
+      "skill": {
+        "solo_board": "Encuentra las palabras de la lección en la cuadrícula",
+        "warmup": "Una ronda corta para entrar en calor",
+        "blitz": "Gánale al reloj con todas las palabras que puedas",
+        "matching": "Une cada palabra con su significado",
+        "spelling": "Escúchala y luego escríbela",
+        "flashcard": "Pasa de la palabra a su significado",
+        "word_list": "Lee la lista entera antes de jugar",
+        "definition": "Lee el significado y elige la palabra",
+        "synonym": "Palabras que significan lo mismo",
+        "antonym": "Palabras que significan lo contrario",
+        "context": "Deduce la palabra a partir de la oración",
+        "multiple_meaning": "Una palabra, dos significados",
+        "roots_affixes": "Qué significan las partes de la palabra"
+      },
+      "locked": {
+        "solo_board": "Añade palabras a esta lección para desbloquear",
+        "warmup": "Añade palabras a esta lección para desbloquear",
+        "blitz": "Añade palabras a esta lección para desbloquear",
+        "matching": "Necesita al menos 4 palabras para formar parejas",
+        "spelling": "Añade palabras a esta lección para desbloquear",
+        "flashcard": "Añade palabras a esta lección para desbloquear",
+        "word_list": "Añade palabras a esta lección para desbloquear"
+      }
+    },
     "vocabFocus": {
       "title": "Enfoque de vocabulario",
       "desc": "Practica una habilidad a la vez",
@@ -12963,31 +13149,41 @@ const es = {
         "definition": "Definiciones",
         "synonym": "Sinónimos",
         "antonym": "Antónimos",
-        "context": "Pistas de contexto"
+        "context": "Pistas de contexto",
+        "multiple_meaning": "Palabras con varios significados",
+        "roots_affixes": "Raíces y afijos"
       },
       "instructions": {
         "definition": "Lee el significado y elige la palabra",
         "synonym": "Elige la palabra que significa lo mismo",
         "antonym": "Elige la palabra que significa lo contrario",
-        "context": "Elige la palabra que completa el hueco"
+        "context": "Elige la palabra que completa el hueco",
+        "multiple_meaning": "Elige la palabra que encaja con los dos significados",
+        "roots_affixes": "Elige qué significa esa parte de la palabra"
       },
       "promptLabel": {
         "definition": "¿Qué palabra significa…",
         "synonym": "Significa lo mismo que…",
         "antonym": "Lo contrario de…",
-        "context": "Completa el hueco"
+        "context": "Completa el hueco",
+        "multiple_meaning": "¿Qué palabra significa las dos cosas?",
+        "roots_affixes": "Partes de la palabra"
       },
       "unlock": {
         "definition": "Añade definiciones a {{min}} palabras o más para desbloquear",
         "synonym": "Añade sinónimos a {{min}} palabras o más para desbloquear",
         "antonym": "Añade antónimos a {{min}} palabras o más para desbloquear",
-        "context": "Añade oraciones de ejemplo a {{min}} palabras o más para desbloquear"
+        "context": "Añade oraciones de ejemplo a {{min}} palabras o más para desbloquear",
+        "multiple_meaning": "Añade un segundo significado a 2 palabras o más para desbloquear",
+        "roots_affixes": "Añade una raíz o un prefijo a 2 palabras o más para desbloquear"
       },
       "notEnough": {
         "definition": "Esta lección necesita definiciones en al menos 4 palabras para esta práctica. ¡Pídeselas a tu profe!",
         "synonym": "Esta lección necesita sinónimos en al menos 4 palabras para esta práctica. ¡Pídeselos a tu profe!",
         "antonym": "Esta lección necesita antónimos en al menos 4 palabras para esta práctica. ¡Pídeselos a tu profe!",
-        "context": "Esta lección necesita oraciones de ejemplo en al menos 4 palabras para esta práctica. ¡Pídeselas a tu profe!"
+        "context": "Esta lección necesita oraciones de ejemplo en al menos 4 palabras para esta práctica. ¡Pídeselas a tu profe!",
+        "multiple_meaning": "Esta lección necesita dos significados en un par de palabras para esta práctica. ¡Pídeselos a tu profe!",
+        "roots_affixes": "Esta lección necesita partes de palabra en un par de palabras para esta práctica. ¡Pídeselas a tu profe!"
       },
       "progress": "{{current}} de {{total}}",
       "progressLabel": "Progreso de las preguntas",
@@ -13249,6 +13445,8 @@ const es = {
       "joinedStudents": "Estudiantes unidos",
       "lessonsSelected": "{{count}} lecciones elegidas",
       "missingRequirements": "Faltan requisitos",
+      "startFailed": "No pudimos empezar la partida. Inténtalo de nuevo.",
+      "tooFast": "Un momento: vuelve a intentarlo en unos segundos.",
       "more": "más",
       "multiLessonHelp": "Mezcla lecciones para más variedad",
       "noClassrooms": "Aún no has creado clases",
@@ -13474,7 +13672,7 @@ const es = {
         },
         "q2": {
           "q": "¿Hay un plan gratis?",
-          "a": "Sí — un plan básico gratis para docentes verificados: hasta 1 clase de 10 estudiantes, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
+          "a": "Sí — un plan básico gratis para docentes verificados: hasta 3 clases de 50 estudiantes cada una, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
         },
         "q3": {
           "q": "¿Soporta hebreo, japonés, sueco y español?",
@@ -13518,7 +13716,7 @@ const es = {
       },
       "esl-word-games": {
         "course_name": "Juegos de palabras ESL de LexiClash",
-        "course_desc": "Vocabulario, ortografía y multijugador en vivo para aulas ESL — 5 idiomas nativos."
+        "course_desc": "Vocabulario, ortografía y multijugador en vivo para aulas ESL — 6 idiomas nativos."
       },
       "vocabulary-games-classroom": {
         "course_name": "Juegos de vocabulario en clase",
@@ -13552,23 +13750,6 @@ const es = {
       "totalXP": "XP total",
       "weekly": "Semanal",
       "xp": "{{xp}} XP"
-    },
-    "lesson": {
-      "autoPronounce": "Auto-pronunciar",
-      "classicMode": "Modo clásico",
-      "contextualExamples": "Ejemplos",
-      "definition": "Definición",
-      "dontKnow": "No lo sé",
-      "enrichingContent": "Enriqueciendo...",
-      "examples": "Ejemplos",
-      "gotIt": "¡Entendido!",
-      "pronounce": "Pronunciar",
-      "pronunciationFallback": "Pronunciación no disponible",
-      "speaking": "Reproduciendo...",
-      "swipeMode": "Modo deslizar",
-      "tapToReveal": "Toca para revelar",
-      "word": "Palabra",
-      "words": "{{count}} palabras"
     },
     "milestones": {
       "coinBonus": "+{{coins}} monedas",
@@ -13683,9 +13864,22 @@ const es = {
       }
     },
     "lesson": {
-      "creationFailed": "No se pudo crear la lección. Inténtalo de nuevo.",
+      "autoPronounce": "Auto-pronunciar",
+      "classicMode": "Modo clásico",
+      "contextualExamples": "Ejemplos",
       "created": "¡Lección creada exitosamente!",
+      "creationFailed": "No se pudo crear la lección. Inténtalo de nuevo.",
+      "definition": "Definición",
+      "dontKnow": "No lo sé",
+      "enrichingContent": "Enriqueciendo...",
+      "examples": "Ejemplos",
+      "gotIt": "¡Entendido!",
       "preferCustom": "O crea tu propia lista de vocabulario personalizada:",
+      "pronounce": "Pronunciar",
+      "pronunciationFallback": "Pronunciación no disponible",
+      "speaking": "Reproduciendo...",
+      "swipeMode": "Modo deslizar",
+      "tapToReveal": "Toca para revelar",
       "word": "palabra",
       "words": "palabras"
     },
@@ -13710,6 +13904,7 @@ const es = {
         "alreadyMember": "Ya estás en esta aula",
         "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "codePasted": "¡Código pegado!",
+        "preparing": "Preparando todo, un momento.",
         "emptyClipboard": "No hay nada copiado",
         "clipboardError": "No se pudo leer el portapapeles",
         "nameLabel": "Tu nombre",
@@ -16368,7 +16563,7 @@ const es = {
     "mode2Tag": "Hasta 1v3",
     "mode2": "Duelos en tiempo real",
     "mode2Body": "Cuatro jugadores, un tablero vivo, sin clemencia. El tablero más ruidoso gana.",
-    "mode3Tag": "5 idiomas",
+    "mode3Tag": "6 idiomas",
     "mode3": "Juega en tu idioma",
     "mode3Body": "Español, inglés, sueco, hebreo, japonés — tus palabras, tu terreno.",
     "bottomTitle": "Tu turno. Haz ruido.",

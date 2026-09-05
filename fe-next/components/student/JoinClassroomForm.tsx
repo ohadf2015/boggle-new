@@ -30,10 +30,23 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const { t, dir, language } = useLanguage();
   const router = useRouter();
   const { joinClassroom } = useJoinClassroom();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Logged-out guests join by typing a name (no email/password needed).
+  //
+  // This stays `!user` ON PURPOSE. The name field is UI *added* for guests and
+  // `disabled={… || (isGuest && !name.trim())}` needs `isGuest` true to require
+  // a name, so folding `authLoading` in here would invert both guards: during
+  // loading the name field would vanish AND the button would go live with an
+  // empty name. Unresolved auth is a third state, handled separately below.
   const isGuest = !user;
+  // Until the session resolves, the form is rendering one branch against state
+  // that is about to change underneath it. A tap in that window is what made
+  // the very first JOIN do nothing at all — no navigation, no error, no request
+  // — and left the student to discover that a second tap works.
+  const isAuthResolving = authLoading;
+  /** A tap that landed before the form could act on it. Replayed on ready. */
+  const [queuedJoin, setQueuedJoin] = useState(false);
 
   const [code, setCode] = useState(initialCode);
   const [name, setName] = useState('');
@@ -51,6 +64,13 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     const normalized = code.trim().toUpperCase();
     if (normalized.length !== 6) {
       setPreview(null);
+      // Forget what we last looked up, or retyping the character just deleted
+      // matches the guard below and returns without re-fetching — the green
+      // confirmation card then never comes back for the rest of the session.
+      // Also clear the spinner this branch used to leave running forever.
+      lastPreviewCodeRef.current = '';
+      setIsLoadingPreview(false);
+      if (previewTimeoutRef.current) clearTimeout(previewTimeoutRef.current);
       return;
     }
     if (normalized === lastPreviewCodeRef.current) return;
@@ -58,9 +78,17 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     setIsLoadingPreview(true);
     previewTimeoutRef.current = setTimeout(async () => {
       lastPreviewCodeRef.current = normalized;
-      const result = await lookupClassroomPreview(normalized);
-      setPreview(result);
-      setIsLoadingPreview(false);
+      try {
+        const result = await lookupClassroomPreview(normalized);
+        setPreview(result);
+      } catch {
+        // The preview is a courtesy and must never gate the join. Swallow the
+        // failure into "no confirmation available" — but ALWAYS clear the
+        // spinner below, or a rejected lookup leaves the card loading forever.
+        setPreview(null);
+      } finally {
+        setIsLoadingPreview(false);
+      }
     }, 300);
     // Block body, not a concise `&&` expression: an arrow returning `a && clearTimeout(b)` is
     // typed `void | null`, which is not a valid EffectCallback cleanup and fails tsc.
@@ -87,6 +115,15 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // A submit can still reach here while auth is unresolved — the Enter key, or
+    // a tap that races the re-render. REMEMBER it rather than dropping it: the
+    // student pressed the button, and the one thing this must never do is
+    // nothing. It replays below the moment everything is ready.
+    if (isAuthResolving) {
+      setQueuedJoin(true);
+      return;
+    }
 
     const trimmedCode = code.trim();
     const trimmedName = name.trim();
@@ -156,6 +193,20 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     }
   };
 
+  // Replay a tap that landed before the form could act on it. Waits for the
+  // session AND for whatever that tap was still missing — a guest name — so the
+  // student is never told off for a race they did not cause. Fires once.
+  useEffect(() => {
+    if (!queuedJoin || isAuthResolving || isSubmitting) return;
+    if (code.trim().length !== 6) return;
+    if (isGuest && !name.trim()) return;
+    setQueuedJoin(false);
+    void handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+    // handleSubmit is redefined every render; depending on it would re-fire the
+    // queued intent. The guards above are the real trigger.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queuedJoin, isAuthResolving, isSubmitting, code, name, isGuest]);
+
   return (
     <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col">
       <EducationHeader showBackButton />
@@ -189,7 +240,20 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-                {preview && <ClassroomPreviewCard name={preview.name} kind={preview.kind} isLoading={isLoadingPreview} />}
+                {/*
+                  Reserved slot, not a bare conditional. The confirmation card
+                  resolves on a 300ms debounce PLUS a network round trip, so it
+                  mounts late — often while the student is filling in their name
+                  or already reaching for JOIN — and mounting it above the form
+                  pushed the button down under a finger already in flight. That
+                  is the "first tap does nothing, second tap works" report: the
+                  tap landed where the button had just been. Holding the height
+                  means the card can arrive whenever it likes without moving
+                  anything below it.
+                */}
+                <div className="min-h-[92px]" data-testid="join-preview-slot">
+                  {preview && <ClassroomPreviewCard name={preview.name} kind={preview.kind} isLoading={isLoadingPreview} />}
+                </div>
 
               {isGuest && code.trim().length === 6 && (
                 <div className="space-y-2">
@@ -304,7 +368,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                 // or rate-limited preview lookup left a student holding a valid code with a dead
                 // button, and a class of 30 joining from one school IP would exhaust the preview
                 // rate limit and lock out everyone after the first few.
-                disabled={isSubmitting || code.trim().length !== 6 || (isGuest && !name.trim())}
+                disabled={isAuthResolving || isSubmitting || code.trim().length !== 6 || (isGuest && !name.trim())}
                 size="lg"
                 className="w-full h-14 text-lg font-black uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -314,6 +378,14 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                   : t('education.student.join.button')
                 }
               </Button>
+
+              {/* A disabled button with no explanation is the same dead end in a
+                  different costume. Say what is being waited on. */}
+              {(isAuthResolving || queuedJoin) && (
+                <p className="text-center text-sm font-neo-body text-neo-white/70">
+                  {t('education.student.join.preparing')}
+                </p>
+              )}
             </form>
 
             {/* Back Link */}

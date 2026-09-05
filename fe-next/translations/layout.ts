@@ -3,7 +3,7 @@ export const layoutTranslations: Record<string, any> = {
     "direction": "ltr",
     "seo": {
       "title": "Free Boggle Online — No Download | LexiClash Word Game",
-      "description": "Play free boggle online — no download. Real-time multiplayer word battles with friends. Like Words With Friends but live. Daily challenges, 5 languages.",
+      "description": "Play free boggle online — no download. Real-time multiplayer word battles with friends. Like Words With Friends but live. Daily challenges, 6 languages.",
       "keywords": "play boggle online free no download, word games online free, online multiplayer word game, word game with friends, daily word wheel, word multiplayer, play boggle online free with other players, online multiplayer word games like hanging with friends, boggle online free, free word game no download, word battle game, word hunt game online, daily word challenge, brain training word game, word puzzle game free, word game for groups, word games for parties, wordle alternative multiplayer, scrabble alternative free, words with friends alternative, competitive word game, word race online, boggle alternatives 2026, word game you type in words, games like boggle online free, word making games, word RPG adventure game, vocabulary builder game, ESL word game classroom, family word game night, real-time word battle, online web based multiplayer words games, word combo game, word game for kids, spelling game multiplayer, daily word puzzle free, lexiclash, lexi clash, word game israel, israeli word game, word game made in israel, boggle hebrew english, multilingual word game, multiplayer word game, word games multiplayer, multiplayer word game online, words with friends multiplayer free online, word games multiplayer online free, word game online multiplayer free, word games online free multiplayer, word game like boggle free, word search game multiplayer, word finding game online, word game no download no signup, free online word game with friends, word game browser, word game instant play",
       "ogTitle": "Free Boggle Online — No Download | LexiClash Word Game",
       "ogDescription": "🎮 Play boggle online free with friends — no download! Real-time word battles, daily challenges, adventure mode ⚡ Like Boggle meets Wordle but multiplayer 🔥",
@@ -67,7 +67,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "about": {
         "title": "About Us - Our Story & Mission",
-        "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 5 languages.",
+        "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 6 languages.",
         "ogTitle": "About LexiClash - Word Game Innovation",
         "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
       },
@@ -178,7 +178,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "about": {
         "title": "אודות - הסיפור והמשימה שלנו",
-        "description": "למדו על לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. גלו את המשימה שלנו להפוך לימוד שפות למהנה ותחרותי, הטכנולוגיה שלנו, כלי החינוך והקהילה הגדלה ב-5 שפות.",
+        "description": "למדו על לקסיקלאש, משחק המילים המרובה משתתפים בזמן אמת. גלו את המשימה שלנו להפוך לימוד שפות למהנה ותחרותי, הטכנולוגיה שלנו, כלי החינוך והקהילה הגדלה ב-6 שפות.",
         "ogTitle": "אודות לקסיקלאש - חדשנות במשחקי מילים",
         "ogDescription": "הסיפור מאחורי לקסיקלאש: להפוך לימוד שפות למהנה ותחרותי דרך קרבות מילים בזמן אמת."
       },
@@ -289,7 +289,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "about": {
         "title": "Om Oss - Vår Historia och Mission",
-        "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 5 språk.",
+        "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 6 språk.",
         "ogTitle": "Om LexiClash - Innovation inom Ordspel",
         "ogDescription": "Historien bakom LexiClash: att göra språkinlärning rolig och tävlingsinriktad genom ordstrider i realtid."
       },
@@ -400,7 +400,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "about": {
         "title": "私たちについて - ストーリーとミッション",
-        "description": "LexiClashについて学びましょう。リアルタイムマルチプレイヤーワードゲーム。言語学習を楽しく競争的にするミッション、テクノロジー、教育ツール、5言語にわたる成長するコミュニティをご覧ください。",
+        "description": "LexiClashについて学びましょう。リアルタイムマルチプレイヤーワードゲーム。言語学習を楽しく競争的にするミッション、テクノロジー、教育ツール、6言語にわたる成長するコミュニティをご覧ください。",
         "ogTitle": "LexiClashについて - ワードゲームイノベーション",
         "ogDescription": "LexiClashの物語：リアルタイムワードバトルを通じて言語学習を楽しく競争的に。"
       },
@@ -511,7 +511,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "about": {
         "title": "Sobre Nosotros - Nuestra Historia y Misión",
-        "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 5 idiomas.",
+        "description": "Conoce LexiClash, el juego de palabras multijugador en tiempo real. Descubre nuestra misión de hacer el aprendizaje de idiomas divertido y competitivo, nuestra tecnología, herramientas educativas y comunidad en 6 idiomas.",
         "ogTitle": "Sobre LexiClash - Innovación en Juegos de Palabras",
         "ogDescription": "La historia detrás de LexiClash: hacer el aprendizaje de idiomas divertido y competitivo a través de batallas de palabras en tiempo real."
       },
@@ -558,7 +558,7 @@ export const layoutTranslations: Record<string, any> = {
     "direction": "ltr",
     "seo": {
       "title": "Бесплатное Богл онлайн — без скачивания | LexiClash",
-      "description": "Играйте в богл онлайн бесплатно — без скачивания. Соревнование в слова в реальном времени с друзьями. Как Words With Friends, но живо. Ежедневные испытания, 5 языков.",
+      "description": "Играйте в богл онлайн бесплатно — без скачивания. Соревнование в слова в реальном времени с друзьями. Как Words With Friends, но живо. Ежедневные испытания, 6 языков.",
       "keywords": "играть в богл онлайн бесплатно, игры в слова онлайн, многопользовательская игра в слова, игра в слова с друзьями, ежедневное колесо слов, словесные игры, множественное колесо, найти слова, балда, эрудит, словесные сражения, игра в слова для пьедестала, игра в слова без скачивания, анаграммы, составь слова из букв, словесная головоломка, игра на скорость, игра в слова онлайн бесплатно, словарная игра, словесная дуэль, состязание в словах, многопользовательская игра, словесные головоломки, слово дня, игра в слова для группы, игра на вечеринку, слова из букв, найди слова онлайн, альтернатива Wordle, альтернатива Scrabble, альтернатива Words With Friends, конкурентная словесная игра, словесные гонки, альтернатива богла, игра со словами, словесные игры для детей, языковая игра, обучающая игра в слова, семейная словесная игра, реальные словесные сражения, веб-игра в слова, словесная комбо-игра, игра в слова для вечеринок, игра в слова на английском, израильская словесная игра, игра в слова на иврите, многоязычная игра, игра в слова без регистрации, бесплатная словесная игра онлайн с друзьями, словесная игра в браузере, мгновенная игра в слова, LexiClash",
       "ogTitle": "Бесплатное Богл онлайн — без скачивания | LexiClash",
       "ogDescription": "🎮 Играйте в богл онлайн бесплатно с друзьями — без скачивания! Реальные словесные сражения, ежедневные испытания, режим приключений ⚡ Как Boggle и Wordle, но многопользовательский 🔥",

@@ -185,7 +185,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                   return (
                     <th
                       key={header.id}
-                      className={`px-4 py-3 text-left text-xs font-neo-body uppercase text-neo-white ${
+                      className={`px-4 py-3 text-start text-xs font-neo-body uppercase text-neo-white ${
                         header.column.getCanSort() ? 'cursor-pointer hover:bg-neo-cyan/10' : ''
                       } ${meta?.className ?? ''}`}
                       onClick={header.column.getToggleSortingHandler()}
@@ -209,7 +209,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                   key={row.id}
                   className={`
                     border-b border-neo-black/20 hover:bg-neo-cyan/10 cursor-pointer
-                    ${student.isStruggling ? 'struggling-row bg-neo-orange/20 border-l-4 border-neo-orange' : ''}
+                    ${student.isStruggling ? 'struggling-row bg-neo-orange/20 border-s-4 border-neo-orange' : ''}
                   `}
                   onClick={() => onStudentClick?.(student.studentId)}
                 >

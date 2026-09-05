@@ -153,7 +153,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📊', text: 'דיוק לכל תלמיד + מילים קשות לכיתה' },
       { icon: '👥', text: 'ריבוי משתתפים חי — כל הכיתה; דו־קרבות בזוגות' },
       { icon: '🌍', text: '6 שפות: אנגלית, עברית (RTL), ספרדית, שוודית, יפנית' },
-      { icon: '💸', text: 'הכל חינם — בלי פרימיום' },
+      { icon: '💸', text: 'כל הכיתה בחינם — 3 כיתות עד 50 תלמידים. Pro ($9 לחודש) מוסיף דוחות' },
       { icon: '🔒', text: 'בטוח: בלי צ\'אט, בלי הודעות פרטיות ובלי קישורים חיצוניים בזמן המשחק' },
     ],
     sections: {
@@ -311,7 +311,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📊', text: 'Noggrannhet per elev + klassomfattande mönster för förlorade ord' },
       { icon: '👥', text: 'Liveflerspelar hela klassen; 1v1-dueller för parövning' },
       { icon: '🌍', text: 'Sex språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska' },
-      { icon: '💸', text: 'Gratis att börja - ingen premiumtier, ingen kostnad per säte' },
+      { icon: '💸', text: 'Hela klassen gratis — 3 klasser med upp till 50 elever. Pro ($9/mån) lägger till rapporter' },
       { icon: '🔒', text: 'Elevssäker: ingen chatt, inga DM, inga externa länkar under spel' },
     ],
     sections: {
@@ -390,7 +390,7 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
       { icon: '📊', text: '学生ごとの精度 + クラス全体の単語ミスパターン' },
       { icon: '👥', text: 'クラス全員のリアルタイムマルチプレイヤー; ペア練習用の1v1デュエル' },
       { icon: '🌍', text: '6つの言語：英語、ヘブライ語（RTL）、スペイン語、スウェーデン語、日本語、ロシア語' },
-      { icon: '💸', text: '永遠に無料 — プレミアム層なし、座席当たりのコストなし' },
+      { icon: '💸', text: 'クラス全員が無料 — 3クラス・各クラス50人まで。Pro（月$9）でレポートが加わります' },
       { icon: '🔒', text: '生徒向け安全：チャットなし、DM なし、プレイ中の外部リンクなし' },
     ],
     sections: {

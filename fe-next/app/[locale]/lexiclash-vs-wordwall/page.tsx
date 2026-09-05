@@ -50,7 +50,7 @@ const faqs = [
   { q: 'How is LexiClash different from Wordwall?', a: 'Wordwall is a templated activity platform — teachers fill in word lists and get pre-built activities (match-up, anagram, balloon pop, quiz). LexiClash is a dedicated word-formation game — students play actual Boggle-style grids, anagrams, and word wheels with real multiplayer mechanics. Wordwall favors variety of templates; LexiClash favors depth of word-game experience.' },
   { q: 'Do students need accounts on LexiClash?', a: 'No. Students join a classroom session with a 6-character code. Wordwall activities are typically student-account-free too (just a link), but Wordwall gates leaderboards, time limits, and tracking behind teacher accounts and paid tiers.' },
   { q: 'Can teachers upload their own word lists?', a: 'Yes on both. LexiClash word lists upload as plain CSV or paste-in. Wordwall has a similar workflow but requires you to pick a template + redo for each new activity type.' },
-  { q: 'Which is better for ESL or language classes?', a: 'LexiClash has built-in dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese — vocabulary games run natively in each language. Wordwall supports any language for activity text but doesn’t have native word-game mechanics tied to language dictionaries.' },
+  { q: 'Which is better for ESL or language classes?', a: 'LexiClash has built-in dictionaries for English, Hebrew (RTL), Spanish, Swedish, Japanese and Russian — vocabulary games run natively in each language. Wordwall supports any language for activity text but doesn’t have native word-game mechanics tied to language dictionaries.' },
   { q: 'Does LexiClash have whole-class multiplayer?', a: 'Yes — real-time, up to 30 students per session, all free. Wordwall’s "Race The Clock" and similar live modes are mostly Wordwall Pro/Plus features.' },
   { q: 'How long is a typical session?', a: '5-10 minutes for whole-class multiplayer; 2-3 minutes for 1v1 vocabulary duels. Same 5-minute warm-up window Wordwall is used for, but with deeper word-game mechanics.' },
 ];
@@ -63,7 +63,7 @@ const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Word-game depth (Boggle/Wheel/Anagram)', '✓ Native mechanics', 'Anagram template only'],
   ['Live whole-class multiplayer', '✓ Free', '✓ Pro tier'],
   ['1v1 student duels', '✓ Built-in', '✗'],
-  ['5 native-dictionary languages', '✓ EN/HE/SV/JA/ES', 'Activity text any language; no dictionaries'],
+  ['6 native-dictionary languages', '✓ EN/HE/SV/JA/ES', 'Activity text any language; no dictionaries'],
   ['Custom curriculum word lists', '✓', '✓'],
   ['Class analytics', '✓ Free', 'Limited free; Pro for full'],
   ['Activity templates variety', '3 word-game modes', '50+ templates (varied formats)'],
@@ -152,7 +152,7 @@ export default async function Page({ params }: PageProps) {
             {[
               { title: 'Word-formation depth', desc: 'Wordwall\'s anagram template scrambles letters; that\'s it. LexiClash has Boggle-style grids, multi-letter word wheels with center-letter rules, and proper anagram puzzles — actual word-game mechanics.' },
               { title: 'Real-time multiplayer in free tier', desc: 'Wordwall\'s live multiplayer modes are mostly Pro features. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
-              { title: '5 native-dictionary languages', desc: 'For ESL, Hebrew immersion, Spanish bilingual — LexiClash has full dictionaries in EN/HE/ES/SV/JA. Wordwall is text-only multilingual, no language-game depth.' },
+              { title: '6 native-dictionary languages', desc: 'For ESL, Hebrew immersion, Spanish bilingual — LexiClash has full dictionaries in EN/HE/ES/SV/JA. Wordwall is text-only multilingual, no language-game depth.' },
               { title: '1v1 vocabulary duels', desc: 'Pair students for head-to-head 2-3 minute word battles. Wordwall doesn\'t have a paired-student game format.' },
               { title: 'No 5-activity limit', desc: 'Wordwall\'s free tier caps you at 5 active activities. LexiClash has no activity cap — make as many word lists as you want, at no cost — custom lists are a free-tier feature.' },
               { title: 'Faster setup for word games', desc: 'Wordwall: pick template, paste words, configure. LexiClash: pick a list, share the code. Under 60 seconds vs 2-5 minutes per activity.' },

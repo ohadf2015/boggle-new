@@ -21,7 +21,11 @@ import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { getPendingDuelsForStudent, type DuelRow } from '@/lib/supabase/education/duels';
 import { cn } from '@/lib/utils';
 import { Users, Swords } from 'lucide-react';
-import DuelChallengeModal from './DuelChallengeModal';
+import dynamic from 'next/dynamic';
+
+// Opens only when a student picks an opponent, so it stays out of the lobby's
+// first load. No SSR needed for a modal that starts closed.
+const DuelChallengeModal = dynamic(() => import('./DuelChallengeModal'), { ssr: false });
 
 // ============================================
 // TYPE DEFINITIONS

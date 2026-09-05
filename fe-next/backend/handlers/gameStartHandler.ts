@@ -26,7 +26,7 @@ import {
   getSocketById,
 } from '../utils/socketHelpers.js';
 
-import { makePositionsMap, normalizeWordForLanguage } from '../modules/wordValidator.js';
+import { makePositionsMap, normalizeWordForLanguage, isWordOnBoard } from '../modules/wordValidator.js';
 import { clearAutoStartState } from '../modules/lobbyAutoStart.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -47,10 +47,11 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 import { initializePlayerData } from './playerDataInit.js';
+import { startVocabQuizForClassroom } from './vocabQuizHandler.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
-import { getClassroomGame } from '../modules/classroomGameManager.js';
+import { getClassroomGame, setClassroomGamePlacedVocabulary } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback, selectCleanCommonTarget, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
 import { resolveTeacherHuntTarget } from '@/shared/utils/classroomHuntTarget';
@@ -391,6 +392,32 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       return;
     }
 
+    // ---- Live Vocab Quiz ----
+    // DO NOT MOVE THIS BLOCK. Its position is load-bearing, and reads as
+    // arbitrary until you have hit the failure — it must stay AFTER the
+    // transitionGameState('START') above and BEFORE mode resolution below.
+    //
+    // A teacher-chosen classroom quiz has no letter grid: it runs its own
+    // question/reveal loop with a per-question clock. It must branch out HERE,
+    // after the state transition (so concurrent starts still lose) but before
+    // mode resolution, grid generation, bot seeding and startGameTimer — any of
+    // which would run a board game underneath the quiz and fire the board's own
+    // endGame mid-round, which would then burn the once-per-game classroom
+    // persistence guard on board results the students never produced.
+    // Returns false for every non-quiz room, so the board path below is
+    // untouched.
+    try {
+      if (await startVocabQuizForClassroom(io, gameCode)) {
+        gamesStarting.delete(gameCode);
+        logger.info('SOCKET', `Game ${gameCode} started as a live vocab quiz`);
+        return;
+      }
+    } catch (err) {
+      // Never strand the room on a quiz-start failure — fall through to the
+      // board game rather than leaving the class staring at a lobby.
+      logger.error('SOCKET', `Vocab quiz start failed for ${gameCode}, falling back to board game: ${(err as Error).message}`);
+    }
+
     // Apply boost token bundled with startGame (atomic with state transition).
     // Replaces the prior separate `boost:apply` emit that raced submitWord —
     // boost now lands in game.playerBoosts before any gameplay broadcast.
@@ -465,7 +492,12 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     const dim = DIFFICULTIES[effectiveDifficulty];
     const gridRows = resolvedMode === 'blast' ? 6 : dim.rows;
     const gridCols = resolvedMode === 'blast' ? 6 : dim.cols;
-    if (playerCount >= 2 || !letterGrid || letterGrid.length === 0) {
+    // A classroom game ALWAYS regenerates, even solo: the board has to carry the
+    // teacher's lesson words. The solo exemption above is an anti-cheat carve-out
+    // and it was silently eating the one run a teacher makes first — "let me try
+    // my own lesson before the bell" — handing her a random board with none of her
+    // vocabulary, right after the setup preview showed her an embedded one.
+    if (playerCount >= 2 || vocabToEmbed.length > 0 || !letterGrid || letterGrid.length === 0) {
       letterGrid = generateRichBoard(
         () => vocabToEmbed.length > 0
           ? generateRandomTable(gridRows, gridCols, gameLang, vocabToEmbed)
@@ -498,6 +530,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       current.letterPositions = positions;
     }
     ensureGame(gameCode);
+
+    // Which lesson words the board actually carries is recorded LATER, against
+    // the final grid — see `recordClassroomWordBank` just before the `startGame`
+    // broadcast. It cannot be answered here: the grid is still regenerated twice
+    // downstream (bot auto-add drops the client board, Word Hunt rebuilds to
+    // embed its target), and a record taken now would describe a board that was
+    // thrown away.
 
     initializePlayerData(gameCode);
 
@@ -730,6 +769,45 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         updateGame(gameCode, { gameMode: 'classic' });
         resolvedMode = 'classic' as GameMode;
       }
+    }
+
+    // ---- Classroom word bank ----
+    // Record which lesson words this board actually carries, HERE and only here:
+    // `letterGrid` is now the grid that goes into the `startGame` payload below,
+    // which is the only board the class ever sees. Everything upstream is a
+    // draft — bot auto-add drops the client board for a fresh 6x6, and Word Hunt
+    // rebuilds to embed its target — so an earlier record described a board that
+    // had already been discarded, which is the very bug the record exists to fix.
+    //
+    // Embedding is best-effort (placement is capped at roughly one word per three
+    // cells and skips anything longer than the board), so this is usually a
+    // subset. A support student's word bank reads it; sending the whole lesson
+    // had them hunting for words that were never placed.
+    if (classroomGame && vocabToEmbed.length > 0) {
+      const finalPositions = makePositionsMap(letterGrid, gameLang);
+      const placedVocabulary = vocabToEmbed.filter((word) =>
+        isWordOnBoard(word, letterGrid, finalPositions, gameLang)
+      );
+      void setClassroomGamePlacedVocabulary(gameCode, placedVocabulary).then(() => {
+        // Everyone already in the room joined BEFORE the board existed, so they
+        // are holding the full lesson list. Re-send each of them their own
+        // context now that the real answer exists. Per-socket, not a room
+        // broadcast: `classroomLevel` differs per student and a broadcast would
+        // flatten it (pitfall class 3 — same state, two shapes).
+        for (const user of Object.values(game.users || {})) {
+          const memberSocket = getSocketById(io, (user as { socketId?: string })?.socketId ?? '');
+          if (!memberSocket) continue;
+          safeEmit(memberSocket, 'classroomContext', {
+            classroomLevel:
+              ((memberSocket.data as Record<string, unknown>)?.classroomLevel as string) ?? 'core',
+            classroomWordBank: placedVocabulary,
+          });
+        }
+      }).catch((err) => {
+        // Never silent: the word bank degrading to the full lesson list is
+        // survivable, but it must not degrade without a trace (class 4).
+        logger.warn('CLASSROOM_GAME', `Word-bank refresh failed for ${gameCode}: ${err}`);
+      });
     }
 
     const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);

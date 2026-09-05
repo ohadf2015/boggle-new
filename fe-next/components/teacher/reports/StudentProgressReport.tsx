@@ -270,10 +270,10 @@ export function StudentProgressReport({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-neo-navy border-b-2 border-black">
-                <th className="text-left p-3 text-neo-white font-bold">{t('teacher.reports.columns.word')}</th>
-                <th className="text-left p-3 text-neo-white font-bold">{t('teacher.reports.columns.status')}</th>
-                <th className="text-left p-3 text-neo-white font-bold">{t('teacher.reports.columns.accuracy')}</th>
-                <th className="text-left p-3 text-neo-white font-bold">{t('teacher.reports.columns.attempts')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.word')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.status')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.accuracy')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.attempts')}</th>
               </tr>
             </thead>
             <tbody>

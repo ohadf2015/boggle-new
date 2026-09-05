@@ -1,3 +1,6 @@
+// Join codes are SIX characters (utils/utils.ts:114). Five locales here advertised
+// a 4-digit code until 2026-09-05 — a literal instruction a teacher follows at the
+// projector, inside HowTo schema.
 // JSON-LD for /education sub-pages (duels, classroom-game).
 // HowTo + LearningResource pair: HowTo gets Google rich snippets;
 // LearningResource is the schema AI answer engines (ChatGPT/Perplexity/AIO)
@@ -104,7 +107,7 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
   },
   he: {
     name: 'איך מריצים משחק מילים לכל הכיתה',
-    description: 'משחק מילים רב-משתתפים בזמן אמת לכל הכיתה. תלמידים מצטרפים עם קוד בן 4 ספרות. ללא חשבונות לתלמידים.',
+    description: 'משחק מילים רב-משתתפים בזמן אמת לכל הכיתה. תלמידים מצטרפים עם קוד בן 6 תווים. ללא חשבונות לתלמידים.',
     steps: [
       { name: 'יצירת מפגש', text: 'לחצו "התחל משחק כיתה". בחרו רשימת מילים, מגבלת זמן ומצב משחק (לוח Boggle, ציד מילים או גלגל).' },
       { name: 'שיתוף קוד הצטרפות', text: 'הציגו את הקוד או QR על המקרן. תלמידים מצטרפים מכל דפדפן בנייד או מחשב — ללא התחברות.' },
@@ -115,10 +118,10 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
   },
   sv: {
     name: 'Så kör du ett ordspel för hela klassen',
-    description: 'Live multiplayer ordspel för hela klassen. Elever ansluter via en 4-siffrig kod. Inga konton krävs för elever.',
+    description: 'Live multiplayer ordspel för hela klassen. Elever ansluter via en kod på 6 tecken. Inga konton krävs för elever.',
     steps: [
       { name: 'Skapa en session', text: 'Klicka på "Starta klassrumsspel". Välj en ordlista, tidsgräns och spelläge (Boggle-bräda, Ordjakt eller Hjul).' },
-      { name: 'Dela anslutningskoden', text: 'Visa den 4-siffriga koden eller QR på projektorn. Elever ansluter från valfri telefon eller bärbar dator — ingen inloggning.' },
+      { name: 'Dela anslutningskoden', text: 'Visa koden på 6 tecken eller QR på projektorn. Elever ansluter från valfri telefon eller bärbar dator — ingen inloggning.' },
       { name: 'Spela och granska', text: 'Upp till 30 elever tävlar i realtid. Livetopplista. Efter rundan visar panelen klassens noggrannhet och vilka ord som lurade flest elever.' },
     ],
     audience: 'F-9-klasser, ESL/EFL-program, fritidsklubbar, vikarieaktiviteter.',
@@ -126,10 +129,10 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
   },
   ja: {
     name: 'クラス全体のワードゲームの実施方法',
-    description: 'クラス全体のリアルタイムマルチプレイヤーワードゲーム。生徒は4桁のコードで参加。アカウント不要。',
+    description: 'クラス全体のリアルタイムマルチプレイヤーワードゲーム。生徒は6文字のコードで参加。アカウント不要。',
     steps: [
       { name: 'セッションを作成', text: '"教室ゲーム開始"をクリック。ワードリスト、制限時間、ゲームモード（Boggleグリッド、ワードハント、ホイール）を選択。' },
-      { name: '参加コードを共有', text: 'プロジェクターに4桁コードまたはQRを表示。生徒は任意のスマホやノートパソコンのブラウザから参加 — ログイン不要。' },
+      { name: '参加コードを共有', text: 'プロジェクターに6文字コードまたはQRを表示。生徒は任意のスマホやノートパソコンのブラウザから参加 — ログイン不要。' },
       { name: 'プレイしてレビュー', text: '最大30人の生徒がリアルタイムで競争。ライブリーダーボード。ラウンド終了後、ダッシュボードがクラスの正確性と最も多くの生徒を引っかけた単語を表示。' },
     ],
     audience: '小中高の教室、ESL/EFLプログラム、放課後クラブ、代理教師活動。',
@@ -137,10 +140,10 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
   },
   es: {
     name: 'Cómo organizar un juego de palabras para toda la clase',
-    description: 'Juego de palabras multijugador en vivo para toda la clase. Los estudiantes se unen con un código de 4 dígitos. Sin cuentas para estudiantes.',
+    description: 'Juego de palabras multijugador en vivo para toda la clase. Los estudiantes se unen con un código de 6 caracteres. Sin cuentas para estudiantes.',
     steps: [
       { name: 'Crear una sesión', text: 'Haz clic en "Iniciar juego de aula". Elige una lista de palabras, límite de tiempo y modo de juego (cuadrícula Boggle, Búsqueda de Palabras o Rueda).' },
-      { name: 'Comparte el código', text: 'Muestra el código de 4 dígitos o QR en el proyector. Los estudiantes se unen desde cualquier navegador móvil o portátil — sin inicio de sesión.' },
+      { name: 'Comparte el código', text: 'Muestra el código de 6 caracteres o QR en el proyector. Los estudiantes se unen desde cualquier navegador móvil o portátil — sin inicio de sesión.' },
       { name: 'Juega y revisa', text: 'Hasta 30 estudiantes compiten en tiempo real. Tabla de clasificación en vivo. Al final, el panel muestra la precisión de la clase y qué palabras hicieron tropezar a más estudiantes.' },
     ],
     audience: 'Aulas K-12, programas ESL/EFL, clubes extraescolares, actividades de profesor sustituto.',
@@ -148,10 +151,10 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
   },
   ru: {
     name: 'Как организовать словесную игру для всего класса',
-    description: 'Живая многоплеерная словесная игра для всего класса. Ученики присоединяются с 4-значным кодом. Для учеников не требуются учетные записи.',
+    description: 'Живая многоплеерная словесная игра для всего класса. Ученики присоединяются с кодом из 6 символов. Для учеников не требуются учетные записи.',
     steps: [
       { name: 'Создай сеанс', text: 'Нажми "Начать игру в классе". Выбери список слов, лимит времени и режим игры (сетка Boggle, Охота на слова или Колесо).' },
-      { name: 'Поделись кодом', text: 'Отобрази 4-значный код или QR на проекторе. Ученики присоединяются из любого мобильного браузера или ноутбука — без входа.' },
+      { name: 'Поделись кодом', text: 'Отобрази код из 6 символов или QR на проекторе. Ученики присоединяются из любого мобильного браузера или ноутбука — без входа.' },
       { name: 'Играй и просмотри', text: 'До 30 учеников соревнуются в реальном времени. Живая таблица лидеров. После раунда панель показывает точность класса и какие слова сбили с толку большинство учеников.' },
     ],
     audience: 'Классы K-12, программы ESL/EFL, внешкольные клубы, деятельность учителя-замены.',

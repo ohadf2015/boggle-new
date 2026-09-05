@@ -33,6 +33,15 @@ vi.mock('@/lib/supabase', () => ({
   },
 }));
 
+// `challenges.ts` writes through `getWriteClient()` and `challengeProgress.ts`
+// reads AND writes through the service-role client, because daily_challenges /
+// weekly_quests grant writes only TO service_role. Point the admin client at the
+// same `from` mock so one set of chains drives both.
+vi.mock('@/utils/supabase/admin', async () => {
+  const { supabase } = await import('@/lib/supabase');
+  return { createAdminClient: () => supabase };
+});
+
 describe('challenges module', () => {
   const mockPlayerId = 'test-player-123';
   const mockDate = '2026-02-14';
@@ -358,17 +367,15 @@ describe('challenges module', () => {
       const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
       const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
-      // Mock update for increment
-      const mockUpdateEqId = vi.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 2 }, error: null });
-      const mockUpdateEq = vi.fn().mockReturnValue({ eq: mockUpdateEqId });
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
+      // Mock the batched upsert for increments (one call for all matching rows)
+      const mockUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
 
       // Weekly path: empty fetch — practice_session has no matching weekly quest_type
       const weeklyEmpty = buildSelectChain([]);
 
       (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectChain })
-        .mockReturnValueOnce({ update: mockUpdate })
+        .mockReturnValueOnce({ upsert: mockUpsert })
         .mockReturnValueOnce({ select: weeklyEmpty });
 
       // WHEN
@@ -398,16 +405,14 @@ describe('challenges module', () => {
       const mockEqPlayer = vi.fn().mockReturnValue({ eq: mockEqDate });
       const mockSelectChain = vi.fn().mockReturnValue({ eq: mockEqPlayer });
 
-      const mockUpdateEqId = vi.fn().mockResolvedValue({ data: { ...mockChallenges[0], current_value: 5, completed: true }, error: null });
-      const mockUpdateEq = vi.fn().mockReturnValue({ eq: mockUpdateEqId });
-      const mockUpdate = vi.fn().mockReturnValue({ eq: mockUpdateEq });
+      const mockUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
 
       // Weekly path: empty fetch
       const weeklySelect = buildSelectChain([]);
 
       (supabase.from as Mock)
         .mockReturnValueOnce({ select: mockSelectChain })
-        .mockReturnValueOnce({ update: mockUpdate })
+        .mockReturnValueOnce({ upsert: mockUpsert })
         .mockReturnValueOnce({ select: weeklySelect });
 
       // WHEN
@@ -415,13 +420,17 @@ describe('challenges module', () => {
 
       // THEN
       expect(result.updated).toBe(1);
-      // Verify update includes completed = true and completed_at
-      expect(mockUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          current_value: 5,
-          completed: true,
-          completed_at: expect.any(String),
-        })
+      // Verify the batched row carries completed = true and completed_at
+      expect(mockUpsert).toHaveBeenCalledWith(
+        [
+          expect.objectContaining({
+            id: 'ch-1',
+            current_value: 5,
+            completed: true,
+            completed_at: expect.any(String),
+          }),
+        ],
+        { onConflict: 'id' }
       );
     });
 
@@ -490,14 +499,13 @@ describe('challenges module', () => {
       ];
       const weeklySelect = buildSelectChain(weeklyQuests);
 
-      // Update chain for weekly increment
-      const weeklyUpdateEqId = vi.fn().mockResolvedValue({ data: null, error: null });
-      const weeklyUpdate = vi.fn().mockReturnValue({ eq: weeklyUpdateEqId });
+      // Batched upsert for weekly increments
+      const weeklyUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
 
       (supabase.from as Mock)
         .mockReturnValueOnce({ select: dailySelect }) // daily fetch
         .mockReturnValueOnce({ select: weeklySelect }) // weekly fetch
-        .mockReturnValueOnce({ update: weeklyUpdate }); // weekly update
+        .mockReturnValueOnce({ upsert: weeklyUpsert }); // weekly batched write
 
       // WHEN
       const result = await updateEducationChallengeProgress(mockPlayerId, 'word_mastered', 1);
@@ -505,10 +513,9 @@ describe('challenges module', () => {
       // THEN: counted as updated, weekly_quests was the target table for the update
       expect(result.updated).toBe(1);
       expect(supabase.from).toHaveBeenCalledWith('weekly_quests');
-      expect(weeklyUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          current_progress: { words_mastered: 6 },
-        })
+      expect(weeklyUpsert).toHaveBeenCalledWith(
+        [expect.objectContaining({ id: 'wq-1', current_progress: { words_mastered: 6 } })],
+        { onConflict: 'id' }
       );
     });
 
@@ -529,23 +536,26 @@ describe('challenges module', () => {
       ];
       const weeklySelect = buildSelectChain(weeklyQuests);
 
-      const weeklyUpdateEqId = vi.fn().mockResolvedValue({ data: null, error: null });
-      const weeklyUpdate = vi.fn().mockReturnValue({ eq: weeklyUpdateEqId });
+      const weeklyUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
 
       (supabase.from as Mock)
         .mockReturnValueOnce({ select: dailySelect })
         .mockReturnValueOnce({ select: weeklySelect })
-        .mockReturnValueOnce({ update: weeklyUpdate });
+        .mockReturnValueOnce({ upsert: weeklyUpsert });
 
       const result = await updateEducationChallengeProgress(mockPlayerId, 'word_mastered', 1);
 
       expect(result.updated).toBe(1);
-      expect(weeklyUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          current_progress: { words_mastered: 20 },
-          completed: true,
-          completed_at: expect.any(String),
-        })
+      expect(weeklyUpsert).toHaveBeenCalledWith(
+        [
+          expect.objectContaining({
+            id: 'wq-2',
+            current_progress: { words_mastered: 20 },
+            completed: true,
+            completed_at: expect.any(String),
+          }),
+        ],
+        { onConflict: 'id' }
       );
     });
   });

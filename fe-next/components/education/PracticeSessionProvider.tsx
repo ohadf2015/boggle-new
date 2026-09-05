@@ -31,6 +31,7 @@ import useEducationXp, {
 import useAchievementUnlock from '@/hooks/useAchievementUnlock';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 // supabase import removed — XP persistence handled server-side only
+import type { VocabFocus } from '@/lib/education/vocabFocus';
 import logger from '@/utils/logger';
 import { trackEduPracticeComplete, trackEduError } from '@/lib/education/telemetry';
 
@@ -50,7 +51,7 @@ export interface LevelUpPayload {
 export interface CompletePracticeSessionData {
   type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz' | 'vocab_focus';
   /** vocab_focus only: which skill was drilled. */
-  focus?: 'definition' | 'synonym' | 'antonym' | 'context';
+  focus?: VocabFocus;
   cardsReviewed?: number;
   cardsCorrect?: number;
   vocabularyWordsFound?: string[];

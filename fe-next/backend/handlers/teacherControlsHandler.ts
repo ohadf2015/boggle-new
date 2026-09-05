@@ -16,6 +16,7 @@ import type { Server, Socket } from 'socket.io';
 import type { GameState } from '../modules/gameState/types.js';
 
 import { getGame, getGameBySocketId } from '../modules/gameStateManager.js';
+import { hasQuizSession } from '../modules/vocabQuizStore.js';
 import { pauseGameTimer, resumeGameTimer, extendGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import { endGame } from '../services/gameLifecycle/gameEnd.js';
 import { skipWordHuntTarget } from './wordHuntHandler.js';
@@ -43,6 +44,18 @@ function resolveTeacherGame(socket: Socket, action: TeacherAction): { gameCode: 
   const game = gameCode ? getGame(gameCode) : null;
   if (!gameCode || !game) {
     logger.warn('TEACHER', `${action} ignored: socket not in a game`, { socketId: socket.id });
+    return null;
+  }
+
+  // A live Vocab Quiz owns this room's clock and its end path. Nothing else
+  // here would stop us: a quiz room is a real 'in-progress' classroom room
+  // hosted by the teacher, so every check below passes — but there is no board
+  // timer to pause, and running the board's endGame would take the
+  // once-per-game `classroom_game_persisted:<code>` key with EMPTY board
+  // results, silently discarding the quiz's own per-student word progress.
+  // vocabQuizHandler listens on these same events and applies them to the quiz.
+  if (hasQuizSession(gameCode)) {
+    logger.debug('TEACHER', `${action} deferred to the live vocab quiz for ${gameCode}`, { socketId: socket.id });
     return null;
   }
 

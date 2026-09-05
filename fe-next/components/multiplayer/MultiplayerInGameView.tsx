@@ -48,6 +48,14 @@ const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => m.WheelRushView),
   { ssr: false },
 );
+const VocabQuizView = dynamic(
+  () => import('@/components/education/vocabQuiz/VocabQuizView').then(m => m.VocabQuizView),
+  { ssr: false },
+);
+const VocabQuizHostView = dynamic(
+  () => import('@/components/education/vocabQuiz/VocabQuizHostView').then(m => m.VocabQuizHostView),
+  { ssr: false },
+);
 import type {
   Language,
   LetterGrid,
@@ -65,6 +73,7 @@ import { useGameMode, useGameStore } from '@/hooks/gameState/store';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useTeacherPaused } from '@/hooks/useTeacherPause';
+import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 
 // ==================== Types ====================
 
@@ -271,6 +280,9 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Teacher live controls: while the classroom round is paused the server
   // stops ticking, so the smoothing tick must stop too or the display drifts.
   const teacherPaused = useTeacherPaused();
+  // Live Vocab Quiz rooms replace the board entirely. Detected from the
+  // server's quiz traffic, since the quiz is not a `GameMode`.
+  const isVocabQuizRoom = useIsVocabQuizRoom(socket);
   const { remainingTime: syncedRemainingTime, setTime: setSyncedTime } = useGameTimer({
     initialTime: totalTime ?? remainingTime ?? 180,
     isPaused: !gameActive || remainingTime == null || teacherPaused,
@@ -391,6 +403,25 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     setBlastBoardClearedByLocal(true);
     playEpicVictorySound();
   }, [setBlastBoardClearedByLocal, playEpicVictorySound]);
+
+  // Live Vocab Quiz — a classroom question round, not a board game. It has no
+  // letter grid at all, so it must render before the grid placeholder guard.
+  // Detected from the server's quiz traffic rather than `gameMode`: the quiz is
+  // deliberately not a member of the GameMode union (see shared/types/vocabQuiz).
+  if (isVocabQuizRoom) {
+    // The teacher hosts on a projector and does not compete; students play on
+    // their phones. Two surfaces, one socket stream.
+    return isHost ? (
+      <VocabQuizHostView
+        socket={socket}
+        joinCode={gameCode}
+        playerCount={leaderboard?.length}
+        t={t}
+      />
+    ) : (
+      <VocabQuizView socket={socket} username={username} t={t} />
+    );
+  }
 
   // Wheel Rush mode — no letter grid; render before grid placeholder guard.
   // Mobile-only fallback: desktop path is handled by WheelRushDesktopAdapter below.

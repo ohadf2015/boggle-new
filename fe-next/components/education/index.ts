@@ -14,7 +14,15 @@ export type { XpProgressBarProps } from './XpProgressBar';
 export { default as StreakBonusIndicator } from './StreakBonusIndicator';
 export type { StreakBonusIndicatorProps } from './StreakBonusIndicator';
 
-export { LevelUpCelebration } from './LevelUpCelebration';
+// LevelUpCelebration is deliberately NOT re-exported here. A barrel re-export is
+// as static as an import: it pulls the component into the first-load chunk of
+// every page that touches this barrel, including ones that never render it.
+// Import it lazily at the render site instead:
+//   const LevelUpCelebration = dynamic(
+//     () => import('@/components/education/LevelUpCelebration').then(m => m.LevelUpCelebration),
+//     { ssr: false }
+//   );
+// The TYPES stay — they are erased at compile time and cost no bytes.
 export type { LevelUpCelebrationProps, LevelUpPayload } from './LevelUpCelebration';
 
 export {

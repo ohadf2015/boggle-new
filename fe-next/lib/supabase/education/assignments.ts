@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { LessonAssignment, TeacherAssignment } from './types';
-import { isVocabFocus, type PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import { isVocabFocus, isPracticeFocusSetting, type PracticeFocusSetting } from '@/lib/education/vocabFocus';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -98,7 +98,10 @@ export async function createAssignment(data: {
   due_date?: string | null;
   title?: string | null;
   instructions?: string | null;
-  /** Vocabulary skill to drill (definition | synonym | antonym | context). `any`/unset = student picks. */
+  /**
+   * Vocabulary skill to drill: definition | synonym | antonym | context |
+   * multiple_meaning | roots_affixes. `any`/unset = student picks.
+   */
   practice_focus?: PracticeFocusSetting | null;
 }): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
@@ -276,9 +279,15 @@ export async function updateAssignment(
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
+    // Same guard as createAssignment: a focus the app does not know would fail
+    // the table's CHECK at the database, which reads as a generic 500.
+    const patch = { ...updates };
+    if ('practice_focus' in patch && patch.practice_focus !== null && !isPracticeFocusSetting(patch.practice_focus)) {
+      delete patch.practice_focus;
+    }
     const { data: assignment, error } = await supabase
       .from('lesson_assignments')
-      .update(updates)
+      .update(patch)
       .eq('id', id)
       .select()
       .single();

@@ -7,7 +7,8 @@ import { MultiLessonSelector } from './MultiLessonSelector';
 import { ClassroomModeSettings } from './ClassroomModeSettings';
 import { StudentViewPreview } from './StudentViewPreview';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
-import type { GameMode } from '@/shared/types/game';
+import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { ClassroomGameMode, PracticeFocusSetting } from '@/shared/types/vocabQuiz';
 
 interface ClassroomSetupStepProps {
   classrooms: Classroom[];
@@ -15,15 +16,21 @@ interface ClassroomSetupStepProps {
   selectedClassroomId: string;
   selectedLessonIds: string[];
   allPlayableWords: string[];
-  gameMode: GameMode;
+  gameMode: ClassroomGameMode;
   targetWord: string;
   minWordLength: number;
+  vocabQuizFocus: PracticeFocusSetting;
+  vocabQuizQuestionCount: number;
+  vocabQuizSeconds: number;
   timerMinutes: number;
   boardSize: 'small' | 'medium' | 'large';
   isStarting: boolean;
   onSelectClassroom: (id: string) => void;
   onSelectLessons: (ids: string[]) => void;
-  onGameModeChange: (mode: GameMode) => void;
+  onGameModeChange: (mode: ClassroomGameMode) => void;
+  onVocabQuizFocusChange: (focus: PracticeFocusSetting) => void;
+  onVocabQuizQuestionCountChange: (count: number) => void;
+  onVocabQuizSecondsChange: (seconds: number) => void;
   onTargetWordChange: (word: string) => void;
   onMinWordLengthChange: (length: number) => void;
   onTimerChange: (minutes: number) => void;
@@ -54,12 +61,18 @@ export function ClassroomSetupStep({
   gameMode,
   targetWord,
   minWordLength,
+  vocabQuizFocus,
+  vocabQuizQuestionCount,
+  vocabQuizSeconds,
   timerMinutes,
   boardSize,
   isStarting,
   onSelectClassroom,
   onSelectLessons,
   onGameModeChange,
+  onVocabQuizFocusChange,
+  onVocabQuizQuestionCountChange,
+  onVocabQuizSecondsChange,
   onTargetWordChange,
   onMinWordLengthChange,
   onTimerChange,
@@ -68,6 +81,25 @@ export function ClassroomSetupStep({
   onBack,
 }: ClassroomSetupStepProps) {
   const { t } = useLanguage();
+
+  // The Vocab Quiz needs the RICH per-word rows (definition / synonyms /
+  // antonyms / example), not the flat `allPlayableWords` strings the board
+  // modes embed into a grid. Derived from the same lessons the teacher just
+  // picked, so the question counts the picker shows come from exactly the rows
+  // the server will later read.
+  const lessonLanguage = useMemo(
+    () => lessons.find((lesson) => selectedLessonIds.includes(lesson.id))?.language,
+    [lessons, selectedLessonIds]
+  );
+
+  const lessonWords: VocabularyWord[] = useMemo(
+    () =>
+      lessons
+        .filter((lesson) => selectedLessonIds.includes(lesson.id))
+        .flatMap((lesson) => lesson.words ?? [])
+        .filter((word) => word?.canIntegrate !== false),
+    [lessons, selectedLessonIds]
+  );
 
   // A lesson can be selected and still yield nothing playable — every word
   // filtered out by canIntegrate. Starting then produces a game with no
@@ -80,7 +112,11 @@ export function ClassroomSetupStep({
   // "Preview what students will see" — needs a classroom (for its real join
   // code) and at least one lesson (for words to hide in the sample board).
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const canPreview = Boolean(selectedClassroomId) && selectedLessonIds.length > 0;
+  // The preview draws a sample letter board. A Vocab Quiz has no board, so the
+  // button is disabled there rather than opening a dialog that would show
+  // students a screen they never see.
+  const canPreview =
+    Boolean(selectedClassroomId) && selectedLessonIds.length > 0 && gameMode !== 'vocab-quiz';
   const selectedClassroom = useMemo(
     () => classrooms.find((c) => c.id === selectedClassroomId) ?? null,
     [classrooms, selectedClassroomId]
@@ -237,6 +273,14 @@ export function ClassroomSetupStep({
           targetWord={targetWord}
           minWordLength={minWordLength}
           allPlayableWords={allPlayableWords}
+          lessonWords={lessonWords}
+          lessonLanguage={lessonLanguage}
+          vocabQuizFocus={vocabQuizFocus}
+          vocabQuizQuestionCount={vocabQuizQuestionCount}
+          vocabQuizSeconds={vocabQuizSeconds}
+          onVocabQuizFocusChange={onVocabQuizFocusChange}
+          onVocabQuizQuestionCountChange={onVocabQuizQuestionCountChange}
+          onVocabQuizSecondsChange={onVocabQuizSecondsChange}
           onGameModeChange={onGameModeChange}
           onTargetWordChange={onTargetWordChange}
           onMinWordLengthChange={onMinWordLengthChange}
@@ -266,6 +310,9 @@ export function ClassroomSetupStep({
         </div>
       </div>
 
+      {/* The preview renders a letter board, which a Vocab Quiz never shows —
+          previewing one would promise students a screen they never get. */}
+      {gameMode !== 'vocab-quiz' && (
       <StudentViewPreview
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
@@ -276,6 +323,7 @@ export function ClassroomSetupStep({
         boardSize={boardSize}
         minWordLength={minWordLength}
       />
+      )}
     </WizardStep>
   );
 }

@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { m, AnimatePresence } from 'framer-motion';
 import { Play, X, Users, Radio } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { io, Socket } from 'socket.io-client';
-import { getSocketURL } from '@/utils/SocketContext';
+import { useActiveClassroomGame } from '@/hooks/useActiveClassroomGame';
 
 export interface ClassroomGameBannerProps {
   /** The classroom ID to listen for games */
@@ -19,21 +18,19 @@ export interface ClassroomGameBannerProps {
   username: string;
 }
 
-interface ActiveGame {
-  gameCode: string;
-  teacherName: string;
-  lessonNames: string[];
-  playerCount?: number;
-}
-
-/** Polling interval for active game discovery (ms) */
-const POLL_INTERVAL = 15_000;
-
 /**
  * ClassroomGameBanner - Notification banner for active classroom games
  *
  * Shows a prominent banner when a teacher starts a game in the student's classroom.
- * Uses WebSocket for instant notifications + polling fallback for reliability.
+ *
+ * The socket lives in `useActiveClassroomGame`, NOT here. This component used to
+ * open its own connection with no auth token; the server reads the user only
+ * from `handshake.auth.token`, so `getActiveClassroomGames` was rejected before
+ * the socket was ever subscribed to `classroom:<id>` — the banner could never
+ * fire, and the rejection was swallowed, so it just said "listening" forever.
+ * The hook was extracted from this file and gained the token; the original never
+ * had it (recurring pitfall class 3). Sharing the hook also collapses three
+ * sockets per student on this page down to the ones that earn their keep.
  */
 export function ClassroomGameBanner({
   classroomId,
@@ -42,93 +39,19 @@ export function ClassroomGameBanner({
 }: ClassroomGameBannerProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
-  const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { activeGame, isConnected, socket } = useActiveClassroomGame(classroomId);
   const [isJoining, setIsJoining] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Request active games from server (used on connect, reconnect, and polling)
-  const requestActiveGames = useCallback((sock: Socket) => {
-    if (sock.connected) {
-      sock.emit('getActiveClassroomGames', { classroomId });
-    }
-  }, [classroomId]);
-
-  useEffect(() => {
-    const socketUrl = getSocketURL();
-    const socketInstance = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-    });
-
-    socketInstance.on('connect', () => {
-      setIsConnected(true);
-      // Join classroom room + fetch active games
-      requestActiveGames(socketInstance);
-    });
-
-    socketInstance.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    // Re-request on reconnect to catch games created while disconnected
-    socketInstance.io.on('reconnect', () => {
-      requestActiveGames(socketInstance);
-    });
-
-    // Listen for new games created (real-time)
-    socketInstance.on('classroomGameCreated', (data: {
-      gameCode: string;
-      teacherName: string;
-      lessonNames: string[];
-    }) => {
-      setDismissed(false);
-      setActiveGame({
-        gameCode: data.gameCode,
-        teacherName: data.teacherName,
-        lessonNames: data.lessonNames,
-      });
-    });
-
-    // Listen for active games list (response to getActiveClassroomGames)
-    socketInstance.on('activeClassroomGames', (data: { games: ActiveGame[] }) => {
-      if (data.games && data.games.length > 0) {
-        setActiveGame(data.games[0]);
-      }
-    });
-
-    // Listen for player join updates
-    socketInstance.on('classroomGamePlayerJoined', (data: {
-      gameCode: string;
-      playerCount: number;
-    }) => {
-      setActiveGame((current) => {
-        if (current && current.gameCode === data.gameCode) {
-          return { ...current, playerCount: data.playerCount };
-        }
-        return current;
-      });
-    });
-
-    setSocket(socketInstance);
-
-    // Polling fallback: periodically check for active games
-    // Catches games missed due to timing or brief disconnects
-    pollIntervalRef.current = setInterval(() => {
-      requestActiveGames(socketInstance);
-    }, POLL_INTERVAL);
-
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-      socketInstance.disconnect();
-    };
-  }, [classroomId, requestActiveGames]);
+  // Keyed on the game, not a boolean. A boolean plus a 15s poll meant the poll
+  // re-set the game while `dismissed` was still true and the dismissed branch
+  // returned null — the whole strip disappeared 15 seconds after the tap.
+  const [dismissedGameCode, setDismissedGameCode] = useState<string | null>(null);
 
   const handleJoinGame = () => {
-    if (!activeGame || !socket) return;
+    // A room code is the whole point of this button. Without one the push lands
+    // on the bare multiplayer hub — "No battles in progress" — which reads as
+    // the app losing the game the student was just invited to. Do nothing
+    // visible rather than navigate somewhere wrong.
+    if (!activeGame?.gameCode || !socket) return;
 
     setIsJoining(true);
 
@@ -145,14 +68,21 @@ export function ClassroomGameBanner({
   };
 
   const handleDismiss = () => {
-    setDismissed(true);
-    setActiveGame(null);
+    if (activeGame) setDismissedGameCode(activeGame.gameCode);
   };
+
+  // Dismissing hides THIS game's call to action and nothing more. The student
+  // still sees that the class is being watched, and a new game clears it by
+  // simply having a different code.
+  const isDismissed = !!activeGame && activeGame.gameCode === dismissedGameCode;
 
   // Always show the "listening" indicator even when no game is active
   // F-18/F-19: friendlier idle copy + pulsing radar animation so the empty
   // state still feels alive instead of looking broken.
-  if (!activeGame) {
+  // A game with no room code is not joinable, so it must not be advertised as
+  // one — showing the JOIN call to action and then doing nothing on tap is the
+  // same dead end, one step later.
+  if (!activeGame?.gameCode || isDismissed) {
     return (
       <m.div
         initial={{ opacity: 0, y: -8 }}
@@ -199,8 +129,6 @@ export function ClassroomGameBanner({
       </m.div>
     );
   }
-
-  if (dismissed) return null;
 
   return (
     <AnimatePresence>
@@ -261,8 +189,10 @@ export function ClassroomGameBanner({
             ))}
           </div>
 
+          {/* Dark body: this line was `text-black/60` and effectively invisible.
+              It now matches the sibling paragraph above it. */}
           {activeGame.playerCount && activeGame.playerCount > 0 && (
-            <div className="flex items-center gap-2 text-black/60 text-sm font-bold mb-4">
+            <div className="flex items-center gap-2 text-neo-white/80 text-sm font-bold mb-4">
               <Users className="w-4 h-4" />
               <span>{activeGame.playerCount} {t('multiplayer.playersJoined')}</span>
             </div>

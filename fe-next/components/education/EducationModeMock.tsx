@@ -41,7 +41,7 @@ export function EducationModeMock() {
           <span className="h-3 w-3 rounded-full border-2 border-neo-navy bg-neo-pink" aria-hidden />
           <span className="h-3 w-3 rounded-full border-2 border-neo-navy bg-neo-yellow" aria-hidden />
           <span className="h-3 w-3 rounded-full border-2 border-neo-navy bg-neo-lime" aria-hidden />
-          <span className="ml-2 truncate rounded-neo-sm bg-neo-white px-2 py-0.5 font-mono text-[11px] text-neo-navy/70">
+          <span className="ms-2 truncate rounded-neo-sm bg-neo-white px-2 py-0.5 font-mono text-[11px] text-neo-navy/70">
             lexiclash.live/classroom
           </span>
         </div>
@@ -72,7 +72,7 @@ export function EducationModeMock() {
                 4821
               </span>
             </div>
-            <span className="shrink-0 text-right font-neo-display text-xs font-bold text-neo-cyan">
+            <span className="shrink-0 text-end font-neo-display text-xs font-bold text-neo-cyan">
               {t('education.landing.mock.players')}
             </span>
           </div>

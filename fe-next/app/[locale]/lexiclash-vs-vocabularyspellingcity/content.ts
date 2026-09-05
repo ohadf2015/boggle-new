@@ -87,11 +87,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Spans older + ESL learners',
-        desc: 'CEFR A1–C2 dictionaries fit middle school and adult ESL, not just K-5 spelling.',
+        desc: 'Full-language dictionaries fit middle school and adult ESL, not just K-5 spelling.',
       },
       {
-        title: '5 native-dictionary languages',
-        desc: 'EN/HE/ES/SV/JA word validation for bilingual and language programs. SpellingCity is English-spelling-first.',
+        title: '6 native-dictionary languages',
+        desc: 'EN/HE/ES/SV/JA/RU word validation for bilingual and language programs. SpellingCity is English-spelling-first.',
       },
     ],
     stillWinsTitle: 'When SpellingCity still wins',
@@ -117,11 +117,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Is LexiClash only for older students?',
-        a: 'LexiClash is strongest for upper-elementary through adult ESL — its CEFR-scaled dictionaries (A1–C2) span beginner to advanced. SpellingCity skews K-5. For early elementary sight-word drilling, SpellingCity may fit better; for middle school, ESL, and review games, LexiClash fits better.',
+        a: 'LexiClash is strongest for upper-elementary through adult ESL — its full-language dictionaries span beginner to advanced. SpellingCity skews K-5. For early elementary sight-word drilling, SpellingCity may fit better; for middle school, ESL, and review games, LexiClash fits better.',
       },
       {
         q: 'Does LexiClash support other languages?',
-        a: 'Yes — native dictionaries for English, Hebrew (RTL), Spanish, Swedish, and Japanese. SpellingCity is English-spelling focused.',
+        a: 'Yes — native dictionaries for English, Hebrew (RTL), Spanish, Swedish, Japanese, and Russian. SpellingCity is English-spelling focused.',
       },
     ],
     moreTitle: 'More comparisons',
@@ -132,7 +132,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     ],
     finalTitle: 'Try it before next class',
     finalBody:
-      'Upload this week\'s spelling list, project the join code, and let the whole class play it at once. No logins to provision, no Premium upsell, no credit card — five minutes to see if live beats solo for your students.',
+      'Upload this week\'s spelling list, project the join code, and let the whole class play it at once. No logins to provision, no credit card, and the free tier holds 3 classes of up to 50 — five minutes to see if live beats solo for your students.',
     finalCta: 'Start a Classroom Game Free',
   },
   he: {
@@ -141,7 +141,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'השוואה בין LexiClash ו-VocabularySpellingCity: משחקי מילים בחיים ולכל הכיתה מול תרגול כתיב אישי. ללא התחברות תלמיד, בחינם, 6 שפות, רשימות מילים מותאמות. החלופה החינמית של SpellingCity לכתיב ולאוצר מילים.',
     ogTitle: 'LexiClash מול VocabularySpellingCity — החלופה החינמית',
     ogDescription:
-      'משחקי מילים בחיים מרובי שחקנים עוקפים תרגול כתיב בודד בהתאמה. ללא התחברות. 6 שפות. בחינם לנצח.',
+      'משחקי מילים בחיים מרובי שחקנים עוקפים תרגול כתיב בודד בהתאמה. ללא התחברות. 6 שפות. כל הכיתה בחינם.',
     twitterTitle: 'LexiClash מול SpellingCity — חלופה חינמית',
     twitterDescription: 'משחקי כתיב + אוצר מילים מרובי שחקנים. ללא התחברות. 6 שפות. בחינם.',
     heroTitle: 'SpellingCity תורגל לבד. LexiClash משחק כל כיתה.',
@@ -187,11 +187,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'מכסה תלמידים מבוגרים יותר + ESL',
-        desc: 'מילונים מסולמי CEFR A1–C2 משתלבים בחטיבה ו-ESL למבוגרים, לא רק כתיב כיתות ייסוד.',
+        desc: 'מילונים מלאים משתלבים בחטיבה ו-ESL למבוגרים, לא רק כתיב כיתות ייסוד.',
       },
       {
         title: '6 שפות עם מילונים מקוריים',
-        desc: 'אימות מילים EN/HE/ES/SV/JA לתוכניות דו-לשוניות ותוכניות שפה. SpellingCity הוא כתיב אנגלית ראשון.',
+        desc: 'אימות מילים EN/HE/ES/SV/JA/RU לתוכניות דו-לשוניות ותוכניות שפה. SpellingCity הוא כתיב אנגלית ראשון.',
       },
     ],
     stillWinsTitle: 'כאשר SpellingCity עדיין מנצח',
@@ -217,7 +217,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'האם LexiClash רק לתלמידים מבוגרים יותר?',
-        a: 'LexiClash חזקה ביותר לחטיבה עליונה עד ESL למבוגרים — המילונים המסולמים שלה (A1–C2) משתרעים מתחילים לגבוה. SpellingCity סוטה לכיתות ייסוד. לתרגול במילות ראייה מוקדם, SpellingCity עשויה להתאים טוב יותר; לחטיבה, ESL ומשחקי ביקורת, LexiClash מתאימה יותר.',
+        a: 'LexiClash חזקה ביותר לחטיבה עליונה עד ESL למבוגרים — המילונים המלאים שלה משתרעים ממתחילים ועד מתקדמים. SpellingCity סוטה לכיתות ייסוד. לתרגול במילות ראייה מוקדם, SpellingCity עשויה להתאים טוב יותר; לחטיבה, ESL ומשחקי ביקורת, LexiClash מתאימה יותר.',
       },
       {
         q: 'האם LexiClash תומכת בשפות אחרות?',
@@ -287,11 +287,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Omfattar äldre + ESL-elever',
-        desc: 'CEFR A1–C2-ordlistor passar mellanstadiet och vuxen-ESL, inte bara mellanstadiet stavning.',
+        desc: 'Fullständiga ordlistor passar mellanstadiet och vuxen-ESL, inte bara mellanstadiet stavning.',
       },
       {
         title: '5 infödda-ordlistassprak',
-        desc: 'EN/HE/ES/SV/JA ordvalidering for tvasprakiga och sprakprogram. SpellingCity är engelsk stavning-först.',
+        desc: 'EN/HE/ES/SV/JA/RU ordvalidering for tvasprakiga och sprakprogram. SpellingCity är engelsk stavning-först.',
       },
     ],
     stillWinsTitle: 'Nar SpellingCity fortfarande vinner',
@@ -317,7 +317,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Är LexiClash bara for äldre elever?',
-        a: 'LexiClash är starkast for mellanstadiet genom vuxen-ESL — dess CEFR-skalerade ordlistor (A1–C2) stracker sig fran nybörjare till avancerad. SpellingCity lutar mot mellanstadiet. For tidigt mellanstadiestavningstraning kan SpellingCity passa bättre; for mellanstadiet, ESL och repetitionsspel passar LexiClash bättre.',
+        a: 'LexiClash är starkast for mellanstadiet genom vuxen-ESL — dess fullständiga ordlistor stracker sig fran nybörjare till avancerad. SpellingCity lutar mot mellanstadiet. For tidigt mellanstadiestavningstraning kan SpellingCity passa bättre; for mellanstadiet, ESL och repetitionsspel passar LexiClash bättre.',
       },
       {
         q: 'Stoder LexiClash andra sprak?',
@@ -387,7 +387,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Toshin + esl gakushachasain o soumatomeru',
-        desc: 'cefr a1 - c2 jisho wa chuugakkoutou to seijin esl ni tekigou suru, shougaku supeingu dake de wa arimasen.',
+        desc: 'kanzen na jisho wa chuugakkoutou to seijin esl ni tekigou suru, shougaku supeingu dake de wa arimasen.',
       },
       {
         title: '5 neitibu jisho gengo',
@@ -417,7 +417,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'LexiClash wa toshin gakusei dake no tame desu ka?',
-        a: 'LexiClash wa toshin shougaku kara seijin esl made saikou desu — sono cefr sukeru jisho (a1 - c2) wa shosinsha kara joushou made no han i desu. spellingcity wa shougaku skyu shimasu. shoki no shougaku genten no tango doriru no tame ni, spellingcity ga yori yoku tekigou suru kamo shiremaseN; chuugakkoutou, esl, oyobi rebyu gemu, lexiclash wa yori yoku tekigou shimasu.',
+        a: 'LexiClash wa toshin shougaku kara seijin esl made saikou desu — sono kanzen na jisho wa shosinsha kara joushou made no han i desu. spellingcity wa shougaku skyu shimasu. shoki no shougaku genten no tango doriru no tame ni, spellingcity ga yori yoku tekigou suru kamo shiremaseN; chuugakkoutou, esl, oyobi rebyu gemu, lexiclash wa yori yoku tekigou shimasu.',
       },
       {
         q: 'LexiClash wa ta no gengo o sapoto shimasu ka?',
@@ -441,7 +441,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'LexiClash vs VocabularySpellingCity comparacion: juegos de palabras multijugador en vivo de toda la clase versus ejercicios de ortografia individual. Sin inicio de sesion de estudiante, gratis, 6 idiomas, listas de palabras personalizadas. La alternativa gratuita de SpellingCity para ortografia y vocabulario.',
     ogTitle: 'LexiClash vs VocabularySpellingCity — La alternativa gratuita',
     ogDescription:
-      'Los juegos de palabras multijugador en vivo vencen los ejercicios de ortografia en solitario para el compromiso. Sin inicio de sesion. 6 idiomas. Gratis por siempre.',
+      'Los juegos de palabras multijugador en vivo vencen los ejercicios de ortografia en solitario para el compromiso. Sin inicio de sesion. 6 idiomas. Toda la clase gratis.',
     twitterTitle: 'LexiClash vs SpellingCity — Alternativa gratuita',
     twitterDescription: 'Juegos de ortografia + vocabulario multijugador. Sin inicio de sesion. 6 idiomas. Gratis.',
     heroTitle: 'SpellingCity practica solo. LexiClash juega toda la clase.',
@@ -487,11 +487,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Abarca estudiantes mayores + ESL',
-        desc: 'Los diccionarios escalados por MCER A1–C2 se ajustan a la escuela secundaria y ESL adulto, no solo a la ortografia de primaria.',
+        desc: 'Los diccionarios completos se ajustan a la escuela secundaria y ESL adulto, no solo a la ortografia de primaria.',
       },
       {
         title: '6 idiomas con diccionarios nativos',
-        desc: 'Validacion de palabras EN/HE/ES/SV/JA para programas bilingues y de idiomas. SpellingCity es ortografia inglesa primero.',
+        desc: 'Validacion de palabras EN/HE/ES/SV/JA/RU para programas bilingues y de idiomas. SpellingCity es ortografia inglesa primero.',
       },
     ],
     stillWinsTitle: 'Cuando SpellingCity aun gana',
@@ -517,7 +517,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'ZEs LexiClash solo para estudiantes mayores?',
-        a: 'LexiClash es mas fuerte para primaria superior a traves de ESL adulto — sus diccionarios escalados por MCER (A1–C2) abarcan desde principiante hasta avanzado. SpellingCity se inclina hacia la primaria. Para la practica de palabras de vista de primaria temprana, SpellingCity puede ser mejor; para la escuela secundaria, ESL y juegos de revision, LexiClash es mejor.',
+        a: 'LexiClash es mas fuerte para primaria superior a traves de ESL adulto — sus diccionarios completos abarcan desde principiante hasta avanzado. SpellingCity se inclina hacia la primaria. Para la practica de palabras de vista de primaria temprana, SpellingCity puede ser mejor; para la escuela secundaria, ESL y juegos de revision, LexiClash es mejor.',
       },
       {
         q: 'ZLexiClash admite otros idiomas?',
@@ -587,11 +587,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Охватывает старших учащихся + ESL',
-        desc: 'Словари с масштабированием CEFR A1–C2 подходят для средней школы и ESL для взрослых, а не только для орфографии начальной школы.',
+        desc: 'Полные словари подходят для средней школы и ESL для взрослых, а не только для орфографии начальной школы.',
       },
       {
         title: '6 языков с собственными словарями',
-        desc: 'Проверка слов EN/HE/ES/SV/JA для двуязычных и языковых программ. SpellingCity это орфография на английском языке в первую очередь.',
+        desc: 'Проверка слов EN/HE/ES/SV/JA/RU для двуязычных и языковых программ. SpellingCity это орфография на английском языке в первую очередь.',
       },
     ],
     stillWinsTitle: 'Когда SpellingCity все еще побеждает',
@@ -617,7 +617,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'LexiClash только для старших учащихся?',
-        a: 'LexiClash сильнее всего для старших классов начальной школы до ESL для взрослых — её словари с масштабированием CEFR (A1–C2) охватывают от начинающих до продвинутых. SpellingCity ориентирована на начальные классы. Для упражнений на работу со словами для зрительного восприятия в начальной школе SpellingCity может подойти лучше; для средней школы, ESL и игр на повторение LexiClash подходит лучше.',
+        a: 'LexiClash сильнее всего для старших классов начальной школы до ESL для взрослых — её полные словари охватывают от начинающих до продвинутых. SpellingCity ориентирована на начальные классы. Для упражнений на работу со словами для зрительного восприятия в начальной школе SpellingCity может подойти лучше; для средней школы, ESL и игр на повторение LexiClash подходит лучше.',
       },
       {
         q: 'Поддерживает ли LexiClash другие языки?',

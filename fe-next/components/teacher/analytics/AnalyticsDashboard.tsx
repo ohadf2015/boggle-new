@@ -253,11 +253,11 @@ export function AnalyticsDashboard({
             <table className="w-full">
               <thead>
                 <tr className="bg-neo-navy/60 border-b-2 border-black/30">
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.streak')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.streak')}</th>
                 </tr>
               </thead>
               <tbody>

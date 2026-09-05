@@ -101,7 +101,12 @@ vi.mock('../../../backend/utils/socketHelpers', () => ({
   safeEmit: mockSafeEmit,
   getSocketById: mockGetSocketById,
 }));
-vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: mockMakePositionsMap, normalizeWordForLanguage: mockNormalizeWordForLanguage }));
+vi.mock('../../../backend/modules/wordValidator', () => ({
+  makePositionsMap: mockMakePositionsMap,
+  normalizeWordForLanguage: mockNormalizeWordForLanguage,
+  // Game start now asks which lesson words the finished board carries.
+  isWordOnBoard: vi.fn(() => true),
+}));
 vi.mock('../../../backend/utils/metrics', () => ({ ensureGame: mockEnsureGame }));
 vi.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: mockGenerateRandomTable }));
 vi.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: mockEnsureLanguageLoaded }));
@@ -117,7 +122,10 @@ vi.mock('../../../backend/modules/gameModeSelector', () => ({
   ALL_GAME_MODES: ['classic', 'blast', 'word-hunt'],
 }));
 vi.mock('../../../backend/handlers/playerDataInit', () => ({ initializePlayerData: mockInitializePlayerData, ensurePlayerState: vi.fn() }));
-vi.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: mockGetClassroomGame }));
+vi.mock('../../../backend/modules/classroomGameManager', () => ({
+  getClassroomGame: mockGetClassroomGame,
+  setClassroomGamePlacedVocabulary: vi.fn(async () => undefined),
+}));
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   initBlastModeState: mockInitBlastModeState,
   hashStringToSeed: mockHashStringToSeed,
@@ -365,6 +373,57 @@ describe('registerStartGameHandler', () => {
         'GAME1',
         expect.objectContaining({ letterGrid: CLIENT_GRID })
       );
+      expect(mockGenerateRandomTable).not.toHaveBeenCalled();
+    });
+
+    // A teacher's first move is to try her own lesson alone before the bell.
+    // With the anti-cheat solo exemption she got the client's random grid and
+    // NOT ONE of her vocabulary words — while the setup wizard's preview had
+    // just shown her an embedded board. Preview and reality disagreed for
+    // exactly the case she tries first. A classroom game always embeds.
+    it('embeds lesson vocabulary for a 1-player classroom game', async () => {
+      mockGetClassroomGame.mockResolvedValue({
+        gameCode: 'GAME1',
+        classroomId: 'c1',
+        vocabularyWords: ['photosynthesis', 'chlorophyll'],
+      } as never);
+      mockGetGame.mockReturnValue(makeGame({
+        users: { Host: { socketId: 'socket-host', isHost: true } },
+      }));
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ gameMode: 'classic' }));
+
+      expect(mockGenerateRandomTable).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        'en',
+        ['PHOTOSYNTHESIS', 'CHLOROPHYLL']
+      );
+      expect(mockUpdateGame).not.toHaveBeenCalledWith(
+        'GAME1',
+        expect.objectContaining({ letterGrid: CLIENT_GRID })
+      );
+    });
+
+    // A solo NON-classroom game keeps the client grid: the exemption exists so
+    // a single player is not forced onto a fresh board, and there are no lesson
+    // words to place.
+    it('keeps the client grid for a 1-player classroom game with no vocabulary', async () => {
+      mockGetClassroomGame.mockResolvedValue({
+        gameCode: 'GAME1',
+        classroomId: 'c1',
+        vocabularyWords: [],
+      } as never);
+      mockGetGame.mockReturnValue(makeGame({
+        users: { Host: { socketId: 'socket-host', isHost: true } },
+      }));
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ gameMode: 'classic' }));
+
       expect(mockGenerateRandomTable).not.toHaveBeenCalled();
     });
 

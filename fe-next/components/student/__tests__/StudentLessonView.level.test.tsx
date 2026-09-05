@@ -61,7 +61,10 @@ describe('StudentLessonView — level-aware word count', () => {
 
     render(<StudentLessonView />);
 
-    expect(screen.getByText(/^2 student\.lessons\.words$/)).toBeInTheDocument();
+    // The count is still level-filtered (2 of 3). It now also names which
+    // population it is counting, because a bare "2 Words" beside an unfiltered
+    // "3 words due" pill reads as a bug — see StudentLessonView.countLabel.
+    expect(screen.getByText(/student\.lessons\.wordsAtYourLevel/)).toBeInTheDocument();
   });
 
   it('counts every word for a challenge student', () => {

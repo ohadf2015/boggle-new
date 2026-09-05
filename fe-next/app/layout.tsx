@@ -31,7 +31,7 @@ export const metadata: Metadata = {
         default: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
         template: '%s | LexiClash',
     },
-    description: 'LexiClash — the free multiplayer word game. Play boggle online with friends, no download needed. Real-time word battles for 2-20+ players. Daily word wheel, adventure mode, brain training. Like Words With Friends but everyone plays at once. 5 languages.',
+    description: 'LexiClash — the free multiplayer word game. Play boggle online with friends, no download needed. Real-time word battles for 2-20+ players. Daily word wheel, adventure mode, brain training. Like Words With Friends but everyone plays at once. 6 languages.',
     // Open Graph meta tags for social sharing (WhatsApp, Facebook, Discord, etc.)
     // These are essential for link previews when sharing root URLs like lexiclash.live?room=1234
     openGraph: {
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
         locale: 'en_US',
         url: 'https://www.lexiclash.live',
         title: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
-        description: 'Play boggle online free — no download, no signup. Real-time multiplayer word battles with friends. Like Words With Friends but everyone plays at once. Daily challenges, 5 languages.',
+        description: 'Play boggle online free — no download, no signup. Real-time multiplayer word battles with friends. Like Words With Friends but everyone plays at once. Daily challenges, 6 languages.',
         siteName: 'LexiClash',
         images: [
             {
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'LexiClash – Free Online Word Game | Play With Friends',
-        description: 'Play boggle free online with friends — no download. Real-time multiplayer word battles, daily challenges, 5 languages.',
+        description: 'Play boggle free online with friends — no download. Real-time multiplayer word battles, daily challenges, 6 languages.',
         images: ['https://www.lexiclash.live/og-image-en.webp'],
     },
     // Block indexing for preview/staging environments

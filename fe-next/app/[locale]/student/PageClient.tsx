@@ -38,6 +38,13 @@ import { UserPlus, User, Award, UserX } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+/**
+ * How long to wait for the profile before admitting it is not coming. Generous
+ * on purpose: `waitForProfile` in the guest join path gives up at 3s, and a slow
+ * network should not throw an error card at a student who is merely waiting.
+ */
+const PROFILE_DEADLINE_MS = 10_000;
+
 const NAV_LINK =
   'flex min-h-[44px] items-center gap-1.5 px-3 py-2 rounded-neo border border-neo-white/20 ' +
   'bg-white/10 text-neo-white font-bold text-xs hover:bg-white/20 transition-colors';
@@ -48,6 +55,7 @@ export default function StudentPageClient() {
   const router = useRouter();
   const isRTL = language === 'he';
   const [isChecking, setIsChecking] = useState(true);
+  const [profileStalled, setProfileStalled] = useState(false);
   const { classroomId, classroom } = useStudentClassroom();
 
   useEffect(() => {
@@ -63,8 +71,43 @@ export default function StudentPageClient() {
       profile?.user_role === 'admin' ||
       profile?.is_admin === true;
     if (isTeacherOrAdmin) { router.push(`/${language}/teacher`); return; }
+    setProfileStalled(false);
     setIsChecking(false);
   }, [user, profile, loading, router, language]);
+
+  // The wait above is correct but it had no floor. A profile read that fails any
+  // way other than PGRST116 never resolves and never logs, and the guest join
+  // path reaches this exact state by design (`waitForProfile` gives up after 3s
+  // and joins anyway). Without a deadline that student sits on a spinner with no
+  // copy, no retry and no way forward — a class-4 silent failure wearing a
+  // loading animation. Past the deadline they get a sentence and a button.
+  useEffect(() => {
+    if (loading || !user || profile) return;
+    const timer = setTimeout(() => setProfileStalled(true), PROFILE_DEADLINE_MS);
+    return () => clearTimeout(timer);
+  }, [loading, user, profile]);
+
+  if (profileStalled && isChecking) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-neo-navy px-4">
+        <div className="w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime p-6 text-neo-black shadow-hard">
+          <h1 className="mb-2 font-neo-display text-xl font-black">
+            {t('student.profileStalled.title')}
+          </h1>
+          <p className="mb-5 font-neo-body text-neo-black/80">
+            {t('student.profileStalled.body')}
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="min-h-[44px] w-full rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]"
+          >
+            {t('student.profileStalled.retry')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isChecking || loading) {
     return (

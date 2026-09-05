@@ -18,9 +18,9 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  general: { bg: 'bg-neo-cyan', border: 'border-l-neo-cyan' },
-  academic: { bg: 'bg-neo-pink', border: 'border-l-neo-pink' },
-  language: { bg: 'bg-neo-lime', border: 'border-l-neo-lime' },
+  general: { bg: 'bg-neo-cyan', border: 'border-s-neo-cyan' },
+  academic: { bg: 'bg-neo-pink', border: 'border-s-neo-pink' },
+  language: { bg: 'bg-neo-lime', border: 'border-s-neo-lime' },
 };
 
 function PackCard({
@@ -38,7 +38,7 @@ function PackCard({
     <div
       className={cn(
         'rounded-neo border-3 border-black shadow-hard bg-neo-navy/80',
-        'border-l-8',
+        'border-s-8',
         colors.border,
         'flex flex-col'
       )}

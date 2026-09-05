@@ -34,6 +34,19 @@ export interface LastGameMissedWord {
   pct: number;
 }
 
+/**
+ * A roster student who has no session row for this game.
+ *
+ * "Missed the word" and "was not in the room" are different instructional
+ * facts, and the word x student grid needs both. Absentees are additive:
+ * they never enter the miss rates, the average accuracy, or
+ * `participation.played`, all of which describe the students who played.
+ */
+export interface AbsentStudent {
+  studentId: string;
+  name: string;
+}
+
 export interface RecentClassroomGame {
   gameCode: string;
   gameMode: string;
@@ -51,6 +64,12 @@ export interface RecentClassroomGame {
   /** Mean of the players' `accuracyPct`. */
   averageAccuracyPct: number;
   participation: { played: number; roster: number };
+  /**
+   * Roster students with no session row for this game. Always set by
+   * `getRecentClassroomGames` (empty when the roster query failed); optional
+   * so existing fixtures and callers keep compiling.
+   */
+  absentStudents?: AbsentStudent[];
 }
 
 export interface GetRecentClassroomGamesOptions {
@@ -76,13 +95,21 @@ interface SessionRow {
 /** Rows per game we are willing to scan; a class is never larger than this. */
 const MAX_ROWS_PER_GAME = 60;
 
+/** One `classroom_memberships` row, reduced to what the report needs. */
+interface RosterMember {
+  studentId: string;
+  /** ISO enrollment date. Null on legacy rows, where the column is nullable. */
+  joinedAt: string | null;
+}
+
 const pct = (num: number, den: number): number => (den > 0 ? Math.round((num / den) * 100) : 0);
 
 function buildGame(
   gameCode: string,
   rows: SessionRow[],
   names: Map<string, string>,
-  roster: number | null
+  roster: number | null,
+  rosterMembers: RosterMember[]
 ): RecentClassroomGame {
   const players: LastGamePlayer[] = rows.map((row) => {
     const found = row.results?.lessonWordsFound ?? [];
@@ -128,6 +155,8 @@ function buildGame(
     ? Math.round(rated.reduce((sum, p) => sum + p.accuracyPct, 0) / rated.length)
     : 0;
 
+  const played = new Set(rows.map((r) => r.student_id));
+
   const newest = rows.reduce<string>(
     (acc, r) => (r.completed_at && r.completed_at > acc ? r.completed_at : acc),
     rows[0]?.completed_at ?? ''
@@ -145,6 +174,16 @@ function buildGame(
     coveragePct: pct(display.size - wordsNobodyFound.length, display.size),
     averageAccuracyPct,
     participation: { played: total, roster: roster ?? total },
+    // Only students who were already on the roster when this game was played.
+    // A student who enrolled on Thursday must not show as "did not play" on
+    // Monday's game — that is the confusion this third state exists to end.
+    // A null `joined_at` is a legacy row, read as a long-standing member.
+    absentStudents: rosterMembers
+      .filter(
+        (m) =>
+          !played.has(m.studentId) && (!m.joinedAt || !newest || m.joinedAt <= newest)
+      )
+      .map((m) => ({ studentId: m.studentId, name: names.get(m.studentId) ?? '' })),
   };
 }
 
@@ -192,26 +231,49 @@ export async function getRecentClassroomGames(
       byGame.get(code)!.push(row);
     }
 
-    const studentIds = [...new Set([...byGame.values()].flat().map((r) => r.student_id))];
+    const playedIds = [...new Set([...byGame.values()].flat().map((r) => r.student_id))];
 
-    const [rosterResult, profilesResult] = await Promise.all([
-      supabase
-        .from('classroom_memberships')
-        .select('student_id', { count: 'exact', head: true })
-        .eq('classroom_id', classroomId),
-      supabase
-        .from('public_profiles')
-        .select('id, display_name, username')
-        .in('id', studentIds),
-    ]);
+    // The roster comes back as rows AND a count from one query — the rows give
+    // the grid its "did not play" column, the count keeps participation honest.
+    // It runs before the profile lookup so absentees get real names too; a
+    // roster failure degrades to "no absentees", never to a broken card.
+    const rosterResult = await supabase
+      .from('classroom_memberships')
+      .select('student_id, joined_at', { count: 'exact' })
+      .eq('classroom_id', classroomId);
 
     if (rosterResult.error) {
       logger.error('Error counting classroom roster:', rosterResult.error);
     }
+    const roster = rosterResult.error ? null : (rosterResult.count ?? null);
+
+    const seenMembers = new Set<string>();
+    const rosterMembers: RosterMember[] = rosterResult.error
+      ? []
+      : ((rosterResult.data ?? []) as Array<{ student_id?: string | null; joined_at?: string | null }>)
+          .filter((r) => {
+            const id = r.student_id;
+            if (typeof id !== 'string' || id === '' || seenMembers.has(id)) return false;
+            seenMembers.add(id);
+            return true;
+          })
+          .map((r) => ({ studentId: r.student_id as string, joinedAt: r.joined_at ?? null }));
+
+    // Players first, then absentees — so the numbered fallback labels a player
+    // sees never shift when the roster query starts or stops returning rows.
+    const studentIds = [
+      ...playedIds,
+      ...rosterMembers.map((m) => m.studentId).filter((id) => !playedIds.includes(id)),
+    ];
+
+    const profilesResult = await supabase
+      .from('public_profiles')
+      .select('id, display_name, username')
+      .in('id', studentIds);
+
     if (profilesResult.error) {
       logger.error('Error fetching student profiles:', profilesResult.error);
     }
-    const roster = rosterResult.error ? null : (rosterResult.count ?? null);
 
     const profiles = new Map<string, { display_name?: string | null; username?: string | null }>();
     for (const p of (profilesResult.data ?? []) as Array<{ id: string; display_name?: string | null; username?: string | null }>) {
@@ -226,7 +288,9 @@ export async function getRecentClassroomGames(
       names.set(id, resolved || `${fallbackName} ${++unnamed}`);
     }
 
-    const games = [...byGame.entries()].map(([code, gameRows]) => buildGame(code, gameRows, names, roster));
+    const games = [...byGame.entries()].map(([code, gameRows]) =>
+      buildGame(code, gameRows, names, roster, rosterMembers)
+    );
     return { data: games, error: null };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

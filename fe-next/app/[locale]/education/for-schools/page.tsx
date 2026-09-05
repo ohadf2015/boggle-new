@@ -4,6 +4,14 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { hreflangAlternates } from '@/lib/seo/hreflang';
+import {
+  educationBreadcrumbJsonLd,
+  educationFaqJsonLd,
+  educationProviderNode,
+} from '@/lib/seo/educationLanding';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 
 export const revalidate = 3600;
 
@@ -13,6 +21,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/for-schools';
+const SLUG = 'for-schools';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
@@ -35,17 +44,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [{ url: ogImage, width: 1200, height: 630, alt: c.ogTitle }],
     },
     twitter: { card: 'summary_large_image', title: c.ogTitle, description: c.ogDescription, images: [ogImage] },
+    // hreflangAlternates, not a hand-written seven: `app/sitemap.ts` emits the ~24-entry
+    // map (regional variants included) from the same helper, and Google discards any
+    // annotation the other side does not reciprocate.
     alternates: {
       canonical: pageUrl,
-      languages: {
-        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
-        en: `${BASE_URL}/en${PAGE_PATH}`,
-        he: `${BASE_URL}/he${PAGE_PATH}`,
-        sv: `${BASE_URL}/sv${PAGE_PATH}`,
-        ja: `${BASE_URL}/ja${PAGE_PATH}`,
-        es: `${BASE_URL}/es${PAGE_PATH}`,
-        ru: `${BASE_URL}/ru${PAGE_PATH}`,
-      },
+      languages: hreflangAlternates(PAGE_PATH),
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -55,38 +59,31 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getForSchoolsContent(locale);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
+  const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
   const orgJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    '@id': `${BASE_URL}/en/education#org`,
-    name: 'LexiClash Education',
-    url: `${BASE_URL}/en/education`,
+    // Locale-aware @id/url — this node used to name the English org on every build.
+    ...educationProviderNode(locale),
     description:
-      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free 30-day trial for teachers; school plans from $149/year.',
+      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; school plans from $149/year.',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
     offers: [
-      { '@type': 'Offer', name: 'Teacher Trial', price: 0, priceCurrency: 'USD', category: 'free trial', description: 'Full 30-day free trial for individual teachers', availability: 'https://schema.org/InStock' },
+      // The free tier is a tier, not a trial: lib/education/freeTierLimits.ts enforces
+      // 3 classes of 50 students with no expiry. Advertising a 30-day trial in schema
+      // understated the free plan and contradicted every other surface.
+      { '@type': 'Offer', name: 'Teacher Free', price: 0, priceCurrency: 'USD', category: 'free', description: 'Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Teacher Pro', price: 9, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 9, priceCurrency: 'USD', unitText: 'month' }, category: 'paid', description: 'Unlimited classrooms plus progress analytics and printable reports', availability: 'https://schema.org/InStock' },
       { '@type': 'Offer', name: 'School Plan', price: 149, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 149, priceCurrency: 'USD', unitText: 'year' }, category: 'paid', description: 'School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO', availability: 'https://schema.org/InStock' },
     ],
   };
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: 'For Schools', item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const breadcrumbJsonLd = educationBreadcrumbJsonLd({
+    locale,
+    path: PAGE_PATH,
+    current: educationPageLabel(SLUG, locale),
+  });
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
@@ -217,6 +214,9 @@ export default async function Page({ params }: PageProps) {
             {c.closingCta}
           </a>
         </section>
+
+        {/* This page had no outbound internal links at all — a crawl dead end. */}
+        <EducationRelatedLinks locale={locale} slug={SLUG} />
       </div>
     </main>
   );

@@ -21,6 +21,8 @@ const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
   usePathname: () => '/en/teacher',
+  // TeacherDashboard reads `?tab=` / `?reviewWords=` on first render.
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 // ── LanguageContext ──────────────────────────────────────────────────────────

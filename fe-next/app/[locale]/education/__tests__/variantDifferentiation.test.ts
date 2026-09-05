@@ -25,9 +25,18 @@ describe('education variant differentiation (anti-doorway)', () => {
   const vocab = getVocabClassroomContent('en');
   const esl = getEslWordGamesContent('en');
 
-  it('esl-word-games meta carries an English-learner / CEFR angle vocab does not', () => {
+  /**
+   * `cefr` and `a1` were dropped from the accepted signals on 2026-09-05: CEFR is
+   * implemented nowhere in this repo, so accepting it here as proof of a distinct
+   * angle would have rewarded exactly the false claim `educationClaims.test.ts`
+   * now forbids. The ESL angle is the AUDIENCE (English learners / EFL), which is
+   * real and is what separates this page from vocabulary-games-classroom.
+   */
+  it('esl-word-games meta carries an English-learner angle vocab does not', () => {
     const eslBlob = `${esl.metaTitle} ${esl.metaDescription}`.toLowerCase();
-    expect(eslBlob).toMatch(/cefr|a1|english learner|english language learner|proficiency|efl/);
+    expect(eslBlob).toMatch(/english learner|english language learner|\besl\b|\befl\b/);
+    const vocabBlob = `${vocab.metaTitle} ${vocab.metaDescription}`.toLowerCase();
+    expect(vocabBlob).not.toMatch(/english learner|\befl\b/);
   });
 
   it('esl and vocab meta descriptions are NOT near-duplicates', () => {

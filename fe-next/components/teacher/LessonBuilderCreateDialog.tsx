@@ -84,7 +84,7 @@ export default function LessonBuilderCreateDialog({
             <div className="border-neo border-neo-black rounded-neo p-4 bg-neo-navy/50">
               <button type="button"
                 onClick={onToggleTemplateSelector}
-                className="flex items-center justify-between w-full text-left"
+                className="flex items-center justify-between w-full text-start"
               >
                 <div className="flex items-center gap-2">
                   <BookTemplate className="w-5 h-5 text-neo-lime" />
@@ -211,7 +211,7 @@ export default function LessonBuilderCreateDialog({
 
           <Dialog.Close asChild>
             <button type="button"
-              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
+              className="absolute top-4 end-4 text-neo-white hover:text-neo-white"
               aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />

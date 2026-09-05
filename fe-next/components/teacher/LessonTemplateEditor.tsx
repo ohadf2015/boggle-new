@@ -299,9 +299,12 @@ export default function LessonTemplateEditor({
               type="button"
               className={cn(
                 'absolute top-4 text-neo-white hover:text-neo-white',
+                // 44px target: a bare w-5 icon is a ~20px tap area, well under
+                // what the rest of this codebase enforces.
+                'flex min-h-[44px] min-w-[44px] items-center justify-center',
                 isRTL ? 'left-4' : 'right-4'
               )}
-              aria-label="Close"
+              aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />
             </button>

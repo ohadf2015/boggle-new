@@ -86,7 +86,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
       { q: 'How is it different from Quizlet, Kahoot, or Wordwall?', a: 'Quizlet, Kahoot, and Wordwall are based on flashcards and multiple-choice quizzes. LexiClash is a word-building game: students build words on a letter grid, word wheel, or anagram board. That means they practice spelling, retrieval, and pattern recognition — not just choosing from given answers. Plus: no student accounts, and it is all free.' },
       { q: 'How long does a classroom session take?', a: 'A vocabulary duel runs 2–3 minutes. A whole-class round runs 5–10 minutes. Most teachers run it as a five-minute class opener, a mid-lesson brain break, or a quick review before the bell.' },
       { q: 'Does it work for elementary, middle, and high school?', a: 'All three. Difficulty level, time limit, and word list are set per session. Younger students play with short words and easy lists; high school students run advanced vocabulary duels under time pressure.' },
-      { q: 'Does it work for Hebrew as a second language classrooms?', a: 'Yes. Five built-in dictionaries (Hebrew, English, Spanish, Swedish, Japanese, Russian) make LexiClash ideal for Hebrew-language classrooms, ESL, and immigrant-student catch-up programs. Students practice spelling and retrieval directly in the target language.' },
+      { q: 'Does it work for Hebrew as a second language classrooms?', a: 'Yes. Six built-in dictionaries (Hebrew, English, Spanish, Swedish, Japanese, Russian) make LexiClash ideal for Hebrew-language classrooms, ESL, and immigrant-student catch-up programs. Students practice spelling and retrieval directly in the target language.' },
       { q: 'Can I track which words each student masters?', a: 'Yes. The teacher dashboard shows accuracy per student, which words were missed most, and which words tripped up the most students in the class — a strong foundation for formative assessment and your next review plan.' },
     ],
     ctaHeading1: 'Ten minutes left in class?',
@@ -111,7 +111,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     heroPart2: 'לכיתה. ',
     heroHighlight2: 'חינם.',
     heroSubtitle:
-      'LexiClash היא פלטפורמת משחקי מילים לכיתה להעשרת אוצר מילים: משחק כיתתי חי, דו-קרבות אחד-על-אחד, רשימות המילים שלכם וחמש שפות — והתלמידים אף פעם לא פותחים חשבון.',
+      'LexiClash היא פלטפורמת משחקי מילים לכיתה להעשרת אוצר מילים: משחק כיתתי חי, דו-קרבות אחד-על-אחד, רשימות המילים שלכם ושש שפות — והתלמידים אף פעם לא פותחים חשבון.',
     ctaPrimary: { label: '▶ התחילו משחק כיתתי', sub: 'חינם · ללא הרשמה לתלמידים' },
     ctaSecondary: { label: '⚔ הריצו דו-קרב 1v1', sub: 'תלמידים פנים מול פנים' },
     featuresTitlePart: 'מה ',
@@ -188,13 +188,13 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     useCases: [
       { tag: 'Öppning', title: 'Snabb klassöppning', desc: 'Ordhjul från gårdagens lista — väcker klassen på fem minuter.' },
       { tag: 'Repetition', title: 'Enhetssammanfattning', desc: 'En rond med hela klassen på enhetens ordförråd; dashboarden visar genast vad som behöver upprepas.' },
-      { tag: 'Andrespråk', title: 'Målspråksöving', desc: 'Spela på dina elevers målspråk — sex inbyggda ordböcker: engelska, hebreiska, spanska, svenska, japanska, ryska.' },
+      { tag: 'Andrespråk', title: 'Målspråksöving', desc: 'Spela på dina elevers målspråk — sex inbyggda ordböcker: engelska, hebreiska, spanska, svenska, japanska, ryska, ryska.' },
       { tag: 'Ingen förberedelse', title: 'Lektionsdropp', desc: 'Noll förberedelse: välj en lista, visa koden, eleverna spelar. Klart på 10 minuter.' },
     ],
     faqTitlePart: 'Frågor för ',
     faqTitleHighlight: 'lärare',
     faqs: [
-      { q: 'Vilka är de bästa ordspelen för ett klassrum?', a: 'LexiClash är byggt för klassrummet: eleverna går med en fyrsiffrig kod (ingen registrering), läraren väljer en ordlista och hela klassen spelar tillsammans live på 5–10 minuter. Spelet fungerar i vilken webbläsare som helst och stöder engelska, hebreiska, spanska, svenska, japanska och ryska — så det fungerar för hebreiska klassrum, ESL-klassrum och språkklassrum också.' },
+      { q: 'Vilka är de bästa ordspelen för ett klassrum?', a: 'LexiClash är byggt för klassrummet: eleverna går med en fyrsiffrig kod (ingen registrering), läraren väljer en ordlista och hela klassen spelar tillsammans live på 5–10 minuter. Spelet fungerar i vilken webbläsare som helst och stöder engelska, hebreiska, spanska, svenska, japanska, ryska och ryska — så det fungerar för hebreiska klassrum, ESL-klassrum och språkklassrum också.' },
       { q: 'Behöver elever öppna ett konto?', a: 'Nej. Eleverna skriver en fyrsiffrig kod som läraren visar och börjar spela omedelbar. Endast lärare öppnar ett gratis konto — för att spara ordlistor och följa klassens framsteg.' },
       { q: 'Kan jag ladda upp min egen ordlista?', a: 'Ja. Ladda upp vilken ordlista som helst — från en lektion, ett kapitel eller din läroplan — och spela den som en-mot-en-dueller, en helklassrond eller individuell träning tilldelad elever.' },
       { q: 'Hur skiljer det sig från Quizlet, Kahoot eller Wordwall?', a: 'Quizlet, Kahoot och Wordwall är baserade på flashcards och flervalsfrågor. LexiClash är ett ordbyggespel: eleverna bygger ord på ett bokstavsnät, ordhjul eller anagrambord. Det innebär att de tränar stavning, retrieval och mönsterigenkänning — inte bara att välja från givna svar. Plus: inga elevkonton, och det är helt gratis.' },

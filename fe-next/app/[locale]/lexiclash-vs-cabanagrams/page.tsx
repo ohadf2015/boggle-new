@@ -61,7 +61,7 @@ const faqs = [
   },
   {
     q: 'What about languages and accessibility?',
-    a: 'LexiClash: 6 languages (English, Hebrew with RTL support, Swedish, Japanese, Spanish), WCAG 2.1 AA accessibility standards. Cabanagrams: 11 languages supported, including many European and Asian languages. Cabanagrams has broader language reach; LexiClash uniquely supports Hebrew RTL and combines language with 30+ game modes.',
+    a: 'LexiClash: 6 languages (English, Hebrew with RTL support, Swedish, Japanese, Spanish, Russian), WCAG 2.1 AA accessibility standards. Cabanagrams: 11 languages supported, including many European and Asian languages. Cabanagrams has broader language reach; LexiClash uniquely supports Hebrew RTL and combines language with 30+ game modes.',
   },
   {
     q: 'How is progression different?',

@@ -47,6 +47,11 @@ async function requireTeacherRole(
   return null; // authorized
 }
 
+// Columns the template UI actually renders. Named explicitly so a future
+// migration cannot widen the teacher-facing reads by accident.
+const TEMPLATE_COLUMNS =
+  'id, lesson_id, teacher_id, name, timer_seconds, difficulty, min_word_length, allow_late_join, board_rows, board_cols, is_default, created_at, updated_at';
+
 // Validation schemas
 const createTemplateSchema = z.object({
   lessonId: z.string().uuid(),
@@ -95,7 +100,7 @@ export async function GET(request: NextRequest) {
     if (templateId) {
       const { data: template, error } = await supabase
         .from('lesson_templates')
-        .select('*')
+        .select(TEMPLATE_COLUMNS)
         .eq('id', templateId)
         .single();
 
@@ -114,7 +119,7 @@ export async function GET(request: NextRequest) {
 
     const { data: templates, error } = await supabase
       .from('lesson_templates')
-      .select('*')
+      .select(TEMPLATE_COLUMNS)
       .eq('lesson_id', lessonId)
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: false });

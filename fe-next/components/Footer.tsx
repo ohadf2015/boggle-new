@@ -8,6 +8,7 @@ import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import EmailSignupForm from './EmailSignupForm';
+import { EDUCATION_PAGES, educationPageLabel } from '@/lib/seo/educationPageLinks';
 
 const KofiIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
@@ -85,13 +86,34 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
             <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
               {t('footer.forTeachers', 'For Teachers')}
             </h3>
+            {/*
+              A mini-sitemap, not a hand-picked five. The old list named 5 of the
+              12 landing pages, so the six teacher-moment pages — the deepest
+              content in the module — had no sitewide inbound link at all and
+              reached Google only through the XML sitemap.
+
+              Anchor text comes from `lib/seo/educationPageLinks.ts` rather than
+              new `footer.*` translation keys on purpose: the labels are already
+              written and localized inside each page's own content module, and a
+              second copy in `translations/*.js` is the dual-source-of-truth
+              pattern that keeps producing drift in this repo. Two columns keep
+              thirteen links from running the footer long.
+            */}
             <ul className="space-y-2">
               <li><Link prefetch={false} href={`/${language}/education`} className={footerLinkClass}>{t('footer.educationHub', 'Education Hub')}</Link></li>
-              <li><Link prefetch={false} href={`/${language}/education/vocabulary-games-classroom`} className={footerLinkClass}>{t('footer.vocabularyGames', 'Vocabulary Games')}</Link></li>
-              <li><Link prefetch={false} href={`/${language}/education/games-for-teachers`} className={footerLinkClass}>{t('footer.gamesForTeachers', 'Games for Teachers')}</Link></li>
-              <li><Link prefetch={false} href={`/${language}/education/esl-word-games`} className={footerLinkClass}>{t('footer.eslWordGames', 'ESL Word Games')}</Link></li>
-              <li><Link prefetch={false} href={`/${language}/education/for-schools`} className={footerLinkClass}>{t('footer.forSchools', 'For Schools')}</Link></li>
-              <li><Link prefetch={false} href={`/${language}/education/spelling-bee-practice`} className={footerLinkClass}>{t('footer.spellingBeePractice', 'Spelling Bee Practice')}</Link></li>
+            </ul>
+            <ul className="mt-2 grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
+              {EDUCATION_PAGES.map((page) => (
+                <li key={page.slug}>
+                  <Link
+                    prefetch={false}
+                    href={`/${language}/education/${page.slug}`}
+                    className={footerLinkClass}
+                  >
+                    {educationPageLabel(page.slug, language)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 

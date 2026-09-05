@@ -36,7 +36,16 @@ describe('GoogleOneTapInitializer', () => {
   it('loads the Google Identity Services script for an unauthenticated web user', () => {
     render(<GoogleOneTapInitializer />);
     const script = screen.getByTestId('gsi-script');
-    expect(script.getAttribute('data-src')).toBe('https://accounts.google.com/gsi/client');
+    expect(script.getAttribute('data-src')).toContain('https://accounts.google.com/gsi/client');
+  });
+
+  // Same root cause as the Sign-In button: GSI's displayed language is set by
+  // the `hl` query param on the script URL at load time, not by anything set
+  // later — without it the One Tap prompt falls back to the browser/OS locale.
+  it('loads the GIS script with hl=<site language> so One Tap matches the page, not the OS/browser', () => {
+    render(<GoogleOneTapInitializer />);
+    const script = screen.getByTestId('gsi-script');
+    expect(script.getAttribute('data-src')).toBe('https://accounts.google.com/gsi/client?hl=en');
   });
 
   it('renders nothing when the user is already authenticated', () => {

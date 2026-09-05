@@ -52,6 +52,18 @@ export interface Classroom {
  */
 export type VocabularyLevel = 'support' | 'core' | 'challenge';
 
+/**
+ * Word parts for roots/affixes practice. Every field is teacher-entered free
+ * text in the lesson's own language; hyphens are stored off (`un`, not `un-`).
+ */
+export interface WordMorphology {
+  root?: string;
+  prefix?: string;
+  suffix?: string;
+  /** What the root means, e.g. `aqua` → "water". Unlocks the meaning question. */
+  rootMeaning?: string;
+}
+
 export interface VocabularyWord {
   word: string;
   definition?: string;
@@ -64,6 +76,10 @@ export interface VocabularyWord {
   antonyms?: string[];
   /** Example sentence for context-clue practice; `___` marks the blank. */
   example?: string;
+  /** Distinct senses for multiple-meaning practice. 2+ unlocks the drill. */
+  meanings?: string[];
+  /** Word parts for roots/affixes practice. */
+  morphology?: WordMorphology;
 }
 
 export interface VocabularyLesson {

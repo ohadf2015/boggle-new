@@ -229,7 +229,7 @@ export default function TemplateLessonSelector({
             onClick={() => onSelect(template)}
             className={cn(
               'p-4 bg-neo-black/30 border-neo border-neo-cyan/50',
-              'rounded-neo text-left hover:shadow-hard-sm transition-all',
+              'rounded-neo text-start hover:shadow-hard-sm transition-all',
               'hover:translate-x-[-2px] hover:translate-y-[-2px]'
             )}
           >

@@ -54,7 +54,28 @@ describe('pickTeacherBanner for a Pro teacher', () => {
     expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: false, proLoading: true })).toBe('none');
   });
 
-  it('a Pro teacher still sees an active trial countdown', () => {
-    expect(pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: true })).toBe('trial');
+  /**
+   * Pro wins over a trial, both stages of it.
+   *
+   * A gifted-Pro teacher keeps her old `teacher_access_requests.trial_expires_at`,
+   * and `hasTrial` was checked FIRST. Verified in prod on 2026-09-05: a teacher
+   * granted Pro through 2027 was about to see a "20 days left in your trial"
+   * countdown over a dashboard whose own header says PRO — and once that date
+   * passed, `TrialUrgencyBanner`'s expired branch would have turned it into an
+   * "Upgrade now" card sitting on top of a year of gifted Pro. That is the exact
+   * thing this file's docstring promises never to do.
+   */
+  it('shows a Pro teacher nothing, even while a stale trial deadline is still on file', () => {
+    expect(pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: true })).toBe('none');
+  });
+
+  it('shows nothing to a trial teacher whose Pro entitlement has not answered yet', () => {
+    // Class 1: two sources, one late. Render the pessimistic state until the
+    // late one lands, rather than a countdown Pro will immediately retract.
+    expect(pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: false, proLoading: true })).toBe('none');
+  });
+
+  it('still shows the countdown to a genuine trial teacher who is not Pro', () => {
+    expect(pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: false, proLoading: false })).toBe('trial');
   });
 });

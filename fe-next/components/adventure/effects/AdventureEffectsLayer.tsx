@@ -21,7 +21,16 @@ import { ScorePopup } from '../juice/ScorePopup';
 import { ChainParticleBurst } from '@/components/animations/ChainParticleBurst';
 import { AdaptiveParticles } from '../juice/AdaptiveParticles';
 import { ExplosionEffect } from '../juice/ExplosionEffect';
-import { LevelUpCelebration, type LevelUpPayload } from '@/components/education/LevelUpCelebration';
+import dynamic from 'next/dynamic';
+import type { LevelUpPayload } from '@/components/education/LevelUpCelebration';
+
+// Renders only after a level-up event, so it must not ship in the adventure
+// gameplay bundle. Celebratory UI never needs SSR. The payload stays a TYPE
+// import — those are erased and cost no bytes.
+const LevelUpCelebration = dynamic(
+  () => import('@/components/education/LevelUpCelebration').then(m => m.LevelUpCelebration),
+  { ssr: false }
+);
 import LexiReaction from '../LexiReaction';
 import { ComboMilestoneOverlay } from '../ComboMilestoneOverlay';
 import { BossDefeatFireworks, type BossTier } from '@/components/celebration/BossDefeatFireworks';

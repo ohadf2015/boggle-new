@@ -4,6 +4,7 @@ import nextDynamic from 'next/dynamic';
 import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
 import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
+import { HREFLANG_LOCALES } from '@/lib/seo/hreflang';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
@@ -227,6 +228,17 @@ export const viewport = {
     interactiveWidget: 'resizes-content' as const,
 };
 
+/**
+ * The languages this site exists in, named once each.
+ *
+ * Both sitewide JSON-LD nodes below used to build this as
+ * `[languageCode, 'he', 'en', 'sv', 'ja', 'es', 'ru']`. The spread already holds
+ * every locale, so the leading `languageCode` was always a duplicate — `/he`
+ * served `["he","he","en", …]`, seven entries for six languages, on every page.
+ * Derived from `HREFLANG_LOCALES` so it cannot drift from what we actually build.
+ */
+const SITE_LANGUAGES: string[] = [...HREFLANG_LOCALES];
+
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {
     const { locale } = await params;
     const validLocale = (SUPPORTED_LOCALES.has(locale) ? locale : 'en') as Locale;
@@ -303,7 +315,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 height: 630,
             },
             screenshot: 'https://www.lexiclash.live/og-image-en.webp',
-            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es', 'ru'],
+            inLanguage: SITE_LANGUAGES,
             availableLanguage: [
                 { '@type': 'Language', name: 'English', alternateName: 'en' },
                 { '@type': 'Language', name: 'Hebrew', alternateName: 'he' },
@@ -315,7 +327,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             featureList: [
                 'Online multiplayer word game with real-time gameplay',
                 'Fast-paced competitive word battles',
-                'Multiple language support (Hebrew, English, Swedish, Japanese, Spanish)',
+                'Multiple language support (Hebrew, English, Swedish, Japanese, Spanish, Russian)',
                 'Live leaderboard and rankings',
                 'Achievement system with 35+ badges',
                 'Room-based multiplayer with QR code sharing',
@@ -414,7 +426,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             publisher: {
                 '@id': 'https://www.lexiclash.live/#organization',
             },
-            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es', 'ru'],
+            inLanguage: SITE_LANGUAGES,
         },
         // WebPage schema - marks the main page as the primary entry point
         {

@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { ArrowLeft, Check, X, BookOpen, Sparkles, ArrowLeftRight, Quote } from 'lucide-react';
+import { ArrowLeft, Check, X, BookOpen, Sparkles, ArrowLeftRight, Quote, Layers, Blocks } from 'lucide-react';
 import PracticeResultsCard from './PracticeResultsCard';
 import {
   buildFocusQuestions,
@@ -47,6 +47,11 @@ export interface VocabFocusPracticeProps {
   questionCount?: number;
   /** Fixed seed for a reproducible question set (tests). Defaults to the clock. */
   seed?: number | string;
+  /**
+   * Lesson language. Only English lessons top thin distractor pools up from the
+   * built-in banks, so pass it through or those questions never build.
+   */
+  language?: string;
 }
 
 const FOCUS_STYLE: Record<VocabFocus, { bg: string; icon: React.ReactNode }> = {
@@ -54,7 +59,14 @@ const FOCUS_STYLE: Record<VocabFocus, { bg: string; icon: React.ReactNode }> = {
   synonym: { bg: 'bg-neo-lime', icon: <Sparkles className="w-5 h-5" /> },
   antonym: { bg: 'bg-neo-pink', icon: <ArrowLeftRight className="w-5 h-5" /> },
   context: { bg: 'bg-neo-yellow', icon: <Quote className="w-5 h-5" /> },
+  multiple_meaning: { bg: 'bg-neo-purple', icon: <Layers className="w-5 h-5" /> },
+  roots_affixes: { bg: 'bg-neo-cyan', icon: <Blocks className="w-5 h-5" /> },
 };
+
+const DEFAULT_FOCUS_STYLE = FOCUS_STYLE.definition;
+
+/** Focuses whose prompt is a phrase or a sentence, not a single word. */
+const LONG_PROMPT_FOCUSES: readonly VocabFocus[] = ['definition', 'context', 'multiple_meaning'];
 
 /** Render a prompt, drawing the `___` blank as a chunky underline. */
 function PromptText({ text }: { text: string }) {
@@ -82,6 +94,7 @@ export function VocabFocusPractice({
   xpSessionData,
   questionCount = DEFAULT_QUESTION_COUNT,
   seed,
+  language,
 }: VocabFocusPracticeProps) {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -90,8 +103,12 @@ export function VocabFocusPractice({
   const [baseSeed] = useState<number | string>(() => seed ?? Date.now());
   const questions = useMemo(
     // First round uses the seed as given (reproducible); restarts reseed.
-    () => buildFocusQuestions(words, focus, { count: questionCount, seed: round === 0 ? baseSeed : `${baseSeed}-${round}` }),
-    [words, focus, questionCount, baseSeed, round]
+    () => buildFocusQuestions(words, focus, {
+      count: questionCount,
+      seed: round === 0 ? baseSeed : `${baseSeed}-${round}`,
+      language,
+    }),
+    [words, focus, questionCount, baseSeed, round, language]
   );
 
   const [index, setIndex] = useState(0);
@@ -143,7 +160,7 @@ export function VocabFocusPractice({
     startedAt.current = Date.now();
   }, []);
 
-  const style = FOCUS_STYLE[focus];
+  const style = FOCUS_STYLE[focus] ?? DEFAULT_FOCUS_STYLE;
 
   // Not enough teacher data for this focus
   if (total === 0) {
@@ -239,7 +256,7 @@ export function VocabFocusPractice({
             data-testid="focus-prompt"
             className={cn(
               'font-neo-display text-neo-black text-balance',
-              focus === 'context' || focus === 'definition' ? 'text-xl sm:text-2xl leading-snug' : 'text-3xl sm:text-4xl'
+              LONG_PROMPT_FOCUSES.includes(focus) ? 'text-xl sm:text-2xl leading-snug' : 'text-3xl sm:text-4xl'
             )}
           >
             <PromptText text={question.prompt} />

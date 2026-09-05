@@ -50,7 +50,7 @@ export interface ForSchoolsContent {
 const EN: ForSchoolsContent = {
   metaTitle: 'Free Vocabulary & ESL Word Games for Schools — LexiClash',
   metaDescription:
-    'Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese), 1v1 word duels and whole-class play. Free 30-day trial for teachers. School plans from $149/year.',
+    'Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play. Free 30-day trial for teachers. School plans from $149/year.',
   ogTitle: 'LexiClash for Schools — Vocabulary & ESL Word Games',
   ogDescription:
     'Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 30-day trial. School plans from $149/year.',
@@ -65,7 +65,7 @@ const EN: ForSchoolsContent = {
   whyTitle: 'Why schools choose LexiClash',
   why: [
     { title: 'No student logins', body: 'Students join a class game with a code -- no accounts to provision, no rostering before you can play, no student data to manage.' },
-    { title: '6 languages, including Hebrew RTL', body: 'English, Hebrew (full right-to-left), Spanish, Swedish and Japanese with native dictionaries -- built for bilingual, ESL and immersion classrooms.' },
+    { title: '6 languages, including Hebrew RTL', body: 'English, Hebrew (full right-to-left), Spanish, Swedish, Japanese and Russian with native dictionaries -- built for bilingual, ESL and immersion classrooms.' },
     { title: '1v1 duels + whole-class', body: 'Pair students head-to-head or run a live whole-class round. Word-building gameplay, not passive multiple-choice.' },
     { title: 'Zero prep', body: 'Pick a word list, pick a mode, share the code. A 5-minute warm-up or an end-of-unit review with no setup.' },
   ],
@@ -96,10 +96,10 @@ const EN: ForSchoolsContent = {
     { q: 'Is LexiClash free for teachers?', a: 'Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $149/school/year.' },
     { q: 'What does a school or district plan include?', a: 'School plans ($149/year per school) add the features that scale: a district admin dashboard, cross-class analytics and reporting, curated curriculum content libraries, an ad-free school environment, and SSO (Clever / ClassLink / Google). The basic classroom game stays free -- plans layer on top, never gate it.' },
     { q: 'Do students need accounts or logins?', a: 'No. Students join a class game with a code -- nothing to provision, no student data to manage. That makes a school-wide rollout far simpler than tools that require rostering or SSO before play.' },
-    { q: 'Which languages are supported?', a: 'English, Hebrew (full right-to-left support), Spanish, Swedish and Japanese, each with a native dictionary -- built for ESL, bilingual and immersion classrooms.' },
+    { q: 'Which languages are supported?', a: 'English, Hebrew (full right-to-left support), Spanish, Swedish, Japanese and Russian, each with a native dictionary -- built for ESL, bilingual and immersion classrooms.' },
     { q: 'How do we start our trial or get a school plan?', a: 'Fill in the form on this page with your role, school or district, and rough student count. We\'ll confirm your trial access and share school plan details -- $149/year per school, district pricing on request.' },
     { q: 'How is this different from Kahoot, Gimkit or Quizlet?', a: 'Those are quiz/flashcard tools that cap their free tiers and are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, has no player cap during the trial, and offers true 1v1 duels.' },
-    { q: 'Can I use LexiClash for ESL or English language learner (ELL) students?', a: 'Yes — LexiClash was built with language learners in mind. It supports English, Hebrew (RTL), Spanish, Swedish and Japanese with native dictionaries. Students can compete in their own language or practice the language they are learning, making it a natural fit for ESL, bilingual and immersion classrooms. Word-building gameplay reinforces vocabulary and spelling organically, without passive multiple-choice.' },
+    { q: 'Can I use LexiClash for ESL or English language learner (ELL) students?', a: 'Yes — LexiClash was built with language learners in mind. It supports English, Hebrew (RTL), Spanish, Swedish, Japanese and Russian with native dictionaries. Students can compete in their own language or practice the language they are learning, making it a natural fit for ESL, bilingual and immersion classrooms. Word-building gameplay reinforces vocabulary and spelling organically, without passive multiple-choice.' },
     { q: 'Can students use LexiClash as a spelling practice game?', a: 'Yes. LexiClash\'s word-building format — where students find, spell and submit real words against a live opponent or the whole class — makes spelling practice competitive and engaging rather than passive. Teachers use it for spelling warm-ups, end-of-unit vocabulary reviews and in-class tournaments.' },
     { q: 'Does LexiClash work on Chromebooks and school devices?', a: 'Yes. LexiClash runs entirely in the browser — no app to install, no student accounts to provision. It works on Chromebooks, iPads, desktops and phones. Students join with a game code. School plans support Clever, ClassLink and Google Sign-In SSO for teacher accounts.' },
   ],
@@ -222,7 +222,7 @@ const HE: ForSchoolsContent = {
     { q: 'האם תלמידים צריכים חשבונות או התחברות?', a: 'לא. התלמידים מצטרפים למשחק כיתתי עם קוד — אין מה להקים, אין נתוני תלמידים לנהל. זה הופך הטמעה בכל בית הספר להרבה יותר פשוטה מכלים שדורשים רישום או SSO לפני שמשחקים.' },
     { q: 'אילו שפות נתמכות?', a: 'אנגלית, עברית (תמיכה מלאה מימין לשמאל), ספרדית, שוודית ויפנית, כל אחת עם מילון מובנה — בנוי לכיתות ESL, דו-לשוניות וטבילה לשונית.' },
     { q: 'איך מתחילים את הניסיון או מקבלים תוכנית בית ספר?', a: 'מלאו את הטופס בעמוד הזה עם התפקיד שלכם, בית הספר או הרשות ומספר תלמידים משוער. נאשר לכם את גישת הניסיון ונשתף פרטים על תוכנית בית הספר — $149 לשנה לבית ספר, מחיר לרשויות לפי בקשה.' },
-    { q: 'במה זה שונה מ-Kahoot, Gimkit או Quizlet?', a: 'אלה כלי חידונים/כרטיסיות שמגבילים את המסלול החינמי שלהם ומתמקדים באנגלית. LexiClash הוא משחק בניית מילים (לא שאלות סגורות), תומך בחמש שפות כולל עברית מימין לשמאל, בלי הגבלת שחקנים בזמן הניסיון ומציע דו-קרבות אמיתיים 1 על 1.' },
+    { q: 'במה זה שונה מ-Kahoot, Gimkit או Quizlet?', a: 'אלה כלי חידונים/כרטיסיות שמגבילים את המסלול החינמי שלהם ומתמקדים באנגלית. LexiClash הוא משחק בניית מילים (לא שאלות סגורות), תומך בשש שפות כולל עברית מימין לשמאל, בלי הגבלת שחקנים בזמן הניסיון ומציע דו-קרבות אמיתיים 1 על 1.' },
     { q: 'אפשר להשתמש ב-LexiClash לתלמידי ESL או לומדי אנגלית (ELL)?', a: 'כן — LexiClash נבנה עם לומדי שפות במחשבה. הוא תומך באנגלית, עברית (מימין לשמאל), ספרדית, שוודית ויפנית עם מילונים מובנים. תלמידים יכולים להתחרות בשפה שלהם או לתרגל את השפה שהם לומדים, מה שהופך אותו למתאים באופן טבעי לכיתות ESL, דו-לשוניות וטבילה לשונית. משחק בניית המילים — שבו תלמידים מוצאים, מאייתים ומגישים מילים אמיתיות מול יריב חי או מול כל הכיתה — מחזק אוצר מילים ואיות באופן טבעי, בלי שאלות סגורות פסיביות.' },
     { q: 'אפשר להשתמש ב-LexiClash כמשחק לתרגול איות?', a: 'כן. פורמט בניית המילים של LexiClash — שבו תלמידים מוצאים, מאייתים ומגישים מילים אמיתיות מול יריב חי או מול כל הכיתה — הופך את תרגול האיות לתחרותי ומרתק במקום פסיבי. מורים משתמשים בו לחימום אוצר מילים, לחזרות בסוף יחידה ולטורנירים כיתתיים.' },
     { q: 'האם LexiClash עובד על Chromebook ומכשירי בית ספר?', a: 'כן. LexiClash רץ לגמרי בדפדפן — בלי אפליקציה להתקין, בלי חשבונות תלמידים להקים. הוא עובד על Chromebook, iPad, מחשבים שולחניים וטלפונים. התלמידים מצטרפים עם קוד משחק. תוכניות בית ספר תומכות ב-Clever, ב-ClassLink ובהתחברות עם Google (SSO) לחשבונות מורים.' },
@@ -236,22 +236,22 @@ const HE: ForSchoolsContent = {
 const SV: ForSchoolsContent = {
   metaTitle: 'Gratis ordförråds- och ESL-ordspel för skolor — LexiClash',
   metaDescription:
-    'Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 5 språk (engelska, hebreiska, spanska, svenska, japanska), 1v1-orddueller och klassomfattande spel. Gratis 30-dagars provperiod för lärare. Skolplaner från $149/år.',
+    'Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 30-dagars provperiod för lärare. Skolplaner från $149/år.',
   ogTitle: 'LexiClash för skolor — Ordförråds- och ESL-ordspel',
   ogDescription:
-    'Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 5 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $149/år.',
+    'Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $149/år.',
   heroTag: 'För skolor och distrikt',
   heroH1: 'Ordspel som din skola faktiskt kan',
   heroHighlight: 'använda',
   heroSubtitle:
-    'Prova LexiClash gratis i 30 dagar — utan inloggning för elever, utan kreditkort, utan annonser i klassrummet. 5 språk inklusive hebreiska RTL, direktsänt klassomfattande spel och 1v1-orddueller. Enskilda lärare behåller gratis basåtkomst efter provperioden; skol- och distriktsplaner skalar därifrån.',
+    'Prova LexiClash gratis i 30 dagar — utan inloggning för elever, utan kreditkort, utan annonser i klassrummet. 6 språk inklusive hebreiska RTL, direktsänt klassomfattande spel och 1v1-orddueller. Enskilda lärare behåller gratis basåtkomst efter provperioden; skol- och distriktsplaner skalar därifrån.',
   freeForeverTitle: 'Börja gratis — skolplaner från $149/år',
   freeForeverBody:
     'Varje lärare får en fullständig 30-dagars provperiod: ingen inloggning för elever, ingen spelargräns, inget kreditkort. Efter provperioden förblir det grundläggande klassrumsspelet gratis för enskilda lärare. Skolplaner lägger till administratörsöversikter, statistik över klasser, läroplansbibliotek, en annonsfri miljö och SSO — från $149/skola/år.',
   whyTitle: 'Varför skolor väljer LexiClash',
   why: [
     { title: 'Ingen inloggning för elever', body: 'Eleverna ansluter till ett klassrumsspel med en kod — inga konton att skapa, ingen klasslista innan ni kan spela, inga elevdata att hantera.' },
-    { title: '5 språk, inklusive hebreiska RTL', body: 'Engelska, hebreiska (fullt höger-till-vänster), spanska, svenska och japanska med inbyggda ordböcker — byggda för tvåspråkiga, ESL- och immersionsklassrum.' },
+    { title: '6 språk, inklusive hebreiska RTL', body: 'Engelska, hebreiska (fullt höger-till-vänster), spanska, svenska, japanska och ryska med inbyggda ordböcker — byggda för tvåspråkiga, ESL- och immersionsklassrum.' },
     { title: '1v1-dueller + klassomfattande spel', body: 'Para ihop elever ansikte mot ansikte eller kör en live-runda med hela klassen. Ordbyggande spel, inte passiva flervalsfrågor.' },
     { title: 'Noll förberedelse', body: 'Välj en ordlista, välj ett läge, dela koden. En 5-minuters uppvärmning eller en repetition i slutet av ett avsnitt — utan extra arbete.' },
   ],

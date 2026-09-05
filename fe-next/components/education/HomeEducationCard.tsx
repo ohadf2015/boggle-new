@@ -114,7 +114,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       {/* CTA affordance */}
       <span
         className={cn(
-          'ml-auto hidden shrink-0 items-center gap-1.5 sm:flex',
+          'ms-auto hidden shrink-0 items-center gap-1.5 sm:flex',
           'rounded-neo border-neo bg-neo-navy px-3 py-2 text-sm font-bold text-neo-white shadow-hard-sm',
           'transition-transform group-hover:translate-x-0.5'
         )}
@@ -124,7 +124,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       </span>
       {/* Mobile: chevron only (label lives above) */}
       <ArrowRight
-        className="ml-auto h-5 w-5 shrink-0 text-neo-black/60 dark:text-neo-white/60 sm:hidden rtl:rotate-180"
+        className="ms-auto h-5 w-5 shrink-0 text-neo-black/60 dark:text-neo-white/60 sm:hidden rtl:rotate-180"
         aria-hidden="true"
       />
     </Link>

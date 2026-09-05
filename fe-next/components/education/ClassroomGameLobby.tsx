@@ -24,7 +24,12 @@ import { ClassroomSetupStep } from './ClassroomSetupStep';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
 import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
-import type { GameMode } from '@/shared/types/game';
+import {
+  VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
+  VOCAB_QUIZ_DEFAULT_SECONDS,
+  type ClassroomGameMode,
+  type PracticeFocusSetting,
+} from '@/shared/types/vocabQuiz';
 import type { Language } from '@/lib/supabase/education/types';
 
 export interface ClassroomGameLobbyProps {
@@ -47,7 +52,13 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [gameMode, setGameMode] = useState<GameMode>('classic');
+  const [gameMode, setGameMode] = useState<ClassroomGameMode>('classic');
+  // Vocab Quiz only: which skill to drill and the round shape. `any` mixes
+  // whatever the chosen lesson can actually build — with definition-only word
+  // lists (the common case today) that resolves to a definition round.
+  const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
+  const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState<number>(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
+  const [vocabQuizSeconds, setVocabQuizSeconds] = useState<number>(VOCAB_QUIZ_DEFAULT_SECONDS);
   // Word Hunt only: the lesson word the teacher pinned as the hunted target.
   // '' means "let the game choose".
   const [targetWord, setTargetWord] = useState<string>('');
@@ -128,8 +139,21 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
           router.push(classroomMultiplayerPath(language, data.gameCode));
         }
       });
+      // The server's error text is internal English ("Invalid payload: …",
+      // "You are not the teacher of this classroom"). A Hebrew or Japanese
+      // teacher was shown it raw, right-aligned in an RTL toast. The real text
+      // is logged for us; the teacher gets a sentence in their own language.
       socketInstance.on('classroomGameError', (data: { error: string }) => {
-        toast.error(data.error);
+        logger.error('Classroom game create rejected:', data?.error);
+        toast.error(t('education.classroomGame.startFailed'));
+        setIsStarting(false);
+      });
+      // The rate-limit path emits `rateLimited`, NOT `classroomGameError`.
+      // Without this listener a double-tapped Start Game stayed disabled with
+      // no message and no recovery short of a reload (pitfall class 4 — a
+      // rejection that produces nothing looks exactly like "still working").
+      socketInstance.on('rateLimited', () => {
+        toast.error(t('education.classroomGame.tooFast'));
         setIsStarting(false);
       });
 
@@ -248,11 +272,19 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
         allowLateJoin: settings.allowLateJoin,
         gameMode,
         targetWord: targetWord || undefined,
+        ...(gameMode === 'vocab-quiz'
+          ? {
+              vocabQuizFocus,
+              vocabQuizQuestionCount,
+              vocabQuizSeconds,
+            }
+          : {}),
       },
     });
   }, [
     user, socket, selectedLessonIds, selectedClassroomId, gameCode,
     classrooms, selectedLessons, allPlayableWords, settings, gameMode, targetWord, minWordLength, profile, language, t,
+    vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds,
   ]);
 
   if (isLoading) {
@@ -326,12 +358,18 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       gameMode={gameMode}
       targetWord={targetWord}
       minWordLength={minWordLength}
+      vocabQuizFocus={vocabQuizFocus}
+      vocabQuizQuestionCount={vocabQuizQuestionCount}
+      vocabQuizSeconds={vocabQuizSeconds}
       timerMinutes={timerMinutes}
       boardSize={boardSize}
       isStarting={isStarting}
       onSelectClassroom={setSelectedClassroomId}
       onSelectLessons={setSelectedLessonIds}
       onGameModeChange={setGameMode}
+      onVocabQuizFocusChange={setVocabQuizFocus}
+      onVocabQuizQuestionCountChange={setVocabQuizQuestionCount}
+      onVocabQuizSecondsChange={setVocabQuizSeconds}
       onTargetWordChange={setTargetWord}
       onMinWordLengthChange={setMinWordLength}
       onTimerChange={setTimerMinutes}

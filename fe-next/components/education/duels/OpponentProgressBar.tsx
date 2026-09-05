@@ -41,8 +41,12 @@ export function OpponentProgressBar({
       <m.div
         data-side="player"
         className={cn(
-          'h-full bg-neo-cyan flex items-center justify-between px-3',
-          'border-r-neo'
+          // A right-edge border class in the `neo` family used to sit here. `neo`
+          // is not a border COLOR (it is an @utility that sets all four borders at
+          // once), so that class generated no CSS at all — verified against a real
+          // Tailwind build. Removing it is a no-op visually and drops a
+          // physical-direction token from the tree.
+          'h-full bg-neo-cyan flex items-center justify-between px-3'
         )}
         initial={{ width: '50%' }}
         animate={{ width: `${myPercentage}%` }}

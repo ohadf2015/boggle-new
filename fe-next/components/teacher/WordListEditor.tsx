@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, CheckCircle, AlertCircle, Trash2, Upload, ChevronDown, ChevronUp, Sparkles, Loader2 } from 'lucide-react';
-import type { Language, VocabularyWord, VocabularyLevel } from '@/lib/supabase/education';
+import type { Language, VocabularyWord, VocabularyLevel, WordMorphology } from '@/lib/supabase/education';
 import { lessonWordStats, withBlank } from '@/lib/education/vocabFocus';
 import {
   mergeEnrichment,
@@ -16,6 +16,7 @@ import {
   type EnrichableField,
   type EnrichmentMap,
 } from '@/lib/education/vocabEnrich';
+import WordSkillFields, { parseSenses } from './lesson-creation/WordSkillFields';
 import logger from '@/utils/logger';
 
 interface WordListEditorProps {
@@ -128,6 +129,24 @@ export default function WordListEditor({
   const handleExampleChange = (index: number, value: string) => {
     setDrafts((prev) => ({ ...prev, [draftKey(index, 'example')]: value }));
     updateWord(index, { example: value });
+  };
+
+  const handleMeaningsChange = (index: number, value: string) => {
+    setDrafts((prev) => ({ ...prev, [draftKey(index, 'meanings')]: value }));
+    const senses = parseSenses(value);
+    updateWord(index, { meanings: senses.length ? senses : undefined });
+  };
+
+  const handleMorphologyChange = (index: number, field: keyof WordMorphology, value: string) => {
+    const current = words[index]?.morphology ?? {};
+    const next: WordMorphology = { ...current, [field]: value };
+    // A part the teacher cleared should disappear, not linger as an empty string.
+    for (const key of Object.keys(next) as (keyof WordMorphology)[]) {
+      if (!next[key]?.trim()) delete next[key];
+    }
+    // A root meaning with no root of its own can never build a question.
+    if (next.rootMeaning && !next.root) delete next.rootMeaning;
+    updateWord(index, { morphology: Object.keys(next).length ? next : undefined });
   };
 
   const handleExampleBlur = (index: number) => {
@@ -243,6 +262,15 @@ export default function WordListEditor({
             </Button>
           )}
         </div>
+      )}
+
+      {words.length > 0 && (
+        <p data-testid="word-list-skill-summary" className="text-xs text-neo-white/70 font-neo-body tabular-nums mb-2">
+          {t('teacher.wordDetails.summarySkills', {
+            meanings: stats.withMeanings,
+            morphology: stats.withMorphology,
+          })}
+        </p>
       )}
 
       {aiState === 'error' && (
@@ -397,6 +425,17 @@ export default function WordListEditor({
                           {t('teacher.wordDetails.exampleHelp')}
                         </span>
                       </label>
+
+                      <WordSkillFields
+                        index={idx}
+                        word={word}
+                        meaningsDraft={drafts[draftKey(idx, 'meanings')]}
+                        onMeaningsChange={handleMeaningsChange}
+                        onMeaningsBlur={(i) => clearDraft(draftKey(i, 'meanings'))}
+                        onMorphologyChange={handleMorphologyChange}
+                        isAiFilled={(field) => isAiFilled(word, field)}
+                        aiHighlightClass={aiHighlight}
+                      />
                     </div>
                   )}
                 </div>

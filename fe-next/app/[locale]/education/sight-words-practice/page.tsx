@@ -7,6 +7,15 @@ import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip'
 import { HighlightedHeading } from '@/components/education/HighlightedHeading';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { EducationDepthSections } from '@/components/education/EducationDepthSections';
+import {
+  educationBreadcrumbJsonLd,
+  educationFaqJsonLd,
+  educationLearningResourceJsonLd,
+  educationProviderNode,
+} from '@/lib/seo/educationLanding';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 interface PageProps {
@@ -15,6 +24,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/sight-words-practice';
+const SLUG = 'sight-words-practice';
 
 const OG_IMAGE: Record<string, string> = {
   en: 'education-hero-en.webp',
@@ -80,55 +90,44 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getSightWordsContent(locale);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
+  const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
   const orgJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    '@id': `${BASE_URL}/en/education#org`,
-    name: 'LexiClash Education',
-    url: `${BASE_URL}/en/education`,
+    ...educationProviderNode(locale),
     description:
-      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free 30-day trial for teachers; school plans from $149/year.',
+      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; school plans from $149/year.',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
     offers: [
-      { '@type': 'Offer', name: 'Teacher Trial', price: 0, priceCurrency: 'USD', category: 'free trial', description: 'Full 30-day free trial for individual teachers', availability: 'https://schema.org/InStock' },
+      // The free tier is a tier, not a trial: lib/education/freeTierLimits.ts enforces
+      // 3 classes of 50 students with no expiry. Advertising a 30-day trial in schema
+      // understated the free plan and contradicted every other surface.
+      { '@type': 'Offer', name: 'Teacher Free', price: 0, priceCurrency: 'USD', category: 'free', description: 'Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Teacher Pro', price: 9, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 9, priceCurrency: 'USD', unitText: 'month' }, category: 'paid', description: 'Unlimited classrooms plus progress analytics and printable reports', availability: 'https://schema.org/InStock' },
       { '@type': 'Offer', name: 'School Plan', price: 149, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 149, priceCurrency: 'USD', unitText: 'year' }, category: 'paid', description: 'School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO', availability: 'https://schema.org/InStock' },
     ],
   };
 
-  const learningResourceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#resource`,
+  // `contentLanguage: 'en'` is passed EXPLICITLY, not inherited: this page's body is
+  // English in every build (content.ts has no per-locale blocks) and the non-EN routes
+  // are noindex. Declaring `ja` here would be a worse lie than the bug being fixed.
+  const learningResourceJsonLd = educationLearningResourceJsonLd({
+    locale,
+    path: PAGE_PATH,
+    contentLanguage: 'en',
     name: 'Sight Words Practice Online',
-    url: `${BASE_URL}/en${PAGE_PATH}`,
-    inLanguage: 'en',
-    learningResourceType: 'Game',
+    description: c.metaDescription,
     educationalUse: ['Sight Word Practice', 'Reading Fluency', 'High-Frequency Word Recognition', 'Spelling Practice'],
     educationalLevel: ['Early Education', 'Primary'],
     typicalAgeRange: '4-9',
-    isAccessibleForFree: true,
     teaches: 'Instant recognition of Dolch and Fry high-frequency sight words, spelling of high-frequency words, reading fluency foundations',
-    audience: { '@type': 'EducationalAudience', educationalRole: ['student', 'parent', 'teacher'] },
-    provider: {
-      '@type': 'EducationalOrganization',
-      '@id': `${BASE_URL}/en/education#org`,
-      name: 'LexiClash Education',
-      url: `${BASE_URL}/en/education`,
-    },
-  };
+  });
 
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#howto`,
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#howto`,
     name: 'How to Practice Sight Words with LexiClash',
     description: 'A 10-minute daily routine that turns any Dolch or Fry sight-word list into games.',
     totalTime: 'PT10M',
@@ -140,15 +139,11 @@ export default async function Page({ params }: PageProps) {
     ],
   };
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: 'Sight Words Practice', item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const breadcrumbJsonLd = educationBreadcrumbJsonLd({
+    locale,
+    path: PAGE_PATH,
+    current: educationPageLabel(SLUG, locale),
+  });
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
@@ -239,6 +234,12 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
+        {/* Mechanism blocks: the specifics a listicle cannot match, each with a
+            self-contained answer marked `data-answer` for AI answer engines. */}
+        <ScrollRevealSection>
+          <EducationDepthSections sections={c.depth} />
+        </ScrollRevealSection>
+
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             {c.faqHeading.split(/FAQ/).map((part, i) => (
@@ -276,6 +277,8 @@ export default async function Page({ params }: PageProps) {
             </Link>
           </div>
         </section>
+
+        <EducationRelatedLinks locale={locale} slug={SLUG} />
 
         <DistrictUpsellStrip />
       </div>

@@ -5,6 +5,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { createAdminClient } from '@/utils/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { DailyChallengeRow, WeeklyQuestRow, ChallengeTier } from './types';
 
@@ -12,6 +13,22 @@ import type { DailyChallengeRow, WeeklyQuestRow, ChallengeTier } from './types';
 // Falls back to anon browser client when service role key is unavailable (browser/test).
 function getWriteClient() {
   return createAdminClient() ?? supabase;
+}
+
+/**
+ * Client for a per-player READ.
+ *
+ * `daily_challenges` / `weekly_quests` grant SELECT `TO authenticated USING
+ * (player_id = auth.uid())`. In the browser the module-level client carries the
+ * user's session and that works. Inside a Next API route it does NOT — it is
+ * `anon` there, so the read came back as 0 rows with `error: null` and the
+ * student's challenge list looked empty. Server callers must therefore pass the
+ * REQUEST's authenticated client (see `createRequestClient`), which is scoped to
+ * one user, so the RLS predicate still does the filtering. Never an admin client:
+ * a service-role read here would bypass the per-player filter entirely.
+ */
+function getReadClient(client?: SupabaseClient) {
+  return client ?? supabase;
 }
 
 // ============================================
@@ -148,14 +165,16 @@ function pickRandom<T>(array: T[]): T {
  */
 export async function getDailyChallenges(
   playerId: string,
-  date?: string
+  date?: string,
+  client?: SupabaseClient
 ): Promise<{ data: DailyChallengeRow[]; error: { message: string } | null }> {
   try {
-    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+    const db = getReadClient(client);
+    if (!db) return { data: [], error: { message: 'Supabase not configured' } };
 
     const targetDate = date || getToday();
 
-    const { data: challenges, error } = await supabase
+    const { data: challenges, error } = await db
       .from('daily_challenges')
       .select('*')
       .eq('player_id', playerId)
@@ -182,22 +201,28 @@ export async function getDailyChallenges(
  */
 export async function getWeeklyQuests(
   playerId: string,
-  weekStart?: string
+  weekStart?: string,
+  client?: SupabaseClient
 ): Promise<{ data: WeeklyQuestRow[]; error: { message: string } | null }> {
   try {
-    if (!supabase) return { data: [], error: { message: 'Supabase not configured' } };
+    const db = getReadClient(client);
+    if (!db) return { data: [], error: { message: 'Supabase not configured' } };
 
     const targetWeek = weekStart || getCurrentWeekStart();
 
-    const { data: quests, error } = await supabase
+    const { data: quests, error } = await db
       .from('weekly_quests')
       .select('*')
       .eq('player_id', playerId)
       .eq('week_start', targetWeek);
 
     if (error) {
-      // PGRST205 = table not found in schema cache (table hasn't been created yet)
+      // PGRST205 = table not found in schema cache (table hasn't been created yet).
+      // Still an empty result to the caller, but never a silent one — an empty
+      // quest list that means "the table is missing" must be distinguishable
+      // from one that means "this player has no quests".
       if (error.code === 'PGRST205') {
+        logger.warn('weekly_quests table not found in schema cache; returning no quests', error);
         return { data: [], error: null };
       }
       logger.error('Error fetching weekly quests:', error);

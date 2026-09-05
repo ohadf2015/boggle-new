@@ -34,12 +34,14 @@ describe('QuickPracticeButton', () => {
     expect(screen.getByRole('button', { name: /practice/i })).toBeInTheDocument();
   });
 
-  it('calls onPractice with flashcard when primary button clicked', () => {
+  it('calls onPractice with no mode when the primary button is clicked', () => {
+    // Was 'flashcard'. That auto-started one drill through `?mode=` and made
+    // the lesson's practice picker unreachable for every student.
     render(<QuickPracticeButton {...defaultProps} />);
 
     fireEvent.click(screen.getByRole('button', { name: /practice/i }));
 
-    expect(defaultProps.onPractice).toHaveBeenCalledWith('flashcard');
+    expect(defaultProps.onPractice).toHaveBeenCalledWith(undefined);
   });
 
   it('shows dropdown with all 4 modes when dropdown trigger clicked', () => {

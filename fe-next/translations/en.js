@@ -1,5 +1,62 @@
 // EN translations
 const en = {
+  "vocabQuiz": {
+    "progress": "Question {current} of {total}",
+    "timeLeft": "{seconds} seconds left",
+    "paused": "Your teacher paused the quiz",
+    "waiting": "Get ready — the first question is on its way.",
+    "lockedIn": "Locked in. Sit tight while the rest of the class answers.",
+    "streak": {
+      "label": "{count} in a row"
+    },
+    "answers": {
+      "label": "Pick an answer",
+      "option": "{option}",
+      "correctOption": "{option} — the correct answer"
+    },
+    "focus": {
+      "any": "Mixed",
+      "definition": "Definitions",
+      "synonym": "Synonyms",
+      "antonym": "Antonyms",
+      "context": "Context clues",
+      "multiple_meaning": "Multiple meanings",
+      "roots_affixes": "Roots & affixes"
+    },
+    "feedback": {
+      "correct": "Nice! You earned {points} points",
+      "wrong": "Not quite — it was {answer}",
+      "noAnswer": "Time's up — it was {answer}",
+      "breakdown": "{base} base · {speed} for speed · {streak} for your streak"
+    },
+    "standings": {
+      "title": "Standings",
+      "empty": "No scores yet."
+    },
+    "finished": {
+      "title": "That's a wrap!",
+      "yourScore": "You scored {score}."
+    },
+    "host": {
+      "joinCode": "Join code",
+      "waiting": "Waiting for the first question…"
+    },
+    "setup": {
+      "focusTitle": "What should this quiz drill?",
+      "focusDescription": "Each option shows how many questions your chosen words can actually make.",
+      "questionsAvailable": "{count} questions",
+      "focusLocked": "Needs more word data",
+      "noQuestions": "These words can't make a quiz yet. Add a definition to at least four of them in the word list editor, then come back.",
+      "enrichHint": "Greyed-out skills need data your word list doesn't have yet. Add synonyms, antonyms or an example sentence to your words in the word list editor to unlock them.",
+      "questionCount": "How many questions?",
+      "cappedNotice": "These words can make {count} questions, so that is how long the round will be.",
+      "secondsPerQuestion": "Time per question",
+      "seconds": "{seconds}s"
+    },
+    "errors": {
+      "noQuestions": "This lesson has no words ready for a quiz yet."
+    }
+  },
   "report": {
     "title": "Report",
     "reason": "What's the problem?",
@@ -469,7 +526,7 @@ const en = {
   },
   "seo": {
     "title": "LexiClash — Free Multiplayer Word Game, 2-20 Players, 8 Modes (No Download)",
-    "description": "Free multiplayer word game — 2-20 players, 8 modes, 5 languages. Real-time word battles like Boggle meets Wordle, no download, no signup. Daily Word Wheel + Word Hunt + Adventure mode. Play instantly →",
+    "description": "Free multiplayer word game — 2-20 players, 8 modes, 6 languages. Real-time word battles like Boggle meets Wordle, no download, no signup. Daily Word Wheel + Word Hunt + Adventure mode. Play instantly →",
     "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download, free boggle online no download, word game you type in words, games like boggle online free, word making games, boggle game free no download, word game like boggle free, word game no download needed, word battle game online, daily word puzzle free, word game for groups, word game for parties online, games like wordle multiplayer, word RPG game, adventure word game, word game on phone free, competitive word puzzle",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
     "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
@@ -531,13 +588,13 @@ const en = {
     },
     "multiplayer": {
       "title": "Free Multiplayer Word Game — 2-20 Players, 8 Modes, No Signup | LexiClash",
-      "description": "Real-time multiplayer word battles, 2-20 players, no signup. Host a room, share the link, compete live in 8 game modes across 5 languages. Daily leaderboard. Play free now →",
+      "description": "Real-time multiplayer word battles, 2-20 players, no signup. Host a room, share the link, compete live in 8 game modes across 6 languages. Daily leaderboard. Play free now →",
       "ogTitle": "Real-Time Word Battles, 2-20 Players — Play Free",
-      "ogDescription": "Host a room, share the link, race for words with up to 20 friends. 8 modes, 5 languages. Free in your browser."
+      "ogDescription": "Host a room, share the link, race for words with up to 20 friends. 8 modes, 6 languages. Free in your browser."
     },
     "about": {
       "title": "About LexiClash - Our Story, Mission & Team",
-      "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 5 languages.",
+      "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 6 languages.",
       "ogTitle": "About LexiClash - Word Game Innovation",
       "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
     },
@@ -839,9 +896,9 @@ const en = {
     },
     "educationHub": {
       "title": "Free Vocabulary Games for the Classroom — No Student Logins",
-      "description": "Free word and vocabulary games for your class — no student accounts, no ads, no downloads. Bring your own word lists, run whole-class multiplayer, in 5 languages.",
+      "description": "Free word and vocabulary games for your class — no student accounts, no ads, no downloads. Bring your own word lists, run whole-class multiplayer, in 6 languages.",
       "ogTitle": "Free Vocabulary Games for the Classroom",
-      "ogDescription": "No student logins, no ads — bring your own word lists and run whole-class word games in 5 languages."
+      "ogDescription": "No student logins, no ads — bring your own word lists and run whole-class word games in 6 languages."
     },
     "educationDuels": {
       "title": "Vocabulary Duels — Student vs Student Word Battles",
@@ -2573,7 +2630,7 @@ const en = {
       "tagline": "Live Now",
       "title": "Spell.",
       "titleAccent": "Win.",
-      "howTo": "Tap connected letters to make words. Longer words = bigger scores. Daily puzzles + live multiplayer in 5 languages.",
+      "howTo": "Tap connected letters to make words. Longer words = bigger scores. Daily puzzles + live multiplayer in 6 languages.",
       "playDaily": "Play Daily",
       "playPractice": "Practice",
       "playMultiplayer": "Multiplayer",
@@ -4441,7 +4498,7 @@ const en = {
       "story": {
         "title": "Our Story",
         "content": "LexiClash was born in 2024 in Israel from a simple but powerful idea: what if word games could be as thrilling and competitive as esports, while also helping people learn new languages? Our founder, Ohad Fisher, grew up playing word games with family and friends in multiple languages. He noticed that while there were many word games available, none truly combined real-time competitive gameplay with meaningful language learning across different scripts and writing directions.",
-        "content2": "Starting from a small prototype, the team built LexiClash from the ground up with multilingual support at its core — including full right-to-left (RTL) support for Hebrew. Within the first year, LexiClash grew to support five languages (Hebrew, English, Swedish, Japanese, and Spanish), introduced multiple original game modes, and built a growing community of players from over 30 countries who compete daily in word battles."
+        "content2": "Starting from a small prototype, the team built LexiClash from the ground up with multilingual support at its core — including full right-to-left (RTL) support for Hebrew. Within the first year, LexiClash grew to support six languages (Hebrew, English, Swedish, Japanese, and Spanish), introduced multiple original game modes, and built a growing community of players from over 30 countries who compete daily in word battles."
       },
       "mission": {
         "title": "Our Mission",
@@ -4457,7 +4514,7 @@ const en = {
         },
         "multilingual": {
           "title": "True Multilingual Support",
-          "content": "We support 5 languages including Hebrew with full right-to-left layout support. Every game mode, every UI element, and every piece of feedback works flawlessly in all supported languages. Players can switch languages instantly and even practice vocabulary across different languages."
+          "content": "We support 6 languages including Hebrew with full right-to-left layout support. Every game mode, every UI element, and every piece of feedback works flawlessly in all supported languages. Players can switch languages instantly and even practice vocabulary across different languages."
         },
         "education": {
           "title": "Education Integration",
@@ -5723,7 +5780,7 @@ const en = {
     "seo": {
       "showcase3d": {
         "title": "LexiClash — A World of Words | Free Multiplayer Word Game",
-        "description": "Scroll into a world of words: trace words on the board, chain combos, beat the room in real-time 1v3 battles, and take the crown. Free, browser-based, 5 languages — no download."
+        "description": "Scroll into a world of words: trace words on the board, chain combos, beat the room in real-time 1v3 battles, and take the crown. Free, browser-based, 6 languages — no download."
       },
       "stepLabel": "Step",
       "whatIsTitle": "What is LexiClash?",
@@ -5736,9 +5793,9 @@ const en = {
       "feature2Desc": "Same puzzle for everyone worldwide, every day. Track your streak and share emoji results — just like Wordle.",
       "feature3Title": "Adventure Mode",
       "feature3Desc": "100 levels across 10 themed worlds. Special tiles, boss battles, and power-ups keep every round fresh.",
-      "feature4Title": "5 Languages",
+      "feature4Title": "6 Languages",
       "feature4TitleShort": "Blast Mode",
-      "feature4Desc": "Play in English, Hebrew, Swedish, Japanese, or Spanish. Switch anytime and challenge friends across languages.",
+      "feature4Desc": "Play in English, Hebrew, Swedish, Japanese, Spanish, or Russian. Switch anytime and challenge friends across languages.",
       "modeTagMultiplayer": "2-20 players",
       "modeTagDaily": "New puzzle daily",
       "modeTagAdventure": "100 levels",
@@ -5764,7 +5821,7 @@ const en = {
       "gameModesDaily": "Daily Challenge — A fresh puzzle every day, identical for all players worldwide. Complete it to maintain your streak and compare your score with the global community. Share your results with emoji grids, just like Wordle.",
       "gameModesAdventure": "Adventure Mode — Journey through 10 themed worlds with 100 levels of increasing difficulty. Encounter special tile types like ice, fire, bombs, and rainbow tiles. Defeat bosses using word power and unlock new worlds as you progress.",
       "educationTitle": "Built for Learning",
-      "educationContent": "Word games are one of the most effective ways to build vocabulary and improve spelling. Research published in AIMS Neuroscience shows that word puzzles activate multiple brain regions simultaneously — including areas responsible for language processing, working memory, and executive function. LexiClash takes this further by offering gameplay in five languages, making it a practical tool for language learners. Teachers use LexiClash in classrooms across three continents to make vocabulary drills engaging. The multiplayer format creates healthy competition that motivates students to expand their word knowledge naturally.",
+      "educationContent": "Word games are one of the most effective ways to build vocabulary and improve spelling. Research published in AIMS Neuroscience shows that word puzzles activate multiple brain regions simultaneously — including areas responsible for language processing, working memory, and executive function. LexiClash takes this further by offering gameplay in six languages, making it a practical tool for language learners. Teachers use LexiClash in classrooms across three continents to make vocabulary drills engaging. The multiplayer format creates healthy competition that motivates students to expand their word knowledge naturally.",
       "faqTitle": "Frequently Asked Questions",
       "faq1Q": "Is LexiClash really free?",
       "faq1A": "Yes, completely free. No hidden paywalls, no premium subscriptions. We sustain the game through non-intrusive advertising that respects your privacy.",
@@ -5779,7 +5836,7 @@ const en = {
       "faq6Q": "Can I create my own board?",
       "faq6A": "Yes! Use the Community Board Builder to design custom letter grids with your own seed words. Publish them for others to play, rate, and compete on. Top boards get featured on the home page.",
       "communityTitle": "Word nerds welcome.",
-      "communityContent": "LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights."
+      "communityContent": "LexiClash players span over 40 countries and six languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights."
     },
     "firstTimer": {
       "exploreModes": "Explore Modes",
@@ -10726,6 +10783,11 @@ const en = {
     },
     "joinClassroom": "Join a Classroom",
     "joinClassroomDescription": "Enter your teacher's code to join",
+    "profileStalled": {
+      "title": "We can't load your profile",
+      "body": "Something went wrong on our side. Try again — your class and your progress are safe.",
+      "retry": "Try again"
+    },
     "notYou": "Not you? Start fresh",
     "activeGame": {
       "title": "Game Starting!",
@@ -10778,6 +10840,7 @@ const en = {
       "review": "Review",
       "playGame": "Play Game",
       "playGameHint": "Practice with a multiplayer game using this vocabulary",
+      "wordsAtYourLevel": "{{mine}} at your level · {{total}} in the lesson",
       "empty": {
         "title": "No lessons assigned yet",
         "subtitle": "Join a classroom to get started with vocabulary practice",
@@ -10853,8 +10916,22 @@ const en = {
       "aiFilling": "Writing suggestions…",
       "aiFilledNote": "Highlighted fields were suggested by AI — check them before you save.",
       "aiError": "Couldn't get suggestions right now. Try again in a minute.",
-      "importFormatHelp": "Optional extras after a | pipe: syn: for synonyms, ant: for antonyms, ex: for an example sentence (use ___ for the word), level: support / core / challenge.",
-      "importFormatExample": "happy - feeling joy | syn: glad, cheerful | ant: sad | ex: The ___ dog wagged its tail. | level: core"
+      "meanings": "Other meanings",
+      "meaningsPlaceholder": "Meanings, separated by ; (e.g. the land beside a river; a place for money)",
+      "meaningsHelp": "Two meanings or more turn this word into a multiple-meaning question.",
+      "morphology": "Word parts",
+      "morphologyHelp": "Fill in a root or an affix and this word can drill roots & affixes.",
+      "prefix": "Prefix",
+      "prefixPlaceholder": "un",
+      "root": "Root",
+      "rootPlaceholder": "aqua",
+      "rootMeaning": "Root means",
+      "rootMeaningPlaceholder": "water",
+      "suffix": "Suffix",
+      "suffixPlaceholder": "ful",
+      "summarySkills": "{{meanings}} with two meanings · {{morphology}} with word parts",
+      "importFormatHelp": "Optional extras after a | pipe: syn: for synonyms, ant: for antonyms, ex: for an example sentence (use ___ for the word), level: support / core / challenge, mean: for extra meanings separated by ;, and root: / pre: / suf: for word parts (root: aqua = water sets the root and what it means).",
+      "importFormatExample": "happy - feeling joy | syn: glad, cheerful | ant: sad | ex: The ___ dog wagged its tail. | level: core\nbank - a place that keeps money | mean: the land beside a river; a place that keeps money | root: banc = bench"
     },
     "levels": {
       "label": "Level",
@@ -10891,7 +10968,59 @@ const en = {
         "classic": "Classic",
         "blast": "Blast",
         "wordHunt": "Word Hunt",
-        "wheelRush": "Wheel Rush"
+        "wheelRush": "Wheel Rush",
+        "vocabQuiz": "Vocab Quiz"
+      }
+    },
+    "classReport": {
+      "title": "Word by student",
+      "hint": "Every lesson word against every student. Hardest words first — that is your reteach list.",
+      "word": "Word",
+      "classMiss": "Class missed",
+      "accuracy": "Accuracy",
+      "didNotPlay": "Did not play",
+      "quizCaveat": "A quiz asks only some of the lesson words, and the ones it never asked are counted as missed here. Check the list before you reteach.",
+      "empty": "Nobody played this one",
+      "emptyHint": "Once students join a class game, their words show up here word by word.",
+      "copy": "Copy for my notes",
+      "copied": "Copied",
+      "copyFallback": "Copy this text:",
+      "print": "Print",
+      "trendTitle": "Across your recent games",
+      "trendEmpty": "Play this lesson again to see whether the class is improving on these words.",
+      "trendBarsLabel": "{word}: missed by {first}% in the first game, {last}% in the last.",
+      "state": {
+        "found": "Found it",
+        "missed": "Missed it",
+        "absent": "Did not play",
+        "quizFound": "Answered correctly",
+        "quizMissed": "Not answered correctly"
+      },
+      "drilldown": {
+        "title": "Student detail",
+        "missedCount": "{count} words missed",
+        "noneMissed": "Found every lesson word.",
+        "absentHint": "This student has no result for this game. Catch them up before the next one.",
+        "suggested": "Try next:",
+        "assign": "Practice these words",
+        "close": "Close"
+      },
+      "practice": {
+        "flashcard": "Meaning first — flashcards, then a quiz",
+        "spelling": "A short spelling drill on the words they missed",
+        "none": "Nothing to reteach — give them the next list",
+        "absent": "Catch them up one to one before the next game"
+      },
+      "notes": {
+        "title": "Class game",
+        "playedAt": "Played",
+        "reteach": "Reteach first",
+        "checkIn": "Check in with",
+        "absent": "Did not play",
+        "nobodyFound": "nobody found it",
+        "allFound": "The class found every lesson word.",
+        "everyoneOk": "Nobody fell below half.",
+        "missedBy": "missed by"
       }
     },
     "proWelcome": {
@@ -10990,7 +11119,8 @@ const en = {
         "classic": "Classic",
         "wordHunt": "Word Hunt",
         "blast": "Blast",
-        "wheelRush": "Wheel Rush"
+        "wheelRush": "Wheel Rush",
+        "vocabQuiz": "Vocab Quiz"
       },
       "huntTarget": {
         "title": "Hunted Word",
@@ -11158,6 +11288,10 @@ const en = {
       "bulkImportLabel": "Paste words here",
       "bulkImportPlaceholder": "Paste words, one per line or comma-separated. Use 'word - definition' for definitions.",
       "bulkImportDetected": "{{count}} words detected",
+      "bulkImportUnreadable": "Couldn't read {{count}} row(s) (row {{rows}}) — no word found, so they were left out. Check for a stray | or a missing word.",
+      "bulkImportOneWordPerLine": "Row {{rows}} looks like several words on one line. Put one word per line and import again.",
+      "savedAndAssigned": "Lesson saved and assigned to {{classroom}} — your students can see it now.",
+      "savedNotAssigned": "Lesson saved, but we couldn't assign it to {{classroom}}. Use the lesson's Assign to Classroom button to try again.",
       "bulkImportButton": "Import",
       "templates": "Lesson Templates",
       "category": {
@@ -11169,6 +11303,8 @@ const en = {
         "everyday": "Everyday"
       },
       "resumeDraft": "Resume Draft?",
+      "reviewSetName": "Words we missed",
+      "reviewSetDescription": "The words your class found least often last game.",
       "draftFound": "You have an unsaved lesson draft from {{time}}",
       "resumeDraftButton": "Resume",
       "discardDraftButton": "Discard",
@@ -11195,7 +11331,8 @@ const en = {
         "label": "Vocabulary focus",
         "help": "Pick one skill to drill, or let students choose. Only skills this lesson has enough words for are available.",
         "any": "Any practice",
-        "anyHint": "Students pick their own mode"
+        "anyHint": "Students pick their own mode",
+        "questionCount": "{{count}} questions · {{skill}}"
       },
       "createTitle": "Create Assignment",
       "create": "Create Assignment",
@@ -11334,7 +11471,13 @@ const en = {
         "pdf": "Export PDF",
         "downloading": "Downloading..."
       },
+      "teacherLabel": "Teacher",
+      "generatedBy": "Generated by LexiClash",
       "columns": {
+        "rank": "Rank",
+        "student": "Student",
+        "score": "Score",
+        "words": "Words",
         "word": "Word",
         "status": "Status",
         "accuracy": "Accuracy",
@@ -11419,14 +11562,14 @@ const en = {
       "upgradePricingReassure": "Cancel anytime — your classrooms, lessons and student data always stay safe.",
       "pricePerDay": "About $0.30 a day",
       "everythingInFree": "Everything in Free, plus:",
-      "freeStartNote": "Great for trying it out — one class of 10 students. A real class outgrows it on day one.",
+      "freeStartNote": "Real classes fit — up to 3 classes of 50 students each. Pro is for when you run more sections or need the reports.",
       "proCtaSubtext": "Set up in 30 seconds · Cancel anytime",
       "trustCancel": "Cancel anytime, no lock-in",
       "trustDataSafe": "Your data stays safe",
       "trustReminder": "Reminder email before every charge",
       "freePlanName": "Free",
       "freeForever": "Forever free, always available",
-      "freeClasses": "Up to {count} class",
+      "freeClasses": "Up to {count} classes",
       "freeStudents": "Up to {count} students per class",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
@@ -11437,7 +11580,7 @@ const en = {
       "faqAutoRenew": "Will I be charged automatically?",
       "faqAutoRenewAnswer": "Yes, your subscription renews monthly. You'll receive a reminder email before each renewal. Cancel anytime to stop future charges.",
       "faqDataLoss": "Will I lose my data if I cancel?",
-      "faqDataLossAnswer": "No. If you cancel, your classrooms, lessons, and student data remain safe. You'll just revert to free-plan limits (1 class, 10 students per class).",
+      "faqDataLossAnswer": "No. If you cancel, your classrooms, lessons, and student data remain safe. You'll just revert to free-plan limits (3 classes, 50 students per class).",
       "legalNote": "By upgrading, you agree to our Terms of Service and understand our Refund Policy.",
       "refundPolicy": "Refund Policy",
       "renewsOn": "Next renewal",
@@ -11448,7 +11591,7 @@ const en = {
       "districtCta": "Get in touch for school pricing",
       "checkoutUnavailable": "Checkout is closed right now — nothing was charged. Please try again shortly.",
       "featureOutcome1": "Run every class you teach — no cap",
-      "featureOutcome2": "Add the whole roster, not the first ten",
+      "featureOutcome2": "Add every section you teach, not just the first 3 classes",
       "featureOutcome3": "See who is stuck, word by word, live",
       "featureOutcome4": "Compare progress across all your classes",
       "priceTaxNote": "Taxes may be added at checkout.",
@@ -11470,6 +11613,49 @@ const en = {
     }
   },
   "education": {
+    "errors": {
+      "serverUnavailable": "We can't reach the class list right now. This is on our side, not yours — try again in a moment."
+    },
+    "classroomModeBlurb": {
+      "classic": "Link adjacent letters on a shared grid",
+      "wordHunt": "Crack the hidden word in ten tries",
+      "blast": "Chain words to clear tiles in combos",
+      "wheelRush": "Build words from one wheel of letters",
+      "vocabQuiz": "Four-choice questions from your own word data"
+    },
+    "practicePicker": {
+      "title": "Pick your practice",
+      "readyCount": "{{ready}} of {{total}} ready to play",
+      "questions": "{{count}} questions",
+      "words": "{{count}} words",
+      "lockedBadge": "Locked",
+      "played": "played {{count}}x",
+      "nothingReady": "This lesson has no words yet. Ask your teacher to add some, then come back.",
+      "skill": {
+        "solo_board": "Find the lesson words in a letter grid",
+        "warmup": "A short grid round to get going",
+        "blitz": "Beat the clock on as many words as you can",
+        "matching": "Match each word to its meaning",
+        "spelling": "Hear it, then spell it",
+        "flashcard": "Flip between the word and its meaning",
+        "word_list": "Read the whole list before you play",
+        "definition": "Read the meaning, pick the word",
+        "synonym": "Words that mean the same",
+        "antonym": "Words that mean the opposite",
+        "context": "Work the word out from the sentence",
+        "multiple_meaning": "One word, two meanings",
+        "roots_affixes": "What the word parts mean"
+      },
+      "locked": {
+        "solo_board": "Add words to this lesson to unlock",
+        "warmup": "Add words to this lesson to unlock",
+        "blitz": "Add words to this lesson to unlock",
+        "matching": "Needs at least 4 words to pair up",
+        "spelling": "Add words to this lesson to unlock",
+        "flashcard": "Add words to this lesson to unlock",
+        "word_list": "Add words to this lesson to unlock"
+      }
+    },
     "vocabFocus": {
       "title": "Vocabulary focus",
       "desc": "Drill one skill at a time",
@@ -11477,31 +11663,41 @@ const en = {
         "definition": "Definition match",
         "synonym": "Synonyms",
         "antonym": "Antonyms",
-        "context": "Context clues"
+        "context": "Context clues",
+        "multiple_meaning": "Multiple meanings",
+        "roots_affixes": "Roots & affixes"
       },
       "instructions": {
         "definition": "Read the meaning, pick the word",
         "synonym": "Pick the word that means the same",
         "antonym": "Pick the word that means the opposite",
-        "context": "Pick the word that fits the blank"
+        "context": "Pick the word that fits the blank",
+        "multiple_meaning": "Pick the word that fits both meanings",
+        "roots_affixes": "Pick what the word part means"
       },
       "promptLabel": {
         "definition": "Which word means…",
         "synonym": "Same meaning as…",
         "antonym": "Opposite of…",
-        "context": "Fill in the blank"
+        "context": "Fill in the blank",
+        "multiple_meaning": "Which word means both?",
+        "roots_affixes": "Word parts"
       },
       "unlock": {
         "definition": "Add definitions to {{min}}+ words to unlock",
         "synonym": "Add synonyms to {{min}}+ words to unlock",
         "antonym": "Add antonyms to {{min}}+ words to unlock",
-        "context": "Add example sentences to {{min}}+ words to unlock"
+        "context": "Add example sentences to {{min}}+ words to unlock",
+        "multiple_meaning": "Add a second meaning to 2+ words to unlock",
+        "roots_affixes": "Add a root or a prefix to 2+ words to unlock"
       },
       "notEnough": {
         "definition": "This lesson needs definitions on at least 4 words for this practice. Ask your teacher to add some!",
         "synonym": "This lesson needs synonyms on at least 4 words for this practice. Ask your teacher to add some!",
         "antonym": "This lesson needs antonyms on at least 4 words for this practice. Ask your teacher to add some!",
-        "context": "This lesson needs example sentences on at least 4 words for this practice. Ask your teacher to add some!"
+        "context": "This lesson needs example sentences on at least 4 words for this practice. Ask your teacher to add some!",
+        "multiple_meaning": "This lesson needs two meanings on at least a couple of words for this practice. Ask your teacher to add some!",
+        "roots_affixes": "This lesson needs word parts on at least a couple of words for this practice. Ask your teacher to add some!"
       },
       "progress": "{{current}} of {{total}}",
       "progressLabel": "Question progress",
@@ -11754,6 +11950,8 @@ const en = {
       "joinedStudents": "Joined Students",
       "lessonsSelected": "{{count}} lessons selected",
       "missingRequirements": "Missing requirements",
+      "startFailed": "We couldn't start the game. Try again.",
+      "tooFast": "One moment — try that again in a few seconds.",
       "more": "more",
       "multiLessonHelp": "Combine lessons for variety",
       "noClassrooms": "No classrooms yet",
@@ -11889,7 +12087,7 @@ const en = {
         "s3": "Aria"
       },
       "moat": {
-        "title": "Why teachers in 5 languages choose LexiClash",
+        "title": "Why teachers in 6 languages choose LexiClash",
         "subtitle": "Three reasons we can defend, not just claim.",
         "native_multilingual": {
           "tag": "Native",
@@ -11979,7 +12177,7 @@ const en = {
         },
         "q2": {
           "q": "Is there a free plan?",
-          "a": "Yes — a free basic plan for verified teachers: up to 1 class of 10 students, no ads on student-facing routes. Teacher Pro ($9/month) unlocks unlimited classes and students."
+          "a": "Yes — a free basic plan for verified teachers: up to 3 classes of 50 students each, no ads on student-facing routes. Teacher Pro ($9/month) unlocks unlimited classes and students."
         },
         "q3": {
           "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?",
@@ -12023,7 +12221,7 @@ const en = {
       },
       "esl-word-games": {
         "course_name": "LexiClash ESL Word Games",
-        "course_desc": "Vocabulary, spelling, and live multiplayer games for ESL classrooms in 5 languages."
+        "course_desc": "Vocabulary, spelling, and live multiplayer games for ESL classrooms in 6 languages."
       },
       "vocabulary-games-classroom": {
         "course_name": "Classroom Vocabulary Games",
@@ -12057,23 +12255,6 @@ const en = {
       "totalXP": "Total XP",
       "weekly": "Weekly",
       "xp": "{{xp}} XP"
-    },
-    "lesson": {
-      "autoPronounce": "Auto-Pronounce",
-      "classicMode": "Classic Mode",
-      "contextualExamples": "Examples",
-      "definition": "Definition",
-      "dontKnow": "Don't Know",
-      "enrichingContent": "Enriching...",
-      "examples": "Examples",
-      "gotIt": "Got It!",
-      "pronounce": "Pronounce",
-      "pronunciationFallback": "Pronunciation unavailable",
-      "speaking": "Speaking...",
-      "swipeMode": "Swipe Mode",
-      "tapToReveal": "Tap to Reveal",
-      "word": "Word",
-      "words": "{{count}} words"
     },
     "milestones": {
       "coinBonus": "+{{coins}} coins",
@@ -12189,9 +12370,22 @@ const en = {
       }
     },
     "lesson": {
-      "creationFailed": "Couldn't create lesson. Please try again.",
+      "autoPronounce": "Auto-Pronounce",
+      "classicMode": "Classic Mode",
+      "contextualExamples": "Examples",
       "created": "Lesson created successfully!",
+      "creationFailed": "Couldn't create lesson. Please try again.",
+      "definition": "Definition",
+      "dontKnow": "Don't Know",
+      "enrichingContent": "Enriching...",
+      "examples": "Examples",
+      "gotIt": "Got It!",
       "preferCustom": "Or create your own custom vocabulary list:",
+      "pronounce": "Pronounce",
+      "pronunciationFallback": "Pronunciation unavailable",
+      "speaking": "Speaking...",
+      "swipeMode": "Swipe Mode",
+      "tapToReveal": "Tap to Reveal",
       "word": "word",
       "words": "words"
     },
@@ -12204,6 +12398,7 @@ const en = {
         "codeHint": "6 characters from your teacher",
         "codeLabel": "Class Code",
         "codePasted": "Pasted!",
+        "preparing": "Getting things ready — one moment.",
         "emptyClipboard": "Nothing to paste",
         "guestError": "Couldn't start your session. Try again or ask your teacher.",
         "invalidCode": "Invalid code",
@@ -15306,7 +15501,7 @@ const en = {
     "mode2Tag": "Up to 1v3",
     "mode2": "Real-time party versus",
     "mode2Body": "Four cubes, one live board, zero mercy. The loudest scoreboard wins.",
-    "mode3Tag": "5 languages",
+    "mode3Tag": "6 languages",
     "mode3": "Play in your language",
     "mode3Body": "Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.",
     "bottomTitle": "Your move. Make it loud.",
@@ -15545,7 +15740,7 @@ const en = {
     "teacherDashboard": "Teacher dashboard / analytics",
     "customWordLists": "Custom curriculum word lists",
     "wordFormation": "Word formation (spelling practice)",
-    "fiveLanguages": "5 languages with native dictionaries",
+    "fiveLanguages": "6 languages with native dictionaries",
     "charitableDonation": "Charitable donation angle",
     "bestFor": "Best for"
   },

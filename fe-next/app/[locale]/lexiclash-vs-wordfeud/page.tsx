@@ -185,7 +185,7 @@ export default async function LexiClashVsWordfeudPage({ params }: PageProps) {
                             { title: 'Multiplayer för 20+ spelare', desc: 'Skapa ett rum, dela koden, få in hela klassen eller hela festen samtidigt på samma rutnät. Wordfeud är begränsat till 1 mot 1.' },
                             { title: 'Klassrumsläge för lärare', desc: 'Egna ordlistor från läroplanen, vokabulärduells, lärardashboard med elevernas framsteg. Helt gratis utan elevregistrering. Saknas i Wordfeud.' },
                             { title: 'Brain Drills (6 minispel)', desc: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Snabba kognitionsövningar — finns inte i Wordfeud.' },
-                            { title: '5 språk i samma app', desc: 'Engelska, hebreiska (RTL), svenska, japanska, spanska. Användbart för språkstudier eller flerspråkiga vänner. Wordfeud fokuserar på nordiska språk var för sig.' },
+                            { title: '6 språk i samma app', desc: 'Engelska, hebreiska (RTL), svenska, japanska, spanska. Användbart för språkstudier eller flerspråkiga vänner. Wordfeud fokuserar på nordiska språk var för sig.' },
                             { title: 'Ingen registrering krävs', desc: 'Klicka Spela, ange smeknamn, kör. Konto är valfritt — för synk mellan enheter. Wordfeud kräver konto från start.' },
                         ].map((item) => (
                             <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
