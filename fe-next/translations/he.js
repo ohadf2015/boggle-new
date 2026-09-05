@@ -12947,7 +12947,11 @@ const he = {
       "shareGapAllFoundText": "{{lesson}} — הכיתה מצאה את כל מילות השיעור.",
       "shareGapCta": "שחקו משחק כיתה",
       "shareGapEyebrow": "פער הכיתה מהיום",
-      "shareGapPracticeHome": "מילים לתרגול בבית"
+      "shareGapPracticeHome": "מילים לתרגול בבית",
+      "postReteachLiveGoogleClassroom": "פרסמו תרגול Live של 3 דק׳ ל-Google Classroom",
+      "postReteachLiveGoogleClassroomTitle": "תרגול Live של 3 דק׳: {{lesson}}",
+      "postReteachLiveGoogleClassroomBody": "לחצו לתרגול Live של 3 דקות על המילים שאף אחד לא מצא: {{missed}}",
+      "startReteachLive": "התחלת תרגול Live"
     },
     "nav": {
       "section": "מורים",

@@ -11607,7 +11607,11 @@ const en = {
       "shareGapAllFoundText": "{{lesson}} — the class found every lesson word.",
       "shareGapCta": "Play a class game",
       "shareGapEyebrow": "Today's class gap",
-      "shareGapPracticeHome": "Words to practice at home"
+      "shareGapPracticeHome": "Words to practice at home",
+      "postReteachLiveGoogleClassroom": "Post 3-min reteach Live to Google Classroom",
+      "postReteachLiveGoogleClassroomTitle": "3-min reteach Live: {{lesson}}",
+      "postReteachLiveGoogleClassroomBody": "Tap for a 3-minute Live reteach on the words nobody found: {{missed}}",
+      "startReteachLive": "Start reteach Live"
     },
     "nav": {
       "section": "Teachers",

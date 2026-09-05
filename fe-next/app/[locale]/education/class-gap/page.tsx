@@ -6,8 +6,8 @@
  */
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { loadTranslation } from '@/translations/loadTranslation';
+import { ClassGapReteachLiveCta } from '@/components/education/ClassGapReteachLiveCta';
 import {
   buildClassGapOgImageUrl,
   interpClassGapTemplate,
@@ -99,6 +99,7 @@ export default async function ClassGapPage(props: PageProps) {
     total: payload.total,
   });
   const cta = readString(t, 'education.results.shareGapCta', 'Play a class game');
+  const reteachLive = readString(t, 'education.results.startReteachLive', 'Start reteach Live');
   const eyebrow = readString(t, 'education.results.shareGapEyebrow', "Today's class gap");
   const practiceHome = readString(t, 'education.results.shareGapPracticeHome', 'Words to practice at home');
   const allFound = readString(t, 'education.results.allFound', 'The class found every lesson word.');
@@ -137,12 +138,12 @@ export default async function ClassGapPage(props: PageProps) {
           </p>
         )}
 
-        <Link
-          href={`/${payload.locale}/education`}
-          className="mt-6 inline-flex w-full items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all"
-        >
-          {cta}
-        </Link>
+        <ClassGapReteachLiveCta
+          payload={payload}
+          reteachLabel={reteachLive}
+          educationHref={`/${payload.locale}/education`}
+          educationLabel={cta}
+        />
       </article>
     </main>
   );

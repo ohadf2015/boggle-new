@@ -16,8 +16,22 @@ import { shareWithFallback } from '@/utils/shareWithFallback';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
-    t: (key: string, params?: Record<string, string | number>) =>
-      params ? `${key}:${JSON.stringify(params)}` : key,
+    // Support t(key), t(key, params), and t(key, fallback, params) — same as ClassroomManager.
+    t: (
+      key: string,
+      second?: string | Record<string, string | number>,
+      third?: Record<string, string | number>,
+    ) => {
+      const fallback = typeof second === 'string' ? second : undefined;
+      const params = typeof second === 'object' && second !== null ? second : third;
+      let out = fallback ?? key;
+      for (const [k, v] of Object.entries(params ?? {})) {
+        out = out.split(`{{${k}}}`).join(String(v)).split(`{${k}}`).join(String(v));
+      }
+      // Keep prior test assertions that match on key:JSON when no fallback was passed.
+      if (!fallback && params) return `${key}:${JSON.stringify(params)}`;
+      return out;
+    },
   }),
 }));
 
@@ -162,4 +176,34 @@ describe('ClassroomResultsCard', () => {
       expect(screen.getByText('education.results.shareGapCopied')).toBeInTheDocument();
     });
   });
+}
+
+  it('offers the teacher a real Google Classroom link for a 3-min reteach Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const a = screen.getByTestId('post-reteach-live-google-classroom') as HTMLAnchorElement;
+    expect(a.tagName).toBe('A');
+    expect(a.target).toBe('_blank');
+    expect(a.rel).toContain('noopener');
+    const u = new URL(a.href);
+    expect(u.origin + u.pathname).toBe('https://classroom.google.com/share');
+    expect(u.searchParams.get('itemtype')).toBe('announcement');
+    const shared = new URL(u.searchParams.get('url')!);
+    expect(shared.origin).toBe('https://www.lexiclash.live');
+    expect(shared.pathname).toBe('/en/education/class-gap');
+    expect(shared.searchParams.get('missed')).toBe('neutron');
+    expect(shared.href).not.toContain('lexiclash.com');
+    expect(shared.href).not.toContain('Maya');
+  });
+
+  it('never offers a student the Google Classroom reteach Live post', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('post-reteach-live-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom reteach post when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('post-reteach-live-google-classroom')).not.toBeInTheDocument();
+  });
+
 });

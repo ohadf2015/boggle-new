@@ -19,9 +19,13 @@
 
 import { useState } from 'react';
 import { GraduationCap, Check, X, RotateCcw, Play, Share2 } from 'lucide-react';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import {
+  buildClassGapShareUrl,
+  buildReteachLiveGoogleClassroomShareUrl,
+} from '@/lib/education/classGapShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -44,6 +48,36 @@ export function ClassroomResultsCard({
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
+
+  /**
+   * Phase 1 Google Classroom share-dialog: post the class-gap card framed as a
+   * 3-min reteach Live. Real <a> (middle-clickable) — same contract as ClassroomManager.
+   * Null when there is nothing to reteach or the URL cannot be built.
+   */
+  const reteachLiveGoogleClassroomHref =
+    isTeacher && summary.missedWords.length > 0
+      ? (() => {
+          try {
+            const lesson = summary.lessonNames.join(', ');
+            return buildReteachLiveGoogleClassroomShareUrl({
+              locale: language,
+              lessonNames: summary.lessonNames,
+              teacherName: summary.teacherName,
+              found: summary.classFoundCount,
+              total: summary.totalWords,
+              missedWords: summary.missedWords,
+              title: t('education.results.postReteachLiveGoogleClassroomTitle', {
+                lesson,
+              }),
+              body: t('education.results.postReteachLiveGoogleClassroomBody', {
+                missed: summary.missedWords.join(', '),
+              }),
+            });
+          } catch {
+            return null;
+          }
+        })()
+      : null;
 
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
@@ -172,6 +206,23 @@ export function ClassroomResultsCard({
             {t('education.results.allFound')}
           </p>
         ))}
+
+      {reteachLiveGoogleClassroomHref && (
+        <a
+          href={reteachLiveGoogleClassroomHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="post-reteach-live-google-classroom"
+          className={cn(
+            'mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all'
+          )}
+        >
+          <GraduationCap className="w-4 h-4" aria-hidden />
+          {t('education.results.postReteachLiveGoogleClassroom')}
+        </a>
+      )}
 
       <button
         type="button"
