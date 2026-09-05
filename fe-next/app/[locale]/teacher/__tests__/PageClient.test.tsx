@@ -9,6 +9,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial: null }) }));
+// The Pro entitlement decides whether the upgrade strip shows at all. Default: a
+// resolved free teacher; individual tests override.
+let proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
 vi.mock('@/components/teacher/TeacherDashboard', () => ({ default: () => <div data-testid="teacher-dashboard" /> }));
 vi.mock('@/components/teacher/DistrictUpsellBanner', () => ({ DistrictUpsellBanner: () => <div /> }));
@@ -34,7 +38,28 @@ const teacherProfile = { user_role: 'teacher' as const, is_admin: false };
 const adminProfile  = { user_role: 'admin' as const,   is_admin: true  };
 
 describe('TeacherPage upgrade CTA', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
+  });
+
+  it('hides the upgrade strip for a Pro teacher (paid or gifted)', () => {
+    proState = { ...proState, hasPro: true, source: 'admin_grant' };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByRole('link', { name: /teacher\.upgradePro\.cta/i })).toBeNull();
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
+      'iap_viewed',
+      expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
+    );
+  });
+
+  it('shows no upsell while the entitlement is still loading', () => {
+    proState = { ...proState, loading: true };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByRole('link', { name: /teacher\.upgradePro\.cta/i })).toBeNull();
+  });
 
   it('shows upgrade link for non-admin teacher', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });

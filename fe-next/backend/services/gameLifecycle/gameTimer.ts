@@ -45,24 +45,64 @@ export function startGameTimer(
   // Reset AI validation count for this game (hybrid cost-saving)
   resetGameAIValidationCount(gameCode);
 
+  // Store timing info in game state for late joiners. Pause bookkeeping is
+  // reset here unconditionally: the game object is reused across rounds and a
+  // round that ended while paused must not start the next one frozen.
+  updateGame(gameCode, {
+    timerSeconds: timerSeconds,
+    isPaused: false,
+    pausedRemainingMs: null,
+    timerElapsedOffsetMs: 0,
+  });
+
+  launchGameInterval(io, gameCode, timerSeconds * 1000, 0);
+
+  // Start bots if any are in the game
+  startBotsForGame(io, gameCode, game.letterGrid, game.language, timerSeconds);
+
+  // NOTE: We do NOT broadcast 'startGame' here anymore.
+  // The game start has already been broadcast from gameLifecycleHandler with all necessary data.
+  // A second broadcast was causing issues with the second game in the same room getting stuck.
+}
+
+/**
+ * (Re)launch the per-second round interval.
+ *
+ * Shared by the fresh-round start and the teacher resume so both tick through
+ * ONE code path (word-hunt drain, timeUpdate broadcast, end-of-round). The end
+ * of the round is read from `game.timerEndTimestamp` on EVERY tick rather than
+ * captured here, so `extendGameTimer` can push it while the interval runs.
+ *
+ * @param remainingMs   how long the clock has left right now
+ * @param elapsedOffsetMs play-time already elapsed before this launch (pauses
+ *        excluded) — feeds the word-hunt drain-rate curve so a 60s pause does
+ *        not jump the drain to its late-game rate on resume.
+ */
+function launchGameInterval(
+  io: Server,
+  gameCode: string,
+  remainingMs: number,
+  elapsedOffsetMs: number,
+): void {
+  const game = getGame(gameCode);
+  if (!game) return;
+
   const intervalMs = parseInt(process.env.TIME_UPDATE_INTERVAL_MS || '1000', 10);
 
   // TIMESTAMP-BASED TIMING: Use actual elapsed time to prevent drift
-  const startTimestamp = Date.now();
-  const endTimestamp = startTimestamp + timerSeconds * 1000;
-
-  // Store timing info in game state for late joiners
-  // Note: Using any to allow dynamic properties that may not be in strict GameState type
-   
+  const launchedAt = Date.now();
+  const endTimestamp = launchedAt + remainingMs;
   updateGame(gameCode, {
-    timerSeconds: timerSeconds,
+    timerEndTimestamp: endTimestamp,
+    timerLaunchedAt: launchedAt,
+    timerElapsedOffsetMs: elapsedOffsetMs,
   });
 
   // Clear any existing timer
   clearGameTimer(gameCode);
 
   // Track last broadcast second to avoid duplicate broadcasts
-  let lastBroadcastSecond = timerSeconds;
+  let lastBroadcastSecond = Math.ceil(remainingMs / 1000);
 
   // Consecutive ticks observed with gameMode='word-hunt' but wordHuntState NULL.
   // Reset to 0 on any healthy tick so a late init cancels the self-heal.
@@ -76,15 +116,17 @@ export function startGameTimer(
     // endTimestamp — broadcasting to an empty room and eventually calling
     // endGame on a non-existent game. Kill ourselves immediately; deleteGame
     // also clears this timer, this is the belt-and-braces half.
-    if (!getGame(gameCode)) {
+    const currentGame = getGame(gameCode);
+    if (!currentGame) {
       clearGameTimer(gameCode);
       logger.warn('TIMER', `${gameCode}: tick fired for deleted game — interval self-cleared`);
       return;
     }
 
-    // Calculate remaining time based on actual elapsed time (prevents drift)
+    // Calculate remaining time based on actual elapsed time (prevents drift).
+    // The end is read live so a teacher "+30s" moves it without a relaunch.
     const now = Date.now();
-    const remainingMs = Math.max(0, endTimestamp - now);
+    const remainingMs = Math.max(0, (currentGame.timerEndTimestamp ?? endTimestamp) - now);
     const remainingTime = Math.ceil(remainingMs / 1000);
 
     // Only update game state when the second actually changed (avoids no-op Redis persist debounces)
@@ -96,22 +138,20 @@ export function startGameTimer(
     // Broadcast every second for accurate client timer display
     // Previous "smart broadcasting" (every 10s) caused player timers to stutter
     if (secondChanged) {
-      // Read gameSessionId fresh — `game` was captured at startGameTimer call
-      // and `updateGame` mutates in place so the closure is currently safe, but
+      // Read gameSessionId fresh — `game` was captured at launch and
+      // `updateGame` mutates in place so the closure is currently safe, but
       // reading via getGame() defends against any future immutable-update
       // refactor that would silently start broadcasting stale session ids and
       // make clients filter all `timeUpdate`s as stale.
-      const liveGame = getGame(gameCode);
       broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
         remainingTime,
-        gameSessionId: liveGame?.gameSessionId ?? game.gameSessionId,
+        gameSessionId: currentGame.gameSessionId ?? game.gameSessionId,
       });
     }
     lastBroadcastSecond = remainingTime;
 
     // Word Hunt: drain life from all non-eliminated players each tick
-    const currentGame = getGame(gameCode);
-    if (currentGame?.gameMode === 'word-hunt' && !currentGame.wordHuntState) {
+    if (currentGame.gameMode === 'word-hunt' && !currentGame.wordHuntState) {
       // Canary: gameMode says word-hunt but the state object is missing, so the
       // drain branch below is skipped (life frozen). A silent gate like this hid a
       // real production freeze for a long time — never let it be invisible again.
@@ -138,10 +178,12 @@ export function startGameTimer(
         return;
       }
     }
-    if (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState) {
+    if (currentGame.gameMode === 'word-hunt' && currentGame.wordHuntState) {
       nullWordHuntTicks = 0; // healthy tick — cancel any pending self-heal (late init)
       const huntState = currentGame.wordHuntState;
-      const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
+      // Play-time elapsed: what ran before this launch (pauses excluded) plus
+      // what has run since. Drives the drain-rate curve.
+      const elapsedSeconds = Math.floor((elapsedOffsetMs + (now - launchedAt)) / 1000);
       const { updatedLives, newlyEliminated } = drainLife(huntState, elapsedSeconds);
 
       // Update game state with drained lives
@@ -183,13 +225,122 @@ export function startGameTimer(
   }, intervalMs);
 
   setGameTimer(gameCode, timerId);
+}
 
-  // Start bots if any are in the game
-  startBotsForGame(io, gameCode, game.letterGrid, game.language, timerSeconds);
+// ---------------------------------------------------------------------------
+// Teacher live controls (classroom rooms) — pause / resume / extend
+// ---------------------------------------------------------------------------
 
-  // NOTE: We do NOT broadcast 'startGame' here anymore.
-  // The game start has already been broadcast from gameLifecycleHandler with all necessary data.
-  // A second broadcast was causing issues with the second game in the same room getting stuck.
+/** Bounds for a single "+N seconds" extension request. */
+export const EXTEND_TIME_MIN_SECONDS = 10;
+export const EXTEND_TIME_MAX_SECONDS = 120;
+
+/**
+ * Freeze the round clock.
+ *
+ * Clears the interval (so neither timeUpdate nor the word-hunt life drain
+ * fires) and records the exact remainder on game state. Everything that gates
+ * on the interval — orphan recovery, the start safety net, word submission —
+ * must check `game.isPaused` so a paused round is not mistaken for a stalled one.
+ *
+ * @returns the remaining whole seconds, or null when there was nothing to pause.
+ */
+export function pauseGameTimer(io: Server, gameCode: string): { remainingTime: number } | null {
+  const game = getGame(gameCode);
+  if (!game || !isInProgress(game.gameState) || game.isPaused) return null;
+
+  const now = Date.now();
+  const remainingMs = Math.max(0, (game.timerEndTimestamp ?? now) - now);
+  const elapsedOffsetMs = (game.timerElapsedOffsetMs ?? 0) + (now - (game.timerLaunchedAt ?? now));
+  const remainingTime = Math.ceil(remainingMs / 1000);
+
+  clearGameTimer(gameCode);
+  updateGame(gameCode, {
+    isPaused: true,
+    pausedRemainingMs: remainingMs,
+    timerElapsedOffsetMs: elapsedOffsetMs,
+    timerLaunchedAt: null,
+    remainingTime,
+  });
+
+  broadcastToRoom(io, getGameRoom(gameCode), 'gamePaused', {
+    remainingTime,
+    gameSessionId: game.gameSessionId,
+  });
+  logger.info('TIMER', `${gameCode}: paused by host with ${remainingTime}s left`);
+  return { remainingTime };
+}
+
+/**
+ * Un-freeze a paused round: relaunch the interval from the stored remainder.
+ *
+ * @returns the remaining whole seconds, or null when the game was not paused.
+ */
+export function resumeGameTimer(io: Server, gameCode: string): { remainingTime: number } | null {
+  const game = getGame(gameCode);
+  if (!game || !isInProgress(game.gameState) || !game.isPaused) return null;
+
+  const remainingMs = Math.max(0, game.pausedRemainingMs ?? 0);
+  const remainingTime = Math.ceil(remainingMs / 1000);
+
+  updateGame(gameCode, { isPaused: false, pausedRemainingMs: null, remainingTime });
+  launchGameInterval(io, gameCode, remainingMs, game.timerElapsedOffsetMs ?? 0);
+
+  broadcastToRoom(io, getGameRoom(gameCode), 'gameResumed', {
+    remainingTime,
+    gameSessionId: game.gameSessionId,
+  });
+  logger.info('TIMER', `${gameCode}: resumed by host with ${remainingTime}s left`);
+  return { remainingTime };
+}
+
+/**
+ * Add time to the current round (clamped to 10..120s per request).
+ *
+ * Running: pushes `timerEndTimestamp`, which the live interval reads each tick.
+ * Paused: grows the stored remainder so the eventual resume honours it. Either
+ * way an immediate `timeUpdate` follows so every client snaps to the new value
+ * instead of waiting for the next natural second boundary.
+ *
+ * @returns what was actually added + the new remainder, or null if not in progress.
+ */
+export function extendGameTimer(
+  io: Server,
+  gameCode: string,
+  seconds: number,
+): { addedSeconds: number; remainingTime: number } | null {
+  const game = getGame(gameCode);
+  if (!game || !isInProgress(game.gameState)) return null;
+  if (!Number.isFinite(seconds)) return null;
+
+  const addedSeconds = Math.min(EXTEND_TIME_MAX_SECONDS, Math.max(EXTEND_TIME_MIN_SECONDS, Math.round(seconds)));
+  const addedMs = addedSeconds * 1000;
+  const now = Date.now();
+
+  let remainingMs: number;
+  if (game.isPaused) {
+    remainingMs = Math.max(0, game.pausedRemainingMs ?? 0) + addedMs;
+    updateGame(gameCode, { pausedRemainingMs: remainingMs });
+  } else {
+    const newEnd = (game.timerEndTimestamp ?? now) + addedMs;
+    remainingMs = Math.max(0, newEnd - now);
+    updateGame(gameCode, { timerEndTimestamp: newEnd });
+  }
+  const remainingTime = Math.ceil(remainingMs / 1000);
+  updateGame(gameCode, { remainingTime });
+
+  const room = getGameRoom(gameCode);
+  broadcastToRoom(io, room, 'timeExtended', {
+    addedSeconds,
+    remainingTime,
+    gameSessionId: game.gameSessionId,
+  });
+  broadcastToRoom(io, room, 'timeUpdate', {
+    remainingTime,
+    gameSessionId: game.gameSessionId,
+  });
+  logger.info('TIMER', `${gameCode}: host added ${addedSeconds}s (${remainingTime}s left)`);
+  return { addedSeconds, remainingTime };
 }
 
 /**
@@ -216,6 +367,8 @@ export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Pr
   if (!game) return false;
   if (!isInProgress(game.gameState)) return false;
   if (hasGameTimer(gameCode)) return false;
+  // A teacher-paused round has no interval BY DESIGN — it is not orphaned.
+  if (game.isPaused) return false;
 
   // Re-register bot AI instances lost on restart. The Bot objects are in-memory
   // only; their identity survived on game.users. Reconstruct them (preserving

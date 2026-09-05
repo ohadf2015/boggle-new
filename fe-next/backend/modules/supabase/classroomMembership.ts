@@ -15,6 +15,36 @@ import { getSupabase } from './client';
 
 export type ClassroomRole = 'teacher' | 'student' | null;
 
+/** Mirrors `VocabularyLevel` in lib/supabase/education/types.ts (kept local: backend does not import frontend lib). */
+export type ClassroomLevel = 'support' | 'core' | 'challenge';
+const CLASSROOM_LEVELS: readonly ClassroomLevel[] = ['support', 'core', 'challenge'];
+
+/**
+ * The student's differentiation level in `classroomId` (classroom_memberships.level).
+ *
+ * Defaults to 'core' on EVERY miss — no row (teacher / guest / stranger), DB error,
+ * missing client, unexpected value — because a lookup failure must never change
+ * gameplay for a player who was already allowed in.
+ */
+export async function getClassroomMembershipLevel(
+  userId: string,
+  classroomId: string
+): Promise<ClassroomLevel> {
+  const client = getSupabase();
+  if (!client) return 'core';
+
+  const { data, error } = await client
+    .from('classroom_memberships')
+    .select('level')
+    .eq('classroom_id', classroomId)
+    .eq('student_id', userId)
+    .maybeSingle();
+
+  if (error || !data) return 'core';
+  const level = (data as { level?: unknown }).level;
+  return CLASSROOM_LEVELS.includes(level as ClassroomLevel) ? (level as ClassroomLevel) : 'core';
+}
+
 /**
  * Returns true if `userId` is the owning teacher of `classroomId`.
  * Returns false on missing supabase client, missing classroom, or mismatch.

@@ -61,6 +61,13 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
   // Stop timer (must use clearGameTimer which prefixes 'game:' to match setGameTimer key)
   clearGameTimer(gameCode);
 
+  // Teacher pause bookkeeping dies with the round: "End round now" while paused
+  // must not leave the room flagged paused for results / the next round.
+  game.isPaused = false;
+  game.pausedRemainingMs = null;
+  game.timerEndTimestamp = null;
+  game.timerLaunchedAt = null;
+
   // Clear any pending blast final-wave timer so it can't re-invoke endGame
   // if another path (human word / bot word) triggered endGame first.
   timerManager.clearTimer(`blastEnd:${gameCode}`);

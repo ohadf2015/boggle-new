@@ -235,6 +235,10 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       boardTheme: game.boardTheme || null,
       gameMode: game.gameMode || 'classic',
       gameSessionId: game.gameSessionId,
+      // Teacher pause: land the reconnecting student ON the pause. Mirrors the
+      // `requestGameState` recovery payload field-for-field (pitfall 3).
+      isPaused: !!game.isPaused,
+      remainingTime: game.remainingTime ?? game.timerSeconds,
       // Replay player's own found words so the in-game word panel isn't blank
       // after reconnect. Score totals come via updateLeaderboard below.
       myFoundWords: game.playerWords?.[username] || [],
@@ -329,6 +333,9 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     boardTheme: game.boardTheme || null,
     gameMode: game.gameMode || 'classic',
     gameSessionId: game.gameSessionId,
+    // Teacher pause — same fields as the reconnect payload above.
+    isPaused: !!game.isPaused,
+    remainingTime: game.remainingTime ?? game.timerSeconds,
   };
 
   // Include blast mode state for late joiners. getOrInitPlayerBoard lazily clones

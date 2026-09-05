@@ -30,6 +30,7 @@ export type PracticeType =
   | 'matching'
   | 'spelling'
   | 'blitz'
+  | 'vocab_focus'
   | 'lesson_completion';
 
 export interface EduPracticeStartArgs {

@@ -73,6 +73,7 @@ vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
   AnalyticsDashboard: () => <div>AnalyticsDashboard</div>,
 }));
 
+vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div data-testid="last-game-insights" /> }));
 import TeacherDashboard from '../TeacherDashboard';
 
 describe('<TeacherDashboard>', () => {

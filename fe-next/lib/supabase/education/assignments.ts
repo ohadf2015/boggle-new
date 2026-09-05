@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { LessonAssignment, TeacherAssignment } from './types';
+import { isVocabFocus, type PracticeFocusSetting } from '@/lib/education/vocabFocus';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -97,16 +98,22 @@ export async function createAssignment(data: {
   due_date?: string | null;
   title?: string | null;
   instructions?: string | null;
+  /** Vocabulary skill to drill (definition | synonym | antonym | context). `any`/unset = student picks. */
+  practice_focus?: PracticeFocusSetting | null;
 }): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
+    // Only write the column when a real focus was chosen, so the legacy insert
+    // shape is untouched on databases that have not run 20260905140000 yet.
+    const focus = isVocabFocus(data.practice_focus) ? { practice_focus: data.practice_focus } : {};
     const { data: assignment, error } = await supabase
       .from('lesson_assignments')
       .insert({
         classroom_id: data.classroom_id,
         lesson_id: data.lesson_id,
         due_date: data.due_date || null,
+        ...focus,
       })
       .select()
       .single();
@@ -263,6 +270,7 @@ export async function updateAssignment(
     due_date?: string | null;
     title?: string | null;
     instructions?: string | null;
+    practice_focus?: PracticeFocusSetting | null;
   }
 ): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };

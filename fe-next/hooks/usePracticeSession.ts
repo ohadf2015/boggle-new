@@ -1,13 +1,45 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
+import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { getWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
+import { wordsForLevel } from '@/lib/education/differentiation';
+import type { VocabularyLevel, VocabularyWord } from '@/lib/supabase/education/types';
+import type { VocabFocus } from '@/lib/education/vocabFocus';
+
+// =============================================
+// PRACTICE WORDS (per-student differentiation)
+// =============================================
+
+const NO_WORDS: VocabularyWord[] = [];
+
+/**
+ * The lesson words THIS student should practise, filtered by their classroom
+ * differentiation level (support/core → no challenge-tier words; challenge → all).
+ *
+ * This is the single choke point for solo practice word selection: every practice
+ * mode (flashcards, solo board, matching, spelling, blitz, word list) should take
+ * `words` from here rather than `lesson.words`, so a support student is never
+ * quizzed on a word the teacher tagged as challenge.
+ *
+ * Referentially stable for unchanged inputs so consumers can key effects on it.
+ */
+export function usePracticeWords<W extends Pick<VocabularyWord, 'level'>>(
+  words: readonly W[] | null | undefined
+): { words: W[]; level: VocabularyLevel; isLevelLoading: boolean } {
+  const { level, isLoading } = useStudentClassroom();
+  const filtered = useMemo(
+    () => (words && words.length > 0 ? wordsForLevel(words, level) : (NO_WORDS as unknown as W[])),
+    [words, level]
+  );
+  return { words: filtered, level, isLevelLoading: isLoading };
+}
 
 // Types
-export type PracticeType = 'flashcard' | 'solo_board' | 'warmup' | 'word_list' | 'matching' | 'spelling' | 'blitz';
+export type PracticeType = 'flashcard' | 'solo_board' | 'warmup' | 'word_list' | 'matching' | 'spelling' | 'blitz' | 'vocab_focus';
 export type MasteryLevel = 'not_started' | 'started' | 'practicing' | 'mastered';
 
 export interface PracticeSession {
@@ -46,6 +78,8 @@ export interface PracticeProgress {
 export interface StartSessionData {
   lessonId: string;
   practiceType: PracticeType;
+  /** vocab_focus only: which skill this session drills (stored in session results). */
+  focus?: VocabFocus;
 }
 
 export interface UpdateSessionData {
@@ -183,7 +217,10 @@ interface UsePracticeProgressState {
 
 interface UsePracticeProgressActions {
   refresh: () => Promise<void>;
-  startSession: (practiceType: PracticeType) => Promise<{ success: boolean; session?: PracticeSession; error?: string }>;
+  startSession: (
+    practiceType: PracticeType,
+    options?: { focus?: VocabFocus }
+  ) => Promise<{ success: boolean; session?: PracticeSession; error?: string }>;
 }
 
 export type UsePracticeProgressReturn = UsePracticeProgressState & UsePracticeProgressActions;
@@ -261,14 +298,19 @@ export function usePracticeProgress(
 
   // Start new practice session
   const startSession = useCallback(async (
-    practiceType: PracticeType
+    practiceType: PracticeType,
+    options?: { focus?: VocabFocus }
   ): Promise<{ success: boolean; session?: PracticeSession; error?: string }> => {
     if (!lessonId) {
       return { success: false, error: 'No lesson ID' };
     }
 
     try {
-      const { session, error } = await startSessionAPI({ lessonId, practiceType });
+      const { session, error } = await startSessionAPI({
+        lessonId,
+        practiceType,
+        ...(options?.focus ? { focus: options.focus } : {}),
+      });
 
       if (error || !session) {
         return { success: false, error: error || 'Failed to start session' };

@@ -42,7 +42,7 @@ interface SummaryWordDetail {
  * lesson word ending in ם/ן/ך/ף/ץ even when the whole class found it — the same
  * asymmetric-compare class of bug as the handoff gate. Normalize BOTH sides.
  */
-function matchKey(word: string, language: Language): string {
+export function matchKey(word: string, language: Language): string {
   return normalizeWord(word.trim(), language).toUpperCase();
 }
 

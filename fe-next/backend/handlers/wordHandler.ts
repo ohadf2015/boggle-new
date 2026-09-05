@@ -234,6 +234,15 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
+      // Teacher pause (classroom rooms): the board is frozen for everyone. The
+      // client overlay blocks input, but an in-flight drag / keyboard submit can
+      // still land here — the server is the source of truth. Bounce with the
+      // same small wordRejected shape the client already handles (tile clears).
+      if (game.isPaused) {
+        socket.emit('wordRejected', { word: word.toLowerCase().trim().substring(0, 50), reason: 'paused' });
+        return;
+      }
+
       // Grace period lock: Prevent race conditions in multi-instance deployments
       // where multiple late word submissions could be processed in parallel
       if (isWithinGracePeriod) {

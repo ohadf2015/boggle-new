@@ -39,3 +39,22 @@ describe('pickTeacherBanner', () => {
     results.forEach((r) => expect(typeof r).toBe('string'));
   });
 });
+
+/**
+ * A Pro teacher — paid or gifted — must never be asked to upgrade. Until this
+ * case existed the dashboard showed "Upgrade to Pro" above a Pro teacher's
+ * dashboard, which reads as "your Pro did not take".
+ */
+describe('pickTeacherBanner for a Pro teacher', () => {
+  it('shows nothing to a Pro teacher with no trial', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: true })).toBe('none');
+  });
+
+  it('shows nothing while the entitlement is still unknown — never an upsell that a later answer retracts', () => {
+    expect(pickTeacherBanner({ hasTrial: false, isAdmin: false, hasPro: false, proLoading: true })).toBe('none');
+  });
+
+  it('a Pro teacher still sees an active trial countdown', () => {
+    expect(pickTeacherBanner({ hasTrial: true, isAdmin: false, hasPro: true })).toBe('trial');
+  });
+});

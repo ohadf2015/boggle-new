@@ -54,6 +54,7 @@ import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
 import { useTimerStallWatchdog } from '../hooks/useTimerStallWatchdog';
+import { useTeacherPaused } from '../hooks/useTeacherPause';
 import { addGameBreadcrumb } from '../utils/sentry';
 
 // ==========================================
@@ -281,9 +282,11 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Stall watchdog — see PlayerView for rationale. Host display can desync the
   // same way (server clock unstarted, gameSessionId drift); recovery emits
   // `requestGameState` to force a fresh `startGame` with current remainingTime.
+  // A teacher pause is a frozen clock BY DESIGN — not a stall to recover from.
+  const teacherPaused = useTeacherPaused();
   useTimerStallWatchdog({
     remainingTime: state.runtime.remainingTime,
-    gameActive: state.runtime.gameStarted || (!!state.runtime.tableData && !!state.runtime.remainingTime && state.runtime.remainingTime > 0),
+    gameActive: !teacherPaused && (state.runtime.gameStarted || (!!state.runtime.tableData && !!state.runtime.remainingTime && state.runtime.remainingTime > 0)),
     waitingForResults: state.runtime.waitingForResults,
     onStall: () => {
       if (state.tournament.finalScores) return;

@@ -6,6 +6,8 @@ export { default as WarmupRound } from './WarmupRound';
 export { default as WordMatchingPractice } from './WordMatchingPractice';
 export { default as SpellingChallengePractice } from './SpellingChallengePractice';
 export { default as TimedBlitzPractice } from './TimedBlitzPractice';
+export { default as VocabFocusPractice } from './VocabFocusPractice';
+export type { VocabFocusPracticeProps, VocabFocusResults } from './VocabFocusPractice';
 
 // New unified practice components
 export { QuickPracticeButton } from './QuickPracticeButton';

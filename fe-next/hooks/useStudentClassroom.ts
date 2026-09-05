@@ -4,11 +4,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
 import { getStudentClassroom, type Classroom } from '@/lib/supabase/education';
+import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import logger from '@/utils/logger';
 
 interface UseStudentClassroomState {
   classroom: Classroom | null;
   classroomId: string | null;
+  /**
+   * The student's differentiation tier in this classroom (their own membership row).
+   * 'core' until loaded and whenever unknown — pessimistic default, never hides words.
+   */
+  level: VocabularyLevel;
   isLoading: boolean;
   error: string | null;
 }
@@ -22,6 +28,7 @@ export type UseStudentClassroomReturn = UseStudentClassroomState & UseStudentCla
 const INITIAL_STATE: UseStudentClassroomState = {
   classroom: null,
   classroomId: null,
+  level: 'core',
   isLoading: true,
   error: null,
 };
@@ -29,6 +36,7 @@ const INITIAL_STATE: UseStudentClassroomState = {
 const EMPTY_STATE: UseStudentClassroomState = {
   classroom: null,
   classroomId: null,
+  level: 'core',
   isLoading: false,
   error: null,
 };
@@ -55,7 +63,7 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
     }
 
     try {
-      const { data, error } = await getStudentClassroom(user.id);
+      const { data, level, error } = await getStudentClassroom(user.id);
 
       if (isMounted.current) {
         if (error) {
@@ -64,6 +72,7 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
           setState({
             classroom: data,
             classroomId: data?.id || null,
+            level: level ?? 'core',
             isLoading: false,
             error: null,
           });

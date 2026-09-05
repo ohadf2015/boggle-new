@@ -23,6 +23,7 @@ import MusicControls from '@/components/MusicControls';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import { EducationBreadcrumbs } from './EducationBreadcrumbs';
 import { useSafeArea } from '@/hooks/useSafeArea';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 interface EducationHeaderProps {
   /** Additional class names */
@@ -94,8 +95,11 @@ export const EducationHeader = memo<EducationHeaderProps>(({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [showMobileMenu]);
 
-  // Determine if user is a teacher (for menu options)
-  const isTeacher = profile?.is_admin === true;
+  // Determine if user is a teacher (for menu options). This was `is_admin === true`,
+  // which hid the "Teacher dashboard" link from every actual teacher — the one
+  // shared predicate (`user_role` teacher/admin, or is_admin) is what /teacher
+  // itself gates on.
+  const isTeacher = isTeacherProfile(profile);
 
   // Determine current section for active state
   const isOnTeacherSection = pathname?.includes('/teacher');

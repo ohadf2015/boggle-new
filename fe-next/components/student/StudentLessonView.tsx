@@ -11,13 +11,16 @@ import { useRouter } from 'next/navigation';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
+import { useStudentClassroom } from '@/hooks/useStudentClassroom';
+import { wordsForLevel } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
-import { BookOpen, Award, Activity, Star } from 'lucide-react';
+import { BookOpen, Award, Activity, Star, Crosshair } from 'lucide-react';
 import type { PracticeType } from '@/hooks/usePracticeSession';
+import { readAssignmentFocus, focusPracticeHref } from '@/lib/education/vocabFocus';
 
 // --- Animation variants ---
 
@@ -79,6 +82,10 @@ export default function StudentLessonView() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { lessons, isLoading, error } = useStudentProgress();
+  // Per-student differentiation: the count / mastery denominator is the words THIS
+  // student practises at their level, not the whole lesson — otherwise a support
+  // student can never reach 100%.
+  const { level } = useStudentClassroom();
 
   const activeLessonCount = lessons.filter((l) => l.status !== 'completed').length;
 
@@ -155,13 +162,15 @@ export default function StudentLessonView() {
       {lessons.map((studentLesson, index) => {
         const { status, lesson, progress } = studentLesson;
 
-        const lessonWords = lesson?.words || [];
+        const lessonWords = wordsForLevel(lesson?.words || [], level);
         const totalWords = lessonWords.length || 1;
         const masteredWords = (progress?.words_mastered || []).length;
         const masteryPercent = progress ? Math.round((masteredWords / totalWords) * 100) : 0;
 
         const lessonName =
           lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
+        // Teacher pinned one vocabulary skill on this assignment → offer it first
+        const assignedFocus = readAssignmentFocus(studentLesson.assignment);
 
         // Card colors per status
         const cardBg =
@@ -278,7 +287,22 @@ export default function StudentLessonView() {
                 </div>
 
                 {/* Practice button */}
-                <div className="sm:shrink-0 w-full sm:w-auto">
+                <div className="sm:shrink-0 w-full sm:w-auto flex flex-col gap-2">
+                  {assignedFocus && (
+                    <Button
+                      size="lg"
+                      data-testid="assigned-focus-practice"
+                      onClick={() => router.push(focusPracticeHref(language, studentLesson.lessonId, assignedFocus))}
+                      className={cn(
+                        'w-full sm:w-auto font-neo-display',
+                        'bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black',
+                        'border-neo border-neo-black shadow-hard hover:shadow-hard-lg'
+                      )}
+                    >
+                      <Crosshair className="w-5 h-5 me-2" aria-hidden="true" />
+                      {t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) })}
+                    </Button>
+                  )}
                   <QuickPracticeButton
                     lessonId={studentLesson.lessonId}
                     onPractice={(mode: PracticeType) => {

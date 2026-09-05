@@ -16,7 +16,14 @@ import {
   validateTargetGuess,
   recordTargetFound,
   penalizeWrongGuess,
+  selectTargetWordWithFallback,
+  initWordHuntState,
+  recordMpTarget,
+  getRecentMpTargets,
 } from '../modules/wordHuntManager.js';
+import { findAllWordsAsync } from '../modules/wordValidatorPool.js';
+import { getCachedTrie } from '../modules/boggleSolver.js';
+import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import {
   broadcastToRoom,
   getGameRoom,
@@ -83,6 +90,12 @@ export function handleSubmitTargetWord(
 
   if (game.gameMode !== 'word-hunt') {
     socket.emit('error', { message: 'Not a word-hunt game' });
+    return;
+  }
+
+  // Teacher pause (classroom rooms): no guesses, no life penalties, nothing.
+  if (game.isPaused) {
+    socket.emit('error', { message: 'Game is paused' });
     return;
   }
 
@@ -203,6 +216,70 @@ export function handleSubmitTargetWord(
       logger.info('WORD_HUNT', `${username} eliminated in ${gameCode} (wrong guess)`);
     }
   }
+}
+
+/**
+ * Teacher control: replace the current target with a fresh one from the SAME
+ * board (a target nobody in a special-ed class can reasonably find, or one
+ * that turned out to be inappropriate for the room).
+ *
+ * Target-scoped state (finder flags, per-player attempt counts) resets; round-
+ * scoped state (lives, eliminations, board word scores) is untouched — the
+ * students keep what they earned. Refused once the target has been found: the
+ * round is already ending (3s celebration timer) and re-targeting would race it.
+ *
+ * @returns the new target's length/category for the caller, or null when no
+ *          swap happened (wrong mode, already found, no other candidate).
+ */
+export async function skipWordHuntTarget(
+  io: Server,
+  gameCode: string,
+): Promise<{ targetLength: number; targetCategory: string | null } | null> {
+  const game = getGame(gameCode);
+  if (!game || game.gameState !== 'in-progress' || game.gameMode !== 'word-hunt') return null;
+  const huntState = game.wordHuntState;
+  if (!huntState || huntState.targetFoundBy || !game.letterGrid) return null;
+
+  const lang = game.language || 'en';
+  const previousTarget = huntState.targetWord;
+
+  // Same solve the round-start path uses, so the new target is guaranteed on-board.
+  const trie = getCachedTrie(lang);
+  const allValidWords = await findAllWordsAsync(game.letterGrid, lang, {
+    minLength: 3, maxLength: 8, maxWords: 10000, trie,
+  });
+
+  // Never hand back the word we are skipping, nor a recent target (LRU).
+  const exclude = new Set<string>(getRecentMpTargets(lang));
+  exclude.add(previousTarget.toLowerCase());
+  const newTarget = selectTargetWordWithFallback(
+    allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, lang, exclude,
+  );
+  if (!newTarget) {
+    logger.warn('WORD_HUNT', `${gameCode}: skipTargetWord found no alternative to "${previousTarget}" — target kept`);
+    return null;
+  }
+  recordMpTarget(lang, newTarget);
+
+  // Reuse the round-start initializer for the derived target fields (length,
+  // category) so a future field added there is not forgotten here.
+  const fresh = initWordHuntState(newTarget, Object.keys(huntState.playerLives), lang);
+  huntState.targetWord = fresh.targetWord;
+  huntState.targetWordLength = fresh.targetWordLength;
+  huntState.targetCategory = fresh.targetCategory;
+  huntState.targetFoundBy = null;
+  huntState.isFirstFinderClaimed = false;
+  huntState.finderCount = 0;
+  huntState.playerAttempts = {};
+
+  broadcastToRoom(io, getGameRoom(gameCode), 'wordHuntTargetSkipped', {
+    previousTarget,
+    wordHuntTargetLength: huntState.targetWordLength,
+    wordHuntTargetCategory: huntState.targetCategory ?? null,
+  });
+  logger.info('WORD_HUNT', `${gameCode}: host skipped target "${previousTarget}" → "${newTarget}"`);
+
+  return { targetLength: huntState.targetWordLength, targetCategory: huntState.targetCategory ?? null };
 }
 
 /**

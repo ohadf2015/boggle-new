@@ -412,7 +412,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // forever — server re-emits startGame with the same stale remainingTime
       // and never restarts the clock. Defense-in-depth: idempotent, safe to
       // call when timer is already running (`startGameTimer` clears first).
-      if (!hasGameTimer(gameCode)) {
+      // A teacher-paused round has no interval BY DESIGN — never "recover" it.
+      if (!hasGameTimer(gameCode) && !game.isPaused) {
         const recoverySeconds = game.remainingTime ?? game.timerSeconds;
         if (recoverySeconds && recoverySeconds > 0) {
           logger.info('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
@@ -444,6 +445,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         boardTheme: game.boardTheme || null,
         gameMode: recoveryGameMode,
         gameSessionId: game.gameSessionId,
+        // Teacher pause: a student who reconnects mid-pause must land ON the
+        // pause (overlay up, clock frozen). Same fields as the `join` reconnect
+        // path in playerReconnectHandler — keep them identical (pitfall 3).
+        isPaused: !!game.isPaused,
+        remainingTime: game.remainingTime ?? game.timerSeconds,
         ...(recoveryGameMode === 'blast' && game.blastModeState ? {
           blastTileOverlay: game.blastModeState.overlay || [],
           blastSeed: game.blastModeState.seed ?? null,

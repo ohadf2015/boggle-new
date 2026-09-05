@@ -38,6 +38,7 @@ import { registerLobbyEmoteHandlers } from './lobbyEmoteHandler.js';
 import { registerLobbyAdGateHandlers } from './lobbyAdGateHandler.js';
 import { registerGiftHandlers } from './giftHandler.js';
 import { registerBoostHandlers } from './boostHandler.js';
+import { registerTeacherControlsHandlers } from './teacherControlsHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -81,6 +82,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerLobbyAdGateHandlers(io, socket);
   registerGiftHandlers(io, socket);
   registerBoostHandlers(io, socket);
+  registerTeacherControlsHandlers(io, socket);
 }
 
 export {

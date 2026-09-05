@@ -28,8 +28,12 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { DuelMonitoringPanel } from './dashboard';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
+import { LastGameInsights } from './analytics/LastGameInsights';
 import { ProGate } from './ProGate';
 import { CurriculumWordListBrowser } from './curriculum/CurriculumWordListBrowser';
+import { TeacherPlanBadge } from './TeacherPlanBadge';
+import { ProWelcomeCelebration } from './ProWelcomeCelebration';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 import {
   Gamepad2, BookOpen, BarChart3, FileText, Users, Swords, HelpCircle, Plus,
 } from 'lucide-react';
@@ -72,6 +76,9 @@ export default function TeacherDashboard() {
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
+  // Only for the one-time gifted-Pro celebration; the header chip reads the
+  // entitlement itself. The hook de-duplicates the request across consumers.
+  const { grant: proGrant, loading: proLoading } = useTeacherPro();
 
   useEffect(() => {
     if (activeTab !== 'prepare') {
@@ -120,6 +127,7 @@ export default function TeacherDashboard() {
         forceShow={showTutorial}
         onDismiss={() => setShowTutorial(false)}
       />
+      {!proLoading && <ProWelcomeCelebration grant={proGrant} />}
 
       <m.div
         className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1"
@@ -137,6 +145,10 @@ export default function TeacherDashboard() {
               <p className="text-sm text-neo-white font-neo-body mt-1">
                 {t('teacher.dashboard.subtitle')}
               </p>
+              {/* The plan, at a glance — a gifted teacher must be able to SEE the
+                  gift took, and a free teacher must never wonder which plan they
+                  are on. */}
+              <TeacherPlanBadge className="mt-3" />
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
@@ -399,6 +411,23 @@ export default function TeacherDashboard() {
                 </div>
               ) : (
                 <>
+                  {/* Last class game — free for every teacher, above the Pro gate.
+                      "Which words did we miss in the round we just played" is the
+                      question a teacher has at the bell; the cross-game trend view
+                      below is what Pro sells. */}
+                  {selectedClassroomId && (
+                    <section>
+                      {classroomSelect}
+                      <LastGameInsights
+                        classroomId={selectedClassroomId}
+                        onCreateReviewLesson={(words) => {
+                          const wordsParam = encodeURIComponent(words.join(','));
+                          router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
+                        }}
+                      />
+                    </section>
+                  )}
+
                   {/* Analytics */}
                   <section>
                     <div className="flex items-center gap-2 mb-4">
@@ -407,7 +436,6 @@ export default function TeacherDashboard() {
                         {t('teacher.dashboard.analytics')}
                       </h2>
                     </div>
-                    {classroomSelect}
                     {selectedClassroomId && (
                       <ProGate feature="analytics">
                         <AnalyticsDashboard

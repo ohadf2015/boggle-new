@@ -15,6 +15,7 @@ import { useHints } from '../hooks/useHints';
 import { useGameTimer } from '../hooks/useGameTimer';
 import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
 import { useTimerStallWatchdog } from '../hooks/useTimerStallWatchdog';
+import { useTeacherPaused } from '../hooks/useTeacherPause';
 import { addGameBreadcrumb } from '../utils/sentry';
 import logger from '@/utils/logger';
 import type { TournamentStanding } from '@/types';
@@ -164,9 +165,11 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Multiplayer timer - uses timestamp-based countdown that syncs with server
   // Initial time will be set when game starts via socket event
+  // Teacher live controls: a paused classroom round freezes the local tick too.
+  const teacherPaused = useTeacherPaused();
   const gameTimer = useGameTimer({
     initialTime: 180, // Default, will be updated on game start
-    isPaused: !gameActive, // Pause when game is not active
+    isPaused: !gameActive || teacherPaused, // not active, or frozen by the teacher
     autoStart: false, // Don't auto-start, wait for game to become active
     onTimeUp: () => {
       // Time up is handled by server, this is just for local display
@@ -206,7 +209,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // re-emit `startGame` with the fresh `remainingTime` via `requestGameState`.
   useTimerStallWatchdog({
     remainingTime,
-    gameActive,
+    // A teacher pause is a frozen clock BY DESIGN — not a stall to recover from.
+    gameActive: gameActive && !teacherPaused,
     waitingForResults,
     onStall: () => {
       logger.log('[PLAYER] Timer-stall watchdog: remainingTime frozen — requesting fresh game state');

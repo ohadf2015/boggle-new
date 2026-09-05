@@ -285,6 +285,12 @@ export function startBotsForGame(
         // Get current game state for mode-specific logic
         const currentGame = getGame(gameCode);
 
+        // Teacher pause: bots freeze with everyone else. Their word schedule
+        // keeps running (scheduleNextWord chains regardless of this callback's
+        // result), so words that fall inside the pause are simply dropped —
+        // the bot resumes scoring on its next scheduled word after resume.
+        if (currentGame?.isPaused) return;
+
         // Bug fix: Calculate blast mode tile bonus (same as human path)
         let blastTileBonus = 0;
         if (currentGame?.gameMode === 'blast' && currentGame.blastModeState) {

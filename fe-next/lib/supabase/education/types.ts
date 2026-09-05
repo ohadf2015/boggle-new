@@ -45,10 +45,25 @@ export interface Classroom {
   member_count?: number;
 }
 
+/**
+ * Differentiation tier. Absent means `core`. A student's own level (on
+ * `classroom_memberships.level`) decides which tiers they practise; the live
+ * board is shared, so there the level drives scaffolding (word bank) instead.
+ */
+export type VocabularyLevel = 'support' | 'core' | 'challenge';
+
 export interface VocabularyWord {
   word: string;
   definition?: string;
   canIntegrate: boolean;
+  /** Differentiation tier. Absent = core. */
+  level?: VocabularyLevel;
+  /** For synonym practice. Free text, teacher-entered. */
+  synonyms?: string[];
+  /** For antonym practice. */
+  antonyms?: string[];
+  /** Example sentence for context-clue practice; `___` marks the blank. */
+  example?: string;
 }
 
 export interface VocabularyLesson {
@@ -107,6 +122,8 @@ export interface ClassroomStudent {
   student_id: string;
   classroom_id: string;
   joined_at: string;
+  /** Teacher-set differentiation tier for this student in this classroom. Defaults to core. */
+  level: VocabularyLevel;
   profiles: any; // Supabase returns array, need to normalize
 }
 

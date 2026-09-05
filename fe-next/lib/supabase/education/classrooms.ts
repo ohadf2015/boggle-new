@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import type { Classroom, ClassroomWithMembers, ClassroomStudent } from './types';
+import type { Classroom, ClassroomWithMembers, ClassroomStudent, VocabularyLevel } from './types';
+import { isVocabularyLevel } from '@/lib/education/differentiation';
 
 /**
  * Get all classrooms for a teacher
@@ -262,8 +263,8 @@ export async function joinClassroom(
  */
 export async function getStudentClassroom(
   studentId: string
-): Promise<{ data: Classroom | null; error: { message: string } | null }> {
-  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+): Promise<{ data: Classroom | null; level: VocabularyLevel; error: { message: string } | null }> {
+  if (!supabase) return { data: null, level: 'core', error: { message: 'Supabase not configured' } };
 
   try {
     // Query membership with joined classroom info, ordered by join date (most recent first)
@@ -273,6 +274,7 @@ export async function getStudentClassroom(
         id,
         classroom_id,
         joined_at,
+        level,
         classrooms (
           id,
           teacher_id,
@@ -290,21 +292,25 @@ export async function getStudentClassroom(
 
     if (membershipError) {
       logger.error('Error fetching student classroom:', membershipError);
-      return { data: null, error: { message: membershipError.message } };
+      return { data: null, level: 'core', error: { message: membershipError.message } };
     }
 
     if (!membership || !membership.classrooms) {
-      return { data: null, error: null };
+      return { data: null, level: 'core', error: null };
     }
 
     // Extract classroom from the nested structure
     const classroom = membership.classrooms as unknown as Classroom;
+    // `level` is the student's OWN differentiation tier in THIS classroom (their own
+    // row is readable under "Students can view own memberships"). Pre-migration rows
+    // and test doubles have no column — treat as core, never as undefined.
+    const level = coerceLevel((membership as { level?: unknown }).level);
 
-    return { data: classroom, error: null };
+    return { data: classroom, level, error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getStudentClassroom:', error);
-    return { data: null, error: { message: error } };
+    return { data: null, level: 'core', error: { message: error } };
   }
 }
 
@@ -320,7 +326,7 @@ export async function getClassroomStudents(
     // First, get all memberships for this classroom
     const { data: memberships, error: membershipError } = await supabase
       .from('classroom_memberships')
-      .select('id, student_id, classroom_id, joined_at')
+      .select('id, student_id, classroom_id, joined_at, level')
       .eq('classroom_id', classroomId)
       .order('joined_at', { ascending: true });
 
@@ -361,6 +367,7 @@ export async function getClassroomStudents(
     // Combine memberships with their profiles
     const studentsWithProfiles = memberships.map(membership => ({
       ...membership,
+      level: coerceLevel((membership as { level?: unknown }).level),
       profiles: profileMap.get(membership.student_id) || null,
     }));
 
@@ -369,5 +376,47 @@ export async function getClassroomStudents(
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getClassroomStudents:', error);
     return { data: [], error: { message: error } };
+  }
+}
+
+/** Unknown/absent → core. The DB CHECK guarantees the value, but old rows and mocks may lack the column. */
+function coerceLevel(value: unknown): VocabularyLevel {
+  return isVocabularyLevel(value) ? value : 'core';
+}
+
+/**
+ * Set a student's differentiation level in a classroom (teacher-owner only).
+ *
+ * Goes through the API route rather than a direct table write: the update must run
+ * on the service role and assert one row changed — under RLS a direct client update
+ * that matches nothing returns error:null and looks like success.
+ */
+export async function setStudentLevel(
+  classroomId: string,
+  studentId: string,
+  level: VocabularyLevel
+): Promise<{ error: { message: string } | null }> {
+  try {
+    const response = await fetch(
+      `/api/education/classroom/${encodeURIComponent(classroomId)}/members/${encodeURIComponent(studentId)}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level }),
+      }
+    );
+    if (!response.ok) {
+      let message = `Failed to update level (${response.status})`;
+      try {
+        const data = await response.json();
+        if (typeof data?.error === 'string') message = data.error;
+      } catch { /* non-JSON error body */ }
+      return { error: { message } };
+    }
+    return { error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to update level';
+    logger.error('Exception in setStudentLevel:', message);
+    return { error: { message } };
   }
 }

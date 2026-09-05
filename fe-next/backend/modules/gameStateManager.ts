@@ -363,6 +363,14 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.minWordLength = undefined;
   game.lastActivity = Date.now();
   game.gameEndedAt = null;
+  // Teacher live-controls clock state (classroom rooms). Unconditional, like
+  // the round-scoped scoring flags below: a room reset while paused must start
+  // its next round running.
+  game.isPaused = false;
+  game.pausedRemainingMs = null;
+  game.timerEndTimestamp = null;
+  game.timerLaunchedAt = null;
+  game.timerElapsedOffsetMs = 0;
   game.wordHuntState = null;
   game.blastModeState = null;
   game.wheelRushState = null;

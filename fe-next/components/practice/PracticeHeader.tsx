@@ -67,6 +67,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
       matching: t('education.practice.matching'),
       spelling: t('education.practice.spelling'),
       blitz: t('education.practice.blitz'),
+      vocab_focus: t('education.vocabFocus.title'),
     };
     return labels[type];
   };

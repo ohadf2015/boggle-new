@@ -13,8 +13,9 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
-import { containsHebrew, type Language, type VocabularyWord } from '@/lib/supabase/education/types';
+import { containsHebrew, type Language, type VocabularyWord, type VocabularyLevel } from '@/lib/supabase/education/types';
 import { sanitizeWord } from '@/shared/utils/wordNormalization';
+import { withBlank } from '@/lib/education/vocabFocus';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -39,6 +40,17 @@ interface ValidationResult {
   definition?: string;
   rowNumber: number;
   hasNiqqud: boolean;
+  extras: Omit<ParsedImportLine, 'word' | 'definition'>;
+}
+
+/** One pasted line, fully parsed. Optional keys are absent (not undefined) when missing. */
+export interface ParsedImportLine {
+  word: string;
+  definition: string;
+  synonyms?: string[];
+  antonyms?: string[];
+  example?: string;
+  level?: VocabularyLevel;
 }
 
 // ============================================
@@ -47,6 +59,48 @@ interface ValidationResult {
 
 // Delimiter pattern: requires spaces around - – — or : to avoid splitting hyphenated words
 const DEFINITION_DELIMITER = /^(.+?)\s+[-–—:]\s+(.+)$/;
+// Extra columns come after ` | ` segments: `syn: a, b | ant: c | ex: The ___ ran. | level: challenge`
+const SEGMENT_SPLIT = /\s*\|\s*/;
+const SEGMENT_KEY = /^([a-z]+)\s*:\s*(.+)$/i;
+const LEVELS: readonly VocabularyLevel[] = ['support', 'core', 'challenge'];
+
+const toList = (value: string): string[] =>
+  value.split(/[,;、，]/).map((s) => s.trim()).filter((s) => s.length > 0);
+
+/**
+ * Parse one import line. Supports the legacy `word - definition` form plus
+ * optional pipe-separated extras (any order, long or short keys):
+ *   `word - definition | syn: a, b | ant: c | ex: The ___ ran. | level: challenge`
+ */
+export function parseBulkImportLine(line: string): ParsedImportLine {
+  const [head = '', ...segments] = line.trim().split(SEGMENT_SPLIT);
+  const match = head.match(DEFINITION_DELIMITER);
+  const result: ParsedImportLine = match
+    ? { word: match[1].trim(), definition: match[2].trim() }
+    : { word: head.trim(), definition: '' };
+
+  for (const segment of segments) {
+    const keyed = segment.match(SEGMENT_KEY);
+    if (!keyed) continue;
+    const key = keyed[1].toLowerCase();
+    const value = keyed[2].trim();
+    if (!value) continue;
+    if (key === 'syn' || key === 'synonym' || key === 'synonyms') {
+      const list = toList(value);
+      if (list.length) result.synonyms = list;
+    } else if (key === 'ant' || key === 'antonym' || key === 'antonyms') {
+      const list = toList(value);
+      if (list.length) result.antonyms = list;
+    } else if (key === 'ex' || key === 'example') {
+      // Insert the blank when the teacher wrote the word out in full.
+      result.example = withBlank(value, result.word) ?? value;
+    } else if (key === 'level' || key === 'lvl') {
+      const level = value.toLowerCase() as VocabularyLevel;
+      if (LEVELS.includes(level)) result.level = level;
+    }
+  }
+  return result;
+}
 
 export default function BulkImportEnhanced({
   isOpen,
@@ -83,21 +137,22 @@ export default function BulkImportEnhanced({
       .map((w) => w.trim())
       .filter((w) => w.length > 0);
 
-    // Detect definition mode: if 50%+ lines match delimiter pattern
-    const matchCount = cleanedLines.filter((line) => DEFINITION_DELIMITER.test(line)).length;
+    // Detect definition mode: if 50%+ lines match delimiter pattern (on the
+    // part before any ` | ` extras)
+    const matchCount = cleanedLines.filter((line) => DEFINITION_DELIMITER.test(line.split(SEGMENT_SPLIT)[0])).length;
     const isDefinitionMode = cleanedLines.length > 0 && matchCount / cleanedLines.length >= 0.5;
 
     // Parse and validate each line
     return cleanedLines.map((line, index) => {
-      let originalWord = line;
-      let definition = '';
+      const parsed = parseBulkImportLine(line);
+      const { word: parsedWord, definition: parsedDefinition, ...extras } = parsed;
+      let originalWord = parsedWord;
+      let definition = parsedDefinition;
 
-      if (isDefinitionMode) {
-        const match = line.match(DEFINITION_DELIMITER);
-        if (match) {
-          originalWord = match[1].trim();
-          definition = match[2].trim();
-        }
+      if (!isDefinitionMode && !line.includes('|')) {
+        // Legacy behaviour: without definition mode the whole line is the word
+        originalWord = line;
+        definition = '';
       }
 
       // Check for Hebrew niqqud
@@ -117,6 +172,7 @@ export default function BulkImportEnhanced({
         definition,
         rowNumber: index + 1,
         hasNiqqud,
+        extras,
       };
     });
   }, [inputText, language, checkWordIntegration]);
@@ -151,6 +207,7 @@ export default function BulkImportEnhanced({
       word: r.word,
       definition: r.definition || undefined,
       canIntegrate: r.canIntegrate,
+      ...r.extras,
     }));
 
     onImport(words);
@@ -180,9 +237,15 @@ export default function BulkImportEnhanced({
           <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
             {t('teacher.lesson.bulkImportTitle')}
           </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white mb-4 text-pretty">
+          <Dialog.Description className="text-sm text-neo-white mb-2 text-pretty">
             {t('teacher.lesson.bulkImportDescription')}
           </Dialog.Description>
+          <p className="text-xs text-neo-white/80 font-neo-body mb-4 text-pretty">
+            {t('teacher.wordDetails.importFormatHelp')}
+            <code className="block mt-1 px-2 py-1 rounded bg-neo-black/40 text-neo-cyan text-[11px] whitespace-pre-wrap" dir="ltr">
+              {t('teacher.wordDetails.importFormatExample')}
+            </code>
+          </p>
 
           <div className="space-y-4">
             {/* File upload area */}
