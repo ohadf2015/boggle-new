@@ -13,6 +13,12 @@ import { PRO_GRANT_MAX_DAYS, proGrantStatus, type ProGrantRow } from '@/lib/educ
  * yet, and what has lapsed. Writes go through lib/education/proGrantServer.ts.
  */
 
+// Express adminAuth runs first, then this route chains several sequential
+// Supabase reads/writes plus a Resend send — same shape as the other admin
+// email routes. Must exceed the (now-excluded) Express 30s cap; see
+// server/middleware.ts requestTimeout's ROUTES_WITH_CUSTOM_TIMEOUT.
+export const maxDuration = 60;
+
 const GrantBody = z.object({
   email: z.string().trim().email(),
   days: z.number().int().min(1).max(PRO_GRANT_MAX_DAYS).optional(),

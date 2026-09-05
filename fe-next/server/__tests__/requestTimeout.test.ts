@@ -42,4 +42,14 @@ describe('requestTimeout', () => {
   it('never times out the Next image optimizer', () => {
     expect(statusAfterTimeout('/_next/image')).toBeNull();
   });
+
+  // Regression: granting Teacher Pro chains Express adminAuth (~1-2s) then the
+  // Next route's own sequential Supabase reads/writes + a Resend send — the
+  // same shape as the admin email routes above. The 30s global Express cap
+  // fired mid-grant and answered 408 while the DB write (and sometimes the
+  // email) was still in flight, so the admin saw a timeout even though the
+  // grant may have already landed.
+  it('never times out granting or listing Teacher Pro', () => {
+    expect(statusAfterTimeout('/api/admin/teacher-pro')).toBeNull();
+  });
 });
