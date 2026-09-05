@@ -28,33 +28,41 @@ ALTER TABLE public.parental_consents ENABLE ROW LEVEL SECURITY;
 -- RLS Policies
 
 -- Users can view their own consent record
+DROP POLICY IF EXISTS "Users can view own consent" ON public.parental_consents;
 CREATE POLICY "Users can view own consent"
     ON public.parental_consents
     FOR SELECT
     USING (auth.uid() = user_id);
 
 -- Users can insert their own consent record
+DROP POLICY IF EXISTS "Users can create own consent" ON public.parental_consents;
 CREATE POLICY "Users can create own consent"
     ON public.parental_consents
     FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
 -- Users can update their own consent (for revocation)
+DROP POLICY IF EXISTS "Users can update own consent" ON public.parental_consents;
 CREATE POLICY "Users can update own consent"
     ON public.parental_consents
     FOR UPDATE
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
--- Teachers can view consent status for their classroom students
--- This allows teachers to verify consent before accessing student data
+-- Teachers can view consent status for their classroom students. The real
+-- membership table is `classroom_memberships` (classroom_id, student_id) --
+-- the original `student_classroom_memberships` name here never existed, which
+-- made this the one statement in the file without an IF NOT EXISTS/IF EXISTS
+-- guard, so it aborted the whole transaction on every apply attempt and this
+-- table was never actually created in production until 2026-09-05.
+DROP POLICY IF EXISTS "Teachers can view student consent in their classrooms" ON public.parental_consents;
 CREATE POLICY "Teachers can view student consent in their classrooms"
     ON public.parental_consents
     FOR SELECT
     USING (
         EXISTS (
             SELECT 1 FROM public.classrooms c
-            JOIN public.student_classroom_memberships scm ON scm.classroom_id = c.id
+            JOIN public.classroom_memberships scm ON scm.classroom_id = c.id
             WHERE c.teacher_id = auth.uid()
             AND scm.student_id = public.parental_consents.user_id
         )
@@ -110,6 +118,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS parental_consents_updated_at ON public.parental_consents;
 CREATE TRIGGER parental_consents_updated_at
     BEFORE UPDATE ON public.parental_consents
     FOR EACH ROW
