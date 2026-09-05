@@ -145,3 +145,60 @@ export function interpClassGapTemplate(
   }
   return out;
 }
+
+/** Session-storage lesson id for a class-gap → Live handoff. Not a real lesson row. */
+export const CLASS_GAP_RETEACH_LIVE_LESSON_ID = 'class-gap-reteach';
+
+/** Fixed 3-minute reteach Live timer (Google Classroom add-on MVP). */
+export const CLASS_GAP_RETEACH_TIMER_SECONDS = 180;
+
+/**
+ * Payload the multiplayer session reader accepts (`lessonId` + `lessonName` +
+ * `vocabularyWords`). Built from the PUBLIC class-gap card: missed words only,
+ * never student names. Returns null when there is nothing to seed — staging an
+ * empty list would start a Live room with the wrong (empty/full) board.
+ *
+ * Timer is always 3 minutes so a Google Classroom Stream post is a short reteach,
+ * not a full lesson rematch. Reuses the lessonGameData shape from reteach #896.
+ */
+export interface ClassGapReteachLiveData {
+  lessonId: string;
+  lessonName: string;
+  vocabularyWords: string[];
+  language: ClassGapLocale;
+  targetWord: string;
+  templateSettings: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  };
+}
+
+export function buildClassGapReteachLiveData(
+  payload: ClassGapSharePayload,
+): ClassGapReteachLiveData | null {
+  if (!payload.missedWords.length) return null;
+  return {
+    lessonId: CLASS_GAP_RETEACH_LIVE_LESSON_ID,
+    lessonName: payload.lesson || 'Class gap',
+    vocabularyWords: [...payload.missedWords],
+    language: payload.locale,
+    // Do not pin a Word Hunt target — it may be a word the class already found.
+    targetWord: '',
+    templateSettings: {
+      timerSeconds: CLASS_GAP_RETEACH_TIMER_SECONDS,
+      difficulty: 'medium',
+      minWordLength: 3,
+      allowLateJoin: true,
+    },
+  };
+}
+
+/**
+ * NEW Live room (create-modal as host), not the same-room restage of reteach #896.
+ * `fromLesson=true` is the existing sessionStorage gate in shouldLoadLessonData.
+ */
+export function classGapReteachLivePath(locale: string): string {
+  return `/${normalizeLocale(locale)}/multiplayer?fromLesson=true&autoCreate=true`;
+}
