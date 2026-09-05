@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { grantTeacherPro } from '@/lib/education/proGrantServer';
+import { grantTeacherPro, type GrantPhase } from '@/lib/education/proGrantServer';
 import { PRO_GRANT_MAX_DAYS, proGrantStatus, type ProGrantRow } from '@/lib/education/proGrant';
+import { withRouteTimeout, type PhaseRef } from '@/lib/server/routeTimeout';
 
 /**
  * Admin: complimentary Teacher Pro by email.
@@ -13,11 +14,17 @@ import { PRO_GRANT_MAX_DAYS, proGrantStatus, type ProGrantRow } from '@/lib/educ
  * yet, and what has lapsed. Writes go through lib/education/proGrantServer.ts.
  */
 
-// Express adminAuth runs first, then this route chains several sequential
-// Supabase reads/writes plus a Resend send — same shape as the other admin
-// email routes. Must exceed the (now-excluded) Express 30s cap; see
-// server/middleware.ts requestTimeout's ROUTES_WITH_CUSTOM_TIMEOUT.
+// Express adminAuth runs first (~1-2s), then this route chains up to ~9
+// sequential Supabase reads/writes plus a Resend send. `maxDuration` below is
+// a Vercel-only mechanism and does NOTHING on this app's actual deployment
+// (a custom Express+Next server on Railway, see server/index.ts) — it's kept
+// only in case this ever runs on Vercel. The real ceiling is the
+// withRouteTimeout wrap on POST: it was the missing piece after the Express
+// 30s cap was excluded for this route (server/middleware.ts
+// ROUTES_WITH_CUSTOM_TIMEOUT) — without it, a single slow step (a hung
+// Supabase call, a stuck Resend send) had nothing bounding the request at all.
 export const maxDuration = 60;
+const ROUTE_TIMEOUT_MS = 25000;
 
 const GrantBody = z.object({
   email: z.string().trim().email(),
@@ -28,10 +35,17 @@ const GrantBody = z.object({
   locale: z.enum(['en', 'he', 'sv', 'ja', 'es', 'ru']).optional(),
 });
 
-export async function POST(request: NextRequest) {
+export function POST(request: NextRequest) {
+  const phaseRef: PhaseRef<GrantPhase | 'init' | 'auth' | 'parse-body'> = { current: 'init', method: 'POST' };
+  return withRouteTimeout({ label: 'admin/teacher-pro', ms: ROUTE_TIMEOUT_MS, phaseRef }, handlePost(request, phaseRef));
+}
+
+async function handlePost(request: NextRequest, phaseRef: PhaseRef<GrantPhase | 'init' | 'auth' | 'parse-body'>) {
+  phaseRef.current = 'auth';
   const auth = await verifyAdminAuth(request);
   if (!auth.success || !auth.user) return auth.response!;
 
+  phaseRef.current = 'parse-body';
   let raw: unknown = {};
   try { raw = await request.json(); } catch { /* fall through to validation */ }
   const parsed = GrantBody.safeParse(raw);
@@ -39,7 +53,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid body', issues: parsed.error.issues }, { status: 400 });
   }
 
-  const result = await grantTeacherPro({ ...parsed.data, grantedBy: auth.user.id });
+  const result = await grantTeacherPro({ ...parsed.data, grantedBy: auth.user.id }, { phaseRef });
   if (!result.ok) {
     if (result.error === 'invalid_email') return NextResponse.json({ ok: false, error: result.error }, { status: 400 });
     // A paying teacher keeps their paid plan. Surface it as a conflict, not a failure.

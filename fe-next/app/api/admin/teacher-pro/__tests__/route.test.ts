@@ -60,7 +60,7 @@ describe('POST /api/admin/teacher-pro', () => {
     grantTeacherPro.mockResolvedValue({ ok: true, grantId: 'g1', userId: 'u1', status: 'active', expiresAt: '2027-09-05T00:00:00.000Z', emailSent: true, fullName: 'Tori', email: 't@x.org' });
     const res = await POST(req({ email: 'T@x.org', note: 'hi' }));
     expect(res.status).toBe(200);
-    expect(grantTeacherPro).toHaveBeenCalledWith(expect.objectContaining({ email: 'T@x.org', note: 'hi', grantedBy: 'admin-1' }));
+    expect((grantTeacherPro.mock.calls[0] as any)[0]).toMatchObject({ email: 'T@x.org', note: 'hi', grantedBy: 'admin-1' });
     expect((grantTeacherPro.mock.calls[0] as any)[0].days).toBeUndefined();
     const body = await res.json();
     expect(body).toMatchObject({ ok: true, status: 'active', emailSent: true });

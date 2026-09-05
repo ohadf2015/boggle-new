@@ -250,9 +250,15 @@ export function preferBrotli(): RequestHandler {
 /**
  * Request timeout middleware
  *
- * IMPORTANT: Next.js App Router routes (app/api/*) have their own timeout
- * configuration via `export const maxDuration`. We should NOT apply Express
- * timeout to these routes to avoid conflicts.
+ * IMPORTANT: `export const maxDuration` is a Vercel-only enforcement
+ * mechanism — it does NOTHING on this app's actual deployment, a custom
+ * Express+Next server on Railway (server/index.ts), because Node just runs
+ * the handler with no cap of its own. A route excluded below from this
+ * middleware's global timeout therefore has NO ceiling at all unless it
+ * enforces one itself via `withRouteTimeout` (lib/server/routeTimeout.ts) —
+ * see guest-session/route.ts and admin/teacher-pro/route.ts. Do not add a
+ * route here on the strength of `maxDuration` alone; confirm it also wraps
+ * its handler in `withRouteTimeout`.
  *
  * Routes excluded from Express timeout:
  * - /api/cron/* - Next.js routes with maxDuration (120s+)
@@ -263,26 +269,37 @@ export function requestTimeout(): RequestHandler {
   // Routes that handle their own timeouts (Next.js maxDuration or long-running Express routes)
   const ROUTES_WITH_CUSTOM_TIMEOUT = [
     '/api/cron/',
-    // Next.js admin email routes — own per-step timeouts + maxDuration=60.
-    // Express adminAuth runs first (~1-2s), then Next route does auth+profile+render+resend
-    // (5+5+8+15=33s worst case). The 30s global Express cap fires before Next finishes,
-    // returning 408 even though the email send is still in flight.
+    // Next.js admin email routes. Express adminAuth runs first (~1-2s), then
+    // the Next route sends a single email — can exceed the 30s global Express
+    // cap on a slow provider round trip. maxDuration=60 on these is inert
+    // (see note above); they do NOT yet self-enforce a wall-clock cap the way
+    // guest-session and teacher-pro do below — sendEmail() (lib/email/send.ts)
+    // bounds the Resend call itself to 10s, but nothing here bounds the rest
+    // of the handler. Wrap with withRouteTimeout before relying on this
+    // exclusion for anything beyond "no longer 408s at 30s".
     '/api/admin/send-test-android-beta-launch',
     '/api/admin/send-android-beta-launch-to-player',
     '/api/admin/android-beta-launch-preview',
     '/api/admin/send-test-android-release-launch',
     '/api/admin/send-android-release-launch-to-player',
     '/api/admin/android-release-launch-preview',
-    // Bulk send loops over all eligible users — easily exceeds the 30s global cap.
+    // Bulk send loops over all eligible users — easily exceeds the 30s global
+    // cap by design (it's a batch job, not a single request). Same caveat as
+    // above: no self-enforced cap here, but each individual sendEmail() call
+    // it makes is bounded to 10s so one stuck recipient can't hang the batch.
     '/api/admin/send-bulk-email',
     // Same shape as the admin email routes above: Express adminAuth (~1-2s),
-    // then the Next route chains several sequential Supabase reads/writes
+    // then the Next route chains up to ~9 sequential Supabase reads/writes
     // (user lookup, subscription read, access-request/profile read, grant
-    // insert, subscription upsert, profile promotion) and a Resend send.
-    // The 30s global cap fired mid-grant and 408'd while the DB write (and
-    // sometimes the email) was still in flight — see route.ts maxDuration=60.
+    // insert, subscription upsert, profile promotion) and a Resend send. The
+    // 30s global cap fired mid-grant and 408'd while the DB write (and
+    // sometimes the email) was still in flight. Excluding it here was only
+    // half the fix — route.ts now also wraps the handler in
+    // `withRouteTimeout` (lib/server/routeTimeout.ts) for a real, self-enforced
+    // ceiling, since maxDuration=60 does nothing on this deployment.
     '/api/admin/teacher-pro',
-    // Non-critical analytics; route owns a 4s wall-clock cap (see route.ts).
+    // Non-critical analytics; route owns a 4s `withRouteTimeout` wall-clock
+    // cap (see route.ts) — the pattern teacher-pro's fix above follows.
     // Was hanging 30s before its own cap was added — see Railway logs 2026-05-01.
     '/api/analytics/guest-session',
     // The Next image optimizer MUST NOT be capped here. Next de-duplicates

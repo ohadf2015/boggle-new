@@ -1,4 +1,13 @@
 import { Resend } from 'resend';
+import { withTimeout } from '@/lib/server/routeTimeout';
+
+// Every caller (admin grant/approval routes, bulk sends, contact/feedback
+// forms) awaits this unbounded otherwise — a slow or hung Resend API call
+// then blocks the caller for as long as Resend takes, with no ceiling of its
+// own. See lib/education/proGrantServer.ts grantTeacherPro, whose Teacher Pro
+// grant requests kept timing out because nothing here (or in the route) ever
+// gave up on a stuck send.
+const SEND_TIMEOUT_MS = 10000;
 
 interface SendEmailArgs {
   to: string | string[];
@@ -31,13 +40,17 @@ export async function sendEmail({ to, subject, html, from, replyTo }: SendEmailA
   }
   try {
     const senderEmail = from || process.env.RESEND_FROM_EMAIL || 'LexiClash <noreply@lexiclash.live>';
-    const result = await resend.emails.send({
-      from: senderEmail,
-      to: Array.isArray(to) ? to : [to],
-      subject,
-      html,
-      ...(replyTo ? { replyTo } : {}),
-    });
+    const result = await withTimeout(
+      resend.emails.send({
+        from: senderEmail,
+        to: Array.isArray(to) ? to : [to],
+        subject,
+        html,
+        ...(replyTo ? { replyTo } : {}),
+      }),
+      SEND_TIMEOUT_MS,
+      () => console.warn('[sendEmail] Resend call exceeded', SEND_TIMEOUT_MS, 'ms; to=', to),
+    );
     if (result.error) return { ok: false, error: result.error.message || 'send failed' };
     return { ok: true, id: result.data?.id };
   } catch (e: any) {

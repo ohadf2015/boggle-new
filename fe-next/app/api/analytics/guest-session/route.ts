@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import type { GuestSessionUpdateData } from '@/backend/modules/guestTracker';
+import { withRouteTimeout, type PhaseRef } from '@/lib/server/routeTimeout';
 
 // Hard wall-clock cap. Express custom server (Railway) ignores Next's `maxDuration`,
 // so we enforce here — without it, hanging Supabase fetches let the request sit until
@@ -27,23 +28,6 @@ type Phase =
   | 'auth-get-user'
   | 'link'
   | 'fetch-session';
-
-function withRouteTimeout<T extends NextResponse>(
-  phaseRef: { current: Phase; method: string; action?: string },
-  work: Promise<T>
-): Promise<T | NextResponse> {
-  return Promise.race<T | NextResponse>([
-    work,
-    new Promise<NextResponse>((resolve) =>
-      setTimeout(() => {
-        console.warn(
-          `[guest-session] wall-clock timeout method=${phaseRef.method} action=${phaseRef.action ?? '?'} stuck-at=${phaseRef.current}`
-        );
-        resolve(NextResponse.json({ error: 'Timeout' }, { status: 504 }));
-      }, ROUTE_TIMEOUT_MS)
-    ),
-  ]);
-}
 
 type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
 
@@ -76,13 +60,13 @@ const RATE_LIMIT_CONFIG = {
 };
 
 export function GET(request: NextRequest) {
-  const phaseRef: { current: Phase; method: string; action?: string } = { current: 'init', method: 'GET' };
-  return withRouteTimeout(phaseRef, handleGet(request, phaseRef));
+  const phaseRef: PhaseRef<Phase> = { current: 'init', method: 'GET' };
+  return withRouteTimeout({ label: 'guest-session', ms: ROUTE_TIMEOUT_MS, phaseRef }, handleGet(request, phaseRef));
 }
 
 export function POST(request: NextRequest) {
-  const phaseRef: { current: Phase; method: string; action?: string } = { current: 'init', method: 'POST' };
-  return withRouteTimeout(phaseRef, handlePost(request, phaseRef));
+  const phaseRef: PhaseRef<Phase> = { current: 'init', method: 'POST' };
+  return withRouteTimeout({ label: 'guest-session', ms: ROUTE_TIMEOUT_MS, phaseRef }, handlePost(request, phaseRef));
 }
 
 /**
