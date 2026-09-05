@@ -9,7 +9,10 @@ type Op = 'select' | 'insert' | 'update' | 'upsert';
 interface Ctx { op: Op; payload?: unknown; filters: Record<string, unknown>; }
 type Handler = (table: string, ctx: Ctx) => { data?: unknown; error?: { message: string } | null };
 
-function fakeAdmin(handle: Handler, rpc: (fn: string, args: unknown) => unknown) {
+/** A user directory `findUserIdByEmail` pages through via `auth.admin.listUsers`. */
+type DirectoryUser = { id: string; email: string };
+
+function fakeAdmin(handle: Handler, directory: DirectoryUser[] = []) {
   const calls: Array<{ table: string; ctx: Ctx }> = [];
   const builder = (table: string, ctx: Ctx) => {
     const b: any = {};
@@ -32,7 +35,15 @@ function fakeAdmin(handle: Handler, rpc: (fn: string, args: unknown) => unknown)
       update: (payload: unknown) => builder(table, { op: 'update', payload, filters: {} }),
       upsert: (payload: unknown) => builder(table, { op: 'upsert', payload, filters: {} }),
     }),
-    rpc: async (fn: string, args: unknown) => ({ data: rpc(fn, args), error: null }),
+    auth: {
+      admin: {
+        // findUserIdByEmail pages through this exactly like the real Admin Auth API.
+        listUsers: async ({ page }: { page: number; perPage: number }) => ({
+          data: { users: page === 1 ? directory : [] },
+          error: null,
+        }),
+      },
+    },
   };
   return { admin, calls };
 }
@@ -50,7 +61,7 @@ beforeEach(() => sendEmail.mockClear());
 
 describe('grantTeacherPro', () => {
   it('refuses an address that is not an email', async () => {
-    const { admin } = fakeAdmin(() => ({}), () => null);
+    const { admin } = fakeAdmin(() => ({}), []);
     const r = await grantTeacherPro({ email: 'nope', grantedBy: 'admin1', nowMs: NOW }, { admin: admin as never });
     expect(r).toEqual({ ok: false, error: 'invalid_email' });
   });
@@ -64,7 +75,7 @@ describe('grantTeacherPro', () => {
       if (table === 'teacher_access_requests') return { data: { full_name: 'Tori Plant', locale: 'en' } };
       if (table === 'teacher_pro_grants' && ctx.op === 'update') return { data: [{ id: 'g1' }] };
       return {};
-    }, () => 'u1');
+    }, [{ id: 'u1', email: 'tori.plant@belcourt.k12.nd.us' }]);
 
     const r = await grantTeacherPro(
       { email: 'Tori.Plant@Belcourt.k12.nd.us', grantedBy: 'admin1', note: 'Sorry about Thursday.', nowMs: NOW },
@@ -108,7 +119,7 @@ describe('grantTeacherPro', () => {
         return { data: { tier: 'pro', status: 'active', source: 'polar', current_period_end: null } };
       }
       return {};
-    }, () => 'u1');
+    }, [{ id: 'u1', email: 't@x.org' }]);
     const r = await grantTeacherPro({ email: 't@x.org', grantedBy: 'a', nowMs: NOW }, { admin: admin as never });
     expect(r).toEqual({ ok: false, error: 'already_paid' });
     expect(calls.some((c) => c.table === 'teacher_pro_grants')).toBe(false);
@@ -121,7 +132,7 @@ describe('grantTeacherPro', () => {
       if (table === 'teacher_pro_grants' && ctx.op === 'update') return { data: [{ id: 'g2' }] };
       if (table === 'teacher_access_requests') return { data: null };
       return {};
-    }, () => null);
+    }, []);
     const r = await grantTeacherPro({ email: 'new@school.org', grantedBy: 'a', fullName: 'Sam', locale: 'es', nowMs: NOW }, { admin: admin as never });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -140,11 +151,27 @@ describe('grantTeacherPro', () => {
       if (table === 'teacher_pro_grants' && ctx.op === 'insert') return { data: { id: 'g1' } };
       if (table === 'subscriptions' && ctx.op === 'upsert') return { error: { message: 'rls denied' } };
       return {};
-    }, () => 'u1');
+    }, [{ id: 'u1', email: 't@x.org' }]);
     const r = await grantTeacherPro({ email: 't@x.org', grantedBy: 'a', nowMs: NOW }, { admin: admin as never });
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.error).toMatch(/rls denied/);
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('a database missing the teacher_pro_grants migration fails with a diagnosable hint, not a bare Postgres error', async () => {
+    const { admin } = fakeAdmin((table, ctx) => {
+      if (table === 'subscriptions' && ctx.op === 'select') return { data: null };
+      if (table === 'teacher_pro_grants' && ctx.op === 'insert') {
+        return { error: { code: '42P01', message: 'relation "public.teacher_pro_grants" does not exist' } };
+      }
+      return {};
+    }, [{ id: 'u1', email: 't@x.org' }]);
+    const r = await grantTeacherPro({ email: 't@x.org', grantedBy: 'a', nowMs: NOW }, { admin: admin as never });
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error).toMatch(/migration pending/);
+    expect(r.error).toMatch(/teacher_pro_grants/);
     expect(sendEmail).not.toHaveBeenCalled();
   });
 });
@@ -160,7 +187,7 @@ describe('applyPendingProGrants', () => {
       if (table === 'profiles') return { data: [{ id: 'u9' }] };
       if (table === 'teacher_pro_grants' && ctx.op === 'update') return { data: [{ id: 'g2' }] };
       return {};
-    }, () => null);
+    }, []);
     const r = await applyPendingProGrants({ userId: 'u9', email: 'New@School.org', nowMs: NOW }, { admin: admin as never });
     expect(r).toEqual({ applied: true, grantId: 'g2', expiresAt: pending.expires_at });
     const stamp = calls.find((c) => c.table === 'teacher_pro_grants' && c.ctx.op === 'update')!;
@@ -185,7 +212,7 @@ describe('revokeProGrant', () => {
       if (table === 'teacher_pro_grants' && ctx.op === 'update') return { data: [{ id: 'g1' }] };
       if (table === 'subscriptions' && ctx.op === 'update') return { data: [{ user_id: 'u1' }] };
       return {};
-    }, () => null);
+    }, []);
     const r = await revokeProGrant({ grantId: 'g1', revokedBy: 'a', nowMs: NOW }, { admin: admin as never });
     expect(r).toEqual({ ok: true });
     const sub = calls.find((c) => c.table === 'subscriptions' && c.ctx.op === 'update')!;
