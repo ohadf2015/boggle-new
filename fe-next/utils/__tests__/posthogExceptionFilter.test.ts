@@ -144,6 +144,24 @@ describe('filterEmptyException', () => {
     expect(filterEmptyException(event as never)).toBeNull();
   });
 
+  // Regression: 1 event 90d showed a JSON-LD `@context` TypeError from an
+  // injected browser extension. The app only writes @context into script tags
+  // and never calls .toLowerCase() on it. Sentry already suppresses this.
+  it('drops JSON-LD @context TypeError from browser extensions', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          {
+            type: 'TypeError',
+            value: 'undefined is not an object (evaluating \'r["@context"].toLowerCase\')',
+          },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
   it('keeps unrelated AbortError (not from Supabase lock)', () => {
     const event = {
       event: '$exception',
