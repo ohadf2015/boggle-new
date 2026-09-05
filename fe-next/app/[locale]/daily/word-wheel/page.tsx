@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
+import { retryImport } from '@/utils/retryImport';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
@@ -13,8 +14,12 @@ interface PageParams {
 
 const LoadingFallback = () => <DailyLoadingFallback mode="wordWheel" />;
 
+// retryImport hardens the lazy chunk load: a stale chunk hash after a deploy (or
+// a flaky mobile network) made this import reject with a ChunkLoadError, leaving
+// the loading fallback on screen forever — the unhandled failure reported on
+// /he/daily/word-wheel. It now retries and then recovers instead of blocking.
 const WordWheelChallenge = dynamicImport(
-  () => import('@/components/daily/WordWheelChallenge'),
+  retryImport(() => import('@/components/daily/WordWheelChallenge')),
   { loading: LoadingFallback }
 );
 

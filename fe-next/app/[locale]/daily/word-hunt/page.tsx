@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 
 import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
+import { retryImport } from '@/utils/retryImport';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
@@ -11,7 +12,9 @@ interface PageParams {
 
 const LoadingFallback = () => <DailyLoadingFallback mode="wordHunt" />;
 
-const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChallenge'), {
+// retryImport hardens the lazy chunk load so a stale-deploy or flaky-network
+// ChunkLoadError retries and then recovers instead of freezing the fallback.
+const DailyChallenge = dynamicImport(retryImport(() => import('@/components/daily/DailyChallenge')), {
   loading: LoadingFallback,
 });
 
