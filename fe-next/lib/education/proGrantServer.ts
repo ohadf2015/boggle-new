@@ -21,10 +21,33 @@ import {
  * deadline; sending it before the row exists would promise Pro the teacher does
  * not have. A failed email after a successful grant is reported (`emailSent`)
  * but does not undo the grant — the grant is the part that helps them.
+ *
+ * This chains up to ~9 sequential Supabase/Resend round trips with no timeout
+ * of its own — the route wraps the whole call in withRouteTimeout
+ * (lib/server/routeTimeout.ts) for a wall-clock ceiling, and `deps.phaseRef`
+ * (set via setPhase below) records which step it was on so a timeout logs
+ * where it hung instead of just "timed out".
  */
+
+export type GrantPhase =
+  | 'lookup-user'
+  | 'read-subscription'
+  | 'read-access-request'
+  | 'read-profile'
+  | 'insert-grant'
+  | 'apply-grant'
+  | 'send-email'
+  | 'mark-email-sent';
 
 interface Deps {
   admin?: SupabaseClient | null;
+  /**
+   * Set by the caller; mutated here so a route-level timeout can log where the
+   * grant hung. Loosely typed (not `GrantPhase`) because the caller's own
+   * phase union usually also covers route-level steps (auth, body parsing)
+   * that happen before `grantTeacherPro` is even called.
+   */
+  phaseRef?: { current: string };
 }
 
 export interface GrantTeacherProArgs {
@@ -77,13 +100,16 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
     return { ok: false, error: e instanceof Error ? e.message : 'invalid duration' };
   }
   const nowIso = new Date(nowMs).toISOString();
+  const setPhase = (phase: GrantPhase) => { if (deps?.phaseRef) deps.phaseRef.current = phase; };
 
   // Email -> user id. SECURITY DEFINER function, execute limited to service_role.
+  setPhase('lookup-user');
   const lookup = await admin.rpc('find_user_id_by_email', { p_email: email });
   if (lookup.error) return { ok: false, error: `user lookup failed: ${lookup.error.message}` };
   const userId: string | null = (lookup.data as string | null) ?? null;
 
   if (userId) {
+    setPhase('read-subscription');
     const { data: existing, error: subErr } = await admin
       .from('subscriptions')
       .select('tier, status, source, current_period_end')
@@ -98,6 +124,7 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
   let fullName = (args.fullName || '').trim();
   let locale: TeacherLocale = args.locale || 'en';
   if (!fullName || !args.locale) {
+    setPhase('read-access-request');
     const { data: req } = await admin
       .from('teacher_access_requests')
       .select('full_name, locale')
@@ -110,6 +137,7 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
     if (!args.locale && r?.locale) locale = r.locale;
   }
   if (!fullName && userId) {
+    setPhase('read-profile');
     const { data: prof } = await admin
       .from('profiles')
       .select('display_name, username')
@@ -120,6 +148,7 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
   }
   if (!fullName) fullName = email.split('@')[0];
 
+  setPhase('insert-grant');
   const { data: grant, error: grantErr } = await admin
     .from('teacher_pro_grants')
     .insert({
@@ -141,6 +170,7 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
   const grantId = (grant as { id: string }).id;
 
   if (userId) {
+    setPhase('apply-grant');
     const applied = await applyGrantToUser(admin, { grantId, userId, expiresAt });
     if (applied.error) return { ok: false, error: applied.error };
   }
@@ -148,7 +178,11 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
   const tpl = teacherProGift({ full_name: fullName, locale, note: args.note, expiresAt, pending: !userId });
   let emailSent = false;
   let emailError: string | undefined;
+  setPhase('send-email');
   try {
+    // sendEmail() self-enforces a cap on the Resend call (lib/email/send.ts),
+    // so a hung provider request can't stall the grant beyond that — it
+    // resolves { ok: false } instead of hanging.
     const sent = await sendEmail({ to: email, subject: tpl.subject, html: tpl.html });
     emailSent = sent.ok;
     if (!sent.ok) emailError = sent.error || 'send failed';
@@ -156,6 +190,7 @@ export async function grantTeacherPro(args: GrantTeacherProArgs, deps?: Deps): P
     emailError = e instanceof Error ? e.message : 'send threw';
   }
   if (emailSent) {
+    setPhase('mark-email-sent');
     await admin.from('teacher_pro_grants').update({ email_sent_at: new Date().toISOString() }).eq('id', grantId).select('id');
   }
 
