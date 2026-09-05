@@ -188,7 +188,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 locales.includes(savedLanguage as Language) &&
                 savedLanguage !== urlLocale
             ) {
-                const segments = pathname.split('/');
+                const segments = (pathname ?? '').split('/');
                 segments[1] = savedLanguage;
                 const newPath = segments.join('/') || `/${savedLanguage}`;
                 setLanguageState(savedLanguage as Language);
@@ -300,7 +300,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             }
 
             // Navigate to new locale preserving FULL path (everything after locale)
-            const segments = pathname.split('/');
+            const segments = (pathname ?? '').split('/');
             // segments[0] is empty string, segments[1] is locale
             const currentLocale = segments[1];
 
@@ -311,7 +311,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 router.push(newPath);
             } else {
                 // Fallback if locale is missing (shouldn't happen with middleware)
-                router.push(`/${newLang}${pathname}`);
+                router.push(`/${newLang}${pathname ?? ''}`);
             }
         }
     }, [pathname, router]);
