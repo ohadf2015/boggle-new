@@ -16,8 +16,26 @@ import { shareWithFallback } from '@/utils/shareWithFallback';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
-    t: (key: string, params?: Record<string, string | number>) =>
-      params ? `${key}:${JSON.stringify(params)}` : key,
+    t: (
+      key: string,
+      fallbackOrParams?: string | Record<string, string | number>,
+      maybeParams?: Record<string, string | number>,
+    ) => {
+      // Legacy results-card calls: t(key, paramsObject) → key:JSON for assertions.
+      if (
+        fallbackOrParams &&
+        typeof fallbackOrParams === 'object' &&
+        maybeParams === undefined
+      ) {
+        return `${key}:${JSON.stringify(fallbackOrParams)}`;
+      }
+      const base = typeof fallbackOrParams === 'string' ? fallbackOrParams : key;
+      if (!maybeParams) return base;
+      return Object.keys(maybeParams).reduce(
+        (out, k) => out.replace(new RegExp(`\\{\\{?${k}\\}\\}?`, 'g'), String(maybeParams[k])),
+        base,
+      );
+    },
   }),
 }));
 
@@ -161,5 +179,34 @@ describe('ClassroomResultsCard', () => {
     await waitFor(() => {
       expect(screen.getByText('education.results.shareGapCopied')).toBeInTheDocument();
     });
+  });
+});
+
+describe('Google Classroom reteach Live post', () => {
+  it('offers the teacher a one-click Google Classroom post when words were missed', () => {
+    render(
+      <ClassroomResultsCard
+        summary={summary}
+        username="Ms. Cohen"
+        isTeacher
+        gameCode="ABC123"
+        onReteach={() => {}}
+      />,
+    );
+    const link = screen.getByTestId('post-reteach-google-classroom');
+    expect(link).toHaveAttribute('href');
+    expect(link.getAttribute('href')).toContain('classroom.google.com/share');
+    expect(link.getAttribute('href')).toContain(encodeURIComponent('ABC123'));
+  });
+
+  it('hides the Google Classroom post from students', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom post when the class found every word', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
   });
 });

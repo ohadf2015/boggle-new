@@ -563,6 +563,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       summary={classroomSummary}
       username={username}
       isTeacher={isHost}
+      gameCode={gameCode}
       onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
       onPractice={
         classroomSummary.lessonIds[0]

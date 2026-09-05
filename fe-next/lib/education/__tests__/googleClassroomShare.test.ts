@@ -12,7 +12,11 @@
  * no sensitive scopes to get verified, no student PII, no tokens to store.
  */
 import { describe, it, expect } from 'vitest';
-import { buildGoogleClassroomShareUrl } from '../googleClassroomShare';
+import {
+  buildGoogleClassroomShareUrl,
+  buildReteachLiveGoogleClassroomShareUrl,
+  buildReteachLiveJoinUrl,
+} from '../googleClassroomShare';
 
 const parse = (u: string) => new URL(u);
 
@@ -73,3 +77,41 @@ describe('buildGoogleClassroomShareUrl', () => {
     expect([...u.searchParams.keys()].sort()).toEqual(['itemtype', 'url']);
   });
 });
+
+describe('buildReteachLiveJoinUrl', () => {
+  it('prefers the live room when a game code is present', () => {
+    expect(
+      buildReteachLiveJoinUrl({
+        locale: 'en',
+        gameCode: 'ABC123',
+        classGapUrl: 'https://www.lexiclash.live/en/education/class-gap?missed=atom',
+      }),
+    ).toBe('https://www.lexiclash.live/en/multiplayer?room=ABC123&classroom=true');
+  });
+
+  it('falls back to the class-gap card when there is no room', () => {
+    const gap = 'https://www.lexiclash.live/en/education/class-gap?missed=atom';
+    expect(buildReteachLiveJoinUrl({ locale: 'en', classGapUrl: gap })).toBe(gap);
+  });
+});
+
+describe('buildReteachLiveGoogleClassroomShareUrl', () => {
+  it('posts a 3-min reteach Live announcement with missed words and no student names', () => {
+    const u = new URL(
+      buildReteachLiveGoogleClassroomShareUrl({
+        joinUrl: 'https://www.lexiclash.live/en/multiplayer?room=ABC123&classroom=true',
+        lessonName: 'Physics 101',
+        missedWords: ['neutron', 'Maya'],
+      }),
+    );
+    expect(u.origin + u.pathname).toBe('https://classroom.google.com/share');
+    expect(u.searchParams.get('itemtype')).toBe('announcement');
+    expect(u.searchParams.get('title')).toContain('3-min reteach Live');
+    expect(u.searchParams.get('title')).toContain('Physics 101');
+    expect(u.searchParams.get('body')).toContain('neutron');
+    // "Maya" here is a word in the missed list fixture — body must still never
+    // invent a roster. The helper only echoes class-level missed words.
+    expect(u.searchParams.get('body')).not.toMatch(/foundBy|student/i);
+  });
+});
+

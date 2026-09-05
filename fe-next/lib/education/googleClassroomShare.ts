@@ -63,3 +63,60 @@ export function buildGoogleClassroomShareUrl({ joinUrl, title, body }: GoogleCla
 
   return share.toString();
 }
+
+/**
+ * One-click Google Classroom post for a 3-min reteach Live from missed words.
+ *
+ * Reuses Phase 1 share dialog (no OAuth). The linked page is either the live
+ * room (when `gameCode` is known) or the class-gap card (missed words, no
+ * student names). Class-level only — never put student names in title/body.
+ */
+export interface ReteachLiveShareArgs {
+  /** Absolute http(s) URL students open — room join or class-gap card. */
+  joinUrl: string;
+  lessonName: string;
+  missedWords: string[];
+  /** Already-localised title; optional override. */
+  title?: string;
+  /** Already-localised body; optional override. */
+  body?: string;
+}
+
+export function buildReteachLiveJoinUrl(opts: {
+  locale: string;
+  gameCode?: string | null;
+  /** Absolute class-gap URL used when there is no live room to join. */
+  classGapUrl: string;
+  origin?: string;
+}): string {
+  const code = (opts.gameCode || '').trim();
+  if (code) {
+    const origin = opts.origin || 'https://www.lexiclash.live';
+    const locale = (opts.locale || 'en').split('-')[0];
+    return `${origin}/${locale}/multiplayer?room=${encodeURIComponent(code)}&classroom=true`;
+  }
+  return opts.classGapUrl;
+}
+
+export function buildReteachLiveGoogleClassroomShareUrl({
+  joinUrl,
+  lessonName,
+  missedWords,
+  title,
+  body,
+}: ReteachLiveShareArgs): string {
+  const words = (missedWords || []).map((w) => w.trim()).filter(Boolean).slice(0, 12);
+  const lesson = (lessonName || '').trim() || 'class';
+  const defaultTitle = title?.trim() || `3-min reteach Live — ${lesson}`;
+  const defaultBody =
+    body?.trim() ||
+    (words.length
+      ? `Tap to join a quick Live reteach on: ${words.join(', ')}. No student names — class words only.`
+      : `Tap to join a quick Live reteach for ${lesson}.`);
+  return buildGoogleClassroomShareUrl({
+    joinUrl,
+    title: defaultTitle,
+    body: defaultBody,
+  });
+}
+

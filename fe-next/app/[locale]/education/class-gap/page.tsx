@@ -99,9 +99,19 @@ export default async function ClassGapPage(props: PageProps) {
     total: payload.total,
   });
   const cta = readString(t, 'education.results.shareGapCta', 'Play a class game');
+  const reteachLiveCta = readString(
+    t,
+    'education.results.reteachLiveCta',
+    'Start 3-min reteach Live',
+  );
   const eyebrow = readString(t, 'education.results.shareGapEyebrow', "Today's class gap");
   const practiceHome = readString(t, 'education.results.shareGapPracticeHome', 'Words to practice at home');
   const allFound = readString(t, 'education.results.allFound', 'The class found every lesson word.');
+  const reteachHref =
+    payload.missedWords.length > 0
+      ? `/${payload.locale}/education/classroom-game`
+      : `/${payload.locale}/education`;
+  const primaryCta = payload.missedWords.length > 0 ? reteachLiveCta : cta;
 
   return (
     <main
@@ -138,10 +148,11 @@ export default async function ClassGapPage(props: PageProps) {
         )}
 
         <Link
-          href={`/${payload.locale}/education`}
+          href={reteachHref}
+          data-testid="class-gap-primary-cta"
           className="mt-6 inline-flex w-full items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all"
         >
-          {cta}
+          {primaryCta}
         </Link>
       </article>
     </main>

@@ -22,6 +22,10 @@ import { GraduationCap, Check, X, RotateCcw, Play, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import {
+  buildReteachLiveGoogleClassroomShareUrl,
+  buildReteachLiveJoinUrl,
+} from '@/lib/education/googleClassroomShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -29,6 +33,8 @@ export interface ClassroomResultsCardProps {
   summary: ClassroomSummary;
   username: string;
   isTeacher: boolean;
+  /** Live room code from the round just finished — used for GC join links. */
+  gameCode?: string | null;
   /** Sends the player into flashcard practice on this lesson. */
   onPractice?: () => void;
   /** Teacher-only: starts a new round on exactly the words the class missed. */
@@ -39,11 +45,44 @@ export function ClassroomResultsCard({
   summary,
   username,
   isTeacher,
+  gameCode,
   onPractice,
   onReteach,
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
+
+  const classGapUrl = buildClassGapShareUrl({
+    locale: language,
+    lessonNames: summary.lessonNames,
+    teacherName: summary.teacherName,
+    found: summary.classFoundCount,
+    total: summary.totalWords,
+    missedWords: summary.missedWords,
+  });
+
+  const googleClassroomReteachHref =
+    isTeacher && summary.missedWords.length > 0
+      ? buildReteachLiveGoogleClassroomShareUrl({
+          joinUrl: buildReteachLiveJoinUrl({
+            locale: language,
+            gameCode,
+            classGapUrl,
+          }),
+          lessonName: summary.lessonNames.join(', '),
+          missedWords: summary.missedWords,
+          title: t(
+            'education.results.googleClassroomReteachTitle',
+            '3-min reteach Live — {{lesson}}',
+            { lesson: summary.lessonNames.join(', ') },
+          ),
+          body: t(
+            'education.results.googleClassroomReteachBody',
+            'Tap to join a quick Live reteach on: {{missed}}. Class words only — no student names.',
+            { missed: summary.missedWords.join(', ') },
+          ),
+        })
+      : null;
 
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
@@ -57,14 +96,7 @@ export function ClassroomResultsCard({
 
   const handleShareGap = async () => {
     const lesson = summary.lessonNames.join(', ');
-    const url = buildClassGapShareUrl({
-      locale: language,
-      lessonNames: summary.lessonNames,
-      teacherName: summary.teacherName,
-      found: summary.classFoundCount,
-      total: summary.totalWords,
-      missedWords: summary.missedWords,
-    });
+    const url = classGapUrl;
     const text = summary.missedWords.length
       ? t('education.results.shareGapText', {
           lesson,
@@ -165,6 +197,25 @@ export function ClassroomResultsCard({
                 <Play className="w-4 h-4" aria-hidden />
                 {t('education.results.playReteachRound')}
               </button>
+            )}
+            {googleClassroomReteachHref && (
+              <a
+                href={googleClassroomReteachHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="post-reteach-google-classroom"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <Share2 className="w-4 h-4" aria-hidden />
+                {t(
+                  'education.results.googleClassroomReteach',
+                  'Post reteach Live to Google Classroom',
+                )}
+              </a>
             )}
           </div>
         ) : (
