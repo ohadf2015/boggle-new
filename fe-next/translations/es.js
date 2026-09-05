@@ -13093,7 +13093,11 @@ const es = {
       "shareGapAllFoundText": "{{lesson}} — la clase encontró todas las palabras de la lección.",
       "shareGapCta": "Jugar una partida de clase",
       "shareGapEyebrow": "El hueco de hoy",
-      "shareGapPracticeHome": "Palabras para practicar en casa"
+      "shareGapPracticeHome": "Palabras para practicar en casa",
+      "startReteachLive": "Empezar reteach Live de 3 min",
+      "postReteachGoogleClassroom": "Publicar reteach de 3 min en Google Classroom",
+      "postReteachGoogleClassroomTitle": "Reteach Live de 3 min — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Abre el enlace y empieza el Live de 3 min con estas palabras: {{missed}}. Los alumnos se unen desde el Stream."
     },
     "nav": {
       "section": "Docentes",

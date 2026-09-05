@@ -22,6 +22,7 @@ import { GraduationCap, Check, X, RotateCcw, Play, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -54,6 +55,37 @@ export function ClassroomResultsCard({
 
   const foundByMe = (word: { foundBy: string[] }) =>
     word.foundBy.some((n) => n.toLowerCase() === username.toLowerCase());
+
+  /**
+   * Google Classroom add-on MVP: post the class-gap card (missed words, no names)
+   * to the Stream so the teacher can start a 3-min reteach Live from that link.
+   * Phase-1 share dialog — no OAuth. Absolute lexiclash.live URL.
+   */
+  const googleClassroomReteachHref = (() => {
+    if (!isTeacher || summary.missedWords.length === 0) return null;
+    try {
+      const classGapUrl = buildClassGapShareUrl({
+        locale: language,
+        lessonNames: summary.lessonNames,
+        teacherName: summary.teacherName,
+        found: summary.classFoundCount,
+        total: summary.totalWords,
+        missedWords: summary.missedWords,
+      });
+      const missed = summary.missedWords.slice(0, 8).join(', ');
+      return buildGoogleClassroomShareUrl({
+        joinUrl: classGapUrl,
+        title: t('education.results.postReteachGoogleClassroomTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        body: t('education.results.postReteachGoogleClassroomBody', {
+          missed,
+        }),
+      });
+    } catch {
+      return null;
+    }
+  })();
 
   const handleShareGap = async () => {
     const lesson = summary.lessonNames.join(', ');
@@ -165,6 +197,22 @@ export function ClassroomResultsCard({
                 <Play className="w-4 h-4" aria-hidden />
                 {t('education.results.playReteachRound')}
               </button>
+            )}
+            {googleClassroomReteachHref && (
+              <a
+                href={googleClassroomReteachHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="post-reteach-google-classroom"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <GraduationCap className="w-4 h-4" aria-hidden />
+                {t('education.results.postReteachGoogleClassroom')}
+              </a>
             )}
           </div>
         ) : (

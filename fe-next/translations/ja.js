@@ -13101,7 +13101,11 @@ const ja = {
       "shareGapAllFoundText": "{{lesson}} — クラスはすべての単語を見つけました。",
       "shareGapCta": "クラスゲームをプレイ",
       "shareGapEyebrow": "今日のクラスギャップ",
-      "shareGapPracticeHome": "家庭で練習する単語"
+      "shareGapPracticeHome": "家庭で練習する単語",
+      "startReteachLive": "3分再指導ライブを開始",
+      "postReteachGoogleClassroom": "3分再指導を Google Classroom に投稿",
+      "postReteachGoogleClassroomTitle": "3分再指導ライブ — {{lesson}}",
+      "postReteachGoogleClassroomBody": "リンクを開き、見逃した単語で3分ライブを開始: {{missed}}。生徒はストリームから参加します。"
     },
     "nav": {
       "section": "教師向け",

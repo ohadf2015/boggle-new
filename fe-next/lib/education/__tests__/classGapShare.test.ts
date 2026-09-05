@@ -5,10 +5,14 @@
 import { describe, it, expect } from 'vitest';
 import {
   CLASS_GAP_ORIGIN,
+  CLASS_GAP_RETEACH_LIVE_LESSON_ID,
+  CLASS_GAP_RETEACH_TIMER_SECONDS,
   MAX_MISSED_WORDS,
   MAX_WORD_LENGTH,
   buildClassGapOgImageUrl,
+  buildClassGapReteachLiveData,
   buildClassGapShareUrl,
+  classGapReteachLivePath,
   interpClassGapTemplate,
   parseClassGapShareParams,
   toClassGapPayload,
@@ -131,5 +135,51 @@ describe('interpClassGapTemplate', () => {
       'Animals — the class found 8 of 12 lesson words. Practice: CAT, DOG, BIRD',
     );
     expect(out).not.toMatch(/\{[a-z]+\}/);
+  });
+});
+
+describe('buildClassGapReteachLiveData', () => {
+  it('returns null when there are no missed words to seed', () => {
+    expect(
+      buildClassGapReteachLiveData({
+        locale: 'en',
+        lesson: 'Physics 101',
+        teacher: 'Ms. Cohen',
+        found: 3,
+        total: 3,
+        missedWords: [],
+      }),
+    ).toBeNull();
+  });
+
+  it('seeds only missed words with a fixed 3-minute Live timer', () => {
+    const data = buildClassGapReteachLiveData({
+      locale: 'en',
+      lesson: 'Physics 101',
+      teacher: 'Ms. Cohen',
+      found: 2,
+      total: 3,
+      missedWords: ['neutron', 'quark'],
+    });
+    expect(data).toEqual({
+      lessonId: CLASS_GAP_RETEACH_LIVE_LESSON_ID,
+      lessonName: 'Physics 101',
+      vocabularyWords: ['neutron', 'quark'],
+      language: 'en',
+      targetWord: '',
+      templateSettings: {
+        timerSeconds: CLASS_GAP_RETEACH_TIMER_SECONDS,
+        difficulty: 'medium',
+        minWordLength: 3,
+        allowLateJoin: true,
+      },
+    });
+    expect(CLASS_GAP_RETEACH_TIMER_SECONDS).toBe(180);
+  });
+
+  it('points autoCreate Live at fromLesson so sessionStorage is read', () => {
+    expect(classGapReteachLivePath('he')).toBe(
+      '/he/multiplayer?fromLesson=true&autoCreate=true',
+    );
   });
 });
