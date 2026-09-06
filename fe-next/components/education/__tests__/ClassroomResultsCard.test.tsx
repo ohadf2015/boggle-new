@@ -162,7 +162,6 @@ describe('ClassroomResultsCard', () => {
       expect(screen.getByText('education.results.shareGapCopied')).toBeInTheDocument();
     });
   });
-});
 
   it('offers the teacher a Google Classroom post for a 3-min reteach Live', () => {
     render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
@@ -171,6 +170,7 @@ describe('ClassroomResultsCard', () => {
     const href = link.getAttribute('href') || '';
     expect(href).toContain('https://classroom.google.com/share');
     expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/class-gap'));
+    expect(href).toContain('itemtype=announcement');
     expect(href).toContain('neutron');
     expect(href).not.toContain('Maya');
     expect(href).not.toContain('lexiclash.com');
@@ -186,3 +186,28 @@ describe('ClassroomResultsCard', () => {
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
   });
+
+  it('offers the teacher a Google Classroom assignment for practice after Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('assign-practice-google-classroom');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/class-gap'));
+    expect(href).toContain('itemtype=assignment');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
+  it('never offers a student the Google Classroom practice assignment', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('assign-practice-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom practice assignment when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('assign-practice-google-classroom')).not.toBeInTheDocument();
+  });
+});
