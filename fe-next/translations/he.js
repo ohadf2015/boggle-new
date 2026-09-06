@@ -3351,6 +3351,19 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "progressPulse": {
+      "title": "ההתקדמות שלך",
+      "game": "משחק #{n}",
+      "vsLast": "{delta} לעומת המשחק הקודם",
+      "best": "שיא {score}",
+      "newBest": "שיא חדש!",
+      "coverage": "{found} מתוך {total} מילים · {pct}%",
+      "wordsFound": "{found} מילים נמצאו",
+      "goalFirst": "המשחק הראשון נרשם. עכשיו תשברו אותו.",
+      "goalNewBest": "קבעתם את הרף. בפעם הבאה עוברים את {target}.",
+      "goalBeatBest": "{gap} נק׳ מהשיא שלך — עוד מילה אחת יכולה לעשות את זה.",
+      "sparklineAria": "{n} המשחקים האחרונים שלך"
+    },
     "streakIgnition": {
       "titleWon": "הרצף נדלק!",
       "titleLost": "ניצחון אחד כדי להצית",
@@ -6361,6 +6374,21 @@ const he = {
     "maybeLater": "אולי אחר כך"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "מה הלאה?",
+      "rematchHarder": "משחק חוזר · קשה יותר",
+      "rematchHarderDesc": "עולים שלב בסולם הבוטים",
+      "rematchMax": "משחק חוזר · מקסימום",
+      "rematchMaxDesc": "השלב הגבוה ביותר. לוח קשה, 3 בוטים",
+      "rematchSame": "עוד פעם אותו דבר",
+      "rematchSameDesc": "לוח חדש, אותן הגדרות",
+      "bots": "נגד בוטים",
+      "botsDesc": "לוח עם טיימר מול בוט אחד",
+      "practice": "אימון",
+      "practiceDesc": "בלי טיימר, בלי לחץ",
+      "daily": "האתגר היומי",
+      "dailyDesc": "אותו פאזל לכולם"
+    },
     "play": "שחק",
     "playDesc": "קפוץ למשחק",
     "howToPlay": "איך משחקים",
@@ -6757,6 +6785,13 @@ const he = {
     "samePuzzle": "אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!",
     "alreadyPlayed": "כבר שיחקתם היום",
     "catchUp": {
+      "tileDone": "שיחקת · לצפייה בתוצאות",
+      "tileMissed": "פספסת · הקש/י להשלמה",
+      "tileToday": "היום · לשחק עכשיו",
+      "tileExpired": "פספסת · חלון ההשלמה נסגר",
+      "tilePending": "בקרוב",
+      "tileHint": "הקש/י על יום שפספסת כדי להשלים אותו — פתוח {days} ימים",
+      "expired": "היום הזה כבר נסגר — אפשר להשלים רק את {days} הימים האחרונים",
       "title": "השלימו אתגרים שפספסתם",
       "subtitle": "יש לכם {count} מהימים האחרונים שעדיין פתוחים",
       "yesterday": "החידה של אתמול",
@@ -14312,6 +14347,15 @@ const he = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "תודה שצפית — הפרס נפתח!",
+      "hint": "תודה! הנה הרמז שלך.",
+      "doubleGold": "הזהב הוכפל — תודה שצפית!",
+      "freeze": "הקפאת הרצף מאובטחת. הרצף שלך בטוח.",
+      "retry": "הזדמנות שנייה נפתחה — קדימה!",
+      "timeLow": "זמן בונוס נוסף — ממשיכים!",
+      "catchup": "היום שפספסת נפתח — בהצלחה!"
+    },
     "label": "פרסומת",
     "rewarded": {
       "watchForGold": "צפו בפרסומת ל-+{amount} זהב",

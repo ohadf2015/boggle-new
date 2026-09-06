@@ -44,6 +44,14 @@ interface AdMobContextValue {
 // from compounding into ad fatigue within a single session.
 const MAX_INTERSTITIALS_PER_SESSION = 4;
 
+// Fatigue guard. The game-end cadence below can come due again within seconds
+// when rounds are short (60s boards, rapid "play again"), and two fullscreen
+// interruptions inside a couple of minutes reads as ad spam — the fastest way
+// to end a session. The cadence decides WHICH game ends are slots; this floor
+// decides how close together two shows may ever be. A held slot is simply
+// skipped (the next cadence hit gets it), never queued.
+const MIN_INTERSTITIAL_GAP_MS = 2 * 60 * 1000;
+
 // AdMob interstitials expire ~1h after load (Google: "reload every hour").
 // Treat a preloaded ad older than this as not-ready so it cold-reloads before
 // showing — otherwise a stale-but-"ready" ad would be consumed + recorded, then
@@ -100,6 +108,8 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const [seededGameEnds] = useState(readTotalGameEnds);
   const totalGameEnds = useRef(seededGameEnds);
   const interstitialsShown = useRef(0);
+  // Wall-clock of the last confirmed show — 0 = none this session.
+  const lastInterstitialAt = useRef(0);
   // Latched when an interstitial slot came due but tier was still 'unknown' —
   // the cue for the UI to ask for age at that natural break (state, not ref,
   // so the consuming wrapper re-renders when it flips).
@@ -213,6 +223,9 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   function interstitialSlotDue(): boolean {
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
     if (totalGameEnds.current <= 3) return false;
+    if (lastInterstitialAt.current && Date.now() - lastInterstitialAt.current < MIN_INTERSTITIAL_GAP_MS) {
+      return false;
+    }
     return (totalGameEnds.current - 3) % 3 === 0;
   }
 
@@ -229,6 +242,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
 
   function recordInterstitialShown() {
     interstitialsShown.current += 1;
+    lastInterstitialAt.current = Date.now();
   }
 
   function shouldShowInterstitial(): boolean {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { AdMobProvider, useAdMobContext } from '../AdMobContext';
 
@@ -49,8 +49,13 @@ function TestConsumer({ onMount }: { onMount: (ctx: ReturnType<typeof useAdMobCo
 describe('AdMobProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     social.tier = 'unknown';
     social.authResolved = true;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('does not initialize AdMob on web', async () => {
@@ -351,9 +356,12 @@ describe('AdMobProvider', () => {
     });
     // Warmup (3 game-ends, no ads)
     for (let i = 0; i < 3; i++) captured!.recordGameEnd();
-    // Four eligible cycles: each = 3 more game-ends, gate true, record show
+    // Four eligible cycles: each = 3 more game-ends, gate true, record show.
+    // The clock advances past the fatigue gap between cycles (see the
+    // fatigue-guard tests) so only the session cap is under test here.
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) captured!.recordGameEnd();
+      vi.setSystemTime(Date.now() + 10 * 60 * 1000);
       expect(captured!.shouldShowInterstitial()).toBe(true);
       captured!.recordInterstitialShown();
     }
@@ -376,9 +384,56 @@ describe('AdMobProvider', () => {
     for (let i = 0; i < 6; i++) captured!.recordGameEnd();
     expect(captured!.shouldShowInterstitial()).toBe(true);
     captured!.recordInterstitialShown();
-    // Cap not reached — gate should still pass on next eligible cycle
+    // Cap not reached — gate should still pass on next eligible cycle (once
+    // the fatigue gap has elapsed).
     for (let j = 0; j < 3; j++) captured!.recordGameEnd();
+    vi.setSystemTime(Date.now() + 10 * 60 * 1000);
     expect(captured!.shouldShowInterstitial()).toBe(true);
+  });
+
+  // Fatigue guard: an interstitial is an interruption. Even when the game-end
+  // cadence says a slot is due, two of them inside a couple of minutes (short
+  // rounds, rapid replays) reads as ad spam and is the fastest way to lose a
+  // session. The cadence stays; the wall clock adds a floor between shows.
+  describe('interstitial fatigue guard', () => {
+    async function mountAdult() {
+      social.tier = 'adult';
+      let captured: ReturnType<typeof useAdMobContext> | null = null;
+      await act(async () => {
+        render(
+          <AdMobProvider>
+            <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+          </AdMobProvider>
+        );
+      });
+      return captured!;
+    }
+
+    it('Given an interstitial just shown, When the next cadence slot comes due within the gap, Then it is held back', async () => {
+      const ctx = await mountAdult();
+      for (let i = 0; i < 6; i++) ctx.recordGameEnd();
+      expect(ctx.shouldShowInterstitial()).toBe(true);
+      ctx.recordInterstitialShown();
+      // Three very fast rounds — 30 seconds later the cadence says "due" again.
+      for (let j = 0; j < 3; j++) ctx.recordGameEnd();
+      vi.setSystemTime(Date.now() + 30 * 1000);
+      expect(ctx.shouldShowInterstitial()).toBe(false);
+    });
+
+    it('Given the gap has elapsed, When the slot is due, Then the interstitial shows again', async () => {
+      const ctx = await mountAdult();
+      for (let i = 0; i < 6; i++) ctx.recordGameEnd();
+      ctx.recordInterstitialShown();
+      for (let j = 0; j < 3; j++) ctx.recordGameEnd();
+      vi.setSystemTime(Date.now() + 3 * 60 * 1000);
+      expect(ctx.shouldShowInterstitial()).toBe(true);
+    });
+
+    it('Given no interstitial shown yet this session, When the first slot is due, Then the gap does not apply', async () => {
+      const ctx = await mountAdult();
+      for (let i = 0; i < 6; i++) ctx.recordGameEnd();
+      expect(ctx.shouldShowInterstitial()).toBe(true);
+    });
   });
 
   // Families Ad Format Requirements: interstitials are the cited format and must

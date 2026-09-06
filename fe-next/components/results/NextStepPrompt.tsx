@@ -33,6 +33,12 @@ interface NextStepPromptProps {
   onRematch?: () => void;
   /** Hide the secondary "back to lobby" button (when a top-level back button already exists) */
   hideBackButton?: boolean;
+  /**
+   * Awaited before the CTA navigates (or before `onAction`). Results screens
+   * use it to run the interstitial at the transition the player chose,
+   * instead of over the score reveal.
+   */
+  beforeNavigate?: () => void | Promise<void>;
 }
 
 /** Where the CTA sends the player. Reported as the `to` prop on both events. */
@@ -68,6 +74,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   scoreDifference,
   onRematch,
   hideBackButton = false,
+  beforeNavigate,
 }) => {
   const { t, language, dir } = useLanguage();
   const reducedMotion = useReducedMotion();
@@ -77,8 +84,13 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const router = useRouter();
 
   // Handle navigation with session cleanup OR direct action callback
-  const handleNavigate = useCallback((href: string, destination: NextStepDestination) => {
+  const handleNavigate = useCallback(async (href: string, destination: NextStepDestination) => {
     trackGrowthEvent('next_step_clicked', { from: currentMode, to: destination, variant });
+    try {
+      await beforeNavigate?.();
+    } catch {
+      // The gate is best-effort — never strand the player on the results page.
+    }
     // If onAction callback is provided, use it instead of navigation
     if (onAction) {
       onAction();
@@ -87,7 +99,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
     // Clear current session before navigating to prevent being stuck on results page
     clearSessionPreservingUsername();
     router.push(href);
-  }, [router, onAction, currentMode, variant]);
+  }, [router, onAction, currentMode, variant, beforeNavigate]);
 
   // Configure next step based on current mode
   const getNextStepConfig = (): ModeConfig => {

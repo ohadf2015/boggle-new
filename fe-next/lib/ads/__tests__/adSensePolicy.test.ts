@@ -148,3 +148,23 @@ describe('adSensePolicy — fill audit', () => {
     expect(summarizeAdSenseFill(insHtml(''))).toEqual({ units: 0, filled: 0, unfilled: 0 });
   });
 });
+
+describe('adSensePolicy — ad-free routes (education)', () => {
+  const base = {
+    enabled: true,
+    hasAdConsent: true,
+    isNative: false,
+    isCrazyGames: false,
+    suppressedByTier: false,
+    onboardingActive: false,
+  };
+
+  it('Given every other gate open, When the route is ad-free, Then AdSense must not load', () => {
+    expect(shouldLoadAdSense({ ...base, adFreeRoute: true })).toBe(false);
+  });
+
+  it('Given every other gate open, When the route is monetizable, Then AdSense loads', () => {
+    expect(shouldLoadAdSense({ ...base, adFreeRoute: false })).toBe(true);
+    expect(shouldLoadAdSense(base)).toBe(true);
+  });
+});

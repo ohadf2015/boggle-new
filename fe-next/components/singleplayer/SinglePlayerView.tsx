@@ -108,6 +108,7 @@ const SinglePlayerView: React.FC = () => {
     handlePlayAgain,
     handleQuickRematch,
     handleBackToLobby,
+    handleStartPreset,
   } = useSinglePlayerConfig({ searchParams });
 
   const setIsInGame = useHideNavigation();
@@ -340,9 +341,11 @@ const SinglePlayerView: React.FC = () => {
                 key={resultsData.gameSessionId || 'results'}
                 results={resultsData}
                 mode={gameState.mode}
+                difficulty={gameState.difficulty}
                 onPlayAgain={handlePlayAgain}
                 onQuickRematch={handleQuickRematch}
                 onBackToLobby={handleBackToLobby}
+                onStartPreset={handleStartPreset}
               />
             )}
           </>

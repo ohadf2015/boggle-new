@@ -99,6 +99,12 @@ export function shouldLoadAdSense(ctx: {
    * practice the script never injects during the FTUE.)
    */
   onboardingActive?: boolean;
+  /**
+   * The current route is an ad-free surface (education / teacher / student /
+   * classroom lobby / admin — see `isAdFreeRoute`). Auto-Ads is page-wide once
+   * the script is in the document, so the script must not be injected there.
+   */
+  adFreeRoute?: boolean;
 }): boolean {
   return (
     ctx.enabled &&
@@ -106,6 +112,7 @@ export function shouldLoadAdSense(ctx: {
     !ctx.isNative &&
     !ctx.isCrazyGames &&
     !ctx.suppressedByTier &&
-    !ctx.onboardingActive
+    !ctx.onboardingActive &&
+    !ctx.adFreeRoute
   );
 }

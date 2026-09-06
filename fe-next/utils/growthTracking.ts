@@ -101,6 +101,7 @@ export type GrowthEvent =
   //             variant: 'desktop' | 'mobile' | 'landscape' }.
   | 'next_step_shown'
   | 'next_step_clicked'
+  | 'next_game_picked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
