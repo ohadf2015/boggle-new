@@ -102,6 +102,14 @@ describe('sitemap', () => {
     }
   });
 
+  it('lists /pricing for every supported locale', () => {
+    for (const locale of ['he', 'en', 'sv', 'ja', 'es', 'ru']) {
+      const entry = routes.find((r) => r.url === `${BASE_URL}/${locale}/pricing`);
+      expect(entry, `missing /pricing for ${locale}`).toBeDefined();
+      expect(entry?.alternates?.languages).toBeDefined();
+    }
+  });
+
   // Adventure is BETA-gated (PageClient redirects non-beta users away) —
   // public visitors and the AdSense reviewer hit a wall. Out of the sitemap
   // and noindexed until GA. Restore both when the BETA badge drops.
