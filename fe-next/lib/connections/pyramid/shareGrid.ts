@@ -1,9 +1,9 @@
 /**
- * Bridge Pyramid share card — same spoiler-free emoji language as the daily
- * (see ../shareGrid), but shaped like the pyramid: the finale square sits
+ * Bridge Pyramid share card — same spoiler-free LexiClash marks as the daily
+ * (see ../shareGrid), but shaped like the pyramid: the finale mark sits
  * above the 3-base row. Pure — caller localizes title/callout via t().
  *
- *   🔺 {title} {date}
+ *   ⚡ LEXICLASH · 🔺 {title} {date}
  *   　{finale}          ← U+3000 pad centers the apex over the base row
  *   {base}{base}{base}
  *   {callout}
@@ -32,7 +32,7 @@ export function buildPyramidShareGrid({
   url,
 }: PyramidGridParams): string {
   const lines = [
-    `🔺 ${title} ${dateISO}`,
+    `⚡ LEXICLASH · 🔺 ${title} ${dateISO}`,
     `　${bridgeSquare(finale)}`,
     base.map(bridgeSquare).join(''),
   ];

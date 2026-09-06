@@ -12,7 +12,7 @@ export interface ClassicDailyShareData {
   /** Puzzle/challenge number shown in header */
   puzzleNumber: number;
   score: number;
-  /** Words the player found (used to build emoji rows) */
+  /** Words the player found */
   words: string[];
 }
 
@@ -68,20 +68,35 @@ export interface GameEmojiShareCardProps {
   onShareClick?: (method: 'native' | 'copy') => void;
 }
 
-// ==================== Emoji generators ====================
+// ==================== Per-mode recap rows (never Wordle squares) ====================
 
-/** Classic Daily: one row per word, green squares = word length */
-function buildClassicRows(words: string[]): string[] {
-  if (words.length === 0) return ['⬛'];
-  // Show up to 8 words to keep the card concise
-  return words.slice(0, 8).map((w) => '🟩'.repeat(Math.min(w.length, 10)));
+function longestOf(words: string[]): string | null {
+  if (words.length === 0) return null;
+  return words.reduce((a, b) => (b.length > a.length ? b : a));
 }
 
-/** Blast: one row per wave + summary row */
+function lengthBuckets(words: string[]): Array<{ len: number; count: number }> {
+  const grouped = new Map<number, number>();
+  for (const w of words) grouped.set(w.length, (grouped.get(w.length) || 0) + 1);
+  return [...grouped.entries()].sort((a, b) => b[0] - a[0]).map(([len, count]) => ({ len, count }));
+}
+
+/** Classic / daily wheel: score + word count + longest, not a letter grid. */
+function buildClassicRows(words: string[], t: (key: string) => string): string[] {
+  if (words.length === 0) return [`0 ${t('share.words')}`];
+  const rows: string[] = [`📝 ${words.length} ${t('share.words')}`];
+  const longest = longestOf(words);
+  if (longest) rows.push(`${t('share.longest')} ${longest.length} · ${longest.toUpperCase()}`);
+  for (const { len, count } of lengthBuckets(words).slice(0, 5)) {
+    rows.push(`${'●'.repeat(Math.min(count, 8))} ${len}${'\u20E3'}`);
+  }
+  return rows;
+}
+
+/** Blast: waves + combo + stars — already LexiClash, keep. */
 function buildBlastRows(data: BlastShareData): string[] {
   const rows: string[] = [];
 
-  // Wave rows: ⭐ for each wave cleared, dim squares for incomplete
   const totalWaves = Math.max(data.waveResults.length, data.wavesCompleted);
   for (let i = 0; i < totalWaves; i++) {
     const wave = data.waveResults[i];
@@ -98,34 +113,28 @@ function buildBlastRows(data: BlastShareData): string[] {
     }
   }
 
-  // Combo row
   if (data.maxCombo >= 3) {
     rows.push(`🔥`.repeat(Math.min(data.maxCombo, 6)) + ` ${data.maxCombo}x combo`);
   }
 
-  // Stars summary
   const starRow = '⭐'.repeat(data.stars) + '☆'.repeat(3 - data.stars);
   rows.push(starRow);
 
   return rows;
 }
 
-/** Singleplayer: word count blocks + combo flame + rank */
-function buildSingleplayerRows(data: SingleplayerShareData): string[] {
+/** Solo: length buckets as dots (not green squares) + combo + rank. */
+function buildSingleplayerRows(data: SingleplayerShareData, t: (key: string) => string): string[] {
   const rows: string[] = [];
-  // Word length distribution as colored blocks
-  const lengths = data.words.map(w => w.length);
-  const grouped = new Map<number, number>();
-  for (const len of lengths) grouped.set(len, (grouped.get(len) || 0) + 1);
-  const sortedLens = [...grouped.entries()].sort((a, b) => b[0] - a[0]);
-  for (const [len, count] of sortedLens.slice(0, 5)) {
-    rows.push(`${'🟩'.repeat(Math.min(count, 8))} ${len}${'\u20E3'}`);
+  rows.push(`📝 ${data.words.length} ${t('share.words')}`);
+  const longest = longestOf(data.words);
+  if (longest) rows.push(`${t('share.longest')} ${longest.length} · ${longest.toUpperCase()}`);
+  for (const { len, count } of lengthBuckets(data.words).slice(0, 5)) {
+    rows.push(`${'●'.repeat(Math.min(count, 8))} ${len}${'\u20E3'}`);
   }
-  // Combo
   if (data.maxCombo && data.maxCombo >= 3) {
     rows.push('🔥'.repeat(Math.min(data.maxCombo, 6)) + ` ${data.maxCombo}x combo`);
   }
-  // Rank
   if (data.rank && data.totalPlayers) {
     const medal = data.rank === 1 ? '🥇' : data.rank === 2 ? '🥈' : data.rank === 3 ? '🥉' : '🏅';
     rows.push(`${medal} #${data.rank}/${data.totalPlayers}`);
@@ -143,13 +152,13 @@ function buildAdventureRows(data: AdventureShareData): string[] {
   return rows;
 }
 
-/** Drill: score + accuracy + time */
+/** Drill: accuracy as lime ticks, not a Wordle meter. */
 function buildDrillRows(data: DrillShareData): string[] {
   const rows: string[] = [];
   if (data.totalWords) {
     const pct = Math.round((data.wordsFound / data.totalWords) * 100);
-    const bars = Math.round(pct / 10);
-    rows.push('🟩'.repeat(bars) + '⬜'.repeat(10 - bars) + ` ${pct}%`);
+    const ticks = Math.round(pct / 10);
+    rows.push(`${'▰'.repeat(ticks)}${'▱'.repeat(10 - ticks)} ${pct}%`);
   }
   rows.push(`📝 ${data.wordsFound} words`);
   if (data.timeSpent) rows.push(`⏱️ ${data.timeSpent}s`);
@@ -161,8 +170,8 @@ function getShareParts(data: GameShareData, t: (key: string) => string): { heade
   switch (data.mode) {
     case 'classic':
       return {
-        header: t('share.emojiCard.classicHeader').replace('{number}', String(data.puzzleNumber)),
-        rows: buildClassicRows(data.words),
+        header: `⚡ ${t('share.emojiCard.classicHeader').replace('{number}', String(data.puzzleNumber))}`,
+        rows: buildClassicRows(data.words, t),
         scoreLine: `${data.score.toLocaleString()} ${t('common.pts')}`,
       };
     case 'blast':
@@ -174,7 +183,7 @@ function getShareParts(data: GameShareData, t: (key: string) => string): { heade
     case 'singleplayer':
       return {
         header: t('share.emojiCard.singleplayerHeader'),
-        rows: buildSingleplayerRows(data),
+        rows: buildSingleplayerRows(data, t),
         scoreLine: `${data.score.toLocaleString()} ${t('common.pts')} · ${data.words.length} ${t('common.words')}`,
       };
     case 'adventure':
@@ -236,7 +245,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
     }
   }, [shareText, handleCopy, onShareClick]);
 
-  const { header, rows: emojiRows, scoreLine } = getShareParts(data, t);
+  const { header, rows: recapRows, scoreLine } = getShareParts(data, t);
 
   return (
     <m.div
@@ -244,27 +253,23 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
+      className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 select-all"
     >
-      {/* Header */}
       <div className="text-neo-lime font-black text-xs uppercase tracking-widest mb-3">
         {header}
       </div>
 
-      {/* Emoji rows */}
-      <div className="space-y-1 mb-3 text-base leading-relaxed">
-        {emojiRows.map((row, idx) => (
+      <div className="space-y-1 mb-3 text-sm leading-relaxed font-bold text-neo-white">
+        {recapRows.map((row, idx) => (
           <div key={`row-${idx}-${row}`}>{row}</div>
         ))}
       </div>
 
-      {/* Score + domain */}
       <div className="border-t border-slate-700/50 pt-2 mt-2 mb-3">
-        <div className="text-neo-white font-bold text-sm">{scoreLine}</div>
-        <div className="text-slate-500 text-xs mt-0.5">lexiclash.live</div>
+        <div className="text-neo-white font-black text-sm tabular-nums">{scoreLine}</div>
+        <div className="text-slate-500 text-xs mt-0.5 font-mono tracking-wider">lexiclash.live</div>
       </div>
 
-      {/* Share buttons */}
       <div className="flex gap-2 select-none">
         <Button
           onClick={handleNativeShare}

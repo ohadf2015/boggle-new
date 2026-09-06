@@ -10,6 +10,8 @@ const t = (key: string) => {
     'share.emojiCard.blastHeader': 'LexiClash Blast 💥',
     'share.emojiCard.share': 'Share',
     'share.emojiCard.copy': 'Copy',
+    'share.words': 'words',
+    'share.longest': 'Longest:',
     'common.pts': 'pts',
     'common.copied': 'Copied!',
     'blast.cleared': 'Cleared',
@@ -36,13 +38,16 @@ describe('GameEmojiShareCard — classic mode', () => {
     expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('pts');
   });
 
-  it('renders green squares for each found word', () => {
+  it('renders a LexiClash recap, never Wordle letter-squares', () => {
     render(<GameEmojiShareCard data={classicData} t={t} />);
     const card = screen.getByTestId('game-emoji-share-card');
-    // CAT = 3 letters → 🟩🟩🟩
-    expect(card).toHaveTextContent('🟩🟩🟩');
-    // STONE = 5 letters → 🟩🟩🟩🟩🟩
-    expect(card).toHaveTextContent('🟩🟩🟩🟩🟩');
+    expect(card.textContent).not.toContain('🟩');
+    expect(card.textContent).not.toContain('🟨');
+    expect(card.textContent).not.toContain('⬛');
+    expect(card.textContent).not.toContain('⬜');
+    expect(card).toHaveTextContent('3 words');
+    expect(card).toHaveTextContent('STONE');
+    expect(card).toHaveTextContent('LexiClash');
   });
 
   it('shows Share and Copy buttons', () => {
@@ -97,7 +102,6 @@ describe('GameEmojiShareCard — blast mode', () => {
   it('renders star rows for completed waves', () => {
     render(<GameEmojiShareCard data={blastData} t={t} />);
     const card = screen.getByTestId('game-emoji-share-card');
-    // Wave 1 at 100% → ⭐⭐⭐
     expect(card).toHaveTextContent('⭐⭐⭐');
   });
 

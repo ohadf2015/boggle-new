@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { m } from 'framer-motion';
 import { Eye, EyeOff, Share2, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import type { Language } from '@/types';
 interface WordEntry {
   word: string;
   found: boolean;
-  /** Per-letter feedback: green (correct), yellow (present), gray (absent) */
+  /** Per-letter feedback kept on the type for callers; never rendered as Wordle squares. */
   feedback?: Array<{ letter: string; feedback: 'green' | 'yellow' | 'gray' }>;
 }
 
@@ -23,35 +23,61 @@ export interface EmojiShareCardProps {
   t: (key: string) => string;
 }
 
-function wordToEmoji(entry: WordEntry): string {
-  // Use per-letter feedback for Wordle-style colored squares
-  if (entry.feedback && entry.feedback.length > 0) {
-    return entry.feedback
-      .map((f) => {
-        if (f.feedback === 'green') return '🟩';
-        if (f.feedback === 'yellow') return '🟨';
-        return '⬛';
-      })
-      .join('');
+const LENGTH_BAR_CLASS: Record<number, string> = {
+  2: 'bg-slate-400',
+  3: 'bg-neo-cyan',
+  4: 'bg-neo-lime',
+  5: 'bg-neo-pink',
+  6: 'bg-neo-purple',
+  7: 'bg-neo-orange',
+};
+
+function barClassForLength(len: number): string {
+  if (len >= 7) return LENGTH_BAR_CLASS[7];
+  return LENGTH_BAR_CLASS[len] ?? LENGTH_BAR_CLASS[3];
+}
+
+function countByLength(words: WordEntry[]): Array<{ len: number; found: number; missed: number }> {
+  const map = new Map<number, { found: number; missed: number }>();
+  for (const w of words) {
+    const len = Math.max(1, w.word.length);
+    const row = map.get(len) ?? { found: 0, missed: 0 };
+    if (w.found) row.found += 1;
+    else row.missed += 1;
+    map.set(len, row);
   }
-  // Fallback: all green if found, all black if not
-  const square = entry.found ? '🟩' : '⬛';
-  return square.repeat(entry.word.length);
+  return [...map.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([len, counts]) => ({ len, ...counts }));
 }
 
-/** Mask a word with asterisks, keeping length visible */
-function maskWord(word: string): string {
-  return '*'.repeat(word.length);
+function longestFound(words: WordEntry[]): WordEntry | null {
+  return words
+    .filter((w) => w.found && w.word.length > 0)
+    .sort((a, b) => b.word.length - a.word.length)[0] ?? null;
 }
 
-/** Build plain-text share string for daily challenge (E-2) */
-function buildDailyShareText(puzzleNumber: number, score: number, solved: boolean, words: WordEntry[], t: (key: string) => string): string {
-  const rows = words.slice(0, 8).map(wordToEmoji);
+/** Plain-text share: LexiClash recap, never a Wordle letter-grid. */
+export function buildDailyShareText(
+  puzzleNumber: number,
+  score: number,
+  solved: boolean,
+  words: WordEntry[],
+  t: (key: string) => string,
+): string {
+  const found = words.filter((w) => w.found).length;
+  const longest = longestFound(words);
+  const header = t('daily.puzzleNumber').replace('{number}', String(puzzleNumber));
+  const status = solved ? '✅' : '❌';
+  const wordsLine = `${found} ${t('share.words')}`;
+  const longestLine = longest
+    ? `${t('share.longest')} ${longest.word.length}`
+    : null;
   return [
-    `${t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))} ${solved ? '✅' : '❌'}`,
-    rows.join('\n'),
-    `${score} ${t('wordHunt.leaderboard.pts')}`,
-    'https://lexiclash.live',
+    `⚡ LEXICLASH · ${header} ${status}`,
+    [wordsLine, longestLine].filter(Boolean).join(' · '),
+    `${score.toLocaleString()} ${t('wordHunt.leaderboard.pts')}`,
+    'lexiclash.live',
   ].join('\n');
 }
 
@@ -60,13 +86,22 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   score,
   solved,
   words,
-  language: _language,  // kept in interface for future RTL support
+  language: _language,
   t,
 }) => {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareText = buildDailyShareText(puzzleNumber, score, solved, words, t);
+  const shareText = useMemo(
+    () => buildDailyShareText(puzzleNumber, score, solved, words, t),
+    [puzzleNumber, score, solved, words, t],
+  );
+
+  const foundCount = words.filter((w) => w.found).length;
+  const missedCount = words.length - foundCount;
+  const lengthRows = useMemo(() => countByLength(words), [words]);
+  const maxBucket = Math.max(1, ...lengthRows.map((r) => r.found + r.missed));
+  const longest = longestFound(words);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -89,17 +124,16 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   }, [shareText, handleCopy]);
 
   return (
-    <NeoPanel asChild tone="navy" className="p-4 font-mono text-sm select-all">
+    <NeoPanel asChild tone="navy" className="p-4 select-all">
     <m.div
       data-testid="emoji-share-card"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      {/* Puzzle header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-neo-lime font-black text-xs uppercase tracking-widest">
-          {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))} {solved ? '✅' : '❌'}
+        <span className="text-neo-lime font-black text-xs uppercase tracking-[0.18em]">
+          ⚡ LEXICLASH · {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))} {solved ? '✅' : '❌'}
         </span>
         <button type="button"
           data-testid="emoji-reveal-toggle"
@@ -118,25 +152,82 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
         </button>
       </div>
 
-      {/* Emoji rows */}
-      <div className="space-y-1 mb-3">
-        {words.map((entry, idx) => (
-          <div key={`word-${idx}-${entry.word}`} className="flex items-center gap-2">
-            <span className="text-base leading-none">{wordToEmoji(entry)}</span>
-            <span className={`text-xs uppercase tracking-wide ${entry.found ? 'text-slate-400' : 'text-slate-600'}`}>
-              {revealed ? entry.word : maskWord(entry.word)}
-            </span>
+      <div className="flex items-end justify-between gap-3 mb-4">
+        <div>
+          <div className="text-neo-lime font-black text-3xl leading-none tabular-nums tracking-tight">
+            {score.toLocaleString()}
           </div>
-        ))}
+          <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">
+            {t('wordHunt.leaderboard.pts')}
+          </div>
+        </div>
+        <div className="text-end">
+          <div className="text-neo-cyan font-black text-xl leading-none tabular-nums">
+            {foundCount}
+          </div>
+          <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">
+            {t('share.words')}
+          </div>
+        </div>
       </div>
 
-      {/* Score + domain */}
-      <div className="border-t border-slate-700/50 pt-2 mt-2 mb-3">
-        <div className="text-neo-white font-bold text-sm">{score} {t('wordHunt.leaderboard.pts')}</div>
-        <div className="text-slate-500 text-xs mt-0.5">lexiclash.live</div>
+      {lengthRows.length > 0 && (
+        <div data-testid="lexiclash-length-bars" className="space-y-1.5 mb-4">
+          {lengthRows.map((row) => {
+            const total = row.found + row.missed;
+            const foundPct = Math.max(8, Math.round((row.found / maxBucket) * 100));
+            return (
+              <div key={`len-${row.len}`} className="flex items-center gap-2">
+                <span className="w-4 text-[10px] font-black text-slate-400 tabular-nums">{row.len}</span>
+                <div className="flex-1 h-2 rounded-sm bg-neo-navy-light overflow-hidden border border-neo-black">
+                  <div
+                    className={`h-full ${barClassForLength(row.len)}`}
+                    style={{ width: `${foundPct}%` }}
+                  />
+                </div>
+                <span className="w-8 text-[10px] font-bold text-slate-400 tabular-nums text-end">
+                  {row.found}/{total}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {longest && (
+        <div className="mb-3 px-3 py-2 rounded-neo border-2 border-neo-lime/30 bg-neo-lime/10">
+          <div className="text-[10px] font-black uppercase tracking-widest text-neo-lime">
+            {t('share.longest')}
+          </div>
+          <div className="font-black text-lg tracking-widest uppercase text-neo-white truncate">
+            {revealed ? longest.word : '●'.repeat(longest.word.length)}
+          </div>
+        </div>
+      )}
+
+      {revealed && (
+        <div className="mb-3 flex flex-wrap gap-1">
+          {words.filter((w) => w.found).slice(0, 12).map((entry, idx) => (
+            <span
+              key={`found-${idx}-${entry.word}`}
+              className="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide rounded-sm bg-neo-navy-light text-neo-cyan border border-neo-black"
+            >
+              {entry.word}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {missedCount > 0 && !revealed && (
+        <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-3">
+          {missedCount} {t('share.words')}
+        </div>
+      )}
+
+      <div className="border-t border-slate-700/50 pt-2 mt-1 mb-3">
+        <div className="text-slate-500 text-xs font-mono tracking-wider">lexiclash.live</div>
       </div>
 
-      {/* Share buttons (E-2 — were missing entirely) */}
       <div className="flex gap-2 select-none">
         <Button
           onClick={handleNativeShare}
