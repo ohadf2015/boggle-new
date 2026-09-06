@@ -84,21 +84,29 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const router = useRouter();
 
   // Handle navigation with session cleanup OR direct action callback
-  const handleNavigate = useCallback(async (href: string, destination: NextStepDestination) => {
+  const handleNavigate = useCallback((href: string, destination: NextStepDestination) => {
     trackGrowthEvent('next_step_clicked', { from: currentMode, to: destination, variant });
-    try {
-      await beforeNavigate?.();
-    } catch {
-      // The gate is best-effort — never strand the player on the results page.
-    }
-    // If onAction callback is provided, use it instead of navigation
-    if (onAction) {
-      onAction();
+    const go = () => {
+      // If onAction callback is provided, use it instead of navigation
+      if (onAction) {
+        onAction();
+        return;
+      }
+      // Clear current session before navigating to prevent being stuck on results page
+      clearSessionPreservingUsername();
+      router.push(href);
+    };
+    // No gate → navigate synchronously (the historical contract; callers and
+    // tests rely on push happening within the click). With a gate, await it
+    // best-effort — it must never strand the player on the results page.
+    if (!beforeNavigate) {
+      go();
       return;
     }
-    // Clear current session before navigating to prevent being stuck on results page
-    clearSessionPreservingUsername();
-    router.push(href);
+    Promise.resolve()
+      .then(() => beforeNavigate())
+      .catch(() => undefined)
+      .then(go);
   }, [router, onAction, currentMode, variant, beforeNavigate]);
 
   // Configure next step based on current mode
