@@ -138,3 +138,14 @@ describe('trackGameCompletion — first_game_won mode propagation', () => {
     expect(payload!.mode).toBe('blast');
   });
 });
+
+describe('trackGameStart — t_c7d4f54a no bare dual-emit', () => {
+  beforeEach(() => captureMock.mockClear());
+
+  it('emits growth:game_started once and does not emit bare game_started', () => {
+    trackGameStart('singleplayer');
+    const names = captureMock.mock.calls.map(([name]) => name);
+    expect(names.filter((n) => n === 'growth:game_started')).toHaveLength(1);
+    expect(names).not.toContain('game_started');
+  });
+});
