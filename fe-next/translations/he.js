@@ -12962,7 +12962,13 @@ const he = {
       "printPracticeSheetSentenceLabel": "השתמשו בה במשפט",
       "printPracticeSheetNameLine": "שם: ________________",
       "printPracticeSheetDateLine": "תאריך: ________________",
-      "printPracticeSheetFooter": "LexiClash · תרגול בלי מכשירים"
+      "printPracticeSheetFooter": "LexiClash · תרגול בלי מכשירים",
+      "startUnpluggedReteachLive": "התחל שיעור חי מנותק ממסכים",
+      "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס — בלי מכשירים",
+      "unpluggedReteachReveal": "חשוף",
+      "unpluggedReteachNext": "הבא",
+      "unpluggedReteachPrev": "הקודם",
+      "unpluggedReteachProgress": "מילה {{current}} מתוך {{total}}"
     },
     "nav": {
       "section": "מורים",

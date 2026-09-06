@@ -35,6 +35,7 @@ describe('ClassGapReteachLiveCta', () => {
       <ClassGapReteachLiveCta
         payload={payload}
         reteachLabel="Start 3-min reteach Live"
+        unpluggedLabel="Start unplugged reteach Live"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -47,6 +48,7 @@ describe('ClassGapReteachLiveCta', () => {
       <ClassGapReteachLiveCta
         payload={payload}
         reteachLabel="Start 3-min reteach Live"
+        unpluggedLabel="Start unplugged reteach Live"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -64,6 +66,7 @@ describe('ClassGapReteachLiveCta', () => {
       <ClassGapReteachLiveCta
         payload={{ ...payload, missedWords: [] }}
         reteachLabel="Start 3-min reteach Live"
+        unpluggedLabel="Start unplugged reteach Live"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -71,4 +74,23 @@ describe('ClassGapReteachLiveCta', () => {
     expect(screen.queryByTestId('start-reteach-live')).not.toBeInTheDocument();
     expect(screen.getByText('Play a class game')).toBeInTheDocument();
   });
+
+  it('offers Start unplugged reteach Live linking to the teacher-screen path', () => {
+    render(
+      <ClassGapReteachLiveCta
+        payload={payload}
+        reteachLabel="Start 3-min reteach Live"
+        unpluggedLabel="Start unplugged reteach Live"
+        educationHref="/en/education"
+        educationLabel="Play a class game"
+      />,
+    );
+    const link = screen.getByTestId('start-unplugged-reteach-live');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/unplugged-reteach');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+  });
+
 });

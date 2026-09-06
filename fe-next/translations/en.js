@@ -11622,7 +11622,13 @@ const en = {
       "printPracticeSheetSentenceLabel": "Use it in a sentence",
       "printPracticeSheetNameLine": "Name: ________________",
       "printPracticeSheetDateLine": "Date: ________________",
-      "printPracticeSheetFooter": "LexiClash · device-free practice"
+      "printPracticeSheetFooter": "LexiClash · device-free practice",
+      "startUnpluggedReteachLive": "Start unplugged reteach Live",
+      "unpluggedReteachHint": "Students answer on the printed practice sheet — no devices needed",
+      "unpluggedReteachReveal": "Reveal",
+      "unpluggedReteachNext": "Next",
+      "unpluggedReteachPrev": "Previous",
+      "unpluggedReteachProgress": "Word {{current}} of {{total}}"
     },
     "nav": {
       "section": "Teachers",

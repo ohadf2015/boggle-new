@@ -1433,7 +1433,13 @@ const ru = {
       "printPracticeSheetSentenceLabel": "Используйте в предложении",
       "printPracticeSheetNameLine": "Имя: ________________",
       "printPracticeSheetDateLine": "Дата: ________________",
-      "printPracticeSheetFooter": "LexiClash · практика без устройств"
+      "printPracticeSheetFooter": "LexiClash · практика без устройств",
+      "startUnpluggedReteachLive": "Начать офлайн reteach Live",
+      "unpluggedReteachHint": "Ученики отвечают на распечатанном листе — без устройств",
+      "unpluggedReteachReveal": "Показать",
+      "unpluggedReteachNext": "Далее",
+      "unpluggedReteachPrev": "Назад",
+      "unpluggedReteachProgress": "Слово {{current}} из {{total}}"
     },
     "nav": {
       "section": "Учителям",

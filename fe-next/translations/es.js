@@ -13108,7 +13108,13 @@ const es = {
       "printPracticeSheetSentenceLabel": "Úsala en una frase",
       "printPracticeSheetNameLine": "Nombre: ________________",
       "printPracticeSheetDateLine": "Fecha: ________________",
-      "printPracticeSheetFooter": "LexiClash · práctica sin dispositivos"
+      "printPracticeSheetFooter": "LexiClash · práctica sin dispositivos",
+      "startUnpluggedReteachLive": "Iniciar reteach Live sin dispositivos",
+      "unpluggedReteachHint": "Los alumnos responden en la hoja impresa — sin dispositivos",
+      "unpluggedReteachReveal": "Mostrar",
+      "unpluggedReteachNext": "Siguiente",
+      "unpluggedReteachPrev": "Anterior",
+      "unpluggedReteachProgress": "Palabra {{current}} de {{total}}"
     },
     "nav": {
       "section": "Docentes",

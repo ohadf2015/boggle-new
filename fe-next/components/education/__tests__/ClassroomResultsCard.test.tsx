@@ -240,4 +240,26 @@ describe('ClassroomResultsCard', () => {
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
   });
+
+  it('offers the teacher an unplugged reteach Live link from last-session misses', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('start-unplugged-reteach-live');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/unplugged-reteach');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('Noa');
+  });
+
+  it('never offers a student the unplugged reteach Live CTA', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('start-unplugged-reteach-live')).not.toBeInTheDocument();
+  });
+
+  it('hides the unplugged reteach Live CTA when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('start-unplugged-reteach-live')).not.toBeInTheDocument();
+  });
+
 });
