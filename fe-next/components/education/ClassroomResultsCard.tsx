@@ -18,11 +18,12 @@
 'use client';
 
 import { useState } from 'react';
-import { GraduationCap, Check, X, RotateCcw, Play, Share2 } from 'lucide-react';
+import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
+import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -119,6 +120,31 @@ export function ClassroomResultsCard({
       return null;
     }
   })();
+
+  /**
+   * Device-free reteach: printable missed-words practice sheet (foil Kahoot
+   * Classic Unplugged / Team Tiles). Class-level words only — no student names.
+   */
+  const handlePrintPracticeSheet = () => {
+    if (!isTeacher || summary.missedWords.length === 0) return;
+    openMissedWordsPracticeSheet({
+      lesson: summary.lessonNames.join(', '),
+      teacher: summary.teacherName,
+      missedWords: summary.missedWords,
+      locale: language,
+      labels: {
+        title: t('education.results.printPracticeSheetTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        subtitle: t('education.results.printPracticeSheetSubtitle'),
+        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
+        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
+        nameLine: t('education.results.printPracticeSheetNameLine'),
+        dateLine: t('education.results.printPracticeSheetDateLine'),
+        footer: t('education.results.printPracticeSheetFooter'),
+      },
+    });
+  };
 
   const handleShareGap = async () => {
     const lesson = summary.lessonNames.join(', ');
@@ -263,6 +289,19 @@ export function ClassroomResultsCard({
                 {t('education.results.assignPracticeGoogleClassroom')}
               </a>
             )}
+            <button
+              type="button"
+              data-testid="print-missed-words-practice-sheet"
+              onClick={handlePrintPracticeSheet}
+              className={cn(
+                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
+                'shadow-hard-sm hover:shadow-hard transition-all'
+              )}
+            >
+              <Printer className="w-4 h-4" aria-hidden />
+              {t('education.results.printPracticeSheet')}
+            </button>
           </div>
         ) : (
           <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">

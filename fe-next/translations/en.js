@@ -11614,7 +11614,15 @@ const en = {
       "postReteachGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from the Stream.",
       "assignPracticeGoogleClassroom": "Assign practice homework to Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Practice missed words — {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "Open the link and practise these missed words at home: {{missed}}. Turn in when done."
+      "assignPracticeGoogleClassroomBody": "Open the link and practise these missed words at home: {{missed}}. Turn in when done.",
+      "printPracticeSheet": "Print practice sheet",
+      "printPracticeSheetTitle": "Missed-words practice — {{lesson}}",
+      "printPracticeSheetSubtitle": "Device-free reteach — write each word, then use it in a sentence",
+      "printPracticeSheetWriteLabel": "Write the word",
+      "printPracticeSheetSentenceLabel": "Use it in a sentence",
+      "printPracticeSheetNameLine": "Name: ________________",
+      "printPracticeSheetDateLine": "Date: ________________",
+      "printPracticeSheetFooter": "LexiClash · device-free practice"
     },
     "nav": {
       "section": "Teachers",

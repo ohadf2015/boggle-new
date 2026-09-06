@@ -12954,7 +12954,15 @@ const he = {
       "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו Live ל-3 דקות על המילים החסרות: {{missed}}. התלמידים מצטרפים מה-Stream.",
       "assignPracticeGoogleClassroom": "שיבוץ תרגול ב-Google Classroom",
       "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות — {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו."
+      "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו.",
+      "printPracticeSheet": "הדפסת דף תרגול",
+      "printPracticeSheetTitle": "תרגול מילים חסרות — {{lesson}}",
+      "printPracticeSheetSubtitle": "חזרה בלי מכשירים — כתבו כל מילה והשתמשו בה במשפט",
+      "printPracticeSheetWriteLabel": "כתבו את המילה",
+      "printPracticeSheetSentenceLabel": "השתמשו בה במשפט",
+      "printPracticeSheetNameLine": "שם: ________________",
+      "printPracticeSheetDateLine": "תאריך: ________________",
+      "printPracticeSheetFooter": "LexiClash · תרגול בלי מכשירים"
     },
     "nav": {
       "section": "מורים",

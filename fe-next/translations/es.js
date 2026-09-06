@@ -13100,7 +13100,15 @@ const es = {
       "postReteachGoogleClassroomBody": "Abre el enlace y empieza el Live de 3 min con estas palabras: {{missed}}. Los alumnos se unen desde el Stream.",
       "assignPracticeGoogleClassroom": "Asignar práctica en Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Practicar palabras falladas — {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "Abre el enlace y practica en casa estas palabras: {{missed}}. Entrégalo cuando termines."
+      "assignPracticeGoogleClassroomBody": "Abre el enlace y practica en casa estas palabras: {{missed}}. Entrégalo cuando termines.",
+      "printPracticeSheet": "Imprimir hoja de práctica",
+      "printPracticeSheetTitle": "Práctica de palabras falladas — {{lesson}}",
+      "printPracticeSheetSubtitle": "Repaso sin dispositivos — escribe cada palabra y úsala en una frase",
+      "printPracticeSheetWriteLabel": "Escribe la palabra",
+      "printPracticeSheetSentenceLabel": "Úsala en una frase",
+      "printPracticeSheetNameLine": "Nombre: ________________",
+      "printPracticeSheetDateLine": "Fecha: ________________",
+      "printPracticeSheetFooter": "LexiClash · práctica sin dispositivos"
     },
     "nav": {
       "section": "Docentes",

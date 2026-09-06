@@ -12,6 +12,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClassroomResultsCard } from '../ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { shareWithFallback } from '@/utils/shareWithFallback';
+import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -23,6 +24,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/utils/shareWithFallback', () => ({
   shareWithFallback: vi.fn().mockResolvedValue('copied'),
+}));
+
+vi.mock('@/lib/education/missedWordsPracticeSheet', () => ({
+  openMissedWordsPracticeSheet: vi.fn().mockReturnValue(true),
 }));
 
 const summary: ClassroomSummary = {
@@ -47,6 +52,8 @@ describe('ClassroomResultsCard', () => {
   beforeEach(() => {
     vi.mocked(shareWithFallback).mockClear();
     vi.mocked(shareWithFallback).mockResolvedValue('copied');
+    vi.mocked(openMissedWordsPracticeSheet).mockClear();
+    vi.mocked(openMissedWordsPracticeSheet).mockReturnValue(true);
   });
 
   it('names the lesson and teacher so a student knows whose class this was', () => {
@@ -209,5 +216,28 @@ describe('ClassroomResultsCard', () => {
     const clean = { ...summary, missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('assign-practice-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher a printable missed-words practice sheet after Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('print-missed-words-practice-sheet'));
+    expect(openMissedWordsPracticeSheet).toHaveBeenCalledTimes(1);
+    const arg = vi.mocked(openMissedWordsPracticeSheet).mock.calls[0][0];
+    expect(arg.missedWords).toEqual(['neutron']);
+    expect(arg.lesson).toContain('Physics 101');
+    expect(arg.teacher).toBe('Ms. Cohen');
+    expect(JSON.stringify(arg)).not.toContain('Maya');
+    expect(JSON.stringify(arg)).not.toContain('Noa');
+  });
+
+  it('never offers a student the printable practice sheet', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
+  });
+
+  it('hides the printable practice sheet when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
   });
 });
