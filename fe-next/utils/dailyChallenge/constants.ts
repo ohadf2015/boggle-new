@@ -105,16 +105,16 @@ export const getDailyCoinAwardKey = (date: string, lang: Language): string =>
 // ==========================================
 
 /**
- * Color emoji for each word length - representing word value/difficulty
+ * Length labels for share recaps — digits, never emoji.
  */
 export const LENGTH_EMOJI: Record<number, string> = {
-  2: '⬜',  // 2-letter (rare/bonus)
-  3: '🟨',  // Yellow - common
-  4: '🟩',  // Green - good
-  5: '🟦',  // Blue - great
-  6: '🟪',  // Purple - excellent
-  7: '🔶',  // Orange - amazing
-  8: '🔶',  // Orange (same for 8+)
+  2: '2',
+  3: '3',
+  4: '4',
+  5: '5',
+  6: '6',
+  7: '7',
+  8: '8',
 };
 
 /**

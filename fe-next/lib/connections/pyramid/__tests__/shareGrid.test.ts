@@ -7,7 +7,7 @@ const failed = { reached: true, solved: false, wrongAttempts: 3, hintUsed: false
 const unreached = { reached: false, solved: false, wrongAttempts: 0, hintUsed: false };
 
 describe('buildPyramidShareGrid', () => {
-  it('renders apex above the 3-base row, with title/date/score', () => {
+  it('renders finale over the 3-base row with labeled tokens', () => {
     const out = buildPyramidShareGrid({
       title: 'Word Bridge',
       dateISO: '2026-07-03',
@@ -18,15 +18,18 @@ describe('buildPyramidShareGrid', () => {
       url: 'https://lexiclash.live/connections/pyramid',
     });
     const lines = out.split('\n');
-    expect(lines[0]).toBe('🔺 Word Bridge 2026-07-03');
-    expect(lines[1]).toBe('　🟩'); // apex row (finale), indented to sit over the middle
-    expect(lines[2]).toBe('🟩🟨🟩'); // base row
+    expect(lines[0]).toBe('LexiClash · Word Bridge 2026-07-03');
+    expect(lines[1]).toBe('finale clean');
+    expect(lines[2]).toBe('base clean · messy · clean');
     expect(lines[3]).toBe('Perfect!');
     expect(lines[4]).toContain('900');
     expect(lines[5]).toBe('https://lexiclash.live/connections/pyramid');
+    expect(out).not.toContain('🟩');
+    expect(out).not.toContain('⚡');
+    expect(out).not.toContain('🔺');
   });
 
-  it('marks a lost run: failed finale red, unreached black', () => {
+  it('marks a lost run: failed finale miss, unreached dash', () => {
     const out = buildPyramidShareGrid({
       title: 'T',
       dateISO: '2026-07-03',
@@ -35,7 +38,7 @@ describe('buildPyramidShareGrid', () => {
       score: 0,
     });
     const lines = out.split('\n');
-    expect(lines[1]).toBe('　⬛');
-    expect(lines[2]).toBe('🟥⬛⬛');
+    expect(lines[1]).toBe('finale —');
+    expect(lines[2]).toBe('base miss · — · —');
   });
 });

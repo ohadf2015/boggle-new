@@ -17,11 +17,11 @@
  * - CollapsibleDetails.tsx - Rewards and details section
  * - CoinUnlockCard.tsx - Coin-gated action cards
  * - ShareSection.tsx   - Share buttons section
- * - AttemptHistory.tsx - Wordle-style attempt grid
+ * - AttemptHistory.tsx - in-game attempt history (not the share card)
  * - StatsSection.tsx   - Statistics with histogram
  * - TryAnotherLanguage.tsx - Language switching component
  * - SharePanel.tsx     - Share modal component
- * - EmojiShareCard.tsx   - Wordle-style emoji share card for results
+ * - EmojiShareCard.tsx   - LexiClash recap share card (score + length bars)
  */
 
 // Types

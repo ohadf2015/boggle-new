@@ -7571,12 +7571,27 @@ const ru = {
     "longest": "Самый Длинный:",
     "emojiCard": {
       "classicHeader": "LexiClash День #{number}",
-      "blastHeader": "LexiClash Взрыв 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Взрыв",
+      "singleplayerHeader": "LexiClash Соло",
       "adventureHeader": "LexiClash Приключение М{world}-У{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Поделиться",
-      "copy": "Копировать"
+      "copy": "Копировать",
+      "lettersCount": "{len} букв × {count}",
+      "stars": "звёзды",
+      "waveLine": "Волна {n} · {pct}%",
+      "rank": "ранг",
+      "highScore": "Новый рекорд",
+      "objectives": "цели",
+      "bossDefeated": "Босс повержен",
+      "accuracy": "точность",
+      "secondsSuffix": "с",
+      "time": "время",
+      "solved": "решено",
+      "unsolved": "открыто",
+      "status": "статус",
+      "hideWords": "Скрыть слова",
+      "revealWords": "Показать слова"
     }
   },
   "boardCoach": {

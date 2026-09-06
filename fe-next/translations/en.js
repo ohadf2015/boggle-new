@@ -1499,12 +1499,27 @@ const en = {
     "longest": "Longest:",
     "emojiCard": {
       "classicHeader": "LexiClash Daily #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash Solo",
       "adventureHeader": "LexiClash Adventure W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Share",
-      "copy": "Copy"
+      "copy": "Copy",
+      "lettersCount": "{len}-letter × {count}",
+      "stars": "stars",
+      "waveLine": "Wave {n} · {pct}%",
+      "rank": "rank",
+      "highScore": "New high score",
+      "objectives": "objectives",
+      "bossDefeated": "Boss defeated",
+      "accuracy": "accuracy",
+      "secondsSuffix": "s",
+      "time": "time",
+      "solved": "cleared",
+      "unsolved": "open",
+      "status": "status",
+      "hideWords": "Hide words",
+      "revealWords": "Reveal words"
     }
   },
   "messaging": {

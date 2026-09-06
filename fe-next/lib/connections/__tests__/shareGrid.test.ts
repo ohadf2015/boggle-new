@@ -14,22 +14,38 @@ const clean = (over: Partial<BridgeOutcome> = {}): BridgeOutcome => ({
   ...over,
 });
 
-describe('bridgeSquare — one emoji per bridge, by solve quality', () => {
-  it('clean solve (0 wrong, no hint) → green', () => {
-    expect(bridgeSquare(clean())).toBe('🟩');
+describe('bridgeSquare — one labeled token per bridge', () => {
+  it('clean solve (0 wrong, no hint) → clean', () => {
+    expect(bridgeSquare(clean())).toBe('clean');
   });
-  it('solved with ≥1 wrong (no hint) → yellow', () => {
-    expect(bridgeSquare(clean({ wrongAttempts: 2 }))).toBe('🟨');
+  it('solved with ≥1 wrong (no hint) → messy', () => {
+    expect(bridgeSquare(clean({ wrongAttempts: 2 }))).toBe('messy');
   });
-  it('solved using a hint → lightbulb (regardless of wrong count)', () => {
-    expect(bridgeSquare(clean({ hintUsed: true }))).toBe('💡');
-    expect(bridgeSquare(clean({ hintUsed: true, wrongAttempts: 3 }))).toBe('💡');
+  it('solved using a hint → hint', () => {
+    expect(bridgeSquare(clean({ hintUsed: true }))).toBe('hint');
+    expect(bridgeSquare(clean({ hintUsed: true, wrongAttempts: 3 }))).toBe('hint');
   });
-  it('reached but not solved → red', () => {
-    expect(bridgeSquare(clean({ solved: false }))).toBe('🟥');
+  it('reached but not solved → miss', () => {
+    expect(bridgeSquare(clean({ solved: false }))).toBe('miss');
   });
-  it('never reached (ran out of lives earlier) → blank', () => {
-    expect(bridgeSquare({ reached: false, solved: false, wrongAttempts: 0, hintUsed: false })).toBe('⬛');
+  it('never reached → dash', () => {
+    expect(bridgeSquare({ reached: false, solved: false, wrongAttempts: 0, hintUsed: false })).toBe('—');
+  });
+  it('never emits Wordle letter-squares or emoji', () => {
+    const marks = [
+      bridgeSquare(clean()),
+      bridgeSquare(clean({ wrongAttempts: 1 })),
+      bridgeSquare(clean({ hintUsed: true })),
+      bridgeSquare(clean({ solved: false })),
+      bridgeSquare({ reached: false, solved: false, wrongAttempts: 0, hintUsed: false }),
+    ].join('');
+    expect(marks).not.toContain('🟩');
+    expect(marks).not.toContain('🟨');
+    expect(marks).not.toContain('⬛');
+    expect(marks).not.toContain('⬜');
+    expect(marks).not.toContain('⚡');
+    expect(marks).not.toContain('💫');
+    expect(marks).not.toContain('💡');
   });
 });
 
@@ -58,22 +74,25 @@ describe('buildDailyBridgeGrid — assembled share text', () => {
     streak: 7,
     rank: 14 as number | null,
     url: 'play.lexiclash.app',
-    callout: 'Perfect chain! ⚡',
+    callout: 'Perfect chain',
   };
 
-  it('puts title + date on line 1, the emoji row on line 2, score line, then url', () => {
+  it('puts LexiClash header on line 1, labeled chain on line 2, score line, then url', () => {
     const text = buildDailyBridgeGrid({
       ...base,
       outcomes: [clean(), clean(), clean({ wrongAttempts: 1 }), clean({ hintUsed: true }), clean({ solved: false })],
     });
     const lines = text.split('\n');
-    expect(lines[0]).toBe('🌉 Word Bridge 2026-06-01');
-    expect(lines[1]).toBe('🟩🟩🟨💡🟥');
-    expect(text).toContain('Perfect chain! ⚡');
-    expect(text).toContain('4/5'); // 4 solved of 5
-    expect(text).toContain('🔥7');
+    expect(lines[0]).toBe('LexiClash · Word Bridge 2026-06-01');
+    expect(lines[1]).toBe('clean · clean · messy · hint · miss');
+    expect(text).toContain('Perfect chain');
+    expect(text).toContain('4/5');
+    expect(text).toContain('streak 7');
     expect(text).toContain('#14');
     expect(lines[lines.length - 1]).toBe('play.lexiclash.app');
+    expect(text).not.toContain('🟩');
+    expect(text).not.toContain('🔥');
+    expect(text).not.toContain('⚡');
   });
 
   it('omits the rank token when rank is null', () => {
@@ -81,14 +100,14 @@ describe('buildDailyBridgeGrid — assembled share text', () => {
     expect(text).not.toContain('#');
   });
 
-  it('emoji row is language-agnostic — works for an RTL/Hebrew title unchanged', () => {
+  it('chain is language-agnostic — works for an RTL/Hebrew title unchanged', () => {
     const text = buildDailyBridgeGrid({
       ...base,
       title: 'גשר מילים',
       outcomes: [clean(), clean(), clean()],
     });
-    expect(text.split('\n')[1]).toBe('🟩🟩🟩');
-    expect(text).toContain('🌉 גשר מילים 2026-06-01');
+    expect(text.split('\n')[1]).toBe('clean · clean · clean');
+    expect(text).toContain('LexiClash · גשר מילים 2026-06-01');
   });
 
   it('counts solved correctly with a never-reached tail', () => {
@@ -100,7 +119,7 @@ describe('buildDailyBridgeGrid — assembled share text', () => {
         { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
       ],
     });
-    expect(text.split('\n')[1]).toBe('🟩🟥⬛');
+    expect(text.split('\n')[1]).toBe('clean · miss · —');
     expect(text).toContain('1/3');
   });
 });

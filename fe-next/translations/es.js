@@ -1886,12 +1886,27 @@ const es = {
     "longest": "Más larga:",
     "emojiCard": {
       "classicHeader": "LexiClash Diario #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash Solo",
       "adventureHeader": "LexiClash Aventura W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Compartir",
-      "copy": "Copiar"
+      "copy": "Copiar",
+      "lettersCount": "{len} letras × {count}",
+      "stars": "estrellas",
+      "waveLine": "Oleada {n} · {pct}%",
+      "rank": "puesto",
+      "highScore": "Nuevo récord",
+      "objectives": "objetivos",
+      "bossDefeated": "Jefe derrotado",
+      "accuracy": "precisión",
+      "secondsSuffix": "s",
+      "time": "tiempo",
+      "solved": "resuelto",
+      "unsolved": "abierto",
+      "status": "estado",
+      "hideWords": "Ocultar palabras",
+      "revealWords": "Mostrar palabras"
     }
   },
   "messaging": {
