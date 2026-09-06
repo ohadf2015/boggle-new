@@ -11611,7 +11611,10 @@ const en = {
       "startReteachLive": "Start 3-min reteach Live",
       "postReteachGoogleClassroom": "Post 3-min reteach to Google Classroom",
       "postReteachGoogleClassroomTitle": "3-min reteach Live — {{lesson}}",
-      "postReteachGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from the Stream."
+      "postReteachGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from the Stream.",
+      "assignPracticeGoogleClassroom": "Assign practice homework to Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Practice missed words — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Open the link and practise these missed words at home: {{missed}}. Turn in when done."
     },
     "nav": {
       "section": "Teachers",

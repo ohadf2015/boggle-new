@@ -13097,7 +13097,10 @@ const es = {
       "startReteachLive": "Empezar reteach Live de 3 min",
       "postReteachGoogleClassroom": "Publicar reteach de 3 min en Google Classroom",
       "postReteachGoogleClassroomTitle": "Reteach Live de 3 min — {{lesson}}",
-      "postReteachGoogleClassroomBody": "Abre el enlace y empieza el Live de 3 min con estas palabras: {{missed}}. Los alumnos se unen desde el Stream."
+      "postReteachGoogleClassroomBody": "Abre el enlace y empieza el Live de 3 min con estas palabras: {{missed}}. Los alumnos se unen desde el Stream.",
+      "assignPracticeGoogleClassroom": "Asignar práctica en Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Practicar palabras falladas — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Abre el enlace y practica en casa estas palabras: {{missed}}. Entrégalo cuando termines."
     },
     "nav": {
       "section": "Docentes",

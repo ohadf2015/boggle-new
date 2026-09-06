@@ -12951,7 +12951,10 @@ const he = {
       "startReteachLive": "התחלת Live חזרה ל-3 דקות",
       "postReteachGoogleClassroom": "פרסום חזרה ל-3 דקות ב-Google Classroom",
       "postReteachGoogleClassroomTitle": "Live חזרה ל-3 דקות — {{lesson}}",
-      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו Live ל-3 דקות על המילים החסרות: {{missed}}. התלמידים מצטרפים מה-Stream."
+      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו Live ל-3 דקות על המילים החסרות: {{missed}}. התלמידים מצטרפים מה-Stream.",
+      "assignPracticeGoogleClassroom": "שיבוץ תרגול ב-Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו."
     },
     "nav": {
       "section": "מורים",

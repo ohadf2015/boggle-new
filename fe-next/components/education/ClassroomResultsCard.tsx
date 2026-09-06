@@ -56,15 +56,10 @@ export function ClassroomResultsCard({
   const foundByMe = (word: { foundBy: string[] }) =>
     word.foundBy.some((n) => n.toLowerCase() === username.toLowerCase());
 
-  /**
-   * Google Classroom add-on MVP: post the class-gap card (missed words, no names)
-   * to the Stream so the teacher can start a 3-min reteach Live from that link.
-   * Phase-1 share dialog — no OAuth. Absolute lexiclash.live URL.
-   */
-  const googleClassroomReteachHref = (() => {
+  const classGapUrlForTeacher = (() => {
     if (!isTeacher || summary.missedWords.length === 0) return null;
     try {
-      const classGapUrl = buildClassGapShareUrl({
+      return buildClassGapShareUrl({
         locale: language,
         lessonNames: summary.lessonNames,
         teacherName: summary.teacherName,
@@ -72,15 +67,53 @@ export function ClassroomResultsCard({
         total: summary.totalWords,
         missedWords: summary.missedWords,
       });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * Google Classroom add-on MVP: post the class-gap card (missed words, no names)
+   * to the Stream so the teacher can start a 3-min reteach Live from that link.
+   * Phase-1 share dialog — no OAuth. Absolute lexiclash.live URL.
+   */
+  const googleClassroomReteachHref = (() => {
+    if (!classGapUrlForTeacher) return null;
+    try {
       const missed = summary.missedWords.slice(0, 8).join(', ');
       return buildGoogleClassroomShareUrl({
-        joinUrl: classGapUrl,
+        joinUrl: classGapUrlForTeacher,
         title: t('education.results.postReteachGoogleClassroomTitle', {
           lesson: summary.lessonNames.join(', '),
         }),
         body: t('education.results.postReteachGoogleClassroomBody', {
           missed,
         }),
+        itemType: 'announcement',
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * After Live ends: assign the same class-gap card as Google Classroom *homework*
+   * (itemtype=assignment). Students open practice-at-home words from Classwork;
+   * teacher sets due date in Google's dialog. Still Phase-1 share — no OAuth.
+   */
+  const googleClassroomAssignHref = (() => {
+    if (!classGapUrlForTeacher) return null;
+    try {
+      const missed = summary.missedWords.slice(0, 8).join(', ');
+      return buildGoogleClassroomShareUrl({
+        joinUrl: classGapUrlForTeacher,
+        title: t('education.results.assignPracticeGoogleClassroomTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        body: t('education.results.assignPracticeGoogleClassroomBody', {
+          missed,
+        }),
+        itemType: 'assignment',
       });
     } catch {
       return null;
@@ -212,6 +245,22 @@ export function ClassroomResultsCard({
               >
                 <GraduationCap className="w-4 h-4" aria-hidden />
                 {t('education.results.postReteachGoogleClassroom')}
+              </a>
+            )}
+            {googleClassroomAssignHref && (
+              <a
+                href={googleClassroomAssignHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="assign-practice-google-classroom"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <GraduationCap className="w-4 h-4" aria-hidden />
+                {t('education.results.assignPracticeGoogleClassroom')}
               </a>
             )}
           </div>

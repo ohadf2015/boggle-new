@@ -1422,7 +1422,10 @@ const ru = {
       "startReteachLive": "Начать 3-минутный reteach Live",
       "postReteachGoogleClassroom": "Опубликовать 3-мин reteach в Google Classroom",
       "postReteachGoogleClassroomTitle": "3-мин reteach Live — {{lesson}}",
-      "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream."
+      "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream.",
+      "assignPracticeGoogleClassroom": "Назначить практику в Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите."
     },
     "nav": {
       "section": "Учителям",

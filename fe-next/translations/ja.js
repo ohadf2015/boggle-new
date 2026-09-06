@@ -13105,7 +13105,10 @@ const ja = {
       "startReteachLive": "3分再指導ライブを開始",
       "postReteachGoogleClassroom": "3分再指導を Google Classroom に投稿",
       "postReteachGoogleClassroomTitle": "3分再指導ライブ — {{lesson}}",
-      "postReteachGoogleClassroomBody": "リンクを開き、見逃した単語で3分ライブを開始: {{missed}}。生徒はストリームから参加します。"
+      "postReteachGoogleClassroomBody": "リンクを開き、見逃した単語で3分ライブを開始: {{missed}}。生徒はストリームから参加します。",
+      "assignPracticeGoogleClassroom": "練習課題を Google Classroom に割り当て",
+      "assignPracticeGoogleClassroomTitle": "見逃した単語の練習 — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "リンクを開き、見逃した単語を家庭で練習: {{missed}}。終わったら提出してください。"
     },
     "nav": {
       "section": "教師向け",

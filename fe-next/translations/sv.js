@@ -13343,7 +13343,10 @@ const sv = {
       "startReteachLive": "Starta 3-minuters reteach Live",
       "postReteachGoogleClassroom": "Publicera 3-minuters reteach i Google Classroom",
       "postReteachGoogleClassroomTitle": "3-minuters reteach Live — {{lesson}}",
-      "postReteachGoogleClassroomBody": "Öppna länken och starta 3-minuters Live på de missade orden: {{missed}}. Eleverna går med från Stream."
+      "postReteachGoogleClassroomBody": "Öppna länken och starta 3-minuters Live på de missade orden: {{missed}}. Eleverna går med från Stream.",
+      "assignPracticeGoogleClassroom": "Tilldela hemövning i Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Öva missade ord — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Öppna länken och öva dessa missade ord hemma: {{missed}}. Lämna in när du är klar."
     },
     "nav": {
       "section": "Lärare",
