@@ -18,10 +18,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { shareWithFallback } from '@/utils/shareWithFallback';
@@ -115,6 +117,22 @@ export function ClassroomResultsCard({
           missed,
         }),
         itemType: 'assignment',
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  const unpluggedReteachHref = (() => {
+    if (!isTeacher || summary.missedWords.length === 0) return null;
+    try {
+      return buildUnpluggedReteachPath({
+        locale: language,
+        lessonNames: summary.lessonNames,
+        teacherName: summary.teacherName,
+        found: summary.classFoundCount,
+        total: summary.totalWords,
+        missedWords: summary.missedWords,
       });
     } catch {
       return null;
@@ -288,6 +306,20 @@ export function ClassroomResultsCard({
                 <GraduationCap className="w-4 h-4" aria-hidden />
                 {t('education.results.assignPracticeGoogleClassroom')}
               </a>
+            )}
+            {unpluggedReteachHref && (
+              <Link
+                href={unpluggedReteachHref}
+                data-testid="start-unplugged-reteach-live"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-pink/90 text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <Play className="w-4 h-4" aria-hidden />
+                {t('education.results.startUnpluggedReteachLive')}
+              </Link>
             )}
             <button
               type="button"

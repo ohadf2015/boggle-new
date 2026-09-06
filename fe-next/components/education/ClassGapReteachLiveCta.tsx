@@ -15,12 +15,15 @@ import {
   classGapReteachLivePath,
   type ClassGapSharePayload,
 } from '@/lib/education/classGapShare';
+import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
 
 export interface ClassGapReteachLiveCtaProps {
   payload: ClassGapSharePayload;
   reteachLabel: string;
   educationHref: string;
   educationLabel: string;
+  /** Teacher-screen-only unplugged reteach (students use printable sheet). */
+  unpluggedLabel: string;
 }
 
 const primaryClass =
@@ -33,6 +36,7 @@ export function ClassGapReteachLiveCta({
   reteachLabel,
   educationHref,
   educationLabel,
+  unpluggedLabel,
 }: ClassGapReteachLiveCtaProps) {
   const router = useRouter();
 
@@ -56,6 +60,8 @@ export function ClassGapReteachLiveCta({
     );
   }
 
+  const unpluggedHref = buildUnpluggedReteachPath(payload);
+
   return (
     <>
       <button
@@ -67,6 +73,13 @@ export function ClassGapReteachLiveCta({
         <Play className="w-5 h-5" aria-hidden />
         {reteachLabel}
       </button>
+      <Link
+        href={unpluggedHref}
+        data-testid="start-unplugged-reteach-live"
+        className={secondaryClass}
+      >
+        {unpluggedLabel}
+      </Link>
       <Link href={educationHref} className={secondaryClass}>
         {educationLabel}
       </Link>
