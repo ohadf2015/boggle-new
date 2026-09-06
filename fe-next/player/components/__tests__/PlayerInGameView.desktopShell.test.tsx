@@ -6,6 +6,9 @@ import { vi } from 'vitest';
  */
 import { render, screen } from '@testing-library/react';
 
+// Live Vocab Quiz view is dynamic()-loaded; the eager next/dynamic mock below
+// would leave its import chain in flight past environment teardown.
+vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
 vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: (importFn: () => Promise<any>) => {
