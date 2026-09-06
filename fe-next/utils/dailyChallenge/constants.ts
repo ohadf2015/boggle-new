@@ -105,17 +105,16 @@ export const getDailyCoinAwardKey = (date: string, lang: Language): string =>
 // ==========================================
 
 /**
- * Length-value marks for share recaps — never Wordle letter-squares.
- * Longer words get louder marks; same shape as the on-screen length bars.
+ * Length labels for share recaps — digits, never emoji.
  */
 export const LENGTH_EMOJI: Record<number, string> = {
-  2: '·',
-  3: '○',
-  4: '●',
-  5: '◆',
-  6: '✦',
-  7: '⚡',
-  8: '⚡',
+  2: '2',
+  3: '3',
+  4: '4',
+  5: '5',
+  6: '6',
+  7: '7',
+  8: '8',
 };
 
 /**

@@ -1903,12 +1903,27 @@ const he = {
     "longest": "הכי ארוכה:",
     "emojiCard": {
       "classicHeader": "LexiClash יומי #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash יחיד",
       "adventureHeader": "LexiClash הרפתקה W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "שתף",
-      "copy": "העתק"
+      "copy": "העתק",
+      "lettersCount": "{len} אותיות × {count}",
+      "stars": "כוכבים",
+      "waveLine": "גל {n} · {pct}%",
+      "rank": "דירוג",
+      "highScore": "שיא חדש",
+      "objectives": "יעדים",
+      "bossDefeated": "הבוס הובס",
+      "accuracy": "דיוק",
+      "secondsSuffix": "ש",
+      "time": "זמן",
+      "solved": "נפתר",
+      "unsolved": "פתוח",
+      "status": "סטטוס",
+      "hideWords": "הסתר מילים",
+      "revealWords": "הצג מילים"
     }
   },
   "messaging": {

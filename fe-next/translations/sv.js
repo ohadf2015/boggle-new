@@ -2192,12 +2192,27 @@ const sv = {
     "longest": "Längsta:",
     "emojiCard": {
       "classicHeader": "LexiClash Daglig #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash Solo",
       "adventureHeader": "LexiClash Äventyr W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Dela",
-      "copy": "Kopiera"
+      "copy": "Kopiera",
+      "lettersCount": "{len} bokstäver × {count}",
+      "stars": "stjärnor",
+      "waveLine": "Våg {n} · {pct}%",
+      "rank": "rank",
+      "highScore": "Nytt rekord",
+      "objectives": "mål",
+      "bossDefeated": "Bossen besegrad",
+      "accuracy": "träffsäkerhet",
+      "secondsSuffix": "s",
+      "time": "tid",
+      "solved": "klarad",
+      "unsolved": "öppen",
+      "status": "status",
+      "hideWords": "Dölj ord",
+      "revealWords": "Visa ord"
     }
   },
   "messaging": {

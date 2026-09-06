@@ -14,24 +14,24 @@ const clean = (over: Partial<BridgeOutcome> = {}): BridgeOutcome => ({
   ...over,
 });
 
-describe('bridgeSquare — one LexiClash mark per bridge, by solve quality', () => {
-  it('clean solve (0 wrong, no hint) → bolt', () => {
-    expect(bridgeSquare(clean())).toBe('⚡');
+describe('bridgeSquare — one labeled token per bridge', () => {
+  it('clean solve (0 wrong, no hint) → clean', () => {
+    expect(bridgeSquare(clean())).toBe('clean');
   });
-  it('solved with ≥1 wrong (no hint) → sparkle', () => {
-    expect(bridgeSquare(clean({ wrongAttempts: 2 }))).toBe('💫');
+  it('solved with ≥1 wrong (no hint) → messy', () => {
+    expect(bridgeSquare(clean({ wrongAttempts: 2 }))).toBe('messy');
   });
-  it('solved using a hint → lightbulb (regardless of wrong count)', () => {
-    expect(bridgeSquare(clean({ hintUsed: true }))).toBe('💡');
-    expect(bridgeSquare(clean({ hintUsed: true, wrongAttempts: 3 }))).toBe('💡');
+  it('solved using a hint → hint', () => {
+    expect(bridgeSquare(clean({ hintUsed: true }))).toBe('hint');
+    expect(bridgeSquare(clean({ hintUsed: true, wrongAttempts: 3 }))).toBe('hint');
   });
   it('reached but not solved → miss', () => {
-    expect(bridgeSquare(clean({ solved: false }))).toBe('✕');
+    expect(bridgeSquare(clean({ solved: false }))).toBe('miss');
   });
-  it('never reached (ran out of lives earlier) → empty', () => {
-    expect(bridgeSquare({ reached: false, solved: false, wrongAttempts: 0, hintUsed: false })).toBe('○');
+  it('never reached → dash', () => {
+    expect(bridgeSquare({ reached: false, solved: false, wrongAttempts: 0, hintUsed: false })).toBe('—');
   });
-  it('never emits Wordle letter-squares', () => {
+  it('never emits Wordle letter-squares or emoji', () => {
     const marks = [
       bridgeSquare(clean()),
       bridgeSquare(clean({ wrongAttempts: 1 })),
@@ -43,6 +43,9 @@ describe('bridgeSquare — one LexiClash mark per bridge, by solve quality', () 
     expect(marks).not.toContain('🟨');
     expect(marks).not.toContain('⬛');
     expect(marks).not.toContain('⬜');
+    expect(marks).not.toContain('⚡');
+    expect(marks).not.toContain('💫');
+    expect(marks).not.toContain('💡');
   });
 });
 
@@ -71,26 +74,25 @@ describe('buildDailyBridgeGrid — assembled share text', () => {
     streak: 7,
     rank: 14 as number | null,
     url: 'play.lexiclash.app',
-    callout: 'Perfect chain! ⚡',
+    callout: 'Perfect chain',
   };
 
-  it('puts LexiClash header on line 1, the chain on line 2, score line, then url', () => {
+  it('puts LexiClash header on line 1, labeled chain on line 2, score line, then url', () => {
     const text = buildDailyBridgeGrid({
       ...base,
       outcomes: [clean(), clean(), clean({ wrongAttempts: 1 }), clean({ hintUsed: true }), clean({ solved: false })],
     });
     const lines = text.split('\n');
-    expect(lines[0]).toBe('⚡ LEXICLASH · Word Bridge 2026-06-01');
-    expect(lines[1]).toBe('⚡⚡💫💡✕');
-    expect(text).toContain('Perfect chain! ⚡');
-    expect(text).toContain('4/5'); // 4 solved of 5
-    expect(text).toContain('🔥7');
+    expect(lines[0]).toBe('LexiClash · Word Bridge 2026-06-01');
+    expect(lines[1]).toBe('clean · clean · messy · hint · miss');
+    expect(text).toContain('Perfect chain');
+    expect(text).toContain('4/5');
+    expect(text).toContain('streak 7');
     expect(text).toContain('#14');
     expect(lines[lines.length - 1]).toBe('play.lexiclash.app');
     expect(text).not.toContain('🟩');
-    expect(text).not.toContain('🟨');
-    expect(text).not.toContain('⬛');
-    expect(text).not.toContain('⬜');
+    expect(text).not.toContain('🔥');
+    expect(text).not.toContain('⚡');
   });
 
   it('omits the rank token when rank is null', () => {
@@ -104,8 +106,8 @@ describe('buildDailyBridgeGrid — assembled share text', () => {
       title: 'גשר מילים',
       outcomes: [clean(), clean(), clean()],
     });
-    expect(text.split('\n')[1]).toBe('⚡⚡⚡');
-    expect(text).toContain('⚡ LEXICLASH · גשר מילים 2026-06-01');
+    expect(text.split('\n')[1]).toBe('clean · clean · clean');
+    expect(text).toContain('LexiClash · גשר מילים 2026-06-01');
   });
 
   it('counts solved correctly with a never-reached tail', () => {
@@ -117,7 +119,7 @@ describe('buildDailyBridgeGrid — assembled share text', () => {
         { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
       ],
     });
-    expect(text.split('\n')[1]).toBe('⚡✕○');
+    expect(text.split('\n')[1]).toBe('clean · miss · —');
     expect(text).toContain('1/3');
   });
 });

@@ -1,38 +1,34 @@
 /**
- * Word Bridge daily share card — spoiler-free chain recap.
+ * Word Bridge daily share — spoiler-free labeled chain recap.
  *
- * One language-agnostic mark per bridge plus a localized praise callout the
- * caller supplies via `t()`. Pure — no DOM, no i18n coupling.
+ * One language-agnostic token per bridge plus a localized praise callout the
+ * caller supplies via `t()`. Pure — no DOM, no i18n coupling, no emoji.
  *
- * LexiClash marks (never Wordle letter-squares):
- *   ⚡ clean solve (0 wrong, no hint)
- *   💫 solved but with ≥1 wrong guess
- *   💡 solved using a hint
- *   ✕ reached but not solved (gave up / out of lives here)
- *   ○ never reached (lost earlier in the chain)
+ * Tokens:
+ *   clean  — 0 wrong, no hint
+ *   messy  — solved with ≥1 wrong guess
+ *   hint   — solved using a hint
+ *   miss   — reached but not solved
+ *   —      — never reached
  */
 
 export interface BridgeOutcome {
-  /** Did the player get to attempt this bridge at all? */
   reached: boolean;
   solved: boolean;
-  /** Wrong guesses on THIS bridge (resets per puzzle). */
   wrongAttempts: number;
   hintUsed: boolean;
 }
 
 export type GridCallout = 'perfect' | 'flawless' | 'oneAway' | 'solid' | 'tough';
 
-/** Map a single bridge's outcome to its universal mark. */
 export function bridgeSquare(o: BridgeOutcome): string {
-  if (!o.reached) return '○';
-  if (!o.solved) return '✕';
-  if (o.hintUsed) return '💡';
-  if (o.wrongAttempts > 0) return '💫';
-  return '⚡';
+  if (!o.reached) return '—';
+  if (!o.solved) return 'miss';
+  if (o.hintUsed) return 'hint';
+  if (o.wrongAttempts > 0) return 'messy';
+  return 'clean';
 }
 
-/** Pick the social praise hook for the whole chain (caller localizes the text). */
 export function gridCallout(outcomes: readonly BridgeOutcome[]): GridCallout {
   const solved = outcomes.filter((o) => o.solved);
   const unsolved = outcomes.length - solved.length;
@@ -46,27 +42,15 @@ export function gridCallout(outcomes: readonly BridgeOutcome[]): GridCallout {
 }
 
 export interface BridgeGridParams {
-  /** Localized game title, e.g. t('connections.title'). */
   title: string;
   dateISO: string;
   outcomes: readonly BridgeOutcome[];
   streak: number;
   rank: number | null;
-  /** Localized praise line (caller maps gridCallout → t()). Optional. */
   callout?: string;
-  /** Share/landing URL appended as the final line. Optional. */
   url?: string;
 }
 
-/**
- * Assemble the full shareable result. Layout (paste-safe, LexiClash-branded):
- *
- *   ⚡ LEXICLASH · {title} {date}
- *   ⚡⚡💫💡✕          ← the chain, in order, no spoilers
- *   {callout}            ← optional localized praise
- *   {solved}/{total} · 🔥{streak} · #{rank}
- *   {url}                ← optional
- */
 export function buildDailyBridgeGrid({
   title,
   dateISO,
@@ -76,13 +60,13 @@ export function buildDailyBridgeGrid({
   callout,
   url,
 }: BridgeGridParams): string {
-  const grid = outcomes.map(bridgeSquare).join('');
+  const chain = outcomes.map(bridgeSquare).join(' · ');
   const solved = outcomes.filter((o) => o.solved).length;
 
-  const score = [`${solved}/${outcomes.length}`, `🔥${streak}`];
+  const score = [`${solved}/${outcomes.length}`, `streak ${streak}`];
   if (rank != null) score.push(`#${rank}`);
 
-  const lines = [`⚡ LEXICLASH · ${title} ${dateISO}`, grid];
+  const lines = [`LexiClash · ${title} ${dateISO}`, chain];
   if (callout) lines.push(callout);
   lines.push(score.join(' · '));
   if (url) lines.push(url);

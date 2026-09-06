@@ -1,11 +1,10 @@
 /**
- * Bridge Pyramid share card — same spoiler-free LexiClash marks as the daily
- * (see ../shareGrid), but shaped like the pyramid: the finale mark sits
- * above the 3-base row. Pure — caller localizes title/callout via t().
+ * Bridge Pyramid share — same labeled tokens as the daily chain
+ * (see ../shareGrid), stacked as finale over the 3-base row.
  *
- *   ⚡ LEXICLASH · 🔺 {title} {date}
- *   　{finale}          ← U+3000 pad centers the apex over the base row
- *   {base}{base}{base}
+ *   LexiClash · {title} {date}
+ *   finale {token}
+ *   base {a} · {b} · {c}
  *   {callout}
  *   {score} pts
  *   {url}
@@ -32,9 +31,9 @@ export function buildPyramidShareGrid({
   url,
 }: PyramidGridParams): string {
   const lines = [
-    `⚡ LEXICLASH · 🔺 ${title} ${dateISO}`,
-    `　${bridgeSquare(finale)}`,
-    base.map(bridgeSquare).join(''),
+    `LexiClash · ${title} ${dateISO}`,
+    `finale ${bridgeSquare(finale)}`,
+    `base ${base.map(bridgeSquare).join(' · ')}`,
   ];
   if (callout) lines.push(callout);
   lines.push(`${score} pts`);

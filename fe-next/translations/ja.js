@@ -1903,12 +1903,27 @@ const ja = {
     "longest": "最長:",
     "emojiCard": {
       "classicHeader": "LexiClash デイリー #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash ソロ",
       "adventureHeader": "LexiClash アドベンチャー W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "シェア",
-      "copy": "コピー"
+      "copy": "コピー",
+      "lettersCount": "{len}文字 × {count}",
+      "stars": "スター",
+      "waveLine": "ウェーブ {n} · {pct}%",
+      "rank": "ランク",
+      "highScore": "自己ベスト",
+      "objectives": "目標",
+      "bossDefeated": "ボス撃破",
+      "accuracy": "精度",
+      "secondsSuffix": "秒",
+      "time": "時間",
+      "solved": "クリア",
+      "unsolved": "未クリア",
+      "status": "ステータス",
+      "hideWords": "単語を隠す",
+      "revealWords": "単語を表示"
     }
   },
   "messaging": {
