@@ -8,8 +8,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 let mockIsOnCG = false;
+let mockCgLoading = false;
+let mockDetectSync = false;
 vi.mock('@/components/CrazyGamesSDK', () => ({
-  useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG, isLoading: false }),
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCG, isLoading: mockCgLoading }),
+  detectCrazyGamesSync: () => mockDetectSync,
 }));
 
 vi.mock('framer-motion', () => {
@@ -44,12 +47,21 @@ describe('LandingHero', () => {
 
   beforeEach(() => {
     mockIsOnCG = false;
+    mockCgLoading = false;
+    mockDetectSync = false;
     vi.clearAllMocks();
   });
 
   it('renders mascot and classroom title on the web homepage', () => {
     render(<LandingHero {...baseProps} />);
     expect(screen.getByTestId('mascot')).toBeInTheDocument();
+    expect(screen.getByText('landing.classroomHeroTitle')).toBeInTheDocument();
+    expect(screen.queryByText('landing.welcomeTitle')).not.toBeInTheDocument();
+  });
+
+  it('keeps classroom H1 while CrazyGames SDK is still loading (SSR/first-paint)', () => {
+    mockCgLoading = true;
+    render(<LandingHero {...baseProps} />);
     expect(screen.getByText('landing.classroomHeroTitle')).toBeInTheDocument();
     expect(screen.queryByText('landing.welcomeTitle')).not.toBeInTheDocument();
   });
