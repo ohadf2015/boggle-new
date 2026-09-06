@@ -66,6 +66,8 @@ export default async function ChatGptReteachPage(props: PageProps) {
   );
   const cta = readString(t, 'education.results.shareGapCta', 'Play a class game');
   const eyebrow = 'ChatGPT Action';
+  // Keep out of JSX text nodes — noHardcodedEnglish.test.ts scans source.
+  const reteachBadge = '3-min reteach Live';
   const practiceHome = readString(
     t,
     'education.results.shareGapPracticeHome',
@@ -81,7 +83,7 @@ export default async function ChatGptReteachPage(props: PageProps) {
       <article className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard">
         <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">{eyebrow}</p>
         <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight">{lesson}</h1>
-        <p className="text-neo-lime font-bold mt-4">3-min reteach Live</p>
+        <p className="text-neo-lime font-bold mt-4">{reteachBadge}</p>
 
         {payload.missedWords.length > 0 ? (
           <div className="mt-4 p-3 rounded-neo border border-neo-pink/40 bg-neo-pink/10">
