@@ -89,3 +89,62 @@ describe('AdSenseLoader — no-fill audit', () => {
     expect(trackGrowthEvent).not.toHaveBeenCalled();
   });
 });
+
+// ------------------------------------------------------------------
+// Education module must be ad-free on web too. Auto-Ads is page-wide once
+// adsbygoogle.js is in the document, so two layers: never inject the script
+// on an ad-free route, and pause ad requests + tag the document whenever the
+// app soft-navigates INTO one with the script already loaded.
+// ------------------------------------------------------------------
+const nav = vi.hoisted(() => ({ pathname: '/' as string }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => nav.pathname,
+}));
+
+describe('AdSenseLoader — education routes stay ad-free', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_ADSENSE_ENABLED = 'true';
+    document.getElementById('adsbygoogle-init')?.remove();
+    document.documentElement.classList.remove('ads-free-route');
+    (window as unknown as { adsbygoogle?: unknown }).adsbygoogle = undefined;
+    nav.pathname = '/';
+  });
+
+  afterEach(() => {
+    cleanup();
+    delete process.env.NEXT_PUBLIC_ADSENSE_ENABLED;
+    document.getElementById('adsbygoogle-init')?.remove();
+    document.documentElement.classList.remove('ads-free-route');
+  });
+
+  it('Given an education route, When mounted, Then adsbygoogle.js is NOT injected', () => {
+    nav.pathname = '/en/education/for-schools';
+    render(<AdSenseLoader />);
+    expect(document.getElementById('adsbygoogle-init')).toBeNull();
+    expect(document.documentElement.classList.contains('ads-free-route')).toBe(true);
+  });
+
+  it('Given a monetizable route, When mounted, Then the script injects and the document is untagged', () => {
+    nav.pathname = '/en/leaderboard';
+    render(<AdSenseLoader />);
+    expect(document.getElementById('adsbygoogle-init')).not.toBeNull();
+    expect(document.documentElement.classList.contains('ads-free-route')).toBe(false);
+  });
+
+  it('Given the script already loaded, When soft-navigating into /teacher, Then ad requests are paused; leaving resumes them', () => {
+    nav.pathname = '/en/leaderboard';
+    const { rerender } = render(<AdSenseLoader />);
+    expect(document.getElementById('adsbygoogle-init')).not.toBeNull();
+
+    nav.pathname = '/en/teacher/classroom/abc';
+    rerender(<AdSenseLoader />);
+    const q = (window as unknown as { adsbygoogle?: { pauseAdRequests?: number } }).adsbygoogle;
+    expect(q?.pauseAdRequests).toBe(1);
+    expect(document.documentElement.classList.contains('ads-free-route')).toBe(true);
+
+    nav.pathname = '/en/leaderboard';
+    rerender(<AdSenseLoader />);
+    expect(q?.pauseAdRequests).toBe(0);
+    expect(document.documentElement.classList.contains('ads-free-route')).toBe(false);
+  });
+});

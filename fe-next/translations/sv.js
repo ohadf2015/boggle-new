@@ -3597,6 +3597,19 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "progressPulse": {
+      "title": "Din utveckling",
+      "game": "Spel #{n}",
+      "vsLast": "{delta} mot förra spelet",
+      "best": "Bästa {score}",
+      "newBest": "Nytt rekord!",
+      "coverage": "{found} av {total} ord · {pct}%",
+      "wordsFound": "{found} ord hittade",
+      "goalFirst": "Första spelet är loggat. Slå det nu.",
+      "goalNewBest": "Du satte ribban. Slå {target} nästa gång.",
+      "goalBeatBest": "{gap} p från ditt rekord — ett ord till kan räcka.",
+      "sparklineAria": "Dina senaste {n} spel"
+    },
     "streakIgnition": {
       "titleWon": "SVITEN ÄR TÄND!",
       "titleLost": "EN VINST FÖR ATT TÄNDA DEN",
@@ -6615,6 +6628,21 @@ const sv = {
     "maybeLater": "Kanske senare"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "Vad händer nu?",
+      "rematchHarder": "Returmatch · svårare",
+      "rematchHarderDesc": "Ett steg upp på botstegen",
+      "rematchMax": "Returmatch · max",
+      "rematchMaxDesc": "Högsta steget. Svårt bräde, 3 bottar",
+      "rematchSame": "Samma igen",
+      "rematchSameDesc": "Nytt bräde, samma inställningar",
+      "bots": "Möt bottar",
+      "botsDesc": "Bräde på tid mot en bot",
+      "practice": "Träning",
+      "practiceDesc": "Ingen timer, ingen press",
+      "daily": "Dagens utmaning",
+      "dailyDesc": "Samma pussel som alla andra"
+    },
     "play": "Spela",
     "playDesc": "Hoppa in i ett spel",
     "howToPlay": "Hur man spelar",
@@ -7075,6 +7103,13 @@ const sv = {
     "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
     "alreadyPlayed": "Redan spelat idag",
     "catchUp": {
+      "tileDone": "Spelad · visa resultat",
+      "tileMissed": "Missad · tryck för att ta igen",
+      "tileToday": "Idag · spela nu",
+      "tileExpired": "Missad · går inte längre att ta igen",
+      "tilePending": "Kommer snart",
+      "tileHint": "Tryck på en missad dag för att ta igen den — öppet i {days} dagar",
+      "expired": "Den dagen är stängd — du kan ta igen de senaste {days} dagarna",
       "title": "Ta igen missade dagliga",
       "subtitle": "Du har {count} från de senaste dagarna kvar",
       "yesterday": "Gårdagens pussel",
@@ -14708,6 +14743,15 @@ const sv = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "Tack för att du tittade — belöning upplåst!",
+      "hint": "Tack! Här är din ledtråd.",
+      "doubleGold": "Guldet dubblat — tack för att du tittade!",
+      "freeze": "Streak-frys säkrad. Din streak är trygg.",
+      "retry": "Andra chansen upplåst — kör!",
+      "timeLow": "Bonustid tillagd — fortsätt!",
+      "catchup": "Missad dag upplåst — lycka till!"
+    },
     "label": "Annons",
     "rewarded": {
       "watchForGold": "Se reklam för +{amount} guld",

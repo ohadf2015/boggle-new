@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Capacitor } from '@capacitor/core';
+import { isAdFreeRoute } from '@/lib/admob-routes';
 import { useCrazyGamesAds } from '@/hooks/useCrazyGamesAds';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
@@ -23,6 +25,10 @@ export function useInterstitialAd() {
   const adMob = useAdMob();
   const h5Ads = useH5GamesAds();
   const firedRef = useRef<Set<string>>(new Set());
+  // Education / teacher / student / classroom surfaces are ad-free in every
+  // format. No trigger site lives there today; this keeps it that way if one
+  // (a shared results screen, say) is ever mounted under those routes.
+  const pathname = usePathname();
 
   // Returns a Promise that resolves once the ad cycle has fully completed
   // (dismissed / failed / never shown). Callers can `await` it to gate
@@ -31,6 +37,10 @@ export function useInterstitialAd() {
   // is done. Non-awaiting callers still get the prior fire-and-forget shape.
   const showInterstitial = useCallback(
     async (name: string): Promise<void> => {
+      // location.search (not useSearchParams) — the classroom flag is fixed at
+      // page entry and this avoids a CSR bailout on statically rendered pages.
+      const search = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search);
+      if (isAdFreeRoute(pathname, search)) return;
       if (firedRef.current.has(name)) return;
       firedRef.current.add(name);
 
@@ -53,7 +63,7 @@ export function useInterstitialAd() {
         h5Ads.showInterstitial(name);
       }
     },
-    [requestMidgameAd, isOnCrazyGamesPlatform, adMob, h5Ads],
+    [pathname, requestMidgameAd, isOnCrazyGamesPlatform, adMob, h5Ads],
   );
 
   return { showInterstitial };

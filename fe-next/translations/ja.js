@@ -3308,6 +3308,19 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "progressPulse": {
+      "title": "あなたの成長",
+      "game": "ゲーム #{n}",
+      "vsLast": "前回比 {delta}",
+      "best": "ベスト {score}",
+      "newBest": "自己ベスト更新！",
+      "coverage": "{total} 語中 {found} 語 · {pct}%",
+      "wordsFound": "{found} 語発見",
+      "goalFirst": "最初の記録が刻まれました。次はこれを超えよう。",
+      "goalNewBest": "基準はあなたが決めた。次は {target} を超えよう。",
+      "goalBeatBest": "ベストまであと {gap} 点 — もう1語で届くかも。",
+      "sparklineAria": "直近 {n} ゲーム"
+    },
     "streakIgnition": {
       "titleWon": "ストリーク点火！",
       "titleLost": "あと1勝で点火",
@@ -6325,6 +6338,21 @@ const ja = {
     "maybeLater": "また今度"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "次は？",
+      "rematchHarder": "再戦 · もっと難しく",
+      "rematchHarderDesc": "ボットのレベルを上げる",
+      "rematchMax": "再戦 · 最高難度",
+      "rematchMaxDesc": "最上級。ハード盤面、ボット3体",
+      "rematchSame": "同じ設定でもう一度",
+      "rematchSameDesc": "新しい盤面、同じ設定",
+      "bots": "ボットと対戦",
+      "botsDesc": "ボット1体とタイマー付き対戦",
+      "practice": "練習",
+      "practiceDesc": "タイマーなし、プレッシャーなし",
+      "daily": "デイリーチャレンジ",
+      "dailyDesc": "みんな同じパズル"
+    },
     "play": "プレイ",
     "playDesc": "ゲームに参加",
     "howToPlay": "遊び方",
@@ -6882,6 +6910,13 @@ const ja = {
     "samePuzzle": "世界中で同じパズル。結果をシェアして友達に挑戦！",
     "alreadyPlayed": "今日はプレイ済み",
     "catchUp": {
+      "tileDone": "プレイ済み · 結果を見る",
+      "tileMissed": "未プレイ · タップして挑戦",
+      "tileToday": "今日 · 今すぐプレイ",
+      "tileExpired": "未プレイ · 期限切れ",
+      "tilePending": "これから",
+      "tileHint": "逃した日をタップして挑戦 — {days}日間有効",
+      "expired": "その日はもう挑戦できません — 挑戦できるのは直近{days}日間です",
       "title": "見逃したデイリーに挑戦",
       "subtitle": "直近の未完了が{count}件あります",
       "yesterday": "昨日のパズル",
@@ -14419,6 +14454,15 @@ const ja = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "視聴ありがとう — 報酬を獲得！",
+      "hint": "ありがとう！ヒントをどうぞ。",
+      "doubleGold": "ゴールド2倍！視聴ありがとう。",
+      "freeze": "ストリーク保護を確保。連続記録は安全です。",
+      "retry": "もう一度チャンス！いってらっしゃい。",
+      "timeLow": "ボーナスタイム追加 — その調子！",
+      "catchup": "逃した日に挑戦できます — がんばって！"
+    },
     "label": "広告",
     "rewarded": {
       "watchForGold": "広告を見て+{amount}ゴールド",

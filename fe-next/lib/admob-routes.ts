@@ -69,3 +69,31 @@ export function isAllowedAdBannerRoute(
   }
   return !GAME_ROUTES.some((r) => path.startsWith(r));
 }
+
+// ------------------------------------------------------------------
+// Ad-free surfaces — EVERY ad format, not just the anchored banner.
+//
+// The education module ("ad-free for students", see education/for-schools
+// content + `education.landing.pro.noAds`) and the operator console must never
+// carry AdSense auto-ads, interstitials, or banners. `isAllowedAdBannerRoute`
+// above only gates the native banner; this is the cross-format gate consumed
+// by AdSenseLoader (web auto-ads) and useInterstitialAd.
+// ------------------------------------------------------------------
+const AD_FREE_ROUTES = ['/education', '/teacher', '/student', '/admin'];
+
+/**
+ * Whether NO ad of any kind may run on this route.
+ *
+ * @param pathname current pathname (may include a locale prefix)
+ * @param search   optional query — `/multiplayer?classroom=true` is the
+ *                 classroom lobby, an education surface the path alone hides.
+ */
+export function isAdFreeRoute(
+  pathname: string | null,
+  search?: URLSearchParams | null,
+): boolean {
+  if (!pathname) return false;
+  const path = pathname.replace(LOCALE_PREFIX, '') || '/';
+  if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') return true;
+  return AD_FREE_ROUTES.some((r) => path === r || path.startsWith(`${r}/`));
+}

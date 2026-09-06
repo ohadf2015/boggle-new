@@ -68,6 +68,10 @@ import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/sha
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useAsyncChallengeProducer } from '@/hooks/useAsyncChallengeProducer';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
+import { useProgressSnapshot } from './results/hooks/useProgressSnapshot';
+import { ProgressPulseCard } from './results/components/ProgressPulseCard';
+import { NextGamePicker } from './results/components/NextGamePicker';
+import type { DifficultyLevel } from '@/shared/types/game';
 
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
 const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
@@ -90,6 +94,10 @@ interface SinglePlayerResultsProps {
   onPlayAgain: () => void;
   onQuickRematch?: () => void;
   onBackToLobby: () => void;
+  /** Board difficulty of the game just played — drives the bots ladder in the picker. */
+  difficulty?: DifficultyLevel;
+  /** Start a preset in-page (the "choose your next game" affordance). Picker hidden when absent. */
+  onStartPreset?: (presetId: string) => void;
 }
 
 const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
@@ -98,26 +106,54 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onPlayAgain,
   onQuickRematch: _onQuickRematch,
   onBackToLobby,
+  difficulty = 'MEDIUM',
+  onStartPreset,
 }) => {
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const [showTomorrowPreview, setShowTomorrowPreview] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
-  const handleBackToLobby = useCallback(() => {
-    // Streak Ignition (t_89663cfc): first-session players already see the
-    // persistent TomorrowCard on this screen — the 3s auto-dismiss banner
-    // would only duplicate it. Send them straight back to the lobby.
-    if (readGamesCompletedCount() <= 1) {
-      onBackToLobby();
-      return;
+  // Interstitial AT THE TRANSITION, not over the score reveal. It used to fire
+  // on mount — a fullscreen ad before the player had even seen their score,
+  // the least relevant (and most exhausting) moment possible. Now every exit
+  // (play again, harder rematch, next step, back) awaits it once; the hook's
+  // own `firedRef` makes repeated calls no-ops, and the gate is best-effort so
+  // a stalled ad can never strand the player on this screen.
+  const { showInterstitial } = useInterstitialAd();
+  const gateWithInterstitial = useCallback(async () => {
+    try {
+      await showInterstitial('singleplayer-complete');
+    } catch {
+      /* never block the exit */
     }
-    setShowTomorrowPreview(true);
-  }, [onBackToLobby]);
+  }, [showInterstitial]);
+
+  const handleBackToLobby = useCallback(() => {
+    void gateWithInterstitial().then(() => {
+      // Streak Ignition (t_89663cfc): first-session players already see the
+      // persistent TomorrowCard on this screen — the 3s auto-dismiss banner
+      // would only duplicate it. Send them straight back to the lobby.
+      if (readGamesCompletedCount() <= 1) {
+        onBackToLobby();
+        return;
+      }
+      setShowTomorrowPreview(true);
+    });
+  }, [onBackToLobby, gateWithInterstitial]);
+
+  const handlePlayAgainGated = useCallback(() => {
+    void gateWithInterstitial().then(onPlayAgain);
+  }, [gateWithInterstitial, onPlayAgain]);
 
   const handleQuickReplay = useCallback(() => {
     trackGrowthEvent('results_cta_clicked', { cta: 'quick_replay', mode });
-    onPlayAgain();
-  }, [onPlayAgain, mode]);
+    handlePlayAgainGated();
+  }, [handlePlayAgainGated, mode]);
+
+  const handleStartPresetGated = useCallback((presetId: string) => {
+    if (!onStartPreset) return;
+    void gateWithInterstitial().then(() => onStartPreset(presetId));
+  }, [gateWithInterstitial, onStartPreset]);
 
   const handleTomorrowDismiss = useCallback(() => {
     setShowTomorrowPreview(false);
@@ -127,15 +163,16 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isDesktop = useIsDesktop();
-  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
   useEffect(() => {
-    showInterstitial('singleplayer-complete');
     if (results.playerScore > 0) {
       submitLeaderboardScore(results.playerScore);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Snapshot BEFORE useGameHistory (below) appends this game — see the hook.
+  const progressSnapshot = useProgressSnapshot(results);
 
   // Async friend-challenge integration: fires POST (challenger flow) or
   // PUT phase=challenged (friend flow) when a pending config is in sessionStorage.
@@ -292,6 +329,20 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Same components, different layout: desktop uses two-column grid via isDesktop hook.
   const profileDisplayName = profile?.display_name || profile?.username || t('common.you');
 
+  // "How am I doing?" — every game, right under the hero.
+  const progressBlock = <ProgressPulseCard snapshot={progressSnapshot} />;
+
+  // "What's next?" — the mode choice single player lost with its lobby.
+  const pickerBlock = onStartPreset ? (
+    <NextGamePicker
+      mode={mode}
+      difficulty={difficulty}
+      isWinner={isWinner}
+      onStartPreset={handleStartPresetGated}
+      onReplaySame={handlePlayAgainGated}
+    />
+  ) : null;
+
   const heroBlock = mode === 'solo-bots' ? (
     <PlacementHero
       rank={playerRank} score={displayScore(results.playerScore)} totalPlayers={allParticipants.length}
@@ -391,7 +442,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="space-y-3">
       {!autoPlayCancelled ? (
         <AutoPlayCountdown
-          onComplete={onPlayAgain}
+          onComplete={handlePlayAgainGated}
           onCancel={() => {
             trackGrowthEvent('results_autoplay_cancelled', { mode });
             setAutoPlayCancelled(true);
@@ -410,7 +461,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               {t('results.playAgainQuestion')}
             </Button>
           )}
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
+          {pickerBlock}
+          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} beforeNavigate={gateWithInterstitial} />
           {results.grid && (
             <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}
               gameLanguage={gameLanguage} gameDuration={results.gameDuration}
@@ -481,7 +533,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         {isDesktop ? (
           <>
             <div className="grid grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-6 items-start">
-              <div className="space-y-4">{heroBlock}{showShareImmediate && shareBlock}{leaderboardBlock}</div>
+              <div className="space-y-4">{heroBlock}{progressBlock}{showShareImmediate && shareBlock}{leaderboardBlock}</div>
               <div className="space-y-4">
                 {statsBlock}
                 <CoinRewardDisplay reward={coinReward} variant="compact" mode={isAuthenticated ? 'earned' : 'teasing'} />
@@ -509,6 +561,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         ) : (
           <div className="space-y-4">
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>{heroBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.13 }}>{progressBlock}</m.div>
             {/* Streak Ignition: the payoff directly below the hero (t_89663cfc) */}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>{retentionBlock}</m.div>
             {showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>{shareBlock}</m.div>}
@@ -561,7 +614,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
       {!isDesktop && (
         <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
-          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" />
+          <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" beforeNavigate={gateWithInterstitial} />
         </div>
       )}
 

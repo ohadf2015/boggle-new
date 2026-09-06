@@ -100,11 +100,22 @@ function makeWrapper(isNative: boolean, platform: string = 'android') {
   return Wrapper;
 }
 
+// Wall clock the provider's interstitial fatigue floor reads (2 min between
+// confirmed shows). Real play puts a round (~60s+) between game ends;
+// drainInterstitial advances this per end so cadence slots 3 ends apart
+// clear the floor exactly as they do on device. Tests that fake `Date` via
+// vi.useFakeTimers replace the global Date and simply bypass this spy.
+const realDateNow = Date.now.bind(Date);
+let clockOffsetMs = 0;
+const GAME_END_SPACING_MS = 60 * 1000;
+
 describe('useAdMob', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.keys(listeners).forEach((k) => delete listeners[k]);
     social.tier = 'adult';
+    clockOffsetMs = 0;
+    vi.spyOn(Date, 'now').mockImplementation(() => realDateNow() + clockOffsetMs);
   });
 
   it('showRewarded fires onReward only after Rewarded event (not on resolve)', async () => {
@@ -289,6 +300,8 @@ describe('useAdMob', () => {
       // Let the fire-and-forget re-warm (settle → prepareInterstitial) run so
       // the next iteration sees a warm ad, mirroring real play.
       await flush();
+      // A round of play passes before the next game end.
+      clockOffsetMs += GAME_END_SPACING_MS;
     }
   };
 
