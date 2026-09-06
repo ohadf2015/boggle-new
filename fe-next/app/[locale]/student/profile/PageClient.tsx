@@ -263,7 +263,7 @@ export default function StudentProfilePageClient() {
             <div
               className="h-4 bg-neo-navy-light border-2 border-neo-black rounded-neo overflow-hidden"
               role="progressbar"
-              aria-label="Level progress"
+              aria-label={t('common.aria.levelProgress')}
               aria-valuenow={xpProgress.progressPercent}
               aria-valuemax={100}
             >

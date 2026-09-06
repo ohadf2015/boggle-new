@@ -222,3 +222,145 @@ export function buildEducationLandingJsonLd({ locale, path, content }: BuildArgs
 
   return nodes;
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Locale-correct JSON-LD fields for the SIX pages that predate this module.
+ *
+ * Those pages carry bespoke content shapes — a Quizlet/Wordwall/Kahoot
+ * comparison table, a four-week training plan, a district pricing block — that
+ * `EducationLandingContent` cannot express, so they are not ported onto the
+ * template. What moves here is only the part that was WRONG in all of them:
+ * `inLanguage: 'en'`, a provider `@id` pinned to `/en/education#org`, and
+ * English breadcrumb names, all served on the he/es/sv/ja/ru builds.
+ *
+ * Keeping these as small field builders rather than a whole-page template means
+ * a page can adopt them one node at a time, and — the reason it matters — the
+ * fields become reachable from a unit test. Built inline inside a page's default
+ * export, they were not.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The language a locale's build is actually written in. Anything without an
+ * education build reads as English, which is what those routes serve.
+ */
+export function educationContentLang(locale: string): EducationLocale {
+  return isEducationLocale(locale) ? locale : 'en';
+}
+
+/**
+ * Breadcrumb labels, in the six languages. These end up as `BreadcrumbList`
+ * item names, which Google renders in the SERP — an English "Home > Education"
+ * above a Japanese title is both wrong and visibly wrong. Values match the ones
+ * the newer teacher-moment pages already carry in their own content files.
+ */
+const BREADCRUMB_LABELS: Record<EducationLocale, { home: string; hub: string }> = {
+  en: { home: 'Home', hub: 'Education' },
+  he: { home: 'בית', hub: 'חינוך' },
+  es: { home: 'Inicio', hub: 'Educación' },
+  sv: { home: 'Hem', hub: 'Utbildning' },
+  ja: { home: 'ホーム', hub: '教育' },
+  ru: { home: 'Главная', hub: 'Образование' },
+};
+
+export function educationBreadcrumbLabels(locale: string): { home: string; hub: string } {
+  return BREADCRUMB_LABELS[educationContentLang(locale)];
+}
+
+export type EducationProviderNode = {
+  '@type': 'EducationalOrganization';
+  '@id': string;
+  name: string;
+  url: string;
+};
+
+/** The publisher entity for a locale build. Never pin this to `/en`. */
+export function educationProviderNode(locale: string): EducationProviderNode {
+  const lang = educationContentLang(locale);
+  return {
+    '@type': 'EducationalOrganization',
+    '@id': `${EDUCATION_BASE_URL}/${lang}/education#org`,
+    name: 'LexiClash Education',
+    url: `${EDUCATION_BASE_URL}/${lang}/education`,
+  };
+}
+
+export function educationBreadcrumbJsonLd(args: {
+  locale: string;
+  path: string;
+  current: string;
+}): JsonLdNode {
+  const { locale, path, current } = args;
+  const url = localeUrl(locale, path);
+  const { home, hub } = educationBreadcrumbLabels(locale);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    '@id': `${url}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: home, item: `${EDUCATION_BASE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: hub, item: `${EDUCATION_BASE_URL}/${locale}/education` },
+      { '@type': 'ListItem', position: 3, name: current, item: url },
+    ],
+  };
+}
+
+export function educationLearningResourceJsonLd(args: {
+  locale: string;
+  path: string;
+  name: string;
+  description: string;
+  teaches: string;
+  /** Defaults to `Game` — these pages are all playable activities. */
+  learningResourceType?: string;
+  educationalUse?: string[];
+  educationalLevel?: string[];
+  typicalAgeRange?: string;
+  educationalRole?: string;
+  /**
+   * Language of the page BODY. Defaults to the locale, which is right for every
+   * page whose `content.ts` has per-locale blocks. `sight-words-practice` passes
+   * `'en'` explicitly because its body is English in every build.
+   */
+  contentLanguage?: string;
+}): JsonLdNode {
+  const url = localeUrl(args.locale, args.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    '@id': `${url}#resource`,
+    name: args.name,
+    description: args.description,
+    url,
+    inLanguage: args.contentLanguage ?? educationContentLang(args.locale),
+    learningResourceType: args.learningResourceType ?? 'Game',
+    ...(args.educationalUse ? { educationalUse: args.educationalUse } : {}),
+    ...(args.educationalLevel ? { educationalLevel: args.educationalLevel } : {}),
+    ...(args.typicalAgeRange ? { typicalAgeRange: args.typicalAgeRange } : {}),
+    teaches: args.teaches,
+    isAccessibleForFree: true,
+    audience: {
+      '@type': 'EducationalAudience',
+      educationalRole: args.educationalRole ?? 'student',
+    },
+    provider: educationProviderNode(args.locale),
+  };
+}
+
+export function educationFaqJsonLd(args: {
+  locale: string;
+  path: string;
+  faqs: ReadonlyArray<EducationFaq>;
+}): JsonLdNode {
+  const url = localeUrl(args.locale, args.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${url}#faq`,
+    inLanguage: educationContentLang(args.locale),
+    mainEntity: args.faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+}

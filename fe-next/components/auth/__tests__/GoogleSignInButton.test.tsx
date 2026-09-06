@@ -45,9 +45,17 @@ describe('GoogleSignInButton', () => {
   it('renders a button container + the GIS script on web when configured', () => {
     render(<GoogleSignInButton />);
     expect(screen.getByTestId('gsi-button-container')).toBeTruthy();
-    expect(screen.getByTestId('gsi-script').getAttribute('data-src')).toBe(
-      'https://accounts.google.com/gsi/client',
-    );
+  });
+
+  // Google's own docs: the GSI iframe's displayed language comes from the `hl`
+  // query param on the SCRIPT tag URL (or the browser/OS locale if absent) —
+  // renderButton's `locale` option only takes effect if it matches the locale
+  // the client library itself was loaded with. Without `hl`, a browser/OS set
+  // to Arabic renders "Arabic" text on the button even on the English site.
+  it('loads the GIS script with hl=<site language> so the button text matches the page, not the OS/browser', () => {
+    render(<GoogleSignInButton />);
+    const src = screen.getByTestId('gsi-script').getAttribute('data-src');
+    expect(src).toBe('https://accounts.google.com/gsi/client?hl=en');
   });
 
   it('wraps the visible Google button in a neo-brutalist frame', () => {

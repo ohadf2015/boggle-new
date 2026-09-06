@@ -13,7 +13,7 @@ describe('esl-word-games page', () => {
 
       // Assert Spanish content is rendered
       expect(text).toContain('Construido para estudiantes de inglés');
-      expect(text).toContain('Escala al nivel CEFR');
+      expect(text).toContain('Ajustar la dificultad para una clase de niveles mixtos');
       // Updated to match the polished Spanish translation (removed "para")
       expect(text).toContain('Gratis Siempre');
 

@@ -15,12 +15,23 @@ const POLL_INTERVAL = 15_000;
 
 /**
  * Hook to detect active classroom games via Socket.IO.
- * Extracted from ClassroomGameBanner for reuse.
+ *
+ * The ONE place the student client listens for their class's live game.
+ * `ClassroomGameBanner` used to carry a second, near-identical copy of this
+ * logic that opened its socket with no auth token — the server rejected it
+ * before ever subscribing it to `classroom:<id>`, so the banner could never
+ * fire (recurring pitfall class 3: two routes, one silently weaker).
+ *
+ * Clearing is as load-bearing as setting: a game that ends must take its JOIN
+ * button with it, or the student taps through to a dead multiplayer room.
+ * Both clear paths — an empty `activeClassroomGames` list and the server's
+ * `classroomGameEnded` broadcast — are handled here.
  */
 export function useActiveClassroomGame(classroomId: string) {
   const [activeGame, setActiveGame] = useState<ActiveGame | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const requestActiveGames = useCallback((sock: Socket) => {
@@ -64,9 +75,18 @@ export function useActiveClassroomGame(classroomId: string) {
 
       socketInstance.on('classroomGameCreated', (data: {
         gameCode: string;
+        classroomId?: string;
         teacherName: string;
         lessonNames: string[];
       }) => {
+        // Trust the payload's own scope, not just the room we think we are in.
+        // The server sends classroomId and this ignored it, so any path that
+        // ever put this socket in a second classroom room would surface another
+        // class's game under this student's banner. Also refuse a record with no
+        // room code: it cannot be joined, so it must not be advertised.
+        if (data?.classroomId && data.classroomId !== classroomId) return;
+        if (!data?.gameCode) return;
+        setError(null);
         setActiveGame({
           gameCode: data.gameCode,
           teacherName: data.teacherName,
@@ -74,10 +94,33 @@ export function useActiveClassroomGame(classroomId: string) {
         });
       });
 
+      // The list is authoritative in BOTH directions. An empty list means the
+      // game is over (or its Redis key expired); leaving the old one on screen
+      // is what kept "JOIN NOW" pointing at a dead room.
       socketInstance.on('activeClassroomGames', (data: { games: ActiveGame[] }) => {
-        if (data.games && data.games.length > 0) {
-          setActiveGame(data.games[0]);
-        }
+        setError(null);
+        // A Redis set has no order, so `games[0]` is arbitrary. Take the first
+        // one that is actually joinable rather than whichever the store handed
+        // back — that arbitrariness is what showed students an older game's
+        // lesson name and then walked them into a dead room.
+        const joinable = (data?.games ?? []).find((g) => !!g?.gameCode) ?? null;
+        setActiveGame(joinable);
+      });
+
+      // The server broadcasts this from every end-of-round path.
+      socketInstance.on('classroomGameEnded', (data: { gameCode?: string }) => {
+        setActiveGame((current) => {
+          if (!current) return null;
+          // No gameCode on the payload → end whatever this classroom was running.
+          if (data?.gameCode && data.gameCode !== current.gameCode) return current;
+          return null;
+        });
+      });
+
+      // Rejections used to vanish. "Not a member", "Authentication required" and
+      // a bad payload all looked exactly like "no game is running" (class 4).
+      socketInstance.on('classroomGameError', (data: { error?: string }) => {
+        setError(data?.error ?? 'unknown');
       });
 
       socketInstance.on('classroomGamePlayerJoined', (data: {
@@ -108,5 +151,5 @@ export function useActiveClassroomGame(classroomId: string) {
     };
   }, [classroomId, requestActiveGames]);
 
-  return { activeGame, isConnected, socket, setActiveGame };
+  return { activeGame, isConnected, socket, setActiveGame, error };
 }

@@ -17,12 +17,13 @@ import {
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
 import {
-  isClassroomTeacher,
-  getClassroomRole,
+  resolveClassroomTeacher,
+  resolveClassroomRole,
 } from '../modules/supabase/classroomMembership.js';
 import { persistClassroomGameScores } from './classroomGamePersistence.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
+import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger.js';
 
 // ==========================================
@@ -44,11 +45,19 @@ const createClassroomGameSchema = z.object({
     timerMinutes: z.number().int().min(1).max(30).optional(),
     boardSize: z.enum(['small', 'medium', 'large']).optional(),
     allowLateJoin: z.boolean().optional(),
-    gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush']).optional(),
+    gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'vocab-quiz']).optional(),
     // Word Hunt: teacher-pinned target. Length/charset is re-checked against the
     // lesson at game start (shared/utils/classroomHuntTarget), so this bound is
     // only a payload-size guard.
     targetWord: z.string().max(100).optional(),
+    // Vocab Quiz: the skill drilled and the round shape. All three are
+    // re-clamped in the engine against what the lesson can actually build, so
+    // these bounds are a payload guard, not the real limits.
+    vocabQuizFocus: z
+      .enum(['any', 'definition', 'synonym', 'antonym', 'context', 'multiple_meaning', 'roots_affixes'])
+      .optional(),
+    vocabQuizQuestionCount: z.number().int().min(4).max(30).optional(),
+    vocabQuizSeconds: z.number().int().min(5).max(90).optional(),
   }).optional(),
 });
 
@@ -120,7 +129,12 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     const payload = validation.data as {
       classroomId: string; teacherId: string; teacherName: string; gameCode: string;
       lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[];
-      settings?: { timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean; gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush'; targetWord?: string };
+      settings?: {
+        timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean;
+        gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz'; targetWord?: string;
+        vocabQuizFocus?: PracticeFocusSetting;
+        vocabQuizQuestionCount?: number; vocabQuizSeconds?: number;
+      };
     };
 
     // Auth check: teacherId MUST match authenticated user (mandatory, not optional)
@@ -136,8 +150,18 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
     // F-08: Verify this user actually teaches this classroom (not just claims to).
     // Without this, a teacher could create games on any classroomId they know.
-    const isTeacherOfClassroom = await isClassroomTeacher(payload.teacherId, payload.classroomId);
-    if (!isTeacherOfClassroom) {
+    const teacherCheck = await resolveClassroomTeacher(payload.teacherId, payload.classroomId);
+    if (teacherCheck === 'unavailable') {
+      // OUR fault, not hers. Telling a teacher she does not own her own class
+      // because the server lost its database is both wrong and unfixable by her.
+      logger.error(
+        'CLASSROOM_GAME',
+        `Teacher check unavailable for ${payload.teacherId} on ${payload.classroomId} — refusing without blaming the user`
+      );
+      socket.emit('classroomGameError', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE' });
+      return;
+    }
+    if (teacherCheck === 'no') {
       socket.emit('classroomGameError', { error: 'You are not the teacher of this classroom' });
       return;
     }
@@ -158,6 +182,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           allowLateJoin: payload.settings?.allowLateJoin,
           gameMode: payload.settings?.gameMode || 'classic',
           targetWord: payload.settings?.targetWord,
+          vocabQuizFocus: payload.settings?.vocabQuizFocus,
+          vocabQuizQuestionCount: payload.settings?.vocabQuizQuestionCount,
+          vocabQuizSeconds: payload.settings?.vocabQuizSeconds,
         },
       };
 
@@ -217,8 +244,13 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       socket.emit('classroomGameError', { error: 'Authentication required' });
       return;
     }
-    const gamesRole = await getClassroomRole(gamesAuthUserId, gamesPayload.classroomId);
-    if (!gamesRole) {
+    const gamesRoleResult = await resolveClassroomRole(gamesAuthUserId, gamesPayload.classroomId);
+    if (gamesRoleResult.status === 'unavailable') {
+      logger.error('CLASSROOM_GAME', `Membership lookup unavailable for ${gamesAuthUserId} on ${gamesPayload.classroomId}`);
+      socket.emit('classroomGameError', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE' });
+      return;
+    }
+    if (!gamesRoleResult.role) {
       socket.emit('classroomGameError', { error: 'You are not a member of this classroom' });
       return;
     }
@@ -277,8 +309,16 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       return;
     }
 
-    const joinRole = await getClassroomRole(joinAuthUserId, existingGame.classroomId);
-    if (!joinRole) {
+    const joinRoleResult = await resolveClassroomRole(joinAuthUserId, existingGame.classroomId);
+    if (joinRoleResult.status === 'unavailable') {
+      // A whole class told "you are not a member" because the server is broken
+      // is the worst version of this — they cannot act on it, and it looks
+      // like the teacher set the room up wrong.
+      logger.error('CLASSROOM_GAME', `Membership lookup unavailable for ${joinAuthUserId} joining ${existingGame.gameCode}`);
+      socket.emit('classroomGameError', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE' });
+      return;
+    }
+    if (!joinRoleResult.role) {
       socket.emit('classroomGameError', { error: 'You are not a member of this classroom' });
       return;
     }
@@ -423,10 +463,22 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
   });
 
   /**
-   * S2.7: End a classroom game early (teacher only)
-   * Validates teacher auth, ends game, triggers score persistence (S2.5)
+   * End a classroom game and persist its results.
+   *
+   * ONE body, registered under both historical event names. They used to be two
+   * near-identical copies and only `endClassroomGame` checked that the caller is
+   * the teacher — `classroomGameEnd` accepted any authenticated socket. That is
+   * recurring pitfall class 3 (two routes to the same outcome, one silently
+   * weaker), and it was a P0: the game code is on the projector, in the QR and
+   * on every student's screen, so any student could end the round, take the
+   * Redis `SET NX` idempotency lock inside `persistClassroomGameScores`, and
+   * leave the server's own end-of-round write with nothing to do — the whole
+   * class's session, word progress and XP silently lost (class 4).
+   *
+   * `playerScores` is client-supplied, so it is also filtered down to userIds
+   * that actually joined this game before it reaches persistence.
    */
-  socket.on('endClassroomGame', async (data: unknown) => {
+  const handleEndClassroomGame = async (data: unknown): Promise<void> => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
@@ -459,8 +511,13 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
       await updateClassroomGameStatus(payload.gameCode, 'finished');
 
+      // Only score rows for players the server saw join this game. Anything
+      // else is a fabricated userId with a fabricated score and XP behind it.
+      const joinedUserIds = new Set((game.players || []).map((p) => p.userId));
+      const verifiedScores = payload.playerScores?.filter((s) => joinedUserIds.has(s.userId));
+
       // Persist scores to Supabase (S2.5) — F-24: capture per-player rewards
-      const rewards = await persistClassroomGameScores(game, payload.playerScores);
+      const rewards = await persistClassroomGameScores(game, verifiedScores);
 
       io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
         gameCode: payload.gameCode,
@@ -472,52 +529,12 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       logger.error('CLASSROOM_GAME', `Failed to end game: ${error}`);
       socket.emit('classroomGameError', { error: 'Failed to end game' });
     }
-  });
+  };
 
-  /**
-   * S2.5: Classroom game end event (triggered by game completion)
-   * Persists player scores to practice_sessions and awards education XP
-   */
-  socket.on('classroomGameEnd', async (data: unknown) => {
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    const validation = endClassroomGameSchema.safeParse(data);
-    if (!validation.success) {
-      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error.issues[0]?.message}` });
-      return;
-    }
-    const payload = validation.data as { gameCode: string; playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }> };
-
-    const classroomGameEndAuthUserId = getAuthUserId(socket);
-    if (!classroomGameEndAuthUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required' });
-      return;
-    }
-
-    try {
-      const game = await getClassroomGame(payload.gameCode);
-      if (!game) {
-        socket.emit('classroomGameError', { error: 'Game not found' });
-        return;
-      }
-
-      await updateClassroomGameStatus(payload.gameCode, 'finished');
-      const rewards = await persistClassroomGameScores(game, payload.playerScores);
-
-      io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
-        gameCode: payload.gameCode,
-        rewards,
-      });
-
-      logger.info('CLASSROOM_GAME', `Game ${payload.gameCode} ended, scores persisted`);
-    } catch (error) {
-      logger.error('CLASSROOM_GAME', `Failed to handle game end: ${error}`);
-      socket.emit('classroomGameError', { error: 'Failed to persist game results' });
-    }
-  });
+  // S2.7 (teacher ends early) and S2.5 (game completion) — same outcome, so the
+  // same guarded body. Do not re-fork these.
+  socket.on('endClassroomGame', handleEndClassroomGame);
+  socket.on('classroomGameEnd', handleEndClassroomGame);
 }
 
 export default registerClassroomGameHandlers;

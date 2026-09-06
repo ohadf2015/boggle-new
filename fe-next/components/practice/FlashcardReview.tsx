@@ -14,7 +14,6 @@ import {
   Trophy,
   Layers,
   MousePointer2,
-  Loader2,
 } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import type { VocabularyWord } from '@/lib/supabase/education';
@@ -57,7 +56,6 @@ export default function FlashcardReview({
   const [showResults, setShowResults] = useState(false);
   const [reviewMode, setReviewMode] = useState<ReviewMode>('classic');
   const [enrichedWords, setEnrichedWords] = useState<EnrichedVocabularyWord[]>([]);
-  const [isEnriching, setIsEnriching] = useState(false);
   const [autoPronounce, setAutoPronounce] = useState(false);
 
   const { speak } = useSpeechSynthesis(language);
@@ -65,66 +63,32 @@ export default function FlashcardReview({
   const currentWord = words[currentIndex];
   const progress = ((currentIndex + 1) / words.length) * 100;
 
-  // Enrich vocabulary words with contextual data on mount
+  // Practice renders from the teacher's own words, always and immediately.
+  //
+  // This used to gate the whole screen on a socket round trip: it set
+  // `isEnriching`, emitted `enrichVocabulary`, and cleared the flag only inside
+  // the `vocabularyEnriched` handler. No server handler for `enrichVocabulary`
+  // exists anywhere in the repo, so that reply never arrived and every student
+  // sat on a spinner forever, on every lesson. The emit and listener are gone
+  // with it; there is nothing on the other end to talk to.
   useEffect(() => {
     if (words.length === 0) return;
-
-    // If socket not available, use words as-is without enrichment
-    if (!socket) {
-      const basicEnriched: EnrichedVocabularyWord[] = words.map((word) => ({
+    setEnrichedWords(
+      words.map((word) => ({
         word: word.word,
         definition: word.definition || '',
         pronunciation: undefined,
+        // No producer exists for part of speech; the only one ever wired was
+        // the phantom socket reply. Left undefined rather than invented.
         partOfSpeech: undefined,
-        examples: [],
-        contextualExamples: [],
-      }));
-      setEnrichedWords(basicEnriched);
-      return;
-    }
-
-    setIsEnriching(true);
-
-    // Convert VocabularyWord to enrichment format
-    const wordsToEnrich = words.map((word) => ({
-      word: word.word,
-      definition: word.definition || '',
-    }));
-
-    // Request enrichment via WebSocket
-    socket.emit('enrichVocabulary', {
-      words: wordsToEnrich,
-      language: language,
-    });
-
-    // Listen for enriched response
-    type EnrichedPayload = Partial<EnrichedVocabularyWord> & {
-      word: string;
-      definition: string;
-      contextualExamples?: string[];
-    };
-    const handleEnriched = (data: { enrichedWords: EnrichedPayload[] }) => {
-      const enriched: EnrichedVocabularyWord[] = data.enrichedWords.map((word) => ({
-        word: word.word,
-        definition: word.definition,
-        pronunciation: word.pronunciation,
-        partOfSpeech: word.partOfSpeech,
-        examples: word.examples || [],
-        contextualExamples: (word.contextualExamples || []).map((text: string) => ({
-          text,
-        })) as VocabularyExample[],
-      }));
-      setEnrichedWords(enriched);
-      setIsEnriching(false);
-    };
-
-    socket.on('vocabularyEnriched', handleEnriched);
-
-    // Cleanup
-    return () => {
-      socket.off('vocabularyEnriched', handleEnriched);
-    };
-  }, [words, language, socket]);
+        // The teacher's own example sentence is real data already on the word,
+        // so the context row still has something true to show. WordContextRow
+        // reads `examples[0].text`.
+        examples: word.example ? [{ text: word.example }] : [],
+        contextualExamples: word.example ? [{ text: word.example }] : [],
+      }))
+    );
+  }, [words]);
 
   const handleFlip = useCallback(() => {
     setIsFlipped((prev) => {
@@ -160,22 +124,6 @@ export default function FlashcardReview({
     setResults([]);
     setShowResults(false);
   }, []);
-
-  // Loading state while enriching
-  if (isEnriching) {
-    return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
-        <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <Loader2 className="w-12 h-12 mx-auto text-neo-cyan animate-spin mb-4" />
-            <p className="text-neo-white font-neo-body">
-              {t('education.lesson.enrichingContent')}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   // Results screen
   if (showResults) {

@@ -8,6 +8,24 @@ const BASE_URL = 'https://www.lexiclash.live';
 const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
+/**
+ * How many languages we claim, derived — never typed as a literal.
+ *
+ * Until 2026-09-05 the WebApplication features below said "5 languages" in four
+ * locales (and Russian said 6), so the hub's own structured data contradicted
+ * itself and undersold the product by a language. A hand-typed count drifts the
+ * moment a locale is added; this one cannot.
+ */
+const LANGUAGE_COUNT = LOCALES.length;
+
+/**
+ * Join codes are SIX characters — `utils/utils.ts:114` generates 6 alphanumerics
+ * (36^6). Five locales advertised a "4-digit" code in this file and four more in
+ * `educationSubpageJsonLd.ts`, which is both wrong and the kind of instruction a
+ * teacher follows literally at the projector.
+ */
+const JOIN_CODE_LENGTH = 6;
+
 // Real, existing LexiClash profiles — used as sameAs for entity verification.
 // NEVER add placeholder/non-existent URLs here: an invalid sameAs hurts more
 // than a missing one. Mirrors the canonical set in app/[locale]/layout.tsx.
@@ -153,52 +171,52 @@ export function buildEducationBreadcrumbJsonLd(locale: string) {
 // resolve one entity, not a parallel org node.
 const WEBAPP_FEATURES: Record<string, string[]> = {
   en: [
-    'No student signup — join a class with a 6-character code',
+    `No student signup — join a class with a ${JOIN_CODE_LENGTH}-character code`,
     'Multiplayer vocabulary duels (1v1) and live whole-class games',
     'Teacher dashboard: custom word lists, progress tracking, class analytics',
-    '5 languages including Hebrew (RTL) and Japanese, each with its own dictionary',
+    `${LANGUAGE_COUNT} languages including Hebrew (RTL) and Japanese, each with its own dictionary`,
     'Curriculum-aligned difficulty for primary, secondary, and ESL/EFL learners',
-    'Runs in any browser — no downloads, no paywalls, no premium tier',
+    'Runs in any browser — no downloads and no ads in class; Teacher Pro is optional',
   ],
   he: [
-    'בלי הרשמת תלמידים — הצטרפות לכיתה עם קוד בן 4 ספרות',
+    `בלי הרשמת תלמידים — הצטרפות לכיתה עם קוד בן ${JOIN_CODE_LENGTH} תווים`,
     'דואלי אוצר מילים רב-משתתפים (1v1) ומשחקים חיים לכל הכיתה',
     'לוח מחוונים למורה: רשימות מילים מותאמות, מעקב התקדמות, אנליטיקת כיתה',
-    '5 שפות כולל עברית (RTL) ויפנית, לכל אחת מילון משלה',
+    `${LANGUAGE_COUNT} שפות כולל עברית (RTL) ויפנית, לכל אחת מילון משלה`,
     'רמת קושי מותאמת תכנית לימודים ליסודי, על-יסודי ולומדי אנגלית כשפה שנייה',
-    'פועל בכל דפדפן — בלי הורדות, בלי חומות תשלום, בלי שכבת פרימיום',
+    'פועל בכל דפדפן — בלי הורדות ובלי פרסומות בשיעור; מסלול Teacher Pro הוא אופציונלי',
   ],
   sv: [
-    'Ingen elevregistrering — gå med i en klass med en 4-siffrig kod',
+    `Ingen elevregistrering — gå med i en klass med en kod på ${JOIN_CODE_LENGTH} tecken`,
     'Ordförrådsdueller för flera spelare (1v1) och live-spel för hela klassen',
     'Lärarpanel: anpassade ordlistor, framstegsspårning, klassanalys',
-    '5 språk inklusive hebreiska (RTL) och japanska, var och en med egen ordbok',
+    `${LANGUAGE_COUNT} språk inklusive hebreiska (RTL) och japanska, var och en med egen ordbok`,
     'Läroplansanpassad svårighetsgrad för grundskola, gymnasium och ESL/EFL',
     'Körs i valfri webbläsare — inga nedladdningar, inga betalspärrar',
   ],
   ja: [
-    '生徒の登録不要 — 4桁のコードでクラスに参加',
+    `生徒の登録不要 — ${JOIN_CODE_LENGTH}文字のコードでクラスに参加`,
     'マルチプレイヤー語彙デュエル（1対1）とクラス全体のライブゲーム',
     '教師ダッシュボード：カスタム単語リスト、進捗追跡、クラス分析',
-    'ヘブライ語（RTL）と日本語を含む5言語、それぞれ独自の辞書',
+    `ヘブライ語（RTL）と日本語を含む${LANGUAGE_COUNT}言語、それぞれ独自の辞書`,
     '小学校・中等教育・ESL/EFL学習者向けのカリキュラム準拠の難易度',
     'あらゆるブラウザで動作 — ダウンロード不要、ペイウォールなし',
   ],
   es: [
-    'Sin registro de estudiantes — únete a una clase con un código de 4 dígitos',
+    `Sin registro de estudiantes — únete a una clase con un código de ${JOIN_CODE_LENGTH} caracteres`,
     'Duelos de vocabulario multijugador (1v1) y juegos en vivo para toda la clase',
     'Panel del profesor: listas personalizadas, seguimiento de progreso, análisis de clase',
-    '5 idiomas incluyendo hebreo (RTL) y japonés, cada uno con su propio diccionario',
+    `${LANGUAGE_COUNT} idiomas incluyendo hebreo (RTL) y japonés, cada uno con su propio diccionario`,
     'Dificultad alineada al currículo para primaria, secundaria y ESL/EFL',
     'Funciona en cualquier navegador — sin descargas, sin muros de pago',
   ],
   ru: [
-    'Без регистрации учеников — присоединись к классу с 4-значным кодом',
+    `Без регистрации учеников — присоединись к классу с кодом из ${JOIN_CODE_LENGTH} символов`,
     'Многоплеерные дуэли словарного запаса (1v1) и живые игры для всего класса',
     'Панель учителя: пользовательские списки слов, отслеживание прогресса, аналитика класса',
-    '6 языков включая иврит (RTL) и японский, каждый с собственным словарем',
+    `${LANGUAGE_COUNT} языков включая иврит (RTL) и японский, каждый с собственным словарем`,
     'Уровень сложности, соответствующий учебной программе для начальной, средней и старшей школы, ESL/EFL',
-    'Работает в любом браузере — без скачивания, без платных стен, без премиум-уровня',
+    'Работает в любом браузере — без скачивания и без рекламы на уроке; Teacher Pro не обязателен',
   ],
 };
 

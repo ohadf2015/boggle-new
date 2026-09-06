@@ -67,7 +67,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['No student logins', '✓ Join by code', '✓ PIN', 'Account-based', 'Account-based'],
       ['Core format', 'Word-formation game', 'Quiz / multiple choice', 'Quiz + game economy', 'Adaptive vocabulary drills'],
       ['1v1 duels', '✓ Built-in', '✗', '✗', '✗'],
-      ['Languages (native dict.)', '✓ EN/HE/SV/JA/ES', 'Text any lang; no dict.', 'English-first', 'English-first'],
+      ['Languages (native dict.)', '✓ EN/HE/SV/JA/ES/RU', 'Text any lang; no dict.', 'English-first', 'English-first'],
       ['Hebrew RTL', '✓', '✗', '✗', '✗'],
       ['Best for', 'Vocabulary, spelling, ESL', 'Trivia / fact review', 'Review with game loop', 'Adaptive vocab mastery'],
       ['Setup time', 'Under 60 seconds', '2–5 min/quiz', '2–5 min/kit', 'Account + list setup'],
@@ -80,7 +80,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'Free for the whole class', desc: 'No 40-player ceiling, no 5-student wall, no $199 entry. Every teacher plays free with a full class — that does not change.' },
       { title: 'No student logins', desc: 'Students join with a code. Nothing to provision, no student data to manage — the easiest tool to roll out school-wide.' },
       { title: 'Word games, not quizzes', desc: 'For vocabulary, spelling and language practice, students find and build words instead of picking A/B/C/D. A better fit for the goal.' },
-      { title: '6 languages incl. Hebrew RTL', desc: 'Native dictionaries for EN/HE/SV/JA/ES — built for ESL, bilingual and immersion classrooms the others don\'t serve.' },
+      { title: '6 languages incl. Hebrew RTL', desc: 'Native dictionaries for EN/HE/SV/JA/ES/RU — built for ESL, bilingual and immersion classrooms the others don\'t serve.' },
       { title: '1v1 vocabulary duels', desc: 'Pair students for 2–3 minute head-to-head word battles — a mode none of these three offer.' },
       { title: 'Scales to your school', desc: 'Free for teachers, with optional district tooling (admin dashboard, analytics, content libraries, ad-free, SSO) on the For Schools page.' },
     ],
@@ -95,7 +95,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: 'What is the best free vocabulary game for the classroom?',
-        a: 'For word and vocabulary practice specifically, LexiClash is free for the whole class with no player cap, no student logins, and native dictionaries in 6 languages (English, Hebrew RTL, Spanish, Swedish, Japanese). Kahoot, Gimkit and Vocabulary.com are strong tools but cap or price their free tiers: Kahoot limits live players, Gimkit gates its Pro modes and reports behind Gimkit Pro, and Vocabulary.com has no real free classroom tier ($199/classroom to start).',
+        a: 'For word and vocabulary practice specifically, LexiClash is free for the whole class with no player cap, no student logins, and native dictionaries in 6 languages (English, Hebrew RTL, Spanish, Swedish, Japanese, Russian). Kahoot, Gimkit and Vocabulary.com are strong tools but cap or price their free tiers: Kahoot limits live players, Gimkit gates its Pro modes and reports behind Gimkit Pro, and Vocabulary.com has no real free classroom tier ($199/classroom to start).',
       },
       {
         q: 'Is LexiClash a free alternative to Gimkit?',
@@ -115,7 +115,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Which one is best for ESL or multilingual classrooms?',
-        a: 'LexiClash, by a wide margin: it has native dictionaries for English, Hebrew (full RTL), Spanish, Swedish and Japanese, so word games work in the target language. Kahoot, Gimkit and Vocabulary.com are English-first and do not have language-game mechanics tied to per-language dictionaries.',
+        a: 'LexiClash, by a wide margin: it has native dictionaries for English, Hebrew (full RTL), Spanish, Swedish, Japanese and Russian, so word games work in the target language. Kahoot, Gimkit and Vocabulary.com are English-first and do not have language-game mechanics tied to per-language dictionaries.',
       },
       {
         q: 'Can a whole school or district use LexiClash?',
@@ -140,9 +140,9 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   sv: {
     metaTitle: 'Bästa gratisordspelet för klassrummet: LexiClash vs Kahoot, Gimkit & Vocabulary.com (2026) | LexiClash',
     metaDescription:
-      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com för klassrum, jämfört ärligt. Se begränsningarna för gratisversioner (Kahoot 40 spelare, Gimkit 5 elever, Vocabulary.com $199/klassrum) och varför LexiClash är gratis för hela klassen — ingen elevloggning, 5 språk, 1v1-dueller.',
+      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com för klassrum, jämfört ärligt. Se begränsningarna för gratisversioner (Kahoot 40 spelare, Gimkit 5 elever, Vocabulary.com $199/klassrum) och varför LexiClash är gratis för hela klassen — ingen elevloggning, 6 språk, 1v1-dueller.',
     ogTitle: 'LexiClash vs Kahoot, Gimkit & Vocabulary.com — för klassrum',
-    ogDescription: 'Den ärliga jämförelsen av gratisversioner. Inga spelbegränsningar, ingen avgift per elev, 5 språk, ingen elevloggning.',
+    ogDescription: 'Den ärliga jämförelsen av gratisversioner. Inga spelbegränsningar, ingen avgift per elev, 6 språk, ingen elevloggning.',
     twitterTitle: 'Bästa gratisordspelet för klassrummet (2026)',
     twitterDescription: 'LexiClash vs Kahoot, Gimkit & Vocabulary.com — ärlig jämförelse.',
     heroTitle: 'Det gratis ordspelet för klassrummet som hela klassen kan använda — utan begränsningar, utan loggning.',
@@ -159,7 +159,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Ingen elevloggning', '✓ Anslut med kod', '✓ PIN', 'Kontobaserad', 'Kontobaserad'],
       ['Kärnformat', 'Ordbindningsspel', 'Quiz / flervalssamling', 'Quiz + spelekonomisystem', 'Adaptiv ordöversiktsträning'],
       ['1v1-dueller', '✓ Inbyggt', '✗', '✗', '✗'],
-      ['Språk (inbyggd ordbok)', '✓ EN/HE/SV/JA/ES', 'Text på vilket språk som helst; ingen ordbok', 'Engelskfokuserad', 'Engelskfokuserad'],
+      ['Språk (inbyggd ordbok)', '✓ EN/HE/SV/JA/ES/RU', 'Text på vilket språk som helst; ingen ordbok', 'Engelskfokuserad', 'Engelskfokuserad'],
       ['Hebreiska RTL', '✓', '✗', '✗', '✗'],
       ['Bäst för', 'Ordförråd, stavning, ESL', 'Trivia / faktaåterkallelse', 'Granskning med spelloop', 'Adaptiv ordöversiktsmästerskap'],
       ['Installationstid', 'Under 60 sekunder', '2–5 min/frågesport', '2–5 min/kit', 'Konto + listinstallation'],
@@ -172,7 +172,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'Gratis för hela klassen', desc: 'Ingen 40-spelartak, ingen 5-elevsgräns, inget $199-inträde. Varje lärare spelar gratis med en hel klass — det förändras inte.' },
       { title: 'Ingen elevloggning', desc: 'Elever ansluter med en kod. Ingenting att etablera, ingen elevdata att hantera — det enklaste verktyget för utbyggnad på skolnivå.' },
       { title: 'Ordspel, inte quiz', desc: 'För ordförråd, stavning och språkträning hittar och bygger eleverna ord istället för att välja A/B/C/D. En bättre passning för målet.' },
-      { title: '5 språk inkl. hebreiska RTL', desc: 'Inbyggda ordböcker för EN/HE/SV/JA/ES — designade för ESL, tvåspråkiga och nedsänkningsklassrum som de andra inte tjänar.' },
+      { title: '6 språk inkl. hebreiska RTL', desc: 'Inbyggda ordböcker för EN/HE/SV/JA/ES/RU — designade för ESL, tvåspråkiga och nedsänkningsklassrum som de andra inte tjänar.' },
       { title: '1v1 ordöversikt-dueller', desc: 'Para elever för 2–3 minuters rakt motsatt ordbataljer — ett läge som ingen av dessa tre erbjuder.' },
       { title: 'Skalbar för din skola', desc: 'Gratis för lärare, med valfri distriktisering (admin-panel, analyser, innehållsbibliotek, annonsfritt, SSO) på sidan För skolor.' },
     ],
@@ -187,7 +187,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Vilket är det bästa gratis ordspelet för klassrummet?',
-        a: 'För ordförråds- och ordöversiktsträning specifikt är LexiClash gratis för hela klassen utan spelbegränsningar, utan elevloggning och med inbyggda ordböcker på 5 språk (engelska, hebreiska RTL, spanska, svenska, japanska). Kahoot, Gimkit och Vocabulary.com är starka verktyg men begränsar eller prissätter sina gratisversioner: Kahoot begränsar direktspelarna, Gimkit begränsar gratisversionen till 5 elever, och Vocabulary.com har ingen gratis klassrumsversion ($199/klassrum för att börja).',
+        a: 'För ordförråds- och ordöversiktsträning specifikt är LexiClash gratis för hela klassen utan spelbegränsningar, utan elevloggning och med inbyggda ordböcker på 6 språk (engelska, hebreiska RTL, spanska, svenska, japanska). Kahoot, Gimkit och Vocabulary.com är starka verktyg men begränsar eller prissätter sina gratisversioner: Kahoot begränsar direktspelarna, Gimkit begränsar gratisversionen till 5 elever, och Vocabulary.com har ingen gratis klassrumsversion ($199/klassrum för att börja).',
       },
       {
         q: 'Är LexiClash ett gratis alternativ till Gimkit?',
@@ -195,7 +195,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Är LexiClash ett gratis alternativ till Vocabulary.com?',
-        a: 'Vocabulary.com är en stark adaptiv ordöversiktsplattform, men den har ingen gratis klassrumsversion — prissättningen börjar omkring $199 per klassrum per år. LexiClash är gratis för varje lärare och klass, med flerspelares ordspel, 1v1-dueller och 5 språk. För läroplansjusterad adaptiv träning är Vocabulary.com utmärkt; för gratis, roligt, flerspelares ordöversiktsträning passar LexiClash bättre.',
+        a: 'Vocabulary.com är en stark adaptiv ordöversiktsplattform, men den har ingen gratis klassrumsversion — prissättningen börjar omkring $199 per klassrum per år. LexiClash är gratis för varje lärare och klass, med flerspelares ordspel, 1v1-dueller och 6 språk. För läroplansjusterad adaptiv träning är Vocabulary.com utmärkt; för gratis, roligt, flerspelares ordöversiktsträning passar LexiClash bättre.',
       },
       {
         q: 'Hur jämförs LexiClash med Kahoot för ordförråd?',
@@ -232,14 +232,14 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
   ja: {
     metaTitle: 'クラス向けの最高の無料単語ゲーム：LexiClash vs Kahoot、Gimkit、Vocabulary.com（2026）| LexiClash',
     metaDescription:
-      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com を正直に比較。無料版の制限を確認（Kahoot 40プレイヤー、Gimkit 5名の学生、Vocabulary.com $199/教室）し、LexiClash がクラス全体で無料の理由 — 生徒ログインなし、5言語、1v1デュエル。',
+      'LexiClash vs Kahoot vs Gimkit vs Vocabulary.com を正直に比較。無料版の制限を確認（Kahoot 40プレイヤー、Gimkit 5名の学生、Vocabulary.com $199/教室）し、LexiClash がクラス全体で無料の理由 — 生徒ログインなし、6言語、1v1デュエル。',
     ogTitle: 'LexiClash vs Kahoot、Gimkit、Vocabulary.com — クラス向け',
-    ogDescription: '正直な無料版比較。プレイ人数制限なし、学生ごとの手数料なし、5言語、生徒ログインなし。',
+    ogDescription: '正直な無料版比較。プレイ人数制限なし、学生ごとの手数料なし、6言語、生徒ログインなし。',
     twitterTitle: 'クラス向けの最高の無料単語ゲーム（2026）',
     twitterDescription: 'LexiClash vs Kahoot、Gimkit、Vocabulary.com — 正直な比較。',
     heroTitle: 'クラス全体が使用できる無料のクラス向け単語ゲーム — 制限なし、ログインなし。',
     intro:
-      'Kahoot、Gimkit、Vocabulary.com はすべて優れたツールですが、それぞれ無料版をを実際のクラスルームに影響を与える方法で制限または価格設定しています。Kahoot は直接プレイ数を制限し、Gimkit は無料版を5名の学生に制限し、Vocabulary.com は実質的な無料教室版がまったくありません。LexiClash は別のアプローチを取っています：教室ゲームはすべての教師に無料で、プレイ人数制限なし、生徒ログインなし、1v1デュエル、5言語のネイティブ辞書を備えています。正直な、横並びの比較をご紹介します。',
+      'Kahoot、Gimkit、Vocabulary.com はすべて優れたツールですが、それぞれ無料版をを実際のクラスルームに影響を与える方法で制限または価格設定しています。Kahoot は直接プレイ数を制限し、Gimkit は無料版を5名の学生に制限し、Vocabulary.com は実質的な無料教室版がまったくありません。LexiClash は別のアプローチを取っています：教室ゲームはすべての教師に無料で、プレイ人数制限なし、生徒ログインなし、1v1デュエル、6言語のネイティブ辞書を備えています。正直な、横並びの比較をご紹介します。',
     ctaPlayClass: '無料でクラスゲームをプレイ',
     ctaForSchools: '学校と地区向け',
 
@@ -251,7 +251,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['生徒ログインなし', '✓ コードで参加', '✓ PIN', 'アカウントベース', 'アカウントベース'],
       ['コア形式', '単語形成ゲーム', 'クイズ/多肢選択', 'クイズ + ゲーム経済', '適応型語彙ドリル'],
       ['1v1デュエル', '✓ 組み込み済み', '✗', '✗', '✗'],
-      ['言語（ネイティブ辞書）', '✓ EN/HE/SV/JA/ES', 'テキストは任意の言語; 辞書なし', '英語が中心', '英語が中心'],
+      ['言語（ネイティブ辞書）', '✓ EN/HE/SV/JA/ES/RU', 'テキストは任意の言語; 辞書なし', '英語が中心', '英語が中心'],
       ['ヘブライ語RTL', '✓', '✗', '✗', '✗'],
       ['最適な用途', '語彙、綴り、ESL', '雑学/事実のリコール', 'ゲーム経済ループによるレビュー', '適応型語彙習得'],
       ['セットアップ時間', '60秒以内', '2–5分/クイズ', '2–5分/キット', 'アカウント + リストセットアップ'],
@@ -264,7 +264,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'クラス全体で無料', desc: '40プレイヤーの上限なし、5名学生の壁なし、$199の入場料なし。すべての教師がクラス全体で無料でプレイします — これは変わりません。' },
       { title: '生徒ログインなし', desc: '生徒はコードで参加します。セットアップするものはなく、生徒データを管理する必要がありません — 学校全体にロールアウトするための最も簡単なツール。' },
       { title: '単語ゲーム、クイズではない', desc: '語彙、綴り、言語練習の場合、生徒は A/B/C/D を選ぶ代わりに単語を見つけて構築します。目標により適合しています。' },
-      { title: 'ヘブライ語 RTL を含む 5言語', desc: 'EN/HE/SV/JA/ES 用のネイティブ辞書 — ESL、二言語、没入型教室用に設計された、他のツールがサポートしていません。' },
+      { title: 'ヘブライ語 RTL を含む 6言語', desc: 'EN/HE/SV/JA/ES/RU 用のネイティブ辞書 — ESL、二言語、没入型教室用に設計された、他のツールがサポートしていません。' },
       { title: '1v1 語彙デュエル', desc: '学生を2～3分のヘッド・トゥ・ヘッドの単語対戦でペアにします — これら3つのどれもが提供していないモード。' },
       { title: 'あなたの学校にスケール', desc: '教師向けは無料。「学校向け」ページでオプションの地区ツール（admin ダッシュボード、分析、コンテンツライブラリ、広告なし、SSO）に登録できます。' },
     ],
@@ -279,7 +279,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: 'クラス向けの最高の無料単語ゲームは何ですか？',
-        a: '単語と語彙練習の場合、LexiClash はプレイ人数制限なし、生徒ログインなし、5言語（英語、ヘブライ語 RTL、スペイン語、スウェーデン語、日本語）のネイティブ辞書でクラス全体で無料です。Kahoot、Gimkit、Vocabulary.com は強力なツールですが、無料版を制限または価格設定しています：Kahoot は直接プレイを制限し、Gimkit は無料版を5名の学生に制限し、Vocabulary.com は無料の教室版がありません（開始するには $199/教室）。',
+        a: '単語と語彙練習の場合、LexiClash はプレイ人数制限なし、生徒ログインなし、6言語（英語、ヘブライ語 RTL、スペイン語、スウェーデン語、日本語、ロシア語）のネイティブ辞書でクラス全体で無料です。Kahoot、Gimkit、Vocabulary.com は強力なツールですが、無料版を制限または価格設定しています：Kahoot は直接プレイを制限し、Gimkit は無料版を5名の学生に制限し、Vocabulary.com は無料の教室版がありません（開始するには $199/教室）。',
       },
       {
         q: 'LexiClash は Gimkit の無料代替品ですか？',
@@ -287,7 +287,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'LexiClash は Vocabulary.com の無料代替品ですか？',
-        a: 'Vocabulary.com は強力な適応型語彙プラットフォームですが、実質的な無料教室版がなく — 価格は年間約 $199 クラスあたり $199 から始まります。LexiClash はすべての教師とクラスに無料で、マルチプレイヤー単語ゲーム、1v1デュエル、5言語があります。カリキュラム調整された適応型ドリルの場合、Vocabulary.com は優れています；無料で楽しいマルチプレイヤー語彙練習の場合、LexiClash がより適しています。',
+        a: 'Vocabulary.com は強力な適応型語彙プラットフォームですが、実質的な無料教室版がなく — 価格は年間約 $199 クラスあたり $199 から始まります。LexiClash はすべての教師とクラスに無料で、マルチプレイヤー単語ゲーム、1v1デュエル、6言語があります。カリキュラム調整された適応型ドリルの場合、Vocabulary.com は優れています；無料で楽しいマルチプレイヤー語彙練習の場合、LexiClash がより適しています。',
       },
       {
         q: 'LexiClash は語彙の面で Kahoot とどのように比較されますか？',
@@ -343,7 +343,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Sin inicio de sesión de estudiantes', '✓ Únete por código', '✓ PIN', 'Basado en cuenta', 'Basado en cuenta'],
       ['Formato principal', 'Juego de formación de palabras', 'Quiz / opción múltiple', 'Quiz + economía de juego', 'Ejercicios de vocabulario adaptativos'],
       ['Duelos 1v1', '✓ Integrado', '✗', '✗', '✗'],
-      ['Idiomas (diccionario nativo)', '✓ EN/HE/SV/JA/ES', 'Texto en cualquier idioma; sin diccionario', 'Centrado en inglés', 'Centrado en inglés'],
+      ['Idiomas (diccionario nativo)', '✓ EN/HE/SV/JA/ES/RU', 'Texto en cualquier idioma; sin diccionario', 'Centrado en inglés', 'Centrado en inglés'],
       ['Hebreo RTL', '✓', '✗', '✗', '✗'],
       ['Mejor para', 'Vocabulario, ortografía, ESL', 'Trivias / recuperación de hechos', 'Revisión con bucle de juego', 'Dominio de vocabulario adaptativo'],
       ['Tiempo de configuración', 'Menos de 60 segundos', '2–5 min/quiz', '2–5 min/kit', 'Cuenta + configuración de lista'],
@@ -356,7 +356,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'Gratuito para toda la clase', desc: 'Sin techo de 40 jugadores, sin pared de 5 estudiantes, sin entrada de $199. Todo maestro juega gratis con una clase completa — eso no cambia.' },
       { title: 'Sin inicio de sesión de estudiantes', desc: 'Los estudiantes se unen con un código. Nada que configurar, sin datos de estudiantes que administrar — la herramienta más fácil para implementar en toda la escuela.' },
       { title: 'Juegos de palabras, no cuestionarios', desc: 'Para vocabulario, ortografía y práctica del idioma, los estudiantes encuentran y construyen palabras en lugar de elegir A/B/C/D. Mejor adaptación al objetivo.' },
-      { title: '6 idiomas incl. hebreo RTL', desc: 'Diccionarios nativos para EN/HE/SV/JA/ES — diseñados para aulas de ESL, bilingües e inmersión que los otros no atienden.' },
+      { title: '6 idiomas incl. hebreo RTL', desc: 'Diccionarios nativos para EN/HE/SV/JA/ES/RU — diseñados para aulas de ESL, bilingües e inmersión que los otros no atienden.' },
       { title: 'Duelos de vocabulario 1v1', desc: 'Empareja estudiantes para batallas de palabras cara a cara de 2–3 minutos — un modo que ninguno de estos tres ofrece.' },
       { title: 'Se escala a tu escuela', desc: 'Gratuito para maestros, con herramientas de distrito opcionales (panel de administrador, análisis, bibliotecas de contenido, sin anuncios, SSO) en la página Para escuelas.' },
     ],
@@ -435,7 +435,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['ללא כניסה לתלמידים', '✓ הצטרף לפי קוד', '✓ PIN', 'מבוסס חשבון', 'מבוסס חשבון'],
       ['פורמט ליבה', 'משחק יצירת מילים', 'חידון / בחירה מרובה', 'חידון + כלכלת משחק', 'תרגילי אוצר מילים אדפטיביים'],
       ['דו קרבות 1v1', '✓ מובנה', '✗', '✗', '✗'],
-      ['שפות (מילון נטיבי)', '✓ EN/HE/SV/JA/ES/RU', 'טקסט בכל שפה; ללא מילון', 'ממוקדת באנגלית', 'ממוקדת באנגלית'],
+      ['שפות (מילון נטיבי)', '✓ EN/HE/SV/JA/ES/RU/RU', 'טקסט בכל שפה; ללא מילון', 'ממוקדת באנגלית', 'ממוקדת באנגלית'],
       ['עברית (מימין לשמאל)', '✓', '✗', '✗', '✗'],
       ['הטוב ביותר ל', 'אוצר מילים, איות, ESL', 'טריוויה / ציטוט עובדות', 'סקירה עם לולאת משחק', 'שליטה באוצר מילים אדפטיבית'],
       ['זמן הגדרה', 'פחות מ-60 שניות', '2-5 דקות/חידון', '2-5 דקות/ערכה', 'חשבון + הגדרת רשימה'],
@@ -448,7 +448,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'חינם לכל הכיתה', desc: 'ללא תקרה של 40 משחקים, ללא קיר של 5 תלמידים, ללא כניסה של $199. כל מורה משחק בחינם עם כיתה מלאה — זה לא משתנה.' },
       { title: 'ללא כניסה לתלמידים', desc: 'תלמידים מצטרפים עם קוד. לא צריך להגדיר, ללא נתוני תלמידים לניהול — הכלי הקל ביותר להרמה ברמה בית הספר.' },
       { title: 'משחקי מילים, לא חידונים', desc: 'עבור אוצר מילים, איות ותרגול שפה, תלמידים מוצאים ובונים מילים במקום לבחור A/B/C/D. התאמה טובה יותר לתכלית.' },
-      { title: '6 שפות כולל עברית (מימין לשמאל)', desc: 'מילונים מובנים עבור EN/HE/SV/JA/ES/RU — בנוי לכיתות ESL, דו-לשוניות וטבילה שאחרים לא משרתים.' },
+      { title: '6 שפות כולל עברית (מימין לשמאל)', desc: 'מילונים מובנים עבור EN/HE/SV/JA/ES/RU/RU — בנוי לכיתות ESL, דו-לשוניות וטבילה שאחרים לא משרתים.' },
       { title: 'דו קרבות אוצר מילים 1v1', desc: 'זווג תלמידים לקרבות מילים פנים אל פנים של 2-3 דקות — מצב שאחד מהשלושה לא מציע.' },
       { title: 'מתרחב לבית הספר שלך', desc: 'חינם למורים, עם כלים מחוז אופציונליים (לוח בקרה ניהול, אנליטיקה, ספריות תוכן, ללא פרסומות, SSO) בעמוד לבתי ספר.' },
     ],
@@ -527,7 +527,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Без входа учеников', '✓ Присоединиться по коду', '✓ PIN', 'На основе аккаунта', 'На основе аккаунта'],
       ['Основной формат', 'Игра на составление слов', 'Викторина / множественный выбор', 'Викторина + игровая экономика', 'Адаптивные упражнения по лексике'],
       ['1v1 дуэли', '✓ Встроено', '✗', '✗', '✗'],
-      ['Языки (нативные словари)', '✓ EN/HE/SV/JA/ES/RU', 'Текст на любом языке; нет словаря', 'Ориентирована на английский', 'Ориентирована на английский'],
+      ['Языки (нативные словари)', '✓ EN/HE/SV/JA/ES/RU/RU', 'Текст на любом языке; нет словаря', 'Ориентирована на английский', 'Ориентирована на английский'],
       ['Еврейский RTL', '✓', '✗', '✗', '✗'],
       ['Лучше всего для', 'Лексика, орфография, ESL', 'Викторина / вспоминание фактов', 'Повторение с игровым циклом', 'Адаптивное овладение лексикой'],
       ['Время настройки', 'Менее 60 секунд', '2-5 мин/викторина', '2-5 мин/набор', 'Аккаунт + настройка списка'],
@@ -540,7 +540,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       { title: 'Бесплатно для всего класса', desc: 'Без потолка 40 игроков, без стены 5 учеников, без вступительного взноса $199. Каждый учитель играет бесплатно с полным классом — это не меняется.' },
       { title: 'Без входа учеников', desc: 'Студенты присоединяются по коду. Ничего не нужно настраивать, нет данных учеников для управления — самый простой инструмент для развертывания по всей школе.' },
       { title: 'Словесные игры, не викторины', desc: 'Для обучения лексике, орфографии и практики языка ученики ищут и составляют слова вместо выбора A/B/C/D. Лучше всего соответствует цели.' },
-      { title: '6 языков включая иврит (RTL)', desc: 'Нативные словари для EN/HE/SV/JA/ES/RU — разработано для ESL, двуязычных и погружающих классов, которых другие не обслуживают.' },
+      { title: '6 языков включая иврит (RTL)', desc: 'Нативные словари для EN/HE/SV/JA/ES/RU/RU — разработано для ESL, двуязычных и погружающих классов, которых другие не обслуживают.' },
       { title: '1v1 лексические дуэли', desc: 'Спарьте учеников на 2-3 минутные словесные поединки лицом к лицу — режим, который ни один из этих трех не предлагает.' },
       { title: 'Масштабируется для вашей школы', desc: 'Бесплатно для учителей, с дополнительными округными инструментами (административная панель, аналитика, библиотеки контента, без объявлений, SSO) на странице "Для школ".' },
     ],

@@ -18,6 +18,21 @@ const STORAGE_KEY = 'lexiclash_lesson_draft';
 /** Draft expires after 24 hours */
 const DRAFT_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * Identifies THIS page load. Created once when the module is first evaluated,
+ * so every component that mounts and remounts within the same page shares it,
+ * while a reload or a new tab gets a fresh one.
+ *
+ * A remount must not re-ask "resume draft?" for work the same page just saved;
+ * a genuine reload should. The teacher dashboard is known to remount its tree
+ * mid-action, which makes this the difference between a prompt that appears
+ * once and one that ambushes the teacher repeatedly.
+ */
+const PAGE_LOAD_ID =
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `page-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
 // ============================================
 // TYPES
 // ============================================
@@ -35,6 +50,12 @@ export interface LessonDraft {
   words: VocabularyWord[];
   /** Timestamp when draft was saved */
   savedAt: number;
+  /**
+   * Which page load wrote this draft. Lets a later mount tell "work from an
+   * earlier visit" from "the draft this very page just autosaved", which a
+   * timestamp cannot: a component remount re-reads storage moments after a save.
+   */
+  pageLoadId?: string;
 }
 
 export interface LessonDraftInput {
@@ -50,6 +71,16 @@ export interface UseLessonDraftReturn {
   draft: LessonDraft | null;
   /** Whether a draft exists */
   hasDraft: boolean;
+  /**
+   * Whether there is work from an EARLIER session worth offering back — the
+   * only correct trigger for a "Resume draft?" prompt.
+   *
+   * True only for a draft read from storage at mount; false the moment this
+   * session saves, restores, or discards. `hasDraft` cannot serve this role:
+   * autosave flips it true, so a prompt keyed on it re-fires every 30 seconds
+   * and blocks the form mid-edit.
+   */
+  hasRestorableDraft: boolean;
   /** Time in ms since draft was saved (null if no draft) */
   draftAge: number | null;
   /** Save current form state as draft */
@@ -91,6 +122,8 @@ export function useLessonDraft(): UseLessonDraftReturn {
   const [draft, setDraft] = useState<LessonDraft | null>(null);
   // Store the age at load time to avoid calling Date.now() during render
   const [draftAge, setDraftAge] = useState<number | null>(null);
+  // Set once, by the mount effect, for a draft this session did not write.
+  const [hasRestorableDraft, setHasRestorableDraft] = useState(false);
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -112,6 +145,10 @@ export function useLessonDraft(): UseLessonDraftReturn {
 
         setDraft(parsed);
         setDraftAge(age);
+        // Only offer back work from a DIFFERENT page load. A remount re-runs
+        // this effect moments after an autosave; that is not something to
+        // interrupt the teacher for.
+        setHasRestorableDraft(parsed.pageLoadId !== PAGE_LOAD_ID);
       }
     } catch (error) {
       console.error('Failed to load lesson draft:', error);
@@ -124,10 +161,13 @@ export function useLessonDraft(): UseLessonDraftReturn {
     const draftData: LessonDraft = {
       ...data,
       savedAt: Date.now(),
+      pageLoadId: PAGE_LOAD_ID,
     };
 
     setDraft(draftData);
     setDraftAge(0); // Just saved, age is 0
+    // This session's own work is never something to offer back to it.
+    setHasRestorableDraft(false);
 
     if (typeof window !== 'undefined') {
       try {
@@ -142,6 +182,7 @@ export function useLessonDraft(): UseLessonDraftReturn {
   const clearDraft = useCallback(() => {
     setDraft(null);
     setDraftAge(null);
+    setHasRestorableDraft(false);
 
     if (typeof window !== 'undefined') {
       try {
@@ -165,6 +206,7 @@ export function useLessonDraft(): UseLessonDraftReturn {
   return {
     draft,
     hasDraft,
+    hasRestorableDraft,
     draftAge,
     saveDraft,
     clearDraft,

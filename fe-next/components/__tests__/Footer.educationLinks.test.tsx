@@ -15,6 +15,7 @@ import path from 'path';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Footer from '../Footer';
+import { EDUCATION_PAGES, educationPageLabel } from '@/lib/seo/educationPageLinks';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -48,6 +49,29 @@ describe('Footer — For Teachers education links (crawl-equity)', () => {
     expect(h).toContain('/en/education/games-for-teachers');
     expect(h).toContain('/en/education/vocabulary-games-classroom');
     expect(h).toContain('/en/education/esl-word-games');
+  });
+
+  /**
+   * The 2026-05-30 fix named five pages by hand. Seven more landing pages shipped
+   * after it — including the six teacher-moment pages, which have the deepest
+   * content in the module — and none of them was ever added, so each repeated the
+   * exact "unknown to Google" problem this cluster was built to solve. The footer
+   * now renders the whole registry, and this asserts the set, not a sample.
+   */
+  it('links EVERY registered education landing page, not a hand-picked five', () => {
+    render(<Footer />);
+    const h = hrefs();
+    const missing = EDUCATION_PAGES.map((p) => `/en/education/${p.slug}`).filter(
+      (href) => !h.includes(href),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it('uses the localized label for the active language', () => {
+    render(<Footer />);
+    // `en` here because the LanguageContext mock pins it; the point is that the
+    // anchor text comes from the registry rather than an English literal.
+    expect(screen.getByText(educationPageLabel('brain-breaks-word-games', 'en'))).toBeTruthy();
   });
 
   it('education links carry the WCAG tap-target padding contract', () => {

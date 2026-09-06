@@ -223,7 +223,7 @@ export default function EducationBadgeGrid({
               onClick={() => toggleCategory(category)}
               aria-expanded={!isCollapsed}
               aria-controls={`category-${category}`}
-              className="w-full flex items-center justify-between text-left group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors"
+              className="w-full flex items-center justify-between text-start group p-3 -m-3 rounded-neo hover:bg-neo-white/5 transition-colors"
             >
               <h3 className="font-neo-display text-xl font-bold text-neo-white group-hover:text-neo-cyan transition-colors">
                 {t(`education.achievements.categories.${category}`)}
@@ -295,7 +295,7 @@ export default function EducationBadgeGrid({
 
       {/* Pin Error Toast */}
       {pinError && (
-        <div className="fixed bottom-[calc(1rem+var(--admob-banner-height,0px))] right-4 z-50">
+        <div className="fixed bottom-[calc(1rem+var(--admob-banner-height,0px))] end-4 z-50">
           <div className="bg-neo-pink text-neo-black px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard-lg flex items-center gap-3">
             <span className="font-neo-body">{pinError}</span>
             <button

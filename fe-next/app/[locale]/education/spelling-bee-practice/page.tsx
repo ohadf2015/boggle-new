@@ -1,12 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { getSpellingBeeContent, type EducationLocale } from './content';
+import { getSpellingBeeContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { HighlightedHeading } from '@/components/education/HighlightedHeading';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { hreflangAlternates } from '@/lib/seo/hreflang';
+import {
+  educationBreadcrumbJsonLd,
+  educationFaqJsonLd,
+  educationLearningResourceJsonLd,
+} from '@/lib/seo/educationLanding';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -14,6 +22,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/spelling-bee-practice';
+const SLUG = 'spelling-bee-practice';
 
 const OG_IMAGE: Record<string, string> = {
   en: 'education-hero-en.webp',
@@ -37,12 +46,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
   const c = getSpellingBeeContent(locale);
-  // EN-only indexing: the page body is localized via content.ts, but SEO
-  // is conservative — only index the EN version. The rich-content sibling
-  // pages (duals, classroom, etc.) index all 5 languages because their bodies
-  // use full content.ts localization. This page's FAQ/drills/plan/hero are
-  // now localized but kept index-gated for consistency.
-  const isEnglish = locale === 'en';
+  // Indexable in every language we build, not English alone. The 2026-05-30 noindex
+  // was correct for a page whose body was hardcoded English with localized meta;
+  // `content.ts` has since grown full per-locale blocks and `page.tsx` renders every
+  // visible string from them, so five genuinely translated pages were being withheld
+  // from search for a reason that had expired. `__tests__/spellingBeeRobots.test.ts`
+  // now asserts the premise (no hardcoded English prose in the body) rather than
+  // restating it in a comment.
+  const isSupportedLocale = EDUCATION_LOCALES.includes(locale as EducationLocale);
   const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale] ?? OG_IMAGE.en}`;
   const ogLocale = OG_LOCALE[locale] ?? 'en_US';
   return {
@@ -63,19 +74,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: c.metaDescription,
       images: [ogImage],
     },
+    // hreflangAlternates, not a hand-written seven: `app/sitemap.ts` emits the ~24-entry
+    // map (regional variants included) from the same helper, and Google discards any
+    // annotation the other side does not reciprocate.
     alternates: {
       canonical: pageUrl,
-      languages: {
-        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
-        en: `${BASE_URL}/en${PAGE_PATH}`,
-        he: `${BASE_URL}/he${PAGE_PATH}`,
-        sv: `${BASE_URL}/sv${PAGE_PATH}`,
-        ja: `${BASE_URL}/ja${PAGE_PATH}`,
-        es: `${BASE_URL}/es${PAGE_PATH}`,
-        ru: `${BASE_URL}/ru${PAGE_PATH}`,
-      },
+      languages: hreflangAlternates(PAGE_PATH),
     },
-    robots: isEnglish ? { index: true, follow: true } : { index: false, follow: true },
+    robots: isSupportedLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 
@@ -84,39 +90,26 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getSpellingBeeContent(locale);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
+  const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
-  const learningResourceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#resource`,
-    name: 'Spelling Bee Practice Online',
-    url: `${BASE_URL}/en${PAGE_PATH}`,
-    inLanguage: 'en',
-    learningResourceType: 'Game',
+  // Name and URL are now the locale's, not `/en`'s: the body is fully translated in
+  // all six languages, so a `/ja` build pointing its resource node at the English URL
+  // was describing a page that does not exist in Japanese.
+  const learningResourceJsonLd = educationLearningResourceJsonLd({
+    locale,
+    path: PAGE_PATH,
+    name: c.metaTitle,
+    description: c.metaDescription,
     educationalUse: ['Spelling Practice', 'Spelling Bee Preparation', 'Vocabulary Building', 'Pattern Recognition', 'Competition Training'],
     educationalLevel: ['Primary', 'Secondary', 'Adult Education'],
     typicalAgeRange: '7-18',
-    isAccessibleForFree: true,
     teaches: 'Spelling, letter pattern recognition, word recall under time pressure, vocabulary',
-    audience: { '@type': 'EducationalAudience', educationalRole: ['student', 'parent'] },
-    provider: {
-      '@type': 'EducationalOrganization',
-      '@id': `${BASE_URL}/en/education#org`,
-      name: 'LexiClash Education',
-      url: `${BASE_URL}/en/education`,
-    },
-  };
+  });
 
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#howto`,
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#howto`,
     name: 'How to Practice for a Spelling Bee with LexiClash',
     description: 'Four-step routine for spelling-bee preparation using free word games.',
     totalTime: 'PT15M',
@@ -128,21 +121,18 @@ export default async function Page({ params }: PageProps) {
     ],
   };
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: 'Spelling Bee Practice', item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const breadcrumbJsonLd = educationBreadcrumbJsonLd({
+    locale,
+    path: PAGE_PATH,
+    current: educationPageLabel(SLUG, locale),
+  });
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       <JsonLd data={faqJsonLd} />
       <JsonLd data={learningResourceJsonLd} />
-      <JsonLd data={howToJsonLd} />
+      {/* English steps — see the vocabulary-games-classroom note. */}
+      {locale === 'en' && <JsonLd data={howToJsonLd} />}
       <JsonLd data={breadcrumbJsonLd} />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
@@ -261,6 +251,8 @@ export default async function Page({ params }: PageProps) {
             </Link>
           </div>
         </section>
+
+        <EducationRelatedLinks locale={locale} slug={SLUG} />
 
         <DistrictUpsellStrip />
       </div>

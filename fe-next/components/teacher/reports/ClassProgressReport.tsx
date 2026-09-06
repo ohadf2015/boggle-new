@@ -250,7 +250,7 @@ export function ClassProgressReport({
                   <button
                     type="button"
                     onClick={() => handleStudentClick(performer.studentId)}
-                    className="flex-1 text-left text-neo-white font-medium hover:text-neo-lime transition-colors"
+                    className="flex-1 text-start text-neo-white font-medium hover:text-neo-lime transition-colors"
                     aria-label={`View ${performer.studentName}'s profile`}
                   >
                     {performer.studentName}
@@ -285,7 +285,7 @@ export function ClassProgressReport({
                   <button
                     type="button"
                     onClick={() => handleStudentClick(student.studentId)}
-                    className="flex-1 text-left text-neo-white font-medium hover:text-neo-lime transition-colors"
+                    className="flex-1 text-start text-neo-white font-medium hover:text-neo-lime transition-colors"
                     aria-label={`View ${student.studentName}'s profile`}
                   >
                     {student.studentName}
@@ -316,11 +316,11 @@ export function ClassProgressReport({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-neo-navy border-b-2 border-black">
-                <th className="text-left p-3 text-neo-white font-bold w-16">Rank</th>
-                <th className="text-left p-3 text-neo-white font-bold">Student</th>
-                <th className="text-left p-3 text-neo-white font-bold">Score</th>
-                <th className="text-left p-3 text-neo-white font-bold">Accuracy</th>
-                <th className="text-left p-3 text-neo-white font-bold">Words</th>
+                <th className="text-start p-3 text-neo-white font-bold w-16">Rank</th>
+                <th className="text-start p-3 text-neo-white font-bold">Student</th>
+                <th className="text-start p-3 text-neo-white font-bold">Score</th>
+                <th className="text-start p-3 text-neo-white font-bold">Accuracy</th>
+                <th className="text-start p-3 text-neo-white font-bold">Words</th>
               </tr>
             </thead>
             <tbody>

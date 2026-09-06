@@ -24,6 +24,10 @@ const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+const VocabQuizView = dynamic(
+  () => import('@/components/education/vocabQuiz/VocabQuizView').then(m => ({ default: m.VocabQuizView })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
 const WordTowerVersus = dynamic(
   () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
@@ -38,6 +42,7 @@ import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } f
 import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
+import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -310,11 +315,22 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Desktop 3-column chassis (≥1024px + flag): wraps each mode's canvas with
   // roster/words/insight rails instead of a mobile grid floating in empty space.
   const shellEnabled = useDesktopShellEnabled();
+  // Live Vocab Quiz rooms replace the board entirely.
+  const isVocabQuizRoom = useIsVocabQuizRoom(socket);
 
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   // caused by the host handler setting tableData (React state) and gameMode (Zustand)
   // in separate calls, producing two render cycles.
   if (!gameModeConfirmed) return null;
+
+  // Live Vocab Quiz — a classroom question round with no letter grid at all, so
+  // it renders before the grid guard. Detected from the server's quiz traffic
+  // rather than `gameMode`: the quiz is deliberately not a member of the
+  // GameMode union (see shared/types/vocabQuiz), and the start payload that
+  // mounts this view therefore carries a placeholder board mode.
+  if (isVocabQuizRoom) {
+    return <VocabQuizView socket={socket} username={username} t={t} />;
+  }
 
   // Wheel-rush has no letter grid — render dedicated view before grid guard
   if (gameMode === 'wheel-rush') {

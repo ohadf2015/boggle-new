@@ -7,6 +7,16 @@ import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip'
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { educationCourseJsonLd } from '@/lib/seo/educationStructuredData';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { EducationDepthSections } from '@/components/education/EducationDepthSections';
+import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
+import { hreflangAlternates } from '@/lib/seo/hreflang';
+import {
+  educationBreadcrumbJsonLd,
+  educationFaqJsonLd,
+  educationLearningResourceJsonLd,
+} from '@/lib/seo/educationLanding';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -14,6 +24,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/esl-word-games';
+const SLUG = 'esl-word-games';
 
 const OG_IMAGE: Record<string, string> = {
   en: 'education-hero-en.webp',
@@ -49,17 +60,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: c.twitterDescription,
       images: [ogImage],
     },
+    // hreflangAlternates, not a hand-written seven: `app/sitemap.ts` emits the ~24-entry
+    // map (regional variants included) from the same helper, and Google discards any
+    // annotation the other side does not reciprocate.
     alternates: {
       canonical: pageUrl,
-      languages: {
-        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
-        en: `${BASE_URL}/en${PAGE_PATH}`,
-        he: `${BASE_URL}/he${PAGE_PATH}`,
-        sv: `${BASE_URL}/sv${PAGE_PATH}`,
-        ja: `${BASE_URL}/ja${PAGE_PATH}`,
-        es: `${BASE_URL}/es${PAGE_PATH}`,
-        ru: `${BASE_URL}/ru${PAGE_PATH}`,
-      },
+      languages: hreflangAlternates(PAGE_PATH),
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -71,44 +77,24 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getEslWordGamesContent(locale);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
+  const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
-  const learningResourceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#resource`,
+  const learningResourceJsonLd = educationLearningResourceJsonLd({
+    locale,
+    path: PAGE_PATH,
     name: c.metaTitle,
-    url: `${BASE_URL}/${locale}${PAGE_PATH}`,
-    inLanguage: 'en',
-    learningResourceType: 'Game',
+    description: c.metaDescription,
     educationalUse: ['ESL Practice', 'EFL Practice', 'Vocabulary Building', 'Spelling Practice', 'Bilingual Programs'],
     educationalLevel: ['Beginner', 'Intermediate', 'Advanced', 'Adult Education'],
     typicalAgeRange: '8-99',
-    isAccessibleForFree: true,
     teaches: 'English vocabulary, spelling, letter patterns, sight-word recognition',
-    audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'ESL/EFL learners' },
-    provider: {
-      '@type': 'EducationalOrganization',
-      '@id': `${BASE_URL}/en/education#org`,
-      name: 'LexiClash Education',
-      url: `${BASE_URL}/en/education`,
-    },
-  };
+  });
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: 'ESL Word Games', item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const breadcrumbJsonLd = educationBreadcrumbJsonLd({
+    locale,
+    path: PAGE_PATH,
+    current: educationPageLabel(SLUG, locale),
+  });
 
   const courseJsonLd = educationCourseJsonLd({
     name: c.metaTitle,
@@ -174,7 +160,7 @@ export default async function Page({ params }: PageProps) {
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.sections.scaleToCefr}
+            {c.sections.setLevelPerClass}
           </h2>
           <div className="grid gap-4 sm:grid-cols-3">
             {c.proficiencyLevels.map((p) => (
@@ -185,6 +171,71 @@ export default async function Page({ params }: PageProps) {
               </div>
             ))}
           </div>
+        </ScrollRevealSection>
+
+        {/* The literal ten-minute loop — the shape that won the sibling landing.
+            Timed steps a teacher can follow on a Tuesday, not a feature list. */}
+        <ScrollRevealSection className="mt-20">
+          <h2 className="mb-4 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+            {c.workflow.heading}
+          </h2>
+          <p
+            data-answer
+            className="max-w-3xl rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 text-base leading-relaxed text-neo-gray-100 shadow-hard sm:text-lg"
+          >
+            {c.workflow.intro}
+          </p>
+          <ol className="mt-6 space-y-3">
+            {c.workflow.steps.map((step) => (
+              <li
+                key={step.when}
+                className="flex items-start gap-4 rounded-neo border-2 border-neo-black bg-neo-navy-light p-4 shadow-hard-sm"
+              >
+                <span className="shrink-0 rounded border-2 border-neo-black bg-neo-lime px-2 py-1 font-neo-display text-xs font-black tabular-nums text-neo-navy">
+                  {step.when}
+                </span>
+                <span className="pt-1 text-sm text-neo-gray-200 sm:text-base">{step.what}</span>
+              </li>
+            ))}
+          </ol>
+        </ScrollRevealSection>
+
+        {/* Where this page is NOT the right tool. Naming it costs nothing and is
+            the honest answer for a reader who wants a self-serve game library. */}
+        <ScrollRevealSection className="mt-16">
+          <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-6 shadow-hard">
+            <h2 className="font-neo-display text-xl font-black uppercase text-neo-cyan sm:text-2xl">
+              {c.arcadeNote.heading}
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-neo-gray-200 sm:text-base">
+              {c.arcadeNote.body}
+            </p>
+            <a
+              href={c.arcadeNote.href}
+              rel="nofollow noopener"
+              target="_blank"
+              className="mt-4 inline-block rounded-neo border-2 border-neo-black bg-neo-navy px-4 py-2 text-sm font-bold text-neo-cyan transition-colors hover:bg-neo-navy-light"
+            >
+              {c.arcadeNote.cta} ↗
+            </a>
+          </div>
+        </ScrollRevealSection>
+
+        {/* Named-format table, counted from the registries — see EducationPlayFormats. */}
+        <ScrollRevealSection>
+          <EducationPlayFormats
+            locale={locale}
+            heading={c.playFormats.heading}
+            intro={c.playFormats.intro}
+            liveLabel={c.playFormats.liveLabel}
+            practiceLabel={c.playFormats.practiceLabel}
+          />
+        </ScrollRevealSection>
+
+        {/* Mechanism blocks: the specifics a listicle cannot match, each with a
+            self-contained answer marked `data-answer` for AI answer engines. */}
+        <ScrollRevealSection>
+          <EducationDepthSections sections={c.depth} />
         </ScrollRevealSection>
 
         <ScrollRevealSection className="mt-20">
@@ -204,11 +255,15 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
-        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={c.related.label}>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.related.vocabulary}</Link>
-          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.related.teachers}</Link>
-          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.related.hub}</Link>
-        </nav>
+        <EducationRelatedLinks
+          locale={locale}
+          slug={SLUG}
+          extra={[
+            { href: '/education/vocabulary-games-classroom', label: c.related.vocabulary, accent: 'lime' },
+            { href: '/education/games-for-teachers', label: c.related.teachers, accent: 'cyan' },
+          ]}
+          count={5}
+        />
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-cyan p-8 text-neo-navy shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">

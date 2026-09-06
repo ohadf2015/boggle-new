@@ -42,7 +42,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
 
       <div className="relative h-6 bg-neo-navy rounded-full overflow-hidden mb-3">
         <m.div
-          className="absolute inset-y-0 left-0 bg-neo-cyan"
+          className="absolute inset-y-0 start-0 bg-neo-cyan"
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(progress, 100)}%` }}
           transition={{ type: 'spring', stiffness: 100 }}

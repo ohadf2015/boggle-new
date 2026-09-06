@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useRecentClassroomGames } from '@/hooks/useRecentClassroomGames';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { ClassReportSection } from '@/components/teacher/report/ClassReportSection';
 import { cn } from '@/lib/utils';
 
 // ============================================
@@ -30,6 +31,8 @@ const MODE_KEYS: Record<string, string> = {
   wordHunt: 'wordHunt',
   'wheel-rush': 'wheelRush',
   wheelRush: 'wheelRush',
+  'vocab-quiz': 'vocabQuiz',
+  vocabQuiz: 'vocabQuiz',
 };
 
 const LOCALES: Record<string, string> = {
@@ -292,6 +295,19 @@ export function LastGameInsights({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Word x student report — who got which word, how the class is
+            trending on it, and one student at a time. Free, like the rest of
+            this card; the Pro analytics below keep the long-range views. */}
+        <div className="border-t-3 border-black/15 pt-4">
+          <ClassReportSection
+            game={game}
+            games={games}
+            onCreateReviewLesson={onCreateReviewLesson}
+            modeLabel={modeLabel(game.gameMode)}
+            playedAtText={formatPlayedAt(game.playedAt, language)}
+          />
         </div>
 
         {/* CTA */}

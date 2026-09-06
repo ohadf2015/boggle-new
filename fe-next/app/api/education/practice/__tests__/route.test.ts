@@ -105,10 +105,14 @@ describe('PATCH /api/education/practice', () => {
   describe('XP Award on Completion', () => {
     it('should award XP via RPC when practice session is completed', async () => {
       // GIVEN: Session exists and is not yet completed
+      // The ownership SELECT also carries the columns the XP calculation reads,
+      // so completion needs one write instead of two.
       const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
           completed_at: null,
         },
         error: null,
@@ -131,16 +135,26 @@ describe('PATCH /api/education/practice', () => {
       // Additional from() call for XP update after server calculation
       const xpUpdateMock = vi.fn().mockResolvedValue({ data: null, error: null });
 
-      mockFrom.mockImplementation(() => {
-        const callCount = mockFrom.mock.calls.length;
+      // Table-aware, not call-count-aware: the handler reads the session, reads
+      // the streak, then performs exactly ONE session write.
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_lesson_progress') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: { current_streak: 0 }, error: null }),
+          };
+        }
+        let isWrite = false;
         const builder: Record<string, Mock> = {
-          select: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
+          select: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
           update: vi.fn(() => {
-            if (callCount >= 3) return { eq: vi.fn().mockResolvedValue(xpUpdateMock()) };
+            isWrite = true;
+            xpUpdateMock();
             return builder;
           }),
-          single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
+          single: vi.fn(() => (isWrite ? sessionUpdateMock() : ownershipCheckMock())),
         };
         return builder;
       });
@@ -173,10 +187,14 @@ describe('PATCH /api/education/practice', () => {
 
     it('should NOT award XP when session is not completed', async () => {
       // GIVEN: Session update without completion
+      // The ownership SELECT also carries the columns the XP calculation reads,
+      // so completion needs one write instead of two.
       const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
           completed_at: null,
         },
         error: null,
@@ -277,10 +295,14 @@ describe('PATCH /api/education/practice', () => {
         error: { message: 'RPC function not found' },
       });
 
+      // The ownership SELECT also carries the columns the XP calculation reads,
+      // so completion needs one write instead of two.
       const ownershipCheckMock = vi.fn().mockResolvedValue({
         data: {
           id: '550e8400-e29b-41d4-a716-446655440001',
           student_id: '550e8400-e29b-41d4-a716-446655440002',
+          lesson_id: '550e8400-e29b-41d4-a716-446655440003',
+          practice_type: 'flashcard',
           completed_at: null,
         },
         error: null,
@@ -302,16 +324,26 @@ describe('PATCH /api/education/practice', () => {
 
       const xpUpdateMock = vi.fn().mockResolvedValue({ data: null, error: null });
 
-      mockFrom.mockImplementation(() => {
-        const callCount = mockFrom.mock.calls.length;
+      // Table-aware, not call-count-aware: the handler reads the session, reads
+      // the streak, then performs exactly ONE session write.
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_lesson_progress') {
+          return {
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: { current_streak: 0 }, error: null }),
+          };
+        }
+        let isWrite = false;
         const builder: Record<string, Mock> = {
-          select: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
+          select: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
           update: vi.fn(() => {
-            if (callCount >= 3) return { eq: vi.fn().mockResolvedValue(xpUpdateMock()) };
+            isWrite = true;
+            xpUpdateMock();
             return builder;
           }),
-          single: callCount === 1 ? ownershipCheckMock : sessionUpdateMock,
+          single: vi.fn(() => (isWrite ? sessionUpdateMock() : ownershipCheckMock())),
         };
         return builder;
       });

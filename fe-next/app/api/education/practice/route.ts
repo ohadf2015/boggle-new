@@ -310,10 +310,16 @@ export async function PATCH(request: NextRequest) {
 
     const { sessionId, completed, ...updateData } = parseResult.data;
 
-    // Verify user owns the session + idempotency guard
+    // Verify user owns the session + idempotency guard.
+    // PERF: the extra columns are exactly the ones the completion path needs to
+    // score the session. Reading them here (same round trip as the ownership
+    // check) is what lets the handler compute xp_awarded BEFORE the write, so
+    // completion is one write instead of two.
     const { data: existing, error: existingError } = await supabase
       .from('practice_sessions')
-      .select('id, student_id, completed_at')
+      .select(
+        'id, student_id, lesson_id, completed_at, practice_type, mode, cards_reviewed, cards_correct, vocabulary_words_found, words_found, words_correct, words_attempted, max_combo'
+      )
       .eq('id', sessionId)
       .eq('student_id', user.id)
       .single();
@@ -325,9 +331,17 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Idempotency guard: if already completed, return existing session without re-awarding XP
+    // Idempotency guard: if already completed, return existing session without re-awarding XP.
+    // Only the three guard columns are returned — the wider select above is an
+    // internal optimisation and must not change this response shape.
     if (existing.completed_at) {
-      return NextResponse.json({ session: existing });
+      return NextResponse.json({
+        session: {
+          id: existing.id,
+          student_id: existing.student_id,
+          completed_at: existing.completed_at,
+        },
+      });
     }
 
     // Build update object with snake_case keys
@@ -344,22 +358,16 @@ export async function PATCH(request: NextRequest) {
     if (updateData.timeSpentSeconds !== undefined) updateObj.time_spent_seconds = updateData.timeSpentSeconds;
     if (completed) updateObj.completed_at = new Date().toISOString();
 
-    // Update session
-    const { data: session, error } = await supabase
-      .from('practice_sessions')
-      .update(updateObj)
-      .eq('id', sessionId)
-      .select('*')
-      .single();
+    // Server-side XP recalculation (H3 fix: never trust client-supplied xpAwarded).
+    // PERF: scored from the MERGED row (what the session will look like after the
+    // write) rather than from the write's return value, so xp_awarded goes into
+    // the same UPDATE instead of costing a second write to the same row.
+    let serverCalculatedXp = 0;
+    let streakDays = 0;
 
-    if (error) {
-      logger.error('Error updating session:', error);
-      return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
-    }
-
-    // Server-side XP recalculation (H3 fix: never trust client-supplied xpAwarded)
     if (completed) {
-      const practiceType = session.practice_type || session.mode;
+      const merged = { ...existing, ...updateObj } as typeof existing & Record<string, unknown>;
+      const practiceType = merged.practice_type || merged.mode;
       const xpType = practiceType === 'solo_board' ? 'solo_board'
         : practiceType === 'warmup' ? 'solo_board'
         : practiceType === 'flashcard' ? 'flashcard'
@@ -372,15 +380,15 @@ export async function PATCH(request: NextRequest) {
       const xpSession: PracticeSessionXp = {
         type: xpType,
         sessionData: {
-          cardsReviewed: session.cards_reviewed,
-          cardsCorrect: session.cards_correct,
-          vocabularyWordsFound: session.vocabulary_words_found || [],
-          pairsMatched: session.words_correct,
-          totalPairs: session.words_attempted,
-          wordsSpelled: session.words_correct,
-          spellingStreak: session.max_combo || 0,
-          blitzWordsFound: session.words_correct || (session.words_found?.length ?? 0),
-          blitzMaxCombo: session.max_combo || 0,
+          cardsReviewed: merged.cards_reviewed,
+          cardsCorrect: merged.cards_correct,
+          vocabularyWordsFound: merged.vocabulary_words_found || [],
+          pairsMatched: merged.words_correct,
+          totalPairs: merged.words_attempted,
+          wordsSpelled: merged.words_correct,
+          spellingStreak: merged.max_combo || 0,
+          blitzWordsFound: merged.words_correct || (merged.words_found?.length ?? 0),
+          blitzMaxCombo: merged.max_combo || 0,
         },
       };
 
@@ -388,58 +396,89 @@ export async function PATCH(request: NextRequest) {
       const { data: progressData } = await supabase
         .from('student_lesson_progress')
         .select('current_streak')
-        .eq('student_id', session.student_id)
-        .eq('lesson_id', session.lesson_id)
+        .eq('student_id', existing.student_id)
+        .eq('lesson_id', existing.lesson_id)
         .single();
 
-      const streakDays = progressData?.current_streak ?? 0;
-      const { totalXp: serverCalculatedXp } = calculatePracticeXp({
-        ...xpSession,
-        streakDays,
-      });
+      streakDays = progressData?.current_streak ?? 0;
+      serverCalculatedXp = calculatePracticeXp({ ...xpSession, streakDays }).totalXp;
 
       // Always write server-calculated XP (even if 0) to prevent client value sticking (B7 fix)
-      await supabase
-        .from('practice_sessions')
-        .update({ xp_awarded: serverCalculatedXp })
-        .eq('id', sessionId);
-      session.xp_awarded = serverCalculatedXp;
+      updateObj.xp_awarded = serverCalculatedXp;
+    }
 
-      if (serverCalculatedXp > 0) {
-        const { error: xpError } = await supabase.rpc('award_education_xp', {
-          p_student_id: session.student_id,
-          p_xp_amount: serverCalculatedXp,
-          p_lesson_id: session.lesson_id,
-        });
+    // PERF: the session write and the two XP RPCs write to three independent
+    // tables and none of them reads another's result, so they travel as ONE
+    // round trip instead of three.
+    // Trade-off, deliberate: if the session write fails while the RPCs succeed,
+    // a client retry re-awards XP (award_education_xp and increment_player_xp are
+    // blind increments, not idempotent). Previously the write was awaited first so
+    // that could not happen. It needs the write to fail on a row whose ownership
+    // SELECT succeeded milliseconds earlier.
+    const sessionWrite = supabase
+      .from('practice_sessions')
+      .update(updateObj)
+      .eq('id', sessionId)
+      .select('*')
+      .single();
 
-        if (xpError) {
-          logger.error('Failed to award education XP:', xpError);
-        } else {
-          logger.info(
-            'EDUCATION',
-            `Awarded ${serverCalculatedXp} XP (server-calculated, streak=${streakDays}d) to student ${session.student_id} for lesson ${session.lesson_id}`
-          );
-        }
+    const shouldAwardXp = Boolean(completed) && serverCalculatedXp > 0;
 
-        // BUG-02 fix: also bump global profile XP (single server-owned write path).
-        // Previously the client called /api/education/record-xp separately, double-counting profile XP.
-        const { error: profileXpError } = await supabase.rpc('increment_player_xp', {
-          p_player_id: session.student_id,
-          p_xp_amount: serverCalculatedXp,
-        });
+    const awardEducationXp = shouldAwardXp
+      ? Promise.resolve(
+          supabase.rpc('award_education_xp', {
+            p_student_id: existing.student_id,
+            p_xp_amount: serverCalculatedXp,
+            p_lesson_id: existing.lesson_id,
+          })
+        )
+      : Promise.resolve(null);
 
-        if (profileXpError) {
-          logger.error('Failed to increment profile XP:', profileXpError);
-        }
+    // BUG-02 fix: also bump global profile XP (single server-owned write path).
+    // Previously the client called /api/education/record-xp separately, double-counting profile XP.
+    const incrementProfileXp = shouldAwardXp
+      ? Promise.resolve(
+          supabase.rpc('increment_player_xp', {
+            p_player_id: existing.student_id,
+            p_xp_amount: serverCalculatedXp,
+          })
+        )
+      : Promise.resolve(null);
+
+    const [{ data: session, error }, xpResult, profileXpResult] = await Promise.all([
+      sessionWrite,
+      awardEducationXp,
+      incrementProfileXp,
+    ]);
+
+    if (error) {
+      logger.error('Error updating session:', error);
+      return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
+    }
+
+    if (shouldAwardXp) {
+      if (xpResult?.error) {
+        logger.error('Failed to award education XP:', xpResult.error);
+      } else {
+        logger.info(
+          'EDUCATION',
+          `Awarded ${serverCalculatedXp} XP (server-calculated, streak=${streakDays}d) to student ${existing.student_id} for lesson ${existing.lesson_id}`
+        );
       }
 
+      if (profileXpResult?.error) {
+        logger.error('Failed to increment profile XP:', profileXpResult.error);
+      }
+    }
+
+    if (completed) {
       // B12 fix: Update daily challenge progress after practice completion
       // Fire-and-forget — don't block the response
-      updateEducationChallengeProgress(session.student_id, 'practice_session', 1).catch(err =>
+      updateEducationChallengeProgress(existing.student_id, 'practice_session', 1).catch(err =>
         logger.error('Failed to update challenge progress:', err)
       );
       if (serverCalculatedXp > 0) {
-        updateEducationChallengeProgress(session.student_id, 'xp_earned', serverCalculatedXp).catch(err =>
+        updateEducationChallengeProgress(existing.student_id, 'xp_earned', serverCalculatedXp).catch(err =>
           logger.error('Failed to update XP challenge progress:', err)
         );
       }

@@ -60,7 +60,7 @@ function AssignmentCard({
       >
         <div className="flex items-start justify-between gap-4">
           {/* Left: Lesson info */}
-          <div className="flex-1 text-left">
+          <div className="flex-1 text-start">
             <div className="flex items-center gap-2 mb-2">
               <div
                 className={cn(
@@ -100,7 +100,7 @@ function AssignmentCard({
           </div>
 
           {/* Right: Progress */}
-          <div className="text-right shrink-0">
+          <div className="text-end shrink-0">
             <div className="text-sm font-neo-body text-neo-white mb-1">
               {assignment.completion_count}/{assignment.student_count} {t('teacher.tracking.studentsCompleted')}
             </div>

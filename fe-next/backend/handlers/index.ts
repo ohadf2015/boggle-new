@@ -39,6 +39,7 @@ import { registerLobbyAdGateHandlers } from './lobbyAdGateHandler.js';
 import { registerGiftHandlers } from './giftHandler.js';
 import { registerBoostHandlers } from './boostHandler.js';
 import { registerTeacherControlsHandlers } from './teacherControlsHandler.js';
+import { registerVocabQuizHandlers } from './vocabQuizHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -83,6 +84,11 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerGiftHandlers(io, socket);
   registerBoostHandlers(io, socket);
   registerTeacherControlsHandlers(io, socket);
+  // Registered AFTER teacher controls: both listen on pauseGame/resumeGame/
+  // endRoundNow/skipTargetWord and each returns early for the other's rooms —
+  // the quiz one when the room has no quiz session, the board one when the room
+  // has no running board timer.
+  registerVocabQuizHandlers(io, socket);
 }
 
 export {

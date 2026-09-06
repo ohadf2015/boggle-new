@@ -16,6 +16,11 @@ vi.mock('../../modules/supabase/classroomMembership', () => ({
   isClassroomTeacher: vi.fn(),
   isClassroomStudent: vi.fn(),
   getClassroomRole: vi.fn(),
+  // Three-state forms: the handler uses these so a server fault ("unavailable")
+  // is reported as a server error instead of accusing the teacher.
+  resolveClassroomTeacher: vi.fn(),
+  resolveClassroomStudent: vi.fn(),
+  resolveClassroomRole: vi.fn(),
 }));
 // Mock rate limiter - always allow
 vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true), default: {
@@ -67,7 +72,10 @@ describe('ClassroomGameHandler', () => {
     // Individual tests override these for rejection scenarios.
     (classroomMembership.isClassroomTeacher as Mock).mockResolvedValue(true);
     (classroomMembership.isClassroomStudent as Mock).mockResolvedValue(true);
-    (classroomMembership.getClassroomRole as Mock).mockResolvedValue('student');
+    (classroomMembership.resolveClassroomRole as Mock).mockResolvedValue({ status: 'ok', role: 'student' });
+    (classroomMembership.resolveClassroomTeacher as Mock).mockResolvedValue('yes');
+    (classroomMembership.resolveClassroomStudent as Mock).mockResolvedValue('yes');
+    (classroomMembership.resolveClassroomRole as Mock).mockResolvedValue({ status: 'ok', role: 'student' });
   });
 
   describe('registerClassroomGameHandlers', () => {
@@ -306,7 +314,7 @@ describe('ClassroomGameHandler', () => {
 
     it('createClassroomGame rejects when auth user is not the classroom teacher', async () => {
       // GIVEN auth matches teacherId claim, but Supabase says they do NOT own this classroom
-      (classroomMembership.isClassroomTeacher as Mock).mockResolvedValue(false);
+      (classroomMembership.resolveClassroomTeacher as Mock).mockResolvedValue('no');
       (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
 
       registerClassroomGameHandlers(mockIo, mockSocket);
@@ -318,7 +326,7 @@ describe('ClassroomGameHandler', () => {
       await createHandler(validCreatePayload);
 
       // THEN - Supabase-level check fires, Redis write never happens
-      expect(classroomMembership.isClassroomTeacher).toHaveBeenCalledWith(
+      expect(classroomMembership.resolveClassroomTeacher).toHaveBeenCalledWith(
         validCreatePayload.teacherId,
         validCreatePayload.classroomId
       );
@@ -339,7 +347,7 @@ describe('ClassroomGameHandler', () => {
         classroomId: '00000000-0000-4000-8000-000000000002',
         players: [],
       });
-      (classroomMembership.getClassroomRole as Mock).mockResolvedValue(null);
+      (classroomMembership.resolveClassroomRole as Mock).mockResolvedValue({ status: 'ok', role: null });
 
       registerClassroomGameHandlers(mockIo, mockSocket);
       const joinHandler = mockSocket.on.mock.calls.find(
@@ -354,7 +362,7 @@ describe('ClassroomGameHandler', () => {
       });
 
       // THEN - role was checked, addPlayer never called, error emitted
-      expect(classroomMembership.getClassroomRole).toHaveBeenCalledWith(
+      expect(classroomMembership.resolveClassroomRole).toHaveBeenCalledWith(
         studentId,
         '00000000-0000-4000-8000-000000000002'
       );
@@ -374,7 +382,7 @@ describe('ClassroomGameHandler', () => {
         classroomId: '00000000-0000-4000-8000-000000000002',
         players: [{ userId: studentId, username: 'Alice' }],
       });
-      (classroomMembership.getClassroomRole as Mock).mockResolvedValue('student');
+      (classroomMembership.resolveClassroomRole as Mock).mockResolvedValue({ status: 'ok', role: 'student' });
       (classroomGameManager.addPlayerToClassroomGame as Mock).mockResolvedValue(undefined);
 
       registerClassroomGameHandlers(mockIo, mockSocket);
@@ -416,7 +424,7 @@ describe('ClassroomGameHandler', () => {
       });
 
       // THEN - generic error, no membership probe, no player add
-      expect(classroomMembership.getClassroomRole).not.toHaveBeenCalled();
+      expect(classroomMembership.resolveClassroomRole).not.toHaveBeenCalled();
       expect(classroomGameManager.addPlayerToClassroomGame).not.toHaveBeenCalled();
       expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
         error: expect.stringMatching(/not found|invalid/i),
@@ -427,7 +435,7 @@ describe('ClassroomGameHandler', () => {
       // GIVEN: random user tries to subscribe to a classroom they are not in
       const outsiderId = '00000000-0000-4000-8000-000000000077';
       mockSocket.handshake.auth.authUserId = outsiderId;
-      (classroomMembership.getClassroomRole as Mock).mockResolvedValue(null);
+      (classroomMembership.resolveClassroomRole as Mock).mockResolvedValue({ status: 'ok', role: null });
 
       registerClassroomGameHandlers(mockIo, mockSocket);
       const getHandler = mockSocket.on.mock.calls.find(

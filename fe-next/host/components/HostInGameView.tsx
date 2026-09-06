@@ -20,6 +20,10 @@ const WordHuntGame = dynamic(
   () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+const VocabQuizHostView = dynamic(
+  () => import('@/components/education/vocabQuiz/VocabQuizHostView').then(m => ({ default: m.VocabQuizHostView })),
+  { ssr: false },
+);
 const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
@@ -46,6 +50,7 @@ import {
 import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
 import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
+import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
 import { getMpInGameContainerClass } from '@/lib/multiplayer/inGameContainerClass';
 
@@ -165,6 +170,8 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Only gameMode at root — mode-overlay state subscribed by InGameScreen.
   const gameMode = useGameMode();
   const gameModeConfirmed = useGameModeConfirmed();
+  // Live Vocab Quiz rooms replace the board entirely.
+  const isVocabQuizRoom = useIsVocabQuizRoom(socket);
   const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
 
   const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
@@ -300,6 +307,24 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   if (!gameModeConfirmed) return null;
+
+  // Live Vocab Quiz — the teacher's projector. No letter grid: the quiz is not a
+  // `GameMode` (see shared/types/vocabQuiz), so it is detected from the server's
+  // quiz traffic rather than from the placeholder board mode in the start
+  // payload that mounted this view.
+  if (isVocabQuizRoom) {
+    return (
+      <>
+        <VocabQuizHostView
+          socket={socket}
+          joinCode={gameCode}
+          playerCount={leaderboard?.length}
+          t={t}
+        />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
+      </>
+    );
+  }
 
   // Wheel-rush: dedicated view (no TV variant yet, host always renders it)
   if (gameMode === 'wheel-rush') {

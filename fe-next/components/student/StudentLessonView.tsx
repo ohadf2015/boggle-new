@@ -163,7 +163,16 @@ export default function StudentLessonView() {
         const { status, lesson, progress } = studentLesson;
 
         const lessonWords = wordsForLevel(lesson?.words || [], level);
-        const totalWords = lessonWords.length || 1;
+        // Two true numbers that disagreed on screen: the card said "8 Words"
+        // (this student's level) while a sibling pill said "10 words due" (the
+        // lesson). Keep the level-filtered count — a support student must be
+        // able to reach 100% — and name the population when the two differ.
+        const wordsAtLevel = lessonWords.length;
+        const wordsInLesson = (lesson?.words || []).length;
+        // `|| 1` is a divide-by-zero guard for the mastery percentage ONLY. It
+        // was also being rendered, telling a student with nothing at their level
+        // that they had "1 Word" they could never find.
+        const totalWords = wordsAtLevel || 1;
         const masteredWords = (progress?.words_mastered || []).length;
         const masteryPercent = progress ? Math.round((masteredWords / totalWords) * 100) : 0;
 
@@ -253,7 +262,12 @@ export default function StudentLessonView() {
                   <div className="flex items-center gap-4 text-sm flex-wrap">
                     <span className="flex items-center gap-1.5 font-bold text-black/60">
                       <BookOpen className="w-4 h-4" />
-                      {totalWords} {t('student.lessons.words')}
+                      {wordsInLesson > wordsAtLevel
+                        ? t('student.lessons.wordsAtYourLevel', {
+                            mine: wordsAtLevel,
+                            total: wordsInLesson,
+                          })
+                        : `${wordsAtLevel} ${t('student.lessons.words')}`}
                     </span>
 
                     {status !== 'assigned' && progress && (
@@ -305,10 +319,12 @@ export default function StudentLessonView() {
                   )}
                   <QuickPracticeButton
                     lessonId={studentLesson.lessonId}
-                    onPractice={(mode: PracticeType) => {
-                      router.push(
-                        `/${language}/student/lessons/${studentLesson.lessonId}?mode=${mode}`
-                      );
+                    onPractice={(mode?: PracticeType) => {
+                      // No mode means "show me what this lesson can do": the
+                      // lesson page opens on its practice picker instead of
+                      // auto-starting a drill.
+                      const base = `/${language}/student/lessons/${studentLesson.lessonId}`;
+                      router.push(mode ? `${base}?mode=${mode}` : base);
                     }}
                     size="lg"
                     className="w-full sm:w-auto"

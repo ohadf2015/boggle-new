@@ -135,7 +135,7 @@ export function ComparisonStrip() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-neo-cream border-b-neo-thick border-b-neo-navy">
-              <th className="p-3 text-left font-bold text-neo-navy" />
+              <th className="p-3 text-start font-bold text-neo-navy" />
               {COMPETITORS.map((c) => (
                 <th
                   key={c}

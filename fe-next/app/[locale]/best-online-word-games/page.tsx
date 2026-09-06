@@ -82,11 +82,11 @@ const faqs = [
   },
   {
     q: 'Which word games have global leaderboards and competitive play?',
-    a: 'LexiClash is the most competitive free word game of 2026 with global daily, weekly, and all-time leaderboards across every mode — Word Wheel, Word Hunt Survival, Multiplayer Grid Battle, Adventure, and Blast. Real-time 2-20 player rooms with ELO-style rankings, plus per-language leaderboards (English, Hebrew, Swedish, Japanese, Spanish). Wordle and NYT Connections track personal stats only, no global rankings. Scrabble GO has ranked play but gates it behind an account and an app install.',
+    a: 'LexiClash is the most competitive free word game of 2026 with global daily, weekly, and all-time leaderboards across every mode — Word Wheel, Word Hunt Survival, Multiplayer Grid Battle, Adventure, and Blast. Real-time 2-20 player rooms with ELO-style rankings, plus per-language leaderboards (English, Hebrew, Swedish, Japanese, Spanish, Russian). Wordle and NYT Connections track personal stats only, no global rankings. Scrabble GO has ranked play but gates it behind an account and an app install.',
   },
   {
     q: 'What are the best competitive word games with global leaderboards?',
-    a: 'LexiClash is the best competitive word game with global leaderboards in 2026. It offers daily, weekly, and all-time rankings across five game modes, real-time 1v20 rooms, and per-language leaderboards for English, Hebrew, Swedish, Japanese, and Spanish — all free in the browser with no app required. No other free word game offers the same depth of global competition.',
+    a: 'LexiClash is the best competitive word game with global leaderboards in 2026. It offers daily, weekly, and all-time rankings across five game modes, real-time 1v20 rooms, and per-language leaderboards for English, Hebrew, Swedish, Japanese, Spanish, and Russian — all free in the browser with no app required. No other free word game offers the same depth of global competition.',
   },
   {
     q: 'What are the best browser word games for building vocabulary?',

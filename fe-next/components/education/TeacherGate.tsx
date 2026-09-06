@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -17,6 +17,9 @@ import { useExperiment } from '@/hooks/useExperiment';
  */
 export function TeacherGate({ children }: { children: React.ReactNode }) {
   const { hasAccess, isLoading } = useTeacherAccess();
+  /** Has access ever settled as granted? Once true, a later loading blip is a
+   *  blip, not a reason to tear the teacher's screen down. */
+  const grantedRef = useRef(false);
   const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
@@ -38,12 +41,28 @@ export function TeacherGate({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, hasAccess, redirectVariant, trackRedirectExposure]);
 
-  if (isLoading) {
+  // The loader is right for the FIRST resolve and wrong for every one after it.
+  // `isLoading` is not one-shot — it is `authLoading || reqLoading ||
+  // profileLoading`, and both `reqLoading` (the access-request refetch) and
+  // `profileLoading` (a user with no profile yet, e.g. mid TOKEN_REFRESHED) go
+  // true again long after the teacher is working. Returning the loader then
+  // UNMOUNTS everything below: the dashboard's `activeTab`, any open modal, and
+  // `ClassroomGameLobby`'s lesson selection. Observed live — the dashboard
+  // snapped back to Play and closed the assign-lesson modal with no signal at
+  // all, and it took several retries racing the reset to assign a lesson.
+  //
+  // So the loader is sticky-once. Genuine loss of access is unaffected: that
+  // arrives with `isLoading` false and still falls through to the branch below.
+  if (!isLoading && hasAccess) grantedRef.current = true;
+  if (isLoading && !grantedRef.current) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
+  }
+  if (isLoading && grantedRef.current) {
+    return <>{children}</>;
   }
   if (!hasAccess) {
     if (redirectVariant === 'redirect-status') {

@@ -11,9 +11,11 @@ export async function getClassrooms(teacherId: string): Promise<{ data: Classroo
 
   try {
     // Get classrooms with member count
+    // Exactly the columns the `Classroom` type declares. This is the teacher
+    // dashboard's first paint, so it must not widen with the table.
     const { data: classrooms, error: classroomsError } = await supabase
       .from('classrooms')
-      .select('*')
+      .select('id, teacher_id, name, join_code, language, created_at, updated_at')
       .eq('teacher_id', teacherId)
       .order('created_at', { ascending: false });
 

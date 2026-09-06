@@ -6,7 +6,7 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: stri
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'user1' }, profile: { user_role: 'teacher', is_admin: false }, loading: false }) }));
 vi.mock('@/hooks/useRecentGameSettings', () => ({ useRecentGameSettings: () => ({ getMostRecent: vi.fn(), hasRecentConfig: false }) }));
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: [{ id: 'c1', name: 'Class 1' }], loading: false }) }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/en/teacher' }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/en/teacher', useSearchParams: () => new URLSearchParams() }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => <div /> }));
 vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: () => null }));
 vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));

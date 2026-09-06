@@ -103,7 +103,7 @@ export default function LessonAssignmentDialog({
                       onClick={() => setSelectedClassroomId(classroom.id)}
                       className={cn(
                         'w-full p-3 rounded-neo border-neo transition-all',
-                        'text-left font-neo-body',
+                        'text-start font-neo-body',
                         selectedClassroomId === classroom.id
                           ? 'bg-neo-cyan/20 border-neo-cyan text-neo-white shadow-hard-sm'
                           : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
@@ -151,7 +151,7 @@ export default function LessonAssignmentDialog({
 
           <Dialog.Close asChild>
             <button type="button"
-              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
+              className="absolute top-4 end-4 text-neo-white hover:text-neo-white"
               aria-label="Close"
               disabled={isAssigning}
             >

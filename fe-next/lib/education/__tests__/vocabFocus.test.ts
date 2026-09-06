@@ -56,8 +56,11 @@ describe('vocabFocus', () => {
       expect(availableFocuses(words)).toContain('synonym');
     });
 
-    it('lists all four focuses for a fully-filled lesson, in canonical order', () => {
-      expect(availableFocuses(fullLesson)).toEqual([...VOCAB_FOCUSES]);
+    it('lists the four classic focuses for a fully-filled lesson, in canonical order', () => {
+      // multiple_meaning / roots_affixes need their own per-word data, which
+      // this lesson does not carry — see vocabFocusSkills.test.ts.
+      expect(availableFocuses(fullLesson)).toEqual(['definition', 'synonym', 'antonym', 'context']);
+      expect(VOCAB_FOCUSES.slice(0, 4)).toEqual(['definition', 'synonym', 'antonym', 'context']);
     });
 
     it('ignores empty strings / whitespace-only data', () => {
@@ -208,6 +211,8 @@ describe('vocabFocus', () => {
         withSynonyms: 5,
         withAntonyms: 5,
         withExamples: 5,
+        withMeanings: 0,
+        withMorphology: 0,
       });
       expect(lessonWordStats([w('a', { definition: 'x' }), w('b', { synonyms: ['y'] }), w('c')])).toEqual({
         total: 3,
@@ -215,6 +220,8 @@ describe('vocabFocus', () => {
         withSynonyms: 1,
         withAntonyms: 0,
         withExamples: 0,
+        withMeanings: 0,
+        withMorphology: 0,
       });
     });
   });

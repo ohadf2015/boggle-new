@@ -14,6 +14,9 @@ export type FaqItem = {
   a: string;
 };
 
+import type { DepthSection } from '@/components/education/EducationDepthSections';
+export type { DepthSection };
+
 export type LocaleContent = {
   metaTitle: string;
   metaDescription: string;
@@ -37,6 +40,12 @@ export type LocaleContent = {
   routineItems: RoutineStep[];
   faqHeading: string;
   faqs: FaqItem[];
+  /**
+   * Mechanism blocks. Every figure in these comes from a constant in this repo —
+   * `app/[locale]/education/__tests__/depthSections.test.ts` asserts each one
+   * against its source rather than trusting review.
+   */
+  depth: DepthSection[];
   bottomSectionHeading1: string;
   bottomSectionHeading2: string;
   noAppText: string;
@@ -141,7 +150,7 @@ const content: LocaleContent = {
     },
     {
       q: 'Is LexiClash free for sight-word practice?',
-      a: 'The word games are free to play — open the browser and start, with no per-student cost. Teachers can try the education tools (custom word lists, classroom dashboard, assignments) free for 30 days, and school plans start at $149/year.',
+      a: 'The word games are free to play — open the browser and start, with no per-student cost. The free teacher tier is not a trial: it covers 3 classes of 50 students each, with custom word lists, the classroom dashboard, and assignments. Teacher Pro is $9/month and adds unlimited classes plus progress analytics and printable reports.',
     },
     {
       q: 'What ages and grades is sight-word practice for?',
@@ -153,7 +162,32 @@ const content: LocaleContent = {
     },
     {
       q: 'Does it work for ESL and English-language learners?',
-      a: 'Yes. LexiClash ships with separate dictionaries for English, Hebrew, Swedish, Japanese, and Spanish, and every list word carries audio pronunciation — useful when a student is still mapping English sounds to English spellings. High-frequency-word practice is a standard early-literacy step in ESL programs for the same reason it is in first-language classrooms.',
+      a: 'Yes. LexiClash ships with separate dictionaries for English, Hebrew, Swedish, Japanese, Spanish, and Russian, and every list word carries audio pronunciation — useful when a student is still mapping English sounds to English spellings. High-frequency-word practice is a standard early-literacy step in ESL programs for the same reason it is in first-language classrooms.',
+    },
+  ],
+  depth: [
+    {
+      heading: 'What one sight-word list actually drives',
+      answer:
+        'Paste a Dolch or Fry list once and it drives seven list-driven practice modes: a solo board, warm-up, blitz, word matching, spelling, flashcards, and word-list review. Every mode reads the same list, so a word added on Monday shows up in all of them.',
+      points: [
+        'Word matching needs at least four words on the list before it opens, so even a short Monday list produces a real pairing round.',
+        "Each word carries a pronunciation button driven by the browser's own speech synthesis, so a child hears the word with no adult reading aloud.",
+        "Three difficulty tiers per student — support, core, and challenge — decide which of the list's words that child practises alone.",
+        'An eighth drill targets one vocabulary skill at a time and draws its questions from the same list.',
+      ],
+    },
+    {
+      heading: 'Running sight words with the whole class',
+      answer:
+        "Students join a live round with a six-character code and no account at all. While it runs the teacher can pause, add thirty seconds, skip a word, or end the round. A room holds 50 students, which is also the free tier's per-class cap.",
+      points: [
+        'Four live controls sit on the teacher screen: pause and resume, plus thirty seconds, skip word, and end round.',
+        'The free tier covers 3 classes of 50 students each. Teacher Pro is $9/month and adds unlimited classes and the progress reports.',
+        'Fifty is the engine ceiling for one room, and the free per-class cap was set to match it rather than to bind before a class finishes its first lesson.',
+        "A class can be handed to Google Classroom through Google's own share dialog — no OAuth, and no access to student rosters.",
+        'After a round the results screen shows the words the class missed; the shareable version is class-level and leaves student names out.',
+      ],
     },
   ],
   bottomSectionHeading1: '10 minutes a day.',

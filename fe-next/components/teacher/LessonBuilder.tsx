@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTemplates, type CreateTemplateData, type UpdateTemplateData } from '@/hooks/useLessonTemplate';
@@ -22,14 +23,26 @@ import type { Language, VocabularyWord, VocabularyLesson } from '@/lib/supabase/
 import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 import { StarterPacksSection } from './StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
+import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 
-export default function LessonBuilder() {
+export interface LessonBuilderProps {
+  /**
+   * Words the teacher's class just missed, arriving from `?reviewWords=` via the
+   * "Practice these words" button on the after-game insights card. Non-empty
+   * opens the create dialog pre-filled, so the CTA lands on a half-written
+   * lesson instead of a reloaded page with the words dropped.
+   */
+  initialReviewWords?: string[];
+}
+
+export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps = {}) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { lessons, isLoading, createLesson, updateLesson } = useLessons();
   const { classrooms } = useClassrooms();
+  const { user } = useAuth();
 
-  const { hasDraft, saveDraft, clearDraft, restoreDraft, draftAge } = useLessonDraft();
+  const { hasRestorableDraft, saveDraft, clearDraft, restoreDraft, draftAge } = useLessonDraft();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,9 +71,33 @@ export default function LessonBuilder() {
 
   const { templates, createTemplate, updateTemplate, getDefaultTemplate } = useTemplates(selectedLesson?.id);
 
+  // Offer to resume only work from an EARLIER session. Keying this on
+  // `hasDraft` made the 30-second autosave below flip it true again and
+  // re-open the prompt mid-edit, blocking the form every half minute.
   useEffect(() => {
-    if (isCreateDialogOpen && hasDraft) setShowDraftPrompt(true);
-  }, [isCreateDialogOpen, hasDraft]);
+    if (isCreateDialogOpen && hasRestorableDraft) setShowDraftPrompt(true);
+  }, [isCreateDialogOpen, hasRestorableDraft]);
+
+  // Arrive-with-words: open the creator already holding the class's missed
+  // words. Runs once per set of words — reopening the dialog by hand later must
+  // not re-seed it, and the template picker is skipped because the word list is
+  // already the point.
+  const seededReviewWordsRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!initialReviewWords?.length) return;
+    const signature = initialReviewWords.join('|');
+    if (seededReviewWordsRef.current === signature) return;
+    seededReviewWordsRef.current = signature;
+
+    setFormData((prev) => ({
+      ...prev,
+      name: prev.name || t('teacher.lesson.reviewSetName'),
+      description: prev.description || t('teacher.lesson.reviewSetDescription'),
+    }));
+    setWords(initialReviewWords.map((word) => ({ word, canIntegrate: true })));
+    setShowTemplateSelector(false);
+    setIsCreateDialogOpen(true);
+  }, [initialReviewWords, t]);
 
   useEffect(() => {
     if (!isCreateDialogOpen) return;
@@ -168,21 +205,42 @@ export default function LessonBuilder() {
     if (words.length === 0) { toast.error(t('teacher.lesson.validation.wordsRequired')); return; }
 
     setIsSaving(true);
-    const result = await createLesson({
-      name: formData.name.trim(), description: formData.description.trim() || undefined,
-      language: formData.language, words, classroomId: formData.classroomId || undefined, isPublic: formData.isPublic,
+    // Picking a classroom here must ALSO assign the lesson to it. Setting only
+    // `vocabulary_lessons.classroom_id` left students on "no lessons assigned".
+    const result = await createLessonAndAssign({
+      lesson: {
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+        language: formData.language,
+        words,
+        classroomId: formData.classroomId || undefined,
+        isPublic: formData.isPublic,
+      },
+      teacherId: user?.id ?? '',
+      createLesson,
     });
     setIsSaving(false);
 
-    if (result.success) {
-      toast.success(t('teacher.lesson.saved'));
-      clearDraft();
-      setIsCreateDialogOpen(false);
-      setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
-      setWords([]);
-    } else {
+    if (!result.success) {
       toast.error(result.error || t('teacher.lesson.error.createFailed'));
+      return;
     }
+
+    const classroomName = classrooms.find((c) => c.id === formData.classroomId)?.name;
+    if (result.assigned && classroomName) {
+      // Say where it went, so "did my class get this?" needs no second guess.
+      toast.success(t('teacher.lesson.savedAndAssigned', { classroom: classroomName }));
+    } else if (result.assignmentError) {
+      // The lesson exists but the class cannot see it — never a plain success.
+      toast.error(t('teacher.lesson.savedNotAssigned', { classroom: classroomName ?? '' }));
+    } else {
+      toast.success(t('teacher.lesson.saved'));
+    }
+
+    clearDraft();
+    setIsCreateDialogOpen(false);
+    setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
+    setWords([]);
   };
 
   if (isLoading) {

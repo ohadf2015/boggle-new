@@ -54,8 +54,40 @@ export interface ClassroomSessionResults {
   lessonWordsMissed: string[];
   /** Every validated word the player found, as received (lesson or not). */
   allWordsFound: string[];
+  /**
+   * The lesson words this game actually PUT IN FRONT of the student.
+   *
+   * Absent for board modes, where the whole lesson is on the grid and every
+   * word really was attemptable. Present for a quiz, which asks a fixed number
+   * of questions from a possibly much longer list — without it, every unasked
+   * word lands in the teacher's "reteach these" column.
+   */
+  lessonWordsAsked?: string[];
+  /** Per-question detail, when the mode has it. Quiz only today. */
+  answers?: QuestionAnswer[];
   durationSeconds?: number;
   playerCount: number;
+}
+
+/** One question as this student answered it. */
+export interface QuestionAnswer {
+  /** The LESSON word drilled — not the answer text, which may be a synonym. */
+  word: string;
+  choiceIndex: number;
+  correct: boolean;
+  /** Time to answer, ms. */
+  ms: number;
+}
+
+export interface PersistClassroomOptions {
+  /**
+   * Lesson words this game asked. Game-level: one question list is broadcast
+   * to everyone. Omit (or pass empty, meaning "unknown") to keep the board
+   * behaviour of treating every lesson word as attempted.
+   */
+  askedWords?: string[];
+  /** Per-student per-question answers, keyed by Supabase auth id. */
+  answersByUser?: Record<string, QuestionAnswer[]>;
 }
 
 interface WordAttempt {
@@ -148,6 +180,26 @@ async function loadLessonVocabulary(
     }
   }
   return byLesson;
+}
+
+/**
+ * Narrow a lesson's vocabulary to the words this game actually asked.
+ *
+ * An empty or absent set means "we do not know what was asked" — the board
+ * case — and returns the vocabulary untouched. Recording zero attempts for a
+ * round that really happened would erase it from the teacher's report, which
+ * is worse than the over-reporting this exists to fix.
+ */
+function restrictToAsked(vocab: LessonVocabulary, askedKeys: Set<string> | null): LessonVocabulary {
+  if (!askedKeys || askedKeys.size === 0) return vocab;
+  const words = new Map<string, string>();
+  for (const [key, display] of vocab.words) {
+    if (askedKeys.has(key)) words.set(key, display);
+  }
+  // An asked set that matches nothing in this lesson (a stale or foreign list)
+  // is treated as unknown rather than as "the whole class attempted nothing".
+  if (words.size === 0) return vocab;
+  return { language: vocab.language, words };
 }
 
 /** Split a lesson's words into found / missed (display form) for one player. */
@@ -251,7 +303,8 @@ export function playerScoresFromGameResults(
 
 export async function persistClassroomGameScores(
   game: ClassroomGame | null | undefined,
-  playerScores?: PlayerScore[]
+  playerScores?: PlayerScore[],
+  options: PersistClassroomOptions = {}
 ): Promise<ClassroomGameReward[]> {
   if (!game) return [];
 
@@ -305,6 +358,13 @@ export async function persistClassroomGameScores(
   }
   const unionVocab: LessonVocabulary = { language: unionLanguage, words: unionWords };
 
+  // Keys of the words this game actually asked, under the union's
+  // normalization. Null for board modes → every lesson word stays attemptable.
+  const askedKeys = options.askedWords && options.askedWords.length > 0
+    ? new Set(options.askedWords.map((w) => keyOf(w, unionLanguage)))
+    : null;
+  const askedVocab = restrictToAsked(unionVocab, askedKeys);
+
   const durationSeconds = game.startedAt
     ? Math.max(0, Math.round((Date.now() - new Date(game.startedAt).getTime()) / 1000))
     : undefined;
@@ -324,8 +384,8 @@ export async function persistClassroomGameScores(
         for (const vocab of vocabByLesson.values()) foundKeys.add(keyOf(word, vocab.language));
       }
 
-      const { found: lessonWordsFound, missed: lessonWordsMissed } = splitLessonWords(unionVocab, foundKeys);
-      const attempted = unionWords.size;
+      const { found: lessonWordsFound, missed: lessonWordsMissed } = splitLessonWords(askedVocab, foundKeys);
+      const attempted = askedVocab.words.size;
       const correct = lessonWordsFound.length;
 
       const results: ClassroomSessionResults = {
@@ -335,6 +395,12 @@ export async function persistClassroomGameScores(
         lessonWordsFound,
         lessonWordsMissed,
         allWordsFound: wordsFound,
+        // Only when we truly know — an absent field tells the report to keep
+        // its "may include unasked words" caveat for older rows.
+        ...(askedKeys ? { lessonWordsAsked: [...askedVocab.words.values()] } : {}),
+        ...(options.answersByUser?.[player.userId]
+          ? { answers: options.answersByUser[player.userId] }
+          : {}),
         durationSeconds,
         playerCount: game.players.length,
       };
@@ -370,8 +436,12 @@ export async function persistClassroomGameScores(
       // Lesson progress — the rows the teacher analytics read. One failure
       // must not hide the other lessons (or the XP below).
       for (const lessonId of lessonIds) {
-        const vocab = vocabByLesson.get(lessonId);
-        if (!vocab || vocab.words.size === 0) continue;
+        const lessonVocab = vocabByLesson.get(lessonId);
+        if (!lessonVocab || lessonVocab.words.size === 0) continue;
+        // Unasked words get no words_attempted entry at all — "not attempted",
+        // never "missed". That distinction is the whole point of the asked set.
+        const vocab = restrictToAsked(lessonVocab, askedKeys);
+        if (vocab.words.size === 0) continue;
         try {
           await upsertLessonProgress(supabase, player.userId, lessonId, vocab, foundKeys, now);
         } catch (err) {

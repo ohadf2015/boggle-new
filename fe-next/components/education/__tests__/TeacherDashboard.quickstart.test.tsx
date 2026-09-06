@@ -15,6 +15,8 @@ import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  // The dashboard reads `?tab=` / `?reviewWords=` on first render.
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 // ── LanguageContext ──────────────────────────────────────────────────────────

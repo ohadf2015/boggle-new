@@ -100,9 +100,23 @@ async function emitClassroomContext(
     const classroomLevel = authUserId
       ? await getClassroomMembershipLevel(authUserId, classroomGame.classroomId)
       : 'core';
+    // Prefer the words the board ACTUALLY carries. Embedding is best-effort, so
+    // the full lesson list sent a support student hunting for words that are not
+    // there — the opposite of scaffolding. `placedVocabulary` is written at game
+    // start; before that (lobby / waiting room) there is no board yet and the
+    // lesson list is the honest answer. An empty ARRAY is meaningful and must
+    // not fall back — it means the board carries none of them.
+    const wordBank = Array.isArray(classroomGame.placedVocabulary)
+      ? classroomGame.placedVocabulary
+      : (Array.isArray(classroomGame.vocabularyWords) ? classroomGame.vocabularyWords : []);
+    // Cache the resolved level on the socket. Game start re-sends this context
+    // once the board exists (the word bank is only knowable then), and it must
+    // not have to re-query Supabase per student — nor guess, which would quietly
+    // demote a support student to core mid-round.
+    (socket.data as Record<string, unknown>).classroomLevel = classroomLevel;
     safeEmit(socket, 'classroomContext', {
       classroomLevel,
-      classroomWordBank: Array.isArray(classroomGame.vocabularyWords) ? classroomGame.vocabularyWords : [],
+      classroomWordBank: wordBank,
     });
   } catch (err) {
     logger.warn('PLAYER_JOIN', `classroomContext lookup failed for ${gameCode}: ${(err as Error)?.message ?? err}`);
@@ -541,3 +555,6 @@ export {
   handleTournamentJoin,
   handleExistingAuthConnectionJoin
 };
+
+/** Test seam for the per-socket classroom context emit (word bank + level). */
+export const emitClassroomContextForTest = emitClassroomContext;

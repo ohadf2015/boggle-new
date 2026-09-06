@@ -72,31 +72,25 @@ vi.mock('@/components/ui/card', () => ({
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const mockWords: VocabularyWord[] = [
-  { word: 'serendipity', definition: 'A happy accident', canIntegrate: true },
-];
-
-const enrichedPayload = [
   {
     word: 'serendipity',
     definition: 'A happy accident',
-    pronunciation: '/ˌsɛr.ənˈdɪp.ɪ.ti/',
-    partOfSpeech: 'noun',
-    examples: [{ text: 'Finding that book was pure serendipity.' }],
-    contextualExamples: [],
+    canIntegrate: true,
+    // The teacher's own example sentence — the only real source of context
+    // this screen has. See the note where triggerEnrichment used to be.
+    example: 'Finding that book was pure serendipity.',
   },
 ];
 
 /**
- * Trigger the vocabularyEnriched socket callback so enrichedWords state is set.
+ * There is no `triggerEnrichment` any more.
+ *
+ * These tests used to drive a `vocabularyEnriched` socket callback to populate
+ * the context row. No server handler for `enrichVocabulary` ever existed, so
+ * that callback fired only here, in this file — the tests were green while
+ * every real student sat on an infinite spinner. The emit, the listener and
+ * the loading gate are gone; the row now renders from the word itself.
  */
-function triggerEnrichment() {
-  const onCall = mockSocket.on.mock.calls.find(([event]: [string]) => event === 'vocabularyEnriched');
-  if (onCall) {
-    act(() => {
-      onCall[1]({ enrichedWords: enrichedPayload });
-    });
-  }
-}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -105,7 +99,7 @@ describe('FlashcardReview — WordContextRow integration', () => {
     vi.clearAllMocks();
   });
 
-  it('shows part-of-speech on the word face when enriched data is available', () => {
+  it('shows no part-of-speech, because nothing in the app produces one', () => {
     render(
       <FlashcardReview
         words={mockWords}
@@ -114,13 +108,12 @@ describe('FlashcardReview — WordContextRow integration', () => {
       />
     );
 
-    triggerEnrichment();
-
-    // The word face is shown by default (not-flipped)
-    expect(screen.getByText('noun')).toBeInTheDocument();
+    // Part of speech had exactly one source: the phantom socket reply. Until
+    // something real produces it, calling a word a "noun" would be invented.
+    expect(screen.queryByText('noun')).not.toBeInTheDocument();
   });
 
-  it('shows usage example on the word face when enriched data is available', () => {
+  it("shows the teacher's own example sentence on the word face", () => {
     render(
       <FlashcardReview
         words={mockWords}
@@ -129,25 +122,24 @@ describe('FlashcardReview — WordContextRow integration', () => {
       />
     );
 
-    triggerEnrichment();
-
+    // No socket round trip, no waiting: the sentence is already on the word.
     expect(
       screen.getByText(/Finding that book was pure serendipity\./)
     ).toBeInTheDocument();
   });
 
-  it('renders nothing for WordContextRow before enrichment callback fires', () => {
-    // The socket mock is set up but triggerEnrichment() is NOT called,
-    // so enrichedWords starts empty and WordContextRow receives undefined props → renders null.
+  it('renders no context row for a word the teacher left bare', () => {
     render(
       <FlashcardReview
-        words={mockWords}
+        words={[{ word: 'serendipity', definition: 'A happy accident', canIntegrate: true }]}
         onComplete={vi.fn()}
         onBack={vi.fn()}
       />
     );
 
-    // part-of-speech 'noun' should not appear (enrichment hasn't happened yet)
     expect(screen.queryByText('noun')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Finding that book was pure serendipity\./)
+    ).not.toBeInTheDocument();
   });
 });

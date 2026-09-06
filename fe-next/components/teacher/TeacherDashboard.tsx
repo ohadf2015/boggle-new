@@ -10,12 +10,19 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
-import { TeacherOnboarding } from '@/components/education/TeacherOnboarding';
+// Measured as the biggest remaining first-load cost on this dashboard, and it
+// renders only for a first-time teacher. `ssr: false` because it is a modal
+// nobody sees on the server render anyway.
+const TeacherOnboarding = dynamic(
+  () => import('@/components/education/TeacherOnboarding').then((m) => m.TeacherOnboarding),
+  { ssr: false }
+);
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
@@ -34,41 +41,23 @@ import { CurriculumWordListBrowser } from './curriculum/CurriculumWordListBrowse
 import { TeacherPlanBadge } from './TeacherPlanBadge';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import {
   Gamepad2, BookOpen, BarChart3, FileText, Users, Swords, HelpCircle, Plus,
 } from 'lucide-react';
 import Link from 'next/link';
 
-type Tab = 'play' | 'prepare' | 'review';
-
-const tabConfig: { id: Tab; icon: typeof Gamepad2; color: string; activeBg: string; activeText: string }[] = [
-  { id: 'play', icon: Gamepad2, color: 'neo-cyan', activeBg: 'bg-neo-cyan', activeText: 'text-black' },
-  { id: 'prepare', icon: BookOpen, color: 'neo-pink', activeBg: 'bg-neo-pink', activeText: 'text-black' },
-  { id: 'review', icon: BarChart3, color: 'neo-lime', activeBg: 'bg-neo-lime', activeText: 'text-black' },
-];
-
-const fadeSlide = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 26 } },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.15 } },
-};
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-};
-
-const slideUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 24 } },
-};
+import { tabConfig, fadeSlide, stagger, slideUp, type Tab } from './teacherDashboardTabs';
 
 export default function TeacherDashboard() {
   const { t, language } = useLanguage();
   const { profile, user } = useAuth();
   const router = useRouter();
   const isRTL = language === 'he';
-  const [activeTab, setActiveTab] = useState<Tab>('play');
+  // `?tab=` and `?reviewWords=` are read here, once, on first render. Both were
+  // written by the "Practice these words" CTA and read by nothing.
+  const deepLink = useTeacherDashboardDeepLink();
+  const [activeTab, setActiveTab] = useState<Tab>(deepLink.tab ?? 'play');
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [openCreateClassroom, setOpenCreateClassroom] = useState(false);
@@ -94,6 +83,17 @@ export default function TeacherDashboard() {
       setSelectedClassroomId(classrooms[0].id);
     }
   }, [classrooms, selectedClassroomId]);
+
+  // Land on Prepare with the missed words in hand. `tab=lessons` was not a tab
+  // id, so the old CTA silently reloaded onto Play and dropped the words.
+  const openReviewLesson = useCallback(
+    (words: string[]) => {
+      const wordsParam = encodeURIComponent(words.join(','));
+      setActiveTab('prepare');
+      router.push(`/${language}/teacher?tab=prepare&reviewWords=${wordsParam}`);
+    },
+    [router, language]
+  );
 
   const handleQuickStart = useCallback(
     (config: GameConfiguration) => {
@@ -287,7 +287,7 @@ export default function TeacherDashboard() {
                   whileTap={{ scale: 0.98, y: 1, boxShadow: '2px 2px 0px black' }}
                   className={cn(
                     'w-full flex items-center gap-5 p-6 rounded-neo border-3 border-black',
-                    'bg-neo-cyan shadow-hard-lg text-left',
+                    'bg-neo-cyan shadow-hard-lg text-start',
                     'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
                   )}
                 >
@@ -362,7 +362,7 @@ export default function TeacherDashboard() {
                     {t('teacher.dashboard.lessons')}
                   </h2>
                 </div>
-                <LessonBuilder />
+                <LessonBuilder initialReviewWords={deepLink.reviewWords} />
               </section>
 
               {/* Curriculum word lists — 138 curated grade-level lists that had no in-app
@@ -420,10 +420,7 @@ export default function TeacherDashboard() {
                       {classroomSelect}
                       <LastGameInsights
                         classroomId={selectedClassroomId}
-                        onCreateReviewLesson={(words) => {
-                          const wordsParam = encodeURIComponent(words.join(','));
-                          router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
-                        }}
+                        onCreateReviewLesson={openReviewLesson}
                       />
                     </section>
                   )}
@@ -440,10 +437,7 @@ export default function TeacherDashboard() {
                       <ProGate feature="analytics">
                         <AnalyticsDashboard
                           classroomId={selectedClassroomId}
-                          onCreateReviewLesson={(words) => {
-                            const wordsParam = encodeURIComponent(words.join(','));
-                            router.push(`/${language}/teacher?tab=lessons&reviewWords=${wordsParam}`);
-                          }}
+                          onCreateReviewLesson={openReviewLesson}
                         />
                       </ProGate>
                     )}

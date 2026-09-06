@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAssignments } from '@/hooks/useAssignments';
@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import {
   VOCAB_FOCUSES,
   MIN_WORDS_PER_FOCUS,
-  availableFocuses,
+  focusQuestionCounts,
   type PracticeFocusSetting,
 } from '@/lib/education/vocabFocus';
 
@@ -46,7 +46,16 @@ export default function AssignmentCreator({
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const selectedLesson = lessons.find(l => l.id === selectedLessonId);
-  const supportedFocuses = selectedLesson ? availableFocuses(selectedLesson.words || []) : [];
+  // How many questions each skill can really build off this lesson. The teacher
+  // sees the number BEFORE assigning, so "context clues" never turns out empty.
+  const focusCounts = useMemo(
+    () =>
+      selectedLesson
+        ? focusQuestionCounts(selectedLesson.words || [], { language: selectedLesson.language })
+        : null,
+    [selectedLesson]
+  );
+  const supportedFocuses = focusCounts ? VOCAB_FOCUSES.filter((f) => focusCounts[f] > 0) : [];
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -230,7 +239,10 @@ export default function AssignmentCreator({
                         </span>
                         <span className="text-xs opacity-80 block">
                           {supported
-                            ? t(`education.vocabFocus.instructions.${option}`)
+                            ? t('teacher.assignment.focus.questionCount', {
+                                count: focusCounts?.[option] ?? 0,
+                                skill: t(`education.vocabFocus.instructions.${option}`),
+                              })
                             : t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}
                         </span>
                       </button>
@@ -341,8 +353,11 @@ export default function AssignmentCreator({
           <Dialog.Close asChild>
             <button
               type="button"
-              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
-              aria-label="Close"
+              // `end-4`, not `right-4`: in Hebrew the X belongs on the same side
+              // the dialog's RTL title starts from. 44px target like the rest of
+              // this codebase — a bare w-5 icon is a ~20px tap area.
+              className="absolute top-4 end-4 flex min-h-[44px] min-w-[44px] items-center justify-center text-neo-white hover:text-neo-white"
+              aria-label={t('common.close')}
               disabled={isSubmitting}
             >
               <X className="w-5 h-5" />

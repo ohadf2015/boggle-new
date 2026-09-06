@@ -1,5 +1,62 @@
 // Ja translations
 const ja = {
+  "vocabQuiz": {
+    "progress": "第{current}問 / 全{total}問",
+    "timeLeft": "残り{seconds}秒",
+    "paused": "先生が一時停止しました",
+    "waiting": "まもなく最初の問題が出ます。",
+    "lockedIn": "回答しました。クラスのみんなを待ちましょう。",
+    "streak": {
+      "label": "{count}問連続正解"
+    },
+    "answers": {
+      "label": "答えを選ぼう",
+      "option": "{option}",
+      "correctOption": "{option}（正解）"
+    },
+    "focus": {
+      "any": "ミックス",
+      "definition": "意味",
+      "synonym": "類義語",
+      "antonym": "対義語",
+      "context": "文脈から推測",
+      "multiple_meaning": "多義語",
+      "roots_affixes": "語根と接辞"
+    },
+    "feedback": {
+      "correct": "正解！ {points}点ゲット",
+      "wrong": "おしい！ 正解は「{answer}」",
+      "noAnswer": "時間切れ。正解は「{answer}」",
+      "breakdown": "基本{base}点 ・ スピード{speed}点 ・ 連続{streak}点"
+    },
+    "standings": {
+      "title": "順位",
+      "empty": "まだ得点がありません。"
+    },
+    "finished": {
+      "title": "おつかれさま！",
+      "yourScore": "あなたの得点は{score}点です。"
+    },
+    "host": {
+      "joinCode": "参加コード",
+      "waiting": "最初の問題を待っています…"
+    },
+    "setup": {
+      "focusTitle": "この小テストで何を練習しますか？",
+      "focusDescription": "選んだ単語から何問つくれるかを、選択肢ごとに表示しています。",
+      "questionsAvailable": "{count}問",
+      "focusLocked": "データが足りません",
+      "noQuestions": "この単語ではまだ小テストをつくれません。単語リスト編集で4語以上に意味を追加してから、もう一度お試しください。",
+      "enrichHint": "グレーの項目には、単語リストにまだ無いデータが必要です。単語リスト編集で類義語・対義語・例文を追加すると使えるようになります。",
+      "questionCount": "問題数",
+      "cappedNotice": "この単語でつくれるのは{count}問なので、ラウンドはその長さになります。",
+      "secondsPerQuestion": "1問あたりの時間",
+      "seconds": "{seconds}秒"
+    },
+    "errors": {
+      "noQuestions": "このレッスンには小テストに使える単語がまだありません。"
+    }
+  },
   "pricing": {
     "title": "プランを選ぶ",
     "subtitle": "先生と学校向けの授業機能",
@@ -938,13 +995,13 @@ const ja = {
     },
     "multiplayer": {
       "title": "マルチプレイヤー単語ゲーム — 2-20人、8モード、登録・DL不要 | LexiClash",
-      "description": "リアルタイム対戦の単語ゲーム：2-20人で同時プレイ、8つのゲームモード、5言語対応、登録・ダウンロード不要。ルーム作成、リンク共有でブラウザから即対戦。無料！",
+      "description": "リアルタイム対戦の単語ゲーム：2-20人で同時プレイ、8つのゲームモード、6言語対応、登録・ダウンロード不要。ルーム作成、リンク共有でブラウザから即対戦。無料！",
       "ogTitle": "2-20人マルチプレイヤー単語ゲーム — 無料",
       "ogDescription": "リアルタイム単語バトル ⚡ 2-20人、8モード、登録不要。ルーム作成、リンク共有。ブラウザで無料プレイ！"
     },
     "about": {
       "title": "LexiClashについて - ミッション、ストーリーとチーム",
-      "description": "LexiClashについて学びましょう。リアルタイムマルチプレイヤーワードゲーム。言語学習を楽しく競争的にするミッション、テクノロジー、教育ツール、5言語にわたる成長するコミュニティをご覧ください。",
+      "description": "LexiClashについて学びましょう。リアルタイムマルチプレイヤーワードゲーム。言語学習を楽しく競争的にするミッション、テクノロジー、教育ツール、6言語にわたる成長するコミュニティをご覧ください。",
       "ogTitle": "LexiClashについて - ワードゲームイノベーション",
       "ogDescription": "LexiClashの物語：リアルタイムワードバトルを通じて言語学習を楽しく競争的に。"
     },
@@ -1052,7 +1109,7 @@ const ja = {
     },
     "education": {
       "title": "LexiClash 教育 - 英語クラスを言葉ゲームで活性化",
-      "description": "教室全体でワードゲーム。語彙レッスン、リアルタイム対戦、進捗分析。先生は無料、生徒は広告なし、5言語対応。",
+      "description": "教室全体でワードゲーム。語彙レッスン、リアルタイム対戦、進捗分析。先生は無料、生徒は広告なし、6言語対応。",
       "ogTitle": "教室向けワードゲーム — 語彙をゲーム化",
       "ogDescription": "英語・多言語教室向け。ライブ対戦ゲーム、カスタムレッスン、進捗追跡。先生完全無料。"
     },
@@ -1222,9 +1279,9 @@ const ja = {
     },
     "educationHub": {
       "title": "教室向け無料語彙ゲーム — 生徒のログイン不要",
-      "description": "教室で使える無料の単語・語彙ゲーム。生徒のアカウント不要、広告なし、ダウンロードなし。自分の単語リストを使い、クラス全体でマルチプレイ、5言語対応。",
+      "description": "教室で使える無料の単語・語彙ゲーム。生徒のアカウント不要、広告なし、ダウンロードなし。自分の単語リストを使い、クラス全体でマルチプレイ、6言語対応。",
       "ogTitle": "教室向け無料語彙ゲーム",
-      "ogDescription": "生徒のログイン不要、広告なし — 自分の単語リストでクラス全体の単語ゲーム、5言語対応。"
+      "ogDescription": "生徒のログイン不要、広告なし — 自分の単語リストでクラス全体の単語ゲーム、6言語対応。"
     },
     "educationDuels": {
       "title": "友達とワードバトル — 1対1デュエル",
@@ -2992,7 +3049,7 @@ const ja = {
       "tagline": "プレイ中",
       "title": "つづれ。",
       "titleAccent": "勝て。",
-      "howTo": "つながった文字をタップして単語を作ろう。長い単語ほど高得点。デイリーパズル＆オンライン対戦、5言語対応。",
+      "howTo": "つながった文字をタップして単語を作ろう。長い単語ほど高得点。デイリーパズル＆オンライン対戦、6言語対応。",
       "autoStart": "{{n}}秒後に開始 — 好きなモードをタップして選んでね",
       "playDaily": "デイリー",
       "playPractice": "練習",
@@ -5720,7 +5777,7 @@ const ja = {
       "story": {
         "title": "私たちのストーリー",
         "content": "LexiClashは2024年にイスラエルで、シンプルだが力強いアイデアから生まれました：ワードゲームがeスポーツのようにスリリングで競争的でありながら、人々の新しい言語学習を助けることができたらどうだろう？創設者のOhad Fisherは、複数の言語で家族や友人とワードゲームを楽しみながら育ちました。多くのワードゲームがある中で、異なる文字体系や書字方向にまたがる意味のある言語学習とリアルタイムの競争的ゲームプレイを真に組み合わせたものはないことに気づきました。",
-        "content2": "小さなプロトタイプから始まり、チームはヘブライ語の完全な右から左（RTL）サポートを含む多言語サポートを核としてLexiClashをゼロから構築しました。最初の1年で、LexiClashは5つの言語（ヘブライ語、英語、スウェーデン語、日本語、スペイン語）をサポートし、複数のオリジナルゲームモードを導入し、30カ国以上から毎日ワードバトルで競い合うプレイヤーの成長するコミュニティを構築しました。"
+        "content2": "小さなプロトタイプから始まり、チームはヘブライ語の完全な右から左（RTL）サポートを含む多言語サポートを核としてLexiClashをゼロから構築しました。最初の1年で、LexiClashは6つの言語（ヘブライ語、英語、スウェーデン語、日本語、スペイン語）をサポートし、複数のオリジナルゲームモードを導入し、30カ国以上から毎日ワードバトルで競い合うプレイヤーの成長するコミュニティを構築しました。"
       },
       "mission": {
         "title": "私たちの使命",
@@ -5736,7 +5793,7 @@ const ja = {
         },
         "multilingual": {
           "title": "真の多言語サポート",
-          "content": "ヘブライ語の完全な右から左レイアウトサポートを含む5言語をサポート。すべてのゲームモード、すべてのUI要素、すべてのフィードバックが、サポートされているすべての言語で完璧に動作します。プレイヤーは即座に言語を切り替え、異なる言語で語彙を練習することもできます。"
+          "content": "ヘブライ語の完全な右から左レイアウトサポートを含む6言語をサポート。すべてのゲームモード、すべてのUI要素、すべてのフィードバックが、サポートされているすべての言語で完璧に動作します。プレイヤーは即座に言語を切り替え、異なる言語で語彙を練習することもできます。"
         },
         "education": {
           "title": "教育統合",
@@ -6269,7 +6326,7 @@ const ja = {
       "feature2Desc": "毎日世界中で同じパズル。ストリークを追跡し、絵文字の結果を共有 — Wordleのように。",
       "feature3Title": "アドベンチャーモード",
       "feature3Desc": "10のテーマワールドに100のレベル。特殊タイル、ボスバトル、パワーアップで毎回新鮮。",
-      "feature4Title": "5言語対応",
+      "feature4Title": "6言語対応",
       "feature4Desc": "英語、ヘブライ語、スウェーデン語、日本語、スペイン語でプレイ。いつでも切り替えて、言語を超えて友達に挑戦。",
       "feature4TitleShort": "ブラストモード",
       "modeTagMultiplayer": "2〜20人対戦",
@@ -6297,7 +6354,7 @@ const ja = {
       "gameModesDaily": "デイリーチャレンジ — 毎日新しいパズル、世界中の全プレイヤーに同じ問題。クリアしてストリークを維持し、グローバルコミュニティとスコアを比較。Wordleのように絵文字グリッドで結果をシェアできます。",
       "gameModesAdventure": "アドベンチャーモード — 10のテーマワールドを100ステージで冒険。氷、炎、爆弾、虹タイルなどの特殊タイルに遭遇。ワードパワーでボスを倒し、進むにつれて新しいワールドを解放しましょう。",
       "educationTitle": "学習のために設計",
-      "educationContent": "ワードゲームは語彙力を高め、スペルを改善する最も効果的な方法の一つです。AIMS Neuroscienceに掲載された研究によると、ワードパズルは言語処理、ワーキングメモリ、実行機能を担う領域を含む複数の脳領域を同時に活性化させます。LexiClashは5言語でのゲームプレイを提供することでさらに一歩進んでおり、語学学習者にとって実用的なツールとなっています。3大陸の教室で教師がLexiClashを使って語彙練習を楽しいものにしています。マルチプレイヤー形式が健全な競争を生み出し、生徒が自然に語彙知識を広げる動機付けとなります。",
+      "educationContent": "ワードゲームは語彙力を高め、スペルを改善する最も効果的な方法の一つです。AIMS Neuroscienceに掲載された研究によると、ワードパズルは言語処理、ワーキングメモリ、実行機能を担う領域を含む複数の脳領域を同時に活性化させます。LexiClashは6言語でのゲームプレイを提供することでさらに一歩進んでおり、語学学習者にとって実用的なツールとなっています。3大陸の教室で教師がLexiClashを使って語彙練習を楽しいものにしています。マルチプレイヤー形式が健全な競争を生み出し、生徒が自然に語彙知識を広げる動機付けとなります。",
       "faqTitle": "よくある質問",
       "faq1Q": "LexiClashは本当に無料ですか？",
       "faq1A": "はい、完全に無料です。隠された課金壁もプレミアムサブスクリプションもありません。プライバシーを尊重した控えめな広告でゲームを運営しています。",
@@ -6312,7 +6369,7 @@ const ja = {
       "faq6Q": "自分のボードを作れますか？",
       "faq6A": "はい！コミュニティボードビルダーを使って、オリジナルの文字グリッドをデザインできます。公開して他のプレイヤーにプレイ、評価、競争してもらいましょう。トップボードはホームページで紹介されます。",
       "communityTitle": "言葉好き、集まってます。",
-      "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。",
+      "communityContent": "LexiClashのプレイヤーは40カ国以上、6言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。",
       "showcase3d": {
         "title": "LexiClash — 単語の世界へ | 無料マルチプレイ単語ゲーム",
         "description": "盤面で単語を引き、コンボを繋いで、1v3のリアルタイム戦で全員を倒す。王座を手にしろ。"
@@ -9464,7 +9521,7 @@ const ja = {
       "churnTotal": "リスク合計",
       "noChurnRisk": "離脱リスクは検出されていません",
       "games": "ゲーム"
-    },
+      },
     "moderation": {
       "title": "モデレーション",
       "queueTitle": "モデレーションキュー",
@@ -12319,6 +12376,7 @@ const ja = {
       "review": "復習",
       "playGame": "ゲームで遊ぶ",
       "playGameHint": "この語彙でマルチプレイヤーゲームを練習",
+      "wordsAtYourLevel": "あなたのレベルは{{mine}}語 · レッスン全体は{{total}}語",
       "empty": {
         "title": "レッスンがありません",
         "subtitle": "クラスに参加して語彙練習を始めよう",
@@ -12376,6 +12434,11 @@ const ja = {
     },
     "joinClassroom": "クラスに参加する",
     "joinClassroomDescription": "先生からもらったクラスコードを入力して参加しよう",
+    "profileStalled": {
+      "title": "プロフィールを読み込めませんでした",
+      "body": "こちらで問題が起きました。もう一度お試しください。クラスと学習の記録は残っています。",
+      "retry": "もう一度試す"
+    },
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
@@ -12397,8 +12460,22 @@ const ja = {
       "aiFilling": "提案を作成中…",
       "aiFilledNote": "ハイライトされた項目はAIの提案です。保存前に確認してください。",
       "aiError": "今は提案を取得できませんでした。1分ほどしてからもう一度お試しください。",
-      "importFormatHelp": "| の後ろに追加情報を書けます：syn: 類義語、ant: 対義語、ex: 例文（単語の位置は ___）、level: support / core / challenge。",
-      "importFormatExample": "うれしい - 喜びを感じている | syn: 楽しい, 幸せ | ant: 悲しい | ex: ___犬がしっぽを振った。 | level: core"
+      "meanings": "ほかの意味",
+      "meaningsPlaceholder": "意味を ; で区切って入力（例：川岸; お金を預ける場所）",
+      "meaningsHelp": "意味が2つ以上あると、多義語の問題として出せます。",
+      "morphology": "語のパーツ",
+      "morphologyHelp": "語根か接辞を入れると、語根と接辞の練習に使えます。",
+      "prefix": "接頭辞",
+      "prefixPlaceholder": "un",
+      "root": "語根",
+      "rootPlaceholder": "aqua",
+      "rootMeaning": "語根の意味",
+      "rootMeaningPlaceholder": "水",
+      "suffix": "接尾辞",
+      "suffixPlaceholder": "ful",
+      "summarySkills": "意味が2つ以上：{{meanings}}語 · 語のパーツあり：{{morphology}}語",
+      "importFormatHelp": "| の後ろに追加情報を書けます：syn: 類義語、ant: 対義語、ex: 例文（単語の位置は ___）、level: support / core / challenge、mean: ほかの意味（; で区切る）、root: / pre: / suf: 語のパーツ（root: aqua = 水 と書くと語根とその意味を同時に指定できます）。",
+      "importFormatExample": "うれしい - 喜びを感じている | syn: 楽しい, 幸せ | ant: 悲しい | ex: ___犬がしっぽを振った。 | level: core\nbank - お金を預ける場所 | mean: 川岸; お金を預ける場所 | root: banc = ベンチ"
     },
     "levels": {
       "label": "レベル",
@@ -12435,7 +12512,59 @@ const ja = {
         "classic": "クラシック",
         "blast": "ブラスト",
         "wordHunt": "ワードハント",
-        "wheelRush": "ホイールラッシュ"
+        "wheelRush": "ホイールラッシュ",
+        "vocabQuiz": "単語クイズ"
+      }
+    },
+    "classReport": {
+      "title": "単語 × 生徒",
+      "hint": "レッスンの全単語と全生徒の対応表です。上にあるほど難しかった単語で、そのまま復習リストになります。",
+      "word": "単語",
+      "classMiss": "クラスの不正解率",
+      "accuracy": "正答率",
+      "didNotPlay": "不参加",
+      "quizCaveat": "クイズはレッスンの一部の単語しか出題しないため、出題されなかった単語もここでは「できなかった」として数えられます。復習の前にリストを確認してください。",
+      "empty": "このゲームには誰も参加していません",
+      "emptyHint": "生徒がクラスゲームに参加すると、単語ごとの結果がここに表示されます。",
+      "copy": "メモ用にコピー",
+      "copied": "コピーしました",
+      "copyFallback": "このテキストをコピーしてください:",
+      "print": "印刷",
+      "trendTitle": "最近のゲームの推移",
+      "trendEmpty": "このレッスンをもう一度プレイすると、クラスの伸びが見えるようになります。",
+      "trendBarsLabel": "{word}: 最初のゲームでは{first}%、最新のゲームでは{last}%が不正解でした。",
+      "state": {
+        "found": "見つけた",
+        "missed": "見つけられなかった",
+        "absent": "不参加",
+        "quizFound": "正解",
+        "quizMissed": "不正解"
+      },
+      "drilldown": {
+        "title": "生徒の詳細",
+        "missedCount": "{count}語ができませんでした",
+        "noneMissed": "レッスンの単語をすべて見つけました。",
+        "absentHint": "この生徒にはこのゲームの記録がありません。次回までにフォローしてください。",
+        "suggested": "次の一手:",
+        "assign": "この単語を練習",
+        "close": "閉じる"
+      },
+      "practice": {
+        "flashcard": "まず意味から — フラッシュカードのあとにクイズ",
+        "spelling": "できなかった単語のスペリング練習",
+        "none": "復習は不要 — 次のリストへ",
+        "absent": "次のゲームまでに個別にフォロー"
+      },
+      "notes": {
+        "title": "クラスゲーム",
+        "playedAt": "参加",
+        "reteach": "最初に復習",
+        "checkIn": "声をかける生徒",
+        "absent": "不参加",
+        "nobodyFound": "誰も見つけられませんでした",
+        "allFound": "クラスはレッスンの単語をすべて見つけました。",
+        "everyoneOk": "半分を下回った生徒はいません。",
+        "missedBy": "できなかった人数"
       }
     },
     "proWelcome": {
@@ -12482,7 +12611,7 @@ const ja = {
       "upgradePricingReassure": "いつでも解約可能 — クラス、レッスン、生徒データは常に安全に保たれます。",
       "pricePerDay": "1日あたり約$0.30",
       "everythingInFree": "無料プランのすべてに加えて：",
-      "freeStartNote": "お試しに最適 — 1クラス10人まで。実際のクラスは初日で上限を超えます。",
+      "freeStartNote": "実際のクラスがそのまま入ります — 最大3クラス、各クラス50人まで。Proはクラス数が増えたときや、レポートが必要なときに。",
       "proCtaSubtext": "30秒で設定 · いつでも解約可能",
       "trustCancel": "いつでも解約、契約の縛りなし",
       "trustDataSafe": "データは安全に保たれます",
@@ -12500,7 +12629,7 @@ const ja = {
       "faqAutoRenew": "自動的に請求されますか？",
       "faqAutoRenewAnswer": "はい、サブスクリプションは毎月更新されます。更新前にリマインダーメールが届きます。いつでも解約して今後の請求を停止できます。",
       "faqDataLoss": "解約するとデータは失われますか？",
-      "faqDataLossAnswer": "いいえ。解約しても、クラス、レッスン、生徒データは安全に保たれます。無料プランの上限（1クラス、1クラス10人）に戻るだけです。",
+      "faqDataLossAnswer": "いいえ。解約しても、クラス、レッスン、生徒データは安全に保たれます。無料プランの上限（3クラス、1クラスあたり50人）に戻るだけです。",
       "legalNote": "アップグレードすると、利用規約に同意し、返金ポリシーを理解したものとみなされます。",
       "refundPolicy": "返金ポリシー",
       "renewsOn": "次回の更新",
@@ -12511,7 +12640,7 @@ const ja = {
       "districtCta": "学校向け料金についてお問い合わせ",
       "checkoutUnavailable": "現在お支払いを受け付けていません。請求は発生していません。しばらくしてからお試しください。",
       "featureOutcome1": "担当するクラスをすべて運営（上限なし）",
-      "featureOutcome2": "最初の10人だけでなく、名簿全員を追加",
+      "featureOutcome2": "最初の3クラスだけでなく、担当するすべてのクラスを追加",
       "featureOutcome3": "誰がどの単語でつまずいているかリアルタイムで把握",
       "featureOutcome4": "すべてのクラスの進捗を比較",
       "priceTaxNote": "お支払い時に税が加算される場合があります。",
@@ -12608,7 +12737,8 @@ const ja = {
         "classic": "クラシック",
         "wordHunt": "ワードハント",
         "blast": "ブラスト",
-        "wheelRush": "ホイールラッシュ"
+        "wheelRush": "ホイールラッシュ",
+        "vocabQuiz": "単語クイズ"
       },
       "huntTarget": {
         "title": "ターゲットの単語",
@@ -12776,6 +12906,10 @@ const ja = {
       "bulkImportLabel": "ここに単語を貼り付け",
       "bulkImportPlaceholder": "単語を貼り付け（1行に1つ）。「単語 - 定義」で定義も追加可能。",
       "bulkImportDetected": "{{count}}個の単語を検出",
+      "bulkImportUnreadable": "{{count}}行（{{rows}}行目）を読み取れませんでした。単語が見つからないため取り込みから除外しました。余分な | や単語の書き忘れがないか確認してください。",
+      "bulkImportOneWordPerLine": "{{rows}}行目に複数の単語が入っているようです。1行に1語ずつ書いて、もう一度取り込んでください。",
+      "savedAndAssigned": "レッスンを保存し、{{classroom}}に割り当てました。生徒はすぐに見られます。",
+      "savedNotAssigned": "レッスンは保存しましたが、{{classroom}}に割り当てられませんでした。レッスンの「クラスに割り当て」ボタンからもう一度お試しください。",
       "bulkImportButton": "インポート",
       "templates": "レッスンテンプレート",
       "category": {
@@ -12787,6 +12921,8 @@ const ja = {
         "everyday": "日常"
       },
       "resumeDraft": "下書きを再開しますか？",
+      "reviewSetName": "見つけられなかった単語",
+      "reviewSetDescription": "前回のゲームでクラスが見つけられなかった単語です。",
       "draftFound": "{{time}}からの未保存のレッスン下書きがあります",
       "resumeDraftButton": "再開",
       "discardDraftButton": "破棄",
@@ -12813,7 +12949,8 @@ const ja = {
         "label": "語彙フォーカス",
         "help": "集中して練習するスキルを1つ選ぶか、生徒に任せます。このレッスンに十分な単語があるスキルだけ選べます。",
         "any": "自由に練習",
-        "anyHint": "生徒が自分でモードを選びます"
+        "anyHint": "生徒が自分でモードを選びます",
+        "questionCount": "{{count}}問 · {{skill}}"
       },
       "createTitle": "課題を作成",
       "create": "課題を作成",
@@ -12952,7 +13089,13 @@ const ja = {
         "pdf": "PDF出力",
         "downloading": "ダウンロード中..."
       },
+      "teacherLabel": "先生",
+      "generatedBy": "LexiClash で作成",
       "columns": {
+        "rank": "順位",
+        "student": "生徒",
+        "score": "スコア",
+        "words": "単語数",
         "word": "単語",
         "status": "ステータス",
         "accuracy": "正確さ",
@@ -13014,6 +13157,49 @@ const ja = {
     }
   },
   "education": {
+    "errors": {
+      "serverUnavailable": "現在、クラス名簿にアクセスできません。こちら側の問題です。少し待ってからもう一度お試しください。"
+    },
+    "classroomModeBlurb": {
+      "classic": "共有の盤で隣り合う文字をつなぐ",
+      "wordHunt": "隠れた単語を10回以内で当てる",
+      "blast": "単語をつないでタイルを消すコンボ",
+      "wheelRush": "1つの文字ホイールから単語を作る",
+      "vocabQuiz": "先生の単語データから作る4択問題"
+    },
+    "practicePicker": {
+      "title": "練習をえらぼう",
+      "readyCount": "{{total}}件中 {{ready}}件がすぐ遊べます",
+      "questions": "{{count}}問",
+      "words": "{{count}}語",
+      "lockedBadge": "ロック中",
+      "played": "{{count}}回プレイ",
+      "nothingReady": "このレッスンにはまだ単語がありません。先生に追加をお願いしてから戻ってきてね。",
+      "skill": {
+        "solo_board": "文字盤からレッスンの単語をさがそう",
+        "warmup": "短いウォームアップの盤面",
+        "blitz": "制限時間内にできるだけ多くの単語を",
+        "matching": "単語と意味をつなげよう",
+        "spelling": "聞いてつづりを書こう",
+        "flashcard": "単語と意味をめくって覚えよう",
+        "word_list": "遊ぶ前にリスト全体を読もう",
+        "definition": "意味を読んで単語を選ぼう",
+        "synonym": "同じ意味の単語",
+        "antonym": "反対の意味の単語",
+        "context": "文から単語を推理しよう",
+        "multiple_meaning": "1つの単語に2つの意味",
+        "roots_affixes": "語のパーツの意味"
+      },
+      "locked": {
+        "solo_board": "このレッスンに単語を追加すると使えます",
+        "warmup": "このレッスンに単語を追加すると使えます",
+        "blitz": "このレッスンに単語を追加すると使えます",
+        "matching": "ペアを作るには4語以上必要です",
+        "spelling": "このレッスンに単語を追加すると使えます",
+        "flashcard": "このレッスンに単語を追加すると使えます",
+        "word_list": "このレッスンに単語を追加すると使えます"
+      }
+    },
     "vocabFocus": {
       "title": "語彙フォーカス",
       "desc": "スキルを1つずつ集中練習",
@@ -13021,31 +13207,41 @@ const ja = {
         "definition": "意味あわせ",
         "synonym": "類義語",
         "antonym": "対義語",
-        "context": "文脈のヒント"
+        "context": "文脈のヒント",
+        "multiple_meaning": "多義語",
+        "roots_affixes": "語根と接辞"
       },
       "instructions": {
         "definition": "意味を読んで単語を選ぼう",
         "synonym": "同じ意味の単語を選ぼう",
         "antonym": "反対の意味の単語を選ぼう",
-        "context": "空欄に合う単語を選ぼう"
+        "context": "空欄に合う単語を選ぼう",
+        "multiple_meaning": "2つの意味の両方に合う単語を選ぼう",
+        "roots_affixes": "その語のパーツの意味を選ぼう"
       },
       "promptLabel": {
         "definition": "この意味の単語は…",
         "synonym": "同じ意味…",
         "antonym": "反対の意味…",
-        "context": "空欄をうめよう"
+        "context": "空欄をうめよう",
+        "multiple_meaning": "どちらの意味にもなる単語は？",
+        "roots_affixes": "語のパーツ"
       },
       "unlock": {
         "definition": "{{min}}語以上に定義を追加すると使えます",
         "synonym": "{{min}}語以上に類義語を追加すると使えます",
         "antonym": "{{min}}語以上に対義語を追加すると使えます",
-        "context": "{{min}}語以上に例文を追加すると使えます"
+        "context": "{{min}}語以上に例文を追加すると使えます",
+        "multiple_meaning": "2語以上に2つ目の意味を追加すると使えます",
+        "roots_affixes": "2語以上に語根か接頭辞を追加すると使えます"
       },
       "notEnough": {
         "definition": "この練習には4語以上の定義が必要です。先生に追加をお願いしよう！",
         "synonym": "この練習には4語以上の類義語が必要です。先生に追加をお願いしよう！",
         "antonym": "この練習には4語以上の対義語が必要です。先生に追加をお願いしよう！",
-        "context": "この練習には4語以上の例文が必要です。先生に追加をお願いしよう！"
+        "context": "この練習には4語以上の例文が必要です。先生に追加をお願いしよう！",
+        "multiple_meaning": "この練習には数語に2つの意味が必要です。先生に追加をお願いしよう！",
+        "roots_affixes": "この練習には数語に語のパーツが必要です。先生に追加をお願いしよう！"
       },
       "progress": "{{total}}問中 {{current}}問目",
       "progressLabel": "問題の進み具合",
@@ -13328,6 +13524,8 @@ const ja = {
       "joinedStudents": "参加した生徒",
       "lessonsSelected": "{{count}}個選択中",
       "missingRequirements": "必要項目が足りません",
+      "startFailed": "ゲームを開始できませんでした。もう一度お試しください。",
+      "tooFast": "少し待ってから、もう一度お試しください。",
       "more": "さらに表示",
       "multiLessonHelp": "レッスンを組み合わせてバリエーションUP",
       "noClassrooms": "まだ教室がありません",
@@ -13553,7 +13751,7 @@ const ja = {
         },
         "q2": {
           "q": "無料プランはありますか？",
-          "a": "はい — 認定教師向けの無料基本プラン：最大1クラス、10人まで、生徒への広告なし。Teacher Pro（月$9）でクラスと生徒数が無制限になります。"
+          "a": "はい — 認定教師向けの無料基本プラン：最大3クラス、各クラス50人まで、生徒への広告なし。Teacher Pro（月$9）でクラスと生徒数が無制限になります。"
         },
         "q3": {
           "q": "本当にヘブライ語・日本語・スウェーデン語・スペイン語に対応していますか？",
@@ -13597,7 +13795,7 @@ const ja = {
       },
       "esl-word-games": {
         "course_name": "ESL 英語クラス用ワードゲーム",
-        "course_desc": "ESL・EFL教室向け。語彙・綴り・リアルタイム対戦。5言語対応で多国籍クラスに最適。"
+        "course_desc": "ESL・EFL教室向け。語彙・綴り・リアルタイム対戦。6言語対応で多国籍クラスに最適。"
       },
       "vocabulary-games-classroom": {
         "course_name": "語彙ゲームで教室を活性化",
@@ -13631,23 +13829,6 @@ const ja = {
       "totalXP": "合計XP",
       "weekly": "週間",
       "xp": "{{xp}} XP"
-    },
-    "lesson": {
-      "autoPronounce": "自動発音",
-      "classicMode": "クラシックモード",
-      "contextualExamples": "使用例",
-      "definition": "定義",
-      "dontKnow": "分からない",
-      "enrichingContent": "準備中...",
-      "examples": "例文",
-      "gotIt": "分かった！",
-      "pronounce": "発音",
-      "pronunciationFallback": "発音は利用不可",
-      "speaking": "再生中...",
-      "swipeMode": "スワイプモード",
-      "tapToReveal": "タップで表示",
-      "word": "単語",
-      "words": "{{count}}語"
     },
     "milestones": {
       "coinBonus": "+{{coins}}コイン",
@@ -13756,6 +13937,7 @@ const ja = {
         "codeLabel": "クラスコード",
         "codeNotRecognised": "そのコードは認識できません",
         "codePasted": "コードを貼り付けました！",
+        "preparing": "準備しています。少しお待ちください。",
         "codePlaceholder": "6文字",
         "emptyClipboard": "クリップボードが空です",
         "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
@@ -13833,9 +14015,22 @@ const ja = {
       "useThisPack": "このパックを使う"
     },
     "lesson": {
-      "creationFailed": "レッスンを作成できませんでした。もう一度お試しください。",
+      "autoPronounce": "自動発音",
+      "classicMode": "クラシックモード",
+      "contextualExamples": "使用例",
       "created": "レッスンが正常に作成されました！",
+      "creationFailed": "レッスンを作成できませんでした。もう一度お試しください。",
+      "definition": "定義",
+      "dontKnow": "分からない",
+      "enrichingContent": "準備中...",
+      "examples": "例文",
+      "gotIt": "分かった！",
       "preferCustom": "または、独自のカスタム語彙リストを作成します：",
+      "pronounce": "発音",
+      "pronunciationFallback": "発音は利用不可",
+      "speaking": "再生中...",
+      "swipeMode": "スワイプモード",
+      "tapToReveal": "タップで表示",
       "word": "語",
       "words": "語"
     },
@@ -16309,7 +16504,7 @@ const ja = {
     "mode2Tag": "最大1v3",
     "mode2": "リアルタイムパーティー戦",
     "mode2Body": "4人、1つのライブボード、容赦なし。最高スコアが勝つ。",
-    "mode3Tag": "5言語",
+    "mode3Tag": "6言語",
     "mode3": "あなたの言語でプレイ",
     "mode3Body": "日本語、英語、スウェーデン語、ヘブライ語、スペイン語 — あなたの言葉、あなたの土俵。",
     "bottomTitle": "あなたのターン。派手にいこう。",
@@ -16323,7 +16518,7 @@ const ja = {
     "faqQ3": "スクラブルのようなものですか?",
     "faqA3": "言葉への同じ愛、でも速い。ターンでタイルを置く代わりに、時計に対してライブボードで言葉をドラッグ — 無料でオンラインでプレイするスクラブル代替品。",
     "faqQ4": "何言語でプレイできますか?",
-    "faqA4": "5言語、それぞれ独自の辞書があります: 英語、日本語、スウェーデン語、ヘブライ語、スペイン語。あなたの言語で単語ゲームをプレイします。",
+    "faqA4": "6言語、それぞれ独自の辞書があります: 英語、日本語、スウェーデン語、ヘブライ語、スペイン語。あなたの言語で単語ゲームをプレイします。",
     "faqQ5": "ダウンロードまたはサインアップは必要ですか?",
     "faqA5": "いいえ。LexiClashはスマートフォン、タブレット、またはテレビの任意の最新ブラウザで実行されます — インストールもアカウントも不要。",
     "faqQ6": "競争的なリーダーボードはありますか?",

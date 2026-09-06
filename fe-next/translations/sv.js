@@ -1,5 +1,62 @@
 // Sv translations
 const sv = {
+  "vocabQuiz": {
+    "progress": "Fråga {current} av {total}",
+    "timeLeft": "{seconds} sekunder kvar",
+    "paused": "Läraren har pausat quizet",
+    "waiting": "Gör dig redo – första frågan kommer strax.",
+    "lockedIn": "Svaret är låst. Vänta in resten av klassen.",
+    "streak": {
+      "label": "{count} i rad"
+    },
+    "answers": {
+      "label": "Välj ett svar",
+      "option": "{option}",
+      "correctOption": "{option} – rätt svar"
+    },
+    "focus": {
+      "any": "Blandat",
+      "definition": "Definitioner",
+      "synonym": "Synonymer",
+      "antonym": "Motsatser",
+      "context": "Ledtrådar i texten",
+      "multiple_meaning": "Flera betydelser",
+      "roots_affixes": "Ordstammar och affix"
+    },
+    "feedback": {
+      "correct": "Snyggt! Du fick {points} poäng",
+      "wrong": "Nästan – rätt svar var {answer}",
+      "noAnswer": "Tiden är ute – rätt svar var {answer}",
+      "breakdown": "{base} i grundpoäng · {speed} för snabbhet · {streak} för sviten"
+    },
+    "standings": {
+      "title": "Ställning",
+      "empty": "Inga poäng än."
+    },
+    "finished": {
+      "title": "Då var det slut!",
+      "yourScore": "Du fick {score} poäng."
+    },
+    "host": {
+      "joinCode": "Kod",
+      "waiting": "Väntar på första frågan …"
+    },
+    "setup": {
+      "focusTitle": "Vad ska quizet träna?",
+      "focusDescription": "Vid varje val står hur många frågor dina valda ord faktiskt räcker till.",
+      "questionsAvailable": "{count} frågor",
+      "focusLocked": "Saknar underlag",
+      "noQuestions": "De här orden räcker inte till ett quiz än. Lägg till en definition på minst fyra av dem i ordlisteredigeraren och kom tillbaka.",
+      "enrichHint": "De gråa alternativen behöver uppgifter som din ordlista saknar. Lägg till synonymer, motsatser eller en exempelmening till orden i ordlisteredigeraren för att låsa upp dem.",
+      "questionCount": "Hur många frågor?",
+      "cappedNotice": "Orden räcker till {count} frågor, så lång blir rundan.",
+      "secondsPerQuestion": "Tid per fråga",
+      "seconds": "{seconds} s"
+    },
+    "errors": {
+      "noQuestions": "Den här lektionen har inga ord redo för ett quiz än."
+    }
+  },
   "pricing": {
     "title": "Välj din plan",
     "subtitle": "Klassrumsfunktioner för lärare och skolor",
@@ -1233,7 +1290,7 @@ const sv = {
     },
     "about": {
       "title": "Om LexiClash - Vårt Uppdrag, Berättelse & Team",
-      "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 5 språk.",
+      "description": "Lär dig om LexiClash, realtids multiplayer ordspel. Upptäck vår mission att göra språkinlärning rolig och tävlingsinriktad, vår teknik, utbildningsverktyg och växande gemenskap på 6 språk.",
       "ogTitle": "Om LexiClash - Innovation inom Ordspel",
       "ogDescription": "Historien bakom LexiClash: att göra språkinlärning rolig och tävlingsinriktad genom ordstrider i realtid."
     },
@@ -1511,9 +1568,9 @@ const sv = {
     },
     "educationHub": {
       "title": "Gratis ordförrådsspel för klassrummet — utan elevkonton",
-      "description": "Gratis ord- och ordförrådsspel för klassen — inga elevkonton, inga annonser, inga nedladdningar. Använd egna ordlistor, kör multiplayer för hela klassen, på 5 språk.",
+      "description": "Gratis ord- och ordförrådsspel för klassen — inga elevkonton, inga annonser, inga nedladdningar. Använd egna ordlistor, kör multiplayer för hela klassen, på 6 språk.",
       "ogTitle": "Gratis ordförrådsspel för klassrummet",
-      "ogDescription": "Inga elevkonton, inga annonser — egna ordlistor och ordspel för hela klassen på 5 språk."
+      "ogDescription": "Inga elevkonton, inga annonser — egna ordlistor och ordspel för hela klassen på 6 språk."
     },
     "educationDuels": {
       "title": "Orddueller — Elev mot elev | LexiClash",
@@ -3282,7 +3339,7 @@ const sv = {
       "tagline": "Spela Nu",
       "title": "Stava.",
       "titleAccent": "Vinn.",
-      "howTo": "Tryck på sammankopplade bokstäver för att bilda ord. Längre ord = mer poäng. Daglig utmaning och live-flerspelarläge på fem språk.",
+      "howTo": "Tryck på sammankopplade bokstäver för att bilda ord. Längre ord = mer poäng. Daglig utmaning och live-flerspelarläge på sex språk.",
       "autoStart": "Startar om {{n}}s – tryck på något läge för att välja",
       "playDaily": "Daglig Utmaning",
       "playPractice": "Träning",
@@ -6010,7 +6067,7 @@ const sv = {
       "story": {
         "title": "Vår historia",
         "content": "LexiClash föddes 2024 i Israel ur en enkel men kraftfull idé: tänk om ordspel kunde vara lika spännande och tävlingsinriktade som e-sport, samtidigt som de hjälper människor att lära sig nya språk? Vår grundare, Ohad Fisher, växte upp med att spela ordspel med familj och vänner på flera språk. Han märkte att även om det fanns många ordspel tillgängliga, kombinerade inget verkligen realtids tävlingsspel med meningsfullt språklärande över olika skriftsystem och skrivriktningar.",
-        "content2": "Med utgångspunkt i en liten prototyp byggde teamet LexiClash från grunden med flerspråkigt stöd i kärnan — inklusive fullt höger-till-vänster (RTL) stöd för hebreiska. Under det första året växte LexiClash till att stödja fem språk (hebreiska, engelska, svenska, japanska och spanska), introducerade flera originella spellägen och byggde en växande gemenskap av spelare från över 30 länder som tävlar dagligen i ordstrider."
+        "content2": "Med utgångspunkt i en liten prototyp byggde teamet LexiClash från grunden med flerspråkigt stöd i kärnan — inklusive fullt höger-till-vänster (RTL) stöd för hebreiska. Under det första året växte LexiClash till att stödja sex språk (hebreiska, engelska, svenska, japanska och spanska), introducerade flera originella spellägen och byggde en växande gemenskap av spelare från över 30 länder som tävlar dagligen i ordstrider."
       },
       "mission": {
         "title": "Vårt uppdrag",
@@ -6026,7 +6083,7 @@ const sv = {
         },
         "multilingual": {
           "title": "Äkta flerspråkigt stöd",
-          "content": "Vi stödjer 5 språk inklusive hebreiska med fullt höger-till-vänster layoutstöd. Varje spelläge, varje UI-element och varje återkoppling fungerar felfritt på alla språk som stöds. Spelare kan byta språk omedelbart och till och med öva ordförråd på olika språk."
+          "content": "Vi stödjer 6 språk inklusive hebreiska med fullt höger-till-vänster layoutstöd. Varje spelläge, varje UI-element och varje återkoppling fungerar felfritt på alla språk som stöds. Spelare kan byta språk omedelbart och till och med öva ordförråd på olika språk."
         },
         "education": {
           "title": "Utbildningsintegration",
@@ -6550,7 +6607,7 @@ const sv = {
     "seo": {
       "showcase3d": {
         "title": "LexiClash — En värld av ord | Gratis flerspelarordspel",
-        "description": "Scrolla in i en ordvärld: dra ord på tavlan, kedja bonusar, slå rummet i realtids 1v3-strider och ta kronan. Gratis, webbläsarbaserad, 5 språk – ingen download."
+        "description": "Scrolla in i en ordvärld: dra ord på tavlan, kedja bonusar, slå rummet i realtids 1v3-strider och ta kronan. Gratis, webbläsarbaserad, 6 språk – ingen download."
       },
       "stepLabel": "Steg",
       "whatIsTitle": "Vad är LexiClash?",
@@ -6563,7 +6620,7 @@ const sv = {
       "feature2Desc": "Samma pussel för alla världen över, varje dag. Följ din svit och dela emoji-resultat — precis som Wordle.",
       "feature3Title": "Äventyrsläge",
       "feature3Desc": "100 nivåer i 10 tematiserade världar. Specialbrickor, bossstrider och power-ups håller varje omgång fräsch.",
-      "feature4Title": "5 språk",
+      "feature4Title": "6 språk",
       "feature4Desc": "Spela på engelska, hebreiska, svenska, japanska eller spanska. Byt när som helst och utmana vänner på olika språk.",
       "feature4TitleShort": "Blast-läge",
       "modeTagMultiplayer": "2-20 spelare",
@@ -6591,7 +6648,7 @@ const sv = {
       "gameModesDaily": "Daglig utmaning — Ett nytt pussel varje dag, identiskt för alla spelare världen över. Slutför det för att hålla din svit igång och jämför ditt resultat med det globala communityt. Dela dina resultat med emoji-rutnät, precis som Wordle.",
       "gameModesAdventure": "Äventyrsläge — Resa genom 10 temavärldar med 100 nivåer av ökande svårighetsgrad. Stöt på speciella bricktyper som is, eld, bomber och regnbågsbrickor. Besegra bossar med ordkraft och lås upp nya världar allt eftersom du avancerar.",
       "educationTitle": "Byggt för lärande",
-      "educationContent": "Ordspel är ett av de mest effektiva sätten att bygga ordförråd och förbättra stavning. Forskning publicerad i AIMS Neuroscience visar att ordpussel aktiverar flera hjärnregioner samtidigt — inklusive områden ansvariga för språkbearbetning, arbetsminne och exekutiva funktioner. LexiClash tar detta vidare genom att erbjuda spel på fem språk, vilket gör det till ett praktiskt verktyg för språkinlärare. Lärare använder LexiClash i klassrum på tre kontinenter för att göra ordförrådsövningar engagerande. Multiplayerformatet skapar hälsosam konkurrens som motiverar elever att naturligt utöka sin ordkunskap.",
+      "educationContent": "Ordspel är ett av de mest effektiva sätten att bygga ordförråd och förbättra stavning. Forskning publicerad i AIMS Neuroscience visar att ordpussel aktiverar flera hjärnregioner samtidigt — inklusive områden ansvariga för språkbearbetning, arbetsminne och exekutiva funktioner. LexiClash tar detta vidare genom att erbjuda spel på sex språk, vilket gör det till ett praktiskt verktyg för språkinlärare. Lärare använder LexiClash i klassrum på tre kontinenter för att göra ordförrådsövningar engagerande. Multiplayerformatet skapar hälsosam konkurrens som motiverar elever att naturligt utöka sin ordkunskap.",
       "faqTitle": "Vanliga frågor",
       "faq1Q": "Är LexiClash verkligen gratis?",
       "faq1A": "Ja, helt gratis. Inga dolda betalväggar, inga premiumabonnemang. Vi finansierar spelet genom diskret reklam som respekterar din integritet.",
@@ -6606,7 +6663,7 @@ const sv = {
       "faq6Q": "Kan jag skapa mitt eget bräde?",
       "faq6A": "Ja! Använd Communitybrädbyggaren för att designa egna bokstavsrutnät. Publicera dem så att andra kan spela, betygsätta och tävla. Topprankade brädor visas på startsidan.",
       "communityTitle": "Här gillar alla ord.",
-      "communityContent": "LexiClash-spelare finns i över 40 länder och fem språk. Gå med i communityt för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäcka nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och community-höjdpunkter."
+      "communityContent": "LexiClash-spelare finns i över 40 länder och sex språk. Gå med i communityt för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäcka nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och community-höjdpunkter."
     },
     "firstTimer": {
       "exploreModes": "Utforska lägen",
@@ -9553,7 +9610,7 @@ const sv = {
       "churnTotal": "Totalt i riskzonen",
       "noChurnRisk": "Ingen churnrisk upptäckt",
       "games": "spel"
-    },
+      },
     "moderation": {
       "title": "Moderering",
       "queueTitle": "Modereringskö",
@@ -12557,6 +12614,7 @@ const sv = {
       "review": "Repetera",
       "playGame": "Spela spel",
       "playGameHint": "Öva med ett multiplayer-spel med dessa ord",
+      "wordsAtYourLevel": "{{mine}} på din nivå · {{total}} i lektionen",
       "empty": {
         "title": "Inga lektioner än",
         "subtitle": "Gå med i ett klassrum för att börja öva",
@@ -12614,6 +12672,11 @@ const sv = {
     },
     "joinClassroom": "Gå med i klassrum",
     "joinClassroomDescription": "Ange koden från din lärare för att komma igång",
+    "profileStalled": {
+      "title": "Vi kunde inte ladda din profil",
+      "body": "Något gick fel hos oss. Försök igen – din klass och dina framsteg finns kvar.",
+      "retry": "Försök igen"
+    },
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
@@ -12635,8 +12698,22 @@ const sv = {
       "aiFilling": "Skriver förslag…",
       "aiFilledNote": "Markerade fält är AI-förslag – kontrollera dem innan du sparar.",
       "aiError": "Kunde inte hämta förslag just nu. Försök igen om en minut.",
-      "importFormatHelp": "Valfria tillägg efter ett |-tecken: syn: för synonymer, ant: för motsatsord, ex: för en exempelmening (skriv ___ i stället för ordet), level: support / core / challenge.",
-      "importFormatExample": "glad - som känner glädje | syn: munter, lycklig | ant: ledsen | ex: Den ___ hunden viftade på svansen. | level: core"
+      "meanings": "Andra betydelser",
+      "meaningsPlaceholder": "Betydelser, åtskilda med ; (t.ex. kanten vid en å; ett ställe för pengar)",
+      "meaningsHelp": "Två betydelser eller fler gör ordet till en fråga om flera betydelser.",
+      "morphology": "Orddelar",
+      "morphologyHelp": "Fyll i en stam eller ett affix så kan ordet användas för stammar och affix.",
+      "prefix": "Prefix",
+      "prefixPlaceholder": "o",
+      "root": "Stam",
+      "rootPlaceholder": "akva",
+      "rootMeaning": "Stammen betyder",
+      "rootMeaningPlaceholder": "vatten",
+      "suffix": "Suffix",
+      "suffixPlaceholder": "lig",
+      "summarySkills": "{{meanings}} med två betydelser · {{morphology}} med orddelar",
+      "importFormatHelp": "Valfria tillägg efter ett |-tecken: syn: för synonymer, ant: för motsatsord, ex: för en exempelmening (skriv ___ i stället för ordet), level: support / core / challenge, mean: för fler betydelser åtskilda med ;, och root: / pre: / suf: för orddelar (root: akva = vatten sätter både stammen och vad den betyder).",
+      "importFormatExample": "glad - som känner glädje | syn: munter, lycklig | ant: ledsen | ex: Den ___ hunden viftade på svansen. | level: core\nvår - årstiden efter vintern | mean: årstiden efter vintern; en källa med vatten | root: vår = källa"
     },
     "levels": {
       "label": "Nivå",
@@ -12673,7 +12750,59 @@ const sv = {
         "classic": "Klassiskt",
         "blast": "Blast",
         "wordHunt": "Ordjakt",
-        "wheelRush": "Hjulrush"
+        "wheelRush": "Hjulrush",
+        "vocabQuiz": "Ordquiz"
+      }
+    },
+    "classReport": {
+      "title": "Ord per elev",
+      "hint": "Varje ord i lektionen mot varje elev. De svåraste överst — det är din repetitionslista.",
+      "word": "Ord",
+      "classMiss": "Klassen missade",
+      "accuracy": "Träffsäkerhet",
+      "didNotPlay": "Spelade inte",
+      "quizCaveat": "Ett quiz frågar bara efter en del av lektionens ord, och de som aldrig frågades räknas här som missade. Kolla listan innan du repeterar.",
+      "empty": "Ingen spelade den här omgången",
+      "emptyHint": "När eleverna går med i ett klassspel dyker deras ord upp här, ord för ord.",
+      "copy": "Kopiera till mina anteckningar",
+      "copied": "Kopierat",
+      "copyFallback": "Kopiera den här texten:",
+      "print": "Skriv ut",
+      "trendTitle": "Över dina senaste omgångar",
+      "trendEmpty": "Spela lektionen igen för att se om klassen förbättras på de här orden.",
+      "trendBarsLabel": "{word}: missat av {first} % i första omgången och {last} % i den sista.",
+      "state": {
+        "found": "Hittade det",
+        "missed": "Missade det",
+        "absent": "Spelade inte",
+        "quizFound": "Svarade rätt",
+        "quizMissed": "Svarade inte rätt"
+      },
+      "drilldown": {
+        "title": "Elevdetaljer",
+        "missedCount": "{count} ord missade",
+        "noneMissed": "Hittade alla ord i lektionen.",
+        "absentHint": "Eleven har inget resultat i den här omgången. Ta igen det före nästa.",
+        "suggested": "Nästa steg:",
+        "assign": "Öva de här orden",
+        "close": "Stäng"
+      },
+      "practice": {
+        "flashcard": "Betydelsen först — flashkort och sedan ett quiz",
+        "spelling": "En kort stavningsövning på orden som missades",
+        "none": "Inget att repetera — ge nästa lista",
+        "absent": "Ta igen det enskilt före nästa omgång"
+      },
+      "notes": {
+        "title": "Klassomgång",
+        "playedAt": "Spelade",
+        "reteach": "Repetera först",
+        "checkIn": "Stäm av med",
+        "absent": "Spelade inte",
+        "nobodyFound": "ingen hittade det",
+        "allFound": "Klassen hittade alla ord i lektionen.",
+        "everyoneOk": "Ingen hamnade under hälften.",
+        "missedBy": "missat av"
       }
     },
     "proWelcome": {
@@ -12720,7 +12849,7 @@ const sv = {
       "upgradePricingReassure": "Avsluta när du vill — dina klassrum, lektioner och elevdata är alltid säkra.",
       "pricePerDay": "Ungefär $0,30 per dag",
       "everythingInFree": "Allt i Free, plus:",
-      "freeStartNote": "Perfekt för att testa — en klass med 10 elever. En riktig klass växer ur det första dagen.",
+      "freeStartNote": "En riktig klass får plats — upp till 3 klasser med 50 elever vardera. Pro är för fler klasser eller för rapporterna.",
       "proCtaSubtext": "Klart på 30 sekunder · Avsluta när du vill",
       "trustCancel": "Avsluta när du vill, ingen bindningstid",
       "trustDataSafe": "Dina data är säkra",
@@ -12738,7 +12867,7 @@ const sv = {
       "faqAutoRenew": "Dras betalningen automatiskt?",
       "faqAutoRenewAnswer": "Ja, din prenumeration förnyas varje månad. Du får ett påminnelsemail före varje förnyelse. Avsluta när du vill för att stoppa framtida betalningar.",
       "faqDataLoss": "Förlorar jag mina data om jag avslutar?",
-      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (1 klass, 10 elever per klass).",
+      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (3 klasser, 50 elever per klass).",
       "legalNote": "Genom att uppgradera godkänner du våra Användarvillkor och förstår vår Återbetalningspolicy.",
       "refundPolicy": "Återbetalningspolicy",
       "renewsOn": "Nästa förnyelse",
@@ -12749,7 +12878,7 @@ const sv = {
       "districtCta": "Kontakta oss för skolpriser",
       "checkoutUnavailable": "Kassan är stängd just nu — inget har debiterats. Försök igen om en stund.",
       "featureOutcome1": "Kör alla klasser du undervisar, utan tak",
-      "featureOutcome2": "Lägg till hela klasslistan, inte bara de tio första",
+      "featureOutcome2": "Lägg till alla klasser du undervisar, inte bara de tre första",
       "featureOutcome3": "Se vem som fastnar, ord för ord, i realtid",
       "featureOutcome4": "Jämför framsteg över alla dina klasser",
       "priceTaxNote": "Moms kan tillkomma i kassan.",
@@ -12846,7 +12975,8 @@ const sv = {
         "classic": "Klassiskt",
         "wordHunt": "Ordjakt",
         "blast": "Blast",
-        "wheelRush": "Hjulrush"
+        "wheelRush": "Hjulrush",
+        "vocabQuiz": "Ordquiz"
       },
       "huntTarget": {
         "title": "Jaktord",
@@ -13014,6 +13144,10 @@ const sv = {
       "bulkImportLabel": "Klistra in ord här",
       "bulkImportPlaceholder": "Klistra in ord, ett per rad. Använd 'ord - definition' för definitioner.",
       "bulkImportDetected": "{{count}} ord upptäckta",
+      "bulkImportUnreadable": "Kunde inte läsa {{count}} rad(er) (rad {{rows}}) — inget ord hittades, så de utelämnades. Kolla om ett | blivit över eller om ordet saknas.",
+      "bulkImportOneWordPerLine": "Rad {{rows}} ser ut att innehålla flera ord på samma rad. Skriv ett ord per rad och importera igen.",
+      "savedAndAssigned": "Lektionen sparades och tilldelades {{classroom}} — dina elever ser den nu.",
+      "savedNotAssigned": "Lektionen sparades, men vi kunde inte tilldela den till {{classroom}}. Försök igen med lektionens knapp Tilldela klass.",
       "bulkImportButton": "Importera",
       "templates": "Lektionsmallar",
       "category": {
@@ -13025,6 +13159,8 @@ const sv = {
         "everyday": "Vardaglig"
       },
       "resumeDraft": "Återuppta utkast?",
+      "reviewSetName": "Ord vi missade",
+      "reviewSetDescription": "Orden som klassen hittade minst ofta i förra spelet.",
       "draftFound": "Du har ett osparat lektionsutkast från {{time}}",
       "resumeDraftButton": "Återuppta",
       "discardDraftButton": "Kasta",
@@ -13051,7 +13187,8 @@ const sv = {
         "label": "Ordförrådsfokus",
         "help": "Välj en färdighet att öva, eller låt eleverna välja själva. Bara färdigheter som lektionen har tillräckligt många ord för går att välja.",
         "any": "Valfri övning",
-        "anyHint": "Eleverna väljer läge själva"
+        "anyHint": "Eleverna väljer läge själva",
+        "questionCount": "{{count}} frågor · {{skill}}"
       },
       "createTitle": "Skapa uppgift",
       "create": "Skapa uppgift",
@@ -13190,7 +13327,13 @@ const sv = {
         "pdf": "Exportera PDF",
         "downloading": "Laddar ner..."
       },
+      "teacherLabel": "Lärare",
+      "generatedBy": "Skapad av LexiClash",
       "columns": {
+        "rank": "Placering",
+        "student": "Elev",
+        "score": "Poäng",
+        "words": "Ord",
         "word": "Ord",
         "status": "Status",
         "accuracy": "Precision",
@@ -13252,6 +13395,49 @@ const sv = {
     }
   },
   "education": {
+    "errors": {
+      "serverUnavailable": "Vi når inte klasslistan just nu. Det är vårt fel, inte ditt – försök igen om en liten stund."
+    },
+    "classroomModeBlurb": {
+      "classic": "Länka intilliggande bokstäver på ett delat bräde",
+      "wordHunt": "Knäck det dolda ordet på tio försök",
+      "blast": "Kedja ord för att rensa brickor i combos",
+      "wheelRush": "Bygg ord från ett enda bokstavshjul",
+      "vocabQuiz": "Frågor med fyra svar från dina egna orddata"
+    },
+    "practicePicker": {
+      "title": "Välj din övning",
+      "readyCount": "{{ready}} av {{total}} klara att spela",
+      "questions": "{{count}} frågor",
+      "words": "{{count}} ord",
+      "lockedBadge": "Låst",
+      "played": "spelad {{count}} ggr",
+      "nothingReady": "Lektionen har inga ord än. Be din lärare lägga till och kom tillbaka.",
+      "skill": {
+        "solo_board": "Hitta lektionens ord i bokstavsrutan",
+        "warmup": "En kort runda för att komma igång",
+        "blitz": "Slå klockan med så många ord du hinner",
+        "matching": "Para ihop varje ord med sin betydelse",
+        "spelling": "Hör ordet och stava det",
+        "flashcard": "Bläddra mellan ordet och dess betydelse",
+        "word_list": "Läs hela listan innan du spelar",
+        "definition": "Läs betydelsen och välj ordet",
+        "synonym": "Ord som betyder samma sak",
+        "antonym": "Ord som betyder motsatsen",
+        "context": "Lista ut ordet med hjälp av meningen",
+        "multiple_meaning": "Ett ord, två betydelser",
+        "roots_affixes": "Vad orddelarna betyder"
+      },
+      "locked": {
+        "solo_board": "Lägg till ord i lektionen för att låsa upp",
+        "warmup": "Lägg till ord i lektionen för att låsa upp",
+        "blitz": "Lägg till ord i lektionen för att låsa upp",
+        "matching": "Behöver minst 4 ord för att kunna paras ihop",
+        "spelling": "Lägg till ord i lektionen för att låsa upp",
+        "flashcard": "Lägg till ord i lektionen för att låsa upp",
+        "word_list": "Lägg till ord i lektionen för att låsa upp"
+      }
+    },
     "vocabFocus": {
       "title": "Ordförrådsfokus",
       "desc": "Öva en färdighet i taget",
@@ -13259,31 +13445,41 @@ const sv = {
         "definition": "Definitioner",
         "synonym": "Synonymer",
         "antonym": "Motsatsord",
-        "context": "Ledtrådar i sammanhanget"
+        "context": "Ledtrådar i sammanhanget",
+        "multiple_meaning": "Ord med flera betydelser",
+        "roots_affixes": "Ordstammar och affix"
       },
       "instructions": {
         "definition": "Läs betydelsen och välj ordet",
         "synonym": "Välj ordet som betyder samma sak",
         "antonym": "Välj ordet som betyder motsatsen",
-        "context": "Välj ordet som passar i luckan"
+        "context": "Välj ordet som passar i luckan",
+        "multiple_meaning": "Välj ordet som passar båda betydelserna",
+        "roots_affixes": "Välj vad orddelen betyder"
       },
       "promptLabel": {
         "definition": "Vilket ord betyder…",
         "synonym": "Betyder samma som…",
         "antonym": "Motsatsen till…",
-        "context": "Fyll i luckan"
+        "context": "Fyll i luckan",
+        "multiple_meaning": "Vilket ord betyder båda?",
+        "roots_affixes": "Orddelar"
       },
       "unlock": {
         "definition": "Lägg till definitioner på minst {{min}} ord för att låsa upp",
         "synonym": "Lägg till synonymer på minst {{min}} ord för att låsa upp",
         "antonym": "Lägg till motsatsord på minst {{min}} ord för att låsa upp",
-        "context": "Lägg till exempelmeningar på minst {{min}} ord för att låsa upp"
+        "context": "Lägg till exempelmeningar på minst {{min}} ord för att låsa upp",
+        "multiple_meaning": "Lägg till en andra betydelse på minst 2 ord för att låsa upp",
+        "roots_affixes": "Lägg till en stam eller ett prefix på minst 2 ord för att låsa upp"
       },
       "notEnough": {
         "definition": "Lektionen behöver definitioner på minst 4 ord för den här övningen. Be din lärare lägga till!",
         "synonym": "Lektionen behöver synonymer på minst 4 ord för den här övningen. Be din lärare lägga till!",
         "antonym": "Lektionen behöver motsatsord på minst 4 ord för den här övningen. Be din lärare lägga till!",
-        "context": "Lektionen behöver exempelmeningar på minst 4 ord för den här övningen. Be din lärare lägga till!"
+        "context": "Lektionen behöver exempelmeningar på minst 4 ord för den här övningen. Be din lärare lägga till!",
+        "multiple_meaning": "Lektionen behöver två betydelser på ett par ord för den här övningen. Be din lärare lägga till!",
+        "roots_affixes": "Lektionen behöver orddelar på ett par ord för den här övningen. Be din lärare lägga till!"
       },
       "progress": "{{current}} av {{total}}",
       "progressLabel": "Frågeförlopp",
@@ -13566,6 +13762,8 @@ const sv = {
       "joinedStudents": "Elever som gick med",
       "lessonsSelected": "{{count}} lektioner valda",
       "missingRequirements": "Det saknas något",
+      "startFailed": "Vi kunde inte starta spelet. Försök igen.",
+      "tooFast": "Ett ögonblick – försök igen om några sekunder.",
       "more": "fler",
       "multiLessonHelp": "Blanda lektioner för mer variation",
       "noClassrooms": "Inga klassrum ännu",
@@ -13791,7 +13989,7 @@ const sv = {
         },
         "q2": {
           "q": "Finns det en gratisplan?",
-          "a": "Ja — en gratis basplan för verifierade lärare: upp till 1 klass med 10 elever, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
+          "a": "Ja — en gratis basplan för verifierade lärare: upp till 3 klasser med 50 elever vardera, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
         },
         "q3": {
           "q": "Stöder LexiClash hebreiska, japanska, svenska och spanska?",
@@ -13835,7 +14033,7 @@ const sv = {
       },
       "esl-word-games": {
         "course_name": "Ordspel för ESL och språkundervisning",
-        "course_desc": "Ordförråd, stavning och live-multiplayer på 5 språk — för ESL-klassrum."
+        "course_desc": "Ordförråd, stavning och live-multiplayer på 6 språk — för ESL-klassrum."
       },
       "vocabulary-games-classroom": {
         "course_name": "Ordförrådsspel för klassrummet",
@@ -13869,23 +14067,6 @@ const sv = {
       "totalXP": "Totalt XP",
       "weekly": "Denna vecka",
       "xp": "{{xp}} XP"
-    },
-    "lesson": {
-      "autoPronounce": "Automatisk uttal",
-      "classicMode": "Klassiskt läge",
-      "contextualExamples": "Exempel",
-      "definition": "Betydelse",
-      "dontKnow": "Vet inte",
-      "enrichingContent": "Laddar...",
-      "examples": "Exempel",
-      "gotIt": "Kan det!",
-      "pronounce": "Uttala",
-      "pronunciationFallback": "Uttal inte tillgängligt",
-      "speaking": "Talar...",
-      "swipeMode": "Svepläge",
-      "tapToReveal": "Tryck för att visa",
-      "word": "Ord",
-      "words": "{{count}} ord"
     },
     "milestones": {
       "coinBonus": "+{{coins}} mynt",
@@ -14000,9 +14181,22 @@ const sv = {
       }
     },
     "lesson": {
-      "creationFailed": "Kunde inte skapa lektionen. Försök igen.",
+      "autoPronounce": "Automatisk uttal",
+      "classicMode": "Klassiskt läge",
+      "contextualExamples": "Exempel",
       "created": "Lektionen skapades framgångsrikt!",
+      "creationFailed": "Kunde inte skapa lektionen. Försök igen.",
+      "definition": "Betydelse",
+      "dontKnow": "Vet inte",
+      "enrichingContent": "Laddar...",
+      "examples": "Exempel",
+      "gotIt": "Kan det!",
       "preferCustom": "Eller skapa din egen anpassade ordlista:",
+      "pronounce": "Uttala",
+      "pronunciationFallback": "Uttal inte tillgängligt",
+      "speaking": "Talar...",
+      "swipeMode": "Svepläge",
+      "tapToReveal": "Tryck för att visa",
       "word": "ord",
       "words": "ord"
     },
@@ -14017,6 +14211,7 @@ const sv = {
         "codeLabel": "Klasskod",
         "codeNotRecognised": "Vi kunde inte känna igen den koden",
         "codePasted": "Klistrad!",
+        "preparing": "Gör i ordning – ett ögonblick.",
         "codePlaceholder": "6 bokstäver",
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
@@ -16392,7 +16587,7 @@ const sv = {
     "mode2Tag": "Upp till 1v3",
     "mode2": "Partykamp i realtid",
     "mode2Body": "Fyra spelare, ett live-bräde, ingen nåd. Den högaste poängen vinner.",
-    "mode3Tag": "5 språk",
+    "mode3Tag": "6 språk",
     "mode3": "Spela på ditt språk",
     "mode3Body": "Svenska, engelska, hebreiska, japanska, spanska — dina ord, din arena.",
     "bottomTitle": "Din tur. Gör bult.",

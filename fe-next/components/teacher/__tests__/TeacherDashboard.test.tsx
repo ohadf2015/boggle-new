@@ -32,6 +32,8 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
   }),
   usePathname: () => '/en/teacher',
+  // TeacherDashboard reads `?tab=` / `?reviewWords=` on first render.
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock('@/components/education/EducationHeader', () => ({

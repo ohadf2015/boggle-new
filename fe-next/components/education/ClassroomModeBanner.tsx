@@ -1,19 +1,26 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Link2, Gavel, Grid2x2 } from 'lucide-react';
+import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Link2, Gavel, Grid2x2, Brain } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { Language, GameMode } from '@/shared/types/game';
+import type { Language } from '@/shared/types/game';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
 interface LessonData {
   lessonId: string;
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
-  gameMode?: GameMode;
+  /**
+   * Widened past `GameMode` on purpose: a classroom room can be a Vocab Quiz,
+   * which is deliberately not a board mode. This value comes out of
+   * sessionStorage, so the narrower type was a lie the compiler believed and
+   * the host crashed on.
+   */
+  gameMode?: ClassroomGameMode;
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;
@@ -28,7 +35,13 @@ interface ClassroomModeBannerProps {
   expanded?: boolean;
 }
 
-const MODE_ICON: Record<GameMode, typeof LayoutGrid> = {
+/**
+ * Exported so `__tests__/classroomModeRegistry` can pin every classroom mode to
+ * an entry here. A missing key used to render `<undefined/>`, which React
+ * throws on — killing the teacher's whole host view and tearing the room down
+ * before any student could join.
+ */
+export const MODE_ICON: Record<string, typeof LayoutGrid> = {
   classic: LayoutGrid,
   'word-hunt': Search,
   blast: Zap,
@@ -38,9 +51,13 @@ const MODE_ICON: Record<GameMode, typeof LayoutGrid> = {
   'sealed-bid': Gavel,
   crossword: Grid3x3,
   wordcraft: Grid2x2,
+  'vocab-quiz': Brain,
 };
 
-const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
+/** Shown when a mode has no icon, so a cosmetic gap can never crash a host. */
+const FALLBACK_MODE_ICON = LayoutGrid;
+
+export const MODE_TRANSLATION_KEY: Record<string, string> = {
   classic: 'classic',
   blast: 'blast',
   'word-hunt': 'wordHunt',
@@ -50,6 +67,7 @@ const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
   'sealed-bid': 'sealedBid',
   crossword: 'crossword',
   wordcraft: 'wordcraft',
+  'vocab-quiz': 'vocabQuiz',
 };
 
 function boardSizeLabel(size?: string): string {
@@ -76,7 +94,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
   const wordCount = lessonData?.vocabularyWords?.length || 0;
   const templateSettings = lessonData?.templateSettings || null;
   const gameMode = lessonData?.gameMode || 'classic';
-  const ModeIcon = MODE_ICON[gameMode];
+  const ModeIcon = MODE_ICON[gameMode] ?? FALLBACK_MODE_ICON;
   const timerMinutes = templateSettings ? Math.round(templateSettings.timerSeconds / 60) : null;
   const allowLateJoin = templateSettings?.allowLateJoin ?? true;
 
@@ -205,7 +223,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                 <SummaryTile
                   icon={<ModeIcon className="w-4 h-4" />}
                   label={t('teacher.classroom.gameModes.title')}
-                  value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}
+                  value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}
                 />
                 {timerMinutes !== null && (
                   <SummaryTile

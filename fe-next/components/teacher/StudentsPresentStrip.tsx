@@ -49,7 +49,7 @@ export default function StudentsPresentStrip({ classrooms }: StudentsPresentStri
       data-testid="students-present-strip"
       className={cn(
         'w-full flex items-center gap-4 p-5 rounded-neo border-3 border-black',
-        'bg-neo-cyan shadow-hard text-left',
+        'bg-neo-cyan shadow-hard text-start',
         'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
         isRTL && 'flex-row-reverse'
       )}

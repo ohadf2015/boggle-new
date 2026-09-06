@@ -8,6 +8,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,7 +17,6 @@ import { usePracticeProgress, usePracticeWords, type PracticeType } from '@/hook
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import {
-  PracticeModeSelector,
   FlashcardReview,
   SoloPracticeBoard,
   WordListPreview,
@@ -27,14 +27,25 @@ import {
   VocabFocusPractice,
 } from '@/components/practice';
 import { availableFocuses, parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
+import PracticePicker from '@/components/education/practicePicker/PracticePicker';
+// PERF: deep imports, not the '@/components/education' barrel. The barrel
+// statically re-exports EducationHeader, ClassroomGameLobby, TeacherOnboarding,
+// ClassroomLeaderboard, EducationBadgeGrid and AchievementProgressCard, all of
+// which a student practising a lesson never renders.
 import {
   PracticeSessionProvider,
   usePracticeSession,
-  XpProgressBar,
-  StreakBonusIndicator,
-  LevelUpCelebration,
-} from '@/components/education';
+} from '@/components/education/PracticeSessionProvider';
+import XpProgressBar from '@/components/education/XpProgressBar';
+import StreakBonusIndicator from '@/components/education/StreakBonusIndicator';
 import { cn } from '@/lib/utils';
+
+// Renders only after a level-up event, so it must not ship in the first load
+// of the practice page. Celebratory UI never needs SSR.
+const LevelUpCelebration = dynamic(
+  () => import('@/components/education/LevelUpCelebration').then(m => m.LevelUpCelebration),
+  { ssr: false }
+);
 
 /**
  * Inner practice content component that uses XP session context
@@ -226,11 +237,15 @@ function PracticeContent({
           />
         );
       case 'vocab_focus': {
-        const focus = selectedFocus ?? availableFocuses(practiceWords)[0] ?? 'definition';
+        const focus =
+          selectedFocus ??
+          availableFocuses(practiceWords, { language: lesson.language })[0] ??
+          'definition';
         return (
           <VocabFocusPractice
             words={practiceWords}
             focus={focus}
+            language={lesson.language}
             onComplete={async (results) => {
               await completePracticeSession({
                 type: 'vocab_focus',
@@ -295,13 +310,19 @@ function PracticeContent({
           )}
         </div>
 
-        <PracticeModeSelector
+        {/*
+          One word list, many games. The picker lists every practice type this
+          lesson can drive, with a readiness badge per tile, so a student never
+          taps into a drill the lesson has no material for.
+        */}
+        <PracticePicker
           lessonName={lesson.name}
-          wordCount={practiceWords.length}
-          progress={{ mastery, progress }}
+          words={practiceWords}
+          language={lesson.language}
+          mastery={mastery}
+          sessions={progress}
           onSelectMode={handleSelectMode}
           onBack={() => router.push(`/${language}/student`)}
-          words={practiceWords}
         />
       </div>
 

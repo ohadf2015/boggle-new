@@ -206,7 +206,7 @@ export function AccessRequestForm({
                 aria-checked={selected}
                 onClick={() => setRole(value)}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-                className={`flex items-center gap-2 rounded-neo border-neo p-3 text-left font-semibold font-neo-display shadow-hard-sm transition-all ${
+                className={`flex items-center gap-2 rounded-neo border-neo p-3 text-start font-semibold font-neo-display shadow-hard-sm transition-all ${
                   selected
                     ? 'bg-neo-lime text-neo-navy -translate-y-0.5 shadow-hard'
                     : 'bg-neo-navy text-neo-white hover:-translate-y-0.5 hover:shadow-hard'

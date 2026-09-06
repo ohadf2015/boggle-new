@@ -18,7 +18,11 @@ import { useState, useCallback } from 'react';
 import { Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import DuelChallengeModal from './DuelChallengeModal';
+import dynamic from 'next/dynamic';
+
+// Opens only on click, so it stays out of the bundle of every roster row that
+// renders a challenge button. No SSR needed for a modal that starts closed.
+const DuelChallengeModal = dynamic(() => import('./DuelChallengeModal'), { ssr: false });
 import type { OpponentInfo } from '@/hooks/useDuelSocket';
 
 // ============================================

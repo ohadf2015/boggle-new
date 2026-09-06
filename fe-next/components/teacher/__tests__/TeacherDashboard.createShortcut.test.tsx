@@ -8,6 +8,8 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   usePathname: () => '/en/teacher',
+  // TeacherDashboard reads `?tab=` / `?reviewWords=` on first render.
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

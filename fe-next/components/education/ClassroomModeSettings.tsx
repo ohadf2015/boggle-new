@@ -11,7 +11,7 @@
  */
 
 import { useEffect, useMemo } from 'react';
-import { LayoutGrid, Search, Zap, RotateCw, Crosshair, Ruler } from 'lucide-react';
+import { LayoutGrid, Search, Zap, RotateCw, Crosshair, Ruler, Brain } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -19,21 +19,27 @@ import {
   HUNT_TARGET_MIN_LENGTH,
   HUNT_TARGET_MAX_LENGTH,
 } from '@/shared/utils/classroomHuntTarget';
-import type { GameMode } from '@/shared/types/game';
+import { VocabQuizFocusPicker } from './vocabQuiz/VocabQuizFocusPicker';
+import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { ClassroomGameMode, PracticeFocusSetting } from '@/shared/types/vocabQuiz';
 
 // Translation keys are camelCase but canonical GameMode wire values are kebab.
-const MODE_KEY_MAP: Partial<Record<GameMode, string>> = {
+const MODE_KEY_MAP: Partial<Record<ClassroomGameMode, string>> = {
   classic: 'classic',
   blast: 'blast',
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
+  'vocab-quiz': 'vocabQuiz',
 };
 
-const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [
+const GAME_MODES: { key: ClassroomGameMode; icon: typeof LayoutGrid; color: string }[] = [
   { key: 'classic', icon: LayoutGrid, color: 'neo-cyan' },
   { key: 'word-hunt', icon: Search, color: 'neo-lime' },
   { key: 'blast', icon: Zap, color: 'neo-pink' },
   { key: 'wheel-rush', icon: RotateCw, color: 'neo-purple' },
+  // The only mode here that is not played on a letter grid: a live 4-choice
+  // question round built from the teacher's own word data.
+  { key: 'vocab-quiz', icon: Brain, color: 'neo-cyan' },
 ];
 
 /**
@@ -44,14 +50,24 @@ const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = 
 const MIN_WORD_LENGTHS = [2, 3, 4, 5] as const;
 
 export interface ClassroomModeSettingsProps {
-  gameMode: GameMode;
+  gameMode: ClassroomGameMode;
   /** The lesson word pinned as the Word Hunt target; '' means let the game pick. */
   targetWord: string;
   minWordLength: number;
   allPlayableWords: string[];
-  onGameModeChange: (mode: GameMode) => void;
+  onGameModeChange: (mode: ClassroomGameMode) => void;
   onTargetWordChange: (word: string) => void;
   onMinWordLengthChange: (length: number) => void;
+  /** Rich per-word lesson data — the Vocab Quiz builds its questions from this. */
+  lessonWords: VocabularyWord[];
+  /** Lesson language, so the picker's counts match what the server will build. */
+  lessonLanguage?: string;
+  vocabQuizFocus: PracticeFocusSetting;
+  vocabQuizQuestionCount: number;
+  vocabQuizSeconds: number;
+  onVocabQuizFocusChange: (focus: PracticeFocusSetting) => void;
+  onVocabQuizQuestionCountChange: (count: number) => void;
+  onVocabQuizSecondsChange: (seconds: number) => void;
 }
 
 export function ClassroomModeSettings({
@@ -62,6 +78,14 @@ export function ClassroomModeSettings({
   onGameModeChange,
   onTargetWordChange,
   onMinWordLengthChange,
+  lessonWords,
+  lessonLanguage,
+  vocabQuizFocus,
+  vocabQuizQuestionCount,
+  vocabQuizSeconds,
+  onVocabQuizFocusChange,
+  onVocabQuizQuestionCountChange,
+  onVocabQuizSecondsChange,
 }: ClassroomModeSettingsProps) {
   const { t } = useLanguage();
 
@@ -88,7 +112,7 @@ export function ClassroomModeSettings({
         <div
           role="radiogroup"
           aria-labelledby="classroom-gamemode-label"
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
         >
           {GAME_MODES.map(({ key, icon: Icon, color }) => {
             const isSelected = gameMode === key;
@@ -116,6 +140,20 @@ export function ClassroomModeSettings({
           })}
         </div>
       </div>
+
+      {gameMode === 'vocab-quiz' && (
+        <VocabQuizFocusPicker
+          words={lessonWords}
+          language={lessonLanguage}
+          focus={vocabQuizFocus}
+          questionCount={vocabQuizQuestionCount}
+          secondsPerQuestion={vocabQuizSeconds}
+          onFocusChange={onVocabQuizFocusChange}
+          onQuestionCountChange={onVocabQuizQuestionCountChange}
+          onSecondsChange={onVocabQuizSecondsChange}
+          t={t}
+        />
+      )}
 
       {gameMode === 'word-hunt' && (
         <div>
@@ -183,6 +221,9 @@ export function ClassroomModeSettings({
         </div>
       )}
 
+      {/* Board-only: a quiz has no letter grid, so a minimum word length is
+          meaningless there and would just be a dead control on the screen. */}
+      {gameMode !== 'vocab-quiz' && (
       <div>
         <div id="classroom-minlen-label" className="block text-neo-white font-bold mb-3">
           <Ruler className="w-5 h-5 inline me-2 text-neo-cyan" />
@@ -218,6 +259,7 @@ export function ClassroomModeSettings({
           })}
         </div>
       </div>
+      )}
     </div>
   );
 }

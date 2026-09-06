@@ -6,7 +6,17 @@ import { EducationHeroBanner } from '@/components/education/EducationHeroBanner'
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { educationCourseJsonLd } from '@/lib/seo/educationStructuredData';
+import { hreflangAlternates } from '@/lib/seo/hreflang';
+import {
+  educationBreadcrumbJsonLd,
+  educationFaqJsonLd,
+  educationLearningResourceJsonLd,
+} from '@/lib/seo/educationLanding';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
+import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { EducationDepthSections } from '@/components/education/EducationDepthSections';
+import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -14,6 +24,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/education/vocabulary-games-classroom';
+const SLUG = 'vocabulary-games-classroom';
 
 const OG_IMAGE: Record<string, string> = {
   en: 'education-hero-en.webp',
@@ -49,17 +60,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: c.twitterDescription,
       images: [ogImage],
     },
+    // hreflangAlternates, not a hand-written seven: `app/sitemap.ts` emits the ~24-entry
+    // map (regional variants included) from the same helper, and Google discards any
+    // annotation the other side does not reciprocate — taking the rest of the cluster with it.
     alternates: {
       canonical: pageUrl,
-      languages: {
-        'x-default': `${BASE_URL}/en${PAGE_PATH}`,
-        en: `${BASE_URL}/en${PAGE_PATH}`,
-        he: `${BASE_URL}/he${PAGE_PATH}`,
-        sv: `${BASE_URL}/sv${PAGE_PATH}`,
-        ja: `${BASE_URL}/ja${PAGE_PATH}`,
-        es: `${BASE_URL}/es${PAGE_PATH}`,
-        ru: `${BASE_URL}/ru${PAGE_PATH}`,
-      },
+      languages: hreflangAlternates(PAGE_PATH),
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -71,39 +77,30 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getVocabClassroomContent(locale);
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
+  const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
-  const learningResourceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#resource`,
+  // This node used to declare English, and name the English organisation, on every
+  // locale — so the Japanese build, correctly titled and indexed in Japanese, told
+  // Google it was an English page published by the English-language publisher.
+  const learningResourceJsonLd = educationLearningResourceJsonLd({
+    locale,
+    path: PAGE_PATH,
     name: c.metaTitle,
-    url: `${BASE_URL}/${locale}${PAGE_PATH}`,
-    inLanguage: 'en',
-    learningResourceType: 'Game',
+    description: c.metaDescription,
     educationalUse: ['Vocabulary Building', 'Classroom Activity', 'Whole-Class Multiplayer', 'Formative Assessment', 'ESL Practice'],
     educationalLevel: ['Primary', 'Secondary', 'Adult Education'],
     typicalAgeRange: '8-99',
-    isAccessibleForFree: true,
     teaches: 'Vocabulary, spelling, word recognition, contextual word usage',
-    audience: { '@type': 'EducationalAudience', educationalRole: 'student' },
-    provider: {
-      '@type': 'EducationalOrganization',
-      '@id': `${BASE_URL}/en/education#org`,
-      name: 'LexiClash Education',
-      url: `${BASE_URL}/en/education`,
-    },
-  };
+  });
 
+  // The HowTo steps below are hardcoded English. Emitting them on the he/es/sv/ja/ru
+  // builds would attach English instructions to a localized page, which is the same
+  // class of defect as the `inLanguage` bug this file just fixed. Gated to EN until
+  // the steps are translated into each content module.
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#howto`,
+    '@id': `${BASE_URL}/${locale}${PAGE_PATH}#howto`,
     name: 'How to Run a Vocabulary Game in Your Classroom',
     description: 'Three steps to a live classroom vocabulary game — under 60 seconds setup once students have their free accounts.',
     totalTime: 'PT1M',
@@ -114,15 +111,11 @@ export default async function Page({ params }: PageProps) {
     ],
   };
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: 'Vocabulary Games for Classroom', item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const breadcrumbJsonLd = educationBreadcrumbJsonLd({
+    locale,
+    path: PAGE_PATH,
+    current: educationPageLabel(SLUG, locale),
+  });
 
   const courseJsonLd = educationCourseJsonLd({
     name: c.metaTitle,
@@ -135,7 +128,7 @@ export default async function Page({ params }: PageProps) {
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       <JsonLd data={faqJsonLd} />
       <JsonLd data={learningResourceJsonLd} />
-      <JsonLd data={howToJsonLd} />
+      {locale === 'en' && <JsonLd data={howToJsonLd} />}
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={courseJsonLd} />
 
@@ -250,6 +243,23 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
+        {/* Named-format table, counted from the registries — see EducationPlayFormats. */}
+        <ScrollRevealSection>
+          <EducationPlayFormats
+            locale={locale}
+            heading={c.playFormats.heading}
+            intro={c.playFormats.intro}
+            liveLabel={c.playFormats.liveLabel}
+            practiceLabel={c.playFormats.practiceLabel}
+          />
+        </ScrollRevealSection>
+
+        {/* Mechanism blocks: the specifics a listicle cannot match, each with a
+            self-contained answer marked `data-answer` for AI answer engines. */}
+        <ScrollRevealSection>
+          <EducationDepthSections sections={c.depth} />
+        </ScrollRevealSection>
+
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
             {c.faqTitle}
@@ -267,11 +277,17 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
-        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={c.related.label}>
-          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.related.esl}</Link>
-          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.related.teachers}</Link>
-          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.related.hub}</Link>
-        </nav>
+        {/* Curated links first, then the shared rotation tops the rail up so this
+            page also points at the teacher-moment pages it used to ignore. */}
+        <EducationRelatedLinks
+          locale={locale}
+          slug={SLUG}
+          extra={[
+            { href: '/education/esl-word-games', label: c.related.esl, accent: 'cyan' },
+            { href: '/education/games-for-teachers', label: c.related.teachers, accent: 'lime' },
+          ]}
+          count={5}
+        />
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
           <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">

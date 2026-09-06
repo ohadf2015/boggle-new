@@ -112,9 +112,17 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
 
   if (!enabled) return null;
 
+  // Google's docs: the GSI button's displayed language comes from the `hl`
+  // query param on the SCRIPT tag URL — the client library itself is fetched
+  // in that language. Without it, GSI falls back to the browser/OS locale, so
+  // a browser set to e.g. Arabic renders an Arabic button even on the English
+  // site. `renderButton`'s own `locale` option only sticks if it matches the
+  // locale the library was loaded with, so both must agree.
+  const gsiSrc = `${GSI_SRC}?hl=${language}`;
+
   return (
     <div ref={wrapperRef} className={cn('flex justify-center', className)}>
-      <Script id="google-gsi-client" src={GSI_SRC} strategy="afterInteractive" onReady={() => void renderButton()} />
+      <Script id="google-gsi-client" src={gsiSrc} strategy="afterInteractive" onReady={() => void renderButton()} />
       {/* Neo-brutalist frame around the (visible, clickable) Google button — hard
           black border + hard shadow, corners clipped to rounded-neo. Full width +
           white bg + centered: GSI renders a snug, content-sized white button, and

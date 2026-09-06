@@ -8,20 +8,40 @@
  * it filled so the UI can highlight those fields for review.
  */
 import { z } from 'zod';
-import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { VocabularyWord, WordMorphology } from '@/lib/supabase/education/types';
 import { withBlank } from './vocabFocus';
+import { stripHyphens } from './vocabFocusSkills';
 
 export const MAX_ENRICH_WORDS = 60;
 export const MAX_LIST_ITEMS = 4;
+/** Senses kept per word. Two is what the multiple-meaning drill needs. */
+export const MAX_MEANINGS = 3;
 
-export type EnrichableField = 'definition' | 'synonyms' | 'antonyms' | 'example';
-export const ENRICHABLE_FIELDS: readonly EnrichableField[] = ['definition', 'synonyms', 'antonyms', 'example'];
+export type EnrichableField =
+  | 'definition'
+  | 'synonyms'
+  | 'antonyms'
+  | 'example'
+  | 'meanings'
+  | 'morphology';
+export const ENRICHABLE_FIELDS: readonly EnrichableField[] = [
+  'definition',
+  'synonyms',
+  'antonyms',
+  'example',
+  'meanings',
+  'morphology',
+];
 
 export interface WordEnrichment {
   definition?: string;
   synonyms?: string[];
   antonyms?: string[];
   example?: string;
+  /** Two or more distinct senses — omitted for a word that only has one. */
+  meanings?: string[];
+  /** Word parts — omitted for a word with no analysable root or affix. */
+  morphology?: WordMorphology;
 }
 
 export type EnrichmentMap = Record<string, WordEnrichment>;
@@ -48,9 +68,11 @@ For every word return:
 - "synonyms": 2 to 4 common single words with the same meaning.
 - "antonyms": 1 to 3 common single words with the opposite meaning (omit the key if the word has no natural opposite).
 - "example": ONE natural sentence that uses the word, with the word itself replaced by ___ (three underscores). The sentence must give enough context clues to guess the word. Never include the word in the sentence.
+- "meanings": ONLY if the word genuinely carries two or more DIFFERENT senses (like "bank" or "trunk"), 2 to 3 short plain-language senses. Omit the key entirely for a single-sense word — do not pad it with rewordings of the same meaning.
+- "morphology": ONLY if the word has a real, teachable word part. An object with any of "prefix", "root", "suffix" (no hyphens, e.g. "un", "aqua", "ful") and "rootMeaning" (what the root means, in one or two words). Omit the key entirely for a word with no analysable parts.
 
 Output ONLY valid JSON, an object keyed by the exact word as given:
-{"word": {"definition": "...", "synonyms": ["..."], "antonyms": ["..."], "example": "The ___ ..."}}`;
+{"word": {"definition": "...", "synonyms": ["..."], "antonyms": ["..."], "example": "The ___ ...", "meanings": ["...", "..."], "morphology": {"prefix": "un", "root": "aqua", "rootMeaning": "water", "suffix": "ful"}}}`;
 }
 
 const listSchema = z.union([z.array(z.unknown()), z.string()]).optional();
@@ -60,6 +82,8 @@ const entrySchema = z
     synonyms: listSchema,
     antonyms: listSchema,
     example: z.unknown().optional(),
+    meanings: listSchema,
+    morphology: z.unknown().optional(),
   })
   .passthrough();
 
@@ -79,6 +103,42 @@ function toList(value: unknown, word: string): string[] {
     if (out.length >= MAX_LIST_ITEMS) break;
   }
   return out;
+}
+
+/**
+ * Senses, not a comma list: a sense is a phrase and routinely contains commas.
+ * Fewer than two distinct senses is not a multiple-meaning word, so drop it.
+ */
+function toSenses(value: unknown): string[] {
+  const raw: unknown[] = Array.isArray(value) ? value : typeof value === 'string' ? value.split(/[;；]/) : [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of raw) {
+    const s = clean(item);
+    if (!s) continue;
+    const key = s.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(s);
+    if (out.length >= MAX_MEANINGS) break;
+  }
+  return out.length >= 2 ? out : [];
+}
+
+const MORPHEME_KEYS: readonly (keyof WordMorphology)[] = ['prefix', 'root', 'suffix', 'rootMeaning'];
+
+/** Normalise a morphology object; returns null when nothing teachable came back. */
+function toMorphology(value: unknown): WordMorphology | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const source = value as Record<string, unknown>;
+  const out: WordMorphology = {};
+  for (const key of MORPHEME_KEYS) {
+    const raw = clean(source[key]);
+    const normalised = key === 'rootMeaning' ? raw : stripHyphens(raw);
+    if (normalised) out[key] = normalised;
+  }
+  if (out.rootMeaning && !out.root) delete out.rootMeaning;
+  return out.prefix || out.root || out.suffix ? out : null;
 }
 
 /** Lenient JSON-object extraction: tolerates code fences and prose around the object. */
@@ -124,6 +184,10 @@ export function parseEnrichResponse(text: string, requestedWords: string[]): Enr
     if (antonyms.length) enrichment.antonyms = antonyms;
     const example = withBlank(clean(entry.data.example), word);
     if (example) enrichment.example = example;
+    const meanings = toSenses(entry.data.meanings);
+    if (meanings.length) enrichment.meanings = meanings;
+    const morphology = toMorphology(entry.data.morphology);
+    if (morphology) enrichment.morphology = morphology;
 
     result[word] = enrichment;
   }
@@ -131,17 +195,35 @@ export function parseEnrichResponse(text: string, requestedWords: string[]): Enr
 }
 
 const isEmptyField = (word: VocabularyWord, field: EnrichableField): boolean => {
-  if (field === 'synonyms' || field === 'antonyms') {
+  if (field === 'synonyms' || field === 'antonyms' || field === 'meanings') {
     const list = word[field];
     return !Array.isArray(list) || list.filter((s) => clean(s)).length === 0;
+  }
+  if (field === 'morphology') {
+    // An object field: empty means "no part the teacher filled in", not "absent".
+    return toMorphology(word.morphology) === null;
   }
   return clean(word[field]).length === 0;
 };
 
-/** Words that have at least one empty enrichable field. */
+/**
+ * Fields every word should end up with. `meanings` and `morphology` are
+ * deliberately NOT here: most words carry one sense and no teachable root, so
+ * counting them would mark every lesson permanently incomplete and keep the
+ * "fill with AI" button nagging forever. They are filled opportunistically
+ * whenever enrichment runs for another reason.
+ */
+export const CORE_ENRICHABLE_FIELDS: readonly EnrichableField[] = [
+  'definition',
+  'synonyms',
+  'antonyms',
+  'example',
+];
+
+/** Words that have at least one empty core field. */
 export function wordsNeedingEnrichment(words: VocabularyWord[]): string[] {
   return words
-    .filter((w) => ENRICHABLE_FIELDS.some((field) => isEmptyField(w, field)))
+    .filter((w) => CORE_ENRICHABLE_FIELDS.some((field) => isEmptyField(w, field)))
     .map((w) => w.word);
 }
 
@@ -165,9 +247,13 @@ export function mergeEnrichment(words: VocabularyWord[], enrichment: EnrichmentM
     for (const field of ENRICHABLE_FIELDS) {
       const value = extra[field];
       if (value === undefined || !isEmptyField(word, field)) continue;
-      if (field === 'synonyms' || field === 'antonyms') {
+      if (field === 'morphology') {
+        const morphology = toMorphology(value);
+        if (!morphology) continue;
+        next.morphology = morphology;
+      } else if (field === 'synonyms' || field === 'antonyms' || field === 'meanings') {
         if (!Array.isArray(value) || value.length === 0) continue;
-        next[field] = [...value];
+        next[field] = [...(value as string[])];
       } else {
         if (typeof value !== 'string' || !value.trim()) continue;
         next[field] = value;

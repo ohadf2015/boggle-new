@@ -1,3 +1,7 @@
+import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
+import type { DepthSection } from '@/components/education/EducationDepthSections';
+export type { DepthSection };
+
 export type LocaleContent = {
   metaTitle: string;
   metaDescription: string;
@@ -18,6 +22,23 @@ export type LocaleContent = {
   related: { label: string; esl: string; teachers: string; hub: string };
   whyTitle: string;
   whyPoints: [string, string, string, string];
+  /**
+   * Mechanism blocks — the thing a 3,000-word teacher-blog listicle cannot write,
+   * because it needs the constants. `__tests__/depthSections.test.ts` pins every
+   * figure to its source module.
+   */
+  depth: DepthSection[];
+  /**
+   * Copy around the derived format table. `{count}`, `{live}` and `{practice}` are
+   * substituted at render time from the registries in lib/education/playFormats.ts —
+   * the number is never written here, because it changes when a mode ships.
+   */
+  playFormats: {
+    heading: string;
+    intro: string;
+    liveLabel: string;
+    practiceLabel: string;
+  };
   faqTitle: string;
   faqs: Array<{ q: string; a: string }>;
   features: Array<{ icon: string; text: string }>;
@@ -78,6 +99,37 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Six languages with full dictionaries. ESL, Hebrew immersion, Spanish bilingual — all native.',
       'Free: 3 classes of up to 50 students. No ads in the classroom.',
     ],
+    depth: [
+      {
+        heading: 'How big the word list behind the games is',
+        answer:
+          `Every language has its own validation dictionary rather than one English list translated. English recognises over ${dictionaryFloor('en', 'en')} words, Spanish over ${dictionaryFloor('es', 'en')}, Swedish over ${dictionaryFloor('sv', 'en')}, Hebrew over ${dictionaryFloor('he', 'en')} and Russian over ${dictionaryFloor('ru', 'en')}. Japanese boards are hiragana, validated against over ${dictionaryFloor('ja', 'en')} hiragana words.`,
+        points: [
+          'The dictionaries are independent word sets per language, not one list translated, so a Hebrew round is judged against Hebrew and laid out right-to-left.',
+          'Japanese boards are kana, so the kanji compound list seeds boards but never judges a submitted word.',
+          "A teacher's own lesson list drives the practice modes directly, so a class drills this week's words without leaving the rest of the language behind.",
+          'Six languages ship with their own dictionary: English, Hebrew, Swedish, Japanese, Spanish, and Russian.',
+        ],
+      },
+      {
+        heading: 'One word list, both halves of the lesson',
+        answer:
+          'One word list drives both halves of the lesson. The class plays a shared live board together, then each student drills the same words alone across seven practice modes. Three tiers — support, core, and challenge — decide which words each child sees in that solo practice.',
+        points: [
+          'The free tier covers 3 classes of 50 students each, and Teacher Pro at $9/month adds unlimited classes and the progress reports.',
+          '50 students is the technical ceiling for one live room, so the free cap and the engine agree rather than the paywall arriving first.',
+          'Live controls during a round: pause and resume, plus thirty seconds, skip a word, and end the round.',
+          'After the round the results screen shows the words the class missed, and the shareable summary stays class-level.',
+        ],
+      },
+    ],
+    playFormats: {
+      heading: 'One word list, {count} ways to play it',
+      intro:
+        'Upload a lesson list once and it drives every format the product has: {live} modes a whole class plays live together, and {practice} drills a student runs alone on the same words. Nothing is re-entered, and a word added on Monday appears in all of them.',
+      liveLabel: '{live} live class modes',
+      practiceLabel: '{practice} solo practice types',
+    },
     faqTitle: 'Frequently Asked Questions',
     faqs: [
       {
@@ -182,6 +234,37 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       '6 שפות עם מילונים מלאים. ESL, הטמעת עברית, ספרדית דו־לשונית — הכל בשפת אם.',
       'כל הכיתה בחינם: 3 כיתות של עד 50 תלמידים. Teacher Pro ($9/חודש) מוסיף כיתות ללא הגבלה ודוחות.',
     ],
+    depth: [
+      {
+        heading: 'כמה גדול מאגר המילים שמאחורי המשחקים',
+        answer:
+          `לכל שפה יש מילון אימות משלה, ולא רשימה אנגלית מתורגמת. אנגלית מזהה מעל ${dictionaryFloor('en', 'he')} מילים, ספרדית מעל ${dictionaryFloor('es', 'he')}, שוודית מעל ${dictionaryFloor('sv', 'he')}, עברית מעל ${dictionaryFloor('he', 'he')} ורוסית מעל ${dictionaryFloor('ru', 'he')}. לוחות יפניים הם הירגאנה, ונבדקים מול מעל ${dictionaryFloor('ja', 'he')} מילים בהירגאנה.`,
+        points: [
+          'המילונים הם אוספי מילים עצמאיים לכל שפה, ולא רשימה אחת מתורגמת — סיבוב בעברית נשפט מול עברית ומוצג מימין לשמאל.',
+          'לוחות יפניים הם קאנה, ולכן רשימת צירופי הקאנג\'י משמשת לבניית הלוח בלבד ולעולם לא לשיפוט מילה שנשלחה.',
+          'רשימת המילים של המורה מזינה ישירות את מצבי התרגול, כך שהכיתה מתרגלת בדיוק את מילות השבוע בלי לוותר על שאר השפה.',
+          'שש שפות עם מילון משלהן: אנגלית, עברית, שוודית, יפנית, ספרדית ורוסית.',
+        ],
+      },
+      {
+        heading: 'רשימת מילים אחת, שני חלקי השיעור',
+        answer:
+          'רשימת מילים אחת מזינה את שני חלקי השיעור. הכיתה משחקת יחד על לוח חי משותף, ואז כל תלמיד מתרגל את אותן מילים לבד בשבעה מצבי תרגול. שלוש רמות — תמיכה, ליבה ואתגר — קובעות אילו מילים כל ילד רואה בתרגול העצמאי.',
+        points: [
+          'המסלול החינמי כולל 3 כיתות עם 50 תלמידים בכל אחת, ו-Teacher Pro ב-$9 לחודש מוסיף כיתות ללא הגבלה ואת דוחות ההתקדמות.',
+          '50 תלמידים הם התקרה הטכנית של חדר חי אחד, כך שהמגבלה החינמית והמנוע מסכימים.',
+          'שליטה חיה במהלך סיבוב: השהיה והמשך, תוספת שלושים שניות, דילוג על מילה וסיום הסיבוב.',
+          'בתום הסיבוב מסך התוצאות מציג את המילים שהכיתה פספסה, והסיכום לשיתוף נשאר ברמת הכיתה.',
+        ],
+      },
+    ],
+    playFormats: {
+      heading: 'רשימת מילים אחת, {count} דרכים לשחק בה',
+      intro:
+        'מעלים רשימת שיעור פעם אחת והיא מזינה כל פורמט במוצר: {live} מצבים שהכיתה כולה משחקת יחד בשידור חי, ו-{practice} תרגילים שתלמיד מריץ לבד על אותן מילים. שום דבר לא מוקלד מחדש, ומילה שנוספה ביום שני מופיעה בכולם.',
+      liveLabel: '{live} מצבי כיתה חיים',
+      practiceLabel: '{practice} סוגי תרגול עצמאי',
+    },
     faqTitle: 'שאלות נפוצות',
     faqs: [
       {
@@ -286,6 +369,37 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       '6 idiomas con diccionarios completos. ESL, inmersión hebraica, bilingüe español — todo nativo.',
       'Toda tu clase gratis: 3 clases de hasta 50. Pro ($9/mes) añade informes.',
     ],
+    depth: [
+      {
+        heading: 'Qué tamaño tiene el diccionario detrás de los juegos',
+        answer:
+          `Cada idioma tiene su propio diccionario de validación, no una lista inglesa traducida. El inglés reconoce más de ${dictionaryFloor('en', 'es')} palabras, el español más de ${dictionaryFloor('es', 'es')}, el sueco más de ${dictionaryFloor('sv', 'es')}, el hebreo más de ${dictionaryFloor('he', 'es')} y el ruso más de ${dictionaryFloor('ru', 'es')}. El japonés valida más de ${dictionaryFloor('ja', 'es')} palabras en hiragana.`,
+        points: [
+          'Los diccionarios son conjuntos de palabras independientes por idioma, así que una ronda en hebreo se juzga contra el hebreo y se muestra de derecha a izquierda.',
+          'Los tableros japoneses son kana, así que la lista de compuestos kanji genera tableros pero nunca juzga una palabra enviada.',
+          'La lista de la docente alimenta directamente los modos de práctica, así que la clase practica justo las palabras de esta semana sin perder el resto del idioma.',
+          'Seis idiomas con diccionario propio: inglés, hebreo, sueco, japonés, español y ruso.',
+        ],
+      },
+      {
+        heading: 'Una lista de palabras, las dos mitades de la clase',
+        answer:
+          'Una sola lista alimenta las dos mitades de la clase. El grupo juega junto en un tablero en vivo y después cada estudiante practica esas mismas palabras a solas en siete modos. Tres niveles — apoyo, base y desafío — deciden qué palabras ve cada niño en esa práctica individual.',
+        points: [
+          'El plan gratuito cubre 3 clases de 50 estudiantes cada una, y Teacher Pro por $9/mes añade clases ilimitadas y los informes de progreso.',
+          '50 estudiantes es el techo técnico de una sala en vivo, así que el límite gratuito y el motor coinciden.',
+          'Controles en vivo durante la ronda: pausar y reanudar, treinta segundos más, saltar una palabra y terminar la ronda.',
+          'Al terminar, la pantalla de resultados muestra las palabras que la clase falló, y el resumen para compartir se queda a nivel de clase.',
+        ],
+      },
+    ],
+    playFormats: {
+      heading: 'Una lista de palabras, {count} formas de jugarla',
+      intro:
+        'Sube una lista de clase una vez y alimenta todos los formatos del producto: {live} modos que la clase entera juega en vivo y {practice} ejercicios que cada estudiante hace a solas con esas mismas palabras. Nada se vuelve a escribir, y una palabra añadida el lunes aparece en todos.',
+      liveLabel: '{live} modos de clase en vivo',
+      practiceLabel: '{practice} tipos de práctica individual',
+    },
     faqTitle: 'Preguntas Frecuentes',
     faqs: [
       {
@@ -363,9 +477,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. 6 språk inkl. hebreiska och ryska. Vilken webbläsare som helst. Gratis att börja.',
     ogTitle: 'Gratis ordförråd spel för klassrummet',
     ogDescription:
-      'Live multiplayer ordförråd spel för lärare. Helklassutmaningar, 1v1 dueller, dina ordlistor, 5 språk. Studentkonton alltid gratis.',
+      'Live multiplayer ordförråd spel för lärare. Helklassutmaningar, 1v1 dueller, dina ordlistor, 6 språk. Studentkonton alltid gratis.',
     twitterDescription:
-      'Ordförråds spelet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, 5 språk — studentkonton alltid gratis.',
+      'Ordförråds spelet som lärare faktiskt använder. Live multiplayer, dueller, dina ordlistor, 6 språk — studentkonton alltid gratis.',
     heroTag: '★ För Lärare ★ Gratis Att Börja ★',
     heroH1: {
       line1: 'Gratis',
@@ -374,7 +488,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       line3: 'Gratis konton.',
     },
     heroSubtitle:
-      'Ordförråds spelet som lärare använder. Live multiplayer, dueller, dina ordlistor, 5 språk — studentkonton gratis alltid.',
+      'Ordförråds spelet som lärare använder. Live multiplayer, dueller, dina ordlistor, 6 språk — studentkonton gratis alltid.',
     ctaSubLabel: 'Gratis · Studentkonton gratis',
     duelCta: { label: '⚔ Kör en 1-mot-1-duell', note: 'Ställ elever mot varandra' },
     related: {
@@ -390,6 +504,37 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       '6 språk med kompletta ordböcker. ESL, hebreisk nedsänkning, spansk tvåspråkig — allt modersmål.',
       'Hela klassen gratis: 3 klasser med upp till 50 elever. Teacher Pro ($9/månad) lägger till obegränsade klasser och rapporter.',
     ],
+    depth: [
+      {
+        heading: 'Hur stor ordlistan bakom spelen är',
+        answer:
+          `Varje språk har sin egen valideringsordlista i stället för en översatt engelsk lista. Engelska känner igen över ${dictionaryFloor('en', 'sv')} ord, spanska över ${dictionaryFloor('es', 'sv')}, svenska över ${dictionaryFloor('sv', 'sv')}, hebreiska över ${dictionaryFloor('he', 'sv')} och ryska över ${dictionaryFloor('ru', 'sv')}. Japanska bräden valideras mot över ${dictionaryFloor('ja', 'sv')} hiraganaord.`,
+        points: [
+          'Ordlistorna är fristående ordmängder per språk, inte en översatt lista, så en hebreisk runda bedöms mot hebreiska och visas från höger till vänster.',
+          'Japanska bräden är kana, så listan med kanjisammansättningar bygger bräden men bedömer aldrig ett inskickat ord.',
+          'Lärarens egen ordlista driver övningslägena direkt, så klassen övar precis veckans ord utan att lämna resten av språket.',
+          'Sex språk med egen ordlista: engelska, hebreiska, svenska, japanska, spanska och ryska.',
+        ],
+      },
+      {
+        heading: 'En ordlista, lektionens båda halvor',
+        answer:
+          'En enda ordlista driver lektionens båda halvor. Klassen spelar tillsammans på ett delat direktbräde, och sedan övar varje elev samma ord på egen hand i sju övningslägen. Tre nivåer — stöd, bas och utmaning — avgör vilka ord varje barn möter i den egna övningen.',
+        points: [
+          'Gratisplanen täcker 3 klasser med 50 elever vardera, och Teacher Pro för $9/månad lägger till obegränsade klasser och rapporterna.',
+          '50 elever är det tekniska taket för ett direktrum, så gratisgränsen och motorn är överens.',
+          'Direktkontroller under rundan: pausa och återuppta, trettio sekunder till, hoppa över ett ord och avsluta rundan.',
+          'Efter rundan visar resultatskärmen orden klassen missade, och sammanfattningen som delas stannar på klassnivå.',
+        ],
+      },
+    ],
+    playFormats: {
+      heading: 'En ordlista, {count} sätt att spela den',
+      intro:
+        'Ladda upp en lektionslista en gång så driver den alla format produkten har: {live} lägen som hela klassen spelar live tillsammans och {practice} övningar som en elev kör på egen hand med samma ord. Inget skrivs in igen, och ett ord som lagts till på måndagen dyker upp i alla.',
+      liveLabel: '{live} direktlägen för klassen',
+      practiceLabel: '{practice} egna övningstyper',
+    },
     faqTitle: 'Vanliga Frågor',
     faqs: [
       {
@@ -423,7 +568,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       { icon: '👥', text: 'Live multiplayer — hela klassen per spel' },
       { icon: '⚔️', text: '1v1 dueller för par eller lag' },
       { icon: '📚', text: 'Dina ordlistor — vilken enhet, vilket ämne som helst' },
-      { icon: '🌍', text: '5 språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska' },
+      { icon: '🌍', text: '6 språk: engelska, hebreiska (RTL), spanska, svenska, japanska, ryska' },
       { icon: '📊', text: 'Lärarpanel: precision per elev + vilka ord som är svåra' },
       { icon: '💸', text: 'Allt gratis — ingen premium' },
     ],
@@ -433,7 +578,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       ['Ordbildningsspel', '✓ Boggle/Wheel/Anagram', '✗ kort', '✗ mallar', '✗ quiz'],
       ['Live multiplayer', '✓', '✓ betald', '✗', '✓'],
       ['1v1 dueller', '✓', '✓ betald', '✗', '✗'],
-      ['5 språk + RTL', '✓', '✗', '✗', '✗'],
+      ['6 språk + RTL', '✓', '✗', '✗', '✗'],
       ['Dina ordlistor', '✓', '✓', '✓', '✓'],
       ['Analyspanel', '✓ gratis', '✓ betald', 'Grund', '✓ betald'],
     ],
@@ -448,7 +593,7 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     ctaPrimaryButtonLabel: '▶ Starta klassrumsspel',
     ctaSecondaryButtonLabel: 'Se utbildningshub',
     metadataLabels: {
-      languages: '5 språk',
+      languages: '6 språk',
       gradeLevel: 'Årskurs 4-12 + vuxen ESL',
       accounts: 'gratis studentkonton',
       duration: '5-minuterssessioner',
@@ -494,6 +639,37 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       '6言語、完全な辞書付き。ESL、ヘブライ語コース、スペイン語バイリンガル — すべてネイティブ。',
       '無料プランは3クラス・各50人まで。クラス全員が参加できます。授業中に広告は出ません。',
     ],
+    depth: [
+      {
+        heading: 'ゲームを支える辞書の規模',
+        answer:
+          `各言語には英語を翻訳したものではなく、それぞれ独自の判定辞書があります。英語は${dictionaryFloor('en', 'ja')}語以上、スペイン語は${dictionaryFloor('es', 'ja')}語以上、スウェーデン語は${dictionaryFloor('sv', 'ja')}語以上、ヘブライ語は${dictionaryFloor('he', 'ja')}語以上、ロシア語は${dictionaryFloor('ru', 'ja')}語以上を認識します。日本語の盤はひらがなで、${dictionaryFloor('ja', 'ja')}語以上のひらがな語で判定されます。`,
+        points: [
+          '辞書は言語ごとに独立した語彙集合で、翻訳した一つのリストではありません。ヘブライ語のラウンドはヘブライ語で判定され、右から左に表示されます。',
+          '日本語の盤はかなです。漢字熟語のリストは盤の生成にのみ使われ、提出された単語の判定には使われません。',
+          '先生自身の単語リストが練習モードを直接動かすので、クラスはその週の単語をそのまま練習できます。',
+          '6言語がそれぞれの辞書を備えています：英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語。',
+        ],
+      },
+      {
+        heading: '単語リスト1つで、授業の両方の場面を',
+        answer:
+          '1つの単語リストが授業の両方の場面を動かします。クラスは共有のライブ盤で一緒に遊び、そのあと各生徒が同じ単語を7つの練習モードで一人で練習します。サポート・コア・チャレンジの3段階が、その生徒が個人練習で出会う単語を決めます。',
+        points: [
+          '無料プランは3クラス・各クラス50人まで。Teacher Pro（月$9）でクラス数が無制限になり、進捗レポートが加わります。',
+          '1つのライブルームの技術的な上限が50人で、無料プランの上限はそれに合わせてあります。',
+          'ラウンド中の操作は4つ：一時停止と再開、30秒追加、単語をスキップ、ラウンド終了。',
+          'ラウンド後、結果画面にクラスが取りこぼした単語が表示されます。共有用のまとめはクラス単位で、生徒名は含みません。',
+        ],
+      },
+    ],
+    playFormats: {
+      heading: '単語リスト1つ、遊び方は{count}通り',
+      intro:
+        'レッスンのリストを一度アップロードすれば、製品のすべての形式がそれで動きます。クラス全体が一緒にライブで遊ぶ{live}つのモードと、生徒が同じ単語で一人で取り組む{practice}種類のドリルです。入力し直す必要はなく、月曜に追加した単語はそのすべてに現れます。',
+      liveLabel: 'ライブのクラスモード{live}種類',
+      practiceLabel: '個人練習{practice}種類',
+    },
     faqTitle: 'よくある質問',
     faqs: [
       {
@@ -596,8 +772,39 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       'Бесплатные ученические аккаунты. Регистрация за 30 секунд, потом отслеживание прогресса навсегда.',
       'Словообразование, не карточки. Лучше Quizlet для орфографии и запоминания.',
       '6 языков со скомплектованными словарями. ESL, иврит погружение, испанский билингвизм — всё на родном языке.',
-      'Всё бесплатно. Без премиума, без объявлений на уроке.',
+      'Бесплатно: 3 класса по 50 учеников. Без рекламы на уроке.',
     ],
+    depth: [
+      {
+        heading: 'Насколько велик словарь за играми',
+        answer:
+          `У каждого языка свой словарь проверки, а не переведённый английский список. Английский распознаёт более ${dictionaryFloor('en', 'ru')} слов, испанский более ${dictionaryFloor('es', 'ru')}, шведский более ${dictionaryFloor('sv', 'ru')}, иврит более ${dictionaryFloor('he', 'ru')} и русский более ${dictionaryFloor('ru', 'ru')}. Японские доски — хирагана, и проверка идёт по более чем ${dictionaryFloor('ja', 'ru')} слов хираганой.`,
+        points: [
+          'Словари — независимые наборы слов для каждого языка, а не один переведённый список: раунд на иврите проверяется по ивриту и отображается справа налево.',
+          'Японские доски — кана, поэтому список кандзи-сочетаний только генерирует доски и никогда не судит отправленное слово.',
+          'Собственный список учителя напрямую питает режимы практики, поэтому класс отрабатывает именно слова этой недели.',
+          'Шесть языков со своим словарём: английский, иврит, шведский, японский, испанский и русский.',
+        ],
+      },
+      {
+        heading: 'Один список слов на обе половины урока',
+        answer:
+          'Один список слов питает обе половины урока. Класс играет вместе на общей живой доске, а затем каждый ученик отрабатывает те же слова один в семи режимах практики. Три уровня — поддержка, база и вызов — решают, какие слова видит каждый ребёнок в этой практике.',
+        points: [
+          'Бесплатный план — 3 класса по 50 учеников в каждом, а Teacher Pro за $9 в месяц добавляет неограниченные классы и отчёты о прогрессе.',
+          '50 учеников — технический потолок одной живой комнаты, поэтому бесплатный лимит и движок совпадают.',
+          'Управление во время раунда: пауза и продолжение, плюс тридцать секунд, пропуск слова и завершение раунда.',
+          'После раунда экран результатов показывает слова, которые класс не нашёл, а сводка для обмена остаётся на уровне класса.',
+        ],
+      },
+    ],
+    playFormats: {
+      heading: 'Один список слов, {count} способов играть',
+      intro:
+        'Загрузите список урока один раз — и он питает все форматы продукта: {live} режимов, в которые класс играет вживую вместе, и {practice} тренировок, которые ученик проходит один по тем же словам. Ничего не вводится заново, а слово, добавленное в понедельник, появляется во всех.',
+      liveLabel: '{live} живых режимов для класса',
+      practiceLabel: '{practice} видов самостоятельной практики',
+    },
     faqTitle: 'Часто задаваемые вопросы',
     faqs: [
       {

@@ -21,8 +21,12 @@ interface SessionCounts {
 }
 
 interface QuickPracticeButtonProps {
-  /** Callback when a practice mode is selected */
-  onPractice: (mode: PracticeType) => void;
+  /**
+   * Callback when practice is chosen. `undefined` means "open the lesson and
+   * let the student pick" — the primary button — while a mode means "start
+   * this drill", from the per-mode menu.
+   */
+  onPractice: (mode?: PracticeType) => void;
   /** Lesson ID for tracking */
   lessonId: string;
   /** Session counts for each mode (optional) */
@@ -95,7 +99,11 @@ export function QuickPracticeButton({
   };
 
   const handlePrimaryClick = useCallback(() => {
-    onPractice('flashcard');
+    // No mode: open the lesson on its practice picker. Firing 'flashcard' here
+    // sent students straight into one drill via `?mode=`, so the tile grid of
+    // every other practice type was unreachable. The per-mode menu below still
+    // passes a mode, and teacher deep links still rely on `?mode=`.
+    onPractice(undefined);
   }, [onPractice]);
 
   const handleModeSelect = useCallback((mode: PracticeType) => {

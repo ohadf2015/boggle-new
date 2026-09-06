@@ -6,6 +6,7 @@
  */
 
 import { getRedisClient } from '../redisClient.js';
+import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger.js';
 
 const CLASSROOM_GAME_TTL = 14400; // 4 hours
@@ -29,13 +30,30 @@ export interface ClassroomGameSettings {
   timerMinutes?: number;
   boardSize?: 'small' | 'medium' | 'large';
   allowLateJoin?: boolean;
-  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
+  /**
+   * `vocab-quiz` is a live 4-choice question round, not a board game. It is
+   * deliberately absent from the canonical `GameMode` union in
+   * shared/types/game.ts: a quiz has no letter grid, no submitted words and no
+   * duplicate/rarity scoring, so widening that union would drag it into random
+   * mode rolls, quick-play matchmaking and every board-engine mode branch.
+   */
+  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz';
   /**
    * Word Hunt only: the lesson word the teacher pinned as the hunted target.
    * Empty/absent means "let the game pick". Re-validated against the lesson at
    * game start — never trusted from the socket payload alone.
    */
   targetWord?: string;
+  /**
+   * Vocab Quiz only: which skill to drill. `any` mixes what the lesson supports.
+   * Typed off the shared builder's own union so a newly added focus cannot
+   * silently fall out of the classroom settings.
+   */
+  vocabQuizFocus?: PracticeFocusSetting;
+  /** Vocab Quiz only: questions in the round (capped by what the lesson can build). */
+  vocabQuizQuestionCount?: number;
+  /** Vocab Quiz only: seconds on each question's clock. */
+  vocabQuizSeconds?: number;
 }
 
 export interface ClassroomGame {
@@ -46,6 +64,15 @@ export interface ClassroomGame {
   lessonIds: string[];
   lessonNames: string[];
   vocabularyWords: string[];
+  /**
+   * The subset of `vocabularyWords` the generated board actually carries,
+   * written once at game start. Embedding is best-effort — placement is capped
+   * at roughly one word per three cells and skips anything longer than the
+   * board — so this is usually SMALLER than `vocabularyWords`. Absent until the
+   * board exists; a support student's word bank falls back to the full lesson
+   * list until then.
+   */
+  placedVocabulary?: string[];
   settings: ClassroomGameSettings;
   players: ClassroomGamePlayer[];
   createdAt: string;
@@ -137,12 +164,24 @@ export async function getActiveClassroomGames(classroomId: string): Promise<Clas
     const games: ClassroomGame[] = [];
     for (const gameCode of gameCodes) {
       const game = await getClassroomGame(gameCode);
-      if (game) {
-        games.push(game);
-      } else {
+      if (!game) {
         // Game expired, remove from set
         await redis.srem(`classroom_games:${classroomId}`, gameCode);
+        continue;
       }
+      if (game.status === 'finished') {
+        // "Active" has to mean JOINABLE. A finished game kept its Redis key for
+        // the rest of the 4h TTL and stayed in this set, so the student banner —
+        // which shows games[0], and a Redis set has no order — routinely
+        // advertised a round that was already over, under whichever lesson name
+        // that older game carried. Tapping JOIN walked the student into a dead
+        // room and out to the generic multiplayer hub with no error at all.
+        // Prune it here, the same way an expired key is already pruned, or every
+        // 15-second poll re-filters it for four hours.
+        await redis.srem(`classroom_games:${classroomId}`, gameCode);
+        continue;
+      }
+      games.push(game);
     }
 
     return games;
@@ -267,5 +306,39 @@ export async function updateClassroomGameStatus(
     logger.info('CLASSROOM_GAME', `Updated game ${gameCode} status to ${status}`);
   } catch (error) {
     logger.error('CLASSROOM_GAME', `Failed to update game status: ${error}`);
+  }
+}
+
+/**
+ * Record which lesson words the generated board actually carries.
+ *
+ * Called once from game start, after the grid exists. A support student's word
+ * bank reads this instead of the full lesson list, so it stops listing words
+ * that are not on the board. Best-effort: a failure here degrades the bank back
+ * to the whole lesson, which is the old behaviour, so it never blocks the game.
+ */
+export async function setClassroomGamePlacedVocabulary(
+  gameCode: string,
+  placedVocabulary: string[]
+): Promise<void> {
+  try {
+    const redis = getRedis();
+    const game = await getClassroomGame(gameCode);
+    if (!game) return;
+
+    game.placedVocabulary = placedVocabulary;
+
+    await redis.setex(
+      `classroom_game:${gameCode}`,
+      CLASSROOM_GAME_TTL,
+      JSON.stringify(game)
+    );
+
+    logger.info(
+      'CLASSROOM_GAME',
+      `Game ${gameCode} board carries ${placedVocabulary.length}/${game.vocabularyWords.length} lesson words`
+    );
+  } catch (error) {
+    logger.error('CLASSROOM_GAME', `Failed to record placed vocabulary: ${error}`);
   }
 }
