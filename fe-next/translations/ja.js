@@ -13108,7 +13108,15 @@ const ja = {
       "postReteachGoogleClassroomBody": "リンクを開き、見逃した単語で3分ライブを開始: {{missed}}。生徒はストリームから参加します。",
       "assignPracticeGoogleClassroom": "練習課題を Google Classroom に割り当て",
       "assignPracticeGoogleClassroomTitle": "見逃した単語の練習 — {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "リンクを開き、見逃した単語を家庭で練習: {{missed}}。終わったら提出してください。"
+      "assignPracticeGoogleClassroomBody": "リンクを開き、見逃した単語を家庭で練習: {{missed}}。終わったら提出してください。",
+      "printPracticeSheet": "練習シートを印刷",
+      "printPracticeSheetTitle": "見逃した単語の練習 — {{lesson}}",
+      "printPracticeSheetSubtitle": "デバイス不要の再指導 — 各単語を書き、文で使いましょう",
+      "printPracticeSheetWriteLabel": "単語を書く",
+      "printPracticeSheetSentenceLabel": "文で使う",
+      "printPracticeSheetNameLine": "名前: ________________",
+      "printPracticeSheetDateLine": "日付: ________________",
+      "printPracticeSheetFooter": "LexiClash · デバイス不要の練習"
     },
     "nav": {
       "section": "教師向け",

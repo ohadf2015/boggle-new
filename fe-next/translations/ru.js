@@ -1425,7 +1425,15 @@ const ru = {
       "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream.",
       "assignPracticeGoogleClassroom": "Назначить практику в Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов — {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите."
+      "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите.",
+      "printPracticeSheet": "Распечатать лист практики",
+      "printPracticeSheetTitle": "Практика пропущенных слов — {{lesson}}",
+      "printPracticeSheetSubtitle": "Повтор без устройств — напишите каждое слово и используйте в предложении",
+      "printPracticeSheetWriteLabel": "Напишите слово",
+      "printPracticeSheetSentenceLabel": "Используйте в предложении",
+      "printPracticeSheetNameLine": "Имя: ________________",
+      "printPracticeSheetDateLine": "Дата: ________________",
+      "printPracticeSheetFooter": "LexiClash · практика без устройств"
     },
     "nav": {
       "section": "Учителям",

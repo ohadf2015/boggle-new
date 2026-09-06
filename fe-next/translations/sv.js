@@ -13346,7 +13346,15 @@ const sv = {
       "postReteachGoogleClassroomBody": "Öppna länken och starta 3-minuters Live på de missade orden: {{missed}}. Eleverna går med från Stream.",
       "assignPracticeGoogleClassroom": "Tilldela hemövning i Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Öva missade ord — {{lesson}}",
-      "assignPracticeGoogleClassroomBody": "Öppna länken och öva dessa missade ord hemma: {{missed}}. Lämna in när du är klar."
+      "assignPracticeGoogleClassroomBody": "Öppna länken och öva dessa missade ord hemma: {{missed}}. Lämna in när du är klar.",
+      "printPracticeSheet": "Skriv ut övningsblad",
+      "printPracticeSheetTitle": "Övning på missade ord — {{lesson}}",
+      "printPracticeSheetSubtitle": "Enhetsfri reteach — skriv varje ord och använd det i en mening",
+      "printPracticeSheetWriteLabel": "Skriv ordet",
+      "printPracticeSheetSentenceLabel": "Använd det i en mening",
+      "printPracticeSheetNameLine": "Namn: ________________",
+      "printPracticeSheetDateLine": "Datum: ________________",
+      "printPracticeSheetFooter": "LexiClash · enhetsfri övning"
     },
     "nav": {
       "section": "Lärare",
