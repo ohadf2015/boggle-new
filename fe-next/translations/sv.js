@@ -13354,7 +13354,7 @@ const sv = {
       "printPracticeSheetSentenceLabel": "Använd det i en mening",
       "printPracticeSheetNameLine": "Namn: ________________",
       "printPracticeSheetDateLine": "Datum: ________________",
-      "printPracticeSheetFooter": "LexiClash · enhetsfri övning",,
+      "printPracticeSheetFooter": "LexiClash · enhetsfri övning",
       "startUnpluggedReteachLive": "Starta frånkopplad reteach Live",
       "unpluggedReteachHint": "Eleverna svarar på det utskrivna övningsbladet — inga enheter",
       "unpluggedReteachReveal": "Visa",

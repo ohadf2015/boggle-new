@@ -13116,7 +13116,7 @@ const ja = {
       "printPracticeSheetSentenceLabel": "文で使う",
       "printPracticeSheetNameLine": "名前: ________________",
       "printPracticeSheetDateLine": "日付: ________________",
-      "printPracticeSheetFooter": "LexiClash · デバイス不要の練習",,
+      "printPracticeSheetFooter": "LexiClash · デバイス不要の練習",
       "startUnpluggedReteachLive": "アンプラグドリティーチLiveを開始",
       "unpluggedReteachHint": "生徒は印刷した練習シートで答えます — 端末不要",
       "unpluggedReteachReveal": "表示",
