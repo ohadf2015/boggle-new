@@ -74,13 +74,13 @@ export function LeagueHomeSection() {
   let statusColor = 'text-neo-white';
   if (summary) {
     if (summary.zone === 'promotion') {
-      statusText = t('league.holdingPromotion') || 'Holding a promotion spot!';
+      statusText = t('league.holdingPromotion', 'Holding a promotion spot!');
       statusColor = 'text-green-400';
     } else if (summary.zone === 'relegation') {
-      statusText = t('league.inDropZone') || 'In the drop zone — climb out!';
+      statusText = t('league.inDropZone', 'In the drop zone — climb out!');
       statusColor = 'text-red-400';
     } else {
-      statusText = interpolate(t('league.spotsFromPromotion') || '{n} spots from promotion', {
+      statusText = interpolate(t('league.spotsFromPromotion', '{n} spots from promotion'), {
         n: summary.toPromotion,
       });
       statusColor = 'text-neo-lime';
@@ -88,7 +88,7 @@ export function LeagueHomeSection() {
   }
 
   return (
-    <section data-testid="league-home-section" aria-label={t('league.yourLeague') || 'Your League'}>
+    <section data-testid="league-home-section" aria-label={t('league.yourLeague', 'Your League')}>
       <div className="rounded-neo border-3 border-black bg-gradient-to-br from-neo-navy-light to-neo-navy shadow-hard overflow-hidden">
         {/* Header: title + tier + position + full-standings link */}
         <Link
@@ -98,7 +98,7 @@ export function LeagueHomeSection() {
           <span className="flex items-center gap-2 min-w-0">
             <Trophy className="w-5 h-5 text-neo-yellow shrink-0" strokeWidth={2.5} aria-hidden="true" />
             <span className="font-neo-display font-black uppercase tracking-wide text-neo-white truncate">
-              {t('league.yourLeague') || 'Your League'}
+              {t('league.yourLeague', 'Your League')}
             </span>
             {!isLoading && (
               <span className={`font-neo-display text-sm font-bold ${TIER_COLOR[tier]} shrink-0`}>
@@ -108,7 +108,7 @@ export function LeagueHomeSection() {
             )}
           </span>
           <span className="flex items-center gap-1 text-xs font-bold text-neo-white/70 shrink-0">
-            {t('league.viewFullStandings') || 'Standings'}
+            {t('league.viewFullStandings', 'Standings')}
             <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </span>
         </Link>
@@ -119,7 +119,7 @@ export function LeagueHomeSection() {
             <p className={`font-neo-body text-sm font-bold ${statusColor} min-w-0`}>
               {myPosition && (
                 <span className="text-neo-white/80 me-2">
-                  {interpolate(t('league.positionOf') || '#{position} of {total}', {
+                  {interpolate(t('league.positionOf', '#{position} of {total}'), {
                     position: myPosition,
                     total: standings.length,
                   })}
@@ -134,7 +134,7 @@ export function LeagueHomeSection() {
                 }`}
               >
                 <Timer className="w-3.5 h-3.5" aria-hidden="true" />
-                {interpolate(t('league.resetsIn') || 'Resets in {time}', {
+                {interpolate(t('league.resetsIn', 'Resets in {time}'), {
                   time: countdown.days > 0 ? `${countdown.days}d ${countdown.hours}h` : `${countdown.hours}h`,
                 })}
               </span>

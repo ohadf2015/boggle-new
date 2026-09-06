@@ -142,10 +142,10 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
 };
 
 // Step 1: Combined Swipe Demo + Color Feedback
-const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string }> = ({ isRTL, t }) => {
+const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string, fallback?: string) => string }> = ({ isRTL, t }) => {
   // Grid letters from translation
-  const letters = (t('daily.carousel.step1Grid') || '').split(',');
-  const highlightedIndices = (t('daily.carousel.step1Highlighted') || '').split(',').map(Number);
+  const letters = (t('daily.carousel.step1Grid', '')).split(',');
+  const highlightedIndices = (t('daily.carousel.step1Highlighted', '')).split(',').map(Number);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-between min-h-0">
@@ -221,7 +221,7 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
 };
 
 // Step 2: Combined Find Word + Clue Revelation
-const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: string, params?: Record<string, string | number>) => string }> = ({
+const Step2FindWordAndClues: React.FC<{ targetWordLength: number; t: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string }> = ({
   targetWordLength,
   t
 }) => {

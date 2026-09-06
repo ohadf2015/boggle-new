@@ -93,8 +93,7 @@ export default function AccessibilitySettingsPageClient() {
       icon: Sparkles,
       title: t('accessibility.fireRoundLights.title'),
       description:
-        t('accessibility.fireRoundLights.description') ||
-        'Turn off the rainbow glowing cells during fire rounds to reduce visual distractions.',
+        t('accessibility.fireRoundLights.description', 'Turn off the rainbow glowing cells during fire rounds to reduce visual distractions.'),
       enabled: settings.disableFireRoundLights,
       iconColor: 'text-neo-purple',
     },
@@ -103,8 +102,7 @@ export default function AccessibilitySettingsPageClient() {
       icon: Waves,
       title: t('accessibility.earthquakeEffects.title'),
       description:
-        t('accessibility.earthquakeEffects.description') ||
-        'Turn off intense earthquake animations including extreme shaking, 3D tumbling, motion blur, screen shake, and particle debris.',
+        t('accessibility.earthquakeEffects.description', 'Turn off intense earthquake animations including extreme shaking, 3D tumbling, motion blur, screen shake, and particle debris.'),
       enabled: settings.disableEarthquakeEffects,
       iconColor: 'text-neo-red',
     },
@@ -113,8 +111,7 @@ export default function AccessibilitySettingsPageClient() {
       icon: Zap,
       title: t('accessibility.reduceMotion.title'),
       description:
-        t('accessibility.reduceMotion.description') ||
-        'Minimize animations and transitions for a calmer experience. Useful for vestibular disorders or motion sensitivity.',
+        t('accessibility.reduceMotion.description', 'Minimize animations and transitions for a calmer experience. Useful for vestibular disorders or motion sensitivity.'),
       enabled: reduceMotion,
       iconColor: 'text-neo-cyan',
     },
@@ -123,8 +120,7 @@ export default function AccessibilitySettingsPageClient() {
       icon: disableSounds ? VolumeX : Volume2,
       title: t('accessibility.disableSounds.title'),
       description:
-        t('accessibility.disableSounds.description') ||
-        'Turn off all sound effects. Music controls are still available in the header.',
+        t('accessibility.disableSounds.description', 'Turn off all sound effects. Music controls are still available in the header.'),
       enabled: disableSounds,
       iconColor: 'text-neo-lime',
     },
@@ -133,8 +129,7 @@ export default function AccessibilitySettingsPageClient() {
       icon: Contrast,
       title: t('accessibility.highContrast.title'),
       description:
-        t('accessibility.highContrast.description') ||
-        'Increase border widths and color contrast for better visibility.',
+        t('accessibility.highContrast.description', 'Increase border widths and color contrast for better visibility.'),
       enabled: highContrast,
       iconColor: 'text-neo-white',
     },
@@ -143,8 +138,7 @@ export default function AccessibilitySettingsPageClient() {
       icon: Type,
       title: t('accessibility.largerText.title'),
       description:
-        t('accessibility.largerText.description') ||
-        'Increase base font size by 125% for better readability.',
+        t('accessibility.largerText.description', 'Increase base font size by 125% for better readability.'),
       enabled: largerText,
       iconColor: 'text-neo-orange',
     },
@@ -167,8 +161,7 @@ export default function AccessibilitySettingsPageClient() {
             {language !== 'he' && '♿'}
           </h1>
           <p className="text-neo-white text-lg opacity-90 max-w-2xl mx-auto">
-            {t('accessibility.subtitle') ||
-              'Customize your experience to meet your needs. These settings are saved locally.'}
+            {t('accessibility.subtitle', 'Customize your experience to meet your needs. These settings are saved locally.')}
           </p>
         </m.div>
 
@@ -232,8 +225,7 @@ export default function AccessibilitySettingsPageClient() {
           className="mt-8 p-4 bg-neo-purple bg-opacity-20 border-2 border-neo-purple rounded-neo"
         >
           <p className="text-neo-white text-sm text-center">
-            {t('accessibility.footer') ||
-              'These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.'}
+            {t('accessibility.footer', 'These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.')}
           </p>
         </m.div>
       </div>

@@ -359,7 +359,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       },
       {
         q: 'אפשר להשתמש בתוכנית דו-לשונית?',
-        a: 'כן. LexiClash תומך בעברית, אנגלית, ספרדית, שוודית ויפנית. מושלם לכיתות הטמעת שפה ולכיתות מעבר.',
+        a: 'כן. LexiClash תומך בעברית, אנגלית, ספרדית, שוודית, יפנית ורוסית. מושלם לכיתות הטמעת שפה ולכיתות מעבר.',
       },
     ],
   },
@@ -681,7 +681,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       {
         heading: '英語の答えはどの辞書で判定されるか',
         answer:
-          `英語の答えは授業用の短いリストではなく、${dictionaryFloor('en', 'ja')}語以上の辞書で判定されます。ほかの5言語もそれぞれ独自の辞書を持ちます：スペイン語${dictionaryFloor('es', 'ja')}語以上、スウェーデン語${dictionaryFloor('sv', 'ja')}語以上、ヘブライ語${dictionaryFloor('he', 'ja')}語以上、ロシア語${dictionaryFloor('ru', 'ja')}語以上、日本語は${dictionaryFloor('ja', 'ja')}語以上のひらがな語。`,
+          `英語の答えは授業用の短いリストではなく、${dictionaryFloor('en', 'ja')}語以上の辞書で判定されます。ほかの6言語もそれぞれ独自の辞書を持ちます：スペイン語${dictionaryFloor('es', 'ja')}語以上、スウェーデン語${dictionaryFloor('sv', 'ja')}語以上、ヘブライ語${dictionaryFloor('he', 'ja')}語以上、ロシア語${dictionaryFloor('ru', 'ja')}語以上、日本語は${dictionaryFloor('ja', 'ja')}語以上のひらがな語。`,
         points: [
           '本物の単語を見つければ、レッスンのリストになくても得点になります。辞書はワークシートではなく言語そのものです。',
           '先生のカスタムリストは練習ドリルを動かし続けるので、その週の目標語彙が繰り返されます。',

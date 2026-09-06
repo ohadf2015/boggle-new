@@ -145,7 +145,7 @@ export function SeedWordTags({
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={() => { if (input.trim()) commitInput(); }}
-          placeholder={tags.length === 0 ? (t('ugc.board.seedWordsHint') || 'Enter words to include (optional)') : ''}
+          placeholder={tags.length === 0 ? (t('ugc.board.seedWordsHint', 'Enter words to include (optional)')) : ''}
           disabled={disabled}
           className={cn(
             'flex-1 min-w-[80px] bg-transparent text-neo-white',
@@ -156,7 +156,7 @@ export function SeedWordTags({
       </div>
 
       <p className="font-neo-body text-xs text-neo-white">
-        {t('ugc.board.seedWordsHelp') || 'Press Enter or comma to add words. Click a tag to edit.'}
+        {t('ugc.board.seedWordsHelp', 'Press Enter or comma to add words. Click a tag to edit.')}
       </p>
     </div>
   );

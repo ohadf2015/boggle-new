@@ -26,7 +26,7 @@ interface ResultsPodiumProps {
   /** Whether this is Word Hunt mode (show words found instead of score) */
   isWordHunt?: boolean;
   /** Translation function */
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
   /** Callback when an emoji is sent to a player */
   onReaction?: (reactionId: string, targetUsername: string) => void;
 }
@@ -230,7 +230,7 @@ export default function ResultsPodium({
       >
         <Trophy className="w-3.5 h-3.5 text-white" />
         <span className="font-black text-[10px] text-white uppercase tracking-wider">
-          {t('results.matchResults') || 'Match Results'}
+          {t('results.matchResults', 'Match Results')}
         </span>
       </m.div>
 
@@ -248,13 +248,13 @@ export default function ResultsPodium({
             currentUsername &&
             player.username.toLowerCase() === currentUsername.toLowerCase();
           const displayName = isCurrentUser
-            ? (t('results.you') || 'YOU')
+            ? (t('results.you', 'YOU'))
             : player.username;
           const isFirst = config.place === 1;
           const showEmojiButton = onReaction && !isCurrentUser;
 
           const scoreDisplay = isWordHunt
-            ? `${player.wordsFoundCount ?? 0} ${t('results.words') || 'Words'}`
+            ? `${player.wordsFoundCount ?? 0} ${t('results.words', 'Words')}`
             : formatScore(player.score);
 
           const baseDelay = REVEAL_DELAYS[layoutIdx];

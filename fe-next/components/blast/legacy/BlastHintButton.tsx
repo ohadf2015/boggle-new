@@ -25,7 +25,7 @@ interface BlastHintButtonProps {
   onFreeHint: () => void;
   /** Caller's ad-hint consumer — invoked AFTER rewarded ad rewards. */
   onAdHint: () => void;
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
 }
 
 export function BlastHintButton({
@@ -57,8 +57,8 @@ export function BlastHintButton({
   if (!freeAvailable && !canShowAd) return null;
 
   const ariaLabel = freeAvailable
-    ? (t('blast.hint.aria.free') || 'Hint (free)')
-    : (t('blast.hint.aria.ad') || 'Hint (watch ad)');
+    ? (t('blast.hint.aria.free', 'Hint (free)'))
+    : (t('blast.hint.aria.ad', 'Hint (watch ad)'));
 
   return (
     <button
@@ -74,7 +74,7 @@ export function BlastHintButton({
       )}
     >
       <Lightbulb className="h-3 w-3" strokeWidth={3} />
-      <span>{freeAvailable ? (t('blast.hint.free') || 'FREE') : (t('blast.hint.ad') || 'HINT')}</span>
+      <span>{freeAvailable ? (t('blast.hint.free', 'FREE')) : (t('blast.hint.ad', 'HINT'))}</span>
     </button>
   );
 }

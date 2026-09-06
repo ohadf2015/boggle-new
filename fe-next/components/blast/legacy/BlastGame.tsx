@@ -358,7 +358,14 @@ export function BlastGame({
 
   // Word submission pipeline
   const getScoreMultiplier = useCallback(() => getComboMultiplier(combo.comboLevel), [combo.comboLevel]);
-  const tSafe = useCallback((key: string) => t(key) || key, [t]);
+  // Forwards `fallback` to the real `t` for the same reason as `tAdapter`
+  // above — `useWordSubmission` receives this as its `t` prop, so a
+  // `t(key, 'fallback')` call inside it was silently inert until this
+  // forwarded the second argument. `|| key` is kept as the final safety net.
+  const tSafe = useCallback(
+    (key: string, fallbackOrParams?: string | Record<string, string | number>) => t(key, fallbackOrParams) || key,
+    [t]
+  );
   const noop = useCallback(() => {}, []);
 
   const wordSubmission = useWordSubmission({
@@ -433,7 +440,13 @@ export function BlastGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* method
   }, [engine.shuffleGrid, playBoardShuffleSound]);
 
-  const tAdapter = useCallback((key: string) => t(key) || undefined, [t]);
+  // Forwards `fallback` to the real `t` (was dropped entirely — every Blast
+  // child component below receives this adapter as its `t` prop, so a
+  // `t(key, 'fallback')` fix at a leaf call site was silently inert until
+  // this forwarded the second argument). `|| undefined` is kept: it collapses
+  // an explicitly empty translation to `undefined` for children that treat
+  // "no value" and "empty string" differently.
+  const tAdapter = useCallback((key: string, fallback?: string) => t(key, fallback) || undefined, [t]);
 
   // Compute initial tile type counts once per wave (for clear_all_type objectives)
   const initialTileTypeCounts = useMemo(() => {
@@ -690,7 +703,7 @@ export function BlastGame({
 
       {shieldToastVisible && (
         <div data-testid="blast-shield-triggered-toast" role="status" aria-live="polite" className="fixed top-20 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-5 py-3 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard-lg animate-neo-pop">
-          <span className="text-xl">🛡️</span>{t('blast.pregameBuff.shieldTriggered') || 'Shield saved you!'}
+          <span className="text-xl">🛡️</span>{t('blast.pregameBuff.shieldTriggered', 'Shield saved you!')}
         </div>
       )}
 

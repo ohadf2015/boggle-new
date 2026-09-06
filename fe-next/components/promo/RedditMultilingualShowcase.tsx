@@ -443,7 +443,7 @@ const CTAScene: React.FC = () => {
           letterSpacing: '0.05em',
         }}
       >
-        5 languages &middot; Free &middot; Browser
+        6 languages &middot; Free &middot; Browser
       </div>
 
       {/* URL */}

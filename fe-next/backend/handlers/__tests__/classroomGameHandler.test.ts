@@ -21,6 +21,9 @@ vi.mock('../../modules/supabase/classroomMembership', () => ({
   resolveClassroomTeacher: vi.fn(),
   resolveClassroomStudent: vi.fn(),
   resolveClassroomRole: vi.fn(),
+  // Resolved server-side so the student banner can name the CLASSROOM, not
+  // just the lesson — a lesson may be reused across several classes.
+  resolveClassroomName: vi.fn(async () => 'Mr Smith\'s Class'),
 }));
 // Mock rate limiter - always allow
 vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true), default: {
@@ -139,12 +142,15 @@ describe('ClassroomGameHandler', () => {
       });
       expect(mockSocket.join).toHaveBeenCalledWith(`classroom:${gameData.classroomId}`);
       expect(mockIo.to).toHaveBeenCalledWith(`classroom:${gameData.classroomId}`);
-      expect(mockIo.emit).toHaveBeenCalledWith('classroomGameCreated', {
+      // The broadcast also carries the classroom's resolved display name, so a
+      // banner that pops up live is labelled the same way the poll would label
+      // it. Asserted loosely: this test is about the game identity.
+      expect(mockIo.emit).toHaveBeenCalledWith('classroomGameCreated', expect.objectContaining({
         gameCode: gameData.gameCode,
         classroomId: gameData.classroomId,
         teacherName: gameData.teacherName,
         lessonNames: gameData.lessonNames,
-      });
+      }));
       expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameCreated', {
         success: true,
         gameCode: gameData.gameCode,
@@ -211,7 +217,16 @@ describe('ClassroomGameHandler', () => {
 
       // THEN
       expect(classroomGameManager.getActiveClassroomGames).toHaveBeenCalledWith(classroomId);
-      expect(mockSocket.emit).toHaveBeenCalledWith('activeClassroomGames', { games });
+      // The payload also names the classroom it answers for, and stamps that
+      // name onto each game — see classroomGameHandler.activeGamesScope.test.ts
+      // for why both exist. Asserted on the game IDENTITY, which is what this
+      // test is about, so it does not break on every future label field.
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'activeClassroomGames',
+        expect.objectContaining({
+          games: [expect.objectContaining({ gameCode: 'GAME1', classroomId })],
+        })
+      );
     });
   });
 
@@ -367,9 +382,11 @@ describe('ClassroomGameHandler', () => {
         '00000000-0000-4000-8000-000000000002'
       );
       expect(classroomGameManager.addPlayerToClassroomGame).not.toHaveBeenCalled();
-      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
+      // Join-path rejections also carry the gameCode they are about; the
+      // membership-message guarantee is what this test is for.
+      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', expect.objectContaining({
         error: expect.stringMatching(/not a member|not authorized|classroom/i),
-      });
+      }));
     });
 
     it('joinClassroomGame allows enrolled student', async () => {
@@ -426,9 +443,13 @@ describe('ClassroomGameHandler', () => {
       // THEN - generic error, no membership probe, no player add
       expect(classroomMembership.resolveClassroomRole).not.toHaveBeenCalled();
       expect(classroomGameManager.addPlayerToClassroomGame).not.toHaveBeenCalled();
-      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', {
+      // Rejections on the join path also name the game they are about, so the
+      // student's banner can tell them from unrelated traffic on the same
+      // socket — see ClassroomGameBanner.joinAck.test.tsx. The generic-message
+      // guarantee this test is about is asserted on the message itself.
+      expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', expect.objectContaining({
         error: expect.stringMatching(/not found|invalid/i),
-      });
+      }));
     });
 
     it('getActiveClassroomGames rejects non-members and does not join socket room', async () => {

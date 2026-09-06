@@ -44,7 +44,7 @@ export interface WordCraftLandingContent {
 const EN: WordCraftLandingContent = {
   metaTitle: 'WordCraft — Free Word Strategy Game You Can Beat (and Battle Friends)',
   metaDescription:
-    'WordCraft is a fast, friendly word-strategy game: drop tiles, claim territory, out-word a beatable bot — or challenge a friend to the exact same board with one link. Free, no download, 5 languages including Hebrew.',
+    'WordCraft is a fast, friendly word-strategy game: drop tiles, claim territory, out-word a beatable bot — or challenge a friend to the exact same board with one link. Free, no download, 6 languages including Hebrew.',
   ogTitle: 'WordCraft — drop tiles, claim territory, beat your friends',
   ogDescription:
     'A bite-size word-battle game that is actually fun and actually beatable. Play free in your browser, then challenge a friend to the identical board with a single link.',
@@ -66,7 +66,7 @@ const EN: WordCraftLandingContent = {
     { emoji: '🎯', title: 'A bot you can beat', body: 'The opponent is tuned to be fun, not brutal. On Easy it plays short, human words — you’ll win and feel smart doing it. Crank it up only when you’re ready.' },
     { emoji: '🟩', title: 'Territory, not just points', body: 'Capturing colored squares adds a tug-of-war layer on top of word scoring. Comebacks are real and last-word steals feel amazing.' },
     { emoji: '🔗', title: '1v1 on one link', body: 'Hit Challenge a Friend and you get a link that drops them onto the identical board. No accounts, no lobby, no waiting — just bragging rights.' },
-    { emoji: '🌍', title: '5 languages', body: 'English, Hebrew (full right-to-left), Spanish, Swedish and Japanese, each with its own real dictionary.' },
+    { emoji: '🌍', title: '6 languages', body: 'English, Hebrew (full right-to-left), Spanish, Swedish, Japanese and Russian, each with its own real dictionary.' },
     { emoji: '📱', title: 'Phone or party screen', body: 'Plays great solo on a phone and looks great cast to a TV for pass-and-play with the room.' },
     { emoji: '⚡', title: 'Zero setup', body: 'No download, no sign-up wall. Open it and you’re placing tiles in seconds.' },
   ],
@@ -80,7 +80,7 @@ const EN: WordCraftLandingContent = {
     { q: 'Is it hard? I’m not a word-game person.', a: 'It’s built to be easy to win. The default bot plays short, beatable words, the rules are “spell a real word, score points,” and there’s a one-time tutorial. You can raise the difficulty whenever you want a real fight.' },
     { q: 'How do I play a friend?', a: 'Tap Challenge a Friend and share the link it copies. Your friend opens it and plays the exact same board you did — same grid, same tiles — then the result compares your scores. No sign-up, no lobby.' },
     { q: 'How is WordCraft different from Scrabble?', a: 'You still build words from letter tiles, but WordCraft adds territory capture (your words flip colored squares to your side), tighter bags so games end in minutes, a difficulty-tunable bot, and one-link friend duels.' },
-    { q: 'What languages does it support?', a: 'Five: English, Hebrew with full right-to-left support, Spanish, Swedish and Japanese — each with a native dictionary, not a translation.' },
+    { q: 'What languages does it support?', a: 'Six: English, Hebrew with full right-to-left support, Spanish, Swedish, Japanese and Russian — each with a native dictionary, not a translation.' },
     { q: 'Can I play on my phone or a TV?', a: 'Both. WordCraft is designed for phones and also looks great on a big party screen for pass-and-play with friends in the room.' },
   ],
   closingTitle: 'Your board is waiting.',

@@ -153,6 +153,28 @@ export default async function Page({ params }: PageProps) {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               {c.heroSubtitle}
             </p>
+
+            {/* Zero-signup path, above the fold. The reader arriving on "vocabulary
+                games for classroom" is comparing us against printable listicles that
+                ask for nothing; every CTA under this one asks for an account first.
+                `?quickPlay=true` auto-joins a guest — see MultiplayerFlow's
+                `quickPlayUsername` fallback, which never checks `isAuthenticated`. */}
+            <div className="mt-7 max-w-xl rounded-neo border-4 border-neo-black bg-neo-lime p-5 text-neo-navy shadow-hard-lg sm:p-6">
+              <p className="font-neo-display text-lg font-black uppercase leading-[1.05] tracking-tight sm:text-xl">
+                {c.noAccount.heading}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed sm:text-base">{c.noAccount.body}</p>
+              <Link
+                href={`/${locale}/multiplayer?quickPlay=true`}
+                className="mt-4 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
+              >
+                {c.noAccount.cta}
+              </Link>
+              <p className="mt-3 text-[10px] font-bold uppercase tracking-widest opacity-70">
+                {c.noAccount.note}
+              </p>
+            </div>
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/daily/word-hunt`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">{c.ctaPrimaryButtonLabel}</span>
@@ -241,6 +263,41 @@ export default async function Page({ params }: PageProps) {
               </div>
             ))}
           </div>
+        </ScrollRevealSection>
+
+        {/* Five things a teacher can run on the guest board today, no account. This is
+            the half of the page a printable-worksheet listicle actually competes on —
+            "what do I do on Tuesday" — and every activity names a mechanism that
+            exists: guest quick play, the six-character room code, the create-room
+            language picker, the host's mode selector, and the daily board. */}
+        <ScrollRevealSection className="mt-20">
+          <h2 className="mb-3 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+            {c.lessonPlan.heading}
+          </h2>
+          <p className="mb-8 max-w-3xl text-sm text-neo-gray-300 sm:text-base">{c.lessonPlan.intro}</p>
+          <ol className="grid gap-4 sm:grid-cols-2">
+            {c.lessonPlan.activities.map((a, i) => (
+              <li
+                key={a.title}
+                className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 pt-6 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+              >
+                <span
+                  className="absolute -top-3 left-4 grid h-7 w-7 place-items-center rounded border-2 border-neo-black bg-neo-cyan font-neo-display text-xs font-black text-neo-navy shadow-hard-sm"
+                  aria-hidden="true"
+                >
+                  {i + 1}
+                </span>
+                <h3 className="font-neo-display text-base font-black text-neo-cyan sm:text-lg">{a.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neo-gray-200 sm:text-base">{a.body}</p>
+              </li>
+            ))}
+          </ol>
+          <Link
+            href={`/${locale}/multiplayer?quickPlay=true`}
+            className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+          >
+            {c.noAccount.cta}
+          </Link>
         </ScrollRevealSection>
 
         {/* Named-format table, counted from the registries — see EducationPlayFormats. */}

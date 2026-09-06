@@ -59,11 +59,11 @@ const faqs = [
   },
   {
     q: 'Can I play a Scrabble-style word game with friends online for free?',
-    a: 'LexiClash supports 2-20+ players in a single room. Create a room, share the link or QR, friends join from any device. Free forever, no pay-to-win, no premium tier required to compete. The leaderboard is global with daily, weekly, and all-time rankings.',
+    a: 'LexiClash supports 2-20+ players in a single room. Create a room, share the link or QR, friends join from any device. Always free to play, no pay-to-win, nothing to buy to compete. The leaderboard is global with daily, weekly, and all-time rankings.',
   },
   {
     q: 'What languages are supported?',
-    a: 'Five full dictionaries: English, Spanish, Swedish, Japanese, and Hebrew (with right-to-left support). Useful for ESL classrooms, language learners, and mixed-language friend groups who want a Scrabble-style word game in their native language.',
+    a: 'Six full dictionaries: English, Spanish, Swedish, Japanese, Hebrew (with right-to-left support), and Russian. Useful for ESL classrooms, language learners, and mixed-language friend groups who want a Scrabble-style word game in their native language.',
   },
   {
     q: 'Are there ads or pay-to-win mechanics?',
@@ -218,8 +218,8 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
               <p className="mt-1 text-sm text-slate-300">Send a URL. Friends join from any device — phone, laptop, tablet. No app store gate, no IT approval at work.</p>
             </div>
             <div className="rounded-neo border-3 border-neo-purple/60 bg-neo-navy-light p-4 shadow-hard">
-              <h3 className="font-neo-display text-lg font-black text-neo-purple">5 languages with full dictionaries</h3>
-              <p className="mt-1 text-sm text-slate-300">English, Spanish, Swedish, Japanese, Hebrew (RTL). Each with 10,000+ valid words verified against native dictionaries.</p>
+              <h3 className="font-neo-display text-lg font-black text-neo-purple">6 languages with full dictionaries</h3>
+              <p className="mt-1 text-sm text-slate-300">English, Spanish, Swedish, Japanese, Hebrew (RTL), Russian. Each with 10,000+ valid words verified against native dictionaries.</p>
             </div>
           </div>
         </section>
@@ -243,7 +243,7 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
             Ready to play a real-time Scrabble alternative?
           </h2>
           <p className="mb-5 text-slate-300">
-            One link, 2-20 friends, 2 minutes per match. Free forever.
+            One link, 2-20 friends, 2 minutes per match. Always free to play.
           </p>
           <Link
             href="/en/multiplayer"

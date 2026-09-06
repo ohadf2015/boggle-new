@@ -157,11 +157,11 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
   sv: {
     metaTitle: 'Gratis ordspel för klassrummet — Livegrupper, orddueller, ingen inloggning | LexiClash',
     metaDescription:
-      'Gratis ordspel designade för klassrummet. Eleverna går med med en fyrsiffrig kod (ingen inloggning, inga konton). Live klassrumsspel, orddueller, egna ordlistor och realtidstavlor. Funkar i vilken webbläsare som helst. Hela klassen.',
+      'Gratis ordspel designade för klassrummet. Eleverna går med med en kod på sex tecken (ingen inloggning, inga konton). Live klassrumsspel, orddueller, egna ordlistor och realtidstavlor. Funkar i vilken webbläsare som helst. Hela klassen.',
     ogTitle: 'Ordspel för klassrummet — gratis, ingen inloggning',
     ogDescription: 'Gå med med en kod och spela direkt. Liveordspel, stavningsöving, inga konton behövs. Fungerar på vilken enhet som helst.',
     twitterTitle: 'Gratis ordspel för klassrummet — LexiClash',
-    twitterDescription: 'Liveordspel för klassrummet. Fyrsiffrig kod för att gå med, ingen inloggning, riktig ordöving, hela klassen.',
+    twitterDescription: 'Liveordspel för klassrummet. Kod på sex tecken för att gå med, ingen inloggning, riktig ordöving, hela klassen.',
     heroTag: '★ FÖR LÄRARE ★ GRATIS ATT BÖRJA ★',
     heroPart1: 'Ordspel ',
     heroHighlight1: 'för klassrummet',
@@ -174,7 +174,7 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     featuresTitlePart: 'Vad du ',
     featuresTitleHighlight: 'får',
     features: [
-      { icon: '⚡', text: 'Elever går med på 5 sekunder med en fyrsiffrig kod — ingen inloggning, inget e-postadress' },
+      { icon: '⚡', text: 'Elever går med på 5 sekunder med en kod på sex tecken — ingen inloggning, inget e-postadress' },
       { icon: '🎯', text: 'Tre spellägen: bokstavsnät, ordletare, ordhjul' },
       { icon: '👥', text: 'Direkt flerspelat — hela klassen tillsammans' },
       { icon: '⚔️', text: 'Orddueller ansikte mot ansikte — för par- eller smågruppöving' },
@@ -194,8 +194,8 @@ const contentMap: Record<ClassroomGameLocale, LocaleContent> = {
     faqTitlePart: 'Frågor för ',
     faqTitleHighlight: 'lärare',
     faqs: [
-      { q: 'Vilka är de bästa ordspelen för ett klassrum?', a: 'LexiClash är byggt för klassrummet: eleverna går med en fyrsiffrig kod (ingen registrering), läraren väljer en ordlista och hela klassen spelar tillsammans live på 5–10 minuter. Spelet fungerar i vilken webbläsare som helst och stöder engelska, hebreiska, spanska, svenska, japanska, ryska och ryska — så det fungerar för hebreiska klassrum, ESL-klassrum och språkklassrum också.' },
-      { q: 'Behöver elever öppna ett konto?', a: 'Nej. Eleverna skriver en fyrsiffrig kod som läraren visar och börjar spela omedelbar. Endast lärare öppnar ett gratis konto — för att spara ordlistor och följa klassens framsteg.' },
+      { q: 'Vilka är de bästa ordspelen för ett klassrum?', a: 'LexiClash är byggt för klassrummet: eleverna går med en kod på sex tecken (ingen registrering), läraren väljer en ordlista och hela klassen spelar tillsammans live på 5–10 minuter. Spelet fungerar i vilken webbläsare som helst och stöder engelska, hebreiska, spanska, svenska, japanska, ryska — så det fungerar för hebreiska klassrum, ESL-klassrum och språkklassrum också.' },
+      { q: 'Behöver elever öppna ett konto?', a: 'Nej. Eleverna skriver en kod på sex tecken som läraren visar och börjar spela omedelbar. Endast lärare öppnar ett gratis konto — för att spara ordlistor och följa klassens framsteg.' },
       { q: 'Kan jag ladda upp min egen ordlista?', a: 'Ja. Ladda upp vilken ordlista som helst — från en lektion, ett kapitel eller din läroplan — och spela den som en-mot-en-dueller, en helklassrond eller individuell träning tilldelad elever.' },
       { q: 'Hur skiljer det sig från Quizlet, Kahoot eller Wordwall?', a: 'Quizlet, Kahoot och Wordwall är baserade på flashcards och flervalsfrågor. LexiClash är ett ordbyggespel: eleverna bygger ord på ett bokstavsnät, ordhjul eller anagrambord. Det innebär att de tränar stavning, retrieval och mönsterigenkänning — inte bara att välja från givna svar. Plus: inga elevkonton, och det är helt gratis.' },
       { q: 'Hur lång tid tar en klassrumssession?', a: 'En ordduell tar 2–3 minuter. En helklassrond tar 5–10 minuter. De flesta lärare kör det som en fem minuters klassöppning, ett mentalt vilo under lektionen eller en snabb repetition före klockan.' },

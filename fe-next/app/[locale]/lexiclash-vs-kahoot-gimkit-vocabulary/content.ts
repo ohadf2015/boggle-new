@@ -187,7 +187,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Vilket är det bästa gratis ordspelet för klassrummet?',
-        a: 'För ordförråds- och ordöversiktsträning specifikt är LexiClash gratis för hela klassen utan spelbegränsningar, utan elevloggning och med inbyggda ordböcker på 6 språk (engelska, hebreiska RTL, spanska, svenska, japanska). Kahoot, Gimkit och Vocabulary.com är starka verktyg men begränsar eller prissätter sina gratisversioner: Kahoot begränsar direktspelarna, Gimkit begränsar gratisversionen till 5 elever, och Vocabulary.com har ingen gratis klassrumsversion ($199/klassrum för att börja).',
+        a: 'För ordförråds- och ordöversiktsträning specifikt är LexiClash gratis för hela klassen utan spelbegränsningar, utan elevloggning och med inbyggda ordböcker på 6 språk (engelska, hebreiska RTL, spanska, svenska, japanska, ryska). Kahoot, Gimkit och Vocabulary.com är starka verktyg men begränsar eller prissätter sina gratisversioner: Kahoot begränsar direktspelarna, Gimkit begränsar gratisversionen till 5 elever, och Vocabulary.com har ingen gratis klassrumsversion ($199/klassrum för att börja).',
       },
       {
         q: 'Är LexiClash ett gratis alternativ till Gimkit?',
@@ -207,7 +207,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Vilken är bäst för ESL eller flerspråkiga klassrum?',
-        a: 'LexiClash, utan tvekan: den har inbyggda ordböcker för engelska, hebreiska (full RTL), spanska, svenska och japanska, så ordspel fungerar på målspråket. Kahoot, Gimkit och Vocabulary.com är engelskfokuserade och har inte språkspelmekanik knutna till per-språkordböcker.',
+        a: 'LexiClash, utan tvekan: den har inbyggda ordböcker för engelska, hebreiska (full RTL), spanska, svenska, japanska och ryska, så ordspel fungerar på målspråket. Kahoot, Gimkit och Vocabulary.com är engelskfokuserade och har inte språkspelmekanik knutna till per-språkordböcker.',
       },
       {
         q: 'Kan en hel skola eller ett helt distrikt använda LexiClash?',
@@ -299,7 +299,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'ESL またはマルチリンガルクラス向けはどれが最適ですか？',
-        a: 'LexiClash、圧倒的に：英語、ヘブライ語（完全 RTL）、スペイン語、スウェーデン語、日本語のネイティブ辞書があり、単語ゲームは対象言語で機能します。Kahoot、Gimkit、Vocabulary.com は英語が中心で、言語別辞書に関連する言語ゲームメカニクスがありません。',
+        a: 'LexiClash、圧倒的に：英語、ヘブライ語（完全 RTL）、スペイン語、スウェーデン語、日本語、ロシア語のネイティブ辞書があり、単語ゲームは対象言語で機能します。Kahoot、Gimkit、Vocabulary.com は英語が中心で、言語別辞書に関連する言語ゲームメカニクスがありません。',
       },
       {
         q: '学校全体または地区全体が LexiClash を使用できますか？',
@@ -371,7 +371,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     faqs: [
       {
         q: '¿Cuál es el mejor juego de vocabulario gratuito para el aula?',
-        a: 'Para práctica de palabras y vocabulario específicamente, LexiClash es gratuito para toda la clase sin límite de jugadores, sin inicio de sesión de estudiantes, y con diccionarios nativos en 6 idiomas (inglés, hebreo RTL, español, sueco, japonés). Kahoot, Gimkit y Vocabulary.com son herramientas sólidas pero limitan o fijan el precio de sus versiones gratuitas: Kahoot limita los jugadores en vivo, Gimkit limita la versión gratuita a 5 estudiantes, y Vocabulary.com no tiene una versión de aula verdaderamente gratuita ($199/aula para comenzar).',
+        a: 'Para práctica de palabras y vocabulario específicamente, LexiClash es gratuito para toda la clase sin límite de jugadores, sin inicio de sesión de estudiantes, y con diccionarios nativos en 6 idiomas (inglés, hebreo RTL, español, sueco, japonés, ruso). Kahoot, Gimkit y Vocabulary.com son herramientas sólidas pero limitan o fijan el precio de sus versiones gratuitas: Kahoot limita los jugadores en vivo, Gimkit limita la versión gratuita a 5 estudiantes, y Vocabulary.com no tiene una versión de aula verdaderamente gratuita ($199/aula para comenzar).',
       },
       {
         q: '¿Es LexiClash una alternativa gratuita a Gimkit?',
@@ -391,7 +391,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: '¿Cuál es mejor para aulas ESL o multilingües?',
-        a: 'LexiClash, por mucho: tiene diccionarios nativos para inglés, hebreo (RTL completo), español, sueco y japonés, para que los juegos de palabras funcionen en el idioma de destino. Kahoot, Gimkit y Vocabulary.com están centrados en inglés y no tienen mecánicas de juego de idioma vinculadas a diccionarios por idioma.',
+        a: 'LexiClash, por mucho: tiene diccionarios nativos para inglés, hebreo (RTL completo), español, sueco, japonés y ruso, para que los juegos de palabras funcionen en el idioma de destino. Kahoot, Gimkit y Vocabulary.com están centrados en inglés y no tienen mecánicas de juego de idioma vinculadas a diccionarios por idioma.',
       },
       {
         q: '¿Puede una escuela o distrito completo usar LexiClash?',

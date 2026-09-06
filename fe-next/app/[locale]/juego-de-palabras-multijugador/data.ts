@@ -26,7 +26,7 @@ export const FEATURES = [
   { icon: '📅', text: 'Desafíos diarios con clasificaciones', accent: 'border-neo-pink shadow-hard-pink' },
   { icon: '👹', text: 'Batallas de jefes con giros únicos', accent: 'border-neo-cyan shadow-hard-cyan' },
   { icon: '💸', text: '100 % gratis, sin descargas', accent: 'border-neo-lime shadow-hard-lime' },
-  { icon: '🌍', text: 'Juega en 5 idiomas (EN, HE, SV, JA, ES)', accent: 'border-neo-purple shadow-hard' },
+  { icon: '🌍', text: 'Juega en 6 idiomas (EN, HE, SV, JA, ES)', accent: 'border-neo-purple shadow-hard' },
 ];
 
 export const STEPS = [

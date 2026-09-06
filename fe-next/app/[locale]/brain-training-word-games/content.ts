@@ -87,14 +87,14 @@ export interface BrainLandingCopy {
 
 const en: BrainLandingCopy = {
   metaTitle: 'Free Brain Training Word Games — 5 Drills, 5 Cognitive Domains',
-  metaDescription: 'Free brain training word games online — 5 research-backed drills (60 sec each) targeting processing speed, working memory, attention, flexibility, and vocabulary. No download, no signup, 5 languages.',
+  metaDescription: 'Free brain training word games online — 5 research-backed drills (60 sec each) targeting processing speed, working memory, attention, flexibility, and vocabulary. No download, no signup, 6 languages.',
   metaKeywords: 'brain training games online free, free brain games for adults, word brain games, cognitive exercises online, brain workout games, memory training games, concentration drills, brain drills, mental fitness app free, lumosity alternative free, elevate alternative, free cognitive training, online brain exercises, brain games no download',
   ogTitle: 'Free Brain Training Word Games — 5 Drills, 5 Cognitive Domains',
-  ogDescription: '5 research-backed brain drills, 60 seconds each. Free, no download, 5 languages. A free alternative to Lumosity, Elevate, and Peak.',
+  ogDescription: '5 research-backed brain drills, 60 seconds each. Free, no download, 6 languages. A free alternative to Lumosity, Elevate, and Peak.',
   twitterTitle: 'Free Brain Training Word Games — 60 sec, 5 Domains',
   twitterDescription: '5 research-backed cognitive drills. Free in your browser, no download.',
 
-  marqueeBadges: ['5 DRILLS · 5 DOMAINS', '60 SECONDS EACH', 'RESEARCH-BACKED', 'FREE FOREVER', 'NO DOWNLOAD', 'BROWSER-BASED'],
+  marqueeBadges: ['5 DRILLS · 5 DOMAINS', '60 SECONDS EACH', 'RESEARCH-BACKED', 'FREE TO PLAY', 'NO DOWNLOAD', 'BROWSER-BASED'],
   badge: '★ Free Brain Workout ★',
   h1Pre: 'Free brain training,',
   h1Highlight: '5 drills, 60 seconds each.',
@@ -146,7 +146,7 @@ const en: BrainLandingCopy = {
     { q: 'Are there brain training games for kids or seniors?', a: 'LexiClash drills work for ages 12+ with vocabulary scaled to player skill. For seniors, the Duke crossword research is the closest evidence — short, language-based drills are especially valuable for verbal fluency and lexical retrieval, which decline earlier than other functions. The 60-second drill length is also low-fatigue for older players.' },
     { q: 'Do brain games actually transfer to real-world thinking?', a: 'Honest answer: transfer is modest, not magic. The 2014 Stanford consensus letter cautioned against over-claims, and the 2016 FTC fined Lumosity $2M for unsupported transfer claims. What’s defensible: domain-specific gains (word-finding speed, vocabulary recall, sustained attention on text tasks) do transfer to similar tasks. LexiClash drills don’t promise IQ gains — just measurable improvements on the drills themselves and on adjacent word-based skills.' },
     { q: 'Can I track my brain training progress over time?', a: 'Yes. The brain hub shows your overall brain score, a 5-domain radar chart, daily/weekly/monthly history, drill-specific level progression (5 levels per drill), and a tier badge. Brain score history persists per-account; create a free profile to keep streaks across devices.' },
-    { q: 'What languages do the brain drills support?', a: 'English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary and rare-word frequency data. RTL is fully supported for Hebrew. All cognitive scoring is language-independent — your brain score is portable across the language you train in.' },
+    { q: 'What languages do the brain drills support?', a: 'English, Hebrew, Swedish, Japanese, Spanish, and Russian. Each language has its own dictionary and rare-word frequency data. RTL is fully supported for Hebrew. All cognitive scoring is language-independent — your brain score is portable across the language you train in.' },
   ],
 
   relatedHeading: 'Related',
@@ -169,7 +169,7 @@ const en: BrainLandingCopy = {
   finalCtaSecondary: 'Quick Start: Lightning Round',
 
   videoGameName: 'LexiClash Brain Drills',
-  videoGameDescription: 'Free brain training word games — 5 research-backed cognitive drills (60 seconds each) targeting processing speed, working memory, attention, cognitive flexibility, and vocabulary. Browser-based, no download, no signup, 5 languages.',
+  videoGameDescription: 'Free brain training word games — 5 research-backed cognitive drills (60 seconds each) targeting processing speed, working memory, attention, cognitive flexibility, and vocabulary. Browser-based, no download, no signup, 6 languages.',
   itemListName: '5 Brain Training Drills',
   itemListDescription: 'Five 60-second cognitive drills, each targeting a distinct domain of executive function and language cognition.',
   itemListDescriptions: [
@@ -192,14 +192,14 @@ const en: BrainLandingCopy = {
 
 const he: BrainLandingCopy = {
   metaTitle: 'משחקי אימון מוח חינם — 5 תרגילים, 5 תחומים קוגניטיביים',
-  metaDescription: 'משחקי אימון מוח חינם אונליין — 5 תרגילי מילים מבוססי מחקר (60 שניות כל אחד) שמכוונים למהירות עיבוד, זיכרון עבודה, ריכוז, גמישות ואוצר מילים. בלי הורדה, בלי הרשמה, ב-5 שפות.',
+  metaDescription: 'משחקי אימון מוח חינם אונליין — 5 תרגילי מילים מבוססי מחקר (60 שניות כל אחד) שמכוונים למהירות עיבוד, זיכרון עבודה, ריכוז, גמישות ואוצר מילים. בלי הורדה, בלי הרשמה, ב-6 שפות.',
   metaKeywords: 'משחקי אימון מוח חינם, משחקי מוח לכולם, אימון קוגניטיבי, תרגילי זיכרון, משחקי מילים למוח, lumosity חלופה חינם, אימון מוח אונליין, משחקי ריכוז, תרגילי מוח, אימון מוחי, משחקי חשיבה',
   ogTitle: 'משחקי אימון מוח חינם — 5 תרגילים, 5 תחומים קוגניטיביים',
-  ogDescription: '5 תרגילי מוח מבוססי מחקר, 60 שניות כל אחד. חינם, בלי הורדה, ב-5 שפות. חלופה חינמית ל-Lumosity, Elevate ו-Peak.',
+  ogDescription: '5 תרגילי מוח מבוססי מחקר, 60 שניות כל אחד. חינם, בלי הורדה, ב-6 שפות. חלופה חינמית ל-Lumosity, Elevate ו-Peak.',
   twitterTitle: 'אימון מוח חינם — 60 שניות, 5 תחומים',
   twitterDescription: '5 תרגילים קוגניטיביים מבוססי מחקר. חינם בדפדפן, בלי הורדה.',
 
-  marqueeBadges: ['5 תרגילים · 5 תחומים', '60 שניות לכל אחד', 'מבוסס מחקר', 'חינם לתמיד', 'בלי הורדה', 'בדפדפן'],
+  marqueeBadges: ['5 תרגילים · 5 תחומים', '60 שניות לכל אחד', 'מבוסס מחקר', 'חינם לשחק', 'בלי הורדה', 'בדפדפן'],
   badge: '★ אימון מוח חינם ★',
   h1Pre: 'אימון מוח חינם,',
   h1Highlight: '5 תרגילים, 60 שניות כל אחד.',
@@ -251,7 +251,7 @@ const he: BrainLandingCopy = {
     { q: 'האם יש משחקי אימון מוח לילדים או למבוגרים?', a: 'תרגילי LexiClash מתאימים לגילאי 12+ עם אוצר מילים שמותאם לרמת השחקן. לקשישים, מחקר התשבצים של דיוק הוא הראיה הקרובה ביותר — תרגילי שפה קצרים חשובים במיוחד לשטף מילולי ולשליפה לקסיקלית, שיורדים מוקדם יותר מתפקודים אחרים.' },
     { q: 'האם משחקי מוח באמת מועילים לחשיבה היומיומית?', a: 'תשובה כנה: ההעברה צנועה, לא קסם. ב-2016 ה-FTC קנס את Lumosity ב-2 מיליון דולר על טענות העברה לא מבוססות. מה שכן ניתן להגנה: רווחים ספציפיים לתחום (מהירות מציאת מילים, שליפת אוצר מילים, ריכוז ממושך) באמת מועברים למשימות דומות.' },
     { q: 'האם אני יכול לעקוב אחר ההתקדמות שלי לאורך זמן?', a: 'כן. מרכז המוח מציג את ציון המוח הכולל, תרשים ראדאר של 5 תחומים, היסטוריה יומית/שבועית/חודשית, התקדמות רמה לכל תרגיל (5 רמות לכל תרגיל) ותג דרגה. צרו פרופיל חינם כדי לשמור רצפים בין מכשירים.' },
-    { q: 'אילו שפות תרגילי המוח תומכים?', a: 'אנגלית, עברית, שוודית, יפנית וספרדית. לכל שפה מילון משלה ונתוני תדירות מילים נדירות. RTL נתמך במלואו לעברית. כל הניקוד הקוגניטיבי בלתי תלוי שפה — ציון המוח שלכם נייד בין השפות.' },
+    { q: 'אילו שפות תרגילי המוח תומכים?', a: 'אנגלית, עברית, שוודית, יפנית, ספרדית ורוסית. לכל שפה מילון משלה ונתוני תדירות מילים נדירות. RTL נתמך במלואו לעברית. כל הניקוד הקוגניטיבי בלתי תלוי שפה — ציון המוח שלכם נייד בין השפות.' },
   ],
 
   relatedHeading: 'קשור',
@@ -274,7 +274,7 @@ const he: BrainLandingCopy = {
   finalCtaSecondary: 'התחלה מהירה: Lightning Round',
 
   videoGameName: 'תרגילי המוח של LexiClash',
-  videoGameDescription: 'משחקי אימון מוח מבוססי מילים חינם — 5 תרגילים קוגניטיביים מבוססי מחקר (60 שניות כל אחד) שמכוונים למהירות עיבוד, זיכרון עבודה, ריכוז, גמישות קוגניטיבית ואוצר מילים. בדפדפן, בלי הורדה, בלי הרשמה, ב-5 שפות.',
+  videoGameDescription: 'משחקי אימון מוח מבוססי מילים חינם — 5 תרגילים קוגניטיביים מבוססי מחקר (60 שניות כל אחד) שמכוונים למהירות עיבוד, זיכרון עבודה, ריכוז, גמישות קוגניטיבית ואוצר מילים. בדפדפן, בלי הורדה, בלי הרשמה, ב-6 שפות.',
   itemListName: '5 תרגילי אימון מוח',
   itemListDescription: 'חמישה תרגילים קוגניטיביים בני 60 שניות, כל אחד מכוון לתחום נפרד של תפקוד ניהולי וקוגניציית שפה.',
   itemListDescriptions: [
@@ -297,14 +297,14 @@ const he: BrainLandingCopy = {
 
 const sv: BrainLandingCopy = {
   metaTitle: 'Gratis hjärnträning ordspel — 5 övningar, 5 kognitiva domäner',
-  metaDescription: 'Gratis hjärnträningsspel online — 5 forskningsbaserade övningar (60 sek vardera) som tränar processhastighet, arbetsminne, uppmärksamhet, flexibilitet och ordförråd. Ingen nedladdning, ingen registrering, 5 språk.',
+  metaDescription: 'Gratis hjärnträningsspel online — 5 forskningsbaserade övningar (60 sek vardera) som tränar processhastighet, arbetsminne, uppmärksamhet, flexibilitet och ordförråd. Ingen nedladdning, ingen registrering, 6 språk.',
   metaKeywords: 'gratis hjärnträning, hjärnträning online, ordspel hjärnträning, kognitiva övningar, minnesträning, koncentrationsövningar, lumosity gratis alternativ, elevate alternativ, mental träning, hjärngym, ordspel för minnet',
   ogTitle: 'Gratis hjärnträning ordspel — 5 övningar, 5 kognitiva domäner',
-  ogDescription: '5 forskningsbaserade hjärnövningar, 60 sekunder vardera. Gratis, ingen nedladdning, 5 språk. Ett gratis alternativ till Lumosity, Elevate och Peak.',
+  ogDescription: '5 forskningsbaserade hjärnövningar, 60 sekunder vardera. Gratis, ingen nedladdning, 6 språk. Ett gratis alternativ till Lumosity, Elevate och Peak.',
   twitterTitle: 'Gratis hjärnträning — 60 sek, 5 domäner',
   twitterDescription: '5 forskningsbaserade kognitiva övningar. Gratis i webbläsaren.',
 
-  marqueeBadges: ['5 ÖVNINGAR · 5 DOMÄNER', '60 SEKUNDER VARDERA', 'FORSKNINGSBASERAT', 'GRATIS FÖR ALLTID', 'INGEN NEDLADDNING', 'I WEBBLÄSAREN'],
+  marqueeBadges: ['5 ÖVNINGAR · 5 DOMÄNER', '60 SEKUNDER VARDERA', 'FORSKNINGSBASERAT', 'GRATIS ATT SPELA', 'INGEN NEDLADDNING', 'I WEBBLÄSAREN'],
   badge: '★ Gratis hjärngym ★',
   h1Pre: 'Gratis hjärnträning,',
   h1Highlight: '5 övningar, 60 sek vardera.',
@@ -356,7 +356,7 @@ const sv: BrainLandingCopy = {
     { q: 'Finns det hjärnträningsspel för barn eller äldre?', a: 'LexiClash-övningar fungerar för åldrar 12+ med ordförråd skalat till spelarens nivå. För äldre är Duke korsordsstudien det närmaste beviset — korta språkbaserade övningar är särskilt värdefulla för verbal flyt och lexikal hämtning, som minskar tidigare än andra funktioner.' },
     { q: 'Överförs hjärnspel till verkligt tänkande?', a: 'Ärligt svar: överföringen är blygsam, inte magi. Stanford-konsensusbrevet 2014 varnade mot överdrivna påståenden, och 2016 bötfällde FTC Lumosity med $2M. Det som är försvarbart: domänspecifika vinster (ordfindshastighet, ordförrådsåterkallelse, uthållig uppmärksamhet på textuppgifter) överförs till liknande uppgifter.' },
     { q: 'Kan jag spåra mina hjärnträningsframsteg över tid?', a: 'Ja. Hjärnnavet visar din totala hjärnpoäng, ett 5-domäns radardiagram, daglig/veckovis/månatlig historik, övningsspecifik nivåprogression (5 nivåer per övning) och ett nivåmärke. Skapa en gratis profil för att behålla sviter över enheter.' },
-    { q: 'Vilka språk stöder hjärnövningarna?', a: 'Engelska, hebreiska, svenska, japanska och spanska. Varje språk har sin egen ordbok och sällsynta-ord-frekvensdata. RTL stöds fullständigt för hebreiska. All kognitiv poängsättning är språkoberoende — din hjärnpoäng är portabel mellan språk.' },
+    { q: 'Vilka språk stöder hjärnövningarna?', a: 'Engelska, hebreiska, svenska, japanska, spanska och ryska. Varje språk har sin egen ordbok och sällsynta-ord-frekvensdata. RTL stöds fullständigt för hebreiska. All kognitiv poängsättning är språkoberoende — din hjärnpoäng är portabel mellan språk.' },
   ],
 
   relatedHeading: 'Relaterat',
@@ -379,7 +379,7 @@ const sv: BrainLandingCopy = {
   finalCtaSecondary: 'Snabbstart: Lightning Round',
 
   videoGameName: 'LexiClash Hjärnövningar',
-  videoGameDescription: 'Gratis hjärnträningsordspel — 5 forskningsbaserade kognitiva övningar (60 sekunder vardera) som tränar processhastighet, arbetsminne, uppmärksamhet, kognitiv flexibilitet och ordförråd. Webbläsarbaserad, ingen nedladdning, ingen registrering, 5 språk.',
+  videoGameDescription: 'Gratis hjärnträningsordspel — 5 forskningsbaserade kognitiva övningar (60 sekunder vardera) som tränar processhastighet, arbetsminne, uppmärksamhet, kognitiv flexibilitet och ordförråd. Webbläsarbaserad, ingen nedladdning, ingen registrering, 6 språk.',
   itemListName: '5 hjärnträningsövningar',
   itemListDescription: 'Fem 60-sekunders kognitiva övningar, var och en riktad mot en distinkt domän av exekutiv funktion och språkkognition.',
   itemListDescriptions: [
@@ -402,14 +402,14 @@ const sv: BrainLandingCopy = {
 
 const ja: BrainLandingCopy = {
   metaTitle: '無料の脳トレ単語ゲーム — 5つのドリル、5つの認知領域',
-  metaDescription: '無料の脳トレ単語ゲーム — 処理速度、ワーキングメモリ、注意、柔軟性、語彙を鍛える研究ベースの5ドリル(各60秒)。ダウンロード不要、登録不要、5言語対応。',
+  metaDescription: '無料の脳トレ単語ゲーム — 処理速度、ワーキングメモリ、注意、柔軟性、語彙を鍛える研究ベースの5ドリル(各60秒)。ダウンロード不要、登録不要、6言語対応。',
   metaKeywords: '脳トレゲーム 無料, 無料脳トレ, 単語脳トレ, 認知トレーニング, 記憶トレーニング, 集中力トレーニング, ルモシティ 代替 無料, 脳トレ オンライン, 大人の脳トレ, 言葉のゲーム 脳トレ',
   ogTitle: '無料の脳トレ単語ゲーム — 5つのドリル、5つの認知領域',
-  ogDescription: '研究ベースの5つの脳トレドリル、各60秒。無料、ダウンロード不要、5言語。Lumosity・Elevate・Peakの無料代替。',
+  ogDescription: '研究ベースの5つの脳トレドリル、各60秒。無料、ダウンロード不要、6言語。Lumosity・Elevate・Peakの無料代替。',
   twitterTitle: '無料脳トレ — 60秒、5領域',
   twitterDescription: '研究ベースの5つの認知ドリル。ブラウザで無料、ダウンロード不要。',
 
-  marqueeBadges: ['5ドリル · 5領域', '各60秒', '研究ベース', 'ずっと無料', 'ダウンロード不要', 'ブラウザ対応'],
+  marqueeBadges: ['5ドリル · 5領域', '各60秒', '研究ベース', '無料でプレイ', 'ダウンロード不要', 'ブラウザ対応'],
   badge: '★ 無料の脳トレ ★',
   h1Pre: '無料の脳トレ、',
   h1Highlight: '5ドリル、各60秒。',
@@ -461,7 +461,7 @@ const ja: BrainLandingCopy = {
     { q: '子供や高齢者向けの脳トレはありますか?', a: 'LexiClashドリルは12歳以上で、語彙はプレイヤーのスキルに合わせてスケールされます。高齢者にはデュークのクロスワード研究が最も近い証拠です — 短い言語ベースのドリルは、他の機能より早く低下する言語流暢性と語彙検索に特に価値があります。' },
     { q: '脳ゲームは実世界の思考に転移しますか?', a: '正直な答え: 転移は控えめで、魔法ではありません。2014年のスタンフォードの合意レターは過度の主張に警告し、2016年にFTCはLumosityに200万ドルの罰金を科しました。擁護できるもの: 領域特異的な利得 (単語検索速度、語彙想起、テキスト課題の持続的注意) は類似の課題に転移します。' },
     { q: '脳トレの進捗を時間とともに追跡できますか?', a: 'はい。脳ハブには総合脳スコア、5領域レーダーチャート、毎日/毎週/毎月の履歴、ドリル別レベル進行 (各ドリル5レベル)、ティアバッジが表示されます。デバイス間で連続記録を保持するには無料プロフィールを作成してください。' },
-    { q: '脳ドリルはどの言語をサポートしますか?', a: '英語、ヘブライ語、スウェーデン語、日本語、スペイン語。各言語に独自の辞書とレア単語頻度データがあります。ヘブライ語のRTLは完全にサポートされます。すべての認知スコアは言語独立です — 脳スコアは言語間で持ち運び可能です。' },
+    { q: '脳ドリルはどの言語をサポートしますか?', a: '英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語。各言語に独自の辞書とレア単語頻度データがあります。ヘブライ語のRTLは完全にサポートされます。すべての認知スコアは言語独立です — 脳スコアは言語間で持ち運び可能です。' },
   ],
 
   relatedHeading: '関連',
@@ -484,7 +484,7 @@ const ja: BrainLandingCopy = {
   finalCtaSecondary: 'クイックスタート: Lightning Round',
 
   videoGameName: 'LexiClash 脳ドリル',
-  videoGameDescription: '無料の脳トレ単語ゲーム — 処理速度、ワーキングメモリ、注意、認知的柔軟性、語彙を鍛える研究ベースの5つの認知ドリル (各60秒)。ブラウザベース、ダウンロード不要、登録不要、5言語。',
+  videoGameDescription: '無料の脳トレ単語ゲーム — 処理速度、ワーキングメモリ、注意、認知的柔軟性、語彙を鍛える研究ベースの5つの認知ドリル (各60秒)。ブラウザベース、ダウンロード不要、登録不要、6言語。',
   itemListName: '5つの脳トレドリル',
   itemListDescription: '5つの60秒の認知ドリル、それぞれが実行機能と言語認知の異なる領域を対象としています。',
   itemListDescriptions: [
@@ -507,14 +507,14 @@ const ja: BrainLandingCopy = {
 
 const es: BrainLandingCopy = {
   metaTitle: 'Juegos de entrenamiento cerebral gratis — 5 ejercicios, 5 dominios cognitivos',
-  metaDescription: 'Juegos de entrenamiento cerebral gratis online — 5 ejercicios respaldados por investigación (60 seg cada uno) que entrenan velocidad de procesamiento, memoria de trabajo, atención, flexibilidad y vocabulario. Sin descarga, sin registro, 5 idiomas.',
+  metaDescription: 'Juegos de entrenamiento cerebral gratis online — 5 ejercicios respaldados por investigación (60 seg cada uno) que entrenan velocidad de procesamiento, memoria de trabajo, atención, flexibilidad y vocabulario. Sin descarga, sin registro, 6 idiomas.',
   metaKeywords: 'juegos de entrenamiento cerebral gratis, juegos cerebrales gratis adultos, juegos de palabras cerebro, ejercicios mentales online, entrenamiento cognitivo gratis, juegos de memoria, ejercicios de concentración, alternativa lumosity gratis, alternativa elevate, gimnasio mental, juegos para el cerebro',
   ogTitle: 'Juegos de entrenamiento cerebral gratis — 5 ejercicios, 5 dominios cognitivos',
-  ogDescription: '5 ejercicios cerebrales respaldados por investigación, 60 segundos cada uno. Gratis, sin descarga, 5 idiomas. Una alternativa gratis a Lumosity, Elevate y Peak.',
+  ogDescription: '5 ejercicios cerebrales respaldados por investigación, 60 segundos cada uno. Gratis, sin descarga, 6 idiomas. Una alternativa gratis a Lumosity, Elevate y Peak.',
   twitterTitle: 'Entrenamiento cerebral gratis — 60 seg, 5 dominios',
   twitterDescription: '5 ejercicios cognitivos respaldados por investigación. Gratis en el navegador.',
 
-  marqueeBadges: ['5 EJERCICIOS · 5 DOMINIOS', '60 SEGUNDOS CADA UNO', 'RESPALDADO POR CIENCIA', 'GRATIS PARA SIEMPRE', 'SIN DESCARGA', 'EN EL NAVEGADOR'],
+  marqueeBadges: ['5 EJERCICIOS · 5 DOMINIOS', '60 SEGUNDOS CADA UNO', 'RESPALDADO POR CIENCIA', 'GRATIS PARA JUGAR', 'SIN DESCARGA', 'EN EL NAVEGADOR'],
   badge: '★ Gimnasio cerebral gratis ★',
   h1Pre: 'Entrenamiento cerebral gratis,',
   h1Highlight: '5 ejercicios, 60 segundos cada uno.',
@@ -566,7 +566,7 @@ const es: BrainLandingCopy = {
     { q: '¿Hay juegos de entrenamiento cerebral para niños o personas mayores?', a: 'Los ejercicios de LexiClash funcionan para edades 12+, con vocabulario escalado al nivel del jugador. Para personas mayores, la investigación de crucigramas de Duke es la evidencia más cercana — los ejercicios cortos basados en lenguaje son especialmente valiosos para la fluidez verbal y la recuperación léxica, que disminuyen antes que otras funciones.' },
     { q: '¿Los juegos cerebrales realmente se transfieren al pensamiento del mundo real?', a: 'Respuesta honesta: la transferencia es modesta, no mágica. La carta de consenso de Stanford de 2014 advirtió contra exageraciones, y en 2016 la FTC multó a Lumosity con $2M. Lo defendible: las ganancias específicas del dominio (velocidad de búsqueda de palabras, recuerdo de vocabulario, atención sostenida en tareas de texto) sí se transfieren a tareas similares.' },
     { q: '¿Puedo seguir mi progreso de entrenamiento cerebral con el tiempo?', a: 'Sí. El centro cerebral muestra tu puntaje cerebral general, gráfico radar de 5 dominios, historial diario/semanal/mensual, progresión de nivel específica del ejercicio (5 niveles por ejercicio) y una insignia de nivel. Crea un perfil gratis para mantener rachas entre dispositivos.' },
-    { q: '¿Qué idiomas admiten los ejercicios cerebrales?', a: 'Inglés, hebreo, sueco, japonés y español. Cada idioma tiene su propio diccionario y datos de frecuencia de palabras raras. RTL es totalmente compatible con hebreo. Toda la puntuación cognitiva es independiente del idioma — tu puntaje cerebral es portable entre idiomas.' },
+    { q: '¿Qué idiomas admiten los ejercicios cerebrales?', a: 'Inglés, hebreo, sueco, japonés, español y ruso. Cada idioma tiene su propio diccionario y datos de frecuencia de palabras raras. RTL es totalmente compatible con hebreo. Toda la puntuación cognitiva es independiente del idioma — tu puntaje cerebral es portable entre idiomas.' },
   ],
 
   relatedHeading: 'Relacionado',
@@ -589,7 +589,7 @@ const es: BrainLandingCopy = {
   finalCtaSecondary: 'Inicio rápido: Lightning Round',
 
   videoGameName: 'Ejercicios cerebrales LexiClash',
-  videoGameDescription: 'Juegos de entrenamiento cerebral con palabras gratis — 5 ejercicios cognitivos respaldados por investigación (60 segundos cada uno) que abordan velocidad de procesamiento, memoria de trabajo, atención, flexibilidad cognitiva y vocabulario. Basado en navegador, sin descarga, sin registro, 5 idiomas.',
+  videoGameDescription: 'Juegos de entrenamiento cerebral con palabras gratis — 5 ejercicios cognitivos respaldados por investigación (60 segundos cada uno) que abordan velocidad de procesamiento, memoria de trabajo, atención, flexibilidad cognitiva y vocabulario. Basado en navegador, sin descarga, sin registro, 6 idiomas.',
   itemListName: '5 ejercicios de entrenamiento cerebral',
   itemListDescription: 'Cinco ejercicios cognitivos de 60 segundos, cada uno apuntando a un dominio distinto de función ejecutiva y cognición lingüística.',
   itemListDescriptions: [
@@ -612,14 +612,14 @@ const es: BrainLandingCopy = {
 
 const ru: BrainLandingCopy = {
   metaTitle: 'Бесплатные игры для тренировки мозга — 5 упражнений, 5 когнитивных областей',
-  metaDescription: 'Бесплатные игры для тренировки мозга онлайн — 5 научно обоснованных упражнений (по 60 сек каждое) для развития скорости обработки, рабочей памяти, внимания, когнитивной гибкости и словарного запаса. Без скачивания, без регистрации, 5 языков.',
+  metaDescription: 'Бесплатные игры для тренировки мозга онлайн — 5 научно обоснованных упражнений (по 60 сек каждое) для развития скорости обработки, рабочей памяти, внимания, когнитивной гибкости и словарного запаса. Без скачивания, без регистрации, 6 языков.',
   metaKeywords: 'игры для тренировки мозга, бесплатные головоломки, развивающие игры, когнитивные упражнения, тренировка памяти, упражнения на концентрацию, головоломки со словами, альтернатива lumosity, тренировка мышления, игры для мозга, словесные игры',
   ogTitle: 'Бесплатные игры для тренировки мозга — 5 упражнений, 5 когнитивных областей',
-  ogDescription: '5 научно обоснованных упражнений для мозга, по 60 секунд каждое. Бесплатно, без скачивания, 5 языков. Альтернатива Lumosity, Elevate и Peak.',
+  ogDescription: '5 научно обоснованных упражнений для мозга, по 60 секунд каждое. Бесплатно, без скачивания, 6 языков. Альтернатива Lumosity, Elevate и Peak.',
   twitterTitle: 'Тренировка мозга — 60 сек, 5 областей',
   twitterDescription: '5 научно обоснованных когнитивных упражнений. Бесплатно в браузере.',
 
-  marqueeBadges: ['5 УПРАЖНЕНИЙ · 5 ОБЛАСТЕЙ', 'ПО 60 СЕКУНД', 'НАУЧНЫЙ ПОДХОД', 'ВСЕГДА БЕСПЛАТНО', 'БЕЗ СКАЧИВАНИЯ', 'В БРАУЗЕРЕ'],
+  marqueeBadges: ['5 УПРАЖНЕНИЙ · 5 ОБЛАСТЕЙ', 'ПО 60 СЕКУНД', 'НАУЧНЫЙ ПОДХОД', 'БЕСПЛАТНАЯ ИГРА', 'БЕЗ СКАЧИВАНИЯ', 'В БРАУЗЕРЕ'],
   badge: '★ Бесплатный фитнес для мозга ★',
   h1Pre: 'Тренировка мозга,',
   h1Highlight: '5 упражнений, по 60 секунд.',
@@ -671,7 +671,7 @@ const ru: BrainLandingCopy = {
     { q: 'Есть ли игры для тренировки мозга для детей или пожилых людей?', a: 'Упражнения LexiClash подходят для 12+ лет со словарным запасом, адаптированным к уровню игрока. Для пожилых людей исследование кроссвордов Дьюка — ближайшее доказательство — короткие упражнения на основе языка особенно ценны для вербальной беглости и извлечения слов, которые снижаются раньше других функций.' },
     { q: 'Игры для мозга действительно помогают в реальном мышлении?', a: 'Честный ответ: перенос умений скромен, не волшебен. Письмо консенсуса Стэнфорда 2014 года предупреждало против чрезмерных заявлений, и в 2016 году FTC оштрафовала Lumosity на $2 млн. Что можно защитить: специфичные для области улучшения (скорость поиска слов, вспоминание словарного запаса, устойчивое внимание на текстовых задачах) переносятся на похожие задачи.' },
     { q: 'Я могу отслеживать мой прогресс тренировки мозга со временем?', a: 'Да. Центр мозга показывает общий балл мозга, радарную диаграмму 5 областей, ежедневную/еженедельную/ежемесячную историю, специфичную прогрессию уровня упражнения (5 уровней за упражнение) и значок уровня. Создай бесплатный профиль, чтобы сохранить серии на разных устройствах.' },
-    { q: 'Какие языки поддерживают упражнения для мозга?', a: 'Английский, иврит, шведский, японский и испанский. Каждый язык имеет свой словарь и данные частоты редких слов. RTL полностью поддерживается для иврита. Все когнитивные баллы независимы от языка — твой балл мозга портативен между языками.' },
+    { q: 'Какие языки поддерживают упражнения для мозга?', a: 'Английский, иврит, шведский, японский, испанский и русский. Каждый язык имеет свой словарь и данные частоты редких слов. RTL полностью поддерживается для иврита. Все когнитивные баллы независимы от языка — твой балл мозга портативен между языками.' },
   ],
 
   relatedHeading: 'Связанное',
@@ -694,7 +694,7 @@ const ru: BrainLandingCopy = {
   finalCtaSecondary: 'Быстрый старт: Lightning Round',
 
   videoGameName: 'Упражнения для мозга LexiClash',
-  videoGameDescription: 'Бесплатные игры для тренировки мозга со словами — 5 научно обоснованных когнитивных упражнений (по 60 секунд каждое) для развития скорости обработки, рабочей памяти, внимания, когнитивной гибкости и словарного запаса. В браузере, без скачивания, без регистрации, 5 языков.',
+  videoGameDescription: 'Бесплатные игры для тренировки мозга со словами — 5 научно обоснованных когнитивных упражнений (по 60 секунд каждое) для развития скорости обработки, рабочей памяти, внимания, когнитивной гибкости и словарного запаса. В браузере, без скачивания, без регистрации, 6 языков.',
   itemListName: '5 упражнений для тренировки мозга',
   itemListDescription: 'Пять 60-секундных когнитивных упражнений, каждое нацелено на отдельную область исполнительной функции и языковой когниции.',
   itemListDescriptions: [

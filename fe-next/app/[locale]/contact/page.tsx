@@ -31,7 +31,7 @@ const contactSeoContent: Record<string, {
       'Partnership inquiries welcome — game portals, education platforms, language-learning apps, content creators',
       'Press and media contact for interviews, reviews, screenshots, and brand assets',
       'School and classroom inquiries — we offer free educator accounts and bulk word-list customization',
-      'Available in English, Hebrew, Swedish, Japanese, and Spanish — write in any language we support',
+      'Available in English, Hebrew, Swedish, Japanese, Spanish, and Russian — write in any language we support',
       'Privacy and data deletion requests handled within 30 days per GDPR and CCPA requirements',
     ],
     faq: [
@@ -53,7 +53,7 @@ const contactSeoContent: Record<string, {
       {
         question: 'Do you accept translation contributions or community localizations?',
         answer:
-          'Yes — LexiClash currently supports English, Hebrew, Swedish, Japanese, and Spanish, all maintained in collaboration with native speakers. If you are fluent in a language not yet supported and want to help bring LexiClash to your community, email us with your background and the language you want to add. We share the translation files, review a sample, and credit contributors in the About page.',
+          'Yes — LexiClash currently supports English, Hebrew, Swedish, Japanese, Spanish, and Russian, all maintained in collaboration with native speakers. If you are fluent in a language not yet supported and want to help bring LexiClash to your community, email us with your background and the language you want to add. We share the translation files, review a sample, and credit contributors in the About page.',
       },
       {
         question: 'Can teachers, schools, or libraries use LexiClash for classroom programs?',
@@ -109,7 +109,7 @@ const contactSeoContent: Record<string, {
       'Запросы партнерства приветствуются — игровые порталы, образовательные платформы, приложения для изучения языков, создатели контента',
       'Контакт для прессы и СМИ для интервью, рецензий, скриншотов и материалов бренда',
       'Запросы школ и классов — мы предлагаем бесплатные учетные записи преподавателей и настройку списков слов',
-      'Доступно на английском, иврите, шведском, японском и испанском языках — напишите на любом поддерживаемом языке',
+      'Доступно на английском, иврите, шведском, японском, испанском и русском языках — напишите на любом поддерживаемом языке',
       'Запросы на удаление данных обрабатываются в течение 30 дней в соответствии с требованиями GDPR и CCPA',
     ],
     faq: [
@@ -127,7 +127,7 @@ const contactSeoContent: Record<string, {
       },
       {
         question: 'Принимаете ли вы вклады переводов или локализации сообществом?',
-        answer: 'Да — LexiClash в настоящее время поддерживает английский, иврит, шведский, японский и испанский языки, все поддерживаемые в сотрудничестве с носителями языков. Если вы свободно говорите на языке, который еще не поддерживается, напишите нам.',
+        answer: 'Да — LexiClash в настоящее время поддерживает английский, иврит, шведский, японский, испанский и русский языки, все поддерживаемые в сотрудничестве с носителями языков. Если вы свободно говорите на языке, который еще не поддерживается, напишите нам.',
       },
       {
         question: 'Могут ли учителя, школы или библиотеки использовать LexiClash для школьных программ?',

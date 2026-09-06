@@ -83,7 +83,7 @@ interface HostPreGameViewProps {
   roomLanguage: Language;
   language: Language;
   username: string;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   timerValue: number;
   setTimerValue: React.Dispatch<React.SetStateAction<number>>;
   timerDirection: number;

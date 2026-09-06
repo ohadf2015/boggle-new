@@ -140,7 +140,7 @@ export default async function JapaneseWordGamePage({ params }: PageProps) {
               '日々の挑戦とリーダーボード',
               'ユニークなツイストを持つボスバトル',
               '完全無料、ダウンロード不要',
-              '5つの言語でプレイ（EN, HE, SV, JA, ES）',
+              '6つの言語でプレイ（EN, HE, SV, JA, ES）',
             ].map((feature) => (
               <div
                 key={feature}

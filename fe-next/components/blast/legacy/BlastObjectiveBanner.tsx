@@ -9,7 +9,7 @@ import type { BlastObjectiveProgress, BlastTileType } from './types';
 
 interface BlastObjectiveBannerProps {
   objectives: BlastObjectiveProgress[];
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
 }
 
 /**
@@ -77,7 +77,7 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
       data-testid="blast-objective-banner"
       className="flex flex-col gap-1 px-3 py-1.5 bg-neo-navy-light/80 border-b-2 border-neo-black"
       role="region"
-      aria-label={t('blast.objective.bannerTitle') || 'Goals'}
+      aria-label={t('blast.objective.bannerTitle', 'Goals')}
     >
       {visible.map((p, i) => {
         const isTargetWord = p.objective.type === 'target_word';

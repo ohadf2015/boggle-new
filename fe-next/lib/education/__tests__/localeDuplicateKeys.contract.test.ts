@@ -22,12 +22,14 @@ import { join } from 'node:path';
 const LOCALES = ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const;
 
 /**
- * Only the branches the education parity contract already covers. Other
- * branches have their own pre-existing collisions (`sealedBid.shareCard`,
- * `sealedBid.session`, `leaderboard.referral`) that belong to other owners;
- * failing on those here would block this suite on someone else's bug.
+ * Only the branches the education parity contract already covers, plus
+ * `sealedBid` and `leaderboard` — both had the exact same collision
+ * (`sealedBid.shareCard`, `sealedBid.session`, `leaderboard.referral`
+ * each declared twice, second block silently winning) and are now fixed
+ * in all six locales, so the guard was extended here rather than left as
+ * a TODO for "someone else's bug".
  */
-const GUARDED_PARENTS = new Set(['education', 'teacher', 'student']);
+const GUARDED_PARENTS = new Set(['education', 'teacher', 'student', 'sealedBid', 'leaderboard']);
 
 const TOP_LEVEL = /^ {2}"([A-Za-z0-9_]+)": \{/;
 const CHILD = /^ {4}"([A-Za-z0-9_]+)": \{/;
@@ -100,7 +102,7 @@ describe('locale files declare each guarded object once', () => {
   });
 
   for (const locale of LOCALES) {
-    it(`${locale} declares every education / teacher / student child once`, () => {
+    it(`${locale} declares every education / teacher / student / sealedBid / leaderboard child once`, () => {
       const source = readFileSync(
         join(__dirname, '..', '..', '..', 'translations', `${locale}.js`),
         'utf8'

@@ -193,6 +193,16 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     }
   };
 
+  /**
+   * A held tap whose ONLY remaining blocker is the student's own name.
+   *
+   * The replay below waits on two things, and one of them can never resolve on
+   * its own: a guest who tapped JOIN before the session settled, without having
+   * given a name, would sit under a "preparing" line forever. The form was
+   * waiting on THEM, and never said so.
+   */
+  const queuedNeedsName = queuedJoin && !isAuthResolving && !isSubmitting && isGuest && !name.trim();
+
   // Replay a tap that landed before the form could act on it. Waits for the
   // session AND for whatever that tap was still missing — a guest name — so the
   // student is never told off for a race they did not cause. Fires once.
@@ -380,8 +390,16 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               </Button>
 
               {/* A disabled button with no explanation is the same dead end in a
-                  different costume. Say what is being waited on. */}
-              {(isAuthResolving || queuedJoin) && (
+                  different costume. Say what is being waited on — and say the
+                  RIGHT thing: a held tap whose only remaining blocker is the
+                  student's own name must ask for the name, not claim to be
+                  busy. "Preparing" forever is the silent no-op with a spinner
+                  painted on it. */}
+              {queuedNeedsName ? (
+                <p role="status" className="text-center text-sm font-neo-body font-bold text-neo-lime">
+                  {t('education.student.join.queuedNeedsName')}
+                </p>
+              ) : (isAuthResolving || queuedJoin) && (
                 <p className="text-center text-sm font-neo-body text-neo-white/70">
                   {t('education.student.join.preparing')}
                 </p>

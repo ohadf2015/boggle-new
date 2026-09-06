@@ -53,7 +53,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gettingStarted',
         question: 'What is LexiClash?',
-        answer: 'LexiClash is a multiplayer word game where you compete against friends or AI opponents to find words on a shared board. Play solo, challenge daily puzzles, or compete in real-time multiplayer matches across Hebrew, English, Swedish, Japanese, and Spanish.',
+        answer: 'LexiClash is a multiplayer word game where you compete against friends or AI opponents to find words on a shared board. Play solo, challenge daily puzzles, or compete in real-time multiplayer matches across Hebrew, English, Swedish, Japanese, Spanish, and Russian.',
       },
       {
         category: 'gettingStarted',
@@ -83,7 +83,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gameplay',
         question: 'Can I play in multiple languages?',
-        answer: 'Yes! LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish. You can switch languages in Settings. Each language has its own word dictionary and leaderboards.',
+        answer: 'Yes! LexiClash supports Hebrew, English, Swedish, Japanese, Spanish, and Russian. You can switch languages in Settings. Each language has its own word dictionary and leaderboards.',
       },
       {
         category: 'technical',
@@ -155,7 +155,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gettingStarted',
         question: 'מה זה LexiClash?',
-        answer: 'LexiClash הוא משחק מילים מרובה משתתפים שבו מתחרים מול חברים או מול יריבי מחשב כדי למצוא מילים על לוח משותף. אפשר לשחק לבד, להתמודד באתגר היומי, או להתחרות בזמן אמת — בעברית, אנגלית, שוודית, יפנית וספרדית.',
+        answer: 'LexiClash הוא משחק מילים מרובה משתתפים שבו מתחרים מול חברים או מול יריבי מחשב כדי למצוא מילים על לוח משותף. אפשר לשחק לבד, להתמודד באתגר היומי, או להתחרות בזמן אמת — בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית.',
       },
       {
         category: 'gettingStarted',
@@ -185,7 +185,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gameplay',
         question: 'אפשר לשחק בכמה שפות?',
-        answer: 'כן! LexiClash תומך בעברית, אנגלית, שוודית, יפנית וספרדית. מחליפים שפה בהגדרות, ולכל שפה יש מילון משלה וטבלאות מובילים נפרדות.',
+        answer: 'כן! LexiClash תומך בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית. מחליפים שפה בהגדרות, ולכל שפה יש מילון משלה וטבלאות מובילים נפרדות.',
       },
       {
         category: 'technical',
@@ -563,7 +563,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gettingStarted',
         question: 'Что такое LexiClash?',
-        answer: 'LexiClash — это многопользовательская игра в слова, где вы соревнуетесь с друзьями или ИИ противниками в поиске слов на общем игровом поле. Играйте в одиночку, принимайте участие в ежедневных испытаниях или соревнуйтесь в реальном времени на иврите, английском, шведском, японском и испанском языках.',
+        answer: 'LexiClash — это многопользовательская игра в слова, где вы соревнуетесь с друзьями или ИИ противниками в поиске слов на общем игровом поле. Играйте в одиночку, принимайте участие в ежедневных испытаниях или соревнуйтесь в реальном времени на иврите, английском, шведском, японском, испанском и русском языках.',
       },
       {
         category: 'gettingStarted',
@@ -593,7 +593,7 @@ export const contentByLocale: Record<string, FAQContent> = {
       {
         category: 'gameplay',
         question: 'Можно ли играть на разных языках?',
-        answer: 'Да! LexiClash поддерживает иврит, английский, шведский, японский и испанский языки. Вы можете изменить язык в настройках. Каждый язык имеет свой собственный словарь и таблицы лидеров.',
+        answer: 'Да! LexiClash поддерживает иврит, английский, шведский, японский, испанский и русский языки. Вы можете изменить язык в настройках. Каждый язык имеет свой собственный словарь и таблицы лидеров.',
       },
       {
         category: 'technical',

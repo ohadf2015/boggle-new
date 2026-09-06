@@ -64,8 +64,8 @@ const es = {
     "pro": "Pro",
     "month": "mes",
     "recommended": "Recomendado",
-    "free_1": "Hasta 5 alumnos por clase",
-    "free_2": "1 aula",
+    "free_1": "Hasta 50 alumnos por clase",
+    "free_2": "Hasta 3 aulas",
     "free_3": "Modos de juego básicos",
     "pro_1": "Alumnos ilimitados por clase",
     "pro_2": "Aulas ilimitadas",
@@ -5620,14 +5620,6 @@ const es = {
     "topPercent": "Top {percent}%",
     "noRankYet": "¡Juega partidas para clasificarte!",
     "comingSoon": "¡Muy pronto! Estamos preparando la tabla de clasificación.",
-    "referral": {
-      "inviteFriends": "¡Invita a amigos y gana recompensas!",
-      "subtitle": "Comparte tu código y ambos ganáis 100 XP + 50 monedas cuando jueguen.",
-      "shareText": "🎮 ¡Juega a LexiClash conmigo! Te reto a un duelo de palabras.",
-      "copied": "¡Enlace copiado!",
-      "friendsJoined": "amigos se unieron",
-      "noReferralsYet": "Aún no hay invitados"
-    },
     "viewLeaderboard": "Ver Clasificación",
     "friends": "Amigos",
     "noFriendsPlayed": "¡Ninguno de tus amigos ha jugado hoy todavía!",
@@ -6306,7 +6298,7 @@ const es = {
       },
       "stepLabel": "Paso",
       "whatIsTitle": "Que es LexiClash?",
-      "whatIsContent": "LexiClash es un juego de palabras multijugador gratuito y rapido que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real en una cuadricula de letras compartida: encuentra palabras, construye combos y sube en la clasificacion. Es como Boggle y Wordle, pero multijugador. Sin descargas, sin registro. Disponible en ingles, hebreo, sueco, japones y espanol.",
+      "whatIsContent": "LexiClash es un juego de palabras multijugador gratuito y rapido que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real en una cuadricula de letras compartida: encuentra palabras, construye combos y sube en la clasificacion. Es como Boggle y Wordle, pero multijugador. Sin descargas, sin registro. Disponible en ingles, hebreo, sueco, japones, espanol y ruso.",
       "whatIsShort": "Batallas de palabras multijugador gratis en tu navegador. Encuentra palabras, arma combos, aplasta a tus amigos. Sin descargas, sin registro.",
       "featuresTitle": "Por que a los jugadores les encanta LexiClash",
       "feature1Title": "Multijugador en tiempo real",
@@ -6316,7 +6308,7 @@ const es = {
       "feature3Title": "Modo aventura",
       "feature3Desc": "100 niveles en 10 mundos tematicos. Fichas especiales, batallas contra jefes y potenciadores.",
       "feature4Title": "6 idiomas",
-      "feature4Desc": "Juega en ingles, hebreo, sueco, japones o espanol. Cambia en cualquier momento y desafia a amigos en diferentes idiomas.",
+      "feature4Desc": "Juega en ingles, hebreo, sueco, japones, espanol o ruso. Cambia en cualquier momento y desafia a amigos en diferentes idiomas.",
       "feature4TitleShort": "Modo Blast",
       "modeTagMultiplayer": "2-20 jugadores",
       "modeTagDaily": "Nuevo puzzle cada dia",
@@ -6350,7 +6342,7 @@ const es = {
       "faq2Q": "¿Necesito crear una cuenta?",
       "faq2A": "No. Puedes jugar como invitado al instante. Crear una cuenta (vía Google o Discord) desbloquea funciones como clasificaciones, seguimiento de logros y sincronización de progreso entre dispositivos.",
       "faq3Q": "¿Qué idiomas se admiten?",
-      "faq3A": "LexiClash admite inglés, hebreo, sueco, japonés y español. Cada idioma tiene su propio diccionario, desafíos diarios y clasificaciones. Puedes cambiar de idioma en cualquier momento desde el menú de configuración.",
+      "faq3A": "LexiClash admite inglés, hebreo, sueco, japonés, español y ruso. Cada idioma tiene su propio diccionario, desafíos diarios y clasificaciones. Puedes cambiar de idioma en cualquier momento desde el menú de configuración.",
       "faq4Q": "¿Puedo jugar en mi teléfono?",
       "faq4A": "Por supuesto. LexiClash es totalmente responsivo y funciona en cualquier navegador móvil moderno. Desliza letras para formar palabras — los controles táctiles están diseñados específicamente para el juego móvil.",
       "faq5Q": "¿Es seguro para niños?",
@@ -12380,7 +12372,8 @@ const es = {
       "joining": "Uniéndose...",
       "listening": "Esperando juegos de clase...",
       "connecting": "Conectando al aula...",
-      "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí"
+      "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí",
+      "joinFailed": "No pudimos meterte — puede que la partida ya haya terminado. Pídele el código a tu profe."
     },
     "playWithClass": {
       "title": "Jugar con la clase",
@@ -12579,6 +12572,10 @@ const es = {
       "giftEnded": "El regalo Pro terminó"
     },
     "proGate": {
+      "analytics": {
+        "title": "Mira cómo va de verdad tu clase",
+        "body": "Con Pro cada partida se convierte en una radiografía de tu clase: qué palabras se afianzan, qué alumnos se atascan y cuánto ha avanzado cada uno desde septiembre. Llévalo a una reunión de padres o de departamento."
+      },
       "cta": "Desbloquéalo con Pro: ${{price}}/mes"
     },
     "subscription": {
@@ -12609,7 +12606,7 @@ const es = {
       "trustDataSafe": "Tus datos están a salvo",
       "trustReminder": "Correo de aviso antes de cada cobro",
       "freePlanName": "Free",
-      "freeForever": "Gratis para siempre, siempre disponible",
+      "freeForever": "Plan gratuito, sin caducidad",
       "freeClasses": "Hasta {count} clase",
       "freeStudents": "Hasta {count} estudiantes por clase",
       "proPlanName": "Teacher Pro",
@@ -13159,7 +13156,17 @@ const es = {
       "wheelRush": "Forma palabras con una sola rueda de letras",
       "vocabQuiz": "Preguntas de cuatro opciones con tus propias palabras"
     },
+    "wordTowerPractice": {
+      "unavailable": "Las palabras de esta lección aún no pueden construir una torre. Hacen falta al menos 4 palabras de 4 a 6 letras.",
+      "done": "Listo",
+      "progress": "{{found}} de {{total}} palabras de la lista",
+      "height": "{{height}} m · {{floors}} pisos",
+      "hit": "¡Palabra de la lista! {{word}}"
+    },
     "practicePicker": {
+      "name": {
+        "word_tower": "Torre de palabras"
+      },
       "title": "Elige tu práctica",
       "readyCount": "{{ready}} de {{total}} listas para jugar",
       "questions": "{{count}} preguntas",
@@ -13168,6 +13175,7 @@ const es = {
       "played": "jugada {{count}} veces",
       "nothingReady": "Esta lección todavía no tiene palabras. Pídeselas a tu profe y vuelve.",
       "skill": {
+        "word_tower": "Forma palabras con las letras de la lista de esta semana",
         "solo_board": "Encuentra las palabras de la lección en la cuadrícula",
         "warmup": "Una ronda corta para entrar en calor",
         "blitz": "Gánale al reloj con todas las palabras que puedas",
@@ -13183,6 +13191,7 @@ const es = {
         "roots_affixes": "Qué significan las partes de la palabra"
       },
       "locked": {
+        "word_tower": "Necesita 4 palabras de la lista de 4 a 6 letras",
         "solo_board": "Añade palabras a esta lección para desbloquear",
         "warmup": "Añade palabras a esta lección para desbloquear",
         "blitz": "Añade palabras a esta lección para desbloquear",
@@ -13505,6 +13514,7 @@ const es = {
       "yesterday": "Ayer"
     },
     "classroomGame": {
+      "classroomLessonLabel": "{{classroom}} · partida en vivo: {{lesson}}",
       "classCode": "Código del juego",
       "classroomNotFound": "Clase no encontrada",
       "classroomSession": "Sesión de clase",
@@ -13594,7 +13604,7 @@ const es = {
         "noAds": "Sin anuncios para tus estudiantes",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos de palabras en vivo",
-        "freeForever": "Gratis para siempre. Sin tarjeta y sin cuenta atrás.",
+        "freeForever": "El plan gratuito no caduca. Sin tarjeta y sin cuenta atrás.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Todo lo del plan Gratis",
         "classLimitPro": "Clases ilimitadas",
@@ -13976,6 +13986,7 @@ const es = {
         "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "codePasted": "¡Código pegado!",
         "preparing": "Preparando todo, un momento.",
+        "queuedNeedsName": "Ya casi — escribe tu nombre arriba y entramos directos.",
         "emptyClipboard": "No hay nada copiado",
         "clipboardError": "No se pudo leer el portapapeles",
         "nameLabel": "Tu nombre",
@@ -14140,7 +14151,7 @@ const es = {
       "auth_required_body": "El acceso docente está vinculado a una cuenta verificada. Crea una cuenta gratis o inicia sesión y seguimos justo aquí.",
       "auth_required_cta": "Crear mi cuenta docente gratis",
       "trust_instant": "Acceso al instante — sin cola de revisión",
-      "trust_free": "Gratis para docentes, para siempre",
+      "trust_free": "Plan docente gratuito, sin caducidad",
       "trust_nologins": "Sin cuentas de estudiantes, sin configuración",
       "cta_micro": "Tarda 60 segundos · Sin tarjeta de crédito",
       "hero_alt": "La mascota de LexiClash da la bienvenida a un aula de cubos de letras",
@@ -16911,7 +16922,12 @@ const es = {
     "shareCard": {
       "title": "Tu historia de engaños",
       "cta": "Compartir resultado",
-      "copied": "¡Copiado!"
+      "copied": "¡Copiado!",
+      "header": "🎯 Puja sellada — {score} pts",
+      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
+      "url": "lexiclash.live/es/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "vs"
     },
     "session": {
       "title": "Contador de bluffs",
@@ -16920,6 +16936,7 @@ const es = {
       "clashLabel": "Choque",
       "passLabel": "Paso",
       "shareCta": "Compartir puntuación",
+      "shareHeader": "🧠 Superé al bot en {unique}/{total} rondas — {score} pts",
       "cashOut": "Cobrar",
       "chips": "fichas",
       "coins": "monedas"
@@ -16939,17 +16956,7 @@ const es = {
       "tooShort": "La palabra debe tener al menos 3 letras",
       "needStake": "Apuesta fichas para bloquear"
     },
-    "revealing": "Revelando…",
-    "shareCard": {
-      "header": "🎯 Puja sellada — {score} pts",
-      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.live/es/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "vs"
-    },
-    "session": {
-      "shareHeader": "🧠 Superé al bot en {unique}/{total} rondas — {score} pts"
-    }
+    "revealing": "Revelando…"
   },
   "supporter": {
     "card": {

@@ -465,7 +465,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     if (!socket) return;
     const handleRoomLanguageChanged = (data: { language: Language; changedBy: string }) => {
       setRoomLanguage(data.language);
-      neoInfoToast(t('hostView.languageChangedNotification', { name: data.changedBy, language: t(`joinView.${data.language === 'en' ? 'english' : data.language === 'he' ? 'hebrew' : data.language === 'sv' ? 'swedish' : data.language === 'ja' ? 'japanese' : 'spanish'}`) }));
+      neoInfoToast(t('hostView.languageChangedNotification', { name: data.changedBy, language: t(`joinView.${data.language === 'en' ? 'english' : data.language === 'he' ? 'hebrew' : data.language === 'sv' ? 'swedish' : data.language === 'ja' ? 'japanese' : data.language === 'es' ? 'spanish' : 'russian'}`) }));
     };
     socket.on('roomLanguageChanged', handleRoomLanguageChanged);
     return () => { socket.off('roomLanguageChanged', handleRoomLanguageChanged); };

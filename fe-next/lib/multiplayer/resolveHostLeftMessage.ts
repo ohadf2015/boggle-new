@@ -10,7 +10,11 @@
  *   2. `data.message` (legacy / wire-level fallback) — used as-is.
  *   3. `t(defaultKey)` — last-resort generic message.
  */
-type Translator = (key: string, params?: Record<string, string | number>) => string;
+type Translator = (
+  key: string,
+  fallbackOrParams?: string | Record<string, string | number>,
+  params?: Record<string, string | number>
+) => string;
 
 interface HostLeftPayload {
   message?: string;

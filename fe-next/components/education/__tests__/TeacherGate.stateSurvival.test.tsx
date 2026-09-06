@@ -31,6 +31,12 @@ const mockUseTeacherAccess = vi.fn();
 vi.mock('@/lib/education/useTeacherAccess', () => ({
   useTeacherAccess: () => mockUseTeacherAccess(),
 }));
+// The sticky-once grant is keyed by user id and lives at module scope, so the
+// gate needs a signed-in user to remember anything — see
+// TeacherGate.remountSurvival.test.tsx for why it moved out of a ref.
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: { id: 'teacher-state-survival' } }),
+}));
 vi.mock('@/hooks/useExperiment', () => ({
   useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
 }));
@@ -42,7 +48,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
-import { TeacherGate } from '../TeacherGate';
+import { TeacherGate, __resetTeacherGrantsForTests } from '../TeacherGate';
 
 /** Stands in for `activeTab` / an open modal / a half-filled wizard. */
 function ChildWithState() {
@@ -56,7 +62,13 @@ function ChildWithState() {
 }
 
 describe('<TeacherGate> — the teacher\'s in-flight work survives an auth blip', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // The grant is module-scoped now, so it survives between tests in this
+    // file exactly as it survives a remount in the browser. Clear it, or a
+    // later test inherits an earlier test's teacher.
+    __resetTeacherGrantsForTests();
+  });
 
   it('keeps children mounted when loading returns after access was granted', () => {
     // GIVEN a teacher whose access has settled, working on the Prepare tab

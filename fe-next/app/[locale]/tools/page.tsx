@@ -72,7 +72,7 @@ const toolsSeoContent: Record<string, {
       'Word Solver — enter any letters and get all valid words instantly',
       'Anagram finder — unscramble jumbled letters into real words',
       'Filter results by word length for targeted practice',
-      'Multi-language support — works with English, Hebrew, Swedish, Japanese, and Spanish dictionaries',
+      'Multi-language support — works with English, Hebrew, Swedish, Japanese, Spanish, and Russian dictionaries',
       'Free to use — no sign-up or payment required',
     ],
     faq: [
@@ -115,7 +115,7 @@ const toolsSeoContent: Record<string, {
       'Решатель слов — введите любые буквы и получите все допустимые слова мгновенно',
       'Поиск анаграмм — расшифруйте перепутанные буквы в реальные слова',
       'Фильтрация результатов по длине слова для целевой практики',
-      'Поддержка многих языков — работает с английским, иврит, шведским, японским и испанским словарями',
+      'Поддержка многих языков — работает с английским, ивритом, шведским, японским, испанским и русским словарями',
       'Бесплатно — без регистрации и платежей',
     ],
     faq: [

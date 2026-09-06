@@ -27,7 +27,7 @@ export interface UseSurvivalWordSubmissionProps {
   grid: LetterGrid;
   language: Language;
   targetWord: string;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   // State reads
   isGameOver: boolean;
   attempts: TargetAttempt[];
@@ -107,7 +107,7 @@ export function useSurvivalWordSubmission({
     const normalizedWord = normalizeWord(word, language);
     if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
       playWordRejectedSound?.();
-      showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
+      showToast('duplicate', t('wordHunt.alreadyGuessed', 'Already guessed!'));
       return;
     }
 
@@ -194,7 +194,7 @@ export function useSurvivalWordSubmission({
 
     if (discoveredWords.some(w => w.word === word)) {
       playWordRejectedSound?.();
-      showToast('duplicate', t('wordHunt.feedback.duplicate') || 'Already found!');
+      showToast('duplicate', t('wordHunt.feedback.duplicate', 'Already found!'));
       return;
     }
 
@@ -259,7 +259,7 @@ export function useSurvivalWordSubmission({
       handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
     } else if (normalizedWord.length === normalizedTarget.length) {
       if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
-        showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
+        showToast('duplicate', t('wordHunt.alreadyGuessed', 'Already guessed!'));
         return;
       }
 

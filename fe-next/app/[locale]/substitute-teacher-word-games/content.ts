@@ -143,7 +143,7 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
   sv: {
     metaTitle: 'Ordspel för vikarier — gratis, noll förberedelse, ingen inloggning | LexiClash',
     metaDescription:
-      'Gratis ordspel utan förberedelse för vikarier. Eleverna går med i ett live-spel med en fyrsiffrig kod — ingen inloggning, inga konton, ingen installation. Funkar på alla enheter, med färdiga ordlistor. Perfekt när vikarieplaneringen fallerar.',
+      'Gratis ordspel utan förberedelse för vikarier. Eleverna går med i ett live-spel med en kod på sex tecken — ingen inloggning, inga konton, ingen installation. Funkar på alla enheter, med färdiga ordlistor. Perfekt när vikarieplaneringen fallerar.',
     ogTitle: 'Ordspel för vikarier — gratis, noll förberedelse',
     ogDescription:
       'Ingen inloggning, inga konton, inget krångel. Visa en kod, eleverna spelar. Vikarieplanen som alltid håller. Gratis.',
@@ -151,14 +151,14 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
     twitterDescription: 'Ordspel utan förberedelse och utan inloggning för vikariedagar. Visa en kod, eleverna spelar. Gratis.',
     heroTitle: 'Vikarieplanen som inte kräver något av dig.',
     intro:
-      'Vikarieplaner faller när de förutsätter förberedelser, inloggningar eller att man känner klassen. LexiClash förutsätter inget av det. Vikarien visar en fyrsiffrig kod, eleverna går med från vilken enhet som helst utan konto, och ett live-ordspel drar igång från en färdig lista — noll förberedelse, ingen inloggning, ingen klasslista. Det håller en klass bättre än ett arbetsblad, håller sig akademiskt (riktig stavnings- och ordträning) och räcker från fem minuters utfyllnad till större delen av lektionen när planeringen spricker. Gratis, körs i webbläsaren och funkar i ett klassrum vikarien aldrig sett förut.',
+      'Vikarieplaner faller när de förutsätter förberedelser, inloggningar eller att man känner klassen. LexiClash förutsätter inget av det. Vikarien visar en kod på sex tecken, eleverna går med från vilken enhet som helst utan konto, och ett live-ordspel drar igång från en färdig lista — noll förberedelse, ingen inloggning, ingen klasslista. Det håller en klass bättre än ett arbetsblad, håller sig akademiskt (riktig stavnings- och ordträning) och räcker från fem minuters utfyllnad till större delen av lektionen när planeringen spricker. Gratis, körs i webbläsaren och funkar i ett klassrum vikarien aldrig sett förut.',
     ctaStart: 'Starta ett spel gratis',
     ctaClassroom: 'Ordspel för klassrummet',
     ctaDuels: 'Dueller 1 mot 1',
     fitsTitle: 'Därför tar vikarier till det',
     fits: [
       { title: 'Inget att förbereda', desc: 'Färdiga ordlistor gör att en vikarie startar ett riktigt spel utan någon förberedelse. Nödplanen som funkar när inget lämnats efter sig.' },
-      { title: 'Ingen inloggning, ingen klasslista', desc: 'En fyrsiffrig kod betyder att vikarien slipper konton, namn och placeringsschema — eleverna går bara med och spelar.' },
+      { title: 'Ingen inloggning, ingen klasslista', desc: 'En kod på sex tecken betyder att vikarien slipper konton, namn och placeringsschema — eleverna går bara med och spelar.' },
       { title: 'Funkar på alla enheter', desc: 'Bara webbläsare — Chromebooks, plattor, telefoner, klassrummets datorer. Inget att installera i ett obekant rum.' },
       { title: 'Håller klassen engagerad', desc: 'Live-tävlingar i ord fångar uppmärksamheten långt bättre än ett arbetsblad — färre bråk på en vikariedag.' },
       { title: 'Faktiskt akademiskt', desc: 'Eleverna tränar stavning och ordförråd, så ordinarie lärare kommer tillbaka till lärande, inte till förlorad tid.' },
@@ -167,7 +167,7 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
     stepsTitle: 'Kör igång kallt, i 3 steg',
     steps: [
       { t: 'Öppna en färdig lista', d: 'Ingen förberedelse — välj en klar ordlista och en tidsgräns.' },
-      { t: 'Visa koden', d: 'Eleverna skriver den fyrsiffriga koden på valfri enhet. Inga konton, inga namn.' },
+      { t: 'Visa koden', d: 'Eleverna skriver koden på sex tecken på valfri enhet. Inga konton, inga namn.' },
       { t: 'Spela, upprepa', d: 'En omgång som utfyllnad eller flera för att täcka lektionen. Live-topplistan håller fokus.' },
     ],
     regularTitle: 'Till ordinarie läraren',
@@ -175,8 +175,8 @@ const contentMap: Record<SubstituteLocale, LocaleContent> = {
       'Lämnar du en vikarieplanering? Lägg in LexiClash-länken och en ordlista i dina vikarienoteringar. Eleverna får akademisk ordträning istället för en film eller sysslor, vikarien får en plan som inte kan misslyckas, och du kommer tillbaka till en klass som faktiskt repeterat ordförråd medan du var borta — ingen extrarättning, inget kaos att städa upp.',
     faqTitle: 'Vanliga frågor',
     faqs: [
-      { q: 'Varför passar det vikarier?', a: 'För att det inte kräver något av dig. Ingen inloggning, ingen kontoregistrering, inget material att förbereda och ingen klasslista att kunna. Vikarien visar en fyrsiffrig kod, eleverna går med från valfri enhet, och ett live-ordspel körs — även utan någon förkunskap om klassen eller ämnet.' },
-      { q: 'Behöver elever eller vikarie konton?', a: 'Nej. Eleverna går med med en fyrsiffrig kod, och en vikarie kan starta ett spel från en färdig ordlista utan något konto alls. Noll friktion är hela poängen i ett obekant rum.' },
+      { q: 'Varför passar det vikarier?', a: 'För att det inte kräver något av dig. Ingen inloggning, ingen kontoregistrering, inget material att förbereda och ingen klasslista att kunna. Vikarien visar en kod på sex tecken, eleverna går med från valfri enhet, och ett live-ordspel körs — även utan någon förkunskap om klassen eller ämnet.' },
+      { q: 'Behöver elever eller vikarie konton?', a: 'Nej. Eleverna går med med en kod på sex tecken, och en vikarie kan starta ett spel från en färdig ordlista utan något konto alls. Noll friktion är hela poängen i ett obekant rum.' },
       { q: 'Krävs någon förberedelse?', a: 'Ingen. Färdiga ordlistor gör att en vikarie kan starta ett helt spel utan förberedelse — perfekt för nödplaner som dyker upp samma morgon. Vill ordinarie lärare koppla det till kapitlet kan hen lämna en egen ordlista redo att spela.' },
       { q: 'Är det gratis?', a: 'Ja — helt gratis, ingen premiumnivå. Hela klassen per live-spel.' },
       { q: 'Vilka årskurser passar det?', a: 'Starkast från mellanstadiet upp till gymnasiet och vuxen-ESL. Brädstorlek och minsta ordlängd gör att vikarien kan välja en nivå som passar vilken klass som helst.' },

@@ -95,7 +95,7 @@ export default function WordHuntResultsSummary({
       >
         <div className="text-center">
           <p className="text-[8px] font-black text-white uppercase tracking-widest mb-1">
-            {t('wordHunt.multiplayer.survivalTime') || 'Survival'}
+            {t('wordHunt.multiplayer.survivalTime', 'Survival')}
           </p>
           <span className="text-sm font-black text-neo-cyan tabular-nums">{formattedSurvivalTime}</span>
         </div>
@@ -109,7 +109,7 @@ export default function WordHuntResultsSummary({
           <div className="flex items-center gap-2 px-2">
             <Skull className="w-3 h-3 text-neo-red/60" />
             <h3 className="text-[10px] font-bold text-neo-red/60 uppercase tracking-widest">
-              {t('wordHunt.results.eliminationHistory') || 'Elimination History'}
+              {t('wordHunt.results.eliminationHistory', 'Elimination History')}
             </h3>
           </div>
 
@@ -133,7 +133,7 @@ export default function WordHuntResultsSummary({
                   <span className="text-white">#{eliminationOrder}</span>
                   {player.username}
                   {isCurrentUser && (
-                    <span className="text-neo-pink">({t('results.you') || 'YOU'})</span>
+                    <span className="text-neo-pink">({t('results.you', 'YOU')})</span>
                   )}
                 </m.span>
               );

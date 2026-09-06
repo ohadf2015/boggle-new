@@ -127,17 +127,17 @@ export function LeagueRivalsCard() {
   if (!player) return null;
 
   const hasRivals = above || below;
-  const title = t('leagueRivals.title') || 'Your League Rivals';
-  const youLabel = t('leagueRivals.you') || 'You';
+  const title = t('leagueRivals.title', 'Your League Rivals');
+  const youLabel = t('leagueRivals.you', 'You');
 
   // Compute gap labels
   const aheadLabel = above
-    ? interpolate(t('leagueRivals.ahead') || '{{pts}} pts ahead', {
+    ? interpolate(t('leagueRivals.ahead', '{{pts}} pts ahead'), {
         pts: above.score - player.score,
       })
     : '';
   const behindLabel = below
-    ? interpolate(t('leagueRivals.behind') || '{{pts}} pts behind', {
+    ? interpolate(t('leagueRivals.behind', '{{pts}} pts behind'), {
         pts: player.score - below.score,
       })
     : '';
@@ -176,7 +176,7 @@ export function LeagueRivalsCard() {
       ) : (
         <div className="px-3 py-4 text-center">
           <p className="text-sm text-neo-white">
-            {t('leagueRivals.noRivals') || 'Climb the league to find rivals!'}
+            {t('leagueRivals.noRivals', 'Climb the league to find rivals!')}
           </p>
         </div>
       )}

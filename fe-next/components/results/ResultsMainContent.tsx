@@ -55,7 +55,7 @@ interface WinStreakData {
 }
 
 /** Translation function type */
-type TFunction = (key: string, params?: Record<string, string | number>) => string;
+type TFunction = (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
 
 /** Mode names are brand proper-nouns shown on the brag card badge. */
 const BRAG_MODE_LABEL: Record<string, string> = {
@@ -297,7 +297,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     // differently (longest here, blast's own metric there) and can disagree.
     if (!hideBestWord) {
       stats.push({
-        label: t('results.bestWord') || 'Best Word',
+        label: t('results.bestWord', 'Best Word'),
         value: displayWord.toUpperCase() || '—',
         icon: <Sparkles className="w-3 h-3" />,
         color: 'text-neo-pink',
@@ -309,7 +309,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     // apart. Every other mode has nothing else carrying it, so it stays.
     if (!isWordHunt) {
       stats.push({
-        label: t('results.wordsFound') || 'Words Found',
+        label: t('results.wordsFound', 'Words Found'),
         value: currentPlayerValidWords.length,
         icon: <Type className="w-3 h-3" />,
         color: 'text-neo-lime',
@@ -321,7 +321,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     // unique-words line to carry it).
     if (!showRivals) {
       stats.push({
-        label: t('results.uniqueWords.label') || 'Only You',
+        label: t('results.uniqueWords.label', 'Only You'),
         value: uniqueWordsCount,
         icon: <Star className="w-3 h-3" />,
         color: 'text-neo-cyan',
@@ -333,7 +333,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     // mislead (their conversion path is the signup nudge sheet, not this chip).
     if (isAuthenticated && coinReward && coinReward.awarded > 0) {
       stats.push({
-        label: t('results.coinsEarned') || 'Coins',
+        label: t('results.coinsEarned', 'Coins'),
         value: `+${coinReward.awarded}`,
         icon: <Coins className="w-3 h-3" />,
         color: 'text-neo-lime',
@@ -348,7 +348,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         const rivalBestDisplay = language === 'he' ? applyHebrewFinalLetters(rivalBest.word) : rivalBest.word;
         if (rivalBestDisplay) {
           stats.push({
-            label: t('results.rivalBestWord') || "Rival's Best",
+            label: t('results.rivalBestWord', "Rival's Best"),
             value: rivalBestDisplay.toUpperCase(),
             icon: <Sparkles className="w-3 h-3" />,
             color: 'text-neo-pink',

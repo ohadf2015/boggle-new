@@ -23,7 +23,7 @@ import type { Player } from '@/hooks/gameState/types';
 
 interface UsePlayerSessionEventsProps {
   socket: Socket | null;
-  t: (key: string) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   username: string;
   queueAchievement: (achievement: AchievementPayload) => void;
   intentionalExitRef: MutableRefObject<boolean>;
@@ -168,7 +168,7 @@ export function usePlayerSessionEvents({
       logger.log('[PLAYER] Session taken over by another tab');
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
-      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherTab') || 'Session moved to another tab', {
+      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherTab', 'Session moved to another tab'), {
         icon: TOAST_ICONS.smartphone,
         duration: 3000
       });
@@ -178,7 +178,7 @@ export function usePlayerSessionEvents({
       logger.log('[PLAYER] Session migrated to different room');
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
-      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherRoom') || 'Session moved to another room', {
+      neoInfoToast(data.message || t('playerView.sessionMovedToAnotherRoom', 'Session moved to another room'), {
         duration: 3000
       });
     };
@@ -189,7 +189,7 @@ export function usePlayerSessionEvents({
     };
 
     const handleRateLimited = () => {
-      wordErrorToast(t('playerView.tooFast') || 'Slow down! Submitting too fast', { duration: 2000 });
+      wordErrorToast(t('playerView.tooFast', 'Slow down! Submitting too fast'), { duration: 2000 });
     };
 
     // Register listeners
