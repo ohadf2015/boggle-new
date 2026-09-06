@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isAllowedAdBannerRoute } from '../admob-routes';
+import { isAllowedAdBannerRoute, isAdFreeRoute } from '../admob-routes';
 
 describe('isAllowedAdBannerRoute', () => {
   it('allows landing/leaderboard/settings (passive pages)', () => {
@@ -97,5 +97,42 @@ describe('isAllowedAdBannerRoute', () => {
 
   it('returns false for null pathname', () => {
     expect(isAllowedAdBannerRoute(null)).toBe(false);
+  });
+});
+
+// ------------------------------------------------------------------
+// Education module is ad-free across EVERY format (AdSense auto-ads,
+// interstitials), not only the native anchored banner.
+// ------------------------------------------------------------------
+describe('isAdFreeRoute', () => {
+  it('Given an education/teacher/student route, When checked, Then it is ad-free', () => {
+    expect(isAdFreeRoute('/education')).toBe(true);
+    expect(isAdFreeRoute('/education/for-schools')).toBe(true);
+    expect(isAdFreeRoute('/he/education/classroom-game')).toBe(true);
+    expect(isAdFreeRoute('/teacher')).toBe(true);
+    expect(isAdFreeRoute('/es/teacher/classroom/abc/analytics')).toBe(true);
+    expect(isAdFreeRoute('/student/join')).toBe(true);
+    expect(isAdFreeRoute('/ja/student/lessons/42/')).toBe(true);
+  });
+
+  it('Given the classroom multiplayer lobby, When checked, Then it is ad-free', () => {
+    expect(isAdFreeRoute('/multiplayer', new URLSearchParams('classroom=true'))).toBe(true);
+    expect(isAdFreeRoute('/he/multiplayer', new URLSearchParams('classroom=true&room=ABC'))).toBe(true);
+  });
+
+  it('Given the admin console, When checked, Then it is ad-free', () => {
+    expect(isAdFreeRoute('/admin/users')).toBe(true);
+  });
+
+  it('Given ordinary game and hub routes, When checked, Then ads may run', () => {
+    expect(isAdFreeRoute('/')).toBe(false);
+    expect(isAdFreeRoute('/daily')).toBe(false);
+    expect(isAdFreeRoute('/singleplayer')).toBe(false);
+    expect(isAdFreeRoute('/multiplayer', new URLSearchParams('room=ABC'))).toBe(false);
+    expect(isAdFreeRoute('/en/pricing')).toBe(false);
+  });
+
+  it('Given a null pathname, When checked, Then it is NOT treated as ad-free (unknown ≠ education)', () => {
+    expect(isAdFreeRoute(null)).toBe(false);
   });
 });

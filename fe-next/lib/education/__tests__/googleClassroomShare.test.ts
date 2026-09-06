@@ -72,4 +72,34 @@ describe('buildGoogleClassroomShareUrl', () => {
     const u = parse(buildGoogleClassroomShareUrl({ joinUrl: 'https://x.test/en/join/ABC123' }));
     expect([...u.searchParams.keys()].sort()).toEqual(['itemtype', 'url']);
   });
+
+  it('posts as an assignment when the teacher is assigning post-Live practice', () => {
+    const u = parse(
+      buildGoogleClassroomShareUrl({
+        joinUrl: 'https://www.lexiclash.live/en/education/class-gap?missed=neutron',
+        title: 'Practice — Physics 101',
+        body: 'Practice these missed words at home: neutron',
+        itemType: 'assignment',
+      }),
+    );
+    expect(u.searchParams.get('itemtype')).toBe('assignment');
+    expect(u.searchParams.get('url')).toContain('class-gap');
+    expect(u.searchParams.get('title')).toBe('Practice — Physics 101');
+  });
+
+  it('defaults to announcement so existing join/reteach callers stay on the Stream', () => {
+    const u = parse(buildGoogleClassroomShareUrl({ joinUrl: 'https://x.test/join/A' }));
+    expect(u.searchParams.get('itemtype')).toBe('announcement');
+  });
+
+  it('rejects an unsupported itemType', () => {
+    expect(() =>
+      buildGoogleClassroomShareUrl({
+        joinUrl: 'https://x.test/join/A',
+        // @ts-expect-error intentional invalid itemType
+        itemType: 'material',
+      }),
+    ).toThrow(/unsupported itemType/);
+  });
+
 });

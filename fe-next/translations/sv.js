@@ -2249,12 +2249,27 @@ const sv = {
     "longest": "Längsta:",
     "emojiCard": {
       "classicHeader": "LexiClash Daglig #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash Solo",
       "adventureHeader": "LexiClash Äventyr W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Dela",
-      "copy": "Kopiera"
+      "copy": "Kopiera",
+      "lettersCount": "{len} bokstäver × {count}",
+      "stars": "stjärnor",
+      "waveLine": "Våg {n} · {pct}%",
+      "rank": "rank",
+      "highScore": "Nytt rekord",
+      "objectives": "mål",
+      "bossDefeated": "Bossen besegrad",
+      "accuracy": "träffsäkerhet",
+      "secondsSuffix": "s",
+      "time": "tid",
+      "solved": "klarad",
+      "unsolved": "öppen",
+      "status": "status",
+      "hideWords": "Dölj ord",
+      "revealWords": "Visa ord"
     }
   },
   "messaging": {
@@ -3639,6 +3654,19 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "progressPulse": {
+      "title": "Din utveckling",
+      "game": "Spel #{n}",
+      "vsLast": "{delta} mot förra spelet",
+      "best": "Bästa {score}",
+      "newBest": "Nytt rekord!",
+      "coverage": "{found} av {total} ord · {pct}%",
+      "wordsFound": "{found} ord hittade",
+      "goalFirst": "Första spelet är loggat. Slå det nu.",
+      "goalNewBest": "Du satte ribban. Slå {target} nästa gång.",
+      "goalBeatBest": "{gap} p från ditt rekord — ett ord till kan räcka.",
+      "sparklineAria": "Dina senaste {n} spel"
+    },
     "streakIgnition": {
       "titleWon": "SVITEN ÄR TÄND!",
       "titleLost": "EN VINST FÖR ATT TÄNDA DEN",
@@ -6657,6 +6685,21 @@ const sv = {
     "maybeLater": "Kanske senare"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "Vad händer nu?",
+      "rematchHarder": "Returmatch · svårare",
+      "rematchHarderDesc": "Ett steg upp på botstegen",
+      "rematchMax": "Returmatch · max",
+      "rematchMaxDesc": "Högsta steget. Svårt bräde, 3 bottar",
+      "rematchSame": "Samma igen",
+      "rematchSameDesc": "Nytt bräde, samma inställningar",
+      "bots": "Möt bottar",
+      "botsDesc": "Bräde på tid mot en bot",
+      "practice": "Träning",
+      "practiceDesc": "Ingen timer, ingen press",
+      "daily": "Dagens utmaning",
+      "dailyDesc": "Samma pussel som alla andra"
+    },
     "play": "Spela",
     "playDesc": "Hoppa in i ett spel",
     "howToPlay": "Hur man spelar",
@@ -7117,6 +7160,13 @@ const sv = {
     "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
     "alreadyPlayed": "Redan spelat idag",
     "catchUp": {
+      "tileDone": "Spelad · visa resultat",
+      "tileMissed": "Missad · tryck för att ta igen",
+      "tileToday": "Idag · spela nu",
+      "tileExpired": "Missad · går inte längre att ta igen",
+      "tilePending": "Kommer snart",
+      "tileHint": "Tryck på en missad dag för att ta igen den — öppet i {days} dagar",
+      "expired": "Den dagen är stängd — du kan ta igen de senaste {days} dagarna",
       "title": "Ta igen missade dagliga",
       "subtitle": "Du har {count} från de senaste dagarna kvar",
       "yesterday": "Gårdagens pussel",
@@ -13535,7 +13585,28 @@ const sv = {
       "shareGapAllFoundText": "{{lesson}} — klassen hittade alla lektionsord.",
       "shareGapCta": "Spela ett klassspel",
       "shareGapEyebrow": "Dagens klasslucka",
-      "shareGapPracticeHome": "Ord att öva hemma"
+      "shareGapPracticeHome": "Ord att öva hemma",
+      "startReteachLive": "Starta 3-minuters reteach Live",
+      "postReteachGoogleClassroom": "Publicera 3-minuters reteach i Google Classroom",
+      "postReteachGoogleClassroomTitle": "3-minuters reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Öppna länken och starta 3-minuters Live på de missade orden: {{missed}}. Eleverna går med från Stream.",
+      "assignPracticeGoogleClassroom": "Tilldela hemövning i Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Öva missade ord — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Öppna länken och öva dessa missade ord hemma: {{missed}}. Lämna in när du är klar.",
+      "printPracticeSheet": "Skriv ut övningsblad",
+      "printPracticeSheetTitle": "Övning på missade ord — {{lesson}}",
+      "printPracticeSheetSubtitle": "Enhetsfri reteach — skriv varje ord och använd det i en mening",
+      "printPracticeSheetWriteLabel": "Skriv ordet",
+      "printPracticeSheetSentenceLabel": "Använd det i en mening",
+      "printPracticeSheetNameLine": "Namn: ________________",
+      "printPracticeSheetDateLine": "Datum: ________________",
+      "printPracticeSheetFooter": "LexiClash · enhetsfri övning",
+      "startUnpluggedReteachLive": "Starta frånkopplad reteach Live",
+      "unpluggedReteachHint": "Eleverna svarar på det utskrivna övningsbladet — inga enheter",
+      "unpluggedReteachReveal": "Visa",
+      "unpluggedReteachNext": "Nästa",
+      "unpluggedReteachPrev": "Föregående",
+      "unpluggedReteachProgress": "Ord {{current}} av {{total}}"
     },
     "nav": {
       "section": "Lärare",
@@ -14867,6 +14938,15 @@ const sv = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "Tack för att du tittade — belöning upplåst!",
+      "hint": "Tack! Här är din ledtråd.",
+      "doubleGold": "Guldet dubblat — tack för att du tittade!",
+      "freeze": "Streak-frys säkrad. Din streak är trygg.",
+      "retry": "Andra chansen upplåst — kör!",
+      "timeLow": "Bonustid tillagd — fortsätt!",
+      "catchup": "Missad dag upplåst — lycka till!"
+    },
     "label": "Annons",
     "rewarded": {
       "watchForGold": "Se reklam för +{amount} guld",

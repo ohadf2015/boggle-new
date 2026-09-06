@@ -2,12 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { getMinWordLength, getDefaultPreset, getPresetById } from './presetConfig';
+import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } from './presetConfig';
 import {
   shouldShowGuidance,
   markGuidanceShown,
 } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding, markOnboardingComplete, hasPlayedBotsGame } from '@/utils/onboardingStorage';
+import { shouldRedirectBareSingleplayer, searchParamsToRecord } from '@/app/[locale]/singleplayer/redirectLogic';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
@@ -117,7 +118,30 @@ interface UseSinglePlayerConfigResult {
   handlePlayAgain: () => void;
   handleQuickRematch: () => void;
   handleBackToLobby: () => void;
+  /** Start a preset in-page from the results screen (no navigation, no re-entry gate). */
+  handleStartPreset: (presetId: string) => void;
   wasFirstTimerPracticeRef: React.MutableRefObject<boolean>;
+}
+
+/** Game state for a preset — shared by the URL auto-start and the in-page picker. */
+function gameStateForPreset(preset: PresetConfig, uiLanguage: string): Omit<SinglePlayerGameState, 'grid'> {
+  let mode: SinglePlayerMode = 'solo-bots';
+  if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
+    mode = 'practice';
+  } else if (preset.settings.bots === 0 && preset.settings.timerSeconds > 0) {
+    mode = 'challenge';
+  }
+  const bots = preset.settings.bots > 0
+    ? generateBotsForPreset(preset.settings.bots, preset.settings.botDifficulty)
+    : [];
+  return {
+    mode,
+    difficulty: preset.settings.difficulty,
+    timerSeconds: preset.settings.timerSeconds,
+    bots,
+    language: (uiLanguage as Language) || 'en',
+    minWordLength: getMinWordLength(uiLanguage, preset.settings.difficulty),
+  };
 }
 
 export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOptions): UseSinglePlayerConfigResult {
@@ -126,16 +150,21 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const router = useRouter();
   const { isAuthenticated, profile } = useAuth();
 
-  const autoStart = searchParams?.get('autoStart') || null;
+  const rawAutoStart = searchParams?.get('autoStart') || null;
   const presetParam = searchParams?.get('preset') || null;
   const boardCode = searchParams?.get('boardCode') || null;
   const mpHandoff = searchParams?.get('mpHandoff') === '1';
   const masteryPractice = searchParams?.get('mastery') === '1';
+  // Bare /singleplayer (no preserved params) is the SEO/CTA entry. Treat it as
+  // autoStart=bots client-side — NEVER server 308 (soft-nav RSC fail; see redirectLogic).
+  const isBareEntry = shouldRedirectBareSingleplayer(searchParamsToRecord(searchParams));
+  const autoStart = rawAutoStart ?? (isBareEntry ? 'bots' : null);
 
   const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
     const hasAutoStart = searchParams?.get('autoStart');
     const hasPreset = searchParams?.get('preset');
-    if (hasAutoStart || hasPreset) return 'playing';
+    const bare = shouldRedirectBareSingleplayer(searchParamsToRecord(searchParams));
+    if (hasAutoStart || hasPreset || bare) return 'playing';
     const isNewPlayer = shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
     return isNewPlayer ? 'pre-game' : 'playing';
   });
@@ -214,7 +243,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
       const botsPreset = getDefaultPreset('solo-bots');
       if (botsPreset) {
         const { config, isFirstWin } = firstWinConfigFor(botsPreset.settings);
-        if (isFirstWin) trackFirstWinConfigApplied('autoStart=bots');
+        if (isFirstWin) trackFirstWinConfigApplied(isBareEntry && !rawAutoStart ? 'bare->bots' : 'autoStart=bots');
         const bots = generateBotsForPreset(config.bots, config.botDifficulty);
         const minWordLength = getMinWordLength(uiLanguage, config.difficulty);
         setGameState({
@@ -265,28 +294,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
 
     const preset = getPresetById(presetParam);
     if (preset) {
-      let mode: SinglePlayerMode = 'solo-bots';
-      if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
-        mode = 'practice';
-      } else if (preset.settings.bots === 0 && preset.settings.timerSeconds > 0) {
-        mode = 'challenge';
-      }
-
-      const minWordLength = getMinWordLength(uiLanguage, preset.settings.difficulty);
-      const bots = preset.settings.bots > 0
-        ? generateBotsForPreset(preset.settings.bots, preset.settings.botDifficulty)
-        : [];
-
-      setGameState(prev => ({
-        ...prev,
-        mode,
-        difficulty: preset.settings.difficulty,
-        timerSeconds: preset.settings.timerSeconds,
-        bots,
-        language: (uiLanguage as Language) || 'en',
-        grid: null,
-        minWordLength,
-      }));
+      setGameState(prev => ({ ...prev, ...gameStateForPreset(preset, uiLanguage), grid: null }));
       setPhase('playing');
     }
   }, [presetParam, autoStart, phase, uiLanguage]);
@@ -419,6 +427,20 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     setPhase('playing');
   }, [unlockAudio]);
 
+  // Start a preset from the results picker — same counters as "play again",
+  // but with the chosen preset's settings (the bots ladder: friendly →
+  // competitive → battle). Unknown ids fall back to a plain replay.
+  const handleStartPreset = useCallback((presetId: string) => {
+    const preset = getPresetById(presetId);
+    wasFirstTimerPracticeRef.current = false;
+    unlockAudio();
+    sessionPlayCountRef.current += 1;
+    trackReplayClicked({ mode: 'sp', fromScreen: 'results' });
+    trackNextGameStarted({ mode: 'sp', gamesThisSession: sessionPlayCountRef.current });
+    setGameState(prev => (preset ? { ...prev, ...gameStateForPreset(preset, uiLanguage), grid: null } : { ...prev, grid: null }));
+    setPhase('playing');
+  }, [unlockAudio, uiLanguage]);
+
   // Back to lobby
   const handleBackToLobby = useCallback(() => {
     router.push(`/${uiLanguage}/`);
@@ -434,6 +456,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     handlePlayAgain,
     handleQuickRematch,
     handleBackToLobby,
+    handleStartPreset,
     wasFirstTimerPracticeRef,
   };
 }

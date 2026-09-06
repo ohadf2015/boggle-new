@@ -13,10 +13,22 @@ import { useAyetVideoAds } from '@/hooks/useAyetVideoAds';
 import { getAyetPlacementId } from '@/lib/ads/ayetVideoAds';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { celebrateAdReward } from '@/lib/ads/rewardCelebration';
 import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
+
+const identityT = (key: string): string => key;
+
+function useRewardCopyTranslator(): (key: string) => string {
+  try {
+    return useLanguage().t ?? identityT;
+  } catch {
+    return identityT;
+  }
+}
 
 const PLACEHOLDER_TIMESTAMPS_KEY = 'lexiclash_placeholder_ad_timestamps';
 const MAX_PLACEHOLDER_PER_HOUR = 3;
@@ -248,6 +260,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
   // Use unified CoinContext for all coin operations
   const { awardWatchedAd, rewards } = useCoinContext();
+  // Translator for the reward celebration. Called unconditionally (hook order
+  // is stable); the try/catch only absorbs the provider-missing throw so a
+  // surface that mounts before LanguageProvider (or a test without one)
+  // degrades to raw keys instead of crashing the ad flow.
+  const t = useRewardCopyTranslator();
 
   // Ad platform hooks
   const crazyGames = useCrazyGames();
@@ -434,6 +451,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       }
       trackRewardedAdWatched(platform, awarded, telemetrySurface);
       setStatus('completed');
+      // Shared payoff for every placement — see lib/ads/rewardCelebration.
+      celebrateAdReward({ rewardKind, awarded, surface, t });
       await onRewardEarned?.(awarded);
 
       // Reset to idle after a short delay
@@ -545,7 +564,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface, t]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths

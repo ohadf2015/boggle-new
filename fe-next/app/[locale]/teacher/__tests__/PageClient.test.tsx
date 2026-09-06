@@ -47,7 +47,7 @@ describe('TeacherPage upgrade CTA', () => {
     proState = { ...proState, hasPro: true, source: 'admin_grant' };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByRole('link', { name: /teacher\.upgradePro\.cta/i })).toBeNull();
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
@@ -58,20 +58,24 @@ describe('TeacherPage upgrade CTA', () => {
     proState = { ...proState, loading: true };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByRole('link', { name: /teacher\.upgradePro\.cta/i })).toBeNull();
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
   });
 
-  it('shows upgrade link for non-admin teacher', () => {
+  it('shows Teacher Pro ask with price, reports, and /pricing checkout for a free teacher', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    const link = screen.getByRole('link', { name: /teacher\.upgradePro\.cta/i });
-    expect(link).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(screen.getByTestId('teacher-pro-ask')).toBeInTheDocument();
+    expect(screen.getByText(/\$9/)).toBeInTheDocument();
+    expect(screen.getByText('teacher.subscription.unlimitedClasses')).toBeInTheDocument();
+    expect(screen.getByText('education.landing.pro.analytics')).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /teacher\.subscription\.upgradeNow/i });
+    expect(link).toHaveAttribute('href', '/en/pricing');
   });
 
   it('hides upgrade link for admin', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: adminProfile, isAdmin: true, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByRole('link', { name: /teacher\.upgradePro\.cta/i })).toBeNull();
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
   });
 
   it('fires iap_viewed impression on mount for non-admin teacher', () => {

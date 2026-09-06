@@ -7,9 +7,15 @@ import { GameEmojiShareCard } from '../GameEmojiShareCard';
 const t = (key: string) => {
   const map: Record<string, string> = {
     'share.emojiCard.classicHeader': 'LexiClash Daily #{number}',
-    'share.emojiCard.blastHeader': 'LexiClash Blast 💥',
+    'share.emojiCard.blastHeader': 'LexiClash Blast',
     'share.emojiCard.share': 'Share',
     'share.emojiCard.copy': 'Copy',
+    'share.emojiCard.lettersCount': '{len}-letter × {count}',
+    'share.emojiCard.stars': 'stars',
+    'share.emojiCard.waveLine': 'Wave {n} · {pct}%',
+    'share.words': 'words',
+    'share.longest': 'Longest',
+    'share.combo': 'combo',
     'common.pts': 'pts',
     'common.copied': 'Copied!',
     'blast.cleared': 'Cleared',
@@ -36,13 +42,19 @@ describe('GameEmojiShareCard — classic mode', () => {
     expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('pts');
   });
 
-  it('renders green squares for each found word', () => {
+  it('renders labeled recap, never Wordle letter-squares or emoji', () => {
     render(<GameEmojiShareCard data={classicData} t={t} />);
     const card = screen.getByTestId('game-emoji-share-card');
-    // CAT = 3 letters → 🟩🟩🟩
-    expect(card).toHaveTextContent('🟩🟩🟩');
-    // STONE = 5 letters → 🟩🟩🟩🟩🟩
-    expect(card).toHaveTextContent('🟩🟩🟩🟩🟩');
+    expect(card.textContent).not.toContain('🟩');
+    expect(card.textContent).not.toContain('🟨');
+    expect(card.textContent).not.toContain('⬛');
+    expect(card.textContent).not.toContain('⬜');
+    expect(card.textContent).not.toContain('⚡');
+    expect(card.textContent).not.toContain('📝');
+    expect(card).toHaveTextContent('3');
+    expect(card).toHaveTextContent('words');
+    expect(card).toHaveTextContent('STONE');
+    expect(card).toHaveTextContent('LexiClash');
   });
 
   it('shows Share and Copy buttons', () => {
@@ -83,7 +95,7 @@ describe('GameEmojiShareCard — blast mode', () => {
 
   it('renders blast header', () => {
     render(<GameEmojiShareCard data={blastData} t={t} />);
-    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('LexiClash Blast 💥');
+    expect(screen.getByTestId('game-emoji-share-card')).toHaveTextContent('LexiClash Blast');
   });
 
   it('renders score and clear percentage', () => {
@@ -94,20 +106,21 @@ describe('GameEmojiShareCard — blast mode', () => {
     expect(card).toHaveTextContent('Cleared');
   });
 
-  it('renders star rows for completed waves', () => {
+  it('renders labeled wave rows, not star emoji', () => {
     render(<GameEmojiShareCard data={blastData} t={t} />);
     const card = screen.getByTestId('game-emoji-share-card');
-    // Wave 1 at 100% → ⭐⭐⭐
-    expect(card).toHaveTextContent('⭐⭐⭐');
+    expect(card).toHaveTextContent('Wave 1');
+    expect(card.textContent).not.toContain('⭐');
   });
 
-  it('renders combo row when maxCombo >= 3', () => {
+  it('renders combo when maxCombo >= 3', () => {
     render(<GameEmojiShareCard data={blastData} t={t} />);
     const card = screen.getByTestId('game-emoji-share-card');
-    expect(card).toHaveTextContent('5x combo');
+    expect(card).toHaveTextContent('5x');
+    expect(card).toHaveTextContent('combo');
   });
 
-  it('does not render combo row when maxCombo < 3', () => {
+  it('does not render combo when maxCombo < 3', () => {
     const data = { ...blastData, maxCombo: 2 };
     render(<GameEmojiShareCard data={data} t={t} />);
     expect(screen.getByTestId('game-emoji-share-card')).not.toHaveTextContent('combo');

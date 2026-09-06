@@ -6,7 +6,7 @@ import { locales, defaultLocale } from '../../lib/i18n';
 
 const pushMock = vi.fn();
 const replaceMock = vi.fn();
-let mockPathname: string = '/en';
+let mockPathname: string | null = '/en';
 
 vi.mock('next/navigation', () => ({
     useRouter: () => ({ push: pushMock, replace: replaceMock }),
@@ -86,6 +86,27 @@ describe('LanguageContext — server/URL locale is authoritative over browser la
 
         await new Promise((r) => setTimeout(r, 30));
         expect(getByTestId('lang').textContent).toBe('en');
+    });
+
+    it('does not throw when usePathname() returns null and an explicit preference overrides the URL locale', async () => {
+        // Regression: usePathname() can return null on the first client render, but
+        // initialLanguage still supplies the URL locale. The explicit-preference
+        // branch then read pathname.split('/') unguarded and threw
+        // "Cannot read properties of null (reading 'split')".
+        localStorage.setItem('boggle_language', 'es');
+        localStorage.setItem('boggle_language_explicit', '1');
+        setBrowserLanguages(['he-IL', 'he']);
+        mockPathname = null;
+
+        render(
+            <LanguageProvider initialLanguage="en">
+                <Probe />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            expect(replaceMock).toHaveBeenCalledWith('/es');
+        });
     });
 
     it('still honors an explicit saved preference over the URL locale (persistence)', async () => {

@@ -89,17 +89,14 @@ describe('OfflineDownloadManager', () => {
       },
     ]);
     const { container } = render(<OfflineDownloadManager />);
-    // Wait for the listDownloads call to complete and render
+    // Wait for listDownloads to resolve AND React to paint downloaded status
+    // (asserting only that the mock was called races the setState after await).
     await waitFor(() => {
       expect(mockListDownloads).toHaveBeenCalled();
+      const allText = container.textContent || '';
+      expect(allText).toContain('English');
+      expect(allText).toContain('offlineDownload.downloaded');
     });
-    // Check that the component rendered and has the formatted content
-    // The mock t() returns the key, but it should be called with the interpolation params
-    const allText = container.textContent || '';
-    expect(allText).toContain('English'); // language name should be there
-    expect(allText).toContain('offlineDownload.downloaded'); // mock returns key
-    // Verify the actual call was made with parameters
-    expect(mockListDownloads).toHaveBeenCalled();
   });
 
   it('shows Download button for non-downloaded languages', async () => {

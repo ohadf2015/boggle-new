@@ -57,6 +57,12 @@ ARG NEXT_PUBLIC_ADSENSE_ENABLED
 ARG NEXT_PUBLIC_CHECKOUT_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
+# Build-only secrets for PostHog source map upload (see next.config.mjs). Both are
+# read only at build time and this stage is discarded, so neither is baked into the
+# runner image. POSTHOG_API_KEY is a personal API key with error-tracking write
+# access; when either is absent the upload is skipped and the build is unchanged.
+ARG POSTHOG_API_KEY
+ARG POSTHOG_PROJECT_ID
 # CDN base for heavy static media (music/sounds/showcase3d) — offloaded to Supabase Storage.
 # When set, next build inlines CDN URLs via getAssetUrl(); when unset, assets serve from public/.
 ARG NEXT_PUBLIC_ASSET_CDN_BASE

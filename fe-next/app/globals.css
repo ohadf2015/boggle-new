@@ -5594,3 +5594,13 @@ html.feedback-capturing [role="dialog"],
 html.feedback-capturing [data-dialog-overlay] {
   visibility: hidden !important;
 }
+
+/* Education / teacher / student / classroom / admin are ad-free in every
+   format. AdSenseLoader tags <html> while on such a route; any Auto-Ads unit
+   already placed before a soft-nav into it is hidden here, and the loader
+   pauses new requests (adsbygoogle.pauseAdRequests). See lib/admob-routes.ts. */
+html.ads-free-route ins.adsbygoogle,
+html.ads-free-route [id^='google_ads_iframe'],
+html.ads-free-route .google-auto-placed {
+  display: none !important;
+}

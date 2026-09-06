@@ -1534,7 +1534,28 @@ const ru = {
       "shareGapAllFoundText": "{{lesson}} — класс нашёл все слова урока.",
       "shareGapCta": "Сыграть классную игру",
       "shareGapEyebrow": "Пробел класса за сегодня",
-      "shareGapPracticeHome": "Слова для практики дома"
+      "shareGapPracticeHome": "Слова для практики дома",
+      "startReteachLive": "Начать 3-минутный reteach Live",
+      "postReteachGoogleClassroom": "Опубликовать 3-мин reteach в Google Classroom",
+      "postReteachGoogleClassroomTitle": "3-мин reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream.",
+      "assignPracticeGoogleClassroom": "Назначить практику в Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите.",
+      "printPracticeSheet": "Распечатать лист практики",
+      "printPracticeSheetTitle": "Практика пропущенных слов — {{lesson}}",
+      "printPracticeSheetSubtitle": "Повтор без устройств — напишите каждое слово и используйте в предложении",
+      "printPracticeSheetWriteLabel": "Напишите слово",
+      "printPracticeSheetSentenceLabel": "Используйте в предложении",
+      "printPracticeSheetNameLine": "Имя: ________________",
+      "printPracticeSheetDateLine": "Дата: ________________",
+      "printPracticeSheetFooter": "LexiClash · практика без устройств",
+      "startUnpluggedReteachLive": "Начать офлайн reteach Live",
+      "unpluggedReteachHint": "Ученики отвечают на распечатанном листе — без устройств",
+      "unpluggedReteachReveal": "Показать",
+      "unpluggedReteachNext": "Далее",
+      "unpluggedReteachPrev": "Назад",
+      "unpluggedReteachProgress": "Слово {{current}} из {{total}}"
     },
     "nav": {
       "section": "Учителям",
@@ -3642,6 +3663,21 @@ const ru = {
     }
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "Что дальше?",
+      "rematchHarder": "Реванш · сложнее",
+      "rematchHarderDesc": "Ступенька выше по лестнице ботов",
+      "rematchMax": "Реванш · максимум",
+      "rematchMaxDesc": "Верхняя ступень. Сложное поле, 3 бота",
+      "rematchSame": "Ещё раз так же",
+      "rematchSameDesc": "Новое поле, те же настройки",
+      "bots": "Против ботов",
+      "botsDesc": "Поле на время против одного бота",
+      "practice": "Тренировка",
+      "practiceDesc": "Без таймера, без давления",
+      "daily": "Ежедневный вызов",
+      "dailyDesc": "Одна головоломка для всех"
+    },
     "play": "Играть",
     "playDesc": "Прыгни в игру",
     "howToPlay": "Правила игры",
@@ -4310,6 +4346,19 @@ const ru = {
   "wordsFound": "слов найдено",
   "secondsLeft": "секунд осталось",
   "results": {
+    "progressPulse": {
+      "title": "Ваш прогресс",
+      "game": "Игра #{n}",
+      "vsLast": "{delta} к прошлой игре",
+      "best": "Рекорд {score}",
+      "newBest": "Новый рекорд!",
+      "coverage": "{found} из {total} слов · {pct}%",
+      "wordsFound": "Найдено слов: {found}",
+      "goalFirst": "Первая игра записана. Теперь побейте её.",
+      "goalNewBest": "Планка ваша. В следующий раз — больше {target}.",
+      "goalBeatBest": "До рекорда {gap} очк. — ещё одно слово может решить.",
+      "sparklineAria": "Ваши последние {n} игр"
+    },
     "streakIgnition": {
       "titleWon": "СЕРИЯ ЗАЖЖЕНА!",
       "titleLost": "ОДНА ПОБЕДА ДО ОГНЯ",
@@ -6875,6 +6924,13 @@ const ru = {
     "samePuzzle": "Одна пазл для всех. Как ты ранжируешься?",
     "alreadyPlayed": "Пройдено Сегодня!",
     "catchUp": {
+      "tileDone": "Сыграно · смотреть результаты",
+      "tileMissed": "Пропущено · нажмите, чтобы наверстать",
+      "tileToday": "Сегодня · играть",
+      "tileExpired": "Пропущено · срок вышел",
+      "tilePending": "Скоро",
+      "tileHint": "Нажмите на пропущенный день, чтобы наверстать — доступно {days} дня",
+      "expired": "Этот день уже закрыт — наверстать можно только последние {days} дня",
       "title": "Наверстай пропущенные дневные",
       "subtitle": "У тебя есть {count} из последних дней все еще открытых",
       "yesterday": "Вчерашний пазл",
@@ -7665,12 +7721,27 @@ const ru = {
     "longest": "Самый Длинный:",
     "emojiCard": {
       "classicHeader": "LexiClash День #{number}",
-      "blastHeader": "LexiClash Взрыв 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Взрыв",
+      "singleplayerHeader": "LexiClash Соло",
       "adventureHeader": "LexiClash Приключение М{world}-У{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Поделиться",
-      "copy": "Копировать"
+      "copy": "Копировать",
+      "lettersCount": "{len} букв × {count}",
+      "stars": "звёзды",
+      "waveLine": "Волна {n} · {pct}%",
+      "rank": "ранг",
+      "highScore": "Новый рекорд",
+      "objectives": "цели",
+      "bossDefeated": "Босс повержен",
+      "accuracy": "точность",
+      "secondsSuffix": "с",
+      "time": "время",
+      "solved": "решено",
+      "unsolved": "открыто",
+      "status": "статус",
+      "hideWords": "Скрыть слова",
+      "revealWords": "Показать слова"
     }
   },
   "boardCoach": {
@@ -9282,6 +9353,15 @@ const ru = {
     "pillClose": "Скрыть баннер приложения"
   },
   "ads": {
+    "thanks": {
+      "generic": "Спасибо за просмотр — награда открыта!",
+      "hint": "Спасибо! Вот ваша подсказка.",
+      "doubleGold": "Золото удвоено — спасибо за просмотр!",
+      "freeze": "Заморозка серии получена. Серия в безопасности.",
+      "retry": "Второй шанс открыт — вперёд!",
+      "timeLow": "Добавлено бонусное время — продолжайте!",
+      "catchup": "Пропущенный день открыт — удачи!"
+    },
     "label": "Объявление",
     "rewarded": {
       "watchForGold": "Посмотрите объявление за +{amount} золото",

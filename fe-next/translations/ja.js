@@ -1960,12 +1960,27 @@ const ja = {
     "longest": "最長:",
     "emojiCard": {
       "classicHeader": "LexiClash デイリー #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash ソロ",
       "adventureHeader": "LexiClash アドベンチャー W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "シェア",
-      "copy": "コピー"
+      "copy": "コピー",
+      "lettersCount": "{len}文字 × {count}",
+      "stars": "スター",
+      "waveLine": "ウェーブ {n} · {pct}%",
+      "rank": "ランク",
+      "highScore": "自己ベスト",
+      "objectives": "目標",
+      "bossDefeated": "ボス撃破",
+      "accuracy": "精度",
+      "secondsSuffix": "秒",
+      "time": "時間",
+      "solved": "クリア",
+      "unsolved": "未クリア",
+      "status": "ステータス",
+      "hideWords": "単語を隠す",
+      "revealWords": "単語を表示"
     }
   },
   "messaging": {
@@ -3350,6 +3365,19 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "progressPulse": {
+      "title": "あなたの成長",
+      "game": "ゲーム #{n}",
+      "vsLast": "前回比 {delta}",
+      "best": "ベスト {score}",
+      "newBest": "自己ベスト更新！",
+      "coverage": "{total} 語中 {found} 語 · {pct}%",
+      "wordsFound": "{found} 語発見",
+      "goalFirst": "最初の記録が刻まれました。次はこれを超えよう。",
+      "goalNewBest": "基準はあなたが決めた。次は {target} を超えよう。",
+      "goalBeatBest": "ベストまであと {gap} 点 — もう1語で届くかも。",
+      "sparklineAria": "直近 {n} ゲーム"
+    },
     "streakIgnition": {
       "titleWon": "ストリーク点火！",
       "titleLost": "あと1勝で点火",
@@ -6367,6 +6395,21 @@ const ja = {
     "maybeLater": "また今度"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "次は？",
+      "rematchHarder": "再戦 · もっと難しく",
+      "rematchHarderDesc": "ボットのレベルを上げる",
+      "rematchMax": "再戦 · 最高難度",
+      "rematchMaxDesc": "最上級。ハード盤面、ボット3体",
+      "rematchSame": "同じ設定でもう一度",
+      "rematchSameDesc": "新しい盤面、同じ設定",
+      "bots": "ボットと対戦",
+      "botsDesc": "ボット1体とタイマー付き対戦",
+      "practice": "練習",
+      "practiceDesc": "タイマーなし、プレッシャーなし",
+      "daily": "デイリーチャレンジ",
+      "dailyDesc": "みんな同じパズル"
+    },
     "play": "プレイ",
     "playDesc": "ゲームに参加",
     "howToPlay": "遊び方",
@@ -6924,6 +6967,13 @@ const ja = {
     "samePuzzle": "世界中で同じパズル。結果をシェアして友達に挑戦！",
     "alreadyPlayed": "今日はプレイ済み",
     "catchUp": {
+      "tileDone": "プレイ済み · 結果を見る",
+      "tileMissed": "未プレイ · タップして挑戦",
+      "tileToday": "今日 · 今すぐプレイ",
+      "tileExpired": "未プレイ · 期限切れ",
+      "tilePending": "これから",
+      "tileHint": "逃した日をタップして挑戦 — {days}日間有効",
+      "expired": "その日はもう挑戦できません — 挑戦できるのは直近{days}日間です",
       "title": "見逃したデイリーに挑戦",
       "subtitle": "直近の未完了が{count}件あります",
       "yesterday": "昨日のパズル",
@@ -13297,7 +13347,28 @@ const ja = {
       "shareGapAllFoundText": "{{lesson}} — クラスはすべての単語を見つけました。",
       "shareGapCta": "クラスゲームをプレイ",
       "shareGapEyebrow": "今日のクラスギャップ",
-      "shareGapPracticeHome": "家庭で練習する単語"
+      "shareGapPracticeHome": "家庭で練習する単語",
+      "startReteachLive": "3分再指導ライブを開始",
+      "postReteachGoogleClassroom": "3分再指導を Google Classroom に投稿",
+      "postReteachGoogleClassroomTitle": "3分再指導ライブ — {{lesson}}",
+      "postReteachGoogleClassroomBody": "リンクを開き、見逃した単語で3分ライブを開始: {{missed}}。生徒はストリームから参加します。",
+      "assignPracticeGoogleClassroom": "練習課題を Google Classroom に割り当て",
+      "assignPracticeGoogleClassroomTitle": "見逃した単語の練習 — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "リンクを開き、見逃した単語を家庭で練習: {{missed}}。終わったら提出してください。",
+      "printPracticeSheet": "練習シートを印刷",
+      "printPracticeSheetTitle": "見逃した単語の練習 — {{lesson}}",
+      "printPracticeSheetSubtitle": "デバイス不要の再指導 — 各単語を書き、文で使いましょう",
+      "printPracticeSheetWriteLabel": "単語を書く",
+      "printPracticeSheetSentenceLabel": "文で使う",
+      "printPracticeSheetNameLine": "名前: ________________",
+      "printPracticeSheetDateLine": "日付: ________________",
+      "printPracticeSheetFooter": "LexiClash · デバイス不要の練習",
+      "startUnpluggedReteachLive": "アンプラグドリティーチLiveを開始",
+      "unpluggedReteachHint": "生徒は印刷した練習シートで答えます — 端末不要",
+      "unpluggedReteachReveal": "表示",
+      "unpluggedReteachNext": "次へ",
+      "unpluggedReteachPrev": "前へ",
+      "unpluggedReteachProgress": "単語 {{current}} / {{total}}"
     },
     "nav": {
       "section": "教師向け",
@@ -14578,6 +14649,15 @@ const ja = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "視聴ありがとう — 報酬を獲得！",
+      "hint": "ありがとう！ヒントをどうぞ。",
+      "doubleGold": "ゴールド2倍！視聴ありがとう。",
+      "freeze": "ストリーク保護を確保。連続記録は安全です。",
+      "retry": "もう一度チャンス！いってらっしゃい。",
+      "timeLow": "ボーナスタイム追加 — その調子！",
+      "catchup": "逃した日に挑戦できます — がんばって！"
+    },
     "label": "広告",
     "rewarded": {
       "watchForGold": "広告を見て+{amount}ゴールド",

@@ -10,12 +10,17 @@
  */
 import { renderHook, act } from '@testing-library/react';
 
-const { midgame, admobShow, h5Show, cgFlag, nativeFlag } = vi.hoisted(() => ({
+const { midgame, admobShow, h5Show, cgFlag, nativeFlag, pathnameRef } = vi.hoisted(() => ({
   midgame: vi.fn(),
   admobShow: vi.fn(),
   h5Show: vi.fn(),
   cgFlag: { value: false },
   nativeFlag: { value: false },
+  pathnameRef: { value: '/' as string | null },
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => pathnameRef.value,
 }));
 
 vi.mock('@/hooks/useCrazyGamesAds', () => ({
@@ -43,6 +48,25 @@ describe('useInterstitialAd', () => {
     h5Show.mockClear();
     cgFlag.value = false;
     nativeFlag.value = false;
+    pathnameRef.value = '/';
+  });
+
+  it('Education routes are ad-free: no platform fires an interstitial there', () => {
+    pathnameRef.value = '/he/education/classroom-game';
+    nativeFlag.value = true;
+    const { result } = renderHook(() => useInterstitialAd());
+    act(() => { result.current.showInterstitial('classroom-complete'); });
+    expect(admobShow).not.toHaveBeenCalled();
+    expect(midgame).not.toHaveBeenCalled();
+    expect(h5Show).not.toHaveBeenCalled();
+  });
+
+  it('Teacher routes are ad-free on the CrazyGames path too', () => {
+    pathnameRef.value = '/en/teacher/classroom/abc';
+    cgFlag.value = true;
+    const { result } = renderHook(() => useInterstitialAd());
+    act(() => { result.current.showInterstitial('anything'); });
+    expect(midgame).not.toHaveBeenCalled();
   });
 
   it('CG path: dedupes same placement name', () => {

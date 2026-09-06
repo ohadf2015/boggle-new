@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
+import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -16,7 +16,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 // hand-rolled the same gate with a *different* loading predicate — two gates,
 // two redirects, and a teacher could satisfy one while the other bounced them.
 function TeacherDashboardInner() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -43,20 +43,7 @@ function TeacherDashboardInner() {
           </div>
         </div>
       )}
-      {banner === 'pro' && (
-        <div className="bg-neo-navy border-b border-black/20 px-4 py-2">
-          <div className="mx-auto max-w-5xl flex items-center justify-between">
-            <span className="text-neo-white/60 text-sm font-neo-body">{t('teacher.upgradePro.body')}</span>
-            <Link
-              href={`/${language}/teacher/upgrade`}
-              className="ms-4 font-neo-display font-black text-sm text-neo-lime underline underline-offset-2 whitespace-nowrap hover:opacity-80 transition-opacity"
-              onClick={() => trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner' })}
-            >
-              {t('teacher.upgradePro.cta')}
-            </Link>
-          </div>
-        </div>
-      )}
+      {banner === 'pro' && <TeacherProAskBanner />}
       <TeacherDashboard />
     </>
   );

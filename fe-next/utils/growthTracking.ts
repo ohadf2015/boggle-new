@@ -101,6 +101,7 @@ export type GrowthEvent =
   //             variant: 'desktop' | 'mobile' | 'landscape' }.
   | 'next_step_shown'
   | 'next_step_clicked'
+  | 'next_game_picked'
   | 'daily_challenge_completed'
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
@@ -425,8 +426,13 @@ const MAX_QUEUE_SIZE = 50;
 
 // Funnel-critical events also emitted under their canonical (unprefixed)
 // name so PostHog dashboards resolve without a `growth:` rewrite.
+//
+// t_c7d4f54a: do NOT dual-emit `game_started`. PostHog 14d showed near-1:1
+// `game_started` (2,293) vs `growth:game_started` (2,254) — double-counting
+// in taxonomy / GrowthRadar. Keep the existing `growth:game_started` emit
+// only (no new event names). Nightly coverage already treats the growth:
+// prefix as healthy for this event.
 const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
-  'game_started',
   'game_completed',
   'game_abandoned',
   'first_game_played',

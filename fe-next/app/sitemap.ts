@@ -163,6 +163,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // and FAQPage JSON-LD. Previously absent from the sitemap — the only revenue
   // surface had no crawl path (added 2026-07-29).
   addForAllLocales(routes, '/teacher/upgrade', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  // Public alias people actually type. /en/pricing 404'd while the paywall
+  // lived only at /teacher/upgrade — anyone hunting a price never reached checkout.
+  addForAllLocales(routes, '/pricing', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
 
   // ─── Education SEO landings ───
   // These pages ship fully localized copy and set `robots: { index: true }` for

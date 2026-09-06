@@ -1943,12 +1943,27 @@ const es = {
     "longest": "Más larga:",
     "emojiCard": {
       "classicHeader": "LexiClash Diario #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash Solo",
       "adventureHeader": "LexiClash Aventura W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Compartir",
-      "copy": "Copiar"
+      "copy": "Copiar",
+      "lettersCount": "{len} letras × {count}",
+      "stars": "estrellas",
+      "waveLine": "Oleada {n} · {pct}%",
+      "rank": "puesto",
+      "highScore": "Nuevo récord",
+      "objectives": "objetivos",
+      "bossDefeated": "Jefe derrotado",
+      "accuracy": "precisión",
+      "secondsSuffix": "s",
+      "time": "tiempo",
+      "solved": "resuelto",
+      "unsolved": "abierto",
+      "status": "estado",
+      "hideWords": "Ocultar palabras",
+      "revealWords": "Mostrar palabras"
     }
   },
   "messaging": {
@@ -3121,6 +3136,19 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "progressPulse": {
+      "title": "Tu progreso",
+      "game": "Partida #{n}",
+      "vsLast": "{delta} frente a tu última partida",
+      "best": "Mejor {score}",
+      "newBest": "¡Nuevo récord!",
+      "coverage": "{found} de {total} palabras · {pct}%",
+      "wordsFound": "{found} palabras encontradas",
+      "goalFirst": "Primera partida registrada. Ahora supérala.",
+      "goalNewBest": "Has puesto el listón. Supera {target} la próxima vez.",
+      "goalBeatBest": "A {gap} pts de tu récord: una palabra más podría bastar.",
+      "sparklineAria": "Tus últimas {n} partidas"
+    },
     "streakIgnition": {
       "titleWon": "¡RACHA ENCENDIDA!",
       "titleLost": "UNA VICTORIA PARA ENCENDERLA",
@@ -6352,6 +6380,21 @@ const es = {
     "maybeLater": "Quizás después"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "¿Y ahora qué?",
+      "rematchHarder": "Revancha · más difícil",
+      "rematchHarderDesc": "Sube un peldaño contra los bots",
+      "rematchMax": "Revancha · máximo",
+      "rematchMaxDesc": "Nivel máximo. Tablero difícil, 3 bots",
+      "rematchSame": "Otra igual",
+      "rematchSameDesc": "Tablero nuevo, misma configuración",
+      "bots": "Contra bots",
+      "botsDesc": "Tablero con tiempo contra un bot",
+      "practice": "Práctica",
+      "practiceDesc": "Sin tiempo, sin presión",
+      "daily": "Reto diario",
+      "dailyDesc": "El mismo puzle para todos"
+    },
     "play": "Jugar",
     "playDesc": "Entra al juego",
     "howToPlay": "Cómo jugar",
@@ -6841,6 +6884,13 @@ const es = {
     "samePuzzle": "Mismo puzzle para todos en el mundo. ¡Comparte tus resultados para desafiar a amigos!",
     "alreadyPlayed": "Ya Jugaste Hoy",
     "catchUp": {
+      "tileDone": "Jugado · ver resultados",
+      "tileMissed": "Perdido · toca para recuperarlo",
+      "tileToday": "Hoy · juega ahora",
+      "tileExpired": "Perdido · ya no se puede recuperar",
+      "tilePending": "Próximamente",
+      "tileHint": "Toca un día perdido para recuperarlo — disponible {days} días",
+      "expired": "Ese día ya cerró — solo puedes recuperar los últimos {days} días",
       "title": "Recupera los retos perdidos",
       "subtitle": "Tienes {count} de los últimos días sin completar",
       "yesterday": "El reto de ayer",
@@ -13289,7 +13339,28 @@ const es = {
       "shareGapAllFoundText": "{{lesson}} — la clase encontró todas las palabras de la lección.",
       "shareGapCta": "Jugar una partida de clase",
       "shareGapEyebrow": "El hueco de hoy",
-      "shareGapPracticeHome": "Palabras para practicar en casa"
+      "shareGapPracticeHome": "Palabras para practicar en casa",
+      "startReteachLive": "Empezar reteach Live de 3 min",
+      "postReteachGoogleClassroom": "Publicar reteach de 3 min en Google Classroom",
+      "postReteachGoogleClassroomTitle": "Reteach Live de 3 min — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Abre el enlace y empieza el Live de 3 min con estas palabras: {{missed}}. Los alumnos se unen desde el Stream.",
+      "assignPracticeGoogleClassroom": "Asignar práctica en Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Practicar palabras falladas — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Abre el enlace y practica en casa estas palabras: {{missed}}. Entrégalo cuando termines.",
+      "printPracticeSheet": "Imprimir hoja de práctica",
+      "printPracticeSheetTitle": "Práctica de palabras falladas — {{lesson}}",
+      "printPracticeSheetSubtitle": "Repaso sin dispositivos — escribe cada palabra y úsala en una frase",
+      "printPracticeSheetWriteLabel": "Escribe la palabra",
+      "printPracticeSheetSentenceLabel": "Úsala en una frase",
+      "printPracticeSheetNameLine": "Nombre: ________________",
+      "printPracticeSheetDateLine": "Fecha: ________________",
+      "printPracticeSheetFooter": "LexiClash · práctica sin dispositivos",
+      "startUnpluggedReteachLive": "Iniciar reteach Live sin dispositivos",
+      "unpluggedReteachHint": "Los alumnos responden en la hoja impresa — sin dispositivos",
+      "unpluggedReteachReveal": "Mostrar",
+      "unpluggedReteachNext": "Siguiente",
+      "unpluggedReteachPrev": "Anterior",
+      "unpluggedReteachProgress": "Palabra {{current}} de {{total}}"
     },
     "nav": {
       "section": "Docentes",
@@ -14417,6 +14488,15 @@ const es = {
     "forfeitCancel": "Cancelar"
   },
   "ads": {
+    "thanks": {
+      "generic": "¡Gracias por ver! Recompensa desbloqueada.",
+      "hint": "¡Gracias! Aquí tienes tu pista.",
+      "doubleGold": "¡Oro duplicado! Gracias por ver.",
+      "freeze": "Congelación de racha lista. Tu racha está a salvo.",
+      "retry": "Segunda oportunidad desbloqueada. ¡A por ella!",
+      "timeLow": "Tiempo extra añadido. ¡Sigue así!",
+      "catchup": "Día perdido desbloqueado. ¡Suerte!"
+    },
     "label": "Anuncio",
     "rewarded": {
       "watchForGold": "Ver anuncio por +{amount} oro",

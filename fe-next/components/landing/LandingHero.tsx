@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useCrazyGames, detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
 import { useExperiment } from '@/hooks/useExperiment';
 import { HeroStyleMascot } from './HeroStyleMascot';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
@@ -60,9 +60,11 @@ function FloatingTiles() {
 // `isMobilePortrait` only feeds behavior props on the mascot (hover/click).
 export function LandingHero({ players, playersLoading, isMobilePortrait, energetic, activePlayers = 0 }: LandingHeroProps) {
   const { t, language } = useLanguage();
-  const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
-  // Still-resolving counts as embedded so the classroom hero never flashes on CrazyGames.
-  const showClassroomHero = !cgLoading && !isOnCrazyGamesPlatform;
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // SSR + first paint: use sync iframe/referrer detect (false on the server and on
+  // normal web). Do NOT wait on CrazyGames SDK isLoading — it starts true and used
+  // to force consumer H1 for crawlers and every first paint.
+  const showClassroomHero = !isOnCrazyGamesPlatform && !detectCrazyGamesSync();
   const showLivePill = energetic && activePlayers > 10;
   const { variant: heroVariant, trackExposure } = useExperiment('landing-variant-homepage-v1');
   const showHeroCta = heroVariant === 'variant';

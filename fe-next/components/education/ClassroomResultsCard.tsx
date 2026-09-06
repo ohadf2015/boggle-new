@@ -18,10 +18,14 @@
 'use client';
 
 import { useState } from 'react';
-import { GraduationCap, Check, X, RotateCcw, Play, Share2 } from 'lucide-react';
+import Link from 'next/link';
+import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
+import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
+import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -54,6 +58,111 @@ export function ClassroomResultsCard({
 
   const foundByMe = (word: { foundBy: string[] }) =>
     word.foundBy.some((n) => n.toLowerCase() === username.toLowerCase());
+
+  const classGapUrlForTeacher = (() => {
+    if (!isTeacher || summary.missedWords.length === 0) return null;
+    try {
+      return buildClassGapShareUrl({
+        locale: language,
+        lessonNames: summary.lessonNames,
+        teacherName: summary.teacherName,
+        found: summary.classFoundCount,
+        total: summary.totalWords,
+        missedWords: summary.missedWords,
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * Google Classroom add-on MVP: post the class-gap card (missed words, no names)
+   * to the Stream so the teacher can start a 3-min reteach Live from that link.
+   * Phase-1 share dialog — no OAuth. Absolute lexiclash.live URL.
+   */
+  const googleClassroomReteachHref = (() => {
+    if (!classGapUrlForTeacher) return null;
+    try {
+      const missed = summary.missedWords.slice(0, 8).join(', ');
+      return buildGoogleClassroomShareUrl({
+        joinUrl: classGapUrlForTeacher,
+        title: t('education.results.postReteachGoogleClassroomTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        body: t('education.results.postReteachGoogleClassroomBody', {
+          missed,
+        }),
+        itemType: 'announcement',
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * After Live ends: assign the same class-gap card as Google Classroom *homework*
+   * (itemtype=assignment). Students open practice-at-home words from Classwork;
+   * teacher sets due date in Google's dialog. Still Phase-1 share — no OAuth.
+   */
+  const googleClassroomAssignHref = (() => {
+    if (!classGapUrlForTeacher) return null;
+    try {
+      const missed = summary.missedWords.slice(0, 8).join(', ');
+      return buildGoogleClassroomShareUrl({
+        joinUrl: classGapUrlForTeacher,
+        title: t('education.results.assignPracticeGoogleClassroomTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        body: t('education.results.assignPracticeGoogleClassroomBody', {
+          missed,
+        }),
+        itemType: 'assignment',
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  const unpluggedReteachHref = (() => {
+    if (!isTeacher || summary.missedWords.length === 0) return null;
+    try {
+      return buildUnpluggedReteachPath({
+        locale: language,
+        lessonNames: summary.lessonNames,
+        teacherName: summary.teacherName,
+        found: summary.classFoundCount,
+        total: summary.totalWords,
+        missedWords: summary.missedWords,
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * Device-free reteach: printable missed-words practice sheet (foil Kahoot
+   * Classic Unplugged / Team Tiles). Class-level words only — no student names.
+   */
+  const handlePrintPracticeSheet = () => {
+    if (!isTeacher || summary.missedWords.length === 0) return;
+    openMissedWordsPracticeSheet({
+      lesson: summary.lessonNames.join(', '),
+      teacher: summary.teacherName,
+      missedWords: summary.missedWords,
+      locale: language,
+      labels: {
+        title: t('education.results.printPracticeSheetTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        subtitle: t('education.results.printPracticeSheetSubtitle'),
+        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
+        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
+        nameLine: t('education.results.printPracticeSheetNameLine'),
+        dateLine: t('education.results.printPracticeSheetDateLine'),
+        footer: t('education.results.printPracticeSheetFooter'),
+      },
+    });
+  };
 
   const handleShareGap = async () => {
     const lesson = summary.lessonNames.join(', ');
@@ -166,6 +275,65 @@ export function ClassroomResultsCard({
                 {t('education.results.playReteachRound')}
               </button>
             )}
+            {googleClassroomReteachHref && (
+              <a
+                href={googleClassroomReteachHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="post-reteach-google-classroom"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <GraduationCap className="w-4 h-4" aria-hidden />
+                {t('education.results.postReteachGoogleClassroom')}
+              </a>
+            )}
+            {googleClassroomAssignHref && (
+              <a
+                href={googleClassroomAssignHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="assign-practice-google-classroom"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <GraduationCap className="w-4 h-4" aria-hidden />
+                {t('education.results.assignPracticeGoogleClassroom')}
+              </a>
+            )}
+            {unpluggedReteachHref && (
+              <Link
+                href={unpluggedReteachHref}
+                data-testid="start-unplugged-reteach-live"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-pink/90 text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <Play className="w-4 h-4" aria-hidden />
+                {t('education.results.startUnpluggedReteachLive')}
+              </Link>
+            )}
+            <button
+              type="button"
+              data-testid="print-missed-words-practice-sheet"
+              onClick={handlePrintPracticeSheet}
+              className={cn(
+                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
+                'shadow-hard-sm hover:shadow-hard transition-all'
+              )}
+            >
+              <Printer className="w-4 h-4" aria-hidden />
+              {t('education.results.printPracticeSheet')}
+            </button>
           </div>
         ) : (
           <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">

@@ -1556,12 +1556,27 @@ const en = {
     "longest": "Longest:",
     "emojiCard": {
       "classicHeader": "LexiClash Daily #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash Solo",
       "adventureHeader": "LexiClash Adventure W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "Share",
-      "copy": "Copy"
+      "copy": "Copy",
+      "lettersCount": "{len}-letter × {count}",
+      "stars": "stars",
+      "waveLine": "Wave {n} · {pct}%",
+      "rank": "rank",
+      "highScore": "New high score",
+      "objectives": "objectives",
+      "bossDefeated": "Boss defeated",
+      "accuracy": "accuracy",
+      "secondsSuffix": "s",
+      "time": "time",
+      "solved": "cleared",
+      "unsolved": "open",
+      "status": "status",
+      "hideWords": "Hide words",
+      "revealWords": "Reveal words"
     }
   },
   "messaging": {
@@ -2887,6 +2902,19 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "progressPulse": {
+      "title": "Your progress",
+      "game": "Game #{n}",
+      "vsLast": "{delta} vs your last game",
+      "best": "Best {score}",
+      "newBest": "New best!",
+      "coverage": "{found} of {total} words · {pct}%",
+      "wordsFound": "{found} words found",
+      "goalFirst": "First game on the board. Now beat it.",
+      "goalNewBest": "You set the bar. Beat {target} next time.",
+      "goalBeatBest": "{gap} pts from your best — one more word could do it.",
+      "sparklineAria": "Your last {n} games"
+    },
     "streakIgnition": {
       "titleWon": "STREAK IGNITED!",
       "titleLost": "ONE WIN TO IGNITE",
@@ -5858,6 +5886,21 @@ const en = {
     "maybeLater": "Not now"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "What's next?",
+      "rematchHarder": "Rematch · harder",
+      "rematchHarderDesc": "Step up the bot ladder",
+      "rematchMax": "Rematch · max",
+      "rematchMaxDesc": "Top rung. Hard board, 3 bots",
+      "rematchSame": "Same again",
+      "rematchSameDesc": "New board, same setup",
+      "bots": "Fight bots",
+      "botsDesc": "Timed board vs one bot",
+      "practice": "Practice",
+      "practiceDesc": "No timer, no pressure",
+      "daily": "Daily Challenge",
+      "dailyDesc": "Same puzzle as everyone"
+    },
     "play": "Play",
     "playDesc": "Jump into a game",
     "howToPlay": "How to Play",
@@ -6288,6 +6331,13 @@ const en = {
     "samePuzzle": "Same puzzle for everyone. How do you rank?",
     "alreadyPlayed": "Done Today!",
     "catchUp": {
+      "tileDone": "Played · view results",
+      "tileMissed": "Missed · tap to catch up",
+      "tileToday": "Today · play now",
+      "tileExpired": "Missed · catch-up window closed",
+      "tilePending": "Coming up",
+      "tileHint": "Tap a missed day to catch up — open for {days} days",
+      "expired": "That one's closed — catch-up covers the last {days} days",
       "title": "Catch up missed dailies",
       "subtitle": "You have {count} from the last few days still open",
       "yesterday": "Yesterday's puzzle",
@@ -11803,7 +11853,28 @@ const en = {
       "shareGapAllFoundText": "{{lesson}} — the class found every lesson word.",
       "shareGapCta": "Play a class game",
       "shareGapEyebrow": "Today's class gap",
-      "shareGapPracticeHome": "Words to practice at home"
+      "shareGapPracticeHome": "Words to practice at home",
+      "startReteachLive": "Start 3-min reteach Live",
+      "postReteachGoogleClassroom": "Post 3-min reteach to Google Classroom",
+      "postReteachGoogleClassroomTitle": "3-min reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from the Stream.",
+      "assignPracticeGoogleClassroom": "Assign practice homework to Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "Practice missed words — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "Open the link and practise these missed words at home: {{missed}}. Turn in when done.",
+      "printPracticeSheet": "Print practice sheet",
+      "printPracticeSheetTitle": "Missed-words practice — {{lesson}}",
+      "printPracticeSheetSubtitle": "Device-free reteach — write each word, then use it in a sentence",
+      "printPracticeSheetWriteLabel": "Write the word",
+      "printPracticeSheetSentenceLabel": "Use it in a sentence",
+      "printPracticeSheetNameLine": "Name: ________________",
+      "printPracticeSheetDateLine": "Date: ________________",
+      "printPracticeSheetFooter": "LexiClash · device-free practice",
+      "startUnpluggedReteachLive": "Start unplugged reteach Live",
+      "unpluggedReteachHint": "Students answer on the printed practice sheet — no devices needed",
+      "unpluggedReteachReveal": "Reveal",
+      "unpluggedReteachNext": "Next",
+      "unpluggedReteachPrev": "Previous",
+      "unpluggedReteachProgress": "Word {{current}} of {{total}}"
     },
     "nav": {
       "section": "Teachers",
@@ -13090,6 +13161,15 @@ const en = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "Thanks for watching — reward unlocked!",
+      "hint": "Thanks! Here's your reveal.",
+      "doubleGold": "Gold doubled — thanks for watching!",
+      "freeze": "Streak freeze secured. Your streak is safe.",
+      "retry": "Second chance unlocked — go get it!",
+      "timeLow": "Bonus time added — keep going!",
+      "catchup": "Missed day unlocked — good luck!"
+    },
     "label": "Advertisement",
     "rewarded": {
       "watchForGold": "Watch ad for +{amount} gold",

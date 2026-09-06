@@ -3,6 +3,7 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { retryImport } from '@/utils/retryImport';
 
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -31,8 +32,10 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Dynamic import for redirect component (client component)
-const DailyRedirect = dynamicImport(() => import('@/components/daily/DailyRedirect'), {
+// Dynamic import for redirect component (client component).
+// retryImport hardens the lazy chunk load so a stale-deploy or flaky-network
+// ChunkLoadError retries and then recovers instead of freezing the fallback.
+const DailyRedirect = dynamicImport(retryImport(() => import('@/components/daily/DailyRedirect')), {
   loading: LoadingFallback,
 });
 

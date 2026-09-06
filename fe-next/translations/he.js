@@ -1960,12 +1960,27 @@ const he = {
     "longest": "הכי ארוכה:",
     "emojiCard": {
       "classicHeader": "LexiClash יומי #{number}",
-      "blastHeader": "LexiClash Blast 💥",
-      "singleplayerHeader": "LexiClash ⚔️",
+      "blastHeader": "LexiClash Blast",
+      "singleplayerHeader": "LexiClash יחיד",
       "adventureHeader": "LexiClash הרפתקה W{world}-L{level}",
-      "drillHeader": "LexiClash {type} 🧠",
+      "drillHeader": "LexiClash {type}",
       "share": "שתף",
-      "copy": "העתק"
+      "copy": "העתק",
+      "lettersCount": "{len} אותיות × {count}",
+      "stars": "כוכבים",
+      "waveLine": "גל {n} · {pct}%",
+      "rank": "דירוג",
+      "highScore": "שיא חדש",
+      "objectives": "יעדים",
+      "bossDefeated": "הבוס הובס",
+      "accuracy": "דיוק",
+      "secondsSuffix": "ש",
+      "time": "זמן",
+      "solved": "נפתר",
+      "unsolved": "פתוח",
+      "status": "סטטוס",
+      "hideWords": "הסתר מילים",
+      "revealWords": "הצג מילים"
     }
   },
   "messaging": {
@@ -3393,6 +3408,19 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "progressPulse": {
+      "title": "ההתקדמות שלך",
+      "game": "משחק #{n}",
+      "vsLast": "{delta} לעומת המשחק הקודם",
+      "best": "שיא {score}",
+      "newBest": "שיא חדש!",
+      "coverage": "{found} מתוך {total} מילים · {pct}%",
+      "wordsFound": "{found} מילים נמצאו",
+      "goalFirst": "המשחק הראשון נרשם. עכשיו תשברו אותו.",
+      "goalNewBest": "קבעתם את הרף. בפעם הבאה עוברים את {target}.",
+      "goalBeatBest": "{gap} נק׳ מהשיא שלך — עוד מילה אחת יכולה לעשות את זה.",
+      "sparklineAria": "{n} המשחקים האחרונים שלך"
+    },
     "streakIgnition": {
       "titleWon": "הרצף נדלק!",
       "titleLost": "ניצחון אחד כדי להצית",
@@ -6403,6 +6431,21 @@ const he = {
     "maybeLater": "אולי אחר כך"
   },
   "singlePlayer": {
+    "nextGame": {
+      "title": "מה הלאה?",
+      "rematchHarder": "משחק חוזר · קשה יותר",
+      "rematchHarderDesc": "עולים שלב בסולם הבוטים",
+      "rematchMax": "משחק חוזר · מקסימום",
+      "rematchMaxDesc": "השלב הגבוה ביותר. לוח קשה, 3 בוטים",
+      "rematchSame": "עוד פעם אותו דבר",
+      "rematchSameDesc": "לוח חדש, אותן הגדרות",
+      "bots": "נגד בוטים",
+      "botsDesc": "לוח עם טיימר מול בוט אחד",
+      "practice": "אימון",
+      "practiceDesc": "בלי טיימר, בלי לחץ",
+      "daily": "האתגר היומי",
+      "dailyDesc": "אותו פאזל לכולם"
+    },
     "play": "שחק",
     "playDesc": "קפוץ למשחק",
     "howToPlay": "איך משחקים",
@@ -6799,6 +6842,13 @@ const he = {
     "samePuzzle": "אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!",
     "alreadyPlayed": "כבר שיחקתם היום",
     "catchUp": {
+      "tileDone": "שיחקת · לצפייה בתוצאות",
+      "tileMissed": "פספסת · הקש/י להשלמה",
+      "tileToday": "היום · לשחק עכשיו",
+      "tileExpired": "פספסת · חלון ההשלמה נסגר",
+      "tilePending": "בקרוב",
+      "tileHint": "הקש/י על יום שפספסת כדי להשלים אותו — פתוח {days} ימים",
+      "expired": "היום הזה כבר נסגר — אפשר להשלים רק את {days} הימים האחרונים",
       "title": "השלימו אתגרים שפספסתם",
       "subtitle": "יש לכם {count} מהימים האחרונים שעדיין פתוחים",
       "yesterday": "החידה של אתמול",
@@ -13143,7 +13193,28 @@ const he = {
       "shareGapAllFoundText": "{{lesson}} — הכיתה מצאה את כל מילות השיעור.",
       "shareGapCta": "שחקו משחק כיתה",
       "shareGapEyebrow": "פער הכיתה מהיום",
-      "shareGapPracticeHome": "מילים לתרגול בבית"
+      "shareGapPracticeHome": "מילים לתרגול בבית",
+      "startReteachLive": "התחלת Live חזרה ל-3 דקות",
+      "postReteachGoogleClassroom": "פרסום חזרה ל-3 דקות ב-Google Classroom",
+      "postReteachGoogleClassroomTitle": "Live חזרה ל-3 דקות — {{lesson}}",
+      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו Live ל-3 דקות על המילים החסרות: {{missed}}. התלמידים מצטרפים מה-Stream.",
+      "assignPracticeGoogleClassroom": "שיבוץ תרגול ב-Google Classroom",
+      "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות — {{lesson}}",
+      "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו.",
+      "printPracticeSheet": "הדפסת דף תרגול",
+      "printPracticeSheetTitle": "תרגול מילים חסרות — {{lesson}}",
+      "printPracticeSheetSubtitle": "חזרה בלי מכשירים — כתבו כל מילה והשתמשו בה במשפט",
+      "printPracticeSheetWriteLabel": "כתבו את המילה",
+      "printPracticeSheetSentenceLabel": "השתמשו בה במשפט",
+      "printPracticeSheetNameLine": "שם: ________________",
+      "printPracticeSheetDateLine": "תאריך: ________________",
+      "printPracticeSheetFooter": "LexiClash · תרגול בלי מכשירים",
+      "startUnpluggedReteachLive": "התחל שיעור חי מנותק ממסכים",
+      "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס — בלי מכשירים",
+      "unpluggedReteachReveal": "חשוף",
+      "unpluggedReteachNext": "הבא",
+      "unpluggedReteachPrev": "הקודם",
+      "unpluggedReteachProgress": "מילה {{current}} מתוך {{total}}"
     },
     "nav": {
       "section": "מורים",
@@ -14471,6 +14542,15 @@ const he = {
     }
   },
   "ads": {
+    "thanks": {
+      "generic": "תודה שצפית — הפרס נפתח!",
+      "hint": "תודה! הנה הרמז שלך.",
+      "doubleGold": "הזהב הוכפל — תודה שצפית!",
+      "freeze": "הקפאת הרצף מאובטחת. הרצף שלך בטוח.",
+      "retry": "הזדמנות שנייה נפתחה — קדימה!",
+      "timeLow": "זמן בונוס נוסף — ממשיכים!",
+      "catchup": "היום שפספסת נפתח — בהצלחה!"
+    },
     "label": "פרסומת",
     "rewarded": {
       "watchForGold": "צפו בפרסומת ל-+{amount} זהב",

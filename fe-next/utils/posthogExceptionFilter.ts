@@ -26,6 +26,10 @@ interface ExceptionListEntry {
 
 const NOISE_VALUE_PATTERNS: RegExp[] = [
   /Unable to convert color/i,
+  // JSON-LD @context TypeError from browser extensions (SEO analyzers, schema
+  // validators). Not first-party code — no application code calls .toLowerCase()
+  // on @context. Mirrors the same suppression in sentry.client.config.ts.
+  /\["@context"\]\.toLowerCase/i,
 ];
 
 // Multi-tab Supabase auth-token lock contention. Three observed shapes:

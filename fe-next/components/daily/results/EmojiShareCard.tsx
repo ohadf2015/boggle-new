@@ -1,16 +1,13 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { m } from 'framer-motion';
-import { Eye, EyeOff, Share2, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { NeoPanel } from '@/components/ui/panel';
+import React, { useState, useCallback, useMemo } from 'react';
 import type { Language } from '@/types';
+import { ShareRecapCard } from '@/components/shared/ShareRecapCard';
+import type { ShareParts } from '@/components/shared/gameShareParts';
 
 interface WordEntry {
   word: string;
   found: boolean;
-  /** Per-letter feedback: green (correct), yellow (present), gray (absent) */
   feedback?: Array<{ letter: string; feedback: 'green' | 'yellow' | 'gray' }>;
 }
 
@@ -23,35 +20,68 @@ export interface EmojiShareCardProps {
   t: (key: string) => string;
 }
 
-function wordToEmoji(entry: WordEntry): string {
-  // Use per-letter feedback for Wordle-style colored squares
-  if (entry.feedback && entry.feedback.length > 0) {
-    return entry.feedback
-      .map((f) => {
-        if (f.feedback === 'green') return '🟩';
-        if (f.feedback === 'yellow') return '🟨';
-        return '⬛';
-      })
-      .join('');
+function countByLength(words: WordEntry[]): Array<{ len: number; found: number; total: number }> {
+  const map = new Map<number, { found: number; missed: number }>();
+  for (const w of words) {
+    const len = Math.max(1, w.word.length);
+    const row = map.get(len) ?? { found: 0, missed: 0 };
+    if (w.found) row.found += 1;
+    else row.missed += 1;
+    map.set(len, row);
   }
-  // Fallback: all green if found, all black if not
-  const square = entry.found ? '🟩' : '⬛';
-  return square.repeat(entry.word.length);
+  return [...map.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([len, counts]) => ({ len, found: counts.found, total: counts.found + counts.missed }));
 }
 
-/** Mask a word with asterisks, keeping length visible */
-function maskWord(word: string): string {
-  return '*'.repeat(word.length);
+function longestFound(words: WordEntry[]): WordEntry | null {
+  return words
+    .filter((w) => w.found && w.word.length > 0)
+    .sort((a, b) => b.word.length - a.word.length)[0] ?? null;
 }
 
-/** Build plain-text share string for daily challenge (E-2) */
-function buildDailyShareText(puzzleNumber: number, score: number, solved: boolean, words: WordEntry[], t: (key: string) => string): string {
-  const rows = words.slice(0, 8).map(wordToEmoji);
+function buildParts(
+  puzzleNumber: number,
+  score: number,
+  solved: boolean,
+  words: WordEntry[],
+  t: (key: string) => string,
+): ShareParts {
+  const found = words.filter((w) => w.found).length;
+  const longest = longestFound(words);
+  const stats = [
+    { value: String(found), label: t('share.words') },
+    {
+      value: solved ? t('share.emojiCard.solved') : t('share.emojiCard.unsolved'),
+      label: t('share.emojiCard.status'),
+    },
+  ];
+  if (longest) {
+    stats.push({ value: String(longest.word.length), label: t('share.longest') });
+  }
+  return {
+    header: t('daily.puzzleNumber').replace('{number}', String(puzzleNumber)),
+    score: score.toLocaleString(),
+    scoreLabel: t('wordHunt.leaderboard.pts'),
+    stats,
+    details: [],
+  };
+}
+
+/** Plain-text share: labeled LexiClash recap, no emoji grid. */
+export function buildDailyShareText(
+  puzzleNumber: number,
+  score: number,
+  solved: boolean,
+  words: WordEntry[],
+  t: (key: string) => string,
+): string {
+  const parts = buildParts(puzzleNumber, score, solved, words, t);
   return [
-    `${t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))} ${solved ? '✅' : '❌'}`,
-    rows.join('\n'),
-    `${score} ${t('wordHunt.leaderboard.pts')}`,
-    'https://lexiclash.live',
+    `LexiClash · ${parts.header}`,
+    `${parts.score} ${parts.scoreLabel}`,
+    parts.stats.map((s) => `${s.value} ${s.label}`).join(' · '),
+    'lexiclash.live',
   ].join('\n');
 }
 
@@ -60,13 +90,22 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   score,
   solved,
   words,
-  language: _language,  // kept in interface for future RTL support
+  language: _language,
   t,
 }) => {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareText = buildDailyShareText(puzzleNumber, score, solved, words, t);
+  const shareText = useMemo(
+    () => buildDailyShareText(puzzleNumber, score, solved, words, t),
+    [puzzleNumber, score, solved, words, t],
+  );
+  const parts = useMemo(
+    () => buildParts(puzzleNumber, score, solved, words, t),
+    [puzzleNumber, score, solved, words, t],
+  );
+  const lengthBars = useMemo(() => countByLength(words), [words]);
+  const longest = longestFound(words);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -89,79 +128,34 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   }, [shareText, handleCopy]);
 
   return (
-    <NeoPanel asChild tone="navy" className="p-4 font-mono text-sm select-all">
-    <m.div
-      data-testid="emoji-share-card"
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-    >
-      {/* Puzzle header */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-neo-lime font-black text-xs uppercase tracking-widest">
-          {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))} {solved ? '✅' : '❌'}
-        </span>
-        <button type="button"
+    <ShareRecapCard
+      testId="emoji-share-card"
+      brand="LexiClash"
+      parts={parts}
+      longestLabel={t('share.longest')}
+      longestWord={longest?.word ?? null}
+      revealed={revealed}
+      lengthBars={lengthBars}
+      extra={
+        <button
+          type="button"
           data-testid="emoji-reveal-toggle"
           onClick={(e) => {
             e.stopPropagation();
-            setRevealed(!revealed);
+            setRevealed((v) => !v);
           }}
-          className="p-1 rounded-lg hover:bg-neo-navy-light transition-colors text-slate-400 hover:text-slate-200"
-          aria-label={revealed ? 'Hide words' : 'Reveal words'}
+          className="relative mb-3 text-[10px] font-black uppercase tracking-widest text-neo-cyan"
         >
-          {revealed ? (
-            <EyeOff className="w-3.5 h-3.5" />
-          ) : (
-            <Eye className="w-3.5 h-3.5" />
-          )}
+          {revealed ? t('share.emojiCard.hideWords') : t('share.emojiCard.revealWords')}
         </button>
-      </div>
-
-      {/* Emoji rows */}
-      <div className="space-y-1 mb-3">
-        {words.map((entry, idx) => (
-          <div key={`word-${idx}-${entry.word}`} className="flex items-center gap-2">
-            <span className="text-base leading-none">{wordToEmoji(entry)}</span>
-            <span className={`text-xs uppercase tracking-wide ${entry.found ? 'text-slate-400' : 'text-slate-600'}`}>
-              {revealed ? entry.word : maskWord(entry.word)}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Score + domain */}
-      <div className="border-t border-slate-700/50 pt-2 mt-2 mb-3">
-        <div className="text-neo-white font-bold text-sm">{score} {t('wordHunt.leaderboard.pts')}</div>
-        <div className="text-slate-500 text-xs mt-0.5">lexiclash.live</div>
-      </div>
-
-      {/* Share buttons (E-2 — were missing entirely) */}
-      <div className="flex gap-2 select-none">
-        <Button
-          onClick={handleNativeShare}
-          size="sm"
-          className="flex-1 py-2 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm font-black text-xs uppercase hover:shadow-hard transition-all"
-        >
-          <Share2 className="w-3.5 h-3.5 me-1" />
-          {t('share.emojiCard.share')}
-        </Button>
-        <Button
-          onClick={handleCopy}
-          size="sm"
-          aria-label={copied ? t('common.copied') : t('share.emojiCard.copy')}
-          className="flex-1 py-2 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm text-xs uppercase hover:shadow-hard transition-all"
-        >
-          {copied ? (
-            <Check className="w-3.5 h-3.5 me-1 text-neo-cyan" />
-          ) : (
-            <Copy className="w-3.5 h-3.5 me-1" />
-          )}
-          {copied ? t('common.copied') : t('share.emojiCard.copy')}
-        </Button>
-      </div>
-    </m.div>
-    </NeoPanel>
+      }
+      onShare={handleNativeShare}
+      onCopy={handleCopy}
+      copied={copied}
+      shareLabel={t('share.emojiCard.share')}
+      copyLabel={t('share.emojiCard.copy')}
+      copiedLabel={t('common.copied')}
+    />
   );
 };
 

@@ -18,6 +18,8 @@
  * Pure: no network, no side effects, no browser APIs. Safe on the server.
  */
 
+export type GoogleClassroomItemType = 'announcement' | 'assignment';
+
 export interface GoogleClassroomShareArgs {
   /** Absolute http(s) URL a student can open to join — the code lives in its path. */
   joinUrl: string;
@@ -25,6 +27,11 @@ export interface GoogleClassroomShareArgs {
   title?: string;
   /** Post body. Same rules as title. */
   body?: string;
+  /**
+   * Stream item type. Default `announcement` (join / reteach Live — lands on Stream).
+   * Use `assignment` for post-Live homework practice; Google prompts the teacher for a due date.
+   */
+  itemType?: GoogleClassroomItemType;
 }
 
 const SHARE_ENDPOINT = 'https://classroom.google.com/share';
@@ -35,7 +42,12 @@ const SHARE_ENDPOINT = 'https://classroom.google.com/share';
  * @throws if `joinUrl` is not an absolute http(s) URL. The result is placed in an anchor a teacher
  * clicks, so a `javascript:` or otherwise unparseable value must never survive to the DOM.
  */
-export function buildGoogleClassroomShareUrl({ joinUrl, title, body }: GoogleClassroomShareArgs): string {
+export function buildGoogleClassroomShareUrl({
+  joinUrl,
+  title,
+  body,
+  itemType = 'announcement',
+}: GoogleClassroomShareArgs): string {
   let parsed: URL;
   try {
     parsed = new URL(joinUrl);
@@ -45,12 +57,15 @@ export function buildGoogleClassroomShareUrl({ joinUrl, title, body }: GoogleCla
   if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
     throw new Error(`buildGoogleClassroomShareUrl: joinUrl must be http(s), got ${parsed.protocol}`);
   }
+  if (itemType !== 'announcement' && itemType !== 'assignment') {
+    throw new Error(`buildGoogleClassroomShareUrl: unsupported itemType: ${String(itemType)}`);
+  }
 
   const share = new URL(SHARE_ENDPOINT);
   share.searchParams.set('url', joinUrl);
-  // Announcement rather than assignment: this is "come and join us", not graded work, and the
-  // Stream is where students actually look. An assignment would also demand a due date.
-  share.searchParams.set('itemtype', 'announcement');
+  // Default announcement = "come and join / reteach Live" on the Stream.
+  // Assignment = post-Live practice homework; Google asks the teacher for a due date in-dialog.
+  share.searchParams.set('itemtype', itemType);
 
   // Only send what we actually have — Google renders whatever it is given, so an empty title
   // produces an empty post. The join code is deliberately NOT repeated as its own parameter;

@@ -35,7 +35,7 @@ describe('markFirstGameActivation → referral milestone', () => {
         milestone: 'first_game_played',
         metadata: { totalScore: 120 },
       },
-      { requireSession: true }
+      { requireSession: true },
     );
   });
 
