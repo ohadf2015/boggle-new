@@ -6,7 +6,7 @@
  * - Price is sourced from TEACHER_PRO_PRICE_USD, never hardcoded
  * - Free tier limits match FREE_TIER_LIMITS constants
  * - All text uses t() for i18n
- * - Link to /teacher/upgrade is present
+ * - Link to /pricing is present
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -72,15 +72,15 @@ describe('ProFramingSection', () => {
     expect(card?.textContent).toContain(en.education.landing.pro.proTier);
   });
 
-  it('links to /teacher/upgrade for checkout', () => {
+  it('links to /pricing for checkout', () => {
     renderComponent();
-    // By the CTA's own copy key, not a /upgrade/i name match: the route is named
-    // "upgrade" but the button never has to say so, and in five of six locales it
-    // does not — matching on the English word pinned copy, not the destination.
+    // Public pricing URL (alias of /teacher/upgrade Polar checkout). Matching on
+    // the CTA copy key, not an English "upgrade" word — five of six locales
+    // never say that word on the button.
     const upgradeLink = screen.getByRole('link', {
       name: en.education.landing.pro.chooseNow,
     });
-    expect(upgradeLink).toHaveAttribute('href', expect.stringContaining('/teacher/upgrade'));
+    expect(upgradeLink).toHaveAttribute('href', expect.stringContaining('/pricing'));
   });
 
   it('illustrates the free-vs-Pro comparison with localized alt text', () => {
