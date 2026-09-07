@@ -55,11 +55,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { payload } = await payloadFrom(props);
   const t = await loadTranslation(payload.locale);
   const lesson = payload.lesson || readString(t, 'education.results.title', 'Lesson recap');
-  const ogTitle = readString(
-    t,
-    'education.results.assignMissGapAsyncTitle',
-    'Async miss-gap homework — {{lesson}}',
-  ).replace('{{lesson}}', lesson);
+  const ogTitle = interpClassGapTemplate(
+    readString(
+      t,
+      'education.results.assignMissGapAsyncTitle',
+      'Async miss-gap homework — {{lesson}}',
+    ),
+    { lesson },
+  );
   const description = payload.missedWords.length
     ? interpClassGapTemplate(
         readString(
