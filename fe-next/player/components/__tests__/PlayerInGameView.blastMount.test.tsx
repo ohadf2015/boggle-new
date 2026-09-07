@@ -22,6 +22,9 @@ vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () =
 // We can't use async React.lazy because tests don't use waitFor.
 // Instead, return a no-op placeholder — the important behavior (BlastGame props)
 // is tested via capturedBlastGameProps which is set in the BlastGame mock render.
+// Live Vocab Quiz view is dynamic()-loaded; the eager next/dynamic mock below
+// would leave its import chain in flight past environment teardown.
+vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
 vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: (importFn: () => Promise<any>, _opts?: any) => {
