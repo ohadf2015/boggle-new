@@ -7747,6 +7747,7 @@ const ja = {
       "played": "プレイ済み",
       "solved": "成功",
       "failed": "失敗",
+      "you": "あなた",
       "attempts": "試行",
       "pts": "pts",
       "words": "単語",

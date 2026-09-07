@@ -77,6 +77,8 @@ const t = (key: string, fallbackOrParams?: string | Record<string, string | numb
     'wordHunt.leaderboard.played': 'played',
     'wordHunt.leaderboard.solved': 'solved',
     'wordHunt.leaderboard.pts': 'pts',
+    'wordHunt.leaderboard.you': 'YOU',
+    'wordHunt.leaderboard.failed': 'Failed',
     'wordHunt.leaderboard.seeWords': 'See words',
     'wordHunt.leaderboard.allLanguages': 'All languages',
     'wordHunt.leaderboard.myLanguage': 'My language',
@@ -146,6 +148,16 @@ describe('TabbedDailyLeaderboard — cross-language board', () => {
     expect(await screen.findByText('Fish')).toBeInTheDocument();
     expect(screen.getByText('YOU')).toBeInTheDocument();
   });
+  it('shows attempts used for unsolved rows instead of a literal X placeholder', async () => {
+    installFetch(url => url.includes('/word-hunt/leaderboard')
+      ? { data: [participant({ player_id: 'a', display_name: 'Aviv', language: 'he', solved: false, attempts_used: 4, efficiency_score: 0 })], totalPlayers: 1, totalSolved: 0 }
+      : null);
+    render(<TabbedDailyLeaderboard puzzleDate="2026-09-07" language="en" currentPlayerId="me" t={t} />);
+    expect(await screen.findByText('Aviv')).toBeInTheDocument();
+    expect(screen.getByText(/✗ 4\/10/)).toBeInTheDocument();
+    expect(screen.queryByText('X/10')).not.toBeInTheDocument();
+  });
+
 
   it('tags every row with the language it was played in', async () => {
     installFetch(url => url.includes('/word-hunt/leaderboard')

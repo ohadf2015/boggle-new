@@ -7986,6 +7986,7 @@ const sv = {
       "played": "spelade",
       "solved": "Löst",
       "failed": "Misslyckades",
+      "you": "DU",
       "attempts": "försök",
       "pts": "poäng",
       "words": "ord",

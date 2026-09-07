@@ -23,9 +23,9 @@ describe('ScoreBadge', () => {
     expect(screen.getByText('3/10')).toBeInTheDocument();
   });
 
-  it('shows X/10 when not solved', () => {
+  it('shows attempts used when not solved', () => {
     render(<ScoreBadge {...baseProps} solved={false} />);
-    expect(screen.getByText('X/10')).toBeInTheDocument();
+    expect(screen.getByText('3/10')).toBeInTheDocument();
   });
 
   it('shows a streak pill when streakDays > 0', () => {

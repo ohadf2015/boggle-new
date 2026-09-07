@@ -7126,6 +7126,7 @@ const en = {
       "played": "played",
       "solved": "solved",
       "failed": "Failed",
+      "you": "YOU",
       "attempts": "attempts",
       "pts": "pts",
       "words": "words",

@@ -425,6 +425,7 @@ const ru = {
       "played": "играли",
       "solved": "решили",
       "failed": "Провал",
+      "you": "ВЫ",
       "attempts": "попыток",
       "pts": "очк",
       "words": "слов",

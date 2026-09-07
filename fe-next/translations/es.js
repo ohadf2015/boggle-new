@@ -7624,6 +7624,7 @@ const es = {
       "played": "jugaron",
       "solved": "Resuelto",
       "failed": "Fallido",
+      "you": "TÚ",
       "attempts": "intentos",
       "pts": "pts",
       "words": "palabras",
