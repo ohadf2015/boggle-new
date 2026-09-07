@@ -8,6 +8,13 @@ import { Request } from 'express';
 export const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type ValidLanguage = typeof VALID_LANGUAGES[number];
 
+/**
+ * Leaderboard language scope: a concrete language, or `all` for the
+ * cross-language ("everyone who played today") board.
+ */
+export const ALL_LANGUAGES_SCOPE = 'all' as const;
+export type LeaderboardLanguageScope = ValidLanguage | typeof ALL_LANGUAGES_SCOPE;
+
 // ==================== Request/Response Types ====================
 
 export interface LeaderboardParams {

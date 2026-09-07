@@ -25,12 +25,15 @@ import {
   isWordValidForDailyChallenge,
   isValidDateFormat,
   isValidLanguage,
+  isLeaderboardLanguageScope,
+  withLanguageScope,
   computeWordHuntRetryScore,
   sanitizeGuestDisplayName,
 } from './utils';
 import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
 import { emptyQuestResult } from '../../../shared/dailyQuestPool';
 import { rerankSequential, dedupeByPlayerKeepBest, sortWordHuntRowsGlobally } from './leaderboardSort';
+import { createSeasonLeaderboardHandler } from './seasonLeaderboard';
 import { updateDailyProfileStats } from './profileStats';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
@@ -533,6 +536,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
 
 /**
  * GET /api/daily-challenge/word-hunt/leaderboard/:date/:language
+ *
+ * `:language` is a concrete language OR `all` for the cross-language board.
  */
 router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
   try {
@@ -549,7 +554,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    if (!isValidLanguage(language)) {
+    if (!isLeaderboardLanguageScope(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
@@ -561,29 +566,41 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Per-language leaderboard: each language plays a DIFFERENT board/target word,
-    // so players are only ranked against — and only see the discovered words of —
-    // others who played the same language. The view's rank_position is per-language,
-    // but it also counts guests + replays, so we still re-sort and renumber below.
+    // Language scope: a concrete language ranks only players who played that
+    // board; `all` ranks everyone who played today, across every language (the
+    // efficiency scale is language-independent). Each row carries its `language`
+    // so the client can show a flag and gate same-language-only features (the
+    // "words you missed" diff) itself.
+    //
     // Guests ARE included: they're recorded under guest_fingerprint (submit above)
-    // with a stable per-guest display_name/avatar already assigned client-side
-    // (getGuestDailyPlayer), so there's no "Guest" name collision to solve here —
-    // dropping the player_id filter that used to hide them is the whole fix.
-    const { data, error } = await supabase
-      .from('daily_word_hunt_leaderboard')
-      .select('*')
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .eq('solved', true)
+    // with a stable per-guest display_name/avatar assigned client-side.
+    //
+    // Unsolved attempts are included too — the view orders `solved DESC` so they
+    // trail every solver, and a player who failed today still sees where they
+    // stand instead of vanishing from a board they played on.
+    //
+    // The view's rank_position is per-language and counts replays, so we re-sort
+    // and renumber below.
+    const rowsQuery = withLanguageScope(
+      supabase
+        .from('daily_word_hunt_leaderboard')
+        .select('*')
+        .eq('puzzle_date', date),
+      language,
+    )
+      .order('solved', { ascending: false, nullsFirst: false })
       .order('efficiency_score', { ascending: false, nullsFirst: false })
       .order('attempts_used', { ascending: true, nullsFirst: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
       // Over-fetch: the view has one row per ATTEMPT, so a player can occupy many
-      // slots (same-language replays). Pull extra so that after collapsing to
-      // one row per player we still have `limit` distinct players.
+      // slots (same-language replays, or one per language on the global board).
+      // Pull extra so that after collapsing to one row per player we still have
+      // `limit` distinct players.
       // ponytail: ×10 cap 500 covers the current worst case (~8 attempts/player); if
       // replay counts climb, move the dedup into the view via DISTINCT ON (player_id).
       .limit(Math.min(limit * 10, 500));
+
+    const { data, error } = await rowsQuery;
 
     if (error) {
       const errorDetails = JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint });
@@ -606,35 +623,37 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    const { count: totalPlayersCount, error: totalPlayersError } = await supabase
-      .from('daily_word_hunt_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language);
+    const { count: totalPlayersCount, error: totalPlayersError } = await withLanguageScope(
+      supabase
+        .from('daily_word_hunt_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date),
+      language,
+    );
 
     if (totalPlayersError) {
       logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
     }
 
-    // Also feeds totalParticipants below: with the player_id filter gone (guests
-    // included), this and "how many solved rows exist" are the exact same query
-    // — one round trip instead of two.
-    const { count: totalSolvedCount, error: totalSolvedError } = await supabase
-      .from('daily_word_hunt_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .eq('solved', true);
+    const { count: totalSolvedCount, error: totalSolvedError } = await withLanguageScope(
+      supabase
+        .from('daily_word_hunt_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date),
+      language,
+    ).eq('solved', true);
 
     if (totalSolvedError) {
       logger.warn('API', `Word Hunt total solved count error: ${totalSolvedError.message || totalSolvedError.code || 'Unknown'}`, { code: totalSolvedError.code, details: totalSolvedError.details });
     }
 
-    const { count: guestSolvedCount, error: guestSolvedError } = await supabase
-      .from('daily_word_hunt_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
+    const { count: guestSolvedCount, error: guestSolvedError } = await withLanguageScope(
+      supabase
+        .from('daily_word_hunt_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date),
+      language,
+    )
       .eq('solved', true)
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
@@ -643,10 +662,9 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message || guestSolvedError.code || 'Unknown'}`, { code: guestSolvedError.code, details: guestSolvedError.details });
     }
 
-    // Sort the same-language rows by the scoring order, collapse each player to their
-    // single best row (the view emits one per ATTEMPT → dedup replays), trim to the
-    // requested limit, then renumber rank_position sequentially 1..N. The view's
-    // rank_position counts guests + replays, so it can't be trusted directly here.
+    // Sort the rows by the scoring order, collapse each player to their single best
+    // row (the view emits one per ATTEMPT → dedup replays / per-language rows),
+    // trim to the requested limit, then renumber rank_position sequentially 1..N.
     const rerankedData = rerankSequential(
       dedupeByPlayerKeepBest(sortWordHuntRowsGlobally(data || [])).slice(0, limit),
     );
@@ -964,6 +982,13 @@ router.get('/streak', async (req: Request<unknown, unknown, unknown, { playerId?
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+/**
+ * GET /api/daily-challenge/word-hunt/season-leaderboard/:language?season=<id>
+ * Season-windowed board (current season by default), folded per player across
+ * languages unless `:language` is concrete. See seasonLeaderboard.ts.
+ */
+router.get('/season-leaderboard/:language', createSeasonLeaderboardHandler('daily_word_hunt_season_leaderboard'));
 
 /**
  * GET /api/daily-challenge/word-hunt/alltime-leaderboard/:language

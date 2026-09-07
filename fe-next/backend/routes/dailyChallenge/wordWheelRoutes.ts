@@ -16,9 +16,12 @@ import {
 import {
   isValidDateFormat,
   isValidLanguage,
+  isLeaderboardLanguageScope,
+  withLanguageScope,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
 import { rerankSequential, dedupeByPlayerKeepBest, sortWordWheelRowsGlobally } from './leaderboardSort';
+import { createSeasonLeaderboardHandler } from './seasonLeaderboard';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -310,6 +313,7 @@ router.get('/check-played/:date/:language', async (
 
 // ==========================================
 // GET /api/daily-challenge/word-wheel/leaderboard/:date/:language
+// `:language` is a concrete language OR `all` for the cross-language board.
 // ==========================================
 
 router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
@@ -327,7 +331,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    if (!isValidLanguage(language)) {
+    if (!isLeaderboardLanguageScope(language)) {
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
@@ -338,21 +342,26 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Per-language leaderboard: each language plays a DIFFERENT wheel, so players are
-    // only ranked against — and only see the submitted words of — others who played the
-    // same language. The view's rank_position counts guests + replays, so we re-sort
-    // and renumber below.
-    const { data, error } = await supabase
-      .from('daily_word_wheel_leaderboard')
-      .select('*')
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .not('player_id', 'is', null)
+    // Language scope: a concrete language ranks only that wheel's players; `all`
+    // ranks everyone who played today across languages (each row carries its
+    // `language` for the client). Guests are included — same contract as the
+    // Word Hunt board, which the combined view merges this into; hiding them on
+    // one side and not the other made a guest's own wheel score vanish from the
+    // very board they were shown after finishing. The view's rank_position
+    // counts guests + replays, so we re-sort and renumber below.
+    const { data, error } = await withLanguageScope(
+      supabase
+        .from('daily_word_wheel_leaderboard')
+        .select('*')
+        .eq('puzzle_date', date),
+      language,
+    )
       .order('score', { ascending: false, nullsFirst: false })
       .order('word_count', { ascending: false, nullsFirst: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
       // Over-fetch: view has one row per ATTEMPT, so a player occupies many slots
-      // (same-language replays). Pull extra so dedup-to-one-per-player still yields `limit`.
+      // (same-language replays, or one per language on the global board). Pull
+      // extra so dedup-to-one-per-player still yields `limit`.
       // ponytail: ×10 cap 500 covers current worst case; move to DISTINCT ON in the view if replays climb.
       .limit(Math.min(limit * 10, 500));
 
@@ -368,27 +377,32 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       dedupeByPlayerKeepBest(sortWordWheelRowsGlobally(data || [])).slice(0, limit),
     );
 
-    const { count: totalCount } = await supabase
-      .from('daily_word_wheel_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language);
+    const { count: totalCount } = await withLanguageScope(
+      supabase
+        .from('daily_word_wheel_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date),
+      language,
+    );
 
-    const { count: guestCount } = await supabase
-      .from('daily_word_wheel_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
+    const { count: guestCount } = await withLanguageScope(
+      supabase
+        .from('daily_word_wheel_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date),
+      language,
+    )
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
 
     // Wheel has no `solved` boolean — anyone who submitted ≥1 word counts as solved.
-    const { count: totalSolvedCount } = await supabase
-      .from('daily_word_wheel_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .gt('word_count', 0);
+    const { count: totalSolvedCount } = await withLanguageScope(
+      supabase
+        .from('daily_word_wheel_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date),
+      language,
+    ).gt('word_count', 0);
 
     res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');
     res.json({
@@ -406,6 +420,13 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// ==========================================
+// GET /api/daily-challenge/word-wheel/season-leaderboard/:language?season=<id>
+// Season-windowed board (current season by default). See seasonLeaderboard.ts.
+// ==========================================
+
+router.get('/season-leaderboard/:language', createSeasonLeaderboardHandler('daily_word_wheel_season_leaderboard'));
 
 // ==========================================
 // GET /api/daily-challenge/word-wheel/alltime-leaderboard/:language

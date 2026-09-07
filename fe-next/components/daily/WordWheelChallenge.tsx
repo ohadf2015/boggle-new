@@ -31,13 +31,13 @@ import {
   getWordWheelResultForDate,
   hasEverPlayedWordWheel,
 } from '@/utils/dailyChallenge';
+import { getGuestFingerprint, getGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import { getGuestFingerprint } from '@/utils/guestManager';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
@@ -173,8 +173,16 @@ const WordWheelChallenge: React.FC = () => {
     isPractice,
   });
 
+  // Daily guest identity (utils/dailyChallenge/guestPlayer) — the SAME fingerprint
+  // Word Hunt records guests under, so a guest's hunt + wheel rows merge on the
+  // combined board and their own row is highlighted. Not the multiplayer guest
+  // session id from utils/guestManager, which used to be read here.
   useEffect(() => {
-    setGuestFingerprint(getGuestFingerprint());
+    let cancelled = false;
+    getGuestFingerprint().then((fp) => {
+      if (!cancelled) setGuestFingerprint(fp || null);
+    });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -268,7 +276,7 @@ const WordWheelChallenge: React.FC = () => {
         const params = new URLSearchParams();
         if (isAuthenticated && profile) params.set('playerId', profile.id);
         else {
-          const fp = guestFingerprint ?? getGuestFingerprint();
+          const fp = guestFingerprint ?? (await getGuestFingerprint());
           if (fp) params.set('guestFingerprint', fp);
         }
 
@@ -332,8 +340,11 @@ const WordWheelChallenge: React.FC = () => {
 
     init();
     return () => { isMounted = false; };
+    // `guestFingerprint` is deliberately NOT a dependency: init resolves the
+    // daily fingerprint itself when it needs one, and re-running on the async
+    // state landing would double the server sync (and its saveWordWheelResult).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, isAuthenticated, profile?.id, guestFingerprint, isPractice, catchupDate, isCatchup]);
+  }, [language, isAuthenticated, profile?.id, isPractice, catchupDate, isCatchup]);
 
   const handleValidateWord = useCallback(
     (word: string) => fastValidateWord(word, language as Language),
@@ -440,28 +451,33 @@ const WordWheelChallenge: React.FC = () => {
     // reconcile localStorage + UI to the canonical row instead of leaving the
     // wasted-replay score in place.
     const longestWord = result.wordsFound.reduce((a, b) => b.length > a.length ? b : a, '');
-    const submitBody = {
-      puzzleDate: date,
-      puzzleNumber,
-      language: gameLang,
-      playerId: isAuthenticated && profile ? profile.id : undefined,
-      guestFingerprint: !isAuthenticated ? (getGuestFingerprint() || undefined) : undefined,
-      displayName: profile?.display_name || 'Guest',
-      avatarEmoji: profile?.avatar_emoji || '🎯',
-      avatarColor: profile?.avatar_color || '#6366f1',
-      avatarImage: profile?.avatar_image || undefined,
-      countryCode: profile?.country_code || undefined,
-      score: result.score,
-      wordCount: result.wordsFound.length,
-      wordsFound: result.wordsFound,
-      longestWord: longestWord || undefined,
-      timeSeconds: result.timeSeconds,
-      centerLetter: puzzle?.centerLetter || undefined,
-      isCatchup,
-    };
 
     void (async () => {
       try {
+        // Guests submit under the daily guest identity (stable fingerprint +
+        // the generated display name/avatar every other daily surface shows),
+        // so the board lists "Curious Otter", not a wall of "Guest".
+        const guest = isAuthenticated ? null : await getGuestDailyPlayer();
+        const guestFp = isAuthenticated ? undefined : (guestFingerprint ?? (await getGuestFingerprint()) ?? undefined);
+        const submitBody = {
+          puzzleDate: date,
+          puzzleNumber,
+          language: gameLang,
+          playerId: isAuthenticated && profile ? profile.id : undefined,
+          guestFingerprint: guestFp || undefined,
+          displayName: profile?.display_name || guest?.displayName || 'Guest',
+          avatarEmoji: profile?.avatar_emoji || guest?.avatarEmoji || '🎯',
+          avatarColor: profile?.avatar_color || guest?.avatarColor || '#6366f1',
+          avatarImage: profile?.avatar_image || undefined,
+          countryCode: profile?.country_code || undefined,
+          score: result.score,
+          wordCount: result.wordsFound.length,
+          wordsFound: result.wordsFound,
+          longestWord: longestWord || undefined,
+          timeSeconds: result.timeSeconds,
+          centerLetter: puzzle?.centerLetter || undefined,
+          isCatchup,
+        };
         const resp = await fetch('/api/daily-challenge/word-wheel/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -506,7 +522,7 @@ const WordWheelChallenge: React.FC = () => {
     })();
 
     setPhase('completed');
-  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile, isPractice, catchupDate, isCatchup]);
+  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile, isPractice, catchupDate, isCatchup, guestFingerprint]);
 
   // Practice dead-end fix: results screen offers "spin another wheel" — fresh
   // RANDOM puzzle (the mount path seeds by date, so re-entering would serve the
@@ -745,7 +761,7 @@ const WordWheelChallenge: React.FC = () => {
               language={language as Language}
               hasPlayedWordHunt={hasPlayedWH}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
-              currentGuestFingerprint={!isAuthenticated ? (getGuestFingerprint() || null) : null}
+              currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
               isAuthenticated={isAuthenticated}
               streakDays={getDailyStreak().currentStreak}
               isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
