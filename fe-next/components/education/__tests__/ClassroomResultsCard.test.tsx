@@ -288,8 +288,6 @@ describe('ClassroomResultsCard', () => {
     expect(screen.queryByTestId('assign-unplugged-google-classroom')).not.toBeInTheDocument();
   });
 
-});
-
   it('offers the teacher a shareable miss-gap practice card after Unplugged assign', async () => {
     render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
     fireEvent.click(screen.getByTestId('share-miss-gap-practice'));
@@ -315,3 +313,26 @@ describe('ClassroomResultsCard', () => {
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('share-miss-gap-practice')).not.toBeInTheDocument();
   });
+
+  it('offers the teacher async miss-gap homework (due-date flow, not Unplugged Live)', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('assign-miss-gap-async-homework');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/miss-gap-assignment');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('unplugged-reteach');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('Noa');
+  });
+
+  it('never offers a student the async miss-gap homework CTA', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('assign-miss-gap-async-homework')).not.toBeInTheDocument();
+  });
+
+  it('hides the async miss-gap homework CTA when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('assign-miss-gap-async-homework')).not.toBeInTheDocument();
+  });
+});

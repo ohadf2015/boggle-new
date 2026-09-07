@@ -19,11 +19,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer } from 'lucide-react';
+import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer, ClipboardList } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
+import { buildMissGapAssignmentPath } from '@/lib/education/missGapAsyncAssignment';
 import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
@@ -168,6 +169,26 @@ export function ClassroomResultsCard({
           missed,
         }),
         itemType: 'assignment',
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * Async miss-gap homework (#972 practice card + due date → class streak).
+   * Foil Kahootopia Assignments (live-game homework). NOT Unplugged Live.
+   */
+  const missGapAsyncAssignHref = (() => {
+    if (!isTeacher || summary.missedWords.length === 0) return null;
+    try {
+      return buildMissGapAssignmentPath({
+        locale: language,
+        lessonNames: summary.lessonNames,
+        teacherName: summary.teacherName,
+        found: summary.classFoundCount,
+        total: summary.totalWords,
+        missedWords: summary.missedWords,
       });
     } catch {
       return null;
@@ -401,6 +422,20 @@ export function ClassroomResultsCard({
                 <GraduationCap className="w-4 h-4" aria-hidden />
                 {t('education.results.assignUnpluggedGoogleClassroom')}
               </a>
+            )}
+            {missGapAsyncAssignHref && (
+              <Link
+                href={missGapAsyncAssignHref}
+                data-testid="assign-miss-gap-async-homework"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <ClipboardList className="w-4 h-4" aria-hidden />
+                {t('education.results.assignMissGapAsyncHomework')}
+              </Link>
             )}
             <button
               type="button"
