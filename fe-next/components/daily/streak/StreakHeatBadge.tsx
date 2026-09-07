@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { useWeeklyChest } from '@/hooks/useWeeklyChest';
@@ -77,28 +77,23 @@ export default function StreakHeatBadge({ streak, today, className }: StreakHeat
         )}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <m.div
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-neo-navy/85 backdrop-blur-md px-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            role="dialog"
-            aria-modal="true"
-            onClick={event => { if (event.target === event.currentTarget) setOpen(false); }}
-          >
-            <StreakHeatCard
-              streak={effectiveStreak}
-              cycleStart={cycleStart}
-              completedDates={completedDates}
-              today={todayIso}
-              isClaimable={isClaimable}
-              onClose={() => setOpen(false)}
-            />
-          </m.div>
-        )}
-      </AnimatePresence>
+      {open && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-neo-navy/85 backdrop-blur-md px-4 animate-in fade-in-0 duration-200"
+          role="dialog"
+          aria-modal="true"
+          onClick={event => { if (event.target === event.currentTarget) setOpen(false); }}
+        >
+          <StreakHeatCard
+            streak={effectiveStreak}
+            cycleStart={cycleStart}
+            completedDates={completedDates}
+            today={todayIso}
+            isClaimable={isClaimable}
+            onClose={() => setOpen(false)}
+          />
+        </div>
+      )}
     </>
   );
 }

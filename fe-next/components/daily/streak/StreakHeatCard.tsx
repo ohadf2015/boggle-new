@@ -76,8 +76,8 @@ export default function StreakHeatCard({
 
       <m.div
         className="relative z-10"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 18 }}
       >
         <Mascot variant={heat.mascot} size="xl" animated priority alt="" />

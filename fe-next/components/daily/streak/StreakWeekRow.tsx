@@ -99,8 +99,8 @@ export default function StreakWeekRow({
             width: `calc(${(litSpan / CYCLE_LENGTH) * 100}% - 0.1875rem)`,
             background: heat.ring,
           }}
-          initial={{ scaleX: 0.85, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
+          initial={{ scaleX: 0.85 }}
+          animate={{ scaleX: 1 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
         />
       )}
