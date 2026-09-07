@@ -23,7 +23,7 @@ import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer } from 'lucid
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
-import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
+import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { shareWithFallback } from '@/utils/shareWithFallback';
@@ -133,6 +133,39 @@ export function ClassroomResultsCard({
         found: summary.classFoundCount,
         total: summary.totalWords,
         missedWords: summary.missedWords,
+      });
+    } catch {
+      return null;
+    }
+  })();
+
+  /**
+   * Google Classroom *assignment* that ships Unplugged reteach (#959) + the #957
+   * printable practice sheet as device-free homework. Foils Kahootopia Assignments
+   * / Classic Unplugged. Absolute Unplugged Live deep-link on lexiclash.live;
+   * class-level missed words only — no student names. Phase-1 share — no OAuth.
+   */
+  const googleClassroomUnpluggedAssignHref = (() => {
+    if (!isTeacher || summary.missedWords.length === 0) return null;
+    try {
+      const unpluggedUrl = buildUnpluggedReteachUrl({
+        locale: language,
+        lessonNames: summary.lessonNames,
+        teacherName: summary.teacherName,
+        found: summary.classFoundCount,
+        total: summary.totalWords,
+        missedWords: summary.missedWords,
+      });
+      const missed = summary.missedWords.slice(0, 8).join(', ');
+      return buildGoogleClassroomShareUrl({
+        joinUrl: unpluggedUrl,
+        title: t('education.results.assignUnpluggedGoogleClassroomTitle', {
+          lesson: summary.lessonNames.join(', '),
+        }),
+        body: t('education.results.assignUnpluggedGoogleClassroomBody', {
+          missed,
+        }),
+        itemType: 'assignment',
       });
     } catch {
       return null;
@@ -320,6 +353,22 @@ export function ClassroomResultsCard({
                 <Play className="w-4 h-4" aria-hidden />
                 {t('education.results.startUnpluggedReteachLive')}
               </Link>
+            )}
+            {googleClassroomUnpluggedAssignHref && (
+              <a
+                href={googleClassroomUnpluggedAssignHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="assign-unplugged-google-classroom"
+                className={cn(
+                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                  'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all'
+                )}
+              >
+                <GraduationCap className="w-4 h-4" aria-hidden />
+                {t('education.results.assignUnpluggedGoogleClassroom')}
+              </a>
             )}
             <button
               type="button"
