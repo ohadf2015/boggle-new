@@ -54,6 +54,9 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const [codeError, setCodeError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  /** A nickname already in use, and a free one the student can take in a tap.
+   *  Two students called Priya is an ordinary class; before this it was a 500. */
+  const [suggestedName, setSuggestedName] = useState<string | null>(null);
   const [preview, setPreview] = useState<ClassroomPreview | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -113,7 +116,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, overrideName?: string) => {
     e.preventDefault();
 
     // A submit can still reach here while auth is unresolved — the Enter key, or
@@ -126,7 +129,10 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     }
 
     const trimmedCode = code.trim();
-    const trimmedName = name.trim();
+    // `overrideName` is the one-tap "use Priya 2" path. It is passed in rather
+    // than read from state because setState is async — retrying off state here
+    // would resend the name that just collided.
+    const trimmedName = (overrideName ?? name).trim();
 
     if (!trimmedCode || trimmedCode.length !== 6) {
       setCodeError(true);
@@ -142,6 +148,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     }
 
     setSubmitError(null);
+    setSuggestedName(null);
     setIsSubmitting(true);
 
     try {
@@ -164,6 +171,14 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             ? `/${language}/multiplayer?room=${result.gameCode}&classroom=true`
             : `/${language}/student`
         );
+      } else if (result.code === 'NAME_TAKEN') {
+        // Someone in this class already has that nickname. The student can fix
+        // this in one tap, so say exactly that instead of "something went
+        // wrong" — and never leave the form looking frozen, which is what the
+        // underlying Supabase 500 used to do.
+        trackEduClassroomJoin({ result: 'error' });
+        setSuggestedName(result.suggestedName ?? null);
+        setNameError(true);
       } else if (result.code === 'STUDENT_LIMIT_REACHED') {
         trackEduClassroomJoin({ result: 'error' });
         const msg = t('education.student.join.classroomFull');
@@ -193,6 +208,16 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     }
   };
 
+  /**
+   * A held tap whose ONLY remaining blocker is the student's own name.
+   *
+   * The replay below waits on two things, and one of them can never resolve on
+   * its own: a guest who tapped JOIN before the session settled, without having
+   * given a name, would sit under a "preparing" line forever. The form was
+   * waiting on THEM, and never said so.
+   */
+  const queuedNeedsName = queuedJoin && !isAuthResolving && !isSubmitting && isGuest && !name.trim();
+
   // Replay a tap that landed before the form could act on it. Waits for the
   // session AND for whatever that tap was still missing — a guest name — so the
   // student is never told off for a race they did not cause. Fires once.
@@ -217,16 +242,37 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
           transition={{ duration: 0.3 }}
           className="w-full max-w-md"
         >
-        {/* Decorative only — the heading below carries the meaning. */}
-        <Image
-          src="/images/education/join-hero.webp"
-          alt=""
-          aria-hidden="true"
-          width={448}
-          height={250}
-          priority
-          className="mx-auto mb-4 w-full max-w-sm h-auto select-none"
-        />
+        {/*
+          The art is a mascot pointing at a blank cream card — the card is a
+          speech-bubble FRAME the illustration leaves empty on purpose. Nothing
+          ever filled it, so the first screen a student sees showed an empty
+          bubble in every locale. The line goes in the DOM rather than being
+          baked into the bitmap so it translates and reflows.
+
+          The overlay box is placed with PHYSICAL percentages on purpose: it
+          tracks where the card sits inside the bitmap, and an <img> does not
+          mirror under `dir="rtl"`, so a logical inset would move the text onto
+          the mascot in Hebrew. The text itself inherits `dir` from the page and
+          is centred, so it reads correctly in both directions.
+        */}
+        <div className="relative mx-auto mb-4 w-full max-w-sm">
+          <Image
+            src="/images/education/join-hero.webp"
+            alt=""
+            aria-hidden="true"
+            width={448}
+            height={250}
+            priority
+            className="w-full h-auto select-none"
+          />
+          <p
+            data-testid="join-hero-bubble"
+            style={{ left: '46%', right: '8%', top: '21%', bottom: '21%' }}
+            className="absolute flex items-center justify-center overflow-hidden text-center font-neo-body text-xs sm:text-sm font-bold leading-snug text-neo-navy"
+          >
+            {t('education.student.join.heroLine')}
+          </p>
+        </div>
         <Card className="border-3 border-neo-black shadow-hard">
           <CardContent className="p-6 sm:p-8">
             {/* Header */}
@@ -255,7 +301,17 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                   {preview && <ClassroomPreviewCard name={preview.name} kind={preview.kind} isLoading={isLoadingPreview} />}
                 </div>
 
-              {isGuest && code.trim().length === 6 && (
+              {/*
+                `|| name` is not belt-and-braces, it is the whole fix. The first
+                tap on JOIN mints an anonymous auth user (useClassroom's guest
+                branch) BEFORE the join route is called, so `user` stops being
+                null even when the join then fails. On `isGuest` alone this
+                whole row vanished on the retry: the student corrected a wrong
+                code and could no longer see — or change — the name about to be
+                submitted for them. A student who has typed a name is a student
+                who was asked for one, and stays asked.
+              */}
+              {(isGuest || name.trim().length > 0) && code.trim().length === 6 && (
                 <div className="space-y-2">
                   <Label
                     htmlFor="student-name"
@@ -270,6 +326,9 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     onChange={(e) => {
                       setName(e.target.value);
                       if (nameError) setNameError(false);
+                      // The suggestion was about the OLD name. Leaving it up
+                      // over a name it was never about is its own small lie.
+                      if (suggestedName) setSuggestedName(null);
                     }}
                     required
                     maxLength={40}
@@ -286,10 +345,33 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                   <p id="name-hint" className="text-xs text-neo-lime">
                     {t('education.student.join.nameHint')}
                   </p>
-                  {nameError && (
+                  {nameError && !suggestedName && (
                     <p id="name-error" className="text-xs text-red-400" role="alert">
                       {t('education.student.join.nameLabel')}
                     </p>
+                  )}
+                  {/* The nickname is taken and we already know one that works.
+                      A problem the student can fix in a single tap should cost
+                      them a single tap — not a generic error and a guess. */}
+                  {suggestedName && (
+                    <div
+                      role="alert"
+                      className="space-y-2 rounded-neo border-2 border-neo-lime bg-neo-lime/10 p-3"
+                    >
+                      <p className="text-xs font-bold text-neo-white">
+                        {t('education.student.join.nameTaken', { suggestedName })}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          setName(suggestedName);
+                          void handleSubmit(e as unknown as React.FormEvent, suggestedName);
+                        }}
+                        className="w-full rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2 text-sm font-black uppercase text-neo-black shadow-hard-sm transition-all hover:shadow-hard"
+                      >
+                        {t('education.student.join.useSuggestedName', { suggestedName })}
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
@@ -380,8 +462,16 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               </Button>
 
               {/* A disabled button with no explanation is the same dead end in a
-                  different costume. Say what is being waited on. */}
-              {(isAuthResolving || queuedJoin) && (
+                  different costume. Say what is being waited on — and say the
+                  RIGHT thing: a held tap whose only remaining blocker is the
+                  student's own name must ask for the name, not claim to be
+                  busy. "Preparing" forever is the silent no-op with a spinner
+                  painted on it. */}
+              {queuedNeedsName ? (
+                <p role="status" className="text-center text-sm font-neo-body font-bold text-neo-lime">
+                  {t('education.student.join.queuedNeedsName')}
+                </p>
+              ) : (isAuthResolving || queuedJoin) && (
                 <p className="text-center text-sm font-neo-body text-neo-white/70">
                   {t('education.student.join.preparing')}
                 </p>

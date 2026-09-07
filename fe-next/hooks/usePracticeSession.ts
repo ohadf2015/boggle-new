@@ -4,9 +4,15 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
-import { getWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
 import { wordsForLevel } from '@/lib/education/differentiation';
+import {
+  readGuestPractice,
+  recordGuestPracticeStart,
+  guestPracticeCounts,
+  guestPracticeMastery,
+  type GuestPracticeRecord,
+} from '@/lib/education/practiceGuestProgress';
 import type { VocabularyLevel, VocabularyWord } from '@/lib/supabase/education/types';
 import type { VocabFocus } from '@/lib/education/vocabFocus';
 
@@ -82,56 +88,9 @@ export interface StartSessionData {
   focus?: VocabFocus;
 }
 
-export interface UpdateSessionData {
-  cardsReviewed?: number;
-  cardsCorrect?: number;
-  wordsFound?: string[];
-  vocabularyWordsFound?: string[];
-  totalScore?: number;
-  timeSpentSeconds?: number;
-  completed?: boolean;
-}
 
 // API functions
-async function fetchSessionsAPI(
-  lessonId: string,
-  studentId?: string
-): Promise<{ sessions: PracticeSession[]; error?: string }> {
-  try {
-    let url = `/api/education/practice?lessonId=${lessonId}`;
-    if (studentId) {
-      url += `&studentId=${studentId}`;
-    }
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { sessions: [], error: data.error || 'Failed to fetch sessions' };
-    }
-
-    return { sessions: data.sessions || [] };
-  } catch (err) {
-    logger.error('Error fetching sessions:', err);
-    return { sessions: [], error: 'Failed to fetch sessions' };
-  }
-}
-
-async function fetchSessionAPI(sessionId: string): Promise<{ session: PracticeSession | null; error?: string }> {
-  try {
-    const response = await getWithAuth(`/api/education/practice?sessionId=${sessionId}`);
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { session: null, error: data.error || 'Session not found' };
-    }
-
-    return { session: data.session };
-  } catch (err) {
-    logger.error('Error fetching session:', err);
-    return { session: null, error: 'Failed to fetch session' };
-  }
-}
 
 async function fetchProgressAPI(
   lessonId: string,
@@ -180,28 +139,6 @@ async function startSessionAPI(data: StartSessionData): Promise<{ session: Pract
   }
 }
 
-async function updateSessionAPI(
-  sessionId: string,
-  data: UpdateSessionData
-): Promise<{ session: PracticeSession | null; error?: string }> {
-  try {
-    const response = await fetch('/api/education/practice', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, ...data }),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      return { session: null, error: result.error || 'Failed to update session' };
-    }
-
-    return { session: result.session };
-  } catch (err) {
-    logger.error('Error updating session:', err);
-    return { session: null, error: 'Failed to update session' };
-  }
-}
 
 // =============================================
 // PRACTICE PROGRESS HOOK
@@ -210,7 +147,6 @@ async function updateSessionAPI(
 interface UsePracticeProgressState {
   progress: PracticeProgress | null;
   mastery: MasteryLevel;
-  sessions: PracticeSession[];
   isLoading: boolean;
   error: string | null;
 }
@@ -220,7 +156,7 @@ interface UsePracticeProgressActions {
   startSession: (
     practiceType: PracticeType,
     options?: { focus?: VocabFocus }
-  ) => Promise<{ success: boolean; session?: PracticeSession; error?: string }>;
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 export type UsePracticeProgressReturn = UsePracticeProgressState & UsePracticeProgressActions;
@@ -234,48 +170,82 @@ export type UsePracticeProgressReturn = UsePracticeProgressState & UsePracticePr
  * - Session history
  * - Start new session
  */
+/**
+ * Shapes a device-local guest record as the same `PracticeProgress` row the
+ * server returns, so the picker and the header read one type either way.
+ */
+function guestProgressRow(lessonId: string, record: GuestPracticeRecord): PracticeProgress {
+  return {
+    student_id: 'guest',
+    lesson_id: lessonId,
+    total_flashcards_reviewed: record.cardsReviewed,
+    total_flashcards_correct: record.cardsCorrect,
+    total_practice_score: 0,
+    total_vocabulary_words_found: record.wordsFound.length,
+    ...guestPracticeCounts(record),
+    total_practice_time_seconds: 0,
+    last_practice_at: record.lastPracticeAt,
+  };
+}
+
 export function usePracticeProgress(
   lessonId: string | undefined,
-  studentId?: string // Optional: for teachers viewing student progress
+  studentId?: string, // Optional: for teachers viewing student progress
+  /** `totalWords` is the mastery denominator for a guest, whose progress has no
+   *  server row to compute it from. */
+  options?: { totalWords?: number }
 ): UsePracticeProgressReturn {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const isMounted = useMounted();
+  // Resolved-and-anonymous, not merely "not authenticated yet". `isAuthenticated`
+  // starts false on every first paint, so branching on it alone would run the
+  // guest path for one frame on a signed-in student's device and write a local
+  // session count that belongs to nobody.
+  const isGuest = !authLoading && !isAuthenticated;
+  const totalWords = options?.totalWords ?? 0;
 
   const [state, setState] = useState<UsePracticeProgressState>({
     progress: null,
     mastery: 'not_started',
-    sessions: [],
     isLoading: true,
     error: null,
   });
 
-  // Fetch progress and sessions
+  // Fetch the aggregated progress row
   const fetchData = useCallback(async () => {
-    if (!isAuthenticated || !lessonId) {
-      setState(prev => ({
-        ...prev,
-        progress: null,
-        mastery: 'not_started',
-        sessions: [],
+    if (!lessonId) {
+      setState(prev => ({ ...prev, progress: null, mastery: 'not_started', isLoading: false }));
+      return;
+    }
+
+    // No account: read the device. Calling the server here would 401 and the
+    // student would be shown "Failed to fetch progress" about practice that
+    // worked perfectly well.
+    if (isGuest) {
+      const record = readGuestPractice(lessonId);
+      setState({
+        progress: guestProgressRow(lessonId, record),
+        mastery: guestPracticeMastery(record, totalWords),
         isLoading: false,
-      }));
+        error: null,
+      });
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setState(prev => ({ ...prev, progress: null, mastery: 'not_started', isLoading: false }));
       return;
     }
 
     try {
-      // Fetch both progress and sessions in parallel
-      const [progressResult, sessionsResult] = await Promise.all([
-        fetchProgressAPI(lessonId, studentId),
-        fetchSessionsAPI(lessonId, studentId),
-      ]);
+      const progressResult = await fetchProgressAPI(lessonId, studentId);
 
       if (isMounted.current) {
         setState({
           progress: progressResult.progress,
           mastery: progressResult.mastery,
-          sessions: sessionsResult.sessions,
           isLoading: false,
-          error: progressResult.error || sessionsResult.error || null,
+          error: progressResult.error || null,
         });
       }
     } catch (err) {
@@ -288,7 +258,7 @@ export function usePracticeProgress(
         }));
       }
     }
-  }, [isAuthenticated, lessonId, studentId, isMounted]);
+  }, [isAuthenticated, isGuest, totalWords, lessonId, studentId, isMounted]);
 
   // Refresh data
   const refresh = useCallback(async () => {
@@ -305,6 +275,20 @@ export function usePracticeProgress(
       return { success: false, error: 'No lesson ID' };
     }
 
+    // No account: the round is real, it just has no server row. Reporting
+    // failure here would leave the practice screen refusing to open.
+    if (isGuest) {
+      const record = recordGuestPracticeStart(lessonId, practiceType);
+      if (isMounted.current) {
+        setState(prev => ({
+          ...prev,
+          progress: guestProgressRow(lessonId, record),
+          mastery: guestPracticeMastery(record, totalWords),
+        }));
+      }
+      return { success: true };
+    }
+
     try {
       const { session, error } = await startSessionAPI({
         lessonId,
@@ -316,221 +300,24 @@ export function usePracticeProgress(
         return { success: false, error: error || 'Failed to start session' };
       }
 
-      // Optimistically add session to list
-      if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          sessions: [session, ...prev.sessions],
-        }));
-      }
-
-      return { success: true, session };
+      return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to start session';
       logger.error('Exception in startSession:', error);
       return { success: false, error };
     }
-  }, [lessonId, isMounted]);
+  }, [lessonId, isGuest, totalWords, isMounted]);
 
   // Initial fetch
   useEffect(() => {
-    if (isAuthenticated && lessonId) {
-      fetchData();
-    } else {
-      setState({
-        progress: null,
-        mastery: 'not_started',
-        sessions: [],
-        isLoading: false,
-        error: null,
-      });
-    }
-  }, [isAuthenticated, lessonId, fetchData]);
+    // `fetchData` already owns every branch (guest, signed in, no lesson);
+    // duplicating that decision here is how the two drifted apart.
+    void fetchData();
+  }, [fetchData]);
 
   return {
     ...state,
     refresh,
     startSession,
-  };
-}
-
-// =============================================
-// ACTIVE SESSION HOOK
-// =============================================
-
-interface UseActiveSessionState {
-  session: PracticeSession | null;
-  isLoading: boolean;
-  isSaving: boolean;
-  error: string | null;
-}
-
-interface UseActiveSessionActions {
-  updateProgress: (data: UpdateSessionData) => Promise<{ success: boolean; error?: string }>;
-  completeSession: (finalData?: UpdateSessionData) => Promise<{ success: boolean; error?: string }>;
-  incrementCards: (correct: boolean) => Promise<{ success: boolean; error?: string }>;
-  addFoundWord: (word: string, isVocabularyWord?: boolean) => Promise<{ success: boolean; error?: string }>;
-  updateTimeSpent: (seconds: number) => Promise<{ success: boolean; error?: string }>;
-}
-
-export type UseActiveSessionReturn = UseActiveSessionState & UseActiveSessionActions;
-
-/**
- * Hook for managing an active practice session
- *
- * Provides:
- * - Session state
- * - Update progress operations
- * - Complete session operation
- * - Convenience methods for common updates
- */
-export function useActiveSession(sessionId: string | undefined): UseActiveSessionReturn {
-  const isMounted = useMounted();
-
-  const [state, setState] = useState<UseActiveSessionState>({
-    session: null,
-    isLoading: true,
-    isSaving: false,
-    error: null,
-  });
-
-  // Fetch session details
-  const fetchSession = useCallback(async () => {
-    if (!sessionId) {
-      setState({
-        session: null,
-        isLoading: false,
-        isSaving: false,
-        error: null,
-      });
-      return;
-    }
-
-    try {
-      const { session, error } = await fetchSessionAPI(sessionId);
-
-      if (isMounted.current) {
-        setState({
-          session,
-          isLoading: false,
-          isSaving: false,
-          error: error || null,
-        });
-      }
-    } catch (err) {
-      logger.error('Error fetching session:', err);
-      if (isMounted.current) {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: 'Failed to load session',
-        }));
-      }
-    }
-  }, [sessionId, isMounted]);
-
-  // Update progress
-  const updateProgress = useCallback(async (
-    data: UpdateSessionData
-  ): Promise<{ success: boolean; error?: string }> => {
-    if (!sessionId) {
-      return { success: false, error: 'No session ID' };
-    }
-
-    setState(prev => ({ ...prev, isSaving: true }));
-
-    try {
-      const { session, error } = await updateSessionAPI(sessionId, data);
-
-      if (error) {
-        if (isMounted.current) {
-          setState(prev => ({ ...prev, isSaving: false }));
-        }
-        return { success: false, error };
-      }
-
-      // Update state with new session data
-      if (isMounted.current && session) {
-        setState(prev => ({
-          ...prev,
-          session,
-          isSaving: false,
-        }));
-      }
-
-      return { success: true };
-    } catch (err) {
-      const error = err instanceof Error ? err.message : 'Failed to update progress';
-      logger.error('Exception in updateProgress:', error);
-      if (isMounted.current) {
-        setState(prev => ({ ...prev, isSaving: false }));
-      }
-      return { success: false, error };
-    }
-  }, [sessionId, isMounted]);
-
-  // Complete session
-  const completeSession = useCallback(async (
-    finalData?: UpdateSessionData
-  ): Promise<{ success: boolean; error?: string }> => {
-    return updateProgress({ ...finalData, completed: true });
-  }, [updateProgress]);
-
-  // Convenience: Increment card count
-  const incrementCards = useCallback(async (
-    correct: boolean
-  ): Promise<{ success: boolean; error?: string }> => {
-    if (!state.session) {
-      return { success: false, error: 'No active session' };
-    }
-
-    const newCardsReviewed = state.session.cards_reviewed + 1;
-    const newCardsCorrect = correct ? state.session.cards_correct + 1 : state.session.cards_correct;
-
-    return updateProgress({
-      cardsReviewed: newCardsReviewed,
-      cardsCorrect: newCardsCorrect,
-    });
-  }, [state.session, updateProgress]);
-
-  // Convenience: Add found word
-  const addFoundWord = useCallback(async (
-    word: string,
-    isVocabularyWord = false
-  ): Promise<{ success: boolean; error?: string }> => {
-    if (!state.session) {
-      return { success: false, error: 'No active session' };
-    }
-
-    const newWordsFound = [...state.session.words_found, word];
-    const newVocabularyWordsFound = isVocabularyWord
-      ? [...state.session.vocabulary_words_found, word]
-      : state.session.vocabulary_words_found;
-
-    return updateProgress({
-      wordsFound: newWordsFound,
-      vocabularyWordsFound: newVocabularyWordsFound,
-    });
-  }, [state.session, updateProgress]);
-
-  // Convenience: Update time spent
-  const updateTimeSpent = useCallback(async (
-    seconds: number
-  ): Promise<{ success: boolean; error?: string }> => {
-    return updateProgress({ timeSpentSeconds: seconds });
-  }, [updateProgress]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchSession();
-  }, [fetchSession]);
-
-  return {
-    ...state,
-    updateProgress,
-    completeSession,
-    incrementCards,
-    addFoundWord,
-    updateTimeSpent,
   };
 }

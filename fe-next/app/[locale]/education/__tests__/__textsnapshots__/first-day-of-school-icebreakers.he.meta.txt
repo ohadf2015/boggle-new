@@ -1,0 +1,63 @@
+{
+  "title": "משחקי שובר קרח ליום הראשון | לקסיקלאש",
+  "description": "משחקי מילים לכיתה שכוללים בחורים שקטים. משחקים ללא לחץ ביום הראשון של בית הספר—ללא שמות שצריך לזכור, אף אחד לא בחזית.",
+  "keywords": [
+    "משחקי שובר קרח לכיתה",
+    "משחקי היכרות לתלמידים",
+    "משחקי מילים בכיתה",
+    "פעילויות יום ראשון בבית ספר",
+    "משחקים לחטיבת ביניים",
+    "שובר קרח בן הספר",
+    "משחקי תקשורת בכיתה"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "ja": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "es": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+    "en-IL": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he-IL": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en-US": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-US": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-GB": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "en-SE": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv-SE": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "en-JP": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "ja-JP": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "en-ES": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-ES": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-MX": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-MX": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-AU": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-AR": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "es-CO": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru-RU": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers"
+  },
+  "ogTitle": "משחקי שובר קרח ליום הראשון | לקסיקלאש",
+  "ogDescription": "משחקי מילים לכיתה שכוללים בחורים שקטים. משחקים ללא לחץ ביום הראשון של בית הספר—ללא שמות שצריך לזכור, אף אחד לא בחזית.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "משחקי שובר קרח ליום הראשון | לקסיקלאש"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "משחקי שובר קרח ליום הראשון | לקסיקלאש",
+  "twDescription": "משחקי מילים לכיתה שכוללים בחורים שקטים. משחקים ללא לחץ ביום הראשון של בית הספר—ללא שמות שצריך לזכור, אף אחד לא בחזית.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

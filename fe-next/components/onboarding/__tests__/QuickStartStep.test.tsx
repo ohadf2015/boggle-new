@@ -68,16 +68,14 @@ describe('QuickStartStep', () => {
   const setup = (props: Partial<React.ComponentProps<typeof QuickStartStep>> = {}) => {
     const onPlay = vi.fn();
     const onHowToPlay = vi.fn();
-    const onHaveAccount = vi.fn();
     render(
       <QuickStartStep
         onPlay={onPlay}
         onHowToPlay={onHowToPlay}
-        onHaveAccount={onHaveAccount}
         {...props}
       />
     );
-    return { onPlay, onHowToPlay, onHaveAccount };
+    return { onPlay, onHowToPlay };
   };
 
   beforeEach(() => {
@@ -143,14 +141,6 @@ describe('QuickStartStep', () => {
     expect(onHowToPlay).toHaveBeenCalledTimes(1);
   });
 
-  it('lets an existing player reach sign-in', () => {
-    const { onHaveAccount } = setup();
-
-    fireEvent.click(screen.getByTestId('quick-start-have-account'));
-
-    expect(onHaveAccount).toHaveBeenCalledTimes(1);
-  });
-
   it('opens the avatar builder on demand and keeps it closed by default', () => {
     setup();
     expect(screen.queryByTestId('avatar-builder')).not.toBeInTheDocument();
@@ -160,8 +150,10 @@ describe('QuickStartStep', () => {
     expect(screen.getByTestId('avatar-builder')).toBeInTheDocument();
   });
 
-  it('hides the sign-in shortcut where external auth is unavailable', () => {
-    setup({ onHaveAccount: undefined });
+  // Sign-in moved to the takeover shell (OnboardingFlow) — the buried link here
+  // measured below the fold at 1440x900. See OnboardingFlow.signInReachable.
+  it('no longer carries its own sign-in link', () => {
+    setup();
     expect(screen.queryByTestId('quick-start-have-account')).not.toBeInTheDocument();
   });
 

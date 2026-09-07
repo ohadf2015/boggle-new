@@ -1,5 +1,16 @@
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
+/**
+ * Locale-invariant half of the LearningResource block. Only `teaches` is
+ * translated; the rest was repeated verbatim in all six locale objects.
+ */
+const LEARNING = {
+  educationalUse: ['Classroom Activity'],
+  educationalLevel: ['Primary', 'Secondary'],
+  typicalAgeRange: '6-13',
+  timeRequired: 'PT20M',
+};
+
 const EN: EducationLandingContent = {
   accent: 'cyan',
   meta: {
@@ -199,11 +210,8 @@ const EN: EducationLandingContent = {
     current: 'Indoor recess games',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-13',
+    ...LEARNING,
     teaches: 'Word recognition, vocabulary, collaborative problem-solving, time management in structured play.',
-    timeRequired: 'PT20M',
   },
 };
 
@@ -410,11 +418,8 @@ const HE: EducationLandingContent = {
     current: 'משחקי הפסקה בתוך הכיתה',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-13',
+    ...LEARNING,
     teaches: 'זיהוי מילים, אוצר מילים, פתרון בעיות שיתופי, ניהול זמן במשחק מובנה.',
-    timeRequired: 'PT20M',
   },
 };
 
@@ -625,12 +630,9 @@ const ES: EducationLandingContent = {
     current: 'Juegos para recreo cubierto',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-13',
+    ...LEARNING,
     teaches:
       'Reconocimiento de palabras, vocabulario, resolución de problemas colaborativa, gestión del tiempo en juego estructurado.',
-    timeRequired: 'PT20M',
   },
 };
 
@@ -841,12 +843,9 @@ const SV: EducationLandingContent = {
     current: 'Inomhusspel för rast',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-13',
+    ...LEARNING,
     teaches:
       'Ordigenkänning, ordförråd, samarbetsproblemslösning, tidshantering i strukturerat spel.',
-    timeRequired: 'PT20M',
   },
 };
 
@@ -1053,12 +1052,9 @@ const JA: EducationLandingContent = {
     current: '室内休み時間ゲーム',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-13',
+    ...LEARNING,
     teaches:
       '単語認識、語彙、協調的な問題解決、構造化されたゲームでの時間管理。',
-    timeRequired: 'PT20M',
   },
 };
 
@@ -1265,11 +1261,8 @@ const RU: EducationLandingContent = {
     current: 'Игры для переменки в помещении',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-13',
+    ...LEARNING,
     teaches: 'Распознавание слов, словарный запас, совместное решение проблем, управление временем в структурированной игре.',
-    timeRequired: 'PT20M',
   },
 };
 

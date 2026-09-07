@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities#page",
+  "name": "Aktiviteter sista veckan — Ordspel",
+  "description": "Håll eleverna engagerade under skolavslutningen. Ordspel utan rättning. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Aktiviteter Sista Veckan",
+      "item": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities#resource",
+  "name": "Aktiviteter sista veckan — Ordspel",
+  "description": "Använd ordspel som varken kräver förberedelse eller rättning. Skapa ett klassrum i LexiClash, dela klasskoden på tavlan och kör Boggle, Ordhjul, Connections-pussel eller orddueller. Eleverna tävlar, du hinner andas, och terminens sista dagar räknas fortfarande som undervisning. Gratis att komma igång.",
+  "url": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+  "inLanguage": "sv",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "ordkunskap, stavning, ordmönster, kategorisering, samspelat spel",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT30M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Vilket spel är bäst för sista veckan av skolan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Boggle och Connections-pussel fungerar bäst: snabbt tempo, ingen vinnare eller förlorare (bara \"hittade du orden?\") och varje elev spelar samtidigt. Ordhjul är utmärkt för snabbhet och lätt tävling."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan mina elever spela hemifrån?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Har eleverna varsin enhet ansluter de till vilket spel du än startar genom att ange klasskoden. De behöver varken mejladress eller konto—de skriver bara sitt namn."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur många elever kan spela samtidigt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hela klassrummet. Vilket antal elever som helst kan ansluta till ett spel och spela live tillsammans."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad händer om en elev är klar innan andra?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "I LexiClash spelar alla elever samma spel samtidigt, så det finns ingen \"tidigt klar.\" Alla ser samma bräde och spelar tills tiden tar slut."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag spåra vilka elever som spelade?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Din klassrumskontrollpanel visar deltagande: vem som spelade, hur många spel, vilka ord de hittade och klassövergripande ordmönster."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Lär spelen läsning eller ordkunskap?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Ordletande bygger mönsterigenkänning och stavning. Connections lär kategorisering och samband. Båda förstärker aktiv ordkunskap utan arbetsblad."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vad om mina elever har olika läsnivåer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Anpassade ordlistor löser detta. Använd enklare ord (tre till fem bokstäver) för yngre elever eller svagare läsare; använd svårare ord för avancerade elever. Alla elever spelar samma spel, men med ord matchade till deras nivå."
+      }
+    }
+  ]
+}

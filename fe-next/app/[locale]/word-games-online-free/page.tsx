@@ -53,7 +53,7 @@ const faqs = [
   },
   {
     q: 'Are these word games good for learning vocabulary?',
-    a: 'Yes! LexiClash helps build vocabulary in 5 languages (English, Hebrew, Swedish, Japanese, Spanish). The brain training drills specifically target pattern recognition and word recall. Teachers use it in classrooms for engaging vocabulary practice.',
+    a: 'Yes! LexiClash helps build vocabulary in 6 languages (English, Hebrew, Swedish, Japanese, Spanish, Russian). The brain training drills specifically target pattern recognition and word recall. Teachers use it in classrooms for engaging vocabulary practice.',
   },
   {
     q: 'How is LexiClash different from Wordle or Scrabble?',
@@ -91,7 +91,7 @@ export default async function WordGamesOnlineFreePage({ params }: PageProps) {
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
           Looking for free word games you can play online right now? LexiClash has 7+ word game modes — all free,
           no download, no signup. Play solo against AI, challenge friends in real-time multiplayer, or try
-          daily puzzles. Available in 5 languages on any device.
+          daily puzzles. Available in 6 languages on any device.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">

@@ -64,8 +64,8 @@ const ja = {
     "pro": "Pro",
     "month": "月",
     "recommended": "おすすめ",
-    "free_1": "1クラス最大5人まで",
-    "free_2": "クラス1つ",
+    "free_1": "1クラス最大50人まで",
+    "free_2": "クラス3つまで",
     "free_3": "基本のゲームモード",
     "pro_1": "1クラスの人数は無制限",
     "pro_2": "クラス数は無制限",
@@ -2429,6 +2429,8 @@ const ja = {
     "needPlayers": "プレイヤーが必要！",
     "commandersJoined": "参加中の司令官",
     "playersInRoom": "ルーム内のプレイヤー",
+    "startQuiz": "クイズを開始",
+    "startClassGame": "ゲームを開始",
     "noOneYet": "まだ誰もいない？",
     "startingWithBots": "ボットで開始まで",
     "addingBots": "ボット追加まで",
@@ -5267,14 +5269,6 @@ const ja = {
     "topPercent": "トップ{percent}%",
     "noRankYet": "ゲームをプレイしてランク入り!",
     "comingSoon": "近日公開！リーダーボードを準備中です。",
-    "referral": {
-      "inviteFriends": "友達を招待して報酬をゲット！",
-      "subtitle": "コードを共有すると、友達がプレイしたとき二人とも100XP＋50コイン獲得！",
-      "shareText": "🎮 LexiClashで一緒に遊ぼう！ワードゲームで勝負だ！",
-      "copied": "リンクをコピーしました！",
-      "friendsJoined": "人の友達が参加",
-      "noReferralsYet": "まだ招待はありません"
-    },
     "viewLeaderboard": "リーダーボードを見る",
     "friends": "フレンド",
     "noFriendsPlayed": "今日はまだフレンドが誰も遊んでいません！",
@@ -6317,7 +6311,7 @@ const ja = {
     "seo": {
       "stepLabel": "ステップ",
       "whatIsTitle": "LexiClashとは？",
-      "whatIsContent": "LexiClashは、ブラウザで直接プレイできる無料の高速マルチプレイヤーワードゲームです。共有された文字グリッド上でリアルタイムのワードバトルで友達と競い合いましょう。単語を見つけ、コンボを構築し、リーダーボードを上りましょう。BoggleとWordleが合体したようなマルチプレイヤーゲームです。ダウンロード不要、登録不要。英語、ヘブライ語、スウェーデン語、日本語、スペイン語で利用可能。",
+      "whatIsContent": "LexiClashは、ブラウザで直接プレイできる無料の高速マルチプレイヤーワードゲームです。共有された文字グリッド上でリアルタイムのワードバトルで友達と競い合いましょう。単語を見つけ、コンボを構築し、リーダーボードを上りましょう。BoggleとWordleが合体したようなマルチプレイヤーゲームです。ダウンロード不要、登録不要。英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語で利用可能。",
       "whatIsShort": "無料のマルチプレイヤー単語バトルをブラウザで。単語を見つけ、コンボを決め、友達を倒そう。ダウンロード不要、登録不要。",
       "featuresTitle": "プレイヤーがLexiClashを愛する理由",
       "feature1Title": "リアルタイムマルチプレイヤー",
@@ -6327,7 +6321,7 @@ const ja = {
       "feature3Title": "アドベンチャーモード",
       "feature3Desc": "10のテーマワールドに100のレベル。特殊タイル、ボスバトル、パワーアップで毎回新鮮。",
       "feature4Title": "6言語対応",
-      "feature4Desc": "英語、ヘブライ語、スウェーデン語、日本語、スペイン語でプレイ。いつでも切り替えて、言語を超えて友達に挑戦。",
+      "feature4Desc": "英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語でプレイ。いつでも切り替えて、言語を超えて友達に挑戦。",
       "feature4TitleShort": "ブラストモード",
       "modeTagMultiplayer": "2〜20人対戦",
       "modeTagDaily": "毎日新しいパズル",
@@ -6361,7 +6355,7 @@ const ja = {
       "faq2Q": "アカウントの作成は必要ですか？",
       "faq2A": "いいえ。ゲストとしてすぐにプレイできます。アカウント作成（GoogleまたはDiscord経由）で、リーダーボードランキング、実績トラッキング、デバイス間の進捗保存などの機能が解放されます。",
       "faq3Q": "対応言語は？",
-      "faq3A": "LexiClashは英語、ヘブライ語、スウェーデン語、日本語、スペイン語に対応。各言語には専用の辞書、デイリーチャレンジ、リーダーボードがあります。設定メニューからいつでも言語を切り替えられます。",
+      "faq3A": "LexiClashは英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語に対応。各言語には専用の辞書、デイリーチャレンジ、リーダーボードがあります。設定メニューからいつでも言語を切り替えられます。",
       "faq4Q": "スマホでプレイできますか？",
       "faq4A": "もちろん。LexiClashは完全レスポンシブで、あらゆるモダンモバイルブラウザで動作します。文字をスワイプして単語を作成 — タッチ操作はモバイルプレイ専用に設計されています。",
       "faq5Q": "子供にも安全ですか？",
@@ -12346,7 +12340,8 @@ const ja = {
       "joining": "参加中...",
       "listening": "クラスルームゲームを待機中...",
       "connecting": "クラスルームに接続中...",
-      "idleHint": "先生がゲームを開始するとここに表示されます"
+      "idleHint": "先生がゲームを開始するとここに表示されます",
+      "joinFailed": "参加できませんでした。ゲームが終了したかもしれません。先生にコードを聞いてみてください。"
     },
     "playWithClass": {
       "title": "クラスと遊ぶ",
@@ -12396,6 +12391,10 @@ const ja = {
       "playGame": "ゲームで遊ぶ",
       "playGameHint": "この語彙でマルチプレイヤーゲームを練習",
       "wordsAtYourLevel": "あなたのレベルは{{mine}}語 · レッスン全体は{{total}}語",
+      "assignment": {
+        "due": "{{date}} まで",
+        "overdue": "期限すぎ — {{date}} まででした"
+      },
       "empty": {
         "title": "レッスンがありません",
         "subtitle": "クラスに参加して語彙練習を始めよう",
@@ -12606,6 +12605,10 @@ const ja = {
       "giftEnded": "Pro ギフトは終了しました"
     },
     "proGate": {
+      "analytics": {
+        "title": "クラスの本当の理解度が見えます",
+        "body": "Proでは、毎回のゲームがクラスの記録になります。どの単語が定着したか、どの生徒がつまずいているか、学期はじめからどれだけ伸びたかが一目でわかります。保護者面談や教科会議にそのまま使えます。"
+      },
       "cta": "Pro で解除 — 月額 ${{price}}"
     },
     "subscription": {
@@ -12636,7 +12639,7 @@ const ja = {
       "trustDataSafe": "データは安全に保たれます",
       "trustReminder": "各請求の前にリマインダーメール",
       "freePlanName": "無料",
-      "freeForever": "ずっと無料、いつでも利用可能",
+      "freeForever": "無料プラン、期限なし",
       "freeClasses": "最大{count}クラス",
       "freeStudents": "クラスあたり最大{count}人",
       "proPlanName": "Teacher Pro",
@@ -12730,6 +12733,7 @@ const ja = {
       "insights": "インサイト",
       "viewReports": "レポートを見る",
       "viewReportsDesc": "クラスの詳細なレポートと分析を表示",
+      "tools": "クラスツール",
       "studentsPresentTitle": "いま {classroom} に {count} 人の生徒がいます",
       "studentsPresentDescription": "ゲームを始めればそのまま参加します。",
       "tab": {
@@ -12871,6 +12875,10 @@ const ja = {
       }
     },
     "lesson": {
+      "pasteWords": "単語リストを貼り付け",
+      "pasteWordsPlaceholder": "1行に1単語 — またはカンマ区切り",
+      "pasteWordsParsed": "{count}語を読み込みました",
+      "pasteWordsAdd": "{count}語を追加",
       "create": "レッスン作成",
       "edit": "レッスン編集",
       "delete": "レッスン削除",
@@ -13186,7 +13194,17 @@ const ja = {
       "wheelRush": "1つの文字ホイールから単語を作る",
       "vocabQuiz": "先生の単語データから作る4択問題"
     },
+    "wordTowerPractice": {
+      "unavailable": "このレッスンの単語ではまだタワーを作れません。4〜6文字の単語が4つ以上必要です。",
+      "done": "おわり",
+      "progress": "リストの単語 {{found}}／{{total}}",
+      "height": "{{height}} m・{{floors}} 階",
+      "hit": "リストの単語！{{word}}"
+    },
     "practicePicker": {
+      "name": {
+        "word_tower": "ワードタワー"
+      },
       "title": "練習をえらぼう",
       "readyCount": "{{total}}件中 {{ready}}件がすぐ遊べます",
       "questions": "{{count}}問",
@@ -13194,7 +13212,10 @@ const ja = {
       "lockedBadge": "ロック中",
       "played": "{{count}}回プレイ",
       "nothingReady": "このレッスンにはまだ単語がありません。先生に追加をお願いしてから戻ってきてね。",
+      "nextMode": "次は{{mode}}",
+      "allModes": "すべてのゲーム",
       "skill": {
+        "word_tower": "今週のリストの文字から単語を作ろう",
         "solo_board": "文字盤からレッスンの単語をさがそう",
         "warmup": "短いウォームアップの盤面",
         "blitz": "制限時間内にできるだけ多くの単語を",
@@ -13210,6 +13231,7 @@ const ja = {
         "roots_affixes": "語のパーツの意味"
       },
       "locked": {
+        "word_tower": "4〜6文字のリスト単語が4つ以上必要です",
         "solo_board": "このレッスンに単語を追加すると使えます",
         "warmup": "このレッスンに単語を追加すると使えます",
         "blitz": "このレッスンに単語を追加すると使えます",
@@ -13532,6 +13554,17 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "questions": "問題数",
+      "perQuestion": "1問あたり",
+      "namePrompt": {
+        "eyebrow": "クラスゲーム",
+        "title": "名前を教えてください",
+        "subtitle": "この名前がクラスの画面に表示されます。",
+        "placeholder": "名前を入力",
+        "submit": "ゲームに参加",
+        "roomLabel": "ルーム {{code}}"
+      },
+      "classroomLessonLabel": "{{classroom}} · ライブ中: {{lesson}}",
       "classCode": "ゲームコード",
       "classroomNotFound": "クラスが見つかりません",
       "classroomSession": "教室セッション",
@@ -13621,7 +13654,7 @@ const ja = {
         "noAds": "生徒には広告なし",
         "customLists": "自分だけの単語リスト",
         "duels": "リアルタイムの単語バトル",
-        "freeForever": "ずっと無料。カード登録も試用期限もありません。",
+        "freeForever": "無料プランに期限はありません。カード登録も試用期限もありません。",
         "proTier": "Teacher Pro",
         "everythingInFree": "無料プランの全機能",
         "classLimitPro": "クラス数は無制限",
@@ -13918,6 +13951,8 @@ const ja = {
       "searchWords": "単語を検索",
       "sessionsCompleted": "{{count}}セッション完了",
       "soloBoard": "ソロボード",
+      "lessonUnavailable": "このレッスンを開けません",
+      "lessonUnavailableBody": "リンクが古いか、レッスンが削除された可能性があります。先生に新しいリンクをもらってね。",
       "spellTheWord": "スペルを書いてみよう",
       "spelling": "スペリング",
       "streak": "{{count}}連続",
@@ -13956,7 +13991,11 @@ const ja = {
         "codeLabel": "クラスコード",
         "codeNotRecognised": "そのコードは認識できません",
         "codePasted": "コードを貼り付けました！",
+        "heroLine": "先生にクラスコードを聞いてね",
         "preparing": "準備しています。少しお待ちください。",
+        "queuedNeedsName": "あと少しです。上に名前を入れると、そのまま参加できます。",
+        "nameTaken": "そのなまえはクラスでつかわれています。{{suggestedName}} はどうですか。",
+        "useSuggestedName": "{{suggestedName}} で参加する",
         "codePlaceholder": "6文字",
         "emptyClipboard": "クリップボードが空です",
         "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
@@ -13977,6 +14016,7 @@ const ja = {
         "success": "クラスに参加しました！",
         "title": "クラスに参加"
       },
+      "classroomRoomGone": "クラスのゲームが終了しました。先生に新しいゲームを始めてもらってね。",
       "lessonsAssigned": "割り当てられたレッスン"
     },
     "template": {
@@ -14178,7 +14218,7 @@ const ja = {
       "auth_required_body": "教師アクセスは認証済みアカウントに紐づきます。無料アカウントを作成するかログインすると、このまま続けられます。",
       "auth_required_cta": "無料の先生アカウントを作成",
       "trust_instant": "即時アクセス — 審査待ちなし",
-      "trust_free": "先生はずっと無料",
+      "trust_free": "教師向け無料プラン、期限なし",
       "trust_nologins": "生徒のログインも設定も不要",
       "cta_micro": "所要60秒 · クレジットカード不要",
       "hero_alt": "文字キューブの教室を迎えるLexiClashのマスコット",
@@ -15172,7 +15212,8 @@ const ja = {
     "hebrew": "ヘブライ語",
     "swedish": "スウェーデン語",
     "japanese": "日本語",
-    "spanish": "スペイン語"
+    "spanish": "スペイン語",
+    "russian": "ロシア語"
   },
   "streakBar": {
     "streak": "{{count}}日連続",
@@ -16862,7 +16903,12 @@ const ja = {
     "shareCard": {
       "title": "あなたのブラフ記録",
       "cta": "結果をシェア",
-      "copied": "コピーしました！"
+      "copied": "コピーしました！",
+      "header": "🎯 シールドビッド — {score}pt",
+      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
+      "url": "lexiclash.live/ja/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "vs"
     },
     "session": {
       "title": "ブラフカウンター",
@@ -16870,7 +16916,11 @@ const ja = {
       "uniqueLabel": "ユニーク",
       "clashLabel": "クラッシュ",
       "passLabel": "パス",
-      "shareCta": "スコアをシェア"
+      "shareCta": "スコアをシェア",
+      "shareHeader": "🧠 {unique}/{total}ラウンドでボットに勝利 — {score}pt",
+      "cashOut": "キャッシュアウト",
+      "chips": "チップ",
+      "coins": "コイン"
     },
     "youWin": "勝利！",
     "youLose": "衝突",
@@ -16894,20 +16944,7 @@ const ja = {
     "revealing": "公開中…",
     "roundLabel": "ラウンド {n}/{total}",
     "chipStack": "チップ: {chips}",
-    "speedBonus": "スピード ×{n}",
-    "shareCard": {
-      "header": "🎯 シールドビッド — {score}pt",
-      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.live/ja/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "vs"
-    },
-    "session": {
-      "shareHeader": "🧠 {unique}/{total}ラウンドでボットに勝利 — {score}pt",
-      "cashOut": "キャッシュアウト",
-      "chips": "チップ",
-      "coins": "コイン"
-    }
+    "speedBonus": "スピード ×{n}"
   },
   "supporter": {
     "card": {

@@ -131,9 +131,9 @@ export function useWordSubmission(
         msg = t('playerView.wordTooShortMin', { min: minVal })
           || `Word too short! (min ${minVal} letters)`;
       } else if (validation.errorKey === 'playerView.wordTooShort') {
-        msg = t('playerView.wordTooShort') || 'Word too short';
+        msg = t('playerView.wordTooShort', 'Word too short');
       } else if (isDuplicate) {
-        msg = t('playerView.alreadyFound') || 'Already found';
+        msg = t('playerView.alreadyFound', 'Already found');
       } else {
         const errorKey = validation.errorKey ?? 'Invalid word';
         msg = t(errorKey) || errorKey;

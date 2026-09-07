@@ -7,10 +7,12 @@
 
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useStudentProgress } from '@/hooks/useStudentProgress';
+import { useStudentProgress, type StudentLesson } from '@/hooks/useStudentProgress';
+import { usePracticeLessons } from '@/hooks/usePracticeLessons';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { wordsForLevel } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
@@ -18,7 +20,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
-import { BookOpen, Award, Activity, Star, Crosshair } from 'lucide-react';
+import { BookOpen, Award, Activity, Star, Crosshair, CalendarClock } from 'lucide-react';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import { readAssignmentFocus, focusPracticeHref } from '@/lib/education/vocabFocus';
 
@@ -81,15 +83,66 @@ const doneBadge = {
 export default function StudentLessonView() {
   const { t, language } = useLanguage();
   const router = useRouter();
+  // TWO sources, on purpose. `useStudentProgress` knows homework — what was
+  // assigned, started, finished, and when it is due. `usePracticeLessons` knows
+  // what this student is ALLOWED TO PLAY, which is the wider set: every lesson
+  // in their classroom, assignment or not.
+  //
+  // Before the second source existed this list was assignment rows and nothing
+  // else, so a teacher who wrote a word list and even ran a live game with it
+  // had still not made it practisable — solo practice waited on a separate
+  // "Create Assignment" step in a different tab. An assignment is now what it
+  // reads as on the card: a deadline and a pinned skill, not a key.
   const { lessons, isLoading, error } = useStudentProgress();
+  const { lessons: practisable, isLoading: isLoadingPractisable } = usePracticeLessons();
   // Per-student differentiation: the count / mastery denominator is the words THIS
   // student practises at their level, not the whole lesson — otherwise a support
   // student can never reach 100%.
   const { level } = useStudentClassroom();
 
-  const activeLessonCount = lessons.filter((l) => l.status !== 'completed').length;
+  // Homework first, in the order the progress hook already sorted it; then
+  // everything else the student may practise. A lesson present in both is ONE
+  // card, and the homework half wins — it is the half that carries the deadline
+  // and the real progress row.
+  const cards = useMemo<StudentLesson[]>(() => {
+    const byId = new Map<string, StudentLesson>();
+    for (const entry of lessons) byId.set(entry.lessonId, entry);
+    for (const open of practisable) {
+      if (byId.has(open.id)) continue;
+      byId.set(open.id, {
+        lessonId: open.id,
+        // Not 'assigned': that status paints a pulsing NEW badge that means
+        // "your teacher gave you this", which is precisely what did not happen.
+        status: 'started',
+        lesson: {
+          id: open.id,
+          name: open.name,
+          description: open.description,
+          language: open.language,
+          words: open.words,
+          classroom_id: open.classroom_id,
+        } as StudentLesson['lesson'],
+        ...(open.assignment ? { assignment: open.assignment as StudentLesson['assignment'] } : {}),
+      });
+    }
+    return [...byId.values()];
+  }, [lessons, practisable]);
 
-  if (isLoading) {
+  // "Is this homework late?" needs the clock, and reading `Date.now()` during
+  // render is impure — the same reason `useTeacherAccess` keeps a ticking
+  // `nowMs`. Sampled once on mount and refreshed hourly, which is far finer
+  // than the day granularity the overdue check actually uses.
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 60 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const activeLessonCount = cards.filter((l) => l.status !== 'completed').length;
+
+  // Both sources, not one. Rendering "join a classroom" while the second is
+  // still in flight flashes an empty state at a student who has lessons.
+  if (isLoading || isLoadingPractisable) {
     return (
       <div className="flex justify-center items-center py-12">
         <PageLoader size="lg" text={t('common.loading')} />
@@ -97,7 +150,10 @@ export default function StudentLessonView() {
     );
   }
 
-  if (error) {
+  // An error on the homework source is only fatal when it left the student with
+  // nothing. If the wider list resolved, showing its lessons beats showing a
+  // red sentence about a query they never asked for.
+  if (error && cards.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-neo-pink font-neo-body text-lg">{error}</p>
@@ -105,7 +161,7 @@ export default function StudentLessonView() {
     );
   }
 
-  if (lessons.length === 0) {
+  if (cards.length === 0) {
     return (
       <div className="py-12">
         <EnhancedEmptyState
@@ -159,7 +215,7 @@ export default function StudentLessonView() {
         </AdaptiveAnimatePresence>
       </AdaptiveMotion.div>
 
-      {lessons.map((studentLesson, index) => {
+      {cards.map((studentLesson, index) => {
         const { status, lesson, progress } = studentLesson;
 
         const lessonWords = wordsForLevel(lesson?.words || [], level);
@@ -180,6 +236,23 @@ export default function StudentLessonView() {
           lesson?.name || `${t('student.lessons.lesson')} #${studentLesson.lessonId.slice(0, 6)}`;
         // Teacher pinned one vocabulary skill on this assignment → offer it first
         const assignedFocus = readAssignmentFocus(studentLesson.assignment);
+
+        // Homework has to LOOK like homework. Every card rendered identically,
+        // so an assignment with a Friday deadline sat beside optional practice
+        // with nothing to tell them apart — and the due date was already
+        // fetched, just never shown.
+        const assignment = studentLesson.assignment as { due_date?: string | null } | null | undefined;
+        const dueDate = assignment?.due_date ? new Date(assignment.due_date) : null;
+        const hasValidDueDate = !!dueDate && !Number.isNaN(dueDate.getTime());
+        // Compared at day granularity: something due today is not overdue at
+        // 09:00 merely because the timestamp says midnight.
+        const isOverdue =
+          hasValidDueDate && dueDate!.setHours(23, 59, 59, 999) < nowMs;
+        const dueLabel = hasValidDueDate
+          ? new Intl.DateTimeFormat(language, { day: 'numeric', month: 'short' }).format(
+              new Date(assignment!.due_date as string)
+            )
+          : null;
 
         // Card colors per status
         const cardBg =
@@ -269,6 +342,34 @@ export default function StudentLessonView() {
                           })
                         : `${wordsAtLevel} ${t('student.lessons.words')}`}
                     </span>
+
+                    {/* Assignment markers. Shown only when there really is an
+                        assignment, and the date only when one was set — an
+                        empty or invented deadline is its own small lie. */}
+                    {dueLabel && (
+                      <span
+                        data-testid="assignment-due-badge"
+                        data-overdue={isOverdue ? 'true' : 'false'}
+                        className={cn(
+                          'flex items-center gap-1.5 rounded-neo border-2 border-black px-2 py-0.5 font-black',
+                          isOverdue ? 'bg-neo-pink text-black' : 'bg-neo-cyan text-black'
+                        )}
+                      >
+                        <CalendarClock className="w-4 h-4" aria-hidden="true" />
+                        {isOverdue
+                          ? t('student.lessons.assignment.overdue', { date: dueLabel })
+                          : t('student.lessons.assignment.due', { date: dueLabel })}
+                      </span>
+                    )}
+                    {assignedFocus && (
+                      <span
+                        data-testid="assignment-focus-chip"
+                        className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 font-black text-black"
+                      >
+                        <Crosshair className="w-4 h-4" aria-hidden="true" />
+                        {t(`education.vocabFocus.focus.${assignedFocus}`)}
+                      </span>
+                    )}
 
                     {status !== 'assigned' && progress && (
                       <>

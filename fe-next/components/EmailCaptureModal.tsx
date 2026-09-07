@@ -182,8 +182,7 @@ export function EmailCaptureModal() {
                 {t('email.successTitle')}
               </h3>
               <p className="text-neo-white opacity-90">
-                {t('email.successMessage') ||
-                  "We'll send you daily challenges and streak reminders. Check your inbox!"}
+                {t('email.successMessage', "We'll send you daily challenges and streak reminders. Check your inbox!")}
               </p>
             </div>
           ) : (
@@ -249,8 +248,7 @@ export function EmailCaptureModal() {
                 </div>
 
                 <p className="text-neo-white text-xs opacity-70 text-center">
-                  {t('email.privacy') ||
-                    "We respect your privacy. Unsubscribe anytime. No spam, we promise."}
+                  {t('email.privacy', "We respect your privacy. Unsubscribe anytime. No spam, we promise.")}
                 </p>
               </form>
             </>

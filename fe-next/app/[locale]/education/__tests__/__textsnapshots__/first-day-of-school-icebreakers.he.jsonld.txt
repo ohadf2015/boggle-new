@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers#page",
+  "name": "משחקי שובר קרח ליום הראשון | לקסיקלאש",
+  "description": "משחקי מילים לכיתה שכוללים בחורים שקטים. משחקים ללא לחץ ביום הראשון של בית הספר—ללא שמות שצריך לזכור, אף אחד לא בחזית.",
+  "url": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "דף הבית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "שובר קרח ביום ראשון",
+      "item": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers#resource",
+  "name": "משחקי שובר קרח ליום הראשון | לקסיקלאש",
+  "description": "משחק מילים של הכיתה כולה על אותן אותיות משותפות—אין בדיקה יחידנית, אין חכה בתור. לקסיקלאש נותן למורה לוח חי ולתלמידים דרך ללא לחץ לדברים, לגלות שמות, ולהרגיש את הכיתה משתנה מדממה לאנרגיה תוך פחות מ-15 דקות.",
+  "url": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+  "inLanguage": "he",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "8-16",
+  "teaches": "cohesion חברתית, אוצר מילים בהקשר, למידת שמות מהירה",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "מה לגבי תלמידים שלא רוצים להרים קול?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "הם בחלק. הם מוצאים מילים בשקט. אתה רואה את הלוח מתמלא תחת שמם. הלחץ ל\"הציג את עצמך\" נעלם—אתה רק רואה מי הם בזמן אמת. כמה ילדים מדברים פחות בסיבוב ראשון, יותר בשני. כך זה עובד."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אוכל להשתמש בזה אם תלמידים כבר מכירים זה את זה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. זה בונה שמות לתוך פנים, לא רק שמות לתוך רשימה. בנוסף, תערובת כיתה טריה (אפילו בשנים חוזרות) יוצרת מרחק מספיק שהקדמה נמוכת לחץ עדיין יוצאת."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "עבור איזה גילאים זה עובד?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "יסודי דרך תיכון. התאם את השפה: ילדים צעירים יותר ציידים במילים פשוטות יותר; ילדים גדולים יותר ציידים במילים ארוכות יותר או משחקים עם מסנן נושא. משחק אחד, מהירויות רבות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אוכל לשחק בזה בצורה אסינכרונית?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. תן לתלמידים קוד הצטרפות, נושא (למשל, \"מצא מילים על החופש\"), ותאריך יעד. הם משחקים בזמנם שלהם. פחות אנרגיה של שובר קרח, יותר אסינכרונית לראות מה הם יודעים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה אם לתלמיד אין מכשיר?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "זווגם עם שכן, או הם עוזרים לזוג זה. הם עדיין מוכרים. עדיין חלק מהחדר."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אוכל להשתמש בזה לשיעורי אנגלית או כיתות רב-לשוניות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן! לומדים צעירים ציידים במילים קצרות יותר; לומדים מתקדמים ציידים לפי משמעות. פרסם את הנושא באנגלית או בשפת האם."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "איך אני שומר את זה בתנועה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "הגדר טיימר. שתי דקות לכל סיבוב, לא עשר. ילדים זז מהר כשהם מבינים את צורת המשחק. תפוס כמה שמות קולנו בין סיבובים כדי להישאר מעורב והם מוכרים."
+      }
+    }
+  ]
+}

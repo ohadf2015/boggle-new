@@ -60,6 +60,41 @@ export type LocaleContent = {
     comparisonSubtitle: string;
     howTeachersUse: string;
   };
+  /**
+   * The zero-signup path, above the fold.
+   *
+   * This page lost a blind comparison against a printable-worksheet listicle purely
+   * on friction: that page asks for nothing, and ours pitched a platform. The product
+   * already HAS a no-account path — `/multiplayer?quickPlay=true` auto-joins a guest
+   * with a stored or generated name (components/multiplayer/MultiplayerFlow.tsx, the
+   * `quickPlayUsername` fallback) and never touches `isAuthenticated`. It was simply
+   * never offered here. The copy promises exactly that and nothing more: no account,
+   * no email, a temporary name you can change.
+   */
+  noAccount: {
+    heading: string;
+    body: string;
+    cta: string;
+    note: string;
+  };
+  /**
+   * What a teacher can do with that guest board TODAY, before creating anything.
+   *
+   * Every activity is tied to something in the code: quick play (guest auto-join),
+   * the six-character room code (utils/utils.ts), the create-room language picker
+   * (CreateRoomModal LANGUAGES) with a per-language dictionary, the host's mode
+   * selector (components/GameModeSelector.tsx — classic, word-hunt, wheel-rush,
+   * blast) and the daily board. No printables, and nothing that needs an account.
+   *
+   * Deliberately NOT shaped like esl-word-games' `workflow`, which is a timed 0:00
+   * walkthrough of the signed-in teacher flow. Same reader, different question, so
+   * the two pages stay distinguishable — see `__tests__/variantDifferentiation.test.ts`.
+   */
+  lessonPlan: {
+    heading: string;
+    intro: string;
+    activities: Array<{ title: string; body: string }>;
+  };
 };
 
 export const EDUCATION_LOCALES = ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const;
@@ -199,6 +234,45 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       comparisonSubtitle: 'A teacher-honest comparison. We\'re not for everyone — just for teachers who want word games without a paywall.',
       howTeachersUse: 'How teachers use it.',
     },
+    noAccount: {
+      heading: 'Start a 2-minute game right now — no account',
+      body:
+        'The button opens a live board in this browser. You get a temporary player name you can change on the way in, and nothing asks for an email or a password. Try it before you decide whether it belongs in a lesson.',
+      cta: 'Play now — no sign-up',
+      note: 'No email · No password · Runs on the school Wi-Fi',
+    },
+    lessonPlan: {
+      heading: 'Run it in your next lesson',
+      intro:
+        'Five things the no-account board already does, today, before you create anything. Each one needs a browser and a screen. None of them needs a printer, a login, or an evening of setup.',
+      activities: [
+        {
+          title: 'Board on the projector, class calls it out',
+          body:
+            'Open the no-account game, put the board on the big screen, and take words from the room while you tap them in. One device, no student logins, and the whole class is playing inside a minute. It fits the last five minutes of a period.',
+        },
+        {
+          title: 'One code, every phone in the room',
+          body:
+            'Host a room from the same lobby and read the six-character code aloud. Students open the multiplayer page in any browser, type the code and a name, and they are in. Fifty players fit in one room, which is a full class with room to spare.',
+        },
+        {
+          title: 'Run the round in the language you teach',
+          body:
+            'The create-room dialog sets the language for the round, and every language is judged against its own dictionary instead of a translated English list. A Spanish or Hebrew round scores real Spanish and Hebrew words, and the Hebrew board lays out right to left.',
+        },
+        {
+          title: 'Switch to Word Hunt when you want one answer, not a race',
+          body:
+            'Before the round starts, the host screen swaps Classic for Word Hunt, Wheel Rush or Blast. Word Hunt points the whole class at a single target word instead of rewarding volume, which slows the room down and leaves you something to discuss afterwards.',
+        },
+        {
+          title: 'The daily board as a bell-ringer',
+          body:
+            'The daily puzzle is the same board for everyone who plays it that day, so your class can compare answers with each other and with everyone else. No account, no setup, and it changes on its own every morning.',
+        },
+      ],
+    },
   },
 
   he: {
@@ -333,6 +407,45 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       comparison: 'LexiClash לעומת האחרים.',
       comparisonSubtitle: 'השוואה כנה. לא בשביל כולם — בשביל מורים שרוצים משחקי מילים בלי תשלומים נסתרים.',
       howTeachersUse: 'איך מורים משתמשים בזה.',
+    },
+    noAccount: {
+      heading: 'התחילו משחק של שתי דקות עכשיו — בלי חשבון',
+      body:
+        'הכפתור פותח לוח חי כאן בדפדפן. מקבלים שם שחקן זמני שאפשר לשנות בדרך פנימה, ואף אחד לא מבקש אימייל או סיסמה. נסו לפני שאתם מחליטים אם זה מתאים לשיעור.',
+      cta: 'שחקו עכשיו — בלי הרשמה',
+      note: 'בלי אימייל · בלי סיסמה · עובד על הרשת של בית הספר',
+    },
+    lessonPlan: {
+      heading: 'להריץ את זה בשיעור הבא',
+      intro:
+        'חמישה דברים שהלוח ללא חשבון כבר עושה, היום, לפני שיוצרים משהו. לכל אחד צריך דפדפן ומסך. לאף אחד לא צריך מדפסת, התחברות או ערב שלם של הגדרות.',
+      activities: [
+        {
+          title: 'הלוח על המקרן, הכיתה קוראת בקול',
+          body:
+            'פתחו את המשחק ללא חשבון, העלו את הלוח למסך הגדול, וקבלו מילים מהכיתה בזמן שאתם מקלידים. מכשיר אחד, בלי התחברות של תלמידים, וכל הכיתה משחקת תוך דקה. מתאים לחמש הדקות האחרונות של השיעור.',
+        },
+        {
+          title: 'קוד אחד, כל הטלפונים בחדר',
+          body:
+            'פתחו חדר מאותו לובי והקריאו את הקוד בן שש התווים. התלמידים נכנסים לעמוד המשחק מכל דפדפן, מקלידים את הקוד ושם, וזהו. חמישים שחקנים נכנסים לחדר אחד — כיתה מלאה ועוד קצת.',
+        },
+        {
+          title: 'להריץ את הסיבוב בשפה שאתם מלמדים',
+          body:
+            'חלון פתיחת החדר קובע את שפת הסיבוב, וכל שפה נשפטת מול מילון משלה ולא מול רשימה אנגלית מתורגמת. סיבוב בספרדית או בעברית מזכה על מילים אמיתיות בשפה, והלוח העברי נפרס מימין לשמאל.',
+        },
+        {
+          title: 'לעבור ל-Word Hunt כשרוצים תשובה אחת, לא מרוץ',
+          body:
+            'לפני תחילת הסיבוב מסך המארח מאפשר להחליף את המצב הקלאסי ב-Word Hunt, ב-Wheel Rush או ב-Blast. ב-Word Hunt כל הכיתה מחפשת מילת מטרה אחת במקום לצבור כמות, מה שמאט את הקצב ומשאיר לכם על מה לדבר אחר כך.',
+        },
+        {
+          title: 'הלוח היומי כפתיח שיעור',
+          body:
+            'החידה היומית היא אותו לוח לכל מי שמשחק באותו יום, כך שהכיתה יכולה להשוות תשובות בינה לבין עצמה ומול כל השאר. בלי חשבון, בלי הגדרות, והוא מתחלף מעצמו כל בוקר.',
+        },
+      ],
     },
   },
 
@@ -469,6 +582,45 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       comparisonSubtitle: 'Honesto. No para todos — solo para maestros que quieren juegos sin paywall.',
       howTeachersUse: 'Cómo se usa.',
     },
+    noAccount: {
+      heading: 'Empieza una partida de 2 minutos ahora — sin cuenta',
+      body:
+        'El botón abre un tablero en vivo en este navegador. Recibes un nombre de jugador temporal que puedes cambiar al entrar, y nadie te pide correo ni contraseña. Pruébalo antes de decidir si encaja en una clase.',
+      cta: 'Jugar ahora — sin registro',
+      note: 'Sin correo · Sin contraseña · Funciona en el wifi del colegio',
+    },
+    lessonPlan: {
+      heading: 'Úsalo en tu próxima clase',
+      intro:
+        'Cinco cosas que el tablero sin cuenta ya hace, hoy, antes de crear nada. Cada una necesita un navegador y una pantalla. Ninguna necesita impresora, inicio de sesión ni una tarde de configuración.',
+      activities: [
+        {
+          title: 'El tablero en el proyector y la clase en voz alta',
+          body:
+            'Abre el juego sin cuenta, pon el tablero en la pantalla grande y recoge palabras del aula mientras tú las escribes. Un solo dispositivo, sin inicios de sesión de estudiantes, y toda la clase juega en menos de un minuto. Cabe en los últimos cinco minutos.',
+        },
+        {
+          title: 'Un código, todos los móviles del aula',
+          body:
+            'Crea una sala desde el mismo vestíbulo y lee en voz alta el código de seis caracteres. Los estudiantes abren la página multijugador en cualquier navegador, escriben el código y un nombre, y ya están dentro. Caben cincuenta jugadores en una sala.',
+        },
+        {
+          title: 'Juega la ronda en el idioma que enseñas',
+          body:
+            'La ventana de crear sala fija el idioma de la ronda, y cada idioma se valida con su propio diccionario en lugar de una lista inglesa traducida. Una ronda en español o hebreo puntúa palabras reales, y el tablero hebreo se dispone de derecha a izquierda.',
+        },
+        {
+          title: 'Cambia a Word Hunt cuando quieras una respuesta, no una carrera',
+          body:
+            'Antes de empezar la ronda, la pantalla del anfitrión cambia el modo clásico por Word Hunt, Wheel Rush o Blast. Word Hunt apunta a toda la clase hacia una única palabra objetivo en vez de premiar el volumen, lo que baja el ritmo y deja algo que comentar después.',
+        },
+        {
+          title: 'El tablero diario como actividad de entrada',
+          body:
+            'El reto diario es el mismo tablero para todos los que juegan ese día, así que tu clase puede comparar respuestas entre sí y con el resto del mundo. Sin cuenta, sin preparación, y cambia solo cada mañana.',
+        },
+      ],
+    },
   },
 
   sv: {
@@ -603,6 +755,45 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       comparison: 'LexiClash vs. de andra.',
       comparisonSubtitle: 'Ärlig jämförelse. Inte för alla — bara för lärare som vill ha ordspel utan paywall.',
       howTeachersUse: 'Hur det fungerar.',
+    },
+    noAccount: {
+      heading: 'Starta ett tvåminutersspel nu — utan konto',
+      body:
+        'Knappen öppnar en levande spelplan direkt i webbläsaren. Du får ett tillfälligt spelarnamn som går att byta på vägen in, och ingen frågar efter e-post eller lösenord. Testa innan du avgör om det hör hemma på en lektion.',
+      cta: 'Spela nu — ingen registrering',
+      note: 'Ingen e-post · Inget lösenord · Fungerar på skolans wifi',
+    },
+    lessonPlan: {
+      heading: 'Kör det på nästa lektion',
+      intro:
+        'Fem saker som spelplanen utan konto redan klarar, i dag, innan du skapar något. Var och en kräver en webbläsare och en skärm. Ingen kräver skrivare, inloggning eller en kväll av inställningar.',
+      activities: [
+        {
+          title: 'Spelplanen på projektorn, klassen ropar ut orden',
+          body:
+            'Öppna spelet utan konto, lägg upp spelplanen på storbildsskärmen och ta emot ord från klassen medan du skriver in dem. En enhet, inga elevinloggningar, och hela klassen spelar inom en minut. Det ryms på lektionens sista fem minuter.',
+        },
+        {
+          title: 'En kod, varje mobil i rummet',
+          body:
+            'Skapa ett rum från samma lobby och läs upp koden på sex tecken. Eleverna öppnar multiplayer-sidan i vilken webbläsare som helst, skriver koden och ett namn, och är inne. Femtio spelare får plats i ett rum — en hel klass med marginal.',
+        },
+        {
+          title: 'Kör rundan på språket du undervisar i',
+          body:
+            'Dialogrutan för att skapa rum bestämmer rundans språk, och varje språk bedöms mot sin egen ordbok i stället för en översatt engelsk lista. En runda på spanska eller hebreiska ger poäng för riktiga ord, och den hebreiska spelplanen läggs ut från höger till vänster.',
+        },
+        {
+          title: 'Byt till Word Hunt när du vill ha ett svar, inte en kapplöpning',
+          body:
+            'Innan rundan startar byter värdskärmen det klassiska läget mot Word Hunt, Wheel Rush eller Blast. Word Hunt riktar hela klassen mot ett enda målord i stället för att belöna mängd, vilket sänker tempot och ger något att prata om efteråt.',
+        },
+        {
+          title: 'Dagens spelplan som lektionsstart',
+          body:
+            'Dagens pussel är samma spelplan för alla som spelar det den dagen, så klassen kan jämföra svar med varandra och med alla andra. Inget konto, ingen förberedelse, och det byts av sig självt varje morgon.',
+        },
+      ],
     },
   },
 
@@ -739,6 +930,45 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       comparisonSubtitle: '正直な比較。みんなに向いているわけじゃない — paywall なしの単語ゲームを求めてる先生だけ。',
       howTeachersUse: '先生はどう使うか。',
     },
+    noAccount: {
+      heading: '2分のゲームを今すぐ — アカウント不要',
+      body:
+        'ボタンを押すと、このブラウザでライブのボードが開きます。仮のプレイヤー名が割り当てられ、入る途中で変更できます。メールもパスワードも聞かれません。授業に合うかどうかは、遊んでから決めてください。',
+      cta: '今すぐプレイ — 登録なし',
+      note: 'メール不要 · パスワード不要 · 学校のWi-Fiで動きます',
+    },
+    lessonPlan: {
+      heading: '次の授業でそのまま使う',
+      intro:
+        'アカウントなしのボードが、今日すでにできること5つ。何かを作る前に試せます。必要なのはブラウザと画面だけで、印刷もログインも準備の夜も要りません。',
+      activities: [
+        {
+          title: 'ボードをプロジェクターに、クラスは声で答える',
+          body:
+            'アカウントなしのゲームを開き、ボードを大画面に映して、教室から出た単語を先生が入力します。端末は1台、生徒のログインはゼロ、1分でクラス全体が参加できます。授業の最後の5分にちょうど収まります。',
+        },
+        {
+          title: 'コード1つで、教室中のスマホが参加',
+          body:
+            '同じロビーからルームを作り、6文字のコードを読み上げます。生徒はどのブラウザからでもマルチプレイヤーのページを開き、コードと名前を入力すれば参加完了です。1つのルームに50人まで入るので、1クラスなら余裕があります。',
+        },
+        {
+          title: '教えている言語でラウンドを回す',
+          body:
+            'ルーム作成の画面でラウンドの言語を決めます。各言語は翻訳された英語リストではなく、その言語専用の辞書で判定されます。スペイン語やヘブライ語のラウンドは本物の単語で得点し、ヘブライ語のボードは右から左に並びます。',
+        },
+        {
+          title: '競争ではなく1つの答えが欲しいときはWord Huntへ',
+          body:
+            'ラウンドを始める前に、ホスト画面でクラシックからWord Hunt、Wheel Rush、Blastに切り替えられます。Word Huntは量を稼ぐのではなく、クラス全員を1つの目標語に向けます。テンポが落ち着き、あとで話し合う材料が残ります。',
+        },
+        {
+          title: 'デイリーのボードを授業の導入に',
+          body:
+            'デイリーパズルはその日に遊ぶ全員が同じボードなので、クラス内でも世界中とでも答えを比べられます。アカウントも準備も不要で、毎朝ひとりでに入れ替わります。',
+        },
+      ],
+    },
   },
 
   ru: {
@@ -873,6 +1103,45 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       comparison: 'LexiClash против других.',
       comparisonSubtitle: 'Честное сравнение. Не для всех — только для учителей, которые хотят словесные игры без платёжных стен.',
       howTeachersUse: 'Как учителя его используют.',
+    },
+    noAccount: {
+      heading: 'Начните двухминутную игру прямо сейчас — без аккаунта',
+      body:
+        'Кнопка открывает живое поле прямо в этом браузере. Вы получаете временное имя игрока, которое можно поменять на входе, и никто не просит почту или пароль. Попробуйте, прежде чем решать, место ли этому на уроке.',
+      cta: 'Играть сейчас — без регистрации',
+      note: 'Без почты · Без пароля · Работает на школьном Wi-Fi',
+    },
+    lessonPlan: {
+      heading: 'Проведите это на следующем уроке',
+      intro:
+        'Пять вещей, которые поле без аккаунта умеет уже сегодня, до того как вы что-то создадите. Каждой нужен браузер и экран. Ни одной не нужен принтер, вход в систему или вечер настроек.',
+      activities: [
+        {
+          title: 'Поле на проекторе, класс говорит вслух',
+          body:
+            'Откройте игру без аккаунта, выведите поле на большой экран и принимайте слова из класса, набирая их сами. Одно устройство, никаких входов для учеников, и через минуту играет весь класс. Помещается в последние пять минут урока.',
+        },
+        {
+          title: 'Один код — каждый телефон в классе',
+          body:
+            'Создайте комнату из того же лобби и прочитайте вслух код из шести символов. Ученики открывают страницу многопользовательской игры в любом браузере, вводят код и имя — и они внутри. В одной комнате помещается пятьдесят игроков, то есть целый класс с запасом.',
+        },
+        {
+          title: 'Проведите раунд на том языке, который преподаёте',
+          body:
+            'Окно создания комнаты задаёт язык раунда, и каждый язык проверяется по собственному словарю, а не по переведённому английскому списку. Раунд на испанском или иврите засчитывает настоящие слова, а поле на иврите разворачивается справа налево.',
+        },
+        {
+          title: 'Переключитесь на Word Hunt, когда нужен один ответ, а не гонка',
+          body:
+            'Перед началом раунда экран ведущего меняет классический режим на Word Hunt, Wheel Rush или Blast. Word Hunt направляет весь класс к одному целевому слову вместо погони за количеством: темп падает, а после раунда остаётся что обсудить.',
+        },
+        {
+          title: 'Ежедневное поле как разминка в начале урока',
+          body:
+            'Ежедневная головоломка — одно и то же поле для всех, кто играет в этот день, поэтому класс может сравнивать ответы между собой и со всем миром. Без аккаунта, без подготовки, и каждое утро оно меняется само.',
+        },
+      ],
     },
   },
 };

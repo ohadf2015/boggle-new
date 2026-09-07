@@ -14,7 +14,7 @@ export default function NotFoundClient() {
   const { t, language } = useLanguage();
 
   useEffect(() => {
-    document.title = '404 - ' + (t('notFound.heading') || 'Page Not Found') + ' | LexiClash';
+    document.title = '404 - ' + (t('notFound.heading', 'Page Not Found')) + ' | LexiClash';
   }, [t]);
 
   // A stale tab navigating after a deploy can hit a spurious 404 (the old build

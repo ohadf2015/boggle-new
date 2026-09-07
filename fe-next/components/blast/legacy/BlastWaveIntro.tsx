@@ -12,7 +12,7 @@ import type { BlastObjectiveProgress } from './types';
 interface BlastWaveIntroProps {
   waveNumber: number;
   archetype: BlastWaveArchetype;
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
   featured?: readonly BlastTileType[];
   /** Wave objectives — previewed so the player knows the goals before play. */
   objectives?: BlastObjectiveProgress[];
@@ -121,7 +121,7 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives 
               transition={{ delay: 0.3, duration: 0.4 }}
               className="font-neo-body text-sm text-neo-white/90 text-center px-4 max-w-[280px]"
             >
-              {t('blast.waveIntro.dragHint') || 'Drag to connect letters into words'}
+              {t('blast.waveIntro.dragHint', 'Drag to connect letters into words')}
             </AdaptiveMotion.span>
           )}
 
@@ -178,7 +178,7 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives 
               className="flex flex-col items-stretch gap-2 px-4 py-3 rounded-neo bg-black/80 border-2 border-neo-black shadow-hard max-w-[320px]"
             >
               <span className="font-neo-display font-black uppercase tracking-wider text-xs text-neo-white/80 text-center">
-                {t('blast.objective.bannerTitle') || 'Goals'}
+                {t('blast.objective.bannerTitle', 'Goals')}
               </span>
               {goalPreview.map((p, i) => (
                 <span
@@ -201,7 +201,7 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives 
               transition={{ duration: 0.5 }}
               className="font-neo-body text-xs text-neo-white/60 text-center mt-1"
             >
-              {t('blast.waveIntro.tapToStart') || 'Tap to start'}
+              {t('blast.waveIntro.tapToStart', 'Tap to start')}
             </AdaptiveMotion.span>
           )}
         </AdaptiveMotion.div>

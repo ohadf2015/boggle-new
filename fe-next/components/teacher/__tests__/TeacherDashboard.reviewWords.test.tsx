@@ -44,10 +44,8 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: 
 vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('../ClassroomManager', () => ({ __esModule: true, default: () => null }));
 vi.mock('../PlayTabFirstRunCard', () => ({ __esModule: true, default: () => null }));
-vi.mock('../QuickStartButton', () => ({ __esModule: true, default: () => null }));
 vi.mock('../StudentsPresentStrip', () => ({ __esModule: true, default: () => null }));
 vi.mock('../assignments', () => ({ AssignmentTrackingPanel: () => null, AssignmentCreator: () => null }));
-vi.mock('../dashboard', () => ({ DuelMonitoringPanel: () => null }));
 vi.mock('../analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => null }));
 vi.mock('../analytics/LastGameInsights', () => ({ LastGameInsights: () => null }));
 vi.mock('../ProGate', () => ({ ProGate: ({ children }: { children: React.ReactNode }) => children }));
@@ -84,37 +82,34 @@ describe('TeacherDashboard — the review-words deep link', () => {
     });
   });
 
-  it('lands on Prepare and hands the missed words to the lesson creator', async () => {
+  it('hands the missed words to the lesson creator', async () => {
     // GIVEN the CTA's URL
-    setParams('tab=prepare&reviewWords=photosynthesis%2Cchlorophyll');
+    setParams('reviewWords=photosynthesis%2Cchlorophyll');
 
     // WHEN the dashboard mounts on it
     render(<TeacherDashboard />);
 
-    // THEN the Prepare tab is showing and the words arrived
+    // THEN the words arrived in the creator
     const builder = await screen.findByTestId('lesson-builder');
     expect(builder).toHaveAttribute('data-review-words', 'photosynthesis|chlorophyll');
   });
 
-  it('honours ?tab= on first render for every real tab id', async () => {
-    // GIVEN a bare tab deep link
-    setParams('tab=prepare');
+  // `?tab=` used to pick one of three tabs. There is one screen now, so a stale
+  // link carrying it must still land on the lessons rather than on nothing.
+  it('still shows the lessons when an old ?tab= link is followed', async () => {
+    setParams('tab=prepare&reviewWords=osmosis');
 
-    // WHEN the dashboard mounts
     render(<TeacherDashboard />);
 
-    // THEN it opens there rather than on Play
-    await waitFor(() => expect(screen.getByTestId('lesson-builder')).toBeInTheDocument());
+    const builder = await screen.findByTestId('lesson-builder');
+    expect(builder).toHaveAttribute('data-review-words', 'osmosis');
   });
 
-  it('ignores a tab id that does not exist and stays on Play', () => {
-    // GIVEN the old broken CTA's `tab=lessons`, or any typo
-    setParams('tab=lessons');
+  it('shows the lessons even when no deep-link params are present', async () => {
+    setParams('');
 
-    // WHEN the dashboard mounts
     render(<TeacherDashboard />);
 
-    // THEN it does not render the Prepare tab's content
-    expect(screen.queryByTestId('lesson-builder')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('lesson-builder')).toBeInTheDocument());
   });
 });

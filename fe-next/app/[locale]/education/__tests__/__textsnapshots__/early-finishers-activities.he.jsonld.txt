@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/early-finishers-activities#page",
+  "name": "פעילויות לתלמידים שמסיימים מוקדם | LexiClash",
+  "description": "משחקי מילים עצמאיים לתלמידים שמסיימים עבודה מוקדם. בלי הנחיה מהמורה, בלי הפסקות בשיעור, וכל מילה היא מהשיעור שלך.",
+  "url": "https://www.lexiclash.live/he/education/early-finishers-activities",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/early-finishers-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "מדריכי הוראה",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "פעילויות לתלמידים שמסיימים מוקדם",
+      "item": "https://www.lexiclash.live/he/education/early-finishers-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/early-finishers-activities#resource",
+  "name": "פעילויות לתלמידים שמסיימים מוקדם | LexiClash",
+  "description": "משחקי מילים עצמאיים כמו LexiClash מאפשרים לתלמידים שמסיימים לשחק בלי הערות של מורה. בלי הפסקות, בלי ציונים נוספים, וכל מילה היא מהשיעור. הגדר פעם אחת, השתמש כל השנה.",
+  "url": "https://www.lexiclash.live/he/education/early-finishers-activities",
+  "inLanguage": "he",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "זיכרון מילים, זיהוי מילים, למידה עצמאית",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT10M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/early-finishers-activities#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "האם הם ימהרו בעבודה הראשונה כדי לשחק?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "חלקם כן, בתחילה. קבעו כללים ברורים: \"צריך לסיים את העבודה כראוי לפני משחק.\" השתמשו בתבנית כדי שידעו מה \"סיים\" אומר. אחרי שבוע זה הופך לנורמה. רוב המורים אומרים שהמשחק למעשה מעודד תלמידים איטיים כי הם רואים חברים משחקים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "זה בטוח? יש צ'ט או קישורים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "בלי צ'ט, בלי הודעות פרטיות, בלי קישורים חיצוניים. זה משחק מילים בלבד. תלמידים רואים שמות ותוצאות של שחקנים אחרים בלוח תוצאות, וזה הכל. בלי מידע אישי."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה עם זמן מסך?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כל סיבוב הוא 2–4 דקות. אם תלמיד סיים 10 דקות מוקדם, הוא משחק סיבוב אחד, לא שישה. המשחק עוצר אותו כשהזמן נגמר. זה קצר יותר מסרטון הפסקה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "צריך ללמד אותם איך משחקים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "הדגמה של שתי דקות עם כל הכיתה. הראה את הרשת, בחר מילה, תן להם למצוא אחת. זהו. הם לומדים באמצעות משחק."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אין לי מכשירים בכיתה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "צריך מכשיר אחד לפחות (טלפון או טבלט) לתלמידים שמסיימים לשתף. רוב הכיתות יש כרומבוק או אייפד. LexiClash עובד בכל."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אני יכול להשתמש באותו קוד כל השנה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן, אותו קוד כל השנה. תלמידים לא צריכים לזכור—אתה כותב אותו על הלוח פעם אחת, וזה נשאר שם. הם משתמשים בו כל פעם שמסיימים מוקדם."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אני אראה מה הם משחקו?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. לוח המורה שלך מראה תוצאות, אילו מילים הם מצאו, ואילו החמיצו. השתמש בזה לבחירת מילים לשבוע הבא."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אם הם מהירים אבל לא תמיד רוצים ללמוד, מה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "תן להם מילים קשות או מטרה גבוהה יותר. LexiClash משתנה לרמות שונות. או סובבו תחנות: חלקם משחקים, חלקם קוראים, חלקם עושים מתמטיקה. המשחק היא תחנה אחת בסיבוב שלך."
+      }
+    }
+  ]
+}

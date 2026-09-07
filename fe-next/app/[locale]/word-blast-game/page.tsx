@@ -153,7 +153,7 @@ export default async function WordBlastGameLandingPage({ params }: PageProps) {
         <div className="flex whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">
           {Array.from({ length: 2 }).map((_, i) => (
             <span key={i} className="flex shrink-0">
-              {['No download', 'Play in 5s', 'Free forever', '5x combos', 'Chain reactions', 'Beat the waves'].map((s) => (
+              {['No download', 'Play in 5s', 'Free to play', '5x combos', 'Chain reactions', 'Beat the waves'].map((s) => (
                 <span key={s} className="mx-4">★ {s}</span>
               ))}
             </span>

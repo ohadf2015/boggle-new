@@ -34,7 +34,7 @@ const DoubleClickIndicator = memo<DoubleClickIndicatorProps>(({ visible }) => {
             className="flex items-center gap-0.5 bg-neo-black text-neo-lime text-[9px] font-black px-1.5 py-0.5 rounded-full border border-neo-lime/60 shadow-[0_0_6px_rgba(191,255,0,0.4)] whitespace-nowrap"
           >
             <span aria-hidden="true">⏎</span>
-            <span>{t('desktopInput.doubleClick') || '2×click'}</span>
+            <span>{t('desktopInput.doubleClick', '2×click')}</span>
           </m.span>
         </m.div>
       )}

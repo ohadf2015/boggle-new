@@ -30,8 +30,39 @@ describe('lookupLiveClassroomGame', () => {
     }));
     await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toEqual({
       classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G',
+      lessonNames: [], settings: {},
     });
     expect(get).toHaveBeenCalledWith('classroom_game:TZCOQ7');
+  });
+
+  /**
+   * The student's lobby has no other source for what game it is about to play:
+   * `lessonGameData` lives in the TEACHER's sessionStorage, so a student's
+   * classroom banner fell back to Classic + classic settings for a Vocab Quiz.
+   * The Redis record the teacher's create wrote already holds the truth, so it
+   * must survive this read rather than being trimmed to three fields.
+   */
+  it('carries the lesson names and the teacher-chosen settings', async () => {
+    get.mockResolvedValue(JSON.stringify({
+      classroomId: 'c1',
+      lessonIds: ['l1'],
+      lessonNames: ['Week 3 Vocabulary'],
+      teacherName: 'Ms. G',
+      settings: {
+        gameMode: 'vocab-quiz',
+        vocabQuizQuestionCount: 8,
+        vocabQuizSeconds: 25,
+        allowLateJoin: true,
+      },
+    }));
+    await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toMatchObject({
+      lessonNames: ['Week 3 Vocabulary'],
+      settings: {
+        gameMode: 'vocab-quiz',
+        vocabQuizQuestionCount: 8,
+        vocabQuizSeconds: 25,
+      },
+    });
   });
 
   it('returns null when there is no such game', async () => {

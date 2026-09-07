@@ -12,8 +12,6 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: 
 vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/QuickStartButton', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/dashboard', () => ({ DuelMonitoringPanel: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div data-testid="analytics" /> }));
 vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div /> }));
@@ -28,14 +26,18 @@ vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({
 import TeacherDashboard from '../TeacherDashboard';
 
 /**
- * The last class game's recap is FREE and sits above the Pro-gated analytics on
- * the Review tab: a free teacher still gets "which words did we miss" for the
- * game they just ran; Pro is the trend view across games and students.
+ * The last class game's recap is FREE and sits above the Pro-gated analytics: a
+ * free teacher still gets "which words did we miss" for the game they just ran;
+ * Pro is the trend view across games and students.
+ *
+ * It moved out of the Review tab and into the single "Class tools" disclosure
+ * when the dashboard became one screen — still free, still above the gate.
  */
-describe('<TeacherDashboard> Review tab — last game insights', () => {
+describe('<TeacherDashboard> class tools — last game insights', () => {
   it('mounts the last-game card for the selected classroom, outside the Pro gate', () => {
     render(<TeacherDashboard />);
-    fireEvent.click(screen.getByRole('tab', { name: 'teacher.dashboard.tab.review' }));
+    const tools = screen.getByTestId('teacher-tools');
+    expect(tools.contains(screen.getByTestId('last-game-insights'))).toBe(true);
     expect(screen.getByTestId('last-game-insights')).toHaveTextContent('c1');
     // Free teacher: analytics is replaced by the ProGate upsell, the recap is not.
     expect(screen.queryByTestId('analytics')).not.toBeInTheDocument();

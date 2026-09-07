@@ -1,14 +1,22 @@
 import { describe, it, expect, vi } from 'vitest';
 import { deriveGuestUsername, signInAsGuestStudent, waitForProfile } from '../guestStudent';
 
+/**
+ * These asserted an exact 1:1 slug, which is precisely the contract that caused
+ * the outage: `profiles.username` is globally unique, so mapping a display name
+ * onto it meant the second "Priya" ANYWHERE raised inside the
+ * `handle_new_user` trigger and Supabase returned a 500. The username now
+ * carries a random suffix; see guestUsernameUnique.test.ts. The slug part is
+ * still asserted here, as a prefix.
+ */
 describe('deriveGuestUsername', () => {
   it('slugifies a display name (lowercase, underscores, alnum only)', () => {
-    expect(deriveGuestUsername('Maya Kohn')).toBe('maya_kohn');
-    expect(deriveGuestUsername('  José-Luis!! ')).toBe('jos_luis');
+    expect(deriveGuestUsername('Maya Kohn')).toMatch(/^maya_kohn-/);
+    expect(deriveGuestUsername('  José-Luis!! ')).toMatch(/^jos_luis-/);
   });
   it('caps length and trims edge underscores', () => {
-    expect(deriveGuestUsername('A'.repeat(40))).toHaveLength(20);
-    expect(deriveGuestUsername('__hi__')).toBe('hi');
+    expect(deriveGuestUsername('A'.repeat(40)).length).toBeLessThanOrEqual(32);
+    expect(deriveGuestUsername('__hi__')).toMatch(/^hi-/);
   });
   it('returns empty string when no alphanumerics remain', () => {
     expect(deriveGuestUsername('!!! ??? ')).toBe('');
@@ -44,9 +52,13 @@ describe('signInAsGuestStudent', () => {
     const res = await signInAsGuestStudent(sb as never, 'Maya Kohn');
     expect(res.error).toBeNull();
     expect(res.user).toEqual({ id: 'anon-1' });
-    expect(sb.auth.signInAnonymously).toHaveBeenCalledWith({
-      options: { data: { full_name: 'Maya Kohn', username: 'maya_kohn' } },
-    });
+    // The TYPED name goes to full_name (which the trigger writes to
+    // display_name, and which every student-facing surface renders). The
+    // username is an internal, globally unique handle, so it is matched as a
+    // prefix — pinning it exactly is what made the second Priya a 500.
+    const [arg] = (sb.auth.signInAnonymously as unknown as { mock: { calls: Array<[{ options: { data: Record<string, string> } }]> } }).mock.calls[0];
+    expect(arg.options.data.full_name).toBe('Maya Kohn');
+    expect(arg.options.data.username).toMatch(/^maya_kohn-[a-z0-9]+$/);
   });
 
   it('omits username (lets the DB default) when the name has no slug', async () => {

@@ -67,8 +67,7 @@ export default function UnsubscribePageClient() {
               </h1>
 
               <p className="text-neo-white mb-6">
-                {t('unsubscribe.successMessage') ||
-                  "You won't receive any more daily challenge emails from us. We hope to see you in the game!"}
+                {t('unsubscribe.successMessage', "You won't receive any more daily challenge emails from us. We hope to see you in the game!")}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -111,8 +110,7 @@ export default function UnsubscribePageClient() {
               </h1>
 
               <p className="text-neo-white mb-6">
-                {t('unsubscribe.errorMessage') ||
-                  "We couldn't process your unsubscribe request. The link may have expired or already been used."}
+                {t('unsubscribe.errorMessage', "We couldn't process your unsubscribe request. The link may have expired or already been used.")}
               </p>
 
               <Button

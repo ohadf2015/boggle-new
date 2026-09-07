@@ -1,0 +1,155 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/esl-word-games#page",
+  "name": "Juegos de palabras en inglés para el aula — 6 idiomas | LexiClash",
+  "description": "Juegos de palabras en inglés para toda la clase: los estudiantes entran desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "url": "https://www.lexiclash.live/es/education/esl-word-games",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/esl-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Juegos de Vocabulario en Inglés Gratis Online",
+      "item": "https://www.lexiclash.live/es/education/esl-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/esl-word-games#resource",
+  "name": "Juegos de palabras en inglés para el aula — 6 idiomas | LexiClash",
+  "description": "Juegos de palabras en inglés para toda la clase: los estudiantes entran desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "url": "https://www.lexiclash.live/es/education/esl-word-games",
+  "inLanguage": "es",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "ESL Practice",
+    "EFL Practice",
+    "Vocabulary Building",
+    "Spelling Practice",
+    "Bilingual Programs"
+  ],
+  "educationalLevel": [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "English vocabulary, spelling, letter patterns, sight-word recognition",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/esl-word-games#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuáles son los mejores juegos para ESL/EFL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Necesitan cuenta?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, pero es gratis. Los maestros crean el aula, estudiantes entran con código. Sin pago."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo ayudan los juegos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Refuerzan ortografía, vocabulario, velocidad bajo presión — todo suma a fluidez. La competencia multiplayer engancha, especialmente con adolescentes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo diferenciar por nivel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Sube tus propias listas y pon a cada estudiante en Apoyo, Base o Desafío. El panel muestra qué palabras cuestan trabajo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Funciona para adultos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Adultos y programas universitarios usan LexiClash para rompehielos y retención."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿En programas bilingües?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. 6 diccionarios: inglés, español, hebreo, sueco, japonés, ruso. Perfecto para inmersión."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuáles son los mejores juegos de vocabulario en inglés?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Word Wheel y Boggle son los juegos de vocabulario en inglés más completos de LexiClash: cada palabra hallada suma al conteo de aciertos, y el panel de maestro marca los términos que más cuestan a la clase — ideal para repasar vocabulario jugando, gratis y sin descargas."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Juegos de palabras en inglés para el aula — 6 idiomas | LexiClash",
+  "description": "Juegos de palabras en inglés para toda la clase: los estudiantes entran desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "url": "https://www.lexiclash.live/es/education/esl-word-games",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "es"
+}

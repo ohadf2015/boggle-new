@@ -83,7 +83,7 @@ interface HostPreGameViewProps {
   roomLanguage: Language;
   language: Language;
   username: string;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   timerValue: number;
   setTimerValue: React.Dispatch<React.SetStateAction<number>>;
   timerDirection: number;
@@ -597,6 +597,12 @@ function HostPreGameView({
   // through all-ready (`<=`) — at all-ready the existing "{count}/{total} ready
   // — start the game!" copy IS the affirmative "everyone's in, press Start" cue
   // that the removed auto-start banner used to provide.
+  // A classroom room's mode was fixed in the setup wizard. The picker cannot
+  // change it and does not even list the quiz, so it is hidden here too — a
+  // teacher who taps "switch to player mode" must not meet it again.
+  const isClassroomRoom = Boolean(lessonData);
+  const startLabelKey = isClassroomRoom ? 'hostView.startClassGame' : undefined;
+
   const readyCount = readyUsernames.length;
   const allReady = readyTotal > 0 && readyCount >= readyTotal;
   // Always-visible ready tally (whenever there are guests who can ready up) so the
@@ -757,16 +763,18 @@ function HostPreGameView({
                     selfActions={selfRosterActions}
                   />
                 </div>
-                <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-                  <BattleModeCard
-                    selectedGameMode={selectedGameMode}
-                    setSelectedGameMode={setSelectedGameMode}
-                    t={t}
-                    isAdmin={isAdmin}
-                    language={roomLanguage}
-                    hasBlastAccess={hasBlastAccess}
-                  />
-                </div>
+                {!isClassroomRoom && (
+                  <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+                    <BattleModeCard
+                      selectedGameMode={selectedGameMode}
+                      setSelectedGameMode={setSelectedGameMode}
+                      t={t}
+                      isAdmin={isAdmin}
+                      language={roomLanguage}
+                      hasBlastAccess={hasBlastAccess}
+                    />
+                  </div>
+                )}
               </>
             }
             rightContent={
@@ -799,6 +807,7 @@ function HostPreGameView({
                   playerCount={filteredPlayersForDisplay.length}
                   maxPlayers={maxPlayers}
                   t={t}
+                  labelKey={startLabelKey}
                 />
               </div>
             </div>
@@ -826,14 +835,16 @@ function HostPreGameView({
                 canEditSelfName={!isAuthenticated}
                 selfActions={selfRosterActions}
               />
-              <BattleModeCard
-                selectedGameMode={selectedGameMode}
-                setSelectedGameMode={setSelectedGameMode}
-                t={t}
-                isAdmin={isAdmin}
-                    language={roomLanguage}
-                hasBlastAccess={hasBlastAccess}
-              />
+              {!isClassroomRoom && (
+                <BattleModeCard
+                  selectedGameMode={selectedGameMode}
+                  setSelectedGameMode={setSelectedGameMode}
+                  t={t}
+                  isAdmin={isAdmin}
+                  language={roomLanguage}
+                  hasBlastAccess={hasBlastAccess}
+                />
+              )}
               <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} lang={roomLanguage} />
               {!isPrivate && <InviteCard gameCode={gameCode} t={t} />}
             </div>
@@ -855,6 +866,7 @@ function HostPreGameView({
                   playerCount={filteredPlayersForDisplay.length}
                   maxPlayers={maxPlayers}
                   t={t}
+                  labelKey={startLabelKey}
                 />
               </div>
             </div>

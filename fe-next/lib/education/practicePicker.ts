@@ -8,13 +8,29 @@
  * questions the drill will not produce.
  */
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { Language } from '@/shared/types/game';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import { VOCAB_FOCUSES, focusQuestionCounts, READINESS_SEED, type VocabFocus } from './vocabFocus';
+import { eligibleLessonWords, isLessonSeedReady } from '@/lib/wordTower/lessonSeed';
 
 /** Seed used for every readiness/count scan, so the badge and the drill agree. */
 export const PICKER_SEED = READINESS_SEED;
 
 export type BasePracticeMode = Exclude<PracticeType, 'vocab_focus'>;
+
+/**
+ * The Word Tower tile's stable id.
+ *
+ * Word Tower is a VARIANT of `solo_board`, not a practice type of its own: the
+ * `practice_type` CHECK constraint has no 'word_tower' value, and a letter-pool
+ * word builder is the closest existing semantics to a solo board. The variant
+ * lives on the tile so the picker can route to the right screen while the
+ * session still records under a value the database accepts.
+ */
+export const WORD_TOWER_TILE_ID = 'word_tower';
+
+/** Distinguishes tiles that share a `mode` but open different screens. */
+export type PracticeVariant = 'word_tower';
 
 /** Board and drill modes, in the order they appear in the grid. */
 export const BASE_PRACTICE_MODES: readonly BasePracticeMode[] = [
@@ -54,6 +70,8 @@ export interface PracticeTile {
   mode: PracticeType;
   /** Set only on vocabulary-skill tiles. */
   focus?: VocabFocus;
+  /** Set when the tile shares a `mode` with another tile but opens its own screen. */
+  variant?: PracticeVariant;
   /** i18n key for the tile name. */
   titleKey: string;
   /** i18n key for the one-line skill this tile drills. */
@@ -129,6 +147,30 @@ export function buildPracticeTiles(
     };
   });
 
+  // Word Tower: the lesson list becomes the letters on the wheel. Readiness is
+  // about the SHAPE of the words, not just how many — a word longer than the
+  // ring can never be built, and a language with no letter bag has no wheel at
+  // all. The count is what the wheel can actually seed so the badge cannot
+  // promise words the drill will not deal.
+  const language = (options.language || 'en') as Language;
+  const lessonWords = words.map((entry) => entry.word);
+  const towerReady = isLessonSeedReady(lessonWords, language);
+  const towerTile: PracticeTile = {
+    id: WORD_TOWER_TILE_ID,
+    mode: 'solo_board',
+    variant: 'word_tower',
+    titleKey: `education.practicePicker.name.${WORD_TOWER_TILE_ID}`,
+    skillKey: `education.practicePicker.skill.${WORD_TOWER_TILE_ID}`,
+    ready: towerReady,
+    count: eligibleLessonWords(lessonWords, language).length,
+    countKind: 'words',
+    // `solo_board_sessions` counts the plain board and this variant together,
+    // so there is nothing honest to show per tile — same call the targeted
+    // vocabulary tiles make below.
+    sessions: 0,
+    ...(towerReady ? {} : { lockedKey: `education.practicePicker.locked.${WORD_TOWER_TILE_ID}` }),
+  };
+
   const counts = focusQuestionCounts(words, {
     language: options.language,
     seed: options.seed ?? PICKER_SEED,
@@ -153,7 +195,7 @@ export function buildPracticeTiles(
     };
   });
 
-  return [...baseTiles, ...focusTiles];
+  return [...baseTiles, towerTile, ...focusTiles];
 }
 
 /** The playable tiles, in picker order. */
@@ -164,4 +206,20 @@ export function readyTiles(tiles: PracticeTile[]): PracticeTile[] {
 /** How many of each kind are playable — the "8 games ready" line above the grid. */
 export function practiceReadiness(tiles: PracticeTile[]): { ready: number; total: number } {
   return { ready: readyTiles(tiles).length, total: tiles.length };
+}
+
+/**
+ * The tile to offer after finishing `currentTileId` — the "next mode" half of
+ * the round-end pair. Wraps around, skips locked tiles, and returns null when
+ * the current tile is the only playable one (offering a student the mode they
+ * just finished as their "next" is worse than offering nothing).
+ */
+export function nextReadyTile(tiles: PracticeTile[], currentTileId: string): PracticeTile | null {
+  const ready = readyTiles(tiles);
+  if (ready.length === 0) return null;
+
+  const index = ready.findIndex((tile) => tile.id === currentTileId);
+  if (index === -1) return ready[0] ?? null;
+  if (ready.length === 1) return null;
+  return ready[(index + 1) % ready.length];
 }

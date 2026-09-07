@@ -84,7 +84,7 @@ const videoGameJsonLd = JSON.stringify({
   '@type': 'VideoGame',
   name: 'LexiClash — Competitive Word Games',
   url: `${BASE_URL}/en/competitive-word-games`,
-  description: 'Free real-time multiplayer competitive word game with a global leaderboard and ranked daily challenges. Browser-based, no download, 5 languages.',
+  description: 'Free real-time multiplayer competitive word game with a global leaderboard and ranked daily challenges. Browser-based, no download, 6 languages.',
   genre: ['Word Game', 'Puzzle', 'Multiplayer'],
   gamePlatform: ['Web Browser', 'Android'],
   playMode: ['MultiPlayer', 'SinglePlayer'],

@@ -14,7 +14,7 @@ export interface InviteCardProps {
   /** Room code */
   gameCode: string;
   /** Translation function */
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   /** Additional className */
   className?: string;
   /** Compact horizontal layout with smaller QR */

@@ -301,6 +301,39 @@ export function playerScoresFromGameResults(
   return scores;
 }
 
+/**
+ * Everyone whose round should be recorded.
+ *
+ * `game.players` is the CLASSROOM roster, filled ONLY by the
+ * `joinClassroomGame` socket event. Students who reach the room the ordinary
+ * way — the join page, the projector code, `playerJoinHandler` — never emit
+ * it, so that list is routinely EMPTY while a full class is playing. Looping
+ * it alone is why game GHYRVS (2026-09-05, two students, ten questions,
+ * everyone at the end screen) produced no rows, no error and no log, and why
+ * `practice_sessions` held zero classroom-game rows in total.
+ *
+ * The people who actually played are in `playerScores`, which each mode builds
+ * from its own live roster. The truth is the union of the two, keyed by user
+ * id: the roster contributes students who joined and scored nothing, the
+ * scores contribute students the roster never heard about.
+ *
+ * The teacher is dropped — they host, they do not compete, and a teacher row
+ * would show up as a student in the report's word x student grid.
+ */
+function collectParticipants(
+  game: ClassroomGame,
+  playerScores?: PlayerScore[]
+): PlayerScore[] {
+  const byUser = new Map<string, PlayerScore>();
+  const add = (userId: string | undefined | null, username?: string) => {
+    if (!userId || userId === game.teacherId || byUser.has(userId)) return;
+    byUser.set(userId, { userId, username, score: 0 });
+  };
+  for (const player of game.players ?? []) add(player?.userId, player?.username);
+  for (const score of playerScores ?? []) add(score?.userId, score?.username);
+  return [...byUser.values()];
+}
+
 export async function persistClassroomGameScores(
   game: ClassroomGame | null | undefined,
   playerScores?: PlayerScore[],
@@ -308,10 +341,32 @@ export async function persistClassroomGameScores(
 ): Promise<ClassroomGameReward[]> {
   if (!game) return [];
 
-  // Idempotency guard: only persist once per game using Redis SET NX
+  // Idempotency guard: only persist once per game using Redis SET NX.
+  //
+  // The key is taken BEFORE we know whether there is anything to write, so
+  // every path that writes nothing must give it back. Otherwise the first
+  // caller to reach this function poisons the game code for 24 hours and the
+  // path that really does have the results — the mode's own end handler — is
+  // refused as a duplicate. That is exactly how GHYRVS was lost: the board
+  // orphan guard force-ended the room, took the key with empty board results,
+  // and the quiz's `finishQuiz` was turned away 29 seconds later.
   const redis = getRedisClient();
+  const idempotencyKey = `classroom_game_persisted:${game.gameCode}`;
+  let holdsKey = false;
+  const releaseIdempotency = async (): Promise<void> => {
+    if (!redis || !holdsKey) return;
+    holdsKey = false;
+    try {
+      await redis.del(idempotencyKey);
+    } catch (err) {
+      logger.error(
+        'CLASSROOM_GAME',
+        `Failed to release the persistence lock for ${game.gameCode}: ${(err as Error).message}`
+      );
+    }
+  };
+
   if (redis) {
-    const idempotencyKey = `classroom_game_persisted:${game.gameCode}`;
     const acquired = await redis.set(idempotencyKey, '1', 'EX', 86400, 'NX');
     if (!acquired) {
       logger.info(
@@ -320,11 +375,25 @@ export async function persistClassroomGameScores(
       );
       return [];
     }
+    holdsKey = true;
   }
 
   const supabase = getSupabase();
   if (!supabase) {
     logger.warn('CLASSROOM_GAME', 'Supabase not configured, skipping score persistence');
+    await releaseIdempotency();
+    return [];
+  }
+
+  const participants = collectParticipants(game, playerScores);
+  if (participants.length === 0) {
+    logger.warn(
+      'CLASSROOM_GAME',
+      `Game ${game.gameCode} ended with no participants to record ` +
+        `(roster ${game.players?.length ?? 0}, scores ${playerScores?.length ?? 0}) — ` +
+        `0 practice sessions written`
+    );
+    await releaseIdempotency();
     return [];
   }
 
@@ -334,10 +403,12 @@ export async function persistClassroomGameScores(
       'CLASSROOM_GAME',
       `Game ${game.gameCode} has no lesson IDs, skipping persistence`
     );
+    await releaseIdempotency();
     return [];
   }
 
   const rewards: ClassroomGameReward[] = [];
+  let sessionsWritten = 0;
 
   // Anchor the session row to the first lesson to avoid inflating
   // `board_sessions` counts in analytics views. Multi-lesson attribution
@@ -369,7 +440,7 @@ export async function persistClassroomGameScores(
     ? Math.max(0, Math.round((Date.now() - new Date(game.startedAt).getTime()) / 1000))
     : undefined;
 
-  for (const player of game.players) {
+  for (const player of participants) {
     let xpEarned = 0;
     try {
       const playerScore = playerScores?.find(ps => ps.userId === player.userId);
@@ -402,7 +473,7 @@ export async function persistClassroomGameScores(
           ? { answers: options.answersByUser[player.userId] }
           : {}),
         durationSeconds,
-        playerCount: game.players.length,
+        playerCount: participants.length,
       };
 
       const { error: sessionError } = await supabase
@@ -428,10 +499,12 @@ export async function persistClassroomGameScores(
       if (sessionError) {
         logger.error(
           'CLASSROOM_GAME',
-          `Failed to create practice session for ${player.userId}: ${sessionError.message}`
+          `Failed to create practice session for ${player.userId} in game ${game.gameCode}: ` +
+            `${sessionError.message}`
         );
         continue;
       }
+      sessionsWritten += 1;
 
       // Lesson progress — the rows the teacher analytics read. One failure
       // must not hide the other lessons (or the XP below).
@@ -490,6 +563,24 @@ export async function persistClassroomGameScores(
       );
     }
     rewards.push({ userId: player.userId, xpEarned, lessonIds });
+  }
+
+  // The teacher's whole report hangs off these rows, so their count is the one
+  // fact worth stating out loud. A round that wrote nothing releases the lock
+  // so the mode's own end path still has a chance to write the real results.
+  if (sessionsWritten === 0) {
+    logger.warn(
+      'CLASSROOM_GAME',
+      `Game ${game.gameCode} wrote 0 practice sessions for ${participants.length} participants — ` +
+        `the teacher's report will be empty`
+    );
+    await releaseIdempotency();
+  } else {
+    logger.info(
+      'CLASSROOM_GAME',
+      `Persisted ${sessionsWritten} practice session row(s) for game ${game.gameCode} ` +
+        `(${participants.length} participants, classroom ${game.classroomId})`
+    );
   }
 
   return rewards;

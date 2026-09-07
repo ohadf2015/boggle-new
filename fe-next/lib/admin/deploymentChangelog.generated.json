@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-01T19:31:19.068Z",
+  "generatedAt": "2026-09-07T14:41:09.376Z",
   "commits": [
     {
-      "sha": "e814c1a69cbcc7225586adfccb6dd5bb63afe63b",
-      "shortSha": "e814c1a",
-      "subject": "feat(fe-next): play-first home + cookie consent never covers Quick Start (#890)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T11:43:21-07:00"
-    },
-    {
-      "sha": "e6694a87923af5052e58e8ab3f5ee5c30a2235bf",
-      "shortSha": "e6694a8",
-      "subject": "Education GTM: persistent For Teachers, classroom hero (#888)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T11:26:31-07:00"
-    },
-    {
-      "sha": "b3378fe9757f2f587dc617e9b21ef9c358a4afbc",
-      "shortSha": "b3378fe",
-      "subject": "fix(fe-next): cookie consent mascot has two hands (#887)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T06:18:50-07:00"
-    },
-    {
-      "sha": "56e6165a83633d3f484c8eeed7b3ead695b2ece2",
-      "shortSha": "56e6165",
-      "subject": "fix(education): keep guests on /education/duels join empty state (#886)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T04:50:03-07:00"
-    },
-    {
-      "sha": "9e2f7434ecac6179d3e8f20f9909016e9889e3a3",
-      "shortSha": "9e2f743",
-      "subject": "chore: land in-flight test-collection and ignore fixes",
+      "sha": "2bd4c7b9dbfb6717c7ede53dc42248d622257e76",
+      "shortSha": "2bd4c7b",
+      "subject": "feat(education): teacher module — plug-and-play lessons, live-game fixes, reuse pass",
       "author": "Ohad Fisher",
-      "date": "2026-09-01T14:19:26+03:00"
+      "date": "2026-09-07T18:40:23+04:00"
     },
     {
-      "sha": "d8da1e5c4ddb5a8f26bfabb7f11dd7336ad47825",
-      "shortSha": "d8da1e5",
-      "subject": "fix(education): put the real mascot on every education page image",
+      "sha": "37de6331513d4869b1d406fc18c90fbb89d89eba",
+      "shortSha": "37de633",
+      "subject": "Merge origin/master into education-gauntlet-2026-09-05",
       "author": "Ohad Fisher",
-      "date": "2026-09-01T14:09:27+03:00"
+      "date": "2026-09-07T01:38:47+04:00"
     },
     {
-      "sha": "538519c902112f633e3fd1826e4e3c3d16723f0c",
-      "shortSha": "538519c",
-      "subject": "chore(nightly): land five nights of salvaged lane code (2026-08-27 → 09-01)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T13:38:08+03:00"
-    },
-    {
-      "sha": "5e89843987eae17b3760045a144c94c08fa66fbf",
-      "shortSha": "5e89843",
-      "subject": "fix(education): send student vocab practice to playable drills, not TeacherGate (#885)",
+      "sha": "0b57a55440cca6d1de21197e29e3266fe9005474",
+      "shortSha": "0b57a55",
+      "subject": "feat(growth): tappable missed dailies, ad-free education, ad fatigue guard, solo progress + next-game picker (#961)",
       "author": "ohadf2015",
-      "date": "2026-09-01T03:36:55-07:00"
+      "date": "2026-09-06T17:32:35+04:00"
     },
     {
-      "sha": "6628a0a558dc7edc5f29b987f252933ac1ceac14",
-      "shortSha": "6628a0a",
-      "subject": "feat(singleplayer): route solo-bots results to multiplayer first (#881)",
+      "sha": "d63993968d2bbe94263e51371bc5b764128ab93b",
+      "shortSha": "d639939",
+      "subject": "feat(education): Teacher Pro ask on hub + public /pricing (#960)",
       "author": "ohadf2015",
-      "date": "2026-09-01T00:40:56-07:00"
+      "date": "2026-09-06T13:53:05+04:00"
     },
     {
-      "sha": "f57a7b270f613e0df0a24b877863f731a100d7f2",
-      "shortSha": "f57a7b2",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-01",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T05:32:48+03:00"
-    },
-    {
-      "sha": "7ebf5e8255a0755dc54800bc77e01a1605480a78",
-      "shortSha": "7ebf5e8",
-      "subject": "feat(join): give /join a code entry page instead of a 404",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T02:07:54+03:00"
-    },
-    {
-      "sha": "c17005d8fee6d4d68bfadbdbcc6ccd90ff47e803",
-      "shortSha": "c17005d",
-      "subject": "fix(education): stop classroom exits from silently creating another room",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T02:01:18+03:00"
-    },
-    {
-      "sha": "39ff9559a55404f993b25287e5a8d3220465b866",
-      "shortSha": "39ff955",
-      "subject": "fix(education): print the join address, not just a QR; guard comparison-page claims",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T01:09:16+03:00"
-    },
-    {
-      "sha": "3913b0579e628a4c26e7b5b03edeaece510638c1",
-      "shortSha": "3913b05",
-      "subject": "Merge remote-tracking branch 'origin/master' into worktree-edu-logrocket-ux",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T23:42:42+03:00"
-    },
-    {
-      "sha": "0d24ff63e04e08a9e5ad3726ee61a19318e67874",
-      "shortSha": "0d24ff6",
-      "subject": "fix(education): explain the teacher-access redirect, and unhardcode 5 landing pages",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T23:42:21+03:00"
-    },
-    {
-      "sha": "bc26c5957d483fc17ff653c572e66352b8a7bb3d",
-      "shortSha": "bc26c59",
-      "subject": "fix(security): fail-closed auth on ranked, crons, and admin email previews (#879)",
+      "sha": "ecc2c3df0bceb836ae99c6d14240ef3b64c70f4c",
+      "shortSha": "ecc2c3d",
+      "subject": "fix(share): LexiClash recap cards, not Wordle letter-squares (#958)",
       "author": "ohadf2015",
-      "date": "2026-08-31T17:29:39+03:00"
+      "date": "2026-09-06T12:30:58+04:00"
     },
     {
-      "sha": "9d4a6ba5bcd3cf709a7737a024da38e0fb4e5e03",
-      "shortSha": "9d4a6ba",
-      "subject": "fix(fe-next): first-visit cookie usable, CTAs clickable, UTC daily date, guest chest quiet (#876)",
+      "sha": "3ca23de8f10de27ca3a9b9e2e3e855f930946438",
+      "shortSha": "3ca23de",
+      "subject": "SEO: daily meta tag improvements (2026-09-06) (#955)",
       "author": "ohadf2015",
-      "date": "2026-08-31T14:52:12+03:00"
+      "date": "2026-09-06T12:30:54+04:00"
     },
     {
-      "sha": "912979ff95fe5898b8ab977ceea6d312e17e606e",
-      "shortSha": "912979f",
-      "subject": "fix(fe-next): remove root-path geo block and add cold-start RUM beacon",
-      "author": "ohadf2015",
-      "date": "2026-08-31T10:56:02+03:00"
-    },
-    {
-      "sha": "e2f76345d7242a3f3007818b25f6def279a8e0fd",
-      "shortSha": "e2f7634",
-      "subject": "feat(seo): daily meta description improvements 2026-08-31 (#874)",
-      "author": "ohadf2015",
-      "date": "2026-08-31T10:37:45+03:00"
-    },
-    {
-      "sha": "41726d002f32d9aadc41332cc3665ccde749bea8",
-      "shortSha": "41726d0",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-31",
+      "sha": "53ce0f4c40ca519bcb931893c68de367881f5f5f",
+      "shortSha": "53ce0f4",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-06",
       "author": "Ohad Fisher",
-      "date": "2026-08-31T04:59:58+03:00"
+      "date": "2026-09-06T12:19:19+04:00"
+    },
+    {
+      "sha": "486646e1dc9d13cf83fa8b2c244795dc27a34a66",
+      "shortSha": "486646e",
+      "subject": "feat(education): unplugged reteach Live — teacher screen + printable sheet (#959)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T11:38:32+04:00"
+    },
+    {
+      "sha": "069d14d0bb6da0ef6b64cf3c80d10b9f6f9c64a1",
+      "shortSha": "069d14d",
+      "subject": "feat(education): printable missed-words practice sheet after Live (#957)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T09:55:59+04:00"
+    },
+    {
+      "sha": "37d6f47e38268feeeb70711334709ad0342e14f9",
+      "shortSha": "37d6f47",
+      "subject": "fix(education): SSR classroom hero on web first paint (#956)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T09:55:12+04:00"
+    },
+    {
+      "sha": "055afbc6b7dce3569af39b67a28ac6cbb2ceb25c",
+      "shortSha": "055afbc",
+      "subject": "feat(education): Google Classroom assign practice after Live (#954)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T06:21:17+04:00"
+    },
+    {
+      "sha": "095c93718ac2c3498bbbd2378155828c4a8eb5b2",
+      "shortSha": "095c937",
+      "subject": "fix(growth): /es/singleplayer soft-nav 308 dead end (post-#897) (#953)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T05:38:19+04:00"
+    },
+    {
+      "sha": "253df37dd36085742d7470bfeb934e6c3b99f193",
+      "shortSha": "253df37",
+      "subject": "fix(growth): stop dual-emitting bare game_started (t_c7d4f54a) (#952)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T05:35:22+04:00"
+    },
+    {
+      "sha": "3f28507351b2c4779afb09dd9fb3edf6a8d12ddd",
+      "shortSha": "3f28507",
+      "subject": "feat(education): ChatGPT Action OpenAPI for 3-min reteach Live (#951)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T02:45:27+04:00"
+    },
+    {
+      "sha": "940d093398619ac356650ab3f150e40b51f802b7",
+      "shortSha": "940d093",
+      "subject": "feat(education): Google Classroom one-click 3-min reteach Live MVP (#949)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T00:25:38+04:00"
+    },
+    {
+      "sha": "3552dc107aaa403658a977a3133cc70a5dcc95f6",
+      "shortSha": "3552dc1",
+      "subject": "feat(education): live vocab quiz, skill practice picker, class report, classroom flow fixes, SEO/GEO pass",
+      "author": "Ohad Fisher",
+      "date": "2026-09-05T23:22:18+04:00"
+    },
+    {
+      "sha": "6c9d1395464d03d98a22618603aa6836769c6f71",
+      "shortSha": "6c9d139",
+      "subject": "Upload browser source maps to PostHog and guard null pathname in LanguageContext (#934)",
+      "author": "posthog-eu[bot]",
+      "date": "2026-09-05T20:31:11+04:00"
+    },
+    {
+      "sha": "4467a9534183859f4110b6a67507828324a4fc51",
+      "shortSha": "4467a95",
+      "subject": "fix(daily): recover from stale-deploy chunk load on daily-mode pages (#935)",
+      "author": "posthog-eu[bot]",
+      "date": "2026-09-05T20:30:42+04:00"
+    },
+    {
+      "sha": "86f0e9398fae7d1ca3801cdd0a62d3ea158eed74",
+      "shortSha": "86f0e93",
+      "subject": "fix(fe-next): suppress JSON-LD @context extension TypeError in PostHog filter (#933)",
+      "author": "posthog-eu[bot]",
+      "date": "2026-09-05T19:53:29+04:00"
+    },
+    {
+      "sha": "f6457fe4fd257855ad0df69affd1044d84749ef4",
+      "shortSha": "f6457fe",
+      "subject": "chore(analytics): PostHog Self-driving setup report",
+      "author": "Ohad Fisher",
+      "date": "2026-09-05T16:57:06+04:00"
     }
   ]
 }

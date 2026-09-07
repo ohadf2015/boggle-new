@@ -55,7 +55,7 @@ const noop = () => {};
  */
 describe('QuickStartStep shows the game before it asks for anything', () => {
   const renderStep = () =>
-    render(<QuickStartStep onPlay={noop} onHowToPlay={noop} onHaveAccount={noop} />);
+    render(<QuickStartStep onPlay={noop} onHowToPlay={noop} />);
 
   it('puts a real board on screen, self-playing, so the game is visible at once', () => {
     renderStep();

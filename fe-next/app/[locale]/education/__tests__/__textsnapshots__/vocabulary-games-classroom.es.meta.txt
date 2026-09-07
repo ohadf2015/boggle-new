@@ -1,0 +1,55 @@
+{
+  "title": "Juegos de vocabulario gratis para el aula — Multijugador en vivo, 6 idiomas | LexiClash",
+  "description": "Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. 6 idiomas incl. hebreo y ruso. Cualquier navegador. Gratis para empezar.",
+  "keywords": "vocabulary games for classroom, classroom vocabulary games, free vocabulary games, classroom word games, vocabulary games for students, vocabulary games online free, multiplayer vocabulary game, free vocabulary game for teachers, free word games for kids classroom",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "ja": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "es": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+    "en-IL": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he-IL": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en-US": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-US": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-GB": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "en-SE": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv-SE": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "en-JP": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "ja-JP": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "en-ES": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-ES": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-MX": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-MX": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-AU": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-AR": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "es-CO": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru-RU": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom"
+  },
+  "ogTitle": "Juegos de vocabulario gratis para el aula",
+  "ogDescription": "Juegos de vocabulario en vivo para maestros. Desafíos para toda la clase, duelos 1v1, tus listas, 6 idiomas. Cuentas de estudiantes gratis para empezar.",
+  "ogLocale": "es_ES",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-es.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Juegos de vocabulario gratis para el aula"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Juegos de vocabulario gratis para el aula",
+  "twDescription": "El juego de vocabulario que los maestros usan. Multijugador en vivo, duelos, tus listas, 6 idiomas — cuentas de estudiantes gratis para empezar.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-es.webp"
+  ]
+}

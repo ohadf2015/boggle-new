@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers#page",
+  "name": "Ледокольные игры для первого дня школы | LexiClash",
+  "description": "Словесные игры для класса, где ученики молчат. Игры без давления на первый день—без списков имен, никто не в центре внимания.",
+  "url": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Ледокол День Знаний",
+      "item": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers#resource",
+  "name": "Ледокольные игры для первого дня школы | LexiClash",
+  "description": "Словесная игра для всего класса на одних и тех же буквах—без индивидуальных выступлений, без ожидания. LexiClash дает учителям живую доску, а ученикам способ без давления говорить, узнавать имена и чувствовать, как класс переходит из тишины в энергию менее чем за 15 минут.",
+  "url": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+  "inLanguage": "ru",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "8-16",
+  "teaches": "социальная сплоченность, словарный запас в контексте, быстрое изучение имен",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Что делать, если ученик не хочет говорить?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Они включены. Они находят слова молча. Вы видите, как доска заполняется под их именем. Давление на «представление себя» исчезает—вы просто видите, кто они в реальном времени. Некоторые ученики говорят меньше в первом раунде, больше во втором. Так это работает."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я использовать это, если ученики уже знают друг друга?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Это связывает имена с лицами, не только с списком. Кроме того, свежий состав класса (даже в повторяющихся годах) создает достаточно дистанции, чтобы низконапорное введение по-прежнему работало."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Для каких возрастных групп это работает?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Начальная школа до старшей школы. Отрегулируйте язык: младшие ученики ищут более простые слова; старшие ищут более длинные слова или играют с фильтром темы. Одна игра, много скоростей."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я играть асинхронно?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Дайте ученикам код, тему (например, «Найди слова о лете») и срок. Они играют в своем темпе. Меньше энергии ледокола, больше асинхронного открытия того, что они знают."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если у ученика нет устройства?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Спарьте их с одноклассником или пусть они помогают той паре. Они все еще известны. По-прежнему часть класса."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я использовать это для ESL или многоязычных классов?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Абсолютно. Младшие ученики ищут более короткие слова; продвинутые ищут по смыслу. Размещайте тему на английском языке или на родном языке."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как держать игру в движении?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Установите таймер. Две минуты за раунд, не десять. Дети движутся быстро, как только они понимают ритм игры. Назовите несколько имен между раундами, чтобы оставаться вовлеченным и чтобы ученики были известны."
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAssignments } from '@/hooks/useAssignments';
 import { useLessons } from '@/hooks/useVocabularyLesson';
+import { useClassrooms } from '@/hooks/useClassroom';
+import { labelLessonsForPicker } from '@/lib/education/lessonLabels';
 import { cn } from '@/lib/utils';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock } from 'lucide-react';
@@ -36,6 +38,17 @@ export default function AssignmentCreator({
   const { user } = useAuth();
   const { createAssignment } = useAssignments(classroomId);
   const { lessons, isLoading: isLoadingLessons } = useLessons();
+  // `useLessons()` spans every class this teacher owns, and reusing one list
+  // across periods is intended — so two rows can read "Week 3 Vocabulary" with
+  // nothing to tell them apart. Name the classroom, but only where it is
+  // actually ambiguous.
+  const { classrooms } = useClassrooms();
+  const lessonLabels = useMemo(() => {
+    const namesById: Record<string, string> = {};
+    for (const c of classrooms) namesById[c.id] = c.name;
+    const labelled = labelLessonsForPicker(lessons, namesById);
+    return new Map(labelled.map((l) => [l.id, l.label]));
+  }, [lessons, classrooms]);
 
   const [selectedType, setSelectedType] = useState<AssignmentType>('practice');
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
@@ -180,7 +193,7 @@ export default function AssignmentCreator({
                 <option value="">{t('teacher.assignment.selectLesson')}</option>
                 {lessons.map((lesson) => (
                   <option key={lesson.id} value={lesson.id}>
-                    {lesson.name} ({lesson.words.length} {t('teacher.assignment.words')})
+                    {lessonLabels.get(lesson.id) ?? lesson.name} ({lesson.words.length} {t('teacher.assignment.words')})
                   </option>
                 ))}
               </select>

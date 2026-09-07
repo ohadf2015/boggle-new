@@ -1,0 +1,132 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/en/education/games-for-teachers#page",
+  "name": "Free Word Games for Teachers — Zero Prep, Class Analytics | LexiClash",
+  "description": "Free browser-based word games built for real classrooms: zero prep, custom vocabulary lists, per-student progress tracking. Use as 5-min warm-up, brain break, or sub-day activity. Free to start.",
+  "url": "https://www.lexiclash.live/en/education/games-for-teachers",
+  "inLanguage": "en",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/en/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/games-for-teachers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Education",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Word Games for Teachers",
+      "item": "https://www.lexiclash.live/en/education/games-for-teachers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/en/education/games-for-teachers#resource",
+  "name": "Free Word Games for Teachers — Zero Prep, Class Analytics | LexiClash",
+  "description": "Free browser-based word games built for real classrooms: zero prep, custom vocabulary lists, per-student progress tracking. Use as 5-min warm-up, brain break, or sub-day activity. Free to start.",
+  "url": "https://www.lexiclash.live/en/education/games-for-teachers",
+  "inLanguage": "en",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Formative Assessment",
+    "Vocabulary Building",
+    "Brain Break",
+    "Substitute Teacher Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/en/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/en/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/games-for-teachers#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What word games can I use with my class?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash offers multiplayer word games like Boggle (find words in letter grids), Word Wheel (form words from spinning wheels), and Word Hunt (race to find hidden words). All games train vocabulary, pattern recognition, and spelling in real time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much prep time is required?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Zero. Create a free account, pick or upload a vocabulary list, share a link or code with students, and start playing. No lesson plans, worksheets, or material prep needed. Games work on Chromebooks, tablets, and phones."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use my own vocabulary lists?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Upload CSV lists, use built-in curriculum lists, or mix both. Teachers can lock vocabulary to specific topics (units, themes, languages) and reuse lists across classes and years."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I track student progress?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The classroom dashboard shows per-student scores, word accuracy, speed, and engagement metrics in real time. Download reports by class, date range, or game type. No manual grading needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can a substitute teacher run this?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. Share a lesson code with the substitute. Students log in, play, and you see all results in your dashboard. Perfect for sub days — no prep needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need a Chromebook cart or special hardware?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Any device with a browser works: Chromebooks, iPads, laptops, or student phones. Works offline in classrooms with patchy WiFi via cached assets."
+      }
+    }
+  ]
+}

@@ -25,7 +25,7 @@ const anagramSeoContent: Record<string, {
       'Tap any word to see its definition, etymology, and Scrabble / Words With Friends point value',
       'Works for crossword help, Scrabble racks, Words With Friends bingo finder, and Boggle path planning',
       'Mobile-friendly URL-driven interface — bookmark frequent rack patterns for one-tap reuse',
-      'Free forever, no signup, runs entirely in your browser with zero data sent to third parties',
+      'Always free to play, no signup, runs entirely in your browser with zero data sent to third parties',
     ],
     faq: [
       {
@@ -147,7 +147,7 @@ const anagramSeoContent: Record<string, {
       'Mismo diccionario competitivo que LexiClash multijugador',
       'Toca cualquier palabra para ver definición, etimología y puntuación Scrabble',
       'Útil para crucigramas, atriles de Scrabble y bingos de Words With Friends',
-      'Gratis para siempre, sin registro, funciona completamente en tu navegador',
+      'Gratis para jugar siempre, sin registro, funciona completamente en tu navegador',
     ],
     faq: [
       {

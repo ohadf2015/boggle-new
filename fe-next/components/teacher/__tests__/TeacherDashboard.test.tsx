@@ -58,14 +58,6 @@ vi.mock('@/components/teacher/LessonBuilder', () => ({
   default: () => <div>LessonBuilder</div>,
 }));
 
-vi.mock('@/components/teacher/QuickStartButton', () => ({
-  default: () => <div>QuickStartButton</div>,
-}));
-
-vi.mock('@/components/teacher/dashboard', () => ({
-  DuelMonitoringPanel: () => <div>DuelMonitoringPanel</div>,
-}));
-
 vi.mock('@/components/teacher/assignments', () => ({
   AssignmentTrackingPanel: () => <div>AssignmentTrackingPanel</div>,
   AssignmentCreator: () => <div>AssignmentCreator</div>,
@@ -84,9 +76,11 @@ describe('<TeacherDashboard>', () => {
     expect(screen.getByText('teacher.dashboard.title')).toBeInTheDocument();
   });
 
-  it('renders TeacherWelcomeBanner when teacher has access', () => {
+  // The welcome banner left the dashboard with the rest of the landing-screen
+  // furniture — it still greets a newly-approved teacher on /education, which is
+  // where they land straight after approval.
+  it('does not repeat the welcome banner on the dashboard', () => {
     render(<TeacherDashboard />);
-    // The banner component is mocked and should render when hasAccess is true
-    expect(screen.getByText('education.teacher.welcome_banner_title')).toBeInTheDocument();
+    expect(screen.queryByText('education.teacher.welcome_banner_title')).not.toBeInTheDocument();
   });
 });

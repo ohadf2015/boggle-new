@@ -1,0 +1,183 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/en/education/spelling-bee-practice#page",
+  "name": "Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash",
+  "description": "Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.",
+  "url": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+  "inLanguage": "en",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/en/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/spelling-bee-practice#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Education",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Spelling Bee Practice Online",
+      "item": "https://www.lexiclash.live/en/education/spelling-bee-practice"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/en/education/spelling-bee-practice#resource",
+  "name": "Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash",
+  "description": "Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.",
+  "url": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+  "inLanguage": "en",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Spelling Practice",
+    "Spelling Bee Preparation",
+    "Vocabulary Building",
+    "Pattern Recognition",
+    "Competition Training"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "7-18",
+  "teaches": "Spelling, letter pattern recognition, word recall under time pressure, vocabulary",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/en/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/en/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/spelling-bee-practice#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How can I practice for a spelling bee online for free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash gives spelling-bee competitors three complementary practice formats: Boggle-style grids (find every valid word from random letters), Word Wheel (form long words from a curated letter set), and Anagram puzzles (rearrange letters into target words). All free, no signup, no app — just open the browser and play. Multiple short sessions per day build pattern recognition and recall under time pressure."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does this help spelling-bee preparation?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Spelling bees test recall under stress + word-pattern recognition + spelling under audio cue. Word games drill the first two directly. Word Wheel and Boggle force students to scan letter patterns and recognize valid words quickly. Anagrams train letter-rearrangement under pressure — the same mental motion as spelling unfamiliar words letter by letter."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I practice 1v1 with another spelling-bee competitor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Use Vocabulary Duels mode to pair two students head-to-head on the same letter grid. First to a target score wins. Excellent simulation of competitive pressure for serious spelling-bee competitors training together."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this suitable for elementary, middle, and high school spelling bees?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — difficulty is configurable. Younger competitors can play with shorter words and longer timers; older competitors face longer words and tighter time limits. Custom advanced word lists can drill spelling-bee-specific vocabulary (Greek/Latin roots, scientific terms, geographic names)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does LexiClash use Scripps National Spelling Bee word lists?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash supports custom word-list upload, so teachers and parents can paste in any list — including Scripps study lists, regional bee word banks, or grade-specific vocabulary from textbooks. Built-in lists cover general English vocabulary for warm-up practice; custom lists handle competition-specific drilling."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How often should a spelling-bee competitor practice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Research on retrieval practice (Roediger & Karpicke 2006) and spaced repetition (Cepeda et al. 2008) suggests 10-15 minute sessions, 4-5 days per week, distributed over weeks rather than crammed in days. LexiClash sessions are designed to fit that pattern: 5-10 minute multiplayer rounds + 2-3 minute solo drills."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is LexiClash classroom-ready for school spelling bees?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Teachers can run whole-class spelling-bee warm-ups (a whole class join with a 6-character code, no student accounts), 1v1 elimination brackets, or assign solo practice. The teacher dashboard shows per-student accuracy and which words tripped the most competitors — useful for targeting review sessions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it free for individual students preparing at home?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — solo practice at home is free, with no per-user fee. Open the browser, pick a mode, start practicing. No account required (though optional account saves your progress and unlocks streak tracking)."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "@id": "https://www.lexiclash.live/en/education/spelling-bee-practice#howto",
+  "name": "How to Practice for a Spelling Bee with LexiClash",
+  "description": "Four-step routine for spelling-bee preparation using free word games.",
+  "totalTime": "PT15M",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Warm up with Word Hunt",
+      "text": "Play one 90-second Word Hunt round to warm up letter-scanning reflexes."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Drill with Word Wheel",
+      "text": "Play one Word Wheel round focused on long-word formation. Aim for at least one 7-letter word."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "1v1 duel with a peer",
+      "text": "Pair with another competitor and run a 2-3 minute Vocabulary Duel on a custom word list from your grade-level study guide."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Review missed words",
+      "text": "After each session, review the missed-word list. Add tough words to your custom drill list for tomorrow."
+    }
+  ]
+}

@@ -97,7 +97,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
   const modes: Mode[] = [
     { side: 'left', accent: 'bg-neo-cyan', tag: t('showcase3d.mode1Tag', 'Solo · Daily'), title: t('showcase3d.mode1', 'One board. One shot.'), body: t('showcase3d.mode1Body', 'The same daily grid for everyone. Climb the global rank before midnight.'), video: getAssetUrl('/videos/reddit-gameplay-demo.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-gameplay-demo.jpg') },
     { side: 'right', accent: 'bg-neo-pink', tag: t('showcase3d.mode2Tag', 'Up to 1v3'), title: t('showcase3d.mode2', 'Real-time party versus'), body: t('showcase3d.mode2Body', 'Four cubes, one live board, zero mercy. The loudest scoreboard wins.'), video: getAssetUrl('/videos/reddit-vs-battle.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-vs-battle.jpg') },
-    { side: 'left', accent: 'bg-neo-purple', tag: t('showcase3d.mode3Tag', '5 languages'), title: t('showcase3d.mode3', 'Play in your language'), body: t('showcase3d.mode3Body', 'Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.'), video: getAssetUrl('/videos/reddit-multilingual-showcase.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-multilingual-showcase.jpg') },
+    { side: 'left', accent: 'bg-neo-purple', tag: t('showcase3d.mode3Tag', '6 languages'), title: t('showcase3d.mode3', 'Play in your language'), body: t('showcase3d.mode3Body', 'Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.'), video: getAssetUrl('/videos/reddit-multilingual-showcase.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-multilingual-showcase.jpg') },
   ];
 
   // pinned multi-chapter scroll-scrub: canvas frame-sequence driven by ScrollTrigger scrub
@@ -267,7 +267,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         features={[
           `${t('showcase3d.mode1Tag', 'Solo · Daily')}: ${t('showcase3d.mode1Body', '')}`,
           `${t('showcase3d.mode2Tag', 'Up to 1v3')}: ${t('showcase3d.mode2Body', '')}`,
-          `${t('showcase3d.mode3Tag', '5 languages')}: ${t('showcase3d.mode3Body', '')}`,
+          `${t('showcase3d.mode3Tag', '6 languages')}: ${t('showcase3d.mode3Body', '')}`,
         ]}
       />
 

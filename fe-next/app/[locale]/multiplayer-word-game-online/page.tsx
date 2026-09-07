@@ -142,7 +142,7 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
               'Daily challenges with leaderboards',
               'Boss battles with unique twists',
               'Completely free, no downloads needed',
-              'Play in 5 languages (EN, HE, SV, JA, ES)',
+              'Play in 6 languages (EN, HE, SV, JA, ES)',
             ].map((feature) => (
               <div
                 key={feature}

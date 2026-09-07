@@ -89,7 +89,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               <button
                 onClick={handleClose}
                 className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white hover:text-neo-white hover:bg-neo-black/80 transition-colors animate-in fade-in-0 zoom-in-50 duration-300"
-                aria-label={t('common.close') || 'Close'}
+                aria-label={t('common.close', 'Close')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -99,7 +99,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
             <div className="relative w-full aspect-video overflow-hidden">
               <Image
                 src="/images/word-hunt-promo.webp"
-                alt={t('wordHuntPromo.imageAlt') || 'Word Hunt multiplayer duel'}
+                alt={t('wordHuntPromo.imageAlt', 'Word Hunt multiplayer duel')}
                 fill
                 className="object-cover"
                 priority

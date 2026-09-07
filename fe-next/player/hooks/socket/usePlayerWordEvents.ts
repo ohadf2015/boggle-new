@@ -44,7 +44,7 @@ interface VoteRecordedPayload { success?: boolean }
 
 interface UsePlayerWordEventsProps {
   socket: Socket | null;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
   inputRef: RefObject<HTMLInputElement | null>;
   playComboSound: (level: number) => void;
   fireRoundActive?: boolean;
@@ -105,7 +105,7 @@ export function usePlayerWordEvents({
 
       if (availableShields > 0) {
         comboShieldsUsedRef.current += 1;
-        neoInfoToast(t('combo.shieldUsed') || '🛡️ Combo Shield Used!', {
+        neoInfoToast(t('combo.shieldUsed', '🛡️ Combo Shield Used!'), {
           duration: 2000,
         });
         logger.log('[COMBO] Shield used, combo preserved at level', currentCombo);
@@ -309,19 +309,19 @@ export function usePlayerWordEvents({
   const handleVoteRecorded = useCallback((data: VoteRecordedPayload) => {
     logger.log('[PLAYER] Vote recorded:', data);
     if (data.success) {
-      neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: TOAST_ICONS.check, duration: 2000 });
+      neoSuccessToast(t('wordFeedback.thankYou', 'Thanks for voting!'), { icon: TOAST_ICONS.check, duration: 2000 });
     }
   }, [t]);
 
   const handleWordBecameValid = useCallback((data: WordLifecyclePayload) => {
     logger.log('[PLAYER] Word became valid:', data);
-    neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: TOAST_ICONS.bookOpen, duration: 3000 });
+    neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid', 'is now a valid word!')}`, { icon: TOAST_ICONS.bookOpen, duration: 3000 });
   }, [t]);
 
   // Spam detection handlers
   const handleSpamWarning = useCallback((data: SpamWarningPayload) => {
     logger.log('[SPAM] Warning received:', data);
-    neoWarningToast(t('spam.warning') || 'Slow down! Too many invalid words', {
+    neoWarningToast(t('spam.warning', 'Slow down! Too many invalid words'), {
       icon: TOAST_ICONS.alertTriangle,
       duration: 4000
     });
@@ -330,7 +330,7 @@ export function usePlayerWordEvents({
   const handleSpamPenalty = useCallback((data: SpamPenaltyPayload) => {
     logger.log('[SPAM] Penalty applied:', data);
     wordErrorToast(
-      (t('spam.penalty') || 'Points deducted: -${points}').replace('${points}', String(data.pointsDeducted)),
+      (t('spam.penalty', 'Points deducted: -${points}')).replace('${points}', String(data.pointsDeducted)),
       { duration: 4000 }
     );
     resetCombo();
@@ -340,7 +340,7 @@ export function usePlayerWordEvents({
     logger.log('[SPAM] Cooldown started:', data);
     const seconds = Math.ceil(data.duration / 1000);
     wordErrorToast(
-      (t('spam.cooldown') || 'Blocked for ${seconds}s - slow down!').replace('${seconds}', String(seconds)),
+      (t('spam.cooldown', 'Blocked for ${seconds}s - slow down!')).replace('${seconds}', String(seconds)),
       { duration: data.duration }
     );
     resetCombo();
@@ -348,7 +348,7 @@ export function usePlayerWordEvents({
 
   const handleSpamCooldownEnd = useCallback((data: SpamCooldownEndPayload) => {
     logger.log('[SPAM] Cooldown ended:', data);
-    neoInfoToast(t('spam.cooldownEnd') || 'You can submit words again', {
+    neoInfoToast(t('spam.cooldownEnd', 'You can submit words again'), {
       icon: TOAST_ICONS.check,
       duration: 2000
     });
@@ -357,7 +357,7 @@ export function usePlayerWordEvents({
   const handleWordBlockedByCooldown = useCallback((data: WordBlockedByCooldownPayload) => {
     const seconds = Math.ceil(data.remainingMs / 1000);
     wordErrorToast(
-      (t('spam.blockedWord') || 'Wait ${seconds}s before submitting').replace('${seconds}', String(seconds)),
+      (t('spam.blockedWord', 'Wait ${seconds}s before submitting')).replace('${seconds}', String(seconds)),
       { duration: 2000 }
     );
   }, [t]);

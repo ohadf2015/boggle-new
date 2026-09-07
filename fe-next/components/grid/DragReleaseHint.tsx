@@ -68,7 +68,7 @@ const DragReleaseHint = memo<DragReleaseHintProps>(({
           className="hidden md:flex absolute top-2 left-1/2 -translate-x-1/2 z-40 pointer-events-none"
         >
           <span className="bg-neo-black/80 text-neo-lime text-[11px] font-black px-3 py-1 rounded-full border border-neo-lime/40 shadow-[0_0_8px_rgba(191,255,0,0.3)] uppercase tracking-wider whitespace-nowrap">
-            {t('desktopInput.releaseToSubmit') || 'Release to submit'}
+            {t('desktopInput.releaseToSubmit', 'Release to submit')}
           </span>
         </m.div>
       )}

@@ -104,7 +104,7 @@ interface PlayerInGameViewProps {
   // Core props
   username: string;
   gameCode: string;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   dir: 'rtl' | 'ltr';
   socket: Socket | null;
 

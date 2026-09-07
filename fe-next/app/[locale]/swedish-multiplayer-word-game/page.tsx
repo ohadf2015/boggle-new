@@ -159,7 +159,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
               'Dagliga utmaningar med poängtabeller',
               'Bosskamper med unika vändningar',
               'Helt gratis, ingen nedladdning behövs',
-              'Spela på 5 språk (EN, HE, SV, JA, ES)',
+              'Spela på 6 språk (EN, HE, SV, JA, ES)',
             ].map((feature) => (
               <div
                 key={feature}

@@ -202,7 +202,7 @@ The Netflix headline is clear. The real story: an entire entertainment ecosystem
 
 זה לא לוקליזציה־צדקה; שם הצמיחה. השווקים האנגלוסקסיים רוויים. מאה המיליונים הבאים של פותרי פאזל יומיים יהיו דוברי עברית, ספרדית, הינדי, פורטוגזית, יפנית, אינדונזית. מי שישחרר את משחק המילים היומי הכי טוב בלא־אנגלית ב־2026 ינעל קטגוריה שעוד אף אחד לא תפס.
 
-(הטיה קלה: אנחנו משחררים בחמש שפות כולל עברית RTL, מה שדומה מבחינת עיצוב לעמידת ידיים. אבל הטרנד הזה גדול מאיתנו.)`,
+(הטיה קלה: אנחנו משחררים בשש שפות כולל עברית RTL, מה שדומה מבחינת עיצוב לעמידת ידיים. אבל הטרנד הזה גדול מאיתנו.)`,
         image: { src: IMG_VOCAB, alt: 'איור של אוצר מילים שגדל בשפות שונות' },
       },
       {
@@ -305,7 +305,7 @@ Det ändras snabbt. Hebreiska ordspel — *Tzeruf*, *Milat HaYom*, vår egen Lex
 
 Det är inte välgörenhetslokalisering; där finns tillväxten. Engelskspråkiga marknader är mättade. De nästa 100 miljonerna dagliga pusselspelare blir hebreiska, spanska, hindi, portugisiska, japanska, indonesiska. Den som släpper det bästa icke-engelska dagliga ordspelet 2026 låser en kategori ingen ännu äger.
 
-(Liten bias: vi släpper på fem språk inklusive hebreisk RTL, vilket designmässigt motsvarar en handstående volt. Men trenden är större än oss.)`,
+(Liten bias: vi släpper på sex språk inklusive hebreisk RTL, vilket designmässigt motsvarar en handstående volt. Men trenden är större än oss.)`,
         image: { src: IMG_VOCAB, alt: 'Ordförråd som växer över språk' },
       },
       {
@@ -408,7 +408,7 @@ LexiClashのリアルタイム対戦やWords With Friendsの非同期型のよ�
 
 慈善ローカライズじゃない。成長があるのがそこ。英語圏は飽和。次の1億人のデイリーパズルプレイヤーは、ヘブライ語、スペイン語、ヒンディー語、ポルトガル語、日本語、インドネシア語の話者になる。2026年に最高の非英語デイリーワードゲームを出した者が、まだ誰もロックしていないカテゴリを取る。
 
-(若干バイアス：僕らはヘブライ語RTL含む5言語で配信している。デザイン的には倒立逆立ちに相当する。でも、このトレンドは僕ら以上に大きい。)`,
+(若干バイアス：僕らはヘブライ語RTL含む6言語で配信している。デザイン的には倒立逆立ちに相当する。でも、このトレンドは僕ら以上に大きい。)`,
         image: { src: IMG_VOCAB, alt: '多言語にわたって伸びる語彙のイラスト' },
       },
       {
@@ -512,7 +512,7 @@ Eso cambia rápido. Juegos de palabras en hebreo — *Tzeruf*, *Milat HaYom*, nu
 
 No es localización por caridad; ahí está el crecimiento. Los mercados anglosajones están saturados. Los próximos 100 millones de jugadores diarios de puzzle van a ser hispanohablantes, hebreohablantes, hindi, portugués, japonés, indonesio. Quien lance el mejor juego diario en idioma no inglés en 2026 cierra una categoría que nadie tiene aún.
 
-(Sesgo declarado: lanzamos en cinco idiomas incluyendo hebreo RTL, lo cual en términos de diseño equivale a hacer una vertical. Pero la tendencia es más grande que nosotros.)`,
+(Sesgo declarado: lanzamos en seis idiomas incluyendo hebreo RTL, lo cual en términos de diseño equivale a hacer una vertical. Pero la tendencia es más grande que nosotros.)`,
         image: { src: IMG_VOCAB, alt: 'Ilustración de vocabulario creciendo a través de idiomas' },
       },
       {

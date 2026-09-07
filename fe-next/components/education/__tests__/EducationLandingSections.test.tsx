@@ -39,13 +39,29 @@ describe('EducationSectionRenderer', () => {
     expect(container.querySelectorAll('svg')).toHaveLength(2);
   });
 
-  it('falls back to a neutral icon for an unknown icon name instead of throwing', () => {
+  /**
+   * Changed in the R2 landing migration. The six SEO pages that moved onto this
+   * renderer ship literal emoji in the `icon` field, and the emoji is text a
+   * reader sees. Swapping it for a stand-in glyph silently deleted eight visible
+   * characters per page, so an unrecognised name is now emitted verbatim.
+   */
+  it('emits an unrecognised icon name verbatim instead of substituting a glyph', () => {
     const { container } = renderSection({
       kind: 'features',
       title: 'T',
-      items: [{ icon: 'not-a-real-icon', text: 'still renders' }],
+      items: [{ icon: '📚', text: 'still renders' }],
     });
     expect(screen.getByText('still renders')).toBeTruthy();
+    expect(screen.getByText('📚')).toBeTruthy();
+    expect(container.querySelectorAll('svg')).toHaveLength(0);
+  });
+
+  it('still draws a real icon when the name is a known one', () => {
+    const { container } = renderSection({
+      kind: 'features',
+      title: 'T',
+      items: [{ icon: 'clock', text: 'drawn icon' }],
+    });
     expect(container.querySelectorAll('svg')).toHaveLength(1);
   });
 

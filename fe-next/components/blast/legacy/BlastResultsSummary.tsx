@@ -593,7 +593,7 @@ export function BlastResultsSummary({
             onClick={onOpenStore}
             className="font-semibold text-neo-cyan hover:text-neo-cyan hover:bg-transparent uppercase tracking-wider text-xs"
           >
-            {t('blast.store.title') || 'Upgrades'}
+            {t('blast.store.title', 'Upgrades')}
           </Button>
         )}
         <Button

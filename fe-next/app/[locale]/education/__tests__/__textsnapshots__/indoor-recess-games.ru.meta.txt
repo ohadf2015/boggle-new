@@ -1,0 +1,64 @@
+{
+  "title": "Игры для переменки в помещении | LexiClash",
+  "description": "Структурированный план переменки на 20 минут для дождливых дней. Бесплатные словесные игры, тихие активности и расписание для любого размера класса.",
+  "keywords": [
+    "игры для переменки в помещении",
+    "деятельность в дождливые дни",
+    "тихие игры в классе",
+    "игры для всего класса",
+    "бесплатные классные игры",
+    "словесные игры в классе",
+    "занятия при плохой погоде",
+    "мозговые перерывы"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "ja": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "es": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+    "en-IL": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he-IL": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en-US": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-US": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-GB": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "en-SE": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "en-JP": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "en-ES": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-ES": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-MX": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-MX": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-AU": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-AR": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "es-CO": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/indoor-recess-games"
+  },
+  "ogTitle": "Игры для переменки в помещении | LexiClash",
+  "ogDescription": "Структурированный план переменки на 20 минут для дождливых дней. Бесплатные словесные игры, тихие активности и расписание для любого размера класса.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Игры для переменки в помещении | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Игры для переменки в помещении | LexiClash",
+  "twDescription": "Структурированный план переменки на 20 минут для дождливых дней. Бесплатные словесные игры, тихие активности и расписание для любого размера класса.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

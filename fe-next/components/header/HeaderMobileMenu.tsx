@@ -975,7 +975,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     <div className="flex justify-center pt-2 pb-1">
                                         <span className="text-[10px] text-neo-white font-bold">
                                             {isRtl ? '← ' : ''}
-                                            {t('common.swipeToClose') || 'Swipe to close'}
+                                            {t('common.swipeToClose', 'Swipe to close')}
                                             {!isRtl ? ' →' : ''}
                                         </span>
                                     </div>

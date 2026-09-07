@@ -6,9 +6,12 @@ import { vi } from 'vitest';
  */
 import { render, screen } from '@testing-library/react';
 
-// Live Vocab Quiz view is dynamic()-loaded; the eager next/dynamic mock below
-// would leave its import chain in flight past environment teardown.
+// Heavy lazy views unrelated to this test: the eager next/dynamic mock below imports every
+// dynamic() target at module load, and their real import chains can still be resolving when
+// the environment is torn down (EnvironmentTeardownError). Stub them.
 vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
+vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
+
 vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: (importFn: () => Promise<any>) => {

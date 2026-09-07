@@ -67,7 +67,11 @@
     ".next-qp/types/**/*.ts",
     ".next-qp/dev/types/**/*.ts",
     ".next-qp-ghost/types/**/*.ts",
-    ".next-qp-ghost/dev/types/**/*.ts"
+    ".next-qp-ghost/dev/types/**/*.ts",
+    ".next-hs/types/**/*.ts",
+    ".next-hs/dev/types/**/*.ts",
+    ".next-gate/types/**/*.ts",
+    ".next-gate/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

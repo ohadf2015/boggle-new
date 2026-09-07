@@ -1,0 +1,55 @@
+{
+  "title": "משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 6 שפות | LexiClash",
+  "description": "משחקי אוצר מילים חינמיים לכיתה. ריבוי משתתפים חי בכיתה שלמה, דו־קרבות אוצר מילים 1v1, ורשימות מילים מהתוכנית. 6 שפות כולל עברית. כל דפדפן. חינם להתחלה.",
+  "keywords": "vocabulary games for classroom, classroom vocabulary games, free vocabulary games, classroom word games, vocabulary games for students, vocabulary games online free, multiplayer vocabulary game, free vocabulary game for teachers, free word games for kids classroom",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "ja": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "es": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom",
+    "en-IL": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "he-IL": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+    "en-US": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-US": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-GB": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "en-SE": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "sv-SE": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+    "en-JP": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "ja-JP": "https://www.lexiclash.live/ja/education/vocabulary-games-classroom",
+    "en-ES": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-ES": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-MX": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-MX": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "en-AU": "https://www.lexiclash.live/en/education/vocabulary-games-classroom",
+    "es-AR": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "es-CO": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+    "ru-RU": "https://www.lexiclash.live/ru/education/vocabulary-games-classroom"
+  },
+  "ogTitle": "משחקי אוצר מילים חינמיים לכיתה",
+  "ogDescription": "משחקי ריבוי משתתפים חיים למורים. אתגרים לכיתה שלמה, דו־קרבות 1v1, רשימות מילים משלכם, 6 שפות. חשבונות תלמידים תמיד חינמיים.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "משחקי אוצר מילים חינמיים לכיתה"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "משחקי אוצר מילים חינמיים לכיתה",
+  "twDescription": "משחק אוצר המילים שמורים באמת משתמשים בו. ריבוי משתתפים חי, דו־קרבות, הרשימות שלכם, 6 שפות — חשבונות תלמידים חינמיים תמיד.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

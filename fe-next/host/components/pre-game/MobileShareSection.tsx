@@ -18,7 +18,7 @@ import {
 
 interface MobileShareSectionProps {
   gameCode: string;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   className?: string;
   /** Show prominent hint banner for empty rooms */
   showHint?: boolean;

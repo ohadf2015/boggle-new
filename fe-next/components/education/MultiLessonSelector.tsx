@@ -34,11 +34,14 @@ export function MultiLessonSelector({
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
 
-  // Calculate playable word count for each lesson
+  // How many words the LESSON has. Not how many a Boggle grid could hold:
+  // `canIntegrate` is false under 3 and over 12 letters, so counting with it
+  // made a ten-word lesson read "9 words" beside its own checkbox, one screen
+  // after the editor said 10, with nothing naming the word that went missing.
   const lessonsWithCounts = useMemo(() => {
     return lessons.map((lesson) => ({
       ...lesson,
-      playableWordCount: lesson.words?.filter((w) => w.canIntegrate).length || 0,
+      playableWordCount: lesson.words?.length || 0,
     }));
   }, [lessons]);
 

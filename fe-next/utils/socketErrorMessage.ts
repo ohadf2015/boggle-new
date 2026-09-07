@@ -11,14 +11,16 @@ export interface SocketErrorPayload {
   message?: string;
 }
 
-type Translator = (key: string) => string;
+// Matches LanguageContext's real `t(path, fallback?)` — was single-arg only,
+// which forbade the valid `t(key, 'fallback')` form used below.
+type Translator = (key: string, fallback?: string) => string;
 
 export function socketErrorMessage(
   payload: SocketErrorPayload | string | undefined,
   t: Translator
 ): string {
   if (typeof payload === 'string') return payload;
-  if (!payload) return t('common.errorOccurred') || 'An error occurred';
+  if (!payload) return t('common.errorOccurred', 'An error occurred');
 
   if (payload.code) {
     const key = `socketErrors.${payload.code}`;
@@ -29,7 +31,7 @@ export function socketErrorMessage(
 
   if (payload.message) return payload.message;
 
-  return t('common.errorOccurred') || 'An error occurred';
+  return t('common.errorOccurred', 'An error occurred');
 }
 
 /**

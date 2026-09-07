@@ -64,8 +64,8 @@ const sv = {
     "pro": "Pro",
     "month": "månad",
     "recommended": "Rekommenderas",
-    "free_1": "Upp till 5 elever per klass",
-    "free_2": "1 klassrum",
+    "free_1": "Upp till 50 elever per klass",
+    "free_2": "Upp till 3 klassrum",
     "free_3": "Grundläggande spellägen",
     "pro_1": "Obegränsat antal elever per klass",
     "pro_2": "Obegränsat antal klassrum",
@@ -2718,6 +2718,8 @@ const sv = {
     "needPlayers": "Behöver spelare!",
     "commandersJoined": "Befälhavare anslutna",
     "playersInRoom": "Spelare i rummet",
+    "startQuiz": "Starta quiz",
+    "startClassGame": "Starta spelet",
     "noOneYet": "Ingen ännu?",
     "startingWithBots": "Startar med bottar om",
     "addingBots": "Lägger till bottar om",
@@ -5557,14 +5559,6 @@ const sv = {
     "topPercent": "Topp {percent}%",
     "noRankYet": "Spela för att bli rankad!",
     "comingSoon": "Kommer snart! Vi förbereder topplistan.",
-    "referral": {
-      "inviteFriends": "Bjud in vänner och tjäna belöningar!",
-      "subtitle": "Dela din kod så får ni båda 100 XP + 50 mynt när de spelar!",
-      "shareText": "🎮 Spela LexiClash med mig! Jag utmanar dig på ett ordspel!",
-      "copied": "Länk kopierad!",
-      "friendsJoined": "vänner har gått med",
-      "noReferralsYet": "Inga inbjudna än"
-    },
     "viewLeaderboard": "Visa topplista",
     "friends": "Vänner",
     "noFriendsPlayed": "Ingen av dina vänner har spelat idag än!",
@@ -6611,7 +6605,7 @@ const sv = {
       },
       "stepLabel": "Steg",
       "whatIsTitle": "Vad är LexiClash?",
-      "whatIsContent": "LexiClash är ett gratis, snabbt multiplayer-ordspel som du kan spela direkt i webbläsaren. Tävla mot vänner i ordstrider i realtid på ett delat bokstavsrutnät — hitta ord, bygg kombos och klättra på topplistorna. Det är som Boggle möter Wordle, men multiplayer. Inga nedladdningar, ingen registrering krävs. Tillgängligt på engelska, hebreiska, svenska, japanska och spanska.",
+      "whatIsContent": "LexiClash är ett gratis, snabbt multiplayer-ordspel som du kan spela direkt i webbläsaren. Tävla mot vänner i ordstrider i realtid på ett delat bokstavsrutnät — hitta ord, bygg kombos och klättra på topplistorna. Det är som Boggle möter Wordle, men multiplayer. Inga nedladdningar, ingen registrering krävs. Tillgängligt på engelska, hebreiska, svenska, japanska, spanska och ryska.",
       "whatIsShort": "Gratis multiplayer-ordstrider i din webbläsare. Hitta ord, bygg kombos, krossa dina vänner. Inga nedladdningar, ingen registrering.",
       "featuresTitle": "Därför älskar spelare LexiClash",
       "feature1Title": "Multiplayer i realtid",
@@ -6621,7 +6615,7 @@ const sv = {
       "feature3Title": "Äventyrsläge",
       "feature3Desc": "100 nivåer i 10 tematiserade världar. Specialbrickor, bossstrider och power-ups håller varje omgång fräsch.",
       "feature4Title": "6 språk",
-      "feature4Desc": "Spela på engelska, hebreiska, svenska, japanska eller spanska. Byt när som helst och utmana vänner på olika språk.",
+      "feature4Desc": "Spela på engelska, hebreiska, svenska, japanska, spanska eller ryska. Byt när som helst och utmana vänner på olika språk.",
       "feature4TitleShort": "Blast-läge",
       "modeTagMultiplayer": "2-20 spelare",
       "modeTagDaily": "Nytt pussel varje dag",
@@ -6655,7 +6649,7 @@ const sv = {
       "faq2Q": "Behöver jag skapa ett konto?",
       "faq2A": "Nej. Du kan spela som gäst direkt. Att skapa ett konto (via Google eller Discord) låser upp funktioner som topplistor, prestationsspårning och synkronisering mellan enheter.",
       "faq3Q": "Vilka språk stöds?",
-      "faq3A": "LexiClash stöder engelska, hebreiska, svenska, japanska och spanska. Varje språk har sin egen ordbok, dagliga utmaningar och topplistor. Du kan byta språk när som helst i inställningsmenyn.",
+      "faq3A": "LexiClash stöder engelska, hebreiska, svenska, japanska, spanska och ryska. Varje språk har sin egen ordbok, dagliga utmaningar och topplistor. Du kan byta språk när som helst i inställningsmenyn.",
       "faq4Q": "Kan jag spela på min mobil?",
       "faq4A": "Absolut. LexiClash är helt responsivt och fungerar i alla moderna mobilwebbläsare. Svep bokstäver för att bilda ord — pekskärmskontrollerna är designade specifikt för mobilspel.",
       "faq5Q": "Är det säkert för barn?",
@@ -12584,7 +12578,8 @@ const sv = {
       "joining": "Går med...",
       "listening": "Lyssnar efter klassrumsspel...",
       "connecting": "Ansluter till klassrummet...",
-      "idleHint": "När din lärare startar ett spel visas det här"
+      "idleHint": "När din lärare startar ett spel visas det här",
+      "joinFailed": "Vi fick inte in dig — spelet kan ha tagit slut. Fråga din lärare efter koden."
     },
     "playWithClass": {
       "title": "Spela med klassen",
@@ -12634,6 +12629,10 @@ const sv = {
       "playGame": "Spela spel",
       "playGameHint": "Öva med ett multiplayer-spel med dessa ord",
       "wordsAtYourLevel": "{{mine}} på din nivå · {{total}} i lektionen",
+      "assignment": {
+        "due": "Klar {{date}}",
+        "overdue": "Försenad — skulle vara klar {{date}}"
+      },
       "empty": {
         "title": "Inga lektioner än",
         "subtitle": "Gå med i ett klassrum för att börja öva",
@@ -12844,6 +12843,10 @@ const sv = {
       "giftEnded": "Pro-gåvan har tagit slut"
     },
     "proGate": {
+      "analytics": {
+        "title": "Se hur din klass faktiskt ligger till",
+        "body": "Med Pro blir varje spel en bild av klassen: vilka ord som sitter, vilka elever som kör fast och hur långt var och en har kommit sedan terminsstarten. Ta med det till utvecklingssamtalet eller ämneskonferensen."
+      },
       "cta": "Lås upp med Pro — ${{price}}/månad"
     },
     "subscription": {
@@ -12874,7 +12877,7 @@ const sv = {
       "trustDataSafe": "Dina data är säkra",
       "trustReminder": "Påminnelse via e-post före varje betalning",
       "freePlanName": "Free",
-      "freeForever": "Gratis för alltid, alltid tillgänglig",
+      "freeForever": "Gratisplan, utan slutdatum",
       "freeClasses": "Upp till {count} klass",
       "freeStudents": "Upp till {count} elever per klass",
       "proPlanName": "Teacher Pro",
@@ -12968,6 +12971,7 @@ const sv = {
       "insights": "INSIKTER",
       "viewReports": "Visa rapporter",
       "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum",
+      "tools": "Klassverktyg",
       "studentsPresentTitle": "{count} elever är i {classroom} just nu",
       "studentsPresentDescription": "Starta ett spel så hoppar de rakt in.",
       "tab": {
@@ -13109,6 +13113,10 @@ const sv = {
       }
     },
     "lesson": {
+      "pasteWords": "Klistra in din ordlista",
+      "pasteWordsPlaceholder": "Ett ord per rad – eller separerade med kommatecken",
+      "pasteWordsParsed": "{count} ord klara",
+      "pasteWordsAdd": "Lägg till {count} ord",
       "create": "Skapa lektion",
       "edit": "Redigera lektion",
       "delete": "Ta bort lektion",
@@ -13424,7 +13432,17 @@ const sv = {
       "wheelRush": "Bygg ord från ett enda bokstavshjul",
       "vocabQuiz": "Frågor med fyra svar från dina egna orddata"
     },
+    "wordTowerPractice": {
+      "unavailable": "Lektionens ord kan inte bygga ett torn än. Det behövs minst 4 ord på 4 till 6 bokstäver.",
+      "done": "Klar",
+      "progress": "{{found}} av {{total}} listord byggda",
+      "height": "{{height}} m · {{floors}} våningar",
+      "hit": "Listord! {{word}}"
+    },
     "practicePicker": {
+      "name": {
+        "word_tower": "Ordtorn"
+      },
       "title": "Välj din övning",
       "readyCount": "{{ready}} av {{total}} klara att spela",
       "questions": "{{count}} frågor",
@@ -13432,7 +13450,10 @@ const sv = {
       "lockedBadge": "Låst",
       "played": "spelad {{count}} ggr",
       "nothingReady": "Lektionen har inga ord än. Be din lärare lägga till och kom tillbaka.",
+      "nextMode": "Nästa: {{mode}}",
+      "allModes": "Alla spel",
       "skill": {
+        "word_tower": "Bygg ord av bokstäverna i veckans lista",
         "solo_board": "Hitta lektionens ord i bokstavsrutan",
         "warmup": "En kort runda för att komma igång",
         "blitz": "Slå klockan med så många ord du hinner",
@@ -13448,6 +13469,7 @@ const sv = {
         "roots_affixes": "Vad orddelarna betyder"
       },
       "locked": {
+        "word_tower": "Kräver minst 4 listord på 4–6 bokstäver",
         "solo_board": "Lägg till ord i lektionen för att låsa upp",
         "warmup": "Lägg till ord i lektionen för att låsa upp",
         "blitz": "Lägg till ord i lektionen för att låsa upp",
@@ -13770,6 +13792,17 @@ const sv = {
       "yesterday": "Igår"
     },
     "classroomGame": {
+      "questions": "Frågor",
+      "perQuestion": "Per fråga",
+      "namePrompt": {
+        "eyebrow": "Klasspel",
+        "title": "Vad heter du?",
+        "subtitle": "Klassen ser det här namnet på tavlan.",
+        "placeholder": "Skriv ditt namn",
+        "submit": "Gå med i spelet",
+        "roomLabel": "Rum {{code}}"
+      },
+      "classroomLessonLabel": "{{classroom}} · live-spel: {{lesson}}",
       "classCode": "Spelkod",
       "classroomNotFound": "Klassrummet hittades inte",
       "classroomSession": "Klassrumsspel",
@@ -13859,7 +13892,7 @@ const sv = {
         "noAds": "Inga annonser för dina elever",
         "customLists": "Dina egna ordlistor",
         "duels": "Orddueller i realtid",
-        "freeForever": "Gratis för alltid. Inget kort, ingen provperiod som tickar.",
+        "freeForever": "Gratisplanen upphör aldrig. Inget kort, ingen provperiod som tickar.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Allt i gratisplanen",
         "classLimitPro": "Obegränsat antal klasser",
@@ -13972,7 +14005,7 @@ const sv = {
         "spelling_bee": {
           "tag": "Stavning",
           "title": "Stavningsövning",
-          "body": "Röststyrd stavning på svenska, hebreiska, japanska, engelska och spanska.",
+          "body": "Röststyrd stavning, flera språk.",
           "teaches": "Stavning genom lyssnande"
         }
       },
@@ -14156,6 +14189,8 @@ const sv = {
       "searchWords": "Sök",
       "sessionsCompleted": "{{count}} slutförda",
       "soloBoard": "Ensamt spel",
+      "lessonUnavailable": "Kan inte öppna lektionen",
+      "lessonUnavailableBody": "Länken kan vara för gammal, eller så är lektionen borttagen. Be din lärare om en ny.",
       "spellTheWord": "Stava ordet",
       "spelling": "Stavning",
       "streak": "{{count}} i rad",
@@ -14230,7 +14265,11 @@ const sv = {
         "codeLabel": "Klasskod",
         "codeNotRecognised": "Vi kunde inte känna igen den koden",
         "codePasted": "Klistrad!",
+        "heroLine": "Fråga din lärare om klasskoden",
         "preparing": "Gör i ordning – ett ögonblick.",
+        "queuedNeedsName": "Nästan inne — skriv ditt namn ovanför så tar vi dig direkt dit.",
+        "nameTaken": "Någon i klassen heter redan så. Testa {{suggestedName}}.",
+        "useSuggestedName": "Gå med som {{suggestedName}}",
         "codePlaceholder": "6 bokstäver",
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
@@ -14251,6 +14290,7 @@ const sv = {
         "success": "Du är med!",
         "title": "Gå med i klassrummet"
       },
+      "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
       "lessonsAssigned": "Tilldelade lektioner"
     },
     "students": "Elever",
@@ -14416,7 +14456,7 @@ const sv = {
       "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",
       "auth_required_cta": "Skapa mitt gratis lärarkonto",
       "trust_instant": "Direkt åtkomst — ingen granskningskö",
-      "trust_free": "Gratis för lärare, för alltid",
+      "trust_free": "Gratis lärarplan, utan slutdatum",
       "trust_nologins": "Inga elevkonton, ingen installation",
       "cta_micro": "Tar 60 sekunder · Inget kreditkort",
       "hero_alt": "LexiClash-maskoten välkomnar ett klassrum fullt av bokstavskuber",
@@ -15461,7 +15501,8 @@ const sv = {
     "hebrew": "Hebreiska",
     "swedish": "Svenska",
     "japanese": "Japanska",
-    "spanish": "Spanska"
+    "spanish": "Spanska",
+    "russian": "Ryska"
   },
   "streakBar": {
     "streak": "{{count}} dagars svit",
@@ -16861,7 +16902,12 @@ const sv = {
     "shareCard": {
       "title": "Din bluffhistoria",
       "cta": "Dela resultat",
-      "copied": "Kopierat!"
+      "copied": "Kopierat!",
+      "header": "🎯 Förseglat bud — {score} poäng",
+      "row": "{round} {emoji} {playerWord} mot {botWord}{points}",
+      "url": "lexiclash.live/sv/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "mot"
     },
     "session": {
       "title": "Bluffräknare",
@@ -16869,7 +16915,11 @@ const sv = {
       "uniqueLabel": "Unik",
       "clashLabel": "Krock",
       "passLabel": "Pass",
-      "shareCta": "Dela poäng"
+      "shareCta": "Dela poäng",
+      "shareHeader": "🧠 Överlistade botten {unique}/{total} rundor — {score} poäng",
+      "cashOut": "Ta ut",
+      "chips": "marker",
+      "coins": "mynt"
     },
     "youWin": "Du vinner!",
     "youLose": "Krock",
@@ -16893,20 +16943,7 @@ const sv = {
     "revealing": "Avslöjar…",
     "roundLabel": "Runda {n} av {total}",
     "chipStack": "Marker: {chips}",
-    "speedBonus": "Hastighet ×{n}",
-    "shareCard": {
-      "header": "🎯 Förseglat bud — {score} poäng",
-      "row": "{round} {emoji} {playerWord} mot {botWord}{points}",
-      "url": "lexiclash.live/sv/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "mot"
-    },
-    "session": {
-      "shareHeader": "🧠 Överlistade botten {unique}/{total} rundor — {score} poäng",
-      "cashOut": "Ta ut",
-      "chips": "marker",
-      "coins": "mynt"
-    }
+    "speedBonus": "Hastighet ×{n}"
   },
   "supporter": {
     "card": {

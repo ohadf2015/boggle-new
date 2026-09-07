@@ -25,40 +25,40 @@ export function getObjectiveTileTypes(objectives: BlastObjective[]): BlastTileTy
  */
 export function formatObjectiveLabel(
   objective: BlastObjective,
-  t: (key: string) => string | undefined,
+  t: (key: string, fallback?: string) => string | undefined,
 ): string {
   let template: string;
 
   switch (objective.type) {
     case 'score_target':
-      template = t('blast.objective.scoreTarget') || 'Score {target} points';
+      template = t('blast.objective.scoreTarget', 'Score {target} points') ?? 'Score {target} points';
       break;
     case 'collect_type':
-      template = t('blast.objective.collectType') || 'Collect {target} {tileType} tiles';
+      template = t('blast.objective.collectType', 'Collect {target} {tileType} tiles') ?? 'Collect {target} {tileType} tiles';
       break;
     case 'clear_all_type':
-      template = t('blast.objective.clearAllType') || 'Clear all {tileType} tiles';
+      template = t('blast.objective.clearAllType', 'Clear all {tileType} tiles') ?? 'Clear all {tileType} tiles';
       break;
     case 'word_length':
-      template = t('blast.objective.wordLength') || 'Find {target} words with {minWordLength}+ letters';
+      template = t('blast.objective.wordLength', 'Find {target} words with {minWordLength}+ letters') ?? 'Find {target} words with {minWordLength}+ letters';
       break;
     case 'clear_percent':
-      template = t('blast.objective.clearPercent') || 'Clear {target}% of the board';
+      template = t('blast.objective.clearPercent', 'Clear {target}% of the board') ?? 'Clear {target}% of the board';
       break;
     case 'target_word':
-      template = t('blast.objective.targetWord') || 'Find: {word}';
+      template = t('blast.objective.targetWord', 'Find: {word}') ?? 'Find: {word}';
       break;
     case 'color_power':
-      template = t('blast.objective.colorPower') || 'Use {count}+ {color} tiles in one word';
+      template = t('blast.objective.colorPower', 'Use {count}+ {color} tiles in one word') ?? 'Use {count}+ {color} tiles in one word';
       break;
     case 'clear_jelly':
-      template = t('blast.objective.clearJelly') || 'Clear all jelly';
+      template = t('blast.objective.clearJelly', 'Clear all jelly') ?? 'Clear all jelly';
       break;
     case 'kill_cake':
-      template = t('blast.objective.killCake') || 'Destroy the cake';
+      template = t('blast.objective.killCake', 'Destroy the cake') ?? 'Destroy the cake';
       break;
     case 'stop_chocolate':
-      template = t('blast.objective.stopChocolate') || 'Stop the chocolate';
+      template = t('blast.objective.stopChocolate', 'Stop the chocolate') ?? 'Stop the chocolate';
       break;
     default:
       template = '';

@@ -30,6 +30,7 @@ import {
   ArrowLeftRight,
   Quote,
   Blocks,
+  Building2,
   Lock,
   CheckCircle,
   Clock,
@@ -41,8 +42,10 @@ import type { VocabFocus } from '@/lib/education/vocabFocus';
 import {
   buildPracticeTiles,
   practiceReadiness,
+  WORD_TOWER_TILE_ID,
   type PracticeSessionCounts,
   type PracticeTile,
+  type PracticeVariant,
 } from '@/lib/education/practicePicker';
 
 export interface PracticePickerProps {
@@ -54,7 +57,10 @@ export interface PracticePickerProps {
   mastery?: MasteryLevel;
   /** Finished-session totals, so each tile can show what has been played. */
   sessions?: PracticeSessionCounts | null;
-  onSelectMode: (mode: PracticeType, options?: { focus?: VocabFocus }) => void;
+  onSelectMode: (
+    mode: PracticeType,
+    options?: { focus?: VocabFocus; variant?: PracticeVariant }
+  ) => void;
   onBack: () => void;
 }
 
@@ -74,6 +80,7 @@ const TILE_LOOK: Record<string, { icon: typeof Grid3X3; accent: string }> = {
   spelling: { icon: PenLine, accent: 'bg-neo-purple' },
   flashcard: { icon: Layers, accent: 'bg-neo-cyan' },
   word_list: { icon: List, accent: 'bg-neo-lime' },
+  [WORD_TOWER_TILE_ID]: { icon: Building2, accent: 'bg-neo-purple' },
   'vocab_focus:definition': { icon: BookOpen, accent: 'bg-neo-cyan' },
   'vocab_focus:synonym': { icon: Sparkles, accent: 'bg-neo-lime' },
   'vocab_focus:antonym': { icon: ArrowLeftRight, accent: 'bg-neo-pink' },
@@ -186,7 +193,16 @@ export default function PracticePicker({
   const MasteryIcon = masteryLook?.icon;
 
   const handleSelect = (tile: PracticeTile) => {
-    onSelectMode(tile.mode, tile.focus ? { focus: tile.focus } : undefined);
+    // Word Tower shares `solo_board` as its practice type, so the variant is
+    // what keeps it from opening the plain board.
+    const options =
+      tile.focus || tile.variant
+        ? {
+            ...(tile.focus ? { focus: tile.focus } : {}),
+            ...(tile.variant ? { variant: tile.variant } : {}),
+          }
+        : undefined;
+    onSelectMode(tile.mode, options);
   };
 
   return (

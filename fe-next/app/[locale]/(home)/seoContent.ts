@@ -22,7 +22,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
   en: {
     title: 'LexiClash — Free Multiplayer Word Game Online',
     description:
-      'LexiClash is a free online multiplayer word game that combines the grid-based word hunting of Boggle with real-time competitive gameplay. Find words on a shared letter grid, race against friends or strangers, and climb the leaderboard — all in your browser with no download or signup required. Play in English, Hebrew, Swedish, Japanese, or Spanish across multiple game modes including Classic, Word Hunt, Blast, and the daily Word Wheel challenge. LexiClash also features Adventure Mode with 100 progressive levels across 10 themed worlds, Brain Training drills for cognitive improvement, and a Party Mode designed for group play on a shared TV screen.',
+      'LexiClash is a free online multiplayer word game that combines the grid-based word hunting of Boggle with real-time competitive gameplay. Find words on a shared letter grid, race against friends or strangers, and climb the leaderboard — all in your browser with no download or signup required. Play in English, Hebrew, Swedish, Japanese, Spanish, or Russian across multiple game modes including Classic, Word Hunt, Blast, and the daily Word Wheel challenge. LexiClash also features Adventure Mode with 100 progressive levels across 10 themed worlds, Brain Training drills for cognitive improvement, and a Party Mode designed for group play on a shared TV screen.',
     features: [
       'Real-time multiplayer word battles — 2 to 20+ players on the same grid simultaneously',
       'Six distinct game modes: Classic, Word Hunt, Blast, Wheel Rush, Adventure, and Brain Training',
@@ -30,7 +30,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       'Adventure Mode with 100 levels across 10 themed worlds, boss fights, and progressive difficulty',
       'Brain Training drills: Lightning Round, Rare Gems, Combo Master, Pattern Switcher, Memory Hunt',
       'Party Mode for game nights — play on a shared TV with phones as controllers',
-      'Five language support: English, Hebrew (RTL), Swedish, Japanese, and Spanish',
+      'Five language support: English, Hebrew (RTL), Swedish, Japanese, Spanish, and Russian',
       'No download, no signup — play instantly in any modern browser on phone, tablet, or desktop',
       'Custom avatars, achievements, XP progression, and seasonal leaderboards',
       'Built on peer-reviewed cognitive science — word games improve vocabulary, memory, and processing speed',
@@ -54,7 +54,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'What languages does LexiClash support?',
         answer:
-          'LexiClash supports five languages: English, Hebrew (with full right-to-left support), Swedish, Japanese, and Spanish. Each language has its own validated dictionary, scoring system, and localized UI. You can switch languages at any time from the settings menu.',
+          'LexiClash supports six languages: English, Hebrew (with full right-to-left support), Swedish, Japanese, Spanish, and Russian. Each language has its own validated dictionary, scoring system, and localized UI. You can switch languages at any time from the settings menu.',
       },
       {
         question: 'Can I play LexiClash on my phone?',
@@ -74,7 +74,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'What are the best free online word games in 2026?',
         answer:
-          'LexiClash has five free word games playable in any browser with no download or signup: Classic (real-time Boggle for 2–50 players), Daily Word Wheel (a shared daily puzzle), Word Hunt (a daily word-search challenge), Word Forge (a speed word-building mode), and Blast (a tile-clearing sprint). Five languages, no account required.',
+          'LexiClash has five free word games playable in any browser with no download or signup: Classic (real-time Boggle for 2–50 players), Daily Word Wheel (a shared daily puzzle), Word Hunt (a daily word-search challenge), Word Forge (a speed word-building mode), and Blast (a tile-clearing sprint). Six languages, no account required.',
       },
     ],
   },
@@ -140,7 +140,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
   he: {
     title: 'LexiClash — משחק מילים מרובה משתתפים חינם',
     description:
-      'LexiClash הוא משחק מילים מרובה משתתפים חינמי בעברית שמשלב את חיפוש המילים על לוח אותיות בסגנון בוגל עם משחק תחרותי בזמן אמת בסגנון סקרבל. מצאו מילים על לוח משותף, התחרו ראש בראש מול חברים או יריבים אקראיים, וטפסו בטבלת המובילים — הכל ישירות בדפדפן, בלי הורדה ובלי הרשמה. שחקו בעברית, אנגלית, שוודית, יפנית או ספרדית במגוון מצבי משחק: קלאסי, ציד מילים, בלאסט, גלגל מילים (מילת היום), מצב הרפתקה עם 50+ שלבים, ואימוני מוח לשיפור אוצר מילים, זיכרון ומהירות עיבוד. LexiClash כולל גם מצב מסיבה למשחק קבוצתי על מסך טלוויזיה משותף עם הטלפונים כשלטים.',
+      'LexiClash הוא משחק מילים מרובה משתתפים חינמי בעברית שמשלב את חיפוש המילים על לוח אותיות בסגנון בוגל עם משחק תחרותי בזמן אמת בסגנון סקרבל. מצאו מילים על לוח משותף, התחרו ראש בראש מול חברים או יריבים אקראיים, וטפסו בטבלת המובילים — הכל ישירות בדפדפן, בלי הורדה ובלי הרשמה. שחקו בעברית, אנגלית, שוודית, יפנית, ספרדית או רוסית במגוון מצבי משחק: קלאסי, ציד מילים, בלאסט, גלגל מילים (מילת היום), מצב הרפתקה עם 50+ שלבים, ואימוני מוח לשיפור אוצר מילים, זיכרון ומהירות עיבוד. LexiClash כולל גם מצב מסיבה למשחק קבוצתי על מסך טלוויזיה משותף עם הטלפונים כשלטים.',
     features: [
       'קרבות מילים מרובי משתתפים בזמן אמת — 2 עד 20+ שחקנים על אותו לוח בו-זמנית',
       'שישה מצבי משחק: קלאסי, ציד מילים, בלאסט, גלגל מילים, הרפתקה ואימון מוח',
@@ -148,7 +148,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       'מצב הרפתקה עם 50+ שלבים, קרבות בוסים ורמת קושי עולה',
       'אימוני מוח: סיבוב ברק, אבנים נדירות, מאסטר קומבו, מחליף תבניות וציד זיכרון',
       'מצב מסיבה לערבי משחקים — שחקו על מסך טלוויזיה משותף עם טלפונים כשלטים',
-      'תמיכה בחמש שפות: עברית (RTL מלא), אנגלית, שוודית, יפנית וספרדית',
+      'תמיכה בשש שפות: עברית (RTL מלא), אנגלית, שוודית, יפנית, ספרדית ורוסית',
       'ללא הורדה, ללא הרשמה — שחקו מיד בכל דפדפן מודרני בטלפון, בטאבלט או במחשב',
       'אווטרים מותאמים אישית, הישגים, התקדמות XP וטבלאות מובילים עונתיות',
       'מבוסס על מדע קוגניטיבי — משחקי מילים משפרים אוצר מילים, זיכרון ומהירות עיבוד',
@@ -172,7 +172,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'באילו שפות LexiClash תומך?',
         answer:
-          'LexiClash תומך בחמש שפות: עברית (עם תמיכה מלאה מימין לשמאל), אנגלית, שוודית, יפנית וספרדית. לכל שפה מילון מאומת משלה, שיטת ניקוד משלה, וממשק מתורגם. ניתן להחליף שפה בכל עת מתפריט ההגדרות.',
+          'LexiClash תומך בשש שפות: עברית (עם תמיכה מלאה מימין לשמאל), אנגלית, שוודית, יפנית, ספרדית ורוסית. לכל שפה מילון מאומת משלה, שיטת ניקוד משלה, וממשק מתורגם. ניתן להחליף שפה בכל עת מתפריט ההגדרות.',
       },
       {
         question: 'האם אפשר לשחק ב-LexiClash מהטלפון?',
@@ -192,7 +192,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'מה הם משחקי המילים הטובים ביותר אונליין ב-2026?',
         answer:
-          'לקסיקלאש מציע חמישה משחקי מילים חינמיים שניתן לשחק בכל דפדפן ללא הורדה: קלאסיק (בוגל בזמן אמת ל-2–50 שחקנים), גלגל המילה היומית (פאזל יומי משותף), Word Hunt (חיפוש מילים יומי), Word Forge (בניית מילים בלחץ זמן), ו-Blast (ספרינט ניקוי קוביות). ללא הרשמה, בחמש שפות כולל עברית.',
+          'לקסיקלאש מציע חמישה משחקי מילים חינמיים שניתן לשחק בכל דפדפן ללא הורדה: קלאסיק (בוגל בזמן אמת ל-2–50 שחקנים), גלגל המילה היומית (פאזל יומי משותף), Word Hunt (חיפוש מילים יומי), Word Forge (בניית מילים בלחץ זמן), ו-Blast (ספרינט ניקוי קוביות). ללא הרשמה, בשש שפות כולל עברית.',
       },
     ],
   },
@@ -205,7 +205,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       'Sex spellägen: Klassiskt, Ordjakt, Blast, Ordhjul, Äventyr och Hjärnträning',
       'Daglig Ordhjulsutmaning med globala topplistor',
       'Äventyrsläge med 50+ nivåer och stigande svårighetsgrad',
-      'Fem språk: engelska, hebreiska, svenska, japanska och spanska',
+      'Sex språk: engelska, hebreiska, svenska, japanska, spanska och ryska',
       'Ingen nedladdning — spela direkt i valfri modern webbläsare',
     ],
     faq: [
@@ -232,7 +232,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'Vilka är de bästa gratis ordspelen online 2026?',
         answer:
-          'LexiClash erbjuder fem gratis ordspel som spelas direkt i webbläsaren utan nedladdning: Classic (Boggle i realtid för 2–50 spelare), Dagligt Ordhjul (ett dagligt delat ordpussel), Word Hunt (daglig ordsökning), Word Forge (snabbt ordbyggarläge) och Blast (sprintläge med brickrensning). Inget konto krävs, tillgängligt på fem språk inklusive svenska.',
+          'LexiClash erbjuder fem gratis ordspel som spelas direkt i webbläsaren utan nedladdning: Classic (Boggle i realtid för 2–50 spelare), Dagligt Ordhjul (ett dagligt delat ordpussel), Word Hunt (daglig ordsökning), Word Forge (snabbt ordbyggarläge) och Blast (sprintläge med brickrensning). Inget konto krävs, tillgängligt på sex språk inklusive svenska.',
       },
     ],
   },
@@ -245,7 +245,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       '6つのゲームモード：クラシック、ワードハント、ブラスト、ワードホイール、アドベンチャー、脳トレ',
       'デイリーワードホイールチャレンジとグローバルリーダーボード',
       'アドベンチャーモード：50以上のレベルとプログレッシブ難易度',
-      '5言語対応：英語、ヘブライ語、スウェーデン語、日本語、スペイン語',
+      '6言語対応：英語、ヘブライ語、スウェーデン語、日本語、スペイン語、ロシア語',
       'ダウンロード不要 — 任意のモダンブラウザで即座にプレイ',
     ],
     faq: [
@@ -272,7 +272,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: '2026年のおすすめ無料オンラインワードゲームは？',
         answer:
-          'LexiClashはダウンロード・登録不要でブラウザから無料プレイできる5つのワードゲームを提供しています。Classic（2〜50人リアルタイムBoggle）、デイリーワードホイール（毎日更新の共有パズル）、ワードハント（毎日の単語探し）、ワードフォージ（制限時間内の単語構築）、Blast（タイルクリアスプリント）。日本語を含む5言語対応。',
+          'LexiClashはダウンロード・登録不要でブラウザから無料プレイできる5つのワードゲームを提供しています。Classic（2〜50人リアルタイムBoggle）、デイリーワードホイール（毎日更新の共有パズル）、ワードハント（毎日の単語探し）、ワードフォージ（制限時間内の単語構築）、Blast（タイルクリアスプリント）。日本語を含む6言語対応。',
       },
     ],
   },
@@ -285,7 +285,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       'Seis modos de juego: Clásico, Caza de Palabras, Blast, Rueda de Palabras, Aventura y Entrenamiento Cerebral',
       'Desafío diario de Rueda de Palabras con tablas de clasificación globales',
       'Modo Aventura con más de 50 niveles y dificultad progresiva',
-      'Cinco idiomas: inglés, hebreo, sueco, japonés y español',
+      'Seis idiomas: inglés, hebreo, sueco, japonés, español y ruso',
       'Sin descarga — juega directamente en cualquier navegador moderno',
     ],
     faq: [
@@ -312,7 +312,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: '¿Cuáles son los mejores juegos de palabras gratuitos en línea en 2026?',
         answer:
-          'LexiClash ofrece cinco juegos de palabras gratuitos que se juegan en el navegador sin descargas: Classic (Boggle en tiempo real para 2–50 jugadores), Rueda de Palabras Diaria (puzzle diario compartido), Word Hunt (búsqueda de palabras diaria), Word Forge (construcción rápida de palabras) y Blast (sprint de limpieza de fichas). Sin registro, en cinco idiomas incluyendo español.',
+          'LexiClash ofrece cinco juegos de palabras gratuitos que se juegan en el navegador sin descargas: Classic (Boggle en tiempo real para 2–50 jugadores), Rueda de Palabras Diaria (puzzle diario compartido), Word Hunt (búsqueda de palabras diaria), Word Forge (construcción rápida de palabras) y Blast (sprint de limpieza de fichas). Sin registro, en seis idiomas incluyendo español.',
       },
     ],
   },

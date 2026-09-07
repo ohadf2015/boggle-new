@@ -1,0 +1,132 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/games-for-teachers#page",
+  "name": "Juegos gratis para maestros — Sin preparación, análisis | LexiClash",
+  "description": "Juegos de palabras gratis para aulas. Sin preparación, tus listas, sigue el progreso. 5 minutos, descanso o día de sustituto. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/games-for-teachers",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/games-for-teachers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Juegos gratis para maestros",
+      "item": "https://www.lexiclash.live/es/education/games-for-teachers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/games-for-teachers#resource",
+  "name": "Juegos gratis para maestros — Sin preparación, análisis | LexiClash",
+  "description": "Juegos de palabras gratis para aulas. Sin preparación, tus listas, sigue el progreso. 5 minutos, descanso o día de sustituto. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/games-for-teachers",
+  "inLanguage": "es",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Formative Assessment",
+    "Vocabulary Building",
+    "Brain Break",
+    "Substitute Teacher Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/games-for-teachers#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Qué juegos hay?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Boggle (busca en rejilla), Rueda (forma de rueda), Caza (encuentra ocultas). Todos: vocabulario, patrones, ortografía en tiempo real."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánta preparación?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cero. Cuenta gratis, elige o carga lista, comparte código, juega. Sin planes ni hojas. Funciona en todo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Mis listas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. CSV o incorporadas o ambas. Bloquea por tema, reutiliza años."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Sigo progreso?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Panel en tiempo real: puntuaciones, precisión, velocidad. Descargas reportes. Sin calificar manual."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Maestro sustituto?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Claro. Comparte código, ellos juegan, ves todo en tu panel. Cero preparación esos días."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Chromebook o hardware?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Cualquier dispositivo. Funciona hasta con WiFi deficiente."
+      }
+    }
+  ]
+}

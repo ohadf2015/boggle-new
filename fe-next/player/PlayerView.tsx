@@ -84,6 +84,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   onUsernameChange,
   seriesRoundNumber,
   onExitToLobby,
+  isClassroomMode,
+  classroomGameMode,
 }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
@@ -710,6 +712,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           isReady={isReady}
           onToggleReady={toggleReady}
           readyInFlight={readyInFlight}
+          isClassroomMode={isClassroomMode}
+          classroomGameMode={classroomGameMode}
         />
     );
   }

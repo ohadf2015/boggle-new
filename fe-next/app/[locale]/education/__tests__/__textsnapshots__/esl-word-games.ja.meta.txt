@@ -1,0 +1,55 @@
+{
+  "title": "教室向け英語単語ゲーム — 先生主導、6言語 | LexiClash",
+  "description": "クラス全体で走らせる英語の単語ゲーム。生徒は6文字のコードでスマホから参加し、盤はプロジェクターに映り、先生が生徒ごとにサポート・コア・チャレンジを設定します。6言語、生徒アカウント不要。",
+  "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ja/education/esl-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "es": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/esl-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/esl-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/esl-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/esl-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/esl-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/esl-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/esl-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/esl-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/esl-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/esl-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/esl-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/esl-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/esl-word-games"
+  },
+  "ogTitle": "教室向け英語単語ゲーム",
+  "ogDescription": "英語学習者向けマルチプレイヤーゲーム。無料、6つの辞書、先生用ダッシュボード。",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/esl-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "教室向け英語単語ゲーム"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "教室向け英語単語ゲーム",
+  "twDescription": "教室向け無料マルチプレイヤー英語ゲーム。",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

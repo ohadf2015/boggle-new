@@ -250,8 +250,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
           </div>
 
           <p className="text-sm text-gray-500 mb-6">
-            {t('customPuzzle.challengeDescription') ||
-              'Find the hidden word before time runs out. Can you beat the creator?'}
+            {t('customPuzzle.challengeDescription', 'Find the hidden word before time runs out. Can you beat the creator?')}
           </p>
 
           <Button

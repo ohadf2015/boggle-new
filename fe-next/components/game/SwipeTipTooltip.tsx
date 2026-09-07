@@ -11,7 +11,7 @@ const AUTO_DISMISS_MS = 8000; // 8 seconds
 interface SwipeTipTooltipProps {
   isVisible: boolean;
   onDismiss: () => void;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
   dir?: 'ltr' | 'rtl';
   /** Locale for example word/grid. Defaults to 'en'. */
   language?: string;
@@ -213,8 +213,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
 
               {/* Description */}
               <p className="text-neo-black/80 text-xs leading-relaxed mb-3">
-                {t('guidance.swipeTip.text') ||
-                  'Drag your finger across letters to form words. Connect adjacent letters in any direction!'}
+                {t('guidance.swipeTip.text', 'Drag your finger across letters to form words. Connect adjacent letters in any direction!')}
               </p>
 
               {/* Interactive Demo Grid */}

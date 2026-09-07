@@ -139,6 +139,23 @@ export function ClassroomSetupStep({
       isLoading={isStarting}
     >
       <div className="space-y-6">
+        {/* What is about to happen, in the same words the students will see.
+            Reusing one lesson across several classes is intended, so the pair
+            is the only thing that identifies this game — showing it here lets a
+            teacher catch a wrong pairing BEFORE thirty students are looking at
+            it, which is how the original report started. */}
+        {selectedClassroom && selectedLessons.length > 0 && (
+          <p
+            data-testid="classroom-lesson-summary"
+            className="rounded-neo border-neo border-neo-cyan bg-neo-navy/60 px-4 py-3 font-neo-body font-bold text-neo-white"
+          >
+            {t('education.classroomGame.classroomLessonLabel', {
+              classroom: selectedClassroom.name,
+              lesson: selectedLessons.map((l) => l.name).join(', '),
+            })}
+          </p>
+        )}
+
         {/* Classroom Selection */}
         <div>
           <label className="block text-neo-white font-bold mb-3">

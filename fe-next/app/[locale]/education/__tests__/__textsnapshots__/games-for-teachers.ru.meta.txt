@@ -1,0 +1,55 @@
+{
+  "title": "Бесплатные словесные игры для учителей — Без подготовки, аналитика | LexiClash",
+  "description": "Словесные игры для класса. Без подготовки, ваши списки, отслеживание успеха. 5 минут, перерыв или день замены. Бесплатный старт.",
+  "keywords": "word games for teachers, vocabulary games for teachers, classroom games for teachers, teacher word games, free games for teachers, classroom activities for teachers, no-prep classroom games, sub day word games, brain break word games, teacher vocabulary tools",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/games-for-teachers",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "he": "https://www.lexiclash.live/he/education/games-for-teachers",
+    "en": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "sv": "https://www.lexiclash.live/sv/education/games-for-teachers",
+    "ja": "https://www.lexiclash.live/ja/education/games-for-teachers",
+    "es": "https://www.lexiclash.live/es/education/games-for-teachers",
+    "ru": "https://www.lexiclash.live/ru/education/games-for-teachers",
+    "en-IL": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "he-IL": "https://www.lexiclash.live/he/education/games-for-teachers",
+    "en-US": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "es-US": "https://www.lexiclash.live/es/education/games-for-teachers",
+    "en-GB": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "en-SE": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "sv-SE": "https://www.lexiclash.live/sv/education/games-for-teachers",
+    "en-JP": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "ja-JP": "https://www.lexiclash.live/ja/education/games-for-teachers",
+    "en-ES": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "es-ES": "https://www.lexiclash.live/es/education/games-for-teachers",
+    "en-MX": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "es-MX": "https://www.lexiclash.live/es/education/games-for-teachers",
+    "en-AU": "https://www.lexiclash.live/en/education/games-for-teachers",
+    "es-AR": "https://www.lexiclash.live/es/education/games-for-teachers",
+    "es-CO": "https://www.lexiclash.live/es/education/games-for-teachers",
+    "ru-RU": "https://www.lexiclash.live/ru/education/games-for-teachers"
+  },
+  "ogTitle": "Бесплатные словесные игры для учителей",
+  "ogDescription": "Для учителя с 5 минутами в классе и 30 учениками, которых нужно развлечь.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/games-for-teachers",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Бесплатные словесные игры для учителей"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Бесплатные словесные игры для учителей",
+  "twDescription": "Бесплатные игры. Выбери список, ученики играют. Панель отслеживает. Без подготовки.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}
