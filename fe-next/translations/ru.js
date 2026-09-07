@@ -1598,6 +1598,17 @@ const ru = {
       "unpluggedReteachPrev": "Назад",
       "unpluggedReteachProgress": "Слово {{current}} из {{total}}"
     },
+    "classroomAddon": {
+      "eyebrow": "Google Classroom Marketplace",
+      "title": "Назначить Unplugged reteach",
+      "subtitle": "Одним кликом опубликуйте печатное ДЗ + Live-ссылку в ленту Classroom. Только слова класса — без имён учеников.",
+      "lessonLabel": "Название урока",
+      "missedWordsLabel": "Пропущенные слова (через запятую)",
+      "privacyNote": "Без импорта списков. Без имён учеников. Публикация через диалог Google — мы не видим, какой класс вы выбрали.",
+      "postToStream": "Опубликовать Unplugged в ленту Classroom",
+      "openUnplugged": "Открыть Unplugged Live",
+      "needMissedWords": "Добавьте хотя бы одно пропущенное слово, чтобы включить назначение."
+    },
     "nav": {
       "section": "Учителям",
       "forTeachers": "Для учителей",

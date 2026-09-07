@@ -13268,6 +13268,17 @@ const he = {
       "unpluggedReteachPrev": "הקודם",
       "unpluggedReteachProgress": "מילה {{current}} מתוך {{total}}"
     },
+    "classroomAddon": {
+      "eyebrow": "Google Classroom Marketplace",
+      "title": "שיבוץ Unplugged לרענון",
+      "subtitle": "פרסום בלחיצה אחת של דף תרגול להדפסה + קישור Live לזרם Classroom. מילים ברמת הכיתה בלבד — בלי שמות תלמידים.",
+      "lessonLabel": "שם השיעור",
+      "missedWordsLabel": "מילים שפספסו (מופרדות בפסיקים)",
+      "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. הפרסום דרך דיאלוג Google — אנחנו לא רואים איזו כיתה נבחרה.",
+      "postToStream": "פרסם משימת Unplugged לזרם Classroom",
+      "openUnplugged": "פתח Unplugged Live",
+      "needMissedWords": "הוסיפו לפחות מילה אחת שפספסו כדי להפעיל שיבוץ בלחיצה."
+    },
     "nav": {
       "section": "מורים",
       "forTeachers": "למורים",

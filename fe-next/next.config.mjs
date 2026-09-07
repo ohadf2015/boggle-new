@@ -508,7 +508,7 @@ const nextConfig = {
       // frame-ancestors block below. Browsers enforce the INTERSECTION of all
       // CSP frame-ancestors, so embed must receive exactly ONE (permissive) CSP.
       {
-        source: '/:path((?!(?:en|he|sv|ja|es|ru)/embed/).*)',
+        source: '/:path((?!(?:en|he|sv|ja|es|ru)/(?:embed/|education/classroom-addon)).*)',
         headers: [
           // Block indexing for preview/staging environments via X-Robots-Tag header
           ...(isPreviewEnvironment ? [{
@@ -556,6 +556,32 @@ const nextConfig = {
               ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://html5.api.gamedistribution.com https://*.gamedistribution.com https://*.posthog.com https://eu.i.posthog.com https://growthradar.app https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.gamedistribution.com https://*.posthog.com https://eu.i.posthog.com https://growthradar.app https://accounts.google.com/gsi/ wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://*.gamedistribution.com https://accounts.google.com/gsi/; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com https://feedback-devtools.com https://www.feedback-devtools.com;"
               // Default: SDK auto-detection enabled — allow CrazyGames SDK script + ads + iframe embedding
               : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://cdn.jsdelivr.net https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://html5.api.gamedistribution.com https://*.gamedistribution.com https://*.posthog.com https://eu.i.posthog.com https://growthradar.app https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.gamedistribution.com https://*.posthog.com https://eu.i.posthog.com https://growthradar.app https://accounts.google.com/gsi/ wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://*.gamedistribution.com https://accounts.google.com/gsi/; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com https://feedback-devtools.com https://www.feedback-devtools.com;",
+          },
+        ],
+      },
+      // Google Classroom Marketplace add-on iframes (Attachment Discovery + views).
+      // Excluded from the global restrictive frame-ancestors so Classroom can embed.
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/education/classroom-addon',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.posthog.com https://eu.i.posthog.com; frame-src 'self' https://classroom.google.com; frame-ancestors 'self' https://classroom.google.com https://*.classroom.google.com;",
+          },
+        ],
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/education/classroom-addon/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.posthog.com https://eu.i.posthog.com; frame-src 'self' https://classroom.google.com; frame-ancestors 'self' https://classroom.google.com https://*.classroom.google.com;",
           },
         ],
       },

@@ -13406,6 +13406,17 @@ const es = {
       "unpluggedReteachPrev": "Anterior",
       "unpluggedReteachProgress": "Palabra {{current}} de {{total}}"
     },
+    "classroomAddon": {
+      "eyebrow": "Marketplace de Google Classroom",
+      "title": "Asignar reteach Unplugged",
+      "subtitle": "Publica en un clic la tarea imprimible + enlace Live en el tablón de Classroom. Solo palabras de clase — sin nombres de alumnos.",
+      "lessonLabel": "Nombre de la lección",
+      "missedWordsLabel": "Palabras falladas (separadas por comas)",
+      "privacyNote": "Sin importar listas. Sin nombres de alumnos. La publicación usa el diálogo de Google — nunca vemos qué clase eliges.",
+      "postToStream": "Publicar Unplugged en el tablón de Classroom",
+      "openUnplugged": "Abrir Unplugged Live",
+      "needMissedWords": "Añade al menos una palabra fallada para activar la asignación."
+    },
     "nav": {
       "section": "Docentes",
       "forTeachers": "Para docentes",
