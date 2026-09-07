@@ -64,6 +64,12 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
      */
     @Override
     protected void load() {
+        // Staleness probe BEFORE the bridge navigates: LOAD_CACHE_ELSE_NETWORK
+        // never revalidates, so without this the WebView would keep serving
+        // whatever build is cached — even long after a new deploy shipped.
+        // Fail-open: offline or slow probe adds nothing to cold start.
+        BuildWatchdog.Result watchdog = BuildWatchdog.probe(this);
+
         super.load();
         WebView webView = getBridge() != null ? getBridge().getWebView() : null;
         if (webView == null) return;
@@ -74,6 +80,29 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         // which is uncached and paints Chromium's stock interstitial offline.
         webView.setSaveEnabled(false);
         getBridge().setWebViewClient(new OfflineAwareWebViewClient(getBridge()));
+
+        // Remote-URL Capacitor app: server.url is already being loaded. When
+        // the watchdog says the cache holds an older build than the server
+        // serves, drop the in-flight navigation and reload from the network
+        // so THIS launch gets the new build (only on deploy boundaries).
+        String serverUrl = webView.getUrl();
+        if (watchdog.stale && serverUrl != null && serverUrl.contains("lexiclash.live")) {
+            android.util.Log.i("MainActivity", "stale web build detected — clearing cache and reloading");
+            try {
+                webView.stopLoading();
+            } catch (Throwable ignored) {
+                // never let stopLoading mask the reload
+            }
+            webView.clearCache(true);
+            final String freshUrl = serverUrl;
+            webView.post(() -> {
+                try {
+                    webView.loadUrl(freshUrl);
+                } catch (Throwable t) {
+                    android.util.Log.w("MainActivity", "watchdog reload failed: " + t.getMessage());
+                }
+            });
+        }
 
         if (!isNetworkAvailable()) {
             String errorUrl = getBridge().getErrorUrl();
