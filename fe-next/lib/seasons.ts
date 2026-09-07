@@ -140,6 +140,25 @@ function catalogForSeason(id: number): SeasonCatalogEntry {
   return SEASON_CATALOG[index];
 }
 
+/** Everything that makes a season LOOK like itself (theme, accent, skin, twist, art). */
+export type SeasonIdentity = SeasonCatalogEntry;
+
+/** The catalog identity for a season id (cycles the catalog for future seasons). */
+export function getSeasonIdentity(id: number): SeasonIdentity {
+  return { ...catalogForSeason(id) };
+}
+
+/**
+ * Whole days + hours until `end`. `ended` is true once `end` has passed, so a
+ * past season reads "over" rather than "0d 0h".
+ */
+export function seasonEndsIn(end: Date, now: Date = new Date()): { days: number; hours: number; ended: boolean } {
+  const totalMs = end.getTime() - now.getTime();
+  if (totalMs <= 0) return { days: 0, hours: 0, ended: true };
+  const totalHours = Math.floor(totalMs / (1000 * 60 * 60));
+  return { days: Math.floor(totalHours / 24), hours: totalHours % 24, ended: false };
+}
+
 /** The twist (flavor + atmosphere) for a given season id. */
 export function getSeasonTwist(id: number): SeasonTwist {
   return catalogForSeason(id).twist;

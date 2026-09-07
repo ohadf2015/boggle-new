@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
-import { getGuestFingerprint } from '@/utils/guestManager';
+import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
@@ -80,8 +80,14 @@ export function DailyChallengeLanding({
   const [wordTowerPlayed, setWordTowerPlayed] = useState(false);
 
   useEffect(() => {
-    setGuestFingerprint(getGuestFingerprint());
+    // Daily guest identity — the fingerprint the daily games record guests
+    // under, so the hub board highlights a guest's own row after they play.
+    let cancelled = false;
+    getGuestFingerprint().then((fp) => {
+      if (!cancelled) setGuestFingerprint(fp || null);
+    });
     setTodayIso(new Date().toISOString().split('T')[0]);
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import { normalizeHebrewWord } from '../../../shared/utils/wordNormalization';
 import { isDictionaryWord } from '../../dictionary';
 import { isWordCommunityValid } from '../../modules/communityWordManager';
 import { COIN_COSTS } from '../../../utils/coinManager';
-import { VALID_LANGUAGES, ValidLanguage } from './types';
+import { VALID_LANGUAGES, ValidLanguage, ALL_LANGUAGES_SCOPE, type LeaderboardLanguageScope } from './types';
 
 /**
  * Normalize a word for comparison based on language.
@@ -55,6 +55,26 @@ export function isValidDateFormat(date: string): boolean {
  */
 export function isValidLanguage(language: string): language is ValidLanguage {
   return VALID_LANGUAGES.includes(language as ValidLanguage);
+}
+
+/**
+ * Validate a leaderboard language scope: a concrete language OR `all`.
+ */
+export function isLeaderboardLanguageScope(language: string): language is LeaderboardLanguageScope {
+  return language === ALL_LANGUAGES_SCOPE || isValidLanguage(language);
+}
+
+/**
+ * Apply the per-language filter unless the caller asked for the global (`all`)
+ * board. Every daily-board query — the ranked rows AND the count queries —
+ * must go through this so the header numbers describe the same population as
+ * the list.
+ */
+export function withLanguageScope<T extends { eq(column: string, value: string): T }>(
+  query: T,
+  language: LeaderboardLanguageScope,
+): T {
+  return language === ALL_LANGUAGES_SCOPE ? query : query.eq('language', language);
 }
 
 /**
