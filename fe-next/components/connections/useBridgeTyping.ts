@@ -9,6 +9,7 @@ import {
   bridgeSlotCount,
   normalizeTypedChar,
 } from '@/lib/connections/keyboard';
+import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface BridgeTypingOptions {
   /** Current guess buffer (base letters). */
@@ -60,6 +61,12 @@ export function useBridgeTyping({
   useEffect(() => {
     if (needsIME || disabled) return;
     const onKeyDown = (e: KeyboardEvent) => {
+      // Connections was the one game keyboard handler missed by the #840
+      // sweep: no typing-target guard, so with a game mounted every keystroke
+      // aimed at the feedback widget / chat / any input was eaten (and
+      // Backspace hijacked). composedPath() pierces shadow roots — see
+      // lib/dom/isTypingTarget.ts.
+      if (isTypingTarget(e)) return;
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.key === 'Enter') {
         if (inputRef.current.trim().length > 0) {

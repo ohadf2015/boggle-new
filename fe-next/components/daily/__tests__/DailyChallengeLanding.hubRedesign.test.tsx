@@ -54,6 +54,14 @@ vi.mock('framer-motion', async () => {
       div: ({ children, className, style, ...props }: React.ComponentProps<'div'>) => (
         <div className={className} style={style} {...props}>{children}</div>
       ),
+      // The Connections quest card (public since 2026-09-07) renders m.a —
+      // the mock needs every motion element the hub's card family can touch.
+      a: ({ children, className, style, ...props }: React.ComponentProps<'a'>) => (
+        <a className={className} style={style} {...props}>{children}</a>
+      ),
+      span: ({ children, className, ...props }: React.ComponentProps<'span'>) => (
+        <span className={className} {...props}>{children}</span>
+      ),
     },
   };
 });
