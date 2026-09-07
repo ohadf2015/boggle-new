@@ -15,11 +15,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es${PAGE_PATH}`;
   return {
     title: 'Juegos de Vocabulario para el Aula - Gratis, Sin Registro | LexiClash',
-    description: 'Juegos de palabras educativos gratis para el aula. Duelos de vocabulario 1v1, juego de aula en vivo, sin registro de estudiantes. Soporta 5 idiomas, alineado con el currículo, funciona en cualquier navegador.',
+    description: 'Juegos de palabras educativos gratis para el aula. Duelos de vocabulario 1v1, juego de aula en vivo, sin registro de estudiantes. Soporta 6 idiomas, alineado con el currículo, funciona en cualquier navegador.',
     keywords: 'juegos de vocabulario para el aula, juegos de palabras educativos, juegos de vocabulario gratis, juegos de palabras para el aula, juegos de vocabulario online, juegos de palabras para profesores, juegos de palabras para estudiantes, vocabulario para el aula, juegos educativos sin registro, actividades de vocabulario',
     openGraph: {
       title: 'Juegos de Vocabulario para el Aula - Gratis | LexiClash',
-      description: 'Sin registro, 5 idiomas, juego instantáneo en navegador. Multijugador en vivo + duelos 1v1 para cualquier aula.',
+      description: 'Sin registro, 6 idiomas, juego instantáneo en navegador. Multijugador en vivo + duelos 1v1 para cualquier aula.',
       locale: 'es_ES',
       type: 'website',
       url: pageUrl,
@@ -48,13 +48,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const faqs = [
-  { q: '¿Cuáles son los mejores juegos de vocabulario gratis para el aula?', a: 'LexiClash está diseñado específicamente para aulas: los estudiantes se unen con un código de 6 caracteres (sin registro), el profesor elige una lista de palabras, y toda la clase juega multijugador en vivo durante 5-10 minutos. Funciona en cualquier navegador y soporta español, inglés, hebreo, sueco y japonés — útil para clases ESL e inmersión bilingüe.' },
+  { q: '¿Cuáles son los mejores juegos de vocabulario gratis para el aula?', a: 'LexiClash está diseñado específicamente para aulas: los estudiantes se unen con un código de 6 caracteres (sin registro), el profesor elige una lista de palabras, y toda la clase juega multijugador en vivo durante 5-10 minutos. Funciona en cualquier navegador y soporta español, inglés, hebreo, sueco, japonés y ruso — útil para clases ESL e inmersión bilingüe.' },
   { q: '¿Necesitan los estudiantes crear cuentas?', a: 'No. Los estudiantes introducen un código de 6 caracteres que el profesor muestra y juegan al instante. Solo los profesores crean cuentas (gratis) para guardar listas de palabras y ver paneles de progreso.' },
   { q: '¿Puedo importar mi propia lista de vocabulario?', a: 'Sí. Los profesores pueden subir listas personalizadas de cualquier unidad, libro de texto o currículo. Úsalas en duelos 1v1, juegos de palabras para toda la clase o práctica asignada.' },
   { q: '¿En qué se diferencia de Quizlet, Kahoot o Wordwall?', a: 'Esas herramientas se basan en tarjetas didácticas o cuestionarios. LexiClash es un juego de formación de palabras: los estudiantes buscan palabras en una cuadrícula estilo Boggle, rueda de letras desordenadas o tablero de anagramas. Mejor para ortografía, recuerdo y reconocimiento de patrones que los cuestionarios de opción múltiple. Además, sin cuentas de estudiante y nivel gratuito completo.' },
   { q: '¿Cuánto dura una sesión de aula?', a: 'Un duelo de vocabulario 1v1 dura 2-3 minutos. Una ronda multijugador para toda la clase dura 5-10 minutos. La mayoría de los profesores lo usan como calentamiento de 5 minutos, descanso mental a mitad de lección o repaso al final de la clase.' },
   { q: '¿Es adecuado para primaria, secundaria o bachillerato?', a: 'Para los tres. La dificultad, el límite de tiempo y la lista de palabras se configuran por sesión. Los estudiantes más jóvenes juegan con palabras más cortas y listas más fáciles; los de bachillerato pueden ejecutar duelos de vocabulario avanzado cronometrados.' },
-  { q: '¿Funciona para clases ESL o programas bilingües?', a: 'Sí — cinco diccionarios integrados (español, inglés, hebreo con RTL, sueco, japonés) hacen de LexiClash una opción sólida para ESL/EFL, programas bilingües español-inglés y aulas multilingües. Los estudiantes practican ortografía y recuerdo en su idioma objetivo.' },
+  { q: '¿Funciona para clases ESL o programas bilingües?', a: 'Sí — seis diccionarios integrados (español, inglés, hebreo con RTL, sueco, japonés) hacen de LexiClash una opción sólida para ESL/EFL, programas bilingües español-inglés, ruso y aulas multilingües. Los estudiantes practican ortografía y recuerdo en su idioma objetivo.' },
   { q: '¿Puedo seguir qué palabras dominaron los estudiantes?', a: 'Sí. El panel del profesor muestra precisión por estudiante, palabras perdidas y patrones de toda la clase (qué palabras hicieron tropezar a más estudiantes). Úsalo para evaluación formativa.' },
 ];
 
@@ -64,7 +64,7 @@ const features = [
   { icon: '👥', text: 'Multijugador en vivo hasta 30 estudiantes por sesión' },
   { icon: '⚔️', text: 'Duelos de vocabulario 1v1 para práctica en parejas o rondas de subgrupo' },
   { icon: '📚', text: 'Sube tus propias listas de vocabulario del currículo — cualquier unidad, materia' },
-  { icon: '🌍', text: 'Cinco idiomas: español, inglés, hebreo (RTL), sueco, japonés' },
+  { icon: '🌍', text: 'Seis idiomas: español, inglés, hebreo (RTL), sueco, japonés, ruso' },
   { icon: '📊', text: 'Panel del profesor: precisión por estudiante + patrones de palabras perdidas' },
   { icon: '💸', text: 'Nivel gratuito cubre todo — sin venta adicional premium' },
 ];
@@ -131,14 +131,14 @@ export default async function Page({ params }: PageProps) {
         <section className="grid items-center gap-10 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-              ★ Para Profesores ★ Gratis Para Siempre ★
+              ★ Para Profesores ★ Empieza Gratis ★
             </span>
             <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
               Juegos de <span className="inline-block rotate-[-2deg] bg-neo-lime px-3 text-neo-navy shadow-hard">Vocabulario</span>
               <br />para el Aula. <span className="text-neo-pink">Gratis.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              El juego de vocabulario que los profesores realmente usan. Multijugador en vivo, duelos 1v1, tus listas de palabras, cinco idiomas — y los estudiantes nunca necesitan una cuenta.
+              El juego de vocabulario que los profesores realmente usan. Multijugador en vivo, duelos 1v1, tus listas de palabras, seis idiomas — y los estudiantes nunca necesitan una cuenta.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">

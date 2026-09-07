@@ -62,7 +62,7 @@ export function InsightsPanel() {
   if (!data) {
     return (
       <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
-        <p className="text-neo-white text-xs">{t('admin.noData') || 'No data available'}</p>
+        <p className="text-neo-white text-xs">{t('admin.noData', 'No data available')}</p>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export function InsightsPanel() {
       <div className="flex items-center justify-between">
         <h2 className="text-neo-white font-bold text-base uppercase tracking-wider flex items-center gap-2">
           <Rocket className="w-5 h-5 text-neo-pink" />
-          {t('admin.insights.title') || 'Insights'}
+          {t('admin.insights.title', 'Insights')}
         </h2>
         <div className="flex gap-1">
           {[30, 90, 365].map(d => (
@@ -92,7 +92,7 @@ export function InsightsPanel() {
                 days === d ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-elevated text-neo-white hover:bg-slate-600'
               )}
             >
-              {d === 365 ? t('admin.insights.allTime') || '1y' : `${d}d`}
+              {d === 365 ? t('admin.insights.allTime', '1y') : `${d}d`}
             </button>
           ))}
         </div>
@@ -101,28 +101,28 @@ export function InsightsPanel() {
       {/* Records / deltas — the dopamine strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
-          <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">{t('admin.insights.gamesToday') || 'Games today'}</p>
+          <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">{t('admin.insights.gamesToday', 'Games today')}</p>
           <p className="text-neo-white font-bold text-3xl tabular-nums">{data.records.today.toLocaleString()}</p>
           <p className={cn('text-xs font-bold flex items-center gap-1 mt-1', deltaColor)}>
             <DeltaIcon className="w-3.5 h-3.5" />
-            {delta.pct === null ? t('admin.insights.vsYesterdayNew') || 'vs 0 yesterday' : `${delta.pct > 0 ? '+' : ''}${delta.pct}% ${t('admin.insights.vsYesterday') || 'vs yesterday'}`}
+            {delta.pct === null ? t('admin.insights.vsYesterdayNew', 'vs 0 yesterday') : `${delta.pct > 0 ? '+' : ''}${delta.pct}% ${t('admin.insights.vsYesterday', 'vs yesterday')}`}
           </p>
         </div>
         <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
           <p className="text-slate-400 text-xs uppercase tracking-wider mb-1 flex items-center gap-1">
-            <Trophy className="w-3.5 h-3.5 text-neo-yellow" />{t('admin.insights.bestDayEver') || 'Best day ever'}
+            <Trophy className="w-3.5 h-3.5 text-neo-yellow" />{t('admin.insights.bestDayEver', 'Best day ever')}
           </p>
           <p className="text-neo-white font-bold text-3xl tabular-nums">{data.records.bestDayGames.toLocaleString()}</p>
           <p className="text-slate-400 text-xs mt-1">{data.records.bestDay ?? '—'}</p>
         </div>
         <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
           <p className="text-slate-400 text-xs uppercase tracking-wider mb-1 flex items-center gap-1">
-            <Flame className="w-3.5 h-3.5 text-neo-orange" />{t('admin.insights.fastestGrowing') || 'Fastest-growing mode'}
+            <Flame className="w-3.5 h-3.5 text-neo-orange" />{t('admin.insights.fastestGrowing', 'Fastest-growing mode')}
           </p>
           {data.records.fastestMode ? (
             <>
               <p className="text-neo-white font-bold text-2xl truncate">{t(MODE_LABEL[data.records.fastestMode]) || data.records.fastestMode}</p>
-              <p className="text-neo-lime text-xs font-bold mt-1">+{data.records.fastestPct}% {t('admin.insights.thisWeek') || 'this week'}</p>
+              <p className="text-neo-lime text-xs font-bold mt-1">+{data.records.fastestPct}% {t('admin.insights.thisWeek', 'this week')}</p>
             </>
           ) : (
             <p className="text-slate-400 text-sm mt-2">—</p>
@@ -132,10 +132,10 @@ export function InsightsPanel() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Day of week */}
-        <Card title={t('admin.insights.byDayOfWeek') || 'Busiest day'} icon={CalendarDays}>
+        <Card title={t('admin.insights.byDayOfWeek', 'Busiest day')} icon={CalendarDays}>
           {peakDow !== null && (
             <p className="text-neo-white text-sm mb-3">
-              🔥 <span className="font-bold text-neo-lime">{t(`admin.insights.dow.${DOW_KEYS[peakDow]}`) || DOW_KEYS[peakDow]}</span> {t('admin.insights.isPeakDay') || 'is your peak day'}
+              🔥 <span className="font-bold text-neo-lime">{t(`admin.insights.dow.${DOW_KEYS[peakDow]}`) || DOW_KEYS[peakDow]}</span> {t('admin.insights.isPeakDay', 'is your peak day')}
             </p>
           )}
           <div className="flex items-end justify-between gap-1.5 h-28">
@@ -154,10 +154,10 @@ export function InsightsPanel() {
         </Card>
 
         {/* Hour of day */}
-        <Card title={t('admin.insights.byHour') || 'Busiest hour (UTC)'} icon={Clock}>
+        <Card title={t('admin.insights.byHour', 'Busiest hour (UTC)')} icon={Clock}>
           {peakHour !== null && (
             <p className="text-neo-white text-sm mb-3">
-              ⏰ <span className="font-bold text-neo-cyan">{String(peakHour).padStart(2, '0')}:00 UTC</span> {t('admin.insights.isPeakHour') || 'is your peak hour'}
+              ⏰ <span className="font-bold text-neo-cyan">{String(peakHour).padStart(2, '0')}:00 UTC</span> {t('admin.insights.isPeakHour', 'is your peak hour')}
             </p>
           )}
           <div className="flex items-end justify-between gap-px h-28">
@@ -177,7 +177,7 @@ export function InsightsPanel() {
         </Card>
 
         {/* Mode affinity */}
-        <Card title={t('admin.insights.crossPlay') || 'Players who play X also play Y'} icon={Share2}>
+        <Card title={t('admin.insights.crossPlay', 'Players who play X also play Y')} icon={Share2}>
           <div className="space-y-2">
             {data.modeAffinity.slice(0, 6).map((a, i) => (
               <div key={`${a.fromMode}-${a.toMode}-${i}`} className="flex items-center gap-2 text-xs">
@@ -190,13 +190,13 @@ export function InsightsPanel() {
                 <span className="text-neo-white w-20 truncate">{t(MODE_LABEL[a.toMode]) || a.toMode}</span>
               </div>
             ))}
-            {data.modeAffinity.length === 0 && <p className="text-slate-400 text-xs">{t('admin.noData') || 'No data available'}</p>}
+            {data.modeAffinity.length === 0 && <p className="text-slate-400 text-xs">{t('admin.noData', 'No data available')}</p>}
           </div>
         </Card>
 
         {/* No-show rate */}
-        <Card title={t('admin.insights.noShowRate') || 'Joined but never scored'} icon={UserX}>
-          <p className="text-slate-500 text-[11px] mb-3">{t('admin.insights.noShowHint') || 'Share of games recorded with 0 score & 0 words — players who joined but did not play.'}</p>
+        <Card title={t('admin.insights.noShowRate', 'Joined but never scored')} icon={UserX}>
+          <p className="text-slate-500 text-[11px] mb-3">{t('admin.insights.noShowHint', 'Share of games recorded with 0 score & 0 words — players who joined but did not play.')}</p>
           <div className="space-y-2">
             {data.noShowByMode.filter(m => m.total >= 5).map(m => (
               <div key={m.mode} className="flex items-center gap-2 text-xs">
@@ -213,8 +213,8 @@ export function InsightsPanel() {
 
         {/* Word quality by language */}
         <div className="lg:col-span-2">
-          <Card title={t('admin.insights.wordQuality') || 'Word-quality by language'} icon={SpellCheck2}>
-            <p className="text-slate-500 text-[11px] mb-3">{t('admin.insights.wordQualityHint') || 'Rejected vs accepted word submissions (30d). A high reject rate flags dictionary gaps for that language.'}</p>
+          <Card title={t('admin.insights.wordQuality', 'Word-quality by language')} icon={SpellCheck2}>
+            <p className="text-slate-500 text-[11px] mb-3">{t('admin.insights.wordQualityHint', 'Rejected vs accepted word submissions (30d). A high reject rate flags dictionary gaps for that language.')}</p>
             <div className="space-y-2">
               {data.wordQualityByLang.map(w => {
                 const total = w.valid + w.invalid;
@@ -226,11 +226,11 @@ export function InsightsPanel() {
                       <div className={cn('h-full rounded-sm', rate >= 60 ? 'bg-neo-red/70' : rate >= 35 ? 'bg-neo-orange/70' : 'bg-neo-lime/70')} style={{ width: `${rate}%` }} />
                     </div>
                     <span className="text-neo-white font-mono w-12 text-right">{rate}%</span>
-                    <span className="text-slate-500 font-mono w-28 text-right">{w.invalid}/{total.toLocaleString()} {t('admin.insights.rejected') || 'rejected'}</span>
+                    <span className="text-slate-500 font-mono w-28 text-right">{w.invalid}/{total.toLocaleString()} {t('admin.insights.rejected', 'rejected')}</span>
                   </div>
                 );
               })}
-              {data.wordQualityByLang.length === 0 && <p className="text-slate-400 text-xs">{t('admin.noData') || 'No data available'}</p>}
+              {data.wordQualityByLang.length === 0 && <p className="text-slate-400 text-xs">{t('admin.noData', 'No data available')}</p>}
             </div>
           </Card>
         </div>

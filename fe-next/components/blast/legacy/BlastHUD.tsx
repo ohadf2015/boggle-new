@@ -108,7 +108,7 @@ function BlastHUDTimer({
 }: {
   remainingTime: number;
   totalTime: number;
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
 }) {
   const suppressUrgency = useSuppressTimerUrgency();
   const { state } = computeTimerUrgency(remainingTime, suppressUrgency);
@@ -188,7 +188,7 @@ interface BlastHUDProps {
   coins?: number;
   /** In-run gems balance (SP only) */
   gems?: number;
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
 }
 
 /**
@@ -292,7 +292,7 @@ export function BlastHUD({
               title={t('blast.luckyBoostDesc')}
             >
               <Sparkles className="h-3 w-3" strokeWidth={3} />
-              {t('blast.luckyBoost') || 'Lucky'}
+              {t('blast.luckyBoost', 'Lucky')}
             </span>
           )}
           {/* Reserved buff slot — keeps chrome stable whether a buff is active or not. */}
@@ -312,7 +312,7 @@ export function BlastHUD({
                     buffConsumed ? 'bg-white/20 text-white line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
                   )}
                   style={NO_TEXT_SHADOW_STYLE}
-                  aria-label={(t(meta.label) || activeBuff) + (buffConsumed ? ` (${t('common.used') || 'used'})` : '')}
+                  aria-label={(t(meta.label) || activeBuff) + (buffConsumed ? ` (${t('common.used', 'used')})` : '')}
                 >
                   <Icon className="h-4 w-4" strokeWidth={3} />
                   {t(meta.label) || activeBuff}

@@ -27,7 +27,7 @@ interface UseHostGameActionsOptions {
   socket: Socket | null;
   gameCode: string;
   username: string;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
 
   // Settings
   difficulty: DifficultyLevel;
@@ -152,7 +152,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       // debug: the player already gets the toast below, and there is nothing
       // server-side to act on. warn() shipped it to Sentry as an error.
       logger.debug('[HOST] Cannot start game: socket not connected');
-      neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: TOAST_ICONS.plug, duration: 4000 });
+      neoErrorToast(t('hostView.connectionLost', 'Connection lost. Please refresh.'), { icon: TOAST_ICONS.plug, duration: 4000 });
       return;
     }
 
@@ -286,7 +286,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     // No players at all (host not playing and nobody joined)
     if (otherPlayers <= 0 && !hostPlaying) {
       logger.warn('[HOST] Cannot start game: no players');
-      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: TOAST_ICONS.alertTriangle, duration: 3000 });
+      neoErrorToast(t('hostView.noPlayers', 'No players in lobby'), { icon: TOAST_ICONS.alertTriangle, duration: 3000 });
       return;
     }
 
@@ -316,7 +316,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   const startSoloDemoWithBots = useCallback((): (() => void) => {
     // Classroom teacher must be non-playing (hostPlaying=false)
     if (hostPlaying) {
-      neoErrorToast(t('hostView.demoBotsFailed') || 'Demo unavailable in player mode', { icon: TOAST_ICONS.alertTriangle });
+      neoErrorToast(t('hostView.demoBotsFailed', 'Demo unavailable in player mode'), { icon: TOAST_ICONS.alertTriangle });
       return () => {}; // no-op
     }
 
@@ -394,7 +394,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setShowCancelTournamentDialog(false);
     setTournamentData(null);
     setGameType('regular');
-    neoErrorToast(t('hostView.tournamentCancelled') || 'Tournament cancelled', {
+    neoErrorToast(t('hostView.tournamentCancelled', 'Tournament cancelled'), {
       icon: TOAST_ICONS.xCircle,
       duration: 3000,
     });
@@ -458,7 +458,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           duration: 3000,
         });
       } else {
-        neoErrorToast(t('hostView.resetFailed') || 'Failed to reset game', {
+        neoErrorToast(t('hostView.resetFailed', 'Failed to reset game'), {
           icon: TOAST_ICONS.xCircle,
           duration: 3000,
         });
@@ -510,7 +510,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
     setTableData(newTable);
 
-    neoInfoToast(t('hostView.boardRegenerated') || 'Board regenerated!', {
+    neoInfoToast(t('hostView.boardRegenerated', 'Board regenerated!'), {
       duration: 2000,
     });
   }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData, gameMode]);

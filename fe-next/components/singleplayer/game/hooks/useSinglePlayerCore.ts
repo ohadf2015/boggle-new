@@ -220,7 +220,7 @@ export function useSinglePlayerCore({
     // caller that stays on the page (quitStaysOnPage) must have it popped,
     // or every confirmed quit strands an extra same-URL history entry.
     leaving: quitting && !quitStaysOnPage,
-    message: t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?',
+    message: t('singlePlayer.quitConfirmMessage', 'You will lose your current progress. Are you sure you want to quit?'),
     onNavigationAttempt: () => { setShowQuitConfirm(true); return false; },
   });
 
@@ -281,14 +281,14 @@ export function useSinglePlayerCore({
       if (spamResult.isCooldown) {
         const msg = spamResult.remainingCooldown
           ? t('playerView.slowDown') || `Slow down! Wait ${spamResult.remainingCooldown}s`
-          : t('playerView.tooFast') || 'Too fast! 3s cooldown';
+          : t('playerView.tooFast', 'Too fast! 3s cooldown');
         wordErrorToast(msg, { duration: spamResult.remainingCooldown ? 1500 : 2000 });
         if (!spamResult.remainingCooldown) combo.resetCombo();
       }
       return;
     }
     if (spamResult.isWarning) {
-      wordErrorToast(t('playerView.submittingTooFast') || 'Submitting too fast!', { duration: 1500 });
+      wordErrorToast(t('playerView.submittingTooFast', 'Submitting too fast!'), { duration: 1500 });
     }
 
     const localValidation = validateWordLocally(normalizedWord, settings.language, minWordLength, foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid })));
@@ -305,14 +305,14 @@ export function useSinglePlayerCore({
 
     const currentGrid = gridRef.current;
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
+      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Word not on board');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notOnBoardMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
       return;
     }
 
     if (foundWordsSetRef.current.has(normalizedWord)) {
-      const alreadyFoundMsg = t('playerView.wordAlreadyFound') || 'Already found!';
+      const alreadyFoundMsg = t('playerView.wordAlreadyFound', 'Already found!');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: alreadyFoundMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg); combo.resetCombo();
       return;
@@ -372,7 +372,7 @@ export function useSinglePlayerCore({
       );
       setFoundWords(foundWordsRef.current);
       wordPace.recordWord();
-      const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+      const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
       recordNotInDictionary(normalizedWord, settings.language, 'single_player');
@@ -407,7 +407,7 @@ export function useSinglePlayerCore({
         );
         setFoundWords(foundWordsRef.current);
         wordPace.recordWord();
-        const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+        const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
         setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
         playWordRejectedSound(); hapticError();
       });

@@ -360,8 +360,12 @@ function TeacherMomentLinks({ locale, lang }: { locale: string; lang: string }) 
             <h3 className={`font-neo-display text-base font-black uppercase ${MOMENT_ACCENT[slug]}`}>
               {c.breadcrumb.current}
             </h3>
-            {/* The answer-first question doubles as the card's promise. */}
-            <p className="mt-2 text-xs leading-relaxed text-neo-gray-200">{c.answer.question}</p>
+            {/* The answer-first question doubles as the card's promise. Only the
+                six teacher-moment landings feed this rail, and every one of them
+                has an answer block — the guard is for the type, not for them. */}
+            {c.answer && (
+              <p className="mt-2 text-xs leading-relaxed text-neo-gray-200">{c.answer.question}</p>
+            )}
           </Link>
         ))}
       </div>

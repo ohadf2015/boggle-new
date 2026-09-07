@@ -56,7 +56,7 @@ const faqs = [
   },
   {
     q: 'How is this different from the original Boggle Word Shake app?',
-    a: 'LexiClash offers the same word-shake gameplay plus real-time multiplayer (2-20+ players), multiple grid sizes (4x4, 5x5, 6x6), daily challenges, combo scoring, and 5-language support — all free with no pay-to-win boosts.',
+    a: 'LexiClash offers the same word-shake gameplay plus real-time multiplayer (2-20+ players), multiple grid sizes (4x4, 5x5, 6x6), daily challenges, combo scoring, and 6-language support — all free with no pay-to-win boosts.',
   },
   {
     q: 'Can I play Boggle Word Shake with friends online?',
@@ -180,7 +180,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
               'Combo scoring for fast word chains',
               'No download — plays in any browser',
               'Daily challenges with global leaderboard',
-              'Available in 5 languages',
+              'Available in 6 languages',
               'Adventure mode with boss battles',
             ].map((feature) => (
               <div key={feature} className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard">

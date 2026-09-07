@@ -72,7 +72,7 @@ interface HostInGameViewProps {
   gameCode: string;
   username: string;
   roomLanguage: Language;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
 
   // Game state
   tableData: LetterGrid;

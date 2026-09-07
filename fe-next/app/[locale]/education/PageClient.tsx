@@ -1,5 +1,6 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -18,6 +19,12 @@ import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip'
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
+
+// Same modal every other surface opens; lazy because it is a modal nobody sees
+// until they ask for it.
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 /**
  * Education Landing - Master page rebuilt with scroll reveals
@@ -49,6 +56,7 @@ export function PageClient() {
   const { t, language } = useLanguage();
   const { isAuthenticated, loading, profile } = useAuth();
   const shouldReduceMotion = useReducedMotion();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Auto-redirect authenticated students to /student dashboard
   useEffect(() => {
@@ -58,7 +66,7 @@ export function PageClient() {
   }, [loading, isAuthenticated, profile?.user_role, language, router]);
 
   // Determine if user has teacher/admin access
-  const hasTeacherAccess = isAuthenticated && !loading && (profile?.user_role === 'teacher' || profile?.is_admin);
+  const hasTeacherAccess = isAuthenticated && !loading && isTeacherProfile(profile);
 
   // If student is redirecting, return null
   if (!loading && isAuthenticated && profile?.user_role === 'student') {
@@ -80,6 +88,42 @@ export function PageClient() {
   return (
     <main className="min-h-screen bg-neo-navy">
       <TopBackLink className="mb-4" />
+
+      {/*
+        The no-account path, deliberately OUTSIDE the auth gates below.
+
+        Everything else on this page is gated on `!loading` to avoid the auth flash,
+        which means none of it is in the server-rendered HTML — a crawler, and a
+        teacher on a slow connection, see nothing. This block needs no auth state to
+        be true, so gating it would hide the one CTA that asks for nothing from the
+        exact reader it is for. Rendered unconditionally: it never changes, so it
+        cannot flash.
+      */}
+      <div className="mx-auto w-full max-w-6xl px-4 pb-2 sm:px-6 lg:px-8">
+        <NoAccountCta locale={language} />
+      </div>
+
+      {/* Sign in. Every other CTA on this page is signup-flavoured ("Get Teacher
+          Access", "Get Teacher Pro"), so a teacher who already HAS an account had
+          to click through the create-account modal to find the sign-in link. */}
+      {!isAuthenticated && (
+        <div className="mx-auto flex w-full max-w-6xl justify-end px-4 pb-4 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            data-testid="education-sign-in"
+            onClick={() => {
+              trackGrowthEvent('landing_cta_clicked', { cta: 'education_sign_in' });
+              setShowAuthModal(true);
+            }}
+            className="min-h-11 rounded-neo border-neo border-neo-cyan px-5 font-neo-body font-bold text-neo-cyan shadow-hard-sm transition-all hover:bg-neo-cyan/15 hover:shadow-hard focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime"
+          >
+            {t('auth.signIn')}
+          </button>
+        </div>
+      )}
+      {showAuthModal && (
+        <AuthModal isOpen onClose={() => setShowAuthModal(false)} initialMode="signin" />
+      )}
 
       {/* Teacher view: cascading shortcut bars + relevant redesign content */}
       {hasTeacherAccess && (

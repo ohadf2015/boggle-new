@@ -2,6 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { layoutTranslations } from '@/translations/layout';
+import { en } from '@/translations/en';
+import { es } from '@/translations/es';
+import { he } from '@/translations/he';
+import { ja } from '@/translations/ja';
+import { ru } from '@/translations/ru';
+import { sv } from '@/translations/sv';
 
 /**
  * The teacher-moment pages get their claims checked by
@@ -31,6 +38,17 @@ const ROOT = join(__dirname, '..', '..', '..', '..');
  * array, which is exactly the text an answer engine quotes about pricing. A false
  * claim is worse in structured data than in prose, not better.
  */
+/**
+ * Round 4 addition: `content.ts` is collected here too.
+ *
+ * Seven of the twelve education `content.ts` files were named by hand in FILES
+ * below; the other five (`brain-breaks-word-games`, `early-finishers-activities`,
+ * `end-of-year-classroom-activities`, `first-day-of-school-icebreakers`,
+ * `indoor-recess-games`, `middle-school-word-games`) were scanned by nothing.
+ * That is the same hand-list failure this function was written to end for
+ * `page.tsx` — a landing page's prose is exactly as claim-bearing as its JSON-LD,
+ * and the next slug someone adds ships unguarded by default under a fixed list.
+ */
 function educationLandingPages(): string[] {
   const dir = join(ROOT, 'app', '[locale]', 'education');
   const found: string[] = [];
@@ -43,8 +61,26 @@ function educationLandingPages(): string[] {
       continue; // a file, not a route directory
     }
     if (entries.includes('page.tsx')) found.push(`app/[locale]/education/${name}/page.tsx`);
+    if (entries.includes('content.ts')) found.push(`app/[locale]/education/${name}/content.ts`);
   }
   return found.sort();
+}
+
+/**
+ * Every `components/education/*.tsx` — DISCOVERED.
+ *
+ * Round 4. A shared component that carries its own copy renders on every landing
+ * page at once, so a false claim there is the widest blast radius in the module,
+ * and no guard has ever looked at one. `EducationHero.tsx` still carries the
+ * history of "Built natively for 5 languages" in a header comment, which is the
+ * proof that this surface has shipped exactly this defect before.
+ */
+function educationComponents(): string[] {
+  const dir = join(ROOT, 'components', 'education');
+  return readdirSync(dir)
+    .filter((f) => /\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f))
+    .map((f) => `components/education/${f}`)
+    .sort();
 }
 
 /**
@@ -62,6 +98,45 @@ function seoModules(): string[] {
     .filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts'))
     .map((f) => `lib/seo/${f}`)
     .sort();
+}
+
+/**
+ * Every marketing/SEO surface under `app/[locale]`, plus the shared landing and promo
+ * copy — DISCOVERED.
+ *
+ * Added round 4 (last mile). The education module was guarded to 1,519 assertions while
+ * the homepage told every visitor, in its visible FAQ *and* in its FAQPage JSON-LD, that
+ * "LexiClash supports five languages". The same claim was live on ~35 other pages: the
+ * about page, the FAQ, the rules page, the leaderboard, the blog, and a dozen keyword
+ * landing pages. Guarding the smaller surface hard and the larger one not at all is how
+ * a claim survives four review rounds.
+ *
+ * `content.ts`, `faq.ts`, `data.ts`, `seoContent.ts`, `page.tsx` and `PageClient.tsx` are
+ * where this repo puts per-page copy. Anything else under `app/[locale]` is behaviour.
+ */
+function siteWideMarketingPages(): string[] {
+  const COPY_FILE = /^(content|faq|data|seoContent)\.ts$|^(page|PageClient)\.tsx$/;
+  const out: string[] = [];
+  const walk = (dir: string, rel: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('__') || entry.name.startsWith('.')) continue;
+      const full = join(dir, entry.name);
+      const next = `${rel}/${entry.name}`;
+      if (entry.isDirectory()) {
+        walk(full, next);
+      } else if (COPY_FILE.test(entry.name)) {
+        out.push(next);
+      }
+    }
+  };
+  walk(join(ROOT, 'app', '[locale]'), 'app/[locale]');
+  for (const dirName of ['landing', 'promo']) {
+    const dir = join(ROOT, 'components', dirName);
+    for (const f of readdirSync(dir)) {
+      if (/\.tsx?$/.test(f) && !/\.test\.tsx?$/.test(f)) out.push(`components/${dirName}/${f}`);
+    }
+  }
+  return out.sort();
 }
 
 function comparisonPages(): string[] {
@@ -97,6 +172,8 @@ const FILES = [
   // so these are now discovered, not listed.
   ...comparisonPages(),
   ...educationLandingPages(),
+  ...educationComponents(),
+  ...siteWideMarketingPages(),
   ...seoModules(),
   // The two layouts. `app/layout.tsx` sets the default description plus the OG and
   // Twitter cards, so a wrong count there rides on every page that does not override
@@ -105,6 +182,14 @@ const FILES = [
   'app/layout.tsx',
   'app/[locale]/layout.tsx',
 ];
+
+/**
+ * The hand-written entries above now overlap the discovered ones, so the same
+ * file would otherwise get two identical describe blocks. Deduped rather than
+ * pruned: the explicit names document intent, and deleting one the day the
+ * discovery walk changes shape is how coverage quietly disappears.
+ */
+const SCANNED = [...new Set(FILES)].sort();
 
 /**
  * Ground truth, all verified in code:
@@ -151,11 +236,22 @@ const FORBIDDEN: Array<[string, RegExp]> = [
       // COMPETITORS' caps ("Kahoot ... до 5 учеников"), which are true and must stay.
       // A number guard cannot tell our cap from a rival's, so it is scoped to the
       // phrasings we only ever use about ourselves.
+      //
+      // Round 4: the `i` flag was missing, and every one of these phrasings begins a
+      // sentence in real copy. `Hasta 5 alumnos por clase` (es) and `Upp till 5 elever
+      // per klass` (sv) both sat in the shipped `pricing.*` namespace and both walked
+      // past a case-sensitive `hasta`/`upp till`. The header comment two entries above
+      // says exactly this about the free-forever list and it happened again here.
+      'i',
     ),
   ],
   [
     'says the join code is 4 digits — ClassroomGameLobby.tsx:141 and utils/utils.ts:118 both emit six characters',
-    /4-digit|4 digit code|4 ספרות|4-siffrig|4桁|4 dígitos|4-значн/,
+    // `fyrsiffrig` added round 4. The Swedish for "four-digit" is a compound adjective,
+    // not the hyphenated `4-siffrig` this rule was written for, so eleven occurrences
+    // across three teacher pages told Swedish teachers to project a four-digit code
+    // that the product never generates. Match the word, not one way of spelling it.
+    /4-digit|4 digit code|four-digit|4 ספרות|ארבע ספרות|4-siffrig|fyrsiffrig|4桁|四桁|4 dígitos|cuatro dígitos|4-значн|четырёхзначн/i,
   ],
   [
     'claims no classroom feature is paywalled — a 4th class and reports/analytics both are',
@@ -195,7 +291,14 @@ const FORBIDDEN: Array<[string, RegExp]> = [
       + String.raw`|\b(5|fem)\s+(språk|ordböcker|ordlistor)\b`
       + String.raw`|(?<!ほかの)(?<!他の)(5つの言語|5言語|5つの辞書|5辞書)`
       + String.raw`|\b5 שפות|\b5 מילונים|חמש שפות|חמישה מילונים`
-      + String.raw`|\b5 (языков|словарей)|пять (языков|словарей)`,
+      // Russian INFLECTS. Round 5: `на 5 языках` (prepositional) shipped in the
+      // /ru/education meta description and og:description for weeks because this
+      // pattern only knew the genitive `языков`. Match the stem plus the case
+      // endings we actually write. `\b` is useless after Cyrillic here — JS `\w`
+      // is ASCII-only, so a space after `языках` is not a word boundary; the
+      // negative lookahead does the job instead.
+      + String.raw`|\b5 (язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])`
+      + String.raw`|пять (язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])`,
       'i',
     ),
   ],
@@ -211,7 +314,7 @@ const FORBIDDEN: Array<[string, RegExp]> = [
       + String.raw`|\b(fem|5)(\s+[\w-]+){0,2}\s+(språk|ordböcker|ordlistor)\b`
       + String.raw`|(?<!ほかの)(?<!他の)(五|5)つ?の?(内蔵)?(言語|辞書)`
       + String.raw`|(חמש|חמישה|5)\s+(\S+\s+){0,2}(שפות|מילונים)`
-      + String.raw`|(пять|5)(\s+[\wа-яё-]+){0,2}\s+(языков|словарей)`,
+      + String.raw`|(пять|5)(\s+[\wа-яё-]+){0,2}\s+(язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])`,
       'i',
     ),
   ],
@@ -223,9 +326,13 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     new RegExp(
       // A RANGE is excluded: llms.txt says "a typical class of 25-30 fits the FREE
       // tier", which describes a real classroom rather than our cap, and is true.
-      String.raw`class(?:es)?\s+of\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|ten|twenty|thirty)\b(?!\s*[-–])`
-      + String.raw`|clases?\s+de\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|diez)\b`
-      + String.raw`|klass(?:er)?\s+med\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|tio)\b`
+      // A DURATION is excluded too. "Aperturas de inicio de clase de 5 minutos"
+      // (five-minute class openers) is about the length of a lesson, not the size
+      // of one, and this rule flagged it — the only false positive the sitewide
+      // sweep produced. Excluded by unit, so a real "clases de 5 alumnos" still fails.
+      String.raw`class(?:es)?\s+of\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|ten|twenty|thirty)\b(?!\s*[-–])(?!\s*(?:minute|second|hour|min\b|sec\b))`
+      + String.raw`|clases?\s+de\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|diez)\b(?!\s*(?:minutos?|segundos?|horas?))`
+      + String.raw`|klass(?:er)?\s+med\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|tio)\b(?!\s*(?:minuter|sekunder|timmar))`
       + String.raw`|כיתות\s+(?:עם|של)\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|עשרה)\b`
       + String.raw`|класс(?:а|ов)?\s+по\s+(?!${FREE_TIER_LIMITS.studentsPerClass}\b)(\d{1,3}|десять)\b`,
       'i',
@@ -238,6 +345,39 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     // naming Russian is an undercount however the list is arranged.
     'names four of our languages in a list that omits Russian',
     /(?=[^.!?]*English)(?=[^.!?]*Hebrew)(?=[^.!?]*Swedish)(?=[^.!?]*Japanese)(?=[^.!?]*Spanish)[^.!?]*(?<![Rr]ussian[^.!?]{0,200})(?:[.!?]|$)/,
+  ],
+  [
+    /**
+     * Round 4. Both enumeration entries above are written in ENGLISH ONLY, so they
+     * could only ever fail on an English string. `landing.seo.faq3A` and
+     * `landing.seo.whatIsContent` listed the same five languages and omitted Russian
+     * in all six catalogues; English tripped, and the other five — which say exactly
+     * the same false thing in their own words — did not.
+     *
+     * So the rule is generated per language from the names that language uses. Whole
+     * string rather than sentence-scoped: naming all five of the non-Russian languages
+     * anywhere in a string that never mentions Russian is an undercount regardless of
+     * punctuation, and Japanese does not end sentences with `.` anyway.
+     */
+    'lists all five other languages without naming Russian, in any of our six languages',
+    ((): RegExp => {
+      const SETS: Array<{ others: string[]; russian: string }> = [
+        { others: ['English', 'Hebrew', 'Swedish', 'Japanese', 'Spanish'], russian: 'Russian' },
+        { others: ['ingl[ée]s', 'hebreo', 'sueco', 'japon[ée]s', 'espa[nñ]ol'], russian: 'ruso' },
+        { others: ['engelska', 'hebreiska', 'svenska', 'japanska', 'spanska'], russian: 'ryska' },
+        { others: ['אנגלית', 'עברית', 'שוודית', 'יפנית', 'ספרדית'], russian: 'רוסית' },
+        { others: ['英語', 'ヘブライ語', 'スウェーデン語', '日本語', 'スペイン語'], russian: 'ロシア語' },
+        { others: ['английск', 'иврит', 'шведск', 'японск', 'испанск'], russian: 'русск' },
+      ];
+      const clause = ({ others, russian }: { others: string[]; russian: string }) =>
+        `(?:${others.map((n) => `(?=[\\s\\S]*${n})`).join('')}(?![\\s\\S]*${russian}))`;
+      // `^`-anchored so the negative lookahead spans the WHOLE line or string.
+      // Unanchored, the engine may start AFTER an earlier mention of Russian and
+      // then honestly report that no Russian follows — a line reading
+      // "Russian 1.34M … English, Hebrew, Swedish, Japanese, Spanish" would fail
+      // a rule it actually satisfies.
+      return new RegExp(`^(?:${SETS.map(clause).join('|')})`, 'i');
+    })(),
   ],
 ];
 
@@ -257,7 +397,7 @@ function isCommentLine(line: string, rel: string): boolean {
   return t.startsWith('//') || t.startsWith('*') || t.startsWith('/*');
 }
 
-describe.each(FILES)('%s', (rel) => {
+describe.each(SCANNED)('%s', (rel) => {
   const source = readFileSync(join(ROOT, rel), 'utf8');
 
   it.each(FORBIDDEN)('does not %s', (_why, pattern) => {
@@ -266,6 +406,82 @@ describe.each(FILES)('%s', (rel) => {
       .map((line, i) => ({ line, n: i + 1, m: line.match(pattern) }))
       .filter((x) => x.m)
       .map((x) => `  ${rel}:${x.n}  "${x.m![0]}"  in: ${x.line.trim().slice(0, 120)}`);
+    expect(offenders.join('\n') || null).toBeNull();
+  });
+});
+
+/**
+ * The translation catalogues, which no claims guard has ever read.
+ *
+ * `languageCountCopy.test.ts` already established that a source-file scan cannot
+ * see these strings and that importing the objects is the only honest way to
+ * check what ships — but it applies exactly ONE rule, the language undercount.
+ * Every other claim in this file (free forever, the student cap, CEFR, the join
+ * code length, the language enumeration) has never touched `translations/*.js`,
+ * even though `education.*`, `teacher.*` and `landing.*` are rendered by the same
+ * teacher-facing pages the file-scan guards. `pricing.*` is in scope too: it is
+ * the paywall table's copy, and it advertised a student cap of its own.
+ *
+ * Objects, not files, for the same reason the language test gives: a catalogue is
+ * one 15,000-line literal, and a line-based scan of it cannot say which namespace
+ * a match belongs to. Namespace-scoped rather than whole-catalogue because the
+ * comparison pages legitimately state COMPETITORS' caps and language counts.
+ */
+const CATALOGUES: Array<[string, unknown]> = [
+  ['en', en], ['es', es], ['he', he], ['ja', ja], ['ru', ru], ['sv', sv],
+];
+
+/** Namespaces the education and teacher surfaces render. */
+/**
+ * `seo` added round 5. `seo.educationHub.description` and `.ogDescription` ARE the
+ * /education hub's meta and og descriptions — the strings the critic found saying
+ * "на 5 языках" while the same page's H1 said six. They are education copy by any
+ * reasonable reading and were outside this filter purely because of where the
+ * translator filed them.
+ */
+const TEACHER_NAMESPACE = /^(education|teacher|landing|pricing|seo)\./;
+
+function walkStrings(node: unknown, path: string[] = []): Array<[string, string]> {
+  if (typeof node === 'string') return [[path.join('.'), node]];
+  if (!node || typeof node !== 'object') return [];
+  return Object.entries(node as Record<string, unknown>).flatMap(([k, v]) =>
+    walkStrings(v, [...path, k]),
+  );
+}
+
+describe.each(CATALOGUES)('translations/%s.js — education, teacher, landing and pricing copy', (locale, catalogue) => {
+  const entries = walkStrings(catalogue).filter(([k]) => TEACHER_NAMESPACE.test(k));
+
+  it('has strings to check', () => {
+    // A silently-empty scan passes forever while covering nothing.
+    expect(entries.length).toBeGreaterThan(100);
+  });
+
+  it.each(FORBIDDEN)('does not %s', (_why, pattern) => {
+    const offenders = entries
+      .filter(([, v]) => pattern.test(v))
+      .map(([k, v]) => `  translations/${locale}.js  ${k}: ${JSON.stringify(v.slice(0, 140))}`);
+    expect(offenders.join('\n') || null).toBeNull();
+  });
+});
+
+/**
+ * `translations/layout.ts` is the sitewide JSON-LD graph's description — the one
+ * string that rides on EVERY education page's `<head>` regardless of what the page
+ * itself says. It is checked whole: there are no namespaces to scope to, and every
+ * string in it is metadata about the product.
+ */
+describe('translations/layout.ts — the sitewide JSON-LD and meta description', () => {
+  const entries = walkStrings(layoutTranslations);
+
+  it('has strings to check', () => {
+    expect(entries.length).toBeGreaterThan(20);
+  });
+
+  it.each(FORBIDDEN)('does not %s', (_why, pattern) => {
+    const offenders = entries
+      .filter(([, v]) => pattern.test(v))
+      .map(([k, v]) => `  translations/layout.ts  ${k}: ${JSON.stringify(v.slice(0, 140))}`);
     expect(offenders.join('\n') || null).toBeNull();
   });
 });

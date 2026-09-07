@@ -51,7 +51,7 @@ export const contentByLocale: Record<string, AboutContent> = {
     story: {
       title: 'Our Story',
       content: 'LexiClash was born in 2024 in Israel from a simple but powerful idea: what if word games could be as thrilling and competitive as esports, while also helping people learn new languages? Our founder, Ohad Fisher, grew up playing word games with family and friends in multiple languages. He noticed that while there were many word games available, none truly combined real-time competitive gameplay with meaningful language learning across different scripts and writing directions.',
-      content2: 'Starting from a small prototype, the team built LexiClash from the ground up with multilingual support at its core — including full right-to-left (RTL) support for Hebrew. Within the first year, LexiClash grew to support five languages (Hebrew, English, Swedish, Japanese, and Spanish), introduced multiple original game modes, and built a growing community of players from over 30 countries who compete daily in word battles.',
+      content2: 'Starting from a small prototype, the team built LexiClash from the ground up with multilingual support at its core — including full right-to-left (RTL) support for Hebrew. Within the first year, LexiClash grew to support six languages (Hebrew, English, Swedish, Japanese, Spanish, and Russian), introduced multiple original game modes, and built a growing community of players from over 30 countries who compete daily in word battles.',
     },
     mission: {
       title: 'Our Mission',
@@ -67,7 +67,7 @@ export const contentByLocale: Record<string, AboutContent> = {
       },
       multilingual: {
         title: 'True Multilingual Support',
-        content: 'We support 5 languages including Hebrew with full right-to-left layout support. Every game mode, every UI element, and every piece of feedback works flawlessly in all supported languages. Players can switch languages instantly and even practice vocabulary across different languages.',
+        content: 'We support 6 languages including Hebrew with full right-to-left layout support. Every game mode, every UI element, and every piece of feedback works flawlessly in all supported languages. Players can switch languages instantly and even practice vocabulary across different languages.',
       },
       education: {
         title: 'Education Integration',
@@ -80,7 +80,7 @@ export const contentByLocale: Record<string, AboutContent> = {
     },
     whatWeDo: {
       title: 'What We Do',
-      content: 'We develop real-time multiplayer word games that combine speed, strategy, and vocabulary skills into an experience that is both entertaining and educational. LexiClash supports Hebrew, English, Swedish, Japanese, and Spanish, with more languages planned for the future.',
+      content: 'We develop real-time multiplayer word games that combine speed, strategy, and vocabulary skills into an experience that is both entertaining and educational. LexiClash supports Hebrew, English, Swedish, Japanese, Spanish, and Russian, with more languages planned for the future.',
       content2: 'Beyond the core game, we build tools for educators, host daily challenges and seasonal events, maintain competitive leaderboards, and continuously develop new game modes and features based on community feedback. Every update is driven by our players\' needs and our commitment to making the best word game platform in the world.',
     },
     technology: {

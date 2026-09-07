@@ -15,7 +15,6 @@ let proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
 vi.mock('@/components/teacher/TeacherDashboard', () => ({ default: () => <div data-testid="teacher-dashboard" /> }));
-vi.mock('@/components/teacher/DistrictUpsellBanner', () => ({ DistrictUpsellBanner: () => <div /> }));
 vi.mock('@/components/education/TrialUrgencyBanner', () => ({ TrialUrgencyBanner: () => null }));
 vi.mock('@/components/education/TeacherGate', () => ({
   TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,

@@ -27,7 +27,7 @@ export interface PerformanceSectionProps {
   wordsDiscovered: number;
   guessesUsed: number;
   extraTries?: number;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
   language: string;
 }
 
@@ -172,7 +172,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
               <Coins className={`w-4 h-4 ${isTeasing ? 'text-amber-500/50' : 'text-amber-400'}`} />
               <span className={`text-xs font-medium ${isTeasing ? 'text-slate-400' : 'text-slate-300'}`}>
                 {isTeasing
-                  ? (t('coins.guestTeasing') || '').replace('{amount}', safeToLocaleString(coinReward.awarded, language))
+                  ? (t('coins.guestTeasing', '')).replace('{amount}', safeToLocaleString(coinReward.awarded, language))
                   : (t('wordHunt.results.coinsEarned'))}
               </span>
             </div>

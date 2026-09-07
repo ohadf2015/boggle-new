@@ -211,7 +211,7 @@ export function PowerUpBar({
               onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); executeHint(); }}
               className="px-3 py-1 bg-neo-lime text-neo-black text-xs font-black rounded-neo border-2 border-neo-black"
             >
-              {t('adventure.retrySave') === 'Retry' ? 'OK' : t('common.confirm') || 'OK'}
+              {t('adventure.retrySave') === 'Retry' ? 'OK' : t('common.confirm', 'OK')}
             </button>
             <button type="button"
               onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); }}

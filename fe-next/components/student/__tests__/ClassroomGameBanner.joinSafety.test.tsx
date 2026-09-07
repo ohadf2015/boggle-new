@@ -12,7 +12,7 @@
  * a socket in a second classroom room would surface another class's game.
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const mockPush = vi.fn();
@@ -48,7 +48,26 @@ vi.mock('framer-motion', () => {
 import { ClassroomGameBanner } from '../ClassroomGameBanner';
 
 const PROPS = { classroomId: 'class-1', userId: 'user-1', username: 'Maya' };
-const mockSocket = { emit: vi.fn() };
+
+/**
+ * JOIN now waits for the server's `joinedClassroomGame` before navigating —
+ * see ClassroomGameBanner.joinAck.test.tsx for why (the rejection used to
+ * arrive after the push and render nowhere). So the socket double has to be
+ * able to answer.
+ */
+const socketListeners: Record<string, Array<(data: unknown) => void>> = {};
+const mockSocket = {
+  emit: vi.fn(),
+  on: vi.fn((event: string, fn: (data: unknown) => void) => {
+    (socketListeners[event] ||= []).push(fn);
+  }),
+  off: vi.fn((event: string, fn: (data: unknown) => void) => {
+    socketListeners[event] = (socketListeners[event] || []).filter((f) => f !== fn);
+  }),
+};
+function serverSays(event: string, data: unknown) {
+  act(() => { (socketListeners[event] || []).forEach((f) => f(data)); });
+}
 
 function mockHook(activeGame: unknown) {
   mockUseActiveClassroomGame.mockReturnValue({
@@ -57,7 +76,10 @@ function mockHook(activeGame: unknown) {
 }
 
 describe('ClassroomGameBanner — JOIN never lands nowhere', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    for (const k of Object.keys(socketListeners)) delete socketListeners[k];
+  });
 
   it('does not navigate when the game has no room code', () => {
     // GIVEN a banner holding a game record with no gameCode
@@ -78,8 +100,9 @@ describe('ClassroomGameBanner — JOIN never lands nowhere', () => {
     mockHook({ gameCode: 'VHTDFB', teacherName: 'Ms Plant', lessonNames: ['Week 3 Vocabulary'] });
     render(<ClassroomGameBanner {...PROPS} />);
 
-    // WHEN the student taps JOIN
+    // WHEN the student taps JOIN and the server lets them in
     fireEvent.click(screen.getByText('student.activeGame.joinNow'));
+    serverSays('joinedClassroomGame', { success: true, gameCode: 'VHTDFB' });
 
     // THEN the room code goes with them
     expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=VHTDFB&classroom=true');

@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/middle-school-word-games#page",
+  "name": "中学生向けの言葉ゲーム | 語彙学習",
+  "description": "中学校(中1-中3)の教室向け無料言葉ゲーム。本物の競争、カスタム語彙、リアルタイムマルチプレイヤー—メール不要。",
+  "url": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/middle-school-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "中学生向けの言葉ゲーム",
+      "item": "https://www.lexiclash.live/ja/education/middle-school-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/middle-school-word-games#resource",
+  "name": "中学生向けの言葉ゲーム | 語彙学習",
+  "description": "LexiClash は、生徒がコードで教室に参加してリアルタイムで言葉探し、語彙チャレンジ、マルチプレイヤーゲームで競い合う無料のブラウザベースの言葉ゲームです。先生は進度追跡を受け取り、すべての教科のカスタム語彙リストをアップロードできます。メールは不要です。",
+  "url": "https://www.lexiclash.live/ja/education/middle-school-word-games",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Vocabulary Development"
+  ],
+  "educationalLevel": [
+    "Secondary"
+  ],
+  "typicalAgeRange": "11-15",
+  "teaches": "Vocabulary acquisition, lexical recall, academic language, competitive communication",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/middle-school-word-games#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "生徒はメールアドレスが必要？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。クラスのライブゲームはコード参加だけ。個人の進度を追跡したい場合はサインインを選べますが、必須ではありません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生徒が何を学んだか確認できる？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "先生用ダッシュボードは言葉ごとの精度、試行回数、クラス全体のパターンを表示します。成績簿にレポート出力できます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "自分の語彙をアップロードできる？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。どの教科やテストの言葉でもアップロード。LexiClash があなたの言葉からゲームを生成します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "競争が弱い読者を落ち込ませないか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "フレーミング次第です。LexiClash でランキングを隠す、レベル別グループ化、個人改善に注力を選べます。ゲームは速く進むので、低スコアは失敗したテストほど恥ずかしくありません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "典型的なゲーム時間？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ほとんどは 5～15 分。ウォーミングアップや復習にぴったり。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "チャットや外部コンテンツ？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。クラスゲームはあなたの生徒のみ。チャット、リンク、サードパーティ広告なし。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "学校がブロックするか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash は教育的で通常ホワイトリスト。ブロックされたら IT に連絡—サポート可能です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どのデバイスで動作？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chromebook、iPad、スマートフォン、ノートパソコン、スマートボード。インストール不要。ブラウザを開いて参加。"
+      }
+    }
+  ]
+}

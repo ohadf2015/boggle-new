@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useAssignLesson } from '@/hooks/useLessons';
 import { cn } from '@/lib/utils';
-import * as Dialog from '@radix-ui/react-dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 import { X, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
@@ -58,22 +58,14 @@ export default function LessonAssignmentDialog({
   };
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onClose}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-        <Dialog.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-full max-w-md p-6',
-            'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
-          )}
-        >
-          <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-2">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md bg-neo-navy text-neo-white p-6" hideCloseButton>
+          <DialogTitle className="text-2xl font-neo-display normal-case text-neo-white mb-2">
             {t('teacher.lessons.assign.title')}
-          </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white mb-6">
+          </DialogTitle>
+          <DialogDescription className="text-sm text-neo-white mb-6">
             {t('teacher.lessons.assign.lessonLabel')}: <span className="text-neo-cyan font-bold">{lessonName}</span>
-          </Dialog.Description>
+          </DialogDescription>
 
           <div className="space-y-4">
             {/* Classroom Selection */}
@@ -149,7 +141,7 @@ export default function LessonAssignmentDialog({
             </div>
           </div>
 
-          <Dialog.Close asChild>
+          <DialogClose asChild>
             <button type="button"
               className="absolute top-4 end-4 text-neo-white hover:text-neo-white"
               aria-label="Close"
@@ -157,9 +149,8 @@ export default function LessonAssignmentDialog({
             >
               <X className="w-5 h-5" />
             </button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+          </DialogClose>
+      </DialogContent>
+    </Dialog>
   );
 }

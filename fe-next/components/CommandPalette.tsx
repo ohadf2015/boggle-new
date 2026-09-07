@@ -77,16 +77,16 @@ export function CommandPalette() {
           label={t('common.search')}
         >
           <Command.Input
-            placeholder={t('common.searchPlaceholder') || 'Search...'}
+            placeholder={t('common.searchPlaceholder', 'Search...')}
             className="w-full border-b-4 border-neo-black bg-neo-white px-4 py-3 text-base font-bold outline-hidden placeholder:text-neo-black/40"
           />
           <Command.List className="max-h-80 overflow-y-auto p-2">
             <Command.Empty className="py-6 text-center text-sm text-neo-black/50">
-              {t('common.noResults') || 'No results found.'}
+              {t('common.noResults', 'No results found.')}
             </Command.Empty>
 
             <Command.Group
-              heading={t('common.navigation') || 'Navigation'}
+              heading={t('common.navigation', 'Navigation')}
               className="mb-1 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-black **:[[cmdk-group-heading]]:uppercase **:[[cmdk-group-heading]]:text-neo-black/50"
             >
               {NAV_ITEMS.filter((i) => i.group === 'navigation').map((item) => (
@@ -103,7 +103,7 @@ export function CommandPalette() {
             </Command.Group>
 
             <Command.Group
-              heading={t('common.account') || 'Account'}
+              heading={t('common.account', 'Account')}
               className="mb-1 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-black **:[[cmdk-group-heading]]:uppercase **:[[cmdk-group-heading]]:text-neo-black/50"
             >
               {NAV_ITEMS.filter((i) => i.group === 'account').map((item) => (
@@ -122,7 +122,7 @@ export function CommandPalette() {
 
           <div className="border-t-2 border-neo-black/10 px-4 py-2 text-xs text-neo-black/40">
             <kbd className="rounded border border-neo-black/20 px-1.5 py-0.5 font-mono text-[10px]">Esc</kbd>
-            {' '}{t('common.toClose') || 'to close'}
+            {' '}{t('common.toClose', 'to close')}
           </div>
         </Command>
       </div>

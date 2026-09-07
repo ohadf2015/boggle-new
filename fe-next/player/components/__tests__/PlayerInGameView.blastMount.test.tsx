@@ -12,6 +12,12 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
+// Heavy lazy views unrelated to this test: the eager next/dynamic mock below imports every
+// dynamic() target at module load, and their real import chains can still be resolving when
+// the environment is torn down (EnvironmentTeardownError). Stub them.
+vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
+vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
+
 // Mock next/dynamic: resolve module synchronously using vi.importActual-style trick.
 // We can't use async React.lazy because tests don't use waitFor.
 // Instead, return a no-op placeholder — the important behavior (BlastGame props)

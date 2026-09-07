@@ -4,9 +4,8 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import * as Dialog from '@radix-ui/react-dialog';
+import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X, Zap } from 'lucide-react';
 
 interface ClassLimitUpsellModalProps {
@@ -36,28 +35,25 @@ export default function ClassLimitUpsellModal({
   }, [isOpen, currentCount, limit]);
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onClose}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-        <Dialog.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-full max-w-md bg-neo-cream border-3 border-black shadow-hard-lg z-50',
-            'rounded-neo overflow-hidden'
-          )}
-        >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      {/* Light-only surface: dark: variants are pinned to the light values on purpose
+          (.claude/rules/60-recurring-pitfalls.md Class 5) — every child sets text-black. */}
+      <DialogContent
+        className="sm:max-w-md bg-neo-cream dark:bg-neo-cream text-black dark:text-black border-3 border-black shadow-hard-lg rounded-neo overflow-hidden p-0"
+        hideCloseButton
+      >
           <div className="bg-neo-cyan px-6 py-4 border-b-3 border-black flex items-center justify-between">
-            <Dialog.Title className="text-2xl font-neo-display font-black text-black">
+            <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
               {t('teacher.subscription.classLimitTitle')}
-            </Dialog.Title>
-            <Dialog.Close asChild>
+            </DialogTitle>
+            <DialogClose asChild>
               <button
                 className="text-black hover:bg-black/10 p-1 rounded transition-colors"
                 aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
               </button>
-            </Dialog.Close>
+            </DialogClose>
           </div>
 
           <div className="p-6 space-y-4">
@@ -157,8 +153,7 @@ export default function ClassLimitUpsellModal({
               </Link>
             </div>
           </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   );
 }

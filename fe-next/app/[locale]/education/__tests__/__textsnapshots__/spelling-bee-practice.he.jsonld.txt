@@ -1,0 +1,148 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/spelling-bee-practice#page",
+  "name": "תרגול איות חינם — משחקי מילים להתכוננות לתחרויות | LexiClash",
+  "description": "תרגול איות בחינם דרך משחקי מילים: Boggle, אנגרמות, גלגל מילים ודו-קרבות 1v1. בלי הרשמה, בלי אפליקציה — רק דפדפן.",
+  "url": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/spelling-bee-practice#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "תרגול איות חינם",
+      "item": "https://www.lexiclash.live/he/education/spelling-bee-practice"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/spelling-bee-practice#resource",
+  "name": "תרגול איות חינם — משחקי מילים להתכוננות לתחרויות | LexiClash",
+  "description": "תרגול איות בחינם דרך משחקי מילים: Boggle, אנגרמות, גלגל מילים ודו-קרבות 1v1. בלי הרשמה, בלי אפליקציה — רק דפדפן.",
+  "url": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+  "inLanguage": "he",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Spelling Practice",
+    "Spelling Bee Preparation",
+    "Vocabulary Building",
+    "Pattern Recognition",
+    "Competition Training"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "7-18",
+  "teaches": "Spelling, letter pattern recognition, word recall under time pressure, vocabulary",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/spelling-bee-practice#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "איך לתרגל איות בחינם באינטרנט?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash מציעה שלוש דרכי תרגול המשלימות זו את זו: לוחות Boggle (מצאו כל מילה תקפה מאותיות אקראיות), גלגל מילים (בנו מילים ארוכות מסט בחור), חידות אנגרמות (סדרו מחדש אותיות למילה). הכל חינם, בלי הרשמה, בלי אפליקציה — פשוט דפדפן. מגוון פעילויות קצרות ביום בונות יכולת לזהות דפוסים וזכירה תחת לחץ."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "איך זה עוזר להכנה לתחרויות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "תחרויות איות בודקות שלוש יכולות: זכירה תחת לחץ, הכרה בדפוסי מילים, וכתיבה לפי הוראה. משחקי מילים מתרגלים את שתי הראשונות ישירות. גלגל מילים ו-Boggle מאלצים סריקה של דפוסים וזיהוי מילים תקפות במהירות. אנגרמות מתרגלות סידור מחדש של אותיות תחת לחץ — אותו תהליך נפשי כמו כתיבת מילה זרה אות אחר אות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אפשר לתרגל דו-קרב עם מתחרה אחר?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. הפעילו את מצב דו-קרבות אוצר מילים כדי לשבץ שני תלמידים זה מול זה על לוח משותף. מי שמגיע לניקוד המטרה ראשון — מנצח. דומה מאד ללחץ האמיתי של תחרות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מתאים לתחרויות ביסודי, חטיבה וחינוך תיכון?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן — ניתן לשנות את הקושי. תלמידים צעירים משחקים עם מילים קצרות וזמן ארוך יותר; מבוגרים בוודאי מתמודדים עם מילים ארוכות ותזמונים הדוקים. רשימות מילים בשכוללה יכולות לתרגל אוצר ספציפי לתחרויות: שורשים יווני-לטיניים, מונחים מדעיים, שמות גיאוגרפיים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם LexiClash משתמשת ברשימות מטרה רשמיות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash מאפשרת להעלות רשימות מילים בעצמכם, כך שמורים והורים יכולים להדביק כל רשימה — כולל רשימות מקורות שיוויים, בנקי מילים אזוריים או אוצר כיתתי מספרי לימוד. רשימות מובנות מכסות אוצר אנגלית כללי לתחימום; רשימות משלכם מטפלות בתרגול ספציפי."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כמה פעמים ביום צריך לתרגל?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "מחקרים על למידה (Roediger & Karpicke 2006) והישנון בהפסקות (Cepeda et al. 2008) מראים: 10-15 דקות, 4-5 ימים בשבוע, מפוזר לאורך שבועות — לא דחוסה. פעילויות LexiClash בנויות כך: 5-10 דקות משחק קבוצתי + 2-3 דקות תרגול בודד."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מתאים לכיתה שלמה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. מורים יכולים להנהל תרגול לכל הכיתה (כל הכיתה עם קוד בן 6 תווים, בלי חשבונות), תחרויות דו-קרב או תרגול בודד. לוח המורה מראה דיוק לתלמיד ואילו מילים טרידו את רוב המתחרים — כך אתם יודעים מה לתרגל בחזרה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "חינם לילדים בביתם?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן — לגמרי חינם, בלי תשלום, בלי הגבלה למשתמש. פתחו דפדפן, בחרו משחק, התחילו. חשבון לא הכרחי (אבל אם תפתחו — הוא שומר התקדמות ופותח עקבות הישגים)."
+      }
+    }
+  ]
+}

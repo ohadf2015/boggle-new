@@ -11,7 +11,7 @@ const AUTO_DISMISS_MS = 8000; // 8 seconds - longer for interactive demo
 interface DirectionGuidanceTooltipProps {
   isVisible: boolean;
   onDismiss: () => void;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
   dir?: 'ltr' | 'rtl';
   /** Locale for the example word/grid. Defaults to 'en'. */
   language?: string;
@@ -185,8 +185,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
 
               {/* Description */}
               <p className="text-neo-black/80 text-xs leading-relaxed mb-3">
-                {t('guidance.directionPattern.text') ||
-                  'You can change directions while tracing a word! Go right, then down, then diagonal - all in one word.'}
+                {t('guidance.directionPattern.text', 'You can change directions while tracing a word! Go right, then down, then diagonal - all in one word.')}
               </p>
 
               {/* Interactive Demo Grid */}

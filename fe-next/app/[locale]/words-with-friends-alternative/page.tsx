@@ -74,7 +74,7 @@ const faqs = [
   },
   {
     q: 'What languages are supported?',
-    a: 'LexiClash supports 5 full dictionaries: English, Hebrew (with full RTL), Swedish, Japanese, and Spanish. Multilingual rooms work — useful for ESL classrooms, language learners, and mixed-language friend groups.',
+    a: 'LexiClash supports 6 full dictionaries: English, Hebrew (with full RTL), Swedish, Japanese, Spanish, and Russian. Multilingual rooms work — useful for ESL classrooms, language learners, and mixed-language friend groups.',
   },
 ];
 
@@ -126,7 +126,7 @@ const softwareAppJsonLd = JSON.stringify({
     'Real-time multiplayer (2-20+ players, not turn-based)',
     'No download or app install required',
     'Free to play with no pay-to-win',
-    '5 languages with full dictionaries (English, Hebrew RTL, Swedish, Japanese, Spanish)',
+    '6 languages with full dictionaries (English, Hebrew RTL, Swedish, Japanese, Spanish, Russian)',
     'Daily Wordle-style challenges and Word Wheel',
     'Adventure mode with boss battles',
     'Blast mode — fast-paced cascading word combos',
@@ -160,7 +160,7 @@ const breadcrumbJsonLd = JSON.stringify({
   ],
 });
 
-const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'REAL-TIME', '2-20 PLAYERS', '5 LANGUAGES', 'NO PAY-TO-WIN', 'PLAY IN 30s', '8 GAME MODES'];
+const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'REAL-TIME', '2-20 PLAYERS', '6 LANGUAGES', 'NO PAY-TO-WIN', 'PLAY IN 30s', '8 GAME MODES'];
 
 const stats = [
   { value: '8', label: 'Game Modes', color: 'text-neo-lime' },
@@ -215,14 +215,14 @@ const bestForBuckets = [
   { tag: 'FAMILY', title: 'Best for family game night', desc: 'Phone + tablet + TV — same game everywhere. Works for ages 6+, all skill levels.', cta: 'Play with family', href: 'multiplayer', color: 'cyan' },
   { tag: 'ASYNC', title: 'Best as a Words With Friends replacement', desc: 'Daily challenges keep the streak alive. Fast 2-min sessions instead of days of waiting.', cta: 'Try Daily', href: 'daily', color: 'lime' },
   { tag: 'TEAMS', title: 'Best for remote team building', desc: 'Send a Slack link. 5-min icebreaker. No download, no IT approval, no friction.', cta: 'Spin up a room', href: 'multiplayer', color: 'pink' },
-  { tag: 'ESL', title: 'Best for language learners', desc: '5 full dictionaries including Hebrew RTL and Japanese. Vocabulary practice in the target language.', cta: 'Pick a language', href: 'multiplayer', color: 'purple' },
+  { tag: 'ESL', title: 'Best for language learners', desc: '6 full dictionaries including Hebrew RTL and Japanese. Vocabulary practice in the target language.', cta: 'Pick a language', href: 'multiplayer', color: 'purple' },
 ] as const;
 
 const whySwitch = [
   { title: 'No more waiting', desc: 'Everyone plays the grid simultaneously. Match takes 2-3 minutes, not 3 days.' },
   { title: '20+ players, not 2', desc: 'Built for groups: parties, classrooms, family nights, team building.' },
   { title: 'Zero downloads', desc: 'Open a browser. Send a link. Friends join instantly. No app store.' },
-  { title: '5 languages', desc: 'English, Hebrew (RTL), Swedish, Japanese, Spanish — full dictionaries.' },
+  { title: '6 languages', desc: 'English, Hebrew (RTL), Swedish, Japanese, Spanish, Russian — full dictionaries.' },
   { title: 'No pay-to-win', desc: 'Skill wins, not wallet. Optional cosmetics never affect competitive play.' },
   { title: '8 game modes, not 1', desc: 'Grid battles, Wordle survival, word wheel, adventure, blast, brain drills, duels, party games.' },
 ];
@@ -269,7 +269,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               Stop waiting for turns. LexiClash is the browser-based word game where 2-20+ friends play the same grid
               <em className="not-italic font-bold text-neo-lime"> at the same time</em>. Real-time, real-fast, really free.
-              Eight game modes, five languages, zero downloads.
+              Eight game modes, six languages, zero downloads.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -292,7 +292,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
               <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> live now</span>
               <span>8 game modes</span>
-              <span className="text-neo-yellow">5 languages</span>
+              <span className="text-neo-yellow">6 languages</span>
               <span>20+ players/room</span>
             </div>
           </div>

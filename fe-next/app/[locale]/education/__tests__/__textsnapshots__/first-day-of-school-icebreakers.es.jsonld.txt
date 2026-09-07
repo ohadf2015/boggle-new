@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers#page",
+  "name": "Rompehielos del Primer Día | LexiClash",
+  "description": "Juegos de palabras para aulas donde los estudiantes están callados. Actividades sin presión para el primer día—sin listas de nombres, nadie en la mira.",
+  "url": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Rompehielos del Primer Día",
+      "item": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers#resource",
+  "name": "Rompehielos del Primer Día | LexiClash",
+  "description": "Un juego de palabras de toda la aula en letras compartidas—sin presentaciones individuales, sin esperas. LexiClash da a los maestros un tablero en vivo y a los estudiantes una forma sin presión de hablar, descubrir nombres y sentir la aula cambiar de silencio a energía en menos de 15 minutos.",
+  "url": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+  "inLanguage": "es",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "8-16",
+  "teaches": "cohesión social, vocabulario en contexto, aprendizaje rápido de nombres",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Qué pasa con los estudiantes que no quieren hablar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Están dentro. Encuentran palabras en silencio. Ves el tablero llenarse con su nombre. La presión de \"presentarse\" desaparece—solo ves quiénes son en tiempo real. Algunos hablan menos la ronda uno, más la ronda dos. Así funciona."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usarlo si los estudiantes ya se conocen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Conecta nombres con caras, no solo nombres con una lista. Plus, una mezcla fresca de aula (incluso en años repetidos) crea suficiente distancia para que la introducción sin presión siga funcionando."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Para qué grupos de edad funciona?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Primaria hasta secundaria. Ajusta el idioma: estudiantes más jóvenes buscan palabras más simples; mayores buscan palabras más largas o juegan con un filtro temático. Un juego, muchas velocidades."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usarlo de forma asincrónica?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Dale a los estudiantes un código, un tema (ej. \"Encuentra palabras sobre el verano\") y una fecha límite. Juegan en su propio tiempo. Menos energía de rompehielos, más asincrónico y descubre qué saben."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué si un estudiante no tiene dispositivo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Emparéjalo con un compañero, o que ayude a ese equipo. Aún se lo conocerá. Aún parte del aula."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar esto para clases de ESL o multilingües?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutamente. Estudiantes más jóvenes buscan palabras más cortas; avanzados buscan por significado. Publica el tema en inglés o en la lengua materna."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo mantengo el movimiento?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Establece un temporizador. Dos minutos por ronda, no diez. Los niños se mueven rápido una vez que entienden el flujo. Nombra a unos pocos estudiantes entre rondas para mantenerte involucrado y a ellos conocidos."
+      }
+    }
+  ]
+}

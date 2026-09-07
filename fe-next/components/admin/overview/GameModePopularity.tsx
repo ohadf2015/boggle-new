@@ -44,7 +44,7 @@ export function GameModePopularity() {
     <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-neo-white font-bold text-sm uppercase tracking-wider">
-          {t('admin.gameModePopularity') || 'Game Mode Popularity'}
+          {t('admin.gameModePopularity', 'Game Mode Popularity')}
         </h3>
         <div className="flex gap-1">
           {[7, 30, 90].map(d => (
@@ -105,12 +105,12 @@ export function GameModePopularity() {
           })}
 
           <div className="border-t border-slate-700 pt-2 mt-3 flex justify-between text-xs text-neo-white">
-            <span>{t('admin.totalGames') || 'Total'}: {totalGames.toLocaleString()}</span>
-            <span>{t('admin.landingCardOrder') || 'Landing card order'}: {stats.filter(s => s.mode !== 'blast').map(s => s.mode).join(' → ')}</span>
+            <span>{t('admin.totalGames', 'Total')}: {totalGames.toLocaleString()}</span>
+            <span>{t('admin.landingCardOrder', 'Landing card order')}: {stats.filter(s => s.mode !== 'blast').map(s => s.mode).join(' → ')}</span>
           </div>
         </div>
       ) : (
-        <p className="text-neo-white text-xs">{t('admin.noData') || 'No data available'}</p>
+        <p className="text-neo-white text-xs">{t('admin.noData', 'No data available')}</p>
       )}
     </div>
   );

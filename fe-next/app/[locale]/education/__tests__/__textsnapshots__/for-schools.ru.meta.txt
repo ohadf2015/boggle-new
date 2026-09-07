@@ -1,0 +1,55 @@
+{
+  "title": "Бесплатные игры на словарный запас для школ — LexiClash",
+  "description": "Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры. Бесплатный пробный период 30 дней для учителей. Школьные планы от $149 в год.",
+  "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/for-schools",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/for-schools",
+    "he": "https://www.lexiclash.live/he/education/for-schools",
+    "en": "https://www.lexiclash.live/en/education/for-schools",
+    "sv": "https://www.lexiclash.live/sv/education/for-schools",
+    "ja": "https://www.lexiclash.live/ja/education/for-schools",
+    "es": "https://www.lexiclash.live/es/education/for-schools",
+    "ru": "https://www.lexiclash.live/ru/education/for-schools",
+    "en-IL": "https://www.lexiclash.live/en/education/for-schools",
+    "he-IL": "https://www.lexiclash.live/he/education/for-schools",
+    "en-US": "https://www.lexiclash.live/en/education/for-schools",
+    "es-US": "https://www.lexiclash.live/es/education/for-schools",
+    "en-GB": "https://www.lexiclash.live/en/education/for-schools",
+    "en-SE": "https://www.lexiclash.live/en/education/for-schools",
+    "sv-SE": "https://www.lexiclash.live/sv/education/for-schools",
+    "en-JP": "https://www.lexiclash.live/en/education/for-schools",
+    "ja-JP": "https://www.lexiclash.live/ja/education/for-schools",
+    "en-ES": "https://www.lexiclash.live/en/education/for-schools",
+    "es-ES": "https://www.lexiclash.live/es/education/for-schools",
+    "en-MX": "https://www.lexiclash.live/en/education/for-schools",
+    "es-MX": "https://www.lexiclash.live/es/education/for-schools",
+    "en-AU": "https://www.lexiclash.live/en/education/for-schools",
+    "es-AR": "https://www.lexiclash.live/es/education/for-schools",
+    "es-CO": "https://www.lexiclash.live/es/education/for-schools",
+    "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
+  },
+  "ogTitle": "LexiClash для школ — игры на словарный запас",
+  "ogDescription": "Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $149 в год.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/for-schools",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/og-image-en.webp",
+      "width": 1200,
+      "height": 630,
+      "alt": "LexiClash для школ — игры на словарный запас"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "LexiClash для школ — игры на словарный запас",
+  "twDescription": "Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $149 в год.",
+  "twImages": [
+    "https://www.lexiclash.live/og-image-en.webp"
+  ]
+}

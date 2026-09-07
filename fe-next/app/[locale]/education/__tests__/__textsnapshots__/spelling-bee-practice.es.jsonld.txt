@@ -1,0 +1,148 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/spelling-bee-practice#page",
+  "name": "Práctica de Ortografía Online — Juegos Gratis | LexiClash",
+  "description": "Práctica de ortografía gratis a través de juegos. Boggle, anagramas, ruedas, duelos. Sin registro, sin app — solo navegador.",
+  "url": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/spelling-bee-practice#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Práctica de Ortografía Online",
+      "item": "https://www.lexiclash.live/es/education/spelling-bee-practice"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/spelling-bee-practice#resource",
+  "name": "Práctica de Ortografía Online — Juegos Gratis | LexiClash",
+  "description": "Práctica de ortografía gratis a través de juegos. Boggle, anagramas, ruedas, duelos. Sin registro, sin app — solo navegador.",
+  "url": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+  "inLanguage": "es",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Spelling Practice",
+    "Spelling Bee Preparation",
+    "Vocabulary Building",
+    "Pattern Recognition",
+    "Competition Training"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "7-18",
+  "teaches": "Spelling, letter pattern recognition, word recall under time pressure, vocabulary",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/spelling-bee-practice#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cómo puedo practicar ortografía en línea gratis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash ofrece a los competidores de ortografía tres formatos de práctica complementarios: cuadrículas Boggle (encuentra todas las palabras válidas de letras aleatorias), rueda de palabras (forma palabras largas de un conjunto de letras seleccionadas) y acertijos de anagramas (reorganiza letras en palabras objetivo). Todo gratis, sin registro, sin app — solo abre el navegador y juega. Varias sesiones cortas al día construyen el reconocimiento de patrones y el recuerdo bajo presión de tiempo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo ayuda esto a la preparación para competencias de ortografía?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las competencias de ortografía prueban el recuerdo bajo estrés + el reconocimiento de patrones de palabras + la ortografía bajo pistas de audio. Los juegos de palabras entrenan los dos primeros directamente. La rueda de palabras y Boggle obligan a los estudiantes a escanear patrones de letras y reconocer palabras válidas rápidamente. Los anagramas entrenan la reorganización de letras bajo presión — el mismo movimiento mental que deletrear palabras desconocidas letra por letra."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo practicar 1v1 con otro competidor de ortografía?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Usa el modo de duelos de vocabulario para emparejar a dos estudiantes cara a cara en la misma cuadrícula de letras. El primero en alcanzar la puntuación objetivo gana. Excelente simulación de presión competitiva para competidores serios entrenando juntos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es apropiado para competencias de ortografía en primaria, secundaria y preparatoria?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí — la dificultad es configurable. Los competidores más jóvenes pueden jugar con palabras más cortas y temporizadores más largos; los competidores mayores enfrentan palabras más largas y límites de tiempo más estrictos. Las listas de palabras avanzadas personalizadas pueden entrenar vocabulario específico de ortografía (raíces griego-latinas, términos científicos, nombres geográficos)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Usa LexiClash las listas de palabras del Scripps National Spelling Bee?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash admite la carga de listas de palabras personalizadas, por lo que maestros y padres pueden pegar cualquier lista — incluyendo listas de estudio de Scripps, bancos de palabras regionales o vocabulario específico del grado de los libros de texto. Las listas incorporadas cubren vocabulario inglés general para práctica de calentamiento; las listas personalizadas manejan la práctica específica de competencia."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Con qué frecuencia debe practicar un competidor de ortografía?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La investigación sobre práctica de recuperación (Roediger & Karpicke 2006) y repetición espaciada (Cepeda et al. 2008) sugiere sesiones de 10-15 minutos, 4-5 días por semana, distribuidas en semanas en lugar de apretadas en días. Las sesiones de LexiClash están diseñadas para ajustarse a ese patrón: rondas multijugador de 5-10 minutos + ejercicios solo de 2-3 minutos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Está LexiClash lista para competencias de ortografía en escuelas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Los maestros pueden ejecutar calentamientos de ortografía para toda la clase (toda la clase se unen con un código de 6 caracteres, sin cuentas de estudiante), torneos de eliminación 1v1 o asignar práctica solo. El panel del maestro muestra la precisión por estudiante y qué palabras tropezaron con la mayoría de los competidores — útil para dirigirse a sesiones de revisión."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es gratis para estudiantes individuales preparándose en casa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí — completamente gratis, sin nivel premium, sin tarifa por usuario. Abre el navegador, elige un modo, empieza a practicar. Sin cuenta requerida (aunque la cuenta opcional guarda tu progreso y desbloquea el seguimiento de racha)."
+      }
+    }
+  ]
+}

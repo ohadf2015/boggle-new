@@ -11,11 +11,11 @@ export const faqByLocale: Record<string, FaqItem[]> = {
   en: [
     {
       question: 'What are the most popular online word games in 2026?',
-      answer: 'The most-played online word games in 2026 are Wordle and NYT Connections (both New York Times), followed by Spelling Bee, Strands, Words With Friends, the multi-grid Wordle variants Quordle and Octordle, and Netflix\'s Scattergories Daily. LexiClash is a free browser option combining real-time multiplayer with daily challenges in five languages.',
+      answer: 'The most-played online word games in 2026 are Wordle and NYT Connections (both New York Times), followed by Spelling Bee, Strands, Words With Friends, the multi-grid Wordle variants Quordle and Octordle, and Netflix\'s Scattergories Daily. LexiClash is a free browser option combining real-time multiplayer with daily challenges in six languages.',
     },
     {
       question: 'What is the best free word game in 2026?',
-      answer: 'For a one-a-day habit, Wordle is the best free option. For category puzzles, NYT Connections. For real-time multiplayer with no pay-to-win power-ups, LexiClash is free in the browser with daily challenges, boss battles, and support for English, Hebrew, Swedish, Japanese and Spanish.',
+      answer: 'For a one-a-day habit, Wordle is the best free option. For category puzzles, NYT Connections. For real-time multiplayer with no pay-to-win power-ups, LexiClash is free in the browser with daily challenges, boss battles, and support for English, Hebrew, Swedish, Japanese, Spanish and Russian.',
     },
     {
       question: 'Why did word games become so popular?',
@@ -34,11 +34,11 @@ export const faqByLocale: Record<string, FaqItem[]> = {
   he: [
     {
       question: 'מהם משחקי המילים הכי פופולריים אונליין ב-2026?',
-      answer: 'משחקי המילים הכי משוחקים אונליין ב-2026 הם Wordle ו-NYT Connections (שניהם של הניו יורק טיימס), אחריהם Spelling Bee, Strands, Words With Friends, גרסאות הרשת המרובה Quordle ו-Octordle, ו-Scattergories Daily של נטפליקס. LexiClash הוא אפשרות חינמית בדפדפן שמשלבת מולטיפלייר בזמן אמת עם אתגרים יומיים בחמש שפות.',
+      answer: 'משחקי המילים הכי משוחקים אונליין ב-2026 הם Wordle ו-NYT Connections (שניהם של הניו יורק טיימס), אחריהם Spelling Bee, Strands, Words With Friends, גרסאות הרשת המרובה Quordle ו-Octordle, ו-Scattergories Daily של נטפליקס. LexiClash הוא אפשרות חינמית בדפדפן שמשלבת מולטיפלייר בזמן אמת עם אתגרים יומיים בשש שפות.',
     },
     {
       question: 'מהו משחק המילים החינמי הכי טוב ב-2026?',
-      answer: 'להרגל של פעם ביום, Wordle הוא האפשרות החינמית הכי טובה. לחידות קטגוריות, NYT Connections. למולטיפלייר בזמן אמת בלי פאוור-אפים של pay-to-win, LexiClash חינמי בדפדפן עם אתגרים יומיים, קרבות בוסים ותמיכה באנגלית, עברית, שוודית, יפנית וספרדית.',
+      answer: 'להרגל של פעם ביום, Wordle הוא האפשרות החינמית הכי טובה. לחידות קטגוריות, NYT Connections. למולטיפלייר בזמן אמת בלי פאוור-אפים של pay-to-win, LexiClash חינמי בדפדפן עם אתגרים יומיים, קרבות בוסים ותמיכה באנגלית, עברית, שוודית, יפנית, ספרדית ורוסית.',
     },
     {
       question: 'למה משחקי מילים הפכו כל כך פופולריים?',
@@ -57,11 +57,11 @@ export const faqByLocale: Record<string, FaqItem[]> = {
   sv: [
     {
       question: 'Vilka är de populäraste ordspelen online 2026?',
-      answer: 'De mest spelade ordspelen online 2026 är Wordle och NYT Connections (båda New York Times), följt av Spelling Bee, Strands, Words With Friends, fler-rutnätsvarianterna Quordle och Octordle samt Netflix Scattergories Daily. LexiClash är ett gratis webbläsaralternativ som kombinerar realtidsmultiplayer med dagliga utmaningar på fem språk.',
+      answer: 'De mest spelade ordspelen online 2026 är Wordle och NYT Connections (båda New York Times), följt av Spelling Bee, Strands, Words With Friends, fler-rutnätsvarianterna Quordle och Octordle samt Netflix Scattergories Daily. LexiClash är ett gratis webbläsaralternativ som kombinerar realtidsmultiplayer med dagliga utmaningar på sex språk.',
     },
     {
       question: 'Vilket är det bästa gratis ordspelet 2026?',
-      answer: 'För en en-om-dagen-vana är Wordle det bästa gratisalternativet. För kategoripussel, NYT Connections. För realtidsmultiplayer utan pay-to-win power-ups är LexiClash gratis i webbläsaren med dagliga utmaningar, boss-strider och stöd för engelska, hebreiska, svenska, japanska och spanska.',
+      answer: 'För en en-om-dagen-vana är Wordle det bästa gratisalternativet. För kategoripussel, NYT Connections. För realtidsmultiplayer utan pay-to-win power-ups är LexiClash gratis i webbläsaren med dagliga utmaningar, boss-strider och stöd för engelska, hebreiska, svenska, japanska, spanska och ryska.',
     },
     {
       question: 'Varför blev ordspel så populära?',
@@ -80,11 +80,11 @@ export const faqByLocale: Record<string, FaqItem[]> = {
   ja: [
     {
       question: '2026年に最も人気のオンラインワードゲームは何ですか?',
-      answer: '2026年に最も遊ばれているオンラインワードゲームはWordleとNYT Connections（どちらもニューヨーク・タイムズ）で、続いてSpelling Bee、Strands、Words With Friends、複数グリッド版のQuordleとOctordle、NetflixのScattergories Dailyです。LexiClashは、リアルタイムマルチプレイヤーと毎日のチャレンジを5言語で組み合わせた無料のブラウザ版の選択肢です。',
+      answer: '2026年に最も遊ばれているオンラインワードゲームはWordleとNYT Connections（どちらもニューヨーク・タイムズ）で、続いてSpelling Bee、Strands、Words With Friends、複数グリッド版のQuordleとOctordle、NetflixのScattergories Dailyです。LexiClashは、リアルタイムマルチプレイヤーと毎日のチャレンジを6言語で組み合わせた無料のブラウザ版の選択肢です。',
     },
     {
       question: '2026年で最高の無料ワードゲームは?',
-      answer: '1日1回の習慣にはWordleが最高の無料の選択肢です。カテゴリーパズルならNYT Connections。pay-to-winのパワーアップなしのリアルタイムマルチプレイヤーなら、LexiClashがブラウザで無料、毎日のチャレンジ、ボスバトル、英語・ヘブライ語・スウェーデン語・日本語・スペイン語に対応しています。',
+      answer: '1日1回の習慣にはWordleが最高の無料の選択肢です。カテゴリーパズルならNYT Connections。pay-to-winのパワーアップなしのリアルタイムマルチプレイヤーなら、LexiClashがブラウザで無料、毎日のチャレンジ、ボスバトル、英語・ヘブライ語・スウェーデン語・日本語・スペイン語・ロシア語に対応しています。',
     },
     {
       question: 'なぜワードゲームはこんなに人気になったのですか?',
@@ -103,11 +103,11 @@ export const faqByLocale: Record<string, FaqItem[]> = {
   es: [
     {
       question: '¿Cuáles son los juegos de palabras online más populares en 2026?',
-      answer: 'Los juegos de palabras online más jugados en 2026 son Wordle y NYT Connections (ambos de The New York Times), seguidos de Spelling Bee, Strands, Words With Friends, las variantes de múltiples cuadrículas Quordle y Octordle, y Scattergories Daily de Netflix. LexiClash es una opción gratuita en el navegador que combina multijugador en tiempo real con desafíos diarios en cinco idiomas.',
+      answer: 'Los juegos de palabras online más jugados en 2026 son Wordle y NYT Connections (ambos de The New York Times), seguidos de Spelling Bee, Strands, Words With Friends, las variantes de múltiples cuadrículas Quordle y Octordle, y Scattergories Daily de Netflix. LexiClash es una opción gratuita en el navegador que combina multijugador en tiempo real con desafíos diarios en seis idiomas.',
     },
     {
       question: '¿Cuál es el mejor juego de palabras gratis en 2026?',
-      answer: 'Para un hábito de uno al día, Wordle es la mejor opción gratuita. Para puzzles de categorías, NYT Connections. Para multijugador en tiempo real sin potenciadores pay-to-win, LexiClash es gratis en el navegador con desafíos diarios, batallas de jefes y soporte para inglés, hebreo, sueco, japonés y español.',
+      answer: 'Para un hábito de uno al día, Wordle es la mejor opción gratuita. Para puzzles de categorías, NYT Connections. Para multijugador en tiempo real sin potenciadores pay-to-win, LexiClash es gratis en el navegador con desafíos diarios, batallas de jefes y soporte para inglés, hebreo, sueco, japonés, español y ruso.',
     },
     {
       question: '¿Por qué los juegos de palabras se volvieron tan populares?',

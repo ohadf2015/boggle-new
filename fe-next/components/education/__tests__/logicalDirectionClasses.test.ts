@@ -24,17 +24,9 @@ const SCANNED_TREES = ['education', 'teacher'];
 /** path (relative to components/) -> physical tokens that must stay, and why. */
 const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
   // ---- components/education ----
-  'education/AchievementUnlockModal.tsx': {
-    tokens: ['right-4', 'left-4'],
-    why: 'ltr:right-4 rtl:left-4 variant pair — already mirrored',
-  },
   'education/EducationHeader.tsx': {
     tokens: ['left-0', 'right-0', 'border-l-4', 'border-r-4', 'rounded-l-neo-lg', 'rounded-r-neo-lg'],
     why: 'the mobile drawer already mirrors ALL SIX inside one isRTL ternary — RTL gets left-0/border-r-4/rounded-r-neo-lg, LTR gets right-0/border-l-4/rounded-l-neo-lg, so border and radius are on the inner edge in both directions',
-  },
-  'education/ClassroomWaitingRoom.tsx': {
-    tokens: ['border-r-neo-cyan', 'border-l-transparent'],
-    why: 'the coloured arc of an animate-spin loader; the element rotates continuously so which quadrant is painted has no reading direction',
   },
   'education/student-preview/PreviewWaitingScreen.tsx': {
     tokens: ['border-r-neo-cyan'],
@@ -53,14 +45,6 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     why: 'isRTL ? right-0 : left-0 ternary',
   },
   // ---- components/teacher ----
-  'teacher/LessonTemplateEditor.tsx': {
-    tokens: ['left-4', 'right-4'],
-    why: 'isRTL ? left-4 : right-4 ternary',
-  },
-  'teacher/QuickStartButton.tsx': {
-    tokens: ['text-left', 'text-right'],
-    why: 'text-left is overridden by isRTL && "rtl text-right" on the same element',
-  },
   'teacher/ProWelcomeCelebration.tsx': {
     tokens: ['text-right'],
     why: 'applied only inside isRTL && "rtl text-right"',

@@ -1,0 +1,64 @@
+{
+  "title": "משחקי הפסקה בתוך הכיתה | LexiClash",
+  "description": "תכנית מובנית של 20 דקות למשחקים בהפסקה בימים גשומים. משחקי מילים חינמיים, פעילויות שקטות, ותכנון לכל גודל כיתה.",
+  "keywords": [
+    "משחקי הפסקה בפנים",
+    "פעילויות יום גשום בכיתה",
+    "משחקים בהפסקה שקטה",
+    "משחקים לכיתה שלמה",
+    "משחקי מילים בחינם",
+    "פעילויות פנים בזמן גשום",
+    "משחקי חינוך משחקים",
+    "הפסקות מוח עם משחקי מילים"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/he/education/indoor-recess-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "ja": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "es": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+    "en-IL": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he-IL": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en-US": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-US": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-GB": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "en-SE": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "en-JP": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "en-ES": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-ES": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-MX": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-MX": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-AU": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-AR": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "es-CO": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/indoor-recess-games"
+  },
+  "ogTitle": "משחקי הפסקה בתוך הכיתה | LexiClash",
+  "ogDescription": "תכנית מובנית של 20 דקות למשחקים בהפסקה בימים גשומים. משחקי מילים חינמיים, פעילויות שקטות, ותכנון לכל גודל כיתה.",
+  "ogLocale": "he_IL",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/he/education/indoor-recess-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-he.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "משחקי הפסקה בתוך הכיתה | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "משחקי הפסקה בתוך הכיתה | LexiClash",
+  "twDescription": "תכנית מובנית של 20 דקות למשחקים בהפסקה בימים גשומים. משחקי מילים חינמיים, פעילויות שקטות, ותכנון לכל גודל כיתה.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-he.webp"
+  ]
+}

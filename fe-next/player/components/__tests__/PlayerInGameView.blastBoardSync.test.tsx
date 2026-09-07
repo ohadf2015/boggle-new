@@ -13,6 +13,12 @@ import { render, screen } from '@testing-library/react';
 // Mocks
 // ---------------------------------------------------------------------------
 
+// Heavy lazy views unrelated to this test: the eager next/dynamic mock below imports every
+// dynamic() target at module load, and their real import chains can still be resolving when
+// the environment is torn down (EnvironmentTeardownError). Stub them.
+vi.mock('@/components/education/vocabQuiz/VocabQuizView', () => ({ VocabQuizView: () => null }));
+vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
+
 // Mock next/dynamic to render mocked components synchronously in tests
 vi.mock('next/dynamic', () => ({
   __esModule: true,

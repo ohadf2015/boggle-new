@@ -1,5 +1,16 @@
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
+/**
+ * Locale-invariant half of the LearningResource block. Only `teaches` is
+ * translated; the rest was repeated verbatim in all six locale objects.
+ */
+const LEARNING = {
+  educationalUse: ['Classroom Activity'],
+  educationalLevel: ['Primary', 'Secondary'],
+  typicalAgeRange: '7-16',
+  timeRequired: 'PT30M',
+};
+
 const EN: EducationLandingContent = {
   accent: 'pink',
   meta: {
@@ -155,11 +166,8 @@ const EN: EducationLandingContent = {
     current: 'End of Year Activities',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'vocabulary, spelling, word patterns, categorization, collaborative play',
-    timeRequired: 'PT30M',
   },
 };
 
@@ -317,11 +325,8 @@ const HE: EducationLandingContent = {
     current: 'פעילויות סוף שנה',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'אוצר מילים, איות, דפוסי מילים, קטגוריזציה, משחק שיתופי',
-    timeRequired: 'PT30M',
   },
 };
 
@@ -479,11 +484,8 @@ const SV: EducationLandingContent = {
     current: 'Aktiviteter Sista Veckan',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'ordkunskap, stavning, ordmönster, kategorisering, samspelat spel',
-    timeRequired: 'PT30M',
   },
 };
 
@@ -641,11 +643,8 @@ const JA: EducationLandingContent = {
     current: '学年末の活動',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: '単語力、スペル、単語パターン、カテゴリー化、協力的な遊び',
-    timeRequired: 'PT30M',
   },
 };
 
@@ -803,11 +802,8 @@ const ES: EducationLandingContent = {
     current: 'Actividades de Fin de Año',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'vocabulario, ortografía, patrones de palabras, categorización, juego colaborativo',
-    timeRequired: 'PT30M',
   },
 };
 
@@ -965,11 +961,8 @@ const RU: EducationLandingContent = {
     current: 'Мероприятия Конца Года',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'словарный запас, орфография, паттерны слов, категоризация, совместная игра',
-    timeRequired: 'PT30M',
   },
 };
 

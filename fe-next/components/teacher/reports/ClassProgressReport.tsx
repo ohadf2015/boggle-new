@@ -15,6 +15,7 @@ import {
   DateRange,
 } from '@/lib/supabase/analytics';
 import logger from '@/utils/logger';
+import { Stat } from '@/components/ui/Stat';
 
 // =============================================
 // TYPE DEFINITIONS
@@ -189,45 +190,33 @@ export function ClassProgressReport({
           {t('teacher.reports.sections.summary')}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Total Students */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.totalStudents')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.totalStudents}
-            </p>
-          </div>
+          <Stat
+            value={data.metrics.totalStudents}
+            label={t('teacher.reports.metrics.totalStudents')}
+            size="lg"
+            className="w-full"
+          />
 
-          {/* Active Students */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.activeStudents')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.activeStudents}
-            </p>
-          </div>
+          <Stat
+            value={data.metrics.activeStudents}
+            label={t('teacher.reports.metrics.activeStudents')}
+            size="lg"
+            className="w-full"
+          />
 
-          {/* Class Average Accuracy */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.classAverageAccuracy')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.classAverageAccuracy}%
-            </p>
-          </div>
+          <Stat
+            value={`${data.metrics.classAverageAccuracy}%`}
+            label={t('teacher.reports.metrics.classAverageAccuracy')}
+            size="lg"
+            className="w-full"
+          />
 
-          {/* Completion Rate */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.completionRate')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.completionRate}%
-            </p>
-          </div>
+          <Stat
+            value={`${data.metrics.completionRate}%`}
+            label={t('teacher.reports.metrics.completionRate')}
+            size="lg"
+            className="w-full"
+          />
         </div>
       </section>
 

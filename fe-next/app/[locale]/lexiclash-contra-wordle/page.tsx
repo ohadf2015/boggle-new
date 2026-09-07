@@ -61,7 +61,7 @@ const faqs = [
   },
   {
     q: '¿LexiClash funciona en español?',
-    a: 'Sí, LexiClash está disponible en español, inglés, hebreo, sueco y japonés. La interfaz, las instrucciones y el diccionario de palabras válidas — todo funciona en tu idioma. Solo selecciona español en los ajustes y listo.',
+    a: 'Sí, LexiClash está disponible en español, inglés, hebreo, sueco, japonés y ruso. La interfaz, las instrucciones y el diccionario de palabras válidas — todo funciona en tu idioma. Solo selecciona español en los ajustes y listo.',
   },
   {
     q: '¿Puedo jugar LexiClash gratis y sin descargar nada?',

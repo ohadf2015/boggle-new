@@ -1,5 +1,17 @@
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
+/**
+ * The LearningResource block is identical in all six locales — it carries no
+ * translated copy — so it is declared once.
+ */
+const LEARNING = {
+  educationalUse: ['Classroom Activity'],
+  educationalLevel: ['Primary', 'Secondary'],
+  typicalAgeRange: '6-14',
+  teaches: 'vocabulary, word recognition, attention reset',
+  timeRequired: 'PT3M',
+};
+
 const EN: EducationLandingContent = {
   accent: 'lime',
   meta: {
@@ -224,13 +236,7 @@ const EN: EducationLandingContent = {
     { href: '/education', label: 'Education home', accent: 'pink' },
   ],
   breadcrumb: { home: 'Home', hub: 'Education', current: 'Brain breaks for classrooms' },
-  learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-14',
-    teaches: 'vocabulary, word recognition, attention reset',
-    timeRequired: 'PT3M',
-  },
+  learning: LEARNING,
 };
 
 const HE: EducationLandingContent = {
@@ -456,13 +462,7 @@ const HE: EducationLandingContent = {
     { href: '/education', label: 'חינוך', accent: 'pink' },
   ],
   breadcrumb: { home: 'בית', hub: 'חינוך', current: 'הפסקות קשב' },
-  learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-14',
-    teaches: 'vocabulary, word recognition, attention reset',
-    timeRequired: 'PT3M',
-  },
+  learning: LEARNING,
 };
 
 const ES: EducationLandingContent = {
@@ -688,13 +688,7 @@ const ES: EducationLandingContent = {
     { href: '/education', label: 'Centro educativo', accent: 'pink' },
   ],
   breadcrumb: { home: 'Inicio', hub: 'Educación', current: 'Pausas de concentración' },
-  learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-14',
-    teaches: 'vocabulary, word recognition, attention reset',
-    timeRequired: 'PT3M',
-  },
+  learning: LEARNING,
 };
 
 const SV: EducationLandingContent = {
@@ -920,13 +914,7 @@ const SV: EducationLandingContent = {
     { href: '/education', label: 'Utbildning', accent: 'pink' },
   ],
   breadcrumb: { home: 'Hem', hub: 'Utbildning', current: 'Hjärnpauser' },
-  learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-14',
-    teaches: 'vocabulary, word recognition, attention reset',
-    timeRequired: 'PT3M',
-  },
+  learning: LEARNING,
 };
 
 const JA: EducationLandingContent = {
@@ -1152,13 +1140,7 @@ const JA: EducationLandingContent = {
     { href: '/education', label: '教育ホーム', accent: 'pink' },
   ],
   breadcrumb: { home: 'ホーム', hub: '教育', current: '脳トレ休憩' },
-  learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-14',
-    teaches: 'vocabulary, word recognition, attention reset',
-    timeRequired: 'PT3M',
-  },
+  learning: LEARNING,
 };
 
 const RU: EducationLandingContent = {
@@ -1384,13 +1366,7 @@ const RU: EducationLandingContent = {
     { href: '/education', label: 'Образование', accent: 'pink' },
   ],
   breadcrumb: { home: 'Главная', hub: 'Образование', current: 'Физминутки' },
-  learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '6-14',
-    teaches: 'vocabulary, word recognition, attention reset',
-    timeRequired: 'PT3M',
-  },
+  learning: LEARNING,
 };
 
 const MAP: Record<string, EducationLandingContent> = { en: EN, he: HE, es: ES, sv: SV, ja: JA, ru: RU };

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
@@ -105,6 +106,10 @@ export default async function Page({ params }: PageProps) {
               <span className="inline-block rotate-[-2deg] bg-neo-lime px-3 text-neo-navy shadow-hard">{c.heroHighlight}</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">{c.heroSubtitle}</p>
+
+            {/* The one CTA here that asks for nothing. */}
+            <NoAccountCta locale={locale} className="mt-7" />
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 {c.heroCta1}

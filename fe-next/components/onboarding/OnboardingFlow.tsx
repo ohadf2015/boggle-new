@@ -434,7 +434,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           <QuickStartStep
             onPlay={handleQuickStartPlay}
             onHowToPlay={() => setShowHowToPlay(true)}
-            onHaveAccount={isOnCrazyGamesPlatform ? undefined : handleHaveAccount}
             onSkip={handleSkipOnboarding}
           />
         );
@@ -561,6 +560,23 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           }}
         />
       </div>
+
+      {/* Sign in. This takeover is `fixed inset-0 z-[100]` — it covers the site
+          header, so it must carry the header's one essential control itself.
+          Pinned to the top inline-end corner (where the header's Sign In sits)
+          because the step content scrolls: the old link lived in the tertiary
+          row at the bottom of the step and measured below the fold at
+          1440x900, which is how "there is no way to sign in" happened. */}
+      {!isOnCrazyGamesPlatform && step !== 'returningUser' && (
+        <button
+          type="button"
+          data-testid="onboarding-sign-in"
+          onClick={handleHaveAccount}
+          className="absolute top-4 end-4 z-20 min-h-11 rounded-neo border-2 border-neo-white/30 px-4 font-neo-body text-sm font-bold text-neo-white transition-colors hover:border-neo-lime hover:text-neo-lime focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime"
+        >
+          {t('onboarding.quickStart.haveAccount')}
+        </button>
+      )}
 
       {/* Progress indicator — a single dot communicates nothing but clutter, so
           it only appears when there is actually a sequence to track. */}

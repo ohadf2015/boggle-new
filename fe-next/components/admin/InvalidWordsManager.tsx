@@ -303,10 +303,10 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
   };
 
   const getReasonLabel = (reason: string | null) => {
-    if (!reason) return t('admin.invalidWords.reasons.unknown') || 'Unknown';
+    if (!reason) return t('admin.invalidWords.reasons.unknown', 'Unknown');
     // Handle dismissed reasons
     if (reason.startsWith('dismissed:')) {
-      return t('admin.invalidWords.reasons.dismissed') || 'Dismissed';
+      return t('admin.invalidWords.reasons.dismissed', 'Dismissed');
     }
     const key = REASON_KEYS[reason];
     return key ? (t(key) || REASON_FALLBACKS[reason] || reason) : reason;

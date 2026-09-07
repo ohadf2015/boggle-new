@@ -82,10 +82,14 @@ describe('MultiLessonSelector', () => {
       />
     );
 
-    // THEN - Animals has 2 playable words
-    expect(screen.getByText(/2.*word/i)).toBeInTheDocument();
-    // Colors has 1 playable word (blue is not integrable)
-    expect(screen.getByText(/1.*word/i)).toBeInTheDocument();
+    // THEN - both lessons show the count the TEACHER put in them: 2 each.
+    // This used to assert Colors showed "1 word" because `canIntegrate` is
+    // false for 'blue' — i.e. it pinned the bug in place. `canIntegrate` is a
+    // Boggle-grid rule (3-12 letters), and using it here is what made a
+    // ten-word lesson read "9 words" beside its own checkbox one screen after
+    // the editor said 10. See MultiLessonSelector.lessonCount.test.tsx.
+    expect(screen.getAllByText(/2.*word/i)).toHaveLength(2);
+    expect(screen.queryByText(/1.*word/i)).not.toBeInTheDocument();
   });
 
   it('should call onSelectChange when lesson is selected', () => {

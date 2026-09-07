@@ -1,0 +1,167 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/en/education/for-schools#faq",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is LexiClash free for teachers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $149/school/year."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does a school or district plan include?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "School plans ($149/year per school) add the features that scale: a district admin dashboard, cross-class analytics and reporting, curated curriculum content libraries, an ad-free school environment, and SSO (Clever / ClassLink / Google). The basic classroom game stays free -- plans layer on top, never gate it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do students need accounts or logins?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Students join a class game with a code -- nothing to provision, no student data to manage. That makes a school-wide rollout far simpler than tools that require rostering or SSO before play."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which languages are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "English, Hebrew (full right-to-left support), Spanish, Swedish, Japanese and Russian, each with a native dictionary -- built for ESL, bilingual and immersion classrooms."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do we start our trial or get a school plan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Fill in the form on this page with your role, school or district, and rough student count. We'll confirm your trial access and share school plan details -- $149/year per school, district pricing on request."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is this different from Kahoot, Gimkit or Quizlet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Those are quiz/flashcard tools that cap their free tiers and are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, has no player cap during the trial, and offers true 1v1 duels."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use LexiClash for ESL or English language learner (ELL) students?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — LexiClash was built with language learners in mind. It supports English, Hebrew (RTL), Spanish, Swedish, Japanese and Russian with native dictionaries. Students can compete in their own language or practice the language they are learning, making it a natural fit for ESL, bilingual and immersion classrooms. Word-building gameplay reinforces vocabulary and spelling organically, without passive multiple-choice."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can students use LexiClash as a spelling practice game?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. LexiClash's word-building format — where students find, spell and submit real words against a live opponent or the whole class — makes spelling practice competitive and engaging rather than passive. Teachers use it for spelling warm-ups, end-of-unit vocabulary reviews and in-class tournaments."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does LexiClash work on Chromebooks and school devices?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. LexiClash runs entirely in the browser — no app to install, no student accounts to provision. It works on Chromebooks, iPads, desktops and phones. Students join with a game code. School plans support Clever, ClassLink and Google Sign-In SSO for teacher accounts."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "@id": "https://www.lexiclash.live/en/education#org",
+  "name": "LexiClash Education",
+  "url": "https://www.lexiclash.live/en/education",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; school plans from $149/year.",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "areaServed": [
+    "US",
+    "IL",
+    "SE",
+    "JP",
+    "ES"
+  ],
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Teacher Free",
+      "price": 0,
+      "priceCurrency": "USD",
+      "category": "free",
+      "description": "Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Teacher Pro",
+      "price": 9,
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 9,
+        "priceCurrency": "USD",
+        "unitText": "month"
+      },
+      "category": "paid",
+      "description": "Unlimited classrooms plus progress analytics and printable reports",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "School Plan",
+      "price": 149,
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": 149,
+        "priceCurrency": "USD",
+        "unitText": "year"
+      },
+      "category": "paid",
+      "description": "School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO",
+      "availability": "https://schema.org/InStock"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/en/education/for-schools#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.lexiclash.live/en"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Education",
+      "item": "https://www.lexiclash.live/en/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Vocabulary & ESL Word Games for Schools",
+      "item": "https://www.lexiclash.live/en/education/for-schools"
+    }
+  ]
+}

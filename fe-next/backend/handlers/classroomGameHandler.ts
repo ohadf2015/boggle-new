@@ -19,6 +19,7 @@ import {
 import {
   resolveClassroomTeacher,
   resolveClassroomRole,
+  resolveClassroomName,
 } from '../modules/supabase/classroomMembership.js';
 import { persistClassroomGameScores } from './classroomGamePersistence.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -194,10 +195,14 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // Join classroom room for notifications
       socket.join(`classroom:${payload.classroomId}`);
 
-      // Broadcast to classroom that a game has been created
+      // Broadcast to classroom that a game has been created. The classroom name
+      // is resolved server-side and travels WITH the game, so the banner that
+      // pops up live is labelled the same way as the one the poll produces.
+      const createdClassroomName = await resolveClassroomName(payload.classroomId);
       io.to(`classroom:${payload.classroomId}`).emit('classroomGameCreated', {
         gameCode: payload.gameCode,
         classroomId: payload.classroomId,
+        classroomName: createdClassroomName,
         teacherName: payload.teacherName,
         lessonNames: payload.lessonNames,
       });
@@ -258,10 +263,33 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     try {
       const games = await getActiveClassroomGames(gamesPayload.classroomId);
 
+      // The set is an index, not a proof of ownership — only the game record
+      // says which classroom a game belongs to. Re-check it here so a stale or
+      // mis-written index entry cannot put another class's game, and another
+      // class's lesson names, in front of this student.
+      const scoped = games.filter((g) => g.classroomId === gamesPayload.classroomId);
+
       // Join classroom room to receive future notifications
       socket.join(`classroom:${gamesPayload.classroomId}`);
 
-      socket.emit('activeClassroomGames', { games });
+      // Resolve the classroom's name here, once, rather than leaving the client
+      // to look it up: a teacher may legitimately run one lesson across several
+      // of her classes, so the lesson name cannot identify the class and the
+      // banner has to say which class the game is for.
+      const classroomName = scoped.length
+        ? await resolveClassroomName(gamesPayload.classroomId)
+        : null;
+
+      // Say WHICH classroom this answers for. Without it the client cannot tell
+      // one classroom's reply from another's — it just wrote whatever arrived
+      // into whatever it happened to be showing (recurring pitfall class 3).
+      socket.emit('activeClassroomGames', {
+        classroomId: gamesPayload.classroomId,
+        classroomName,
+        games: classroomName
+          ? scoped.map((g) => ({ ...g, classroomName }))
+          : scoped,
+      });
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to get active games: ${error}`);
       socket.emit('classroomGameError', {
@@ -290,11 +318,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Auth check: authentication required, userId must match authenticated user
     const joinAuthUserId = getAuthUserId(socket);
     if (!joinAuthUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required' });
+      socket.emit('classroomGameError', { error: 'Authentication required', gameCode: joinPayload.gameCode });
       return;
     }
     if (joinAuthUserId !== joinPayload.userId) {
-      socket.emit('classroomGameError', { error: 'User ID does not match authenticated user' });
+      socket.emit('classroomGameError', { error: 'User ID does not match authenticated user', gameCode: joinPayload.gameCode });
       return;
     }
 
@@ -305,7 +333,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // oracle to discover valid classroom IDs.
     const existingGame = await getClassroomGame(joinPayload.gameCode);
     if (!existingGame) {
-      socket.emit('classroomGameError', { error: 'Game not found' });
+      socket.emit('classroomGameError', { error: 'Game not found', gameCode: joinPayload.gameCode });
       return;
     }
 
@@ -315,11 +343,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // is the worst version of this — they cannot act on it, and it looks
       // like the teacher set the room up wrong.
       logger.error('CLASSROOM_GAME', `Membership lookup unavailable for ${joinAuthUserId} joining ${existingGame.gameCode}`);
-      socket.emit('classroomGameError', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE' });
+      socket.emit('classroomGameError', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE', gameCode: joinPayload.gameCode });
       return;
     }
     if (!joinRoleResult.role) {
-      socket.emit('classroomGameError', { error: 'You are not a member of this classroom' });
+      socket.emit('classroomGameError', { error: 'You are not a member of this classroom', gameCode: joinPayload.gameCode });
       return;
     }
 
@@ -350,9 +378,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       logger.info('CLASSROOM_GAME', `Player ${joinPayload.username} joined game ${joinPayload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to join game: ${error}`);
-      socket.emit('classroomGameError', {
-        error: 'Failed to join game',
-      });
+      socket.emit('classroomGameError', { error: 'Failed to join game', gameCode: joinPayload.gameCode });
     }
   });
 

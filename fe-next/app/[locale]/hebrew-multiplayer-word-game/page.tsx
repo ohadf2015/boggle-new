@@ -139,7 +139,7 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
               'אתגרים יומיים ודירוגים',
               'קרבות בוסים עם הפתעות ייחודיות',
               'לגמרי חינם, ללא הורדה',
-              'שחקו בעברית, אנגלית, שוודית, יפנית וספרדית',
+              'שחקו בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית',
             ].map((feature) => (
               <div
                 key={feature}

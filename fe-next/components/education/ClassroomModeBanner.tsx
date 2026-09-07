@@ -7,7 +7,8 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
-import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
+import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
 
 interface LessonData {
   lessonId: string;
@@ -33,6 +34,23 @@ interface ClassroomModeBannerProps {
   lessonData: LessonData | null;
   gameCode?: string;
   expanded?: boolean;
+  /**
+   * Whoever is running the room. Defaults to true so the teacher's screen — the
+   * only caller before students had a lobby of their own — cannot regress.
+   *
+   * A student is not a host: the share code, the copy button and the QR poster
+   * are the host's controls for filling the room, and printing them on the phone
+   * that just scanned that QR is noise at best.
+   */
+  isHost?: boolean;
+  /**
+   * The room's own record of itself, from `/api/education/classroom/live-game`.
+   *
+   * `lessonData` cannot serve a student: it is read from `lessonGameData` in the
+   * TEACHER's sessionStorage, so a student's copy is always null and every field
+   * below fell through to a default (mode "Classic", 6×6, no lesson name).
+   */
+  liveGame?: LiveClassroomGameInfo | null;
 }
 
 /**
@@ -70,11 +88,23 @@ export const MODE_TRANSLATION_KEY: Record<string, string> = {
   'vocab-quiz': 'vocabQuiz',
 };
 
+/**
+ * Must match the sizes `ClassroomSetupStep` offers, one for one.
+ *
+ * This table was one step behind that screen — an older 4×4/5×5/6×6 scale with
+ * no `medium` case at all — so the teacher's Medium fell through to the default
+ * and the lobby announced 5×5 to a room that was 6×6. Every size was off by
+ * one. The value itself was never lost: `ClassroomGameLobby` writes the
+ * teacher's choice to `templateSettings.difficulty` verbatim.
+ *
+ * The fallback is Medium because that is what the setup screen preselects, so
+ * an absent value and an unset one say the same thing.
+ */
 function boardSizeLabel(size?: string): string {
   switch (size) {
-    case 'small': return '4×4';
-    case 'large': return '6×6';
-    default: return '5×5';
+    case 'small': return '5×5';
+    case 'large': return '7×7';
+    default: return '6×6';
   }
 }
 
@@ -85,18 +115,43 @@ function boardSizeLabel(size?: string): string {
  * additionally renders a full education lobby panel with game code, QR,
  * mode, timer, board size, late join, lesson name, and word count.
  */
-export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: ClassroomModeBannerProps) {
+export function ClassroomModeBanner({
+  lessonData,
+  gameCode,
+  expanded = false,
+  isHost = true,
+  liveGame = null,
+}: ClassroomModeBannerProps) {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [joinUrl, setJoinUrl] = useState('');
 
-  const lessonName = lessonData?.lessonName || '';
+  // Two sources, and only one of them exists on any given client: `lessonData`
+  // is the teacher's own sessionStorage, `liveGame` is what the server says
+  // about the room. Read the local one first (it is what the teacher just
+  // picked, before the room even exists) and fall back to the server's.
+  const remoteSettings = liveGame?.settings ?? null;
+  const lessonName = lessonData?.lessonName || (liveGame?.lessonNames ?? []).join(' · ');
   const wordCount = lessonData?.vocabularyWords?.length || 0;
   const templateSettings = lessonData?.templateSettings || null;
-  const gameMode = lessonData?.gameMode || 'classic';
+  const gameMode: ClassroomGameMode = lessonData?.gameMode || liveGame?.gameMode || 'classic';
   const ModeIcon = MODE_ICON[gameMode] ?? FALLBACK_MODE_ICON;
-  const timerMinutes = templateSettings ? Math.round(templateSettings.timerSeconds / 60) : null;
-  const allowLateJoin = templateSettings?.allowLateJoin ?? true;
+  const timerMinutes = templateSettings
+    ? Math.round(templateSettings.timerSeconds / 60)
+    : remoteSettings?.timerMinutes ?? null;
+  const boardSize = templateSettings?.difficulty ?? remoteSettings?.boardSize ?? undefined;
+  const allowLateJoin = templateSettings?.allowLateJoin ?? remoteSettings?.allowLateJoin ?? true;
+
+  // A quiz has no grid and no round clock — printing a board size and a
+  // "3 minutes" next to it describes a game nobody is playing.
+  const isQuiz = gameMode === VOCAB_QUIZ_MODE;
+  const questionCount = remoteSettings?.vocabQuizQuestionCount ?? null;
+  const questionSeconds = remoteSettings?.vocabQuizSeconds ?? null;
+
+  // The class's own name, which the server resolves and the teacher's local copy
+  // never carried. The generic label stays as the fallback for a room whose
+  // classroom could not be named.
+  const sessionLabel = liveGame?.classroomName || t('education.classroomGame.classroomSession');
 
   useEffect(() => {
     if (gameCode && typeof window !== 'undefined') {
@@ -123,7 +178,13 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
     }
   }, [gameCode, joinUrl, t]);
 
-  const showPanel = expanded && !!gameCode;
+  // A student's every settings value comes from `liveGame`, so without it the
+  // whole card renders defaults: Classic, 6×6, three minutes. That is the exact
+  // wrong screen this component exists to stop showing, restored silently
+  // whenever the lookup fails — and it fails per IP, which a whole class shares.
+  // Recurring pitfall class 4. Show the class and the lesson, and nothing we do
+  // not actually know.
+  const showPanel = expanded && !!gameCode && (isHost || !!liveGame);
 
   const previewWords = useMemo(
     () => (lessonData?.vocabularyWords || []).slice(0, 12),
@@ -142,7 +203,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
       >
         <div className="flex items-center gap-2 text-neo-cyan font-bold">
           <GraduationCap className="w-4 h-4" />
-          <span>{t('education.classroomGame.classroomSession')}</span>
+          <span>{sessionLabel}</span>
         </div>
 
         {lessonName && (
@@ -167,8 +228,18 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
 
       {showPanel && (
         <div className="w-full px-3 sm:px-4 pt-3 pb-4">
-          <div className="max-w-5xl mx-auto grid gap-4 sm:gap-5 md:grid-cols-[1.1fr_1fr]">
-            {/* Join info card */}
+          <div
+            className={cn(
+              'max-w-5xl mx-auto grid gap-4 sm:gap-5',
+              // With no share card there is nothing to sit beside, so the
+              // student's summary takes the single column rather than half of a
+              // two-column grid with a hole in it.
+              isHost ? 'md:grid-cols-[1.1fr_1fr]' : 'max-w-xl'
+            )}
+          >
+            {/* Join info card — host only. The QR, the code and the copy button
+                are how a host FILLS the room; the student already got in. */}
+            {isHost && (
             <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-black bg-neo-cyan/15 shadow-hard-lg">
               <p className="text-xs sm:text-sm text-neo-white font-neo-body text-center mb-2">
                 {t('education.classroomGame.shareCode')}
@@ -212,6 +283,7 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                 </div>
               )}
             </div>
+            )}
 
             {/* Settings + lesson card */}
             <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-black bg-neo-navy/70 shadow-hard">
@@ -225,18 +297,41 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                   label={t('teacher.classroom.gameModes.title')}
                   value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}
                 />
-                {timerMinutes !== null && (
-                  <SummaryTile
-                    icon={<Clock className="w-4 h-4" />}
-                    label={t('education.template.timer')}
-                    value={`${timerMinutes} ${t('common.minutes')}`}
-                  />
+                {isQuiz ? (
+                  <>
+                    {questionCount !== null && (
+                      <SummaryTile
+                        testId="classroom-quiz-question-count"
+                        icon={<Brain className="w-4 h-4" />}
+                        label={t('education.classroomGame.questions')}
+                        value={String(questionCount)}
+                      />
+                    )}
+                    {questionSeconds !== null && (
+                      <SummaryTile
+                        testId="classroom-quiz-seconds"
+                        icon={<Clock className="w-4 h-4" />}
+                        label={t('education.classroomGame.perQuestion')}
+                        value={t('vocabQuiz.setup.seconds', { seconds: questionSeconds })}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {timerMinutes !== null && (
+                      <SummaryTile
+                        icon={<Clock className="w-4 h-4" />}
+                        label={t('education.template.timer')}
+                        value={`${timerMinutes} ${t('common.minutes')}`}
+                      />
+                    )}
+                    <SummaryTile
+                      icon={<Grid3x3 className="w-4 h-4" />}
+                      label={t('education.template.boardSize')}
+                      value={boardSizeLabel(boardSize)}
+                    />
+                  </>
                 )}
-                <SummaryTile
-                  icon={<Grid3x3 className="w-4 h-4" />}
-                  label={t('education.template.boardSize')}
-                  value={boardSizeLabel(templateSettings?.difficulty)}
-                />
                 <SummaryTile
                   icon={<UserPlus className="w-4 h-4" />}
                   label={t('education.template.lateJoin')}
@@ -249,9 +344,14 @@ export function ClassroomModeBanner({ lessonData, gameCode, expanded = false }: 
                   <div className="flex items-center gap-2 text-neo-pink font-bold text-sm mb-2">
                     <BookOpen className="w-4 h-4" />
                     <span className="truncate">{lessonName}</span>
-                    <span className="text-neo-white ms-auto shrink-0 font-neo-body">
-                      {t('education.classroomGame.words', { count: wordCount })}
-                    </span>
+                    {/* The word list is the answer key, so it is never sent to a
+                        student — and an unguarded count then announced "0 words"
+                        beside a ten-word lesson. Say nothing rather than that. */}
+                    {wordCount > 0 && (
+                      <span className="text-neo-white ms-auto shrink-0 font-neo-body">
+                        {t('education.classroomGame.words', { count: wordCount })}
+                      </span>
+                    )}
                   </div>
                   {previewWords.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
@@ -284,13 +384,15 @@ function SummaryTile({
   icon,
   label,
   value,
+  testId,
 }: {
   icon: React.ReactNode;
   label: string;
   value: React.ReactNode;
+  testId?: string;
 }) {
   return (
-    <div className="p-3 rounded-neo border border-neo-black bg-neo-navy-light/80">
+    <div data-testid={testId} className="p-3 rounded-neo border border-neo-black bg-neo-navy-light/80">
       <div className="flex items-center gap-1.5 text-neo-white text-[10px] uppercase tracking-wide mb-1">
         {icon}
         <span>{label}</span>

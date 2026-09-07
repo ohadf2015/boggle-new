@@ -40,7 +40,7 @@ const guidesContent: Record<string, {
     ],
     educationCta: {
       heading: 'Using LexiClash in the Classroom?',
-      body: 'Teachers run live vocabulary competitions and spelling practice across five languages. Students at every level compete in real time — no setup needed.',
+      body: 'Teachers run live vocabulary competitions and spelling practice across six languages. Students at every level compete in real time — no setup needed.',
       links: [
         { label: 'Education Hub', path: 'education' },
         { label: 'LexiClash for Schools', path: 'education/for-schools' },
@@ -76,7 +76,7 @@ const guidesContent: Record<string, {
     ],
     educationCta: {
       heading: 'משתמשים ב-LexiClash בכיתה?',
-      body: 'מורים מנהלים תחרויות אוצר מילים חיות ותרגול כתיב בחמש שפות. תלמידים בכל הרמות מתחרים בזמן אמת — ללא הגדרה מוקדמת.',
+      body: 'מורים מנהלים תחרויות אוצר מילים חיות ותרגול כתיב בשש שפות. תלמידים בכל הרמות מתחרים בזמן אמת — ללא הגדרה מוקדמת.',
       links: [
         { label: 'מרכז חינוך', path: 'education' },
         { label: 'LexiClash למוסדות חינוך', path: 'education/for-schools' },
@@ -112,7 +112,7 @@ const guidesContent: Record<string, {
     ],
     educationCta: {
       heading: 'Använder du LexiClash i klassrummet?',
-      body: 'Lärare kör live-ordtävlingar och stavningsövningar på fem språk. Elever på alla nivåer tävlar i realtid — ingen förberedelse krävs.',
+      body: 'Lärare kör live-ordtävlingar och stavningsövningar på sex språk. Elever på alla nivåer tävlar i realtid — ingen förberedelse krävs.',
       links: [
         { label: 'Utbildningshub', path: 'education' },
         { label: 'LexiClash för skolor', path: 'education/for-schools' },
@@ -148,7 +148,7 @@ const guidesContent: Record<string, {
     ],
     educationCta: {
       heading: 'LexiClashを教室で活用していますか？',
-      body: '教師は5言語でライブ語彙コンテストや綴り練習を実施しています。あらゆるレベルの生徒がリアルタイムで競えます。',
+      body: '教師は6言語でライブ語彙コンテストや綴り練習を実施しています。あらゆるレベルの生徒がリアルタイムで競えます。',
       links: [
         { label: '教育ハブ', path: 'education' },
         { label: '学校向けLexiClash', path: 'education/for-schools' },
@@ -184,7 +184,7 @@ const guidesContent: Record<string, {
     ],
     educationCta: {
       heading: '¿Usas LexiClash en el aula?',
-      body: 'Los profesores organizan competiciones de vocabulario en vivo y práctica de ortografía en cinco idiomas. Alumnos de todos los niveles compiten en tiempo real.',
+      body: 'Los profesores organizan competiciones de vocabulario en vivo y práctica de ortografía en seis idiomas. Alumnos de todos los niveles compiten en tiempo real.',
       links: [
         { label: 'Centro educativo', path: 'education' },
         { label: 'LexiClash para instituciones', path: 'education/for-schools' },

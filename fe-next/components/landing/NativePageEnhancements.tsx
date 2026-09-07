@@ -75,7 +75,7 @@ const en: LocaleStrings = {
     { tag: 'FAMILY', title: 'Best for family game night', desc: 'Phone + tablet + TV. Same game everywhere. Ages 6+, all skill levels.', cta: 'Play with family', href: 'multiplayer', color: 'cyan' },
     { tag: 'ASYNC', title: 'Best as a Words With Friends replacement', desc: 'Daily challenges keep the streak alive. Fast 2-min sessions instead of days of waiting.', cta: 'Try Daily', href: 'daily', color: 'lime' },
     { tag: 'TEAMS', title: 'Best for remote team building', desc: 'Send a Slack link. 5-min icebreaker. No download, no IT approval, no friction.', cta: 'Spin up a room', href: 'multiplayer', color: 'pink' },
-    { tag: 'LANGUAGE', title: 'Best for language learners', desc: '5 full dictionaries including Hebrew RTL and Japanese. Vocabulary practice in target language.', cta: 'Pick a language', href: 'multiplayer', color: 'purple' },
+    { tag: 'LANGUAGE', title: 'Best for language learners', desc: '6 full dictionaries including Hebrew RTL and Japanese. Vocabulary practice in target language.', cta: 'Pick a language', href: 'multiplayer', color: 'purple' },
   ],
 };
 
@@ -105,7 +105,7 @@ const he: LocaleStrings = {
     { tag: 'משפחה', title: 'הכי מתאים לערב משפחתי', desc: 'טלפון + טאבלט + טלוויזיה. אותו משחק בכל מקום. גיל 6+, כל רמות המיומנות.', cta: 'שחקו עם המשפחה', href: 'multiplayer', color: 'cyan' },
     { tag: 'אסינק', title: 'תחליף ל-Words With Friends', desc: 'אתגרים יומיים שומרים על הרצף. מפגשים של 2 דקות במקום ימים של המתנה.', cta: 'נסו את היומי', href: 'daily', color: 'lime' },
     { tag: 'צוותים', title: 'בניית צוות מרחוק', desc: 'שלחו לינק לסלאק. שובר קרח של 5 דקות. בלי הורדה, בלי אישור IT, בלי חיכוך.', cta: 'פתחו חדר', href: 'multiplayer', color: 'pink' },
-    { tag: 'שפות', title: 'לומדי שפות', desc: '5 מילונים מלאים כולל עברית (RTL) ויפנית. תרגול אוצר מילים בשפת היעד.', cta: 'בחרו שפה', href: 'multiplayer', color: 'purple' },
+    { tag: 'שפות', title: 'לומדי שפות', desc: '6 מילונים מלאים כולל עברית (RTL) ויפנית. תרגול אוצר מילים בשפת היעד.', cta: 'בחרו שפה', href: 'multiplayer', color: 'purple' },
   ],
 };
 
@@ -195,7 +195,7 @@ const es: LocaleStrings = {
     { tag: 'FAMILIA', title: 'Mejor para noche familiar', desc: 'Teléfono + tableta + TV. Mismo juego en todas partes. Edades 6+, todos los niveles.', cta: 'Jugar en familia', href: 'multiplayer', color: 'cyan' },
     { tag: 'ASÍNCRONO', title: 'Mejor reemplazo de Words With Friends', desc: 'Desafíos diarios mantienen viva la racha. Sesiones rápidas de 2 min en lugar de días de espera.', cta: 'Probar Diario', href: 'daily', color: 'lime' },
     { tag: 'EQUIPOS', title: 'Mejor para team building remoto', desc: 'Envía un enlace de Slack. Rompehielos de 5 min. Sin descarga, sin aprobación de TI, sin fricción.', cta: 'Iniciar sala', href: 'multiplayer', color: 'pink' },
-    { tag: 'IDIOMAS', title: 'Mejor para aprendices de idiomas', desc: '5 diccionarios completos incluyendo hebreo (RTL) y japonés. Práctica de vocabulario en el idioma objetivo.', cta: 'Elegir idioma', href: 'multiplayer', color: 'purple' },
+    { tag: 'IDIOMAS', title: 'Mejor para aprendices de idiomas', desc: '6 diccionarios completos incluyendo hebreo (RTL) y japonés. Práctica de vocabulario en el idioma objetivo.', cta: 'Elegir idioma', href: 'multiplayer', color: 'purple' },
   ],
 };
 

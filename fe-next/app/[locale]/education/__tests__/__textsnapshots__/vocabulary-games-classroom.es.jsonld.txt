@@ -1,0 +1,146 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/vocabulary-games-classroom#page",
+  "name": "Juegos de vocabulario gratis para el aula — Multijugador en vivo, 6 idiomas | LexiClash",
+  "description": "Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. 6 idiomas incl. hebreo y ruso. Cualquier navegador. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/vocabulary-games-classroom#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Juegos de vocabulario gratis para el aula",
+      "item": "https://www.lexiclash.live/es/education/vocabulary-games-classroom"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/vocabulary-games-classroom#resource",
+  "name": "Juegos de vocabulario gratis para el aula — Multijugador en vivo, 6 idiomas | LexiClash",
+  "description": "Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. 6 idiomas incl. hebreo y ruso. Cualquier navegador. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+  "inLanguage": "es",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Vocabulary Building",
+    "Classroom Activity",
+    "Whole-Class Multiplayer",
+    "Formative Assessment",
+    "ESL Practice"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual word usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/vocabulary-games-classroom#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Necesitan registrarse los estudiantes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, pero es gratis y toma 30 segundos. Correo o cuenta Google. Sin tarjeta de crédito, sin sorpresas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Usamos nuestras propias listas de palabras?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Sube la lista en tu panel de maestro y lanza juegos con tu vocabulario. Todo en el mismo lugar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto duran?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "3–5 minutos. Perfectos para calentamientos, transiciones, descansos. La dificultad y el tiempo se ajustan."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué grados soporta?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Desde 4to grado hasta 12vo, ESL, adultos, bilingües. La dificultad se ajusta por juego."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Venden datos de estudiantes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Nunca. Cumplimos con FERPA. Privacidad total garantizada."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Si el WiFi es lento?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash funciona en cualquier navegador y cualquier conexión. Carga en WiFi lento y funciona en todos los dispositivos."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Juegos de vocabulario gratis para el aula — Multijugador en vivo, 6 idiomas | LexiClash",
+  "description": "Juegos de vocabulario gratis para la clase. Multijugador en vivo, duelos de vocabulario 1v1, tus listas de palabras. 6 idiomas incl. hebreo y ruso. Cualquier navegador. Gratis para empezar.",
+  "url": "https://www.lexiclash.live/es/education/vocabulary-games-classroom",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "es"
+}

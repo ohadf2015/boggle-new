@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/brain-breaks-word-games#page",
+  "name": "授業中の脳トレ休憩 | 無料オンライン単語ゲーム",
+  "description": "1～5分で集中力を取り戻す高速ゲーム。準備不要、すべてのデバイスで動作、クラス全体で一緒にプレイ。",
+  "url": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/brain-breaks-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "脳トレ休憩",
+      "item": "https://www.lexiclash.live/ja/education/brain-breaks-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/brain-breaks-word-games#resource",
+  "name": "授業中の脳トレ休憩 | 無料オンライン単語ゲーム",
+  "description": "脳トレ休憩は1～5分の活動で、集中力を回復させます。LexiClashはどんなプロジェクターや共有画面でもライブの単語探しゲームを実行します—すべての生徒が同時に携帯電話でプレイします。準備も教材も不要です。落ち着きのなさを遮るのに十分な注意が必要だからです。",
+  "url": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-14",
+  "teaches": "vocabulary, word recognition, attention reset",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT3M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/brain-breaks-word-games#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "クラスコードを生徒にどのように与えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "クラスゲームを開始すると、コードが画面に表示されます。声に出すか、ボードに表示します。生徒が入力またはスキャンします。10秒で参加します。ログインなし。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "一部の生徒が携帯電話を持っていない場合はどうなりますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "クラスメートと組んだり、チームでプレイしたりできます。またはすべてのデバイスが存在する時にシングルプレイゲームを保存します。柔軟です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ゲームの方法を教える必要がありますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。ルールは画面にあります。最初のラウンドで、簡単な例を説明します。ほとんどの生徒は30秒で理解します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "別の言語を教える場合は使用できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClashは6言語をサポート。英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語。クラス言語を設定。ゲームはその言語の単語を使用。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "脳トレ休憩はどのくらい長くすべきですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1～5分。短い方が良いです。2分のゲーム。もっと長く（3～5）生徒が非常に落ち着きなく。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "これは授業から生徒をそらしますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "明確な限界を設定しない場合のみ。最初から言う：「3分プレイ、電話を入れる」。知るとき、再フォーカス。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "同じゲームを1週間に2回使用できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。反復はOK。生徒は自分のスコアを削除するために再度プレイするのが好きです。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "脳トレに最適なゲームは何ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ワード探し（黙った格子探し）、ワードホイール（回転）、速いデュエル（1～2分）最高。長いトーナメントを避ける。"
+      }
+    }
+  ]
+}

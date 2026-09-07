@@ -404,7 +404,7 @@ export function BlastView() {
               <Gift className="h-5 w-5 animate-neo-wobble" strokeWidth={3} />
               {t('blast.pregameBuff.claim')}
               <span className="absolute -top-2 -right-2 rounded-full border-2 border-black bg-neo-lime px-1.5 py-0.5 text-[9px] font-black uppercase text-neo-navy shadow-hard">
-                {t('common.free') || 'Free'}
+                {t('common.free', 'Free')}
               </span>
             </button>
           ) : null}

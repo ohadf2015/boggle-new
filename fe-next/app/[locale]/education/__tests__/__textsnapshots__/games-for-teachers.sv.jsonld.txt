@@ -1,0 +1,132 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/games-for-teachers#page",
+  "name": "Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash",
+  "description": "Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/games-for-teachers",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/games-for-teachers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Gratis ordspel för lärare",
+      "item": "https://www.lexiclash.live/sv/education/games-for-teachers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/games-for-teachers#resource",
+  "name": "Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash",
+  "description": "Gratis ordspel för klassrummet. Ingen förberedelse, dina listor, spår framsteg. 5 minuter, paus eller vikariedag. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/games-for-teachers",
+  "inLanguage": "sv",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Formative Assessment",
+    "Vocabulary Building",
+    "Brain Break",
+    "Substitute Teacher Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/games-for-teachers#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Vilka ordspel kan jag använda med min klass?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash erbjuder flerspelar-ordspel som Boggle (hitta ord i bokstavsnät), Ordhjul (forma ord från roterande hjul) och Ordjakt (tävla om att hitta dolda ord). Alla spel tränar vokabulär, mönsterigenkänning och stavning i realtid."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur mycket förberedelsetid krävs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Noll. Skapa ett gratis konto, välj eller ladda upp en vokabulärlista, dela en länk eller kod med eleverna och börja spela. Inga lektionsplaner, arbetsblad eller materialförberedelse krävs. Spelen fungerar på Chromebooks, surfplattor och telefoner."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag använda mina egna vokabulärlistor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Ladda upp CSV-listor, använd inbyggda läroplanlistor eller blanda båda. Lärare kan låsa vokabulär till specifika ämnen (enheter, teman, språk) och återanvända listor mellan klasser och år."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur spårar jag elevernas framsteg?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Klassrummets instrumentpanel visar poäng per elev, ordnoggrannhet, hastighet och engagemangsmätvärden i realtid. Ladda ned rapporter efter klass, datumintervall eller speltyp. Ingen manuell betygsättning krävs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan en vikarierande lärare köra detta?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolut. Dela en lektionskod med vikaren. Eleverna loggar in, spelar och du ser alla resultat i din instrumentpanel. Perfekt för vikariedagar — ingen förberedelse krävs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Behöver jag en Chromebook-vagn eller speciell hårdvara?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nej. Alla enheter med en webbläsare fungerar: Chromebooks, iPad-skivor, bärbara datorer eller elevtelefoner. Fungerar i klassrum med instabil WiFi via cachade tillgångar."
+      }
+    }
+  ]
+}

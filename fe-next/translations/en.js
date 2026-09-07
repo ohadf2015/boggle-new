@@ -2025,6 +2025,8 @@ const en = {
     "needPlayers": "Need players!",
     "commandersJoined": "Commanders Joined",
     "playersInRoom": "Players in Room",
+    "startQuiz": "Start Quiz",
+    "startClassGame": "Start Game",
     "noOneYet": "No one yet?",
     "startingWithBots": "Starting with bots in",
     "addingBots": "Adding bots in",
@@ -5812,7 +5814,7 @@ const en = {
       },
       "stepLabel": "Step",
       "whatIsTitle": "What is LexiClash?",
-      "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.",
+      "whatIsContent": "LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It's like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, Spanish, and Russian.",
       "whatIsShort": "Free multiplayer word battles in your browser. Find words, build combos, crush your friends. No downloads, no signup.",
       "featuresTitle": "Why Players Love LexiClash",
       "feature1Title": "Real-Time Multiplayer",
@@ -5856,7 +5858,7 @@ const en = {
       "faq2Q": "Do I need to create an account?",
       "faq2A": "No. You can play as a guest instantly. Creating an account (via Google or Discord) unlocks features like leaderboard rankings, achievement tracking, and progress saving across devices.",
       "faq3Q": "What languages are supported?",
-      "faq3A": "LexiClash supports English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own curated dictionary, daily challenges, and leaderboards. You can switch languages anytime from the settings menu.",
+      "faq3A": "LexiClash supports English, Hebrew, Swedish, Japanese, Spanish, and Russian. Each language has its own curated dictionary, daily challenges, and leaderboards. You can switch languages anytime from the settings menu.",
       "faq4Q": "Can I play on my phone?",
       "faq4A": "Absolutely. LexiClash is fully responsive and works on any modern mobile browser. Swipe letters to form words — the touch controls are designed specifically for mobile play.",
       "faq5Q": "Is it safe for children?",
@@ -10846,7 +10848,8 @@ const en = {
       "joining": "Joining...",
       "listening": "Listening for classroom games...",
       "connecting": "Connecting to classroom...",
-      "idleHint": "When your teacher starts a game, you'll see it here"
+      "idleHint": "When your teacher starts a game, you'll see it here",
+      "joinFailed": "Couldn't get you in — the game may have ended. Ask your teacher for the code."
     },
     "playWithClass": {
       "title": "Play with Class",
@@ -10891,6 +10894,10 @@ const en = {
       "playGame": "Play Game",
       "playGameHint": "Practice with a multiplayer game using this vocabulary",
       "wordsAtYourLevel": "{{mine}} at your level · {{total}} in the lesson",
+      "assignment": {
+        "due": "Due {{date}}",
+        "overdue": "Late — was due {{date}}"
+      },
       "empty": {
         "title": "No lessons assigned yet",
         "subtitle": "Join a classroom to get started with vocabulary practice",
@@ -11143,6 +11150,7 @@ const en = {
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
       "viewReportsDesc": "View detailed reports and analytics for your classrooms",
+      "tools": "Class tools",
       "studentsPresentTitle": "{count} students are in {classroom} right now",
       "studentsPresentDescription": "Start a game and they drop straight in.",
       "tab": {
@@ -11284,6 +11292,10 @@ const en = {
       }
     },
     "lesson": {
+      "pasteWords": "Paste your word list",
+      "pasteWordsPlaceholder": "One word per line — or separated by commas",
+      "pasteWordsParsed": "{count} words ready",
+      "pasteWordsAdd": "Add {count} words",
       "create": "Create Lesson",
       "edit": "Edit Lesson",
       "delete": "Delete Lesson",
@@ -11588,6 +11600,10 @@ const en = {
       "lastUpdated": "Last Updated"
     },
     "proGate": {
+      "analytics": {
+        "title": "See how your class is really doing",
+        "body": "Pro turns every game into a picture of your class: which words are sticking, which students are stuck, and how far each one has come since September. Bring it to a parent evening or a department meeting."
+      },
       "cta": "Unlock this with Pro — ${{price}}/month"
     },
     "subscription": {
@@ -11618,7 +11634,7 @@ const en = {
       "trustDataSafe": "Your data stays safe",
       "trustReminder": "Reminder email before every charge",
       "freePlanName": "Free",
-      "freeForever": "Forever free, always available",
+      "freeForever": "Free plan, no expiry",
       "freeClasses": "Up to {count} classes",
       "freeStudents": "Up to {count} students per class",
       "proPlanName": "Teacher Pro",
@@ -11673,7 +11689,17 @@ const en = {
       "wheelRush": "Build words from one wheel of letters",
       "vocabQuiz": "Four-choice questions from your own word data"
     },
+    "wordTowerPractice": {
+      "unavailable": "This lesson's words can't build a tower yet. It needs at least 4 words of 4 to 6 letters.",
+      "done": "Done",
+      "progress": "{{found}} of {{total}} list words built",
+      "height": "{{height}} m · {{floors}} floors",
+      "hit": "List word! {{word}}"
+    },
     "practicePicker": {
+      "name": {
+        "word_tower": "Word Tower"
+      },
       "title": "Pick your practice",
       "readyCount": "{{ready}} of {{total}} ready to play",
       "questions": "{{count}} questions",
@@ -11681,7 +11707,10 @@ const en = {
       "lockedBadge": "Locked",
       "played": "played {{count}}x",
       "nothingReady": "This lesson has no words yet. Ask your teacher to add some, then come back.",
+      "nextMode": "Next: {{mode}}",
+      "allModes": "All games",
       "skill": {
+        "word_tower": "Build words from the letters of this week's list",
         "solo_board": "Find the lesson words in a letter grid",
         "warmup": "A short grid round to get going",
         "blitz": "Beat the clock on as many words as you can",
@@ -11697,6 +11726,7 @@ const en = {
         "roots_affixes": "What the word parts mean"
       },
       "locked": {
+        "word_tower": "Needs 4+ list words of 4–6 letters to unlock",
         "solo_board": "Add words to this lesson to unlock",
         "warmup": "Add words to this lesson to unlock",
         "blitz": "Add words to this lesson to unlock",
@@ -12010,6 +12040,17 @@ const en = {
       "yesterday": "Yesterday"
     },
     "classroomGame": {
+      "questions": "Questions",
+      "perQuestion": "Per question",
+      "namePrompt": {
+        "eyebrow": "Class game",
+        "title": "What's your name?",
+        "subtitle": "Your class sees this name on the board.",
+        "placeholder": "Type your name",
+        "submit": "Join game",
+        "roomLabel": "Room {{code}}"
+      },
+      "classroomLessonLabel": "{{classroom}} · live game: {{lesson}}",
       "classCode": "Game Code",
       "classroomNotFound": "Classroom not found",
       "classroomSession": "Classroom Session",
@@ -12099,7 +12140,7 @@ const en = {
         "noAds": "No advertising for your students",
         "customLists": "Your own word lists",
         "duels": "Live word duels",
-        "freeForever": "Free forever. No card, no trial clock.",
+        "freeForever": "The free plan never expires. No card, no trial clock.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Everything in Free",
         "classLimitPro": "Unlimited classrooms",
@@ -12396,6 +12437,8 @@ const en = {
       "searchWords": "Search words",
       "sessionsCompleted": "{{count}} sessions done",
       "soloBoard": "Solo Board",
+      "lessonUnavailable": "Can't open this lesson",
+      "lessonUnavailableBody": "The link may be out of date, or the lesson was removed. Ask your teacher for a new one.",
       "spellTheWord": "Spell it out",
       "spelling": "Spelling",
       "streak": "{{count}} streak",
@@ -12469,7 +12512,11 @@ const en = {
         "codeHint": "6 characters from your teacher",
         "codeLabel": "Class Code",
         "codePasted": "Pasted!",
+        "heroLine": "Ask your teacher for the class code",
         "preparing": "Getting things ready — one moment.",
+        "queuedNeedsName": "Almost in — add your name above and we'll take you straight there.",
+        "nameTaken": "Someone in this class already has that name. Try {{suggestedName}}.",
+        "useSuggestedName": "Join as {{suggestedName}}",
         "emptyClipboard": "Nothing to paste",
         "guestError": "Couldn't start your session. Try again or ask your teacher.",
         "invalidCode": "Invalid code",
@@ -12488,6 +12535,7 @@ const en = {
         "success": "You're in!",
         "title": "Join a Class"
       },
+      "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
       "lessonsAssigned": "Lessons Assigned"
     },
     "students": "Students",
@@ -12654,7 +12702,7 @@ const en = {
       "auth_required_body": "Teacher access is tied to a verified account. Create a free account or sign in, and we'll pick up right here.",
       "auth_required_cta": "Create my free teacher account",
       "trust_instant": "Instant access — no review queue",
-      "trust_free": "Free for teachers, forever",
+      "trust_free": "Free teacher plan, no expiry",
       "trust_nologins": "No student logins, no setup",
       "cta_micro": "Takes 60 seconds · No credit card",
       "hero_alt": "The LexiClash mascot welcoming a classroom of letter cubes",
@@ -13744,7 +13792,8 @@ const en = {
     "hebrew": "Hebrew",
     "swedish": "Swedish",
     "japanese": "Japanese",
-    "spanish": "Spanish"
+    "spanish": "Spanish",
+    "russian": "Russian"
   },
   "streakBar": {
     "streak": "{{count}} day streak",
@@ -15911,8 +15960,8 @@ const en = {
     "pro": "Pro",
     "month": "month",
     "recommended": "Recommended",
-    "free_1": "Up to 5 students per class",
-    "free_2": "1 class room",
+    "free_1": "Up to 50 students per class",
+    "free_2": "Up to 3 classrooms",
     "free_3": "Basic game modes",
     "pro_1": "Unlimited students per class",
     "pro_2": "Unlimited classrooms",

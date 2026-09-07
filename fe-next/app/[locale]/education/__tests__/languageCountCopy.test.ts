@@ -30,7 +30,11 @@ const CATALOGUES: Array<[string, unknown]> = [
 
 /** Any count of languages/dictionaries that is not the number of locales we build. */
 const UNDERCOUNT =
-  /\b(?!6\b)\d{1,2}\s+(languages|dictionaries)\b|\b(five|four)\s+languages\b|\b(?!6\b)\d{1,2}\s+(idiomas|diccionarios)\b|\b(?!6\b)\d{1,2}\s+(språk|ordböcker)\b|\b(?!6\b)\d{1,2}\s+(שפות|מילונים)|\b(?!6\b)\d{1,2}\s+(языков|словарей)|(?<!ほかの)(?<!他の)(?!6)\d{1,2}(つの)?(言語|辞書)/i;
+  // Russian stem + case endings, not the genitive alone: this file matches keys
+  // named like metadata (`/\b(seo|meta|og|twitter)/i`), so it DID look at
+  // `seo.educationHub.description` — and still missed `на 5 языках`, because the
+  // pattern only knew `языков`. Same gap, same round, two files.
+  /\b(?!6\b)\d{1,2}\s+(languages|dictionaries)\b|\b(five|four)\s+languages\b|\b(?!6\b)\d{1,2}\s+(idiomas|diccionarios)\b|\b(?!6\b)\d{1,2}\s+(språk|ordböcker)\b|\b(?!6\b)\d{1,2}\s+(שפות|מילונים)|\b(?!6\b)\d{1,2}\s+(язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])|(?<!ほかの)(?<!他の)(?!6)\d{1,2}(つの)?(言語|辞書)/i;
 
 function walk(node: unknown, path: string[] = []): Array<[string, string]> {
   if (typeof node === 'string') return [[path.join('.'), node]];

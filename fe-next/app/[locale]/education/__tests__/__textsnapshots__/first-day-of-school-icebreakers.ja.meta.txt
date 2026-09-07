@@ -1,0 +1,63 @@
+{
+  "title": "学年始め のアイスブレーカー | レキシクラッシュ",
+  "description": "静かな教室を活気づけるゲーム。初日に最適—名前を覚える必要なし、誰も目立たない。",
+  "keywords": [
+    "アイスブレーカー 教室",
+    "クラスメイト 仲良くなる",
+    "言葉ゲーム 授業",
+    "学年始め 活動",
+    "中学生 クラス活動",
+    "クラス紹介 ゲーム",
+    "言葉遊び 学級"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "ja": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "es": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+    "en-IL": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he-IL": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en-US": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-US": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-GB": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "en-SE": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv-SE": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "en-JP": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "ja-JP": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "en-ES": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-ES": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-MX": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-MX": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-AU": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-AR": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "es-CO": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru-RU": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers"
+  },
+  "ogTitle": "学年始め のアイスブレーカー | レキシクラッシュ",
+  "ogDescription": "静かな教室を活気づけるゲーム。初日に最適—名前を覚える必要なし、誰も目立たない。",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "学年始め のアイスブレーカー | レキシクラッシュ"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "学年始め のアイスブレーカー | レキシクラッシュ",
+  "twDescription": "静かな教室を活気づけるゲーム。初日に最適—名前を覚える必要なし、誰も目立たない。",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

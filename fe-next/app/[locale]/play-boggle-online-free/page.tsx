@@ -70,7 +70,7 @@ const faqs = [
   },
   {
     q: 'What are the best Boggle alternatives online?',
-    a: 'LexiClash is one of the best free Boggle alternatives. It offers the classic letter-grid word-finding gameplay plus multiplayer battles, daily challenges, adventure mode with boss fights, and brain training drills. All free, no download needed, available in 5 languages.',
+    a: 'LexiClash is one of the best free Boggle alternatives. It offers the classic letter-grid word-finding gameplay plus multiplayer battles, daily challenges, adventure mode with boss fights, and brain training drills. All free, no download needed, available in 6 languages.',
   },
   {
     q: 'Does it work on mobile without downloading an app?',
@@ -126,7 +126,7 @@ const softwareAppJsonLd = JSON.stringify({
   inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
 });
 
-const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'NO ADS HELL', 'PLAY IN 5s', '5 LANGUAGES', 'REAL-TIME', 'INSTANT FUN'];
+const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'NO ADS HELL', 'PLAY IN 5s', '6 LANGUAGES', 'REAL-TIME', 'INSTANT FUN'];
 
 const modes = [
   { href: 'singleplayer', color: 'lime', label: 'Solo', title: 'BEAT THE BOTS', desc: 'You vs sneaky AI rivals. Three difficulty tiers — pick your pain.', mascot: '/mascot/play.webp', cta: 'Play Solo Free' },
@@ -161,7 +161,7 @@ const features = [
   { icon: '🌀', text: 'Daily Word Wheel — chase the global record' },
   { icon: '🔥', text: 'Combo scoring rewards lightning chains' },
   { icon: '📱', text: 'Phone, tablet, desktop — same game everywhere' },
-  { icon: '🌍', text: 'Five languages: EN · HE · SV · JA · ES' },
+  { icon: '🌍', text: 'Six languages: EN · HE · SV · JA · ES' },
   { icon: '🐉', text: 'Adventure mode with boss battles & loot' },
   { icon: '🧠', text: 'Brain drills to sharpen the word-brain' },
 ];
@@ -240,7 +240,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs uppercase tracking-widest text-neo-gray-200">
               <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> live now</span>
               <span>browser-based</span>
-              <span className="text-neo-yellow">5 languages</span>
+              <span className="text-neo-yellow">6 languages</span>
               <span>2-20 players</span>
             </div>
           </div>
@@ -375,7 +375,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             </h2>
             <p className="mt-4 text-neo-white">
               Spin up a room in 3 seconds. Share a 4-letter code or QR. 20 people on phones, one TV in the middle —
-              chaos in five languages. Real-time scoring, combo streaks, the works.
+              chaos in six languages. Real-time scoring, combo streaks, the works.
             </p>
             <Link
               href={`/${locale}/multiplayer`}

@@ -12,7 +12,7 @@ export interface UseSurvivalHintsProps {
   language: Language;
   playWordAcceptedSound?: () => void;
   showToast: (type: FeedbackType, message: string) => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   accumulatedClues?: Map<number, { letter: string; type: string }>;
 }
 
@@ -157,7 +157,7 @@ export function useSurvivalHints({
     if (!nextHintItem) return;
     
     if (clueTokens < nextHintItem.cost) {
-      showToast('invalid-word', t('wordHunt.survival.notEnoughTokens') || 'Not enough tokens!');
+      showToast('invalid-word', t('wordHunt.survival.notEnoughTokens', 'Not enough tokens!'));
       return;
     }
     

@@ -98,6 +98,35 @@ export async function resolveClassroomRole(
   return { status: 'ok', role: null };
 }
 
+/**
+ * The classroom's display name, or null when it cannot be resolved.
+ *
+ * Resolved on the SERVER and put on the wire beside the game, so a student's
+ * banner can say which class a game is for without a second client lookup that
+ * could disagree with the game it is labelling. Cross-classroom lesson reuse is
+ * the intended teacher workflow — one vocabulary list across every period — so
+ * the lesson name alone cannot identify the class, and a Flow Check student
+ * seeing "Week 3 Vocabulary" with no classroom named is what made a correct
+ * game look like the wrong one.
+ *
+ * Null on every miss (no row, DB error, no client). The label is a courtesy and
+ * must never gate the banner: callers fall back to the lesson alone.
+ */
+export async function resolveClassroomName(classroomId: string): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+
+  const { data, error } = await client
+    .from('classrooms')
+    .select('name')
+    .eq('id', classroomId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  const name = (data as { name?: unknown }).name;
+  return typeof name === 'string' && name.trim() ? name : null;
+}
+
 /** Mirrors `VocabularyLevel` in lib/supabase/education/types.ts (kept local: backend does not import frontend lib). */
 export type ClassroomLevel = 'support' | 'core' | 'challenge';
 const CLASSROOM_LEVELS: readonly ClassroomLevel[] = ['support', 'core', 'challenge'];

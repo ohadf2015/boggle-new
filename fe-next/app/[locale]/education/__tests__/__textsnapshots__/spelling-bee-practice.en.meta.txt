@@ -1,0 +1,55 @@
+{
+  "title": "Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash",
+  "description": "Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.",
+  "keywords": "spelling bee practice online, online spelling bee practice, spelling bee training, spelling games online, spelling practice free, scripps spelling bee practice, classroom spelling bee, spelling games for kids, spelling bee online, spelling competition practice",
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "he": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+    "en": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "sv": "https://www.lexiclash.live/sv/education/spelling-bee-practice",
+    "ja": "https://www.lexiclash.live/ja/education/spelling-bee-practice",
+    "es": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "ru": "https://www.lexiclash.live/ru/education/spelling-bee-practice",
+    "en-IL": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "he-IL": "https://www.lexiclash.live/he/education/spelling-bee-practice",
+    "en-US": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-US": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "en-GB": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "en-SE": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "sv-SE": "https://www.lexiclash.live/sv/education/spelling-bee-practice",
+    "en-JP": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "ja-JP": "https://www.lexiclash.live/ja/education/spelling-bee-practice",
+    "en-ES": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-ES": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "en-MX": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-MX": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "en-AU": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+    "es-AR": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "es-CO": "https://www.lexiclash.live/es/education/spelling-bee-practice",
+    "ru-RU": "https://www.lexiclash.live/ru/education/spelling-bee-practice"
+  },
+  "ogTitle": "Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash",
+  "ogDescription": "Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.",
+  "ogLocale": "en_US",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/en/education/spelling-bee-practice",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Spelling Bee Practice Online — Free Word Games for Spelling Champions | LexiClash",
+  "twDescription": "Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

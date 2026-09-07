@@ -113,7 +113,7 @@ Digital games like LexiClash log everything automatically. No grading required. 
 
 Use physical games for collaborative, social activities. Use digital games for individual practice and assessment. They complement each other perfectly.
 
-LexiClash specifically matters because it supports five languages: Hebrew, English, Swedish, Japanese, and Spanish. In diverse 2026 classrooms, ELL kids can build confidence playing in their home language, then switch to English for challenge. Same mechanic, transferable skills. Real-time multiplayer means peer modeling and natural differentiation happening simultaneously. The daily challenge creates a shared reference point where kids arrive already discussing the day's puzzle. The scoring rewards both breadth (many short words) and depth (fewer long words), so different learners feel successful.
+LexiClash specifically matters because it supports six languages: Hebrew, English, Swedish, Japanese, Spanish, and Russian. In diverse 2026 classrooms, ELL kids can build confidence playing in their home language, then switch to English for challenge. Same mechanic, transferable skills. Real-time multiplayer means peer modeling and natural differentiation happening simultaneously. The daily challenge creates a shared reference point where kids arrive already discussing the day's puzzle. The scoring rewards both breadth (many short words) and depth (fewer long words), so different learners feel successful.
 
 Is one platform a complete vocabulary program? No. But alongside direct instruction, wide reading, and classroom discussion, word games fill a real gap: engaged, repeated, emotionally positive vocabulary encounters that kids actually want to do again and again.
 
@@ -252,7 +252,7 @@ Marcus did.`,
 
 ההמלצה שלי: השתמשו במשחקים פיזיים לפעילויות חברתיות ושיתופיות ובמשחקים דיגיטליים לתרגול אישי והערכה. שני הפורמטים משלימים זה את זה יפה.
 
-לקסיקלאש, למשל, תומך בעברית, אנגלית, שוודית, יפנית וספרדית. בכיתה מגוונת — שהיא רוב הכיתות ב-2026 — זה משנה. תלמיד יכול לשחק בשפת האם שלו לבניית ביטחון, ואז לעבור לאנגלית לאתגר.
+לקסיקלאש, למשל, תומך בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית. בכיתה מגוונת — שהיא רוב הכיתות ב-2026 — זה משנה. תלמיד יכול לשחק בשפת האם שלו לבניית ביטחון, ואז לעבור לאנגלית לאתגר.
 
 זה המבחן האמיתי של כל כלי חינוכי. לא "האם זה מלמד?" אלא "האם הם רוצים לחזור?"
 
@@ -565,7 +565,7 @@ Los juegos de palabras digitales como LexiClash hacen esto aún más fácil al r
 
 La perspectiva clave para los administradores: los juegos de palabras no reemplazan la evaluación. SON evaluación: formativa, continua, de bajo riesgo que captura datos que las pruebas tradicionales pasan por alto.
 
-Mi recomendación: usa juegos físicos para actividades sociales y colaborativas, y juegos digitales para práctica individual y evaluación. LexiClash soporta hebreo, inglés, sueco, japonés y español. En un aula diversa, esto importa.
+Mi recomendación: usa juegos físicos para actividades sociales y colaborativas, y juegos digitales para práctica individual y evaluación. LexiClash soporta hebreo, inglés, sueco, japonés, español y ruso. En un aula diversa, esto importa.
 
 La prueba real de cualquier herramienta educativa no es "¿enseña?" sino "¿quieren volver?" Marcus quiso. Y eso es a lo que siempre regreso.`,
       },
@@ -679,7 +679,7 @@ La prueba real de cualquier herramienta educativa no es "¿enseña?" sino "¿qui
 
 Используйте физические игры для совместных социальных мероприятий. Используйте цифровые игры для индивидуальной практики и оценки. Они идеально дополняют друг друга.
 
-LexiClash имеет значение, потому что он поддерживает пять языков: русский, английский, шведский, японский и испанский. В разнообразных классах 2026 года, в которых учат ELL, это имеет значение. Ученик может развивать уверенность, играя на своем родном языке, а затем переходить на английский для вызова. То же самое механика, переносимые навыки. Задача дня создаёт общую точку отсчёта, где ученики приходят и уже обсуждают головоломку дня. Система подсчёта очков вознаграждает как ширину (много коротких слов), так и глубину (меньше длинных слов), поэтому разные учащиеся чувствуют себя успешными.
+LexiClash имеет значение, потому что он поддерживает шесть языков: русский, английский, шведский, японский и испанский. В разнообразных классах 2026 года, в которых учат ELL, это имеет значение. Ученик может развивать уверенность, играя на своем родном языке, а затем переходить на английский для вызова. То же самое механика, переносимые навыки. Задача дня создаёт общую точку отсчёта, где ученики приходят и уже обсуждают головоломку дня. Система подсчёта очков вознаграждает как ширину (много коротких слов), так и глубину (меньше длинных слов), поэтому разные учащиеся чувствуют себя успешными.
 
 Это настоящий тест для любого образовательного инструмента не «учит ли это?», а «хотят ли они вернуться?»
 

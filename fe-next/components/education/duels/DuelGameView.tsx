@@ -22,6 +22,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getDuelById } from '@/lib/supabase/education/duels';
 import { useDuelSocket, type DuelCompletedData, type ScoreSubmittedData } from '@/hooks/useDuelSocket';
 import { useImeText } from '@/hooks/useImeText';
+import { useGameTimer } from '@/hooks/useGameTimer';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -77,13 +78,25 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   const [validatedScore, setValidatedScore] = useState<ScoreSubmittedData | null>(null);
   const [result, setResult] = useState<DuelCompletedData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState(DUEL_TIME_LIMIT_SECONDS);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const autoSubmitTriggered = useRef(false);
   const wordsFoundRef = useRef<string[]>([]);
   useEffect(() => {
     wordsFoundRef.current = wordsFound;
   }, [wordsFound]);
+
+  // Timestamp-based shared timer instead of a local setInterval: the hand-rolled
+  // one decremented per tick, so it drifted (and stalled) whenever the main
+  // thread was busy. `useGameTimer` measures elapsed wall time and fires
+  // `onTimeUp` exactly once, which is what `autoSubmitTriggered` used to guard.
+  const handleTimeUp = useCallback(() => {
+    submitScore(duelId, wordsFoundRef.current);
+    setPhase('submitting');
+  }, [duelId, submitScore]);
+
+  const { remainingTime: timeRemaining } = useGameTimer({
+    initialTime: DUEL_TIME_LIMIT_SECONDS,
+    isPaused: phase !== 'playing',
+    onTimeUp: handleTimeUp,
+  });
 
   // ============================================
   // EFFECTS
@@ -122,44 +135,6 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
     loadDuel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duelId, studentId]);
-
-  // G4 fix: Countdown timer — auto-submits when time expires
-  useEffect(() => {
-    if (phase !== 'playing') {
-      // Clear timer when not in playing phase
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      return;
-    }
-
-    timerRef.current = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          // Time's up — auto-submit
-          if (!autoSubmitTriggered.current) {
-            autoSubmitTriggered.current = true;
-            // Use setTimeout to avoid state update during render
-            setTimeout(() => {
-              const words = wordsFoundRef.current;
-              submitScore(duelId, words);
-              setPhase('submitting');
-            }, 0);
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [phase, duelId, submitScore]);
 
   // Socket event listeners
   useEffect(() => {

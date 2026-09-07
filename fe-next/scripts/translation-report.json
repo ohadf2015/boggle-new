@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6289,
+    "totalKeysInCode": 6663,
     "keyCountByLanguage": {
-      "en": 12180,
-      "es": 12476,
-      "he": 12381,
-      "ja": 12441,
-      "ru": 12221,
-      "sv": 12437
+      "en": 12665,
+      "es": 12973,
+      "he": 12875,
+      "ja": 12935,
+      "ru": 12706,
+      "sv": 12931
     },
-    "missingFromEnglish": 66,
+    "missingFromEnglish": 83,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 322,
+      "templateLiterals": 349,
       "fallbackUsages": 1,
-      "variableKeys": 120
+      "variableKeys": 125
     }
   },
   "runtimeRisks": {
@@ -93,7 +93,7 @@
         "pattern": "`sealedBid.outcome.${settlement.outcome}`",
         "type": "template_literal",
         "file": "app/[locale]/sealed-bid/page.tsx",
-        "line": 284,
+        "line": 270,
         "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
       },
       {
@@ -324,15 +324,43 @@
         "pattern": "`admin.teacherFunnel.stage.${r.stage}`",
         "type": "template_literal",
         "file": "components/admin/TeacherFunnelPanel.tsx",
-        "line": 524,
+        "line": 546,
         "context": "{t(`admin.teacherFunnel.stage.${r.stage}`)}"
       },
       {
         "pattern": "`admin.teacherFunnel.trial.${r.trialState}`",
         "type": "template_literal",
         "file": "components/admin/TeacherFunnelPanel.tsx",
-        "line": 528,
+        "line": 550,
         "context": "{t(`admin.teacherFunnel.trial.${r.trialState}`)}"
+      },
+      {
+        "pattern": "`admin.teacherPro.error.${code}`",
+        "type": "template_literal",
+        "file": "components/admin/TeacherProGrantPanel.tsx",
+        "line": 108,
+        "context": "setError(code === 'generic' ? `${t('admin.teacherPro.error.generic')} ${j.error || res.status}` : t("
+      },
+      {
+        "pattern": "`admin.teacherPro.form.days.${d}`",
+        "type": "template_literal",
+        "file": "components/admin/TeacherProGrantPanel.tsx",
+        "line": 155,
+        "context": "{DURATIONS.map((d) => <option key={d} value={d}>{t(`admin.teacherPro.form.days.${d}`)}</option>)}"
+      },
+      {
+        "pattern": "`admin.teacherPro.result.${result.status}`",
+        "type": "template_literal",
+        "file": "components/admin/TeacherProGrantPanel.tsx",
+        "line": 178,
+        "context": "<p>{t(`admin.teacherPro.result.${result.status}`, { email: result.email, date: fmt(result.expiresAt)"
+      },
+      {
+        "pattern": "`admin.teacherPro.status.${r.status}`",
+        "type": "template_literal",
+        "file": "components/admin/TeacherProGrantPanel.tsx",
+        "line": 231,
+        "context": "<td className=\"p-3\"><span className={`rounded px-2 py-0.5 text-xs font-black uppercase ${STATUS_TONE"
       },
       {
         "pattern": "`admin.blocklist.duration.${d.key}`",
@@ -667,14 +695,14 @@
         "pattern": "`blast.pregameBuff.${initialBuff}`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 703,
+        "line": 716,
         "context": "const label = t(`blast.pregameBuff.${initialBuff}`) || initialBuff;"
       },
       {
         "pattern": "`blast.pregameBuff.${initialBuff}Desc`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 704,
+        "line": 717,
         "context": "const desc = t(`blast.pregameBuff.${initialBuff}Desc`) || '';"
       },
       {
@@ -1343,24 +1371,24 @@
         "context": "const tierName = t(`education.achievements.tiers.${tier}`);"
       },
       {
-        "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`",
+        "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 208,
-        "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}"
+        "line": 226,
+        "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
         "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeSettings.tsx",
-        "line": 95,
+        "line": 119,
         "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
       },
       {
         "pattern": "`teacher.classroom.minWordLength.len${len}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeSettings.tsx",
-        "line": 198,
+        "line": 239,
         "context": "const label = t(`teacher.classroom.minWordLength.len${len}`);"
       },
       {
@@ -1441,11 +1469,60 @@
         "context": "{t('education.landing.modes.teaches')}: {t(`education.landing.modes.${m.key}.teaches`)}"
       },
       {
+        "pattern": "`education.studentPreview.steps.${step}`",
+        "type": "template_literal",
+        "file": "components/education/StudentViewPreview.tsx",
+        "line": 190,
+        "context": "{t(`education.studentPreview.steps.${step}`)}"
+      },
+      {
+        "pattern": "`education.studentPreview.skipped.reason.${reason}`",
+        "type": "template_literal",
+        "file": "components/education/StudentViewPreview.tsx",
+        "line": 299,
+        "context": "{t(`education.studentPreview.skipped.reason.${reason}`, { max: Math.max(rows, cols) })}"
+      },
+      {
         "pattern": "`challenges.${challenge.challenge_tier}`",
         "type": "template_literal",
         "file": "components/education/challenges/DailyChallengeCard.tsx",
         "line": 42,
         "context": "{t(`challenges.${challenge.challenge_tier}`)}"
+      },
+      {
+        "pattern": "`education.practice.mastery.${mastery}`",
+        "type": "template_literal",
+        "file": "components/education/practicePicker/PracticePicker.tsx",
+        "line": 238,
+        "context": "{t(`education.practice.mastery.${mastery}`)}"
+      },
+      {
+        "pattern": "`teacher.classroom.gameModes.${key}`",
+        "type": "template_literal",
+        "file": "components/education/student-preview/previewLabels.ts",
+        "line": 22,
+        "context": "return key ? t(`teacher.classroom.gameModes.${key}`) : mode;"
+      },
+      {
+        "pattern": "`vocabQuiz.focus.${key}`",
+        "type": "template_literal",
+        "file": "components/education/vocabQuiz/VocabQuizFocusPicker.tsx",
+        "line": 151,
+        "context": "{t(`vocabQuiz.focus.${key}`)}"
+      },
+      {
+        "pattern": "`vocabQuiz.focus.${question.focus}`",
+        "type": "template_literal",
+        "file": "components/education/vocabQuiz/VocabQuizHostView.tsx",
+        "line": 96,
+        "context": "{t(`vocabQuiz.focus.${question.focus}`)}"
+      },
+      {
+        "pattern": "`vocabQuiz.focus.${question.focus}`",
+        "type": "template_literal",
+        "file": "components/education/vocabQuiz/VocabQuizView.tsx",
+        "line": 36,
+        "context": "() => (question ? t(`vocabQuiz.focus.${question.focus}`) : ''),"
       },
       {
         "pattern": "`xp.prestigeModal.${key}`",
@@ -1682,8 +1759,64 @@
         "pattern": "`education.practice.mastery.${mastery}`",
         "type": "template_literal",
         "file": "components/practice/PracticeModeSelector.tsx",
-        "line": 206,
+        "line": 216,
         "context": "{t(`education.practice.mastery.${mastery}`) || mastery}"
+      },
+      {
+        "pattern": "`education.vocabFocus.focus.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeModeSelector.tsx",
+        "line": 354,
+        "context": "{t(`education.vocabFocus.focus.${focus}`)}"
+      },
+      {
+        "pattern": "`education.vocabFocus.instructions.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeModeSelector.tsx",
+        "line": 358,
+        "context": "? t(`education.vocabFocus.instructions.${focus}`)"
+      },
+      {
+        "pattern": "`education.vocabFocus.unlock.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeModeSelector.tsx",
+        "line": 359,
+        "context": ": t(`education.vocabFocus.unlock.${focus}`, { min: MIN_WORDS_PER_FOCUS })}"
+      },
+      {
+        "pattern": "`education.vocabFocus.focus.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/VocabFocusPractice.tsx",
+        "line": 170,
+        "context": "<h2 className=\"text-2xl font-neo-display text-neo-black mb-2\">{t(`education.vocabFocus.focus.${focus"
+      },
+      {
+        "pattern": "`education.vocabFocus.notEnough.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/VocabFocusPractice.tsx",
+        "line": 171,
+        "context": "<p className=\"font-neo-body text-neo-black/80 mb-6 text-pretty\">{t(`education.vocabFocus.notEnough.$"
+      },
+      {
+        "pattern": "`education.vocabFocus.focus.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/VocabFocusPractice.tsx",
+        "line": 221,
+        "context": "{t(`education.vocabFocus.focus.${focus}`)}"
+      },
+      {
+        "pattern": "`education.vocabFocus.instructions.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/VocabFocusPractice.tsx",
+        "line": 224,
+        "context": "<p className=\"text-sm font-neo-body text-neo-white/80\">{t(`education.vocabFocus.instructions.${focus"
+      },
+      {
+        "pattern": "`education.vocabFocus.promptLabel.${focus}`",
+        "type": "template_literal",
+        "file": "components/practice/VocabFocusPractice.tsx",
+        "line": 253,
+        "context": "{t(`education.vocabFocus.promptLabel.${focus}`)}"
       },
       {
         "pattern": "`achievementTiers.${tier.toLowerCase()}`",
@@ -1889,6 +2022,13 @@
         "context": "{t(`catalystTeaser.${c.id}.desc`)}"
       },
       {
+        "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
+        "type": "template_literal",
+        "file": "components/student/StudentLessonView.tsx",
+        "line": 317,
+        "context": "{t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) }"
+      },
+      {
         "pattern": "`teacher.subscription.matrix.${row.key}`",
         "type": "template_literal",
         "file": "components/teacher/PlanComparisonMatrix.tsx",
@@ -1899,22 +2039,36 @@
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 50,
+        "line": 64,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 53,
+        "line": 67,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
+      },
+      {
+        "pattern": "`teacher.proWelcome.perk.${key}`",
+        "type": "template_literal",
+        "file": "components/teacher/ProWelcomeCelebration.tsx",
+        "line": 96,
+        "context": "<span className=\"text-sm font-bold text-black\">{t(`teacher.proWelcome.perk.${key}`)}</span>"
       },
       {
         "pattern": "`teacher.dashboard.tab.${tab.id}`",
         "type": "template_literal",
         "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 209,
+        "line": 221,
         "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
+      },
+      {
+        "pattern": "`teacher.lastGame.mode.${key}`",
+        "type": "template_literal",
+        "file": "components/teacher/analytics/LastGameInsights.tsx",
+        "line": 111,
+        "context": "return key ? t(`teacher.lastGame.mode.${key}`) : mode;"
       },
       {
         "pattern": "`education.analytics.${level.key}`",
@@ -1922,6 +2076,34 @@
         "file": "components/teacher/analytics/VocabularyHeatmap.tsx",
         "line": 110,
         "context": "{t(`education.analytics.${level.key}`)}"
+      },
+      {
+        "pattern": "`education.vocabFocus.focus.${option}`",
+        "type": "template_literal",
+        "file": "components/teacher/assignments/AssignmentCreator.tsx",
+        "line": 238,
+        "context": "{t(`education.vocabFocus.focus.${option}`)}"
+      },
+      {
+        "pattern": "`education.vocabFocus.instructions.${option}`",
+        "type": "template_literal",
+        "file": "components/teacher/assignments/AssignmentCreator.tsx",
+        "line": 244,
+        "context": "skill: t(`education.vocabFocus.instructions.${option}`),"
+      },
+      {
+        "pattern": "`education.vocabFocus.unlock.${option}`",
+        "type": "template_literal",
+        "file": "components/teacher/assignments/AssignmentCreator.tsx",
+        "line": 246,
+        "context": ": t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}"
+      },
+      {
+        "pattern": "`education.vocabFocus.focus.${practiceFocus}`",
+        "type": "template_literal",
+        "file": "components/teacher/assignments/AssignmentTrackingPanel.tsx",
+        "line": 81,
+        "context": "{t(`education.vocabFocus.focus.${practiceFocus}`)}"
       },
       {
         "pattern": "`teacher.curriculum.grades.${list.grade_level}`",
@@ -1936,6 +2118,13 @@
         "file": "components/teacher/curriculum/CurriculumWordListBrowser.tsx",
         "line": 275,
         "context": "{t(`teacher.curriculum.subjects.${list.subject}`)}"
+      },
+      {
+        "pattern": "`teacher.classReport.practice.${drill.practiceKey}`",
+        "type": "template_literal",
+        "file": "components/teacher/report/StudentDrillDownPanel.tsx",
+        "line": 102,
+        "context": "{t(`teacher.classReport.practice.${drill.practiceKey}`)}"
       },
       {
         "pattern": "`training.analysis.skills.${skill}`",
@@ -1969,7 +2158,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 614,
+        "line": 626,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -2004,14 +2193,14 @@
         "pattern": "`wordcraft.gems.dice.families.${sessionDice.id}`",
         "type": "template_literal",
         "file": "components/word-craft/gems/GemHuntPageClient.tsx",
-        "line": 312,
+        "line": 315,
         "context": "? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`), mul"
       },
       {
         "pattern": "`wordcraft.gems.dice.families.${fam.id}`",
         "type": "template_literal",
         "file": "components/word-craft/gems/GemHuntPageClient.tsx",
-        "line": 432,
+        "line": 435,
         "context": "{t(`wordcraft.gems.dice.families.${fam.id}`)}"
       },
       {
@@ -2363,7 +2552,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 369,
+        "line": 441,
         "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
@@ -2371,7 +2560,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 371,
+        "line": 443,
         "context": "{t(a)}"
       },
       {
@@ -2675,16 +2864,16 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 361,
-        "context": "const tSafe = useCallback((key: string) => t(key) || key, [t]);"
+        "line": 366,
+        "context": "(key: string, fallbackOrParams?: string | Record<string, string | number>) => t(key, fallbackOrParam"
       },
       {
         "pattern": "t(key)",
         "variable": "key",
         "type": "variable_key",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 436,
-        "context": "const tAdapter = useCallback((key: string) => t(key) || undefined, [t]);"
+        "line": 449,
+        "context": "const tAdapter = useCallback((key: string, fallback?: string) => t(key, fallback) || undefined, [t])"
       },
       {
         "pattern": "t(key)",
@@ -2763,7 +2952,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 178,
+        "line": 246,
         "context": "{t(labelKey)}"
       },
       {
@@ -2771,7 +2960,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 213,
+        "line": 281,
         "context": "{t(labelKey)}"
       },
       {
@@ -2893,6 +3082,46 @@
         "file": "components/native/OfflineFallback.tsx",
         "line": 109,
         "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/party/PartyView.tsx",
+        "line": 107,
+        "context": "t={(key, params) => t(key, params)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/party/PartyView.tsx",
+        "line": 117,
+        "context": "<PartyHandoff t={(key, params) => t(key, params)} state={state} onReady={() => apply(beginTurn)} />"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/party/PartyView.tsx",
+        "line": 122,
+        "context": "t={(key, params) => t(key, params)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/party/PartyView.tsx",
+        "line": 133,
+        "context": "<PartyRoundBreakdown t={(key, params) => t(key, params)} state={state} onContinue={() => apply(nextA"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/party/PartyView.tsx",
+        "line": 137,
+        "context": "<PartyPodium t={(key, params) => t(key, params)} state={state} onPlayAgain={playAgain} onNewGame={di"
       },
       {
         "pattern": "t(confirmLabelKey)",
@@ -3107,7 +3336,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "hooks/useWordSubmission.ts",
-        "line": 339,
+        "line": 345,
         "context": "const msg = params ? t(errorKey, params) : t(errorKey);"
       },
       {
@@ -3115,7 +3344,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "hooks/useWordSubmission.ts",
-        "line": 339,
+        "line": 345,
         "context": "const msg = params ? t(errorKey, params) : t(errorKey);"
       },
       {
@@ -3195,7 +3424,7 @@
         "variable": "defaultKey",
         "type": "variable_key",
         "file": "lib/multiplayer/resolveHostLeftMessage.ts",
-        "line": 31,
+        "line": 35,
         "context": "if (defaultKey) return t(defaultKey);"
       },
       {
@@ -3218,7 +3447,7 @@
         "pattern": "t(defaultKey)",
         "variable": "defaultKey",
         "file": "lib/multiplayer/resolveHostLeftMessage.ts",
-        "line": 31,
+        "line": 35,
         "context": "if (defaultKey) return t(defaultKey);",
         "type": "variable_key"
       },
@@ -3243,7 +3472,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "utils/socketErrorMessage.ts",
-        "line": 25,
+        "line": 27,
         "context": "const translated = t(key);"
       }
     ]
@@ -3262,7 +3491,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessQueue.tsx",
-          "line": 132
+          "line": 143
         }
       ]
     },
@@ -3271,7 +3500,164 @@
       "usages": [
         {
           "file": "components/admin/TeacherAccessQueue.tsx",
-          "line": 173
+          "line": 184
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.assignments",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 216
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.assignmentsEmpty",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 218
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.classrooms",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 176
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.classroomsEmpty",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 178
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.completedCount",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 229
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.completions",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 243
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.completionsEmpty",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 245
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.error",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 65
+        },
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.health",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 123
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.level",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 256
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.roleGranted",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 140
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.roleMissing",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.title",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.wordlists",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 196
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.wordlistsEmpty",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 198
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.words",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.wordsMastered",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 259
         }
       ]
     },
@@ -3280,7 +3666,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3289,7 +3675,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3298,7 +3684,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3307,7 +3693,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3316,7 +3702,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 432
+          "line": 449
         }
       ]
     },
@@ -3325,7 +3711,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3334,7 +3720,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3343,7 +3729,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 444
+          "line": 461
         }
       ]
     },
@@ -3352,7 +3738,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 431
+          "line": 448
         }
       ]
     },
@@ -3361,7 +3747,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 510
+          "line": 532
         }
       ]
     },
@@ -3370,7 +3756,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 505
+          "line": 527
         }
       ]
     },
@@ -3379,7 +3765,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 259
+          "line": 260
         }
       ]
     },
@@ -3388,7 +3774,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 246
+          "line": 247
         }
       ]
     },
@@ -3397,7 +3783,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 254
+          "line": 255
         }
       ]
     },
@@ -3406,7 +3792,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 291
+          "line": 292
         }
       ]
     },
@@ -3415,7 +3801,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 286
+          "line": 287
         }
       ]
     },
@@ -3423,8 +3809,12 @@
       "key": "admin.teacherFunnel.classrooms.students",
       "usages": [
         {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 185
+        },
+        {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 257
+          "line": 258
         }
       ]
     },
@@ -3433,7 +3823,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 239
+          "line": 240
         }
       ]
     },
@@ -3442,7 +3832,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 255
+          "line": 256
         }
       ]
     },
@@ -3451,7 +3841,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 238
+          "line": 239
         }
       ]
     },
@@ -3459,8 +3849,20 @@
       "key": "admin.teacherFunnel.classrooms.unnamed",
       "usages": [
         {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 183
+        },
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 203
+        },
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 223
+        },
+        {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 269
+          "line": 270
         }
       ]
     },
@@ -3469,7 +3871,16 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 458
+          "line": 475
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.col.view",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 484
         }
       ]
     },
@@ -3478,7 +3889,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 414
+          "line": 431
         }
       ]
     },
@@ -3487,7 +3898,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 203
+          "line": 204
         }
       ]
     },
@@ -3496,7 +3907,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 210
+          "line": 211
         }
       ]
     },
@@ -3505,7 +3916,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 189
+          "line": 190
         }
       ]
     },
@@ -3514,7 +3925,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 195
+          "line": 196
         }
       ]
     },
@@ -3523,7 +3934,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 181
+          "line": 182
         }
       ]
     },
@@ -3532,7 +3943,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 178
+          "line": 179
         }
       ]
     },
@@ -3541,7 +3952,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 404
+          "line": 421
         }
       ]
     },
@@ -3550,7 +3961,124 @@
       "usages": [
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
-          "line": 489
+          "line": 510
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.rowOpenActivity",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 509
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherFunnel.view",
+      "usages": [
+        {
+          "file": "components/admin/TeacherFunnelPanel.tsx",
+          "line": 565
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.approved",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.blocked",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.blockedAlert",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 145
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.error",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.noClassroom",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.noClassroomAlert",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.subtitle",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.teaching",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 136
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.teachingAlert",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.title",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherHealth.view",
+      "usages": [
+        {
+          "file": "components/admin/overview/TeacherHealthCard.tsx",
+          "line": 100
         }
       ]
     },
@@ -3631,7 +4159,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 223
+          "line": 232
         }
       ]
     },
@@ -3659,156 +4187,6 @@
         {
           "file": "app/[locale]/PageClient.tsx",
           "line": 253
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.autoPronounce",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardReview.tsx",
-          "line": 400
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.classicMode",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardReview.tsx",
-          "line": 295
-        },
-        {
-          "file": "components/practice/FlashcardReview.tsx",
-          "line": 358
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.contextualExamples",
-      "usages": [
-        {
-          "file": "components/practice/VocabularyCardEnriched.tsx",
-          "line": 109
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.definition",
-      "usages": [
-        {
-          "file": "components/practice/VocabularyCardEnriched.tsx",
-          "line": 70
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.dontKnow",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardSwipeStack.tsx",
-          "line": 232
-        },
-        {
-          "file": "components/practice/FlashcardSwipeStack.tsx",
-          "line": 233
-        },
-        {
-          "file": "components/practice/SwipeFeedbackOverlay.tsx",
-          "line": 69
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.enrichingContent",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardReview.tsx",
-          "line": 172
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.examples",
-      "usages": [
-        {
-          "file": "components/practice/VocabularyCardEnriched.tsx",
-          "line": 81
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.gotIt",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardSwipeStack.tsx",
-          "line": 232
-        },
-        {
-          "file": "components/practice/FlashcardSwipeStack.tsx",
-          "line": 233
-        },
-        {
-          "file": "components/practice/SwipeFeedbackOverlay.tsx",
-          "line": 52
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.pronounce",
-      "usages": [
-        {
-          "file": "components/practice/PronunciationButton.tsx",
-          "line": 66
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.pronunciationFallback",
-      "usages": [
-        {
-          "file": "components/practice/PronunciationButton.tsx",
-          "line": 93
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.speaking",
-      "usages": [
-        {
-          "file": "components/practice/PronunciationButton.tsx",
-          "line": 66
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.swipeMode",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardReview.tsx",
-          "line": 304
-        },
-        {
-          "file": "components/practice/FlashcardReview.tsx",
-          "line": 367
-        }
-      ]
-    },
-    {
-      "key": "education.lesson.tapToReveal",
-      "usages": [
-        {
-          "file": "components/practice/FlashcardSwipeStack.tsx",
-          "line": 212
-        }
-      ]
-    },
-    {
-      "key": "footer.spellingBeePractice",
-      "usages": [
-        {
-          "file": "components/Footer.tsx",
-          "line": 94
         }
       ]
     },
@@ -3862,7 +4240,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 280
+          "line": 299
         }
       ]
     },
@@ -3871,7 +4249,7 @@
       "usages": [
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
-          "line": 271
+          "line": 289
         }
       ]
     }
@@ -3934,19 +4312,7 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta",
-      "sealedBid.session.cashOut",
-      "sealedBid.session.chips",
-      "sealedBid.session.coins"
+      "vs.bestFor"
     ],
     "he": [
       "sealedBidLegacy.chipStack",
@@ -3978,16 +4344,7 @@
       "seo.quickPlay.title",
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
-      "seo.quickPlay.ogDescription",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta"
+      "seo.quickPlay.ogDescription"
     ],
     "ja": [
       "sealedBidLegacy.chipStack",
@@ -4045,16 +4402,7 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta"
+      "vs.bestFor"
     ],
     "ru": [
       "seo.refund.title",
@@ -4125,16 +4473,7 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta"
+      "vs.bestFor"
     ]
   },
   "keysNotInEnglish": {

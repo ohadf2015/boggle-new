@@ -57,6 +57,7 @@ import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
+import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
 import { stopAllBots } from '../modules/botManager.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
@@ -637,6 +638,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     // ended early.
     const orphanedNoTimer = !startedAt && !hasGameTimer(gameCode);
     if (clockExpired || orphanedNoTimer) {
+      // A live vocab quiz room looks orphaned to every check above and is not:
+      // the quiz owns its own clock, so it sets no start stamp and no board
+      // timer. Ending it here runs the board's end path, which persists
+      // board-shaped results and takes the once-per-game classroom
+      // persistence key — that is how game GHYRVS lost a full round of
+      // student answers on 2026-09-05. The quiz answers for itself.
+      if (handleQuizRequestResults(io, socket, gameCode)) return;
       logger.warn('SOCKET', `requestResults on ${clockExpired ? 'overdue' : 'orphaned (no start stamp + no timer)'} in-progress game ${gameCode} — forcing endGame`);
       endGame(io, gameCode);
     }

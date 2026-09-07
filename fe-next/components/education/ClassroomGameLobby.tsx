@@ -27,6 +27,7 @@ import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
+  VOCAB_QUIZ_MODE,
   type ClassroomGameMode,
   type PracticeFocusSetting,
 } from '@/shared/types/vocabQuiz';
@@ -52,7 +53,11 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [gameMode, setGameMode] = useState<ClassroomGameMode>('classic');
+  // The mode the teacher explicitly picked. `null` means they have not touched
+  // the picker, and the default below is derived from whether a lesson is
+  // attached — ONE source of truth, resolved at render, so nothing can flip it
+  // late (pitfalls class 1).
+  const [pickedGameMode, setPickedGameMode] = useState<ClassroomGameMode | null>(null);
   // Vocab Quiz only: which skill to drill and the round shape. `any` mixes
   // whatever the chosen lesson can actually build — with definition-only word
   // lists (the common case today) that resolves to a definition round.
@@ -178,9 +183,26 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     return lessons.filter((l) => selectedLessonIds.includes(l.id));
   }, [lessons, selectedLessonIds]);
 
+  // Every word the teacher assigned, deduped — NOT filtered by `canIntegrate`.
+  //
+  // `canIntegrate` answers "can a Boggle grid hold this?" (3-12 letters). Using
+  // it here made it answer "is this part of the lesson?", which is a different
+  // question with a different answer: a ten-word list saved in the editor
+  // arrived at the host screen as nine, and "photosynthesis" was gone with no
+  // error anywhere. It also starved Vocab Quiz, where word length is irrelevant.
+  // The server already caps what it can embed and reports the truth back as
+  // `placedVocabulary`, so over-sending costs nothing and under-sending lies.
+  // A lesson attached means the teacher came to drill THOSE words, so the
+  // default is the mode that actually asks about them. Classic cannot: measured
+  // live 2026-09-07, a 6x6 board carried 1 of 9 lesson words (`placedVocabulary
+  // === ["ENZYME"]`) because a straight run caps at six letters and vocabulary
+  // is longer than that. Classic stays the default with no lesson attached.
+  const gameMode: ClassroomGameMode =
+    pickedGameMode ?? (selectedLessonIds.length > 0 ? VOCAB_QUIZ_MODE : 'classic');
+
   const allPlayableWords = useMemo(() => {
     const words = selectedLessons.flatMap((lesson) =>
-      lesson.words?.filter((w) => w.canIntegrate).map((w) => w.word) || []
+      lesson.words?.map((w) => w.word).filter((w): w is string => !!w?.trim()) || []
     );
     return [...new Set(words)];
   }, [selectedLessons]);
@@ -366,7 +388,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       isStarting={isStarting}
       onSelectClassroom={setSelectedClassroomId}
       onSelectLessons={setSelectedLessonIds}
-      onGameModeChange={setGameMode}
+      onGameModeChange={setPickedGameMode}
       onVocabQuizFocusChange={setVocabQuizFocus}
       onVocabQuizQuestionCountChange={setVocabQuizQuestionCount}
       onVocabQuizSecondsChange={setVocabQuizSeconds}
