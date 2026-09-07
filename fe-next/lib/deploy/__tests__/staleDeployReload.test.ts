@@ -1,9 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   isChunkLoadError,
   shouldReloadForStaleDeploy,
+  shouldReloadForMissingChunk,
   recoverFromStaleChunk,
+  hardNavigateCacheBust,
+  stripChunkReloadParam,
   CHUNK_RECOVERY_GUARD_KEY,
+  CHUNK_RELOAD_PARAM,
 } from '../staleDeployReload';
 
 describe('isChunkLoadError', () => {
@@ -67,6 +71,16 @@ describe('shouldReloadForStaleDeploy', () => {
   });
 });
 
+describe('shouldReloadForMissingChunk', () => {
+  it('reloads when the guard is clear', () => {
+    expect(shouldReloadForMissingChunk({ alreadyReloaded: false })).toBe(true);
+  });
+
+  it('does not reload when already reloaded', () => {
+    expect(shouldReloadForMissingChunk({ alreadyReloaded: true })).toBe(false);
+  });
+});
+
 describe('recoverFromStaleChunk', () => {
   const baseDeps = () => ({
     clientBuildTime: 'CLIENT',
@@ -76,24 +90,52 @@ describe('recoverFromStaleChunk', () => {
     clearCachesAndReload: vi.fn(async () => {}),
   });
 
-  it('reloads once on a stale deploy (version mismatch)', async () => {
-    const deps = baseDeps();
+  it('reloads once on a stale deploy (version mismatch) when force is off', async () => {
+    const deps = { ...baseDeps(), forceOnChunkFailure: false };
     const did = await recoverFromStaleChunk(deps);
     expect(did).toBe(true);
     expect(deps.setGuard).toHaveBeenCalledOnce();
     expect(deps.clearCachesAndReload).toHaveBeenCalledOnce();
   });
 
-  it('does NOT reload when build times match (fresh build)', async () => {
-    const deps = { ...baseDeps(), fetchServerBuildTime: vi.fn(async () => 'CLIENT') };
+  it('does NOT reload when build times match and force is off', async () => {
+    const deps = {
+      ...baseDeps(),
+      forceOnChunkFailure: false,
+      fetchServerBuildTime: vi.fn(async () => 'CLIENT'),
+    };
     const did = await recoverFromStaleChunk(deps);
     expect(did).toBe(false);
     expect(deps.clearCachesAndReload).not.toHaveBeenCalled();
   });
 
-  it('does NOT reload when the version fetch fails (fail-safe)', async () => {
+  it('DOES reload when build times match but forceOnChunkFailure is true (CDN/SWR hole)', async () => {
     const deps = {
       ...baseDeps(),
+      forceOnChunkFailure: true,
+      fetchServerBuildTime: vi.fn(async () => 'CLIENT'),
+    };
+    const did = await recoverFromStaleChunk(deps);
+    expect(did).toBe(true);
+    expect(deps.clearCachesAndReload).toHaveBeenCalledOnce();
+    // Version fetch is skipped entirely in the force path.
+    expect(deps.fetchServerBuildTime).not.toHaveBeenCalled();
+  });
+
+  it('defaults forceOnChunkFailure to true (chunk 2703 hot after #893/#935)', async () => {
+    const deps = {
+      ...baseDeps(),
+      fetchServerBuildTime: vi.fn(async () => 'CLIENT'),
+    };
+    const did = await recoverFromStaleChunk(deps);
+    expect(did).toBe(true);
+    expect(deps.clearCachesAndReload).toHaveBeenCalledOnce();
+  });
+
+  it('does NOT reload when the version fetch fails and force is off', async () => {
+    const deps = {
+      ...baseDeps(),
+      forceOnChunkFailure: false,
       fetchServerBuildTime: vi.fn(async () => {
         throw new Error('network down');
       }),
@@ -113,5 +155,64 @@ describe('recoverFromStaleChunk', () => {
 
   it('exposes the shared guard key reused across error boundaries', () => {
     expect(CHUNK_RECOVERY_GUARD_KEY).toBe('chunk_error_refresh');
+  });
+});
+
+describe('hardNavigateCacheBust / stripChunkReloadParam', () => {
+  const originalLocation = window.location;
+  const originalHistory = window.history;
+
+  beforeEach(() => {
+    const replace = vi.fn();
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        href: 'https://lexiclash.live/en/daily?x=1',
+        reload: vi.fn(),
+        replace,
+      },
+    });
+    Object.defineProperty(window, 'history', {
+      configurable: true,
+      value: {
+        state: null,
+        replaceState: vi.fn(),
+      },
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+    Object.defineProperty(window, 'history', { configurable: true, value: originalHistory });
+  });
+
+  it('navigates with a cache-busting query param instead of bare reload', () => {
+    hardNavigateCacheBust(() => 12345);
+    expect(window.location.replace).toHaveBeenCalledOnce();
+    const dest = String((window.location.replace as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0]);
+    expect(dest).toContain(`${CHUNK_RELOAD_PARAM}=12345`);
+    expect(dest).toContain('x=1');
+    expect(window.location.reload).not.toHaveBeenCalled();
+  });
+
+  it('strips the recovery param from the address bar after a clean boot', () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        href: `https://lexiclash.live/en?${CHUNK_RELOAD_PARAM}=99&keep=1`,
+        reload: vi.fn(),
+        replace: vi.fn(),
+      },
+    });
+    stripChunkReloadParam();
+    expect(window.history.replaceState).toHaveBeenCalledOnce();
+    const next = (window.history.replaceState as unknown as ReturnType<typeof vi.fn>).mock.calls[0][2];
+    expect(next).toBe('/en?keep=1');
+    expect(String(next)).not.toContain(CHUNK_RELOAD_PARAM);
+  });
+
+  it('no-ops strip when the param is absent', () => {
+    stripChunkReloadParam();
+    expect(window.history.replaceState).not.toHaveBeenCalled();
   });
 });

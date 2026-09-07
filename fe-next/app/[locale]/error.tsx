@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
+import { clearCachesAndReload } from '@/lib/deploy/staleDeployReload';
 
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || '';
@@ -39,22 +40,6 @@ function isChunkLoadError(error: Error): boolean {
   );
 }
 
-async function clearCachesAndReload(): Promise<void> {
-  // Clear all service worker caches
-  if ('caches' in window) {
-    const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map(name => caches.delete(name)));
-  }
-
-  // Unregister service workers to get fresh version
-  if ('serviceWorker' in navigator) {
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registrations.map(reg => reg.unregister()));
-  }
-
-  // Force hard reload (bypass cache)
-  window.location.reload();
-}
 
 export default function Error({
   error,

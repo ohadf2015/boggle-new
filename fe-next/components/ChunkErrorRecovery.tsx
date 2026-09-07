@@ -5,23 +5,29 @@ import {
   isChunkLoadError,
   recoverFromStaleChunk,
   clearCachesAndReload,
+  stripChunkReloadParam,
   CHUNK_RECOVERY_GUARD_KEY,
 } from '@/lib/deploy/staleDeployReload';
 
 /**
- * ChunkErrorRecovery — surface-agnostic stale-deploy recovery.
+ * ChunkErrorRecovery — surface-agnostic stale-deploy / CDN-missing chunk recovery.
  *
  * Listens globally for the chunk/module load failures that React error
  * boundaries miss: stale `<script>`/`<link>` 404s (asset `error` events, which
  * don't bubble — hence capture phase) and `next/dynamic` import rejections
- * (unhandled promise rejections). When the failure is chunk-shaped AND the
- * client build is provably stale, it hard-reloads once to pull the fresh build.
+ * (unhandled promise rejections).
  *
- * Mounted once, app-wide, beside VersionChecker. See `lib/deploy/staleDeployReload`
- * for the version-gated, fail-safe decision core.
+ * After #893/#935, chunk 2703 / 14850 stayed hot because this listener only
+ * reloaded when `/api/version` proved a build mismatch. CDN / offline-shell
+ * SWR / flaky-network 404s on a hashed asset are unrecoverable in place even
+ * when the version endpoint agrees the build is "current", so we now force
+ * ONE cache-busting hard navigation per session (same policy as retryImport
+ * and the boot guard). Mounted once, app-wide, beside VersionChecker.
  */
 export default function ChunkErrorRecovery(): null {
   useEffect(() => {
+    stripChunkReloadParam();
+
     const attempt = (name: string | undefined, message: string | undefined): void => {
       if (!isChunkLoadError(name, message)) return;
       void recoverFromStaleChunk({
@@ -46,10 +52,13 @@ export default function ChunkErrorRecovery(): null {
           try {
             sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
           } catch {
-            /* sessionStorage unavailable — version mismatch is still the primary guard */
+            /* sessionStorage unavailable — one-shot navigation is still the primary guard */
           }
         },
         clearCachesAndReload,
+        // Content-hashed chunk 404s are unrecoverable in place — do not require
+        // a version mismatch (that gate left PostHog ChunkLoadError hot after #893/#935).
+        forceOnChunkFailure: true,
       });
     };
 

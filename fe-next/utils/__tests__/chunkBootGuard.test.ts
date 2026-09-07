@@ -19,7 +19,11 @@ function makeWindow(storageThrows = false) {
       };
   const win = {
     sessionStorage,
-    location: { reload: vi.fn() },
+    location: {
+      href: 'https://lexiclash.live/en',
+      reload: vi.fn(),
+      replace: vi.fn(),
+    },
     addEventListener: (type: string, fn: Handler) => {
       (listeners[type] ||= []).push(fn);
     },
@@ -33,12 +37,20 @@ function runGuard(win: Record<string, unknown>) {
   // against a fake window the same way, without needing a browser. In a real
   // document `sessionStorage` resolves off window — shadow it explicitly here
   // so the fake (or deliberately throwing) storage is what the script sees.
-  const fn = new Function('window', 'sessionStorage', CHUNK_BOOT_GUARD_SCRIPT);
-  fn(win, win.sessionStorage);
+  // URL is provided by the host environment (Node 20+ / jsdom).
+  const fn = new Function('window', 'sessionStorage', 'URL', CHUNK_BOOT_GUARD_SCRIPT);
+  fn(win, win.sessionStorage, URL);
 }
 
 function fire(win: ReturnType<typeof makeWindow>, type: string, event: unknown) {
   for (const fn of win.listeners[type] ?? []) fn(event);
+}
+
+function expectNavigatedOnce(w: ReturnType<typeof makeWindow>) {
+  expect(w.win.location.replace).toHaveBeenCalledTimes(1);
+  const dest = String(w.win.location.replace.mock.calls[0][0]);
+  expect(dest).toContain('_lc_chunk=');
+  expect(w.win.location.reload).not.toHaveBeenCalled();
 }
 
 const script404 = { target: { tagName: 'SCRIPT', src: 'https://lexiclash.live/_next/static/chunks/14850.js' } };
@@ -51,34 +63,34 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     expect(() => runGuard(win as unknown as Record<string, unknown>)).not.toThrow();
   });
 
-  it('hard-reloads once when an /_next/static script fails at boot', () => {
+  it('hard-navigates once when an /_next/static script fails at boot', () => {
     const w = makeWindow();
     runGuard(w.win as unknown as Record<string, unknown>);
     fire(w, 'error', script404);
-    expect(w.win.location.reload).toHaveBeenCalledTimes(1);
+    expectNavigatedOnce(w);
   });
 
-  it('hard-reloads once when an /_next/static stylesheet fails at boot', () => {
+  it('hard-navigates once when an /_next/static stylesheet fails at boot', () => {
     const w = makeWindow();
     runGuard(w.win as unknown as Record<string, unknown>);
     fire(w, 'error', link404);
-    expect(w.win.location.reload).toHaveBeenCalledTimes(1);
+    expectNavigatedOnce(w);
   });
 
-  it('hard-reloads once on a "Loading chunk" error message', () => {
+  it('hard-navigates once on a "Loading chunk" error message', () => {
     const w = makeWindow();
     runGuard(w.win as unknown as Record<string, unknown>);
     fire(w, 'error', chunkMessage);
-    expect(w.win.location.reload).toHaveBeenCalledTimes(1);
+    expectNavigatedOnce(w);
   });
 
-  it('never reloads twice — the sessionStorage guard stops reload loops', () => {
+  it('never navigates twice — the sessionStorage guard stops reload loops', () => {
     const w = makeWindow();
     runGuard(w.win as unknown as Record<string, unknown>);
     fire(w, 'error', script404);
     fire(w, 'error', chunkMessage);
     fire(w, 'error', link404);
-    expect(w.win.location.reload).toHaveBeenCalledTimes(1);
+    expect(w.win.location.replace).toHaveBeenCalledTimes(1);
   });
 
   it('ignores unrelated resource failures and errors', () => {
@@ -87,6 +99,7 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     fire(w, 'error', { target: { tagName: 'IMG', src: 'https://lexiclash.live/_next/static/x.png' } });
     fire(w, 'error', { target: { tagName: 'SCRIPT', src: 'https://pagead2.googlesyndication.com/ads.js' } });
     fire(w, 'error', { message: 'ResizeObserver loop limit exceeded' });
+    expect(w.win.location.replace).not.toHaveBeenCalled();
     expect(w.win.location.reload).not.toHaveBeenCalled();
   });
 
@@ -100,11 +113,11 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     w2.store.lc_chunk_boot_reload = '1';
     runGuard(w2.win as unknown as Record<string, unknown>);
     fire(w2, 'error', script404);
-    expect(w2.win.location.reload).not.toHaveBeenCalled();
+    expect(w2.win.location.replace).not.toHaveBeenCalled();
     // …but a clean load clears the flag so the next incident self-heals.
     fire(w2, 'load', {});
     expect(w2.store.lc_chunk_boot_reload).toBeUndefined();
     fire(w2, 'error', chunkMessage);
-    expect(w2.win.location.reload).toHaveBeenCalledTimes(1);
+    expect(w2.win.location.replace).toHaveBeenCalledTimes(1);
   });
 });

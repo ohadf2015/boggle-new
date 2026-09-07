@@ -8,21 +8,21 @@
  * deploy), React never mounts, no listener ever exists, and the visitor is
  * left on a blank page with a bare "Loading chunk N failed" in the console
  * (growth-radar #2700/#1870: "Loading chunk 14850 failed" on /es and
- * /en/multiplayer).
+ * /en/multiplayer; t_f6783906 chunk 2703 still hot after #893/#935).
  *
  * This script runs synchronously in <head>, before any app chunk loads. It
  * watches (capture phase — resource error events do not bubble) for failed
  * <script>/<link> loads under /_next/static/ and for "Loading chunk" errors,
- * and hard-reloads ONCE per page load to pull the fresh build. The guard flag
- * lives in sessionStorage so a genuinely offline client cannot reload-loop:
- * the second failed load sees the flag and stops. The flag is cleared on
- * every `load` event — resource errors always fire BEFORE `load`, so a clean
- * boot clears it for the next navigation, and since error events never
- * self-generate, an offline client still can't loop (each reload needs a
- * fresh error, and the flag blocks exactly one).
+ * and hard-navigates ONCE per page load with a cache-busting query param so
+ * the browser cannot re-serve the previous HTML from the offline-shell SWR
+ * window (bare location.reload() was the remaining hole after #893). The
+ * guard flag lives in sessionStorage so a genuinely offline client cannot
+ * reload-loop: the second failed load sees the flag and stops. The flag is
+ * cleared on every `load` event — resource errors always fire BEFORE `load`,
+ * so a clean boot clears it for the next navigation.
  *
  * Static literal, inlined into a <script> tag in the locale layout — no user
  * input, must stay dependency-free (runs before the app bundle loads). Placed
  * AFTER the storage shim so sessionStorage is always safe to touch.
  */
-export const CHUNK_BOOT_GUARD_SCRIPT = `(function(){var KEY='lc_chunk_boot_reload';function has(){try{return sessionStorage.getItem(KEY)==='1'}catch(e){return false}}function mark(){try{sessionStorage.setItem(KEY,'1')}catch(e){}}function clear(){try{sessionStorage.removeItem(KEY)}catch(e){}}function reloadOnce(){if(has())return;mark();window.location.reload()}window.addEventListener('error',function(e){var t=e&&e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')){var src=t.src||t.href||'';if(src.indexOf('/_next/static/')!==-1)reloadOnce();return}var m=(e&&e.message)||'';if(/loading (css )?chunk|dynamically imported module/i.test(m))reloadOnce()},true);window.addEventListener('load',function(){clear()})})();`;
+export const CHUNK_BOOT_GUARD_SCRIPT = `(function(){var KEY='lc_chunk_boot_reload';var PARAM='_lc_chunk';function has(){try{return sessionStorage.getItem(KEY)==='1'}catch(e){return false}}function mark(){try{sessionStorage.setItem(KEY,'1')}catch(e){}}function clear(){try{sessionStorage.removeItem(KEY)}catch(e){}}function navigateOnce(){if(has())return;mark();try{var u=new URL(window.location.href);u.searchParams.set(PARAM,String(Date.now()));window.location.replace(u.toString())}catch(e){window.location.reload()}}window.addEventListener('error',function(e){var t=e&&e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')){var src=t.src||t.href||'';if(src.indexOf('/_next/static/')!==-1)navigateOnce();return}var m=(e&&e.message)||'';if(/loading (css )?chunk|dynamically imported module/i.test(m))navigateOnce()},true);window.addEventListener('load',function(){clear()})})();`;
