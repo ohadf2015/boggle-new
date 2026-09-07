@@ -28,12 +28,14 @@ import {
   useGameSessionLogging,
   useCoinRewards,
   useCognitiveScoring,
-  useSignupPrompt,
 } from '../results';
 import { CatalystTeaser } from './CatalystTeaser';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
 
-const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
+// SignupPromptHost owns the post-game prompt (t_4833c3cd). PracticeResults
+// only renders a non-blocking inline card so guests see value without a
+// second stacked modal racing the host.
+const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 
 // ─── Encouragement tiers — always positive ───
 
@@ -217,8 +219,6 @@ const PracticeResults = memo(function PracticeResults({
   useCoinRewards({ results, playerRank: 1, totalParticipants: 1 });
 
   useCognitiveScoring({ userId: user?.id, mode: 'practice', results });
-
-  const { showSignupModal, setShowSignupModal } = useSignupPrompt({ isAuthenticated, hasUser: !!user, authLoading });
 
   // ─── Encouragement content ───
   const tier = getEncouragementTier(results.playerScore);
@@ -404,6 +404,16 @@ const PracticeResults = memo(function PracticeResults({
           </m.div>
 
 
+          {/* Soft signup CTA — Host owns the timed prompt; no duplicate modal. */}
+          {!isAuthenticated && !authLoading && (
+            <InlineSignupCard
+              isAuthenticated={isAuthenticated}
+              titleKey="auth.firstWin.title"
+              bodyKey="auth.firstWin.subtitleValueProp"
+              className="mb-4"
+            />
+          )}
+
           {/* ── Catalyst teaser — surfaces what's coming in arena/adventure ── */}
           <CatalystTeaser t={t} />
 
@@ -520,7 +530,6 @@ const PracticeResults = memo(function PracticeResults({
         </div>
       </div>
 
-      <FirstWinSignupModal isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} variant="multiGames" />
     </div>
   );
 });

@@ -4908,6 +4908,7 @@ const sv = {
         "leaderboard": "Tävla på topplistor",
         "playWithFriends": "Spela med vänner"
       },
+      "quickSave": "Tar 10 sekunder — spara den här vinsten för alltid",
       "maybeLater": "Kanske senare",
       "statsTeaser": "{games} spel • {score} poäng väntar på att sparas!"
     },

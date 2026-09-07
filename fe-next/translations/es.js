@@ -4241,6 +4241,7 @@ const es = {
         "leaderboard": "Competir en clasificaciones",
         "playWithFriends": "Jugar con amigos"
       },
+      "quickSave": "Toma 10 segundos — guarda esta victoria para siempre",
       "maybeLater": "Quizás después",
       "statsTeaser": "¡{games} partidas • {score} pts esperando ser guardados!"
     },

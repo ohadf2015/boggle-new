@@ -4147,6 +4147,7 @@ const en = {
       "subtitle": "You've got game! Sign up to keep winning.",
       "subtitleUrgency": "Don't lose this win — sign up before it slips away.",
       "subtitleValueProp": "Track your streak and unlock daily challenges.",
+      "quickSave": "Takes 10 seconds — keep this win forever",
       "benefitsTitle": "Unlock:",
       "benefits": {
         "trackProgress": "Track your progress",
