@@ -24,7 +24,7 @@ const seoContent: Record<string, {
       'Brain Training: Five cognitive drills — Lightning Round, Rare Gems, Combo Master, Pattern Switcher, Memory Hunt',
       'Scoring system: Points scale with word length (3-letter = 1pt, 4 = 1, 5 = 2, 6 = 3, 7 = 5, 8+ = 11+)',
       'Combo chains: Find words in quick succession to earn multiplier bonuses up to 5×',
-      'Dictionary validation: Every word checked against curated dictionaries for English, Hebrew, Swedish, Japanese, and Spanish',
+      'Dictionary validation: Every word checked against curated dictionaries for English, Hebrew, Swedish, Japanese, Spanish, and Russian',
       'Fair play: All players see the same grid, same timer, same dictionary — skill decides the winner',
     ],
     faq: [
@@ -36,7 +36,7 @@ const seoContent: Record<string, {
       {
         question: 'What dictionaries does LexiClash use?',
         answer:
-          'LexiClash uses curated word lists validated for each supported language. English uses a comprehensive dictionary of common and uncommon words. Hebrew, Swedish, Japanese, and Spanish each have dedicated dictionaries suited to their language structure. Proper nouns, abbreviations, and slang are excluded.',
+          'LexiClash uses curated word lists validated for each supported language. English uses a comprehensive dictionary of common and uncommon words. Hebrew, Swedish, Japanese, Spanish, and Russian each have dedicated dictionaries suited to their language structure. Proper nouns, abbreviations, and slang are excluded.',
       },
       {
         question: 'How do I connect letters to form a word?',
@@ -51,7 +51,7 @@ const seoContent: Record<string, {
       {
         question: 'Can I play LexiClash in different languages?',
         answer:
-          'Yes — LexiClash supports five languages: English, Hebrew (with full right-to-left interface support), Swedish, Japanese, and Spanish. Each language has its own validated dictionary and the entire game interface is translated. Switch languages from the settings menu at any time.',
+          'Yes — LexiClash supports six languages: English, Hebrew (with full right-to-left interface support), Swedish, Japanese, Spanish, and Russian. Each language has its own validated dictionary and the entire game interface is translated. Switch languages from the settings menu at any time.',
       },
     ],
   },

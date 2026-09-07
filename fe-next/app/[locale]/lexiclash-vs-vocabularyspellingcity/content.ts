@@ -221,7 +221,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'האם LexiClash תומכת בשפות אחרות?',
-        a: 'כן — מילונים מקוריים לאנגלית, עברית (RTL), ספרדית, שוודית ויפנית. SpellingCity היא כתיב אנגלית מיוחדת.',
+        a: 'כן — מילונים מקוריים לאנגלית, עברית (RTL), ספרדית, שוודית, יפנית ורוסית. SpellingCity היא כתיב אנגלית מיוחדת.',
       },
     ],
     moreTitle: 'עוד השוואות',
@@ -321,7 +321,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Stoder LexiClash andra sprak?',
-        a: 'Ja — infödda ordlistor for engelska, hebreiska (RTL), spanska, svenska och japanska. SpellingCity är engelsk stavning-fokuserad.',
+        a: 'Ja — infödda ordlistor for engelska, hebreiska (RTL), spanska, svenska, japanska och ryska. SpellingCity är engelsk stavning-fokuserad.',
       },
     ],
     moreTitle: 'Fler jamforelser',
@@ -521,7 +521,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'ZLexiClash admite otros idiomas?',
-        a: 'Si — diccionarios nativos para ingles, hebreo (RTL), espanol, sueco y japones. SpellingCity se enfoca en la ortografia inglesa.',
+        a: 'Si — diccionarios nativos para ingles, hebreo (RTL), espanol, sueco, japones y ruso. SpellingCity se enfoca en la ortografia inglesa.',
       },
     ],
     moreTitle: 'Mas comparaciones',
@@ -621,7 +621,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         q: 'Поддерживает ли LexiClash другие языки?',
-        a: 'Да — собственные словари для английского, иврита (RTL), испанского, шведского и японского языков. SpellingCity ориентирована на английскую орфографию.',
+        a: 'Да — собственные словари для английского, иврита (RTL), испанского, шведского, японского и русского языков. SpellingCity ориентирована на английскую орфографию.',
       },
     ],
     moreTitle: 'Еще сравнения',

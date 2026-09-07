@@ -215,7 +215,7 @@ Words With Friends — היום תחת Take-Two Interactive — חצה 6 מיל�
         title: 'איפה LexiClash משתלב בכל זה',
         content: `בדיקת הטיה כנה ומהירה: אני מייצר את LexiClash, אז כמובן שאני חושב שיש פער ששווה למלא.
 
-אבל הנה הפער האמיתי. משחקי החידה היומית ניצחו ב*הרגל*. משחקי מרובי המשתתפים הקלאסיים ניצחו ב*אנשים*. מעט מאוד משחקים עושים את שניהם — משחק מילים תחרותי בזמן אמת שהוא גם טקס יומי, ושעובד בחמש שפות כולל עברית מימין לשמאל.
+אבל הנה הפער האמיתי. משחקי החידה היומית ניצחו ב*הרגל*. משחקי מרובי המשתתפים הקלאסיים ניצחו ב*אנשים*. מעט מאוד משחקים עושים את שניהם — משחק מילים תחרותי בזמן אמת שהוא גם טקס יומי, ושעובד בשש שפות כולל עברית מימין לשמאל.
 
 זה המסלול שאנחנו בונים בו: המהירות והקנטור של מרובה משתתפים, המשיכה לחזור מחר של אתגר יומי, בלי פאוור-אפים של pay-to-win, חינם בדפדפן. אם כל המאמר הזה גרם לכם להתחשק לשחק משהו — אתם לא צריכים לעזוב את הטאב הזה.`,
       },
@@ -332,7 +332,7 @@ När Netflix kopierar din genre har genren officiellt anlänt.`,
         title: 'Var LexiClash passar in i allt detta',
         content: `Snabb, ärlig partiskhetskontroll: jag gör LexiClash, så självklart tycker jag att det finns ett gap värt att fylla.
 
-Men här är det faktiska gapet. De dagliga pusselspelen spikade *vanan*. De klassiska flerspelarspelen spikade *människorna*. Väldigt få spel gör båda — ett realtids-, tävlingsinriktat ordspel som också är ett dagligt ritual, och som fungerar på fem språk inklusive hebreiska från höger till vänster.
+Men här är det faktiska gapet. De dagliga pusselspelen spikade *vanan*. De klassiska flerspelarspelen spikade *människorna*. Väldigt få spel gör båda — ett realtids-, tävlingsinriktat ordspel som också är ett dagligt ritual, och som fungerar på sex språk inklusive hebreiska från höger till vänster.
 
 Det är spåret vi bygger i: hastigheten och snacket från flerspelarläge, kom-tillbaka-imorgon-dragningen från en daglig utmaning, inga pay-to-win power-ups, gratis i webbläsaren. Om hela den här artikeln fick dig att vilja spela något — du behöver inte lämna den här fliken.`,
       },
@@ -449,7 +449,7 @@ Netflixがあなたのジャンルをコピーするとき、そのジャンル�
         title: 'この中でLexiClashはどこに収まるか',
         content: `正直で素早いバイアスチェック。私はLexiClashを作っているので、当然、埋める価値のあるギャップがあると思っています。
 
-でも、実際のギャップはこれです。毎日のパズルゲームは*習慣*を決めた。古典的なマルチプレイヤーゲームは*人々*を決めた。両方をやるゲームはごくわずか — 毎日の儀式でもあるリアルタイムの競争ワードゲーム、しかも右から左に書くヘブライ語を含む5言語で動くもの。
+でも、実際のギャップはこれです。毎日のパズルゲームは*習慣*を決めた。古典的なマルチプレイヤーゲームは*人々*を決めた。両方をやるゲームはごくわずか — 毎日の儀式でもあるリアルタイムの競争ワードゲーム、しかも右から左に書くヘブライ語を含む6言語で動くもの。
 
 それが私たちが作っている道です。マルチプレイヤーのスピードと挑発、毎日のチャレンジの「明日また来たい」という引力、pay-to-winのパワーアップなし、ブラウザで無料。この記事全体で何か遊びたくなったなら — このタブを離れる必要はありません。`,
       },
@@ -566,7 +566,7 @@ Cuando Netflix copia tu género, el género ha llegado oficialmente.`,
         title: 'Dónde encaja LexiClash en todo esto',
         content: `Un rápido y honesto control de sesgo: yo hago LexiClash, así que por supuesto creo que hay un hueco que vale la pena llenar.
 
-Pero este es el hueco real. Los juegos de puzzle diario clavaron el *hábito*. Los juegos multijugador clásicos clavaron a las *personas*. Muy pocos juegos hacen ambas cosas — un juego de palabras competitivo en tiempo real que también es un ritual diario, y que funciona en cinco idiomas incluido el hebreo de derecha a izquierda.
+Pero este es el hueco real. Los juegos de puzzle diario clavaron el *hábito*. Los juegos multijugador clásicos clavaron a las *personas*. Muy pocos juegos hacen ambas cosas — un juego de palabras competitivo en tiempo real que también es un ritual diario, y que funciona en seis idiomas incluido el hebreo de derecha a izquierda.
 
 Ese es el carril en el que estamos construyendo: la velocidad y las pullas del multijugador, el tirón de vuelve-mañana de un desafío diario, sin potenciadores pay-to-win, gratis en el navegador. Si todo este artículo te dio ganas de jugar a algo — no tienes que salir de esta pestaña.`,
       },

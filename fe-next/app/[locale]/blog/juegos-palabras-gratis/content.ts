@@ -56,7 +56,7 @@ Wordle popularizó este formato en 2021. Una página web, una palabra de cinco l
 
 ¿Por qué funcionaba? Porque la limitación era la característica. No podías abusar del juego. No podías comprar tu camino al éxito. Jugabas la misma partida que tu hermana en Buenos Aires y tu jefe en Madrid, y esa experiencia compartida fue lo que hizo que el formato se volviera viral.
 
-Hoy, las mejores aplicaciones de palabras gratis copian este formato. LexiClash tiene un modo "Palabra del Día" en cinco idiomas, incluyendo español con acentos correctos y vocabulario regional. Otras aplicaciones tienen formatos similares. Todas comparten una característica: terminan rápido y te dejan en paz hasta mañana.
+Hoy, las mejores aplicaciones de palabras gratis copian este formato. LexiClash tiene un modo "Palabra del Día" en seis idiomas, incluyendo español con acentos correctos y vocabulario regional. Otras aplicaciones tienen formatos similares. Todas comparten una característica: terminan rápido y te dejan en paz hasta mañana.
 
 Si el formato te enganchó después de una semana, encontraste un hábito gratis. Si no, perdiste cinco minutos al día por siete días. Es una apuesta de bajo riesgo.`,
       },

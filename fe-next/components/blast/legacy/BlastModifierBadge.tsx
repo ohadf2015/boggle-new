@@ -43,7 +43,7 @@ interface BlastModifierBadgeProps {
   variant: 'chip' | 'banner';
   // Accepts the app's `t` (string) and BlastStage's looser `t` (string | undefined);
   // missing keys fall back to the modifier id / empty string below.
-  t: (key: string, params?: Record<string, string>) => string | undefined;
+  t: (key: string, fallbackOrParams?: string | Record<string, string>, params?: Record<string, string>) => string | undefined;
 }
 
 /**
@@ -81,7 +81,7 @@ export function BlastModifierBadge({ modifier, variant, t }: BlastModifierBadgeP
       className={`flex flex-col items-center gap-1 rounded-neo border-neo-thick border-neo-black px-5 py-3 text-center shadow-hard-lg ${BANNER_CLASSES[modifier.color]}`}
     >
       <span className="text-[0.65rem] font-bold uppercase tracking-[0.2em] opacity-70">
-        {t('blast.modifier.incoming') || 'Modifier'}
+        {t('blast.modifier.incoming', 'Modifier')}
       </span>
       <span className="flex items-center gap-2 font-neo-display text-2xl font-black uppercase">
         <Icon className="h-6 w-6" aria-hidden />

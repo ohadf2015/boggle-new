@@ -10,7 +10,9 @@ import {
   getStoredUsername,
   getOrCreateStoredUsername,
   hasCompleteStoredProfile,
+  setStoredUsername as persistStoredUsername,
 } from '@/utils/profileStorage';
+import ClassroomJoinNamePrompt from './ClassroomJoinNamePrompt';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent, trackGuestJoin } from '@/utils/growthTracking';
@@ -132,6 +134,13 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const [flowState, setFlowState] = useState<FlowState>(autoCreate ? 'create-modal' : 'room-list');
   const [selectedRoom, setSelectedRoom] = useState<ActiveRoom | null>(null);
 
+  // Classroom mode has no room list and no dismissible modal layer, so "this
+  // student still owes us a name" is its own state rather than a `flowState`
+  // value. `flowState` is reset to 'room-list' by every modal close, which under
+  // the classroom early-return means falling back onto the waiting spinner.
+  const [needsClassroomName, setNeedsClassroomName] = useState(false);
+  const classroomNameSubmittedRef = useRef(false);
+
   // UX-007: Track which room is being joined to show per-card loading state
   const [joiningRoomCode, setJoiningRoomCode] = useState<string | null>(null);
 
@@ -228,7 +237,19 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Handle auto-join for invitation links
   const handleInvitationAutoJoin = useCallback(
     (roomCode: string) => {
-      if (hasProfile()) {
+      // A classroom student needs a NAME and nothing else — the lobby generates
+      // their avatar on arrival. `hasProfile()` additionally demands an avatar id,
+      // which the classroom prompt has no honest value to write, so a student who
+      // refreshed mid-lesson would be asked for a name they had already given.
+      const canAutoJoin =
+        hasProfile() || (isClassroomMode && !isAuthenticated && !!getStoredUsername());
+
+      if (canAutoJoin) {
+        // Auth resolves a beat after mount, so a signed-in student can reach the
+        // prompt first and then land here. Clearing this is what takes the form
+        // off screen — otherwise they type into it while this join is in flight
+        // and a submit fires a second one under a different name.
+        setNeedsClassroomName(false);
         // Auto-join directly - no modal needed
         const profile = getProfileData();
         if (!isAuthenticated) {
@@ -249,6 +270,18 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         }
         // Pass username as override to avoid stale closure in handleJoin
         handleJoin(false, null, roomCode, undefined, profile.username);
+      } else if (isClassroomMode) {
+        // Classroom students never see the public join modal — it offers an
+        // avatar studio and a dismiss button, and dismissing lands them back on
+        // the waiting spinner. Ask for a name, nothing else.
+        //
+        // Once they have answered, never ask again. This effect re-fires when
+        // `isAuthenticated`/`displayName` resolve (both are in the callback's
+        // deps), and the name we persisted is a username with no avatar id — so
+        // `hasProfile()` is still false and the prompt would reappear ON TOP of
+        // the join it just started.
+        if (classroomNameSubmittedRef.current) return;
+        setNeedsClassroomName(true);
       } else {
         // Need to collect profile - show join modal
         // Create a minimal room object for the modal
@@ -264,7 +297,36 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         setFlowState('join-modal');
       }
     },
-    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated]
+    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, defaultLanguage, host, isAuthenticated, isClassroomMode]
+  );
+
+  // The student typed a name. Persist it (so a refresh mid-lesson does not ask
+  // again), then take the exact same join path a guest with a stored profile
+  // takes — one route to the room, not two that can drift.
+  const handleClassroomNameSubmit = useCallback(
+    (name: string) => {
+      if (!prefilledRoom) return;
+      classroomNameSubmittedRef.current = true;
+      persistStoredUsername(name);
+      setNeedsClassroomName(false);
+      setGameCode(prefilledRoom);
+      setUsername(name);
+      // Same fork as `handleInvitationAutoJoin`: on `?host=true` the code was
+      // minted upstream and this client CREATES that room. Joining a room that
+      // does not exist yet would hang the teacher on the loader.
+      if (host) {
+        setRoomName(`${name} Room`);
+        setHostUsername(name);
+        handleJoin(true, defaultLanguage, prefilledRoom, `${name} Room`, name, {
+          isPrivate: true,
+          isClassroom: true,
+        });
+        return;
+      }
+      trackGuestJoin(name, prefilledRoom, defaultLanguage);
+      handleJoin(false, null, prefilledRoom, undefined, name);
+    },
+    [prefilledRoom, defaultLanguage, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, host]
   );
 
   // NOTE: CrazyGames invite is handled via the onInviteJoin callback above.
@@ -505,6 +567,26 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // nothing to create, and this branch returned before the create modal could render.
   // They sat on a spinner that could never resolve. Without a room, fall through to the
   // normal lobby so there is always something to act on.
+  //
+  // A guest with NO stored profile (the QR target, the share link and the
+  // student dashboard's "JOIN NOW" all land here) cannot be auto-joined: the
+  // server needs a name. That used to leave them on the loader below forever,
+  // because `handleInvitationAutoJoin` asked for the join modal and this early
+  // return fired before any modal could mount. Ask them, in place, first.
+  //
+  // Students routed through `/join/[code]` never see this — that page collects
+  // a name of its own and arrives with one stored.
+  if (isClassroomMode && prefilledRoom && needsClassroomName) {
+    return (
+      <ClassroomJoinNamePrompt
+        roomCode={prefilledRoom}
+        onSubmit={handleClassroomNameSubmit}
+        initialName={getStoredUsername() || ''}
+        disabled={isJoining}
+      />
+    );
+  }
+
   if (isClassroomMode && prefilledRoom) {
     return (
       <div className="flex-1 flex items-center justify-center px-4 py-8" data-testid="classroom-waiting">

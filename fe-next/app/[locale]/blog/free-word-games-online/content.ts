@@ -53,7 +53,7 @@ Wordle did not invent this format, but Wordle proved it could be massive. Josh W
 
 The daily format works because it respects two things modern apps do not: your time and your attention. You finish in one sitting. You do not get pulled back in. You feel a small accomplishment and you go on with your day. Then tomorrow there is a new one waiting, but only one. The scarcity is the feature.
 
-LexiClash's Word of the Day works on this principle, in five languages including Hebrew with proper right-to-left support. The Hebrew version was the part that took the longest, because the daily puzzle format had no good Hebrew implementation before 2024 — most "Wordle in Hebrew" clones treated the script as an afterthought. We had to think about it from the start. If you read Hebrew, you will notice.`,
+LexiClash's Word of the Day works on this principle, in six languages including Hebrew with proper right-to-left support. The Hebrew version was the part that took the longest, because the daily puzzle format had no good Hebrew implementation before 2024 — most "Wordle in Hebrew" clones treated the script as an afterthought. We had to think about it from the start. If you read Hebrew, you will notice.`,
       },
       {
         title: 'Real-Time Multiplayer: Humans, Not Bots',

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development tsx server.ts",
+    "dev": "tsx scripts/build-i18n-assets.ts --skip-brotli && cross-env NODE_ENV=development tsx server.ts",
     "dev:windows": "if exist .next rd /s /q .next && npx tsx server.ts",
     "email": "email dev --dir emails --port 3030",
     "lsp": "typescript-language-server --stdio",

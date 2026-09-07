@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'LexiClash vs Freerice — Free Multiplayer Word Game for Classrooms (2026) | LexiClash',
-    description: 'LexiClash vs Freerice compared: live whole-class multiplayer word games with a teacher dashboard vs solo vocabulary quiz. Both free, no login — LexiClash adds real-time competition, custom word lists, and 5-language word formation.',
+    description: 'LexiClash vs Freerice compared: live whole-class multiplayer word games with a teacher dashboard vs solo vocabulary quiz. Both free, no login — LexiClash adds real-time competition, custom word lists, and 6-language word formation.',
     keywords: 'lexiclash vs freerice, freerice alternative, free vocabulary game classroom, freerice for teachers, multiplayer vocabulary game, no login word game, free word game classroom, freerice vs lexiclash, vocabulary game like freerice',
     openGraph: {
       title: 'LexiClash vs Freerice — Free, No-Login Word Games',

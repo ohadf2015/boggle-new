@@ -19,6 +19,8 @@ import { useTvSounds } from '../hooks/useTvSounds';
 import { useTvFullscreen } from '../hooks/useTvFullscreen';
 import { useTvFinalMinute } from '../hooks/useTvFinalMinute';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHostView';
+import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import {
   useGameMode,
@@ -114,6 +116,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   const wordHuntTargetLength = useWordHuntTargetLength();
 
+  // Is this room running a live Vocab Quiz? Detected from the server's quiz
+  // traffic — the quiz is not a `GameMode`, so the room's mode cannot say.
+  const isVocabQuizRoom = useIsVocabQuizRoom(socket);
+
   // CrazyGames platform detection - fullscreen is managed by CrazyGames, not us
   const { isOnCrazyGamesPlatform } = useCrazyGames();
 
@@ -207,6 +213,30 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         return true;
       });
   }, [playersReady, playerScores, playerWordCounts, username]);
+
+  // Live Vocab Quiz — the classroom projector.
+  //
+  // A classroom teacher runs the room as a NON-PLAYING host, which is the only
+  // way to reach this component; `HostInGameView` (host playing) is where the
+  // quiz projector was originally wired, and a teacher never renders it. So the
+  // one surface the quiz projector was built for could not display it: the
+  // students got their questions while the projector sat on the board-game
+  // broadcast saying "waiting for the action to begin".
+  //
+  // The quiz has no letter grid and is deliberately not a `GameMode` (see
+  // shared/types/vocabQuiz), so the room's mode stays whatever the lobby last
+  // held — the server's quiz traffic is the signal, exactly as on the playing
+  // host's path.
+  if (isVocabQuizRoom) {
+    return (
+      <VocabQuizHostView
+        socket={socket}
+        joinCode={gameCode}
+        playerCount={leaderboardData.length}
+        t={t}
+      />
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative">

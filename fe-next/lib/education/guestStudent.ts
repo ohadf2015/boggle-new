@@ -25,15 +25,53 @@ export interface GuestSignInResult {
   error: string | null;
 }
 
-/** Slugify a free-text display name into a safe username (or '' if none). */
+/** Random suffix length. 6 base36 chars ≈ 2 billion values per name. */
+const GUEST_SUFFIX_LEN = 6;
+
+/**
+ * Slugify a free-text display name into a GLOBALLY UNIQUE username (or '' if
+ * the name slugifies to nothing).
+ *
+ * The suffix is the whole point. `profiles.username` is unique across every
+ * school on the platform, and this used to map a display name straight onto it
+ * — so the second "Priya" anywhere in the world hit the unique index INSIDE the
+ * `handle_new_user` trigger, which surfaces as a Supabase 500 ("Database error
+ * creating anonymous user"). My first fix checked for that collision and
+ * returned a 409, which was worse in a different way: the first Priya in a
+ * brand-new classroom was told her own name was taken because a student at
+ * another school had used it.
+ *
+ * `username` and the student's NAME were being conflated. This is an internal
+ * handle; nothing student-facing renders it. The roster, banner, standings and
+ * reports all resolve `display_name` first (`ClassroomStudentList` via
+ * `resolveDisplayName([display_name, username])`), and `signInAsGuestStudent`
+ * puts the typed name in `full_name`, which the trigger writes to
+ * `display_name`. Duplicates there are harmless — two Priyas in a class is a
+ * classroom, not an error.
+ *
+ * Empty stays empty: `signInAsGuestStudent` then omits `username` and the
+ * trigger falls back to its own unique `Player_<id>` default. Inventing a
+ * handle here would be a second source of truth for the same decision.
+ */
 export function deriveGuestUsername(name: string): string {
-  return name
+  const base = name
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '')
-    .slice(0, 20)
+    // Leave room for the separator and suffix inside the 32-char budget.
+    .slice(0, 32 - GUEST_SUFFIX_LEN - 1)
     .replace(/_+$/g, '');
+
+  if (!base) return '';
+
+  // `crypto.randomUUID` is not available in every runtime this module is
+  // imported from, so build the suffix from random base36 digits directly.
+  let suffix = '';
+  while (suffix.length < GUEST_SUFFIX_LEN) {
+    suffix += Math.random().toString(36).slice(2);
+  }
+  return `${base}-${suffix.slice(0, GUEST_SUFFIX_LEN)}`;
 }
 
 /**

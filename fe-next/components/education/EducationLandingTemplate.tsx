@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ACCENT, EducationSectionRenderer } from '@/components/education/EducationLandingSections';
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
@@ -55,6 +56,12 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           <p className="mt-7 max-w-[62ch] text-lg leading-relaxed text-neo-white/80 sm:text-xl">
             {hero.subtitle}
           </p>
+
+          {/* The no-account path, once, above the fold. Placed in the template rather
+              than in each page so the six teacher-moment landings that share it all
+              get the same entry point — the hero CTAs below route to pages that ask
+              for an account first. */}
+          <NoAccountCta locale={locale} className="mt-8" />
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link

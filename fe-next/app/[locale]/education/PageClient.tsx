@@ -18,6 +18,7 @@ import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip'
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
 
 /**
  * Education Landing - Master page rebuilt with scroll reveals
@@ -80,6 +81,20 @@ export function PageClient() {
   return (
     <main className="min-h-screen bg-neo-navy">
       <TopBackLink className="mb-4" />
+
+      {/*
+        The no-account path, deliberately OUTSIDE the auth gates below.
+
+        Everything else on this page is gated on `!loading` to avoid the auth flash,
+        which means none of it is in the server-rendered HTML — a crawler, and a
+        teacher on a slow connection, see nothing. This block needs no auth state to
+        be true, so gating it would hide the one CTA that asks for nothing from the
+        exact reader it is for. Rendered unconditionally: it never changes, so it
+        cannot flash.
+      */}
+      <div className="mx-auto w-full max-w-6xl px-4 pb-2 sm:px-6 lg:px-8">
+        <NoAccountCta locale={language} />
+      </div>
 
       {/* Teacher view: cascading shortcut bars + relevant redesign content */}
       {hasTeacherAccess && (

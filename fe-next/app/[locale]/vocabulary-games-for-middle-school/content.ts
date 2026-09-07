@@ -35,15 +35,15 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   en: {
     metaTitle: 'Vocabulary Games for Middle School — Free, No-Login Multiplayer (2026) | LexiClash',
     metaDescription:
-      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 6-character code — no logins, no signup. Use your own word lists, CEFR-scaled for ESL, ready in under a minute.',
+      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 6-character code — no logins, no signup. Use your own word lists, levelled per student for ESL, ready in under a minute.',
     ogTitle: 'Vocabulary Games for Middle School — Free & No-Login',
     ogDescription:
-      'Live multiplayer vocabulary games for grades 6–8. Join with a code, no signup. Your word lists. Free forever.',
+      'Live multiplayer vocabulary games for grades 6–8. Join with a code, no signup. Your word lists. Free to start.',
     twitterTitle: 'Vocabulary Games for Middle School — Free',
     twitterDescription: 'Live multiplayer vocabulary games, grades 6–8. No login. Free.',
     heroTitle: 'Vocabulary games middle schoolers actually want to play.',
     intro:
-      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 6-character code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty scales A1–C2 for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
+      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 6-character code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty is set per student across support, core and challenge for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
     ctaStart: 'Start a Class Game Free',
     ctaDuels: 'Run a 1v1 Duel',
     ctaMore: 'All Classroom Games',
@@ -63,7 +63,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         title: 'Differentiate in one class',
-        desc: 'CEFR A1–C2 scaling lets newcomers and advanced readers play the same activity at the right level.'
+        desc: 'Support, core and challenge tiers let newcomers and advanced readers play the same activity at the right level.'
       },
       {
         title: 'Whole-class + 1v1',
@@ -93,7 +93,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     faqs: [
       {
         q: 'Are these vocabulary games really free for middle school?',
-        a: 'Yes — LexiClash is fully free with no premium tier. Whole-class multiplayer, 1v1 duels, custom word lists, and the teacher dashboard are all free, with no per-student or per-class limit beyond 30 students per live game.'
+        a: 'Yes — whole-class multiplayer, 1v1 duels, custom word lists and the teacher dashboard are all free, for up to 3 classes of 50 students. Teacher Pro ($9/month) adds unlimited classes and the progress reports; a live game holds 50 players.'
       },
       {
         q: 'Do my middle schoolers need accounts or logins?',
@@ -105,7 +105,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: 'Is it a good fit for 6th, 7th, and 8th grade?',
-        a: 'Middle school is the sweet spot. Difficulty is CEFR-scaled (A1–C2), so you can pitch it at grade level or stretch advanced students, and the word-formation gameplay rewards spelling and recall rather than guessing.'
+        a: 'Middle school is the sweet spot. Difficulty is set per student — support, core or challenge — so you can pitch it at grade level or stretch advanced students, and the word-formation gameplay rewards spelling and recall rather than guessing.'
       },
       {
         q: 'Does it work for ESL and newcomers in middle school?',
@@ -119,7 +119,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     moreTitle: 'More for teachers',
     moreCards: [
       { title: 'Bell Ringer Word Games', sub: '5-minute start-of-class openers' },
-      { title: 'ESL Word Games', sub: 'CEFR-scaled, 6 languages' },
+      { title: 'ESL Word Games', sub: 'Three levels, 6 languages' },
       { title: 'Education Hub', sub: 'All classroom word games' },
     ],
     finalTitle: 'Try it before next class',
@@ -130,15 +130,15 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   he: {
     metaTitle: 'משחקי אוצר מילים לחטיבת ביניים — חינם, ללא התחברות, מולטיפלייר (2026) | LexiClash',
     metaDescription:
-      'משחקי אוצר מילים חינם לחטיבת ביניים. מולטיפלייר כיתתי חי ודיואלים 1v1 שהתלמידים מצטרפים אליהם עם קוד בן 6 תווים — ללא התחברות, ללא הרשמה. השתמש ברשימות המילים שלך, מותאם CEFR לאנגלית כשפה זרה, מוכן בפחות מדקה.',
+      'משחקי אוצר מילים חינם לחטיבת ביניים. מולטיפלייר כיתתי חי ודיואלים 1v1 שהתלמידים מצטרפים אליהם עם קוד בן 6 תווים — ללא התחברות, ללא הרשמה. השתמש ברשימות המילים שלך, מדורג לכל תלמיד לאנגלית כשפה זרה, מוכן בפחות מדקה.',
     ogTitle: 'משחקי אוצר מילים לחטיבת ביניים — חינם וללא התחברות',
     ogDescription:
-      'משחקי אוצר מילים מולטיפלייר חיים לכיתות 6–8. הצטרף עם קוד, ללא הרשמה. רשימות המילים שלך. חינם לתמיד.',
+      'משחקי אוצר מילים מולטיפלייר חיים לכיתות 6–8. הצטרף עם קוד, ללא הרשמה. רשימות המילים שלך. מתחילים בחינם.',
     twitterTitle: 'משחקי אוצר מילים לחטיבת ביניים — חינם',
     twitterDescription: 'משחקי אוצר מילים מולטיפלייר חיים, כיתות 6–8. ללא התחברות. חינם.',
     heroTitle: 'משחקי אוצר מילים שתלמידי חטיבת ביניים באמת רוצים לשחק.',
     intro:
-      'חזרה על אוצר מילים בחטיבת ביניים מתה כשזה דף עבודה ונתקעת כשצריך 30 התחברויות. LexiClash היא הפתרון: משחקי מילים חיים וחינם שהתלמידים שלך מצטרפים אליהם עם קוד בן 6 תווים — ללא חשבונות, ללא הרשמה. הוסף את רשימת המילים של השבוע, הקרן את הקוד, וכל הכיתה משחקת בו-זמנית. משחקיית היווצרות מילים מתרגלת איות ושליפה (לא ניחוש מזל), רמות קושי A1–C2 לתלמידי אנגלית כשפה זרה וקוראים מתקדמים, ואתה מקבל לוח קבלות למורה עם נתונים פורמטיביים מיידיים. מוכן בפחות מדקה.',
+      'חזרה על אוצר מילים בחטיבת ביניים מתה כשזה דף עבודה ונתקעת כשצריך 30 התחברויות. LexiClash היא הפתרון: משחקי מילים חיים וחינם שהתלמידים שלך מצטרפים אליהם עם קוד בן 6 תווים — ללא חשבונות, ללא הרשמה. הוסף את רשימת המילים של השבוע, הקרן את הקוד, וכל הכיתה משחקת בו-זמנית. משחקיית היווצרות מילים מתרגלת איות ושליפה (לא ניחוש מזל), רמות קושי לכל תלמיד — תמיכה, ליבה ואתגר — לתלמידי אנגלית כשפה זרה ולקוראים מתקדמים, ואתה מקבל לוח קבלות למורה עם נתונים פורמטיביים מיידיים. מוכן בפחות מדקה.',
     ctaStart: 'התחל משחק כיתתי חינם',
     ctaDuels: 'השחק דואל 1v1',
     ctaMore: 'כל משחקי הכיתה',
@@ -158,7 +158,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         title: 'הבחנה בכיתה אחת',
-        desc: 'קנה מידה CEFR A1–C2 מאפשר למתחילים וקוראים מתקדמים לשחק באותה פעילות ברמה נכונה.'
+        desc: 'שלוש הרמות — תמיכה, ליבה ואתגר — מאפשרות למתחילים ולקוראים מתקדמים לשחק באותה פעילות ברמה הנכונה.'
       },
       {
         title: 'כיתה מלאה + 1v1',
@@ -200,7 +200,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: 'האם זה התאמה טובה לכיתה 6, 7 ו-8?',
-        a: 'חטיבת ביניים היא הנקודה המתוקה. קושי מודרג CEFR (A1–C2), כך שאתה יכול לכוון לרמת כיתה או להתיש תלמידים מתקדמים, ומשחקיית היווצרות המילים תגמול איות ושליפה במקום ניחוש.'
+        a: 'חטיבת ביניים היא הנקודה המתוקה. הקושי נקבע לכל תלמיד — תמיכה, ליבה או אתגר — כך שאפשר לכוון לרמת הכיתה או למתוח תלמידים מתקדמים, ומשחקיית היווצרות המילים תגמול איות ושליפה במקום ניחוש.'
       },
       {
         q: 'האם זה עובד לאנגלית כשפה זרה ולמתחילים בחטיבת ביניים?',
@@ -214,7 +214,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     moreTitle: 'עוד למורים',
     moreCards: [
       { title: 'משחקי מילים פעמון התחלה', sub: 'פתיחות התחלת כיתה של 5 דקות' },
-      { title: 'משחקי מילים אנגלית כשפה זרה', sub: 'מודרג CEFR, 6 שפות' },
+      { title: 'משחקי מילים אנגלית כשפה זרה', sub: 'שלוש רמות, 6 שפות' },
       { title: 'Hub החינוך', sub: 'כל משחקי מילים בכיתה' },
     ],
     finalTitle: 'נסה את זה לפני הכיתה הבאה',
@@ -225,15 +225,15 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   sv: {
     metaTitle: 'Ordförrådslekar för mellanstadiet — gratis, ingen inloggning, multiplayer (2026) | LexiClash',
     metaDescription:
-      'Gratis ordförrådslekar för mellanstadiet. Live hel-klass-multiplayer och 1v1-dueller som elever ansluter till med en fyrsiffrig kod — ingen inloggning, ingen registrering. Använd dina egna ordlistor, CEFR-skalad för ESL, klara på under en minut.',
+      'Gratis ordförrådslekar för mellanstadiet. Live hel-klass-multiplayer och 1v1-dueller som elever ansluter till med en kod på sex tecken — ingen inloggning, ingen registrering. Använd dina egna ordlistor, nivåanpassad per elev för ESL, klara på under en minut.',
     ogTitle: 'Ordförrådslekar för mellanstadiet — gratis & ingen inloggning',
     ogDescription:
-      'Live multiplayer-ordförrådslekar för årskurs 6–8. Gå med med en kod, ingen registrering. Dina ordlistor. Gratis för alltid.',
+      'Live multiplayer-ordförrådslekar för årskurs 6–8. Gå med med en kod, ingen registrering. Dina ordlistor. Gratis att komma igång.',
     twitterTitle: 'Ordförrådslekar för mellanstadiet — gratis',
     twitterDescription: 'Live multiplayer ordförrådslekar, årskurs 6–8. Ingen inloggning. Gratis.',
     heroTitle: 'Ordförrådslekar som mellanstadieelever faktiskt vill spela.',
     intro:
-      'Ordförrådsrepetition i mellanstadiet dör när det är ett arbetsblad och stannar när det behövs 30 inloggningar. LexiClash är lösningen: gratis, live ordlekar som dina elever ansluter till med en fyrsiffrig kod — inga konton, ingen registrering. Släpp in denna veckas ordlista, projicera koden, och hela klassen spelar tillsammans. Ordbildningsspelmekaniken tränar stavning och återkallelse (inte slumpmässig gissning), svårighetsnivå skalas A1–C2 för ESL och avancerade läsare, och du får en lärardashboard för omedelbar formativ data. Klara på under en minut.',
+      'Ordförrådsrepetition i mellanstadiet dör när det är ett arbetsblad och stannar när det behövs 30 inloggningar. LexiClash är lösningen: gratis, live ordlekar som dina elever ansluter till med en kod på sex tecken — inga konton, ingen registrering. Släpp in denna veckas ordlista, projicera koden, och hela klassen spelar tillsammans. Ordbildningsspelmekaniken tränar stavning och återkallelse (inte slumpmässig gissning), svårighetsnivån sätts per elev — stöd, kärna och utmaning — för ESL och avancerade läsare, och du får en lärardashboard för omedelbar formativ data. Klara på under en minut.',
     ctaStart: 'Starta ett klassrum-spel gratis',
     ctaDuels: 'Kör en 1v1-duell',
     ctaMore: 'Alla klassrumsspel',
@@ -241,7 +241,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     fits: [
       {
         title: 'Ingen inloggning som bromsar dig',
-        desc: 'En fyrsiffrig anslutningskod slår att etablera 30 konton. Perfekt för 1:1 Chromebook-vagnar och BYOD där elever inte alla har skolmejl.'
+        desc: 'En anslutningskod på sex tecken slår att etablera 30 konton. Perfekt för 1:1 Chromebook-vagnar och BYOD där elever inte alla har skolmejl.'
       },
       {
         title: 'Din ordlista, inte vår',
@@ -253,7 +253,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         title: 'Differentiera i en klass',
-        desc: 'CEFR A1–C2-skalning låter nybörjare och avancerade läsare spela samma aktivitet på rätt nivå.'
+        desc: 'De tre nivåerna — stöd, kärna och utmaning — låter nybörjare och avancerade läsare spela samma aktivitet på rätt nivå.'
       },
       {
         title: 'Hel klass + 1v1',
@@ -272,7 +272,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         t: 'Projicera koden',
-        d: 'Elever öppnar länken och skriver in den fyrsiffriga anslutningskoden. Inga konton, vilken enhet som helst.'
+        d: 'Elever öppnar länken och skriver in anslutningskoden på sex tecken. Inga konton, vilken enhet som helst.'
       },
       {
         t: 'Spela + granska',
@@ -287,7 +287,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: 'Behöver mina mellanstadieelever konton eller inloggningar?',
-        a: 'Nej. Elever ansluter till ett klassrumsspel med en fyrsiffrig kod du projicerar — ingen mejl, ingen registrering, ingen klassbok. Det eliminerar den största installationsfriktionen för 1:1 och BYOD-klassrum.'
+        a: 'Nej. Elever ansluter till ett klassrumsspel med en kod på sex tecken du projicerar — ingen mejl, ingen registrering, ingen klassbok. Det eliminerar den största installationsfriktionen för 1:1 och BYOD-klassrum.'
       },
       {
         q: 'Kan jag använda mina egna ordförrådsord?',
@@ -295,7 +295,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: 'Är det en bra passform för årskurs 6, 7 och 8?',
-        a: 'Mellanstadiet är den perfekta punkten. Svårigheten är CEFR-skalad (A1–C2), så du kan rikta den på årskursnivå eller sträcka avancerade elever, och ordbildningsspelmekaniken belönar stavning och återkallelse snarare än gissning.'
+        a: 'Mellanstadiet är den perfekta punkten. Svårigheten sätts per elev — stöd, kärna eller utmaning — så du kan rikta den på årskursnivå eller sträcka avancerade elever, och ordbildningsspelmekaniken belönar stavning och återkallelse snarare än gissning.'
       },
       {
         q: 'Fungerar det för ESL och nybörjare i mellanstadiet?',
@@ -309,7 +309,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     moreTitle: 'Mer för lärare',
     moreCards: [
       { title: 'Klassrumsstarter-ordlekar', sub: '5-minuters klassrumsstarter' },
-      { title: 'ESL-ordlekar', sub: 'CEFR-skalad, 6 språk' },
+      { title: 'ESL-ordlekar', sub: 'Tre nivåer, 6 språk' },
       { title: 'Utbildningsnav', sub: 'Alla klassrumsordslekar' },
     ],
     finalTitle: 'Prova det före nästa lektion',
@@ -320,15 +320,15 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   ja: {
     metaTitle: 'Vocabulary Games for Middle School — Free, No-Login Multiplayer (2026) | LexiClash',
     metaDescription:
-      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 6-character code — no logins, no signup. Use your own word lists, CEFR-scaled for ESL, ready in under a minute.',
+      'Free vocabulary games for middle school. Live whole-class multiplayer and 1v1 duels students join with a 6-character code — no logins, no signup. Use your own word lists, levelled per student for ESL, ready in under a minute.',
     ogTitle: 'Vocabulary Games for Middle School — Free & No-Login',
     ogDescription:
-      'Live multiplayer vocabulary games for grades 6–8. Join with a code, no signup. Your word lists. Free forever.',
+      'Live multiplayer vocabulary games for grades 6–8. Join with a code, no signup. Your word lists. Free to start.',
     twitterTitle: 'Vocabulary Games for Middle School — Free',
     twitterDescription: 'Live multiplayer vocabulary games, grades 6–8. No login. Free.',
     heroTitle: '中学生が本当にやりたい語彙ゲーム。',
     intro:
-      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 6-character code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty scales A1–C2 for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
+      'Middle school vocabulary review dies when it\'s a worksheet and stalls when it needs 30 logins. LexiClash is the fix: free, live word games your students join with a 6-character code — no accounts, no signup. Drop in this week\'s word list, project the code, and the whole class plays at once. Word-formation gameplay drills spelling and recall (not lucky guessing), difficulty is set per student across support, core and challenge for ESL and advanced readers, and you get a teacher dashboard for instant formative data. Ready in under a minute.',
     ctaStart: 'クラスゲームを無料で開始',
     ctaDuels: '1v1デュエルを実行',
     ctaMore: 'すべてのクラスルームゲーム',
@@ -348,7 +348,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         title: '1つのクラスで差別化',
-        desc: 'CEFR A1–C2 scaling lets newcomers and advanced readers play the same activity at the right level.'
+        desc: 'Support, core and challenge tiers let newcomers and advanced readers play the same activity at the right level.'
       },
       {
         title: 'クラス全体+ 1v1',
@@ -378,7 +378,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     faqs: [
       {
         q: 'これらの語彙ゲームは本当に中学生向けに無料ですか？',
-        a: 'Yes — LexiClash is fully free with no premium tier. Whole-class multiplayer, 1v1 duels, custom word lists, and the teacher dashboard are all free, with no per-student or per-class limit beyond 30 students per live game.'
+        a: 'Yes — whole-class multiplayer, 1v1 duels, custom word lists and the teacher dashboard are all free, for up to 3 classes of 50 students. Teacher Pro ($9/month) adds unlimited classes and the progress reports; a live game holds 50 players.'
       },
       {
         q: '中学生はアカウントまたはログインが必要ですか？',
@@ -390,7 +390,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: '6年生、7年生、8年生に適していますか？',
-        a: 'Middle school is the sweet spot. Difficulty is CEFR-scaled (A1–C2), so you can pitch it at grade level or stretch advanced students, and the word-formation gameplay rewards spelling and recall rather than guessing.'
+        a: 'Middle school is the sweet spot. Difficulty is set per student — support, core or challenge — so you can pitch it at grade level or stretch advanced students, and the word-formation gameplay rewards spelling and recall rather than guessing.'
       },
       {
         q: '中学校のESLと初心者に対応していますか？',
@@ -404,7 +404,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     moreTitle: '教師向けその他',
     moreCards: [
       { title: 'ベルリンガーワードゲーム', sub: '5分間のクラス開始オープナー' },
-      { title: 'ESLワードゲーム', sub: 'CEFR対応、6言語' },
+      { title: 'ESLワードゲーム', sub: '3段階のレベル、6言語' },
       { title: 'EducationHub', sub: 'すべてのクラスルームワードゲーム' },
     ],
     finalTitle: '次のクラスの前に試してください',
@@ -415,15 +415,15 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   es: {
     metaTitle: 'Juegos de Vocabulario para Secundaria — Gratis, Sin Inicio de Sesión, Multijugador (2026) | LexiClash',
     metaDescription:
-      'Juegos de vocabulario gratuitos para la secundaria. Multijugador en directo de toda la clase y duelos 1v1 a los que los estudiantes se unen con un código de 6 caracteres — sin inicio de sesión, sin registro. Usa tus propias listas de palabras, escalada CEFR para ESL, lista en menos de un minuto.',
+      'Juegos de vocabulario gratuitos para la secundaria. Multijugador en directo de toda la clase y duelos 1v1 a los que los estudiantes se unen con un código de 6 caracteres — sin inicio de sesión, sin registro. Usa tus propias listas de palabras, nivelada por estudiante para ESL, lista en menos de un minuto.',
     ogTitle: 'Juegos de Vocabulario para Secundaria — Gratis y Sin Inicio de Sesión',
     ogDescription:
-      'Juegos de vocabulario multijugador en directo para los grados 6–8. Únete con un código, sin registro. Tus listas de palabras. Gratis para siempre.',
+      'Juegos de vocabulario multijugador en directo para los grados 6–8. Únete con un código, sin registro. Tus listas de palabras. Empieza gratis.',
     twitterTitle: 'Juegos de Vocabulario para Secundaria — Gratis',
     twitterDescription: 'Juegos de vocabulario multijugador en directo, grados 6–8. Sin inicio de sesión. Gratis.',
     heroTitle: 'Juegos de vocabulario que los estudiantes de secundaria realmente quieren jugar.',
     intro:
-      'La revisión de vocabulario de secundaria muere cuando es una hoja de trabajo y se detiene cuando necesita 30 inicios de sesión. LexiClash es la solución: juegos de palabras en directo y gratuitos a los que tus estudiantes se unen con un código de 6 caracteres — sin cuentas, sin registro. Agrega la lista de palabras de esta semana, proyecta el código, y toda la clase juega a la vez. La mecánica de juego de formación de palabras practica la ortografía y el recuerdo (no adivinanzas de suerte), la dificultad se escala A1–C2 para ESL y lectores avanzados, y obtienes un panel de control de maestro para datos formativos instantáneos. Listo en menos de un minuto.',
+      'La revisión de vocabulario de secundaria muere cuando es una hoja de trabajo y se detiene cuando necesita 30 inicios de sesión. LexiClash es la solución: juegos de palabras en directo y gratuitos a los que tus estudiantes se unen con un código de 6 caracteres — sin cuentas, sin registro. Agrega la lista de palabras de esta semana, proyecta el código, y toda la clase juega a la vez. La mecánica de juego de formación de palabras practica la ortografía y el recuerdo (no adivinanzas de suerte), la dificultad se fija por estudiante entre apoyo, base y desafío para ESL y lectores avanzados, y obtienes un panel de control de maestro para datos formativos instantáneos. Listo en menos de un minuto.',
     ctaStart: 'Inicia un Juego de Clase Gratis',
     ctaDuels: 'Ejecutar un Duelo 1v1',
     ctaMore: 'Todos los Juegos de Aula',
@@ -443,7 +443,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         title: 'Diferenciar en una clase',
-        desc: 'El escalado CEFR A1–C2 permite que los principiantes y los lectores avanzados jueguen la misma actividad en el nivel correcto.'
+        desc: 'Los tres niveles — apoyo, base y desafío — permiten que los principiantes y los lectores avanzados jueguen la misma actividad en el nivel correcto.'
       },
       {
         title: 'Clase completa + 1v1',
@@ -485,7 +485,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: '¿Es un buen ajuste para 6º, 7º y 8º grado?',
-        a: 'La secundaria es el punto dulce. La dificultad se escala CEFR (A1–C2), por lo que puedes dirigirla al nivel de grado o extender a estudiantes avanzados, y la mecánica de juego de formación de palabras recompensa la ortografía y el recuerdo en lugar de adivinar.'
+        a: 'La secundaria es el punto dulce. La dificultad se fija por estudiante — apoyo, base o desafío — por lo que puedes dirigirla al nivel de grado o extender a estudiantes avanzados, y la mecánica de juego de formación de palabras recompensa la ortografía y el recuerdo en lugar de adivinar.'
       },
       {
         q: '¿Funciona para ESL y principiantes en la secundaria?',
@@ -499,7 +499,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     moreTitle: 'Más para maestros',
     moreCards: [
       { title: 'Juegos de Palabras de Llamada de Campana', sub: 'Aperturas de inicio de clase de 5 minutos' },
-      { title: 'Juegos de Palabras ESL', sub: 'Escalado CEFR, 6 idiomas' },
+      { title: 'Juegos de Palabras ESL', sub: 'Tres niveles, 6 idiomas' },
       { title: 'Centro de Educación', sub: 'Todos los juegos de palabras del aula' },
     ],
     finalTitle: 'Pruébalo antes de la próxima clase',
@@ -510,7 +510,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
   ru: {
     metaTitle: 'Словарные игры для средней школы — бесплатно, без входа, мультиплеер (2026) | LexiClash',
     metaDescription:
-      'Бесплатные словарные игры для средней школы. Живой мультиплеер для целого класса и дуэли 1v1, к которым ученики присоединяются по коду из 6 символов — без входа, без регистрации. Используйте свои списки слов, адаптированные по CEFR для ESL, готово менее чем за минуту.',
+      'Бесплатные словарные игры для средней школы. Живой мультиплеер для целого класса и дуэли 1v1, к которым ученики присоединяются по коду из 6 символов — без входа, без регистрации. Используйте свои списки слов, с уровнем для каждого ученика для ESL, готово менее чем за минуту.',
     ogTitle: 'Словарные игры для средней школы — бесплатно и без входа',
     ogDescription:
       'Живые многопользовательские словарные игры для 6–8 классов. Присоединитесь по коду, без регистрации. Ваши списки слов. Бесплатно навсегда.',
@@ -518,7 +518,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     twitterDescription: 'Живые многопользовательские словарные игры, 6–8 классы. Без входа. Бесплатно.',
     heroTitle: 'Словарные игры, которые учащиеся средней школы действительно хотят играть.',
     intro:
-      'Повторение словарного запаса в средней школе умирает, когда это рабочий лист, и застревает, когда требуется 30 входов. LexiClash — решение: бесплатные живые словесные игры, к которым ваши ученики присоединяются по коду из 6 символов — без учетных записей, без регистрации. Загрузите список слов этой недели, проецируйте код, и весь класс играет одновременно. Геймплей образования слов тренирует орфографию и извлечение из памяти (не удачное угадывание), уровни сложности масштабируются A1–C2 для ESL и продвинутых читателей, и вы получаете панель инструментов учителя для мгновенных формирующих данных. Готово менее чем за минуту.',
+      'Повторение словарного запаса в средней школе умирает, когда это рабочий лист, и застревает, когда требуется 30 входов. LexiClash — решение: бесплатные живые словесные игры, к которым ваши ученики присоединяются по коду из 6 символов — без учетных записей, без регистрации. Загрузите список слов этой недели, проецируйте код, и весь класс играет одновременно. Геймплей образования слов тренирует орфографию и извлечение из памяти (не удачное угадывание), уровень сложности задаётся для каждого ученика — поддержка, база и вызов — для ESL и продвинутых читателей, и вы получаете панель инструментов учителя для мгновенных формирующих данных. Готово менее чем за минуту.',
     ctaStart: 'Начать классную игру бесплатно',
     ctaDuels: 'Провести дуэль 1v1',
     ctaMore: 'Все игры класса',
@@ -538,7 +538,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         title: 'Дифференциация в одном классе',
-        desc: 'Масштабирование CEFR A1–C2 позволяет новичкам и продвинутым читателям играть в одно и то же действие на нужном уровне.'
+        desc: 'Три уровня — поддержка, база и вызов — позволяют новичкам и продвинутым читателям играть в одно и то же действие на нужном уровне.'
       },
       {
         title: 'Весь класс + 1v1',
@@ -580,7 +580,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
       },
       {
         q: 'Это хорошее соответствие для 6-го, 7-го и 8-го класса?',
-        a: 'Средняя школа — это сладкое место. Сложность масштабируется CEFR (A1–C2), поэтому вы можете настроить её на уровень класса или бросить вызов продвинутым студентам, и геймплей образования слов награждает орфографию и извлечение из памяти, а не угадывание.'
+        a: 'Средняя школа — это сладкое место. Сложность задаётся для каждого ученика — поддержка, база или вызов — поэтому вы можете настроить её на уровень класса или бросить вызов продвинутым ученикам, и геймплей образования слов награждает орфографию и извлечение из памяти, а не угадывание.'
       },
       {
         q: 'Это работает для ESL и новичков в средней школе?',
@@ -594,7 +594,7 @@ const contentMap: Record<MiddleSchoolLocale, LocaleContent> = {
     moreTitle: 'Больше для учителей',
     moreCards: [
       { title: 'Словарные игры сигнала начала', sub: 'Открытие начала класса в 5 минут' },
-      { title: 'Словарные игры ESL', sub: 'Масштабируется CEFR, 6 языков' },
+      { title: 'Словарные игры ESL', sub: 'Три уровня, 6 языков' },
       { title: 'Образовательный центр', sub: 'Все классные словарные игры' },
     ],
     finalTitle: 'Попробуйте перед следующим классом',

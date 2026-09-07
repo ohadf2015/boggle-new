@@ -21,7 +21,7 @@ interface QRCodeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   gameCode: string;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
 }
 
 export const QRCodeDialog: React.FC<QRCodeDialogProps> = memo(function QRCodeDialog({
@@ -86,7 +86,7 @@ interface ValidationModalProps {
   validations: Record<string, boolean>;
   onToggleValidation: (playerId: string | null, word: string) => void;
   onSubmit: () => void;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
 }
 
 export const ValidationModal: React.FC<ValidationModalProps> = memo(function ValidationModal({
@@ -239,7 +239,7 @@ interface FinalScoresModalProps {
   finalScores: PlayerResult[];
   tournamentData: TournamentData | null;
   username: string;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   onStartNewGame: () => void;
   onNextRound: () => void;
   socket: Socket | null;
@@ -445,7 +445,7 @@ interface ExitConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
 }
 
 export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function ExitConfirmDialog({
@@ -485,7 +485,7 @@ interface SoloStartConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   gameCode: string;
 }
 
@@ -552,7 +552,7 @@ interface CancelTournamentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
 }
 
 export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = memo(function CancelTournamentDialog({

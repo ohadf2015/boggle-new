@@ -111,7 +111,7 @@ The multilingual angle is where it gets interesting. For bilingual or multilingu
 
 Bialystok and colleagues at York University published a study in Neuropsychologia in 2007 that tracked 184 patients at a memory clinic. Bilinguals showed Alzheimer's symptoms about four years later than monolinguals, even after controlling for education and immigration history. Correlation again, but four years is a long time.
 
-LexiClash runs in English, Hebrew, Swedish, Japanese, and Spanish. A bilingual player who switches between two boards in one session is doing the cognitive equivalent of adding plates to a barbell. Same lift, more weight.`,
+LexiClash runs in English, Hebrew, Swedish, Japanese, Spanish, and Russian. A bilingual player who switches between two boards in one session is doing the cognitive equivalent of adding plates to a barbell. Same lift, more weight.`,
       },
       {
         title: 'Should you play more word games?',
@@ -755,7 +755,7 @@ FTCは、Lumosityが「加齢に伴う認知機能低下に対する消費者の
 
 Бьялисток и её коллеги из Йоркского университета опубликовали исследование в Neuropsychologia в 2007 году, которое отслеживало 184 пациентов в клинике памяти. Двуязычные люди показывали симптомы болезни Альцгеймера примерно на четыре года позже, чем одноязычные, даже после учёта образования и истории иммиграции. Снова корреляция, но четыре года — это долгое время.
 
-LexiClash доступен на английском, иврите, шведском, японском и испанском языках. Двуязычный игрок, который переключается между двумя досками в одной сессии, делает когнитивный эквивалент добавления блинов к штанге. Одно и то же упражнение, больше веса.`,
+LexiClash доступен на английском, иврите, шведском, японском, испанском и русском языках. Двуязычный игрок, который переключается между двумя досками в одной сессии, делает когнитивный эквивалент добавления блинов к штанге. Одно и то же упражнение, больше веса.`,
       },
       {
         title: 'Должен ли ты играть в словесные игры больше?',

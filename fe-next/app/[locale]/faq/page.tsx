@@ -115,13 +115,13 @@ const faqSeoContent: Record<string, {
       'Account setup, profile customization, and streak tracking explained',
       'Multiplayer and Party TV room creation, joining, and host controls',
       'Scoring system breakdown — word length, combos, bonus tiles, and multipliers',
-      'Language support details — play in English, Hebrew, Swedish, Japanese, or Spanish',
+      'Language support details — play in English, Hebrew, Swedish, Japanese, Spanish, or Russian',
     ],
     faq: [
       {
         question: 'What is LexiClash?',
         answer:
-          'LexiClash is a free, real-time multiplayer word game. Find words on a letter grid, compete against friends or strangers, and climb the leaderboard. Available in 5 languages with multiple game modes.',
+          'LexiClash is a free, real-time multiplayer word game. Find words on a letter grid, compete against friends or strangers, and climb the leaderboard. Available in 6 languages with multiple game modes.',
       },
       {
         question: 'How do I start a multiplayer game?',

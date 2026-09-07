@@ -55,9 +55,11 @@ const richLesson: VocabularyWord[] = [
 ];
 
 describe('buildPracticeTiles', () => {
-  it('offers one tile per base practice mode plus one per vocabulary skill', () => {
+  it('offers one tile per base practice mode plus Word Tower plus one per vocabulary skill', () => {
     const tiles = buildPracticeTiles(richLesson, { language: 'en' });
-    expect(tiles).toHaveLength(BASE_PRACTICE_MODES.length + VOCAB_FOCUSES.length);
+    // The +1 is Word Tower: a variant of solo_board rather than a base mode of
+    // its own, so it is not in BASE_PRACTICE_MODES.
+    expect(tiles).toHaveLength(BASE_PRACTICE_MODES.length + 1 + VOCAB_FOCUSES.length);
     expect(new Set(tiles.map((t) => t.id)).size).toBe(tiles.length);
   });
 

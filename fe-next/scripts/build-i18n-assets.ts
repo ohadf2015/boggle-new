@@ -20,12 +20,17 @@
  * Wired into `build:prebuild`. Output is gitignored.
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync, readdirSync, rmSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readdirSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { normalizeMessages } from '../i18n/normalizeMessages';
+import {
+  manifestMatchesDisk,
+  fingerprintSources,
+  SOURCES_KEY,
+} from '../lib/i18n/i18nAssetFreshness';
 
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -37,13 +42,47 @@ const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 /** Keep in sync with `translations/loadTranslation.ts`. */
 const GLOBAL = '__LEXI_MESSAGES__';
 
+// Brotli at quality 11 over six catalogues dominates the runtime of this
+// script. `npm run dev` now calls it on every start, so dev skips it —
+// server/precompressedI18n.ts falls back to gzip when the `.br` is missing.
+// Production keeps it: `build:prebuild` passes no flag.
+const SKIP_BROTLI = process.argv.includes('--skip-brotli');
+
 mkdirSync(OUT_DIR, { recursive: true });
 mkdirSync(path.dirname(MANIFEST), { recursive: true });
 
-// Stale hashed files would accumulate across builds and ship in the image.
-if (existsSync(OUT_DIR)) {
-  for (const f of readdirSync(OUT_DIR)) {
-    if (f.endsWith('.js') || f.endsWith('.js.br')) rmSync(path.join(OUT_DIR, f));
+// Everything the emitted catalogues are derived from. A change to any of these
+// must invalidate the build — comparing disk against the manifest alone cannot
+// see a source edit, which is how a stale catalogue kept being served after
+// builders added keys, and new strings rendered as raw key paths.
+// `translations/layout.ts` is deliberately NOT here: it is imported directly by
+// app/[locale]/layout.tsx and bundled by webpack, never through this asset.
+const SOURCE_FILES = [
+  ...LOCALES.map((lang) => path.join(ROOT, 'translations', `${lang}.js`)),
+  path.join(ROOT, 'i18n', 'normalizeMessages.ts'),
+];
+const SOURCES_FINGERPRINT = fingerprintSources(
+  SOURCE_FILES.map((file) => readFileSync(file, 'utf8')),
+);
+
+// Warm start: skip only when the files the manifest names are all present AND
+// they were built from exactly these sources. This is not only a speed guard —
+// the prune below would otherwise churn the catalogue under any dev server
+// already serving this worktree.
+if (!process.argv.includes('--force') && existsSync(MANIFEST) && existsSync(OUT_DIR)) {
+  try {
+    const current = JSON.parse(readFileSync(MANIFEST, 'utf8')) as Record<string, string>;
+    if (
+      manifestMatchesDisk(current, readdirSync(OUT_DIR), {
+        skipBrotli: SKIP_BROTLI,
+        sourcesFingerprint: SOURCES_FINGERPRINT,
+      })
+    ) {
+      process.stdout.write('  i18n assets already match the manifest and sources — skipping\n');
+      process.exit(0);
+    }
+  } catch {
+    // Unreadable manifest: fall through and rebuild.
   }
 }
 
@@ -66,19 +105,40 @@ for (const lang of LOCALES) {
   // quality 11 for. Measured on en: 171kB gzip / 158kB brotli-5 (recompressed
   // per request) / 137kB here, once, at build time. Served by
   // server/precompressedI18n.ts, which falls back to gzip if this is missing.
-  const brotli = brotliCompressSync(Buffer.from(source), {
-    params: {
-      [zlibConstants.BROTLI_PARAM_QUALITY]: 11,
-      [zlibConstants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(source),
-    },
-  });
-  writeFileSync(path.join(OUT_DIR, `${file}.br`), brotli);
+  const brotli = SKIP_BROTLI
+    ? null
+    : brotliCompressSync(Buffer.from(source), {
+        params: {
+          [zlibConstants.BROTLI_PARAM_QUALITY]: 11,
+          [zlibConstants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(source),
+        },
+      });
+  if (brotli) writeFileSync(path.join(OUT_DIR, `${file}.br`), brotli);
 
   manifest[lang] = `/i18n/${file}`;
   process.stdout.write(
-    `  i18n ${lang} → ${file} (${(json.length / 1024).toFixed(0)}kB, br ${(brotli.length / 1024).toFixed(0)}kB)\n`,
+    `  i18n ${lang} → ${file} (${(json.length / 1024).toFixed(0)}kB${
+      brotli ? `, br ${(brotli.length / 1024).toFixed(0)}kB` : ', br skipped'
+    })\n`,
   );
 }
 
+manifest[SOURCES_KEY] = SOURCES_FINGERPRINT;
 writeFileSync(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 process.stdout.write(`  i18n manifest → ${path.relative(ROOT, MANIFEST)}\n`);
+
+// Prune AFTER the new files and the new manifest are on disk, never before.
+// Several dev servers share this worktree; deleting first left a window where
+// the manifest named a file that no longer existed, which is the 404 that
+// started all of this. Writing first means the worst case is a served asset
+// that is momentarily stale, not one that is missing.
+const keep = new Set(
+  Object.entries(manifest)
+    .filter(([key]) => key !== SOURCES_KEY)
+    .map(([, entry]) => entry.replace(/^\/i18n\//, '')),
+);
+for (const f of readdirSync(OUT_DIR)) {
+  if (!f.endsWith('.js') && !f.endsWith('.js.br')) continue;
+  if (keep.has(f) || keep.has(f.replace(/\.br$/, ''))) continue;
+  rmSync(path.join(OUT_DIR, f));
+}

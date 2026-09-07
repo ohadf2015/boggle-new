@@ -63,9 +63,9 @@ const keywordsMap: Record<string, string> = {
 const descriptionMap: Record<string, string> = {
   en: 'Play Boggle online free with friends — no signup, no download. Real-time word battles, daily word wheel, 6 modes. Play in browser. Start now →',
   he: 'משחק מילים מרובה משתתפים חינם בעברית — ללא הורדה. בוגל בזמן אמת עם חברים, גלגל מילים יומי, 6 מצבי משחק, 10,000+ מילים. שחק עכשיו בדפדפן ←',
-  sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids ordstrider, dagligt ordhjul, 6 spellägen, 5 språk. Som Alfapet möter Boggle. Spela nu →',
-  ja: '友達と無料マルチプレイヤーワードゲーム — 登録不要・ダウンロード不要。リアルタイム単語バトル、毎日のワードホイール、6モード、5言語対応。今すぐブラウザで開始 →',
-  es: 'Juego de palabras multijugador gratis — sin descarga, sin registro. Batallas en tiempo real, rueda diaria, 6 modos, 5 idiomas. ¡Juega en tu navegador! →',
+  sv: 'Spela gratis ordspel online med vänner — ingen nedladdning. Realtids ordstrider, dagligt ordhjul, 6 spellägen, 6 språk. Som Alfapet möter Boggle. Spela nu →',
+  ja: '友達と無料マルチプレイヤーワードゲーム — 登録不要・ダウンロード不要。リアルタイム単語バトル、毎日のワードホイール、6モード、6言語対応。今すぐブラウザで開始 →',
+  es: 'Juego de palabras multijugador gratis — sin descarga, sin registro. Batallas en tiempo real, rueda diaria, 6 modos, 6 idiomas. ¡Juega en tu navegador! →',
   ru: 'Бесплатная игра в слова с другими игроками — без регистрации и скачивания. Битвы в реальном времени, ежедневное колесо слов, 6 режимов. Играй в браузере →',
 };
 

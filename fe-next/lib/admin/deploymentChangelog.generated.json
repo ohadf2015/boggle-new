@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-01T19:31:19.068Z",
+  "generatedAt": "2026-09-05T19:42:01.541Z",
   "commits": [
     {
-      "sha": "e814c1a69cbcc7225586adfccb6dd5bb63afe63b",
-      "shortSha": "e814c1a",
-      "subject": "feat(fe-next): play-first home + cookie consent never covers Quick Start (#890)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T11:43:21-07:00"
-    },
-    {
-      "sha": "e6694a87923af5052e58e8ab3f5ee5c30a2235bf",
-      "shortSha": "e6694a8",
-      "subject": "Education GTM: persistent For Teachers, classroom hero (#888)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T11:26:31-07:00"
-    },
-    {
-      "sha": "b3378fe9757f2f587dc617e9b21ef9c358a4afbc",
-      "shortSha": "b3378fe",
-      "subject": "fix(fe-next): cookie consent mascot has two hands (#887)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T06:18:50-07:00"
-    },
-    {
-      "sha": "56e6165a83633d3f484c8eeed7b3ead695b2ece2",
-      "shortSha": "56e6165",
-      "subject": "fix(education): keep guests on /education/duels join empty state (#886)",
-      "author": "ohadf2015",
-      "date": "2026-09-01T04:50:03-07:00"
-    },
-    {
-      "sha": "9e2f7434ecac6179d3e8f20f9909016e9889e3a3",
-      "shortSha": "9e2f743",
-      "subject": "chore: land in-flight test-collection and ignore fixes",
+      "sha": "3552dc107aaa403658a977a3133cc70a5dcc95f6",
+      "shortSha": "3552dc1",
+      "subject": "feat(education): live vocab quiz, skill practice picker, class report, classroom flow fixes, SEO/GEO pass",
       "author": "Ohad Fisher",
-      "date": "2026-09-01T14:19:26+03:00"
+      "date": "2026-09-05T23:22:18+04:00"
     },
     {
-      "sha": "d8da1e5c4ddb5a8f26bfabb7f11dd7336ad47825",
-      "shortSha": "d8da1e5",
-      "subject": "fix(education): put the real mascot on every education page image",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T14:09:27+03:00"
-    },
-    {
-      "sha": "538519c902112f633e3fd1826e4e3c3d16723f0c",
-      "shortSha": "538519c",
-      "subject": "chore(nightly): land five nights of salvaged lane code (2026-08-27 → 09-01)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T13:38:08+03:00"
-    },
-    {
-      "sha": "5e89843987eae17b3760045a144c94c08fa66fbf",
-      "shortSha": "5e89843",
-      "subject": "fix(education): send student vocab practice to playable drills, not TeacherGate (#885)",
+      "sha": "ce21568e526fda4aaf61a0f570ca8f4232586be4",
+      "shortSha": "ce21568",
+      "subject": "fix(admin): stop Teacher Pro grants from hanging until the client gives up (#945)",
       "author": "ohadf2015",
-      "date": "2026-09-01T03:36:55-07:00"
+      "date": "2026-09-05T13:48:05+04:00"
     },
     {
-      "sha": "6628a0a558dc7edc5f29b987f252933ac1ceac14",
-      "shortSha": "6628a0a",
-      "subject": "feat(singleplayer): route solo-bots results to multiplayer first (#881)",
+      "sha": "6e987fc0a7a82a58f68ea4c61d509053062cd144",
+      "shortSha": "6e987fc",
+      "subject": "fix(supabase): apply the ~40 migrations stuck behind the broken CI token (#943)",
       "author": "ohadf2015",
-      "date": "2026-09-01T00:40:56-07:00"
+      "date": "2026-09-05T13:22:35+04:00"
     },
     {
-      "sha": "f57a7b270f613e0df0a24b877863f731a100d7f2",
-      "shortSha": "f57a7b2",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-01",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T05:32:48+03:00"
-    },
-    {
-      "sha": "7ebf5e8255a0755dc54800bc77e01a1605480a78",
-      "shortSha": "7ebf5e8",
-      "subject": "feat(join): give /join a code entry page instead of a 404",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T02:07:54+03:00"
-    },
-    {
-      "sha": "c17005d8fee6d4d68bfadbdbcc6ccd90ff47e803",
-      "shortSha": "c17005d",
-      "subject": "fix(education): stop classroom exits from silently creating another room",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T02:01:18+03:00"
-    },
-    {
-      "sha": "39ff9559a55404f993b25287e5a8d3220465b866",
-      "shortSha": "39ff955",
-      "subject": "fix(education): print the join address, not just a QR; guard comparison-page claims",
-      "author": "Ohad Fisher",
-      "date": "2026-09-01T01:09:16+03:00"
-    },
-    {
-      "sha": "3913b0579e628a4c26e7b5b03edeaece510638c1",
-      "shortSha": "3913b05",
-      "subject": "Merge remote-tracking branch 'origin/master' into worktree-edu-logrocket-ux",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T23:42:42+03:00"
-    },
-    {
-      "sha": "0d24ff63e04e08a9e5ad3726ee61a19318e67874",
-      "shortSha": "0d24ff6",
-      "subject": "fix(education): explain the teacher-access redirect, and unhardcode 5 landing pages",
-      "author": "Ohad Fisher",
-      "date": "2026-08-31T23:42:21+03:00"
-    },
-    {
-      "sha": "bc26c5957d483fc17ff653c572e66352b8a7bb3d",
-      "shortSha": "bc26c59",
-      "subject": "fix(security): fail-closed auth on ranked, crons, and admin email previews (#879)",
+      "sha": "eeeefa3cedc60456d4b88993781e4c17a9d7ebb2",
+      "shortSha": "eeeefa3",
+      "subject": "fix(education): resolve Teacher Pro grants without a migration-gated RPC (#942)",
       "author": "ohadf2015",
-      "date": "2026-08-31T17:29:39+03:00"
+      "date": "2026-09-05T12:07:53+04:00"
     },
     {
-      "sha": "9d4a6ba5bcd3cf709a7737a024da38e0fb4e5e03",
-      "shortSha": "9d4a6ba",
-      "subject": "fix(fe-next): first-visit cookie usable, CTAs clickable, UTC daily date, guest chest quiet (#876)",
+      "sha": "d0f2b53f397a2164be455107358d40fb3ae93611",
+      "shortSha": "d0f2b53",
+      "subject": "fix(admin): give Teacher Pro grants a real wall-clock timeout, not just an inert maxDuration (#941)",
       "author": "ohadf2015",
-      "date": "2026-08-31T14:52:12+03:00"
+      "date": "2026-09-05T10:34:12+03:00"
     },
     {
-      "sha": "912979ff95fe5898b8ab977ceea6d312e17e606e",
-      "shortSha": "912979f",
-      "subject": "fix(fe-next): remove root-path geo block and add cold-start RUM beacon",
+      "sha": "5a6159206993c92fa6d6f3d6dc3f6a9fac59da87",
+      "shortSha": "5a61592",
+      "subject": "fix(admin): stop Express 30s cap from timing out Teacher Pro grants (#940)",
       "author": "ohadf2015",
-      "date": "2026-08-31T10:56:02+03:00"
+      "date": "2026-09-05T09:57:00+03:00"
     },
     {
-      "sha": "e2f76345d7242a3f3007818b25f6def279a8e0fd",
-      "shortSha": "e2f7634",
-      "subject": "feat(seo): daily meta description improvements 2026-08-31 (#874)",
+      "sha": "b6b13948b3579a21fd441bc955570e8725a3d84f",
+      "shortSha": "b6b1394",
+      "subject": "feat(admin): Gift Pro entry points from the admin home and Teacher Access page (#939)",
       "author": "ohadf2015",
-      "date": "2026-08-31T10:37:45+03:00"
+      "date": "2026-09-05T08:42:58+03:00"
     },
     {
-      "sha": "41726d002f32d9aadc41332cc3665ccde749bea8",
-      "shortSha": "41726d0",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-31",
+      "sha": "d8fe704ca44f188e0cfd6d4aa6320055f3b73814",
+      "shortSha": "d8fe704",
+      "subject": "fix(education): survive a database that has not received the 2026-09-05 migrations (#938)",
+      "author": "ohadf2015",
+      "date": "2026-09-05T08:29:55+03:00"
+    },
+    {
+      "sha": "19c1592f1f08d27d736867fbffbbaa25424b2f80",
+      "shortSha": "19c1592",
+      "subject": "feat(seo): daily meta tag improvements 2026-09-05 (#937)",
+      "author": "ohadf2015",
+      "date": "2026-09-05T08:11:55+03:00"
+    },
+    {
+      "sha": "e1b7b93b39db95da119bb7892bbd42245cf1562c",
+      "shortSha": "e1b7b93",
+      "subject": "feat(education): teacher Pro gifts, Tori's asks, and the classroom persistence fix (#936)",
+      "author": "ohadf2015",
+      "date": "2026-09-05T08:11:19+03:00"
+    },
+    {
+      "sha": "7add65b9ae0fc8240b214e3961771e4d9e4f1916",
+      "shortSha": "7add65b",
+      "subject": "fix(education): students could not join a class or play — two dead ends",
       "author": "Ohad Fisher",
-      "date": "2026-08-31T04:59:58+03:00"
+      "date": "2026-09-04T22:08:54+04:00"
+    },
+    {
+      "sha": "f0634e0da934f3e41a177225f43f2ea4be4136aa",
+      "shortSha": "f0634e0",
+      "subject": "fix(test): stop useBlastEngine.mpGrid renderHook from OOM-looping (#920)",
+      "author": "ohadf2015",
+      "date": "2026-09-04T11:32:06+03:00"
+    },
+    {
+      "sha": "4a005a94f6613e3ea2cf98e61a7f6c43a7144cf3",
+      "shortSha": "4a005a9",
+      "subject": "test(fe-next): cover claim_admin_gift contract on gift claim route (#923)",
+      "author": "ohadf2015",
+      "date": "2026-09-04T11:31:57+03:00"
+    },
+    {
+      "sha": "30e5adc650ee51a23c687bc84295e1fd52bcb801",
+      "shortSha": "30e5adc",
+      "subject": "feat(seo): daily meta tag improvements 2026-09-04 (#931)",
+      "author": "ohadf2015",
+      "date": "2026-09-04T08:13:30+03:00"
+    },
+    {
+      "sha": "773822c7ec8cb0986537f9e2be45e8fdd0d793e4",
+      "shortSha": "773822c",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-04",
+      "author": "Ohad Fisher",
+      "date": "2026-09-04T05:59:06+04:00"
+    },
+    {
+      "sha": "b52f0e758d941de47150758a99c2796d617c7f03",
+      "shortSha": "b52f0e7",
+      "subject": "fix(fe-next): NativeAppProvider vitest no longer leaks App.then UNIMPLEMENTED (#922)",
+      "author": "ohadf2015",
+      "date": "2026-09-04T01:34:14+03:00"
+    },
+    {
+      "sha": "f20d8c84cb50b990c81bfee67ef5b47c3607f8ef",
+      "shortSha": "f20d8c8",
+      "subject": "feat(teacher): lead the Pro upgrade page with the classroom result (#919)",
+      "author": "ohadf2015",
+      "date": "2026-09-03T23:36:03+03:00"
+    },
+    {
+      "sha": "d5b8b4848eabfc90a46a6ab2e49a0a51b79964c0",
+      "shortSha": "d5b8b48",
+      "subject": "fix(android): release script defaulted to the wrong signing key (#918)",
+      "author": "ohadf2015",
+      "date": "2026-09-03T23:35:47+03:00"
+    },
+    {
+      "sha": "bf773d327f8ff793512760a6b0dd66de97ae1f0a",
+      "shortSha": "bf773d3",
+      "subject": "fix(fe-next): replace Chromium interstitial with bundled offline launcher (#917)",
+      "author": "ohadf2015",
+      "date": "2026-09-03T20:34:07+03:00"
+    },
+    {
+      "sha": "0235308c13cd18dec6d690e5122f2c9f40731830",
+      "shortSha": "0235308",
+      "subject": "fix(fe-next): cold-start offline boots from WebView HTTP cache (#916)",
+      "author": "ohadf2015",
+      "date": "2026-09-03T17:25:06+03:00"
     }
   ]
 }

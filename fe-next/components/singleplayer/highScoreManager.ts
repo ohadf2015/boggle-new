@@ -218,11 +218,11 @@ export function getHighScoreForPreset(presetId: string, difficulty: DifficultyLe
 export function getProgressMessage(
   currentScore: number,
   highScore: number | null,
-  t: (key: string) => string
+  t: (key: string, fallback?: string) => string
 ): { message: string; type: 'ahead' | 'behind' | 'tied' | 'first' } {
   if (!highScore) {
     return {
-      message: t('challenge.settingRecord') || 'Setting your first record!',
+      message: t('challenge.settingRecord', 'Setting your first record!'),
       type: 'first',
     };
   }
@@ -231,17 +231,17 @@ export function getProgressMessage(
 
   if (diff > 0) {
     return {
-      message: (t('challenge.aheadOfRecord') || '+{diff} ahead of record!').replace('{diff}', String(diff)),
+      message: (t('challenge.aheadOfRecord', '+{diff} ahead of record!')).replace('{diff}', String(diff)),
       type: 'ahead',
     };
   } else if (diff < 0) {
     return {
-      message: (t('challenge.behindRecord') || '{diff} to beat your record').replace('{diff}', String(Math.abs(diff))),
+      message: (t('challenge.behindRecord', '{diff} to beat your record')).replace('{diff}', String(Math.abs(diff))),
       type: 'behind',
     };
   } else {
     return {
-      message: t('challenge.tiedWithRecord') || 'Tied with your record!',
+      message: t('challenge.tiedWithRecord', 'Tied with your record!'),
       type: 'tied',
     };
   }

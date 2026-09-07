@@ -84,7 +84,7 @@ export function LeaguePositionBadge() {
   if (error || !myPosition) return null;
 
   const tierName = t(`league.${tier}`) || tier;
-  const positionText = interpolate(t('league.positionOf') || '#{position} of {total}', {
+  const positionText = interpolate(t('league.positionOf', '#{position} of {total}'), {
     position: myPosition,
     total: standings.length,
   });
@@ -94,12 +94,12 @@ export function LeaguePositionBadge() {
   let gapColor = 'text-neo-white';
 
   if (xpGap?.xpToPromote != null && xpGap.xpToPromote > 0) {
-    gapText = interpolate(t('league.xpToPromote') || '{xp} XP to promote', {
+    gapText = interpolate(t('league.xpToPromote', '{xp} XP to promote'), {
       xp: xpGap.xpToPromote,
     });
     gapColor = 'text-green-400';
   } else if (xpGap?.xpAboveRelegation != null) {
-    gapText = interpolate(t('league.xpAboveRelegation') || '{xp} XP above relegation', {
+    gapText = interpolate(t('league.xpAboveRelegation', '{xp} XP above relegation'), {
       xp: xpGap.xpAboveRelegation,
     });
     gapColor = xpGap.xpAboveRelegation <= 50 ? 'text-red-400' : 'text-neo-white';

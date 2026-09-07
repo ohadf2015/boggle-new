@@ -444,8 +444,8 @@ export default function AvatarBuilderModal({
             whileTap={{ scale: 0.88 }}
             transition={BUTTON_SPRING}
             className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
-            title={t('avatarBuilder.download') || 'Download'}
-            aria-label={t('avatarBuilder.download') || 'Download'}
+            title={t('avatarBuilder.download', 'Download')}
+            aria-label={t('avatarBuilder.download', 'Download')}
           >
             <Download size={16} />
           </AdaptiveMotion.button>

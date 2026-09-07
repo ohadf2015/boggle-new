@@ -141,15 +141,15 @@ export function AddFriendBadge({
           'bg-neo-navy/80 text-green-300 font-bold text-[9px] uppercase shadow-hard-sm',
           className
         )}
-        aria-label={t('results.requestSent') || 'Request Sent'}
+        aria-label={t('results.requestSent', 'Request Sent')}
       >
         <Check className="w-3 h-3" />
-        {variant === 'inline' && (t('results.requestSent') || 'Request Sent')}
+        {variant === 'inline' && (t('results.requestSent', 'Request Sent'))}
       </span>
     );
   }
 
-  const ariaLabel = (t('results.addFriend') || 'Add {name}').replace('{name}', username);
+  const ariaLabel = (t('results.addFriend', 'Add {name}')).replace('{name}', username);
 
   if (variant === 'inline') {
     return (

@@ -112,7 +112,7 @@ export interface OnShowResultsData {
 
 interface UsePlayerGameEventsProps {
   socket: Socket | null;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
   username: string;
   onShowResults?: (data: OnShowResultsData) => void;
 
@@ -485,7 +485,7 @@ export function usePlayerGameEvents({
       onGameStartRef.current?.();
 
       const toastMessage = data.lateJoin
-        ? (t('common.joinedGame') || 'Joined game!')
+        ? (t('common.joinedGame', 'Joined game!'))
         : t('common.gameStarted');
       neoSuccessToast(toastMessage, { id: 'game-started', icon: data.lateJoin ? TOAST_ICONS.gamepad : TOAST_ICONS.rocket, duration: 3000 });
     };

@@ -9,6 +9,10 @@ export interface ActiveGame {
   teacherName: string;
   lessonNames: string[];
   playerCount?: number;
+  /** Which classroom this game belongs to. Absent from an older server. */
+  classroomId?: string;
+  /** That classroom's display name, resolved server-side. Absent from an older server. */
+  classroomName?: string | null;
 }
 
 const POLL_INTERVAL = 15_000;
@@ -42,7 +46,24 @@ export function useActiveClassroomGame(classroomId: string) {
 
   useEffect(() => {
     const socketUrl = getSocketURL();
-    let socketInstance: ReturnType<typeof io>;
+    let socketInstance: ReturnType<typeof io> | undefined;
+    /**
+     * The teardown flag, and the whole reason this hook could show another
+     * class's game.
+     *
+     * `initSocket` is async: it awaits `getSession()` before `socketInstance`
+     * is ever assigned. React runs this effect's cleanup the moment
+     * `classroomId` changes — INSIDE that window — so `socketInstance
+     * ?.disconnect()` had nothing to disconnect and silently did nothing
+     * (recurring pitfall class 4). The classroom-A socket then lived forever:
+     * still subscribed to `classroom:A`, still polling every 15 seconds, and
+     * still holding the same stable `setActiveGame` — so it kept writing
+     * classroom A's game into a hook that now represents classroom B.
+     *
+     * Cleanup therefore records the intent, and the async setup honours it
+     * whenever it finally lands.
+     */
+    let cancelled = false;
 
     async function initSocket() {
       let token: string | undefined;
@@ -55,27 +76,38 @@ export function useActiveClassroomGame(classroomId: string) {
         // proceed without token
       }
 
-      socketInstance = io(socketUrl, {
+      // A non-optional local so the listener closures below have a socket that
+      // cannot be undefined; `socketInstance` exists only for the cleanup path.
+      const sock = io(socketUrl, {
         transports: ['websocket', 'polling'],
         auth: token ? { token } : {},
       });
+      socketInstance = sock;
 
-      socketInstance.on('connect', () => {
+      // The classroom changed (or the page unmounted) while the session was
+      // resolving. Close this one immediately and wire up nothing.
+      if (cancelled) {
+        sock.disconnect();
+        return;
+      }
+
+      sock.on('connect', () => {
         setIsConnected(true);
-        requestActiveGames(socketInstance);
+        requestActiveGames(sock);
       });
 
-      socketInstance.on('disconnect', () => {
+      sock.on('disconnect', () => {
         setIsConnected(false);
       });
 
-      socketInstance.io.on('reconnect', () => {
-        requestActiveGames(socketInstance);
+      sock.io.on('reconnect', () => {
+        requestActiveGames(sock);
       });
 
-      socketInstance.on('classroomGameCreated', (data: {
+      sock.on('classroomGameCreated', (data: {
         gameCode: string;
         classroomId?: string;
+        classroomName?: string | null;
         teacherName: string;
         lessonNames: string[];
       }) => {
@@ -89,6 +121,8 @@ export function useActiveClassroomGame(classroomId: string) {
         setError(null);
         setActiveGame({
           gameCode: data.gameCode,
+          classroomId: data.classroomId,
+          classroomName: data.classroomName,
           teacherName: data.teacherName,
           lessonNames: data.lessonNames,
         });
@@ -97,18 +131,29 @@ export function useActiveClassroomGame(classroomId: string) {
       // The list is authoritative in BOTH directions. An empty list means the
       // game is over (or its Redis key expired); leaving the old one on screen
       // is what kept "JOIN NOW" pointing at a dead room.
-      socketInstance.on('activeClassroomGames', (data: { games: ActiveGame[] }) => {
+      sock.on('activeClassroomGames', (data: { classroomId?: string; games: ActiveGame[] }) => {
+        // Whose answer is this? The payload used to say nothing, so the client
+        // had no way to tell and trusted every one of them. A response for a
+        // classroom this hook is not watching is not evidence about this
+        // classroom — in particular it must never CLEAR a running game.
+        if (data?.classroomId && data.classroomId !== classroomId) return;
         setError(null);
         // A Redis set has no order, so `games[0]` is arbitrary. Take the first
         // one that is actually joinable rather than whichever the store handed
         // back — that arbitrariness is what showed students an older game's
         // lesson name and then walked them into a dead room.
-        const joinable = (data?.games ?? []).find((g) => !!g?.gameCode) ?? null;
+        //
+        // Each game is re-checked against this classroom too. `classroomId` is
+        // optional only so an older server (which sends neither) keeps working;
+        // when it IS present it is authoritative.
+        const joinable = (data?.games ?? []).find(
+          (g) => !!g?.gameCode && (!g.classroomId || g.classroomId === classroomId)
+        ) ?? null;
         setActiveGame(joinable);
       });
 
       // The server broadcasts this from every end-of-round path.
-      socketInstance.on('classroomGameEnded', (data: { gameCode?: string }) => {
+      sock.on('classroomGameEnded', (data: { gameCode?: string }) => {
         setActiveGame((current) => {
           if (!current) return null;
           // No gameCode on the payload → end whatever this classroom was running.
@@ -119,11 +164,11 @@ export function useActiveClassroomGame(classroomId: string) {
 
       // Rejections used to vanish. "Not a member", "Authentication required" and
       // a bad payload all looked exactly like "no game is running" (class 4).
-      socketInstance.on('classroomGameError', (data: { error?: string }) => {
+      sock.on('classroomGameError', (data: { error?: string }) => {
         setError(data?.error ?? 'unknown');
       });
 
-      socketInstance.on('classroomGamePlayerJoined', (data: {
+      sock.on('classroomGamePlayerJoined', (data: {
         gameCode: string;
         playerCount: number;
       }) => {
@@ -135,15 +180,16 @@ export function useActiveClassroomGame(classroomId: string) {
         });
       });
 
-      setSocket(socketInstance);
+      setSocket(sock);
 
       pollIntervalRef.current = setInterval(() => {
-        requestActiveGames(socketInstance);
+        requestActiveGames(sock);
       }, POLL_INTERVAL);
     }
 
     initSocket();
     return () => {
+      cancelled = true;
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }

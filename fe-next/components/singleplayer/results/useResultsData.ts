@@ -79,14 +79,14 @@ export interface Participant {
 
 export function useResultsData(
   results: SinglePlayerResultsData,
-  t: (key: string) => string,
+  t: (key: string, fallback?: string) => string,
   playerAvatar?: ParticipantAvatar
 ) {
   // Calculate rankings for solo-bots mode
   const allParticipants = useMemo((): Participant[] => {
     return [
       {
-        name: t('common.you') || 'You',
+        name: t('common.you', 'You'),
         score: results.playerScore,
         isPlayer: true,
         avatar: playerAvatar,
@@ -206,7 +206,7 @@ export function useResultsData(
   const playerArchetypes = useMemo((): Map<string, PlayerArchetype> => {
     if (results.botScores.length === 0) return new Map();
 
-    const playerUsername = t('common.you') || 'You';
+    const playerUsername = t('common.you', 'You');
 
     // Convert player data to archetype calculation format
     const playerData = {
@@ -239,7 +239,7 @@ export function useResultsData(
 
   // Get player's archetype
   const playerArchetype = useMemo((): PlayerArchetype | null => {
-    const playerUsername = t('common.you') || 'You';
+    const playerUsername = t('common.you', 'You');
     return playerArchetypes.get(playerUsername) || null;
   }, [playerArchetypes, t]);
 
@@ -248,7 +248,7 @@ export function useResultsData(
   const missedWords = useMemo(() => {
     if (results.botScores.length === 0) return [];
 
-    const playerUsername = t('common.you') || 'You';
+    const playerUsername = t('common.you', 'You');
     const playerWords = results.playerWordData || [];
 
     // Build allPlayersWords map — include ALL player words (even invalid)

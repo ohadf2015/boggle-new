@@ -74,7 +74,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
             'rounded-neo p-2 transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
             'hover:bg-neo-white/10'
           )}
-          aria-label={t('common.back') || 'Back'}
+          aria-label={t('common.back', 'Back')}
         >
           <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
         </button>
@@ -117,7 +117,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
                   : generatedBoard.totalFindableWords >= 5 ? 'bg-neo-orange text-black'
                   : 'bg-neo-red text-white'
               )}>
-                {generatedBoard.totalFindableWords} {t('ugc.board.words') || 'words'}
+                {generatedBoard.totalFindableWords} {t('ugc.board.words', 'words')}
               </span>
               <span className={cn(
                 'font-neo-display text-xs font-bold px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm',
@@ -154,7 +154,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
         disabled={!canProceed}
         className="bg-neo-lime text-black"
       >
-        {t('ugc.board.preview') || 'Preview & Publish'}
+        {t('ugc.board.preview', 'Preview & Publish')}
       </NeoButton>
     </div>
   );
@@ -359,7 +359,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
       {/* Actions */}
       <div className="flex gap-3 flex-wrap">
         <NeoButton data-testid="back-btn" onClick={handleBack} className="bg-neo-navy text-white">
-          {t('common.back') || 'Back'}
+          {t('common.back', 'Back')}
         </NeoButton>
         <NeoButton
           data-testid="publish-btn"
@@ -430,10 +430,10 @@ function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
       {/* Share buttons */}
       <div data-testid="share-buttons" className="flex gap-3 flex-wrap justify-center">
         <NeoButton onClick={handleCopy} className="bg-neo-cyan text-black">
-          {t('ugc.board.copyCode') || 'Copy Code'}
+          {t('ugc.board.copyCode', 'Copy Code')}
         </NeoButton>
         <NeoButton onClick={handleShare} className="bg-neo-orange text-black">
-          {t('ugc.board.share') || 'Share'}
+          {t('ugc.board.share', 'Share')}
         </NeoButton>
       </div>
 

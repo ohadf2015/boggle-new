@@ -40,7 +40,7 @@ export interface InGameScreenProps {
   gameCode: string;
   isHost?: boolean;
   isPlaying?: boolean;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   dir?: 'rtl' | 'ltr';
   socket: Socket | null;
 
@@ -130,7 +130,11 @@ export interface InGameScreenProps {
 /**
  * Translation function type
  */
-export type TranslationFn = (path: string, params?: Record<string, string | number>) => string;
+export type TranslationFn = (
+  path: string,
+  fallbackOrParams?: string | Record<string, string | number>,
+  params?: Record<string, string | number>
+) => string;
 
 /**
  * State for earthquake effect

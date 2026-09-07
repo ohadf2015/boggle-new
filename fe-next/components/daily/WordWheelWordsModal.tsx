@@ -24,7 +24,7 @@ interface WordWheelWordsModalProps {
    *  (words the opponent found that the current player did NOT) so the
    *  player gets actionable "look what I missed" intel instead of a flood. */
   myWordsFound?: string[];
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
 }
 
 interface WordsPayload {
@@ -75,7 +75,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
         if (!cancelled) setPayload(data as WordsPayload);
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;
-        if (!cancelled) setError(t('common.error') || 'Error');
+        if (!cancelled) setError(t('common.error', 'Error'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -128,7 +128,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
           </h2>
           <p className="text-sm font-bold opacity-80 mt-0.5 pe-14">
             {diffMode
-              ? (t('wordWheel.youMissedTitle') || 'Words you missed')
+              ? (t('wordWheel.youMissedTitle', 'Words you missed'))
               : t('wordWheel.submittedWordsTitle')}
           </p>
         </div>
@@ -137,7 +137,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {loading && (
             <div className="py-8 text-center text-neo-white font-bold text-sm">
-              {t('common.loading') || 'Loading…'}
+              {t('common.loading', 'Loading…')}
             </div>
           )}
 
@@ -155,7 +155,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
                 <StatBox icon={<Hash className="w-3.5 h-3.5" />} label={t('wordWheel.foundWords')} value={payload.wordCount} />
                 <StatBox
                   icon={<Star className="w-3.5 h-3.5" />}
-                  label={t('wordWheel.longest') || 'Longest'}
+                  label={t('wordWheel.longest', 'Longest')}
                   value={payload.longestWord || '—'}
                 />
               </div>
@@ -164,7 +164,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
               {sortedWords.length === 0 ? (
                 <p className="py-6 text-center text-neo-white text-sm font-medium">
                   {diffMode && allWords.length > 0
-                    ? (t('wordWheel.youFoundEverything') || 'You found every word they did. Nice.')
+                    ? (t('wordWheel.youFoundEverything', 'You found every word they did. Nice.'))
                     : t('wordWheel.noWordsSubmitted')}
                 </p>
               ) : (
@@ -191,7 +191,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
                       className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-neo-cyan/80 hover:text-neo-cyan focus-visible:outline-hidden focus-visible:underline transition-colors"
                     >
                       {showAll
-                        ? (t('wordWheel.results.showLess') || 'Show less')
+                        ? (t('wordWheel.results.showLess', 'Show less'))
                         : (t('wordWheel.results.showMoreCount')?.replace('{count}', String(remainingCount))
                             || `Show all (+${remainingCount} more)`)}
                     </button>

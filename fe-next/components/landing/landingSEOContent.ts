@@ -36,7 +36,7 @@ export interface LandingSEOContent {
 const en: LandingSEOContent = {
   whatIsTitle: 'What is LexiClash?',
   whatIsContent:
-    'LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It\'s like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, and Spanish.',
+    'LexiClash is a free, fast-paced multiplayer word game you can play right in your browser. Compete with friends in real-time word battles on a shared letter grid — find words, build combos, and climb the leaderboard. It\'s like Boggle meets Wordle, but multiplayer. No downloads, no sign-ups required. Available in English, Hebrew, Swedish, Japanese, Spanish, and Russian.',
   whatIsShort:
     'Free multiplayer word battles in your browser. Find words, build combos, crush your friends. No downloads, no signup.',
   featuresTitle: 'Why Players Love LexiClash',
@@ -117,7 +117,7 @@ const en: LandingSEOContent = {
   ],
   educationTitle: 'Built for Learning',
   educationContent:
-    'Word games are one of the most effective ways to build vocabulary and improve spelling. Research published in AIMS Neuroscience shows that word puzzles activate multiple brain regions simultaneously — including areas responsible for language processing, working memory, and executive function. LexiClash takes this further by offering gameplay in five languages, making it a practical tool for language learners. Teachers use LexiClash in classrooms across three continents to make vocabulary drills engaging. The multiplayer format creates healthy competition that motivates students to expand their word knowledge naturally.',
+    'Word games are one of the most effective ways to build vocabulary and improve spelling. Research published in AIMS Neuroscience shows that word puzzles activate multiple brain regions simultaneously — including areas responsible for language processing, working memory, and executive function. LexiClash takes this further by offering gameplay in six languages, making it a practical tool for language learners. Teachers use LexiClash in classrooms across three continents to make vocabulary drills engaging. The multiplayer format creates healthy competition that motivates students to expand their word knowledge naturally.',
   educationStats: [
     { value: '5', label: 'Languages' },
     { value: '3', label: 'Continents' },
@@ -138,7 +138,7 @@ const en: LandingSEOContent = {
     {
       question: 'What languages are supported?',
       answer:
-        'LexiClash supports English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own curated dictionary, daily challenges, and leaderboards. You can switch languages anytime from the settings menu.',
+        'LexiClash supports English, Hebrew, Swedish, Japanese, Spanish, and Russian. Each language has its own curated dictionary, daily challenges, and leaderboards. You can switch languages anytime from the settings menu.',
     },
     {
       question: 'Can I play on my phone?',
@@ -163,13 +163,13 @@ const en: LandingSEOContent = {
   ],
   communityTitle: 'Join Thousands of Word Game Enthusiasts',
   communityContent:
-    'LexiClash players span over 40 countries and five languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights.',
+    'LexiClash players span over 40 countries and six languages. Join the community to compete on global leaderboards, share daily challenge results, and discover new word strategies. Follow us on Instagram @lexi.clash for tips, updates, and community highlights.',
 };
 
 const he: LandingSEOContent = {
   whatIsTitle: 'מה זה LexiClash?',
   whatIsContent:
-    'LexiClash הוא משחק מילים מרובה משתתפים, חינמי ומהיר, שניתן לשחק ישירות בדפדפן. התחרו עם חברים בקרב מילים בזמן אמת על לוח אותיות משותף — מצאו מילים, בנו קומבואים וטפסו בטבלת הדירוג. כמו Boggle פגש Wordle, אבל מרובה משתתפים. ללא הורדות, ללא הרשמה. זמין בעברית, אנגלית, שוודית, יפנית וספרדית.',
+    'LexiClash הוא משחק מילים מרובה משתתפים, חינמי ומהיר, שניתן לשחק ישירות בדפדפן. התחרו עם חברים בקרב מילים בזמן אמת על לוח אותיות משותף — מצאו מילים, בנו קומבואים וטפסו בטבלת הדירוג. כמו Boggle פגש Wordle, אבל מרובה משתתפים. ללא הורדות, ללא הרשמה. זמין בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית.',
   whatIsShort:
     'קרבות מילים מרובי משתתפים, חינמיים, ישר בדפדפן. מצאו מילים, בנו קומבואים, נצחו את החברים. ללא הורדות, ללא הרשמה.',
   featuresTitle: 'למה שחקנים אוהבים את LexiClash',
@@ -257,7 +257,7 @@ const he: LandingSEOContent = {
   ],
   educationTitle: 'בנוי ללמידה',
   educationContent:
-    'משחקי מילים הם אחד הכלים היעילים ביותר לבניית אוצר מילים ושיפור כישורי איות. מחקר שפורסם ב-AIMS Neuroscience מראה שחידות מילים מפעילות אזורי מוח מרובים בו-זמנית — כולל אזורים האחראים לעיבוד שפה, זיכרון עבודה ותפקוד ניהולי. LexiClash הולך צעד רחוק יותר בכך שמציע משחק בחמש שפות, מה שהופך אותו לכלי מעשי ללומדי שפות. מורים משתמשים ב-LexiClash בכיתות בשלושה יבשות כדי להפוך תרגילי אוצר מילים למרתקים. פורמט ריבוי המשתתפים יוצר תחרות בריאה שמניעה תלמידים להרחיב את ידע המילים שלהם באופן טבעי.',
+    'משחקי מילים הם אחד הכלים היעילים ביותר לבניית אוצר מילים ושיפור כישורי איות. מחקר שפורסם ב-AIMS Neuroscience מראה שחידות מילים מפעילות אזורי מוח מרובים בו-זמנית — כולל אזורים האחראים לעיבוד שפה, זיכרון עבודה ותפקוד ניהולי. LexiClash הולך צעד רחוק יותר בכך שמציע משחק בשש שפות, מה שהופך אותו לכלי מעשי ללומדי שפות. מורים משתמשים ב-LexiClash בכיתות בשלושה יבשות כדי להפוך תרגילי אוצר מילים למרתקים. פורמט ריבוי המשתתפים יוצר תחרות בריאה שמניעה תלמידים להרחיב את ידע המילים שלהם באופן טבעי.',
   educationStats: [
     { value: '5', label: 'שפות' },
     { value: '3', label: 'יבשות' },
@@ -278,7 +278,7 @@ const he: LandingSEOContent = {
     {
       question: 'אילו שפות נתמכות?',
       answer:
-        'LexiClash תומך בעברית, אנגלית, שוודית, יפנית וספרדית. לכל שפה יש מילון ייחודי, אתגרים יומיים ולוחות דירוג משלה. ניתן לעבור בין שפות בכל עת מתפריט ההגדרות.',
+        'LexiClash תומך בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית. לכל שפה יש מילון ייחודי, אתגרים יומיים ולוחות דירוג משלה. ניתן לעבור בין שפות בכל עת מתפריט ההגדרות.',
     },
     {
       question: 'האם ניתן לשחק בטלפון?',
@@ -303,13 +303,13 @@ const he: LandingSEOContent = {
   ],
   communityTitle: 'הצטרפו לאלפי חובבי משחקי מילים',
   communityContent:
-    'שחקני LexiClash פרוסים על פני יותר מ-40 מדינות וחמש שפות. הצטרפו לקהילה כדי להתחרות בלוחות דירוג גלובליים, לשתף תוצאות אתגרים יומיים ולגלות אסטרטגיות מילים חדשות. עקבו אחרינו באינסטגרם @lexi.clash לטיפים, עדכונים ואירועי קהילה.',
+    'שחקני LexiClash פרוסים על פני יותר מ-40 מדינות ושש שפות. הצטרפו לקהילה כדי להתחרות בלוחות דירוג גלובליים, לשתף תוצאות אתגרים יומיים ולגלות אסטרטגיות מילים חדשות. עקבו אחרינו באינסטגרם @lexi.clash לטיפים, עדכונים ואירועי קהילה.',
 };
 
 const sv: LandingSEOContent = {
   whatIsTitle: 'Vad är LexiClash?',
   whatIsContent:
-    'LexiClash är ett gratis, fartfyllt multiplayer-ordspel som du spelar direkt i webbläsaren. Tävla mot vänner i realtids-ordstrider på ett gemensamt bokstavsnät — hitta ord, bygg kombos och klättra på topplistan. Det är som Boggle möter Wordle, fast multiplayer. Inga nedladdningar, ingen registrering krävs. Tillgängligt på svenska, engelska, hebreiska, japanska och spanska.',
+    'LexiClash är ett gratis, fartfyllt multiplayer-ordspel som du spelar direkt i webbläsaren. Tävla mot vänner i realtids-ordstrider på ett gemensamt bokstavsnät — hitta ord, bygg kombos och klättra på topplistan. Det är som Boggle möter Wordle, fast multiplayer. Inga nedladdningar, ingen registrering krävs. Tillgängligt på svenska, engelska, hebreiska, japanska, spanska och ryska.',
   whatIsShort:
     'Gratis multiplayer-ordstrider i webbläsaren. Hitta ord, bygg kombos, krossa dina vänner. Inga nedladdningar, ingen registrering.',
   featuresTitle: 'Varför spelare älskar LexiClash',
@@ -397,7 +397,7 @@ const sv: LandingSEOContent = {
   ],
   educationTitle: 'Byggt för lärande',
   educationContent:
-    'Ordspel är ett av de mest effektiva sätten att bygga ordförråd och förbättra stavning. Forskning publicerad i AIMS Neuroscience visar att ordpussel aktiverar flera hjärnregioner samtidigt — inklusive områden som ansvarar för språkbearbetning, arbetsminne och exekutiva funktioner. LexiClash tar detta vidare genom att erbjuda spel på fem språk, vilket gör det till ett praktiskt verktyg för språkinlärare. Lärare använder LexiClash i klassrum på tre kontinenter för att göra ordförrådsövningar engagerande. Multiplayerformatet skapar hälsosam tävling som motiverar elever att naturligt utöka sitt ordförråd.',
+    'Ordspel är ett av de mest effektiva sätten att bygga ordförråd och förbättra stavning. Forskning publicerad i AIMS Neuroscience visar att ordpussel aktiverar flera hjärnregioner samtidigt — inklusive områden som ansvarar för språkbearbetning, arbetsminne och exekutiva funktioner. LexiClash tar detta vidare genom att erbjuda spel på sex språk, vilket gör det till ett praktiskt verktyg för språkinlärare. Lärare använder LexiClash i klassrum på tre kontinenter för att göra ordförrådsövningar engagerande. Multiplayerformatet skapar hälsosam tävling som motiverar elever att naturligt utöka sitt ordförråd.',
   educationStats: [
     { value: '5', label: 'Språk' },
     { value: '3', label: 'Kontinenter' },
@@ -418,7 +418,7 @@ const sv: LandingSEOContent = {
     {
       question: 'Vilka språk stöds?',
       answer:
-        'LexiClash stödjer svenska, engelska, hebreiska, japanska och spanska. Varje språk har sin egen kurerade ordbok, dagliga utmaningar och topplistor. Du kan byta språk när som helst från inställningsmenyn.',
+        'LexiClash stödjer svenska, engelska, hebreiska, japanska, spanska och ryska. Varje språk har sin egen kurerade ordbok, dagliga utmaningar och topplistor. Du kan byta språk när som helst från inställningsmenyn.',
     },
     {
       question: 'Kan jag spela på mobilen?',
@@ -443,13 +443,13 @@ const sv: LandingSEOContent = {
   ],
   communityTitle: 'Gå med tusentals ordspelsentusiaster',
   communityContent:
-    'LexiClash-spelare finns i över 40 länder och på fem språk. Gå med i gemenskapen för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäck nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och gemenskapshöjdpunkter.',
+    'LexiClash-spelare finns i över 40 länder och på sex språk. Gå med i gemenskapen för att tävla på globala topplistor, dela dagliga utmaningsresultat och upptäck nya ordstrategier. Följ oss på Instagram @lexi.clash för tips, uppdateringar och gemenskapshöjdpunkter.',
 };
 
 const ja: LandingSEOContent = {
   whatIsTitle: 'LexiClashとは？',
   whatIsContent:
-    'LexiClashは、ブラウザでそのまま遊べる無料の対戦型ワードゲームです。共有のレターグリッドでリアルタイムの言葉バトルを楽しもう — 単語を見つけ、コンボを重ね、ランキングを駆け上がれ。BoggleとWordleが合体したような、マルチプレイヤーゲームです。ダウンロード不要、アカウント登録不要。日本語、英語、ヘブライ語、スウェーデン語、スペイン語に対応。',
+    'LexiClashは、ブラウザでそのまま遊べる無料の対戦型ワードゲームです。共有のレターグリッドでリアルタイムの言葉バトルを楽しもう — 単語を見つけ、コンボを重ね、ランキングを駆け上がれ。BoggleとWordleが合体したような、マルチプレイヤーゲームです。ダウンロード不要、アカウント登録不要。日本語、英語、ヘブライ語、スウェーデン語、スペイン語、ロシア語に対応。',
   whatIsShort:
     'ブラウザで遊べる無料の対戦ワードゲーム。単語を探し、コンボをつなぎ、友達を倒そう。ダウンロードも登録も不要。',
   featuresTitle: 'みんながLexiClashを好きな理由',
@@ -537,7 +537,7 @@ const ja: LandingSEOContent = {
   ],
   educationTitle: '学びのために作られた',
   educationContent:
-    'ワードゲームは語彙力を高めスペルを改善する最も効果的な方法のひとつです。AIMS Neuroscienceに掲載された研究によると、言葉パズルは言語処理、ワーキングメモリ、実行機能を担う複数の脳領域を同時に活性化させます。LexiClashはさらに5言語でのゲームプレイを提供し、語学学習者にとって実用的なツールになっています。教師たちは3大陸の教室でLexiClashを使い、語彙ドリルを楽しいものに変えています。マルチプレイヤー形式が健全な競争を生み出し、生徒が自然と語彙を広げるモチベーションになります。',
+    'ワードゲームは語彙力を高めスペルを改善する最も効果的な方法のひとつです。AIMS Neuroscienceに掲載された研究によると、言葉パズルは言語処理、ワーキングメモリ、実行機能を担う複数の脳領域を同時に活性化させます。LexiClashはさらに6言語でのゲームプレイを提供し、語学学習者にとって実用的なツールになっています。教師たちは3大陸の教室でLexiClashを使い、語彙ドリルを楽しいものに変えています。マルチプレイヤー形式が健全な競争を生み出し、生徒が自然と語彙を広げるモチベーションになります。',
   educationStats: [
     { value: '5', label: '言語' },
     { value: '3', label: '大陸' },
@@ -558,7 +558,7 @@ const ja: LandingSEOContent = {
     {
       question: '対応言語は？',
       answer:
-        'LexiClashは日本語、英語、ヘブライ語、スウェーデン語、スペイン語に対応しています。各言語に専用の辞書、デイリーチャレンジ、ランキングがあります。設定メニューからいつでも言語を切り替えられます。',
+        'LexiClashは日本語、英語、ヘブライ語、スウェーデン語、スペイン語、ロシア語に対応しています。各言語に専用の辞書、デイリーチャレンジ、ランキングがあります。設定メニューからいつでも言語を切り替えられます。',
     },
     {
       question: 'スマホで遊べますか？',
@@ -583,13 +583,13 @@ const ja: LandingSEOContent = {
   ],
   communityTitle: '数千人のワードゲーム愛好家と一緒に',
   communityContent:
-    'LexiClashのプレイヤーは40カ国以上、5言語にわたっています。コミュニティに参加して、グローバルランキングで競い、デイリーチャレンジの結果をシェアし、新しいワード戦略を発見しよう。Instagram @lexi.clash でヒント、アップデート、コミュニティハイライトをチェック。',
+    'LexiClashのプレイヤーは40カ国以上、6言語にわたっています。コミュニティに参加して、グローバルランキングで競い、デイリーチャレンジの結果をシェアし、新しいワード戦略を発見しよう。Instagram @lexi.clash でヒント、アップデート、コミュニティハイライトをチェック。',
 };
 
 const es: LandingSEOContent = {
   whatIsTitle: '¿Qué es LexiClash?',
   whatIsContent:
-    'LexiClash es un juego de palabras multijugador gratuito y de ritmo acelerado que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real sobre una cuadrícula de letras compartida — encuentra palabras, construye combos y escala en la clasificación. Es como Boggle se encuentra con Wordle, pero multijugador. Sin descargas, sin registro. Disponible en español, inglés, hebreo, sueco y japonés.',
+    'LexiClash es un juego de palabras multijugador gratuito y de ritmo acelerado que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real sobre una cuadrícula de letras compartida — encuentra palabras, construye combos y escala en la clasificación. Es como Boggle se encuentra con Wordle, pero multijugador. Sin descargas, sin registro. Disponible en español, inglés, hebreo, sueco, japonés y ruso.',
   whatIsShort:
     'Batallas de palabras multijugador gratis en tu navegador. Encuentra palabras, construye combos, aplasta a tus amigos. Sin descargas, sin registro.',
   featuresTitle: 'Por qué los jugadores adoran LexiClash',
@@ -677,7 +677,7 @@ const es: LandingSEOContent = {
   ],
   educationTitle: 'Diseñado para aprender',
   educationContent:
-    'Los juegos de palabras son una de las formas más efectivas de ampliar el vocabulario y mejorar la ortografía. Investigaciones publicadas en AIMS Neuroscience muestran que los rompecabezas de palabras activan múltiples regiones cerebrales simultáneamente — incluidas las responsables del procesamiento del lenguaje, la memoria de trabajo y las funciones ejecutivas. LexiClash va más allá al ofrecer juego en cinco idiomas, convirtiéndolo en una herramienta práctica para quienes aprenden idiomas. Los profesores usan LexiClash en aulas de tres continentes para hacer los ejercicios de vocabulario más entretenidos. El formato multijugador crea una competencia sana que motiva a los estudiantes a ampliar su vocabulario de forma natural.',
+    'Los juegos de palabras son una de las formas más efectivas de ampliar el vocabulario y mejorar la ortografía. Investigaciones publicadas en AIMS Neuroscience muestran que los rompecabezas de palabras activan múltiples regiones cerebrales simultáneamente — incluidas las responsables del procesamiento del lenguaje, la memoria de trabajo y las funciones ejecutivas. LexiClash va más allá al ofrecer juego en seis idiomas, convirtiéndolo en una herramienta práctica para quienes aprenden idiomas. Los profesores usan LexiClash en aulas de tres continentes para hacer los ejercicios de vocabulario más entretenidos. El formato multijugador crea una competencia sana que motiva a los estudiantes a ampliar su vocabulario de forma natural.',
   educationStats: [
     { value: '5', label: 'Idiomas' },
     { value: '3', label: 'Continentes' },
@@ -698,7 +698,7 @@ const es: LandingSEOContent = {
     {
       question: '¿Qué idiomas se admiten?',
       answer:
-        'LexiClash es compatible con español, inglés, hebreo, sueco y japonés. Cada idioma tiene su propio diccionario curado, desafíos diarios y tablas de clasificación. Puedes cambiar de idioma en cualquier momento desde el menú de configuración.',
+        'LexiClash es compatible con español, inglés, hebreo, sueco, japonés y ruso. Cada idioma tiene su propio diccionario curado, desafíos diarios y tablas de clasificación. Puedes cambiar de idioma en cualquier momento desde el menú de configuración.',
     },
     {
       question: '¿Puedo jugar en el móvil?',
@@ -723,7 +723,7 @@ const es: LandingSEOContent = {
   ],
   communityTitle: 'Únete a miles de entusiastas de los juegos de palabras',
   communityContent:
-    'Los jugadores de LexiClash están repartidos en más de 40 países y cinco idiomas. Únete a la comunidad para competir en tablas de clasificación globales, compartir resultados de desafíos diarios y descubrir nuevas estrategias de vocabulario. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y destacados de la comunidad.',
+    'Los jugadores de LexiClash están repartidos en más de 40 países y seis idiomas. Únete a la comunidad para competir en tablas de clasificación globales, compartir resultados de desafíos diarios y descubrir nuevas estrategias de vocabulario. Síguenos en Instagram @lexi.clash para consejos, actualizaciones y destacados de la comunidad.',
 };
 
 const ru: LandingSEOContent = {

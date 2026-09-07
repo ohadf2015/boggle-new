@@ -28,6 +28,8 @@ import {
 } from '@/components/practice';
 import { availableFocuses, parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
 import PracticePicker from '@/components/education/practicePicker/PracticePicker';
+import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
+import type { PracticeVariant } from '@/lib/education/practicePicker';
 // PERF: deep imports, not the '@/components/education' barrel. The barrel
 // statically re-exports EducationHeader, ClassroomGameLobby, TeacherOnboarding,
 // ClassroomLeaderboard, EducationBadgeGrid and AchievementProgressCard, all of
@@ -79,6 +81,10 @@ function PracticeContent({
   const { t } = useLanguage();
   const [selectedMode, setSelectedMode] = useState<PracticeType | null>(initialMode);
   const [selectedFocus, setSelectedFocus] = useState<VocabFocus | null>(initialFocus);
+  // Word Tower records as `solo_board` (no 'word_tower' value exists in the
+  // practice_type CHECK), so the variant is what decides which screen opens.
+  // Client-side only: there is no `?mode=` deep link for it yet.
+  const [selectedVariant, setSelectedVariant] = useState<PracticeVariant | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   // Per-student differentiation: every practice mode below takes its words from here
   // (filtered by the student's classroom level), never from raw `lesson.words`.
@@ -104,15 +110,22 @@ function PracticeContent({
   } = usePracticeSession();
 
   // Handle mode selection
-  const handleSelectMode = useCallback(async (mode: PracticeType, options?: { focus?: VocabFocus }) => {
+  const handleSelectMode = useCallback(async (mode: PracticeType, options?: { focus?: VocabFocus; variant?: PracticeVariant }) => {
     setSelectedMode(mode);
     setSelectedFocus(options?.focus ?? null);
-    await startSession(mode, options);
+    setSelectedVariant(options?.variant ?? null);
+    // The variant is a client-side routing detail; the session still starts as
+    // the practice type the database accepts.
+    await startSession(mode, options?.focus ? { focus: options.focus } : undefined);
   }, [startSession]);
 
   // Handle back to mode selector
   const handleBack = useCallback(() => {
     setSelectedMode(null);
+    // Clear the variant with the mode, or the next plain solo_board tap would
+    // re-open Word Tower instead of the board (Class 2: stale state across a
+    // reset path).
+    setSelectedVariant(null);
   }, []);
 
   // Handle flashcard practice completion
@@ -167,6 +180,23 @@ function PracticeContent({
           />
         );
       case 'solo_board':
+        if (selectedVariant === 'word_tower') {
+          return (
+            <WordTowerPractice
+              words={practiceWords.map((entry) => entry.word)}
+              language={lesson.language}
+              onComplete={async (results) => {
+                await completePracticeSession({
+                  type: 'solo_board',
+                  vocabularyWordsFound: results.vocabularyWordsFound,
+                  newWordsFound: [],
+                });
+                handleBack();
+              }}
+              onBack={handleBack}
+            />
+          );
+        }
         return (
           <SoloPracticeBoard
             {...commonProps}

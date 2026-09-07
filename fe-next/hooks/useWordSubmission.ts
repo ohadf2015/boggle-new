@@ -72,7 +72,7 @@ export interface UseWordSubmissionOptions {
   /** Current combo level for scoring */
   comboLevel?: number;
   /** Translation function */
-  t?: (key: string, params?: Record<string, string | number>) => string;
+  t?: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   /** Called when word is accepted */
   onWordAccepted?: (word: string, score: number, comboBonus: number, fireRoundBonus: number) => void;
   /** Called when word is rejected */
@@ -206,7 +206,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       return {
         blocked: true,
         warning: false,
-        message: t('playerView.tooFast') || 'Too fast! 3s cooldown',
+        message: t('playerView.tooFast', 'Too fast! 3s cooldown'),
       };
     }
 
@@ -214,7 +214,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       return {
         blocked: false,
         warning: true,
-        message: t('playerView.submittingTooFast') || 'Submitting too fast!',
+        message: t('playerView.submittingTooFast', 'Submitting too fast!'),
       };
     }
 
@@ -278,7 +278,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
         ? { ...fw, isValid: false, score: 0 }
         : fw
     ));
-    const msg = t('playerView.invalidWord') || 'Not a valid word';
+    const msg = t('playerView.invalidWord', 'Not a valid word');
     setCurrentFeedback({
       id: `reject-${now}`,
       type: 'rejected',
@@ -364,7 +364,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     // Step 2: Check if word exists on board (uses cached positions map)
     if (!grid || !isWordOnBoard(normalizedWord, grid, language, positionsMapRef.current ?? undefined)) {
-      const msg = t('playerView.wordNotOnBoard') || 'Word not on board';
+      const msg = t('playerView.wordNotOnBoard', 'Word not on board');
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -382,7 +382,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     // Step 3: Check for duplicates
     if (foundWordsSetRef.current.has(normalizedWord)) {
-      const msg = t('playerView.wordAlreadyFound') || 'Already found!';
+      const msg = t('playerView.wordAlreadyFound', 'Already found!');
       setCurrentFeedback({
         id: `duplicate-${now}`,
         type: 'duplicate',

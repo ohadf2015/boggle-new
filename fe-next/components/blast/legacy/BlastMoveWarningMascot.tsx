@@ -5,7 +5,7 @@ import { MASCOT_IMAGES } from './utils/blastMascot';
 
 interface BlastMoveWarningMascotProps {
   movesRemaining: number;
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
 }
 
 export function BlastMoveWarningMascot({ movesRemaining, t }: BlastMoveWarningMascotProps) {
@@ -13,8 +13,8 @@ export function BlastMoveWarningMascot({ movesRemaining, t }: BlastMoveWarningMa
   if (movesRemaining <= 0 || movesRemaining > 3) return null;
 
   const mascotSrc = MASCOT_IMAGES.sweating;
-  const label = t('blast.moveWarning.label') || '';
-  const alt = t('blast.mascot.sweating') || '';
+  const label = t('blast.moveWarning.label', '');
+  const alt = t('blast.mascot.sweating', '') ?? '';
 
   return (
     <div className="absolute top-4 right-4 pointer-events-none z-40 flex flex-col items-center gap-1">

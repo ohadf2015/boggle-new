@@ -5,7 +5,7 @@ import { MASCOT_IMAGES } from './utils/blastMascot';
 
 interface BlastSugarCrushFinaleProps {
   active: boolean;
-  t: (key: string) => string | undefined;
+  t: (key: string, fallback?: string) => string | undefined;
 }
 
 /**
@@ -16,8 +16,8 @@ export function BlastSugarCrushFinale({ active, t }: BlastSugarCrushFinaleProps)
   if (!active) return null;
 
   const mascotSrc = MASCOT_IMAGES.hyped;
-  const title = t('blast.sugarCrush.title') || '';
-  const alt = t('blast.mascot.hyped') || '';
+  const title = t('blast.sugarCrush.title', '');
+  const alt = t('blast.mascot.hyped', '');
 
   return (
     <div className="absolute inset-0 pointer-events-none z-50 flex flex-col items-center justify-center gap-3">

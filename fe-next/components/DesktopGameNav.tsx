@@ -85,7 +85,7 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
     <nav
       data-desktop-game-nav
       className="hidden md:block relative w-full bg-neo-navy/80 border-b-2 border-neo-white/10 shrink-0 z-55"
-      aria-label={t('nav.gameNavigation') || 'Game navigation'}
+      aria-label={t('nav.gameNavigation', 'Game navigation')}
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">

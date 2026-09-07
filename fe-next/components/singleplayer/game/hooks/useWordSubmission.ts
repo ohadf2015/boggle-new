@@ -41,7 +41,7 @@ interface UseWordSubmissionOptions {
   /** Spam detection hook return */
   spamDetection: UseSpamDetectionReturn;
   /** Translation function */
-  t: (key: string, params?: Record<string, string | number>) => string | undefined;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string | undefined;
   /** Sound effects */
   playWordAcceptedSound: () => void;
   playComboSound: (level: number) => void;
@@ -156,7 +156,7 @@ export function useWordSubmission({
       if (spamResult.isCooldown) {
         const msg = spamResult.remainingCooldown
           ? t('playerView.slowDown') || `Slow down! Wait ${spamResult.remainingCooldown}s`
-          : t('playerView.tooFast') || 'Too fast! 3s cooldown';
+          : t('playerView.tooFast', 'Too fast! 3s cooldown');
         setCurrentFeedback({
           id: `spam-${now}`,
           type: 'rejected',
@@ -206,7 +206,7 @@ export function useWordSubmission({
     // Step 2: Check if word exists on board
     const currentGrid = gridRef.current;
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, language)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard') || 'Word not on board';
+      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Word not on board');
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -223,7 +223,7 @@ export function useWordSubmission({
 
     // Step 3: Check for duplicates
     if (foundWordsSetRef.current.has(normalizedWord)) {
-      const alreadyFoundMsg = t('playerView.wordAlreadyFound') || 'Already found!';
+      const alreadyFoundMsg = t('playerView.wordAlreadyFound', 'Already found!');
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -327,7 +327,7 @@ export function useWordSubmission({
       );
       setFoundWords(foundWordsRef.current);
 
-      const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+      const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -392,7 +392,7 @@ export function useWordSubmission({
         );
         setFoundWords(foundWordsRef.current);
 
-        const invalidMsg = t('playerView.invalidWord') || 'Not a valid word';
+        const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
         setCurrentFeedback({
           id: `reject-${errorNow}`,
           type: 'rejected',

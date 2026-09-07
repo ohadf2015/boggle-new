@@ -13,7 +13,7 @@ import type { TournamentData, TournamentStanding } from '@/hooks/gameState/types
 
 interface UsePlayerTournamentEventsProps {
   socket: Socket | null;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
 }
 
 interface TournamentCreatedPayload { tournament: TournamentData }
@@ -45,7 +45,7 @@ export function usePlayerTournamentEvents({
 
     const handleTournamentCreated = (data: TournamentCreatedPayload) => {
       setTournamentData(data.tournament);
-      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: TOAST_ICONS.trophy, duration: 3000 });
+      neoSuccessToast(t('hostView.tournamentCreated', 'Tournament created!'), { icon: TOAST_ICONS.trophy, duration: 3000 });
     };
 
     const handleTournamentRoundStarting = (data: TournamentRoundStartingPayload) => {

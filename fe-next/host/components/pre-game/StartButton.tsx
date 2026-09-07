@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import { m } from 'framer-motion';
-import { Swords } from 'lucide-react';
+import { Swords, Play } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
 // ==================== Props ====================
@@ -17,7 +17,16 @@ interface StartButtonProps {
   className?: string;
   /** Compact single-line layout for mobile */
   compact?: boolean;
+  /**
+   * Translation key for the button copy. Defaults to the arcade "Start Battle!".
+   * Classroom rooms pass a teacher-register key instead ("Start Quiz" / "Start
+   * Game") — a teacher projecting a vocabulary quiz is not starting a battle.
+   */
+  labelKey?: string;
 }
+
+/** The arcade default. Anything else swaps the crossed-swords glyph for a plain play arrow. */
+const DEFAULT_LABEL_KEY = 'hostView.startBattle';
 
 // ==================== Component ====================
 
@@ -30,7 +39,9 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   t,
   className = '',
   compact = false,
+  labelKey = DEFAULT_LABEL_KEY,
 }) {
+  const LabelIcon = labelKey === DEFAULT_LABEL_KEY ? Swords : Play;
   // Compact: single-line start button + status inline
   if (compact) {
     return (
@@ -51,8 +62,8 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
             <span className="text-sm">{t('hostView.creatingTournament')}</span>
           ) : (
             <>
-              <Swords className="w-5 h-5" />
-              <span>{t('hostView.startBattle')}</span>
+              <LabelIcon className="w-5 h-5" />
+              <span>{t(labelKey)}</span>
             </>
           )}
         </m.button>
@@ -85,8 +96,8 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
           <span className="text-lg">{t('hostView.creatingTournament')}</span>
         ) : (
           <>
-            <Swords className="w-6 h-6" />
-            <span>{t('hostView.startBattle')}</span>
+            <LabelIcon className="w-6 h-6" />
+            <span>{t(labelKey)}</span>
           </>
         )}
       </m.button>

@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'Discover how free multilingual word games accelerate vocabulary acquisition. Research-backed strategies for learning Hebrew, English, Swedish, Japanese, and Spanish.',
+  en: 'Discover how free multilingual word games accelerate vocabulary acquisition. Research-backed strategies for learning Hebrew, English, Swedish, Japanese, Spanish, and Russian.',
   he: 'גלו כיצד משחקי מילים רב-לשוניים מאיצים רכישת אוצר מילים. אסטרטגיות מבוססות מחקר ללימוד עברית, אנגלית, שוודית ויפנית.',
   sv: 'Upptäck hur flerspråkiga ordspel påskyndar ordinlärning. Forskningsbaserade strategier för svenska, engelska, hebreiska och japanska.',
   ja: '多言語ワードゲームが語彙習得をどう加速するか発見。ヘブライ語、英語、スウェーデン語、日本語の学習戦略を紹介。',

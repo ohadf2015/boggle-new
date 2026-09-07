@@ -7,6 +7,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,7 +19,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
-import { BookOpen, Award, Activity, Star, Crosshair } from 'lucide-react';
+import { BookOpen, Award, Activity, Star, Crosshair, CalendarClock } from 'lucide-react';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import { readAssignmentFocus, focusPracticeHref } from '@/lib/education/vocabFocus';
 
@@ -86,6 +87,16 @@ export default function StudentLessonView() {
   // student practises at their level, not the whole lesson — otherwise a support
   // student can never reach 100%.
   const { level } = useStudentClassroom();
+
+  // "Is this homework late?" needs the clock, and reading `Date.now()` during
+  // render is impure — the same reason `useTeacherAccess` keeps a ticking
+  // `nowMs`. Sampled once on mount and refreshed hourly, which is far finer
+  // than the day granularity the overdue check actually uses.
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 60 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const activeLessonCount = lessons.filter((l) => l.status !== 'completed').length;
 
@@ -181,6 +192,23 @@ export default function StudentLessonView() {
         // Teacher pinned one vocabulary skill on this assignment → offer it first
         const assignedFocus = readAssignmentFocus(studentLesson.assignment);
 
+        // Homework has to LOOK like homework. Every card rendered identically,
+        // so an assignment with a Friday deadline sat beside optional practice
+        // with nothing to tell them apart — and the due date was already
+        // fetched, just never shown.
+        const assignment = studentLesson.assignment as { due_date?: string | null } | null | undefined;
+        const dueDate = assignment?.due_date ? new Date(assignment.due_date) : null;
+        const hasValidDueDate = !!dueDate && !Number.isNaN(dueDate.getTime());
+        // Compared at day granularity: something due today is not overdue at
+        // 09:00 merely because the timestamp says midnight.
+        const isOverdue =
+          hasValidDueDate && dueDate!.setHours(23, 59, 59, 999) < nowMs;
+        const dueLabel = hasValidDueDate
+          ? new Intl.DateTimeFormat(language, { day: 'numeric', month: 'short' }).format(
+              new Date(assignment!.due_date as string)
+            )
+          : null;
+
         // Card colors per status
         const cardBg =
           status === 'assigned' ? 'bg-neo-navy' : status === 'completed' ? 'bg-neo-lime/10' : 'bg-neo-navy';
@@ -269,6 +297,34 @@ export default function StudentLessonView() {
                           })
                         : `${wordsAtLevel} ${t('student.lessons.words')}`}
                     </span>
+
+                    {/* Assignment markers. Shown only when there really is an
+                        assignment, and the date only when one was set — an
+                        empty or invented deadline is its own small lie. */}
+                    {dueLabel && (
+                      <span
+                        data-testid="assignment-due-badge"
+                        data-overdue={isOverdue ? 'true' : 'false'}
+                        className={cn(
+                          'flex items-center gap-1.5 rounded-neo border-2 border-black px-2 py-0.5 font-black',
+                          isOverdue ? 'bg-neo-pink text-black' : 'bg-neo-cyan text-black'
+                        )}
+                      >
+                        <CalendarClock className="w-4 h-4" aria-hidden="true" />
+                        {isOverdue
+                          ? t('student.lessons.assignment.overdue', { date: dueLabel })
+                          : t('student.lessons.assignment.due', { date: dueLabel })}
+                      </span>
+                    )}
+                    {assignedFocus && (
+                      <span
+                        data-testid="assignment-focus-chip"
+                        className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 font-black text-black"
+                      >
+                        <Crosshair className="w-4 h-4" aria-hidden="true" />
+                        {t(`education.vocabFocus.focus.${assignedFocus}`)}
+                      </span>
+                    )}
 
                     {status !== 'assigned' && progress && (
                       <>

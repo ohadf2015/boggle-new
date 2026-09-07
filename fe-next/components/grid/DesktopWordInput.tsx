@@ -168,12 +168,12 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
               setTypedWord(value);
             }}
             disabled={!enabled}
-            placeholder={t('desktopInput.placeholder') || 'Type a word...'}
+            placeholder={t('desktopInput.placeholder', 'Type a word...')}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
-            aria-label={t('desktopInput.ariaLabel') || 'Type a word to submit'}
+            aria-label={t('desktopInput.ariaLabel', 'Type a word to submit')}
             className={cn(
               'flex-1 bg-transparent outline-hidden font-black text-lg uppercase tracking-wider',
               'text-neo-black placeholder:text-neo-black/30 placeholder:font-bold placeholder:text-sm placeholder:normal-case placeholder:tracking-normal',
@@ -190,7 +190,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
                 exit={{ opacity: 0, scale: 0.5 }}
                 onClick={handleClear}
                 className="p-1 rounded-neo hover:bg-neo-black/10 transition-colors"
-                aria-label={t('common.clear') || 'Clear'}
+                aria-label={t('common.clear', 'Clear')}
                 type="button"
               >
                 <X className="w-4 h-4 text-neo-black/50" />
@@ -209,7 +209,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
                 ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard-pressed hover:shadow-hard-sm hover:-translate-x-px hover:-translate-y-px cursor-pointer'
                 : 'bg-neo-black/10 border-neo-black/20 text-neo-black/30 cursor-not-allowed',
             )}
-            aria-label={t('desktopInput.submit') || 'Submit word'}
+            aria-label={t('desktopInput.submit', 'Submit word')}
             type="button"
           >
             <Send className="w-4 h-4" />
@@ -225,7 +225,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
               exit={{ opacity: 0 }}
               className="text-[10px] text-neo-white text-center mt-1 font-bold"
             >
-              {t('desktopInput.hint') || 'Type letters to find words · Enter to submit · Esc to clear'}
+              {t('desktopInput.hint', 'Type letters to find words · Enter to submit · Esc to clear')}
             </m.p>
           )}
         </AnimatePresence>

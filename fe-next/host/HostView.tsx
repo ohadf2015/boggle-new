@@ -14,6 +14,7 @@ import { useEarthquakeFireRound } from '../hooks/useEarthquakeFireRound';
 import type { Language, PlayerResult } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { GameMode } from '@/shared/types/game';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { useGameMode, useGameModeConfirmed, useHostSelectedGameMode } from '@/hooks/gameState/store';
 import logger from '@/utils/logger';
@@ -106,6 +107,17 @@ interface HostViewProps {
   isQuickPlay?: boolean;
   /** SPA reset to lobby (no reload) — see useHostGameActions.onExitToLobby. */
   onExitToLobby?: () => void;
+  /** Room was opened from the teacher dashboard (`?classroom=true`). */
+  isClassroomMode?: boolean;
+  /**
+   * Mode the teacher fixed in the setup wizard, read from the live classroom
+   * game record (Redis). That record is written when the room is created, so on
+   * the teacher's own first moments the lookup can still 404 — hence the
+   * `lessonData` fallback below, which is the same source `ClassroomModeBanner`
+   * prefers. `LessonData.gameMode` is typed `GameMode` here and cannot carry
+   * `vocab-quiz`, so neither source alone is sufficient.
+   */
+  classroomGameMode?: ClassroomGameMode;
 }
 
 // ==========================================
@@ -126,6 +138,8 @@ const HostView: React.FC<HostViewProps> = memo(({
   isPrivate = false,
   isQuickPlay = false,
   onExitToLobby,
+  isClassroomMode = false,
+  classroomGameMode,
 }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -389,6 +403,13 @@ const HostView: React.FC<HostViewProps> = memo(({
       },
     });
   }, [socket, difficulty, roomLanguage, lessonData, setWordsForBoard]);
+
+  // Two sources, either of which can be the only one present: the live-game
+  // record (every client, but 404s until Redis has the room) and the teacher's
+  // own sessionStorage copy (host only, available immediately). Same precedence
+  // ClassroomModeBanner uses.
+  const resolvedClassroomGameMode: ClassroomGameMode | undefined =
+    (lessonData?.gameMode as ClassroomGameMode | undefined) ?? classroomGameMode;
 
   // Listen for players ready updates
   useEffect(() => {
@@ -752,6 +773,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           username={username}
           t={t}
           playersReady={players.playersReady as any}
+          readyUsernames={playersReadyData?.readyUsernames ?? []}
           timerValue={settings.timerValue}
           difficulty={settings.difficulty}
           onStartGame={actions.startGame}
@@ -759,6 +781,8 @@ const HostView: React.FC<HostViewProps> = memo(({
           tournamentCreating={tournament.tournamentCreating}
           setHostPlaying={state.setHostPlaying}
           onStartSoloDemoWithBots={actions.startSoloDemoWithBots}
+          isClassroomMode={isClassroomMode}
+          classroomGameMode={resolvedClassroomGameMode}
         />
       )}
 

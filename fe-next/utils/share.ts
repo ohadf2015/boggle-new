@@ -30,10 +30,16 @@ export function trackShareCompleted(
 }
 
 /**
- * Translation function type
+ * Translation function type. Matches LanguageContext's real `t(path,
+ * fallbackOrParams?, params?)` signature — the second argument can be
+ * either a plain string fallback or a params object. This was previously
+ * typed as `params` only, which silently forbade the (perfectly valid)
+ * `t(key, 'fallback')` form that replaced the dead `t(key) || 'fallback'`
+ * pattern below.
  */
 type TranslationFunction = (
   key: string,
+  fallbackOrParams?: string | Record<string, string | number>,
   params?: Record<string, string | number>,
 ) => string;
 
@@ -703,7 +709,7 @@ export const shareBoard = (
       });
   } else {
     navigator.clipboard.writeText(message).then(() => {
-      toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+      toast.success(t('share.linkCopied', 'Link copied!'), { duration: 2000, icon: '✅' });
       trackShareCompleted('clipboard', { surface: 'board' });
     }).catch(() => {});
   }
@@ -741,7 +747,7 @@ export const shareWordPack = (
       });
   } else {
     navigator.clipboard.writeText(message).then(() => {
-      toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+      toast.success(t('share.linkCopied', 'Link copied!'), { duration: 2000, icon: '✅' });
       trackShareCompleted('clipboard', { surface: 'word_pack' });
     }).catch(() => {});
   }

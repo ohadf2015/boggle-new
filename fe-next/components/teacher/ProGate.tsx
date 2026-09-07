@@ -21,7 +21,21 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
  * matches Pro's advertised bullets against — a bullet nothing here can refuse is a bullet we
  * are not actually selling.
  */
-export type ProFeature = 'analytics';
+/**
+ * Every Pro surface this gate can stand in front of.
+ *
+ * A runtime array, not a bare type union, because the keys below are built
+ * dynamically (`teacher.proGate.${feature}.title`) and a TYPE is erased before
+ * any test can see it. A static key scan cannot find a template-literal key
+ * either — which is exactly how `teacher.proGate.analytics.title` and `.body`
+ * came to render as raw key paths on the live Assignments screen while every
+ * i18n guard in the repo stayed green. `proGateCopy.contract.test.ts` iterates
+ * THIS array, so adding a feature here fails that test until its copy exists in
+ * all six locales.
+ */
+export const PRO_FEATURES = ['analytics'] as const;
+
+export type ProFeature = (typeof PRO_FEATURES)[number];
 
 interface ProGateProps {
   feature: ProFeature;

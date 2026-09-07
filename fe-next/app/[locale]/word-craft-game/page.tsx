@@ -84,7 +84,7 @@ const faqs = [
   },
   {
     q: 'What languages does WordCraft support?',
-    a: 'WordCraft plays in English, Hebrew (right-to-left), Swedish, Japanese, and Spanish, each with its own tile distribution and dictionary.',
+    a: 'WordCraft plays in English, Hebrew (right-to-left), Swedish, Japanese, Spanish, and Russian, each with its own tile distribution and dictionary.',
   },
 ];
 
@@ -181,7 +181,7 @@ export default async function WordCraftGameLandingPage({ params }: PageProps) {
         <div className="flex whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">
           {Array.from({ length: 2 }).map((_, i) => (
             <span key={i} className="flex shrink-0">
-              {['No download', 'Play in 5s', 'Free forever', 'Claim territory', '5 languages', 'Word strategy'].map((s) => (
+              {['No download', 'Play in 5s', 'Free to play', 'Claim territory', '6 languages', 'Word strategy'].map((s) => (
                 <span key={s} className="mx-4">★ {s}</span>
               ))}
             </span>
@@ -282,7 +282,7 @@ export default async function WordCraftGameLandingPage({ params }: PageProps) {
             'Roguelike Card runs — draft power-ups between rounds',
             'Gem Hunt collection mode for combo hunters',
             'Pass-and-play turn-based on one device',
-            'Plays in 5 languages, including Hebrew (RTL)',
+            'Plays in 6 languages, including Hebrew (RTL)',
           ].map((f) => (
             <li key={f} className="flex items-start gap-3 rounded-neo border-neo border-black bg-neo-navy-light p-4 font-neo-body text-sm shadow-hard">
               <span className="text-neo-lime">✦</span>

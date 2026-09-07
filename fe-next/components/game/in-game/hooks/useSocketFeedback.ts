@@ -87,7 +87,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `duplicate-${Date.now()}`,
         type: 'duplicate',
         word: data.word,
-        message: t('playerView.alreadyFound') || 'Already found',
+        message: t('playerView.alreadyFound', 'Already found'),
         timestamp: Date.now(),
       });
     };
@@ -118,7 +118,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: t('playerView.invalidWord') || 'Invalid word',
+        message: t('playerView.invalidWord', 'Invalid word'),
         timestamp: Date.now(),
       });
       playWordRejectedSound();
@@ -130,7 +130,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: t('playerView.wordTooShort') || 'Too short',
+        message: t('playerView.wordTooShort', 'Too short'),
         timestamp: Date.now(),
       });
       playWordRejectedSound();
