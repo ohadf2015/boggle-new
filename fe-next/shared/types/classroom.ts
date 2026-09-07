@@ -6,6 +6,8 @@
  * the teacher's view and the students' view from drifting apart.
  */
 
+import type { ClassroomTeam } from '../utils/teamBattle';
+
 export interface ClassroomWordCoverage {
   /** The lesson word as the teacher entered it. */
   word: string;
@@ -17,6 +19,23 @@ export interface ClassroomPlayerMastery {
   found: number;
   total: number;
 }
+
+/**
+ * SPED-friendly accessibility flags for a classroom game. Set by the teacher
+ * in the setup wizard, stored on the classroom game, echoed here so every
+ * client renders the same accommodations.
+ */
+export interface ClassroomAccessibility {
+  /** Larger board/word typography on student devices. */
+  largeText?: boolean;
+  /** Sound cues nudged on for the room (student can still mute). */
+  audioCues?: boolean;
+  /** Flat bonus added to every human player's score. */
+  participationPoints?: boolean;
+}
+
+/** Points every human player gets when participationPoints is on. */
+export const PARTICIPATION_BONUS = 10;
 
 export interface ClassroomSummary {
   teacherName: string;
@@ -31,4 +50,10 @@ export interface ClassroomSummary {
   /** How many distinct lesson words the class found between them. */
   classFoundCount: number;
   masteryByPlayer: Record<string, ClassroomPlayerMastery>;
+  /** Present when the teacher ran a team battle: server-dealt rosters. */
+  teamBattle?: { teamCount: number; teams: ClassroomTeam[] };
+  /** Present when the SPED preset awarded a flat participation bonus. */
+  participationBonus?: number;
+  /** Echo of the room's accessibility flags (large type, audio cues). */
+  accessibility?: ClassroomAccessibility;
 }

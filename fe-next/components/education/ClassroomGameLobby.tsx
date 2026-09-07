@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
 import { BookOpen, School } from 'lucide-react';
@@ -30,14 +30,25 @@ import {
   type ClassroomGameMode,
   type PracticeFocusSetting,
 } from '@/shared/types/vocabQuiz';
+import {
+  getPresetValues,
+  applyVocabularyCap,
+  type ClassroomPresetId,
+} from '@/lib/education/classroomPresets';
+import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
+import type { ClassroomAccessibility } from '@/shared/types/classroom';
+import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
+import type { GameMode } from '@/shared/types/game';
 import type { Language } from '@/lib/supabase/education/types';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
+  /** 'repeatLast' → prefill classroom + lessons + settings from the last game. */
+  initialFlow?: string;
   onBack: () => void;
 }
 
-export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLobbyProps) {
+export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: ClassroomGameLobbyProps) {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -75,6 +86,57 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
     () => ({ timerMinutes, boardSize, allowLateJoin: true }),
     [timerMinutes, boardSize]
   );
+
+  // Team battle + SPED accessibility knobs (P0: Friday team battle).
+  const [playStyle, setPlayStyle] = useState<PlayStyle>('ffa');
+  const [teamCount, setTeamCount] = useState<number>(2);
+  const [accessibility, setAccessibility] = useState<ClassroomAccessibility>({});
+  // The preset the teacher last tapped; drives the vocabulary cap note.
+  const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>(null);
+
+  // Repeat-last / quick-start configs (same localStorage the dashboard reads).
+  const { saveConfig, getMostRecent } = useRecentGameSettings();
+
+  const applyPreset = useCallback(
+    (id: ClassroomPresetId) => {
+      const preset = getPresetValues(id);
+      setTimerMinutes(preset.timerMinutes);
+      setBoardSize(preset.boardSize);
+      setMinWordLength(preset.minWordLength);
+      setPlayStyle(preset.playStyle);
+      setTeamCount(preset.teamCount);
+      setAccessibility(preset.accessibility);
+      setActivePreset(id);
+      // The Friday ritual starts from the teacher's LAST list — lessons arrive
+      // newest-first, so the first one is it. Only preselect when nothing is
+      // chosen yet; never yank a deliberate pick.
+      if (id === 'friday-battle') {
+        setSelectedLessonIds((prev) =>
+          prev.length > 0 ? prev : lessons.slice(0, 1).map((l) => l.id)
+        );
+      }
+    },
+    [lessons]
+  );
+
+  // Repeat-last entry (dashboard hero): prefill EVERYTHING from the most
+  // recent config — classroom, lessons, timer, board — so the teacher is one
+  // tap from recreating Friday's room. Runs once lessons+classrooms land.
+  const repeatLastAppliedRef = useRef(false);
+  useEffect(() => {
+    if (initialFlow !== 'repeatLast' || repeatLastAppliedRef.current) return;
+    if (isLoading || classrooms.length === 0) return;
+    const last = getMostRecent();
+    if (!last) return;
+    repeatLastAppliedRef.current = true;
+    if (last.classroomId && classrooms.some((c) => c.id === last.classroomId)) {
+      setSelectedClassroomId(last.classroomId);
+    }
+    const validLessonIds = last.lessonIds.filter((id) => lessons.some((l) => l.id === id));
+    if (validLessonIds.length > 0) setSelectedLessonIds(validLessonIds);
+    if (last.settings?.timerMinutes) setTimerMinutes(last.settings.timerMinutes);
+    if (last.settings?.boardSize) setBoardSize(last.settings.boardSize);
+  }, [initialFlow, isLoading, classrooms, lessons, getMostRecent]);
 
   // Fetch teacher data
   const fetchTeacherData = useCallback(async () => {
@@ -243,13 +305,20 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       return;
     }
 
+    // SPED preset caps the playable vocabulary so the round stays winnable.
+    const presetCap = activePreset ? getPresetValues(activePreset).vocabularyCap : 0;
+    const playableWords = applyVocabularyCap(allPlayableWords, presetCap);
+
     sessionStorage.setItem('lessonGameData', JSON.stringify({
       lessonId: selectedLessonIds.join(','),
       lessonName: selectedLessons.map(l => l.name).join(', '),
-      vocabularyWords: allPlayableWords,
+      vocabularyWords: playableWords,
       language,
       gameMode,
       targetWord,
+      playStyle,
+      teamCount,
+      accessibility,
       templateSettings: {
         timerSeconds: settings.timerMinutes * 60,
         difficulty: settings.boardSize,
@@ -258,6 +327,22 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       },
     }));
 
+    // Feed the dashboard's Quick start / Repeat last heroes — nothing saved
+    // here before this line, which is why those buttons never appeared.
+    saveConfig({
+      id: `${Date.now()}`,
+      classroomId: selectedClassroomId,
+      classroomName: selectedClassroom.name,
+      lessonIds: selectedLessonIds,
+      lessonNames: selectedLessons.map((l) => l.name),
+      settings: {
+        timerMinutes: settings.timerMinutes,
+        boardSize: settings.boardSize,
+        allowLateJoin: settings.allowLateJoin,
+      },
+      savedAt: Date.now(),
+    });
+
     socket.emit('createClassroomGame', {
       gameCode,
       classroomId: selectedClassroomId,
@@ -265,7 +350,7 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       teacherName: profile?.display_name || user.email || 'Teacher',
       lessonIds: selectedLessonIds,
       lessonNames: selectedLessons.map((l) => l.name),
-      vocabularyWords: allPlayableWords,
+      vocabularyWords: playableWords,
       settings: {
         timerMinutes: settings.timerMinutes,
         boardSize: settings.boardSize,
@@ -279,12 +364,18 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
               vocabQuizSeconds,
             }
           : {}),
+        playStyle,
+        teamCount: playStyle === 'teams' ? clampTeamCount(teamCount) : undefined,
+        accessibility: (accessibility.largeText || accessibility.audioCues || accessibility.participationPoints)
+          ? accessibility
+          : undefined,
       },
     });
   }, [
     user, socket, selectedLessonIds, selectedClassroomId, gameCode,
     classrooms, selectedLessons, allPlayableWords, settings, gameMode, targetWord, minWordLength, profile, language, t,
     vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds,
+    playStyle, teamCount, accessibility, activePreset, saveConfig,
   ]);
 
   if (isLoading) {
@@ -364,6 +455,14 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
       timerMinutes={timerMinutes}
       boardSize={boardSize}
       isStarting={isStarting}
+      activePreset={activePreset}
+      playStyle={playStyle}
+      teamCount={teamCount}
+      accessibility={accessibility}
+      onApplyPreset={applyPreset}
+      onPlayStyleChange={(style) => { setPlayStyle(style); setActivePreset(null); }}
+      onTeamCountChange={(count) => { setTeamCount(count); setActivePreset(null); }}
+      onAccessibilityChange={(next) => { setAccessibility(next); setActivePreset(null); }}
       onSelectClassroom={setSelectedClassroomId}
       onSelectLessons={setSelectedLessonIds}
       onGameModeChange={setGameMode}

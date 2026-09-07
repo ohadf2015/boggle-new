@@ -38,6 +38,15 @@ export interface LessonGameData {
   language?: string;
   gameMode?: string;
   targetWord?: string;
+  /** Team battle: free-for-all or teams, with the teacher's team count. */
+  playStyle?: 'ffa' | 'teams';
+  teamCount?: number;
+  /** SPED-friendly accommodations (ride the startGame payload server-side). */
+  accessibility?: {
+    largeText?: boolean;
+    audioCues?: boolean;
+    participationPoints?: boolean;
+  };
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;

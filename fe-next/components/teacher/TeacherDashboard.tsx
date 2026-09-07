@@ -29,6 +29,7 @@ import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import PlayTabFirstRunCard from './PlayTabFirstRunCard';
 import QuickStartButton from './QuickStartButton';
+import RepeatLastGameButton from './RepeatLastGameButton';
 import StudentsPresentStrip from './StudentsPresentStrip';
 import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecentGameSettings';
 import { useClassrooms } from '@/hooks/useClassroom';
@@ -102,6 +103,21 @@ export default function TeacherDashboard() {
     },
     [router, language]
   );
+
+  // Repeat last: the launcher prefills the ENTIRE saved setup (classroom,
+  // lessons, timer, board) — the teacher just confirms. Distinct from quick
+  // start, which only pre-selects the lesson.
+  const handleRepeatLast = useCallback(
+    (_config: GameConfiguration) => {
+      router.push(`/${language}/education/classroom-game?flow=repeatLast`);
+    },
+    [router, language]
+  );
+
+  // "First live game" signal. Analytics/assignments/reports and the trial
+  // banners stay buried until the teacher has actually run a room — the
+  // launcher saves a config at game start, so a saved config == has played.
+  const hasPlayedLiveGame = hasRecentConfig;
 
   const classroomSelect = classrooms.length > 1 ? (
     <div className="flex items-center gap-3 mb-4">

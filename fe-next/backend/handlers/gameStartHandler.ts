@@ -812,10 +812,26 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
 
+    // Classroom rooms carry teacher-chosen team battle + SPED accessibility
+    // settings. They ride the startGame payload so every student's client can
+    // apply them (large type, audio cues) from the first frame — the summary
+    // echo at results time is too late for in-game accommodations.
+    const startPayload = buildStartGamePayload(gameCode, letterGrid, validTimer, gameLang, effectiveMinWordLength, messageId, game.gameSessionId, boardTheme, resolvedMode);
+    const classroomAccessibility = classroomGame?.settings?.accessibility;
+    if (classroomAccessibility && (classroomAccessibility.largeText || classroomAccessibility.audioCues)) {
+      startPayload.accessibility = {
+        largeText: !!classroomAccessibility.largeText,
+        audioCues: !!classroomAccessibility.audioCues,
+      };
+    }
+    if (classroomGame?.settings?.playStyle === 'teams') {
+      startPayload.teamBattle = {
+        teamCount: classroomGame.settings.teamCount ?? 2,
+      };
+    }
+
     // Broadcast start
-    broadcastToRoom(io, getGameRoom(gameCode), 'startGame',
-      buildStartGamePayload(gameCode, letterGrid, validTimer, gameLang, effectiveMinWordLength, messageId, game.gameSessionId, boardTheme, resolvedMode)
-    );
+    broadcastToRoom(io, getGameRoom(gameCode), 'startGame', startPayload);
 
     // Tell word-tower clients the per-player match is initialized so they can
     // (re)pull their tower. Beats the requestTowerState race: the versus hook

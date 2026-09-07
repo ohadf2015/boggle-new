@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { School, BookOpen, Timer, Grid3x3, Eye } from 'lucide-react';
+import { School, BookOpen, Timer, Grid3x3, Eye, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { WizardStep } from '@/components/ui/WizardStep';
@@ -9,6 +9,11 @@ import { StudentViewPreview } from './StudentViewPreview';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { ClassroomGameMode, PracticeFocusSetting } from '@/shared/types/vocabQuiz';
+import { ClassroomBattleSettings } from './ClassroomBattleSettings';
+import { SPED_VOCAB_CAP, type ClassroomPresetId } from '@/lib/education/classroomPresets';
+import type { PlayStyle } from '@/shared/utils/teamBattle';
+import type { ClassroomAccessibility } from '@/shared/types/classroom';
+import type { GameMode } from '@/shared/types/game';
 
 interface ClassroomSetupStepProps {
   classrooms: Classroom[];
@@ -25,6 +30,14 @@ interface ClassroomSetupStepProps {
   timerMinutes: number;
   boardSize: 'small' | 'medium' | 'large';
   isStarting: boolean;
+  activePreset: ClassroomPresetId | null;
+  playStyle: PlayStyle;
+  teamCount: number;
+  accessibility: ClassroomAccessibility;
+  onApplyPreset: (id: ClassroomPresetId) => void;
+  onPlayStyleChange: (style: PlayStyle) => void;
+  onTeamCountChange: (count: number) => void;
+  onAccessibilityChange: (next: ClassroomAccessibility) => void;
   onSelectClassroom: (id: string) => void;
   onSelectLessons: (ids: string[]) => void;
   onGameModeChange: (mode: ClassroomGameMode) => void;
@@ -67,6 +80,14 @@ export function ClassroomSetupStep({
   timerMinutes,
   boardSize,
   isStarting,
+  activePreset,
+  playStyle,
+  teamCount,
+  accessibility,
+  onApplyPreset,
+  onPlayStyleChange,
+  onTeamCountChange,
+  onAccessibilityChange,
   onSelectClassroom,
   onSelectLessons,
   onGameModeChange,
@@ -139,6 +160,42 @@ export function ClassroomSetupStep({
       isLoading={isStarting}
     >
       <div className="space-y-6">
+        {/* Ritual presets — one tap loads a whole configuration */}
+        <div>
+          <div className="block text-neo-white font-bold mb-3">
+            <Sparkles className="w-5 h-5 inline me-2 text-neo-yellow" />
+            {t('teacher.classroom.presets.title')}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {(['friday-battle', 'sped', 'standard'] as ClassroomPresetId[]).map((id) => {
+              const isActive = activePreset === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={isActive}
+                  data-testid={`preset-${id}`}
+                  onClick={() => onApplyPreset(id)}
+                  className={cn(
+                    'px-4 py-3 rounded-neo border-neo border-neo-black transition-all text-start',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2',
+                    isActive
+                      ? 'bg-neo-yellow text-neo-black shadow-hard'
+                      : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                  )}
+                >
+                  <span className="block font-neo-display font-black text-sm">
+                    {t(`teacher.classroom.presets.${id === 'friday-battle' ? 'fridayBattle' : id}.name`)}
+                  </span>
+                  <span className={cn('block text-xs mt-0.5', isActive ? 'text-neo-black/70' : 'text-neo-white/70')}>
+                    {t(`teacher.classroom.presets.${id === 'friday-battle' ? 'fridayBattle' : id}.desc`)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* What is about to happen, in the same words the students will see.
             Reusing one lesson across several classes is intended, so the pair
             is the only thing that identifies this game — showing it here lets a
@@ -211,9 +268,24 @@ export function ClassroomSetupStep({
               <p className="text-neo-white font-bold text-center">
                 {t('education.classroomGame.words', { count: allPlayableWords.length })}
               </p>
+              {activePreset === 'sped' && allPlayableWords.length > SPED_VOCAB_CAP && (
+                <p className="text-neo-white/70 text-xs text-center mt-1" data-testid="sped-vocab-cap-note">
+                  {t('teacher.classroom.support.vocabCapNote', { count: SPED_VOCAB_CAP })}
+                </p>
+              )}
             </div>
           )}
         </div>
+
+        {/* Team battle + SPED support knobs */}
+        <ClassroomBattleSettings
+          playStyle={playStyle}
+          teamCount={teamCount}
+          accessibility={accessibility}
+          onPlayStyleChange={onPlayStyleChange}
+          onTeamCountChange={onTeamCountChange}
+          onAccessibilityChange={onAccessibilityChange}
+        />
 
         {/* Timer */}
         <div>
