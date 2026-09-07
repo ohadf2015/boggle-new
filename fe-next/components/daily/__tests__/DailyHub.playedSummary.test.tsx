@@ -12,6 +12,21 @@ vi.mock('framer-motion', () => ({
   m: new Proxy({}, {
     get: () => ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
   }),
+  // DailyHub mounts StreakHeatBadge, which gates its modal on AnimatePresence.
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+// The streak badge reads the server chest cycle; this suite is about the quest
+// cards, so keep it inert rather than letting it reach for auth + network.
+vi.mock('@/hooks/useWeeklyChest', () => ({
+  useWeeklyChest: () => ({
+    loading: false,
+    daysCompleted: 0,
+    currentStreak: 0,
+    completedDates: [],
+    cycleStart: '',
+    isClaimable: false,
+  }),
 }));
 
 vi.mock('next/link', () => ({

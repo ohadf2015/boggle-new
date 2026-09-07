@@ -7163,6 +7163,21 @@ const ja = {
       "monthlyMaster": "マンスリーマスター",
       "centurion": "センチュリオン"
     },
+    "streakHeat": {
+      "starting": "火花",
+      "hot": "着火",
+      "fire": "燃焼",
+      "epic": "大炎上",
+      "legendary": "溶岩",
+      "mythic": "超新星",
+      "immortal": "永遠の炎",
+      "open": "連続記録を見る",
+      "continue": "つづける"
+    },
+    "streakShare": {
+      "text": "LexiClashで{days}日連続",
+      "button": "自慢する"
+    },
     "weeklyChest": {
       "title": "週間チェスト",
       "dayProgress": "7日中{day}日目",

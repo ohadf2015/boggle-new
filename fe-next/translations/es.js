@@ -7126,6 +7126,21 @@ const es = {
       "monthlyMaster": "Maestro Mensual",
       "centurion": "Centurión"
     },
+    "streakHeat": {
+      "starting": "Chispa",
+      "hot": "Yesca",
+      "fire": "Ardiente",
+      "epic": "Infierno",
+      "legendary": "Fundido",
+      "mythic": "Supernova",
+      "immortal": "Eterno",
+      "open": "Ver tu racha",
+      "continue": "Continuar"
+    },
+    "streakShare": {
+      "text": "{days} días seguidos en LexiClash",
+      "button": "Presúmelo"
+    },
     "weeklyChest": {
       "title": "Cofre semanal",
       "dayProgress": "Día {day} de 7",

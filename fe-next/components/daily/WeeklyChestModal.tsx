@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Coins, Award, X, Snowflake, Sparkles } from 'lucide-react'
+import { Coins, Award, X, Snowflake, Sparkles, Share2, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { safeToLocaleString } from '@/utils/bcp47Locale'
 import { cn } from '@/lib/utils'
@@ -9,12 +9,10 @@ import gsap from 'gsap'
 import { triggerHaptic } from '@/utils/hapticFeedback'
 import { getAssetUrl } from '@/lib/assets/cdn'
 import type { PendingChest } from '@/hooks/useWeeklyChest'
-
-const CHEST_IMAGES: Record<string, string> = {
-  bronze: '/daily/chests/chest-bronze.jpg',
-  silver: '/daily/chests/chest-silver.jpg',
-  gold:   '/daily/chests/chest-gold.jpg',
-}
+import { Mascot } from '@/components/ui/Mascot'
+import { getStreakHeat } from '@/lib/streakHeat'
+import { getStreakTier } from '@/lib/streakTierRewards'
+import { shareStreak } from '@/utils/streakShare'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: 'text-amber-500',
@@ -49,18 +47,37 @@ function playSound(src: string, volume = 0.5) {
 
 interface Props {
   chest: PendingChest
+  /**
+   * The player's day streak, used for the heat backdrop and the share card.
+   * Optional because this modal is mounted from several surfaces; without it
+   * the reward still renders, just without the brag.
+   */
+  streak?: number
   onClose: () => void
 }
 
-export default function WeeklyChestModal({ chest, onClose }: Props) {
+export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) {
   const { t, language } = useLanguage()
-  const chestRef = useRef<HTMLImageElement>(null)
+  const chestRef = useRef<HTMLDivElement>(null)
   const raysRef = useRef<HTMLDivElement>(null)
   const haloRef = useRef<HTMLDivElement>(null)
   const revealRef = useRef<HTMLDivElement>(null)
   const coinNumberRef = useRef<HTMLSpanElement>(null)
   const [canClose, setCanClose] = useState(false)
   const [coinCount, setCoinCount] = useState(0)
+  const [sharing, setSharing] = useState(false)
+
+  // Heat comes from the STREAK, not the chest tier: the chest tier reflects how
+  // well the week was played, the streak reflects how long the habit has held —
+  // and it is the streak the player shares.
+  const heat = getStreakHeat(streak)
+  const tierId = getStreakTier(streak)?.id ?? 'starting'
+
+  const handleShare = () => {
+    if (sharing) return
+    setSharing(true)
+    void shareStreak({ streak, tierId, t, lang: language }).finally(() => setSharing(false))
+  }
 
   const tierKey = chest.tier.charAt(0).toUpperCase() + chest.tier.slice(1)
   const tierLabel = t(`daily.weeklyChest.tier${tierKey}`)
@@ -148,7 +165,13 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
       aria-modal="true"
       aria-label={t('daily.weeklyChest.title')}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-neo-navy/85 backdrop-blur-md"
+      data-testid="chest-backdrop"
+      className="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-md"
+      style={{
+        // Hardcoded dark base under the tier tint — pitfall Class 5: a
+        // lazy-mounted fullscreen overlay must never use a cream/dark pair.
+        background: `radial-gradient(circle at 50% 40%, ${heat.from}cc 0%, rgba(26,26,46,0.92) 70%)`,
+      }}
     >
       <div className="relative flex flex-col items-center gap-5 p-8 max-w-sm w-full">
         {/* Persistent tier-colored halo behind the rewards — fades in during burst, stays. */}
@@ -170,17 +193,16 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
           style={{ background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,225,53,0.14) 20deg, transparent 40deg, rgba(255,225,53,0.14) 60deg, transparent 80deg, rgba(255,225,53,0.14) 100deg, transparent 120deg, rgba(255,225,53,0.14) 140deg, transparent 160deg, rgba(255,225,53,0.14) 180deg, transparent 200deg, rgba(255,225,53,0.14) 220deg, transparent 240deg, rgba(255,225,53,0.14) 260deg, transparent 280deg, rgba(255,225,53,0.14) 300deg, transparent 320deg, rgba(255,225,53,0.14) 340deg, transparent 360deg)' }}
         />
 
-        <Image
-          ref={chestRef}
-          src={CHEST_IMAGES[chest.tier]}
-          alt={`${chest.tier} chest`}
-          width={160}
-          height={160}
-          className="relative z-10"
-          unoptimized
-        />
+        {/* The chest that shakes then flies off. Mascot-styled art so the gift
+            screen matches the rest of the character work. */}
+        <div ref={chestRef} className="relative z-10">
+          <Mascot variant="streakChestClosed" size="lg" animated={false} alt="" />
+        </div>
 
         <div ref={revealRef} className="flex flex-col items-center gap-3 relative z-10">
+          {/* Reveal hero: the mascot bursting out of the open chest. */}
+          <Mascot variant="streakChestOpen" size="lg" animated alt="" />
+
           {/* Tier subtitle */}
           <p className={cn('font-neo-display font-black text-xs uppercase tracking-[0.2em] opacity-80', TIER_COLORS[chest.tier])}>
             {tierLabel} {t('daily.weeklyChest.title')}
@@ -243,6 +265,21 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
             ? `${tierLabel} ${t('daily.weeklyChest.title')} — ${chest.labelKey ? t(chest.labelKey) + ', ' : ''}+${safeToLocaleString(chest.coins, language)} coins${freezes > 0 ? `, +${safeToLocaleString(freezes, language)} streak ${freezes === 1 ? 'freeze' : 'freezes'}` : ''}`
             : ''}
         </div>
+
+        {canClose && streak > 0 && (
+          <button
+            type="button"
+            data-testid="chest-share-button"
+            onClick={handleShare}
+            disabled={sharing}
+            className="mt-3 flex items-center gap-1.5 px-5 py-2 rounded-neo border-2 border-black bg-neo-white text-neo-navy font-neo-display font-black text-sm shadow-hard active:shadow-hard-pressed active:translate-y-px relative z-10 uppercase tracking-wider disabled:opacity-70"
+          >
+            {sharing
+              ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              : <Share2 className="w-4 h-4" aria-hidden="true" />}
+            {t('daily.streakShare.button', 'Show it off')}
+          </button>
+        )}
 
         {canClose && (
           <button

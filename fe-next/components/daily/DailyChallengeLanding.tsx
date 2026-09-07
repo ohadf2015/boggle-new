@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
+import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import type { Language } from '@/types';
@@ -480,7 +481,11 @@ export function DailyChallengeLanding({
       )}
 
       {claimedChest && (
-        <WeeklyChestModal chest={claimedChest} onClose={() => setClaimedChest(null)} />
+        <WeeklyChestModal
+          chest={claimedChest}
+          streak={getDailyStreak().currentStreak}
+          onClose={() => setClaimedChest(null)}
+        />
       )}
 
       {/* Leaderboard Teaser — only render after client-side date hydration */}

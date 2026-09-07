@@ -7402,6 +7402,21 @@ const sv = {
     "milestoneReached": "Milstolpe nådd!",
     "rewardClaimed": "Belöning hämtad!",
     "streakFreezeEarned": "Svitfrysning tjänad!",
+    "streakHeat": {
+      "starting": "Gnista",
+      "hot": "Antänd",
+      "fire": "Brinnande",
+      "epic": "Inferno",
+      "legendary": "Smält",
+      "mythic": "Supernova",
+      "immortal": "Evig",
+      "open": "Visa din streak",
+      "continue": "Fortsätt"
+    },
+    "streakShare": {
+      "text": "{days} dagar i rad på LexiClash",
+      "button": "Visa upp det"
+    },
     "weeklyChest": {
       "title": "Veckokista",
       "dayProgress": "Dag {day} av 7",
