@@ -13665,7 +13665,15 @@ const sv = {
       "unpluggedReteachReveal": "Visa",
       "unpluggedReteachNext": "Nästa",
       "unpluggedReteachPrev": "Föregående",
-      "unpluggedReteachProgress": "Ord {{current}} av {{total}}"
+      "unpluggedReteachProgress": "Ord {{current}} av {{total}}",
+      "shareMissGapPractice": "Dela miss-gap-övningskort",
+      "shareMissGapPracticeCopied": "Övningskortlänk kopierad — klistra in till vårdnadshavare",
+      "shareMissGapPracticeTitle": "Miss-gap-övningskort",
+      "shareMissGapPracticeText": "{{lesson}} — hemläxa miss-gap (skriv ut eller spara PDF): {{missed}}",
+      "missGapPracticeEyebrow": "Hemläxa att öva",
+      "missGapPracticeSubtitle": "Enhetsfri miss-gap-övning efter Unplugged-uppgift i Classroom — öppna, skriv ut eller spara som PDF.",
+      "missGapPracticeFoil": "Kahoot Unplugged har ingen hemläxa — LexiClash har",
+      "missGapPracticePrintPdf": "Skriv ut / spara övnings-PDF",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",

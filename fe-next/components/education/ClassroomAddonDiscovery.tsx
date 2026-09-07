@@ -10,7 +10,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { GraduationCap, Printer, Share2 } from 'lucide-react';
+import { Check, GraduationCap, Printer, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -18,6 +18,8 @@ import {
   type ClassroomAddonContextQuery,
 } from '@/lib/education/googleClassroomAddon';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 
 export interface ClassroomAddonDiscoveryProps {
   locale: string;
@@ -35,6 +37,7 @@ export function ClassroomAddonDiscovery({
   const { t } = useLanguage();
   const [lesson, setLesson] = useState(initialLesson);
   const [missedText, setMissedText] = useState(initialMissedWords.join(', '));
+  const [missGapShareState, setMissGapShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
 
   const assign = useMemo(() => {
     return buildClassroomAddonAssign({
@@ -47,6 +50,36 @@ export function ClassroomAddonDiscovery({
   const streamHref = assign.ok ? assign.streamAssignUrl : null;
   const unpluggedHref = assign.ok ? assign.unpluggedUrl : null;
   const words = assign.ok ? assign.attachment.title : '';
+
+
+  const handleShareMissGapPractice = async () => {
+    if (!assign.ok) return;
+    const missed = missedText
+      .split(/[,;\n]+/)
+      .map((w) => w.trim())
+      .filter(Boolean);
+    if (missed.length === 0) return;
+    const lessonName = lesson.trim() || 'Unplugged reteach';
+    const url = buildMissGapPracticeShareUrl({
+      locale,
+      lessonNames: [lessonName],
+      teacherName: '',
+      found: 0,
+      total: missed.length,
+      missedWords: missed,
+    });
+    const text = t('education.results.shareMissGapPracticeText', {
+      lesson: lessonName,
+      missed: missed.join(', '),
+    });
+    const result = await shareWithFallback({
+      title: t('education.results.shareMissGapPracticeTitle'),
+      text,
+      url,
+      clipboardText: `${text}\n${url}`,
+    });
+    if (result === 'copied' || result === 'shared') setMissGapShareState(result);
+  };
 
   const handlePrint = () => {
     if (!assign.ok) return;
@@ -173,6 +206,31 @@ export function ClassroomAddonDiscovery({
         >
           <Printer className="w-4 h-4" aria-hidden />
           {t('education.results.printPracticeSheet')}
+        </button>
+      )}
+
+      {assign.ok && (
+        <button
+          type="button"
+          data-testid="classroom-addon-share-miss-gap"
+          onClick={handleShareMissGapPractice}
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          {missGapShareState === 'idle' ? (
+            <>
+              <Share2 className="w-4 h-4" aria-hidden />
+              {t('education.results.shareMissGapPractice')}
+            </>
+          ) : (
+            <>
+              <Check className="w-4 h-4" aria-hidden />
+              {t('education.results.shareMissGapPracticeCopied')}
+            </>
+          )}
         </button>
       )}
 

@@ -13419,7 +13419,15 @@ const es = {
       "unpluggedReteachReveal": "Mostrar",
       "unpluggedReteachNext": "Siguiente",
       "unpluggedReteachPrev": "Anterior",
-      "unpluggedReteachProgress": "Palabra {{current}} de {{total}}"
+      "unpluggedReteachProgress": "Palabra {{current}} de {{total}}",
+      "shareMissGapPractice": "Compartir tarjeta de práctica miss-gap",
+      "shareMissGapPracticeCopied": "Enlace de práctica copiado — pégalo para las familias",
+      "shareMissGapPracticeTitle": "Tarjeta de práctica miss-gap",
+      "shareMissGapPracticeText": "{{lesson}} — práctica miss-gap para casa (imprimir o guardar PDF): {{missed}}",
+      "missGapPracticeEyebrow": "Práctica para casa",
+      "missGapPracticeSubtitle": "Práctica miss-gap sin dispositivos tras asignar Unplugged en Classroom — abre, imprime o guarda como PDF.",
+      "missGapPracticeFoil": "Kahoot Unplugged no tiene tarea para casa — LexiClash sí",
+      "missGapPracticePrintPdf": "Imprimir / guardar PDF de práctica",
     },
     "classroomAddon": {
       "eyebrow": "Marketplace de Google Classroom",

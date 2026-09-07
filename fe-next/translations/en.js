@@ -11941,7 +11941,15 @@ const en = {
       "unpluggedReteachReveal": "Reveal",
       "unpluggedReteachNext": "Next",
       "unpluggedReteachPrev": "Previous",
-      "unpluggedReteachProgress": "Word {{current}} of {{total}}"
+      "unpluggedReteachProgress": "Word {{current}} of {{total}}",
+      "shareMissGapPractice": "Share miss-gap practice card",
+      "shareMissGapPracticeCopied": "Practice card link copied — paste for parents",
+      "shareMissGapPracticeTitle": "Miss-gap practice card",
+      "shareMissGapPracticeText": "{{lesson}} — take-home miss-gap practice (print or save PDF): {{missed}}",
+      "missGapPracticeEyebrow": "Take-home practice",
+      "missGapPracticeSubtitle": "Device-free miss-gap practice after Unplugged Classroom assign — open, print, or save as PDF.",
+      "missGapPracticeFoil": "Kahoot Unplugged has no take-home — LexiClash does",
+      "missGapPracticePrintPdf": "Print / save practice PDF",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",

@@ -2,7 +2,8 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import { ClassroomAddonDiscovery } from '../ClassroomAddonDiscovery';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -19,6 +20,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/lib/education/missedWordsPracticeSheet', () => ({
   openMissedWordsPracticeSheet: vi.fn(() => true),
+}));
+
+vi.mock('@/utils/shareWithFallback', () => ({
+  shareWithFallback: vi.fn().mockResolvedValue('copied'),
 }));
 
 describe('ClassroomAddonDiscovery', () => {
@@ -80,5 +85,21 @@ describe('ClassroomAddonDiscovery', () => {
     const arg = vi.mocked(openMissedWordsPracticeSheet).mock.calls[0][0];
     expect(arg.missedWords).toEqual(['neutron']);
     expect(arg.lesson).toContain('Physics 101');
+  });
+
+  it('shares a miss-gap practice card after Unplugged Stream assign is ready', async () => {
+    render(
+      <ClassroomAddonDiscovery
+        locale="en"
+        initialLesson="Physics 101"
+        initialMissedWords={['neutron']}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('classroom-addon-share-miss-gap'));
+    await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
+    const arg = vi.mocked(shareWithFallback).mock.calls[0][0] as { url?: string };
+    expect(arg.url).toContain('https://www.lexiclash.live/en/education/miss-gap-practice');
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
   });
 });

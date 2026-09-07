@@ -23,6 +23,7 @@ import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer } from 'lucid
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
+import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
@@ -48,6 +49,7 @@ export function ClassroomResultsCard({
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
+  const [missGapShareState, setMissGapShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
 
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
@@ -195,6 +197,36 @@ export function ClassroomResultsCard({
         footer: t('education.results.printPracticeSheetFooter'),
       },
     });
+  };
+
+
+  /**
+   * Shareable miss-gap practice card / PDF after Unplugged Classroom assign.
+   * Foil: Kahoot Unplugged has no take-home. Parents get a lexiclash.live link
+   * that prints the #957 practice sheet (Save as PDF). Class words only.
+   */
+  const handleShareMissGapPractice = async () => {
+    if (!isTeacher || summary.missedWords.length === 0) return;
+    const lesson = summary.lessonNames.join(', ');
+    const url = buildMissGapPracticeShareUrl({
+      locale: language,
+      lessonNames: summary.lessonNames,
+      teacherName: summary.teacherName,
+      found: summary.classFoundCount,
+      total: summary.totalWords,
+      missedWords: summary.missedWords,
+    });
+    const text = t('education.results.shareMissGapPracticeText', {
+      lesson,
+      missed: summary.missedWords.join(', '),
+    });
+    const result = await shareWithFallback({
+      title: t('education.results.shareMissGapPracticeTitle'),
+      text,
+      url,
+      clipboardText: `${text}\n${url}`,
+    });
+    if (result === 'copied' || result === 'shared') setMissGapShareState(result);
   };
 
   const handleShareGap = async () => {
@@ -382,6 +414,28 @@ export function ClassroomResultsCard({
             >
               <Printer className="w-4 h-4" aria-hidden />
               {t('education.results.printPracticeSheet')}
+            </button>
+            <button
+              type="button"
+              data-testid="share-miss-gap-practice"
+              onClick={handleShareMissGapPractice}
+              className={cn(
+                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+                'shadow-hard-sm hover:shadow-hard transition-all'
+              )}
+            >
+              {missGapShareState === 'idle' ? (
+                <>
+                  <Share2 className="w-4 h-4" aria-hidden />
+                  {t('education.results.shareMissGapPractice')}
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" aria-hidden />
+                  {t('education.results.shareMissGapPracticeCopied')}
+                </>
+              )}
             </button>
           </div>
         ) : (
