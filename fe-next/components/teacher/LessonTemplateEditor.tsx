@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import * as Dialog from '@radix-ui/react-dialog';
-import { X, Save, Clock, Grid3X3, Type, Users, Zap } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Save, Clock, Grid3X3, Type, Users, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { LessonTemplate, CreateTemplateData, UpdateTemplateData, Difficulty } from '@/hooks/useLessonTemplate';
 
@@ -115,25 +115,16 @@ export default function LessonTemplateEditor({
   const selectedDifficulty = DIFFICULTY_OPTIONS.find((d) => d.value === difficulty);
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-        <Dialog.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-full max-w-lg max-h-[90vh] overflow-y-auto p-6',
-            'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
-          )}
-          dir={isRTL ? 'rtl' : 'ltr'}
-        >
-          <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-lg bg-neo-navy text-neo-white p-6" dir={isRTL ? 'rtl' : 'ltr'} closeButtonLabel={t('common.close')}>
+          <DialogTitle className="text-2xl font-neo-display normal-case text-neo-white mb-6">
             {existingTemplate
               ? t('education.template.edit')
               : t('education.template.create')}
-          </Dialog.Title>
-          <Dialog.Description className="sr-only">
+          </DialogTitle>
+          <DialogDescription className="sr-only">
             {t('education.template.description')}
-          </Dialog.Description>
+          </DialogDescription>
 
           <div className="space-y-6">
             {/* Template Name */}
@@ -294,23 +285,7 @@ export default function LessonTemplateEditor({
             </div>
           </div>
 
-          <Dialog.Close asChild>
-            <button
-              type="button"
-              className={cn(
-                'absolute top-4 text-neo-white hover:text-neo-white',
-                // 44px target: a bare w-5 icon is a ~20px tap area, well under
-                // what the rest of this codebase enforces.
-                'flex min-h-[44px] min-w-[44px] items-center justify-center',
-                isRTL ? 'left-4' : 'right-4'
-              )}
-              aria-label={t('common.close')}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   );
 }

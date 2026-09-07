@@ -1,5 +1,16 @@
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
+/**
+ * Locale-invariant half of the LearningResource block. Only `teaches` is
+ * translated; the rest was repeated verbatim in all six locale objects.
+ */
+const LEARNING = {
+  educationalUse: ['Classroom Activity'],
+  educationalLevel: ['Primary', 'Secondary'],
+  typicalAgeRange: '7-16',
+  timeRequired: 'PT10M',
+};
+
 const EN: EducationLandingContent = {
   accent: 'lime',
   meta: {
@@ -160,11 +171,8 @@ const EN: EducationLandingContent = {
     current: 'Early finishers activities',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'Vocabulary retention, word recognition, independent learning',
-    timeRequired: 'PT10M',
   },
 };
 
@@ -328,11 +336,8 @@ const HE: EducationLandingContent = {
     current: 'פעילויות לתלמידים שמסיימים מוקדם',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'זיכרון מילים, זיהוי מילים, למידה עצמאית',
-    timeRequired: 'PT10M',
   },
 };
 
@@ -496,11 +501,8 @@ const ES: EducationLandingContent = {
     current: 'Actividades para estudiantes que terminan primero',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'Retención de vocabulario, reconocimiento de palabras, aprendizaje independiente',
-    timeRequired: 'PT10M',
   },
 };
 
@@ -664,11 +666,8 @@ const SV: EducationLandingContent = {
     current: 'Aktiviteter för elever som är klara först',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'Ordförrådsminne, ordkännedom, oberoende lärande',
-    timeRequired: 'PT10M',
   },
 };
 
@@ -832,11 +831,8 @@ const JA: EducationLandingContent = {
     current: '課題を終わらせた生徒向けアクティビティ',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: '語彙の定着、単語認識、自主学習',
-    timeRequired: 'PT10M',
   },
 };
 
@@ -1000,11 +996,8 @@ const RU: EducationLandingContent = {
     current: 'Занятия для учеников, закончивших раньше',
   },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '7-16',
+    ...LEARNING,
     teaches: 'Закрепление лексики, узнавание слов, самостоятельное обучение',
-    timeRequired: 'PT10M',
   },
 };
 

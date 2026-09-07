@@ -7,7 +7,7 @@
  * 3. Zero classrooms (loaded, no error): shows first-run card + hides Start Game CTA
  * 4. One+ classrooms (loaded, no error): shows Start Game CTA + hides first-run card
  *
- * CRITICAL: QuickStartButton is also gated on classrooms.length > 0 to prevent
+ * The zero-classroom guard prevents
  * dead-ending with a config but no classroom context to load.
  */
 
@@ -83,14 +83,6 @@ vi.mock('@/components/teacher/ClassroomManager', () => ({
 
 vi.mock('@/components/teacher/LessonBuilder', () => ({
   default: () => <div data-testid="lesson-builder" />,
-}));
-
-vi.mock('@/components/teacher/QuickStartButton', () => ({
-  default: () => <div data-testid="quick-start-button">Quick Start</div>,
-}));
-
-vi.mock('@/components/teacher/dashboard', () => ({
-  DuelMonitoringPanel: () => <div data-testid="duel-monitoring-panel" />,
 }));
 
 vi.mock('@/components/teacher/assignments', () => ({
@@ -280,7 +272,7 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       expect(screen.getByTestId('play-tab-first-run-card')).toBeInTheDocument();
     });
 
-    it('should NOT render Start Game CTA when zero classrooms + loaded + no error', () => {
+    it('should NOT render a generic Start Game CTA when zero classrooms + loaded + no error', () => {
       // GIVEN — zero classrooms are loaded successfully
       mockClassroomsState.isLoading = false;
       mockClassroomsState.classrooms = [];
@@ -293,34 +285,12 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       expect(screen.queryByText('Start Game')).not.toBeInTheDocument();
     });
 
-    it('should NOT render QuickStartButton when zero classrooms (even with recent config)', () => {
-      // GIVEN — zero classrooms, but a recent config exists
-      // (edge case: teacher created a config, then deleted all classrooms)
-      mockHasRecentConfig.value = true;
-      mockGetMostRecent.mockReturnValue({
-        id: 'cfg-1',
-        classroomId: 'cls-1',
-        classroomName: 'Math Class',
-        lessonIds: ['lesson-42'],
-        lessonNames: ['Fractions'],
-        settings: { timerMinutes: 3, boardSize: 'medium', allowLateJoin: true },
-        savedAt: Date.now(),
-      });
-      mockClassroomsState.isLoading = false;
-      mockClassroomsState.classrooms = [];
-      mockClassroomsState.error = null;
-
-      // WHEN
-      render(<TeacherDashboard />);
-
-      // THEN — QuickStartButton is NOT rendered (gated on classrooms.length > 0)
-      // This prevents dead-ending at /education/classroom-game with no classroom context
-      expect(screen.queryByTestId('quick-start-button')).not.toBeInTheDocument();
-    });
   });
 
   describe('one or more classrooms (loaded, no error)', () => {
-    it('should render Start Game CTA when classrooms exist + loaded + no error', () => {
+    // The generic START GAME CTA is gone: every lesson card hosts itself, so the
+    // landing screen shows the lessons instead of one mode-less button.
+    it('should render the lessons when classrooms exist + loaded + no error', () => {
       // GIVEN — one classroom is loaded successfully
       mockClassroomsState.isLoading = false;
       mockClassroomsState.classrooms = [
@@ -339,8 +309,9 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       // WHEN
       render(<TeacherDashboard />);
 
-      // THEN — Start Game button is visible
-      expect(screen.getByText('Start Game')).toBeInTheDocument();
+      // THEN — the lesson list is the landing screen
+      expect(screen.getByTestId('lesson-builder')).toBeInTheDocument();
+      expect(screen.queryByText('Start Game')).not.toBeInTheDocument();
     });
 
     it('should NOT render first-run card when classrooms exist + loaded + no error', () => {
@@ -366,60 +337,6 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       expect(screen.queryByTestId('play-tab-first-run-card')).not.toBeInTheDocument();
     });
 
-    it('should render QuickStartButton when classrooms exist + hasRecentConfig', () => {
-      // GIVEN — one classroom exists AND a recent config is saved
-      mockHasRecentConfig.value = true;
-      mockGetMostRecent.mockReturnValue({
-        id: 'cfg-1',
-        classroomId: 'cls-1',
-        classroomName: 'Math Class',
-        lessonIds: ['lesson-42'],
-        lessonNames: ['Fractions'],
-        settings: { timerMinutes: 3, boardSize: 'medium', allowLateJoin: true },
-        savedAt: Date.now(),
-      });
-      mockClassroomsState.isLoading = false;
-      mockClassroomsState.classrooms = [
-        {
-          id: 'cls-1',
-          name: 'Math Class',
-          language: 'en',
-          teacher_id: 'user1',
-          join_code: 'ABC123',
-          created_at: '2026-01-01',
-          member_count: 5,
-        },
-      ];
-      mockClassroomsState.error = null;
 
-      // WHEN
-      render(<TeacherDashboard />);
-
-      // THEN — QuickStartButton IS rendered (normal path)
-      expect(screen.getByTestId('quick-start-button')).toBeInTheDocument();
-    });
-
-    it('should render Duel Activity when classrooms exist + loaded + no error', () => {
-      // GIVEN — one classroom is loaded successfully
-      mockClassroomsState.isLoading = false;
-      mockClassroomsState.classrooms = [
-        {
-          id: 'cls-1',
-          name: 'Math Class',
-          language: 'en',
-          teacher_id: 'user1',
-          join_code: 'ABC123',
-          created_at: '2026-01-01',
-          member_count: 5,
-        },
-      ];
-      mockClassroomsState.error = null;
-
-      // WHEN
-      render(<TeacherDashboard />);
-
-      // THEN — Duel Activity panel is visible
-      expect(screen.getByTestId('duel-monitoring-panel')).toBeInTheDocument();
-    });
   });
 });

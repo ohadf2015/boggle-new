@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import { hreflangAlternates } from './hreflang';
+import { enOnlyAlternates } from './enOnlyAlternates';
+import type { ClassGameSection } from '@/components/education/ClassGameList';
+import type { DepthSection } from '@/components/education/EducationDepthSections';
+import type { NoAccountCopy } from '@/components/education/NoAccountCta';
 
 /**
  * Shared SEO/GEO plumbing for every education landing page.
@@ -51,11 +55,34 @@ export type EducationFaq = { q: string; a: string };
  * penalise.
  */
 export type EducationSection =
-  | { kind: 'cards'; title: string; intro?: string; items: Array<{ tag?: string; title: string; desc: string }> }
+  | {
+      kind: 'cards';
+      title: string;
+      intro?: string;
+      /** Locale-less href turns the card into a link; `cta` is its visible label. */
+      items: Array<{ tag?: string; title: string; desc: string; href?: string; cta?: string }>;
+    }
   | { kind: 'features'; title: string; intro?: string; items: Array<{ icon: string; text: string }> }
   | { kind: 'steps'; title: string; intro?: string; items: Array<{ step: string; focus: string; activity: string }> }
   | { kind: 'wordlist'; title: string; intro?: string; groups: Array<{ label: string; words: string[] }> }
   | { kind: 'table'; title: string; intro?: string; columns: string[]; rows: string[][] }
+  /**
+   * A numbered listicle of classroom games. The data stays with the page that
+   * owns it — `vocabulary-games-classroom` and `esl-word-games` keep two
+   * deliberately disjoint lists (see their anti-doorway test), so the renderer
+   * takes the section rather than importing either module.
+   */
+  | { kind: 'classgames'; section: ClassGameSection }
+  /**
+   * Mechanism blocks. Every figure in these is asserted against its source
+   * constant by `app/[locale]/education/__tests__/depthSections.test.ts`, so
+   * the data stays with the page that owns it.
+   */
+  | { kind: 'depth'; sections: DepthSection[] }
+  /** Named live/practice formats, counted from the mode registries. */
+  | { kind: 'playformats'; heading: string; intro: string; liveLabel: string; practiceLabel: string }
+  /** A single aside with an outbound link — `href` is absolute, not locale-prefixed. */
+  | { kind: 'note'; heading: string; body: string; href: string; cta: string }
   | { kind: 'prose'; title: string; paragraphs: string[] };
 
 export type EducationLandingContent = {
@@ -66,8 +93,15 @@ export type EducationLandingContent = {
     ogTitle?: string;
     ogDescription?: string;
     twitterDescription?: string;
-    /** Per-locale. Never share one English list across locales. */
-    keywords: string[];
+    /**
+     * Per-locale. Never share one English list across locales.
+     *
+     * The six pages migrated onto this template in R2 still carry one English
+     * comma-separated string each, exactly as they did before the migration —
+     * reflowing it into an array would change the metadata export. Splitting
+     * them into real per-locale lists is a separate, copy-level change.
+     */
+    keywords: string[] | string;
   };
   hero: {
     /**
@@ -76,6 +110,8 @@ export type EducationLandingContent = {
      * above the heading; the heading carries its own weight.
      */
     facts: string[];
+    /** Small rotated badge above the H1, e.g. "* For Teachers * Zero Prep *". */
+    tag?: string;
     h1: { part1: string; highlight: string; part2: string };
     subtitle: string;
     primaryCta: EducationCta;
@@ -85,9 +121,47 @@ export type EducationLandingContent = {
    * Answer-first block. Rendered high on the page and marked `speakable` so AI
    * answer engines have a self-contained passage to quote instead of stitching
    * one together from the marketing copy.
+   *
+   * Optional: three of the pages migrated in R2 never had one, and inventing
+   * the passage would mean writing new marketing copy in six languages. When it
+   * is absent the page emits no `speakable` hint rather than pointing at a
+   * selector that matches nothing.
    */
-  answer: { question: string; answer: string };
+  answer?: { question: string; answer: string };
+  /** Locale-illustrated banner above the H1. Omit for a text-only hero. */
+  heroBanner?: { title: string; subtitle?: string };
+  /** Page-specific wording for the no-account CTA; omit for the shared default. */
+  noAccountCopy?: NoAccountCopy;
   sections: EducationSection[];
+  /**
+   * Scroll-reveal entrance on each section. Off by default and deliberately so:
+   * the entrance tween starts at `opacity-0`, which is the mobile-web flash in
+   * `.claude/rules/60-recurring-pitfalls.md` Class 5. Only the pages that
+   * already shipped it turn it on, so the migration changes nothing.
+   */
+  revealSections?: boolean;
+  /**
+   * Closing CTA band. `position` exists because the pages disagree about it:
+   * three put the band after the related-links rail, one before it.
+   */
+  footerCta?: {
+    heading: string;
+    highlight?: string;
+    body?: string;
+    ctas: EducationCta[];
+    position?: 'beforeRelated' | 'afterRelated';
+  };
+  /**
+   * Index and hreflang in English only. `sight-words-practice` is deliberately
+   * EN-only: its body is English in every locale, so the non-EN variants are
+   * noindexed and the cluster self-references EN rather than declaring
+   * noindexed siblings as alternates. See `lib/seo/enOnlyAlternates.ts`.
+   */
+  enOnlyHreflang?: boolean;
+  /** Footer blocks. Default true keeps the six originally-converted pages as-is. */
+  showTeacherAccessCta?: boolean;
+  showDistrictUpsell?: boolean;
+  districtUpsellHideTeacherCta?: boolean;
   faqs: EducationFaq[];
   /** Localized section labels the template needs but that carry no SEO payload. */
   labels: { faqTitle: string; relatedTitle: string };
@@ -101,7 +175,19 @@ export type EducationLandingContent = {
     teaches: string;
     /** ISO 8601 duration, e.g. `PT5M`. */
     timeRequired?: string;
+    /** Defaults to `meta.title`; one page names the resource more tersely. */
+    name?: string;
+    /** Defaults to `Activity`; pages that are games say so. */
+    learningResourceType?: string;
+    /** Defaults to `teacher`; the student-facing pages say `student`. */
+    educationalRole?: string;
   };
+  /**
+   * Extra JSON-LD nodes this page emitted before it moved onto the template —
+   * `Course`, `HowTo`, `EducationalOrganization`. They are page-specific and
+   * rich-result eligible, so they are carried rather than dropped.
+   */
+  extraJsonLd?: Array<Record<string, unknown> & { '@type': string; '@id'?: string }>;
 };
 
 type BuildArgs = { locale: string; path: string; content: EducationLandingContent };
@@ -123,6 +209,7 @@ export function buildEducationLandingMetadata({ locale, path, content }: BuildAr
 
   // Same map the sitemap emits — see lib/seo/hreflang.ts for why that matters.
   const languages = hreflangAlternates(path);
+  const enOnly = content.enOnlyHreflang === true;
 
   return {
     title: meta.title,
@@ -143,8 +230,11 @@ export function buildEducationLandingMetadata({ locale, path, content }: BuildAr
       description: meta.twitterDescription ?? meta.description,
       images: [image],
     },
-    alternates: { canonical: url, languages },
-    robots: supported ? { index: true, follow: true } : { index: false, follow: true },
+    alternates: enOnly ? enOnlyAlternates(path) : { canonical: url, languages },
+    robots:
+      (enOnly ? locale === 'en' : supported)
+        ? { index: true, follow: true }
+        : { index: false, follow: true },
   };
 }
 
@@ -166,10 +256,16 @@ export function buildEducationLandingJsonLd({ locale, path, content }: BuildArgs
       inLanguage: lang,
       isPartOf: { '@id': `${EDUCATION_BASE_URL}/${lang}/education#org` },
       primaryImageOfPage: heroImage(locale),
-      speakable: {
-        '@type': 'SpeakableSpecification',
-        cssSelector: ['[data-answer]'],
-      },
+      // No answer block on the page means no `[data-answer]` element, so the
+      // hint would point a voice assistant at nothing.
+      ...(answer
+        ? {
+            speakable: {
+              '@type': 'SpeakableSpecification',
+              cssSelector: ['[data-answer]'],
+            },
+          }
+        : {}),
     },
     {
       '@context': 'https://schema.org',
@@ -181,30 +277,37 @@ export function buildEducationLandingJsonLd({ locale, path, content }: BuildArgs
         { '@type': 'ListItem', position: 3, name: breadcrumb.current, item: url },
       ],
     },
-    {
+
+  ];
+
+  // A page whose body is English in every build noindexes its non-EN routes, so
+  // the LearningResource node belongs to /en only — declaring an English resource
+  // on a localized URL is the same lie the `inLanguage` fix removed.
+  if (!content.enOnlyHreflang || locale === 'en') {
+    nodes.push({
       '@context': 'https://schema.org',
       '@type': 'LearningResource',
       '@id': `${url}#resource`,
-      name: meta.title,
-      description: answer.answer,
+      name: learning.name ?? meta.title,
+      description: answer?.answer ?? meta.description,
       url,
       inLanguage: lang,
-      learningResourceType: 'Activity',
+      learningResourceType: learning.learningResourceType ?? 'Activity',
       educationalUse: learning.educationalUse,
       educationalLevel: learning.educationalLevel,
       typicalAgeRange: learning.typicalAgeRange,
       teaches: learning.teaches,
       isAccessibleForFree: true,
       ...(learning.timeRequired ? { timeRequired: learning.timeRequired } : {}),
-      audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
+      audience: { '@type': 'EducationalAudience', educationalRole: learning.educationalRole ?? 'teacher' },
       provider: {
         '@type': 'EducationalOrganization',
         '@id': `${EDUCATION_BASE_URL}/${lang}/education#org`,
         name: 'LexiClash Education',
         url: `${EDUCATION_BASE_URL}/${lang}/education`,
       },
-    },
-  ];
+    });
+  }
 
   if (faqs.length > 0) {
     nodes.push({
@@ -218,6 +321,12 @@ export function buildEducationLandingJsonLd({ locale, path, content }: BuildArgs
         acceptedAnswer: { '@type': 'Answer', text: f.a },
       })),
     });
+  }
+
+  // Page-specific nodes (Course, HowTo, EducationalOrganization) that predate the
+  // template. Appended last so the shared nodes keep their order.
+  for (const extra of content.extraJsonLd ?? []) {
+    nodes.push(extra as JsonLdNode);
   }
 
   return nodes;

@@ -1,5 +1,17 @@
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
+/**
+ * The LearningResource block is identical in all six locales — it carries no
+ * translated copy — so it is declared once.
+ */
+const LEARNING = {
+  educationalUse: ['Classroom Activity', 'Vocabulary Development'],
+  educationalLevel: ['Secondary'],
+  typicalAgeRange: '11-15',
+  teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
+  timeRequired: 'PT15M',
+};
+
 const EN: EducationLandingContent = {
   accent: 'pink',
   meta: {
@@ -232,13 +244,7 @@ const EN: EducationLandingContent = {
     hub: 'Education',
     current: 'Middle School Word Games',
   },
-  learning: {
-    educationalUse: ['Classroom Activity', 'Vocabulary Development'],
-    educationalLevel: ['Secondary'],
-    typicalAgeRange: '11-15',
-    teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
-    timeRequired: 'PT15M',
-  },
+  learning: LEARNING,
 };
 
 const HE: EducationLandingContent = {
@@ -507,13 +513,7 @@ const HE: EducationLandingContent = {
     hub: 'חינוך',
     current: 'משחקי מילים לחטיבת ביניים',
   },
-  learning: {
-    educationalUse: ['Classroom Activity', 'Vocabulary Development'],
-    educationalLevel: ['Secondary'],
-    typicalAgeRange: '11-15',
-    teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
-    timeRequired: 'PT15M',
-  },
+  learning: LEARNING,
 };
 
 const ES: EducationLandingContent = {
@@ -782,13 +782,7 @@ const ES: EducationLandingContent = {
     hub: 'Educación',
     current: 'Juegos de Palabras para Secundaria',
   },
-  learning: {
-    educationalUse: ['Classroom Activity', 'Vocabulary Development'],
-    educationalLevel: ['Secondary'],
-    typicalAgeRange: '11-15',
-    teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
-    timeRequired: 'PT15M',
-  },
+  learning: LEARNING,
 };
 
 const SV: EducationLandingContent = {
@@ -1057,13 +1051,7 @@ const SV: EducationLandingContent = {
     hub: 'Utbildning',
     current: 'Ordspel för Högstadiet',
   },
-  learning: {
-    educationalUse: ['Classroom Activity', 'Vocabulary Development'],
-    educationalLevel: ['Secondary'],
-    typicalAgeRange: '11-15',
-    teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
-    timeRequired: 'PT15M',
-  },
+  learning: LEARNING,
 };
 
 const JA: EducationLandingContent = {
@@ -1332,13 +1320,7 @@ const JA: EducationLandingContent = {
     hub: '教育',
     current: '中学生向けの言葉ゲーム',
   },
-  learning: {
-    educationalUse: ['Classroom Activity', 'Vocabulary Development'],
-    educationalLevel: ['Secondary'],
-    typicalAgeRange: '11-15',
-    teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
-    timeRequired: 'PT15M',
-  },
+  learning: LEARNING,
 };
 
 const RU: EducationLandingContent = {
@@ -1607,13 +1589,7 @@ const RU: EducationLandingContent = {
     hub: 'Образование',
     current: 'Словесные игры для средней школы',
   },
-  learning: {
-    educationalUse: ['Classroom Activity', 'Vocabulary Development'],
-    educationalLevel: ['Secondary'],
-    typicalAgeRange: '11-15',
-    teaches: 'Vocabulary acquisition, lexical recall, academic language, competitive communication',
-    timeRequired: 'PT15M',
-  },
+  learning: LEARNING,
 };
 
 const MAP: Record<string, EducationLandingContent> = {

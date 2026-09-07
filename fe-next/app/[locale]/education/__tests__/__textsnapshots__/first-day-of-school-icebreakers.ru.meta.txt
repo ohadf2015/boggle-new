@@ -1,0 +1,63 @@
+{
+  "title": "Ледокольные игры для первого дня школы | LexiClash",
+  "description": "Словесные игры для класса, где ученики молчат. Игры без давления на первый день—без списков имен, никто не в центре внимания.",
+  "keywords": [
+    "ледокольные игры класс",
+    "игры знакомства ученики",
+    "словесные игры класс",
+    "первый день школы активность",
+    "ледокольные среднюю школу",
+    "представление учеников",
+    "игры класс общения"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "ja": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "es": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+    "en-IL": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "he-IL": "https://www.lexiclash.live/he/education/first-day-of-school-icebreakers",
+    "en-US": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-US": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-GB": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "en-SE": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "sv-SE": "https://www.lexiclash.live/sv/education/first-day-of-school-icebreakers",
+    "en-JP": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "ja-JP": "https://www.lexiclash.live/ja/education/first-day-of-school-icebreakers",
+    "en-ES": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-ES": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-MX": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-MX": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "en-AU": "https://www.lexiclash.live/en/education/first-day-of-school-icebreakers",
+    "es-AR": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "es-CO": "https://www.lexiclash.live/es/education/first-day-of-school-icebreakers",
+    "ru-RU": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers"
+  },
+  "ogTitle": "Ледокольные игры для первого дня школы | LexiClash",
+  "ogDescription": "Словесные игры для класса, где ученики молчат. Игры без давления на первый день—без списков имен, никто не в центре внимания.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/first-day-of-school-icebreakers",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Ледокольные игры для первого дня школы | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Ледокольные игры для первого дня школы | LexiClash",
+  "twDescription": "Словесные игры для класса, где ученики молчат. Игры без давления на первый день—без списков имен, никто не в центре внимания.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

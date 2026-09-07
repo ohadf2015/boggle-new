@@ -1,0 +1,132 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/games-for-teachers#page",
+  "name": "無料単語ゲーム — 先生向け、準備なし | LexiClash",
+  "description": "教室向けの無料ゲーム。準備なし、あなたのリスト、進度追跡。5分、休憩、代講。無料で始められる。",
+  "url": "https://www.lexiclash.live/ja/education/games-for-teachers",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/games-for-teachers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "教育",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "無料単語ゲーム",
+      "item": "https://www.lexiclash.live/ja/education/games-for-teachers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/games-for-teachers#resource",
+  "name": "無料単語ゲーム — 先生向け、準備なし | LexiClash",
+  "description": "教室向けの無料ゲーム。準備なし、あなたのリスト、進度追跡。5分、休憩、代講。無料で始められる。",
+  "url": "https://www.lexiclash.live/ja/education/games-for-teachers",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Formative Assessment",
+    "Vocabulary Building",
+    "Brain Break",
+    "Substitute Teacher Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/games-for-teachers#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "クラスでどんな単語ゲームが使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClashはボグル（文字グリッドから単語を見つける）、ワードホイール（回転するホイールから単語を形成）、ワードハント（隠れた単語を見つけるレース）などのマルチプレイヤー単語ゲームを提供します。すべてのゲームはリアルタイムで語彙、パターン認識、綴りをトレーニングします。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "準備時間はどのくらい必要ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ゼロです。無料アカウントを作成し、語彙リストを選択またはアップロードし、生徒とリンクまたはコードを共有してプレイを開始します。レッスン計画、ワークシート、または教材の準備は不要です。ゲームはChromebook、タブレット、携帯電話で動作します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "自分の語彙リストを使用できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。CSVリストをアップロードするか、組み込みカリキュラムリストを使用するか、両方を混ぜます。教師は語彙を特定のトピック（ユニット、テーマ、言語）にロックでき、クラスや年を通じてリストを再利用できます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生徒の進捗をどのように追跡しますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "クラスダッシュボードは、生徒ごとのスコア、単語の正確さ、速度、エンゲージメント指標をリアルタイムで表示します。クラス、日付範囲、またはゲームタイプ別にレポートをダウンロードします。手動採点は不要です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "代替教師がこれを実行できますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "もちろんです。代替教師とレッスンコードを共有します。生徒がログインしてプレイし、すべての結果があなたのダッシュボードに表示されます。代替授業に最適です—準備は不要です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Chromebook カートまたは特別なハードウェアが必要ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ。ブラウザを備えたすべてのデバイスが機能します：Chromebook、iPad、ラップトップ、または生徒の携帯電話。WiFiが不安定な教室でもキャッシュされたアセットを通じて機能します。"
+      }
+    }
+  ]
+}

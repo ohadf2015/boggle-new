@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
@@ -6,6 +7,8 @@ import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ACCENT, EducationSectionRenderer } from '@/components/education/EducationLandingSections';
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
+import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
+import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import {
   buildEducationLandingJsonLd,
   type EducationLandingContent,
@@ -28,7 +31,37 @@ interface Props {
 export function EducationLandingTemplate({ locale, path, content }: Props) {
   const a = ACCENT[content.accent];
   const jsonLd = buildEducationLandingJsonLd({ locale, path, content });
-  const { hero, answer } = content;
+  const { hero, answer, heroBanner, footerCta, revealSections } = content;
+  const showTeacherCta = content.showTeacherAccessCta ?? true;
+  const showUpsell = content.showDistrictUpsell ?? true;
+
+  const footerCtaBlock = footerCta ? (
+    <section className={`mt-12 mb-12 rounded-neo border-4 border-neo-black ${a.fill} ${a.ink} p-8 shadow-hard-xl sm:p-12`}>
+      <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
+        {footerCta.heading}
+        {footerCta.highlight && (
+          <>
+            <br />
+            <span className={`bg-neo-navy px-3 ${a.text}`}>{footerCta.highlight}</span>
+          </>
+        )}
+      </h2>
+      {footerCta.body && <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">{footerCta.body}</p>}
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        {footerCta.ctas.map((cta, i) => (
+          <Link
+            key={cta.href}
+            href={`/${locale}${cta.href}`}
+            className={`rounded-neo border-4 border-neo-black px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider sm:text-lg ${
+              i === 0 ? `bg-neo-navy ${a.text} shadow-hard-lg` : 'bg-neo-cyan text-neo-navy shadow-hard'
+            }`}
+          >
+            {cta.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  ) : null;
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
@@ -39,7 +72,16 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-6" />
 
-        <header className="max-w-4xl">
+        {heroBanner && (
+          <EducationHeroBanner title={heroBanner.title} subtitle={heroBanner.subtitle} />
+        )}
+
+        <header className={heroBanner ? 'mt-12 max-w-4xl' : 'max-w-4xl'}>
+          {hero.tag && (
+            <span className="mb-5 inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-purple px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white shadow-hard">
+              {hero.tag}
+            </span>
+          )}
           <h1 className="font-neo-display text-[clamp(2.5rem,9vw,5.5rem)] font-black leading-[0.92] tracking-[-0.03em]">
             {hero.h1.part1}{' '}
             {/* No entrance animation on the H1: it is the LCP element, and
@@ -61,7 +103,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
               than in each page so the six teacher-moment landings that share it all
               get the same entry point — the hero CTAs below route to pages that ask
               for an account first. */}
-          <NoAccountCta locale={locale} className="mt-8" />
+          <NoAccountCta locale={locale} className="mt-8" copy={content.noAccountCopy} />
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link
@@ -105,21 +147,30 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           lift it whole; `data-answer` is the selector named by the page's
           SpeakableSpecification.
         */}
-        <section
-          data-answer
-          className={`mt-16 rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-lg sm:p-8`}
-        >
-          <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
-            {answer.question}
-          </h2>
-          <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
-            {answer.answer}
-          </p>
-        </section>
+        {answer && (
+          <section
+            data-answer
+            className={`mt-16 rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-lg sm:p-8`}
+          >
+            <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
+              {answer.question}
+            </h2>
+            <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
+              {answer.answer}
+            </p>
+          </section>
+        )}
 
-        {content.sections.map((section, i) => (
-          <EducationSectionRenderer key={`${section.kind}-${i}`} section={section} accent={content.accent} />
-        ))}
+        {content.sections.map((section, i) => {
+          const rendered = (
+            <EducationSectionRenderer section={section} accent={content.accent} locale={locale} />
+          );
+          return revealSections ? (
+            <ScrollRevealSection key={`${section.kind}-${i}`}>{rendered}</ScrollRevealSection>
+          ) : (
+            <Fragment key={`${section.kind}-${i}`}>{rendered}</Fragment>
+          );
+        })}
 
         {content.faqs.length > 0 && (
           <section className="mt-20 sm:mt-24">
@@ -156,6 +207,8 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           Curation alone produced a one-way silo — the six teacher-moment pages
           were linked from nowhere, footer and hub included.
         */}
+        {footerCta?.position === 'beforeRelated' && footerCtaBlock}
+
         <EducationRelatedLinks
           locale={locale}
           slug={path.replace('/education/', '')}
@@ -163,8 +216,10 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
           count={Math.max(3, content.related.length + 3)}
         />
 
-        <TeacherAccessCTA />
-        <DistrictUpsellStrip hideTeacherCta />
+        {footerCta?.position !== 'beforeRelated' && footerCtaBlock}
+
+        {showTeacherCta && <TeacherAccessCTA />}
+        {showUpsell && <DistrictUpsellStrip hideTeacherCta={content.districtUpsellHideTeacherCta ?? true} />}
       </div>
     </main>
   );

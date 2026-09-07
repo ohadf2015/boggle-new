@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/es/education/middle-school-word-games#page",
+  "name": "Juegos de Palabras para Secundaria | Vocabulario",
+  "description": "Juegos de palabras gratis para aulas de secundaria. Competición real, listas de vocabulario personalizadas, multijugador en vivo—sin email.",
+  "url": "https://www.lexiclash.live/es/education/middle-school-word-games",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/es/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-es.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/es/education/middle-school-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://www.lexiclash.live/es"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Educación",
+      "item": "https://www.lexiclash.live/es/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Juegos de Palabras para Secundaria",
+      "item": "https://www.lexiclash.live/es/education/middle-school-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/es/education/middle-school-word-games#resource",
+  "name": "Juegos de Palabras para Secundaria | Vocabulario",
+  "description": "LexiClash es un juego de palabras gratis basado en navegador donde los estudiantes se unen a aulas en vivo con un código para competir en búsquedas de palabras, desafíos de vocabulario y juegos multijugador en tiempo real. Los maestros obtienen seguimiento de progreso y pueden subir listas de vocabulario personalizadas para cualquier materia. No se requiere correo electrónico.",
+  "url": "https://www.lexiclash.live/es/education/middle-school-word-games",
+  "inLanguage": "es",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Vocabulary Development"
+  ],
+  "educationalLevel": [
+    "Secondary"
+  ],
+  "typicalAgeRange": "11-15",
+  "teaches": "Vocabulary acquisition, lexical recall, academic language, competitive communication",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/es/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/es/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/es/education/middle-school-word-games#faq",
+  "inLanguage": "es",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Los estudiantes necesitan correos electrónicos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Para juegos de clase en vivo, se unen solo con un código. Si quieren rastrear su progreso personal, pueden optar por iniciar sesión, pero no es obligatorio."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo sé qué aprendieron mis estudiantes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tu panel de control muestra precisión por palabra, conteo de intentos y patrones en toda la clase. Exporta informes a tu libreta de calificaciones."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo subir vocabulario personalizado?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Sube una lista de palabras para cualquier tema o examen. LexiClash genera juegos de tus palabras."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿El juego competitivo desmoraliza a los lectores débiles?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depende de cómo lo enmarques. LexiClash te deja ocultar rankings, agrupar estudiantes por nivel, o enfocarse en mejora personal. Los juegos también se mueven rápido, así que una puntuación baja se siente menos vergüenza que un examen fallido."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto dura un juego típico?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La mayoría de los juegos duran 5–15 minutos. Perfecto para un calentamiento o repaso, no un período completo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Hay chat o contenido externo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Los juegos de clase están cerrados solo a tus estudiantes. Sin chat, sin enlaces, sin anuncios externos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Mi escuela lo bloqueará?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash es educativo y generalmente está en lista blanca. Si encuentras un bloqueo, contacta a TI—podemos ayudar a hacer el caso."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿En qué dispositivos funciona?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chromebooks, iPads, teléfonos, laptops y pizarras inteligentes. Sin instalación necesaria. Solo abre el navegador y únete."
+      }
+    }
+  ]
+}

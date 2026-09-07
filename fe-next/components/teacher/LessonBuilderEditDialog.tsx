@@ -1,10 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import WordListEditor from './WordListEditor';
-import * as Dialog from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import type { VocabularyWord, VocabularyLesson } from '@/lib/supabase/education';
 
 interface LessonBuilderEditDialogProps {
@@ -27,22 +25,14 @@ export default function LessonBuilderEditDialog({
   t,
 }: LessonBuilderEditDialogProps) {
   return (
-    <Dialog.Root open={!!editingLesson} onOpenChange={(open) => !open && onClose()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-        <Dialog.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6',
-            'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
-          )}
-        >
-          <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
+    <Dialog open={!!editingLesson} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-2xl bg-neo-navy text-neo-white p-6" closeButtonLabel={t('common.close')}>
+          <DialogTitle className="text-2xl font-neo-display normal-case text-neo-white mb-2 text-balance">
             {t('teacher.lesson.editLesson')}
-          </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white mb-4 text-pretty">
+          </DialogTitle>
+          <DialogDescription className="text-sm text-neo-white mb-4 text-pretty">
             {t('teacher.lesson.dialog.editDescription')}
-          </Dialog.Description>
+          </DialogDescription>
 
           <WordListEditor
             words={editWords}
@@ -69,17 +59,7 @@ export default function LessonBuilderEditDialog({
             </Button>
           </div>
 
-          <Dialog.Close asChild>
-            <button
-              type="button"
-              className="absolute top-4 end-4 text-neo-white hover:text-neo-white"
-              aria-label={t('common.close')}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   );
 }

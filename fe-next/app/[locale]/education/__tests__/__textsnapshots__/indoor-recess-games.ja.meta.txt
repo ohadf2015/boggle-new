@@ -1,0 +1,64 @@
+{
+  "title": "雨の日の室内休み時間ゲーム | LexiClash",
+  "description": "20分の構造化された室内休み時間プラン。無料の単語ゲーム、静かなアクティビティ、すべてのクラスサイズに対応。",
+  "keywords": [
+    "室内休み時間のゲーム",
+    "雨の日のクラス活動",
+    "室内の遊び",
+    "クラス全体のゲーム",
+    "無料の教室ゲーム",
+    "静かな室内ゲーム",
+    "単語ゲーム",
+    "気分転換活動"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "ja": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "es": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru": "https://www.lexiclash.live/ru/education/indoor-recess-games",
+    "en-IL": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "he-IL": "https://www.lexiclash.live/he/education/indoor-recess-games",
+    "en-US": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-US": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-GB": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "en-SE": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/indoor-recess-games",
+    "en-JP": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+    "en-ES": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-ES": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-MX": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-MX": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "en-AU": "https://www.lexiclash.live/en/education/indoor-recess-games",
+    "es-AR": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "es-CO": "https://www.lexiclash.live/es/education/indoor-recess-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/indoor-recess-games"
+  },
+  "ogTitle": "雨の日の室内休み時間ゲーム | LexiClash",
+  "ogDescription": "20分の構造化された室内休み時間プラン。無料の単語ゲーム、静かなアクティビティ、すべてのクラスサイズに対応。",
+  "ogLocale": "ja_JP",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ja/education/indoor-recess-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-ja.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "雨の日の室内休み時間ゲーム | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "雨の日の室内休み時間ゲーム | LexiClash",
+  "twDescription": "20分の構造化された室内休み時間プラン。無料の単語ゲーム、静かなアクティビティ、すべてのクラスサイズに対応。",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-ja.webp"
+  ]
+}

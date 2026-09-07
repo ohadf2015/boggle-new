@@ -1,6 +1,111 @@
 {
-  "generatedAt": "2026-09-05T19:42:01.541Z",
+  "generatedAt": "2026-09-07T14:41:09.376Z",
   "commits": [
+    {
+      "sha": "2bd4c7b9dbfb6717c7ede53dc42248d622257e76",
+      "shortSha": "2bd4c7b",
+      "subject": "feat(education): teacher module — plug-and-play lessons, live-game fixes, reuse pass",
+      "author": "Ohad Fisher",
+      "date": "2026-09-07T18:40:23+04:00"
+    },
+    {
+      "sha": "37de6331513d4869b1d406fc18c90fbb89d89eba",
+      "shortSha": "37de633",
+      "subject": "Merge origin/master into education-gauntlet-2026-09-05",
+      "author": "Ohad Fisher",
+      "date": "2026-09-07T01:38:47+04:00"
+    },
+    {
+      "sha": "0b57a55440cca6d1de21197e29e3266fe9005474",
+      "shortSha": "0b57a55",
+      "subject": "feat(growth): tappable missed dailies, ad-free education, ad fatigue guard, solo progress + next-game picker (#961)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T17:32:35+04:00"
+    },
+    {
+      "sha": "d63993968d2bbe94263e51371bc5b764128ab93b",
+      "shortSha": "d639939",
+      "subject": "feat(education): Teacher Pro ask on hub + public /pricing (#960)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T13:53:05+04:00"
+    },
+    {
+      "sha": "ecc2c3df0bceb836ae99c6d14240ef3b64c70f4c",
+      "shortSha": "ecc2c3d",
+      "subject": "fix(share): LexiClash recap cards, not Wordle letter-squares (#958)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T12:30:58+04:00"
+    },
+    {
+      "sha": "3ca23de8f10de27ca3a9b9e2e3e855f930946438",
+      "shortSha": "3ca23de",
+      "subject": "SEO: daily meta tag improvements (2026-09-06) (#955)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T12:30:54+04:00"
+    },
+    {
+      "sha": "53ce0f4c40ca519bcb931893c68de367881f5f5f",
+      "shortSha": "53ce0f4",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-06",
+      "author": "Ohad Fisher",
+      "date": "2026-09-06T12:19:19+04:00"
+    },
+    {
+      "sha": "486646e1dc9d13cf83fa8b2c244795dc27a34a66",
+      "shortSha": "486646e",
+      "subject": "feat(education): unplugged reteach Live — teacher screen + printable sheet (#959)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T11:38:32+04:00"
+    },
+    {
+      "sha": "069d14d0bb6da0ef6b64cf3c80d10b9f6f9c64a1",
+      "shortSha": "069d14d",
+      "subject": "feat(education): printable missed-words practice sheet after Live (#957)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T09:55:59+04:00"
+    },
+    {
+      "sha": "37d6f47e38268feeeb70711334709ad0342e14f9",
+      "shortSha": "37d6f47",
+      "subject": "fix(education): SSR classroom hero on web first paint (#956)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T09:55:12+04:00"
+    },
+    {
+      "sha": "055afbc6b7dce3569af39b67a28ac6cbb2ceb25c",
+      "shortSha": "055afbc",
+      "subject": "feat(education): Google Classroom assign practice after Live (#954)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T06:21:17+04:00"
+    },
+    {
+      "sha": "095c93718ac2c3498bbbd2378155828c4a8eb5b2",
+      "shortSha": "095c937",
+      "subject": "fix(growth): /es/singleplayer soft-nav 308 dead end (post-#897) (#953)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T05:38:19+04:00"
+    },
+    {
+      "sha": "253df37dd36085742d7470bfeb934e6c3b99f193",
+      "shortSha": "253df37",
+      "subject": "fix(growth): stop dual-emitting bare game_started (t_c7d4f54a) (#952)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T05:35:22+04:00"
+    },
+    {
+      "sha": "3f28507351b2c4779afb09dd9fb3edf6a8d12ddd",
+      "shortSha": "3f28507",
+      "subject": "feat(education): ChatGPT Action OpenAPI for 3-min reteach Live (#951)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T02:45:27+04:00"
+    },
+    {
+      "sha": "940d093398619ac356650ab3f150e40b51f802b7",
+      "shortSha": "940d093",
+      "subject": "feat(education): Google Classroom one-click 3-min reteach Live MVP (#949)",
+      "author": "ohadf2015",
+      "date": "2026-09-06T00:25:38+04:00"
+    },
     {
       "sha": "3552dc107aaa403658a977a3133cc70a5dcc95f6",
       "shortSha": "3552dc1",
@@ -9,137 +114,32 @@
       "date": "2026-09-05T23:22:18+04:00"
     },
     {
-      "sha": "ce21568e526fda4aaf61a0f570ca8f4232586be4",
-      "shortSha": "ce21568",
-      "subject": "fix(admin): stop Teacher Pro grants from hanging until the client gives up (#945)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T13:48:05+04:00"
+      "sha": "6c9d1395464d03d98a22618603aa6836769c6f71",
+      "shortSha": "6c9d139",
+      "subject": "Upload browser source maps to PostHog and guard null pathname in LanguageContext (#934)",
+      "author": "posthog-eu[bot]",
+      "date": "2026-09-05T20:31:11+04:00"
     },
     {
-      "sha": "6e987fc0a7a82a58f68ea4c61d509053062cd144",
-      "shortSha": "6e987fc",
-      "subject": "fix(supabase): apply the ~40 migrations stuck behind the broken CI token (#943)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T13:22:35+04:00"
+      "sha": "4467a9534183859f4110b6a67507828324a4fc51",
+      "shortSha": "4467a95",
+      "subject": "fix(daily): recover from stale-deploy chunk load on daily-mode pages (#935)",
+      "author": "posthog-eu[bot]",
+      "date": "2026-09-05T20:30:42+04:00"
     },
     {
-      "sha": "eeeefa3cedc60456d4b88993781e4c17a9d7ebb2",
-      "shortSha": "eeeefa3",
-      "subject": "fix(education): resolve Teacher Pro grants without a migration-gated RPC (#942)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T12:07:53+04:00"
+      "sha": "86f0e9398fae7d1ca3801cdd0a62d3ea158eed74",
+      "shortSha": "86f0e93",
+      "subject": "fix(fe-next): suppress JSON-LD @context extension TypeError in PostHog filter (#933)",
+      "author": "posthog-eu[bot]",
+      "date": "2026-09-05T19:53:29+04:00"
     },
     {
-      "sha": "d0f2b53f397a2164be455107358d40fb3ae93611",
-      "shortSha": "d0f2b53",
-      "subject": "fix(admin): give Teacher Pro grants a real wall-clock timeout, not just an inert maxDuration (#941)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T10:34:12+03:00"
-    },
-    {
-      "sha": "5a6159206993c92fa6d6f3d6dc3f6a9fac59da87",
-      "shortSha": "5a61592",
-      "subject": "fix(admin): stop Express 30s cap from timing out Teacher Pro grants (#940)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T09:57:00+03:00"
-    },
-    {
-      "sha": "b6b13948b3579a21fd441bc955570e8725a3d84f",
-      "shortSha": "b6b1394",
-      "subject": "feat(admin): Gift Pro entry points from the admin home and Teacher Access page (#939)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T08:42:58+03:00"
-    },
-    {
-      "sha": "d8fe704ca44f188e0cfd6d4aa6320055f3b73814",
-      "shortSha": "d8fe704",
-      "subject": "fix(education): survive a database that has not received the 2026-09-05 migrations (#938)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T08:29:55+03:00"
-    },
-    {
-      "sha": "19c1592f1f08d27d736867fbffbbaa25424b2f80",
-      "shortSha": "19c1592",
-      "subject": "feat(seo): daily meta tag improvements 2026-09-05 (#937)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T08:11:55+03:00"
-    },
-    {
-      "sha": "e1b7b93b39db95da119bb7892bbd42245cf1562c",
-      "shortSha": "e1b7b93",
-      "subject": "feat(education): teacher Pro gifts, Tori's asks, and the classroom persistence fix (#936)",
-      "author": "ohadf2015",
-      "date": "2026-09-05T08:11:19+03:00"
-    },
-    {
-      "sha": "7add65b9ae0fc8240b214e3961771e4d9e4f1916",
-      "shortSha": "7add65b",
-      "subject": "fix(education): students could not join a class or play — two dead ends",
+      "sha": "f6457fe4fd257855ad0df69affd1044d84749ef4",
+      "shortSha": "f6457fe",
+      "subject": "chore(analytics): PostHog Self-driving setup report",
       "author": "Ohad Fisher",
-      "date": "2026-09-04T22:08:54+04:00"
-    },
-    {
-      "sha": "f0634e0da934f3e41a177225f43f2ea4be4136aa",
-      "shortSha": "f0634e0",
-      "subject": "fix(test): stop useBlastEngine.mpGrid renderHook from OOM-looping (#920)",
-      "author": "ohadf2015",
-      "date": "2026-09-04T11:32:06+03:00"
-    },
-    {
-      "sha": "4a005a94f6613e3ea2cf98e61a7f6c43a7144cf3",
-      "shortSha": "4a005a9",
-      "subject": "test(fe-next): cover claim_admin_gift contract on gift claim route (#923)",
-      "author": "ohadf2015",
-      "date": "2026-09-04T11:31:57+03:00"
-    },
-    {
-      "sha": "30e5adc650ee51a23c687bc84295e1fd52bcb801",
-      "shortSha": "30e5adc",
-      "subject": "feat(seo): daily meta tag improvements 2026-09-04 (#931)",
-      "author": "ohadf2015",
-      "date": "2026-09-04T08:13:30+03:00"
-    },
-    {
-      "sha": "773822c7ec8cb0986537f9e2be45e8fdd0d793e4",
-      "shortSha": "773822c",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-04",
-      "author": "Ohad Fisher",
-      "date": "2026-09-04T05:59:06+04:00"
-    },
-    {
-      "sha": "b52f0e758d941de47150758a99c2796d617c7f03",
-      "shortSha": "b52f0e7",
-      "subject": "fix(fe-next): NativeAppProvider vitest no longer leaks App.then UNIMPLEMENTED (#922)",
-      "author": "ohadf2015",
-      "date": "2026-09-04T01:34:14+03:00"
-    },
-    {
-      "sha": "f20d8c84cb50b990c81bfee67ef5b47c3607f8ef",
-      "shortSha": "f20d8c8",
-      "subject": "feat(teacher): lead the Pro upgrade page with the classroom result (#919)",
-      "author": "ohadf2015",
-      "date": "2026-09-03T23:36:03+03:00"
-    },
-    {
-      "sha": "d5b8b4848eabfc90a46a6ab2e49a0a51b79964c0",
-      "shortSha": "d5b8b48",
-      "subject": "fix(android): release script defaulted to the wrong signing key (#918)",
-      "author": "ohadf2015",
-      "date": "2026-09-03T23:35:47+03:00"
-    },
-    {
-      "sha": "bf773d327f8ff793512760a6b0dd66de97ae1f0a",
-      "shortSha": "bf773d3",
-      "subject": "fix(fe-next): replace Chromium interstitial with bundled offline launcher (#917)",
-      "author": "ohadf2015",
-      "date": "2026-09-03T20:34:07+03:00"
-    },
-    {
-      "sha": "0235308c13cd18dec6d690e5122f2c9f40731830",
-      "shortSha": "0235308",
-      "subject": "fix(fe-next): cold-start offline boots from WebView HTTP cache (#916)",
-      "author": "ohadf2015",
-      "date": "2026-09-03T17:25:06+03:00"
+      "date": "2026-09-05T16:57:06+04:00"
     }
   ]
 }

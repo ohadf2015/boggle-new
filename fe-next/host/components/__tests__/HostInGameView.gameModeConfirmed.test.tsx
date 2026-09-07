@@ -60,6 +60,13 @@ vi.mock('@/components/wordhunt/WordHuntGame', () => ({
 vi.mock('@/components/multiplayer/WheelRushView', () => ({
   WheelRushView: () => <div data-testid="wheel-rush-view" />,
 }));
+// The next/dynamic mock above calls importFn() at module evaluation, so every
+// dynamic() in HostInGameView starts a real import chain immediately. WordTower
+// pulls the pixi scene and is still resolving when jsdom tears down —
+// EnvironmentTeardownError, naming whichever module loses the race. Stub it.
+vi.mock('@/components/wordTower/WordTowerVersus', () => ({
+  WordTowerVersus: () => <div data-testid="word-tower-versus" />,
+}));
 vi.mock('@/lib/multiplayer/usePendingWords', () => ({
   usePendingWords: () => ({ pendingWords: new Map(), enqueuePending: vi.fn(), confirmPending: vi.fn(), rejectPending: vi.fn(), dismissPending: vi.fn(), clearAll: vi.fn(), isPending: vi.fn().mockReturnValue(false) }),
 }));

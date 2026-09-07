@@ -1,0 +1,147 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/esl-word-games#page",
+  "name": "Английские словесные игры для класса — 6 языков | LexiClash",
+  "description": "Английские словесные игры для всего класса: ученики входят с телефона по коду из шести символов, доска идёт на проектор, а вы задаёте Поддержку, Базу или Вызов каждому ученику. Шесть языков, без ученических аккаунтов.",
+  "url": "https://www.lexiclash.live/ru/education/esl-word-games",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/esl-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Бесплатные игры английского языка",
+      "item": "https://www.lexiclash.live/ru/education/esl-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/esl-word-games#resource",
+  "name": "Английские словесные игры для класса — 6 языков | LexiClash",
+  "description": "Английские словесные игры для всего класса: ученики входят с телефона по коду из шести символов, доска идёт на проектор, а вы задаёте Поддержку, Базу или Вызов каждому ученику. Шесть языков, без ученических аккаунтов.",
+  "url": "https://www.lexiclash.live/ru/education/esl-word-games",
+  "inLanguage": "ru",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "ESL Practice",
+    "EFL Practice",
+    "Vocabulary Building",
+    "Spelling Practice",
+    "Bilingual Programs"
+  ],
+  "educationalLevel": [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "English vocabulary, spelling, letter patterns, sight-word recognition",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/esl-word-games#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Какие лучшие бесплатные игры английского языка?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash предлагает живые многопользовательские игры по формированию слов: быстрый Boggle, Word Wheel для словарного запаса и Word Hunt для поиска цели. Все игры проходят в реальном времени против одноклассников или AI, что делает обучение конкурентным и интересным."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Нужна ли учащимся учетная запись?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да, учетные записи необходимы, но бесплатны. Учитель создает класс, а ученики присоединяются с простым кодом. Никаких платежей, никогда."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как словесные игры помогают учащимся?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Словесные игры развивают орфографию, распознавание словарного запаса и быстрый вспомнил под давлением — навыки, которые напрямую переходят в беглость. Многопользовательская конкуренция повышает вовлеченность и запоминание, особенно для подростков."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я адаптировать игры для разных уровней?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Учителя загружают свои списки слов и задают каждому ученику Поддержку, Базу или Вызов. Панель класса показывает, какие слова вызывают трудности."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Подходит ли LexiClash для взрослых учащихся ESL/EFL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Абсолютно. Взрослые учащиеся и университетские программы ESL/EFL используют LexiClash для ледокольных игр и закрепления словарного запаса."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я использовать LexiClash в двуязычной программе?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. LexiClash поддерживает шесть языков: Английский, Испанский, Иврит, Шведский, Японский и Русский. Идеально для классов полного погружения и переходных программ."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Английские словесные игры для класса — 6 языков | LexiClash",
+  "description": "Английские словесные игры для всего класса: ученики входят с телефона по коду из шести символов, доска идёт на проектор, а вы задаёте Поддержку, Базу или Вызов каждому ученику. Шесть языков, без ученических аккаунтов.",
+  "url": "https://www.lexiclash.live/ru/education/esl-word-games",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "ru"
+}

@@ -17,6 +17,10 @@ import {
   Zap,
 } from 'lucide-react';
 import type { EducationAccent, EducationSection } from '@/lib/seo/educationLanding';
+import Link from 'next/link';
+import { ClassGameList } from '@/components/education/ClassGameList';
+import { EducationDepthSections } from '@/components/education/EducationDepthSections';
+import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
 
 /**
  * Tailwind v4 only generates classes it can see as literal strings, so every
@@ -56,8 +60,22 @@ const ICONS = {
 
 export type EducationIconName = keyof typeof ICONS;
 
+/**
+ * A content file names a drawn icon (`clock`, `users`, ...). The pages migrated
+ * in R2 shipped literal emoji in that field instead, and the emoji is rendered
+ * text a reader sees — so an unrecognised name is emitted verbatim rather than
+ * silently swapped for a stand-in glyph, which would have deleted eight visible
+ * characters per page.
+ */
 function Icon({ name, className }: { name: string; className?: string }) {
-  const Cmp = ICONS[name as EducationIconName] ?? Sparkles;
+  const Cmp = ICONS[name as EducationIconName];
+  if (!Cmp) {
+    return (
+      <span className="text-xl" aria-hidden>
+        {name}
+      </span>
+    );
+  }
   return <Cmp className={className} strokeWidth={2.5} aria-hidden />;
 }
 
@@ -78,9 +96,12 @@ function Block({ children }: { children: React.ReactNode }) {
 export function EducationSectionRenderer({
   section,
   accent,
+  locale,
 }: {
   section: EducationSection;
   accent: EducationAccent;
+  /** Prefixes any card href; sections are locale-less like the rest of the content. */
+  locale: string;
 }) {
   const a = ACCENT[accent];
 
@@ -110,20 +131,36 @@ export function EducationSectionRenderer({
       <Block>
         <SectionHeading title={section.title} intro={section.intro} />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {section.items.map((u) => (
-            <div
-              key={u.title}
-              className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard"
-            >
-              {u.tag && (
-                <span className={`absolute -top-3 start-4 border-2 border-neo-black ${a.fill} ${a.ink} px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest`}>
-                  {u.tag}
-                </span>
-              )}
-              <h3 className="mt-2 font-neo-display text-base font-black">{u.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neo-white/75">{u.desc}</p>
-            </div>
-          ))}
+          {section.items.map((u) => {
+            const body = (
+              <>
+                {u.tag && (
+                  <span className={`absolute -top-3 start-4 border-2 border-neo-black ${a.fill} ${a.ink} px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest`}>
+                    {u.tag}
+                  </span>
+                )}
+                <h3 className="mt-2 font-neo-display text-base font-black">{u.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neo-white/75">{u.desc}</p>
+                {u.cta && (
+                  <span className={`mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest ${a.text}`}>
+                    {u.cta}
+                  </span>
+                )}
+              </>
+            );
+            const shell = 'relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard';
+            // A card with somewhere to go is a link, not a div with a label that
+            // looks clickable.
+            return u.href ? (
+              <Link key={u.title} href={`/${locale}${u.href}`} className={`group ${shell}`}>
+                {body}
+              </Link>
+            ) : (
+              <div key={u.title} className={shell}>
+                {body}
+              </div>
+            );
+          })}
         </div>
       </Block>
     );
@@ -181,6 +218,45 @@ export function EducationSectionRenderer({
         </div>
       </Block>
     );
+  }
+
+  if (section.kind === 'playformats') {
+    return (
+      <EducationPlayFormats
+        locale={locale}
+        heading={section.heading}
+        intro={section.intro}
+        liveLabel={section.liveLabel}
+        practiceLabel={section.practiceLabel}
+      />
+    );
+  }
+
+  if (section.kind === 'note') {
+    return (
+      <section className="mt-16 rounded-neo border-3 border-neo-black bg-neo-navy-light p-6 shadow-hard sm:p-8">
+        <h2 className={`font-neo-display text-xl font-black uppercase sm:text-2xl ${a.text}`}>{section.heading}</h2>
+        <p className="mt-3 max-w-[68ch] text-sm leading-relaxed text-neo-white/75 sm:text-base">{section.body}</p>
+        <a
+          href={section.href}
+          className="mt-4 inline-block font-neo-display text-sm font-black uppercase tracking-widest text-neo-cyan underline underline-offset-4"
+        >
+          {section.cta} ↗
+        </a>
+      </section>
+    );
+  }
+
+  if (section.kind === 'depth') {
+    // Owns its own headings; a Block/SectionHeading around it would print a
+    // second one.
+    return <EducationDepthSections sections={section.sections} />;
+  }
+
+  if (section.kind === 'classgames') {
+    // The listicle owns its own heading and intro, so it is rendered bare —
+    // wrapping it in a Block/SectionHeading would print a second heading.
+    return <ClassGameList section={section.section} />;
   }
 
   if (section.kind === 'table') {

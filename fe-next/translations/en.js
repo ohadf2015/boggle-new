@@ -11150,6 +11150,7 @@ const en = {
       "insights": "INSIGHTS",
       "viewReports": "View Reports",
       "viewReportsDesc": "View detailed reports and analytics for your classrooms",
+      "tools": "Class tools",
       "studentsPresentTitle": "{count} students are in {classroom} right now",
       "studentsPresentDescription": "Start a game and they drop straight in.",
       "tab": {
@@ -11291,6 +11292,10 @@ const en = {
       }
     },
     "lesson": {
+      "pasteWords": "Paste your word list",
+      "pasteWordsPlaceholder": "One word per line — or separated by commas",
+      "pasteWordsParsed": "{count} words ready",
+      "pasteWordsAdd": "Add {count} words",
       "create": "Create Lesson",
       "edit": "Edit Lesson",
       "delete": "Delete Lesson",
@@ -11702,6 +11707,8 @@ const en = {
       "lockedBadge": "Locked",
       "played": "played {{count}}x",
       "nothingReady": "This lesson has no words yet. Ask your teacher to add some, then come back.",
+      "nextMode": "Next: {{mode}}",
+      "allModes": "All games",
       "skill": {
         "word_tower": "Build words from the letters of this week's list",
         "solo_board": "Find the lesson words in a letter grid",
@@ -12430,6 +12437,8 @@ const en = {
       "searchWords": "Search words",
       "sessionsCompleted": "{{count}} sessions done",
       "soloBoard": "Solo Board",
+      "lessonUnavailable": "Can't open this lesson",
+      "lessonUnavailableBody": "The link may be out of date, or the lesson was removed. Ask your teacher for a new one.",
       "spellTheWord": "Spell it out",
       "spelling": "Spelling",
       "streak": "{{count}} streak",

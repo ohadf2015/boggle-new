@@ -49,6 +49,11 @@ const { mockUseStudentProgress, mockUseStudentClassroom } = vi.hoisted(() => ({
 }));
 vi.mock('@/hooks/useStudentProgress', () => ({ useStudentProgress: () => mockUseStudentProgress() }));
 vi.mock('@/hooks/useStudentClassroom', () => ({ useStudentClassroom: () => mockUseStudentClassroom() }));
+// The wider "what may I practise" source. Empty here: these cases are about
+// how a HOMEWORK card renders, so the second source must not add rows.
+vi.mock('@/hooks/usePracticeLessons', () => ({
+  usePracticeLessons: () => ({ lessons: [], isLoading: false, error: null }),
+}));
 
 import StudentLessonView from '../StudentLessonView';
 

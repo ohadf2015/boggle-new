@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities#page",
+  "name": "פעילויות סוף שנה בכיתה — משחקי מילים",
+  "description": "שמור על תלמידים מעורבים בימים האחרונים של שנת הלימודים. משחקי מילים לא דורשים בדיקה. בחינם להתחיל.",
+  "url": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "פעילויות סוף שנה",
+      "item": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities#resource",
+  "name": "פעילויות סוף שנה בכיתה — משחקי מילים",
+  "description": "השתמש במשחקי מילים של LexiClash—בלי הכנה, בלי בדיקות. צור כיתה, תן לתלמידים קוד הצטרפות, והפעל Boggle, Word Wheel, משחקי Connections או דואלים. בחינם להתחיל.",
+  "url": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+  "inLanguage": "he",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "אוצר מילים, איות, דפוסי מילים, קטגוריזציה, משחק שיתופי",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT30M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "מה המשחק הטוב ביותר לשבוע האחרון של בית הספר?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Boggle וחידות Connections עובדות הכי טוב: בקצב מהיר, בלי מנצחים או מפסידים (רק \"מצאת את המילים?\"), וכל תלמיד משחק בו זמנית."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם התלמידים שלי יכולים למשחק מהבית?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. אם לתלמידים יש מכשירים, הם יכולים להצטרף לכל משחק שאתה מארח על ידי הזנת קוד ההצטרפות. הם לא צריכים דוא\"ל או חשבון."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כמה תלמידים יכולים למשחק בו זמנית?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כל הכיתה. כל מספר של תלמידים יכול להצטרף למשחק ולמשחק ישיר ביחד."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה אם תלמיד מסיים מוקדם?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ב-LexiClash, כל התלמידים משחקים את אותו המשחק בו זמנית, אז אין \"סיום מוקדם.\" הכולם רואים את אותו הלוח ומשחקים עד שהזמן נגמר."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אני יכול לעקוב אחר אילו תלמידים משחקים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. לוח הבקרה של הכיתה שלך מציג השתתפות: מי משחק, כמה משחקים, אילו מילים הם מצאו, וחוקיות המילים בכיתה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם המשחקים מלמדים קריאה או אוצר מילים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. ציד מילים בונה זיהוי דפוסים ואיות. Connections מלמד קטגוריה וקשרים. שניהם מחזקים ידע מילים פעיל ללא דפים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה אם לתלמידים שלי יש רמות קריאה שונות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "רשימות מילים בהתאמה אישית פותרות זאת. השתמש במילים קלות יותר (שלוש עד חמש אותיות) לתלמידים צעירים יותר או קוראים נמוכים יותר; השתמש במילים קשות יותר לתלמידים מתקדמים. כל התלמידים משחקים את אותו המשחק, אך עם מילים מותאמות לרמתם."
+      }
+    }
+  ]
+}

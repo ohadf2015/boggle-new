@@ -13,14 +13,18 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
+import { splitImportLines, DEFINITION_DELIMITER } from './splitImportLines';
+
+// Re-exported: existing tests and callers import the parser from here.
+export { splitImportLines };
 import { containsHebrew, type Language, type VocabularyWord, type VocabularyLevel, type WordMorphology } from '@/lib/supabase/education/types';
 import { sanitizeWord } from '@/shared/utils/wordNormalization';
 import { withBlank } from '@/lib/education/vocabFocus';
 import { stripHyphens } from '@/lib/education/vocabFocusSkills';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import * as Dialog from '@radix-ui/react-dialog';
-import { X, CheckCircle, AlertCircle, Upload, FileUp } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { CheckCircle, AlertCircle, Upload, FileUp } from 'lucide-react';
 
 // ============================================
 // TYPES
@@ -64,40 +68,10 @@ export interface ParsedImportLine {
 // COMPONENT
 // ============================================
 
-// Delimiter pattern: requires spaces around - – — or : to avoid splitting hyphenated words
-const DEFINITION_DELIMITER = /^(.+?)\s+[-–—:]\s+(.+)$/;
 // Extra columns come after ` | ` segments: `syn: a, b | ant: c | ex: The ___ ran. | level: challenge`
 const SEGMENT_SPLIT = /\s*\|\s*/;
 const SEGMENT_KEY = /^([a-z]+)\s*:\s*(.+)$/i;
 const LEVELS: readonly VocabularyLevel[] = ['support', 'core', 'challenge'];
-
-/**
- * A row carries structure — pipe segments, or a `word - definition` pair —
- * rather than being one bare word in a list.
- */
-const isStructuredRow = (text: string): boolean =>
-  text.includes('|') || DEFINITION_DELIMITER.test(text);
-
-/**
- * Turn pasted text into rows.
- *
- * Newlines win when present. Otherwise a SINGLE structured row is kept whole:
- * splitting it on commas cuts it apart at `syn: a, b`, which silently
- * truncated the synonyms and stranded the later segments on a wordless row.
- * Only a plain list of bare words is split on commas or whitespace.
- */
-export function splitImportLines(text: string): string[] {
-  const trimmed = text.trim();
-  if (!trimmed) return [];
-
-  let rows: string[];
-  if (trimmed.includes('\n')) rows = trimmed.split('\n');
-  else if (isStructuredRow(trimmed)) rows = [trimmed];
-  else if (trimmed.includes(',')) rows = trimmed.split(',');
-  else rows = trimmed.split(/\s+/);
-
-  return rows.map((row) => row.trim()).filter((row) => row.length > 0);
-}
 
 /**
  * Roughly how many words a line is trying to carry.
@@ -316,22 +290,14 @@ export default function BulkImportEnhanced({
   if (!isOpen) return null;
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-        <Dialog.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-full max-w-lg max-h-[90vh] overflow-y-auto p-6',
-            'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
-          )}
-        >
-          <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="sm:max-w-lg bg-neo-navy text-neo-white p-6" closeButtonLabel={t('common.close')}>
+          <DialogTitle className="text-2xl font-neo-display normal-case text-neo-white mb-4 text-balance">
             {t('teacher.lesson.bulkImportTitle')}
-          </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white mb-2 text-pretty">
+          </DialogTitle>
+          <DialogDescription className="text-sm text-neo-white mb-2 text-pretty">
             {t('teacher.lesson.bulkImportDescription')}
-          </Dialog.Description>
+          </DialogDescription>
           <p className="text-xs text-neo-white/80 font-neo-body mb-4 text-pretty">
             {t('teacher.wordDetails.importFormatHelp')}
             <code className="block mt-1 px-2 py-1 rounded bg-neo-black/40 text-neo-cyan text-[11px] whitespace-pre-wrap" dir="ltr">
@@ -485,7 +451,12 @@ export default function BulkImportEnhanced({
               >
                 <Upload className="w-4 h-4 me-2" />
                 {t('teacher.lesson.bulkImportButton')}
-                {stats.ready > 0 && ` ${stats.ready} words`}
+                {/* Count the rows the import actually sends, not the subset a
+                    board can build: a word that cannot be built is still kept in
+                    the lesson, so `stats.ready` under-promised by one per such
+                    word ("IMPORT 9 WORDS" for 10 pasted). */}
+                {importableRows.length > 0 &&
+                  ` ${t('teacher.lesson.words', { count: importableRows.length })}`}
               </Button>
               <Button
                 variant="outline"
@@ -497,16 +468,7 @@ export default function BulkImportEnhanced({
             </div>
           </div>
 
-          <Dialog.Close asChild>
-            <button type="button"
-              className="absolute top-4 end-4 text-neo-white hover:text-neo-white"
-              aria-label={t('common.close')}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -23,9 +23,10 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { locales } from '@/i18n/config';
-import { educationLearningResourceJsonLd } from '@/lib/seo/educationLanding';
+import { buildEducationLandingJsonLd, educationLearningResourceJsonLd } from '@/lib/seo/educationLanding';
 import { getEslWordGamesContent } from '../esl-word-games/content';
 import { getVocabClassroomContent } from '../vocabulary-games-classroom/content';
+import { getSightWordsLanding } from '../sight-words-practice/landing';
 import { getSightWordsContent } from '../sight-words-practice/content';
 
 const ROOT = join(__dirname, '..', '..', '..', '..');
@@ -62,17 +63,25 @@ describe('arm 2 — a locale-invariant page emits no LearningResource off /en', 
     }
   });
 
+  /**
+   * Asserted against the emitted nodes, not the page source. The page moved onto
+   * `EducationLandingTemplate` in R2 and no longer names these builders inline —
+   * a source-text assertion would have gone quietly vacuous.
+   */
   it('its LearningResource and HowTo are gated to the English route', () => {
-    const src = readFileSync(
-      join(ROOT, 'app', '[locale]', 'education', 'sight-words-practice', 'page.tsx'),
-      'utf8',
-    );
-    // Both English-only nodes must sit behind the same test `robots` uses.
-    for (const node of ['learningResourceJsonLd', 'howToJsonLd']) {
-      const rendered = new RegExp(String.raw`\{isEnglish && <JsonLd data=\{${node}\} />\}`);
-      expect(src).toMatch(rendered);
-      // and must not ALSO be rendered ungated
-      expect(src).not.toMatch(new RegExp(String.raw`\n\s*<JsonLd data=\{${node}\} />`));
+    const types = (locale: string) =>
+      buildEducationLandingJsonLd({
+        locale,
+        path: '/education/sight-words-practice',
+        content: getSightWordsLanding(locale),
+      }).map((n) => n['@type']);
+
+    expect(types('en')).toContain('LearningResource');
+    expect(types('en')).toContain('HowTo');
+
+    for (const locale of locales.filter((l) => l !== 'en')) {
+      expect(types(locale)).not.toContain('LearningResource');
+      expect(types(locale)).not.toContain('HowTo');
     }
   });
 

@@ -12568,6 +12568,7 @@ const he = {
       "insights": "תובנות",
       "viewReports": "צפה בדוחות",
       "viewReportsDesc": "צפה בדוחות מפורטים ואנליטיקה עבור הכיתות שלך",
+      "tools": "כלי כיתה",
       "studentsPresentTitle": "{count} תלמידים נמצאים עכשיו ב-{classroom}",
       "studentsPresentDescription": "התחילו משחק והם ייכנסו ישר.",
       "tab": {
@@ -12709,6 +12710,10 @@ const he = {
       }
     },
     "lesson": {
+      "pasteWords": "הדביקו את רשימת המילים",
+      "pasteWordsPlaceholder": "מילה אחת בכל שורה — או מופרדות בפסיקים",
+      "pasteWordsParsed": "{count} מילים מוכנות",
+      "pasteWordsAdd": "הוסיפו {count} מילים",
       "create": "צור שיעור",
       "edit": "ערוך שיעור",
       "delete": "מחק שיעור",
@@ -13042,6 +13047,8 @@ const he = {
       "lockedBadge": "נעול",
       "played": "שיחקתם {{count}} פעמים",
       "nothingReady": "אין עדיין מילים בשיעור הזה. בקשו מהמורה להוסיף וחזרו לכאן.",
+      "nextMode": "הבא: {{mode}}",
+      "allModes": "כל המשחקים",
       "skill": {
         "word_tower": "בנו מילים מהאותיות של הרשימה השבועית",
         "solo_board": "מוצאים את מילות השיעור בלוח האותיות",
@@ -13779,6 +13786,8 @@ const he = {
       "searchWords": "חפשו מילים",
       "sessionsCompleted": "{{count}} אימונים בוצעו",
       "soloBoard": "לוח עצמאי",
+      "lessonUnavailable": "אי אפשר לפתוח את השיעור",
+      "lessonUnavailableBody": "ייתכן שהקישור כבר לא בתוקף או שהשיעור נמחק. בקשו מהמורה קישור חדש.",
       "spellTheWord": "איית את המילה",
       "spelling": "כתיב",
       "streak": "רצף {{count}}",

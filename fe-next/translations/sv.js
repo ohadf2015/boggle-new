@@ -12952,6 +12952,7 @@ const sv = {
       "insights": "INSIKTER",
       "viewReports": "Visa rapporter",
       "viewReportsDesc": "Visa detaljerade rapporter och analys för dina klassrum",
+      "tools": "Klassverktyg",
       "studentsPresentTitle": "{count} elever är i {classroom} just nu",
       "studentsPresentDescription": "Starta ett spel så hoppar de rakt in.",
       "tab": {
@@ -13093,6 +13094,10 @@ const sv = {
       }
     },
     "lesson": {
+      "pasteWords": "Klistra in din ordlista",
+      "pasteWordsPlaceholder": "Ett ord per rad – eller separerade med kommatecken",
+      "pasteWordsParsed": "{count} ord klara",
+      "pasteWordsAdd": "Lägg till {count} ord",
       "create": "Skapa lektion",
       "edit": "Redigera lektion",
       "delete": "Ta bort lektion",
@@ -13426,6 +13431,8 @@ const sv = {
       "lockedBadge": "Låst",
       "played": "spelad {{count}} ggr",
       "nothingReady": "Lektionen har inga ord än. Be din lärare lägga till och kom tillbaka.",
+      "nextMode": "Nästa: {{mode}}",
+      "allModes": "Alla spel",
       "skill": {
         "word_tower": "Bygg ord av bokstäverna i veckans lista",
         "solo_board": "Hitta lektionens ord i bokstavsrutan",
@@ -14163,6 +14170,8 @@ const sv = {
       "searchWords": "Sök",
       "sessionsCompleted": "{{count}} slutförda",
       "soloBoard": "Ensamt spel",
+      "lessonUnavailable": "Kan inte öppna lektionen",
+      "lessonUnavailableBody": "Länken kan vara för gammal, eller så är lektionen borttagen. Be din lärare om en ny.",
       "spellTheWord": "Stava ordet",
       "spelling": "Stavning",
       "streak": "{{count}} i rad",

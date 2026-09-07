@@ -1,0 +1,64 @@
+{
+  "title": "Brain Breaks for the Classroom | LexiClash",
+  "description": "Fast word games to reset focus in 1–5 minutes. No prep, works on any screen, whole class at once. Keep learning after sitting.",
+  "keywords": [
+    "brain breaks for classroom",
+    "quick brain break activities",
+    "brain breaks for middle school",
+    "2 minute brain breaks",
+    "no prep brain breaks",
+    "word game activities",
+    "classroom energy activities",
+    "attention reset games"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "es": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/brain-breaks-word-games"
+  },
+  "ogTitle": "Brain Breaks for the Classroom | LexiClash",
+  "ogDescription": "Fast word games to reset focus in 1–5 minutes. No prep, works on any screen, whole class at once. Keep learning after sitting.",
+  "ogLocale": "en_US",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Brain Breaks for the Classroom | LexiClash"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Brain Breaks for the Classroom | LexiClash",
+  "twDescription": "Fast word games to reset focus in 1–5 minutes. No prep, works on any screen, whole class at once. Keep learning after sitting.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

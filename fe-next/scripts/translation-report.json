@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6653,
+    "totalKeysInCode": 6689,
     "keyCountByLanguage": {
-      "en": 12652,
-      "es": 12948,
-      "he": 12853,
-      "ja": 12913,
-      "ru": 12693,
-      "sv": 12909
+      "en": 12765,
+      "es": 13073,
+      "he": 12975,
+      "ja": 13035,
+      "ru": 12807,
+      "sv": 13031
     },
     "missingFromEnglish": 83,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 349,
+      "templateLiterals": 348,
       "fallbackUsages": 1,
-      "variableKeys": 125
+      "variableKeys": 129
     }
   },
   "runtimeRisks": {
@@ -695,14 +695,14 @@
         "pattern": "`blast.pregameBuff.${initialBuff}`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 703,
+        "line": 716,
         "context": "const label = t(`blast.pregameBuff.${initialBuff}`) || initialBuff;"
       },
       {
         "pattern": "`blast.pregameBuff.${initialBuff}Desc`",
         "type": "template_literal",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 704,
+        "line": 717,
         "context": "const desc = t(`blast.pregameBuff.${initialBuff}Desc`) || '';"
       },
       {
@@ -1364,17 +1364,10 @@
         "context": ": t(`education.achievements.${achievement.key}.hint`)}"
       },
       {
-        "pattern": "`education.achievements.tiers.${tier}`",
-        "type": "template_literal",
-        "file": "components/education/AchievementUnlockModal.tsx",
-        "line": 101,
-        "context": "const tierName = t(`education.achievements.tiers.${tier}`);"
-      },
-      {
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 226,
+        "line": 298,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
@@ -1493,7 +1486,7 @@
         "pattern": "`education.practice.mastery.${mastery}`",
         "type": "template_literal",
         "file": "components/education/practicePicker/PracticePicker.tsx",
-        "line": 222,
+        "line": 238,
         "context": "{t(`education.practice.mastery.${mastery}`)}"
       },
       {
@@ -2025,7 +2018,14 @@
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 317,
+        "line": 370,
+        "context": "{t(`education.vocabFocus.focus.${assignedFocus}`)}"
+      },
+      {
+        "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
+        "type": "template_literal",
+        "file": "components/student/StudentLessonView.tsx",
+        "line": 418,
         "context": "{t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) }"
       },
       {
@@ -2039,14 +2039,14 @@
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 50,
+        "line": 87,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 53,
+        "line": 90,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
       },
       {
@@ -2055,13 +2055,6 @@
         "file": "components/teacher/ProWelcomeCelebration.tsx",
         "line": 96,
         "context": "<span className=\"text-sm font-bold text-black\">{t(`teacher.proWelcome.perk.${key}`)}</span>"
-      },
-      {
-        "pattern": "`teacher.dashboard.tab.${tab.id}`",
-        "type": "template_literal",
-        "file": "components/teacher/TeacherDashboard.tsx",
-        "line": 221,
-        "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
       },
       {
         "pattern": "`teacher.lastGame.mode.${key}`",
@@ -2081,21 +2074,21 @@
         "pattern": "`education.vocabFocus.focus.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 238,
+        "line": 251,
         "context": "{t(`education.vocabFocus.focus.${option}`)}"
       },
       {
         "pattern": "`education.vocabFocus.instructions.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 244,
+        "line": 257,
         "context": "skill: t(`education.vocabFocus.instructions.${option}`),"
       },
       {
         "pattern": "`education.vocabFocus.unlock.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 246,
+        "line": 259,
         "context": ": t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}"
       },
       {
@@ -2417,7 +2410,7 @@
         "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
         "type": "template_literal",
         "file": "host/components/HostPreGameView.tsx",
-        "line": 694,
+        "line": 700,
         "context": "{t(`joinView.${"
       },
       {
@@ -2522,6 +2515,14 @@
         "file": "app/[locale]/leaderboard/error.tsx",
         "line": 64,
         "context": "🔄 {t(locale, 'errors.tryAgainButton')}"
+      },
+      {
+        "pattern": "t(CLASSROOM_ROOM_GONE_KEY)",
+        "variable": "CLASSROOM_ROOM_GONE_KEY",
+        "type": "variable_key",
+        "file": "app/[locale]/multiplayer/PageClient.tsx",
+        "line": 262,
+        "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
       },
       {
         "pattern": "t(locale)",
@@ -2864,16 +2865,16 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 361,
-        "context": "const tSafe = useCallback((key: string) => t(key) || key, [t]);"
+        "line": 366,
+        "context": "(key: string, fallbackOrParams?: string | Record<string, string | number>) => t(key, fallbackOrParam"
       },
       {
         "pattern": "t(key)",
         "variable": "key",
         "type": "variable_key",
         "file": "components/blast/legacy/BlastGame.tsx",
-        "line": 436,
-        "context": "const tAdapter = useCallback((key: string) => t(key) || undefined, [t]);"
+        "line": 449,
+        "context": "const tAdapter = useCallback((key: string, fallback?: string) => t(key, fallback) || undefined, [t])"
       },
       {
         "pattern": "t(key)",
@@ -2952,7 +2953,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 229,
+        "line": 246,
         "context": "{t(labelKey)}"
       },
       {
@@ -2960,7 +2961,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 264,
+        "line": 281,
         "context": "{t(labelKey)}"
       },
       {
@@ -3042,6 +3043,14 @@
         "file": "components/leagues/LeagueCard.tsx",
         "line": 52,
         "context": "{t(tierKey)}"
+      },
+      {
+        "pattern": "t(error)",
+        "variable": "error",
+        "type": "variable_key",
+        "file": "components/multiplayer/ClassroomJoinNamePrompt.tsx",
+        "line": 106,
+        "context": "{t(error)}"
       },
       {
         "pattern": "t(nameError)",
@@ -3380,6 +3389,22 @@
         "context": "<p className=\"text-sm text-neo-black/70\">{t(presetDescKey)}</p>"
       },
       {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/StartButton.tsx",
+        "line": 66,
+        "context": "<span>{t(labelKey)}</span>"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/StartButton.tsx",
+        "line": 100,
+        "context": "<span>{t(labelKey)}</span>"
+      },
+      {
         "pattern": "t(nameKey)",
         "variable": "nameKey",
         "type": "variable_key",
@@ -3424,7 +3449,7 @@
         "variable": "defaultKey",
         "type": "variable_key",
         "file": "lib/multiplayer/resolveHostLeftMessage.ts",
-        "line": 31,
+        "line": 35,
         "context": "if (defaultKey) return t(defaultKey);"
       },
       {
@@ -3447,7 +3472,7 @@
         "pattern": "t(defaultKey)",
         "variable": "defaultKey",
         "file": "lib/multiplayer/resolveHostLeftMessage.ts",
-        "line": 31,
+        "line": 35,
         "context": "if (defaultKey) return t(defaultKey);",
         "type": "variable_key"
       },
@@ -3472,7 +3497,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "utils/socketErrorMessage.ts",
-        "line": 25,
+        "line": 27,
         "context": "const translated = t(key);"
       }
     ]
@@ -4312,19 +4337,7 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta",
-      "sealedBid.session.cashOut",
-      "sealedBid.session.chips",
-      "sealedBid.session.coins"
+      "vs.bestFor"
     ],
     "he": [
       "sealedBidLegacy.chipStack",
@@ -4356,16 +4369,7 @@
       "seo.quickPlay.title",
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
-      "seo.quickPlay.ogDescription",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta"
+      "seo.quickPlay.ogDescription"
     ],
     "ja": [
       "sealedBidLegacy.chipStack",
@@ -4423,16 +4427,7 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta"
+      "vs.bestFor"
     ],
     "ru": [
       "seo.refund.title",
@@ -4503,16 +4498,7 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor",
-      "sealedBid.shareCard.title",
-      "sealedBid.shareCard.cta",
-      "sealedBid.shareCard.copied",
-      "sealedBid.session.title",
-      "sealedBid.session.outsmarted",
-      "sealedBid.session.uniqueLabel",
-      "sealedBid.session.clashLabel",
-      "sealedBid.session.passLabel",
-      "sealedBid.session.shareCta"
+      "vs.bestFor"
     ]
   },
   "keysNotInEnglish": {
@@ -5505,7 +5491,8 @@
       "sealedBid.adminOnly",
       "sealedBid.err.notInRack",
       "sealedBid.err.notWord",
-      "sealedBid.yourWord"
+      "sealedBid.yourWord",
+      "adventure.surprise.russian"
     ],
     "sv": [
       "leadChange.tookTheLeadVerb",

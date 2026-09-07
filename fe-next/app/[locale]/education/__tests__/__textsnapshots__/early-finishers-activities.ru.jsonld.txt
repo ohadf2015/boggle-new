@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/early-finishers-activities#page",
+  "name": "Занятия для учеников, которые закончили раньше | LexiClash",
+  "description": "Словесные игры для самостоятельной работы. Без ежедневной подготовки, ученики играют и учатся одновременно.",
+  "url": "https://www.lexiclash.live/ru/education/early-finishers-activities",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/early-finishers-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Учебные ресурсы",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Занятия для учеников, закончивших раньше",
+      "item": "https://www.lexiclash.live/ru/education/early-finishers-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/early-finishers-activities#resource",
+  "name": "Занятия для учеников, которые закончили раньше | LexiClash",
+  "description": "Самостоятельные словесные игры, такие как LexiClash, позволяют быстрым ученикам играть без постоянного надзора учителя. Без перерывов на уроках, без дополнительной работы для вас, и каждое слово из вашего урока.",
+  "url": "https://www.lexiclash.live/ru/education/early-finishers-activities",
+  "inLanguage": "ru",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "Закрепление лексики, узнавание слов, самостоятельное обучение",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT10M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/early-finishers-activities#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Будут ли они торопиться с основной работой, чтобы поиграть?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Некоторые будут, поначалу. Установите чёткие правила: \"Вы должны закончить работу правильно, прежде чем играть.\" Используйте контрольный список, чтобы они знали, что значит \"закончено\". После недели это становится нормой. Большинство учителей говорят, что игра мотивирует медленных учеников, потому что они видят, как играют одноклассники."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Это безопасно? Есть ли чат или внешние ссылки?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Никакого чата, никаких личных сообщений, никаких внешних ссылок. Это просто словесная игра. Ученики видят имена и баллы других игроков в таблице лидеров, но больше ничего. Личная информация не делится."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как насчёт экранного времени?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Каждый раунд 2–4 минуты. Если ученик закончил на 10 минут раньше, он играет один раунд, а не шесть. Игра остановит его, когда время закончится. Это короче, чем видео для перерыва."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Нужно ли я учить их, как играть?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "2-минутная демонстрация для всего класса. Покажи сетку, укажи на слово, дай им найти одно. Этого достаточно. Они учатся в процессе игры. Никакого туториала."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если у меня нет устройств в классе?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Вам нужно хотя бы одно устройство (телефон или планшет), которым ученики могут делиться. Многие классы имеют набор Chromebook или общий iPad. LexiClash работает на всех."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Могу ли я использовать один и тот же код весь год?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да, один и тот же код весь год. Ученикам не нужно его запоминать—вы пишете его на доске один раз, и он остаётся там. Они используют его каждый раз, когда закончат раньше."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Смогу ли я увидеть, во что они играли?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Ваша панель учителя показывает баллы, какие слова они нашли и какие пропустили. Используйте это для выбора лексики на следующую неделю."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Что если ученики, закончившие раньше, просто отвлекают, а не учебный пробел?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Дайте им более сложные слова или установите более высокий показатель баллов. LexiClash адаптируется к разным уровням. Или чередуйте: некоторые играют, другие читают, третьи занимаются математикой. Игра—одна из станций в вашей системе."
+      }
+    }
+  ]
+}

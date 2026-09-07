@@ -12685,6 +12685,7 @@ const es = {
       "insights": "DATOS",
       "viewReports": "Ver informes",
       "viewReportsDesc": "Ver informes detallados y análisis de tus aulas",
+      "tools": "Herramientas de clase",
       "studentsPresentTitle": "{count} alumnos están en {classroom} ahora mismo",
       "studentsPresentDescription": "Empieza una partida y entrarán directamente.",
       "tab": {
@@ -12826,6 +12827,10 @@ const es = {
       }
     },
     "lesson": {
+      "pasteWords": "Pega tu lista de palabras",
+      "pasteWordsPlaceholder": "Una palabra por línea o separadas por comas",
+      "pasteWordsParsed": "{count} palabras listas",
+      "pasteWordsAdd": "Añadir {count} palabras",
       "create": "Crear Lección",
       "edit": "Editar Lección",
       "delete": "Eliminar Lección",
@@ -13180,6 +13185,8 @@ const es = {
       "lockedBadge": "Bloqueado",
       "played": "jugada {{count}} veces",
       "nothingReady": "Esta lección todavía no tiene palabras. Pídeselas a tu profe y vuelve.",
+      "nextMode": "Siguiente: {{mode}}",
+      "allModes": "Todos los juegos",
       "skill": {
         "word_tower": "Forma palabras con las letras de la lista de esta semana",
         "solo_board": "Encuentra las palabras de la lección en la cuadrícula",
@@ -13917,6 +13924,8 @@ const es = {
       "searchWords": "Buscar palabras",
       "sessionsCompleted": "{{count}} sesiones",
       "soloBoard": "Tablero individual",
+      "lessonUnavailable": "No se puede abrir la lección",
+      "lessonUnavailableBody": "Puede que el enlace ya no sirva o que la lección se haya borrado. Pídele uno nuevo a tu profe.",
       "spellTheWord": "Deletréala",
       "spelling": "Ortografía",
       "streak": "Racha de {{count}}",

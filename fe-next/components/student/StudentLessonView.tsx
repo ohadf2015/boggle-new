@@ -7,11 +7,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useStudentProgress } from '@/hooks/useStudentProgress';
+import { useStudentProgress, type StudentLesson } from '@/hooks/useStudentProgress';
+import { usePracticeLessons } from '@/hooks/usePracticeLessons';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { wordsForLevel } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
@@ -82,11 +83,50 @@ const doneBadge = {
 export default function StudentLessonView() {
   const { t, language } = useLanguage();
   const router = useRouter();
+  // TWO sources, on purpose. `useStudentProgress` knows homework — what was
+  // assigned, started, finished, and when it is due. `usePracticeLessons` knows
+  // what this student is ALLOWED TO PLAY, which is the wider set: every lesson
+  // in their classroom, assignment or not.
+  //
+  // Before the second source existed this list was assignment rows and nothing
+  // else, so a teacher who wrote a word list and even ran a live game with it
+  // had still not made it practisable — solo practice waited on a separate
+  // "Create Assignment" step in a different tab. An assignment is now what it
+  // reads as on the card: a deadline and a pinned skill, not a key.
   const { lessons, isLoading, error } = useStudentProgress();
+  const { lessons: practisable, isLoading: isLoadingPractisable } = usePracticeLessons();
   // Per-student differentiation: the count / mastery denominator is the words THIS
   // student practises at their level, not the whole lesson — otherwise a support
   // student can never reach 100%.
   const { level } = useStudentClassroom();
+
+  // Homework first, in the order the progress hook already sorted it; then
+  // everything else the student may practise. A lesson present in both is ONE
+  // card, and the homework half wins — it is the half that carries the deadline
+  // and the real progress row.
+  const cards = useMemo<StudentLesson[]>(() => {
+    const byId = new Map<string, StudentLesson>();
+    for (const entry of lessons) byId.set(entry.lessonId, entry);
+    for (const open of practisable) {
+      if (byId.has(open.id)) continue;
+      byId.set(open.id, {
+        lessonId: open.id,
+        // Not 'assigned': that status paints a pulsing NEW badge that means
+        // "your teacher gave you this", which is precisely what did not happen.
+        status: 'started',
+        lesson: {
+          id: open.id,
+          name: open.name,
+          description: open.description,
+          language: open.language,
+          words: open.words,
+          classroom_id: open.classroom_id,
+        } as StudentLesson['lesson'],
+        ...(open.assignment ? { assignment: open.assignment as StudentLesson['assignment'] } : {}),
+      });
+    }
+    return [...byId.values()];
+  }, [lessons, practisable]);
 
   // "Is this homework late?" needs the clock, and reading `Date.now()` during
   // render is impure — the same reason `useTeacherAccess` keeps a ticking
@@ -98,9 +138,11 @@ export default function StudentLessonView() {
     return () => clearInterval(id);
   }, []);
 
-  const activeLessonCount = lessons.filter((l) => l.status !== 'completed').length;
+  const activeLessonCount = cards.filter((l) => l.status !== 'completed').length;
 
-  if (isLoading) {
+  // Both sources, not one. Rendering "join a classroom" while the second is
+  // still in flight flashes an empty state at a student who has lessons.
+  if (isLoading || isLoadingPractisable) {
     return (
       <div className="flex justify-center items-center py-12">
         <PageLoader size="lg" text={t('common.loading')} />
@@ -108,7 +150,10 @@ export default function StudentLessonView() {
     );
   }
 
-  if (error) {
+  // An error on the homework source is only fatal when it left the student with
+  // nothing. If the wider list resolved, showing its lessons beats showing a
+  // red sentence about a query they never asked for.
+  if (error && cards.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-neo-pink font-neo-body text-lg">{error}</p>
@@ -116,7 +161,7 @@ export default function StudentLessonView() {
     );
   }
 
-  if (lessons.length === 0) {
+  if (cards.length === 0) {
     return (
       <div className="py-12">
         <EnhancedEmptyState
@@ -170,7 +215,7 @@ export default function StudentLessonView() {
         </AdaptiveAnimatePresence>
       </AdaptiveMotion.div>
 
-      {lessons.map((studentLesson, index) => {
+      {cards.map((studentLesson, index) => {
         const { status, lesson, progress } = studentLesson;
 
         const lessonWords = wordsForLevel(lesson?.words || [], level);

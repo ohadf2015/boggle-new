@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/indoor-recess-games#page",
+  "name": "משחקי הפסקה בתוך הכיתה | LexiClash",
+  "description": "תכנית מובנית של 20 דקות למשחקים בהפסקה בימים גשומים. משחקי מילים חינמיים, פעילויות שקטות, ותכנון לכל גודל כיתה.",
+  "url": "https://www.lexiclash.live/he/education/indoor-recess-games",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/indoor-recess-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "דף הבית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "משחקי הפסקה בתוך הכיתה",
+      "item": "https://www.lexiclash.live/he/education/indoor-recess-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/indoor-recess-games#resource",
+  "name": "משחקי הפסקה בתוך הכיתה | LexiClash",
+  "description": "LexiClash מריץ משחקי מילים חינמיים בכל דפדפן—מקרן, טאבלט או טלפון—עם משחק של כל הכיתה בו־זמנית, בלי דוא״ל, ותוכנית מובנית של 20 דקות. מורים שולטים בחדר בזמן אמת ויכולים ללמד לצד התלמידים.",
+  "url": "https://www.lexiclash.live/he/education/indoor-recess-games",
+  "inLanguage": "he",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "6-13",
+  "teaches": "זיהוי מילים, אוצר מילים, פתרון בעיות שיתופי, ניהול זמן במשחק מובנה.",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT20M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/indoor-recess-games#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "האם תלמידים צריכים להיכנס או להקים חשבונות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. למשחק של כל הכיתה, אתה יוצר את החדר. תלמידים מצטרפים עם קוד. ללא דוא״ל, חשבונות, סיסמאות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה קורה אם אנחנו גומרים ברעיונות בחצי הדרך?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "סובב את מצב המשחק. שיחקת ציד מילים? עבור לקשרים. אותו בלוק של 20 דקות, פאזל חדש, מאפס את האנרגיה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אני יכול לשחק עם ילדים שקוראים בקשיות?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. אתה יכול להגדיר את קושי המילה ואורך. מילים קצרות לקוראים צעירים. אתה שולט בלוח, אז אתה יכול לדלג על פאזלים קשים באמצע הבלוק."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כמה התקנים אני באמת צריך?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "רק אחד. מקרן וגם מחשב, טאבלט או לוח חכם. אתה שולט בו. כולם אחרים צופים וצועקים תשובות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה אם האינטרנט נמוך?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "משחקים אלה צריכים אינטרנט. אם שלך נמוך, השתמש במשחקים הנייר השקט לעיל, או קפוץ למשחקי קיר: תליון, 20 שאלות, או שרשור חרוזים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אני חייב לשמור על ניקוד?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. המשחק שומר על זה. אבל אתה יכול לכבות את תצוגת הניקוד אם הכיתה שלך עובדת טוב יותר ללא לוח מובילים."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אני יכול להשתמש במשחקים אלה למשהו אחר מלבד הפסקה?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "בהחלט. עוצרי מוח, סוף־דרך, ימים גשומים, או מחזור של חמש דקות. אותה תכנית של 20 דקות עובדת."
+      }
+    }
+  ]
+}

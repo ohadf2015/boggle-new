@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/middle-school-word-games#page",
+  "name": "Ordspel för högstadiet | Ordförråd",
+  "description": "Gratis ordspel för högstadieklassrum (åk 7–9). Verklig konkurrens, eget ordförråd, direktsänd multiplayer—ingen e-post.",
+  "url": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/middle-school-word-games#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Ordspel för Högstadiet",
+      "item": "https://www.lexiclash.live/sv/education/middle-school-word-games"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/middle-school-word-games#resource",
+  "name": "Ordspel för högstadiet | Ordförråd",
+  "description": "LexiClash är ett gratis webbläsarbaserat ordspel där elever går med i direktsända klassrum med en kod för att tävla i ordletning, ordförrådsutmaningar och realtids multiplayer-spel. Lärare får framstegsspårning och kan ladda upp anpassade ordlistor för alla ämnen. Ingen e-post krävs.",
+  "url": "https://www.lexiclash.live/sv/education/middle-school-word-games",
+  "inLanguage": "sv",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Vocabulary Development"
+  ],
+  "educationalLevel": [
+    "Secondary"
+  ],
+  "typicalAgeRange": "11-15",
+  "teaches": "Vocabulary acquisition, lexical recall, academic language, competitive communication",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT15M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/middle-school-word-games#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Behöver eleverna e-postadresser?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nej. För direktsända klassrumsspel går de med endast en kod. Om de vill spåra personlig framsteg kan de välja att logga in, men det är inte nödvändigt."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur vet jag vad mina elever lärde sig?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Din kontrollpanel visar noggrannhet per ord, försöksantal och mönster över hele klassen. Exportera rapporter till ditt betygsbok."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan jag ladda upp mitt eget ordförråd?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Ladda upp en ordlista för alla ämnen eller prov. LexiClash genererar spel från dina ord."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Demotiverar konkurrens svaga läsare?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Det beror på hur du presenterar det. LexiClash låter dig dölja resultattabeller, gruppera elever efter nivå, eller fokusera på personlig förbättring. Spelen rör sig också snabbt, så ett lågt poängtal känns mindre stigmatiserande än ett misslyckat prov."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur långt tar ett typiskt spel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "De flesta spelen tar 5–15 minuter. Perfekt för en uppvärmning eller repetition, inte en helt lektion."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Finns det chatt eller externt innehål?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nej. Klassrumsspelen är stängda för dina elever. Ingen chatt, inga länkar, inga tredjeparts-annonser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Blockerar min skola detta?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash är undervisande och vanligtvis på vitlistan. Kontakta IT om du stöter på ett block—vi kan hjälpa till att göra ett fall för det."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vilka enheter fungerar det på?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chromebooks, iPad, telefoner, laptops och smartboards. Ingen installation behövs. Bara öppna webbläsaren och gå med."
+      }
+    }
+  ]
+}

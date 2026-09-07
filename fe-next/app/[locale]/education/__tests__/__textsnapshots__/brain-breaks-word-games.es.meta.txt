@@ -1,0 +1,64 @@
+{
+  "title": "Pausas de concentración para aula | Juegos de palabras",
+  "description": "Juegos rápidos para recuperar la atención en 1–5 minutos. Sin preparación, funciona en cualquier dispositivo, toda la clase a la vez.",
+  "keywords": [
+    "pausas de concentración para aula",
+    "descansos cerebrales rápidos",
+    "juegos de palabras para clase",
+    "actividades de pausa de 2 minutos",
+    "descansos sin preparación",
+    "juegos educativos",
+    "actividades para el aula",
+    "dinámicas de clase"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "ja": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "es": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru": "https://www.lexiclash.live/ru/education/brain-breaks-word-games",
+    "en-IL": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "he-IL": "https://www.lexiclash.live/he/education/brain-breaks-word-games",
+    "en-US": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-US": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-GB": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "en-SE": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "sv-SE": "https://www.lexiclash.live/sv/education/brain-breaks-word-games",
+    "en-JP": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "ja-JP": "https://www.lexiclash.live/ja/education/brain-breaks-word-games",
+    "en-ES": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-ES": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-MX": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-MX": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "en-AU": "https://www.lexiclash.live/en/education/brain-breaks-word-games",
+    "es-AR": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "es-CO": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+    "ru-RU": "https://www.lexiclash.live/ru/education/brain-breaks-word-games"
+  },
+  "ogTitle": "Pausas de concentración para aula | Juegos de palabras",
+  "ogDescription": "Juegos rápidos para recuperar la atención en 1–5 minutos. Sin preparación, funciona en cualquier dispositivo, toda la clase a la vez.",
+  "ogLocale": "es_ES",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/es/education/brain-breaks-word-games",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-es.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Pausas de concentración para aula | Juegos de palabras"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Pausas de concentración para aula | Juegos de palabras",
+  "twDescription": "Juegos rápidos para recuperar la atención en 1–5 minutos. Sin preparación, funciona en cualquier dispositivo, toda la clase a la vez.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-es.webp"
+  ]
+}

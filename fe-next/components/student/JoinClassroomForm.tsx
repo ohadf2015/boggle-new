@@ -301,7 +301,17 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                   {preview && <ClassroomPreviewCard name={preview.name} kind={preview.kind} isLoading={isLoadingPreview} />}
                 </div>
 
-              {isGuest && code.trim().length === 6 && (
+              {/*
+                `|| name` is not belt-and-braces, it is the whole fix. The first
+                tap on JOIN mints an anonymous auth user (useClassroom's guest
+                branch) BEFORE the join route is called, so `user` stops being
+                null even when the join then fails. On `isGuest` alone this
+                whole row vanished on the retry: the student corrected a wrong
+                code and could no longer see — or change — the name about to be
+                submitted for them. A student who has typed a name is a student
+                who was asked for one, and stays asked.
+              */}
+              {(isGuest || name.trim().length > 0) && code.trim().length === 6 && (
                 <div className="space-y-2">
                   <Label
                     htmlFor="student-name"

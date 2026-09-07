@@ -1,0 +1,146 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/he/education/vocabulary-games-classroom#page",
+  "name": "משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 6 שפות | LexiClash",
+  "description": "משחקי אוצר מילים חינמיים לכיתה. ריבוי משתתפים חי בכיתה שלמה, דו־קרבות אוצר מילים 1v1, ורשימות מילים מהתוכנית. 6 שפות כולל עברית. כל דפדפן. חינם להתחלה.",
+  "url": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+  "inLanguage": "he",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/he/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-he.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/he/education/vocabulary-games-classroom#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "בית",
+      "item": "https://www.lexiclash.live/he"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "חינוך",
+      "item": "https://www.lexiclash.live/he/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "משחקי אוצר מילים חינמיים בכיתה",
+      "item": "https://www.lexiclash.live/he/education/vocabulary-games-classroom"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/he/education/vocabulary-games-classroom#resource",
+  "name": "משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 6 שפות | LexiClash",
+  "description": "משחקי אוצר מילים חינמיים לכיתה. ריבוי משתתפים חי בכיתה שלמה, דו־קרבות אוצר מילים 1v1, ורשימות מילים מהתוכנית. 6 שפות כולל עברית. כל דפדפן. חינם להתחלה.",
+  "url": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+  "inLanguage": "he",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Vocabulary Building",
+    "Classroom Activity",
+    "Whole-Class Multiplayer",
+    "Formative Assessment",
+    "ESL Practice"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual word usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/he/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/he/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/he/education/vocabulary-games-classroom#faq",
+  "inLanguage": "he",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "האם תלמידים צריכים להירשם?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן, אבל זה חינם ולוקח 30 שניות. דוא״ל אחד או חשבון Google — וזהו. בלי כרטיס אשראי ובלי הפתעות."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "אפשר להשתמש ברשימות המילים שלנו?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כן. מעלים את רשימת המילים בלוח המורה, ואז מפעילים משחקי כיתה או דו־קרבות עם הקוד שלכם."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "כמה זמן נמשכים משחקים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "3–5 דקות. מושלם לחימום, מעברים בין שיעורים, או הפסקות קטנות. אפשר להתאים את הקושי והזמן."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "איזה גילאים זה מתאים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "כיתות 4–12, תוכניות ESL, למידה למבוגרים, וכיתות דו־לשוניות. הקושי משתנה לפי משחק."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "האם אתם מוכרים את הנתונים של התלמידים?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "לא. לעולם לא מוכרים ולא משתפים נתוני תלמידים. תואם FERPA. מדיניות פרטיות מלאה זמינה."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "מה עם בתי ספר עם WiFi בעייתי?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash פועל בכל דפדפן ובכל חיבור אינטרנט. עובד על WiFi בית-ספרי, טאבלטים, Chromebooks וכל מכשיר."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "משחקי אוצר מילים חינמיים בכיתה — ריבוי משתתפים חי, 6 שפות | LexiClash",
+  "description": "משחקי אוצר מילים חינמיים לכיתה. ריבוי משתתפים חי בכיתה שלמה, דו־קרבות אוצר מילים 1v1, ורשימות מילים מהתוכנית. 6 שפות כולל עברית. כל דפדפן. חינם להתחלה.",
+  "url": "https://www.lexiclash.live/he/education/vocabulary-games-classroom",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "he"
+}

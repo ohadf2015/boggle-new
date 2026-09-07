@@ -1,0 +1,62 @@
+{
+  "title": "Мероприятия конца года — Словесные игры",
+  "description": "Поддержите интерес учащихся в последние дни учебного года. Словесные игры без проверки. Бесплатно начать.",
+  "keywords": [
+    "мероприятия конца года",
+    "игры конца учебного года",
+    "последний день школы",
+    "словесные игры класс",
+    "учебные мероприятия конец года",
+    "игры для последней недели"
+  ],
+  "robots": {
+    "index": true,
+    "follow": true
+  },
+  "canonical": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+  "languages": {
+    "x-default": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "he": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+    "en": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "sv": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+    "ja": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+    "es": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "ru": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+    "en-IL": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "he-IL": "https://www.lexiclash.live/he/education/end-of-year-classroom-activities",
+    "en-US": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-US": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-GB": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "en-SE": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "sv-SE": "https://www.lexiclash.live/sv/education/end-of-year-classroom-activities",
+    "en-JP": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "ja-JP": "https://www.lexiclash.live/ja/education/end-of-year-classroom-activities",
+    "en-ES": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-ES": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-MX": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-MX": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "en-AU": "https://www.lexiclash.live/en/education/end-of-year-classroom-activities",
+    "es-AR": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "es-CO": "https://www.lexiclash.live/es/education/end-of-year-classroom-activities",
+    "ru-RU": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities"
+  },
+  "ogTitle": "Мероприятия конца года — Словесные игры",
+  "ogDescription": "Поддержите интерес учащихся в последние дни учебного года. Словесные игры без проверки. Бесплатно начать.",
+  "ogLocale": "ru_RU",
+  "ogType": "website",
+  "ogUrl": "https://www.lexiclash.live/ru/education/end-of-year-classroom-activities",
+  "ogImages": [
+    {
+      "url": "https://www.lexiclash.live/images/education-hero-en.webp",
+      "width": 1200,
+      "height": 675,
+      "alt": "Мероприятия конца года — Словесные игры"
+    }
+  ],
+  "twCard": "summary_large_image",
+  "twTitle": "Мероприятия конца года — Словесные игры",
+  "twDescription": "Поддержите интерес учащихся в последние дни учебного года. Словесные игры без проверки. Бесплатно начать.",
+  "twImages": [
+    "https://www.lexiclash.live/images/education-hero-en.webp"
+  ]
+}

@@ -12714,6 +12714,7 @@ const ja = {
       "insights": "インサイト",
       "viewReports": "レポートを見る",
       "viewReportsDesc": "クラスの詳細なレポートと分析を表示",
+      "tools": "クラスツール",
       "studentsPresentTitle": "いま {classroom} に {count} 人の生徒がいます",
       "studentsPresentDescription": "ゲームを始めればそのまま参加します。",
       "tab": {
@@ -12855,6 +12856,10 @@ const ja = {
       }
     },
     "lesson": {
+      "pasteWords": "単語リストを貼り付け",
+      "pasteWordsPlaceholder": "1行に1単語 — またはカンマ区切り",
+      "pasteWordsParsed": "{count}語を読み込みました",
+      "pasteWordsAdd": "{count}語を追加",
       "create": "レッスン作成",
       "edit": "レッスン編集",
       "delete": "レッスン削除",
@@ -13188,6 +13193,8 @@ const ja = {
       "lockedBadge": "ロック中",
       "played": "{{count}}回プレイ",
       "nothingReady": "このレッスンにはまだ単語がありません。先生に追加をお願いしてから戻ってきてね。",
+      "nextMode": "次は{{mode}}",
+      "allModes": "すべてのゲーム",
       "skill": {
         "word_tower": "今週のリストの文字から単語を作ろう",
         "solo_board": "文字盤からレッスンの単語をさがそう",
@@ -13925,6 +13932,8 @@ const ja = {
       "searchWords": "単語を検索",
       "sessionsCompleted": "{{count}}セッション完了",
       "soloBoard": "ソロボード",
+      "lessonUnavailable": "このレッスンを開けません",
+      "lessonUnavailableBody": "リンクが古いか、レッスンが削除された可能性があります。先生に新しいリンクをもらってね。",
       "spellTheWord": "スペルを書いてみよう",
       "spelling": "スペリング",
       "streak": "{{count}}連続",

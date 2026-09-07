@@ -1,0 +1,146 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom#page",
+  "name": "Gratis ordförråd spel för klassrummet — Live multiplayer, 6 språk | LexiClash",
+  "description": "Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. 6 språk inkl. hebreiska och ryska. Vilken webbläsare som helst. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+  "inLanguage": "sv",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/sv/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-sv.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Hem",
+      "item": "https://www.lexiclash.live/sv"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Utbildning",
+      "item": "https://www.lexiclash.live/sv/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Gratis ordförråd spel för klassrummet",
+      "item": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom#resource",
+  "name": "Gratis ordförråd spel för klassrummet — Live multiplayer, 6 språk | LexiClash",
+  "description": "Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. 6 språk inkl. hebreiska och ryska. Vilken webbläsare som helst. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+  "inLanguage": "sv",
+  "learningResourceType": "Game",
+  "educationalUse": [
+    "Vocabulary Building",
+    "Classroom Activity",
+    "Whole-Class Multiplayer",
+    "Formative Assessment",
+    "ESL Practice"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual word usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/sv/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/sv/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom#faq",
+  "inLanguage": "sv",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Måste studenter registrera sig?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja, men det är gratis och tar 30 sekunder. Mail eller Google-konto. Inget kreditkort, inga överraskningar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kan vi använda våra egna ordlistor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Ladda upp i ditt panel och starta spel med ditt ordförråd."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hur lång tid tar ett spel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "3–5 minuter. Perfekt för uppvärmning, övergångar, pauser. Svårighetsgrad och tid går att ändra."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vilka åldrar passar det?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Från årskurs 4 upp till vuxna, ESL-program, tvåspråkiga klassrum. Svårigheten justeras per spel."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Säljer ni elevdata?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nej, aldrig. Vi följer FERPA. Fullständig integritet garanterad."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Fungerar det med dåligt WiFi?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash fungerar i vilken webbläsare som helst och vilken anslutning som helst. Jobbar bra på skolans WiFi, tablets, Chromebooks, datorer."
+      }
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Gratis ordförråd spel för klassrummet — Live multiplayer, 6 språk | LexiClash",
+  "description": "Gratis ordförråd spel för klassrummet. Live multiplayer, 1v1 ordförrådsdueller, dina ordlistor. 6 språk inkl. hebreiska och ryska. Vilken webbläsare som helst. Gratis att börja.",
+  "url": "https://www.lexiclash.live/sv/education/vocabulary-games-classroom",
+  "provider": {
+    "@type": "Organization",
+    "name": "LexiClash",
+    "url": "https://www.lexiclash.live"
+  },
+  "inLanguage": "sv"
+}

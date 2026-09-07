@@ -1,5 +1,16 @@
 import type { EducationLandingContent } from '@/lib/seo/educationLanding';
 
+/**
+ * Locale-invariant half of the LearningResource block. Only `teaches` is
+ * translated; the rest was repeated verbatim in all six locale objects.
+ */
+const LEARNING = {
+  educationalUse: ['Classroom Activity'],
+  educationalLevel: ['Primary', 'Secondary'],
+  typicalAgeRange: '8-16',
+  timeRequired: 'PT15M',
+};
+
 const EN: EducationLandingContent = {
   accent: 'purple',
   meta: {
@@ -185,11 +196,8 @@ const EN: EducationLandingContent = {
   ],
   breadcrumb: { home: 'Home', hub: 'Education', current: 'First Day Icebreakers' },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '8-16',
+    ...LEARNING,
     teaches: 'social cohesion, vocabulary in context, rapid name learning',
-    timeRequired: 'PT15M',
   },
 };
 
@@ -365,11 +373,8 @@ const HE: EducationLandingContent = {
   ],
   breadcrumb: { home: 'דף הבית', hub: 'חינוך', current: 'שובר קרח ביום ראשון' },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '8-16',
+    ...LEARNING,
     teaches: 'cohesion חברתית, אוצר מילים בהקשר, למידת שמות מהירה',
-    timeRequired: 'PT15M',
   },
 };
 
@@ -564,11 +569,8 @@ const ES: EducationLandingContent = {
   ],
   breadcrumb: { home: 'Inicio', hub: 'Educación', current: 'Rompehielos del Primer Día' },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '8-16',
+    ...LEARNING,
     teaches: 'cohesión social, vocabulario en contexto, aprendizaje rápido de nombres',
-    timeRequired: 'PT15M',
   },
 };
 
@@ -757,11 +759,8 @@ const SV: EducationLandingContent = {
   ],
   breadcrumb: { home: 'Hem', hub: 'Utbildning', current: 'Första Dagen Isbrytare' },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '8-16',
+    ...LEARNING,
     teaches: 'social sammanhållning, ordförråd i sammanhang, snabb namnlärning',
-    timeRequired: 'PT15M',
   },
 };
 
@@ -950,11 +949,8 @@ const JA: EducationLandingContent = {
   ],
   breadcrumb: { home: 'ホーム', hub: '教育', current: '学年始めアイスブレーカー' },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '8-16',
+    ...LEARNING,
     teaches: '社会的結束、文脈での語彙、迅速な名前学習',
-    timeRequired: 'PT15M',
   },
 };
 
@@ -1144,11 +1140,8 @@ const RU: EducationLandingContent = {
   ],
   breadcrumb: { home: 'Главная', hub: 'Образование', current: 'Ледокол День Знаний' },
   learning: {
-    educationalUse: ['Classroom Activity'],
-    educationalLevel: ['Primary', 'Secondary'],
-    typicalAgeRange: '8-16',
+    ...LEARNING,
     teaches: 'социальная сплоченность, словарный запас в контексте, быстрое изучение имен',
-    timeRequired: 'PT15M',
   },
 };
 

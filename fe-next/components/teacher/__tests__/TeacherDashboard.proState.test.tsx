@@ -16,8 +16,6 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: 
 vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/QuickStartButton', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/dashboard', () => ({ DuelMonitoringPanel: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div /> }));
 vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div /> }));

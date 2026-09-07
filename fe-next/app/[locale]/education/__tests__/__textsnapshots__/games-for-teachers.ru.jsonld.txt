@@ -1,0 +1,132 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ru/education/games-for-teachers#page",
+  "name": "Бесплатные словесные игры для учителей — Без подготовки, аналитика | LexiClash",
+  "description": "Словесные игры для класса. Без подготовки, ваши списки, отслеживание успеха. 5 минут, перерыв или день замены. Бесплатный старт.",
+  "url": "https://www.lexiclash.live/ru/education/games-for-teachers",
+  "inLanguage": "ru",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ru/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-en.webp"
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ru/education/games-for-teachers#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://www.lexiclash.live/ru"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Образование",
+      "item": "https://www.lexiclash.live/ru/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Бесплатные словесные игры для учителей",
+      "item": "https://www.lexiclash.live/ru/education/games-for-teachers"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ru/education/games-for-teachers#resource",
+  "name": "Бесплатные словесные игры для учителей — Без подготовки, аналитика | LexiClash",
+  "description": "Словесные игры для класса. Без подготовки, ваши списки, отслеживание успеха. 5 минут, перерыв или день замены. Бесплатный старт.",
+  "url": "https://www.lexiclash.live/ru/education/games-for-teachers",
+  "inLanguage": "ru",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity",
+    "Formative Assessment",
+    "Vocabulary Building",
+    "Brain Break",
+    "Substitute Teacher Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary",
+    "Adult Education"
+  ],
+  "typicalAgeRange": "8-99",
+  "teaches": "Vocabulary, spelling, word recognition, contextual usage",
+  "isAccessibleForFree": true,
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ru/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ru/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ru/education/games-for-teachers#faq",
+  "inLanguage": "ru",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Какие словесные игры можно использовать с классом?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LexiClash предлагает многопользовательские словесные игры: Boggle (поиск слов в сетке букв), Word Wheel (составление слов из вращающегося колеса) и Word Hunt (поиск скрытых слов). Все игры тренируют словарный запас, распознавание паттернов и орфографию в реальном времени."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Сколько требуется подготовки?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Никакой. Создай бесплатный аккаунт, выбери или загрузи список слов, поделись ссылкой или кодом с учениками и начни играть. Не нужны планы уроков, рабочие листы или подготовка материалов. Игры работают на Chromebook, планшетах и телефонах."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Можно использовать свои списки слов?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да. Загружай CSV-файлы, используй встроенные списки или комбинируй оба варианта. Учителя могут закрепить словарь за конкретными темами (разделы, тематики, языки) и переиспользовать списки между классами и годами."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Как отслеживать прогресс учеников?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Панель управления класса показывает баллы по каждому ученику, точность, скорость и метрики участия в реальном времени. Скачивай отчеты по классу, диапазону дат или типу игры. Ручное оценивание не требуется."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Может ли учитель-заместитель это использовать?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Конечно. Поделись кодом урока с заместителем. Ученики входят, играют, и все результаты видны в твоей панели. Идеально для дня замены — никакой подготовки."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Нужен Chromebook или специальное оборудование?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Нет. Работает на любом устройстве с браузером: Chromebook, iPad, ноутбуках или телефонах учеников. Функционирует даже в классах с нестабильным WiFi благодаря кэшированным ресурсам."
+      }
+    }
+  ]
+}

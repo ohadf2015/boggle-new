@@ -207,3 +207,19 @@ export function readyTiles(tiles: PracticeTile[]): PracticeTile[] {
 export function practiceReadiness(tiles: PracticeTile[]): { ready: number; total: number } {
   return { ready: readyTiles(tiles).length, total: tiles.length };
 }
+
+/**
+ * The tile to offer after finishing `currentTileId` — the "next mode" half of
+ * the round-end pair. Wraps around, skips locked tiles, and returns null when
+ * the current tile is the only playable one (offering a student the mode they
+ * just finished as their "next" is worse than offering nothing).
+ */
+export function nextReadyTile(tiles: PracticeTile[], currentTileId: string): PracticeTile | null {
+  const ready = readyTiles(tiles);
+  if (ready.length === 0) return null;
+
+  const index = ready.findIndex((tile) => tile.id === currentTileId);
+  if (index === -1) return ready[0] ?? null;
+  if (ready.length === 1) return null;
+  return ready[(index + 1) % ready.length];
+}

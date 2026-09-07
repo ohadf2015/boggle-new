@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.lexiclash.live/ja/education/early-finishers-activities#page",
+  "name": "課題を終わらせた生徒向けのアクティビティ | LexiClash",
+  "description": "自分のペースで進められる単語ゲーム。毎日の準備不要、生徒は遊びながら学べます。",
+  "url": "https://www.lexiclash.live/ja/education/early-finishers-activities",
+  "inLanguage": "ja",
+  "isPartOf": {
+    "@id": "https://www.lexiclash.live/ja/education#org"
+  },
+  "primaryImageOfPage": "https://www.lexiclash.live/images/education-hero-ja.webp",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [
+      "[data-answer]"
+    ]
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://www.lexiclash.live/ja/education/early-finishers-activities#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ホーム",
+      "item": "https://www.lexiclash.live/ja"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "指導資料",
+      "item": "https://www.lexiclash.live/ja/education"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "課題を終わらせた生徒向けアクティビティ",
+      "item": "https://www.lexiclash.live/ja/education/early-finishers-activities"
+    }
+  ]
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "@id": "https://www.lexiclash.live/ja/education/early-finishers-activities#resource",
+  "name": "課題を終わらせた生徒向けのアクティビティ | LexiClash",
+  "description": "課題を早く終えた生徒には、自分で進められる単語ゲームを用意しておきます。LexiClashを開き、その日に扱った単語リストで一回戦を遊ぶだけなので、先生に質問する必要がありません。授業を中断せず、丸つけも増えず、練習する単語はいま教えた内容そのものです。",
+  "url": "https://www.lexiclash.live/ja/education/early-finishers-activities",
+  "inLanguage": "ja",
+  "learningResourceType": "Activity",
+  "educationalUse": [
+    "Classroom Activity"
+  ],
+  "educationalLevel": [
+    "Primary",
+    "Secondary"
+  ],
+  "typicalAgeRange": "7-16",
+  "teaches": "語彙の定着、単語認識、自主学習",
+  "isAccessibleForFree": true,
+  "timeRequired": "PT10M",
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "teacher"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "@id": "https://www.lexiclash.live/ja/education#org",
+    "name": "LexiClash Education",
+    "url": "https://www.lexiclash.live/ja/education"
+  }
+}
+---
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://www.lexiclash.live/ja/education/early-finishers-activities#faq",
+  "inLanguage": "ja",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "ゲームのために課題を急いでしてしまわないでしょうか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "最初はするかもしれません。明確なルール：「遊ぶ前に課題をちゃんと終わらせてください」。チェックリストで「完了」の意味を明確にします。1週間でふつうになります。ほとんどの先生は、友達がゲームしているのを見ると遅い生徒もやる気になると言います。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "セキュリティは大丈夫？チャットや外部リンクは？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "チャットなし、DM機能なし、外部リンクなし。ゲームだけです。他の生徒の名前とスコアがランキングに出ますが、それだけ。個人情報は共有されません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "画面時間は大丈夫でしょうか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1ゲーム2～4分です。10分早く終わった生徒なら1ゲームをします。タイマーで自動停止します。動画より短いです。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "やり方を教える必要がありますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "2分間全クラスでデモをします。グリッドを見せて、単語を指して、1個探させます。それで十分です。ゲームで覚えます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "教室にデバイスがない場合は？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "最低1台（スマホまたはタブレット）あれば、生徒でシェアできます。Chromebookセットかタブレットがあれば理想的。LexiClashはどれでも動きます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "コードは1年中同じ？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい、1年中同じコード。生徒が覚える必要はない。黒板に1回書いたら、そこにずっとあります。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "どのゲームを遊んだか見える？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。先生ダッシュボードで得点、見つけた単語、見落とした単語がわかります。来週の授業の語彙選択に使えます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "早い生徒が学習できていない場合はどうしますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "もっと難しい単語にするか、高いスコア目標を設定します。LexiClashはレベルに合わせられます。または、何人かはゲーム、何人かは読書、何人かは算数をします。ゲームは活動の一つです。"
+      }
+    }
+  ]
+}

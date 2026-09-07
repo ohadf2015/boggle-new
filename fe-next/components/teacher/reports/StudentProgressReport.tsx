@@ -15,6 +15,7 @@ import {
   DateRange,
 } from '@/lib/supabase/analytics';
 import logger from '@/utils/logger';
+import { Stat } from '@/components/ui/Stat';
 
 // =============================================
 // TYPE DEFINITIONS
@@ -219,45 +220,33 @@ export function StudentProgressReport({
           {t('teacher.reports.sections.summary')}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Words Learned */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.wordsLearned')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.wordsLearned} / {data.metrics.totalWords}
-            </p>
-          </div>
+          <Stat
+            value={`${data.metrics.wordsLearned} / ${data.metrics.totalWords}`}
+            label={t('teacher.reports.metrics.wordsLearned')}
+            size="lg"
+            className="w-full"
+          />
 
-          {/* Accuracy */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.accuracy')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.accuracy}%
-            </p>
-          </div>
+          <Stat
+            value={`${data.metrics.accuracy}%`}
+            label={t('teacher.reports.metrics.accuracy')}
+            size="lg"
+            className="w-full"
+          />
 
-          {/* Practice Time */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.practiceTime')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {formatMinutes(data.metrics.practiceTimeMinutes)}
-            </p>
-          </div>
+          <Stat
+            value={formatMinutes(data.metrics.practiceTimeMinutes)}
+            label={t('teacher.reports.metrics.practiceTime')}
+            size="lg"
+            className="w-full"
+          />
 
-          {/* Current Streak */}
-          <div className="p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard">
-            <p className="text-sm text-neo-gray">
-              {t('teacher.reports.metrics.currentStreak')}
-            </p>
-            <p className="text-2xl font-bold text-neo-white">
-              {data.metrics.currentStreak} days
-            </p>
-          </div>
+          <Stat
+            value={`${data.metrics.currentStreak} days`}
+            label={t('teacher.reports.metrics.currentStreak')}
+            size="lg"
+            className="w-full"
+          />
         </div>
       </section>
 

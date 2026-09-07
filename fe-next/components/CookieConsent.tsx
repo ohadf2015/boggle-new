@@ -16,6 +16,26 @@ import {
   resetConsent,
   onConsentChange,
 } from '@/utils/cookieConsent';
+import { MODAL_OPEN_CLASS } from '@/lib/native/modalOpenSignal';
+
+/**
+ * True while a modal owns the screen (`html.modal-open`, the ref-counted flag
+ * set by AuthModal and the shared ui/dialog). The consent sheet sits at z-[200]
+ * — above every modal — and is a bottom band up to 60vh tall, so on a short
+ * viewport it lands over the MIDDLE of an open modal and eats its clicks.
+ */
+function useModalOwnsScreen(): boolean {
+  const [owned, setOwned] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const read = () => setOwned(root.classList.contains(MODAL_OPEN_CLASS));
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return owned;
+}
 
 /**
  * Non-blocking cookie-consent bottom sheet (GDPR).
@@ -38,6 +58,8 @@ export default function CookieConsent() {
   const [analytics, setAnalytics] = useState(false);
   const [advertising, setAdvertising] = useState(false);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const modalOwnsScreen = useModalOwnsScreen();
+  const showSheet = visible && !modalOwnsScreen;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -87,7 +109,7 @@ export default function CookieConsent() {
   // tracks the sheet growing (the Customize panel) and viewport resizes; the
   // reservation is removed the moment a consent choice hides the sheet.
   useEffect(() => {
-    if (!visible) return;
+    if (!showSheet) return;
     const sheet = sheetRef.current;
     if (!sheet) return;
     const root = document.documentElement;
@@ -106,7 +128,7 @@ export default function CookieConsent() {
       root.classList.remove('has-cookie-consent');
       root.style.removeProperty('--cookie-consent-height');
     };
-  }, [visible]);
+  }, [showSheet]);
 
   // Load existing state when showing details
   useEffect(() => {
@@ -144,7 +166,7 @@ export default function CookieConsent() {
   // CrazyGames embeds its own platform-level consent UI before our iframe loads.
   // A second banner inside the iframe violates the embed UX expectation.
   if (isOnCrazyGamesPlatform) return null;
-  if (!visible) return null;
+  if (!showSheet) return null;
 
   const isRtl = language === 'he';
 
