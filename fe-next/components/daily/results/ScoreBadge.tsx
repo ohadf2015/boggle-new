@@ -37,7 +37,7 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
       </GameBadge>
     ) : (
       <GameBadge variant="score-fail" icon={X} size="lg" animate="pop">
-        X/10
+        {attemptsUsed}/10
       </GameBadge>
     )}
     {streakDays > 0 && (

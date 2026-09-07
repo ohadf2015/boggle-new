@@ -7657,6 +7657,7 @@ const he = {
       "played": "שיחקו",
       "solved": "פתרו",
       "failed": "נכשל",
+      "you": "אתה",
       "attempts": "ניסיונות",
       "pts": "נק'",
       "words": "מילים",

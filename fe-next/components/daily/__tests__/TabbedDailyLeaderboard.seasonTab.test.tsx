@@ -74,6 +74,7 @@ const t = (key: string, fallbackOrParams?: string | Record<string, string | numb
     'wordHunt.leaderboard.allTime': 'All Time',
     'leaderboard.friends': 'Friends',
     'wordHunt.leaderboard.pts': 'pts',
+    'wordHunt.leaderboard.you': 'YOU',
     'wordHunt.leaderboard.seasonPts': 'season pts',
     'wordHunt.leaderboard.daysPlayed': '{count} days',
     'wordHunt.leaderboard.dayPlayed': '1 day',
@@ -125,11 +126,12 @@ const seasonRow = (over: Record<string, unknown>) => ({
 
 const installFetch = (respond: (url: string) => Record<string, unknown> | null) => {
   const calls: string[] = [];
-  vi.stubGlobal('fetch', vi.fn((url: string) => {
+  const fetchMock = vi.fn((url: string) => {
     calls.push(url);
     const body = respond(url) ?? { data: [], totalParticipants: 0, totalPlayers: 0, totalSolved: 0, guestPlayerCount: 0 };
     return Promise.resolve({ ok: true, json: () => Promise.resolve(body) });
-  }));
+  });
+  vi.stubGlobal('fetch', fetchMock);
   return calls;
 };
 

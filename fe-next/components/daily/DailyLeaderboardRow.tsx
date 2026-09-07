@@ -165,7 +165,7 @@ export const TodayParticipantRow = memo<{
           {showLanguage && <LanguageChip language={participant.language} />}
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
-              YOU
+              {t('wordHunt.leaderboard.you', 'YOU')}
             </span>
           )}
           <MovementChip movement={movement} t={t} />
@@ -183,7 +183,11 @@ export const TodayParticipantRow = memo<{
         <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
           {participant.solved !== undefined && (
             <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
-              {participant.solved ? `✓ ${participant.attempts_used}/10` : `✗ X/10`}
+              {participant.solved
+                ? `✓ ${participant.attempts_used}/10`
+                : participant.attempts_used != null
+                  ? `✗ ${participant.attempts_used}/10`
+                  : `✗ ${t('wordHunt.leaderboard.failed', 'Failed')}`}
             </span>
           )}
           {participant.score != null && participant.score > 0 && (
@@ -348,7 +352,7 @@ export const AllTimeParticipantRow = memo<{
           </PlayerProfileTooltip>
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
-              YOU
+              {t('wordHunt.leaderboard.you', 'YOU')}
             </span>
           )}
           {participant.best_efficiency != null && (
@@ -470,7 +474,7 @@ export const SeasonParticipantRow = memo<{
           ))}
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
-              YOU
+              {t('wordHunt.leaderboard.you', 'YOU')}
             </span>
           )}
           {rank === 1 && (
