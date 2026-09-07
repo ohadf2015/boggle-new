@@ -126,10 +126,11 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
     expect(mockPush).toHaveBeenCalledWith('/en/daily/word-tower');
   });
 
-  it('counts Word Tower as the third quest in the progress bar', async () => {
+  it('counts all four public quests in the progress bar', async () => {
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    // Word Hunt + Word Wheel + Word Tower + Connections (graduated from beta).
+    expect(bar).toHaveAttribute('aria-valuemax', '4');
   });
 
   it('renders the Word Tower box at exactly the size of its two siblings', async () => {
@@ -152,10 +153,11 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
     expect(boxClasses('wordTower')).toContain('md:min-h-[130px]');
   });
 
-  it('does NOT tag the public card as beta, and hides admin-only modes', async () => {
+  it('renders the graduated Connections quest as a public (non-beta) card', async () => {
     renderHub();
-    const card = await screen.findByTestId('quest-card-wordTower');
+    // Connections graduated from the admin-gated registry card to a public
+    // daily quest (Ohad 2026-09-07) — present for ordinary players, no BETA tag.
+    const card = await screen.findByTestId('daily-quest-card-connections');
     expect(card.textContent).not.toMatch(/beta/i);
-    expect(screen.queryByTestId('daily-quest-card-connections')).not.toBeInTheDocument();
   });
 });

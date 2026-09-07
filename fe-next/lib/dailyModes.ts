@@ -10,12 +10,18 @@
  * here with `adminOnly: true`, surfaces only to admins via {@link adminOnlyDailyModes},
  * and graduates to public by flipping the flag — no hub rewrite.
  *
- * Word Tower is the first mode driven by this: its daily run gives every player the
+ * Word Tower was the first mode driven by this: its daily run gives every player the
  * same letters for the day (see `lib/wordTower/dailySeed.ts`) and keeps a per-day best
  * + streak. Cross-day tower carryover ("continue building each day") is now LIVE — the
  * physical tower (floors/height/records) persists across UTC days while the wheel +
  * per-session mechanics refresh to each day's shared seed (see the HYBRID branch in
  * `restoreWordTowerState`, keyed on the save blob's `gameCode`).
+ *
+ * Connections (Word Bridge) is the second graduate: the daily route hosts BOTH
+ * flavors, alternating by UTC day — the classic 5-riddle chain and the pyramid
+ * (see lib/connections/dailyVariant.ts). It stays a registry-driven generic card
+ * like its beta days, but now public, with the hub feeding it a played-today
+ * status so a cleared day reads like every other quest.
  */
 
 export type DailyModeId = 'word-hunt' | 'word-wheel' | 'word-tower' | 'connections';
@@ -62,7 +68,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   {
     id: 'connections',
     path: '/connections/daily',
-    adminOnly: true,
+    adminOnly: false,
     titleKey: 'connections.daily.questTitle',
     descKey: 'connections.daily.questDesc',
     accent: 'purple',

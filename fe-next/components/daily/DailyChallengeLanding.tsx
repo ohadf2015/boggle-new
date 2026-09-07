@@ -16,6 +16,7 @@ import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 import { questCardModes, visibleDailyModes } from '@/lib/dailyModes';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
+import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
@@ -79,6 +80,9 @@ export function DailyChallengeLanding({
   // Word Tower "played today" — client-only localStorage read (SSR-safe), kept
   // fresh when the player returns from the game (visibility/back nav).
   const [wordTowerPlayed, setWordTowerPlayed] = useState(false);
+  // Connections (Word Bridge) played today — same marker both daily flavors
+  // write on their terminal screens (5-riddle chain AND pyramid).
+  const [connectionsPlayed, setConnectionsPlayed] = useState(false);
 
   useEffect(() => {
     // Daily guest identity — the fingerprint the daily games record guests
@@ -95,6 +99,9 @@ export function DailyChallengeLanding({
     const check = () => {
       try {
         setWordTowerPlayed(isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey()))));
+      } catch { /* storage disabled — treat as not played */ }
+      try {
+        setConnectionsPlayed(hasPlayedConnectionsToday());
       } catch { /* storage disabled — treat as not played */ }
     };
     check();
@@ -164,16 +171,20 @@ export function DailyChallengeLanding({
   // player actually sees the card. Read off the REGISTRY, not `questModes` — Word
   // Tower is drawn with the shared QuestCard now, so it is deliberately absent
   // from the generic registry-card list and checking there would silently drop
-  // the bar back to /2.
-  const showsWordTower = visibleDailyModes(canSeeInWorkModes).some((mode) => mode.id === 'word-tower');
+  // the bar back to /2. Connections is the 4th quest (generic card) with the
+  // same registry-driven rule.
+  const visibleModes = visibleDailyModes(canSeeInWorkModes);
+  const showsWordTower = visibleModes.some((mode) => mode.id === 'word-tower');
+  const showsConnections = visibleModes.some((mode) => mode.id === 'connections');
   const wordTowerHref = `/${currentLanguage}/daily/word-tower`;
-  const totalQuests = 2 + (showsWordTower ? 1 : 0);
+  const totalQuests = 2 + (showsWordTower ? 1 : 0) + (showsConnections ? 1 : 0);
 
   // Completion count for progress bar
   const completedCount =
     (wordHuntStatus === 'won' ? 1 : 0) +
     (wordWheelStatus === 'played' ? 1 : 0) +
-    (showsWordTower && wordTowerPlayed ? 1 : 0);
+    (showsWordTower && wordTowerPlayed ? 1 : 0) +
+    (showsConnections && connectionsPlayed ? 1 : 0);
 
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
   const wordWheelPlayed = wordWheelStatus === 'played';
@@ -439,8 +450,9 @@ export function DailyChallengeLanding({
         </>
       )}
 
-      {/* Registry-driven quest cards — everything still gated (Connections).
-          Empty for ordinary players; only admins/beta testers see this node. */}
+      {/* Registry-driven quest cards — Connections (Word Bridge) is the daily
+          quest #4 now that it graduated from beta: public card, played-today
+          status fed from the same marker both daily flavors write. */}
       {questModes.length > 0 && (
         <>
           <div className="w-full flex flex-col gap-2" data-testid="daily-quest-modes">
@@ -450,6 +462,7 @@ export function DailyChallengeLanding({
                 mode={mode}
                 locale={currentLanguage}
                 t={t}
+                played={mode.id === 'connections' ? connectionsPlayed : false}
                 delay={0.35 + i * 0.05}
               />
             ))}

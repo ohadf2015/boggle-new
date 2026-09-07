@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { m } from 'framer-motion';
 import Link from 'next/link';
-import { Share2, Heart, ChevronRight } from 'lucide-react';
+import { Share2, Heart, ChevronRight, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -26,7 +26,7 @@ import {
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
 import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
-import { todayUTC } from '@/lib/connections/dailyClient';
+import { todayUTC, markConnectionsPlayedToday, advanceClientStreak } from '@/lib/connections/dailyClient';
 import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
 import type { GameState } from '@/lib/connections/types';
 import PyramidProgress from './PyramidProgress';
@@ -63,8 +63,12 @@ function reducer(state: PyramidState, action: Action): PyramidState {
  * Bridge Pyramid — a three-stage tower where solving all 3 base riddles
  * unlocks the finale. The bridges from the 3 stages become clues for the
  * final meta-answer puzzle.
+ *
+ * `sharePath` — when the run is hosted as the day's daily variant
+ * (/connections/daily), share links point back at the daily host so
+ * recipients land on the same quest; standalone play keeps the pyramid route.
  */
-export default function PyramidChallenge() {
+export default function PyramidChallenge({ sharePath }: { sharePath?: string } = {}) {
   // Null-guard wrapper: the early return must happen BEFORE any of the run's
   // hooks mount (rules-of-hooks), so the actual game lives in PyramidRun.
   const { language } = useLanguage();
@@ -72,10 +76,18 @@ export default function PyramidChallenge() {
   const [solvedPyramids] = useState<ReadonlySet<string>>(() => getSolvedIds('pyramid', language));
   const pyramid = dailyPyramid(today, language, solvedPyramids);
   if (!pyramid) return null;
-  return <PyramidRun pyramid={pyramid} today={today} />;
+  return <PyramidRun pyramid={pyramid} today={today} sharePath={sharePath} />;
 }
 
-function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof dailyPyramid>>; today: string }) {
+function PyramidRun({
+  pyramid,
+  today,
+  sharePath,
+}: {
+  pyramid: NonNullable<ReturnType<typeof dailyPyramid>>;
+  today: string;
+  sharePath?: string;
+}) {
   const { t, language } = useLanguage();
   const { isAdmin } = useAuth();
   const prefersReducedMotion = useReducedMotion();
@@ -120,6 +132,20 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
   useEffect(() => {
     startRef.current = Date.now();
   }, []);
+
+  // Daily-parity: finishing a pyramid (won OR lost) counts as playing the Word
+  // Bridge daily quest. The 5-riddle daily writes the same markers on its own
+  // terminal, so without this a pyramid day would show an unplayed quest card
+  // and silently break the day streak. Stamped once — the terminal effect can
+  // re-fire on unrelated re-renders.
+  const dailyStampedRef = useRef(false);
+  const [clientStreak, setClientStreak] = useState(0);
+  useEffect(() => {
+    if (!isTerminal || dailyStampedRef.current) return;
+    dailyStampedRef.current = true;
+    markConnectionsPlayedToday(today);
+    setClientStreak(advanceClientStreak(today).streak);
+  }, [isTerminal, today]);
 
   // Per-answer feedback (sound + haptic) and outcome tracking
   useEffect(() => {
@@ -215,7 +241,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
       wrongAttempts: 0,
       hintUsed: false,
     };
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/${language}/connections/pyramid` : undefined;
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/${sharePath ?? `${language}/connections/pyramid`}` : undefined;
     const text = buildPyramidShareGrid({
       title: t('connections.pyramid.title'),
       dateISO: today,
@@ -235,7 +261,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
     } catch {
       /* user cancelled / unsupported */
     }
-  }, [t, language, today, pyramidState.score]);
+  }, [t, language, today, pyramidState.score, sharePath]);
 
   // Terminal state: won/lost
   if (isTerminal) {
@@ -268,6 +294,20 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
             <span className="font-neo-display text-xl font-black text-neo-yellow tabular-nums">
               {pyramidState.score}
             </span>
+            {/* Same streak chip the 5-riddle daily results draw — pyramid days
+                advance the same client streak, so it should show it too. */}
+            {clientStreak > 0 && (
+              <m.span
+                data-testid="pyramid-streak-chip"
+                initial={{ scale: 0, rotate: -12 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.4 }}
+                className="inline-flex items-center gap-1 rounded-neo border-neo border-neo-orange bg-neo-orange/10 px-3 py-1 shadow-hard-sm"
+              >
+                <Flame className="h-4 w-4 text-neo-orange" strokeWidth={2.5} aria-hidden="true" />
+                <span className="font-neo-display font-black text-neo-orange">{clientStreak}</span>
+              </m.span>
+            )}
           </div>
           {pyramidState.status === 'lost' && (
             <p className="mt-3 font-neo-body text-sm text-neo-white/70">

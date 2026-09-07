@@ -9,55 +9,47 @@ import {
 } from '@/lib/dailyModes';
 
 describe('dailyModes registry', () => {
-  it('lists the three known daily modes', () => {
+  it('lists the four known daily modes', () => {
     const ids = DAILY_MODES.map((m) => m.id);
     expect(ids).toContain('word-hunt');
     expect(ids).toContain('word-wheel');
     expect(ids).toContain('word-tower');
+    expect(ids).toContain('connections');
   });
 
-  it('ships Word Tower as a PUBLIC daily mode alongside the other live modes', () => {
-    const tower = DAILY_MODES.find((m) => m.id === 'word-tower')!;
-    expect(tower.adminOnly).toBe(false);
-    expect(DAILY_MODES.find((m) => m.id === 'word-hunt')!.adminOnly).toBe(false);
-    expect(DAILY_MODES.find((m) => m.id === 'word-wheel')!.adminOnly).toBe(false);
+  it('ships every daily mode PUBLIC (no admin gate left in the registry)', () => {
+    for (const mode of DAILY_MODES) {
+      expect(mode.adminOnly, `${mode.id} should be public`).toBe(false);
+    }
   });
 
-  it('hides admin-only modes from non-admins but keeps the public ones', () => {
-    const ids = visibleDailyModes(false).map((m) => m.id);
-    expect(ids).not.toContain('connections');
-    expect(ids).toContain('word-tower');
-    expect(ids).toContain('word-hunt');
+  it('shows all modes to non-admins and admins alike', () => {
+    const publicIds = visibleDailyModes(false).map((m) => m.id);
+    expect(publicIds).toEqual(DAILY_MODES.map((m) => m.id));
+    expect(visibleDailyModes(true).map((m) => m.id)).toEqual(publicIds);
   });
 
-  it('shows every mode to admins', () => {
-    const ids = visibleDailyModes(true).map((m) => m.id);
-    expect(ids).toContain('word-tower');
-    expect(ids).toContain('word-hunt');
-    expect(ids).toContain('word-wheel');
-  });
-
-  it('adminOnlyDailyModes returns the future-gated modes only', () => {
-    const ids = adminOnlyDailyModes().map((m) => m.id);
-    expect(ids).toEqual(['connections']);
+  it('adminOnlyDailyModes is empty now that Connections graduated', () => {
+    expect(adminOnlyDailyModes()).toEqual([]);
   });
 
   // Word Tower graduated OUT of the generic quest cards in 42bc4968a (2026-08-18,
   // "render Word Tower with the shared daily QuestCard"): once it went public it is
   // drawn with the same QuestCard chrome as Word Hunt and Word Wheel, so all three
-  // are excluded here. This test asserted the pre-graduation shape and had been red
-  // on master ever since.
+  // are excluded here. Connections is the second public mode but STAYS generic —
+  // the DailyModeQuestCard already gives it full-bleed mascot art and a played
+  // badge, and its hard-nav `<a>` guarantees the daily host re-reads the date.
   it('exposes the registry-driven quest cards (everything but the bespoke hero cards)', () => {
     const publicIds = questCardModes(false).map((m) => m.id);
-    expect(publicIds).toEqual([]);
+    expect(publicIds).toEqual(['connections']);
     const adminIds = questCardModes(true).map((m) => m.id);
     expect(adminIds).toEqual(['connections']);
   });
 
-  it('registers Connections as an admin-gated daily card pointing at the daily route', () => {
+  it('registers Connections as a PUBLIC daily card pointing at the variant-aware daily route', () => {
     const connections = DAILY_MODES.find((m) => m.id === 'connections')!;
     expect(connections).toBeDefined();
-    expect(connections.adminOnly).toBe(true);
+    expect(connections.adminOnly).toBe(false);
     expect(connections.path).toBe('/connections/daily');
     expect(connections.accent).toBe('purple');
     expect(dailyModeHref(connections, 'he')).toBe('/he/connections/daily');
