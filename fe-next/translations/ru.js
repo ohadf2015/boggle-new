@@ -1596,7 +1596,15 @@ const ru = {
       "unpluggedReteachReveal": "Показать",
       "unpluggedReteachNext": "Далее",
       "unpluggedReteachPrev": "Назад",
-      "unpluggedReteachProgress": "Слово {{current}} из {{total}}"
+      "unpluggedReteachProgress": "Слово {{current}} из {{total}}",
+      "shareMissGapPractice": "Поделиться карточкой практики miss-gap",
+      "shareMissGapPracticeCopied": "Ссылка на карточку скопирована — вставьте для родителей",
+      "shareMissGapPracticeTitle": "Карточка практики miss-gap",
+      "shareMissGapPracticeText": "{{lesson}} — домашняя практика miss-gap (печать или PDF): {{missed}}",
+      "missGapPracticeEyebrow": "Домашняя практика",
+      "missGapPracticeSubtitle": "Практика miss-gap без устройств после задания Unplugged в Classroom — откройте, распечатайте или сохраните PDF.",
+      "missGapPracticeFoil": "У Kahoot Unplugged нет домашки — у LexiClash есть",
+      "missGapPracticePrintPdf": "Печать / сохранить PDF практики",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",

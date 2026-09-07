@@ -29,7 +29,7 @@ const EDUCATION_DIR = join(__dirname, '..');
  * signed-in classroom flows and the noindexed internal pages. They are excluded
  * from the registry on purpose and must stay excluded.
  */
-const NON_LANDING = new Set(['access', 'class-gap', 'classroom-addon', 'classroom-game', 'duels', 'unplugged-reteach', 'chatgpt-reteach']);
+const NON_LANDING = new Set(['access', 'class-gap', 'classroom-addon', 'classroom-game', 'duels', 'unplugged-reteach', 'chatgpt-reteach', 'miss-gap-practice']);
 
 function landingDirs(): string[] {
   return readdirSync(EDUCATION_DIR, { withFileTypes: true })

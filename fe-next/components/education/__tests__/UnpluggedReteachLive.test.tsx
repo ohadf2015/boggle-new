@@ -1,7 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UnpluggedReteachLive } from '../UnpluggedReteachLive';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -16,6 +17,10 @@ vi.mock('@/lib/education/missedWordsPracticeSheet', () => ({
   openMissedWordsPracticeSheet: vi.fn().mockReturnValue(true),
 }));
 
+vi.mock('@/utils/shareWithFallback', () => ({
+  shareWithFallback: vi.fn().mockResolvedValue('copied'),
+}));
+
 const payload: ClassGapSharePayload = {
   locale: 'en',
   lesson: 'Physics 101',
@@ -28,6 +33,8 @@ const payload: ClassGapSharePayload = {
 describe('UnpluggedReteachLive', () => {
   beforeEach(() => {
     vi.mocked(openMissedWordsPracticeSheet).mockClear();
+    vi.mocked(shareWithFallback).mockClear();
+    vi.mocked(shareWithFallback).mockResolvedValue('copied');
   });
 
   it('renders the projector shell with the first word hidden until reveal', () => {
@@ -67,5 +74,15 @@ describe('UnpluggedReteachLive', () => {
     );
     expect(screen.getByText('education.results.allFound')).toBeInTheDocument();
     expect(screen.queryByTestId('unplugged-reteach-reveal')).not.toBeInTheDocument();
+  });
+
+  it('shares a miss-gap practice card URL for take-home PDF after Unplugged', async () => {
+    render(<UnpluggedReteachLive payload={payload} />);
+    fireEvent.click(screen.getByTestId('share-miss-gap-practice'));
+    await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
+    const arg = vi.mocked(shareWithFallback).mock.calls[0][0] as { url?: string };
+    expect(arg.url).toContain('https://www.lexiclash.live/en/education/miss-gap-practice');
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
   });
 });

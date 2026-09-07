@@ -13412,7 +13412,15 @@ const ja = {
       "unpluggedReteachReveal": "表示",
       "unpluggedReteachNext": "次へ",
       "unpluggedReteachPrev": "前へ",
-      "unpluggedReteachProgress": "単語 {{current}} / {{total}}"
+      "unpluggedReteachProgress": "単語 {{current}} / {{total}}",
+      "shareMissGapPractice": "ミスギャップ練習カードを共有",
+      "shareMissGapPracticeCopied": "練習カードのリンクをコピーしました — 保護者に貼り付け",
+      "shareMissGapPracticeTitle": "ミスギャップ練習カード",
+      "shareMissGapPracticeText": "{{lesson}} — 持ち帰りミスギャップ練習（印刷またはPDF保存）: {{missed}}",
+      "missGapPracticeEyebrow": "家庭学習カード",
+      "missGapPracticeSubtitle": "Classroom の Unplugged 課題のあとのデバイス不要ミスギャップ練習 — 開いて印刷、または PDF 保存。",
+      "missGapPracticeFoil": "Kahoot Unplugged には持ち帰り練習がない — LexiClash にはある",
+      "missGapPracticePrintPdf": "練習 PDF を印刷 / 保存",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",

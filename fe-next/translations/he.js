@@ -13266,7 +13266,15 @@ const he = {
       "unpluggedReteachReveal": "חשוף",
       "unpluggedReteachNext": "הבא",
       "unpluggedReteachPrev": "הקודם",
-      "unpluggedReteachProgress": "מילה {{current}} מתוך {{total}}"
+      "unpluggedReteachProgress": "מילה {{current}} מתוך {{total}}",
+      "shareMissGapPractice": "שיתוף כרטיס תרגול miss-gap",
+      "shareMissGapPracticeCopied": "קישור כרטיס התרגול הועתק — להדבקה להורים",
+      "shareMissGapPracticeTitle": "כרטיס תרגול miss-gap",
+      "shareMissGapPracticeText": "{{lesson}} — תרגול miss-gap לבית (הדפסה או שמירת PDF): {{missed}}",
+      "missGapPracticeEyebrow": "תרגול לבית",
+      "missGapPracticeSubtitle": "תרגול miss-gap בלי מכשירים אחרי שיבוץ Unplugged ב-Classroom — פתחו, הדפיסו או שמרו כ-PDF.",
+      "missGapPracticeFoil": "ל-Kahoot Unplugged אין שיעורי בית — ל-LexiClash יש",
+      "missGapPracticePrintPdf": "הדפסה / שמירת PDF לתרגול",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",

@@ -8,11 +8,13 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Eye, Printer } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Eye, Printer, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 
 export interface UnpluggedReteachLiveProps {
   payload: ClassGapSharePayload;
@@ -28,6 +30,7 @@ export function UnpluggedReteachLive({
   const words = payload.missedWords;
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [missGapShareState, setMissGapShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
 
   const safeIndex = words.length === 0 ? 0 : Math.min(index, words.length - 1);
   const current = words[safeIndex] ?? '';
@@ -54,6 +57,24 @@ export function UnpluggedReteachLive({
     if (safeIndex >= words.length - 1) return;
     setIndex(safeIndex + 1);
     setRevealed(false);
+  };
+
+
+  const handleShareMissGapPractice = async () => {
+    if (words.length === 0) return;
+    const lesson = payload.lesson || t('education.results.title');
+    const url = buildMissGapPracticeShareUrl(payload);
+    const text = t('education.results.shareMissGapPracticeText', {
+      lesson,
+      missed: words.join(', '),
+    });
+    const result = await shareWithFallback({
+      title: t('education.results.shareMissGapPracticeTitle'),
+      text,
+      url,
+      clipboardText: `${text}\n${url}`,
+    });
+    if (result === 'copied' || result === 'shared') setMissGapShareState(result);
   };
 
   const handlePrint = () => {
@@ -196,6 +217,29 @@ export function UnpluggedReteachLive({
         >
           <Printer className="w-5 h-5" aria-hidden />
           {t('education.results.printPracticeSheet')}
+        </button>
+
+        <button
+          type="button"
+          data-testid="share-miss-gap-practice"
+          onClick={handleShareMissGapPractice}
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+            'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          {missGapShareState === 'idle' ? (
+            <>
+              <Share2 className="w-5 h-5" aria-hidden />
+              {t('education.results.shareMissGapPractice')}
+            </>
+          ) : (
+            <>
+              <Check className="w-5 h-5" aria-hidden />
+              {t('education.results.shareMissGapPracticeCopied')}
+            </>
+          )}
         </button>
       </div>
     </div>

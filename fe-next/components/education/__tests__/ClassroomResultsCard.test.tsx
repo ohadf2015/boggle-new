@@ -289,3 +289,29 @@ describe('ClassroomResultsCard', () => {
   });
 
 });
+
+  it('offers the teacher a shareable miss-gap practice card after Unplugged assign', async () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('share-miss-gap-practice'));
+    await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
+    const arg = vi.mocked(shareWithFallback).mock.calls.at(-1)?.[0] as {
+      url?: string;
+      clipboardText?: string;
+    };
+    expect(arg.url).toContain('https://www.lexiclash.live/en/education/miss-gap-practice');
+    expect(arg.url).toContain('neutron');
+    expect(arg.url).not.toContain('Maya');
+    expect(arg.url).not.toContain('Noa');
+    expect(arg.clipboardText).toContain('miss-gap-practice');
+  });
+
+  it('never offers a student the miss-gap practice share CTA', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('share-miss-gap-practice')).not.toBeInTheDocument();
+  });
+
+  it('hides the miss-gap practice share CTA when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('share-miss-gap-practice')).not.toBeInTheDocument();
+  });
