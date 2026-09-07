@@ -33,7 +33,8 @@ interface ClassroomSetupStepProps {
   activePreset: ClassroomPresetId | null;
   playStyle: PlayStyle;
   teamCount: number;
-  accessibility: ClassroomAccessibility;
+  /** SPED accommodations — optional; absent means "no accommodations". */
+  accessibility?: ClassroomAccessibility;
   onApplyPreset: (id: ClassroomPresetId) => void;
   onPlayStyleChange: (style: PlayStyle) => void;
   onTeamCountChange: (count: number) => void;
@@ -83,7 +84,7 @@ export function ClassroomSetupStep({
   activePreset,
   playStyle,
   teamCount,
-  accessibility,
+  accessibility = {},
   onApplyPreset,
   onPlayStyleChange,
   onTeamCountChange,

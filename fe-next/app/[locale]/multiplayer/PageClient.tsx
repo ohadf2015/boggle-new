@@ -23,6 +23,7 @@ import { saveSession, clearSession, clearSessionPreservingUsername } from '@/uti
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { setStoredUsername } from '@/utils/profileStorage';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
@@ -314,12 +315,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // page-level toast stream was duplicating every elimination and stacking
   // uncapped over the board — removed in favour of the single in-game source.
   const mpSounds = useMultiplayerSounds();
+  const { sfxMuted, toggleSfxMute } = useSoundEffects();
 
   const {
     socket, isConnected, roomsLoading, attemptingReconnect,
     setAttemptingReconnect, refreshRooms, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
-    classroomLevel, classroomWordBank,
+    classroomLevel, classroomWordBank, classroomAccessibility,
   } = useMultiplayerSocket({
     language: language as Language, gameCode, username, roomName,
     isActive, isHost, roomLanguage,
@@ -498,6 +500,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   // Sync ref bridge so hooks called before useMultiplayerSocket get the latest socket
   socketRef.current = socket;
+
+  // SPED audio-cue accommodation: the room asks for sound nudged ON. Applied
+  // once per game start and only ever as an UNMUTE — a student's own mute tap
+  // afterwards always wins (the teacher's nudge never re-fires mid-round).
+  const audioCuesActive = !!classroomAccessibility?.audioCues;
+  useEffect(() => {
+    if (audioCuesActive && sfxMuted) toggleSfxMute();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one nudge per game start, not per mute toggle
+  }, [audioCuesActive]);
 
   useAchievementSocketBridge(socket);
 
@@ -746,7 +757,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // when the user tapped into the room, where the shift is input-excluded.
             <AutoHideHeader collapseSpacerWhenHidden="user-initiated" />
           )}
-          {renderView()}
+          {/* SPED large-text accommodation: the teacher's support preset rides
+              the startGame payload; zoom scales the whole play surface (grid,
+              word input, word bank) without touching per-component font sizes. */}
+          <div style={classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
+            {renderView()}
+          </div>
           {/* Teacher live controls (classroom rooms). Overlay for everyone while
               paused; the floating bar only for the host. Both gated on a live
               round so a stale flag can never surface on lobby/results. */}

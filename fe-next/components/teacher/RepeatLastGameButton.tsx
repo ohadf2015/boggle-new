@@ -26,8 +26,7 @@ export default function RepeatLastGameButton({
   onClick,
   className,
 }: RepeatLastGameButtonProps) {
-  const { t, language } = useLanguage();
-  const isRTL = language === 'he';
+  const { t } = useLanguage();
 
   if (!config) return null;
 
@@ -45,9 +44,8 @@ export default function RepeatLastGameButton({
         'group w-full p-4 rounded-neo border-neo border-neo-black',
         'bg-neo-yellow/90 hover:bg-neo-yellow',
         'shadow-hard hover:shadow-hard-lg transition-all',
-        'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
+        'text-start hover:translate-x-[-2px] hover:translate-y-[-2px]',
         'focus:outline-hidden focus:ring-2 focus:ring-neo-yellow',
-        isRTL && 'rtl text-right',
         className
       )}
     >

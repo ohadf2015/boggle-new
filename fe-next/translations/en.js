@@ -11137,6 +11137,10 @@ const en = {
       "quickTipDescription": "Start a classroom game to engage students with multiplayer vocabulary practice. Students can join with a simple game code!",
       "quickStart": "Quick Start",
       "repeatLastGame": "Repeat Last Game",
+      "repeatLastGameDesc": "Same class, same list, one tap",
+      "reviewLockedTitle": "Play your first class game",
+      "reviewLockedDesc": "Analytics, assignments and reports unlock after your first live game — start one from the Play tab.",
+      "reviewLockedCta": "Go to Play",
       "lastPlayed": "Last played",
       "noRecentGames": "No recent games",
       "assignments": "Assignments",
@@ -11171,6 +11175,28 @@ const en = {
       "scanToJoin": "Scan to join"
     },
     "classroom": {
+      "presets": {
+        "title": "Ritual presets",
+        "fridayBattle": { "name": "Friday Vocab Battle", "desc": "Teams · your last list · loud and fast" },
+        "sped": { "name": "Support (SPED)", "desc": "Fewer words · more time · larger type" },
+        "standard": { "name": "Standard", "desc": "Classic 3-minute free-for-all" }
+      },
+      "playStyle": {
+        "title": "Play style",
+        "ffa": "Free-for-all",
+        "ffaDesc": "Every student for themselves",
+        "teams": "Teams",
+        "teamsDesc": "Auto-split into balanced teams",
+        "teamCount": "How many teams?",
+        "autoAssignNote": "Students are split automatically — no setup, fair every time."
+      },
+      "support": {
+        "title": "Support (SPED)",
+        "largeText": "Larger type",
+        "audioCues": "Audio cues",
+        "participation": "Participation points",
+        "vocabCapNote": "Support preset: only the first {count} words are in play."
+      },
       "gameModes": {
         "title": "Game Mode",
         "classic": "Classic",
@@ -11869,6 +11895,13 @@ const en = {
       "allFound": "The class found every lesson word.",
       "practiceMissed": "Practise these words",
       "playReteachRound": "Play reteach round — missed words only",
+      "rematch": "Rematch — same list, same code",
+      "teamBattle": {
+        "title": "Team battle",
+        "teamName": "Team {number}",
+        "winner": "Winner!"
+      },
+      "participationBonus": "+{points} participation points for everyone",
       "shareGap": "Share class gap",
       "shareGapCopied": "Link copied — paste in Slack or a parent chat",
       "shareGapTitle": "Class vocabulary gap",

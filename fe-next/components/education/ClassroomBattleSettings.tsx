@@ -19,7 +19,8 @@ import type { ClassroomAccessibility } from '@/shared/types/classroom';
 interface ClassroomBattleSettingsProps {
   playStyle: PlayStyle;
   teamCount: number;
-  accessibility: ClassroomAccessibility;
+  /** SPED accommodations — optional; absent means "no accommodations". */
+  accessibility?: ClassroomAccessibility;
   onPlayStyleChange: (style: PlayStyle) => void;
   onTeamCountChange: (count: number) => void;
   onAccessibilityChange: (next: ClassroomAccessibility) => void;
@@ -33,7 +34,7 @@ const TEAM_COUNTS = Array.from(
 export function ClassroomBattleSettings({
   playStyle,
   teamCount,
-  accessibility,
+  accessibility = {},
   onPlayStyleChange,
   onTeamCountChange,
   onAccessibilityChange,

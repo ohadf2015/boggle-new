@@ -12701,6 +12701,10 @@ const ja = {
       "quickTipDescription": "クラスルームゲームを開始して、マルチプレイヤーの語彙練習で生徒を引き付けましょう。生徒は簡単なゲームコードで参加できます！",
       "quickStart": "クイックスタート",
       "repeatLastGame": "前回のゲームを繰り返す",
+      "repeatLastGameDesc": "同じクラス、同じリスト、ワンタップ",
+      "reviewLockedTitle": "最初のクラスゲームをプレイ",
+      "reviewLockedDesc": "分析・課題・レポートは初めてのライブゲーム後に解放されます —「プレイ」タブから開始。",
+      "reviewLockedCta": "プレイへ",
       "lastPlayed": "最後にプレイ",
       "noRecentGames": "最近のゲームはありません",
       "assignments": "課題",
@@ -12735,6 +12739,28 @@ const ja = {
       "scanToJoin": "スキャンして参加"
     },
     "classroom": {
+      "presets": {
+        "title": "定型プリセット",
+        "fridayBattle": { "name": "金曜単語バトル", "desc": "チーム戦 · 前回のリスト · 速くてにぎやか" },
+        "sped": { "name": "サポート (SPED)", "desc": "少ない単語 · 長めの時間 · 大きな文字" },
+        "standard": { "name": "標準", "desc": "定番3分間の全員対戦" }
+      },
+      "playStyle": {
+        "title": "プレイスタイル",
+        "ffa": "全員対戦",
+        "ffaDesc": "各自が自分のために",
+        "teams": "チーム",
+        "teamsDesc": "自動でバランスよくチーム分け",
+        "teamCount": "チーム数は？",
+        "autoAssignNote": "生徒は自動で振り分けられます — 準備不要、毎回公平。"
+      },
+      "support": {
+        "title": "サポート (SPED)",
+        "largeText": "大きな文字",
+        "audioCues": "音声キュー",
+        "participation": "参加ポイント",
+        "vocabCapNote": "サポートモード: 最初の{count}語のみが出題されます。"
+      },
       "gameModes": {
         "title": "ゲームモード",
         "classic": "クラシック",
@@ -13355,6 +13381,13 @@ const ja = {
       "allFound": "クラスはすべての単語を見つけました。",
       "practiceMissed": "この単語を練習する",
       "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ",
+      "rematch": "リマッチ — 同じリスト、同じコード",
+      "teamBattle": {
+        "title": "チームバトル",
+        "teamName": "チーム {number}",
+        "winner": "優勝！"
+      },
+      "participationBonus": "全員に+{points}参加ポイント",
       "shareGap": "クラスの抜けをシェア",
       "shareGapCopied": "リンクをコピーしました — Slackや保護者チャットに貼ってください",
       "shareGapTitle": "クラスの語彙ギャップ",

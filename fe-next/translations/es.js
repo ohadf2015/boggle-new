@@ -12672,6 +12672,10 @@ const es = {
       "quickTipDescription": "¡Inicia un juego de aula para involucrar a los estudiantes con práctica de vocabulario multijugador. Los estudiantes pueden unirse con un código de juego simple!",
       "quickStart": "Inicio Rápido",
       "repeatLastGame": "Repetir Último Juego",
+      "repeatLastGameDesc": "Misma clase, misma lista, un toque",
+      "reviewLockedTitle": "Juega tu primer juego de clase",
+      "reviewLockedDesc": "Analíticas, tareas e informes se desbloquean tras tu primer juego en vivo — empieza uno en la pestaña Jugar.",
+      "reviewLockedCta": "Ir a Jugar",
       "lastPlayed": "Último jugado",
       "noRecentGames": "Sin juegos recientes",
       "assignments": "Tareas",
@@ -12706,6 +12710,28 @@ const es = {
       "scanToJoin": "Escanea para unirte"
     },
     "classroom": {
+      "presets": {
+        "title": "Rituales rápidos",
+        "fridayBattle": { "name": "Batalla de vocabulario del viernes", "desc": "Equipos · tu última lista · rápido y ruidoso" },
+        "sped": { "name": "Apoyo (SPED)", "desc": "Menos palabras · más tiempo · letra grande" },
+        "standard": { "name": "Estándar", "desc": "Todos contra todos, 3 minutos clásicos" }
+      },
+      "playStyle": {
+        "title": "Estilo de juego",
+        "ffa": "Todos contra todos",
+        "ffaDesc": "Cada estudiante por su cuenta",
+        "teams": "Equipos",
+        "teamsDesc": "División automática en equipos equilibrados",
+        "teamCount": "¿Cuántos equipos?",
+        "autoAssignNote": "Los estudiantes se dividen automáticamente — sin preparación, justo cada vez."
+      },
+      "support": {
+        "title": "Apoyo (SPED)",
+        "largeText": "Letra grande",
+        "audioCues": "Señales de audio",
+        "participation": "Puntos de participación",
+        "vocabCapNote": "Modo de apoyo: solo las primeras {count} palabras entran en juego."
+      },
       "gameModes": {
         "title": "Modo de juego",
         "classic": "Clásico",
@@ -13347,6 +13373,13 @@ const es = {
       "allFound": "La clase encontró todas las palabras de la lección.",
       "practiceMissed": "Practicar estas palabras",
       "playReteachRound": "Jugar ronda de repaso — solo las palabras que faltan",
+      "rematch": "Revancha — misma lista, mismo código",
+      "teamBattle": {
+        "title": "Batalla por equipos",
+        "teamName": "Equipo {number}",
+        "winner": "¡Ganador!"
+      },
+      "participationBonus": "+{points} puntos de participación para todos",
       "shareGap": "Compartir el hueco de la clase",
       "shareGapCopied": "Enlace copiado — pégalo en Slack o en el chat de padres",
       "shareGapTitle": "Hueco de vocabulario de la clase",

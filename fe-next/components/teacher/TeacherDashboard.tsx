@@ -322,9 +322,14 @@ export default function TeacherDashboard() {
                 </>
               )}
 
-              {/* Quick Start — gated on having classrooms (prevents dead-end with zero classrooms + recent config) */}
+              {/* Heroes: Quick Start + Repeat Last — a teacher with a list is
+                  one tap from a room. Gated on having classrooms (prevents a
+                  dead-end with zero classrooms + a recent config) */}
               {hasRecentConfig && classrooms.length > 0 && (
-                <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
+                  <RepeatLastGameButton config={getMostRecent()} onClick={handleRepeatLast} />
+                </div>
               )}
 
               {/* Duel Activity */}
@@ -430,7 +435,9 @@ export default function TeacherDashboard() {
                   {/* Last class game — free for every teacher, above the Pro gate.
                       "Which words did we miss in the round we just played" is the
                       question a teacher has at the bell; the cross-game trend view
-                      below is what Pro sells. */}
+                      below is what Pro sells. NOT buried with the P0 gate: this
+                      card IS the first-game payoff, and it renders a friendly
+                      empty state for a teacher who has not played yet. */}
                   {selectedClassroomId && (
                     <section>
                       {classroomSelect}
@@ -441,7 +448,40 @@ export default function TeacherDashboard() {
                     </section>
                   )}
 
-                  {/* Analytics */}
+                  {!hasPlayedLiveGame ? (
+                    /* P0: analytics/assignments/reports stay BURIED until the
+                       first live game — a teacher who has never run a room gets
+                       one job (play), not a wall of empty charts. */
+                    <div
+                      data-testid="review-locked-card"
+                      className="rounded-neo border-3 border-black bg-neo-cream shadow-hard px-6 py-10 text-center"
+                    >
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan shadow-hard-sm">
+                        <Gamepad2 className="h-8 w-8 text-black" />
+                      </div>
+                      <p className="text-black font-neo-body font-black text-lg text-balance">
+                        {t('teacher.dashboard.reviewLockedTitle')}
+                      </p>
+                      <p className="mt-1 text-sm font-bold text-black/60 text-pretty">
+                        {t('teacher.dashboard.reviewLockedDesc')}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('play')}
+                        data-testid="review-locked-play-cta"
+                        className={cn(
+                          'mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-neo px-6 py-2.5',
+                          'border-3 border-black bg-neo-cyan font-neo-display font-black text-black shadow-hard',
+                          'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all'
+                        )}
+                      >
+                        <Gamepad2 className="h-5 w-5" />
+                        {t('teacher.dashboard.reviewLockedCta')}
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Analytics */}
                   <section>
                     <div className="flex items-center gap-2 mb-4">
                       <BarChart3 className="w-4 h-4 text-neo-lime" />
@@ -494,6 +534,8 @@ export default function TeacherDashboard() {
                         <p className="text-xs text-black/60">{t('teacher.dashboard.viewReportsDesc')}</p>
                       </div>
                     </Link>
+                  )}
+                    </>
                   )}
                 </>
               )}

@@ -193,8 +193,8 @@ describe('TeacherDashboard — QuickStartButton integration', () => {
       // WHEN
       render(<TeacherDashboard />);
 
-      // THEN
-      expect(screen.getByText('Science Lab')).toBeInTheDocument();
+      // THEN — both P0 heroes (Quick Start + Repeat Last) surface the config
+      expect(screen.getAllByText('Science Lab')).toHaveLength(2);
     });
   });
 

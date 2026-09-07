@@ -12939,6 +12939,10 @@ const sv = {
       "quickTipDescription": "Starta ett klassrumsspel för att engagera elever med flerspelar-glosövning. Elever går med via en enkel spelkod!",
       "quickStart": "Snabbstart",
       "repeatLastGame": "Upprepa senaste spel",
+      "repeatLastGameDesc": "Samma klass, samma lista, ett tryck",
+      "reviewLockedTitle": "Spela ditt första klassrumsspel",
+      "reviewLockedDesc": "Analys, uppgifter och rapporter låses upp efter ditt första livespel — starta ett från fliken Spela.",
+      "reviewLockedCta": "Gå till Spela",
       "lastPlayed": "Senast spelat",
       "noRecentGames": "Inga senaste spel",
       "assignments": "Uppgifter",
@@ -12973,6 +12977,28 @@ const sv = {
       "scanToJoin": "Skanna för att gå med"
     },
     "classroom": {
+      "presets": {
+        "title": "Snabbritualer",
+        "fridayBattle": { "name": "Fredagens ordkamp", "desc": "Lag · din senaste lista · högljutt och snabbt" },
+        "sped": { "name": "Stöd (SPED)", "desc": "Färre ord · mer tid · större text" },
+        "standard": { "name": "Standard", "desc": "Klassisk 3-minuters alla-mot-alla" }
+      },
+      "playStyle": {
+        "title": "Spelstil",
+        "ffa": "Alla mot alla",
+        "ffaDesc": "Varje elev för sig",
+        "teams": "Lag",
+        "teamsDesc": "Automatisk uppdelning i balanserade lag",
+        "teamCount": "Hur många lag?",
+        "autoAssignNote": "Eleverna delas in automatiskt — ingen förberedelse, rättvist varje gång."
+      },
+      "support": {
+        "title": "Stöd (SPED)",
+        "largeText": "Större text",
+        "audioCues": "Ljudsignaler",
+        "participation": "Deltagarpoäng",
+        "vocabCapNote": "Stödläge: bara de {count} första orden är med."
+      },
       "gameModes": {
         "title": "Spelläge",
         "classic": "Klassiskt",
@@ -13593,6 +13619,13 @@ const sv = {
       "allFound": "Klassen hittade alla lektionsord.",
       "practiceMissed": "Öva de här orden",
       "playReteachRound": "Spela repetitionsrunda — bara missade ord",
+      "rematch": "Revansch — samma lista, samma kod",
+      "teamBattle": {
+        "title": "Lagkamp",
+        "teamName": "Lag {number}",
+        "winner": "Vinnare!"
+      },
+      "participationBonus": "+{points} deltagarpoäng till alla",
       "shareGap": "Dela klassens lucka",
       "shareGapCopied": "Länk kopierad — klistra in i Slack eller föräldrachatten",
       "shareGapTitle": "Klassens ordförrådslucka",

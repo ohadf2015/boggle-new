@@ -8,6 +8,7 @@ import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -20,13 +21,19 @@ function TeacherDashboardInner() {
   const { isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
   const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasRecentConfig } = useRecentGameSettings();
 
   // At most one banner above the dashboard. This page used to stack a trial
   // countdown, a district-pricing upsell and a Pro strip before the thing the
   // teacher opened it for. District pricing keeps its home on the classroom-game
   // launcher, which already links to "LexiClash for schools". A Pro teacher
   // (paid or gifted) gets no upsell at all.
-  const banner = pickTeacherBanner({ hasTrial: !!trial, isAdmin, hasPro, proLoading });
+  // P0: before the FIRST live game every urgency banner stays buried — a new
+  // teacher's only job is starting a room, and the launcher saving a config is
+  // the "has played" signal.
+  const banner = hasRecentConfig
+    ? pickTeacherBanner({ hasTrial: !!trial, isAdmin, hasPro, proLoading })
+    : null;
 
   useEffect(() => {
     if (banner === 'pro') {

@@ -90,6 +90,8 @@ interface UseMultiplayerSocketReturn {
   classroomLevel: VocabularyLevel;
   /** Lesson vocabulary embedded in the board (classroom games only; [] otherwise). */
   classroomWordBank: string[];
+  /** Room-wide SPED accommodations from the startGame payload (classroom games). */
+  classroomAccessibility: { largeText?: boolean; audioCues?: boolean } | null;
   setAttemptingReconnect: (value: boolean) => void;
   setRoomsLoading: (value: boolean) => void;
   refreshRooms: () => void;
@@ -120,6 +122,10 @@ export function useMultiplayerSocket(
   // ---- Classroom differentiation state (see `classroomContext` listener) ----
   const [classroomLevel, setClassroomLevel] = useState<VocabularyLevel>('core');
   const [classroomWordBank, setClassroomWordBank] = useState<string[]>([]);
+  const [classroomAccessibility, setClassroomAccessibility] = useState<{
+    largeText?: boolean;
+    audioCues?: boolean;
+  } | null>(null);
   const [roomsLoading, setRoomsLoading] = useState<boolean>(true);
   const [attemptingReconnect, setAttemptingReconnect] = useState<boolean>(false);
 
@@ -484,6 +490,17 @@ export function useMultiplayerSocket(
       // the pause, and a fresh round (no flag) clears a stale one from the
       // previous round. Derive, never keep — one source of truth.
       setTeacherPaused(!!data.isPaused);
+      // SPED accommodations ride the same payload: every student's client
+      // applies them from the first frame (large type, audio cue nudge).
+      // A payload without the flag clears a stale one from the prior round.
+      setClassroomAccessibility(
+        data?.accessibility && (data.accessibility.largeText || data.accessibility.audioCues)
+          ? {
+              largeText: !!data.accessibility.largeText,
+              audioCues: !!data.accessibility.audioCues,
+            }
+          : null
+      );
       optionsRef.current.onGameStart(data);
     });
 
@@ -806,6 +823,7 @@ export function useMultiplayerSocket(
     attemptingReconnect,
     classroomLevel,
     classroomWordBank,
+    classroomAccessibility,
     setAttemptingReconnect,
     setRoomsLoading,
     refreshRooms,
