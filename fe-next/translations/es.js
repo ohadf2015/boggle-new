@@ -2490,6 +2490,8 @@ const es = {
     "needPlayers": "¡Necesita jugadores!",
     "commandersJoined": "Comandantes unidos",
     "playersInRoom": "Jugadores en la sala",
+    "startQuiz": "Iniciar cuestionario",
+    "startClassGame": "Iniciar juego",
     "noOneYet": "¿Nadie aún?",
     "startingWithBots": "Empezando con bots en",
     "addingBots": "Añadiendo bots en",
@@ -12353,6 +12355,10 @@ const es = {
       "playGame": "Jugar",
       "playGameHint": "Practica con un juego multijugador usando este vocabulario",
       "wordsAtYourLevel": "{{mine}} de tu nivel · {{total}} en la lección",
+      "assignment": {
+        "due": "Para el {{date}}",
+        "overdue": "Atrasado — era para el {{date}}"
+      },
       "empty": {
         "title": "Sin lecciones asignadas",
         "subtitle": "Únete a un aula para empezar a practicar",
@@ -13514,6 +13520,16 @@ const es = {
       "yesterday": "Ayer"
     },
     "classroomGame": {
+      "questions": "Preguntas",
+      "perQuestion": "Por pregunta",
+      "namePrompt": {
+        "eyebrow": "Juego de clase",
+        "title": "¿Cómo te llamas?",
+        "subtitle": "Tu clase verá este nombre en la pizarra.",
+        "placeholder": "Escribe tu nombre",
+        "submit": "Entrar al juego",
+        "roomLabel": "Sala {{code}}"
+      },
       "classroomLessonLabel": "{{classroom}} · partida en vivo: {{lesson}}",
       "classCode": "Código del juego",
       "classroomNotFound": "Clase no encontrada",
@@ -13985,8 +14001,11 @@ const es = {
         "alreadyMember": "Ya estás en esta aula",
         "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "codePasted": "¡Código pegado!",
+        "heroLine": "Pide a tu profe el código de la clase",
         "preparing": "Preparando todo, un momento.",
         "queuedNeedsName": "Ya casi — escribe tu nombre arriba y entramos directos.",
+        "nameTaken": "Ya hay alguien con ese nombre en la clase. Prueba {{suggestedName}}.",
+        "useSuggestedName": "Entrar como {{suggestedName}}",
         "emptyClipboard": "No hay nada copiado",
         "clipboardError": "No se pudo leer el portapapeles",
         "nameLabel": "Tu nombre",
@@ -13994,6 +14013,7 @@ const es = {
         "nameHint": "No necesitas cuenta: solo elige un nombre",
         "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe."
       },
+      "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
       "lessonsAssigned": "Lecciones asignadas"
     },
     "template": {
@@ -15304,7 +15324,8 @@ const es = {
     "hebrew": "Hebreo",
     "swedish": "Sueco",
     "japanese": "Japonés",
-    "spanish": "Español"
+    "spanish": "Español",
+    "russian": "Ruso"
   },
   "streakBar": {
     "streak": "Racha de {{count}} días",

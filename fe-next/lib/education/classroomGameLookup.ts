@@ -25,10 +25,32 @@ export function classroomGameKey(gameCode: string): string {
   return `${CLASSROOM_GAME_KEY_PREFIX}${gameCode}`;
 }
 
+/**
+ * The teacher-chosen settings, as `backend/modules/classroomGameManager.ts`
+ * writes them. Kept structurally identical rather than imported: that module
+ * uses Node-ESM `.js` specifiers webpack cannot resolve (see above).
+ */
+export interface LiveClassroomGameSettings {
+  timerMinutes?: number;
+  boardSize?: 'small' | 'medium' | 'large';
+  allowLateJoin?: boolean;
+  gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz';
+  vocabQuizQuestionCount?: number;
+  vocabQuizSeconds?: number;
+}
+
 export interface LiveClassroomGame {
   classroomId: string;
   lessonIds: string[];
   teacherName: string;
+  /** Lesson titles, for the student-facing "what are we playing" summary. */
+  lessonNames: string[];
+  /**
+   * What the teacher actually picked. The student's own client has no copy of
+   * this — `lessonGameData` is written to the TEACHER's sessionStorage — so
+   * without it a student's lobby renders classic defaults over a Vocab Quiz.
+   */
+  settings: LiveClassroomGameSettings;
 }
 
 /**
@@ -53,6 +75,8 @@ export async function lookupLiveClassroomGame(
       classroomId: game.classroomId,
       lessonIds: game.lessonIds ?? [],
       teacherName: game.teacherName ?? '',
+      lessonNames: game.lessonNames ?? [],
+      settings: game.settings ?? {},
     };
   } catch (err) {
     logger.error('lookupLiveClassroomGame failed:', err);

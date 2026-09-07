@@ -2025,6 +2025,8 @@ const en = {
     "needPlayers": "Need players!",
     "commandersJoined": "Commanders Joined",
     "playersInRoom": "Players in Room",
+    "startQuiz": "Start Quiz",
+    "startClassGame": "Start Game",
     "noOneYet": "No one yet?",
     "startingWithBots": "Starting with bots in",
     "addingBots": "Adding bots in",
@@ -10892,6 +10894,10 @@ const en = {
       "playGame": "Play Game",
       "playGameHint": "Practice with a multiplayer game using this vocabulary",
       "wordsAtYourLevel": "{{mine}} at your level · {{total}} in the lesson",
+      "assignment": {
+        "due": "Due {{date}}",
+        "overdue": "Late — was due {{date}}"
+      },
       "empty": {
         "title": "No lessons assigned yet",
         "subtitle": "Join a classroom to get started with vocabulary practice",
@@ -12027,6 +12033,16 @@ const en = {
       "yesterday": "Yesterday"
     },
     "classroomGame": {
+      "questions": "Questions",
+      "perQuestion": "Per question",
+      "namePrompt": {
+        "eyebrow": "Class game",
+        "title": "What's your name?",
+        "subtitle": "Your class sees this name on the board.",
+        "placeholder": "Type your name",
+        "submit": "Join game",
+        "roomLabel": "Room {{code}}"
+      },
       "classroomLessonLabel": "{{classroom}} · live game: {{lesson}}",
       "classCode": "Game Code",
       "classroomNotFound": "Classroom not found",
@@ -12487,8 +12503,11 @@ const en = {
         "codeHint": "6 characters from your teacher",
         "codeLabel": "Class Code",
         "codePasted": "Pasted!",
+        "heroLine": "Ask your teacher for the class code",
         "preparing": "Getting things ready — one moment.",
         "queuedNeedsName": "Almost in — add your name above and we'll take you straight there.",
+        "nameTaken": "Someone in this class already has that name. Try {{suggestedName}}.",
+        "useSuggestedName": "Join as {{suggestedName}}",
         "emptyClipboard": "Nothing to paste",
         "guestError": "Couldn't start your session. Try again or ask your teacher.",
         "invalidCode": "Invalid code",
@@ -12507,6 +12526,7 @@ const en = {
         "success": "You're in!",
         "title": "Join a Class"
       },
+      "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
       "lessonsAssigned": "Lessons Assigned"
     },
     "students": "Students",
@@ -13763,7 +13783,8 @@ const en = {
     "hebrew": "Hebrew",
     "swedish": "Swedish",
     "japanese": "Japanese",
-    "spanish": "Spanish"
+    "spanish": "Spanish",
+    "russian": "Russian"
   },
   "streakBar": {
     "streak": "{{count}} day streak",

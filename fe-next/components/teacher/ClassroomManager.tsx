@@ -21,7 +21,7 @@ import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
-const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
+export const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
   en: 'languages.english',
   he: 'languages.hebrew',
   sv: 'languages.swedish',

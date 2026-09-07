@@ -3,15 +3,17 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
+import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
 import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
+import { isClassroomStudent, classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
 import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
@@ -227,6 +229,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     onSetRoomLanguage: setRoomLanguage, onSetLessonData: handleSetLessonData, t,
   });
 
+  // The room's own record of what it is playing and whose class it belongs to.
+  // The teacher's browser has this in sessionStorage already; nobody else in the
+  // room does, which is why a student's classroom lobby announced Classic and
+  // classic settings in the middle of a Vocab Quiz.
+  const liveClassroomGame = useLiveClassroomGameInfo(gameCode || prefilledRoomCode, isClassroomMode);
+
   const {
     showResults, setShowResults, resultsData, setResultsData,
     isSpectator, setIsSpectator, spectators, setSpectators,
@@ -237,6 +245,23 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // Stable reference: this is in the dep array of PlayerView's pendingGameStart
   // effect — an inline arrow would re-fire game-start side effects every render.
   const handleGameStartConsumed = useCallback(() => setPendingGameStart(null), [setPendingGameStart]);
+
+  const router = useRouter();
+
+  // A classroom room that stops existing must not hand its students to the
+  // arcade. `isClassroomStudent` is the one place that decision is made; the
+  // three call sites below (host migration, room-gone error, host-left modal)
+  // are the three ways a live room reached them with three different outcomes.
+  const classroomStudentRef = useRef<boolean>(false);
+  classroomStudentRef.current = isClassroomStudent({ isClassroomMode, isHost: isHost || isClassroomHost });
+
+  const exitClassroomStudentToHub = useCallback(() => {
+    clearSessionPreservingUsername(username);
+    setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
+    setShowResults(false); setResultsData(null);
+    toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });
+    router.push(classroomStudentHomePath(language));
+  }, [username, t, router, language, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
 
   // Native-safe exit to the multiplayer lobby: reset MP state IN PLACE (no page
   // reload). Shared by the results "Exit" button and the host-left grace modal.
@@ -379,6 +404,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         // Always renders — `roomGoneFeedback` no longer returns null, so a
         // stale lobby tap can't end in silence. The shared `roomGone` toast id
         // collapses a run of dead-room taps into one message instead of a stack.
+        // A classroom student gets the classroom sentence and their own hub —
+        // the arcade "no battles in progress" lobby means nothing to them and
+        // reads as the app having simply lost their class.
+        if (classroomStudentRef.current) {
+          setError('');
+          setPrefilledRoomCode(''); setAttemptingReconnect(false); setShouldAutoJoin(false);
+          exitClassroomStudentToHub();
+          return;
+        }
         const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
         toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
         if (!isActive && cameFromInvite) {
@@ -451,7 +485,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setIsJoining(false);
       toast.error(t('multiplayerFlow.rateLimited'), { duration: 3000, icon: '⏳', id: MP_TOAST_IDS.rateLimited });
     },
-    onHostTransferred: (data) => { if (data.newHost === username) setIsHost(true); },
+    onHostTransferred: (data) => {
+      if (data.newHost !== username) return;
+      // A classroom student is never a host candidate. The server's ordinary
+      // migration picked one when the teacher dropped, and they were rendered
+      // the teacher's own share-code/QR screen. Send them home instead.
+      if (classroomStudentRef.current) { exitClassroomStudentToHub(); return; }
+      setIsHost(true);
+    },
     t,
   });
 
@@ -604,6 +645,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             isPrivate={isPrivate}
             isQuickPlay={quickPlay}
             onExitToLobby={handleExitToLobby}
+            isClassroomMode={isClassroomMode}
+            classroomGameMode={liveClassroomGame?.gameMode}
           />
         </FeatureErrorBoundary>
       );
@@ -619,6 +662,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           roomLanguage={roomLanguage} onUsernameChange={setUsername}
           seriesRoundNumber={seriesTracker.roundNumber}
           onExitToLobby={handleExitToLobby}
+          isClassroomMode={isClassroomMode}
+          classroomGameMode={liveClassroomGame?.gameMode}
         />
       </FeatureErrorBoundary>
     );
@@ -679,6 +724,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                   lessonData={lessonDataState}
                   gameCode={gameCode || prefilledRoomCode}
                   expanded={classroomPanelExpanded({ gameActive })}
+                  // `isHost` only flips once the server answers `joined`, and the
+                  // teacher arrives on `?host=true` — without the URL flag their
+                  // own share code would blink out of existence on every reload.
+                  isHost={isHost || isClassroomHost}
+                  liveGame={liveClassroomGame}
                 />
               </>
             )
@@ -726,8 +776,13 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             reason={hostLeftState?.reason}
             onExit={() => {
               // Same native-safe in-place reset as the results "Exit" button,
-              // then clear the grace modal.
-              handleExitToLobby();
+              // then clear the grace modal — except for a classroom student,
+              // whose "back to the lobby" is the student hub, not the arcade.
+              if (classroomStudentRef.current) {
+                exitClassroomStudentToHub();
+              } else {
+                handleExitToLobby();
+              }
               setHostLeftState(null);
             }}
           />

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getGamesForTeachersContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
@@ -123,6 +124,9 @@ export default async function Page({ params }: PageProps) {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               {c.heroSubtitle}
             </p>
+
+            {/* The one CTA here that asks for nothing. */}
+            <NoAccountCta locale={locale} className="mt-7" />
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-purple px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">{c.heroCtaStartGame}</span>

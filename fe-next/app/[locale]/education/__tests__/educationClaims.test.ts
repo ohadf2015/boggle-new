@@ -291,7 +291,14 @@ const FORBIDDEN: Array<[string, RegExp]> = [
       + String.raw`|\b(5|fem)\s+(språk|ordböcker|ordlistor)\b`
       + String.raw`|(?<!ほかの)(?<!他の)(5つの言語|5言語|5つの辞書|5辞書)`
       + String.raw`|\b5 שפות|\b5 מילונים|חמש שפות|חמישה מילונים`
-      + String.raw`|\b5 (языков|словарей)|пять (языков|словарей)`,
+      // Russian INFLECTS. Round 5: `на 5 языках` (prepositional) shipped in the
+      // /ru/education meta description and og:description for weeks because this
+      // pattern only knew the genitive `языков`. Match the stem plus the case
+      // endings we actually write. `\b` is useless after Cyrillic here — JS `\w`
+      // is ASCII-only, so a space after `языках` is not a word boundary; the
+      // negative lookahead does the job instead.
+      + String.raw`|\b5 (язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])`
+      + String.raw`|пять (язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])`,
       'i',
     ),
   ],
@@ -307,7 +314,7 @@ const FORBIDDEN: Array<[string, RegExp]> = [
       + String.raw`|\b(fem|5)(\s+[\w-]+){0,2}\s+(språk|ordböcker|ordlistor)\b`
       + String.raw`|(?<!ほかの)(?<!他の)(五|5)つ?の?(内蔵)?(言語|辞書)`
       + String.raw`|(חמש|חמישה|5)\s+(\S+\s+){0,2}(שפות|מילונים)`
-      + String.raw`|(пять|5)(\s+[\wа-яё-]+){0,2}\s+(языков|словарей)`,
+      + String.raw`|(пять|5)(\s+[\wа-яё-]+){0,2}\s+(язык(?:ов|ах|ами|а)|словар(?:ей|ях|ями|я))(?![а-яё])`,
       'i',
     ),
   ],
@@ -425,7 +432,14 @@ const CATALOGUES: Array<[string, unknown]> = [
 ];
 
 /** Namespaces the education and teacher surfaces render. */
-const TEACHER_NAMESPACE = /^(education|teacher|landing|pricing)\./;
+/**
+ * `seo` added round 5. `seo.educationHub.description` and `.ogDescription` ARE the
+ * /education hub's meta and og descriptions — the strings the critic found saying
+ * "на 5 языках" while the same page's H1 said six. They are education copy by any
+ * reasonable reading and were outside this filter purely because of where the
+ * translator filed them.
+ */
+const TEACHER_NAMESPACE = /^(education|teacher|landing|pricing|seo)\./;
 
 function walkStrings(node: unknown, path: string[] = []): Array<[string, string]> {
   if (typeof node === 'string') return [[path.join('.'), node]];

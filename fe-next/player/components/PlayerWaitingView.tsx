@@ -33,6 +33,7 @@ import { useGameMode } from '@/hooks/gameState';
 import { LANGUAGE_FLAGS, getLanguageName } from '@/lib/languageConfig';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
 // ==================== Types ====================
 
@@ -67,6 +68,20 @@ interface PlayerWaitingViewProps {
   onToggleReady?: () => void;
   /** Whether a ready toggle is currently in-flight (prevents double-click rage). */
   readyInFlight?: boolean;
+  /**
+   * This room belongs to a teacher's class.
+   *
+   * The share code and the invite card are how a HOST fills a public room. A
+   * student arrived by scanning that code off a projector; the roster is the
+   * class, and the only person who admits anyone is the teacher.
+   */
+  isClassroomMode?: boolean;
+  /**
+   * The mode the teacher picked, from the room's own record. The lobby store's
+   * `gameMode` is whatever board mode the room last held, so a Vocab Quiz lobby
+   * reads as `classic` there and the how-to-play panel taught the wrong game.
+   */
+  classroomGameMode?: ClassroomGameMode;
 }
 
 const MAX_PLAYERS = 8;
@@ -89,6 +104,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   isReady = false,
   onToggleReady,
   readyInFlight = false,
+  isClassroomMode = false,
+  classroomGameMode,
 }): React.ReactElement => {
   const { isAuthenticated, updateProfile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -384,7 +401,24 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // host and every player see IDENTICAL how-to-play content for every mode —
   // including wheel-rush + localized step images that the old inline copy lacked.
   const renderModeTips = (): React.ReactElement | null => {
-    // Always show How-to-Play to non-host players in the lobby. The host may not
+    // In a classroom room the teacher has ALREADY locked the mode in, and the
+    // room record says which. Prefer it over the store: the store holds whatever
+    // board mode the room last carried, so a Vocab Quiz lobby reads as `classic`
+    // there and this panel taught tracing words on a grid seconds before a
+    // multiple-choice question. A quiz has no board how-to-play at all — show
+    // nothing rather than the wrong game.
+    if (isClassroomMode) {
+      if (!classroomGameMode || classroomGameMode === VOCAB_QUIZ_MODE) return null;
+      return (
+        <GameInstructions
+          selectedGameMode={classroomGameMode as GameModeOption}
+          t={t}
+          defaultOpen={false}
+          lang={gameLanguage ?? 'en'}
+        />
+      );
+    }
+    // Public rooms: always show How-to-Play to non-host players. The host may not
     // have locked in a mode yet (null/'random'), so fall back to classic rather
     // than hiding the panel entirely.
     const mode = (gameMode || 'classic') as GameModeOption;
@@ -442,7 +476,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <MobileShareSection gameCode={gameCode} t={t} compact />
+            {/* Host control: a classroom student got into this room by scanning
+                the teacher's code, and has nobody to hand it on to. */}
+            {!isClassroomMode && <MobileShareSection gameCode={gameCode} t={t} compact />}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {gameLanguage && (
@@ -487,7 +523,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             }
             rightContent={
               <>
-                <InviteCard gameCode={gameCode} t={t} desktop />
+                {!isClassroomMode && <InviteCard gameCode={gameCode} t={t} desktop />}
                 <div
                   data-testid="desktop-chat-area"
                   className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"

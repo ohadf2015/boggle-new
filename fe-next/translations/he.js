@@ -2472,6 +2472,8 @@ const he = {
     "needPlayers": "!צריך שחקנים",
     "commandersJoined": "לוחמים שהצטרפו",
     "playersInRoom": "שחקנים בחדר",
+    "startQuiz": "התחל חידון",
+    "startClassGame": "התחל משחק",
     "noOneYet": "עוד אף אחד?",
     "startingWithBots": "מתחיל עם בוטים בעוד",
     "addingBots": "מוסיף בוטים בעוד",
@@ -12224,6 +12226,10 @@ const he = {
       "playGame": "שחק משחק",
       "playGameHint": "תרגלו במשחק מרובה משתתפים עם אוצר המילים הזה",
       "wordsAtYourLevel": "{{mine}} ברמה שלכם · {{total}} בשיעור",
+      "assignment": {
+        "due": "להגשה ב-{{date}}",
+        "overdue": "באיחור — היה להגשה ב-{{date}}"
+      },
       "empty": {
         "title": "אין שיעורים עדיין",
         "subtitle": "הצטרפו לכיתה כדי להתחיל לתרגל",
@@ -13376,6 +13382,16 @@ const he = {
       "yesterday": "אתמול"
     },
     "classroomGame": {
+      "questions": "שאלות",
+      "perQuestion": "לכל שאלה",
+      "namePrompt": {
+        "eyebrow": "משחק כיתתי",
+        "title": "איך קוראים לך?",
+        "subtitle": "השם הזה יופיע על לוח הכיתה.",
+        "placeholder": "הקלידו את השם",
+        "submit": "כניסה למשחק",
+        "roomLabel": "חדר {{code}}"
+      },
       "classroomLessonLabel": "{{classroom}} · משחק חי: {{lesson}}",
       "classCode": "קוד המשחק",
       "classroomNotFound": "הכיתה לא נמצאה",
@@ -13835,8 +13851,11 @@ const he = {
         "codeHint": "6 תווים מהמורה",
         "codeLabel": "קוד כיתה",
         "codePasted": "הודבק!",
+        "heroLine": "בקשו מהמורה את קוד הכיתה",
         "preparing": "רגע, מתכוננים…",
         "queuedNeedsName": "כמעט בפנים — כתבו את השם למעלה ואנחנו ניכנס מיד.",
+        "nameTaken": "כבר יש בכיתה מישהו עם השם הזה. אפשר {{suggestedName}}.",
+        "useSuggestedName": "להצטרף בתור {{suggestedName}}",
         "emptyClipboard": "אין מה להדביק",
         "guestError": "לא הצלחנו להתחיל. נסו שוב או פנו למורה.",
         "invalidCode": "קוד לא תקין",
@@ -13855,6 +13874,7 @@ const he = {
         "success": "נכנסת!",
         "title": "הצטרף לכיתה"
       },
+      "classroomRoomGone": "משחק הכיתה הסתיים. בקשו מהמורה להתחיל משחק חדש.",
       "lessonsAssigned": "שיעורים שהוקצו"
     },
     "students": "תלמידים",
@@ -15149,7 +15169,8 @@ const he = {
     "hebrew": "עברית",
     "swedish": "שוודית",
     "japanese": "יפנית",
-    "spanish": "ספרדית"
+    "spanish": "ספרדית",
+    "russian": "רוסית"
   },
   "streakBar": {
     "streak": "רצף של {{count}} ימים",

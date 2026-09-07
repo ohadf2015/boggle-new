@@ -24,6 +24,7 @@ import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
 import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
 import { getClassroomGame, updateClassroomGameStatus, type ClassroomGame } from '../../modules/classroomGameManager';
+import { hasQuizSession } from '../../modules/vocabQuizStore.js';
 import { buildClassroomSummary } from '../../modules/classroomSummary';
 import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
@@ -338,7 +339,19 @@ export async function calculateAndBroadcastFinalScores(
   // Runs AFTER the results broadcast so a slow database never delays scores;
   // `persistClassroomGameScores` is idempotent (Redis SET NX), so the legacy
   // handlers stay safe if a client ever does emit them.
-  if (classroomGame) {
+  // A room still running a vocab quiz is NOT this path's to close. The board
+  // results above are empty by construction — a quiz puts no words on a grid —
+  // so persisting them would write one row per student showing zero words
+  // found, and would then hold the once-per-game idempotency key against the
+  // quiz's own `finishQuiz`. That is how game GHYRVS lost a full round on
+  // 2026-09-05. `finishQuiz` removes the session BEFORE it persists, so the
+  // quiz's real write is never caught here.
+  if (classroomGame && hasQuizSession(gameCode)) {
+    logger.info(
+      'CLASSROOM_GAME',
+      `Board end path reached ${gameCode} while its vocab quiz is live — leaving persistence to the quiz`
+    );
+  } else if (classroomGame) {
     try {
       await updateClassroomGameStatus(gameCode, 'finished');
       const rewards = await persistClassroomGameScores(

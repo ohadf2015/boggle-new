@@ -27,6 +27,7 @@ import {
 } from '../authUtils';
 import type { AuthStateSetters } from '../authTypes';
 import { shouldReloadAfterSignIn } from '../reloadOnSignIn';
+import { shouldRedirectToPendingJoin } from '../pendingJoinRedirect';
 
 // Constants for timeout values
 // Increased from 2s to 5s to accommodate slower mobile connections (fixes JAVASCRIPT-NEXTJS-11)
@@ -330,7 +331,16 @@ async function handleAuthStateChange(
           // Check for pending classroom join after successful sign-in
           if (typeof window !== 'undefined') {
             const pendingJoinCode = sessionStorage.getItem('joinClassroomReturnCode');
-            if (pendingJoinCode) {
+            const isAnonymousSession = sessionUser.is_anonymous === true;
+            // An anonymous session is the guest join MINTING ITSELF mid-flow —
+            // it goes on to POST the enrolment and navigate into the room. Take
+            // the return code off the shelf so no later SIGNED_IN can fire the
+            // redirect below and bounce the student out of the room they are
+            // walking into.
+            if (pendingJoinCode && isAnonymousSession) {
+              sessionStorage.removeItem('joinClassroomReturnCode');
+            }
+            if (shouldRedirectToPendingJoin({ pendingJoinCode, isAnonymous: isAnonymousSession })) {
               sessionStorage.removeItem('joinClassroomReturnCode');
               // Redirect to join page with the code
               const currentLocale = window.location.pathname.split('/')[1] || 'en';
@@ -339,7 +349,7 @@ async function handleAuthStateChange(
               shouldReloadAfterSignIn('SIGNED_IN', {
                 wasUnauthenticated,
                 pathname: window.location.pathname,
-                isAnonymous: sessionUser.is_anonymous === true,
+                isAnonymous: isAnonymousSession,
               })
             ) {
               // Fresh guest → authenticated: hard reload so EVERY page (server

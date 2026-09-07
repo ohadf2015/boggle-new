@@ -1,4 +1,5 @@
 import type { LetterGrid, Language, Avatar } from '@/types';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
 export interface Player {
   username: string;
@@ -41,4 +42,8 @@ export interface PlayerViewProps {
   seriesRoundNumber?: number;
   /** SPA reset to lobby (no reload) — see usePlayerExit.onExitToLobby. */
   onExitToLobby?: () => void;
+  /** This room belongs to a teacher's class — suppresses the host's share/invite chrome. */
+  isClassroomMode?: boolean;
+  /** The mode the teacher locked in, from the room's own record (not the lobby store). */
+  classroomGameMode?: ClassroomGameMode;
 }

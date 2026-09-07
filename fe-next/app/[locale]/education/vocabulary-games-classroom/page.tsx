@@ -17,6 +17,9 @@ import { EducationRelatedLinks } from '@/components/education/EducationRelatedLi
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationDepthSections } from '@/components/education/EducationDepthSections';
 import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
+import { ClassGameList } from '@/components/education/ClassGameList';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
+import { getVocabClassGames } from './classGames';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -154,26 +157,11 @@ export default async function Page({ params }: PageProps) {
               {c.heroSubtitle}
             </p>
 
-            {/* Zero-signup path, above the fold. The reader arriving on "vocabulary
-                games for classroom" is comparing us against printable listicles that
-                ask for nothing; every CTA under this one asks for an account first.
-                `?quickPlay=true` auto-joins a guest — see MultiplayerFlow's
-                `quickPlayUsername` fallback, which never checks `isAuthenticated`. */}
-            <div className="mt-7 max-w-xl rounded-neo border-4 border-neo-black bg-neo-lime p-5 text-neo-navy shadow-hard-lg sm:p-6">
-              <p className="font-neo-display text-lg font-black uppercase leading-[1.05] tracking-tight sm:text-xl">
-                {c.noAccount.heading}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed sm:text-base">{c.noAccount.body}</p>
-              <Link
-                href={`/${locale}/multiplayer?quickPlay=true`}
-                className="mt-4 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
-              >
-                {c.noAccount.cta}
-              </Link>
-              <p className="mt-3 text-[10px] font-bold uppercase tracking-widest opacity-70">
-                {c.noAccount.note}
-              </p>
-            </div>
+            {/* Zero-signup path, above the fold — now the shared component, so all
+                four education landings offer the same entry point. This page keeps its
+                own wording, which is tuned to the printable-listicle comparison it was
+                written for and is already six-locale native. */}
+            <NoAccountCta locale={locale} className="mt-7" copy={c.noAccount} />
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/daily/word-hunt`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
@@ -203,6 +191,14 @@ export default async function Page({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {/* The list the query actually asks for, above the product sections.
+            "Vocabulary games for classroom" is an informational query: the reader
+            wants games with setup and rules, which is why a printable listicle beat
+            this page four rounds running while it answered with a pitch. */}
+        <ScrollRevealSection className="mt-20">
+          <ClassGameList section={getVocabClassGames(locale)} />
+        </ScrollRevealSection>
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
@@ -282,7 +278,7 @@ export default async function Page({ params }: PageProps) {
                 className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 pt-6 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
               >
                 <span
-                  className="absolute -top-3 left-4 grid h-7 w-7 place-items-center rounded border-2 border-neo-black bg-neo-cyan font-neo-display text-xs font-black text-neo-navy shadow-hard-sm"
+                  className="absolute -top-3 start-4 grid h-7 w-7 place-items-center rounded border-2 border-neo-black bg-neo-cyan font-neo-display text-xs font-black text-neo-navy shadow-hard-sm"
                   aria-hidden="true"
                 >
                   {i + 1}
@@ -292,12 +288,6 @@ export default async function Page({ params }: PageProps) {
               </li>
             ))}
           </ol>
-          <Link
-            href={`/${locale}/multiplayer?quickPlay=true`}
-            className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
-          >
-            {c.noAccount.cta}
-          </Link>
         </ScrollRevealSection>
 
         {/* Named-format table, counted from the registries — see EducationPlayFormats. */}

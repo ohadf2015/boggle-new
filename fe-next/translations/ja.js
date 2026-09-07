@@ -2429,6 +2429,8 @@ const ja = {
     "needPlayers": "プレイヤーが必要！",
     "commandersJoined": "参加中の司令官",
     "playersInRoom": "ルーム内のプレイヤー",
+    "startQuiz": "クイズを開始",
+    "startClassGame": "ゲームを開始",
     "noOneYet": "まだ誰もいない？",
     "startingWithBots": "ボットで開始まで",
     "addingBots": "ボット追加まで",
@@ -12370,6 +12372,10 @@ const ja = {
       "playGame": "ゲームで遊ぶ",
       "playGameHint": "この語彙でマルチプレイヤーゲームを練習",
       "wordsAtYourLevel": "あなたのレベルは{{mine}}語 · レッスン全体は{{total}}語",
+      "assignment": {
+        "due": "{{date}} まで",
+        "overdue": "期限すぎ — {{date}} まででした"
+      },
       "empty": {
         "title": "レッスンがありません",
         "subtitle": "クラスに参加して語彙練習を始めよう",
@@ -13522,6 +13528,16 @@ const ja = {
       "yesterday": "昨日"
     },
     "classroomGame": {
+      "questions": "問題数",
+      "perQuestion": "1問あたり",
+      "namePrompt": {
+        "eyebrow": "クラスゲーム",
+        "title": "名前を教えてください",
+        "subtitle": "この名前がクラスの画面に表示されます。",
+        "placeholder": "名前を入力",
+        "submit": "ゲームに参加",
+        "roomLabel": "ルーム {{code}}"
+      },
       "classroomLessonLabel": "{{classroom}} · ライブ中: {{lesson}}",
       "classCode": "ゲームコード",
       "classroomNotFound": "クラスが見つかりません",
@@ -13947,8 +13963,11 @@ const ja = {
         "codeLabel": "クラスコード",
         "codeNotRecognised": "そのコードは認識できません",
         "codePasted": "コードを貼り付けました！",
+        "heroLine": "先生にクラスコードを聞いてね",
         "preparing": "準備しています。少しお待ちください。",
         "queuedNeedsName": "あと少しです。上に名前を入れると、そのまま参加できます。",
+        "nameTaken": "そのなまえはクラスでつかわれています。{{suggestedName}} はどうですか。",
+        "useSuggestedName": "{{suggestedName}} で参加する",
         "codePlaceholder": "6文字",
         "emptyClipboard": "クリップボードが空です",
         "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
@@ -13969,6 +13988,7 @@ const ja = {
         "success": "クラスに参加しました！",
         "title": "クラスに参加"
       },
+      "classroomRoomGone": "クラスのゲームが終了しました。先生に新しいゲームを始めてもらってね。",
       "lessonsAssigned": "割り当てられたレッスン"
     },
     "template": {
@@ -15164,7 +15184,8 @@ const ja = {
     "hebrew": "ヘブライ語",
     "swedish": "スウェーデン語",
     "japanese": "日本語",
-    "spanish": "スペイン語"
+    "spanish": "スペイン語",
+    "russian": "ロシア語"
   },
   "streakBar": {
     "streak": "{{count}}日連続",

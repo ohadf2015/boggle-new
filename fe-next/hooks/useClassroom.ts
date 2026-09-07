@@ -41,6 +41,30 @@ export type UseClassroomsReturn = UseClassroomsState & UseClassroomsActions;
  * - Create/update/delete operations
  * - Automatic refresh on auth state change
  */
+/**
+ * Every mounted `useClassrooms` that wants to hear about a write.
+ *
+ * The rows live in a per-instance `useState`, so each consumer holds a private
+ * copy — ClassroomManager, LessonBuilder, TeacherDashboard,
+ * LessonAssignmentDialog, PlayTabFirstRunCard and HostWordSelector all mount
+ * their own. A teacher who created a class in one of them found her new class
+ * missing from the lesson editor's dropdown until a full reload, because the
+ * optimistic update reached exactly one copy (recurring pitfall class 1: one
+ * fact, six copies, no way to tell which is current).
+ *
+ * A write therefore tells the others to refetch. Doing it here rather than
+ * asking six call sites to remember is the point: a rule that must be followed
+ * by hand at every new call site is a rule that will be missed.
+ */
+const classroomListSubscribers = new Set<() => void>();
+
+/** Tell every OTHER mounted list to refetch after a write. */
+function broadcastClassroomsChanged(except?: () => void): void {
+  for (const notify of classroomListSubscribers) {
+    if (notify !== except) notify();
+  }
+}
+
 export function useClassrooms(): UseClassroomsReturn {
   const { isAuthenticated, user } = useAuth();
   const isMounted = useMounted();
@@ -98,6 +122,20 @@ export function useClassrooms(): UseClassroomsReturn {
     await fetchClassrooms();
   }, [fetchClassrooms]);
 
+  // Refetch quietly when another mounted list reports a write. No `isLoading`
+  // flip: this is a background reconcile, and flashing a spinner across every
+  // open dropdown because a class was created elsewhere would be worse than the
+  // staleness it fixes.
+  const selfNotifyRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    const notify = () => { void fetchClassrooms(); };
+    selfNotifyRef.current = notify;
+    classroomListSubscribers.add(notify);
+    // Unsubscribe on unmount, or every closed dialog stays subscribed for the
+    // rest of the session and refetches forever.
+    return () => { classroomListSubscribers.delete(notify); };
+  }, [fetchClassrooms]);
+
   // Create new classroom (calls server-side API route for enforcement)
   const createClassroom = useCallback(async (
     name: string,
@@ -143,6 +181,10 @@ export function useClassrooms(): UseClassroomsReturn {
         }));
       }
 
+      // Tell every other mounted list, or the lesson editor's dropdown keeps
+      // serving the rows it fetched before this class existed.
+      broadcastClassroomsChanged(selfNotifyRef.current);
+
       return { success: true, data: classroom };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to create classroom';
@@ -173,6 +215,8 @@ export function useClassrooms(): UseClassroomsReturn {
         }));
       }
 
+      broadcastClassroomsChanged(selfNotifyRef.current);
+
       return { success: true };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to update classroom';
@@ -197,6 +241,8 @@ export function useClassrooms(): UseClassroomsReturn {
           classrooms: prev.classrooms.filter(c => c.id !== id),
         }));
       }
+
+      broadcastClassroomsChanged(selfNotifyRef.current);
 
       return { success: true };
     } catch (err) {
@@ -436,7 +482,35 @@ export function useClassroom(classroomId: string | undefined): UseClassroomRetur
  * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
  * and for the generic fallback; it is not fit to render on its own.
  */
-export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE';
+/**
+ * Ask the server whether a guest nickname is free, and for a free variant.
+ *
+ * Fails OPEN on any transport problem: a check we could not perform must never
+ * be the reason a student cannot join. Worst case they meet the original error;
+ * blocking here would turn our outage into their locked door.
+ */
+async function checkGuestNameAvailable(
+  name: string,
+  joinCode: string
+): Promise<{ code?: 'NAME_TAKEN'; suggestedName?: string } | null> {
+  try {
+    const res = await fetch('/api/education/guest-name', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // `joinCode` is not optional in practice. The route scopes its 409 to that
+      // classroom's roster and fails OPEN without it — so omitting it does not
+      // relax the check, it disables it entirely and silently.
+      body: JSON.stringify({ name, joinCode }),
+    });
+    if (res.status !== 409) return null;
+    const data = await res.json();
+    return { code: 'NAME_TAKEN', suggestedName: data?.suggestedName };
+  } catch {
+    return null;
+  }
+}
+
+export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN';
 
 export interface JoinClassroomResult {
   success: boolean;
@@ -444,6 +518,8 @@ export interface JoinClassroomResult {
   /** Set when the code the student typed was a LIVE GAME code — the room to enter now. */
   gameCode?: string;
   code?: JoinClassroomErrorCode;
+  /** For NAME_TAKEN: a nickname that is actually free, for one-tap acceptance. */
+  suggestedName?: string;
   error?: string;
 }
 
@@ -467,6 +543,27 @@ export function useJoinClassroom() {
         if (!guestName) {
           return { success: false, error: 'Not authenticated' };
         }
+        // Check the nickname BEFORE minting the anonymous user. Two students
+        // called Priya is an ordinary class, and it used to be a hard 500 —
+        // `deriveGuestUsername` now appends a random suffix so usernames no
+        // longer collide, but the ORDER still matters: once `signInAnonymously`
+        // has run the auth user exists and cannot be un-created.
+        //
+        // Scoped to THIS classroom's roster, which is why the join code goes
+        // with the name. The question is "does someone in this class already
+        // answer to this?", not "is this string used anywhere on the platform".
+        // The check must be server-side: own-row RLS would report every name
+        // free to this browser.
+        const nameCheck = await checkGuestNameAvailable(guestName, joinCode);
+        if (nameCheck?.code === 'NAME_TAKEN') {
+          return {
+            success: false,
+            code: 'NAME_TAKEN',
+            suggestedName: nameCheck.suggestedName,
+            error: 'NAME_TAKEN',
+          };
+        }
+
         const supabase = createClient();
         const guest = await signInAsGuestStudent(supabase, guestName);
         if (guest.error || !guest.user) {

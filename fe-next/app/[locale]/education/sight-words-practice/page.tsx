@@ -17,6 +17,7 @@ import {
 import { educationPageLabel } from '@/lib/seo/educationPageLinks';
 import { EducationRelatedLinks } from '@/components/education/EducationRelatedLinks';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -89,6 +90,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getSightWordsContent(locale);
+  // Same test `generateMetadata` uses for `robots`: this route is indexable, and its
+  // English-only structured data is truthful, on /en alone.
+  const isEnglish = locale === 'en';
 
   const faqJsonLd = educationFaqJsonLd({ locale, path: PAGE_PATH, faqs: c.faqs });
 
@@ -149,8 +153,23 @@ export default async function Page({ params }: PageProps) {
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       <JsonLd data={faqJsonLd} />
       <JsonLd data={orgJsonLd} />
-      <JsonLd data={learningResourceJsonLd} />
-      <JsonLd data={howToJsonLd} />
+      {/*
+        English-only nodes, emitted on the English route only.
+
+        `content.ts` has no per-locale blocks — `getSightWordsContent` ignores its
+        argument — so this page's BODY is English on all six routes, and the five
+        non-English routes are `noindex, follow` with a canonical back to /en.
+        Both nodes below are English: `LearningResource` carries an English name and
+        `inLanguage: 'en'`, and every `HowTo` step is hardcoded English prose.
+
+        Localizing `inLanguage` would be worse than the bug: it would tell crawlers a
+        Japanese-language resource exists at /ja when the page they fetch is English.
+        The honest fix is the one `vocabulary-games-classroom/page.tsx` already uses
+        for its own English HowTo — emit them where they are true, and nowhere else.
+        If this page is ever translated, delete the gate in the same commit.
+      */}
+      {isEnglish && <JsonLd data={learningResourceJsonLd} />}
+      {isEnglish && <JsonLd data={howToJsonLd} />}
       <JsonLd data={breadcrumbJsonLd} />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
@@ -174,6 +193,13 @@ export default async function Page({ params }: PageProps) {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               {c.mainParagraph}
             </p>
+
+            {/* The one CTA on this page that asks for nothing. Localized even though
+                the body is English-only — the surrounding chrome is localized too, and
+                the non-English routes are noindexed rather than mixed-language SERP
+                entries. */}
+            <NoAccountCta locale={locale} className="mt-7" />
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/daily/word-hunt`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">{c.startWordHuntLabel}</span>

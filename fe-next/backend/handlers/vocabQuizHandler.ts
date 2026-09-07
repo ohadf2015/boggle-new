@@ -24,18 +24,14 @@
 import type { Server, Socket } from 'socket.io';
 import { z } from 'zod';
 
-import {
-  getClassroomGame,
-  updateClassroomGameStatus,
-} from '../modules/classroomGameManager.js';
+import { getClassroomGame } from '../modules/classroomGameManager.js';
 import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
-  transitionGameState,
 } from '../modules/gameStateManager.js';
 import { loadLessonVocabulary } from '../services/vocabQuizLessonWords.js';
-import { persistClassroomGameScores } from './classroomGamePersistence.js';
+import { finishQuiz, handleQuizRequestResults } from '../services/vocabQuizRound.js';
 import {
   createQuizSession,
   addQuizPlayer,
@@ -45,20 +41,15 @@ import {
   buildQuestionPayload,
   buildReveal,
   advanceQuiz,
-  quizStandings,
   snapshotFor,
   pauseQuiz,
   resumeQuiz,
-  correctWordsByUser,
-  askedWords,
-  answersByUser,
   type VocabQuizSession,
 } from '../services/vocabQuizEngine.js';
 import {
   setQuizSession,
   getQuizSession,
   setQuizTimer,
-  deleteQuizSession,
   clearAllQuizSessions,
 } from '../modules/vocabQuizStore.js';
 import {
@@ -70,7 +61,6 @@ import {
 } from '@/shared/types/vocabQuiz';
 import { isPracticeFocusSetting } from '@/lib/education/vocabFocus';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { clearGameTimer } from '../utils/timerManager.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
@@ -117,75 +107,6 @@ function emitReveal(io: Server, session: VocabQuizSession): void {
 // ---------------------------------------------------------------------------
 // Round lifecycle
 // ---------------------------------------------------------------------------
-
-/**
- * Close the round: stop the clock, tell the room, and write the results
- * through the classroom persistence path.
- *
- * `wordsFound` carries the LESSON word for every question the student answered
- * correctly. `upsertLessonProgress` marks every lesson word attempted and only
- * these mastered, which is exactly the required mapping: a wrong answer on W
- * leaves W attempted-not-mastered.
- */
-async function finishQuiz(io: Server, gameCode: string): Promise<void> {
-  const session = getQuizSession(gameCode);
-  if (!session) return;
-
-  // Take the session out of the registry FIRST so a late tick or a second
-  // `endRoundNow` cannot drive this path twice.
-  deleteQuizSession(gameCode);
-
-  const standings = quizStandings(session);
-  toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.ended, {
-    gameCode,
-    standings,
-    totalQuestions: session.questions.length,
-  });
-
-  // Retire the room in the board engine's state machine too, so its timeout
-  // path can never fire a second, board-shaped end for this room.
-  try {
-    transitionGameState(gameCode, 'END', { immediate: true });
-    clearGameTimer(gameCode);
-  } catch (err) {
-    logger.warn('VOCAB_QUIZ', `Could not retire room ${gameCode}: ${(err as Error).message}`);
-  }
-
-  try {
-    const classroomGame = await getClassroomGame(gameCode);
-    if (!classroomGame) return;
-
-    await updateClassroomGameStatus(gameCode, 'finished');
-
-    const wordsByUser = correctWordsByUser(session);
-    const scoreByUser = new Map<string, number>();
-    for (const player of session.players.values()) {
-      if (player.userId) scoreByUser.set(player.userId, player.score);
-    }
-
-    const playerScores = [...wordsByUser.entries()].map(([userId, wordsFound]) => ({
-      userId,
-      score: scoreByUser.get(userId) ?? 0,
-      wordsFound,
-    }));
-
-    // The asked set is what stops the teacher's reteach list filling with
-    // words the class never saw; the answers give the report per-question
-    // detail that would otherwise die with the in-memory session.
-    const rewards = await persistClassroomGameScores(classroomGame, playerScores, {
-      askedWords: askedWords(session),
-      answersByUser: answersByUser(session),
-    });
-    io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameEnded', { gameCode, rewards });
-
-    logger.info(
-      'VOCAB_QUIZ',
-      `Quiz ${gameCode} finished: ${session.questions.length} questions, ${playerScores.length} students recorded`
-    );
-  } catch (err) {
-    logger.error('VOCAB_QUIZ', `Failed to persist quiz ${gameCode}: ${(err as Error).message}`);
-  }
-}
 
 /** Move from the live question into the reveal beat. */
 function beginReveal(io: Server, session: VocabQuizSession, now: number): void {
@@ -476,6 +397,12 @@ export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
 // ---------------------------------------------------------------------------
 // Test / shutdown helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * The board lifecycle's `requestResults` guard reaches the quiz through here,
+ * so `vocabQuizHandler` stays the single import surface for quiz behaviour.
+ */
+export { handleQuizRequestResults };
 
 /** @internal — inspection hook for tests. */
 export function getActiveQuiz(gameCode: string): VocabQuizSession | undefined {

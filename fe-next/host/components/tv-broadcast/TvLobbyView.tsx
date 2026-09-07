@@ -15,6 +15,7 @@ import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
+import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -45,6 +46,27 @@ interface TvLobbyViewProps {
   setHostPlaying?: React.Dispatch<React.SetStateAction<boolean>>;
   /** Fill room with 3 bots then start game (classroom teacher demo with zero students) */
   onStartSoloDemoWithBots?: () => (() => void);
+  /**
+   * Usernames the server reports as lobby-ready (`playersReadyUpdate`). Without
+   * it the roster's ready chip is structurally stuck at 0/N: the denominator
+   * comes from the roster, the numerator only from this list. That was the
+   * "0/2 READY that never moved" a teacher watched while both students tapped
+   * READY UP — HostPreGameView passed it, this lobby did not.
+   */
+  readyUsernames?: string[];
+  /** Room was opened from the teacher dashboard (`?classroom=true`). */
+  isClassroomMode?: boolean;
+  /**
+   * The mode the teacher fixed at setup. In a classroom room the mode is not the
+   * host's to change here, so the arcade picker is hidden and the start control
+   * takes the matching label from the classroom registry in shared/types/vocabQuiz.
+   */
+  classroomGameMode?: ClassroomGameMode;
+}
+
+/** Start-button copy for a classroom room, by the mode the teacher already chose. */
+function classroomStartLabelKey(mode: ClassroomGameMode | undefined): string {
+  return mode === VOCAB_QUIZ_MODE ? 'hostView.startQuiz' : 'hostView.startClassGame';
 }
 
 /**
@@ -68,6 +90,9 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   tournamentCreating,
   setHostPlaying,
   onStartSoloDemoWithBots,
+  readyUsernames = [],
+  isClassroomMode = false,
+  classroomGameMode,
 }) => {
   const { isAdmin } = useAuth();
   // Display the server-owned auto-start countdown on the TV screen too, with a
@@ -184,6 +209,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               username={username}
               gameCode={gameCode}
               maxPlayers={8}
+              readyUsernames={readyUsernames}
               t={t}
             />
           </div>
@@ -207,13 +233,18 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             </div>
           </div>
 
-          {/* Battle mode selector */}
-          <BattleModeCard
-            selectedGameMode={selectedGameMode}
-            setSelectedGameMode={setSelectedGameMode}
-            t={t}
-            isAdmin={isAdmin}
-          />
+          {/* Battle mode selector — arcade rooms only. A classroom room's mode is
+              fixed in the setup wizard and already stated in the settings panel
+              above; offering a picker here (which does not even list the quiz)
+              only asks a teacher to re-choose something they cannot change. */}
+          {!isClassroomMode && (
+            <BattleModeCard
+              selectedGameMode={selectedGameMode}
+              setSelectedGameMode={setSelectedGameMode}
+              t={t}
+              isAdmin={isAdmin}
+            />
+          )}
 
           {/* Auto-start countdown banner (everyone ready) */}
           {autoStartSecondsLeft !== null && (
@@ -238,6 +269,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             tournamentCreating={tournamentCreating}
             playerCount={playerCount}
             t={t}
+            labelKey={isClassroomMode ? classroomStartLabelKey(classroomGameMode) : undefined}
             className="text-2xl"
           />
 

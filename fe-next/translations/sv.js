@@ -2718,6 +2718,8 @@ const sv = {
     "needPlayers": "Behöver spelare!",
     "commandersJoined": "Befälhavare anslutna",
     "playersInRoom": "Spelare i rummet",
+    "startQuiz": "Starta quiz",
+    "startClassGame": "Starta spelet",
     "noOneYet": "Ingen ännu?",
     "startingWithBots": "Startar med bottar om",
     "addingBots": "Lägger till bottar om",
@@ -12608,6 +12610,10 @@ const sv = {
       "playGame": "Spela spel",
       "playGameHint": "Öva med ett multiplayer-spel med dessa ord",
       "wordsAtYourLevel": "{{mine}} på din nivå · {{total}} i lektionen",
+      "assignment": {
+        "due": "Klar {{date}}",
+        "overdue": "Försenad — skulle vara klar {{date}}"
+      },
       "empty": {
         "title": "Inga lektioner än",
         "subtitle": "Gå med i ett klassrum för att börja öva",
@@ -13760,6 +13766,16 @@ const sv = {
       "yesterday": "Igår"
     },
     "classroomGame": {
+      "questions": "Frågor",
+      "perQuestion": "Per fråga",
+      "namePrompt": {
+        "eyebrow": "Klasspel",
+        "title": "Vad heter du?",
+        "subtitle": "Klassen ser det här namnet på tavlan.",
+        "placeholder": "Skriv ditt namn",
+        "submit": "Gå med i spelet",
+        "roomLabel": "Rum {{code}}"
+      },
       "classroomLessonLabel": "{{classroom}} · live-spel: {{lesson}}",
       "classCode": "Spelkod",
       "classroomNotFound": "Klassrummet hittades inte",
@@ -14221,8 +14237,11 @@ const sv = {
         "codeLabel": "Klasskod",
         "codeNotRecognised": "Vi kunde inte känna igen den koden",
         "codePasted": "Klistrad!",
+        "heroLine": "Fråga din lärare om klasskoden",
         "preparing": "Gör i ordning – ett ögonblick.",
         "queuedNeedsName": "Nästan inne — skriv ditt namn ovanför så tar vi dig direkt dit.",
+        "nameTaken": "Någon i klassen heter redan så. Testa {{suggestedName}}.",
+        "useSuggestedName": "Gå med som {{suggestedName}}",
         "codePlaceholder": "6 bokstäver",
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
@@ -14243,6 +14262,7 @@ const sv = {
         "success": "Du är med!",
         "title": "Gå med i klassrummet"
       },
+      "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
       "lessonsAssigned": "Tilldelade lektioner"
     },
     "students": "Elever",
@@ -15453,7 +15473,8 @@ const sv = {
     "hebrew": "Hebreiska",
     "swedish": "Svenska",
     "japanese": "Japanska",
-    "spanish": "Spanska"
+    "spanish": "Spanska",
+    "russian": "Ryska"
   },
   "streakBar": {
     "streak": "{{count}} dagars svit",

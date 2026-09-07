@@ -9,6 +9,9 @@ import { educationCourseJsonLd } from '@/lib/seo/educationStructuredData';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationDepthSections } from '@/components/education/EducationDepthSections';
 import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
+import { ClassGameList } from '@/components/education/ClassGameList';
+import { NoAccountCta } from '@/components/education/NoAccountCta';
+import { getEslClassGames } from './classGames';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
 import {
   educationBreadcrumbJsonLd,
@@ -130,6 +133,11 @@ export default async function Page({ params }: PageProps) {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               {c.heroSubtitle}
             </p>
+
+            {/* Every other CTA on this page routes to /education/access, which asks for
+                an account first. This one asks for nothing. */}
+            <NoAccountCta locale={locale} className="mt-7" />
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">{c.heroCtas.primary}</span>
@@ -142,6 +150,13 @@ export default async function Page({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {/* The list the query actually asks for, above the product sections. Four
+            rounds lost this page to Teach-This because "ESL word games for the
+            classroom" wants games with setup and rules, not a feature tour. */}
+        <ScrollRevealSection className="mt-20">
+          <ClassGameList section={getEslClassGames(locale)} />
+        </ScrollRevealSection>
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
