@@ -57,7 +57,7 @@ describe('MissGapAsyncAssignment', () => {
     expect(screen.getByTestId('miss-gap-practice-card')).toBeInTheDocument();
   });
 
-  it('student mode: due banner + complete feeds class streak', async () => {
+  it('student mode: due banner + complete feeds class streak + grade passback', async () => {
     render(
       <MissGapAsyncAssignment
         payload={{ ...payload, dueDate: '2099-12-31' }}
@@ -71,6 +71,11 @@ describe('MissGapAsyncAssignment', () => {
         '"streak":1',
       );
     });
+    const grade = await screen.findByTestId('miss-gap-async-grade-passback');
+    expect(grade).toBeInTheDocument();
+    const link = screen.getByTestId('miss-gap-async-open-grade-passback');
+    expect(link.getAttribute('href')).toContain('miss-gap-grade-passback');
+    expect(link.getAttribute('href')).toContain('points=100');
   });
 
   it('shares async homework URL with due date', async () => {

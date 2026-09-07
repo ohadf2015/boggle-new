@@ -96,6 +96,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/indoor-recess-games",
   "/education/middle-school-word-games",
   "/education/miss-gap-assignment",
+  "/education/miss-gap-grade-passback",
   "/education/miss-gap-practice",
   "/education/sight-words-practice",
   "/education/spelling-bee-practice",

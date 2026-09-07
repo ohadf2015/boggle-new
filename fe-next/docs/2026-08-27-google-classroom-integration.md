@@ -1,6 +1,6 @@
 # Google Classroom integration — spec
 
-**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
+**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 1.6 miss-gap grade passback shipped 2026-09-08 (Kahoot Marketplace foil; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
 the product owner's, not an engineer's (see below).
 
 ## Why
@@ -75,6 +75,24 @@ deferred — Discovery already emits the attachment body shape when that lands.
 
 **Implementation:** `lib/education/googleClassroomAddon.ts`, Discovery UI,
 API routes above. Skips teacher-p0 / streak tracks.
+
+## Phase 1.6 — Miss-gap grade passback (SHIPPED slice)
+
+Kahoot Marketplace grade-passback foil for **#975 async miss-gap homework**.
+When a student marks practice complete, LexiClash scores the turn-in
+(on-time = 100/100, late = 70/100) and exposes:
+
+- Grade receipt tool route: `/{locale}/education/miss-gap-grade-passback` (**NON_LANDING**)
+- `POST /api/classroom-addon/grade-passback` → `attachment.maxPoints` +
+  `studentSubmission` patch body (`pointsEarned`, `postState=TURNED_IN`)
+- Classroom iframe CSP on the receipt route (same ancestors as #970)
+
+No roster OAuth. `classroom.addons.teacher` patch wire-up remains deferred —
+the attachment / submission shapes ship today so Grade sync can land without
+another rebuild of the homework path.
+
+**Implementation:** `lib/education/missGapGradePassback.ts`, receipt UI,
+API route above; wired from `MissGapAsyncAssignment` on complete.
 
 ## Phase 2 — Roster import (NOT BUILT — needs a product decision first)
 

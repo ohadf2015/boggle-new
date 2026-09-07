@@ -3,7 +3,8 @@
  *
  * Teacher picks a due date, assigns the #972 miss-gap practice card (NOT a live
  * Unplugged session). Students open the homework link, practise, mark complete;
- * on-time completion feeds the class streak.
+ * on-time completion feeds the class streak and opens GC grade passback
+ * (Kahoot Marketplace grade-passback foil — #970-style, no roster OAuth).
  */
 'use client';
 
@@ -26,6 +27,11 @@ import {
   readClassStreak,
   recordClassHomeworkCompletion,
 } from '@/lib/education/classStreak';
+import {
+  buildMissGapGradePassbackPath,
+  scoreMissGapHomework,
+  type MissGapGradeScore,
+} from '@/lib/education/missGapGradePassback';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 
 export interface MissGapAsyncAssignmentProps {
@@ -44,6 +50,7 @@ export function MissGapAsyncAssignment({
   );
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
   const [completed, setCompleted] = useState(false);
+  const [gradeScore, setGradeScore] = useState<MissGapGradeScore | null>(null);
   const [streak, setStreak] = useState(() =>
     readClassStreak(buildMissGapClassKey(initial)),
   );
@@ -105,8 +112,18 @@ export function MissGapAsyncAssignment({
       dueDate: payload.dueDate,
     });
     setStreak(next);
+    const score = scoreMissGapHomework({
+      dueDate: payload.dueDate,
+      completed: true,
+    });
+    setGradeScore(score);
     setCompleted(true);
   };
+
+  const gradePassbackHref = useMemo(() => {
+    if (!gradeScore || !payload.dueDate || words.length === 0) return null;
+    return buildMissGapGradePassbackPath({ input: payload, score: gradeScore });
+  }, [gradeScore, payload, words.length]);
 
   if (words.length === 0) {
     return (
@@ -242,6 +259,31 @@ export function MissGapAsyncAssignment({
                 ? t('education.results.assignMissGapAsyncCompleted')
                 : t('education.results.assignMissGapAsyncComplete')}
             </button>
+            {completed && gradeScore && gradePassbackHref ? (
+              <div
+                className="space-y-2"
+                data-testid="miss-gap-async-grade-passback"
+              >
+                <p className="text-neo-cream font-bold text-sm">
+                  {t('education.results.missGapGradePassbackScore', {
+                    points: gradeScore.pointsEarned,
+                    max: gradeScore.maxPoints,
+                  })}
+                </p>
+                <Link
+                  href={gradePassbackHref}
+                  data-testid="miss-gap-async-open-grade-passback"
+                  className={cn(
+                    'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+                    'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+                    'shadow-hard-sm hover:shadow-hard transition-all',
+                  )}
+                >
+                  <GraduationCap className="w-5 h-5" aria-hidden />
+                  {t('education.results.missGapGradePassbackOpen')}
+                </Link>
+              </div>
+            ) : null}
           </div>
         )}
       </section>
