@@ -262,4 +262,30 @@ describe('ClassroomResultsCard', () => {
     expect(screen.queryByTestId('start-unplugged-reteach-live')).not.toBeInTheDocument();
   });
 
+
+  it('offers the teacher a Google Classroom Unplugged reteach assignment after Live', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    const link = screen.getByTestId('assign-unplugged-google-classroom');
+    expect(link).toHaveAttribute('href');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain(encodeURIComponent('https://www.lexiclash.live/en/education/unplugged-reteach'));
+    expect(href).toContain('itemtype=assignment');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('Maya');
+    expect(href).not.toContain('Noa');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
+  it('never offers a student the Google Classroom Unplugged assignment', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('assign-unplugged-google-classroom')).not.toBeInTheDocument();
+  });
+
+  it('hides the Google Classroom Unplugged assignment when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('assign-unplugged-google-classroom')).not.toBeInTheDocument();
+  });
+
 });
