@@ -286,7 +286,7 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       'One-click post Unplugged reteach homework (printable practice sheet + Live deep-link) into Google Classroom Stream. Class-level missed words only — no student names or roster import.',
     origin: CLASS_GAP_ORIGIN,
     production_url: 'https://www.lexiclash.live',
-    foils: ['Discovery Education Gemini Classroom', 'Kahootopia Assignments'],
+    foils: ['Discovery Education Gemini Classroom', 'Kahootopia Assignments', 'Kahoot Marketplace grade passback'],
     extends: ['#949', '#954', '#957', '#959', '#968'],
     privacy: {
       student_names: false,
@@ -309,6 +309,17 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       itemType: 'assignment',
       deep_link: 'unplugged-reteach',
       printable: 'missed-words practice sheet (#957)',
+    },
+    grade_passback: {
+      for: 'miss-gap-assignment',
+      foil: 'Kahoot Marketplace grade passback',
+      api: '/api/classroom-addon/grade-passback',
+      studentViewPath: '/education/miss-gap-grade-passback',
+      maxPoints: 100,
+      student_names: false,
+      roster_scopes: false,
+      oauth_required_for_grade_sync: true,
+      extends: ['#970', '#975'],
     },
   };
 }

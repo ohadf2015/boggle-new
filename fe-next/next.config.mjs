@@ -508,7 +508,7 @@ const nextConfig = {
       // frame-ancestors block below. Browsers enforce the INTERSECTION of all
       // CSP frame-ancestors, so embed must receive exactly ONE (permissive) CSP.
       {
-        source: '/:path((?!(?:en|he|sv|ja|es|ru)/(?:embed/|education/classroom-addon)).*)',
+        source: '/:path((?!(?:en|he|sv|ja|es|ru)/(?:embed/|education/classroom-addon|education/miss-gap-grade-passback)).*)',
         headers: [
           // Block indexing for preview/staging environments via X-Robots-Tag header
           ...(isPreviewEnvironment ? [{
@@ -575,6 +575,19 @@ const nextConfig = {
       },
       {
         source: '/:locale(en|he|sv|ja|es|ru)/education/classroom-addon/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.posthog.com https://eu.i.posthog.com; frame-src 'self' https://classroom.google.com; frame-ancestors 'self' https://classroom.google.com https://*.classroom.google.com;",
+          },
+        ],
+      },
+      // Miss-gap grade passback student attachment / receipt (Classroom iframe).
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/education/miss-gap-grade-passback',
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
