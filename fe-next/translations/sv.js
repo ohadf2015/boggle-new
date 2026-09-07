@@ -13652,6 +13652,17 @@ const sv = {
       "unpluggedReteachPrev": "Föregående",
       "unpluggedReteachProgress": "Ord {{current}} av {{total}}"
     },
+    "classroomAddon": {
+      "eyebrow": "Google Classroom Marketplace",
+      "title": "Tilldela Unplugged reteach",
+      "subtitle": "Publicera utskrivbar + Live-länk som läxa till Classroom-strömmen med ett klick. Endast klassord — inga elevnamn.",
+      "lessonLabel": "Lektionsnamn",
+      "missedWordsLabel": "Missade ord (kommaseparerade)",
+      "privacyNote": "Ingen roster-import. Inga elevnamn. Publicering via Googles dialog — vi ser aldrig vilken klass du väljer.",
+      "postToStream": "Publicera Unplugged-uppgift till Classroom-strömmen",
+      "openUnplugged": "Öppna Unplugged Live",
+      "needMissedWords": "Lägg till minst ett missat ord för att aktivera tilldelning."
+    },
     "nav": {
       "section": "Lärare",
       "forTeachers": "För lärare",

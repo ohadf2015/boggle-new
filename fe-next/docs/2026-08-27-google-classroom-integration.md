@@ -1,6 +1,6 @@
 # Google Classroom integration — spec
 
-**Status:** Phase 1 implemented 2026-08-27. Phase 2 NOT started, and blocked on a decision that is
+**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
 the product owner's, not an engineer's (see below).
 
 ## Why
@@ -48,6 +48,33 @@ Deliberately chosen over the API route because it:
 
 **Implementation:** `lib/education/googleClassroomShare.ts` (pure, no network, no side effects) plus
 one action in `ClassroomManager`. Copy in all six locales.
+
+
+## Phase 1.5 — Marketplace / Workspace add-on Discovery (SHIPPED slice)
+
+Foil Discovery Education Gemini Classroom (2026-08-31) + Kahootopia Assignments.
+Teachers need a path **inside Classroom** (not only the in-app #968 CTA) to
+one-click post Unplugged reteach homework (printable #957 + Live deep-link
+#959/#968) into the Stream.
+
+**Shipped in this slice (no OAuth, no roster PII):**
+
+- Attachment Discovery iframe: `/{locale}/education/classroom-addon`
+- Teacher/Student attachment view: `/{locale}/education/classroom-addon/attachment`
+  (reuses Unplugged reteach Live)
+- Assign API: `POST /api/classroom-addon/assign` → `#968` Stream share URL +
+  AddOnAttachment URI body
+- Marketplace listing JSON: `GET /api/classroom-addon/marketplace`
+- CSP `frame-ancestors` allows `classroom.google.com` on addon routes only
+
+Stream post still uses Phase 1 `classroom.google.com/share?itemtype=assignment`
+with the Unplugged Live absolute URL on **lexiclash.live**. Creating a native
+add-on attachment via `courses.courseWork.addOnAttachments.create` needs
+`classroom.addons.teacher` only (NOT `classroom.rosters.readonly`) and is
+deferred — Discovery already emits the attachment body shape when that lands.
+
+**Implementation:** `lib/education/googleClassroomAddon.ts`, Discovery UI,
+API routes above. Skips teacher-p0 / streak tracks.
 
 ## Phase 2 — Roster import (NOT BUILT — needs a product decision first)
 

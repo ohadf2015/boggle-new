@@ -11928,6 +11928,17 @@ const en = {
       "unpluggedReteachPrev": "Previous",
       "unpluggedReteachProgress": "Word {{current}} of {{total}}"
     },
+    "classroomAddon": {
+      "eyebrow": "Google Classroom Marketplace",
+      "title": "Assign Unplugged reteach",
+      "subtitle": "One-click post printable + Live deep-link homework into the Classroom Stream. Class words only — no student names.",
+      "lessonLabel": "Lesson name",
+      "missedWordsLabel": "Missed words (comma-separated)",
+      "privacyNote": "No roster import. No student names. Stream post uses Google's share dialog — we never see which class you pick.",
+      "postToStream": "Post Unplugged assign to Classroom Stream",
+      "openUnplugged": "Open Unplugged Live",
+      "needMissedWords": "Add at least one missed word to enable one-click assign."
+    },
     "nav": {
       "section": "Teachers",
       "forTeachers": "For teachers",

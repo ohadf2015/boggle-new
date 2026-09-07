@@ -13414,6 +13414,17 @@ const ja = {
       "unpluggedReteachPrev": "前へ",
       "unpluggedReteachProgress": "単語 {{current}} / {{total}}"
     },
+    "classroomAddon": {
+      "eyebrow": "Google Classroom Marketplace",
+      "title": "アンプラグドリティーチを課題にする",
+      "subtitle": "プリント＋Liveディープリンクの宿題を Classroom のストリームへワンクリック投稿。クラスの単語のみ — 生徒名は送りません。",
+      "lessonLabel": "レッスン名",
+      "missedWordsLabel": "見逃した単語（カンマ区切り）",
+      "privacyNote": "名簿の取り込みなし。生徒名なし。投稿は Google の共有ダイアログ — どのクラスかは見えません。",
+      "postToStream": "Unplugged 課題を Classroom ストリームへ投稿",
+      "openUnplugged": "Unplugged Live を開く",
+      "needMissedWords": "ワンクリック課題には、見逃した単語を1つ以上入力してください。"
+    },
     "nav": {
       "section": "教師向け",
       "forTeachers": "教師の方へ",
