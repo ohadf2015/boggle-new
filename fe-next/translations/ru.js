@@ -7197,6 +7197,21 @@ const ru = {
     "milestoneReached": "Веха достигнута!",
     "rewardClaimed": "Награда получена!",
     "streakFreezeEarned": "Защита серии получена!",
+    "streakHeat": {
+      "starting": "Искра",
+      "hot": "Разжигание",
+      "fire": "Пламя",
+      "epic": "Инферно",
+      "legendary": "Расплав",
+      "mythic": "Сверхновая",
+      "immortal": "Вечный",
+      "open": "Посмотреть серию",
+      "continue": "Продолжить"
+    },
+    "streakShare": {
+      "text": "{days} дней подряд в LexiClash",
+      "button": "Похвастаться"
+    },
     "weeklyChest": {
       "title": "Еженедельный Сундук",
       "dayProgress": "День {day} из 7",

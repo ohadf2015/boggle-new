@@ -43,7 +43,20 @@ export type MascotVariant =
   | 'question'    // question.webp (dark)
   | 'trophyNobg'  // trophy-nobg.webp (nobg)
   | 'explorerNobg'// explorer-nobg.webp (nobg)
-  | 'cryingNobg'; // crying-nobg.webp (nobg)
+  | 'cryingNobg'  // crying-nobg.webp (nobg)
+  // Streak heat tiers — one mascot per STREAK_TIERS step, so the daily streak
+  // visibly gets hotter as it grows. See lib/streakHeat.ts for the mapping.
+  // ponytail: static single-frame stickers, unlike the older animated variants.
+  // The Framer idle motion in Mascot.tsx carries them; if one ever needs real
+  // frame animation, re-export it as multi-frame WebP under the same filename.
+  | 'streakSpark'      // streak-spark-nobg.webp (nobg)     — days 1-2
+  | 'streakKindling'   // streak-kindling-nobg.webp (nobg)  — days 3-6
+  | 'streakInferno'    // streak-inferno-nobg.webp (nobg)   — days 14-29
+  | 'streakMolten'     // streak-molten-nobg.webp (nobg)    — days 30-59
+  | 'streakSupernova'  // streak-supernova-nobg.webp (nobg) — days 60-99
+  | 'streakEternal'    // streak-eternal-nobg.webp (nobg)   — days 100+
+  | 'streakChestClosed'// streak-chest-closed-nobg.webp (nobg)
+  | 'streakChestOpen'; // streak-chest-open-nobg.webp (nobg)
 
 /**
  * Background type for each mascot GIF.
@@ -91,6 +104,14 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   trophyNobg: '/mascot/trophy-nobg.webp',
   explorerNobg: '/mascot/explorer-nobg.webp',
   cryingNobg: '/mascot/crying-nobg.webp',
+  streakSpark: '/mascot/streak-spark-nobg.webp',
+  streakKindling: '/mascot/streak-kindling-nobg.webp',
+  streakInferno: '/mascot/streak-inferno-nobg.webp',
+  streakMolten: '/mascot/streak-molten-nobg.webp',
+  streakSupernova: '/mascot/streak-supernova-nobg.webp',
+  streakEternal: '/mascot/streak-eternal-nobg.webp',
+  streakChestClosed: '/mascot/streak-chest-closed-nobg.webp',
+  streakChestOpen: '/mascot/streak-chest-open-nobg.webp',
 };
 
 /**
@@ -135,6 +156,14 @@ export const MASCOT_BG_TYPE: Record<MascotVariant, MascotBgType> = {
   trophyNobg: 'nobg',
   explorerNobg: 'nobg',
   cryingNobg: 'nobg',
+  streakSpark: 'nobg',
+  streakKindling: 'nobg',
+  streakInferno: 'nobg',
+  streakMolten: 'nobg',
+  streakSupernova: 'nobg',
+  streakEternal: 'nobg',
+  streakChestClosed: 'nobg',
+  streakChestOpen: 'nobg',
 };
 
 /**

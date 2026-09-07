@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Search, CircleDot, CheckCircle2, Clock, Calendar } from 'lucide-react';
+import { Search, CircleDot, CheckCircle2, Clock, Calendar, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,7 @@ import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
 import type { Language } from '@/types';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
+import StreakHeatBadge from './streak/StreakHeatBadge';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 // ==========================================
@@ -173,11 +174,10 @@ export default function DailyHub() {
 
         {/* Streak & Countdown */}
         <div className="flex items-center justify-center gap-4">
-          {streak.currentStreak > 0 && (
-            <span className="text-neo-lime font-neo-display font-black text-lg">
-              🔥 {streak.currentStreak}
-            </span>
-          )}
+          {/* Shown from day 1 here: reaching the daily hub is a deliberate act,
+              so a young streak is context the player asked for — unlike the
+              passive home tile, which still waits for MIN_STREAK_TO_DISPLAY. */}
+          <StreakHeatBadge streak={streak.currentStreak} today={date} />
           <span className="flex items-center gap-1.5 text-neo-white text-sm">
             <Clock className="w-4 h-4" />
             {countdown}
@@ -192,7 +192,8 @@ export default function DailyHub() {
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
-            ✨ {t('daily.dailyDouble')}
+            <Sparkles className="w-4 h-4 inline-block me-1 align-[-2px]" aria-hidden="true" />
+            {t('daily.dailyDouble')}
           </m.div>
         )}
 
@@ -257,7 +258,7 @@ export default function DailyHub() {
       </m.div>
 
       {claimedChest && (
-        <WeeklyChestModal chest={claimedChest} onClose={() => setClaimedChest(null)} />
+        <WeeklyChestModal chest={claimedChest} streak={streak.currentStreak} onClose={() => setClaimedChest(null)} />
       )}
     </div>
   );

@@ -6544,6 +6544,21 @@ const en = {
     "milestoneReached": "Milestone reached!",
     "rewardClaimed": "Reward claimed!",
     "streakFreezeEarned": "Streak freeze earned!",
+    "streakHeat": {
+      "starting": "Spark",
+      "hot": "Kindling",
+      "fire": "Blazing",
+      "epic": "Inferno",
+      "legendary": "Molten",
+      "mythic": "Supernova",
+      "immortal": "Eternal",
+      "open": "View your streak",
+      "continue": "Continue"
+    },
+    "streakShare": {
+      "text": "{days}-day streak on LexiClash",
+      "button": "Show it off"
+    },
     "weeklyChest": {
       "title": "Weekly Chest",
       "dayProgress": "Day {day} of 7",

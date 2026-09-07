@@ -412,6 +412,49 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       rotate: [0, -1, 1, 0],
       transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
     },
+    // Streak heat tiers — idle motion speeds up with the tier, mirroring the
+    // escalation in Mascot.tsx so both renderers agree on how hot each looks.
+    streakSpark: {
+      rotate: [0, -3, 3, 0],
+      scale: [1, 1.03, 1],
+      transition: { duration: 2.4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    streakKindling: {
+      y: [0, -4, 0],
+      scale: [1, 1.04, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    streakInferno: {
+      y: [0, -7, 0],
+      scale: [1, 1.07, 1],
+      transition: { duration: 1.3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    streakMolten: {
+      y: [0, -6, 0],
+      rotate: [0, -2, 2, 0],
+      scale: [1, 1.06, 1],
+      transition: { duration: 1.1, repeat: Infinity, ease: 'easeInOut' },
+    },
+    streakSupernova: {
+      x: [0, -2, 2, -1, 1, 0],
+      y: [0, -8, 0],
+      scale: [1, 1.09, 1],
+      transition: { duration: 0.9, repeat: Infinity, ease: 'easeInOut' },
+    },
+    streakEternal: {
+      y: [0, -5, 0],
+      scale: [1, 1.04, 1],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    streakChestClosed: {
+      rotate: [0, -2, 2, -2, 0],
+      transition: { duration: 0.9, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' },
+    },
+    streakChestOpen: {
+      y: [0, -6, 0],
+      scale: [1, 1.05, 1],
+      transition: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
+    },
   };
 
   const baseVariant = getBaseVariant(variant);

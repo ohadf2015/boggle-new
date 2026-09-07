@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { MODE_IMAGE_ENTRANCE } from '@/lib/landing/modeImageEntrance';
-import { Flame, Check, Clock, Sparkles, X, Star, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Check, Clock, Sparkles, X, Star, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,8 @@ import {
   getDailyStreak,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
+import { Mascot } from '@/components/ui/Mascot';
+import { getStreakHeat } from '@/lib/streakHeat';
 
 interface PreloadedDailyStats {
   hasPlayed: boolean;
@@ -419,9 +421,15 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
               }}
             >
-              <Flame
-                className="text-neo-orange/70"
-                style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }}
+              {/* Tier mascot rather than a generic flame glyph, so the chip
+                  itself gets hotter as the streak grows. Still no pulse — the
+                  threshold and the quiet treatment above are unchanged. */}
+              <Mascot
+                variant={getStreakHeat(streak).mascot}
+                size="xs"
+                animated={false}
+                alt=""
+                className="!w-4 !h-4 shrink-0"
               />
               {streak} {t('daily.dayStreak')}
             </span>

@@ -7092,6 +7092,21 @@ const he = {
       "monthlyMaster": "אלוף חודשי",
       "centurion": "קנטוריון"
     },
+    "streakHeat": {
+      "starting": "ניצוץ",
+      "hot": "מתלקח",
+      "fire": "בוער",
+      "epic": "תופת",
+      "legendary": "מותך",
+      "mythic": "סופרנובה",
+      "immortal": "נצחי",
+      "open": "הצגת הרצף שלך",
+      "continue": "להמשיך"
+    },
+    "streakShare": {
+      "text": "רצף של {days} ימים ב-LexiClash",
+      "button": "תראו לכולם"
+    },
     "weeklyChest": {
       "title": "תיבת שבועית",
       "dayProgress": "יום {day} מתוך 7",
