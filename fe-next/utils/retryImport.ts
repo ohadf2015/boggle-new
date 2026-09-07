@@ -1,4 +1,5 @@
 import logger from '@/utils/logger';
+import { clearCachesAndReload } from '@/lib/deploy/staleDeployReload';
 
 /**
  * Hardens a dynamic `import()` against transient chunk-load failures.
@@ -31,23 +32,6 @@ function isChunkLoadError(err: unknown): boolean {
   );
 }
 
-/** Clear all caches and unregister service workers to ensure a fresh build is fetched. */
-async function clearCachesAndReload(): Promise<void> {
-  // Clear all service worker caches
-  if ('caches' in window) {
-    const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map(name => caches.delete(name)));
-  }
-
-  // Unregister service workers to get fresh version
-  if ('serviceWorker' in navigator) {
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registrations.map(reg => reg.unregister()));
-  }
-
-  // Force hard reload (bypass cache)
-  window.location.reload();
-}
 
 /** Allow at most one reload per window so a permanently-broken chunk can't loop. */
 function shouldReloadOnce(): boolean {

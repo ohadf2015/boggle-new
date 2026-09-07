@@ -16,7 +16,8 @@ import { offlineCapableRoutes } from '@/lib/offline/offlineCapableModes';
  * For the offline-shell routes (the same set the SW precaches — home shells
  * plus every offline-capable mode) we rewrite Cache-Control to a short
  * max-age plus a long stale-while-revalidate window, so:
- *  - online: shell is served from cache for 5 min, then revalidated;
+ *  - online: shell is served from cache for 5 min, then revalidated
+ *    (SWR capped at 1h — see OFFLINE_SHELL_CACHE_CONTROL comment);
  *  - offline cold start: WebView serves the cached shell from disk cache
  *    (MainActivity sets LOAD_CACHE_ELSE_NETWORK), React boots, and
  *    NetworkStatusHandler's offline launcher takes over.
@@ -31,8 +32,15 @@ import { offlineCapableRoutes } from '@/lib/offline/offlineCapableModes';
  *  - Anything outside the shell set is untouched (APIs keep no-store).
  */
 
+// Note on SWR length (t_f6783906 / ChunkLoadError):
+// A 24h stale-while-revalidate window kept post-deploy HTML alive in the
+// browser HTTP cache. Bare location.reload() then re-served that stale
+// document (still pointing at deleted chunk hashes), so recovery looped
+// once and gave up. Keep a short SWR for Android WebView cold-start offline
+// (the reason this header exists) but cap it at 1h so a deploy heals within
+// the hour even if recovery somehow reuses the document cache.
 export const OFFLINE_SHELL_CACHE_CONTROL =
-  'private, max-age=300, stale-while-revalidate=86400';
+  'private, max-age=300, stale-while-revalidate=3600';
 
 const EXTRA_SHELL_SEGMENTS = ['connections/pyramid'] as const;
 

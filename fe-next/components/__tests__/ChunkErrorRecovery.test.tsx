@@ -2,19 +2,24 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import ChunkErrorRecovery from '../ChunkErrorRecovery';
 
-// Reload is the observable side effect — stub it so the test environment survives.
+// Cache-busting replace is the observable side effect — stub it so the test
+// environment survives. Bare reload is the fallback only.
+const replaceSpy = vi.fn();
 const reloadSpy = vi.fn();
 
 beforeEach(() => {
+  replaceSpy.mockClear();
   reloadSpy.mockClear();
   sessionStorage.clear();
-  // jsdom/happy-dom: location.reload is read-only; redefine for the assertion.
   Object.defineProperty(window, 'location', {
-    value: { ...window.location, reload: reloadSpy },
+    value: {
+      href: 'https://lexiclash.live/en',
+      reload: reloadSpy,
+      replace: replaceSpy,
+    },
     writable: true,
     configurable: true,
   });
-  // Stale build: client build time differs from the server's.
   (process.env as Record<string, string>).NEXT_PUBLIC_BUILD_TIME = 'CLIENT_OLD';
 });
 
@@ -36,7 +41,7 @@ function mockVersion(serverBuildTime: string, ok = true): void {
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe('ChunkErrorRecovery', () => {
-  it('hard-reloads on a chunk unhandledrejection when the build is stale', async () => {
+  it('hard-navigates on a chunk unhandledrejection (force path, no version gate)', async () => {
     mockVersion('SERVER_NEW');
     render(<ChunkErrorRecovery />);
 
@@ -46,11 +51,14 @@ describe('ChunkErrorRecovery', () => {
 
     await flush();
     await flush();
-    expect(reloadSpy).toHaveBeenCalledOnce();
+    expect(replaceSpy).toHaveBeenCalledOnce();
+    expect(String(replaceSpy.mock.calls[0][0])).toContain('_lc_chunk=');
   });
 
-  it('does NOT reload when the build is current (genuine error)', async () => {
-    mockVersion('CLIENT_OLD'); // server matches client → not stale
+  it('still hard-navigates when the build appears current (CDN/SWR chunk 404 hole)', async () => {
+    // Pre-#t_f6783906 this was a silent no-op — the version gate blocked recovery
+    // when clientBuildTime === serverBuildTime even though the hashed chunk 404'd.
+    mockVersion('CLIENT_OLD');
     render(<ChunkErrorRecovery />);
 
     const event = new Event('unhandledrejection') as Event & { reason?: unknown };
@@ -59,10 +67,10 @@ describe('ChunkErrorRecovery', () => {
 
     await flush();
     await flush();
-    expect(reloadSpy).not.toHaveBeenCalled();
+    expect(replaceSpy).toHaveBeenCalledOnce();
   });
 
-  it('ignores non-chunk errors (no version fetch, no reload)', async () => {
+  it('ignores non-chunk errors (no navigation)', async () => {
     const fetchSpy = vi.fn();
     vi.stubGlobal('fetch', fetchSpy);
     render(<ChunkErrorRecovery />);
@@ -72,7 +80,7 @@ describe('ChunkErrorRecovery', () => {
     window.dispatchEvent(event);
 
     await flush();
-    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(replaceSpy).not.toHaveBeenCalled();
     expect(reloadSpy).not.toHaveBeenCalled();
   });
 
@@ -86,6 +94,6 @@ describe('ChunkErrorRecovery', () => {
     window.dispatchEvent(event);
 
     await flush();
-    expect(reloadSpy).not.toHaveBeenCalled();
+    expect(replaceSpy).not.toHaveBeenCalled();
   });
 });
