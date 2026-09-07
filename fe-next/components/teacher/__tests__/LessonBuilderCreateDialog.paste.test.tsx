@@ -47,7 +47,6 @@ const setup = (overrides: Record<string, unknown> = {}) => {
       p && 'count' in p ? `${k}:${p.count}` : k,
     ...overrides,
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render(<LessonBuilderCreateDialog {...(props as any)} />);
   return { onWordsChange };
 };

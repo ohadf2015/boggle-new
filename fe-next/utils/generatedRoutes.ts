@@ -97,6 +97,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/middle-school-word-games",
   "/education/sight-words-practice",
   "/education/spelling-bee-practice",
+  "/education/unplugged-reteach",
   "/education/vocabulary-games-classroom",
   "/erudit-onlayn",
   "/faq",
