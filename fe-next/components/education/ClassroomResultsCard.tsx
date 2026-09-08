@@ -19,7 +19,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer, ClipboardList } from 'lucide-react';
+import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer, ClipboardList, QrCode } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
@@ -28,6 +28,7 @@ import { buildMissGapAssignmentPath } from '@/lib/education/missGapAsyncAssignme
 import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
@@ -216,6 +217,39 @@ export function ClassroomResultsCard({
         nameLine: t('education.results.printPracticeSheetNameLine'),
         dateLine: t('education.results.printPracticeSheetDateLine'),
         footer: t('education.results.printPracticeSheetFooter'),
+      },
+    });
+  };
+
+  /**
+   * Unplugged reteach printable pack PDF (#957 practice pages + QR deep-link to
+   * #959 Live). Foil Kahoot Classic Unplugged. Class words only — no names.
+   * Moat ~6:28am after #980.
+   */
+  const handlePrintUnpluggedPack = () => {
+    if (!isTeacher || summary.missedWords.length === 0) return;
+    const lesson = summary.lessonNames.join(', ');
+    openUnpluggedReteachPrintablePack({
+      lesson,
+      teacher: summary.teacherName,
+      missedWords: summary.missedWords,
+      found: summary.classFoundCount,
+      total: summary.totalWords,
+      locale: language,
+      labels: {
+        title: t('education.results.printPracticeSheetTitle', { lesson }),
+        subtitle: t('education.results.printPracticeSheetSubtitle'),
+        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
+        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
+        nameLine: t('education.results.printPracticeSheetNameLine'),
+        dateLine: t('education.results.printPracticeSheetDateLine'),
+        footer: t('education.results.unpluggedReteachPackFooter'),
+        packTitle: t('education.results.unpluggedReteachPackTitle', { lesson }),
+        packSubtitle: t('education.results.unpluggedReteachPackSubtitle'),
+        packFoil: t('education.results.unpluggedReteachPackFoil'),
+        qrHint: t('education.results.unpluggedReteachPackQrHint'),
+        packHowTo: t('education.results.unpluggedReteachPackHowTo'),
+        practiceHeading: t('education.results.unpluggedReteachPackPracticeHeading'),
       },
     });
   };
@@ -449,6 +483,19 @@ export function ClassroomResultsCard({
             >
               <Printer className="w-4 h-4" aria-hidden />
               {t('education.results.printPracticeSheet')}
+            </button>
+            <button
+              type="button"
+              data-testid="print-unplugged-reteach-pack"
+              onClick={handlePrintUnpluggedPack}
+              className={cn(
+                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+                'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+                'shadow-hard-sm hover:shadow-hard transition-all'
+              )}
+            >
+              <QrCode className="w-4 h-4" aria-hidden />
+              {t('education.results.printUnpluggedReteachPack')}
             </button>
             <button
               type="button"

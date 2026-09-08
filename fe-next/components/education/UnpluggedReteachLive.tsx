@@ -8,10 +8,11 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Check, ChevronLeft, ChevronRight, Eye, Printer, Share2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Eye, Printer, Share2, QrCode } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
@@ -94,6 +95,34 @@ export function UnpluggedReteachLive({
         nameLine: t('education.results.printPracticeSheetNameLine'),
         dateLine: t('education.results.printPracticeSheetDateLine'),
         footer: t('education.results.printPracticeSheetFooter'),
+      },
+    });
+  };
+
+  const handlePrintPack = () => {
+    if (words.length === 0) return;
+    const lesson = payload.lesson || t('education.results.title');
+    openUnpluggedReteachPrintablePack({
+      lesson: payload.lesson,
+      teacher: payload.teacher,
+      missedWords: words,
+      found: payload.found,
+      total: payload.total,
+      locale: payload.locale || language,
+      labels: {
+        title: t('education.results.printPracticeSheetTitle', { lesson }),
+        subtitle: t('education.results.printPracticeSheetSubtitle'),
+        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
+        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
+        nameLine: t('education.results.printPracticeSheetNameLine'),
+        dateLine: t('education.results.printPracticeSheetDateLine'),
+        footer: t('education.results.unpluggedReteachPackFooter'),
+        packTitle: t('education.results.unpluggedReteachPackTitle', { lesson }),
+        packSubtitle: t('education.results.unpluggedReteachPackSubtitle'),
+        packFoil: t('education.results.unpluggedReteachPackFoil'),
+        qrHint: t('education.results.unpluggedReteachPackQrHint'),
+        packHowTo: t('education.results.unpluggedReteachPackHowTo'),
+        practiceHeading: t('education.results.unpluggedReteachPackPracticeHeading'),
       },
     });
   };
@@ -217,6 +246,20 @@ export function UnpluggedReteachLive({
         >
           <Printer className="w-5 h-5" aria-hidden />
           {t('education.results.printPracticeSheet')}
+        </button>
+
+        <button
+          type="button"
+          data-testid="print-unplugged-reteach-pack"
+          onClick={handlePrintPack}
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+            'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          <QrCode className="w-5 h-5" aria-hidden />
+          {t('education.results.printUnpluggedReteachPack')}
         </button>
 
         <button
