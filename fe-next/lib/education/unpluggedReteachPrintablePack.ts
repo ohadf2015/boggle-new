@@ -17,8 +17,11 @@ import {
   type MissedWordsPracticeSheetLabels,
 } from './missedWordsPracticeSheet';
 import { buildUnpluggedReteachUrl } from './unpluggedReteachLive';
-import type { ClassGapShareInput, ClassGapSharePayload } from './classGapShare';
-import { toClassGapPayload } from './classGapShare';
+import {
+  toClassGapPayload,
+  type ClassGapShareInput,
+  type ClassGapSharePayload,
+} from './classGapShare';
 
 export const UNPLUGGED_PACK_QR_UTM = {
   utm_source: 'unplugged_pack',
