@@ -3,6 +3,7 @@
  *
  * Foils Kahoot Marketplace grade passback: shows pointsEarned/maxPoints after
  * practice complete, with a copyable turn-in receipt. No roster OAuth.
+ * Below: parent WhatsApp shareable miss-gap practice card (moat next-layer).
  */
 'use client';
 
@@ -21,6 +22,7 @@ import {
   type MissGapGradeScore,
 } from '@/lib/education/missGapGradePassback';
 import { shareWithFallback } from '@/utils/shareWithFallback';
+import { MissGapWhatsAppShareCard } from '@/components/education/MissGapWhatsAppShareCard';
 
 export interface MissGapGradePassbackProps {
   payload: MissGapAssignmentPayload;
@@ -90,6 +92,7 @@ export function MissGapGradePassback({
   }
 
   return (
+    <div className="w-full max-w-xl flex flex-col gap-4" data-testid="miss-gap-grade-passback-stack">
     <div
       data-testid="miss-gap-grade-passback"
       className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard"
@@ -180,6 +183,8 @@ export function MissGapGradePassback({
           {t('education.results.missGapGradePassbackBackHomework')}
         </Link>
       </div>
+    </div>
+      <MissGapWhatsAppShareCard payload={payload} />
     </div>
   );
 }
