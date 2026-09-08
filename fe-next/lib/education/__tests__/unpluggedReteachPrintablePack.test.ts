@@ -137,7 +137,7 @@ describe('openUnpluggedReteachPrintablePack', () => {
           write: vi.fn(),
           close: vi.fn(),
         };
-        return { document: doc, close: vi.fn(), focus: vi.fn() };
+        return { document: doc, close: vi.fn(), focus: vi.fn(), opener: window };
       }),
     );
   });
@@ -153,10 +153,12 @@ describe('openUnpluggedReteachPrintablePack', () => {
       labels,
     });
     expect(ok).toBe(true);
-    expect(window.open).toHaveBeenCalled();
+    expect(window.open).toHaveBeenCalledWith('', '_blank');
     const win = vi.mocked(window.open).mock.results[0].value as {
       document: { write: ReturnType<typeof vi.fn> };
+      opener: unknown;
     };
+    expect(win.opener).toBeNull();
     expect(win.document.write).toHaveBeenCalled();
     const written = String(win.document.write.mock.calls[0][0]);
     expect(written).toContain('unplugged-reteach-printable-pack');

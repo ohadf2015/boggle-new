@@ -108,7 +108,7 @@ describe('openMissedWordsPracticeSheet', () => {
       write: vi.fn(),
       close: vi.fn(),
     };
-    const popup = { document: doc, close: vi.fn() };
+    const popup = { document: doc, close: vi.fn(), opener: window };
     window.open = vi.fn().mockReturnValue(popup);
 
     const ok = openMissedWordsPracticeSheet({
@@ -117,7 +117,8 @@ describe('openMissedWordsPracticeSheet', () => {
       labels,
     });
     expect(ok).toBe(true);
-    expect(window.open).toHaveBeenCalled();
+    expect(window.open).toHaveBeenCalledWith('', '_blank');
+    expect(popup.opener).toBeNull();
     expect(doc.write).toHaveBeenCalled();
     const written = doc.write.mock.calls[0][0] as string;
     expect(written).toContain('neutron');

@@ -168,8 +168,17 @@ export function openMissedWordsPracticeSheet(
   if (typeof window === 'undefined') return false;
   const html = buildMissedWordsPracticeSheetHtml(input);
   if (!html) return false;
-  const w = window.open('', '_blank', 'noopener,noreferrer');
+  // Do not pass noopener/noreferrer in windowFeatures: Chromium then returns
+  // null from window.open (or an opaque window), so document.write never runs and
+  // teachers only get an about:blank tab. Open a writable blank window, drop
+  // opener ourselves, then write the print HTML.
+  const w = window.open('', '_blank');
   if (!w) return false;
+  try {
+    w.opener = null;
+  } catch {
+    /* ignore */
+  }
   try {
     w.document.open();
     w.document.write(html);
