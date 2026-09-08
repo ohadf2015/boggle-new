@@ -5,8 +5,12 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Gamepad2, Zap, Trophy, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/shared/types/game';
+import { languageFlag, languageLabelKey } from '@/lib/i18n/languageLabels';
+import { locales } from '@/i18n/config';
 
-const SUPPORTED_LOCALES: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+// The canonical shipped-locale list, not a sixth hand-written copy: this one
+// sat at five and never offered Russian in the CrazyGames switcher.
+const SUPPORTED_LOCALES = locales as readonly Language[];
 
 interface LobbyTutorialPanelProps {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -23,14 +27,6 @@ const STEP_ICONS = {
   zap: Zap,
   trophy: Trophy,
 } as const;
-
-const LANGUAGE_FLAGS: Record<string, string> = {
-  en: '\u{1F1FA}\u{1F1F8}',
-  he: '\u{1F1EE}\u{1F1F1}',
-  sv: '\u{1F1F8}\u{1F1EA}',
-  ja: '\u{1F1EF}\u{1F1F5}',
-  es: '\u{1F1EA}\u{1F1F8}',
-};
 
 export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => {
   const [step, setStep] = useState(0);
@@ -117,7 +113,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
                   : 'bg-neo-white/5 border-neo-white/20 text-neo-white hover:border-neo-cream/40'
               }`}
             >
-              {LANGUAGE_FLAGS[loc] || ''} {t(`joinView.${loc === 'en' ? 'english' : loc === 'he' ? 'hebrew' : loc === 'sv' ? 'swedish' : loc === 'ja' ? 'japanese' : 'spanish'}`)}
+              {languageFlag(loc)} {t(languageLabelKey(loc))}
             </button>
           ))}
         </div>

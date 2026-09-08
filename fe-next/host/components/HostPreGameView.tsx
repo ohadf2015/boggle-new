@@ -12,6 +12,7 @@ import { EmoteTray } from '@/player/components/lobby/EmoteTray';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
+import { languageFlag, languageLabelKey } from '@/lib/i18n/languageLabels';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { classroomHostPreset } from '@/lib/education/classroomHostPreset';
@@ -694,12 +695,10 @@ function HostPreGameView({
             aria-label={t('joinView.selectLanguage')}
           >
             <span className="text-base leading-none" aria-hidden>
-              {({ en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸' } as Record<Language, string>)[roomLanguage]}
+              {languageFlag(roomLanguage)}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime short:max-sm:hidden">
-              {t(`joinView.${
-                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<Language, string>)[roomLanguage]
-              }`)}
+              {t(languageLabelKey(roomLanguage))}
             </span>
           </div>
           <div className="flex items-center gap-2 shrink-0">

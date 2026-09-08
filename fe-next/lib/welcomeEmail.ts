@@ -102,12 +102,22 @@ export async function sendWelcomeEmailToUser(
     // Step 4: Resolve email address
     let email = opts?.email;
     if (!email) {
-      const { data } = await supabase.auth.admin.getUserById(userId);
+      const { data, error: lookupErr } = await supabase.auth.admin.getUserById(userId);
+      // A failed lookup and a genuinely emailless account both land on the
+      // `no_email` return below and used to be indistinguishable — this error
+      // was discarded. Only the failure is a fault, so only it stays loud.
+      if (lookupErr) {
+        logger.error('EMAIL', `Welcome email: auth lookup failed for user ${userId}`, lookupErr);
+      }
       email = data?.user?.email ?? undefined;
     }
 
     if (!email) {
-      logger.error('EMAIL', `Welcome email: no email for user ${userId}`);
+      // Expected terminal state, not a fault: accounts with no email address
+      // still emit SIGNED_IN, so the client trigger fires for them too. This
+      // was logger.error, which ships to Sentry — ~19 events/week with nothing
+      // to fix (JAVASCRIPT-NEXTJS-233). The caller still gets `no_email`.
+      logger.info('EMAIL', `Welcome email: no email for user ${userId}`);
       // Revert the claim since we can't proceed
       await supabase
         .from('profiles')

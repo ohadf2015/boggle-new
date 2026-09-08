@@ -20,15 +20,11 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
 
-export const LANGUAGE_LABEL_KEYS: Record<Language, string> = {
-  en: 'languages.english',
-  he: 'languages.hebrew',
-  sv: 'languages.swedish',
-  ja: 'languages.japanese',
-  es: 'languages.spanish',
-  ru: 'languages.russian',
-};
+// Re-exported for the existing contract test; the map itself is shared with the
+// lobby language chips (lib/i18n/languageLabels.ts) so it can only drift once.
+export { LANGUAGE_LABEL_KEYS };
 
 interface ClassroomManagerProps {
   autoOpenCreate?: boolean;

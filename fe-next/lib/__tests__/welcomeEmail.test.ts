@@ -42,6 +42,7 @@ vi.mock('@/backend/utils/logger', () => ({
 }));
 
 // Import after mocks
+import logger from '@/backend/utils/logger';
 import { sendWelcomeEmailToUser } from '../welcomeEmail';
 
 describe('sendWelcomeEmailToUser', () => {
@@ -242,6 +243,41 @@ describe('sendWelcomeEmailToUser', () => {
       const result = await sendWelcomeEmailToUser('user-123');
 
       expect(result).toEqual({ sent: false, reason: 'no_email' });
+    });
+
+    // An account with no email address is an expected terminal state, not a
+    // fault: those sessions still emit SIGNED_IN, so the trigger fires for
+    // them. logger.error ships to Sentry, where this was ~19 events/week with
+    // nothing to fix (JAVASCRIPT-NEXTJS-233).
+    it('logs the emailless account at info, never at Sentry-bound error', async () => {
+      mockSupabase.auth.admin.getUserById = vi
+        .fn()
+        .mockResolvedValue({ data: { user: { id: 'user-123', email: null } }, error: null });
+
+      await sendWelcomeEmailToUser('user-123');
+
+      expect(logger.error).not.toHaveBeenCalled();
+      expect(logger.info).toHaveBeenCalledWith(
+        'EMAIL',
+        expect.stringContaining('no email for user user-123')
+      );
+    });
+
+    // The opposite case must stay loud: a failing admin lookup looks identical
+    // from the return value, and its error used to be discarded entirely.
+    it('reports a failed auth lookup as an error', async () => {
+      mockSupabase.auth.admin.getUserById = vi
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: 'rate limited' } });
+
+      const result = await sendWelcomeEmailToUser('user-123');
+
+      expect(result).toEqual({ sent: false, reason: 'no_email' });
+      expect(logger.error).toHaveBeenCalledWith(
+        'EMAIL',
+        expect.stringContaining('auth lookup failed for user user-123'),
+        expect.anything()
+      );
     });
   });
 
