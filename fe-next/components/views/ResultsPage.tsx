@@ -69,6 +69,7 @@ const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRu
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 const ClassroomResultsCard = dynamic(() => import('@/components/education/ClassroomResultsCard').then(m => m.ClassroomResultsCard), { ssr: false });
+const TeamBattleStandings = dynamic(() => import('@/components/education/TeamBattleStandings').then(m => m.TeamBattleStandings), { ssr: false });
 
 import { buildReteachLessonData } from '@/lib/education/classroomGameHandoff';
 
@@ -558,18 +559,48 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     window.location.reload();
   }, [classroomSummary]);
 
+  // Rematch (teacher/host only): the teacher's sessionStorage still holds the
+  // SAME lessonGameData and the URL already carries ?classroom=true&host=true,
+  // so a plain reload rejoins the SAME room (same code, students stay put) and
+  // restages the SAME list — a Friday-battle rematch without recreating
+  // anything. Reteach differs only in that it narrows the payload first.
+  const handleRematch = useCallback(() => {
+    if (!classroomSummary) return;
+    try {
+      if (!sessionStorage.getItem('lessonGameData')) return;
+    } catch (err) {
+      logger.warn('[RESULTS] Could not verify rematch payload:', err);
+      return;
+    }
+    window.location.reload();
+  }, [classroomSummary]);
+
   const postGameWordReviewNode = classroomSummary ? (
-    <ClassroomResultsCard
-      summary={classroomSummary}
-      username={username}
-      isTeacher={isHost}
-      onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
-      onPractice={
-        classroomSummary.lessonIds[0]
-          ? () => router.push(`/${language}/student/lessons/${classroomSummary.lessonIds[0]}?mode=flashcard`)
-          : undefined
-      }
-    />
+    <>
+      {classroomSummary.teamBattle && (
+        <div className="mb-4">
+          <TeamBattleStandings
+            teams={classroomSummary.teamBattle.teams}
+            scores={sortedScores.map((s: { username: string; score: number }) => ({
+              username: s.username,
+              score: s.score,
+            }))}
+          />
+        </div>
+      )}
+      <ClassroomResultsCard
+        summary={classroomSummary}
+        username={username}
+        isTeacher={isHost}
+        onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
+        onRematch={isHost ? handleRematch : undefined}
+        onPractice={
+          classroomSummary.lessonIds[0]
+            ? () => router.push(`/${language}/student/lessons/${classroomSummary.lessonIds[0]}?mode=flashcard`)
+            : undefined
+        }
+      />
+    </>
   ) : lessonGameData && !isGuest ? (
     <PostGameWordReview
       vocabularyWords={lessonGameData.vocabularyWords}

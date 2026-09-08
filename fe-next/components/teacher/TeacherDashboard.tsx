@@ -32,7 +32,10 @@ import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import PlayTabFirstRunCard from './PlayTabFirstRunCard';
+import QuickStartButton from './QuickStartButton';
+import RepeatLastGameButton from './RepeatLastGameButton';
 import StudentsPresentStrip from './StudentsPresentStrip';
+import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecentGameSettings';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
@@ -60,6 +63,7 @@ export default function TeacherDashboard() {
   const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
   const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
+  const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   // Only for the one-time gifted-Pro celebration; the header chip reads the
   // entitlement itself. The hook de-duplicates the request across consumers.
   const { grant: proGrant, loading: proLoading } = useTeacherPro();
@@ -77,6 +81,21 @@ export default function TeacherDashboard() {
   const openReviewLesson = useCallback(
     (words: string[]) => {
       router.push(`/${language}/teacher?reviewWords=${encodeURIComponent(words.join(','))}`);
+    },
+    [router, language]
+  );
+
+  const handleQuickStart = useCallback(
+    (config: GameConfiguration) => {
+      const lessonParam = config.lessonIds[0] || '';
+      router.push(`/${language}/education/classroom-game?lessonId=${lessonParam}`);
+    },
+    [router, language]
+  );
+
+  const handleRepeatLast = useCallback(
+    (_config: GameConfiguration) => {
+      router.push(`/${language}/education/classroom-game?flow=repeatLast`);
     },
     [router, language]
   );
@@ -158,6 +177,13 @@ export default function TeacherDashboard() {
                   onJoinCodeCreated={setNewlyCreatedJoinCode}
                   initialJoinCode={newlyCreatedJoinCode}
                 />
+              </m.div>
+            )}
+
+            {hasRecentConfig && classrooms.length > 0 && (
+              <m.div variants={slideUp} className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
+                <RepeatLastGameButton config={getMostRecent()} onClick={handleRepeatLast} />
               </m.div>
             )}
 

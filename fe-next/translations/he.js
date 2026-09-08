@@ -12591,6 +12591,7 @@ const he = {
       "quickTipDescription": "התחל משחק כיתתי כדי למשוך את התלמידים עם תרגול אוצר מילים רב משתתפים. התלמידים יכולים להצטרף עם קוד משחק פשוט!",
       "quickStart": "התחלה מהירה",
       "repeatLastGame": "חזור על המשחק האחרון",
+      "repeatLastGameDesc": "אותה כיתה, אותה רשימה, לחיצה אחת",
       "lastPlayed": "שוחק לאחרונה",
       "noRecentGames": "אין משחקים אחרונים",
       "assignments": "משימות",
@@ -12626,6 +12627,28 @@ const he = {
       "scanToJoin": "סרקו להצטרפות"
     },
     "classroom": {
+      "presets": {
+        "title": "תבניות מהירות",
+        "fridayBattle": { "name": "קרב אוצר המילים של שישי", "desc": "קבוצות · הרשימה האחרונה · מהר ורועש" },
+        "sped": { "name": "תמיכה (SPED)", "desc": "פחות מילים · יותר זמן · גופן גדול" },
+        "standard": { "name": "רגיל", "desc": "כולם נגד כולם, 3 דקות קלאסי" }
+      },
+      "playStyle": {
+        "title": "סגנון משחק",
+        "ffa": "כולם נגד כולם",
+        "ffaDesc": "כל תלמיד לעצמו",
+        "teams": "קבוצות",
+        "teamsDesc": "חלוקה אוטומטית לקבוצות מאוזנות",
+        "teamCount": "כמה קבוצות?",
+        "autoAssignNote": "התלמידים מתחלקים אוטומטית — בלי הכנה, הוגן בכל פעם."
+      },
+      "support": {
+        "title": "תמיכה (SPED)",
+        "largeText": "גופן גדול",
+        "audioCues": "צלילי עזר",
+        "participation": "נקודות השתתפות",
+        "vocabCapNote": "מצב תמיכה: רק {count} המילים הראשונות במשחק."
+      },
       "gameModes": {
         "title": "מצב משחק",
         "classic": "קלאסי",
@@ -13252,6 +13275,13 @@ const he = {
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
       "practiceMissed": "תרגלו את המילים האלה",
       "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו",
+      "rematch": "ריבאץ' — אותה רשימה, אותו קוד",
+      "teamBattle": {
+        "title": "קרב קבוצות",
+        "teamName": "קבוצה {number}",
+        "winner": "מנצחת!"
+      },
+      "participationBonus": "+{points} נקודות השתתפות לכולם",
       "shareGap": "שיתוף פער הכיתה",
       "shareGapCopied": "הקישור הועתק — הדביקו ב-Slack או בצ'אט הורים",
       "shareGapTitle": "פער אוצר המילים של הכיתה",

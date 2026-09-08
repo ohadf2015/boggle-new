@@ -59,6 +59,15 @@ const createClassroomGameSchema = z.object({
       .optional(),
     vocabQuizQuestionCount: z.number().int().min(4).max(30).optional(),
     vocabQuizSeconds: z.number().int().min(5).max(90).optional(),
+    // Team battle (weekly teams / juegos en equipo).
+    playStyle: z.enum(['ffa', 'teams']).optional(),
+    teamCount: z.number().int().min(2).max(4).optional(),
+    // SPED-friendly accommodations.
+    accessibility: z.object({
+      largeText: z.boolean().optional(),
+      audioCues: z.boolean().optional(),
+      participationPoints: z.boolean().optional(),
+    }).optional(),
   }).optional(),
 });
 
@@ -135,6 +144,8 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz'; targetWord?: string;
         vocabQuizFocus?: PracticeFocusSetting;
         vocabQuizQuestionCount?: number; vocabQuizSeconds?: number;
+        playStyle?: 'ffa' | 'teams'; teamCount?: number;
+        accessibility?: { largeText?: boolean; audioCues?: boolean; participationPoints?: boolean };
       };
     };
 
@@ -186,6 +197,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           vocabQuizFocus: payload.settings?.vocabQuizFocus,
           vocabQuizQuestionCount: payload.settings?.vocabQuizQuestionCount,
           vocabQuizSeconds: payload.settings?.vocabQuizSeconds,
+          playStyle: payload.settings?.playStyle,
+          teamCount: payload.settings?.teamCount,
+          accessibility: payload.settings?.accessibility,
         },
       };
 

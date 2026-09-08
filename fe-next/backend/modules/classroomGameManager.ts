@@ -54,6 +54,16 @@ export interface ClassroomGameSettings {
   vocabQuizQuestionCount?: number;
   /** Vocab Quiz only: seconds on each question's clock. */
   vocabQuizSeconds?: number;
+  /** Free-for-all or team battle (weekly teams / juegos en equipo). */
+  playStyle?: 'ffa' | 'teams';
+  /** Team count when playStyle === 'teams' (server clamps to 2-4). */
+  teamCount?: number;
+  /** SPED-friendly accommodations chosen in the setup wizard. */
+  accessibility?: {
+    largeText?: boolean;
+    audioCues?: boolean;
+    participationPoints?: boolean;
+  };
 }
 
 export interface ClassroomGame {
