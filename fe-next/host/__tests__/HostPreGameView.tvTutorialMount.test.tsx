@@ -71,10 +71,6 @@ vi.mock('../../components/PresenceIndicator', () => ({
   default: () => null,
 }));
 
-vi.mock('../../components/BotControls', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
@@ -130,9 +126,6 @@ vi.mock('../components/pre-game/MobileShareSection', () => ({
 }));
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
 
-vi.mock('../components/pre-game/PresetInfoDrawer', () => ({
-  PresetInfoDrawer: () => null,
-}));
 
 vi.mock('../components/pre-game/desktop', () => ({
   DesktopLobbyLayout: () => null,

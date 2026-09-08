@@ -37,9 +37,6 @@ vi.mock('@/hooks/useLiveRoomStats', () => ({
     refresh: vi.fn(),
   }),
 }));
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,
 }));

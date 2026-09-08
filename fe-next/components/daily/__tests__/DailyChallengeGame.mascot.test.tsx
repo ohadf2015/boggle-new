@@ -87,9 +87,6 @@ vi.mock('@/contexts/CoinContext', () => ({
 }));
 
 // --- Hook mocks ---
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useGameMusic', () => ({
   useGameMusic: vi.fn(),

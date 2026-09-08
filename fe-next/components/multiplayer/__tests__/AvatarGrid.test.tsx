@@ -133,13 +133,6 @@ vi.mock('@/components/avatar/AvatarRenderer', () => {
   return { default: MockAvatarRenderer };
 });
 
-vi.mock('@/components/join/LanguageSelector', () => ({
-  LanguageSelector: ({ selectedLanguage, onLanguageChange }: { selectedLanguage: string; onLanguageChange: (lang: string) => void }) => (
-    <select data-testid="language-selector" value={selectedLanguage} onChange={(e) => onLanguageChange(e.target.value)}>
-      <option value="en">English</option>
-    </select>
-  ),
-}));
 
 describe('Avatar Builder Integration', () => {
   const mockRoom: ActiveRoom = {

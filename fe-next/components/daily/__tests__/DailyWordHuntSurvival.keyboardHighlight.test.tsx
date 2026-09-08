@@ -75,9 +75,6 @@ vi.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

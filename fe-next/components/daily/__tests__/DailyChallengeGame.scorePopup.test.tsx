@@ -112,9 +112,6 @@ vi.mock('@/hooks/useKeyboardWordInput', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/components/GridComponent', () => ({
   __esModule: true,

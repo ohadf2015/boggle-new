@@ -196,9 +196,6 @@ vi.mock('framer-motion', () => ({
   useReducedMotion: () => false,
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,

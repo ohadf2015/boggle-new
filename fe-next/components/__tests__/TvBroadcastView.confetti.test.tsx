@@ -54,18 +54,6 @@ vi.mock('@/hooks/gameState/store', () => ({
 }));
 
 // Mock heavy child components
-vi.mock('@/host/components/tv-broadcast/TvGrid', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvActivityPanel', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvMomentumTicker', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvJoinBar', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvGameHeader', () => ({ __esModule: true, default: () => <div /> }));
-vi.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
-  __esModule: true,
-  default: () => <div />,
-  TvHelpButton: () => <div />,
-}));
 
 // Mock confetti util — track calls
 const mockFireConfetti = vi.fn();

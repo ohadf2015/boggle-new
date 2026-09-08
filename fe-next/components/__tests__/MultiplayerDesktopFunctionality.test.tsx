@@ -86,10 +86,6 @@ vi.mock('../../components/RoomChat', () => ({
 }));
 
 // Mock BotControls component since it requires LanguageProvider
-vi.mock('../../components/BotControls', () => ({
-  __esModule: true,
-  default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
-}));
 
 // Mock TvTutorialOverlay component
 vi.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({

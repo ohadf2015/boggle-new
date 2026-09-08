@@ -75,10 +75,6 @@ vi.mock('../QuickProfileSetup', () => ({
   __esModule: true,
   default: () => <div data-testid="quick-profile-setup" />,
 }));
-vi.mock('../ScoreRevealV2', () => ({
-  __esModule: true,
-  default: () => <div data-testid="score-reveal" />,
-}));
 vi.mock('../ReturningUserStep', () => ({
   __esModule: true,
   default: () => <div data-testid="returning-user-step" />,

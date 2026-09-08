@@ -43,9 +43,6 @@ vi.mock('@/hooks/useWinStreak', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('framer-motion', () => {
   const motionValueStub = () => ({

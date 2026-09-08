@@ -22,9 +22,6 @@ vi.mock('canvas-confetti', () => ({
   default: vi.fn(),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/components/GridComponent', () => ({
   __esModule: true,

@@ -39,24 +39,6 @@ vi.mock('@/components/AutoHideHeader', () => ({ __esModule: true, default: () =>
 vi.mock('@/components/MusicControls', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ui/PullToRefreshIndicator', () => ({ PullToRefreshIndicator: () => null }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loading">Loading...</div> }));
-vi.mock('@/hooks/useMobileLandscape', () => ({ useMobileLandscape: () => false }));
-vi.mock('@/hooks/useDevicePerformance', () => ({ useDevicePerformance: () => ({ isLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false }) }));
-vi.mock('@/hooks/usePullToRefresh', () => ({ usePullToRefresh: () => ({ pullToRefreshHandlers: {}, pullState: { progress: 0, isRefreshing: false } }) }));
-vi.mock('@/utils/playerProgressStorage', () => ({ hasPlayedAnyGame: vi.fn(() => true) }));
-vi.mock('@/hooks/useWinStreak', () => ({ useWinStreak: () => ({ recordWin: vi.fn() }) }));
-vi.mock('@/contexts/AdMobContext', () => ({
-  useAdMobContext: () => ({
-    recordGameEnd: vi.fn(),
-    shouldShowInterstitial: () => false,
-    recordInterstitialShown: vi.fn(),
-    hasNoAds: () => true,
-    getConfig: () => null,
-    whenReady: () => Promise.resolve(),
-    prepareInterstitial: () => Promise.resolve(),
-    isInterstitialReady: () => false,
-    consumeInterstitial: vi.fn(),
-  }),
-}));
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: vi.fn(),
   trackDailyPuzzle: vi.fn(),

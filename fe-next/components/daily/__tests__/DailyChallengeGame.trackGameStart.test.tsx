@@ -69,7 +69,6 @@ vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({ useCrazyGamesLifecycle: vi.fn
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ isLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false }),
 }));
-vi.mock('@/hooks/useMobileLandscape', () => ({ useMobileLandscape: () => false }));
 vi.mock('@/components/ui/InteractiveMascot', () => ({ InteractiveMascot: () => null }));
 vi.mock('@/components/game/FloatingCoinAnimation', () => ({ __esModule: true, default: () => null }));
 

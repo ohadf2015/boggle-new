@@ -97,3 +97,9 @@ docs/marketing/**/*-film/
 # than deleted so a concurrent session's in-flight capture is not destroyed.
 /test.png
 /live-*-tooltip.png
+
+# Release artifacts (build output, never commit)
+fe-next/LexiClash-release.apk
+fe-next/LexiClash-release.apk.idsig
+*.apk
+*.idsig

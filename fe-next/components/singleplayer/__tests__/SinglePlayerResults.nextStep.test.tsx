@@ -82,9 +82,6 @@ vi.mock('@/hooks/useWinStreak', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useAutoShowWithInteraction', () => ({
   useAutoShowWithInteraction: vi.fn(),
@@ -210,13 +207,6 @@ vi.mock('@/components/results/PlayerInsights', () => ({ default: () => null }));
 vi.mock('@/components/results/CompactResultsStats', () => ({ default: () => null }));
 vi.mock('@/components/results/BonusBadgesRow', () => ({ default: () => null }));
 vi.mock('@/components/results/CoinRewardDisplay', () => ({ default: () => null }));
-vi.mock('@/components/results/BrainPointsDisplay', () => ({ default: () => null }));
-vi.mock('@/components/results/RewardsSummary', () => ({ default: () => null }));
-vi.mock('@/components/results/MissedWords', () => ({ default: () => null }));
-vi.mock('@/components/results/WordPointsGroup', () => ({
-  WordPointsGroup: () => null,
-  InvalidWordsSection: () => null,
-}));
 vi.mock('@/components/AchievementBadge', () => ({
   AchievementBadge: () => null,
 }));
