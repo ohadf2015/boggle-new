@@ -23,6 +23,10 @@ vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+let recentState = { hasRecentConfig: true };
+vi.mock('@/hooks/useRecentGameSettings', () => ({
+  useRecentGameSettings: () => recentState,
+}));
 vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null }));
 vi.mock('@/components/ui/button', () => ({ Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button> }));
 
@@ -40,6 +44,7 @@ describe('TeacherPage upgrade CTA', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
+    recentState = { hasRecentConfig: true };
   });
 
   it('hides the upgrade strip for a Pro teacher (paid or gifted)', () => {
@@ -90,6 +95,17 @@ describe('TeacherPage upgrade CTA', () => {
   it('does not fire iap_viewed impression for admin', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: adminProfile, isAdmin: true, loading: false });
     render(<TeacherPage />);
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
+      'iap_viewed',
+      expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
+    );
+  });
+
+  it('buries the Pro ask until the teacher has run a live game', () => {
+    recentState = { hasRecentConfig: false };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),

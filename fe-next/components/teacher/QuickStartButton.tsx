@@ -40,8 +40,7 @@ export default function QuickStartButton({
   onClick,
   className,
 }: QuickStartButtonProps) {
-  const { t, language } = useLanguage();
-  const isRTL = language === 'he';
+  const { t } = useLanguage();
 
   // Don't render if no config
   if (!config) {
@@ -67,9 +66,8 @@ export default function QuickStartButton({
         'group w-full p-4 rounded-neo border-neo border-neo-black',
         'bg-neo-lime/90 hover:bg-neo-lime',
         'shadow-hard hover:shadow-hard-lg transition-all',
-        'text-left hover:translate-x-[-2px] hover:translate-y-[-2px]',
+        'text-start hover:translate-x-[-2px] hover:translate-y-[-2px]',
         'focus:outline-hidden focus:ring-2 focus:ring-neo-lime',
-        isRTL && 'rtl text-right',
         className
       )}
     >
