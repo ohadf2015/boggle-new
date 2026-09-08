@@ -189,6 +189,14 @@ export type GrowthEvent =
   // repaints, from (c) a native stall that never fires dismissed and hits
   // safety_timeout. NOT a funnel step.
   | 'interstitial_ad_lifecycle'
+  // Ad-quality measurement (lib/ads/adQuality — Deloitte × Google AdMob,
+  // "Quality drives value" 2025). `ad_closed`: one event per closed ad
+  // experience, tagged { format, terminal: 'clean'|'broken'|'skipped', surface }.
+  // `ad_outcome`: the 5-minute follow-up, tagged { played_again_within_5m,
+  // minutes_to_next_game } — correlating ad exposure with session continuation
+  // is the study's core dataset (churn +6-7% per disruptive exposure).
+  | 'ad_closed'
+  | 'ad_outcome'
   // Web display (AdSense Auto-Ads) placement audit. `units: 0` = the script
   // loaded but Auto-Ads placed nothing — the silent zero-revenue state.
   | 'web_ads_fill_audit'

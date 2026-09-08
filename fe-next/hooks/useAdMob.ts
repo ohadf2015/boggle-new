@@ -3,7 +3,8 @@ import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, RewardInte
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
-import { trackRewardedLifecycle, trackInterstitialLifecycle } from '@/utils/growthTracking';
+import { trackRewardedLifecycle, trackInterstitialLifecycle, type InterstitialLifecycleStage, type RewardedLifecycleStage } from '@/utils/growthTracking';
+import { trackAdClosed, classifyInterstitialTerminal, classifyRewardedTerminal } from '@/lib/ads/adQuality';
 
 // Module-level so every useAdMob() consumer observes the same banner state.
 // Prevents hideBanner calls when no banner was ever shown (Sentry #120).
@@ -84,7 +85,7 @@ export interface ShowBannerOptions {
 }
 
 export function useAdMob() {
-  const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial: prepareInterstitialAd, isInterstitialReady, consumeInterstitial } = useAdMobContext();
+  const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial: prepareInterstitialAd, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
   const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void, opts?: ShowRewardedOptions) => {
@@ -132,6 +133,10 @@ export function useAdMob() {
     // grace window for a late event before declaring skip.
     let rewarded = false;
     let settled = false;
+    // Last lifecycle stage seen — feeds classifyRewardedTerminal so the
+    // ad_closed/ad_outcome events record whether a no-reward close was a
+    // player skip (Dismissed) or an SDK failure (lib/ads/adQuality).
+    let lastStage: RewardedLifecycleStage | null = null;
     let dismissGraceTimer: ReturnType<typeof setTimeout> | null = null;
     let safetyTimer: ReturnType<typeof setTimeout> | null = null;
     let prepareTimer: ReturnType<typeof setTimeout> | null = null;
@@ -159,6 +164,7 @@ export function useAdMob() {
     const pendingHandles = [
       AdMob.addListener(Events.Rewarded, () => {
         trackRewardedLifecycle('rewarded', surface);
+        lastStage = 'rewarded';
         rewarded = true;
         finishRef(true);
       }),
@@ -168,6 +174,7 @@ export function useAdMob() {
         // `dismissed` in telemetry = the close tap isn't reaching the SDK
         // (native ad won't close — the reported symptom).
         trackRewardedLifecycle('dismissed', surface);
+        lastStage = 'dismissed';
         if (rewarded || settled) return;
         dismissGraceTimer = setTimeout(() => {
           if (!rewarded) finishRef(false);
@@ -175,10 +182,12 @@ export function useAdMob() {
       }),
       AdMob.addListener(Events.FailedToShow, (e: { message?: string } | undefined) => {
         trackRewardedLifecycle('failed_to_show', surface);
+        lastStage = 'failed_to_show';
         finishRef(false, e?.message || 'Ad failed to show');
       }),
       AdMob.addListener(Events.FailedToLoad, (e: { message?: string } | undefined) => {
         trackRewardedLifecycle('failed_to_load', surface);
+        lastStage = 'failed_to_load';
         finishRef(false, e?.message || 'Ad failed to load');
       }),
     ];
@@ -203,6 +212,7 @@ export function useAdMob() {
         visReconcileTimer = setTimeout(() => {
           if (settled) return;
           trackRewardedLifecycle('visibility_reconcile', surface);
+          lastStage = 'visibility_reconcile';
           finishRef(false, 'Ad closed without a reward signal');
         }, VISIBILITY_RECONCILE_GRACE_MS);
       };
@@ -220,6 +230,13 @@ export function useAdMob() {
           // On teardown the WebView can fail to repaint its GPU surface (blank
           // white frame). Force a repaint before handing control back to React.
           kickWebViewRepaint();
+          // Ad-quality measurement (lib/ads/adQuality, Deloitte × AdMob 2025):
+          // record the close class + arm the 5-min played-again outcome window.
+          trackAdClosed({
+            format: 'rewarded',
+            terminal: classifyRewardedTerminal(ok, lastStage),
+            surface,
+          });
           if (ok) onReward(); else onError?.(errMsg || 'Ad dismissed without reward');
           resolve();
         };
@@ -237,6 +254,7 @@ export function useAdMob() {
             prepareTimer = setTimeout(
               () => {
                 trackRewardedLifecycle('prepare_timeout', surface);
+                lastStage = 'prepare_timeout';
                 finishRef(false, 'Ad not ready — please try again');
               },
               REWARD_PREPARE_TIMEOUT_MS,
@@ -262,6 +280,7 @@ export function useAdMob() {
             safetyTimer = setTimeout(
               () => {
                 trackRewardedLifecycle('safety_timeout', surface);
+                lastStage = 'safety_timeout';
                 finishRef(false, 'Ad timed out — please try again');
               },
               REWARD_SAFETY_TIMEOUT_MS,
@@ -320,6 +339,11 @@ export function useAdMob() {
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
     let settled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
+    // Which terminal stage closed this show — feeds classifyInterstitialTerminal
+    // so ad_closed/ad_outcome and the broken-ad cooldown see the real class
+    // (lib/ads/adQuality). Set on EVERY settle path; 'error' is the fallback
+    // for a settle that arrives without a stage (defensive — all paths set one).
+    let terminalStage: InterstitialLifecycleStage | null = null;
 
     await new Promise<void>((resolve) => {
       const settle = () => {
@@ -328,6 +352,12 @@ export function useAdMob() {
         if (timer) { clearTimeout(timer); timer = null; }
         handles.forEach((h) => { try { h.remove(); } catch {} });
         handles.length = 0;
+        // Ad-quality measurement (lib/ads/adQuality, Deloitte × AdMob 2025):
+        // record the close class, arm the 5-min played-again outcome window,
+        // and let the context double the cooldown if this ad broke.
+        const terminal = classifyInterstitialTerminal(terminalStage ?? 'error');
+        noteInterstitialTerminal(terminal);
+        trackAdClosed({ format: 'interstitial', terminal });
         // Interstitial is a fullscreen native Activity over the WebView. On
         // dismiss the WebView can fail to repaint its GPU surface, leaving a
         // blank white frame on top of the still-mounted results page (the
@@ -347,14 +377,17 @@ export function useAdMob() {
       Promise.all([
         AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
           trackInterstitialLifecycle('dismissed');
+          terminalStage = 'dismissed';
           settle();
         }),
         AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
           trackInterstitialLifecycle('failed_to_show');
+          terminalStage = 'failed_to_show';
           settle();
         }),
         AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
           trackInterstitialLifecycle('failed_to_load');
+          terminalStage = 'failed_to_load';
           settle();
         }),
       ])
@@ -375,6 +408,7 @@ export function useAdMob() {
           // No terminal event arrived in time — the native ad stalled. This
           // breadcrumb is the tell for a hung show (vs a clean dismiss).
           trackInterstitialLifecycle('safety_timeout');
+          terminalStage = 'safety_timeout';
           settle();
         }, ms);
       };
@@ -397,6 +431,7 @@ export function useAdMob() {
             // host) aren't blocked, and DON'T record a shown impression so the
             // no-fill doesn't burn one of the 4 session slots.
             trackInterstitialLifecycle('no_fill');
+            terminalStage = 'no_fill';
             settle();
             return;
           }
@@ -412,11 +447,12 @@ export function useAdMob() {
           trackInterstitialLifecycle('show_resolved');
         } catch {
           trackInterstitialLifecycle('error');
+          terminalStage = 'error';
           settle();
         }
       })();
     });
-  }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady, prepareInterstitialAd, isInterstitialReady, consumeInterstitial]);
+  }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady, prepareInterstitialAd, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal]);
 
   const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number, opts?: ShowBannerOptions) => {
     if (hasNoAds()) return;

@@ -45,6 +45,9 @@ vi.mock('@/lib/native/webviewRepaint', () => ({ kickWebViewRepaint: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => ({
   trackRewardedLifecycle: vi.fn(),
   trackInterstitialLifecycle: vi.fn(),
+  // Real adQuality module (lib/ads/adQuality) consumes trackGrowthEvent on
+  // every ad settle for the ad_closed/ad_outcome events — stub it here.
+  trackGrowthEvent: vi.fn(),
 }));
 
 // Slow cold load: prepare takes 6s, then the user views the ad for 12s.
@@ -65,6 +68,7 @@ vi.mock('@/contexts/AdMobContext', () => ({
       }),
     isInterstitialReady: () => ready,
     consumeInterstitial: vi.fn(),
+    noteInterstitialTerminal: vi.fn(),
   }),
 }));
 

@@ -23,12 +23,22 @@ vi.mock('@capacitor-community/admob', () => ({
   BannerAdPosition: {},
 }));
 
+// Real adQuality module (lib/ads/adQuality) consumes trackGrowthEvent on
+// every ad settle for the ad_closed/ad_outcome events — stub it alongside the
+// lifecycle breadcrumbs useAdMob emits.
+vi.mock('@/utils/growthTracking', () => ({
+  trackRewardedLifecycle: vi.fn(),
+  trackInterstitialLifecycle: vi.fn(),
+  trackGrowthEvent: vi.fn(),
+}));
+
 // --- Context mock: whenReady NEVER resolves (AdMob init stalls) -------------
 vi.mock('@/contexts/AdMobContext', () => ({
   useAdMobContext: () => ({
     recordGameEnd: vi.fn(),
     shouldShowInterstitial: () => false,
     recordInterstitialShown: vi.fn(),
+    noteInterstitialTerminal: vi.fn(),
     hasNoAds: () => false,
     getConfig: () => ({ rewardedAdId: 'r-1', rewardedUnits: { generic: 'r-1' } }),
     whenReady: () => new Promise<void>(() => {}), // hangs forever

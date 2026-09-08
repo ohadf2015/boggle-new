@@ -34,6 +34,7 @@
 // (so it stays pure + trivially testable in node). The returned string value
 // 'General' is exactly the enum's runtime value.
 import type { MaxAdContentRating } from '@capacitor-community/admob';
+import type { AdTerminal } from '../ads/adQuality';
 import type { SocialTier } from './socialPolicy';
 
 /** True when we must serve NO ads of any format (actual knowledge of a child). */
@@ -79,4 +80,20 @@ export function resolveChildDirectedAdInit(tier: SocialTier): ChildDirectedAdIni
     // module stay type-only (no runtime AdMob dependency).
     maxAdContentRating: (treatAsChild ? 'General' : 'Teen') as MaxAdContentRating,
   };
+}
+
+// Base floor between two interstitial shows (2 min) — see AdMobContext for the
+// fatigue-guard rationale.
+const BASE_INTERSTITIAL_GAP_MS = 2 * 60 * 1000;
+
+/**
+ * Minimum wall time between two interstitial SHOWS, given how the last one
+ * ended (Deloitte × Google AdMob, "Quality drives value" 2025: a stalled or
+ * frozen fullscreen ad is a disruptive ad feature — churn +6-7% per exposure).
+ * A 'broken' terminal (safety timeout, failed show/load) doubles the floor so
+ * a misbehaving SDK/mediation chain never stacks two risky fullscreen
+ * experiences minutes apart. Clean/skipped/unknown terminals keep the base.
+ */
+export function interstitialMinGapMs(lastTerminal: AdTerminal | null): number {
+  return lastTerminal === 'broken' ? BASE_INTERSTITIAL_GAP_MS * 2 : BASE_INTERSTITIAL_GAP_MS;
 }
