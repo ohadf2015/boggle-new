@@ -28,6 +28,8 @@ import { hasQuizSession } from '../../modules/vocabQuizStore.js';
 import { buildClassroomSummary } from '../../modules/classroomSummary';
 import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
+import { assignTeams, clampTeamCount } from '@/shared/utils/teamBattle';
+import { PARTICIPATION_BONUS } from '@/shared/types/classroom';
 import type { UserData } from './types';
 import logger from '../../utils/logger';
 
@@ -51,6 +53,20 @@ export async function calculateAndBroadcastFinalScores(
 
   logger.info('FINAL_SCORES', `Calculating final scores for game ${gameCode}`);
   const language = game.language || 'en';
+
+  // Teacher-launched room? Fetched ONCE here: the settings drive the SPED
+  // participation bonus (applied to scores below) AND the team-battle /
+  // accessibility fields on the classroom summary (built later).
+  let classroomGame: Awaited<ReturnType<typeof getClassroomGame>> = null;
+  try {
+    classroomGame = await getClassroomGame(gameCode);
+  } catch (err) {
+    logger.warn('CLASSROOM_GAME', `Failed to load classroom game ${gameCode}: ${(err as Error).message}`);
+  }
+  const classroomSettings = classroomGame?.settings;
+  const participationBonus = classroomSettings?.accessibility?.participationPoints
+    ? PARTICIPATION_BONUS
+    : 0;
 
   // Build data structures in single pass
   const wordCountMap: Record<string, number> = {};
@@ -141,6 +157,16 @@ export async function calculateAndBroadcastFinalScores(
     finalScores.push(...(boosted as unknown as PlayerScoreResult[]));
   }
 
+  // SPED participation bonus: a flat award to every HUMAN player so no student
+  // ends the round on zero. Flat = the ranking order is unchanged, so no
+  // re-sort is needed; bots are excluded (they are not students).
+  if (participationBonus > 0) {
+    for (const playerResult of finalScores) {
+      if (game.users?.[playerResult.username]?.isBot) continue;
+      playerResult.totalScore += participationBonus;
+    }
+  }
+
   // In Word Hunt, the player who found the target word is the winner
   // Re-sort so target finder ranks first, others by score
   if (game.gameMode === 'word-hunt' && game.wordHuntState?.targetFoundBy) {
@@ -211,10 +237,10 @@ export async function calculateAndBroadcastFinalScores(
   // Build the classroom summary if a teacher launched this room. Derived here,
   // not on the client: `lessonGameData` only exists in the TEACHER's
   // sessionStorage, so a client-side version is empty for every student.
+  // `classroomGame` was already fetched above (it drives the SPED participation
+  // bonus) — reuse it, never fetch twice.
   let classroomSummary;
-  let classroomGame: ClassroomGame | null = null;
   try {
-    classroomGame = await getClassroomGame(gameCode);
     if (classroomGame) {
       classroomSummary = buildClassroomSummary({
         language,
@@ -232,6 +258,29 @@ export async function calculateAndBroadcastFinalScores(
           }>,
         })),
       }) ?? undefined;
+
+      if (classroomSummary) {
+        // Team battle: deal teams deterministically from the human roster so
+        // every client renders identical standings with no extra round-trip.
+        if (classroomSettings?.playStyle === 'teams') {
+          const humanNames = resultsWithIconAchievements
+            .filter((p) => !game.users?.[p.username]?.isBot)
+            .map((p) => p.username);
+          classroomSummary.teamBattle = {
+            teamCount: clampTeamCount(classroomSettings.teamCount),
+            teams: assignTeams(humanNames, classroomSettings.teamCount ?? 2, gameCode),
+          };
+        }
+        if (participationBonus > 0) {
+          classroomSummary.participationBonus = participationBonus;
+        }
+        if (classroomSettings?.accessibility?.largeText || classroomSettings?.accessibility?.audioCues) {
+          classroomSummary.accessibility = {
+            largeText: !!classroomSettings.accessibility.largeText,
+            audioCues: !!classroomSettings.accessibility.audioCues,
+          };
+        }
+      }
     }
   } catch (err) {
     // Never let a Redis hiccup swallow the results broadcast — but say so, so

@@ -31,6 +31,8 @@ function ClassroomGameInner() {
 
   // Optional lesson ID from URL params (pre-selects a lesson in the lobby)
   const lessonId = searchParams?.get('lessonId') || '';
+  // 'repeatLast' (dashboard Repeat-last hero) prefills the whole last setup.
+  const flow = searchParams?.get('flow') || '';
 
   useEffect(() => {
     if (authLoading) return;
@@ -65,6 +67,7 @@ function ClassroomGameInner() {
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <ClassroomGameLobby
           initialLessonId={lessonId}
+          initialFlow={flow}
           onBack={handleBack}
         />
       </main>

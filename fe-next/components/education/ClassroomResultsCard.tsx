@@ -40,6 +40,8 @@ export interface ClassroomResultsCardProps {
   onPractice?: () => void;
   /** Teacher-only: starts a new round on exactly the words the class missed. */
   onReteach?: () => void;
+  /** Teacher-only: same list, same code — a new round without recreating the room. */
+  onRematch?: () => void;
 }
 
 export function ClassroomResultsCard({
@@ -48,6 +50,7 @@ export function ClassroomResultsCard({
   isTeacher,
   onPractice,
   onReteach,
+  onRematch,
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
@@ -367,6 +370,31 @@ export function ClassroomResultsCard({
           );
         })}
       </ul>
+
+      {isTeacher && summary.participationBonus ? (
+        <p
+          data-testid="participation-bonus-note"
+          className="mb-4 p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm"
+        >
+          {t('education.results.participationBonus', { points: summary.participationBonus })}
+        </p>
+      ) : null}
+
+      {isTeacher && onRematch && (
+        <button
+          type="button"
+          data-testid="rematch-same-list"
+          onClick={onRematch}
+          className={cn(
+            'mb-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+            'bg-neo-yellow text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg transition-all'
+          )}
+        >
+          <RotateCcw className="w-5 h-5" aria-hidden />
+          {t('education.results.rematch')}
+        </button>
+      )}
 
       {isTeacher &&
         (summary.missedWords.length > 0 ? (
