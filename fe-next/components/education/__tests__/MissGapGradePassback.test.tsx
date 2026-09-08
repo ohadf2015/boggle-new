@@ -49,6 +49,8 @@ describe('MissGapGradePassback', () => {
     expect(card).toHaveAttribute('data-max', '100');
     expect(card).toHaveAttribute('data-on-time', '1');
     expect(screen.getByTestId('miss-gap-grade-privacy')).toBeInTheDocument();
+    expect(screen.getByTestId('miss-gap-whatsapp-share-card')).toBeInTheDocument();
+    expect(screen.getByTestId('miss-gap-whatsapp-foil')).toBeInTheDocument();
   });
 
   it('copies grade receipt URL with points', async () => {

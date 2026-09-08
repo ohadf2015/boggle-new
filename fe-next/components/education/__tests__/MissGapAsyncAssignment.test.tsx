@@ -76,6 +76,12 @@ describe('MissGapAsyncAssignment', () => {
     const link = screen.getByTestId('miss-gap-async-open-grade-passback');
     expect(link.getAttribute('href')).toContain('miss-gap-grade-passback');
     expect(link.getAttribute('href')).toContain('points=100');
+    const wa = screen.getByTestId('miss-gap-async-whatsapp-share');
+    expect(wa.getAttribute('href')).toContain('wa.me');
+    const decoded = decodeURIComponent(wa.getAttribute('href') || '');
+    expect(decoded).toContain('miss-gap-whatsapp');
+    expect(decoded).toContain('utm_source=whatsapp');
+    expect(decoded).toContain('due=2099-12-31');
   });
 
   it('shares async homework URL with due date', async () => {

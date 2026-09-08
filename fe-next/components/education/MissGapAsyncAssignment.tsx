@@ -5,6 +5,7 @@
  * Unplugged session). Students open the homework link, practise, mark complete;
  * on-time completion feeds the class streak and opens GC grade passback
  * (Kahoot Marketplace grade-passback foil — #970-style, no roster OAuth).
+ * After complete: parent WhatsApp share of the miss-gap practice card.
  */
 'use client';
 
@@ -33,6 +34,11 @@ import {
   type MissGapGradeScore,
 } from '@/lib/education/missGapGradePassback';
 import { shareWithFallback } from '@/utils/shareWithFallback';
+import { WhatsAppIcon } from '@/components/icons/SocialIcons';
+import {
+  buildMissGapWhatsAppDeepLink,
+  canShareMissGapWhatsApp,
+} from '@/lib/education/missGapWhatsAppShare';
 
 export interface MissGapAsyncAssignmentProps {
   payload: MissGapAssignmentPayload;
@@ -283,6 +289,29 @@ export function MissGapAsyncAssignment({
                   {t('education.results.missGapGradePassbackOpen')}
                 </Link>
               </div>
+            ) : null}
+            {completed && canShareMissGapWhatsApp(payload) ? (
+              <a
+                href={buildMissGapWhatsAppDeepLink({
+                  text: t('education.results.missGapWhatsAppShareText', {
+                    lesson,
+                    missed: words.join(', '),
+                    due: payload.dueDate || '—',
+                  }),
+                  input: payload,
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="miss-gap-async-whatsapp-share"
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+                  'bg-brand-whatsapp text-neo-white border-neo border-neo-black rounded-neo',
+                  'shadow-hard-sm hover:shadow-hard transition-all hover:bg-brand-whatsapp-hover',
+                )}
+              >
+                <WhatsAppIcon className="w-5 h-5" />
+                {t('education.results.missGapWhatsAppShare')}
+              </a>
             ) : null}
           </div>
         )}
