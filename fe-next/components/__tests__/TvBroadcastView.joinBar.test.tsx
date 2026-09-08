@@ -49,10 +49,6 @@ vi.mock('@/host/hooks/useTvFullscreen', () => ({
 }));
 
 // Mock TvGrid to avoid rendering complexity
-vi.mock('@/host/components/tv-broadcast/TvGrid', () => ({
-  __esModule: true,
-  default: () => <div data-testid="tv-grid-mock">Grid</div>
-}));
 
 // Mock TvLeaderboard
 vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({

@@ -87,9 +87,6 @@ vi.mock('@/contexts/CoinContext', () => ({
 }));
 
 // --- Hook mocks ---
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useGameMusic', () => ({
   useGameMusic: vi.fn(),
@@ -177,9 +174,6 @@ vi.mock('@/components/achievements/AchievementProgressTracker', () => ({
   AchievementProgressTracker: () => null,
 }));
 
-vi.mock('@/components/tutorial/TutorialCallout', () => ({
-  TutorialCallout: () => null,
-}));
 
 vi.mock('@/components/game/DirectionGuidanceTooltip', () => ({
   __esModule: true,

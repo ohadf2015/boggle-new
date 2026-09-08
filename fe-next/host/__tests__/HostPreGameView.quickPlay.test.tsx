@@ -27,9 +27,6 @@ vi.mock('../../hooks/useCrazyGamesInvite', () => ({
   }),
 }));
 
-vi.mock('../../hooks/useCrazyGames', () => ({
-  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
-}));
 
 vi.mock('framer-motion', () => ({
   m: new Proxy({}, {
@@ -49,7 +46,6 @@ vi.mock('../../components/ui/checkbox', () => ({ Checkbox: () => null }));
 vi.mock('../../components/Avatar', () => ({ __esModule: true, default: () => null }));
 vi.mock('../../components/RoomChat', () => ({ __esModule: true, default: () => null }));
 vi.mock('../../components/PresenceIndicator', () => ({ __esModule: true, default: () => null }));
-vi.mock('../../components/BotControls', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
   useHostSelectedGameMode: () => 'random',
@@ -72,7 +68,6 @@ vi.mock('../components/pre-game/StartButton', () => ({ StartButton: () => null }
 vi.mock('../components/pre-game/MobileBottomNav', () => ({ MobileBottomNav: () => null }));
 vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection: () => null }));
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
-vi.mock('../components/pre-game/PresetInfoDrawer', () => ({ PresetInfoDrawer: () => null }));
 vi.mock('../components/pre-game/desktop', () => ({
   DesktopLobbyLayout: () => null,
   SettingsPanel: () => null,
@@ -81,7 +76,6 @@ vi.mock('../components/pre-game/desktop', () => ({
 }));
 vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
 vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
-vi.mock('../components/HostPreGameView.useAvatarPremium', () => ({ useAvatarPremium: () => ({ allowed: true }) }), { virtual: true });
 
 const mockT = (key: string) => key;
 

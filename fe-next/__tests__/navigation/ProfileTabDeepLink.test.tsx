@@ -104,9 +104,6 @@ vi.mock('@/components/seasons/SeasonTrophyCase', () => ({
   default: () => null,
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/utils/session', () => ({
   getSession: () => null,
@@ -141,10 +138,6 @@ vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
-vi.mock('@/components/EmojiAvatarPicker', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 
 vi.mock('@/components/auth/AuthModal', () => ({
   __esModule: true,

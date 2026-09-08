@@ -54,7 +54,6 @@ vi.mock('@/hooks/gameState/store', () => ({
 }));
 
 // Mock heavy child components
-vi.mock('@/host/components/tv-broadcast/TvGrid', () => ({ __esModule: true, default: () => <div /> }));
 vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({ __esModule: true, default: () => <div /> }));
 vi.mock('@/host/components/tv-broadcast/TvActivityPanel', () => ({ __esModule: true, default: () => <div /> }));
 vi.mock('@/host/components/tv-broadcast/TvMomentumTicker', () => ({ __esModule: true, default: () => <div /> }));

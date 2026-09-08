@@ -65,9 +65,6 @@ vi.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
@@ -249,9 +246,6 @@ describe('DailyWordHuntSurvival - Keyboard Typing', () => {
 
     // Mock landscape mode and rerender
     vi.resetModules();
-    vi.mock('@/hooks/useMobileLandscape', () => ({
-      useMobileLandscape: () => true,
-    }));
 
     rerender(
       <DailyWordHuntSurvival

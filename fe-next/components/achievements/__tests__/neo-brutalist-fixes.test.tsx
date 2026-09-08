@@ -72,9 +72,6 @@ vi.mock('@/lib/supabase', () => ({
 vi.mock('@/constants/achievementIcons', () => ({
   getAchievementIcon: () => '🏆',
 }));
-vi.mock('../AchievementIcon', () => ({
-  AchievementIcon: ({ achievementKey }: { achievementKey: string }) => <span data-testid="achievement-icon">{achievementKey}</span>,
-}));
 vi.mock('@/utils/achievementTiers', () => ({
   calculateTier: () => null,
   TIER_COLORS: {

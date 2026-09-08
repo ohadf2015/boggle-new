@@ -115,9 +115,6 @@ vi.mock('@/components/ui/PageLoader', () => ({
 }));
 
 // Mock hooks
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

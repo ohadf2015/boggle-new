@@ -22,7 +22,6 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 vi.mock('@/contexts/CoinContext', () => ({ useCoin: () => ({ coins: 0, updateCoins: vi.fn() }) }));
 vi.mock('@/contexts/HapticsContext', () => ({ useHapticsConfig: () => ({ isEnabled: true, toggle: vi.fn() }) }));
 vi.mock('@/hooks/useLiveRoomStats', () => ({ useLiveRoomStats: () => ({ openRooms: 0, totalPlayers: 0, refresh: vi.fn() }) }));
-vi.mock('@/hooks/useMobileLandscape', () => ({ useMobileLandscape: () => true }));
 vi.mock('@/hooks/useMobilePortrait', () => ({ useMobilePortrait: () => false }));
 vi.mock('@/hooks/useTiltEffect', () => ({
   useMouseParallax: () => ({ x: 0, y: 0 }),

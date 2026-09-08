@@ -72,13 +72,6 @@ vi.mock('../components/RoomChat', () => ({
 vi.mock('../components/PresenceIndicator', () => ({
   default: function MockPresenceIndicator() { return <div data-testid="presence-indicator" />; },
 }));
-vi.mock('../components/BotControls', () => ({
-  default: function MockBotControls() { return <div data-testid="bot-controls" />; },
-}));
-vi.mock('@/components/layout/MobileDrawer', () => ({
-  MobileDrawer: ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) =>
-    isOpen ? <div data-testid="mobile-drawer">{children}</div> : null,
-}));
 vi.mock('../lib/utils', () => ({
   cn: (...classes: (string | undefined | boolean)[]) => classes.filter(Boolean).join(' '),
 }));

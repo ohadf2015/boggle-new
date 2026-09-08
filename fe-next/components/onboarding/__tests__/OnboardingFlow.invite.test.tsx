@@ -33,9 +33,6 @@ vi.mock('@/components/onboarding/ReturningUserStep', () => ({
 vi.mock('@/components/onboarding/LanguageSelect', () => ({
   default: () => <div data-testid="language-select" />,
 }));
-vi.mock('@/components/onboarding/ScoreRevealV2', () => ({
-  default: () => <div data-testid="score-reveal" />,
-}));
 vi.mock('@/components/onboarding/QuickStartStep', () => ({
   default: () => <div data-testid="quick-start-step" />,
 }));

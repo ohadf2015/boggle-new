@@ -37,9 +37,6 @@ vi.mock('@/hooks/useLiveRoomStats', () => ({
     refresh: vi.fn(),
   }),
 }));
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,
 }));
@@ -101,12 +98,6 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
   };
   return { default: MockDailyChallengeBanner };
-});
-vi.mock('@/components/OnboardingModal', () => {
-  const MockOnboardingModal = () => {
-    return null;
-  };
-  return { default: MockOnboardingModal };
 });
 vi.mock('@/components/auth/AuthModal', () => {
   const MockAuthModal = () => {

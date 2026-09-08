@@ -17,9 +17,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

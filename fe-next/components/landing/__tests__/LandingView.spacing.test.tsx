@@ -57,9 +57,6 @@ vi.mock('@/hooks/useLiveRoomStats', () => ({
     refresh: vi.fn(),
   }),
 }));
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => true, // Mobile landscape mode
-}));
 vi.mock('@/hooks/useMobilePortrait', () => ({
   useMobilePortrait: () => false,
 }));
@@ -185,12 +182,6 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   return { default: MockDailyChallengeBanner };
 });
 
-vi.mock('@/components/OnboardingModal', () => {
-  const MockOnboardingModal = () => {
-    return <div>Onboarding Modal</div>;
-  };
-  return { default: MockOnboardingModal };
-});
 
 describe('LandingView - Daily Challenge Banner Spacing', () => {
   beforeEach(() => {
@@ -245,9 +236,6 @@ describe('LandingView - Daily Challenge Banner Spacing', () => {
 
   it('should render Daily Challenge Banner inside the mode cards grid on mobile portrait', () => {
     vi.resetModules();
-    vi.mock('@/hooks/useMobileLandscape', () => ({
-      useMobileLandscape: () => false,
-    }));
     vi.mock('@/hooks/useMobilePortrait', () => ({
       useMobilePortrait: () => true,
     }));

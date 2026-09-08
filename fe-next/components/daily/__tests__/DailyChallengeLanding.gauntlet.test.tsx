@@ -77,13 +77,7 @@ vi.mock('../TabbedDailyLeaderboard', () => ({
   default: () => <div data-testid="tabbed-daily-leaderboard" />,
 }));
 
-vi.mock('../landing/ConfettiBackground', () => ({
-  ConfettiBackground: () => null,
-}));
 
-vi.mock('../landing/FloatingDecorations', () => ({
-  FloatingDecorations: () => null,
-}));
 
 // --- framer-motion mock ---
 vi.mock('framer-motion', () => ({

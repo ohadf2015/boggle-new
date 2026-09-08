@@ -198,9 +198,6 @@ vi.mock('@/hooks/usePullToRefresh', () => ({
   })
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false
-}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({

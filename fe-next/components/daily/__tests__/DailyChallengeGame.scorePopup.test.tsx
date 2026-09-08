@@ -112,9 +112,6 @@ vi.mock('@/hooks/useKeyboardWordInput', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
@@ -151,9 +148,6 @@ vi.mock('@/components/game/KeyboardHintTooltip', () => ({
   default: () => null,
 }));
 
-vi.mock('@/components/tutorial/TutorialCallout', () => ({
-  TutorialCallout: () => null,
-}));
 
 vi.mock('@/components/achievements/AchievementProgressTracker', () => ({
   AchievementProgressTracker: () => null,

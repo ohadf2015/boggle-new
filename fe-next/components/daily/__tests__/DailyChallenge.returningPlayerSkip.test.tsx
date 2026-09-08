@@ -64,7 +64,6 @@ vi.mock('@/components/AutoHideHeader', () => ({ __esModule: true, default: () =>
 vi.mock('@/components/MusicControls', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ui/PullToRefreshIndicator', () => ({ PullToRefreshIndicator: () => null }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loading">Loading...</div> }));
-vi.mock('@/hooks/useMobileLandscape', () => ({ useMobileLandscape: () => false }));
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ isLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false }),
 }));

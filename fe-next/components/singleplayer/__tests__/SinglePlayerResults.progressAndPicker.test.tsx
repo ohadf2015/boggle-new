@@ -90,9 +90,6 @@ vi.mock('@/hooks/useWinStreak', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useAutoShowWithInteraction', () => ({
   useAutoShowWithInteraction: vi.fn(),
@@ -209,17 +206,10 @@ vi.mock('@/components/results/ResultsWinnerBanner', () => {
   MockResultsWinnerBanner.displayName = 'MockResultsWinnerBanner';
   return { default: MockResultsWinnerBanner };
 });
-vi.mock('@/components/results/Top3Leaderboard', () => {
-  const MockTop3Leaderboard = () => <div data-testid="leaderboard">Leaderboard</div>;
-  MockTop3Leaderboard.displayName = 'MockTop3Leaderboard';
-  return { default: MockTop3Leaderboard };
-});
 vi.mock('@/components/results/PlayerArchetypeBadge', () => ({ default: () => null }));
 vi.mock('@/components/results/PlayerInsights', () => ({ default: () => null }));
-vi.mock('@/components/results/CompactResultsStats', () => ({ default: () => null }));
 vi.mock('@/components/results/BonusBadgesRow', () => ({ default: () => null }));
 vi.mock('@/components/results/CoinRewardDisplay', () => ({ default: () => null }));
-vi.mock('@/components/results/BrainPointsDisplay', () => ({ default: () => null }));
 vi.mock('@/components/results/RewardsSummary', () => ({ default: () => null }));
 vi.mock('@/components/results/MissedWords', () => ({ default: () => null }));
 vi.mock('@/components/results/WordPointsGroup', () => ({

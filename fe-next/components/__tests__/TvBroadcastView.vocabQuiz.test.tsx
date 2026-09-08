@@ -39,10 +39,6 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 vi.mock('@/host/hooks/useTvFullscreen', () => ({
   useTvFullscreen: () => ({ isFullscreen: false, toggleFullscreen: vi.fn(), isSupported: true }),
 }));
-vi.mock('@/host/components/tv-broadcast/TvGrid', () => ({
-  __esModule: true,
-  default: () => <div data-testid="tv-grid-mock">Grid</div>,
-}));
 vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({
   __esModule: true,
   default: () => <div data-testid="tv-leaderboard-mock">Leaderboard</div>,

@@ -110,9 +110,6 @@ vi.mock('@/hooks/useGameMusic', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useMobileLandscape', () => ({
-  useMobileLandscape: () => false,
-}));
 
 vi.mock('@/hooks/useEarthquakeFireRound', () => ({
   useEarthquakeFireRound: () => ({
