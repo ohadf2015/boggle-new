@@ -4619,6 +4619,7 @@ const ja = {
         "leaderboard": "ランキングで競争",
         "playWithFriends": "友達と遊ぶ"
       },
+      "quickSave": "10秒で完了 — この勝利をずっと残そう",
       "maybeLater": "また今度",
       "statsTeaser": "{games}ゲーム・{score}点を保存しよう！"
     },

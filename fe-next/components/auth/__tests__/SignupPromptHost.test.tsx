@@ -20,11 +20,15 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('next/dynamic', () => ({
   default: () => {
-    const Stub = (props: { isOpen: boolean; variant?: string }) =>
+    const Stub = (props: { isOpen: boolean; variant?: string; surface?: string }) =>
       props.isOpen
         ? React.createElement(
             'div',
-            { 'data-testid': 'first-win-signup-modal', 'data-variant': props.variant },
+            {
+              'data-testid': 'first-win-signup-modal',
+              'data-variant': props.variant,
+              'data-surface': props.surface,
+            },
             'modal'
           )
         : null;
@@ -37,7 +41,13 @@ import { SignupPromptHost } from '../SignupPromptHost';
 describe('SignupPromptHost', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseSignupPrompt.mockReturnValue({ showSignupModal: false, setShowSignupModal: vi.fn(), isFirstWin: false });
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: false,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: false,
+      frictionVariant: 'soft-sheet',
+    });
     mockUsePathname.mockReturnValue('/he');
     mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, loading: false });
   });
@@ -48,7 +58,13 @@ describe('SignupPromptHost', () => {
   });
 
   it('renders modal when guest hook signals show', () => {
-    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn(), isFirstWin: false });
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: true,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: false,
+      frictionVariant: 'soft-sheet',
+    });
     render(<SignupPromptHost />);
     expect(screen.getByTestId('first-win-signup-modal')).toBeInTheDocument();
   });
@@ -57,13 +73,25 @@ describe('SignupPromptHost', () => {
     // Regression: the host used to hardcode variant="multiGames", so the
     // hook's isFirstWin was computed but never consumed — first-time winners
     // (the prompt's largest population) got generic copy and no confetti.
-    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn(), isFirstWin: true });
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: true,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: true,
+      frictionVariant: 'soft-sheet',
+    });
     render(<SignupPromptHost />);
     expect(screen.getByTestId('first-win-signup-modal')).toHaveAttribute('data-variant', 'firstWin');
   });
 
   it('keeps the multiGames variant for non-first-win prompts', () => {
-    mockUseSignupPrompt.mockReturnValue({ showSignupModal: true, setShowSignupModal: vi.fn(), isFirstWin: false });
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: true,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: false,
+      frictionVariant: 'soft-sheet',
+    });
     render(<SignupPromptHost />);
     expect(screen.getByTestId('first-win-signup-modal')).toHaveAttribute('data-variant', 'multiGames');
   });
@@ -95,3 +123,28 @@ describe('SignupPromptHost', () => {
     expect(args.authLoading).toBe(false);
   });
 });
+
+  it('passes soft-sheet surface by default (friction v1)', () => {
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: true,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: true,
+      frictionVariant: 'soft-sheet',
+    });
+    render(<SignupPromptHost />);
+    expect(screen.getByTestId('first-win-signup-modal')).toHaveAttribute('data-surface', 'sheet');
+  });
+
+  it('passes dialog surface for control holdout', () => {
+    mockUseSignupPrompt.mockReturnValue({
+      showSignupModal: true,
+      setShowSignupModal: vi.fn(),
+      dismissSignupModal: vi.fn(),
+      isFirstWin: true,
+      frictionVariant: 'control',
+    });
+    render(<SignupPromptHost />);
+    expect(screen.getByTestId('first-win-signup-modal')).toHaveAttribute('data-surface', 'dialog');
+  });
+

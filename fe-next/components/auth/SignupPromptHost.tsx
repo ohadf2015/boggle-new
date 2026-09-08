@@ -11,6 +11,9 @@
  *
  * MP routes are excluded; useMultiplayerSignupNudge owns that flow with its
  * own bottom-sheet UX.
+ *
+ * t_4833c3cd: honor frictionVariant so soft-sheet vs blocking Dialog is
+ * driven by signup-prompt-friction-v1 (default soft-sheet).
  */
 
 import dynamic from 'next/dynamic';
@@ -31,7 +34,7 @@ export function SignupPromptHost() {
   const pathname = usePathname();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
 
-  const { showSignupModal, dismissSignupModal, isFirstWin } = useSignupPrompt({
+  const { showSignupModal, dismissSignupModal, isFirstWin, frictionVariant } = useSignupPrompt({
     isAuthenticated,
     hasUser: !!user,
     authLoading,
@@ -47,6 +50,7 @@ export function SignupPromptHost() {
       // under the default after-first-win variant — got generic copy and no
       // celebration. PostHog 14d ordered path: prompt 145 → completed 3.
       variant={isFirstWin ? 'firstWin' : 'multiGames'}
+      surface={frictionVariant === 'control' ? 'dialog' : 'sheet'}
     />
   );
 }

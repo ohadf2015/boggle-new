@@ -4662,6 +4662,7 @@ const he = {
         "leaderboard": "התחרה בטבלאות המובילים",
         "playWithFriends": "שחק עם חברים"
       },
+      "quickSave": "10 שניות — שמרו את הניצחון הזה לתמיד",
       "maybeLater": "אולי אחר כך",
       "statsTeaser": "{games} משחקים • {score} נק' מחכים להישמר!"
     },

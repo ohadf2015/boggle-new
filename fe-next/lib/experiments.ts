@@ -54,9 +54,26 @@ export const EXPERIMENTS = {
    */
   'signup-prompt-cta-copy': defineExperiment({
     variants: ['control', 'urgency', 'value-prop'] as const,
-    default: 'control',
+    // t_4833c3cd: value-prop is the clearer CTA; make it the shipped default
+    // while control/urgency remain available for PostHog holdout.
+    default: 'value-prop',
     description:
-      'First-win signup modal CTA wording. control = current copy, urgency = "Don\'t lose your streak", value-prop = "Track progress + unlock daily challenges".',
+      'First-win signup modal CTA wording. control = legacy copy, urgency = "Don\'t lose your streak", value-prop = "Track progress + unlock daily challenges" (default after t_4833c3cd).',
+  }),
+
+  /**
+   * Post-game signup prompt friction (t_4833c3cd). Host-filtered
+   * signup_prompt_shown → signup_completed was ~1.13% (4/155) after #897+#953.
+   * Hypothesis: the blocking Dialog auth-wall over the win moment drives
+   * reflex dismiss; a non-blocking value-first sheet + faster peak timing
+   * lifts completion without new event names.
+   * Conversion = growth:signup_completed / growth:signup_prompt_shown.
+   */
+  'signup-prompt-friction-v1': defineExperiment({
+    variants: ['control', 'soft-sheet'] as const,
+    default: 'soft-sheet',
+    description:
+      'Post-game signup prompt surface (t_4833c3cd). control = blocking Dialog + 3.5s delay (legacy). soft-sheet = non-blocking bottom sheet, value before OAuth, 1.5s peak timing. Conversion = growth:signup_completed / growth:signup_prompt_shown.',
   }),
 
   /**

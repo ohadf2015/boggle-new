@@ -31,6 +31,15 @@ vi.mock('@/hooks/useConsentDecided', () => ({
   useConsentDecided: () => mockConsentDecided(),
 }));
 
+const mockFrictionVariant = vi.fn<() => 'control' | 'soft-sheet'>();
+const mockTrackFrictionExposure = vi.fn();
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({
+    variant: mockFrictionVariant(),
+    trackExposure: mockTrackFrictionExposure,
+  }),
+}));
+
 // Active-game gate: the prompt must never interrupt live gameplay. Default
 // false (no active game) so all pre-existing behaviour tests are unaffected.
 const mockIsGameActive = vi.fn<() => boolean>();
@@ -40,7 +49,7 @@ vi.mock('@/utils/abandonOnPagehide', () => ({
 
 import { useSignupPrompt } from '../useSignupPrompt';
 
-const flushTimer = async (ms = 3600): Promise<void> => {
+const flushTimer = async (ms = 1600): Promise<void> => {
   await act(async () => {
     vi.advanceTimersByTime(ms);
   });
@@ -52,6 +61,8 @@ beforeEach(() => {
   mockStats.mockReturnValue({ games: 0, wins: 0 });
   mockConsentDecided.mockReturnValue(true);
   mockIsGameActive.mockReturnValue(false);
+  mockFrictionVariant.mockReturnValue('soft-sheet');
+  mockTrackFrictionExposure.mockClear();
   mockTrackSignupFunnel.mockClear();
   if (typeof window !== 'undefined') {
     window.sessionStorage.clear();
@@ -350,6 +361,46 @@ describe('useSignupPrompt — cookie consent gating', () => {
     rerender();
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+  });
+});
+
+describe('useSignupPrompt — friction timing + latch', () => {
+  it('uses peak 1.5s delay on soft-sheet (default)', async () => {
+    mockFrictionVariant.mockReturnValue('soft-sheet');
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await act(async () => { vi.advanceTimersByTime(1400); });
+    expect(result.current.showSignupModal).toBe(false);
+    await act(async () => { vi.advanceTimersByTime(200); });
+    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.frictionVariant).toBe('soft-sheet');
+  });
+
+  it('keeps legacy 3.5s delay on control', async () => {
+    mockFrictionVariant.mockReturnValue('control');
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await act(async () => { vi.advanceTimersByTime(3400); });
+    expect(result.current.showSignupModal).toBe(false);
+    await act(async () => { vi.advanceTimersByTime(200); });
+    expect(result.current.showSignupModal).toBe(true);
+  });
+
+  it('re-checks sessionStorage inside the timer (no double fire across mounts)', async () => {
+    mockStats.mockReturnValue({ games: 1, wins: 1 });
+    renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
     expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
   });
 });

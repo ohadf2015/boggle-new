@@ -65,9 +65,10 @@ describe('useExperiment', () => {
   });
 
   it('returns the live variant when posthog provides one', () => {
-    mockFlagValue.mockReturnValue('value-prop');
+    // Non-default arm — value-prop is the registry default after t_4833c3cd.
+    mockFlagValue.mockReturnValue('urgency');
     const { result } = renderHook(() => useExperiment('signup-prompt-cta-copy'));
-    expect(result.current.variant).toBe('value-prop');
+    expect(result.current.variant).toBe('urgency');
   });
 
   it('coerces an unknown variant string to the default (defensive)', () => {
@@ -77,7 +78,10 @@ describe('useExperiment', () => {
   });
 
   it('exposes a trackExposure() that fires experiment_exposed once per mount', () => {
-    mockFlagValue.mockReturnValue('value-prop');
+    // Must use a NON-default arm: registry default for signup-prompt-cta-copy
+    // is now value-prop (t_4833c3cd), and trackExposure intentionally no-ops
+    // when variant === fallback so unassigned users don't pollute stats.
+    mockFlagValue.mockReturnValue('urgency');
     const { result } = renderHook(() => useExperiment('signup-prompt-cta-copy'));
 
     result.current.trackExposure();
@@ -86,7 +90,7 @@ describe('useExperiment', () => {
     expect(mockCapture).toHaveBeenCalledTimes(1);
     expect(mockCapture).toHaveBeenCalledWith('experiment_exposed', {
       experiment: 'signup-prompt-cta-copy',
-      variant: 'value-prop',
+      variant: 'urgency',
     });
   });
 
@@ -102,7 +106,11 @@ describe('useExperiment', () => {
       mockFlagValue.mockImplementation((_key, fallback) => fallback);
       mockUseAuth.mockReturnValue({ user: null });
       const { result } = renderHook(() => useExperiment('signup-prompt-cta-copy'));
-      expect(result.current.variant).toBe('control');
+      // t_4833c3cd flipped default to value-prop (soft-sheet product change).
+      expect(result.current.variant).toBe(
+        EXPERIMENTS['signup-prompt-cta-copy'].default,
+      );
+      expect(result.current.variant).toBe('value-prop');
     });
   });
 

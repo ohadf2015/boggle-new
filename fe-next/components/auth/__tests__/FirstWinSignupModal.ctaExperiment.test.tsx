@@ -131,3 +131,20 @@ describe('FirstWinSignupModal — CTA copy experiment', () => {
     // hook-internal guard still ensures only one experiment_exposed PostHog event.
   });
 });
+
+describe('FirstWinSignupModal — soft sheet surface (t_4833c3cd)', () => {
+  it('renders non-blocking sheet by default', () => {
+    render(<FirstWinSignupModal isOpen onClose={vi.fn()} variant="firstWin" />);
+    expect(screen.getByTestId('first-win-signup-sheet')).toBeInTheDocument();
+    expect(screen.getByText(/\[auth\.firstWin\.quickSave\]/)).toBeInTheDocument();
+  });
+
+  it('renders dialog when surface=dialog (control holdout)', () => {
+    render(
+      <FirstWinSignupModal isOpen onClose={vi.fn()} variant="firstWin" surface="dialog" />
+    );
+    expect(screen.getByTestId('dialog')).toBeInTheDocument();
+    expect(screen.queryByTestId('first-win-signup-sheet')).toBeNull();
+  });
+});
+

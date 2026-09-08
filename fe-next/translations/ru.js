@@ -5036,6 +5036,7 @@ const ru = {
         "leaderboard": "Соревнуйся в рейтинге",
         "playWithFriends": "Играй с друзьями"
       },
+      "quickSave": "Всего 10 секунд — сохраните эту победу навсегда",
       "maybeLater": "Потом",
       "statsTeaser": "{games} игр • {score} очков ждут сохранения!"
     },

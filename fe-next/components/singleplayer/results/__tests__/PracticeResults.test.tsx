@@ -71,6 +71,11 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
+vi.mock('@/components/auth/InlineSignupCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="inline-signup-card">InlineSignup</div>,
+}));
+
 vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: () => true, // Disable animations in tests

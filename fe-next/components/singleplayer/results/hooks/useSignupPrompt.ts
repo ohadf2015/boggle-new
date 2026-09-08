@@ -5,17 +5,29 @@
  * and only surfaces the modal on results screens, never pre-game.
  * Gate: 1+ games completed (ensures first-game is done before prompt).
  * Variant via PostHog flag: after-first-win (1 win minimum) or after-third-game (3 games minimum).
+ *
+ * t_4833c3cd: timing + latch hardening for the prompt→completed cliff.
+ * Soft-sheet arm (signup-prompt-friction-v1) fires at the emotional peak
+ * (1.5s); control keeps the legacy 3.5s delay. Timer re-checks the
+ * once-per-session latch so parallel mounts (Host + leftover results
+ * callers) cannot double-fire prompt_shown.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getGuestStats } from '@/utils/guestManager';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { useConsentDecided } from '@/hooks/useConsentDecided';
+import { useExperiment } from '@/hooks/useExperiment';
 import { trackSignupFunnel } from '@/utils/growthTracking';
 import { isGameActive } from '@/utils/abandonOnPagehide';
 
 // Session storage key for tracking if signup prompt was shown
 const SIGNUP_PROMPT_SHOWN_KEY = 'boggle_sp_signup_shown';
+
+/** Legacy delay — control arm of signup-prompt-friction-v1. */
+export const SIGNUP_PROMPT_DELAY_CONTROL_MS = 3500;
+/** Peak-timing delay — soft-sheet arm (default after t_4833c3cd). */
+export const SIGNUP_PROMPT_DELAY_PEAK_MS = 1500;
 
 interface UseSignupPromptParams {
   isAuthenticated: boolean;
@@ -30,11 +42,13 @@ interface SignupPromptResult {
   dismissSignupModal: () => void;
   /** True when the prompt qualifies as a first-win celebration (winner emotional peak). */
   isFirstWin: boolean;
+  /** Friction experiment arm — host chooses Dialog vs soft sheet. */
+  frictionVariant: 'control' | 'soft-sheet';
 }
 
 /**
  * Hook to manage signup prompt display for guests
- * Shows modal after 2+ games with a delay
+ * Shows modal after qualify gate with a delay
  */
 export function useSignupPrompt({
   isAuthenticated,
@@ -62,6 +76,14 @@ export function useSignupPrompt({
   // A/B test: 'after-first-win' gates on actual win (with 5-game fallback for non-winners);
   // 'after-third-game' gates purely on games count.
   const signupVariant = usePostHogFlag<string>('show-signup-after-first-win', 'after-first-win');
+
+  // t_4833c3cd friction surface + peak timing.
+  const { variant: frictionVariant, trackExposure: trackFrictionExposure } =
+    useExperiment('signup-prompt-friction-v1');
+  const delayMs =
+    frictionVariant === 'control'
+      ? SIGNUP_PROMPT_DELAY_CONTROL_MS
+      : SIGNUP_PROMPT_DELAY_PEAK_MS;
 
   // Hold the prompt until the cookie-consent decision is resolved. The consent banner
   // (z-110, no backdrop) would otherwise sit on top of this modal (z-90), so the modal
@@ -102,15 +124,30 @@ export function useSignupPrompt({
       // `guestStatsChanged` (i.e. that game's results screen) re-runs this
       // effect and shows the prompt at a natural pause.
       if (isGameActive()) return;
+      // Parallel mounts (SignupPromptHost + leftover results callers) both
+      // schedule timers before either latches. Re-check here so only the
+      // first fire wins — prevents double prompt_shown + stacked UI.
+      if (sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY)) return;
       setIsFirstWin(qualifiesAsFirstWin);
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
       shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
       trackSignupFunnel('prompt_shown', qualifiesAsFirstWin);
-    }, 3500);
+      trackFrictionExposure();
+    }, delayMs);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, hasUser, authLoading, disabled, signupVariant, statsVersion, consentDecided]);
+  }, [
+    isAuthenticated,
+    hasUser,
+    authLoading,
+    disabled,
+    signupVariant,
+    statsVersion,
+    consentDecided,
+    delayMs,
+    trackFrictionExposure,
+  ]);
 
   const dismissSignupModal = useCallback(() => {
     setShowSignupModal(false);
@@ -121,5 +158,11 @@ export function useSignupPrompt({
     }
   }, []);
 
-  return { showSignupModal, setShowSignupModal, dismissSignupModal, isFirstWin };
+  return {
+    showSignupModal,
+    setShowSignupModal,
+    dismissSignupModal,
+    isFirstWin,
+    frictionVariant,
+  };
 }
