@@ -3,6 +3,7 @@ import {
   shouldSuppressAdsForTier,
   shouldSuppressInterstitialForTier,
   resolveChildDirectedAdInit,
+  interstitialMinGapMs,
 } from './adPolicy';
 
 /**
@@ -80,5 +81,22 @@ describe('resolveChildDirectedAdInit', () => {
       tagForUnderAgeOfConsent: false,
       maxAdContentRating: 'Teen',
     });
+  });
+});
+
+/**
+ * Broken-ad cooldown (Deloitte × AdMob "Quality drives value" 2025): a stalled
+ * fullscreen ad is a disruptive exposure, so it doubles the minimum gap
+ * before the next interstitial instead of risking a second one minutes later.
+ */
+describe('interstitialMinGapMs', () => {
+  it('uses the 2-minute base floor for clean, skipped, and unknown terminals', () => {
+    expect(interstitialMinGapMs('clean')).toBe(2 * 60 * 1000);
+    expect(interstitialMinGapMs('skipped')).toBe(2 * 60 * 1000);
+    expect(interstitialMinGapMs(null)).toBe(2 * 60 * 1000);
+  });
+
+  it('doubles the floor after a broken terminal', () => {
+    expect(interstitialMinGapMs('broken')).toBe(4 * 60 * 1000);
   });
 });

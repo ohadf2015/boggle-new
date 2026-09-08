@@ -27,6 +27,9 @@ vi.mock('@capacitor-community/admob', () => ({
 const trackRewardedLifecycle = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackRewardedLifecycle: (...args: unknown[]) => trackRewardedLifecycle(...args),
+  // Real adQuality module (lib/ads/adQuality) consumes trackGrowthEvent on
+  // every ad settle for the ad_closed/ad_outcome events — stub it here.
+  trackGrowthEvent: vi.fn(),
 }));
 
 // --- Context mock ----------------------------------------------------------
@@ -35,6 +38,7 @@ vi.mock('@/contexts/AdMobContext', () => ({
     recordGameEnd: vi.fn(),
     shouldShowInterstitial: () => false,
     recordInterstitialShown: vi.fn(),
+    noteInterstitialTerminal: vi.fn(),
     hasNoAds: () => false,
     getConfig: () => ({ rewardedAdId: 'r-1', rewardedUnits: { generic: 'r-1' } }),
     whenReady: () => Promise.resolve(),

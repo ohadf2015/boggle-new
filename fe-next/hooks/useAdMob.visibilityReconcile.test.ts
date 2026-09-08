@@ -34,6 +34,9 @@ const trackRewardedLifecycle = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackRewardedLifecycle: (...args: unknown[]) => trackRewardedLifecycle(...args),
   trackInterstitialLifecycle: vi.fn(),
+  // Real adQuality module (lib/ads/adQuality) consumes trackGrowthEvent on
+  // every ad settle for the ad_closed/ad_outcome events — stub it here.
+  trackGrowthEvent: vi.fn(),
 }));
 
 // --- repaint mock (native no-op in jsdom) ----------------------------------
@@ -51,6 +54,7 @@ vi.mock('@/contexts/AdMobContext', () => ({
     prepareInterstitial: vi.fn(),
     isInterstitialReady: () => false,
     consumeInterstitial: vi.fn(),
+    noteInterstitialTerminal: vi.fn(),
   }),
 }));
 

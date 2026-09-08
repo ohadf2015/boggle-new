@@ -9,7 +9,9 @@ import {
   shouldSuppressAdsForTier,
   shouldSuppressInterstitialForTier,
   resolveChildDirectedAdInit,
+  interstitialMinGapMs,
 } from '@/lib/families/adPolicy';
+import { noteGameEndedAfterAd, type AdTerminal } from '@/lib/ads/adQuality';
 
 interface AdMobContextValue {
   recordGameEnd: () => void;
@@ -30,6 +32,14 @@ interface AdMobContextValue {
   /** Mark the warm interstitial consumed (call right before showing it). */
   consumeInterstitial: () => void;
   /**
+   * Record how the last interstitial SHOW ended ('clean' | 'broken' |
+   * 'skipped' — see lib/ads/adQuality). A 'broken' terminal (SDK stall,
+   * failed show/load) doubles the minimum gap before the next show:
+   * Deloitte × AdMob 2025 — a stalled fullscreen ad is a disruptive exposure,
+   * so a misbehaving mediation chain never stacks two of them minutes apart.
+   */
+  noteInterstitialTerminal: (terminal: AdTerminal) => void;
+  /**
    * True once an interstitial slot came due but was blocked ONLY by the
    * undeclared ('unknown') tier. The UI uses this natural break to ask for
    * the user's age instead of showing an ad — a declared 13+ flips the tier
@@ -49,8 +59,9 @@ const MAX_INTERSTITIALS_PER_SESSION = 4;
 // interruptions inside a couple of minutes reads as ad spam — the fastest way
 // to end a session. The cadence decides WHICH game ends are slots; this floor
 // decides how close together two shows may ever be. A held slot is simply
-// skipped (the next cadence hit gets it), never queued.
-const MIN_INTERSTITIAL_GAP_MS = 2 * 60 * 1000;
+// skipped (the next cadence hit gets it), never queued. The floor itself is
+// interstitialMinGapMs(lastTerminal) — a broken terminal (stalled/failed ad)
+// doubles it, per Deloitte × AdMob "Quality drives value" (2025).
 
 // AdMob interstitials expire ~1h after load (Google: "reload every hour").
 // Treat a preloaded ad older than this as not-ready so it cold-reloads before
@@ -127,6 +138,9 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const interstitialReady = useRef(false);
   const interstitialReadyAt = useRef(0);
   const interstitialInFlight = useRef<Promise<void> | null>(null);
+  // How the last interstitial SHOW ended ('clean' | 'broken' | 'skipped') —
+  // drives the doubled cooldown after a stalled/failed ad. null = none yet.
+  const lastInterstitialTerminal = useRef<AdTerminal | null>(null);
 
   // Defer init until auth has SETTLED, then RE-init whenever the resolved
   // ad-policy config changes.
@@ -223,7 +237,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   function interstitialSlotDue(): boolean {
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
     if (totalGameEnds.current <= 3) return false;
-    if (lastInterstitialAt.current && Date.now() - lastInterstitialAt.current < MIN_INTERSTITIAL_GAP_MS) {
+    if (lastInterstitialAt.current && Date.now() - lastInterstitialAt.current < interstitialMinGapMs(lastInterstitialTerminal.current)) {
       return false;
     }
     return (totalGameEnds.current - 3) % 3 === 0;
@@ -232,6 +246,9 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   function recordGameEnd() {
     totalGameEnds.current += 1;
     writeTotalGameEnds(totalGameEnds.current);
+    // A finished game inside an open ad-outcome window = the player kept
+    // playing after the ad (lib/ads/adQuality — Deloitte × AdMob measurement).
+    noteGameEndedAfterAd();
     // A slot came due and the ONLY blocker is that we don't know the user's
     // age — surface the age prompt at this natural break instead of an ad.
     // Declared 13+ → tier 'adult' → real interstitials from the next slot.
@@ -277,6 +294,10 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     interstitialReady.current = false;
   }
 
+  function noteInterstitialTerminal(terminal: AdTerminal): void {
+    lastInterstitialTerminal.current = terminal;
+  }
+
   function prepareInterstitial(): Promise<void> {
     if (!shouldPreloadInterstitial()) return Promise.resolve();
     if (isInterstitialReady()) return Promise.resolve(); // fresh & warm — skip (stale falls through to reload)
@@ -302,7 +323,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial, ageGatePromptOpportunity }}>
+    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial, noteInterstitialTerminal, ageGatePromptOpportunity }}>
       {children}
     </AdMobContext.Provider>
   );

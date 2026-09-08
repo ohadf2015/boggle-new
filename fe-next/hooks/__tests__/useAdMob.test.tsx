@@ -16,6 +16,9 @@ vi.mock('@capacitor/core', () => ({
 vi.mock('@/utils/growthTracking', () => ({
   trackRewardedLifecycle: vi.fn(),
   trackInterstitialLifecycle: vi.fn(),
+  // Real adQuality module (lib/ads/adQuality) consumes trackGrowthEvent on
+  // every ad settle for the ad_closed/ad_outcome events — stub it here.
+  trackGrowthEvent: vi.fn(),
 }));
 
 // Interstitials are now adult-only (Families Ad Format). These tests exercise
@@ -88,7 +91,7 @@ vi.mock('@capacitor-community/admob', () => ({
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPosition } from '@capacitor-community/admob';
 import { AdMobProvider } from '@/contexts/AdMobContext';
-import { trackInterstitialLifecycle } from '@/utils/growthTracking';
+import { trackInterstitialLifecycle, trackGrowthEvent } from '@/utils/growthTracking';
 import { useAdMob } from '../useAdMob';
 
 function makeWrapper(isNative: boolean, platform: string = 'android') {
@@ -812,6 +815,93 @@ describe('useAdMob', () => {
         await p;
       });
       expect(stages()).toContain('failed_to_show');
+    });
+  });
+
+  /**
+   * Ad-quality events (lib/ads/adQuality — Deloitte × AdMob "Quality drives
+   * value" 2025). Every ad close must emit `ad_closed` with its terminal class
+   * so PostHog can correlate exposure with the played-again follow-up.
+   */
+  describe('ad_closed / ad_outcome instrumentation', () => {
+    const adClosed = () =>
+      vi.mocked(trackGrowthEvent).mock.calls.filter((c) => c[0] === 'ad_closed');
+
+    it('interstitial dismissed → ad_closed with clean terminal', async () => {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      await act(async () => {
+        await drainInterstitial(() => result.current.showInterstitial(), 5);
+      });
+      vi.mocked(trackGrowthEvent).mockClear();
+      await act(async () => {
+        const p = result.current.showInterstitial(); // end 6 — eligible
+        await flush();
+        fireEvent('interstitialAdDismissed');
+        await p;
+      });
+      expect(adClosed()).toEqual([
+        ['ad_closed', { format: 'interstitial', terminal: 'clean', surface: null }],
+      ]);
+    });
+
+    it('interstitial FailedToShow → ad_closed with broken terminal', async () => {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      await act(async () => {
+        await drainInterstitial(() => result.current.showInterstitial(), 5);
+      });
+      vi.mocked(trackGrowthEvent).mockClear();
+      await act(async () => {
+        const p = result.current.showInterstitial(); // end 6 — eligible
+        await flush();
+        fireEvent('interstitialAdFailedToShow');
+        await p;
+      });
+      expect(adClosed()).toEqual([
+        ['ad_closed', { format: 'interstitial', terminal: 'broken', surface: null }],
+      ]);
+    });
+
+    it('rewarded grant → ad_closed rewarded/clean with the surface', async () => {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      const onReward = vi.fn();
+      const onError = vi.fn();
+      await act(async () => {
+        const p = result.current.showRewarded(onReward, onError, { surface: 'streak_freeze' });
+        await flush();
+        fireEvent('onRewardedVideoAdReward', { type: 'coins', amount: 10 });
+        fireEvent('onRewardedVideoAdDismissed');
+        await p;
+      });
+      expect(onReward).toHaveBeenCalled();
+      expect(adClosed()).toEqual([
+        ['ad_closed', { format: 'rewarded', terminal: 'clean', surface: 'streak_freeze' }],
+      ]);
+    });
+
+    it('rewarded dismissed without reward → ad_closed rewarded/clean (a skip, not a failure)', async () => {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      const onReward = vi.fn();
+      const onError = vi.fn();
+      vi.useFakeTimers();
+      try {
+        await act(async () => {
+          const p = result.current.showRewarded(onReward, onError);
+          await flush();
+          fireEvent('onRewardedVideoAdDismissed');
+          await vi.advanceTimersByTimeAsync(1000); // dismiss grace window
+          await p;
+        });
+      } finally {
+        vi.useRealTimers();
+      }
+      expect(onReward).not.toHaveBeenCalled();
+      expect(adClosed()).toEqual([
+        ['ad_closed', { format: 'rewarded', terminal: 'clean', surface: 'generic' }],
+      ]);
     });
   });
 });
