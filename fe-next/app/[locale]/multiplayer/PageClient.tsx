@@ -321,7 +321,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     socket, isConnected, roomsLoading, attemptingReconnect,
     setAttemptingReconnect, refreshRooms, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
-    classroomLevel, classroomWordBank, classroomAccessibility,
+    classroomAccessibility,
+    classroomLevel, classroomWordBank,
   } = useMultiplayerSocket({
     language: language as Language, gameCode, username, roomName,
     isActive, isHost, roomLanguage,
