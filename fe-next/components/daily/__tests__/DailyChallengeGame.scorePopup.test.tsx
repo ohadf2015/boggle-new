@@ -148,9 +148,6 @@ vi.mock('@/components/game/KeyboardHintTooltip', () => ({
   default: () => null,
 }));
 
-vi.mock('@/components/tutorial/TutorialCallout', () => ({
-  TutorialCallout: () => null,
-}));
 
 vi.mock('@/components/achievements/AchievementProgressTracker', () => ({
   AchievementProgressTracker: () => null,

@@ -174,9 +174,6 @@ vi.mock('@/components/achievements/AchievementProgressTracker', () => ({
   AchievementProgressTracker: () => null,
 }));
 
-vi.mock('@/components/tutorial/TutorialCallout', () => ({
-  TutorialCallout: () => null,
-}));
 
 vi.mock('@/components/game/DirectionGuidanceTooltip', () => ({
   __esModule: true,

@@ -104,6 +104,10 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({ enableComplexAnimations: false, prefersReducedMotion: true }),
 }));
 
+vi.mock('@/hooks/useAutoShowWithInteraction', () => ({ useAutoShowWithInteraction: vi.fn() }));
+vi.mock('@/hooks/useWordHuntPromo', () => ({
+  useWordHuntPromo: () => ({ canShow: false, recordImpression: vi.fn() }),
+}));
 vi.mock('@/hooks/useSaveCognitiveScore', () => ({
   useSaveCognitiveScore: () => ({ saveCognitiveScore: vi.fn().mockResolvedValue(null) }),
 }));
@@ -188,9 +192,13 @@ vi.mock('@/components/results/ResultsWinnerBanner', () => ({
 vi.mock('@/components/results/PlayerArchetypeBadge', () => ({ default: () => null }));
 vi.mock('@/components/results/BonusBadgesRow', () => ({ default: () => null }));
 vi.mock('@/components/results/CoinRewardDisplay', () => ({ default: () => null }));
-vi.mock('@/components/results/Top3Leaderboard', () => ({ default: () => null }));
 vi.mock('@/components/results/PlayerInsights', () => ({ default: () => null }));
-vi.mock('@/components/results/CompactResultsStats', () => ({ default: () => null }));
+vi.mock('@/components/results/RewardsSummary', () => ({ default: () => null }));
+vi.mock('@/components/results/MissedWords', () => ({ default: () => null }));
+vi.mock('@/components/results/WordPointsGroup', () => ({
+  WordPointsGroup: () => null,
+  InvalidWordsSection: () => null,
+}));
 vi.mock('@/components/AchievementBadge', () => ({ AchievementBadge: () => null }));
 vi.mock('@/components/layout/MobileTabBar', () => ({ MobileTabBar: () => null }));
 vi.mock('@/components/voting/WordFeedbackModal', () => ({ default: () => null }));

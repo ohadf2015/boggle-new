@@ -99,12 +99,6 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   };
   return { default: MockDailyChallengeBanner };
 });
-vi.mock('@/components/OnboardingModal', () => {
-  const MockOnboardingModal = () => {
-    return null;
-  };
-  return { default: MockOnboardingModal };
-});
 vi.mock('@/components/auth/AuthModal', () => {
   const MockAuthModal = () => {
     return null;

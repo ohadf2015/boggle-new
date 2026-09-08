@@ -79,10 +79,6 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 
 // Mock OnboardingModal
-vi.mock('@/components/OnboardingModal', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 
 // Mock ProfileCustomizationModal
 vi.mock('@/components/ProfileCustomizationModal', () => ({
@@ -169,10 +165,6 @@ vi.mock('@/components/Header', () => ({
   default: () => <header data-testid="header">Header</header>,
 }));
 
-vi.mock('@/components/SocialProof', () => ({
-  __esModule: true,
-  default: () => <div data-testid="social-proof">Social Proof</div>,
-}));
 
 vi.mock('../ModeCard', () => ({
   __esModule: true,

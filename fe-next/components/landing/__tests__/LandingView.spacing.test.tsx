@@ -182,12 +182,6 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   return { default: MockDailyChallengeBanner };
 });
 
-vi.mock('@/components/OnboardingModal', () => {
-  const MockOnboardingModal = () => {
-    return <div>Onboarding Modal</div>;
-  };
-  return { default: MockOnboardingModal };
-});
 
 describe('LandingView - Daily Challenge Banner Spacing', () => {
   beforeEach(() => {
