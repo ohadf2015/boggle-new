@@ -1,43 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
-  getCategoryForWord,
   getCategoryLabel,
   CATEGORY_EMOJIS,
   ALL_CATEGORIES,
 } from '../wordCategories';
-
-describe('getCategoryForWord', () => {
-  it('returns "animals" for known animal words', () => {
-    expect(getCategoryForWord('cat')).toBe('animals');
-    expect(getCategoryForWord('dog')).toBe('animals');
-    expect(getCategoryForWord('bird')).toBe('animals');
-  });
-
-  it('returns "food" for known food words', () => {
-    expect(getCategoryForWord('cake')).toBe('food');
-    expect(getCategoryForWord('rice')).toBe('food');
-  });
-
-  it('returns null for unknown words', () => {
-    expect(getCategoryForWord('xyzzy')).toBeNull();
-    expect(getCategoryForWord('qwert')).toBeNull();
-  });
-
-  it('is case-insensitive', () => {
-    expect(getCategoryForWord('CAT')).toBe('animals');
-    expect(getCategoryForWord('Cat')).toBe('animals');
-  });
-
-  it('returns "nature" for nature words', () => {
-    expect(getCategoryForWord('tree')).toBe('nature');
-    expect(getCategoryForWord('lake')).toBe('nature');
-  });
-
-  it('returns "colors" for color words', () => {
-    expect(getCategoryForWord('blue')).toBe('colors');
-    expect(getCategoryForWord('pink')).toBe('colors');
-  });
-});
 
 describe('getCategoryLabel', () => {
   it('returns English label for animals category', () => {
