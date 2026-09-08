@@ -16,6 +16,22 @@ import type { RankMovement } from './leaderboardLive';
 import type { DailyParticipant, AllTimeParticipant, SeasonParticipant } from './TabbedDailyLeaderboard';
 
 /**
+ * Seed for Avatar's deterministic fallback.
+ *
+ * The leaderboard views build `custom_avatar` from `LEFT JOIN profiles ON player_id`,
+ * so a guest — who has no profile row — always comes back with it NULL. Avatar only
+ * renders its seeded fallback when it is handed some identity; with neither a config
+ * nor a seed it treats the row as still-loading and shows a skeleton forever. Season
+ * rows carry no fingerprint, hence the display_name tail (same convention as
+ * ConnectionsLeaderboard, which seeds on display_name so it leaks no identifiers).
+ */
+const avatarSeed = (p: {
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  display_name: string;
+}): string => p.player_id ?? p.guest_fingerprint ?? p.display_name;
+
+/**
  * The app's `t`: key plus either a fallback string or interpolation params.
  * Declared through a method signature so parameters are checked bivariantly —
  * callers hand in `t`s typed `(key) => string`, `(key, params?) => string` and
@@ -131,6 +147,7 @@ export const TodayParticipantRow = memo<{
 
             avatarImage={participant.avatar_image ?? undefined}
             customAvatar={participant.custom_avatar ?? undefined}
+            userId={avatarSeed(participant)}
             size="lg"
             className="w-full h-full"
           />
@@ -315,6 +332,7 @@ export const AllTimeParticipantRow = memo<{
 
             avatarImage={participant.avatar_image ?? undefined}
             customAvatar={participant.custom_avatar ?? undefined}
+            userId={avatarSeed(participant)}
             size="lg"
             className="w-full h-full"
           />
@@ -441,6 +459,7 @@ export const SeasonParticipantRow = memo<{
           <Avatar
             avatarImage={participant.avatar_image ?? undefined}
             customAvatar={participant.custom_avatar ?? undefined}
+            userId={avatarSeed(participant)}
             size="lg"
             className="w-full h-full"
           />

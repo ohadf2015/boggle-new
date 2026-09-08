@@ -129,6 +129,13 @@ const WordWheelChallenge: React.FC = () => {
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
   const [gameResult, setGameResult] = useState<WordWheelGameResult | null>(null);
+  /**
+   * Bumped once the submit POST lands, to remount the results leaderboard.
+   * The results screen shows immediately (the submit is deliberately not
+   * awaited), so its first fetch races the write and comes back without this
+   * player. Same pattern Word Hunt uses via `onSubmitSuccess`.
+   */
+  const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [puzzleNumber, setPuzzleNumber] = useState(0);
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
@@ -518,6 +525,11 @@ const WordWheelChallenge: React.FC = () => {
         }
       } catch {
         /* leaderboard submission is best-effort */
+      } finally {
+        // The row (if any) exists server-side now — let the board refetch.
+        // In `finally` so a failed submit still refreshes rather than leaving
+        // the player looking at a board that silently excludes them.
+        setLeaderboardKey(k => k + 1);
       }
     })();
 
@@ -767,6 +779,7 @@ const WordWheelChallenge: React.FC = () => {
               isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
               alreadyPlayed={phase === 'already-played'}
               isCatchup={isCatchup}
+              leaderboardKey={leaderboardKey}
               onPracticeAgain={isPractice ? handlePracticeAgain : undefined}
             />
           </m.div>

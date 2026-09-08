@@ -43,6 +43,12 @@ interface WordWheelResultsProps {
   hasPlayedWordHunt: boolean;
   currentPlayerId?: string | null;
   currentGuestFingerprint?: string | null;
+  /**
+   * Bumped by the parent once the submit POST lands. Used as the leaderboard's
+   * `key` so it remounts and refetches — the first mount races the write and
+   * would otherwise show a board without this player.
+   */
+  leaderboardKey?: number;
   /** Whether the viewer is signed in. Gates the guest signup CTA. */
   isAuthenticated?: boolean;
   /** Current daily-streak length (getDailyStreak().currentStreak) — surfaced as a chip + signup hook. */
@@ -137,7 +143,7 @@ const CONFETTI_COLORS = ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6', '#FFD700', 
 
 const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
-  currentPlayerId, currentGuestFingerprint,
+  currentPlayerId, currentGuestFingerprint, leaderboardKey = 0,
   isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
   isCatchup = false, onPracticeAgain,
 }) => {
@@ -576,6 +582,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           transition={{ delay: 0.8 }}
         >
           <TabbedDailyLeaderboard
+            key={leaderboardKey}
             puzzleDate={puzzleDate}
             language={gameLang}
             currentPlayerId={currentPlayerId}

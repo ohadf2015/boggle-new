@@ -18,6 +18,14 @@ import type { ChaseParticipant } from './chaseTarget';
 import { DailySeasonRibbon } from './DailySeasonRibbon';
 import { participantKey, computeRankMovements, collectCountries, type RankMovement } from './leaderboardLive';
 
+/**
+ * The leaderboard routes answer with `Cache-Control: public, max-age=20`. That is
+ * fine for the landing/ready screens, but a player who has just finished refetches
+ * the identical URL within those 20s — and the browser replays the pre-submit body,
+ * so they do not see their own row. These reads must reach the server.
+ */
+const NO_STORE: RequestInit = { cache: 'no-store' };
+
 // ==========================================
 // Types
 // ==========================================
@@ -323,8 +331,8 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       const wantHunt = scope !== 'word-wheel';
       const wantWheel = scope !== 'word-hunt';
       const [huntRes, wheelRes] = await Promise.all([
-        wantHunt ? fetch(`/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${fetchLanguage}?limit=100`) : Promise.resolve(null),
-        wantWheel ? fetch(`/api/daily-challenge/word-wheel/leaderboard/${puzzleDate}/${fetchLanguage}?limit=100`) : Promise.resolve(null),
+        wantHunt ? fetch(`/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${fetchLanguage}?limit=100`, NO_STORE) : Promise.resolve(null),
+        wantWheel ? fetch(`/api/daily-challenge/word-wheel/leaderboard/${puzzleDate}/${fetchLanguage}?limit=100`, NO_STORE) : Promise.resolve(null),
       ]);
 
       if ((wantHunt && !huntRes?.ok) && (wantWheel && !wheelRes?.ok)) {
@@ -439,8 +447,8 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       const wantHunt = scope !== 'word-wheel';
       const wantWheel = scope !== 'word-hunt';
       const [huntRes, wheelRes] = await Promise.all([
-        wantHunt ? fetch(`/api/daily-challenge/word-hunt/alltime-leaderboard/${language}?limit=100`) : Promise.resolve(null),
-        wantWheel ? fetch(`/api/daily-challenge/word-wheel/alltime-leaderboard/${language}?limit=100`) : Promise.resolve(null),
+        wantHunt ? fetch(`/api/daily-challenge/word-hunt/alltime-leaderboard/${language}?limit=100`, NO_STORE) : Promise.resolve(null),
+        wantWheel ? fetch(`/api/daily-challenge/word-wheel/alltime-leaderboard/${language}?limit=100`, NO_STORE) : Promise.resolve(null),
       ]);
 
       if ((wantHunt && !huntRes?.ok) && (wantWheel && !wheelRes?.ok)) {
@@ -531,8 +539,8 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       const wantWheel = scope !== 'word-hunt';
       const qs = `?season=${seasonId}&limit=100`;
       const [huntRes, wheelRes] = await Promise.all([
-        wantHunt ? fetch(`/api/daily-challenge/word-hunt/season-leaderboard/${fetchLanguage}${qs}`) : Promise.resolve(null),
-        wantWheel ? fetch(`/api/daily-challenge/word-wheel/season-leaderboard/${fetchLanguage}${qs}`) : Promise.resolve(null),
+        wantHunt ? fetch(`/api/daily-challenge/word-hunt/season-leaderboard/${fetchLanguage}${qs}`, NO_STORE) : Promise.resolve(null),
+        wantWheel ? fetch(`/api/daily-challenge/word-wheel/season-leaderboard/${fetchLanguage}${qs}`, NO_STORE) : Promise.resolve(null),
       ]);
 
       if ((wantHunt && !huntRes?.ok) && (wantWheel && !wheelRes?.ok)) {
