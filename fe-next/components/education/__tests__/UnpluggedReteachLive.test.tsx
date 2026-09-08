@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UnpluggedReteachLive } from '../UnpluggedReteachLive';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
 
@@ -15,6 +16,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/lib/education/missedWordsPracticeSheet', () => ({
   openMissedWordsPracticeSheet: vi.fn().mockReturnValue(true),
+}));
+
+vi.mock('@/lib/education/unpluggedReteachPrintablePack', () => ({
+  openUnpluggedReteachPrintablePack: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock('@/utils/shareWithFallback', () => ({
@@ -33,6 +38,8 @@ const payload: ClassGapSharePayload = {
 describe('UnpluggedReteachLive', () => {
   beforeEach(() => {
     vi.mocked(openMissedWordsPracticeSheet).mockClear();
+    vi.mocked(openUnpluggedReteachPrintablePack).mockClear();
+    vi.mocked(openUnpluggedReteachPrintablePack).mockReturnValue(true);
     vi.mocked(shareWithFallback).mockClear();
     vi.mocked(shareWithFallback).mockResolvedValue('copied');
   });
@@ -84,5 +91,14 @@ describe('UnpluggedReteachLive', () => {
     expect(arg.url).toContain('https://www.lexiclash.live/en/education/miss-gap-practice');
     expect(arg.url).toContain('neutron');
     expect(arg.url).not.toContain('Maya');
+  });
+
+  it('prints the unplugged reteach pack with QR Live deep-link', () => {
+    render(<UnpluggedReteachLive payload={payload} />);
+    fireEvent.click(screen.getByTestId('print-unplugged-reteach-pack'));
+    expect(openUnpluggedReteachPrintablePack).toHaveBeenCalledTimes(1);
+    const arg = vi.mocked(openUnpluggedReteachPrintablePack).mock.calls[0][0];
+    expect(arg.missedWords).toEqual(['neutron', 'quark']);
+    expect(JSON.stringify(arg)).not.toContain('Maya');
   });
 });

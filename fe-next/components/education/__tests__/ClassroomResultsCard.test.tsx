@@ -13,6 +13,7 @@ import { ClassroomResultsCard } from '../ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
+import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -28,6 +29,10 @@ vi.mock('@/utils/shareWithFallback', () => ({
 
 vi.mock('@/lib/education/missedWordsPracticeSheet', () => ({
   openMissedWordsPracticeSheet: vi.fn().mockReturnValue(true),
+}));
+
+vi.mock('@/lib/education/unpluggedReteachPrintablePack', () => ({
+  openUnpluggedReteachPrintablePack: vi.fn().mockReturnValue(true),
 }));
 
 const summary: ClassroomSummary = {
@@ -54,6 +59,8 @@ describe('ClassroomResultsCard', () => {
     vi.mocked(shareWithFallback).mockResolvedValue('copied');
     vi.mocked(openMissedWordsPracticeSheet).mockClear();
     vi.mocked(openMissedWordsPracticeSheet).mockReturnValue(true);
+    vi.mocked(openUnpluggedReteachPrintablePack).mockClear();
+    vi.mocked(openUnpluggedReteachPrintablePack).mockReturnValue(true);
   });
 
   it('names the lesson and teacher so a student knows whose class this was', () => {
@@ -334,5 +341,27 @@ describe('ClassroomResultsCard', () => {
     const clean = { ...summary, missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('assign-miss-gap-async-homework')).not.toBeInTheDocument();
+  });
+
+  it('offers the teacher an unplugged reteach printable pack with QR Live deep-link', () => {
+    render(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher />);
+    fireEvent.click(screen.getByTestId('print-unplugged-reteach-pack'));
+    expect(openUnpluggedReteachPrintablePack).toHaveBeenCalledTimes(1);
+    const arg = vi.mocked(openUnpluggedReteachPrintablePack).mock.calls[0][0];
+    expect(arg.missedWords).toEqual(['neutron']);
+    expect(arg.lesson).toContain('Physics 101');
+    expect(JSON.stringify(arg)).not.toContain('Maya');
+    expect(JSON.stringify(arg)).not.toContain('Noa');
+  });
+
+  it('never offers a student the unplugged reteach printable pack', () => {
+    render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
+    expect(screen.queryByTestId('print-unplugged-reteach-pack')).not.toBeInTheDocument();
+  });
+
+  it('hides the unplugged reteach printable pack when every word was found', () => {
+    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
+    expect(screen.queryByTestId('print-unplugged-reteach-pack')).not.toBeInTheDocument();
   });
 });
