@@ -432,6 +432,14 @@ let sessionId: string | null = null;
 const eventQueue: Array<{ event: GrowthEvent; data: GrowthEventData }> = [];
 const MAX_QUEUE_SIZE = 50;
 
+// Guards `trackGameEnd` to one emission per mode per `trackGameStart`.
+// Keyed BY MODE, not global: a single flag ate the 2nd and 3rd of three
+// different modes ending in a row (caught by
+// `growthTracking.pushPromptGamesPlayed.test.ts`), which is an undercount —
+// the failure mode worse than the double-count this guards against. The set
+// holds at most one entry per game mode, a small fixed vocabulary.
+const endEmittedModes = new Set<string>();
+
 // Funnel-critical events also emitted under their canonical (unprefixed)
 // name so PostHog dashboards resolve without a `growth:` rewrite.
 //
@@ -1181,6 +1189,8 @@ export const trackGameStart = (
   extras: Record<string, unknown> = {}
 ): void => {
   sessionGameCount += 1;
+  // Re-arm this mode's one-end-per-start guard in trackGameEnd.
+  endEmittedModes.delete(mode);
   // gameMode/engineMode defaults first so MP callers' explicit engineMode:'multiplayer'
   // + gameMode:'<resolved>' override them (nightly splits MP rounds by mode). The
   // canonical `mode` goes LAST so extras can never clobber it — matches trackGameEnd's
@@ -1209,6 +1219,25 @@ export const trackGameEnd = (
   durationSec?: number,
   extras: Record<string, unknown> = {}
 ): void => {
+  // One end per start. Callers re-report a finished game more often than you
+  // would think: `useSaveDrillResult` emits on every call with no client guard,
+  // and word-craft's `gameEndTrackedRef` is per component instance, so a remount
+  // re-arms it. Production 90d, $host-filtered:
+  //   brain-drill  79 starts / 123 completions (6.47 per session vs 3.95 starts)
+  //   word-craft   34 starts / 121 completions (24.2 per session vs 4.86 starts)
+  // Both modes DO call `trackGameStart`, so this was never a missing start — it
+  // was a duplicated end, which also double-credited `total_games_played` and
+  // `games_completed` person properties. Guarding here covers every mode instead
+  // of leaving the next one to rediscover it (Class 3 in
+  // `.claude/rules/60-recurring-pitfalls.md`).
+  //
+  // Deliberately keyed to "since the last start", not "ever": a drill session
+  // legitimately plays ~4 games in a row, and a mode that never calls
+  // `trackGameStart` still gets its first end through — silencing it would trade
+  // a double-count for a silent undercount, which is the worse failure.
+  if (endEmittedModes.has(mode)) return;
+  endEmittedModes.add(mode);
+
   // Game lifecycle ended (either path) — clear active flag so a later pagehide
   // does not double-emit `game_abandoned`.
   markGameInactive();

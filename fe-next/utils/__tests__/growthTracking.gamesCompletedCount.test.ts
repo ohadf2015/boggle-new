@@ -44,7 +44,7 @@ vi.mock('@/utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
-import { trackGameEnd } from '../growthTracking';
+import { trackGameEnd, trackGameStart } from '../growthTracking';
 
 const KEY = 'games_completed_count';
 
@@ -91,8 +91,25 @@ describe('trackGameEnd — games_completed_count', () => {
   });
 
   it('reaches the PWA/iOS install-hint threshold after 2 completed games', () => {
+    // A game is a START and an END. This used to call trackGameEnd twice with no
+    // start between, which no code path produces: both singleplayer start
+    // emitters are mount-only effects (`SinglePlayerGame.tsx:70`,
+    // `useSinglePlayerEffects.ts:92`, both `[]` deps, commented "remount = new
+    // game"). trackGameEnd now ignores a second end for the same mode without an
+    // intervening start, because word-craft was reporting 24.2 completions per
+    // session against 4.86 starts and inflating this very counter.
+    trackGameStart('singleplayer', {});
     trackGameEnd('singleplayer', 10, 1, true);
+    trackGameStart('singleplayer', {});
     trackGameEnd('singleplayer', 10, 1, true);
     expect(parseInt(read() ?? '0', 10)).toBeGreaterThanOrEqual(2);
+  });
+
+  it('does NOT count a mode that reports the same finished game twice', () => {
+    // The guard this counter depends on. One start, two ends -> one game.
+    trackGameStart('word-craft', {});
+    trackGameEnd('word-craft', 10, 1, true);
+    trackGameEnd('word-craft', 10, 1, true);
+    expect(read()).toBe('1');
   });
 });

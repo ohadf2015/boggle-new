@@ -26,7 +26,7 @@ export type CoachDemoType =
   | 'clearTiles' // clear cascading tiles (blast)
   | 'stack' // stack words to build height (tower)
   | 'connectGroup' // group four related words (connections)
-  | 'chain'; // last letter starts next word (shiritori)
+  | 'chain'; // last letter starts next word (word-chain demo)
 
 export interface CoachStep {
   /** Animation the demo renders; `icon` pairs with `emoji`. */
@@ -146,16 +146,6 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
     steps: [
       { demo: 'icon', emoji: '🤫', captionKey: 'modeCoach.sealedBid.step1' },
       { demo: 'icon', emoji: '💎', captionKey: 'modeCoach.sealedBid.step2' },
-    ],
-  },
-  shiritori: {
-    mode: 'shiritori',
-    tier: 'simple',
-    accent: 'pink',
-    titleKey: 'modeCoach.shiritori.title',
-    steps: [
-      { demo: 'chain', captionKey: 'modeCoach.shiritori.step1' },
-      { demo: 'icon', emoji: '⏱️', captionKey: 'modeCoach.shiritori.step2' },
     ],
   },
   adventure: {

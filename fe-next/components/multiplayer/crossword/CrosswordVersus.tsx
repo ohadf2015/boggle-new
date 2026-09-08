@@ -6,7 +6,7 @@
  * (useCrosswordGame) and reports progress on each word solved. A live standings
  * rail shows rivals' completion. Renders the stateless crossword sub-components
  * directly so it never edits the (churning) solo CrosswordView. Mirrors the
- * WordTower/Shiritori/SealedBid versus mounts.
+ * WordTower/SealedBid versus mounts.
  */
 import { useEffect, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';

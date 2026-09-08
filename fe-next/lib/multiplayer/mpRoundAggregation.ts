@@ -6,7 +6,7 @@
  *
  * Note: game_results table structure:
  *   - game_code: room identifier
- *   - game_mode: current round's mode ('classic' | 'blast' | 'word-hunt' | 'word-tower' | 'wheel-rush' | 'shiritori')
+ *   - game_mode: current round's mode ('classic' | 'blast' | 'word-hunt' | 'word-tower' | 'wheel-rush')
  *   - created_at: timestamp
  *   - score: player's score for that round
  */

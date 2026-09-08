@@ -58,11 +58,6 @@ export function seededRandom(seed: number): () => number {
 
 /** Per-mode daily mutators — the "modifier" pillar. Labels resolved via t(). */
 const MODIFIERS: Record<SoloMode, SoloModifier[]> = {
-  shiritori: [
-    { id: 'long-words', labelKey: 'solo.modifier.shiritori.longWords.label', descKey: 'solo.modifier.shiritori.longWords.desc' },
-    { id: 'no-repeat-vowel', labelKey: 'solo.modifier.shiritori.noRepeatVowel.label', descKey: 'solo.modifier.shiritori.noRepeatVowel.desc' },
-    { id: 'speed-demon', labelKey: 'solo.modifier.shiritori.speedDemon.label', descKey: 'solo.modifier.shiritori.speedDemon.desc' },
-  ],
   'sealed-bid': [
     { id: 'no-clash-penalty', labelKey: 'solo.modifier.sealedBid.noClashPenalty.label', descKey: 'solo.modifier.sealedBid.noClashPenalty.desc' },
     { id: 'vowel-tax', labelKey: 'solo.modifier.sealedBid.vowelTax.label', descKey: 'solo.modifier.sealedBid.vowelTax.desc' },

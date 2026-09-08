@@ -20,7 +20,7 @@ describe('getModeLabel', () => {
 
   it('humanizes a single-word unknown mode', () => {
     const t = vi.fn((key: string) => `T(${key})`);
-    expect(getModeLabel('shiritori', t)).toBe('Shiritori');
+    expect(getModeLabel('wordfall', t)).toBe('Wordfall');
   });
 
   it('labels the Other bucket via its dedicated i18n key', () => {

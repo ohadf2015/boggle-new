@@ -57,7 +57,6 @@ import { initWordHuntState, selectTargetWordWithFallback, selectCleanCommonTarge
 import { resolveTeacherHuntTarget } from '@/shared/utils/classroomHuntTarget';
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
 import { initVersusMatch } from '@/lib/wordTower/versusMatch';
-import { initShiritoriState } from '../modules/shiritoriManager.js';
 import { initSealedBidState } from '../modules/sealedBidManager.js';
 import { armSealedBidFirstRound } from './sealedBidHandler.js';
 import { pickRounds as pickSealedBidRacks, ROUNDS_PER_GAME as SEALED_BID_ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
@@ -341,15 +340,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // timeout path. (clamped to <=600 above's range.)
     if (resolvedMode === 'sealed-bid') validTimer = 210;       // 5 rounds x (30s bid + 5s reveal) = 175s + buffer
     else if (resolvedMode === 'crossword') validTimer = 420;   // generous race cap (a 5x5 can take minutes)
-    else if (resolvedMode === 'shiritori') validTimer = 300;   // turn-driven; long backstop
 
-    // In-work modes (Word Tower, Shiritori) are beta: hosts must be admins OR
+    // In-work modes (Word Tower) are beta: hosts must be admins OR
     // beta testers. UI hides them from everyone else; this server gate enforces
     // it even if a client crafts the startGame emit directly. Neither is reachable
     // via random roll (not in ALL_GAME_MODES). Decision routes through the shared
     // canAccessInWorkMode chokepoint (lib/auth/inWorkModeAccess.ts) so future
     // in-work modes inherit beta access for free.
-    if (resolvedMode === 'word-tower' || resolvedMode === 'shiritori' || resolvedMode === 'sealed-bid' || resolvedMode === 'crossword') {
+    if (resolvedMode === 'word-tower' || resolvedMode === 'sealed-bid' || resolvedMode === 'crossword') {
       const iwHostUser = Object.values(game.users).find((u) => u.isHost);
       const iwHostAuthId = iwHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
       const iwSupabase = getSupabase();
@@ -365,18 +363,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         inWorkAllowed = canAccessInWorkMode(iwProfile);
       }
       // Per-mode language constraints (gameLang is declared later — resolve inline here):
-      //  - Shiritori needs a Japanese board (JA hiragana dictionary).
       //  - Sealed Bid only has curated racks + dictionary for EN and HE.
       const boardLang = language || game.language || 'en';
-      if (inWorkAllowed && resolvedMode === 'shiritori' && boardLang !== 'ja') inWorkAllowed = false;
       if (inWorkAllowed && resolvedMode === 'sealed-bid' && boardLang !== 'en' && boardLang !== 'he') inWorkAllowed = false;
-      // Shiritori is PUBLISHED for Japanese: a ja board is live for every host,
-      // no admin/beta gate (still human-only, JA hiragana dictionary enforced).
-      if (resolvedMode === 'shiritori' && boardLang === 'ja') inWorkAllowed = true;
       if (!inWorkAllowed) {
         gamesStarting.delete(gameCode);
         logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);
-        const modeName = resolvedMode === 'shiritori' ? 'Shiritori' : resolvedMode === 'sealed-bid' ? 'Sealed Bid' : resolvedMode === 'crossword' ? 'Crossword' : 'Word Tower';
+        const modeName = resolvedMode === 'sealed-bid' ? 'Sealed Bid' : resolvedMode === 'crossword' ? 'Crossword' : 'Word Tower';
         emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: `${modeName} is in beta` });
         return;
       }
@@ -564,11 +557,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Auto-add bots if solo player started the game.
-    // EXCEPT in-work human-vs-human invite modes (Shiritori turn-chain, Sealed Bid
-    // auction): the bot AI has no move logic for them, so auto-filled bots would
-    // stall a Shiritori turn forever / never lock a Sealed Bid round. These modes
-    // are invite-a-human modes; started solo they degrade to single-player practice.
-    const HUMAN_ONLY_MODES: GameMode[] = ['shiritori', 'sealed-bid', 'crossword'];
+    // EXCEPT in-work human-vs-human invite modes (Sealed Bid auction): the bot
+    // AI has no move logic for them, so auto-filled bots would never lock a
+    // Sealed Bid round. These modes are invite-a-human modes; started solo
+    // they degrade to single-player practice.
+    const HUMAN_ONLY_MODES: GameMode[] = ['sealed-bid', 'crossword'];
     const autoAddResult = HUMAN_ONLY_MODES.includes(resolvedMode)
       ? { botsAdded: 0 }
       : await autoAddBotsForSoloPlayer(gameCode, game);
@@ -640,17 +633,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }
       if (!getGame(gameCode)?.wheelRushState) {
         logger.error('WHEEL_RUSH', `Game ${gameCode} wheelRushState NOT SET after initWheelRushState call`);
-      }
-    }
-
-    // Initialize shiritori (しりとり) word-chain state if needed. Humans only —
-    // bots have no shiritori move logic, so a bot in the turn order would hang
-    // the chain on its turn (no per-turn auto-advance for bots).
-    if (resolvedMode === 'shiritori') {
-      const shiritoriState = initShiritoriState(humanUsernames);
-      const currentGame = getGame(gameCode);
-      if (currentGame) {
-        currentGame.shiritoriState = shiritoriState;
       }
     }
 
@@ -838,25 +820,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // polls on mount during the countdown, before the match exists.
     if (resolvedMode === 'word-tower') {
       broadcastToRoom(io, getGameRoom(gameCode), 'towerMatchReady', {});
-    }
-
-    // Broadcast shiritori init AFTER startGame so the client has time to mount
-    // ShiritoriVersus and subscribe. Late joiners/reconnects poll requestShiritoriState.
-    if (resolvedMode === 'shiritori') {
-      const cg = getGame(gameCode);
-      const ss = cg?.shiritoriState;
-      if (ss) {
-        broadcastToRoom(io, getGameRoom(gameCode), 'shiritoriInit', {
-          players: ss.players,
-          currentPlayer: ss.players[ss.turnIndex] ?? null,
-          requiredHead: ss.requiredHead,
-          chain: ss.chain,
-          eliminated: Object.keys(ss.eliminated).filter((p) => ss.eliminated[p]),
-          startedAt: ss.startedAt,
-          finished: ss.finished,
-          winner: ss.winner,
-        });
-      }
     }
 
     // Broadcast sealed-bid init AFTER startGame so the client can mount the view

@@ -206,10 +206,16 @@ export function useSinglePlayerCore({
     onSkillUnlock: handleTrainingSkillUnlock, onComplete: handleTrainingComplete,
   });
 
+  // First-15-seconds fix: the round clock used to start the instant this hook
+  // mounted, before the grid even existed — the async board fetch (themed
+  // words -> dictionary lookup -> client generation) burned real seconds off
+  // a 60s round while the player stared at a loader with nothing to do.
+  // Gating on `!grid` holds the clock (same mechanism as earthquake/gift
+  // modal/reward-ad pauses) until there is an actual board to play.
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
     isPaused: isPaused || settings.mode === 'practice',
-    isExternallyPaused: isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
+    isExternallyPaused: !grid || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
     autoStart: settings.mode !== 'practice',
     onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });

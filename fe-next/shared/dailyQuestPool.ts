@@ -11,7 +11,7 @@
  * DB columns word_hunt/adventure/community_completed remain SLOT containers
  * (0/1/2) — their names are legacy; they no longer imply a mode.
  *
- * Beta modes (adventure, blast, wheel-rush, word-tower, shiritori, sealed-bid,
+ * Beta modes (adventure, blast, wheel-rush, word-tower, sealed-bid,
  * crossword) are NEVER referenced here — quests only steer to public routes.
  */
 
@@ -43,7 +43,6 @@ export const QUEST_BETA_MODES = [
   'blast',
   'wheel-rush',
   'word-tower',
-  'shiritori',
   'sealed-bid',
   'crossword',
 ] as const;

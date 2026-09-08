@@ -6,15 +6,14 @@ import { Check } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { getModeDescription, MODE_ICONS, type GameModeOption } from '@/components/GameModeSelector';
 import { useExperiment } from '@/hooks/useExperiment';
-import { isShiritoriAvailable } from '@/shared/utils/availableModes';
 
 interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
-  /** When true, surfaces the admin-only Word Tower + Shiritori previews. (Blast is public — no longer gated.) */
+  /** When true, surfaces the admin-only Word Tower previews. (Blast is public — no longer gated.) */
   isAdmin?: boolean;
-  /** Board/game language — gates Shiritori (Japanese-only). */
+  /** Board/game language — gates admin-only modes by dictionary availability. */
   language?: string | null;
   /** @deprecated Blast is offered to all players now; this no longer affects visibility. */
   hasBlastAccess?: boolean;
@@ -89,7 +88,6 @@ const MODES: ModeVisualConfig[] = [
   { mode: 'wheel-rush', nameKey: 'gameModes.wheelRush.name', family: 'lime' },
   { mode: 'blast', nameKey: 'gameModes.blast.name', family: 'pink' },
   { mode: 'word-tower', nameKey: 'wordTower.cardTitle', family: 'purple' },
-  { mode: 'shiritori', nameKey: 'gameModes.shiritori.name', family: 'purple' },
   { mode: 'sealed-bid', nameKey: 'gameModes.sealedBid.name', family: 'pink' },
   { mode: 'crossword', nameKey: 'gameModes.crossword.name', family: 'cyan' },
 ];
@@ -109,19 +107,15 @@ export function BattleModeCard({
 
   // Blast is now offered to ALL players (gate removed after MP-blast parity).
   // Word Tower stays admin-only AND behind the `word-tower` experiment (mirrors
-  // the solo gating; server enforces admin too). Shiritori is PUBLISHED for
-  // Japanese: any ja host may pick it (no admin/beta gate) — server still
-  // enforces the ja board (JA hiragana dictionary).
+  // the solo gating; server enforces admin too).
   const { variant: wordTowerVariant } = useExperiment('word-tower');
   const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
-  const shiritoriEnabled = isShiritoriAvailable(language);
   // Sealed Bid has curated racks + dictionary only for EN and HE boards.
   const sealedBidEnabled = isAdmin && (language === 'en' || language === 'he');
   // Crossword has a baked puzzle pool for every locale (falls back to EN).
   const crosswordEnabled = isAdmin;
   const visibleModes = MODES.filter((m) => {
     if (m.mode === 'word-tower') return wordTowerEnabled;
-    if (m.mode === 'shiritori') return shiritoriEnabled;
     if (m.mode === 'sealed-bid') return sealedBidEnabled;
     if (m.mode === 'crossword') return crosswordEnabled;
     return true;

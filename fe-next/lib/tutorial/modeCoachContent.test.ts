@@ -12,7 +12,6 @@ const EXPECTED_MODES: CoachModeKey[] = [
   'wordCraft',
   'crossword',
   'sealedBid',
-  'shiritori',
   'adventure',
 ];
 

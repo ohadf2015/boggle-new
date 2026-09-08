@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { recordGameCompleted } from '@/utils/multiplayerProgressStorage';
+import { markGameInactive } from '@/utils/abandonOnPagehide';
 import { useGameStore } from '@/hooks/gameState/store';
 import type { Language } from '@/shared/types/game';
 
@@ -110,6 +111,25 @@ export function useMultiplayerGameFlow(
           hasLetterGrid: !!rd?.letterGrid,
         });
       }
+      // Seeing results ends the round, and THIS call is what unmounts the view
+      // that would otherwise log the abandon. Clear the flag synchronously here,
+      // before `setShowResults(true)` swaps the tree out.
+      //
+      // The two paths that used to clear it both resolve too late. `trackGameEnd`
+      // is driven by `useGameEndTelemetry`, which watches `finalScores` /
+      // `waitingForResults` — both set in the same handler as `onShowResults`
+      // (`useHostGameEvents.ts:516-537`), so React batches them into one commit
+      // and the host tree is gone before the effect sees the rising edge.
+      // `ResultsMainContent`'s `results_viewed` (`growthTracking.ts:503`) lives
+      // inside a `next/dynamic({ssr:false})` chunk, so on a cold chunk its mount
+      // loses to `emitAbandonOnSpaNavigate`'s `setTimeout(0)`.
+      //
+      // Production 90d, AFTER the 2026-08-15 fix (5afa38b1b): 211 of classic's
+      // 512 abandons still fired at 85-95s against a ~90s round. One chokepoint
+      // covers all four MP modes instead of five results components staying in
+      // step (Class 1 + Class 3 in `.claude/rules/60-recurring-pitfalls.md`).
+      markGameInactive();
+
       setResultsData(rd);
       setShowResults(true);
       recordGameCompleted();

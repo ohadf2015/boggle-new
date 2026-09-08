@@ -45,7 +45,6 @@ describe('offlineCapableModes', () => {
       expect(OFFLINE_CAPABLE_MODES).not.toContain('custom');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('challenge');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('quick-play');
-      expect(OFFLINE_CAPABLE_MODES).not.toContain('shiritori');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('anagram');
     });
   });
@@ -149,7 +148,6 @@ describe('offlineCapableModes', () => {
       expect(isOfflineCapable('/en/custom')).toBe(false);
       expect(isOfflineCapable('/en/challenge')).toBe(false);
       expect(isOfflineCapable('/en/quick-play')).toBe(false);
-      expect(isOfflineCapable('/en/shiritori')).toBe(false);
     });
 
     it('returns false for the locale home page and bare root', () => {

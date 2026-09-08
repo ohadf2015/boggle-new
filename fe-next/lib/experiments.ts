@@ -260,7 +260,7 @@ export const EXPERIMENTS = {
   }),
 
   /**
-   * Word Tower solo game mode (Tower Bloxx + Shiritori word-chain). Admin-only
+   * Word Tower solo game mode (Tower Bloxx word-chain). Admin-only
    * during development: the landing-card + route are additionally gated on
    * `isAdmin`, so `on` here only reveals the mode to admins. Flip in PostHog to
    * widen rollout once the mode graduates. Email override keeps it live for the

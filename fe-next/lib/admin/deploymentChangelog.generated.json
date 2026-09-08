@@ -1,19 +1,138 @@
 {
-  "generatedAt": "2026-09-07T14:41:09.376Z",
+  "generatedAt": "2026-09-08T06:43:20.647Z",
   "commits": [
     {
-      "sha": "2bd4c7b9dbfb6717c7ede53dc42248d622257e76",
-      "shortSha": "2bd4c7b",
-      "subject": "feat(education): teacher module — plug-and-play lessons, live-game fixes, reuse pass",
-      "author": "Ohad Fisher",
-      "date": "2026-09-07T18:40:23+04:00"
+      "sha": "a552f93a48cc44ff1cf711cd764ee39324c13233",
+      "shortSha": "a552f93",
+      "subject": "feat(education): unplugged reteach printable pack PDF + QR Live deep-link (#981)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T07:30:43+04:00"
     },
     {
-      "sha": "37de6331513d4869b1d406fc18c90fbb89d89eba",
-      "shortSha": "37de633",
-      "subject": "Merge origin/master into education-gauntlet-2026-09-05",
-      "author": "Ohad Fisher",
-      "date": "2026-09-07T01:38:47+04:00"
+      "sha": "be97774a30d97dd73b16d8faa5129a72a40f7e2d",
+      "shortSha": "be97774",
+      "subject": "feat(education): parent WhatsApp shareable miss-gap practice card after GC passback (#980)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T05:19:48+04:00"
+    },
+    {
+      "sha": "54f54ff5105b30a9e169b7f1e71aacbee33cf63a",
+      "shortSha": "54f54ff",
+      "subject": "fix(growth): t_4833c3cd reduce signup_prompt→completed cliff after #897+#953 (#978)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T04:14:10+04:00"
+    },
+    {
+      "sha": "f2912507b369a1ec21917f4cdafab49b670a0602",
+      "shortSha": "f291250",
+      "subject": "fix(deploy): cache-bust ChunkLoadError recovery after #893/#935 (t_f6783906) (#979)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T03:58:11+04:00"
+    },
+    {
+      "sha": "2ef8662cb2a5018e1251f164e504536ecba487b9",
+      "shortSha": "2ef8662",
+      "subject": "feat(education): GC grade passback for async miss-gap homework (#977)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T03:16:01+04:00"
+    },
+    {
+      "sha": "51efbfd957772031686f0c4cb3a5dd733d194e90",
+      "shortSha": "51efbfd",
+      "subject": "fix(education): interpolate miss-gap-assignment meta title after ICU normalize (#976)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T02:08:37+04:00"
+    },
+    {
+      "sha": "8c671ee4985725cd7557611d4d5ae33ce34705ce",
+      "shortSha": "8c671ee",
+      "subject": "feat(education): Kahootopia-style async miss-gap homework + class streak (#975)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T01:15:57+04:00"
+    },
+    {
+      "sha": "51721a58c5380fde6677aeff6e7d84072a5aa3e9",
+      "shortSha": "51721a5",
+      "subject": "feat(daily): graduate connections into the daily quest rotation + keyboard fix (#971)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T00:30:41+04:00"
+    },
+    {
+      "sha": "e5170ca79061d92a06f8cbb766efb9ec5fd65469",
+      "shortSha": "e5170ca",
+      "subject": "fix(daily-leaderboard): localize YOU pill + real attempts on unsolved rows (#974)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T23:47:06+04:00"
+    },
+    {
+      "sha": "e0aeb42513ac9c82a8cca3f1b75f2dfe498f2e90",
+      "shortSha": "e0aeb42",
+      "subject": "feat(education): shareable miss-gap practice card/PDF after Unplugged assign (#972)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T23:22:34+04:00"
+    },
+    {
+      "sha": "0fdbfe8e95e3f560b952689e831ce0f5f6fadb1d",
+      "shortSha": "0fdbfe8",
+      "subject": "fix(native): build watchdog — new web deploys actually reach the Android app (#973)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T23:13:51+04:00"
+    },
+    {
+      "sha": "93af33c2371fba179123939cce4dd8afd4c9313b",
+      "shortSha": "93af33c",
+      "subject": "feat(streak): heat tiers, 7-day cycle row, mascot gift screen, shareable streak card (#969)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T22:56:55+04:00"
+    },
+    {
+      "sha": "bbe65ad02046d65342d1603f3ce77439260fbbbd",
+      "shortSha": "bbe65ad",
+      "subject": "feat(education): Google Classroom Marketplace add-on — Unplugged Stream assign (#970)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T21:38:04+04:00"
+    },
+    {
+      "sha": "52fa74818aa2b95b45a852af97c2f9e4ca356702",
+      "shortSha": "52fa748",
+      "subject": "feat(education): Classroom assign Unplugged reteach + printable sheet (#968)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T19:49:42+04:00"
+    },
+    {
+      "sha": "95ee8408eb251bec2c49f816e3afc2bfee7cb82c",
+      "shortSha": "95ee840",
+      "subject": "feat(daily): global, season-aware daily leaderboard with guests, unsolved players and live movement (#964)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T19:42:33+04:00"
+    },
+    {
+      "sha": "dcd2b044729dc7a9480e393d11769b8806a25165",
+      "shortSha": "dcd2b04",
+      "subject": "feat(education): teacher module — plug-and-play lessons, live-game fixes, one-screen dashboard, reuse pass (#966)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T19:40:49+04:00"
+    },
+    {
+      "sha": "1052356f7fdefb80dfbebca71db6fc4409d7cd68",
+      "shortSha": "1052356",
+      "subject": "feat(education): gauntlet follow-up rounds 2-3 + master SEO test fix (#965)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T18:17:38+04:00"
+    },
+    {
+      "sha": "c36f62200301c27f9239fcd444a8884600bbce9f",
+      "shortSha": "c36f622",
+      "subject": "seo: daily meta tag improvements 2026-09-07 (#962)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T09:13:12+04:00"
+    },
+    {
+      "sha": "b3bc4ae7d674474dfc3293813bd7ee96d8e23079",
+      "shortSha": "b3bc4ae",
+      "subject": "feat(education): live vocab quiz, skill practice picker, class report, classroom flow fixes, SEO/GEO pass (#946)",
+      "author": "ohadf2015",
+      "date": "2026-09-07T02:36:48+04:00"
     },
     {
       "sha": "0b57a55440cca6d1de21197e29e3266fe9005474",
@@ -21,125 +140,6 @@
       "subject": "feat(growth): tappable missed dailies, ad-free education, ad fatigue guard, solo progress + next-game picker (#961)",
       "author": "ohadf2015",
       "date": "2026-09-06T17:32:35+04:00"
-    },
-    {
-      "sha": "d63993968d2bbe94263e51371bc5b764128ab93b",
-      "shortSha": "d639939",
-      "subject": "feat(education): Teacher Pro ask on hub + public /pricing (#960)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T13:53:05+04:00"
-    },
-    {
-      "sha": "ecc2c3df0bceb836ae99c6d14240ef3b64c70f4c",
-      "shortSha": "ecc2c3d",
-      "subject": "fix(share): LexiClash recap cards, not Wordle letter-squares (#958)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T12:30:58+04:00"
-    },
-    {
-      "sha": "3ca23de8f10de27ca3a9b9e2e3e855f930946438",
-      "shortSha": "3ca23de",
-      "subject": "SEO: daily meta tag improvements (2026-09-06) (#955)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T12:30:54+04:00"
-    },
-    {
-      "sha": "53ce0f4c40ca519bcb931893c68de367881f5f5f",
-      "shortSha": "53ce0f4",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-06",
-      "author": "Ohad Fisher",
-      "date": "2026-09-06T12:19:19+04:00"
-    },
-    {
-      "sha": "486646e1dc9d13cf83fa8b2c244795dc27a34a66",
-      "shortSha": "486646e",
-      "subject": "feat(education): unplugged reteach Live — teacher screen + printable sheet (#959)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T11:38:32+04:00"
-    },
-    {
-      "sha": "069d14d0bb6da0ef6b64cf3c80d10b9f6f9c64a1",
-      "shortSha": "069d14d",
-      "subject": "feat(education): printable missed-words practice sheet after Live (#957)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T09:55:59+04:00"
-    },
-    {
-      "sha": "37d6f47e38268feeeb70711334709ad0342e14f9",
-      "shortSha": "37d6f47",
-      "subject": "fix(education): SSR classroom hero on web first paint (#956)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T09:55:12+04:00"
-    },
-    {
-      "sha": "055afbc6b7dce3569af39b67a28ac6cbb2ceb25c",
-      "shortSha": "055afbc",
-      "subject": "feat(education): Google Classroom assign practice after Live (#954)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T06:21:17+04:00"
-    },
-    {
-      "sha": "095c93718ac2c3498bbbd2378155828c4a8eb5b2",
-      "shortSha": "095c937",
-      "subject": "fix(growth): /es/singleplayer soft-nav 308 dead end (post-#897) (#953)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T05:38:19+04:00"
-    },
-    {
-      "sha": "253df37dd36085742d7470bfeb934e6c3b99f193",
-      "shortSha": "253df37",
-      "subject": "fix(growth): stop dual-emitting bare game_started (t_c7d4f54a) (#952)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T05:35:22+04:00"
-    },
-    {
-      "sha": "3f28507351b2c4779afb09dd9fb3edf6a8d12ddd",
-      "shortSha": "3f28507",
-      "subject": "feat(education): ChatGPT Action OpenAPI for 3-min reteach Live (#951)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T02:45:27+04:00"
-    },
-    {
-      "sha": "940d093398619ac356650ab3f150e40b51f802b7",
-      "shortSha": "940d093",
-      "subject": "feat(education): Google Classroom one-click 3-min reteach Live MVP (#949)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T00:25:38+04:00"
-    },
-    {
-      "sha": "3552dc107aaa403658a977a3133cc70a5dcc95f6",
-      "shortSha": "3552dc1",
-      "subject": "feat(education): live vocab quiz, skill practice picker, class report, classroom flow fixes, SEO/GEO pass",
-      "author": "Ohad Fisher",
-      "date": "2026-09-05T23:22:18+04:00"
-    },
-    {
-      "sha": "6c9d1395464d03d98a22618603aa6836769c6f71",
-      "shortSha": "6c9d139",
-      "subject": "Upload browser source maps to PostHog and guard null pathname in LanguageContext (#934)",
-      "author": "posthog-eu[bot]",
-      "date": "2026-09-05T20:31:11+04:00"
-    },
-    {
-      "sha": "4467a9534183859f4110b6a67507828324a4fc51",
-      "shortSha": "4467a95",
-      "subject": "fix(daily): recover from stale-deploy chunk load on daily-mode pages (#935)",
-      "author": "posthog-eu[bot]",
-      "date": "2026-09-05T20:30:42+04:00"
-    },
-    {
-      "sha": "86f0e9398fae7d1ca3801cdd0a62d3ea158eed74",
-      "shortSha": "86f0e93",
-      "subject": "fix(fe-next): suppress JSON-LD @context extension TypeError in PostHog filter (#933)",
-      "author": "posthog-eu[bot]",
-      "date": "2026-09-05T19:53:29+04:00"
-    },
-    {
-      "sha": "f6457fe4fd257855ad0df69affd1044d84749ef4",
-      "shortSha": "f6457fe",
-      "subject": "chore(analytics): PostHog Self-driving setup report",
-      "author": "Ohad Fisher",
-      "date": "2026-09-05T16:57:06+04:00"
     }
   ]
 }

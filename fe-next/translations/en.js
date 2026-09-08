@@ -201,79 +201,6 @@ const en = {
     "affirmGoodWord": "That's a good one",
     "noRush": "Calm · no rush"
   },
-  "shiritori": {
-    "chain": "Word chain",
-    "inputLabel": "Type your word",
-    "nextStartsWith": "Next word starts with",
-    "players": "Players",
-    "submit": "Submit",
-    "waitTurn": "Waiting for your turn…",
-    "wins": "wins!",
-    "empty": "—",
-    "winner": "{winner} wins!",
-    "finished": "Game over",
-    "chainArrow": "→",
-    "yourTurn": "Your turn — type a word",
-    "youWin": "You win!",
-    "error": {
-      "too-short": "Too short — at least 2 kana.",
-      "already-used": "Already played — no repeats.",
-      "bad-chain": "Must start with the required kana.",
-      "not-a-word": "Not in the dictionary.",
-      "not-your-turn": "Wait for your turn."
-    },
-    "solo": {
-      "category": { "hit": "✨ +2× {category}!" },
-      "title": "Shiritori Solo",
-      "tagline": "Chain hiragana words against the bot.",
-      "back": "Back to Shiritori",
-      "adminBadge": "Admin preview",
-      "adminOnly": "Shiritori Solo is an admin-only preview.",
-      "headPrompt": "Next word starts with:",
-      "inputPlaceholder": "Keep your chain alive…",
-      "submit": "Send",
-      "checking": "Checking…",
-      "giveUp": "Give up",
-      "confirmNewGame": "Start a new game? Your current chain will be lost.",
-      "again": "Play again",
-      "won": "You win!",
-      "lost": "Round over",
-      "botThinking": "Bot is thinking…",
-      "difficultyLabel": "Bot difficulty",
-      "difficulty": {"easy": "Easy", "medium": "Medium", "hard": "Hard"},
-      "err": {
-        "not-hiragana": "Hiragana only (e.g. ねこ).",
-        "wrong-head": "Wrong head kana — chain from the highlighted kana.",
-        "duplicate": "That word was already played.",
-        "not-in-dict": "Not in the Japanese dictionary.",
-        "network": "Network error — please try again."
-      },
-      "endReason": {
-        "player-no-move": "You gave up — the bot wins.",
-        "player-ends-n": "Your word ended in ん — the bot wins.",
-        "player-invalid": "Invalid word — the bot wins.",
-        "bot-no-move": "The bot ran out of words — you win!",
-        "bot-ends-n": "The bot ended in ん — you win!"
-      },
-      "howTo": {
-        "title": "How to play",
-        "cta": "Got it!",
-        "steps": ["🔤 Type a hiragana word starting with the highlighted kana", "⛓️ Each word must begin with the last kana of the previous word", "🚫 You lose if you end on ん (n) — and no repeats!"]
-      },
-      "combo": {
-        "ariaLabel": "Chain depth: {{n}}",
-        "newBest": "New best!",
-        "best": "Best: {{n}}"
-      },
-      "ghost": {
-        "reveal": "👻 Ghost Turn — ×2!",
-        "score": "Score:"
-      },
-      "tempo": {
-        "bonus": "⚡ Fast chain — +50%!"
-      }
-    }
-  },
   "solo": {
     "reward": {
       "comeBackTomorrow": "Daily coins already claimed — come back tomorrow!",
@@ -285,11 +212,6 @@ const en = {
     },
     "modifier": {
       "todaysTwist": "Today's Twist",
-      "shiritori": {
-        "longWords": { "label": "Long & Strong", "desc": "A day for stretching out big, bold words." },
-        "noRepeatVowel": { "label": "Vowel Drought", "desc": "Keep your vowels fresh and varied." },
-        "speedDemon": { "label": "Speed Demon", "desc": "Quick thinking rules the chain today." }
-      },
       "sealedBid": {
         "noClashPenalty": { "label": "Truce Day", "desc": "A friendlier market — bid freely." },
         "vowelTax": { "label": "Vowel Tax", "desc": "Vowels are the hot commodity today." },
@@ -2964,7 +2886,6 @@ const en = {
         "wordHunt": "Word Hunt",
         "wheelRush": "Wheel Rush",
         "wordTower": "Word Tower",
-        "shiritori": "Shiritori",
         "sealedBid": "Sealed Bid",
         "random": "Surprise Mode"
       },
@@ -2974,7 +2895,6 @@ const en = {
         "wordHunt": "Hunt the hidden word",
         "wheelRush": "Race rivals on the wheel",
         "wordTower": "Stack the tower",
-        "shiritori": "Chain the words",
         "sealedBid": "Outbid the room",
         "random": "A surprise awaits"
       }
@@ -5202,7 +5122,7 @@ const en = {
     "referral": {
       "inviteFriends": "Invite Friends, Earn Rewards!",
       "subtitle": "Share your code and both get 100 XP + 50 coins when they play!",
-      "shareText": "🎮 Play LexiClash with me! Challenge me to a word game!",
+      "shareText": "Play LexiClash with me! Challenge me to a word game!",
       "copied": "Link copied!",
       "friendsJoined": "friends joined",
       "noReferralsYet": "No referrals yet"
@@ -5728,8 +5648,6 @@ const en = {
     "partyModeDesc": "Big-screen Caption / Pixel / Shadow Clash",
     "wordAlchemyMode": "Word Alchemy",
     "wordAlchemyModeDesc": "Transform one word into the next",
-    "shiritoriMode": "Shiritori",
-    "shiritoriModeDesc": "Japanese word chain — last letter starts next",
     "sealedBidMode": "Sealed Bid",
     "sealedBidModeDesc": "Pick a word nobody else will — unique bids score double",
     "wordfallMode": "Wordfall",
@@ -6478,7 +6396,7 @@ const en = {
       "bragDomination": "Absolute word domination 👑",
       "bragCrushed": "The board never stood a chance",
       "bragSolid": "Solid word hunting today",
-      "cta": "Think you can beat this? 🎮",
+      "cta": "Think you can beat this?",
       "header": "LexiClash Daily #{number}",
       "stats": "{words} words • {score} pts",
       "streak": "🔥 {days} day streak!",
@@ -13526,11 +13444,6 @@ const en = {
       "step1": "Pick your strongest word",
       "step2": "Words nobody else picks score double"
     },
-    "shiritori": {
-      "title": "Word Chain",
-      "step1": "Start where the last word ended",
-      "step2": "Keep the chain alive — no repeats"
-    },
     "adventure": {
       "title": "Beat the Levels",
       "step1": "Hit each goal to move on",
@@ -13605,10 +13518,6 @@ const en = {
         "tip2": "Tap outer letters in any order",
         "tip3": "Try plural forms to extend a word"
       }
-    },
-    "shiritori": {
-      "name": "Shiritori",
-      "description": "Chain words — each begins with the last letter of the one before!"
     },
     "sealedBid": {
       "name": "Sealed Bid",
@@ -13690,8 +13599,16 @@ const en = {
     "strip": "Brag about it",
     "others": "+{count} others",
     "share": "Share",
-    "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",
-    "shareTextSolo": "⚔️ {score} pts — LexiClash"
+    "shareTextVs": "{score}–{rivalScore} vs {name} — LexiClash",
+    "shareTextSolo": "{score} pts — LexiClash",
+    "page": {
+      "titleVs": "Think you can beat this?",
+      "titleSolo": "Think you can beat this score?",
+      "sub": "No signup, no download. Jump straight into the next round.",
+      "cta": "Take the rematch",
+      "explore": "Or explore LexiClash",
+      "imageAlt": "Shared LexiClash result"
+    }
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

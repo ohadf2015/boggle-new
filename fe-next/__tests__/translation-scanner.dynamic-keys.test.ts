@@ -71,14 +71,14 @@ describe('translation scanner — dynamic t() key resolution', () => {
       'diff.tsx',
       `type Difficulty = 'easy' | 'medium' | 'hard';
        export function label(d: Difficulty, t: any) {
-         return t(\`shiritori.solo.difficulty.\${d}\`);
+         return t(\`wordcraft.solo.difficulty.\${d}\`);
        }`
     );
     const keys = keysOf(scanner.extractTFunctionCalls(file));
     expect(keys).toEqual([
-      'shiritori.solo.difficulty.easy',
-      'shiritori.solo.difficulty.hard',
-      'shiritori.solo.difficulty.medium',
+      'wordcraft.solo.difficulty.easy',
+      'wordcraft.solo.difficulty.hard',
+      'wordcraft.solo.difficulty.medium',
     ]);
   });
 

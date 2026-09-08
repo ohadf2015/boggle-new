@@ -374,7 +374,6 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.wordHuntState = null;
   game.blastModeState = null;
   game.wheelRushState = null;
-  game.shiritoriState = null;
   game.sealedBidState = null;
   game.crosswordMpState = null;
   game.wordTowerVersusState = null;

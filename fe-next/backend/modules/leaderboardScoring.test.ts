@@ -3,7 +3,7 @@
  * which modes award competitive (total_score) points and how heavily.
  *
  * Requirements under test:
- *  - Feature-gated modes (word-tower, shiritori) award ZERO leaderboard points.
+ *  - Feature-gated modes (word-tower, sealed-bid) award ZERO leaderboard points.
  *  - Daily and multiplayer/casual play are weighted EQUALLY (1x): the leaderboard
  *    is the sum of raw earned points, so multiplayer counts as much per point as
  *    daily (daily still ranks high via its larger raw scores, not a multiplier).
@@ -21,9 +21,9 @@ import {
 
 describe('leaderboardScoring policy', () => {
   describe('isGatedMode', () => {
-    it('treats weight-0 modes (word-tower, shiritori) as gated', () => {
+    it('treats weight-0 modes (word-tower, sealed-bid) as gated', () => {
       expect(isGatedMode('word-tower')).toBe(true);
-      expect(isGatedMode('shiritori')).toBe(true);
+      expect(isGatedMode('sealed-bid')).toBe(true);
     });
 
     it('treats public rotation modes as not gated', () => {
@@ -64,7 +64,7 @@ describe('leaderboardScoring policy', () => {
   describe('leaderboardPointsForGame', () => {
     it('awards ZERO for gated modes regardless of score', () => {
       expect(leaderboardPointsForGame('word-tower', 1000)).toBe(0);
-      expect(leaderboardPointsForGame('shiritori', 500)).toBe(0);
+      expect(leaderboardPointsForGame('sealed-bid', 500)).toBe(0);
     });
 
     it('weights daily and multiplayer equally — equal raw score yields equal points', () => {

@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { LandingChallengeCards } from '../LandingChallengeCards';
+import { MODE_META } from '@/lib/landing/modeMeta';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
@@ -98,6 +99,19 @@ describe('LandingChallengeCards', () => {
 
     it('veteran landing has no practice cube', () => {
       mockIsVeteran.mockReturnValue(true);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
+    });
+
+    it('stays absent even though MODE_META.practice.path now resolves to a real route', () => {
+      // Regression guard: MODE_META.practice.path was fixed from the retired
+      // '/practice' to '/singleplayer?autoStart=practice' (see modeMetaRoutes
+      // test) so lib/email/welcomeModes.ts stops linking a dead route. That
+      // fix must NOT resurrect the hub tile — the retirement in 712e2475d is
+      // a data-backed product decision (299 started, 151/50.5% never played a
+      // real game after) independent of whether the path resolves.
+      expect(MODE_META.practice.path).not.toBe('/practice');
+      mockIsVeteran.mockReturnValue(false);
       const { container } = render(<LandingChallengeCards {...baseProps} />);
       expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
     });

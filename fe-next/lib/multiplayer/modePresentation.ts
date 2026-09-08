@@ -47,7 +47,6 @@ const MODE_META: Record<GameMode | 'random', ModeMeta> = {
   'word-hunt': { slug: 'wordHunt', color: 'cyan', icon: 'Target' },
   'wheel-rush': { slug: 'wheelRush', color: 'purple', icon: 'RotateCw' },
   'word-tower': { slug: 'wordTower', color: 'orange', icon: 'Building2' },
-  shiritori: { slug: 'shiritori', color: 'cyan', icon: 'Link' },
   'sealed-bid': { slug: 'sealedBid', color: 'pink', icon: 'Gavel' },
   crossword: { slug: 'crossword', color: 'cyan', icon: 'Grid3x3' },
   wordcraft: { slug: 'wordcraft', color: 'purple', icon: 'Grid2x2' },
@@ -60,7 +59,6 @@ const KNOWN_MODES = new Set<string>([
   'word-hunt',
   'wheel-rush',
   'word-tower',
-  'shiritori',
   'sealed-bid',
   'crossword',
 ]);

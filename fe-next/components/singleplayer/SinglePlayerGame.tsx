@@ -2,12 +2,14 @@
 
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { shouldShowScorePopup } from '@/lib/singleplayer/scorePopup';
 import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
 import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogEngagement';
+import { useBoardReadyTelemetry } from './game/hooks/useBoardReadyTelemetry';
 
 const DEAD_TIME_THRESHOLD_MS = 15000;
 import {
@@ -94,6 +96,12 @@ function SinglePlayerGame({
     }
   }, [core.grid, encouragement]);
 
+  // First-15-seconds instrumentation: proves the timer gate in
+  // useSinglePlayerCore held the clock while the board was loading (see
+  // useBoardReadyTelemetry — remainingTimeAtReady should always equal
+  // timerSeconds now).
+  useBoardReadyTelemetry(core.grid, core.timer.remainingTime, settings.mode, settings.timerSeconds);
+
   // Trigger 'first-word' when first word is found
   useEffect(() => {
     const wordCount = core.foundWords.length;
@@ -111,6 +119,11 @@ function SinglePlayerGame({
   // Score popup — shows "+30" when score increases
   const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
   const prevScoreRef = useRef(0);
+  // Deliberately NOT the `prevWordCountRef` above: that one is owned by the
+  // encouragement effect, which is declared earlier and so has already advanced
+  // it to the current count by the time this effect runs — sharing it would make
+  // the popup check never match. Separate ref, separate owner.
+  const prevPopupWordCountRef = useRef(0);
 
   // Refs for anchoring the floating score popup to real HUD elements (portrait/mobile)
   const scoreBadgeRef = useRef<HTMLDivElement>(null);
@@ -133,7 +146,13 @@ function SinglePlayerGame({
   // Long words (6+) get a bonus label for extra celebration
   useEffect(() => {
     const delta = core.score - prevScoreRef.current;
-    if (delta > 0 && prevScoreRef.current > 0) {
+    if (
+      shouldShowScorePopup({
+        delta,
+        prevWordCount: prevPopupWordCountRef.current,
+        wordCount: core.foundWords.length,
+      })
+    ) {
       const lastWord = core.foundWords[core.foundWords.length - 1];
       const wordLen = lastWord?.word?.length ?? 0;
       const bonus = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
@@ -153,6 +172,7 @@ function SinglePlayerGame({
       });
     }
     prevScoreRef.current = core.score;
+    prevPopupWordCountRef.current = core.foundWords.length;
   }, [core.score, core.foundWords]);
 
   // Practice-mode all-words celebration — fires once when player clears the board.

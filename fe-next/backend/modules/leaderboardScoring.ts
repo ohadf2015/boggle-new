@@ -10,8 +10,8 @@
  *    is the sum of raw earned points; we do NOT amplify daily or attenuate
  *    multiplayer. Daily still tends to rank high because its raw per-game scores
  *    are larger, but multiplayer now counts fully and compounds across games.
- *  - Feature-gated / preview modes (admin-only `word-tower`, coming-soon
- *    `shiritori`) contribute NOTHING — they must not pollute the leaderboard.
+ *  - Feature-gated / preview modes (admin-only `word-tower`) contribute
+ *    NOTHING — they must not pollute the leaderboard.
  *  - XP / progression is a SEPARATE track and is intentionally NOT governed
  *    here (we don't punish players for playing casually; we only re-weight the
  *    competitive currency).

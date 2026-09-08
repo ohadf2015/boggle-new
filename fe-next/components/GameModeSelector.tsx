@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Shuffle, FileText, Bomb, Crosshair, Disc3, Building2, Link2, Gavel, Grid3x3, Grid2x2 } from 'lucide-react';
+import { Shuffle, FileText, Bomb, Crosshair, Disc3, Building2, Gavel, Grid3x3, Grid2x2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
 
@@ -28,7 +28,6 @@ export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   'word-hunt': <Crosshair className="w-4 h-4" />,
   'wheel-rush': <Disc3 className="w-4 h-4" />,
   'word-tower': <Building2 className="w-4 h-4" />,
-  shiritori: <Link2 className="w-4 h-4" />,
   'sealed-bid': <Gavel className="w-4 h-4" />,
   crossword: <Grid3x3 className="w-4 h-4" />,
   wordcraft: <Grid2x2 className="w-4 h-4" />,
@@ -41,7 +40,6 @@ export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
   'word-hunt': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
   'wheel-rush': 'bg-neo-lime/30 text-neo-lime border-neo-lime/60',
   'word-tower': 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
-  shiritori: 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
   'sealed-bid': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
   crossword: 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60',
   wordcraft: 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
@@ -54,7 +52,6 @@ const MODE_GLOW: Record<GameModeOption, string> = {
   'word-hunt': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
   'wheel-rush': 'shadow-[0_0_10px_rgba(191,255,0,0.25)]',
   'word-tower': 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
-  shiritori: 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
   'sealed-bid': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
   crossword: 'shadow-[0_0_10px_rgba(0,255,255,0.25)]',
   wordcraft: 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
@@ -68,7 +65,6 @@ export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']
     'word-hunt': t('gameModes.wordHunt.name'),
     'wheel-rush': t('gameModes.wheelRush.name'),
     'word-tower': t('wordTower.cardTitle'),
-    shiritori: t('gameModes.shiritori.name'),
     'sealed-bid': t('gameModes.sealedBid.name'),
     crossword: t('gameModes.crossword.name'),
     wordcraft: t('wordcraft.title'),
@@ -88,7 +84,6 @@ export function getModeDescription(mode: GameModeOption, t: GameModeSelectorProp
     'word-hunt': t('gameModes.wordHunt.description'),
     'wheel-rush': t('gameModes.wheelRush.description'),
     'word-tower': t('wordTower.cardDesc'),
-    shiritori: t('gameModes.shiritori.description'),
     'sealed-bid': t('gameModes.sealedBid.description'),
     crossword: t('gameModes.crossword.description'),
     wordcraft: t('wordcraft.modeDesc'),

@@ -227,89 +227,6 @@ const he = {
     "affirmGoodWord": "מילה יפה",
     "noRush": "רוגע · בלי לחץ"
   },
-  "shiritori": {
-    "chain": "שרשרת מילים",
-    "inputLabel": "הקלידו מילה",
-    "nextStartsWith": "המילה הבאה מתחילה ב־",
-    "players": "שחקנים",
-    "submit": "שליחה",
-    "waitTurn": "ממתינים לתורכם…",
-    "wins": "ניצח!",
-    "empty": "—",
-    "winner": "{winner} ניצח!",
-    "finished": "המשחק נגמר",
-    "chainArrow": "→",
-    "yourTurn": "תורכם — הקלידו מילה",
-    "youWin": "ניצחתם!",
-    "error": {
-      "too-short": "קצר מדי — לפחות 2 הברות.",
-      "already-used": "כבר שוחק — בלי חזרות.",
-      "bad-chain": "חייב להתחיל בהברה הנדרשת.",
-      "not-a-word": "לא במילון.",
-      "not-your-turn": "המתן לתורך."
-    },
-    "solo": {
-      "category": {
-        "hit": "✨ +2× {category}!"
-      },
-      "howTo": {
-        "title": "איך משחקים",
-        "cta": "הבנתי!",
-        "steps": [
-          "🔤 הקלידו מילה בהיראגנה שמתחילה בהברה המודגשת",
-          "⛓️ כל מילה חייבת להתחיל בהברה האחרונה של המילה הקודמת",
-          "🚫 מפסידים אם מסיימים ב-ん (n) — ואסור לחזור על מילים!"
-        ]
-      },
-      "title": "שיריטורי לבד",
-      "tagline": "שרשרו מילות היראגנה מול הבוט.",
-      "back": "חזרה לשיריטורי",
-      "adminBadge": "תצוגה לאדמין",
-      "adminOnly": "שיריטורי לבד זמין רק לאדמינים.",
-      "headPrompt": "המילה הבאה מתחילה ב־",
-      "inputPlaceholder": "שמרו על השרשרת…",
-      "submit": "שליחה",
-      "checking": "בודק…",
-      "giveUp": "אני נכנע",
-      "confirmNewGame": "להתחיל משחק חדש? השרשרת הנוכחית תאבד.",
-      "again": "עוד פעם",
-      "won": "ניצחתם!",
-      "lost": "הסיבוב נגמר",
-      "botThinking": "הבוט חושב…",
-      "difficultyLabel": "רמת קושי",
-      "difficulty": {
-        "easy": "קל",
-        "medium": "בינוני",
-        "hard": "קשה"
-      },
-      "err": {
-        "not-hiragana": "רק יראגנה (לדוגמה ねこ).",
-        "wrong-head": "אות פתיחה שגויה — התחילו מהאות המודגשת.",
-        "duplicate": "המילה כבר שוחקה.",
-        "not-in-dict": "לא נמצא במילון היפני.",
-        "network": "שגיאת רשת — אנא נסה שוב."
-      },
-      "endReason": {
-        "player-no-move": "ויתרתם — הבוט מנצח.",
-        "player-ends-n": "המילה שלכם הסתיימה ב־ん — הבוט מנצח.",
-        "player-invalid": "מילה לא תקינה — הבוט מנצח.",
-        "bot-no-move": "הבוט אזל המילים — ניצחתם!",
-        "bot-ends-n": "הבוט סיים ב־ん — ניצחתם!"
-      },
-      "combo": {
-        "ariaLabel": "עומק השרשרת: {{n}}",
-        "newBest": "שיא חדש!",
-        "best": "שיא: {{n}}"
-      },
-      "ghost": {
-        "reveal": "👻 תור רוח — ×2!",
-        "score": "ניקוד:"
-      },
-      "tempo": {
-        "bonus": "⚡ שרשרת מהירה — +50%!"
-      }
-    }
-  },
   "solo": {
     "reward": {
       "comeBackTomorrow": "הטבעות הישנות כבר תבעו היום — חזרו מחר!",
@@ -321,20 +238,6 @@ const he = {
     },
     "modifier": {
       "todaysTwist": "טוויסט היום",
-      "shiritori": {
-        "longWords": {
-          "label": "ארוכות וחזקות",
-          "desc": "יום למילים גדולות ועז."
-        },
-        "noRepeatVowel": {
-          "label": "מחסור בתנועות",
-          "desc": "שמרו את התנועות שלכם טריות ומגוונות."
-        },
-        "speedDemon": {
-          "label": "דמון המהירות",
-          "desc": "התחשבות מהירה תשלוט בשרשרת היום."
-        }
-      },
       "sealedBid": {
         "noClashPenalty": {
           "label": "יום שלום",
@@ -3470,7 +3373,6 @@ const he = {
         "wordHunt": "ציד מילים",
         "wheelRush": "גלגל מהיר",
         "wordTower": "מגדל מילים",
-        "shiritori": "שירִיטורי",
         "sealedBid": "הצעה סמויה",
         "random": "מצב הפתעה"
       },
@@ -3480,7 +3382,6 @@ const he = {
         "wordHunt": "צודו את המילה הנסתרת",
         "wheelRush": "התחרו ביריבים על הגלגל",
         "wordTower": "בנו את המגדל",
-        "shiritori": "שרשרו את המילים",
         "sealedBid": "להערים על כולם",
         "random": "הפתעה מחכה"
       }
@@ -5711,7 +5612,7 @@ const he = {
     "referral": {
       "inviteFriends": "הזמינו חברים, קבלו פרסים!",
       "subtitle": "שתפו את הקוד שלכם ושניכם מקבלים 100 XP + 50 מטבעות כשהם משחקים!",
-      "shareText": "🎮 שחקו איתי ב-LexiClash! אתגרו אותי למשחק מילים!",
+      "shareText": "שחקו איתי ב-LexiClash! אתגרו אותי למשחק מילים!",
       "copied": "הקישור הועתק!",
       "friendsJoined": "חברים הצטרפו",
       "noReferralsYet": "עדיין אין הפניות"
@@ -6273,8 +6174,6 @@ const he = {
     "partyModeDesc": "Caption / Pixel / Shadow Clash על מסך גדול",
     "wordAlchemyMode": "אלכימיית מילים",
     "wordAlchemyModeDesc": "הפכו מילה אחת למילה הבאה",
-    "shiritoriMode": "שיריטורי",
-    "shiritoriModeDesc": "שרשרת מילים יפנית — האות האחרונה מתחילה את הבאה",
     "sealedBidMode": "הצעה חתומה",
     "sealedBidModeDesc": "בחרו מילה שאף אחד לא יבחר — הצעה ייחודית מכפילה ניקוד",
     "wordfallMode": "מפל מילים",
@@ -6994,7 +6893,7 @@ const he = {
       "bragDomination": "שליטה מוחלטת במילים 👑",
       "bragCrushed": "הלוח לא עמד בי",
       "bragSolid": "ציד מילים מוצלח היום",
-      "cta": "תצליחו לנצח את זה? 🎮",
+      "cta": "תצליחו לנצח את זה?",
       "header": "LexiClash יומי #{number}",
       "stats": "{words} מילים • {score} נק'",
       "streak": "רצף של {days} ימים! 🔥",
@@ -14907,11 +14806,6 @@ const he = {
       "step1": "בחר את המילה הכי חזקה שלך",
       "step2": "מילה שאף אחד לא בחר = כפול!"
     },
-    "shiritori": {
-      "title": "שרשרת מילים",
-      "step1": "התחל מהאות שבה נגמרה המילה הקודמת",
-      "step2": "אסור לחזור על מילה!"
-    },
     "adventure": {
       "title": "כבוש את השלבים",
       "step1": "השלם כל יעד כדי להתקדם",
@@ -14986,10 +14880,6 @@ const he = {
         "tip2": "הקישו על אותיות החוץ בכל סדר",
         "tip3": "נסו צורות רבות כדי להאריך מילה"
       }
-    },
-    "shiritori": {
-      "name": "שיריטורי",
-      "description": "שרשרת מילים — כל מילה מתחילה באות האחרונה של הקודמת!"
     },
     "sealedBid": {
       "name": "הצעה סמויה",
@@ -15071,8 +14961,16 @@ const he = {
     "strip": "תתפאר בזה",
     "others": "+{count} עוד",
     "share": "שיתוף",
-    "shareTextVs": "⚔️ {score}–{rivalScore} מול {name} — LexiClash",
-    "shareTextSolo": "⚔️ {score} נק' — LexiClash"
+    "shareTextVs": "{score}–{rivalScore} מול {name} — LexiClash",
+    "shareTextSolo": "{score} נק' — LexiClash",
+    "page": {
+      "titleVs": "חושבים שתצליחו לנצח?",
+      "titleSolo": "חושבים שתשברו את השיא?",
+      "sub": "בלי הרשמה, בלי הורדה. ישר לסבב הבא.",
+      "cta": "לסבב חוזר",
+      "explore": "או לגלות את LexiClash",
+      "imageAlt": "תוצאה משותפת ב-LexiClash"
+    }
   },
   "shareResult": {
     "singleplayer": "LexiClash סולו",
@@ -15594,7 +15492,7 @@ const he = {
     "rankUp": "דירוג ↑{{change}}",
     "rankDown": "דירוג ↓{{change}}",
     "share": "שתף סיכום",
-    "shareText": "השבוע שלי ב-LexiClash: {{games}} משחקים, {{words}} מילים, ניקוד שיא {{score}}. רצף של {{streak}} ימים! נסו לנצח! 🎮",
+    "shareText": "השבוע שלי ב-LexiClash: {{games}} משחקים, {{words}} מילים, ניקוד שיא {{score}}. רצף של {{streak}} ימים! נסו לנצח!",
     "shareMonthlyText": "החודש שלי ב-LexiClash: {{games}} משחקים, {{words}} מילים, המילה הארוכה ביותר: {{word}}. שיפור של {{improvement}}%! 🔥",
     "noData": "שחק כמה משחקים כדי לראות את הסיכום!",
     "copied": "הסיכום הועתק!"

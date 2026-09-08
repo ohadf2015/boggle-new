@@ -12,7 +12,7 @@
  */
 import {
   Swords, BookOpen, Map, Bomb, Link2, Brain, Layers, Building2,
-  ScrollText, Gavel, Grid3x3,
+  Gavel, Grid3x3,
   CloudRain, Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -74,7 +74,16 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
     imgScale: 0.82, // anchor (2×2) tile is wider-than-tall → object-cover zooms the knights+burst and clips the navy margin; scale <1 shrinks the box to restore breathing room (baked navy == tile bg, no seam, no clip)
   },
   practice: {
-    titleKey: 'landing.practice', descKey: 'landing.practiceDesc', path: '/practice',
+    // NOT a hub tile — `712e2475d` took practice off the hub for everyone
+    // (90-day data: 299 started, 151 (50.5%) never played a real game after —
+    // a cul-de-sac, not an onramp) and `54b07afd3` deleted the `/practice`
+    // routes behind permanent 301s. `LandingChallengeCards` filters 'practice'
+    // out of cardOrder unconditionally and that filter is intentional — do not
+    // remove it. This entry stays in MODE_META only because `path` is read
+    // directly by a real consumer (`lib/email/welcomeModes.ts`, the welcome/
+    // re-engagement email mode grid), so it must point at where practice
+    // actually lives today, not the retired route.
+    titleKey: 'landing.practice', descKey: 'landing.practiceDesc', path: '/singleplayer?autoStart=practice',
     Icon: BookOpen, variant: 'cyan', modeImage: '/modes/practice.png', genIcon: '/modes/cubes/practice.png',
     imgScale: 1.6, // sticker fills ~47% of frame → scale up to read full-bleed
   },
@@ -116,10 +125,6 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   wordTower: {
     titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
     Icon: Building2, variant: 'lime', badge: 'NEW', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
-  },
-  shiritori: {
-    titleKey: 'landing.shiritoriMode', descKey: 'landing.shiritoriModeDesc', path: '/shiritori/solo',
-    Icon: ScrollText, variant: 'blue', badge: 'ADMIN', genIcon: '/modes/cubes/shiritori.png',
   },
   sealedBid: {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',

@@ -7,8 +7,8 @@
  * What was REMOVED (2026-08-07): the vertical letter-chain model —
  * `buildTowerColumn`, `cellAltitudes`, `sharedConnectorLen`, `blendColors`,
  * `hexToHsl`. It rendered the tower as a single column of one-letter-per-row
- * tiles and tinted each Shiritori connector the blend of its two neighbouring
- * words. The Shiritori chain was retired (see `validateTowerWord`), which left
+ * tiles and tinted each word-chain connector the blend of its two neighbouring
+ * words. The word-chain mechanic was retired (see `validateTowerWord`), which left
  * the connector-blend describing a mechanic that no longer existed and the
  * tower drawn as a 1-tile-wide spire. A word is now ONE horizontal floor —
  * see `towerFloor.ts`.

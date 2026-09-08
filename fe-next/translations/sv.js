@@ -215,11 +215,6 @@ const sv = {
       "step1": "Välj ditt starkaste ord",
       "step2": "Unikt bud = dubbelt poäng"
     },
-    "shiritori": {
-      "title": "Ordkedja",
-      "step1": "Börja på förra ordets sista bokstav",
-      "step2": "Aldrig samma ord två gånger"
-    },
     "adventure": {
       "title": "Äventyret",
       "step1": "Rensa mål för att gå vidare",
@@ -516,89 +511,6 @@ const sv = {
     "affirmGoodWord": "Vilket fint ord",
     "noRush": "Lugnt · ingen brådska"
   },
-  "shiritori": {
-    "chain": "Ordkedja",
-    "inputLabel": "Skriv ditt ord",
-    "nextStartsWith": "Nästa ord börjar med",
-    "players": "Spelare",
-    "submit": "Skicka",
-    "waitTurn": "Väntar på din tur…",
-    "wins": "vinner!",
-    "empty": "—",
-    "winner": "{winner} vinner!",
-    "finished": "Spelet slut",
-    "chainArrow": "→",
-    "yourTurn": "Din tur – skriv ett ord",
-    "youWin": "Du vinner!",
-    "error": {
-      "too-short": "För kort — minst 2 kana.",
-      "already-used": "Redan spelat — inga upprepningar.",
-      "bad-chain": "Måste börja med rätt kana.",
-      "not-a-word": "Inte i ordlistan.",
-      "not-your-turn": "Vänta på din tur."
-    },
-    "solo": {
-      "category": {
-        "hit": "✨ +2× {category}!"
-      },
-      "howTo": {
-        "title": "Så spelar du",
-        "cta": "Uppfattat!",
-        "steps": [
-          "🔤 Skriv ett hiragana-ord som börjar på det markerade kana-tecknet",
-          "⛓️ Varje ord måste börja på föregående ords sista kana",
-          "🚫 Du förlorar om du slutar på ん (n) – och inga upprepningar!"
-        ]
-      },
-      "title": "Shiritori Solo",
-      "tagline": "Kedja hiragana-ord mot boten.",
-      "back": "Tillbaka till Shiritori",
-      "adminBadge": "Adminförhandsvisning",
-      "adminOnly": "Shiritori Solo är endast en admin-förhandsvisning.",
-      "headPrompt": "Nästa ord börjar med:",
-      "inputPlaceholder": "Håll kedjan vid liv…",
-      "submit": "Skicka",
-      "checking": "Kontrollerar…",
-      "giveUp": "Ge upp",
-      "confirmNewGame": "Starta ett nytt spel? Din nuvarande kedja förloras.",
-      "again": "Spela igen",
-      "won": "Du vinner!",
-      "lost": "Rundan är slut",
-      "botThinking": "Boten tänker…",
-      "difficultyLabel": "Botens svårighetsgrad",
-      "difficulty": {
-        "easy": "Lätt",
-        "medium": "Medel",
-        "hard": "Svår"
-      },
-      "err": {
-        "not-hiragana": "Endast hiragana (t.ex. ねこ).",
-        "wrong-head": "Fel inledande kana — börja med den markerade kana.",
-        "duplicate": "Det ordet har redan spelats.",
-        "not-in-dict": "Inte i den japanska ordboken.",
-        "network": "Nätverksfel — försök igen."
-      },
-      "endReason": {
-        "player-no-move": "Du gav upp — boten vinner.",
-        "player-ends-n": "Ditt ord slutade på ん — boten vinner.",
-        "player-invalid": "Ogiltigt ord — boten vinner.",
-        "bot-no-move": "Boten fick slut på ord — du vinner!",
-        "bot-ends-n": "Boten slutade på ん — du vinner!"
-      },
-      "combo": {
-        "ariaLabel": "Kedjans djup: {{n}}",
-        "newBest": "Nytt rekord!",
-        "best": "Rekord: {{n}}"
-      },
-      "ghost": {
-        "reveal": "👻 Spökturen — ×2!",
-        "score": "Poäng:"
-      },
-      "tempo": {
-        "bonus": "⚡ Snabbkedja — +50%!"
-      }
-    }
-  },
   "solo": {
     "reward": {
       "comeBackTomorrow": "Dagens mynt redan hämtade — kom tillbaka imorgon!",
@@ -610,20 +522,6 @@ const sv = {
     },
     "modifier": {
       "todaysTwist": "Dagens twist",
-      "shiritori": {
-        "longWords": {
-          "label": "Långa & Starka",
-          "desc": "En dag för att sträcka ut stora, djärva ord."
-        },
-        "noRepeatVowel": {
-          "label": "Vokalstöt",
-          "desc": "Håll dina vokaler färska och varierande."
-        },
-        "speedDemon": {
-          "label": "Snabbets demon",
-          "desc": "Snabb tänkande styr kedjan idag."
-        }
-      },
       "sealedBid": {
         "noClashPenalty": {
           "label": "Fredsdag",
@@ -3716,7 +3614,6 @@ const sv = {
         "wordHunt": "Ordjakt",
         "wheelRush": "Hjulrush",
         "wordTower": "Ordtorn",
-        "shiritori": "Shiritori",
         "sealedBid": "Hemligt bud",
         "random": "Överraskningsläge"
       },
@@ -3726,7 +3623,6 @@ const sv = {
         "wordHunt": "Jaga det dolda ordet",
         "wheelRush": "Tävla mot rivaler på hjulet",
         "wordTower": "Bygg tornet",
-        "shiritori": "Kedja orden",
         "sealedBid": "Övertrumfa rummet",
         "random": "En överraskning väntar"
       }
@@ -5589,7 +5485,7 @@ const sv = {
     "referral": {
       "inviteFriends": "Bjud in vänner, tjäna belöningar!",
       "subtitle": "Dela din kod så får ni båda 100 XP + 50 mynt när de spelar.",
-      "shareText": "🎮 Spela LexiClash med mig! Jag utmanar dig på ett ordspel!",
+      "shareText": "Spela LexiClash med mig! Jag utmanar dig på ett ordspel!",
       "copied": "Länk kopierad!",
       "friendsJoined": "vänner gick med",
       "noReferralsYet": "Inga hänvisningar ännu"
@@ -6519,8 +6415,6 @@ const sv = {
     "partyModeDesc": "Caption / Pixel / Shadow Clash på stor skärm",
     "wordAlchemyMode": "Ordalkemi",
     "wordAlchemyModeDesc": "Förvandla ett ord till nästa",
-    "shiritoriMode": "Shiritori",
-    "shiritoriModeDesc": "Japansk ordkedja — sista bokstaven startar nästa",
     "sealedBidMode": "Förseglat bud",
     "sealedBidModeDesc": "Välj ett ord ingen annan väljer — unikt bud ger dubbla poäng",
     "wordfallMode": "Ordfall",
@@ -7345,7 +7239,7 @@ const sv = {
       "bragDomination": "Total orddominans 👑",
       "bragCrushed": "Brädet hade ingen chans",
       "bragSolid": "Stabil ordjakt idag",
-      "cta": "Tror du att du kan slå det här? 🎮",
+      "cta": "Tror du att du kan slå det här?",
       "header": "LexiClash Daglig #{number}",
       "stats": "{words} ord • {score} poäng",
       "streak": "🔥 {days} dagars svit!",
@@ -15291,10 +15185,6 @@ const sv = {
         "tip3": "Prova pluralformer för att förlänga"
       }
     },
-    "shiritori": {
-      "name": "Shiritori",
-      "description": "Kedja ord — varje ord börjar på förra ordets sista bokstav!"
-    },
     "sealedBid": {
       "name": "Hemligt bud",
       "description": "Bjud ett ord ingen annan väljer — unika bud ger dubbla poäng!"
@@ -15375,8 +15265,16 @@ const sv = {
     "strip": "Skryt om det",
     "others": "+{count} FLER",
     "share": "Dela",
-    "shareTextVs": "⚔️ {score}–{rivalScore} mot {name} — LexiClash",
-    "shareTextSolo": "⚔️ {score} p — LexiClash"
+    "shareTextVs": "{score}–{rivalScore} mot {name} — LexiClash",
+    "shareTextSolo": "{score} p — LexiClash",
+    "page": {
+      "titleVs": "Tror du att du kan slå det här?",
+      "titleSolo": "Tror du att du kan slå det resultatet?",
+      "sub": "Ingen registrering, ingen nedladdning. Hoppa direkt in i nästa runda.",
+      "cta": "Ta returmatchen",
+      "explore": "Eller utforska LexiClash",
+      "imageAlt": "Delat LexiClash-resultat"
+    }
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
@@ -15898,7 +15796,7 @@ const sv = {
     "rankUp": "Rank ↑{{change}}",
     "rankDown": "Rank ↓{{change}}",
     "share": "Dela sammanfattning",
-    "shareText": "Min LexiClash-vecka: {{games}} spel, {{words}} ord hittade, bästa poäng {{score}}. {{streak}} dagars svit! Slå det! 🎮",
+    "shareText": "Min LexiClash-vecka: {{games}} spel, {{words}} ord hittade, bästa poäng {{score}}. {{streak}} dagars svit! Slå det!",
     "shareMonthlyText": "Min LexiClash-månad: {{games}} spel, {{words}} ord hittade, längsta ord: {{word}}. {{improvement}}% förbättring! 🔥",
     "noData": "Spela några spel för att se din sammanfattning!",
     "copied": "Sammanfattning kopierad!"

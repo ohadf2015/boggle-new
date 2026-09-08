@@ -48,7 +48,7 @@ const EMPTY: SealedBidClientState = {
 /**
  * Subscribes to the sealed-bid socket events and derives the live round state.
  * The MP view mounts on startGame, so the hook polls requestSealedBidState on
- * mount (and reconnect) and waits for sealedBidInit. Mirrors useShiritoriGame.
+ * mount (and reconnect) and waits for sealedBidInit.
  */
 export function useSealedBidGame(
   socket: SealedBidSocketLike | null,

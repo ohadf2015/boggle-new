@@ -99,10 +99,10 @@ async function processPlayerResult(
         // Continue anyway - stats update will also try to create the profile
       }
 
-      // Feature-gated / preview modes (admin-only word-tower, coming-soon
-      // shiritori) must NOT award leaderboard points or XP — they would pollute
-      // the season + global leaderboard. We still record the game_result row for
-      // analytics history; only the profile stats / XP / leaderboard writes skip.
+      // Feature-gated / preview modes (admin-only word-tower) must NOT award
+      // leaderboard points or XP — they would pollute the season + global
+      // leaderboard. We still record the game_result row for analytics
+      // history; only the profile stats / XP / leaderboard writes skip.
       const eligibleForAward = awardsLeaderboardPoints(gameInfo.gameMode);
       if (!eligibleForAward) {
         logger.info('SUPABASE', `Mode '${gameInfo.gameMode}' is feature-gated — skipping leaderboard/XP award for ${playerScore.username}`);

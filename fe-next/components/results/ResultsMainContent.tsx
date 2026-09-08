@@ -3,7 +3,7 @@
 import React, { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Type, Star, Coins, ChevronDown, ChevronUp, Share2 } from 'lucide-react';
+import { Sparkles, Type, Star, Coins, ChevronDown, ChevronUp, Share2, Copy, Check } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
 import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
@@ -193,6 +193,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const { dir: _dir, language } = useLanguage();
   const [showDetails, setShowDetails] = useState(false);
   const [showBrag, setShowBrag] = useState(false);
+  const [stripCopied, setStripCopied] = useState(false);
 
   // Resolution-aware: `isAuthenticated` alone would flash the guest layout at a
   // logged-in player on first paint (rules/60 Class 1).
@@ -376,8 +377,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       maxCombo: shareCardStats?.maxCombo,
       won: isCurrentUserWinner,
       opponentScore: sortedScores.find(p => p.username !== username)?.score,
+      // Feeds the word-length ladder. Length bands only — no letters travel, so
+      // this stays postable even on the daily's one shared board.
+      words: currentPlayerValidWords.map(w => w.word),
     };
-  }, [currentPlayerData, currentPlayerValidWords.length, shareCardStats, isCurrentUserWinner, sortedScores, username, gameMode]);
+  }, [currentPlayerData, currentPlayerValidWords, shareCardStats, isCurrentUserWinner, sortedScores, username, gameMode]);
 
   // Brag card — screenshot-first MP share artifact. MP-only; reuses the same
   // derived stats as shareParams. The card is built to be screenshotted (no
@@ -406,6 +410,38 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         : undefined,
     };
   }, [currentPlayerData, isMultiplayer, sortedScores, username, isCurrentUserWinner, currentPlayerRank, currentPlayerValidWords.length, shareCardStats, gameMode, language]);
+
+  // The shareable artifact is the OG image at `app/api/og/brag`, unfurled from
+  // the link below — deliberately not emoji text art (see
+  // shared/utils/shareResultGenerator). The text is just its caption.
+  const bragShareText = useMemo(() => {
+    if (!bragData) return '';
+    const { key, params } = deriveBragShareText(bragData.data, bragData.current.score);
+    return t(key, params);
+  }, [bragData, t]);
+
+  // Carries the result on the link, so the recipient's chat preview shows the
+  // scoreline image instead of a bare room invite.
+  const bragShareUrl = useMemo(
+    () =>
+      getBragShareUrl(gameCode, {
+        score: bragData?.current.score ?? 0,
+        rival: bragData?.data.rival?.score ?? null,
+        name: bragData?.data.rival?.name ?? null,
+        mode: gameMode ?? null,
+        words: currentPlayerValidWords.length,
+        best: shareCardStats?.longestWord ?? null,
+      }),
+    [gameCode, bragData, gameMode, currentPlayerValidWords.length, shareCardStats]
+  );
+
+  // A compact, emoji-free preview of what gets shared.
+  const bragScoreline = useMemo(() => {
+    if (!bragData) return '';
+    const mine = bragData.current.score;
+    const rival = bragData.data.rival?.score;
+    return rival == null ? `${mine}` : `${mine} - ${rival}`;
+  }, [bragData]);
 
   useEffect(() => {
     if (bragData) {
@@ -605,25 +641,68 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           the same tap. Sharing is opt-in, so it costs one line until asked for.
           mp_brag_card_viewed still fires on mount — the impression is the strip,
           so the metric keeps meaning the same thing; opening is its own event. */}
+      {/* The artifact renders ON the strip, not behind it. Measured 90d: 8,728
+          strip impressions produced 3 expands and 5 copies — 8,725 people never
+          saw the thing they were being asked to share. Of the few who did open
+          it, nearly all shared, so the artifact was never the problem; the
+          expand step was. Copy is now reachable from the impression itself. The
+          full card stays behind the chevron, so the demotion that removed a
+          350px block and a competing primary button is preserved. */}
       {bragData && (
-        <button
-          type="button"
-          onClick={() => {
-            setShowBrag(v => !v);
-            if (!showBrag) {
-              trackGrowthEvent('mp_brag_card_expanded', {
+        <div className="w-full flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setShowBrag(v => !v);
+              if (!showBrag) {
+                trackGrowthEvent('mp_brag_card_expanded', {
+                  gameMode: gameMode ?? 'unknown',
+                  outcome: bragData.data.outcome,
+                  language,
+                });
+              }
+            }}
+            className={`${DISCLOSURE_TOGGLE_CLASS} flex-1 min-w-0`}
+            aria-expanded={showBrag}
+          >
+            <Share2 className="w-4 h-4 text-neo-pink shrink-0" />
+            <span className="truncate">{t('brag.strip')}</span>
+            {bragScoreline && (
+              <span className="font-bold tabular-nums text-neo-lime shrink-0">
+                {bragScoreline}
+              </span>
+            )}
+            {showBrag ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(
+                  `${bragShareText}\n${bragShareUrl}`
+                );
+                setStripCopied(true);
+                setTimeout(() => setStripCopied(false), 2000);
+              } catch {
+                // Clipboard denied (permissions / insecure context) — the
+                // expanded card still offers native share and copy.
+                return;
+              }
+              trackGrowthEvent('mp_brag_card_copy_link', {
                 gameMode: gameMode ?? 'unknown',
                 outcome: bragData.data.outcome,
                 language,
+                hasRoomLink: !!gameCode,
+                surface: 'strip',
               });
-            }
-          }}
-          className={DISCLOSURE_TOGGLE_CLASS}
-        >
-          <Share2 className="w-4 h-4 text-neo-pink" />
-          {t('brag.strip')}
-          {showBrag ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
+              trackShareCompleted('clipboard', { surface: 'mp_brag_strip' });
+            }}
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 border-2 border-black bg-neo-pink text-neo-white font-neo-body font-bold text-sm rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+          >
+            {stripCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            <span>{stripCopied ? t('brag.copied') : t('brag.share')}</span>
+          </button>
+        </div>
       )}
       {bragData && showBrag && (
         <MpBragCard
@@ -634,11 +713,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           // The room stays open through results (held for the rematch), so the
           // card carries a LIVE join link — a shared link lands the friend in
           // the room for the next round, not on the homepage.
-          shareUrl={getBragShareUrl(gameCode)}
-          shareText={(() => {
-            const { key, params } = deriveBragShareText(bragData.data, bragData.current.score);
-            return t(key, params);
-          })()}
+          shareUrl={bragShareUrl}
+          shareText={bragShareText}
           onCopyLink={() =>
             trackGrowthEvent('mp_brag_card_copy_link', {
               gameMode: gameMode ?? 'unknown',

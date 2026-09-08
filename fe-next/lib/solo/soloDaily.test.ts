@@ -46,13 +46,13 @@ describe('soloDaily', () => {
 
   describe('soloSeed', () => {
     it('is deterministic for the same mode + date', () => {
-      expect(soloSeed('shiritori', '2026-06-16')).toBe(soloSeed('shiritori', '2026-06-16'));
+      expect(soloSeed('crossword', '2026-06-16')).toBe(soloSeed('crossword', '2026-06-16'));
     });
     it('differs across modes', () => {
-      expect(soloSeed('shiritori', '2026-06-16')).not.toBe(soloSeed('sealed-bid', '2026-06-16'));
+      expect(soloSeed('crossword', '2026-06-16')).not.toBe(soloSeed('sealed-bid', '2026-06-16'));
     });
     it('differs across dates', () => {
-      expect(soloSeed('shiritori', '2026-06-16')).not.toBe(soloSeed('shiritori', '2026-06-17'));
+      expect(soloSeed('crossword', '2026-06-16')).not.toBe(soloSeed('crossword', '2026-06-17'));
     });
     it('returns a finite non-negative 32-bit integer', () => {
       const s = soloSeed('word-alchemy', '2026-06-16');
@@ -79,7 +79,7 @@ describe('soloDaily', () => {
 
   describe('pickDailyModifier', () => {
     it('returns a modifier with i18n keys', () => {
-      const m = pickDailyModifier('shiritori', '2026-06-16');
+      const m = pickDailyModifier('crossword', '2026-06-16');
       expect(m.id).toBeTruthy();
       expect(m.labelKey).toMatch(/^solo\.modifier\./);
       expect(m.descKey).toMatch(/^solo\.modifier\./);
@@ -140,7 +140,7 @@ describe('soloDaily', () => {
 
     it('keys are per-mode and per-language (independent claims)', () => {
       awardSoloDaily('sealed-bid', '2026-06-16', 'en', 80, true);
-      const otherMode = awardSoloDaily('shiritori', '2026-06-16', 'en', 80, true);
+      const otherMode = awardSoloDaily('crossword', '2026-06-16', 'en', 80, true);
       const otherLang = awardSoloDaily('sealed-bid', '2026-06-16', 'he', 80, true);
       expect(otherMode).not.toBeNull();
       expect(otherLang).not.toBeNull();

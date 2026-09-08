@@ -53,7 +53,6 @@ const MODE_SEGMENTS: Readonly<Record<string, string>> = {
   'word-craft': 'word-craft',
   'word-tower': 'word-tower',
   'word-of-the-day': 'word-of-the-day',
-  shiritori: 'shiritori',
   practice: 'practice',
   adventure: 'adventure',
   anagram: 'anagram',

@@ -16,7 +16,7 @@ interface AutoHideFooterProps {
 // First-path-segment classification (exact match — see `segment` below).
 // GAME_ROUTES: interactive gameplay screens. Hide the full footer; desktop
 // lobbies fall back to a compact legal strip. Their SEO marketing landing pages
-// (e.g. word-craft-game, word-craft-landing, anagram, shiritori) are deliberately
+// (e.g. word-craft-game, word-craft-landing, anagram) are deliberately
 // NOT listed — those keep the full footer for internal-link SEO.
 const GAME_ROUTES = new Set([
   'quick-play',

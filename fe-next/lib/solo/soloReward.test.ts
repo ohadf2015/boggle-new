@@ -26,13 +26,13 @@ describe('soloReward', () => {
     });
 
     it('adds score bonus = floor(score / SCORE_DIVISOR)', () => {
-      const r = computeSoloReward({ mode: 'shiritori', score: 95, won: false, seed: 3 });
+      const r = computeSoloReward({ mode: 'crossword', score: 95, won: false, seed: 3 });
       expect(r.breakdown.scoreBonus).toBe(Math.floor(95 / COIN_EARNING_OTHER.SCORE_DIVISOR));
     });
 
     it('adds a win bonus only when won', () => {
-      const lost = computeSoloReward({ mode: 'shiritori', score: 50, won: false, seed: 3 });
-      const won = computeSoloReward({ mode: 'shiritori', score: 50, won: true, seed: 3 });
+      const lost = computeSoloReward({ mode: 'crossword', score: 50, won: false, seed: 3 });
+      const won = computeSoloReward({ mode: 'crossword', score: 50, won: true, seed: 3 });
       expect(lost.breakdown.winBonus).toBe(0);
       expect(won.breakdown.winBonus).toBeGreaterThan(0);
     });
@@ -45,7 +45,7 @@ describe('soloReward', () => {
     });
 
     it('caps total at MAX_GAME_REWARD', () => {
-      const r = computeSoloReward({ mode: 'shiritori', score: 100000, won: true, seed: 9 });
+      const r = computeSoloReward({ mode: 'crossword', score: 100000, won: true, seed: 9 });
       expect(r.coins).toBeLessThanOrEqual(COIN_EARNING_OTHER.MAX_GAME_REWARD);
     });
 
@@ -65,7 +65,7 @@ describe('soloReward', () => {
 
     it('bonus is always a non-negative known tier value', () => {
       for (let s = 0; s < 30; s++) {
-        const r = computeSoloReward({ mode: 'shiritori', score: 30, won: true, seed: s });
+        const r = computeSoloReward({ mode: 'crossword', score: 30, won: true, seed: s });
         expect([0, 5, 10, 25]).toContain(r.bonus);
       }
     });

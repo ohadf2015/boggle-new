@@ -312,8 +312,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // Build the unified bottom→top stack of FLOORS. One word = ONE horizontal
     // course of tiles, laid at the offset the crane actually dropped it at, so
     // the silhouette is a record of the run (Tower Bloxx). Replaces the old
-    // vertical one-letter-per-row column, which existed to draw the retired
-    // Shiritori chain.
+    // vertical one-letter-per-row column, which existed to draw a retired
+    // word-chain layout.
     const C = floors.length;
     // Grounded camera: base stands on the deck, stack grows up, camera pans once
     // the committed tower (NOT the pending preview) overflows the window.

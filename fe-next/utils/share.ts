@@ -77,9 +77,46 @@ export const getJoinUrl = (gameCode: string, utmSource?: string, hostName?: stri
  * join link — a friend who taps it lands in the room for the next round.
  * Without a code (or during SSR) it falls back to the homepage.
  */
-export const getBragShareUrl = (gameCode?: string): string => {
-  const joinUrl = gameCode ? getJoinUrl(gameCode, 'brag_card') : '';
-  return joinUrl || 'https://lexiclash.live';
+export interface BragShareParams {
+  score: number;
+  rival?: number | null;
+  name?: string | null;
+  mode?: string | null;
+  words?: number | null;
+  best?: string | null;
+}
+
+export const getBragShareUrl = (
+  gameCode?: string,
+  brag?: BragShareParams
+): string => {
+  if (!gameCode) return 'https://lexiclash.live';
+  if (typeof window === 'undefined') return '';
+
+  // Points at /{locale}/brag/{code}, NOT the old /{locale}?room={code}.
+  // A brag link has to unfurl into the result image, and og:image comes from the
+  // metadata of whatever URL is pasted. Hanging it off the homepage would mean
+  // reading searchParams in the homepage's generateMetadata, which forces
+  // dynamic rendering on the app's primary SEO and LCP page. The brag page's own
+  // CTA carries the room code onward, so the rematch is still one tap away.
+  const origin = window.location.origin;
+  const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+  const locale = localeMatch?.[1] || 'en';
+
+  const params = new URLSearchParams();
+  if (brag) {
+    params.set('score', String(Math.max(0, Math.round(brag.score))));
+    if (brag.rival != null) params.set('rival', String(Math.max(0, Math.round(brag.rival))));
+    if (brag.name) params.set('name', brag.name.slice(0, 24));
+    if (brag.mode) params.set('mode', brag.mode);
+    if (brag.words != null) params.set('words', String(Math.max(0, Math.round(brag.words))));
+    if (brag.best) params.set('best', brag.best.slice(0, 20));
+  }
+  params.set('utm_source', 'brag_card');
+  params.set('utm_medium', 'referral');
+  params.set('utm_campaign', 'player_invite');
+
+  return `${origin}/${locale}/brag/${encodeURIComponent(gameCode)}?${params.toString()}`;
 };
 
 /**

@@ -21,7 +21,7 @@ export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
  * - Standalone modes (daily / adventure / endless / drill / single player)
  *   which have their own local types in their respective modules.
  */
-export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'shiritori' | 'sealed-bid' | 'crossword' | 'wordcraft';
+export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'sealed-bid' | 'crossword' | 'wordcraft';
 export type GameModeSelection = GameMode | 'random';
 
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
@@ -271,8 +271,6 @@ export interface Game {
     discoveryWordCount?: number;
     [key: string]: unknown;
   } | null;
-  /** Shiritori (しりとり) word-chain state (present during shiritori games) */
-  shiritoriState?: ShiritoriModeState | null;
   /** Sealed Bid auction state (present during sealed-bid games) */
   sealedBidState?: SealedBidModeState | null;
   /** Crossword race state (present during crossword MP games) */
@@ -376,26 +374,6 @@ export interface WheelRushModeState {
   repeatCredited?: Record<string, string[]>;
 }
 
-/** Shiritori (しりとり) word-chain mode state tracked per game. */
-export interface ShiritoriModeState {
-  /** Turn order. */
-  players: string[];
-  /** Index into `players` of whose turn it is. */
-  turnIndex: number;
-  /** Words played so far, in order. */
-  chain: string[];
-  /** Words already used this round (no repeats). */
-  used: string[];
-  /** Kana the next word must start with (null on the opening move). */
-  requiredHead: string | null;
-  startedAt: number;
-  /** Absolute epoch ms by which the current player must answer. */
-  turnDeadline: number;
-  /** Eliminated flag per player. */
-  eliminated: Record<string, boolean>;
-  finished: boolean;
-  winner: string | null;
-}
 
 /** A locked bid for the current Sealed Bid round (cross-player resolution at reveal). */
 export interface SealedBidEntry {

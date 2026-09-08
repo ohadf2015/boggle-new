@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Link2, Gavel, Grid2x2, Brain } from 'lucide-react';
+import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Gavel, Grid2x2, Brain } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -65,7 +65,6 @@ export const MODE_ICON: Record<string, typeof LayoutGrid> = {
   blast: Zap,
   'wheel-rush': RotateCw,
   'word-tower': Building2,
-  shiritori: Link2,
   'sealed-bid': Gavel,
   crossword: Grid3x3,
   wordcraft: Grid2x2,
@@ -81,7 +80,6 @@ export const MODE_TRANSLATION_KEY: Record<string, string> = {
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
-  shiritori: 'shiritori',
   'sealed-bid': 'sealedBid',
   crossword: 'crossword',
   wordcraft: 'wordcraft',

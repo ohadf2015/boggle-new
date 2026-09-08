@@ -8,7 +8,7 @@
  * PostHog Event Schema:
  *   event: 'game_started' | 'game_completed'
  *   properties:
- *     - gameMode: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'shiritori'
+ *     - gameMode: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower'
  *     - engineMode: 'multiplayer' (constant for MP events)
  *     - isMultiplayer: true (constant for MP events)
  *     - roundIndex: number (0-based round in session; 0 for first game, 1 for second, etc.)

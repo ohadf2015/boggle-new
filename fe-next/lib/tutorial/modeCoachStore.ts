@@ -28,7 +28,6 @@ export type CoachModeKey =
   | 'wordCraft'
   | 'crossword'
   | 'sealedBid'
-  | 'shiritori'
   | 'adventure';
 
 export function coachStorageKey(mode: CoachModeKey): string {

@@ -227,89 +227,6 @@ const ja = {
     "affirmGoodWord": "よい言葉ですね",
     "noRush": "のんびり・焦らずに"
   },
-  "shiritori": {
-    "chain": "言葉のチェーン",
-    "inputLabel": "言葉を入力",
-    "nextStartsWith": "次の言葉の最初の文字",
-    "players": "プレイヤー",
-    "submit": "送信",
-    "waitTurn": "順番をお待ちください…",
-    "wins": "の勝ち！",
-    "empty": "—",
-    "winner": "{winner}の勝ち！",
-    "finished": "ゲーム終了",
-    "chainArrow": "→",
-    "yourTurn": "あなたの番です — 言葉を入力",
-    "youWin": "あなたの勝ち！",
-    "error": {
-      "too-short": "短すぎます — 2文字以上で。",
-      "already-used": "もう使われました — 繰り返しは禁止。",
-      "bad-chain": "指定のかなで始めてください。",
-      "not-a-word": "辞書にありません。",
-      "not-your-turn": "順番をお待ちください。"
-    },
-    "solo": {
-      "category": {
-        "hit": "✨ +2× {category}!"
-      },
-      "howTo": {
-        "title": "遊び方",
-        "cta": "OK！",
-        "steps": [
-          "🔤 ハイライトされた仮名で始まるひらがなの単語を入力",
-          "⛓️ 各単語は前の単語の最後の仮名で始めること",
-          "🚫 「ん」で終わると負け。同じ単語の繰り返しも禁止！"
-        ]
-      },
-      "title": "しりとり ソロ",
-      "tagline": "ボット相手にひらがなでしりとり。",
-      "back": "しりとりに戻る",
-      "adminBadge": "管理者プレビュー",
-      "adminOnly": "しりとりソロは管理者専用のプレビューです。",
-      "headPrompt": "次の言葉の最初の文字：",
-      "inputPlaceholder": "チェーンを繋げ…",
-      "submit": "送信",
-      "checking": "確認中…",
-      "giveUp": "降参",
-      "confirmNewGame": "新しいゲームを始めますか？現在のチェーンは失われます。",
-      "again": "もう一度",
-      "won": "勝利！",
-      "lost": "ラウンド終了",
-      "botThinking": "ボットが考え中…",
-      "difficultyLabel": "ボットの難易度",
-      "difficulty": {
-        "easy": "やさしい",
-        "medium": "ふつう",
-        "hard": "むずかしい"
-      },
-      "err": {
-        "not-hiragana": "ひらがなのみ（例：ねこ）。",
-        "wrong-head": "最初の文字が違います — 表示された文字から始めてください。",
-        "duplicate": "その単語はもう使われました。",
-        "not-in-dict": "日本語辞書にありません。",
-        "network": "ネットワークエラー — もう一度お試しください。"
-      },
-      "endReason": {
-        "player-no-move": "降参しました — ボットの勝ち。",
-        "player-ends-n": "ん で終わりました — ボットの勝ち。",
-        "player-invalid": "無効な単語 — ボットの勝ち。",
-        "bot-no-move": "ボットの単語切れ — あなたの勝ち！",
-        "bot-ends-n": "ボットが ん で終了 — あなたの勝ち！"
-      },
-      "combo": {
-        "ariaLabel": "チェーンの深さ: {{n}}",
-        "newBest": "新記録！",
-        "best": "記録: {{n}}"
-      },
-      "ghost": {
-        "reveal": "👻 ゴーストターン — ×2!",
-        "score": "スコア:"
-      },
-      "tempo": {
-        "bonus": "⚡ 速攻チェーン — +50%！"
-      }
-    }
-  },
   "solo": {
     "reward": {
       "comeBackTomorrow": "本日のコインはすでに獲得しました — 明日またお越しください！",
@@ -321,20 +238,6 @@ const ja = {
     },
     "modifier": {
       "todaysTwist": "今日のひねり",
-      "shiritori": {
-        "longWords": {
-          "label": "長くて強い",
-          "desc": "大きく大胆な言葉を伸ばす日。"
-        },
-        "noRepeatVowel": {
-          "label": "母音不足",
-          "desc": "母音を新鮮で多様に保とう。"
-        },
-        "speedDemon": {
-          "label": "スピード鬼",
-          "desc": "速い思考がチェーンを支配する今日。"
-        }
-      },
       "sealedBid": {
         "noClashPenalty": {
           "label": "休戦の日",
@@ -3430,7 +3333,6 @@ const ja = {
         "wordHunt": "ワードハント",
         "wheelRush": "ホイールラッシュ",
         "wordTower": "ワードタワー",
-        "shiritori": "しりとり",
         "sealedBid": "封印入札",
         "random": "サプライズモード"
       },
@@ -3440,7 +3342,6 @@ const ja = {
         "wordHunt": "隠れた単語を狩ろう",
         "wheelRush": "ホイールでライバルと対戦",
         "wordTower": "タワーを積もう",
-        "shiritori": "単語をつなげよう",
         "sealedBid": "全員を出し抜け",
         "random": "お楽しみに"
       }
@@ -5299,7 +5200,7 @@ const ja = {
     "referral": {
       "inviteFriends": "友達を招待して報酬をゲット！",
       "subtitle": "コードを共有すると、友達がプレイしたときに二人とも100 XP＋50コインがもらえます。",
-      "shareText": "🎮 LexiClashで一緒に遊ぼう！ワードゲームで勝負だ！",
+      "shareText": "LexiClashで一緒に遊ぼう！ワードゲームで勝負だ！",
       "copied": "リンクをコピーしました！",
       "friendsJoined": "人の友達が参加",
       "noReferralsYet": "まだ紹介がありません"
@@ -6229,8 +6130,6 @@ const ja = {
     "partyModeDesc": "大画面で Caption / Pixel / Shadow Clash",
     "wordAlchemyMode": "ワードアルケミー",
     "wordAlchemyModeDesc": "1つの単語を次の単語へ変えよう",
-    "shiritoriMode": "しりとり",
-    "shiritoriModeDesc": "最後の文字で次の単語をつなごう",
     "sealedBidMode": "シールドビッド",
     "sealedBidModeDesc": "誰も選ばない単語を選べ — ユニークな入札で得点2倍",
     "wordfallMode": "ワードフォール",
@@ -7110,7 +7009,7 @@ const ja = {
       "bragDomination": "言葉の完全支配 👑",
       "bragCrushed": "ボードは相手にならなかった",
       "bragSolid": "今日は順調な単語狩り",
-      "cta": "これを超えられる? 🎮",
+      "cta": "これを超えられる?",
       "header": "LexiClash デイリー #{number}",
       "stats": "{words}語 • {score}点",
       "streak": "🔥 {days}日連続！",
@@ -15002,10 +14901,6 @@ const ja = {
         "tip3": "複数形を試して単語を伸ばす"
       }
     },
-    "shiritori": {
-      "name": "しりとり",
-      "description": "前の言葉の最後の文字から始めよう！"
-    },
     "sealedBid": {
       "name": "封印入札",
       "description": "他の誰も選ばない単語を入札 — ユニークな入札は得点2倍！"
@@ -15086,8 +14981,16 @@ const ja = {
     "strip": "自慢する",
     "others": "+{count}人",
     "share": "シェア",
-    "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",
-    "shareTextSolo": "⚔️ {score}点 — LexiClash"
+    "shareTextVs": "{score}–{rivalScore} vs {name} — LexiClash",
+    "shareTextSolo": "{score}点 — LexiClash",
+    "page": {
+      "titleVs": "これを超えられる？",
+      "titleSolo": "このスコアを超えられる？",
+      "sub": "登録もダウンロードも不要。次のラウンドにすぐ参加できます。",
+      "cta": "リマッチする",
+      "explore": "LexiClash を見てみる",
+      "imageAlt": "共有された LexiClash の結果"
+    }
   },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",
@@ -15609,7 +15512,7 @@ const ja = {
     "rankUp": "ランク↑{{change}}",
     "rankDown": "ランク↓{{change}}",
     "share": "まとめを共有",
-    "shareText": "LexiClashの今週: {{games}}ゲーム、{{words}}語発見、ベストスコア{{score}}。{{streak}}日連続！これを超えてみて！🎮",
+    "shareText": "LexiClashの今週: {{games}}ゲーム、{{words}}語発見、ベストスコア{{score}}。{{streak}}日連続！これを超えてみて！",
     "shareMonthlyText": "LexiClashの今月: {{games}}ゲーム、{{words}}語発見、最長の単語: {{word}}。{{improvement}}%向上！🔥",
     "noData": "まとめを見るにはゲームをプレイしよう！",
     "copied": "クリップボードにコピーしました！"
@@ -16985,11 +16888,6 @@ const ja = {
       "title": "秘密入札",
       "step1": "最高の単語をひそかに入札",
       "step2": "他とかぶらないと2倍ゲット！"
-    },
-    "shiritori": {
-      "title": "しりとり",
-      "step1": "前の言葉の最後の文字から始める",
-      "step2": "「ん」で終わったら負け"
     },
     "adventure": {
       "title": "アドベンチャー",

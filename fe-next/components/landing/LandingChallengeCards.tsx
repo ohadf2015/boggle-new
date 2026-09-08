@@ -57,7 +57,6 @@ type LandingCardKey =
   | 'brainGym'
   | 'wordCraft'
   | 'wordTower'
-  | 'shiritori'
   | 'sealedBid'
   | 'crossword'
   | 'wordfall'
@@ -75,7 +74,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTower',
-  'shiritori', 'sealedBid', 'crossword', 'wordfall',
+  'sealedBid', 'crossword', 'wordfall',
   'wordTowerV2', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
   'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
   'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
@@ -158,7 +157,6 @@ export function LandingChallengeCards({
     if (!next.includes('wordTower')) next.push('wordTower');
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
-    if (canSeeInWorkModes && !next.includes('shiritori')) next.push('shiritori');
     if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
@@ -203,7 +201,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'shiritori', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer

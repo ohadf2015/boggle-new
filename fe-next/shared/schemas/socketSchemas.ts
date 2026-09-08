@@ -192,7 +192,7 @@ export const StartGameSchema = z.object({
     emoji: z.string(),
     isHoliday: z.boolean().optional(),
   }).nullable().optional(),
-  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'shiritori', 'word-tower', 'random']).optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'random']).optional(),
   tvMode: z.boolean().optional(),
   /**
    * Optional boost token bundled with startGame so the server can register
@@ -253,14 +253,6 @@ export const ScrambleTowerSchema = z.object({}).strict();
 /** Word Tower (versus) — drop a bomb on a rival's tower. */
 export const SendTowerBombSchema = z.object({
   targetPlayerId: z.string().min(1).max(64),
-});
-
-/**
- * submitShiritoriWord event payload - Shiritori (しりとり) MP word-chain turn.
- * Hiragana words; game is resolved from the socket, like wheel-rush.
- */
-export const SubmitShiritoriWordSchema = z.object({
-  word: z.string().min(1).max(50).transform(s => s.trim()),
 });
 
 /**
@@ -468,7 +460,6 @@ export const ClientEventSchemas = {
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,
   submitWheelWord: SubmitWheelWordSchema,
-  submitShiritoriWord: SubmitShiritoriWordSchema,
   submitSealedBid: SubmitSealedBidSchema,
   submitCrosswordProgress: SubmitCrosswordProgressSchema,
   submitWordVote: SubmitWordVoteSchema,
@@ -583,7 +574,6 @@ export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
 export type SubmitTowerWordData = z.infer<typeof SubmitTowerWordSchema>;
 export type ScrambleTowerData = z.infer<typeof ScrambleTowerSchema>;
 export type SendTowerBombData = z.infer<typeof SendTowerBombSchema>;
-export type SubmitShiritoriWordData = z.infer<typeof SubmitShiritoriWordSchema>;
 export type SubmitSealedBidData = z.infer<typeof SubmitSealedBidSchema>;
 export type SubmitCrosswordProgressData = z.infer<typeof SubmitCrosswordProgressSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;

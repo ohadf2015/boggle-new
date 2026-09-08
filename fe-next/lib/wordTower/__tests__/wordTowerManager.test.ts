@@ -158,7 +158,7 @@ describe('wordTowerManager — validate (no chain)', () => {
   it('accepts any buildable, real word regardless of its first letter', () => {
     const s = freshState();
     expect(validateTowerWord(s, 'cat', isInDict)).toEqual({ accepted: true });
-    // RAT would have broken the old shiritori chain — now it is perfectly fine.
+    // RAT would have broken the old word-chain rule — now it is perfectly fine.
     expect(validateTowerWord(s, 'rat', isInDict)).toEqual({ accepted: true });
   });
 

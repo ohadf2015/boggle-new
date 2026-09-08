@@ -25,6 +25,15 @@ export interface ShareParams {
 
 type TFunction = (key: string) => string;
 
+/**
+ * NO EMOJI in share output — product decision, 2026-09-08.
+ *
+ * An emoji block-grid was built here and rejected: emoji render inconsistently
+ * across platforms, break RTL runs, and read as a Wordle knockoff beside this
+ * app's Neo-Brutalist identity. The shareable artifact is the OG image at
+ * `app/api/og/brag`, unfurled from the shared link. This function produces only
+ * the plain caption that travels with it. Guarded by a test.
+ */
 export function generateShareText(params: ShareParams, t: TFunction): string {
   const { gameMode, score, wordsFound, longestWord, maxCombo, won, opponentScore, level, puzzleNumber } = params;
 
@@ -43,13 +52,6 @@ export function generateShareText(params: ShareParams, t: TFunction): string {
   }
 
   lines.push(header);
-
-  // NO emoji grid. Coloured squares are Wordle's signature, not ours, and they
-  // say nothing about who you played or beat. Our share artifact is the
-  // avatar-and-rival brag card (components/results/MpBragCard) — the text here
-  // is only the caption that travels with it. The grid builder and the `words`
-  // param that fed it are deleted rather than left behind a flag; no caller ever
-  // passed `words`, so this emitted nothing anywhere. Guarded by a test.
 
   // Stats line
   const stats: string[] = [];

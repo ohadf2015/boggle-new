@@ -1,22 +1,22 @@
 /**
- * Shiritori is a Japanese-native mode and must ONLY be offered to ja-language
- * players. This locks that product rule. Spec: docs/2026-05-21-shiritori-mode-spec.md.
+ * `availableMpModes` is the single source of truth for which multiplayer
+ * modes a player may pick, given their GAME language. The last language-gated
+ * mode has since been retired; this now locks down that every language sees
+ * the same base rotation, and that a removed mode never reappears.
  */
 import { describe, it, expect } from 'vitest';
-import { isShiritoriAvailable, availableMpModes, BASE_MP_MODES } from '../availableModes';
+import { availableMpModes, BASE_MP_MODES } from '../availableModes';
 
-describe('shiritori JA-only availability', () => {
-  it('is available only when the game language is Japanese', () => {
-    expect(isShiritoriAvailable('ja')).toBe(true);
-    expect(isShiritoriAvailable('en')).toBe(false);
-    expect(isShiritoriAvailable('he')).toBe(false);
-    expect(isShiritoriAvailable(null)).toBe(false);
-    expect(isShiritoriAvailable(undefined)).toBe(false);
+describe('availableMpModes', () => {
+  it('returns the same base mode list regardless of language', () => {
+    expect(availableMpModes('ja')).toEqual(BASE_MP_MODES);
+    expect(availableMpModes('en')).toEqual(BASE_MP_MODES);
+    expect(availableMpModes('he')).toEqual(BASE_MP_MODES);
+    expect(availableMpModes(null)).toEqual(BASE_MP_MODES);
+    expect(availableMpModes(undefined)).toEqual(BASE_MP_MODES);
   });
 
-  it('appends shiritori to the mode list for ja, leaves others untouched', () => {
-    expect(availableMpModes('ja')).toEqual([...BASE_MP_MODES, 'shiritori']);
-    expect(availableMpModes('en')).toEqual(BASE_MP_MODES);
-    expect(availableMpModes('en')).not.toContain('shiritori');
+  it('never returns a stale/removed mode (e.g. the retired JA-only chain mode)', () => {
+    expect(availableMpModes('ja')).toEqual(['classic', 'word-hunt', 'wheel-rush']);
   });
 });

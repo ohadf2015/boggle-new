@@ -1,7 +1,7 @@
 /**
  * Test: feature-gated modes must NOT award leaderboard points / XP.
  *
- * word-tower (admin-only) and shiritori (coming-soon) are gated at game START
+ * word-tower (admin-only) and sealed-bid (admin/beta) are gated at game START
  * but their RESULT recording was previously ungated, letting them write
  * profiles.total_score + XP and pollute the season/global leaderboard.
  *
@@ -59,8 +59,8 @@ describe('processGameResults — feature-gated mode award gating', () => {
     expect(updateRankedProgress).not.toHaveBeenCalled();
   });
 
-  it('skips leaderboard/XP writes for shiritori', async () => {
-    await processGameResults('GAME2', scores as never, { gameMode: 'shiritori', language: 'en' } as never, authMap as never);
+  it('skips leaderboard/XP writes for sealed-bid', async () => {
+    await processGameResults('GAME2', scores as never, { gameMode: 'sealed-bid', language: 'en' } as never, authMap as never);
 
     expect(updatePlayerStats).not.toHaveBeenCalled();
     expect(updateLeaderboardEntry).not.toHaveBeenCalled();

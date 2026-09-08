@@ -227,89 +227,6 @@ const es = {
     "affirmGoodWord": "Bonita palabra",
     "noRush": "Tranquilo · sin prisa"
   },
-  "shiritori": {
-    "chain": "Cadena de palabras",
-    "inputLabel": "Escribe tu palabra",
-    "nextStartsWith": "La siguiente palabra empieza con",
-    "players": "Jugadores",
-    "submit": "Enviar",
-    "waitTurn": "Esperando tu turno…",
-    "wins": "¡gana!",
-    "empty": "—",
-    "winner": "¡{winner} gana!",
-    "finished": "Fin del juego",
-    "chainArrow": "→",
-    "yourTurn": "Tu turno: escribe una palabra",
-    "youWin": "¡Ganaste!",
-    "error": {
-      "too-short": "Demasiado corto — al menos 2 kana.",
-      "already-used": "Ya se usó — sin repeticiones.",
-      "bad-chain": "Debe empezar con la kana requerida.",
-      "not-a-word": "No está en el diccionario.",
-      "not-your-turn": "Espera tu turno."
-    },
-    "solo": {
-      "category": {
-        "hit": "✨ +2× {category}!"
-      },
-      "title": "Shiritori en solitario",
-      "tagline": "Encadena palabras en hiragana contra el bot.",
-      "back": "Volver a Shiritori",
-      "adminBadge": "Vista de admin",
-      "adminOnly": "Shiritori en solitario es solo una vista previa para admins.",
-      "headPrompt": "La siguiente palabra empieza con:",
-      "inputPlaceholder": "¡Mantén tu cadena viva…",
-      "submit": "Enviar",
-      "checking": "Comprobando…",
-      "giveUp": "Rendirse",
-      "confirmNewGame": "¿Empezar un juego nuevo? Perderás tu cadena actual.",
-      "again": "Jugar otra vez",
-      "won": "¡Ganaste!",
-      "lost": "Ronda terminada",
-      "botThinking": "El bot está pensando…",
-      "difficultyLabel": "Dificultad del bot",
-      "difficulty": {
-        "easy": "Fácil",
-        "medium": "Media",
-        "hard": "Difícil"
-      },
-      "err": {
-        "not-hiragana": "Solo hiragana (p. ej. ねこ).",
-        "wrong-head": "Letra inicial incorrecta — empieza por la kana resaltada.",
-        "duplicate": "Esa palabra ya se jugó.",
-        "not-in-dict": "No está en el diccionario japonés.",
-        "network": "Error de red — por favor inténtalo de nuevo."
-      },
-      "endReason": {
-        "player-no-move": "Te rendiste — gana el bot.",
-        "player-ends-n": "Tu palabra terminó en ん — gana el bot.",
-        "player-invalid": "Palabra no válida — gana el bot.",
-        "bot-no-move": "El bot se quedó sin palabras — ¡ganas tú!",
-        "bot-ends-n": "El bot terminó en ん — ¡ganas tú!"
-      },
-      "howTo": {
-        "title": "Cómo jugar",
-        "cta": "¡Entendido!",
-        "steps": [
-          "🔤 Escribe una palabra en hiragana que empiece con el kana resaltado",
-          "⛓️ Cada palabra debe empezar con el último kana de la anterior",
-          "🚫 Pierdes si terminas en ん (n), ¡y nada de repetir palabras!"
-        ]
-      },
-      "combo": {
-        "ariaLabel": "Profundidad de cadena: {{n}}",
-        "newBest": "¡Nuevo récord!",
-        "best": "Récord: {{n}}"
-      },
-      "ghost": {
-        "reveal": "👻 Turno fantasma — ×2!",
-        "score": "Puntos:"
-      },
-      "tempo": {
-        "bonus": "⚡ ¡Cadena rápida — +50%!"
-      }
-    }
-  },
   "solo": {
     "reward": {
       "comeBackTomorrow": "¡Las monedas diarias ya se reclamaron — vuelve mañana!",
@@ -321,20 +238,6 @@ const es = {
     },
     "modifier": {
       "todaysTwist": "Giro de hoy",
-      "shiritori": {
-        "longWords": {
-          "label": "Largas y Fuertes",
-          "desc": "Un día para palabras grandes y audaces."
-        },
-        "noRepeatVowel": {
-          "label": "Sequía de vocales",
-          "desc": "Mantén tus vocales frescas y variadas."
-        },
-        "speedDemon": {
-          "label": "Demonio de velocidad",
-          "desc": "El pensamiento rápido domina la cadena hoy."
-        }
-      },
       "sealedBid": {
         "noClashPenalty": {
           "label": "Día de tregua",
@@ -3198,7 +3101,6 @@ const es = {
         "wordHunt": "Caza de Palabras",
         "wheelRush": "Rueda Rápida",
         "wordTower": "Torre de Palabras",
-        "shiritori": "Shiritori",
         "sealedBid": "Puja Sellada",
         "random": "Modo Sorpresa"
       },
@@ -3208,7 +3110,6 @@ const es = {
         "wordHunt": "Caza la palabra oculta",
         "wheelRush": "Compite contra rivales en la rueda",
         "wordTower": "Apila la torre",
-        "shiritori": "Encadena las palabras",
         "sealedBid": "Supera a todos",
         "random": "Te espera una sorpresa"
       }
@@ -5652,7 +5553,7 @@ const es = {
     "referral": {
       "inviteFriends": "¡Invita amigos y gana recompensas!",
       "subtitle": "Comparte tu código y ambos ganáis 100 XP + 50 monedas cuando jueguen.",
-      "shareText": "🎮 ¡Juega a LexiClash conmigo! Te reto a un duelo de palabras.",
+      "shareText": "¡Juega a LexiClash conmigo! Te reto a un duelo de palabras.",
       "copied": "¡Enlace copiado!",
       "friendsJoined": "amigos se unieron",
       "noReferralsYet": "Aún no hay referidos"
@@ -6214,8 +6115,6 @@ const es = {
     "partyModeDesc": "Caption / Pixel / Shadow Clash en pantalla grande",
     "wordAlchemyMode": "Alquimia de Palabras",
     "wordAlchemyModeDesc": "Transforma una palabra en la siguiente",
-    "shiritoriMode": "Shiritori",
-    "shiritoriModeDesc": "Cadena de palabras japonesa — última letra inicia la siguiente",
     "sealedBidMode": "Puja secreta",
     "sealedBidModeDesc": "Elige la palabra que nadie más elegirá — pujas únicas dan el doble",
     "wordfallMode": "Cascada de palabras",
@@ -7028,7 +6927,7 @@ const es = {
       "bragDomination": "Dominación total de palabras 👑",
       "bragCrushed": "El tablero no tuvo oportunidad",
       "bragSolid": "Buena caza de palabras hoy",
-      "cta": "¿Crees que puedes superarlo? 🎮",
+      "cta": "¿Crees que puedes superarlo?",
       "header": "LexiClash Diario #{number}",
       "stats": "{words} palabras • {score} pts",
       "streak": "🔥 ¡{days} días seguidos!",
@@ -14772,11 +14671,6 @@ const es = {
       "step1": "Elige tu palabra más fuerte",
       "step2": "Palabras únicas valen el doble"
     },
-    "shiritori": {
-      "title": "Cadena de Palabras",
-      "step1": "Empieza con la última letra de la anterior",
-      "step2": "Sin repetir, nunca"
-    },
     "adventure": {
       "title": "Bate Niveles",
       "step1": "Cumple metas para avanzar",
@@ -14851,10 +14745,6 @@ const es = {
         "tip2": "Toca las letras exteriores en cualquier orden",
         "tip3": "Prueba plurales para alargar la palabra"
       }
-    },
-    "shiritori": {
-      "name": "Shiritori",
-      "description": "¡Encadena palabras — cada una empieza con la última letra de la anterior!"
     },
     "sealedBid": {
       "name": "Puja Sellada",
@@ -15153,8 +15043,16 @@ const es = {
     "strip": "Presume de esto",
     "others": "+{count} MÁS",
     "share": "Compartir",
-    "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",
-    "shareTextSolo": "⚔️ {score} pts — LexiClash"
+    "shareTextVs": "{score}–{rivalScore} vs {name} — LexiClash",
+    "shareTextSolo": "{score} pts — LexiClash",
+    "page": {
+      "titleVs": "¿Crees que puedes superarlo?",
+      "titleSolo": "¿Crees que puedes superar esa puntuación?",
+      "sub": "Sin registro y sin descargas. Entra directo a la siguiente ronda.",
+      "cta": "Jugar la revancha",
+      "explore": "O explora LexiClash",
+      "imageAlt": "Resultado compartido de LexiClash"
+    }
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
@@ -15749,7 +15647,7 @@ const es = {
     "rankUp": "Rango ↑{{change}}",
     "rankDown": "Rango ↓{{change}}",
     "share": "Compartir resumen",
-    "shareText": "Mi semana en LexiClash: {{games}} partidas, {{words}} palabras, mejor puntuación {{score}}. ¡{{streak}} días de racha! ¡Supéralo! 🎮",
+    "shareText": "Mi semana en LexiClash: {{games}} partidas, {{words}} palabras, mejor puntuación {{score}}. ¡{{streak}} días de racha! ¡Supéralo!",
     "shareMonthlyText": "Mi mes en LexiClash: {{games}} partidas, {{words}} palabras, palabra más larga: {{word}}. ¡{{improvement}}% de mejora! 🔥",
     "noData": "¡Juega algunas partidas para ver tu resumen!",
     "copied": "¡Resumen copiado!"

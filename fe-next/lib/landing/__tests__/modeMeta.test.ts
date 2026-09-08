@@ -12,7 +12,10 @@ describe('MODE_META — parity with control renderCard', () => {
   // [key, route-suffix, variant] mirrored from LandingChallengeCards.renderCard
   const PUBLIC_CONTRACT: ReadonlyArray<[string, string, string]> = [
     ['arena', '/multiplayer', 'pink'],
-    ['practice', '/practice', 'cyan'],
+    // practice is off the hub for everyone (712e2475d) — this route is never
+    // rendered by the control switch anymore. It stays real (not the retired
+    // `/practice`) because welcomeModes.ts reads it directly for email links.
+    ['practice', '/singleplayer?autoStart=practice', 'cyan'],
     ['blast', '/blast', 'orange'],
     ['adventure', '/adventure', 'lime'],
     ['connections', '/connections/pyramid', 'blue'],
@@ -121,7 +124,7 @@ describe('MODE_META — parity with control renderCard', () => {
   describe('admin modes carry the ADMIN badge', () => {
     // wordTower left this list when it was published — modeMeta.ts now gives it
     // badge 'NEW' on purpose, so asserting ADMIN here was testing a stale fact.
-    it.each(['shiritori', 'sealedBid'])(
+    it.each(['sealedBid'])(
       '%s badge=ADMIN',
       (key) => {
         expect(MODE_META[key].badge).toBe('ADMIN');

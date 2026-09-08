@@ -35,7 +35,6 @@ const WordTowerVersus = dynamic(
 // Lightweight gridless versus views (no pixi/gsap) — static-imported so they
 // never race jsdom teardown via a deferred dynamic import. WordTower stays
 // dynamic above because it pulls the pixi scene.
-import { ShiritoriVersus } from '@/components/multiplayer/shiritori/ShiritoriVersus';
 import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
@@ -368,11 +367,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Word Tower versus — per-player towers, no shared grid
   if (gameMode === 'word-tower') {
     return <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} />;
-  }
-
-  // Shiritori — turn-based word chain, no letter grid
-  if (gameMode === 'shiritori') {
-    return <ShiritoriVersus socket={socket} username={username} onQuit={onExitRoom} />;
   }
 
   // Sealed Bid — secret auction bids, no letter grid

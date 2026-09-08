@@ -123,29 +123,8 @@ describe('LandingChallengeCards — Word Tower is public', () => {
   });
 });
 
-describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
-  it('does NOT render the Shiritori card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="shiritori"]')).toBeNull();
-  });
-
-  it('renders the Shiritori card for an admin linking to the playable solo route', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="shiritori"]');
-    expect(card).toBeInTheDocument();
-    // Card must start the game, not dump the user on the /shiritori marketing
-    // page whose primary CTA bounces to /multiplayer.
-    expect(card?.getAttribute('href')).toBe('/en/shiritori/solo');
-  });
-});
-
-
 describe('LandingChallengeCards — full admin dev-preview roster', () => {
-  it('renders ALL 4 admin-gated dev preview cards for a post-newbie admin', () => {
+  it('renders ALL 3 admin-gated dev preview cards for a post-newbie admin', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('admin@example.com');
     // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
@@ -159,7 +138,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
       // Party, Word Alchemy, Word Forge and Word Vault modes were removed.
       'wordTower',          // Word Tower
-      'shiritori',          // Shiritori
       'sealedBid',          // Sealed Bid
       'wordfall',           // Wordfall (Blast V2)
     ];
@@ -178,7 +156,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
       // 'wordTower' is NOT here any more — the mode shipped publicly 2026-08-14.
-      'shiritori',
       'sealedBid',
       'wordfall',
     ];

@@ -147,7 +147,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       'word-hunt': 'wordHunt',
       'wheel-rush': 'wheelRush',
       'word-tower': 'wordTower',
-      'shiritori': 'shiritori',
       'sealed-bid': 'sealedBid',
       'crossword': 'crossword',
     };

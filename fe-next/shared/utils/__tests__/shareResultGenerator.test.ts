@@ -137,28 +137,79 @@ describe('generateShareText', () => {
 });
 
 /**
- * LexiClash never ships a Wordle-style emoji grid. Our share artifact is the
- * avatar-and-rival brag card (components/results/MpBragCard) — coloured squares
- * are someone else's signature and say nothing about who you beat. The grid
- * builder is gone; this fails if any of it grows back.
+ * REPLACES the previous "never ships an emoji grid" guard.
+ *
+ * That guard encoded a real objection: coloured squares are Wordle's signature
+ * and "say nothing about who you beat". The first half no longer holds and the
+ * second is now answered rather than overridden.
+ *
+ * What changed: production, 90d, $host-filtered. The share surface was measured.
+ *   growth:mp_brag_card_viewed     8,728 impressions / 848 people
+ *   growth:mp_brag_card_expanded       3
+ *   growth:mp_brag_card_copy_link      5 / 4 people
+ * The avatar-and-rival brag card the old comment names as "our share artifact"
+ * converts at 0.06%. It is collapsed behind a one-line disclosure strip, so
+ * effectively nobody ever sees the artifact, and the text that travels without
+ * it is a stat dump ("Score: 142 | Words: 23") that a recipient cannot rank,
+ * cannot scan in a busy chat, and has no reason to tap.
+ *
+ * Why emoji specifically, and why this is not a Wordle knockoff:
+ *  - Emoji are the only reliably FIXED-WIDTH glyph across chat clients. ASCII
+ *    bars (|=#) misalign the moment a proportional font renders them, which is
+ *    the actual reason Wordle uses squares. The mechanism is portable; the
+ *    meaning is what must be ours.
+ *  - Wordle's colours encode GUESS CORRECTNESS against a hidden answer.
+ *    Ours encode WORD LENGTH — the dimension LexiClash actually scores on. The
+ *    shape of your round is its fingerprint, and no two rounds look alike.
+ *  - It stays spoiler-free: lengths reveal no letters and no board positions,
+ *    which matters because the daily modes share one board across all players.
+ *  - The head-to-head scoreline rides along, so it still says who you beat —
+ *    the thing the old guard correctly insisted on and a bare grid loses.
  */
-describe('share text never contains a Wordle-style emoji grid', () => {
+/**
+ * NO EMOJI in share output — product decision, 2026-09-08.
+ *
+ * This replaces an emoji composition-row contract that briefly lived here. The
+ * shareable artifact is now the OG image at `app/api/og/brag`, unfurled from the
+ * shared link; the text is only its caption. Emoji render inconsistently across
+ * platforms, break RTL runs, and read as a Wordle knockoff next to the app's
+ * Neo-Brutalist identity.
+ *
+ * This guard is deliberately broad — any pictograph, dingbat, variation selector
+ * or regional indicator — so the next well-meaning grid does not grow back.
+ */
+describe('share text contains no emoji, in any mode', () => {
   const t = (k: string) => k;
-  const GRID_GLYPHS = ['\u{1F7E9}', '\u{2B1B}', '\u{1F7E8}', '\u{2B1C}', '\u{1F7E6}', '\u{1F7EA}'];
+  const EMOJI =
+    /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{20E3}\u{1F1E6}-\u{1F1FF}]/u;
 
   it.each(['singleplayer', 'multiplayer', 'blast', 'daily', 'adventure', 'wordHunt'] as const)(
-    'emits no grid squares for %s',
+    'emits no emoji for %s',
     (gameMode) => {
-      const result = generateShareText(
-        { gameMode, score: 120, wordsFound: 9, longestWord: 'ELEPHANT', maxCombo: 4, won: true, opponentScore: 90 },
+      const out = generateShareText(
+        {
+          gameMode, score: 142, wordsFound: 11, longestWord: 'SPLENDID',
+          maxCombo: 4, won: true, opponentScore: 118, level: 3, puzzleNumber: 1482,
+        },
         t
       );
-      for (const glyph of GRID_GLYPHS) expect(result).not.toContain(glyph);
+      expect(out).not.toMatch(EMOJI);
     }
   );
 
-  it('has no grid builder left to call', async () => {
+  it('has no grid or row builder left to call', async () => {
     const mod = await import('../shareResultGenerator');
     expect('generateEmojiGrid' in mod).toBe(false);
+    expect('buildShareRow' in mod).toBe(false);
+    expect('buildLengthLadder' in mod).toBe(false);
+  });
+
+  it('still carries the scoreline the image caption needs', () => {
+    const out = generateShareText(
+      { gameMode: 'multiplayer', score: 142, wordsFound: 11, won: true, opponentScore: 118 },
+      t
+    );
+    expect(out).toContain('142');
+    expect(out).toContain('118');
   });
 });

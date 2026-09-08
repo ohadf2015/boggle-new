@@ -76,12 +76,17 @@ beforeEach(() => {
 });
 
 describe('ResultsMainContent — brag card share wiring', () => {
-  it('passes the LIVE room join link as the brag share URL when a room code exists', () => {
+  it('shares a brag URL that carries the result, so the link unfurls the image', () => {
+    // Was the bare room link (/{locale}?room=CODE). og:image comes from the
+    // metadata of whatever URL is pasted, and the homepage cannot carry a
+    // per-result image without going dynamic — so the link now points at the
+    // brag page, which renders the image and passes the room code onward.
     render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
     openBrag();
     const props = bragProps.mock.calls.at(-1)?.[0];
     const parsed = new URL(props.shareUrl);
-    expect(parsed.searchParams.get('room')).toBe('ABC123');
+    expect(parsed.pathname).toMatch(/\/brag\/ABC123$/);
+    expect(parsed.searchParams.get('score')).toBeTruthy();
     expect(parsed.searchParams.get('utm_source')).toBe('brag_card');
   });
 
@@ -96,8 +101,13 @@ describe('ResultsMainContent — brag card share wiring', () => {
     render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
     openBrag();
     const props = bragProps.mock.calls.at(-1)?.[0];
-    // t() echoes the key in this harness — win vs the named rival.
+    // The artifact is the OG image on the link; the text is only its caption,
+    // so this is the localized boast and nothing else. No emoji, by product
+    // decision. t() echoes the key in this harness.
     expect(props.shareText).toBe('brag.shareTextVs');
+    expect(props.shareText).not.toMatch(
+      /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u
+    );
   });
 
   it('tracks the native share as a growth event + unified share funnel', () => {
@@ -111,6 +121,37 @@ describe('ResultsMainContent — brag card share wiring', () => {
     expect(trackGrowthEvent).toHaveBeenCalledWith(
       'share_completed',
       expect.objectContaining({ method: 'web_share_api', surface: 'mp_brag_card' })
+    );
+  });
+
+  it('copies from the strip itself, with no expand step', () => {
+    // Production 90d: 8,728 strip impressions produced 3 expands and 5 copies,
+    // so gating copy behind the chevron cost essentially every share.
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+
+    render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
+    // deliberately NOT calling openBrag()
+    fireEvent.click(screen.getByText('brag.share'));
+    expect(writeText).toHaveBeenCalledTimes(1);
+    const copied = writeText.mock.calls[0][0] as string;
+    expect(copied).toContain('brag.shareTextVs');
+    expect(copied).toMatch(/\/brag\/ABC123/);
+    expect(copied).not.toMatch(
+      /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u
+    );
+  });
+
+  it('shows the scoreline on the strip, and no emoji anywhere', () => {
+    render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
+    const text = document.body.textContent ?? '';
+    // The strip previews what gets shared rather than saying "Brag" alone.
+    expect(text).toMatch(/\d+\s*-\s*\d+|\d+/);
+    expect(text).not.toMatch(
+      /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u
     );
   });
 });

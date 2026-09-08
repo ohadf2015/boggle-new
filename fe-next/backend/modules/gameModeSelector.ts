@@ -15,8 +15,6 @@ export const GAME_MODE_WEIGHTS: Record<GameMode, number> = {
   'wheel-rush': 0.15,
   // Word Tower is admin-gated + has its own versus flow — never auto-rotated.
   'word-tower': 0,
-  // Shiritori is JA-only + turn-based; not part of the generic mode rotation.
-  'shiritori': 0,
   // Sealed Bid is an admin/beta auction mode — never auto-rotated.
   'sealed-bid': 0,
   // Crossword race is an admin/beta parallel-race mode — never auto-rotated.

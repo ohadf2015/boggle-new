@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { wordColor, textColorOn, hexToHsl } from '../towerColumn';
 
 // The vertical letter-chain model (buildTowerColumn / cellAltitudes /
-// blendColors / sharedConnectorLen) was deleted with the Shiritori chain it
+// blendColors / sharedConnectorLen) was deleted with the word-chain layout it
 // drew — a word is now ONE horizontal floor (see towerFloor.test.ts). What
 // remains is per-word colour and glyph contrast.
 

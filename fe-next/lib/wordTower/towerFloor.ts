@@ -12,7 +12,7 @@
  *     stacking game finally spend the same currency.
  *
  * Replaces the vertical one-letter-per-row model in `towerColumn.ts`, which
- * existed to render the (since retired) Shiritori chain.
+ * existed to render a (since retired) word-chain layout.
  */
 
 /** Seam between letter tiles inside one floor (px). */

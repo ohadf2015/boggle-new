@@ -1,7 +1,7 @@
 /**
  * soloReward — pure per-mode score→coin mapping + a deterministic variable bonus.
  *
- * Wires the session-only beta modes (Shiritori, Sealed Bid, Crossword)
+ * Wires the session-only beta modes (Sealed Bid, Crossword)
  * into the existing coin economy (`utils/coinManager`) WITHOUT new infra. Each mode's
  * score→coin mapping is an explicit, tested function — this is also the "is the reward
  * fair/fun" knob, so it is never an inline expression.
@@ -13,7 +13,7 @@
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { seededRandom } from './soloDaily';
 
-export type SoloMode = 'shiritori' | 'sealed-bid' | 'crossword';
+export type SoloMode = 'sealed-bid' | 'crossword';
 
 export interface SoloRewardBreakdown {
   base: number;

@@ -20,7 +20,6 @@ describe('classifyRoute', () => {
       ['/ja/word-tower', 'word-tower'],
       ['/en/word-of-the-day', 'word-of-the-day'],
       ['/en/wheel-rush', 'wheel-rush'],
-      ['/ja/shiritori', 'shiritori'],
       ['/es/practice', 'practice'],
       ['/en/adventure', 'adventure'],
       ['/en/anagram', 'anagram'],

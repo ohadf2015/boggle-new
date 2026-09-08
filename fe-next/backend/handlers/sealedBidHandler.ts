@@ -5,7 +5,7 @@
  * min length), locks it, and when every active player has locked (or the round
  * deadline fires) resolves the round ACROSS players (sealedBidManager →
  * sbMpEngine): unique bids double, clashes halve. Broadcasts the reveal, waits a
- * short window, then advances. Mirrors wheelRushHandler/shiritoriHandler shape.
+ * short window, then advances. Mirrors wheelRushHandler shape.
  */
 import type { Server, Socket } from 'socket.io';
 import type { GameState } from '../modules/gameState/types.js';
@@ -166,8 +166,7 @@ function topScorer(scores: Record<string, number>): string | null {
 }
 
 /**
- * Finalize: transition state (idempotent), clear timers, record results. Mirrors
- * finalizeShiritoriGame.
+ * Finalize: transition state (idempotent), clear timers, record results.
  */
 async function finalizeSealedBidGame(io: Server, gameCode: string, game: GameState, winner: string | null): Promise<void> {
   const transitionResult = transitionGameState(gameCode, 'END', { immediate: true });

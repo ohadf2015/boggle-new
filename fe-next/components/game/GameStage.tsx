@@ -6,8 +6,8 @@
  * Why it exists: the old `min-h-[100dvh] px-4 py-8` + `space-y-*` document
  * pattern lets the page body scroll once the play content (a growing word
  * chain, an on-screen keyboard pushing layout) exceeds the viewport. That is
- * the root cause of "in-game screen scroll" across shiritori / word-alchemy /
- * sealed-bid. GameStage caps the shell to exactly one viewport
+ * the root cause of "in-game screen scroll" across word-alchemy / sealed-bid.
+ * GameStage caps the shell to exactly one viewport
  * (`h-[100dvh] overflow-hidden flex flex-col`) and confines scrolling to the
  * middle body region, so the header (HUD) and footer (input/controls) stay
  * pinned while only the play area scrolls when it must.

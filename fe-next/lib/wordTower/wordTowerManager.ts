@@ -56,9 +56,9 @@ export function chainLetter(word: string, language: Language): string {
   return c.charAt(c.length - 1);
 }
 
-// Word-final letters that tend to strand the Shiritori chain (vowels / Hebrew
+// Word-final letters that tend to strand the word-chain (vowels / Hebrew
 // matres lectionis). JA kana always end in a vowel sound, so the rule is off
-// there (that IS shiritori).
+// there.
 const CHAIN_VOWELS: Record<Language, string> = {
   en: 'AEIOU', he: 'אהוי', sv: 'AEIOU', es: 'AEIOU', ja: '', fr: 'AEIOU', de: 'AEIOU', ru: 'АЕИОУЫ',
 };

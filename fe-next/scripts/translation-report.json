@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6689,
+    "totalKeysInCode": 6757,
     "keyCountByLanguage": {
-      "en": 12765,
-      "es": 13073,
-      "he": 12975,
-      "ja": 13035,
-      "ru": 12807,
-      "sv": 13031
+      "en": 12804,
+      "es": 13112,
+      "he": 13014,
+      "ja": 13074,
+      "ru": 12846,
+      "sv": 13070
     },
     "missingFromEnglish": 83,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 348,
+      "templateLiterals": 344,
       "fallbackUsages": 1,
-      "variableKeys": 129
+      "variableKeys": 131
     }
   },
   "runtimeRisks": {
@@ -95,27 +95,6 @@
         "file": "app/[locale]/sealed-bid/page.tsx",
         "line": 270,
         "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
-      },
-      {
-        "pattern": "`shiritori.solo.err.${r.reason}`",
-        "type": "template_literal",
-        "file": "app/[locale]/shiritori/solo/page.tsx",
-        "line": 202,
-        "context": "setError(t(`shiritori.solo.err.${r.reason}`));"
-      },
-      {
-        "pattern": "`shiritori.solo.category.${catBonus.category}`",
-        "type": "template_literal",
-        "file": "app/[locale]/shiritori/solo/page.tsx",
-        "line": 222,
-        "context": "toast(t('shiritori.solo.category.hit', { category: t(`shiritori.solo.category.${catBonus.category}`)"
-      },
-      {
-        "pattern": "`shiritori.solo.endReason.${state.endReason}`",
-        "type": "template_literal",
-        "file": "app/[locale]/shiritori/solo/page.tsx",
-        "line": 375,
-        "context": "{t(`shiritori.solo.endReason.${state.endReason}`)}"
       },
       {
         "pattern": "`achievements.${achievement.key}.name`",
@@ -1157,7 +1136,7 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`",
         "type": "template_literal",
         "file": "components/connections/pyramid/PyramidChallenge.tsx",
-        "line": 225,
+        "line": 251,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]"
       },
       {
@@ -1276,7 +1255,7 @@
         "pattern": "`daily.weeklyChest.tier${tierKey}`",
         "type": "template_literal",
         "file": "components/daily/WeeklyChestModal.tsx",
-        "line": 66,
+        "line": 83,
         "context": "const tierLabel = t(`daily.weeklyChest.tier${tierKey}`)"
       },
       {
@@ -1367,7 +1346,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 298,
+        "line": 296,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
@@ -1712,13 +1691,6 @@
         "file": "components/multiplayer/sealedBid/SealedBidVersus.tsx",
         "line": 237,
         "context": "{r.word ?? '—'} · {t(`sealedBidMp.outcome.${r.outcome}`)} ·{' '}"
-      },
-      {
-        "pattern": "`shiritori.error.${lastError}`",
-        "type": "template_literal",
-        "file": "components/multiplayer/shiritori/ShiritoriView.tsx",
-        "line": 204,
-        "context": "{t(`shiritori.error.${lastError}`)}"
       },
       {
         "pattern": "`offline.queue.status.${status}`",
@@ -2809,7 +2781,15 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/auth/FirstWinSignupModal.tsx",
-        "line": 164,
+        "line": 234,
+        "context": "{t(subtitleKey)}"
+      },
+      {
+        "pattern": "t(subtitleKey)",
+        "variable": "subtitleKey",
+        "type": "variable_key",
+        "file": "components/auth/FirstWinSignupModal.tsx",
+        "line": 331,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -2931,6 +2911,14 @@
         "line": 85,
         "context": "<span className=\"font-neo-display text-lg\">{t(affirmKey)}</span>",
         "type": "variable_key"
+      },
+      {
+        "pattern": "t(twistTitleKey)",
+        "variable": "twistTitleKey",
+        "type": "variable_key",
+        "file": "components/daily/DailySeasonRibbon.tsx",
+        "line": 46,
+        "context": "const twistTitleRaw = t(twistTitleKey);"
       },
       {
         "pattern": "t(descKey)",
@@ -3225,7 +3213,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 640,
+        "line": 420,
         "context": "return t(key, params);"
       },
       {
@@ -3257,7 +3245,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 300,
+        "line": 306,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3265,7 +3253,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 300,
+        "line": 306,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3377,7 +3365,7 @@
         "variable": "nameKey",
         "type": "variable_key",
         "file": "host/components/pre-game/BattleModeCard.tsx",
-        "line": 187,
+        "line": 181,
         "context": "{t(nameKey)}"
       },
       {
@@ -3489,7 +3477,7 @@
         "variable": "modeKey",
         "type": "variable_key",
         "file": "shared/utils/shareResultGenerator.ts",
-        "line": 35,
+        "line": 44,
         "context": "let header = t(modeKey);"
       },
       {
