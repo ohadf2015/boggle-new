@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Gavel, Grid2x2, Brain } from 'lucide-react';
+import { m, AnimatePresence } from 'framer-motion';
+import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Grid3x3, UserPlus, X, Clock, Building2, Grid2x2, Gavel, Brain } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -224,8 +225,16 @@ export function ClassroomModeBanner({
         )}
       </div>
 
-      {showPanel && (
-        <div className="w-full px-3 sm:px-4 pt-3 pb-4">
+      <AnimatePresence initial={false}>
+        {showPanel && (
+          <m.div
+            key="classroom-lobby-panel"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+            className="w-full px-3 sm:px-4 pt-3 pb-4"
+          >
           <div
             className={cn(
               'max-w-5xl mx-auto grid gap-4 sm:gap-5',
@@ -372,8 +381,9 @@ export function ClassroomModeBanner({
               )}
             </div>
           </div>
-        </div>
-      )}
+          </m.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
