@@ -109,7 +109,7 @@ export default function DuelChallengeModal({
             type="button"
             onClick={onClose}
             className="text-neo-white hover:text-neo-white transition-colors"
-            aria-label={t('common.close', 'Close')}
+            aria-label={t('common.close')}
           >
             <X className="w-6 h-6" />
           </button>

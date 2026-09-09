@@ -39,10 +39,10 @@ export default function CreateClassroomWizard({
     >
       <div className="text-center mb-6">
         <h3 className="text-xl sm:text-2xl font-neo-display font-black text-black text-balance">
-          {t('teacher.classroom.wizard.title', 'Get students in 3 steps')}
+          {t('teacher.classroom.wizard.title')}
         </h3>
         <p className="mt-1 text-sm font-neo-body font-bold text-black/60 text-pretty">
-          {t('teacher.classroom.wizard.subtitle', "You'll have a join code in under a minute.")}
+          {t('teacher.classroom.wizard.subtitle')}
         </p>
       </div>
 
@@ -87,7 +87,7 @@ export default function CreateClassroomWizard({
           )}
         >
           <Plus className="size-5" aria-hidden="true" />
-          {t('teacher.classroom.create', 'Create Classroom')}
+          {t('teacher.classroom.create')}
         </button>
       </div>
     </div>

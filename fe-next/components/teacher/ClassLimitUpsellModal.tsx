@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { TEACHER_PRO_PRICE_USD, FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X, Zap } from 'lucide-react';
@@ -63,7 +64,7 @@ export default function ClassLimitUpsellModal({
                 <p className="font-bold text-black">
                   {t('teacher.subscription.classLimitMessage', {
                     current: currentCount,
-                    limit: limit || 2,
+                    limit: limit ?? FREE_TIER_LIMITS.classes,
                   })}
                 </p>
               </div>
@@ -93,7 +94,7 @@ export default function ClassLimitUpsellModal({
                 {t('teacher.subscription.priceUSD')}
               </p>
               <p className="text-3xl font-neo-display font-black text-neo-cyan">
-                $9{' '}
+                ${TEACHER_PRO_PRICE_USD}{' '}
                 <span className="text-lg text-black/60 font-bold">
                   {t('teacher.subscription.perMonth')}
                 </span>

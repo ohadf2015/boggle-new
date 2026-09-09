@@ -219,7 +219,7 @@ export default function TeacherDashboard() {
                 className="size-4 shrink-0 transition-transform group-open:rotate-180"
                 aria-hidden="true"
               />
-              {t('teacher.dashboard.tools', 'Class tools')}
+              {t('teacher.dashboard.tools')}
             </summary>
 
             <div className="space-y-8 border-t-2 border-black/30 px-5 py-6">
