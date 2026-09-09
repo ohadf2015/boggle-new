@@ -6,8 +6,10 @@ vi.mock('@/lib/polar', () => ({
   PolarClient: { validateWebhookSignature: () => signatureValid },
 }))
 const upsertSubscription = vi.fn()
+const grantProFromOrder = vi.fn()
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
+  grantProFromOrder: (...args: unknown[]) => grantProFromOrder(...args),
   logSubscriptionEvent: vi.fn(),
 }))
 
@@ -114,5 +116,37 @@ describe('polar webhook', () => {
       })
     )
     expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({ userId: 'u2' }))
+  })
+
+  describe('order events — belt-and-braces grant that must not own the row', () => {
+    // 2026-09-09 production: order.created arrived ~1.5s after subscription.active
+    // and its full upsert wiped current_period_end + the provider subscription id.
+    // The route now delegates to grantProFromOrder, which stamps only the order id
+    // when a provider row exists.
+
+    it('order.created with the Pro product grants via the order path', async () => {
+      const res = await POST(
+        polarEvent('order.created', { id: 'ord_1', product_id: PRO_PRODUCT_ID, metadata: { user_id: 'u1' } })
+      )
+      expect(await res.json()).toMatchObject({ received: true })
+      expect(grantProFromOrder).toHaveBeenCalledWith({ userId: 'u1', providerOrderId: 'ord_1' })
+      expect(upsertSubscription).not.toHaveBeenCalled()
+    })
+
+    it('order.paid grants via the same order path', async () => {
+      const res = await POST(
+        polarEvent('order.paid', { id: 'ord_1', product_id: PRO_PRODUCT_ID, metadata: { user_id: 'u1' } })
+      )
+      expect(await res.json()).toMatchObject({ received: true })
+      expect(grantProFromOrder).toHaveBeenCalledWith({ userId: 'u1', providerOrderId: 'ord_1' })
+    })
+
+    it('order.created with a non-Pro product grants nothing', async () => {
+      await POST(
+        polarEvent('order.created', { id: 'ord_2', product_id: 'prod-something-else', metadata: { user_id: 'u1' } })
+      )
+      expect(grantProFromOrder).not.toHaveBeenCalled()
+      expect(upsertSubscription).not.toHaveBeenCalled()
+    })
   })
 })

@@ -189,11 +189,15 @@ export async function canAddStudent(
   const teacherId = classroomData[0].teacher_id
   const subscription = await checkTeacherSubscription(teacherId)
 
-  // Count current students in this classroom
+  // Count current students in this classroom. The teacher's own membership (a
+  // teacher joining their own class with the student join code — first seen with
+  // the first paying teacher, 2026-09-09) is a preview, not a student seat, and
+  // must not burn one seat of the free cap.
   const { count } = await admin
     .from('classroom_memberships')
     .select('*', { count: 'exact', head: true })
     .eq('classroom_id', classroomId)
+    .neq('student_id', teacherId)
 
   const currentCount = count || 0
 
@@ -293,6 +297,67 @@ export async function upsertSubscription({
     console.error('[Subscription] Failed to upsert:', error)
     throw error
   }
+}
+
+/**
+ * Belt-and-braces Pro grant from an ORDER event (order.created / order.paid).
+ *
+ * Order events exist to grant Pro when the subscription events were missed —
+ * and they arrive in the same burst as those subscription events, almost always
+ * AFTER them. A full upsert here would overwrite the row the subscription event
+ * just wrote: `currentPeriodEnd` defaults to null and no providerSubscriptionId
+ * is passed, so both fields the subscription event had just stamped get wiped.
+ * Seen in production 2026-09-09 (the first paying Teacher Pro): subscription.active
+ * wrote the renewal date at 00:50:32Z, order.created nulled it again at 00:50:33Z,
+ * and the dashboard showed a paying teacher a row with no renewal date and no
+ * subscription id.
+ *
+ * Rule:
+ * - Provider-owned row (source polar/lemon_squeezy, or NULL source on a row that
+ *   predates the column) → stamp ONLY the order id. Subscription events own the
+ *   lifecycle of these rows; an order event only records which order paid.
+ * - No row, or an admin grant → the full belt-and-braces upsert. A payment
+ *   replaces a gift (same rule as upsertSubscription, which clears grant_id).
+ */
+export async function grantProFromOrder({
+  userId,
+  providerOrderId,
+}: {
+  userId: string
+  providerOrderId: string
+}): Promise<void> {
+  const supabase = createAdminClient() ?? (await createClient())
+
+  const { data: existing, error: readError } = await supabase
+    .from('subscriptions')
+    .select('tier,status,source,current_period_end')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (readError) {
+    // A read failure must not block the grant — fall through to the upsert,
+    // which is idempotent and self-healing on the next event.
+    console.error('[Subscription] grantProFromOrder: read failed, falling back to upsert:', readError)
+  }
+
+  if (existing && !readError && existing.source !== 'admin_grant') {
+    const { error } = await supabase
+      .from('subscriptions')
+      .update({ lemon_squeezy_order_id: providerOrderId })
+      .eq('user_id', userId)
+    if (error) {
+      console.error('[Subscription] grantProFromOrder: failed to stamp order id:', error)
+      throw error
+    }
+    return
+  }
+
+  await upsertSubscription({
+    userId,
+    tier: 'pro',
+    status: 'active',
+    providerOrderId,
+  })
 }
 
 /**

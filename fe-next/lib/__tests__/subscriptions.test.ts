@@ -114,10 +114,7 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classrooms') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: CLASSES - 1,
-                  error: null,
-                }),
+                eq: vi.fn().mockResolvedValue({ count: CLASSES - 1, error: null }),
               }),
             };
           }
@@ -159,10 +156,7 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classrooms') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: CLASSES,
-                  error: null,
-                }),
+                eq: vi.fn().mockResolvedValue({ count: CLASSES, error: null }),
               }),
             };
           }
@@ -205,10 +199,7 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classrooms') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 5,
-                  error: null,
-                }),
+                eq: vi.fn().mockResolvedValue({ count: 5, error: null }),
               }),
             };
           }
@@ -250,10 +241,7 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classrooms') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 100,
-                  error: null,
-                }),
+                eq: vi.fn().mockResolvedValue({ count: 100, error: null }),
               }),
             };
           }
@@ -294,10 +282,7 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classrooms') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 3,
-                  error: null,
-                }),
+                eq: vi.fn().mockResolvedValue({ count: 3, error: null }),
               }),
             };
           }
@@ -350,9 +335,16 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classroom_memberships') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 0,
-                  error: null,
+                eq: vi.fn().mockReturnValue({
+
+                  neq: vi.fn().mockResolvedValue({
+
+                    count: 0,
+
+                    error: null,
+
+                  }),
+
                 }),
               }),
             };
@@ -404,9 +396,16 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classroom_memberships') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: STUDENTS - 1,
-                  error: null,
+                eq: vi.fn().mockReturnValue({
+
+                  neq: vi.fn().mockResolvedValue({
+
+                    count: STUDENTS - 1,
+
+                    error: null,
+
+                  }),
+
                 }),
               }),
             };
@@ -457,9 +456,16 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classroom_memberships') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: STUDENTS,
-                  error: null,
+                eq: vi.fn().mockReturnValue({
+
+                  neq: vi.fn().mockResolvedValue({
+
+                    count: STUDENTS,
+
+                    error: null,
+
+                  }),
+
                 }),
               }),
             };
@@ -511,9 +517,11 @@ describe('Subscription tier limits', () => {
           } else if (table === 'classroom_memberships') {
             return {
               select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockResolvedValue({
-                  count: 500,
-                  error: null,
+                eq: vi.fn().mockReturnValue({
+                  neq: vi.fn().mockResolvedValue({
+                    count: 500,
+                    error: null,
+                  }),
                 }),
               }),
             };

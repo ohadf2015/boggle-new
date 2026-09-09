@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
-import { upsertSubscription, logSubscriptionEvent, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
+import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
         await handleSubscriptionRevoked(payload, userId)
         break
       case 'order.created':
+      case 'order.paid':
         await handleOrderCreated(payload, userId)
         break
       default:
@@ -181,17 +182,18 @@ async function handleSubscriptionRevoked(payload: WebhookPayload, userId?: strin
   })
 }
 
-/** One-off purchases / first subscription order — belt-and-braces Pro grant. */
+/**
+ * One-off purchases / first subscription order — belt-and-braces Pro grant.
+ *
+ * Delegates to grantProFromOrder: when the subscription events already wrote
+ * the row (the common case — they arrive first in the same burst), this only
+ * stamps the order id and leaves the provider-owned fields (renewal date,
+ * subscription id) untouched.
+ */
 async function handleOrderCreated(payload: WebhookPayload, userId?: string) {
   if (!userId) return
   const data = payload?.data ?? {}
   const productId = getProductId(payload)
   if (getTierFromProductId(productId) !== 'pro') return
-  await upsertSubscription({
-    userId,
-    tier: 'pro',
-    status: 'active',
-    providerOrderId: String(data.id ?? ''),
-    providerProductId: productId,
-  })
+  await grantProFromOrder({ userId, providerOrderId: String(data.id ?? '') })
 }
