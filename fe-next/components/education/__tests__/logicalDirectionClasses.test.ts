@@ -28,6 +28,10 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     tokens: ['left-0', 'right-0', 'border-l-4', 'border-r-4', 'rounded-l-neo-lg', 'rounded-r-neo-lg'],
     why: 'the mobile drawer already mirrors ALL SIX inside one isRTL ternary — RTL gets left-0/border-r-4/rounded-r-neo-lg, LTR gets right-0/border-l-4/rounded-l-neo-lg, so border and radius are on the inner edge in both directions',
   },
+  'education/EducationMenuDropdown.tsx': {
+    tokens: ['left-0', 'right-0'],
+    why: 'dropdown alignment mirrors inside one isRTL ternary (RTL hangs left-0, LTR right-0)',
+  },
   'education/student-preview/PreviewWaitingScreen.tsx': {
     tokens: ['border-r-neo-cyan'],
     why: 'same animate-spin loader arc',
