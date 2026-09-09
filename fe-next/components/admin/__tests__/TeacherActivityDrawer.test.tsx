@@ -73,9 +73,26 @@ const details = (over: Partial<TeacherActivityDetails> = {}): TeacherActivityDet
       language: 'en',
       createdAt: '2026-08-01T00:00:00Z',
       wordCount: 12,
+      words: ['cat', 'dog'],
       sourceGameCode: null,
     },
   ],
+  gamesByClassroom: {
+    c1: [
+      {
+        gameCode: 'ROOM42',
+        gameMode: 'classic',
+        playedAt: '2026-08-22T10:00:00Z',
+        playerCount: 1,
+        rosterCount: 1,
+        coveragePct: 80,
+        averageAccuracyPct: 75,
+        topPlayers: [{ name: 'Sally', score: 120 }],
+        missedWords: ['hat'],
+      },
+    ],
+  },
+  plan: { tier: 'pro', hasPro: true, periodEnd: '2026-10-01T00:00:00Z' },
   assignments: [
     {
       id: 'a1',

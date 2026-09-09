@@ -12,7 +12,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
-import { buildTeacherActivity } from '@/lib/education/teacherActivity';
+import { buildTeacherActivity, slimClassroomGame } from '@/lib/education/teacherActivity';
+import { getRecentClassroomGames } from '@/lib/supabase/analyticsLastGame';
+import { checkTeacherSubscription } from '@/lib/subscriptions';
 
 interface RouteContext {
   params: Promise<{ userId: string }>;
@@ -114,6 +116,25 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: followError.message }, { status: 500 });
   }
 
+  // Recent live games per classroom + subscription state. Game reads use the
+  // service-role client (teacher-row RLS would silently hide them) and degrade
+  // to an empty list per classroom — a games-read failure must not 500 the
+  // whole drill-down.
+  const gamesByClassroom: Record<string, ReturnType<typeof slimClassroomGame>[]> = {};
+  await Promise.all(
+    classroomIds.map(async (classroomId) => {
+      const { data } = await getRecentClassroomGames(
+        classroomId,
+        5,
+        { fallbackName: 'Student' },
+        supabase,
+      );
+      gamesByClassroom[classroomId] = (data ?? []).map(slimClassroomGame);
+    }),
+  );
+
+  const subscription = await checkTeacherSubscription(userId);
+
   return NextResponse.json(
     buildTeacherActivity({
       userId,
@@ -124,6 +145,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
       lessons,
       assignments: assignmentsRes.data ?? [],
       progress: progressRes.data ?? [],
+      gamesByClassroom,
+      plan: {
+        tier: subscription.tier,
+        hasPro: subscription.tier === 'pro' && subscription.status === 'active',
+        periodEnd: subscription.current_period_end,
+      },
     }),
   );
 }

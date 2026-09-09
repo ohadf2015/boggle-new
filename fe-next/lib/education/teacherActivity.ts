@@ -59,6 +59,66 @@ export interface TeacherActivityInput {
     total_xp: number | null;
     words_mastered: string[] | null;
   }>;
+  /** Recent live games per classroom, already slimmed by the route. */
+  gamesByClassroom?: Record<string, ClassroomGameSummary[]>;
+  /** Subscription state from lib/subscriptions checkTeacherSubscription. */
+  plan?: {
+    tier: string;
+    hasPro: boolean;
+    periodEnd: string | null;
+  };
+}
+
+/**
+ * The admin-safe slice of a classroom game for the drill-down. Deliberately
+ * slimmer than RecentClassroomGame: no per-player accuracy arrays, no full
+ * word banks — enough to see WHAT was played and how it went.
+ */
+export interface ClassroomGameSummary {
+  gameCode: string;
+  gameMode: string;
+  playedAt: string;
+  playerCount: number;
+  rosterCount: number | null;
+  coveragePct: number;
+  averageAccuracyPct: number;
+  topPlayers: Array<{ name: string; score: number }>;
+  /** Highest miss-rate lesson words first, capped. */
+  missedWords: string[];
+}
+
+export const GAME_SUMMARY_MISSED_WORD_CAP = 5;
+export const GAME_SUMMARY_TOP_PLAYER_CAP = 3;
+
+/**
+ * Reduce a full RecentClassroomGame to the admin drill-down slice. Pure so the
+ * route stays dumb and the shape is testable without a database.
+ */
+export function slimClassroomGame(game: {
+  gameCode: string;
+  gameMode: string;
+  playedAt: string;
+  players: Array<{ name: string; score: number }>;
+  participation: { played: number; roster: number };
+  coveragePct: number;
+  averageAccuracyPct: number;
+  missedWords: Array<{ word: string }>;
+}): ClassroomGameSummary {
+  return {
+    gameCode: game.gameCode,
+    gameMode: game.gameMode,
+    playedAt: game.playedAt,
+    playerCount: game.participation.played,
+    rosterCount: game.participation.roster,
+    coveragePct: game.coveragePct,
+    averageAccuracyPct: game.averageAccuracyPct,
+    topPlayers: game.players
+      .slice(0, GAME_SUMMARY_TOP_PLAYER_CAP)
+      .map((p) => ({ name: p.name, score: p.score })),
+    missedWords: game.missedWords
+      .slice(0, GAME_SUMMARY_MISSED_WORD_CAP)
+      .map((m) => m.word),
+  };
 }
 
 export interface TeacherActivityDetails {
@@ -88,8 +148,17 @@ export interface TeacherActivityDetails {
     language: string | null;
     createdAt: string | null;
     wordCount: number;
+    /** First words of the list (capped) — enough to see content without the full bank. */
+    words: string[];
     sourceGameCode: string | null;
   }>;
+  /** classroomId → recent games, newest first. Empty record when none played. */
+  gamesByClassroom: Record<string, ClassroomGameSummary[]>;
+  plan: {
+    tier: string;
+    hasPro: boolean;
+    periodEnd: string | null;
+  };
   assignments: Array<{
     id: string;
     title: string | null;
@@ -115,9 +184,33 @@ function wordCountOf(words: unknown): number {
   return Array.isArray(words) ? words.length : 0;
 }
 
+/**
+ * Lesson `words` banks are polymorphic in the wild: legacy rows are plain
+ * strings, newer rows are { word: 'cat' }-style objects. The admin drill-down
+ * only needs a readable preview, so normalize both and cap the slice.
+ */
+export const WORD_PREVIEW_CAP = 40;
+
+function wordPreviewOf(words: unknown): string[] {
+  if (!Array.isArray(words)) return [];
+  const out: string[] = [];
+  for (const entry of words) {
+    if (typeof entry === 'string') {
+      if (entry) out.push(entry);
+    } else if (entry && typeof entry === 'object' && typeof (entry as { word?: unknown }).word === 'string') {
+      const w = (entry as { word: string }).word;
+      if (w) out.push(w);
+    }
+    if (out.length >= WORD_PREVIEW_CAP) break;
+  }
+  return out;
+}
+
 export function buildTeacherActivity(input: TeacherActivityInput): TeacherActivityDetails {
   const { userId, profile, request, classrooms, memberships, lessons, assignments, progress } =
     input;
+  const gamesByClassroom = input.gamesByClassroom ?? {};
+  const plan = input.plan ?? { tier: 'free', hasPro: false, periodEnd: null };
 
   const studentsByClassroom = new Map<string, Array<{ id: string; joinedAt: string | null }>>();
   for (const m of memberships) {
@@ -182,8 +275,11 @@ export function buildTeacherActivity(input: TeacherActivityInput): TeacherActivi
       language: l.language,
       createdAt: l.created_at,
       wordCount: wordCountOf(l.words),
+      words: wordPreviewOf(l.words),
       sourceGameCode: l.source_game_code,
     })),
+    gamesByClassroom,
+    plan,
     assignments: assignments.map((a) => ({
       id: a.id,
       title: a.title || (a.lesson_id ? lessonNameById.get(a.lesson_id) ?? null : null),

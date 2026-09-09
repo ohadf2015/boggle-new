@@ -11583,6 +11583,10 @@ const en = {
         "title": "See how your class is really doing",
         "body": "Pro turns every game into a picture of your class: which words are sticking, which students are stuck, and how far each one has come since September. Bring it to a parent evening or a department meeting."
       },
+      "reports": {
+        "title": "Progress reports are a Pro feature",
+        "body": "See how every student is doing across all your classes and games: words mastered, levels, XP, and printable PDFs for parent evenings. Upgrade to Teacher Pro to unlock class and student reports."
+      },
       "cta": "Unlock this with Pro — ${{price}}/month"
     },
     "subscription": {

@@ -158,7 +158,18 @@ function TeacherReportsInner() {
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
+import { ProGate } from '@/components/teacher/ProGate';
 
+// Reports are a Pro surface (planMatrix: analytics/reports are what the money
+// buys; last-game insights on the dashboard stay free). The gate swaps the
+// whole page for the upsell — same merchandising-boundary pattern as the
+// analytics dashboard.
 export default function TeacherReportsPage() {
-  return <TeacherGate><TeacherReportsInner /></TeacherGate>;
+  return (
+    <TeacherGate>
+      <ProGate feature="reports">
+        <TeacherReportsInner />
+      </ProGate>
+    </TeacherGate>
+  );
 }
