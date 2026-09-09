@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildTeacherActivity,
+  slimClassroomGame,
   type TeacherActivityInput,
 } from '../teacherActivity';
 
@@ -111,7 +112,8 @@ describe('buildTeacherActivity', () => {
       }),
     );
 
-    // THEN wordCount is the array length and sourceGameCode is forwarded
+    // THEN wordCount is the array length, the word preview is extracted and
+    // sourceGameCode is forwarded
     expect(out.wordlists).toEqual([
       {
         id: 'l1',
@@ -119,9 +121,31 @@ describe('buildTeacherActivity', () => {
         language: 'en',
         createdAt: '2026-08-01T00:00:00Z',
         wordCount: 3,
+        words: ['cat', 'dog', 'hat'],
         sourceGameCode: 'ROOM1',
       },
     ]);
+  });
+
+  it('shouldNormalizeStringWordBanksAndCapThePreviewAtForty', () => {
+    const out = buildTeacherActivity(
+      input({
+        lessons: [
+          {
+            id: 'l2',
+            name: 'Legacy',
+            language: 'en',
+            created_at: '2026-08-01T00:00:00Z',
+            words: Array.from({ length: 60 }, (_, i) => `w${i}`),
+            source_game_code: null,
+          },
+        ],
+      }),
+    );
+
+    expect(out.wordlists[0].wordCount).toBe(60);
+    expect(out.wordlists[0].words).toHaveLength(40);
+    expect(out.wordlists[0].words[0]).toBe('w0');
   });
 
   it('shouldTreatNonArrayWordsAsZeroWhenCountingWordlistSize', () => {
@@ -325,5 +349,88 @@ describe('buildTeacherActivity', () => {
     expect(out.wordlists).toEqual([]);
     expect(out.assignments).toEqual([]);
     expect(out.completions).toEqual([]);
+  });
+
+  it('shouldDefaultPlanToFreeAndGamesToEmptyRecord', () => {
+    const out = buildTeacherActivity(input());
+
+    expect(out.plan).toEqual({ tier: 'free', hasPro: false, periodEnd: null });
+    expect(out.gamesByClassroom).toEqual({});
+  });
+
+  it('shouldForwardPlanAndGamesWhenProvided', () => {
+    const game = {
+      gameCode: 'R1',
+      gameMode: 'classic',
+      playedAt: '2026-09-01T10:00:00Z',
+      playerCount: 2,
+      rosterCount: 2,
+      coveragePct: 66,
+      averageAccuracyPct: 70,
+      topPlayers: [{ name: 'Sally', score: 100 }],
+      missedWords: ['hat'],
+    };
+    const out = buildTeacherActivity(
+      input({
+        plan: { tier: 'pro', hasPro: true, periodEnd: '2026-10-01T00:00:00Z' },
+        gamesByClassroom: { c1: [game] },
+      }),
+    );
+
+    expect(out.plan.hasPro).toBe(true);
+    expect(out.gamesByClassroom.c1).toHaveLength(1);
+    expect(out.gamesByClassroom.c1[0].gameCode).toBe('R1');
+  });
+});
+
+describe('slimClassroomGame', () => {
+  const fullGame = {
+    gameCode: 'ROOM1',
+    gameMode: 'vocab-quiz',
+    playedAt: '2026-09-01T10:00:00Z',
+    players: [
+      { name: 'A', score: 100 },
+      { name: 'B', score: 90 },
+      { name: 'C', score: 80 },
+      { name: 'D', score: 70 },
+    ],
+    participation: { played: 3, roster: 4 },
+    coveragePct: 55.4,
+    averageAccuracyPct: 61.2,
+    missedWords: [
+      { word: 'one' },
+      { word: 'two' },
+      { word: 'three' },
+      { word: 'four' },
+      { word: 'five' },
+      { word: 'six' },
+    ],
+  };
+
+  it('shouldKeepCountsAndCapsLists', () => {
+    const out = slimClassroomGame(fullGame);
+
+    expect(out).toEqual({
+      gameCode: 'ROOM1',
+      gameMode: 'vocab-quiz',
+      playedAt: '2026-09-01T10:00:00Z',
+      playerCount: 3,
+      rosterCount: 4,
+      coveragePct: 55.4,
+      averageAccuracyPct: 61.2,
+      topPlayers: [
+        { name: 'A', score: 100 },
+        { name: 'B', score: 90 },
+        { name: 'C', score: 80 },
+      ],
+      missedWords: ['one', 'two', 'three', 'four', 'five'],
+    });
+  });
+
+  it('shouldTolerateEmptyPlayersAndMissedWords', () => {
+    const out = slimClassroomGame({ ...fullGame, players: [], missedWords: [] });
+
+    expect(out.topPlayers).toEqual([]);
+    expect(out.missedWords).toEqual([]);
   });
 });

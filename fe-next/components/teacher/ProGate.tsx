@@ -33,7 +33,7 @@ import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
  * THIS array, so adding a feature here fails that test until its copy exists in
  * all six locales.
  */
-export const PRO_FEATURES = ['analytics'] as const;
+export const PRO_FEATURES = ['analytics', 'reports'] as const;
 
 export type ProFeature = (typeof PRO_FEATURES)[number];
 

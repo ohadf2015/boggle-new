@@ -191,19 +191,26 @@ function buildGame(
  * The most recent live games of a classroom, newest first.
  * Errors on the primary query are returned; roster/name lookups degrade
  * gracefully (numbered fallback names, roster = players) but are logged.
+ *
+ * `client` overrides the module-level anon client — the admin drill-down
+ * passes the service-role client because practice_sessions RLS is
+ * teacher-row-scoped and an admin reading another teacher's games would
+ * otherwise silently see an empty list.
  */
 export async function getRecentClassroomGames(
   classroomId: string,
   limit: number = 5,
-  options: GetRecentClassroomGamesOptions = {}
+  options: GetRecentClassroomGamesOptions = {},
+  client?: typeof supabase,
 ): Promise<{ data: RecentClassroomGame[]; error: { message: string } | null }> {
-  if (!supabase) {
+  const db = client ?? supabase;
+  if (!db) {
     return { data: [], error: { message: 'Supabase not configured' } };
   }
   const fallbackName = options.fallbackName ?? 'Student';
 
   try {
-    const { data: rows, error } = await supabase
+    const { data: rows, error } = await db
       .from('practice_sessions')
       .select('student_id, score, total_score, mode, completed_at, results')
       .eq('classroom_id', classroomId)
@@ -237,7 +244,7 @@ export async function getRecentClassroomGames(
     // the grid its "did not play" column, the count keeps participation honest.
     // It runs before the profile lookup so absentees get real names too; a
     // roster failure degrades to "no absentees", never to a broken card.
-    const rosterResult = await supabase
+    const rosterResult = await db
       .from('classroom_memberships')
       .select('student_id, joined_at', { count: 'exact' })
       .eq('classroom_id', classroomId);
@@ -266,7 +273,7 @@ export async function getRecentClassroomGames(
       ...rosterMembers.map((m) => m.studentId).filter((id) => !playedIds.includes(id)),
     ];
 
-    const profilesResult = await supabase
+    const profilesResult = await db
       .from('public_profiles')
       .select('id, display_name, username')
       .in('id', studentIds);

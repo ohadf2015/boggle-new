@@ -12519,6 +12519,10 @@ const es = {
         "title": "Mira cómo va de verdad tu clase",
         "body": "Con Pro cada partida se convierte en una radiografía de tu clase: qué palabras se afianzan, qué alumnos se atascan y cuánto ha avanzado cada uno desde septiembre. Llévalo a una reunión de padres o de departamento."
       },
+      "reports": {
+        "title": "Los informes de progreso son una función Pro",
+        "body": "Mira cómo le va a cada estudiante en todas tus clases y juegos: palabras dominadas, niveles, XP e informes PDF imprimibles para reuniones de padres. Actualiza a Teacher Pro para desbloquear los informes de clase y de estudiantes."
+      },
       "cta": "Desbloquéalo con Pro: ${{price}}/mes"
     },
     "subscription": {

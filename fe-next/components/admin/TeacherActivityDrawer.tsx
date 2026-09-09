@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
+import Link from 'next/link';
 import type { TeacherFunnelRow } from '@/lib/education/teacherFunnel';
 import type { TeacherActivityDetails } from '@/lib/education/teacherActivity';
+import { teacherDetailPath } from '@/components/admin/education/AdminTeacherDetail';
 
 interface Props {
   row: TeacherFunnelRow;
@@ -42,7 +44,7 @@ function trialLabel(expiresAt: string | null, t: Translate) {
 }
 
 export function TeacherActivityDrawer({ row, onClose }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const dialogRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<TeacherActivityDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +119,16 @@ export function TeacherActivityDrawer({ row, onClose }: Props) {
         <h2 id="teacher-activity-title" className="mt-2 text-2xl font-bold text-neo-navy">
           {t('admin.teacherActivity.title', 'Teacher activity')}
         </h2>
+        {row.userId && (
+          <p className="mt-1">
+            <Link
+              href={teacherDetailPath(language, row.userId)}
+              className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-cyan px-3 py-1 text-xs font-black text-black shadow-hard-sm hover:shadow-hard"
+            >
+              {t('admin.teacherActivity.openFullView', 'Open full teacher view')}
+            </Link>
+          </p>
+        )}
 
         <section
           className="mt-4 rounded-neo border-neo border-black bg-neo-cream p-4 shadow-hard-sm"
@@ -157,6 +169,16 @@ export function TeacherActivityDrawer({ row, onClose }: Props) {
                 {daysAgo(lastSeenAt, t)}
               </dd>
             </div>
+            <div>
+              <dt className="text-[11px] font-bold uppercase text-neo-navy/50">
+                {t('admin.teacherActivity.plan', 'Plan')}
+              </dt>
+              <dd className="font-bold">
+                {data?.plan?.hasPro
+                  ? t('admin.teacherDetail.planPro', 'PRO')
+                  : t('admin.teacherDetail.planFree', 'Free')}
+              </dd>
+            </div>
           </dl>
         </section>
 
@@ -182,7 +204,8 @@ export function TeacherActivityDrawer({ row, onClose }: Props) {
                   <li key={c.id} className="py-2">
                     <p className="font-bold">{c.name || t('admin.teacherFunnel.classrooms.unnamed', '(unnamed)')}</p>
                     <p className="text-xs text-neo-navy/60">
-                      {[c.language, c.joinCode, `${c.studentCount} ${t('admin.teacherFunnel.classrooms.students', 'Students').toLowerCase()}`]
+                      {[c.language, c.joinCode, `${c.studentCount} ${t('admin.teacherFunnel.classrooms.students', 'Students').toLowerCase()}`,
+                        t('admin.teacherActivity.gamesCount', '{count} games', { count: data.gamesByClassroom?.[c.id]?.length ?? 0 })]
                         .filter(Boolean)
                         .join(' · ')}
                     </p>

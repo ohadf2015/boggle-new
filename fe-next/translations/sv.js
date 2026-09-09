@@ -12760,6 +12760,10 @@ const sv = {
         "title": "Se hur din klass faktiskt ligger till",
         "body": "Med Pro blir varje spel en bild av klassen: vilka ord som sitter, vilka elever som kör fast och hur långt var och en har kommit sedan terminsstarten. Ta med det till utvecklingssamtalet eller ämneskonferensen."
       },
+      "reports": {
+        "title": "Framstegsrapporter är en Pro-funktion",
+        "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter."
+      },
       "cta": "Lås upp med Pro — ${{price}}/månad"
     },
     "subscription": {

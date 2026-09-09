@@ -84,6 +84,14 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({
   useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
 }));
 
+// Reports are a Pro surface: the page is wrapped in <ProGate feature="reports">.
+// Default every render to a Pro teacher so the existing view tests exercise the
+// reports; the gating describe below flips the mock to free/loading.
+const proState = { hasPro: true, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: async () => {} };
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => proState,
+}));
+
 describe('ReportsPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -169,6 +177,35 @@ describe('ReportsPageClient', () => {
       await waitFor(() => {
         expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Pro gating', () => {
+    afterEach(() => {
+      proState.hasPro = true;
+      proState.loading = false;
+    });
+
+    it('shows the Pro upsell instead of reports for a free teacher', () => {
+      proState.hasPro = false;
+      render(<ReportsPageClient />);
+
+      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
+      expect(screen.queryByText('Progress Reports')).not.toBeInTheDocument();
+    });
+
+    it('renders nothing while the entitlement is loading', () => {
+      proState.loading = true;
+      const { container } = render(<ReportsPageClient />);
+
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it('renders reports for a Pro teacher', () => {
+      render(<ReportsPageClient />);
+
+      expect(screen.getByText('Progress Reports')).toBeInTheDocument();
+      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
   });
 
