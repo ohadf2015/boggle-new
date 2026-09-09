@@ -16,7 +16,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -66,7 +66,21 @@ export default function TeacherDashboard() {
   const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   // Only for the one-time gifted-Pro celebration; the header chip reads the
   // entitlement itself. The hook de-duplicates the request across consumers.
-  const { grant: proGrant, loading: proLoading } = useTeacherPro();
+  const { grant: proGrant, loading: proLoading, hasPro, source: proSource, refresh: refreshPro } = useTeacherPro();
+  // Back from Polar checkout. The webhook that flips the subscriptions row can
+  // land seconds after the redirect — keep re-reading rather than greet a
+  // teacher who just paid with "Upgrade to Pro".
+  const checkoutSuccess = useSearchParams()?.get('checkout') === 'success';
+  useEffect(() => {
+    if (!checkoutSuccess || proLoading || hasPro) return;
+    let tries = 0;
+    const id = setInterval(() => {
+      tries += 1;
+      void refreshPro();
+      if (tries >= 8) clearInterval(id);
+    }, 2000);
+    return () => clearInterval(id);
+  }, [checkoutSuccess, proLoading, hasPro, refreshPro]);
 
   const hasTeacherAccess = isTeacherProfile(profile);
 
@@ -104,7 +118,7 @@ export default function TeacherDashboard() {
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
       <EducationHeader />
       <TeacherOnboarding />
-      {!proLoading && <ProWelcomeCelebration grant={proGrant} />}
+      {!proLoading && <ProWelcomeCelebration grant={proGrant} paid={checkoutSuccess && hasPro && proSource === 'polar'} />}
 
       <m.div
         className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1"

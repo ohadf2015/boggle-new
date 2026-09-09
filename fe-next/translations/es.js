@@ -12502,6 +12502,8 @@ const es = {
         "unlimited": "Clases y alumnos ilimitados"
       },
       "noCard": "Cuando termine, vuelves al plan gratuito sin más. Nunca te cobraremos sin que tú lo elijas.",
+      "paidBody": "Tu suscripción a Teacher Pro está activa. Puedes gestionarla o cancelarla cuando quieras desde tu perfil de docente.",
+      "manage": "Gestionar suscripción",
       "cta": "¡Vamos!"
     },
     "plan": {

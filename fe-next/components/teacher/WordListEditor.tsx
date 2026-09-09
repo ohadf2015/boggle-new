@@ -180,7 +180,7 @@ export default function WordListEditor({
         onWordsChange(merged);
       }
     } catch (error) {
-      logger.error('AI lesson enrichment failed:', error);
+      logger.warn('AI lesson enrichment failed:', error);
       setAiState('error');
     }
   }, [incompleteWords, language, words, onWordsChange]);

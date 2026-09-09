@@ -12743,6 +12743,8 @@ const sv = {
         "unlimited": "Obegränsat antal klasser och elever"
       },
       "noCard": "När det tar slut går du helt enkelt tillbaka till gratisplanen. Vi debiterar dig aldrig utan att du själv väljer det.",
+      "paidBody": "Din Teacher Pro-prenumeration är aktiv. Hantera eller avsluta den när du vill från din lärarprofil.",
+      "manage": "Hantera prenumeration",
       "cta": "Kör!"
     },
     "plan": {

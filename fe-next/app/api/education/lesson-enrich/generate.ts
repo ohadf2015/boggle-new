@@ -14,7 +14,9 @@ import logger from '@/utils/logger';
 
 /** Words per model call — keeps each JSON response comfortably inside the output budget. */
 const BATCH_SIZE = 15;
-const TIMEOUT_MS = 45_000;
+// Below the edge proxy's request timeout — a 45s model call surfaced to the
+// teacher as a bare 408 instead of our 503 (Sentry JAVASCRIPT-NEXTJS-24C).
+const TIMEOUT_MS = 20_000;
 const MAX_OUTPUT_TOKENS = 4096;
 
 let aiPromise: Promise<GoogleGenAI> | null = null;

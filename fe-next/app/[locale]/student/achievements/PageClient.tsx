@@ -17,7 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AchievementGrid, type Achievement } from '@/components/education/achievements/AchievementGrid';
-import type { AchievementCategory } from '@/lib/supabase/education/types';
+import { STUDENT_PROGRESS_SELECT, buildAchievementsRecord } from '@/lib/education/achievementProgress';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
@@ -69,7 +69,7 @@ export default function StudentAchievementsPageClient() {
         // Fetch student's progress for each achievement
         const { data: progress, error: progressError } = await supabase
           .from('student_achievements_progress')
-          .select('achievement_key, count')
+          .select(STUDENT_PROGRESS_SELECT)
           .eq('student_id', user.id);
 
         if (progressError) {
@@ -78,26 +78,7 @@ export default function StudentAchievementsPageClient() {
           return;
         }
 
-        // Create a map for easy lookup
-        const progressMap = new Map(
-          (progress || []).map((p) => [p.achievement_key, p])
-        );
-
-        // Transform into Achievement format
-        const achievementsRecord: Record<string, Achievement> = {};
-        for (const def of definitions || []) {
-          const studentProgress = progressMap.get(def.key);
-          achievementsRecord[def.key] = {
-            count: studentProgress?.count || 0,
-            category: def.category as AchievementCategory,
-            icon: def.icon,
-            nameKey: def.base_name_key,
-            descriptionKey: def.base_description_key,
-            isSecret: def.is_secret,
-          };
-        }
-
-        setAchievements(achievementsRecord);
+        setAchievements(buildAchievementsRecord(definitions || [], progress || []));
         setIsLoadingAchievements(false);
       } catch (error) {
         logger.error('Error in fetchAchievements:', error);

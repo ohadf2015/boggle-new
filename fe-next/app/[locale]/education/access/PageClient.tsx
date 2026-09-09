@@ -10,6 +10,7 @@ import { AccessRequestGate } from '@/components/education/AccessRequestGate';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -22,6 +23,9 @@ const TRUST = [
 export function PageClient() {
   const { t, language } = useLanguage();
   const { status, latestRequest, hasAccess, trial, isLoading } = useTeacherAccess();
+  // A Pro teacher keeps the trial deadline Pro replaced — never show her the
+  // trial upsell, and show nothing until the entitlement has answered.
+  const { hasPro, loading: proLoading } = useTeacherPro();
   // TeacherGate encodes the page it blocked as `?from=`. Reading it back is what
   // turns a silent teleport into an explanation — see AccessRedirectNotice.
   const redirectedFrom = useSearchParams()?.get('from') ?? null;
@@ -66,7 +70,7 @@ export function PageClient() {
           <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
             {t('education.access.already_approved_title')}
           </h2>
-          {trial && (
+          {trial && !hasPro && !proLoading && (
             <div className="mt-4">
               <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
             </div>

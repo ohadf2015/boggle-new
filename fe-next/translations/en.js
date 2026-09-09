@@ -11043,6 +11043,8 @@ const en = {
         "unlimited": "Unlimited classes and students"
       },
       "noCard": "When it ends you simply go back to the free plan. We will never charge you without you choosing to.",
+      "paidBody": "Your Teacher Pro subscription is active. Manage or cancel it anytime from your teacher profile.",
+      "manage": "Manage subscription",
       "cta": "Let's go"
     },
     "plan": {
