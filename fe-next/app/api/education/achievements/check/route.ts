@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PROGRESS_UPSERT_CONFLICT, toProgressUpsertRows } from '@/lib/education/achievementProgress';
 import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import {
   checkAchievementProgress,
   type StudentProgressData,
-  type AchievementProgress,
 } from '@/backend/modules/educationAchievementManager';
 
 // Schema for student progress data
@@ -141,20 +141,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Also update achievement progress table (B10 fix)
-    const progressUpserts = achievementProgress
-      .filter((ap: AchievementProgress) => ap.progress_value > 0)
-      .map((ap: AchievementProgress) => ({
-        student_id: user.id,
-        achievement_key: ap.key,
-        current_value: ap.progress_value,
-        target_value: ap.next_threshold ?? ap.progress_value,
-        updated_at: new Date().toISOString(),
-      }));
+    const progressUpserts = toProgressUpsertRows(achievementProgress, user.id);
 
     if (progressUpserts.length > 0) {
       await supabase
         .from('student_achievements_progress')
-        .upsert(progressUpserts, { onConflict: 'student_id,achievement_key' })
+        .upsert(progressUpserts, { onConflict: PROGRESS_UPSERT_CONFLICT })
         .then(({ error }) => {
           if (error) logger.error('Failed to update achievement progress:', error);
         });

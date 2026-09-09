@@ -183,6 +183,15 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     const howl = createLazyHowl(src, {
       loop: true,
       volume: 0,
+      // Howler ends a sound synchronously when seek >= stop. A track that decodes
+      // to 0s (truncated file, empty CDN body) with loop:true recurses
+      // _ended→play→_ended to a stack overflow (Sentry 1PP/1RZ) — stop looping it.
+      onload: () => {
+        if (howl.duration() <= 0) {
+          logger.warn(`[Music] ${key} loaded with no duration — looping disabled`);
+          howl.loop(false);
+        }
+      },
       onloaderror: (_id, err) => { logger.log(`[Music] Failed to load ${key}:`, err); },
       onplayerror: (_id, err) => {
         logger.log(`[Music] Failed to play ${key}:`, err);

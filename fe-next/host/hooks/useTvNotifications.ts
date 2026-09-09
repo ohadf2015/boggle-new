@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { AchievementPayload } from '@/shared/types/socket';
 import type { Socket } from 'socket.io-client';
 import {
   NOTIFICATION_LAYOUTS,
@@ -22,14 +23,6 @@ interface LeaderboardEntry {
   username: string;
   score: number;
   wordCount?: number;
-}
-
-interface AchievementPayload {
-  username: string;
-  achievement: {
-    id: string;
-    name: string;
-  };
 }
 
 interface LevelUpPayload {
@@ -338,9 +331,17 @@ export function useTvNotifications({
   useEffect(() => {
     if (!socket || !enabled) return;
 
-    const handleAchievement = (data: { achievements: AchievementPayload[] }) => {
-      data.achievements?.forEach(({ username, achievement }) => {
-        addNotification('achievement', 'medium', t('tvBroadcast.notifications.achievement'), achievement.name, username);
+    // Server shape is { achievements: [{ key, icon, count? }] } (shared/types/socket.ts).
+    // A local { username, achievement: { name } } type here made `.name` throw on
+    // every event — and socket.io replays buffered events on reconnect, so one
+    // flaky network turned into a 32-crash burst (Sentry JAVASCRIPT-NEXTJS-247).
+    const handleAchievement = (data: { achievements?: AchievementPayload[] } | null | undefined) => {
+      const list = data?.achievements;
+      if (!Array.isArray(list)) return;
+      list.forEach((achievement) => {
+        if (!achievement || typeof achievement.key !== 'string') return;
+        const name = t(`achievements.${achievement.key}.name`) || achievement.key;
+        addNotification('achievement', 'medium', t('tvBroadcast.notifications.achievement'), name);
       });
     };
 

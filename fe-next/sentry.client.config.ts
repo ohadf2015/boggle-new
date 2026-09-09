@@ -92,6 +92,12 @@ Sentry.init({
   ignoreErrors: [
     "ResizeObserver loop limit exceeded",
     "ResizeObserver loop completed with undelivered notifications",
+    // Google Identity Services (accounts.google.com/gsi) runs inline in our page;
+    // its own logger lines are not ours to fix (JAVASCRIPT-NEXTJS-1RT)
+    /\[GSI_LOGGER\]/,
+    // Android FCM registration while Play Services is unreachable — device
+    // state, retried by the OS (JAVASCRIPT-NEXTJS-1XZ)
+    /Push registration error.*SERVICE_NOT_AVAILABLE/,
     "Failed to fetch",
     "NetworkError",
     "Network request failed",

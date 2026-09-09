@@ -322,9 +322,11 @@ export function useSaveCognitiveScore() {
         tierProgress = Math.round(calculateTierProgress(overallScore));
         scoreDelta = overallScore; // First game so all points are new
 
+        // Two results screens can save at once: both read no row, both write.
+        // Upsert on user_id and keep whichever landed first (Sentry 242).
         const { error: createError } = await supabase
           .from('brain_scores')
-          .insert({
+          .upsert({
             user_id: userId,
             processing_speed: safeProcessingSpeed,
             working_memory: safeWorkingMemory,
@@ -336,7 +338,7 @@ export function useSaveCognitiveScore() {
             tier_progress: tierProgress,
             games_analyzed: 1,
             last_activity_at: new Date().toISOString(),
-          });
+          }, { onConflict: 'user_id', ignoreDuplicates: true });
 
         if (createError) {
           logger.error('[useSaveCognitiveScore] Failed to create brain score:', createError);
