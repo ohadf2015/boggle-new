@@ -75,7 +75,7 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
 
     if (result.success) {
       fireConfetti();
-      toast.success(t('teacher.classroom.success.created', 'Classroom created!'));
+      toast.success(t('teacher.classroom.success.created'));
       setIsCreateDialogOpen(false);
       setFormData({ name: '', language: language as Language });
       if (result.data?.id && result.data.join_code) {
@@ -256,7 +256,7 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                 className="bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
               >
                 <Share2 className="w-4 h-4 me-2" />
-                {t('teacher.classroom.share', 'Share')}
+                {t('teacher.classroom.share')}
               </Button>
               {googleClassroomHref(createdClassroom.name, createdClassroom.join_code) && (
                 <a
@@ -344,10 +344,10 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                         data-testid="share-join-code"
                         onClick={() => shareInvite(classroom.name, classroom.join_code)}
                         className="flex-1 min-h-11 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all"
-                        aria-label={t('teacher.classroom.share', 'Share')}
+                        aria-label={t('teacher.classroom.share')}
                       >
                         <Share2 className="w-4 h-4 me-2" />
-                        {t('teacher.classroom.share', 'Share')}
+                        {t('teacher.classroom.share')}
                       </Button>
                     </div>
                     {googleClassroomHref(classroom.name, classroom.join_code) && (
