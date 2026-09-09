@@ -45,6 +45,7 @@ export default function RepeatLastGameButton({
         'bg-neo-yellow/90 hover:bg-neo-yellow',
         'shadow-hard hover:shadow-hard-lg transition-all',
         'text-start hover:translate-x-[-2px] hover:translate-y-[-2px]',
+        'active:translate-x-0 active:translate-y-0 active:shadow-hard-pressed',
         'focus:outline-hidden focus:ring-2 focus:ring-neo-yellow',
         className
       )}

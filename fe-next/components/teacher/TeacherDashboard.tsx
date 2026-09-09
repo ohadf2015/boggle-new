@@ -274,7 +274,7 @@ export default function TeacherDashboard() {
                     href={`/${language}/teacher/reports`}
                     className={cn(
                       'flex items-center gap-3 p-4 rounded-neo border-2 border-black',
-                      'bg-neo-cream shadow-hard hover:shadow-hard-lg transition-shadow',
+                      'bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',
                       'text-black font-neo-body font-bold'
                     )}
                   >
