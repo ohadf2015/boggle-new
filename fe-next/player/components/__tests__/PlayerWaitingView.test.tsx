@@ -35,6 +35,12 @@ function filterDomProps(props: Record<string, unknown>): Record<string, unknown>
 vi.mock('../../../host/components/pre-game/MobileShareSection', () => ({
   MobileShareSection: () => <div data-testid="mobile-share-section" />,
 }));
+// The real LobbyAudioButton needs Music/SFX/Language providers; the waiting-view
+// suites render without them. The audio-control hand-off itself is covered by
+// LobbyAudioButton.test.tsx + NavigationContext.headerAudioControl.test.tsx.
+vi.mock('../../../host/components/pre-game/LobbyAudioButton', () => ({
+  LobbyAudioButton: () => <button data-testid="lobby-audio-button" aria-label="Mute" />,
+}));
 vi.mock('../../../host/components/pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (
     <div data-testid="desktop-layout">{leftContent}{rightContent}</div>
@@ -227,6 +233,13 @@ describe('PlayerWaitingView', () => {
     it('does NOT render the daily-challenge promotion ember', () => {
       render(<PlayerWaitingView {...defaultProps} />);
       expect(screen.queryByTestId('lobby-daily-ember-slot')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Header audio control (FAB overlap fix)', () => {
+    it('hosts its own mute control in the header so the global in-game FAB stands down', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getByTestId('lobby-audio-button')).toBeInTheDocument();
     });
   });
 

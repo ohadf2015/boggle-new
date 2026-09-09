@@ -8,6 +8,7 @@ import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap } from '
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import { LobbyAudioButton } from '../../host/components/pre-game/LobbyAudioButton';
 import { LobbyAutoStartStatus } from '@/components/lobby/LobbyAutoStartStatus';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
@@ -481,22 +482,35 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             {!isClassroomMode && <MobileShareSection gameCode={gameCode} t={t} compact />}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {gameLanguage && (
-              <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
-                <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
-                <span className="text-xs font-black text-neo-cream uppercase">
-                  {getLanguageName(gameLanguage, true)}
-                </span>
-              </div>
+            {/* Classroom rooms sit under EducationHeader + ClassroomModeBanner,
+                which already carry navigation, breadcrumbs, and UI language —
+                restacking the board-language pill + switcher here gave students
+                two full header rows before any content. Keep only the live
+                counter, the mute control, and the exit. */}
+            {!isClassroomMode && (
+              <>
+                {gameLanguage && (
+                  <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
+                    <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
+                    <span className="text-xs font-black text-neo-cream uppercase">
+                      {getLanguageName(gameLanguage, true)}
+                    </span>
+                  </div>
+                )}
+                {/* UI-language pill — distinct from the board-language chip above; one tap. */}
+                <QuickLanguageSwitcher compact />
+              </>
             )}
-            {/* UI-language pill — distinct from the board-language chip above; one tap. */}
-            <QuickLanguageSwitcher compact />
             <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
               <Users className="w-4 h-4 text-neo-cyan" />
               <span className="text-xs font-black text-neo-cream">
                 {nonHostPlayers.length}/{MAX_PLAYERS}
               </span>
             </div>
+            {/* Mute control for the public lobby — in classroom rooms the visible
+                EducationHeader already hosts MusicControls (registered, so the
+                global FAB stands down); a second speaker here would duplicate it. */}
+            {!isClassroomMode && <LobbyAudioButton />}
             <button
               type="button"
               onClick={onExitRoom}

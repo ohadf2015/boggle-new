@@ -62,6 +62,11 @@ vi.mock('../../host/components/pre-game/MobileShareSection', () => ({
   ),
 }));
 
+// The real LobbyAudioButton needs Music/SFX/Language providers; stub it.
+vi.mock('../../host/components/pre-game/LobbyAudioButton', () => ({
+  LobbyAudioButton: () => <button data-testid="lobby-audio-button">Mute</button>,
+}));
+
 // Mock DesktopLobbyLayout
 vi.mock('../../host/components/pre-game/desktop', () => ({
   DesktopLobbyLayout: ({ leftContent, rightContent }: { leftContent: React.ReactNode; rightContent: React.ReactNode }) => (

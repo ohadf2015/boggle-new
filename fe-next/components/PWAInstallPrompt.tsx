@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Download, Share, Plus, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigation } from '@/contexts/NavigationContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { gameEvents } from '@/components/GoogleAnalytics';
 import { isAndroidBrowser } from '@/utils/androidApp';
@@ -42,6 +43,7 @@ interface BeforeInstallPromptEvent extends Event {
  */
 export function PWAInstallPrompt() {
   const { t } = useLanguage();
+  const { isInGame } = useNavigation();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -149,6 +151,10 @@ export function PWAInstallPrompt() {
   };
 
   if (isOnCrazyGamesPlatform) return null;
+  // Never paint over gameplay or a game lobby — the fixed bottom banner would
+  // cover rosters, ready buttons, and boards (same class as the conversion-
+  // surface guard below: re-read on the render that would paint).
+  if (isInGame) return null;
   // The effect-time check below can't hold on its own: this component mounts once at the
   // layout level, so a client-side navigation INTO /teacher/upgrade never re-runs it, and
   // beforeinstallprompt fires long after mount. Re-read the signal here, on the very render

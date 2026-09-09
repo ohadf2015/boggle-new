@@ -21,6 +21,10 @@ import '@testing-library/jest-dom';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
+const navState = { isInGame: false };
+vi.mock('@/contexts/NavigationContext', () => ({
+  useNavigation: () => ({ isInGame: navState.isInGame, setIsInGame: vi.fn(), activeTab: 'home', setActiveTab: vi.fn(), headerAudioControlActive: false, registerHeaderAudioControl: () => () => {} }),
+}));
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));
@@ -44,6 +48,7 @@ describe('PWAInstallPrompt on a conversion surface', () => {
   beforeEach(() => {
     localStorage.clear();
     document.body.classList.remove('conversion-surface');
+    navState.isInGame = false;
     // Desktop Chrome UA: the Android and iOS branches both bail before the listener.
     Object.defineProperty(navigator, 'userAgent', {
       value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
@@ -78,6 +83,15 @@ describe('PWAInstallPrompt on a conversion surface', () => {
     // Mounted clean — this is the layout-level component that never re-runs its effect.
     // The visitor then navigates into the upgrade page, which sets the class.
     document.body.classList.add('conversion-surface');
+    await firePromptable();
+    expect(screen.queryByText('pwa.installButton')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing during active gameplay — the fixed bottom banner would cover the board', async () => {
+    const { PWAInstallPrompt } = await import('../PWAInstallPrompt');
+    render(<PWAInstallPrompt />);
+    // The visitor navigates INTO a game (lobby or board) after the layout mounted.
+    navState.isInGame = true;
     await firePromptable();
     expect(screen.queryByText('pwa.installButton')).not.toBeInTheDocument();
   });
