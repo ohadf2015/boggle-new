@@ -45,6 +45,12 @@ vi.mock('../../../host/components/pre-game/GameInstructions', () => ({
     <div data-testid="game-instructions" data-mode={selectedGameMode} />
   ),
 }));
+// The real LobbyAudioButton needs Music/SFX/Language providers; the waiting-view
+// suites render without them. The audio-control hand-off itself is covered by
+// LobbyAudioButton.test.tsx + NavigationContext.headerAudioControl.test.tsx.
+vi.mock('../../../host/components/pre-game/LobbyAudioButton', () => ({
+  LobbyAudioButton: () => <button data-testid="lobby-audio-button" aria-label="Mute" />,
+}));
 vi.mock('../../../components/RoomChat', () => ({ default: () => <div data-testid="room-chat" /> }));
 vi.mock('../../../components/Avatar', () => ({ default: () => <div data-testid="avatar" /> }));
 vi.mock('../../../components/ui/alert-dialog', () => ({
@@ -107,6 +113,23 @@ describe('PlayerWaitingView — classroom students get no host controls', () => 
     render(<PlayerWaitingView {...defaultProps} />);
     expect(screen.getAllByTestId('mobile-share-section').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByTestId('invite-card').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('trims duplicate language chrome in a classroom room (EducationHeader owns it)', () => {
+    render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
+    // What survives: the live counter and the exit.
+    expect(screen.getByText('1/8')).toBeInTheDocument();
+    expect(screen.getByLabelText('common.exit')).toBeInTheDocument();
+    // What goes: the board-language pill, the UI-language switcher, AND the
+    // in-header mute — the classroom route's visible EducationHeader already
+    // hosts MusicControls, so a second speaker here would duplicate it.
+    expect(screen.queryByText('English')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lobby-audio-button')).not.toBeInTheDocument();
+  });
+
+  it('hosts the in-header mute control in a public room (no visible header there)', () => {
+    render(<PlayerWaitingView {...defaultProps} />);
+    expect(screen.getByTestId('lobby-audio-button')).toBeInTheDocument();
   });
 
   it('teaches the classroom mode the teacher actually chose', () => {

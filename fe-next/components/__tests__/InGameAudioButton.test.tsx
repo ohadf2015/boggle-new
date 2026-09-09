@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import React from 'react';
-import { render, fireEvent, screen, cleanup } from '@testing-library/react';
+import { render, fireEvent, screen, cleanup, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 /**
@@ -133,5 +133,68 @@ describe('InGameAudioButton', () => {
     render(<InGameAudioButton />);
     expect(screen.getByRole('button', { name: /unmute/i })).toBeInTheDocument();
     expect(muteButton()).toHaveAttribute('aria-pressed', 'false');
+  });
+});
+
+describe('InGameAudioButton obstruction guard', () => {
+  beforeEach(resetState);
+  afterEach(() => {
+    cleanup();
+    // jsdom has no elementsFromPoint — restore the undefined default so the
+    // guard's feature-detection branch (typeof !== 'function' → no probing)
+    // is what the non-guard tests exercise.
+    delete (document as Partial<Document>).elementsFromPoint;
+  });
+
+  /** A fake header button parked in the FAB's corner (48px tall). */
+  function headerBlocker(bottom = 48): HTMLElement {
+    const blocker = document.createElement('button');
+    blocker.getBoundingClientRect = () => ({
+      top: 0, bottom, left: 0, right: 200, width: 200, height: bottom, x: 0, y: 0, toJSON: () => ({}),
+    }) as DOMRect;
+    return blocker;
+  }
+
+  it('nudges below a header button parked in its corner instead of covering it', async () => {
+    navState.isInGame = true;
+    const blocker = headerBlocker();
+    let probes = 0;
+    document.elementsFromPoint = vi.fn(() => {
+      probes += 1;
+      return probes === 1 ? [blocker] : [];
+    }) as unknown as typeof document.elementsFromPoint;
+
+    render(<InGameAudioButton />);
+
+    await waitFor(() => expect(muteButton().style.marginTop).toBe('56px'));
+    expect(muteButton()).toBeInTheDocument();
+  });
+
+  it('ignores non-interactive overlays in its corner', async () => {
+    navState.isInGame = true;
+    const inertDiv = document.createElement('div');
+    document.elementsFromPoint = vi.fn(() => [inertDiv]) as unknown as typeof document.elementsFromPoint;
+
+    render(<InGameAudioButton />);
+
+    await waitFor(() => expect(document.elementsFromPoint).toHaveBeenCalled());
+    expect(muteButton().style.marginTop).toBe('');
+  });
+
+  it('stands down entirely when the corner never clears', async () => {
+    navState.isInGame = true;
+    const blocker = headerBlocker();
+    document.elementsFromPoint = vi.fn(() => [blocker]) as unknown as typeof document.elementsFromPoint;
+
+    const { container } = render(<InGameAudioButton />);
+
+    await waitFor(() => expect(container).toBeEmptyDOMElement());
+  });
+
+  it('does not probe (and renders normally) when elementsFromPoint is unavailable', () => {
+    navState.isInGame = true;
+    render(<InGameAudioButton />);
+    expect(muteButton()).toBeInTheDocument();
+    expect(muteButton().style.marginTop).toBe('');
   });
 });
