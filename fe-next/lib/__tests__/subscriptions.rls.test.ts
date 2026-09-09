@@ -39,7 +39,8 @@ const mockAdminClient = (
         select: () => ({ eq: async () => ({ data: classroom ? [classroom] : [], error: null }) }),
       };
       if (table === 'classroom_memberships') return {
-        select: () => ({ eq: async () => ({ count: members, error: null }) }),
+        // mirrors the real query: .eq('classroom_id', id).neq('student_id', teacherId)
+        select: () => ({ eq: () => ({ neq: async () => ({ count: members, error: null }) }) }),
       };
       if (table === 'subscriptions') return {
         select: () => ({
@@ -101,6 +102,32 @@ describe('canAddStudent counts through the service-role client', () => {
 
     expect(out.allowed).toBe(true);
     expect(out.limit).toBeNull();
+  });
+
+  it('excludes the TEACHER\'s own membership from the student-seat count', async () => {
+    // A teacher joining their own class with the student join code gets a membership row
+    // like anyone else. That row is a preview, not a student seat — counting it burns one
+    // seat of the free cap. First seen in production 2026-09-09: the first paying teacher's
+    // brand-new class reported currentCount 2 for exactly one real student.
+    const neq = vi.fn().mockResolvedValue({ count: FREE_TIER_LIMITS.studentsPerClass - 1, error: null });
+    const eq = vi.fn().mockReturnValue({ neq });
+    const admin = {
+      from: vi.fn((table: string) => {
+        if (table === 'classrooms')
+          return { select: () => ({ eq: async () => ({ data: [{ teacher_id: 'teacher-1' }], error: null }) }) };
+        if (table === 'classroom_memberships') return { select: () => ({ eq }) };
+        if (table === 'subscriptions')
+          return { select: () => ({ eq: () => ({ single: async () => ({ data: null, error: { message: 'no rows' } }) }) }) };
+        return {};
+      }),
+    };
+    (createAdminClient as any).mockReturnValue(admin);
+
+    const out = await canAddStudent('c-1');
+
+    expect(neq).toHaveBeenCalledWith('student_id', 'teacher-1');
+    expect(out.currentCount).toBe(FREE_TIER_LIMITS.studentsPerClass - 1);
+    expect(out.allowed).toBe(true);
   });
 
   it('never reads classrooms or memberships on the request-scoped client', async () => {
