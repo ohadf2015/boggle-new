@@ -1,36 +1,39 @@
 {
-  "date": "2026-09-04",
-  "note": "Backend: brief's two items (unindexed_foreign_keys on vocabulary_lessons, auth_db_connections_absolute) are stale-reused duplicates of 2026-09-01 -- brief explicitly flagged supabase source as STALE this run (last-good reused). The FK index (idx_vocabulary_lessons_classroom_id) already shipped 09-01; auth connection strategy is a dashboard config toggle, not code -- still deferred to human queue. No new backend query audit run tonight (brief-first contract: don't re-run discovery on a stale/duplicate slice). Frontend: re-ran the brief's PostHog LCP items through the mandatory sample gate, grouped by route with query params stripped. ALL routes fail n>=50 tonight -- highest is /es/multiplayer at n=26 (was n=14 on 09-01, trending up but still under floor). The brief's growthradar.app/imposketch.io items are OTHER apps on the shared PostHog project (memory: PostHog is shared by ~12 apps), correctly excluded. /en/education/access (brief LCP 5843ms) has n=8 -- checked PageClient.tsx anyway per SPEED priority: the hero image already deliberately omits `priority` with an inline comment explaining phone-viewport LCP is the h1, not the image -- already perf-considered, no change needed. Note: PageClient.tsx has unrelated uncommitted WIP from another session (redirect-notice removal) -- left untouched, not a perf lane concern. Bundle: fresh build present (BUILD_ID BdWceyiy4EZSt6dMpGroB, 2026-09-03 19:46), top-10 chunks flat vs 09-01 baseline (+424KB total across all 10, largest single delta +8KB) -- pure hash/content churn, no chunk crossed the 50KB-heavier threshold, no regression.",
+  "date": "2026-09-09",
+  "note": "Backend: both brief items confirmed via fresh mcp__supabase__get_advisors(performance) call (not reused from stale brief) -- unindexed_foreign_keys on vocabulary_lessons is GONE from current advisors (index already shipped 09-01, no longer flagged), auth_db_connections_absolute still present -- it's a dashboard connection-pooling toggle, not a migration, stays human queue (unchanged since 09-01). No backend code shipped tonight -- nothing left in the brief slice needed a fix. Frontend: re-ran the brief's PostHog LCP items through the mandatory sample gate. daily/word-wheel routes (en/he) are still n=2/n=3 -- DEFERRED, unchanged. The brief's 85515ms LCP on /en/multiplayer?quickPlay=true is a n=14 sub-slice -- below floor, textbook sample-noise (memory: single slow device drags p75 on low n). BUT querying the parent route without the query-param filter found /en/multiplayer at n=187 -- first night this route clears the floor. It fails all three CWV thresholds (LCP 2760/INP 504/CLS 0.265) on absolute grounds (no same-metric baseline yet at this n to diff against). Investigated cause: CLS matches a known open memory item (RoomListView skeleton) that has ALREADY partially shipped since that memory was written (0.92 -> 0.265) -- residual is skeleton-card-count mismatch, needs profiling not a guess-fix. INP 504ms is new, likely the 810-line PageClient.tsx's synchronous hook-heavy hydration -- also needs attribution before touching. Logged full detail to perf-watch.md, watching 2 more nights per the n>=50 gate before any code change to these large actively-instrumented files. Bundle: fresh build present (BUILD_ID FJTXMHrK6QGIOL8MSIEDRSep, 2026-09-08 23:21), top-10 chunk sum 6152KB vs 09-04's 6012KB -- filenames are content-hashed so no 1:1 chunk mapping is possible across builds, but max single chunk (856KB) is flat vs baseline (868KB) and total delta is consistent with hash/content churn, no chunk crossed the 50KB-heavier regression threshold.",
   "backend": {
-    "advisor_warnings_count": 2,
+    "advisor_warnings_count": 1,
     "shipped": [],
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
-      "unindexed_foreign_keys_vocabulary_lessons": "already shipped 09-01 as idx_vocabulary_lessons_classroom_id -- brief item is a stale reuse of the same advisor warning, not a new finding"
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)"
+    },
+    "resolved_since_last_check": {
+      "unindexed_foreign_keys_vocabulary_lessons": "confirmed gone from current advisor output -- index shipped 09-01, closing this line item"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/es/multiplayer", "p75_lcp": 3840, "n": 26, "window": "24h", "status": "DEFERRED -- n=26, below 50-sample floor (was n=14 on 09-01)" },
-      { "route": "/en/multiplayer", "p75_lcp": 1113, "n": 12, "window": "24h", "status": "DEFERRED -- low n=12" },
-      { "route": "/en/education/access", "p75_lcp": 8228, "n": 8, "window": "24h", "status": "DEFERRED -- low n=8; page already perf-considered (deliberate no-priority hero image, documented in code)" }
+      { "route": "/en/multiplayer", "p75_lcp": 2760, "p75_inp": 504, "p75_cls": 0.265, "n": 187, "window": "24h", "status": "FLAGGED -- first night at n>=50, fails all 3 thresholds, watching 2 more nights before code change, see perf-watch.md" },
+      { "route": "/en/multiplayer?quickPlay=true", "p75_lcp": 85695, "n": 14, "window": "24h", "status": "DEFERRED -- n=14, below 50-sample floor, treat the 85s figure as noise" },
+      { "route": "/he/daily/word-wheel", "p75_lcp": 4255, "n": 3, "window": "24h", "status": "DEFERRED -- low n=3" },
+      { "route": "/en/daily/word-wheel", "p75_lcp": 4044, "n": 2, "window": "24h", "status": "DEFERRED -- low n=2" }
     ],
-    "no_change_shipped": "no route cleared the n>=50 sample floor tonight; no actionable regression"
+    "no_change_shipped": "one route (/en/multiplayer) cleared the n>=50 floor for the first time and fails thresholds -- flagged to perf-watch.md, no guess-fix without attribution profiling"
   },
   "bundle": {
-    "note": "fresh build present, top chunks flat vs 09-01 (+424KB total across top-10, max single-chunk delta +8KB) -- pure churn, no regression",
-    "total_kb": 44048,
+    "note": "fresh build present, top-10 chunk sum 6152KB vs 09-04 baseline 6012KB (+140KB) -- filenames are content-hashed per build so no chunk-to-chunk name mapping is possible; max single chunk flat (856KB vs 868KB); consistent with hash/content churn, no regression",
+    "total_kb": 44940,
     "top_chunks": [
-      { "name": "69979-d038ae87ed2b931b.js", "kb": 868 },
-      { "name": "64789.ae68706724bca9c0.js", "kb": 760 },
-      { "name": "53169.9a603cc7c58f8813.js", "kb": 668 },
-      { "name": "39299.1581bff69485bf45.js", "kb": 612 },
-      { "name": "82745.5d617f732b2577a6.js", "kb": 592 },
-      { "name": "62972.df4116ee65fca098.js", "kb": 544 },
-      { "name": "45477.28120f7cec61591b.js", "kb": 520 },
-      { "name": "95782.b7db2f59936094f3.js", "kb": 492 },
-      { "name": "956.577df8cce4708344.js", "kb": 488 },
-      { "name": "65990-60c86e942cd3f586.js", "kb": 468 }
+      { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },
+      { "name": "64789.4d7cafb654dc179d.js", "kb": 800 },
+      { "name": "68292.99fcfa5b93f48ce2.js", "kb": 648 },
+      { "name": "39299.e0835ec0eedd6035.js", "kb": 648 },
+      { "name": "82745.77f19dd963f9e0e4.js", "kb": 624 },
+      { "name": "62972.afe98b1585e2b2ca.js", "kb": 576 },
+      { "name": "45477.7451a4ffd8adf4a5.js", "kb": 548 },
+      { "name": "1683.af38824d17585dba.js", "kb": 492 },
+      { "name": "956.03280bfb46471c90.js", "kb": 488 },
+      { "name": "72539.23a8e6fbbede68ea.js", "kb": 472 }
     ]
   }
 }

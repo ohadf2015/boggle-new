@@ -272,3 +272,12 @@ resolves. No `<img>`/`next/image` LCP candidate exists on this route; the LCP el
 **Not fixed tonight:** `WordWheelChallenge.tsx` is 500+ lines of live-tested daily-game logic (streak, catch-up,
 rewarded-ad gating, server sync) — not safe to touch blind within a single lane's time budget. Human/lane-05
 review recommended.
+
+## [FRONTEND] `/en/multiplayer` first clean sample — CLS 0.265, INP 504ms — 2026-09-09
+
+**Severity:** Medium
+**Source:** PostHog `$web_vitals` 24h, n=187 — first night this route clears the n≥50 floor (was n=12 on 2026-09-04, n=14 on the `?quickPlay=true` sub-slice tonight — sub-slice still below floor, ignore its 85s LCP outlier per the sample-noise rule).
+**Metric:** p75 LCP 2760ms (>2500 threshold), p75 INP 504ms (>200 threshold), p75 CLS 0.265 (>0.1 threshold). No same-metric baseline at n≥50 exists yet, so this is an absolute-threshold flag, not a delta regression.
+**Context:** memory `MP CLS 0.92+` already names this route's known cause (socket connecting→lobby DOM swap) and logs a skeleton fix as open/human-queue. Checked `RoomListView.tsx:309-332` tonight — a `room-list-skeleton` (3 fixed-height cards) and `initial={false}` static-appear already shipped since that memory was written (CLS dropped 0.92→0.265, real progress). Residual CLS likely comes from the skeleton's fixed 3-card height not matching the real room count once `activeRooms` arrives (0 rooms / 5 rooms / etc. all shift height differently) — needs real height-attribution profiling, not a guess-fix.
+**INP 504ms is new** — not previously logged. `PageClient.tsx` is an 810-line client component with ~20 hooks mounted synchronously at lobby load (not wrapped in `next/dynamic`, unlike its own `HostLeftGraceModal` child which already lazy-loads). Suspect: main-thread hydration cost of that hook fan-out, not a single fixable interaction handler.
+**Action:** Watch 2 more nights (n≥50 gate must hold — 187 tonight is comfortably above). If still failing thresholds after 09-11, profile with Chrome DevTools INP attribution + CLS shift attribution on `/en/multiplayer` before touching `PageClient.tsx` or `RoomListView.tsx` — both are large, actively-instrumented files (see inline `perf-render-delay-root-cause` references) and a guess-fix risks regressing the LCP work already done there.

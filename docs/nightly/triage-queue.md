@@ -2292,3 +2292,24 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred (not wired tonight — time budget)
   - why: per nightly-learnings STEP 3b hard precondition, did not touch the flag; needs either wiring the practice-wheel CTA experiment or deleting the dead flag
   - recommended owner: self (lane 03, next run)
+
+## 2026-09-09
+- [Restore] stale drop 20260904-020001 (6+ files, education/access PageClient, play-boggle-online-free page, dictionary candidates)
+  - status: closed-not-needed (verified moot, not restored)
+  - why: every file diffed against current master is STALE-BASE — e.g. PageClient.tsx in the backup predates the `AccessRedirectNotice` fix shipped 08-31 (`0d24ff63e`), and play-boggle-online-free/page.tsx predates the 6-languages SEO copy fix. Restoring would REGRESS already-shipped work, not recover lost work. Matches the known "nightly builds from a stale base" pattern (memory nightly-salvage-is-write-only-stale-base-2026-09-01).
+  - recommended owner: self — lane 7 should downweight/expire restore-queue items whose target files have since been touched by a later commit (git log since drop date), instead of re-surfacing them by staleness score alone.
+- [Sentry] JAVASCRIPT-NEXTJS-233 "[EMAIL] Welcome email: no email for user X" (19 events/9d)
+  - status: already-fixed (verified, no action needed)
+  - why: root-caused and shipped in commit c8e142e8b (2026-09-08, same day) — `no_email` is a legitimate terminal state, downgraded logger.error->info for THAT case only while adding a new loud logger.error for an actual failed auth lookup (previously silently discarded). Not a blanket silence.
+- [Sentry] JAVASCRIPT-NEXTJS-234 "<unlabeled event>" on /es/multiplayer (16 occurrences, 1 user, last seen 2026-08-31)
+  - status: deferred — needs-repro
+  - why: event payload is an empty `console_error` (`args: [""]`), no stack trace, no message. Stale (9 days, brief listed it via a stale cached score) and single-user. Not actionable without a fresh occurrence or a populated error message.
+  - recommended owner: self — re-check if it fires again with a non-empty message.
+- [Player report] Word Tower "not in the dictionary" for "ice" (Report-a-Bug, 2026-09-02, filed from /en/leaderboard)
+  - status: deferred — needs-repro
+  - why: traced the full pipeline (`validateTowerWord` -> `isInDictionary` -> `/api/dictionary-words?lang=en` -> `an-array-of-english-words`). Confirmed "ice" IS in the underlying English word list (`node -e "require('an-array-of-english-words').includes('ice')"` -> true), and the uppercase-canonicalization on both the dict-build side (`addDictKeys`) and the lookup side (`canon()`) is consistent — no case-mismatch bug found (the Class-2 pattern this smelled like). Could not reproduce live; feedback report location (/en/leaderboard) is likely just wherever the floating feedback widget was open, not necessarily where the bug occurred.
+  - recommended owner: self — next run, try live-repro in Word Tower with a stale IndexedDB-cached dictionary (24h cache) to check for a stale-cache-missing-word case Class-1 style.
+- [Supabase] 7× `function_search_path_mutable` WARN (get_or_create_player_rating, get_random_words_from_bank, get_user_leaderboard_rank, process_gift, sync_leaderboard_avatar, update_achievement_progress_updated_at, update_teacher_assignment_updated_at)
+  - status: attempted + reverted same run (no net change)
+  - why: applied `SET search_path=''` per the autonomy-matrix "ship autonomously" bullet, but `get_random_words_from_bank` immediately broke — its body references `daily_challenge_word_bank` unqualified, relying on the implicit `public` search_path. Reverted via `RESET search_path` and verified the function works again. **The autonomy-matrix bullet for this advisor category is unsafe in this codebase** — most/all of these functions likely have the same unqualified-reference pattern and would need each function body schema-qualified (`public.daily_challenge_word_bank` etc.) before `SET search_path=''` is safe, which is a real (if small) code change per function, not a one-line hardening no-op.
+  - recommended owner: self/backend — fix properly (schema-qualify each function body, THEN set search_path) one function at a time, verified with a live call each time, not as a batch.

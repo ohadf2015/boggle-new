@@ -74,6 +74,25 @@ function trackFirstWinConfigApplied(entry: string): void {
   }
 }
 
+/**
+ * The returning-player gate below renders the interactive 'playing' board
+ * (initial phase state) for one paint before router.replace() lands on MP
+ * Quick Play — a null-grid board a user can click before it's yanked away.
+ * Suspected source of the ?autoStart=bots rage-click cluster; this event lets
+ * tomorrow's PostHog query correlate redirect fires with rageclick locale/reach.
+ */
+function trackBotsToMpRedirect(uiLanguage: string, entry: string): void {
+  try {
+    // Same event name a 2026-09-04 lane run intended to ship for this exact
+    // call site (docs/nightly/impact-ledger.ndjson id
+    // 03-engagement-2026-09-04-singleplayer-bots-stale-redirect) — that run's
+    // code never actually landed (gate dropped it), so this fires it for real.
+    posthog.capture('singleplayer_bots_stale_redirect', { locale: uiLanguage, entry });
+  } catch {
+    /* analytics best-effort */
+  }
+}
+
 const BOT_NAMES = [
   'WordBot', 'LexiBot', 'AlphaBot', 'BrainBot', 'SpeedBot',
   'CleverBot', 'QuickBot', 'SmartBot', 'ProBot', 'MasterBot',
@@ -206,6 +225,7 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     if (!hasPlayedBotsGame()) return;
     hasRedirectedRef.current = true;
     hasAutoStartedRef.current = true; // suppress subsequent auto-start effects
+    trackBotsToMpRedirect(uiLanguage, autoStart === 'bots' ? 'autoStart=bots' : 'preset=bots');
     router.replace(`/${uiLanguage}/multiplayer?quickPlay=true`);
   }, [autoStart, presetParam, router, uiLanguage]);
 

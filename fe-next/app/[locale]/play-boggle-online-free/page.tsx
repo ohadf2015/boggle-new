@@ -374,8 +374,9 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               The party <span className="bg-neo-navy px-2 text-neo-lime">starts</span> when friends join.
             </h2>
             <p className="mt-4 text-neo-white">
-              Spin up a room in 3 seconds. Share a 4-letter code or QR. 20 people on phones, one TV in the middle —
-              chaos in six languages. Real-time scoring, combo streaks, the works.
+              Play boggle online with up to 50 people at once. Spin up a room in 3 seconds, share a 4-letter code or
+              QR, 20 people on phones, one TV in the middle — chaos in six languages. Real-time scoring, combo
+              streaks, the works.
             </p>
             <Link
               href={`/${locale}/multiplayer`}
