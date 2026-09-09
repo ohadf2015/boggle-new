@@ -19,6 +19,14 @@ vi.mock('@/components/education/TrialUrgencyBanner', () => ({
   TrialUrgencyBanner: () => <div data-testid="trial-urgency">Trial</div>,
 }));
 
+// The approved card shows the trial banner only when the Pro entitlement has
+// RESOLVED to free — a loading entitlement hides it. Mock the hook resolved so
+// the state machine tests don't depend on the real fetch timing out.
+const mockProState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: async () => {} };
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => mockProState,
+}));
+
 // Mock GSAP — jsdom can't render animations, so the effect runs but has no visual effect
 vi.mock('gsap', () => ({
   gsap: {

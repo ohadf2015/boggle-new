@@ -133,7 +133,24 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }),
   );
 
-  const subscription = await checkTeacherSubscription(userId);
+  // Plan read is best-effort: checkTeacherSubscription falls back to a
+  // request-scoped client, which does not exist outside a request (tests,
+  // cron). A missing entitlement read must not 500 the drill-down.
+  let plan: { tier: string; hasPro: boolean; periodEnd: string | null } = {
+    tier: 'free',
+    hasPro: false,
+    periodEnd: null,
+  };
+  try {
+    const subscription = await checkTeacherSubscription(userId);
+    plan = {
+      tier: subscription.tier,
+      hasPro: subscription.tier === 'pro' && subscription.status === 'active',
+      periodEnd: subscription.current_period_end,
+    };
+  } catch {
+    // free-plan default above
+  }
 
   return NextResponse.json(
     buildTeacherActivity({
@@ -146,11 +163,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       assignments: assignmentsRes.data ?? [],
       progress: progressRes.data ?? [],
       gamesByClassroom,
-      plan: {
-        tier: subscription.tier,
-        hasPro: subscription.tier === 'pro' && subscription.status === 'active',
-        periodEnd: subscription.current_period_end,
-      },
+      plan,
     }),
   );
 }
