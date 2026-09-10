@@ -146,6 +146,8 @@ export function ClassroomSetupStep({
     () => lessons.filter((l) => selectedLessonIds.includes(l.id)),
     [lessons, selectedLessonIds]
   );
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const showClassroomPicker = classrooms.length > 1;
 
   return (
     <WizardStep
@@ -213,7 +215,7 @@ export function ClassroomSetupStep({
           </p>
         )}
 
-        {/* Classroom Selection */}
+        {showClassroomPicker && (
         <div>
           <label className="block text-neo-white font-bold mb-3">
             <School className="w-5 h-5 inline me-2 text-neo-cyan" />
@@ -250,6 +252,7 @@ export function ClassroomSetupStep({
             ))}
           </div>
         </div>
+        )}
 
         {/* Lesson Selection */}
         <div>
@@ -277,7 +280,26 @@ export function ClassroomSetupStep({
           )}
         </div>
 
-        {/* Team battle + SPED support knobs */}
+        <details
+          data-testid="setup-advanced"
+          className="rounded-neo border-neo border-neo-black bg-neo-navy/50"
+          open={advancedOpen}
+        >
+          <summary
+            data-testid="setup-advanced-summary"
+            className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-4 py-3 font-neo-display font-bold text-neo-white marker:content-none"
+            onClick={(event) => {
+              event.preventDefault();
+              setAdvancedOpen((open) => !open);
+            }}
+          >
+            {t('education.classroomGame.advanced')}
+            <span className="ms-auto text-xs font-neo-body font-bold text-neo-white/60">
+              {t('education.classroomGame.advancedHint')}
+            </span>
+          </summary>
+          {advancedOpen && (
+          <div className="space-y-6 border-t border-neo-black/40 px-4 pb-4 pt-4">
         <ClassroomBattleSettings
           playStyle={playStyle}
           teamCount={teamCount}
@@ -397,6 +419,9 @@ export function ClassroomSetupStep({
               : t('education.studentPreview.disabledHint')}
           </p>
         </div>
+          </div>
+          )}
+        </details>
       </div>
 
       {/* The preview renders a letter board, which a Vocab Quiz never shows —

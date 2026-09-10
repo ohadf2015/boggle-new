@@ -55,6 +55,7 @@ describe('ClassroomSetupStep — student preview', () => {
     const { rerender } = render(
       <ClassroomSetupStep {...baseProps} selectedLessonIds={[]} allPlayableWords={[]} />
     );
+    fireEvent.click(screen.getByTestId('setup-advanced-summary'));
     expect(previewButton()).toBeDisabled();
 
     rerender(<ClassroomSetupStep {...baseProps} selectedClassroomId="" />);
@@ -66,6 +67,7 @@ describe('ClassroomSetupStep — student preview', () => {
 
   it('opens the preview dialog with the selected classroom join code', () => {
     render(<ClassroomSetupStep {...baseProps} />);
+    fireEvent.click(screen.getByTestId('setup-advanced-summary'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     fireEvent.click(previewButton());
     expect(screen.getByRole('dialog')).toBeInTheDocument();

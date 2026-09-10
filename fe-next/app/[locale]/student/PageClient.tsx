@@ -31,6 +31,7 @@ import { StudentHubPlayZone } from '@/components/student/StudentHubPlayZone';
 import { StudentHubProgressZone } from '@/components/student/StudentHubProgressZone';
 import { StudentHubLearnZone } from '@/components/student/StudentHubLearnZone';
 import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
+import { useActiveClassroomGame } from '@/hooks/useActiveClassroomGame';
 import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
 import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -179,7 +180,7 @@ export default function StudentPageClient() {
           The banner renders its own quiet "listening" state when no game is active.
         */}
         {classroomId && (
-          <ClassroomGameBanner
+          <StudentClassHub
             classroomId={classroomId}
             userId={user.id}
             username={studentName}
@@ -222,22 +223,44 @@ export default function StudentPageClient() {
         )}
 
         {/* 2. What the teacher gave them: lessons, and the words due for review. */}
-        <StudentHubLearnZone userId={user.id} classroomId={classroomId ?? undefined} />
-
-        {/* 3. Ways to play. */}
-        {classroomId && (
-          <StudentHubPlayZone
-            classroomId={classroomId}
-            userId={user.id}
-            username={studentName}
-          />
-        )}
-
-        {/* 4. Their standing. Last: it is a reward for work already done, not a next action. */}
-        {classroomId && (
-          <StudentHubProgressZone classroomId={classroomId} userId={user.id} />
+        {!classroomId && (
+          <StudentHubLearnZone userId={user.id} classroomId={undefined} />
         )}
       </div>
     </div>
+  );
+}
+
+function StudentClassHub({
+  classroomId,
+  userId,
+  username,
+}: {
+  classroomId: string;
+  userId: string;
+  username: string;
+}) {
+  const session = useActiveClassroomGame(classroomId);
+  const liveNow = Boolean(session.activeGame?.gameCode);
+
+  return (
+    <>
+      <ClassroomGameBanner
+        classroomId={classroomId}
+        userId={userId}
+        username={username}
+      />
+      {!liveNow && (
+        <>
+          <StudentHubLearnZone userId={userId} classroomId={classroomId} />
+          <StudentHubPlayZone
+            classroomId={classroomId}
+            userId={userId}
+            username={username}
+          />
+          <StudentHubProgressZone classroomId={classroomId} userId={userId} />
+        </>
+      )}
+    </>
   );
 }

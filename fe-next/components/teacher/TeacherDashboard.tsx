@@ -45,7 +45,7 @@ import { TeacherPlanBadge } from './TeacherPlanBadge';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
-import { BarChart3, FileText, ChevronDown } from 'lucide-react';
+import { BarChart3, FileText, ChevronDown, Play } from 'lucide-react';
 import Link from 'next/link';
 
 import { stagger, slideUp } from './teacherDashboardTabs';
@@ -198,6 +198,25 @@ export default function TeacherDashboard() {
               <m.div variants={slideUp} className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
                 <RepeatLastGameButton config={getMostRecent()} onClick={handleRepeatLast} />
+              </m.div>
+            )}
+
+            {classrooms.length > 0 && (
+              <m.div variants={slideUp} className="mb-6">
+                <Link
+                  href={`/${language}/education/classroom-game`}
+                  data-testid="start-game-hero"
+                  className={cn(
+                    'flex min-h-[52px] w-full items-center justify-center gap-2 rounded-neo',
+                    'border-3 border-black bg-neo-lime px-6 py-3',
+                    'font-neo-display text-lg font-black text-black shadow-hard',
+                    'hover:-translate-y-0.5 hover:shadow-hard-lg transition-all',
+                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
+                  )}
+                >
+                  <Play className="h-5 w-5" aria-hidden="true" />
+                  {t('teacher.dashboard.startGameHero')}
+                </Link>
               </m.div>
             )}
 

@@ -37,6 +37,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/hooks/useStudentClassroom', () => ({
   useStudentClassroom: () => ({ classroomId: 'c1', classroom: { id: 'c1', name: 'ELA (7th)' } }),
 }));
+vi.mock('@/hooks/useActiveClassroomGame', () => ({
+  useActiveClassroomGame: () => ({ activeGame: null, isConnected: true, socket: {} }),
+}));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
 vi.mock('@/components/student/StudentHubPlayZone', () => ({
