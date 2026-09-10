@@ -20,6 +20,23 @@ const COMMON_URLS = (locale: Locale) => ({
     faq: `${BASE}/${locale}/faq`,
 });
 
+const EDUCATION_LANDING_SLUGS = [
+    'esl-word-games',
+    'english-games-elementary',
+    'english-games-middle-school',
+    'english-games-adults',
+    'irregular-verbs-games',
+    'english-vocabulary-topics',
+] as const;
+
+function educationLandingLines(locale: Locale, labels: Record<(typeof EDUCATION_LANDING_SLUGS)[number], string>): string {
+    const hub = `${BASE}/${locale}/education`;
+    const rows = EDUCATION_LANDING_SLUGS.map(
+        (slug) => `- ${labels[slug]}: ${BASE}/${locale}/education/${slug}`,
+    );
+    return [`- Hub: ${hub}`, ...rows].join('\n');
+}
+
 function buildEn(): string {
     const u = COMMON_URLS('en');
     return `# LexiClash — Real-Time Multiplayer Word Battle Game
@@ -37,6 +54,16 @@ Full reference: ${BASE}/llms-full.txt
 - Adventure Mode: ${u.adventure}
 - Brain Drills (6 mini-games): ${u.brainDrills}
 - Education (free classroom toolkit): ${u.education}
+
+## Education
+${educationLandingLines('en', {
+    'esl-word-games': 'ESL word games for the classroom',
+    'english-games-elementary': 'English games for elementary',
+    'english-games-middle-school': 'English games for middle school',
+    'english-games-adults': 'English games for adults',
+    'irregular-verbs-games': 'Irregular verb games',
+    'english-vocabulary-topics': 'English vocabulary by topic (food, animals, travel, school)',
+})}
 
 ## Why LexiClash for English-language users
 
@@ -80,6 +107,16 @@ Hebrew brand keywords: משחק מילים, אנגרמה, תפזורת, וורד
 - Adventure Mode (הרפתקה): ${u.adventure}
 - Brain Drills (תרגילי חשיבה): ${u.brainDrills}
 - Education (חינוך, כיתות): ${u.education}
+
+## Education
+${educationLandingLines('he', {
+    'esl-word-games': 'משחקי מילים באנגלית לכיתה',
+    'english-games-elementary': 'משחקי אנגלית לכיתות יסוד',
+    'english-games-middle-school': 'משחקי אנגלית לחטיבת ביניים',
+    'english-games-adults': 'משחקי אנגלית למבוגרים',
+    'irregular-verbs-games': 'משחקי פעלים חריגים',
+    'english-vocabulary-topics': 'אוצר מילים באנגלית לפי נושאים',
+})}
 
 ## The Daily Word / המילה היומית
 
@@ -130,6 +167,16 @@ Komplett referens: ${BASE}/llms-full.txt
 - Brain Drills (6 snabba minispel): ${u.brainDrills}
 - Utbildning (gratis klassrumsverktyg): ${u.education}
 
+## Utbildning
+${educationLandingLines('sv', {
+    'esl-word-games': 'ESL-ordlekar för klassrummet',
+    'english-games-elementary': 'Engelsklekar för lågstadiet',
+    'english-games-middle-school': 'Engelsklekar för högstadiet',
+    'english-games-adults': 'Engelsklekar för vuxna',
+    'irregular-verbs-games': 'Oregelbundna verb-lekar',
+    'english-vocabulary-topics': 'Engelskt ordförråd efter tema',
+})}
+
 ## Varför LexiClash för svenska spelare
 
 - **Realtid istället för turordning**: Wordfeud och Alfapet är turbaserade — en match kan dra ut på dagar. LexiClash körs synkront, en hel match tar 90 sekunder.
@@ -176,6 +223,16 @@ Website: ${BASE}/ja
 - 脳トレ (Brain Drills、6種のミニゲーム): ${u.brainDrills}
 - 教育モード (無料の教室ツール): ${u.education}
 
+## 教育
+${educationLandingLines('ja', {
+    'esl-word-games': '教室向けESL単語ゲーム',
+    'english-games-elementary': '小学校向け英語ゲーム',
+    'english-games-middle-school': '中学生向け英語ゲーム',
+    'english-games-adults': '大人向け英語ゲーム',
+    'irregular-verbs-games': '不規則動詞ゲーム',
+    'english-vocabulary-topics': 'テーマ別英単語（食べ物・動物・旅行・学校）',
+})}
+
 ## 日本語ユーザーが LexiClash を選ぶ理由
 
 - **リアルタイム同期プレイ**: Words With Friends や Scrabble GO のようなターン制ではなく、全プレイヤーが同じ盤面で同時に単語を探す。1試合90秒。
@@ -220,6 +277,16 @@ Referencia completa: ${BASE}/llms-full.txt
 - Modo aventura: ${u.adventure}
 - Brain Drills (6 minijuegos rápidos): ${u.brainDrills}
 - Educación (kit gratuito para aulas): ${u.education}
+
+## Educación
+${educationLandingLines('es', {
+    'esl-word-games': 'Juegos de palabras en inglés para el aula',
+    'english-games-elementary': 'Juegos de inglés para primaria',
+    'english-games-middle-school': 'Juegos de inglés para secundaria',
+    'english-games-adults': 'Aprender inglés jugando para adultos',
+    'irregular-verbs-games': 'Juegos de verbos irregulares',
+    'english-vocabulary-topics': 'Vocabulario en inglés por temas (comida, animales, viaje, escuela)',
+})}
 
 ## Por qué LexiClash para hispanohablantes
 
@@ -270,6 +337,16 @@ function buildRu(): string {
 - Режим приключений: ${u.adventure}
 - Тренировка мозга (6 мини-игр): ${u.brainDrills}
 - Образование (бесплатный набор для классов): ${u.education}
+
+## Образование
+${educationLandingLines('ru', {
+    'esl-word-games': 'Словесные игры ESL для класса',
+    'english-games-elementary': 'Игры на английском для начальной школы',
+    'english-games-middle-school': 'Игры на английском для средней школы',
+    'english-games-adults': 'Игры на английском для взрослых',
+    'irregular-verbs-games': 'Игры на неправильные глаголы',
+    'english-vocabulary-topics': 'Английский словарь по темам',
+})}
 
 ## Почему LexiClash для русскоязычных игроков
 

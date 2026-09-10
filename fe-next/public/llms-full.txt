@@ -163,6 +163,11 @@ A: Real-time simultaneous play (not turn-based like Scrabble), no download neede
 - Live Classroom Game (whole-class multiplayer): https://www.lexiclash.live/en/education/classroom-game
 - Free Classroom Vocabulary Games: https://www.lexiclash.live/en/education/vocabulary-games-classroom
 - ESL Word Games (English learners): https://www.lexiclash.live/en/education/esl-word-games
+- English Games for Elementary: https://www.lexiclash.live/en/education/english-games-elementary
+- English Games for Middle School: https://www.lexiclash.live/en/education/english-games-middle-school
+- English Games for Adults: https://www.lexiclash.live/en/education/english-games-adults
+- Irregular Verb Games: https://www.lexiclash.live/en/education/irregular-verbs-games
+- English Vocabulary by Topic: https://www.lexiclash.live/en/education/english-vocabulary-topics
 - Word Games for Teachers: https://www.lexiclash.live/en/education/games-for-teachers
 - For Schools & Districts: https://www.lexiclash.live/en/education/for-schools
 - Spelling Bee Practice: https://www.lexiclash.live/en/education/spelling-bee-practice

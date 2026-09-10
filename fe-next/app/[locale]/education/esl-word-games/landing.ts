@@ -3,6 +3,7 @@ import { educationPageLabel } from '@/lib/seo/educationPageLinks';
 import { getEslWordGamesContent } from './content';
 import { getEslClassGames } from './classGames';
 import { eslExtraJsonLd } from './jsonLd';
+import { playableCopy } from '@/lib/education/eslCefrDemo';
 
 const SLUG = 'esl-word-games';
 
@@ -46,6 +47,7 @@ export function getEslWordGamesLanding(locale: string): EducationLandingContent 
       subtitle: c.heroSubtitle,
     },
     sections: [
+      { kind: 'playable', title: playableCopy(locale).title, intro: playableCopy(locale).intro },
       { kind: 'classgames', section: getEslClassGames(locale) },
       { kind: 'features', title: c.sections.builtFor, items: c.features },
       { kind: 'cards', title: c.sections.setLevelPerClass, items: c.proficiencyLevels },

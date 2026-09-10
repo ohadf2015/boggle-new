@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { ClassGameList } from '@/components/education/ClassGameList';
 import { EducationDepthSections } from '@/components/education/EducationDepthSections';
 import { EducationPlayFormats } from '@/components/education/EducationPlayFormats';
+import { EslPlayableDemo } from '@/components/education/EslPlayableDemo';
 
 /**
  * Tailwind v4 only generates classes it can see as literal strings, so every
@@ -96,12 +97,12 @@ function Block({ children }: { children: React.ReactNode }) {
 export function EducationSectionRenderer({
   section,
   accent,
-  locale,
+  locale = 'en',
 }: {
   section: EducationSection;
   accent: EducationAccent;
   /** Prefixes any card href; sections are locale-less like the rest of the content. */
-  locale: string;
+  locale?: string;
 }) {
   const a = ACCENT[accent];
 
@@ -257,6 +258,15 @@ export function EducationSectionRenderer({
     // The listicle owns its own heading and intro, so it is rendered bare —
     // wrapping it in a Block/SectionHeading would print a second heading.
     return <ClassGameList section={section.section} />;
+  }
+
+  if (section.kind === 'playable') {
+    return (
+      <Block>
+        <SectionHeading title={section.title} intro={section.intro} />
+        <EslPlayableDemo locale={locale} />
+      </Block>
+    );
   }
 
   if (section.kind === 'table') {

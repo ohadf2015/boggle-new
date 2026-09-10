@@ -83,6 +83,8 @@ export type EducationSection =
   | { kind: 'playformats'; heading: string; intro: string; liveLabel: string; practiceLabel: string }
   /** A single aside with an outbound link — `href` is absolute, not locale-prefixed. */
   | { kind: 'note'; heading: string; body: string; href: string; cta: string }
+  /** Interactive ESL round + CEFR lists. Client island; heading stays in HTML. */
+  | { kind: 'playable'; title: string; intro?: string }
   | { kind: 'prose'; title: string; paragraphs: string[] };
 
 export type EducationLandingContent = {
