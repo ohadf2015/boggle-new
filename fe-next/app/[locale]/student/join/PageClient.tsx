@@ -1,34 +1,20 @@
 /**
- * Student Join Classroom Page
+ * `/[locale]/student/join` — the in-app "join a class" entry.
  *
- * Allows students to join a teacher's classroom using a 6-character code.
- * No account required: logged-out students join as an anonymous guest by
- * entering a name (the form handles both signed-in and guest paths). We only
- * wait for auth to finish loading so a returning student's session is restored
- * before deciding what the form shows.
+ * Same surface as `/join` and `/join/[code]`: one `JoinFlow`, so a student
+ * cannot meet two different join screens depending on which door they came
+ * through (recurring pitfall class 3). No account required — a logged-out
+ * student joins as a guest by typing a name.
+ *
+ * No auth gate here on purpose. `JoinFlow` renders immediately and holds a tap
+ * that lands before the session resolves; a full-page loader in front of the
+ * code field is the wait this redesign exists to remove.
  */
 
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { PageLoader } from '@/components/ui/PageLoader';
-import JoinClassroomForm from '@/components/student/JoinClassroomForm';
+import JoinFlow from '@/components/education/join/JoinFlow';
 
 export default function StudentJoinPageClient() {
-  const { loading } = useAuth();
-  const { t } = useLanguage();
-
-  // Wait for session restore (a returning guest's persisted anon session) before
-  // rendering, so we don't briefly show the guest name field to an already
-  // signed-in student.
-  if (loading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center bg-neo-navy">
-        <PageLoader size="lg" text={t('common.loading')} />
-      </div>
-    );
-  }
-
-  return <JoinClassroomForm />;
+  return <JoinFlow />;
 }

@@ -13,6 +13,7 @@ import type { VocabularyWord } from '@/lib/supabase/education/types';
 vi.mock('../../modules/classroomGameManager', () => ({
   getClassroomGame: vi.fn(),
   updateClassroomGameStatus: vi.fn().mockResolvedValue(undefined),
+  reopenClassroomGameForRound: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('../../modules/gameStateManager', () => ({
   getGame: vi.fn(),

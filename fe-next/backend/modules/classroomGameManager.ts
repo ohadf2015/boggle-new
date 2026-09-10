@@ -8,6 +8,7 @@
 import { getRedisClient } from '../redisClient.js';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger.js';
+import { isClassroomSessionEnded } from './classroomGameSessionState.js';
 
 const CLASSROOM_GAME_TTL = 14400; // 4 hours
 
@@ -87,7 +88,14 @@ export interface ClassroomGame {
   players: ClassroomGamePlayer[];
   createdAt: string;
   startedAt?: string;
-  status: 'waiting' | 'playing' | 'finished';
+  /**
+   * The ROUND clock. `'finished'` is written at the end of every round, not at
+   * the end of the lesson, so it never means "this code is dead" — see
+   * `classroomGameSession.ts`.
+   */
+  status: 'waiting' | 'playing' | 'finished' | 'ended';
+  /** The SESSION clock: set once when the teacher ends the game. Terminal. */
+  endedAt?: string;
 }
 
 export interface CreateClassroomGameData {
@@ -179,15 +187,18 @@ export async function getActiveClassroomGames(classroomId: string): Promise<Clas
         await redis.srem(`classroom_games:${classroomId}`, gameCode);
         continue;
       }
-      if (game.status === 'finished') {
-        // "Active" has to mean JOINABLE. A finished game kept its Redis key for
+      if (isClassroomSessionEnded(game)) {
+        // "Active" has to mean JOINABLE. An ended game kept its Redis key for
         // the rest of the 4h TTL and stayed in this set, so the student banner —
         // which shows games[0], and a Redis set has no order — routinely
-        // advertised a round that was already over, under whichever lesson name
+        // advertised a game that was already over, under whichever lesson name
         // that older game carried. Tapping JOIN walked the student into a dead
         // room and out to the generic multiplayer hub with no error at all.
         // Prune it here, the same way an expired key is already pruned, or every
         // 15-second poll re-filters it for four hours.
+        // ENDED, not `'finished'`: a finished ROUND is still a live game whose
+        // teacher has not pressed "next round" yet, and pruning it there hid a
+        // running lesson from its own class.
         await redis.srem(`classroom_games:${classroomId}`, gameCode);
         continue;
       }
@@ -295,7 +306,7 @@ export async function removePlayerFromClassroomGame(
  */
 export async function updateClassroomGameStatus(
   gameCode: string,
-  status: 'waiting' | 'playing' | 'finished'
+  status: 'waiting' | 'playing' | 'finished' | 'ended'
 ): Promise<void> {
   try {
     const redis = getRedis();
@@ -306,17 +317,123 @@ export async function updateClassroomGameStatus(
     if (status === 'playing' && !game.startedAt) {
       game.startedAt = new Date().toISOString();
     }
+    // `'ended'` is the one terminal status, and it is the ONLY writer of the
+    // session marker every join gate reads. Stamping it here rather than in a
+    // second "end the game" function keeps one writer for one outcome — the
+    // teacher's socket event and the room teardown reach the same line.
+    if (status === 'ended' && !game.endedAt) {
+      game.endedAt = new Date().toISOString();
+    }
 
     await redis.setex(
       `classroom_game:${gameCode}`,
       CLASSROOM_GAME_TTL,
       JSON.stringify(game)
     );
+    // Out of the classroom's index in the same breath, or the student hub's
+    // banner keeps advertising a game nobody can join.
+    if (status === 'ended') {
+      await redis.srem(`classroom_games:${game.classroomId}`, gameCode);
+    }
 
     logger.info('CLASSROOM_GAME', `Updated game ${gameCode} status to ${status}`);
   } catch (error) {
     logger.error('CLASSROOM_GAME', `Failed to update game status: ${error}`);
   }
+}
+
+/**
+ * Mark this code live again because a round is starting in its room.
+ *
+ * `status: 'finished'` is written at the end of EVERY round — `gameScores.ts`
+ * for a board round, `vocabQuizRound.ts` for a quiz — not at the end of the
+ * lesson, and until now nothing ever wrote it back. `startClassroomGame` cannot:
+ * it refuses any status but `'waiting'`, and no client emits it. The teacher's
+ * "Rematch" is `onReturnToRoom` — the same room, the same code, a new round.
+ *
+ * That mattered the moment the code stopped resolving for a finished game
+ * (`lib/education/classroomGameLookup.ts`, and the SREM in
+ * `getActiveClassroomGames` below): round one ending killed the projector code
+ * for the rest of the lesson, so a student who dropped wifi during round two and
+ * re-scanned the QR was told their code was not recognised while the class was
+ * playing it. Kahoot's bar is that a PIN is dead when the game is over, not
+ * between two rounds of it.
+ *
+ * The SADD is half the fix, not a flourish: the finish pruned the code out of
+ * `classroom_games:<classroomId>`, and without putting it back the student hub's
+ * banner would keep saying there is no live game — a dead end traded for an
+ * invisible one.
+ *
+ * Best-effort by construction. Called on every game start, including the many
+ * that are not classroom games at all, so it must be cheap when there is nothing
+ * to do (one Redis read, no write) and must never throw: a round has to start
+ * even when Redis is unreachable.
+ */
+export async function reopenClassroomGameForRound(gameCode: string): Promise<void> {
+  try {
+    const game = await getClassroomGame(gameCode);
+    if (!game) return;
+    await markRoundLive(game);
+  } catch (error) {
+    logger.error('CLASSROOM_GAME', `Failed to reopen classroom game ${gameCode}: ${error}`);
+  }
+}
+
+/**
+ * The same reopen, folded into the read the caller was doing anyway.
+ *
+ * Game start needs the classroom record (lesson words, settings) AND needs the
+ * code marked live. As two calls that was two Redis reads of one key on every
+ * game start in the app — most of them not classroom games at all — plus a
+ * window in which an un-awaited reopen could land after, and clobber, the
+ * placed-vocabulary write that happens later in the same start. One awaited
+ * call, one read, no race.
+ *
+ * Returns the record for the caller, or null when the code is an ordinary
+ * multiplayer room (the common case). Never throws and never blocks a round: if
+ * Redis refuses the write the code may stay shut, but the game still starts and
+ * the failure is logged rather than swallowed.
+ */
+export async function beginClassroomRound(gameCode: string): Promise<ClassroomGame | null> {
+  try {
+    const game = await getClassroomGame(gameCode);
+    if (!game) return null;
+    try {
+      await markRoundLive(game);
+    } catch (error) {
+      logger.error('CLASSROOM_GAME', `Failed to reopen classroom game ${gameCode}: ${error}`);
+    }
+    return game;
+  } catch (error) {
+    logger.error('CLASSROOM_GAME', `Classroom lookup failed at round start for ${gameCode}: ${error}`);
+    return null;
+  }
+}
+
+/**
+ * Write `status: 'playing'` back and re-index the code. No-op when the record
+ * already says playing — every round start passes through here, and a no-op
+ * must not cost a write and a fresh TTL on a record nobody changed.
+ */
+async function markRoundLive(game: ClassroomGame): Promise<void> {
+  if (game.status === 'playing') return;
+  // Terminal means terminal. This runs on EVERY `startGame` in the app, so a
+  // stray start on a code whose game the teacher ended must not resurrect it —
+  // that would reopen the original dead-room bug from the other end.
+  if (isClassroomSessionEnded(game)) return;
+
+  const redis = getRedis();
+  game.status = 'playing';
+  if (!game.startedAt) game.startedAt = new Date().toISOString();
+
+  await redis.setex(
+    `classroom_game:${game.gameCode}`,
+    CLASSROOM_GAME_TTL,
+    JSON.stringify(game)
+  );
+  await redis.sadd(`classroom_games:${game.classroomId}`, game.gameCode);
+
+  logger.info('CLASSROOM_GAME', `Reopened classroom game ${game.gameCode} for a new round`);
 }
 
 /**

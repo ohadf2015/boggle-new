@@ -57,6 +57,35 @@ export interface LiveClassroomGame {
  * Returns null for "no such live game" AND for any failure (Redis down, malformed JSON).
  * Callers treat both the same way: fall through to the next interpretation of the code.
  * Never throws — a classroom code that resolves fine must not be blocked by this lookup.
+ *
+ * A game whose SESSION has ended is also null, and that is the point of this function
+ * existing rather than a bare `redis.get`. The record keeps a fresh four-hour TTL after the
+ * teacher is done, so the code stayed perfectly readable while the room it names was
+ * already gone (the playable room lives in `gameStateManager`, on entirely separate rules).
+ * A student typing the code still on the whiteboard was enrolled, handed back a `gameCode`,
+ * and walked into a dead room or a permanent spinner. Every HTTP door onto a projector
+ * code — `classroom/join`, `join-code/resolve`, `classroom/live-game` — comes through here,
+ * so one gate shuts all three the instant the teacher ends the game, which is the Kahoot
+ * behaviour: the PIN of an ended game is simply not recognised.
+ *
+ * The marker is `endedAt`, NOT `status: 'finished'`, and the difference is a whole bug.
+ * `finished` is written at the end of EVERY round — `gameScores.ts` the instant a board
+ * timer expires — while the teacher presses "next round" seconds to minutes later and the
+ * class sits on the results screen. Rejecting `finished` here told a latecomer typing the
+ * whiteboard code that we did not recognise it, in the middle of a lesson whose room and
+ * roster were entirely alive. `endedAt` is written once, by the teacher's own
+ * `endClassroomGame` and by the room actually being torn down — see
+ * `backend/modules/classroomGameSession.ts`, whose `isClassroomSessionEnded` this restates
+ * (webpack cannot bundle that module's Node-ESM `.js` specifiers; the test below pins the
+ * two against drift).
+ *
+ * Deliberately NOT a delete of the Redis key. `backend/services/gameLifecycle/gameScores.ts`
+ * re-reads the same record while it scores the round (participation bonus, classroom
+ * summary), so deleting on end would trade a dead-end for a silently lost round
+ * (recurring pitfall class 4).
+ *
+ * A record with NO marker stays joinable: failing closed on a missing field would lock a
+ * whole class out of a live round, strictly worse than the bug this fixes.
  */
 export async function lookupLiveClassroomGame(
   gameCode: string
@@ -68,8 +97,13 @@ export async function lookupLiveClassroomGame(
     const raw = await redis.get(classroomGameKey(gameCode));
     if (!raw) return null;
 
-    const game = JSON.parse(raw) as Partial<LiveClassroomGame>;
+    const game = JSON.parse(raw) as Partial<LiveClassroomGame> & {
+      status?: string;
+      endedAt?: string;
+    };
     if (!game?.classroomId) return null;
+    // The session rule, restated. Mirrors `isClassroomSessionEnded`.
+    if (game.status === 'ended' || game.endedAt) return null;
 
     return {
       classroomId: game.classroomId,

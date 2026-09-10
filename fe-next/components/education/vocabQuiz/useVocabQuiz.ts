@@ -188,7 +188,27 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
     socket.on(VOCAB_QUIZ_EVENTS.paused, onPaused);
     // Ask on mount AND on every reconnect: a refresh mid-round must restore the
     // live question with the time actually left, not wait for the next one.
-    socket.on('connect', requestState);
+    //
+    // But NOT on `connect`, which is the one obvious place to put it and is
+    // wrong. A reconnecting socket arrives with a brand-new id the server has
+    // never seen; only the `join` that `utils/SocketContext.tsx` re-emits from
+    // its own `connect` handler rebuilds the server's in-memory socket.id →
+    // game / username maps. `vocabQuizHandler`'s `requestState` resolves through
+    // exactly those maps and answers a miss with `if (!ctx) return;` — silence.
+    // `join` goes out first on the wire, but the server handles it
+    // asynchronously (Supabase + Redis), so a `connect`-fired `requestState`
+    // routinely overtook it and died unanswered: a blank quiz until the next
+    // question happened to broadcast, and never at all if the round was between
+    // questions, paused, or on its last one. Class 3 racing class 4.
+    //
+    // So sequence it behind the server's own confirmation that the join landed.
+    // `playerJoinHandler` sends `joined` for a player and `joinedAsSpectator`
+    // for the other door; wiring only one would rebuild the same asymmetry a
+    // layer down, so both are here. Re-asking is idempotent — the server just
+    // re-snapshots — so the extra ask on a first join costs nothing and closes
+    // the mirror race where this view mounts before the join completes.
+    socket.on('joined', requestState);
+    socket.on('joinedAsSpectator', requestState);
     requestState();
 
     return () => {
@@ -198,7 +218,8 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
       socket.off(VOCAB_QUIZ_EVENTS.state, onState);
       socket.off(VOCAB_QUIZ_EVENTS.ended, onEnded);
       socket.off(VOCAB_QUIZ_EVENTS.paused, onPaused);
-      socket.off('connect', requestState);
+      socket.off('joined', requestState);
+      socket.off('joinedAsSpectator', requestState);
     };
   }, [socket, anchorClock]);
 

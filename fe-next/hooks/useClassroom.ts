@@ -16,6 +16,7 @@ import {
 } from '@/lib/supabase/education';
 import { createClient } from '@/utils/supabase/client';
 import { signInAsGuestStudent, waitForProfile } from '@/lib/education/guestStudent';
+import { runGuestJoinPreflight } from '@/lib/education/joinGuestPreflight';
 import logger from '@/utils/logger';
 
 interface UseClassroomsState {
@@ -482,34 +483,6 @@ export function useClassroom(classroomId: string | undefined): UseClassroomRetur
  * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
  * and for the generic fallback; it is not fit to render on its own.
  */
-/**
- * Ask the server whether a guest nickname is free, and for a free variant.
- *
- * Fails OPEN on any transport problem: a check we could not perform must never
- * be the reason a student cannot join. Worst case they meet the original error;
- * blocking here would turn our outage into their locked door.
- */
-async function checkGuestNameAvailable(
-  name: string,
-  joinCode: string
-): Promise<{ code?: 'NAME_TAKEN'; suggestedName?: string } | null> {
-  try {
-    const res = await fetch('/api/education/guest-name', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      // `joinCode` is not optional in practice. The route scopes its 409 to that
-      // classroom's roster and fails OPEN without it — so omitting it does not
-      // relax the check, it disables it entirely and silently.
-      body: JSON.stringify({ name, joinCode }),
-    });
-    if (res.status !== 409) return null;
-    const data = await res.json();
-    return { code: 'NAME_TAKEN', suggestedName: data?.suggestedName };
-  } catch {
-    return null;
-  }
-}
-
 export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN';
 
 export interface JoinClassroomResult {
@@ -543,26 +516,13 @@ export function useJoinClassroom() {
         if (!guestName) {
           return { success: false, error: 'Not authenticated' };
         }
-        // Check the nickname BEFORE minting the anonymous user. Two students
-        // called Priya is an ordinary class, and it used to be a hard 500 —
-        // `deriveGuestUsername` now appends a random suffix so usernames no
-        // longer collide, but the ORDER still matters: once `signInAnonymously`
-        // has run the auth user exists and cannot be un-created.
-        //
-        // Scoped to THIS classroom's roster, which is why the join code goes
-        // with the name. The question is "does someone in this class already
-        // answer to this?", not "is this string used anywhere on the platform".
-        // The check must be server-side: own-row RLS would report every name
-        // free to this browser.
-        const nameCheck = await checkGuestNameAvailable(guestName, joinCode);
-        if (nameCheck?.code === 'NAME_TAKEN') {
-          return {
-            success: false,
-            code: 'NAME_TAKEN',
-            suggestedName: nameCheck.suggestedName,
-            error: 'NAME_TAKEN',
-          };
-        }
+        // Nothing may be created until both the CODE and the NICKNAME have
+        // had their say — an anonymous `auth.users` row cannot be un-created,
+        // and the checks must be server-side (own-row RLS would report every
+        // name free to this browser). Only a confident refusal stops the join;
+        // `runGuestJoinPreflight` carries on through our own outages.
+        const refusal = await runGuestJoinPreflight(joinCode, guestName);
+        if (refusal) return { success: false, ...refusal };
 
         const supabase = createClient();
         const guest = await signInAsGuestStudent(supabase, guestName);

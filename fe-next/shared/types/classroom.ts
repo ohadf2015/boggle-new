@@ -37,6 +37,17 @@ export interface ClassroomAccessibility {
 /** Points every human player gets when participationPoints is on. */
 export const PARTICIPATION_BONUS = 10;
 
+/** One plinth on the end-of-game podium. */
+export interface ClassroomPodiumEntry {
+  username: string;
+  score: number;
+  /** 1, 2 or 3 — the server's ranking, never recomputed on a client. */
+  rank: number;
+  /** Lesson words this player found; absent for a player with no mastery row. */
+  wordsFound?: number;
+  totalWords?: number;
+}
+
 export interface ClassroomSummary {
   teacherName: string;
   lessonNames: string[];
@@ -56,4 +67,16 @@ export interface ClassroomSummary {
   participationBonus?: number;
   /** Echo of the room's accessibility flags (large type, audio cues). */
   accessibility?: ClassroomAccessibility;
+  /**
+   * Top human finishers, best first. Server-built so the projector, the
+   * teacher's laptop and every student phone celebrate the same three names.
+   */
+  podium?: ClassroomPodiumEntry[];
+  /**
+   * Subset of `missedWords` the board generator never actually embedded, so
+   * results can say "the class never saw these" instead of blaming the class.
+   * Absent when the placed list is unknown — then all misses read as misses.
+   * `missedWords` stays whole: a reteach round should still cover these.
+   */
+  neverPlacedWords?: string[];
 }

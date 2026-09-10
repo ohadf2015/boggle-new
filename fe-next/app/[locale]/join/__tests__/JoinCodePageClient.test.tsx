@@ -1,65 +1,70 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
-const push = vi.fn();
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+/**
+ * `/[locale]/join` — the address a teacher says out loud.
+ *
+ * It returned a hard 404 once, then became a second, smaller code form that
+ * validated and forwarded to `/join/[code]`. Both were the same failure in
+ * different costumes: a student holding a code and an extra step in the way.
+ * It now renders the one shared `JoinFlow`.
+ *
+ * The `?code=` read is the other half. The projector share sheet and several
+ * outbound links carry `?code=`, and it was silently ignored — a student who
+ * arrived with the code already in the URL was still asked to type it.
+ */
+const { mockSearchParams } = vi.hoisted(() => ({
+  mockSearchParams: { get: vi.fn() },
+}));
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+vi.mock('@/components/education/join/JoinFlow', () => ({
+  default: ({ initialCode }: { initialCode?: string }) => (
+    <div data-testid="join-flow">{initialCode}</div>
+  ),
 }));
 
 import { JoinCodePageClient } from '../PageClient';
 
-/**
- * `/[locale]/join` returned a hard 404 in production. Only `/join/[code]`
- * resolved, so:
- *   - "go to lexiclash.live/join" — the shorthand a teacher says out loud —
- *     was a dead end,
- *   - and a student who had the code but not the full URL had nowhere to type it.
- *
- * That is the same "code and nowhere to put it" failure as the QR-only banner,
- * on the most guessable address in the product.
- */
+const withParams = (params: Record<string, string>) => {
+  mockSearchParams.get.mockImplementation((k: string) => params[k] ?? null);
+};
+
 describe('<JoinCodePageClient>', () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  const type = (value: string) =>
-    fireEvent.change(screen.getByRole('textbox'), { target: { value } });
-
-  it('sends a valid code to the route that actually resolves', () => {
-    render(<JoinCodePageClient />);
-    type('ABC123');
-    fireEvent.click(screen.getByRole('button', { name: 'joinByCode.submit' }));
-    expect(push).toHaveBeenCalledWith('/en/join/ABC123');
+  beforeEach(() => {
+    vi.clearAllMocks();
+    withParams({});
   });
 
-  it('strips characters a student pastes or types by mistake', () => {
+  it('renders the shared join flow rather than a second code form', () => {
     render(<JoinCodePageClient />);
-    // Copied out of chat with spaces and punctuation around it.
-    type(' abc-123 ');
-    fireEvent.click(screen.getByRole('button', { name: 'joinByCode.submit' }));
-    expect(push).toHaveBeenCalledWith('/en/join/ABC123');
+    expect(screen.getByTestId('join-flow')).toBeInTheDocument();
   });
 
-  it('refuses a too-short code instead of routing to a 404', () => {
+  it('pre-fills from ?code=, which used to be read by nothing at all', () => {
+    withParams({ code: 'P45KRT' });
     render(<JoinCodePageClient />);
-    type('AB1');
-    fireEvent.click(screen.getByRole('button', { name: 'joinByCode.submit' }));
-    expect(push).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByTestId('join-flow')).toHaveTextContent('P45KRT');
   });
 
-  it('refuses an empty submit', () => {
+  it('accepts ?pin= too — the word the students actually say', () => {
+    withParams({ pin: 'P45KRT' });
     render(<JoinCodePageClient />);
-    fireEvent.click(screen.getByRole('button', { name: 'joinByCode.submit' }));
-    expect(push).not.toHaveBeenCalled();
+    expect(screen.getByTestId('join-flow')).toHaveTextContent('P45KRT');
   });
 
-  it('shows a real message, never a raw translation key path', () => {
+  it('opens on an empty code when the URL carries none', () => {
     render(<JoinCodePageClient />);
-    type('AB1');
-    fireEvent.click(screen.getByRole('button', { name: 'joinByCode.submit' }));
-    // `t` is mocked to echo the key, so assert we ask for a defined key rather
-    // than rendering validateGameCode's raw return value.
-    expect(screen.getByRole('alert').textContent).toMatch(/^validation\./);
+    expect(screen.getByTestId('join-flow')).toHaveTextContent('');
+  });
+
+  it('hands a junk code straight through — the flow decides, not the route', () => {
+    // Sanitizing in two places is how the two paths drift apart. One owner.
+    withParams({ code: ' ab-1 ' });
+    render(<JoinCodePageClient />);
+    expect(screen.getByTestId('join-flow')).toHaveTextContent('ab-1');
   });
 });

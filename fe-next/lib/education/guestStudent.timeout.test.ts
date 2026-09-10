@@ -55,4 +55,43 @@ describe('waitForProfile', () => {
   it('still resolves true promptly when the profile is readable', async () => {
     await expect(waitForProfile(respondingClient(), 'u1', { tries: 3, delayMs: 0 })).resolves.toBe(true);
   });
+
+  /**
+   * The two ends of the bound, at the DEFAULTS the join path actually uses —
+   * the earlier tests all pass their own options, so nothing pinned the shipped
+   * behaviour.
+   *
+   * A poll, not a sleep: the wait ends on the first successful read. The
+   * three-second figure is a hard DEADLINE for the pathological case, and a
+   * student whose `handle_new_user` trigger lands in 40ms must not be made to
+   * wait it out. Real timers on purpose — fake ones would let a `setTimeout(3000)`
+   * masquerading as a poll pass this.
+   */
+  it('returns on the FIRST successful read, nowhere near the 3s deadline', async () => {
+    const started = Date.now();
+    await expect(waitForProfile(respondingClient(), 'u1')).resolves.toBe(true);
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
+
+  it('keeps polling past an empty read and returns as soon as the row lands', async () => {
+    let attempts = 0;
+    const client = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            maybeSingle: async () => {
+              attempts += 1;
+              // The trigger has not committed yet on the first two reads.
+              return attempts < 3 ? { data: null } : { data: { id: 'u1' } };
+            },
+          }),
+        }),
+      }),
+    } as never;
+
+    const started = Date.now();
+    await expect(waitForProfile(client, 'u1')).resolves.toBe(true);
+    expect(attempts).toBe(3);
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
 });

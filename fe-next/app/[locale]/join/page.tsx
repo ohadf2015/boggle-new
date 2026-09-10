@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { JoinCodePageClient } from './PageClient';
 
 const META: Record<string, { title: string; description: string }> = {
@@ -19,5 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function Page() {
-  return <JoinCodePageClient />;
+  // `useSearchParams` (for `?code=`) needs a Suspense boundary or `next build`
+  // refuses to prerender this route. The fallback is the page's own navy, not
+  // a spinner: the client component mounts in the same frame, and flashing a
+  // loader in front of a student holding a code is the thing we are removing.
+  return (
+    <Suspense fallback={<div className="min-h-dvh bg-neo-navy" />}>
+      <JoinCodePageClient />
+    </Suspense>
+  );
 }

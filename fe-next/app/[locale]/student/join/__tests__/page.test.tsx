@@ -1,149 +1,64 @@
-import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
-/**
- * Tests for Student Join Classroom Page
- *
- * Reproduces bug: When student navigates to join page while auth is loading,
- * they get redirected to landing page instead of seeing the join form.
- */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
-import { render, screen, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+/**
+ * `/[locale]/student/join` — the in-app door.
+ *
+ * It must render the SAME `JoinFlow` as `/join` and `/join/[code]`. Three
+ * doors onto one job is how two of them quietly drift apart (recurring
+ * pitfall class 3), and this one is the door a student uses after a failed
+ * attempt, so it has to behave identically to the one they came in through.
+ *
+ * It also must never redirect (the old bug: logged-out students bounced to
+ * the landing page) and never gate on auth (the old spinner).
+ */
+const { mockPush, mockUseAuth } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockUseAuth: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
+vi.mock('@/components/education/join/JoinFlow', () => ({
+  default: ({ initialCode }: { initialCode?: string }) => (
+    <div data-testid="join-flow">{initialCode ?? ''}</div>
+  ),
+}));
+
 import StudentJoinPageClient from '../PageClient';
 
-// Mock dependencies
-vi.mock('next/navigation', () => ({
-  useRouter: vi.fn(),
-}));
-
-vi.mock('@/contexts/AuthContext');
-vi.mock('@/contexts/LanguageContext');
-vi.mock('@/components/student/JoinClassroomForm', () => ({
-  default: function MockJoinClassroomForm() {
-    return <div data-testid="join-form">Join Classroom Form</div>;
-  },
-}));
-
-describe('StudentJoinPageClient - Auth Loading Bug', () => {
-  const mockPush = vi.fn();
-  const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
-  const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
-  const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
-
+describe('<StudentJoinPageClient>', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseRouter.mockReturnValue({ push: mockPush } as any);
-    mockUseLanguage.mockReturnValue({
-      t: (key: string) => key,
-      language: 'en',
-      setLanguage: vi.fn(),
-      languages: ['en', 'he', 'sv', 'ja', 'es'],
-    } as any);
+    mockUseAuth.mockReturnValue({ user: null, loading: false, isAuthenticated: false });
   });
 
-  test('should NOT redirect when auth is still loading', async () => {
-    // GIVEN: User navigates to join page while auth is still loading
-    mockUseAuth.mockReturnValue({
-      user: null,
-      profile: null,
-      isAuthenticated: false,
-      loading: true, // Key: still loading!
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
+  it('renders the shared join flow with no code pre-filled', () => {
     render(<StudentJoinPageClient />);
-
-    // THEN: Should NOT redirect - should show loader and wait for loading to complete
-    // BUG: Current code redirects to landing page even when loading=true
-    await waitFor(
-      () => {
-        expect(mockPush).not.toHaveBeenCalled();
-      },
-      { timeout: 100 }
-    );
+    expect(screen.getByTestId('join-flow')).toBeInTheDocument();
+    expect(screen.getByTestId('join-flow')).toHaveTextContent('');
   });
 
-  test('should show loader while auth is loading', async () => {
-    // GIVEN: Auth is loading
-    mockUseAuth.mockReturnValue({
-      user: null,
-      profile: null,
-      isAuthenticated: false,
-      loading: true,
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
+  it('shows the flow — not a loader — while the session is still resolving', () => {
+    mockUseAuth.mockReturnValue({ user: null, loading: true, isAuthenticated: false });
     render(<StudentJoinPageClient />);
+    expect(screen.getByTestId('join-flow')).toBeInTheDocument();
+    expect(screen.queryByText('common.loading')).not.toBeInTheDocument();
+  });
 
-    // THEN: Should show loader (not redirect)
-    expect(screen.getByText('common.loading')).toBeInTheDocument();
+  it('never redirects a logged-out student away from the join screen', () => {
+    render(<StudentJoinPageClient />);
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  test('should show join form when fully authenticated', async () => {
-    // GIVEN: User is fully authenticated
+  it('never redirects a signed-in student either', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'user-123' } as any,
-      profile: { id: 'user-123', username: 'testuser' } as any,
-      isAuthenticated: true,
+      user: { id: 'u1' },
       loading: false,
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
-    render(<StudentJoinPageClient />);
-
-    // THEN: Should show join form
-    await waitFor(() => {
-      expect(screen.getByTestId('join-form')).toBeInTheDocument();
+      isAuthenticated: true,
     });
-
-    expect(mockPush).not.toHaveBeenCalled();
-  });
-
-  test('shows the join form (NOT a redirect) for a logged-out student — they join as a guest', async () => {
-    // GIVEN: Auth loading completes, user is not authenticated.
-    mockUseAuth.mockReturnValue({
-      user: null,
-      profile: null,
-      isAuthenticated: false,
-      loading: false, // Loading complete
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
     render(<StudentJoinPageClient />);
-
-    // THEN: Account-less students must reach the form (guest join), not be
-    // bounced to the landing page.
-    await waitFor(() => {
-      expect(screen.getByTestId('join-form')).toBeInTheDocument();
-    });
     expect(mockPush).not.toHaveBeenCalled();
-  });
-
-  test('should NOT redirect when user exists but profile still loading', async () => {
-    // GIVEN: User signed in, but profile fetch in progress
-    mockUseAuth.mockReturnValue({
-      user: { id: 'user-123' } as any,
-      profile: null, // Profile not yet loaded
-      isAuthenticated: false, // False because profile is null
-      loading: true, // Still loading profile
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
-    render(<StudentJoinPageClient />);
-
-    // THEN: Should wait for loading, not redirect
-    await waitFor(
-      () => {
-        expect(mockPush).not.toHaveBeenCalled();
-      },
-      { timeout: 100 }
-    );
   });
 });

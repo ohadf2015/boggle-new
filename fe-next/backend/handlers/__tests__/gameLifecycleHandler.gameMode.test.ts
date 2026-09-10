@@ -240,7 +240,7 @@ vi.mock('../../../backend/utils/gameStateMachine', () => ({
 }));
 
 vi.mock('../../../backend/modules/classroomGameManager', () => ({
-  getClassroomGame: vi.fn().mockResolvedValue(null),
+  getClassroomGame: vi.fn().mockResolvedValue(null), beginClassroomRound: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('../../../backend/modules/roundEventsManager', () => ({

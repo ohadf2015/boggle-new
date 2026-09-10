@@ -28,6 +28,7 @@ vi.mock('@/lib/education/classroomGameLookup', () => ({
 import { GET } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 
 const req = (code: string) =>
   new Request(`https://x.test/api/education/join-code/resolve?code=${code}`) as never;
@@ -48,6 +49,7 @@ const withClassroom = (row: unknown) => {
 beforeEach(() => {
   vi.clearAllMocks();
   (lookupLiveClassroomGame as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+  (checkApiRateLimit as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ success: true });
 });
 
 describe('GET /api/education/join-code/resolve', () => {
@@ -104,6 +106,51 @@ describe('GET /api/education/join-code/resolve', () => {
     const res = await GET(req('TZCOQ7'));
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toMatchObject({ kind: 'unknown' });
+  });
+
+  /**
+   * `kind: 'unknown'` is OVERLOADED, and a caller that hard-stops on it will
+   * eventually refuse a perfectly good code. It is the answer for a genuine
+   * miss, for a tripped rate limit, and for a roster RPC that errored or threw —
+   * four situations, one word, and only the first of them means "wrong code".
+   *
+   * The guest join path now pre-validates the code so a typo costs one fast
+   * request instead of an anonymous auth user plus a three-second spinner. That
+   * only stays safe while it can tell a CONFIDENT unknown from a degraded one:
+   * hard-stopping during a Supabase hiccup would tell a whole school their
+   * classroom code was wrong (recurring pitfall class 4 — fail open, say
+   * nothing, look identical to the real answer).
+   *
+   * So an unknown that came out of a broken lookup says so. Redis-down is the
+   * deliberate exception: `lookupLiveClassroomGame` swallows its own failures,
+   * and a student holding a GAME code cannot join with Redis down regardless.
+   */
+  it('flags an unknown produced by a broken classroom lookup as degraded', async () => {
+    (createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      rpc: vi.fn(async () => ({ data: null, error: { message: 'connection reset' } })),
+    });
+    const res = await GET(req('Q3UQ2J'));
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ kind: 'unknown', degraded: true });
+  });
+
+  it('flags an unknown as degraded when the classroom lookup throws', async () => {
+    (createClient as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('boom'));
+    const res = await GET(req('Q3UQ2J'));
+    await expect(res.json()).resolves.toEqual({ kind: 'unknown', degraded: true });
+  });
+
+  it('flags a rate-limited answer as degraded — it never even looked', async () => {
+    (checkApiRateLimit as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ success: false });
+    const res = await GET(req('Q3UQ2J'));
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ kind: 'unknown', degraded: true });
+  });
+
+  it('leaves a CONFIDENT unknown unflagged, so a typo can be called a typo', async () => {
+    withClassroom(null);
+    const res = await GET(req('ZZZZZZ'));
+    await expect(res.json()).resolves.toEqual({ kind: 'unknown' });
   });
 
   it('rejects a malformed code without touching either backend', async () => {

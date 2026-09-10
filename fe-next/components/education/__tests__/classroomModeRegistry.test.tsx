@@ -21,6 +21,27 @@ import fs from 'fs';
 import path from 'path';
 
 import { CLASSROOM_GAME_MODES } from '@/shared/types/vocabQuiz';
+
+/**
+ * The banner's expanded panel is the STUDENT surface now — a classroom HOST in
+ * the lobby sees `components/education/projector/ProjectorLobby` instead, and
+ * the banner stands down so the wall carries one code, not two. A student's
+ * settings only ever come from the room record, so these renders supply one.
+ */
+const STUDENT_LIVE_GAME = {
+  gameCode: 'ABC123',
+  classroomId: 'c1',
+  classroomName: 'ELA Period 3',
+  lessonNames: ['Unit 3'],
+  gameMode: 'classic' as const,
+  settings: {
+    timerMinutes: 3,
+    boardSize: 'medium' as const,
+    allowLateJoin: true,
+    vocabQuizQuestionCount: null,
+    vocabQuizSeconds: null,
+  },
+};
 import { ClassroomModeBanner, MODE_ICON, MODE_TRANSLATION_KEY } from '../ClassroomModeBanner';
 import { en } from '@/translations/en.js';
 import { he } from '@/translations/he.js';
@@ -73,6 +94,8 @@ describe('ClassroomModeBanner renders for every classroom mode', () => {
           }}
           gameCode="ABC123"
           expanded
+          isHost={false}
+          liveGame={STUDENT_LIVE_GAME}
         />
       )
     ).not.toThrow();
@@ -93,6 +116,8 @@ describe('ClassroomModeBanner renders for every classroom mode', () => {
         }}
         gameCode="ABC123"
         expanded
+        isHost={false}
+        liveGame={STUDENT_LIVE_GAME}
       />
     );
     expect(screen.getByText('teacher.classroom.gameModes.vocabQuiz')).toBeInTheDocument();
@@ -115,6 +140,8 @@ describe('ClassroomModeBanner renders for every classroom mode', () => {
           }}
           gameCode="ABC123"
           expanded
+          isHost={false}
+          liveGame={STUDENT_LIVE_GAME}
         />
       )
     ).not.toThrow();

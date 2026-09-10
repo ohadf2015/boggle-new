@@ -19,7 +19,14 @@
  *
  * The critic filed this as a cross-CLASSROOM leak. It is not: the classroom
  * scoping is correct at every layer. It is a cross-GAME leak inside one
- * classroom, and a finished game being advertised as live.
+ * classroom, and an ended game being advertised as live.
+ *
+ * "Ended", not `status: 'finished'`. That status is written at the end of every
+ * ROUND, and the teacher presses "next round" seconds to minutes later, so
+ * pruning on it hid a lesson that was still running from its own class — the
+ * banner went blank the moment the timer expired. The terminal marker is
+ * `endedAt` (`backend/modules/classroomGameSession.ts`), written once when the
+ * teacher ends the game or its room is torn down.
  */
 import { vi, type Mock } from 'vitest';
 
@@ -58,11 +65,11 @@ describe('getActiveClassroomGames — active means joinable', () => {
     mockRedis.srem.mockResolvedValue(1);
   });
 
-  it('does not return a game that has already finished', async () => {
-    // GIVEN the exact live state: one waiting game and one finished one
+  it('does not return a game whose session the teacher ended', async () => {
+    // GIVEN the exact live state: one waiting game and one ended one
     (mockRedis.smembers as Mock).mockResolvedValue(['R438D5', 'VHTDFB']);
     (mockRedis.get as Mock).mockImplementation(async (key: string) =>
-      key.endsWith('R438D5') ? game('R438D5', 'finished', 'Flow Check Words')
+      key.endsWith('R438D5') ? game('R438D5', 'ended', 'Flow Check Words')
         : game('VHTDFB', 'waiting', 'Week 3 Vocabulary')
     );
 
@@ -73,10 +80,10 @@ describe('getActiveClassroomGames — active means joinable', () => {
     expect(games.map((g) => g.gameCode)).toEqual(['VHTDFB']);
   });
 
-  it('prunes the finished game from the set so it stops being offered', async () => {
-    // GIVEN a finished game still sitting in the classroom's set
+  it('prunes the ended game from the set so it stops being offered', async () => {
+    // GIVEN an ended game still sitting in the classroom's set
     (mockRedis.smembers as Mock).mockResolvedValue(['R438D5']);
-    (mockRedis.get as Mock).mockResolvedValue(game('R438D5', 'finished', 'Flow Check Words'));
+    (mockRedis.get as Mock).mockResolvedValue(game('R438D5', 'ended', 'Flow Check Words'));
 
     // WHEN the list is read
     await getActiveClassroomGames(CLASSROOM);
@@ -84,6 +91,21 @@ describe('getActiveClassroomGames — active means joinable', () => {
     // THEN it is removed, exactly as an expired key already was — otherwise it
     // is re-filtered on every 15-second poll for four hours
     expect(mockRedis.srem).toHaveBeenCalledWith(`classroom_games:${CLASSROOM}`, 'R438D5');
+  });
+
+  /**
+   * The between-round gap. Round one's timer has expired, the class is on the
+   * results screen, the teacher has not pressed "next round" yet — and the
+   * banner must still offer the game, because a latecomer can still join it.
+   */
+  it('still offers a game whose round just finished', async () => {
+    (mockRedis.smembers as Mock).mockResolvedValue(['R438D5']);
+    (mockRedis.get as Mock).mockResolvedValue(game('R438D5', 'finished', 'Flow Check Words'));
+
+    const games = await getActiveClassroomGames(CLASSROOM);
+
+    expect(games.map((g) => g.gameCode)).toEqual(['R438D5']);
+    expect(mockRedis.srem).not.toHaveBeenCalled();
   });
 
   it('still returns waiting and playing games', async () => {

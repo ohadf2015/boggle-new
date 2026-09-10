@@ -81,17 +81,40 @@ describe('useActiveClassroomGame', () => {
     expect(result.current.activeGame).toBeNull();
   });
 
-  it('clears the active game on classroomGameEnded', async () => {
+  it('clears the active game when the teacher ends the session', async () => {
     // GIVEN a live game on screen
     const { result } = renderHook(() => useActiveClassroomGame('class-1'));
     await waitFor(() => expect(socketHandlers['activeClassroomGames']).toBeDefined());
     act(() => { socketHandlers['activeClassroomGames']({ games: [GAME] }); });
 
-    // WHEN the teacher ends the round
-    act(() => { socketHandlers['classroomGameEnded']?.({ gameCode: 'ABC123' }); });
+    // WHEN the teacher ends the GAME (not a round)
+    act(() => {
+      socketHandlers['classroomGameEnded']?.({ gameCode: 'ABC123', sessionEnded: true });
+    });
 
     // THEN the banner stops offering to join it
     expect(result.current.activeGame).toBeNull();
+  });
+
+  /**
+   * `classroomGameEnded` is broadcast at the end of EVERY round —
+   * `gameScores.ts:405` the instant a board timer expires, `vocabQuizRound.ts`
+   * when a quiz closes — and the teacher starts the next round seconds to
+   * minutes later. Clearing on it blanked the JOIN card for up to a full
+   * 15-second poll while the room, the roster and the code were all alive, so a
+   * student watching the hub during the results screen was told their class had
+   * nothing running. Only `sessionEnded` means the game is over.
+   */
+  it('keeps offering the game between two rounds', async () => {
+    const { result } = renderHook(() => useActiveClassroomGame('class-1'));
+    await waitFor(() => expect(socketHandlers['activeClassroomGames']).toBeDefined());
+    act(() => { socketHandlers['activeClassroomGames']({ games: [GAME] }); });
+
+    // WHEN round one's timer expires
+    act(() => { socketHandlers['classroomGameEnded']?.({ gameCode: 'ABC123' }); });
+
+    // THEN the card is still there for a latecomer to tap
+    expect(result.current.activeGame?.gameCode).toBe('ABC123');
   });
 
   it('ignores classroomGameEnded for a different game code', async () => {
@@ -101,7 +124,9 @@ describe('useActiveClassroomGame', () => {
     act(() => { socketHandlers['activeClassroomGames']({ games: [GAME] }); });
 
     // WHEN some other room's game ends
-    act(() => { socketHandlers['classroomGameEnded']?.({ gameCode: 'ZZZ999' }); });
+    act(() => {
+      socketHandlers['classroomGameEnded']?.({ gameCode: 'ZZZ999', sessionEnded: true });
+    });
 
     // THEN this one is untouched
     expect(result.current.activeGame?.gameCode).toBe('ABC123');

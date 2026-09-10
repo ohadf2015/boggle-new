@@ -70,6 +70,13 @@ vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
 vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div data-testid="last-game-insights" /> }));
 import TeacherDashboard from '../TeacherDashboard';
 
+// The PLAY NOW panel has its own suite (dashboard/__tests__/PlayNowLauncher);
+// here it is only the thing that must sit above everything else.
+vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
+  PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
+}));
+
+
 describe('<TeacherDashboard>', () => {
   it('renders teacher dashboard with greeting', () => {
     render(<TeacherDashboard />);

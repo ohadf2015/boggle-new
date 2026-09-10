@@ -641,7 +641,10 @@ const HostView: React.FC<HostViewProps> = memo(({
       )}
 
       {/* Dialogs */}
-      {/* TV Results View - Full screen for broadcast mode (host NOT playing) */}
+      {/* TV Results View - Full screen for broadcast mode (host NOT playing).
+          Classroom rooms are FORCED into broadcast mode, so for a teacher this
+          view — not ResultsPage — is the whole end-of-game moment; that is why
+          it needs classroomSummary. */}
       {!!tournament.finalScores && !settings.hostPlaying && !runtime.waitingForResults && (
         <TvResultsView
           finalScores={(tournament.finalScores?.players ?? []) as unknown as PlayerResult[]}
@@ -649,6 +652,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           username={username}
           playersReady={playersReadyData}
           gameDuration={settings.timerValue * 60}
+          classroomSummary={tournament.finalScores?.classroomSummary}
           onStartNewGame={() => {
             state.setFinalScores(null);
             actions.handleStartNewGame();
@@ -783,6 +787,12 @@ const HostView: React.FC<HostViewProps> = memo(({
           onStartSoloDemoWithBots={actions.startSoloDemoWithBots}
           isClassroomMode={isClassroomMode}
           classroomGameMode={resolvedClassroomGameMode}
+          // The projector lobby prints the session, not just the code — and the
+          // teacher's own sessionStorage copy is the source that exists before
+          // the server record does.
+          lessonName={lessonData?.lessonName}
+          wordCount={lessonData?.vocabularyWords?.length}
+          classroomTemplateSettings={lessonData?.templateSettings ?? null}
         />
       )}
 

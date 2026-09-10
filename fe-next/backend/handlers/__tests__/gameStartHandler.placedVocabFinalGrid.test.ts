@@ -80,7 +80,9 @@ vi.mock('../../../backend/modules/gameModeSelector', () => ({ selectNextGameMode
 vi.mock('../../../backend/handlers/playerDataInit', () => ({ initializePlayerData: vi.fn(), ensurePlayerState: vi.fn() }));
 vi.mock('../../../backend/modules/classroomGameManager', () => ({
   getClassroomGame: mockGetClassroomGame,
+  beginClassroomRound: mockGetClassroomGame,
   setClassroomGamePlacedVocabulary: mockSetPlaced,
+  reopenClassroomGameForRound: vi.fn(async () => undefined),
 }));
 vi.mock('../../../backend/modules/blastModeManager', () => ({ initBlastModeState: vi.fn(() => ({ overlay: [], seed: 1, playerLives: {} })), hashStringToSeed: vi.fn(() => 1) }));
 vi.mock('../../../backend/modules/wordHuntManager', () => ({ initWordHuntState: vi.fn(), selectTargetWordWithFallback: vi.fn(() => null) }));

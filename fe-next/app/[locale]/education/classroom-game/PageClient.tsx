@@ -7,6 +7,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
+import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
+import {
+  QUICK_LAUNCH_FLOW,
+  clearQuickLaunchIntent,
+  readQuickLaunchIntent,
+} from '@/components/teacher/dashboard/quickLaunchIntent';
 import { cn } from '@/lib/utils';
 
 /**
@@ -33,6 +39,20 @@ function ClassroomGameInner() {
   const lessonId = searchParams?.get('lessonId') || '';
   // 'repeatLast' (dashboard Repeat-last hero) prefills the whole last setup.
   const flow = searchParams?.get('flow') || '';
+
+  // 'quickLaunch' — the dashboard's one-tap PLAY NOW. The intent is read ONCE,
+  // at mount, so a reload (or a second tab, or a five-minute-old intent) falls
+  // straight through to the full setup screen instead of silently re-firing a
+  // room the teacher already has open.
+  const [quickLaunchIntent] = useState(() =>
+    (searchParams?.get('flow') || '') === QUICK_LAUNCH_FLOW ? readQuickLaunchIntent() : null
+  );
+  const [expressAbandoned, setExpressAbandoned] = useState(false);
+  const openFullSetup = useCallback(() => {
+    clearQuickLaunchIntent();
+    setExpressAbandoned(true);
+  }, []);
+  const runExpress = !!quickLaunchIntent && !expressAbandoned;
 
   useEffect(() => {
     if (authLoading) return;
@@ -65,11 +85,18 @@ function ClassroomGameInner() {
       <EducationHeader showBackButton title={t('education.classroomGame.title')} />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <ClassroomGameLobby
-          initialLessonId={lessonId}
-          initialFlow={flow}
-          onBack={handleBack}
-        />
+        {runExpress ? (
+          <ClassroomGameLobbyExpress
+            intent={quickLaunchIntent}
+            onOpenFullSetup={openFullSetup}
+          />
+        ) : (
+          <ClassroomGameLobby
+            initialLessonId={lessonId}
+            initialFlow={flow}
+            onBack={handleBack}
+          />
+        )}
       </main>
     </div>
   );

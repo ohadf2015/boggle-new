@@ -51,7 +51,7 @@ import { startVocabQuizForClassroom } from './vocabQuizHandler.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
-import { getClassroomGame, setClassroomGamePlacedVocabulary } from '../modules/classroomGameManager.js';
+import { beginClassroomRound, setClassroomGamePlacedVocabulary } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback, selectCleanCommonTarget, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
 import { resolveTeacherHuntTarget } from '@/shared/utils/classroomHuntTarget';
@@ -465,8 +465,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }
     }
 
-    // Check if this is a classroom game
-    const classroomGame = await getClassroomGame(gameCode);
+    // Classroom game? Reads the record AND marks the code live for this round.
+    const classroomGame = await beginClassroomRound(gameCode);
     const lessonVocabulary = classroomGame?.vocabularyWords
       ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
       : undefined;

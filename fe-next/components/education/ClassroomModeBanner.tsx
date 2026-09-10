@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
+import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
 
 interface LessonData {
   lessonId: string;
@@ -75,37 +76,7 @@ export const MODE_ICON: Record<string, typeof LayoutGrid> = {
 /** Shown when a mode has no icon, so a cosmetic gap can never crash a host. */
 const FALLBACK_MODE_ICON = LayoutGrid;
 
-export const MODE_TRANSLATION_KEY: Record<string, string> = {
-  classic: 'classic',
-  blast: 'blast',
-  'word-hunt': 'wordHunt',
-  'wheel-rush': 'wheelRush',
-  'word-tower': 'wordTower',
-  'sealed-bid': 'sealedBid',
-  crossword: 'crossword',
-  wordcraft: 'wordcraft',
-  'vocab-quiz': 'vocabQuiz',
-};
-
-/**
- * Must match the sizes `ClassroomSetupStep` offers, one for one.
- *
- * This table was one step behind that screen — an older 4×4/5×5/6×6 scale with
- * no `medium` case at all — so the teacher's Medium fell through to the default
- * and the lobby announced 5×5 to a room that was 6×6. Every size was off by
- * one. The value itself was never lost: `ClassroomGameLobby` writes the
- * teacher's choice to `templateSettings.difficulty` verbatim.
- *
- * The fallback is Medium because that is what the setup screen preselects, so
- * an absent value and an unset one say the same thing.
- */
-function boardSizeLabel(size?: string): string {
-  switch (size) {
-    case 'small': return '5×5';
-    case 'large': return '7×7';
-    default: return '6×6';
-  }
-}
+export { MODE_TRANSLATION_KEY } from './classroomModeLabels';
 
 /**
  * Classroom session banner + in-lobby info panel.
@@ -189,6 +160,34 @@ export function ClassroomModeBanner({
     () => (lessonData?.vocabularyWords || []).slice(0, 12),
     [lessonData?.vocabularyWords]
   );
+
+  /**
+   * When the projector lobby is up, this banner stands down.
+   *
+   * A classroom teacher used to get the SAME session announced twice on one
+   * screen: this panel (code + QR + copy + settings) and, immediately below it,
+   * `TvLobbyView`'s own code + QR + address at a different size. On a wall that
+   * is two codes and two QRs for one room, and a class splits between them.
+   * `components/education/projector/ProjectorLobby` is the collapsed surface,
+   * and it prints everything this panel did — class name, lesson, word count,
+   * mode, timer, board size, late join, the typed address, the code at 12vw,
+   * one QR and one copy button — so nothing is lost by going quiet here.
+   *
+   * DERIVED, never signalled: `lessonData` is exactly the value that forces the
+   * projector. `useHostViewState` hard-sets `hostPlaying=false` whenever
+   * `hasLessonData` (and refuses to persist it), so a host holding lesson data
+   * is ALWAYS on the TV lobby. Without it — a teacher opening the room URL in a
+   * second tab, where `lessonGameData` does not exist — the desktop preference
+   * wins and `HostPreGameView` renders instead, which is why this panel must
+   * stay for that case. A late signal from the projector's own mount would
+   * instead flash the duplicate for a frame (recurring pitfall class 1).
+   *
+   * `expanded` is `!gameActive`, and `gameActive` survives the results screen
+   * (only `resetForNewRound` clears it), so this is scoped to the LOBBY.
+   */
+  if (isHost && expanded && !!gameCode && !!lessonData) {
+    return null;
+  }
 
   return (
     <>

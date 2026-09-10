@@ -1,168 +1,73 @@
-import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+
 /**
- * Tests for Join Classroom via Shareable Link
+ * `/[locale]/join/[code]` — where the projector's QR code lands.
  *
- * Reproduces bug: When student clicks join link while loading auth,
- * they get redirected to landing page instead of joining classroom.
+ * Two bugs are buried in this route's history and both must stay dead:
+ *
+ *  1. It bounced every logged-out student to the homepage and demanded a
+ *     signup, in front of the one action the link exists for. Guests join.
+ *  2. It rendered a full-page loader until auth resolved. That is a spinner
+ *     between a phone camera and a nickname field — the exact wait this
+ *     redesign removes. `JoinFlow` renders immediately and holds an early tap
+ *     itself, so there is nothing to gate on here.
+ *
+ * Nothing on this page may ever call `router.push`; the flow owns navigation.
  */
+const { mockPush, mockUseAuth } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockUseAuth: vi.fn(),
+}));
 
-import { render, screen, waitFor } from '@testing-library/react';
-import { useRouter, useParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import JoinWithCodePage from '../page';
-
-// Mock dependencies
 vi.mock('next/navigation', () => ({
-  useRouter: vi.fn(),
-  useParams: vi.fn(),
+  useRouter: () => ({ push: mockPush }),
+  useParams: () => ({ code: '4HCDMS' }),
+}));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
+vi.mock('@/components/education/join/JoinFlow', () => ({
+  default: ({ initialCode }: { initialCode?: string }) => (
+    <div data-testid="join-flow">{initialCode}</div>
+  ),
 }));
 
-vi.mock('@/contexts/AuthContext');
-vi.mock('@/contexts/LanguageContext');
-vi.mock('@/components/ui/PageLoader', () => ({
-  PageLoader: ({ text }: { text?: string }) => <div data-testid="page-loader">{text}</div>,
-}));
-vi.mock('@/components/student/JoinClassroomForm', () => ({
-  default: function MockJoinClassroomForm({ initialCode }: { initialCode: string }) {
-    return <div data-testid="join-form">Join Form: {initialCode}</div>;
-  },
-}));
+import JoinWithCodePageClient from '../PageClient';
 
-describe('JoinWithCodePage - Bug Reproduction', () => {
-  const mockPush = vi.fn();
-  const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
-  const mockUseParams = useParams as MockedFunction<typeof useParams>;
-  const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
-  const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
-
+describe('<JoinWithCodePageClient>', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseRouter.mockReturnValue({ push: mockPush } as any);
-    mockUseParams.mockReturnValue({ code: '4HCDMS' });
-    mockUseLanguage.mockReturnValue({
-      t: (key: string) => key,
-      language: 'en',
-      setLanguage: vi.fn(),
-      languages: ['en', 'he', 'sv', 'ja', 'es'],
-    } as any);
-
-    // Clear sessionStorage
     sessionStorage.clear();
+    mockUseAuth.mockReturnValue({ user: null, loading: false, isAuthenticated: false });
   });
 
-  test('BUG: redirects to landing page when auth is still loading', async () => {
-    // GIVEN: User clicks join link while auth is still loading
-    // This simulates the race condition where user exists but profile hasn't loaded yet
-    mockUseAuth.mockReturnValue({
-      user: null,  // Auth still loading
-      profile: null,
-      isAuthenticated: false,
-      loading: true,  // Key: still loading!
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
-    render(<JoinWithCodePage />);
-
-    // THEN: Should NOT redirect immediately (should wait for loading to complete)
-    // BUG: Current code redirects to landing page even when loading=true
-    await waitFor(() => {
-      expect(mockPush).not.toHaveBeenCalled();
-    }, { timeout: 100 });
+  it('hands the URL code to the flow', () => {
+    render(<JoinWithCodePageClient />);
+    expect(screen.getByTestId('join-flow')).toHaveTextContent('4HCDMS');
   });
 
-  test('BUG: redirect loop when user signs in and returns to join page', async () => {
-    // GIVEN: User just signed in, has session but profile not loaded yet
-    mockUseAuth.mockReturnValue({
-      user: { id: 'user-123' } as any,
-      profile: null,  // Profile fetch in progress
-      isAuthenticated: false,  // False because profile is null
-      loading: true,
-      isSupabaseEnabled: true,
-    } as any);
-
-    // AND: SessionStorage has pending join code (from previous redirect)
-    sessionStorage.setItem('joinClassroomReturnCode', '4HCDMS');
-
-    // WHEN: Page renders after redirect from useAuthInitialization
-    render(<JoinWithCodePage />);
-
-    // THEN: Should wait for loading to complete, not redirect again
-    await waitFor(() => {
-      expect(mockPush).not.toHaveBeenCalled();
-    }, { timeout: 100 });
-
-    // BUG: Current code checks isAuthenticated without checking loading state
-    // This causes redirect loop: join -> landing -> join -> landing
+  it('shows the flow to a logged-out student instead of bouncing them', () => {
+    render(<JoinWithCodePageClient />);
+    expect(screen.getByTestId('join-flow')).toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
-  test('EXPECTED: should show join form when fully authenticated', async () => {
-    // GIVEN: User is fully authenticated
+  it('shows the flow — not a loader — while the session is still resolving', () => {
+    mockUseAuth.mockReturnValue({ user: null, loading: true, isAuthenticated: false });
+    render(<JoinWithCodePageClient />);
+    expect(screen.getByTestId('join-flow')).toBeInTheDocument();
+    expect(screen.queryByText('common.loading')).not.toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect a signed-in student either', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'user-123' } as any,
-      profile: { id: 'user-123', username: 'testuser' } as any,
+      user: { id: 'user-123' },
+      loading: false,
       isAuthenticated: true,
-      loading: false,
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
-    render(<JoinWithCodePage />);
-
-    // THEN: Should show join form with code from URL
-    await waitFor(() => {
-      expect(screen.getByTestId('join-form')).toBeInTheDocument();
-      expect(screen.getByText(/Join Form: 4HCDMS/)).toBeInTheDocument();
     });
-
+    render(<JoinWithCodePageClient />);
+    expect(screen.getByTestId('join-flow')).toBeInTheDocument();
     expect(mockPush).not.toHaveBeenCalled();
-  });
-
-  /**
-   * This replaces an earlier `should redirect unauthenticated user after loading
-   * completes` test. That assertion encoded the bug rather than a requirement:
-   * `JoinClassroomForm` has supported guest join since it shipped (it renders a
-   * name field when `!user`), and the sibling route /student/join renders it
-   * ungated — but /join/[code], the link teachers actually paste, bounced every
-   * logged-out student to the homepage and demanded a signup first.
-   */
-  test('EXPECTED: shows the join form to a logged-out student instead of bouncing them', async () => {
-    // GIVEN: Auth loading completes, visitor is not authenticated
-    mockUseAuth.mockReturnValue({
-      user: null,
-      profile: null,
-      isAuthenticated: false,
-      loading: false,  // Loading complete
-      isSupabaseEnabled: true,
-    } as any);
-
-    // WHEN: Page renders
-    render(<JoinWithCodePage />);
-
-    // THEN: The form renders, pre-filled, and nobody is sent to the landing page
-    await waitFor(() => {
-      expect(screen.getByTestId('join-form')).toBeInTheDocument();
-    });
-    expect(screen.getByText(/Join Form: 4HCDMS/)).toBeInTheDocument();
-    expect(mockPush).not.toHaveBeenCalled();
-  });
-
-  test('EXPECTED: still stashes the code so a student who picks sign-in comes back here', async () => {
-    // The return path (useAuthInitialization reads this key on SIGNED_IN) stays
-    // intact for students who choose an account over a guest session.
-    mockUseAuth.mockReturnValue({
-      user: null,
-      profile: null,
-      isAuthenticated: false,
-      loading: false,
-      isSupabaseEnabled: true,
-    } as any);
-
-    render(<JoinWithCodePage />);
-
-    await waitFor(() => {
-      expect(sessionStorage.getItem('joinClassroomReturnCode')).toBe('4HCDMS');
-    });
   });
 });

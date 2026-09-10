@@ -5,6 +5,15 @@ import * as LanguageContext from '@/contexts/LanguageContext';
 
 const mockUseLanguage = vi.fn();
 
+/**
+ * NOTE (projector collapse): a classroom host who HAS `lessonData` is on the
+ * projector lobby (`components/education/projector/ProjectorLobby`), and this
+ * banner stands down for them — see ClassroomModeBanner.projectorOwnsJoin.
+ * These cases are the other host: no `lessonGameData` in this tab (the room URL
+ * opened in a second window, or a mirrored device), so `useHostViewState` never
+ * forces TV mode, `HostPreGameView` renders instead, and this banner is still
+ * the only surface carrying the code. Hence `lessonData={null}` throughout.
+ */
 describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -20,16 +29,9 @@ describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
     });
     vi.spyOn(LanguageContext, 'useLanguage').mockImplementation(mockUseLanguage);
 
-    const lessonData = {
-      lessonId: '123',
-      lessonName: 'Test',
-      vocabularyWords: [],
-      language: 'en' as const,
-    };
-
     const { container } = render(
       <ClassroomModeBanner
-        lessonData={lessonData}
+        lessonData={null}
         gameCode="ABC123"
         expanded={true}
       />
@@ -49,23 +51,9 @@ describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
     });
     vi.spyOn(LanguageContext, 'useLanguage').mockImplementation(mockUseLanguage);
 
-    const lessonData = {
-      lessonId: '123',
-      lessonName: 'Test Lesson',
-      vocabularyWords: ['hello', 'world'],
-      language: 'en' as const,
-      gameMode: 'classic' as const,
-      templateSettings: {
-        timerSeconds: 120,
-        difficulty: 'medium',
-        minWordLength: 2,
-        allowLateJoin: true,
-      },
-    };
-
     const { container } = render(
       <ClassroomModeBanner
-        lessonData={lessonData}
+        lessonData={null}
         gameCode="TESTABC"
         expanded={true}
       />
@@ -96,7 +84,7 @@ describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
 
     const { container } = render(
       <ClassroomModeBanner
-        lessonData={{ lessonId: '1', lessonName: 'L', vocabularyWords: [], language: 'en' as const }}
+        lessonData={null}
         gameCode="TESTABC"
         expanded={true}
       />
@@ -133,7 +121,7 @@ describe('ClassroomModeBanner - joinUrl locale-prefixed generation', () => {
 
     const { getByLabelText } = render(
       <ClassroomModeBanner
-        lessonData={{ lessonId: '1', lessonName: 'L', vocabularyWords: [], language: 'en' as const }}
+        lessonData={null}
         gameCode="TESTABC"
         expanded={true}
       />

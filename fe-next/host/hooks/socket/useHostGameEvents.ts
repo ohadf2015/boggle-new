@@ -23,6 +23,8 @@ import type { StartGameBroadcast, XpGainedPayload, LevelUpPayload, PlayerResultP
 import type { BlastTileOverlay, LetterFeedback, BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 import type { Player } from '@/hooks/useGameState';
 import type { LetterGrid, Language } from '@/types';
+// Imported, never redeclared — the server builds this exact shape.
+import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { TournamentData } from '@/shared/types/view';
 import { useGameStore } from '@/hooks/gameState/store';
 
@@ -67,6 +69,8 @@ interface ValidatedScoresPayload {
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: BlastSummary;
   wheelRushSummary?: WheelRushSummary;
+  /** Lesson recap — present only for a classroom game. */
+  classroomSummary?: ClassroomSummary;
 }
 
 interface TimeUpdatePayload {
@@ -96,6 +100,13 @@ export interface FinalScoresState {
   players: PlayerResultPayload[];
   gameCode: string;
   wordHuntSummary?: WordHuntSummary;
+  /**
+   * On the SAME payload as the scores, deliberately: a classroom host never
+   * reaches ResultsPage (onShowResults below is gated on hostPlaying, forced
+   * false for lesson rooms), so this is the projector's only route to the
+   * recap — a second event would restore scores without it on reconnect.
+   */
+  classroomSummary?: ClassroomSummary;
 }
 
 interface UseHostGameEventsProps {
@@ -519,6 +530,7 @@ export function useHostGameEvents({
         players: data.scores,
         gameCode: '',
         wordHuntSummary: data.wordHuntSummary,
+        classroomSummary: data.classroomSummary,
       });
 
       // Only call onShowResults if host is playing (not in broadcast mode).

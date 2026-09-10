@@ -28,6 +28,8 @@ import { useMusic } from '../../../contexts/MusicContext';
 import type { PlayerResult } from '@/types/components';
 import type { TournamentStanding } from '@/shared/types/game';
 import type { Language } from '@/shared/types';
+import type { ClassroomSummary } from '@/shared/types/classroom';
+import ClassroomTvResults from '@/components/education/results/ClassroomTvResults';
 
 // Sound paths for results
 const RESULTS_SOUNDS: Record<SoundType, string> = {
@@ -76,6 +78,12 @@ interface TvResultsViewProps {
   allWords?: Array<{ word: string; score: number; foundBy?: string[] }>;
   /** Current game mode (from store) */
   gameMode?: string;
+  /**
+   * Server-built lesson recap. Present ONLY for a classroom game — a classroom
+   * host is forced into broadcast mode and so never reaches ResultsPage, which
+   * means this view is the teacher's whole end-of-game moment.
+   */
+  classroomSummary?: ClassroomSummary;
 }
 
 /**
@@ -100,6 +108,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   isTeacher = false,
   allWords = [],
   gameMode: gameModeOverride,
+  classroomSummary,
 }) => {
   const storeGameMode = useGameMode();
   const gameMode = gameModeOverride || storeGameMode;
@@ -295,7 +304,10 @@ const TvResultsView = memo<TvResultsViewProps>(({
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-hidden px-6 pb-32">
-          {showTournamentStandings ? (
+          {classroomSummary ? (
+            // Classroom lesson recap — the projector's whole results moment.
+            <ClassroomTvResults summary={classroomSummary} onRematch={onStartNewGame} t={t} />
+          ) : showTournamentStandings ? (
             // Tournament Standings View
             <m.div
               initial={{ opacity: 0, scale: 0.95 }}

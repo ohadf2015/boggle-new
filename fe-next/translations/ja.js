@@ -12376,6 +12376,40 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "playNow": {
+      "title": "いますぐプレイ",
+      "subtitle": "ワンタップで画面にコードが出ます。",
+      "sourceGroup": "単語を選ぶ",
+      "sourceRecent": "自分のリスト",
+      "sourcePacks": "おすすめパック",
+      "sourcePaste": "単語を貼り付け",
+      "pasteLabel": "ここに単語を貼り付けてください",
+      "pastePlaceholder": "光合成, 有糸分裂, 浸透…",
+      "pasteTooFew": "単語を{{min}}個以上入れてください",
+      "pasteReady": "{{count}}語、準備完了",
+      "pastedRoundName": "きょうの単語",
+      "goLive": "スタート",
+      "armedWith": "{{title}} · {{count}}語",
+      "pickSomething": "単語リストを選べばすぐ始まります",
+      "noSetupNeeded": "クラス作成も名簿入力も不要 — 生徒はコードで参加します。",
+      "shortcutsLabel": "先生用ショートカット",
+      "shortcutLastGame": "直前のゲーム",
+      "shortcutSetup": "詳細設定",
+      "shortcutReports": "レポート",
+      "goingLive": "開始します",
+      "stageClassroom": "クラスを準備中",
+      "stageLesson": "単語を読み込み中",
+      "stageRoom": "ルームを開いています",
+      "defaultClassName": "わたしのクラス",
+      "failureHint": "もう一度お試しいただくか、詳細設定から選んでください。",
+      "retry": "もう一度",
+      "openFullSetup": "詳細設定",
+      "failure": {
+        "classroom": "クラスを準備できませんでした",
+        "lesson": "単語を読み込めませんでした",
+        "room": "ルームを開けませんでした"
+      }
+    },
     "wordDetails": {
       "more": "詳細",
       "level": "レベル",
@@ -13129,6 +13163,18 @@ const ja = {
     }
   },
   "education": {
+    "projectorLobby": {
+      "joinAt": "アクセス先",
+      "gameCode": "クラスコード",
+      "scanToJoin": "スキャンでもOK",
+      "inTheRoom": "人が参加中",
+      "readyCount": "{{total}}人中{{ready}}人が準備完了",
+      "nobodyYet": "まだ誰も入っていません",
+      "nobodyYetHint": "上のコードを入力しよう。一番乗りは誰だ？",
+      "startBlocked": "生徒が1人参加したらスタートできます。",
+      "lateJoinOn": "途中参加OK",
+      "lateJoinOff": "途中参加なし"
+    },
     "errors": {
       "serverUnavailable": "現在、クラス名簿にアクセスできません。こちら側の問題です。少し待ってからもう一度お試しください。"
     },
@@ -13335,6 +13381,17 @@ const ja = {
       "participationBonus": "全員に+{points}参加ポイント",
       "shareGap": "クラスの抜けをシェア",
       "shareGapCopied": "リンクをコピーしました — Slackや保護者チャットに貼ってください",
+      "podium": {
+        "title": "トップスコア",
+        "wordsFound": "{{total}}語中{{found}}語",
+        "correct": "正解{{count}}問"
+      },
+      "coverageMeterLabel": "レッスン単語の{{percent}}%を発見",
+      "moreWaysToReteach": "この単語を復習する他の方法",
+      "fullReport": "詳細レポート",
+      "neverPlaced": "盤面に出なかった単語",
+      "neverPlacedHint": "盤面に入りきらず、クラスは一度も見ていません。もう一度対戦すればチャンスがあります。",
+      "allBoardWordsFound": "盤面に出たレッスン単語は、クラスがすべて見つけました。",
       "shareGapTitle": "クラスの語彙ギャップ",
       "shareGapText": "{{lesson}} — クラスは {{total}} 語のうち {{found}} 語を見つけました。練習: {{missed}}",
       "shareGapAllFoundText": "{{lesson}} — クラスはすべての単語を見つけました。",
@@ -14019,6 +14076,20 @@ const ja = {
         "codeLabel": "クラスコード",
         "codeNotRecognised": "そのコードは認識できません",
         "codePasted": "コードを貼り付けました！",
+        "flow": {
+          "steps": "参加の手順",
+          "codeHeadline": "コードを入力",
+          "codeSub": "6文字。先生の画面に出ているコードだよ。",
+          "codeTooShort": "6文字必要だよ。あと少し足りません。",
+          "next": "つぎへ",
+          "changeCode": "コードを変える",
+          "nameHeadline": "名前をきめよう",
+          "nameRequired": "まず名前をきめてね。クラスのみんなに表示されます。",
+          "readyHeadline": "じゅんびはいい？",
+          "readySub": "タップひとつで参加できます。",
+          "go": "スタート！",
+          "entering": "入室しています…"
+        },
         "heroLine": "先生にクラスコードを聞いてね",
         "preparing": "準備しています。少しお待ちください。",
         "queuedNeedsName": "あと少しです。上に名前を入れると、そのまま参加できます。",
@@ -14027,7 +14098,7 @@ const ja = {
         "codePlaceholder": "6文字",
         "emptyClipboard": "クリップボードが空です",
         "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
-        "invalidCode": "無効なクラスコードです",
+        "invalidCode": "そのコードは見つかりませんでした。先生に確認してね。ゲームが終わるとコードは使えなくなります。",
         "joining": "参加中...",
         "nameHint": "アカウントは不要 — 名前を入力するだけ",
         "nameLabel": "あなたの名前",
