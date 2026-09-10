@@ -52,4 +52,8 @@ describe('requestTimeout', () => {
   it('never times out granting or listing Teacher Pro', () => {
     expect(statusAfterTimeout('/api/admin/teacher-pro')).toBeNull();
   });
+
+  it('never times out the re-engagement email cron', () => {
+    expect(statusAfterTimeout('/api/email/send-reengagement')).toBeNull();
+  });
 });

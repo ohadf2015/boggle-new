@@ -279,6 +279,12 @@ export function requestTimeout(): RequestHandler {
   // Routes that handle their own timeouts (Next.js maxDuration or long-running Express routes)
   const ROUTES_WITH_CUSTOM_TIMEOUT = [
     '/api/cron/',
+    // pg_cron hourly re-engagement batch. Same shape as send-bulk-email: loops
+    // eligible lapsed users and sends sequentially. The 30s global Express cap
+    // 408'd the 2026-09-10 controlled run (request 7527) after the job was
+    // already live — 0 emails landed. Exclude so the 120s pg_net timeout is
+    // the actual ceiling.
+    '/api/email/send-reengagement',
     // Next.js admin email routes. Express adminAuth runs first (~1-2s), then
     // the Next route sends a single email — can exceed the 30s global Express
     // cap on a slow provider round trip. maxDuration=60 on these is inert
