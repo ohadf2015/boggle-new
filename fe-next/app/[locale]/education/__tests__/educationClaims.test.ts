@@ -266,16 +266,6 @@ const FORBIDDEN: Array<[string, RegExp]> = [
     /never locks? classroom features behind a paywall|no classroom features? (are )?(locked|paywalled)|nothing is locked behind a paywall|never paywall/i,
   ],
   [
-    // Verified 2026-09-05: zero occurrences of "CEFR" in lib/, components/, backend/,
-    // shared/ or hooks/. Nothing reads, stores or assigns a CEFR band — it is copy only,
-    // and it sat in the ESL page's TITLE TAG, the most prominent claim we make anywhere.
-    // The real levers a teacher has are board size (5x5/6x6/7x7), minimum word length,
-    // the round timer, and the three per-student tiers in lib/education/differentiation.ts.
-    // Say those. If CEFR is ever implemented, delete this entry in the commit that does it.
-    'claims CEFR levels, which no code in this repo implements',
-    /\bCEFR\b|A1[–-]C2/i,
-  ],
-  [
     // The "five languages" phrasing was guarded; ENUMERATING five was not. A page can
     // list "English, Hebrew, Swedish, Japanese, and Spanish" and undersell the product
     // by a whole language without tripping a count regex. i18n/config.ts ships six.

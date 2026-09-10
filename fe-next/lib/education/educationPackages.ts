@@ -11,8 +11,6 @@ export type EducationPackageId = 'teacher_pro' | 'classroom' | 'school';
 export type EducationLeadPlan = 'classroom' | 'school';
 export type EducationPackageCta = 'checkout' | 'lead';
 
-export type SchoolLeadSource = (typeof SCHOOL_LEAD_SOURCES)[number];
-
 export interface EducationPackage {
   id: EducationPackageId;
   priceUsd: number | null;

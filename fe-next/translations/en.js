@@ -11665,6 +11665,14 @@ const en = {
     "errors": {
       "serverUnavailable": "We can't reach the class list right now. This is on our side, not yours — try again in a moment."
     },
+    "intentCta": {
+      "forTeachers": "For teachers / learn English",
+      "eslBody": "Running a class, or learning English by playing? Open the ESL word-games page — teacher-led rounds, six dictionaries, no student accounts.",
+      "eslLink": "ESL word games for the classroom",
+      "teachersBody": "Teachers and English learners: free classroom games, topic lists, and a whole-class board you run from the projector.",
+      "hubLink": "Education hub",
+      "elementaryLink": "English games for elementary"
+    },
     "classroomModeBlurb": {
       "classic": "Link adjacent letters on a shared grid",
       "wordHunt": "Crack the hidden word in ten tries",

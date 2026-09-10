@@ -47,6 +47,11 @@ const LABELS: Record<string, Record<EducationLinkLocale, string>> = {
   'first-day-of-school-icebreakers': { en: 'First Day Icebreakers', he: 'שובר קרח ביום ראשון', es: 'Rompehielos del Primer Día', sv: 'Första Dagen Isbrytare', ja: '学年始めアイスブレーカー', ru: 'Ледокол День Знаний' },
   'end-of-year-classroom-activities': { en: 'End of Year Activities', he: 'פעילויות סוף שנה', es: 'Actividades de Fin de Año', sv: 'Aktiviteter Sista Veckan', ja: '学年末の活動', ru: 'Мероприятия Конца Года' },
   'middle-school-word-games': { en: 'Middle School Word Games', he: 'משחקי מילים לחטיבת ביניים', es: 'Juegos de Palabras para Secundaria', sv: 'Ordspel för Högstadiet', ja: '中学生向けの言葉ゲーム', ru: 'Словесные игры для средней школы' },
+  'english-games-elementary': { en: 'English games for elementary', he: 'משחקי אנגלית לכיתות יסוד', es: 'Juegos de inglés para primaria', sv: 'Engelsklekar för lågstadiet', ja: '小学校向け英語ゲーム', ru: 'Игры на английском для начальной школы' },
+  'english-games-middle-school': { en: 'English games for middle school', he: 'משחקי אנגלית לחטיבת ביניים', es: 'Juegos de inglés para secundaria', sv: 'Engelsklekar för högstadiet', ja: '中学生向け英語ゲーム', ru: 'Игры на английском для средней школы' },
+  'english-games-adults': { en: 'English games for adults', he: 'משחקי אנגלית למבוגרים', es: 'Aprender inglés jugando para adultos', sv: 'Engelsklekar för vuxna', ja: '大人向け英語ゲーム', ru: 'Игры на английском для взрослых' },
+  'irregular-verbs-games': { en: 'Irregular verb games', he: 'משחקי פעלים חריגים', es: 'Juegos de verbos irregulares', sv: 'Oregelbundna verb-lekar', ja: '不規則動詞ゲーム', ru: 'Игры на неправильные глаголы' },
+  'english-vocabulary-topics': { en: 'English vocabulary by topic', he: 'אוצר מילים באנגלית לפי נושאים', es: 'Vocabulario en inglés por temas', sv: 'Engelskt ordförråd efter tema', ja: 'テーマ別英単語', ru: 'Английский словарь по темам' },
 };
 
 /**
@@ -67,6 +72,11 @@ export const EDUCATION_PAGES: readonly EducationPageLink[] = [
   { slug: 'first-day-of-school-icebreakers', accent: 'cyan', label: LABELS['first-day-of-school-icebreakers'] },
   { slug: 'end-of-year-classroom-activities', accent: 'purple', label: LABELS['end-of-year-classroom-activities'] },
   { slug: 'middle-school-word-games', accent: 'pink', label: LABELS['middle-school-word-games'] },
+  { slug: 'english-games-elementary', accent: 'lime', label: LABELS['english-games-elementary'] },
+  { slug: 'english-games-middle-school', accent: 'pink', label: LABELS['english-games-middle-school'] },
+  { slug: 'english-games-adults', accent: 'purple', label: LABELS['english-games-adults'] },
+  { slug: 'irregular-verbs-games', accent: 'cyan', label: LABELS['irregular-verbs-games'] },
+  { slug: 'english-vocabulary-topics', accent: 'lime', label: LABELS['english-vocabulary-topics'] },
 ] as const;
 
 function linkLocale(locale: string): EducationLinkLocale {

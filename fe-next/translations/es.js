@@ -13124,6 +13124,14 @@ const es = {
     "errors": {
       "serverUnavailable": "Ahora mismo no podemos acceder a la lista de la clase. Es un problema nuestro, no tuyo: inténtalo de nuevo en un momento."
     },
+    "intentCta": {
+      "forTeachers": "Para profesores / para aprender inglés",
+      "eslBody": "¿Das clase o estás aprendiendo inglés jugando? Entra en la página de juegos ESL: rondas dirigidas por la docente, seis diccionarios, sin cuentas de estudiante.",
+      "eslLink": "Juegos de palabras en inglés para el aula",
+      "teachersBody": "Profesorado y estudiantes de inglés: juegos de aula gratis, listas por temas y un tablero para toda la clase que se proyecta.",
+      "hubLink": "Centro educativo",
+      "elementaryLink": "Juegos de inglés para primaria"
+    },
     "classroomModeBlurb": {
       "classic": "Une letras contiguas en un tablero compartido",
       "wordHunt": "Descifra la palabra oculta en diez intentos",

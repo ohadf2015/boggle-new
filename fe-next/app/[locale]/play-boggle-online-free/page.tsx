@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -496,6 +497,8 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             ))}
           </div>
         </section>
+
+        <EducationIntentCta locale={locale} variant="teachers" />
 
         {/* FINAL CTA */}
         <section className="relative mt-20 mb-12 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">

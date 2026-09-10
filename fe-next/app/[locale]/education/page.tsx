@@ -17,6 +17,7 @@ import { getEndOfYearContent } from './end-of-year-classroom-activities/content'
 import { getIcebreakersContent } from './first-day-of-school-icebreakers/content';
 import { getEarlyFinishersContent } from './early-finishers-activities/content';
 import { getMiddleSchoolContent } from './middle-school-word-games/content';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
 
 
 // The hub renders from a static content object keyed by locale — no cookies(),
@@ -289,6 +290,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
       </div>
 
       <TeacherMomentLinks locale={locale} lang={lang} />
+      <EnglishLearnerLinks locale={locale} lang={lang} />
 
       <p className="mt-6 text-sm text-neo-gray-300">
         {(() => {
@@ -366,6 +368,56 @@ function TeacherMomentLinks({ locale, lang }: { locale: string; lang: string }) 
             {c.answer && (
               <p className="mt-2 text-xs leading-relaxed text-neo-gray-200">{c.answer.question}</p>
             )}
+          </Link>
+        ))}
+      </div>
+    </>
+  );
+}
+
+const LEARNER_HEADING: Record<string, { heading: string; subhead: string }> = {
+  en: { heading: 'English-learner games', subhead: 'Age bands and topic drills for Spanish-English classrooms — the same teacher-led shape as the ESL page that already ranks.' },
+  he: { heading: 'משחקים ללומדי אנגלית', subhead: 'לפי גיל ולפי נושא, באותו מבנה של דף ה-ESL שכבר מביא תנועה.' },
+  sv: { heading: 'Spel för engelskinlärare', subhead: 'Åldersband och temaborr för spansk-engelska klassrum — samma lärarledda form som ESL-sidan som redan rankar.' },
+  ja: { heading: '英語学習者向けゲーム', subhead: '年齢層とテーマ別ドリル。すでに検索で届いているESLページと同じ、教師主導の形です。' },
+  es: { heading: 'Juegos para aprender inglés', subhead: 'Por etapa y por tema, con la misma estructura de aula que la página de ESL que ya posiciona.' },
+  ru: { heading: 'Игры для изучающих английский', subhead: 'По возрасту и по темам — та же учительская форма, что у ESL-страницы, которая уже ранжируется.' },
+};
+
+const LEARNER_SLUGS = [
+  'english-games-elementary',
+  'english-games-middle-school',
+  'english-games-adults',
+  'irregular-verbs-games',
+  'english-vocabulary-topics',
+] as const;
+
+const LEARNER_ACCENT: Record<(typeof LEARNER_SLUGS)[number], string> = {
+  'english-games-elementary': 'text-neo-lime',
+  'english-games-middle-school': 'text-neo-pink',
+  'english-games-adults': 'text-neo-purple',
+  'irregular-verbs-games': 'text-neo-cyan',
+  'english-vocabulary-topics': 'text-neo-lime',
+};
+
+function EnglishLearnerLinks({ locale, lang }: { locale: string; lang: string }) {
+  const copy = LEARNER_HEADING[lang] ?? LEARNER_HEADING.en;
+  return (
+    <>
+      <h2 className="mt-12 font-neo-display text-2xl font-black uppercase text-neo-white sm:text-3xl">
+        {copy.heading}
+      </h2>
+      <p className="mt-2 max-w-2xl text-sm text-neo-gray-200 sm:text-base">{copy.subhead}</p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {LEARNER_SLUGS.map((slug) => (
+          <Link
+            key={slug}
+            href={`/${locale}/education/${slug}`}
+            className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5"
+          >
+            <h3 className={`font-neo-display text-base font-black uppercase ${LEARNER_ACCENT[slug]}`}>
+              {educationPageLabel(slug, locale)}
+            </h3>
           </Link>
         ))}
       </div>
