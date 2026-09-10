@@ -18,6 +18,7 @@ import { isAuthorizedCronRequest } from '@/lib/cronAuth';
  */
 export async function POST(request: NextRequest) {
   if (!isAuthorizedCronRequest(request)) {
+    logger.debug('[Reengagement Cron] Unauthorized request attempted');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
