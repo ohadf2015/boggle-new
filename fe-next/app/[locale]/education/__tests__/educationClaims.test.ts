@@ -166,6 +166,10 @@ const FILES = [
   'app/[locale]/word-games-for-the-classroom/content.ts',
   'app/[locale]/education/page.tsx',
   'public/llms.txt',
+  // llms-full.txt drifted outside this guard until 2026-09-10: it still said
+  // "5 languages" after Russian shipped and claimed "no premium tiers" while
+  // Teacher Pro was a live $9/month plan. Answer engines quote this file.
+  'public/llms-full.txt',
   // Comparison pages sat OUTSIDE this guard until 2026-08-31, which is exactly why they
   // still claimed LexiClash was "fully free with no premium tier" long after that was
   // corrected everywhere else. A guard that does not cover a file cannot protect it —
