@@ -65,6 +65,7 @@ function makeSupabase(stubs: QueryStub[], authUsers: { id: string; email: string
     const chain: Record<string, unknown> = {};
     chain.select = vi.fn().mockReturnValue(chain);
     chain.eq = vi.fn().mockReturnValue(chain);
+    chain.in = vi.fn().mockReturnValue(chain);
     chain.gte = vi.fn().mockReturnValue(chain);
     chain.lt = vi.fn().mockReturnValue(chain);
     chain.order = vi.fn().mockReturnValue(chain);
@@ -116,7 +117,7 @@ describe('getReengagementRecipients — any-game gate', () => {
         // Recent activity in some other game mode → MUST cause skip
         {
           table: 'player_engagement',
-          data: { last_played_at: new Date().toISOString() },
+          data: [{ player_id: 'user-1', last_played_at: new Date().toISOString() }],
         },
       ],
       [{ id: 'user-1', email: 'test@example.com' }],
@@ -138,7 +139,7 @@ describe('getReengagementRecipients — any-game gate', () => {
         { table: 'daily_word_hunt_attempts', data: null }, // no recent daily (hunt)
         { table: 'daily_word_wheel_attempts', data: null }, // no recent daily (wheel)
         { table: 'player_engagement', data: null }, // no recent any-mode
-        { table: 'daily_word_hunt_attempts', data: { id: 'h1' } }, // historical play exists (hunt)
+        { table: 'daily_word_hunt_attempts', data: [{ player_id: 'user-1' }] }, // historical play exists (hunt)
       ],
       [{ id: 'user-1', email: 'test@example.com' }],
     );
@@ -159,7 +160,7 @@ describe('getReengagementRecipients — any-game gate', () => {
         { table: 'daily_word_wheel_attempts', data: null }, // no recent daily (wheel)
         { table: 'player_engagement', data: null }, // no recent any-mode
         { table: 'daily_word_hunt_attempts', data: null }, // no historical hunt
-        { table: 'daily_word_wheel_attempts', data: { id: 'w1' } }, // historical wheel play
+        { table: 'daily_word_wheel_attempts', data: [{ player_id: 'user-1' }] }, // historical wheel play
       ],
       [{ id: 'user-1', email: 'test@example.com' }],
     );
@@ -208,7 +209,7 @@ describe('getReengagementRecipients — any-game gate', () => {
         { table: 'daily_word_hunt_attempts', data: null },
         { table: 'daily_word_wheel_attempts', data: null },
         { table: 'player_engagement', data: null },
-        { table: 'daily_word_hunt_attempts', data: { id: 'h1' } },
+        { table: 'daily_word_hunt_attempts', data: [{ player_id: 'user-1' }] },
       ],
       [{ id: 'user-1', email: 'test@example.com' }],
     );
