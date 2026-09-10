@@ -69,8 +69,9 @@ describe('the no-account CTA', () => {
     // Rendered either through the shared component or, if someone hand-rolls it,
     // as a literal href. Both count, so the guard cannot be dodged by inlining.
     const viaComponent = (src.match(/<NoAccountCta\b/g) ?? []).length;
-    const viaLiteral = (src.match(/multiplayer\?quickPlay=true/g) ?? []).length;
-    expect(viaComponent + viaLiteral).toBe(1);
+    const viaConsumerMp = (src.match(/multiplayer\?quickPlay=true/g) ?? []).length;
+    expect(viaComponent).toBe(1);
+    expect(viaConsumerMp).toBe(0);
   });
 
   it.each(PAGES)('%s imports the shared component rather than reinventing it', (_name, file) => {
@@ -96,15 +97,22 @@ describe('the shared copy', () => {
     expect(c.body).not.toBe(en.body);
   });
 
-  it('promises no account, and nothing the quick-play path does not deliver', () => {
+  it('promises no account, and nothing the classroom-game guest path does not deliver', () => {
     const blob = Object.values(noAccountCopy('en')).join(' ');
     expect(blob).toMatch(/no account|no sign-?up/i);
-    // MultiplayerFlow auto-joins a guest with a stored-or-generated name. It does not
-    // promise offline play, an app, or that scores persist — do not claim those here.
+    expect(blob).toMatch(/no email/i);
+    expect(blob).toMatch(/no password/i);
+    expect(blob).toMatch(/class/i);
+    // Join is class-code + display name. Do not claim consumer quick-play.
     expect(blob).not.toMatch(/offline|download the app|saved forever|progress is saved/i);
+    expect(blob).not.toMatch(/temporary player name/i);
+    expect(blob).not.toMatch(/live board/i);
   });
 
   it('points at the guest route, locale-prefixed by the component', () => {
-    expect(QUICK_PLAY_PATH).toBe('/multiplayer?quickPlay=true');
+    // Education hub traffic belongs on the classroom game, not consumer MP.
+    // TeacherGate /education/access is the #1 edu URL already — do not dump here.
+    expect(QUICK_PLAY_PATH).toBe('/education/classroom-game');
+    expect(QUICK_PLAY_PATH).not.toMatch(/multiplayer|quickPlay|\/access/);
   });
 });
