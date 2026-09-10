@@ -11,6 +11,8 @@ export type EducationPackageId = 'teacher_pro' | 'classroom' | 'school';
 export type EducationLeadPlan = 'classroom' | 'school';
 export type EducationPackageCta = 'checkout' | 'lead';
 
+export type SchoolLeadSource = (typeof SCHOOL_LEAD_SOURCES)[number];
+
 export interface EducationPackage {
   id: EducationPackageId;
   priceUsd: number | null;
@@ -18,7 +20,7 @@ export interface EducationPackage {
   cta: EducationPackageCta;
   leadPlan?: EducationLeadPlan;
   checkoutPath?: '/teacher/upgrade';
-  leadSource: string;
+  leadSource: SchoolLeadSource;
 }
 
 export const EDUCATION_PACKAGES: readonly EducationPackage[] = [
