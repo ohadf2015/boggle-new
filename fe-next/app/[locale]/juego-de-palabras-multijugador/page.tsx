@@ -10,6 +10,7 @@ import { StepsSection } from './components/StepsSection';
 import { ModesShowcase } from './components/ModesShowcase';
 import { FaqAccordion } from './components/FaqAccordion';
 import { BottomCTA } from './components/BottomCTA';
+import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ComparisonTable } from './components/ComparisonTable';
 import { PageScrollFx } from './components/PageScrollFx';
 import { FAQS } from './data';
@@ -239,6 +240,8 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
             </Link>
           </div>
         </section>
+
+        <EducationIntentCta locale={locale} variant="esl" />
 
         <BottomCTA locale={locale} />
 
