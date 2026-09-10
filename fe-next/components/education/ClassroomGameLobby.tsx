@@ -23,7 +23,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomSetupStep } from './ClassroomSetupStep';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
-import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
+import { classroomMultiplayerPath, socketTeacherName } from '@/lib/education/classroomGameHandoff';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
@@ -61,6 +61,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
   const [gameCode, setGameCode] = useState<string>('');
   const [isStarting, setIsStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
   // The mode the teacher explicitly picked. `null` means they have not touched
@@ -203,6 +204,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
       socketInstance.on('classroomGameError', (data: { error: string }) => {
         logger.error('Classroom game create rejected:', data?.error);
         toast.error(t('education.classroomGame.startFailed'));
+        setStartError('education.classroomGame.startFailed');
         setIsStarting(false);
       });
       // The rate-limit path emits `rateLimited`, NOT `classroomGameError`.
@@ -211,6 +213,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
       // rejection that produces nothing looks exactly like "still working").
       socketInstance.on('rateLimited', () => {
         toast.error(t('education.classroomGame.tooFast'));
+        setStartError('education.classroomGame.tooFast');
         setIsStarting(false);
       });
 
@@ -304,8 +307,10 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   );
 
   const handleStartGame = useCallback(() => {
+    setStartError(null);
     if (!user || !socket || selectedLessonIds.length === 0 || !selectedClassroomId) {
       toast.error(t('education.classroomGame.missingRequirements'));
+      setStartError('education.classroomGame.missingRequirements');
       return;
     }
     setIsStarting(true);
@@ -351,12 +356,11 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
       },
       savedAt: Date.now(),
     });
-
     socket.emit('createClassroomGame', {
       gameCode,
       classroomId: selectedClassroomId,
       teacherId: user.id,
-      teacherName: profile?.display_name || user.email || 'Teacher',
+      teacherName: socketTeacherName(user, profile?.display_name),
       lessonIds: selectedLessonIds,
       lessonNames: selectedLessons.map((l) => l.name),
       vocabularyWords: playableWords,
@@ -449,7 +453,13 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   }
 
   return (
-    <ClassroomSetupStep
+    <>
+      {startError && (
+        <p role="alert" data-testid="create-room-error" className="mb-4 rounded-neo border-neo border-neo-black bg-neo-pink/20 px-4 py-3 text-center font-bold text-neo-white">
+          {t(startError)}
+        </p>
+      )}
+      <ClassroomSetupStep
       classrooms={classrooms}
       lessons={lessons}
       selectedClassroomId={selectedClassroomId}
@@ -485,5 +495,6 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
       onNext={handleStartGame}
       onBack={onBack}
     />
+    </>
   );
 }
