@@ -12659,7 +12659,7 @@ const sv = {
       "error": "Vi kunde inte ladda resultaten från senaste spelet.",
       "retry": "Försök igen",
       "emptyTitle": "Inget klasspel ännu",
-      "emptyHint": "Starta ett från fliken Spela – orden klassen hittar och missar visas här.",
+      "emptyHint": "Starta ett med Starta spelet på ett lektionskort – orden klassen hittar och missar visas här.",
       "previousGames": "Tidigare spel",
       "playersPlayed": "{{count}} elever spelade",
       "studentFallback": "Elev",

@@ -1,7 +1,7 @@
 /**
- * LastGameInsights — the free "Last class game" card on the teacher's
- * Review tab. Renders from useRecentClassroomGames; every string goes
- * through t() so tests see raw keys.
+ * LastGameInsights — the free "Last class game" card on the one-screen
+ * teacher dashboard. Renders from useRecentClassroomGames; every string
+ * goes through t() so tests see raw keys.
  */
 import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
@@ -79,7 +79,7 @@ describe('LastGameInsights', () => {
     expect(screen.getByTestId('last-game-loading')).toBeInTheDocument();
   });
 
-  it('shows the empty state with a hint to start a game from the Play tab', () => {
+  it('shows the empty state with a hint to start a game from a lesson card', () => {
     mockHook({ games: [] });
     render(<LastGameInsights classroomId="class-1" />);
     expect(screen.getByTestId('last-game-empty')).toBeInTheDocument();

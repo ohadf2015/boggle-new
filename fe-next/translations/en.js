@@ -10959,7 +10959,7 @@ const en = {
       "error": "We couldn't load the last game's results.",
       "retry": "Try again",
       "emptyTitle": "No class game yet",
-      "emptyHint": "Start one from the Play tab — the words your class finds and misses will show up here.",
+      "emptyHint": "Start one with Start Game on a lesson card — the words your class finds and misses will show up here.",
       "previousGames": "Previous games",
       "playersPlayed": "{{count}} students played",
       "studentFallback": "Student",

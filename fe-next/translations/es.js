@@ -12418,7 +12418,7 @@ const es = {
       "error": "No pudimos cargar los resultados de la última partida.",
       "retry": "Reintentar",
       "emptyTitle": "Aún no hay partidas de clase",
-      "emptyHint": "Inicia una desde la pestaña Jugar: aquí verás qué palabras encontró y cuáles se le escaparon a la clase.",
+      "emptyHint": "Inicia una con Iniciar juego en una tarjeta de lección: aquí verás qué palabras encontró y cuáles se le escaparon a la clase.",
       "previousGames": "Partidas anteriores",
       "playersPlayed": "{{count}} estudiantes jugaron",
       "studentFallback": "Estudiante",
