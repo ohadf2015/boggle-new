@@ -12,8 +12,11 @@ export async function goto(page: Page, path: string, locale: Locale = 'en') {
 
 /** Wait for page to be fully loaded (hydrated) */
 export async function waitForHydration(page: Page) {
-  // Wait for Next.js hydration — __NEXT_DATA__ or body not having loading class
-  await page.waitForLoadState('networkidle');
+  // Persistent connections (version polling, websockets, analytics beacons)
+  // can keep the network busy forever, so networkidle is a fast-path, not a
+  // gate — bounded wait, then settle for React hydration.
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
   // Give React time to hydrate
   await page.waitForTimeout(500);
 }

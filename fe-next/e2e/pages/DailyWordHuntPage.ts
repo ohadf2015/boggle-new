@@ -1,4 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
+import { waitForHydration } from '../helpers/test-utils';
 
 /**
  * Page Object for the Daily Word Hunt flow.
@@ -62,7 +63,7 @@ export class DailyWordHuntPage {
   /** Navigate to the daily challenge landing */
   async visitLanding(locale = 'en') {
     await this.page.goto(`/${locale}/daily/word-hunt`);
-    await this.page.waitForLoadState('networkidle');
+    await waitForHydration(this.page);
   }
 
   /** Click on the Word Hunt quest card to start */

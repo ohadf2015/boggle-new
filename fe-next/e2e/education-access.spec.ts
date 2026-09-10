@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForHydration } from './helpers/test-utils';
 
 test.describe('Education access gate', () => {
   test('non-teacher hitting /teacher redirects to /education/access', async ({ page }) => {
@@ -18,7 +19,7 @@ test.describe('Education access gate', () => {
 
   test('admin queue redirects non-admin away', async ({ page }) => {
     await page.goto('http://localhost:3001/en/admin/teacher-access');
-    await page.waitForLoadState('networkidle');
+    await waitForHydration(page);
     expect(page.url()).not.toContain('/admin/teacher-access');
   });
 });
