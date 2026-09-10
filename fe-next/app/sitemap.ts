@@ -191,6 +191,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     '/education/first-day-of-school-icebreakers',
     '/education/early-finishers-activities',
     '/education/middle-school-word-games',
+    '/education/english-games-elementary',
+    '/education/english-games-middle-school',
+    '/education/english-games-adults',
+    '/education/irregular-verbs-games',
+    '/education/english-vocabulary-topics',
   ];
   educationLandings.forEach((path) => {
     addForAllLocales(routes, path, {

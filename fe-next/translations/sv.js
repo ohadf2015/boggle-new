@@ -13365,6 +13365,14 @@ const sv = {
     "errors": {
       "serverUnavailable": "Vi når inte klasslistan just nu. Det är vårt fel, inte ditt – försök igen om en liten stund."
     },
+    "intentCta": {
+      "forTeachers": "För lärare / för att lära sig engelska",
+      "eslBody": "Kör du klass, eller lär du dig engelska genom lek? ESL-sidan har lärarledda rundor, sex ordböcker och inga elevkonton.",
+      "eslLink": "ESL-ordlekar för klassrummet",
+      "teachersBody": "Lärare och engelskinlärare: gratis klassrumsspel, temalistor och ett helklassbräde du kör från projektorn.",
+      "hubLink": "Utbildningshubb",
+      "elementaryLink": "Engelsklekar för lågstadiet"
+    },
     "classroomModeBlurb": {
       "classic": "Länka intilliggande bokstäver på ett delat bräde",
       "wordHunt": "Knäck det dolda ordet på tio försök",

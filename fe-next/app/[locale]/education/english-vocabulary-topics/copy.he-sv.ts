@@ -1,0 +1,158 @@
+import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
+import type { LocaleContent } from '../_englishLearner/types';
+
+export const he: LocaleContent = {
+  metaTitle: 'משחקי אנגלית לפי נושאים — בהובלת המורה, 6 שפות | LexiClash',
+  metaDescription: 'משחקי אנגלית לכיתת יסוד: הילדים מצטרפים מהמחשב הלוח עם קוד בן שישה תווים, הלוח עולה על המקרן, ואתם קובעים תמיכה, ליבה או אתגר לכל ילד. שש שפות, בלי חשבונות תלמידים.',
+  ogTitle: 'משחקי אנגלית לפי נושאים',
+  ogDescription: 'משחקי אנגלית בהובלת המורה לפי נושאים. אוכל, חיות, נסיעות ובית ספר, לוח משותף, שישה מילונים.',
+  twitterDescription: 'משחקי אנגלית לפי נושאים. כיתה חיה, 6 שפות, בלי חשבונות תלמידים.',
+  heroTag: '★ אנגלית לפי נושא ★ חינם להתחלה ★',
+  heroH1: { highlight: 'משחקי אנגלית', rest1: 'לכיתות', rest2: 'לפי נושא.' },
+  heroSubtitle: 'משחקי אנגלית בהובלת המורה לפי נושאים. בוחרים רשימה קצרה, הכיתה מצטרפת מהמחשבים הניידים, והמקרן מציג את הלוח. שישה מילונים, בלי חשבונות תלמידים, ורמה לכל ילד.',
+  ctaLabel: 'פתחו כיתה בחינם',
+  heroCtas: { primary: '▶ הפעילו משחק נושא', primaryNote: 'כל הכיתה · 5 דקות', secondary: '🔍 ציד מילים יומי', secondaryNote: 'תרגול שקט' },
+  related: { label: 'משאבי הוראה נוספים', vocabulary: '→ משחקי אנגלית כשפה זרה', teachers: '→ משחקים למורים', hub: '→ מרכז ההוראה' },
+  depth: [
+    {
+      heading: 'מול איזה מילון נבדקת תשובה באנגלית',
+      answer: `תשובות באנגלית נבדקות מול מילון של מעל ${dictionaryFloor('en', 'he')} מילים, לא מול רשימת הוראה קצרה. לספרדית, שוודית, עברית, רוסית ויפנית יש מילון משלהן: מעל ${dictionaryFloor('es', 'he')}, ${dictionaryFloor('sv', 'he')}, ${dictionaryFloor('he', 'he')}, ${dictionaryFloor('ru', 'he')} ו-${dictionaryFloor('ja', 'he')} מילים בהירגאנה.`,
+      points: ['ילד שמוצא מילה אנגלית אמיתית מקבל עליה ניקוד גם אם לא הייתה ברשימת השבוע.', 'הרשימה הקצרה שלכם עדיין מזינה את התרגול, כך שמילות השבוע הן מה שחוזר.', 'שש שפות עם מילון משלהן: אנגלית, עברית, שוודית, יפנית, ספרדית ורוסית.'],
+    },
+    {
+      heading: 'איך קובעים רמה לכיתה מעורבת לפי נושא',
+      answer: 'ללוח שלושה גדלים — 5x5, 6x6 ו-7x7 — ואתם קובעים את אורך הסיבוב ואת אורך המילה המינימלי. לכל ילד יש תמיכה, ליבה או אתגר, כך שאותו לוח משותף דורש דברים שונים.',
+      points: ['ברירת המחדל היא לוח 6x6 ומינימום שלוש אותיות.', 'אורך הסיבוב נקבע בדקות, וברירת המחדל שלוש דקות.', 'המסלול החינמי כולל 3 כיתות של 50; Teacher Pro עולה 9 דולר לחודש ומוסיף כיתות בלי הגבלה ודוחות.'],
+    },
+  ],
+  playFormats: {
+    heading: '{count} דרכים לתרגל רשימה אחת באנגלית',
+    intro: 'אותה רשימה מגיעה ללומד ב-{count} צורות. {live} מהן מצבי כיתה חיים; {practice} הנותרות הן תרגול עצמאי, ושישה מהם מכוונים למיומנות אחת — הגדרות, מילים נרדפות, ניגודים, רמזי הקשר, משמעויות כפולות ושורשים.',
+    liveLabel: '{live} מצבי כיתה חיים',
+    practiceLabel: '{practice} תרגולים עצמאיים לפי מיומנות',
+  },
+  workflow: {
+    heading: 'עשר דקות, מהתחלה עד הסוף',
+    intro: 'כל הלולאה נכנסת בעשר הדקות האחרונות של שיעור לפי נושא. מדביקים שמונה עד שתים־עשרה אוכל, חיות, נסיעות ובית ספר, מעלים קוד למקרן, והכיתה משחקת מהמחשבים הניידים.',
+    steps: [
+      { when: '0:00', what: 'הדביקו את המילים הקצרות של השבוע — CVC, צבעים, חפצי כיתה.' },
+      { when: '0:30', what: 'בחרו קלאסי או ציד מילים וסיבוב של שתי דקות. הקוד עולה ללוח.' },
+      { when: '1:00', what: 'הילדים פותחים דפדפן ומקלידים שישה תווים. בלי מייל, בלי חשבון.' },
+      { when: '2:00', what: 'משחקים. מהמסך שלכם אפשר להשהות, להוסיף שלושים שניות או לדלג על מילה.' },
+      { when: '8:00', what: 'קוראים יחד את המילים שפספסו, ומעבירים לתמיכה מי שהתקשה.' },
+    ],
+  },
+  arcadeNote: { heading: 'מתי ארקייד לתלמידים עדיף', body: 'הדף הזה בנוי למורה שמריץ סיבוב לכיתת לפי נושא. אם אתם מחפשים עשרות משחקים בשירות עצמי, אתר ספרייה רחב יותר. חזרו לכאן כשצריך את כל הכיתה על לוח אחד.', href: 'https://7esl.com/word-games/', cta: 'משחקי המילים של 7ESL' },
+  faqTitle: 'שאלות נפוצות',
+  features: [
+    { icon: 'globe', text: 'שישה מילונים; אנגלית נשפטת כאנגלית, לא כרשימה מתורגמת' },
+    { icon: 'users', text: 'משחק חי לכל הכיתה; הילדים מצטרפים עם קוד בן שישה תווים' },
+    { icon: 'timer', text: 'סיבובים של שתיים ושלוש דקות שנכנסים בשיעור פוניקה' },
+    { icon: 'book', text: 'מדביקים CVC, צבעים, חיות או רשימת הקריאה של השבוע' },
+    { icon: 'monitor', text: 'מחשבים ניידים, כרומבוקים והמקרן בכיתה' },
+    { icon: 'lock', text: 'בלי חשבונות תלמידים. המסלול החינמי כולל 3 כיתות של 50' },
+  ],
+  proficiencyLevels: [
+    { tag: 'תמיכה', title: 'מתחילים', desc: 'מילים בנות 3 אותיות, טיימר ארוך ובנק מילים גלוי.' },
+    { tag: 'ליבה', title: 'במסלול', desc: 'מילים בנות 3–5 אותיות, טיימר רגיל. לוח 5x5 מספיק.' },
+    { tag: 'אתגר', title: 'מוכנים לעוד', desc: 'מילים ארוכות יותר וטיימר הדוק, על אותו לוח.' },
+  ],
+  sections: { builtFor: 'בנוי לאוצר מילים לפי נושא.', setLevelPerClass: 'קובעים את הרמה לכל כיתה.', ctaHeading: 'נשארו חמש דקות?', ctaSubtitle: 'הפעילו סיבוב אוכל, חיות, נסיעות ובית ספר.', ctaPrimaryButtonLabel: '▶ התחילו משחק נושא', ctaSecondaryButtonLabel: 'חזרה להוראה' },
+  faqs: [
+    { q: 'אילו משחקי אנגלית עובדים לפי נושא?', a: 'משחקי לוח אותיות קצרים ומתוזמנים. הילדים מוצאים מילות CVC, צבעים וחפצי כיתה על לוח משותף בזמן שאתם שולטים באורך הסיבוב. שלבו חימום בלי מכשיר כדי לא לנעול את מי שעדיין קורא לאט.' },
+    { q: 'האם הילדים צריכים חשבון?', a: 'לא. מצטרפים עם קוד בן שישה תווים. החשבונות נשארים אצל המורה. המסלול החינמי כולל 3 כיתות של 50.' },
+    { q: 'אפשר להשתמש ברשימת הפוניקה?', a: 'כן. מדביקים את הגרפמות או את מילות הקריאה של השבוע. הסיבוב החי עדיין מזכה על כל מילה אנגלית אמיתית שהמילון מכיר.' },
+    { q: 'איך שומרים על כיתה ג׳ מעורבת ביחד?', a: 'לוח אחד משותף, שלוש רמות. תמיכה רואה בנק מילים; אתגר מחפש מילים ארוכות יותר על אותה רשת. אף אחד לא יוצא לחדר אחר.' },
+    { q: 'זה רק באנגלית?', a: 'הממשק יכול להישאר בעברית, ספרדית, שוודית, יפנית או רוסית בזמן שהסיבוב נשפט באנגלית. העברית מימין לשמאל, כולל הלוח.' },
+    { q: 'מאיפה מתחילים?', a: 'פותחים את משחק הכיתה, מדביקים שמונה אוכל, חיות, נסיעות ובית ספר, מעלים את הקוד למקרן. חמש דקות מספיקות לסיבוב ראשון.' },
+  ],
+
+  topics: {
+    title: 'רשימות נושא שאפשר לשחק',
+    intro: 'הדביקו כל קבוצה למשחק כיתה או לציד מילים. אלה מילים באנגלית שהמילון כבר מכיר.',
+    groups: [
+      { label: 'אוכל (food)', words: ['bread', 'apple', 'rice', 'cheese', 'water', 'sugar', 'lemon', 'onion', 'pasta', 'honey'] },
+      { label: 'חיות (animals)', words: ['tiger', 'horse', 'whale', 'mouse', 'eagle', 'snake', 'sheep', 'camel', 'panda', 'wolf'] },
+      { label: 'נסיעות (travel)', words: ['train', 'hotel', 'ticket', 'passport', 'airport', 'map', 'luggage', 'bridge', 'beach', 'taxi'] },
+      { label: 'בית ספר (school)', words: ['pencil', 'desk', 'teacher', 'lesson', 'book', 'ruler', 'paper', 'board', 'class', 'exam'] },
+    ],
+  },
+};
+
+export const sv: LocaleContent = {
+  metaTitle: 'Engelsklekar för temavis ordförråd — lärarlett, 6 språk | LexiClash',
+  metaDescription: 'Engelsklekar för en lågstadieklass: barnen går med från surfplattan med en sexteckenskod, planen läggs upp på projektorn och du sätter Stöd, Kärna eller Utmaning per barn. Sex språk, inga elevkonton.',
+  ogTitle: 'Engelsklekar för temavis ordförråd',
+  ogDescription: 'Lärarledda engelsklekar för temavis ordförråd. Korta ord, delad plan, sex ordböcker.',
+  twitterDescription: 'Engelsklekar för temavis ordförråd. Liveklass, 6 språk, inga elevkonton.',
+  heroTag: '★ Engelska i temavis ordförråd ★ Gratis att börja ★',
+  heroH1: { highlight: 'Engelsklekar', rest1: 'för', rest2: 'temavis ordförråd.' },
+  heroSubtitle: 'Lärarledda engelsklekar för temavis ordförråd. Du väljer en kort lista, klassen går med från surfplattor och projektorn visar planen. Sex ordböcker, inga elevkonton, och en nivå per barn.',
+  ctaLabel: 'Skapa gratis klassrum',
+  heroCtas: { primary: '▶ Kör en lågstadielek', primaryNote: 'Hela klassen · 5 minuter', secondary: '🔍 Daglig ordjakt', secondaryNote: 'Tyst övning' },
+  related: { label: 'Relaterade utbildningsresurser', vocabulary: '→ ESL-ordlekar', teachers: '→ Spel för lärare', hub: '→ Utbildningshubb' },
+  depth: [
+    {
+      heading: 'Vilken ordbok ett engelskt svar prövas mot',
+      answer: `Engelska svar prövas mot en ordbok på över ${dictionaryFloor('en', 'sv')} ord, inte en kort undervisningslista. Spanska, svenska, hebreiska, ryska och japanska har var sin: över ${dictionaryFloor('es', 'sv')}, ${dictionaryFloor('sv', 'sv')}, ${dictionaryFloor('he', 'sv')}, ${dictionaryFloor('ru', 'sv')} och ${dictionaryFloor('ja', 'sv')} hiraganaord.`,
+      points: ['Ett barn som hittar ett riktigt engelskt ord får poäng även om det inte stod på veckans lista.', 'Din korta lista styr fortfarande övningarna, så veckans ord är det som upprepas.', 'Sex språk med egen ordbok: engelska, hebreiska, svenska, japanska, spanska och ryska.'],
+    },
+    {
+      heading: 'Svårighet i ett blandat lågstadierum',
+      answer: 'Planen har tre storlekar — 5x5, 6x6 och 7x7 — och du sätter rundans längd och minsta ordlängd. Varje barn bär Stöd, Kärna eller Utmaning, så samma delade plan frågar olika saker.',
+      points: ['En runda defaultar till 6x6 och minst tre bokstäver.', 'Rundans längd sätts i minuter av läraren och defaultar till tre.', 'Gratisskiktet täcker 3 klasser à 50; Teacher Pro kostar 9 $/månad och lägger till obegränsade klasser och rapporter.'],
+    },
+  ],
+  playFormats: {
+    heading: '{count} sätt att borra en engelsk lista',
+    intro: 'Samma lista når eleven i {count} olika former. {live} av dem är live-klasslägen; de andra {practice} är soloövningar, varav sex siktar på en enda färdighet — definitioner, synonymer, antonymer, kontextledtrådar, flera betydelser och rötter.',
+    liveLabel: '{live} live-klasslägen',
+    practiceLabel: '{practice} soloövningar per färdighet',
+  },
+  workflow: {
+    heading: 'Tio minuter, start till mål',
+    intro: 'Hela loopen ryms i de sista tio minuterna av en lågstadielektion. Du klistrar åtta till tolv korta ord, lägger en kod på projektorn och klassen spelar från surfplattor.',
+    steps: [
+      { when: '0:00', what: 'Klistra veckans korta ord — CVC, färger, klassrumsföremål.' },
+      { when: '0:30', what: 'Välj Klassiskt eller Ordjakt och en tvåminutersrunda. Koden går upp på tavlan.' },
+      { when: '1:00', what: 'Barnen öppnar webbläsaren och skriver sex tecken. Ingen e-post, inget konto.' },
+      { when: '2:00', what: 'Spela. Pausa, lägg till trettio sekunder eller hoppa över ett ord från din skärm.' },
+      { when: '8:00', what: 'Läs de missade orden tillsammans, flytta sedan den som körde fast till Stöd.' },
+    ],
+  },
+  arcadeNote: { heading: 'När ett elevarkad passar bättre', body: 'Den här sidan är byggd för en lärare som kör en runda för temavis ordförråd. Vill du ha dussintals självbetjänade minispel är en bibliotekssajt bredare. Kom tillbaka när hela klassen ska sitta på samma plan.', href: 'https://7esl.com/word-games/', cta: '7ESL:s ordlekar' },
+  faqTitle: 'Vanliga frågor',
+  features: [
+    { icon: 'globe', text: 'Sex ordböcker; engelska bedöms som engelska, inte en översatt lista' },
+    { icon: 'users', text: 'Livelek för hela klassen; barnen går med med en sexteckenskod' },
+    { icon: 'timer', text: 'Två- och treminutersrundor som ryms i ett fonikpass' },
+    { icon: 'book', text: 'Klistra CVC, färger, djur eller veckans läslista' },
+    { icon: 'monitor', text: 'Surfplattor, Chromebooks och klassrumsprojektorn' },
+    { icon: 'lock', text: 'Inga elevkonton. Gratisskiktet täcker 3 klasser à 50' },
+  ],
+  proficiencyLevels: [
+    { tag: 'Stöd', title: 'Nybörjare', desc: '3-bokstavsord, längre timer, synlig ordbank.' },
+    { tag: 'Kärna', title: 'På spår', desc: 'Blandade 3–5 bokstäver, standardtimer. 5x5 räcker.' },
+    { tag: 'Utmaning', title: 'Redo för mer', desc: 'Längre ord och tajtare timer, samma plan.' },
+  ],
+  sections: { builtFor: 'Byggd för temavis ordförråd.', setLevelPerClass: 'Sätt nivån per klass.', ctaHeading: 'Fem minuter kvar?', ctaSubtitle: 'Kör en runda med korta ord.', ctaPrimaryButtonLabel: '▶ Starta lågstadielek', ctaSecondaryButtonLabel: 'Tillbaka till utbildning' },
+  faqs: [
+    { q: 'Vilka engelsklekar funkar i temavis ordförråd?', a: 'Korta, tidsatta bokstavsplaner. Barnen hittar CVC-ord, färger och klassrumsföremål på en delad plan medan du håller rundans längd. Para med en uppvärmning utan enhet så att den som fortfarande läser långsamt inte låses till skärmen.' },
+    { q: 'Behöver barnen ett konto?', a: 'Nej. De går med med en sexteckenskod. Kontona stannar hos läraren. Gratisskiktet täcker 3 klasser à 50.' },
+    { q: 'Kan jag använda min foniklista?', a: 'Ja. Klistra veckans grafem eller läsord. Liverundor ger fortfarande poäng för varje riktigt engelskt ord ordboken känner.' },
+    { q: 'Hur håller jag ett blandat år 3 tillsammans?', a: 'En delad plan, tre nivåer. Stöd ser en ordbank; Utmaning jagar längre ord på samma rutnät. Ingen skickas till ett annat rum.' },
+    { q: 'Är det bara på engelska?', a: 'Gränssnittet kan stanna på svenska, spanska, hebreiska, japanska eller ryska medan rundan bedöms på engelska. Hebreiska är höger-till-vänster, inklusive planen.' },
+    { q: 'Var börjar jag?', a: 'Öppna klassrumsleken, klistra åtta korta ord, lägg koden på projektorn. Fem minuter räcker till en första runda.' },
+  ],
+
+  topics: {
+    title: 'Spelbara temalistor',
+    intro: 'Klistra in vilken grupp som helst i ett klassrumsspel eller Ordjakt. Det är engelska ord ordboken redan känner.',
+    groups: [
+      { label: 'Mat (food)', words: ['bread', 'apple', 'rice', 'cheese', 'water', 'sugar', 'lemon', 'onion', 'pasta', 'honey'] },
+      { label: 'Djur (animals)', words: ['tiger', 'horse', 'whale', 'mouse', 'eagle', 'snake', 'sheep', 'camel', 'panda', 'wolf'] },
+      { label: 'Resa (travel)', words: ['train', 'hotel', 'ticket', 'passport', 'airport', 'map', 'luggage', 'bridge', 'beach', 'taxi'] },
+      { label: 'Skola (school)', words: ['pencil', 'desk', 'teacher', 'lesson', 'book', 'ruler', 'paper', 'board', 'class', 'exam'] },
+    ],
+  },
+};
