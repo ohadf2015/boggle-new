@@ -2,138 +2,159 @@
 
 Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All lane prompts inject this file as preamble.
 
-> **Window: 2026-08-29..09-04. Of 7 nights, only 4 launched lanes (08-30, 08-31, 09-01, 09-04).**
-> **08-29 died 3 KB into the log; 09-02 and 09-03 both hard-ABORTED at preflight, off-master.**
+> **Window: 2026-09-04..09-10. Of 7 nights, 3 launched lanes (09-06, 09-09, 09-10).** 09-05, 09-07 and 09-08
+> had no scheduled run (09-08 log is 631 B, a manual stub).
 >
-> **HEADLINE 1 — the loop shipped ZERO lane code for 4 consecutive gating nights.** 08-28, 08-30, 08-31 and
-> 09-01 ALL ended `docs-only salvage — lane code dropped`: **73 file-drops, ~30 distinct files** (13+15+19+26,
-> but 08-31 and 09-01 share ~14 identical paths). Every night the verdict chain is byte-identical: FAIL →
-> non-authored parser says "baseline poison" → lint-skipped re-gate FAILs → conclusive typecheck tier →
-> **`FAILED on a missing tool binary ('command not found') … node_modules/.bin unprovisioned even after
-> self-heal`** → "genuinely unverifiable" → docs-only drop.
+> **HEADLINE 1 — THE GATE IS FIXED. The loop shipped real code again.** Last week's `_gate_ensure_bin` /
+> `command not found` chain that cost 4 consecutive nights of lane code is **GONE**. 09-09 shipped
+> `dcb36a657` with 2 real code files (`app/[locale]/play-boggle-online-free/page.tsx`,
+> `components/singleplayer/useSinglePlayerConfig.ts`) plus 15 docs, and the report records
+> *"shipped type-checked (standalone tsc) + affected-tests-green"*. `rg "command not found"` returns **ZERO**
+> on the **09-09 and 09-10** logs — but still MATCHES on **09-06**, so the loss streak ran 5 nights and the
+> fix landed on 09-09. Evidence for CLOSED = 2 clean nights, not 3. **Close it. Do not re-report it. Do not
+> "fix" `_gate_ensure_bin`.**
 >
-> **ROOT CAUSE — VERIFIED TONIGHT, and it is NOT what last week's file assumed.** `_gate_ensure_bin`
-> (`gate-isolated.sh:84-96`) is guarded by `for b in eslint vitest tsc next; do [ -e .bin/$b ] || need=1`.
-> `rg "self-healing with|self-heal failed|missing dev-tool"` over all four run logs returns **ZERO matches** —
-> so the guard evaluated false and **the self-heal never ran**. The `cp -Rc` clone at `:459-464` leaves the
-> `.bin` symlinks *present but unrunnable*, `[ -e ]` passes, and the gate then dies on `command not found`.
-> **The precondition guard is the bug, not `npm rebuild`.** Swapping in `cp -a` alone would edit dead code.
-> **FIX: provision + ASSERT unconditionally — run `./node_modules/.bin/eslint --version` after the clone and
-> hard-fail loudly if it does not execute.** Last week's file demoted this whole item to "watch — did not
-> fire"; that demotion cost a week of code.
+> **HEADLINE 2 — the new #1: one lane per night STALLS ~7.9 h and is then killed by the deadline guard.**
+> Three launched nights, three different lanes, one identical shape:
 >
-> **HEADLINE 2 — the off-master preflight abort is BACK.** Last week's file said "CLOSED this week. Do not
-> re-report." It fired 09-02 (on `geo/wordshake-word-wheel-citations`) and 09-03 (on `fix/user-deletion`):
-> `ABORT — not on master and auto-recover unsafe (dirty tree or unpushed work)`. Both logged
-> `preflight requested a timed retry — re-running once in 180 min` and **no retry log was ever written** —
-> textbook Class-4 silent failure. Do not close this item again without a test.
+> | Night | Lane that died | Window | Duration | rc |
+> |---|---|---|---|---|
+> | 09-06 | lane 2 `11-mode-qa` | 01:35 → 09:25 | **7h50m** | 75 |
+> | 09-09 | lane 4 `05-landing` | 01:54 → 09:48 | **7h54m** | 75 |
+> | 09-10 | lane 3 `02-perf` | 01:33 → 09:14 | **7h41m** | 75 |
+>
+> **The 7.9 h is NOT a usage-limit wait — that reading is wrong and was corrected before this file shipped.**
+> The 09-10 log holds exactly ONE backoff event, and it reads:
+> `USAGE-LIMIT hit (BACKOFF) — wait 120s would resume past 06:30; aborting (rc=75)`. That is the **06:30
+> deadline guard working as designed**, firing instantly — a 7.9 h `sleeping 120s` loop would have left ~230
+> lines. So `rc 75` is the *symptom*: the lane had already stalled for hours, and rc 75 is simply how a
+> stalled lane exits once it wakes past the deadline.
+> **The stall itself is UNEXPLAINED and is the real bug.** Lane 3 on 09-10 logged exactly one tool call
+> across 7h41m — a dispatched `Explore` subagent — matching the known failure `machine sleep kills subagents
+> silently`. `caffeinate -i -w $$` is wired at `run.sh:34`, but `-i` holds only an *idle*-sleep assertion and
+> does not survive a lid close. Every other lane on those nights finished in a normal 8–18 min, and the dead
+> lane's files are reverted (`reverting THIS lane's own files only`).
+> **Cost: 1 lane lost per night (~12% of output) + the night ends at 10:30 instead of ~03:00.**
+> **FIX THAT WORKS UNDER EITHER MECHANISM: a per-lane WALL-CLOCK CAP (~25–30 min → revert, advance).**
+> Do NOT "cap the usage-limit retry" — `rg "exit 75|EX_TEMPFAIL" scripts/nightly/run.sh` returns nothing;
+> run.sh only *classifies* rc 75 at `:445`/`:512`, the CLI emits it. There is no in-lane wait loop to cap.
 
 ## FOUNDER DIRECTIVE — highest priority
 - **2026-06-23 (standing):** (1) SPEED without bugs, (2) MODE READINESS to release quality,
   (3) EDUCATION growth into real `/[locale]/education` pages, (4) AUTONOMY (ship reversible, defer only
   irreversible).
 - **ADMIN-BETA TARGET LIST.** NOT admin-gated, never pick as STEP-0 targets: `blast`/`blast/v2`, `crossword`
-  (noindex-only), `shiritori` (graduated 07-23), `word-tower` (graduated 07-20), `party`/`word-alchemy`/
-  `word-forge`/`word-vault` (DELETED 07-06 — any pitch naming these is dead). **Surviving admin-gated set:
-  `sealed-bid`, `word-craft` (`?mode=gems`, `?mode=cards`), `brain-drill`, `wheel-rush`.** Check the gate
-  BEFORE offering a polish idea.
-- **Lane 11 wheel-rush plateau — ENFORCE THE HARD STOP.** The rule was written twice and ignored twice. If a
-  lane's own prior artifact names the same blocker two nights running, the lane MUST spend the night on the
-  blocker or a different target, not another audit.
+  (noindex-only), `shiritori` (**DELETED 09-08** in `2e13200f9` — any pitch naming it is dead), `word-tower`
+  (graduated 07-20), `party`/`word-alchemy`/`word-forge`/`word-vault` (DELETED 07-06). **Surviving
+  admin-gated set: `sealed-bid`, `word-craft` (`?mode=gems`, `?mode=cards`), `brain-drill`, `wheel-rush`.**
+  Check the gate BEFORE offering a polish idea.
+- **The lane scheduler skipping lanes is BY DESIGN, not a bug.** `run.sh:421` —
+  `"8/12 lanes selected — skipping zero-signal lanes … rotation gives every idle lane a slot ~every 3 nights"`.
+  Last week's file wrongly logged lane 04/06/10's low launch count as a failure. It is the scheduler working.
+  `NIGHTLY_SCHEDULER=0` restores all 12. **Do not file this as a defect again.**
 - **2026-06-27 (blog cadence):** new blog every 2 days — word-game + education/"AI to learn a language"
-  angles, link a live MODE. **Lane 08 owns; 04/06 feed topics.** Lane 08 ran 1 of 4 launched nights (09-01).
-  Cadence is effectively dead; needs a founder call or a scheduler exemption.
+  angles, link a live MODE. **Lane 08 owns; 04/06 feed topics.** Lane 08 launched 0 of 3 nights this window.
+  Cadence is dead; needs a founder call or a scheduler exemption (it is being scored zero-signal).
 - **Improve admin-beta modes nightly — NO new modes** (2026-06-16). Lane 05 STEP 0 improves ONE existing
   admin-gated mode/night, EXISTING files only, keeps the admin gate.
-- **No hard file-count cap.** `LEXI_LANE_FILE_CAP=999`; per-lane working-set ~8. Write all 5 locale
-  translations FIRST.
+- **No hard file-count cap.** `LEXI_LANE_FILE_CAP=999`; per-lane working-set ~8. Write all locale
+  translations FIRST — **`ru` is a live 6th locale** despite CLAUDE.md saying 5.
 
 ## Telegram-button feedback (last 7 days)
-- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still stops at 2026-07-26 — now 40 days.** Seventh
+- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still stops at 2026-07-26 — now 46 days.** Eighth
   consecutive window at 0. `night:good` 0 · `night:meh` 0 · `polish:try` 0 · `idea:build` 0 · `reddit:*` 0 ·
-  `mode:*` 0. The Telegram card CTA is dead as a steering channel. **Stop adding buttons.** Any lane prompt
+  `mode:*` 0. **The Telegram card CTA is dead as a steering channel. Stop adding buttons.** Any lane prompt
   that says "wait for a `polish:try` vote" is unreachable — self-select instead.
 - Do not confuse these with `feedback/summary-*.md` — that is the **player** sentiment digest
   (PostHog `growth:game_feedback` + Supabase `feedback_reports`), a different and also tiny signal.
 
 ## What works (validated this week)
-- **The toolchain-error classifier itself is correct.** It refuses to blame lane code for a missing binary
-  every single time (4/4 nights). It is doing its job; the job it protects is broken upstream. Keep it.
-- **docs-only salvage is genuinely recoverable.** Every drop wrote a backup + a `restore-queue.ndjson` row,
-  and 08-31 and 09-01 both carry `{"resolve":...}`. Nothing was lost, only delayed. (validated ×2)
-- **`restore-salvaged-code.sh` is NOT the restore path — 3-way `git merge-file` is.** Lanes 01 on 08-28,
-  08-30 and 09-01 all correctly reached for per-night merge-file over the blind-rsync script. (validated ×3)
-- **Isolated ship when the founder has unpushed commits** — nightly diff goes out via worktree, founder
-  commits stay local. Fired 08-28, 08-30, 09-01, no collision. (validated ×3)
-- **Dirty-tree preflight + WIP snapshot/protect list** — zero founder WIP lost on any launched night.
-- **Per-lane MCP scoping + idle leash** (`no MCP → idle leash raised to 1500s`) — no lane hit the idle killer
-  this window. The 09-04 `USAGE-LIMIT hit (BACKOFF) — sleeping 120s` retry on lane 03 recovered to rc=0.
-- **Verify-already-correct and CLOSE the finding.** A night that ships 0 files but retires phantom findings is
-  a real win. (carried)
+- **The isolated gate now provisions its toolchain correctly and ships.** 09-09 shipped a real code commit
+  (`dcb36a657`); the **09-09 and 09-10** logs record no `command not found`. **09-06 still does** — the fix
+  landed 09-09, so this is 2 clean nights. The single largest loss channel in the loop is closed.
+  (validated ×2, headline)
+- **Per-lane self-revert contains a blast radius perfectly.** All three usage-limit deaths reverted ONLY the
+  dead lane's own files (`reverting THIS lane's own files only`) and the remaining 4–5 lanes ran clean to
+  completion afterwards. One lane dying no longer poisons the night. (validated ×3)
+- **The Mandatory-Minimum-Artifact floor works.** Every launched lane, including ones that shipped no code,
+  left a `docs/nightly/artifacts/lane-NN-*.md`. Zero total-loss lanes this window. (validated ×3)
+- **Duplicated run-log lines are FIXED** — `head -40 | uniq -c` on the 09-10 log shows every line exactly
+  once. Last week's carried S-effort item is done; drop it.
+- **The stranded-ref retry now ALERTS instead of failing silently** —
+  `preflight: WARN — could not auto-recover refs/nightly-pending/2026-08-28 … will retry next run`.
+  The Class-4 silent no-op is gone even though the ref is still stuck.
+- **Preflight dirty-tree handling matured** — `will run on top of WIP and ship it` +
+  `skipping ff-pull (git-ship rebases onto origin at push time)`. No founder WIP lost, and the off-master
+  hard-ABORT did NOT fire on any launched night this window.
+- **Verify-already-correct and CLOSE the finding.** 09-09 lane 01: *"everything traced came back either
+  clean or already-fixed"* — a night that retires phantom findings is a real win. (carried)
 - **Pixi `.destroyed`/`.geometry` null-guard chain in rAF; BOOLEAN not bare Capacitor proxy; try/catch on async
   generation paths; `initial={false}` on above-fold Framer entrances; eslint-changed-files-only + single
-  end-of-run commit + Mandatory-Minimum-Artifact floor; `DirectionalIcon` (NAMED import — a default import
-  resolves to `undefined` and silently no-ops) + Tailwind logical `start-`/`end-` for RTL; local JWT verify on
-  read-only GET; root-cause a dead counter at the shared funnel, not the caller; same-run flag+event WIRE then
-  create the flag; Supabase Management API raw-SQL fallback (MCP is not load-bearing).** (doctrine)
+  end-of-run commit; `DirectionalIcon` (NAMED import — a default import resolves to `undefined` and silently
+  no-ops) + Tailwind logical `start-`/`end-` for RTL; local JWT verify on read-only GET; root-cause a dead
+  counter at the shared funnel, not the caller; Supabase Management API raw-SQL fallback (MCP is not
+  load-bearing).** (doctrine)
 
 ## What to avoid (failed this week)
-- **#1 — `_gate_ensure_bin`'s PRECONDITION GUARD never fires, so the gate dies on `command not found` 4/4
-  nights and the loop loses 100% of its code.** Verified: the self-heal log lines appear in **none** of the
-  four run logs. `[ -e node_modules/.bin/<tool> ]` passes on symlinks the `cp -Rc` clone left unrunnable.
-  **FIX: drop the guard — after the clone, always assert `./node_modules/.bin/eslint --version` executes;
-  if it does not, provision by `cp -a` from the primary checkout and hard-fail loudly if that still fails.**
-  Do NOT just swap `npm rebuild` for `cp -a`: that line is never reached.
-  File: `scripts/nightly/lib/gate-isolated.sh:84-96` (guard) + `:459-464` (clone).
-  (open, **#1 by an enormous margin**, S-effort, ~30 distinct files/week recovered)
-- **#2 — The gate burns 2h20m–2h50m per night running the SAME doomed sequence 5+ times.** 08-31: 02:39→04:59.
-  09-01: 03:04→05:32. Once `_gate_ensure_bin` reports a failed self-heal, every downstream tier is
-  pre-determined to hit `command not found`. **Short-circuit: if the .bin provision fails, skip straight to
-  in-place fallback and alert — do not run four more full gates to rediscover it.** (open, new, S-effort)
-- **#3 — Preflight off-master ABORT regressed** (09-02, 09-03) and its "retry in 180 min" **never ran**.
-  Two dead nights out of seven. The retry must actually schedule (and log), or the abort must alert. (open,
-  **REOPENED**, M-effort)
-- **#4 — Stranded `refs/nightly-pending/` is now THREE refs: 2026-08-03, 2026-08-06, and 2026-08-28.** The
-  retry has silently failed ~19 nights for 08-03. New this week: the isolated ship blocks on a conflict in
-  the SAME three files every time — `docs/nightly/impact-ledger.ndjson`, `mode-readiness.md`,
-  `perf-baseline.json`. Those are append-only/regenerated artifacts; give them a union merge driver
-  (`.gitattributes`) and the conflict class disappears. (open, M-effort, high leverage)
-- **#5 — Lane rc is a useless health signal: every lane returned rc=0 on every launched night** while the
-  night shipped zero code. `rc=0` means "the agent process exited", not "work landed". Any dashboard or
-  scheduler keyed on rc is blind. Emit a per-lane `files_shipped=` line after the gate instead. (open, new)
-- **Every line in the run log is still printed TWICE.** Re-confirmed on 09-04. A tee/redirect is
-  double-plumbed in `run.sh`; it doubles every log grep a lane does. (open, carried, S-effort)
+- **#1 — One lane per night STALLS ~7.9 h with no output, then exits rc 75 and its work is reverted.**
+  3/3 launched nights, always a different lane. The lane goes silent ~01:50 and does not resume until
+  ~09:20; on 09-10 it logged ONE tool call (an `Explore` subagent) in the whole span. **rc 75 is the exit,
+  not the cause** — the single backoff line reads `wait 120s would resume past 06:30; aborting (rc=75)`,
+  i.e. the deadline guard firing correctly on an already-dead lane.
+  **FIX: a per-lane WALL-CLOCK CAP (~25–30 min) → revert that lane, advance to the next.** This recovers the
+  lane and the ~7.9 h regardless of whether the stall is a hung subagent (machine sleep) or a usage block,
+  and every later lane demonstrably runs fine. Do NOT cap "the usage retry" — no such loop exists in run.sh.
+  Secondary: `caffeinate -i` (`run.sh:34`) holds only an *idle*-sleep assertion and will not survive a lid
+  close; `-s`/`-d` is the stronger assertion if sleep is confirmed as the mechanism.
+  (open, **#1**, S/M-effort, ~1 lane/night recovered)
+- **#2 — The usage window may already be depleted at launch.** On 09-10 lanes 1+2 spent only 18 min before
+  lane 3 died, and the 5-hour pool is shared with the founder's own daytime sessions. **Probe the remaining
+  window at preflight and log one line**, so a starved night is diagnosable instead of looking like a lane
+  bug — and so #1's diagnosis can be confirmed rather than inferred. (open, new, S-effort)
+- **#3 — Stranded `refs/nightly-pending/` is still THREE refs: 2026-08-03, 2026-08-06, 2026-08-28.** Now
+  ~38 nights of failed retries for 08-03. It alerts now, but never lands. The blocker is a conflict in the
+  same append-only artifacts every time — `docs/nightly/impact-ledger.ndjson`, `mode-readiness.md`,
+  `perf-baseline.json`. **Give those three a union merge driver in `.gitattributes` and the class
+  disappears.** (open, carried, M-effort, high leverage)
+- **#4 — Lane rc is still a useless health signal.** Lanes that died at the usage limit and lanes that shipped
+  both surface as "continuing". The only honest per-lane signal in the log is `kept N authored file(s)`.
+  **Emit `files_shipped=` per lane after the gate**; any dashboard keyed on rc is blind. (open, carried)
 - **agent-browser cannot dismiss the cookie-consent overlay** — the dialog renders outside the snapshot a11y
-  tree. Blocking lane 11 visual QA AND lane 02 CLS capture for a **20th+ night**. FIX: pre-seed the consent
+  tree. Blocking lane 11 visual QA AND lane 02 CLS capture for a **25th+ night**. FIX: pre-seed the consent
   cookie/localStorage before first navigation. (open, **longest-running blocker in the loop**)
 - **Impact checks against a zero denominator read as "neutral" and teach nothing.** Assert the DENOMINATOR is
-  plausible first; report `no-exposure`, not `neutral`. Never write `x/7` when only 4 nights launched.
+  plausible first; report `no-exposure`, not `neutral`. Never write `x/7` when only 3 nights launched.
 - **`reddit-fetch search` returns garbage**; the RSS *feed* path works, the *search* path does not. Fall
   straight through to WebSearch. (carried, lane 04)
 - **Don't diagnose a live run from its own report** — an in-progress report is always half-written. (carried)
 - **Subagents fabricate non-English word lists** — spot-check 5 real words per locale before shipping any
-  he/ja/sv/es content. (carried, lane 10)
+  he/ja/sv/es/ru content. (carried, lane 10)
+- **A bare `count` in a supabase-js select is a PostgREST AGGREGATE (42803), not a column.** Verify live names
+  in `information_schema.columns`; import socket payload types from `@/shared/types/socket`, never redeclare
+  locally — a redeclared type crashed the one paying teacher 32× (09-09).
 
 ## Open watches (carry forward)
-- **`_gate_ensure_bin` npm-rebuild self-heal** — 4/4 nights, 100% of lane code lost. Status: **#1, assign now.**
-- **Preflight off-master abort** — Status: **REOPENED** (09-02, 09-03). Its retry is a silent no-op.
-- **Stranded `refs/nightly-pending/2026-08-03, -08-06, -08-28`** — Status: open, ~19 nights of silent retries.
-  Conflict is always the same 3 nightly artifacts → union merge driver.
-- **agent-browser cookie-consent dismissal** — Status: open, #1 tooling gap, 20+ nights.
+- **Per-night lane stall → rc 75 kill** — 3/3 launched nights, ~7.9 h + 1 lane lost each. Mechanism unproven
+  (hung subagent vs usage block); a wall-clock cap fixes both. Status: **#1, assign now.**
+- **Depleted window at launch** — Status: open, new; needs a preflight probe to settle #1's mechanism.
+- **Stranded `refs/nightly-pending/2026-08-03, -08-06, -08-28`** — Status: open, ~38 nights. Union merge driver.
+- **agent-browser cookie-consent dismissal** — Status: open, #1 tooling gap, 25+ nights.
+- **Lane 08 (blog cadence) launched 0/3** while the founder asks for a post every 2 days. The scheduler is
+  scoring it zero-signal. Status: open, needs a founder call or an exemption flag.
 - **Wheel-rush readiness** — blocked on visual QA + HE/JA native review, no code blockers. Status: rotate.
-- **Duplicated run-log lines** — Status: open, S-effort.
-- **Lane 08 (blog cadence) ran 1 of 4** while the founder directive asks for a post every 2 days.
-  Status: open, needs a founder call.
-- **Restore queue: tag `20260827-010001` has NO resolve line** (8 files still unrestored); 08-31 and 09-01 are
-  resolved. Status: open, one stranded tag.
-- **MP CLS 0.92+** (socket `connecting→lobby` DOM swap; `NativeLanguageBanner` and `CookieConsent` RULED OUT).
-  Fix = a `RoomListView` skeleton at lobby dimensions, 4–6h. Status: open, human queue.
-- **Telemetry classifier false-positives** — 25 of 33 "DEAD" events fire as `growth:<name>`. Probe
-  `growth:<event>` volume before marking DEAD. Status: open 6 weeks.
+- **Restore queue: tag `20260827-010001` has NO resolve line** (8 files unrestored). Status: open, 1 stranded tag.
+- **MP CLS 0.92+** (socket `connecting→lobby` DOM swap). Fix = a `RoomListView` skeleton at lobby dimensions,
+  4–6 h. Status: open, human queue.
+- **Telemetry classifier false-positives** — 09-10 lane 12 reported `DEAD: 69 (context-gated, ex…)`; most fire
+  as `growth:<name>`. Probe `growth:<event>` volume before marking DEAD. Status: open 7 weeks.
 - **Unwired-but-typed experiments** — `exp-practice-wheel-cta-v1`, `exp-game-abandon-confirm-v1`,
   `exp-mp-round-feedback-top-v1` + 7 more, 0 non-test call sites. Search `rg "n\('exp-" fe-next`, NOT
   `useExperiment`. Status: open, lane 03 (wire or delete).
 - **Brain Drill has no traffic** (`drill_completed` 0/13d+). Status: open — discoverability, not features.
+- **`_gate_ensure_bin` / missing dev-tool binaries** — Status: **CLOSED 09-09**, verified by a real shipped
+  code commit + zero `command not found` in 2 logs. Do not reopen without a fresh log match.
+- **Off-master preflight ABORT** — Status: **quiet** (did not fire on any launched night this window). Watch.
+- **Duplicated run-log lines** — Status: **CLOSED**, verified on the 09-10 log.
 - **GSC/human queue** — GSC creds drifted to `lf-finance.co.il`; IndexNow Bing parity; AdSense re-submit after
   ≥5 informational pages clear 400w; Sentry MCP write-403; Supabase never-expire PAT. Status: human.
 
@@ -141,18 +162,18 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 
 | Lane | Recommended skills | Evidence |
 |---|---|---|
-| 01 triage | `security`, `supabase-db-manager` | 4/4 launched rc=0; drove the merge-file restore 3 nights |
-| 02 perf | `superpowers:systematic-debugging`, `supabase-db-manager`, `agent-browser:agent-browser` | 4/4 rc=0 — most consistent lane |
-| 03 engagement | `frontend-design` | 4/4 rc=0; recovered from a usage-limit backoff on 09-04 |
-| 04 competitor | `humanizer`, `game-designer` | 1/4 (08-31 only) — near-permanent scheduler skip |
-| 05 landing | `frontend-design`, `impeccable`, `animate-ai` | 4/4 launched, 0 reverts (`impeccable:craft` was not a real skill name — corrected) |
-| 06 seo | `seo-daily` | 1/4 (09-01); native review mandatory |
-| 07 self-learn | none — prompt-only | 2/4 (08-30, 09-04); the file it rewrites went 18 days stale |
-| 08 adsense | `humanizer`, `higgsfield-generate` | 1/4 (09-01) — blog cadence at risk |
-| 09 monetization | `frontend-design` | 3/4 (08-30, 08-31, 09-01) |
-| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 2/4 (08-30, 08-31) — recovered from 2 dead windows |
-| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | 4/4 launched; **escalate the blocker, don't re-audit** |
-| 12 telemetry | none — prompt-only | 2/4 (09-01, 09-04); idempotence guard still unbuilt |
+| 01 triage | `security`, `supabase-db-manager` | 3/3 launched, kept files each night; 09-09 correctly CLOSED phantom findings |
+| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 2/3 (09-10 lost to the usage window); `supabase-db-manager` dropped — no perf evidence |
+| 03 engagement | `frontend-design` | 3/3 launched, kept 2–5 files each night — most consistent lane |
+| 04 competitor | `humanizer`, `game-designer` | 1/3 (09-06) — scheduler-rotated, not broken |
+| 05 landing | `frontend-design`, `impeccable`, `animate-ai` | 2/3 (09-09 lost to the usage window), 0 reverts when it runs |
+| 06 seo | `seo-daily` | 1/3 (09-09); mandatory — native review required |
+| 07 self-learn | none — prompt-only | 1/3 (09-10); scheduler skipped it 09-09 |
+| 08 adsense | `humanizer`, `higgsfield-generate` | **0/3** — blog cadence at risk, needs an exemption |
+| 09 monetization | `frontend-design` | 2/3 (09-06, 09-09); kept only 1 file each — low yield, watch |
+| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 1/3 (09-06, kept 5 files — best per-run yield) |
+| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | 2/3 (09-06 lost to the usage window); **escalate the blocker, don't re-audit** |
+| 12 telemetry | none — prompt-only | 2/3 (09-09, 09-10); idempotence guard still unbuilt |
 
 ## Reddit reply etiquette (lane 4 sub-output)
 - **Never auto-post.** Drafts only. User reviews + posts manually.
@@ -173,4 +194,4 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 ## Stat-framing reminders (memory anchors — DO NOT EDIT)
 - Never write "0 downloads" / "0 ads" / "no rating yet" — use "browser-based", "ad-free", "free".
 - Never insert `aggregateRating` JSON-LD without source data.
-- Hebrew/Japanese/Swedish/Spanish strings are AI-generated — flag commits for native review.
+- Hebrew/Japanese/Swedish/Spanish/Russian strings are AI-generated — flag commits for native review.

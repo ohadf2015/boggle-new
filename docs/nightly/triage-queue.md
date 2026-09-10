@@ -2313,3 +2313,21 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: attempted + reverted same run (no net change)
   - why: applied `SET search_path=''` per the autonomy-matrix "ship autonomously" bullet, but `get_random_words_from_bank` immediately broke — its body references `daily_challenge_word_bank` unqualified, relying on the implicit `public` search_path. Reverted via `RESET search_path` and verified the function works again. **The autonomy-matrix bullet for this advisor category is unsafe in this codebase** — most/all of these functions likely have the same unqualified-reference pattern and would need each function body schema-qualified (`public.daily_challenge_word_bank` etc.) before `SET search_path=''` is safe, which is a real (if small) code change per function, not a one-line hardening no-op.
   - recommended owner: self/backend — fix properly (schema-qualify each function body, THEN set search_path) one function at a time, verified with a live call each time, not as a batch.
+
+## 2026-09-10
+- [Sentry] TypeError: Cannot read properties of undefined (reading 'name') — JAVASCRIPT-NEXTJS-247
+  - first/last seen 2026-09-09T01:06-01:07, count 32, userCount 1
+  - link: https://lexiclash.sentry.io/issues/145817108/
+  - status: already-fixed (no new commit needed) — root cause was host/hooks/useTvNotifications.ts handleAchievement using a locally-redeclared payload type; fixed by commit 7fd931e6a (2026-09-09 11:00), which predates and covers this burst
+  - why: Sentry write API returned 403 (known human-queue item), could not mark resolved via MCP
+  - recommended owner: review-by-eod (someone with Sentry UI access should click resolve)
+- [Supabase] function_search_path_mutable — 7 functions (update_teacher_assignment_updated_at, get_random_words_from_bank, sync_leaderboard_avatar, get_user_leaderboard_rank, update_achievement_progress_updated_at, get_or_create_player_rating, process_gift)
+  - status: shipped via apply_migration fix_function_search_path_pin_to_public
+  - why: recommended owner: review-by-eod — one of the 7 (process_gift) touches profiles.total_coins/xp; migration only sets search_path, did not touch function body/logic, but flagging per coin-economy caution
+
+## Lane 03 (2026-09-10) — mp_round experiments inconclusive after 14+ days
+- `exp-mp-round-issue-probe-v1` (created 2026-07-23, ~49d): 337 exposures/30d, both arms <1000. Below n≥1000/arm decision threshold — cannot retire, needs longer window or a higher-traffic surface.
+- `exp-mp-round-reaction-v1` (created 2026-07-18, ~54d): 338 exposures/30d, both arms <1000. Same — inconclusive by volume, not by effect.
+- `exp-mp-results-rival-best-word-v1` (created 2026-07-20, ~52d): 795 exposures/30d, both arms <1000. Closest to threshold; re-check in ~2 weeks.
+- `exp-mp-quickplay-eager-disable-v1` (created 2026-07-29, ~43d): 810 exposures/30d, both arms <1000 — same pattern.
+- Root cause (shared): mp_round is a low-traffic surface (2-player MP round-result screen). None of these 4 flags are decided; none should be retired yet. Recommend: either extend window to 60d before judging, or consider combining exposure across surfaces if the underlying UI is reused. Human call, not autonomous.
