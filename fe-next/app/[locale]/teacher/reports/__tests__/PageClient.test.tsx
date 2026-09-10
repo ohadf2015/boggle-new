@@ -92,6 +92,11 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
 
+const trackEduReportsViewed = vi.fn();
+vi.mock('@/lib/education/telemetry', () => ({
+  trackEduReportsViewed: (...args: unknown[]) => trackEduReportsViewed(...args),
+}));
+
 describe('ReportsPageClient', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -206,6 +211,29 @@ describe('ReportsPageClient', () => {
 
       expect(screen.getByText('Progress Reports')).toBeInTheDocument();
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Telemetry', () => {
+    it('fires edu_reports_viewed once for a Pro teacher landing on the list', () => {
+      render(<ReportsPageClient />);
+      expect(trackEduReportsViewed).toHaveBeenCalledTimes(1);
+      expect(trackEduReportsViewed).toHaveBeenCalledWith({});
+    });
+
+    it('includes classroom scope when the URL already selects a class', () => {
+      mockSearchParams.set('classroomId', 'classroom-1');
+      render(<ReportsPageClient />);
+      expect(trackEduReportsViewed).toHaveBeenCalledWith({
+        classroomId: 'classroom-1',
+      });
+    });
+
+    it('does not fire when the Pro gate blocks the page', () => {
+      proState.hasPro = false;
+      render(<ReportsPageClient />);
+      expect(trackEduReportsViewed).not.toHaveBeenCalled();
+      proState.hasPro = true;
     });
   });
 

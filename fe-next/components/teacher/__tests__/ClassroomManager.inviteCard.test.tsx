@@ -46,9 +46,16 @@ vi.mock('@/hooks/useClassroom', () => ({
   }),
 }));
 
+const trackEduClassroomCreated = vi.fn();
+vi.mock('@/lib/education/telemetry', () => ({
+  trackEduClassroomCreated: (...args: unknown[]) => trackEduClassroomCreated(...args),
+}));
+
 import toast from 'react-hot-toast';
 import { fireConfetti } from '@/utils/confettiUtils';
 import ClassroomManager from '../ClassroomManager';
+
+const createButtonName = /teacher\.classroom\.create/i;
 
 describe('ClassroomManager invite + celebration UX', () => {
   beforeEach(() => {
@@ -56,6 +63,7 @@ describe('ClassroomManager invite + celebration UX', () => {
     vi.mocked(toast.success).mockClear();
     vi.mocked(toast.error).mockClear();
     createClassroom.mockReset();
+    trackEduClassroomCreated.mockClear();
     classroomsState.classrooms = [];
   });
 
@@ -116,9 +124,9 @@ describe('ClassroomManager invite + celebration UX', () => {
     render(<ClassroomManager />);
 
     // WHEN — open create dialog (header button is first matching create CTA)
-    await user.click(screen.getAllByRole('button', { name: /teacher\.classroom\.create/i })[0]);
+    await user.click(screen.getAllByRole('button', { name: createButtonName })[0]);
     await user.type(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'), 'Period 3');
-    const dialogCreate = screen.getAllByRole('button', { name: /teacher\.classroom\.create/i }).at(-1);
+    const dialogCreate = screen.getAllByRole('button', { name: createButtonName }).at(-1);
     await user.click(dialogCreate!);
 
     // THEN
@@ -128,5 +136,50 @@ describe('ClassroomManager invite + celebration UX', () => {
     });
     expect(screen.getByTestId('classroom-created-banner')).toBeInTheDocument();
     expect(screen.getByTestId('classroom-created-banner')).toHaveTextContent('XYZ789');
+  });
+
+  it('shouldFireEduClassroomCreatedWhenCreateSucceeds', async () => {
+    const user = userEvent.setup();
+    createClassroom.mockResolvedValue({
+      success: true,
+      data: {
+        id: 'cls-new',
+        name: 'Period 3',
+        language: 'he',
+        join_code: 'XYZ789',
+      },
+    });
+    render(<ClassroomManager />);
+
+    await user.click(screen.getAllByRole('button', { name: createButtonName })[0]);
+    await user.type(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'), 'Period 3');
+    const dialogCreate = screen.getAllByRole('button', { name: createButtonName }).at(-1);
+    await user.click(dialogCreate!);
+
+    await waitFor(() => {
+      expect(trackEduClassroomCreated).toHaveBeenCalledWith({
+        classroomId: 'cls-new',
+        language: 'he',
+      });
+    });
+  });
+
+  it('shouldNotFireEduClassroomCreatedWhenCreateFails', async () => {
+    const user = userEvent.setup();
+    createClassroom.mockResolvedValue({
+      success: false,
+      error: 'nope',
+    });
+    render(<ClassroomManager />);
+
+    await user.click(screen.getAllByRole('button', { name: createButtonName })[0]);
+    await user.type(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'), 'Period 3');
+    const dialogCreateFail = screen.getAllByRole('button', { name: createButtonName }).at(-1);
+    await user.click(dialogCreateFail!);
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalled();
+    });
+    expect(trackEduClassroomCreated).not.toHaveBeenCalled();
   });
 });
