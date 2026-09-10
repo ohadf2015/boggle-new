@@ -11,6 +11,7 @@ import { Play, Clock, Grid3X3, BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { GameConfiguration } from '@/hooks/useRecentGameSettings';
+import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 
 export interface QuickStartButtonProps {
   /** The game configuration to display and start */
@@ -48,6 +49,11 @@ export default function QuickStartButton({
   }
 
   const handleClick = () => {
+    trackEduLiveGameStarted({
+      classroomId: config.classroomId,
+      source: 'quick_start',
+      lessonCount: config.lessonIds.length,
+    });
     onClick?.(config);
   };
 

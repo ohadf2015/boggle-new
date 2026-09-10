@@ -311,4 +311,43 @@ export function setEduTestAccountFlag(isTestAccount: boolean): void {
 export function isTestAccountEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   return email.trim().toLowerCase().endsWith('@lexiclash.test');
+
+export interface EduClassroomCreatedArgs {
+  classroomId: string;
+  language?: string;
+}
+
+export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
+  const props: Record<string, unknown> = { classroom_id: args.classroomId };
+  if (args.language) props.language = args.language;
+  safeCapture('edu_classroom_created', props);
+}
+
+export type LiveGameStartSource = 'create_room' | 'quick_start';
+
+export interface EduLiveGameStartedArgs {
+  classroomId: string;
+  source: LiveGameStartSource;
+  lessonCount?: number;
+}
+
+export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
+  const props: Record<string, unknown> = {
+    classroom_id: args.classroomId,
+    source: args.source,
+  };
+  if (args.lessonCount !== undefined) props.lesson_count = args.lessonCount;
+  safeCapture('edu_live_game_started', props);
+}
+
+export interface EduReportsViewedArgs {
+  classroomId?: string;
+  studentId?: string;
+}
+
+export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
+  const props: Record<string, unknown> = {};
+  if (args.classroomId) props.classroom_id = args.classroomId;
+  if (args.studentId) props.student_id = args.studentId;
+  safeCapture('edu_reports_viewed', props);e84ddb2f2 (feat(edu): instrument classroom create, live start, reports viewed)
 }

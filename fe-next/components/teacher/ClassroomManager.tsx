@@ -20,6 +20,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import { stagger, slideUp } from './teacherDashboardTabs';
 
 // Re-exported for the existing contract test; the map itself is shared with the
@@ -71,6 +72,10 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
       toast.success(t('teacher.classroom.success.created'));
       setIsCreateDialogOpen(false);
       if (result.data?.id && result.data.join_code) {
+        trackEduClassroomCreated({
+          classroomId: result.data.id,
+          language: result.data.language ?? classroomLanguage,
+        });
         setCreatedClassroom({
           id: result.data.id,
           name: result.data.name,
