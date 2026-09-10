@@ -231,6 +231,10 @@ export type GrowthEvent =
   | 'education_upsell_impression'
   | 'school_lead_submitted'
   | 'school_lead_form_viewed'
+  // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
+  // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
+  | 'edu_page_play_demo_started'
+  | 'esl_list_used'
   // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel, Daily → Multiplayer)
   | 'cross_promo_click'
   // Cross-promo CTA exposure — fires once when a cross-promo card is rendered, so
