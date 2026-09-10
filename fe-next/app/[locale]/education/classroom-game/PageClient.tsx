@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
+import { ClassroomGuestDemo } from '@/components/education/ClassroomGuestDemo';
+import { TeacherGate } from '@/components/education/TeacherGate';
 import { cn } from '@/lib/utils';
 
 /**
@@ -75,8 +77,25 @@ function ClassroomGameInner() {
   );
 }
 
-import { TeacherGate } from '@/components/education/TeacherGate';
-
 export default function ClassroomGamePage() {
-  return <TeacherGate><ClassroomGameInner /></TeacherGate>;
+  const { isAuthenticated, loading } = useAuth();
+  const { t } = useLanguage();
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
+        <PageLoader size="lg" text={t('common.loading')} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <ClassroomGuestDemo />;
+  }
+
+  return (
+    <TeacherGate>
+      <ClassroomGameInner />
+    </TeacherGate>
+  );
 }

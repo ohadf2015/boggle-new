@@ -48,12 +48,13 @@ describe('vocabulary-games-classroom page', () => {
   });
 
   describe('guest CTAs', () => {
-    it('hit playable student practice, not teacher-only classroom-game', async () => {
+    it('offers the no-account classroom game, not consumer MP', async () => {
       const { container } = render(
         await Page({ params: Promise.resolve({ locale: 'en' }) })
       );
       const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href') || '');
-      expect(hrefs.some((h) => h.includes('classroom-game'))).toBe(false);
+      expect(hrefs.some((h) => h.includes('/en/education/classroom-game'))).toBe(true);
+      expect(hrefs.some((h) => h.includes('quickPlay=true'))).toBe(false);
       expect(hrefs.some((h) => h.includes('/daily/word-hunt'))).toBe(true);
     });
   });
