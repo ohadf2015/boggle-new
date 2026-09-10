@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,6 +18,7 @@ import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressR
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { trackEduReportsViewed } from '@/lib/education/telemetry';
 
 /**
  * TeacherReportsInner - Teacher Reports Page
@@ -42,6 +43,15 @@ function TeacherReportsInner() {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
     studentIdFromUrl
   );
+
+  useEffect(() => {
+    const payload: { classroomId?: string; studentId?: string } = {};
+    if (classroomIdFromUrl) payload.classroomId = classroomIdFromUrl;
+    if (studentIdFromUrl) payload.studentId = studentIdFromUrl;
+    trackEduReportsViewed(payload);
+    // Fire once per landing — classroom clicks are navigation, not a new view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle classroom selection
   const handleClassroomSelect = useCallback(
