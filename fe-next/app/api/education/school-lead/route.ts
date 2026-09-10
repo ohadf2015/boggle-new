@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (countErr) console.error('[school-lead] rate-limit check failed, proceeding:', countErr.message);
   if (rateLimited === true) return bad('too many requests in 24h, try again later', 429);
 
-  const ins = await sb.from('school_leads').insert({ ...lead, source: 'for-schools-page' });
+  const ins = await sb.from('school_leads').insert({ ...lead });
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
 
   const tpl = schoolLeadAdminNotify(lead);

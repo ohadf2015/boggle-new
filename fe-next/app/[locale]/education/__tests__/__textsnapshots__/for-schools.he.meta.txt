@@ -1,6 +1,6 @@
 {
   "title": "משחקי אוצר מילים ואנגלית לבתי ספר — חינם | LexiClash",
-  "description": "משחקי אוצר מילים ותרגול איות לכיתות — בלי חשבונות תלמידים, 6 שפות (אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית), דו-קרבות מילים 1 על 1 ומשחק כיתתי. ניסיון חינם ל-30 יום למורים. תוכניות בית ספר החל מ-$149 לשנה.",
+  "description": "משחקי אוצר מילים ותרגול איות לכיתות — בלי חשבונות תלמידים, 6 שפות (אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית), דו-קרבות מילים 1 על 1 ומשחק כיתתי. ניסיון חינם ל-30 יום למורים. תוכניות בית ספר החל מ-$39 לסמסטר.",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,
@@ -34,7 +34,7 @@
     "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
   },
   "ogTitle": "LexiClash לבתי ספר — משחקי אוצר מילים ואנגלית",
-  "ogDescription": "משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1. ניסיון חינם ל-30 יום. תוכניות בית ספר החל מ-$149 לשנה.",
+  "ogDescription": "משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1. ניסיון חינם ל-30 יום. תוכניות בית ספר החל מ-$39 לסמסטר.",
   "ogLocale": "he_IL",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/he/education/for-schools",
@@ -48,7 +48,7 @@
   ],
   "twCard": "summary_large_image",
   "twTitle": "LexiClash לבתי ספר — משחקי אוצר מילים ואנגלית",
-  "twDescription": "משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1. ניסיון חינם ל-30 יום. תוכניות בית ספר החל מ-$149 לשנה.",
+  "twDescription": "משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1. ניסיון חינם ל-30 יום. תוכניות בית ספר החל מ-$39 לסמסטר.",
   "twImages": [
     "https://www.lexiclash.live/og-image-en.webp"
   ]

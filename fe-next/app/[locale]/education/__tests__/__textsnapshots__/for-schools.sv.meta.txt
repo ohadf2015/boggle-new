@@ -1,6 +1,6 @@
 {
   "title": "Gratis ordförråds- och ESL-ordspel för skolor — LexiClash",
-  "description": "Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 30-dagars provperiod för lärare. Skolplaner från $149/år.",
+  "description": "Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel. Gratis 30-dagars provperiod för lärare. Skolplaner från $39/termin.",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,
@@ -34,7 +34,7 @@
     "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
   },
   "ogTitle": "LexiClash för skolor — Ordförråds- och ESL-ordspel",
-  "ogDescription": "Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $149/år.",
+  "ogDescription": "Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $39/termin.",
   "ogLocale": "sv_SE",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/sv/education/for-schools",
@@ -48,7 +48,7 @@
   ],
   "twCard": "summary_large_image",
   "twTitle": "LexiClash för skolor — Ordförråds- och ESL-ordspel",
-  "twDescription": "Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $149/år.",
+  "twDescription": "Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller. Gratis provperiod. Skolplaner från $39/termin.",
   "twImages": [
     "https://www.lexiclash.live/og-image-en.webp"
   ]

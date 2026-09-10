@@ -231,6 +231,10 @@ export type GrowthEvent =
   | 'education_upsell_impression'
   | 'school_lead_submitted'
   | 'school_lead_form_viewed'
+  // Education packages page (t_c354b27e). Canonical names the card asked for:
+  // package_view → education_package_viewed; lead_submitted → school_lead_submitted
+  // with { plan }. Do not add a second analytics stack; t_a72fccab owns funnel events.
+  | 'education_package_viewed'
   // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel, Daily → Multiplayer)
   | 'cross_promo_click'
   // Cross-promo CTA exposure — fires once when a cross-promo card is rendered, so

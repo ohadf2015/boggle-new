@@ -14565,7 +14565,40 @@ const sv = {
         "rate_limited": "För många inlämningar. Försök igen om 24 timmar.",
         "success_title": "Tack — vi har tagit emot det!",
         "success_body": "Vi bekräftar din provperiod och delar information om skolplanen inom 1–2 arbetsdagar. Fortsätt spela med din klass under tiden — det är gratis.",
+        "class_size": "Klassstorlek",
         "privacy_note": "Vi använder detta endast för att kontakta dig om skolfunktioner. Ingen spam."
+      }
+    },
+    "packages": {
+      "title": "Utbildningspaket",
+      "subtitle": "Teacher Pro är live-betalning. Klassrumsplanen är ett prisankare — berätta om din klass. Skolor och distrikt: kontakta oss. Ingen kassa för klassrum förrän efterfrågan når tröskeln.",
+      "teacherPro": {
+        "name": "Teacher Pro",
+        "interval": "/mån",
+        "blurb": "Alla rapporter, miss-gap-läxor och reteach-verktyg för en lärare.",
+        "cta": "Uppgradera — $9/mån"
+      },
+      "classroom": {
+        "name": "Klassrumsplan",
+        "interval": "/termin",
+        "blurb": "Hela klassen, alla Pro-funktioner, klass-streaks och prioriterad support.",
+        "cta": "Begär klassrum — $39/termin"
+      },
+      "school": {
+        "name": "Skolor och distrikt",
+        "price": "Kontakta oss",
+        "blurb": "Utrullning, admin och distriktsbehov. Samma formulär, taggat som skollead.",
+        "cta": "Kontakta oss"
+      },
+      "feature": {
+        "reports": "Alla klassrapporter",
+        "homework": "Miss-gap-läxor",
+        "reteach": "Reteach-verktyg",
+        "wholeClass": "Hela klassen, inte bara en lärarplats",
+        "proPlus": "Varje Teacher Pro-funktion ingår",
+        "streaks": "Klass-streaks",
+        "priority": "Prioriterad support",
+        "district": "Skol- och distriktsutrullning"
       }
     }
   },

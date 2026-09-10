@@ -90,6 +90,25 @@ describe('validateSchoolLeadPayload', () => {
     expect(validateSchoolLeadPayload({ ...valid, locale: 'fr' }).ok).toBe(false);
   });
 
+  it('defaults source to for-schools-page', () => {
+    const r = validateSchoolLeadPayload(valid);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.payload.source).toBe('for-schools-page');
+  });
+
+  it('accepts classroom-plan and school-district sources', () => {
+    const classroom = validateSchoolLeadPayload({ ...valid, source: 'classroom-plan' });
+    expect(classroom.ok).toBe(true);
+    if (classroom.ok) expect(classroom.payload.source).toBe('classroom-plan');
+    const school = validateSchoolLeadPayload({ ...valid, source: 'school-district' });
+    expect(school.ok).toBe(true);
+    if (school.ok) expect(school.payload.source).toBe('school-district');
+  });
+
+  it('rejects an unknown source (do not invent billing SKUs via source)', () => {
+    expect(validateSchoolLeadPayload({ ...valid, source: 'polar-checkout' }).ok).toBe(false);
+  });
+
   it('exposes the role / bucket / interest registries for the form to render', () => {
     expect(SCHOOL_LEAD_ROLES).toContain('district_admin');
     expect(STUDENT_COUNT_BUCKETS).toContain('gte_2000');

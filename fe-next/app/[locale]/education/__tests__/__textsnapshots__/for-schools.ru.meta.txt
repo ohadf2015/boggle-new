@@ -1,6 +1,6 @@
 {
   "title": "Бесплатные игры на словарный запас для школ — LexiClash",
-  "description": "Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры. Бесплатный пробный период 30 дней для учителей. Школьные планы от $149 в год.",
+  "description": "Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры. Бесплатный пробный период 30 дней для учителей. Школьные планы от $39 за семестр.",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,
@@ -34,7 +34,7 @@
     "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
   },
   "ogTitle": "LexiClash для школ — игры на словарный запас",
-  "ogDescription": "Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $149 в год.",
+  "ogDescription": "Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $39 за семестр.",
   "ogLocale": "ru_RU",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/ru/education/for-schools",
@@ -48,7 +48,7 @@
   ],
   "twCard": "summary_large_image",
   "twTitle": "LexiClash для школ — игры на словарный запас",
-  "twDescription": "Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $149 в год.",
+  "twDescription": "Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1. Бесплатный пробный период. Школьные планы от $39 за семестр.",
   "twImages": [
     "https://www.lexiclash.live/og-image-en.webp"
   ]

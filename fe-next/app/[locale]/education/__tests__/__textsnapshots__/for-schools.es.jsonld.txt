@@ -9,7 +9,7 @@
       "name": "¿Es LexiClash gratis para maestros?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Cada maestro obtiene una prueba completa de 30 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $149/escuela/año."
+        "text": "Cada maestro obtiene una prueba completa de 30 días: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego básico de aula sigue siendo gratis para maestros individuales. Los planes escolares — que agregan paneles de administración, análisis, bibliotecas de contenido curricular y un entorno sin anuncios — comienzan en $39/trimestre."
       }
     },
     {
@@ -17,7 +17,7 @@
       "name": "¿Qué incluyen los planes escolares o de distrito?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Los planes escolares ($149/año por escuela) agregan las funciones que escalan: un panel de administración de distrito, análisis y reportes entre clases, bibliotecas de contenido curricular curadas, un entorno escolar sin anuncios y SSO (Clever / ClassLink / Google). El juego básico de aula sigue siendo gratis — los planes se superponen, nunca lo limitan."
+        "text": "Los planes escolares ($39/trimestre) agregan las funciones que escalan: un panel de administración de distrito, análisis y reportes entre clases, bibliotecas de contenido curricular curadas, un entorno escolar sin anuncios y SSO (Clever / ClassLink / Google). El juego básico de aula sigue siendo gratis — los planes se superponen, nunca lo limitan."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "¿Cómo iniciamos nuestra prueba u obtenemos un plan escolar?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Completa el formulario en esta página con tu rol, escuela o distrito y cuántos estudiantes tienes aproximadamente. Confirmaremos tu acceso de prueba y compartiremos los detalles del plan escolar — $149/año por escuela, precio de distrito bajo solicitud."
+        "text": "Completa el formulario en esta página con tu rol, escuela o distrito y cuántos estudiantes tienes aproximadamente. Confirmaremos tu acceso de prueba y compartiremos los detalles del plan escolar — $39/trimestre, precio de distrito bajo solicitud."
       }
     },
     {
@@ -85,7 +85,7 @@
   "@id": "https://www.lexiclash.live/es/education#org",
   "name": "LexiClash Education",
   "url": "https://www.lexiclash.live/es/education",
-  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; school plans from $149/year.",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.",
   "audience": {
     "@type": "EducationalAudience",
     "educationalRole": "teacher"
@@ -119,22 +119,29 @@
         "unitText": "month"
       },
       "category": "paid",
-      "description": "Unlimited classrooms plus progress analytics and printable reports",
+      "description": "Unlimited classrooms plus progress analytics, miss-gap homework and reteach tools",
       "availability": "https://schema.org/InStock"
     },
     {
       "@type": "Offer",
-      "name": "School Plan",
-      "price": 149,
+      "name": "Classroom plan",
+      "price": 39,
       "priceCurrency": "USD",
       "priceSpecification": {
         "@type": "UnitPriceSpecification",
-        "price": 149,
+        "price": 39,
         "priceCurrency": "USD",
-        "unitText": "year"
+        "unitText": "term"
       },
       "category": "paid",
-      "description": "School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO",
+      "description": "Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Schools & districts",
+      "category": "paid",
+      "description": "Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.",
       "availability": "https://schema.org/InStock"
     }
   ]

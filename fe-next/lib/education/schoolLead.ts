@@ -1,4 +1,5 @@
 import type { TeacherLocale } from '@/lib/education/types';
+import { SCHOOL_LEAD_SOURCES, type SchoolLeadSource } from '@/lib/education/educationPackages';
 
 // ── Qualification registries (the load-bearing "is this a payable lead" signal) ──
 // Roles that map to budget authority sit alongside classroom roles so we can
@@ -48,6 +49,7 @@ export interface SchoolLeadPayload {
   country?: string;
   message?: string;
   locale: TeacherLocale;
+  source: SchoolLeadSource;
 }
 
 export type SchoolLeadValidation =
@@ -101,6 +103,14 @@ export function validateSchoolLeadPayload(body: unknown): SchoolLeadValidation {
 
   if (!LOCALES.includes(b.locale as TeacherLocale)) return { ok: false, error: 'invalid locale' };
 
+  let source: SchoolLeadSource = 'for-schools-page';
+  if (b.source !== undefined && b.source !== '') {
+    if (!SCHOOL_LEAD_SOURCES.includes(b.source as SchoolLeadSource)) {
+      return { ok: false, error: 'invalid source' };
+    }
+    source = b.source as SchoolLeadSource;
+  }
+
   return {
     ok: true,
     payload: {
@@ -113,6 +123,7 @@ export function validateSchoolLeadPayload(body: unknown): SchoolLeadValidation {
       country: country ? (country as string) : undefined,
       message: message ? (message as string) : undefined,
       locale: b.locale as TeacherLocale,
+      source,
     },
   };
 }
