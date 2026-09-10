@@ -13293,6 +13293,8 @@ const es = {
         "boardLabel": "Tablero de letras de muestra",
         "samplePath": "Resaltada: {word}",
         "minLength": "Las palabras necesitan al menos {count} letras.",
+        "quizLabel": "Pregunta de muestra",
+        "quizNote": "Los estudiantes ven una pregunta de cuatro opciones de tus palabras, no un tablero de letras.",
         "hiddenWords": "Palabras escondidas en este tablero",
         "noneHidden": "Ninguna de las palabras elegidas cabe en un tablero de este tamaño."
       },

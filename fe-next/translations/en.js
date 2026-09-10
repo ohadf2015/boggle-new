@@ -11834,6 +11834,8 @@ const en = {
         "boardLabel": "Sample letter board",
         "samplePath": "Highlighted: {word}",
         "minLength": "Words need at least {count} letters.",
+        "quizLabel": "Sample quiz question",
+        "quizNote": "Students see a four-choice question from your lesson words — not a letter board.",
         "hiddenWords": "Words hidden in this board",
         "noneHidden": "None of the selected words fit a board this size."
       },

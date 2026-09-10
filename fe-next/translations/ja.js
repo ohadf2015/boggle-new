@@ -13301,6 +13301,8 @@ const ja = {
         "boardLabel": "サンプルの文字ボード",
         "samplePath": "ハイライト：{word}",
         "minLength": "単語は{count}文字以上必要です。",
+        "quizLabel": "クイズのサンプル問題",
+        "quizNote": "生徒にはレッスンの単語から四択問題が表示されます。文字ボードではありません。",
         "hiddenWords": "このボードに隠れている単語",
         "noneHidden": "選んだ単語はどれも、このサイズのボードには入りません。"
       },

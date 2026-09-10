@@ -5,19 +5,20 @@
  * length) so the student summary can never drift from what the teacher chose.
  */
 
-import type { GameMode } from '@/shared/types/game';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 
 // Translation keys are camelCase; canonical GameMode wire values are kebab.
-const MODE_KEY_MAP: Partial<Record<GameMode, string>> = {
+const MODE_KEY_MAP: Partial<Record<ClassroomGameMode, string>> = {
   classic: 'classic',
   blast: 'blast',
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
+  'vocab-quiz': 'vocabQuiz',
 };
 
 export type Translate = (key: string, params?: Record<string, string | number>) => string;
 
-export function gameModeLabel(t: Translate, mode: GameMode): string {
+export function gameModeLabel(t: Translate, mode: ClassroomGameMode): string {
   const key = MODE_KEY_MAP[mode];
   return key ? t(`teacher.classroom.gameModes.${key}`) : mode;
 }

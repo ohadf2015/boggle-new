@@ -130,14 +130,10 @@ export function ClassroomSetupStep({
     !selectedClassroomId ||
     allPlayableWords.length === 0;
 
-  // "Preview what students will see" — needs a classroom (for its real join
-  // code) and at least one lesson (for words to hide in the sample board).
+  // Preview needs a classroom (real join code) and a lesson (words for the
+  // sample board or the sample quiz question).
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  // The preview draws a sample letter board. A Vocab Quiz has no board, so the
-  // button is disabled there rather than opening a dialog that would show
-  // students a screen they never see.
-  const canPreview =
-    Boolean(selectedClassroomId) && selectedLessonIds.length > 0 && gameMode !== 'vocab-quiz';
+  const canPreview = Boolean(selectedClassroomId) && selectedLessonIds.length > 0;
   const selectedClassroom = useMemo(
     () => classrooms.find((c) => c.id === selectedClassroomId) ?? null,
     [classrooms, selectedClassroomId]
@@ -424,9 +420,6 @@ export function ClassroomSetupStep({
         </details>
       </div>
 
-      {/* The preview renders a letter board, which a Vocab Quiz never shows —
-          previewing one would promise students a screen they never get. */}
-      {gameMode !== 'vocab-quiz' && (
       <StudentViewPreview
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
@@ -437,7 +430,6 @@ export function ClassroomSetupStep({
         boardSize={boardSize}
         minWordLength={minWordLength}
       />
-      )}
     </WizardStep>
   );
 }

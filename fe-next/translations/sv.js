@@ -13534,6 +13534,8 @@ const sv = {
         "boardLabel": "Exempel på bokstavsbräde",
         "samplePath": "Markerat: {word}",
         "minLength": "Ord måste ha minst {count} bokstäver.",
+        "quizLabel": "Exempelfråga",
+        "quizNote": "Eleverna ser en fyravalsfråga från lektionens ord — inte ett bokstavsbräde.",
         "hiddenWords": "Ord gömda i det här brädet",
         "noneHidden": "Inget av de valda orden får plats på ett bräde i den här storleken."
       },

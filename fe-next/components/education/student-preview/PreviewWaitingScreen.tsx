@@ -1,4 +1,4 @@
-import type { GameMode } from '@/shared/types/game';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import {
   boardSizeLabel,
   gameModeLabel,
@@ -10,7 +10,7 @@ import {
 interface PreviewWaitingScreenProps {
   t: Translate;
   joinCode: string;
-  gameMode: GameMode;
+  gameMode: ClassroomGameMode;
   timerMinutes: number;
   boardSize: 'small' | 'medium' | 'large';
   rows: number;
