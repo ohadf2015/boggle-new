@@ -28,4 +28,8 @@ describe('reengagement email cron migration', () => {
     expect(sql).toContain('x-cron-secret');
     expect(sql).toContain("vault.decrypted_secrets WHERE name = 'cron_secret'");
   });
+
+  it('sets a pg_net timeout long enough for the recipient scan', () => {
+    expect(sql).toContain('timeout_milliseconds := 120000');
+  });
 });

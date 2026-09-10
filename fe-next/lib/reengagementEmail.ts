@@ -181,15 +181,55 @@ export async function getFirstLetterForLanguage(
 // Recipient Fetching
 // ==========================================
 
+const AUTH_LIST_PAGE_SIZE = 50; // Auth admin listUsers default; larger perPage is not reliably honored
+const IN_FILTER_CHUNK = 100;
+
+function playerIdsFrom(data: unknown): string[] {
+  if (!data) return [];
+  const rows = Array.isArray(data) ? data : [data];
+  const ids: string[] = [];
+  for (const row of rows) {
+    const id = (row as { player_id?: string })?.player_id;
+    if (id) ids.push(id);
+  }
+  return ids;
+}
+
+async function collectPlayerIds(
+  supabase: DailySupabase,
+  table: string,
+  ids: string[],
+  column: 'puzzle_date' | 'last_played_at',
+  cutoff: string,
+): Promise<Set<string>> {
+  const found = new Set<string>();
+  if (ids.length === 0) return found;
+  for (let i = 0; i < ids.length; i += IN_FILTER_CHUNK) {
+    const chunk = ids.slice(i, i + IN_FILTER_CHUNK);
+    const { data } = await supabase
+      .from(table)
+      .select('player_id')
+      .in('player_id', chunk)
+      .gte(column, cutoff);
+    for (const id of playerIdsFrom(data)) found.add(id);
+  }
+  return found;
+}
+
 /**
  * Get users eligible for re-engagement emails. Conservative gating to avoid
  * nagging users who don't want it:
  *   - daily_email_subscribed = true
- *   - No daily_puzzle_attempts in last INACTIVITY_DAYS
- *   - HAS played daily at least once ever (skip never-played sign-ups)
- *   - Most recent play within MAX_INACTIVITY_DAYS (give up on long-gone users)
+ *   - No live daily attempts in last INACTIVITY_DAYS
+ *   - HAS played daily at least once in MAX_INACTIVITY_DAYS (skip never-played + long-gone)
  *   - last_reengagement_email_sent_at null or > MIN_INTERVAL_DAYS ago
  *   - Local time 7-9 AM
+ *
+ * Plumbing notes (prod 2026-09-10): a per-user N+1 plus listUsers()'s first
+ * page of 50 made pg_net's 5s POST time out at 07:00 UTC (the UTC 7–9 window)
+ * and return "No eligible recipients" otherwise — 0 sends since 2026-07-09
+ * despite ~39 SQL-eligible users. Batch the activity checks; page through
+ * every auth user.
  */
 export async function getReengagementRecipients(): Promise<ReengagementRecipient[]> {
   const supabase = getSupabaseAdmin();
@@ -214,60 +254,70 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
 
   if (error || !profiles?.length) return [];
 
-  const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-  if (authError) return [];
-
   const emailMap = new Map<string, string>();
-  authUsers.users.forEach((user: { id: string; email?: string }) => {
-    if (user.email) emailMap.set(user.id, user.email);
-  });
+  for (let page = 1; page <= 100; page++) {
+    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: AUTH_LIST_PAGE_SIZE,
+    });
+    if (authError) return [];
+    const users = authUsers?.users ?? [];
+    for (const user of users as { id: string; email?: string }[]) {
+      if (user.email) emailMap.set(user.id, user.email);
+    }
+    if (users.length < AUTH_LIST_PAGE_SIZE) break;
+  }
 
   const inactivityDate = new Date();
   inactivityDate.setDate(inactivityDate.getDate() - INACTIVITY_DAYS);
   const inactivityCutoff = inactivityDate.toISOString().split('T')[0];
+  const inactivityCutoffIso = inactivityDate.toISOString();
 
   const giveUpDate = new Date();
   giveUpDate.setDate(giveUpDate.getDate() - MAX_INACTIVITY_DAYS);
   const giveUpCutoff = giveUpDate.toISOString().split('T')[0];
 
-  const recipients: ReengagementRecipient[] = [];
-
-  for (const profile of profiles) {
-    const email = emailMap.get(profile.id);
-    if (!email) continue;
-
+  const hourFiltered = profiles.filter((profile) => {
+    if (!emailMap.get(profile.id)) return false;
     if (profile.last_reengagement_email_sent_at) {
       const lastSent = new Date(profile.last_reengagement_email_sent_at);
-      if (lastSent.toISOString() > antiSpamCutoff) continue;
+      if (lastSent.toISOString() > antiSpamCutoff) return false;
     }
+    const localHour = getLocalHour(profile.timezone || 'UTC');
+    if (localHour < 7 || localHour > 9) return false;
+    return true;
+  });
+  if (hourFiltered.length === 0) return [];
 
-    const userTimezone = profile.timezone || 'UTC';
-    const localHour = getLocalHour(userTimezone);
-    if (localHour < 7 || localHour > 9) continue;
+  const candidateIds = hourFiltered.map((p) => p.id);
 
-    // Recent activity check — skip users who played the daily within window.
-    const playedDailyRecently = await hasDailyAttemptSince(supabase, profile.id, inactivityCutoff);
-    if (playedDailyRecently) continue;
+  const recentDailyIds = new Set<string>();
+  for (const table of DAILY_ATTEMPT_TABLES) {
+    const ids = await collectPlayerIds(supabase, table, candidateIds, 'puzzle_date', inactivityCutoff);
+    ids.forEach((id) => recentDailyIds.add(id));
+  }
 
-    // Cross-mode activity check — engagementManager writes last_played_at on
-    // every game (MP, SP, brain drills, party). If the user played anything
-    // recently, don't nag them to come back.
-    const inactivityCutoffIso = inactivityDate.toISOString();
-    const { data: recentAnyGame } = await supabase
-      .from('player_engagement')
-      .select('last_played_at')
-      .eq('player_id', profile.id)
-      .gte('last_played_at', inactivityCutoffIso)
-      .limit(1)
-      .maybeSingle();
+  const recentAnyIds = await collectPlayerIds(
+    supabase,
+    'player_engagement',
+    candidateIds,
+    'last_played_at',
+    inactivityCutoffIso,
+  );
 
-    if (recentAnyGame) continue;
+  const windowDailyIds = new Set<string>();
+  for (const table of DAILY_ATTEMPT_TABLES) {
+    const ids = await collectPlayerIds(supabase, table, candidateIds, 'puzzle_date', giveUpCutoff);
+    ids.forEach((id) => windowDailyIds.add(id));
+  }
 
-    // Engagement window — must have played at least once within last MAX_INACTIVITY_DAYS.
-    // Skips two cohorts we shouldn't nag: never-played sign-ups + long-gone users.
-    const playedDailyInWindow = await hasDailyAttemptSince(supabase, profile.id, giveUpCutoff);
-    if (!playedDailyInWindow) continue;
-
+  const recipients: ReengagementRecipient[] = [];
+  for (const profile of hourFiltered) {
+    if (recentDailyIds.has(profile.id)) continue;
+    if (recentAnyIds.has(profile.id)) continue;
+    if (!windowDailyIds.has(profile.id)) continue;
+    const email = emailMap.get(profile.id);
+    if (!email) continue;
     recipients.push({
       id: profile.id,
       email,

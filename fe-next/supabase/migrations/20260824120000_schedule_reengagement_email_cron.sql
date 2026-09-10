@@ -9,6 +9,11 @@
 -- Requires a vault secret named 'cron_secret' whose value matches the app's CRON_SECRET env
 -- var (checked by isAuthorizedCronRequest in lib/cronAuth.ts, fail-closed if unset).
 
+-- Idempotent reschedule: drop the existing job if present, then insert with a
+-- 120s pg_net timeout. The previous 5s default aborted the 07:00 UTC tick
+-- while the handler was still scanning recipients (prod 2026-09-10).
+SELECT cron.unschedule(jobid) FROM cron.job WHERE jobname = 'reengagement-email-hourly';
+
 SELECT cron.schedule(
   'reengagement-email-hourly',
   '0 * * * *',
@@ -18,7 +23,8 @@ SELECT cron.schedule(
     headers := json_build_object(
       'Content-Type', 'application/json',
       'x-cron-secret', (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'cron_secret')
-    )::jsonb
+    )::jsonb,
+    timeout_milliseconds := 120000
   );
   $$
 );
