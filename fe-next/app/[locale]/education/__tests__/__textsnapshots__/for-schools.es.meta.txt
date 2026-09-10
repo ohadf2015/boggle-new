@@ -1,6 +1,6 @@
 {
   "title": "Juegos de vocabulario y ESL gratis para escuelas — LexiClash",
-  "description": "Juegos de vocabulario y práctica de ortografía en inglés para aulas K-12 — sin inicios de sesión de estudiantes, 6 idiomas (inglés, hebreo, español, sueco, japonés, ruso), duelos de palabras 1v1 y juego en clase completo. Prueba gratis por 30 días para maestros. Planes escolares desde $149/año.",
+  "description": "Juegos de vocabulario y práctica de ortografía en inglés para aulas K-12 — sin inicios de sesión de estudiantes, 6 idiomas (inglés, hebreo, español, sueco, japonés, ruso), duelos de palabras 1v1 y juego en clase completo. Prueba gratis por 30 días para maestros. Planes escolares desde $39/trimestre.",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,
@@ -34,7 +34,7 @@
     "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
   },
   "ogTitle": "LexiClash para escuelas — Juegos de vocabulario y ESL",
-  "ogDescription": "Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1. Prueba gratis por 30 días. Planes escolares desde $149/año.",
+  "ogDescription": "Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1. Prueba gratis por 30 días. Planes escolares desde $39/trimestre.",
   "ogLocale": "es_ES",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/es/education/for-schools",
@@ -48,7 +48,7 @@
   ],
   "twCard": "summary_large_image",
   "twTitle": "LexiClash para escuelas — Juegos de vocabulario y ESL",
-  "twDescription": "Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1. Prueba gratis por 30 días. Planes escolares desde $149/año.",
+  "twDescription": "Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1. Prueba gratis por 30 días. Planes escolares desde $39/trimestre.",
   "twImages": [
     "https://www.lexiclash.live/og-image-en.webp"
   ]

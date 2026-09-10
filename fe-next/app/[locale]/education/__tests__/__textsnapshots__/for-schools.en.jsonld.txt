@@ -9,7 +9,7 @@
       "name": "Is LexiClash free for teachers?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $149/school/year."
+        "text": "Every teacher gets a full 30-day trial: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the basic classroom game stays free for individual teachers. School plans -- which add admin dashboards, analytics, curriculum libraries, and an ad-free environment -- start at $39/term."
       }
     },
     {
@@ -17,7 +17,7 @@
       "name": "What does a school or district plan include?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "School plans ($149/year per school) add the features that scale: a district admin dashboard, cross-class analytics and reporting, curated curriculum content libraries, an ad-free school environment, and SSO (Clever / ClassLink / Google). The basic classroom game stays free -- plans layer on top, never gate it."
+        "text": "School plans ($39/term) add the features that scale: a district admin dashboard, cross-class analytics and reporting, curated curriculum content libraries, an ad-free school environment, and SSO (Clever / ClassLink / Google). The basic classroom game stays free -- plans layer on top, never gate it."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "How do we start our trial or get a school plan?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Fill in the form on this page with your role, school or district, and rough student count. We'll confirm your trial access and share school plan details -- $149/year per school, district pricing on request."
+        "text": "Fill in the form on this page with your role, school or district, and rough student count. We'll confirm your trial access and share school plan details -- $39/term, district pricing on request."
       }
     },
     {
@@ -85,7 +85,7 @@
   "@id": "https://www.lexiclash.live/en/education#org",
   "name": "LexiClash Education",
   "url": "https://www.lexiclash.live/en/education",
-  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; school plans from $149/year.",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.",
   "audience": {
     "@type": "EducationalAudience",
     "educationalRole": "teacher"
@@ -119,22 +119,29 @@
         "unitText": "month"
       },
       "category": "paid",
-      "description": "Unlimited classrooms plus progress analytics and printable reports",
+      "description": "Unlimited classrooms plus progress analytics, miss-gap homework and reteach tools",
       "availability": "https://schema.org/InStock"
     },
     {
       "@type": "Offer",
-      "name": "School Plan",
-      "price": 149,
+      "name": "Classroom plan",
+      "price": 39,
       "priceCurrency": "USD",
       "priceSpecification": {
         "@type": "UnitPriceSpecification",
-        "price": 149,
+        "price": 39,
         "priceCurrency": "USD",
-        "unitText": "year"
+        "unitText": "term"
       },
       "category": "paid",
-      "description": "School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO",
+      "description": "Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.",
+      "availability": "https://schema.org/InStock"
+    },
+    {
+      "@type": "Offer",
+      "name": "Schools & districts",
+      "category": "paid",
+      "description": "Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.",
       "availability": "https://schema.org/InStock"
     }
   ]

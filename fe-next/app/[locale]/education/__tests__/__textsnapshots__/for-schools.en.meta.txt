@@ -1,6 +1,6 @@
 {
   "title": "Free Vocabulary & ESL Word Games for Schools — LexiClash",
-  "description": "Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play. Free 30-day trial for teachers. School plans from $149/year.",
+  "description": "Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play. Free 30-day trial for teachers. School plans from $39/term.",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,
@@ -34,7 +34,7 @@
     "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
   },
   "ogTitle": "LexiClash for Schools — Vocabulary & ESL Word Games",
-  "ogDescription": "Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 30-day trial. School plans from $149/year.",
+  "ogDescription": "Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 30-day trial. School plans from $39/term.",
   "ogLocale": "en_US",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/en/education/for-schools",
@@ -48,7 +48,7 @@
   ],
   "twCard": "summary_large_image",
   "twTitle": "LexiClash for Schools — Vocabulary & ESL Word Games",
-  "twDescription": "Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 30-day trial. School plans from $149/year.",
+  "twDescription": "Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels. Free 30-day trial. School plans from $39/term.",
   "twImages": [
     "https://www.lexiclash.live/og-image-en.webp"
   ]

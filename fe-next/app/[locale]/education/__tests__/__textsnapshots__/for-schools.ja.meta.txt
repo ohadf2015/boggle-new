@@ -1,6 +1,6 @@
 {
   "title": "学校向け無料語彙・ESL単語ゲーム — LexiClash",
-  "description": "K-12クラス向けの語彙とESLスペリング練習 — 学生ログイン不要、6言語（英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語）、1v1単語決闘とクラス全体プレイ。教師向け30日間無料トライアル。学校プランは年$149から。",
+  "description": "K-12クラス向けの語彙とESLスペリング練習 — 学生ログイン不要、6言語（英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語）、1v1単語決闘とクラス全体プレイ。教師向け30日間無料トライアル。学校プランは学期$39から。",
   "keywords": "vocabulary game for schools, word game for schools, classroom word game district, free word game school license, multiplayer vocabulary game classroom, 1v1 word game classroom, word game no student login, Kahoot alternative vocabulary, Gimkit alternative word game, ESL word game school",
   "robots": {
     "index": true,
@@ -34,7 +34,7 @@
     "ru-RU": "https://www.lexiclash.live/ru/education/for-schools"
   },
   "ogTitle": "学校向けLexiClash — 語彙とESL単語ゲーム",
-  "ogDescription": "すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘。30日間無料トライアル。学校プランは年$149から。",
+  "ogDescription": "すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘。30日間無料トライアル。学校プランは学期$39から。",
   "ogLocale": "ja_JP",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/ja/education/for-schools",
@@ -48,7 +48,7 @@
   ],
   "twCard": "summary_large_image",
   "twTitle": "学校向けLexiClash — 語彙とESL単語ゲーム",
-  "twDescription": "すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘。30日間無料トライアル。学校プランは年$149から。",
+  "twDescription": "すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘。30日間無料トライアル。学校プランは学期$39から。",
   "twImages": [
     "https://www.lexiclash.live/og-image-en.webp"
   ]

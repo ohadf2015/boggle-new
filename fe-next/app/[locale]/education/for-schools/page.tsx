@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from './content';
-import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
+import { ForSchoolsPackages } from '@/components/education/EducationPackages';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
 import {
@@ -67,7 +67,7 @@ export default async function Page({ params }: PageProps) {
     // Locale-aware @id/url — this node used to name the English org on every build.
     ...educationProviderNode(locale),
     description:
-      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; school plans from $149/year.',
+      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
     offers: [
@@ -75,8 +75,9 @@ export default async function Page({ params }: PageProps) {
       // 3 classes of 50 students with no expiry. Advertising a 30-day trial in schema
       // understated the free plan and contradicted every other surface.
       { '@type': 'Offer', name: 'Teacher Free', price: 0, priceCurrency: 'USD', category: 'free', description: 'Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games', availability: 'https://schema.org/InStock' },
-      { '@type': 'Offer', name: 'Teacher Pro', price: 9, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 9, priceCurrency: 'USD', unitText: 'month' }, category: 'paid', description: 'Unlimited classrooms plus progress analytics and printable reports', availability: 'https://schema.org/InStock' },
-      { '@type': 'Offer', name: 'School Plan', price: 149, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 149, priceCurrency: 'USD', unitText: 'year' }, category: 'paid', description: 'School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Teacher Pro', price: 9, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 9, priceCurrency: 'USD', unitText: 'month' }, category: 'paid', description: 'Unlimited classrooms plus progress analytics, miss-gap homework and reteach tools', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Classroom plan', price: 39, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 39, priceCurrency: 'USD', unitText: 'term' }, category: 'paid', description: 'Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Schools & districts', category: 'paid', description: 'Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.', availability: 'https://schema.org/InStock' },
     ],
   };
 
@@ -186,18 +187,7 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Lead capture */}
-        <section id="lead" className="mt-16 scroll-mt-20 grid gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.leadTitle}</h2>
-            <p className="mt-3 text-neo-gray-200">{c.leadIntro}</p>
-          </div>
-          <div className="lg:col-span-7">
-            <div className="rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-xl">
-              <SchoolLeadForm />
-            </div>
-          </div>
-        </section>
+        <ForSchoolsPackages locale={locale} leadTitle={c.leadTitle} leadIntro={c.leadIntro} />
 
         {/* FAQ (GEO-citable) */}
         <section className="mt-16">

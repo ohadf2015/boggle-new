@@ -12862,8 +12862,41 @@ const en = {
         "rate_limited": "Too many submissions. Please try again in 24 hours.",
         "success_title": "Thanks — we’ve got it!",
         "success_body": "We’ll confirm your trial access and share school plan details within 1–2 business days. Keep playing with your class in the meantime — it’s free.",
+        "class_size": "Class size",
         "privacy_note": "We’ll only use this to talk to you about school features. No spam."
       }
+    },
+    "packages": {
+          "title": "Education packages",
+          "subtitle": "Teacher Pro is live billing. Classroom is a public price anchor — tell us about your class. Schools and districts: contact us. No classroom checkout until demand hits the trigger.",
+          "teacherPro": {
+                "name": "Teacher Pro",
+                "interval": "/mo",
+                "blurb": "All reports, miss-gap homework, and reteach tools for one teacher.",
+                "cta": "Upgrade — $9/mo"
+          },
+          "classroom": {
+                "name": "Classroom plan",
+                "interval": "/term",
+                "blurb": "Whole class, all Pro features, class streaks, and priority support.",
+                "cta": "Request Classroom — $39/term"
+          },
+          "school": {
+                "name": "Schools & districts",
+                "price": "Contact us",
+                "blurb": "Rollout, admin, and district needs. Same form, tagged as a school lead.",
+                "cta": "Contact us"
+          },
+          "feature": {
+                "reports": "All class reports",
+                "homework": "Miss-gap homework",
+                "reteach": "Reteach tools",
+                "wholeClass": "Whole class, not just one teacher seat",
+                "proPlus": "Every Teacher Pro feature included",
+                "streaks": "Class streaks",
+                "priority": "Priority support",
+                "district": "School and district rollout"
+          }
     },
     "teacher": {
       "welcome_banner_title": "You're approved! Welcome, teacher! 🎉",

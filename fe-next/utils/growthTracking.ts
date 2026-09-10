@@ -231,6 +231,10 @@ export type GrowthEvent =
   | 'education_upsell_impression'
   | 'school_lead_submitted'
   | 'school_lead_form_viewed'
+  // Education packages page (t_c354b27e). Canonical names the card asked for:
+  // package_view → education_package_viewed; lead_submitted → school_lead_submitted
+  // with { plan }. Do not add a second analytics stack; t_a72fccab owns funnel events.
+  | 'education_package_viewed'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'

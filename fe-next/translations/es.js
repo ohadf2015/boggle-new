@@ -14321,8 +14321,41 @@ const es = {
         "rate_limited": "Demasiados envíos. Por favor intenta de nuevo en 24 horas.",
         "success_title": "¡Gracias — lo recibimos!",
         "success_body": "Confirmaremos tu acceso de prueba y compartiremos los detalles del plan escolar en 1–2 días hábiles. Mientras tanto, sigue jugando con tu clase — es gratis.",
+        "class_size": "Tamaño de la clase",
         "privacy_note": "Solo usaremos esto para comunicarnos contigo sobre funciones escolares. Sin spam."
       }
+    },
+    "packages": {
+          "title": "Paquetes educativos",
+          "subtitle": "Teacher Pro es facturación real. El plan de aula es un ancla de precio: cuéntanos de tu clase. Escuelas y distritos: contáctanos. Sin checkout de aula hasta el umbral de demanda.",
+          "teacherPro": {
+                "name": "Teacher Pro",
+                "interval": "/mes",
+                "blurb": "Todos los informes, deberes de huecos y herramientas de reenseñanza para un docente.",
+                "cta": "Mejorar — $9/mes"
+          },
+          "classroom": {
+                "name": "Plan de aula",
+                "interval": "/trimestre",
+                "blurb": "Toda la clase, todas las funciones Pro, rachas de clase y soporte prioritario.",
+                "cta": "Pedir aula — $39/trimestre"
+          },
+          "school": {
+                "name": "Escuelas y distritos",
+                "price": "Contáctanos",
+                "blurb": "Despliegue, admin y necesidades de distrito. El mismo formulario, marcado como lead escolar.",
+                "cta": "Contáctanos"
+          },
+          "feature": {
+                "reports": "Todos los informes de clase",
+                "homework": "Deberes de huecos",
+                "reteach": "Herramientas de reenseñanza",
+                "wholeClass": "Toda la clase, no un solo asiento de docente",
+                "proPlus": "Todas las funciones de Teacher Pro",
+                "streaks": "Rachas de clase",
+                "priority": "Soporte prioritario",
+                "district": "Despliegue escolar y de distrito"
+          }
     },
     "teacher": {
       "welcome_banner_title": "¡Bienvenido, maestro! 🎉",

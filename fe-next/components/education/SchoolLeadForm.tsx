@@ -15,6 +15,7 @@ import {
   type SchoolLeadPayload,
 } from '@/lib/education/schoolLead';
 import type { TeacherLocale } from '@/lib/education/types';
+import { packageById, type EducationLeadPlan } from '@/lib/education/educationPackages';
 
 const FIELD_CLASS =
   'mt-1 w-full rounded-neo border-neo bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
@@ -22,17 +23,18 @@ const FIELD_CLASS =
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
 
-export function SchoolLeadForm() {
+export function SchoolLeadForm({ plan = 'school' }: { plan?: EducationLeadPlan }) {
   const { t, language } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
+  const pkg = packageById(plan === 'classroom' ? 'classroom' : 'school');
 
   useEffect(() => {
-    trackGrowthEvent('school_lead_form_viewed', { locale: language });
-  }, [language]);
+    trackGrowthEvent('school_lead_form_viewed', { locale: language, plan });
+  }, [language, plan]);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [school, setSchool] = useState('');
-  const [role, setRole] = useState<SchoolLeadRole>('school_admin');
+  const [role, setRole] = useState<SchoolLeadRole>(plan === 'classroom' ? 'teacher' : 'school_admin');
   const [studentCount, setStudentCount] = useState<StudentCountBucket>('200_500');
   const [interests, setInterests] = useState<SchoolLeadInterest[]>([]);
   const [country, setCountry] = useState('');
@@ -76,6 +78,7 @@ export function SchoolLeadForm() {
           country: country || undefined,
           message: message || undefined,
           locale: language as TeacherLocale,
+          source: pkg.leadSource,
         } satisfies SchoolLeadPayload),
       });
       if (!res.ok) {
@@ -83,7 +86,7 @@ export function SchoolLeadForm() {
         return;
       }
       setSuccess(true);
-      trackGrowthEvent('school_lead_submitted', { role, student_count: studentCount, locale: language });
+      trackGrowthEvent('school_lead_submitted', { role, student_count: studentCount, locale: language, plan });
     } catch {
       setError(t('education.forSchools.form.submit_error'));
     } finally {
@@ -131,7 +134,9 @@ export function SchoolLeadForm() {
         </Select>
       </m.div>
       <m.div variants={item}>
-        <label htmlFor="sl-student_count" className={LABEL_CLASS}>{t('education.forSchools.form.student_count')}</label>
+        <label htmlFor="sl-student_count" className={LABEL_CLASS}>
+          {plan === 'classroom' ? t('education.forSchools.form.class_size') : t('education.forSchools.form.student_count')}
+        </label>
         <Select value={studentCount} onValueChange={(v) => setStudentCount(v as StudentCountBucket)}>
           <SelectTrigger id="sl-student_count" className={FIELD_CLASS}><SelectValue /></SelectTrigger>
           <SelectContent>
