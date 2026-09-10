@@ -1,4 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
+import { waitForHydration } from '../helpers/test-utils';
 
 /**
  * Page Object for the FTUE.
@@ -48,7 +49,7 @@ export class OnboardingPage {
       localStorage.removeItem('lexiclash_onboarding_data');
     });
     await this.page.reload();
-    await this.page.waitForLoadState('networkidle');
+    await waitForHydration(this.page);
   }
 
   async waitForFlow() {

@@ -1,5 +1,6 @@
 import { type Page, type Locator, expect } from '@playwright/test';
 import { submitRealWord } from '../helpers/grid-solver';
+import { waitForHydration } from '../helpers/test-utils';
 
 /**
  * Page Object for the multiplayer flow.
@@ -102,7 +103,7 @@ export class MultiplayerPage {
   /** Navigate to multiplayer page */
   async visit(locale = 'en') {
     await this.page.goto(`/${locale}/multiplayer`);
-    await this.page.waitForLoadState('networkidle');
+    await waitForHydration(this.page);
   }
 
   /** Open create room modal and fill details */

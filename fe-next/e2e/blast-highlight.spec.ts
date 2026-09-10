@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
+import { waitForHydration } from './helpers/test-utils';
 
 test.describe('Blast highlight reel', () => {
   test('blast page loads without error', async ({ page }) => {
     // Navigate to English blast page (baseURL set to localhost:3001 in config)
     await page.goto('/en/blast');
 
-    // Wait for network to be idle
-    await page.waitForLoadState('networkidle');
+    // Wait for app ready (networkidle is only a bounded fast-path — persistent
+    // connections like version polling must not hang the test)
+    await waitForHydration(page);
 
     // Smoke test: verify page loaded with title
     // (deterministic full-flow requires test hooks in BlastEngine not yet present)
@@ -23,8 +25,9 @@ test.describe('Blast highlight reel', () => {
     // Navigate to English blast page
     await page.goto('/en/blast');
 
-    // Wait for network to be idle
-    await page.waitForLoadState('networkidle');
+    // Wait for app ready (networkidle is only a bounded fast-path — persistent
+    // connections like version polling must not hang the test)
+    await waitForHydration(page);
 
     // Verify page loaded successfully even with reduced-motion enabled
     await expect(page).toHaveTitle(/blast|lexiclash/i);
