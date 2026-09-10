@@ -18,7 +18,9 @@ import {
   buildReteachLessonData,
   classroomMultiplayerPath,
   shouldLoadLessonData,
+  socketTeacherName,
 } from './classroomGameHandoff';
+import { UsernameSchema } from '@/shared/schemas/socketSchemas';
 
 describe('classroomMultiplayerPath', () => {
   it('carries the room code and marks the room as a host-run classroom game', () => {
@@ -106,5 +108,25 @@ describe('buildReteachLessonData', () => {
     expect(
       buildReteachLessonData(null, { missedWords: ['neutron'], lessonIds: [], lessonNames: [] })
     ).toBeNull();
+  });
+});
+
+describe('socketTeacherName', () => {
+  it('never sends a raw email (UsernameSchema rejects @)', () => {
+    const name = socketTeacherName(
+      { email: 'ohadf2015+qa-teacher@gmail.com' },
+      '',
+    );
+    expect(name).not.toMatch(/@/);
+    expect(UsernameSchema.safeParse(name).success).toBe(true);
+  });
+
+  it('caps long OAuth display names at 30', () => {
+    const name = socketTeacherName(
+      { email: 't@example.com' },
+      'A Very Long Teacher Display Name From Google OAuth',
+    );
+    expect(name.length).toBeLessThanOrEqual(30);
+    expect(UsernameSchema.safeParse(name).success).toBe(true);
   });
 });

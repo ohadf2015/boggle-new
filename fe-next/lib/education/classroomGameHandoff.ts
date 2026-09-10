@@ -9,6 +9,8 @@
  * chosen game mode were written and silently discarded.
  */
 
+import { sanitizeUsername } from '@/utils/consts';
+
 /** The URL ClassroomGameLobby sends the teacher to after the room is created. */
 export function classroomMultiplayerPath(locale: string, gameCode: string): string {
   return `/${locale}/multiplayer?room=${gameCode}&classroom=true&host=true`;
@@ -97,4 +99,23 @@ export function buildReteachLessonData(
     // already found — on a reteach board let the game choose.
     targetWord: '',
   };
+}
+
+/**
+ * teacherName on createClassroomGame is UsernameSchema (no `@`, max 30).
+ * Magic-link teachers fall back to email; OAuth names can be longer than 30.
+ * Either one is `Invalid payload` server-side and looks like a dead CREATE ROOM.
+ */
+export function socketTeacherName(
+  user: { email?: string | null; user_metadata?: Record<string, unknown> } | null | undefined,
+  displayName?: string | null,
+): string {
+  const meta = user?.user_metadata;
+  const raw =
+    (displayName && displayName.trim()) ||
+    (typeof meta?.full_name === 'string' ? meta.full_name : '') ||
+    (typeof meta?.name === 'string' ? meta.name : '') ||
+    user?.email?.split('@')[0] ||
+    '';
+  return sanitizeUsername(raw) || 'Teacher';
 }
