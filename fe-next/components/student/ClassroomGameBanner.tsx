@@ -289,7 +289,9 @@ export function ClassroomGameBanner({
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <Play className="w-6 h-6" />
-                {t('student.activeGame.joinNow')}
+                {activeGame.teacherName
+                  ? t('student.activeGame.joinTeachersGame', { teacher: activeGame.teacherName })
+                  : t('student.activeGame.joinNow')}
               </span>
             )}
           </button>

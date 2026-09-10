@@ -21,7 +21,12 @@ const lesson = {
   id: 'l1',
   name: 'Lesson 1',
   language: 'en',
-  words: [{ word: 'apple', canIntegrate: true }],
+  words: [
+    { word: 'apple', definition: 'a round fruit', canIntegrate: true },
+    { word: 'grape', definition: 'a small berry', canIntegrate: true },
+    { word: 'mango', definition: 'a tropical fruit', canIntegrate: true },
+    { word: 'peach', definition: 'a fuzzy fruit', canIntegrate: true },
+  ],
 } as any;
 
 const baseProps = {
@@ -29,7 +34,7 @@ const baseProps = {
   lessons: [lesson],
   selectedClassroomId: 'c1',
   selectedLessonIds: ['l1'],
-  allPlayableWords: ['apple'],
+  allPlayableWords: ['apple', 'grape', 'mango', 'peach'],
   gameMode: 'classic' as const,
   targetWord: '',
   minWordLength: 3,
@@ -55,6 +60,7 @@ describe('ClassroomSetupStep — student preview', () => {
     const { rerender } = render(
       <ClassroomSetupStep {...baseProps} selectedLessonIds={[]} allPlayableWords={[]} />
     );
+    fireEvent.click(screen.getByTestId('setup-advanced-summary'));
     expect(previewButton()).toBeDisabled();
 
     rerender(<ClassroomSetupStep {...baseProps} selectedClassroomId="" />);
@@ -66,9 +72,22 @@ describe('ClassroomSetupStep — student preview', () => {
 
   it('opens the preview dialog with the selected classroom join code', () => {
     render(<ClassroomSetupStep {...baseProps} />);
+    fireEvent.click(screen.getByTestId('setup-advanced-summary'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     fireEvent.click(previewButton());
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByTestId('student-preview-join-code')).toHaveTextContent('QWE789');
+  });
+
+  it('enables preview in vocab-quiz and shows quiz options, not a letter board', () => {
+    render(<ClassroomSetupStep {...baseProps} gameMode="vocab-quiz" />);
+    fireEvent.click(screen.getByTestId('setup-advanced-summary'));
+    expect(previewButton()).not.toBeDisabled();
+    fireEvent.click(previewButton());
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'education.studentPreview.next' }));
+    fireEvent.click(screen.getByRole('button', { name: 'education.studentPreview.next' }));
+    expect(screen.queryByTestId('student-preview-board')).not.toBeInTheDocument();
+    expect(screen.getByTestId('student-preview-quiz-options')).toBeInTheDocument();
   });
 });

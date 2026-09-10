@@ -27,18 +27,19 @@ import {
   type PreviewSkippedWord,
 } from '@/lib/education/previewBoard';
 import type { Classroom, VocabularyLesson } from '@/lib/supabase/education/types';
-import type { GameMode } from '@/shared/types/game';
+import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { PhoneFrame } from './student-preview/PhoneFrame';
 import { PreviewJoinScreen } from './student-preview/PreviewJoinScreen';
 import { PreviewWaitingScreen } from './student-preview/PreviewWaitingScreen';
 import { PreviewGameScreen } from './student-preview/PreviewGameScreen';
+import { buildPreviewQuizQuestion } from './student-preview/previewQuiz';
 
 export interface StudentViewPreviewProps {
   isOpen: boolean;
   onClose: () => void;
   classroom: Pick<Classroom, 'name' | 'join_code' | 'language'> | null | undefined;
   lessons: Pick<VocabularyLesson, 'id' | 'name' | 'language' | 'words'>[];
-  gameMode: GameMode;
+  gameMode: ClassroomGameMode;
   timerMinutes: number;
   boardSize: 'small' | 'medium' | 'large';
   minWordLength: number;
@@ -90,6 +91,7 @@ export function StudentViewPreview({
   const joinCode = classroom?.join_code ?? '';
   const language = classroom?.language ?? lessons[0]?.language ?? uiLanguage ?? 'en';
   const { rows, cols } = PREVIEW_BOARD_DIMS[boardSize];
+  const isQuiz = gameMode === VOCAB_QUIZ_MODE;
 
   const triage = useMemo(
     () => classifyLessonWords(lessons.flatMap((lesson) => lesson.words ?? [])),
@@ -99,6 +101,18 @@ export function StudentViewPreview({
   const board = useMemo(
     () => generatePreviewBoard({ rows, cols, words: triage.integrable, language, seed }),
     [rows, cols, triage.integrable, language, seed]
+  );
+
+  const quiz = useMemo(
+    () =>
+      isQuiz
+        ? buildPreviewQuizQuestion(
+            lessons.flatMap((lesson) => lesson.words ?? []),
+            seed,
+            language
+          )
+        : null,
+    [isQuiz, lessons, seed, language]
   );
 
   // Lesson-level rejections first (they never change with the board), then
@@ -215,6 +229,7 @@ export function StudentViewPreview({
                   gameMode={gameMode}
                   timerMinutes={timerMinutes}
                   minWordLength={minWordLength}
+                  quiz={quiz}
                 />
               )}
             </PhoneFrame>
@@ -241,7 +256,13 @@ export function StudentViewPreview({
                 </TeacherNote>
               )}
 
-              {step === 'game' && (
+              {step === 'game' && isQuiz && (
+                <TeacherNote>
+                  <p>{t('education.studentPreview.game.quizNote')}</p>
+                </TeacherNote>
+              )}
+
+              {step === 'game' && !isQuiz && (
                 <>
                   <div className="rounded-neo border-3 border-neo-black bg-neo-cream p-3 shadow-hard">
                     <div className="mb-2 flex items-center justify-between gap-2">

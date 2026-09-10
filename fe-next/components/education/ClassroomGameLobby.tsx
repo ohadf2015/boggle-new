@@ -82,11 +82,8 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   const [minWordLength, setMinWordLength] = useState<number>(3);
   const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
 
-  // Teacher-configurable lobby settings — were hardcoded, now part of the
-  // wizard so the room is created with the teacher's final choices instead of
-  // forcing them into the lobby with defaults they can't preview.
   const [timerMinutes, setTimerMinutes] = useState<number>(3);
-  const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>('small');
   const settings = useMemo(
     () => ({ timerMinutes, boardSize, allowLateJoin: true }),
     [timerMinutes, boardSize]
@@ -96,7 +93,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   const [playStyle, setPlayStyle] = useState<PlayStyle>('ffa');
   const [teamCount, setTeamCount] = useState<number>(2);
   const [accessibility, setAccessibility] = useState<ClassroomAccessibility>({});
-  const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>(null);
+  const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>('standard');
   const { saveConfig, getMostRecent } = useRecentGameSettings();
 
   const applyPreset = useCallback(
@@ -118,21 +115,24 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
     [lessons]
   );
 
-  const repeatLastAppliedRef = useRef(false);
+  const lastUsedAppliedRef = useRef(false);
   useEffect(() => {
-    if (initialFlow !== 'repeatLast' || repeatLastAppliedRef.current) return;
+    if (lastUsedAppliedRef.current) return;
     if (isLoading || classrooms.length === 0) return;
     const last = getMostRecent();
+    lastUsedAppliedRef.current = true;
     if (!last) return;
-    repeatLastAppliedRef.current = true;
     if (last.classroomId && classrooms.some((c) => c.id === last.classroomId)) {
       setSelectedClassroomId(last.classroomId);
     }
-    const validLessonIds = last.lessonIds.filter((id) => lessons.some((l) => l.id === id));
-    if (validLessonIds.length > 0) setSelectedLessonIds(validLessonIds);
+    if (!initialLessonId) {
+      const validLessonIds = last.lessonIds.filter((id) => lessons.some((l) => l.id === id));
+      if (validLessonIds.length > 0) setSelectedLessonIds(validLessonIds);
+    }
     if (last.settings?.timerMinutes) setTimerMinutes(last.settings.timerMinutes);
     if (last.settings?.boardSize) setBoardSize(last.settings.boardSize);
-  }, [initialFlow, isLoading, classrooms, lessons, getMostRecent]);
+    setActivePreset(null);
+  }, [isLoading, classrooms, lessons, getMostRecent, initialLessonId]);
 
   // Fetch teacher data
   const fetchTeacherData = useCallback(async () => {

@@ -33,7 +33,7 @@ export interface ClassroomPresetValues {
 export const CLASSROOM_PRESETS: Record<ClassroomPresetId, ClassroomPresetValues> = {
   standard: {
     timerMinutes: 3,
-    boardSize: 'medium',
+    boardSize: 'small',
     minWordLength: 3,
     playStyle: 'ffa',
     teamCount: 2,

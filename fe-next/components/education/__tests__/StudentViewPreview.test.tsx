@@ -136,4 +136,32 @@ describe('StudentViewPreview', () => {
     fireEvent.click(screen.getByRole('button', { name: 'education.studentPreview.close' }));
     expect(onClose).toHaveBeenCalledTimes(2);
   });
+
+  it('in vocab-quiz shows a sample question instead of a letter board', () => {
+    const quizLessons = [
+      {
+        id: 'l1',
+        name: 'Unit 1',
+        language: 'en',
+        words: [
+          { word: 'apple', definition: 'a round fruit', canIntegrate: true },
+          { word: 'grape', definition: 'a small berry', canIntegrate: true },
+          { word: 'mango', definition: 'a tropical fruit', canIntegrate: true },
+          { word: 'peach', definition: 'a fuzzy fruit', canIntegrate: true },
+        ],
+      },
+    ] as any[];
+    render(
+      <StudentViewPreview {...baseProps} lessons={quizLessons} gameMode={'vocab-quiz' as any} />
+    );
+    const next = screen.getByRole('button', { name: 'education.studentPreview.next' });
+    fireEvent.click(next);
+    fireEvent.click(next);
+    expect(screen.getByTestId('student-preview-step')).toHaveTextContent(
+      'education.studentPreview.steps.game'
+    );
+    expect(screen.queryByTestId('student-preview-board')).not.toBeInTheDocument();
+    const options = screen.getByTestId('student-preview-quiz-options');
+    expect(within(options).getAllByRole('button')).toHaveLength(4);
+  });
 });
