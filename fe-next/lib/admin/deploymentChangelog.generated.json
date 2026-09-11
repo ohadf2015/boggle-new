@@ -1,6 +1,132 @@
 {
-  "generatedAt": "2026-09-08T06:43:20.647Z",
+  "generatedAt": "2026-09-11T08:35:59.455Z",
   "commits": [
+    {
+      "sha": "0f8f2ce18102fea386a320fffa27e0ace285ba4e",
+      "shortSha": "0f8f2ce",
+      "subject": "wip(education): teacher-module gauntlet checkpoint — reliability + teacher home won blind vs Kahoot",
+      "author": "Ohad Fisher",
+      "date": "2026-09-11T01:52:17+03:00"
+    },
+    {
+      "sha": "ef45197f268ca59998ba1357f50c4e358afedb9b",
+      "shortSha": "ef45197",
+      "subject": "chore(education): split EducationMenuDropdown out of EducationHeader (#995)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T20:21:54+04:00"
+    },
+    {
+      "sha": "64c06ad69004aa6c996f2ba16a84820f1b6b047b",
+      "shortSha": "64c06ad",
+      "subject": "feat(education): polish teacher surfaces — motion, responsiveness, dialog system (#994)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T20:14:36+04:00"
+    },
+    {
+      "sha": "e1d097a8f940de25667416bc73dc6b977227e393",
+      "shortSha": "e1d097a",
+      "subject": "fix(teacher): red CI on master — plan read outside request scope + access-page test (#993)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T17:18:41+04:00"
+    },
+    {
+      "sha": "bfc35124dd9dd56c952707dd47d09f55ed539e52",
+      "shortSha": "bfc3512",
+      "subject": "feat(teacher): gate reports behind Pro + admin education drill-down (#992)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T16:37:01+04:00"
+    },
+    {
+      "sha": "7ebb3976b3f944c4daa6fba112bafc1f3d94b645",
+      "shortSha": "7ebb397",
+      "subject": "chore(teacher): strip hardcoded EN fallbacks, single-source upsell numbers (#991)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T16:36:58+04:00"
+    },
+    {
+      "sha": "dcb36a6579898ff24d896ddce454dfe668cf7f24",
+      "shortSha": "dcb36a6",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-09",
+      "author": "Ohad Fisher",
+      "date": "2026-09-09T12:17:52+04:00"
+    },
+    {
+      "sha": "982033be98f81b0092a23d5de8c075db364a24be",
+      "shortSha": "982033b",
+      "subject": "fix(subscriptions): Polar order webhooks must not wipe provider fields (+ teacher seat count) (#987)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T11:04:19+04:00"
+    },
+    {
+      "sha": "7fd931e6a973c5ca7659acb186f99ee9f107e011",
+      "shortSha": "7fd931e",
+      "subject": "fix(education): surface paid Pro, hide trial upsell from Pro teachers, fix 6 Sentry crashes (#989)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T11:00:54+04:00"
+    },
+    {
+      "sha": "5944dec3d07d40f994fcc3c964be5c72712a44fa",
+      "shortSha": "5944dec",
+      "subject": "chore: resolve the five deferred cleanup items from #986 (#988)",
+      "author": "ohadf2015",
+      "date": "2026-09-09T10:43:49+04:00"
+    },
+    {
+      "sha": "4f0aedce3c2d0fc0b4360bdc7323917517f623a3",
+      "shortSha": "4f0aedc",
+      "subject": "chore(nightly): post-run residue 2026-09-06",
+      "author": "Ohad Fisher",
+      "date": "2026-09-06T12:20:01+04:00"
+    },
+    {
+      "sha": "c8e142e8b23b0928a33213c7e07ee0cedb177720",
+      "shortSha": "c8e142e",
+      "subject": "fix(sentry): kill joinView.undefined for ru rooms and welcome-email Sentry noise",
+      "author": "Ohad Fisher",
+      "date": "2026-09-08T23:25:14+04:00"
+    },
+    {
+      "sha": "9dd0d08517926d2bc9e39a950145683b82a589d8",
+      "shortSha": "9dd0d08",
+      "subject": "fix(daily): show the finisher on the board, and give guests a real avatar",
+      "author": "Ohad Fisher",
+      "date": "2026-09-08T22:52:02+04:00"
+    },
+    {
+      "sha": "dab8f088125c6efdc16f0f0df6007961aaf0c622",
+      "shortSha": "dab8f08",
+      "subject": "chore: remove dead code, unused deps, and tracked build artifacts (#986)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T22:50:51+04:00"
+    },
+    {
+      "sha": "2e13200f96d57a86115c87886aa6d15ff7a9ba2f",
+      "shortSha": "2e13200",
+      "subject": "feat(modes): fix broken gameplay counters, brag OG image, remove shiritori",
+      "author": "Ohad Fisher",
+      "date": "2026-09-08T16:40:06+04:00"
+    },
+    {
+      "sha": "8ef04c60f79fa4138c0b2b8cec433a10524a5766",
+      "shortSha": "8ef04c6",
+      "subject": "feat(ads): ad-quality measurement + broken-ad cooldown (Deloitte x AdMob) (#985)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T13:51:03+04:00"
+    },
+    {
+      "sha": "0fc922bd4686a2fb9a5c363276b380665f411116",
+      "shortSha": "0fc922b",
+      "subject": "feat(education): teacher P0 on one-screen dashboard (#983)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T12:03:02+04:00"
+    },
+    {
+      "sha": "746c9cf4c6a953052dbe05fb5a08fcdce89ed89c",
+      "shortSha": "746c9cf",
+      "subject": "fix(education): Print unplugged pack / practice sheet in Chrome (#982)",
+      "author": "ohadf2015",
+      "date": "2026-09-08T11:09:29+04:00"
+    },
     {
       "sha": "a552f93a48cc44ff1cf711cd764ee39324c13233",
       "shortSha": "a552f93",
@@ -14,132 +140,6 @@
       "subject": "feat(education): parent WhatsApp shareable miss-gap practice card after GC passback (#980)",
       "author": "ohadf2015",
       "date": "2026-09-08T05:19:48+04:00"
-    },
-    {
-      "sha": "54f54ff5105b30a9e169b7f1e71aacbee33cf63a",
-      "shortSha": "54f54ff",
-      "subject": "fix(growth): t_4833c3cd reduce signup_prompt→completed cliff after #897+#953 (#978)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T04:14:10+04:00"
-    },
-    {
-      "sha": "f2912507b369a1ec21917f4cdafab49b670a0602",
-      "shortSha": "f291250",
-      "subject": "fix(deploy): cache-bust ChunkLoadError recovery after #893/#935 (t_f6783906) (#979)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T03:58:11+04:00"
-    },
-    {
-      "sha": "2ef8662cb2a5018e1251f164e504536ecba487b9",
-      "shortSha": "2ef8662",
-      "subject": "feat(education): GC grade passback for async miss-gap homework (#977)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T03:16:01+04:00"
-    },
-    {
-      "sha": "51efbfd957772031686f0c4cb3a5dd733d194e90",
-      "shortSha": "51efbfd",
-      "subject": "fix(education): interpolate miss-gap-assignment meta title after ICU normalize (#976)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T02:08:37+04:00"
-    },
-    {
-      "sha": "8c671ee4985725cd7557611d4d5ae33ce34705ce",
-      "shortSha": "8c671ee",
-      "subject": "feat(education): Kahootopia-style async miss-gap homework + class streak (#975)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T01:15:57+04:00"
-    },
-    {
-      "sha": "51721a58c5380fde6677aeff6e7d84072a5aa3e9",
-      "shortSha": "51721a5",
-      "subject": "feat(daily): graduate connections into the daily quest rotation + keyboard fix (#971)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T00:30:41+04:00"
-    },
-    {
-      "sha": "e5170ca79061d92a06f8cbb766efb9ec5fd65469",
-      "shortSha": "e5170ca",
-      "subject": "fix(daily-leaderboard): localize YOU pill + real attempts on unsolved rows (#974)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T23:47:06+04:00"
-    },
-    {
-      "sha": "e0aeb42513ac9c82a8cca3f1b75f2dfe498f2e90",
-      "shortSha": "e0aeb42",
-      "subject": "feat(education): shareable miss-gap practice card/PDF after Unplugged assign (#972)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T23:22:34+04:00"
-    },
-    {
-      "sha": "0fdbfe8e95e3f560b952689e831ce0f5f6fadb1d",
-      "shortSha": "0fdbfe8",
-      "subject": "fix(native): build watchdog — new web deploys actually reach the Android app (#973)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T23:13:51+04:00"
-    },
-    {
-      "sha": "93af33c2371fba179123939cce4dd8afd4c9313b",
-      "shortSha": "93af33c",
-      "subject": "feat(streak): heat tiers, 7-day cycle row, mascot gift screen, shareable streak card (#969)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T22:56:55+04:00"
-    },
-    {
-      "sha": "bbe65ad02046d65342d1603f3ce77439260fbbbd",
-      "shortSha": "bbe65ad",
-      "subject": "feat(education): Google Classroom Marketplace add-on — Unplugged Stream assign (#970)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T21:38:04+04:00"
-    },
-    {
-      "sha": "52fa74818aa2b95b45a852af97c2f9e4ca356702",
-      "shortSha": "52fa748",
-      "subject": "feat(education): Classroom assign Unplugged reteach + printable sheet (#968)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T19:49:42+04:00"
-    },
-    {
-      "sha": "95ee8408eb251bec2c49f816e3afc2bfee7cb82c",
-      "shortSha": "95ee840",
-      "subject": "feat(daily): global, season-aware daily leaderboard with guests, unsolved players and live movement (#964)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T19:42:33+04:00"
-    },
-    {
-      "sha": "dcd2b044729dc7a9480e393d11769b8806a25165",
-      "shortSha": "dcd2b04",
-      "subject": "feat(education): teacher module — plug-and-play lessons, live-game fixes, one-screen dashboard, reuse pass (#966)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T19:40:49+04:00"
-    },
-    {
-      "sha": "1052356f7fdefb80dfbebca71db6fc4409d7cd68",
-      "shortSha": "1052356",
-      "subject": "feat(education): gauntlet follow-up rounds 2-3 + master SEO test fix (#965)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T18:17:38+04:00"
-    },
-    {
-      "sha": "c36f62200301c27f9239fcd444a8884600bbce9f",
-      "shortSha": "c36f622",
-      "subject": "seo: daily meta tag improvements 2026-09-07 (#962)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T09:13:12+04:00"
-    },
-    {
-      "sha": "b3bc4ae7d674474dfc3293813bd7ee96d8e23079",
-      "shortSha": "b3bc4ae",
-      "subject": "feat(education): live vocab quiz, skill practice picker, class report, classroom flow fixes, SEO/GEO pass (#946)",
-      "author": "ohadf2015",
-      "date": "2026-09-07T02:36:48+04:00"
-    },
-    {
-      "sha": "0b57a55440cca6d1de21197e29e3266fe9005474",
-      "shortSha": "0b57a55",
-      "subject": "feat(growth): tappable missed dailies, ad-free education, ad fatigue guard, solo progress + next-game picker (#961)",
-      "author": "ohadf2015",
-      "date": "2026-09-06T17:32:35+04:00"
     }
   ]
 }

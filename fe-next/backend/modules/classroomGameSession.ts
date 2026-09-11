@@ -43,13 +43,13 @@
  * deleting.
  */
 
-import { getRedisClient } from '../redisClient.js';
-import logger from '../utils/logger.js';
-import { getClassroomGame, updateClassroomGameStatus } from './classroomGameManager.js';
-import { isClassroomSessionEnded } from './classroomGameSessionState.js';
+import { getRedisClient } from '../redisClient';
+import logger from '../utils/logger';
+import { getClassroomGame, updateClassroomGameStatus } from './classroomGameManager';
+import { isClassroomSessionEnded } from './classroomGameSessionState';
 
-export { isClassroomSessionEnded } from './classroomGameSessionState.js';
-export type { ClassroomSessionState } from './classroomGameSessionState.js';
+export { isClassroomSessionEnded } from './classroomGameSessionState';
+export type { ClassroomSessionState } from './classroomGameSessionState';
 
 /**
  * Mark a classroom session over because its room is gone.

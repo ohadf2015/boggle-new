@@ -53,12 +53,17 @@ describe('ResultsPodium', () => {
     expect(height(2)).toBeGreaterThan(height(3));
   });
 
-  it('reveals the plinths in reverse order — third, second, then the winner', () => {
+  /**
+   * The staged bottom-up reveal is GONE on purpose — see the static-paint test
+   * below. Rank order is now carried by the DOM, which is what a screen reader
+   * reads out and what a phone stacks, instead of by an animation timeline.
+   */
+  it('lists the finishers in rank order in the DOM, winner first', () => {
     render(<ResultsPodium entries={three} t={t} />);
-    const delay = (rank: number) =>
-      parseFloat(screen.getByTestId(`podium-place-${rank}`).style.animationDelay);
-    expect(delay(3)).toBeLessThan(delay(2));
-    expect(delay(2)).toBeLessThan(delay(1));
+    const ranks = screen
+      .getAllByTestId(/^podium-place-/)
+      .map((el) => el.getAttribute('data-rank'));
+    expect(ranks).toEqual(['1', '2', '3']);
   });
 
   it('renders a two-player room without inventing a third place', () => {
@@ -84,8 +89,30 @@ describe('ResultsPodium', () => {
     expect(screen.getByRole('list', { name: 'education.results.podium.title' })).toBeInTheDocument();
   });
 
-  it('never animates for a viewer who asked for reduced motion', () => {
+  /**
+   * Capture r2: the a11y tree read "WE HAVE A WINNER!" with all three names
+   * while a screenshot taken in the same instant showed nothing painted. The
+   * cause was here — `animate-neo-pop` starts at `opacity: 0`, and the plinths
+   * carried staged `animationDelay` up to 0.45s with `animationFillMode:
+   * 'both'`, whose BACKWARDS fill holds that invisible 0% frame through the
+   * delay. The winner's plinth was blank for ~450ms and unsettled until ~850ms.
+   * Pitfall Class 5 verbatim: an entrance opacity tween on a large surface.
+   *
+   * The podium now appears statically. It is still loud — colour-coded
+   * plinths, tilt, crown, hard shadows — it just never starts invisible.
+   */
+  it('paints the moment it mounts — no entrance fade, on any plinth', () => {
     render(<ResultsPodium entries={three} t={t} />);
-    expect(screen.getByTestId('podium-place-1').className).toContain('motion-reduce:animate-none');
+    for (const rank of [1, 2, 3]) {
+      const plinth = screen.getByTestId(`podium-place-${rank}`);
+      expect(plinth.className).not.toContain('animate-neo-pop');
+      expect(plinth.style.opacity).not.toBe('0');
+      expect(plinth.style.animationDelay).toBe('');
+    }
+  });
+
+  it('paints statically on the projector too, where the delay staging was worst', () => {
+    render(<ResultsPodium entries={three} size="projector" t={t} />);
+    expect(screen.getByTestId('podium-place-1').className).not.toContain('animate-');
   });
 });

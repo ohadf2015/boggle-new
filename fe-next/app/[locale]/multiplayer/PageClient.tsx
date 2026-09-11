@@ -10,6 +10,7 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
+import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
 import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
@@ -601,6 +602,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     getReconnectAttempt: () => 0, maxReconnectAttempts: 20, manualReconnect: handleManualReconnect,
   }), [socket, isConnected, error, attemptingReconnect, isServerUpdating, handleManualReconnect]);
 
+  // Round state from the server's own traffic: the host never writes the store's `gameActive` (see controls/teacherStripVisibility).
+  const teacherStrip = useTeacherStripState({ socket, isActive, isHost, isClassroomMode, showResults, storeGameActive: gameActive });
   const renderView = (): React.JSX.Element => {
     if (showResults) {
       return (
@@ -776,15 +779,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           {isActive && gameActive && !showResults && (
             <StudentWordBank level={classroomLevel} words={classroomWordBank} />
           )}
-          {isActive && gameActive && !showResults && isHost && isClassroomMode && (
+          {teacherStrip.visible && (
             <TeacherLiveControls
-              isPaused={isPaused}
-              gameMode={liveGameMode}
-              onPause={pauseGame}
-              onResume={resumeGame}
-              onExtendTime={extendTime}
-              onEndRound={endRoundNow}
-              onSkipWord={skipTargetWord}
+              isPaused={isPaused || teacherStrip.quizPaused} gameMode={liveGameMode} isQuizRound={teacherStrip.quizRound}
+              onPause={pauseGame} onResume={resumeGame} onExtendTime={extendTime}
+              onEndRound={endRoundNow} onSkipWord={skipTargetWord}
+              students={playersInRoom} hostUsername={hostUsername || username} socket={socket}
             />
           )}
           <HostLeftGraceModal

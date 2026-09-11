@@ -21,6 +21,7 @@ import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { useVocabQuiz } from './useVocabQuiz';
 import { VocabQuizAnswerGrid } from './VocabQuizAnswerGrid';
 import { VocabQuizStandings } from './VocabQuizStandings';
+import { StudentRoundOutcome } from '../results/StudentRoundOutcome';
 
 export interface VocabQuizViewProps {
   socket: Socket | null;
@@ -31,6 +32,12 @@ export interface VocabQuizViewProps {
 export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
   const quiz = useVocabQuiz(socket);
   const { question, reveal, myAnswer, pendingChoice, phase } = quiz;
+
+  // The student's own row out of the standings the SERVER sorted — never a
+  // second ranking computed here (Class 3).
+  const myStanding = quiz.standings.find(
+    (p) => p.username.trim().toLowerCase() === username.trim().toLowerCase()
+  );
 
   const focusLabel = useMemo(
     () => (question ? t(`vocabQuiz.focus.${question.focus}`) : ''),
@@ -159,17 +166,26 @@ export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
         </div>
       )}
 
-      {/* Finished */}
+      {/* Finished — the same shape a board round ends on: my own placing
+          first, then the room's top three on plinths. The projector already
+          finished on that podium; the phone used to finish on a list. */}
       {phase === 'ended' && (
         <div className="flex-1 flex flex-col gap-4">
           <h2 className="flex items-center gap-2 font-neo-display font-bold text-2xl">
             <Trophy className="w-7 h-7 text-neo-yellow" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
-          <p className="font-neo-body text-neo-white/80">
-            {t('vocabQuiz.finished.yourScore', { score: quiz.myScore })}
-          </p>
-          <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={10} t={t} />
+          <StudentRoundOutcome
+            username={username}
+            standings={quiz.standings}
+            mastery={
+              myStanding
+                ? { found: myStanding.correctCount, total: quiz.totalQuestions }
+                : undefined
+            }
+            t={t}
+          />
+          <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={10} podium t={t} />
         </div>
       )}
     </div>

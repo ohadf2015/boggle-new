@@ -1,10 +1,18 @@
 /**
  * ResultsPodium — the first thing the room sees when a game ends.
  *
- * Three plinths, winner in the middle and tallest, revealed bottom-up: third,
- * second, then the crown. Kahoot draws flat bars in one purple; this is
- * colour-coded, hard-shadowed and rotated a hair off true, so the winner's
- * plinth reads as an object on the wall rather than a chart column.
+ * Three plinths, winner in the middle and tallest. Kahoot draws flat bars in
+ * one purple; this is colour-coded, hard-shadowed and rotated a hair off true,
+ * so the winner's plinth reads as an object on the wall rather than a chart
+ * column.
+ *
+ * It PAINTS ON MOUNT. The plinths used to rise bottom-up on staged
+ * `animation-delay` over `animate-neo-pop`, whose first keyframe is
+ * `opacity: 0` — with `animationFillMode: 'both'` the backwards fill held the
+ * winner invisible for the whole 450ms delay. A capture read the full
+ * standings out of the a11y tree while the screenshot showed an empty screen
+ * (Pitfall Class 5). The only motion left is the crown, a 28px transform-only
+ * wobble that cannot hide anything.
  *
  * DOM order is rank order (1, 2, 3) — a screen reader hears the standings — and
  * `order-*` does the 2-1-3 staging only once there is room for three columns.
@@ -60,8 +68,6 @@ const COLUMN: Record<number, string> = {
   3: 'sm:order-3',
 };
 
-/** Third rises first, the winner last — the reveal everyone waits for. */
-const DELAY: Record<number, number> = { 3: 0.05, 2: 0.25, 1: 0.45 };
 
 export function ResultsPodium({ entries, size = 'card', t }: ResultsPodiumProps) {
   if (entries.length === 0) return null;
@@ -81,10 +87,8 @@ export function ResultsPodium({ entries, size = 'card', t }: ResultsPodiumProps)
             data-testid={`podium-place-${rank}`}
             data-rank={String(rank)}
             data-plinth-height={String(height)}
-            style={{ animationDelay: `${DELAY[rank] ?? 0.05}s`, animationFillMode: 'both' }}
             className={cn(
               'flex-1 sm:max-w-[14rem] flex flex-col items-center',
-              'animate-neo-pop motion-reduce:animate-none',
               COLUMN[rank] ?? 'sm:order-3'
             )}
           >
@@ -100,6 +104,10 @@ export function ResultsPodium({ entries, size = 'card', t }: ResultsPodiumProps)
                 <Crown
                   className={cn(
                     'absolute -top-4 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 text-neo-yellow',
+                    // The ONE moving thing on the screen, and it is a 28px icon:
+                    // a transform-only rotate, never an opacity tween, so no
+                    // plinth can ever be caught mid-fade (Class 5).
+                    'animate-neo-wobble motion-reduce:animate-none',
                     projector ? 'w-10 h-10' : 'w-7 h-7'
                   )}
                   aria-hidden

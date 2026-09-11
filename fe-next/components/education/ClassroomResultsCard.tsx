@@ -27,7 +27,9 @@ import { GraduationCap, Check, RotateCcw, Share2, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './results/ResultsPodium';
+import { StudentRoundOutcome } from './results/StudentRoundOutcome';
 import { WordCoverageGlance } from './results/WordCoverageGlance';
+import { ClassNeedsHelp } from './results/ClassNeedsHelp';
 import { ReteachActions } from './results/ReteachActions';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
 import { useReteachLinks } from './results/useReteachLinks';
@@ -43,6 +45,13 @@ export interface ClassroomResultsCardProps {
   onReteach?: () => void;
   /** Teacher-only: same list, same code — a new round without recreating the room. */
   onRematch?: () => void;
+  /**
+   * Final standings, best first, exactly as the server sorted them. Present
+   * only on the live results page; the card renders without it (an older
+   * payload, a printed recap) minus the student's placing hero. Never used to
+   * re-rank — `summary.podium` remains the one ranking in the system.
+   */
+  standings?: Array<{ username: string; score: number }>;
 }
 
 export function ClassroomResultsCard({
@@ -52,6 +61,7 @@ export function ClassroomResultsCard({
   onPractice,
   onReteach,
   onRematch,
+  standings,
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
   const links = useReteachLinks(summary, isTeacher);
@@ -86,6 +96,17 @@ export function ClassroomResultsCard({
         </div>
       </div>
 
+      {/* My round first, then the room's. A student holding a phone wants one
+          answer before anything else, and it is not the class average. */}
+      {!isTeacher && standings && standings.length > 0 && (
+        <StudentRoundOutcome
+          username={username}
+          standings={standings}
+          mastery={summary.masteryByPlayer[username]}
+          t={t}
+        />
+      )}
+
       {podium.length > 0 && (
         <div className="mb-5">
           <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-neo-yellow">
@@ -102,6 +123,10 @@ export function ClassroomResultsCard({
         neverPlaced={neverPlaced}
         t={t}
       />
+
+      {/* Coverage says how the CLASS did; this says which children to pull
+          aside, while they are still in the room. */}
+      {isTeacher && <ClassNeedsHelp masteryByPlayer={summary.masteryByPlayer} t={t} />}
 
       {isTeacher && summary.participationBonus ? (
         <p

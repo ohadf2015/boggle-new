@@ -5,10 +5,10 @@
  * These games are linked to specific classrooms and notify students automatically.
  */
 
-import { getRedisClient } from '../redisClient.js';
+import { getRedisClient } from '../redisClient';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
-import logger from '../utils/logger.js';
-import { isClassroomSessionEnded } from './classroomGameSessionState.js';
+import logger from '../utils/logger';
+import { isClassroomSessionEnded } from './classroomGameSessionState';
 
 const CLASSROOM_GAME_TTL = 14400; // 4 hours
 

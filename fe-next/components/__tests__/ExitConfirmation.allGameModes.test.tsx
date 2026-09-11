@@ -14,7 +14,7 @@
  */
 
 import { renderHook } from '@testing-library/react';
-import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { useNavigationGuard, resetPhantomPopStateForTests } from '@/hooks/useNavigationGuard';
 
 // Mock window methods
 const mockPushState = vi.fn();
@@ -23,6 +23,10 @@ const originalHistory = window.history;
 describe('Exit Confirmation - All Game Modes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // The guard keeps a module-level phantom-pop claim; this file's mocked
+    // history never fires popstate, so a prior test's teardown would defer the
+    // next test's pushState. Same seam the other guard tests use.
+    resetPhantomPopStateForTests();
     // Mock history.pushState
     Object.defineProperty(window, 'history', {
       value: {
