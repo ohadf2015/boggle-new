@@ -57,20 +57,46 @@ export interface DuelStartedData {
 
 export interface WordAcceptedData {
   word: string;
+  /** Base dictionary score PLUS the additive combo bonus. */
   points: number;
   totalScore: number;
   wordCount: number;
+  /** Chain length after this word. Server-owned; the client only displays it. */
+  comboStreak?: number;
+  /** Additive bonus this word earned (0 when the chain just started). */
+  comboBonus?: number;
 }
 
 export interface WordRejectedData {
   word: string;
   reason: string;
+  /** 0 — a miss snaps the chain. */
+  comboStreak?: number;
 }
 
 export interface OpponentProgressData {
   opponentId: string;
   totalScore: number;
   wordCount: number;
+  /** The rival's live chain, so the swing bar can flag a hot opponent. */
+  comboStreak?: number;
+}
+
+/**
+ * The server's answer to `duel:create-challenge` and `duel:rematch` — the new
+ * duel's id. A rematch is a NEW duel row, so this is the only way the client
+ * learns where to go next.
+ */
+export interface DuelCreatedData {
+  duelId: string;
+}
+
+/** A mascot sticker thrown by the other side of an async duel. */
+export interface TauntReceivedData {
+  duelId: string;
+  fromId: string;
+  fromName: string;
+  stickerId: string;
 }
 
 export interface OpponentDisconnectedData {
@@ -110,6 +136,8 @@ export interface UseDuelSocketReturn {
   submitScore: (duelId: string, wordsFound: string[]) => void;
   // Real-time actions
   submitWord: (duelId: string, word: string, positions?: number[]) => void;
+  /** Throw a mascot sticker into a duel room (async duels). */
+  sendTaunt: (duelId: string, stickerId: string) => void;
   forfeitDuel: (duelId: string) => void;
   syncState: (duelId: string) => void;
   // Event listeners (caller provides callbacks)
@@ -118,6 +146,7 @@ export interface UseDuelSocketReturn {
   onDuelAccepted: (cb: (data: DuelAcceptedData) => void) => () => void;
   onDuelDeclined: (cb: (data: { duelId: string }) => void) => () => void;
   onDuelCompleted: (cb: (data: DuelCompletedData) => void) => () => void;
+  onDuelCreated: (cb: (data: DuelCreatedData) => void) => () => void;
   onScoreSubmitted: (cb: (data: ScoreSubmittedData) => void) => () => void;
   onError: (cb: (data: { message: string }) => void) => () => void;
   // Real-time event listeners
@@ -128,4 +157,5 @@ export interface UseDuelSocketReturn {
   onOpponentDisconnected: (cb: (data: OpponentDisconnectedData) => void) => () => void;
   onOpponentReconnected: (cb: (data: OpponentReconnectedData) => void) => () => void;
   onStateSynced: (cb: (data: StateSyncedData) => void) => () => void;
+  onTauntReceived: (cb: (data: TauntReceivedData) => void) => () => void;
 }

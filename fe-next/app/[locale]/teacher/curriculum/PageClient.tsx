@@ -12,6 +12,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { CurriculumWordListBrowser } from '@/components/teacher/curriculum/CurriculumWordListBrowser';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { VocabularyLesson } from '@/lib/supabase/education';
 
 /**
@@ -20,7 +22,7 @@ import { VocabularyLesson } from '@/lib/supabase/education';
  * Shows curriculum-aligned word lists with filtering and import functionality.
  */
 function TeacherCurriculumInner() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -44,21 +46,48 @@ function TeacherCurriculumInner() {
     [classroomId, language, router]
   );
 
+  // The browser is a long filtered list — exactly the content the shell's one
+  // scrolling region is for. The page itself stays put, so the filters at the
+  // top of the list never scroll out of a teacher's reach.
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6 lg:p-8">
-      <main className="max-w-6xl mx-auto">
-        <CurriculumWordListBrowser
-          teacherId={user?.id}
-          classroomId={classroomId}
-          onImportSuccess={handleImportSuccess}
-        />
-      </main>
-    </div>
+    <main className="max-w-6xl mx-auto">
+      <CurriculumWordListBrowser
+        teacherId={user?.id}
+        classroomId={classroomId}
+        onImportSuccess={handleImportSuccess}
+      />
+    </main>
   );
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
 
+/**
+ * The shell wraps the GATE, not the other way round. `TeacherGate` renders a
+ * loader while the role read is in flight and a denial when it resolves
+ * negative, and neither of those is this file's markup — so a shell mounted
+ * inside the gated child leaves the two states a teacher meets first scrolling
+ * the document with no lock at all.
+ */
 export default function TeacherCurriculumPage() {
-  return <TeacherGate><TeacherCurriculumInner /></TeacherGate>;
+  return (
+    <CurriculumShell>
+      <TeacherGate>
+        <TeacherCurriculumInner />
+      </TeacherGate>
+    </CurriculumShell>
+  );
+}
+
+function CurriculumShell({ children }: { children: React.ReactNode }) {
+  const { t } = useLanguage();
+  return (
+    <EducationShell
+      header={<EducationHeader showBackButton />}
+      scrollRegionLabel={t('teacher.curriculum.title')}
+      contentClassName="p-4 sm:p-6 lg:p-8"
+    >
+      {children}
+    </EducationShell>
+  );
 }

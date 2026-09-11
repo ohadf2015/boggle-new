@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,6 +33,9 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { EducationHeader } from '@/components/education/EducationHeader';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -80,7 +83,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
@@ -111,8 +114,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   // ==================== RENDER ====================
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           {/* Title & Back Button */}
@@ -120,12 +122,17 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <button type="button"
               onClick={handleBackToClassroom}
               className={cn(
-                'inline-flex items-center gap-2 mb-3',
-                'text-neo-cyan hover:text-neo-lime',
-                'transition-colors duration-200'
+                // A bare cyan word on navy is not a control. 2px cream edge +
+                // a lighter fill, same treatment as every other secondary
+                // action on these screens.
+                'inline-flex min-h-11 items-center gap-2 mb-3 rounded-neo px-3 py-2',
+                'border-[2px] border-neo-cream bg-neo-navy-light shadow-hard-sm',
+                'text-neo-white hover:-translate-y-0.5 hover:shadow-hard',
+                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
+                'transition-all duration-200'
               )}
             >
-              <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
               <span className="text-sm font-neo-body">{t('education.analytics.backToClassroom')}</span>
             </button>
 
@@ -140,7 +147,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           {/* Live Activity Indicator */}
           <div
             className={cn(
-              'bg-neo-navy/50 border-neo border-neo-black shadow-hard rounded-neo',
+              'bg-neo-navy/50 border-[2px] border-neo-black shadow-hard rounded-neo',
               'px-4 py-3'
             )}
           >
@@ -154,7 +161,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         </div>
 
         {/* Metrics Dashboard */}
-        <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
+        <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
           <ProGate feature="analytics">
             <AnalyticsDashboard
               classroomId={classroomId}
@@ -169,15 +176,18 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           <TabsList
             className={cn(
               'grid w-full grid-cols-4 gap-2',
-              'bg-neo-navy/50 border-neo border-neo-black shadow-hard rounded-neo p-2'
+              'bg-neo-navy/50 border-[2px] border-neo-black shadow-hard rounded-neo p-2'
             )}
           >
             <TabsTrigger
               value="students"
               className={cn(
-                'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black',
-                'data-[state=inactive]:text-neo-white',
+                // Selected differs by FILL, not only by text colour; unselected
+                // still carries a 2px cream edge so it reads as tappable at all
+                // (it used to be bare text on navy — `edge<3`).
+                'font-neo-body font-bold rounded-neo border-[2px]',
+                'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
+                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
                 'transition-all duration-200'
               )}
             >
@@ -186,9 +196,12 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <TabsTrigger
               value="lessons"
               className={cn(
-                'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white',
-                'data-[state=inactive]:text-neo-white',
+                // Selected differs by FILL, not only by text colour; unselected
+                // still carries a 2px cream edge so it reads as tappable at all
+                // (it used to be bare text on navy — `edge<3`).
+                'font-neo-body font-bold rounded-neo border-[2px]',
+                'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white data-[state=active]:border-neo-black',
+                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
                 'transition-all duration-200'
               )}
             >
@@ -197,9 +210,12 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <TabsTrigger
               value="vocabulary"
               className={cn(
-                'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black',
-                'data-[state=inactive]:text-neo-white',
+                // Selected differs by FILL, not only by text colour; unselected
+                // still carries a 2px cream edge so it reads as tappable at all
+                // (it used to be bare text on navy — `edge<3`).
+                'font-neo-body font-bold rounded-neo border-[2px]',
+                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
+                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
                 'transition-all duration-200'
               )}
             >
@@ -208,9 +224,12 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <TabsTrigger
               value="assignments"
               className={cn(
-                'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black',
-                'data-[state=inactive]:text-neo-white',
+                // Selected differs by FILL, not only by text colour; unselected
+                // still carries a 2px cream edge so it reads as tappable at all
+                // (it used to be bare text on navy — `edge<3`).
+                'font-neo-body font-bold rounded-neo border-[2px]',
+                'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black data-[state=active]:border-neo-black',
+                'data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream',
                 'transition-all duration-200'
               )}
             >
@@ -220,7 +239,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
           {/* Student Progress Tab */}
           <TabsContent value="students" className="space-y-4">
-            <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
               <h2 className="text-2xl font-neo-display text-neo-white mb-4">
                 {t('education.analytics.studentProgress')}
               </h2>
@@ -233,14 +252,14 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
           {/* Lesson Effectiveness Tab */}
           <TabsContent value="lessons" className="space-y-4">
-            <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
               <LessonEffectivenessChart classroomId={classroomId} />
             </div>
           </TabsContent>
 
           {/* Vocabulary Mastery Tab */}
           <TabsContent value="vocabulary" className="space-y-4">
-            <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
               <h2 className="text-2xl font-neo-display text-neo-white mb-4">
                 {t('education.analytics.vocabularyMastery')}
               </h2>
@@ -250,7 +269,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
           {/* Assignments Tab */}
           <TabsContent value="assignments" className="space-y-4">
-            <div className="bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
               <AssignmentTrackingPanel
                 classroomId={classroomId}
                 onCreateAssignment={() => {
@@ -266,7 +285,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {recentActivity.length > 0 && (
           <div
             className={cn(
-              'bg-neo-navy/30 border-neo border-neo-black shadow-hard rounded-neo p-4',
+              'bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-4',
               'hidden lg:block'
             )}
           >
@@ -300,13 +319,36 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
 
+/**
+ * Shell above gate — see `components/education/shell/__tests__/gatedShellOrder.test.ts`.
+ * The gate's loader and denial are not this file's markup, so a shell mounted
+ * only by the inner component would let those two branches scroll the document.
+ */
 export function AnalyticsPageClient({ classroomId, locale }: AnalyticsPageClientProps) {
-  return <TeacherGate><AnalyticsPageClientInner classroomId={classroomId} locale={locale} /></TeacherGate>;
+  return (
+    <AnalyticsShell>
+      <TeacherGate>
+        <AnalyticsPageClientInner classroomId={classroomId} locale={locale} />
+      </TeacherGate>
+    </AnalyticsShell>
+  );
+}
+
+function AnalyticsShell({ children }: { children: ReactNode }) {
+  const { t } = useLanguage();
+  return (
+    <EducationShell
+      header={<EducationHeader showBackButton />}
+      scrollRegionLabel={t('teacher.shell.analyticsLabel')}
+      contentClassName="p-4 md:p-8"
+    >
+      {children}
+    </EducationShell>
+  );
 }

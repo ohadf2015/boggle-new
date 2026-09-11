@@ -28,7 +28,7 @@ import type { ReteachLinks } from './useReteachLinks';
 
 const ACTION =
   'flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm text-center ' +
-  'text-neo-black border-neo border-neo-black rounded-neo shadow-hard-sm ' +
+  'text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard-sm ' +
   'hover:shadow-hard hover:-translate-y-0.5 transition-all';
 
 export interface ReteachActionsProps {
@@ -47,7 +47,7 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
           onClick={onReteach}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold text-base',
-            'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
+            'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
           )}
         >
@@ -56,12 +56,16 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
         </button>
       )}
 
-      <details className="group mt-3 rounded-neo border-neo border-neo-black bg-neo-navy overflow-hidden">
+      <details className="group mt-3 rounded-neo border-[3px] border-neo-black bg-neo-navy overflow-hidden">
         <summary
           data-testid="reteach-more-actions"
           className={cn(
             'flex items-center justify-between gap-2 cursor-pointer list-none px-4 py-3',
+            // A 2px cream edge, not navy-on-navy: a disclosure is a control and
+            // has to have a visible edge on a dark card (design addendum —
+            // fill OR border must clear 3:1 against what surrounds it).
             'font-neo-display font-bold text-sm text-neo-white bg-neo-navy-elevated',
+            'border-2 border-neo-cream',
             'hover:bg-neo-purple/30 transition-colors'
           )}
         >

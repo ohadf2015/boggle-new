@@ -158,12 +158,15 @@ export function ClassroomGameBanner({
           </span>
         </span>
         <div className="flex flex-col">
-          <span className="text-sm font-neo-display font-black text-black uppercase tracking-wide">
+          {/* The strip's fill is a 20% tint over the navy shell, so it resolves
+              DARK — black copy on it measured 1.23:1, i.e. unreadable. The
+              cyan/lime accent lives in the radar chip, which is solid. */}
+          <span className="text-sm font-neo-display font-black text-neo-white uppercase tracking-wide">
             {isConnected
               ? t('student.activeGame.listening')
               : t('student.activeGame.connecting')}
           </span>
-          <span className="text-xs font-neo-body text-black/60">
+          <span className="text-xs font-neo-body text-neo-white/70">
             {t('student.activeGame.idleHint')}
           </span>
         </div>

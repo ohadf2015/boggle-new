@@ -37,6 +37,7 @@ import { registerLifecycleHandlers } from './lifecycle';
 import { registerLobbyHandlers } from './lobby';
 import { registerGameplayHandlers } from './gameplay';
 import { registerRealtimeHandlers } from './realtime';
+import { registerTauntHandlers } from './taunt';
 import { registerDisconnectionHandlers, handleReconnection } from './disconnection';
 import logger from '@/backend/utils/logger';
 
@@ -68,6 +69,9 @@ export function registerDuelHandlers(namespace: Namespace, socket: DuelSocket): 
 
   // Register realtime handlers (word submission, progress updates)
   registerRealtimeHandlers(namespace, socket);
+
+  // Register taunt handler (mascot sticker relay, async duels)
+  registerTauntHandlers(namespace, socket);
 
   // Register disconnection handlers (grace period, forfeit)
   registerDisconnectionHandlers(namespace, socket);

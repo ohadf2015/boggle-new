@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { StudentHubPlayZone } from '@/components/student/StudentHubPlayZone';
 import { StudentHubProgressZone } from '@/components/student/StudentHubProgressZone';
@@ -87,9 +88,12 @@ export default function StudentPageClient() {
     return () => clearTimeout(timer);
   }, [loading, user, profile]);
 
+  // Every branch goes through the shell — the stalled and loading states are
+  // the ones a student is most likely to see first, and a page that scrolls
+  // for a second and then stops is a jolt on a phone.
   if (profileStalled && isChecking) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy px-4">
+      <EducationShell header={<EducationHeader />} contentClassName="flex items-center justify-center px-4">
         <div className="w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime p-6 text-neo-black shadow-hard">
           <h1 className="mb-2 font-neo-display text-xl font-black">
             {t('student.profileStalled.title')}
@@ -105,15 +109,15 @@ export default function StudentPageClient() {
             {t('student.profileStalled.retry')}
           </button>
         </div>
-      </div>
+      </EducationShell>
     );
   }
 
   if (isChecking || loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy">
+      <EducationShell header={<EducationHeader />} contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
-      </div>
+      </EducationShell>
     );
   }
 
@@ -122,10 +126,13 @@ export default function StudentPageClient() {
   const studentName = resolveStudentDisplayName(profile, user, t('student.dashboard.defaultName'));
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <EducationHeader />
-
-      <div className="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 flex-1 space-y-6">
+    <EducationShell
+      className={cn(isRTL && 'rtl')}
+      header={<EducationHeader />}
+      scrollRegionLabel={t('student.dashboard.title')}
+      contentClassName="px-4 py-4 sm:px-6"
+    >
+      <div className="w-full max-w-5xl mx-auto space-y-6">
         {/*
           One header line, and it names the CLASS. "Student Dashboard" told a student nothing
           they did not already know; their teacher's class name tells them they are in the
@@ -238,6 +245,6 @@ export default function StudentPageClient() {
           <StudentHubProgressZone classroomId={classroomId} userId={user.id} />
         )}
       </div>
-    </div>
+    </EducationShell>
   );
 }

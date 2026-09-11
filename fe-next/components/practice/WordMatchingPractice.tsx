@@ -20,6 +20,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Check, X, ArrowLeft } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import PracticeResultsCard from './PracticeResultsCard';
+import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 import { useMatchingGame, type MatchingItem } from './hooks/useMatchingGame';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { EnrichedVocabularyWord } from '@/types/vocabulary';
@@ -31,6 +32,10 @@ export interface WordMatchingPracticeProps {
   onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
   onBack: () => void;
   /** XP session data to display on results screen (optional) */
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
   xpSessionData?: {
     sessionXpEarned: number;
     sessionMasteryMessage: string | null;
@@ -126,9 +131,10 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
 DroppableDefinitionSlot.displayName = 'DroppableDefinitionSlot';
 
 export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
-  ({ words, onComplete, onBack, xpSessionData }) => {
+  ({ words, onComplete, onBack, xpSessionData, onNext, nextLabel }) => {
     const { t, dir, language } = useLanguage();
     const isRTL = dir === 'rtl';
+    const sfx = usePracticeSfx();
 
     const {
       wordColumn,
@@ -172,6 +178,8 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
         const result = checkMatch(wordId, definitionText);
 
         if (result.correct) {
+          // A snapped pair is the whole reward loop of this mode; it was silent.
+          sfx.match();
           // Show correct feedback
           setFeedback((prev) => ({ ...prev, [over.id as string]: 'correct' }));
 
@@ -184,6 +192,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             });
           }, 1000);
         } else {
+          sfx.wrong();
           // Show incorrect feedback
           setFeedback((prev) => ({ ...prev, [over.id as string]: 'incorrect' }));
 
@@ -197,7 +206,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
           }, 1000);
         }
       },
-      [definitionColumn, checkMatch]
+      [definitionColumn, checkMatch, sfx]
     );
 
     // Show results and report completion when game ends
@@ -224,7 +233,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
 
     if (showResults) {
       return (
-        <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
           <PracticeResultsCard
             correct={correctCount}
             total={attempts}
@@ -232,13 +241,15 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
             onRestart={handleRestart}
             onBack={onBack}
+            onNext={onNext}
+            nextLabel={nextLabel}
           />
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
         <div className="max-w-5xl mx-auto mb-4">
           <div className="flex items-center justify-between">

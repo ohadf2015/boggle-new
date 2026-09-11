@@ -30,8 +30,13 @@ import {
 } from './quickLaunchIntent';
 import { SourceSwitch, PickRow, PastePanel, STARTER_PACKS, type PlayNowSource } from './PlayNowSources';
 
-/** How many saved lists fit on the panel before it stops being one glance. */
-const RECENT_LIMIT = 4;
+/**
+ * How many saved lists fit on the panel before it stops being one glance.
+ * Three, not four: a row of four is a menu to read, and the panel is already
+ * armed with the top one — the list is there to CHANGE the default, not to
+ * make the teacher choose before they can play.
+ */
+const RECENT_LIMIT = 3;
 
 export interface PlayNowLauncherProps {
   /** Hand the resolved intent to the dashboard, which stores it and navigates. */
@@ -148,47 +153,20 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
       </div>
 
       <div className="space-y-3 px-4 py-4 sm:px-5">
-        <SourceSwitch active={source} available={available} onChange={setPickedSource} />
+        {/* What is already loaded. Said BEFORE the button, because it is the
+            one thing a teacher needs to know before pressing it. */}
+        <p
+          data-testid="play-now-armed"
+          className="text-center font-neo-body text-sm font-bold text-neo-white text-balance"
+        >
+          {intent
+            ? t('teacher.playNow.armedWith', { title: intent.title, count: wordCount })
+            : t('teacher.playNow.pickSomething')}
+        </p>
 
-        <div className="min-h-[5.5rem]">
-          {source === 'recent' && (
-            <ul className="grid gap-2 sm:grid-cols-2" data-testid="play-now-recent-list">
-              {recentLessons.map((l) => (
-                <li key={l.id}>
-                  <PickRow
-                    testId={`play-now-lesson-${l.id}`}
-                    title={l.name}
-                    meta={t('teacher.lesson.words', { count: l.words?.length ?? 0 })}
-                    accent="bg-neo-cyan"
-                    selected={activeLesson?.id === l.id}
-                    onSelect={() => setPickedLessonId(l.id)}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {source === 'packs' && (
-            <ul className="grid gap-2 sm:grid-cols-3" data-testid="play-now-pack-list">
-              {STARTER_PACKS.map((p) => (
-                <li key={p.nameKey}>
-                  <PickRow
-                    testId={`play-now-pack-${p.category}`}
-                    title={t(p.nameKey)}
-                    meta={t('teacher.lesson.words', { count: p.words.length })}
-                    accent="bg-neo-lime"
-                    selected={activePack?.nameKey === p.nameKey}
-                    onSelect={() => setPickedPackKey(p.nameKey)}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {source === 'paste' && <PastePanel value={pasted} words={pastedWords} onChange={setPasted} />}
-        </div>
-
-        {/* One dominant action. Everything above it is ammunition, not a step. */}
+        {/* One dominant action, and it comes FIRST. Measured live at 390x844 it
+            used to sit at y=688 — under a source switch and a three-row list
+            the teacher never had to touch, because the panel arms itself. */}
         <button
           type="button"
           data-testid="play-now-go"
@@ -200,20 +178,70 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
             'transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
             intent
               ? 'bg-neo-lime text-black shadow-hard-lg hover:-translate-y-1 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed'
-              : 'cursor-not-allowed bg-neo-cream/40 text-black/40 shadow-hard-sm'
+              // Still bordered, still legible: this is the state a teacher
+              // sees on first paint, while the lessons read is open. A solid
+              // fill rather than `cream/70` — a Tailwind v4 opacity modifier
+              // computes to `oklab(…)`, which reads as no fill at all.
+              : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
           )}
         >
           <Rocket className="size-7 shrink-0" strokeWidth={3} aria-hidden="true" />
           {t('teacher.playNow.goLive')}
         </button>
 
-        <p className="text-center font-neo-body text-xs font-bold text-neo-white/70 text-balance">
-          {intent
-            ? t('teacher.playNow.armedWith', { title: intent.title, count: wordCount })
-            : t('teacher.playNow.pickSomething')}
-          <span className="mx-1 text-neo-white/30" aria-hidden="true">·</span>
-          <span className="text-neo-white/45">{t('teacher.playNow.noSetupNeeded')}</span>
+        <p className="text-center font-neo-body text-xs font-bold text-neo-white/70">
+          {t('teacher.playNow.noSetupNeeded')}
         </p>
+
+        {/* Everything below the line exists to CHANGE the default, never to
+            reach it. Hence the label, and hence its place under the button. */}
+        <div data-testid="play-now-change" className="space-y-3 border-t-[3px] border-black/50 pt-3">
+          <p className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-white/70">
+            {t('teacher.playNow.changeWords')}
+          </p>
+
+          <SourceSwitch active={source} available={available} onChange={setPickedSource} />
+
+          <div className="min-h-[5.5rem]">
+            {source === 'recent' && (
+              <ul className="grid gap-2 sm:grid-cols-2" data-testid="play-now-recent-list">
+                {recentLessons.map((l, i) => (
+                  <li key={l.id}>
+                    <PickRow
+                      testId={`play-now-lesson-${l.id}`}
+                      title={l.name}
+                      meta={t('teacher.lesson.words', { count: l.words?.length ?? 0 })}
+                      accent="bg-neo-cyan"
+                      recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
+                      selected={activeLesson?.id === l.id}
+                      onSelect={() => setPickedLessonId(l.id)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {source === 'packs' && (
+              <ul className="grid gap-2 sm:grid-cols-3" data-testid="play-now-pack-list">
+                {STARTER_PACKS.map((p, i) => (
+                  <li key={p.nameKey}>
+                    <PickRow
+                      testId={`play-now-pack-${p.category}`}
+                      title={t(p.nameKey)}
+                      meta={t('teacher.lesson.words', { count: p.words.length })}
+                      accent="bg-neo-lime"
+                      recommendedLabel={i === 0 ? t('teacher.playNow.recommended') : undefined}
+                      selected={activePack?.nameKey === p.nameKey}
+                      onSelect={() => setPickedPackKey(p.nameKey)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {source === 'paste' && <PastePanel value={pasted} words={pastedWords} onChange={setPasted} />}
+          </div>
+        </div>
       </div>
     </section>
   );

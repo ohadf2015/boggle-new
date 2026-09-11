@@ -148,7 +148,7 @@ export function MissGapWhatsAppShareCard({
             onClick={handleWhatsApp}
             className={cn(
               'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-              'bg-brand-whatsapp text-neo-white border-neo border-neo-black rounded-neo',
+              'bg-brand-whatsapp text-neo-black border-neo border-neo-black rounded-neo',
               'shadow-hard hover:shadow-hard-lg transition-all hover:bg-brand-whatsapp-hover',
             )}
           >

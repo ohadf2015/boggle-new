@@ -14,12 +14,30 @@ import { Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 
-/** One family per option, in the fixed order students learn to expect. */
+/**
+ * One family per option, in the fixed order students learn to expect.
+ *
+ * Black text on all four, including pink and purple where white is the obvious
+ * choice and the failing one: #ff1493 is 3.64:1 against white and #8b5cf6 is
+ * 4.24:1, both under the 4.5:1 AA floor these tiles have to clear as the only
+ * controls on the screen. Black clears it on every fill (5.8:1 and 5.0:1), and
+ * one rule for four tiles is also the more legible design.
+ *
+ * `dim` is the post-reveal state for an option nobody needs to read closely any
+ * more. It is a genuinely different FILL rather than transparency laid over the
+ * bright one: the muted token still contrasts hard against the navy, so the
+ * tile keeps its edge instead of dissolving into the surface.
+ *
+ * Ink is per fill, not per family, because purple is the one place the two
+ * disagree: #8b5cf6 takes black at 4.96:1, but its muted twin #7c4fcc drops
+ * black to 3.85:1 and lifts white to 5.46:1. Every ratio here was measured
+ * against the live page, not eyeballed.
+ */
 const OPTION_STYLES = [
-  { base: 'bg-neo-lime text-neo-black', dim: 'bg-neo-lime-muted', glyph: '▲' },
-  { base: 'bg-neo-pink text-neo-white', dim: 'bg-neo-pink-muted', glyph: '●' },
-  { base: 'bg-neo-cyan text-neo-black', dim: 'bg-neo-cyan-muted', glyph: '■' },
-  { base: 'bg-neo-purple text-neo-white', dim: 'bg-neo-purple-muted', glyph: '◆' },
+  { base: 'bg-neo-lime', dim: 'bg-neo-lime-muted', text: 'text-neo-black', dimText: 'text-neo-black', glyph: '▲' },
+  { base: 'bg-neo-pink', dim: 'bg-neo-pink-muted', text: 'text-neo-black', dimText: 'text-neo-black', glyph: '●' },
+  { base: 'bg-neo-cyan', dim: 'bg-neo-cyan-muted', text: 'text-neo-black', dimText: 'text-neo-black', glyph: '■' },
+  { base: 'bg-neo-purple', dim: 'bg-neo-purple-muted', text: 'text-neo-black', dimText: 'text-neo-white', glyph: '◆' },
 ] as const;
 
 export interface VocabQuizAnswerGridProps {
@@ -31,6 +49,8 @@ export interface VocabQuizAnswerGridProps {
   disabled: boolean;
   onSelect: (index: number) => void;
   t: TranslateFn;
+  /** Lets the caller hand the grid the height it is allowed to fill. */
+  className?: string;
 }
 
 export function VocabQuizAnswerGrid({
@@ -40,11 +60,19 @@ export function VocabQuizAnswerGrid({
   disabled,
   onSelect,
   t,
+  className,
 }: VocabQuizAnswerGridProps) {
   const revealed = correctIndex !== null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-label={t('vocabQuiz.answers.label')}>
+    // Two columns from the narrowest phone up: a 2x2 block sits in the bottom
+    // half of a 390x844 screen where a thumb actually reaches, and the four
+    // tiles split the height they are given rather than stacking past the fold.
+    <div
+      className={cn('grid grid-cols-2 auto-rows-fr gap-2.5 sm:gap-3', className)}
+      role="group"
+      aria-label={t('vocabQuiz.answers.label')}
+    >
       {choices.map((choice, index) => {
         const style = OPTION_STYLES[index % OPTION_STYLES.length];
         const isSelected = selectedIndex === index;
@@ -70,13 +98,17 @@ export function VocabQuizAnswerGrid({
                 : choice
             }
             className={cn(
-              'relative min-h-[64px] px-4 py-4 rounded-neo border-neo border-neo-black',
-              'font-neo-display font-bold text-lg text-start break-words',
-              'flex items-center gap-3 transition-all',
+              'relative h-full min-h-[64px] px-3 py-3 sm:px-4 sm:py-4 rounded-neo border-[2px] border-neo-black',
+              'font-neo-display font-bold text-base sm:text-lg text-start break-words',
+              'flex items-center gap-2 sm:gap-3 transition-all',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white focus-visible:ring-offset-2',
-              faded ? cn(style.dim, 'text-neo-white/70 opacity-60') : style.base,
+              faded ? cn(style.dim, style.dimText) : cn(style.base, style.text),
               isSelected ? 'shadow-hard-lg ring-4 ring-neo-white' : 'shadow-hard',
-              !disabled && 'active:translate-y-[2px] active:shadow-hard-sm animate-neo-press',
+              // The press lives on `:active` and NOWHERE else. `animate-neo-press`
+              // is `…forwards` onto a 100% keyframe of translate(1px,1px) +
+              // --shadow-pressed, so applying it unconditionally left all four
+              // tiles resting in the pressed state with the hard shadow gone.
+              !disabled && 'active:translate-y-[2px] active:shadow-hard-sm',
               disabled && !revealed && 'opacity-90',
               isWrongPick && 'animate-neo-shake'
             )}

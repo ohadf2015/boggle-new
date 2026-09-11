@@ -36,7 +36,7 @@ export interface ResultsPrimaryActionsProps {
 
 const BUTTON =
   'flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold ' +
-  'border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg ' +
+  'border-[3px] border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg ' +
   'hover:-translate-y-0.5 transition-all';
 
 export function ResultsPrimaryActions({ language, onRematch, t }: ResultsPrimaryActionsProps) {

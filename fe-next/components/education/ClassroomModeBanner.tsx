@@ -11,6 +11,8 @@ import type { Language } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { LiveClassroomGameInfo } from '@/lib/education/liveClassroomGameInfo';
 import { MODE_TRANSLATION_KEY, boardSizeLabel } from './classroomModeLabels';
+import { LobbyModeSwitcher } from './lobby/LobbyModeSwitcher';
+import type { Socket } from 'socket.io-client';
 
 interface LessonData {
   lessonId: string;
@@ -53,6 +55,12 @@ interface ClassroomModeBannerProps {
    * below fell through to a default (mode "Classic", 6×6, no lesson name).
    */
   liveGame?: LiveClassroomGameInfo | null;
+  /**
+   * The ROOM's socket, so the teacher can change the game without leaving it.
+   * Optional: every non-classroom caller and every student passes nothing, and
+   * the switcher is host-and-lobby-only anyway.
+   */
+  socket?: Socket | null;
 }
 
 /**
@@ -91,6 +99,7 @@ export function ClassroomModeBanner({
   expanded = false,
   isHost = true,
   liveGame = null,
+  socket = null,
 }: ClassroomModeBannerProps) {
   const { t, language } = useLanguage();
   const [copied, setCopied] = useState(false);
@@ -185,8 +194,18 @@ export function ClassroomModeBanner({
    * `expanded` is `!gameActive`, and `gameActive` survives the results screen
    * (only `resetForNewRound` clears it), so this is scoped to the LOBBY.
    */
+  /**
+   * ...with ONE exception, which is why this is no longer a bare `return null`.
+   *
+   * The projector prints everything this panel did, but it has no way to
+   * CHANGE anything: round 1's picker only existed before the room, so a
+   * teacher who wanted a different game had to exit — ending the room for every
+   * student in it — and come back with a new code. This row is that control and
+   * nothing else. It deliberately re-prints no code and no QR, so the
+   * duplicate-code-on-the-wall bug the early return exists to stop stays fixed.
+   */
   if (isHost && expanded && !!gameCode && !!lessonData) {
-    return null;
+    return <LobbyModeSwitcher gameCode={gameCode} currentMode={gameMode} socket={socket} />;
   }
 
   return (

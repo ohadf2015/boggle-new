@@ -67,11 +67,11 @@ const LESSONS = [
 const CLASSROOMS = [{ id: 'class-1', name: 'ELA (7th)', member_count: 5 }];
 
 /** Re-query every time: the wizard re-renders and the node identity can change. */
-const startBtn = () => screen.getByRole('button', { name: /createRoom/i });
+const startBtn = () => screen.getByTestId('lobby-go-live');
 
 async function renderLobby() {
   render(<ClassroomGameLobby initialLessonId="lesson-1" onBack={vi.fn()} />);
-  return await screen.findByRole('button', { name: /createRoom/i });
+  return await screen.findByTestId('lobby-go-live');
 }
 
 describe('ClassroomGameLobby — Start Game always recovers', () => {

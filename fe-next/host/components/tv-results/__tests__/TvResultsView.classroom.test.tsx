@@ -12,7 +12,7 @@
  * invisible on the only screen the room was looking at.
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import TvResultsView from '../TvResultsView';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -121,9 +121,22 @@ describe('TvResultsView — the classroom projector', () => {
     expect(screen.queryByTestId('generic-arcade-podium')).not.toBeInTheDocument();
   });
 
-  it('names the winners on the plinths so the room reads them from the back', () => {
+  // The plinths are painted from the first frame; the NAMES land on the
+  // reveal's timetable (third, second, a beat, the winner). Both halves of that
+  // are asserted here, because a reveal that ever leaves the wall blank is the
+  // exact bug that froze this podium static in the first place.
+  it('has the plinths on the wall before any name is revealed', () => {
     render(<TvResultsView {...baseProps} classroomSummary={summary} />);
-    expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Maya');
+    expect(screen.getByTestId('podium-place-1')).toBeInTheDocument();
+    expect(screen.getByTestId('podium-place-2')).toBeInTheDocument();
+  });
+
+  it('names the winners on the plinths so the room reads them from the back', async () => {
+    render(<TvResultsView {...baseProps} classroomSummary={summary} />);
+    await waitFor(
+      () => expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Maya'),
+      { timeout: 4000 }
+    );
     expect(screen.getByTestId('podium-place-1')).toHaveTextContent('90');
   });
 

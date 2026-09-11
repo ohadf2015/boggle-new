@@ -159,7 +159,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'flex items-center justify-center',
                 'w-10 h-10 min-w-[40px] min-h-[40px]',
                 'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
-                'border-3 border-neo-black dark:border-slate-500',
+                'border-3 border-neo-black dark:border-neo-cream',
                 'rounded-neo shadow-hard-sm',
                 'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
                 'active:translate-x-px active:translate-y-px active:shadow-none',
@@ -316,7 +316,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       'flex items-center justify-center',
                       'min-w-[48px] min-h-[48px] w-12 h-12',
                       'bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-white',
-                      'border-3 border-neo-black dark:border-slate-500',
+                      'border-3 border-neo-black dark:border-neo-cream',
                       'rounded-neo shadow-hard-sm',
                       'active:translate-x-px active:translate-y-px active:shadow-none',
                       'transition-all duration-100'
@@ -334,7 +334,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                     <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
                       {t('settings.language')}
                     </span>
-                    <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-neo-navy">
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-neo-cream bg-neo-cream dark:bg-neo-navy">
                       <QuickLanguageSwitcher showLabel />
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                           isOnTeacherSection
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                            : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard'
                         )}
                       >
                         <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-cyan/50 border-3 border-neo-black text-neo-black">
@@ -375,7 +375,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                           'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                           isOnStudentSection
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                            : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-slate-500 shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard'
                         )}
                       >
                         <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
@@ -390,7 +390,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       href={`/${language}/education`}
                       onClick={() => setShowMobileMenu(false)}
                       className={cn(
-                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
+                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-neo-cream transition-all w-full',
                         'bg-neo-cream dark:bg-neo-navy hover:bg-neo-lime/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
                         'shadow-hard-sm hover:shadow-hard'
                       )}
@@ -406,7 +406,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                       href={`/${language}`}
                       onClick={() => setShowMobileMenu(false)}
                       className={cn(
-                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
+                        'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-neo-cream transition-all w-full',
                         'bg-neo-cream dark:bg-neo-navy hover:bg-neo-pink/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
                         'shadow-hard-sm hover:shadow-hard'
                       )}
@@ -432,7 +432,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                         <button
                           onClick={handleSignOut}
                           className={cn(
-                            'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full',
+                            'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-neo-cream transition-all w-full',
                             'bg-neo-cream dark:bg-neo-navy hover:bg-neo-pink/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
                             'shadow-hard-sm hover:shadow-hard'
                           )}

@@ -82,10 +82,29 @@ vi.mock('@/components/education/practicePicker/WordTowerPractice', () => ({
 }));
 
 vi.mock('@/components/practice', () => ({
-  FlashcardReview: ({ onComplete }: { onComplete: (r: { correct: number; total: number }) => void }) => (
-    <button data-testid="finish-round" onClick={() => onComplete({ correct: 2, total: 2 })}>
-      flashcards
-    </button>
+  /*
+    The NEXT action used to live on a fixed bar the page rendered underneath the
+    mode. It now belongs to the mode's own completion card, reached through the
+    `onNext` prop — so this stub renders that button when the prop arrives,
+    which is exactly what the page is on the hook for providing.
+  */
+  FlashcardReview: ({
+    onComplete,
+    onNext,
+  }: {
+    onComplete: (r: { correct: number; total: number }) => void;
+    onNext?: () => void;
+  }) => (
+    <>
+      <button data-testid="finish-round" onClick={() => onComplete({ correct: 2, total: 2 })}>
+        flashcards
+      </button>
+      {onNext && (
+        <button data-testid="practice-next-mode" onClick={onNext}>
+          next
+        </button>
+      )}
+    </>
   ),
   SoloPracticeBoard: () => <div>board</div>,
   WordListPreview: () => <div data-testid="word-list">word list</div>,

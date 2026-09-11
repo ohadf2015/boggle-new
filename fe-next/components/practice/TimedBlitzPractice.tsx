@@ -4,10 +4,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { Flame, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useBlitzGame } from './hooks/useBlitzGame';
 import CircularTimer from '../CircularTimer';
 import PracticeResultsCard from './PracticeResultsCard';
+import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
+import StreakFlame from '@/components/education/practice/StreakFlame';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
 export interface TimedBlitzPracticeProps {
@@ -21,6 +23,10 @@ export interface TimedBlitzPracticeProps {
   }) => void;
   onBack: () => void;
   /** XP session data to display on results screen (optional) */
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
   xpSessionData?: {
     sessionXpEarned: number;
     sessionMasteryMessage: string | null;
@@ -46,9 +52,12 @@ export function TimedBlitzPractice({
   onComplete,
   onBack,
   xpSessionData,
+  onNext,
+  nextLabel,
 }: TimedBlitzPracticeProps) {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
+  const sfx = usePracticeSfx();
 
   const [phase, setPhase] = useState<GamePhase>('countdown');
   const [countdown, setCountdown] = useState(3);
@@ -79,15 +88,17 @@ export function TimedBlitzPractice({
     const timer = setTimeout(() => {
       if (countdown > 1) {
         setCountdown(countdown - 1);
+        sfx.advance();
       } else {
         // Start the game
         setPhase('playing');
+        sfx.start();
         startGame();
       }
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [phase, countdown, startGame]);
+  }, [phase, countdown, startGame, sfx]);
 
   /**
    * Focus input when playing
@@ -104,6 +115,7 @@ export function TimedBlitzPractice({
   useEffect(() => {
     if (isGameOver && phase === 'playing') {
       setPhase('timesup');
+      sfx.timesUp();
 
       // Show TIME'S UP for 1.5 seconds, then results
       setTimeout(() => {
@@ -117,7 +129,7 @@ export function TimedBlitzPractice({
         });
       }, 1500);
     }
-  }, [isGameOver, phase, wordsFound, wordsAttempted, combo, maxCombo, score, onComplete]);
+  }, [isGameOver, phase, wordsFound, wordsAttempted, combo, maxCombo, score, onComplete, sfx]);
 
   /**
    * Handle answer submission
@@ -131,7 +143,9 @@ export function TimedBlitzPractice({
       }
 
       // Submit answer
-      submitAnswer(inputValue);
+      const result = submitAnswer(inputValue);
+      if (result.correct) sfx.correct();
+      else sfx.wrong();
 
       // Clear input immediately (no pause)
       setInputValue('');
@@ -139,7 +153,7 @@ export function TimedBlitzPractice({
       // Keep focus
       inputRef.current?.focus();
     },
-    [inputValue, isStarted, isGameOver, submitAnswer]
+    [inputValue, isStarted, isGameOver, submitAnswer, sfx]
   );
 
   /**
@@ -156,6 +170,24 @@ export function TimedBlitzPractice({
    */
   const isLowTime = remainingTime <= 20;
   const isVeryLowTime = remainingTime <= 10;
+
+  /*
+   * One urgency sting on the crossing into the red, not a beep every second —
+   * a per-second alarm over a typing drill is the fastest way to get a student
+   * to mute the tab. The ref makes the cue fire on the transition only, and a
+   * restart (back to full time) re-arms it.
+   */
+  const urgencyFiredRef = useRef(false);
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    if (remainingTime > 10) {
+      urgencyFiredRef.current = false;
+      return;
+    }
+    if (urgencyFiredRef.current) return;
+    urgencyFiredRef.current = true;
+    sfx.urgent();
+  }, [remainingTime, phase, sfx]);
 
   return (
     <div
@@ -214,26 +246,25 @@ export function TimedBlitzPractice({
                 <CircularTimer remainingTime={remainingTime} totalTime={60} size="lg" />
               </div>
 
-              {/* Combo display */}
+              {/*
+                The combo was a static orange pill. It is now the same growing
+                fire Spelling uses, so a run of right answers is visibly and
+                audibly escalating rather than just a bigger number.
+              */}
               <div data-testid="combo-display" className="flex items-center gap-2">
                 {combo > 0 && (
-                  <AdaptiveMotion.div
-                    data-testid="combo-badge"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: [0, 1.3, 1] }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                    className={cn(
-                      'px-4 py-2 rounded-neo',
-                      'bg-neo-orange border-neo border-neo-black',
-                      'shadow-hard',
-                      'flex items-center gap-2'
+                  <div data-testid="combo-badge">
+                    {combo >= 2 ? (
+                      <StreakFlame streak={combo} />
+                    ) : (
+                      // One right answer is a count, not yet a fire. Showing it
+                      // plainly (and in lime, not the reserved streak orange)
+                      // is what makes the flame at two mean something.
+                      <span className="inline-flex min-w-[2.25rem] items-center justify-center rounded-neo border-3 border-black bg-neo-lime px-2 py-1 font-neo-display text-lg font-black tabular-nums leading-none text-black">
+                        {combo}
+                      </span>
                     )}
-                  >
-                    <Flame className="w-5 h-5 text-neo-yellow" />
-                    <span className="font-neo-display text-neo-white text-xl">
-                      {combo}x {t('education.practice.combo')}!
-                    </span>
-                  </AdaptiveMotion.div>
+                  </div>
                 )}
               </div>
 
@@ -358,6 +389,8 @@ export function TimedBlitzPractice({
               masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
               onRestart={handleRestart}
               onBack={onBack}
+              onNext={onNext}
+              nextLabel={nextLabel}
             />
           </AdaptiveMotion.div>
         )}

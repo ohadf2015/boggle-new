@@ -254,9 +254,14 @@ export default function StudentLessonView() {
             )
           : null;
 
-        // Card colors per status
+        // Card colours per status.
+        // These cards are full of `text-black` — they were drawn for a cream
+        // page. Under the education shell the page is `bg-neo-navy`, so a navy
+        // card put black copy on near-black: the lesson NAME measured 1.23:1.
+        // A solid cream card is what the ink was designed for, and it gives the
+        // card its own edge against the navy behind it.
         const cardBg =
-          status === 'assigned' ? 'bg-neo-navy' : status === 'completed' ? 'bg-neo-lime/10' : 'bg-neo-navy';
+          status === 'completed' ? 'bg-neo-lime' : 'bg-neo-cream';
         const accentBar =
           status === 'assigned' ? 'bg-neo-cyan' : status === 'completed' ? 'bg-neo-lime' : 'bg-black/20';
         const fillColor = status === 'completed' ? 'bg-neo-lime' : 'bg-neo-cyan';

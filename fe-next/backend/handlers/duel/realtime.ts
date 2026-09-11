@@ -14,6 +14,12 @@ import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
 import logger from '@/backend/utils/logger';
 import timerManager from '@/backend/utils/timerManager';
 import { checkRateLimit } from '../../utils/rateLimiter';
+import {
+  advanceDuelCombo,
+  breakDuelCombo,
+  createDuelComboState,
+  type DuelComboState,
+} from '@/backend/modules/duelCombo';
 
 // ==========================================
 // In-Memory Game State
@@ -31,6 +37,12 @@ interface RealtimeGameState {
   opponentWords: string[];
   challengerScore: number;
   opponentScore: number;
+  /**
+   * Per-player combo chains. Lazily created so duels started before this
+   * shipped (and the existing handler tests) keep working without them.
+   */
+  challengerCombo?: DuelComboState;
+  opponentCombo?: DuelComboState;
   /** Set to true when completion is in progress — blocks new word submissions */
   completing?: boolean;
 }
@@ -106,15 +118,22 @@ export function registerRealtimeHandlers(
         playerWords
       );
 
+      const combo = getPlayerCombo(gameState, isChallenger);
+
       if (!result.valid) {
+        // A miss snaps the chain — the client dims the meter on comboStreak 0.
+        breakDuelCombo(combo);
         socket.emit('duel:word-rejected', {
           word: payload.word,
           reason: result.reason || 'invalid',
+          comboStreak: combo.streak,
         });
         return;
       }
 
-      const points = result.score;
+      // Combo bonus is ADDITIVE on top of the base dictionary score.
+      const { streak: comboStreak, bonus: comboBonus } = advanceDuelCombo(combo, Date.now());
+      const points = result.score + comboBonus;
 
       // Update in-memory state
       playerWords.push(result.normalizedWord);
@@ -130,6 +149,8 @@ export function registerRealtimeHandlers(
         points,
         totalScore: isChallenger ? gameState.challengerScore : gameState.opponentScore,
         wordCount: playerWords.length,
+        comboStreak,
+        comboBonus,
       });
 
       // Broadcast to opponent: progress update
@@ -138,6 +159,7 @@ export function registerRealtimeHandlers(
         opponentId: userId,
         totalScore: isChallenger ? gameState.challengerScore : gameState.opponentScore,
         wordCount: playerWords.length,
+        comboStreak,
       });
 
       logger.info(
@@ -151,6 +173,19 @@ export function registerRealtimeHandlers(
       });
     }
   });
+}
+
+/**
+ * Lazily resolve a player's combo chain on the shared game state.
+ * Each player owns their own chain — one player's miss never cools the other.
+ */
+function getPlayerCombo(gameState: RealtimeGameState, isChallenger: boolean): DuelComboState {
+  if (isChallenger) {
+    gameState.challengerCombo ??= createDuelComboState();
+    return gameState.challengerCombo;
+  }
+  gameState.opponentCombo ??= createDuelComboState();
+  return gameState.opponentCombo;
 }
 
 // ==========================================
@@ -202,6 +237,8 @@ export async function startRealtimeDuel(
       opponentWords: [],
       challengerScore: 0,
       opponentScore: 0,
+      challengerCombo: createDuelComboState(),
+      opponentCombo: createDuelComboState(),
     };
 
     realtimeGames.set(duelId, gameState);

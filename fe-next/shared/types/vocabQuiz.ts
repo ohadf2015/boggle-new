@@ -111,6 +111,37 @@ export interface VocabQuizReveal {
   nextInMs: number;
   /** True when this was the last question. */
   isLast: boolean;
+  /**
+   * The word the class meets next, reduced to a tease: its first letter and how
+   * long it is. Rides the reveal so the between-questions countdown has
+   * something to show without a second event (and without shipping the whole
+   * next question early).
+   */
+  nextHint?: VocabQuizNextHint;
+}
+
+/** First letter + length of the next question's word. */
+export interface VocabQuizNextHint {
+  letter: string;
+  length: number;
+}
+
+/**
+ * Live commitment count while the clock still runs — what makes the projector's
+ * bars fill in as students lock in, instead of snapping into place at the
+ * reveal. Carries no correctness signal: `distribution` is votes per choice, and
+ * which choice is right ships only in the reveal.
+ */
+export interface VocabQuizLockIn {
+  gameCode: string;
+  /** Question this count belongs to — a late packet for the previous one is dropped. */
+  index: number;
+  /** How many students have committed. */
+  locked: number;
+  /** How many students are in the room. */
+  total: number;
+  /** Votes per choice index. */
+  distribution: number[];
 }
 
 /** Private per-student result for the question they just answered. */
@@ -193,6 +224,7 @@ export const VOCAB_QUIZ_EVENTS = {
   answerResult: 'vocabQuiz:answerResult',
   ended: 'vocabQuiz:ended',
   paused: 'vocabQuiz:paused',
+  lockIn: 'vocabQuiz:lockIn',
   answer: 'vocabQuiz:answer',
   requestState: 'vocabQuiz:requestState',
 } as const;

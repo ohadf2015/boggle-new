@@ -24,6 +24,8 @@ import { getClassrooms, getLesson, createLesson } from '@/lib/supabase/education
 import { createClient } from '@/utils/supabase/client';
 import { classroomMultiplayerPath, type LessonGameData } from '@/lib/education/classroomGameHandoff';
 import { clearQuickLaunchIntent, type QuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
+import { ModePickerStrip } from './modePicker/ModePickerStrip';
+import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 import type { Classroom, Language } from '@/lib/supabase/education/types';
@@ -50,7 +52,7 @@ import {
  */
 const LAUNCH_TIMEOUT_MS = 20_000;
 
-const EMPTY_SNAPSHOT: LaunchSnapshot = { stage: 'classroom', failure: null, gameCode: null };
+const EMPTY_SNAPSHOT: LaunchSnapshot = { stage: 'classroom', failure: null, gameCode: null, mode: null };
 
 const STAGES: QuickLaunchStage[] = ['classroom', 'lesson', 'room'];
 const STAGE_LABEL: Record<QuickLaunchStage, string> = {
@@ -83,9 +85,16 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
   saveConfigRef.current = saveConfig;
 
   const [attempt, setAttempt] = useState(0);
-  // One key per (intent, attempt). A remount reuses the run already in flight;
-  // Retry mints a new key and therefore a genuinely new run.
-  const launchKey = `${intent.createdAt}:${attempt}`;
+  /**
+   * The poster the teacher tapped on the way past. `null` — the normal case —
+   * leaves the runner's derived mode alone, so GO LIVE is still one tap and
+   * nothing about the default path changed.
+   */
+  const [modeOverride, setModeOverride] = useState<ClassroomGameMode | null>(null);
+  // One key per (intent, attempt, chosen mode). A remount reuses the run already
+  // in flight; Retry — or a different poster — mints a new key and therefore a
+  // genuinely new run.
+  const launchKey = `${intent.createdAt}:${attempt}:${modeOverride ?? 'auto'}`;
 
   const snapshot =
     useSyncExternalStore(
@@ -94,7 +103,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
       () => undefined
     ) ?? EMPTY_SNAPSHOT;
 
-  const { stage, failure, gameCode: liveGameCode } = snapshot;
+  const { stage, failure, gameCode: liveGameCode, mode: derivedMode } = snapshot;
 
   const teacherName = profile?.display_name || user?.email || 'Teacher';
   const defaultClassName = t('teacher.playNow.defaultClassName');
@@ -173,6 +182,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
               defaultClassName,
               uiLanguage: language,
               onStage: control.setStage,
+              modeOverride: modeOverride ?? undefined,
               listClassrooms: async () => {
                 const { data } = await getClassrooms(authUserId);
                 return (data || []) as Classroom[];
@@ -212,6 +222,10 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             control.fail(result.failure);
             return;
           }
+
+          // Tell the screen which game it is about to be, so the strip below
+          // can mark it before the room even answers.
+          control.setMode(result.payload.settings.gameMode);
 
           const staged: LessonGameData = {
             lessonId: result.lesson.id,
@@ -280,6 +294,21 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
     setAttempt((n) => n + 1);
   }, [launchKey]);
 
+  /**
+   * A second tap, on a poster. Abandons the run in flight (its socket and its
+   * watchdog go with it) and starts a fresh one with the chosen game. Tapping
+   * the game that is already loading does nothing — a teacher confirming their
+   * own choice should not cost the class a restart.
+   */
+  const switchMode = useCallback(
+    (mode: ClassroomGameMode) => {
+      if (mode === (modeOverride ?? derivedMode)) return;
+      abandonLaunch(launchKey);
+      setModeOverride(mode);
+    },
+    [launchKey, modeOverride, derivedMode]
+  );
+
   const openFullSetup = useCallback(() => {
     abandonLaunch(launchKey);
     onOpenFullSetup();
@@ -289,7 +318,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
     return (
       <div
         data-testid="express-failure"
-        className="rounded-neo-lg border-4 border-neo-red bg-neo-cream p-6 shadow-hard-lg text-center"
+        className="min-h-0 flex-1 overflow-y-auto rounded-neo-lg border-4 border-neo-red bg-neo-cream p-6 shadow-hard-lg text-center"
       >
         <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-neo border-3 border-black bg-neo-red/15 shadow-hard-sm">
           <TriangleAlert className="size-7 text-neo-red" strokeWidth={3} aria-hidden="true" />
@@ -323,11 +352,12 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
   }
 
   const stageIndex = STAGES.indexOf(stage);
+  const liveMode = (modeOverride ?? derivedMode) as ClassroomGameMode | null;
 
   return (
     <div
       data-testid="express-progress"
-      className="rounded-neo-lg border-4 border-black bg-neo-navy p-6 shadow-hard-lg sm:p-10"
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-black bg-neo-navy p-5 shadow-hard-lg sm:p-8"
     >
       <div className="flex items-center justify-center gap-3">
         <Rocket className="size-9 shrink-0 text-neo-lime motion-safe:animate-bounce" strokeWidth={3} aria-hidden="true" />
@@ -350,7 +380,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
                 'flex min-h-12 items-center gap-3 rounded-neo border-3 border-black px-4 py-2',
                 done && 'bg-neo-lime/90 text-black shadow-hard-sm',
                 now && 'bg-neo-cream text-black shadow-hard',
-                !done && !now && 'bg-neo-navy-light text-neo-white/50'
+                !done && !now && 'bg-neo-navy-light text-neo-cream/80'
               )}
             >
               <span className="flex size-6 shrink-0 items-center justify-center" aria-hidden="true">
@@ -365,6 +395,31 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
           );
         })}
       </ol>
+
+      {/*
+        The picker, while the room spins up. GO LIVE stays one tap — this costs
+        the teacher who does not care exactly nothing — but the teacher who
+        glanced at the projector and wanted Blast instead has somewhere to say
+        so, without being sent back through the full setup screen.
+
+        Held back until the runner has derived a mode. The strip leads with the
+        chosen poster, so painting it early puts Classic at the head of the row
+        and then reshuffles every tile when the real answer arrives — pitfall
+        class 1, and on a screen that is up for two seconds that reorder is the
+        whole screen. There is also nothing to offer yet: "switch the game"
+        needs a game to switch away from.
+      */}
+      {liveMode && (
+        <div className="mx-auto mt-6 max-w-3xl border-t-2 border-neo-white/15 pt-4">
+          <p className="text-center font-neo-display text-xs font-black uppercase tracking-tight text-neo-white/70">
+            {t('education.modePicker.sheetTitle')}
+          </p>
+          <p className="mb-3 mt-0.5 text-center font-neo-body text-[0.7rem] font-bold text-neo-cream/80">
+            {t('education.modePicker.sheetHint')}
+          </p>
+          <ModePickerStrip selected={liveMode} recommended={null} onPick={switchMode} />
+        </div>
+      )}
     </div>
   );
 }

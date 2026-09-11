@@ -10,7 +10,8 @@ import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
 
-const CLASSROOM_GAME_TTL = 14400; // 4 hours
+/** Exported so in-place settings edits (classroomGameSettings) re-use ONE TTL. */
+export const CLASSROOM_GAME_TTL = 14400; // 4 hours
 
 function getRedis() {
   const client = getRedisClient();

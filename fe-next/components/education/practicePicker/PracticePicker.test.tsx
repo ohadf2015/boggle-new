@@ -154,3 +154,46 @@ describe('PracticePicker', () => {
     expect(screen.queryByTestId('practice-tile-plays-solo_board')).not.toBeInTheDocument();
   });
 });
+
+describe('PracticePicker poster grid', () => {
+  it('shows what each game pays, so the tiles are not interchangeable', () => {
+    renderIt();
+    // Spelling pays 20/word against Blitz's 10 — the reason to pick one.
+    expect(screen.getByTestId('practice-tile-xp-spelling')).toHaveTextContent('20');
+    expect(screen.getByTestId('practice-tile-xp-blitz')).toHaveTextContent('10');
+  });
+
+  it('does not advertise XP on the read-only word list', () => {
+    renderIt();
+    expect(screen.queryByTestId('practice-tile-xp-word_list')).not.toBeInTheDocument();
+  });
+
+  it('gives every tile mascot art, poster or fallback', () => {
+    renderIt();
+    for (const id of ['blitz', 'flashcard', 'spelling', 'matching', 'solo_board']) {
+      const art = screen.getByTestId(`practice-tile-art-${id}`);
+      expect(art).toHaveAttribute('src', expect.stringMatching(/\.webp$/));
+    }
+  });
+
+  it('uses the full-bleed poster where one has been drawn', () => {
+    renderIt();
+    expect(screen.getByTestId('practice-tile-art-blitz')).toHaveAttribute(
+      'src',
+      '/mascot/teacher/practice-blitz.webp'
+    );
+  });
+
+  it('keeps every tile to a single line of copy so the grid fits a phone', () => {
+    renderIt();
+    // The old tile stacked title + skill sentence + badges (4 rows). The poster
+    // tile carries the name and one meta row and nothing else.
+    const tile = screen.getByTestId('practice-tile-spelling');
+    expect(tile.querySelectorAll('[data-tile-line]')).toHaveLength(1);
+  });
+
+  it('scrolls the grid, never the page', () => {
+    renderIt();
+    expect(screen.getByTestId('practice-picker-grid').className).toContain('overflow-y-auto');
+  });
+});

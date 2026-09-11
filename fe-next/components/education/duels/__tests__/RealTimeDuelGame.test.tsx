@@ -16,6 +16,10 @@ vi.mock('@/utils/coinManager', () => ({
   awardGameCoins: mockAwardGameCoins,
 }));
 
+// Confetti draws to a real canvas; the reveal screen's celebration is covered
+// by DuelRevealScreen's own test.
+vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
+
 // Mock useDuelSocket hook
 const mockSubmitWord = vi.fn();
 const mockForfeitDuel = vi.fn();
@@ -52,6 +56,8 @@ vi.mock('@/hooks/useDuelSocket', () => ({
       mockListeners['duel:opponent-reconnected'] = cb;
       return () => delete mockListeners['duel:opponent-reconnected'];
     },
+    onDuelCreated: vi.fn(() => () => {}),
+    onError: vi.fn(() => () => {}),
     onDuelCompleted: (cb: Function) => {
       mockListeners['duel:completed'] = cb;
       return () => delete mockListeners['duel:completed'];
@@ -354,7 +360,9 @@ describe('RealTimeDuelGame', () => {
     mockListeners['duel:completed']?.(completedData);
 
     await waitFor(() => {
-      expect(screen.getByText('duels.youWin')).toBeInTheDocument();
+      // The completed phase is now DuelRevealScreen (mascot clip + confetti +
+      // coin flight + best-of-3), not the old static trophy badge.
+      expect(screen.getByText('education.duels.revealWin')).toBeInTheDocument();
     });
   });
 

@@ -20,10 +20,21 @@ export interface LaunchSnapshot {
   failure: QuickLaunchFailure | null;
   /** Set once the SERVER confirmed the room; the caller then navigates. */
   gameCode: string | null;
+  /**
+   * The mode this launch settled on, as soon as the runner knows it.
+   *
+   * The express screen shows a poster strip while the room spins up, and it
+   * cannot highlight the live mode without being told: the mode is derived
+   * inside the runner from the lesson's own words, which the screen has never
+   * seen. `null` until the runner gets that far.
+   */
+  mode: string | null;
 }
 
 export interface LaunchControl {
   setStage: (stage: QuickLaunchStage) => void;
+  /** Announce the mode the runner derived, so the strip can mark it. */
+  setMode: (mode: string) => void;
   fail: (failure: QuickLaunchFailure) => void;
   succeed: (gameCode: string) => void;
   /** Torn down when the launch is abandoned (retry, or the teacher walks out). */
@@ -62,7 +73,7 @@ function update(key: string, launch: Launch, next: Partial<LaunchSnapshot>): voi
 export function ensureLaunch(key: string, start: (control: LaunchControl) => void): void {
   if (launches.has(key)) return;
   const launch: Launch = {
-    snapshot: { stage: 'classroom', failure: null, gameCode: null },
+    snapshot: { stage: 'classroom', failure: null, gameCode: null, mode: null },
     disposers: [],
     settled: false,
   };
@@ -73,6 +84,10 @@ export function ensureLaunch(key: string, start: (control: LaunchControl) => voi
     setStage: (stage) => {
       if (launch.settled || launch.snapshot.stage === stage) return;
       update(key, launch, { stage });
+    },
+    setMode: (mode) => {
+      if (launch.settled || launch.snapshot.mode === mode) return;
+      update(key, launch, { mode });
     },
     // First cause wins. A watchdog firing after the real error would otherwise
     // rename the problem to "timeout" and send the teacher down the wrong path.

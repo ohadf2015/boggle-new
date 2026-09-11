@@ -28,7 +28,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './results/ResultsPodium';
 import { StudentRoundOutcome } from './results/StudentRoundOutcome';
+import { WinnerSpotlight } from './results/WinnerSpotlight';
 import { WordCoverageGlance } from './results/WordCoverageGlance';
+import { useRoundEndReveal } from './results/useRoundEndReveal';
+import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
+import { sessionKeyFor } from '@/lib/education/roundEndHistory';
+import { isRevealed, sweepReached } from '@/lib/education/roundEndStage';
 import { ClassNeedsHelp } from './results/ClassNeedsHelp';
 import { ReteachActions } from './results/ReteachActions';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
@@ -65,6 +70,30 @@ export function ClassroomResultsCard({
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
   const links = useReteachLinks(summary, isTeacher);
+  const stage = useRoundEndReveal(true);
+
+  // The student's own line in the server's standings — the one row this card is
+  // allowed to bank. Bots ride along in the payload and are not classmates.
+  // One computation, read by the history hook and by the coverage meter — the
+  // phone and the projector must never disagree about whether the class swept
+  // it (Pitfall Class 3: two renderers, one number).
+  const classSwept = summary.totalWords > 0 && summary.classFoundCount >= summary.totalWords;
+
+  const humans = (standings ?? []).filter((p) => !(p as { isBot?: boolean }).isBot);
+  const myIndex = humans.findIndex(
+    (p) => p.username.trim().toLowerCase() === username.trim().toLowerCase()
+  );
+  const { momentum } = useSessionRoundHistory({
+    sessionKey: sessionKeyFor(summary),
+    score: myIndex >= 0 ? humans[myIndex].score : 0,
+    rank: myIndex + 1,
+    players: humans.length,
+    sweep: classSwept,
+    // A teacher's card is a report, not a scoreboard; and nothing is banked
+    // until this player actually has a placing, so a card that mounts before
+    // the scores settle cannot record a zero (Pitfall Class 3).
+    ready: !isTeacher && myIndex >= 0,
+  });
 
   // `neverPlacedWords` is a subset of `missedWords`: lesson words the board
   // generator never embedded. Absent means "we cannot tell" — then every miss
@@ -82,8 +111,20 @@ export function ClassroomResultsCard({
         : undefined,
   }));
 
+  // The winner's fanfare belongs to the winner's own phone. Every other phone
+  // in the room shows the same bar, the same mascot and the same name — in
+  // silence. `viewerWon` is read off the SERVER's podium, never re-ranked here.
+  const viewerWon =
+    !!podium[0] && podium[0].username.trim().toLowerCase() === username.trim().toLowerCase();
+
   return (
-    <div className="p-5 rounded-neo border-neo border-neo-black bg-neo-navy shadow-hard">
+    <div
+      data-testid="classroom-results-card"
+      // Self-describing for a screenshot harness (and for a human wondering
+      // whether the podium is mid-reveal or broken): poll for `done`.
+      data-round-end-stage={stage}
+      className="p-5 rounded-neo border-[2px] border-neo-black bg-neo-navy shadow-hard"
+    >
       <div className="flex items-start gap-3 mb-4">
         <GraduationCap className="w-6 h-6 text-neo-lime shrink-0 mt-0.5" />
         <div className="min-w-0">
@@ -103,6 +144,7 @@ export function ClassroomResultsCard({
           username={username}
           standings={standings}
           mastery={summary.masteryByPlayer[username]}
+          momentum={momentum}
           t={t}
         />
       )}
@@ -112,7 +154,20 @@ export function ClassroomResultsCard({
           <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-neo-yellow">
             {t('education.results.podium.title')}
           </p>
-          <ResultsPodium entries={podium} t={t} />
+          <ResultsPodium entries={podium} stage={stage} t={t} />
+          {podium[0] && (
+            <div className="mt-3">
+              <WinnerSpotlight
+                winner={{ username: podium[0].username, score: podium[0].score }}
+                active={isRevealed(1, stage)}
+                // The teacher's own device is the room's screen when it is the
+                // only one; a student's is not. And on a swept round the sweep
+                // chime takes the screen's one sound — see ClassroomTvResults.
+                cue={(isTeacher || viewerWon) && !classSwept}
+                t={t}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -121,6 +176,14 @@ export function ClassroomResultsCard({
         username={username}
         isTeacher={isTeacher}
         neverPlaced={neverPlaced}
+        fill={sweepReached(stage)}
+        celebrate={sweepReached(stage)}
+        // The sweep is the room's, so every phone SHOWS it — not only the
+        // phones whose owner personally found all of them. The chime is a
+        // different question: thirty phones chiming out of sync is noise, so
+        // only the room's screen (and the winner's own phone) makes it.
+        classSwept={classSwept}
+        cue={isTeacher || viewerWon}
         t={t}
       />
 
@@ -203,7 +266,7 @@ export function ClassroomResultsCard({
         onClick={links.onShareGap}
         className={cn(
           'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-          'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
+          'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
           'shadow-hard hover:shadow-hard-lg transition-all'
         )}
       >
@@ -226,7 +289,7 @@ export function ClassroomResultsCard({
           onClick={onPractice}
           className={cn(
             'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+            'bg-neo-cyan text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg transition-all'
           )}
         >

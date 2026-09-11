@@ -12,7 +12,7 @@
  * — that file is the regression gate for this split and stays unchanged.
  */
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClassroomResultsCard } from '../ClassroomResultsCard';
@@ -74,19 +74,40 @@ describe('ClassroomResultsCard — the podium', () => {
     useTeacherProSpy.mockClear();
   });
 
-  it('leads with the winners, for the teacher', () => {
+  /**
+   * The plinths are on screen from the first frame — that is the capture-safety
+   * rule and it has its own test in `results/__tests__/ResultsPodium.test.tsx`.
+   * What arrives on the reveal's timetable is the NAME and the SCORE inside
+   * them, so these three assertions wait for the reveal to rest.
+   */
+  const settle = () =>
+    waitFor(
+      () => expect(screen.getByTestId('podium-place-1')).toHaveAttribute('data-revealed', 'true'),
+      { timeout: 4000 }
+    );
+
+  it('paints all the plinths before a single name lands', () => {
     render(<ClassroomResultsCard summary={base} username="Ms. Cohen" isTeacher />);
+    expect(screen.getByTestId('podium-place-1')).toBeInTheDocument();
+    expect(screen.getByTestId('podium-place-2')).toBeInTheDocument();
+  });
+
+  it('leads with the winners, for the teacher', async () => {
+    render(<ClassroomResultsCard summary={base} username="Ms. Cohen" isTeacher />);
+    await settle();
     expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Maya');
     expect(screen.getByTestId('podium-place-1')).toHaveTextContent('90');
   });
 
-  it('shows the same podium to a student — everyone celebrates the same names', () => {
+  it('shows the same podium to a student — everyone celebrates the same names', async () => {
     render(<ClassroomResultsCard summary={base} username="Noa" isTeacher={false} />);
+    await settle();
     expect(screen.getByTestId('podium-place-2')).toHaveTextContent('Noa');
   });
 
-  it('captions each plinth with the words that player found', () => {
+  it('captions each plinth with the words that player found', async () => {
     render(<ClassroomResultsCard summary={base} username="Noa" isTeacher={false} />);
+    await settle();
     expect(screen.getByTestId('podium-detail-1')).toHaveTextContent(
       'education.results.podium.wordsFound:{"found":2,"total":4}'
     );

@@ -18,6 +18,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Check, X, BookOpen, Sparkles, ArrowLeftRight, Quote, Layers, Blocks } from 'lucide-react';
 import PracticeResultsCard from './PracticeResultsCard';
+import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 import {
   buildFocusQuestions,
   BLANK,
@@ -43,6 +44,10 @@ export interface VocabFocusPracticeProps {
     sessionXpEarned: number;
     sessionMasteryMessage: string | null;
   };
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
   /** Questions per round (capped at the number of usable words). */
   questionCount?: number;
   /** Fixed seed for a reproducible question set (tests). Defaults to the clock. */
@@ -92,11 +97,14 @@ export function VocabFocusPractice({
   onComplete,
   onBack,
   xpSessionData,
+  onNext,
+  nextLabel,
   questionCount = DEFAULT_QUESTION_COUNT,
   seed,
   language,
 }: VocabFocusPracticeProps) {
   const { t, dir } = useLanguage();
+  const sfx = usePracticeSfx();
   const isRTL = dir === 'rtl';
 
   const [round, setRound] = useState(0);
@@ -132,9 +140,14 @@ export function VocabFocusPractice({
     (choiceIndex: number) => {
       if (answered || !question) return;
       setSelected(choiceIndex);
-      if (choiceIndex === question.answerIndex) setCorrectCount((c) => c + 1);
+      if (choiceIndex === question.answerIndex) {
+        sfx.correct();
+        setCorrectCount((c) => c + 1);
+      } else {
+        sfx.wrong();
+      }
     },
-    [answered, question]
+    [answered, question, sfx]
   );
 
   const handleNext = useCallback(() => {
@@ -146,9 +159,10 @@ export function VocabFocusPractice({
       onComplete({ correct: correctCount, total, accuracy: total ? correctCount / total : 0, focus });
       return;
     }
+    sfx.advance();
     setIndex((i) => i + 1);
     setSelected(null);
-  }, [answered, isLast, correctCount, total, focus, onComplete]);
+  }, [answered, isLast, correctCount, total, focus, onComplete, sfx]);
 
   const handleRestart = useCallback(() => {
     setRound((r) => r + 1);
@@ -165,7 +179,7 @@ export function VocabFocusPractice({
   // Not enough teacher data for this focus
   if (total === 0) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-md w-full rounded-neo border-3 border-black shadow-hard bg-neo-cream p-6 text-center">
           <h2 className="text-2xl font-neo-display text-neo-black mb-2">{t(`education.vocabFocus.focus.${focus}`)}</h2>
           <p className="font-neo-body text-neo-black/80 mb-6 text-pretty">{t(`education.vocabFocus.notEnough.${focus}`)}</p>
@@ -184,7 +198,7 @@ export function VocabFocusPractice({
 
   if (showResults) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         <PracticeResultsCard
           correct={correctCount}
           total={total}
@@ -193,13 +207,15 @@ export function VocabFocusPractice({
           timeSpent={timeSpent}
           onRestart={handleRestart}
           onBack={onBack}
+          onNext={onNext}
+          nextLabel={nextLabel}
         />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">

@@ -13,11 +13,17 @@ import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { WordContextRow } from './WordContextRow';
 import { PronunciationButton } from './PronunciationButton';
+import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
+import StreakFlame from '@/components/education/practice/StreakFlame';
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
   onComplete: (results: { correct: number; total: number; accuracy: number }) => void;
   onBack: () => void;
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
   /** XP session data to display on results screen (optional) */
   xpSessionData?: {
     sessionXpEarned: number;
@@ -41,9 +47,12 @@ export function SpellingChallengePractice({
   onComplete,
   onBack,
   xpSessionData,
+  onNext,
+  nextLabel,
 }: SpellingChallengePracticeProps) {
   const { t, dir, language } = useLanguage();
   const isRTL = dir === 'rtl';
+  const sfx = usePracticeSfx();
 
   const {
     currentWord,
@@ -76,9 +85,12 @@ export function SpellingChallengePractice({
   const sessionStartRef = useRef<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize session start time
+  // Initialize session start time — and open the round with a cue, so the
+  // student hears that a drill has begun rather than just seeing a new card.
   useEffect(() => {
     sessionStartRef.current = Date.now();
+    sfx.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per mount
   }, []);
 
   // Focus input on mount and word change
@@ -105,6 +117,8 @@ export function SpellingChallengePractice({
       if (!inputValue.trim() || feedback) return;
 
       const result = submitAnswer(inputValue);
+      if (result.correct) sfx.correct();
+      else sfx.wrong();
       setFeedback(result);
       setInputValue('');
 
@@ -114,7 +128,7 @@ export function SpellingChallengePractice({
         setFeedback(null);
       }, delay);
     },
-    [inputValue, feedback, submitAnswer]
+    [inputValue, feedback, submitAnswer, sfx]
   );
 
   const handleRestart = useCallback(() => {
@@ -136,7 +150,7 @@ export function SpellingChallengePractice({
 
   if (showResults) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4">
         <PracticeResultsCard
           correct={correctCount}
           total={attempts}
@@ -147,13 +161,15 @@ export function SpellingChallengePractice({
           timeSpent={timeSpent}
           maxStreak={maxStreak}
           hintsUsed={totalHintsUsed}
+          onNext={onNext}
+          nextLabel={nextLabel}
         />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="max-w-2xl mx-auto mb-6">
         <div className="flex items-center justify-between">
@@ -191,20 +207,16 @@ export function SpellingChallengePractice({
 
       {/* Main content */}
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Streak display */}
+        {/*
+          The streak used to be a flat orange pill reading "4x streak". It is
+          now a fire that visibly grows through four stages and stings when it
+          reaches a new one — the one tense mechanic in this drill, finally
+          audible. `streak-display` stays as the testid for existing coverage.
+        */}
         {currentStreak > 0 && (
-          <AdaptiveMotion.div
-            data-testid="streak-display"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className={cn(
-              'mx-auto w-fit px-4 py-2 rounded-neo',
-              'bg-neo-orange border-neo border-neo-black shadow-hard',
-              'font-neo-display text-neo-white text-lg'
-            )}
-          >
-            {currentStreak}x {t('education.practice.streak')}!
-          </AdaptiveMotion.div>
+          <div data-testid="streak-display" className="flex justify-center">
+            <StreakFlame streak={currentStreak} />
+          </div>
         )}
 
         {/* Definition card */}
@@ -251,7 +263,10 @@ export function SpellingChallengePractice({
           <Button
             variant="ghost"
             size="sm"
-            onClick={getHint}
+            onClick={() => {
+              sfx.hint();
+              getHint();
+            }}
             disabled={!!feedback || isComplete}
             data-testid="hint-button"
             className="text-neo-yellow hover:text-neo-yellow/80"

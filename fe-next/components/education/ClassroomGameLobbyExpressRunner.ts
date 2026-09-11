@@ -65,6 +65,15 @@ export interface QuickLaunchDeps {
     words: VocabularyWord[];
   }) => Promise<{ data?: VocabularyLesson | null; error?: { message: string } | null }>;
   onStage: (stage: QuickLaunchStage) => void;
+  /**
+   * The mode the teacher picked from the poster strip on the launch screen.
+   *
+   * Absent — the overwhelming case — the mode is derived from the words and
+   * GO LIVE stays exactly one tap. Present, it wins: a teacher who looked at
+   * the posters and wanted a different game gets that game, without being sent
+   * back through the full setup screen to ask for it.
+   */
+  modeOverride?: ClassroomGameMode;
 }
 
 export interface CreateClassroomGamePayload {
@@ -191,7 +200,7 @@ export async function prepareQuickLaunch(
     return { ok: false, failure: { code: 'lesson', reason: 'EMPTY' } };
   }
 
-  const gameMode = pickQuickLaunchMode(lessonWords);
+  const gameMode = deps.modeOverride ?? pickQuickLaunchMode(lessonWords);
   const isQuiz = gameMode === 'vocab-quiz';
 
   return {

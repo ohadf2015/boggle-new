@@ -6,12 +6,13 @@
 
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { type ReactNode, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { NeoPanel } from '@/components/ui/panel';
 import SubscriptionStatusCard from '@/components/teacher/SubscriptionStatusCard';
@@ -22,7 +23,6 @@ function TeacherProfileInner() {
   const { user, profile, loading, isAuthenticated } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
-  const isRTL = language === 'he';
   const { classrooms, isLoading: classroomsLoading } = useClassrooms();
 
   const isTeacher = profile?.is_admin === true || profile?.user_role === 'teacher' || profile?.user_role === 'admin';
@@ -39,9 +39,12 @@ function TeacherProfileInner() {
     }
   }, [loading, isAuthenticated, isTeacher, router, language]);
 
+  // The loading branch is inside the shell too (the shell is now above the
+  // gate): a page that scrolls for the second before the profile lands, then
+  // stops, is a jolt on a phone.
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy">
+      <div className="flex h-full items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
@@ -55,20 +58,14 @@ function TeacherProfileInner() {
   const userRole = profile?.user_role || (profile?.is_admin ? 'teacher' : 'student');
 
   return (
-    <div
-      data-testid="teacher-profile-page"
-      className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}
-    >
-      <EducationHeader showBackButton />
-
-      <div className="w-full max-w-3xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
+    <div data-testid="teacher-profile-page" className="w-full max-w-3xl mx-auto">
 
         {/* Profile Header */}
         <NeoPanel tone="cream" className="mb-8 p-6">
           <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className="w-20 h-20 rounded-neo bg-neo-cyan border-3 border-neo-black shadow-hard-sm flex items-center justify-center shrink-0">
-              <span className="text-4xl" role="img" aria-label={t('teacher.profile.avatar')}>
+              <span className="text-4xl text-neo-black" role="img" aria-label={t('teacher.profile.avatar')}>
                 {profile?.avatar_emoji || '👩‍🏫'}
               </span>
             </div>
@@ -125,7 +122,10 @@ function TeacherProfileInner() {
                 </div>
                 <div
                   data-testid="total-student-count"
-                  className="text-4xl font-neo-display font-black text-neo-cyan"
+                  // Was text-neo-cyan on a cream panel — 1.24:1, the biggest
+                  // number on the screen and the hardest to read. Black on
+                  // cream is ~17:1; the cyan chip above still carries the hue.
+                  className="text-4xl font-neo-display font-black text-neo-black"
                 >
                   {totalStudents}
                 </div>
@@ -187,13 +187,37 @@ function TeacherProfileInner() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';
 
+/**
+ * Shell above gate. `TeacherGate`'s loader and its denial are not this file's
+ * markup, so a shell mounted only by the inner component would leave a teacher's
+ * very first frame — and a non-teacher's only frame — scrolling the document.
+ */
 export default function TeacherProfilePage() {
-  return <TeacherGate><TeacherProfileInner /></TeacherGate>;
+  return (
+    <ProfileShell>
+      <TeacherGate>
+        <TeacherProfileInner />
+      </TeacherGate>
+    </ProfileShell>
+  );
+}
+
+function ProfileShell({ children }: { children: ReactNode }) {
+  const { t, language } = useLanguage();
+  return (
+    <EducationShell
+      className={cn(language === 'he' && 'rtl')}
+      header={<EducationHeader showBackButton />}
+      scrollRegionLabel={t('teacher.shell.profileLabel')}
+      contentClassName="px-4 py-6 sm:px-6 lg:px-8"
+    >
+      {children}
+    </EducationShell>
+  );
 }

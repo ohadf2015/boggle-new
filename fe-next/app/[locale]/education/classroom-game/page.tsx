@@ -7,6 +7,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { buildEducationClassroomJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import PageClient from './PageClient';
+import { LobbySeoTail } from './LobbySeoTail';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,9 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
           tree (ClassroomGameLobby, EducationHeader) emits no h1 at any state, so the page
           genuinely had none. duels' does — see the note there. Checked the rendered
           components, not just the PageClient files. */}
+      {/* Kept in the server HTML, taken out of the layout while the lobby is up
+          — it is 740px tall and was the whole of this route's page scroll. */}
+      <LobbySeoTail>
       <GamePageSeoContent
         title={copy.name}
         description={copy.description}
@@ -79,6 +83,7 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
           </Link>
         </div>
       </section>
+      </LobbySeoTail>
     </>
   );
 }

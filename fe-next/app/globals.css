@@ -3999,6 +3999,46 @@ body.screen-fit-locked #fdw-root {
   display: none;
 }
 
+/* ====================================
+   EDUCATION SHELL LOCK
+   Written by components/education/shell/useEducationShellLock.ts.
+   `<body>` carries `.screen-fit` (min-height:100dvh; overflow-y:auto), so every
+   teacher/student CRUD screen scrolled the document itself. This class stops
+   that; the shell's own h-dvh + flex-1/min-h-0 chain is what gives the single
+   inner region its scrollbar instead.
+   `body.edu-shell-locked` (0,2,1) outranks `.screen-fit` (0,1,0), so the two
+   coexist — NavigationContext keeps writing `.screen-fit` and never fights us.
+   Deliberately separate from `.screen-fit-locked`, which is the in-game signal
+   read by lib/inGameSurface.ts and hides #fdw-root.
+   ==================================== */
+body.edu-shell-locked {
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior-y: none;
+}
+
+/* The cookie sheet's height reservation, undone for a shell-locked screen.
+   `html.has-cookie-consent body.screen-fit` pads the body by the sheet's
+   measured height so an ordinary scrolling page shifts its content up clear of
+   the fixed band. A shell-locked page has nothing to shift: it is sized to the
+   viewport, so the padding takes the height away instead. Measured on
+   /en/teacher at 390x844 — a 398px reservation left the shell 446px tall, the
+   bottom tab bar floating mid-screen and the last rows of content clipped.
+   Same specificity as the generic rule (0,2,2), so this MUST stay after it in
+   the file; --bottom-stack-height is re-stated so the nav / ad-banner
+   reservation is not lost with it. */
+html.has-cookie-consent body.edu-shell-locked {
+  padding-bottom: var(--bottom-stack-height, 0px);
+}
+
+/* ...and re-applied where it belongs: the one region that actually scrolls, so
+   its last row still clears the sheet while the shell keeps its full height. */
+html.has-cookie-consent .edu-shell-scroll {
+  padding-bottom: calc(var(--cookie-consent-height, 0px) + 0.75rem);
+}
+
 /* Full-screen flex container - LOCKED (no scroll) */
 .screen-fit-locked {
   height: 100vh;

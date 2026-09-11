@@ -78,7 +78,7 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
           compact ? "w-10 h-10 px-0" : showLabel ? "w-auto h-10 px-3" : "w-14 h-10 px-1.5",
           // Neo-brutalist base styling
           "bg-neo-cream text-neo-black dark:bg-neo-navy-elevated dark:text-white",
-          "border-3 border-neo-black dark:border-slate-500",
+          "border-3 border-neo-black dark:border-neo-cream",
           "rounded-neo shadow-hard-sm",
           // Hover: lift up with bigger shadow
           "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard",
@@ -114,7 +114,7 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
           // Override default content styling with neo-brutalist look
           "min-w-[180px]",
           "bg-neo-cream dark:bg-neo-navy-light",
-          "border-3 border-neo-black dark:border-slate-500",
+          "border-3 border-neo-black dark:border-neo-cream",
           "rounded-neo shadow-hard-lg",
           "p-1"
         )}

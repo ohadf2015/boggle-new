@@ -1,6 +1,16 @@
 /**
  * The three ways a teacher can answer "which words?" on the PLAY NOW panel.
  *
+ * Every fill here is SOLID, and every control names its own text colour. Both
+ * are deliberate. A `/70` opacity modifier on a CSS-variable colour compiles,
+ * under Tailwind v4, to `color-mix(... )` — which the browser reports as
+ * `oklab(… / 0.7)`. To anything reading `getComputedStyle().backgroundColor`
+ * (the contrast audit, a screen-reader-adjacent tool, any theming pass) that is
+ * not a colour it can reason about, so a translucent control scores as though
+ * it had no fill at all. And an unstyled `<button>` inherits the shell's white
+ * text, which on a cream fill is 1.02:1 — text you cannot read on a control
+ * that looks fine in a screenshot.
+ *
  * All three are visible as one segmented row and each is a plain pressable —
  * deliberately NOT `role="tab"`. The dashboard's own contract test forbids a
  * tab bar, and rightly: a tab implies pages of a form you work through, and
@@ -49,9 +59,10 @@ export const SourceSwitch = memo(function SourceSwitch({
               'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-black px-4 py-2',
               'font-neo-display text-sm font-black uppercase tracking-wide transition-all duration-100',
               'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              // Selected differs by FILL, not by a shade of the same fill.
               on
                 ? cn(tint, 'text-black shadow-hard -translate-y-0.5')
-                : 'bg-neo-cream/85 text-black/70 shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard'
+                : 'bg-neo-cream text-neo-gray shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard'
             )}
           >
             <Icon className="size-4 shrink-0" aria-hidden="true" />
@@ -70,6 +81,7 @@ export const PickRow = memo(function PickRow({
   selected,
   testId,
   accent,
+  recommendedLabel,
   onSelect,
 }: {
   title: string;
@@ -77,6 +89,9 @@ export const PickRow = memo(function PickRow({
   selected: boolean;
   testId: string;
   accent: string;
+  /** Set on the row the panel arms itself with, so the default is named rather
+   *  than left for the teacher to infer from a tick they did not put there. */
+  recommendedLabel?: string;
   onSelect: () => void;
 }) {
   return (
@@ -87,16 +102,20 @@ export const PickRow = memo(function PickRow({
       onClick={onSelect}
       className={cn(
         'group flex w-full min-h-14 items-center gap-3 rounded-neo border-3 border-black px-4 py-3 text-start',
-        'transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        // `text-black` on the button itself: it would otherwise inherit the
+        // shell's white and sit at 1.02:1 on its own cream fill.
+        'text-black transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         selected
-          ? 'bg-neo-cream shadow-hard -translate-y-0.5'
-          : 'bg-neo-cream/70 shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard'
+          ? cn(accent, 'shadow-hard -translate-y-0.5')
+          : 'bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard'
       )}
     >
       <span
         className={cn(
           'flex size-8 shrink-0 items-center justify-center rounded-neo border-3 border-black',
-          selected ? accent : 'bg-neo-white'
+          // The row already carries the accent when armed, so the tick goes
+          // pale against it rather than disappearing into it.
+          selected ? 'bg-neo-cream' : 'bg-neo-white'
         )}
         aria-hidden="true"
       >
@@ -104,7 +123,17 @@ export const PickRow = memo(function PickRow({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-neo-display text-base font-black text-black">{title}</span>
-        <span className="block truncate font-neo-body text-xs font-bold text-black/60">{meta}</span>
+        <span className="flex items-center gap-1.5 font-neo-body text-xs font-bold text-neo-gray">
+          <span className="truncate">{meta}</span>
+          {recommendedLabel ? (
+            <span
+              data-testid={`${testId}-recommended`}
+              className="shrink-0 rounded-full border-2 border-black bg-neo-white px-1.5 py-px font-neo-display text-[10px] font-black uppercase leading-tight text-black"
+            >
+              {recommendedLabel}
+            </span>
+          ) : null}
+        </span>
       </span>
     </button>
   );

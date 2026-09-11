@@ -22,6 +22,13 @@ import { getPendingDuelsForStudent, type DuelRow } from '@/lib/supabase/educatio
 import { cn } from '@/lib/utils';
 import { Users, Swords } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { AsyncDuelTurnCard } from './AsyncDuelTurnCard';
+import {
+  rememberSentTaunt,
+  readSentTaunt,
+  duelTauntById,
+  type DuelTauntId,
+} from '@/lib/education/duelTaunts';
 
 // Opens only when a student picks an opponent, so it stays out of the lobby's
 // first load. No SSR needed for a modal that starts closed.
@@ -40,13 +47,24 @@ export interface DuelLobbyProps {
   lessons: Array<{ id: string; name: string }>;
   /** Callback to switch to another tab (e.g. 'classmates') */
   onTabChange?: (tab: string) => void;
+  /**
+   * studentId -> display name. Without it the pending list printed raw uuids
+   * ("challengeFrom 9f2c…"), which is how this screen read for months.
+   */
+  opponentNames?: Record<string, string>;
 }
 
 // ============================================
 // COMPONENT
 // ============================================
 
-export default function DuelLobby({ classroomId, studentId, lessons, onTabChange }: DuelLobbyProps) {
+export default function DuelLobby({
+  classroomId,
+  studentId,
+  lessons,
+  onTabChange,
+  opponentNames = {},
+}: DuelLobbyProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const {
@@ -54,8 +72,10 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
     leaveLobby,
     acceptChallenge,
     declineChallenge,
+    sendTaunt,
     onLobbyUpdate,
     onChallengeReceived,
+    onTauntReceived,
   } = useDuelSocket();
 
   // State
@@ -63,6 +83,10 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
   const [pendingChallenges, setPendingChallenges] = useState<DuelRow[]>([]);
   const [selectedOpponent, setSelectedOpponent] = useState<OpponentInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  /** duelId -> sticker this device already sent. */
+  const [sentTaunts, setSentTaunts] = useState<Record<string, DuelTauntId>>({});
+  /** duelId -> sticker the other student threw back. */
+  const [incomingTaunts, setIncomingTaunts] = useState<Record<string, DuelTauntId>>({});
 
   // Fetch initial pending challenges
   useEffect(() => {
@@ -119,6 +143,26 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
 
     return cleanup;
   }, [onChallengeReceived, fetchPendingChallenges]);
+
+  // A sticker thrown back lands on the matching turn card.
+  useEffect(() => {
+    if (!onTauntReceived) return;
+    return onTauntReceived((data) => {
+      const taunt = duelTauntById(data.stickerId);
+      if (!taunt) return;
+      setIncomingTaunts((prev) => ({ ...prev, [data.duelId]: taunt.id }));
+    });
+  }, [onTauntReceived]);
+
+  // Handle taunt send — optimistic locally, best-effort over the socket.
+  const handleTaunt = useCallback(
+    (duelId: string, tauntId: DuelTauntId) => {
+      setSentTaunts((prev) => ({ ...prev, [duelId]: tauntId }));
+      rememberSentTaunt(duelId, tauntId);
+      sendTaunt?.(duelId, tauntId);
+    },
+    [sendTaunt]
+  );
 
   // Handle accept challenge
   const handleAccept = useCallback(
@@ -192,54 +236,23 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
         ) : (
           <div className="space-y-3">
             {pendingChallenges.map((challenge) => (
-              <div
+              <AsyncDuelTurnCard
                 key={challenge.id}
-                className={cn(
-                  'p-4 rounded-neo border-3 border-black',
-                  'bg-neo-cream shadow-hard-sm',
-                  'flex items-center justify-between gap-4'
-                )}
-              >
-                <div className="flex-1">
-                  <p className="text-black font-neo-body font-black">
-                    {t('challengeFrom', { name: challenge.challenger_id })}
-                  </p>
-                  <p className="text-black/60 text-sm font-bold">
-                    {lessons.find((l) => l.id === challenge.lesson_id)?.name || t('education.duels.unknownLesson')}
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleAccept(challenge.id)}
-                    className={cn(
-                      'px-4 py-2 font-black rounded-neo',
-                      'bg-neo-cyan text-black',
-                      'border-3 border-black shadow-hard-sm',
-                      'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                      'transition-all duration-100',
-                      'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
-                    )}
-                  >
-                    {t('accept')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDecline(challenge.id)}
-                    className={cn(
-                      'px-4 py-2 font-black rounded-neo',
-                      'bg-neo-pink text-white',
-                      'border-3 border-black shadow-hard-sm',
-                      'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                      'transition-all duration-100',
-                      'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
-                    )}
-                  >
-                    {t('decline')}
-                  </button>
-                </div>
-              </div>
+                duelId={challenge.id}
+                opponentName={
+                  opponentNames[challenge.challenger_id] || t('common.opponent')
+                }
+                lessonName={
+                  lessons.find((l) => l.id === challenge.lesson_id)?.name ||
+                  t('education.duels.unknownLesson')
+                }
+                opponentScore={challenge.challenger_score ?? 0}
+                sentTaunt={sentTaunts[challenge.id] ?? readSentTaunt(challenge.id)}
+                incomingTaunt={incomingTaunts[challenge.id] ?? null}
+                onAccept={handleAccept}
+                onDecline={handleDecline}
+                onTaunt={handleTaunt}
+              />
             ))}
           </div>
         )}

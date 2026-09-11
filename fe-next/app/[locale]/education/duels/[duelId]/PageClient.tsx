@@ -27,6 +27,10 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
   const [duelError, setDuelError] = useState<string | null>(null);
   const [duelType, setDuelType] = useState<'async' | 'realtime'>('async');
   const [opponentName, setOpponentName] = useState<string>('');
+  // Needed for the rematch emit AND the best-of-3 series key. Without them the
+  // reveal screen has no REMATCH button at all — which is how it shipped.
+  const [opponentId, setOpponentId] = useState<string | undefined>(undefined);
+  const [lessonId, setLessonId] = useState<string | undefined>(undefined);
 
   // Verify duel exists and user is a participant
   useEffect(() => {
@@ -61,7 +65,9 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
         // Set duel type and opponent name
         setDuelType(duel.duel_type || 'async');
+        setLessonId(duel.lesson_id ?? undefined);
         const opponentId = duel.challenger_id === user.id ? duel.opponent_id : duel.challenger_id;
+        setOpponentId(opponentId ?? undefined);
         const { data: opponentProfile } = await getProfile(opponentId, 'minimal');
         setOpponentName(opponentProfile?.display_name || t('common.opponent'));
       } catch (error) {
@@ -121,16 +127,36 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
     );
   }
 
+  const isLive = duelType === 'realtime';
+
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-dvh', isRTL && 'rtl')}>
+    <div
+      className={cn(
+        'flex flex-col bg-neo-navy w-full',
+        // A live duel is a game surface: the shell locks and the play panel owns
+        // the one scrolling region, so a thumb never scrolls the page mid-duel.
+        isLive ? 'h-dvh overflow-hidden' : 'min-h-dvh',
+        isRTL && 'rtl'
+      )}
+    >
       <EducationHeader showBackButton title={t('duelsTitle')} />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        {duelType === 'realtime' ? (
+      <main
+        className={cn(
+          'w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8',
+          isLive ? 'flex-1 min-h-0 overflow-hidden py-2' : 'flex-1 py-6'
+        )}
+      >
+        {isLive ? (
           <RealTimeDuelGame
+            // A rematch changes only the [duelId] segment, so React would reuse
+            // the instance and open game 2 on game 1's podium. Remount instead.
+            key={duelId}
             duelId={duelId}
             studentId={user!.id}
             opponentName={opponentName}
+            opponentId={opponentId}
+            lessonId={lessonId}
             onBackToLobby={handleBackToLobby}
           />
         ) : (

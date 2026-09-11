@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { EducationBadgeGrid, type StudentAchievement } from '@/components/education';
 import { cn } from '@/lib/utils';
@@ -189,9 +190,9 @@ export default function StudentProfilePageClient() {
   // Show loader during auth check or while auth is loading
   if (isChecking || loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy">
+      <EducationShell header={<EducationHeader showBackButton />} contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
-      </div>
+      </EducationShell>
     );
   }
 
@@ -200,10 +201,9 @@ export default function StudentProfilePageClient() {
   }
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <EducationHeader showBackButton />
-
-      <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
+    <EducationShell className={cn(isRTL && 'rtl')} header={<EducationHeader showBackButton />}
+      scrollRegionLabel={t('student.dashboard.title')} contentClassName="px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full max-w-7xl mx-auto">
         {/* Profile Header */}
         <div className="mb-8 space-y-6">
           {/* Avatar + Name Row */}
@@ -219,7 +219,7 @@ export default function StudentProfilePageClient() {
               />
             ) : (
               <div className="w-24 h-24 rounded-full bg-neo-cyan border-4 border-neo-black shadow-hard flex items-center justify-center">
-                <span className="text-5xl">{profile?.avatar_emoji || '👤'}</span>
+                <span className="text-5xl text-neo-black">{profile?.avatar_emoji || '👤'}</span>
               </div>
             )}
 
@@ -232,11 +232,11 @@ export default function StudentProfilePageClient() {
                 <div className="px-3 py-1 bg-neo-lime text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                   {t('education.xp.level')} {currentLevel}
                 </div>
-                <div className="px-3 py-1 bg-neo-orange text-neo-white font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
+                <div className="px-3 py-1 bg-neo-cyan text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                   {totalXp} {t('education.xp.totalXp')}
                 </div>
                 {currentStreak > 0 && (
-                  <div className="px-3 py-1 bg-neo-pink text-neo-white font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
+                  <div className="px-3 py-1 bg-neo-orange text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                     🔥 {currentStreak} {t('education.xp.streak')}
                   </div>
                 )}
@@ -565,6 +565,6 @@ export default function StudentProfilePageClient() {
           />
         )}
       </div>
-    </div>
+    </EducationShell>
   );
 }

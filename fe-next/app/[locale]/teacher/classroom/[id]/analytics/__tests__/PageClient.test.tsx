@@ -21,6 +21,12 @@ import { useRouter } from 'next/navigation';
 // MOCKS
 // ============================================
 
+// The page now mounts the shared education header — a compact bar with a way
+// back, which these screens used to lack entirely. It pulls MusicContext in,
+// which this suite has no provider for and no interest in.
+vi.mock('@/components/education/EducationHeader', () => ({
+  EducationHeader: () => <div data-testid="education-header" />,
+}));
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/hooks/useRealtimeClassroomProgress');
 vi.mock('next/navigation', () => ({

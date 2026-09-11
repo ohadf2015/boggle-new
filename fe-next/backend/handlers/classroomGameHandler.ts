@@ -24,6 +24,7 @@ import {
 import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
 import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
 import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
+import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
@@ -480,6 +481,10 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
   // teardown belongs next to the reason for it, not bolted onto a listener list.
   // Both historical event names are still registered there, to ONE guarded body.
   registerClassroomGameEndHandlers(io, socket);
+
+  // Changing the game WITHOUT minting a new code — the gap a blind critic
+  // reproduced. Also its own module, and for the same reason.
+  registerClassroomGameModeHandlers(io, socket);
 }
 
 export default registerClassroomGameHandlers;

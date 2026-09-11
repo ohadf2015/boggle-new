@@ -11,6 +11,7 @@ import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner'
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
 import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
+import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 import { StudentWordBank } from '@/components/education/StudentWordBank';
 import { hideClassroomChrome, classroomPanelExpanded } from '@/lib/education/classroomLobbyChrome';
@@ -604,6 +605,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   // Round state from the server's own traffic: the host never writes the store's `gameActive` (see controls/teacherStripVisibility).
   const teacherStrip = useTeacherStripState({ socket, isActive, isHost, isClassroomMode, showResults, storeGameActive: gameActive });
+  const quizOwnsScreen = useIsVocabQuizRoom(socket);
   const renderView = (): React.JSX.Element => {
     if (showResults) {
       return (
@@ -725,14 +727,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             </div>
           )}
           {isClassroomMode ? (
-            // Hide header + banner during active gameplay to maximize grid space;
-            // show in lobby and results.
-            //
+            // Hide header + banner during gameplay to maximise the play surface.
             // Gated on `gameActive`, NOT `isActive`: `onJoined` sets `isActive`
             // the moment the host lands in the LOBBY, so the old predicate hid
-            // the join code exactly when the teacher needed to put it on a
-            // projector. See lib/education/classroomLobbyChrome.ts.
-            hideClassroomChrome({ gameActive, showResults }) ? null : (
+            // the join code exactly when the teacher needed it on a projector.
+            // The OR: a quiz never sets `gameActive`, so the settings card sat on top of the answer tiles all round.
+            hideClassroomChrome({ gameActive: gameActive || quizOwnsScreen, showResults }) ? null : (
               <>
                 <EducationHeader showBackButton title={t('education.classroomGame.title')} />
                 <ClassroomModeBanner
@@ -744,6 +744,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
                   // own share code would blink out of existence on every reload.
                   isHost={isHost || isClassroomHost}
                   liveGame={liveClassroomGame}
+                  // The room's own socket, so the teacher can change the game
+                  // from inside the lobby instead of exiting and minting a new
+                  // code (mode-picker piece, round 2).
+                  socket={socket}
                 />
               </>
             )
@@ -764,7 +768,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           {/* SPED large-text accommodation: the teacher's support preset rides
               the startGame payload; zoom scales the whole play surface (grid,
               word input, word bank) without touching per-component font sizes. */}
-          <div style={classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
+          <div className={quizOwnsScreen ? 'flex-1 flex flex-col min-h-0' : undefined} style={classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
             {renderView()}
           </div>
           {/* Teacher live controls (classroom rooms). Overlay for everyone while

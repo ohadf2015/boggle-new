@@ -256,7 +256,11 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           onClick={handleSkip}
           className={cn(
             'absolute top-3 z-10 flex h-11 w-11 items-center justify-center',
-            'text-neo-white hover:text-neo-pink transition-colors',
+            // A bare glyph on the panel is not a control: it has no fill and no
+            // border, so the only way out of a first-run modal was a shape you
+            // had to already know was there. Cream edge, ~15:1 against navy.
+            'rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-white',
+            'hover:bg-neo-pink hover:text-black transition-colors',
             isRTL ? 'left-3' : 'right-3'
           )}
           aria-label={t('common.skip')}

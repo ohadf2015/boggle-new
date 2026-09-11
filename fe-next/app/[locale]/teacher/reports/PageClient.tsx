@@ -15,6 +15,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { EducationHeader } from '@/components/education/EducationHeader';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 
 /**
  * TeacherReportsInner - Teacher Reports Page
@@ -85,37 +88,40 @@ function TeacherReportsInner() {
   // No classroom selected - show classroom list
   if (!selectedClassroomId) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 lg:p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl sm:text-3xl font-bold text-neo-white font-neo-display mb-6">
             {t('teacher.reports.title')}
           </h1>
 
-          <h2 className="text-lg text-neo-gray mb-4">
+          <h2 className="text-lg text-neo-white/70 mb-4">
             {t('teacher.reports.selectClassroom')}
           </h2>
 
           {classroomsLoading ? (
-            <div className="text-neo-gray animate-pulse">{t('teacher.reports.loadingClassrooms')}</div>
+            <div className="text-neo-white/70 animate-pulse">{t('teacher.reports.loadingClassrooms')}</div>
           ) : classrooms && classrooms.length > 0 ? (
             <div className="space-y-3">
               {classrooms.map((classroom) => (
                 <button type="button"
                   key={classroom.id}
                   onClick={() => handleClassroomSelect(classroom.id)}
-                  className="w-full flex items-center justify-between p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:bg-neo-navy/80 transition-all text-start"
+                  // The class picker IS the primary action of this screen, and
+                  // it read as navy-on-navy with a black edge (~1.2:1 both
+                  // ways). Cream edge + a lighter fill puts it back on the
+                  // page. Width written literally — `border-neo` is merged
+                  // away by cn() elsewhere and the habit costs nothing here.
+                  className="w-full flex items-center justify-between p-4 bg-neo-navy-light border-[3px] border-neo-cream rounded-neo shadow-hard hover:shadow-hard-pressed hover:-translate-y-0.5 transition-all text-start"
                 >
                   <span className="text-neo-white font-medium">
                     {classroom.name}
                   </span>
-                  <ChevronRight className="w-5 h-5 text-neo-gray rtl:rotate-180" />
+                  <DirectionalIcon icon={ChevronRight} className="w-5 h-5 text-neo-cyan" />
                 </button>
               ))}
             </div>
           ) : (
-            <div className="text-neo-gray">{t('teacher.reports.noClassroomsFound')}</div>
+            <div className="text-neo-white/70">{t('teacher.reports.noClassroomsFound')}</div>
           )}
-        </div>
       </div>
     );
   }
@@ -123,15 +129,14 @@ function TeacherReportsInner() {
   // Student view
   if (selectedStudentId) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 lg:p-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
           {/* Back button */}
           <button type="button"
             onClick={handleBackToClass}
-            className="flex items-center gap-2 text-neo-gray hover:text-neo-white mb-6 transition-colors"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-[2px] border-neo-cream bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm mb-6 transition-all hover:-translate-y-0.5 hover:shadow-hard focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
             aria-label={t('teacher.reports.backToClass')}
           >
-            <ArrowLeft className="w-5 h-5 rtl:scale-x-[-1]" />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             <span>{t('teacher.reports.backToClass')}</span>
           </button>
 
@@ -139,20 +144,17 @@ function TeacherReportsInner() {
             studentId={selectedStudentId}
             classroomId={selectedClassroomId}
           />
-        </div>
       </div>
     );
   }
 
   // Class view
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
         <ClassProgressReport
           classroomId={selectedClassroomId}
           onStudentClick={handleStudentClick}
         />
-      </div>
     </div>
   );
 }
@@ -166,10 +168,33 @@ import { ProGate } from '@/components/teacher/ProGate';
 // analytics dashboard.
 export default function TeacherReportsPage() {
   return (
-    <TeacherGate>
-      <ProGate feature="reports">
-        <TeacherReportsInner />
-      </ProGate>
-    </TeacherGate>
+    <ReportsShell>
+      <TeacherGate>
+        <ProGate feature="reports">
+          <TeacherReportsInner />
+        </ProGate>
+      </TeacherGate>
+    </ReportsShell>
+  );
+}
+
+/**
+ * The shell wraps BOTH gates. Reports has five states a teacher can land on —
+ * the role loader, the role denial, the Pro upsell, the class picker, a report —
+ * and only the last two are this file's own markup. Measured live as a free
+ * teacher on `/en/teacher/reports`: the upsell rendered with no shell at all and
+ * `body` back to plain `.screen-fit`, i.e. the page scrolling again on the one
+ * screen we sell Pro from. One shell, above everything, so all five are held.
+ */
+function ReportsShell({ children }: { children: React.ReactNode }) {
+  const { t } = useLanguage();
+  return (
+    <EducationShell
+      header={<EducationHeader showBackButton />}
+      scrollRegionLabel={t('teacher.reports.title')}
+      contentClassName="p-4 sm:p-6 lg:p-8"
+    >
+      {children}
+    </EducationShell>
   );
 }

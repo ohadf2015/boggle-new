@@ -17,6 +17,7 @@ import {
   onConsentChange,
 } from '@/utils/cookieConsent';
 import { MODAL_OPEN_CLASS } from '@/lib/native/modalOpenSignal';
+import { useInGameSurface } from '@/lib/inGameSurface';
 
 /**
  * True while a modal owns the screen (`html.modal-open`, the ref-counted flag
@@ -59,6 +60,7 @@ export default function CookieConsent() {
   const [advertising, setAdvertising] = useState(false);
   const sheetRef = useRef<HTMLDivElement>(null);
   const modalOwnsScreen = useModalOwnsScreen();
+  const inGameSurface = useInGameSurface();
   const showSheet = visible && !modalOwnsScreen;
 
   useEffect(() => {
@@ -183,7 +185,15 @@ export default function CookieConsent() {
       aria-modal="false"
       aria-label={t('cookieConsent.title')}
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-[200]',
+        'fixed bottom-0 left-0 right-0',
+        // z-[200] wins every stacking contest — including the ones it should
+        // lose. On a projected game surface it covered `TeacherLiveControls`
+        // (z-[70]) and `GamePausedOverlay` (z-60): the class watched a cookie
+        // sheet sit on the host's START GAME and on the round-end screen.
+        // There it drops below both and waits its turn; everywhere else it
+        // keeps the rank that makes ACCEPT ALL reachable over the install
+        // Dialog's body-level z-90 portal.
+        inGameSurface ? 'z-[60]' : 'z-[200]',
         'w-full max-w-2xl mx-auto',
         'min-h-[280px] max-h-[60vh] overflow-y-auto',
         'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
@@ -237,7 +247,7 @@ export default function CookieConsent() {
             className={cn(
               'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
               'text-neo-cyan hover:text-neo-white',
-              'border-2 border-neo-cyan/40 rounded-neo transition-colors duration-100'
+              'border-2 border-neo-cyan rounded-neo transition-colors duration-100'
             )}
           >
             {t('cookieConsent.customize')}
@@ -248,7 +258,7 @@ export default function CookieConsent() {
             className={cn(
               'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
               'text-neo-white hover:text-neo-white',
-              'border-2 border-neo-cream/30 rounded-neo transition-colors duration-100'
+              'border-2 border-neo-cream rounded-neo transition-colors duration-100'
             )}
           >
             {t('cookieConsent.decline')}

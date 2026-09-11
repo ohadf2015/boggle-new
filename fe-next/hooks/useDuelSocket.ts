@@ -34,6 +34,7 @@ import type {
   LobbyUpdateData,
   DuelAcceptedData,
   DuelCompletedData,
+  DuelCreatedData,
   ScoreSubmittedData,
   DuelStartedData,
   WordAcceptedData,
@@ -42,6 +43,7 @@ import type {
   OpponentDisconnectedData,
   OpponentReconnectedData,
   StateSyncedData,
+  TauntReceivedData,
 } from './useDuelSocket.types';
 
 // Re-export types for consumer convenience
@@ -52,6 +54,7 @@ export type {
   OpponentInfo,
   DuelAcceptedData,
   DuelCompletedData,
+  DuelCreatedData,
   ScoreSubmittedData,
   DuelStartedData,
   WordAcceptedData,
@@ -60,6 +63,7 @@ export type {
   OpponentDisconnectedData,
   OpponentReconnectedData,
   StateSyncedData,
+  TauntReceivedData,
 } from './useDuelSocket.types';
 
 // ==========================================
@@ -248,6 +252,11 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     socketRef.current?.emit('duel:sync-state', { duelId });
   }, []);
 
+  /** Throw a mascot sticker at the other side of a duel (ids only — allowlisted server-side). */
+  const sendTaunt = useCallback((duelId: string, stickerId: string) => {
+    socketRef.current?.emit('duel:taunt', { duelId, stickerId });
+  }, []);
+
   // ==========================================
   // Event Listeners
   // ==========================================
@@ -270,6 +279,11 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
   );
   const onDuelCompleted = useCallback(
     (cb: (data: DuelCompletedData) => void) => registerListener('duel:completed', cb),
+    [registerListener]
+  );
+  /** Where a freshly created duel (including a rematch) lives. */
+  const onDuelCreated = useCallback(
+    (cb: (data: DuelCreatedData) => void) => registerListener('duel:created', cb),
     [registerListener]
   );
   const onScoreSubmitted = useCallback(
@@ -308,6 +322,10 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     (cb: (data: StateSyncedData) => void) => registerListener('duel:state-synced', cb),
     [registerListener]
   );
+  const onTauntReceived = useCallback(
+    (cb: (data: TauntReceivedData) => void) => registerListener('duel:taunt-received', cb),
+    [registerListener]
+  );
 
   // ==========================================
   // Return API
@@ -329,6 +347,7 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     submitScore,
     // Real-time actions
     submitWord,
+    sendTaunt,
     forfeitDuel,
     syncState,
     // Event listeners
@@ -337,6 +356,7 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     onDuelAccepted,
     onDuelDeclined,
     onDuelCompleted,
+    onDuelCreated,
     onScoreSubmitted,
     onError,
     // Real-time event listeners
@@ -347,5 +367,6 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     onOpponentDisconnected,
     onOpponentReconnected,
     onStateSynced,
+    onTauntReceived,
   };
 }

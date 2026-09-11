@@ -27,6 +27,8 @@ const { mockSearchParams, mockUseAuth } = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   useSearchParams: () => mockSearchParams,
+  // EducationShell reads the path to decide which tab set the screen gets.
+  usePathname: () => '/en/teacher',
 }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));

@@ -46,6 +46,7 @@ import {
   resumeQuiz,
   type VocabQuizSession,
 } from '../services/vocabQuizEngine.js';
+import { buildLockIn, decorateReveal } from '../services/vocabQuizJuice.js';
 import {
   setQuizSession,
   getQuizSession,
@@ -101,7 +102,20 @@ function emitQuestion(io: Server, session: VocabQuizSession, now: number): void 
 }
 
 function emitReveal(io: Server, session: VocabQuizSession): void {
-  toRoom(io, session.gameCode, VOCAB_QUIZ_EVENTS.reveal, buildReveal(session));
+  // `decorateReveal` adds the next word's tease so the between-questions
+  // countdown has something to show. Same payload, same single path.
+  toRoom(io, session.gameCode, VOCAB_QUIZ_EVENTS.reveal, decorateReveal(session, buildReveal(session)));
+}
+
+/**
+ * How many students have committed, and to what — broadcast on every answer so
+ * the projector's bars fill in live rather than snapping into place at the
+ * reveal. No correctness signal travels here; the right choice still ships only
+ * in the reveal.
+ */
+function emitLockIn(io: Server, session: VocabQuizSession): void {
+  if (session.phase !== 'question') return;
+  toRoom(io, session.gameCode, VOCAB_QUIZ_EVENTS.lockIn, buildLockIn(session));
 }
 
 // ---------------------------------------------------------------------------
@@ -332,6 +346,12 @@ export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
     if (!result) return;
 
     socket.emit(VOCAB_QUIZ_EVENTS.answerResult, result);
+
+    // BEFORE the everyone-answered cut, never after: a lock-in that lands once
+    // the reveal has already gone out would repaint the reveal bars with the
+    // live count. Ordering, not a client-side guard, is what keeps the two
+    // beats in sequence (the client drops stale indices as a second line).
+    emitLockIn(io, ctx.session);
 
     // Everyone in — cut to the reveal without waiting out the clock.
     if (everyoneAnswered(ctx.session) && ctx.session.phase === 'question') {

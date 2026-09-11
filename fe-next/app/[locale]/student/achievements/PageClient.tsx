@@ -15,6 +15,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AchievementGrid, type Achievement } from '@/components/education/achievements/AchievementGrid';
 import { STUDENT_PROGRESS_SELECT, buildAchievementsRecord } from '@/lib/education/achievementProgress';
@@ -94,17 +95,20 @@ export default function StudentAchievementsPageClient() {
   // Show loader while checking auth
   if (loading || isChecking) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-neo-navy">
+      <EducationShell header={<EducationHeader showBackButton />} contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
-      </div>
+      </EducationShell>
     );
   }
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <EducationHeader showBackButton />
-
-      <div className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
+    <EducationShell
+      className={cn(isRTL && 'rtl')}
+      header={<EducationHeader showBackButton />}
+      scrollRegionLabel={t('student.dashboard.achievements')}
+      contentClassName="px-4 py-6 sm:px-6 lg:px-8"
+    >
+      <div className="w-full max-w-5xl mx-auto">
         {/* Back Navigation */}
         <Link
           href={`/${language}/student`}
@@ -142,6 +146,6 @@ export default function StudentAchievementsPageClient() {
           />
         )}
       </div>
-    </div>
+    </EducationShell>
   );
 }

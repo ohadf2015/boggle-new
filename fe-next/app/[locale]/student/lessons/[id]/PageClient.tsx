@@ -26,20 +26,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { usePracticeLesson } from '@/hooks/usePracticeLessons';
 import { usePracticeProgress, usePracticeWords, type PracticeType } from '@/hooks/usePracticeSession';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
-import {
-  FlashcardReview,
-  SoloPracticeBoard,
-  WordListPreview,
-  WarmupRound,
-  WordMatchingPractice,
-  SpellingChallengePractice,
-  TimedBlitzPractice,
-  VocabFocusPractice,
-} from '@/components/practice';
-import { availableFocuses, parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
+import { parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
 import PracticePicker from '@/components/education/practicePicker/PracticePicker';
-import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
+import PracticeModeStage from '@/components/education/practice/PracticeModeStage';
 import {
   buildPracticeTiles,
   nextReadyTile,
@@ -198,11 +189,6 @@ function PracticeContent({
     await completePracticeSession({ type, ...payload });
   }, [completePracticeSession, onGuestResult]);
 
-  // Handle word found during practice
-  const handleWordFound = useCallback(() => {
-    // Individual word progress is aggregated at the end of the round.
-  }, []);
-
   // XP session data for practice components
   const xpSessionData = {
     sessionXpEarned,
@@ -225,193 +211,63 @@ function PracticeContent({
     });
   }, [nextTile, openMode]);
 
-  // Render the selected practice mode
-  const renderPracticeMode = () => {
-    if (!selectedMode || practiceWords.length === 0) return null;
-
-    const commonProps = {
-      lessonName: lesson.name,
-      words: practiceWords,
-      language: lesson.language,
-      onBack: handleBack,
-    };
-
-    switch (selectedMode) {
-      case 'flashcard':
-        return (
-          <FlashcardReview
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('flashcard', { cardsReviewed: results.total, cardsCorrect: results.correct })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'solo_board':
-        if (selectedVariant === 'word_tower') {
-          return (
-            <WordTowerPractice
-              words={practiceWords.map((entry) => entry.word)}
-              language={lesson.language}
-              onComplete={async (results) => {
-                await finishRound('solo_board', {
-                  vocabularyWordsFound: results.vocabularyWordsFound,
-                  newWordsFound: [],
-                });
-                handleBack();
-              }}
-              onBack={handleBack}
-            />
-          );
-        }
-        return (
-          <SoloPracticeBoard
-            {...commonProps}
-            onComplete={(results) =>
-              finishRound('solo_board', {
-                vocabularyWordsFound: results.vocabularyWordsFound,
-                newWordsFound: [],
-              })
-            }
-            onWordFound={handleWordFound}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'word_list':
-        return <WordListPreview {...commonProps} onBack={handleBack} />;
-      case 'warmup':
-        return (
-          <WarmupRound
-            {...commonProps}
-            onComplete={(results) =>
-              finishRound('solo_board', {
-                vocabularyWordsFound: results.vocabularyWordsFound,
-                newWordsFound: [],
-              })
-            }
-            onWordFound={handleWordFound}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'matching':
-        return (
-          <WordMatchingPractice
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('matching', { cardsReviewed: results.total, cardsCorrect: results.correct })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'spelling':
-        return (
-          <SpellingChallengePractice
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('spelling', { cardsReviewed: results.total, cardsCorrect: results.correct })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'blitz':
-        return (
-          <TimedBlitzPractice
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('blitz', {
-                cardsReviewed: results.wordsAttempted,
-                cardsCorrect: results.wordsFound,
-              })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'vocab_focus': {
-        const focus =
-          selectedFocus ??
-          availableFocuses(practiceWords, { language: lesson.language })[0] ??
-          'definition';
-        return (
-          <VocabFocusPractice
-            words={practiceWords}
-            focus={focus}
-            language={lesson.language}
-            onComplete={(results) =>
-              finishRound('vocab_focus', {
-                focus: results.focus,
-                cardsReviewed: results.total,
-                cardsCorrect: results.correct,
-              })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      }
-      default:
-        return null;
-    }
-  };
-
-  // If a mode is selected, render it full-screen with XP header
+  // Playing: the XP bar is the shell's header, the round is the one scroller.
   if (selectedMode) {
     return (
       <>
-        {/* XP Header for practice modes */}
-        <div
-          className="fixed top-0 left-0 right-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-b border-neo-black/30 px-4 py-2"
-          style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0.5rem))' }}
+        <EducationShell
+          className={cn(isRTL && 'rtl')}
+          scrollRegionLabel={lesson.name}
+          header={
+            /*
+              The XP bar used to be `position: fixed` with a `pt-16` spacer
+              under it, which left the document scrolling behind a floating
+              bar on every phone. As the shell's header slot it is the same
+              always-visible strip, but now the shell owns the height and the
+              round below it is the only thing that scrolls.
+
+              It must stay mounted here: it carries `data-xp-flight-target`,
+              and the coins a finished round throws aim at that node.
+            */
+            <div
+              className="flex shrink-0 items-center gap-3 border-b-2 border-neo-white/15 bg-neo-navy px-3 py-2"
+              style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0.5rem))' }}
+            >
+              <div className="min-w-0 flex-1">
+                <XpProgressBar
+                  totalXp={totalXp}
+                  recentXpGain={sessionXpEarned}
+                  size="sm"
+                  showNextLevel={false}
+                />
+              </div>
+              {streak.currentStreak > 0 && (
+                <StreakBonusIndicator currentStreak={streak.currentStreak} size="sm" />
+              )}
+            </div>
+          }
         >
-          <div className="max-w-2xl mx-auto flex items-center gap-4">
-            <div className="flex-1">
-              <XpProgressBar totalXp={totalXp} recentXpGain={sessionXpEarned} size="sm" />
-            </div>
-            {streak.currentStreak > 0 && (
-              <StreakBonusIndicator currentStreak={streak.currentStreak} size="sm" />
-            )}
-          </div>
-        </div>
-
-        {/* Practice content with top padding for XP header */}
-        <div className={cn('pt-16', nextTile && 'pb-24')}>
-          {renderPracticeMode()}
-        </div>
-
-        {/*
-          The other half of the round-end. Every drill already ends on its own
-          card with a retry button, so "practise again" exists; what did not was
-          anywhere to go next except a grid of thirteen tiles. This sits under
-          that card rather than replacing it.
-        */}
-        {nextTile && (
-          <div
-            className="fixed bottom-0 left-0 right-0 z-50 border-t-3 border-black bg-neo-navy/95 px-4 py-3 backdrop-blur-xs"
-            style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
-          >
-            <div className="mx-auto flex max-w-2xl items-center gap-3">
-              <button
-                type="button"
-                data-testid="practice-next-mode"
-                onClick={handleNextTile}
-                className="min-h-[44px] flex-1 rounded-neo border-3 border-black bg-neo-lime px-4 py-2 font-neo-display font-black uppercase text-black shadow-hard transition-all hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
-              >
-                {t('education.practicePicker.nextMode', { mode: t(nextTile.titleKey) })}
-              </button>
-              <button
-                type="button"
-                data-testid="practice-all-modes"
-                onClick={handleBack}
-                className="min-h-[44px] rounded-neo border-3 border-black bg-neo-cream px-4 py-2 font-neo-display font-black uppercase text-black shadow-hard-sm"
-              >
-                {t('education.practicePicker.allModes')}
-              </button>
-            </div>
-          </div>
-        )}
+          {/*
+            The round itself. The old layout added a fixed bottom strip carrying
+            "next game" while the score card carried "play again" — two halves of
+            one decision, 400px apart, with the strip regularly off-screen on a
+            phone. Both now live on the completion card, so `onNext` goes down
+            into the mode rather than a bar being stacked on top of it.
+          */}
+          <PracticeModeStage
+            mode={selectedMode}
+            variant={selectedVariant}
+            focus={selectedFocus}
+            lessonName={lesson.name}
+            language={lesson.language}
+            words={practiceWords}
+            onFinish={finishRound}
+            onBack={handleBack}
+            xpSessionData={xpSessionData}
+            onNext={nextTile ? handleNextTile : undefined}
+            nextLabel={nextTile ? t(nextTile.titleKey) : undefined}
+          />
+        </EducationShell>
 
         {/* Level up celebration modal */}
         <LevelUpCelebration levelUpData={levelUpData} onClose={dismissLevelUp} />
@@ -421,17 +277,25 @@ function PracticeContent({
 
   // Mode selector view
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden min-h-dvh', isRTL && 'rtl')}>
-      <EducationHeader showBackButton />
-
-      <div className="w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
-        {/* XP Progress above mode selector */}
-        <div className="mb-6 flex items-center gap-4">
-          <div className="flex-1">
-            <XpProgressBar totalXp={totalXp} size="md" />
+    <EducationShell className={cn(isRTL && 'rtl')} header={<EducationHeader showBackButton />}
+      scrollRegionLabel={lesson.name}
+      contentClassName="flex flex-col overflow-hidden px-3 py-3 sm:px-6">
+      {/*
+        `h-full min-h-0 flex-col` is what hands the scroll to the tile grid.
+        Without it the picker's own `h-full` resolved against an auto-height
+        scroll context, the grid grew to its full 1700px, and the shell scrolled
+        instead — taking the title, the XP bar and the readiness line off the
+        top of the phone on the first flick.
+      */}
+      <div className="flex h-full min-h-0 w-full max-w-4xl flex-col mx-auto">
+        {/* XP progress: one slim line. The "next level" preview is a second
+            row of chrome on a screen whose job is showing games. */}
+        <div className="mb-2 flex shrink-0 items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <XpProgressBar totalXp={totalXp} size="sm" showNextLevel={false} />
           </div>
           {streak.currentStreak > 0 && (
-            <StreakBonusIndicator currentStreak={streak.currentStreak} />
+            <StreakBonusIndicator currentStreak={streak.currentStreak} size="sm" />
           )}
         </div>
 
@@ -453,7 +317,7 @@ function PracticeContent({
 
       {/* Level up celebration modal */}
       <LevelUpCelebration levelUpData={levelUpData} onClose={dismissLevelUp} />
-    </div>
+    </EducationShell>
   );
 }
 
@@ -504,9 +368,9 @@ export default function LessonPracticePageClient() {
 
   if (loading || isLoadingLesson || isLoadingProgress || !studentId) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy">
+      <EducationShell header={<EducationHeader showBackButton />} contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
-      </div>
+      </EducationShell>
     );
   }
 
@@ -514,7 +378,7 @@ export default function LessonPracticePageClient() {
   // here, leaving a student staring at an empty navy page with no way back.
   if (!lesson) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy px-4">
+      <EducationShell header={<EducationHeader showBackButton />} contentClassName="flex items-center justify-center px-4">
         <div className="w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime p-6 text-neo-black shadow-hard">
           <h1 className="mb-2 font-neo-display text-xl font-black">
             {t('education.practice.lessonUnavailable')}
@@ -530,7 +394,7 @@ export default function LessonPracticePageClient() {
             {t('common.back')}
           </button>
         </div>
-      </div>
+      </EducationShell>
     );
   }
 

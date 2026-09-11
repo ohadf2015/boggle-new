@@ -3,6 +3,7 @@
 import nextDynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { isStudentJoinPath } from '@/components/education/join/joinRoutes';
+import { isQuietChromeSurface } from '@/components/education/shell/quietChromeRoutes';
 
 /**
  * Post-hydration-only chrome mounted by the locale layout: install prompts,
@@ -70,12 +71,19 @@ export default function DeferredLayoutWidgets() {
   // screen (`/multiplayer`), which is this same layout under another path.
   // The silent widgets (version check, churn telemetry, referral attribution)
   // keep running — this is about what covers the field, not a blackout.
-  const quietJoinScreen = isStudentJoinPath(usePathname());
+  const pathname = usePathname();
+  const quietJoinScreen = isStudentJoinPath(pathname);
+  // The teacher's own screens and every projected surface. Each is sized to the
+  // viewport with nowhere left to scroll, and `PWAInstallPrompt` (z-[100]) and
+  // `PushNotificationPrompt` (z-50) both dock on top of `TeacherLiveControls`
+  // (z-[70]) — i.e. over START GAME, in front of a class. The consent sheet is
+  // NOT in this group: it keeps mounting and re-ranks itself instead.
+  const quietChrome = quietJoinScreen || isQuietChromeSurface(pathname);
 
   return (
     <>
       <VersionChecker />
-      {!quietJoinScreen && (
+      {!quietChrome && (
         <>
           <AndroidAppRedirect />
           <AndroidAppInstallPromo />
@@ -83,9 +91,9 @@ export default function DeferredLayoutWidgets() {
           <PWAInstallPrompt />
           <PushNotificationPrompt />
           <NewYearCountdown />
-          <CookieConsent />
         </>
       )}
+      {!quietJoinScreen && <CookieConsent />}
       <ChurnSignalTracker />
       <ReferralCodeClaimer />
     </>

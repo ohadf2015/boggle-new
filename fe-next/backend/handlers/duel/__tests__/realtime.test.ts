@@ -366,10 +366,12 @@ describe('Real-Time Duel Handlers', () => {
       expect(mockSocket.to).toHaveBeenCalledWith('duel:550e8400-e29b-41d4-a716-446655440001');
 
       // Verify opponent-progress emitted
+      // comboStreak rides along so the opponent's swing bar can show a hot rival
       expect(mockRoomEmit).toHaveBeenCalledWith('duel:opponent-progress', {
         opponentId: 'user-1',
         totalScore: 3,
         wordCount: 1,
+        comboStreak: 1,
       });
     });
   });

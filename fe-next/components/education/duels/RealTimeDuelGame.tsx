@@ -1,28 +1,32 @@
 'use client';
 
 /**
- * RealTimeDuelGame - Real-time duel gameplay screen
+ * RealTimeDuelGame — orchestrator for a live 1v1 duel.
  *
- * Features:
- * - Waiting phase (before duel:started)
- * - Playing phase (live word finding with frozen board)
- * - Completed phase (results with win/loss/draw)
- * - Live progress bar showing relative scores
- * - Opponent disconnect overlay
- * - Forfeit confirmation dialog
- * - Server-timestamp countdown timer
- * - Real-time word submission with pending→accepted/rejected states
- * - Neo-brutalist styling
+ * Phases: waiting → playing → completed.
+ *
+ * What changed in this round (the duel had timer pressure but no payoff):
+ * - every word used to be worth the same regardless of pace. The SERVER now
+ *   chains words inside a combo window and pays a flat additive bonus; this
+ *   screen renders that chain (DuelComboMeter) from the numbers the server
+ *   sends — it never recomputes points (Class 3: one owner per number).
+ * - "am I winning?" is now answered in words by DuelSwingBar, live.
+ * - the end was a silent trophy badge. It is now DuelRevealScreen: the mascot's
+ *   champion/defeat clip, confetti + fanfare for the winner, coins that fly
+ *   into a counter, and a REMATCH that carries a best-of-3 tally.
+ *
+ * The layout is a locked column — the play panel owns the single scroll region,
+ * so no page scroll on a phone.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInterval } from '@/hooks/useSafeTimeout';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Swords, Trophy, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDuelSocket } from '@/hooks/useDuelSocket';
 import { useImeText } from '@/hooks/useImeText';
+import { useDuelCombo } from '@/hooks/useDuelCombo';
+import { useDuelRematch } from '@/hooks/useDuelRematch';
 import type {
   DuelStartedData,
   WordAcceptedData,
@@ -31,16 +35,20 @@ import type {
   OpponentDisconnectedData,
   DuelCompletedData,
 } from '@/hooks/useDuelSocket.types';
-import { cn } from '@/lib/utils';
 import { awardGameCoins } from '@/utils/coinManager';
+import {
+  duelSeriesKey,
+  readDuelSeries,
+  recordDuelSeriesResult,
+  duelSeriesStatus,
+  clearDuelSeries,
+  type DuelSeries,
+} from '@/lib/education/duelSeries';
 import { Loader } from '@/components/ui/Loader';
-import { OpponentProgressBar } from './OpponentProgressBar';
 import { DuelDisconnectOverlay } from './DuelDisconnectOverlay';
 import { ForfeitConfirmDialog } from './ForfeitConfirmDialog';
-
-// ============================================
-// TYPE DEFINITIONS
-// ============================================
+import { DuelPlayPanel, type DuelWordStatus } from './DuelPlayPanel';
+import { DuelRevealScreen, type DuelOutcome } from './DuelRevealScreen';
 
 export interface RealTimeDuelGameProps {
   duelId: string;
@@ -53,16 +61,7 @@ export interface RealTimeDuelGameProps {
 
 type GamePhase = 'waiting' | 'playing' | 'completed';
 
-interface WordStatus {
-  word: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  points?: number;
-  reason?: string;
-}
-
-// ============================================
-// COMPONENT
-// ============================================
+const EMPTY_SERIES: DuelSeries = { mine: 0, theirs: 0, games: 0 };
 
 export function RealTimeDuelGame({
   duelId,
@@ -73,7 +72,8 @@ export function RealTimeDuelGame({
   onBackToLobby,
 }: RealTimeDuelGameProps) {
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playWordRejectedSound, playCountdownBeep, setGameActive } = useSoundEffects();
+  const { playWordAcceptedSound, playWordRejectedSound, playCountdownBeep, setGameActive } =
+    useSoundEffects();
   const {
     socket: duelSocket,
     submitWord,
@@ -85,60 +85,91 @@ export function RealTimeDuelGame({
     onOpponentDisconnected,
     onOpponentReconnected,
     onDuelCompleted,
+    onDuelCreated,
+    onError,
   } = useDuelSocket();
 
-  // State
+  const combo = useDuelCombo();
+
   const [phase, setPhase] = useState<GamePhase>('waiting');
   const [boardState, setBoardState] = useState<string[][]>([]);
   const [startTime, setStartTime] = useState<string>('');
   const [timeLimit, setTimeLimit] = useState<number>(180);
   const [timeRemaining, setTimeRemaining] = useState<number>(180);
   const {
-    value: currentWord,
     isEmpty: currentWordEmpty,
     getValue: getCurrentWord,
     reset: resetCurrentWord,
     inputProps: wordInputProps,
   } = useImeText<HTMLInputElement>();
-  const [words, setWords] = useState<WordStatus[]>([]);
+  const [words, setWords] = useState<DuelWordStatus[]>([]);
   const [myScore, setMyScore] = useState(0);
-  const [_myWordCount, setMyWordCount] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
-  const [_opponentWordCount, setOpponentWordCount] = useState(0);
+  const [opponentStreak, setOpponentStreak] = useState(0);
   const [isDisconnected, setIsDisconnected] = useState(false);
   const [gracePeriodSeconds, setGracePeriodSeconds] = useState(30);
   const [showForfeitDialog, setShowForfeitDialog] = useState(false);
   const [result, setResult] = useState<DuelCompletedData | null>(null);
+  const [coinsAwarded, setCoinsAwarded] = useState(0);
+  const [series, setSeries] = useState<DuelSeries>(EMPTY_SERIES);
 
-  // ============================================
-  // TIMER EFFECT
-  // ============================================
+  /**
+   * A duel completes exactly once. The server can legitimately re-emit
+   * duel:completed on a reconnect, and the tally must not count that as a
+   * second game (Class 2: stale state across a round boundary).
+   */
+  const completionRecorded = useRef(false);
+  const peakStreakRef = useRef(0);
+  peakStreakRef.current = Math.max(peakStreakRef.current, combo.peakStreak);
 
-  // Enable sound gate during gameplay
+  const seriesKey = opponentId && lessonId ? duelSeriesKey(opponentId, lessonId) : null;
+
+  /**
+   * A rematch stays inside the /education/duels/[duelId] segment, so React
+   * reuses this instance and every ref/state below would carry game 1 into
+   * game 2: the podium would still be up, and `completionRecorded` would block
+   * the best-of-3 tally from ever counting another game (Class 2 — stale
+   * mutable state across a round boundary). One unconditional reset, keyed on
+   * the duel, beats remembering to clear six things.
+   */
+  const previousDuelId = useRef(duelId);
+  if (previousDuelId.current !== duelId) {
+    previousDuelId.current = duelId;
+    completionRecorded.current = false;
+    peakStreakRef.current = 0;
+    setPhase('waiting');
+    setResult(null);
+    setWords([]);
+    setMyScore(0);
+    setOpponentScore(0);
+    setOpponentStreak(0);
+    setCoinsAwarded(0);
+    setIsDisconnected(false);
+    setStartTime('');
+    combo.reset();
+  }
+
+  // Sound gate follows the live phase
   useEffect(() => {
     const isPlaying = phase === 'playing';
     setGameActive(isPlaying);
     return () => setGameActive(false);
   }, [phase, setGameActive]);
 
-  // Countdown beep in last 10 seconds
   useEffect(() => {
     if (phase === 'playing' && timeRemaining <= 10 && timeRemaining > 0) {
       playCountdownBeep(timeRemaining);
     }
   }, [timeRemaining, phase, playCountdownBeep]);
 
-  useInterval(() => {
-    const start = new Date(startTime).getTime();
-    const now = new Date().getTime();
-    const elapsed = Math.floor((now - start) / 1000);
-    const remaining = Math.max(0, timeLimit - elapsed);
-    setTimeRemaining(remaining);
-  }, phase === 'playing' && startTime ? 100 : null);
-
-  // ============================================
-  // SOCKET EVENT LISTENERS
-  // ============================================
+  useInterval(
+    () => {
+      const start = new Date(startTime).getTime();
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      setTimeRemaining(Math.max(0, timeLimit - elapsed));
+    },
+    phase === 'playing' && startTime ? 100 : null
+  );
 
   useEffect(() => {
     const cleanupStarted = onDuelStarted((data: DuelStartedData) => {
@@ -157,7 +188,8 @@ export function RealTimeDuelGame({
         )
       );
       setMyScore(data.totalScore);
-      setMyWordCount(data.wordCount);
+      // Streak + bonus are the SERVER's numbers; the meter only renders them.
+      combo.registerAccepted(data.comboStreak ?? 0, data.comboBonus ?? 0);
       playWordAcceptedSound();
     });
 
@@ -169,12 +201,13 @@ export function RealTimeDuelGame({
             : w
         )
       );
+      combo.registerRejected(data.comboStreak ?? 0);
       playWordRejectedSound();
     });
 
     const cleanupOpponentProgress = onOpponentProgress((data: OpponentProgressData) => {
       setOpponentScore(data.totalScore);
-      setOpponentWordCount(data.wordCount);
+      setOpponentStreak(data.comboStreak ?? 0);
     });
 
     const cleanupDisconnected = onOpponentDisconnected((data: OpponentDisconnectedData) => {
@@ -182,18 +215,27 @@ export function RealTimeDuelGame({
       setGracePeriodSeconds(data.gracePeriodSeconds);
     });
 
-    const cleanupReconnected = onOpponentReconnected(() => {
-      setIsDisconnected(false);
-    });
+    const cleanupReconnected = onOpponentReconnected(() => setIsDisconnected(false));
 
     const cleanupCompleted = onDuelCompleted((data: DuelCompletedData) => {
       setResult(data);
       setPhase('completed');
+
+      if (completionRecorded.current) return;
+      completionRecorded.current = true;
+
       const isWinner = data.winnerId === studentId;
+      const isDraw = data.winnerId === null;
       const finalScore = isWinner
         ? Math.max(data.challengerScore, data.opponentScore)
         : Math.min(data.challengerScore, data.opponentScore);
-      awardGameCoins(duelId, 'multiplayer', finalScore, isWinner ? 1 : 2, 2);
+
+      const award = awardGameCoins(duelId, 'multiplayer', finalScore, isWinner ? 1 : 2, 2);
+      setCoinsAwarded(award?.awarded ?? 0);
+
+      if (seriesKey) {
+        setSeries(recordDuelSeriesResult(seriesKey, isDraw ? 'draw' : isWinner ? 'win' : 'loss'));
+      }
     });
 
     return () => {
@@ -205,6 +247,8 @@ export function RealTimeDuelGame({
       cleanupReconnected();
       cleanupCompleted();
     };
+    // combo callbacks are stable useCallback handles
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     onDuelStarted,
     onWordAccepted,
@@ -217,25 +261,19 @@ export function RealTimeDuelGame({
     playWordRejectedSound,
     duelId,
     studentId,
+    seriesKey,
   ]);
-
-  // ============================================
-  // HANDLERS
-  // ============================================
 
   const handleSubmitWord = useCallback(() => {
     const raw = getCurrentWord();
     if (!raw) return;
 
     const word = raw.toUpperCase();
-
-    // Check if word already submitted
     if (words.find((w) => w.word === word)) {
       resetCurrentWord();
       return;
     }
 
-    // Add word as pending
     setWords((prev) => [...prev, { word, status: 'pending' }]);
     submitWord(duelId, word);
     resetCurrentWord();
@@ -244,9 +282,7 @@ export function RealTimeDuelGame({
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.nativeEvent.isComposing || e.keyCode === 229) return;
-      if (e.key === 'Enter') {
-        handleSubmitWord();
-      }
+      if (e.key === 'Enter') handleSubmitWord();
     },
     [handleSubmitWord]
   );
@@ -256,30 +292,31 @@ export function RealTimeDuelGame({
     setShowForfeitDialog(false);
   }, [duelId, forfeitDuel]);
 
-  const handleRematch = useCallback(() => {
-    if (duelSocket && opponentId && lessonId) {
-      duelSocket.emit('duel:rematch', { opponentId, lessonId });
-    }
-  }, [duelSocket, opponentId, lessonId]);
+  const status = duelSeriesStatus(series);
 
-  // ============================================
-  // RENDER HELPERS
-  // ============================================
+  // A decided series starts over on the next duel rather than piling up a 4th.
+  const handleBeforeRematch = useCallback(() => {
+    if (seriesKey && status !== 'open') clearDuelSeries(seriesKey);
+  }, [seriesKey, status]);
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  const {
+    pending: rematchPending,
+    canRematch,
+    requestRematch,
+  } = useDuelRematch({
+    socket: duelSocket,
+    opponentId,
+    lessonId,
+    onDuelCreated,
+    onError,
+    onBeforeRequest: handleBeforeRematch,
+  });
 
-  // ============================================
-  // WAITING PHASE
-  // ============================================
-
+  // ---------- waiting ----------
   if (phase === 'waiting') {
     return (
       <div
-        className="flex items-center justify-center min-h-[400px]"
+        className="flex min-h-[400px] items-center justify-center"
         data-testid="realtime-duel-game"
       >
         <Loader size="lg" />
@@ -288,234 +325,58 @@ export function RealTimeDuelGame({
     );
   }
 
-  // ============================================
-  // COMPLETED PHASE
-  // ============================================
-
+  // ---------- completed ----------
   if (phase === 'completed' && result) {
     const isWinner = result.winnerId === studentId;
     const isDraw = result.winnerId === null;
+    const outcome: DuelOutcome = isDraw ? 'draw' : isWinner ? 'win' : 'loss';
     const xp = isWinner ? result.xpAwarded.winner : result.xpAwarded.loser;
 
     return (
-      <AdaptiveMotion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center min-h-[500px] text-center p-8"
-        data-testid="realtime-duel-game"
-      >
-        {/* Result Badge */}
-        <AdaptiveMotion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-          className={cn(
-            'mb-6 p-6 rounded-neo border-neo-thick shadow-hard',
-            isDraw
-              ? 'bg-yellow-500 border-neo-black'
-              : isWinner
-                ? 'bg-neo-lime border-neo-black'
-                : 'bg-red-500 border-neo-black'
-          )}
-        >
-          {isWinner ? (
-            <Trophy className="w-16 h-16 text-neo-black" />
-          ) : (
-            <Swords className="w-16 h-16 text-neo-white" />
-          )}
-        </AdaptiveMotion.div>
-
-        {/* Result Text */}
-        <h2 className="text-4xl font-neo-display font-bold text-neo-white mb-4">
-          {isDraw ? t('duels.draw') : isWinner ? t('duels.youWin') : t('duels.youLose')}
-        </h2>
-
-        {/* Scores */}
-        <div className="flex gap-6 mb-6">
-          <div className="text-neo-white">
-            <p className="text-sm opacity-70">{t('duels.you')}</p>
-            <p className="text-3xl font-bold">{myScore}</p>
-          </div>
-          <div className="text-neo-white text-3xl">{t('education.duels.vs')}</div>
-          <div className="text-neo-white">
-            <p className="text-sm opacity-70">{opponentName}</p>
-            <p className="text-3xl font-bold">{opponentScore}</p>
-          </div>
-        </div>
-
-        {/* XP Earned */}
-        <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
-          <Flame className="w-6 h-6 text-neo-pink" />
-          <span className="text-neo-white font-neo-body">
-            {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
-          </span>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4">
-          {opponentId && lessonId && (
-            <button
-              type="button"
-              onClick={handleRematch}
-              className="px-6 py-3 bg-neo-pink text-white font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
-            >
-              {t('education.duels.rematch')}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onBackToLobby}
-            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
-          >
-            {t('duels.backToLobby')}
-          </button>
-        </div>
-      </AdaptiveMotion.div>
-    );
-  }
-
-  // ============================================
-  // PLAYING PHASE
-  // ============================================
-
-  return (
-    <div className="max-w-4xl mx-auto p-6" data-testid="realtime-duel-game">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
-        {/* My Score */}
-        <div className="flex items-center gap-2">
-          <div className="text-neo-white">
-            <p className="text-sm opacity-70">{t('duels.you')}</p>
-            <p className="text-2xl font-bold" data-testid="my-score">
-              {myScore}
-            </p>
-          </div>
-        </div>
-
-        {/* Timer */}
-        <div
-          data-testid="duel-timer"
-          className={cn(
-            'text-3xl font-neo-display font-bold',
-            timeRemaining <= 10 ? 'text-red-500' : 'text-neo-white'
-          )}
-        >
-          {formatTime(timeRemaining)}
-        </div>
-
-        {/* Opponent Score */}
-        <div className="flex items-center gap-2">
-          <div className="text-neo-white">
-            <p className="text-sm opacity-70">{opponentName}</p>
-            <p className="text-2xl font-bold" data-testid="opponent-score">
-              {opponentScore}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-6">
-        <OpponentProgressBar
+      <div data-testid="realtime-duel-game">
+        <DuelRevealScreen
+          outcome={outcome}
           myScore={myScore}
           opponentScore={opponentScore}
           myName={t('duels.you')}
           opponentName={opponentName}
+          xp={xp}
+          coins={coinsAwarded}
+          peakStreak={peakStreakRef.current}
+          series={series}
+          seriesStatus={status}
+          onRematch={canRematch ? requestRematch : undefined}
+          rematchPending={rematchPending}
+          onBackToLobby={onBackToLobby}
         />
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Board Grid */}
-        <div>
-          <h2 className="text-lg font-neo-display font-bold text-neo-white mb-4">
-            {t('duels.findWords')}
-          </h2>
-          <div className="grid grid-cols-4 gap-2 p-4 bg-neo-navy border-neo-thick rounded-neo shadow-hard">
-            {boardState.flat().map((letter, idx) => (
-              <div
-                key={`cell-${idx}-${letter}`}
-                className="aspect-square flex items-center justify-center bg-neo-lime text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
-              >
-                {letter}
-              </div>
-            ))}
-          </div>
-        </div>
+  // ---------- playing ----------
+  return (
+    <div
+      className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col overflow-hidden"
+      data-testid="realtime-duel-game"
+    >
+      <DuelPlayPanel
+        boardState={boardState}
+        words={words}
+        myScore={myScore}
+        opponentScore={opponentScore}
+        opponentName={opponentName}
+        myName={t('duels.you')}
+        comboStreak={combo.streak}
+        comboBonus={combo.bonus}
+        opponentStreak={opponentStreak}
+        timeRemaining={timeRemaining}
+        wordInputProps={wordInputProps as unknown as Record<string, unknown>}
+        currentWordEmpty={currentWordEmpty}
+        onSubmitWord={handleSubmitWord}
+        onKeyDown={handleKeyPress}
+        onForfeit={() => setShowForfeitDialog(true)}
+      />
 
-        {/* Word Input & Found Words */}
-        <div>
-          <h2 className="text-lg font-neo-display font-bold text-neo-white mb-4">
-            {t('duels.typeWord')}
-          </h2>
-
-          {/* Input Area */}
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              {...wordInputProps}
-              onKeyDown={handleKeyPress}
-              placeholder={t('duels.typeWord')}
-              data-testid="word-input"
-              className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
-            />
-            <button
-              type="button"
-              onClick={handleSubmitWord}
-              aria-disabled={currentWordEmpty}
-              data-testid="submit-word-btn"
-              className={cn(
-                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all',
-                currentWordEmpty && 'opacity-50 cursor-not-allowed'
-              )}
-            >
-              {t('duels.addWord')}
-            </button>
-          </div>
-
-          {/* Found Words List */}
-          <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
-            <AdaptiveAnimatePresence>
-              {words.length === 0 ? (
-                <p className="text-neo-white text-sm text-center py-8">
-                  {t('duels.typeWord')}
-                </p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {words.map((wordStatus, idx) => (
-                    <AdaptiveMotion.div
-                      key={`word-${idx}-${wordStatus.word}`}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className={cn(
-                        'px-3 py-1 font-neo-body font-bold rounded-neo border-neo shadow-hard-sm',
-                        wordStatus.status === 'accepted' && 'bg-green-500 text-neo-white',
-                        wordStatus.status === 'rejected' && 'bg-red-500 text-neo-white',
-                        wordStatus.status === 'pending' && 'bg-neo-navy text-neo-white'
-                      )}
-                    >
-                      {wordStatus.word}
-                      {wordStatus.points && ` (+${wordStatus.points})`}
-                    </AdaptiveMotion.div>
-                  ))}
-                </div>
-              )}
-            </AdaptiveAnimatePresence>
-          </div>
-
-          {/* Forfeit Button */}
-          <button
-            type="button"
-            onClick={() => setShowForfeitDialog(true)}
-            data-testid="forfeit-btn"
-            className="text-neo-white hover:text-neo-white text-sm underline"
-          >
-            {t('duels.forfeitConfirm')}
-          </button>
-        </div>
-      </div>
-
-      {/* Disconnect Overlay */}
       {isDisconnected && (
         <DuelDisconnectOverlay
           opponentName={opponentName}
@@ -523,7 +384,6 @@ export function RealTimeDuelGame({
         />
       )}
 
-      {/* Forfeit Dialog */}
       <ForfeitConfirmDialog
         open={showForfeitDialog}
         onConfirm={handleForfeit}

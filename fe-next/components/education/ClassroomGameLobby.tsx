@@ -1,29 +1,34 @@
 /**
- * ClassroomGameLobby
+ * ClassroomGameLobby — pick the game, and the class is playing.
  *
- * Single-step classroom game creator: teacher picks classroom + lessons + mode,
- * then clicking Start Game creates the room and enters the multiplayer lobby
- * where game code, QR, and education details are displayed.
+ * The lobby used to open on a wizard: "Step 1 of 1", a preset block, classroom
+ * radios, a lesson list, team settings, a timer grid, a board-size grid, and
+ * only at the very bottom five small icon radios for the game mode — the one
+ * choice that decides what the lesson actually is. Blooket leads with the mode
+ * and makes it a wall of posters, but its poster says only the mode's NAME —
+ * how it plays, how long it runs and whether it suits your material all sit
+ * behind a second tap. This leads with the mode too, puts all three on the
+ * poster's face, and makes the live one a wide hero so there is a lead tile
+ * rather than five equal ones. Switching is free (the settings below reshape in
+ * place); GO LIVE, which names the chosen game, is the one and only commit.
+ *
+ * Everything else moved into `lobby/` so this file stays a coordinator:
+ *  - `useTeacherLobbyData`      — classes, lessons, starter packs
+ *  - `useClassroomLaunchSocket` — the socket, the emit, the failure paths
+ *  - `LobbyModeHero`            — the pinned picker
+ *  - `LobbySetupPanel` / `LobbyRoundSettings` — the fine-tuning that scrolls
  */
 
 'use client';
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import logger from '@/utils/logger';
-import { BookOpen, School } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
-import { getLessons, getClassrooms, createLesson as createLessonAPI, type VocabularyLesson, type Classroom } from '@/lib/supabase/education';
-import toast from 'react-hot-toast';
-import { io, Socket } from 'socket.io-client';
-import { getSocketURL } from '@/utils/SocketContext';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { ClassroomSetupStep } from './ClassroomSetupStep';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
-import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
-import { classroomMultiplayerPath, socketTeacherName } from '@/lib/education/classroomGameHandoff';
+import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_SECONDS,
@@ -31,15 +36,20 @@ import {
   type ClassroomGameMode,
   type PracticeFocusSetting,
 } from '@/shared/types/vocabQuiz';
-import {
-  getPresetValues,
-  applyVocabularyCap,
-  type ClassroomPresetId,
-} from '@/lib/education/classroomPresets';
+import { getPresetValues, applyVocabularyCap, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility } from '@/shared/types/classroom';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
-import type { Language } from '@/lib/supabase/education/types';
+import { recommendedModeBadge } from '@/lib/education/gameModes';
+import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
+import { LobbyModeHero } from './lobby/LobbyModeHero';
+import { LobbySetupPanel } from './lobby/LobbySetupPanel';
+import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
+import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
+import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
+import { useTeacherLobbyData } from './lobby/useTeacherLobbyData';
+import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
+import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
@@ -53,51 +63,43 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   const { user, profile } = useAuth();
   const router = useRouter();
 
-  const [lessons, setLessons] = useState<VocabularyLesson[]>([]);
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
-  const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>(
-    initialLessonId ? [initialLessonId] : []
-  );
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
-  const [gameCode, setGameCode] = useState<string>('');
-  const [isStarting, setIsStarting] = useState(false);
-  const [startError, setStartError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  // The mode the teacher explicitly picked. `null` means they have not touched
-  // the picker, and the default below is derived from whether a lesson is
-  // attached — ONE source of truth, resolved at render, so nothing can flip it
-  // late (pitfalls class 1).
+  const {
+    lessons,
+    classrooms,
+    isLoading,
+    isCreatingFromPack,
+    selectedLessonIds,
+    setSelectedLessonIds,
+    selectedClassroomId,
+    setSelectedClassroomId,
+    createLessonFromPack,
+  } = useTeacherLobbyData(user?.id, t, initialLessonId);
+
+  const { gameCode, isStarting, startError, setStartError, launch } = useClassroomLaunchSocket(t, language);
+
+  // The mode the teacher explicitly picked. `null` means untouched, and the
+  // default below is derived at render from whether a lesson is attached — ONE
+  // source of truth, nothing that can flip it late (pitfalls class 1).
   const [pickedGameMode, setPickedGameMode] = useState<ClassroomGameMode | null>(null);
-  // Vocab Quiz only: which skill to drill and the round shape. `any` mixes
-  // whatever the chosen lesson can actually build — with definition-only word
-  // lists (the common case today) that resolves to a definition round.
   const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
-  const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState<number>(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
-  const [vocabQuizSeconds, setVocabQuizSeconds] = useState<number>(VOCAB_QUIZ_DEFAULT_SECONDS);
-  // Word Hunt only: the lesson word the teacher pinned as the hunted target.
-  // '' means "let the game choose".
-  const [targetWord, setTargetWord] = useState<string>('');
-  // Shortest word that scores — the teacher's grade-level dial.
-  const [minWordLength, setMinWordLength] = useState<number>(3);
-  const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
-
-  // Teacher-configurable lobby settings — were hardcoded, now part of the
-  // wizard so the room is created with the teacher's final choices instead of
-  // forcing them into the lobby with defaults they can't preview.
-  const [timerMinutes, setTimerMinutes] = useState<number>(3);
+  const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
+  const [vocabQuizSeconds, setVocabQuizSeconds] = useState(VOCAB_QUIZ_DEFAULT_SECONDS);
+  const [targetWord, setTargetWord] = useState('');
+  const [minWordLength, setMinWordLength] = useState(3);
+  const [timerMinutes, setTimerMinutes] = useState(3);
   const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>('medium');
-  const settings = useMemo(
-    () => ({ timerMinutes, boardSize, allowLateJoin: true }),
-    [timerMinutes, boardSize]
-  );
-
-  // Team battle + SPED accessibility knobs (P0: Friday team battle).
   const [playStyle, setPlayStyle] = useState<PlayStyle>('ffa');
-  const [teamCount, setTeamCount] = useState<number>(2);
+  const [teamCount, setTeamCount] = useState(2);
   const [accessibility, setAccessibility] = useState<ClassroomAccessibility>({});
   const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>(null);
-  const { saveConfig, getMostRecent } = useRecentGameSettings();
+  /**
+   * Both folds start SHUT, and neither is remembered across visits: the screen
+   * a teacher opens in front of a class is the one-tap one, every time.
+   */
+  const [modesExpanded, setModesExpanded] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
+
+  const { saveConfig } = useRecentGameSettings();
 
   const applyPreset = useCallback(
     (id: ClassroomPresetId) => {
@@ -110,391 +112,264 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
       setAccessibility(preset.accessibility);
       setActivePreset(id);
       if (id === 'friday-battle') {
-        setSelectedLessonIds((prev) =>
-          prev.length > 0 ? prev : lessons.slice(0, 1).map((l) => l.id)
-        );
+        setSelectedLessonIds((prev) => (prev.length > 0 ? prev : lessons.slice(0, 1).map((l) => l.id)));
       }
     },
-    [lessons]
+    [lessons, setSelectedLessonIds]
   );
 
-  const repeatLastAppliedRef = useRef(false);
-  useEffect(() => {
-    if (initialFlow !== 'repeatLast' || repeatLastAppliedRef.current) return;
-    if (isLoading || classrooms.length === 0) return;
-    const last = getMostRecent();
-    if (!last) return;
-    repeatLastAppliedRef.current = true;
-    if (last.classroomId && classrooms.some((c) => c.id === last.classroomId)) {
-      setSelectedClassroomId(last.classroomId);
-    }
-    const validLessonIds = last.lessonIds.filter((id) => lessons.some((l) => l.id === id));
-    if (validLessonIds.length > 0) setSelectedLessonIds(validLessonIds);
-    if (last.settings?.timerMinutes) setTimerMinutes(last.settings.timerMinutes);
-    if (last.settings?.boardSize) setBoardSize(last.settings.boardSize);
-  }, [initialFlow, isLoading, classrooms, lessons, getMostRecent]);
-
-  // Fetch teacher data
-  const fetchTeacherData = useCallback(async () => {
-    if (!user) return;
-    setIsLoading(true);
-    try {
-      const [lessonsResult, classroomsResult] = await Promise.all([
-        getLessons(user.id),
-        getClassrooms(user.id),
-      ]);
-      if (lessonsResult.data) setLessons(lessonsResult.data);
-      if (classroomsResult.data) {
-        setClassrooms(classroomsResult.data);
-        if (classroomsResult.data.length > 0) {
-          // Use functional update to avoid depending on selectedClassroomId,
-          // which would create a re-fetch loop (fetch sets id → callback
-          // recreated → effect re-runs → isLoading=true → fetch again).
-          setSelectedClassroomId((prev) => prev || classroomsResult.data[0].id);
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to fetch teacher data:', error);
-      toast.error(t('errors.loadFailed'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, t]);
+  const { pending: repeatPending } = useRepeatLastSetup({
+    flow: initialFlow,
+    isLoading,
+    classrooms,
+    lessons,
+    setSelectedClassroomId,
+    setSelectedLessonIds,
+    setTimerMinutes,
+    setBoardSize,
+  });
 
   useEffect(() => {
-    if (!user) {
-      router.push(`/${language}/education`);
-      return;
-    }
-    fetchTeacherData();
-  }, [user, language, router, fetchTeacherData]);
+    if (!user) router.push(`/${language}/education`);
+  }, [user, language, router]);
 
-  // Initialize Socket.IO
-  useEffect(() => {
-    const socketUrl = getSocketURL();
-    let socketInstance: ReturnType<typeof io>;
+  const selectedLessons = useMemo(
+    () => lessons.filter((l) => selectedLessonIds.includes(l.id)),
+    [lessons, selectedLessonIds]
+  );
 
-    async function initSocket() {
-      let token: string | undefined;
-      try {
-        const { createClient } = await import('@/utils/supabase/client');
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        token = session?.access_token;
-      } catch {
-        // proceed without token
-      }
-
-      socketInstance = io(socketUrl, {
-        transports: ['websocket', 'polling'],
-        auth: token ? { token } : {},
-      });
-
-      socketInstance.on('connect', () => { logger.info('Connected to Socket.IO'); });
-      socketInstance.on('classroomGameCreated', (data: { success: boolean; gameCode: string }) => {
-        if (data.success) {
-          toast.success(t('education.classroomGame.gameCreated'));
-          router.push(classroomMultiplayerPath(language, data.gameCode));
-        }
-      });
-      // The server's error text is internal English ("Invalid payload: …",
-      // "You are not the teacher of this classroom"). A Hebrew or Japanese
-      // teacher was shown it raw, right-aligned in an RTL toast. The real text
-      // is logged for us; the teacher gets a sentence in their own language.
-      socketInstance.on('classroomGameError', (data: { error: string }) => {
-        logger.error('Classroom game create rejected:', data?.error);
-        toast.error(t('education.classroomGame.startFailed'));
-        setStartError('education.classroomGame.startFailed');
-        setIsStarting(false);
-      });
-      // The rate-limit path emits `rateLimited`, NOT `classroomGameError`.
-      // Without this listener a double-tapped Start Game stayed disabled with
-      // no message and no recovery short of a reload (pitfall class 4 — a
-      // rejection that produces nothing looks exactly like "still working").
-      socketInstance.on('rateLimited', () => {
-        toast.error(t('education.classroomGame.tooFast'));
-        setStartError('education.classroomGame.tooFast');
-        setIsStarting(false);
-      });
-
-      setSocket(socketInstance);
-    }
-
-    initSocket();
-    return () => { socketInstance?.disconnect(); };
-  }, [t, language, router]);
-
-  // Generate game code on mount
-  useEffect(() => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setGameCode(code);
-  }, []);
-
-  const selectedLessons = useMemo(() => {
-    return lessons.filter((l) => selectedLessonIds.includes(l.id));
-  }, [lessons, selectedLessonIds]);
-
-  // Every word the teacher assigned, deduped — NOT filtered by `canIntegrate`.
-  //
-  // `canIntegrate` answers "can a Boggle grid hold this?" (3-12 letters). Using
-  // it here made it answer "is this part of the lesson?", which is a different
-  // question with a different answer: a ten-word list saved in the editor
-  // arrived at the host screen as nine, and "photosynthesis" was gone with no
-  // error anywhere. It also starved Vocab Quiz, where word length is irrelevant.
-  // The server already caps what it can embed and reports the truth back as
-  // `placedVocabulary`, so over-sending costs nothing and under-sending lies.
-  // A lesson attached means the teacher came to drill THOSE words, so the
-  // default is the mode that actually asks about them. Classic cannot: measured
-  // live 2026-09-07, a 6x6 board carried 1 of 9 lesson words (`placedVocabulary
-  // === ["ENZYME"]`) because a straight run caps at six letters and vocabulary
-  // is longer than that. Classic stays the default with no lesson attached.
-  const gameMode: ClassroomGameMode =
-    pickedGameMode ?? (selectedLessonIds.length > 0 ? VOCAB_QUIZ_MODE : 'classic');
-
+  // Every word the teacher assigned, deduped — NOT filtered by `canIntegrate`,
+  // which answers "can a Boggle grid hold this?" (3-12 letters) and not "is this
+  // part of the lesson?". Using it here turned a ten-word list into nine and
+  // dropped "photosynthesis" with no error anywhere (measured 2026-09-07).
   const allPlayableWords = useMemo(() => {
-    const words = selectedLessons.flatMap((lesson) =>
-      lesson.words?.map((w) => w.word).filter((w): w is string => !!w?.trim()) || []
+    const words = selectedLessons.flatMap(
+      (lesson) => lesson.words?.map((w) => w.word).filter((w): w is string => !!w?.trim()) || []
     );
     return [...new Set(words)];
   }, [selectedLessons]);
 
-  const handleSelectStarterPack = useCallback(
-    async (pack: { name: string; description: string; language: string; words: any[] }) => {
-      if (!user) {
-        toast.error(t('errors.loadFailed'));
+  // The RICH per-word rows the quiz builds questions from — and what the
+  // "best fit" flag is computed off.
+  const lessonWords = useMemo(
+    () => selectedLessons.flatMap((lesson) => lesson.words ?? []).filter((w) => w?.canIntegrate !== false),
+    [selectedLessons]
+  );
+  const lessonLanguage = selectedLessons[0]?.language;
+
+  // A lesson attached means the teacher came to drill THOSE words, and Classic
+  // cannot: a 6×6 board carried 1 of 9 lesson words because a straight run caps
+  // at six letters. Classic stays the default with nothing attached.
+  const gameMode: ClassroomGameMode =
+    pickedGameMode ?? (selectedLessonIds.length > 0 ? VOCAB_QUIZ_MODE : 'classic');
+  const recommended = useMemo(() => recommendedModeBadge(lessonWords), [lessonWords]);
+
+  const cannotStart =
+    selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
+
+  const startGame = useCallback(
+    (mode: ClassroomGameMode) => {
+      setStartError(null);
+      const classroom = classrooms.find((c) => c.id === selectedClassroomId);
+      if (!user || !classroom || selectedLessonIds.length === 0) {
+        toast.error(t('education.classroomGame.missingRequirements'));
+        setStartError('education.classroomGame.missingRequirements');
         return;
       }
 
-      setIsCreatingFromPack(true);
+      const presetCap = activePreset ? getPresetValues(activePreset).vocabularyCap : 0;
+      const playableWords = applyVocabularyCap(allPlayableWords, presetCap);
+      const lessonNames = selectedLessons.map((l) => l.name);
+
       try {
-        const vocabularyWords = convertPackWordsToLessonWords(pack.words);
-
-        const { data: newLesson, error } = await createLessonAPI({
-          teacher_id: user.id,
-          classroom_id: null,
-          name: pack.name,
-          description: pack.description,
-          language: pack.language as Language,
-          words: vocabularyWords,
-          is_public: false,
-          source_game_code: null,
-        });
-
-        if (error || !newLesson) {
-          logger.error('Failed to create lesson from starter pack:', error);
-          toast.error(error?.message || t('education.lesson.creationFailed'));
-          setIsCreatingFromPack(false);
-          return;
-        }
-
-        // Add the new lesson to state and select it
-        setLessons([newLesson, ...lessons]);
-        setSelectedLessonIds([newLesson.id]);
-        toast.success(t('education.lesson.created'));
-        setIsCreatingFromPack(false);
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-        logger.error('Exception creating lesson from starter pack:', errorMsg);
-        toast.error(t('education.lesson.creationFailed'));
-        setIsCreatingFromPack(false);
+        sessionStorage.setItem(
+          'lessonGameData',
+          JSON.stringify({
+            lessonId: selectedLessonIds.join(','),
+            lessonName: lessonNames.join(', '),
+            vocabularyWords: playableWords,
+            language,
+            gameMode: mode,
+            targetWord,
+            playStyle,
+            teamCount,
+            accessibility,
+            templateSettings: {
+              timerSeconds: timerMinutes * 60,
+              difficulty: boardSize,
+              minWordLength,
+              allowLateJoin: true,
+            },
+          })
+        );
+      } catch {
+        /* storage off — the socket payload still carries the words */
       }
+
+      saveConfig({
+        id: `${Date.now()}`,
+        classroomId: selectedClassroomId,
+        classroomName: classroom.name,
+        lessonIds: selectedLessonIds,
+        lessonNames,
+        settings: { timerMinutes, boardSize, allowLateJoin: true },
+        savedAt: Date.now(),
+      });
+
+      launch({
+        gameCode,
+        classroomId: selectedClassroomId,
+        teacherId: user.id,
+        teacherName: socketTeacherName(user, profile?.display_name),
+        lessonIds: selectedLessonIds,
+        lessonNames,
+        vocabularyWords: playableWords,
+        settings: {
+          timerMinutes,
+          boardSize,
+          allowLateJoin: true,
+          gameMode: mode,
+          targetWord: targetWord || undefined,
+          ...(mode === VOCAB_QUIZ_MODE
+            ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds }
+            : {}),
+          playStyle,
+          teamCount: playStyle === 'teams' ? clampTeamCount(teamCount) : undefined,
+          accessibility:
+            accessibility.largeText || accessibility.audioCues || accessibility.participationPoints
+              ? accessibility
+              : undefined,
+        },
+      });
     },
-    [user, t, lessons]
+    [
+      user, profile, classrooms, selectedClassroomId, selectedLessonIds, selectedLessons,
+      allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
+      targetWord, minWordLength, timerMinutes, boardSize, playStyle, teamCount, accessibility,
+      vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds,
+    ]
   );
 
-  const handleStartGame = useCallback(() => {
-    setStartError(null);
-    if (!user || !socket || selectedLessonIds.length === 0 || !selectedClassroomId) {
-      toast.error(t('education.classroomGame.missingRequirements'));
-      setStartError('education.classroomGame.missingRequirements');
-      return;
-    }
-    setIsStarting(true);
+  /**
+   * A tap on a poster CHOOSES; it never fires a room.
+   *
+   * Creating a room navigates away to /multiplayer, so a poster that launched
+   * would make "switch the mode from the lobby" impossible — and on a phone a
+   * double tap would open a room in front of thirty students by accident. It
+   * would also put a second launch control on a screen that is allowed exactly
+   * one. GO LIVE is that one, it names the chosen mode, and the recommended
+   * mode is already chosen, so the teacher who agrees with us still taps once.
+   */
+  const pickMode = useCallback((mode: ClassroomGameMode) => {
+    setPickedGameMode(mode);
+    // The chosen poster becomes the hero, so leaving the list open would show
+    // it twice and re-open the decision the teacher just closed.
+    setModesExpanded(false);
+  }, []);
 
-    const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId);
-    if (!selectedClassroom) {
-      toast.error(t('education.classroomGame.classroomNotFound'));
-      setIsStarting(false);
-      return;
-    }
+  /**
+   * Why GO LIVE is greyed, said out loud and BEFORE the tap — a disabled
+   * primary action with no sentence beside it is the silent no-op of
+   * recurring pitfall class 4.
+   */
+  const blockedKey = cannotStart ? 'education.modePicker.needsLesson' : null;
 
-    const presetCap = activePreset ? getPresetValues(activePreset).vocabularyCap : 0;
-    const playableWords = applyVocabularyCap(allPlayableWords, presetCap);
-
-    sessionStorage.setItem('lessonGameData', JSON.stringify({
-      lessonId: selectedLessonIds.join(','),
-      lessonName: selectedLessons.map(l => l.name).join(', '),
-      vocabularyWords: playableWords,
-      language,
-      gameMode,
-      targetWord,
-      playStyle,
-      teamCount,
-      accessibility,
-      templateSettings: {
-        timerSeconds: settings.timerMinutes * 60,
-        difficulty: settings.boardSize,
-        minWordLength,
-        allowLateJoin: settings.allowLateJoin,
-      },
-    }));
-
-    saveConfig({
-      id: `${Date.now()}`,
-      classroomId: selectedClassroomId,
-      classroomName: selectedClassroom.name,
-      lessonIds: selectedLessonIds,
-      lessonNames: selectedLessons.map((l) => l.name),
-      settings: {
-        timerMinutes: settings.timerMinutes,
-        boardSize: settings.boardSize,
-        allowLateJoin: settings.allowLateJoin,
-      },
-      savedAt: Date.now(),
-    });
-    socket.emit('createClassroomGame', {
-      gameCode,
-      classroomId: selectedClassroomId,
-      teacherId: user.id,
-      teacherName: socketTeacherName(user, profile?.display_name),
-      lessonIds: selectedLessonIds,
-      lessonNames: selectedLessons.map((l) => l.name),
-      vocabularyWords: playableWords,
-      settings: {
-        timerMinutes: settings.timerMinutes,
-        boardSize: settings.boardSize,
-        allowLateJoin: settings.allowLateJoin,
-        gameMode,
-        targetWord: targetWord || undefined,
-        ...(gameMode === 'vocab-quiz'
-          ? {
-              vocabQuizFocus,
-              vocabQuizQuestionCount,
-              vocabQuizSeconds,
-            }
-          : {}),
-        playStyle,
-        teamCount: playStyle === 'teams' ? clampTeamCount(teamCount) : undefined,
-        accessibility: (accessibility.largeText || accessibility.audioCues || accessibility.participationPoints)
-          ? accessibility
-          : undefined,
-      },
-    });
-  }, [
-    user, socket, selectedLessonIds, selectedClassroomId, gameCode,
-    classrooms, selectedLessons, allPlayableWords, settings, gameMode, targetWord, minWordLength, profile, language, t,
-    vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds,
-    playStyle, teamCount, accessibility, activePreset, saveConfig,
-  ]);
-
-  if (isLoading) {
+  // `repeatPending` is part of the gate on purpose: the restored lesson decides
+  // which poster leads, so painting before it lands shows Classic and then
+  // jumps to the quiz (pitfall class 1).
+  if (isLoading || repeatPending) {
     return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
   }
 
-  // No classrooms
   if (classrooms.length === 0) {
     return (
-      <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
-        <School className="w-12 h-12 text-neo-white mx-auto mb-4" />
-        <p className="text-neo-white font-neo-body mb-4">
-          {t('education.classroomGame.noClassrooms')}
-        </p>
-        <div className="flex items-center justify-center gap-3">
-          <button type="button" onClick={onBack} className={cn('px-6 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all')}>
-            {t('common.back')}
-          </button>
-          <button type="button" onClick={() => router.push(`/${language}/teacher`)} className={cn('px-6 py-3 font-bold bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}>
-            {t('education.classroomGame.createClassroom')}
-          </button>
-        </div>
-      </div>
+      <LobbyNoClassrooms onBack={onBack} onCreateClassroom={() => router.push(`/${language}/teacher`)} />
     );
   }
 
-  // No lessons - show starter packs
   if (lessons.length === 0) {
     return (
-      <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard">
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={onBack}
-            className={cn('px-4 py-2 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all text-sm')}
-          >
-            {t('common.back')}
-          </button>
-        </div>
-        <div className={isCreatingFromPack ? 'opacity-50 pointer-events-none' : ''}>
-          <StarterPacksSection onSelectPack={handleSelectStarterPack} />
-        </div>
-        {isCreatingFromPack && (
-          <div className="mt-4 text-center">
-            <PageLoader text={t('teacher.classroom.settingUp')} size="sm" nested />
-          </div>
-        )}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-neo-white font-neo-body mb-3">
-            {t('education.lesson.preferCustom')}
-          </p>
-          <button
-            type="button"
-            onClick={() => router.push(`/${language}/teacher`)}
-            className={cn('px-6 py-3 font-bold bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}
-          >
-            {t('education.classroomGame.createLesson')}
-          </button>
-        </div>
-      </div>
+      <LobbyNoLessons
+        starterPacks={<StarterPacksSection onSelectPack={createLessonFromPack} />}
+        isCreating={isCreatingFromPack}
+        onBack={onBack}
+        onCreateLesson={() => router.push(`/${language}/teacher`)}
+      />
     );
   }
 
   return (
-    <>
+    <ClassroomLobbyShell
+      pinned={
+        <LobbyModeHero
+          selected={gameMode}
+          recommended={recommended}
+          busy={isStarting}
+          blockedKey={blockedKey}
+          expanded={modesExpanded}
+          onToggleExpanded={() => setModesExpanded((v) => !v)}
+          onPick={pickMode}
+          onGoLive={() => startGame(gameMode)}
+        />
+      }
+    >
       {startError && (
-        <p role="alert" data-testid="create-room-error" className="mb-4 rounded-neo border-neo border-neo-black bg-neo-pink/20 px-4 py-3 text-center font-bold text-neo-white">
+        <p
+          role="alert"
+          data-testid="create-room-error"
+          className="mb-4 rounded-neo border-[3px] border-neo-pink bg-neo-navy-light px-4 py-3 text-center font-bold text-neo-white"
+        >
           {t(startError)}
         </p>
       )}
-      <ClassroomSetupStep
-      classrooms={classrooms}
-      lessons={lessons}
-      selectedClassroomId={selectedClassroomId}
-      selectedLessonIds={selectedLessonIds}
-      allPlayableWords={allPlayableWords}
-      gameMode={gameMode}
-      targetWord={targetWord}
-      minWordLength={minWordLength}
-      vocabQuizFocus={vocabQuizFocus}
-      vocabQuizQuestionCount={vocabQuizQuestionCount}
-      vocabQuizSeconds={vocabQuizSeconds}
-      timerMinutes={timerMinutes}
-      boardSize={boardSize}
-      isStarting={isStarting}
-      activePreset={activePreset}
-      playStyle={playStyle}
-      teamCount={teamCount}
-      accessibility={accessibility}
-      onApplyPreset={applyPreset}
-      onPlayStyleChange={(style) => { setPlayStyle(style); setActivePreset(null); }}
-      onTeamCountChange={(count) => { setTeamCount(count); setActivePreset(null); }}
-      onAccessibilityChange={(next) => { setAccessibility(next); setActivePreset(null); }}
-      onSelectClassroom={setSelectedClassroomId}
-      onSelectLessons={setSelectedLessonIds}
-      onGameModeChange={setPickedGameMode}
-      onVocabQuizFocusChange={setVocabQuizFocus}
-      onVocabQuizQuestionCountChange={setVocabQuizQuestionCount}
-      onVocabQuizSecondsChange={setVocabQuizSeconds}
-      onTargetWordChange={setTargetWord}
-      onMinWordLengthChange={setMinWordLength}
-      onTimerChange={setTimerMinutes}
-      onBoardSizeChange={setBoardSize}
-      onNext={handleStartGame}
-      onBack={onBack}
-    />
-    </>
+
+      <LobbySetupDisclosure
+        classroomName={classrooms.find((c) => c.id === selectedClassroomId)?.name ?? ''}
+        lessonNames={selectedLessons.map((l) => l.name)}
+        wordCount={allPlayableWords.length}
+        incomplete={cannotStart}
+        open={setupOpen}
+        onToggle={() => setSetupOpen((v) => !v)}
+      >
+        <LobbySetupPanel
+          classrooms={classrooms}
+          lessons={lessons}
+          selectedClassroomId={selectedClassroomId}
+          selectedLessonIds={selectedLessonIds}
+          wordCount={allPlayableWords.length}
+          activePreset={activePreset}
+          playStyle={playStyle}
+          teamCount={teamCount}
+          accessibility={accessibility}
+          onSelectClassroom={setSelectedClassroomId}
+          onSelectLessons={setSelectedLessonIds}
+          onApplyPreset={applyPreset}
+          onPlayStyleChange={(style) => { setPlayStyle(style); setActivePreset(null); }}
+          onTeamCountChange={(count) => { setTeamCount(count); setActivePreset(null); }}
+          onAccessibilityChange={(next) => { setAccessibility(next); setActivePreset(null); }}
+        />
+
+        <LobbyRoundSettings
+          gameMode={gameMode}
+          timerMinutes={timerMinutes}
+          boardSize={boardSize}
+          minWordLength={minWordLength}
+          targetWord={targetWord}
+          allPlayableWords={allPlayableWords}
+          lessonWords={lessonWords}
+          lessonLanguage={lessonLanguage}
+          vocabQuizFocus={vocabQuizFocus}
+          vocabQuizQuestionCount={vocabQuizQuestionCount}
+          vocabQuizSeconds={vocabQuizSeconds}
+          onTimerChange={setTimerMinutes}
+          onBoardSizeChange={setBoardSize}
+          onMinWordLengthChange={setMinWordLength}
+          onTargetWordChange={setTargetWord}
+          onVocabQuizFocusChange={setVocabQuizFocus}
+          onVocabQuizQuestionCountChange={setVocabQuizQuestionCount}
+          onVocabQuizSecondsChange={setVocabQuizSeconds}
+        />
+      </LobbySetupDisclosure>
+    </ClassroomLobbyShell>
   );
 }

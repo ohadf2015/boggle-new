@@ -13,6 +13,11 @@ vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: [{ 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/en/teacher', useSearchParams: () => new URLSearchParams() }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => <div /> }));
 vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: () => null }));
+// The welcome dialog waits for the first-run walkthrough to be out of the way
+// (both are fixed overlays, z-[90] under z-[100]). This teacher has seen it.
+vi.mock('@/hooks/useOnboardingState', () => ({
+  useTeacherOnboardingState: () => ({ isCompleted: true, isSkipped: false, shouldShowOnboarding: false }),
+}));
 vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));

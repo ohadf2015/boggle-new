@@ -1,36 +1,41 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PracticeResultsCard } from '../PracticeResultsCard';
 
-// Mock LanguageContext
+// PracticeResultsCard is now a thin adapter: every practice mode already
+// imports it, so it keeps its old prop shape and delegates the actual payoff to
+// PracticeCompletionMoment. These tests pin the adapter contract — the stars,
+// confetti and stinger themselves are covered in
+// components/education/practice/__tests__/PracticeCompletionMoment.test.tsx.
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
-        'education.practice.encouragement0': 'Keep trying! Practice makes progress.',
-        'education.practice.encouragement50': 'Good effort! Keep practicing.',
-        'education.practice.encouragement80': 'Great job! Almost there.',
-        'education.practice.encouragement100': "Perfect! You've mastered these words.",
-        'education.practice.tryAgain': 'Try Again',
-        'education.practice.back': 'Back',
-        'education.practice.correctCount': 'correct',
-        'education.xp.earned': 'XP earned',
+        'education.practice.time': 'Time',
+        'education.practice.maxStreak': 'Max Streak',
+        'education.practice.hintsUsed': 'Hints Used',
       };
-      return translations[key] || key;
+      const base = translations[key] ?? key;
+      return params ? `${base}:${JSON.stringify(params)}` : base;
     },
     language: 'en',
     dir: 'ltr',
   }),
 }));
 
-// Mock Mascot
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playSound: vi.fn() }),
+}));
+
+vi.mock('@/utils/confettiUtils', () => ({
+  fireVictoryConfetti: vi.fn(),
+  fireRankConfetti: vi.fn(),
+}));
+
 vi.mock('@/components/ui/Mascot', () => ({
   __esModule: true,
-  Mascot: ({ variant }: { variant: string }) => (
-    <div data-testid="mascot">Mascot: {variant}</div>
-  ),
-  default: ({ variant }: { variant: string }) => (
-    <div data-testid="mascot">Mascot: {variant}</div>
-  ),
+  Mascot: ({ variant }: { variant: string }) => <div data-testid="mascot">Mascot: {variant}</div>,
+  default: ({ variant }: { variant: string }) => <div data-testid="mascot">Mascot: {variant}</div>,
 }));
 
 describe('PracticeResultsCard', () => {
@@ -45,155 +50,78 @@ describe('PracticeResultsCard', () => {
     vi.clearAllMocks();
   });
 
-  it('renders percentage score', () => {
+  it('renders the shared completion moment', () => {
     render(<PracticeResultsCard {...defaultProps} />);
-
-    // 8/10 = 80%
-    expect(screen.getByText('80%')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-results-card')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-completion')).toBeInTheDocument();
   });
 
-  it('renders correct/total count', () => {
-    render(<PracticeResultsCard {...defaultProps} />);
-
-    expect(screen.getByText(/8.*\/.*10/)).toBeInTheDocument();
+  it('scores the round so a strong result earns three stars', () => {
+    render(<PracticeResultsCard {...defaultProps} correct={10} total={10} />);
+    expect(screen.getByTestId('practice-completion-stars')).toHaveAttribute('data-stars', '3');
   });
 
-  it('renders XP earned when provided', () => {
+  it('still celebrates a weak round with a single star', () => {
+    render(<PracticeResultsCard {...defaultProps} correct={2} total={10} />);
+    expect(screen.getByTestId('practice-completion-stars')).toHaveAttribute('data-stars', '1');
+  });
+
+  it('forwards XP earned', () => {
     render(<PracticeResultsCard {...defaultProps} xpEarned={50} />);
-
-    expect(screen.getByText(/\+50/)).toBeInTheDocument();
+    expect(screen.getByTestId('practice-completion-xp')).toHaveTextContent('50');
   });
 
-  it('does not render XP when not provided', () => {
+  it('omits the XP chip when nothing was earned', () => {
     render(<PracticeResultsCard {...defaultProps} />);
-
-    expect(screen.queryByText(/\+/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('practice-completion-xp')).not.toBeInTheDocument();
   });
 
-  it('renders custom mastery message when provided', () => {
-    render(
-      <PracticeResultsCard {...defaultProps} masteryMessage="You are amazing!" />
-    );
-
+  it('forwards a server-authored mastery message', () => {
+    render(<PracticeResultsCard {...defaultProps} masteryMessage="You are amazing!" />);
     expect(screen.getByText('You are amazing!')).toBeInTheDocument();
   });
 
-  it('renders encouragement message for 0% score', () => {
-    render(<PracticeResultsCard {...defaultProps} correct={0} total={10} />);
-
-    expect(
-      screen.getByText('Keep trying! Practice makes progress.')
-    ).toBeInTheDocument();
-  });
-
-  it('renders encouragement message for 50% score', () => {
-    render(<PracticeResultsCard {...defaultProps} correct={5} total={10} />);
-
-    expect(screen.getByText('Good effort! Keep practicing.')).toBeInTheDocument();
-  });
-
-  it('renders encouragement message for 80% score', () => {
-    render(<PracticeResultsCard {...defaultProps} correct={8} total={10} />);
-
-    expect(screen.getByText('Great job! Almost there.')).toBeInTheDocument();
-  });
-
-  it('renders encouragement message for 100% score', () => {
-    render(<PracticeResultsCard {...defaultProps} correct={10} total={10} />);
-
-    expect(
-      screen.getByText("Perfect! You've mastered these words.")
-    ).toBeInTheDocument();
-  });
-
-  it('calls onRestart when Try Again button is clicked', () => {
+  it('maps onRestart onto the AGAIN action', () => {
     render(<PracticeResultsCard {...defaultProps} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
-
+    fireEvent.click(screen.getByTestId('practice-completion-again'));
     expect(defaultProps.onRestart).toHaveBeenCalledTimes(1);
   });
 
-  it('calls onBack when Back button is clicked', () => {
+  it('maps onBack onto the all-games action', () => {
     render(<PracticeResultsCard {...defaultProps} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
-
+    fireEvent.click(screen.getByTestId('practice-completion-back'));
     expect(defaultProps.onBack).toHaveBeenCalledTimes(1);
   });
 
-  it('renders mascot with appropriate variant based on score', () => {
-    // High score should show celebration mascot
-    render(<PracticeResultsCard {...defaultProps} correct={10} total={10} />);
-
-    expect(screen.getByTestId('mascot')).toBeInTheDocument();
-    expect(screen.getByText(/mascot: celebration/i)).toBeInTheDocument();
+  it('offers a NEXT button when the picker supplies one', () => {
+    const onNext = vi.fn();
+    render(<PracticeResultsCard {...defaultProps} onNext={onNext} nextLabel="Spelling" />);
+    fireEvent.click(screen.getByTestId('practice-completion-next'));
+    expect(onNext).toHaveBeenCalledTimes(1);
   });
 
-  it('renders oops mascot for low scores', () => {
-    render(<PracticeResultsCard {...defaultProps} correct={2} total={10} />);
-
-    expect(screen.getByText(/mascot: oops/i)).toBeInTheDocument();
+  it('turns the optional extras into completion stats', () => {
+    render(<PracticeResultsCard {...defaultProps} timeSpent={125} maxStreak={5} hintsUsed={2} />);
+    expect(screen.getByTestId('practice-completion-stat-time')).toHaveTextContent('2:05');
+    expect(screen.getByTestId('practice-completion-stat-streak')).toHaveTextContent('5');
+    expect(screen.getByTestId('practice-completion-stat-hints')).toHaveTextContent('2');
   });
 
-  it('renders trophy icon', () => {
+  it('renders no stats grid when no extras are supplied', () => {
     render(<PracticeResultsCard {...defaultProps} />);
-
-    expect(screen.getByTestId('results-trophy')).toBeInTheDocument();
+    expect(screen.queryByTestId('practice-completion-stat-time')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('practice-completion-stat-streak')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('practice-completion-stat-hints')).not.toBeInTheDocument();
   });
 
-  it('applies custom className', () => {
+  it('renders only the extras it was given', () => {
+    render(<PracticeResultsCard {...defaultProps} timeSpent={60} />);
+    expect(screen.getByTestId('practice-completion-stat-time')).toHaveTextContent('1:00');
+    expect(screen.queryByTestId('practice-completion-stat-streak')).not.toBeInTheDocument();
+  });
+
+  it('applies a custom className to the wrapper', () => {
     render(<PracticeResultsCard {...defaultProps} className="custom-class" />);
-
-    const card = screen.getByTestId('practice-results-card');
-    expect(card).toHaveClass('custom-class');
-  });
-
-  it('renders extended stats when provided', () => {
-    render(
-      <PracticeResultsCard
-        {...defaultProps}
-        timeSpent={125}
-        maxStreak={5}
-        hintsUsed={2}
-      />
-    );
-
-    // Check for time display (125s = 2:05)
-    expect(screen.getByText(/2:05/)).toBeInTheDocument();
-
-    // Check for max streak
-    expect(screen.getByText(/5x/)).toBeInTheDocument();
-
-    // The hints stat should be rendered (just check it's present somewhere in the component)
-    // Since t() mocks return the key, we verify the stat structure exists by checking for labels
-    const container = screen.getByTestId('practice-results-card');
-    expect(container).toBeInTheDocument();
-  });
-
-  it('does not render stats grid when no extended props provided', () => {
-    render(<PracticeResultsCard {...defaultProps} />);
-
-    // Stats grid should not be in DOM
-    expect(screen.queryByText(/Time/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Max Streak/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Hints Used/)).not.toBeInTheDocument();
-  });
-
-  it('renders only provided extended stats', () => {
-    render(
-      <PracticeResultsCard
-        {...defaultProps}
-        timeSpent={60}
-        // maxStreak and hintsUsed not provided
-      />
-    );
-
-    // Time should be shown
-    expect(screen.getByText(/1:00/)).toBeInTheDocument();
-
-    // But not max streak or hints
-    expect(screen.queryByText(/Max Streak/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Hints Used/)).not.toBeInTheDocument();
+    expect(screen.getByTestId('practice-results-card')).toHaveClass('custom-class');
   });
 });

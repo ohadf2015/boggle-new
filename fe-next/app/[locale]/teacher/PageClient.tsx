@@ -41,18 +41,19 @@ function TeacherDashboardInner() {
     }
   }, [banner]);
 
+  // Handed to the dashboard, never rendered beside it: a sibling of an `h-dvh`
+  // root grows the page past the viewport and the document starts scrolling
+  // again — for precisely the teachers who have a banner to see.
   return (
-    <>
-      {banner === 'trial' && trial && (
-        <div className="bg-neo-navy px-4 pt-4">
-          <div className="mx-auto max-w-5xl">
-            <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
-          </div>
-        </div>
-      )}
-      {banner === 'pro' && <TeacherProAskBanner />}
-      <TeacherDashboard />
-    </>
+    <TeacherDashboard
+      banner={
+        banner === 'trial' && trial ? (
+          <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
+        ) : banner === 'pro' ? (
+          <TeacherProAskBanner />
+        ) : undefined
+      }
+    />
   );
 }
 

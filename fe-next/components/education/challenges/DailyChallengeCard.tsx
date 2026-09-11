@@ -17,7 +17,9 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
   const tierColors: Record<'easy' | 'medium' | 'hard', string> = {
     easy: 'bg-neo-lime text-neo-black',
     medium: 'bg-neo-cyan text-neo-black',
-    hard: 'bg-neo-pink text-white',
+    // White on neo-pink is 3.64:1 — under AA for a 12px badge. Black on
+    // the same pink is ~6:1, and matches the easy/medium tiers.
+    hard: 'bg-neo-pink text-neo-black',
   };
 
   const progress = challenge.target_value > 0
@@ -36,7 +38,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       {/* Tier Badge */}
       <div className="flex items-center justify-between mb-2">
         <span
-          className={`${tierColors[challenge.challenge_tier as 'easy' | 'medium' | 'hard']} text-xs font-black px-2 py-1 rounded uppercase border-neo border-neo-black`}
+          className={`${tierColors[challenge.challenge_tier as 'easy' | 'medium' | 'hard']} text-xs font-black px-2 py-1 rounded uppercase border-[2px] border-neo-black`}
           data-testid="tier-badge"
         >
           {t(`challenges.${challenge.challenge_tier}`)}

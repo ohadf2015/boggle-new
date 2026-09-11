@@ -1,17 +1,14 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowLeft,
   Check,
   X,
-  RotateCcw,
-  Trophy,
   Layers,
   MousePointer2,
 } from 'lucide-react';
@@ -23,12 +20,18 @@ import { useSocketOptional } from '@/utils/SocketContext';
 import { PronunciationButton } from './PronunciationButton';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { WordContextRow } from './WordContextRow';
+import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
+import BeatTheClock from '@/components/education/practice/BeatTheClock';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
   onComplete: (results: { correct: number; total: number }) => void;
   onBack: () => void;
   onCardReviewed?: (correct: boolean) => void;
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
   /** XP session data to display on results screen (optional) */
   xpSessionData?: {
     sessionXpEarned: number;
@@ -44,6 +47,8 @@ export default function FlashcardReview({
   onBack,
   onCardReviewed,
   xpSessionData,
+  onNext,
+  nextLabel,
 }: FlashcardReviewProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -125,86 +130,61 @@ export default function FlashcardReview({
     setShowResults(false);
   }, []);
 
-  // Results screen
+  /*
+    The optional clock running out ends the deck where it stands. Cards never
+    reached count as not-known, which is the honest reading: you did not get to
+    them. Guarded against a double-finish because the timer and the last card
+    can land on the same tick.
+  */
+  const finishedRef = useRef(false);
+  const handleClockExpired = useCallback(() => {
+    if (finishedRef.current || showResults) return;
+    finishedRef.current = true;
+    const correctCount = results.filter(Boolean).length;
+    setShowResults(true);
+    onComplete({ correct: correctCount, total: words.length });
+  }, [results, words.length, onComplete, showResults]);
+
+  /*
+    The deck used to end on a trophy glyph, a percentage and a scroll of every
+    word. That list is genuinely useful, so it survives — but underneath the
+    same completion moment every other mode now shows, so finishing a deck
+    finally sounds and looks like finishing something.
+  */
   if (showResults) {
     const correctCount = results.filter(Boolean).length;
-    const percentage = Math.round((correctCount / words.length) * 100);
 
     return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
-        <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <AdaptiveMotion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200 }}
-            >
-              <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
-            </AdaptiveMotion.div>
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="flex min-h-full items-center justify-center bg-neo-navy p-4">
+        <div className="w-full max-w-sm space-y-3">
+          <PracticeCompletionMoment
+            correct={correctCount}
+            total={words.length}
+            xpEarned={xpSessionData?.sessionXpEarned}
+            masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
+            onAgain={handleRestart}
+            onBack={onBack}
+            onNext={onNext}
+            nextLabel={nextLabel}
+          />
 
-            <h2 className="text-2xl font-neo-display text-neo-white mb-2">
-              {t('education.practice.complete')}
-            </h2>
-
-            <div className="my-6">
-              <p className="text-5xl font-neo-display text-neo-cyan">{percentage}%</p>
-              <p className="text-slate-400 mt-2">
-                {correctCount} / {words.length} {t('education.practice.correctCount')}
-              </p>
-
-              {/* XP Session Summary - Mastery message shown FIRST (research requirement) */}
-              {xpSessionData && (
-                <div className="mt-4 pt-4 border-t border-neo-black/30">
-                  {xpSessionData.sessionMasteryMessage && (
-                    <p className="font-neo-display text-lg text-neo-yellow mb-2">
-                      {xpSessionData.sessionMasteryMessage}
-                    </p>
-                  )}
-                  <p className="text-neo-white font-neo-body">
-                    +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Word results summary */}
-            <div className="bg-neo-black/30 rounded-neo p-4 mb-6 max-h-40 overflow-y-auto">
-              {words.map((word, idx) => (
-                <div
-                  key={`word-${idx}-${word.word}`}
-                  className="flex items-center justify-between py-1 text-sm"
-                >
-                  <span className="text-neo-white font-neo-body">{word.word}</span>
-                  {results[idx] ? (
-                    <Check className="w-4 h-4 text-neo-cyan" />
-                  ) : (
-                    <X className="w-4 h-4 text-neo-pink" />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={handleRestart}
-                className={cn(
-                  'flex-1 bg-neo-cyan text-neo-black font-bold',
-                  'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
+          {/* Per-word recap — the one thing a flashcard deck owes the student. */}
+          <div className="max-h-40 overflow-y-auto rounded-neo border-3 border-black bg-black/30 p-3">
+            {words.map((word, idx) => (
+              <div
+                key={`word-${idx}-${word.word}`}
+                className="flex items-center justify-between py-1 text-sm"
+              >
+                <span className="font-neo-body text-neo-white">{word.word}</span>
+                {results[idx] ? (
+                  <Check className="h-4 w-4 text-neo-cyan" aria-hidden="true" />
+                ) : (
+                  <X className="h-4 w-4 text-neo-pink" aria-hidden="true" />
                 )}
-              >
-                <RotateCcw className="w-4 h-4 me-2" />
-                {t('common.retry')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onBack}
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-              >
-                {t('common.back')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -212,7 +192,7 @@ export default function FlashcardReview({
   // Render swipe mode
   if (reviewMode === 'swipe' && enrichedWords.length > 0) {
     return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-full bg-neo-navy p-4 sm:p-6">
         <div className="max-w-lg mx-auto">
           {/* Header with mode toggle */}
           <div className="flex items-center gap-4 mb-6">
@@ -256,6 +236,19 @@ export default function FlashcardReview({
             </div>
           </div>
 
+
+          {/*
+            Flashcards are self-paced by design, so the clock is OFF here — but
+            one tap turns the deck into a race for students who want one.
+          */}
+          <BeatTheClock
+            mode="flashcard"
+            wordCount={words.length}
+            defaultOn={false}
+            active={!showResults}
+            onExpire={handleClockExpired}
+            className="mb-4"
+          />
           {/* Swipe stack */}
           <FlashcardSwipeStack
             words={enrichedWords}
@@ -274,7 +267,7 @@ export default function FlashcardReview({
 
   // Classic mode (existing tap-to-flip)
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-full bg-neo-navy p-4 sm:p-6">
       <div className="max-w-lg mx-auto">
         {/* Header with mode toggle */}
         <div className="flex items-center gap-4 mb-6">
@@ -319,6 +312,19 @@ export default function FlashcardReview({
             </div>
           )}
         </div>
+
+        {/*
+          Flashcards are self-paced by design, so the clock is OFF here — but
+          one tap turns the deck into a race for students who want one.
+        */}
+        <BeatTheClock
+          mode="flashcard"
+          wordCount={words.length}
+          defaultOn={false}
+          active={!showResults}
+          onExpire={handleClockExpired}
+          className="mb-4"
+        />
 
         {/* Progress bar and auto-pronounce option */}
         <div className="mb-8">

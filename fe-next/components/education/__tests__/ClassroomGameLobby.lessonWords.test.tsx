@@ -64,7 +64,7 @@ async function openLessonAndStart() {
     fireEvent.click(screen.getByText(/Ecology Vocabulary Audit/i).closest('button')!);
   });
   await waitFor(() => {
-    fireEvent.click(screen.getByText('education.classroomGame.createRoom'));
+    fireEvent.click(screen.getByTestId('lobby-go-live'));
   });
   const call = mockSocket.emit.mock.calls.find((c) => c[0] === 'createClassroomGame');
   expect(call).toBeDefined();

@@ -62,15 +62,18 @@ export function TeacherPlanBadge({ className }: { className?: string }) {
       data-testid="teacher-plan-badge"
       data-plan="free"
       className={cn(
-        'inline-flex items-center gap-2 rounded-neo border-2 border-black/40 bg-neo-navy-light px-3 py-1.5 text-neo-white/80',
-        'hover:border-neo-lime hover:text-neo-white transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
+        // A lime edge, not a black one: `border-black/40` on `bg-neo-navy-light`
+        // sitting on `bg-neo-navy` separates from the page by 1.07:1 — the chip
+        // is the only route to the upgrade page and it was invisible.
+        'inline-flex items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-navy-light px-3 py-1.5 text-neo-white',
+        'hover:bg-neo-lime hover:text-black transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
         className,
       )}
     >
       <span className="font-neo-display text-sm font-black uppercase tracking-wide">
         {grantExpired ? t('teacher.plan.giftEnded') : t('teacher.plan.free')}
       </span>
-      <span className="text-xs font-bold text-neo-lime underline underline-offset-2">{t('teacher.plan.upgrade')}</span>
+      <span className="text-xs font-bold underline underline-offset-2">{t('teacher.plan.upgrade')}</span>
     </Link>
   );
 }

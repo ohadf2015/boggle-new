@@ -11,6 +11,12 @@ import userEvent from '@testing-library/user-event';
 import ReportsPageClient from '../PageClient';
 
 // Mock the report components
+// The page now mounts the shared education header — a compact bar with a way
+// back, which these screens used to lack entirely. It pulls MusicContext in,
+// which this suite has no provider for and no interest in.
+vi.mock('@/components/education/EducationHeader', () => ({
+  EducationHeader: () => <div data-testid="education-header" />,
+}));
 vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
   StudentProgressReport: ({ studentId, classroomId }: { studentId: string; classroomId: string }) => (
     <div data-testid="student-progress-report" data-student-id={studentId} data-classroom-id={classroomId}>
@@ -194,11 +200,18 @@ describe('ReportsPageClient', () => {
       expect(screen.queryByText('Progress Reports')).not.toBeInTheDocument();
     });
 
-    it('renders nothing while the entitlement is loading', () => {
+    it('holds the loading state inside the shell, with no report content yet', () => {
+      // The shell is mounted ABOVE both gates, so the entitlement-loading frame
+      // is inside the locked, non-scrolling layout rather than a bare document
+      // that scrolls for a beat and then stops. What must NOT be there yet is
+      // any report content — see gatedShellOrder.test.ts.
       proState.loading = true;
       const { container } = render(<ReportsPageClient />);
 
-      expect(container).toBeEmptyDOMElement();
+      expect(screen.getByTestId('education-shell-scroll')).toBeEmptyDOMElement();
+      expect(container).not.toBeEmptyDOMElement();
+      expect(screen.queryByText('Progress Reports')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
 
     it('renders reports for a Pro teacher', () => {

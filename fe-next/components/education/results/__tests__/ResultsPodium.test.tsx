@@ -116,3 +116,94 @@ describe('ResultsPodium', () => {
     expect(screen.getByTestId('podium-place-1').className).not.toContain('animate-');
   });
 });
+
+/**
+ * The staged reveal is BACK — but as a content swap inside plinths that were
+ * already painted, never as an entrance tween on the plinths themselves.
+ *
+ * The distinction is the whole fix for the capture bug. At every stage of the
+ * reveal, including the very first frame, three full-height coloured plinths
+ * are on screen. What arrives on the timetable is the NAME and the SCORE. A
+ * screenshot taken at any instant shows a podium; it can never show an empty
+ * screen, and the a11y tree never reads out a name the pixels do not show.
+ */
+describe('ResultsPodium — staged classroom reveal', () => {
+  it('is fully revealed when no stage is given, so the general game is untouched', () => {
+    render(<ResultsPodium entries={three} t={t} />);
+    for (const rank of [1, 2, 3]) {
+      expect(screen.getByTestId(`podium-place-${rank}`).dataset.revealed).toBe('true');
+    }
+  });
+
+  it('paints all three plinths before a single name is revealed', () => {
+    render(<ResultsPodium entries={three} stage="stage" t={t} />);
+    for (const rank of [1, 2, 3]) {
+      const plinth = screen.getByTestId(`podium-place-${rank}`);
+      expect(plinth).toBeInTheDocument();
+      // Painted: full height, no opacity tween, nothing hidden.
+      expect(Number(plinth.dataset.plinthHeight)).toBeGreaterThan(0);
+      expect(plinth.className).not.toContain('opacity-0');
+      expect(plinth.style.opacity).not.toBe('0');
+    }
+  });
+
+  it('withholds the names until their stage', () => {
+    const { rerender } = render(<ResultsPodium entries={three} stage="stage" t={t} />);
+    expect(screen.queryByText('Maya')).not.toBeInTheDocument();
+
+    rerender(<ResultsPodium entries={three} stage="third" t={t} />);
+    expect(screen.getByText('Eitan')).toBeInTheDocument();
+    expect(screen.queryByText('Maya')).not.toBeInTheDocument();
+
+    rerender(<ResultsPodium entries={three} stage="second" t={t} />);
+    expect(screen.getByText('Noa')).toBeInTheDocument();
+    expect(screen.queryByText('Maya')).not.toBeInTheDocument();
+
+    rerender(<ResultsPodium entries={three} stage="first" t={t} />);
+    expect(screen.getByText('Maya')).toBeInTheDocument();
+  });
+
+  it('hides an unrevealed plinth from the a11y tree so the screen and the reader agree', () => {
+    render(<ResultsPodium entries={three} stage="third" t={t} />);
+    expect(screen.getByTestId('podium-place-1')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('podium-place-3')).not.toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('crowns the winner only once the winner is actually revealed', () => {
+    const { rerender } = render(<ResultsPodium entries={three} stage="second" t={t} />);
+    expect(screen.queryByTestId('podium-crown')).not.toBeInTheDocument();
+    rerender(<ResultsPodium entries={three} stage="first" t={t} />);
+    expect(screen.getByTestId('podium-crown')).toBeInTheDocument();
+  });
+
+  it('never fades anything in — the reveal is transform-only', () => {
+    for (const stage of ['stage', 'third', 'second', 'first', 'done'] as const) {
+      const { container, unmount } = render(<ResultsPodium entries={three} stage={stage} t={t} />);
+      expect(container.querySelectorAll('.animate-neo-pop')).toHaveLength(0);
+      expect(container.querySelectorAll('.opacity-0')).toHaveLength(0);
+      expect(container.querySelectorAll('[style*="opacity: 0"]')).toHaveLength(0);
+      unmount();
+    }
+  });
+
+  it('lifts the crown clear of the winner’s name instead of sitting on it', () => {
+    // Caught on the projector: a 40px crown hung at -top-4 (16px) dropped 24px
+    // INTO a text-3xl placard and struck through the winner's name. The offset
+    // has to scale with the icon, or the loudest name in the room is the one
+    // thing on the wall you cannot read.
+    const { rerender } = render(<ResultsPodium entries={three} stage="done" size="card" t={t} />);
+    expect(screen.getByTestId('podium-crown').className).toContain('-top-6');
+    rerender(<ResultsPodium entries={three} stage="done" size="projector" t={t} />);
+    expect(screen.getByTestId('podium-crown').className).toContain('-top-9');
+  });
+
+  it('is indistinguishable from the static podium once it rests', () => {
+    render(<ResultsPodium entries={three} stage="done" t={t} />);
+    for (const entry of three) {
+      const plinth = screen.getByTestId(`podium-place-${entry.rank}`);
+      expect(plinth).toHaveTextContent(entry.username);
+      expect(plinth).toHaveTextContent(String(entry.score));
+      expect(plinth).not.toHaveAttribute('aria-hidden', 'true');
+    }
+  });
+});

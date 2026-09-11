@@ -24,6 +24,7 @@ import {
   type VocabQuizStanding,
   type VocabQuizEnded,
   type VocabQuizPhase,
+  type VocabQuizLockIn,
 } from '@/shared/types/vocabQuiz';
 
 export interface VocabQuizClientState {
@@ -45,6 +46,13 @@ export interface VocabQuizClientState {
   totalQuestions: number;
   questionNumber: number;
   finished: boolean;
+  /**
+   * Who has committed to what on the CURRENT question, while the clock still
+   * runs. Null between questions — the reveal carries its own final
+   * distribution, and letting a live count survive into the reveal would
+   * repaint the bars the class just watched settle.
+   */
+  lockIn: VocabQuizLockIn | null;
 }
 
 const IDLE: VocabQuizClientState = {
@@ -62,6 +70,7 @@ const IDLE: VocabQuizClientState = {
   totalQuestions: 0,
   questionNumber: 0,
   finished: false,
+  lockIn: null,
 };
 
 export interface UseVocabQuizResult extends VocabQuizClientState {
@@ -109,6 +118,10 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         secondsLeft: Math.ceil(payload.remainingMs / 1000),
         fractionLeft: payload.remainingMs / Math.max(1, payload.limitMs),
         finished: false,
+        // A new question starts with an empty room, and the same question
+        // re-broadcast (resume / extend time) has had its answers kept by the
+        // server — either way the next lockIn packet is the truth.
+        lockIn: prev.questionNumber === payload.index + 1 ? prev.lockIn : null,
       }));
     };
 
@@ -124,7 +137,22 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         questionNumber: payload.index + 1,
         secondsLeft: 0,
         fractionLeft: 0,
+        lockIn: null,
       }));
+    };
+
+    /**
+     * Live commitment count. Dropped unless it belongs to the question on
+     * screen: the last student's packet and the reveal cross on the wire, and a
+     * stale count landing after the reveal would overwrite the settled bars
+     * (Class 3 — two paths writing the same surface).
+     */
+    const onLockIn = (payload: VocabQuizLockIn) => {
+      setState((prev) => {
+        if (prev.phase !== 'question') return prev;
+        if (!prev.question || payload.index !== prev.question.index) return prev;
+        return { ...prev, lockIn: payload };
+      });
     };
 
     const onAnswerResult = (payload: VocabQuizAnswerResult) => {
@@ -156,6 +184,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         totalQuestions: snap.total,
         questionNumber: snap.index + 1,
         finished: !snap.active,
+        lockIn: null,
       });
     };
 
@@ -171,6 +200,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
         secondsLeft: 0,
         fractionLeft: 0,
         finished: true,
+        lockIn: null,
       }));
     };
 
@@ -182,6 +212,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
 
     socket.on(VOCAB_QUIZ_EVENTS.question, onQuestion);
     socket.on(VOCAB_QUIZ_EVENTS.reveal, onReveal);
+    socket.on(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
     socket.on(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
     socket.on(VOCAB_QUIZ_EVENTS.state, onState);
     socket.on(VOCAB_QUIZ_EVENTS.ended, onEnded);
@@ -214,6 +245,7 @@ export function useVocabQuiz(socket: Socket | null): UseVocabQuizResult {
     return () => {
       socket.off(VOCAB_QUIZ_EVENTS.question, onQuestion);
       socket.off(VOCAB_QUIZ_EVENTS.reveal, onReveal);
+      socket.off(VOCAB_QUIZ_EVENTS.lockIn, onLockIn);
       socket.off(VOCAB_QUIZ_EVENTS.answerResult, onAnswerResult);
       socket.off(VOCAB_QUIZ_EVENTS.state, onState);
       socket.off(VOCAB_QUIZ_EVENTS.ended, onEnded);

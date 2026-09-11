@@ -3,12 +3,23 @@
 /**
  * PracticePicker — one word list, many games.
  *
- * A tile per practice type the lesson can drive, each showing the skill it
- * drills and how much material the lesson actually supplies. Locked tiles stay
- * on the board on purpose: "add synonyms to unlock" is how a student sees the
- * lesson has more in it, and how a teacher learns what to fill in.
+ * A poster per practice type the lesson can drive. Locked tiles stay on the
+ * board on purpose: "add synonyms to unlock" is how a student sees the lesson
+ * has more in it, and how a teacher learns what to fill in.
  *
- * The readiness model is pure and lives in `lib/education/practicePicker`.
+ * What changed, and why: the picker used to be thirteen near-identical cream
+ * cards, each carrying a title, a full sentence about the skill it drills, a
+ * count badge and a play count. On a 390x844 phone that is roughly two and a
+ * half screens of reading before a student can choose, and the thing that
+ * actually distinguishes the modes — what they *are*, and what they pay — was
+ * the part that got cut off. The grid is now art-led: a picture, a name, and
+ * one meta line carrying the XP rate and the material count.
+ *
+ * The shell also stops the page scrolling. The header and readiness line are
+ * fixed height; the grid is the single scrolling region, which is the pattern
+ * the rest of the education module is converging on.
+ *
+ * The readiness model stays pure and lives in `lib/education/practicePicker`.
  */
 
 import { useMemo } from 'react';
@@ -16,37 +27,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import {
-  ArrowLeft,
-  Grid3X3,
-  Zap,
-  Timer,
-  Shuffle,
-  PenLine,
-  Layers,
-  List,
-  BookOpen,
-  Sparkles,
-  ArrowLeftRight,
-  Quote,
-  Blocks,
-  Building2,
-  Lock,
-  CheckCircle,
-  Clock,
-  Target,
-} from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, Target } from 'lucide-react';
 import type { PracticeType, MasteryLevel } from '@/hooks/usePracticeSession';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { VocabFocus } from '@/lib/education/vocabFocus';
 import {
   buildPracticeTiles,
   practiceReadiness,
-  WORD_TOWER_TILE_ID,
   type PracticeSessionCounts,
   type PracticeTile,
   type PracticeVariant,
 } from '@/lib/education/practicePicker';
+import PracticePickerTile from './PracticePickerTile';
 
 export interface PracticePickerProps {
   lessonName: string;
@@ -70,109 +62,6 @@ const MASTERY_LOOK: Record<string, { icon: typeof CheckCircle; className: string
   practicing: { icon: Clock, className: 'text-neo-yellow' },
   started: { icon: Target, className: 'text-neo-orange' },
 };
-
-/** Icon and accent per tile, keyed by the model's stable tile id. */
-const TILE_LOOK: Record<string, { icon: typeof Grid3X3; accent: string }> = {
-  solo_board: { icon: Grid3X3, accent: 'bg-neo-cyan' },
-  warmup: { icon: Zap, accent: 'bg-neo-pink' },
-  blitz: { icon: Timer, accent: 'bg-neo-pink' },
-  matching: { icon: Shuffle, accent: 'bg-neo-lime' },
-  spelling: { icon: PenLine, accent: 'bg-neo-purple' },
-  flashcard: { icon: Layers, accent: 'bg-neo-cyan' },
-  word_list: { icon: List, accent: 'bg-neo-lime' },
-  [WORD_TOWER_TILE_ID]: { icon: Building2, accent: 'bg-neo-purple' },
-  'vocab_focus:definition': { icon: BookOpen, accent: 'bg-neo-cyan' },
-  'vocab_focus:synonym': { icon: Sparkles, accent: 'bg-neo-lime' },
-  'vocab_focus:antonym': { icon: ArrowLeftRight, accent: 'bg-neo-pink' },
-  'vocab_focus:context': { icon: Quote, accent: 'bg-neo-purple' },
-  'vocab_focus:multiple_meaning': { icon: Layers, accent: 'bg-neo-purple' },
-  'vocab_focus:roots_affixes': { icon: Blocks, accent: 'bg-neo-cyan' },
-};
-
-const FALLBACK_LOOK = { icon: Grid3X3, accent: 'bg-neo-cyan' };
-
-function TileCard({
-  tile,
-  onSelect,
-}: {
-  tile: PracticeTile;
-  onSelect: (tile: PracticeTile) => void;
-}) {
-  const { t } = useLanguage();
-  const look = TILE_LOOK[tile.id] ?? FALLBACK_LOOK;
-  const Icon = tile.ready ? look.icon : Lock;
-  const badge =
-    tile.countKind === 'questions'
-      ? t('education.practicePicker.questions', { count: tile.count })
-      : t('education.practicePicker.words', { count: tile.count });
-
-  return (
-    <button
-      type="button"
-      data-testid={`practice-tile-${tile.id}`}
-      disabled={!tile.ready}
-      aria-disabled={!tile.ready}
-      onClick={() => tile.ready && onSelect(tile)}
-      className={cn(
-        'group flex flex-col text-start rounded-neo border-3 border-black overflow-hidden min-h-40 transition-all',
-        tile.ready
-          ? 'bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-0.5'
-          : 'bg-neo-cream/40 border-black/30 cursor-not-allowed'
-      )}
-    >
-      {/* Accent strip doubles as the tile's colour code */}
-      <span className={cn('h-2 w-full', tile.ready ? look.accent : 'bg-black/20')} aria-hidden="true" />
-      <span className="flex flex-col gap-2 p-4 flex-1">
-        <span className="flex items-center gap-2">
-          <span
-            className={cn(
-              'w-10 h-10 rounded-neo border-2 border-black flex items-center justify-center shrink-0',
-              tile.ready ? look.accent : 'bg-black/10 border-black/30'
-            )}
-          >
-            <Icon className={cn('w-5 h-5', tile.ready ? 'text-black' : 'text-black/50')} aria-hidden="true" />
-          </span>
-          <span
-            className={cn(
-              'font-neo-display font-black uppercase leading-tight text-balance',
-              tile.ready ? 'text-black' : 'text-black/50'
-            )}
-          >
-            {t(tile.titleKey)}
-          </span>
-        </span>
-
-        <span
-          className={cn(
-            'text-xs font-neo-body font-bold text-pretty',
-            tile.ready ? 'text-black/70' : 'text-black/45'
-          )}
-        >
-          {tile.ready ? t(tile.skillKey) : t(tile.lockedKey ?? tile.skillKey, { min: 4 })}
-        </span>
-
-        <span className="mt-auto pt-1 flex flex-wrap items-center gap-1.5">
-          <span
-            className={cn(
-              'inline-block text-[11px] font-neo-body font-black uppercase tabular-nums px-2 py-0.5 rounded-neo border-2 border-black',
-              tile.ready ? 'bg-neo-yellow text-black' : 'bg-black/10 text-black/50 border-black/30'
-            )}
-          >
-            {tile.ready ? badge : t('education.practicePicker.lockedBadge')}
-          </span>
-          {tile.sessions > 0 && (
-            <span
-              data-testid={`practice-tile-plays-${tile.id}`}
-              className="inline-block text-[11px] font-neo-body font-bold tabular-nums text-black/60"
-            >
-              {t('education.practicePicker.played', { count: tile.sessions })}
-            </span>
-          )}
-        </span>
-      </span>
-    </button>
-  );
-}
 
 export default function PracticePicker({
   lessonName,
@@ -206,48 +95,73 @@ export default function PracticePicker({
   };
 
   return (
-    <div className="w-full">
-      <div className="flex items-center gap-3 mb-4">
+    <div className="flex h-full min-h-0 w-full flex-col">
+      {/*
+        Header: ONE row, and the readiness/mastery meta rides in it rather than
+        on a line of its own. Every row up here is a row of tiles a student on a
+        390x844 phone does not get to see.
+      */}
+      <div className="flex shrink-0 items-center gap-2 pb-2">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+          className="shrink-0 text-neo-cream hover:bg-neo-white/10 hover:text-neo-white"
         >
-          <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
+          <DirectionalIcon icon={ArrowLeft} className="h-5 w-5" />
         </Button>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-neo-display text-neo-white text-balance">
+        <div className="min-w-0 flex-1">
+          <h1 className="font-neo-display text-lg font-black uppercase leading-none text-neo-white text-balance">
             {t('education.practicePicker.title')}
           </h1>
-          <p className="text-sm text-neo-white/80 font-neo-body truncate">{lessonName}</p>
+          <p className="truncate font-neo-body text-[11px] leading-tight text-neo-white/70">
+            {lessonName}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-0.5">
+          <p
+            data-testid="practice-picker-readiness"
+            className="font-neo-body text-[11px] tabular-nums text-neo-white/65"
+          >
+            {t('education.practicePicker.readyCount', {
+              ready: readiness.ready,
+              total: readiness.total,
+            })}
+          </p>
+          {masteryLook && MasteryIcon && (
+            <p
+              data-testid="practice-picker-mastery"
+              className={cn(
+                'flex items-center gap-1 font-neo-body text-[11px] font-bold',
+                masteryLook.className
+              )}
+            >
+              <MasteryIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t(`education.practice.mastery.${mastery}`)}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 mb-3">
-        <p data-testid="practice-picker-readiness" className="text-xs font-neo-body text-neo-white/70 tabular-nums">
-          {t('education.practicePicker.readyCount', { ready: readiness.ready, total: readiness.total })}
-        </p>
-        {masteryLook && MasteryIcon && (
-          <p
-            data-testid="practice-picker-mastery"
-            className={cn('flex items-center gap-1 text-xs font-neo-body font-bold', masteryLook.className)}
-          >
-            <MasteryIcon className="w-4 h-4" aria-hidden="true" />
-            {t(`education.practice.mastery.${mastery}`)}
-          </p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {/*
+        The one scrolling region on this screen. The shell above and the page
+        around it stay put, so the phone never scrolls the body.
+      */}
+      <div
+        data-testid="practice-picker-grid"
+        className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2.5 overflow-y-auto overscroll-contain pb-2 sm:grid-cols-3 lg:grid-cols-4"
+      >
         {tiles.map((tile) => (
-          <TileCard key={tile.id} tile={tile} onSelect={handleSelect} />
+          <PracticePickerTile key={tile.id} tile={tile} onSelect={handleSelect} />
         ))}
       </div>
 
       {readiness.ready === 0 && (
-        <p role="status" className="mt-4 text-sm font-neo-body text-neo-white/80 text-pretty">
+        <p
+          role="status"
+          className="shrink-0 pt-3 font-neo-body text-sm text-neo-white/80 text-pretty"
+        >
           {t('education.practicePicker.nothingReady')}
         </p>
       )}

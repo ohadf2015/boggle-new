@@ -65,14 +65,26 @@ function renderBanner(props: Partial<React.ComponentProps<typeof ClassroomModeBa
 }
 
 describe('ClassroomModeBanner — the projector owns the classroom lobby', () => {
-  it('renders nothing for a teacher in the lobby', () => {
+  /**
+   * ROUND 2. This used to render literally nothing, and that was the gap: the
+   * projector prints everything the panel did but can CHANGE nothing, so a
+   * teacher who wanted a different game had to exit — ending the room for
+   * every student in it — and come back with a new code. The banner now
+   * renders exactly one thing here: the in-place mode switch. Everything the
+   * early return existed to suppress (the second code, the second QR, the
+   * settings grid, the word list) stays suppressed — the test below pins that.
+   */
+  it('renders only the in-place mode switch for a teacher in the lobby', () => {
     const { container } = renderBanner({ isHost: true, liveGame });
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByTestId('lobby-mode-switcher')).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="qr-code-wrapper"]')).toBeNull();
+    expect(screen.queryByText('education.classroomGame.shareCode')).not.toBeInTheDocument();
   });
 
   it('defaults to the host, so an unspecified viewer also gets the single surface', () => {
-    const { container } = renderBanner({ liveGame });
-    expect(container).toBeEmptyDOMElement();
+    renderBanner({ liveGame });
+    expect(screen.getByTestId('lobby-mode-switcher')).toBeInTheDocument();
+    expect(screen.queryByText('education.classroomGame.gameSettings')).not.toBeInTheDocument();
   });
 
   it('prints no second game code anywhere on the teacher screen', () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { Volume2, Loader2 } from 'lucide-react';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,7 +29,9 @@ export function PronunciationButton({
   const { speak, isSpeaking } = useSpeechSynthesis();
   const [showFallback, setShowFallback] = useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    // The button is often nested in a clickable card (flashcard flip): keep the click here.
+    e.stopPropagation();
     const success: boolean = await speak(word, lang);
 
     // Show IPA fallback if voice unavailable

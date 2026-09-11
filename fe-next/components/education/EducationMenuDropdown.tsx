@@ -52,7 +52,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
           'flex items-center justify-center',
           'w-10 h-10 sm:w-11 sm:h-11',
           'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
-          'border-3 border-neo-black dark:border-slate-500',
+          'border-3 border-neo-black dark:border-neo-cream',
           'rounded-neo shadow-hard-sm',
           'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
           'active:translate-x-px active:translate-y-px active:shadow-none',
@@ -70,7 +70,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
             className={cn(
               'absolute top-full mt-2 w-56',
               'bg-neo-cream dark:bg-neo-navy',
-              'border-3 border-neo-black dark:border-slate-500',
+              'border-3 border-neo-black dark:border-neo-cream',
               'rounded-neo shadow-hard-lg',
               'overflow-hidden z-50',
               'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150',

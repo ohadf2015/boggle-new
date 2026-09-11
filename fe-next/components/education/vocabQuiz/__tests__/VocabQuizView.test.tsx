@@ -89,6 +89,8 @@ describe('VocabQuizView', () => {
 
     expect(screen.getByText('to leave behind for good')).toBeInTheDocument();
     expect(screen.getByText('vocabQuiz.progress:1,5')).toBeInTheDocument();
+    // Four tiles and nothing else tappable: the header mascot is a reaction,
+    // not a control, so it must not answer to a role a thumb can hit.
     expect(screen.getAllByRole('button')).toHaveLength(4);
   });
 
@@ -115,7 +117,7 @@ describe('VocabQuizView', () => {
     expect(emitted.filter((e) => e.event === VOCAB_QUIZ_EVENTS.answer)).toHaveLength(1);
   });
 
-  it('shows the score and streak the server reports, never one it computes itself', () => {
+  it('shows the score and streak the server reports, never one it computes itself', async () => {
     const { socket, server } = makeSocket();
     render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
@@ -124,11 +126,28 @@ describe('VocabQuizView', () => {
       points: 148, speedBonus: 48, streakBonus: 0, streak: 3, totalScore: 420,
     });
 
-    expect(screen.getByText('420')).toBeInTheDocument();
+    // The counter rolls up to the server's total rather than snapping — but it
+    // is the SERVER's total it lands on, never a sum computed here.
+    expect(await screen.findByText('420')).toBeInTheDocument();
     expect(screen.getByLabelText('vocabQuiz.streak.label:3')).toBeInTheDocument();
   });
 
-  it('tells the student they were right, and breaks the points down', () => {
+  it('flies the points that earned the jump instead of explaining them in prose', async () => {
+    const { socket, server } = makeSocket();
+    render(<VocabQuizView socket={socket} username="ana" t={t} />);
+    server(VOCAB_QUIZ_EVENTS.question, QUESTION);
+    server(VOCAB_QUIZ_EVENTS.answerResult, {
+      index: 0, correct: true, choiceIndex: 0,
+      points: 148, speedBonus: 48, streakBonus: 0, streak: 1, totalScore: 148,
+    });
+
+    expect(screen.getByTestId('vocab-quiz-score-pop')).toHaveTextContent('148');
+    // The old three-part prose breakdown is gone: nobody read it, and it was
+    // what pushed the round off the bottom of a 390x844 phone.
+    expect(screen.queryByText(/vocabQuiz\.feedback\.breakdown/)).toBeNull();
+  });
+
+  it('tells the student they were right in one strip, with the word underneath', () => {
     const { socket, server } = makeSocket();
     render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
@@ -138,8 +157,11 @@ describe('VocabQuizView', () => {
     });
     server(VOCAB_QUIZ_EVENTS.reveal, REVEAL);
 
-    expect(screen.getByText('vocabQuiz.feedback.correct:148')).toBeInTheDocument();
-    expect(screen.getByText('vocabQuiz.feedback.breakdown:100,48,0')).toBeInTheDocument();
+    expect(screen.getByText('vocabQuiz.correctShort')).toBeInTheDocument();
+    // The word and its definition stay on screen — the verdict alone teaches
+    // nobody anything.
+    expect(screen.getAllByText('abandon').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/to leave behind for good/).length).toBeGreaterThan(0);
   });
 
   it('names the right answer when the student never answered', () => {
@@ -151,14 +173,16 @@ describe('VocabQuizView', () => {
     expect(screen.getByText('vocabQuiz.feedback.noAnswer:abandon')).toBeInTheDocument();
   });
 
-  it('shows standings between questions', () => {
+  it('shows where the student stands between questions, in one line', () => {
+    // A full standings list here is what used to make the reveal taller than
+    // the question and force the phone to scroll. The rank is the part a
+    // student actually looks for, and it fits in the header.
     const { socket, server } = makeSocket();
     render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, QUESTION);
     server(VOCAB_QUIZ_EVENTS.reveal, REVEAL);
 
-    expect(screen.getByText('ana')).toBeInTheDocument();
-    expect(screen.getByText('148')).toBeInTheDocument();
+    expect(screen.getByText('vocabQuiz.rank:1,2')).toBeInTheDocument();
   });
 
   it('clears the previous answer when the next question arrives', async () => {
@@ -175,7 +199,7 @@ describe('VocabQuizView', () => {
     expect(emitted.filter((e) => e.event === VOCAB_QUIZ_EVENTS.answer)).toHaveLength(2);
   });
 
-  it('restores a mid-question refresh with the time left and the answer already given', () => {
+  it('restores a mid-question refresh with the time left and the answer already given', async () => {
     const { socket, server } = makeSocket();
     render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.state, {
@@ -198,7 +222,7 @@ describe('VocabQuizView', () => {
     });
 
     expect(screen.getByText('vocabQuiz.progress:3,5')).toBeInTheDocument();
-    expect(screen.getByText('260')).toBeInTheDocument();
+    expect(await screen.findByText('260')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /brittle/ })).toHaveAttribute('aria-pressed', 'true');
   });
 

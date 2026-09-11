@@ -10,6 +10,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getStudentClassroom, getLessons, getClassroomStudents, type Classroom, type VocabularyLesson, type ClassroomStudent } from '@/lib/supabase/education';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { resolveDisplayName } from '@/lib/displayName';
 
 type Tab = 'lobby' | 'history' | 'classmates';
 
@@ -78,6 +79,17 @@ function DuelsPageClientInner() {
 
   const lessonOptions = lessons.map((l) => ({ id: l.id, name: l.name }));
 
+  // The pending-duel rows only carry challenger_id. Without this map the async
+  // turn card would print a raw uuid where a classmate's name belongs.
+  const opponentNames: Record<string, string> = {};
+  for (const classmate of classmates) {
+    const profile = Array.isArray(classmate.profiles) ? classmate.profiles[0] : classmate.profiles;
+    opponentNames[classmate.student_id] = resolveDisplayName(
+      [profile?.display_name, profile?.username],
+      t('common.opponent')
+    );
+  }
+
   return (
     <div className="min-h-dvh bg-neo-navy p-4 sm:p-6">
       <TopBackLink className="mb-4" />
@@ -107,6 +119,8 @@ function DuelsPageClientInner() {
             classroomId={classroom.id}
             studentId={user.id}
             lessons={lessonOptions}
+            opponentNames={opponentNames}
+            onTabChange={(tab) => setActiveTab(tab as Tab)}
           />
         </TabsContent>
         <TabsContent value="history">

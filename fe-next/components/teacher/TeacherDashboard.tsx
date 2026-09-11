@@ -20,13 +20,14 @@
 
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { type ReactNode, useState, useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 // Measured as the biggest remaining first-load cost on this dashboard, and it
 // renders only for a first-time teacher. `ssr: false` because it is a modal
 // nobody sees on the server render anyway.
@@ -50,17 +51,43 @@ import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
 import { LastGameInsights } from './analytics/LastGameInsights';
 import { ProGate } from './ProGate';
-import { TeacherPlanBadge } from './TeacherPlanBadge';
+import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
+import { useTeacherOnboardingState } from '@/hooks/useOnboardingState';
 import { BarChart3, FileText, ChevronDown, History, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
 import { stagger, slideUp } from './teacherDashboardTabs';
+
+/**
+ * The secondary row. A `border-black` outline on a `bg-neo-navy-light` fill
+ * separates from the navy page by about 1.3:1 — a shape you can only find by
+ * hunting for it. A cream edge is ~15:1 and costs nothing.
+ */
+const SHORTCUT_CLASS = cn(
+  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-neo-cream',
+  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
+  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard',
+  'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan'
+);
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 
-export default function TeacherDashboard() {
+export interface TeacherDashboardProps {
+  /**
+   * The trial / Pro strip, when the route client has one to show.
+   *
+   * A slot rather than a sibling: rendered next to this component it sat
+   * outside an `h-dvh` root and made the page taller than the viewport, so the
+   * document scrolled again for exactly the teachers who see a banner. And it
+   * landed above PLAY NOW, which is a stacked prompt in front of the primary
+   * action. Inside, below the hero, it is neither.
+   */
+  banner?: ReactNode;
+}
+
+export default function TeacherDashboard({ banner }: TeacherDashboardProps = {}) {
   const { t, language } = useLanguage();
   const { profile } = useAuth();
   const router = useRouter();
@@ -75,6 +102,15 @@ export default function TeacherDashboard() {
   const [toolsOpen, setToolsOpen] = useState(false);
   const toolsRef = useRef<HTMLDetailsElement>(null);
   const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
+  // Two fixed overlays used to be able to own the screen at once: the first-run
+  // walkthrough at z-[100] and the Pro welcome at z-[90] under it. Read
+  // PESSIMISTICALLY — `shouldShowOnboarding` is false until localStorage has
+  // been read, so gating on it directly would flash the welcome dialog for a
+  // frame and then bury it (pitfall class 1). `completed || skipped` is only
+  // ever true once the flag has actually resolved.
+  const { isCompleted: onboardingCompleted, isSkipped: onboardingSkipped } = useTeacherOnboardingState();
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
+  const onboardingClear = onboardingCompleted || onboardingSkipped || onboardingDismissed;
   const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
   // Only for the one-time gifted-Pro celebration; the header chip reads the
@@ -123,32 +159,37 @@ export default function TeacherDashboard() {
   );
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden', isRTL && 'rtl')}>
-      <EducationHeader />
-      <TeacherOnboarding />
-      {!proLoading && <ProWelcomeCelebration grant={proGrant} paid={checkoutSuccess && hasPro && proSource === 'polar'} />}
+    <EducationShell
+      className={cn(isRTL && 'rtl')}
+      scrollRegionLabel={t('teacher.dashboard.title')}
+      header={<EducationHeader />}
+      statusRow={<TeacherStatusRow />}
+      contentClassName="px-4 py-4 sm:px-6 lg:px-8"
+    >
+      {/* Both are fixed overlays, and only ever ONE at a time: the welcome
+          dialog waits until the first-run walkthrough is finished, or it would
+          land at z-[90] under an onboarding modal at z-[100] and be missed. */}
+      <TeacherOnboarding onDismiss={() => setOnboardingDismissed(true)} />
+      {!proLoading && onboardingClear && (
+        <ProWelcomeCelebration grant={proGrant} paid={checkoutSuccess && hasPro && proSource === 'polar'} />
+      )}
 
       <m.div
-        className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1"
+        data-testid="teacher-dashboard-grid"
+        // Desktop is a layout, not a stretched phone: the hero takes two of
+        // three columns and the secondary rail sits beside it instead of
+        // pushing the lesson builder a screen further down. Phone keeps the
+        // same DOM order — hero, the one-tap rail, then the prep work — so no
+        // JS viewport branch is needed and nothing reflows after first paint.
+        className="w-full max-w-[1280px] mx-auto lg:grid lg:grid-cols-3 lg:gap-x-6 lg:items-start"
         variants={stagger}
-        initial="hidden"
+        // Class-5: an opacity tween on a column this wide promotes a
+        // page-sized GPU layer and flashes on the Chromium mobile renderer.
+        // `false` paints the resting state on frame one; the variants stay so
+        // a child can still animate on a state change later.
+        initial={false}
         animate="visible"
       >
-        <m.div variants={slideUp} className="mb-6 flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white">
-              {t('teacher.dashboard.title')}
-            </h1>
-            <p className="text-sm text-neo-white font-neo-body mt-1">
-              {t('teacher.dashboard.subtitle')}
-            </p>
-          </div>
-          {/* The plan, at a glance — a gifted teacher must be able to SEE the
-              gift took, and a free teacher must never wonder which plan they
-              are on. */}
-          <TeacherPlanBadge className="shrink-0" />
-        </m.div>
-
         {classroomsError ? (
           // Pessimistic: never show the lessons or an empty card while the
           // classroom read is broken. Solid cream card — the dashboard root is
@@ -157,7 +198,7 @@ export default function TeacherDashboard() {
           <m.div
             variants={slideUp}
             data-testid="play-tab-error-card"
-            className="rounded-neo border-3 border-neo-red bg-neo-cream shadow-hard px-6 py-8 text-center"
+            className="lg:col-span-3 rounded-neo border-3 border-neo-red bg-neo-cream shadow-hard px-6 py-8 text-center"
           >
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-neo-red bg-neo-red/10 shadow-hard-sm">
               <BarChart3 className="h-8 w-8 text-neo-red" />
@@ -185,16 +226,34 @@ export default function TeacherDashboard() {
         ) : (
           <>
             {/* The one button. First on the page, armed on arrival. */}
-            <m.div variants={slideUp} className="mb-5">
+            <m.div
+              variants={slideUp}
+              data-testid="teacher-dashboard-main"
+              className="mb-5 lg:col-span-2"
+            >
               <PlayNowLauncher onLaunch={handleQuickLaunch} />
             </m.div>
 
-            {/* One tap away, never in the way. */}
-            <m.nav
+            {/* The 1/3 rail: what happened, who is waiting, where to go next.
+                On phone it falls directly under the button, which is where it
+                was before — one compact row, never a wall of cards. */}
+            <m.aside
               variants={slideUp}
+              data-testid="teacher-dashboard-aside"
+              className="lg:col-span-1 lg:row-span-2"
+            >
+            {/* Seen on the way down, never in front of the button. */}
+            {banner ? (
+              <div data-testid="teacher-dashboard-banner" className="mb-5">
+                {banner}
+              </div>
+            ) : null}
+
+            {/* One tap away, never in the way. */}
+            <nav
               data-testid="teacher-shortcuts"
               aria-label={t('teacher.playNow.shortcutsLabel')}
-              className="mb-6 grid grid-cols-3 gap-3"
+              className="mb-6 grid grid-cols-3 gap-3 lg:grid-cols-1"
             >
               <button
                 type="button"
@@ -203,63 +262,54 @@ export default function TeacherDashboard() {
                   setToolsOpen(true);
                   requestAnimationFrame(() => toolsRef.current?.scrollIntoView({ block: 'start' }));
                 }}
-                className={cn(
-                  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-black',
-                  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
-                  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard'
-                )}
+                className={SHORTCUT_CLASS}
               >
-                <History className="size-4 shrink-0" aria-hidden="true" />
+                <History className="size-4 shrink-0 text-neo-cyan" aria-hidden="true" />
                 {t('teacher.playNow.shortcutLastGame')}
               </button>
               <Link
                 href={`/${language}/education/classroom-game`}
                 data-testid="shortcut-recent"
-                className={cn(
-                  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-black',
-                  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
-                  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard'
-                )}
+                className={SHORTCUT_CLASS}
               >
-                <SlidersHorizontal className="size-4 shrink-0" aria-hidden="true" />
+                <SlidersHorizontal className="size-4 shrink-0 text-neo-lime" aria-hidden="true" />
                 {t('teacher.playNow.shortcutSetup')}
               </Link>
               <Link
                 href={`/${language}/teacher/reports`}
                 data-testid="shortcut-reports"
-                className={cn(
-                  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-black',
-                  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
-                  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard'
-                )}
+                className={SHORTCUT_CLASS}
               >
-                <FileText className="size-4 shrink-0" aria-hidden="true" />
+                <FileText className="size-4 shrink-0 text-neo-pink" aria-hidden="true" />
                 {t('teacher.playNow.shortcutReports')}
               </Link>
-            </m.nav>
+            </nav>
 
             {/* Who is already waiting. One line, and the reason to press host. */}
             {!classroomsLoading && classrooms.length > 0 && (
-              <m.div variants={slideUp} className="mb-6">
+              <div className="mb-6">
                 <StudentsPresentStrip classrooms={classrooms} />
-              </m.div>
+              </div>
             )}
+            </m.aside>
 
-            {/* A teacher with no classroom yet needs a join code before a lesson
-                is worth anything, so the first run keeps its own card. */}
-            {!classroomsLoading && (classrooms.length === 0 || newlyCreatedJoinCode) && (
-              <m.div variants={slideUp} className="mb-6">
-                <PlayTabFirstRunCard
-                  onJoinCodeCreated={setNewlyCreatedJoinCode}
-                  initialJoinCode={newlyCreatedJoinCode}
-                />
-              </m.div>
-            )}
+            <m.div variants={slideUp} data-testid="teacher-dashboard-prep" className="lg:col-span-2">
+              {/* A teacher with no classroom yet needs a join code before a
+                  lesson is worth anything, so the first run keeps its card. */}
+              {!classroomsLoading && (classrooms.length === 0 || newlyCreatedJoinCode) && (
+                <div className="mb-6">
+                  <PlayTabFirstRunCard
+                    onJoinCodeCreated={setNewlyCreatedJoinCode}
+                    initialJoinCode={newlyCreatedJoinCode}
+                  />
+                </div>
+              )}
 
-            {/* Below the fold of the one button: the place to prepare, for the
-                teacher who has a free period rather than a class in the room. */}
-            <m.div variants={slideUp} className="mt-8">
-              <LessonBuilder initialReviewWords={deepLink.reviewWords} />
+              {/* Below the fold of the one button: the place to prepare, for the
+                  teacher who has a free period rather than a class in the room. */}
+              <div className="mt-2 lg:mt-0">
+                <LessonBuilder initialReviewWords={deepLink.reviewWords} />
+              </div>
             </m.div>
           </>
         )}
@@ -271,9 +321,11 @@ export default function TeacherDashboard() {
             data-testid="teacher-tools"
             open={toolsOpen}
             onToggle={(e) => setToolsOpen((e.currentTarget as HTMLDetailsElement).open)}
-            className="group mt-10 rounded-neo border-2 border-black/30 bg-neo-navy-light"
+            className="group mt-10 lg:col-span-3"
           >
-            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-5 py-3 font-neo-display font-bold text-neo-white marker:content-none">
+            {/* The border lives on the summary, not the wrapper: the summary is
+                the tappable thing, and the contrast rule is about controls. */}
+            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-white shadow-hard-sm marker:content-none group-open:rounded-b-none">
               <ChevronDown
                 className="size-4 shrink-0 transition-transform group-open:rotate-180"
                 aria-hidden="true"
@@ -281,7 +333,7 @@ export default function TeacherDashboard() {
               {t('teacher.dashboard.tools')}
             </summary>
 
-            <div className="space-y-8 border-t-2 border-black/30 px-5 py-6">
+            <div className="space-y-8 rounded-b-neo border-3 border-t-0 border-neo-cream bg-neo-navy-light px-5 py-6">
               {/* One classroom picker for every surface below it — it used to be
                   rendered three times, once per section. */}
               {classrooms.length > 1 && (
@@ -360,6 +412,6 @@ export default function TeacherDashboard() {
           onComplete={() => setShowAssignmentCreator(false)}
         />
       )}
-    </div>
+    </EducationShell>
   );
 }

@@ -75,7 +75,7 @@ export function ClassroomBattleSettings({
                 data-testid={`playstyle-${style}`}
                 onClick={() => onPlayStyleChange(style)}
                 className={cn(
-                  'px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all text-start',
+                  'px-4 py-3 font-bold rounded-neo border-[3px] border-neo-cream transition-all text-start',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
                   isSelected
                     ? 'bg-neo-pink text-neo-black shadow-hard'
@@ -115,7 +115,7 @@ export function ClassroomBattleSettings({
                     data-testid={`teamcount-${count}`}
                     onClick={() => onTeamCountChange(count)}
                     className={cn(
-                      'px-4 py-2.5 font-bold rounded-neo border-neo border-neo-black transition-all',
+                      'px-4 py-2.5 font-bold rounded-neo border-[3px] border-neo-cream transition-all',
                       'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
                       isSelected
                         ? 'bg-neo-pink text-neo-black shadow-hard'
@@ -151,7 +151,7 @@ export function ClassroomBattleSettings({
                 data-testid={`support-${key}`}
                 onClick={() => toggle(key)}
                 className={cn(
-                  'px-4 py-2 min-h-[44px] font-bold text-sm rounded-neo border-neo border-neo-black transition-all',
+                  'px-4 py-2 min-h-[44px] font-bold text-sm rounded-neo border-[3px] border-neo-cream transition-all',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
                   isOn
                     ? 'bg-neo-lime text-neo-black shadow-hard'

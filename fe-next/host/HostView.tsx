@@ -30,6 +30,7 @@ import {
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import TvBroadcastView from './components/TvBroadcastView';
+import { useIsVocabQuizRoom, projectorShowsQuiz } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import TvLobbyView from './components/tv-broadcast/TvLobbyView';
 import { TvResultsView } from './components/tv-results';
 import {
@@ -622,6 +623,7 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;
+  const isVocabQuizRoom = useIsVocabQuizRoom(socket);
 
   // Navigation hiding is managed by PageClient based on isActive/showResults
 
@@ -825,9 +827,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           totalTime={settings.timerValue * 60}
         />
       )}
-
-      {/* TV Broadcast View - Host NOT Playing (Spectator Mode) */}
-      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !settings.hostPlaying && runtime.tableData) && (
+      {projectorShowsQuiz({ gameStarted: !!runtime.gameStarted, hasActiveGameData: !!hasActiveGameData, waitingForResults: !!runtime.waitingForResults, hostPlaying: !!settings.hostPlaying, hasBoard: !!runtime.tableData, isQuizRoom: isVocabQuizRoom }) && (
         <TvBroadcastView
           gameCode={gameCode}
           username={username}

@@ -68,11 +68,16 @@ export const AchievementGrid = memo<AchievementGridProps>(
               key={key}
               onClick={() => setActiveCategory(key)}
               className={cn(
-                'px-4 py-2 rounded-neo border-neo border-neo-black',
+                // `border-neo` (the WIDTH) and `border-neo-black` (the COLOUR)
+                // are one tailwind-merge group, so cn() kept only the colour and
+                // preflight rendered these chips with NO border — on a navy fill
+                // over a navy page, an invisible control. Literal width + a cream
+                // edge; selected still differs by FILL, not just by text colour.
+                'px-4 py-2 min-h-11 rounded-neo border-[2px]',
                 'font-bold text-sm transition-all duration-200',
                 activeCategory === key
-                  ? 'bg-neo-lime text-neo-black shadow-hard'
-                  : 'bg-neo-navy text-neo-white hover:bg-neo-navy-light'
+                  ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard'
+                  : 'bg-neo-navy-light text-neo-white border-neo-cream hover:bg-neo-navy'
               )}
             >
               {t(labelKey)}

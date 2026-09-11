@@ -86,7 +86,7 @@ export function VocabQuizStandings({
               <li
                 key={player.username}
                 className={cn(
-                  'flex items-center gap-3 rounded-neo border-neo border-neo-black px-3',
+                  'flex items-center gap-3 rounded-neo border-[2px] border-neo-black px-3',
                   projector ? 'py-3' : 'py-2',
                   isMe
                     ? 'bg-neo-lime text-neo-black shadow-hard'

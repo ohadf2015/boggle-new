@@ -24,6 +24,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
 import { ArrowLeft, Check, Blocks } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
 import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
@@ -63,14 +64,28 @@ export interface WordTowerPracticeProps {
   language: Language;
   onComplete: (results: WordTowerPracticeResults) => void | Promise<void>;
   onBack: () => void;
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
 }
 
-export default function WordTowerPractice({
+/**
+ * One run of the tower. `useWordTower` builds its reducer state once, so the
+ * only honest way to hand a student a genuinely fresh tower is to remount this
+ * — which is exactly what the exported wrapper below does by bumping a key.
+ * Resetting in place would leave the reducer's tray and combo state behind
+ * (recurring pitfall Class 2: stale mutable state across a reset path).
+ */
+function WordTowerRun({
   words,
   language,
   onComplete,
   onBack,
-}: WordTowerPracticeProps) {
+  onNext,
+  nextLabel,
+  onAgain,
+}: WordTowerPracticeProps & { onAgain: () => void }) {
   const { t, dir } = useLanguage();
 
   const seed = useMemo(() => buildLessonSeed(words, language), [words, language]);
@@ -149,9 +164,15 @@ export default function WordTowerPractice({
   }, [resultKey, game.floors, seed, language]);
 
   const finishedRef = useRef(false);
+  // Word Tower used to report its result and get unmounted in the same tick —
+  // the student's reward for topping out was being dropped back on the tile
+  // grid. It now holds the screen and shows the same completion moment as
+  // every other mode.
+  const [done, setDone] = useState(false);
   const handleDone = useCallback(() => {
     if (finishedRef.current) return;
     finishedRef.current = true;
+    setDone(true);
     void onComplete({
       vocabularyWordsFound: hits,
       wordsFound: game.floors.map((floor) => floor.word),
@@ -159,6 +180,27 @@ export default function WordTowerPractice({
       score: Math.round(game.heightM) + hits.length * LESSON_HIT_POINTS,
     });
   }, [hits, game.floors, game.heightM, onComplete]);
+
+
+
+  if (done) {
+    return (
+      <div className="flex w-full items-center justify-center py-4" data-testid="word-tower-complete">
+        <PracticeCompletionMoment
+          correct={hits.length}
+          total={seed.targets.length}
+          stats={[
+            { key: 'floors', label: t('student.practiceFun.floors'), value: `${game.floors.length}` },
+            { key: 'height', label: t('student.practiceFun.height'), value: `${Math.round(game.heightM)}m` },
+          ]}
+          onAgain={onAgain}
+          onBack={onBack}
+          onNext={onNext}
+          nextLabel={nextLabel}
+        />
+      </div>
+    );
+  }
 
   if (!seeded) {
     return (
@@ -299,3 +341,19 @@ export default function WordTowerPractice({
 
 /** Canonical form of a lesson word, for callers matching against results. */
 export { canonLessonWord };
+
+/**
+ * Public entry point. Holds nothing but the run key, so AGAIN on the
+ * completion card gives the student a genuinely new tower rather than a
+ * half-cleared one.
+ */
+export default function WordTowerPractice(props: WordTowerPracticeProps) {
+  const [runKey, setRunKey] = useState(0);
+  return (
+    <WordTowerRun
+      key={runKey}
+      {...props}
+      onAgain={() => setRunKey((k) => k + 1)}
+    />
+  );
+}

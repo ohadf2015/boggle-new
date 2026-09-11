@@ -151,12 +151,11 @@ describe('DuelLobby', () => {
 
       render(<DuelLobby {...defaultProps} />);
 
-      await waitFor(() => {
-        const acceptButton = screen.getByText('Accept');
-        fireEvent.click(acceptButton);
-
-        expect(mockAcceptChallenge).toHaveBeenCalledWith('duel-1');
-      });
+      // The row is now an AsyncDuelTurnCard: the primary action is "play my
+      // turn" / "beat it", not a generic Accept button.
+      await waitFor(() => screen.getByTestId('duel-turn-play'));
+      fireEvent.click(screen.getByTestId('duel-turn-play'));
+      expect(mockAcceptChallenge).toHaveBeenCalledWith('duel-1');
     });
 
     it('calls declineChallenge when Decline button clicked', async () => {
@@ -175,12 +174,9 @@ describe('DuelLobby', () => {
 
       render(<DuelLobby {...defaultProps} />);
 
-      await waitFor(() => {
-        const declineButton = screen.getByText('Decline');
-        fireEvent.click(declineButton);
-
-        expect(mockDeclineChallenge).toHaveBeenCalledWith('duel-1');
-      });
+      await waitFor(() => screen.getByTestId('duel-turn-decline'));
+      fireEvent.click(screen.getByTestId('duel-turn-decline'));
+      expect(mockDeclineChallenge).toHaveBeenCalledWith('duel-1');
     });
   });
 

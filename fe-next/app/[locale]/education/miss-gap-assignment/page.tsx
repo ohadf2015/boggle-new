@@ -117,12 +117,16 @@ export default async function MissGapAssignmentPage(props: PageProps) {
   const dir = payload.locale === 'he' ? 'rtl' : 'ltr';
 
   return (
+    // Locked shell, one inner scroll region — the page body never scrolls, so
+    // the homework game can take the viewport without fighting it.
     <main
       dir={dir}
-      className="min-h-dvh bg-neo-navy flex items-center justify-center px-4 py-10"
+      className="h-dvh overflow-hidden bg-neo-navy flex flex-col"
       data-testid="miss-gap-assignment-page"
     >
-      <MissGapAsyncAssignment payload={payload} teacherMode={teacherMode} />
+      <div className="flex-1 min-h-0 overflow-y-auto flex justify-center px-4 py-6">
+        <MissGapAsyncAssignment payload={payload} teacherMode={teacherMode} />
+      </div>
     </main>
   );
 }

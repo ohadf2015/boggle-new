@@ -14,7 +14,14 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ 
 let proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
-vi.mock('@/components/teacher/TeacherDashboard', () => ({ default: () => <div data-testid="teacher-dashboard" /> }));
+// The banner is a SLOT on the dashboard now, not a sibling — rendered beside an
+// `h-dvh` root it made the page taller than the viewport. The mock has to render
+// what it is handed, or these assertions would pass on a dropped banner.
+vi.mock('@/components/teacher/TeacherDashboard', () => ({
+  default: ({ banner }: { banner?: React.ReactNode }) => (
+    <div data-testid="teacher-dashboard">{banner}</div>
+  ),
+}));
 vi.mock('@/components/education/TrialUrgencyBanner', () => ({ TrialUrgencyBanner: () => null }));
 vi.mock('@/components/education/TeacherGate', () => ({
   TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,

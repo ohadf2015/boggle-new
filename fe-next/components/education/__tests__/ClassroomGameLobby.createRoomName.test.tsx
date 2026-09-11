@@ -64,7 +64,7 @@ const LESSONS = [
 const CLASSROOMS = [{ id: 'class-1', name: 'QA Dogfood Class', member_count: 1 }];
 
 function startBtn() {
-  return screen.getByRole('button', { name: /createRoom/i });
+  return screen.getByTestId('lobby-go-live');
 }
 
 async function clickCreateRoom() {

@@ -9,9 +9,9 @@
  */
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Calendar, Check, ClipboardList, Flame, GraduationCap, Share2 } from 'lucide-react';
+import { Calendar, Check, ClipboardList, Flame, GraduationCap, Play, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { MissGapPracticeCard } from '@/components/education/MissGapPracticeCard';
@@ -39,6 +39,9 @@ import {
   buildMissGapWhatsAppDeepLink,
   canShareMissGapWhatsApp,
 } from '@/lib/education/missGapWhatsAppShare';
+import { MissGapGame } from '@/components/education/missGap/MissGapGame';
+import { MissGapTeacherProgress } from '@/components/education/missGap/MissGapTeacherProgress';
+import { useMissGapProgress } from '@/components/education/missGap/useMissGapProgress';
 
 export interface MissGapAsyncAssignmentProps {
   payload: MissGapAssignmentPayload;
@@ -60,6 +63,13 @@ export function MissGapAsyncAssignment({
   const [streak, setStreak] = useState(() =>
     readClassStreak(buildMissGapClassKey(initial)),
   );
+  // The class streak now lives on the server. The device copy is only the first
+  // paint (instant, offline, and never higher than the truth because it counts
+  // one phone); the server number overrides it the moment it lands — pessimistic
+  // first, never the other way round (pitfalls Class 1).
+  const [serverStreak, setServerStreak] = useState<number | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [progressToken, setProgressToken] = useState(0);
 
   const isTeacher = teacherMode ?? !initial.dueDate;
   const locale = initial.locale || language;
@@ -74,6 +84,10 @@ export function MissGapAsyncAssignment({
   );
 
   const classKey = buildMissGapClassKey(payload);
+  // ONE read of the server state, for the teacher's roster AND the student's
+  // streak chip. The student branch used to have no server read at all, so a
+  // fresh phone showed a 0-day streak for a class five days in.
+  const progress = useMissGapProgress(classKey, payload.dueDate, progressToken);
   const words = payload.missedWords;
   const lesson = payload.lesson || t('education.results.title');
 
@@ -111,18 +125,24 @@ export function MissGapAsyncAssignment({
     if (result === 'copied' || result === 'shared') setShareState(result);
   };
 
-  const handleComplete = () => {
-    if (!payload.dueDate || words.length === 0) return;
+  // The fetched streak is authoritative over the device copy.
+  useEffect(() => {
+    if (progress.data) setServerStreak(progress.data.streak.currentStreak);
+  }, [progress.data]);
+
+  /** The game finished and the server accepted the run. */
+  const handleGameFinished = (nextServerStreak: number) => {
+    if (words.length === 0) return;
     const next = recordClassHomeworkCompletion({
       classKey,
       dueDate: payload.dueDate,
     });
     setStreak(next);
-    const score = scoreMissGapHomework({
-      dueDate: payload.dueDate,
-      completed: true,
-    });
-    setGradeScore(score);
+    setServerStreak(nextServerStreak);
+    setProgressToken((n) => n + 1);
+    setGradeScore(
+      scoreMissGapHomework({ dueDate: payload.dueDate, completed: true }),
+    );
     setCompleted(true);
   };
 
@@ -130,6 +150,64 @@ export function MissGapAsyncAssignment({
     if (!gradeScore || !payload.dueDate || words.length === 0) return null;
     return buildMissGapGradePassbackPath({ input: payload, score: gradeScore });
   }, [gradeScore, payload, words.length]);
+
+  /**
+   * Turn-in + parent share. Rendered at the moment of triumph inside the
+   * game's finish screen, and on the page once the overlay is closed — the
+   * same nodes either way, so both surfaces keep working.
+   */
+  const turnInActions = (
+    <>
+      {completed && gradeScore && gradePassbackHref ? (
+        <div
+          className="space-y-2"
+          data-testid="miss-gap-async-grade-passback"
+        >
+          <p className="text-neo-cream font-bold text-sm">
+            {t('education.results.missGapGradePassbackScore', {
+              points: gradeScore.pointsEarned,
+              max: gradeScore.maxPoints,
+            })}
+          </p>
+          <Link
+            href={gradePassbackHref}
+            data-testid="miss-gap-async-open-grade-passback"
+            className={cn(
+              'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+              'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+              'shadow-hard-sm hover:shadow-hard transition-all',
+            )}
+          >
+            <GraduationCap className="w-5 h-5" aria-hidden />
+            {t('education.results.missGapGradePassbackOpen')}
+          </Link>
+        </div>
+      ) : null}
+      {completed && canShareMissGapWhatsApp(payload) ? (
+        <a
+          href={buildMissGapWhatsAppDeepLink({
+            text: t('education.results.missGapWhatsAppShareText', {
+              lesson,
+              missed: words.join(', '),
+              due: payload.dueDate || '—',
+            }),
+            input: payload,
+          })}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="miss-gap-async-whatsapp-share"
+          className={cn(
+            'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+            'bg-brand-whatsapp text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all hover:bg-brand-whatsapp-hover',
+          )}
+        >
+          <WhatsAppIcon className="w-5 h-5" />
+          {t('education.results.missGapWhatsAppShare')}
+        </a>
+      ) : null}
+    </>
+  );
 
   if (words.length === 0) {
     return (
@@ -174,7 +252,7 @@ export function MissGapAsyncAssignment({
           <Flame className="w-4 h-4 text-neo-pink" aria-hidden />
           <span data-testid="miss-gap-class-streak">
             {t('education.results.assignMissGapAsyncStreak', {
-              streak: streak.currentStreak,
+              streak: serverStreak ?? streak.currentStreak,
             })}
           </span>
         </div>
@@ -236,6 +314,8 @@ export function MissGapAsyncAssignment({
                 </>
               )}
             </button>
+
+            <MissGapTeacherProgress data={progress.data} failed={progress.failed} />
           </div>
         ) : (
           <div className="mt-5 space-y-3">
@@ -248,76 +328,47 @@ export function MissGapAsyncAssignment({
                 due: payload.dueDate,
               })}
             </p>
+            {/* The homework IS the game now: no self-marked checkbox, the run
+                itself is what gets recorded. */}
             <button
               type="button"
               data-testid="miss-gap-async-complete"
-              onClick={handleComplete}
-              disabled={completed}
+              onClick={() => setPlaying(true)}
               className={cn(
-                'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
+                'w-full flex items-center justify-center gap-2 px-4 py-4 font-neo-display font-bold text-lg',
                 'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg transition-all',
-                completed && 'opacity-80',
               )}
             >
-              <Check className="w-5 h-5" aria-hidden />
+              {completed ? (
+                <Check className="w-5 h-5" aria-hidden />
+              ) : (
+                <Play className="w-5 h-5" aria-hidden />
+              )}
               {completed
-                ? t('education.results.assignMissGapAsyncCompleted')
-                : t('education.results.assignMissGapAsyncComplete')}
+                ? t('education.homework.playAgainCta')
+                : t('education.homework.startCta', { count: words.length })}
             </button>
-            {completed && gradeScore && gradePassbackHref ? (
-              <div
-                className="space-y-2"
-                data-testid="miss-gap-async-grade-passback"
-              >
-                <p className="text-neo-cream font-bold text-sm">
-                  {t('education.results.missGapGradePassbackScore', {
-                    points: gradeScore.pointsEarned,
-                    max: gradeScore.maxPoints,
-                  })}
-                </p>
-                <Link
-                  href={gradePassbackHref}
-                  data-testid="miss-gap-async-open-grade-passback"
-                  className={cn(
-                    'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-                    'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
-                    'shadow-hard-sm hover:shadow-hard transition-all',
-                  )}
-                >
-                  <GraduationCap className="w-5 h-5" aria-hidden />
-                  {t('education.results.missGapGradePassbackOpen')}
-                </Link>
-              </div>
-            ) : null}
-            {completed && canShareMissGapWhatsApp(payload) ? (
-              <a
-                href={buildMissGapWhatsAppDeepLink({
-                  text: t('education.results.missGapWhatsAppShareText', {
-                    lesson,
-                    missed: words.join(', '),
-                    due: payload.dueDate || '—',
-                  }),
-                  input: payload,
-                })}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="miss-gap-async-whatsapp-share"
-                className={cn(
-                  'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-                  'bg-brand-whatsapp text-neo-white border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all hover:bg-brand-whatsapp-hover',
-                )}
-              >
-                <WhatsAppIcon className="w-5 h-5" />
-                {t('education.results.missGapWhatsAppShare')}
-              </a>
-            ) : null}
+            {!playing ? turnInActions : null}
           </div>
         )}
       </section>
 
       <MissGapPracticeCard payload={payload} />
+
+      {playing ? (
+        <MissGapGame
+          classKey={classKey}
+          lesson={lesson}
+          teacher={payload.teacher}
+          dueDate={payload.dueDate}
+          words={words}
+          initialStreak={serverStreak ?? streak.currentStreak}
+          onClose={() => setPlaying(false)}
+          onFinished={handleGameFinished}
+          finishActions={turnInActions}
+        />
+      ) : null}
     </div>
   );
 }

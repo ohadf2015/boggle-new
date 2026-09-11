@@ -96,7 +96,7 @@ export function VocabQuizFocusPicker({
 
   const chipClass = (selected: boolean, enabled: boolean) =>
     cn(
-      'flex flex-col items-start gap-1 px-4 py-3 rounded-neo border-neo border-neo-black transition-all text-start',
+      'flex flex-col items-start gap-1 px-4 py-3 rounded-neo border-[2px] border-neo-cream transition-all text-start',
       'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
       !enabled && 'opacity-45 cursor-not-allowed',
       selected && enabled
@@ -189,7 +189,7 @@ export function VocabQuizFocusPicker({
               aria-checked={questionCount === count}
               onClick={() => onQuestionCountChange(count)}
               className={cn(
-                'px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+                'px-4 py-3 font-bold rounded-neo border-[2px] border-neo-cream transition-all',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
                 questionCount === count
                   ? 'bg-neo-lime text-neo-black shadow-hard'
@@ -221,10 +221,10 @@ export function VocabQuizFocusPicker({
               aria-checked={secondsPerQuestion === seconds}
               onClick={() => onSecondsChange(seconds)}
               className={cn(
-                'px-4 py-3 font-bold rounded-neo border-neo border-neo-black transition-all',
+                'px-4 py-3 font-bold rounded-neo border-[2px] border-neo-cream transition-all',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
                 secondsPerQuestion === seconds
-                  ? 'bg-neo-pink text-neo-white shadow-hard'
+                  ? 'bg-neo-pink text-black shadow-hard'
                   : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
               )}
             >

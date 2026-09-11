@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -69,6 +70,25 @@ function ClassroomGameInner() {
     router.push(`/${language}/education`);
   }, [router, language]);
 
+  /**
+   * Lock the body while the lobby is up.
+   *
+   * `<body>` carries `.screen-fit` (overflow-y:auto) app-wide, and this route
+   * also server-renders its SEO block and the schools CTA BELOW the client
+   * tree — 768px of it — so the shell being `h-dvh` is not enough on its own:
+   * the page still scrolls the lobby out from under the teacher. This is the
+   * same `.screen-fit-locked` mechanism the multiplayer view uses, and it
+   * leaves the crawler-facing copy in the DOM untouched.
+   *
+   * The cleanup is not optional: without it, BACK to /education leaves every
+   * later screen unable to scroll.
+   */
+  const { setIsInGame } = useNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+
   if (isChecking || authLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
@@ -81,10 +101,18 @@ function ClassroomGameInner() {
   }
 
   return (
-    <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-dvh', isRTL && 'rtl')}>
+    /* The lobby locks: the shell is exactly one viewport tall and hides its
+       overflow, and the ONE region that scrolls is inside ClassroomLobbyShell.
+       `<body>` carries `.screen-fit` (overflow-y:auto) app-wide, so a screen
+       that must not scroll has to contain itself. */
+    /* `shrink-0` is load-bearing: the app shell wraps this route in a
+       `flex-1 flex flex-col min-h-0` column, and a flex child defaults to
+       shrink:1 — so `h-dvh` alone collapsed the whole lobby to 160px and
+       `overflow-hidden` clipped the mode picker to a two-pixel sliver. */
+    <div className={cn('flex h-dvh shrink-0 flex-col overflow-hidden bg-neo-navy w-full', isRTL && 'rtl')}>
       <EducationHeader showBackButton title={t('education.classroomGame.title')} />
 
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+      <main className="flex min-h-0 flex-1 w-full max-w-5xl mx-auto flex-col overflow-hidden px-3 py-3 sm:px-6">
         {runExpress ? (
           <ClassroomGameLobbyExpress
             intent={quickLaunchIntent}

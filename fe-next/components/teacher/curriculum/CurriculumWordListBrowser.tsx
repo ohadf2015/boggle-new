@@ -151,7 +151,7 @@ export function CurriculumWordListBrowser({
         <h1 className="text-2xl sm:text-3xl font-bold text-neo-white font-neo-display">
           {t('teacher.curriculum.title')}
         </h1>
-        <p className="text-neo-gray mt-2">{t('teacher.curriculum.description')}</p>
+        <p className="text-neo-white/70 mt-2">{t('teacher.curriculum.description')}</p>
       </div>
 
       {/* Filters */}
@@ -168,7 +168,7 @@ export function CurriculumWordListBrowser({
           <div>
             <label
               htmlFor="grade-filter"
-              className="block text-sm font-medium text-neo-gray mb-1"
+              className="block text-sm font-medium text-neo-white/70 mb-1"
             >
               {t('teacher.curriculum.filters.grade')}
             </label>
@@ -177,7 +177,7 @@ export function CurriculumWordListBrowser({
               aria-label={t('teacher.curriculum.filters.grade')}
               value={filters.gradeLevel || ''}
               onChange={handleGradeChange}
-              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-hidden"
+              className="w-full min-h-11 bg-neo-navy-light border-[2px] border-neo-cream rounded-neo p-2 text-neo-white shadow-hard-sm focus:ring-2 focus:ring-neo-lime focus:outline-hidden"
             >
               <option value="">{t('teacher.curriculum.allGrades')}</option>
               {GRADE_LEVELS.map((grade) => (
@@ -192,7 +192,7 @@ export function CurriculumWordListBrowser({
           <div>
             <label
               htmlFor="subject-filter"
-              className="block text-sm font-medium text-neo-gray mb-1"
+              className="block text-sm font-medium text-neo-white/70 mb-1"
             >
               {t('teacher.curriculum.filters.subject')}
             </label>
@@ -201,7 +201,7 @@ export function CurriculumWordListBrowser({
               aria-label={t('teacher.curriculum.filters.subject')}
               value={filters.subject || ''}
               onChange={handleSubjectChange}
-              className="w-full bg-neo-navy border-neo border-black rounded-neo p-2 text-neo-white focus:ring-2 focus:ring-neo-lime focus:outline-hidden"
+              className="w-full min-h-11 bg-neo-navy-light border-[2px] border-neo-cream rounded-neo p-2 text-neo-white shadow-hard-sm focus:ring-2 focus:ring-neo-lime focus:outline-hidden"
             >
               <option value="">{t('teacher.curriculum.allSubjects')}</option>
               {SUBJECTS.map((subject) => (
@@ -218,7 +218,7 @@ export function CurriculumWordListBrowser({
               <button
                 type="button"
                 onClick={clearFilters}
-                className="flex items-center gap-2 px-4 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-gray hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-neo-navy-light border-[2px] border-neo-cream rounded-neo text-neo-cream hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
               >
                 <X className="w-4 h-4" />
                 {t('teacher.curriculum.filters.clear')}
@@ -230,7 +230,7 @@ export function CurriculumWordListBrowser({
 
       {/* Loading State */}
       {loading && (
-        <div className="text-center py-8 text-neo-gray animate-pulse">
+        <div className="text-center py-8 text-neo-white/70 animate-pulse">
           {t('common.loading')}
         </div>
       )}
@@ -244,7 +244,7 @@ export function CurriculumWordListBrowser({
 
       {/* No Results */}
       {!loading && !error && lists.length === 0 && (
-        <div className="text-center py-8 text-neo-gray">
+        <div className="text-center py-8 text-neo-white/70">
           {t('teacher.curriculum.noResults')}
         </div>
       )}
@@ -265,7 +265,7 @@ export function CurriculumWordListBrowser({
                       {list.name}
                     </h3>
                     {list.description && (
-                      <p className="text-sm text-neo-gray mt-1">{list.description}</p>
+                      <p className="text-sm text-neo-white/70 mt-1">{list.description}</p>
                     )}
                     <div className="flex flex-wrap gap-2 mt-2">
                       <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-lime/20 text-neo-lime rounded">
@@ -274,12 +274,12 @@ export function CurriculumWordListBrowser({
                       <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-cyan/20 text-neo-cyan rounded">
                         {t(`teacher.curriculum.subjects.${list.subject}`)}
                       </span>
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-gray/20 text-neo-gray rounded">
+                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neo-cyan/20 text-neo-cream rounded">
                         {t('teacher.curriculum.wordCount', { count: list.word_count })}
                       </span>
                     </div>
                     {list.curriculum_standard && (
-                      <p className="text-xs text-neo-gray mt-2">
+                      <p className="text-xs text-neo-white/70 mt-2">
                         {list.curriculum_standard}
                       </p>
                     )}
@@ -291,7 +291,7 @@ export function CurriculumWordListBrowser({
                     <button
                       type="button"
                       onClick={() => togglePreview(list.id)}
-                      className="flex items-center gap-2 px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-gray hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 bg-neo-navy-light border-[2px] border-neo-cream rounded-neo text-neo-cream hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
                       aria-label={t('teacher.curriculum.preview')}
                     >
                       {expandedListId === list.id ? (
@@ -346,7 +346,7 @@ export function CurriculumWordListBrowser({
                       >
                         <span className="font-medium text-neo-white">{word.word}</span>
                         {word.definition && (
-                          <p className="text-sm text-neo-gray mt-1">{word.definition}</p>
+                          <p className="text-sm text-neo-white/70 mt-1">{word.definition}</p>
                         )}
                       </div>
                     ))}

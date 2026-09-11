@@ -20,9 +20,10 @@
 
 'use client';
 
-import { Crown, TrendingUp, Users } from 'lucide-react';
+import { ArrowUpNarrowWide, Crown, Flame, Minus, Star, TrendingDown, TrendingUp, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClassroomPlayerMastery } from '@/shared/types/classroom';
+import type { RoundMomentum } from '@/lib/education/roundEndHistory';
 
 export interface StudentRoundOutcomeProps {
   /** The name this client plays under, as the server echoes it. */
@@ -34,8 +35,18 @@ export interface StudentRoundOutcomeProps {
   standings: Array<{ username: string; score: number; isBot?: boolean }>;
   /** This student's own lesson-word tally. Absent for a late joiner. */
   mastery?: ClassroomPlayerMastery;
+  /**
+   * What this round meant next to the earlier rounds of this session. `null`
+   * (and round one) prints nothing — a first round has nothing to beat, and no
+   * chip is always better than a confident wrong chip.
+   */
+  momentum?: RoundMomentum | null;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
+
+/** The chip shell every momentum badge shares. */
+const CHIP =
+  'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-black font-bold text-sm shadow-hard-sm';
 
 /** Rank 1-3 borrow the podium's plinth colours so the two screens rhyme. */
 const RANK_SKIN: Record<number, string> = {
@@ -48,6 +59,7 @@ export function StudentRoundOutcome({
   username,
   standings,
   mastery,
+  momentum,
   t,
 }: StudentRoundOutcomeProps) {
   // Count the room the way the server's podium counts it: `buildClassroomPodium`
@@ -80,7 +92,7 @@ export function StudentRoundOutcome({
       data-testid="student-round-outcome"
       data-rank={String(rank)}
       className={cn(
-        'mb-5 p-4 rounded-neo border-neo border-neo-black bg-neo-navy-elevated shadow-hard'
+        'mb-5 p-4 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated shadow-hard'
       )}
     >
       <div className="flex items-center gap-4">
@@ -88,7 +100,7 @@ export function StudentRoundOutcome({
         <div
           className={cn(
             'relative shrink-0 flex flex-col items-center justify-center',
-            'w-24 h-24 -rotate-2 rounded-neo border-neo border-neo-black shadow-hard',
+            'w-24 h-24 -rotate-2 rounded-neo border-[2px] border-neo-black shadow-hard',
             'text-neo-black',
             RANK_SKIN[rank] ?? 'bg-neo-lime'
           )}
@@ -133,11 +145,69 @@ export function StudentRoundOutcome({
         </div>
       </div>
 
+      {/* The session's story, and the reason a student wants round three. A
+          placing rewards the same three children every round; a delta rewards
+          everyone who improved. Round one carries none of this. */}
+      {momentum && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span
+            data-testid="student-outcome-delta"
+            className={cn(
+              CHIP,
+              momentum.delta > 0 && 'bg-neo-lime text-neo-black',
+              momentum.delta < 0 && 'bg-neo-pink text-neo-black',
+              momentum.delta === 0 && 'bg-neo-navy text-neo-white'
+            )}
+          >
+            {momentum.delta > 0 ? (
+              <TrendingUp className="w-4 h-4 shrink-0" aria-hidden />
+            ) : momentum.delta < 0 ? (
+              <TrendingDown className="w-4 h-4 shrink-0" aria-hidden />
+            ) : (
+              <Minus className="w-4 h-4 shrink-0" aria-hidden />
+            )}
+            {momentum.delta > 0
+              ? t('education.results.moment.deltaUp', { points: momentum.delta })
+              : momentum.delta < 0
+                ? t('education.results.moment.deltaDown', { points: Math.abs(momentum.delta) })
+                : t('education.results.moment.deltaSame')}
+          </span>
+
+          {momentum.personalBest && (
+            <span
+              data-testid="student-outcome-best"
+              className={cn(CHIP, 'bg-neo-yellow text-neo-black')}
+            >
+              <Star className="w-4 h-4 shrink-0" aria-hidden />
+              {t('education.results.moment.personalBest')}
+            </span>
+          )}
+
+          {momentum.rankDelta > 0 && (
+            <span
+              data-testid="student-outcome-climb"
+              className={cn(CHIP, 'bg-neo-cyan text-neo-black')}
+            >
+              <ArrowUpNarrowWide className="w-4 h-4 shrink-0" aria-hidden />
+              {t('education.results.moment.climbed', { places: momentum.rankDelta })}
+            </span>
+          )}
+
+          <span
+            data-testid="student-outcome-round"
+            className={cn(CHIP, 'bg-neo-navy text-neo-white')}
+          >
+            <Flame className="w-4 h-4 shrink-0 text-neo-orange" aria-hidden />
+            {t('education.results.moment.roundOfSession', { round: momentum.roundNumber })}
+          </span>
+        </div>
+      )}
+
       <div className="mt-3 flex flex-wrap gap-2">
         {mastery && (
           <span
             data-testid="student-outcome-words"
-            className="px-3 py-1.5 rounded-neo border-neo border-neo-black bg-neo-lime text-neo-black font-bold text-sm shadow-hard-sm"
+            className="px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-lime text-neo-black font-bold text-sm shadow-hard-sm"
           >
             {t('education.results.you.words', { found: mastery.found, total: mastery.total })}
           </span>
@@ -145,7 +215,7 @@ export function StudentRoundOutcome({
         {ahead && (
           <span
             data-testid="student-outcome-gap"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm"
           >
             <TrendingUp className="w-4 h-4 shrink-0 text-neo-yellow" aria-hidden />
             {t('education.results.you.gapToNext', { points: gap, name: ahead.username })}

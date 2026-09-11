@@ -67,7 +67,7 @@ export function ClassNeedsHelp({ masteryByPlayer, t }: ClassNeedsHelpProps) {
       <p
         data-testid="class-needs-help-none"
         className={cn(
-          'mb-4 flex items-center gap-2 p-3 rounded-neo border-neo border-neo-black',
+          'mb-4 flex items-center gap-2 p-3 rounded-neo border-[2px] border-neo-black',
           'bg-neo-lime text-neo-black font-neo-body font-bold text-sm shadow-hard-sm'
         )}
       >
@@ -80,7 +80,7 @@ export function ClassNeedsHelp({ masteryByPlayer, t }: ClassNeedsHelpProps) {
   return (
     <section
       data-testid="class-needs-help"
-      className="mb-4 p-3 rounded-neo border-neo border-neo-black bg-neo-navy-elevated shadow-hard-sm"
+      className="mb-4 p-3 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated shadow-hard-sm"
     >
       <p className="mb-2 flex items-center gap-2 font-neo-display font-bold text-sm uppercase tracking-wide text-neo-orange">
         <LifeBuoy className="w-5 h-5 shrink-0" aria-hidden />
@@ -92,7 +92,7 @@ export function ClassNeedsHelp({ masteryByPlayer, t }: ClassNeedsHelpProps) {
             key={student.username}
             data-testid={`needs-help-${student.username}`}
             className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-neo border-neo border-neo-black',
+              'flex items-center gap-2 px-3 py-1.5 rounded-neo border-[2px] border-neo-black',
               'bg-neo-navy text-neo-white font-neo-body font-bold text-sm'
             )}
           >

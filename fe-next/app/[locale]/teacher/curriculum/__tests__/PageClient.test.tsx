@@ -10,6 +10,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import CurriculumPageClient from '../PageClient';
 
 // Mock the CurriculumWordListBrowser component
+// The page now mounts the shared education header — a compact bar with a way
+// back, which these screens used to lack entirely. It pulls MusicContext in,
+// which this suite has no provider for and no interest in.
+vi.mock('@/components/education/EducationHeader', () => ({
+  EducationHeader: () => <div data-testid="education-header" />,
+}));
 vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({
   CurriculumWordListBrowser: ({
     teacherId,
@@ -115,12 +121,15 @@ describe('CurriculumPageClient', () => {
   });
 
   describe('Page Container', () => {
-    it('renders with appropriate styling', () => {
+    it('fits the viewport instead of growing the page', () => {
       const { container } = render(<CurriculumPageClient />);
 
-      // Check for neo-brutalist styling
+      // `min-h-screen` said "at least the viewport, then keep going" — the
+      // word-list browser is long, so the whole document scrolled. The shell
+      // pins the page and scrolls the list inside it.
       const wrapper = container.firstChild as HTMLElement;
-      expect(wrapper).toHaveClass('min-h-screen');
+      expect(wrapper).toHaveClass('h-dvh');
+      expect(wrapper).toHaveClass('overflow-hidden');
       expect(wrapper).toHaveClass('bg-neo-navy');
     });
   });

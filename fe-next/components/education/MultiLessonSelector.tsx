@@ -87,7 +87,7 @@ export function MultiLessonSelector({
             type="button"
             onClick={handleSelectAll}
             className={cn(
-              'text-sm font-bold px-4 py-2.5 rounded-neo border-neo border-neo-black transition-all',
+              'text-sm font-bold px-4 py-2.5 rounded-neo border-[3px] border-neo-cream transition-all',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
               allSelected
                 ? 'bg-neo-white/20 text-neo-white hover:bg-neo-white/30'
@@ -117,7 +117,7 @@ export function MultiLessonSelector({
               aria-checked={isSelected}
               onClick={() => handleToggleLesson(lesson.id)}
               className={cn(
-                'relative p-4 rounded-neo border-neo border-neo-black',
+                'relative p-4 rounded-neo border-[3px] border-neo-cream',
                 'transition-all duration-150',
                 'text-start',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',

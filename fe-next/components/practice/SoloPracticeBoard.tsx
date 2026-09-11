@@ -14,15 +14,15 @@ import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
-import { m } from 'framer-motion';
 import {
   ArrowLeft,
   RotateCcw,
   CheckCircle,
   Star,
-  Trophy,
   Target
 } from 'lucide-react';
+import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
+import BeatTheClock from '@/components/education/practice/BeatTheClock';
 import type { LetterGrid, Language, DifficultyLevel } from '@/types';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
@@ -34,6 +34,10 @@ interface SoloPracticeBoardProps {
   onComplete: (results: { wordsFound: string[]; vocabularyWordsFound: string[]; score: number }) => void;
   onBack: () => void;
   onWordFound?: (word: string, isVocabularyWord: boolean) => void;
+  /** Jump straight into the next ready mode, when the lesson offers one. */
+  onNext?: () => void;
+  /** Human name of that next mode, for the button label. */
+  nextLabel?: string;
   /** XP session data to display on results screen (optional) */
   xpSessionData?: {
     sessionXpEarned: number;
@@ -50,6 +54,8 @@ export default function SoloPracticeBoard({
   onBack,
   onWordFound,
   xpSessionData,
+  onNext,
+  nextLabel,
 }: SoloPracticeBoardProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -156,159 +162,38 @@ export default function SoloPracticeBoard({
     });
   }, [validWords, vocabularyFound, score, onComplete]);
 
-  // Completion screen
+  /*
+    The board used to end on its own bespoke card — a trophy glyph, a score and
+    two buttons, with no confetti, no sound and no stars. It now lands on the
+    same completion moment every other practice mode uses, scored on how much of
+    the teacher's vocabulary the student actually dug out of the grid.
+  */
   if (showComplete) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center" translate="no">
-        <m.div
-          initial={{ scale: 0.8, opacity: 0, y: 30 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy/90 max-w-md w-full overflow-hidden"
-        >
-          {/* Celebration header stripe */}
-          <div className="h-2 bg-linear-to-r from-neo-cyan via-neo-yellow to-neo-pink" />
-
-          <div className="p-8 text-center">
-            <m.div
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: 1, rotate: [0, 8, -5, 3, 0] }}
-              transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.2 }}
-            >
-              <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
-            </m.div>
-
-            <m.h2
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-2xl font-neo-display font-black text-neo-white uppercase mb-2"
-            >
-              {t('education.practice.complete')}
-            </m.h2>
-
-            <div className="my-6 space-y-4">
-              <m.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.4 }}
-                className="flex items-center justify-center gap-2"
-              >
-                <Star className="w-6 h-6 text-neo-yellow" />
-                <span className="text-4xl font-neo-display font-black text-neo-cyan tabular-nums">{score}</span>
-                <span className="text-neo-white font-bold">{t('education.practice.points')}</span>
-              </m.div>
-
-              <m.div
-                className="grid grid-cols-2 gap-4 text-center"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.5 } } }}
-              >
-                <m.div
-                  variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
-                  className="p-3 bg-neo-yellow/10 rounded-neo border-2 border-black shadow-hard-sm"
-                >
-                  <p className="text-2xl font-neo-display font-black text-neo-white tabular-nums">{validWordCount}</p>
-                  <p className="text-xs text-neo-white font-bold">
-                    {t('education.practice.wordsFound')}
-                  </p>
-                </m.div>
-                <m.div
-                  variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
-                  className="p-3 bg-neo-cyan/10 rounded-neo border-2 border-black shadow-hard-sm"
-                >
-                  <p className="text-2xl font-neo-display font-black text-neo-cyan tabular-nums">{vocabularyFound.length}</p>
-                  <p className="text-xs text-neo-white font-bold">
-                    {t('education.practice.vocabularyWords')}
-                  </p>
-                </m.div>
-              </m.div>
-            </div>
-
-            {/* XP Session Summary */}
-            {xpSessionData && (
-              <m.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="mb-4 pt-4 border-t-2 border-black/20"
-              >
-                {xpSessionData.sessionMasteryMessage && (
-                  <p className="font-neo-display text-lg text-neo-yellow mb-2">
-                    {xpSessionData.sessionMasteryMessage}
-                  </p>
-                )}
-                <m.p
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ delay: 0.9, duration: 0.4 }}
-                  className="text-neo-white font-neo-body font-bold"
-                >
-                  +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
-                </m.p>
-              </m.div>
-            )}
-
-            {/* Vocabulary words found */}
-            {vocabularyFound.length > 0 && (
-              <m.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="bg-black/20 rounded-neo border-2 border-black/30 p-4 mb-6 max-h-32 overflow-y-auto"
-              >
-                <p className="text-xs text-neo-white font-bold mb-2">{t('education.practice.vocabularyWordsFound')}</p>
-                <div className="flex flex-wrap gap-2">
-                  {vocabularyFound.map((word, i) => (
-                    <m.span
-                      key={word}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.9 + i * 0.05, type: 'spring', stiffness: 400, damping: 15 }}
-                      className="px-2 py-1 bg-neo-cyan/20 text-neo-cyan text-sm rounded-neo border border-neo-cyan/30 font-neo-body font-bold"
-                    >
-                      {word}
-                    </m.span>
-                  ))}
-                </div>
-              </m.div>
-            )}
-
-            <m.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="flex gap-3"
-            >
-              <Button
-                onClick={() => {
-                  setShowComplete(false);
-                  handleRegenerate();
-                }}
-                className={cn(
-                  'flex-1 bg-neo-cyan text-neo-black font-black uppercase',
-                  'border-3 border-neo-black shadow-hard hover:shadow-hard-pressed'
-                )}
-              >
-                <RotateCcw className="w-4 h-4 me-2" />
-                {t('common.retry')}
-              </Button>
-              <Button
-                onClick={onBack}
-                className="border-3 border-neo-pink text-neo-pink bg-neo-pink/10 hover:bg-neo-pink/20 font-black uppercase"
-              >
-                {t('common.back')}
-              </Button>
-            </m.div>
-          </div>
-        </m.div>
+      <div className="flex min-h-full items-center justify-center bg-neo-navy p-4" translate="no">
+        <PracticeCompletionMoment
+          correct={vocabularyFound.length}
+          total={vocabularyWords.length}
+          xpEarned={xpSessionData?.sessionXpEarned}
+          masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
+          stats={[
+            { key: 'score', label: t('education.practice.points'), value: `${score}` },
+            { key: 'words', label: t('education.practice.wordsFound'), value: `${validWordCount}` },
+          ]}
+          onAgain={() => {
+            setShowComplete(false);
+            handleRegenerate();
+          }}
+          onBack={onBack}
+          onNext={onNext}
+          nextLabel={nextLabel}
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6" translate="no">
+    <div className="min-h-full bg-neo-navy p-4 sm:p-6" translate="no">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-4">
@@ -362,6 +247,20 @@ export default function SoloPracticeBoard({
                 </span>
               </div>
             </div>
+
+            {/*
+              The board had no time pressure of any kind. It does now, on by
+              default, and the student can switch it off in one tap if they
+              would rather browse the grid.
+            */}
+            <BeatTheClock
+              mode="solo_board"
+              wordCount={vocabularyWords.length}
+              defaultOn
+              active={!showComplete}
+              onExpire={handleFinish}
+              className="mt-3 border-t-2 border-black/30 pt-3"
+            />
           </CardContent>
         </Card>
 
