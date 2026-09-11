@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Boggle Online Free — Multiplayer Up to 50 Players | LexiClash',
-    description: 'Play Boggle online free with friends — no download, no account needed. Real-time multiplayer up to 50 players or solo vs bots. 4×4 to 6×6 →',
+    description: 'Play free Boggle online — no download, no account. Up to 50 players in real-time or solo vs bots. Start in seconds on any device! →',
     keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
     openGraph: {
       title: 'Free Boggle Online — Play Solo or Multiplayer | LexiClash',
