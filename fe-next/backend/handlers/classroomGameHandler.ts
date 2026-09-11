@@ -21,7 +21,10 @@ import {
   resolveClassroomRole,
   resolveClassroomName,
 } from '../modules/supabase/classroomMembership.js';
-import { persistClassroomGameScores } from './classroomGamePersistence.js';
+import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
+import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
+import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
+import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
@@ -75,15 +78,6 @@ const startClassroomGameSchema = z.object({
   gameCode: gameCodeSchema,
 });
 
-const endClassroomGameSchema = z.object({
-  gameCode: gameCodeSchema,
-  playerScores: z.array(z.object({
-    userId: z.string().uuid(),
-    score: z.number().min(0),
-    wordsFound: z.array(z.string()).optional(),
-  })).optional(),
-});
-
 const getActiveGamesSchema = z.object({
   classroomId: classroomIdSchema,
 });
@@ -100,25 +94,10 @@ const leaveClassroomGameSchema = z.object({
 });
 
 /**
- * Extract authenticated user ID from socket handshake.
- * Returns null if not authenticated.
- */
-function getAuthUserId(socket: Socket): string | null {
-  // Prefer server-verified user ID (set by auth middleware)
-  const verified = (socket.data as Record<string, unknown>)?.verifiedUserId as string | undefined;
-  if (verified) return verified;
-  // Fallback for backwards compatibility — log warning
-  const handshakeAuth = (socket.handshake.auth?.authUserId as string) || null;
-  if (handshakeAuth) {
-    logger.warn('AUTH', `Using unverified authUserId from handshake for socket ${socket.id}`);
-  }
-  return handshakeAuth;
-}
-
-/**
  * Register classroom game socket event handlers
  */
 export function registerClassroomGameHandlers(io: Server, socket: Socket): void {
+  registerClassroomRecoveryHandlers(socket);
   /**
    * Create a new classroom game
    * Broadcasts notification to all students in the classroom
@@ -340,16 +319,10 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       return;
     }
 
-    // F-03 + F-11: Load game first, then enforce classroom membership.
-    // Loading the game first means an invalid gameCode returns a generic
-    // "not found" without ever probing Supabase for classroom membership,
-    // which prevents attackers from using the membership check as an
-    // oracle to discover valid classroom IDs.
+    // Unknown code and ended code, rejected identically and before any
+    // membership probe — see `classroomGameJoinGate`.
     const existingGame = await getClassroomGame(joinPayload.gameCode);
-    if (!existingGame) {
-      socket.emit('classroomGameError', { error: 'Game not found', gameCode: joinPayload.gameCode });
-      return;
-    }
+    if (!ensureJoinableClassroomGame(socket, existingGame, joinPayload.gameCode)) return;
 
     const joinRoleResult = await resolveClassroomRole(joinAuthUserId, existingGame.classroomId);
     if (joinRoleResult.status === 'unavailable') {
@@ -502,79 +475,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
   });
 
-  /**
-   * End a classroom game and persist its results.
-   *
-   * ONE body, registered under both historical event names. They used to be two
-   * near-identical copies and only `endClassroomGame` checked that the caller is
-   * the teacher — `classroomGameEnd` accepted any authenticated socket. That is
-   * recurring pitfall class 3 (two routes to the same outcome, one silently
-   * weaker), and it was a P0: the game code is on the projector, in the QR and
-   * on every student's screen, so any student could end the round, take the
-   * Redis `SET NX` idempotency lock inside `persistClassroomGameScores`, and
-   * leave the server's own end-of-round write with nothing to do — the whole
-   * class's session, word progress and XP silently lost (class 4).
-   *
-   * `playerScores` is client-supplied, so it is also filtered down to userIds
-   * that actually joined this game before it reaches persistence.
-   */
-  const handleEndClassroomGame = async (data: unknown): Promise<void> => {
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    const validation = endClassroomGameSchema.safeParse(data);
-    if (!validation.success) {
-      socket.emit('classroomGameError', { error: `Invalid payload: ${validation.error.issues[0]?.message}` });
-      return;
-    }
-    const payload = validation.data as { gameCode: string; playerScores?: Array<{ userId: string; score: number; wordsFound?: string[] }> };
-
-    const authUserId = getAuthUserId(socket);
-    if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required' });
-      return;
-    }
-
-    try {
-      const game = await getClassroomGame(payload.gameCode);
-      if (!game) {
-        socket.emit('classroomGameError', { error: 'Game not found' });
-        return;
-      }
-
-      if (authUserId !== game.teacherId) {
-        socket.emit('classroomGameError', { error: 'Only the teacher can end this game' });
-        return;
-      }
-
-      await updateClassroomGameStatus(payload.gameCode, 'finished');
-
-      // Only score rows for players the server saw join this game. Anything
-      // else is a fabricated userId with a fabricated score and XP behind it.
-      const joinedUserIds = new Set((game.players || []).map((p) => p.userId));
-      const verifiedScores = payload.playerScores?.filter((s) => joinedUserIds.has(s.userId));
-
-      // Persist scores to Supabase (S2.5) — F-24: capture per-player rewards
-      const rewards = await persistClassroomGameScores(game, verifiedScores);
-
-      io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
-        gameCode: payload.gameCode,
-        rewards,
-      });
-
-      logger.info('CLASSROOM_GAME', `Teacher ${authUserId} ended game ${payload.gameCode}`);
-    } catch (error) {
-      logger.error('CLASSROOM_GAME', `Failed to end game: ${error}`);
-      socket.emit('classroomGameError', { error: 'Failed to end game' });
-    }
-  };
-
-  // S2.7 (teacher ends early) and S2.5 (game completion) — same outcome, so the
-  // same guarded body. Do not re-fork these.
-  socket.on('endClassroomGame', handleEndClassroomGame);
-  socket.on('classroomGameEnd', handleEndClassroomGame);
+  // Ending the session ends the ROOM too, so that body lives in its own module
+  // (`classroomGameEndHandler`) — this file is over the 500-line limit, and the
+  // teardown belongs next to the reason for it, not bolted onto a listener list.
+  // Both historical event names are still registered there, to ONE guarded body.
+  registerClassroomGameEndHandlers(io, socket);
 }
 
 export default registerClassroomGameHandlers;

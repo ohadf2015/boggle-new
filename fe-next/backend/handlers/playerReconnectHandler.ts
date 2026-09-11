@@ -336,6 +336,14 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     // Teacher pause — same fields as the reconnect payload above.
     isPaused: !!game.isPaused,
     remainingTime: game.remainingTime ?? game.timerSeconds,
+    // Carry the authoritative leaderboard INSIDE startGame, exactly as the
+    // reconnect payload above does and for the same reason: the client then
+    // restores the scoreboard in the same batched setState as the board, and
+    // the separate `updateLeaderboard` below becomes a belt rather than the
+    // only thread. Late join was the sibling still relying on that one emit —
+    // pitfall class 3, and the path that pays is the classroom one, where
+    // arriving after the teacher hits start IS the normal way in.
+    leaderboard: getLeaderboard(gameCode),
   };
 
   // Include blast mode state for late joiners. getOrInitPlayerBoard lazily clones

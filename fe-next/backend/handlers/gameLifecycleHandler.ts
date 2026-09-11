@@ -57,6 +57,7 @@ import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
+import { resendFinishedResults } from './finishedResultsResend';
 import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
 import { stopAllBots } from '../modules/botManager.js';
@@ -479,14 +480,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // playerReconnectHandler so both reconnect paths restore score identically.
       safeEmit(socket, 'updateLeaderboard', { leaderboard: getLeaderboard(gameCode) });
     } else if (game.gameState === 'finished') {
-      // Reconnecting to a finished game — resend results so the player sees the results screen
-      logger.info('SOCKET', `Resending results to reconnecting player in finished game ${gameCode}`);
-      const leaderboard = getLeaderboard(gameCode);
-      safeEmit(socket, 'validatedScores', {
-        leaderboard,
-        gameMode: game.gameMode || 'classic',
-        reconnect: true,
-      });
+      // Reconnecting to a finished game — resend the SAME payload `requestResults`
+      // below and `playerReconnectHandler` resend. See `finishedResultsResend`
+      // for what a thinner one costs the client.
+      resendFinishedResults(socket, gameCode, game);
     }
   });
 

@@ -159,7 +159,8 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
             <Trophy className="w-10 h-10 text-neo-yellow" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
-          <VocabQuizStandings standings={quiz.standings} limit={5} size="projector" t={t} />
+          {/* The quiz finishes on the same podium every other classroom mode gets. */}
+          <VocabQuizStandings standings={quiz.standings} limit={5} size="projector" podium t={t} />
         </div>
       )}
 

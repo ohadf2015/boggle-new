@@ -46,8 +46,8 @@ import { startGameTimer, resumeGameTimerIfMissing } from '../services/gameLifecy
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import logger from '../utils/logger.js';
 import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
-import { getClassroomGame } from '../modules/classroomGameManager.js';
-import { getClassroomMembershipLevel } from '../modules/supabase/classroomMembership.js';
+import { emitClassroomContext } from '../modules/classroomGameContext.js';
+import { checkClassroomSeat } from './classroomSeatGate.js';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts.js';
 import { isInProgress, shouldSendGameState } from '../utils/gameStateMachine.js';
 import { notifyPlayerJoined } from '../modules/notificationService.js';
@@ -84,45 +84,6 @@ interface UpgradeToPlayerPayload {
  * @param io - Socket.IO server instance
  * @param socket - Socket.IO socket instance
  */
-/**
- * Tell this socket its differentiation level and the lesson word bank, if the
- * room is a classroom game. Guests and non-members are 'core'. Non-classroom
- * rooms get nothing (the client resets to core/[] on every `joined`).
- */
-async function emitClassroomContext(
-  socket: Socket,
-  gameCode: string,
-  authUserId: string | undefined
-): Promise<void> {
-  try {
-    const classroomGame = await getClassroomGame(gameCode);
-    if (!classroomGame) return;
-    const classroomLevel = authUserId
-      ? await getClassroomMembershipLevel(authUserId, classroomGame.classroomId)
-      : 'core';
-    // Prefer the words the board ACTUALLY carries. Embedding is best-effort, so
-    // the full lesson list sent a support student hunting for words that are not
-    // there — the opposite of scaffolding. `placedVocabulary` is written at game
-    // start; before that (lobby / waiting room) there is no board yet and the
-    // lesson list is the honest answer. An empty ARRAY is meaningful and must
-    // not fall back — it means the board carries none of them.
-    const wordBank = Array.isArray(classroomGame.placedVocabulary)
-      ? classroomGame.placedVocabulary
-      : (Array.isArray(classroomGame.vocabularyWords) ? classroomGame.vocabularyWords : []);
-    // Cache the resolved level on the socket. Game start re-sends this context
-    // once the board exists (the word bank is only knowable then), and it must
-    // not have to re-query Supabase per student — nor guess, which would quietly
-    // demote a support student to core mid-round.
-    (socket.data as Record<string, unknown>).classroomLevel = classroomLevel;
-    safeEmit(socket, 'classroomContext', {
-      classroomLevel,
-      classroomWordBank: wordBank,
-    });
-  } catch (err) {
-    logger.warn('PLAYER_JOIN', `classroomContext lookup failed for ${gameCode}: ${(err as Error)?.message ?? err}`);
-  }
-}
-
 function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
   // Handle player joining
@@ -175,6 +136,14 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Awaited so the dictionary is warm (bot solving + word validation) before
     // the resumed round runs.
     await resumeGameTimerIfMissing(io, gameCode);
+
+    // The room exists — but a classroom room outlives its SESSION. Ask the one
+    // seat gate every door uses, before anything seats this socket (reconnect
+    // included, since the client re-emits `join` to rebuild the socket map).
+    // No-op for ordinary multiplayer rooms; hands back the classroom record so
+    // `emitClassroomContext` below reads Redis once, not twice.
+    const seat = await checkClassroomSeat(socket, gameCode, 'multiplayer');
+    if (seat.refused) return;
 
     // Handle multi-tab detection and existing auth connection
     if (authUserId) {
@@ -272,7 +241,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // reconnect all pass through this ONE call site — `startGame` is a room
     // broadcast and cannot carry a per-socket value (pitfalls class 3).
     // Fire-and-forget: it must never delay or fail the join.
-    void emitClassroomContext(socket, gameCode, authUserId);
+    void emitClassroomContext(socket, gameCode, authUserId, seat);
 
     // Handle reconnection
     if (existingSocketId || game.users[username]) {

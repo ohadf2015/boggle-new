@@ -29,6 +29,8 @@ import logger from '@/utils/logger';
 import { addGameBreadcrumb } from '@/utils/sentry';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
 import { setMmdChanges } from '@/lib/results/rankedResultStore';
+import type { ClassroomSummary } from '@/shared/types/classroom';
+import { createTvRevealGate } from '@/components/education/results/classroomResultsDelivery';
 
 interface StartGameBroadcastExt extends StartGameBroadcast {
   gameSessionId?: number;
@@ -57,6 +59,8 @@ interface ValidatedScoresPayload {
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: BlastSummary;
   wheelRushSummary?: WheelRushSummary;
+  /** Server-built lesson recap; the host path already forwarded it. */
+  classroomSummary?: ClassroomSummary;
   tvMode?: boolean;
   isRanked?: boolean;
   mmrChanges?: Record<string, { oldMmr: number; newMmr: number; delta: number }>;
@@ -106,6 +110,7 @@ export interface OnShowResultsData {
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: BlastSummary;
   wheelRushSummary?: WheelRushSummary;
+  classroomSummary?: ClassroomSummary;
   isRanked?: boolean;
   mmrChanges?: Record<string, { oldMmr: number; newMmr: number; delta: number }>;
 }
@@ -261,6 +266,8 @@ export function usePlayerGameEvents({
   // Prevents true duplicates without blocking the initial event (fixes race condition
   // where validatedScores can arrive before endGame sets waitingForResults=true)
   const hasProcessedResultsRef = useRef<number | null>(null);
+  /** Session whose results actually REACHED the screen (not merely arrived). */
+  const resultsDisplayedRef = useRef<number | null>(null);
   // Tracks the session whose results were only ever shown via the EMPTY
   // safety fallback (no real scores arrived in time). A later REAL
   // validatedScores for that session must be allowed to supersede the empty
@@ -596,11 +603,6 @@ export function usePlayerGameEvents({
       }
     };
 
-    // --- TV mode sync: defer results until host reveals on TV ---
-    let tvRevealTimeoutId: ReturnType<typeof setTimeout> | null = null;
-    const pendingTvResultsRef: { current: ValidatedScoresPayload | null } = { current: null };
-    let tvRevealedBeforeData = false;
-
     const showResultsFromData = (data: ValidatedScoresPayload) => {
       // Sync blast stats from server
       if (data.blastSummary) {
@@ -621,6 +623,7 @@ export function usePlayerGameEvents({
       }
 
       // Transition to results
+      resultsDisplayedRef.current = gameSessionIdRef.current;
       setGameActive(false);
       gameActiveRef.current = false;
       setWaitingForResults(false);
@@ -638,24 +641,24 @@ export function usePlayerGameEvents({
           wordHuntSummary: data.wordHuntSummary,
           blastSummary: data.blastSummary,
           wheelRushSummary: data.wheelRushSummary,
+          classroomSummary: data.classroomSummary,
           isRanked: data.isRanked,
           mmrChanges: data.mmrChanges,
         });
       }
     };
 
-    const handleResultsRevealed = () => {
-      if (tvRevealTimeoutId) { clearTimeout(tvRevealTimeoutId); tvRevealTimeoutId = null; }
-      const pending = pendingTvResultsRef.current;
-      if (!pending) {
-        // resultsRevealed arrived before validatedScores — flag it so data shows immediately
-        tvRevealedBeforeData = true;
-        return;
-      }
-      pendingTvResultsRef.current = null;
-      logger.log('[PLAYER] TV reveal received — showing results');
-      showResultsFromData(pending);
-    };
+    // An arcade TV room waits for the host's reveal; a classroom never does, and
+    // the hold survives a socket reconnect. Both rules live in
+    // components/education/results/classroomResultsDelivery.
+    const tvGate = createTvRevealGate<ValidatedScoresPayload>({
+      onShow: showResultsFromData,
+      onHold: () => {
+        setGameActive(false);
+        gameActiveRef.current = false;
+        setWaitingForResults(true);
+      },
+    });
 
     const handleValidatedScores = (data: ValidatedScoresPayload) => {
       // Deduplicate by game session — prevents processing results twice for the same game.
@@ -666,7 +669,11 @@ export function usePlayerGameEvents({
       const hasRealScores = Array.isArray(data?.scores) && data.scores.length > 0;
       const supersedesEmptyFallback =
         emptyResultsFallbackRef.current === sessionId && hasRealScores;
-      if (hasProcessedResultsRef.current === sessionId && !supersedesEmptyFallback) {
+      // "Processed" must mean DISPLAYED. A reconnect at the round boundary tore
+      // down the held payload, and this guard then swallowed the server's
+      // resend — three live classroom rounds, zero results screens (Class 4).
+      const neverDisplayed = resultsDisplayedRef.current !== sessionId && hasRealScores;
+      if (hasProcessedResultsRef.current === sessionId && !supersedesEmptyFallback && !neverDisplayed) {
         logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', sessionId);
         return;
       }
@@ -684,25 +691,7 @@ export function usePlayerGameEvents({
         setMmdChanges(data.mmrChanges);
       }
 
-      // If TV mode active, defer showing results until host signals reveal is done
-      if (data.tvMode && !tvRevealedBeforeData) {
-        pendingTvResultsRef.current = data;
-        // Mark game inactive immediately so UI stops gameplay
-        setGameActive(false);
-        gameActiveRef.current = false;
-        setWaitingForResults(true);
-        // 25s fallback — if host never reveals (disconnect, etc), show results anyway
-        tvRevealTimeoutId = setTimeout(() => {
-          if (pendingTvResultsRef.current) {
-            logger.log('[PLAYER] TV reveal timeout — showing results anyway');
-            pendingTvResultsRef.current = null;
-            showResultsFromData(data);
-          }
-        }, 25000);
-        return;
-      }
-
-      showResultsFromData(data);
+      tvGate.receive(data);
     };
 
     const handleFinalScores = (data: FinalScoresPayload) => {
@@ -744,6 +733,7 @@ export function usePlayerGameEvents({
       waitingStartTimeRef.current = null;
       hasProcessedResultsRef.current = null;
       emptyResultsFallbackRef.current = null;
+      resultsDisplayedRef.current = null;
 
       // Reset timer for next game
       // Use ref to get latest timer methods (avoids socket listener re-registration)
@@ -938,7 +928,7 @@ export function usePlayerGameEvents({
     socket.on('endGame', handleEndGame);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('validatedScores', handleValidatedScores);
-    socket.on('resultsRevealed', handleResultsRevealed);
+    socket.on('resultsRevealed', tvGate.revealed);
     socket.on('finalScores', handleFinalScores);
     socket.on('resetGame', handleResetGame);
     socket.on('hostLeftRoomClosing', handleHostLeftRoomClosing);
@@ -981,9 +971,9 @@ export function usePlayerGameEvents({
       socket.off('endGame', handleEndGame);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('validatedScores', handleValidatedScores);
-      socket.off('resultsRevealed', handleResultsRevealed);
+      socket.off('resultsRevealed', tvGate.revealed);
       socket.off('finalScores', handleFinalScores);
-      if (tvRevealTimeoutId) { clearTimeout(tvRevealTimeoutId); tvRevealTimeoutId = null; }
+      tvGate.dispose();
       socket.off('resetGame', handleResetGame);
       socket.off('hostLeftRoomClosing', handleHostLeftRoomClosing);
       // Earthquake handlers cleanup

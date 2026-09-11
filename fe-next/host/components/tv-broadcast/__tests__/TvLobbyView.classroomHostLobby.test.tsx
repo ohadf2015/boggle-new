@@ -25,8 +25,13 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvLobbyView from '../TvLobbyView';
 
+// Mocks widened (not weakened) when the classroom branch started rendering
+// ProjectorLobby: the projector uses AnimatePresence, list motion elements and
+// a handful more glyphs. Every assertion below is unchanged.
 vi.mock('framer-motion', () => ({
-  m: { h1: 'h1', div: 'div', button: 'button' },
+  m: { h1: 'h1', div: 'div', button: 'button', span: 'span', p: 'p', li: 'li', ul: 'ul' },
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => true,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -35,6 +40,21 @@ vi.mock('lucide-react', () => ({
   Monitor: () => null,
   Swords: () => null,
   Play: () => null,
+  Users: () => null,
+  Check: () => null,
+  Clock: () => null,
+  Grid3x3: () => null,
+  BookOpen: () => null,
+  UserPlus: () => null,
+  GraduationCap: () => null,
+  Copy: () => null,
+  ArrowLeft: () => null,
+}));
+
+// The room's server-side record. Not under test here; pinned so the projector
+// renders its generic fallbacks instead of firing a fetch in jsdom.
+vi.mock('@/hooks/useLiveClassroomGameInfo', () => ({
+  useLiveClassroomGameInfo: () => null,
 }));
 
 vi.mock('../TvJoinBar', () => ({

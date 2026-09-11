@@ -37,24 +37,49 @@ const JOIN_ROUTE = '/api/education/classroom/join';
  * un-created. So a guest join makes TWO requests, precheck then join.
  */
 const NAME_ROUTE = '/api/education/guest-name';
+/**
+ * And a THIRD request, fired alongside the nickname precheck: "is this code
+ * even a thing?". A logged-out student with a typo used to pay for it with an
+ * anonymous auth user and a three-second profile wait before the join answered
+ * 400. Parallel with the name check, so the happy path still waits one
+ * round-trip, not two. See `useJoinClassroom.badCode.test.tsx`.
+ */
+const RESOLVE_ROUTE = '/api/education/join-code/resolve';
 
 /** Which routes were hit, in order — the ordering IS the contract here. */
 const routesCalled = (mock: ReturnType<typeof vi.fn>) =>
-  mock.mock.calls.map((c) => c[0]);
+  mock.mock.calls.map((c) => String(c[0]).split('?')[0]);
+
+/** The body of the (single) call to one route — indices shift, routes do not. */
+const bodyOf = (mock: ReturnType<typeof vi.fn>, route: string) => {
+  const call = mock.mock.calls.find((c) => String(c[0]).startsWith(route));
+  if (!call) throw new Error(`no request to ${route}`);
+  return JSON.parse(call[1].body);
+};
 
 describe('useJoinClassroom — guest (account-less) path', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
+  /** Per-route replies for one test, keyed by path — call order is no longer stable. */
+  let overrides: Record<string, () => unknown>;
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockSignInAsGuest.mockResolvedValue({ user: { id: 'anon-1' }, error: null });
     mockWaitForProfile.mockResolvedValue(true);
     // The join now goes through the cap-enforcing server route.
-    fetchMock = vi.fn(async (url: string) =>
-      url === NAME_ROUTE
-        ? { ok: true, status: 200, json: async () => ({ available: true, name: 'Maya' }) }
-        : { ok: true, status: 200, json: async () => ({ classroomId: 'class-1' }) }
-    );
+    overrides = {};
+    fetchMock = vi.fn(async (url: string) => {
+      const route = String(url).split('?')[0];
+      const override = overrides[route];
+      if (override) return override();
+      if (route === RESOLVE_ROUTE) {
+        return { ok: true, status: 200, json: async () => ({ kind: 'game', gameCode: 'ABC123' }) };
+      }
+      if (route === NAME_ROUTE) {
+        return { ok: true, status: 200, json: async () => ({ available: true, name: 'Maya' }) };
+      }
+      return { ok: true, status: 200, json: async () => ({ classroomId: 'class-1' }) };
+    });
     vi.stubGlobal('fetch', fetchMock);
   });
 
@@ -90,8 +115,8 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     // `signInAnonymously` has run, the auth user exists and a colliding
     // username has already raised inside the trigger — there is nothing left to
     // check and nothing to undo.
-    expect(routesCalled(fetchMock)).toEqual([NAME_ROUTE, JOIN_ROUTE]);
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ name: 'Maya', joinCode: 'ABC123' });
+    expect(routesCalled(fetchMock)).toEqual([RESOLVE_ROUTE, NAME_ROUTE, JOIN_ROUTE]);
+    expect(bodyOf(fetchMock, NAME_ROUTE)).toEqual({ name: 'Maya', joinCode: 'ABC123' });
     expect(res).toEqual({ success: true, classroomId: 'class-1' });
   });
 
@@ -115,8 +140,7 @@ describe('useJoinClassroom — guest (account-less) path', () => {
 
     await result.current.joinClassroom('P45KRT', { guestName: 'Priya' });
 
-    const precheckBody = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(precheckBody.joinCode).toBe('P45KRT');
+    expect(bodyOf(fetchMock, NAME_ROUTE).joinCode).toBe('P45KRT');
   });
 
   it('stops on a 409 from the precheck and never mints an anonymous user', async () => {
@@ -124,27 +148,27 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     // signing in would raise inside the `handle_new_user` trigger and return a
     // Supabase 500 — after the auth user exists.
     mockUseAuth.mockReturnValue({ user: null });
-    fetchMock.mockImplementationOnce(async () => ({
+    overrides[NAME_ROUTE] = () => ({
       ok: false,
       status: 409,
       json: async () => ({
         available: false, code: 'NAME_TAKEN', name: 'priya', suggestedName: 'priya 2',
       }),
-    }));
+    });
     const { result } = renderHook(() => useJoinClassroom());
 
     const res = await result.current.joinClassroom('ABC123', { guestName: 'priya' });
 
     // THEN we stop before creating anything, and hand back a name that works
     expect(mockSignInAsGuest).not.toHaveBeenCalled();
-    expect(routesCalled(fetchMock)).toEqual([NAME_ROUTE]);
+    expect(routesCalled(fetchMock)).toEqual([RESOLVE_ROUTE, NAME_ROUTE]);
     expect(res).toMatchObject({ success: false, code: 'NAME_TAKEN', suggestedName: 'priya 2' });
   });
 
   it('joins anyway when the precheck itself fails', async () => {
     // GIVEN a precheck that errors — our outage, not the student's problem
     mockUseAuth.mockReturnValue({ user: null });
-    fetchMock.mockImplementationOnce(async () => { throw new Error('network'); });
+    overrides[NAME_ROUTE] = () => { throw new Error('network'); };
     const { result } = renderHook(() => useJoinClassroom());
 
     const res = await result.current.joinClassroom('ABC123', { guestName: 'Maya' });
@@ -153,6 +177,25 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     // request into nobody in the school being able to join.
     expect(mockSignInAsGuest).toHaveBeenCalled();
     expect(res.success).toBe(true);
+  });
+
+  /**
+   * The profile wait is a CONVENIENCE (it removes a redirect race on the student
+   * hub); the join route needs only the session. So a trigger that never lands
+   * inside the deadline must cost the student a slower join, never a failed one.
+   * Without this, `waitForProfile` returning false is one edit away from being
+   * read as "abort" — which is the 2026-08-30 incident, where the anonymous user
+   * existed and no membership followed.
+   */
+  it('joins anyway when the profile trigger never lands inside the deadline', async () => {
+    mockUseAuth.mockReturnValue({ user: null });
+    mockWaitForProfile.mockResolvedValue(false);
+    const { result } = renderHook(() => useJoinClassroom());
+
+    const res = await result.current.joinClassroom('ABC123', { guestName: 'Maya' });
+
+    expect(routesCalled(fetchMock)).toContain(JOIN_ROUTE);
+    expect(res).toEqual({ success: true, classroomId: 'class-1' });
   });
 
   it('logged-out with NO name preserves the not-authenticated guard', async () => {
@@ -176,7 +219,7 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     // The precheck ran (it precedes sign-in), but the JOIN did not: a failed
     // anonymous sign-in must not be followed by a membership write for a
     // student who has no identity.
-    expect(routesCalled(fetchMock)).toEqual([NAME_ROUTE]);
+    expect(routesCalled(fetchMock)).toEqual([RESOLVE_ROUTE, NAME_ROUTE]);
     expect(res.success).toBe(false);
     expect(res.error).toContain('disabled');
   });

@@ -31,6 +31,13 @@ vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 let proState: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 
+// The PLAY NOW panel has its own suite (dashboard/__tests__/PlayNowLauncher);
+// here it is only the thing that must sit above everything else.
+vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
+  PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
+}));
+
+
 import TeacherDashboard from '../TeacherDashboard';
 
 const PAID = { hasPro: true, loading: false, source: 'polar', periodEnd: '2026-10-09T00:00:00Z', grant: null, grantExpired: false };

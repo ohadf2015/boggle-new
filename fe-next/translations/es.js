@@ -12368,6 +12368,40 @@ const es = {
     }
   },
   "teacher": {
+    "playNow": {
+      "title": "Jugar ya",
+      "subtitle": "Un toque y el código está en pantalla.",
+      "sourceGroup": "Elige las palabras",
+      "sourceRecent": "Tus listas",
+      "sourcePacks": "Packs listos",
+      "sourcePaste": "Pegar palabras",
+      "pasteLabel": "Pega aquí tus palabras",
+      "pastePlaceholder": "fotosíntesis, mitosis, ósmosis…",
+      "pasteTooFew": "Añade al menos {{min}} palabras",
+      "pasteReady": "{{count}} palabras, listas para jugar",
+      "pastedRoundName": "Palabras de hoy",
+      "goLive": "¡En directo!",
+      "armedWith": "{{title}} · {{count}} palabras",
+      "pickSomething": "Elige una lista y arrancamos",
+      "noSetupNeeded": "Sin crear clase ni escribir la lista: el alumnado entra con el código.",
+      "shortcutsLabel": "Atajos del profesorado",
+      "shortcutLastGame": "Última partida",
+      "shortcutSetup": "Configuración completa",
+      "shortcutReports": "Informes",
+      "goingLive": "Saliendo en directo",
+      "stageClassroom": "Preparando tu clase",
+      "stageLesson": "Cargando las palabras",
+      "stageRoom": "Abriendo la sala",
+      "defaultClassName": "Mi clase",
+      "failureHint": "Inténtalo otra vez o abre la configuración completa y elígelo tú.",
+      "retry": "Reintentar",
+      "openFullSetup": "Configuración completa",
+      "failure": {
+        "classroom": "No pudimos preparar tu clase",
+        "lesson": "No pudimos cargar esas palabras",
+        "room": "No pudimos abrir la sala"
+      }
+    },
     "wordDetails": {
       "more": "Más",
       "level": "Nivel",
@@ -13121,6 +13155,18 @@ const es = {
     }
   },
   "education": {
+    "projectorLobby": {
+      "joinAt": "Entra en",
+      "gameCode": "Código de clase",
+      "scanToJoin": "O escanea",
+      "inTheRoom": "en la sala",
+      "readyCount": "{{ready}} de {{total}} listos",
+      "nobodyYet": "Todavía no hay nadie",
+      "nobodyYetHint": "Escribe el código de arriba. Quien entre primero se lleva la gloria.",
+      "startBlocked": "Espera a que entre al menos un alumno para empezar.",
+      "lateJoinOn": "Se puede entrar tarde",
+      "lateJoinOff": "No se puede entrar tarde"
+    },
     "errors": {
       "serverUnavailable": "Ahora mismo no podemos acceder a la lista de la clase. Es un problema nuestro, no tuyo: inténtalo de nuevo en un momento."
     },
@@ -13239,6 +13285,19 @@ const es = {
       "startAssigned": "Practicar {{focus}}"
     },
     "liveControls": {
+      "studentsCount": "{{count}} jugando",
+      "idleCount": "{{count}} atascados",
+      "rosterTitle": "Tu clase",
+      "rosterEmpty": "Todavía no se ha unido nadie",
+      "idleBadge": "Atascado",
+      "wordsFound": "{{count}} encontradas",
+      "remove": "Expulsar",
+      "removeAria": "Expulsar a {{name}} de la partida",
+      "removeConfirm": "Expulsar a {{name}}",
+      "removeCancel": "Dejar",
+      "removeWarning": "No podrá volver a esta partida",
+      "removing": "Expulsando…",
+      "removeFailed": "Reintentar",
       "title": "Controles del docente",
       "pause": "Pausar",
       "resume": "Reanudar",
@@ -13246,6 +13305,7 @@ const es = {
       "endRound": "Terminar ronda",
       "endRoundConfirm": "Toca otra vez para terminar",
       "skipWord": "Saltar palabra",
+      "skipQuestion": "Saltar pregunta",
       "pausedTitle": "En pausa",
       "pausedBody": "Tu profe pausó el juego. Espera un momento, enseguida seguimos.",
       "pausedBodyHost": "La clase está en pausa. Toca Reanudar cuando quieras continuar.",
@@ -13335,6 +13395,32 @@ const es = {
       "participationBonus": "+{points} puntos de participación para todos",
       "shareGap": "Compartir el hueco de la clase",
       "shareGapCopied": "Enlace copiado — pégalo en Slack o en el chat de padres",
+      "podium": {
+        "title": "Mejores puntuaciones",
+        "wordsFound": "{{found}} de {{total}} palabras",
+        "correct": "{{count}} aciertos"
+      },
+      "you": {
+        "won": "¡GANASTE!",
+        "podium": "¡EN EL PODIO!",
+        "finished": "¡RONDA TERMINADA!",
+        "of": "de {{total}}",
+        "points": "puntos",
+        "beat": "Por delante de {{count}} de la clase",
+        "words": "{{found}}/{{total}} palabras de la lección",
+        "gapToNext": "{{points}} por detrás de {{name}}"
+      },
+      "coverageMeterLabel": "{{percent}} % de las palabras de la lección encontradas",
+      "moreWaysToReteach": "Más formas de repasar estas palabras",
+      "fullReport": "Informe completo",
+      "neverPlaced": "Nunca aparecieron en el tablero",
+      "neverPlacedHint": "No cabían en el tablero: la clase nunca las vio. Juega una revancha para darles otra oportunidad.",
+      "needsHelp": {
+        "title": "Repasar con ({{count}})",
+        "none": "Toda la clase encontró al menos la mitad de la lista. Otra ronda.",
+        "hint": "Menos de la mitad de las palabras de la lección en esta ronda."
+      },
+      "allBoardWordsFound": "La clase encontró todas las palabras de la lección que aparecieron en el tablero.",
       "shareGapTitle": "Hueco de vocabulario de la clase",
       "shareGapText": "{{lesson}} — la clase encontró {{found}} de {{total}} palabras. Para practicar: {{missed}}",
       "shareGapAllFoundText": "{{lesson}} — la clase encontró todas las palabras de la lección.",
@@ -14061,10 +14147,24 @@ const es = {
           "gameConfirm": "Tu clase está jugando ahora: entrarás directamente"
         },
         "success": "¡Ya estás dentro!",
-        "invalidCode": "Ese código no funciona",
+        "invalidCode": "No reconocemos ese código. Compruébalo con tu profe: los códigos dejan de funcionar cuando termina la partida.",
         "alreadyMember": "Ya estás en esta aula",
         "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "codePasted": "¡Código pegado!",
+        "flow": {
+          "steps": "Pasos para unirte",
+          "codeHeadline": "ESCRIBE EL CÓDIGO",
+          "codeSub": "Seis caracteres, los que salen en la pantalla del profe.",
+          "codeTooShort": "Son seis caracteres: aún faltan algunos.",
+          "next": "Siguiente",
+          "changeCode": "Cambiar el código",
+          "nameHeadline": "ELIGE UN NOMBRE",
+          "nameRequired": "Elige un nombre primero: lo verá toda la clase.",
+          "readyHeadline": "¿LISTO?",
+          "readySub": "Un toque y ya estás dentro.",
+          "go": "¡Vamos!",
+          "entering": "Te estamos metiendo…"
+        },
         "heroLine": "Pide a tu profe el código de la clase",
         "preparing": "Preparando todo, un momento.",
         "queuedNeedsName": "Ya casi — escribe tu nombre arriba y entramos directos.",

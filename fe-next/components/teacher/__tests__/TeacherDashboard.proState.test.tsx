@@ -28,6 +28,13 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div data-testid="last-game-insights" /> }));
 import TeacherDashboard from '../TeacherDashboard';
 
+// The PLAY NOW panel has its own suite (dashboard/__tests__/PlayNowLauncher);
+// here it is only the thing that must sit above everything else.
+vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
+  PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
+}));
+
+
 const grant = { id: 'g1', expires_at: '2027-09-05T12:00:00Z', days: 365, note: 'Sorry about Thursday.', welcomed: false };
 
 /**

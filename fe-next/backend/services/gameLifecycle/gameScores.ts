@@ -26,6 +26,7 @@ import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type Mmd
 import { getClassroomGame, updateClassroomGameStatus, type ClassroomGame } from '../../modules/classroomGameManager';
 import { hasQuizSession } from '../../modules/vocabQuizStore.js';
 import { buildClassroomSummary } from '../../modules/classroomSummary';
+import { buildClassroomPodium, splitNeverPlacedWords } from '../../modules/classroomResultsExtras';
 import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import { assignTeams, clampTeamCount } from '@/shared/utils/teamBattle';
@@ -274,6 +275,23 @@ export async function calculateAndBroadcastFinalScores(
         if (participationBonus > 0) {
           classroomSummary.participationBonus = participationBonus;
         }
+        // The podium and the never-placed split: presentation facts the room
+        // sees before the coverage table. Server-built so the projector and
+        // every phone celebrate the same names.
+        classroomSummary.podium = buildClassroomPodium({
+          players: resultsWithIconAchievements.map((p) => ({
+            username: p.username,
+            totalScore: p.totalScore,
+            isBot: !!game.users?.[p.username]?.isBot,
+          })),
+          masteryByPlayer: classroomSummary.masteryByPlayer,
+        });
+        const neverPlaced = splitNeverPlacedWords({
+          missedWords: classroomSummary.missedWords,
+          placedWords: classroomGame.placedVocabulary,
+          language,
+        });
+        if (neverPlaced.length > 0) classroomSummary.neverPlacedWords = neverPlaced;
         if (classroomSettings?.accessibility?.largeText || classroomSettings?.accessibility?.audioCues) {
           classroomSummary.accessibility = {
             largeText: !!classroomSettings.accessibility.largeText,

@@ -12230,6 +12230,40 @@ const he = {
     "notYou": "זה לא אתם? התחילו מחדש"
   },
   "teacher": {
+    "playNow": {
+      "title": "משחקים עכשיו",
+      "subtitle": "לחיצה אחת והקוד על המסך.",
+      "sourceGroup": "בחרו את המילים",
+      "sourceRecent": "הרשימות שלכם",
+      "sourcePacks": "חבילות מוכנות",
+      "sourcePaste": "הדביקו מילים",
+      "pasteLabel": "הדביקו כאן את המילים",
+      "pastePlaceholder": "פוטוסינתזה, מיטוזה, אוסמוזה…",
+      "pasteTooFew": "הוסיפו לפחות {{min}} מילים",
+      "pasteReady": "{{count}} מילים, מוכנות לשחק",
+      "pastedRoundName": "המילים של היום",
+      "goLive": "יוצאים לדרך",
+      "armedWith": "{{title}} · {{count}} מילים",
+      "pickSomething": "בחרו רשימת מילים ויוצאים",
+      "noSetupNeeded": "בלי ליצור כיתה ובלי להקליד שמות — התלמידים נכנסים עם הקוד.",
+      "shortcutsLabel": "קיצורי דרך למורה",
+      "shortcutLastGame": "המשחק האחרון",
+      "shortcutSetup": "הגדרה מלאה",
+      "shortcutReports": "דוחות",
+      "goingLive": "עולים לאוויר",
+      "stageClassroom": "מכינים את הכיתה",
+      "stageLesson": "טוענים את המילים",
+      "stageRoom": "פותחים את החדר",
+      "defaultClassName": "הכיתה שלי",
+      "failureHint": "נסו שוב, או פתחו את ההגדרה המלאה ובחרו בעצמכם.",
+      "retry": "נסו שוב",
+      "openFullSetup": "הגדרה מלאה",
+      "failure": {
+        "classroom": "לא הצלחנו להכין את הכיתה",
+        "lesson": "לא הצלחנו לטעון את המילים",
+        "room": "לא הצלחנו לפתוח את החדר"
+      }
+    },
     "wordDetails": {
       "more": "עוד",
       "level": "רמה",
@@ -12983,6 +13017,18 @@ const he = {
     }
   },
   "education": {
+    "projectorLobby": {
+      "joinAt": "היכנסו לכתובת",
+      "gameCode": "קוד הכיתה",
+      "scanToJoin": "או סרקו",
+      "inTheRoom": "בחדר",
+      "readyCount": "{{ready}} מתוך {{total}} מוכנים",
+      "nobodyYet": "עוד אף אחד לא נכנס",
+      "nobodyYetHint": "הקלידו את הקוד למעלה. הראשון שנכנס תופס את הכתר.",
+      "startBlocked": "צריך שתלמיד אחד לפחות ייכנס לפני שאפשר להתחיל.",
+      "lateJoinOn": "אפשר להצטרף באיחור",
+      "lateJoinOff": "אי אפשר להצטרף באיחור"
+    },
     "errors": {
       "serverUnavailable": "לא מצליחים להגיע לרשימת הכיתה כרגע. זו תקלה אצלנו, לא אצלך — נסו שוב בעוד רגע."
     },
@@ -13101,6 +13147,19 @@ const he = {
       "startAssigned": "לתרגל {{focus}}"
     },
     "liveControls": {
+      "studentsCount": "{{count}} משחקים",
+      "idleCount": "{{count}} תקועים",
+      "rosterTitle": "הכיתה שלך",
+      "rosterEmpty": "אף אחד עוד לא הצטרף",
+      "idleBadge": "תקוע",
+      "wordsFound": "{{count}} נמצאו",
+      "remove": "הסרה",
+      "removeAria": "להסיר את {{name}} מהמשחק",
+      "removeConfirm": "להסיר את {{name}}",
+      "removeCancel": "להשאיר",
+      "removeWarning": "לא יוכלו לחזור למשחק הזה",
+      "removing": "מסיר…",
+      "removeFailed": "לנסות שוב",
       "title": "פקדי מורה",
       "pause": "השהיה",
       "resume": "המשך",
@@ -13108,6 +13167,7 @@ const he = {
       "endRound": "סיום הסיבוב",
       "endRoundConfirm": "לחצו שוב לסיום",
       "skipWord": "דלגו על המילה",
+      "skipQuestion": "דלגו על השאלה",
       "pausedTitle": "המשחק מושהה",
       "pausedBody": "המורה השהה את המשחק. רגע של סבלנות — ממשיכים בקרוב.",
       "pausedBodyHost": "הכיתה מוקפאת. לחצו על ״המשך״ כשתהיו מוכנים להמשיך.",
@@ -13197,6 +13257,32 @@ const he = {
       "participationBonus": "+{points} נקודות השתתפות לכולם",
       "shareGap": "שיתוף פער הכיתה",
       "shareGapCopied": "הקישור הועתק — הדביקו ב-Slack או בצ'אט הורים",
+      "podium": {
+        "title": "המובילים",
+        "wordsFound": "{{found}} מתוך {{total}} מילים",
+        "correct": "{{count}} תשובות נכונות"
+      },
+      "you": {
+        "won": "ניצחת!",
+        "podium": "על הפודיום!",
+        "finished": "הסיבוב נגמר!",
+        "of": "מתוך {{total}}",
+        "points": "נקודות",
+        "beat": "לפני {{count}} בכיתה",
+        "words": "{{found}} מתוך {{total}} מילות שיעור",
+        "gapToNext": "{{points}} מאחורי {{name}}"
+      },
+      "coverageMeterLabel": "{{percent}}% ממילות השיעור נמצאו",
+      "moreWaysToReteach": "עוד דרכים ללמד מחדש את המילים",
+      "fullReport": "דוח מלא",
+      "neverPlaced": "לא הופיעו על הלוח",
+      "neverPlacedHint": "הלוח לא הצליח להכיל אותן — הכיתה מעולם לא ראתה אותן. התחילו סיבוב חוזר כדי לתת להן הזדמנות.",
+      "needsHelp": {
+        "title": "כדאי לעבור איתם ({{count}})",
+        "none": "כולם מצאו לפחות חצי מהרשימה. אפשר לסבב נוסף.",
+        "hint": "פחות מחצי ממילות השיעור בסיבוב הזה."
+      },
+      "allBoardWordsFound": "הכיתה מצאה כל מילת שיעור שהופיעה על הלוח.",
       "shareGapTitle": "פער אוצר המילים של הכיתה",
       "shareGapText": "{{lesson}} — הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור. לתרגול: {{missed}}",
       "shareGapAllFoundText": "{{lesson}} — הכיתה מצאה את כל מילות השיעור.",
@@ -13915,6 +14001,20 @@ const he = {
         "codeHint": "6 תווים מהמורה",
         "codeLabel": "קוד כיתה",
         "codePasted": "הודבק!",
+        "flow": {
+          "steps": "שלבי ההצטרפות",
+          "codeHeadline": "הקלידו את הקוד",
+          "codeSub": "שישה תווים, ישר מהמסך של המורה.",
+          "codeTooShort": "צריך שישה תווים — חסרים עוד כמה.",
+          "next": "הלאה",
+          "changeCode": "שינוי הקוד",
+          "nameHeadline": "בחרו שם",
+          "nameRequired": "קודם בחרו שם — כל הכיתה תראה אותו.",
+          "readyHeadline": "מוכנים?",
+          "readySub": "לחיצה אחת ואתם בפנים.",
+          "go": "יאללה, נכנסים",
+          "entering": "מכניסים אתכם…"
+        },
         "heroLine": "בקשו מהמורה את קוד הכיתה",
         "preparing": "רגע, מתכוננים…",
         "queuedNeedsName": "כמעט בפנים — כתבו את השם למעלה ואנחנו ניכנס מיד.",
@@ -13922,7 +14022,7 @@ const he = {
         "useSuggestedName": "להצטרף בתור {{suggestedName}}",
         "emptyClipboard": "אין מה להדביק",
         "guestError": "לא הצלחנו להתחיל. נסו שוב או פנו למורה.",
-        "invalidCode": "קוד לא תקין",
+        "invalidCode": "לא זיהינו את הקוד הזה. בדקו אותו שוב עם המורה — כשהמשחק נגמר הקוד מפסיק לעבוד.",
         "joining": "מצטרף...",
         "nameHint": "לא צריך חשבון — פשוט בחרו שם",
         "nameLabel": "השם שלך",

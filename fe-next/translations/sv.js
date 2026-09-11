@@ -12609,6 +12609,40 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
+    "playNow": {
+      "title": "Spela nu",
+      "subtitle": "Ett tryck och koden står på skärmen.",
+      "sourceGroup": "Välj orden",
+      "sourceRecent": "Dina listor",
+      "sourcePacks": "Färdiga paket",
+      "sourcePaste": "Klistra in ord",
+      "pasteLabel": "Klistra in dina ord här",
+      "pastePlaceholder": "fotosyntes, mitos, osmos…",
+      "pasteTooFew": "Lägg till minst {{min}} ord",
+      "pasteReady": "{{count}} ord, klara att köra",
+      "pastedRoundName": "Dagens ord",
+      "goLive": "Kör igång",
+      "armedWith": "{{title}} · {{count}} ord",
+      "pickSomething": "Välj en ordlista så är du igång",
+      "noSetupNeeded": "Ingen klass att skapa, ingen lista att skriva — eleverna går in med koden.",
+      "shortcutsLabel": "Genvägar för läraren",
+      "shortcutLastGame": "Senaste spelet",
+      "shortcutSetup": "Alla inställningar",
+      "shortcutReports": "Rapporter",
+      "goingLive": "Kör igång",
+      "stageClassroom": "Förbereder din klass",
+      "stageLesson": "Hämtar orden",
+      "stageRoom": "Öppnar rummet",
+      "defaultClassName": "Min klass",
+      "failureHint": "Försök igen, eller öppna alla inställningar och välj själv.",
+      "retry": "Försök igen",
+      "openFullSetup": "Alla inställningar",
+      "failure": {
+        "classroom": "Kunde inte förbereda din klass",
+        "lesson": "Kunde inte hämta orden",
+        "room": "Kunde inte öppna rummet"
+      }
+    },
     "wordDetails": {
       "more": "Mer",
       "level": "Nivå",
@@ -13362,6 +13396,18 @@ const sv = {
     }
   },
   "education": {
+    "projectorLobby": {
+      "joinAt": "Gå till",
+      "gameCode": "Klasskod",
+      "scanToJoin": "Eller skanna",
+      "inTheRoom": "i rummet",
+      "readyCount": "{{ready}} av {{total}} redo",
+      "nobodyYet": "Ingen är inne än",
+      "nobodyYetHint": "Skriv in koden ovan. Först in tar tronen.",
+      "startBlocked": "Vänta tills minst en elev har anslutit innan du startar.",
+      "lateJoinOn": "Sen anslutning tillåten",
+      "lateJoinOff": "Sen anslutning stängd"
+    },
     "errors": {
       "serverUnavailable": "Vi når inte klasslistan just nu. Det är vårt fel, inte ditt – försök igen om en liten stund."
     },
@@ -13480,6 +13526,19 @@ const sv = {
       "startAssigned": "Öva {{focus}}"
     },
     "liveControls": {
+      "studentsCount": "{{count}} spelar",
+      "idleCount": "{{count}} har fastnat",
+      "rosterTitle": "Din klass",
+      "rosterEmpty": "Ingen har gått med än",
+      "idleBadge": "Fastnat",
+      "wordsFound": "{{count}} hittade",
+      "remove": "Ta bort",
+      "removeAria": "Ta bort {{name}} från spelet",
+      "removeConfirm": "Ta bort {{name}}",
+      "removeCancel": "Behåll",
+      "removeWarning": "Hen kan inte gå med i det här spelet igen",
+      "removing": "Tar bort…",
+      "removeFailed": "Försök igen",
       "title": "Lärarkontroller",
       "pause": "Pausa",
       "resume": "Fortsätt",
@@ -13487,6 +13546,7 @@ const sv = {
       "endRound": "Avsluta rundan",
       "endRoundConfirm": "Tryck igen för att avsluta",
       "skipWord": "Hoppa över ordet",
+      "skipQuestion": "Hoppa över frågan",
       "pausedTitle": "Pausat",
       "pausedBody": "Din lärare har pausat spelet. Häng kvar – vi fortsätter snart.",
       "pausedBodyHost": "Klassen är pausad. Tryck på Fortsätt när du vill köra vidare.",
@@ -13576,6 +13636,32 @@ const sv = {
       "participationBonus": "+{points} deltagarpoäng till alla",
       "shareGap": "Dela klassens lucka",
       "shareGapCopied": "Länk kopierad — klistra in i Slack eller föräldrachatten",
+      "podium": {
+        "title": "Topplacerade",
+        "wordsFound": "{{found}} av {{total}} ord",
+        "correct": "{{count}} rätt"
+      },
+      "you": {
+        "won": "DU VANN!",
+        "podium": "PÅ PALLEN!",
+        "finished": "RONDEN ÄR SLUT!",
+        "of": "av {{total}}",
+        "points": "poäng",
+        "beat": "Före {{count}} i klassen",
+        "words": "{{found}}/{{total}} läxord",
+        "gapToNext": "{{points}} efter {{name}}"
+      },
+      "coverageMeterLabel": "{{percent}} % av lektionens ord hittade",
+      "moreWaysToReteach": "Fler sätt att repetera orden",
+      "fullReport": "Fullständig rapport",
+      "neverPlaced": "Kom aldrig med på spelplanen",
+      "neverPlacedHint": "Spelplanen fick inte plats med dem — klassen såg dem aldrig. Kör en returmatch så får de en ny chans.",
+      "needsHelp": {
+        "title": "Ta åt sidan ({{count}})",
+        "none": "Alla hittade minst halva listan. Kör en runda till.",
+        "hint": "Under hälften av lektionens ord den här ronden."
+      },
+      "allBoardWordsFound": "Klassen hittade varje lektionsord som kom med på spelplanen.",
       "shareGapTitle": "Klassens ordförrådslucka",
       "shareGapText": "{{lesson}} — klassen hittade {{found}} av {{total}} lektionsord. Öva: {{missed}}",
       "shareGapAllFoundText": "{{lesson}} — klassen hittade alla lektionsord.",
@@ -14296,6 +14382,20 @@ const sv = {
         "codeLabel": "Klasskod",
         "codeNotRecognised": "Vi kunde inte känna igen den koden",
         "codePasted": "Klistrad!",
+        "flow": {
+          "steps": "Steg för att gå med",
+          "codeHeadline": "SKRIV IN KODEN",
+          "codeSub": "Sex tecken, direkt från lärarens skärm.",
+          "codeTooShort": "Sex tecken — det fattas några.",
+          "next": "Vidare",
+          "changeCode": "Byt kod",
+          "nameHeadline": "VÄLJ ETT NAMN",
+          "nameRequired": "Välj ett namn först — hela klassen ser det.",
+          "readyHeadline": "REDO?",
+          "readySub": "Ett tryck så är du inne.",
+          "go": "Kör!",
+          "entering": "Vi släpper in dig…"
+        },
         "heroLine": "Fråga din lärare om klasskoden",
         "preparing": "Gör i ordning – ett ögonblick.",
         "queuedNeedsName": "Nästan inne — skriv ditt namn ovanför så tar vi dig direkt dit.",
@@ -14304,7 +14404,7 @@ const sv = {
         "codePlaceholder": "6 bokstäver",
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
-        "invalidCode": "Koden är inte giltig",
+        "invalidCode": "Vi känner inte igen den koden. Dubbelkolla med din lärare – koder slutar fungera när spelet är slut.",
         "joining": "Går med...",
         "nameHint": "Inget konto behövs – välj bara ett namn",
         "nameLabel": "Ditt namn",

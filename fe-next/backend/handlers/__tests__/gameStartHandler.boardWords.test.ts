@@ -73,7 +73,7 @@ vi.mock('../../../backend/modules/gameModeSelector', () => ({
   ALL_GAME_MODES: [],
 }));
 vi.mock('../../../backend/handlers/playerDataInit', () => ({ initializePlayerData: vi.fn(), ensurePlayerState: vi.fn() }));
-vi.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: vi.fn(() => null) }));
+vi.mock('../../../backend/modules/classroomGameManager', () => ({ getClassroomGame: vi.fn(() => null), beginClassroomRound: vi.fn(async () => null) }));
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   initBlastModeState: vi.fn(),
   hashStringToSeed: vi.fn(() => 0),

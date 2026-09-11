@@ -152,8 +152,16 @@ export function useActiveClassroomGame(classroomId: string) {
         setActiveGame(joinable);
       });
 
-      // The server broadcasts this from every end-of-round path.
-      sock.on('classroomGameEnded', (data: { gameCode?: string }) => {
+      // The server broadcasts this from every end-of-ROUND path, and the
+      // teacher starts the next round seconds to minutes later while the class
+      // reads the results screen. Only `sessionEnded` means the game itself is
+      // over (the teacher's own `endClassroomGame`); clearing on a round end
+      // blanked the JOIN card for a full 15-second poll while the room, the
+      // roster and the code were all alive. Room teardown carries no broadcast
+      // at all — the next poll drops it, because the code is pruned out of the
+      // classroom index the moment its session is marked ended.
+      sock.on('classroomGameEnded', (data: { gameCode?: string; sessionEnded?: boolean }) => {
+        if (!data?.sessionEnded) return;
         setActiveGame((current) => {
           if (!current) return null;
           // No gameCode on the payload → end whatever this classroom was running.

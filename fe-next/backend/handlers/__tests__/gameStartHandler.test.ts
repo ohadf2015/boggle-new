@@ -123,8 +123,9 @@ vi.mock('../../../backend/modules/gameModeSelector', () => ({
 }));
 vi.mock('../../../backend/handlers/playerDataInit', () => ({ initializePlayerData: mockInitializePlayerData, ensurePlayerState: vi.fn() }));
 vi.mock('../../../backend/modules/classroomGameManager', () => ({
-  getClassroomGame: mockGetClassroomGame,
+  getClassroomGame: mockGetClassroomGame, beginClassroomRound: mockGetClassroomGame,
   setClassroomGamePlacedVocabulary: vi.fn(async () => undefined),
+  reopenClassroomGameForRound: vi.fn(async () => undefined),
 }));
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   initBlastModeState: mockInitBlastModeState,

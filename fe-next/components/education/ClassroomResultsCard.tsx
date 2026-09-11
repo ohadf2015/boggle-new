@@ -1,35 +1,38 @@
 /**
  * ClassroomResultsCard
  *
- * The results screen a classroom game deserves: not "who won", but "which of
- * today's words landed".
+ * The end of a classroom game is a moment, not a report. In order:
+ *  1. the PODIUM — three names, three scores, the winner in the middle;
+ *  2. the class's word coverage in one glance — one number, one bar, the chips;
+ *  3. one tap to rematch, one tap to the full report.
+ * Everything else (seven ways to send the missed words home) lives behind a
+ * disclosure, because a teacher standing in front of 30 children reads one
+ * button, not eight.
  *
  * Renders from the server-built `classroomSummary` in the shared results
  * payload — NOT from the teacher's sessionStorage, which is why the previous
  * lesson card was blank for every student in the room.
  *
- * Two audiences, one card:
- *  - a student sees their own hits and misses,
- *  - the teacher sees class-wide coverage and the reteach list.
+ * Two audiences, one card: a student sees their own hits and misses, the
+ * teacher sees class-wide coverage and the reteach list. Either can share the
+ * CLASS-level gap (no student names) with parents / Slack.
  *
- * Either can share the CLASS-level gap (no student names) with parents / Slack.
+ * Layout and links live in components/education/results/*; this file decides
+ * what the room sees and in what order.
  */
 
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { GraduationCap, Check, X, RotateCcw, Play, Share2, Printer, ClipboardList, QrCode } from 'lucide-react';
+import { GraduationCap, Check, RotateCcw, Share2, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
-import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
-import { buildMissGapAssignmentPath } from '@/lib/education/missGapAsyncAssignment';
-import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
-import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
-import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
-import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
-import { shareWithFallback } from '@/utils/shareWithFallback';
+import { ResultsPodium, type PodiumEntry } from './results/ResultsPodium';
+import { StudentRoundOutcome } from './results/StudentRoundOutcome';
+import { WordCoverageGlance } from './results/WordCoverageGlance';
+import { ClassNeedsHelp } from './results/ClassNeedsHelp';
+import { ReteachActions } from './results/ReteachActions';
+import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
+import { useReteachLinks } from './results/useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 
 export interface ClassroomResultsCardProps {
@@ -42,6 +45,13 @@ export interface ClassroomResultsCardProps {
   onReteach?: () => void;
   /** Teacher-only: same list, same code — a new round without recreating the room. */
   onRematch?: () => void;
+  /**
+   * Final standings, best first, exactly as the server sorted them. Present
+   * only on the live results page; the card renders without it (an older
+   * payload, a printed recap) minus the student's placing hero. Never used to
+   * re-rank — `summary.podium` remains the one ranking in the system.
+   */
+  standings?: Array<{ username: string; score: number }>;
 }
 
 export function ClassroomResultsCard({
@@ -51,274 +61,32 @@ export function ClassroomResultsCard({
   onPractice,
   onReteach,
   onRematch,
+  standings,
 }: ClassroomResultsCardProps) {
   const { t, language } = useLanguage();
-  const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
-  const [missGapShareState, setMissGapShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
+  const links = useReteachLinks(summary, isTeacher);
 
-  // A late joiner has no mastery row; treat them as having found nothing rather
-  // than crashing or hiding the card.
-  const mine = summary.masteryByPlayer[username] ?? {
-    found: 0,
-    total: summary.totalWords,
-  };
+  // `neverPlacedWords` is a subset of `missedWords`: lesson words the board
+  // generator never embedded. Absent means "we cannot tell" — then every miss
+  // reads as a miss, exactly as before. Never treat an unknown source as proof.
+  const neverPlaced = new Set((summary.neverPlacedWords ?? []).map((w) => w.toLowerCase()));
+  const missedOnBoard = summary.missedWords.filter((w) => !neverPlaced.has(w.toLowerCase()));
 
-  const foundByMe = (word: { foundBy: string[] }) =>
-    word.foundBy.some((n) => n.toLowerCase() === username.toLowerCase());
-
-  const classGapUrlForTeacher = (() => {
-    if (!isTeacher || summary.missedWords.length === 0) return null;
-    try {
-      return buildClassGapShareUrl({
-        locale: language,
-        lessonNames: summary.lessonNames,
-        teacherName: summary.teacherName,
-        found: summary.classFoundCount,
-        total: summary.totalWords,
-        missedWords: summary.missedWords,
-      });
-    } catch {
-      return null;
-    }
-  })();
-
-  /**
-   * Google Classroom add-on MVP: post the class-gap card (missed words, no names)
-   * to the Stream so the teacher can start a 3-min reteach Live from that link.
-   * Phase-1 share dialog — no OAuth. Absolute lexiclash.live URL.
-   */
-  const googleClassroomReteachHref = (() => {
-    if (!classGapUrlForTeacher) return null;
-    try {
-      const missed = summary.missedWords.slice(0, 8).join(', ');
-      return buildGoogleClassroomShareUrl({
-        joinUrl: classGapUrlForTeacher,
-        title: t('education.results.postReteachGoogleClassroomTitle', {
-          lesson: summary.lessonNames.join(', '),
-        }),
-        body: t('education.results.postReteachGoogleClassroomBody', {
-          missed,
-        }),
-        itemType: 'announcement',
-      });
-    } catch {
-      return null;
-    }
-  })();
-
-  /**
-   * After Live ends: assign the same class-gap card as Google Classroom *homework*
-   * (itemtype=assignment). Students open practice-at-home words from Classwork;
-   * teacher sets due date in Google's dialog. Still Phase-1 share — no OAuth.
-   */
-  const googleClassroomAssignHref = (() => {
-    if (!classGapUrlForTeacher) return null;
-    try {
-      const missed = summary.missedWords.slice(0, 8).join(', ');
-      return buildGoogleClassroomShareUrl({
-        joinUrl: classGapUrlForTeacher,
-        title: t('education.results.assignPracticeGoogleClassroomTitle', {
-          lesson: summary.lessonNames.join(', '),
-        }),
-        body: t('education.results.assignPracticeGoogleClassroomBody', {
-          missed,
-        }),
-        itemType: 'assignment',
-      });
-    } catch {
-      return null;
-    }
-  })();
-
-  const unpluggedReteachHref = (() => {
-    if (!isTeacher || summary.missedWords.length === 0) return null;
-    try {
-      return buildUnpluggedReteachPath({
-        locale: language,
-        lessonNames: summary.lessonNames,
-        teacherName: summary.teacherName,
-        found: summary.classFoundCount,
-        total: summary.totalWords,
-        missedWords: summary.missedWords,
-      });
-    } catch {
-      return null;
-    }
-  })();
-
-  /**
-   * Google Classroom *assignment* that ships Unplugged reteach (#959) + the #957
-   * printable practice sheet as device-free homework. Foils Kahootopia Assignments
-   * / Classic Unplugged. Absolute Unplugged Live deep-link on lexiclash.live;
-   * class-level missed words only — no student names. Phase-1 share — no OAuth.
-   */
-  const googleClassroomUnpluggedAssignHref = (() => {
-    if (!isTeacher || summary.missedWords.length === 0) return null;
-    try {
-      const unpluggedUrl = buildUnpluggedReteachUrl({
-        locale: language,
-        lessonNames: summary.lessonNames,
-        teacherName: summary.teacherName,
-        found: summary.classFoundCount,
-        total: summary.totalWords,
-        missedWords: summary.missedWords,
-      });
-      const missed = summary.missedWords.slice(0, 8).join(', ');
-      return buildGoogleClassroomShareUrl({
-        joinUrl: unpluggedUrl,
-        title: t('education.results.assignUnpluggedGoogleClassroomTitle', {
-          lesson: summary.lessonNames.join(', '),
-        }),
-        body: t('education.results.assignUnpluggedGoogleClassroomBody', {
-          missed,
-        }),
-        itemType: 'assignment',
-      });
-    } catch {
-      return null;
-    }
-  })();
-
-  /**
-   * Async miss-gap homework (#972 practice card + due date → class streak).
-   * Foil Kahootopia Assignments (live-game homework). NOT Unplugged Live.
-   */
-  const missGapAsyncAssignHref = (() => {
-    if (!isTeacher || summary.missedWords.length === 0) return null;
-    try {
-      return buildMissGapAssignmentPath({
-        locale: language,
-        lessonNames: summary.lessonNames,
-        teacherName: summary.teacherName,
-        found: summary.classFoundCount,
-        total: summary.totalWords,
-        missedWords: summary.missedWords,
-      });
-    } catch {
-      return null;
-    }
-  })();
-
-  /**
-   * Device-free reteach: printable missed-words practice sheet (foil Kahoot
-   * Classic Unplugged / Team Tiles). Class-level words only — no student names.
-   */
-  const handlePrintPracticeSheet = () => {
-    if (!isTeacher || summary.missedWords.length === 0) return;
-    openMissedWordsPracticeSheet({
-      lesson: summary.lessonNames.join(', '),
-      teacher: summary.teacherName,
-      missedWords: summary.missedWords,
-      locale: language,
-      labels: {
-        title: t('education.results.printPracticeSheetTitle', {
-          lesson: summary.lessonNames.join(', '),
-        }),
-        subtitle: t('education.results.printPracticeSheetSubtitle'),
-        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
-        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
-        nameLine: t('education.results.printPracticeSheetNameLine'),
-        dateLine: t('education.results.printPracticeSheetDateLine'),
-        footer: t('education.results.printPracticeSheetFooter'),
-      },
-    });
-  };
-
-  /**
-   * Unplugged reteach printable pack PDF (#957 practice pages + QR deep-link to
-   * #959 Live). Foil Kahoot Classic Unplugged. Class words only — no names.
-   * Moat ~6:28am after #980.
-   */
-  const handlePrintUnpluggedPack = () => {
-    if (!isTeacher || summary.missedWords.length === 0) return;
-    const lesson = summary.lessonNames.join(', ');
-    openUnpluggedReteachPrintablePack({
-      lesson,
-      teacher: summary.teacherName,
-      missedWords: summary.missedWords,
-      found: summary.classFoundCount,
-      total: summary.totalWords,
-      locale: language,
-      labels: {
-        title: t('education.results.printPracticeSheetTitle', { lesson }),
-        subtitle: t('education.results.printPracticeSheetSubtitle'),
-        writeLabel: t('education.results.printPracticeSheetWriteLabel'),
-        sentenceLabel: t('education.results.printPracticeSheetSentenceLabel'),
-        nameLine: t('education.results.printPracticeSheetNameLine'),
-        dateLine: t('education.results.printPracticeSheetDateLine'),
-        footer: t('education.results.unpluggedReteachPackFooter'),
-        packTitle: t('education.results.unpluggedReteachPackTitle', { lesson }),
-        packSubtitle: t('education.results.unpluggedReteachPackSubtitle'),
-        packFoil: t('education.results.unpluggedReteachPackFoil'),
-        qrHint: t('education.results.unpluggedReteachPackQrHint'),
-        packHowTo: t('education.results.unpluggedReteachPackHowTo'),
-        practiceHeading: t('education.results.unpluggedReteachPackPracticeHeading'),
-      },
-    });
-  };
-
-
-  /**
-   * Shareable miss-gap practice card / PDF after Unplugged Classroom assign.
-   * Foil: Kahoot Unplugged has no take-home. Parents get a lexiclash.live link
-   * that prints the #957 practice sheet (Save as PDF). Class words only.
-   */
-  const handleShareMissGapPractice = async () => {
-    if (!isTeacher || summary.missedWords.length === 0) return;
-    const lesson = summary.lessonNames.join(', ');
-    const url = buildMissGapPracticeShareUrl({
-      locale: language,
-      lessonNames: summary.lessonNames,
-      teacherName: summary.teacherName,
-      found: summary.classFoundCount,
-      total: summary.totalWords,
-      missedWords: summary.missedWords,
-    });
-    const text = t('education.results.shareMissGapPracticeText', {
-      lesson,
-      missed: summary.missedWords.join(', '),
-    });
-    const result = await shareWithFallback({
-      title: t('education.results.shareMissGapPracticeTitle'),
-      text,
-      url,
-      clipboardText: `${text}\n${url}`,
-    });
-    if (result === 'copied' || result === 'shared') setMissGapShareState(result);
-  };
-
-  const handleShareGap = async () => {
-    const lesson = summary.lessonNames.join(', ');
-    const url = buildClassGapShareUrl({
-      locale: language,
-      lessonNames: summary.lessonNames,
-      teacherName: summary.teacherName,
-      found: summary.classFoundCount,
-      total: summary.totalWords,
-      missedWords: summary.missedWords,
-    });
-    const text = summary.missedWords.length
-      ? t('education.results.shareGapText', {
-          lesson,
-          found: summary.classFoundCount,
-          total: summary.totalWords,
-          missed: summary.missedWords.join(', '),
-        })
-      : t('education.results.shareGapAllFoundText', { lesson });
-    const result = await shareWithFallback({
-      title: t('education.results.shareGapTitle'),
-      text,
-      url,
-      clipboardText: `${text}\n${url}`,
-    });
-    if (result === 'copied' || result === 'shared') setShareState(result);
-  };
+  const podium: PodiumEntry[] = (summary.podium ?? []).map((p) => ({
+    username: p.username,
+    score: p.score,
+    rank: p.rank,
+    detail:
+      typeof p.wordsFound === 'number' && typeof p.totalWords === 'number'
+        ? t('education.results.podium.wordsFound', { found: p.wordsFound, total: p.totalWords })
+        : undefined,
+  }));
 
   return (
     <div className="p-5 rounded-neo border-neo border-neo-black bg-neo-navy shadow-hard">
       <div className="flex items-start gap-3 mb-4">
         <GraduationCap className="w-6 h-6 text-neo-lime shrink-0 mt-0.5" />
-        <div>
+        <div className="min-w-0">
           <h3 className="text-neo-white font-neo-display font-bold text-lg leading-tight">
             {t('education.results.title')}
           </h3>
@@ -328,48 +96,37 @@ export function ClassroomResultsCard({
         </div>
       </div>
 
-      <p className="text-neo-white font-bold mb-3">
-        {isTeacher
-          ? t('education.results.classCoverage', {
-              found: summary.classFoundCount,
-              total: summary.totalWords,
-            })
-          : t('education.results.yourMastery', {
-              found: mine.found,
-              total: mine.total,
-            })}
-      </p>
+      {/* My round first, then the room's. A student holding a phone wants one
+          answer before anything else, and it is not the class average. */}
+      {!isTeacher && standings && standings.length > 0 && (
+        <StudentRoundOutcome
+          username={username}
+          standings={standings}
+          mastery={summary.masteryByPlayer[username]}
+          t={t}
+        />
+      )}
 
-      <ul className="flex flex-wrap gap-2 mb-4">
-        {summary.coverage.map((entry) => {
-          // For the teacher "found" means the class found it; for a student it
-          // means they personally did. Same list, different question.
-          const found = isTeacher ? entry.foundBy.length > 0 : foundByMe(entry);
-          return (
-            <li
-              key={entry.word}
-              data-testid={`lesson-word-${entry.word}`}
-              data-found={String(found)}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-neo border-neo-black text-sm font-bold',
-                found
-                  ? 'bg-neo-lime text-neo-black'
-                  : 'bg-neo-navy-light text-neo-white/60'
-              )}
-            >
-              {found ? (
-                <Check className="w-4 h-4" aria-hidden />
-              ) : (
-                <X className="w-4 h-4" aria-hidden />
-              )}
-              <span>{entry.word}</span>
-              {isTeacher && entry.foundBy.length > 0 && (
-                <span className="ms-1 text-xs opacity-70">{entry.foundBy.length}</span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {podium.length > 0 && (
+        <div className="mb-5">
+          <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-neo-yellow">
+            {t('education.results.podium.title')}
+          </p>
+          <ResultsPodium entries={podium} t={t} />
+        </div>
+      )}
+
+      <WordCoverageGlance
+        summary={summary}
+        username={username}
+        isTeacher={isTeacher}
+        neverPlaced={neverPlaced}
+        t={t}
+      />
+
+      {/* Coverage says how the CLASS did; this says which children to pull
+          aside, while they are still in the room. */}
+      {isTeacher && <ClassNeedsHelp masteryByPlayer={summary.masteryByPlayer} t={t} />}
 
       {isTeacher && summary.participationBonus ? (
         <p
@@ -380,20 +137,11 @@ export function ClassroomResultsCard({
         </p>
       ) : null}
 
-      {isTeacher && onRematch && (
-        <button
-          type="button"
-          data-testid="rematch-same-list"
-          onClick={onRematch}
-          className={cn(
-            'mb-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-yellow text-neo-black border-neo border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg transition-all'
-          )}
-        >
-          <RotateCcw className="w-5 h-5" aria-hidden />
-          {t('education.results.rematch')}
-        </button>
+      {/* The two taps that matter, side by side and above the fold. Mounted
+          only for the teacher — the Pro check inside must not fire on thirty
+          student phones that never see the link. */}
+      {isTeacher && (
+        <ResultsPrimaryActions language={language} onRematch={onRematch} t={t} />
       )}
 
       {isTeacher &&
@@ -402,151 +150,46 @@ export function ClassroomResultsCard({
             data-testid="reteach-list"
             className="p-3 rounded-neo border border-neo-pink/40 bg-neo-pink/10"
           >
-            <p className="text-neo-white font-bold text-sm mb-1">
-              {t('education.results.reteach')}
-            </p>
-            <p className="text-neo-white/80 font-neo-body text-sm">
-              {summary.missedWords.join(', ')}
-            </p>
-            {onReteach && (
-              <button
-                type="button"
-                data-testid="play-reteach-round"
-                onClick={onReteach}
-                className={cn(
-                  'mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                  'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all'
-                )}
+            {missedOnBoard.length > 0 ? (
+              <>
+                <p className="text-neo-white font-bold text-sm mb-1">
+                  {t('education.results.reteach')}
+                </p>
+                <p
+                  data-testid="missed-on-board-words"
+                  className="text-neo-white/80 font-neo-body text-sm"
+                >
+                  {missedOnBoard.join(', ')}
+                </p>
+              </>
+            ) : (
+              <p
+                data-testid="all-board-words-found"
+                className="text-neo-white font-bold text-sm"
               >
-                <Play className="w-4 h-4" aria-hidden />
-                {t('education.results.playReteachRound')}
-              </button>
+                {t('education.results.allBoardWordsFound')}
+              </p>
             )}
-            {googleClassroomReteachHref && (
-              <a
-                href={googleClassroomReteachHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="post-reteach-google-classroom"
-                className={cn(
-                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                  'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all'
-                )}
+
+            {neverPlaced.size > 0 && (
+              <div
+                data-testid="never-placed-words"
+                className="mt-3 p-3 rounded-neo border border-dashed border-neo-white/30 bg-neo-navy/60"
               >
-                <GraduationCap className="w-4 h-4" aria-hidden />
-                {t('education.results.postReteachGoogleClassroom')}
-              </a>
+                <p className="flex items-center gap-2 text-neo-white/80 font-bold text-sm mb-1">
+                  <EyeOff className="w-4 h-4 shrink-0" aria-hidden />
+                  {t('education.results.neverPlaced')}
+                </p>
+                <p className="text-neo-white/70 font-neo-body text-sm">
+                  {summary.neverPlacedWords?.join(', ')}
+                </p>
+                <p className="mt-1 text-neo-white/50 font-neo-body text-xs">
+                  {t('education.results.neverPlacedHint')}
+                </p>
+              </div>
             )}
-            {googleClassroomAssignHref && (
-              <a
-                href={googleClassroomAssignHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="assign-practice-google-classroom"
-                className={cn(
-                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                  'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all'
-                )}
-              >
-                <GraduationCap className="w-4 h-4" aria-hidden />
-                {t('education.results.assignPracticeGoogleClassroom')}
-              </a>
-            )}
-            {unpluggedReteachHref && (
-              <Link
-                href={unpluggedReteachHref}
-                data-testid="start-unplugged-reteach-live"
-                className={cn(
-                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                  'bg-neo-pink/90 text-neo-black border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all'
-                )}
-              >
-                <Play className="w-4 h-4" aria-hidden />
-                {t('education.results.startUnpluggedReteachLive')}
-              </Link>
-            )}
-            {googleClassroomUnpluggedAssignHref && (
-              <a
-                href={googleClassroomUnpluggedAssignHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="assign-unplugged-google-classroom"
-                className={cn(
-                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                  'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all'
-                )}
-              >
-                <GraduationCap className="w-4 h-4" aria-hidden />
-                {t('education.results.assignUnpluggedGoogleClassroom')}
-              </a>
-            )}
-            {missGapAsyncAssignHref && (
-              <Link
-                href={missGapAsyncAssignHref}
-                data-testid="assign-miss-gap-async-homework"
-                className={cn(
-                  'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                  'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
-                  'shadow-hard-sm hover:shadow-hard transition-all'
-                )}
-              >
-                <ClipboardList className="w-4 h-4" aria-hidden />
-                {t('education.results.assignMissGapAsyncHomework')}
-              </Link>
-            )}
-            <button
-              type="button"
-              data-testid="print-missed-words-practice-sheet"
-              onClick={handlePrintPracticeSheet}
-              className={cn(
-                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
-                'shadow-hard-sm hover:shadow-hard transition-all'
-              )}
-            >
-              <Printer className="w-4 h-4" aria-hidden />
-              {t('education.results.printPracticeSheet')}
-            </button>
-            <button
-              type="button"
-              data-testid="print-unplugged-reteach-pack"
-              onClick={handlePrintUnpluggedPack}
-              className={cn(
-                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
-                'shadow-hard-sm hover:shadow-hard transition-all'
-              )}
-            >
-              <QrCode className="w-4 h-4" aria-hidden />
-              {t('education.results.printUnpluggedReteachPack')}
-            </button>
-            <button
-              type="button"
-              data-testid="share-miss-gap-practice"
-              onClick={handleShareMissGapPractice}
-              className={cn(
-                'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-                'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
-                'shadow-hard-sm hover:shadow-hard transition-all'
-              )}
-            >
-              {missGapShareState === 'idle' ? (
-                <>
-                  <Share2 className="w-4 h-4" aria-hidden />
-                  {t('education.results.shareMissGapPractice')}
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4" aria-hidden />
-                  {t('education.results.shareMissGapPracticeCopied')}
-                </>
-              )}
-            </button>
+
+            <ReteachActions links={links} onReteach={onReteach} t={t} />
           </div>
         ) : (
           <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">
@@ -557,14 +200,14 @@ export function ClassroomResultsCard({
       <button
         type="button"
         data-testid="share-class-gap"
-        onClick={handleShareGap}
+        onClick={links.onShareGap}
         className={cn(
           'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
           'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
           'shadow-hard hover:shadow-hard-lg transition-all'
         )}
       >
-        {shareState === 'idle' ? (
+        {links.shareState === 'idle' ? (
           <>
             <Share2 className="w-5 h-5" aria-hidden />
             {t('education.results.shareGap')}

@@ -65,6 +65,67 @@ describe('lookupLiveClassroomGame', () => {
     });
   });
 
+  /**
+   * THE ENDED-GAME DEAD END.
+   *
+   * The record keeps a FRESH four-hour TTL after the teacher is done, so the
+   * code stays fully readable long after the room is gone. This lookup is what
+   * `/api/education/classroom/join`, `/api/education/join-code/resolve` and
+   * `/api/education/classroom/live-game` all resolve a projector code through,
+   * and it only ever asked "is there a blob with a classroomId?".
+   *
+   * So a student typing the code still on the whiteboard after the bell was
+   * ENROLLED (200, `gameCode` in the body) and routed into
+   * `/multiplayer?room=<code>&classroom=true` — a room the independent
+   * `gameStateManager` lifecycle had already torn down. Dead room, or a
+   * permanent spinner.
+   *
+   * Kahoot's bar: an ended game's PIN is simply not recognised. One gate here
+   * closes all three routes at once.
+   */
+  it.each([
+    ['the terminal status', { status: 'ended' }],
+    ['the endedAt stamp alone', { status: 'finished', endedAt: '2026-09-10T09:14:00.000Z' }],
+  ])('returns null once the teacher has ended the game — %s', async (_label, marker) => {
+    get.mockResolvedValue(JSON.stringify({
+      classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G', ...marker,
+    }));
+    await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toBeNull();
+  });
+
+  /**
+   * THE BETWEEN-ROUND LATECOMER — the gap the first version of this gate
+   * opened. `status: 'finished'` is written the instant a round's timer
+   * expires (`gameScores.ts:405`), and the teacher presses "next round"
+   * seconds to minutes later while the class reads the results screen. Refusing
+   * the code there told a student their classroom's live game did not exist.
+   * Kahoot's PIN survives between questions; it dies when the host ends the
+   * game, which is `endedAt` and nothing else.
+   */
+  it('still resolves between two rounds, while the teacher has not restarted', async () => {
+    get.mockResolvedValue(JSON.stringify({
+      classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G', status: 'finished',
+    }));
+    await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toMatchObject({ classroomId: 'c1' });
+  });
+
+  it.each(['waiting', 'playing'] as const)('still resolves a %s game', async (status) => {
+    get.mockResolvedValue(JSON.stringify({
+      classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G', status,
+    }));
+    await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toMatchObject({ classroomId: 'c1' });
+  });
+
+  /**
+   * A record written before the session marker existed, or one whose write
+   * raced, must stay JOINABLE. Failing closed on a missing field would lock a whole class
+   * out of a live round — strictly worse than the bug being fixed.
+   */
+  it('treats a record with no status as joinable', async () => {
+    get.mockResolvedValue(JSON.stringify({ classroomId: 'c1', lessonIds: [], teacherName: '' }));
+    await expect(lookupLiveClassroomGame('TZCOQ7')).resolves.toMatchObject({ classroomId: 'c1' });
+  });
+
   it('returns null when there is no such game', async () => {
     get.mockResolvedValue(null);
     await expect(lookupLiveClassroomGame('ZZZZZZ')).resolves.toBeNull();
@@ -86,6 +147,23 @@ describe('lookupLiveClassroomGame', () => {
    * definitions of one key is a drift risk, so pin it: if the writer's key format changes,
    * this fails instead of the lookup silently returning null forever.
    */
+  /**
+   * The session rule is stated twice — here, and in
+   * `backend/modules/classroomGameSessionState.ts` for the socket server —
+   * because webpack cannot resolve that module's sibling Node-ESM `.js`
+   * specifiers. Two statements of one rule is a drift risk, so pin it: if the
+   * socket half ever starts treating a plain `'finished'` round as dead again,
+   * this fails instead of a whole class quietly losing its code mid-lesson.
+   */
+  it('states the same session rule as the socket server', () => {
+    const src = readFileSync(
+      join(process.cwd(), 'backend/modules/classroomGameSessionState.ts'),
+      'utf8'
+    );
+    expect(src).toContain("game.status === 'ended' || Boolean(game.endedAt)");
+    expect(src).not.toContain("=== 'finished'");
+  });
+
   it('uses the same Redis key as the socket server that writes it', () => {
     const src = readFileSync(
       join(process.cwd(), 'backend/modules/classroomGameManager.ts'),

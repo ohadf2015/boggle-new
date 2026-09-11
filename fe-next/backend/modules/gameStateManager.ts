@@ -50,6 +50,7 @@ import * as gameQueryManager from './gameQueryManager';
 import * as hostManager from './hostManager';
 import * as metrics from '../utils/metrics';
 import { gameCleanupEmitter } from '../events/gameCleanup';
+import { endClassroomGameSession } from './classroomGameSession';
 
 import type { GameBase, AddUserOptions, AuthContext } from './userManager';
 import type { ScoreGameBase, AddWordOptions, LeaderboardPlayer } from './scoreManager';
@@ -243,6 +244,12 @@ function deleteGame(gameCode: string): void {
   // their map entries and pending timers. Idempotent: a game that already
   // ended normally just re-runs no-op deletes.
   gameCleanupEmitter.emitGameEnd(gameCode);
+  // A classroom code outlives its room by up to four hours in Redis, so the
+  // room going away is what has to kill it — every genuine teardown (closeRoom,
+  // host-left, grace expiry, the empty-room and stale sweeps) converges here,
+  // and none of them is a round ending. Fire-and-forget: it never throws, and a
+  // Redis round-trip must not sit inside synchronous teardown bookkeeping.
+  void endClassroomGameSession(gameCode);
   metrics.deleteRoom(gameCode);
   deleteGameFromRedis(gameCode);
   delete games[gameCode];

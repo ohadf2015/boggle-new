@@ -1,7 +1,7 @@
 /**
  * `classroomGameEnd` must be as locked down as its twin `endClassroomGame`.
  *
- * Both handlers end the round, flip the Redis status to `finished` and call
+ * Both handlers end the SESSION, flip the Redis status to `ended` and call
  * `persistClassroomGameScores`. Only `endClassroomGame` ever checked that the
  * caller is the teacher. `classroomGameEnd` checked authentication alone, so
  * any signed-in student holding the game code — which is on the projector, in
@@ -117,7 +117,7 @@ describe('classroomGameEnd — teacher-only, like its twin', () => {
     await handlers['classroomGameEnd']?.({ gameCode: 'ABC123' });
 
     // THEN the round finishes and results are persisted and broadcast
-    expect(classroomGameManager.updateClassroomGameStatus).toHaveBeenCalledWith('ABC123', 'finished');
+    expect(classroomGameManager.updateClassroomGameStatus).toHaveBeenCalledWith('ABC123', 'ended');
     expect(persistence.persistClassroomGameScores).toHaveBeenCalled();
     expect(io.to).toHaveBeenCalledWith(`classroom:${GAME.classroomId}`);
   });

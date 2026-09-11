@@ -69,6 +69,7 @@ const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRu
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 const ClassroomResultsCard = dynamic(() => import('@/components/education/ClassroomResultsCard').then(m => m.ClassroomResultsCard), { ssr: false });
+import { toStandings } from '@/components/education/results/resultsStandings';
 const TeamBattleStandings = dynamic(() => import('@/components/education/TeamBattleStandings').then(m => m.TeamBattleStandings), { ssr: false });
 
 import { buildReteachLessonData } from '@/lib/education/classroomGameHandoff';
@@ -581,10 +582,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         <div className="mb-4">
           <TeamBattleStandings
             teams={classroomSummary.teamBattle.teams}
-            scores={sortedScores.map((s: { username: string; score: number }) => ({
-              username: s.username,
-              score: s.score,
-            }))}
+            scores={toStandings(sortedScores)}
           />
         </div>
       )}
@@ -592,6 +590,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         summary={classroomSummary}
         username={username}
         isTeacher={isHost}
+        standings={toStandings(sortedScores)}
         onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
         onRematch={isHost ? handleRematch : undefined}
         onPractice={
@@ -1109,19 +1108,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <BlastMpResults results={blastMpResults} gameMode="blast" />
         </div>
       )}
-      {/* Mobile owns ONE word-list disclosure. Everyone else's unique words, the
-          missed words and the post-game review used to render fully expanded
-          below the recap — the tallest content on the screen, and none of it
-          answers "did I win". They now ride inside the same "show details"
-          collapse that already held the player's own words, so the recap ends at
-          the rematch bar instead of a long scroll of other people's vocabulary. */}
+      {/* Mobile owns ONE word-list disclosure, and everything that is not "did I
+          win" rides inside it. The CLASSROOM recap is the exception: a student's
+          placing, their lesson words and the podium ARE the moment, and a moment
+          behind a disclosure is a moment nobody has. */}
+      {classroomSummary && <div className="mb-4">{postGameWordReviewNode}</div>}
       <ResultsMainContent
         {...mainContentProps}
         hideInlineCta={!isBotsOnlyGame}
         detailsSlot={
           <>
             {renderDetailsTab()}
-            {postGameWordReviewNode}
+            {!classroomSummary && postGameWordReviewNode}
           </>
         }
       />

@@ -297,12 +297,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
         router.push(routes[tab as Exclude<TabId, 'dynamic'>]);
     }, [router, language, isAuthenticated, dynamicSpec]);
 
-    // pathsWithOwnNav — dedicated surfaces (admin/educator) that ship their own nav.
-    // Game entrypoints (multiplayer, adventure, daily, brain, …) show the global nav on
-    // their lobby screens; actual gameplay hides it via `isInGame` (NavigationContext).
+    // pathsWithOwnNav — dedicated surfaces (admin/educator) with their own nav, plus /join:
+    // a single-purpose student screen where three tabs are three ways out of it (/student/join
+    // already hid it). Game lobbies keep the nav; gameplay hides it via `isInGame`.
     const shouldHideOnCurrentPath = useMemo(() => {
-        const pathsWithOwnNav = ['/admin', '/student', '/teacher'];
-        return pathsWithOwnNav.some(p => cleanPath.startsWith(p));
+        const pathsWithOwnNav = ['/admin', '/student', '/teacher', '/join'];
+        return pathsWithOwnNav.some(p => matchesPrefix(cleanPath, p));
     }, [cleanPath]);
 
     // Hide entire bottom nav on CrazyGames — external links and social features prohibited

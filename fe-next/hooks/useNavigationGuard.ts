@@ -55,6 +55,22 @@ interface UseNavigationGuardOptions {
 let pendingPhantomPops = 0;
 /** A pop that never arrives must not swallow a real back press later. */
 const PHANTOM_POP_TTL_MS = 1000;
+/**
+ * How often a deferred plant re-checks whether the stack has settled.
+ *
+ * Planting a phantom while a sibling teardown's `go(-1)` is still in flight is
+ * how this module ends up popping MORE entries than it pushed: the in-flight
+ * pop moves the stack back past the fresh phantom, and the next teardown's
+ * `go(-1)` then eats a REAL entry. On 2026-09-11 that threw a student out of a
+ * live classroom round — `/multiplayer?room=SSPBSW&classroom=true` back to
+ * `/join/SSPBSW` one second after the teacher ended it, so the results screen
+ * never rendered. Each outstanding claim is cleared by `PHANTOM_POP_TTL_MS`
+ * whether or not its pop arrives, so the poll below always terminates — after
+ * one TTL window in the ordinary single-pop case, and after N if N teardowns
+ * ever stack claims. The poll's timer is cleared on unmount, so it can never
+ * outlive the component that started it.
+ */
+const PHANTOM_SETTLE_POLL_MS = 50;
 
 /**
  * Test seam. The counter is module state that outlives a single `renderHook`,
@@ -142,12 +158,22 @@ export function useNavigationGuard({
   useEffect(() => {
     if (!enabled || typeof window === 'undefined') return;
 
-    // Push a dummy state to history so we can intercept back button
-    if (!historyPushedRef.current) {
+    // Push a dummy state to history so we can intercept back button — but only
+    // once this module's own stack movement has settled. See
+    // PHANTOM_SETTLE_POLL_MS for what planting on top of an in-flight pop costs.
+    let plantTimer: ReturnType<typeof setTimeout> | undefined;
+    const plantPhantom = () => {
+      plantTimer = undefined;
+      if (historyPushedRef.current) return;
+      if (pendingPhantomPops > 0) {
+        plantTimer = setTimeout(plantPhantom, PHANTOM_SETTLE_POLL_MS);
+        return;
+      }
       phantomHrefRef.current = window.location.href;
       window.history.pushState({ gameGuard: true }, '', window.location.href);
       historyPushedRef.current = true;
-    }
+    };
+    plantPhantom();
 
     const handlePopState = () => {
       // Our own teardown's go(-1) coming home — not the user pressing back.
@@ -179,6 +205,7 @@ export function useNavigationGuard({
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
+      if (plantTimer !== undefined) clearTimeout(plantTimer);
       const phantomHref = phantomHrefRef.current;
       const wasPushed = historyPushedRef.current;
       historyPushedRef.current = false;

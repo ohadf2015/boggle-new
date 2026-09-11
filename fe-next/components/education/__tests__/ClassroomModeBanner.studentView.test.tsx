@@ -23,6 +23,14 @@ import * as LanguageContext from '@/contexts/LanguageContext';
 
 const mockUseLanguage = vi.fn();
 
+/** The teacher's own sessionStorage copy — its presence is what forces the projector. */
+const TEACHER_LESSON = {
+  lessonId: 'l1',
+  lessonName: 'Week 3 Vocabulary',
+  vocabularyWords: ['abandon'],
+  language: 'en' as const,
+};
+
 const liveQuiz = {
   gameCode: 'JATS5Z',
   classroomId: 'c1',
@@ -49,7 +57,7 @@ function renderBanner(props: Partial<React.ComponentProps<typeof ClassroomModeBa
   });
   vi.spyOn(LanguageContext, 'useLanguage').mockImplementation(mockUseLanguage);
 
-  render(
+  return render(
     <ClassroomModeBanner lessonData={null} gameCode="JATS5Z" expanded {...props} />
   );
 }
@@ -105,15 +113,29 @@ describe('ClassroomModeBanner — the student half of a classroom lobby', () => 
     expect(screen.queryByText('JATS5Z')).toBeNull();
   });
 
-  it('still gives the teacher the share code and QR', () => {
-    renderBanner({ isHost: true, liveGame: liveQuiz });
-    expect(screen.getByText('education.classroomGame.shareCode')).toBeTruthy();
-    expect(screen.getByText('JATS5Z')).toBeTruthy();
+  /**
+   * The teacher's half moved OUT of this component. A classroom host in the
+   * lobby is looking at `components/education/projector/ProjectorLobby`, which
+   * prints the code at 12vw with one QR and one copy button; the banner used to
+   * draw a second, smaller code and QR directly above it. It now stands down —
+   * see ClassroomModeBanner.projectorOwnsJoin.test.tsx for that contract, and
+   * ProjectorJoinPanel.test.tsx for the address/clipboard guarantees that came
+   * with it.
+   */
+  it('stands down for the teacher on the projector — that surface owns the code', () => {
+    const { container } = renderBanner({ isHost: true, liveGame: liveQuiz, lessonData: TEACHER_LESSON });
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('treats an unspecified viewer as the host, so the teacher screen cannot regress', () => {
     renderBanner({ liveGame: null });
     expect(screen.getByText('education.classroomGame.shareCode')).toBeTruthy();
+  });
+
+  it('still carries the code for a teacher whose tab has no lesson copy (no projector)', () => {
+    renderBanner({ isHost: true, liveGame: liveQuiz, lessonData: null });
+    expect(screen.getByText('education.classroomGame.shareCode')).toBeTruthy();
+    expect(screen.getByText('JATS5Z')).toBeTruthy();
   });
 
   /**

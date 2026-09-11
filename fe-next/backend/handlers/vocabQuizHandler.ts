@@ -24,7 +24,7 @@
 import type { Server, Socket } from 'socket.io';
 import { z } from 'zod';
 
-import { getClassroomGame } from '../modules/classroomGameManager.js';
+import { getClassroomGame, reopenClassroomGameForRound } from '../modules/classroomGameManager.js';
 import {
   getGame,
   getGameBySocketId,
@@ -231,6 +231,13 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
     addQuizPlayer(session, { username, userId: gameUser.authUserId ?? null });
   }
 
+  // This room is running a round again, so its code is joinable again. The
+  // board path does the same from `gameStartHandler`, but the quiz branch
+  // returns out of that handler before it — leaving a class on its second quiz
+  // round behind a code that answers "not recognised" to anyone reconnecting.
+  // Fire-and-forget: a Redis write must never hold up the first question.
+  void reopenClassroomGameForRound(gameCode);
+
   setQuizSession(gameCode, session);
   startTicking(io, gameCode);
 
@@ -335,7 +342,21 @@ export function registerVocabQuizHandlers(io: Server, socket: Socket): void {
   socket.on(VOCAB_QUIZ_EVENTS.requestState, () => {
     if (!checkRateLimit(socket.id)) return;
     const ctx = quizForSocket(socket);
-    if (!ctx) return;
+    // No ctx means this socket is not (yet) bound to a game in the in-memory
+    // socket.id → game map — the normal case for a reconnecting socket whose
+    // `join` has not finished, and the case that used to leave a student on a
+    // blank quiz forever. The client now waits for `joined`/`joinedAsSpectator`
+    // before asking (see `useVocabQuiz`), so reaching here means either an
+    // ordinary non-quiz room or a genuinely lost rejoin. Either way it is no
+    // longer allowed to be INVISIBLE: a silent return on an error path is
+    // recurring pitfall class 4, and this exact one cost a whole class a round.
+    if (!ctx) {
+      logger.debug(
+        'VOCAB_QUIZ',
+        `requestState from unbound socket ${socket.id} — no quiz context, nothing sent`
+      );
+      return;
+    }
     const username = getUsernameBySocketId(socket.id) ?? '';
     // A student who refreshed mid-round may not be in the roster any more.
     // Re-enrol before snapshotting so their score is theirs, not a fresh zero.

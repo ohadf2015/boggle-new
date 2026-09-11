@@ -1,6 +1,8 @@
 'use client';
 
 import nextDynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
+import { isStudentJoinPath } from '@/components/education/join/joinRoutes';
 
 /**
  * Post-hydration-only chrome mounted by the locale layout: install prompts,
@@ -59,16 +61,31 @@ const ReferralCodeClaimer = nextDynamic(
 
 /** Mount inside the providers — VersionChecker and the prompts read LanguageContext. */
 export default function DeferredLayoutWidgets() {
+  // The student join screen is the one surface where these are not "chrome"
+  // but an obstacle: a 390px capture of `/join/<code>` showed the cookie sheet
+  // sitting ON the six code cells, and `AndroidAppRedirect` sends an Android
+  // visitor to the Play Store — off the lesson their teacher just started.
+  // The consent ask is DEFERRED, not skipped: non-essential scripts remain
+  // gated on a decision nobody has made, and the sheet mounts on the very next
+  // screen (`/multiplayer`), which is this same layout under another path.
+  // The silent widgets (version check, churn telemetry, referral attribution)
+  // keep running — this is about what covers the field, not a blackout.
+  const quietJoinScreen = isStudentJoinPath(usePathname());
+
   return (
     <>
       <VersionChecker />
-      <AndroidAppRedirect />
-      <AndroidAppInstallPromo />
-      <AndroidInstallPill />
-      <PWAInstallPrompt />
-      <PushNotificationPrompt />
-      <NewYearCountdown />
-      <CookieConsent />
+      {!quietJoinScreen && (
+        <>
+          <AndroidAppRedirect />
+          <AndroidAppInstallPromo />
+          <AndroidInstallPill />
+          <PWAInstallPrompt />
+          <PushNotificationPrompt />
+          <NewYearCountdown />
+          <CookieConsent />
+        </>
+      )}
       <ChurnSignalTracker />
       <ReferralCodeClaimer />
     </>

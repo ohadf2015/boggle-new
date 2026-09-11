@@ -10909,6 +10909,40 @@ const en = {
     }
   },
   "teacher": {
+    "playNow": {
+      "title": "Play now",
+      "subtitle": "One tap and the code is on the screen.",
+      "sourceGroup": "Choose the words",
+      "sourceRecent": "Your lists",
+      "sourcePacks": "Starter packs",
+      "sourcePaste": "Paste words",
+      "pasteLabel": "Drop your words in here",
+      "pastePlaceholder": "photosynthesis, mitosis, osmosis…",
+      "pasteTooFew": "Add at least {{min}} words",
+      "pasteReady": "{{count}} words, ready to go",
+      "pastedRoundName": "Today's words",
+      "goLive": "Go live",
+      "armedWith": "{{title}} · {{count}} words",
+      "pickSomething": "Pick a word list and you're off",
+      "noSetupNeeded": "No class to make, no roster to type — students join with the code.",
+      "shortcutsLabel": "Teacher shortcuts",
+      "shortcutLastGame": "Last game",
+      "shortcutSetup": "Full setup",
+      "shortcutReports": "Reports",
+      "goingLive": "Going live",
+      "stageClassroom": "Setting up your class",
+      "stageLesson": "Loading the words",
+      "stageRoom": "Opening the room",
+      "defaultClassName": "My Class",
+      "failureHint": "Try again, or open the full setup and choose it yourself.",
+      "retry": "Try again",
+      "openFullSetup": "Full setup",
+      "failure": {
+        "classroom": "Couldn't set up your class",
+        "lesson": "Couldn't load those words",
+        "room": "Couldn't open the room"
+      }
+    },
     "wordDetails": {
       "more": "More",
       "level": "Level",
@@ -11662,6 +11696,18 @@ const en = {
     }
   },
   "education": {
+    "projectorLobby": {
+      "joinAt": "Go to",
+      "gameCode": "Class code",
+      "scanToJoin": "Or scan",
+      "inTheRoom": "in the room",
+      "readyCount": "{{ready}} / {{total}} ready",
+      "nobodyYet": "Nobody's in yet",
+      "nobodyYetHint": "Type the code above. First one in gets the bragging rights.",
+      "startBlocked": "Waiting for one student to join before you can start.",
+      "lateJoinOn": "Late join on",
+      "lateJoinOff": "Late join off"
+    },
     "errors": {
       "serverUnavailable": "We can't reach the class list right now. This is on our side, not yours — try again in a moment."
     },
@@ -11780,6 +11826,19 @@ const en = {
       "startAssigned": "Practice {{focus}}"
     },
     "liveControls": {
+      "studentsCount": "{{count}} playing",
+      "idleCount": "{{count}} stuck",
+      "rosterTitle": "Your class",
+      "rosterEmpty": "Nobody has joined yet",
+      "idleBadge": "Stuck",
+      "wordsFound": "{{count}} found",
+      "remove": "Remove",
+      "removeAria": "Remove {{name}} from this game",
+      "removeConfirm": "Remove {{name}}",
+      "removeCancel": "Keep",
+      "removeWarning": "They can't rejoin this game",
+      "removing": "Removing…",
+      "removeFailed": "Try again",
       "title": "Teacher controls",
       "pause": "Pause",
       "resume": "Resume",
@@ -11787,6 +11846,7 @@ const en = {
       "endRound": "End round",
       "endRoundConfirm": "Tap again to end",
       "skipWord": "Skip word",
+      "skipQuestion": "Skip question",
       "pausedTitle": "Paused",
       "pausedBody": "Your teacher paused the game. Sit tight — it'll start again soon.",
       "pausedBodyHost": "The class is frozen. Tap Resume when you're ready to keep going.",
@@ -11876,6 +11936,32 @@ const en = {
       "participationBonus": "+{points} participation points for everyone",
       "shareGap": "Share class gap",
       "shareGapCopied": "Link copied — paste in Slack or a parent chat",
+      "podium": {
+        "title": "Top scorers",
+        "wordsFound": "{{found}} of {{total}} words",
+        "correct": "{{count}} correct"
+      },
+      "you": {
+        "won": "YOU WON!",
+        "podium": "ON THE PODIUM!",
+        "finished": "ROUND DONE!",
+        "of": "of {{total}}",
+        "points": "points",
+        "beat": "Ahead of {{count}} in the class",
+        "words": "{{found}}/{{total}} lesson words",
+        "gapToNext": "{{points}} behind {{name}}"
+      },
+      "coverageMeterLabel": "{{percent}}% of the lesson words found",
+      "moreWaysToReteach": "More ways to reteach these words",
+      "fullReport": "Full report",
+      "neverPlaced": "Never appeared on the board",
+      "neverPlacedHint": "The board could not fit these — the class never saw them. Run a rematch to give them another chance.",
+      "needsHelp": {
+        "title": "Pull aside ({{count}})",
+        "none": "Everyone found at least half the list. Go again.",
+        "hint": "Under half the lesson words this round."
+      },
+      "allBoardWordsFound": "The class found every lesson word that made it onto the board.",
       "shareGapTitle": "Class vocabulary gap",
       "shareGapText": "{{lesson}} — the class found {{found}} of {{total}} lesson words. Practice: {{missed}}",
       "shareGapAllFoundText": "{{lesson}} — the class found every lesson word.",
@@ -12586,6 +12672,20 @@ const en = {
         "codeHint": "6 characters from your teacher",
         "codeLabel": "Class Code",
         "codePasted": "Pasted!",
+        "flow": {
+          "steps": "Join steps",
+          "codeHeadline": "TYPE THE CODE",
+          "codeSub": "Six characters, straight off your teacher's screen.",
+          "codeTooShort": "Six characters — a couple still missing.",
+          "next": "Next",
+          "changeCode": "Change the code",
+          "nameHeadline": "PICK A NAME",
+          "nameRequired": "Pick a name first — the whole class will see it.",
+          "readyHeadline": "READY?",
+          "readySub": "One tap and you're in the room.",
+          "go": "Let's go",
+          "entering": "Getting you in…"
+        },
         "heroLine": "Ask your teacher for the class code",
         "preparing": "Getting things ready — one moment.",
         "queuedNeedsName": "Almost in — add your name above and we'll take you straight there.",
@@ -12593,7 +12693,7 @@ const en = {
         "useSuggestedName": "Join as {{suggestedName}}",
         "emptyClipboard": "Nothing to paste",
         "guestError": "Couldn't start your session. Try again or ask your teacher.",
-        "invalidCode": "Invalid code",
+        "invalidCode": "We didn't recognize that code. Check it with your teacher — codes stop working once the game ends.",
         "joining": "Joining...",
         "nameHint": "No account needed — just pick a name",
         "nameLabel": "Your Name",

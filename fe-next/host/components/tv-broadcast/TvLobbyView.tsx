@@ -8,6 +8,7 @@ import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
 import { LobbyReactions } from '@/components/lobby/LobbyReactions';
+import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,6 +63,17 @@ interface TvLobbyViewProps {
    * takes the matching label from the classroom registry in shared/types/vocabQuiz.
    */
   classroomGameMode?: ClassroomGameMode;
+  /** Lesson the teacher picked at setup (their own sessionStorage copy). */
+  lessonName?: string;
+  /** How many vocabulary words that lesson carries. */
+  wordCount?: number;
+  /** The teacher's own copy of the room settings, before the server record lands. */
+  classroomTemplateSettings?: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  } | null;
 }
 
 /** Start-button copy for a classroom room, by the mode the teacher already chose. */
@@ -86,13 +98,16 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   timerValue,
   difficulty,
   onStartGame,
-  onExitRoom: _onExitRoom,
+  onExitRoom,
   tournamentCreating,
   setHostPlaying,
   onStartSoloDemoWithBots,
   readyUsernames = [],
   isClassroomMode = false,
   classroomGameMode,
+  lessonName,
+  wordCount,
+  classroomTemplateSettings = null,
 }) => {
   const { isAdmin } = useAuth();
   // Display the server-owned auto-start countdown on the TV screen too, with a
@@ -113,6 +128,17 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     });
   }, [playersReady, username]);
   const playerCount = filteredPlayers.length;
+  // The projector prints names, so it needs the roster in one shape — the
+  // arcade lobby accepts bare strings as well as records.
+  const projectorStudents = useMemo(
+    () =>
+      filteredPlayers.map((player) =>
+        typeof player === 'string'
+          ? { username: player }
+          : { username: player.username, isBot: player.isBot }
+      ),
+    [filteredPlayers]
+  );
   const hostSelectedGameMode = useHostSelectedGameMode();
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
   const [localGameMode, setLocalGameMode] = useState<GameModeOption>(hostSelectedGameMode || 'random');
@@ -165,6 +191,40 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     const callback = onStartSoloDemoWithBots();
     setSoloDemoCallback(() => callback);
   };
+
+  // A classroom room gets ONE surface. The arcade TV lobby stacks a join bar, a
+  // roster, a settings card and a mode picker; on a projector, above
+  // `ClassroomModeBanner`'s own code + QR panel, that was two join codes and two
+  // QRs on the same wall. `ProjectorLobby` is the collapsed surface, and the
+  // banner stands down for a host in the lobby (see ClassroomModeBanner).
+  if (isClassroomMode) {
+    return (
+      <>
+        <ProjectorLobby
+          gameCode={gameCode}
+          language={roomLanguage}
+          students={projectorStudents}
+          readyUsernames={readyUsernames}
+          t={t}
+          onStartGame={onStartGame}
+          onExitRoom={onExitRoom}
+          startLabelKey={classroomStartLabelKey(classroomGameMode)}
+          starting={tournamentCreating}
+          lessonName={lessonName}
+          wordCount={wordCount}
+          classroomGameMode={classroomGameMode}
+          templateSettings={classroomTemplateSettings}
+          autoStartSecondsLeft={autoStartSecondsLeft}
+          onCancelAutoStart={cancelAutoStart}
+          onStartPracticeRound={onStartSoloDemoWithBots ? handleSoloDemoClick : undefined}
+          practiceRoundPending={soloDemoInProgress}
+          practiceRoundFailed={soloDemoFailed}
+        />
+        {/* Receive-only emoji floats — students fling reactions, the wall shows them. */}
+        <LobbyReactions username={username} receiveOnly />
+      </>
+    );
+  }
 
   return (
     <div data-testid="tv-lobby-view" className="flex flex-col h-full min-h-screen bg-neo-navy">

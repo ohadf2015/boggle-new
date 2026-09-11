@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 6757,
+    "totalKeysInCode": 6710,
     "keyCountByLanguage": {
-      "en": 12804,
-      "es": 13112,
-      "he": 13014,
-      "ja": 13074,
-      "ru": 12846,
-      "sv": 13070
+      "en": 12894,
+      "es": 13202,
+      "he": 13104,
+      "ja": 13164,
+      "ru": 12936,
+      "sv": 13160
     },
-    "missingFromEnglish": 83,
+    "missingFromEnglish": 101,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 344,
+      "templateLiterals": 341,
       "fallbackUsages": 1,
-      "variableKeys": 131
+      "variableKeys": 127
     }
   },
   "runtimeRisks": {
@@ -30,14 +30,14 @@
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
         "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 177,
+        "line": 181,
         "context": "{t(`education.access.${key}`)}"
       },
       {
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
         "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 253,
+        "line": 257,
         "context": "{t(`education.access.${key}`)}"
       },
       {
@@ -1343,10 +1343,17 @@
         "context": ": t(`education.achievements.${achievement.key}.hint`)}"
       },
       {
+        "pattern": "`teacher.playNow.failure.${failure.code}`",
+        "type": "template_literal",
+        "file": "components/education/ClassroomGameLobbyExpress.tsx",
+        "line": 298,
+        "context": "{t(`teacher.playNow.failure.${failure.code}`)}"
+      },
+      {
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 296,
+        "line": 304,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
@@ -1581,13 +1588,6 @@
         "context": "{t(`asyncChallenge.mode.${challenge.gameMode}`)}"
       },
       {
-        "pattern": "`ugc.difficulty.${board.difficulty.toLowerCase()}`",
-        "type": "template_literal",
-        "file": "components/landing/LandingCommunityShowcase.tsx",
-        "line": 181,
-        "context": "{t(`ugc.difficulty.${board.difficulty.toLowerCase()}`)}"
-      },
-      {
         "pattern": "`landing.home.tier.${tier.toLowerCase()}`",
         "type": "template_literal",
         "file": "components/landing/home/HomeRankCard.tsx",
@@ -1698,20 +1698,6 @@
         "file": "components/offline/PendingSyncBadge.tsx",
         "line": 97,
         "context": "{t(`offline.queue.status.${status}`)}"
-      },
-      {
-        "pattern": "`onboarding.ftue.v2.titles.${tier.key}`",
-        "type": "template_literal",
-        "file": "components/onboarding/ScoreRevealV2.tsx",
-        "line": 97,
-        "context": "{t(`onboarding.ftue.v2.titles.${tier.key}`)}"
-      },
-      {
-        "pattern": "`onboarding.ftue.v2.mascotReactions.${tier.key}`",
-        "type": "template_literal",
-        "file": "components/onboarding/ScoreRevealV2.tsx",
-        "line": 132,
-        "context": "{t(`onboarding.ftue.v2.mascotReactions.${tier.key}`)}"
       },
       {
         "pattern": "`practice.continueTo.${next}`",
@@ -1924,13 +1910,6 @@
         "context": "{t(`quickPlay.solo.blurb.${active}`)}"
       },
       {
-        "pattern": "`ranked.${nextTier.id}`",
-        "type": "template_literal",
-        "file": "components/ranked/RankedTierBadge.tsx",
-        "line": 73,
-        "context": "{t('ranked.nextTier')}: {t(`ranked.${nextTier.id}`)}"
-      },
-      {
         "pattern": "`results.crowns.${crown.id}`",
         "type": "template_literal",
         "file": "components/results/ConsolationRows.tsx",
@@ -2025,7 +2004,7 @@
         "pattern": "`teacher.proWelcome.perk.${key}`",
         "type": "template_literal",
         "file": "components/teacher/ProWelcomeCelebration.tsx",
-        "line": 96,
+        "line": 122,
         "context": "<span className=\"text-sm font-bold text-black\">{t(`teacher.proWelcome.perk.${key}`)}</span>"
       },
       {
@@ -2379,18 +2358,18 @@
         "type": "template_literal"
       },
       {
-        "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
-        "type": "template_literal",
-        "file": "host/components/HostPreGameView.tsx",
-        "line": 700,
-        "context": "{t(`joinView.${"
-      },
-      {
         "pattern": "`tvResults.${labelKey}`",
         "type": "template_literal",
         "file": "host/components/tv-results/TvResultsWinnersPodium.tsx",
         "line": 274,
         "context": "{t(`tvResults.${labelKey}`)}"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "host/hooks/useTvNotifications.ts",
+        "line": 343,
+        "context": "const name = t(`achievements.${achievement.key}.name`) || achievement.key;"
       },
       {
         "pattern": "tvBroadcast.mode.${mode}",
@@ -2457,14 +2436,6 @@
         "context": "{t(labelKey)}"
       },
       {
-        "pattern": "t(errorKey)",
-        "variable": "errorKey",
-        "type": "variable_key",
-        "file": "app/[locale]/join/PageClient.tsx",
-        "line": 69,
-        "context": "{t(errorKey)}"
-      },
-      {
         "pattern": "t(locale)",
         "variable": "locale",
         "type": "variable_key",
@@ -2493,7 +2464,7 @@
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
         "file": "app/[locale]/multiplayer/PageClient.tsx",
-        "line": 262,
+        "line": 263,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
       },
       {
@@ -2559,22 +2530,6 @@
         "file": "components/adventure/AdventureObjectives.tsx",
         "line": 148,
         "context": "const label = t(translationKey, { target: objective.target });"
-      },
-      {
-        "pattern": "t(themeDisplayKey)",
-        "variable": "themeDisplayKey",
-        "type": "variable_key",
-        "file": "components/adventure/AdventureThemeBanner.tsx",
-        "line": 40,
-        "context": "{t(themeDisplayKey)}"
-      },
-      {
-        "pattern": "t(gameModeDisplayKey)",
-        "variable": "gameModeDisplayKey",
-        "type": "variable_key",
-        "file": "components/adventure/AdventureThemeBanner.tsx",
-        "line": 45,
-        "context": "{t(gameModeDisplayKey)}"
       },
       {
         "pattern": "t(currentTaunt)",
@@ -2940,8 +2895,8 @@
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "type": "variable_key",
-        "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 246,
+        "file": "components/education/ClassroomBattleSettings.tsx",
+        "line": 161,
         "context": "{t(labelKey)}"
       },
       {
@@ -2949,7 +2904,15 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/ClassroomSetupStep.tsx",
-        "line": 281,
+        "line": 318,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/education/ClassroomSetupStep.tsx",
+        "line": 353,
         "context": "{t(labelKey)}"
       },
       {
@@ -2967,6 +2930,22 @@
         "file": "components/education/achievements/AchievementGrid.tsx",
         "line": 103,
         "context": "const displayName = isSecret && !isUnlocked ? '???' : t(nameKey);"
+      },
+      {
+        "pattern": "t(pasteNoteKey)",
+        "variable": "pasteNoteKey",
+        "type": "variable_key",
+        "file": "components/education/join/JoinFlow.tsx",
+        "line": 147,
+        "context": "<p className=\"font-neo-body text-sm font-bold text-neo-lime\">{t(pasteNoteKey)}</p>"
+      },
+      {
+        "pattern": "t(startLabelKey)",
+        "variable": "startLabelKey",
+        "type": "variable_key",
+        "file": "components/education/projector/ProjectorLobby.tsx",
+        "line": 298,
+        "context": "{starting ? t('hostView.creatingTournament') : t(startLabelKey)}"
       },
       {
         "pattern": "t(key)",
@@ -3057,14 +3036,6 @@
         "context": "{t(nameError)}"
       },
       {
-        "pattern": "t(nameError)",
-        "variable": "nameError",
-        "type": "variable_key",
-        "file": "components/multiplayer/PlayerProfileCard.tsx",
-        "line": 135,
-        "context": "{t(nameError)}"
-      },
-      {
         "pattern": "t(taglineKey)",
         "variable": "taglineKey",
         "type": "variable_key",
@@ -3151,22 +3122,6 @@
         "file": "components/quests/QuestCard.tsx",
         "line": 116,
         "context": "{t(descKey)}"
-      },
-      {
-        "pattern": "t(tierNameKey)",
-        "variable": "tierNameKey",
-        "type": "variable_key",
-        "file": "components/ranked/RankedTierBadge.tsx",
-        "line": 27,
-        "context": "<span style={{ color: tier.color }}>{t(tierNameKey)}</span>"
-      },
-      {
-        "pattern": "t(tierNameKey)",
-        "variable": "tierNameKey",
-        "type": "variable_key",
-        "file": "components/ranked/RankedTierBadge.tsx",
-        "line": 41,
-        "context": "{t(tierNameKey)}"
       },
       {
         "pattern": "t(key)",
@@ -3308,6 +3263,14 @@
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "type": "variable_key",
+        "file": "components/teacher/dashboard/PlayNowSources.tsx",
+        "line": 58,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
         "file": "components/ugc/CreatorProfileStats.tsx",
         "line": 75,
         "context": "{t(labelKey)}"
@@ -3319,14 +3282,6 @@
         "file": "components/ugc/UGCFeaturedStrip.tsx",
         "line": 88,
         "context": "{t(titleKey)}"
-      },
-      {
-        "pattern": "t(key)",
-        "variable": "key",
-        "type": "variable_key",
-        "file": "hooks/useValidation.ts",
-        "line": 41,
-        "context": "toast.error(t(key) || key);"
       },
       {
         "pattern": "t(errorKey)",
@@ -3367,14 +3322,6 @@
         "file": "host/components/pre-game/BattleModeCard.tsx",
         "line": 181,
         "context": "{t(nameKey)}"
-      },
-      {
-        "pattern": "t(presetDescKey)",
-        "variable": "presetDescKey",
-        "type": "variable_key",
-        "file": "host/components/pre-game/PresetInfoDrawer.tsx",
-        "line": 73,
-        "context": "<p className=\"text-sm text-neo-black/70\">{t(presetDescKey)}</p>"
       },
       {
         "pattern": "t(labelKey)",
@@ -3522,7 +3469,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 216
+          "line": 239
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 237
         }
       ]
     },
@@ -3531,7 +3482,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 218
+          "line": 241
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 241
         }
       ]
     },
@@ -3540,7 +3495,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 176
+          "line": 198
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 153
         }
       ]
     },
@@ -3549,7 +3508,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 178
+          "line": 200
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 157
         }
       ]
     },
@@ -3558,7 +3521,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 229
+          "line": 252
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 249
         }
       ]
     },
@@ -3567,7 +3534,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 243
+          "line": 266
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 262
         }
       ]
     },
@@ -3576,7 +3547,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 245
+          "line": 268
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 266
         }
       ]
     },
@@ -3585,11 +3560,24 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 65
+          "line": 67
         },
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 82
+          "line": 84
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.gamesCount",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 208
         }
       ]
     },
@@ -3598,7 +3586,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 123
+          "line": 135
         }
       ]
     },
@@ -3607,7 +3595,29 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 256
+          "line": 279
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 274
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.openFullView",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.plan",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 174
         }
       ]
     },
@@ -3616,7 +3626,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 140
+          "line": 152
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 121
         }
       ]
     },
@@ -3625,7 +3639,20 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 141
+          "line": 153
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherActivity.status",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 146
         }
       ]
     },
@@ -3634,7 +3661,7 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 118
+          "line": 120
         }
       ]
     },
@@ -3643,7 +3670,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 196
+          "line": 219
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 194
         }
       ]
     },
@@ -3652,6 +3683,10 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 221
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
           "line": 198
         }
       ]
@@ -3661,7 +3696,11 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 205
+          "line": 228
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 206
         }
       ]
     },
@@ -3670,7 +3709,118 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 259
+          "line": 282
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 276
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.colCoverage",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 320
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.colMissed",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 322
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.colMode",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 318
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.colPlayed",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 317
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.colPlayers",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 319
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.colTop",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 321
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.gameCount",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.noGames",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 308
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.planFree",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 179
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.planPro",
+      "usages": [
+        {
+          "file": "components/admin/TeacherActivityDrawer.tsx",
+          "line": 178
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherDetail.renews",
+      "usages": [
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 143
         }
       ]
     },
@@ -3823,11 +3973,15 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 185
+          "line": 207
         },
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
           "line": 258
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 175
         }
       ]
     },
@@ -3863,19 +4017,31 @@
       "usages": [
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 183
+          "line": 205
         },
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 203
+          "line": 226
         },
         {
           "file": "components/admin/TeacherActivityDrawer.tsx",
-          "line": 223
+          "line": 246
         },
         {
           "file": "components/admin/TeacherFunnelPanel.tsx",
           "line": 270
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 166
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 204
+        },
+        {
+          "file": "components/admin/education/AdminTeacherDetail.tsx",
+          "line": 246
         }
       ]
     },
@@ -4213,11 +4379,38 @@
       ]
     },
     {
+      "key": "joinView.undefined",
+      "usages": [
+        {
+          "file": "lib/i18n/languageLabels.ts",
+          "line": 8
+        }
+      ]
+    },
+    {
       "key": "sealedBid.yourWord",
       "usages": [
         {
           "file": "components/sealedBid/SealedBidTable.tsx",
           "line": 83
+        }
+      ]
+    },
+    {
+      "key": "teacher.classroom.presets.friday-battle.desc",
+      "usages": [
+        {
+          "file": "components/education/ClassroomSetupStep.tsx",
+          "line": 191
+        }
+      ]
+    },
+    {
+      "key": "teacher.classroom.presets.friday-battle.name",
+      "usages": [
+        {
+          "file": "components/education/ClassroomSetupStep.tsx",
+          "line": 188
         }
       ]
     },

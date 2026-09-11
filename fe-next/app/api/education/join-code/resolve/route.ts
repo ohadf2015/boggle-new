@@ -24,6 +24,14 @@ import logger from '@/utils/logger';
  *   - An unresolvable code answers `kind: 'unknown'` with **200**, not an error status. The
  *     page needs a branchable answer so it can still offer the student both doors; a 4xx
  *     here is what produced the dead end in the first place.
+ *   - An unknown that came out of a BROKEN lookup carries `degraded: true`. `unknown` alone
+ *     is overloaded — genuine miss, tripped rate limit, roster RPC error, roster throw — and
+ *     the guest join path now hard-stops on it to spare a typo an anonymous auth user and a
+ *     three-second spinner. Without this flag that optimisation would refuse a perfectly
+ *     good classroom code during any Supabase hiccup, which is recurring pitfall class 4
+ *     wearing the mask of a normal answer. Redis-down is the deliberate exception: the game
+ *     lookup swallows its own failures, and a student holding a GAME code cannot join with
+ *     Redis down anyway.
  *   - Redis being down degrades to `kind: 'unknown'`, never a 500. A student whose classroom
  *     code is fine must not be blocked by the game lookup failing.
  *   - The rate limit is generous and, like `preview`, must never be load-bearing for the
@@ -47,8 +55,12 @@ export async function GET(request: Request) {
   });
   if (!rateLimit.success) {
     // Not a hard failure: an unresolved code still renders an actionable page.
-    return NextResponse.json({ kind: 'unknown' }, { status: 200 });
+    // Degraded, though — we never looked, so this is not evidence of a bad code.
+    return NextResponse.json({ kind: 'unknown', degraded: true }, { status: 200 });
   }
+
+  /** Set when a lookup FAILED, as opposed to answering "no such thing". */
+  let degraded = false;
 
   // 1. Classroom roster code. Checked first and allowed to win a (vanishingly unlikely)
   //    collision: enrolment is permanent, a game code expires in four hours.
@@ -68,9 +80,11 @@ export async function GET(request: Request) {
         });
       }
     } else {
+      degraded = true;
       logger.error('join-code resolve: classroom lookup failed:', error);
     }
   } catch (err) {
+    degraded = true;
     logger.error('join-code resolve: classroom lookup threw:', err);
   }
 
@@ -91,5 +105,5 @@ export async function GET(request: Request) {
     logger.error('join-code resolve: game lookup threw:', err);
   }
 
-  return NextResponse.json({ kind: 'unknown' });
+  return NextResponse.json(degraded ? { kind: 'unknown', degraded: true } : { kind: 'unknown' });
 }

@@ -1,5 +1,5 @@
 /**
- * TeacherDashboard — one screen.
+ * TeacherDashboard — one screen, one button.
  *
  * It used to be three tabs (Play / Prepare / Review). Measured live at
  * 1440x900, the landing screen carried a Pro banner, a plan badge, a tab bar, a
@@ -7,14 +7,20 @@
  * card — and not a single lesson. The lessons a teacher came for were a tab
  * away, so hosting a specific word list cost three taps and a hunt.
  *
- * Now: the lessons ARE the screen, each card hosts itself, and every other
- * surface (classrooms, assignments, last-game insights, analytics, reports)
- * lives in one disclosure that stays shut until asked for.
+ * Now the screen leads with PLAY NOW: one dominant button, already armed with
+ * the teacher's most recently played list, with starter packs and a paste box
+ * behind it as ways to change the words rather than steps to pass through. A
+ * tired teacher taps once and the express lobby has a join code on the
+ * projector — no classroom, no roster, no lesson made first.
+ *
+ * Below it, the lesson builder for when there IS time to prepare, then two
+ * small shortcuts (last game, reports), then one disclosure holding every
+ * other surface (classrooms, assignments, analytics) shut until asked for.
  */
 
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
@@ -32,10 +38,13 @@ import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import PlayTabFirstRunCard from './PlayTabFirstRunCard';
-import QuickStartButton from './QuickStartButton';
-import RepeatLastGameButton from './RepeatLastGameButton';
 import StudentsPresentStrip from './StudentsPresentStrip';
-import { useRecentGameSettings, type GameConfiguration } from '@/hooks/useRecentGameSettings';
+import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
+import {
+  QUICK_LAUNCH_FLOW,
+  writeQuickLaunchIntent,
+  type QuickLaunchIntent,
+} from './dashboard/quickLaunchIntent';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentTrackingPanel, AssignmentCreator } from './assignments';
 import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
@@ -45,7 +54,7 @@ import { TeacherPlanBadge } from './TeacherPlanBadge';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
-import { BarChart3, FileText, ChevronDown } from 'lucide-react';
+import { BarChart3, FileText, ChevronDown, History, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
 
 import { stagger, slideUp } from './teacherDashboardTabs';
@@ -60,10 +69,14 @@ export default function TeacherDashboard() {
   // after-game insights card and read here, once, on first render.
   const deepLink = useTeacherDashboardDeepLink();
   const [showAssignmentCreator, setShowAssignmentCreator] = useState(false);
+  // The tools drawer is controlled so the "last game" shortcut can open it —
+  // one tap to the thing a teacher wants right after the bell, and shut again
+  // the moment they are done with it.
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const toolsRef = useRef<HTMLDetailsElement>(null);
   const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
   const { classrooms, isLoading: classroomsLoading, error: classroomsError, refresh: refreshClassrooms } = useClassrooms();
   const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
-  const { getMostRecent, hasRecentConfig } = useRecentGameSettings();
   // Only for the one-time gifted-Pro celebration; the header chip reads the
   // entitlement itself. The hook de-duplicates the request across consumers.
   const { grant: proGrant, loading: proLoading, hasPro, source: proSource, refresh: refreshPro } = useTeacherPro();
@@ -99,17 +112,12 @@ export default function TeacherDashboard() {
     [router, language]
   );
 
-  const handleQuickStart = useCallback(
-    (config: GameConfiguration) => {
-      const lessonParam = config.lessonIds[0] || '';
-      router.push(`/${language}/education/classroom-game?lessonId=${lessonParam}`);
-    },
-    [router, language]
-  );
-
-  const handleRepeatLast = useCallback(
-    (_config: GameConfiguration) => {
-      router.push(`/${language}/education/classroom-game?flow=repeatLast`);
+  // The whole hand-off: stash what to play, then navigate. The express lobby
+  // does the rest — classroom, lesson and room — without another screen.
+  const handleQuickLaunch = useCallback(
+    (intent: Omit<QuickLaunchIntent, 'createdAt'>) => {
+      writeQuickLaunchIntent(intent);
+      router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
     },
     [router, language]
   );
@@ -176,6 +184,60 @@ export default function TeacherDashboard() {
           </m.div>
         ) : (
           <>
+            {/* The one button. First on the page, armed on arrival. */}
+            <m.div variants={slideUp} className="mb-5">
+              <PlayNowLauncher onLaunch={handleQuickLaunch} />
+            </m.div>
+
+            {/* One tap away, never in the way. */}
+            <m.nav
+              variants={slideUp}
+              data-testid="teacher-shortcuts"
+              aria-label={t('teacher.playNow.shortcutsLabel')}
+              className="mb-6 grid grid-cols-3 gap-3"
+            >
+              <button
+                type="button"
+                data-testid="shortcut-last-game"
+                onClick={() => {
+                  setToolsOpen(true);
+                  requestAnimationFrame(() => toolsRef.current?.scrollIntoView({ block: 'start' }));
+                }}
+                className={cn(
+                  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-black',
+                  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
+                  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard'
+                )}
+              >
+                <History className="size-4 shrink-0" aria-hidden="true" />
+                {t('teacher.playNow.shortcutLastGame')}
+              </button>
+              <Link
+                href={`/${language}/education/classroom-game`}
+                data-testid="shortcut-recent"
+                className={cn(
+                  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-black',
+                  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
+                  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard'
+                )}
+              >
+                <SlidersHorizontal className="size-4 shrink-0" aria-hidden="true" />
+                {t('teacher.playNow.shortcutSetup')}
+              </Link>
+              <Link
+                href={`/${language}/teacher/reports`}
+                data-testid="shortcut-reports"
+                className={cn(
+                  'flex min-h-12 items-center justify-center gap-2 rounded-neo border-3 border-black',
+                  'bg-neo-navy-light px-3 py-2 font-neo-display text-xs font-black uppercase text-neo-white',
+                  'shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard'
+                )}
+              >
+                <FileText className="size-4 shrink-0" aria-hidden="true" />
+                {t('teacher.playNow.shortcutReports')}
+              </Link>
+            </m.nav>
+
             {/* Who is already waiting. One line, and the reason to press host. */}
             {!classroomsLoading && classrooms.length > 0 && (
               <m.div variants={slideUp} className="mb-6">
@@ -194,15 +256,9 @@ export default function TeacherDashboard() {
               </m.div>
             )}
 
-            {hasRecentConfig && classrooms.length > 0 && (
-              <m.div variants={slideUp} className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <QuickStartButton config={getMostRecent()} onClick={handleQuickStart} />
-                <RepeatLastGameButton config={getMostRecent()} onClick={handleRepeatLast} />
-              </m.div>
-            )}
-
-            {/* The screen. Paste words, get a lesson, host it from its card. */}
-            <m.div variants={slideUp}>
+            {/* Below the fold of the one button: the place to prepare, for the
+                teacher who has a free period rather than a class in the room. */}
+            <m.div variants={slideUp} className="mt-8">
               <LessonBuilder initialReviewWords={deepLink.reviewWords} />
             </m.div>
           </>
@@ -211,7 +267,10 @@ export default function TeacherDashboard() {
         {/* Everything that is not "host my words": open only when asked. */}
         {hasTeacherAccess && (
           <details
+            ref={toolsRef}
             data-testid="teacher-tools"
+            open={toolsOpen}
+            onToggle={(e) => setToolsOpen((e.currentTarget as HTMLDetailsElement).open)}
             className="group mt-10 rounded-neo border-2 border-black/30 bg-neo-navy-light"
           >
             <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-5 py-3 font-neo-display font-bold text-neo-white marker:content-none">
