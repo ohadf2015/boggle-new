@@ -595,18 +595,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         __html: CHUNK_BOOT_GUARD_SCRIPT,
                     }}
                 />
-                {/* Message catalogue. A classic, non-deferred script so
-                    globalThis.__LEXI_MESSAGES__ exists before hydration — without it
-                    t() returns raw key paths and React repaints the SSR'd text.
-                    Content-hashed and served immutable (see next.config.mjs headers),
-                    so it costs one request on the first page and nothing after. */}
+                {/* Message catalogue. Must run BEFORE Next hydrates: without
+                    globalThis.__LEXI_MESSAGES__, getCachedTranslation() is empty on
+                    the client, t() returns raw key paths, and React #418 fires on
+                    every page (SSR used require() so the HTML has real copy).
+                    A raw <script src> in this <head> is emitted AFTER Next's
+                    async runtime chunks in the served HTML, so hydration can
+                    win the race. next/script beforeInteractive is injected into
+                    the initial HTML ahead of the Next runtime on purpose. */}
                 <link rel="preload" as="script" href={messagesSrc} />
-                {/* eslint-disable-next-line @next/next/no-sync-scripts -- synchronous is the
-                    whole point: async/defer would let hydration start without the catalogue,
-                    t() would return raw key paths, and React would repaint every string the
-                    server rendered. The preload above starts the fetch with the HTML, and the
-                    file is immutable so it only ever costs one request. */}
-                <script src={messagesSrc} />
+                <Script id="lexi-i18n-messages" src={messagesSrc} strategy="beforeInteractive" />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://www.lexiclash.live" />

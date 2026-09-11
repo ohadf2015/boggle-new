@@ -241,17 +241,24 @@ const GridCell = memo<GridCellProps>(({
       // every selected cell. Suppress them while a word is being built
       // (selectedCellsLength > 0); the static escalation (tier color + glow +
       // scale) still escalates per letter and paints once.
-      ...(isSelected ? composeSelectedCellStyle({
-        isRainbow: comboColors.isRainbow ?? false,
-        flicker: comboColors.flicker ?? false,
-        comboLevel,
-        selectionIndex: selectionIdx,
-        totalSelected: selectedCellsLength,
-        escalationCombo,
-        escalationTier: escalation?.tier ?? -1,
-        reduceMotion,
-        suppressAnimations: selectedCellsLength > 0,
-      }) : {}),
+      ...(isSelected ? (() => {
+        const selectedStyle = composeSelectedCellStyle({
+          isRainbow: comboColors.isRainbow ?? false,
+          flicker: comboColors.flicker ?? false,
+          comboLevel,
+          selectionIndex: selectionIdx,
+          totalSelected: selectedCellsLength,
+          escalationCombo,
+          escalationTier: escalation?.tier ?? -1,
+          reduceMotion,
+          suppressAnimations: selectedCellsLength > 0,
+        });
+        // Base-tier composeSelectedCellStyle returns {} — without an opaque fill
+        // the transparent letter span is measured (and seen) against the navy
+        // board (#1a1a2e), which is 1.23:1 with text-neo-black. Force lime.
+        const hasBg = selectedStyle.background != null || selectedStyle.backgroundColor != null;
+        return hasBg ? selectedStyle : { ...selectedStyle, backgroundColor: '#bfff00' };
+      })() : {}),
       ...(isFrozen && !isSelected ? {
         background: 'linear-gradient(135deg, rgba(186,230,253,0.6), rgba(147,197,253,0.4), rgba(186,230,253,0.6))',
         pointerEvents: 'none' as const,
@@ -290,6 +297,13 @@ const GridCell = memo<GridCellProps>(({
     <span
       className="relative z-10 pointer-events-none select-none"
       style={{
+        // Explicit color on the glyph — inherited `text-neo-black` on a
+        // transparent span samples the navy board (uisight: 1.23:1, invisible).
+        color: isSelected
+          ? comboColors.textColor === 'text-neo-white'
+            ? '#FFFEF0'
+            : '#1a1a2e'
+          : undefined,
         textShadow: isSelected
           ? comboColors.isRainbow || comboLevel >= 5
             ? '0 2px 4px rgba(0,0,0,0.3)'
