@@ -21,6 +21,7 @@ vi.mock('@/utils/supabase/server', () => ({
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 
 import { POST } from '../route';
+import { SCHOOL_LEAD_NOTIFY_TO } from '@/lib/education/schoolLeadNotify';
 
 const mkReq = (body: any): Request =>
   new Request('http://test/api/education/school-lead', {
@@ -46,6 +47,7 @@ describe('POST /api/education/school-lead', () => {
     vi.clearAllMocks();
     h.rateLimited = false;
     h.rpcError = null;
+    h.sendEmailSpy.mockResolvedValue({ ok: true });
   });
 
   it('200 + inserts a qualified lead row', async () => {
@@ -65,9 +67,35 @@ describe('POST /api/education/school-lead', () => {
     expect(insertSpy.mock.calls[0][0].source).toBe('classroom-plan');
   });
 
-  it('notifies the admin by email', async () => {
+  it('notifies ohadf2015@gmail.com with name/school/role/locale and reply-to the lead', async () => {
     await POST(mkReq(valid));
     expect(sendEmailSpy).toHaveBeenCalledTimes(1);
+    const args = sendEmailSpy.mock.calls[0][0];
+    expect(args.to).toBe(SCHOOL_LEAD_NOTIFY_TO);
+    expect(args.to).toBe('ohadf2015@gmail.com');
+    expect(args.replyTo).toBe(valid.email);
+    expect(args.subject).toMatch(/Lincoln High School/);
+    expect(args.html).toContain('Dana Levi');
+    expect(args.html).toContain(valid.email);
+    expect(args.html).toContain('school_admin');
+    expect(args.html).toContain('en');
+    expect(args.html).toMatch(/Timestamp:/);
+  });
+
+  it('still 200 when Resend returns { ok:false } — row is source of truth', async () => {
+    h.sendEmailSpy.mockResolvedValueOnce({ ok: false, error: 'resend down' });
+    const res = await POST(mkReq(valid));
+    expect(res.status).toBe(200);
+    expect((await res.json()).ok).toBe(true);
+    expect(insertSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('still 200 when sendEmail throws — mail failure never 500s the form', async () => {
+    h.sendEmailSpy.mockRejectedValueOnce(new Error('network'));
+    const res = await POST(mkReq(valid));
+    expect(res.status).toBe(200);
+    expect((await res.json()).ok).toBe(true);
+    expect(insertSpy).toHaveBeenCalledTimes(1);
   });
 
   it('400 if school_or_district missing', async () => {

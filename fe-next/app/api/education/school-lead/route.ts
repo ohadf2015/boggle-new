@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { sendEmail } from '@/lib/email/send';
 import { schoolLeadAdminNotify } from '@/lib/email/templates/schoolLeadAdminNotify';
 import { validateSchoolLeadPayload } from '@/lib/education/schoolLead';
+import { SCHOOL_LEAD_NOTIFY_TO } from '@/lib/education/schoolLeadNotify';
 
 function bad(msg: string, status = 400) {
   return NextResponse.json({ ok: false, error: msg }, { status });
@@ -36,11 +37,20 @@ export async function POST(req: Request) {
   const ins = await sb.from('school_leads').insert({ ...lead });
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
 
-  const tpl = schoolLeadAdminNotify(lead);
+  const submittedAt = new Date().toISOString();
+  const tpl = schoolLeadAdminNotify({ ...lead, submittedAt });
   // Fire-and-forget; a delivery hiccup must not fail the lead capture.
   try {
-    await sendEmail({ to: 'lexiclash.game@gmail.com', subject: tpl.subject, html: tpl.html });
-  } catch { /* noop — row is already persisted */ }
+    const result = await sendEmail({
+      to: SCHOOL_LEAD_NOTIFY_TO,
+      subject: tpl.subject,
+      html: tpl.html,
+      replyTo: lead.email,
+    });
+    if (!result.ok) console.error('[school-lead] notify failed:', result.error);
+  } catch (e) {
+    console.error('[school-lead] notify threw:', e);
+  }
 
   // Both keys on purpose: this route's error path answers { ok: false, error }, so a caller that
   // checks `ok` saw undefined on success — the shapes disagreed. `success` stays for any existing
