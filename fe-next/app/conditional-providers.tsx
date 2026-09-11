@@ -92,7 +92,7 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside
   return (
-    <NextIntlClientProvider locale={lang} messages={initialTranslations as Record<string, unknown>}>
+    <NextIntlClientProvider locale={lang} timeZone="UTC" messages={initialTranslations as Record<string, unknown>}>
       <NuqsAdapter>
         <EssentialProviders lang={lang} initialTranslations={initialTranslations}>
           {needsGameStack ? (
