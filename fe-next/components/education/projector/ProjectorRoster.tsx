@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Check, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
   t,
 }) {
   const reduceMotion = useReducedMotion();
-  const readySet = new Set(readyUsernames);
+  const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
   const readyCount = students.filter((s) => readySet.has(s.username)).length;
   // Chip size is a function of how full the room is — a class of 32 has to fit
   // on the wall, because nobody scrolls a projector. See `rosterDensity`.

@@ -369,9 +369,17 @@ export async function updateClassroomGameStatus(
  * to do (one Redis read, no write) and must never throw: a round has to start
  * even when Redis is unreachable.
  */
-export async function reopenClassroomGameForRound(gameCode: string): Promise<void> {
+export async function reopenClassroomGameForRound(
+  gameCode: string,
+  /**
+   * The record when the caller already read it this tick (the vocab-quiz start
+   * does). Passing it makes this the zero-read variant of `beginClassroomRound`
+   * below for callers that must not await the write.
+   */
+  preloaded?: ClassroomGame | null
+): Promise<void> {
   try {
-    const game = await getClassroomGame(gameCode);
+    const game = preloaded ?? (await getClassroomGame(gameCode));
     if (!game) return;
     await markRoundLive(game);
   } catch (error) {

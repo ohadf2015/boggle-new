@@ -13,7 +13,6 @@ import { memo } from 'react';
 import { BookMarked, Sparkles, ClipboardPaste, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 import { MIN_PASTED_WORDS } from './quickLaunchIntent';
 
 export type PlayNowSource = 'recent' | 'packs' | 'paste';
@@ -154,4 +153,3 @@ export const PastePanel = memo(function PastePanel({
   );
 });
 
-export const STARTER_PACKS = STARTER_LESSON_PACKS;

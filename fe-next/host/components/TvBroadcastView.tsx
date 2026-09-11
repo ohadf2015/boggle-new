@@ -21,6 +21,7 @@ import { useTvFinalMinute } from '../hooks/useTvFinalMinute';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHostView';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
+import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherBarInset';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import {
   useGameMode,
@@ -230,11 +231,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   // The teacher's live control strip is docked to the bottom of the viewport and
   // publishes its own height on <html>; reserving that space here is what keeps
   // it off the board and the leaderboard instead of floating over them.
-  const teacherControlsInset = { paddingBottom: 'var(--lc-teacher-bar-h, 0px)' };
 
   if (isVocabQuizRoom) {
     return (
-      <div className="flex-1 flex flex-col min-h-0 bg-neo-navy" style={teacherControlsInset}>
+      <div className="flex-1 flex flex-col min-h-0 bg-neo-navy" style={TEACHER_CONTROLS_INSET}>
         <VocabQuizHostView
           socket={socket}
           joinCode={gameCode}
@@ -248,7 +248,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   return (
     <div
       className="flex-1 flex flex-col min-h-0 bg-neo-navy overflow-hidden relative"
-      style={teacherControlsInset}
+      style={TEACHER_CONTROLS_INSET}
     >
       {/* Dynamic mode background */}
       {gameMode && MODE_BACKGROUNDS[gameMode] && (

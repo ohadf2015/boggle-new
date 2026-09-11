@@ -64,6 +64,30 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
     }
   };
 
+  /**
+   * Every Classroom share is the same card — a title carrying the lesson, a body
+   * carrying the first eight missed words — and differs only in where it points
+   * and whether Google files it as an announcement or as homework. The
+   * destination arrives as a thunk so a builder that throws is caught here
+   * rather than one line above the try.
+   */
+  const googleClassroomHref = (
+    destination: () => string | null,
+    titleKey: string,
+    bodyKey: string,
+    itemType: 'announcement' | 'assignment'
+  ): string | null =>
+    safely(() => {
+      const joinUrl = destination();
+      if (!joinUrl) return null;
+      return buildGoogleClassroomShareUrl({
+        joinUrl,
+        title: t(titleKey, { lesson }),
+        body: t(bodyKey, { missed: summary.missedWords.slice(0, 8).join(', ') }),
+        itemType,
+      });
+    });
+
   const classGapUrl = hasMisses ? safely(() => buildClassGapShareUrl(gapArgs)) : null;
 
   /**
@@ -71,36 +95,24 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
    * to the Stream so the teacher can start a 3-min reteach Live from that link.
    * Phase-1 share dialog — no OAuth. Absolute lexiclash.live URL.
    */
-  const googleClassroomReteachHref = classGapUrl
-    ? safely(() =>
-        buildGoogleClassroomShareUrl({
-          joinUrl: classGapUrl,
-          title: t('education.results.postReteachGoogleClassroomTitle', { lesson }),
-          body: t('education.results.postReteachGoogleClassroomBody', {
-            missed: summary.missedWords.slice(0, 8).join(', '),
-          }),
-          itemType: 'announcement',
-        })
-      )
-    : null;
+  const googleClassroomReteachHref = googleClassroomHref(
+    () => classGapUrl,
+    'education.results.postReteachGoogleClassroomTitle',
+    'education.results.postReteachGoogleClassroomBody',
+    'announcement'
+  );
 
   /**
    * After Live ends: assign the same class-gap card as Google Classroom *homework*
    * (itemtype=assignment). Students open practice-at-home words from Classwork;
    * teacher sets due date in Google's dialog. Still Phase-1 share — no OAuth.
    */
-  const googleClassroomAssignHref = classGapUrl
-    ? safely(() =>
-        buildGoogleClassroomShareUrl({
-          joinUrl: classGapUrl,
-          title: t('education.results.assignPracticeGoogleClassroomTitle', { lesson }),
-          body: t('education.results.assignPracticeGoogleClassroomBody', {
-            missed: summary.missedWords.slice(0, 8).join(', '),
-          }),
-          itemType: 'assignment',
-        })
-      )
-    : null;
+  const googleClassroomAssignHref = googleClassroomHref(
+    () => classGapUrl,
+    'education.results.assignPracticeGoogleClassroomTitle',
+    'education.results.assignPracticeGoogleClassroomBody',
+    'assignment'
+  );
 
   const unpluggedReteachHref = hasMisses ? safely(() => buildUnpluggedReteachPath(gapArgs)) : null;
 
@@ -110,18 +122,12 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
    * / Classic Unplugged. Absolute Unplugged Live deep-link on lexiclash.live;
    * class-level missed words only — no student names. Phase-1 share — no OAuth.
    */
-  const googleClassroomUnpluggedAssignHref = hasMisses
-    ? safely(() =>
-        buildGoogleClassroomShareUrl({
-          joinUrl: buildUnpluggedReteachUrl(gapArgs),
-          title: t('education.results.assignUnpluggedGoogleClassroomTitle', { lesson }),
-          body: t('education.results.assignUnpluggedGoogleClassroomBody', {
-            missed: summary.missedWords.slice(0, 8).join(', '),
-          }),
-          itemType: 'assignment',
-        })
-      )
-    : null;
+  const googleClassroomUnpluggedAssignHref = googleClassroomHref(
+    () => (hasMisses ? buildUnpluggedReteachUrl(gapArgs) : null),
+    'education.results.assignUnpluggedGoogleClassroomTitle',
+    'education.results.assignUnpluggedGoogleClassroomBody',
+    'assignment'
+  );
 
   /**
    * Async miss-gap homework (#972 practice card + due date → class streak).
@@ -180,6 +186,22 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
   };
 
   /**
+   * Both share buttons obey the same two rules: the clipboard fallback is the
+   * text with the url on its own line, and the button only flips to "copied" /
+   * "shared" when the share actually happened. Kept in one place so a third
+   * share cannot land with one of them quietly missing.
+   */
+  const share = async (
+    title: string,
+    text: string,
+    url: string,
+    setState: (state: ShareState) => void
+  ) => {
+    const result = await shareWithFallback({ title, text, url, clipboardText: `${text}\n${url}` });
+    if (result === 'copied' || result === 'shared') setState(result);
+  };
+
+  /**
    * Shareable miss-gap practice card / PDF after Unplugged Classroom assign.
    * Foil: Kahoot Unplugged has no take-home. Parents get a lexiclash.live link
    * that prints the #957 practice sheet (Save as PDF). Class words only.
@@ -191,13 +213,7 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
       lesson,
       missed: summary.missedWords.join(', '),
     });
-    const result = await shareWithFallback({
-      title: t('education.results.shareMissGapPracticeTitle'),
-      text,
-      url,
-      clipboardText: `${text}\n${url}`,
-    });
-    if (result === 'copied' || result === 'shared') setMissGapShareState(result);
+    await share(t('education.results.shareMissGapPracticeTitle'), text, url, setMissGapShareState);
   };
 
   const onShareGap = async () => {
@@ -210,13 +226,7 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
           missed: summary.missedWords.join(', '),
         })
       : t('education.results.shareGapAllFoundText', { lesson });
-    const result = await shareWithFallback({
-      title: t('education.results.shareGapTitle'),
-      text,
-      url,
-      clipboardText: `${text}\n${url}`,
-    });
-    if (result === 'copied' || result === 'shared') setShareState(result);
+    await share(t('education.results.shareGapTitle'), text, url, setShareState);
   };
 
   return {

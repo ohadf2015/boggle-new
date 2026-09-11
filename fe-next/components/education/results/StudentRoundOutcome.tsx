@@ -23,6 +23,8 @@
 import { Crown, TrendingUp, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ClassroomPlayerMastery } from '@/shared/types/classroom';
+import type { ResultsStanding } from './resultsStandings';
+import { RANK_FILL } from './ResultsPodium';
 
 export interface StudentRoundOutcomeProps {
   /** The name this client plays under, as the server echoes it. */
@@ -31,18 +33,11 @@ export interface StudentRoundOutcomeProps {
    * Final standings, best first — the server's order, rendered verbatim.
    * Bots may ride along; they are filtered here, not re-sorted.
    */
-  standings: Array<{ username: string; score: number; isBot?: boolean }>;
+  standings: ResultsStanding[];
   /** This student's own lesson-word tally. Absent for a late joiner. */
   mastery?: ClassroomPlayerMastery;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
-
-/** Rank 1-3 borrow the podium's plinth colours so the two screens rhyme. */
-const RANK_SKIN: Record<number, string> = {
-  1: 'bg-neo-yellow',
-  2: 'bg-neo-cyan',
-  3: 'bg-neo-pink',
-};
 
 export function StudentRoundOutcome({
   username,
@@ -90,7 +85,7 @@ export function StudentRoundOutcome({
             'relative shrink-0 flex flex-col items-center justify-center',
             'w-24 h-24 -rotate-2 rounded-neo border-neo border-neo-black shadow-hard',
             'text-neo-black',
-            RANK_SKIN[rank] ?? 'bg-neo-lime'
+            RANK_FILL[rank] ?? 'bg-neo-lime'
           )}
         >
           {rank === 1 && (

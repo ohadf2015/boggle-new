@@ -27,4 +27,3 @@ export function toStandings(
   return scores.map((p) => ({ username: p.username, score: p.score, isBot: p.isBot }));
 }
 
-export default toStandings;

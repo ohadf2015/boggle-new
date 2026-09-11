@@ -87,9 +87,13 @@ describe('startVocabQuizForClassroom reopens the classroom code', () => {
     // WHEN the teacher runs another quiz round in the same room
     const started = await startVocabQuizForClassroom(io, CODE);
 
-    // THEN the quiz took over AND the projector code resolves again
+    // THEN the quiz took over AND the projector code resolves again — handed
+    // the record this path already read, so the reopen costs no second read.
     expect(started).toBe(true);
-    expect(classroomGameManager.reopenClassroomGameForRound).toHaveBeenCalledWith(CODE);
+    expect(classroomGameManager.reopenClassroomGameForRound).toHaveBeenCalledWith(
+      CODE,
+      expect.objectContaining({ gameCode: CODE })
+    );
   });
 
   it('does not reopen a room the quiz declines to take over', async () => {

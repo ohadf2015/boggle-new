@@ -27,6 +27,7 @@ import { GraduationCap, Check, RotateCcw, Share2, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './results/ResultsPodium';
+import type { ResultsStanding } from './results/resultsStandings';
 import { StudentRoundOutcome } from './results/StudentRoundOutcome';
 import { WordCoverageGlance } from './results/WordCoverageGlance';
 import { ClassNeedsHelp } from './results/ClassNeedsHelp';
@@ -51,7 +52,7 @@ export interface ClassroomResultsCardProps {
    * payload, a printed recap) minus the student's placing hero. Never used to
    * re-rank — `summary.podium` remains the one ranking in the system.
    */
-  standings?: Array<{ username: string; score: number }>;
+  standings?: ResultsStanding[];
 }
 
 export function ClassroomResultsCard({
