@@ -3,12 +3,14 @@ import logger from '@/utils/logger';
 /**
  * What a six-character code is, in ONE round trip.
  *
- * Two helpers already ask `/api/education/join-code/resolve` this question:
- * `lib/education/joinCodeVerdict` wants "is it real", `lib/education/
- * classroomPreview` wants "whose room is it". The join screen needs both facts
- * at the same instant, and a class of thirty shares one school IP against that
- * route's rate limit — so asking twice per code is a cost paid for nothing.
- * This is the same contract as those two, read off a single response.
+ * `lib/education/joinCodeVerdict` already asks `/api/education/join-code/resolve`
+ * the narrower question "is it real". The join screen needs that AND "whose room
+ * is it" at the same instant, and a class of thirty shares one school IP against
+ * that route's rate limit — so asking twice per code is a cost paid for nothing.
+ * This is the same contract, read off a single response.
+ *
+ * (A third reader, `lib/education/classroomPreview`, was orphaned when the old
+ * join form was replaced and has been deleted.)
  *
  * `unverified` is the load-bearing value. The route answers `kind: 'unknown'`
  * for a genuine miss AND for a tripped rate limit, an errored roster RPC, or a

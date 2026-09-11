@@ -192,7 +192,7 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
  * exactly as before.
  */
 export async function startVocabQuizForClassroom(io: Server, gameCode: string): Promise<boolean> {
-  let classroomGame;
+  let classroomGame: Awaited<ReturnType<typeof getClassroomGame>>;
   try {
     classroomGame = await getClassroomGame(gameCode);
   } catch (err) {
@@ -249,8 +249,10 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
   // board path does the same from `gameStartHandler`, but the quiz branch
   // returns out of that handler before it — leaving a class on its second quiz
   // round behind a code that answers "not recognised" to anyone reconnecting.
-  // Fire-and-forget: a Redis write must never hold up the first question.
-  void reopenClassroomGameForRound(gameCode);
+  // Fire-and-forget: a Redis write must never hold up the first question. The
+  // record is the one read at the top of this function — re-reading it here is
+  // the double read `beginClassroomRound` exists to avoid on the board path.
+  void reopenClassroomGameForRound(gameCode, classroomGame);
 
   setQuizSession(gameCode, session);
   startTicking(io, gameCode);

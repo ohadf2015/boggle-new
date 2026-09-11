@@ -576,13 +576,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     window.location.reload();
   }, [classroomSummary]);
 
+  // One narrowing, two consumers. Two calls is two arrays for the same rows,
+  // and the second one is where a filter added to only one of them would hide.
+  const classroomStandings = useMemo(() => toStandings(sortedScores), [sortedScores]);
+
   const postGameWordReviewNode = classroomSummary ? (
     <>
       {classroomSummary.teamBattle && (
         <div className="mb-4">
           <TeamBattleStandings
             teams={classroomSummary.teamBattle.teams}
-            scores={toStandings(sortedScores)}
+            scores={classroomStandings}
           />
         </div>
       )}
@@ -590,7 +594,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         summary={classroomSummary}
         username={username}
         isTeacher={isHost}
-        standings={toStandings(sortedScores)}
+        standings={classroomStandings}
         onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
         onRematch={isHost ? handleRematch : undefined}
         onPractice={

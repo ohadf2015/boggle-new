@@ -13,15 +13,11 @@ import { useShortViewport } from './controls/useShortViewport';
 import type { RosterMember } from './controls/classActivityModel';
 import { useKickStudent } from '@/hooks/useKickStudent';
 
-/**
- * Height of the docked strip, published on <html> while it is mounted.
- *
- * The strip is fixed to the bottom so it survives the projector's fullscreen
- * (which targets `document.documentElement`), and surfaces underneath it read
- * this variable as bottom padding so the bar reserves its own space instead of
- * sitting on top of the board or the leaderboard.
- */
-export const TEACHER_BAR_HEIGHT_VAR = '--lc-teacher-bar-h';
+// Re-exported so existing importers of the strip keep working; the variable
+// and the matching inset live in `controls/teacherBarInset` so a surface can
+// reserve the space without importing this component.
+export { TEACHER_BAR_HEIGHT_VAR } from './controls/teacherBarInset';
+import { TEACHER_BAR_HEIGHT_VAR } from './controls/teacherBarInset';
 
 /** Seconds added per "+30s" tap (server clamps 10..120). */
 const EXTEND_SECONDS = 30;

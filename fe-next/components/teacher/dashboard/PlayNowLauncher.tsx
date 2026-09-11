@@ -28,7 +28,8 @@ import {
   parsePastedWords,
   type QuickLaunchIntent,
 } from './quickLaunchIntent';
-import { SourceSwitch, PickRow, PastePanel, STARTER_PACKS, type PlayNowSource } from './PlayNowSources';
+import { SourceSwitch, PickRow, PastePanel, type PlayNowSource } from './PlayNowSources';
+import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 
 /**
  * How many saved lists fit on the panel before it stops being one glance.
@@ -37,6 +38,12 @@ import { SourceSwitch, PickRow, PastePanel, STARTER_PACKS, type PlayNowSource } 
  * make the teacher choose before they can play.
  */
 const RECENT_LIMIT = 3;
+
+/** What the button will launch, and the count its label shows — one source. */
+interface ArmedLaunch {
+  intent: Omit<QuickLaunchIntent, 'createdAt'>;
+  wordCount: number;
+}
 
 export interface PlayNowLauncherProps {
   /** Hand the resolved intent to the dashboard, which stores it and navigates. */
@@ -85,10 +92,13 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
   const activeLesson =
     recentLessons.find((l) => l.id === pickedLessonId) ?? recentLessons[0] ?? null;
   const activePack =
-    STARTER_PACKS.find((p) => p.nameKey === pickedPackKey) ?? STARTER_PACKS[0] ?? null;
+    STARTER_LESSON_PACKS.find((p) => p.nameKey === pickedPackKey) ?? STARTER_LESSON_PACKS[0] ?? null;
   const pastedWords = useMemo(() => parsePastedWords(pasted), [pasted]);
 
-  const intent = useMemo<Omit<QuickLaunchIntent, 'createdAt'> | null>(() => {
+  // Intent and its word count resolve together. As two parallel `source`
+  // switches a fourth source could be taught to one and not the other, and the
+  // button would arm a round whose label counted the previous source's words.
+  const armed = useMemo<ArmedLaunch | null>(() => {
     // Never arm while the lessons read is still open: a teacher who taps in
     // that window would host a starter pack when their own list was one tick
     // away (pitfalls class 1 — render the pessimistic state until all sources
@@ -97,19 +107,25 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
     if (source === 'recent') {
       if (!activeLesson) return null;
       return {
-        source: 'lesson',
-        lessonId: activeLesson.id,
-        title: activeLesson.name,
-        language: activeLesson.language || language,
+        intent: {
+          source: 'lesson',
+          lessonId: activeLesson.id,
+          title: activeLesson.name,
+          language: activeLesson.language || language,
+        },
+        wordCount: activeLesson.words?.length ?? 0,
       };
     }
     if (source === 'packs') {
       if (!activePack) return null;
       return {
-        source: 'pack',
-        packKey: activePack.nameKey,
-        title: t(activePack.nameKey),
-        language: activePack.language,
+        intent: {
+          source: 'pack',
+          packKey: activePack.nameKey,
+          title: t(activePack.nameKey),
+          language: activePack.language,
+        },
+        wordCount: activePack.words.length,
       };
     }
     if (pastedWords.length < MIN_PASTED_WORDS) return null;
@@ -117,24 +133,20 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
       ? language
       : 'en';
     return {
-      source: 'paste',
-      words: pastedWords,
-      title: t('teacher.playNow.pastedRoundName'),
-      language: uiLanguage,
+      intent: {
+        source: 'paste',
+        words: pastedWords,
+        title: t('teacher.playNow.pastedRoundName'),
+        language: uiLanguage,
+      },
+      wordCount: pastedWords.length,
     };
   }, [lessonsLoading, source, activeLesson, activePack, pastedWords, language, t]);
 
-  const wordCount =
-    source === 'recent'
-      ? activeLesson?.words?.length ?? 0
-      : source === 'packs'
-        ? activePack?.words.length ?? 0
-        : pastedWords.length;
-
   const handleGo = useCallback(() => {
-    if (!intent) return;
-    onLaunch(intent);
-  }, [intent, onLaunch]);
+    if (!armed) return;
+    onLaunch(armed.intent);
+  }, [armed, onLaunch]);
 
   return (
     <section
@@ -159,8 +171,8 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
           data-testid="play-now-armed"
           className="text-center font-neo-body text-sm font-bold text-neo-white text-balance"
         >
-          {intent
-            ? t('teacher.playNow.armedWith', { title: intent.title, count: wordCount })
+          {armed
+            ? t('teacher.playNow.armedWith', { title: armed.intent.title, count: armed.wordCount })
             : t('teacher.playNow.pickSomething')}
         </p>
 
@@ -170,13 +182,13 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
         <button
           type="button"
           data-testid="play-now-go"
-          disabled={!intent}
+          disabled={!armed}
           onClick={handleGo}
           className={cn(
             'flex w-full min-h-16 items-center justify-center gap-3 rounded-neo border-4 border-black px-6 py-4',
             'font-neo-display text-2xl font-black uppercase tracking-tight sm:text-3xl',
             'transition-all duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-            intent
+            armed
               ? 'bg-neo-lime text-black shadow-hard-lg hover:-translate-y-1 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed'
               // Still bordered, still legible: this is the state a teacher
               // sees on first paint, while the lessons read is open. A solid
@@ -223,7 +235,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
 
             {source === 'packs' && (
               <ul className="grid gap-2 sm:grid-cols-3" data-testid="play-now-pack-list">
-                {STARTER_PACKS.map((p, i) => (
+                {STARTER_LESSON_PACKS.map((p, i) => (
                   <li key={p.nameKey}>
                     <PickRow
                       testId={`play-now-pack-${p.category}`}

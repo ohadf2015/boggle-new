@@ -89,4 +89,3 @@ export async function runGuestJoinPreflight(
   return null;
 }
 
-export default runGuestJoinPreflight;

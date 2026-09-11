@@ -227,7 +227,6 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         </div>
       )}
 
-      {/* Settings ticker + the one Start control. */}
       {/* Settings ticker + the one Start control. Stacks on a phone — the
           teacher's own screen is often the projector, mirrored. */}
       <footer className="flex shrink-0 flex-col gap-[1.5vw] border-t-4 border-neo-cream/15 pt-[1.5vw] md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:pt-[1vw]">

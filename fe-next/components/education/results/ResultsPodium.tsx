@@ -65,10 +65,15 @@ const HEIGHT: Record<number, { card: number; projector: number }> = {
   3: { card: 4, projector: 7 },
 };
 
-const PLINTH: Record<number, string> = {
-  1: 'bg-neo-yellow text-neo-black',
-  2: 'bg-neo-cyan text-neo-black',
-  3: 'bg-neo-pink text-neo-black',
+/**
+ * Gold, silver, bronze in the neo palette. Exported because the student's own
+ * placing card rhymes with the podium on purpose — one map, so the two screens
+ * cannot drift to different silvers.
+ */
+export const RANK_FILL: Record<number, string> = {
+  1: 'bg-neo-yellow',
+  2: 'bg-neo-cyan',
+  3: 'bg-neo-pink',
 };
 
 const TILT: Record<number, string> = {
@@ -169,7 +174,8 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
               className={cn(
                 '-mt-1 w-full flex flex-col items-center justify-center gap-0.5',
                 'rounded-neo border-[2px] border-neo-black shadow-hard',
-                PLINTH[rank] ?? PLINTH[3]
+                'text-neo-black',
+                RANK_FILL[rank] ?? RANK_FILL[3]
               )}
             >
               <span
