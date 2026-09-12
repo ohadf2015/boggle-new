@@ -27,4 +27,20 @@ describe('letter-grid fit — no magic viewport constants', () => {
     expect(source).toContain('useContainerDimensions');
     expect(source).toMatch(/flex-1 min-h-0/);
   });
+
+  // The measured grid only works when the drill root is a flex column with a
+  // definite height: `flex-1` on the grid wrapper resolves against it. A
+  // `min-h-full` block root leaves the wrapper at auto height (0), the
+  // measurement never validates, and the board renders NOTHING. This
+  // regressed on master when a parallel branch rewrote SoloPracticeBoard's
+  // root while the grid hunk came from the measured-square fix (merge
+  // d6461f4a8, caught by production dogfood 2026-09-12: empty board).
+  it.each([
+    ['SoloPracticeBoard.tsx', 'SoloPracticeBoard'],
+    ['WarmupRound.tsx', 'WarmupRound'],
+  ])('%s drill root is a full-height flex column (grid flex-1 has a real area)', (file, name) => {
+    const source = read(file);
+    expect(source).toMatch(/DRILL_ROOT_CLASS/);
+    expect(source).not.toMatch(/min-h-full bg-neo-navy/);
+  });
 });
