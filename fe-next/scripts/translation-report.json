@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6874,
+    "totalKeysInCode": 6875,
     "keyCountByLanguage": {
-      "en": 13265,
-      "es": 13573,
-      "he": 13475,
-      "ja": 13535,
-      "ru": 13307,
-      "sv": 13531
+      "en": 13267,
+      "es": 13575,
+      "he": 13477,
+      "ja": 13537,
+      "ru": 13309,
+      "sv": 13533
     },
-    "missingFromEnglish": 102,
+    "missingFromEnglish": 101,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 350,
@@ -4559,15 +4559,6 @@
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
           "line": 289
-        }
-      ]
-    },
-    {
-      "key": "wordWheel.streakBadge",
-      "usages": [
-        {
-          "file": "components/multiplayer/WheelRushCelebration.tsx",
-          "line": 60
         }
       ]
     }
