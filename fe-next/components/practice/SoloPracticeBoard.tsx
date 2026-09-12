@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
+import { DRILL_ROOT_CLASS } from './drillLayout';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -229,8 +230,8 @@ export default function SoloPracticeBoard({
   }
 
   return (
-    <div className="min-h-full bg-neo-navy p-4 sm:p-6" translate="no">
-      <div className="max-w-2xl mx-auto">
+    <div className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')} translate="no">
+      <div className="max-w-2xl mx-auto flex flex-col h-full min-h-0 w-full">
         {/* Header */}
         <div className="flex items-center gap-4 mb-4">
           <Button
