@@ -163,6 +163,12 @@ export const blogPosts: BlogPost[] = [
     image: '/images/blog/top-player-secrets.jpg',
     date: '2026-08-03',
   },
+  {
+    slug: 'death-of-turn-based-word-games',
+    // TODO-image: dedicated /images/blog/death-of-turn-based-word-games.jpg hero
+    image: '/images/blog/multiplayer-social.jpg',
+    date: '2026-09-12',
+  },
 ];
 
 export const blogPostsContent: Record<string, PageContent> = {
@@ -171,6 +177,12 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Tips, strategies, and insights for word game enthusiasts',
     footerText: 'Join thousands of word game enthusiasts improving their skills with LexiClash. Play solo, compete with friends, or challenge daily puzzles in Hebrew, English, Swedish, and Japanese.',
     posts: {
+      'death-of-turn-based-word-games': {
+        title: "I Waited 11 Days for Someone to Play 'QI.' Then I Deleted the App.",
+        excerpt: 'Turn-based word games taught a whole generation that playing with friends means waiting for friends. Real-time word games are correcting that mistake.',
+        readTime: '9 min read',
+        category: 'Opinion',
+      },
       'multiplayer-strategy-guide': {
         title: 'The Multiplayer Strategy Guide: How to Actually Win Word Battles',
         excerpt: 'Multiplayer is a different sport from solo play. Pacing, combo management, room-size tactics, fire rounds, and the mental game — the full playbook.',
@@ -316,6 +328,12 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'טיפים, אסטרטגיות ותובנות לחובבי משחקי מילים',
     footerText: 'הצטרפו לאלפי חובבי משחקי מילים שמשפרים את הכישורים שלהם עם LexiClash. שחקו לבד, התחרו עם חברים, או התמודדו עם אתגרים יומיים בעברית, אנגלית, שוודית ויפנית.',
     posts: {
+      'death-of-turn-based-word-games': {
+        title: 'חיכיתי 11 יום שמישהי תשחק את המילה "את". ואז מחקתי את האפליקציה.',
+        excerpt: 'חיכיתי אחד עשר יום שמישהי תשחק מילה בת שתי אותיות. משחקי מילים מבוססי תורות לימדו דור שלם שלשחק עם חברים זה לחכות לחברים — זמן אמת מתקן את הטעות.',
+        readTime: '9 דקות קריאה',
+        category: 'דעה',
+      },
       '10-surprising-benefits-word-games': {
         title: '10 יתרונות מפתיעים של משחקי מילים יומיים',
         excerpt: 'סיבות מבוססות מדע למה משחקי מילים הם הרבה יותר מבידור - אימון מוחי חיוני שיכול להאט הזדקנות ב-5 שנים.',
@@ -455,6 +473,12 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Tips, strategier och insikter för ordspelsentusiaster',
     footerText: 'Gå med tusentals ordspelsentusiaster som förbättrar sina färdigheter med LexiClash. Spela solo, tävla med vänner eller utmana dagliga pussel på hebreiska, engelska, svenska och japanska.',
     posts: {
+      'death-of-turn-based-word-games': {
+        title: 'Jag väntade 11 dagar på att någon skulle lägga "ZOO". Sen raderade jag appen.',
+        excerpt: 'Jag väntade elva dagar på att Karin skulle lägga ZOO. Sen raderade jag appen – och upptäckte vad ordspel i realtid faktiskt kan göra med en spelkväll.',
+        readTime: '9 min läsning',
+        category: 'Krönika',
+      },
       '10-surprising-benefits-word-games': {
         title: '10 överraskande fördelar med att spela ordspel dagligen',
         excerpt: 'Vetenskapligt bevisade skäl till varför ordspel är mer än bara skoj—de är viktig hjärnträning som kan bromsa åldrandet med upp till 5 år.',
@@ -588,6 +612,12 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'ワードゲーム愛好家のためのヒント、戦略、洞察',
     footerText: 'LexiClashでスキルを向上させている何千人ものワードゲーム愛好家に参加しましょう。ソロプレイ、友達との対戦、ヘブライ語、英語、スウェーデン語、日本語でのデイリーチャレンジに挑戦しましょう。',
     posts: {
+      'death-of-turn-based-word-games': {
+        title: '11日待って届いた一手は「QI」。私はアプリを消した',
+        excerpt: '通知が届いたのは11日後だった。「佳代子さんが『QI』をプレイしました」——その瞬間、私はアプリを消すことを決めた。ターンベース言葉ゲームの静かな終わりと、リアルタイム対戦が教えてくれたこと。',
+        readTime: '9分で読める',
+        category: 'コラム',
+      },
       '10-surprising-benefits-word-games': {
         title: '毎日のワードゲームで得られる10の驚くべきメリット',
         excerpt: 'ワードゲームが単なる娯楽以上である科学的理由—脳の老化を最大5年遅らせる必須の脳トレーニング。',
@@ -715,6 +745,12 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Consejos, estrategias e ideas para entusiastas de juegos de palabras',
     footerText: 'Únete a miles de entusiastas de juegos de palabras que mejoran sus habilidades con LexiClash. Juega solo, compite con amigos o desafía puzzles diarios en hebreo, inglés, sueco, japonés y español.',
     posts: {
+      'death-of-turn-based-word-games': {
+        title: 'Esperé 11 días a que alguien jugara "FE". Después desinstalé la aplicación.',
+        excerpt: 'Esperé once días a que mi amiga jugara una palabra de dos letras. Ese día entendí por qué las partidas por turnos mueren en silencio, y por qué el tiempo real las está reemplazando.',
+        readTime: '9 min de lectura',
+        category: 'Opinión',
+      },
       '10-surprising-benefits-word-games': {
         title: '10 Beneficios Sorprendentes de Jugar Juegos de Palabras',
         excerpt: 'Razones respaldadas por la ciencia de por qué los juegos de palabras son entrenamiento cerebral esencial.',

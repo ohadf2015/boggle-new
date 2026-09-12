@@ -431,6 +431,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'spelling-bee-science-vocabulary',
     'multiplayer-strategy-guide',
     'leaderboard-elo-explained',
+    'death-of-turn-based-word-games',
   ];
   // English-only articles (metaTitles has 'en' only → hasTranslation=false →
   // every non-en locale is noindexed). Advertising noindexed locale URLs in
