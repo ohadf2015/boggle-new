@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, Shield, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -27,7 +28,10 @@ import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
 import { MpModeBreakdown } from '@/components/admin/overview/MpModeBreakdown';
 import { InsightsPanel } from '@/components/admin/overview/InsightsPanel';
-import { DailyActivityChart } from '@/components/admin/overview/DailyActivityChart';
+const DailyActivityChart = dynamic(
+  () => import('@/components/admin/overview/DailyActivityChart').then((m) => m.DailyActivityChart),
+  { ssr: false }
+);
 import { DeploymentInfoPanel } from '@/components/admin/overview/DeploymentInfoPanel';
 
 export default function AdminPageClient() {
