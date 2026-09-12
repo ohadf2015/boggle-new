@@ -75,7 +75,7 @@ export function ClassmatesList({
   // ============================================
 
   return (
-    <div className="border-2 border-neo-black rounded-neo bg-neo-navy/30 p-3 space-y-2">
+    <div className="border-2 border-neo-cream/40 rounded-neo bg-neo-navy/30 p-3 space-y-2">
       {displayClassmates.map((classmate) => {
         // Extract profile data (Supabase returns array, normalize)
         const profile = Array.isArray(classmate.profiles)
@@ -91,7 +91,7 @@ export function ClassmatesList({
         return (
           <div
             key={classmate.id}
-            className="flex items-center justify-between p-3 rounded-neo bg-neo-navy/50 border-2 border-neo-black/30"
+            className="flex items-center justify-between p-3 rounded-neo bg-neo-navy/50 border-2 border-neo-cream/40"
           >
             {/* Avatar + Name */}
             <div className="flex items-center gap-3">

@@ -132,7 +132,7 @@ export function StudentViewPreview({
         aria-modal="true"
         aria-labelledby={TITLE_ID}
         onClick={(e) => e.stopPropagation()}
-        className="relative flex max-h-[94vh] w-full max-w-3xl flex-col rounded-neo border-3 border-neo-black bg-neo-navy shadow-hard-lg"
+        className="relative flex max-h-[94vh] w-full max-w-3xl flex-col rounded-neo border-3 border-neo-cream/40 bg-neo-navy shadow-hard-lg"
       >
         {/* Header */}
         <div className="flex items-start gap-3 border-b-3 border-neo-black p-4 pe-14">
@@ -146,7 +146,7 @@ export function StudentViewPreview({
             type="button"
             onClick={onClose}
             aria-label={t('education.studentPreview.close')}
-            className="absolute end-3 top-3 flex h-9 w-9 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+            className="absolute end-3 top-3 flex h-9 w-9 items-center justify-center rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light text-neo-cream shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
           >
             <X size={18} strokeWidth={3} aria-hidden="true" />
           </button>
@@ -278,7 +278,7 @@ export function StudentViewPreview({
                     </p>
                   </div>
 
-                  <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-3">
+                  <div className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-3">
                     <h3 className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream">
                       {t('education.studentPreview.skipped.title')}
                     </h3>
@@ -314,7 +314,7 @@ export function StudentViewPreview({
             type="button"
             onClick={goBack}
             disabled={stepIndex === 0}
-            className="inline-flex items-center gap-1 rounded-neo border-3 border-neo-black bg-neo-navy-light px-4 py-2 font-bold text-neo-white shadow-hard-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+            className="inline-flex items-center gap-1 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light px-4 py-2 font-bold text-neo-white shadow-hard-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           >
             <ChevronLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             {t('education.studentPreview.back')}

@@ -26,13 +26,18 @@ describe('NeoPanel', () => {
   });
 
   describe('tone', () => {
-    it('navy → bg-neo-navy', () => {
+    it('navy → bg-neo-navy with a VISIBLE border (contrast gate)', () => {
       const { container } = render(<NeoPanel tone="navy">x</NeoPanel>);
-      expect(container.firstChild as HTMLElement).toHaveClass('bg-neo-navy');
+      const el = container.firstChild as HTMLElement;
+      expect(el).toHaveClass('bg-neo-navy');
+      // black-on-navy measures 1.23:1 and fails the 3:1 non-text edge gate.
+      // cream/40 on navy measures 3.74:1.
+      expect(el.className.split(/\s+/)).not.toContain('border-neo-black');
+      expect(el).toHaveClass('border-neo-cream/40');
     });
-    it('cream → bg-neo-cream', () => {
+    it('cream → bg-neo-cream, black border (black on cream passes)', () => {
       const { container } = render(<NeoPanel tone="cream">x</NeoPanel>);
-      expect(container.firstChild as HTMLElement).toHaveClass('bg-neo-cream');
+      expect(container.firstChild as HTMLElement).toHaveClass('bg-neo-cream', 'border-neo-black');
     });
   });
 
@@ -90,7 +95,7 @@ describe('NeoPanel', () => {
       // child element type preserved (section, not div)
       expect(el.tagName).toBe('SECTION');
       // panel variant classes merged onto the child
-      expect(el).toHaveClass('border-3', 'border-neo-black', 'bg-neo-navy', 'shadow-hard-lg');
+      expect(el).toHaveClass('border-3', 'border-neo-cream/40', 'bg-neo-navy', 'shadow-hard-lg');
       // child's own className preserved
       expect(el).toHaveClass('p-5', 'max-w-[280px]');
     });
@@ -104,7 +109,7 @@ describe('NeoPanel', () => {
       );
       const got = new Set((container.firstChild as HTMLElement).className.split(/\s+/));
       [
-        'bg-neo-navy', 'border-3', 'border-neo-black', 'rounded-neo', 'shadow-hard-lg',
+        'bg-neo-navy', 'border-3', 'border-neo-cream/40', 'rounded-neo', 'shadow-hard-lg',
         'p-5', 'max-w-[280px]', 'flex', 'flex-col', 'items-center', 'gap-3',
       ].forEach((c) => expect(got.has(c)).toBe(true));
     });
@@ -127,7 +132,7 @@ describe('NeoPanel', () => {
       <NeoPanel tone="navy" shadow="md" className="p-4">x</NeoPanel>
     );
     const got = new Set((container.firstChild as HTMLElement).className.split(/\s+/));
-    ['bg-neo-navy', 'border-3', 'border-neo-black', 'rounded-neo', 'shadow-hard', 'p-4'].forEach(
+    ['bg-neo-navy', 'border-3', 'border-neo-cream/40', 'rounded-neo', 'shadow-hard', 'p-4'].forEach(
       (c) => expect(got.has(c)).toBe(true)
     );
   });

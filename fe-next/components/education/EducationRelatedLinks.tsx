@@ -81,7 +81,7 @@ export function EducationRelatedLinks({
           <Link
             key={r.href}
             href={`/${locale}${r.href}`}
-            className={`rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy`}
+            className={`rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-2 ${ACCENT_TEXT[r.accent]} transition-colors hover:bg-neo-navy`}
           >
             {r.label}
           </Link>

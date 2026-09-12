@@ -121,7 +121,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
             {hero.secondaryCta && (
               <Link
                 href={`/${locale}${hero.secondaryCta.href}`}
-                className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
+                className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white"
               >
                 <span className="block text-base sm:text-lg">{hero.secondaryCta.label}</span>
                 {hero.secondaryCta.sublabel && (
@@ -150,7 +150,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
         {answer && (
           <section
             data-answer
-            className={`mt-16 rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-lg sm:p-8`}
+            className={`mt-16 rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8`}
           >
             <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
               {answer.question}
@@ -181,7 +181,7 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
               {content.faqs.map((faq) => (
                 <details
                   key={faq.q}
-                  className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard open:shadow-hard-lg"
+                  className="group rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light shadow-hard open:shadow-hard-lg"
                 >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                     <span>{faq.q}</span>

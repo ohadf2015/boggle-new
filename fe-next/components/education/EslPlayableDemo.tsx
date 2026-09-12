@@ -67,7 +67,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
     <div
       dir={dir}
       data-testid="esl-playable-demo"
-      className="mt-8 rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard sm:p-6"
+      className="mt-8 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard sm:p-6"
     >
       <div className="flex flex-wrap gap-2">
         {CEFR_LEVELS.map((lv) => (
@@ -91,7 +91,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
         {list.map((w) => (
           <li
             key={w}
-            className="rounded-neo border-2 border-neo-black bg-neo-navy px-2.5 py-1 text-sm font-bold text-neo-white"
+            className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2.5 py-1 text-sm font-bold text-neo-white"
           >
             {w}
           </li>
@@ -139,7 +139,7 @@ export function EslPlayableDemo({ locale }: { locale: string }) {
             <button
               type="button"
               onClick={() => setPath([])}
-              className="rounded-neo border-2 border-neo-black bg-neo-navy px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-white"
+              className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-4 py-2 font-neo-display text-xs font-black uppercase text-neo-white"
             >
               {copy.clear}
             </button>

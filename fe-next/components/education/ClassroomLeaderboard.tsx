@@ -264,7 +264,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
         )}
 
         {/* Rank Number */}
-        <div className="shrink-0 w-8 h-8 rounded-neo border-neo bg-neo-navy border-neo-black flex items-center justify-center">
+        <div className="shrink-0 w-8 h-8 rounded-neo border-neo bg-neo-navy border-neo-cream/40 flex items-center justify-center">
           <span className="font-neo-display font-black text-sm text-neo-white">
             {rank}
           </span>
@@ -280,7 +280,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
             className="w-12 h-12 rounded-full border-neo border-neo-black"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-neo-navy border-neo border-neo-black flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-neo-navy border-neo border-neo-cream/40 flex items-center justify-center">
             <User className="w-4 h-4" />
           </div>
         )}

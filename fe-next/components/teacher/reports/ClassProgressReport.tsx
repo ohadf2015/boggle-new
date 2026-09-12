@@ -230,7 +230,7 @@ export function ClassProgressReport({
             {data.topPerformers.map((performer, index) => (
               <div
                 key={performer.studentId}
-                className="flex items-center gap-4 p-3 bg-neo-lime/10 border-neo border-black rounded-neo"
+                className="flex items-center gap-4 p-3 bg-neo-lime/10 border-neo border-neo-cream/40 rounded-neo"
               >
                 <span className="text-xl font-bold text-neo-lime w-8">
                   #{index + 1}

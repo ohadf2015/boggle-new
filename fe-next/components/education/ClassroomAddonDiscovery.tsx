@@ -20,6 +20,7 @@ import {
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
+import { NeoNote } from '@/components/ui/note';
 
 export interface ClassroomAddonDiscoveryProps {
   locale: string;
@@ -107,7 +108,7 @@ export function ClassroomAddonDiscovery({
 
   return (
     <div
-      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard"
+      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light shadow-hard"
       data-testid="classroom-addon-discovery"
       data-in-classroom={String(inClassroom)}
     >
@@ -131,7 +132,7 @@ export function ClassroomAddonDiscovery({
           value={lesson}
           onChange={(e) => setLesson(e.target.value)}
           data-testid="classroom-addon-lesson"
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-neo-body text-sm"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
           autoComplete="off"
         />
       </label>
@@ -145,7 +146,7 @@ export function ClassroomAddonDiscovery({
           onChange={(e) => setMissedText(e.target.value)}
           data-testid="classroom-addon-missed-words"
           rows={3}
-          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-neo-body text-sm"
+          className="mt-1 w-full px-3 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body text-sm"
         />
       </label>
 
@@ -169,12 +170,13 @@ export function ClassroomAddonDiscovery({
           {t('education.classroomAddon.postToStream')}
         </a>
       ) : (
-        <p
+        <NeoNote
+          tone="alert"
           data-testid="classroom-addon-need-words"
-          className="mt-5 p-3 rounded-neo border border-neo-pink/40 bg-neo-pink/10 text-neo-white font-neo-body text-sm"
+          className="mt-5 text-neo-white font-neo-body text-sm"
         >
           {t('education.classroomAddon.needMissedWords')}
-        </p>
+        </NeoNote>
       )}
 
       {unpluggedHref && (

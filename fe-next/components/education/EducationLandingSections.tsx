@@ -114,7 +114,7 @@ export function EducationSectionRenderer({
           {section.items.map((f) => (
             <li
               key={f.text}
-              className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard"
+              className="flex items-start gap-4 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard"
             >
               <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black ${a.fill} ${a.ink} shadow-hard-sm`}>
                 <Icon name={f.icon} className="h-5 w-5" />
@@ -177,7 +177,7 @@ export function EducationSectionRenderer({
           {section.items.map((s, i) => (
             <li
               key={s.step}
-              className="grid gap-3 rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard sm:grid-cols-[auto_1fr_2fr] sm:items-baseline sm:gap-6"
+              className="grid gap-3 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard sm:grid-cols-[auto_1fr_2fr] sm:items-baseline sm:gap-6"
             >
               <span className={`inline-grid h-9 w-9 place-items-center rounded-neo border-3 border-neo-black ${a.fill} ${a.ink} font-neo-display text-sm font-black`}>
                 {i + 1}
@@ -208,7 +208,7 @@ export function EducationSectionRenderer({
                 {g.words.map((w) => (
                   <li
                     key={w}
-                    className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm font-bold text-neo-white shadow-hard-sm"
+                    className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm font-bold text-neo-white shadow-hard-sm"
                   >
                     {w}
                   </li>
@@ -235,7 +235,7 @@ export function EducationSectionRenderer({
 
   if (section.kind === 'note') {
     return (
-      <section className="mt-16 rounded-neo border-3 border-neo-black bg-neo-navy-light p-6 shadow-hard sm:p-8">
+      <section className="mt-16 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard sm:p-8">
         <h2 className={`font-neo-display text-xl font-black uppercase sm:text-2xl ${a.text}`}>{section.heading}</h2>
         <p className="mt-3 max-w-[68ch] text-sm leading-relaxed text-neo-white/75 sm:text-base">{section.body}</p>
         <a

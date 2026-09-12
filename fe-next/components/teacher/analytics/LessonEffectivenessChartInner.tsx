@@ -79,7 +79,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
 
   if (error) {
     return (
-      <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
+      <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
         <CardContent className="py-12 text-center">
           <p className="text-red-400">{t('education.analytics.error')}</p>
         </CardContent>
@@ -89,7 +89,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
 
   if (effectiveness.length === 0) {
     return (
-      <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
+      <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
         <CardContent className="py-12 text-center">
           <TrendingUp className="w-12 h-12 text-neo-white mx-auto mb-4" />
           <h3 className="text-xl font-neo-display text-neo-white mb-2">
@@ -102,7 +102,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
   }
 
   return (
-    <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80">
+    <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80">
       <CardHeader>
         <CardTitle className="text-2xl font-neo-display text-neo-white">
           {t('education.analytics.lessonEffectiveness')}

@@ -167,7 +167,7 @@ export function ForSchoolsPackages({
           <p className="mt-3 text-neo-gray-200">{leadIntro}</p>
         </div>
         <div className="lg:col-span-7">
-          <div className="rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-xl">
+          <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-xl">
             <SchoolLeadForm plan={plan} />
           </div>
         </div>

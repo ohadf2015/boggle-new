@@ -111,7 +111,7 @@ export default function CompletionTracker({
             {completionPercentage}%
           </span>
         </div>
-        <div className="w-full h-3 bg-neo-black/30 rounded-full overflow-hidden border border-neo-black">
+        <div className="w-full h-3 bg-neo-black/30 rounded-full overflow-hidden border border-neo-cream/40">
           <div
             className="h-full bg-neo-cyan transition-all duration-300"
             style={{ width: `${completionPercentage}%` }}
@@ -127,7 +127,7 @@ export default function CompletionTracker({
         {sortedCompletions.map((completion) => (
           <div
             key={completion.id}
-            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/20 border border-neo-black"
+            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/20 border border-neo-cream/40"
           >
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-green-500" />
@@ -151,7 +151,7 @@ export default function CompletionTracker({
         {nonCompletingStudents.map((student) => (
           <div
             key={`pending-${student.student_id}`}
-            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-black/30"
+            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-cream/40"
           >
             <div className="flex items-center gap-3">
               <Circle className="w-5 h-5 text-neo-white" />
@@ -167,7 +167,7 @@ export default function CompletionTracker({
         {Array.from({ length: anonymousNotCompleted }).map((_, i) => (
           <div
             key={`pending-${i}`}
-            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-black/30"
+            className="flex items-center justify-between p-3 rounded-neo bg-neo-black/10 border border-neo-cream/40"
           >
             <div className="flex items-center gap-3">
               <Circle className="w-5 h-5 text-neo-white" />
@@ -185,7 +185,7 @@ export default function CompletionTracker({
           <button
             type="button"
             onClick={() => setShowStrugglingAreas(!showStrugglingAreas)}
-            className="w-full flex items-center justify-between p-3 rounded-neo bg-neo-orange/10 border border-neo-orange/30 hover:bg-neo-orange/20 transition-colors"
+            className="w-full flex items-center justify-between p-3 rounded-neo bg-neo-orange/10 border border-neo-orange/70 hover:bg-neo-orange/20 transition-colors"
           >
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-neo-orange" />

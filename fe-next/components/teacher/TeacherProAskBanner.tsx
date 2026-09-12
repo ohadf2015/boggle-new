@@ -38,7 +38,7 @@ export function TeacherProAskBanner() {
         </div>
         <Link
           href={`/${language}/pricing`}
-          className="inline-flex items-center justify-center rounded-neo bg-neo-navy text-neo-lime font-neo-display font-black text-sm px-5 py-3 border-neo border-black shadow-hard hover:shadow-hard-lg whitespace-nowrap"
+          className="inline-flex items-center justify-center rounded-neo bg-neo-navy text-neo-lime font-neo-display font-black text-sm px-5 py-3 border-neo border-neo-cream/40 shadow-hard hover:shadow-hard-lg whitespace-nowrap"
           onClick={() =>
             trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner' })
           }

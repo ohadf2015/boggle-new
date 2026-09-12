@@ -60,7 +60,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
                 className="w-8 h-8 rounded-full border-neo border-neo-black"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-neo-cyan/20 border-neo border-neo-black flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-neo-cyan/20 border-neo border-neo-cream/60 flex items-center justify-center">
                 <span className="text-neo-white font-neo-body text-sm">
                   {student.displayName[0].toUpperCase()}
                 </span>
@@ -154,7 +154,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
 
   if (error) {
     return (
-      <div className="bg-neo-orange/20 border-neo border-neo-black shadow-hard p-4 rounded-neo">
+      <div className="bg-neo-orange/20 border-neo border-neo-cream/40 shadow-hard p-4 rounded-neo">
         <p className="text-neo-white font-neo-body">{error.message}</p>
       </div>
     );
@@ -162,7 +162,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
 
   if (students.length === 0) {
     return (
-      <div className="bg-neo-navy/80 border-neo border-neo-black shadow-hard p-8 rounded-neo text-center">
+      <div className="bg-neo-navy/80 border-neo border-neo-cream/40 shadow-hard p-8 rounded-neo text-center">
         <p className="text-neo-white font-neo-body text-lg mb-2">
           {t('education.analytics.noStudents')}
         </p>
@@ -174,7 +174,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
   }
 
   return (
-    <div className="bg-neo-navy border-neo border-neo-black shadow-hard rounded-neo overflow-hidden">
+    <div className="bg-neo-navy border-neo border-neo-cream/40 shadow-hard rounded-neo overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

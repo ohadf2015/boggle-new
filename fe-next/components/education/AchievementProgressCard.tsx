@@ -188,7 +188,7 @@ export default function AchievementProgressCard({
             <div className="mt-3">
               {/* Progress Bar */}
               <div
-                className="h-3 bg-neo-navy-light border-neo border-neo-black rounded-sm overflow-hidden"
+                className="h-3 bg-neo-navy-light border-neo border-neo-cream/40 rounded-sm overflow-hidden"
                 role="progressbar"
                 aria-valuenow={achievement.progressValue}
                 aria-valuemax={achievement.nextThreshold}

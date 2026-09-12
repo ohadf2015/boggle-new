@@ -187,7 +187,7 @@ export default function AssignmentCreator({
               <select
                 value={selectedLessonId}
                 onChange={(e) => setSelectedLessonId(e.target.value)}
-                className="w-full p-3 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-neo-body"
+                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body"
                 disabled={isLoadingLessons}
               >
                 <option value="">{t('teacher.assignment.selectLesson')}</option>
@@ -273,7 +273,7 @@ export default function AssignmentCreator({
               <button
                 type="button"
                 onClick={() => setShowDatePicker(!showDatePicker)}
-                className="w-full p-3 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-neo-body flex items-center justify-between"
+                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body flex items-center justify-between"
               >
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
@@ -282,7 +282,7 @@ export default function AssignmentCreator({
                 <ChevronDown className={cn('w-5 h-5 transition-transform', showDatePicker && 'rotate-180')} />
               </button>
               {showDatePicker && (
-                <div className="mt-2 p-4 bg-neo-navy border-neo border-neo-black rounded-neo shadow-hard space-y-3">
+                <div className="mt-2 p-4 bg-neo-navy border-neo border-neo-cream/40 rounded-neo shadow-hard space-y-3">
                   <div className="text-sm font-neo-body text-neo-white mb-2">
                     {t('teacher.assignment.quickSelect')}
                   </div>
@@ -321,7 +321,7 @@ export default function AssignmentCreator({
                       value={dueDate}
                       onChange={(e) => setDueDate(e.target.value)}
                       aria-label={t('teacher.assignment.customDate')}
-                      className="w-full p-2 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white text-sm"
+                      className="w-full p-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white text-sm"
                     />
                   </div>
                 </div>
@@ -338,7 +338,7 @@ export default function AssignmentCreator({
                 onChange={(e) => setInstructions(e.target.value)}
                 rows={3}
                 aria-label={t('teacher.assignment.instructionsLabel')}
-                className="w-full p-3 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-neo-body resize-none"
+                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body resize-none"
                 placeholder={t('teacher.assignment.instructionsPlaceholder')}
               />
             </div>

@@ -9,8 +9,30 @@
 - RTL: Shadows auto-flip for Hebrew (`-2px 2px 0px`)
 
 **Borders:**
-- Use `border-neo` (2px) or `border-neo-thick` (3px) with black
+- Use `border-neo` (2px) or `border-neo-thick` (3px)
 - Border radius: `rounded-neo` (8px), modern soft rounding
+- **Border colour is a function of the FILL, not a habit.** Black is correct on
+  cream/lime/cyan/yellow (~20:1); on navy it measures **1.23:1** and the border
+  effectively disappears. On any `bg-neo-navy*` ground use `border-neo-cream/40`
+  (3.74:1) or a solid accent. The 3:1 floor is WCAG 1.4.11 (non-text contrast).
+- Translucent accent borders mostly FAIL: `pink/40` = 1.69:1, `red/40` = 1.72:1,
+  `purple/60` = 2.18:1. Lime/cyan/yellow need ≥45%; cream/white need ≥40%.
+  When in doubt use a **solid** accent border — it matches the brand's
+  "solid borders" rule and clears the gate on every tone (min 4.35:1).
+- Guarded by `components/education/__tests__/educationBorderContrast.test.ts`,
+  which computes real WCAG ratios from the shipped hex values across
+  `components/education`, `components/teacher` and `app/[locale]/education`.
+
+**Box shells — reuse, don't retype:**
+- `NeoPanel` (`components/ui/panel.tsx`) — the card SHELL. `tone` carries the
+  bg AND its matching border colour, so the contrast rule above is impossible
+  to get wrong. `asChild` makes a framer-motion element BE the panel.
+- `NeoNote` (`components/ui/note.tsx`) — a flat tinted tile INSIDE a panel
+  (status line, tip, warning, redacted block). Solid accent border + `/10` fill,
+  no shadow. Tones: `ok` / `alert` / `info` / `danger` / `muted`, plus `dashed`.
+- `Card` (`components/ui/card.tsx`) — heavy full-height mode/feature tiles only.
+- Every variant map holds a **complete literal class string**. Tailwind v4 only
+  generates utilities it can see verbatim, so never build one by interpolation.
 
 **Color Palette (4 families):**
 - Lime (Primary): `neo-lime` (#BFFF00), `neo-lime-light`, `neo-lime-muted`, `neo-lime-dark`

@@ -49,7 +49,7 @@ export default function SubscriptionStatusCard() {
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center min-h-32">
+      <div className="p-6 bg-neo-navy-light border-3 border-neo-cream/40 rounded-neo shadow-hard flex items-center justify-center min-h-32">
         <Loader size="sm" text={t('common.loading')} />
       </div>
     );

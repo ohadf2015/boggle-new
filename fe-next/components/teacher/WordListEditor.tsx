@@ -294,7 +294,7 @@ export default function WordListEditor({
               return (
                 <div
                   key={`word-${idx}-${word.word}`}
-                  className="bg-neo-navy/50 p-2 rounded border border-neo-black"
+                  className="bg-neo-navy/50 p-2 rounded border border-neo-cream/40"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-1 min-w-0">

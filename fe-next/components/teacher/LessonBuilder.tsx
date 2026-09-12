@@ -259,7 +259,7 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
       {/* Lessons Grid */}
       {lessons.length === 0 ? (
         <div className={isCreatingFromPack ? 'opacity-50 pointer-events-none' : ''}>
-          <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50 mb-6">
+          <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50 mb-6">
             <CardContent className="p-6">
               <StarterPacksSection onSelectPack={handleSelectStarterPack} />
             </CardContent>
@@ -274,7 +274,7 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
               <p className="text-neo-white mt-2">{t('teacher.classroom.settingUp')}</p>
             </div>
           )}
-          <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
+          <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
             <CardContent className="py-12 text-center">
               <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
                 {t('teacher.lesson.noLessons')}
@@ -298,7 +298,7 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
             return (
               <Card
                 key={lesson.id}
-                className="border-neo border-neo-black shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all flex flex-col"
+                className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80 hover:shadow-hard-lg transition-all flex flex-col"
               >
                 <CardHeader className="pb-3">
                   <CardTitle className="text-xl font-neo-display text-neo-white text-balance">

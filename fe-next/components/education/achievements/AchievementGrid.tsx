@@ -183,7 +183,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                         <span>{tierProgress.currentTier}</span>
                       </div>
                     ) : (
-                      <div className="px-3 py-1 rounded-full border-neo border-neo-black bg-neo-navy-light text-neo-white font-black text-xs">
+                      <div className="px-3 py-1 rounded-full border-neo border-neo-cream/40 bg-neo-navy-light text-neo-white font-black text-xs">
                         {t('education.achievements.locked')}
                       </div>
                     )}
@@ -198,7 +198,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                       </p>
 
                       {/* Progress bar */}
-                      <div className="w-full h-2 bg-neo-navy/50 rounded-full overflow-hidden border border-neo-black">
+                      <div className="w-full h-2 bg-neo-navy/50 rounded-full overflow-hidden border border-neo-cream/40">
                         <AdaptiveMotion.div
                           className="h-full rounded-full"
                           initial={{ width: 0 }}

@@ -8,6 +8,7 @@
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { ClassGapReteachLiveCta } from '@/components/education/ClassGapReteachLiveCta';
+import { NeoNote } from '@/components/ui/note';
 import {
   buildClassGapOgImageUrl,
   interpClassGapTemplate,
@@ -119,7 +120,7 @@ export default async function ClassGapPage(props: PageProps) {
       className="min-h-dvh bg-neo-navy flex items-center justify-center px-4 py-10"
       data-testid="class-gap-page"
     >
-      <article className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard">
+      <article className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light shadow-hard">
         <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">{eyebrow}</p>
         <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight">{lesson}</h1>
         {payload.teacher ? (
@@ -128,23 +129,23 @@ export default async function ClassGapPage(props: PageProps) {
         <p className="text-neo-lime font-bold mt-4">{coverage}</p>
 
         {payload.missedWords.length > 0 ? (
-          <div className="mt-4 p-3 rounded-neo border border-neo-pink/40 bg-neo-pink/10">
+          <NeoNote tone="alert" className="mt-4">
             <p className="text-neo-white font-bold text-sm mb-2">{practiceHome}</p>
             <ul className="flex flex-wrap gap-2">
               {payload.missedWords.map((word) => (
                 <li
                   key={word}
-                  className="px-3 py-1.5 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-bold text-sm"
+                  className="px-3 py-1.5 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-bold text-sm"
                 >
                   {word}
                 </li>
               ))}
             </ul>
-          </div>
+          </NeoNote>
         ) : (
-          <p className="mt-4 p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">
+          <NeoNote tone="ok" className="mt-4 text-neo-white font-neo-body text-sm">
             {allFound}
-          </p>
+          </NeoNote>
         )}
 
         <ClassGapReteachLiveCta

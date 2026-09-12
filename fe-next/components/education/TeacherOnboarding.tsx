@@ -32,7 +32,7 @@ interface InfographicStep {
 /** Mini phone frame showing a join code (step 2) */
 function PhoneCodeVisual() {
   return (
-    <div className="mx-auto w-14 rounded-neo border-2 border-neo-black bg-neo-navy-light p-1.5 shadow-hard-sm">
+    <div className="mx-auto w-14 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1.5 shadow-hard-sm">
       <div className="mx-auto mb-1 h-1 w-5 rounded-full bg-neo-white/30" />
       <div className="rounded-neo-sm border border-neo-black bg-neo-lime px-1 py-1.5 text-center font-mono text-[10px] font-black tracking-widest text-neo-black">
         ABC123

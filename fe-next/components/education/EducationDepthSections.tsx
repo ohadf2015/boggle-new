@@ -35,7 +35,7 @@ export function EducationDepthSections({ sections }: { sections: readonly DepthS
           </h2>
           <p
             data-answer
-            className="max-w-3xl rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 text-base leading-relaxed text-neo-gray-100 shadow-hard sm:text-lg"
+            className="max-w-3xl rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 text-base leading-relaxed text-neo-gray-100 shadow-hard sm:text-lg"
           >
             {section.answer}
           </p>
@@ -43,7 +43,7 @@ export function EducationDepthSections({ sections }: { sections: readonly DepthS
             {section.points.map((point) => (
               <li
                 key={point}
-                className="flex items-start gap-3 rounded-neo border-2 border-neo-black bg-neo-navy-light p-4 text-sm text-neo-gray-200 shadow-hard-sm sm:text-base"
+                className="flex items-start gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 text-sm text-neo-gray-200 shadow-hard-sm sm:text-base"
               >
                 <span aria-hidden="true" className="text-neo-lime">
                   ▸

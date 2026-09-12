@@ -121,7 +121,7 @@ export default async function Page({ params }: PageProps) {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-xl">
+            <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-xl">
               <h2 className="font-neo-display text-xl font-black text-neo-lime">{c.freeForeverTitle}</h2>
               <p className="mt-3 text-neo-gray-200">{c.freeForeverBody}</p>
             </div>

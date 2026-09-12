@@ -369,7 +369,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                             : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard'
                         )}
                       >
-                        <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
+                        <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-cream/60 text-neo-black">
                           <BookOpen className="w-4 h-4" aria-hidden="true" />
                         </span>
                         <span>{t('education.header.studentDashboard')}</span>
@@ -402,7 +402,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                         'shadow-hard-sm hover:shadow-hard'
                       )}
                     >
-                      <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-cream/60 text-neo-black">
                         <Home className="w-4 h-4" aria-hidden="true" />
                       </span>
                       <span>{t('common.backToHome')}</span>
@@ -428,7 +428,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                             'shadow-hard-sm hover:shadow-hard'
                           )}
                         >
-                          <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-black text-neo-black">
+                          <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink/50 border-3 border-neo-cream/60 text-neo-black">
                             <LogOut className="w-4 h-4" aria-hidden="true" />
                           </span>
                           <span>{t('auth.signOut')}</span>

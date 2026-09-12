@@ -77,7 +77,7 @@ export function PageClient() {
           )}
           <Link
             href={`/${language}/teacher`}
-            className="mt-4 inline-block rounded-neo border-neo border-black bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
+            className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
           >
             {t('education.access.go_to_teacher')}
           </Link>
@@ -114,7 +114,7 @@ export function PageClient() {
       )}
 
       {showPitch && (
-        <div className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg sm:p-7">
+        <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-7">
           <AccessRequestGate />
         </div>
       )}
@@ -131,7 +131,7 @@ export function PageClient() {
             <p className="mt-2">{t('education.access.status_unknown_body')}</p>
             <Link
               href={`/${language}/teacher`}
-              className="mt-4 inline-block rounded-neo border-neo border-black bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
+              className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
             >
               {t('education.access.go_to_teacher')}
             </Link>
@@ -211,7 +211,7 @@ export function PageClient() {
         <div ref={belowRef} className="mt-16">
           <ol
             data-access-reveal
-            className="grid divide-y-2 divide-black overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:divide-y-0"
+            className="grid divide-y-2 divide-black overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:divide-y-0"
           >
             {(['step1', 'step2', 'step3'] as const).map((k, i) => (
               <li key={k} className="p-5">

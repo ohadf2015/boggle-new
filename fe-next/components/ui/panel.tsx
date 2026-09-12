@@ -8,7 +8,7 @@ import { cn } from "../../lib/utils";
  * NeoPanel — lightweight neo-brutalist box shell.
  *
  * Consolidates the most hand-rolled pattern in the app:
- * `border-3 border-neo-black rounded-neo` + a tone bg + `shadow-hard*`
+ * `border-3 <tone border> rounded-neo` + a tone bg + `shadow-hard*`
  * (240+ inline copies across 143 files as of 2026-06-16).
  *
  * Boundary (do NOT blur):
@@ -20,12 +20,15 @@ import { cn } from "../../lib/utils";
  *
  * Uses `shadow-hard-*` utilities, which auto-flip for RTL (Hebrew).
  */
-const panelVariants = cva("border-3 border-neo-black", {
+const panelVariants = cva("border-3", {
   variants: {
+    // Border colour lives with the tone, not the base: black-on-navy measures
+    // 1.23:1 and fails the 3:1 non-text edge gate (the border is invisible).
+    // cream/40 on navy measures 3.74:1; black on cream measures ~20:1.
     tone: {
-      none: "",
-      navy: "bg-neo-navy",
-      cream: "bg-neo-cream",
+      none: "border-neo-black",
+      navy: "bg-neo-navy border-neo-cream/40",
+      cream: "bg-neo-cream border-neo-black",
     },
     shadow: {
       none: "",

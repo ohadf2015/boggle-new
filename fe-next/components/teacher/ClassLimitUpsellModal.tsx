@@ -58,7 +58,7 @@ export default function ClassLimitUpsellModal({
           </div>
 
           <div className="p-6 space-y-4">
-            <div className="bg-neo-pink/20 border-2 border-black rounded-neo p-4">
+            <div className="bg-neo-pink/20 border-2 border-neo-cream/40 rounded-neo p-4">
               <div className="flex items-center gap-3 mb-2">
                 <Zap className="w-5 h-5 text-black flex-shrink-0" />
                 <p className="font-bold text-black">
@@ -73,7 +73,7 @@ export default function ClassLimitUpsellModal({
               </p>
             </div>
 
-            <div className="bg-neo-lime/20 border-2 border-black rounded-neo p-4">
+            <div className="bg-neo-lime/20 border-2 border-neo-cream/60 rounded-neo p-4">
               <h3 className="font-neo-display font-black text-black mb-2 text-lg">
                 {t('teacher.subscription.proFeatures')}
               </h3>

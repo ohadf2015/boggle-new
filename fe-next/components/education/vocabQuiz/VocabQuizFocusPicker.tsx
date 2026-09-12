@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { focusAvailability } from '@/lib/education/vocabQuizQuestions';
 import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import { NeoNote } from '@/components/ui/note';
 import {
   VOCAB_QUIZ_MIN_QUESTION_COUNT,
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
@@ -163,14 +164,14 @@ export function VocabQuizFocusPicker({
         {/* The one message that matters most with today's lesson data: WHERE to
             add what is missing, not just that it is missing. */}
         {bestSingle === 0 ? (
-          <p className="mt-3 p-3 rounded-neo border border-neo-red/40 bg-neo-red/10 text-neo-white font-neo-body text-sm">
+          <NeoNote tone="danger" className="mt-3 text-neo-white font-neo-body text-sm">
             {t('vocabQuiz.setup.noQuestions')}
-          </p>
+          </NeoNote>
         ) : (
           Object.values(availability).some((n) => n === 0) && (
-            <p className="mt-3 p-3 rounded-neo border border-neo-cyan/30 bg-neo-cyan/10 text-neo-white font-neo-body text-sm">
+            <NeoNote tone="info" className="mt-3 text-neo-white font-neo-body text-sm">
               {t('vocabQuiz.setup.enrichHint')}
-            </p>
+            </NeoNote>
           )
         )}
       </div>

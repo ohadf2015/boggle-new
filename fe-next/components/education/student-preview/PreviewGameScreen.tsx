@@ -73,7 +73,7 @@ export function PreviewGameScreen({
         </p>
       )}
 
-      <div className="mt-auto rounded-neo border-2 border-neo-white/20 bg-neo-navy-light px-3 py-2 text-center text-xs text-neo-white/80">
+      <div className="mt-auto rounded-neo border-2 border-neo-white/40 bg-neo-navy-light px-3 py-2 text-center text-xs text-neo-white/80">
         {t('education.studentPreview.game.minLength', { count: minWordLength })}
       </div>
     </div>

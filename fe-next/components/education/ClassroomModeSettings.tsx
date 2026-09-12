@@ -22,6 +22,7 @@ import {
 import { VocabQuizFocusPicker } from './vocabQuiz/VocabQuizFocusPicker';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { ClassroomGameMode, PracticeFocusSetting } from '@/shared/types/vocabQuiz';
+import { NeoNote } from '@/components/ui/note';
 
 // Translation keys are camelCase but canonical GameMode wire values are kebab.
 const MODE_KEY_MAP: Partial<Record<ClassroomGameMode, string>> = {
@@ -166,12 +167,12 @@ export function ClassroomModeSettings({
           </p>
 
           {huntTargets.length === 0 ? (
-            <p className="p-3 rounded-neo border border-neo-lime/30 bg-neo-lime/10 text-neo-white font-neo-body text-sm">
+            <NeoNote tone="ok" className="text-neo-white font-neo-body text-sm">
               {t('teacher.classroom.huntTarget.noneEligible', {
                 min: HUNT_TARGET_MIN_LENGTH,
                 max: HUNT_TARGET_MAX_LENGTH,
               })}
-            </p>
+            </NeoNote>
           ) : (
             <div
               role="radiogroup"

@@ -91,7 +91,7 @@ export function VocabularyHeatmap({
   return (
     <div className="space-y-4">
       {/* Legend */}
-      <div className="flex items-center gap-4 p-3 bg-neo-navy/30 rounded-neo border-neo border-neo-white/20">
+      <div className="flex items-center gap-4 p-3 bg-neo-navy/30 rounded-neo border-neo border-neo-white/40">
         <span className="text-neo-white font-neo-display text-sm">
           {t('education.analytics.masteryLevels')}:
         </span>
@@ -139,7 +139,7 @@ export function VocabularyHeatmap({
             {heatmapData.words.map(word => (
               <div key={word} className="flex">
                 {/* Word label (sticky) */}
-                <div className="w-32 shrink-0 p-2 border-neo border-neo-white/20 bg-neo-navy flex items-center">
+                <div className="w-32 shrink-0 p-2 border-neo border-neo-white/40 bg-neo-navy flex items-center">
                   <span className="text-neo-white text-sm font-neo-body truncate">
                     {word}
                   </span>

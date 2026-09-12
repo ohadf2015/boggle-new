@@ -32,7 +32,7 @@ export function TeamBattleStandings({ teams, scores }: TeamBattleStandingsProps)
   return (
     <div
       data-testid="team-battle-standings"
-      className="p-5 rounded-neo border-neo border-neo-black bg-neo-navy shadow-hard"
+      className="p-5 rounded-neo border-neo border-neo-cream/40 bg-neo-navy shadow-hard"
     >
       <div className="flex items-center gap-3 mb-4">
         <Trophy className="w-6 h-6 text-neo-yellow shrink-0" />

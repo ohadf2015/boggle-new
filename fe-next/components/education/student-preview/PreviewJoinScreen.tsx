@@ -14,7 +14,7 @@ interface PreviewJoinScreenProps {
 export function PreviewJoinScreen({ t, joinCode }: PreviewJoinScreenProps) {
   return (
     <div className="flex h-full flex-col justify-center">
-      <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard">
+      <div className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard">
         <h3 className="mb-1 font-neo-display text-lg font-black uppercase text-neo-white">
           {t('education.student.join.title')}
         </h3>
@@ -25,7 +25,7 @@ export function PreviewJoinScreen({ t, joinCode }: PreviewJoinScreenProps) {
             <p className="mb-1 text-[11px] font-bold uppercase text-neo-white">
               {t('education.student.join.nameLabel')}
             </p>
-            <div className="h-11 rounded-neo border-2 border-neo-white/20 bg-neo-navy/60 px-3 text-sm font-bold leading-[2.6rem] text-neo-white/50">
+            <div className="h-11 rounded-neo border-2 border-neo-white/40 bg-neo-navy/60 px-3 text-sm font-bold leading-[2.6rem] text-neo-white/50">
               {t('education.student.join.namePlaceholder')}
             </div>
           </div>

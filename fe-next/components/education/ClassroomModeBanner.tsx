@@ -254,7 +254,7 @@ export function ClassroomModeBanner({
             {/* Join info card — host only. The QR, the code and the copy button
                 are how a host FILLS the room; the student already got in. */}
             {isHost && (
-            <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-black bg-neo-cyan/15 shadow-hard-lg">
+            <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-cyan/15 shadow-hard-lg">
               <p className="text-xs sm:text-sm text-neo-white font-neo-body text-center mb-2">
                 {t('education.classroomGame.shareCode')}
               </p>
@@ -300,7 +300,7 @@ export function ClassroomModeBanner({
             )}
 
             {/* Settings + lesson card */}
-            <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-black bg-neo-navy/70 shadow-hard">
+            <div className="p-4 sm:p-5 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy/70 shadow-hard">
               <h4 className="text-neo-white font-bold mb-3 text-sm sm:text-base">
                 {t('education.classroomGame.gameSettings')}
               </h4>
@@ -407,7 +407,7 @@ function SummaryTile({
   testId?: string;
 }) {
   return (
-    <div data-testid={testId} className="p-3 rounded-neo border border-neo-black bg-neo-navy-light/80">
+    <div data-testid={testId} className="p-3 rounded-neo border border-neo-cream/40 bg-neo-navy-light/80">
       <div className="flex items-center gap-1.5 text-neo-white text-[10px] uppercase tracking-wide mb-1">
         {icon}
         <span>{label}</span>

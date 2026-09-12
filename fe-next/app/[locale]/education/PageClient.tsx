@@ -201,7 +201,7 @@ export function PageClient() {
           <ComparisonStrip />
           {/* School / district plan CTA: teachers are highest-intent advocates for school purchases */}
           <div className="mx-auto my-8 max-w-3xl px-4">
-            <aside className="rounded-neo border-neo border-neo-purple/60 bg-neo-navy-light px-6 py-5 shadow-hard">
+            <aside className="rounded-neo border-neo border-neo-purple/90 bg-neo-navy-light px-6 py-5 shadow-hard">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h3 className="text-lg font-neo-display font-black text-neo-purple">

@@ -152,7 +152,7 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
     <section
       data-testid="play-now-launcher"
       aria-labelledby="play-now-heading"
-      className="rounded-neo-lg border-4 border-black bg-neo-navy-light shadow-hard-lg overflow-hidden"
+      className="rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy-light shadow-hard-lg overflow-hidden"
     >
       {/* The loud bit. A lime slab across the top so the eye lands here first
           and nowhere else on the page. */}

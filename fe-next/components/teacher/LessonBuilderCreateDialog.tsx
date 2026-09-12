@@ -123,7 +123,7 @@ export default function LessonBuilderCreateDialog({
             </div>
 
             {/* Template Selector - Collapsible */}
-            <div className="border-neo border-neo-black rounded-neo p-4 bg-neo-navy/50">
+            <div className="border-neo border-neo-cream/40 rounded-neo p-4 bg-neo-navy/50">
               <button type="button"
                 onClick={onToggleTemplateSelector}
                 className="flex items-center justify-between w-full text-start"

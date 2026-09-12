@@ -53,7 +53,7 @@ function AssignmentCard({
   const practiceFocus = readAssignmentFocus(assignment);
 
   return (
-    <div className="rounded-neo border-neo border-neo-black bg-neo-navy/50 overflow-hidden">
+    <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/50 overflow-hidden">
       <button
         onClick={onExpand}
         className="w-full p-4 hover:bg-neo-navy/80 transition-colors"
@@ -233,7 +233,7 @@ export default function AssignmentTrackingPanel({
 
       {/* Assignment List */}
       {filteredAssignments.length === 0 ? (
-        <div className="p-12 text-center bg-neo-black/10 rounded-neo border-neo border-neo-black">
+        <div className="p-12 text-center bg-neo-black/10 rounded-neo border-neo border-neo-cream/40">
           <p className="text-neo-white font-neo-body mb-4">
             {activeTab === 'all'
               ? t('teacher.tracking.noAssignments')

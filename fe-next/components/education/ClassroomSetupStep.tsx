@@ -264,7 +264,7 @@ export function ClassroomSetupStep({
           />
 
           {selectedLessonIds.length > 0 && (
-            <div className="mt-4 p-3 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30">
+            <div className="mt-4 p-3 bg-neo-cyan/10 rounded-neo border border-neo-cyan/50">
               <p className="text-neo-white font-bold text-center">
                 {t('education.classroomGame.words', { count: allPlayableWords.length })}
               </p>
@@ -376,7 +376,7 @@ export function ClassroomSetupStep({
         />
 
         {/* Student preview */}
-        <div className="rounded-neo border-neo border-neo-black bg-neo-navy/50 p-4">
+        <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/50 p-4">
           <button
             type="button"
             onClick={() => setIsPreviewOpen(true)}

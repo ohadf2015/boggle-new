@@ -54,7 +54,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       </p>
 
       {/* Progress Bar */}
-      <div className="relative h-6 bg-neo-navy-light border border-neo-black rounded-full overflow-hidden mb-3" data-testid="progress-bar">
+      <div className="relative h-6 bg-neo-navy-light border border-neo-cream/40 rounded-full overflow-hidden mb-3" data-testid="progress-bar">
         <m.div
           className="absolute inset-y-0 start-0 bg-neo-cyan"
           initial={{ width: 0 }}

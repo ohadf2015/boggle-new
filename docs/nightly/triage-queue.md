@@ -2331,3 +2331,22 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - `exp-mp-results-rival-best-word-v1` (created 2026-07-20, ~52d): 795 exposures/30d, both arms <1000. Closest to threshold; re-check in ~2 weeks.
 - `exp-mp-quickplay-eager-disable-v1` (created 2026-07-29, ~43d): 810 exposures/30d, both arms <1000 — same pattern.
 - Root cause (shared): mp_round is a low-traffic surface (2-player MP round-result screen). None of these 4 flags are decided; none should be retired yet. Recommend: either extend window to 60d before judging, or consider combining exposure across surfaces if the underlying UI is reused. Human call, not autonomous.
+
+## 2026-09-12
+- [Restore] stale salvage 20260904-020001 (20 files) — SKIPPED tonight
+  - restore target fe-next/app/[locale]/education/access/PageClient.tsx already has a LIVE 4-line uncommitted diff in this shared checkout (another concurrent lane mid-edit)
+  - status: deferred
+  - why: rsync-based restore would blind-overwrite another session's in-flight WIP on the same file — irreversible in a shared checkout
+  - recommended owner: self (retry once tree is clean / no concurrent lane touching those paths)
+- [Sentry] JAVASCRIPT-NEXTJS-247 TypeError: Cannot read properties of undefined (reading 'name')
+  - 32 occurrences, 1 user, first/last seen 2026-09-09, /en/multiplayer, escalating
+  - link: https://lexiclash.sentry.io/issues/145817108/
+  - status: deferred
+  - why: entire stacktrace is minified socket.io-client vendor chunks (59729, 21069) with zero first-party frames resolvable from the MCP event payload — no sourcemap-resolved trace available this run, so any fix would be a blind guess at which socket.on() handler reads `.name` off an undefined payload
+  - recommended owner: self (next run: check Sentry sourcemap upload / try analyze_issue_with_seer, or reproduce locally on /multiplayer with a slow/dropped socket event)
+- [PostHog] DOMException: NotFoundError: Failed to execute 'insertBefore' on 'Node' — not a child
+  - 3 occurrences/24h
+  - link: https://eu.posthog.com/project/151059/error_tracking/01a05dbf-a31b-7920-aacd-6f85f8683d6e
+  - status: deferred
+  - why: classic React/DOM-race insertBefore error (portal or list unmount racing a DOM mutation); needs the PostHog issue's page URL + component stack to localize, not pulled this run due to time budget after the two supabase RPC fixes
+  - recommended owner: self (next run: pull full PostHog issue event props for page/component before touching any portal/list code)

@@ -302,7 +302,7 @@ export function StudentProgressReport({
             {data.recommendations.map((recommendation, index) => (
               <li
                 key={`rec-${index}-${recommendation}`}
-                className="flex items-start gap-2 p-3 bg-neo-navy/50 border-neo border-black rounded-neo"
+                className="flex items-start gap-2 p-3 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo"
               >
                 <span className="text-neo-lime font-bold">-</span>
                 <span className="text-neo-white">{recommendation}</span>

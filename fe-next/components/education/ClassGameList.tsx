@@ -60,7 +60,7 @@ export function ClassGameList({ section }: { section: ClassGameSection }): React
         {section.games.map((g, i) => (
           <li
             key={g.name}
-            className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 pt-7 shadow-hard sm:p-6 sm:pt-7"
+            className="relative rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 pt-7 shadow-hard sm:p-6 sm:pt-7"
           >
             <span
               className="absolute -top-3.5 start-4 grid h-8 w-8 place-items-center rounded border-2 border-neo-black bg-neo-yellow font-neo-display text-sm font-black text-neo-navy shadow-hard-sm"
@@ -86,13 +86,13 @@ export function ClassGameList({ section }: { section: ClassGameSection }): React
             </dl>
 
             <ul className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold uppercase tracking-widest">
-              <li className="rounded border-2 border-neo-black bg-neo-navy px-2 py-1 text-neo-gray-200">
+              <li className="rounded border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 text-neo-gray-200">
                 {labels.time}: {g.time}
               </li>
-              <li className="rounded border-2 border-neo-black bg-neo-navy px-2 py-1 text-neo-gray-200">
+              <li className="rounded border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 text-neo-gray-200">
                 {labels.group}: {g.groupSize}
               </li>
-              <li className="rounded border-2 border-neo-black bg-neo-navy px-2 py-1 text-neo-gray-200">
+              <li className="rounded border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 text-neo-gray-200">
                 {labels.drills}: {g.drills}
               </li>
             </ul>

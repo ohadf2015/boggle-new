@@ -151,7 +151,7 @@ export function ProFramingSection() {
 
           <Link
             href={`/${language}/pricing`}
-            className="inline-block w-full text-center rounded-neo bg-neo-navy text-neo-lime font-bold py-3 border-neo border-black shadow-hard hover:shadow-hard-lg transition-shadow"
+            className="inline-block w-full text-center rounded-neo bg-neo-navy text-neo-lime font-bold py-3 border-neo border-neo-cream/40 shadow-hard hover:shadow-hard-lg transition-shadow"
           >
             {t('education.landing.pro.chooseNow')}
           </Link>
@@ -159,7 +159,7 @@ export function ProFramingSection() {
       </div>
 
       {/* Why now — honest framing */}
-      <div className="rounded-neo border-neo border-neo-white/20 bg-neo-navy-light p-6 text-center">
+      <div className="rounded-neo border-neo border-neo-white/40 bg-neo-navy-light p-6 text-center">
         {/* The student cap is named in this sentence too, so it interpolates from the same
             constant as the tier card above. Hardcoding it in copy desyncs the moment the cap
             moves — it was 30 until 2026-08-23. */}

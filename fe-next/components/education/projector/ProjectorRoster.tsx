@@ -116,7 +116,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                 >
                   <span
                     aria-hidden="true"
-                    className="inline-flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-navy text-neo-cream"
+                    className="inline-flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full border-2 border-neo-cream/40 bg-neo-navy text-neo-cream"
                   >
                     {chipInitial(student.username)}
                   </span>

@@ -27,6 +27,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/blog/boggle-vs-wordle",
   "/blog/boggle-vs-words-with-friends",
   "/blog/daily-challenge-strategies",
+  "/blog/death-of-turn-based-word-games",
   "/blog/free-word-games-online",
   "/blog/hebrew-word-games-guide",
   "/blog/improve-word-game-skills",

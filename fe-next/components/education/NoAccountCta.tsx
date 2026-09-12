@@ -88,7 +88,7 @@ export function NoAccountCta({
       <p className="mt-3 text-sm leading-relaxed sm:text-base">{c.body}</p>
       <Link
         href={`/${locale}${QUICK_PLAY_PATH}`}
-        className="mt-4 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
+        className="mt-4 inline-block rounded-neo border-4 border-neo-cream/40 bg-neo-navy px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
       >
         {c.cta}
       </Link>

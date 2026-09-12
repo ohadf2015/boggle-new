@@ -71,7 +71,7 @@ export default function PostGameWordReview({
             {found.map((word) => (
               <span
                 key={word}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-neo bg-neo-lime/15 border border-neo-lime/30 text-neo-white font-bold text-sm"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-neo bg-neo-lime/15 border border-neo-lime/50 text-neo-white font-bold text-sm"
               >
                 <Check className="w-3 h-3 text-neo-lime" />
                 {word}
@@ -94,7 +94,7 @@ export default function PostGameWordReview({
             {missed.map((word) => (
               <span
                 key={word}
-                className="inline-flex items-center px-2 py-1 rounded-neo bg-neo-white/5 border border-neo-white/10 text-neo-white text-sm"
+                className="inline-flex items-center px-2 py-1 rounded-neo bg-neo-white/5 border border-neo-white/40 text-neo-white text-sm"
               >
                 {word}
               </span>

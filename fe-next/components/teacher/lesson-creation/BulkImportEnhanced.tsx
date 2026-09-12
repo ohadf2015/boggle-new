@@ -387,7 +387,7 @@ export default function BulkImportEnhanced({
                   <div
                     data-testid="bulk-import-unreadable"
                     role="alert"
-                    className="p-3 bg-neo-pink/20 border-neo border-neo-pink/50 rounded-neo"
+                    className="p-3 bg-neo-pink/20 border-neo border-neo-pink/90 rounded-neo"
                   >
                     <div className="flex items-start gap-2 text-sm font-neo-body text-neo-pink">
                       <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />

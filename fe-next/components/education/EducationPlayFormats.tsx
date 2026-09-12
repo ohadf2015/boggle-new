@@ -42,7 +42,7 @@ export function EducationPlayFormats({
         {rows.map((f) => (
           <li
             key={f.id}
-            className="rounded-neo border-2 border-neo-black bg-neo-navy-light p-4 shadow-hard-sm"
+            className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-sm"
           >
             <span className={`font-neo-display text-sm font-black uppercase ${accent}`}>
               {f.name}
@@ -61,7 +61,7 @@ export function EducationPlayFormats({
       </h2>
       <p
         data-answer
-        className="max-w-3xl rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 text-base leading-relaxed text-neo-gray-100 shadow-hard sm:text-lg"
+        className="max-w-3xl rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 text-base leading-relaxed text-neo-gray-100 shadow-hard sm:text-lg"
       >
         {intro
           .replace('{count}', String(total))

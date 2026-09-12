@@ -193,7 +193,7 @@ export default function TemplateLessonSelector({
   const categories: CategoryFilter[] = ['all', 'grade-1', 'grade-2', 'grade-3', 'academic', 'everyday'];
 
   return (
-    <div className="bg-neo-navy/50 border-neo border-neo-black rounded-neo p-6">
+    <div className="bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo p-6">
       <div className="flex items-center gap-3 mb-4">
         <BookTemplate className="w-6 h-6 text-neo-cyan" />
         <h3 className="text-xl font-neo-display text-neo-white">

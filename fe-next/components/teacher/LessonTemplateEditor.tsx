@@ -137,7 +137,7 @@ export default function LessonTemplateEditor({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t('education.template.namePlaceholder')}
-                className="border-neo border-neo-black shadow-hard-sm bg-neo-navy/50"
+                className="border-neo border-neo-cream/40 shadow-hard-sm bg-neo-navy/50"
               />
             </div>
 
@@ -225,7 +225,7 @@ export default function LessonTemplateEditor({
             </div>
 
             {/* Allow Late Join */}
-            <div className="flex items-center justify-between p-4 bg-neo-black/30 rounded-neo border border-neo-black">
+            <div className="flex items-center justify-between p-4 bg-neo-black/30 rounded-neo border border-neo-cream/40">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-neo-cyan" />
                 <div>
@@ -244,7 +244,7 @@ export default function LessonTemplateEditor({
             </div>
 
             {/* Set as Default */}
-            <div className="flex items-center justify-between p-4 bg-neo-black/30 rounded-neo border border-neo-black">
+            <div className="flex items-center justify-between p-4 bg-neo-black/30 rounded-neo border border-neo-cream/40">
               <div>
                 <Label className="text-sm font-neo-body text-neo-white">
                   {t('education.template.setDefault')}

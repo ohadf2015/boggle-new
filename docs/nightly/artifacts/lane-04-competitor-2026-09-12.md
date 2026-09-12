@@ -1,0 +1,4 @@
+status: shipped
+attempted: research competitor word-game concepts + reddit reply candidates + education competitor angle, write ideas files + report append
+files_touched: docs/nightly/ideas/2026-09-12.md, docs/nightly/ideas/2026-09-12-reddit.md, docs/nightly/reports/2026-09-12.md (append), docs/nightly/artifacts/lane-04-competitor-2026-09-12.md
+next_steps: Reddit search transport still broken (jq parse fail on reddit-fetch.sh search, 3/4 calls) - only feed path works; retry feed Anagrams/Scrabble top-month tomorrow (not attempted, time-boxed). No live reddit reply candidate surfaced tonight (feed only returned showcase posts, not open questions) - honest stub written, not fabricated. Two fresh polish ideas surfaced for lane 5: Word Craft combo burn-off flourish, Brain Drill boss-word ambush - both new mechanic families vs idea-history ledger.
