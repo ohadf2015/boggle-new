@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useContainerDimensions } from '@/hooks/useContainerDimensions';
 import { cn } from '@/lib/utils';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,15 @@ export default function WarmupRound({
 }: WarmupRoundProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, setGameActive } = useSoundEffects();
+
+  // Largest square that fits the measured leftover area — the
+  // percentage/aspect-ratio chain this replaced resolved to 0 inside the
+  // fixed-viewport drill root and clipped the board's last row (390x844
+  // dogfood, 2026-09-12).
+  const { containerRef: gridAreaRef, dimensions: gridArea, isReady: gridAreaReady } =
+    useContainerDimensions(50);
+  const gridSize =
+    gridAreaReady && gridArea ? Math.min(gridArea.width, gridArea.height) : 0;
 
   // Enable sound gate
   useEffect(() => {
@@ -277,16 +287,18 @@ export default function WarmupRound({
           </CardContent>
         </Card>
 
-        <div className="mb-4 flex-1 min-h-0 flex items-center justify-center">
-          <div className="aspect-square h-full max-w-full w-auto">
-            <GridComponent
-              grid={grid}
-              interactive
-              onWordSubmit={handleWordSubmit}
-              language={language}
-              animateOnMount
-            />
-          </div>
+        <div ref={gridAreaRef} className="mb-4 flex-1 min-h-0 flex items-center justify-center">
+          {gridSize > 0 && (
+            <div style={{ width: gridSize, height: gridSize }}>
+              <GridComponent
+                grid={grid}
+                interactive
+                onWordSubmit={handleWordSubmit}
+                language={language}
+                animateOnMount
+              />
+            </div>
+          )}
         </div>
 
         {/* Found words */}
