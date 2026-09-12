@@ -656,8 +656,8 @@ describe('TimedBlitzPractice', () => {
         />
       );
 
-      // Should render without crashing
-      expect(screen.getByTestId('countdown-phase')).toBeInTheDocument();
+      expect(screen.getByTestId('practice-insufficient-data')).toBeInTheDocument();
+      expect(screen.queryByTestId('countdown-phase')).not.toBeInTheDocument();
     });
   });
 });

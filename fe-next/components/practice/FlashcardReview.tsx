@@ -1,28 +1,30 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowLeft,
   Check,
   X,
-  RotateCcw,
-  Trophy,
   Layers,
   MousePointer2,
 } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import type { VocabularyWord } from '@/lib/supabase/education';
 import { FlashcardSwipeStack } from './FlashcardSwipeStack';
-import type { EnrichedVocabularyWord, VocabularyExample } from '@/types/vocabulary';
+import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { PronunciationButton } from './PronunciationButton';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { WordContextRow } from './WordContextRow';
+import PracticeResultsCard from './PracticeResultsCard';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { DRILL_ROOT_CLASS } from './drillLayout';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -47,8 +49,10 @@ export default function FlashcardReview({
 }: FlashcardReviewProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
-  const socketContext = useSocketOptional();
-  const socket = socketContext?.socket;
+  useSocketOptional();
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+
+  const usable = useMemo(() => wordsReadyForDrill(words, 'definition'), [words]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -60,8 +64,13 @@ export default function FlashcardReview({
 
   const { speak } = useSpeechSynthesis(language);
 
-  const currentWord = words[currentIndex];
-  const progress = ((currentIndex + 1) / words.length) * 100;
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
+
+  const currentWord = usable[currentIndex];
+  const progress = usable.length === 0 ? 0 : ((currentIndex + 1) / usable.length) * 100;
 
   // Practice renders from the teacher's own words, always and immediately.
   //
@@ -72,9 +81,9 @@ export default function FlashcardReview({
   // sat on a spinner forever, on every lesson. The emit and listener are gone
   // with it; there is nothing on the other end to talk to.
   useEffect(() => {
-    if (words.length === 0) return;
+    if (usable.length === 0) return;
     setEnrichedWords(
-      words.map((word) => ({
+      usable.map((word) => ({
         word: word.word,
         definition: word.definition || '',
         pronunciation: undefined,
@@ -88,7 +97,7 @@ export default function FlashcardReview({
         contextualExamples: word.example ? [{ text: word.example }] : [],
       }))
     );
-  }, [words]);
+  }, [usable]);
 
   const handleFlip = useCallback(() => {
     setIsFlipped((prev) => {
@@ -102,21 +111,21 @@ export default function FlashcardReview({
   }, [autoPronounce, currentWord, speak]);
 
   const handleAnswer = useCallback((correct: boolean) => {
+    if (correct) playWordAcceptedSound();
+    else playWordRejectedSound();
     setResults((prev) => [...prev, correct]);
     onCardReviewed?.(correct);
 
-    if (currentIndex === words.length - 1) {
-      // Last card - show results
+    if (currentIndex === usable.length - 1) {
       const finalResults = [...results, correct];
       const correctCount = finalResults.filter(Boolean).length;
       setShowResults(true);
-      onComplete({ correct: correctCount, total: words.length });
+      onComplete({ correct: correctCount, total: usable.length });
     } else {
-      // Next card
       setCurrentIndex((prev) => prev + 1);
       setIsFlipped(false);
     }
-  }, [currentIndex, words.length, results, onCardReviewed, onComplete]);
+  }, [currentIndex, usable.length, results, onCardReviewed, onComplete, playWordAcceptedSound, playWordRejectedSound]);
 
   const handleRestart = useCallback(() => {
     setCurrentIndex(0);
@@ -125,86 +134,24 @@ export default function FlashcardReview({
     setShowResults(false);
   }, []);
 
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   // Results screen
   if (showResults) {
     const correctCount = results.filter(Boolean).length;
-    const percentage = Math.round((correctCount / words.length) * 100);
 
     return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
-        <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <AdaptiveMotion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200 }}
-            >
-              <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
-            </AdaptiveMotion.div>
-
-            <h2 className="text-2xl font-neo-display text-neo-white mb-2">
-              {t('education.practice.complete')}
-            </h2>
-
-            <div className="my-6">
-              <p className="text-5xl font-neo-display text-neo-cyan">{percentage}%</p>
-              <p className="text-slate-400 mt-2">
-                {correctCount} / {words.length} {t('education.practice.correctCount')}
-              </p>
-
-              {/* XP Session Summary - Mastery message shown FIRST (research requirement) */}
-              {xpSessionData && (
-                <div className="mt-4 pt-4 border-t border-neo-black/30">
-                  {xpSessionData.sessionMasteryMessage && (
-                    <p className="font-neo-display text-lg text-neo-yellow mb-2">
-                      {xpSessionData.sessionMasteryMessage}
-                    </p>
-                  )}
-                  <p className="text-neo-white font-neo-body">
-                    +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Word results summary */}
-            <div className="bg-neo-black/30 rounded-neo p-4 mb-6 max-h-40 overflow-y-auto">
-              {words.map((word, idx) => (
-                <div
-                  key={`word-${idx}-${word.word}`}
-                  className="flex items-center justify-between py-1 text-sm"
-                >
-                  <span className="text-neo-white font-neo-body">{word.word}</span>
-                  {results[idx] ? (
-                    <Check className="w-4 h-4 text-neo-cyan" />
-                  ) : (
-                    <X className="w-4 h-4 text-neo-pink" />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={handleRestart}
-                className={cn(
-                  'flex-1 bg-neo-cyan text-neo-black font-bold',
-                  'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
-                )}
-              >
-                <RotateCcw className="w-4 h-4 me-2" />
-                {t('common.retry')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onBack}
-                className="border-neo-pink text-neo-pink hover:bg-neo-pink/20"
-              >
-                {t('common.back')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div dir={isRTL ? 'rtl' : 'ltr'} className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4 sm:p-6')}>
+        <PracticeResultsCard
+          correct={correctCount}
+          total={usable.length}
+          xpEarned={xpSessionData?.sessionXpEarned}
+          masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
+          onRestart={handleRestart}
+          onBack={onBack}
+        />
       </div>
     );
   }
@@ -212,10 +159,10 @@ export default function FlashcardReview({
   // Render swipe mode
   if (reviewMode === 'swipe' && enrichedWords.length > 0) {
     return (
-      <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6">
-        <div className="max-w-lg mx-auto">
+      <div dir={isRTL ? 'rtl' : 'ltr'} className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')}>
+        <div className="max-w-lg mx-auto flex-1 min-h-0 flex flex-col w-full">
           {/* Header with mode toggle */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-6 shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -230,7 +177,7 @@ export default function FlashcardReview({
                 {t('education.practice.flashcards')}
               </h1>
               <p className="text-sm text-slate-400">
-                {currentIndex + 1} / {words.length}
+                {currentIndex + 1} / {usable.length}
               </p>
             </div>
             {/* Mode toggle buttons - in swipe mode, swipe button is active */}
@@ -264,7 +211,7 @@ export default function FlashcardReview({
             onComplete={() => {
               const correctCount = results.filter(Boolean).length;
               setShowResults(true);
-              onComplete({ correct: correctCount, total: words.length });
+              onComplete({ correct: correctCount, total: usable.length });
             }}
           />
         </div>
@@ -274,10 +221,10 @@ export default function FlashcardReview({
 
   // Classic mode (existing tap-to-flip)
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-neo-navy p-4 sm:p-6">
-      <div className="max-w-lg mx-auto">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')}>
+      <div className="max-w-lg mx-auto flex-1 min-h-0 flex flex-col w-full">
         {/* Header with mode toggle */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -292,7 +239,7 @@ export default function FlashcardReview({
               {t('education.practice.flashcards')}
             </h1>
             <p className="text-sm text-slate-400">
-              {currentIndex + 1} / {words.length}
+              {currentIndex + 1} / {usable.length}
             </p>
           </div>
           {/* Mode toggle buttons (only show if enriched) */}
@@ -352,7 +299,7 @@ export default function FlashcardReview({
 
         {/* Flashcard */}
         <AdaptiveMotion.div
-          className="relative h-64 sm:h-80 perspective-1000 cursor-pointer mb-8"
+          className="relative flex-1 min-h-0 h-64 sm:h-80 perspective-1000 cursor-pointer mb-8"
           onClick={handleFlip}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

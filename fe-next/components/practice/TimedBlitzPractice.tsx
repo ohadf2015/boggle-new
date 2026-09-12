@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { Flame, Sparkles } from 'lucide-react';
 import { useBlitzGame } from './hooks/useBlitzGame';
 import CircularTimer from '../CircularTimer';
 import PracticeResultsCard from './PracticeResultsCard';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { DRILL_ROOT_CLASS } from './drillLayout';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
 export interface TimedBlitzPracticeProps {
@@ -49,6 +53,9 @@ export function TimedBlitzPractice({
 }: TimedBlitzPracticeProps) {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+
+  const usable = useMemo(() => wordsReadyForDrill(words, 'definition'), [words]);
 
   const [phase, setPhase] = useState<GamePhase>('countdown');
   const [countdown, setCountdown] = useState(3);
@@ -67,13 +74,19 @@ export function TimedBlitzPractice({
     score,
     submitAnswer,
     startGame,
-  } = useBlitzGame(words, 60);
+  } = useBlitzGame(usable, 60);
+
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   /**
    * Countdown phase effect
    * 3-2-1 countdown before game starts
    */
   useEffect(() => {
+    if (usable.length < 1) return;
     if (phase !== 'countdown') return;
 
     const timer = setTimeout(() => {
@@ -87,7 +100,7 @@ export function TimedBlitzPractice({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [phase, countdown, startGame]);
+  }, [phase, countdown, startGame, usable.length]);
 
   /**
    * Focus input when playing
@@ -130,8 +143,9 @@ export function TimedBlitzPractice({
         return;
       }
 
-      // Submit answer
-      submitAnswer(inputValue);
+      const result = submitAnswer(inputValue);
+      if (result.correct) playWordAcceptedSound();
+      else playWordRejectedSound();
 
       // Clear input immediately (no pause)
       setInputValue('');
@@ -139,7 +153,7 @@ export function TimedBlitzPractice({
       // Keep focus
       inputRef.current?.focus();
     },
-    [inputValue, isStarted, isGameOver, submitAnswer]
+    [inputValue, isStarted, isGameOver, submitAnswer, playWordAcceptedSound, playWordRejectedSound]
   );
 
   /**
@@ -157,10 +171,15 @@ export function TimedBlitzPractice({
   const isLowTime = remainingTime <= 20;
   const isVeryLowTime = remainingTime <= 10;
 
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   return (
     <div
       className={cn(
-        'w-full h-full flex flex-col items-center justify-center',
+        DRILL_ROOT_CLASS,
+        'w-full items-center justify-center',
         'p-4 relative'
       )}
       dir={isRTL ? 'rtl' : 'ltr'}

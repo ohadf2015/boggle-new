@@ -18,6 +18,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Check, X, BookOpen, Sparkles, ArrowLeftRight, Quote, Layers, Blocks } from 'lucide-react';
 import PracticeResultsCard from './PracticeResultsCard';
+import { DRILL_ROOT_CLASS, DRILL_SCROLL_CLASS } from './drillLayout';
 import {
   buildFocusQuestions,
   BLANK,
@@ -165,7 +166,7 @@ export function VocabFocusPractice({
   // Not enough teacher data for this focus
   if (total === 0) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4')} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="max-w-md w-full rounded-neo border-3 border-black shadow-hard bg-neo-cream p-6 text-center">
           <h2 className="text-2xl font-neo-display text-neo-black mb-2">{t(`education.vocabFocus.focus.${focus}`)}</h2>
           <p className="font-neo-body text-neo-black/80 mb-6 text-pretty">{t(`education.vocabFocus.notEnough.${focus}`)}</p>
@@ -184,7 +185,7 @@ export function VocabFocusPractice({
 
   if (showResults) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4')} dir={isRTL ? 'rtl' : 'ltr'}>
         <PracticeResultsCard
           correct={correctCount}
           total={total}
@@ -199,8 +200,8 @@ export function VocabFocusPractice({
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-2xl mx-auto">
+    <div className={cn(DRILL_ROOT_CLASS, 'p-4')} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={cn('max-w-2xl mx-auto w-full flex flex-col', DRILL_SCROLL_CLASS)}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <Button

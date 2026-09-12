@@ -27,19 +27,9 @@ import { usePracticeLesson } from '@/hooks/usePracticeLessons';
 import { usePracticeProgress, usePracticeWords, type PracticeType } from '@/hooks/usePracticeSession';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
-import {
-  FlashcardReview,
-  SoloPracticeBoard,
-  WordListPreview,
-  WarmupRound,
-  WordMatchingPractice,
-  SpellingChallengePractice,
-  TimedBlitzPractice,
-  VocabFocusPractice,
-} from '@/components/practice';
-import { availableFocuses, parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
+import { parseFocusParam, type VocabFocus } from '@/lib/education/vocabFocus';
 import PracticePicker from '@/components/education/practicePicker/PracticePicker';
-import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
+import { LessonPracticeMode } from './LessonPracticeMode';
 import {
   buildPracticeTiles,
   nextReadyTile,
@@ -198,11 +188,6 @@ function PracticeContent({
     await completePracticeSession({ type, ...payload });
   }, [completePracticeSession, onGuestResult]);
 
-  // Handle word found during practice
-  const handleWordFound = useCallback(() => {
-    // Individual word progress is aggregated at the end of the round.
-  }, []);
-
   // XP session data for practice components
   const xpSessionData = {
     sessionXpEarned,
@@ -225,145 +210,34 @@ function PracticeContent({
     });
   }, [nextTile, openMode]);
 
-  // Render the selected practice mode
   const renderPracticeMode = () => {
-    if (!selectedMode || practiceWords.length === 0) return null;
-
-    const commonProps = {
-      lessonName: lesson.name,
-      words: practiceWords,
-      language: lesson.language,
-      onBack: handleBack,
-    };
-
-    switch (selectedMode) {
-      case 'flashcard':
-        return (
-          <FlashcardReview
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('flashcard', { cardsReviewed: results.total, cardsCorrect: results.correct })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'solo_board':
-        if (selectedVariant === 'word_tower') {
-          return (
-            <WordTowerPractice
-              words={practiceWords.map((entry) => entry.word)}
-              language={lesson.language}
-              onComplete={async (results) => {
-                await finishRound('solo_board', {
-                  vocabularyWordsFound: results.vocabularyWordsFound,
-                  newWordsFound: [],
-                });
-                handleBack();
-              }}
-              onBack={handleBack}
-            />
-          );
-        }
-        return (
-          <SoloPracticeBoard
-            {...commonProps}
-            onComplete={(results) =>
-              finishRound('solo_board', {
-                vocabularyWordsFound: results.vocabularyWordsFound,
-                newWordsFound: [],
-              })
-            }
-            onWordFound={handleWordFound}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'word_list':
-        return <WordListPreview {...commonProps} onBack={handleBack} />;
-      case 'warmup':
-        return (
-          <WarmupRound
-            {...commonProps}
-            onComplete={(results) =>
-              finishRound('solo_board', {
-                vocabularyWordsFound: results.vocabularyWordsFound,
-                newWordsFound: [],
-              })
-            }
-            onWordFound={handleWordFound}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'matching':
-        return (
-          <WordMatchingPractice
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('matching', { cardsReviewed: results.total, cardsCorrect: results.correct })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'spelling':
-        return (
-          <SpellingChallengePractice
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('spelling', { cardsReviewed: results.total, cardsCorrect: results.correct })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'blitz':
-        return (
-          <TimedBlitzPractice
-            words={practiceWords}
-            onComplete={(results) =>
-              finishRound('blitz', {
-                cardsReviewed: results.wordsAttempted,
-                cardsCorrect: results.wordsFound,
-              })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      case 'vocab_focus': {
-        const focus =
-          selectedFocus ??
-          availableFocuses(practiceWords, { language: lesson.language })[0] ??
-          'definition';
-        return (
-          <VocabFocusPractice
-            words={practiceWords}
-            focus={focus}
-            language={lesson.language}
-            onComplete={(results) =>
-              finishRound('vocab_focus', {
-                focus: results.focus,
-                cardsReviewed: results.total,
-                cardsCorrect: results.correct,
-              })
-            }
-            onBack={handleBack}
-            xpSessionData={xpSessionData}
-          />
-        );
-      }
-      default:
-        return null;
-    }
+    if (!selectedMode) return null;
+    return (
+      <LessonPracticeMode
+        selectedMode={selectedMode}
+        selectedVariant={selectedVariant}
+        selectedFocus={selectedFocus}
+        lessonName={lesson.name}
+        language={lesson.language}
+        practiceWords={practiceWords}
+        xpSessionData={xpSessionData}
+        onBack={handleBack}
+        finishRound={finishRound}
+      />
+    );
   };
 
-  // If a mode is selected, render it full-screen with XP header
+  // If a mode is selected, render it full-screen with XP header.
+  // In-flow flex column (not a fixed overlay + pt-16 spacer) so the drill
+  // can size to the leftover viewport and the page itself never scrolls.
   if (selectedMode) {
     return (
-      <>
-        {/* XP Header for practice modes */}
+      <div
+        data-testid="practice-active-shell"
+        className="h-dvh flex flex-col overflow-hidden bg-neo-navy"
+      >
         <div
-          className="fixed top-0 left-0 right-0 z-50 bg-neo-navy/95 backdrop-blur-xs border-b border-neo-black/30 px-4 py-2"
+          className="shrink-0 bg-neo-navy/95 backdrop-blur-xs border-b border-neo-black/30 px-4 py-2"
           style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0.5rem))' }}
         >
           <div className="max-w-2xl mx-auto flex items-center gap-4">
@@ -376,8 +250,7 @@ function PracticeContent({
           </div>
         </div>
 
-        {/* Practice content with top padding for XP header */}
-        <div className={cn('pt-16', nextTile && 'pb-24')}>
+        <div className={cn('flex-1 min-h-0 overflow-hidden', nextTile && 'pb-24')}>
           {renderPracticeMode()}
         </div>
 
@@ -415,7 +288,7 @@ function PracticeContent({
 
         {/* Level up celebration modal */}
         <LevelUpCelebration levelUpData={levelUpData} onClose={dismissLevelUp} />
-      </>
+      </div>
     );
   }
 

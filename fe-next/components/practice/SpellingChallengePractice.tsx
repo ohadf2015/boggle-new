@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -13,6 +14,9 @@ import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { WordContextRow } from './WordContextRow';
 import { PronunciationButton } from './PronunciationButton';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { DRILL_ROOT_CLASS, DRILL_SCROLL_CLASS } from './drillLayout';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
@@ -44,6 +48,9 @@ export function SpellingChallengePractice({
 }: SpellingChallengePracticeProps) {
   const { t, dir, language } = useLanguage();
   const isRTL = dir === 'rtl';
+  const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+
+  const usable = useMemo(() => wordsReadyForDrill(words, 'definition'), [words]);
 
   const {
     currentWord,
@@ -60,13 +67,18 @@ export function SpellingChallengePractice({
     accuracy,
     isComplete,
     resetGame,
-  } = useSpellingGame(words);
+  } = useSpellingGame(usable);
 
   // Mirror the hook's sort-by-length so wordIndex maps to the right enriched word
   const sortedWords = useMemo(
-    () => [...words].sort((a, b) => a.word.length - b.word.length),
-    [words]
+    () => [...usable].sort((a, b) => a.word.length - b.word.length),
+    [usable]
   );
+
+  useEffect(() => {
+    setGameActive(true);
+    return () => setGameActive(false);
+  }, [setGameActive]);
 
   const [inputValue, setInputValue] = useState('');
   const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string } | null>(null);
@@ -105,6 +117,8 @@ export function SpellingChallengePractice({
       if (!inputValue.trim() || feedback) return;
 
       const result = submitAnswer(inputValue);
+      if (result.correct) playWordAcceptedSound();
+      else playWordRejectedSound();
       setFeedback(result);
       setInputValue('');
 
@@ -114,7 +128,7 @@ export function SpellingChallengePractice({
         setFeedback(null);
       }, delay);
     },
-    [inputValue, feedback, submitAnswer]
+    [inputValue, feedback, submitAnswer, playWordAcceptedSound, playWordRejectedSound]
   );
 
   const handleRestart = useCallback(() => {
@@ -134,9 +148,13 @@ export function SpellingChallengePractice({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordIndex]);
 
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   if (showResults) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+      <div className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4')}>
         <PracticeResultsCard
           correct={correctCount}
           total={attempts}
@@ -153,9 +171,9 @@ export function SpellingChallengePractice({
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={cn(DRILL_ROOT_CLASS, 'p-4')} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="max-w-2xl mx-auto mb-6">
+      <div className="max-w-2xl mx-auto mb-6 shrink-0">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -190,7 +208,7 @@ export function SpellingChallengePractice({
       </div>
 
       {/* Main content */}
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className={cn('max-w-2xl mx-auto space-y-6 w-full', DRILL_SCROLL_CLASS)}>
         {/* Streak display */}
         {currentStreak > 0 && (
           <AdaptiveMotion.div
@@ -239,7 +257,7 @@ export function SpellingChallengePractice({
           className="flex items-center justify-center gap-3"
         >
           <span className="font-mono text-neo-cyan text-2xl tracking-widest">
-            {currentHint}{'_'.repeat(Math.max(0, (words[wordIndex]?.word.length || 0) - currentHint.length))}
+            {currentHint}{'_'.repeat(Math.max(0, (sortedWords[wordIndex]?.word.length || 0) - currentHint.length))}
           </span>
           {sortedWords[wordIndex] && (
             <PronunciationButton
