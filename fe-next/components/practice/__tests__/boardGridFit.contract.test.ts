@@ -43,4 +43,21 @@ describe('letter-grid fit — no magic viewport constants', () => {
     expect(source).toMatch(/DRILL_ROOT_CLASS/);
     expect(source).not.toMatch(/min-h-full bg-neo-navy/);
   });
+
+  // The shared ui/Card base class carries `h-full`. Inside a definite-height
+  // flex column that basis lets the card claim the whole column and the
+  // grid's flex-1 wrapper collapses to 0 — the board then renders nothing
+  // (production, 2026-09-12). Every in-column Card in these drills must
+  // override it back to content height.
+  it.each([
+    ['SoloPracticeBoard.tsx', 'SoloPracticeBoard'],
+    ['WarmupRound.tsx', 'WarmupRound'],
+  ])('%s in-column Cards override the base Card h-full (h-auto)', (file, name) => {
+    const source = read(file);
+    const cards = source.match(/<Card className="[^"]*"/g) ?? [];
+    expect(cards.length).toBeGreaterThan(0);
+    for (const card of cards) {
+      expect(card).toContain('h-auto');
+    }
+  });
 });

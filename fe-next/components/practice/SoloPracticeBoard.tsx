@@ -261,7 +261,7 @@ export default function SoloPracticeBoard({
         </div>
 
         {/* Stats bar */}
-        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -325,7 +325,7 @@ export default function SoloPracticeBoard({
 
         {/* Found words */}
         {validWords.length > 0 && (
-          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
             <CardContent className="py-3">
               <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
