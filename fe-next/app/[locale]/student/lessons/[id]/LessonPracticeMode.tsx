@@ -12,6 +12,7 @@ import {
 } from '@/components/practice';
 import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
 import { availableFocuses, type VocabFocus } from '@/lib/education/vocabFocus';
+import type { CompletePracticeSessionData } from '@/components/education/PracticeSessionProvider';
 import type { PracticeVariant } from '@/lib/education/practicePicker';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
@@ -29,7 +30,7 @@ interface LessonPracticeModeProps {
   };
   onBack: () => void;
   finishRound: (
-    type: PracticeType,
+    type: CompletePracticeSessionData['type'],
     payload: {
       focus?: VocabFocus;
       cardsReviewed?: number;
