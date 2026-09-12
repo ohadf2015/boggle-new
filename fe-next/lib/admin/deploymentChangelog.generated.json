@@ -1,6 +1,34 @@
 {
-  "generatedAt": "2026-09-12T13:55:11.788Z",
+  "generatedAt": "2026-09-12T17:28:23.894Z",
   "commits": [
+    {
+      "sha": "012883867e8c26cb4cbb6c0e7a4687f5d7c8be34",
+      "shortSha": "0128838",
+      "subject": "merge: origin/master (97c8704df, #1021 practice-drill fit + guards) into gauntlet/teacher-module-r2",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T20:25:21+03:00"
+    },
+    {
+      "sha": "3d31ecedb4b183982474bd0b4610db5f1aa35d65",
+      "shortSha": "3d31ece",
+      "subject": "chore(i18n): regenerate translation report",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T19:59:57+03:00"
+    },
+    {
+      "sha": "ecbaa7f2b153d45ade11ea03fe43bf3228becdad",
+      "shortSha": "ecbaa7f",
+      "subject": "feat(education): teacher module gauntlet II — six pieces won blind vs Blooket, interim ship",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T17:25:54+03:00"
+    },
+    {
+      "sha": "97c8704df2e727103e4987dcf2e9065b25378d43",
+      "shortSha": "97c8704",
+      "subject": "fix(practice): no-scroll drill fit, missing-data guards, SFX, drop mobile breadcrumbs (#1021)",
+      "author": "ohadf2015",
+      "date": "2026-09-12T18:11:27+04:00"
+    },
     {
       "sha": "c1ce436d84eba9356bb2809975885351fbc1df83",
       "shortSha": "c1ce436",
@@ -112,34 +140,6 @@
       "subject": "feat(education): packages page — Teacher Pro $9/mo, Classroom $39/term lead, schools contact (#1005)",
       "author": "ohadf2015",
       "date": "2026-09-11T00:31:22+04:00"
-    },
-    {
-      "sha": "2218cb21906279a8534602221d5851dc9fbd6998",
-      "shortSha": "2218cb2",
-      "subject": "fix(education): CREATE ROOM no longer no-ops for email-only teachers (#1007)",
-      "author": "ohadf2015",
-      "date": "2026-09-10T19:02:54+04:00"
-    },
-    {
-      "sha": "2a2f27c83a316175886e3dbde1c2f0829ac62018",
-      "shortSha": "2a2f27c",
-      "subject": "feat(education): playable ESL demo + CEFR lists on the winner page (#1006)",
-      "author": "ohadf2015",
-      "date": "2026-09-10T18:33:05+04:00"
-    },
-    {
-      "sha": "0f3c7a6c49f8539a89d55bfa8aa90c713dd2b369",
-      "shortSha": "0f3c7a6",
-      "subject": "grok: You are working on the LexiClash repo (fe-next/ is the main Next.js 16 (#1003)",
-      "author": "ohadf2015",
-      "date": "2026-09-10T17:14:33+04:00"
-    },
-    {
-      "sha": "23a655a5bd996cd537f85c2e46a0bfe1b43fbde6",
-      "shortSha": "23a655a",
-      "subject": "fix(geo): correct llms-full.txt drift — 6 languages, education landings, Teacher Pro claim (#1002)",
-      "author": "ohadf2015",
-      "date": "2026-09-10T17:11:48+04:00"
     }
   ]
 }
