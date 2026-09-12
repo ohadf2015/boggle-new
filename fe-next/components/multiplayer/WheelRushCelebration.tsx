@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AnimatePresence, m } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface WheelCelebration {
@@ -55,10 +55,17 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
           <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">
             {celebration.word}
           </span>
-          {celebration.tier === 'all' && (celebration.streak ?? 0) >= 2 && (
-            <span className="font-neo-display font-black text-xs uppercase tracking-wide bg-neo-black text-neo-yellow px-2 py-0.5 rounded-neo">
-              {t('wordWheel.streakBadge', { count: celebration.streak as number })}
+          {celebration.tier === 'all' && (celebration.streak ?? 0) >= 4 ? (
+            <span className="flex items-center gap-1 font-neo-display font-black text-xs uppercase tracking-wide bg-neo-orange text-neo-black px-2 py-0.5 rounded-neo">
+              <Flame className="w-3 h-3" />
+              {t('wordWheel.onFireBadge', { count: celebration.streak as number })}
             </span>
+          ) : (
+            celebration.tier === 'all' && (celebration.streak ?? 0) >= 2 && (
+              <span className="font-neo-display font-black text-xs uppercase tracking-wide bg-neo-black text-neo-yellow px-2 py-0.5 rounded-neo">
+                {t('wordWheel.streakBadge', { count: celebration.streak as number })}
+              </span>
+            )
           )}
         </m.div>
       )}

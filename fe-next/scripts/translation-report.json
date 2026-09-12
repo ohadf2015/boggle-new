@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6873,
+    "totalKeysInCode": 6874,
     "keyCountByLanguage": {
-      "en": 13263,
-      "es": 13571,
-      "he": 13473,
-      "ja": 13533,
-      "ru": 13305,
-      "sv": 13529
+      "en": 13265,
+      "es": 13573,
+      "he": 13475,
+      "ja": 13535,
+      "ru": 13307,
+      "sv": 13531
     },
     "missingFromEnglish": 102,
     "problematicFlatKeys": 0,
@@ -1360,14 +1360,14 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeSettings.tsx",
-        "line": 119,
+        "line": 120,
         "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
       },
       {
         "pattern": "`teacher.classroom.minWordLength.len${len}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeSettings.tsx",
-        "line": 239,
+        "line": 240,
         "context": "const label = t(`teacher.classroom.minWordLength.len${len}`);"
       },
       {
@@ -1549,7 +1549,7 @@
         "pattern": "`vocabQuiz.focus.${key}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizFocusPicker.tsx",
-        "line": 151,
+        "line": 152,
         "context": "{t(`vocabQuiz.focus.${key}`)}"
       },
       {

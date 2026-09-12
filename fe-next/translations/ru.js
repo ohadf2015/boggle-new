@@ -12401,6 +12401,8 @@ const ru = {
     "invalidLetters": "Можно использовать только буквы колеса",
     "allLettersUsed": "ВСЕ БУКВЫ!",
     "almostAllLetters": "ПОЧТИ ВСЕ!",
+    "streakBadge": "{count} подряд!",
+    "onFireBadge": "{count} подряд, в ударе!",
     "inputPlaceholder": "Печатай слово...",
     "tapLetters": "Нажимай или тяни буквы, чтобы составить слово",
     "tapToRemove": "Нажми на добавленную букву снова, чтобы удалить",

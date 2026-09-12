@@ -34,4 +34,30 @@ describe('WheelRushCelebration', () => {
     );
     expect(screen.getByTestId('wheel-celebration').textContent).toContain('wordWheel.almostAllLetters');
   });
+
+  it('shows the base streak badge below the on-fire threshold', () => {
+    render(
+      <WheelRushCelebration
+        celebration={{ tier: 'all', word: 'CANTERS', key: 3, streak: 3 }}
+        t={t}
+        prefersReduced={false}
+      />,
+    );
+    const banner = screen.getByTestId('wheel-celebration');
+    expect(banner.textContent).toContain('wordWheel.streakBadge');
+    expect(banner.textContent).not.toContain('wordWheel.onFireBadge');
+  });
+
+  it('escalates to the on-fire badge at a streak of 4+', () => {
+    render(
+      <WheelRushCelebration
+        celebration={{ tier: 'all', word: 'CANTERS', key: 4, streak: 4 }}
+        t={t}
+        prefersReduced={false}
+      />,
+    );
+    const banner = screen.getByTestId('wheel-celebration');
+    expect(banner.textContent).toContain('wordWheel.onFireBadge');
+    expect(banner.textContent).not.toContain('wordWheel.streakBadge');
+  });
 });

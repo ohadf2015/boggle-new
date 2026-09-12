@@ -7326,6 +7326,8 @@ const es = {
     "invalidLetters": "Solo puedes usar las letras de la rueda",
     "allLettersUsed": "¡TODAS LAS LETRAS!",
     "almostAllLetters": "¡CASI TODAS!",
+    "streakBadge": "¡{count} seguidas!",
+    "onFireBadge": "¡{count} seguidas, en racha!",
     "inputPlaceholder": "Escribe una palabra...",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",

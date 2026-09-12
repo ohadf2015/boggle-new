@@ -6771,6 +6771,8 @@ const en = {
     "invalidLetters": "Can only use wheel letters",
     "allLettersUsed": "ALL LETTERS!",
     "almostAllLetters": "ALMOST ALL!",
+    "streakBadge": "{count} in a row!",
+    "onFireBadge": "{count} on fire!",
     "inputPlaceholder": "Type a word...",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",

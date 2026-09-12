@@ -7292,6 +7292,8 @@ const he = {
     "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
     "allLettersUsed": "כל האותיות!",
     "almostAllLetters": "כמעט הכל!",
+    "streakBadge": "{count} ברצף!",
+    "onFireBadge": "{count} על האש!",
     "inputPlaceholder": "הקלד מילה...",
     "tapLetters": "הקש או גרור אותיות כדי לבנות מילה",
     "tapToRemove": "הקש שוב על אות שהוספת כדי להסיר",
