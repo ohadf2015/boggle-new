@@ -123,7 +123,6 @@ export default defineConfig({
       '**/AdventureGame.bossIntegration.test.tsx',
       '**/useAdventureCurrency.test.ts',
       '**/reengagementEmail.test.ts',
-      '**/SinglePlayerGame.achievements.test.tsx',
       '**/PracticeWheelSandbox.drag.test.tsx',
       '**/PracticeWheelSandbox.completion.test.tsx',
       '**/ScoreReadout.test.tsx',
