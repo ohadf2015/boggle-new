@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6870,
+    "totalKeysInCode": 6873,
     "keyCountByLanguage": {
-      "en": 13261,
-      "es": 13569,
-      "he": 13471,
-      "ja": 13531,
-      "ru": 13303,
-      "sv": 13527
+      "en": 13263,
+      "es": 13571,
+      "he": 13473,
+      "ja": 13533,
+      "ru": 13305,
+      "sv": 13529
     },
-    "missingFromEnglish": 101,
+    "missingFromEnglish": 102,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 350,
@@ -93,7 +93,7 @@
         "pattern": "`sealedBid.outcome.${settlement.outcome}`",
         "type": "template_literal",
         "file": "app/[locale]/sealed-bid/page.tsx",
-        "line": 270,
+        "line": 285,
         "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
       },
       {
@@ -156,21 +156,21 @@
         "pattern": "`achievements.${achievement.key}.name`",
         "type": "template_literal",
         "file": "components/achievements/AchievementPopup.tsx",
-        "line": 51,
+        "line": 52,
         "context": "? t(`achievements.${achievement.key}.name`) || achievement.key"
       },
       {
         "pattern": "`achievements.${achievement.key}.name`",
         "type": "template_literal",
         "file": "components/achievements/AchievementPopup.tsx",
-        "line": 89,
+        "line": 91,
         "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,"
       },
       {
         "pattern": "`achievements.${achievement.key}.description`",
         "type": "template_literal",
         "file": "components/achievements/AchievementPopup.tsx",
-        "line": 90,
+        "line": 92,
         "context": "description: t(`achievements.${achievement.key}.description`)"
       },
       {
@@ -2527,7 +2527,7 @@
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
         "file": "app/[locale]/multiplayer/PageClient.tsx",
-        "line": 265,
+        "line": 276,
         "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
       },
       {
@@ -3231,7 +3231,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/GameFeedbackCard.tsx",
-        "line": 113,
+        "line": 134,
         "context": "{t(key)}"
       },
       {
@@ -4559,6 +4559,15 @@
         {
           "file": "components/wordTowerV2/WordTowerV2.tsx",
           "line": 289
+        }
+      ]
+    },
+    {
+      "key": "wordWheel.streakBadge",
+      "usages": [
+        {
+          "file": "components/multiplayer/WheelRushCelebration.tsx",
+          "line": 60
         }
       ]
     }
