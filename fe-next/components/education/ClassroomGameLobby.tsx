@@ -38,6 +38,7 @@ import {
 } from '@/lib/education/classroomPresets';
 import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility } from '@/shared/types/classroom';
+import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import type { Language } from '@/lib/supabase/education/types';
 
@@ -383,6 +384,11 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
           ? accessibility
           : undefined,
       },
+    });
+    trackEduLiveGameStarted({
+      classroomId: selectedClassroomId,
+      source: 'create_room',
+      lessonCount: selectedLessonIds.length,
     });
   }, [
     user, socket, selectedLessonIds, selectedClassroomId, gameCode,

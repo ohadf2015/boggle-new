@@ -51,6 +51,11 @@ vi.mock('@/utils/supabase/client', () => ({
   createClient: () => ({ auth: { getSession: async () => ({ data: { session: { access_token: 'jwt' } } }) } }),
 }));
 
+const trackEduLiveGameStarted = vi.fn();
+vi.mock('@/lib/education/telemetry', () => ({
+  trackEduLiveGameStarted: (...args: unknown[]) => trackEduLiveGameStarted(...args),
+}));
+
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
@@ -112,5 +117,23 @@ describe('ClassroomGameLobby — Start Game always recovers', () => {
     // THEN the teacher never sees the internal string
     expect(mockToastError).toHaveBeenCalledWith('education.classroomGame.startFailed');
     expect(mockToastError).not.toHaveBeenCalledWith('You are not the teacher of this classroom');
+  });
+
+  it('fires edu_live_game_started with source create_room when CREATE ROOM is clicked', async () => {
+    await renderLobby();
+    await waitFor(() => expect(startBtn()).not.toBeDisabled());
+    fireEvent.click(startBtn());
+
+    await waitFor(() => {
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'createClassroomGame',
+        expect.objectContaining({ classroomId: 'class-1' }),
+      );
+    });
+    expect(trackEduLiveGameStarted).toHaveBeenCalledWith({
+      classroomId: 'class-1',
+      source: 'create_room',
+      lessonCount: 1,
+    });
   });
 });
