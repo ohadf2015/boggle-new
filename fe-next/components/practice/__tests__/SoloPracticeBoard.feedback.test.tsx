@@ -11,6 +11,16 @@ vi.mock('@/components/GridComponent', () => {
   return { default: Wrapped };
 });
 
+// The board sizes itself by measuring its container; jsdom reports 0x0, so
+// pin a fixed size to keep GridComponent mounted.
+vi.mock('@/hooks/useContainerDimensions', () => ({
+  useContainerDimensions: () => ({
+    containerRef: { current: null },
+    dimensions: { width: 360, height: 360 },
+    isReady: true,
+  }),
+}));
+
 vi.mock('@/components/game/WordFormingArea', () => ({
   __esModule: true,
   default: ({ feedback }: { feedback: { type: string } | null }) => (

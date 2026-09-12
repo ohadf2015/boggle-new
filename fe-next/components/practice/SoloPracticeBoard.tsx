@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import GridComponent from '@/components/GridComponent';
 import WordFormingArea from '@/components/game/WordFormingArea';
+import { useContainerDimensions } from '@/hooks/useContainerDimensions';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
@@ -54,6 +55,15 @@ export default function SoloPracticeBoard({
 }: SoloPracticeBoardProps) {
   const { t } = useLanguage();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+
+  // Measure the grid's flex-1 area and render the largest square that fits
+  // both axes. Percentage + aspect-ratio chains resolve to 0 inside the
+  // fixed-viewport drill root on phones, which pushed the board's last row
+  // off-screen (dogfood-found on 390x844, 2026-09-12).
+  const { containerRef: gridAreaRef, dimensions: gridArea, isReady: gridAreaReady } =
+    useContainerDimensions(50);
+  const gridSize =
+    gridAreaReady && gridArea ? Math.min(gridArea.width, gridArea.height) : 0;
 
   // Enable sound gate
   useEffect(() => {
@@ -239,19 +249,23 @@ export default function SoloPracticeBoard({
         {/* Word forming area with feedback */}
         <WordFormingArea word={formingWord} letterCount={formingLetterCount} feedback={currentFeedback} compact className="mb-3 justify-center shrink-0" />
 
-        {/* Game grid scales to leftover height on a phone viewport */}
-        <div className="mb-4 flex-1 min-h-0 flex items-center justify-center">
-          <div className="aspect-square h-full max-w-full w-auto">
-            <GridComponent
-              grid={grid}
-              interactive
-              onWordSubmit={submitWord}
-              onWordChange={handleWordChange}
-              hideWordPreview
-              language={language}
-              animateOnMount
-            />
-          </div>
+        {/* Game grid: largest square that fits the measured leftover area.
+            Percentage/aspect-ratio chains collapse to 0 inside the flex
+            drill root on phones — measure and pin explicit px instead. */}
+        <div ref={gridAreaRef} className="mb-4 flex-1 min-h-0 flex items-center justify-center">
+          {gridSize > 0 && (
+            <div style={{ width: gridSize, height: gridSize }}>
+              <GridComponent
+                grid={grid}
+                interactive
+                onWordSubmit={submitWord}
+                onWordChange={handleWordChange}
+                hideWordPreview
+                language={language}
+                animateOnMount
+              />
+            </div>
+          )}
         </div>
 
         {/* Found words */}
