@@ -8309,6 +8309,7 @@ const es = {
         "loading": "Cargando anuncio…"
       },
       "luckyGemBonus": "¡Gema de la suerte!",
+      "flawless": "¡Perfecto — sin perder vidas!",
       "lightning-round": {
         "name": "Ronda Relámpago",
         "description": "Encuentra palabras lo más rápido posible",
@@ -17099,6 +17100,7 @@ const es = {
   },
   "sealedBid": {
     "luckyStreak": "¡RACHA DE SUERTE!",
+    "hotStreak": "¡{n} seguidas!",
     "title": "Puja sellada",
     "badge": "Puja sellada",
     "roundLabel": "Ronda {n} de {total}",

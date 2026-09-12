@@ -10,6 +10,8 @@ export interface WheelCelebration {
   word: string;
   /** Bump on each fire so a new pangram replaces (re-animates) the previous banner. */
   key: number;
+  /** Consecutive 'all' clears this round (2+ triggers the streak badge). */
+  streak?: number;
 }
 
 interface Props {
@@ -53,6 +55,11 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
           <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">
             {celebration.word}
           </span>
+          {celebration.tier === 'all' && (celebration.streak ?? 0) >= 2 && (
+            <span className="font-neo-display font-black text-xs uppercase tracking-wide bg-neo-black text-neo-yellow px-2 py-0.5 rounded-neo">
+              {t('wordWheel.streakBadge', { count: celebration.streak as number })}
+            </span>
+          )}
         </m.div>
       )}
     </AnimatePresence>

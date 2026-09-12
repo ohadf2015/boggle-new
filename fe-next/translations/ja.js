@@ -8350,6 +8350,7 @@ const ja = {
         "loading": "広告を読み込み中…"
       },
       "luckyGemBonus": "ラッキー宝石！",
+      "flawless": "パーフェクト！ライフを1つも失わなかった！",
       "lightning-round": {
         "name": "ライトニングラウンド",
         "description": "できるだけ速く単語を見つけろ",
@@ -17044,6 +17045,7 @@ const ja = {
   },
   "sealedBid": {
     "luckyStreak": "ラッキーストリーク！",
+    "hotStreak": "{n}連勝！",
     "allIn": "全て投入",
     "clear": "クリア",
     "currentStake": "現在の賭け金",

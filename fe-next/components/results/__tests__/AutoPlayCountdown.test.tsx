@@ -30,15 +30,27 @@ vi.mock('@/hooks/useReducedMotion', () => ({
   default: vi.fn(() => false),
 }));
 
+const trackGrowthEvent = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => trackGrowthEvent(...args),
+}));
+
 import AutoPlayCountdown from '../AutoPlayCountdown';
 
 describe('AutoPlayCountdown', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    trackGrowthEvent.mockClear();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it('should fire replay_countdown_shown once on mount', () => {
+    render(<AutoPlayCountdown onComplete={vi.fn()} onCancel={vi.fn()} />);
+    expect(trackGrowthEvent).toHaveBeenCalledTimes(1);
+    expect(trackGrowthEvent).toHaveBeenCalledWith('replay_countdown_shown', {});
   });
 
   it('should render with initial countdown value', () => {

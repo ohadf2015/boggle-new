@@ -789,6 +789,27 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * mp_round sentiment is still 2/3 avg as of 2026-09-10 (feedback digest) despite
+   * 3 stacked experiments on this surface (ready-button micro-delight, rival's-best-word,
+   * issue-probe) — none targets the 'great' (top) rating specifically. Hypothesis:
+   * closing the loop with positive reinforcement on a GOOD rating (not just fixing bad
+   * ones) lifts repeat feedback-card response rate and correlates with session
+   * continuation, since players currently get a flat instant-close on 'great'.
+   *
+   * control = current: 'great' rating closes card immediately (no reaction).
+   * confetti = 'great' rating shows a brief (600ms) heart-burst animation before closing.
+   * Primary metric: growth:game_feedback response rate on mp_round (2nd+ prompt shown).
+   * Guardrail: mp_results_exit_clicked must not rise.
+   * PostHog flag key = 'exp-mp-round-great-delight-v1', 50/50 rollout.
+   */
+  'exp-mp-round-great-delight-v1': defineExperiment({
+    variants: ['control', 'confetti'] as const,
+    default: 'control',
+    description:
+      "MP round 'great' rating positive-reinforcement. confetti = brief heart-burst animation (600ms) before closing on a 'great' mp_round rating. control = instant close (current). Targets flat mp_round sentiment (avg 2/3, 2026-09-10) — none of the 3 existing mp_round experiments target the positive tail. Fires mp_round_great_delight_shown. Primary metric: game_feedback repeat response rate on mp_round.",
+  }),
+
+  /**
    * Addresses rage-click signal on /es/multiplayer (7 users, score 0.875, 2026-07-28).
    * Root cause: gap between Quick Play button click and isJoining propagating from
    * parent (async socket confirm) — button stays enabled, users re-click.

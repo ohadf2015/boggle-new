@@ -176,8 +176,14 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   useEffect(() => {
     if (!isJoining) setSeekingDismissed(false); // re-arm for the next attempt
   }, [isJoining]);
+  // isQuickPlayPending (eager-disable arm) can be true BEFORE isJoining flips —
+  // without it here, that window shows a disabled button with zero feedback,
+  // which is the exact rage-click pattern this overlay exists to prevent.
   const isSeekingOverlay =
-    quickPlay && isJoining && seekingVariant === 'match-seeking' && !seekingDismissed;
+    quickPlay &&
+    (isJoining || isQuickPlayPending) &&
+    seekingVariant === 'match-seeking' &&
+    !seekingDismissed;
   useEffect(() => {
     if (!isSeekingOverlay) return;
     trackSeekingExposure();

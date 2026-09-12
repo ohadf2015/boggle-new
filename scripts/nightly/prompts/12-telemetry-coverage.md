@@ -38,15 +38,27 @@ the backlog (§1b) and the per-mode completion holes (§2). Drain it incremental
 TMP=$(mktemp -d)
 nightly_extract_growth_events fe-next/utils/growthTracking.ts > "$TMP/code.txt"
 bash scripts/nightly/lib/posthog-query.sh hogql \
-  "SELECT event, countIf(timestamp > now() - INTERVAL 7 DAY) AS d7, countIf(timestamp <= now() - INTERVAL 7 DAY AND timestamp > now() - INTERVAL 14 DAY) AS prev7 FROM events WHERE timestamp > now() - INTERVAL 14 DAY GROUP BY event LIMIT 500" \
+  "SELECT event, countIf(timestamp > now() - INTERVAL 7 DAY) AS d7, countIf(timestamp <= now() - INTERVAL 7 DAY AND timestamp > now() - INTERVAL 14 DAY) AS prev7 FROM events WHERE timestamp > now() - INTERVAL 14 DAY AND (properties.\$host = 'www.lexiclash.live' OR properties.\$host IS NULL) GROUP BY event LIMIT 500" \
   | jq -r '.results[] | [.[0],(.[1]|tostring),(.[2]|tostring)] | @tsv' > "$TMP/live.tsv"
 nightly_coverage_classify "$TMP/code.txt" "$TMP/live.tsv"   # → DEAD + CRATERED markdown table
 ```
 Then per-mode completion (the §2 hole):
 ```bash
 bash scripts/nightly/lib/posthog-query.sh hogql \
-  "SELECT event, coalesce(properties.mode, properties.gameMode, 'none') AS m, count() AS c FROM events WHERE event IN ('game_started','game_completed') AND timestamp > now() - INTERVAL 14 DAY GROUP BY event, m ORDER BY m, event LIMIT 100"
+  "SELECT event, coalesce(properties.mode, properties.gameMode, 'none') AS m, count() AS c FROM events WHERE event IN ('game_started','game_completed') AND timestamp > now() - INTERVAL 14 DAY AND (properties.\$host = 'www.lexiclash.live' OR properties.\$host IS NULL) GROUP BY event, m ORDER BY m, event LIMIT 100"
 ```
+**Always filter `properties.$host = 'www.lexiclash.live' OR properties.$host IS NULL`** — this
+PostHog project is shared by ~12 unrelated apps (`imposketch.io`, `growthradar.app`,
+`stoquant.com`, etc). Unfiltered, their own `game_started`/`page_view`/etc events land in `events`
+too — verified 2026-09-10: 46 cross-app `game_started` rows (host `imposketch.io`, zero
+`mode`/`gameMode` props) fabricated a phantom `mode=none` per-mode completion hole. **Do NOT filter
+to `$host = 'www.lexiclash.live'` alone** — several real LexiClash events are server-side emits
+with NULL `$host` (verified: `mp_player_dropped` 283/7d, `coins_awarded` 206/7d, `drill_completed`
+29/7d, `challenge_sent`, `email_subscribed` all NULL-host) and a `$host`-only filter silently
+DEAD-flags them (Class 4 silent failure — undercount reads identical to "broken"). The `IS NULL`
+half is safe here because none of `game_started`/`game_completed`/other registry names appeared in
+the NULL-host cross-app check — re-verify that assumption if this classifier starts flagging a
+previously-healthy server-side event as newly-dead.
 
 ═══ STEP 2 — Triage (judgment — do NOT dump the raw list) ═══
 Bucket every flagged event:
