@@ -27,6 +27,7 @@ import { useDuelSocket } from '@/hooks/useDuelSocket';
 import { useImeText } from '@/hooks/useImeText';
 import { useDuelCombo } from '@/hooks/useDuelCombo';
 import { useDuelRematch } from '@/hooks/useDuelRematch';
+import { useDuelGameJoin } from '@/hooks/useDuelGameJoin';
 import type {
   DuelStartedData,
   WordAcceptedData,
@@ -44,10 +45,11 @@ import {
   clearDuelSeries,
   type DuelSeries,
 } from '@/lib/education/duelSeries';
-import { Loader } from '@/components/ui/Loader';
 import { DuelDisconnectOverlay } from './DuelDisconnectOverlay';
+import { DuelWaitingRoom } from './DuelWaitingRoom';
 import { ForfeitConfirmDialog } from './ForfeitConfirmDialog';
 import { DuelPlayPanel, type DuelWordStatus } from './DuelPlayPanel';
+import { DuelSeriesTally } from './DuelSeriesTally';
 import { DuelRevealScreen, type DuelOutcome } from './DuelRevealScreen';
 
 export interface RealTimeDuelGameProps {
@@ -76,8 +78,10 @@ export function RealTimeDuelGame({
     useSoundEffects();
   const {
     socket: duelSocket,
+    isConnected,
     submitWord,
     forfeitDuel,
+    joinDuelGame,
     onDuelStarted,
     onWordAccepted,
     onWordRejected,
@@ -86,6 +90,10 @@ export function RealTimeDuelGame({
     onOpponentReconnected,
     onDuelCompleted,
     onDuelCreated,
+    onRematchOffered,
+    onRematchPending,
+    onRematchInvited,
+    onRematchWithdrawn,
     onError,
   } = useDuelSocket();
 
@@ -125,6 +133,20 @@ export function RealTimeDuelGame({
   const seriesKey = opponentId && lessonId ? duelSeriesKey(opponentId, lessonId) : null;
 
   /**
+   * localStorage is the ONE source of truth for the tally; this state mirrors
+   * it. Without this the component only ever wrote: a reload — or opening game
+   * 2 from the lobby instead of REMATCH — started back at 0-0 and the waiting
+   * screen could not say which game of the series was coming (Class 1: two
+   * places holding the same value, one of them never read).
+   *
+   * Keyed on duelId as well as the key, so a rematch re-reads the result the
+   * previous game just recorded.
+   */
+  useEffect(() => {
+    setSeries(seriesKey ? readDuelSeries(seriesKey) : EMPTY_SERIES);
+  }, [seriesKey, duelId]);
+
+  /**
    * A rematch stays inside the /education/duels/[duelId] segment, so React
    * reuses this instance and every ref/state below would carry game 1 into
    * game 2: the podium would still be up, and `completionRecorded` would block
@@ -148,6 +170,26 @@ export function RealTimeDuelGame({
     setStartTime('');
     combo.reset();
   }
+
+  /**
+   * Tell the server this screen exists — and keep asking if it is not ready.
+   *
+   * The duel was started before this socket existed, so it is in no room and
+   * has missed `duel:started`. A rematch makes the race certain: both clients
+   * navigate the instant the duel is created, so the first join can beat the
+   * server's own game state and get `duel:error` back. One unanswered join is
+   * how this screen used to spin forever (recurring-pitfalls Class 4).
+   */
+  const {
+    stalled: joinStalled,
+    retry: retryJoin,
+  } = useDuelGameJoin({
+    duelId,
+    isConnected,
+    joined: phase !== 'waiting',
+    joinDuelGame,
+    onError,
+  });
 
   // Sound gate follows the live phase
   useEffect(() => {
@@ -173,6 +215,10 @@ export function RealTimeDuelGame({
 
   useEffect(() => {
     const cleanupStarted = onDuelStarted((data: DuelStartedData) => {
+      // A rematch starts a DIFFERENT duel while this screen is still mounted on
+      // the old one; without this guard the podium flipped back to a board
+      // (Class 3 — two duels sharing one socket).
+      if (data.duelId && data.duelId !== duelId) return;
       setBoardState(data.boardState);
       setStartTime(data.startTime);
       setTimeLimit(data.timeLimit);
@@ -300,27 +346,37 @@ export function RealTimeDuelGame({
   }, [seriesKey, status]);
 
   const {
-    pending: rematchPending,
+    state: rematchState,
+    offeredByName: rematchOfferedByName,
     canRematch,
     requestRematch,
+    cancelRematch,
   } = useDuelRematch({
     socket: duelSocket,
     opponentId,
     lessonId,
+    duelId,
     onDuelCreated,
     onError,
+    onRematchOffered,
+    onRematchPending,
+    onRematchInvited,
+    onRematchWithdrawn,
     onBeforeRequest: handleBeforeRematch,
   });
 
   // ---------- waiting ----------
   if (phase === 'waiting') {
     return (
-      <div
-        className="flex min-h-[400px] items-center justify-center"
-        data-testid="realtime-duel-game"
-      >
-        <Loader size="lg" />
-        <p className="ms-4 text-neo-white">{t('duels.waitingForOpponent')}</p>
+      <div className="h-full" data-testid="realtime-duel-game">
+        <DuelWaitingRoom
+          opponentName={opponentName}
+          stalled={joinStalled}
+          onRetry={retryJoin}
+          onBackToLobby={onBackToLobby}
+          series={series}
+          seriesStatus={status}
+        />
       </div>
     );
   }
@@ -346,7 +402,9 @@ export function RealTimeDuelGame({
           series={series}
           seriesStatus={status}
           onRematch={canRematch ? requestRematch : undefined}
-          rematchPending={rematchPending}
+          onCancelRematch={cancelRematch}
+          rematchState={rematchState}
+          rematchOfferedByName={rematchOfferedByName}
           onBackToLobby={onBackToLobby}
         />
       </div>

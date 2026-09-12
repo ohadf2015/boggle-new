@@ -88,6 +88,18 @@ export interface StylePopupGateInput {
    * `false` suppresses, so existing call sites are unaffected. False → never show.
    */
   hasPlayedAtLeastOneGame?: boolean;
+  /**
+   * A surface that must not be covered is on screen right now — a live board, a
+   * lobby, a round-end recap, the projector results (`lib/overlayQuietZone`).
+   * True → never show; the wrapper re-decides the moment the zone clears, so the
+   * picker is DEFERRED, not dropped.
+   *
+   * `gameActive` + `resultsShowing` are not enough on their own: they were both
+   * satisfied when this popup opened full-screen over a student's "YOU WON!"
+   * recap on a phone — the results screen reads as a natural break to this gate
+   * while being the exact moment the round pays off.
+   */
+  overlayQuietZone?: boolean;
 }
 
 /**
@@ -110,6 +122,10 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   // board (and a running, unpausable multiplayer timer). Only surface the popup
   // at a natural break — the "showing at the wrong moment" fix.
   if (input.gameActive) return false;
+  // Never cover a moment. The quiet zone is the shared rule (a board, a lobby,
+  // a round-end recap, the projector) — it covers the results screen, which the
+  // `resultsShowing` gate below deliberately treats as an opening.
+  if (input.overlayQuietZone) return false;
   // On a gameplay route, hold the popup until the game is over (results screen).
   // Pre-game setup / lobby / countdown are still mid-flow. Off gameplay routes
   // (menus, profile, leaderboard) the user is already idle, so this gate is moot.

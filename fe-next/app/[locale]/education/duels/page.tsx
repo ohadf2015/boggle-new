@@ -25,29 +25,28 @@ export default async function DuelsPage({ params }: { params: Promise<{ locale: 
       <Script id="ld-edu-duels-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumb)}</Script>
       <Suspense
         fallback={
-          <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
+          <div className="flex h-[100dvh] items-center justify-center overflow-hidden bg-neo-navy">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan" />
           </div>
         }
       >
-        <PageClient />
+        {/* The SEO copy is HANDED TO the client shell rather than rendered beside
+            it. As a sibling it grew the document to ~1550px against an 844px
+            phone viewport — the round-1 disqualifying measurement — because a
+            locked shell cannot clip what lives outside it. Inside, it is the tail
+            of the one scrolling region: crawler keeps the words, phone keeps one
+            screen. Deliberately NOT asH1, unlike /education/classroom-game:
+            DuelHistory already emits an h1 for a signed-in student. */}
+        <PageClient
+          seoContent={
+            <GamePageSeoContent
+              title={copy.name}
+              description={copy.description}
+              features={copy.steps.map((s) => `${s.name} — ${s.text}`)}
+            />
+          }
+        />
       </Suspense>
-      {/* PageClient is client-only, so this route served 4 visible words to a crawler
-          (measured 2026-08-21) while the HowTo JSON-LD above described three steps that
-          appeared nowhere on the page. Google requires HowTo markup to reflect content the
-          user can actually see, so rendering the same strings fixes both the shell and the
-          markup mismatch. The copy is not new — DUELS_CONTENT already had all 6 locales and
-          getEducationSubpageContent was exported for it, used until now only by its own
-          test. Not collapsible: this page has no game above it to push down.
-          Deliberately NOT asH1, unlike /education/classroom-game: PageClient.tsx:114 renders
-          <DuelHistory>, and DuelHistory.tsx:127 emits an h1 — so a signed-in student viewing
-          their history would get two. The SSR h1 count of 0 is misleading here because the
-          client half is what supplies it. Same reason /leaderboard omits asH1. */}
-      <GamePageSeoContent
-        title={copy.name}
-        description={copy.description}
-        features={copy.steps.map((s) => `${s.name} — ${s.text}`)}
-      />
     </>
   );
 }

@@ -121,6 +121,11 @@ export function scoreMissGapHomework(args: {
   completedOn?: string;
   completed?: boolean;
   maxPoints?: number;
+  /**
+   * 0-100 from the run the student actually played. Omitted → the old
+   * completion-only grade (nothing else knows an accuracy).
+   */
+  accuracy?: number;
 }): MissGapGradeScore {
   const dueDate = normalizeDueDate(args.dueDate);
   const completedOn = normalizeDueDate(args.completedOn || todayUtcDate());
@@ -142,9 +147,16 @@ export function scoreMissGapHomework(args: {
   }
 
   const onTime = contributesToOnTimeGrade(dueDate, completedOn);
-  const pointsEarned = onTime
+  const base = onTime
     ? maxPoints
     : Math.round((MISS_GAP_LATE_POINTS / MISS_GAP_MAX_POINTS) * maxPoints);
+  // Half the grade is for turning it in, half for getting the words right. A
+  // 2-of-6 run used to pass back a full 100 because "completed" was the only
+  // thing the old checkbox homework could measure.
+  const pointsEarned =
+    typeof args.accuracy === 'number' && Number.isFinite(args.accuracy)
+      ? Math.round(base * (0.5 + 0.5 * (Math.min(100, Math.max(0, args.accuracy)) / 100)))
+      : base;
 
   return {
     maxPoints,

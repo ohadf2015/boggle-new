@@ -77,7 +77,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
           <div
             className={cn(
               'max-w-md w-full',
-              'bg-neo-navy border-neo border-neo-black rounded-neo',
+              'bg-neo-navy border-[3px] border-neo-black rounded-neo',
               'shadow-hard-lg',
               'overflow-hidden',
               'animate-in fade-in-0 zoom-in-95 duration-300'
@@ -112,7 +112,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   data-testid="swipe-left-indicator"
                   className="flex flex-col items-center gap-2"
                 >
-                  <div className="w-14 h-14 rounded-full bg-neo-pink/20 border-neo border-neo-pink flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-neo-pink/20 border-[3px] border-neo-pink flex items-center justify-center">
                     {isRTL ? (
                       <ArrowRight className="w-7 h-7 text-neo-pink" />
                     ) : (
@@ -141,7 +141,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   data-testid="swipe-right-indicator"
                   className="flex flex-col items-center gap-2"
                 >
-                  <div className="w-14 h-14 rounded-full bg-neo-cyan/20 border-neo border-neo-cyan flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-neo-cyan/20 border-[3px] border-neo-cyan flex items-center justify-center">
                     {isRTL ? (
                       <ArrowLeft className="w-7 h-7 text-neo-cyan" />
                     ) : (
@@ -165,7 +165,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
                   'font-neo-display text-lg',
                   'bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black',
                   'shadow-hard hover:shadow-hard-lg',
-                  'border-neo border-neo-black',
+                  'border-[3px] border-neo-black',
                   'w-full sm:w-auto px-8'
                 )}
               >

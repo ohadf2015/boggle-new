@@ -124,7 +124,9 @@ describe('DuelHistory', () => {
 
       expect(screen.getByText('5')).toBeInTheDocument(); // wins
       expect(screen.getByText('3')).toBeInTheDocument(); // losses
-      expect(screen.getByText('1')).toBeInTheDocument(); // draws
+      // Draws lost its own tile when the five-square grid became one record strip;
+      // a drawn duel still shows in the list below with its own badge.
+      expect(screen.getByText('Win Rate')).toBeInTheDocument();
     });
 
     it('should display win streak', async () => {

@@ -92,6 +92,28 @@ export function VocabQuizChoiceBars({
                 isCorrect && 'ring-4 ring-neo-yellow'
               )}
             >
+              {/* Which one was RIGHT, stated independently of how many picked
+                  it. Measured live at 1440x900: a question the whole class
+                  missed left the answer at 0% width, so the only thing marking
+                  it on the wall was a thin ring. The vote bar stays honest —
+                  the wash says "this one", the bar says "this many". */}
+              {isCorrect && (
+                <div
+                  data-testid="vocab-quiz-answer-wash"
+                  className="absolute inset-0 bg-neo-lime opacity-25"
+                  aria-hidden
+                />
+              )}
+              {/* The option's colour at zero votes. Without it the wall rests
+                  as four near-black rectangles while the same four options are
+                  full-bleed colour on every phone in the room — and that colour
+                  is how a student matches the wall to the tile under their
+                  thumb. Solid, never a tint; the vote bar grows over it. */}
+              <div
+                data-testid={`vocab-quiz-rail-${index}`}
+                className={cn('absolute inset-y-0 start-0 w-3', style.fill)}
+                aria-hidden
+              />
               <div
                 data-testid={`vocab-quiz-bar-${index}`}
                 className={cn(

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BarChart3, BookOpen, Dumbbell, Play, Trophy, User } from 'lucide-react';
+import { BarChart3, BookOpen, Dumbbell, Play, Trophy, User, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { EducationNavItem, ResolvedEducationNav } from './navItems';
 
@@ -38,6 +38,7 @@ const ICONS = {
   user: User,
   trophy: Trophy,
   dumbbell: Dumbbell,
+  users: Users,
 } as const;
 
 export interface EducationNavProps {
@@ -55,7 +56,9 @@ function itemClasses(active: boolean, variant: 'tabs' | 'sidebar') {
     'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
     variant === 'tabs'
       ? 'min-h-[52px] flex-1 flex-col gap-1 px-1 py-1.5 text-[11px]'
-      : 'min-h-[48px] w-full justify-start px-3 py-2 text-[15px]',
+      : // Tablet collapses this to an icon rail, so the row centres its icon
+        // until there is desktop width for a label beside it.
+        'min-h-[48px] w-full justify-center px-2 py-2 text-[15px] lg:justify-start lg:px-3',
     active
       ? 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
       : 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-cream hover:bg-neo-cyan hover:text-neo-black',
@@ -81,9 +84,16 @@ function NavLink({
       aria-current={active ? 'page' : undefined}
       className={itemClasses(active, variant)}
     >
-      <Icon className={variant === 'tabs' ? 'h-5 w-5 shrink-0' : 'h-5 w-5 shrink-0'} aria-hidden />
-      {/* An icon alone is not a label — every tab says what it is. */}
-      <span className="truncate">{t(item.labelKey)}</span>
+      <Icon className="h-5 w-5 shrink-0" aria-hidden />
+      {/* An icon alone is not a label — every tab says what it is. On the tablet
+          icon rail the label stays in the DOM for screen readers and is simply
+          not painted; removing it would leave an unnamed button. */}
+      <span
+        data-testid={variant === 'sidebar' ? `education-side-label-${item.key}` : undefined}
+        className={cn('truncate', variant === 'sidebar' && 'hidden lg:inline')}
+      >
+        {t(item.labelKey)}
+      </span>
     </Link>
   );
 }
@@ -99,9 +109,10 @@ export function EducationNav({ nav, t, variant, className }: EducationNavProps) 
         data-testid="education-sidebar"
         aria-label={t('teacher.nav.sidebarLabel')}
         className={cn(
-          // Desktop only, and short enough that it never becomes a second
-          // scroller — the shell contract is exactly one.
-          'hidden shrink-0 lg:flex w-60 flex-col gap-2 overflow-hidden',
+          // Tablet and up, and short enough that it never becomes a second
+          // scroller — the shell contract is exactly one. 72px is an icon rail
+          // at tablet; 240px with labels once there is desktop width.
+          'hidden shrink-0 md:flex w-[72px] lg:w-60 flex-col gap-2 overflow-hidden',
           'border-e-[3px] border-neo-cream bg-neo-navy px-3 py-4',
           className,
         )}
@@ -116,7 +127,9 @@ export function EducationNav({ nav, t, variant, className }: EducationNavProps) 
       data-testid="education-tabbar"
       aria-label={t('teacher.nav.tabsLabel')}
       className={cn(
-        'shrink-0 lg:hidden flex items-stretch gap-1.5',
+        // Hidden the instant the sidebar arrives (md): a tablet carrying both
+        // would spend a row of content on a duplicate nav.
+        'shrink-0 md:hidden flex items-stretch gap-1.5',
         'border-t-[3px] border-neo-cream bg-neo-navy px-2 pt-2',
         'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
         className,

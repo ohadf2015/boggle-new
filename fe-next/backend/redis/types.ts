@@ -29,6 +29,7 @@ export interface GameStateData {
   wordHuntState: Record<string, unknown> | null;
   isRanked?: boolean;
   isPrivate?: boolean;
+  isClassroom?: boolean;
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
   aiApprovedWords?: unknown[];
@@ -126,6 +127,7 @@ export interface GameDataInput {
   wordHuntState?: Record<string, unknown> | null;
   isRanked?: boolean;
   isPrivate?: boolean;
+  isClassroom?: boolean;
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
   aiApprovedWords?: unknown[];

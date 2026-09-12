@@ -59,17 +59,23 @@ export interface CreateDuelData {
   expiresAt?: string;
 }
 
+/**
+ * A profile embed that can legitimately be absent.
+ *
+ * A student reading another student's `profiles` row gets zero rows with
+ * `error: null` (own-row RLS), so PostgREST resolves the embed to `null`. The
+ * type used to promise a row, and the History tab crashed on `.display_name`
+ * every time it opened. Lying in the type is how a null reaches render.
+ */
+export interface DuelProfileEmbed {
+  id: string;
+  display_name: string | null;
+  avatar_config: Record<string, unknown> | null;
+}
+
 export interface DuelHistoryEntry extends DuelRow {
-  challenger: {
-    id: string;
-    display_name: string;
-    avatar_config: Record<string, unknown> | null;
-  };
-  opponent: {
-    id: string;
-    display_name: string;
-    avatar_config: Record<string, unknown> | null;
-  };
+  challenger: DuelProfileEmbed | null;
+  opponent: DuelProfileEmbed | null;
   isWin: boolean;
 }
 

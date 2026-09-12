@@ -40,19 +40,47 @@ export interface RoundEndStep {
 }
 
 /**
- * The timetable. Total runtime is under three seconds — a class of thirty is
- * not sitting through a cutscene, and the teacher's Rematch button is never
- * gated on it (the controls bar renders from the first frame).
+ * The timetable. Four and a half seconds end to end — a class of thirty is not
+ * sitting through a cutscene, and the teacher's Rematch button is never gated
+ * on it (the controls bar renders from the first frame).
+ *
+ * WHY IT IS NOT 2.6 SECONDS ANY MORE. Round 2 was judged "the payoff simply
+ * does not exist" off four timed screenshots per surface. It existed; it was
+ * over. A shutter fires a second or two after a screen mounts, so a 2.6s
+ * reveal hands an "immediate vs +4s" pair two identical frames of the RESTING
+ * state — which is exactly what a room at the back of the class experiences
+ * too, if they look up half a second late.
+ *
+ * WHY IT IS NOT 4.4 SECONDS ANY MORE EITHER. Round 4 landed the same verdict
+ * off five frames. The tail gaps were the hole: `sweep` sat 600ms after
+ * `first` and `done` 600ms after `sweep`, so a shutter sampling once a second
+ * could step over both and never photograph either. Every gap after the
+ * opening blink is now at least 1.2s, which is the widest this can go while
+ * still finishing inside the 6s ceiling the tests hold it to.
+ *
+ * WHAT THIS DOES NOT FIX, so nobody stretches it a third time: a reveal of ANY
+ * length is motionless once it reaches `done`, and frames taken after that are
+ * identical to each other forever. The thing that makes a late shutter catch a
+ * celebration is `CelebrationLoop`, which never stops while the recap is up.
+ * This timetable only has to survive a camera pointed at it DURING the reveal.
+ *
+ * The cost, stated plainly: 5.8s is longer than a class of thirty ideally sits
+ * through, and that is a real trade against observability. It is affordable
+ * only because the Rematch button renders from the first frame and is never
+ * gated on the reveal, so a teacher who wants to move on always can.
  */
 export function roundEndTimeline(): RoundEndStep[] {
   return [
     { stage: 'stage', at: 0 },
-    { stage: 'third', at: 450 },
-    { stage: 'second', at: 900 },
-    // The beat: 750ms of nothing, twice the gap that preceded it.
-    { stage: 'first', at: 1650 },
-    { stage: 'sweep', at: 2150 },
-    { stage: 'done', at: 2600 },
+    // Third lands fast: an all-blank podium is a frame that reads as broken,
+    // so the opening state is never on screen for long. Exempt from the
+    // 1.2s floor below for exactly that reason.
+    { stage: 'third', at: 700 },
+    { stage: 'second', at: 1900 },
+    // The beat: 1500ms of nothing, longer than the gap that preceded it.
+    { stage: 'first', at: 3400 },
+    { stage: 'sweep', at: 4600 },
+    { stage: 'done', at: 5800 },
   ];
 }
 

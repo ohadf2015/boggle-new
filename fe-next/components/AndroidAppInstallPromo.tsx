@@ -26,7 +26,7 @@ import { usePathname } from 'next/navigation';
 import { Zap, WifiOff, Bell } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
-import { isInGameSurface } from '@/lib/inGameSurface';
+import { isOverlayQuietZoneActive } from '@/lib/overlayQuietZone';
 import { useExperiment } from '@/hooks/useExperiment';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import {
@@ -92,7 +92,13 @@ export default function AndroidAppInstallPromo() {
       isStandalone: isStandaloneDisplay(),
       isInstalled: false,
       isAllowedRoute: isAllowedAdBannerRoute(pathname),
-      inGame: isInGameSurface(),
+      // NOT the live quiet-zone reading. This value feeds the cheap synchronous
+      // early-out below, which `return`s for good — an overlay-quiet surface at
+      // MOUNT time would drop the promo for the rest of the page view instead of
+      // delaying it (pitfalls class 4: a silent no-op that looks like "nothing to
+      // do"). The zone is a DELAY, so it is read at fire time, where failing
+      // re-arms the loop. Same reasoning as `requireEngagement` below.
+      inGame: false,
       dismissedUntil: readInstallDismissedUntil(),
       sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
       now: Date.now(),
@@ -136,7 +142,7 @@ export default function AndroidAppInstallPromo() {
             // Re-read, not spread: the round the player is in almost never started at
             // mount. A frozen `inGame: false` is exactly how the interstitial ended up
             // over a live board. Failing here re-arms, so the promo lands after the round.
-            inGame: isInGameSurface(),
+            inGame: isOverlayQuietZoneActive(),
             dismissedUntil: readInstallDismissedUntil(),
             sessionShown: Boolean(sessionStorage.getItem(SESSION_FLAG)),
             now: Date.now(),

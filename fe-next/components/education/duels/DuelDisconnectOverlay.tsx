@@ -50,7 +50,7 @@ export function DuelDisconnectOverlay({
       data-testid="disconnect-overlay"
       className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs animate-in fade-in-0 duration-300"
     >
-      <div className="bg-neo-navy border-neo-thick rounded-neo shadow-hard p-8 max-w-md text-center">
+      <div className="bg-neo-navy border-[3px] border-neo-cream rounded-neo shadow-hard p-8 max-w-md text-center">
         {/* Icon */}
         <WifiOff className="w-16 h-16 text-neo-pink mx-auto mb-4" />
 

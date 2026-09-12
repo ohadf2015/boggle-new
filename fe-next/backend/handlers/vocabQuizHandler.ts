@@ -51,6 +51,7 @@ import {
   setQuizSession,
   getQuizSession,
   setQuizTimer,
+  clearQuizFinished,
   clearAllQuizSessions,
 } from '../modules/vocabQuizStore.js';
 import {
@@ -192,6 +193,13 @@ function readQuizSettings(settings: Record<string, unknown> | undefined) {
  * exactly as before.
  */
 export async function startVocabQuizForClassroom(io: Server, gameCode: string): Promise<boolean> {
+  // Whatever starts next in this room owns it from here. A finished quiz keeps
+  // answering `hasQuizSession` for a grace window (so the board's end path
+  // cannot steal the persistence key from `finishQuiz`); a board round hosted
+  // straight afterwards must not inherit that deferral and find its own END
+  // ROUND ignored.
+  clearQuizFinished(gameCode);
+
   let classroomGame: Awaited<ReturnType<typeof getClassroomGame>>;
   try {
     classroomGame = await getClassroomGame(gameCode);

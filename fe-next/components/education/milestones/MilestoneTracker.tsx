@@ -60,9 +60,14 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
               {nextMilestone?.level || '—'}
             </span>
           </div>
+          {/* `xpRemaining` is `{{xp}} XP to next level` — a sentence with a
+              slot, not a label. Rendered bare with the number appended after a
+              colon it read `{xp} XP to next level: 466` on the student hub in
+              every locale. Pass the number INTO the string; the accent then
+              covers the whole line, so no markup is needed inside it. */}
           {nextMilestone && (
-            <div className="text-sm text-neo-white">
-              {t('education.milestones.xpRemaining')}: <span className="font-bold text-neo-lime">{xpToNextMilestone}</span>
+            <div className="text-sm font-bold text-neo-lime">
+              {t('education.milestones.xpRemaining', { xp: xpToNextMilestone })}
             </div>
           )}
         </div>

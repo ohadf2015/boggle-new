@@ -61,6 +61,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 vi.mock('@/utils/SocketContext', () => ({
   useSocketOptional: () => ({ socket: null }),
+  // ProjectorLobby's in-place mode switch resolves the room socket itself.
+  getSharedSocketIfExists: () => null,
 }));
 
 vi.mock('@/hooks/useLobbyAutoStart', () => ({

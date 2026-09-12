@@ -18,14 +18,14 @@
 
 import { useEffect, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import { PauseCircle, Trophy, Users } from 'lucide-react';
+import { PauseCircle, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import type { ExtendedMascotVariant } from '@/components/ui/mascotUtils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { useVocabQuiz } from './useVocabQuiz';
 import { useVocabQuizJuice } from './useVocabQuizJuice';
-import { VocabQuizStandings } from './VocabQuizStandings';
+import { VocabQuizFinale } from './VocabQuizFinale';
 import { VocabQuizChoiceBars } from './VocabQuizChoiceBars';
 import { VocabQuizNextUp } from './VocabQuizNextUp';
 
@@ -105,12 +105,18 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
           alt={t('vocabQuiz.mascot.alt')}
           className="shrink-0"
         />
-        <span className="font-neo-display font-bold text-2xl text-neo-white/70">
-          {t('vocabQuiz.progress', {
-            current: quiz.questionNumber || 1,
-            total: quiz.totalQuestions || 1,
-          })}
-        </span>
+        {/* A question counter on a finished round is chrome from a screen that
+            no longer exists; the finale below carries its own headline. The
+            join code stays, because a phone that lost the room mid-celebration
+            is the commonest reason a student is stuck. */}
+        {phase !== 'ended' && (
+          <span className="font-neo-display font-bold text-2xl text-neo-white/70">
+            {t('vocabQuiz.progress', {
+              current: quiz.questionNumber || 1,
+              total: quiz.totalQuestions || 1,
+            })}
+          </span>
+        )}
         {typeof playerCount === 'number' && (
           <span className="flex items-center gap-2 text-xl text-neo-white/70">
             <Users className="w-6 h-6" aria-hidden />
@@ -202,15 +208,11 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
         </div>
       )}
 
+      {/* The payoff the whole round was building towards: the class's own three
+          numbers, Lexi with the trophy, and the podium — not a list under a
+          heading. See VocabQuizFinale. */}
       {phase === 'ended' && (
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col gap-5">
-          <h2 className="flex items-center gap-3 font-neo-display font-bold text-4xl">
-            <Trophy className="w-10 h-10 text-neo-yellow" aria-hidden />
-            {t('vocabQuiz.finished.title')}
-          </h2>
-          {/* The quiz finishes on the same podium every other classroom mode gets. */}
-          <VocabQuizStandings standings={quiz.standings} limit={5} size="projector" podium t={t} />
-        </div>
+        <VocabQuizFinale standings={quiz.standings} totalQuestions={quiz.totalQuestions} t={t} />
       )}
     </div>
   );

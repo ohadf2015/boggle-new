@@ -235,7 +235,11 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-black/70 p-4 animate-in fade-in-0 duration-300"
+      // Class-5: an opacity-from-0 entrance on a FULLSCREEN layer promotes a
+      // page-sized GPU layer and flashes on the Chromium mobile renderer. The
+      // backdrop now paints at its resting value on frame one; the panel
+      // inside it keeps its (small, bounded) entrance.
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-black/70 p-4"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div

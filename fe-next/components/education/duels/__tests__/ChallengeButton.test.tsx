@@ -118,13 +118,20 @@ describe('ChallengeButton', () => {
       });
     });
 
-    it('applies neo-brutalist styling', () => {
+    // The border width must be written as an ARBITRARY value. `border-neo`
+    // (a width utility) and `border-neo-black` (a colour) land in the same
+    // tailwind-merge class group, so cn() drops the width and Tailwind's
+    // preflight then renders the control with no border at all.
+    it('applies neo-brutalist styling with a border width cn() cannot drop', () => {
       render(<ChallengeButton {...mockProps} />);
 
       const button = screen.getByTestId('challenge-button');
       expect(button).toHaveClass('bg-neo-pink');
-      expect(button).toHaveClass('border-3');
+      expect(button).toHaveClass('border-[3px]');
+      expect(button).toHaveClass('border-neo-black');
       expect(button).toHaveClass('shadow-hard-sm');
+      // Cream-on-pink measures 3.6:1 — labels on an accent fill are black.
+      expect(button).toHaveClass('text-neo-black');
     });
   });
 

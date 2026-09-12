@@ -16,14 +16,21 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-const { mockPush, mockUseAuth, mockUsePracticeLesson, mockUsePracticeProgress, mockStartSession } =
-  vi.hoisted(() => ({
-    mockPush: vi.fn(),
-    mockUseAuth: vi.fn(),
-    mockUsePracticeLesson: vi.fn(),
-    mockUsePracticeProgress: vi.fn(),
-    mockStartSession: vi.fn().mockResolvedValue({ success: true }),
-  }));
+const {
+  mockPush,
+  mockUseAuth,
+  mockUsePracticeLesson,
+  mockUsePracticeProgress,
+  mockStartSession,
+  mockDismissLevelUp,
+} = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockUseAuth: vi.fn(),
+  mockUsePracticeLesson: vi.fn(),
+  mockUsePracticeProgress: vi.fn(),
+  mockStartSession: vi.fn().mockResolvedValue({ success: true }),
+  mockDismissLevelUp: vi.fn(),
+}));
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => mockUseAuth() }));
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -33,6 +40,9 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
   useParams: () => ({ id: 'lesson-1' }),
   useSearchParams: () => new URLSearchParams(),
+  // EducationShell reads this to place the Practice tab. Omitting it does not
+  // yield undefined — vitest throws on an unknown export of a mocked module.
+  usePathname: () => '/en/student/lessons/lesson-1',
 }));
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
 
@@ -64,7 +74,7 @@ vi.mock('@/components/education/PracticeSessionProvider', () => ({
     sessionMasteryMessage: null,
     completePracticeSession: completeSpy,
     levelUpData: null,
-    dismissLevelUp: vi.fn(),
+    dismissLevelUp: mockDismissLevelUp,
   }),
 }));
 
@@ -225,5 +235,56 @@ describe('round end offers the next mode', () => {
     await user.click(await screen.findByTestId('pick-flashcard'));
 
     expect(screen.queryByTestId('practice-next-mode')).not.toBeInTheDocument();
+  });
+});
+
+/*
+ * The r2 capture caught this flow dead-ending twice: a lesson a student reached
+ * from their own hub answered with nothing, and the screen that replaced it
+ * offered a single way out — back to the list they had just come from. A load
+ * that failed once is very often a load that succeeds on the retry, so the
+ * dominant action on that screen is TRY AGAIN; the way back is the smaller one.
+ */
+describe('lesson that would not load', () => {
+  it('leads with a retry rather than only a way out', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'student-1' }, loading: false });
+    mockUsePracticeLesson.mockReturnValue({ lesson: null, isLoading: false, error: null });
+    mockUsePracticeProgress.mockReturnValue({
+      progress: null,
+      mastery: null,
+      startSession: mockStartSession,
+      isLoading: false,
+    });
+
+    render(<LessonPracticePageClient />);
+
+    const retry = await screen.findByTestId('practice-lesson-retry');
+    expect(retry).toHaveAttribute('data-primary', 'true');
+    // And the escape hatch is still there, one step down.
+    expect(screen.getByTestId('practice-lesson-exit')).not.toHaveAttribute('data-primary');
+  });
+});
+
+/*
+ * Pitfalls Class 1 — a level-up that the finished round already celebrated on
+ * its completion card must not reappear as a modal over the NEXT round. The
+ * page clears the pending level-up as it opens a mode, so the only surface that
+ * can ever show it is one that is not being played on.
+ */
+describe('level-up never lands on top of a round', () => {
+  it('clears any pending level-up when the next mode opens', async () => {
+    const user = userEvent.setup();
+    mockUseAuth.mockReturnValue({ user: { id: 'student-1' }, loading: false });
+    mockUsePracticeLesson.mockReturnValue({ lesson: LESSON, isLoading: false, error: null });
+    mockUsePracticeProgress.mockReturnValue({
+      progress: null,
+      mastery: null,
+      startSession: mockStartSession,
+      isLoading: false,
+    });
+
+    render(<LessonPracticePageClient />);
+    await user.click(await screen.findByTestId('pick-flashcard'));
+    await waitFor(() => expect(mockDismissLevelUp).toHaveBeenCalled());
   });
 });

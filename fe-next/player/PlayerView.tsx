@@ -19,9 +19,7 @@ import { useTeacherPaused } from '../hooks/useTeacherPause';
 import { addGameBreadcrumb } from '../utils/sentry';
 import logger from '@/utils/logger';
 import type { TournamentStanding } from '@/types';
-import type {
-  ViewTournamentData as TournamentData,
-} from '@/shared/types/view';
+import type { ViewTournamentData as TournamentData } from '@/shared/types/view';
 
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
@@ -61,6 +59,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
+import { useBoardWaitingScreen } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 
 import type { WordToVote, PlayerViewProps } from './types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -104,6 +103,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const boardTheme = useBoardTheme();
   const totalBoardWords = useTotalBoardWords();
   const waitingForResults = useWaitingForResults();
+  const boardWaiting = useBoardWaitingScreen(socket, waitingForResults); // a quiz room has no board clock
   const letterGrid = useLetterGrid();
   const shufflingGrid = useShufflingGrid();
   const leaderboard = useLeaderboard();
@@ -668,7 +668,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // This allows players to see the board while countdown is active
   // Also covers the transition period between countdown ending and gameActive being set
   const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
-  const showGameView = gameActive || (hasGameData && !waitingForResults);
+  const showGameView = gameActive || (hasGameData && !boardWaiting);
 
   // Map game mode to display label
   const modeRevealLabel = gameMode === 'blast' ? t('countdown.modeReveal.blast') : gameMode === 'word-hunt' ? t('countdown.modeReveal.wordHunt') : gameMode === 'wheel-rush' ? t('countdown.modeReveal.wheelRush') : t('countdown.modeReveal.classic');
@@ -677,7 +677,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // in-game-view return below, so GoRipplesAnimation (and ModeRevealOverlay)
   // mount from exactly one tree position — no unmount/remount that would
   // restart the countdown from 3.
-  if (!showGameView && !waitingForResults && !showModeReveal && !showStartAnimation) {
+  if (!showGameView && !boardWaiting && !showModeReveal && !showStartAnimation) {
     // Show loading indicator when server is preparing the game
     if (isGameLoading) {
       return (
@@ -718,7 +718,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   }
 
   // Waiting for results — brief transition until scores arrive (no validation modal)
-  if (waitingForResults) {
+  if (boardWaiting) {
     const playerEntry = leaderboard.find(p => p.username === username);
     const playerScore = playerEntry?.score ?? 0;
     const validWords = foundWords.filter(w => w.validated !== false);

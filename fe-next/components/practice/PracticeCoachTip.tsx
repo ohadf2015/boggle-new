@@ -54,7 +54,7 @@ export default function PracticeCoachTip({
       data-testid="practice-coach-tip"
       className={
         className ??
-        'mx-auto w-full max-w-md flex items-center gap-2 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-cream/95 text-neo-black shadow-hard-sm'
+        'mx-auto w-full max-w-md flex items-center gap-2 px-3 py-2 rounded-neo border-[2px] border-neo-black bg-neo-cream/95 text-neo-black shadow-hard-sm'
       }
     >
       <span className="font-neo-display font-black text-xs uppercase shrink-0">

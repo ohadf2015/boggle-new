@@ -19,7 +19,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 const { mockUseAuth, mockPush } = vi.hoisted(() => ({ mockUseAuth: vi.fn(), mockPush: vi.fn() }));
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
+// usePathname is what EducationShell reads to decide whether this screen has
+// tabs. A bare factory mock without it does not return undefined — vitest
+// throws on the unknown export — so every partial mock of this module must
+// name it.
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }), usePathname: () => '/en/student' }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({

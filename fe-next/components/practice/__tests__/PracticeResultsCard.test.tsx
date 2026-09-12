@@ -76,9 +76,21 @@ describe('PracticeResultsCard', () => {
     expect(screen.queryByTestId('practice-completion-xp')).not.toBeInTheDocument();
   });
 
-  it('forwards a server-authored mastery message', () => {
-    render(<PracticeResultsCard {...defaultProps} masteryMessage="You are amazing!" />);
-    expect(screen.getByText('You are amazing!')).toBeInTheDocument();
+  /*
+   * The XP endpoint's masteryMessage is English template-literal copy from
+   * backend/modules/educationXpManager.ts and it only restated the stat grid.
+   * A Hebrew or Japanese student was reading one English sentence on the
+   * payoff card, so the card dropped it; a caller that still passes it must
+   * not be able to get it back on screen.
+   */
+  it('does not render a server-authored English mastery message', () => {
+    render(
+      <PracticeResultsCard
+        {...defaultProps}
+        {...({ masteryMessage: 'You are amazing!' } as Record<string, unknown>)}
+      />
+    );
+    expect(screen.queryByText('You are amazing!')).not.toBeInTheDocument();
   });
 
   it('maps onRestart onto the AGAIN action', () => {
@@ -89,7 +101,7 @@ describe('PracticeResultsCard', () => {
 
   it('maps onBack onto the all-games action', () => {
     render(<PracticeResultsCard {...defaultProps} />);
-    fireEvent.click(screen.getByTestId('practice-completion-back'));
+    fireEvent.click(screen.getByTestId('practice-completion-exit'));
     expect(defaultProps.onBack).toHaveBeenCalledTimes(1);
   });
 
@@ -123,5 +135,28 @@ describe('PracticeResultsCard', () => {
   it('applies a custom className to the wrapper', () => {
     render(<PracticeResultsCard {...defaultProps} className="custom-class" />);
     expect(screen.getByTestId('practice-results-card')).toHaveClass('custom-class');
+  });
+});
+
+describe('PracticeResultsCard stat labels', () => {
+  it('GIVEN a best streak WHEN the card renders THEN the label is a label, not an unfilled sentence', () => {
+    // `education.practice.maxStreak` is "Best Streak: {{count}}" and
+    // `hintsUsed` is "{{count}} hints used" — both were passed as LABELS beside
+    // a separate value, so the card printed a raw "{count}" at the student.
+    render(
+      <PracticeResultsCard
+        correct={4}
+        total={8}
+        maxStreak={2}
+        hintsUsed={3}
+        onRestart={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+    const card = screen.getByTestId('practice-results-card');
+    // The bare-label keys, not the interpolated sentences.
+    expect(card.textContent).toContain('student.practiceFun.bestStreak');
+    expect(card.textContent).not.toContain('Max Streak');
+    expect(card.textContent).not.toContain('Hints Used');
   });
 });

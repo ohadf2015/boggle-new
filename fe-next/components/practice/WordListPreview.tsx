@@ -57,7 +57,7 @@ export default function WordListPreview({
               onViewComplete?.();
               onBack();
             }}
-            className="text-slate-400 hover:text-neo-white"
+            className="text-neo-cream hover:text-neo-white"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
@@ -66,15 +66,15 @@ export default function WordListPreview({
               <BookOpen className="w-5 h-5 text-neo-yellow" />
               {t('education.practice.wordList')}
             </h1>
-            <p className="text-sm text-slate-400">{lessonName}</p>
+            <p className="text-sm text-neo-cream">{lessonName}</p>
           </div>
         </div>
 
         {/* Stats bar */}
-        <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">
+              <span className="text-neo-cream">
                 {words.length} {t('education.practice.wordCount')} {t('education.practice.total')}
               </span>
               <div className="flex items-center gap-4">
@@ -94,7 +94,7 @@ export default function WordListPreview({
         {/* Search */}
         <div className="relative mb-4">
           <Search className={cn(
-            'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400',
+            'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-neo-cream',
             isRTL ? 'right-3' : 'left-3'
           )} />
           <Input
@@ -102,7 +102,7 @@ export default function WordListPreview({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('education.practice.searchWords')}
             className={cn(
-              'border-neo border-neo-black shadow-hard-sm bg-neo-navy/50',
+              'border-[3px] border-neo-black shadow-hard-sm bg-neo-navy/50',
               'ps-10'
             )}
           />
@@ -111,9 +111,9 @@ export default function WordListPreview({
         {/* Word list */}
         <div className="space-y-2">
           {filteredWords.length === 0 ? (
-            <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
+            <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/50">
               <CardContent className="py-8 text-center">
-                <p className="text-slate-400">
+                <p className="text-neo-cream">
                   {searchQuery
                     ? t('education.practice.noResults')
                     : t('education.practice.noWords')}
@@ -126,7 +126,7 @@ export default function WordListPreview({
                 key={`word-${idx}-${word.word}`}
                 onClick={() => handleToggleExpand(word.word)}
                 className={cn(
-                  'border-neo border-neo-black shadow-hard cursor-pointer',
+                  'border-[3px] border-neo-black shadow-hard cursor-pointer',
                   'transition-all hover:shadow-hard-lg',
                   expandedWord === word.word
                     ? 'bg-neo-cyan/10'
@@ -145,7 +145,7 @@ export default function WordListPreview({
                         {word.word}
                       </span>
                     </div>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-neo-cream">
                       {expandedWord === word.word ? '▲' : '▼'}
                     </span>
                   </div>
@@ -156,11 +156,11 @@ export default function WordListPreview({
                       {word.definition ? (
                         <p className="text-sm text-slate-300">{word.definition}</p>
                       ) : (
-                        <p className="text-sm text-slate-500 italic">
+                        <p className="text-sm text-neo-cream italic">
                           {t('education.practice.noDefinition')}
                         </p>
                       )}
-                      <p className="text-xs text-slate-500 mt-2">
+                      <p className="text-xs text-neo-cream mt-2">
                         {word.canIntegrate
                           ? t('teacher.lesson.canIntegrate')
                           : t('teacher.lesson.cannotIntegrate')}
@@ -182,7 +182,7 @@ export default function WordListPreview({
             }}
             className={cn(
               'w-full bg-neo-cyan text-neo-black font-bold',
-              'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
+              'border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed'
             )}
           >
             {t('common.understood')}

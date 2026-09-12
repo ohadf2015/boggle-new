@@ -68,7 +68,7 @@ export default function PracticeChainCta({ currentMode, className }: Props) {
               key={mode}
               data-testid={`practice-chain-dot-${mode}`}
               data-state={state}
-              className={`block w-2.5 h-2.5 rounded-full border-2 transition-colors ${DOT_CLASS[state]}`}
+              className={`block w-2.5 h-2.5 rounded-full border-[2px] transition-colors ${DOT_CLASS[state]}`}
             />
           );
         })}
@@ -79,7 +79,7 @@ export default function PracticeChainCta({ currentMode, className }: Props) {
         data-testid="practice-chain-cta"
         className={
           className ??
-          'inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]'
+          'inline-flex items-center justify-center w-full bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]'
         }
       >
         {label}

@@ -22,6 +22,7 @@ import {
   recommendedModeBadge,
   definedWordCount,
   modeDurationMinutes,
+  configuredRoundMinutes,
 } from '../gameModes';
 import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_MODE } from '@/shared/types/vocabQuiz';
 import { pickQuickLaunchMode } from '@/components/teacher/dashboard/quickLaunchIntent';
@@ -100,5 +101,52 @@ describe('recommendedModeForWords — "recommended for this lesson"', () => {
     for (const words of [defined(4), defined(3), bare(9), []]) {
       expect(recommendedModeForWords(words)).toBe(pickQuickLaunchMode(words));
     }
+  });
+});
+
+/**
+ * The minute chip on the poster and the minute chip in the round settings are
+ * the SAME fact. Measured live 2026-09-11 they disagreed — the poster promised
+ * "5 MIN" from the catalog and the lobby two taps later said "3 min" from the
+ * timer the teacher had set — which is recurring pitfall class 3 (one fact,
+ * two sources) and reads to a teacher as a lie on the poster.
+ */
+describe('configuredRoundMinutes — the poster quotes the room, not the catalog', () => {
+  it('quotes the timer the teacher set, for every board mode', () => {
+    for (const mode of ['classic', 'word-hunt', 'blast', 'wheel-rush'] as const) {
+      expect(configuredRoundMinutes(mode, { timerMinutes: 7 })).toBe(7);
+      expect(configuredRoundMinutes(mode, { timerMinutes: 2 })).toBe(2);
+    }
+  });
+
+  it('derives the quiz length from its own two settings, never the board timer', () => {
+    // 10 questions x 20s = 200s -> 3 min, whatever the board timer says.
+    expect(
+      configuredRoundMinutes(VOCAB_QUIZ_MODE, {
+        timerMinutes: 9,
+        vocabQuizQuestionCount: 10,
+        vocabQuizSeconds: 20,
+      })
+    ).toBe(3);
+    expect(
+      configuredRoundMinutes(VOCAB_QUIZ_MODE, {
+        timerMinutes: 9,
+        vocabQuizQuestionCount: 20,
+        vocabQuizSeconds: 30,
+      })
+    ).toBe(10);
+  });
+
+  /** A chip reading "0 min" is worse than a rough one. */
+  it('never quotes less than a minute', () => {
+    expect(
+      configuredRoundMinutes(VOCAB_QUIZ_MODE, { vocabQuizQuestionCount: 1, vocabQuizSeconds: 5 })
+    ).toBe(1);
+    expect(configuredRoundMinutes('classic', { timerMinutes: 0 })).toBe(1);
+  });
+
+  it('falls back to the catalog when the room is not configured yet', () => {
+    expect(configuredRoundMinutes('blast', {})).toBe(modeDurationMinutes('blast'));
+    expect(configuredRoundMinutes(VOCAB_QUIZ_MODE, {})).toBe(modeDurationMinutes(VOCAB_QUIZ_MODE));
   });
 });

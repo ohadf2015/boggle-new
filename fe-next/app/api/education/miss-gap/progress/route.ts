@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { MISS_GAP_PROGRESS_RATE_LIMIT } from '@/lib/education/missGapRateLimits';
 import { normalizeDay } from '@/lib/education/classStreakMath';
 import { normalizeMissGapClassKey } from '@/lib/education/missGapClassKey';
 import logger from '@/utils/logger';
@@ -39,10 +40,12 @@ interface RunRow {
 }
 
 export async function GET(request: NextRequest) {
-  const limit = checkApiRateLimit(request, 'education-miss-gap-progress', {
-    windowMs: 60_000,
-    maxRequests: 60,
-  });
+  // Per-IP, and a class shares one — see lib/education/missGapRateLimits.ts.
+  const limit = checkApiRateLimit(
+    request,
+    'education-miss-gap-progress',
+    MISS_GAP_PROGRESS_RATE_LIMIT,
+  );
   if (!limit.success) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }

@@ -55,7 +55,11 @@ vi.mock('@/hooks/gameState', () => ({
   useGameActions: () => ({ setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAdmin: false }) }));
-vi.mock('@/utils/SocketContext', () => ({ useSocketOptional: () => ({ socket: null }) }));
+vi.mock('@/utils/SocketContext', () => ({
+  useSocketOptional: () => ({ socket: null }),
+  // ProjectorLobby's in-place mode switch resolves the room socket itself.
+  getSharedSocketIfExists: () => null,
+}));
 vi.mock('@/hooks/useLobbyAutoStart', () => ({
   useLobbyAutoStart: () => ({ secondsLeft: null, cancel: vi.fn() }),
 }));

@@ -83,10 +83,12 @@ describe('MissGapAsyncAssignment', () => {
     mockProgressFetch();
   });
 
-  it('teacher mode: due date + Kahootopia foil + GC assign (not Unplugged Live)', () => {
+  it('teacher mode: due date + GC assign (not Unplugged Live), no positioning copy', () => {
     render(<MissGapAsyncAssignment payload={payload} teacherMode />);
     expect(screen.getByTestId('miss-gap-async-assignment')).toBeInTheDocument();
-    expect(screen.getByTestId('miss-gap-async-foil')).toBeInTheDocument();
+    // The competitor-positioning line was written for the PR, not for a teacher
+    // standing in front of a class. One element fewer on the screen.
+    expect(screen.queryByTestId('miss-gap-async-foil')).not.toBeInTheDocument();
     expect(screen.getByTestId('miss-gap-async-due-date')).toBeInTheDocument();
     const gc = screen.getByTestId('assign-miss-gap-async-google-classroom');
     expect(gc.getAttribute('href')).toContain('classroom.google.com/share');
@@ -97,7 +99,8 @@ describe('MissGapAsyncAssignment', () => {
     expect(decodeURIComponent(gc.getAttribute('href') || '')).not.toContain(
       'unplugged-reteach',
     );
-    expect(screen.getByTestId('miss-gap-practice-card')).toBeInTheDocument();
+    // The take-home card is reachable, not open — see the disclosure test below.
+    expect(screen.getByTestId('miss-gap-takehome-toggle')).toBeInTheDocument();
   });
 
   it('student mode: due banner + complete feeds class streak + grade passback', async () => {
@@ -117,7 +120,7 @@ describe('MissGapAsyncAssignment', () => {
     await waitFor(() => {
       // The server number wins over the device copy once it lands.
       expect(screen.getByTestId('miss-gap-class-streak').textContent).toContain(
-        '"streak":4',
+        '"count":4',
       );
     });
     // Finishing re-reads the roster so the teacher's card is not stale.
@@ -150,7 +153,7 @@ describe('MissGapAsyncAssignment', () => {
     );
     await waitFor(() => {
       expect(screen.getByTestId('miss-gap-class-streak').textContent).toContain(
-        '"streak":5',
+        '"count":5',
       );
     });
     const requested = String(fetchMock.mock.calls[0][0]);
@@ -171,5 +174,95 @@ describe('MissGapAsyncAssignment', () => {
     expect(arg.url).toContain('/education/miss-gap-assignment');
     expect(arg.url).toContain('due=2026-09-11');
     expect(arg.url).toContain('neutron');
+  });
+
+  /**
+   * Decision fatigue, measured. The finished student screen used to carry TWO
+   * full-width lime buttons — "play it again" and the grade turn-in — plus a
+   * saturated WhatsApp button, so nothing read as THE next thing to do. The
+   * turn-in is the one that ends the homework, so it is the only primary left.
+   */
+  it('student mode: exactly one primary CTA once the run is recorded', async () => {
+    const { container } = render(
+      <MissGapAsyncAssignment
+        payload={{ ...payload, dueDate: '2099-12-31' }}
+        teacherMode={false}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('miss-gap-async-complete'));
+    fireEvent.click(await screen.findByTestId('stub-finish-game'));
+    await screen.findByTestId('miss-gap-async-grade-passback');
+
+    const primaries = container.querySelectorAll('.bg-neo-lime');
+    expect(primaries).toHaveLength(1);
+    expect(screen.getByTestId('miss-gap-async-open-grade-passback').className).toContain(
+      'bg-neo-lime',
+    );
+    // Replay survives as a quieter control — visible, bordered, not a primary.
+    const replay = screen.getByTestId('miss-gap-async-complete');
+    expect(replay.className).not.toContain('bg-neo-lime');
+    expect(replay.className).toContain('border-[3px]');
+  });
+
+  /**
+   * The printable take-home card is the parent-facing artifact and the WhatsApp
+   * share points at it — so it stays. It just stops being a second full card
+   * shouting under the finish screen: one disclosure, closed by default.
+   */
+  it('student mode: the take-home card waits behind one disclosure', async () => {
+    render(
+      <MissGapAsyncAssignment
+        payload={{ ...payload, dueDate: '2099-12-31' }}
+        teacherMode={false}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('miss-gap-async-complete'));
+    fireEvent.click(await screen.findByTestId('stub-finish-game'));
+    await screen.findByTestId('miss-gap-async-grade-passback');
+
+    expect(screen.queryByTestId('miss-gap-practice-card')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('miss-gap-takehome-toggle'));
+    expect(await screen.findByTestId('miss-gap-practice-card')).toBeInTheDocument();
+  });
+
+  /**
+   * REVERSED 2026-09-12. This used to assert the teacher's card rendered open,
+   * on the reasoning that it is the teacher's working surface. Measured at
+   * 1440x900 that open card put the document at 1294px against a 900 viewport
+   * and left its own "Start unplugged reteach Live" below the fold — a clipped
+   * live CTA, which cost the piece the round. It is also a second CTA cluster
+   * under the screen's one primary action. The teacher's working surface is
+   * sending the link; the printable card is one tap away.
+   * See MissGapAsyncAssignment.fold.test.tsx for the full reasoning.
+   */
+  it('teacher mode: the take-home card waits behind the same one disclosure', () => {
+    render(<MissGapAsyncAssignment payload={payload} teacherMode />);
+    expect(screen.queryByTestId('miss-gap-practice-card')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('miss-gap-takehome-toggle'));
+    expect(screen.getByTestId('miss-gap-practice-card')).toBeInTheDocument();
+  });
+
+  /**
+   * Reload safety. Anything that re-mounts the page — the cookie banner's
+   * accept, a pull-to-refresh, reopening the link from WhatsApp — used to wipe
+   * the receipt: back to "Start", no turn-in, no score, as if the homework had
+   * never been done. The run was in the database the whole time.
+   */
+  it('student mode: a reload still shows the receipt for a finished run', async () => {
+    const props = {
+      payload: { ...payload, dueDate: '2099-12-31' },
+      teacherMode: false,
+    };
+    const first = render(<MissGapAsyncAssignment {...props} />);
+    fireEvent.click(screen.getByTestId('miss-gap-async-complete'));
+    fireEvent.click(await screen.findByTestId('stub-finish-game'));
+    await screen.findByTestId('miss-gap-async-grade-passback');
+    first.unmount();
+
+    render(<MissGapAsyncAssignment {...props} />);
+    expect(
+      await screen.findByTestId('miss-gap-async-open-grade-passback'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('miss-gap-takehome-toggle')).toBeInTheDocument();
   });
 });

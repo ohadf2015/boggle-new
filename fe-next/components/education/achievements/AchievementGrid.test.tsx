@@ -142,10 +142,10 @@ describe('AchievementGrid', () => {
     );
 
     expect(screen.getByText('education.achievements.all')).toBeInTheDocument();
-    expect(screen.getByText('education.achievements.progress')).toBeInTheDocument();
-    expect(screen.getByText('education.achievements.skill')).toBeInTheDocument();
-    expect(screen.getByText('education.achievements.consistency')).toBeInTheDocument();
-    expect(screen.getByText('education.achievements.exploration')).toBeInTheDocument();
+    expect(screen.getByText('education.achievements.categories.progress')).toBeInTheDocument();
+    expect(screen.getByText('education.achievements.categories.skill')).toBeInTheDocument();
+    expect(screen.getByText('education.achievements.categories.consistency')).toBeInTheDocument();
+    expect(screen.getByText('education.achievements.categories.exploration')).toBeInTheDocument();
   });
 
   it('should filter achievements by category', () => {
@@ -157,7 +157,7 @@ describe('AchievementGrid', () => {
     );
 
     // Click Progress tab
-    fireEvent.click(screen.getByText('education.achievements.progress'));
+    fireEvent.click(screen.getByText('education.achievements.categories.progress'));
 
     // Should only show progress achievements
     expect(screen.getByText('achievements.duelWinner.name')).toBeInTheDocument();

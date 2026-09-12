@@ -29,7 +29,7 @@ import type { PlayerResult } from '@/types/components';
 import type { TournamentStanding } from '@/shared/types/game';
 import type { Language } from '@/shared/types';
 import type { ClassroomSummary } from '@/shared/types/classroom';
-import ClassroomTvResults from '@/components/education/results/ClassroomTvResults';
+import ClassroomTvResultsScreen from './ClassroomTvResultsScreen';
 
 // Sound paths for results
 const RESULTS_SOUNDS: Record<SoundType, string> = {
@@ -100,7 +100,11 @@ const TvResultsView = memo<TvResultsViewProps>(({
   onStartNewGame,
   onNextRound,
   onShowQR,
-  onClose: _onClose,
+  // Was unused (`_onClose`) while the arcade layout had no dismiss. The
+  // classroom branch below needs it: its layer is opaque and covers the
+  // projector lobby, so without a way out the teacher must reload to change
+  // the next round's game.
+  onClose,
   t,
   socket = null,
   gameCode = '',
@@ -231,6 +235,20 @@ const TvResultsView = memo<TvResultsViewProps>(({
   const isLastRound = tournamentData?.isComplete ?? true;
   const showTournamentStandings = currentPhase === 'tournament-standings';
 
+  // A classroom round leaves HERE, before the arcade chrome. Two reasons, both
+  // learned the hard way: this root sits at z-[60] and the projector LOBBY
+  // (also `fixed inset-0`, also opaque) sits at z-[65], so for the whole time
+  // the celebration was up the room was looking at the lobby painted over it;
+  // and the wrapper stacks a gradient ground, a DJ mascot, an install QR, a
+  // ready strip, a word selector and a controls bar around the recap, which is
+  // eight things too many on a wall thirty children are reading at once.
+  // The general game's results are untouched below.
+  if (classroomSummary) {
+    return (
+      <ClassroomTvResultsScreen summary={classroomSummary} onRematch={onStartNewGame} onClose={onClose} t={t} />
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 z-[60] overflow-hidden">
       {/* Fullscreen Toggle Button */}
@@ -304,10 +322,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-hidden px-6 pb-32">
-          {classroomSummary ? (
-            // Classroom lesson recap — the projector's whole results moment.
-            <ClassroomTvResults summary={classroomSummary} onRematch={onStartNewGame} t={t} />
-          ) : showTournamentStandings ? (
+          {showTournamentStandings ? (
             // Tournament Standings View
             <m.div
               initial={{ opacity: 0, scale: 0.95 }}

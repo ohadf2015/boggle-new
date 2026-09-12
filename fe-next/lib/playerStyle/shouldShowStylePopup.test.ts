@@ -17,6 +17,22 @@ const base = {
 };
 
 describe('shouldShowStylePopup', () => {
+  it('never opens while the overlay quiet zone is up (a round-end recap is not a break)', () => {
+    // Measured live: this popup opened full-screen over "YOU WON! 257 POINTS" on
+    // a student's phone. `resultsShowing` reads that moment as a natural break,
+    // so the quiet zone has to override it.
+    expect(
+      shouldShowStylePopup({ ...base, overlayQuietZone: true }),
+    ).toBe(false);
+    expect(
+      shouldShowStylePopup({ ...base, overlayQuietZone: true, onGameplayRoute: true, resultsShowing: true }),
+    ).toBe(false);
+  });
+
+  it('opens again once the quiet zone clears (deferred, not dropped)', () => {
+    expect(shouldShowStylePopup({ ...base, overlayQuietZone: false })).toBe(true);
+  });
+
   it('never shows before mount (hydration safety)', () => {
     expect(shouldShowStylePopup({ ...base, isMounted: false })).toBe(false);
   });

@@ -18,6 +18,7 @@ import {
 } from '@/utils/cookieConsent';
 import { MODAL_OPEN_CLASS } from '@/lib/native/modalOpenSignal';
 import { useInGameSurface } from '@/lib/inGameSurface';
+import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
 
 /**
  * True while a modal owns the screen (`html.modal-open`, the ref-counted flag
@@ -61,7 +62,14 @@ export default function CookieConsent() {
   const sheetRef = useRef<HTMLDivElement>(null);
   const modalOwnsScreen = useModalOwnsScreen();
   const inGameSurface = useInGameSurface();
-  const showSheet = visible && !modalOwnsScreen;
+  // Re-ranking to z-[60] on a game surface (below) was not enough: the sheet is
+  // a band up to 60vh tall, and it was measured sitting on a guest's board for
+  // 36 seconds of a live round, and over the round-end recap after it. Inside
+  // the quiet zone it does not render at all. `visible` is untouched, so the ask
+  // is DEFERRED — non-essential scripts stay gated on a decision nobody made,
+  // and the sheet reappears the instant the zone clears.
+  const overlayQuietZone = useOverlayQuietZone();
+  const showSheet = visible && !modalOwnsScreen && !overlayQuietZone;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -72,11 +80,19 @@ export default function CookieConsent() {
       // LCP. Mounting immediately after hydration made the consent text the LCP
       // element on a busy main thread (~16s mobile LCP). The sheet simply
       // appears once the browser is idle, after the hero has painted.
+      // Re-read the decision at SHOW time, not only when the callback was
+      // scheduled: the idle callback can land a second or more later, and by
+      // then another tab or the ManageCookies flow may have recorded a choice.
+      // One source of truth, read at the moment it is acted on (pitfalls class 1).
+      const showIfStillUndecided = () => {
+        if (hasConsentDecision()) return;
+        setVisible(true);
+      };
       if (typeof window.requestIdleCallback === 'function') {
-        const id = window.requestIdleCallback(() => setVisible(true), { timeout: 1200 });
+        const id = window.requestIdleCallback(showIfStillUndecided, { timeout: 1200 });
         cancelShow = () => window.cancelIdleCallback(id);
       } else {
-        const id = window.setTimeout(() => setVisible(true), 800);
+        const id = window.setTimeout(showIfStillUndecided, 800);
         cancelShow = () => window.clearTimeout(id);
       }
     }

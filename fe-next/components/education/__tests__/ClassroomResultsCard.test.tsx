@@ -157,16 +157,32 @@ describe('ClassroomResultsCard', () => {
     expect(arg.url).not.toContain('lexiclash.com');
   });
 
-  it('lets a student send the same class-level gap to a parent', async () => {
+  /**
+   * Round 2's verdict counted NINE competing calls to action on the student's
+   * results screen. "Share the class's gap with a parent" was one of them, and
+   * it is the least defensible: it is a teacher's report, worded for an adult,
+   * sent from a fifteen-year-old's phone about a class rather than about them.
+   * The student's screen keeps exactly one thing to do — practise what they
+   * missed. The share stays, on the device that has a reason to use it.
+   */
+  it('keeps the parent-share on the teacher device, not on thirty phones', () => {
     render(<ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} />);
-    expect(screen.getByTestId('share-class-gap')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('share-class-gap'));
-    await waitFor(() => {
-      expect(shareWithFallback).toHaveBeenCalled();
-    });
-    const arg = vi.mocked(shareWithFallback).mock.calls[0][0];
-    expect(arg.url).toContain('neutron');
-    expect(arg.url).not.toContain('Maya');
+    expect(screen.queryByTestId('share-class-gap')).not.toBeInTheDocument();
+  });
+
+  it('leaves a student exactly one thing to do: practise what they missed', () => {
+    render(
+      <ClassroomResultsCard
+        summary={summary}
+        username="Noa"
+        isTeacher={false}
+        onPractice={() => {}}
+      />
+    );
+    const actions = screen
+      .getByTestId('classroom-results-card')
+      .querySelectorAll('button, a[href]');
+    expect(actions).toHaveLength(1);
   });
 
   it('confirms when the gap link was copied for Slack/parent chat', async () => {

@@ -123,6 +123,8 @@ const RUNS = [
 ];
 
 let streakRow: StreakRow | null;
+/** The row already filed for this student, if any — drives the replay merge. */
+let previousRun: Record<string, unknown> | null;
 let upsertedRun: Record<string, unknown> | null;
 let upsertedStreak: Record<string, unknown> | null;
 /** Every `.eq(column, value)` the progress route applied to the runs query. */
@@ -145,17 +147,23 @@ function makeClient() {
           // It records the filters and actually applies them, so "the route
           // forgot to narrow" and "the route narrowed too hard" are both visible.
           select: () => {
+            const filters: Array<[string, unknown]> = [];
             const builder = {
               eq(column: string, value: unknown) {
-                runFilters.push([column, value]);
+                filters.push([column, value]);
                 return builder;
               },
               order() {
                 return builder;
               },
+              // The complete route's "what did this student already score?" read.
+              async maybeSingle() {
+                return { data: previousRun, error: null };
+              },
               async limit() {
+                runFilters.push(...filters);
                 const data = RUNS.filter((row) =>
-                  runFilters.every(
+                  filters.every(
                     ([column, value]) => (row as Record<string, unknown>)[column] === value,
                   ),
                 );
@@ -202,6 +210,7 @@ beforeEach(() => {
   mockCheckApiRateLimit.mockReturnValue({ success: true });
   mockGetAuthedUser.mockResolvedValue(null);
   streakRow = null;
+  previousRun = null;
   upsertedRun = null;
   upsertedStreak = null;
   runFilters = [];
@@ -298,6 +307,52 @@ describe('POST /api/education/miss-gap/complete', () => {
       }) as never,
     );
     expect(res.status).toBe(503);
+  });
+
+  /**
+   * "Play again" sits one tap under the stars. Replaying must never hand the
+   * teacher a worse row than the student already earned — see missGapRunMerge.
+   */
+  it('given a worse replay, keeps the best score the student already recorded', async () => {
+    previousRun = {
+      words_correct: 8,
+      accuracy: 100,
+      stars: 3,
+      best_streak: 8,
+      duration_ms: 91000,
+      on_time: true,
+    };
+    const request = new NextRequest('http://localhost/api/education/miss-gap/complete', {
+      method: 'POST',
+      body: { ...BODY, wordsCorrect: 1, accuracy: 13, stars: 1, bestStreak: 1, durationMs: 40000 },
+    });
+    const response = await POST(request);
+    expect(response.status).toBe(200);
+    expect(upsertedRun).toMatchObject({
+      words_correct: 8,
+      accuracy: 100,
+      stars: 3,
+      best_streak: 8,
+      // The personal best is the FASTEST time, so the quicker replay wins here.
+      duration_ms: 40000,
+    });
+  });
+
+  it('given a better replay, records the improvement', async () => {
+    previousRun = {
+      words_correct: 2,
+      accuracy: 25,
+      stars: 1,
+      best_streak: 1,
+      duration_ms: 150000,
+      on_time: true,
+    };
+    const request = new NextRequest('http://localhost/api/education/miss-gap/complete', {
+      method: 'POST',
+      body: BODY,
+    });
+    await POST(request);
+    expect(upsertedRun).toMatchObject({ words_correct: 8, accuracy: 100, stars: 3 });
   });
 });
 

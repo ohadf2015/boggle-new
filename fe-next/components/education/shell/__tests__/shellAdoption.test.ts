@@ -23,6 +23,7 @@ const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 /** Every screen named in the no-scroll contract. */
 const SCREENS: readonly [string, string][] = [
   ['/teacher', 'components/teacher/TeacherDashboard.tsx'],
+  ['/teacher/classroom', 'app/[locale]/teacher/classroom/PageClient.tsx'],
   ['/teacher/curriculum', 'app/[locale]/teacher/curriculum/PageClient.tsx'],
   ['/teacher/reports', 'app/[locale]/teacher/reports/PageClient.tsx'],
   ['/teacher/classroom/[id]/analytics', 'app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx'],

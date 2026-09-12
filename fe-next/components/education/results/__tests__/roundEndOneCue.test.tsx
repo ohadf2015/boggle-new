@@ -52,6 +52,7 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 import { ClassroomTvResults } from '../ClassroomTvResults';
 import { ClassroomResultsCard } from '../../ClassroomResultsCard';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import { roundEndTimeline } from '@/lib/education/roundEndStage';
 
 const t = (key: string, params?: Record<string, string | number>) =>
   params ? `${key}:${JSON.stringify(params)}` : key;
@@ -74,10 +75,19 @@ function summary(found: number): ClassroomSummary {
   };
 }
 
-/** Run the whole reveal timetable out, past the last step. */
+/**
+ * Run the whole reveal timetable out, past the last step.
+ *
+ * Derived from the timetable rather than hardcoded: a literal 4000 silently
+ * stopped short the moment the timetable was widened for the 1-second shutter
+ * (round 5), and every cue assertion here failed as "called 0 times" — which
+ * reads like a broken cue rather than a test that stopped early.
+ */
 async function playOutTheReveal() {
+  const timeline = roundEndTimeline();
+  const end = timeline[timeline.length - 1].at;
   await act(async () => {
-    vi.advanceTimersByTime(4000);
+    vi.advanceTimersByTime(end + 500);
   });
 }
 

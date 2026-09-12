@@ -59,8 +59,19 @@ describe('projectorShowsQuiz', () => {
     expect(projectorShowsQuiz({ ...BOARD_ROUND, hostPlaying: true, isQuizRoom: true })).toBe(false);
   });
 
-  it('stays shut once the round is waiting on results', () => {
-    expect(projectorShowsQuiz({ ...BOARD_ROUND, waitingForResults: true, isQuizRoom: true })).toBe(false);
+  it('stays shut for a BOARD round waiting on results', () => {
+    expect(projectorShowsQuiz({ ...BOARD_ROUND, waitingForResults: true })).toBe(false);
+  });
+
+  it('keeps a quiz on the wall even when the shell claims it is waiting on results', () => {
+    // `waitingForResults` is a board fact: the grid's clock hit zero and the
+    // scores have not arrived. A quiz has neither grid nor board clock, so for
+    // a quiz room the flag is noise raised by the shell's own watchdogs — and
+    // honouring it blanked the projector at the whistle. Every "standings" shot
+    // in the round-2 capture turned out to be the lobby because of this line.
+    expect(
+      projectorShowsQuiz({ ...BOARD_ROUND, waitingForResults: true, isQuizRoom: true })
+    ).toBe(true);
   });
 
   it('keeps the projector on the quiz after the last question, for the podium', () => {

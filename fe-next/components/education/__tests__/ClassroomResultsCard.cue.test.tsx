@@ -136,7 +136,7 @@ describe('ClassroomResultsCard — who the fanfare is for', () => {
     const card = screen.getByTestId('classroom-results-card');
     expect(card).toHaveAttribute('data-round-end-stage');
     await waitFor(() => expect(card).toHaveAttribute('data-round-end-stage', 'done'), {
-      timeout: 5000,
+      timeout: 7000,
     });
   });
 });

@@ -40,12 +40,18 @@ export interface StreakFlameProps {
 /** Flame art grows with the stage so the heat is legible at a glance. */
 const FLAME_PX: Record<number, number> = { 1: 26, 2: 32, 3: 40, 4: 48 };
 
-/** Pill gets hotter too — lime is "on a roll", orange is "on fire". */
+/*
+ * Pill fill is SOLID at every stage. It used to fade in (`/70`, `/85`) so the
+ * early rungs read cooler, but an alpha fill over the navy card put the black
+ * digit on a blend neither the eye nor a contrast audit could resolve — the r2
+ * capture measured that digit at 1.23:1. The heat now comes from the art size
+ * and the shadow, which cost nothing in legibility.
+ */
 const PILL_BY_STAGE: Record<number, string> = {
-  1: 'bg-neo-orange/70',
-  2: 'bg-neo-orange/85',
-  3: 'bg-neo-orange',
-  4: 'bg-neo-orange shadow-hard',
+  1: 'bg-neo-orange',
+  2: 'bg-neo-orange shadow-hard-sm',
+  3: 'bg-neo-orange shadow-hard',
+  4: 'bg-neo-orange shadow-hard ring-2 ring-neo-yellow',
 };
 
 export default function StreakFlame({ streak, className }: StreakFlameProps) {
@@ -84,7 +90,7 @@ export default function StreakFlame({ streak, className }: StreakFlameProps) {
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 480, damping: 12 }}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-neo border-3 border-black px-2.5 py-1',
+        'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-black px-2.5 py-1',
         PILL_BY_STAGE[flame.stage],
         className
       )}

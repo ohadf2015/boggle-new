@@ -66,7 +66,7 @@ const DraggableWordCard = memo<DraggableWordCardProps>(({ item, isMatched }) => 
       {...listeners}
       {...attributes}
       className={cn(
-        'p-4 rounded-neo border-neo border-neo-black',
+        'p-4 rounded-neo border-[3px] border-neo-black',
         'bg-neo-cyan text-neo-black font-neo-display text-lg',
         'shadow-hard hover:shadow-hard-lg transition-shadow',
         'cursor-move select-none',
@@ -101,11 +101,13 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
     <div
       ref={setNodeRef}
       className={cn(
-        'p-4 rounded-neo border-neo',
+        'p-4 rounded-neo border-[3px]',
         'font-neo-body text-base min-h-16 flex items-center justify-center',
         'transition-all relative',
         isMatched && 'border-neo-green bg-neo-green/10',
-        !isMatched && 'border-neo-black bg-neo-white/5',
+        // A black edge over a 5% white wash is invisible on navy (1.23:1); an
+        // empty slot still has to read as a place a card can land.
+        !isMatched && 'border-neo-cream bg-neo-navy-light',
         isOver && !isMatched && 'bg-neo-cyan/20 border-neo-cyan',
         feedback === 'correct' && 'border-neo-green bg-neo-green/20',
         feedback === 'incorrect' && 'border-neo-pink bg-neo-pink/20 animate-neo-shake'
@@ -238,7 +240,6 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             correct={correctCount}
             total={attempts}
             xpEarned={xpSessionData?.sessionXpEarned}
-            masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
             onRestart={handleRestart}
             onBack={onBack}
             onNext={onNext}

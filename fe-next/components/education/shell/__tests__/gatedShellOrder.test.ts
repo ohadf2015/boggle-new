@@ -36,6 +36,7 @@ const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 
 /** Files whose default export puts a gate around the whole page. */
 const GATED: readonly [string, string][] = [
+  ['/teacher/classroom', 'app/[locale]/teacher/classroom/PageClient.tsx'],
   ['/teacher/reports', 'app/[locale]/teacher/reports/PageClient.tsx'],
   ['/teacher/curriculum', 'app/[locale]/teacher/curriculum/PageClient.tsx'],
   ['/teacher/classroom/[id]/analytics', 'app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx'],

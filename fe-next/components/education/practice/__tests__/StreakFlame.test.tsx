@@ -103,3 +103,23 @@ describe('StreakFlame', () => {
     );
   });
 });
+
+/*
+ * Contrast (design addendum, measured by the r2 capture): the streak digit on
+ * the pill audited at 1.23:1. The pill's lower stages were alpha fills
+ * (`bg-neo-orange/70`, `/85`) over navy, so the colour under the black digit
+ * was neither orange nor navy but a muddy blend an auditor cannot resolve.
+ * Every stage now paints a SOLID fill; the heat reads from size and shadow.
+ */
+describe('StreakFlame contrast', () => {
+  it('paints a solid fill at every stage — never an alpha tint over the navy', () => {
+    for (const [streak, stage] of [[2, '1'], [4, '2'], [8, '3'], [14, '4']] as const) {
+      const { unmount } = render(<StreakFlame streak={streak} />);
+      const flame = screen.getByTestId('practice-streak-flame');
+      expect(flame).toHaveAttribute('data-stage', stage);
+      expect(flame.className).not.toMatch(/bg-neo-orange\//);
+      expect(flame.className).toMatch(/bg-neo-(orange|yellow)(?!\/)/);
+      unmount();
+    }
+  });
+});

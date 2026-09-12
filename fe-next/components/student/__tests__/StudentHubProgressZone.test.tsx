@@ -47,7 +47,13 @@ vi.mock('@/lib/supabase/education/milestones', () => ({
 }));
 
 vi.mock('@/components/ui/InteractiveMascot', () => ({
-  InteractiveMascot: () => <div data-testid="mascot" />,
+  // Echoes `sizeClassName` the way the real component does — it concatenates it
+  // onto the same wrapper it puts `role="button"` on, which is the element the
+  // contrast audit measures. A mock that swallowed the prop would let a missing
+  // edge class pass here and fail in the browser.
+  InteractiveMascot: ({ sizeClassName }: { sizeClassName?: string }) => (
+    <div data-testid="mascot" role="button" className={sizeClassName} />
+  ),
 }));
 
 vi.mock('framer-motion', () => {
@@ -88,5 +94,26 @@ describe('StudentHubProgressZone', () => {
   it('renders rank display', () => {
     render(<StudentHubProgressZone classroomId="cls-1" userId="u-1" />);
     expect(screen.getByText('#3')).toBeInTheDocument();
+  });
+
+  /**
+   * The mascot in the lime header takes `enableHover`, and `InteractiveMascot`
+   * turns any interactivity into `role="button"` + `tabIndex=0`. The live
+   * contrast audit therefore judges it as a control and measured edgeRatio 0:
+   * it is a transparent box sitting on the same lime fill as its parent, so
+   * nothing marks where it begins. Both of the obvious retreats are worse — a
+   * mascot that cannot react is not this product, and dropping the role would
+   * hide a focusable element from the audit rather than fix it. A black ring is
+   * the house answer on a light fill (black-on-lime measures 20.7:1, against
+   * the 3:1 the edge rule asks for) and it reads as a badge, not a patch.
+   */
+  it('gives the header mascot an edge, since it is exposed as a control', () => {
+    const { container } = render(<StudentHubProgressZone classroomId="cls-1" userId="u-1" />);
+    const mascot = container.querySelector('[role="button"]');
+    expect(mascot).not.toBeNull();
+    // Width written literally: twMerge folds `border-neo` into the same class
+    // group as `border-neo-<colour>` and drops the width, leaving it borderless.
+    expect(mascot!.className).toContain('border-[2px]');
+    expect(mascot!.className).toContain('border-neo-black');
   });
 });

@@ -22,6 +22,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { FIRST_WIN_EVENT } from '@/lib/retention/firstWin';
+import { useOverlayQuietZone, isOverlayQuietZoneActive } from '@/lib/overlayQuietZone';
 
 type PromptTrigger = 'games_threshold' | 'first_win';
 
@@ -30,6 +31,12 @@ export function PushNotificationPrompt() {
   // Hold the prompt until cookie consent is resolved so it doesn't stack under the
   // consent banner (z-110) while pending. Same modal-coordination rule as signup/email.
   const consentDecided = useConsentDecided();
+  // Overlay quiet zone: never over a board, a lobby or a round-end recap.
+  // This one has to be checked BEFORE `evaluate()`, not at render: evaluate
+  // consumes `clearFirstWinPromptPending()`, a one-shot flag. Gating only the
+  // paint would burn that flag behind a recap and the prompt would never come
+  // back — a dropped prompt wearing a deferred prompt's clothes.
+  const overlayQuietZone = useOverlayQuietZone();
   const [visible, setVisible] = useState(false);
   // Which gate opened the prompt — first_win uses celebratory copy and feeds
   // the show → grant funnel with a `trigger` prop.
@@ -45,6 +52,9 @@ export function PushNotificationPrompt() {
   // higher-intent moment and has its own copy. Showing consumes the pending
   // flag so the prompt doesn't reappear on every later mount.
   const evaluate = useCallback((): boolean => {
+    // Re-read live rather than closing over the render-time value: the FIRST_WIN
+    // listener below fires from an event, which can land mid-round.
+    if (isOverlayQuietZoneActive()) return false;
     if (shouldShowFirstWinPushPrompt()) {
       clearFirstWinPromptPending();
       setTrigger('first_win');
@@ -65,9 +75,9 @@ export function PushNotificationPrompt() {
   // prompt becomes visible. Pairs with `push_prompt_dismissed` /
   // `push_prompt_granted` so the show → grant funnel is computable.
   useEffect(() => {
-    if (!consentDecided) return;
+    if (!consentDecided || overlayQuietZone) return;
     evaluate();
-  }, [consentDecided, evaluate]);
+  }, [consentDecided, evaluate, overlayQuietZone]);
 
   // Re-engagement lever: a first win mid-session arms the prompt immediately
   // (the player is on the results screen riding the win) instead of waiting
@@ -83,7 +93,9 @@ export function PushNotificationPrompt() {
     return () => window.removeEventListener(FIRST_WIN_EVENT, onFirstWin);
   }, [consentDecided, evaluate]);
 
-  if (!visible) {
+  // Belt and braces: the zone can re-open (a rematch starts) while the prompt is
+  // already up. `visible` survives, so it returns when the round is over.
+  if (!visible || overlayQuietZone) {
     return null;
   }
 

@@ -109,7 +109,9 @@ export function StudentRoundOutcome({
           <span className="font-neo-display font-black text-5xl leading-none tabular-nums">
             {rank}
           </span>
-          <span className="font-neo-body font-bold text-[0.65rem] uppercase tracking-widest opacity-70">
+          {/* No opacity: 70% black on the pink third-place fill is 4.20:1 at
+              10px, under AA. The hierarchy is carried by size, not by fade. */}
+          <span className="font-neo-body font-bold text-[0.65rem] uppercase tracking-widest">
             {t('education.results.you.of', { total: humans.length })}
           </span>
         </div>

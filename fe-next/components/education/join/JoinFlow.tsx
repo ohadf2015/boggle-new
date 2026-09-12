@@ -181,7 +181,9 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
               type="button"
               onClick={flow.backToCode}
               aria-label={t(`${K}.flow.changeCode`)}
-              className="flex items-center gap-3 self-start rounded-neo border-3 border-neo-black bg-neo-navy-light px-3 py-2 shadow-hard"
+              /* Cream edge, not black: black on navy measures 1.23:1 and the
+                 audit reads this control as borderless. */
+              className="flex items-center gap-3 self-start rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard"
             >
               <DirectionalIcon icon={ArrowLeft} className="h-4 w-4 text-neo-cyan" />
               <span

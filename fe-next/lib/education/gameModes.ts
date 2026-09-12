@@ -150,3 +150,40 @@ export function recommendedModeBadge(
 ): ClassroomGameMode | null {
   return definedWordCount(words) >= MIN_WORDS_PER_FOCUS ? VOCAB_QUIZ_MODE : null;
 }
+
+/** The round-length settings a lobby can have configured, all optional. */
+export interface ConfiguredRoundSettings {
+  /** Board modes: the timer the teacher set, in minutes. */
+  timerMinutes?: number;
+  /** Quiz: how many questions the round asks. */
+  vocabQuizQuestionCount?: number;
+  /** Quiz: how long each question stays open, in seconds. */
+  vocabQuizSeconds?: number;
+}
+
+/**
+ * How long THIS room's round will take — the number the poster chip quotes.
+ *
+ * The catalog minute is a planning estimate for a mode nobody has configured.
+ * The moment a lobby has settings, they are the answer, because the same fact
+ * is also printed in the round settings below the poster and in the live
+ * lobby's chip row: measured live 2026-09-11 the poster promised "5 MIN" while
+ * the room it launched said "3 min", which is one fact with two sources
+ * (recurring pitfall class 3) and reads as a stale line on the poster.
+ *
+ * The quiz is derived from its OWN two settings rather than the board timer,
+ * which it does not use at all.
+ */
+export function configuredRoundMinutes(
+  id: string | undefined | null,
+  settings: ConfiguredRoundSettings
+): number {
+  if (id === VOCAB_QUIZ_MODE) {
+    const count = settings.vocabQuizQuestionCount;
+    const seconds = settings.vocabQuizSeconds;
+    if (!count || !seconds) return modeDurationMinutes(id);
+    return Math.max(1, Math.round((count * seconds) / 60));
+  }
+  if (settings.timerMinutes === undefined) return modeDurationMinutes(id);
+  return Math.max(1, Math.round(settings.timerMinutes));
+}

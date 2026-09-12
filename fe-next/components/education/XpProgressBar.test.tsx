@@ -160,6 +160,24 @@ describe('XpProgressBar', () => {
 
       expect(screen.queryByText(/\+\d+/)).not.toBeInTheDocument();
     });
+
+    /*
+      `{recentXpGain && recentXpGain > 0 && …}` renders the NUMBER ZERO when the
+      round has earned nothing yet — React prints `0`, it is not falsy enough to
+      vanish. Every practice round starts at 0 XP, so a bare "0" sat in the
+      header strip beside the level for the whole first round (seen on the r5
+      Blitz capture, top-right of the XP bar).
+    */
+    it('renders nothing at all when the round has earned 0 XP so far', () => {
+      const zero = render(<XpProgressBar totalXp={150} recentXpGain={0} />);
+      const zeroText = zero.container.textContent;
+      zero.unmount();
+
+      const absent = render(<XpProgressBar totalXp={150} />);
+
+      expect(screen.queryByTestId('xp-recent-gain')).not.toBeInTheDocument();
+      expect(zeroText).toBe(absent.container.textContent);
+    });
   });
 
   describe('RTL support', () => {
@@ -229,5 +247,15 @@ describe('XpProgressBar', () => {
       render(<XpProgressBar totalXp={150} />);
       expect(screen.queryByTestId('xp-recent-gain')).not.toBeInTheDocument();
     });
+  });
+});
+
+describe('XpProgressBar legibility', () => {
+  it('GIVEN a bar over a navy track WHEN rendered THEN no mix-blend percentage sits inside it', () => {
+    // `text-neo-black mix-blend-difference` measured 1.23:1 against the empty
+    // track. The number was also a third telling of the same fact — the level
+    // row above already reads "0 / 264 XP" and the fill shows the same ratio.
+    const { container } = render(<XpProgressBar userId="u1" lessonId="l1" />);
+    expect(container.querySelector('.mix-blend-difference')).toBeNull();
   });
 });

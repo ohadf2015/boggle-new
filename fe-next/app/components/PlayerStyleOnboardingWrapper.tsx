@@ -22,6 +22,7 @@ import {
 } from '@/lib/playerStyle/playerStyleStorage';
 import { shouldShowStylePopup } from '@/lib/playerStyle/shouldShowStylePopup';
 import { isCrawler } from '@/lib/seo/isCrawler';
+import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
 import type { PlayerStyleKey } from '@/lib/playerStyle/styles';
 import logger from '@/utils/logger';
 
@@ -76,6 +77,11 @@ export default function PlayerStyleOnboardingWrapper() {
   // On a gameplay route, the popup may only open once the game is over: either a
   // game was played and is now finished, or the results are being computed.
   const resultsShowing = (hasPlayedRef.current || waitingForResults) && !gameActive;
+  // The shared "nothing may cover this" rule. `resultsShowing` above treats the
+  // results screen as an opening — which is how this modal ended up full-screen
+  // over a student's round-end recap. The zone outranks it, and re-renders this
+  // wrapper when it clears so the decision is retaken rather than abandoned.
+  const overlayQuietZone = useOverlayQuietZone();
 
   useEffect(() => {
     if (!isMounted) return;
@@ -114,6 +120,8 @@ export default function PlayerStyleOnboardingWrapper() {
         // Hold the picker until the player has at least one game under their belt
         // (FTUE) — keeps it out of the multiplayer lobby for brand-new players.
         hasPlayedAtLeastOneGame,
+        // Never over a board, a lobby, a round-end recap or the projector.
+        overlayQuietZone,
       });
       // Only ever OPEN from the effect; dismissal owns closing. This prevents a
       // dep change while the modal is open from yanking it shut mid-choice, and
@@ -139,6 +147,9 @@ export default function PlayerStyleOnboardingWrapper() {
     onGameplayRoute,
     resultsShowing,
     hasPlayedAtLeastOneGame,
+    // Retake the decision the moment the quiet zone clears — this is what makes
+    // the popup DEFERRED rather than dropped.
+    overlayQuietZone,
     pathname,
   ]);
 

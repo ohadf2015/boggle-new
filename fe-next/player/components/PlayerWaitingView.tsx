@@ -113,19 +113,17 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const gameMode = useGameMode();
 
   // Lobby emotes — self-contained over the shared socket (no prop threading).
-  // The server echoes every emote to the whole room (sender included), so the
-  // sender's own avatar face-swap uses the same canonical username as its tile.
+  // The server echoes every emote to the whole room, sender included.
   const socketCtx = useSocketOptional();
   const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
     socket: socketCtx?.socket ?? null,
   });
   // Broadcast this guest's rewarded-ad state so the host's Start disables while
-  // they watch (return value unused here — guests don't gate anything).
+  // they watch (return unused — guests gate nothing).
   useLobbyAdGate({ socket: socketCtx?.socket ?? null });
 
-  // The server-owned auto-start countdown (1Hz `lobbyAutoStartTick`) lives in
-  // <LobbyAutoStartStatus/>, a memoized leaf — keeping it out of this component
-  // so the whole 8-avatar lobby tree no longer re-renders once per second.
+  // The 1Hz auto-start countdown lives in <LobbyAutoStartStatus/>, a memoized
+  // leaf, so the 8-avatar tree does not re-render once per second.
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
@@ -142,10 +140,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const nonHostPlayers = playersReady;
   const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
 
-  // Ready-state lookups for roster badges + the "N/M ready" status line.
-  // Bots auto-count as ready; host clicks Start (never "Ready") so is excluded.
-  // Memoized so unrelated re-renders don't rebuild the Set / re-scan the roster
-  // and so child props keep stable references.
+  // Ready-state lookups for roster badges + the "N/M ready" status line. Bots
+  // auto-count as ready; the host clicks Start, never Ready. Memoized so
+  // unrelated re-renders keep stable child props.
   const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
   const readyTotal = useMemo(() => nonHostPlayers.filter((p) => {
     const o = typeof p === 'object' ? p : null;
@@ -182,14 +179,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <div className="h-1.5 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime" />
 
       <div className="p-4 sm:p-5 flex items-center gap-4 sm:gap-5">
-        {/* Large clickable avatar */}
+        {/* Large clickable avatar. The lime ring lives on the BUTTON, not the
+            inner disc: an audit reads a control's OWN fill/border edge. */}
         <button
           type="button"
           data-testid="edit-avatar-button"
           onClick={() => setIsAvatarBuilderOpen(true)}
-          className="relative shrink-0 group"
+          className="relative shrink-0 group rounded-full border-[3px] border-neo-lime"
         >
-          <div className="w-20 h-20 rounded-full border-3 border-neo-black overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-slate-800 transition-transform group-hover:scale-105 group-active:scale-95">
+          <div className="w-20 h-20 rounded-full border-3 border-neo-black overflow-hidden shadow-hard transition-transform group-hover:scale-105 group-active:scale-95">
             <Avatar
               customAvatar={currentAvatar}
               size="2xl"
@@ -250,17 +248,16 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                   type="button"
                   data-testid="edit-name-button"
                   onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
-                  className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border-[2px] border-neo-cream text-neo-cream flex items-center justify-center transition-colors"
                   aria-label={t('playerView.editName')}
                 >
-                  <Pencil className="w-3.5 h-3.5 text-slate-400" />
+                  <Pencil className="w-3.5 h-3.5 text-neo-cream" />
                 </button>
               )}
             </div>
           )}
 
-          {/* Ready toggle — lets a non-host signal the host they're set to go.
-              Advisory only: the host can still start whenever they like. */}
+          {/* Ready toggle — advisory: the host can start whenever they like. */}
           {onToggleReady ? (
             <m.button
               type="button"
@@ -286,13 +283,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
           <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />
 
-          {/* Emote picker sits right beside your avatar+name so it reads as
-              "react as ME" — tapping a face swaps the hero avatar above (and
-              your roster tile) for the whole room. Compact: a single trigger
-              that expands the emoji row inline on tap. Was previously buried
-              under the roster, where its link to your own avatar was unclear. */}
-          <div className="mt-3">
+          {/* Beside your avatar+name so it reads as "react as ME": a tapped face
+              swaps the hero avatar above, and your roster tile, for the room. */}
+          <div className="mt-3 flex items-end gap-2">
             <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
+            {/* Fixed height inside an already-sized card: never a layout hazard. */}
+            {isClassroomMode && classroomArt('ms-auto h-12 w-auto')}
           </div>
         </div>
       </div>
@@ -302,8 +298,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // ==================== Player Roster ====================
   const renderPlayerRoster = (): React.ReactElement => (
     <section className="space-y-2">
-      {/* No roster header — the top bar already shows the live X/8 count; a second
-          "players in room" label + count was pure noise. */}
+      {/* No roster header — the top bar already shows the live X/8 count. */}
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide pt-1">
         <AnimatePresence>
           {nonHostPlayers.map((player, index) => {
@@ -341,11 +336,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
                     isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : '',
                   )}>
-                    {/* Avatar handles full fallback chain (customAvatar → seeded face from userId).
-                        Don't gate on hasAvatar: backend may emit legacy `{emoji,color}` shape
-                        (userManager.ts) which has no customAvatar — Avatar still renders a
-                        deterministic seeded face from userId={name}. Stacking a colored bg
-                        disc + initial-letter span behind it caused a visible "two avatars" bug. */}
+                    {/* Avatar owns the whole fallback chain (customAvatar → seeded
+                        face from userId). Don't gate on hasAvatar: the legacy
+                        `{emoji,color}` payload has none and still renders. */}
                     <Avatar
                       customAvatar={avatar?.customAvatar ?? undefined}
                       userId={name}
@@ -355,9 +348,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                       mood={emotesByUsername[name]?.emote}
                     />
                   </div>
-                  {/* Lobby emote = avatar FACE-SWAP only (eyes/brows/mouth via the
-                      `mood` prop above). No floating emoji bubble — the face is the
-                      whole signal, mirrored to every player in the room. */}
+                  {/* Lobby emote = avatar FACE-SWAP only (the `mood` prop above).
+                      No emoji bubble — the face is the whole signal. */}
                   {isBot && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">
                       <Bot className="w-3 h-3 text-neo-black" />
@@ -402,12 +394,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // host and every player see IDENTICAL how-to-play content for every mode —
   // including wheel-rush + localized step images that the old inline copy lacked.
   const renderModeTips = (): React.ReactElement | null => {
-    // In a classroom room the teacher has ALREADY locked the mode in, and the
-    // room record says which. Prefer it over the store: the store holds whatever
-    // board mode the room last carried, so a Vocab Quiz lobby reads as `classic`
-    // there and this panel taught tracing words on a grid seconds before a
-    // multiple-choice question. A quiz has no board how-to-play at all — show
-    // nothing rather than the wrong game.
+    // In a classroom the teacher has already locked the mode in and the room
+    // record says which; the store still holds the last BOARD mode, so a Vocab
+    // Quiz lobby reads as `classic` there and taught the wrong game. A quiz has
+    // no board how-to-play — show nothing rather than something false.
     if (isClassroomMode) {
       if (!classroomGameMode || classroomGameMode === VOCAB_QUIZ_MODE) return null;
       return (
@@ -419,9 +409,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         />
       );
     }
-    // Public rooms: always show How-to-Play to non-host players. The host may not
-    // have locked in a mode yet (null/'random'), so fall back to classic rather
-    // than hiding the panel entirely.
+    // Public rooms: always show How-to-Play. The host may not have locked a mode
+    // in yet (null/'random'), so fall back to classic rather than hide it.
     const mode = (gameMode || 'classic') as GameModeOption;
     return (
       <GameInstructions
@@ -433,26 +422,30 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     );
   };
 
+  // Lexi waits with the class. Decorative: the status line above already says
+  // what is happening, so the art has no copy and no accessible name.
+  const classroomArt = (sizing: string): React.ReactElement => (
+    <img data-testid="classroom-lobby-mascot" src="/images/education/waiting-for-teacher.webp"
+      alt="" aria-hidden="true" className={cn('object-contain select-none pointer-events-none', sizing)} />
+  );
+
   // ==================== Mobile Content ====================
-  // Non-scrolling flex column: the fixed-size sections stack at their natural
-  // height and the chat/tutorial panel (flex-1, min-h-0) absorbs all remaining
-  // space — so the screen fits without page scroll, and an inline emote expansion
-  // just shrinks the chat rather than overflowing. The duplicate share section was
-  // dropped (invite already lives compact in the top bar).
+  // Non-scrolling flex column: fixed-size sections stack at their natural height
+  // and the chat panel (flex-1, min-h-0) absorbs whatever is left, so the screen
+  // fits without page scroll.
   const renderMobileContent = (): React.ReactElement => (
     <div className="flex-1 flex flex-col overflow-hidden px-3 py-2 gap-2 min-h-0">
       <section className="shrink-0">{renderHeroCard()}</section>
       <div className="shrink-0">{renderPlayerRoster()}</div>
       <div className="shrink-0">{renderModeTips()}</div>
-      {/* Chat gets the tallest slot in the column: it's the only flex-1 child and
-          carries a min height so it stays comfortably usable even before the
-          fixed sections above collapse. Removing the daily-ember + reward rows
-          freed the vertical space it now claims. */}
+      {/* No chat in a class, and so no age gate: "Tell us your age to use chat"
+          + ADD MY AGE was ~300px of column below the fold at 390x844, clipped
+          and untappable, because this slot pins a 38vh floor in every room.
+          Public rooms keep it — chat is the tallest thing they have. */}
+      {isClassroomMode ? null : (
       <section className="flex-1 min-h-[38vh] pb-1">
-        {/* overflow-y-auto (not -hidden): on a short screen the chat panel is the
-            flex-fill that gets squeezed — its content (e.g. the guest age-gate)
-            then scrolls WITHIN the panel instead of being clipped. The page itself
-            never scrolls (the mobile root is bounded). */}
+        {/* overflow-y-auto, not -hidden: the squeezed flex-fill scrolls WITHIN
+            the panel. The page itself never scrolls. */}
         <div className="h-full bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-y-auto overscroll-contain">
           {isOnCrazyGamesPlatform ? (
             <LobbyTutorialPanel t={t} />
@@ -468,6 +461,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           )}
         </div>
       </section>
+      )}
     </div>
   );
 
@@ -483,10 +477,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {/* Classroom rooms sit under EducationHeader + ClassroomModeBanner,
-                which already carry navigation, breadcrumbs, and UI language —
-                restacking the board-language pill + switcher here gave students
-                two full header rows before any content. Keep only the live
-                counter, the mute control, and the exit. */}
+                which already carry navigation and UI language. Keep only the
+                live counter, the mute control, and the exit. */}
             {!isClassroomMode && (
               <>
                 {gameLanguage && (
@@ -514,7 +506,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <button
               type="button"
               onClick={onExitRoom}
-              className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
+              /* `text-neo-black` on the BUTTON, not only the icon: an audit reads
+                 an icon-only control's name against the button's own colour, and
+                 the inherited white measured 3.55:1 on --neo-red (black: 5.92). */
+              className="w-9 h-9 flex items-center justify-center bg-neo-red text-neo-black border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
               aria-label={t('common.exit')}
             >
               <LogOut className="w-4 h-4 text-neo-black rtl:scale-x-[-1]" />
@@ -542,7 +537,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                   data-testid="desktop-chat-area"
                   className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"
                 >
-                  {isOnCrazyGamesPlatform ? (
+                  {isClassroomMode ? (
+                    classroomArt('h-full w-auto mx-auto')
+                  ) : isOnCrazyGamesPlatform ? (
                     <LobbyTutorialPanel t={t} />
                   ) : (
                     <RoomChat
@@ -566,10 +563,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </div>
       </main>
 
-      {/* B4 — CrazyGames waiting-room banner */}
-      <div className="w-full flex justify-center py-2">
-        <CrazyGamesBanner size="320x50" />
-      </div>
+      {/* B4 — CrazyGames banner. Never in a classroom: the wrapper costs ~66px. */}
+      {!isClassroomMode && (
+        <div data-testid="lobby-ad-slot" className="w-full shrink-0 flex justify-center py-2">
+          <CrazyGamesBanner size="320x50" />
+        </div>
+      )}
 
       {/* Avatar Builder Modal */}
       <AvatarBuilderModal

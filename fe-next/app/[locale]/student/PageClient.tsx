@@ -35,7 +35,7 @@ import { ClassroomGameBanner } from '@/components/student/ClassroomGameBanner';
 import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
 import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
-import { UserPlus, User, Award, UserX } from 'lucide-react';
+import { UserPlus, UserX } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -132,7 +132,7 @@ export default function StudentPageClient() {
       scrollRegionLabel={t('student.dashboard.title')}
       contentClassName="px-4 py-4 sm:px-6"
     >
-      <div className="w-full max-w-5xl mx-auto space-y-6">
+      <div className="w-full max-w-[1280px] mx-auto space-y-6">
         {/*
           One header line, and it names the CLASS. "Student Dashboard" told a student nothing
           they did not already know; their teacher's class name tells them they are in the
@@ -153,33 +153,35 @@ export default function StudentPageClient() {
             </h1>
           </div>
 
-          <nav className="flex gap-2 shrink-0" aria-label={t('student.nav.profile')}>
-            <Link href={`/${language}/student/profile`} className={NAV_LINK}>
-              <User className="w-3.5 h-3.5" />
-              {t('student.nav.profile')}
-            </Link>
-            <Link href={`/${language}/student/achievements`} className={NAV_LINK}>
-              <Award className="w-3.5 h-3.5" />
-              {t('student.nav.achievements')}
-            </Link>
-            {/* Shared-device escape for guest (anonymous) students: sign out the
-                device-bound session so the next student is not mistaken for this
-                one. Only shown to account-less guests. */}
-            {user?.is_anonymous && (
-              <button
-                onClick={async () => {
-                  await signOut();
-                  router.push(`/${language}/student/join`);
-                }}
-                className={cn(NAV_LINK, 'hover:bg-neo-pink hover:text-neo-black')}
-              >
-                <UserX className="w-3.5 h-3.5" />
-                {t('student.notYou')}
-              </button>
-            )}
-          </nav>
+          {/* Me and Awards used to sit here as a second copy of two tabs the
+              shell already shows on every width. Only the shared-device escape
+              is left: it signs the device-bound guest session out so the next
+              student is not mistaken for this one, which is not navigation. */}
+          {user?.is_anonymous && (
+            <button
+              onClick={async () => {
+                await signOut();
+                router.push(`/${language}/student/join`);
+              }}
+              className={cn(NAV_LINK, 'shrink-0 hover:bg-neo-pink hover:text-neo-black')}
+            >
+              <UserX className="w-3.5 h-3.5" />
+              {t('student.notYou')}
+            </button>
+          )}
         </m.header>
 
+        {/*
+          From `lg` the page is two columns: the things a student acts on (live game,
+          lessons, ways to play) take two thirds, their standing takes the last third.
+          Below `lg` there is no grid at all, so the phone keeps the single stack the
+          order above was designed for.
+        */}
+        <div
+          data-testid="student-hub-grid"
+          className="space-y-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0 lg:items-start"
+        >
+        <div data-testid="student-hub-main" className="space-y-6 lg:col-span-2">
         {/*
           1. LIVE NOW. Hoisted out of the Play zone: when the teacher has a game running,
           nothing else on this page matters, and it must not sit below three other cards.
@@ -240,10 +242,16 @@ export default function StudentPageClient() {
           />
         )}
 
-        {/* 4. Their standing. Last: it is a reward for work already done, not a next action. */}
-        {classroomId && (
-          <StudentHubProgressZone classroomId={classroomId} userId={user.id} />
-        )}
+        </div>
+
+        {/* 4. Their standing. Last on a phone, beside the rest on a desktop: it is a
+            reward for work already done, never the next action. */}
+        <div data-testid="student-hub-side" className="space-y-6 lg:col-span-1">
+          {classroomId && (
+            <StudentHubProgressZone classroomId={classroomId} userId={user.id} />
+          )}
+        </div>
+        </div>
       </div>
     </EducationShell>
   );

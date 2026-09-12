@@ -97,9 +97,26 @@ export type CancelDuelPayload = z.infer<typeof cancelDuelSchema>;
 export const rematchDuelSchema = z.object({
   opponentId: z.string().uuid('Invalid opponent ID'),
   lessonId: z.string().uuid('Invalid lesson ID'),
+  /**
+   * The duel being rematched FROM. Optional for older clients, but it is the
+   * only reliable source of `classroom_id` (NOT NULL on student_duels) when a
+   * pair has never played this lesson before.
+   */
+  duelId: z.string().uuid('Invalid duel ID').optional(),
 });
 
 export type RematchDuelPayload = z.infer<typeof rematchDuelSchema>;
+
+/**
+ * Withdrawing your own rematch offer (the pact is keyed on the pair + lesson,
+ * so no duel id is needed).
+ */
+export const cancelRematchSchema = z.object({
+  opponentId: z.string().uuid('Invalid opponent ID'),
+  lessonId: z.string().uuid('Invalid lesson ID'),
+});
+
+export type CancelRematchPayload = z.infer<typeof cancelRematchSchema>;
 
 /**
  * Submit word payload validation (real-time duels)

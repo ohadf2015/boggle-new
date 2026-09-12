@@ -76,7 +76,7 @@ export function DuelSeriesTally({ series, status, className }: DuelSeriesTallyPr
       </div>
       <p
         data-testid="duel-series-label"
-        className="font-neo-body text-[11px] font-black uppercase tracking-widest text-neo-white/70"
+        className="font-neo-body text-[11px] font-black uppercase tracking-widest text-neo-cream/85"
       >
         {label}
       </p>

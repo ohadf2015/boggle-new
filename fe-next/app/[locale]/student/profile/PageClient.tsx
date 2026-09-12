@@ -30,7 +30,7 @@ import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
 import { getStudentClassroom, getClassroomStudents, getLessons as getStudentLessons, type Classroom, type ClassroomStudent, type VocabularyLesson } from '@/lib/supabase/education';
 
 export default function StudentProfilePageClient() {
-  const { user, isAuthenticated, profile, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
@@ -60,14 +60,14 @@ export default function StudentProfilePageClient() {
       return; // Still loading, don't make any decisions yet
     }
 
-    // Check authentication (only after loading completes)
-    if (!isAuthenticated) {
+    // On `user`, not `isAuthenticated` (= user && profile, lands later) — see subpageGuard.
+    if (!user) {
       router.push(`/${language}`);
       return;
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, loading, router, language]);
+  }, [user, loading, router, language]);
 
   // Fetch student achievements
   useEffect(() => {

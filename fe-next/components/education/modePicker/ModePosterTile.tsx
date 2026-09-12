@@ -10,10 +10,13 @@
  * TWO SIZES, AND ONLY ONE OF THEM IS LOUD. Round 1 put five equally coloured
  * posters on screen at once and handed the ranking back to the teacher. The bar
  * (design card `education/03-mode-tiles`) shows one hero and folds the rest
- * away; when they are unfolded they are NEUTRAL — navy fill, cream edge, a navy
- * poster well — so exactly one accent colour is ever on the screen. Compact
- * tiles deliberately carry no how-it-plays line and no minute chip: they are a
- * menu of five names, not five specs to read standing in front of a class.
+ * away; when they are unfolded their CARD is neutral — navy fill, cream edge —
+ * and only the poster well behind the mascot wears the mode's colour, so the
+ * fold reads as five posters without becoming a paint chart. Compact tiles
+ * deliberately carry no how-it-plays line and no minute chip: they are a menu
+ * of five names, not five specs to read standing in front of a class. They DO
+ * carry the best-fit flag, because a teacher who opens the fold is exactly the
+ * teacher second-guessing the hero.
  *
  * CONTRAST. On a navy surface the edge is the mode's accent or cream, never
  * black (measured: black on navy = 1.23:1, cream on navy = 16.8:1). Labels on
@@ -80,6 +83,13 @@ export interface ModePosterTileProps {
   /** Hero only: the fold's open state, mirrored onto the tile's aria. */
   expanded?: boolean;
   /**
+   * Hero only. The round length the teacher has actually configured, which
+   * overrides the catalog's planning estimate. One fact, one source: without
+   * it the poster promised "5 MIN" and the lobby it launched into said "3 min"
+   * (measured 2026-09-11) — recurring pitfall class 3.
+   */
+  minutes?: number;
+  /**
    * Hero only. The big poster is not a radio — it is already the chosen mode —
    * so tapping it does the one thing a teacher could want from it: open the
    * list of the others. Same action as the "More modes" button beside it, so
@@ -96,6 +106,7 @@ export function ModePosterTile({
   busy,
   onPick,
   expanded,
+  minutes,
   onOpenPicker,
 }: ModePosterTileProps) {
   const { t } = useLanguage();
@@ -122,19 +133,37 @@ export function ModePosterTile({
           'disabled:cursor-wait'
         )}
       >
-        <span className="grid size-12 shrink-0 place-items-center rounded-neo border-[2px] border-black bg-neo-navy">
+        <span
+          className={cn(
+            'grid size-14 shrink-0 place-items-center rounded-neo border-[2px] border-black sm:size-16',
+            // The poster well wears the mode's own colour — the tile fill stays
+            // navy, so four alternates never turn the fold into a paint chart.
+            ACCENT_FIELD[mode.accent]
+          )}
+        >
           <Image
             src={mode.poster}
             alt=""
             width={160}
             height={160}
-            className="size-10 select-none object-contain"
-            sizes="48px"
+            className="size-12 select-none object-contain sm:size-14"
+            sizes="64px"
           />
         </span>
-        <span className="w-full truncate text-center font-neo-display text-[0.7rem] font-black uppercase leading-tight text-neo-cream">
+        <span className="w-full truncate text-center font-neo-display text-[0.8rem] font-black uppercase leading-tight text-neo-cream">
           {t(mode.nameKey)}
         </span>
+        {/* The fold has to carry the recommendation too: a teacher who opens it
+            is exactly the teacher who is second-guessing the hero. */}
+        {recommended && (
+          <span
+            data-testid="mode-recommended"
+            className="inline-flex max-w-full items-center gap-1 truncate rounded-neo border-[2px] border-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-tight text-black"
+          >
+            <Sparkles className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
+            {t('education.modePicker.recommended')}
+          </span>
+        )}
       </button>
     );
   }
@@ -161,7 +190,7 @@ export function ModePosterTile({
     >
       <span
         className={cn(
-          'relative grid w-24 shrink-0 place-items-center self-stretch border-e-[2px] border-black sm:w-32',
+          'relative grid w-24 shrink-0 place-items-center self-stretch border-e-[2px] border-black sm:w-32 lg:w-48',
           ACCENT_FIELD[mode.accent]
         )}
       >
@@ -170,8 +199,8 @@ export function ModePosterTile({
           alt=""
           width={320}
           height={320}
-          className="size-20 select-none object-contain sm:size-28"
-          sizes="(max-width: 640px) 96px, 128px"
+          className="size-20 select-none object-contain sm:size-28 lg:size-40"
+          sizes="(max-width: 640px) 96px, (max-width: 1024px) 128px, 192px"
           priority
         />
       </span>
@@ -179,11 +208,11 @@ export function ModePosterTile({
       <span className="flex min-w-0 flex-1 flex-col">
         <span
           className={cn(
-            'flex items-center justify-between gap-2 border-b-[2px] border-black px-2.5 py-1',
+            'flex items-center justify-between gap-2 border-b-[2px] border-black px-2.5 py-1 lg:px-4 lg:py-2',
             ACCENT_BAR[mode.accent]
           )}
         >
-          <span className="truncate font-neo-display text-base font-black uppercase leading-tight sm:text-xl">
+          <span className="truncate font-neo-display text-base font-black uppercase leading-tight sm:text-xl lg:text-3xl">
             {t(mode.nameKey)}
           </span>
           {recommended && (
@@ -197,14 +226,14 @@ export function ModePosterTile({
           )}
         </span>
 
-        <span className="flex-1 px-2.5 py-1.5 font-neo-body text-[0.8rem] font-bold leading-snug text-neo-cream sm:text-sm">
+        <span className="flex-1 px-2.5 py-1.5 font-neo-body text-[0.8rem] font-bold leading-snug text-neo-cream sm:text-sm lg:px-4 lg:py-3 lg:text-lg">
           {t(mode.howKey)}
         </span>
 
-        <span className="flex items-center gap-1.5 px-2.5 pb-1.5">
-          <span className="inline-flex items-center gap-1 rounded-neo border-[2px] border-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[0.65rem] font-black uppercase leading-tight text-black">
+        <span className="flex items-center gap-1.5 px-2.5 pb-1.5 lg:px-4 lg:pb-3">
+          <span className="inline-flex items-center gap-1 rounded-neo border-[2px] border-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[0.65rem] font-black uppercase leading-tight text-black lg:px-2.5 lg:py-1 lg:text-sm">
             <Clock className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
-            {t('education.modePicker.minutes', { count: mode.minutes })}
+            {t('education.modePicker.minutes', { count: minutes ?? mode.minutes })}
           </span>
         </span>
       </span>

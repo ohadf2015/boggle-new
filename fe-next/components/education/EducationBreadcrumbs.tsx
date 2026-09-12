@@ -14,6 +14,9 @@ interface BreadcrumbItem {
   isCurrent?: boolean;
 }
 
+/** UUIDs and other opaque record ids — never a step a person navigated to. */
+const ID_SEGMENT = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 interface EducationBreadcrumbsProps {
   /** Additional class names */
   className?: string;
@@ -104,8 +107,14 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
           label = t('education.header.breadcrumbs.reports');
           break;
         default:
-          // For dynamic segments like lesson IDs, try to get a readable name
-          // or use a truncated version
+          /*
+            A database id is not a place. This branch used to render
+            `d647f2f8...` as the last step of the student's practice trail —
+            a raw UUID above the games. Drop the crumb instead of truncating
+            it: the segment before it ("Lessons") is a real, clickable step,
+            and no new copy is needed in six locales.
+          */
+          if (ID_SEGMENT.test(segment)) return;
           if (segment.length > 8) {
             label = `${segment.slice(0, 8)}...`;
           }
@@ -118,6 +127,11 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
         isCurrent: isLast,
       });
     });
+
+    // A dropped id segment would otherwise leave the trail with no current
+    // step, so the last crumb that survived is the one the student is on.
+    const tail = breadcrumbs[breadcrumbs.length - 1];
+    if (tail) tail.isCurrent = true;
 
     return breadcrumbs;
   }, [pathname, language, t, customItems]);

@@ -11,6 +11,8 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 const classroomsMock = { value: [{ id: 'c1', name: 'Class 1' }] as Array<{ id: string; name: string }> };
 
@@ -112,25 +114,31 @@ describe('<TeacherDashboard> — fits the viewport', () => {
   describe('nothing blocks the one button', () => {
     /**
      * Measured live at 1440x900 on /en/teacher: the first-run walkthrough
-     * rendered as `fixed inset-0 z-[100]`, opaque, `pointer-events:auto`, over
-     * an armed GO LIVE. `elementFromPoint` at the button's centre returned the
-     * modal, not the button — the hero was not the hero. It is a fullscreen
-     * prompt above the primary action, which the decision-fatigue rule forbids
-     * in the same words it forbids for consent and install prompts.
+     * rendered as `fixed inset-0 z-[100]`, opaque and `pointer-events:auto`,
+     * over an armed GO LIVE — `elementFromPoint` at the button's centre
+     * returned the modal, not the button. A fullscreen prompt above the
+     * primary action is the defect the addendum spells out for consent and
+     * install prompts; it arrives here from a different component.
      *
-     * A teacher with a classroom is not a first-run teacher, and that is every
-     * visit where GO LIVE has something to launch.
+     * Asserted on the SOURCE, not the render: the walkthrough is a
+     * `next/dynamic` import and its loader never resolves under jsdom, so a
+     * `queryByTestId` for it returns null whatever the gate says — a test that
+     * passes for the wrong reason and would keep passing if the gate were
+     * deleted. The live hit-test is the behavioural proof.
      */
-    it('does not put the walkthrough over the hero once a classroom exists', () => {
-      render(<TeacherDashboard />);
-      expect(screen.queryByTestId('teacher-onboarding')).toBeNull();
+    const src = readFileSync(
+      path.join(__dirname, '..', 'TeacherDashboard.tsx'),
+      'utf8',
+    );
+
+    it('gates the walkthrough on the teacher having no classroom yet', () => {
+      expect(src).toMatch(
+        /\{!classroomsLoading && classrooms\.length === 0 && \(\s*<TeacherOnboarding/,
+      );
     });
 
-    it('still teaches a teacher who has nothing yet', () => {
-      classroomsMock.value = [];
-      render(<TeacherDashboard />);
-      expect(screen.getByTestId('teacher-onboarding')).toBeInTheDocument();
-      classroomsMock.value = [{ id: 'c1', name: 'Class 1' }];
+    it('still mounts it for that teacher, rather than dropping it', () => {
+      expect(src).toContain('<TeacherOnboarding onDismiss=');
     });
   });
 
@@ -155,10 +163,14 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       expect(aside.contains(screen.getByTestId('teacher-shortcuts'))).toBe(true);
     });
 
-    it('gives the phone a bottom tab bar and the desktop a sidebar', () => {
+    it('gives the phone a bottom tab bar and every wider screen a sidebar', () => {
       render(<TeacherDashboard />);
-      expect(screen.getByTestId('education-tabbar').className).toContain('lg:hidden');
-      expect(screen.getByTestId('education-sidebar').className).toContain('lg:flex');
+      // The handover is at `md`, not `lg`: a tablet gets the sidebar collapsed
+      // to an icon rail and NO bottom bar. Carrying both would spend a row of
+      // the teacher's content on a duplicate nav.
+      expect(screen.getByTestId('education-tabbar').className).toContain('md:hidden');
+      expect(screen.getByTestId('education-sidebar').className).toContain('md:flex');
+      expect(screen.getByTestId('education-sidebar').className).toContain('lg:w-60');
     });
   });
 

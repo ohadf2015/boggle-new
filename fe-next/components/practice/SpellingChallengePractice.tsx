@@ -71,9 +71,15 @@ export function SpellingChallengePractice({
     resetGame,
   } = useSpellingGame(words);
 
-  // Mirror the hook's sort-by-length so wordIndex maps to the right enriched word
+  // Mirror the hook's sort-by-length so wordIndex maps to the right enriched
+  // word — including the hook's drop of entries with no `word`, or the two
+  // lists index differently and the hint row describes a different card than
+  // the one on screen.
   const sortedWords = useMemo(
-    () => [...words].sort((a, b) => a.word.length - b.word.length),
+    () =>
+      words
+        .filter((entry) => typeof entry?.word === 'string' && entry.word.length > 0)
+        .sort((a, b) => a.word.length - b.word.length),
     [words]
   );
 
@@ -155,7 +161,6 @@ export function SpellingChallengePractice({
           correct={correctCount}
           total={attempts}
           xpEarned={xpSessionData?.sessionXpEarned}
-          masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
           onRestart={handleRestart}
           onBack={onBack}
           timeSpent={timeSpent}
@@ -230,13 +235,20 @@ export function SpellingChallengePractice({
             data-testid="definition-card"
             className={cn(
               'p-8 rounded-neo',
-              'bg-neo-navy border-neo-thick border-neo-black',
+              // Cream edge, not black: a black border on navy measures 1.23:1,
+              // so the prompt card had no visible edge at all.
+              'bg-neo-navy-light border-[3px] border-neo-cream',
               'shadow-hard-lg',
               'min-h-[120px] flex items-center justify-center'
             )}
           >
             <p className="font-neo-body text-neo-white text-2xl text-center">
-              {currentWord?.definition || t('education.practice.noWords')}
+              {/*
+                A word with no definition is not a broken round — Spelling's
+                prompt is the audio. "No words to practice" over a live 8-word
+                drill read as a failure that had not happened.
+              */}
+              {currentWord?.definition || t('student.practiceFun.listenAndSpell')}
             </p>
             <WordContextRow
               partOfSpeech={(sortedWords[wordIndex] as Partial<EnrichedVocabularyWord>)?.partOfSpeech}
@@ -251,7 +263,16 @@ export function SpellingChallengePractice({
           className="flex items-center justify-center gap-3"
         >
           <span className="font-mono text-neo-cyan text-2xl tracking-widest">
-            {currentHint}{'_'.repeat(Math.max(0, (words[wordIndex]?.word.length || 0) - currentHint.length))}
+            {/*
+              Blanks come from the SORTED list. Reading the unsorted prop here
+              counted the underscores off a different word entirely, and the
+              optional chain stopped one level too early: an entry with no
+              `word` threw and took the whole round down with it.
+            */}
+            {currentHint}
+            {'_'.repeat(
+              Math.max(0, (sortedWords[wordIndex]?.word?.length ?? 0) - currentHint.length)
+            )}
           </span>
           {sortedWords[wordIndex] && (
             <PronunciationButton
@@ -285,7 +306,7 @@ export function SpellingChallengePractice({
               exit={{ scale: 0, opacity: 0 }}
               transition={{ duration: 0.25, times: [0, 0.6, 1] }}
               className={cn(
-                'p-4 rounded-neo border-neo text-center',
+                'p-4 rounded-neo border-[3px] text-center',
                 feedback.correct
                   ? 'bg-neo-green/20 border-neo-green'
                   : 'bg-neo-pink/20 border-neo-pink animate-neo-shake'
@@ -319,8 +340,8 @@ export function SpellingChallengePractice({
               </div>
               {!feedback.correct && (
                 <p className="text-neo-white font-neo-body">
-                  {t('education.practice.correctAnswer')}{' '}
-                  <span className="text-neo-white font-bold">{feedback.correctWord}</span>
+                  {t('student.practiceFun.answerLabel')}{' '}
+                  <span className="text-neo-lime font-black">{feedback.correctWord}</span>
                 </p>
               )}
             </AdaptiveMotion.div>
@@ -343,7 +364,7 @@ export function SpellingChallengePractice({
             aria-label={t('education.practice.spellTheWord')}
             className={cn(
               'px-6 py-4 rounded-neo',
-              'border-neo-thick border-neo-black',
+              'border-[4px] border-neo-black',
               'bg-neo-white text-neo-black',
               'font-neo-body text-xl',
               'shadow-hard',
@@ -358,11 +379,17 @@ export function SpellingChallengePractice({
             disabled={!!feedback || isComplete || !inputValue.trim()}
             className={cn(
               'px-6 py-4 rounded-neo',
-              'bg-neo-purple hover:bg-neo-purple/90',
-              'border-neo-thick border-neo-black',
+              // Lime + black, the same primary the picker's PLAY uses. White on
+              // neo-purple measures 4.23:1 — under AA — and dropped further the
+              // moment `disabled:opacity-50` faded the label with the fill.
+              'bg-neo-lime hover:bg-neo-lime/90',
+              'border-[3px] border-black',
               'shadow-hard hover:shadow-hard-lg',
-              'font-neo-display text-neo-white text-xl',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'font-neo-display text-black text-xl',
+              // Disabled drains the FILL and keeps a readable label and a
+              // visible edge, instead of fading the whole control.
+              'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
+              'disabled:shadow-none disabled:cursor-not-allowed',
               'transition-all active:translate-y-1'
             )}
           >

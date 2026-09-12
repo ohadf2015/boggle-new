@@ -3,31 +3,39 @@
 /**
  * PracticePicker — one word list, many games.
  *
- * A poster per practice type the lesson can drive. Locked tiles stay on the
- * board on purpose: "add synonyms to unlock" is how a student sees the lesson
- * has more in it, and how a teacher learns what to fill in.
+ * What changed, and why. The picker was first a wall of thirteen cream cards,
+ * each with a title, a sentence about the skill it drills, a count badge and a
+ * play count — roughly two and a half phone screens of reading before a student
+ * could choose. That became an art-led poster grid, which fixed the reading but
+ * not the arithmetic: fourteen posters is still fourteen decisions, and the
+ * screen still recommended nothing.
  *
- * What changed, and why: the picker used to be thirteen near-identical cream
- * cards, each carrying a title, a full sentence about the skill it drills, a
- * count badge and a play count. On a 390x844 phone that is roughly two and a
- * half screens of reading before a student can choose, and the thing that
- * actually distinguishes the modes — what they *are*, and what they pay — was
- * the part that got cut off. The grid is now art-led: a picture, a name, and
- * one meta line carrying the XP rate and the material count.
+ * So the grid is now ranked. One practice is promoted to a hero poster with a
+ * single PLAY on it — one tap and the round starts. Three more sit beside it.
+ * Everything else, including every skill the lesson has not unlocked yet, waits
+ * behind one "more games" disclosure. A student who wants the default never sees
+ * the other ten; a student who wants the antonym drill is two taps from it.
  *
- * The shell also stops the page scrolling. The header and readiness line are
- * fixed height; the grid is the single scrolling region, which is the pattern
- * the rest of the education module is converging on.
+ * Locked tiles still exist, they are just no longer the first thing a twelve
+ * year old reads: "add synonyms to unlock" is how a student learns the lesson
+ * has more in it, and how a teacher learns what to fill in — but it is a
+ * footnote, not an opening argument.
  *
- * The readiness model stays pure and lives in `lib/education/practicePicker`.
+ * The header lost the readiness count and the mastery badge. Both were header
+ * stats competing with the thing the screen is for, the readiness number now
+ * lives on the disclosure that actually acts on it, and the XP bar above the
+ * picker already reports level and progress.
+ *
+ * The shell also stops the page scrolling: header is fixed height, the content
+ * column is the single scrolling region.
+ *
+ * The readiness model stays pure in `lib/education/practicePicker`; the ranking
+ * that chooses the hero is pure in `lib/education/practiceShortlist`.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { ArrowLeft, CheckCircle, Clock, Target } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { PracticeType, MasteryLevel } from '@/hooks/usePracticeSession';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { VocabFocus } from '@/lib/education/vocabFocus';
@@ -38,48 +46,47 @@ import {
   type PracticeTile,
   type PracticeVariant,
 } from '@/lib/education/practicePicker';
+import { practiceShortlist } from '@/lib/education/practiceShortlist';
 import PracticePickerTile from './PracticePickerTile';
+import PracticePickerHero from './PracticePickerHero';
 
 export interface PracticePickerProps {
   lessonName: string;
   words: VocabularyWord[];
   /** Lesson language — decides whether built-in distractor banks apply. */
   language?: string;
-  /** The student's mastery of this lesson, shown beside the readiness line. */
+  /** Kept for callers; the badge itself moved off this screen. */
   mastery?: MasteryLevel;
-  /** Finished-session totals, so each tile can show what has been played. */
+  /** Finished-session totals: they rank the recommendation and fill the tiles. */
   sessions?: PracticeSessionCounts | null;
   onSelectMode: (
     mode: PracticeType,
     options?: { focus?: VocabFocus; variant?: PracticeVariant }
   ) => void;
-  onBack: () => void;
+  /**
+   * Kept for callers. The picker no longer draws a back control: the education
+   * shell's header already carries one directly above this screen, and two
+   * identical arrows 60px apart is chrome pretending to be a choice.
+   */
+  onBack?: () => void;
 }
-
-/** Mastery badge, carried over from the mode selector this picker replaced. */
-const MASTERY_LOOK: Record<string, { icon: typeof CheckCircle; className: string }> = {
-  mastered: { icon: CheckCircle, className: 'text-neo-cyan' },
-  practicing: { icon: Clock, className: 'text-neo-yellow' },
-  started: { icon: Target, className: 'text-neo-orange' },
-};
 
 export default function PracticePicker({
   lessonName,
   words,
   language,
-  mastery,
   sessions,
   onSelectMode,
-  onBack,
 }: PracticePickerProps) {
   const { t } = useLanguage();
+  const [showAll, setShowAll] = useState(false);
+
   const tiles = useMemo(
     () => buildPracticeTiles(words, { language, sessions }),
     [words, language, sessions]
   );
   const readiness = useMemo(() => practiceReadiness(tiles), [tiles]);
-  const masteryLook = mastery && mastery !== 'not_started' ? MASTERY_LOOK[mastery] : undefined;
-  const MasteryIcon = masteryLook?.icon;
+  const shortlist = useMemo(() => practiceShortlist(tiles), [tiles]);
 
   const handleSelect = (tile: PracticeTile) => {
     // Word Tower shares `solo_board` as its practice type, so the variant is
@@ -96,75 +103,74 @@ export default function PracticePicker({
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
-      {/*
-        Header: ONE row, and the readiness/mastery meta rides in it rather than
-        on a line of its own. Every row up here is a row of tiles a student on a
-        390x844 phone does not get to see.
-      */}
-      <div className="flex shrink-0 items-center gap-2 pb-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          aria-label={t('common.back')}
-          className="shrink-0 text-neo-cream hover:bg-neo-white/10 hover:text-neo-white"
-        >
-          <DirectionalIcon icon={ArrowLeft} className="h-5 w-5" />
-        </Button>
-        <div className="min-w-0 flex-1">
-          <h1 className="font-neo-display text-lg font-black uppercase leading-none text-neo-white text-balance">
-            {t('education.practicePicker.title')}
-          </h1>
-          <p className="truncate font-neo-body text-[11px] leading-tight text-neo-white/70">
-            {lessonName}
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-0.5">
-          <p
-            data-testid="practice-picker-readiness"
-            className="font-neo-body text-[11px] tabular-nums text-neo-white/65"
-          >
-            {t('education.practicePicker.readyCount', {
-              ready: readiness.ready,
-              total: readiness.total,
-            })}
-          </p>
-          {masteryLook && MasteryIcon && (
-            <p
-              data-testid="practice-picker-mastery"
-              className={cn(
-                'flex items-center gap-1 font-neo-body text-[11px] font-bold',
-                masteryLook.className
-              )}
-            >
-              <MasteryIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              {t(`education.practice.mastery.${mastery}`)}
-            </p>
-          )}
-        </div>
-      </div>
+      {/* Header: ONE line. The lesson's name is the page title in the bar above
+          this (see the route's PageClient), so repeating it here spent a second
+          row of a 390x844 phone on the same six words. */}
+      <h1 className="shrink-0 pb-2 font-neo-display text-lg font-black uppercase leading-none text-neo-white text-balance">
+        {t('education.practicePicker.title')}
+      </h1>
 
-      {/*
-        The one scrolling region on this screen. The shell above and the page
-        around it stay put, so the phone never scrolls the body.
-      */}
+      {/* The one scrolling region on this screen. The shell above and the page
+          around it stay put, so the phone never scrolls the body. */}
       <div
         data-testid="practice-picker-grid"
-        className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2.5 overflow-y-auto overscroll-contain pb-2 sm:grid-cols-3 lg:grid-cols-4"
+        role="group"
+        aria-label={lessonName}
+        className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pb-2"
       >
-        {tiles.map((tile) => (
-          <PracticePickerTile key={tile.id} tile={tile} onSelect={handleSelect} />
-        ))}
-      </div>
+        {shortlist.recommended && (
+          <PracticePickerHero tile={shortlist.recommended} onSelect={handleSelect} />
+        )}
 
-      {readiness.ready === 0 && (
-        <p
-          role="status"
-          className="shrink-0 pt-3 font-neo-body text-sm text-neo-white/80 text-pretty"
-        >
-          {t('education.practicePicker.nothingReady')}
-        </p>
-      )}
+        {shortlist.alsoReady.length > 0 && (
+          <div
+            data-testid="practice-picker-shortlist"
+            className="grid grid-cols-3 gap-2.5 sm:gap-3"
+          >
+            {shortlist.alsoReady.map((tile) => (
+              <PracticePickerTile key={tile.id} tile={tile} onSelect={handleSelect} />
+            ))}
+          </div>
+        )}
+
+        {shortlist.rest.length > 0 && (
+          <>
+            <button
+              type="button"
+              data-testid="practice-picker-more"
+              aria-expanded={showAll}
+              onClick={() => setShowAll((open) => !open)}
+              className="flex min-h-[46px] w-full shrink-0 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-sm font-black uppercase text-neo-cream transition-colors hover:bg-neo-navy-light"
+            >
+              {showAll
+                ? t('student.practiceFun.fewerGames')
+                : t('student.practiceFun.moreGames', { count: shortlist.rest.length })}
+              {showAll ? (
+                <ChevronUp className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <ChevronDown className="h-4 w-4" aria-hidden="true" />
+              )}
+            </button>
+
+            {showAll && (
+              <div
+                data-testid="practice-picker-rest"
+                className="grid grid-cols-2 content-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4"
+              >
+                {shortlist.rest.map((tile) => (
+                  <PracticePickerTile key={tile.id} tile={tile} onSelect={handleSelect} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {readiness.ready === 0 && (
+          <p role="status" className="shrink-0 font-neo-body text-sm text-neo-cream text-pretty">
+            {t('education.practicePicker.nothingReady')}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

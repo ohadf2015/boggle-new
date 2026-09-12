@@ -2,6 +2,11 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AndroidAppInstallPromo from '../AndroidAppInstallPromo';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
+import {
+  OVERLAY_QUIET_ZONE_GRACE_MS,
+  claimOverlayQuietZone,
+  resetOverlayQuietZoneForTests,
+} from '@/lib/overlayQuietZone';
 
 const captureMock = vi.fn();
 
@@ -60,6 +65,7 @@ beforeEach(() => {
   mockNative = false;
   mockPromoVariant = 'control';
   mockHasConsentDecision = true;
+  resetOverlayQuietZoneForTests();
   exposureMock.mockClear();
   setUA(ANDROID_UA);
   Object.defineProperty(window, 'location', {
@@ -269,6 +275,27 @@ describe('exp-install-promo-after-first-game-v1', () => {
     expect(useAndroidInstallStore.getState().open).toBe(false);
 
     localStorage.setItem('games_completed_count', '1');
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(true);
+  });
+
+  it('withholds the auto-popup inside the overlay quiet zone, and re-arms after it', async () => {
+    // `inGame: isInGameSurface()` covered a live board but not the round-end
+    // recap or the projector results, which live on /multiplayer — not a game
+    // route, no body class. The quiet zone is raised by the surface itself.
+    // Same re-arm loop as the consent case: advance by SHOW_DELAY_MS, never
+    // runAllTimersAsync (that would chase the infinite re-arm forever).
+    const release = claimOverlayQuietZone('classroom-results');
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    act(() => { fireEvent.pointerDown(window); });
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { vi.advanceTimersByTime(12_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(false);
+
+    // Recap dismissed, grace window elapsed — the next re-arm cycle fires it.
+    release();
+    await act(async () => { vi.advanceTimersByTime(OVERLAY_QUIET_ZONE_GRACE_MS + 100); });
     await act(async () => { vi.advanceTimersByTime(12_000); });
     expect(useAndroidInstallStore.getState().open).toBe(true);
   });

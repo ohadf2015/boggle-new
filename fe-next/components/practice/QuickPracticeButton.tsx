@@ -163,7 +163,7 @@ export function QuickPracticeButton({
           'font-neo-display',
           'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
           'shadow-hard hover:shadow-hard-lg',
-          'border-neo border-neo-black',
+          'border-[3px] border-neo-black',
           'transition-all',
           size === 'lg' ? 'text-base px-6' : 'px-4',
           isRTL ? 'rounded-l-none rounded-r-neo' : 'rounded-r-none rounded-l-neo'
@@ -183,7 +183,7 @@ export function QuickPracticeButton({
         className={cn(
           'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
           'shadow-hard hover:shadow-hard-lg',
-          'border-neo border-neo-black',
+          'border-[3px] border-neo-black',
           isRTL ? 'border-r-0 rounded-r-none rounded-l-neo' : 'border-l-0 rounded-l-none rounded-r-neo',
           'px-2 transition-all'
         )}
@@ -207,7 +207,7 @@ export function QuickPracticeButton({
             className={cn(
               'absolute top-full mt-2 z-50',
               'min-w-[200px]',
-              'bg-neo-navy border-neo border-neo-black rounded-neo shadow-hard-lg',
+              'bg-neo-navy border-[3px] border-neo-black rounded-neo shadow-hard-lg',
               'overflow-hidden',
               isRTL ? 'left-0' : 'right-0'
             )}

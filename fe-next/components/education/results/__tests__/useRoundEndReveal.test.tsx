@@ -12,6 +12,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useRoundEndReveal } from '../useRoundEndReveal';
+import { roundEndTimeline } from '@/lib/education/roundEndStage';
 
 function setReducedMotion(matches: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -44,19 +45,23 @@ describe('useRoundEndReveal', () => {
     expect(result.current).toBe('stage');
   });
 
+  // Driven off the timetable, not off literals: the gaps were stretched once
+  // already (a 2.6s reveal was over before a capture's shutter opened) and a
+  // test that hardcodes them just has to be edited again next time.
   it('walks third, second, then the winner', () => {
+    const at = (stage: string) => roundEndTimeline().find((s) => s.stage === stage)!.at;
     const { result } = renderHook(() => useRoundEndReveal(true));
-    act(() => { vi.advanceTimersByTime(500); });
+    act(() => { vi.advanceTimersByTime(at('third')); });
     expect(result.current).toBe('third');
-    act(() => { vi.advanceTimersByTime(500); });
+    act(() => { vi.advanceTimersByTime(at('second') - at('third')); });
     expect(result.current).toBe('second');
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => { vi.advanceTimersByTime(at('first') - at('second')); });
     expect(result.current).toBe('first');
   });
 
   it('settles on the resting stage', () => {
     const { result } = renderHook(() => useRoundEndReveal(true));
-    act(() => { vi.advanceTimersByTime(5000); });
+    act(() => { vi.advanceTimersByTime(10000); });
     expect(result.current).toBe('done');
   });
 

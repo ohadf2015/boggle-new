@@ -12,12 +12,22 @@
  *
  * PageClient is stubbed to render nothing, which is exactly the crawler's view. Remove the
  * GamePageSeoContent call from either page and these fail.
+ *
+ * 2026-09-12: /duels now HANDS its copy to the client shell (`seoContent` prop) instead of
+ * rendering it as a sibling — as a sibling it grew the phone document to ~1550px against an
+ * 844px viewport, and a locked shell cannot clip what lives outside it. Next SSRs client
+ * components, so the prop element is still rendered server-side and still ships in the
+ * initial HTML; only a stub that swallows its props can't see it. The duels stub therefore
+ * forwards `seoContent` and keeps modelling the crawler truthfully. Delete the
+ * GamePageSeoContent call from either page and these still fail.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
 
-vi.mock('../duels/PageClient', () => ({ default: () => null }));
+vi.mock('../duels/PageClient', () => ({
+  default: ({ seoContent }: { seoContent?: React.ReactNode }) => seoContent ?? null,
+}));
 vi.mock('../classroom-game/PageClient', () => ({ default: () => null }));
 
 import DuelsPage from '../duels/page';

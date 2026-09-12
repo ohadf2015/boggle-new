@@ -140,6 +140,7 @@ export default function PracticeModeStage({
             })
           }
           xpSessionData={xpSessionData}
+          {...forward}
         />
       );
 

@@ -43,6 +43,31 @@ export const BASE_PRACTICE_MODES: readonly BasePracticeMode[] = [
   'word_list',
 ];
 
+/**
+ * Modes that are useless without word meanings, and how many they need.
+ *
+ * Blitz shows a definition and asks the student to type the word back; Matching
+ * pairs words against their definitions. On a bare word list Blitz renders the
+ * string "No words to practice" over a running 60-second clock and Matching has
+ * an empty right-hand column — both were still reported ready, because
+ * readiness only ever counted words. Blitz also leads the recommendation
+ * ranking, so on a bare list the picker put a dead round behind its one big
+ * PLAY button: a Class-4 silent failure, no error, nothing in the console, just
+ * a game that does not exist.
+ */
+const MODE_MIN_DEFINITIONS: Partial<Record<BasePracticeMode, number>> = {
+  blitz: 1,
+  matching: 4,
+};
+
+/** How many of the lesson's words carry a usable meaning. */
+function definitionCount(words: VocabularyWord[]): number {
+  return words.filter((entry) => (entry.definition ?? '').trim().length > 0).length;
+}
+
+/** Told to the student when a mode is locked for want of meanings, not words. */
+const NEEDS_DEFINITIONS_KEY = 'student.practiceFun.needsDefinitions';
+
 /** Words a mode needs before it is worth opening. */
 const BASE_MODE_MIN_WORDS: Record<BasePracticeMode, number> = {
   solo_board: 1,
@@ -132,8 +157,17 @@ export function buildPracticeTiles(
   options: PracticeTileOptions = {}
 ): PracticeTile[] {
   const wordCount = words.length;
+  const withDefinitions = definitionCount(words);
   const baseTiles: PracticeTile[] = BASE_PRACTICE_MODES.map((mode) => {
-    const ready = wordCount >= BASE_MODE_MIN_WORDS[mode];
+    const hasWords = wordCount >= BASE_MODE_MIN_WORDS[mode];
+    const definitionsNeeded = MODE_MIN_DEFINITIONS[mode] ?? 0;
+    const hasMeanings = withDefinitions >= definitionsNeeded;
+    const ready = hasWords && hasMeanings;
+    // Say which of the two is missing: "add words" is useless advice to a
+    // teacher whose lesson already has eight of them.
+    const lockedKey = hasWords
+      ? NEEDS_DEFINITIONS_KEY
+      : `education.practicePicker.locked.${mode}`;
     return {
       id: mode,
       mode,
@@ -143,7 +177,7 @@ export function buildPracticeTiles(
       count: wordCount,
       countKind: 'words' as const,
       sessions: options.sessions?.[SESSION_COLUMN[mode]] ?? 0,
-      ...(ready ? {} : { lockedKey: `education.practicePicker.locked.${mode}` }),
+      ...(ready ? {} : { lockedKey }),
     };
   });
 

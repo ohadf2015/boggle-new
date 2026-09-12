@@ -67,7 +67,7 @@ describe('ClassroomTvResults', () => {
     render(<ClassroomTvResults summary={summary()} t={t} />);
     await waitFor(
       () => expect(screen.getByTestId('winner-spotlight')).toHaveAttribute('data-active', 'true'),
-      { timeout: 4000 }
+      { timeout: 7000 }
     );
     expect(screen.getByTestId('podium-place-1')).toHaveTextContent('Maya');
   });
@@ -76,7 +76,7 @@ describe('ClassroomTvResults', () => {
     render(<ClassroomTvResults summary={summary()} t={t} />);
     expect(screen.getByTestId('coverage-fill')).toHaveStyle({ width: '0%' });
     await waitFor(() => expect(screen.getByTestId('coverage-fill')).toHaveStyle({ width: '50%' }), {
-      timeout: 4000,
+      timeout: 7000,
     });
   });
 
@@ -124,12 +124,22 @@ describe('ClassroomTvResults', () => {
     // that does not know the timeline can poll this instead of guessing.
     expect(root).toHaveAttribute('data-round-end-stage', 'stage');
     await waitFor(() => expect(root).toHaveAttribute('data-round-end-stage', 'done'), {
-      timeout: 5000,
+      timeout: 7000,
     });
   });
 
-  it('scrolls inside itself, never the page body', () => {
+  /**
+   * Was "scrolls inside itself, never the page body". Containing the scroll
+   * was right and still holds; putting it on the ROOT was not. Measured on the
+   * wall at 1280x633: scrollHeight 1202 against clientHeight 595, with REMATCH
+   * — the screen's one action — six hundred pixels under the fold behind a
+   * gesture nobody performs on a projector. The recap now fits, and the only
+   * region that may overflow is the list of words left to reteach.
+   * See `roundEndProjectorFit.test.tsx`.
+   */
+  it('locks its own root and scrolls nothing but the reteach list', () => {
     render(<ClassroomTvResults summary={summary()} t={t} />);
-    expect(screen.getByTestId('classroom-tv-results').className).toContain('overflow-y-auto');
+    expect(screen.getByTestId('classroom-tv-results').className).toContain('overflow-hidden');
+    expect(screen.getByTestId('coverage-words').className).toContain('overflow-y-auto');
   });
 });

@@ -18,12 +18,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { MISS_GAP_COMPLETE_RATE_LIMIT } from '@/lib/education/missGapRateLimits';
 import {
   foldClassStreak,
   normalizeDay,
   MAX_COMPLETION_DAYS,
 } from '@/lib/education/classStreakMath';
 import { normalizeMissGapClassKey } from '@/lib/education/missGapClassKey';
+import { mergeMissGapRun } from '@/lib/education/missGapRunMerge';
 import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -47,10 +49,14 @@ function int(value: unknown, min: number, max: number): number {
 }
 
 export async function POST(request: NextRequest) {
-  const limit = checkApiRateLimit(request, 'education-miss-gap-complete', {
-    windowMs: 60_000,
-    maxRequests: 20,
-  });
+  // Sized off a CLASS, not a person: the budget is per-IP and a school NAT is
+  // one IP. See lib/education/missGapRateLimits.ts for the numbers and the
+  // app-wide five-minute IP block they have to stay clear of.
+  const limit = checkApiRateLimit(
+    request,
+    'education-miss-gap-complete',
+    MISS_GAP_COMPLETE_RATE_LIMIT,
+  );
   if (!limit.success) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
@@ -110,9 +116,21 @@ export async function POST(request: NextRequest) {
     updated_at: nowIso,
   };
 
+  // A replay must never downgrade what the teacher already sees — the upsert
+  // replaces the row, so merge the achievement columns first (missGapRunMerge).
+  const { data: previousRun } = await supabase
+    .from('miss_gap_homework_runs')
+    .select('words_correct, accuracy, stars, best_streak, duration_ms, on_time')
+    .eq('class_key', classKey)
+    .eq('due_key', dueDate)
+    .eq('student_key', studentKey)
+    .maybeSingle();
+
   const { data: run, error: runError } = await supabase
     .from('miss_gap_homework_runs')
-    .upsert(row, { onConflict: 'class_key,due_key,student_key' })
+    .upsert(mergeMissGapRun(previousRun, row), {
+      onConflict: 'class_key,due_key,student_key',
+    })
     .select()
     .single();
 

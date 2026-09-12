@@ -35,6 +35,8 @@ export interface VocabQuizStudentHeaderProps {
   lockedIn: { locked: number; total: number } | null;
   /** Where this student sits in the room — shown between questions. */
   rank: { position: number; total: number } | null;
+  /** The round is over: there is no question left to be N of M. */
+  finished?: boolean;
   t: TranslateFn;
 }
 
@@ -47,6 +49,7 @@ export function VocabQuizStudentHeader({
   mascot,
   lockedIn,
   rank,
+  finished = false,
   t,
 }: VocabQuizStudentHeaderProps) {
   const scale = flameScale(streak);
@@ -77,9 +80,15 @@ export function VocabQuizStudentHeader({
       />
 
       <div className="flex flex-col min-w-0">
-        <span className="font-neo-display font-bold text-xs leading-tight text-neo-white/70 truncate">
-          {t('vocabQuiz.progress', { current: questionNumber || 1, total: totalQuestions || 1 })}
-        </span>
+        {/* A finished round has no question to be N of M — measured live in
+            room RV4UN9, the phone read "Question 4 of 10" directly above
+            "That's a wrap!". The score and the flame stay: those are the
+            student's, not the question's. */}
+        {!finished && (
+          <span className="font-neo-display font-bold text-xs leading-tight text-neo-white/70 truncate">
+            {t('vocabQuiz.progress', { current: questionNumber || 1, total: totalQuestions || 1 })}
+          </span>
+        )}
         {/* One line, two jobs: while the clock runs it is the room committing
             around you; between questions it is where you stand. Both matter,
             neither is worth a second row on a 390px phone. */}

@@ -67,7 +67,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
             data-testid="duel-combo-streak"
             className={cn(
               'font-neo-display text-base font-black leading-none tabular-nums',
-              isHot ? 'text-neo-orange' : 'text-neo-white/50'
+              isHot ? 'text-neo-orange' : 'text-neo-cream/80'
             )}
           >
             {streak}
@@ -75,7 +75,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
           <span
             className={cn(
               'truncate font-neo-body text-[10px] font-black uppercase tracking-widest',
-              isHot ? 'text-neo-white' : 'text-neo-white/50'
+              isHot ? 'text-neo-white' : 'text-neo-cream/80'
             )}
           >
             {t(tier.labelKey)}

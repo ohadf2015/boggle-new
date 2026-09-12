@@ -133,8 +133,8 @@ export function ChallengeButton({
         disabled={showSuccess}
         className={cn(
           'px-4 py-2 font-neo-body font-bold rounded-neo',
-          'bg-neo-pink text-white',
-          'border-3 border-neo border-neo-black shadow-hard-sm',
+          'bg-neo-pink text-neo-black',
+          'border-[3px] border-neo-black shadow-hard-sm',
           'hover:shadow-hard transition-all',
           'disabled:opacity-70 disabled:cursor-not-allowed',
           'flex items-center gap-2',

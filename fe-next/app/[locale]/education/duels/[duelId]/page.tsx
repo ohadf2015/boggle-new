@@ -16,7 +16,7 @@ export default async function DuelPage({
   return (
     <Suspense
       fallback={
-        <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
+        <div className="flex h-dvh items-center justify-center overflow-hidden bg-neo-navy">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan" />
         </div>
       }

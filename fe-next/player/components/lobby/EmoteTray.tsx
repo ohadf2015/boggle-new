@@ -21,7 +21,11 @@ interface EmoteTrayProps {
 }
 
 const buttonClass = cn(
-  'flex h-11 w-11 items-center justify-center rounded-neo border-neo border-neo-black',
+  // Width written as an arbitrary value beside the colour: tailwind-merge files
+  // `border-neo` in the border-COLOUR group and drops it, leaving a borderless
+  // navy button at 1.07:1 on the lobby card. Cream, not black — a black edge on
+  // navy measures 1.23:1 and is no edge at all.
+  'flex h-11 w-11 items-center justify-center rounded-neo border-[2px] border-neo-cream',
   'bg-neo-navy-light text-2xl leading-none shadow-hard-sm transition-transform',
   'hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink',

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import logger from '@/utils/logger';
+import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
 
 // Dynamic import for ProfileCustomizationModal (not needed on initial page load)
 const ProfileCustomizationModal = dynamic(
@@ -21,6 +22,13 @@ const ProfileCustomizationModal = dynamic(
  */
 export default function ProfileCustomizationWrapper() {
   const { profile, needsProfileCustomization, updateProfile } = useAuth();
+  // Overlay quiet zone. This modal cannot be dismissed (`handleClose` is a
+  // deliberate no-op — the user must save a name), so opening it over a live
+  // board or a round-end recap does not just cover the moment, it traps the
+  // player in it. Nothing is marked as shown here and the open is driven by an
+  // auth flag, so standing down is a pure DEFER: the effect below re-runs when
+  // the zone clears and the modal appears then. See lib/overlayQuietZone.
+  const overlayQuietZone = useOverlayQuietZone();
   const [showModal, setShowModal] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -31,7 +39,7 @@ export default function ProfileCustomizationWrapper() {
 
   // Show profile customization modal for authenticated users who haven't customized
   useEffect(() => {
-    if (!isMounted || !needsProfileCustomization) {
+    if (!isMounted || !needsProfileCustomization || overlayQuietZone) {
       setShowModal(false);
       return;
     }
@@ -43,7 +51,7 @@ export default function ProfileCustomizationWrapper() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [isMounted, needsProfileCustomization]);
+  }, [isMounted, needsProfileCustomization, overlayQuietZone]);
 
   // Handle profile customization save
   const handleSave = useCallback(async (name: string, avatarConfig: CustomAvatarConfig) => {

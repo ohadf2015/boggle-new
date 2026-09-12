@@ -25,6 +25,7 @@ import type { Player } from '@/hooks/useGameState';
 import type { LetterGrid, Language } from '@/types';
 // Imported, never redeclared — the server builds this exact shape.
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import { hostLeavesProjectorRecap } from '@/lib/education/roundEndResultsRoute';
 import type { TournamentData } from '@/shared/types/view';
 import { useGameStore } from '@/hooks/gameState/store';
 
@@ -94,6 +95,8 @@ export interface OnShowResultsData {
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: BlastSummary;
   wheelRushSummary?: WheelRushSummary;
+  /** Same field the player path carries, so both routes restore the lesson recap. */
+  classroomSummary?: ClassroomSummary;
 }
 
 export interface FinalScoresState {
@@ -101,10 +104,10 @@ export interface FinalScoresState {
   gameCode: string;
   wordHuntSummary?: WordHuntSummary;
   /**
-   * On the SAME payload as the scores, deliberately: a classroom host never
-   * reaches ResultsPage (onShowResults below is gated on hostPlaying, forced
-   * false for lesson rooms), so this is the projector's only route to the
-   * recap — a second event would restore scores without it on reconnect.
+   * On the SAME payload as the scores, deliberately: a classroom host stays
+   * in this tree (onShowResults below is gated on hostPlaying, forced false
+   * for lesson rooms), so this is the projector's only route to the recap —
+   * a second event would restore scores without it on reconnect.
    */
   classroomSummary?: ClassroomSummary;
 }
@@ -533,14 +536,9 @@ export function useHostGameEvents({
         classroomSummary: data.classroomSummary,
       });
 
-      // Only call onShowResults if host is playing (not in broadcast mode).
-      // Wheel-rush has no dedicated TV broadcast results view, so a desktop
-      // host whose `hostPlaying` was previously toggled off (persisted via
-      // `host_broadcast_mode_enabled` localStorage) would otherwise sit on the
-      // game screen forever after the round ends. Bypass the gate for that
-      // mode so the host always lands on the standard results page.
-      const isWheelRush = data.gameMode === 'wheel-rush';
-      const shouldShowResults = hostPlayingRef.current || isWheelRush;
+      // Arcade wheel-rush bypasses the broadcast gate (no TV view); a classroom room never
+      // may (it has the projector recap). One predicate, keyed on classroomSummary like the render.
+      const shouldShowResults = hostLeavesProjectorRecap({ hostPlaying: hostPlayingRef.current, gameMode: data.gameMode, hasClassroomSummary: !!data.classroomSummary });
       if (shouldShowResults && currentOnShowResults) {
         currentOnShowResults({
           scores: data.scores,
@@ -550,6 +548,7 @@ export function useHostGameEvents({
           wordHuntSummary: data.wordHuntSummary,
           blastSummary: data.blastSummary,
           wheelRushSummary: data.wheelRushSummary,
+          classroomSummary: data.classroomSummary, // both paths to ResultsPage carry the recap (pitfalls Class 3)
         });
       }
     };

@@ -158,8 +158,11 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             </div>
           )}
 
-          {/* Recent XP gain indicator */}
-          {recentXpGain && recentXpGain > 0 && (
+          {/* Recent XP gain indicator.
+              `recentXpGain && …` printed a bare "0" for the whole of every
+              round that had not scored yet — React renders the number 0, it is
+              not falsy enough to disappear. Compare, never coerce. */}
+          {(recentXpGain ?? 0) > 0 && (
             <m.span
               data-testid="xp-recent-gain"
               role="status"
@@ -184,7 +187,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         data-testid="xp-progress-container"
         className={cn(
           'relative w-full rounded-neo overflow-hidden',
-          'bg-neo-navy border-neo border-neo-black shadow-hard',
+          'bg-neo-navy border-[3px] border-neo-black shadow-hard',
           sizeConfig.container,
           // RTL: Progress bar fill direction handled by CSS
           isRTL && 'rtl:shadow-hard-rtl'
@@ -217,15 +220,13 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           />
         )}
 
-        {/* Progress percentage text (centered) */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className={cn(
-            'font-neo-body font-black text-neo-black mix-blend-difference tabular-nums',
-            size === 'sm' ? 'text-xs' : 'text-sm'
-          )}>
-            {progress.progressPercent}%
-          </span>
-        </div>
+        {/*
+          The percentage label that used to sit here is gone. It was painted
+          `text-neo-black mix-blend-difference`, which measures 1.23:1 against
+          the empty navy track — unreadable exactly when it mattered, at 0% —
+          and it was the third telling of one fact: the row above already reads
+          "0 / 264 XP" and the fill itself shows the same ratio.
+        */}
       </div>
 
       {/* Next level preview */}

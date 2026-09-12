@@ -34,6 +34,12 @@ export interface LobbyModeHeroProps {
   recommended: TeacherGameMode['id'] | null;
   busy?: boolean;
   /**
+   * The round length this lobby is actually configured for. Passed down so the
+   * poster's minute chip and the round settings below it can never disagree —
+   * the catalog number is only a fallback for a mode nobody has tuned yet.
+   */
+  minutes?: number;
+  /**
    * Set while GO LIVE cannot fire. It only DISABLES here — the sentence saying
    * why is the setup row's own label, so the screen never stacks a banner over
    * a prompt (addendum: at most one status row, zero stacked prompts).
@@ -50,6 +56,7 @@ export function LobbyModeHero({
   selected,
   recommended,
   busy,
+  minutes,
   blockedKey,
   expanded,
   onToggleExpanded,
@@ -71,6 +78,7 @@ export function LobbyModeHero({
         selected
         recommended={recommended === live.id}
         busy={busy}
+        minutes={minutes}
         expanded={expanded}
         onPick={onPick}
         onOpenPicker={onToggleExpanded}
@@ -88,14 +96,14 @@ export function LobbyModeHero({
           onClick={onGoLive}
           disabled={!!blockedKey || busy}
           className={cn(
-            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-neo border-[3px] border-black px-4 py-2',
-            'bg-neo-lime font-neo-display text-base font-black uppercase tracking-tight text-black shadow-hard',
+            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-neo border-[3px] border-black px-4 py-2 lg:min-h-16',
+            'bg-neo-lime font-neo-display text-base font-black uppercase tracking-tight text-black shadow-hard lg:text-2xl',
             'transition-all motion-safe:hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5',
             'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
             'disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-hard'
           )}
         >
-          <Radio className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
+          <Radio className="size-5 shrink-0 lg:size-7" strokeWidth={3} aria-hidden="true" />
           {t('education.modePicker.launch', { mode: t(live.nameKey) })}
         </button>
 
@@ -107,8 +115,8 @@ export function LobbyModeHero({
           aria-expanded={expanded}
           onClick={onToggleExpanded}
           className={cn(
-            'flex min-h-12 shrink-0 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy-light px-3 py-2',
-            'font-neo-display text-xs font-black uppercase leading-tight text-neo-cream',
+            'flex min-h-12 shrink-0 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy-light px-3 py-2 lg:min-h-16 lg:px-5',
+            'font-neo-display text-xs font-black uppercase leading-tight text-neo-cream lg:text-base',
             'transition-colors hover:bg-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
           )}
         >

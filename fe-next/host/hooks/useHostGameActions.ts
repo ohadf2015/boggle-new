@@ -84,7 +84,7 @@ export interface UseHostGameActionsReturn {
   handleExitRoom: () => void;
   confirmExitRoom: () => void;
   handleCancelTournament: () => void;
-  handleStartNewGame: () => void;
+  handleStartNewGame: (options?: { gameMode?: string }) => void; // gameMode pins the restart; omitted = old re-roll
   handleNextRound: () => void;
   handleShowQR: () => void;
   handleCancelTournamentDialog: () => void;
@@ -400,7 +400,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     });
   }, [socket, tournamentData, t, setShowCancelTournamentDialog, setTournamentData, setGameType]);
 
-  const handleStartNewGame = useCallback(() => {
+  const handleStartNewGame = useCallback((options?: { gameMode?: string }) => {
     // Reuse the same lock as startGame to prevent duplicate emissions
     if (startGameLockRef.current) {
       logger.warn('[HOST] handleStartNewGame already in progress, ignoring duplicate');
@@ -449,7 +449,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           minWordLength: minWordLength,
           difficulty: difficulty,
           boardTheme: boardTheme,
-          gameMode: hostSelectedGameMode || 'random',
+          gameMode: options?.gameMode || hostSelectedGameMode || 'random',
           tvMode: !hostPlaying,
         });
 

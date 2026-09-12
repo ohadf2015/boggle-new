@@ -229,6 +229,21 @@ describe('useVocabQuizJuice — the finish', () => {
     rerender({ ...base, phase: 'ended', myCorrectCount: 4, totalQuestions: 5 });
     expect(fireVictoryConfetti).not.toHaveBeenCalled();
   });
+
+  it('celebrates on the wall whatever the class scored — once', () => {
+    // The projector's ending is the room's ending. It does not wait for anyone
+    // to have been perfect: the round finishing IS the moment, and a silent
+    // final screen in front of thirty people is the payoff cliff the critic
+    // called disqualifying. Latched, because `ended` re-renders freely.
+    const { rerender } = renderHook((props: VocabQuizJuiceInput) => useVocabQuizJuice(props), {
+      initialProps: { ...base, surface: 'host' as const },
+    });
+    const ended = { ...base, surface: 'host' as const, phase: 'ended' as const, myCorrectCount: 0 };
+    rerender(ended);
+    rerender(ended);
+
+    expect(keysPlayed().filter((k) => k === 'confettiRain')).toHaveLength(1);
+  });
 });
 
 describe('useVocabQuizJuice — the projector', () => {

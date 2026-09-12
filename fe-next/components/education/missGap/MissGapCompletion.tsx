@@ -63,7 +63,7 @@ export function MissGapCompletion({
   return (
     <div
       data-testid="miss-gap-completion"
-      className="flex flex-col h-full min-h-0 gap-3 text-center"
+      className="flex flex-col flex-1 min-h-0 gap-3 text-center"
     >
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-center gap-3 pt-1">
         <Image
@@ -85,7 +85,7 @@ export function MissGapCompletion({
                 'w-10 h-10 stroke-[2.5]',
                 n <= score.stars
                   ? 'fill-neo-yellow text-neo-black'
-                  : 'fill-transparent text-neo-white/25',
+                  : 'fill-transparent text-neo-cream/60',
               )}
             />
           ))}
@@ -99,19 +99,19 @@ export function MissGapCompletion({
         </h2>
 
         <div className="grid grid-cols-2 gap-2 w-full">
-          <p className="rounded-neo border-neo border-neo-black bg-neo-navy-light px-3 py-2">
+          <p className="rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2">
             <span className="block font-neo-display font-bold text-2xl text-neo-cyan">
               {score.correct}/{score.total}
             </span>
-            <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-white/70">
+            <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-cream">
               {t('education.homework.wordsRight')}
             </span>
           </p>
-          <p className="rounded-neo border-neo border-neo-black bg-neo-navy-light px-3 py-2">
+          <p className="rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2">
             <span className="block font-neo-display font-bold text-2xl text-neo-lime">
               {score.bestStreak}
             </span>
-            <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-white/70">
+            <span className="block font-neo-body text-[11px] uppercase tracking-wider text-neo-cream">
               {t('education.homework.bestRun')}
             </span>
           </p>
@@ -120,7 +120,7 @@ export function MissGapCompletion({
         {saveState === 'failed' ? (
           <p
             data-testid="miss-gap-save-failed"
-            className="w-full rounded-neo border-neo border-neo-black bg-neo-pink px-3 py-2 font-bold text-sm text-neo-black"
+            className="w-full rounded-neo border-[3px] border-neo-black bg-neo-pink px-3 py-2 font-bold text-sm text-neo-black"
           >
             {t('education.homework.saveFailed')}
           </p>
@@ -130,9 +130,11 @@ export function MissGapCompletion({
             {classmates > 0 ? (
               <p
                 data-testid="miss-gap-classmates"
-                className="font-neo-body text-sm text-neo-white/80"
+                className="font-neo-body text-sm text-neo-cream"
               >
-                {t('education.homework.classmates', { count: classmates })}
+                {classmates === 1
+                  ? t('education.homework.classmatesOne')
+                  : t('education.homework.classmates', { count: classmates })}
               </p>
             ) : (
               // First one in gets the bragging rights, not an empty "0 others".
@@ -147,6 +149,8 @@ export function MissGapCompletion({
         )}
       </div>
 
+      {/* One dominant action (the turn-in, supplied by the host), then a
+          quieter replay. Nothing else competes for the tap. */}
       <div className="shrink-0 space-y-2">
         {children}
         <button
@@ -154,12 +158,12 @@ export function MissGapCompletion({
           data-testid="miss-gap-replay"
           onClick={onReplay}
           className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo shadow-hard-sm',
-            'transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+            'w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold',
+            'bg-neo-navy text-neo-cream border-[3px] border-neo-cream rounded-neo',
+            'transition-transform active:translate-x-[2px] active:translate-y-[2px]',
           )}
         >
-          <RotateCcw className="w-5 h-5" aria-hidden />
+          <RotateCcw className="w-4 h-4" aria-hidden />
           {t('education.homework.playAgain')}
         </button>
       </div>

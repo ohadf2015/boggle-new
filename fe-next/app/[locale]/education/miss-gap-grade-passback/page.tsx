@@ -8,6 +8,7 @@
 
 import type { Metadata } from 'next';
 import { MissGapGradePassback } from '@/components/education/MissGapGradePassback';
+import { MissGapShellLock } from '@/components/education/missGap/MissGapShellLock';
 import {
   parseClassGapShareParams,
   searchRecordToParams,
@@ -108,10 +109,28 @@ export default async function MissGapGradePassbackPage(props: PageProps) {
   return (
     <main
       dir={dir}
-      className="min-h-dvh bg-neo-navy flex items-center justify-center px-4 py-10"
+      className="flex-1 min-h-0 max-h-dvh overflow-hidden bg-neo-navy flex flex-col"
       data-testid="miss-gap-grade-passback-page"
     >
-      <MissGapGradePassback payload={payload} score={score} />
+      {/* Two rules, both load-bearing.
+          `flex-1 min-h-0` (not `h-dvh`): `<body>` is a flex column and this main
+          sits under two more `flex-1 min-h-0` wrappers plus a `shrink-0` footer,
+          so a fixed `100dvh` here would overflow the body's CONTENT box —
+          `body.edu-shell-locked` is `height:100dvh` with border-box, and on a
+          phone it still carries the bottom-nav reservation inside that height.
+          Taking the available space instead can never overflow it.
+          `MissGapShellLock`: `<body>` otherwise keeps `.screen-fit` plus the
+          bottom-nav / cookie-sheet `padding-bottom` (441px measured at 390x844,
+          for a document 1285px tall against an 844px viewport) — height, not
+          overflow, so no `overflow:hidden` can remove it. The lock sizes the
+          body to the viewport and moves the sheet clearance onto the one region
+          that actually scrolls, `.edu-shell-scroll`. */}
+      <MissGapShellLock chromeFree />
+      <div className="edu-shell-scroll flex-1 min-h-0 overflow-y-auto px-4 py-6">
+        <div className="min-h-full flex items-center justify-center">
+          <MissGapGradePassback payload={payload} score={score} />
+        </div>
+      </div>
     </main>
   );
 }

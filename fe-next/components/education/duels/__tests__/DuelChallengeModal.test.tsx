@@ -93,6 +93,13 @@ describe('DuelChallengeModal', () => {
     });
   });
 
+  /**
+   * The duel-type tiles and the lesson picker now start collapsed behind one
+   * CHANGE disclosure (decision-fatigue rule: at most one visible decision
+   * before the primary action). Tests that drive those controls open it first.
+   */
+  const openSetup = () => fireEvent.click(screen.getByTestId('duel-challenge-change'));
+
   describe('rendering', () => {
     it('renders opponent information', () => {
       render(<DuelChallengeModal {...defaultProps} />);
@@ -102,6 +109,7 @@ describe('DuelChallengeModal', () => {
 
     it('renders lesson selector dropdown', () => {
       render(<DuelChallengeModal {...defaultProps} />);
+      openSetup();
 
       expect(screen.getAllByText('Select Lesson')[0]).toBeInTheDocument();
       expect(screen.getByRole('combobox')).toBeInTheDocument();
@@ -109,6 +117,7 @@ describe('DuelChallengeModal', () => {
 
     it('renders all lesson options', () => {
       render(<DuelChallengeModal {...defaultProps} />);
+      openSetup();
 
       expect(screen.getByText('Lesson 1')).toBeInTheDocument();
       expect(screen.getByText('Lesson 2')).toBeInTheDocument();
@@ -128,18 +137,20 @@ describe('DuelChallengeModal', () => {
   });
 
   describe('lesson selection', () => {
-    it('requires lesson selection before sending', () => {
-      render(<DuelChallengeModal {...defaultProps} />);
+    // The guard is still there, but it only bites when there is genuinely
+    // nothing to play: with lessons present the first one is pre-selected so a
+    // single tap sends (see DuelChallengeModal.defaults.test.tsx).
+    it('refuses to send when the classroom has no lessons at all', () => {
+      render(<DuelChallengeModal {...defaultProps} lessons={[]} />);
 
-      const sendButton = screen.getByText('Send Challenge');
-      fireEvent.click(sendButton);
+      fireEvent.click(screen.getByText('Send Challenge'));
 
-      // Should not call createChallenge without lesson
       expect(mockCreateChallenge).not.toHaveBeenCalled();
     });
 
     it('allows selecting a lesson', () => {
       render(<DuelChallengeModal {...defaultProps} />);
+      openSetup();
 
       const dropdown = screen.getByRole('combobox');
       fireEvent.change(dropdown, { target: { value: 'lesson-1' } });
@@ -151,6 +162,7 @@ describe('DuelChallengeModal', () => {
   describe('challenge creation', () => {
     it('calls createChallenge with correct params when lesson selected', () => {
       render(<DuelChallengeModal {...defaultProps} />);
+      openSetup();
 
       // Select lesson
       const dropdown = screen.getByRole('combobox');
@@ -160,16 +172,18 @@ describe('DuelChallengeModal', () => {
       const sendButton = screen.getByText('Send Challenge');
       fireEvent.click(sendButton);
 
+      // realtime is the pre-selected recommendation
       expect(mockCreateChallenge).toHaveBeenCalledWith(
         'opponent-1',
         'lesson-1',
         'classroom-1',
-        'async'
+        'realtime'
       );
     });
 
     it('shows loading state while creating', () => {
       render(<DuelChallengeModal {...defaultProps} />);
+      openSetup();
 
       const dropdown = screen.getByRole('combobox');
       fireEvent.change(dropdown, { target: { value: 'lesson-1' } });
@@ -184,6 +198,7 @@ describe('DuelChallengeModal', () => {
     it('auto-closes after successful creation', async () => {
       vi.useFakeTimers();
       render(<DuelChallengeModal {...defaultProps} />);
+      openSetup();
 
       const dropdown = screen.getByRole('combobox');
       fireEvent.change(dropdown, { target: { value: 'lesson-1' } });
@@ -227,29 +242,33 @@ describe('DuelChallengeModal', () => {
       render(<DuelChallengeModal {...defaultProps} />);
 
       const modal = screen.getByTestId('duel-challenge-modal');
-      expect(modal).toHaveClass('border-3');
-      expect(modal).toHaveClass('border-neo-black');
+      // Arbitrary width so cn()/tailwind-merge cannot collapse it into the
+      // colour class; cream rather than black because a black edge on navy
+      // measures 1.23:1 and simply disappears.
+      expect(modal).toHaveClass('border-[3px]');
+      expect(modal).toHaveClass('border-neo-cream');
       expect(modal).toHaveClass('shadow-hard-lg');
     });
   });
 
-  describe('forfeit/cancel button destructive styling', () => {
-    it('cancel button has destructive background color', () => {
+  describe('cancel button reads as a secondary control', () => {
+    // Dismissing a challenge dialog destroys nothing, so red is the wrong
+    // signal (red is reserved for destructive actions). It must still read as
+    // a control: a 3px cream border on the navy surface, never a ghost button.
+    it('cancel button is not dressed as a destructive action', () => {
       render(<DuelChallengeModal {...defaultProps} />);
 
       const cancelButton = screen.getByText('Cancel');
-      // Must be visually destructive — red or neo-pink
-      const hasDestructiveStyle =
-        cancelButton.classList.contains('bg-red-500') ||
-        cancelButton.classList.contains('bg-neo-pink');
-      expect(hasDestructiveStyle).toBe(true);
+      expect(cancelButton.classList.contains('bg-red-500')).toBe(false);
+      expect(cancelButton.classList.contains('bg-neo-pink')).toBe(false);
     });
 
-    it('cancel button has neo-brutalist border and shadow', () => {
+    it('cancel button carries a border cn() cannot drop', () => {
       render(<DuelChallengeModal {...defaultProps} />);
 
       const cancelButton = screen.getByText('Cancel');
-      expect(cancelButton).toHaveClass('border-neo-black');
+      expect(cancelButton).toHaveClass('border-[3px]');
+      expect(cancelButton).toHaveClass('border-neo-cream');
       expect(cancelButton).toHaveClass('shadow-hard-sm');
     });
   });

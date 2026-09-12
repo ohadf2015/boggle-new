@@ -25,8 +25,8 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { Check, X, EyeOff, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check, X, EyeOff, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireVictoryConfetti, cleanupConfetti } from '@/utils/confettiUtils';
@@ -65,6 +65,21 @@ export interface WordCoverageGlanceProps {
    * class-wide meter and on the projector.
    */
   classSwept?: boolean;
+  /**
+   * Print only the words still to teach. A projector is read from the back of
+   * a room at a glance, and thirty green chips saying "yes we found house" is
+   * a register, not a lesson — the meter above already gave that number. What
+   * a teacher looks up for is the short list of what to do next. The phone
+   * card keeps the full list, because it is held, and read.
+   */
+  missedOnly?: boolean;
+  /**
+   * Hard cap on printed chips, with the remainder counted in one more chip. A
+   * class that found nothing of thirty must not push the one button off the
+   * bottom of the wall (which is exactly what it did: scrollHeight 1202 in a
+   * 595px viewport).
+   */
+  maxChips?: number;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -78,9 +93,12 @@ export function WordCoverageGlance({
   celebrate = false,
   cue = true,
   classSwept,
+  missedOnly = false,
+  maxChips,
   t,
 }: WordCoverageGlanceProps) {
   const projector = size === 'projector';
+  const [expanded, setExpanded] = useState(false);
   // A late joiner has no mastery row; treat them as having found nothing rather
   // than crashing or hiding the card.
   const mine = summary.masteryByPlayer[username] ?? { found: 0, total: summary.totalWords };
@@ -126,9 +144,25 @@ export function WordCoverageGlance({
   const foundByMe = (word: { foundBy: string[] }) =>
     word.foundBy.some((n) => n.toLowerCase() === username.toLowerCase());
 
+  const wasFound = (entry: { word: string; foundBy: string[] }) =>
+    isTeacher ? entry.foundBy.length > 0 : foundByMe(entry);
+
+  // Two independent trims, in this order: drop what is already learnt, then
+  // cap what is left. Both are counted, never silently dropped — a teacher
+  // reading "12 to reteach" off a wall that printed 12 of 30 would plan the
+  // wrong lesson.
+  const listed = missedOnly ? summary.coverage.filter((e) => !wasFound(e)) : summary.coverage;
+  // The cap is the WALL's default, not a ceiling on what the room may read.
+  // A count with no words behind it is a number a teacher cannot act on, and
+  // the list region below is already the one scrollable area here, so the
+  // expansion costs no layout that was not already paid for.
+  const capped = typeof maxChips === 'number' ? listed.slice(0, maxChips) : listed;
+  const shown = expanded ? listed : capped;
+  const hidden = listed.length - capped.length;
+
   return (
-    <section className={projector ? '' : 'mb-4'}>
-      <div className="flex items-end gap-3 mb-2">
+    <section className={projector ? 'h-full min-h-0 flex flex-col' : 'mb-4'}>
+      <div className="shrink-0 flex items-end gap-3 mb-2">
         <span
           className={cn(
             'font-neo-display font-black leading-none tabular-nums',
@@ -197,7 +231,7 @@ export function WordCoverageGlance({
         aria-valuemax={total}
         aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
         className={cn(
-          'w-full rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated overflow-hidden mb-3',
+          'w-full shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated overflow-hidden mb-3',
           projector ? 'h-8' : 'h-4'
         )}
       >
@@ -211,9 +245,18 @@ export function WordCoverageGlance({
         />
       </div>
 
-      <ul className="flex flex-wrap gap-2">
-        {summary.coverage.map((entry) => {
-          const hit = isTeacher ? entry.foundBy.length > 0 : foundByMe(entry);
+      <ul
+        data-testid="coverage-words"
+        className={cn(
+          'flex flex-wrap gap-2 content-start',
+          // The ONE region on the projector that may overflow, and it is the
+          // least important one. Everything a teacher acts on — the meter, the
+          // podium, the button — is outside it and always on the wall.
+          projector && 'min-h-0 flex-1 overflow-y-auto'
+        )}
+      >
+        {shown.map((entry) => {
+          const hit = wasFound(entry);
           const unplaced = !hit && neverPlaced.has(entry.word.toLowerCase());
           return (
             <li
@@ -226,7 +269,11 @@ export function WordCoverageGlance({
                 projector ? 'px-4 py-2.5 text-2xl' : 'px-3 py-1.5 text-sm',
                 hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
                 !hit && !unplaced && 'border-[2px] border-neo-black bg-neo-navy-light text-neo-white/60',
-                unplaced && 'border-2 border-dashed border-neo-white/40 text-neo-white/50'
+                // A word the board never carried is still a word a teacher
+                // reads off a wall: the dash says "not the class's fault",
+                // the 75% keeps it legible (50% measured 4.61:1 — over the
+                // line, but only just, and this is read from six metres).
+                unplaced && 'border-2 border-dashed border-neo-cream/70 text-neo-white/75'
               )}
             >
               {hit ? (
@@ -245,6 +292,51 @@ export function WordCoverageGlance({
             </li>
           );
         })}
+
+        {/* A swept round empties this list by construction — and an empty
+            bordered panel is the last thing the 100% screen should show. The
+            sweep takes the space the misses had, which is the whole point. */}
+        {missedOnly && shown.length === 0 && (
+          <li
+            data-testid="coverage-all-found"
+            className={cn(
+              'w-full flex items-center gap-3 rounded-neo font-bold',
+              'border-[2px] border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm',
+              projector ? 'px-5 py-4 text-3xl' : 'px-3 py-2 text-sm'
+            )}
+          >
+            <Sparkles className={projector ? 'w-8 h-8 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
+            {t('education.results.allFound')}
+          </li>
+        )}
+
+        {hidden > 0 && (
+          <li className="flex">
+            <button
+              type="button"
+              data-testid="coverage-more"
+              aria-expanded={expanded}
+              onClick={() => setExpanded((v) => !v)}
+              className={cn(
+                'flex items-center gap-2 rounded-neo font-bold',
+                // Cream edge on navy measures 16.8:1 — this has to read as a
+                // control from six metres, not as one more grey chip.
+                'border-[2px] border-neo-cream bg-neo-navy text-neo-cream',
+                'hover:bg-neo-navy-light transition-colors',
+                projector ? 'px-4 py-2.5 text-2xl' : 'px-3 py-1.5 text-sm'
+              )}
+            >
+              {expanded ? (
+                <ChevronUp className={projector ? 'w-6 h-6 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
+              ) : (
+                <ChevronDown className={projector ? 'w-6 h-6 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
+              )}
+              {expanded
+                ? t('education.results.fewerWords')
+                : t('education.results.moreWords', { count: hidden })}
+            </button>
+          </li>
+        )}
       </ul>
     </section>
   );

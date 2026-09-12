@@ -41,6 +41,41 @@ describe('buildClassroomPodium', () => {
     ]);
   });
 
+  // Seen on a real projector (room DQRV92, 2026-09-11): a classroom host is
+  // forced into broadcast mode but is still a socket in the room, so on a slow
+  // round the teacher's zero sorted to the top and the wall read
+  // "WE HAVE A WINNER! Mr. Gauntlet B — 0" over three children's plinths.
+  // Excluding them CLIENT-side is not enough: the slice to three happens here,
+  // so a three-student class would lose its third plinth entirely.
+  it('never puts the teacher on a classroom podium', () => {
+    const podium = buildClassroomPodium({
+      players: [
+        { username: 'Mr. Gauntlet B', totalScore: 0 },
+        { username: 'Maya', totalScore: 90 },
+        { username: 'Noa', totalScore: 70 },
+        { username: 'Eitan', totalScore: 50 },
+      ],
+      masteryByPlayer: mastery,
+      exclude: ['Mr. Gauntlet B'],
+    });
+
+    expect(podium.map((p) => p.username)).toEqual(['Maya', 'Noa', 'Eitan']);
+    expect(podium.map((p) => p.rank)).toEqual([1, 2, 3]);
+  });
+
+  it('matches the excluded name case- and whitespace-insensitively', () => {
+    const podium = buildClassroomPodium({
+      players: [
+        { username: 'Mr. Gauntlet B', totalScore: 0 },
+        { username: 'Maya', totalScore: 90 },
+      ],
+      masteryByPlayer: mastery,
+      exclude: ['  mr. gauntlet b '],
+    });
+
+    expect(podium.map((p) => p.username)).toEqual(['Maya']);
+  });
+
   it('never puts a bot on a classroom podium', () => {
     const podium = buildClassroomPodium({
       players: [

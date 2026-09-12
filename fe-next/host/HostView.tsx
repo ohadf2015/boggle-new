@@ -657,7 +657,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           classroomSummary={tournament.finalScores?.classroomSummary}
           onStartNewGame={() => {
             state.setFinalScores(null);
-            actions.handleStartNewGame();
+            actions.handleStartNewGame({ gameMode: currentGameMode }); // same list, same code, same GAME
           }}
           onNextRound={() => {
             state.setFinalScores(null);

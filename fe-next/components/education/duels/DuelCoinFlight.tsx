@@ -101,7 +101,7 @@ export function DuelCoinFlight({ coins, active, onComplete, className }: DuelCoi
         aria-live="polite"
         aria-label={t('education.duels.coinsEarned', undefined, { count: awarded })}
         className={cn(
-          'relative z-10 inline-flex items-center gap-1.5 rounded-neo border-neo bg-neo-yellow px-3 py-1.5 shadow-hard',
+          'relative z-10 inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-yellow px-3 py-1.5 shadow-hard',
           'font-neo-display text-lg font-black tabular-nums text-neo-black'
         )}
       >

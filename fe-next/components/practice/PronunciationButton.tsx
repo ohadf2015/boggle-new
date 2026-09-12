@@ -56,7 +56,7 @@ export function PronunciationButton({
           ${sizeClasses[size]}
           flex items-center justify-center
           bg-neo-cyan text-neo-navy
-          border-neo border-black
+          border-[3px] border-black
           rounded-neo
           shadow-hard
           transition-all duration-150
@@ -81,7 +81,7 @@ export function PronunciationButton({
             absolute top-full mt-2 left-1/2 -translate-x-1/2
             px-3 py-2
             bg-neo-navy text-neo-white
-            border-neo border-neo-yellow
+            border-[3px] border-neo-yellow
             rounded-neo
             shadow-hard
             text-sm font-neo-body

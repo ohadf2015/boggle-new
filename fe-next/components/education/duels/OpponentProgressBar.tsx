@@ -34,7 +34,7 @@ export function OpponentProgressBar({
 
   return (
     <div
-      className="h-8 border-neo rounded-neo shadow-hard overflow-hidden flex bg-neo-navy"
+      className="h-8 border-[2px] border-neo-cream rounded-neo shadow-hard overflow-hidden flex bg-neo-navy"
       data-testid="opponent-progress-bar"
     >
       {/* Player Side (Left) */}

@@ -4,6 +4,8 @@ import nextDynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { isStudentJoinPath } from '@/components/education/join/joinRoutes';
 import { isQuietChromeSurface } from '@/components/education/shell/quietChromeRoutes';
+import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
+import { useOverlayQuietZoneGameWatch } from '@/lib/overlayQuietZoneGameWatch';
 
 /**
  * Post-hydration-only chrome mounted by the locale layout: install prompts,
@@ -62,6 +64,17 @@ const ReferralCodeClaimer = nextDynamic(
 
 /** Mount inside the providers — VersionChecker and the prompts read LanguageContext. */
 export default function DeferredLayoutWidgets() {
+  // Raise the overlay quiet zone on the game-over transition itself, from the
+  // one component that is mounted on every route. Doing it here rather than in
+  // each prompt keeps the signal and its consumers in one file: a prompt added
+  // to the list below inherits the rule by construction.
+  useOverlayQuietZoneGameWatch();
+  // The runtime half of the route list below. `isQuietChromeSurface` covers the
+  // teacher's own screens by path; this covers every surface that declares
+  // itself uncoverable at runtime — a live board in any mode, a lobby, the
+  // round-end recap, the projector results — plus the grace window after a
+  // round ends. Route lists never converged; a claim is raised by the surface.
+  const overlayQuietZone = useOverlayQuietZone();
   // The student join screen is the one surface where these are not "chrome"
   // but an obstacle: a 390px capture of `/join/<code>` showed the cookie sheet
   // sitting ON the six code cells, and `AndroidAppRedirect` sends an Android
@@ -78,7 +91,7 @@ export default function DeferredLayoutWidgets() {
   // `PushNotificationPrompt` (z-50) both dock on top of `TeacherLiveControls`
   // (z-[70]) — i.e. over START GAME, in front of a class. The consent sheet is
   // NOT in this group: it keeps mounting and re-ranks itself instead.
-  const quietChrome = quietJoinScreen || isQuietChromeSurface(pathname);
+  const quietChrome = quietJoinScreen || isQuietChromeSurface(pathname) || overlayQuietZone;
 
   return (
     <>

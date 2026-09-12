@@ -17,7 +17,7 @@ export default function PracticeBadge({ className = '' }: Props) {
   const { t } = useLanguage();
   return (
     <div
-      className={`inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 shadow-hard-sm ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-cream px-2.5 py-1 shadow-hard-sm ${className}`}
       role="status"
       aria-label={t('practiceBadge.aria')}
     >

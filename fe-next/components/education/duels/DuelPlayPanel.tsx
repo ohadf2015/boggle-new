@@ -77,7 +77,7 @@ export function DuelPlayPanel({
       {/* Timer + live scores */}
       <div className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy px-3 py-2 shadow-hard">
         <div className="text-neo-white">
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest opacity-60">
+          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
             {t('duels.you')}
           </p>
           <p className="font-neo-display text-xl font-black tabular-nums" data-testid="my-score">
@@ -98,7 +98,7 @@ export function DuelPlayPanel({
         </div>
 
         <div className="text-end text-neo-white">
-          <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest opacity-60">
+          <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
             {opponentName}
           </p>
           <p
@@ -125,11 +125,11 @@ export function DuelPlayPanel({
       <DuelComboMeter className="shrink-0" streak={comboStreak} bonus={comboBonus} />
 
       {/* Board */}
-      <div className="mx-auto grid w-full max-w-[min(92vw,360px)] shrink-0 grid-cols-4 gap-1.5 rounded-neo border-neo-thick bg-neo-navy p-2 shadow-hard">
+      <div className="mx-auto grid w-full max-w-[min(92vw,360px)] shrink-0 grid-cols-4 gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy p-2 shadow-hard">
         {boardState.flat().map((letter, idx) => (
           <div
             key={`cell-${idx}-${letter}`}
-            className="flex aspect-square items-center justify-center rounded-neo border-neo bg-neo-lime font-neo-display text-2xl font-black text-neo-black shadow-hard-sm"
+            className="flex aspect-square items-center justify-center rounded-neo border-[2px] border-neo-black bg-neo-lime font-neo-display text-2xl font-black text-neo-black shadow-hard-sm"
           >
             {letter}
           </div>
@@ -144,7 +144,7 @@ export function DuelPlayPanel({
           onKeyDown={onKeyDown}
           placeholder={t('duels.typeWord')}
           data-testid="word-input"
-          className="min-w-0 flex-1 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body font-bold text-neo-white placeholder:text-neo-white/60 shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
+          className="min-w-0 flex-1 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body font-bold text-neo-white placeholder:text-neo-cream/80 shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
         />
         <button
           type="button"
@@ -152,7 +152,7 @@ export function DuelPlayPanel({
           aria-disabled={currentWordEmpty}
           data-testid="submit-word-btn"
           className={cn(
-            'shrink-0 rounded-neo border-neo bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
+            'shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
             currentWordEmpty && 'cursor-not-allowed opacity-50'
           )}
         >
@@ -163,7 +163,7 @@ export function DuelPlayPanel({
       {/* The ONE scrolling region on this surface */}
       <div className="min-h-0 flex-1 overflow-y-auto rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy p-2 shadow-hard">
         {words.length === 0 ? (
-          <p className="py-6 text-center font-neo-body text-sm text-neo-white/50">
+          <p className="py-6 text-center font-neo-body text-sm text-neo-cream/80">
             {t('duels.findWords')}
           </p>
         ) : (
@@ -174,10 +174,10 @@ export function DuelPlayPanel({
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 className={cn(
-                  'rounded-neo border-neo px-2 py-0.5 font-neo-body text-sm font-black shadow-hard-sm',
+                  'rounded-neo border-[2px] border-neo-black px-2 py-0.5 font-neo-body text-sm font-black shadow-hard-sm',
                   wordStatus.status === 'accepted' && 'bg-neo-lime text-neo-black',
                   wordStatus.status === 'rejected' && 'bg-neo-pink text-neo-white',
-                  wordStatus.status === 'pending' && 'border-neo-cream/70 bg-neo-navy text-neo-white'
+                  wordStatus.status === 'pending' && 'border-neo-cream bg-neo-navy text-neo-white'
                 )}
               >
                 {wordStatus.word}

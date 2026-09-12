@@ -122,15 +122,9 @@ describe('ClassroomModeBanner — the student half of a classroom lobby', () => 
    * ProjectorJoinPanel.test.tsx for the address/clipboard guarantees that came
    * with it.
    */
-  /**
-   * Round 2: "stands down" is now "stands down to one row". The projector
-   * still owns the code, the QR and the settings; the banner keeps only the
-   * control that surface has no way to offer — changing the game in place.
-   */
-  it('stands down to the mode switch for the teacher on the projector', () => {
-    renderBanner({ isHost: true, liveGame: liveQuiz, lessonData: TEACHER_LESSON });
-    expect(screen.getByTestId('lobby-mode-switcher')).toBeInTheDocument();
-    expect(screen.queryByTestId('qr-code-wrapper')).not.toBeInTheDocument();
+  it('stands down for the teacher on the projector — that surface owns the code', () => {
+    const { container } = renderBanner({ isHost: true, liveGame: liveQuiz, lessonData: TEACHER_LESSON });
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('treats an unspecified viewer as the host, so the teacher screen cannot regress', () => {

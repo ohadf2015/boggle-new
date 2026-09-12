@@ -169,3 +169,71 @@ describe('missGapGradePassbackMarketplaceSlice', () => {
     expect(String(slice.api)).toContain('/api/classroom-addon/grade-passback');
   });
 });
+
+/**
+ * The grade a teacher passes back has to mean something.
+ *
+ * Before the homework was a game, "completed" was a checkbox, so full marks for
+ * ticking it was the only honest score available. Now the run has an accuracy,
+ * and a student who got 2 of 6 right must not turn in 100/100 — the whole point
+ * of recording the run server-side is that the number is earned.
+ */
+describe('scoreMissGapHomework — accuracy', () => {
+  it('still gives full marks on time when no accuracy is known', () => {
+    const score = scoreMissGapHomework({
+      dueDate: '2099-12-31',
+      completedOn: '2099-12-01',
+    });
+    expect(score.pointsEarned).toBe(100);
+  });
+
+  it('splits the grade: half for finishing, half for getting them right', () => {
+    const perfect = scoreMissGapHomework({
+      dueDate: '2099-12-31',
+      completedOn: '2099-12-01',
+      accuracy: 100,
+    });
+    expect(perfect.pointsEarned).toBe(100);
+
+    const third = scoreMissGapHomework({
+      dueDate: '2099-12-31',
+      completedOn: '2099-12-01',
+      accuracy: 33,
+    });
+    expect(third.pointsEarned).toBe(67);
+
+    const none = scoreMissGapHomework({
+      dueDate: '2099-12-31',
+      completedOn: '2099-12-01',
+      accuracy: 0,
+    });
+    expect(none.pointsEarned).toBe(50);
+  });
+
+  it('applies the late penalty on top of the accuracy split', () => {
+    const late = scoreMissGapHomework({
+      dueDate: '2026-01-01',
+      completedOn: '2026-01-05',
+      accuracy: 100,
+    });
+    expect(late.onTime).toBe(false);
+    expect(late.pointsEarned).toBe(70);
+  });
+
+  it('clamps a nonsense accuracy instead of inventing points', () => {
+    expect(
+      scoreMissGapHomework({
+        dueDate: '2099-12-31',
+        completedOn: '2099-12-01',
+        accuracy: 250,
+      }).pointsEarned,
+    ).toBe(100);
+    expect(
+      scoreMissGapHomework({
+        dueDate: '2099-12-31',
+        completedOn: '2099-12-01',
+        accuracy: -40,
+      }).pointsEarned,
+    ).toBe(50);
+  });
+});

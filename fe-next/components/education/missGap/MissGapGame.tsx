@@ -17,6 +17,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useEducationShellLock } from '@/components/education/shell/useEducationShellLock';
+import { useMissGapNavLock } from './useMissGapNavLock';
 import { cn } from '@/lib/utils';
 import { MASCOT_IMAGES } from '@/components/ui/mascotData';
 import {
@@ -51,7 +53,8 @@ export interface MissGapGameProps {
   onClose: () => void;
   /** Share / turn-in actions, rendered under the finish screen. */
   finishActions?: React.ReactNode;
-  onFinished?: (streak: number) => void;
+  /** (class streak after this run, accuracy 0-100) — the host grades on both. */
+  onFinished?: (streak: number, accuracy: number) => void;
 }
 
 interface CompleteResponse {
@@ -93,19 +96,49 @@ export function MissGapGame({
     setName(getRememberedStudentName());
   }, []);
 
-  // Nothing behind the game may scroll while it is open. The DOCUMENT needs the
-  // lock as much as the body: the site nav renders outside the page shell, so
-  // the html element stays taller than the viewport and the page still scrolled
-  // ~59px behind the fixed overlay with only `body` locked. Restores exactly
-  // what it found, so a host page with its own overflow rule is not clobbered.
+  // Nothing behind the game may scroll while it is open.
+  //
+  // The previous attempt here wrote inline `overflow:hidden` onto BOTH
+  // documentElement and body and still measured 903px of document against an
+  // 844px viewport at 390x844 — the page scrolled 59px behind the overlay. Both
+  // halves were wrong for different reasons: `app/globals.css:2853` declares
+  // `html { overflow: visible !important }`, which beats an inline style, so the
+  // documentElement half never applied; and the 59px was never overflow in the
+  // first place, it is HEIGHT — `html.has-global-bottom-nav body` carries
+  // `padding-bottom: var(--bottom-stack-height)` to clear the global bottom nav,
+  // on `.screen-fit-locked` just as much as on `.screen-fit`.
+  //
+  // `setIsInGame(true)` is the app's own answer and it fixes both: the bottom
+  // nav hides itself and drops `has-global-bottom-nav` off `<html>`, so the
+  // padding goes with it and the document is exactly viewport height — nothing
+  // to scroll, rather than a scroll that is merely suppressed. NavigationProvider
+  // swaps the body to `.screen-fit-locked` at the same time.
+  //
+  // `setIsInGame` alone leaves one reservation standing: the cookie sheet.
+  // `html.has-cookie-consent body.screen-fit-locked` keeps padding a LOCKED body
+  // by the sheet's measured height (398px live, re-rendered on every
+  // navigation), and globals.css undoes that for exactly one class —
+  // `edu-shell-locked` — handing the clearance to `.edu-shell-scroll` instead.
+  // Both locks, then; they are ref-counted and independent.
+  // Claimed through the shared REF-COUNTED lock, not a bare `setIsInGame`
+  // pair. The route's own `MissGapShellLock chromeFree` holds the same nav for
+  // the whole visit, and `setIsInGame` is a plain boolean with no ref count —
+  // so an unconditional `false` here handed the nav (and with it
+  // `--bottom-stack-height` of body padding) straight back to the pre-start
+  // screen the second a student tapped X. That is the 59px overflow the critic
+  // disqualified the round on, reappearing on the most common path through the
+  // screen. See useMissGapNavLock.ts.
+  useMissGapNavLock();
+  useEducationShellLock();
+
+  // Backstop for a host that mounts no NavigationProvider — a homework share
+  // link is a cold URL and must not depend on one. `useHideNavigation` degrades
+  // to a no-op there, and this is then the only lock. Restores exactly what it
+  // found so a host with its own overflow rule is not clobbered.
   useEffect(() => {
-    const root = document.documentElement;
-    const previousRoot = root.style.overflow;
     const previousBody = document.body.style.overflow;
-    root.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     return () => {
-      root.style.overflow = previousRoot;
       document.body.style.overflow = previousBody;
     };
   }, []);
@@ -208,11 +241,16 @@ export function MissGapGame({
         });
         if (!res.ok) throw new Error(`status ${res.status}`);
         const data = (await res.json()) as CompleteResponse;
-        if (cancelled) return;
         const nextStreak = data.streak?.currentStreak ?? classStreak;
+        // `cancelled` guards THIS component's state — it may be gone, because a
+        // student can tap X the moment the last answer lands. It must not guard
+        // `onFinished`: that belongs to the page, which is still mounted and
+        // still owes the student the turn-in link and the refreshed streak for
+        // a run the server already stored (pitfalls Class 4).
+        onFinished?.(nextStreak, finalScore.accuracy);
+        if (cancelled) return;
         setClassStreak(nextStreak);
         setSaveState('saved');
-        onFinished?.(nextStreak);
         const progress = await fetch(
           `/api/education/miss-gap/progress?classKey=${encodeURIComponent(classKey)}&dueDate=${encodeURIComponent(dueDate)}`,
         );
@@ -254,13 +292,13 @@ export function MissGapGame({
       data-testid="miss-gap-game"
       className="fixed inset-0 z-[90] bg-neo-navy flex flex-col overflow-hidden"
     >
-      <header className="shrink-0 flex items-center gap-2 px-3 py-2 border-b-[3px] border-neo-black bg-neo-navy-light">
+      <header className="shrink-0 flex items-center gap-2 px-3 py-2 border-b-[3px] border-neo-cream bg-neo-navy-light">
         <button
           type="button"
           data-testid="miss-gap-game-exit"
           onClick={onClose}
           aria-label={t('education.homework.exit')}
-          className="w-9 h-9 grid place-items-center rounded-neo border-2 border-neo-black bg-neo-cream text-neo-black"
+          className="w-9 h-9 grid place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black"
         >
           <X className="w-5 h-5" aria-hidden />
         </button>
@@ -278,9 +316,9 @@ export function MissGapGame({
         <MissGapStreakFlame streak={phase === 'play' ? runStreak : classStreak} />
       </header>
 
-      <div className="flex-1 min-h-0 px-4 py-3 max-w-xl w-full mx-auto">
+      <div className="flex-1 min-h-0 px-4 py-3 max-w-xl lg:max-w-4xl w-full mx-auto flex flex-col">
         {phase === 'intro' ? (
-          <div className="flex flex-col h-full min-h-0 text-center">
+          <div className="flex flex-col flex-1 min-h-0 text-center">
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-center gap-3">
               <Image
                 src={MASCOT_IMAGES.explorerNobg}
@@ -294,21 +332,9 @@ export function MissGapGame({
               <h2 className="font-neo-display font-bold text-2xl text-neo-white leading-tight">
                 {t('education.homework.introTitle', { count: rounds.length })}
               </h2>
-              <p className="font-neo-body text-sm text-neo-white/80">
+              <p className="font-neo-body text-sm text-neo-cream">
                 {t('education.homework.introSubtitle')}
               </p>
-              {/* The words themselves, up front: a student should know what
-                  they are walking into before they type a name. */}
-              <ul className="flex flex-wrap gap-1.5 justify-center" data-testid="miss-gap-intro-words">
-                {rounds.map((r) => (
-                  <li
-                    key={r.id}
-                    className="px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white font-bold text-sm"
-                  >
-                    {r.word}
-                  </li>
-                ))}
-              </ul>
               <label className="w-full text-start">
                 <span className="block font-bold text-xs uppercase tracking-widest text-neo-cyan mb-1">
                   {t('education.homework.nameLabel')}
@@ -319,7 +345,7 @@ export function MissGapGame({
                   maxLength={24}
                   onChange={(e) => setName(sanitizeStudentName(e.target.value))}
                   placeholder={t('education.homework.namePlaceholder')}
-                  className="w-full px-3 py-3 rounded-neo border-neo border-neo-black bg-neo-cream text-neo-black placeholder:text-neo-black/55 font-neo-body"
+                  className="w-full px-3 py-3 rounded-neo border-[3px] border-neo-black bg-neo-cream text-neo-black placeholder:text-neo-black/75 font-neo-body"
                 />
               </label>
             </div>
@@ -329,7 +355,7 @@ export function MissGapGame({
               onClick={start}
               className={cn(
                 'shrink-0 w-full px-4 py-4 font-neo-display font-bold text-lg',
-                'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard',
+                'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard',
                 'transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
               )}
             >

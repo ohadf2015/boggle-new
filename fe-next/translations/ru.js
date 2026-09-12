@@ -53,7 +53,16 @@ const ru = {
     },
     "finished": {
       "title": "Вот и всё!",
-      "yourScore": "Ваш результат: {score}."
+      "yourScore": "Ваш результат: {score}.",
+      "subtitle": "{questions} вопросов · {players} играют",
+      "classAccuracy": "Класс ответил",
+      "wordsNailed": "Слов взято",
+      "topStreak": "Лучшая серия",
+      "percent": "{percent} %",
+      "mascotAlt": "Лекси поднимает кубок",
+      "perfect": "Идеальный раунд!",
+      "bestStreak": "Лучшая серия {count}",
+      "correctOf": "{correct} из {total} верно"
     },
     "host": {
       "joinCode": "Код для входа",
@@ -740,8 +749,20 @@ const ru = {
       "allGames": "Все игры",
       "streakLabel": "{{count}} подряд",
       "beatTheClock": "Успей за таймер",
+      "bestStreak": "Лучшая серия",
+      "listenAndSpell": "Послушай и напиши слово",
+      "needsDefinitions": "Нужны значения слов — попроси учителя добавить их",
+      "recommended": "Рекомендуем",
+      "playNow": "Играть",
+      "moreGames": "Ещё игры ({{count}})",
+      "fewerGames": "Свернуть",
       "floors": "Этажи",
-      "height": "Высота"
+      "height": "Высота",
+      "points": "Очки",
+      "answerLabel": "Ответ:",
+      "levelUp": "Уровень {{level}}!",
+      "tryAgain": "Ещё раз",
+      "myLessons": "Мои уроки"
     },
     "hub": {
       "playZone": "Играть",
@@ -1408,7 +1429,10 @@ const ru = {
   "duelComplete": "Поединок завершен!",
   "education": {
     "homework": {
+      "takeHomeToggle": "Карточка для практики дома",
+      "backToDashboard": "Назад в панель учителя",
       "classmatesFirst": "Ты первый, кто закончил сегодня — серия начинается с тебя.",
+      "classmatesOne": "Один одноклассник тоже уже прошёл",
       "introTitle": "{{count}} слов, которые класс не нашёл",
       "introSubtitle": "Нажимай правильный ответ, а сложные слова собирай по буквам. Примерно две минуты.",
       "nameLabel": "Твоё имя",
@@ -1433,12 +1457,18 @@ const ru = {
       "saveFailed": "Не удалось сохранить результат. Проверь связь и сыграй ещё раз.",
       "classStreakDays": "Серия класса: {{count}} дн.",
       "classStreakSubtitle": "Дни подряд, когда кто-то из класса доходил до конца.",
+      "classStreakChecking": "Проверяем серию класса…",
+      "cheer": "Нажми, когда знаешь.",
+      "studentEyebrow": "Твоё домашнее задание",
+      "studentTitle": "{{count}} слов, которые нужно вернуть",
       "classmates": "Ещё {{count}} одноклассников прошли это",
       "anonStudent": "Кто-то",
       "teacherEyebrow": "Кто играл",
       "teacherPlayed": "Завершили",
       "teacherAverage": "Средний результат",
       "teacherEmpty": "Пока никто не играл. Поделитесь ссылкой — список заполнится сразу.",
+      "teacherNamesSignedOut": "Войдите как учитель, чтобы увидеть, кто играл.",
+      "gradeOnTime": "Вовремя — серия класса в безопасности.",
       "teacherLoadFailed": "Не удалось загрузить список. Попробуйте через минуту.",
       "teacherOnTime": "В срок",
       "teacherLate": "С опозданием"
@@ -1704,6 +1734,7 @@ const ru = {
       "allFound": "Класс нашёл все слова урока.",
       "practiceMissed": "Потренировать эти слова",
       "playReteachRound": "Сыграть раунд повторения — только пропущенные слова",
+      "backToLobby": "Назад в лобби",
       "rematch": "Реванш — тот же список, тот же код",
       "teamBattle": {
         "title": "Командная битва",
@@ -1751,6 +1782,8 @@ const ru = {
         "none": "Все нашли хотя бы половину списка. Можно ещё раунд.",
         "hint": "Меньше половины слов урока в этом раунде."
       },
+      "moreWords": "ещё {count}",
+      "fewerWords": "Показать меньше",
       "allBoardWordsFound": "Класс нашёл все слова урока, которые попали на поле.",
       "shareGapTitle": "Словарный пробел класса",
       "shareGapText": "{{lesson}} — класс нашёл {{found}} из {{total}} слов урока. Для практики: {{missed}}",
@@ -1812,13 +1845,13 @@ const ru = {
       "shareMissGapPracticeTitle": "Карточка практики miss-gap",
       "shareMissGapPracticeText": "{{lesson}} — домашняя практика miss-gap (печать или PDF): {{missed}}",
       "missGapPracticeEyebrow": "Домашняя практика",
-      "missGapPracticeSubtitle": "Практика miss-gap без устройств после задания Unplugged в Classroom — откройте, распечатайте или сохраните PDF.",
+      "missGapPracticeSubtitle": "Лист для печати со словами, которые класс пропустил: откройте, распечатайте или сохраните в PDF. Устройства не нужны.",
       "missGapPracticeFoil": "У Kahoot Unplugged нет домашки — у LexiClash есть",
       "missGapPracticePrintPdf": "Печать / сохранить PDF для практики",
       "assignMissGapAsyncHomework": "Назначить асинхронное miss-gap ДЗ",
       "assignMissGapAsyncEyebrow": "Асинхронное ДЗ",
       "assignMissGapAsyncHeading": "Практика miss-gap со сроком",
-      "assignMissGapAsyncSubtitle": "Ученики сами проходят карточку miss-gap (#972) — это не живой Unplugged. Своевременное выполнение питает классную серию.",
+      "assignMissGapAsyncSubtitle": "Ученики играют две минуты со словами, которые класс пропустил. Вы видите, кто закончил, а выполнение в срок сохраняет серию класса.",
       "assignMissGapAsyncFoil": "Kahootopia Assignments — это ДЗ в живой игре; LexiClash назначает асинхронную miss-gap практику, которая питает классную серию",
       "assignMissGapAsyncDueLabel": "Срок сдачи",
       "assignMissGapAsyncDueBanner": "Срок {{due}} — завершите miss-gap практику, чтобы сохранить классную серию",
@@ -1833,13 +1866,13 @@ const ru = {
       "assignMissGapAsyncStreak": "Серия класса: {{streak}} дн.",
       "missGapGradePassbackEyebrow": "Передача оценок в Google Classroom",
       "missGapGradePassbackHeading": "Сдать оценку miss-gap",
-      "missGapGradePassbackSubtitle": "Практика завершена — оценка готова для журнала Classroom (foil Kahoot Marketplace grade passback).",
+      "missGapGradePassbackSubtitle": "Практика завершена — оценка готова к отправке в классный журнал.",
       "missGapGradePassbackFoil": "Kahoot Marketplace синхронизирует баллы с Classroom — LexiClash делает то же для асинхронного miss-gap ДЗ без OAuth списка учеников",
       "missGapGradePassbackScore": "Оценка: {{points}} / {{max}}",
       "missGapGradePassbackOnTime": "Вовремя — полный балл + серия класса",
       "missGapGradePassbackLate": "С опозданием — сниженный черновик (серия без изменений)",
       "missGapGradePassbackDue": "Срок {{due}}",
-      "missGapGradePassbackPrivacy": "Без имён учеников. Без импорта списка. Синхронизация оценок через Classroom add-on готова, когда включён teacher scope.",
+      "missGapGradePassbackPrivacy": "Имена не передаются и список класса не импортируется. Отправляется только оценка за эту практику.",
       "missGapGradePassbackCopy": "Скопировать ссылку квитанции оценки",
       "missGapGradePassbackCopied": "Квитанция скопирована — вставьте в Classroom или отправьте учителю",
       "missGapGradePassbackShareText": "{{lesson}} — оценка miss-gap {{points}}/{{max}} (срок {{due}})",
@@ -1849,7 +1882,7 @@ const ru = {
 
       "missGapWhatsAppEyebrow": "Практика для родителей в WhatsApp",
       "missGapWhatsAppHeading": "Отправить miss-gap практику домой в WhatsApp",
-      "missGapWhatsAppSubtitle": "После passback оценки в Classroom — один тап отправляет карточку #972 в чат родителей. Только слова класса.",
+      "missGapWhatsAppSubtitle": "Отправьте карточку практики в родительский чат одним касанием: только слова класса, без имён учеников.",
       "missGapWhatsAppParentSubtitle": "Потренируйте с ребёнком пропущенные слова из {{lesson}} — распечатайте или откройте карточку.",
       "missGapWhatsAppFoil": "Синхронизация оценок Classroom останавливается на журнале — LexiClash шлёт miss-gap карточку домой в WhatsApp",
       "missGapWhatsAppDue": "Срок сдачи {{due}}",
@@ -1887,6 +1920,7 @@ const ru = {
       "myClassroom": "Мой класс"
     },
     "duels": {
+      "recommended": "Рекомендуем",
       "lobby": "Лобби",
       "history": "История",
       "classmates": "Одноклассники",
@@ -1902,6 +1936,7 @@ const ru = {
       "aheadBy": "Впереди на {{points}}",
       "behindBy": "Отстаёшь на {{points}}",
       "levelPegged": "Полная ничья",
+      "changeSetup": "Изменить",
       "revealWin": "Чемпион!",
       "revealLose": "Поражение!",
       "revealDraw": "Ничья!",
@@ -1920,12 +1955,24 @@ const ru = {
       "turnBeatIt": "Побить",
       "turnPlay": "Сыграть ход",
       "turnDecline": "Пропустить",
+      "turnLiveBadge": "Вживую",
+      "turnLiveInvite": "{{name}} ждёт — вживую!",
+      "turnAcceptLive": "Играть сейчас",
       "tauntPrompt": "Отправь стикер",
       "tauntSent": "Стикер отправлен",
       "tauntFire": "Слишком легко",
       "tauntMindblown": "Ого!",
       "tauntTrophy": "Побей это",
       "tauntTears": "Хорошая игра",
+      "rematchAccept": "Принять реванш",
+      "rematchWants": "{{name}} хочет реванш",
+      "rematchWaiting": "Ждём {{name}}",
+      "rematchTapCancel": "Нажми, чтобы отменить",
+      "rematchInvited": "Приглашение отправлено в их лобби",
+      "waitingForName": "Ждём {{name}}…",
+      "stillWaiting": "{{name}} ещё не здесь",
+      "waitingHint": "Возможно, дуэль закрыли. Попробуй снова или вернись в лобби.",
+      "tryAgain": "Попробовать снова",
       "rematchSent": "Готовим…",
       "noClassmatesOnline": "Сейчас одноклассников нет в сети",
       "challengeSomeone": "Вызови соперника!",
@@ -1941,6 +1988,24 @@ const ru = {
       "coinReward": "+{{amount}} монет"
     },
     "achievements": {
+      "first_lesson": { "name": "Первый урок", "description": "Пройди урок от учителя" },
+      "word_master": { "name": "Мастер слов", "description": "Выучи новые слова" },
+      "level_climber": { "name": "Новый уровень", "description": "Поднимись на новый уровень" },
+      "xp_collector": { "name": "Коллекционер XP", "description": "Копи XP на тренировках" },
+      "practice_veteran": { "name": "Ветеран тренировок", "description": "Проходи раунды практики" },
+      "speed_demon": { "name": "Скорострел", "description": "Отвечай, пока не вышло время" },
+      "perfect_streak": { "name": "Идеальный раунд", "description": "Пройди раунд без ошибок" },
+      "boss_slayer": { "name": "Победитель босса", "description": "Выиграй раунд с боссом" },
+      "combo_master": { "name": "Мастер комбо", "description": "Собери длинное комбо" },
+      "streak_starter": { "name": "Начало серии", "description": "Занимайся несколько дней подряд" },
+      "early_bird": { "name": "Ранняя пташка", "description": "Тренируйся до школы" },
+      "dedicated_learner": { "name": "Упорный ученик", "description": "Занимайся во много разных дней" },
+      "weekly_warrior": { "name": "Неделя без пропусков", "description": "Занимайся каждый день недели" },
+      "streak_champion": { "name": "Чемпион серий", "description": "Удержи длинную ежедневную серию" },
+      "mode_explorer": { "name": "Исследователь режимов", "description": "Попробуй разные игры-тренировки" },
+      "lesson_collector": { "name": "Коллекционер уроков", "description": "Тренируйся по многим урокам" },
+      "classroom_contributor": { "name": "Командный игрок", "description": "Заработай очки для класса" },
+      "word_variety": { "name": "Охотник за словами", "description": "Находи самые разные слова" },
       "categories": {"consistency":"Стабильность","exploration":"Исследование","progress":"Прогресс","skill":"Мастерство"},
       "ariaDismissError": "Отклонить ошибку",
       "ariaOverallProgress": "Общий прогресс",
@@ -2853,15 +2918,6 @@ const ru = {
           }
     },
     "teacher": {
-    "emptyClassroom": {
-      "title": "Класса ещё нет — и он не нужен",
-      "body": "Нажмите «В ЭФИР» — мы создадим класс, пока код появляется на доске.",
-      "getCode": "Получить код входа"
-    },
-    "shell": {
-      "profileLabel": "Мой профиль учителя",
-      "analyticsLabel": "Аналитика класса"
-    },
       "welcome_banner_title": "Ты одобрен! Добро пожаловать, учитель! 🎉",
       "welcome_banner_body": "Твой аккаунт учителя готов. Ты можешь создавать классы, назначать игры и отслеживать прогресс учеников.",
       "welcome_banner_dismiss": "Понял"
@@ -9086,6 +9142,118 @@ const ru = {
     }
   },
   "achievements": {
+    "first_lesson": {
+      "name": "Первый урок",
+      "description": "Пройди свой первый урок"
+    },
+    "word_master": {
+      "name": "Мастер слов",
+      "description": "Освой слова по-настоящему"
+    },
+    "level_climber": {
+      "name": "Покоритель уровней",
+      "description": "Поднимайся по лестнице уровней"
+    },
+    "xp_collector": {
+      "name": "Коллекционер опыта",
+      "description": "Копи очки опыта"
+    },
+    "practice_veteran": {
+      "name": "Ветеран практики",
+      "description": "Набирай занятие за занятием"
+    },
+    "duel_veteran": {
+      "name": "Ветеран дуэлей",
+      "description": "Играй дуэль за дуэлью"
+    },
+    "speed_demon": {
+      "name": "Демон скорости",
+      "description": "Отвечай быстрее, чем моргнут часы"
+    },
+    "perfect_streak": {
+      "name": "Чистый раунд",
+      "description": "Проходи раунды без единой ошибки"
+    },
+    "boss_slayer": {
+      "name": "Убийца боссов",
+      "description": "Свали словесных боссов"
+    },
+    "combo_master": {
+      "name": "Мастер комбо",
+      "description": "Собирай ответы в большие комбо"
+    },
+    "duel_champion": {
+      "name": "Чемпион дуэлей",
+      "description": "Побеждай одноклассников в дуэлях"
+    },
+    "comeback_king": {
+      "name": "Король камбэка",
+      "description": "Выиграй дуэль из отставания"
+    },
+    "speed_dueler": {
+      "name": "Быстрая рука",
+      "description": "Находи слово первым в дуэли"
+    },
+    "spelling_ace": {
+      "name": "Ас правописания",
+      "description": "Проходи раунды письма идеально"
+    },
+    "matching_master": {
+      "name": "Мастер пар",
+      "description": "Собирай пары молниеносно"
+    },
+    "blitz_champion": {
+      "name": "Чемпион блица",
+      "description": "Ставь рекорды в блице"
+    },
+    "streak_starter": {
+      "name": "Начало серии",
+      "description": "Играй дни подряд"
+    },
+    "early_bird": {
+      "name": "Ранняя пташка",
+      "description": "Тренируйся до начала уроков"
+    },
+    "dedicated_learner": {
+      "name": "Прилежный ученик",
+      "description": "Появляйся день за днём"
+    },
+    "weekly_warrior": {
+      "name": "Воин недели",
+      "description": "Целые недели без пропусков"
+    },
+    "streak_champion": {
+      "name": "Чемпион серий",
+      "description": "Держи огромную серию живой"
+    },
+    "duel_streak": {
+      "name": "Серия дуэлей",
+      "description": "Побеждай в дуэлях подряд"
+    },
+    "practice_streak": {
+      "name": "Серия практики",
+      "description": "Дни практики подряд"
+    },
+    "mode_explorer": {
+      "name": "Исследователь",
+      "description": "Попробуй каждый режим игры"
+    },
+    "lesson_collector": {
+      "name": "Собиратель уроков",
+      "description": "Собирай пройденные уроки"
+    },
+    "classroom_contributor": {
+      "name": "Опора класса",
+      "description": "Добавляй очки в счёт класса"
+    },
+    "word_variety": {
+      "name": "Радуга слов",
+      "description": "Играй самыми разными словами"
+    },
+    "mode_master": {
+      "name": "Мастер режимов",
+      "description": "Освой все режимы практики"
+    },
     "unlocked": "Достижение разблокировано!",
     "upgraded": "Достижение обновлено!",
     "shareText": "Я только что разблокировал \"{{name}}\" в LexiClash! Приходи играть!",
@@ -9905,6 +10073,7 @@ const ru = {
   "teacher": {
     "nav": {
       "play": "Игра",
+      "classes": "Классы",
       "lessons": "Уроки",
       "reports": "Отчёты",
       "me": "Профиль",
@@ -9913,6 +10082,15 @@ const ru = {
       "studentAchievements": "Награды",
       "sidebarLabel": "Разделы учителя",
       "tabsLabel": "Основные разделы"
+    },
+    "emptyClassroom": {
+      "title": "Класса ещё нет — и он не нужен",
+      "body": "Нажмите «В ЭФИР» — мы создадим класс, пока код появляется на доске.",
+      "getCode": "Получить код входа"
+    },
+    "shell": {
+      "profileLabel": "Мой профиль учителя",
+      "analyticsLabel": "Аналитика класса"
     },
     "playNow": {
       "recommended": "Рекомендуем",

@@ -53,7 +53,16 @@ const he = {
     },
     "finished": {
       "title": "וזהו, סיימנו!",
-      "yourScore": "צברתם {score} נקודות."
+      "yourScore": "צברתם {score} נקודות.",
+      "subtitle": "{questions} שאלות · {players} משתתפים",
+      "classAccuracy": "הכיתה צדקה",
+      "wordsNailed": "מילים שנכבשו",
+      "topStreak": "הרצף הטוב ביותר",
+      "percent": "{percent}%",
+      "mascotAlt": "לקסי מרימה את הגביע",
+      "perfect": "סיבוב מושלם!",
+      "bestStreak": "הרצף הארוך ביותר {count}",
+      "correctOf": "{correct} מתוך {total} נכונות"
     },
     "host": {
       "joinCode": "קוד הצטרפות",
@@ -4140,6 +4149,118 @@ const he = {
     "viewProgress": "צפה בהתקדמות"
   },
   "achievements": {
+    "first_lesson": {
+      "name": "שיעור ראשון",
+      "description": "לסיים את השיעור הראשון"
+    },
+    "word_master": {
+      "name": "אלוף המילים",
+      "description": "לשלוט במילים לתמיד"
+    },
+    "level_climber": {
+      "name": "מטפס דרגות",
+      "description": "לטפס בסולם הדרגות"
+    },
+    "xp_collector": {
+      "name": "אספן ניסיון",
+      "description": "לצבור נקודות ניסיון"
+    },
+    "practice_veteran": {
+      "name": "ותיק תרגול",
+      "description": "לצבור מפגשי תרגול"
+    },
+    "duel_veteran": {
+      "name": "ותיק קרבות",
+      "description": "לשחק קרב אחרי קרב"
+    },
+    "speed_demon": {
+      "name": "שד המהירות",
+      "description": "לענות לפני שהשעון מצמץ"
+    },
+    "perfect_streak": {
+      "name": "ללא רבב",
+      "description": "לסיים סבבים בלי טעות אחת"
+    },
+    "boss_slayer": {
+      "name": "קוטל בוסים",
+      "description": "להפיל את בוסי המילים"
+    },
+    "combo_master": {
+      "name": "אלוף קומבו",
+      "description": "לשרשר תשובות לקומבו ענק"
+    },
+    "duel_champion": {
+      "name": "אלוף קרבות",
+      "description": "לנצח בקרבות מול חברים"
+    },
+    "comeback_king": {
+      "name": "מלך הקאמבק",
+      "description": "לנצח קרב מתוך פיגור"
+    },
+    "speed_dueler": {
+      "name": "שליפה מהירה",
+      "description": "למצוא את המילה ראשון בקרב"
+    },
+    "spelling_ace": {
+      "name": "אלוף איות",
+      "description": "לסיים סבבי איות מושלמים"
+    },
+    "matching_master": {
+      "name": "אלוף התאמות",
+      "description": "לסיים סבבי התאמה במהירות"
+    },
+    "blitz_champion": {
+      "name": "אלוף בליץ",
+      "description": "לקבוע ניקוד ענק בבליץ"
+    },
+    "streak_starter": {
+      "name": "פותח רצף",
+      "description": "לשחק ימים ברצף"
+    },
+    "early_bird": {
+      "name": "משכים קום",
+      "description": "לתרגל לפני הלימודים"
+    },
+    "dedicated_learner": {
+      "name": "לומד מסור",
+      "description": "להופיע יום אחרי יום"
+    },
+    "weekly_warrior": {
+      "name": "לוחם שבועי",
+      "description": "שבועות שלמים בלי פספוס"
+    },
+    "streak_champion": {
+      "name": "אלוף הרצף",
+      "description": "לשמור על רצף ענק"
+    },
+    "duel_streak": {
+      "name": "רצף קרבות",
+      "description": "לנצח בקרבות ברצף"
+    },
+    "practice_streak": {
+      "name": "רצף תרגול",
+      "description": "ימי תרגול ברצף"
+    },
+    "mode_explorer": {
+      "name": "חוקר מצבים",
+      "description": "לנסות כל מצב משחק"
+    },
+    "lesson_collector": {
+      "name": "אספן שיעורים",
+      "description": "לאסוף שיעורים שהושלמו"
+    },
+    "classroom_contributor": {
+      "name": "עוזר לכיתה",
+      "description": "לתרום נקודות לניקוד הכיתה"
+    },
+    "word_variety": {
+      "name": "קשת מילים",
+      "description": "לשחק מגוון מילים פרוע"
+    },
+    "mode_master": {
+      "name": "אלוף המצבים",
+      "description": "לשלוט בכל מצבי התרגול"
+    },
     "unlocked": "הישג נפתח!",
     "upgraded": "הישג שודרג!",
     "shareText": "פתחתי את ההישג \"{{name}}\" ב-LexiClash! בוא לשחק גם!",
@@ -12128,8 +12249,20 @@ const he = {
       "allGames": "כל המשחקים",
       "streakLabel": "{{count}} ברצף",
       "beatTheClock": "מרוץ נגד השעון",
+      "bestStreak": "הרצף הכי ארוך",
+      "listenAndSpell": "הקשיבו ואז כתבו את המילה",
+      "needsDefinitions": "צריך פירושים למילים — בקשו מהמורה להוסיף",
+      "recommended": "מומלץ",
+      "playNow": "שחקו",
+      "moreGames": "עוד משחקים ({{count}})",
+      "fewerGames": "פחות משחקים",
       "floors": "קומות",
-      "height": "גובה"
+      "height": "גובה",
+      "points": "נקודות",
+      "answerLabel": "התשובה:",
+      "levelUp": "שלב {{level}}!",
+      "tryAgain": "נסו שוב",
+      "myLessons": "השיעורים שלי"
     },
     "hub": {
       "playZone": "שחק",
@@ -12270,6 +12403,7 @@ const he = {
   "teacher": {
     "nav": {
       "play": "משחק",
+      "classes": "כיתות",
       "lessons": "שיעורים",
       "reports": "דוחות",
       "me": "שלי",
@@ -13078,6 +13212,8 @@ const he = {
   },
   "education": {
     "homework": {
+      "takeHomeToggle": "כרטיס תרגול לקחת הביתה",
+      "backToDashboard": "חזרה ללוח המורה",
       "classmatesFirst": "את/ה הראשון/ה שסיים/ה היום — הרצף מתחיל ממך.",
       "introTitle": "{{count}} מילים שהכיתה פספסה",
       "introSubtitle": "לוחצים על התשובה הנכונה, ומאייתים את הקשות. בערך שתי דקות.",
@@ -13103,12 +13239,19 @@ const he = {
       "saveFailed": "לא הצלחנו לשמור את הסיבוב. בדקו את החיבור ושחקו שוב.",
       "classStreakDays": "רצף כיתתי של {{count}} ימים",
       "classStreakSubtitle": "ימים ברצף שבהם מישהו בכיתה סיים.",
+      "classStreakChecking": "בודקים את רצף הכיתה…",
+      "cheer": "הקישו כשאתם יודעים.",
+      "studentEyebrow": "שיעורי הבית שלך",
+      "studentTitle": "{{count}} מילים להחזיר",
       "classmates": "עוד {{count}} מהכיתה סיימו את זה",
+      "classmatesOne": "עוד חבר/ה אחד/ת בכיתה כבר סיים/ה",
       "anonStudent": "מישהו",
       "teacherEyebrow": "מי שיחק",
       "teacherPlayed": "סיימו",
       "teacherAverage": "ממוצע כיתתי",
       "teacherEmpty": "אף אחד עוד לא שיחק. שתפו את הקישור והרשימה תתמלא בזמן אמת.",
+      "teacherNamesSignedOut": "התחברו כמורה כדי לראות מי שיחק.",
+      "gradeOnTime": "הוגש בזמן — רצף הכיתה שמור.",
       "teacherLoadFailed": "לא הצלחנו לטעון מי שיחק. נסו שוב עוד רגע.",
       "teacherOnTime": "בזמן",
       "teacherLate": "באיחור"
@@ -13374,6 +13517,7 @@ const he = {
       "allFound": "הכיתה מצאה את כל מילות השיעור.",
       "practiceMissed": "תרגלו את המילים האלה",
       "playReteachRound": "שחקו סבב חזרה — רק המילים שהחסרנו",
+      "backToLobby": "חזרה ללובי",
       "rematch": "ריבאץ' — אותה רשימה, אותו קוד",
       "teamBattle": {
         "title": "קרב קבוצות",
@@ -13421,6 +13565,8 @@ const he = {
         "none": "כולם מצאו לפחות חצי מהרשימה. אפשר לסבב נוסף.",
         "hint": "פחות מחצי ממילות השיעור בסיבוב הזה."
       },
+      "moreWords": "+{count} נוספות",
+      "fewerWords": "הצגה מצומצמת",
       "allBoardWordsFound": "הכיתה מצאה כל מילת שיעור שהופיעה על הלוח.",
       "shareGapTitle": "פער אוצר המילים של הכיתה",
       "shareGapText": "{{lesson}} — הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור. לתרגול: {{missed}}",
@@ -13482,13 +13628,13 @@ const he = {
       "shareMissGapPracticeTitle": "כרטיס תרגול miss-gap",
       "shareMissGapPracticeText": "{{lesson}} — תרגול miss-gap לבית (הדפסה או שמירת PDF): {{missed}}",
       "missGapPracticeEyebrow": "תרגול לבית",
-      "missGapPracticeSubtitle": "תרגול miss-gap בלי מכשירים אחרי שיבוץ Unplugged ב-Classroom — פתחו, הדפיסו או שמרו כ-PDF.",
+      "missGapPracticeSubtitle": "דף תרגול להדפסה עם המילים שהכיתה פספסה — פותחים, מדפיסים או שומרים כ-PDF. בלי מכשירים.",
       "missGapPracticeFoil": "ל-Kahoot Unplugged אין שיעורי בית — ל-LexiClash יש",
       "missGapPracticePrintPdf": "הדפסה / שמירת PDF לתרגול",
       "assignMissGapAsyncHomework": "שיבוץ שיעורי בית miss-gap אסינכרוניים",
       "assignMissGapAsyncEyebrow": "שיעורי בית אסינכרוניים",
       "assignMissGapAsyncHeading": "תרגול miss-gap עם תאריך יעד",
-      "assignMissGapAsyncSubtitle": "התלמידים מתרגלים את כרטיס ה-miss-gap (#972) לבד — לא מפגש Unplugged חי. השלמה בזמן מזינה את רצף הכיתה.",
+      "assignMissGapAsyncSubtitle": "התלמידים משחקים משחק של שתי דקות על המילים שהכיתה פספסה. אתם רואים מי סיים, וסיום בזמן שומר על רצף הכיתה.",
       "assignMissGapAsyncFoil": "Kahootopia Assignments הם שיעורי בית של משחק חי — LexiClash משבצת תרגול miss-gap אסינכרוני שמזין את רצף הכיתה",
       "assignMissGapAsyncDueLabel": "תאריך יעד",
       "assignMissGapAsyncDueBanner": "יעד {{due}} — סיימו את תרגול ה-miss-gap כדי לשמור על רצף הכיתה",
@@ -13503,13 +13649,13 @@ const he = {
       "assignMissGapAsyncStreak": "רצף כיתה: {{streak}} יום/ימים",
       "missGapGradePassbackEyebrow": "העברת ציון ל-Google Classroom",
       "missGapGradePassbackHeading": "הגשת ציון miss-gap",
-      "missGapGradePassbackSubtitle": "התרגול הושלם — הציון מוכן ליומן הציונים של Classroom (foil של Kahoot Marketplace grade passback).",
+      "missGapGradePassbackSubtitle": "התרגול הושלם — הציון מוכן להגשה ליומן הציונים של הכיתה.",
       "missGapGradePassbackFoil": "Kahoot Marketplace מסנכרן ציונים ל-Classroom — LexiClash עושה זאת לשיעורי miss-gap אסינכרוניים, בלי OAuth לרשימת תלמידים",
       "missGapGradePassbackScore": "ציון: {{points}} / {{max}}",
       "missGapGradePassbackOnTime": "בזמן — ציון מלא + רצף כיתה",
       "missGapGradePassbackLate": "הגשה באיחור — ציון טיוטה מופחת (הרצף לא משתנה)",
       "missGapGradePassbackDue": "תאריך יעד {{due}}",
-      "missGapGradePassbackPrivacy": "בלי שמות תלמידים. בלי ייבוא רשימה. סנכרון ציונים דרך Add-on של Classroom מוכן כשיופעל scope המורה.",
+      "missGapGradePassbackPrivacy": "לא משתפים שמות ולא מייבאים רשימת כיתה. מוגש רק הציון של התרגול הזה.",
       "missGapGradePassbackCopy": "העתקת קישור קבלה לציון",
       "missGapGradePassbackCopied": "הקבלה הועתקה — הדביקו ב-Classroom או שתפו עם המורה",
       "missGapGradePassbackShareText": "{{lesson}} — ציון miss-gap {{points}}/{{max}} (יעד {{due}})",
@@ -13519,7 +13665,7 @@ const he = {
 
       "missGapWhatsAppEyebrow": "תרגול להורים בוואטסאפ",
       "missGapWhatsAppHeading": "שליחת כרטיס תרגול miss-gap להורים בוואטסאפ",
-      "missGapWhatsAppSubtitle": "אחרי העברת הציון ל-Classroom, לחיצה אחת שולחת את כרטיס #972 לצ'אט הורים — רק מילות כיתה.",
+      "missGapWhatsAppSubtitle": "שולחים את כרטיס התרגול ישירות לצ'אט ההורים בלחיצה אחת — מילים של הכיתה בלבד, בלי שמות תלמידים.",
       "missGapWhatsAppParentSubtitle": "תרגלו עם הילד/ה את המילים שפספסו מ־{{lesson}} — הדפיסו או פתחו את הכרטיס.",
       "missGapWhatsAppFoil": "סנכרון ציונים של Classroom נעצר ביומן הציונים — LexiClash שולח את כרטיס miss-gap הביתה בוואטסאפ",
       "missGapWhatsAppDue": "מועד הגשה {{due}}",
@@ -13566,6 +13712,7 @@ const he = {
       "vocabScore": "מצאתם {{found}} מתוך {{total}} מילים מהאוצר!"
     },
     "duels": {
+      "recommended": "מומלץ",
       "lobby": "לובי",
       "history": "היסטוריה",
       "classmates": "חברי הכיתה",
@@ -13581,6 +13728,7 @@ const he = {
       "aheadBy": "מובילים ב-{{points}}",
       "behindBy": "מפגרים ב-{{points}}",
       "levelPegged": "תיקו מוחלט",
+      "changeSetup": "שינוי",
       "revealWin": "אלופים!",
       "revealLose": "הפסדתם!",
       "revealDraw": "תיקו!",
@@ -13599,12 +13747,24 @@ const he = {
       "turnBeatIt": "לנצח את זה",
       "turnPlay": "לשחק את התור",
       "turnDecline": "דילוג",
+      "turnLiveBadge": "חי",
+      "turnLiveInvite": "{{name}} מחכה — עכשיו!",
+      "turnAcceptLive": "לשחק עכשיו",
       "tauntPrompt": "שלחו מדבקה",
       "tauntSent": "המדבקה נשלחה",
       "tauntFire": "קלי קלות",
       "tauntMindblown": "ואו!",
       "tauntTrophy": "תנסו לנצח",
       "tauntTears": "משחק טוב",
+      "rematchAccept": "מקבלים את האתגר",
+      "rematchWants": "{{name}} רוצה עוד קרב",
+      "rematchWaiting": "מחכים ל{{name}}",
+      "rematchTapCancel": "אפשר לבטל בלחיצה",
+      "rematchInvited": "ההזמנה נשלחה ללובי שלהם",
+      "waitingForName": "מחכים ל{{name}}…",
+      "stillWaiting": "{{name}} עדיין לא כאן",
+      "waitingHint": "אולי הם סגרו את הקרב. אפשר לנסות שוב או לחזור ללובי.",
+      "tryAgain": "מנסים שוב",
       "rematchSent": "מכינים סיבוב…",
       "noClassmatesOnline": "אין כרגע חברי כיתה מחוברים",
       "challengeSomeone": "תאתגרו מישהו!",
@@ -13620,6 +13780,24 @@ const he = {
       "coinReward": "+{{amount}} מטבעות"
     },
     "achievements": {
+      "first_lesson": { "name": "שיעור ראשון", "description": "סיימו שיעור מהמורה" },
+      "word_master": { "name": "אלוף מילים", "description": "שלטו במילים חדשות" },
+      "level_climber": { "name": "מטפסי דרגות", "description": "הגיעו לדרגה חדשה" },
+      "xp_collector": { "name": "אספני XP", "description": "צברו XP מתרגול" },
+      "practice_veteran": { "name": "ותיקי התרגול", "description": "סיימו סבבי תרגול" },
+      "speed_demon": { "name": "מהירי תגובה", "description": "ענו לפני שהשעון נגמר" },
+      "perfect_streak": { "name": "סבב מושלם", "description": "סיימו סבב בלי טעות אחת" },
+      "boss_slayer": { "name": "מפילי בוסים", "description": "נצחו סבב בוס" },
+      "combo_master": { "name": "אלוף קומבו", "description": "בנו קומבו ארוך" },
+      "streak_starter": { "name": "פותחי רצף", "description": "תרגלו כמה ימים ברצף" },
+      "early_bird": { "name": "משכימי קום", "description": "תרגלו לפני בית הספר" },
+      "dedicated_learner": { "name": "לומדים מתמידים", "description": "תרגלו בהרבה ימים שונים" },
+      "weekly_warrior": { "name": "לוחמי השבוע", "description": "תרגלו בכל יום בשבוע" },
+      "streak_champion": { "name": "אלופי הרצף", "description": "שמרו על רצף יומי ארוך" },
+      "mode_explorer": { "name": "חוקרי משחקים", "description": "נסו משחקי תרגול שונים" },
+      "lesson_collector": { "name": "אספני שיעורים", "description": "תרגלו המון שיעורים" },
+      "classroom_contributor": { "name": "שחקני קבוצה", "description": "צברו נקודות לכיתה" },
+      "word_variety": { "name": "אוצרי מילים", "description": "מצאו מילים מכל הסוגים" },
       "categories": {"consistency":"עקביות","exploration":"חקר","progress":"התקדמות","skill":"כישורים"},
       "ariaDismissError": "סגור הודעת שגיאה",
       "ariaOverallProgress": "התקדמות כללית",

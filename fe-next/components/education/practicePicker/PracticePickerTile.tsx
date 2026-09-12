@@ -49,6 +49,9 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
       disabled={!tile.ready}
       aria-disabled={!tile.ready}
       onClick={() => tile.ready && onSelect(tile)}
+      // Inline, for the same reason as the hero: at `auto` the tile collapses
+      // to its name band and the art never shows.
+      style={{ minHeight: 128 }}
       className={cn(
         // The ACCENT is the button's own fill, not a child's. A tappable thing
         // has to differ from the surface around it by fill or border; a navy
@@ -59,18 +62,19 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
         // while the tile itself takes its full aspect height — so every row
         // overlapped the one below it. A min-height contributes to track sizing
         // directly and renders identically.
-        'group relative flex min-h-[168px] w-full flex-col overflow-hidden rounded-neo border-3 text-start transition-all sm:min-h-[196px]',
+        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] text-start transition-all',
         tile.ready
-          ? cn(
-              accent,
-              // Black text ON the accent: the name band below sets its own
-              // colour, but the button's default has to be legible against the
-              // button's own fill, not only against the band painted over it.
-              'border-black text-black shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed'
-            )
-          : // Locked keeps the navy fill — that IS the lock — so a light border
-            // is the only thing left to say "this is a control, just not yet".
-            'cursor-not-allowed border-neo-white/45 bg-neo-navy text-neo-cream opacity-60'
+          ? // ONE card style for every tile on this surface. The hero owns the
+            // screen's accent fill; a tile carries a cream edge (16.8:1 on navy,
+            // where a black edge is 1.23:1) and keeps its mode colour as a rail,
+            // so four posters side by side never put four accents on the page.
+            'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed'
+          : // Locked is the same card with the colour drained and a padlock: it
+            // still has to read as a control, just not one that is open yet.
+            // No container `opacity-*` here — fading the whole button fades its
+            // border too, and the contrast audit then measures a 1:1 edge on a
+            // control it can still see. The greyscale art carries the state.
+            'cursor-not-allowed border-neo-cream bg-neo-navy text-neo-cream'
       )}
     >
       {/* Art: bespoke poster bleeds to the edges, chip art floats on the accent. */}
@@ -78,7 +82,7 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
         // Inset by the frame width so the accent shows as a hard rim around the
         // poster. Bespoke posters are painted on the same navy as the page, so
         // edge-to-edge art would put a navy tile on a navy grid again.
-        <span data-poster-frame="" className="absolute inset-[3px] overflow-hidden rounded-[5px]">
+        <span data-poster-frame="" className="absolute inset-0 overflow-hidden rounded-[5px]">
           <Image
             data-testid={`practice-tile-art-${tile.id}`}
             src={art.src}
@@ -98,26 +102,26 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
             width={96}
             height={96}
             unoptimized
-            className={cn('h-[52%] w-auto object-contain', !tile.ready && 'grayscale')}
+            className={cn('h-[48%] w-auto object-contain', !tile.ready && 'grayscale')}
           />
         </span>
       )}
 
       {/* Name + one meta line, on a hard band so they read over any art. */}
-      <span className="relative mt-auto w-full border-t-3 border-black bg-neo-navy/95 px-2 py-1.5 backdrop-blur-[2px]">
-        <span className="block font-neo-display text-[13px] font-black uppercase leading-[1.1] text-neo-white text-balance">
+      <span className="relative mt-auto w-full border-t-[3px] border-neo-cream bg-neo-navy px-2 py-1.5">
+        <span className="block font-neo-display text-[12px] font-black uppercase leading-[1.1] text-neo-white text-balance">
           {t(tile.titleKey)}
         </span>
         <span
           data-tile-line=""
-          className="mt-0.5 flex flex-wrap items-center gap-1 font-neo-body text-[10px] font-bold leading-none text-neo-white/75"
+          className="mt-0.5 flex flex-wrap items-center gap-1 font-neo-body text-[10px] font-bold leading-none text-neo-cream"
         >
           {tile.ready ? (
             <>
               {xp > 0 && (
                 <span
                   data-testid={`practice-tile-xp-${tile.id}`}
-                  className="inline-flex items-center gap-0.5 rounded-[4px] border-2 border-black bg-neo-yellow px-1 py-0.5 tabular-nums text-black"
+                  className="inline-flex items-center gap-0.5 rounded-[4px] border-[2px] border-black bg-neo-yellow px-1 py-0.5 tabular-nums text-black"
                 >
                   <Zap className="h-2.5 w-2.5 fill-black" aria-hidden="true" />
                   {t('student.practiceFun.xpRate', { xp })}
@@ -127,7 +131,7 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
               {tile.sessions > 0 && (
                 <span
                   data-testid={`practice-tile-plays-${tile.id}`}
-                  className="tabular-nums text-neo-white/55"
+                  className="tabular-nums text-neo-cream"
                 >
                   {t('education.practicePicker.played', { count: tile.sessions })}
                 </span>
@@ -144,7 +148,8 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
 
       {/* Accent rail — the colour code survives even under a full-bleed poster. */}
       <span
-        className={cn('absolute inset-x-0 bottom-0 h-1.5', tile.ready ? accent : 'bg-neo-white/25')}
+        data-tile-rail=""
+        className={cn('absolute inset-x-0 bottom-0 h-1.5', tile.ready ? accent : 'bg-neo-cream/40')}
         aria-hidden="true"
       />
     </button>

@@ -93,7 +93,7 @@ export default function XpCoinFlight({ count, originRef, onLanded }: XpCoinFligh
       {coins.map(({ i, spread, lift }) => (
         <m.span
           key={i}
-          className="absolute h-5 w-5 rounded-full border-2 border-black bg-neo-yellow shadow-hard-sm"
+          className="absolute h-5 w-5 rounded-full border-[2px] border-black bg-neo-yellow shadow-hard-sm"
           style={{ left: flight.from.x - 10, top: flight.from.y - 10 }}
           initial={{ x: 0, y: 0, scale: 0.4, opacity: 1 }}
           animate={{

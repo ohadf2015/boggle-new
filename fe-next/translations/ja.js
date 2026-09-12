@@ -53,7 +53,16 @@ const ja = {
     },
     "finished": {
       "title": "おつかれさま！",
-      "yourScore": "あなたの得点は{score}点です。"
+      "yourScore": "あなたの得点は{score}点です。",
+      "subtitle": "全{questions}問 · {players}人",
+      "classAccuracy": "クラス正答率",
+      "wordsNailed": "正解した単語",
+      "topStreak": "最高連続正解",
+      "percent": "{percent}%",
+      "mascotAlt": "トロフィーをかかげるレクシー",
+      "perfect": "パーフェクト！",
+      "bestStreak": "最高連続 {count}",
+      "correctOf": "{total}問中{correct}問正解"
     },
     "host": {
       "joinCode": "参加コード",
@@ -4097,6 +4106,118 @@ const ja = {
     "viewProgress": "進捗を見る"
   },
   "achievements": {
+    "first_lesson": {
+      "name": "はじめの一歩",
+      "description": "最初のレッスンをクリアする"
+    },
+    "word_master": {
+      "name": "単語マスター",
+      "description": "単語を完全に自分のものにする"
+    },
+    "level_climber": {
+      "name": "レベル登り",
+      "description": "レベルの階段をのぼる"
+    },
+    "xp_collector": {
+      "name": "XPコレクター",
+      "description": "経験値をためこむ"
+    },
+    "practice_veteran": {
+      "name": "練習の達人",
+      "description": "練習セッションを積み重ねる"
+    },
+    "duel_veteran": {
+      "name": "デュエル歴戦",
+      "description": "デュエルを何度も戦う"
+    },
+    "speed_demon": {
+      "name": "スピードの鬼",
+      "description": "時計がまばたきする前に答える"
+    },
+    "perfect_streak": {
+      "name": "ノーミス",
+      "description": "ミスゼロでラウンドを制覇する"
+    },
+    "boss_slayer": {
+      "name": "ボスキラー",
+      "description": "単語ボスを倒す"
+    },
+    "combo_master": {
+      "name": "コンボ名人",
+      "description": "答えをつないで大コンボ"
+    },
+    "duel_champion": {
+      "name": "デュエル王者",
+      "description": "クラスメイトとのデュエルに勝つ"
+    },
+    "comeback_king": {
+      "name": "逆転の王",
+      "description": "負けている所からデュエルに勝つ"
+    },
+    "speed_dueler": {
+      "name": "早撃ち",
+      "description": "デュエルで一番に単語を見つける"
+    },
+    "spelling_ace": {
+      "name": "つづりの達人",
+      "description": "つづりラウンドを完璧にする"
+    },
+    "matching_master": {
+      "name": "マッチの達人",
+      "description": "マッチラウンドを素早くクリア"
+    },
+    "blitz_champion": {
+      "name": "ブリッツ王者",
+      "description": "ブリッツで高得点を出す"
+    },
+    "streak_starter": {
+      "name": "連続スタート",
+      "description": "毎日つづけて遊ぶ"
+    },
+    "early_bird": {
+      "name": "早起きさん",
+      "description": "学校が始まる前に練習する"
+    },
+    "dedicated_learner": {
+      "name": "まじめな学び手",
+      "description": "毎日かならず顔を出す"
+    },
+    "weekly_warrior": {
+      "name": "週間戦士",
+      "description": "まるっと一週間、休みなし"
+    },
+    "streak_champion": {
+      "name": "連続チャンプ",
+      "description": "とんでもない連続記録を守る"
+    },
+    "duel_streak": {
+      "name": "デュエル連勝",
+      "description": "デュエルで連勝する"
+    },
+    "practice_streak": {
+      "name": "練習連続",
+      "description": "練習した日を連ねる"
+    },
+    "mode_explorer": {
+      "name": "モード探検家",
+      "description": "すべてのゲームモードを試す"
+    },
+    "lesson_collector": {
+      "name": "レッスン収集",
+      "description": "クリアしたレッスンを集める"
+    },
+    "classroom_contributor": {
+      "name": "クラスの味方",
+      "description": "クラスの得点に貢献する"
+    },
+    "word_variety": {
+      "name": "単語の虹",
+      "description": "とにかく幅広い単語で遊ぶ"
+    },
+    "mode_master": {
+      "name": "モードマスター",
+      "description": "練習モードを全制覇する"
+    },
     "unlocked": "実績解除！",
     "upgraded": "実績アップグレード！",
     "shareText": "LexiClashで「{{name}}」を達成！一緒に遊ぼう！",
@@ -12269,8 +12390,20 @@ const ja = {
       "allGames": "ゲーム一覧",
       "streakLabel": "{{count}}連続",
       "beatTheClock": "タイムアタック",
+      "bestStreak": "最高連続",
+      "listenAndSpell": "聞いてからつづってみよう",
+      "needsDefinitions": "単語の意味が必要です。先生に追加してもらおう",
+      "recommended": "おすすめ",
+      "playNow": "プレイ",
+      "moreGames": "ほかのゲーム（{{count}}）",
+      "fewerGames": "とじる",
       "floors": "階数",
-      "height": "高さ"
+      "height": "高さ",
+      "points": "スコア",
+      "answerLabel": "答え：",
+      "levelUp": "レベル{{level}}！",
+      "tryAgain": "もう一度",
+      "myLessons": "マイレッスン"
     },
     "hub": {
       "playZone": "プレイ",
@@ -12416,6 +12549,7 @@ const ja = {
   "teacher": {
     "nav": {
       "play": "プレイ",
+      "classes": "クラス",
       "lessons": "レッスン",
       "reports": "レポート",
       "me": "マイページ",
@@ -13224,7 +13358,10 @@ const ja = {
   },
   "education": {
     "homework": {
+      "takeHomeToggle": "持ち帰り練習カード",
+      "backToDashboard": "ダッシュボードに戻る",
       "classmatesFirst": "今日いちばん乗り！ 連続記録はきみから始まる。",
+      "classmatesOne": "クラスメイトが1人、もう終わらせたよ",
       "introTitle": "クラスが間違えた{{count}}語",
       "introSubtitle": "正しい答えをタップして、むずかしい語はつづってみよう。だいたい2分。",
       "nameLabel": "なまえ",
@@ -13249,12 +13386,18 @@ const ja = {
       "saveFailed": "記録を保存できませんでした。通信を確認して、もう一度あそんでね。",
       "classStreakDays": "クラス連続{{count}}日",
       "classStreakSubtitle": "クラスの誰かが終わらせた連続日数。",
+      "classStreakChecking": "クラスの連続記録を確認中…",
+      "cheer": "わかったらタップ！",
+      "studentEyebrow": "あなたのしゅくだい",
+      "studentTitle": "とりかえす単語は{{count}}コ",
       "classmates": "クラスメイト{{count}}人もクリア済み",
       "anonStudent": "だれか",
       "teacherEyebrow": "プレイした人",
       "teacherPlayed": "完了",
       "teacherAverage": "クラス平均",
       "teacherEmpty": "まだ誰もプレイしていません。リンクを共有すると、ここにすぐ並びます。",
+      "teacherNamesSignedOut": "だれが遊んだかは、先生としてログインすると見られます。",
+      "gradeOnTime": "期限内！ クラスの連続記録は守られたよ。",
       "teacherLoadFailed": "プレイ状況を読み込めませんでした。少し待って再試行してください。",
       "teacherOnTime": "期限内",
       "teacherLate": "遅れ"
@@ -13520,6 +13663,7 @@ const ja = {
       "allFound": "クラスはすべての単語を見つけました。",
       "practiceMissed": "この単語を練習する",
       "playReteachRound": "復習ラウンドをプレイ — 見つからなかった単語だけ",
+      "backToLobby": "ロビーに戻る",
       "rematch": "リマッチ — 同じリスト、同じコード",
       "teamBattle": {
         "title": "チームバトル",
@@ -13567,6 +13711,8 @@ const ja = {
         "none": "全員がリストの半分以上を見つけました。もう一戦どうぞ。",
         "hint": "このラウンドでレッスン単語の半分未満でした。"
       },
+      "moreWords": "ほか{count}語",
+      "fewerWords": "表示を減らす",
       "allBoardWordsFound": "盤面に出たレッスン単語は、クラスがすべて見つけました。",
       "shareGapTitle": "クラスの語彙ギャップ",
       "shareGapText": "{{lesson}} — クラスは {{total}} 語のうち {{found}} 語を見つけました。練習: {{missed}}",
@@ -13628,13 +13774,13 @@ const ja = {
       "shareMissGapPracticeTitle": "ミスギャップ練習カード",
       "shareMissGapPracticeText": "{{lesson}} — 持ち帰りミスギャップ練習（印刷またはPDF保存）: {{missed}}",
       "missGapPracticeEyebrow": "家庭学習カード",
-      "missGapPracticeSubtitle": "Classroom の Unplugged 課題のあとのデバイス不要ミスギャップ練習 — 開いて印刷、または PDF 保存。",
+      "missGapPracticeSubtitle": "クラスが取りこぼした単語の練習プリントです。開いて印刷するか、PDFとして保存できます。端末は不要です。",
       "missGapPracticeFoil": "Kahoot Unplugged には持ち帰り練習がない — LexiClash にはある",
       "missGapPracticePrintPdf": "練習PDFを印刷 / 保存",
       "assignMissGapAsyncHomework": "非同期 miss-gap 宿題を割り当て",
       "assignMissGapAsyncEyebrow": "非同期宿題",
       "assignMissGapAsyncHeading": "期限付き miss-gap 練習",
-      "assignMissGapAsyncSubtitle": "生徒は #972 miss-gap カードを各自で練習 — ライブ Unplugged ではありません。期限内完了がクラス連続記録につながります。",
+      "assignMissGapAsyncSubtitle": "クラスが取りこぼした単語で、生徒は2分間のゲームをプレイします。だれが終えたかが一目でわかり、期限内に終えるとクラスの連続記録が続きます。",
       "assignMissGapAsyncFoil": "Kahootopia Assignments はライブゲーム宿題 — LexiClash はクラス連続記録につながる非同期 miss-gap 練習を割り当てます",
       "assignMissGapAsyncDueLabel": "提出期限",
       "assignMissGapAsyncDueBanner": "期限 {{due}} — miss-gap 練習を終えてクラス連続を守ろう",
@@ -13649,13 +13795,13 @@ const ja = {
       "assignMissGapAsyncStreak": "クラス連続: {{streak}} 日",
       "missGapGradePassbackEyebrow": "Google Classroom への成績連携",
       "missGapGradePassbackHeading": "ミスギャップ成績を提出",
-      "missGapGradePassbackSubtitle": "練習完了 — Classroom の成績簿向けスコアの準備ができました（Kahoot Marketplace grade passback の対抗機能）。",
+      "missGapGradePassbackSubtitle": "練習が完了しました — 点数をクラスの成績表に提出できます。",
       "missGapGradePassbackFoil": "Kahoot Marketplace はクイズ点数を Classroom に同期 — LexiClash は非同期ミスギャップ宿題でも同じことを、名簿 OAuth なしで行います",
       "missGapGradePassbackScore": "スコア: {{points}} / {{max}}",
       "missGapGradePassbackOnTime": "期限内 — 満点 + クラス連続記録",
       "missGapGradePassbackLate": "期限後提出 — 下書き点数が減点（連続記録は変わりません）",
       "missGapGradePassbackDue": "提出期限 {{due}}",
-      "missGapGradePassbackPrivacy": "生徒名なし。名簿インポートなし。教師アドオン scope が有効になると Classroom 成績同期の形が使えます。",
+      "missGapGradePassbackPrivacy": "名前は共有されず、クラス名簿の取り込みもありません。提出されるのはこの練習の点数だけです。",
       "missGapGradePassbackCopy": "成績レシートのリンクをコピー",
       "missGapGradePassbackCopied": "レシートをコピーしました — Classroom に貼るか先生と共有してください",
       "missGapGradePassbackShareText": "{{lesson}} — ミスギャップ成績 {{points}}/{{max}}（期限 {{due}}）",
@@ -13665,7 +13811,7 @@ const ja = {
 
       "missGapWhatsAppEyebrow": "保護者向けWhatsApp練習",
       "missGapWhatsAppHeading": "miss-gap練習カードをWhatsAppで家庭へ",
-      "missGapWhatsAppSubtitle": "Classroomへの成績パスバック後、#972練習カードを保護者チャットへワンタップ — クラス語のみ。",
+      "missGapWhatsAppSubtitle": "練習カードをワンタップで保護者のチャットに送れます。共有されるのはクラスの単語だけで、生徒の名前は含みません。",
       "missGapWhatsAppParentSubtitle": "{{lesson}} の取りこぼし語を親子で練習 — 印刷するか練習カードを開いてください。",
       "missGapWhatsAppFoil": "Classroomの成績同期は成績表で止まる — LexiClashはmiss-gap練習カードをWhatsAppで家庭へ送ります",
       "missGapWhatsAppDue": "提出期限 {{due}}",
@@ -13712,6 +13858,7 @@ const ja = {
       "vocabScore": "{{total}}個の語彙のうち{{found}}個を見つけました！"
     },
     "duels": {
+      "recommended": "おすすめ",
       "lobby": "ロビー",
       "history": "履歴",
       "classmates": "クラスメート",
@@ -13727,6 +13874,7 @@ const ja = {
       "aheadBy": "{{points}} 点リード",
       "behindBy": "{{points}} 点ビハインド",
       "levelPegged": "完全に同点",
+      "changeSetup": "変更",
       "revealWin": "チャンピオン！",
       "revealLose": "敗北！",
       "revealDraw": "引き分け！",
@@ -13745,12 +13893,24 @@ const ja = {
       "turnBeatIt": "超える",
       "turnPlay": "自分の番をプレイ",
       "turnDecline": "スキップ",
+      "turnLiveBadge": "ライブ",
+      "turnLiveInvite": "{{name}} が待っています — ライブ！",
+      "turnAcceptLive": "今すぐ対戦",
       "tauntPrompt": "ステッカーを送る",
       "tauntSent": "ステッカー送信済み",
       "tauntFire": "楽勝",
       "tauntMindblown": "すごい！",
       "tauntTrophy": "超えてみろ",
       "tauntTears": "いい勝負",
+      "rematchAccept": "再戦を受ける",
+      "rematchWants": "{{name}}が再戦したがっています",
+      "rematchWaiting": "{{name}}を待っています",
+      "rematchTapCancel": "タップでキャンセル",
+      "rematchInvited": "ロビーに招待を送りました",
+      "waitingForName": "{{name}}を待っています…",
+      "stillWaiting": "{{name}}はまだ来ていません",
+      "waitingHint": "デュエルを閉じたのかもしれません。もう一度試すか、ロビーに戻りましょう。",
+      "tryAgain": "もう一度",
       "rematchSent": "準備中…",
       "noClassmatesOnline": "現在オンラインのクラスメートはいません",
       "challengeSomeone": "誰かに挑戦しよう！",
@@ -13766,6 +13926,24 @@ const ja = {
       "coinReward": "+{{amount}} コイン"
     },
     "achievements": {
+      "first_lesson": { "name": "はじめてのレッスン", "description": "先生のレッスンをクリア" },
+      "word_master": { "name": "単語マスター", "description": "たくさんの単語を覚えよう" },
+      "level_climber": { "name": "レベルアップ", "description": "新しいレベルに到達" },
+      "xp_collector": { "name": "XPコレクター", "description": "練習でXPをためよう" },
+      "practice_veteran": { "name": "練習の達人", "description": "練習ラウンドをこなそう" },
+      "speed_demon": { "name": "スピードスター", "description": "時間切れになる前に答えよう" },
+      "perfect_streak": { "name": "パーフェクト", "description": "ミスなしでラウンドをクリア" },
+      "boss_slayer": { "name": "ボスハンター", "description": "ボスラウンドに勝利" },
+      "combo_master": { "name": "コンボマスター", "description": "長いコンボをつなげよう" },
+      "streak_starter": { "name": "連続スタート", "description": "何日か続けて練習しよう" },
+      "early_bird": { "name": "早起きさん", "description": "学校の前に練習しよう" },
+      "dedicated_learner": { "name": "がんばり屋", "description": "いろいろな日に練習しよう" },
+      "weekly_warrior": { "name": "1週間かんぺき", "description": "1週間毎日練習しよう" },
+      "streak_champion": { "name": "連続チャンピオン", "description": "長い連続記録を守ろう" },
+      "mode_explorer": { "name": "モード探検家", "description": "いろいろな練習ゲームを試そう" },
+      "lesson_collector": { "name": "レッスンコレクター", "description": "たくさんのレッスンで練習しよう" },
+      "classroom_contributor": { "name": "チームプレイヤー", "description": "クラスのために得点しよう" },
+      "word_variety": { "name": "単語ハンター", "description": "いろいろな種類の単語を見つけよう" },
       "categories": {"consistency":"継続力","exploration":"探索","progress":"進捗","skill":"スキル"},
       "ariaDismissError": "エラーを消す",
       "ariaOverallProgress": "全体的な進捗",

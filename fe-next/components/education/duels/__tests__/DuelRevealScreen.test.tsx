@@ -76,9 +76,16 @@ describe('DuelRevealScreen', () => {
     expect(playSound).toHaveBeenCalledWith('defeatSting', expect.anything());
   });
 
-  it('gives the clip a poster so nothing flashes before it decodes', () => {
+  // Was: "gives the clip a poster". A `poster` attribute is dropped the moment
+  // the element thinks it has a frame, which is how round 1 shipped a CHAMPION
+  // screen whose mascot box was a black rectangle. The still is now a real
+  // <img> painted underneath — see DuelRevealMascot.
+  it('paints the mascot still under the clip so the box is never black', () => {
     render(<DuelRevealScreen {...props} />);
-    expect(screen.getByTestId('duel-reveal-clip')).toHaveAttribute('poster');
+    expect(screen.getByTestId('duel-reveal-still')).toHaveAttribute(
+      'src',
+      '/mascot/trophy-nobg.webp'
+    );
   });
 
   it('shows both final scores and the coin award', () => {

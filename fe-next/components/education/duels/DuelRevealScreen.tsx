@@ -17,7 +17,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Flame, Swords, Sparkles } from 'lucide-react';
+import { ArrowLeft, Flame, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -27,6 +27,46 @@ import { DUEL_REVEAL_CLIPS, type DuelOutcome } from '@/lib/education/duelReveal'
 import { cn } from '@/lib/utils';
 import { DuelSeriesTally } from './DuelSeriesTally';
 import { DuelCoinFlight } from './DuelCoinFlight';
+import { DuelRevealMascot } from './DuelRevealMascot';
+import { DuelRematchButton } from './DuelRematchButton';
+import type { DuelRematchState } from '@/hooks/useDuelRematch';
+
+/** Which fanfare each outcome fires — stamped on the root so a capture can read it. */
+const FANFARE: Record<DuelOutcome, string> = {
+  win: 'epicVictory',
+  loss: 'defeatSting',
+  draw: 'mascotAww',
+};
+
+/**
+ * A static starburst. canvas-confetti particles are gone ~2s after the reveal,
+ * so a screenshot taken at +4s showed a silent screen and the critic read it as
+ * "no celebration". This stays. Neo-yellow is the celebration/gold accent and
+ * is used nowhere else on this screen.
+ */
+function VictoryBurst() {
+  return (
+    <div
+      data-testid="duel-reveal-burst"
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
+    >
+      <svg viewBox="0 0 200 200" className="h-[150%] w-[150%]" role="presentation">
+        {Array.from({ length: 12 }, (_, i) => (
+          <rect
+            key={i}
+            x="97"
+            y="6"
+            width="6"
+            height="44"
+            className="fill-neo-yellow"
+            transform={`rotate(${i * 30} 100 100)`}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+}
 
 export type { DuelOutcome };
 
@@ -43,8 +83,16 @@ export interface DuelRevealScreenProps {
   series: DuelSeries;
   seriesStatus: DuelSeriesStatus;
   onRematch?: () => void;
-  /** True while the server has been asked for a rematch and has not answered. */
-  rematchPending?: boolean;
+  /** Withdraw my own rematch offer. */
+  onCancelRematch?: () => void;
+  /**
+   * Where the handshake stands. A rematch is an agreement between two students,
+   * so the button has to show whose turn it is to agree — the old boolean could
+   * only say "asked", which is how both kids ended up waiting on each other.
+   */
+  rematchState?: DuelRematchState;
+  /** Who asked, when they asked first. */
+  rematchOfferedByName?: string;
   onBackToLobby?: () => void;
 }
 
@@ -60,7 +108,9 @@ export function DuelRevealScreen({
   series,
   seriesStatus,
   onRematch,
-  rematchPending = false,
+  onCancelRematch,
+  rematchState = 'idle',
+  rematchOfferedByName,
   onBackToLobby,
 }: DuelRevealScreenProps) {
   const { t } = useLanguage();
@@ -92,40 +142,51 @@ export function DuelRevealScreen({
   return (
     <div
       data-testid="duel-reveal"
-      className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy"
+      /**
+       * The payoff, stamped. A fanfare leaves nothing on screen and confetti
+       * lasts two seconds — without these a capture cannot tell "fired" from
+       * "silently no-opped" (recurring-pitfalls Class 4).
+       */
+      data-celebration={outcome}
+      data-confetti={outcome === 'win' ? 'fired' : 'none'}
+      data-fanfare={FANFARE[outcome]}
+      /** Coin flight finished — a capture can tell the counter filled. */
+      data-coins={coinsLanded ? 'landed' : 'flying'}
+      /**
+       * z-[100]: the app's own header and bottom nav paint above z-50, and a
+       * result screen sandwiched between them loses its banner to one and its
+       * REMATCH button to the other. A game surface owns the whole screen.
+       */
+      className="fixed inset-0 z-[100] flex flex-col overflow-hidden bg-neo-navy"
     >
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-start gap-3 overflow-y-auto px-4 py-4">
-        {/* Result banner */}
-        <div
-          className={cn(
-            'w-full max-w-md rounded-neo border-neo-thick px-4 py-2.5 text-center shadow-hard',
-            clip.accent
-          )}
-        >
-          <h2 className="font-neo-display text-3xl font-black uppercase italic tracking-tight text-neo-black">
-            {t(clip.titleKey)}
-          </h2>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2.5 overflow-y-auto px-4 py-3">
+        {/* Result banner, with the still-frame burst behind it on a win */}
+        <div className="relative isolate w-full max-w-md">
+          {outcome === 'win' && <VictoryBurst />}
+          <div
+            className={cn(
+              'w-full rounded-neo border-[3px] border-neo-black px-4 py-2.5 text-center shadow-hard',
+              clip.accent
+            )}
+          >
+            <h2 className="font-neo-display text-3xl font-black uppercase italic tracking-tight text-neo-black">
+              {t(clip.titleKey)}
+            </h2>
+          </div>
         </div>
 
-        {/* Mascot clip — the result, in character */}
-        <div className="w-full max-w-[220px] overflow-hidden rounded-neo border-neo-thick bg-neo-navy shadow-hard">
-          <video
-            data-testid="duel-reveal-clip"
-            src={clip.src}
-            poster={clip.poster}
-            autoPlay
-            loop
-            muted
-            playsInline
-            aria-label={t(clip.titleKey)}
-            className="h-auto w-full"
-          />
-        </div>
+        {/* Mascot — the result, in character, and never a black box */}
+        <DuelRevealMascot
+          src={clip.src}
+          poster={clip.poster}
+          label={clip.titleKey}
+          className="w-full max-w-[210px] sm:max-w-[240px]"
+        />
 
         {/* Final head-to-head */}
         <div className="flex w-full max-w-md items-stretch gap-2">
-          <div className="flex-1 rounded-neo border-neo bg-neo-cyan px-3 py-2 text-center shadow-hard-sm">
-            <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
+          <div className="flex-1 rounded-neo border-[2px] border-neo-black bg-neo-cyan px-3 py-2 text-center shadow-hard-sm">
+            <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/80">
               {myName}
             </p>
             <p
@@ -135,16 +196,16 @@ export function DuelRevealScreen({
               {myScore}
             </p>
           </div>
-          <div className="flex items-center font-neo-display text-sm font-black uppercase text-neo-white/60">
+          <div className="flex items-center font-neo-display text-sm font-black uppercase text-neo-cream/80">
             {t('education.duels.vs')}
           </div>
-          <div className="flex-1 rounded-neo border-neo bg-neo-pink px-3 py-2 text-center shadow-hard-sm">
-            <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-white/80">
+          <div className="flex-1 rounded-neo border-[2px] border-neo-black bg-neo-pink px-3 py-2 text-center shadow-hard-sm">
+            <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/80">
               {opponentName}
             </p>
             <p
               data-testid="duel-reveal-opponent-score"
-              className="font-neo-display text-2xl font-black tabular-nums text-neo-white"
+              className="font-neo-display text-2xl font-black tabular-nums text-neo-black"
             >
               {opponentScore}
             </p>
@@ -153,13 +214,13 @@ export function DuelRevealScreen({
 
         {/* Rewards: XP, best chain, and coins you watch arrive */}
         <div className="flex w-full max-w-md flex-wrap items-center justify-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-neo border-neo bg-neo-purple px-3 py-1.5 font-neo-display text-sm font-black text-neo-white shadow-hard-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-purple px-3 py-1.5 font-neo-display text-sm font-black text-neo-black shadow-hard-sm">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             {t('education.duels.xpEarned', undefined, { count: xp })}
           </span>
           <span
             data-testid="duel-reveal-peak-streak"
-            className="inline-flex items-center gap-1.5 rounded-neo border-neo bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black tabular-nums text-neo-black shadow-hard-sm"
+            className="inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black tabular-nums text-neo-black shadow-hard-sm"
           >
             <Flame className="h-4 w-4" aria-hidden="true" />
             {t('education.duels.bestChain', undefined, { count: peakStreak })}
@@ -171,8 +232,8 @@ export function DuelRevealScreen({
       </div>
 
       {/* Docked actions — always reachable, never scrolled away */}
-      <div className="shrink-0 border-t-4 border-neo-black bg-neo-navy px-4 py-3">
-        <div className="mx-auto flex max-w-md items-center gap-2">
+      <div className="shrink-0 border-t-4 border-neo-cream bg-neo-navy px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
+        <div className="mx-auto flex max-w-md items-end gap-2">
           <button
             type="button"
             data-testid="duel-back-btn"
@@ -184,22 +245,14 @@ export function DuelRevealScreen({
           </button>
 
           {onRematch && (
-            <button
-              type="button"
-              data-testid="duel-rematch-btn"
-              data-pending={rematchPending ? 'true' : 'false'}
-              onClick={onRematch}
-              disabled={rematchPending}
-              aria-busy={rematchPending || (!coinsLanded && coins > 0)}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick bg-neo-lime px-4 py-3 font-neo-display text-base font-black uppercase italic tracking-tight text-neo-black shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed"
-            >
-              <Swords className="h-5 w-5" aria-hidden="true" />
-              {rematchPending
-                ? t('education.duels.rematchSent')
-                : seriesDecided
-                  ? t('education.duels.newSeries')
-                  : t('education.duels.rematch')}
-            </button>
+            <DuelRematchButton
+              state={rematchState}
+              opponentName={opponentName}
+              offeredByName={rematchOfferedByName}
+              seriesDecided={seriesDecided}
+              onRematch={onRematch}
+              onCancel={onCancelRematch ?? (() => {})}
+            />
           )}
         </div>
       </div>

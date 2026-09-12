@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
 
 interface QueuedModal {
   id: string;
@@ -33,10 +34,22 @@ export function useModalQueue({ modals }: UseModalQueueOptions): {
 } {
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
-  const activeModalId =
-    modals
-      .filter((m) => m.isReady && !dismissedIds.has(m.id))
-      .sort((a, b) => a.priority - b.priority)[0]?.id ?? null;
+  // OVERLAY QUIET ZONE. Every modal in this queue is a fixed overlay on the
+  // results screen, and the classroom round-end recap lives on that same screen.
+  // The share prompt was measured covering a student's "YOU WON!" podium.
+  //
+  // Suppress the WINNER, never the readiness. Filtering `isReady` would drop the
+  // queue's ready count to zero, which its reset effect below reads as "new game
+  // cycle" and clears `dismissedIds` — a modal the user already closed would
+  // re-open when the zone lifted. Here the queue keeps its whole state and only
+  // the display waits, so each caller's own `show*` flag survives untouched.
+  const quietZone = useOverlayQuietZone();
+
+  const activeModalId = quietZone
+    ? null
+    : modals
+        .filter((m) => m.isReady && !dismissedIds.has(m.id))
+        .sort((a, b) => a.priority - b.priority)[0]?.id ?? null;
 
   const dismiss = useCallback((id: string) => {
     setDismissedIds((prev) => new Set(prev).add(id));

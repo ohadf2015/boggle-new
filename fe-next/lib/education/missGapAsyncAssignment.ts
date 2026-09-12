@@ -23,6 +23,10 @@ import {
   type ClassGapSharePayload,
 } from './classGapShare';
 import { buildGoogleClassroomShareUrl } from './googleClassroomShare';
+import {
+  encodeMissGapDefinitions,
+  parseMissGapDefinitions,
+} from './missGapDefinitions';
 import { buildMissGapPracticeShareUrl } from './missGapPracticeShare';
 
 export const MISS_GAP_ASSIGNMENT_PATH = '/education/miss-gap-assignment';
@@ -33,11 +37,19 @@ export const DEFAULT_DUE_OFFSET_DAYS = 3;
 export interface MissGapAssignmentInput extends ClassGapShareInput {
   /** ISO date YYYY-MM-DD. Empty/absent → teacher still picking. */
   dueDate?: string | null;
+  /**
+   * word → meaning, when the lesson had them. This is what upgrades the
+   * homework from "which spelling is right" to "what does it mean" — see
+   * `missGapDefinitions.ts` for the wire format.
+   */
+  definitions?: Record<string, string> | null;
 }
 
 export interface MissGapAssignmentPayload extends ClassGapSharePayload {
   /** Normalized YYYY-MM-DD or empty string when unset. */
   dueDate: string;
+  /** Cleaned word→meaning map, lower-cased keys. `{}` when the lesson had none. */
+  definitions: Record<string, string>;
 }
 
 function sanitizeText(value: string, max: number): string {
@@ -128,7 +140,17 @@ export function toMissGapAssignmentPayload(
   const dueDate = normalizeDueDate(
     'dueDate' in input ? (input as MissGapAssignmentInput).dueDate : '',
   );
-  return { ...base, dueDate };
+  // Round-tripping through the wire format is the cheapest way to apply the
+  // same cleaning, casing and caps the share link applies.
+  const definitions = parseMissGapDefinitions(
+    encodeMissGapDefinitions(
+      'definitions' in input
+        ? ((input as MissGapAssignmentInput).definitions ?? null)
+        : null,
+      base.missedWords,
+    ),
+  );
+  return { ...base, dueDate, definitions };
 }
 
 function applyParams(url: URL, payload: MissGapAssignmentPayload): void {
@@ -141,9 +163,18 @@ function applyParams(url: URL, payload: MissGapAssignmentPayload): void {
   }
   url.searchParams.set('lang', payload.locale);
   if (payload.dueDate) url.searchParams.set('due', payload.dueDate);
+  const defs = encodeMissGapDefinitions(payload.definitions, payload.missedWords);
+  if (defs) url.searchParams.set('defs', defs);
 }
 
-/** Absolute homework URL on lexiclash.live (parents / GC / Slack). */
+/**
+ * Absolute homework URL on lexiclash.live (parents / GC / Slack).
+ *
+ * Carries `role=student` so the link can never be mistaken for the teacher's
+ * compose entry — see `missGapEntry.ts`. Without it, a share link that lost
+ * its `due=` param on the way through a chat app opened the due-date picker
+ * instead of the game.
+ */
 export function buildMissGapAssignmentShareUrl(
   input: MissGapAssignmentInput | MissGapAssignmentPayload | ClassGapSharePayload,
 ): string {
@@ -153,6 +184,7 @@ export function buildMissGapAssignmentShareUrl(
     CLASS_GAP_ORIGIN,
   );
   applyParams(url, payload);
+  url.searchParams.set('role', 'student');
   return url.toString();
 }
 

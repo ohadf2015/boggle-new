@@ -20,7 +20,7 @@ interface VocabularyCardEnrichedProps {
  *
  * Neo-Brutalist design with:
  * - Hard shadows (shadow-hard)
- * - Chunky borders (border-neo)
+ * - Chunky borders (border-[3px])
  * - Bold colors from palette
  */
 export function VocabularyCardEnriched({
@@ -37,7 +37,7 @@ export function VocabularyCardEnriched({
       dir={isRTL ? 'rtl' : 'ltr'}
       className={`
         bg-neo-white
-        border-neo border-black
+        border-[3px] border-black
         rounded-neo
         shadow-hard
         p-6
@@ -111,7 +111,7 @@ export function VocabularyCardEnriched({
           <div
             className="
               bg-neo-yellow/10
-              border-neo border-neo-yellow
+              border-[3px] border-neo-yellow
               rounded-neo
               p-4
             "
@@ -141,7 +141,7 @@ export function VocabularyCardEnriched({
 
       {/* Compact mode: Show only first example */}
       {compact && word.examples.length > 0 && (
-        <div className="mt-4 pt-4 border-t-2 border-black">
+        <div className="mt-4 pt-4 border-t-[2px] border-black">
           <p className="text-sm font-neo-body text-neo-navy italic">
             &ldquo;{word.examples[0].text}&rdquo;
           </p>

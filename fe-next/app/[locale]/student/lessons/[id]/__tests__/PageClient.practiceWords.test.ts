@@ -6,9 +6,12 @@ import { resolve } from 'node:path';
  * raw `lesson.words`, or a support student is quizzed on challenge-tier words the
  * teacher deliberately kept off their list.
  */
-const source = readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
+/* The loop moved out of PageClient into PracticeContent; the guarantee did not. */
+const source =
+  readFileSync(resolve(__dirname, '../PracticeContent.tsx'), 'utf8') +
+  readFileSync(resolve(__dirname, '../PageClient.tsx'), 'utf8');
 
-describe('student lesson PageClient — practice words are level-filtered', () => {
+describe('student lesson practice — practice words are level-filtered', () => {
   it('derives practice words through usePracticeWords', () => {
     expect(source).toMatch(/usePracticeWords\(/);
   });

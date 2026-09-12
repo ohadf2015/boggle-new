@@ -202,7 +202,7 @@ export default function StickyReadyBar({
 
     // Active countdown (both host and non-host)
     if (showCountdown) {
-      const btnColor = isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black';
+      const btnColor = isRevenge ? 'bg-neo-pink text-neo-black' : 'bg-neo-lime text-neo-black';
 
       return (
         <div className="flex items-center gap-2" data-testid="auto-countdown">
@@ -310,7 +310,7 @@ export default function StickyReadyBar({
           whileTap={hostStartGated ? undefined : { scale: 0.95 }}
           className={cn(
             btnBase,
-            isRevenge ? 'bg-neo-pink text-white' : 'bg-neo-lime text-neo-black',
+            isRevenge ? 'bg-neo-pink text-neo-black' : 'bg-neo-lime text-neo-black',
             hostStartGated && 'opacity-60 cursor-not-allowed'
           )}
         >
@@ -337,7 +337,7 @@ export default function StickyReadyBar({
         <m.button
           onClick={() => { clearCancelFlag(); onMarkReady(); }}
           whileTap={{ scale: 0.95 }}
-          className={cn(btnBase, 'bg-neo-pink text-white')}
+          className={cn(btnBase, 'bg-neo-pink text-neo-black')}
         >
           <div className="w-7 h-7 rounded-full border-2 border-black overflow-hidden shadow-hard-sm shrink-0 bg-neo-navy">
             <Avatar userId={winnerUsername} customAvatar={winnerAvatar?.customAvatar} size="sm" className="w-full h-full" />

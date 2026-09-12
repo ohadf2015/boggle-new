@@ -30,11 +30,15 @@ import { ResultsPodium, type PodiumEntry } from './results/ResultsPodium';
 import type { ResultsStanding } from './results/resultsStandings';
 import { StudentRoundOutcome } from './results/StudentRoundOutcome';
 import { WinnerSpotlight } from './results/WinnerSpotlight';
+import { CelebrationLoop } from './results/CelebrationLoop';
 import { WordCoverageGlance } from './results/WordCoverageGlance';
 import { useRoundEndReveal } from './results/useRoundEndReveal';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
+import { podiumWithoutHost, standingsWithoutHost } from '@/lib/education/roundEndPodium';
 import { isRevealed, sweepReached } from '@/lib/education/roundEndStage';
+import { classSwept as isClassSwept } from '@/lib/education/roundEndSweep';
 import { ClassNeedsHelp } from './results/ClassNeedsHelp';
 import { ReteachActions } from './results/ReteachActions';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
@@ -69,6 +73,13 @@ export function ClassroomResultsCard({
   onRematch,
   standings,
 }: ClassroomResultsCardProps) {
+  // Nothing may cover this. A "Make LexiClash yours" style picker opened
+  // full-screen over a student's "YOU WON! 257 POINTS" here on a phone — the
+  // third auto-opening overlay to bury this moment. The recap now raises the
+  // quiet zone for as long as it is on screen, and every auto-opening prompt
+  // in the app consults it before opening (lib/overlayQuietZone).
+  useOverlayQuietZoneClaim(true, 'classroom-results');
+
   const { t, language } = useLanguage();
   const links = useReteachLinks(summary, isTeacher);
   const stage = useRoundEndReveal(true);
@@ -78,9 +89,23 @@ export function ClassroomResultsCard({
   // One computation, read by the history hook and by the coverage meter — the
   // phone and the projector must never disagree about whether the class swept
   // it (Pitfall Class 3: two renderers, one number).
-  const classSwept = summary.totalWords > 0 && summary.classFoundCount >= summary.totalWords;
+  // Discounts lesson words the board never carried — without that a sweep was
+  // arithmetically impossible on any partial board, which is every normal
+  // round. See lib/education/roundEndSweep.
+  const classSwept = isClassSwept({
+    totalWords: summary.totalWords,
+    classFoundCount: summary.classFoundCount,
+    neverPlacedCount: summary.neverPlacedWords
+      ? new Set(summary.neverPlacedWords.map((w) => w.toLowerCase())).size
+      : undefined,
+  });
 
-  const humans = (standings ?? []).filter((p) => !(p as { isBot?: boolean }).isBot);
+  // Bots are not classmates, and neither is the teacher: a classroom host is
+  // forced into broadcast mode yet still rides along in the server's standings,
+  // which told a student they came "2nd of 4" in a class of three. One helper,
+  // shared with the projector (`lib/education/roundEndPodium`).
+  const classmates = standingsWithoutHost(standings, summary.teacherName);
+  const humans = classmates.filter((p) => !(p as { isBot?: boolean }).isBot);
   const myIndex = humans.findIndex(
     (p) => p.username.trim().toLowerCase() === username.trim().toLowerCase()
   );
@@ -102,7 +127,7 @@ export function ClassroomResultsCard({
   const neverPlaced = new Set((summary.neverPlacedWords ?? []).map((w) => w.toLowerCase()));
   const missedOnBoard = summary.missedWords.filter((w) => !neverPlaced.has(w.toLowerCase()));
 
-  const podium: PodiumEntry[] = (summary.podium ?? []).map((p) => ({
+  const podium: PodiumEntry[] = podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
     username: p.username,
     score: p.score,
     rank: p.rank,
@@ -140,10 +165,10 @@ export function ClassroomResultsCard({
 
       {/* My round first, then the room's. A student holding a phone wants one
           answer before anything else, and it is not the class average. */}
-      {!isTeacher && standings && standings.length > 0 && (
+      {!isTeacher && humans.length > 0 && (
         <StudentRoundOutcome
           username={username}
-          standings={standings}
+          standings={classmates}
           mastery={summary.masteryByPlayer[username]}
           momentum={momentum}
           t={t}
@@ -151,7 +176,15 @@ export function ClassroomResultsCard({
       )}
 
       {podium.length > 0 && (
-        <div className="mb-5">
+        <div className="relative mb-5">
+          {/* `relative` above bounds the celebration to this block: it never
+              covers the actions below it and is never fullscreen.
+              Same rule as the win sting: this phone celebrates when ITS owner
+              won, or when it is the teacher's device standing in for the
+              room's screen. Twenty-nine phones cheering for someone else is
+              noise. Unlike the one-shot canvas burst, this keeps running, so a
+              shot taken seconds later still shows a celebration. */}
+          <CelebrationLoop active={isRevealed(1, stage) && (isTeacher || viewerWon)} />
           <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-neo-yellow">
             {t('education.results.podium.title')}
           </p>
@@ -261,6 +294,11 @@ export function ClassroomResultsCard({
           </p>
         ))}
 
+      {/* Teacher only. The class's gap, worded for an adult, is a report — and
+          a report sent from thirty student phones is thirty copies of the same
+          message to the wrong audience. A student's screen keeps one action
+          (below), which is the whole of round 2's "nine competing CTAs" note. */}
+      {isTeacher && (
       <button
         type="button"
         data-testid="share-class-gap"
@@ -283,6 +321,7 @@ export function ClassroomResultsCard({
           </>
         )}
       </button>
+      )}
 
       {onPractice && (
         <button

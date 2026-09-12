@@ -35,7 +35,7 @@ export function TauntStickerPicker({
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-white/60">
+      <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
         {selected ? t('education.duels.tauntSent') : t('education.duels.tauntPrompt')}
       </p>
       <div className="flex items-center gap-2" role="group" aria-label={t('education.duels.tauntPrompt')}>
@@ -55,7 +55,11 @@ export function TauntStickerPicker({
                 onSelect(taunt.id);
               }}
               className={cn(
-                'flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo shadow-hard-sm transition-all duration-100',
+                // text-neo-black: the tile carries only art, but its accessible
+                // name is read against this fill — and a label on an accent
+                // fill is black (cream on orange measures 2.3:1). The width is
+                // arbitrary so cn() cannot collapse it into the colour class.
+                'flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[2px] border-neo-black text-neo-black shadow-hard-sm transition-all duration-100',
                 taunt.accentClass,
                 isSelected && 'ring-4 ring-neo-yellow',
                 locked && !isSelected && 'opacity-40',

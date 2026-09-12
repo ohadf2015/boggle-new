@@ -49,6 +49,10 @@ vi.mock('lucide-react', () => ({
   GraduationCap: () => null,
   Copy: () => null,
   ArrowLeft: () => null,
+  // ProjectorLobby's in-place mode switch (round 2).
+  Shuffle: () => null,
+  Loader2: () => null,
+  X: () => null,
 }));
 
 // The room's server-side record. Not under test here; pinned so the projector
@@ -87,7 +91,11 @@ vi.mock('@/hooks/gameState', () => ({
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAdmin: false }) }));
-vi.mock('@/utils/SocketContext', () => ({ useSocketOptional: () => ({ socket: null }) }));
+vi.mock('@/utils/SocketContext', () => ({
+  useSocketOptional: () => ({ socket: null }),
+  // ProjectorLobby's in-place mode switch resolves the room socket itself.
+  getSharedSocketIfExists: () => null,
+}));
 vi.mock('@/hooks/useLobbyAutoStart', () => ({
   useLobbyAutoStart: () => ({ secondsLeft: null, cancel: vi.fn() }),
 }));

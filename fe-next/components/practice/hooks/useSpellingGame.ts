@@ -55,9 +55,15 @@ export interface UseSpellingGameReturn {
  * - Hebrew normalization support
  */
 export function useSpellingGame(words: VocabularyWord[]): UseSpellingGameReturn {
-  // Sort words by length for progressive difficulty
+  // Sort words by length for progressive difficulty.
+  // Entries with no `word` are dropped rather than sorted: a lesson row can
+  // reach here with the field missing, and `a.word.length` then throws inside
+  // the sort comparator, which the error boundary turns into "LET'S GET YOU
+  // BACK!" over the whole practice screen.
   const sortedWords = useRef<VocabularyWord[]>(
-    [...words].sort((a, b) => a.word.length - b.word.length)
+    words
+      .filter((entry) => typeof entry?.word === 'string' && entry.word.length > 0)
+      .sort((a, b) => a.word.length - b.word.length)
   );
 
   // Game state

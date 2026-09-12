@@ -140,10 +140,17 @@ describe('TvResultsView — the classroom projector', () => {
     expect(screen.getByTestId('podium-place-1')).toHaveTextContent('90');
   });
 
+  /**
+   * The meter is the class's number and stays. The chip list no longer prints
+   * the words that went RIGHT: a wall read from the back of a room wants the
+   * short list of what to do next, not a register of thirty greens, and on a
+   * thirty-word lesson that register is what pushed REMATCH off the screen.
+   * The phone card still lists everything — see `roundEndProjectorFit`.
+   */
   it('shows the class word coverage on the same screen', () => {
     render(<TvResultsView {...baseProps} classroomSummary={summary} />);
     expect(screen.getByTestId('coverage-meter')).toHaveAttribute('aria-valuenow', '2');
-    expect(screen.getByTestId('lesson-word-photon')).toHaveAttribute('data-found', 'true');
+    expect(screen.queryByTestId('lesson-word-photon')).not.toBeInTheDocument();
   });
 
   it('does not blame the class for a word the board never carried', () => {

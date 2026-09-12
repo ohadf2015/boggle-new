@@ -37,12 +37,15 @@ export function MissGapStreakFlame({
   const art = MASCOT_IMAGES[heat.mascot];
 
   if (size === 'pill') {
+    // Nothing to brag about at zero — an empty flame is just chrome, and it
+    // pops in the moment the student earns one.
+    if (days <= 0) return null;
     return (
       <span
         data-testid="miss-gap-streak-pill"
         className={cn(
           'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-neo',
-          'border-2 border-neo-black bg-neo-orange text-neo-black font-neo-display font-bold text-sm',
+          'border-[2px] border-neo-black bg-neo-orange text-neo-black font-neo-display font-bold text-sm',
           className,
         )}
       >
@@ -56,8 +59,11 @@ export function MissGapStreakFlame({
     <div
       data-testid="miss-gap-streak-hero"
       className={cn(
-        'w-full rounded-neo border-neo border-neo-black shadow-hard px-4 py-3',
-        'flex items-center gap-3 text-left',
+        'w-full rounded-neo border-[3px] border-neo-black shadow-hard px-4 py-3',
+        // `text-start`, not `text-left`: this card is the first thing a Hebrew
+        // student sees on the finish screen, and a physical `left` would pin the
+        // streak copy to the wrong edge under RTL.
+        'flex items-center gap-3 text-start',
         className,
       )}
       style={{ background: streakHeatGradient(heat) }}

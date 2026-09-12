@@ -12,7 +12,7 @@
  */
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -52,7 +52,7 @@ const TILE_TONES = [
  * vanishes — so these keep a cream border to stay visibly a control, and the
  * ink sits at 70% (8.4:1) rather than the 25-45% that fell under AA.
  */
-const MUTED_TILE = 'bg-neo-navy-light text-neo-white/70 border-neo-cream/60';
+const MUTED_TILE = 'bg-neo-navy-light text-neo-cream border-neo-cream';
 
 export function MissGapRoundView({
   round,
@@ -64,8 +64,14 @@ export function MissGapRoundView({
 }: MissGapRoundViewProps) {
   const { t } = useLanguage();
   const [typed, setTyped] = useState<number[]>([]);
+  // The letters so far also live in a ref. Two taps inside one task (a fast
+  // thumb, a double-tap, an assistive device) would otherwise both read the
+  // SAME render's `typed`, so the second letter saw an empty prefix and a
+  // correctly spelled word was scored wrong. The ref is always current.
+  const typedRef = useRef<number[]>([]);
 
   useEffect(() => {
+    typedRef.current = [];
     setTyped([]);
   }, [round.id]);
 
@@ -83,7 +89,8 @@ export function MissGapRoundView({
   const pickTile = (index: number) => {
     if (locked) return;
     onTapFeedback();
-    const next = [...typed, index];
+    const next = [...typedRef.current, index];
+    typedRef.current = next;
     setTyped(next);
     const attempt = next.map((i) => round.tiles[i]).join('');
     if (attempt === target) {
@@ -96,10 +103,10 @@ export function MissGapRoundView({
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0 gap-3">
+    <div className="flex flex-col flex-1 min-h-0 gap-3">
       {/* Timer bar — a shrinking strip reads faster than a number on a phone. */}
       <div
-        className="h-3 w-full rounded-neo border-2 border-neo-black bg-neo-navy-light overflow-hidden shrink-0"
+        className="h-3 w-full rounded-neo border-[2px] border-neo-cream bg-neo-navy-light overflow-hidden shrink-0"
         role="timer"
         aria-label={t('education.homework.timeLeft', { seconds: Math.ceil(secondsLeft) })}
       >
@@ -113,14 +120,28 @@ export function MissGapRoundView({
         />
       </div>
 
-      <div className="shrink-0">
-        <p className="text-neo-cyan font-bold text-[11px] uppercase tracking-widest">
+      {/* Phone: prompt, then answers, then the mascot row — one column, one
+          scroller. From `lg` the same two blocks sit side by side, because at
+          1440 the single column left ~280px of empty navy between the word and
+          the tiles with half the screen unused. Nothing about the phone layout
+          changes; only the desktop breakpoint adds a grid. */}
+      <div
+        data-testid="miss-gap-round-body"
+        className="flex flex-col flex-1 min-h-0 gap-3 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-stretch"
+      >
+      {/* Centred inside its own half at lg; the answers column next to it
+          stretches, so neither side floats in the middle of a 900px screen. */}
+      <div className="shrink-0 lg:flex lg:flex-col lg:justify-center">
+        <p
+          data-testid="miss-gap-round-prompt"
+          className="text-neo-cyan font-bold text-xs uppercase tracking-widest"
+        >
           {prompt}
         </p>
         {round.kind === 'meaning' || round.kind === 'spell' ? (
           <p
             data-testid="miss-gap-round-word"
-            className="text-neo-white font-neo-display font-bold text-3xl leading-tight break-words"
+            className="text-neo-white font-neo-display font-bold text-3xl lg:text-5xl leading-tight break-words"
           >
             {/* A spell round hides the word ONLY when a definition is there to
                 go on. With no definition there is nothing to recall from, so
@@ -130,12 +151,12 @@ export function MissGapRoundView({
               : round.word}
           </p>
         ) : (
-          <p className="text-neo-white/70 font-neo-body text-sm">
+          <p className="text-neo-cream font-neo-body text-sm">
             {t('education.homework.promptSpellingHint')}
           </p>
         )}
         {round.kind === 'spell' && round.hint ? (
-          <p className="text-neo-white/70 font-neo-body text-sm mt-1">{round.hint}</p>
+          <p className="text-neo-cream font-neo-body text-sm mt-1">{round.hint}</p>
         ) : null}
       </div>
 
@@ -143,7 +164,15 @@ export function MissGapRoundView({
           a tall phone is thumb-reachable instead of pinned to the top. */}
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-center">
         {round.kind === 'spell' ? (
-          <div className="flex flex-col gap-3">
+          // Claims the leftover height the same way the answer stack does, and
+          // splits it: slots stay up under the word, the letter tiles drop to
+          // the bottom where the thumb already is. Centring both (the old
+          // `flex flex-col gap-3`) left ~230px of bare navy above and below on
+          // a 390x844 phone while the meaning round filled the same screen.
+          <div
+            data-testid="miss-gap-spell-block"
+            className="flex flex-col flex-1 min-h-0 justify-between gap-4 py-1"
+          >
             <div
               data-testid="miss-gap-spell-slots"
               className="flex flex-wrap gap-1.5 justify-center min-h-[3rem]"
@@ -152,13 +181,13 @@ export function MissGapRoundView({
                 <span
                   key={`${round.id}-slot-${i}`}
                   className={cn(
-                    'w-9 h-11 grid place-items-center rounded-neo border-2 border-neo-black',
-                    'font-neo-display font-bold text-xl',
+                    'w-10 h-12 grid place-items-center rounded-neo border-[3px]',
+                    'font-neo-display font-bold text-2xl',
                     locked && outcome === 'correct'
-                      ? 'bg-neo-lime text-neo-black'
+                      ? 'bg-neo-lime text-neo-black border-neo-black'
                       : spelled[i]
-                        ? 'bg-neo-cyan text-neo-black'
-                        : 'bg-neo-navy-light text-neo-white/30',
+                        ? 'bg-neo-cyan text-neo-black border-neo-black'
+                        : 'bg-neo-navy text-neo-cream border-neo-cream',
                   )}
                 >
                   {locked ? letter : (spelled[i] ?? '')}
@@ -174,8 +203,8 @@ export function MissGapRoundView({
                   disabled={locked || typed.includes(index)}
                   onClick={() => pickTile(index)}
                   className={cn(
-                    'w-12 h-12 rounded-neo border-neo shadow-hard-sm',
-                    'font-neo-display font-bold text-xl transition-transform',
+                    'w-14 h-14 rounded-neo border-[3px] shadow-hard-sm',
+                    'font-neo-display font-bold text-2xl transition-transform',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                     typed.includes(index)
                       ? MUTED_TILE
@@ -188,12 +217,18 @@ export function MissGapRoundView({
             </div>
           </div>
         ) : (
-          <ul className="grid grid-cols-1 gap-2.5">
+          // Flex column that CLAIMS the leftover height, not a content-sized
+          // grid. Centred intrinsic tiles left ~200px of empty navy above the
+          // first answer and ~180px under the last at 390x844; sharing the
+          // space puts four fat, thumb-sized tiles on the screen instead.
+          // `min-h` on the item is the floor that keeps a one-line answer
+          // tappable when the space runs short.
+          <ul className="flex flex-col gap-2.5 flex-1 min-h-0">
             {round.choices.map((choice, index) => {
               const isPicked = pickedLabel === choice.label;
               const reveal = locked && choice.correct;
               return (
-                <li key={choice.id}>
+                <li key={choice.id} className="flex flex-1 min-h-[3.25rem]">
                   <button
                     type="button"
                     data-testid="miss-gap-choice"
@@ -204,7 +239,7 @@ export function MissGapRoundView({
                       onAnswer(choice.correct, choice.label);
                     }}
                     className={cn(
-                      'w-full text-start px-4 py-3.5 rounded-neo border-neo',
+                      'w-full h-full flex items-center text-start px-4 py-3 rounded-neo border-[3px]',
                       'font-neo-display font-bold text-base leading-snug shadow-hard-sm',
                       'transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                       reveal
@@ -225,32 +260,44 @@ export function MissGapRoundView({
         )}
       </div>
 
-      {/* Mascot reaction — pinned, never a layout jump. */}
+      </div>
+
+      {/* Mascot — present for the whole round, not only the reveal. Same box
+          either way, so the reveal never moves the layout under a thumb. */}
       <div className="h-16 shrink-0 flex items-center gap-2" aria-live="polite">
-        {locked ? (
-          <>
-            <Image
-              src={outcome === 'correct' ? MASCOT_IMAGES.powerup : MASCOT_IMAGES.cryingNobg}
-              alt=""
-              width={56}
-              height={56}
-              unoptimized
-              aria-hidden
-              className="w-14 h-14 shrink-0"
-            />
-            <p
-              data-testid="miss-gap-round-feedback"
-              className={cn(
-                'font-neo-display font-bold text-lg',
-                outcome === 'correct' ? 'text-neo-lime' : 'text-neo-pink',
-              )}
-            >
-              {outcome === 'correct'
-                ? t('education.homework.correct')
-                : t('education.homework.almost', { word: round.word })}
-            </p>
-          </>
-        ) : null}
+        <Image
+          src={
+            !locked
+              ? MASCOT_IMAGES.explorerNobg
+              : outcome === 'correct'
+                ? MASCOT_IMAGES.powerup
+                : MASCOT_IMAGES.cryingNobg
+          }
+          alt=""
+          width={56}
+          height={56}
+          unoptimized
+          aria-hidden
+          className="w-14 h-14 shrink-0"
+        />
+        <p
+          data-testid="miss-gap-round-feedback"
+          className={cn(
+            'font-neo-display font-bold',
+            locked ? 'text-xl' : 'text-base',
+            !locked
+              ? 'text-neo-cream'
+              : outcome === 'correct'
+                ? 'text-neo-lime'
+                : 'text-neo-cream',
+          )}
+        >
+          {!locked
+            ? t('education.homework.cheer')
+            : outcome === 'correct'
+              ? t('education.homework.correct')
+              : t('education.homework.almost', { word: round.word })}
+        </p>
       </div>
     </div>
   );

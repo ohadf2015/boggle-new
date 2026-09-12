@@ -180,13 +180,13 @@ export function VocabFocusPractice({
   if (total === 0) {
     return (
       <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="max-w-md w-full rounded-neo border-3 border-black shadow-hard bg-neo-cream p-6 text-center">
+        <div className="max-w-md w-full rounded-neo border-[3px] border-black shadow-hard bg-neo-cream p-6 text-center">
           <h2 className="text-2xl font-neo-display text-neo-black mb-2">{t(`education.vocabFocus.focus.${focus}`)}</h2>
           <p className="font-neo-body text-neo-black/80 mb-6 text-pretty">{t(`education.vocabFocus.notEnough.${focus}`)}</p>
           <Button
             onClick={onBack}
             aria-label={t('common.back')}
-            className="min-h-12 bg-neo-cyan text-neo-black font-neo-display border-3 border-black shadow-hard hover:shadow-hard-lg"
+            className="min-h-12 bg-neo-cyan text-neo-black font-neo-display border-[3px] border-black shadow-hard hover:shadow-hard-lg"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5 me-2" />
             {t('common.back')}
@@ -203,7 +203,6 @@ export function VocabFocusPractice({
           correct={correctCount}
           total={total}
           xpEarned={xpSessionData?.sessionXpEarned}
-          masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
           timeSpent={timeSpent}
           onRestart={handleRestart}
           onBack={onBack}
@@ -230,7 +229,7 @@ export function VocabFocusPractice({
           </Button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className={cn('inline-flex items-center justify-center w-8 h-8 rounded-neo border-2 border-black text-neo-black', style.bg)}>
+              <span className={cn('inline-flex items-center justify-center w-8 h-8 rounded-neo border-[2px] border-black text-neo-black', style.bg)}>
                 {style.icon}
               </span>
               <h2 className="text-xl font-neo-display text-neo-white truncate">
@@ -251,7 +250,7 @@ export function VocabFocusPractice({
           aria-valuemin={0}
           aria-valuemax={total}
           aria-valuenow={index}
-          className="h-3 w-full rounded-neo border-2 border-black bg-neo-black/30 overflow-hidden mb-6"
+          className="h-3 w-full rounded-neo border-[2px] border-black bg-neo-black/30 overflow-hidden mb-6"
         >
           <AdaptiveMotion.div
             className={cn('h-full', style.bg)}
@@ -263,7 +262,7 @@ export function VocabFocusPractice({
         {/* Prompt */}
         <div
           key={`prompt-${round}-${index}`}
-          className={cn('rounded-neo border-3 border-black shadow-hard p-6 mb-4', style.bg)}
+          className={cn('rounded-neo border-[3px] border-black shadow-hard p-6 mb-4', style.bg)}
         >
           <p className="text-xs font-neo-body font-bold uppercase tracking-wide text-neo-black/60 mb-2">
             {t(`education.vocabFocus.promptLabel.${focus}`)}
@@ -297,7 +296,7 @@ export function VocabFocusPractice({
                 disabled={answered}
                 data-state={state}
                 className={cn(
-                  'min-h-16 px-4 py-3 rounded-neo border-3 border-black font-neo-display text-lg text-start',
+                  'min-h-16 px-4 py-3 rounded-neo border-[3px] border-black font-neo-display text-lg text-start',
                   'transition-all shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
                   'disabled:cursor-default',
                   state === 'idle' && 'bg-neo-cream text-neo-black hover:bg-neo-white',
@@ -324,7 +323,7 @@ export function VocabFocusPractice({
             initial={{ y: 12 }}
             animate={{ y: 0 }}
             className={cn(
-              'mt-4 rounded-neo border-3 border-black shadow-hard p-4',
+              'mt-4 rounded-neo border-[3px] border-black shadow-hard p-4',
               wasCorrect ? 'bg-neo-lime' : 'bg-neo-pink'
             )}
           >
@@ -347,7 +346,7 @@ export function VocabFocusPractice({
             <Button
               onClick={handleNext}
               autoFocus
-              className="mt-3 w-full min-h-12 bg-neo-black text-neo-white font-neo-display text-lg border-3 border-black shadow-hard hover:bg-neo-navy"
+              className="mt-3 w-full min-h-12 bg-neo-black text-neo-white font-neo-display text-lg border-[3px] border-black shadow-hard hover:bg-neo-navy"
             >
               {isLast ? t('education.vocabFocus.finish') : t('education.vocabFocus.next')}
             </Button>

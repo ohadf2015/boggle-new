@@ -28,11 +28,20 @@
  * resolved for the removal to take effect.
  */
 
-import type { ReactNode } from 'react';
-import { useNavigation } from '@/contexts/NavigationContext';
+import { useContext, type ReactNode } from 'react';
+import NavigationContext from '@/contexts/NavigationContext';
 
 export function LobbySeoTail({ children }: { children: ReactNode }) {
-  const { isInGame } = useNavigation();
+  // Read the context directly rather than through `useNavigation()`, which
+  // THROWS outside a provider. `subpageSeoContent.test.tsx` renders this route's
+  // server tree in isolation to assert the HowTo copy is really in the HTML, and
+  // that render mounts no NavigationProvider — so the throwing hook turned a
+  // crawler-copy assertion into a crash. Same degrade-to-no-op convention the
+  // sibling hooks in NavigationContext already document (`useHideNavigation`,
+  // `useRegisterHeaderAudioControl`): no provider → `false` → the copy renders,
+  // which is exactly the crawler/logged-out case. In the app the layout always
+  // mounts the provider, so lobby behaviour is unchanged.
+  const isInGame = useContext(NavigationContext)?.isInGame ?? false;
   return <div hidden={isInGame}>{children}</div>;
 }
 

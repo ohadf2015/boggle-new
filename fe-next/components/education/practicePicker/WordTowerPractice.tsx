@@ -204,7 +204,7 @@ function WordTowerRun({
 
   if (!seeded) {
     return (
-      <div className="w-full bg-neo-navy p-4 rounded-neo border-3 border-black">
+      <div className="w-full bg-neo-navy p-4 rounded-neo border-[3px] border-black">
         <Button
           variant="ghost"
           size="sm"
@@ -229,7 +229,7 @@ function WordTowerRun({
   const canBuild = tower.word.length >= WORD_TOWER_MIN_WORD_LEN;
 
   return (
-    <div className="w-full bg-neo-navy rounded-neo border-3 border-black p-4">
+    <div className="w-full bg-neo-navy rounded-neo border-[3px] border-black p-4">
       <div className="flex items-center gap-2 mb-3">
         <Button
           variant="ghost"
@@ -247,7 +247,7 @@ function WordTowerRun({
           type="button"
           data-testid="word-tower-practice-done"
           onClick={handleDone}
-          className="shrink-0 rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-black shadow-hard active:translate-y-0.5"
+          className="shrink-0 rounded-neo border-[2px] border-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-black shadow-hard active:translate-y-0.5"
         >
           {t('education.wordTowerPractice.done')}
         </button>
@@ -257,7 +257,7 @@ function WordTowerRun({
       <p
         data-testid="word-tower-practice-hits"
         data-count={hits.length}
-        className="text-xs font-neo-body font-bold uppercase text-neo-white/70 tabular-nums mb-2"
+        className="text-xs font-neo-body font-bold uppercase text-neo-cream tabular-nums mb-2"
       >
         {t('education.wordTowerPractice.progress', {
           found: hits.length,
@@ -273,7 +273,7 @@ function WordTowerRun({
               data-testid={`word-tower-practice-target-${target}`}
               data-hit={isHit ? 'true' : 'false'}
               className={cn(
-                'flex items-center gap-1 rounded-neo border-2 border-black px-2 py-1 font-neo-display text-sm font-black uppercase',
+                'flex items-center gap-1 rounded-neo border-[2px] border-black px-2 py-1 font-neo-display text-sm font-black uppercase',
                 isHit
                   ? 'bg-neo-lime text-black'
                   : target === next
@@ -305,7 +305,7 @@ function WordTowerRun({
       {lastHit && (
         <p
           role="status"
-          className="mb-3 rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-black"
+          className="mb-3 rounded-neo border-[2px] border-black bg-neo-lime px-3 py-1.5 font-neo-display text-sm font-black uppercase text-black"
         >
           {t('education.wordTowerPractice.hit', { word: lastHit })}
         </p>

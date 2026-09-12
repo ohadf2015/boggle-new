@@ -34,6 +34,7 @@
 import type { Namespace } from 'socket.io';
 import type { DuelSocket } from './types';
 import { registerLifecycleHandlers } from './lifecycle';
+import { registerRematchHandlers } from './rematch';
 import { registerLobbyHandlers } from './lobby';
 import { registerGameplayHandlers } from './gameplay';
 import { registerRealtimeHandlers } from './realtime';
@@ -60,6 +61,9 @@ export function registerDuelHandlers(namespace: Namespace, socket: DuelSocket): 
 
   // Register lifecycle handlers (create, accept, decline, cancel)
   registerLifecycleHandlers(namespace, socket);
+
+  // Register the rematch handshake (offer -> match -> one duel for both)
+  registerRematchHandlers(namespace, socket);
 
   // Register lobby handlers (join, leave, disconnect cleanup)
   registerLobbyHandlers(namespace, socket);

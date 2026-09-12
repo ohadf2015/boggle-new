@@ -15,9 +15,12 @@
  * list, so the two are kept apart: `/teacher` is quiet-chrome (no install
  * pills) AND navigable (tabs).
  *
- * Tab budget is 4, not the 5 the brief allows. `/teacher` has no classroom
- * index route — classes live on the dashboard — and a tab that duplicates the
- * hub it sits next to is a choice the teacher should not have to make.
+ * Tab budget: up to 5 per the addendum. Teacher used to stop at 4 because
+ * `/teacher` had no classroom index route — classes lived only inside the
+ * dashboard's tools section. The 2026-09-11 18:45 addendum update pins the
+ * teacher row at Play · Classes · Lessons · Reports · Me explicitly, so
+ * `/teacher/classroom` (a thin wrapper around the same `ClassroomManager` the
+ * dashboard already mounts) now exists as that index route.
  */
 
 export type EducationNavKind = 'teacher' | 'student';
@@ -32,13 +35,14 @@ export interface EducationNavItem {
   /** Translation key — resolved by the caller, which owns `t`. */
   labelKey: string;
   /** lucide icon name, resolved in `EducationNav` so this module stays pure. */
-  icon: 'play' | 'book' | 'chart' | 'user' | 'trophy' | 'dumbbell';
+  icon: 'play' | 'book' | 'chart' | 'user' | 'trophy' | 'dumbbell' | 'users';
 }
 
 type NavTemplate = Omit<EducationNavItem, 'href'>;
 
 const TEACHER_TABS: readonly NavTemplate[] = [
   { key: 'play', segment: '', labelKey: 'teacher.nav.play', icon: 'play' },
+  { key: 'classes', segment: 'classroom', labelKey: 'teacher.nav.classes', icon: 'users' },
   { key: 'lessons', segment: 'curriculum', labelKey: 'teacher.nav.lessons', icon: 'book' },
   { key: 'reports', segment: 'reports', labelKey: 'teacher.nav.reports', icon: 'chart' },
   { key: 'me', segment: 'profile', labelKey: 'teacher.nav.me', icon: 'user' },

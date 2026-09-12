@@ -78,12 +78,12 @@ export function MissGapGradePassback({
     return (
       <div
         data-testid="miss-gap-grade-passback"
-        className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard text-center"
+        className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard text-center"
       >
         <p className="text-neo-white font-neo-body mb-4">{t('education.results.allFound')}</p>
         <Link
           href={`/${locale}/education`}
-          className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard"
+          className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard"
         >
           {t('education.results.shareGapCta')}
         </Link>
@@ -92,29 +92,32 @@ export function MissGapGradePassback({
   }
 
   return (
-    <div className="w-full max-w-xl flex flex-col gap-4" data-testid="miss-gap-grade-passback-stack">
+    // Phone: one column that the route's single scroll region handles. From
+    // `lg`: two columns, because stacked at 1440x900 the parent-share card and
+    // its two links stood entirely below the fold while 460px of width sat
+    // empty on either side. `items-start` + `content-start` keep the rows at
+    // their content height — a stretched grid is what floated the assignment
+    // card's disclosure 190px under the card it belongs to.
+    <div
+      className="w-full max-w-xl flex flex-col gap-4 lg:max-w-5xl lg:grid lg:grid-cols-2 lg:items-start lg:content-start lg:gap-5"
+      data-testid="miss-gap-grade-passback-stack"
+    >
     <div
       data-testid="miss-gap-grade-passback"
-      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard"
+      className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard"
     >
-      <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">
+      <p className="text-neo-lime font-bold text-xs uppercase tracking-widest mb-2">
         {t('education.results.missGapGradePassbackEyebrow')}
       </p>
       <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight">
         {t('education.results.missGapGradePassbackHeading')}
       </h1>
-      <p className="text-neo-white/80 font-neo-body text-sm mt-3">
+      <p className="text-neo-cream font-neo-body text-sm mt-3">
         {t('education.results.missGapGradePassbackSubtitle')}
-      </p>
-      <p
-        className="text-neo-lime/90 font-neo-body text-xs mt-2"
-        data-testid="miss-gap-grade-passback-foil"
-      >
-        {t('education.results.missGapGradePassbackFoil')}
       </p>
 
       <div
-        className="mt-5 p-4 rounded-neo border-neo border-neo-black bg-neo-navy flex flex-col gap-2"
+        className="mt-5 p-4 rounded-neo border-[3px] border-neo-cream bg-neo-navy flex flex-col gap-2"
         data-testid="miss-gap-grade-score"
         data-points={score.pointsEarned}
         data-max={score.maxPoints}
@@ -128,20 +131,20 @@ export function MissGapGradePassback({
             max: score.maxPoints,
           })}
         </div>
-        <p className="text-neo-white/80 font-neo-body text-sm">
+        <p className="text-neo-cream font-neo-body text-sm">
           {score.onTime
-            ? t('education.results.missGapGradePassbackOnTime')
+            ? t('education.homework.gradeOnTime')
             : t('education.results.missGapGradePassbackLate')}
         </p>
         {payload.dueDate ? (
-          <p className="flex items-center gap-2 text-neo-white/70 text-xs">
+          <p className="flex items-center gap-2 text-neo-cream text-xs">
             <ClipboardList className="w-3.5 h-3.5" aria-hidden />
             {t('education.results.missGapGradePassbackDue', { due: payload.dueDate })}
           </p>
         ) : null}
       </div>
 
-      <p className="text-neo-white/60 font-neo-body text-xs mt-3" data-testid="miss-gap-grade-privacy">
+      <p className="text-neo-cream font-neo-body text-xs mt-3" data-testid="miss-gap-grade-privacy">
         {t('education.results.missGapGradePassbackPrivacy')}
       </p>
 
@@ -153,7 +156,7 @@ export function MissGapGradePassback({
           disabled={!payload.dueDate}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
+            'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg transition-all',
             !payload.dueDate && 'opacity-50 cursor-not-allowed',
           )}
@@ -176,7 +179,7 @@ export function MissGapGradePassback({
           data-testid="miss-gap-grade-back-homework"
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
+            'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition-all',
           )}
         >

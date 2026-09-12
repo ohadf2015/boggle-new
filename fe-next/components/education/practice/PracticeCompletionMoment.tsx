@@ -29,9 +29,10 @@ import { fireVictoryConfetti, fireRankConfetti } from '@/utils/confettiUtils';
 import { Mascot } from '@/components/ui/Mascot';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, ArrowRight, RotateCcw, Star, Zap } from 'lucide-react';
+import { ArrowRight, RotateCcw, Star, X, Zap } from 'lucide-react';
 import { practiceCelebrationPlan, coinBurstCount } from '@/lib/education/practiceJuice';
 import XpCoinFlight from './XpCoinFlight';
+import { usePracticeCelebration } from './PracticeCelebrationContext';
 
 export interface CompletionStat {
   /** Stable id — also the testid suffix. */
@@ -44,8 +45,6 @@ export interface PracticeCompletionMomentProps {
   correct: number;
   total: number;
   xpEarned?: number;
-  /** Server-authored "you mastered X" line, shown under the headline. */
-  masteryMessage?: string | null;
   /** Per-mode extras — words found, best streak, time, hints. */
   stats?: CompletionStat[];
   /** Replay this same mode. */
@@ -69,7 +68,6 @@ export default function PracticeCompletionMoment({
   correct,
   total,
   xpEarned = 0,
-  masteryMessage,
   stats,
   onAgain,
   onNext,
@@ -88,6 +86,21 @@ export default function PracticeCompletionMoment({
   const [coinsFlying, setCoinsFlying] = useState(0);
 
   const plan = useMemo(() => practiceCelebrationPlan(correct, total), [correct, total]);
+
+  /*
+    A level-up earned by THIS round belongs on this card, not in a modal on top
+    of it. Claim it once, keep a local copy so the banner survives the claim,
+    and tell the session it has been shown so `LevelUpCelebration` stays shut.
+  */
+  const { levelUp, acknowledge } = usePracticeCelebration();
+  const [claimedLevel, setClaimedLevel] = useState<number | null>(null);
+  const claimedRef = useRef(false);
+  useEffect(() => {
+    if (claimedRef.current || !levelUp) return;
+    claimedRef.current = true;
+    setClaimedLevel(levelUp.newLevel);
+    acknowledge();
+  }, [levelUp, acknowledge]);
 
   useEffect(() => {
     if (firedRef.current) return;
@@ -126,11 +139,22 @@ export default function PracticeCompletionMoment({
       data-rank={plan.rank}
       dir={dir}
       className={cn(
-        'mx-auto w-full max-w-sm overflow-hidden rounded-neo border-3 border-black bg-neo-navy shadow-hard-lg',
+        'relative mx-auto w-full max-w-sm overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard-lg',
         className
       )}
     >
       <span className={cn('block h-2.5 w-full', RANK_ACCENT[plan.rank])} aria-hidden="true" />
+
+      {/* Leaving is chrome, not a third button competing with the payoff. */}
+      <button
+        type="button"
+        data-testid="practice-completion-exit"
+        onClick={onBack}
+        aria-label={t('student.practiceFun.allGames')}
+        className="absolute end-2 top-4 flex h-9 w-9 items-center justify-center rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream transition-colors hover:bg-neo-navy-light"
+      >
+        <X className="h-4 w-4" aria-hidden="true" />
+      </button>
 
       <div className="flex flex-col items-center gap-3 px-5 py-5 text-center">
         {/* Stars — the headline result, read before any number. */}
@@ -151,7 +175,7 @@ export default function PracticeCompletionMoment({
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.12 * slot, type: 'spring', stiffness: 380, damping: 13 }}
                 className={cn(
-                  'flex h-11 w-11 items-center justify-center rounded-neo border-3 border-black',
+                  'flex h-11 w-11 items-center justify-center rounded-neo border-[3px] border-black',
                   filled ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-navy/60 border-black/40'
                 )}
               >
@@ -175,10 +199,6 @@ export default function PracticeCompletionMoment({
           {t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}
         </p>
 
-        {masteryMessage && (
-          <p className="font-neo-body text-sm font-bold text-neo-lime text-pretty">{masteryMessage}</p>
-        )}
-
         {xpEarned > 0 && (
           <AdaptiveMotion.div
             ref={xpChipRef}
@@ -186,11 +206,26 @@ export default function PracticeCompletionMoment({
             initial={{ scale: 0.6 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.42, type: 'spring', stiffness: 420, damping: 14 }}
-            className="inline-flex items-center gap-1.5 rounded-neo border-3 border-black bg-neo-yellow px-3 py-1.5 shadow-hard-sm"
+            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-black bg-neo-yellow px-3 py-1.5 shadow-hard-sm"
           >
             <Zap className="h-4 w-4 fill-black text-black" aria-hidden="true" />
             <span className="font-neo-display text-base font-black tabular-nums text-black">
               {t('student.practiceFun.xpGain', { xp: xpEarned })}
+            </span>
+          </AdaptiveMotion.div>
+        )}
+
+        {claimedLevel !== null && (
+          <AdaptiveMotion.div
+            data-testid="practice-completion-levelup"
+            initial={{ scale: 0.7 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 13 }}
+            className="flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-yellow px-3 py-2 shadow-hard-sm"
+          >
+            <Star className="h-4 w-4 fill-black text-black" aria-hidden="true" />
+            <span className="font-neo-display text-base font-black uppercase text-black">
+              {t('student.practiceFun.levelUp', { level: claimedLevel })}
             </span>
           </AdaptiveMotion.div>
         )}
@@ -201,12 +236,12 @@ export default function PracticeCompletionMoment({
               <div
                 key={stat.key}
                 data-testid={`practice-completion-stat-${stat.key}`}
-                className="rounded-neo border-2 border-black/50 bg-black/25 px-2 py-1.5"
+                className="rounded-neo border-[2px] border-black/50 bg-black/25 px-2 py-1.5"
               >
                 <p className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-cyan">
                   {stat.value}
                 </p>
-                <p className="mt-0.5 font-neo-body text-[11px] font-bold leading-tight text-neo-white/70">
+                <p className="mt-0.5 font-neo-body text-[11px] font-bold leading-tight text-neo-cream">
                   {stat.label}
                 </p>
               </div>
@@ -214,63 +249,44 @@ export default function PracticeCompletionMoment({
           </div>
         )}
 
-        {/* One big forward action. NEXT when there is somewhere to go, AGAIN otherwise. */}
-        <div className="mt-1 flex w-full flex-col gap-2">
-          {onNext ? (
-            <>
-              <button
-                type="button"
-                data-testid="practice-completion-next"
-                onClick={onNext}
-                className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-black shadow-hard transition-all hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
-              >
+        {/*
+          ONE dominant action. NEXT when the lesson has somewhere to go, AGAIN
+          otherwise — and the only other choice is half the width and half the
+          type size beneath it, so the eye never has to rank two equals.
+        */}
+        <div data-testid="practice-completion-actions" className="mt-1 flex w-full flex-col items-center gap-2">
+          <button
+            type="button"
+            data-primary="true"
+            data-testid={onNext ? 'practice-completion-next' : 'practice-completion-again'}
+            onClick={onNext ?? onAgain}
+            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-black shadow-hard transition-all hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            {onNext ? (
+              <>
                 {nextLabel
                   ? t('student.practiceFun.nextMode', { mode: nextLabel })
                   : t('student.practiceFun.next')}
                 <DirectionalIcon icon={ArrowRight} className="h-5 w-5" />
-              </button>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  data-testid="practice-completion-again"
-                  onClick={onAgain}
-                  className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-neo border-3 border-black bg-neo-cream px-3 font-neo-display text-sm font-black uppercase text-black shadow-hard-sm"
-                >
-                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                  {t('student.practiceFun.again')}
-                </button>
-                <button
-                  type="button"
-                  data-testid="practice-completion-back"
-                  onClick={onBack}
-                  className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-neo border-3 border-neo-cream bg-neo-navy px-3 font-neo-display text-sm font-black uppercase text-neo-cream"
-                >
-                  <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
-                  {t('student.practiceFun.allGames')}
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                data-testid="practice-completion-again"
-                onClick={onAgain}
-                className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-4 font-neo-display text-lg font-black uppercase text-black shadow-hard transition-all hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
-              >
+              </>
+            ) : (
+              <>
                 <RotateCcw className="h-5 w-5" aria-hidden="true" />
                 {t('student.practiceFun.again')}
-              </button>
-              <button
-                type="button"
-                data-testid="practice-completion-back"
-                onClick={onBack}
-                className="flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-neo border-3 border-neo-cream bg-neo-navy px-3 font-neo-display text-sm font-black uppercase text-neo-cream"
-              >
-                <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
-                {t('student.practiceFun.allGames')}
-              </button>
-            </>
+              </>
+            )}
+          </button>
+
+          {onNext && (
+            <button
+              type="button"
+              data-testid="practice-completion-again"
+              onClick={onAgain}
+              className="flex min-h-[40px] w-3/5 items-center justify-center gap-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-3 font-neo-body text-xs font-bold uppercase text-neo-cream transition-colors hover:bg-neo-navy-light"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('student.practiceFun.again')}
+            </button>
           )}
         </div>
       </div>

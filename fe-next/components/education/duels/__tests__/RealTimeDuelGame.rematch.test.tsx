@@ -52,6 +52,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'duels.backToLobby': 'Back to Lobby',
         'education.duels.rematch': 'Rematch',
         'education.duels.rematchSent': 'Waiting for them...',
+        'education.duels.rematchWaiting': 'Waiting for them',
+        'education.duels.rematchAccept': 'Accept rematch',
+        'education.duels.rematchInvited': 'Invite sent',
+        'education.duels.waitingForName': 'Waiting for opponent...',
+        'education.duels.tryAgain': 'Try again',
       };
       return translations[key] || key;
     },
@@ -63,6 +68,7 @@ describe('RealTimeDuelGame — rematch', () => {
   let completedCallback: ((data: any) => void) | null = null;
   let createdCallback: ((data: any) => void) | null = null;
   let errorCallback: ((data: any) => void) | null = null;
+  let rematchOfferedCallback: ((data: any) => void) | null = null;
 
   const defaultProps = {
     duelId: 'duel-1',
@@ -78,6 +84,7 @@ describe('RealTimeDuelGame — rematch', () => {
     completedCallback = null;
     createdCallback = null;
     errorCallback = null;
+    rematchOfferedCallback = null;
     (useDuelSocket as any).mockReturnValue({
       socket: { emit: mockEmit },
       isConnected: true,
@@ -98,6 +105,14 @@ describe('RealTimeDuelGame — rematch', () => {
         createdCallback = cb;
         return () => {};
       }),
+      onRematchOffered: vi.fn((cb) => {
+        rematchOfferedCallback = cb;
+        return () => {};
+      }),
+      onRematchPending: vi.fn(() => () => {}),
+      onRematchInvited: vi.fn(() => () => {}),
+      onRematchWithdrawn: vi.fn(() => () => {}),
+      joinDuelGame: vi.fn(),
       onError: vi.fn((cb) => {
         errorCallback = cb;
         return () => {};
@@ -143,6 +158,7 @@ describe('RealTimeDuelGame — rematch', () => {
     expect(mockEmit).toHaveBeenCalledWith('duel:rematch', {
       opponentId: 'opponent-1',
       lessonId: 'lesson-1',
+      duelId: 'duel-1',
     });
   });
 });
@@ -152,6 +168,7 @@ describe('RealTimeDuelGame — rematch destination', () => {
   let completedCallback: ((data: any) => void) | null = null;
   let createdCallback: ((data: any) => void) | null = null;
   let errorCallback: ((data: any) => void) | null = null;
+  let rematchOfferedCallback: ((data: any) => void) | null = null;
 
   const defaultProps = {
     duelId: 'duel-1',
@@ -178,6 +195,7 @@ describe('RealTimeDuelGame — rematch destination', () => {
     completedCallback = null;
     createdCallback = null;
     errorCallback = null;
+    rematchOfferedCallback = null;
     (useDuelSocket as any).mockReturnValue({
       socket: { emit: mockEmit },
       isConnected: true,
@@ -198,6 +216,14 @@ describe('RealTimeDuelGame — rematch destination', () => {
         createdCallback = cb;
         return () => {};
       }),
+      onRematchOffered: vi.fn((cb) => {
+        rematchOfferedCallback = cb;
+        return () => {};
+      }),
+      onRematchPending: vi.fn(() => () => {}),
+      onRematchInvited: vi.fn(() => () => {}),
+      onRematchWithdrawn: vi.fn(() => () => {}),
+      joinDuelGame: vi.fn(),
       onError: vi.fn((cb) => {
         errorCallback = cb;
         return () => {};
@@ -223,13 +249,46 @@ describe('RealTimeDuelGame — rematch destination', () => {
     });
   });
 
-  it('shows a waiting state on the button until the server answers', async () => {
+  it('waits for the other student instead of navigating on its own', async () => {
     render(<RealTimeDuelGame {...defaultProps} />);
     complete();
 
     await waitFor(() => fireEvent.click(screen.getByTestId('duel-rematch-btn')));
 
-    expect(screen.getByTestId('duel-rematch-btn')).toHaveAttribute('data-pending', 'true');
+    expect(screen.getByTestId('duel-rematch-btn')).toHaveAttribute('data-state', 'pending');
+    // The bug this replaces: the tapper used to be sent into a duel room the
+    // opponent had never agreed to, and both sides then waited forever.
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('turns into ACCEPT when the other student asked first', async () => {
+    render(<RealTimeDuelGame {...defaultProps} />);
+    complete();
+
+    await waitFor(() => expect(screen.getByTestId('duel-rematch-btn')).toBeInTheDocument());
+
+    act(() => {
+      rematchOfferedCallback?.({ fromUserId: 'opponent-1', fromName: 'Maya' });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('duel-rematch-btn')).toHaveAttribute('data-state', 'offered');
+    });
+  });
+
+  it('follows the one duel the server agreed for both, even after its own wait lapsed', async () => {
+    render(<RealTimeDuelGame {...defaultProps} />);
+    complete();
+
+    await waitFor(() => expect(screen.getByTestId('duel-rematch-btn')).toBeInTheDocument());
+
+    act(() => {
+      createdCallback?.({ duelId: 'duel-7', isRematch: true });
+    });
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/en/education/duels/duel-7');
+    });
   });
 
   // A rejected rematch (rate limit, lesson gone) must not leave a dead button.
@@ -244,7 +303,7 @@ describe('RealTimeDuelGame — rematch destination', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('duel-rematch-btn')).toHaveAttribute('data-pending', 'false');
+      expect(screen.getByTestId('duel-rematch-btn')).toHaveAttribute('data-state', 'idle');
     });
   });
 
@@ -297,6 +356,11 @@ describe('RealTimeDuelGame — a new duel is a clean slate', () => {
         return () => {};
       }),
       onDuelCreated: vi.fn(() => () => {}),
+      onRematchOffered: vi.fn(() => () => {}),
+      onRematchPending: vi.fn(() => () => {}),
+      onRematchInvited: vi.fn(() => () => {}),
+      onRematchWithdrawn: vi.fn(() => () => {}),
+      joinDuelGame: vi.fn(),
       onError: vi.fn(() => () => {}),
     });
   });
@@ -323,6 +387,6 @@ describe('RealTimeDuelGame — a new duel is a clean slate', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('duel-reveal')).not.toBeInTheDocument();
     });
-    expect(screen.getByText('Waiting for opponent...')).toBeInTheDocument();
+    expect(screen.getByTestId('duel-waiting')).toBeInTheDocument();
   });
 });

@@ -49,6 +49,22 @@ const CHIP_ART: Record<string, string> = {
 /** Last-resort art, so no tile can ever render empty. */
 const FALLBACK_CHIP = '/mascot/trophy-nobg.webp';
 
+/**
+ * Hero art for the three modes whose bespoke poster is a tall 896x1200 plate.
+ *
+ * A poster works on a tile, where the frame is nearly as tall as it is wide. The
+ * hero frame is landscape, so `object-cover` throws away two thirds of the
+ * drawing and lands on the mascot's chin — and `object-contain` is worse, since
+ * the poster is painted on neo-navy and a navy rectangle sitting on a pink fill
+ * reads as a failed image load. The hero therefore always floats a transparent
+ * mascot on the accent, which cannot crop wrong at any size.
+ */
+const HERO_CHIP: Record<string, string> = {
+  blitz: '/mascot/onfire-nobg.webp',
+  spelling: '/mascot/powerup-nobg.webp',
+  flashcard: '/mascot/mindblown-nobg.webp',
+};
+
 export type PracticeArtKind = 'poster' | 'chip';
 
 export interface PracticeTileArt {
@@ -61,6 +77,17 @@ export function practiceTileArt(tileId: string): PracticeTileArt {
   const poster = POSTER_ART[tileId];
   if (poster) return { src: poster, kind: 'poster' };
   return { src: CHIP_ART[tileId] ?? FALLBACK_CHIP, kind: 'chip' };
+}
+
+/**
+ * Transparent mascot for the recommended-practice hero.
+ *
+ * Only `-nobg` art is eligible: everything else in the library is baked onto an
+ * opaque dark or white rectangle, which on a lime or pink fill reads as a bug
+ * rather than a mascot.
+ */
+export function practiceHeroArt(tileId: string): string {
+  return HERO_CHIP[tileId] ?? CHIP_ART[tileId] ?? FALLBACK_CHIP;
 }
 
 /**

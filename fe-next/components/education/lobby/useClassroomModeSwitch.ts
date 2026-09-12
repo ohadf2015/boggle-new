@@ -37,6 +37,9 @@ export interface ClassroomModeSwitchArgs {
   currentMode: ClassroomGameMode;
   socket: Socket | null;
   t: Translate;
+  /** Called with the server-confirmed mode, so the surrounding surface can
+   *  re-describe the room in the same tick. */
+  onApplied?: (mode: ClassroomGameMode) => void;
 }
 
 /**
@@ -61,6 +64,7 @@ export function useClassroomModeSwitch({
   currentMode,
   socket,
   t,
+  onApplied,
 }: ClassroomModeSwitchArgs) {
   const { setGameMode, setHostSelectedGameMode } = useGameActions();
   /** Set once the SERVER has confirmed; null means "whatever the caller says". */
@@ -68,6 +72,10 @@ export function useClassroomModeSwitch({
   const [pendingMode, setPendingMode] = useState<ClassroomGameMode | null>(null);
   const pendingRef = useRef<ClassroomGameMode | null>(null);
   pendingRef.current = pendingMode;
+  // Held in a ref so a caller passing an inline arrow does not tear the socket
+  // listeners down and rebuild them on every render.
+  const appliedCbRef = useRef(onApplied);
+  appliedCbRef.current = onApplied;
 
   useEffect(() => {
     if (!socket) return;
@@ -89,6 +97,7 @@ export function useClassroomModeSwitch({
       }
       setAppliedMode(mode);
       setPendingMode(null);
+      appliedCbRef.current?.(mode);
       toast.success(t('education.modePicker.switched', { mode: t(`teacher.classroom.gameModes.${modeKeySuffix(mode)}`) }));
     };
 

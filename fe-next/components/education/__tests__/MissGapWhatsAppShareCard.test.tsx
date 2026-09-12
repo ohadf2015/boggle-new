@@ -32,10 +32,12 @@ describe('MissGapWhatsAppShareCard', () => {
     vi.stubGlobal('open', openSpy);
   });
 
-  it('shows foil + due + words and opens wa.me with parent card URL', () => {
+  it('shows due + words and opens wa.me with parent card URL, no positioning copy', () => {
     render(<MissGapWhatsAppShareCard payload={payload} />);
     expect(screen.getByTestId('miss-gap-whatsapp-share-card')).toBeInTheDocument();
-    expect(screen.getByTestId('miss-gap-whatsapp-foil')).toBeInTheDocument();
+    // Competitor-positioning copy was written for the PR, not for the parent
+    // reading this on a phone. One element fewer.
+    expect(screen.queryByTestId('miss-gap-whatsapp-foil')).not.toBeInTheDocument();
     expect(screen.getByTestId('miss-gap-whatsapp-due')).toBeInTheDocument();
     expect(screen.getByTestId('miss-gap-whatsapp-words')).toHaveTextContent('neutron');
     expect(screen.getByTestId('miss-gap-whatsapp-privacy')).toBeInTheDocument();

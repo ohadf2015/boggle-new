@@ -100,7 +100,7 @@ describe('RealTimeDuelGame', () => {
     );
 
     expect(screen.getByTestId('realtime-duel-game')).toBeInTheDocument();
-    expect(screen.getByText('duels.waitingForOpponent')).toBeInTheDocument();
+    expect(screen.getByTestId('duel-waiting')).toBeInTheDocument();
   });
 
   it('should transition to playing when duel:started received', async () => {
@@ -113,7 +113,7 @@ describe('RealTimeDuelGame', () => {
     );
 
     // Initially waiting
-    expect(screen.getByText('duels.waitingForOpponent')).toBeInTheDocument();
+    expect(screen.getByTestId('duel-waiting')).toBeInTheDocument();
 
     // Emit duel:started event
     const startData: DuelStartedData = {
@@ -132,7 +132,7 @@ describe('RealTimeDuelGame', () => {
 
     // Should transition to playing
     await waitFor(() => {
-      expect(screen.queryByText('duels.waitingForOpponent')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('duel-waiting')).not.toBeInTheDocument();
       expect(screen.getByTestId('duel-timer')).toBeInTheDocument();
     });
   });

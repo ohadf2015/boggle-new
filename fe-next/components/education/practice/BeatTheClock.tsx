@@ -118,7 +118,7 @@ export default function BeatTheClock({
         onClick={handleToggle}
         aria-pressed={enabled}
         className={cn(
-          'inline-flex min-h-[36px] items-center gap-1.5 rounded-neo border-3 px-2.5 py-1 font-neo-display text-xs font-black uppercase transition-colors',
+          'inline-flex min-h-[36px] items-center gap-1.5 rounded-neo border-[3px] px-2.5 py-1 font-neo-display text-xs font-black uppercase transition-colors',
           // ON is a filled pink control; OFF keeps the navy fill, so the cream
           // border is the only thing that can make it findable at all.
           enabled
@@ -145,7 +145,7 @@ export default function BeatTheClock({
           >
             {formatClock(left)}
           </span>
-          <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-neo border-2 border-black bg-black/40">
+          <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-neo border-[2px] border-black bg-black/40">
             <div
               className={cn(
                 'h-full transition-[width] duration-1000 ease-linear',

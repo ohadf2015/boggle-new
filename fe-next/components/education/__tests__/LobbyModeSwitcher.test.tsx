@@ -32,14 +32,6 @@ vi.mock('react-hot-toast', () => ({
   default: { error: mockToastError, success: mockToastSuccess },
 }));
 
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string, params?: unknown) =>
-      params && typeof params === 'object' ? `${key}|${JSON.stringify(params)}` : key,
-    language: 'en',
-  }),
-}));
-
 const { setGameMode, setHostSelectedGameMode } = vi.hoisted(() => ({
   setGameMode: vi.fn(),
   setHostSelectedGameMode: vi.fn(),
@@ -64,9 +56,20 @@ const socket = {
 
 const CODE = 'JATS5Z';
 
+const t = (key: string, params?: Record<string, string | number>) =>
+  params ? `${key}|${JSON.stringify(params)}` : key;
+
+const onModeApplied = vi.fn();
+
 function renderSwitcher(currentMode = 'classic') {
   return render(
-    <LobbyModeSwitcher gameCode={CODE} currentMode={currentMode as never} socket={socket} />
+    <LobbyModeSwitcher
+      gameCode={CODE}
+      currentMode={currentMode as never}
+      socket={socket}
+      t={t}
+      onModeApplied={onModeApplied}
+    />
   );
 }
 
@@ -93,7 +96,7 @@ describe('LobbyModeSwitcher — the room keeps its code', () => {
 
   it('names the live game and offers exactly one way to change it', async () => {
     renderSwitcher();
-    expect(screen.getByTestId('lobby-mode-switcher')).toHaveTextContent(
+    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent(
       'teacher.classroom.gameModes.classic'
     );
     expect(screen.getAllByTestId('lobby-change-mode')).toHaveLength(1);
@@ -126,7 +129,7 @@ describe('LobbyModeSwitcher — the room keeps its code', () => {
     await waitFor(() =>
       expect(JSON.parse(sessionStorage.getItem('lessonGameData')!).gameMode).toBe('vocab-quiz')
     );
-    expect(screen.getByTestId('lobby-mode-switcher')).toHaveTextContent(
+    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent(
       'teacher.classroom.gameModes.vocabQuiz'
     );
   });
@@ -153,12 +156,12 @@ describe('LobbyModeSwitcher — the room keeps its code', () => {
     fireEvent.click(screen.getByTestId('mode-tile-vocab-quiz'));
     ack('vocab-quiz');
 
-    await waitFor(() => expect(screen.getByTestId('lobby-mode-switcher')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('lobby-change-mode')).toBeInTheDocument());
     expect(setHostSelectedGameMode).not.toHaveBeenCalledWith('vocab-quiz');
     expect(setGameMode).not.toHaveBeenCalledWith('vocab-quiz');
   });
 
-  it('closes the fold and says so when the switch lands', async () => {
+  it('closes the sheet and says so when the switch lands', async () => {
     renderSwitcher();
     fireEvent.click(screen.getByTestId('lobby-change-mode'));
     fireEvent.click(screen.getByTestId('mode-tile-blast'));
@@ -177,10 +180,47 @@ describe('LobbyModeSwitcher — the room keeps its code', () => {
     act(() => handlers['classroomGameError']?.({ error: 'education.modePicker.switchMidRound' }));
 
     await waitFor(() => expect(mockToastError).toHaveBeenCalled());
-    expect(screen.getByTestId('lobby-mode-switcher')).toHaveTextContent(
+    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent(
       'teacher.classroom.gameModes.classic'
     );
     expect(JSON.parse(sessionStorage.getItem('lessonGameData')!).gameMode).toBe('classic');
+  });
+
+  /**
+   * The surrounding surface has its own copies of "what are we playing" — the
+   * settings chips and the start-button copy, both fed from `lessonGameData`,
+   * which the multiplayer shell reads into React state once at mount. Measured
+   * live 2026-09-11: without this the chip said BLAST while the row beside it
+   * offered "10 · Questions" and the button still said START QUIZ.
+   */
+  it('tells the surrounding surface, so the whole lobby re-describes the room', async () => {
+    renderSwitcher();
+    fireEvent.click(screen.getByTestId('lobby-change-mode'));
+    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+
+    expect(onModeApplied).not.toHaveBeenCalled(); // not until the server agrees
+    ack('blast');
+
+    await waitFor(() => expect(onModeApplied).toHaveBeenCalledWith('blast'));
+  });
+
+  /**
+   * The chip lives in the projector footer, whose every other chip is sized in
+   * `vw` — correct on a wall, and 10px in a 22px-tall target on a 390px phone,
+   * which is the teacher's own screen for half the sessions in this product.
+   * Measured live 2026-09-11 at 390x844: 56x22 CSS px, font 10.14px. A control
+   * that small is not a control. Phone-first sizing here, `vw` only from `md`.
+   */
+  it('stays a real tap target on the teacher phone, not a 10px projector chip', () => {
+    renderSwitcher();
+    const chip = screen.getByTestId('lobby-change-mode');
+    expect(chip.className).toContain('min-h-11');
+    expect(chip.className).toContain('text-[15px]');
+    // Any vw sizing must be behind a breakpoint, never the phone default.
+    const bare = chip.className
+      .split(/\s+/)
+      .filter((c) => /\[[\d.]+vw\]/.test(c) && !/^(sm|md|lg|xl):/.test(c));
+    expect(bare).toEqual([]);
   });
 
   /** An ack for some other room must not repaint this one. */
@@ -190,8 +230,8 @@ describe('LobbyModeSwitcher — the room keeps its code', () => {
     fireEvent.click(screen.getByTestId('mode-tile-blast'));
     ack('wheel-rush', 'OTHER1');
 
-    await waitFor(() => expect(screen.getByTestId('lobby-mode-switcher')).toBeInTheDocument());
-    expect(screen.getByTestId('lobby-mode-switcher')).toHaveTextContent(
+    await waitFor(() => expect(screen.getByTestId('lobby-change-mode')).toBeInTheDocument());
+    expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent(
       'teacher.classroom.gameModes.classic'
     );
   });

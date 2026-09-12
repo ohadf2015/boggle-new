@@ -14,7 +14,7 @@
  * "first move" rather than inviting a student to "beat 0".
  */
 
-import { Swords, Target } from 'lucide-react';
+import { Swords, Target, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { duelTauntById, type DuelTauntId } from '@/lib/education/duelTaunts';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,13 @@ export interface AsyncDuelTurnCardProps {
   sentTaunt?: DuelTauntId | null;
   /** Sticker the opponent threw at you (live, over the socket). */
   incomingTaunt?: DuelTauntId | null;
+  /**
+   * Real-time challenges arrive in the same pending list as async turns, but
+   * they mean "someone is waiting for you RIGHT NOW" — a different promise,
+   * so a different card. Unknown values fall back to async: over-claiming
+   * "live" when nobody is there is the worse failure.
+   */
+  duelType?: 'async' | 'realtime';
   onAccept: (duelId: string) => void;
   onDecline: (duelId: string) => void;
   onTaunt: (duelId: string, tauntId: DuelTauntId) => void;
@@ -43,27 +50,32 @@ export function AsyncDuelTurnCard({
   opponentScore,
   sentTaunt = null,
   incomingTaunt = null,
+  duelType = 'async',
   onAccept,
   onDecline,
   onTaunt,
   className,
 }: AsyncDuelTurnCardProps) {
   const { t } = useLanguage();
-  const hasTarget = opponentScore > 0;
+  const isLive = duelType === 'realtime';
+  // A live challenge has no score yet — nobody has played. Showing a "0 to
+  // beat" target there would invent a scoreboard out of nothing.
+  const hasTarget = !isLive && opponentScore > 0;
   const incoming = incomingTaunt ? duelTauntById(incomingTaunt) : undefined;
 
   return (
     <div
       data-testid="duel-turn-card"
+      data-duel-type={isLive ? 'realtime' : 'async'}
       data-state={hasTarget ? 'target-set' : 'first-move'}
       className={cn(
-        'rounded-neo border-neo-thick bg-neo-navy p-3 shadow-hard',
+        'rounded-neo border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard',
         className
       )}
     >
       <div className="flex items-start gap-3">
         {/* Opponent tile */}
-        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo bg-neo-cyan shadow-hard-sm">
+        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[2px] border-neo-black bg-neo-cyan shadow-hard-sm">
           <span className="font-neo-display text-xl font-black text-neo-black">
             {(opponentName || '?').charAt(0).toUpperCase()}
           </span>
@@ -80,12 +92,23 @@ export function AsyncDuelTurnCard({
         </div>
 
         <div className="min-w-0 flex-1">
+          {isLive && (
+            <span
+              data-testid="duel-turn-live-badge"
+              className="mb-1 inline-flex items-center gap-1 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2 py-0.5 font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black"
+            >
+              <Zap className="h-3 w-3" aria-hidden="true" />
+              {t('education.duels.turnLiveBadge')}
+            </span>
+          )}
           <p className="truncate font-neo-display text-base font-black uppercase italic tracking-tight text-neo-white">
-            {hasTarget
-              ? t('education.duels.turnBeatThem', undefined, { name: opponentName })
-              : t('education.duels.turnFirstMove', undefined, { name: opponentName })}
+            {isLive
+              ? t('education.duels.turnLiveInvite', undefined, { name: opponentName })
+              : hasTarget
+                ? t('education.duels.turnBeatThem', undefined, { name: opponentName })
+                : t('education.duels.turnFirstMove', undefined, { name: opponentName })}
           </p>
-          <p className="truncate font-neo-body text-xs font-bold text-neo-white/60">
+          <p className="truncate font-neo-body text-xs font-bold text-neo-cream/80">
             {lessonName}
           </p>
         </div>
@@ -94,7 +117,7 @@ export function AsyncDuelTurnCard({
         {hasTarget && (
           <div
             data-testid="duel-turn-target"
-            className="shrink-0 rounded-neo border-neo bg-neo-yellow px-2.5 py-1 text-center shadow-hard-sm"
+            className="shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-yellow px-2.5 py-1 text-center shadow-hard-sm"
           >
             <span className="flex items-center gap-1 font-neo-display text-lg font-black leading-none tabular-nums text-neo-black">
               <Target className="h-4 w-4" aria-hidden="true" />
@@ -119,10 +142,14 @@ export function AsyncDuelTurnCard({
           type="button"
           data-testid="duel-turn-play"
           onClick={() => onAccept(duelId)}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-neo bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard transition-all duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard transition-all duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed"
         >
           <Swords className="h-4 w-4" aria-hidden="true" />
-          {hasTarget ? t('education.duels.turnBeatIt') : t('education.duels.turnPlay')}
+          {isLive
+            ? t('education.duels.turnAcceptLive')
+            : hasTarget
+              ? t('education.duels.turnBeatIt')
+              : t('education.duels.turnPlay')}
         </button>
         <button
           type="button"

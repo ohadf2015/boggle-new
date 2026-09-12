@@ -34,6 +34,21 @@ describe('VocabQuizChoiceBars — filling in live', () => {
   });
 
 
+  it('colour-codes every option before a single vote lands', () => {
+    // Captured at 1440x900 on a room that had not answered yet: four near-black
+    // rectangles with a 40px chip in the corner, while the same four options on
+    // the phone are full-bleed lime/pink/cyan/purple. The bar has to carry its
+    // option's colour at zero votes too — that colour is how a student matches
+    // the wall to the tile under their thumb.
+    render(
+      <VocabQuizChoiceBars choices={CHOICES} distribution={[0, 0, 0, 0]} totalPlayers={4} answerIndex={null} sweep={false} t={t} />
+    );
+    expect(screen.getByTestId('vocab-quiz-rail-0').className).toContain('bg-neo-lime');
+    expect(screen.getByTestId('vocab-quiz-rail-1').className).toContain('bg-neo-pink');
+    expect(screen.getByTestId('vocab-quiz-rail-2').className).toContain('bg-neo-cyan');
+    expect(screen.getByTestId('vocab-quiz-rail-3').className).toContain('bg-neo-purple');
+  });
+
   it('shows empty bars before anyone has committed', () => {
     render(
       <VocabQuizChoiceBars choices={CHOICES} distribution={[0, 0, 0, 0]} totalPlayers={4} answerIndex={null} sweep={false} t={t} />
@@ -71,6 +86,36 @@ describe('VocabQuizChoiceBars — filling in live', () => {
       <VocabQuizChoiceBars choices={CHOICES} distribution={[0, 4, 0, 0]} totalPlayers={4} answerIndex={1} sweep t={t} />
     );
     expect(screen.getByText('vocabQuiz.sweep.title')).toBeInTheDocument();
+  });
+
+
+  it('paints the answer green even when nobody picked it', () => {
+    // Captured live at 1440x900 (room XJ5UQN, question 2): every student
+    // missed it, so the correct bar was 0% wide and the right answer sat on
+    // the wall as a dark navy box distinguishable only by a thin ring. The
+    // vote bar must stay honest — zero votes is zero width — so the answer
+    // gets its own full-width wash underneath it. The bar states the share;
+    // the wash states which one was right.
+    render(
+      <VocabQuizChoiceBars choices={CHOICES} distribution={[2, 0, 0, 0]} totalPlayers={2} answerIndex={1} sweep={false} t={t} />
+    );
+    expect(width('vocab-quiz-bar-1')).toBe('0%');
+    const wash = screen.getByTestId('vocab-quiz-answer-wash');
+    expect(wash.className).toContain('bg-neo-lime');
+  });
+
+  it('washes only the answer, never a distractor that swept the room', () => {
+    render(
+      <VocabQuizChoiceBars choices={CHOICES} distribution={[2, 0, 0, 0]} totalPlayers={2} answerIndex={1} sweep={false} t={t} />
+    );
+    expect(screen.getAllByTestId('vocab-quiz-answer-wash')).toHaveLength(1);
+  });
+
+  it('has no answer wash while the clock is still running', () => {
+    render(
+      <VocabQuizChoiceBars choices={CHOICES} distribution={[1, 0, 0, 0]} totalPlayers={4} answerIndex={null} sweep={false} t={t} />
+    );
+    expect(screen.queryByTestId('vocab-quiz-answer-wash')).toBeNull();
   });
 
   it('has no sweep banner on an ordinary reveal', () => {

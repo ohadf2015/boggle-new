@@ -25,7 +25,7 @@ import logger from '@/utils/logger';
 import Image from 'next/image';
 
 export default function StudentAchievementsPageClient() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, loading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
@@ -33,19 +33,26 @@ export default function StudentAchievementsPageClient() {
   const [achievements, setAchievements] = useState<Record<string, Achievement>>({});
   const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
 
-  // Auth guard
+  // Auth guard.
+  //
+  // On `user`, never on `isAuthenticated` — that flag is `!!user && !!profile`,
+  // and the profile row is a second round-trip that lands AFTER `loading` goes
+  // false. Reading it here turned a cold load of this page into a redirect to
+  // the marketing home for a student who was signed in the whole time (four
+  // loads out of four, measured). `user` is the only value that actually says
+  // "no session"; see app/[locale]/student/__tests__/subpageGuard.test.tsx.
   useEffect(() => {
     if (loading) {
       return; // Still loading, don't make any decisions yet
     }
 
-    if (!isAuthenticated) {
+    if (!user) {
       router.push(`/${language}`);
       return;
     }
 
     setIsChecking(false);
-  }, [isAuthenticated, loading, router, language]);
+  }, [user, loading, router, language]);
 
   // Fetch education achievements
   useEffect(() => {

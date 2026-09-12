@@ -155,7 +155,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               <div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-pink/20 border-neo border-neo-pink',
+                  'bg-neo-pink/20 border-[3px] border-neo-pink',
                   'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
                 )}
                 style={{ animationDelay: '0.6s' }}
@@ -188,7 +188,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 'w-full py-3 px-6',
                 'bg-neo-lime hover:bg-neo-pink',
                 'text-neo-black font-black text-lg',
-                'border-3 border-neo-black rounded-neo',
+                'border-[3px] border-neo-black rounded-neo',
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',

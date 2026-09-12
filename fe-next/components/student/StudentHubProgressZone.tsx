@@ -133,7 +133,15 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
             <InteractiveMascot
               variant={mascotVariant}
               size="sm"
-              sizeClassName="w-12 h-12 sm:w-16 sm:h-16"
+              // `sizeClassName` is concatenated onto the interactive wrapper, so
+              // the ring lands on the element the audit actually measures. Black
+              // on lime = 20.7:1; the width is literal because twMerge drops
+              // `border-neo` when a colour class is alongside it.
+              // `text-neo-black` carries no visible text — the wrapper holds
+              // only the mascot art — but the audit reads a role="button" with
+              // an aria-label as text, and inherited cream-on-cream measured
+              // 1.02:1. Naming the on-fill colour makes the measurement honest.
+              sizeClassName="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-[2px] border-neo-black bg-neo-cream text-neo-black"
               enableHover
               enableClick
               clickAnimation="bounce"
@@ -185,7 +193,11 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
               >
                 <Trophy className="w-5 h-5 text-black" />
               </m.div>
-              <p className="text-xs text-neo-white font-bold">{t('education.leaderboard.rank')}</p>
+              {/* `education.leaderboard.rank` is the FORMAT `#{{rank}}`, not the
+                  noun — used bare as a tile label it printed a literal
+                  `#{rank}` on the student's own home screen in all six
+                  locales. `leaderboard.rank` is the noun ("Rank"). */}
+              <p className="text-xs text-neo-white font-bold">{t('leaderboard.rank')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">
                 {typeof rank === 'number' ? `#${rank}` : rank}
               </p>
@@ -213,7 +225,10 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
               >
                 <Flame className="w-5 h-5 text-white" />
               </m.div>
-              <p className="text-xs text-neo-white font-bold">{t('education.leaderboard.streak')}</p>
+              {/* Same shape: `education.leaderboard.streak` is `{{count}}-day
+                  streak`. The tile already prints the number below it, so the
+                  label wants the noun — `education.xp.streak` ("Day Streak"). */}
+              <p className="text-xs text-neo-white font-bold">{t('education.xp.streak')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">
                 {currentStreak} {t('common.days')}
               </p>

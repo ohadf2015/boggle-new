@@ -260,7 +260,7 @@ export function TimedBlitzPractice({
                       // One right answer is a count, not yet a fire. Showing it
                       // plainly (and in lime, not the reserved streak orange)
                       // is what makes the flame at two mean something.
-                      <span className="inline-flex min-w-[2.25rem] items-center justify-center rounded-neo border-3 border-black bg-neo-lime px-2 py-1 font-neo-display text-lg font-black tabular-nums leading-none text-black">
+                      <span className="inline-flex min-w-[2.25rem] items-center justify-center rounded-neo border-[3px] border-black bg-neo-lime px-2 py-1 font-neo-display text-lg font-black tabular-nums leading-none text-black">
                         {combo}
                       </span>
                     )}
@@ -276,7 +276,7 @@ export function TimedBlitzPractice({
                 transition={{ duration: 0.2 }}
                 className={cn(
                   'px-4 py-2 rounded-neo',
-                  'bg-neo-yellow/20 border-neo border-neo-yellow',
+                  'bg-neo-yellow/20 border-[3px] border-neo-yellow',
                   'font-neo-display text-neo-yellow text-2xl'
                 )}
               >
@@ -293,7 +293,8 @@ export function TimedBlitzPractice({
               data-testid="definition-card"
               className={cn(
                 'p-8 rounded-neo',
-                'bg-neo-navy border-neo-thick border-neo-black',
+                // Cream edge, not black: black on navy measures 1.23:1.
+                'bg-neo-navy-light border-[3px] border-neo-cream',
                 'shadow-hard-lg',
                 'min-h-[150px] flex items-center justify-center'
               )}
@@ -319,7 +320,7 @@ export function TimedBlitzPractice({
                 data-testid="word-input"
                 className={cn(
                   'px-6 py-4 rounded-neo',
-                  'border-neo-thick border-neo-black',
+                  'border-[4px] border-neo-black',
                   'bg-neo-white text-neo-black',
                   'font-neo-body text-xl',
                   'shadow-hard',
@@ -334,13 +335,19 @@ export function TimedBlitzPractice({
                 type="submit"
                 disabled={isGameOver || !inputValue.trim()}
                 className={cn(
-                  'px-6 py-4 rounded-neo',
-                  'bg-neo-cyan hover:bg-neo-cyan/90',
-                  'border-neo-thick border-neo-black',
-                  'shadow-hard hover:shadow-hard-lg',
-                  'font-neo-display text-neo-black text-xl',
-                  'disabled:opacity-50 disabled:cursor-not-allowed',
-                  'transition-all active:translate-y-1'
+                'px-6 py-4 rounded-neo',
+                // Lime + black, the same primary the picker's PLAY uses. White on
+                // neo-purple measures 4.23:1 — under AA — and dropped further the
+                // moment `disabled:opacity-50` faded the label with the fill.
+                'bg-neo-lime hover:bg-neo-lime/90',
+                'border-[3px] border-black',
+                'shadow-hard hover:shadow-hard-lg',
+                'font-neo-display text-black text-xl',
+                // Disabled drains the FILL and keeps a readable label and a
+                // visible edge, instead of fading the whole control.
+                'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
+                'disabled:shadow-none disabled:cursor-not-allowed',
+                'transition-all active:translate-y-1'
                 )}
               >
                 {t('education.practice.submit')}
@@ -386,7 +393,6 @@ export function TimedBlitzPractice({
               correct={wordsFound}
               total={wordsAttempted}
               xpEarned={xpSessionData?.sessionXpEarned}
-              masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
               onRestart={handleRestart}
               onBack={onBack}
               onNext={onNext}

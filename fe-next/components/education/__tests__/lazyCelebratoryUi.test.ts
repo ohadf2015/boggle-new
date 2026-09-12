@@ -168,7 +168,11 @@ describe('event-only education UI is always loaded lazily', () => {
 });
 
 describe('student lesson page — first-load bundle', () => {
-  const source = readFileSync(join(ROOT, 'app/[locale]/student/lessons/[id]/PageClient.tsx'), 'utf8');
+  // The practice loop moved out of PageClient into its own module; the
+  // no-barrel / direct-import guarantee covers the pair, not one half of it.
+  const source =
+    readFileSync(join(ROOT, 'app/[locale]/student/lessons/[id]/PageClient.tsx'), 'utf8') +
+    readFileSync(join(ROOT, 'app/[locale]/student/lessons/[id]/PracticeContent.tsx'), 'utf8');
 
   it('does not import the education barrel', () => {
     expect(source).not.toMatch(/from\s+'@\/components\/education'/);

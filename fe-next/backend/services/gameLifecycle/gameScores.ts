@@ -285,6 +285,9 @@ export async function calculateAndBroadcastFinalScores(
             isBot: !!game.users?.[p.username]?.isBot,
           })),
           masteryByPlayer: classroomSummary.masteryByPlayer,
+          // The teacher holds a socket but never plays (classroom rooms force
+          // broadcast), so their zero was sorting onto the top plinth.
+          exclude: [classroomGame.teacherName],
         });
         const neverPlaced = splitNeverPlacedWords({
           missedWords: classroomSummary.missedWords,

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { ArrowLeft, BookOpen, Clock, GraduationCap, Grid3x3, Play, UserPlus, Zap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,8 @@ import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQui
 import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { canStartProjectorRound } from './projectorLobbyModel';
+import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
+import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
 interface ProjectorLobbyProps {
   gameCode: string;
@@ -93,7 +95,15 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const liveGame = useLiveClassroomGameInfo(gameCode, true);
 
   const canStart = canStartProjectorRound(students.length);
-  const mode: ClassroomGameMode = classroomGameMode ?? liveGame?.gameMode ?? 'classic';
+  /**
+   * A mode the teacher switched to from THIS surface outranks both sources
+   * below. `classroomGameMode` is derived from `lessonGameData`, which the
+   * multiplayer shell reads into React state once at mount — so after an
+   * in-place switch it still described the old game, and the chips said
+   * "10 · Questions" beside a BLAST room (measured live 2026-09-11).
+   */
+  const [switchedMode, setSwitchedMode] = useState<ClassroomGameMode | null>(null);
+  const mode: ClassroomGameMode = switchedMode ?? classroomGameMode ?? liveGame?.gameMode ?? 'classic';
   const isQuiz = mode === VOCAB_QUIZ_MODE;
   const settings = liveGame?.settings ?? null;
 
@@ -178,7 +188,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             data-testid="projector-exit"
             onClick={onExitRoom}
             aria-label={t('common.back')}
-            className="shrink-0 rounded-neo border-3 border-neo-cream/30 p-2 text-neo-cream/70 transition-colors hover:border-neo-cream hover:text-neo-cream"
+            className="shrink-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-2 text-neo-cream transition-colors hover:bg-neo-navy"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-5 w-5" />
           </button>
@@ -231,15 +241,34 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           teacher's own screen is often the projector, mirrored. */}
       <footer className="flex shrink-0 flex-col gap-[1.5vw] border-t-4 border-neo-cream/15 pt-[1.5vw] md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-[1vw] md:pt-[1vw]">
         <ul className="flex flex-wrap items-center gap-[0.8vw] font-neo-body">
-          {facts.map((fact) => (
-            <li
-              key={fact.key}
-              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/25 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]"
-            >
-              {fact.icon}
-              {fact.text}
-            </li>
-          ))}
+          {facts.map((fact) =>
+            // The chip that NAMES the game is the control that changes it.
+            // Round 1 shipped a picker that only existed before the room, so a
+            // teacher who wanted a different game had to exit — ending the room
+            // for every student in it — and come back with a new code. This
+            // surface is `fixed inset-0 z-[65]`, i.e. it IS the teacher's
+            // screen in the lobby, so the control has to be on it; everything
+            // behind it is unreachable. Same room, same code, no rejoining.
+            fact.key === 'mode' ? (
+              <li key={fact.key} className="inline-flex">
+                <LobbyModeSwitcher
+                  gameCode={gameCode}
+                  currentMode={mode}
+                  socket={getSharedSocketIfExists()}
+                  t={t}
+                  onModeApplied={setSwitchedMode}
+                />
+              </li>
+            ) : (
+              <li
+                key={fact.key}
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/25 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]"
+              >
+                {fact.icon}
+                {fact.text}
+              </li>
+            )
+          )}
         </ul>
 
         <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
@@ -281,20 +310,33 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             onClick={onStartGame}
             disabled={!canStart || starting}
             className={cn(
-              'flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 border-neo-black md:w-auto',
+              'flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 md:w-auto',
               'px-4 py-3 font-neo-display text-[5vw] font-black uppercase tracking-tight',
               'md:px-[2.4vw] md:py-[0.9vw] md:text-[2vw]',
-              'bg-neo-lime text-neo-black shadow-hard-xl transition-all',
-              'active:translate-y-1 active:shadow-hard',
+              'transition-all active:translate-y-1 active:shadow-hard',
               'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               // Locked, not muddy: a 40%-opacity lime on navy reads as a dead
-              // olive slab. Say "not yet" in the palette instead.
-              'disabled:cursor-not-allowed disabled:border-neo-cream/25 disabled:bg-neo-navy-light',
-              'disabled:text-neo-cream/45 disabled:shadow-none'
+              // olive slab, so "not yet" is said in the palette instead. And
+              // the locked state keeps a FULL cream edge with cream ink —
+              // measured 2026-09-11, the old `disabled:` pair rendered black
+              // ink on navy-light: text 1.32:1, edge 1.23:1, i.e. a Start
+              // button that did not read as a control at all.
+              //
+              // Branched in JS rather than through `disabled:` variants: the
+              // black base colours are what those variants have to beat, and
+              // stating one colour per state leaves nothing to beat.
+              !canStart || starting
+                ? 'cursor-not-allowed border-neo-cream bg-neo-navy-light text-neo-cream opacity-80 shadow-none'
+                : 'border-neo-black bg-neo-lime text-neo-black shadow-hard-xl'
             )}
           >
             <Play className="h-[0.8em] w-[0.8em] shrink-0" aria-hidden="true" />
-            {starting ? t('hostView.creatingTournament') : t(startLabelKey)}
+            {/* Recomputed from the LIVE mode, not the prop: the prop is
+                derived upstream from the same stale `lessonGameData`, so after
+                a switch to a board game it still read START QUIZ. */}
+            {starting
+              ? t('hostView.creatingTournament')
+              : t(switchedMode ? (isQuiz ? 'hostView.startQuiz' : 'hostView.startClassGame') : startLabelKey)}
           </button>
         </div>
       </footer>

@@ -336,10 +336,15 @@ describe('DuelLobby', () => {
     it('uses neo-brutalist design classes', () => {
       render(<DuelLobby {...defaultProps} />);
 
+      // The lobby is no longer a card inside a card: the locked shell already
+      // frames and pads this surface, so an outer border here was a third
+      // nested box around the turn cards and opponent tiles. It also put a
+      // BLACK edge on a navy fill — 1.23:1, a contrast-gate failure.
       const container = screen.getByTestId('duel-lobby-container');
-      expect(container).toHaveClass('border-3');
-      expect(container).toHaveClass('border-neo-black');
-      expect(container).toHaveClass('shadow-hard-sm');
+      expect(container).not.toHaveClass('border-3');
+      expect(container).not.toHaveClass('shadow-hard-sm');
+      // The pieces inside carry the card style instead.
+      expect(screen.getByTestId('duel-lobby-opponents')).toHaveClass('border-[3px]');
     });
   });
 });

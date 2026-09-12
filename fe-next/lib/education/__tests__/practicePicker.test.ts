@@ -152,3 +152,42 @@ describe('buildPracticeTiles', () => {
     expect(ready.map((t) => t.id)).toEqual(tiles.filter((t) => t.ready).map((t) => t.id));
   });
 });
+
+describe('buildPracticeTiles — modes that need word meanings', () => {
+  /**
+   * Blitz shows a definition and asks the student to type the word; Matching
+   * pairs words against their definitions. On a bare word list both open on an
+   * empty prompt — Blitz literally renders "No words to practice" over a running
+   * 60-second clock — and the picker was still calling them ready. Worse, Blitz
+   * leads the recommendation ranking, so the bare-list case put a dead round
+   * behind the screen's one big PLAY button.
+   */
+  const bareList: VocabularyWord[] = ['happy', 'brave', 'quick', 'tiny'].map((word) => w(word));
+
+  it('GIVEN a lesson with no definitions WHEN tiles are built THEN blitz is locked', () => {
+    const tiles = buildPracticeTiles(bareList, { language: 'en' });
+    const blitz = tiles.find((tile) => tile.id === 'blitz');
+    expect(blitz?.ready).toBe(false);
+    expect(blitz?.lockedKey).toBe('student.practiceFun.needsDefinitions');
+  });
+
+  it('GIVEN a lesson with no definitions WHEN tiles are built THEN matching is locked', () => {
+    const tiles = buildPracticeTiles(bareList, { language: 'en' });
+    const matching = tiles.find((tile) => tile.id === 'matching');
+    expect(matching?.ready).toBe(false);
+    expect(matching?.lockedKey).toBe('student.practiceFun.needsDefinitions');
+  });
+
+  it('GIVEN a lesson with no definitions WHEN tiles are built THEN the grid modes stay open', () => {
+    const tiles = buildPracticeTiles(bareList, { language: 'en' });
+    for (const id of ['solo_board', 'warmup', 'spelling', 'flashcard', 'word_list']) {
+      expect(tiles.find((tile) => tile.id === id)?.ready).toBe(true);
+    }
+  });
+
+  it('GIVEN definitions WHEN tiles are built THEN blitz and matching open again', () => {
+    const tiles = buildPracticeTiles(richLesson, { language: 'en' });
+    expect(tiles.find((tile) => tile.id === 'blitz')?.ready).toBe(true);
+    expect(tiles.find((tile) => tile.id === 'matching')?.ready).toBe(true);
+  });
+});

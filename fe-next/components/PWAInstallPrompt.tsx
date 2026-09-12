@@ -11,6 +11,7 @@ import { isAndroidBrowser } from '@/utils/androidApp';
 import { isNative } from '@/utils/platform';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { isIOSSafari, shouldShowIOSInstallHint } from '@/utils/iosInstall';
+import { useOverlayQuietZone } from '@/lib/overlayQuietZone';
 
 const PWA_DISMISS_KEY = 'pwa_install_dismissed_until';
 const PWA_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -44,6 +45,12 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAInstallPrompt() {
   const { t } = useLanguage();
   const { isInGame } = useNavigation();
+  // `isInGame` is false on exactly the surfaces this banner hurt most: the
+  // classroom round-end recap and the projector results both live on
+  // /multiplayer, which is deliberately not a game route. The quiet zone is
+  // raised by the surface itself, so it covers them and the grace window after
+  // a round ends. `showPrompt` is untouched — the banner is deferred, not lost.
+  const overlayQuietZone = useOverlayQuietZone();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -154,7 +161,7 @@ export function PWAInstallPrompt() {
   // Never paint over gameplay or a game lobby — the fixed bottom banner would
   // cover rosters, ready buttons, and boards (same class as the conversion-
   // surface guard below: re-read on the render that would paint).
-  if (isInGame) return null;
+  if (isInGame || overlayQuietZone) return null;
   // The effect-time check below can't hold on its own: this component mounts once at the
   // layout level, so a client-side navigation INTO /teacher/upgrade never re-runs it, and
   // beforeinstallprompt fires long after mount. Re-read the signal here, on the very render

@@ -31,6 +31,15 @@ export interface BuildClassroomPodiumArgs {
   players: PodiumPlayerInput[];
   masteryByPlayer: Record<string, ClassroomPlayerMastery>;
   limit?: number;
+  /**
+   * Names that are in the room but are not contestants — the teacher. A
+   * classroom host is forced into broadcast mode yet still holds a socket, so
+   * the score calculator ranks their zero, and on a slow round it sorts first:
+   * a real projector read "WE HAVE A WINNER! Mr. Gauntlet B — 0" over three
+   * children. Dropped BEFORE the slice, because dropping it afterwards costs a
+   * three-student class its third plinth.
+   */
+  exclude?: string[];
 }
 
 /**
@@ -42,9 +51,11 @@ export function buildClassroomPodium({
   players,
   masteryByPlayer,
   limit = 3,
+  exclude = [],
 }: BuildClassroomPodiumArgs): ClassroomPodiumEntry[] {
+  const excluded = new Set(exclude.map((n) => n.trim().toLowerCase()));
   return players
-    .filter((p) => !p.isBot)
+    .filter((p) => !p.isBot && !excluded.has(p.username.trim().toLowerCase()))
     .slice(0, limit)
     .map((p, index) => {
       const mastery = masteryByPlayer[p.username];

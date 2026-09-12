@@ -30,8 +30,6 @@ export interface PracticeResultsCardProps {
   total: number;
   /** XP earned in this session (optional) */
   xpEarned?: number;
-  /** Custom mastery message (optional, shown under the headline) */
-  masteryMessage?: string;
   /** Callback when the student replays this mode */
   onRestart: () => void;
   /** Callback when the student goes back to the picker */
@@ -60,7 +58,6 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
   correct,
   total,
   xpEarned,
-  masteryMessage,
   onRestart,
   onBack,
   className,
@@ -77,11 +74,15 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
     if (timeSpent !== undefined && timeSpent > 0) {
       rows.push({ key: 'time', label: t('education.practice.time'), value: formatClock(timeSpent) });
     }
+    // Bare labels only. `education.practice.maxStreak` is "Best Streak:
+    // {{count}}" and `hintsUsed` is "{{count}} hints used" — whole sentences,
+    // and the stat tile already renders the number above the label, so passing
+    // them here printed a literal "{count}" at the student.
     if (maxStreak !== undefined && maxStreak > 1) {
-      rows.push({ key: 'streak', label: t('education.practice.maxStreak'), value: `${maxStreak}x` });
+      rows.push({ key: 'streak', label: t('student.practiceFun.bestStreak'), value: `${maxStreak}x` });
     }
     if (hintsUsed !== undefined && hintsUsed > 0) {
-      rows.push({ key: 'hints', label: t('education.practice.hintsUsed'), value: `${hintsUsed}` });
+      rows.push({ key: 'hints', label: t('education.practice.hints'), value: `${hintsUsed}` });
     }
     return rows;
   }, [timeSpent, maxStreak, hintsUsed, t]);
@@ -92,7 +93,6 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
         correct={correct}
         total={total}
         xpEarned={xpEarned}
-        masteryMessage={masteryMessage}
         stats={stats}
         onAgain={onRestart}
         onBack={onBack}

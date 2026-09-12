@@ -31,7 +31,13 @@ import { fireRankConfetti, cleanupConfetti } from '@/utils/confettiUtils';
 import { playRoundEndCue, ROUND_WIN_SOUND } from '@/lib/education/roundEndSound';
 
 const TROPHY_STILL = '/mascot/teacher/badge-trophy.webp';
-const TROPHY_LOOP = '/mascot/teacher/video/trophy-celebrate.mp4';
+/**
+ * The 384px faststart encode (75KB), not the 640px master (662KB). Measured on
+ * a cold profile at the back of a real round: the master was still `paused`
+ * for every frame of the 4.4s reveal, so the celebration was a photograph of a
+ * trophy. The reveal is the whole budget — the loop has to be moving inside it.
+ */
+const TROPHY_LOOP = '/mascot/teacher/video/trophy-celebrate-384.mp4';
 
 export interface WinnerSpotlightProps {
   /** The room's first place. Absent (a room nobody scored in) renders nothing. */
@@ -108,11 +114,31 @@ export function WinnerSpotlight({
       {/* The mascot is the constant: it is on the wall before the name is, so
           the bar is never an empty rectangle waiting for content. */}
       <div
+        data-testid="winner-mascot-frame"
+        // A headless renderer routinely leaves the <video> `paused` on its
+        // poster (the 640px encode did exactly that for every frame of a 4.4s
+        // reveal). Then the trophy is a photograph, and two shots a second
+        // apart are identical — half of why round 4's five frames matched.
+        // This CSS pulse does not care whether the video decodes.
+        data-trophy-pulse={active && !calm ? 'on' : 'off'}
+        style={
+          active && !calm
+            ? {
+                animation: 'lc-trophy-pulse 1.8s ease-in-out infinite',
+              }
+            : undefined
+        }
         className={cn(
-          'shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-black bg-neo-navy',
+          // Decorative: `aria-hidden` keeps it out of the a11y tree but does
+          // nothing about hit-testing, and a capture run lost a lobby click to
+          // `covered by <video>`. Nothing here is ever the target of a tap.
+          'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-black bg-neo-navy',
           projector ? 'w-28 h-28' : 'w-16 h-16'
         )}
       >
+        {active && !calm && (
+          <style>{`@keyframes lc-trophy-pulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.08) rotate(-3deg)}}`}</style>
+        )}
         {calm ? (
           // The still IS the video's own poster frame; routing it through
           // next/image would request a second, differently-encoded copy of an
@@ -123,19 +149,20 @@ export function WinnerSpotlight({
             src={TROPHY_STILL}
             alt=""
             aria-hidden
-            className="w-full h-full object-cover"
+            className="pointer-events-none w-full h-full object-cover"
           />
         ) : (
           <video
             data-testid="winner-mascot-video"
             src={TROPHY_LOOP}
             poster={TROPHY_STILL}
+            preload="auto"
             autoPlay
             loop
             muted
             playsInline
             aria-hidden
-            className="w-full h-full object-cover"
+            className="pointer-events-none w-full h-full object-cover"
           />
         )}
       </div>
@@ -144,7 +171,9 @@ export function WinnerSpotlight({
         <p
           className={cn(
             'font-neo-display font-black uppercase tracking-widest leading-none',
-            active ? 'text-neo-yellow' : 'text-neo-white/40',
+            // 40% white on navy-elevated measured 3.50:1 — a smudge at the
+            // back of a room, which is the only place this line is read from.
+            active ? 'text-neo-yellow' : 'text-neo-white/75',
             projector ? 'text-3xl' : 'text-sm'
           )}
         >

@@ -32,6 +32,7 @@ import useAchievementUnlock from '@/hooks/useAchievementUnlock';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 // supabase import removed — XP persistence handled server-side only
 import type { VocabFocus } from '@/lib/education/vocabFocus';
+import { practiceXpPayload } from '@/lib/education/practiceXpPayload';
 import logger from '@/utils/logger';
 import { trackEduPracticeComplete, trackEduError } from '@/lib/education/telemetry';
 
@@ -202,27 +203,25 @@ export function PracticeSessionProvider({
       setIsPersisting(true);
 
       try {
-        // Build session data for XP calculation
-        const xpSessionData: Record<string, unknown> = {};
-        // vocab_focus is a 4-choice quiz: same shape (cards reviewed/correct) and
-        // XP formula as flashcards. The server mirrors this mapping.
-        const isCardQuiz = sessionData.type === 'flashcard' || sessionData.type === 'vocab_focus';
-        const xpType = sessionData.type === 'vocab_focus' ? 'flashcard' : sessionData.type;
+        /*
+          One mapping, one place. Each practice type is scored by the server off
+          its OWN fields (`wordsSpelled`, `pairsMatched`, `blitzWordsFound`), and
+          the branch that used to live here filled only the flashcard and board
+          ones — so Spelling, Matching and Blitz all sent an empty payload,
+          earned the daily base and nothing per word, and reported "0 words
+          correctly" under a card showing a real score.
+        */
+        const payload = practiceXpPayload(sessionData);
 
-        if (isCardQuiz) {
-          xpSessionData.cardsReviewed = sessionData.cardsReviewed;
-          xpSessionData.cardsCorrect = sessionData.cardsCorrect;
-        } else if (sessionData.type === 'solo_board') {
-          xpSessionData.vocabularyWordsFound = sessionData.vocabularyWordsFound;
-          xpSessionData.newWordsFound = sessionData.newWordsFound;
-        } else if (sessionData.type === 'lesson_completion') {
-          xpSessionData.masteryLevel = sessionData.masteryLevel;
-        }
+        // Achievement metrics below still key off the card-quiz modes only —
+        // "words mastered" and "perfect game" have always meant a reviewed/
+        // correct pair, and widening them here would silently inflate badges.
+        const isCardQuiz = sessionData.type === 'flashcard' || sessionData.type === 'vocab_focus';
 
         // Award XP via hook
         const result = await awardPracticeXp({
-          type: xpType,
-          sessionData: xpSessionData as Parameters<typeof awardPracticeXp>[0]['sessionData'],
+          type: payload.type,
+          sessionData: payload.sessionData as Parameters<typeof awardPracticeXp>[0]['sessionData'],
           streakDays: streak.currentStreak,
         });
 

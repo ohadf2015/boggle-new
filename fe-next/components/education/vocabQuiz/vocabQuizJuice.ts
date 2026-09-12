@@ -126,3 +126,48 @@ export function mascotStateFor({ phase, answered, correct, streak }: MascotState
   if (phase === 'reveal') return 'thinking';
   return answered ? 'spectating' : 'thinking';
 }
+
+/** What the whole class did, as three numbers the wall can hold. */
+export interface ClassFinaleStats {
+  players: number;
+  /** Correct answers across the room. */
+  correct: number;
+  /** Answers the room could have got right: players × questions asked. */
+  attempts: number;
+  /** `correct / attempts`, rounded to a whole percent. */
+  accuracy: number;
+  /** The longest run anyone reached — not the one they happened to end on. */
+  topStreak: number;
+}
+
+/**
+ * The class's own scoreboard for the finale.
+ *
+ * A quiz that ends on a ranked list rewards the three children who were already
+ * winning. These three numbers belong to everybody in the room, which is the
+ * difference between "who won" and "how we did" — and the second is the one a
+ * teacher reads out loud.
+ *
+ * Derived from the standings the server already sorted, so the wall can never
+ * disagree with the phones (Class 3 in .claude/rules/60-recurring-pitfalls.md).
+ */
+export function classFinaleStats(
+  standings: ReadonlyArray<{ correctCount: number; bestStreak: number }>,
+  totalQuestions: number
+): ClassFinaleStats {
+  const players = standings.length;
+  const correct = standings.reduce((sum, p) => sum + (p.correctCount || 0), 0);
+  const questions = Number.isFinite(totalQuestions) && totalQuestions > 0 ? totalQuestions : 0;
+  const attempts = players * questions;
+  const topStreak = standings.reduce((best, p) => Math.max(best, p.bestStreak || 0), 0);
+  return {
+    players,
+    correct,
+    attempts,
+    // A round that asked nothing, or a room nobody joined, reports 0 rather
+    // than NaN — a percent sign next to "NaN" on a projector is the loudest
+    // possible bug (Class 4: the silent divide that prints).
+    accuracy: attempts > 0 ? Math.round((correct / attempts) * 100) : 0,
+    topStreak,
+  };
+}

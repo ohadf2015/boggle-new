@@ -170,9 +170,15 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
                 the first frame, whatever the stage. This is the object a
                 screenshot always catches. */}
             <div
-              style={{ height: `${height}rem` }}
+              // MIN-height, not height. At projector scale the rank digit, the
+              // score and the "3 of 30 words" sub-line together stand taller
+              // than the 7rem third-place block, and a fixed height simply let
+              // them hang out of the bottom of it — seen on a real wall with
+              // three players. The step between the three placings is what the
+              // number is for; it is not a promise the content has to keep.
+              style={{ minHeight: `${height}rem` }}
               className={cn(
-                '-mt-1 w-full flex flex-col items-center justify-center gap-0.5',
+                '-mt-1 w-full flex flex-col items-center justify-center gap-0.5 py-2',
                 'rounded-neo border-[2px] border-neo-black shadow-hard',
                 'text-neo-black',
                 RANK_FILL[rank] ?? RANK_FILL[3]
@@ -180,7 +186,9 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
             >
               <span
                 className={cn(
-                  'font-neo-display font-black leading-none opacity-60',
+                  // 60% black on the pink third-place fill measured 3.47:1.
+                  // 80% clears AA on all three fills (4.91 / 10.57 / 11.01).
+                  'font-neo-display font-black leading-none opacity-80',
                   projector ? 'text-2xl' : 'text-sm'
                 )}
                 aria-hidden

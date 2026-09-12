@@ -24,6 +24,7 @@ import {
   type DuelHistoryEntry,
   type DuelStatsResult,
 } from '@/lib/supabase/education/duels';
+import { readStudentName } from '@/lib/education/duelOpponentNames';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
 
@@ -129,54 +130,52 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
         </h1>
       </div>
 
-      {/* Stats Panel */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        {/* Wins */}
-        <div className="p-4 bg-green-600 border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white uppercase tracking-wide mb-1">
+      {/* Record strip — one card, not five coloured squares. White-on-yellow at
+          12px was 1.9:1, five accents at once broke the colour rule, and the
+          grid cost ~180px on a screen that now has a fixed height budget. */}
+      <div
+        data-testid="duel-record-strip"
+        className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 py-3 shadow-hard"
+      >
+        <div>
+          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
             {t('duels.wins')}
           </p>
-          <p className="text-3xl font-neo-display font-bold text-white">{stats.wins}</p>
+          <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
+            {stats.wins}
+          </p>
         </div>
-
-        {/* Losses */}
-        <div className="p-4 bg-red-600 border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white uppercase tracking-wide mb-1">
+        <div>
+          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
             {t('duels.losses')}
           </p>
-          <p className="text-3xl font-neo-display font-bold text-white">{stats.losses}</p>
-        </div>
-
-        {/* Draws */}
-        <div className="p-4 bg-yellow-500 border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white uppercase tracking-wide mb-1">
-            {t('duels.draws')}
+          <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
+            {stats.losses}
           </p>
-          <p className="text-3xl font-neo-display font-bold text-white">{stats.draws}</p>
         </div>
-
-        {/* Win Streak */}
-        <div className="p-4 bg-neo-pink border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white uppercase tracking-wide mb-1">
-            {t('duels.winStreak')}
-          </p>
-          <div className="flex items-center gap-2">
-            {stats.winStreak >= 3 && <Flame className="w-5 h-5 text-white" />}
-            <p className="text-3xl font-neo-display font-bold text-white">
-              {stats.winStreak}
-            </p>
-          </div>
-        </div>
-
-        {/* Win Rate */}
-        <div className="p-4 bg-neo-cyan border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-neo-black/70 uppercase tracking-wide mb-1">
+        <div>
+          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black/70">
             {t('duels.winRate')}
           </p>
-          <p className="text-3xl font-neo-display font-bold text-neo-black">
+          <p className="font-neo-display text-2xl font-black tabular-nums leading-none text-neo-black">
             {winRate.toFixed(1)}%
           </p>
         </div>
+
+        {stats.winStreak > 0 && (
+          <span
+            data-testid="duel-streak-chip"
+            className="ms-auto inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2.5 py-1 shadow-hard-sm"
+          >
+            <Flame className="h-4 w-4 text-neo-black" aria-hidden="true" />
+            <span className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-black">
+              {stats.winStreak}
+            </span>
+            <span className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black">
+              {t('duels.winStreak')}
+            </span>
+          </span>
+        )}
       </div>
 
       {/* Recent Duels */}
@@ -191,9 +190,27 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
             const isWin = duel.isWin;
             const isLoss = !isWin && !isDraw;
 
-            // Determine opponent based on perspective
-            const opponent =
+            /**
+             * Who you played — and the name may simply not exist.
+             *
+             * `challenger:profiles(...)` / `opponent:profiles(...)` come back
+             * NULL for anybody but yourself: own-row RLS on `profiles` returns
+             * zero rows with `error: null`, so the embed resolves to null
+             * rather than to a row with a blank name. Reading `.display_name`
+             * off that threw a TypeError and took the whole History tab into
+             * the generic error boundary on every open.
+             *
+             * The lobby banks every classmate's name against their user id, so
+             * ask that before falling back to the translated "Opponent".
+             */
+            const opponentProfile =
               duel.challenger_id === studentId ? duel.opponent : duel.challenger;
+            const opponentUserId =
+              duel.challenger_id === studentId ? duel.opponent_id : duel.challenger_id;
+            const opponentName =
+              opponentProfile?.display_name?.trim() ||
+              (opponentUserId ? readStudentName(opponentUserId) : null) ||
+              t('common.opponent');
 
             // Determine scores based on perspective
             const studentScore =
@@ -211,7 +228,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className={cn(
-                  'p-4 rounded-neo border-neo shadow-hard flex items-center gap-4',
+                  'p-4 rounded-neo border-[2px] border-neo-cream shadow-hard flex items-center gap-4',
                   'bg-neo-navy',
                   isWin && 'border-s-4 border-s-green-500',
                   isLoss && 'border-s-4 border-s-red-500',
@@ -228,7 +245,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 {/* Badge */}
                 <div
                   className={cn(
-                    'shrink-0 w-10 h-10 rounded-neo border-neo shadow-hard flex items-center justify-center',
+                    'shrink-0 w-10 h-10 rounded-neo border-[2px] border-neo-cream shadow-hard flex items-center justify-center',
                     isWin && 'bg-green-500',
                     isLoss && 'bg-red-500',
                     isDraw && 'bg-yellow-500'
@@ -242,10 +259,10 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                 {/* Info */}
                 <div className="flex-1">
                   <p className="text-neo-white font-neo-body font-bold mb-1">
-                    {t('duels.vs')} {opponent.display_name}
+                    {t('duels.vs')} {opponentName}
                   </p>
                   <p className="text-sm text-neo-white">
-                    {t('duels.you')}: {studentScore} {t('duels.vs')} {opponent.display_name}:{' '}
+                    {t('duels.you')}: {studentScore} {t('duels.vs')} {opponentName}:{' '}
                     {opponentScore}
                   </p>
                 </div>

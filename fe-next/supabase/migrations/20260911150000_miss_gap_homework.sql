@@ -5,8 +5,10 @@
 -- on their phone was invisible to the teacher, and clearing site data erased a
 -- three-week class streak. Two tables fix both:
 --
---   miss_gap_homework_runs   one row per student per assignment (upserted, so a
---                            replay improves the row instead of duplicating it)
+--   miss_gap_homework_runs   one row per student per assignment (upserted; the
+--                            route merges achievement columns via
+--                            lib/education/missGapRunMerge so a replay can only
+--                            improve the row, never downgrade it)
 --   miss_gap_class_streaks   one row per class key, the streak of consecutive
 --                            calendar days on which at least one student finished
 --

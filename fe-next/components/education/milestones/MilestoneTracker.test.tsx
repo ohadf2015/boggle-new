@@ -9,7 +9,16 @@ import { MilestoneTracker } from './MilestoneTracker';
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => key,
+    // Interpolating mock: `xpRemaining` is a sentence with an {{xp}} slot, and
+    // a key-echo mock hid the fact that the component was rendering the slot
+    // raw next to a separately-styled number.
+    t: (key: string, params?: Record<string, unknown>) =>
+      params
+        ? Object.entries(params).reduce(
+            (out, [name, value]) => out.split(`{{${name}}}`).join(String(value)),
+            `${key}:{{xp}}`,
+          )
+        : key,
   }),
 }));
 
@@ -75,11 +84,12 @@ describe('MilestoneTracker', () => {
   it('should show XP remaining to next milestone', () => {
     render(<MilestoneTracker totalXp={150} />);
 
-    // Use more flexible matcher since text is split across elements
-    expect(screen.getByText((content, element) => {
-      return content.includes('education.milestones.xpRemaining');
-    })).toBeInTheDocument();
-    expect(screen.getByText('250')).toBeInTheDocument();
+    // The number must be INSIDE the translated sentence, not appended after it.
+    const line = screen.getByText((content) =>
+      content.includes('education.milestones.xpRemaining'),
+    );
+    expect(line).toHaveTextContent('250');
+    expect(line.textContent ?? '').not.toMatch(/\{\{|\}\}/);
   });
 
   it('should render progress bar with correct percentage', () => {

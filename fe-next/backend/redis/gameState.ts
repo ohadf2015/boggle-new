@@ -77,6 +77,12 @@ export async function saveGameState(gameCode: string, gameData: GameDataInput): 
     wordHuntState: JSON.stringify(gameData.wordHuntState || null),
     isRanked: String(gameData.isRanked ?? false),
     isPrivate: String(gameData.isPrivate ?? false),
+    // Must be persisted alongside isRanked/isPrivate: a restored room that
+    // loses this flag stops being a classroom room, so the teacher's host seat
+    // becomes auto-transferable to a student (connectionHandler audit T4) and
+    // every teacher live control is dropped silently (teacherControlsHandler
+    // requires game.isClassroom). See gameState.classroomFlag.test.ts.
+    isClassroom: String(gameData.isClassroom ?? false),
     allowLateJoin: String(gameData.allowLateJoin ?? true),
     chatHistory: JSON.stringify(gameData.chatHistory || []),
     aiApprovedWords: JSON.stringify(gameData.aiApprovedWords || []),
@@ -170,6 +176,9 @@ export async function getGameState(gameCode: string): Promise<GameStateData | nu
       wordHuntState: safeJsonParse<Record<string, unknown> | null>(data.wordHuntState, null, 'wordHuntState', gameCode),
       isRanked: data.isRanked === 'true',
       isPrivate: data.isPrivate === 'true',
+      // Defaults false for legacy records written before this field existed —
+      // an arcade room wrongly flagged classroom would wedge host migration.
+      isClassroom: data.isClassroom === 'true',
       allowLateJoin: data.allowLateJoin !== 'false',
       chatHistory: data.chatHistory ? safeJsonParse<unknown[]>(data.chatHistory, [], 'chatHistory', gameCode) : undefined,
       aiApprovedWords: data.aiApprovedWords ? safeJsonParse<unknown[]>(data.aiApprovedWords, [], 'aiApprovedWords', gameCode) : undefined,

@@ -73,6 +73,7 @@ import { toStandings } from '@/components/education/results/resultsStandings';
 const TeamBattleStandings = dynamic(() => import('@/components/education/TeamBattleStandings').then(m => m.TeamBattleStandings), { ssr: false });
 
 import { buildReteachLessonData } from '@/lib/education/classroomGameHandoff';
+import { modeSceneOwnsHeroSlot } from '@/lib/education/roundEndResultsRoute';
 
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 
@@ -93,6 +94,7 @@ interface DesktopResultsLayoutProps {
   blastResultScores: Record<string, number>;
   blastMpResults: any[];
   wheelRushPlayerStats: Record<string, WheelRushPlayerStats>;
+  /** False in a lesson round: the recap, not the mode scene, owns the top slot. */ heroSlotOwnedByMode: boolean;
   currentUsername?: string;
   gameCode?: string;
   isBotsOnlyGame: boolean;
@@ -120,6 +122,7 @@ function DesktopResultsLayout({
   blastResultScores,
   blastMpResults,
   wheelRushPlayerStats,
+  heroSlotOwnedByMode,
   currentUsername,
   gameCode,
   isBotsOnlyGame,
@@ -178,9 +181,8 @@ function DesktopResultsLayout({
           <ExitRoomButton onClick={handleExitRoom} label={exitLabel || ''} />
         </div>
 
-        {/* Wheel-rush hero scene takes the top slot for that mode; the
-            standard cinematic block follows beneath for podium + ranks. */}
-        {resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length > 0 && (
+        {/* Wheel-rush hero takes the top slot for that mode (podium + ranks follow beneath) — except in a lesson round, where the recap holds it. */}
+        {heroSlotOwnedByMode && resolvedGameMode === 'wheel-rush' && Object.keys(wheelRushPlayerStats).length > 0 && (
           <ResultsSectionReveal index={0} flat className="w-full max-w-3xl mx-auto mb-6 relative z-10">
             <WheelRushResultsScene
               playerStats={wheelRushPlayerStats}
@@ -209,7 +211,7 @@ function DesktopResultsLayout({
         </ResultsHeroTilt>
 
         {/* Blast MP Results — renders ranked player list above standard content */}
-        {resolvedGameMode === 'blast' && Array.isArray(blastMpResults) && blastMpResults.length > 0 && (
+        {heroSlotOwnedByMode && resolvedGameMode === 'blast' && Array.isArray(blastMpResults) && blastMpResults.length > 0 && (
           <ResultsSectionReveal index={1.5} flat className="w-full max-w-5xl mx-auto mb-6 relative z-10">
             <BlastMpResults results={blastMpResults} gameMode="blast" />
           </ResultsSectionReveal>
@@ -233,8 +235,7 @@ function DesktopResultsLayout({
                 />
               </ResultsSectionReveal>
             )}
-            {/* Wheel-rush summary already rendered as the hero scene above
-                this layout's two-column grid. No secondary card needed. */}
+            {/* Wheel-rush's summary is its hero scene above; no secondary card. */}
             {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
             {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
                 (PostGameEngagement self-hides on CG; this one stays).
@@ -492,15 +493,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Wheel-rush hero is the page's centerpiece for that mode. The dedicated
   // server payload (wheelRushSummary.playerStats) can be missing when scoring
-  // hits the fallback path, when stats sync races a late-arriving validatedScores
-  // event, or when a player joined late. Backfilling from the standard scores
-  // payload guarantees the hero always has something to render.
+  // hits the fallback path, when stats sync races a late validatedScores event,
+  // or when a player joined late — so the hero always has something to render.
   const effectiveWheelRushStats = useMemo(
     () => resolveWheelRushStats(wheelRushPlayerStats, sortedScores),
     [wheelRushPlayerStats, sortedScores],
   );
   const isWheelRush = resolvedGameMode === 'wheel-rush';
   const hasWheelRushStats = Object.keys(effectiveWheelRushStats).length > 0;
+  const heroSlotOwnedByMode = modeSceneOwnsHeroSlot({ hasClassroomSummary: !!classroomSummary });
 
   // Victory / defeat sounds on results mount
   const { playVictorySound, playDefeatSound, playEpicVictorySound } = useSoundEffects();
@@ -576,8 +577,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     window.location.reload();
   }, [classroomSummary]);
 
-  // One narrowing, two consumers. Two calls is two arrays for the same rows,
-  // and the second one is where a filter added to only one of them would hide.
   const classroomStandings = useMemo(() => toStandings(sortedScores), [sortedScores]);
 
   const postGameWordReviewNode = classroomSummary ? (
@@ -1092,13 +1091,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     });
   }, [sortedScores, resolvedGameMode, blastBoardClearedByLocal, username, blastPlayerStats]);
 
-  // Render Results Tab Content using shared component.
-  // Wheel-rush gets a radial wheel-themed hero scene rendered ABOVE the
-  // standard cinematic content — it owns the visual identity for that mode
-  // instead of sitting below the generic podium.
+  // Results tab: a mode's hero scene sits above the cinematic block unless a lesson recap is on screen.
   const renderResultsTab = () => (
     <>
-      {isWheelRush && hasWheelRushStats && (
+      {heroSlotOwnedByMode && isWheelRush && hasWheelRushStats && (
         <div className="mb-4">
           <WheelRushResultsScene
             playerStats={effectiveWheelRushStats}
@@ -1107,15 +1103,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           />
         </div>
       )}
-      {resolvedGameMode === 'blast' && blastMpResults.length > 0 && (
+      {heroSlotOwnedByMode && resolvedGameMode === 'blast' && blastMpResults.length > 0 && (
         <div className="mb-4">
           <BlastMpResults results={blastMpResults} gameMode="blast" />
         </div>
       )}
       {/* Mobile owns ONE word-list disclosure, and everything that is not "did I
-          win" rides inside it. The CLASSROOM recap is the exception: a student's
-          placing, their lesson words and the podium ARE the moment, and a moment
-          behind a disclosure is a moment nobody has. */}
+          win" rides inside it. The CLASSROOM recap is the exception: placing,
+          lesson words and podium ARE the moment — which is also why the mode
+          hero scenes above yield the top slot to it. */}
       {classroomSummary && <div className="mb-4">{postGameWordReviewNode}</div>}
       <ResultsMainContent
         {...mainContentProps}
@@ -1142,8 +1138,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           />
         </div>
       )}
-      {/* Wheel-rush summary already rendered as the hero scene above; no
-          secondary domination card needed below the podium. */}
+      {/* Wheel-rush's summary is its hero scene above; no domination card. */}
       {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
     </>
   );
@@ -1421,6 +1416,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         blastResultScores={blastResultScores}
         blastMpResults={blastMpResults}
         wheelRushPlayerStats={effectiveWheelRushStats}
+        heroSlotOwnedByMode={heroSlotOwnedByMode}
         currentUsername={username}
         gameCode={gameCode}
         isBotsOnlyGame={isBotsOnlyGame}

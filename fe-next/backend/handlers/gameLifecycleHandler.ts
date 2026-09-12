@@ -58,6 +58,7 @@ import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
+import { tryReclaimClassroomHostSeat } from './classroomGameHostReclaim';
 import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
 import { stopAllBots } from '../modules/botManager.js';
@@ -162,8 +163,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const sanitizedPlayerId = playerId || undefined;
 
       if (gameExists(gameCode) || gamesBeingCreated.has(gameCode)) {
-        // Expected dedup: client double-tapped Create or stale request retry.
-        // Server rejects via emitError; no need to ship to Sentry.
+        if (tryReclaimClassroomHostSeat(io, socket, { gameCode, authUserId, hostUsername })) return;
         logger.info('SOCKET', `Game code already exists or in-flight: ${gameCode}`);
         emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
         return;

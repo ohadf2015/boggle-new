@@ -44,13 +44,20 @@ export const AchievementGrid = memo<AchievementGridProps>(
     const { t } = useLanguage();
     const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
 
-    // Category tabs
+    // Category tabs.
+    //
+    // `education.achievements.progress` is NOT the category noun — it is the
+    // count format `{{current}}/{{next}}` that AchievementProgressCard renders
+    // inside a badge. Borrowing it here printed a literal `{current}/{next}`
+    // where the tab label belongs, in all six locales. The nouns live under
+    // `.categories.*`; the other three tabs happen to have a sibling at the
+    // top level, so they are moved too and the row now reads from one place.
     const categories: { key: CategoryFilter; labelKey: string }[] = [
       { key: 'all', labelKey: 'education.achievements.all' },
-      { key: 'progress', labelKey: 'education.achievements.progress' },
-      { key: 'skill', labelKey: 'education.achievements.skill' },
-      { key: 'consistency', labelKey: 'education.achievements.consistency' },
-      { key: 'exploration', labelKey: 'education.achievements.exploration' },
+      { key: 'progress', labelKey: 'education.achievements.categories.progress' },
+      { key: 'skill', labelKey: 'education.achievements.categories.skill' },
+      { key: 'consistency', labelKey: 'education.achievements.categories.consistency' },
+      { key: 'exploration', labelKey: 'education.achievements.categories.exploration' },
     ];
 
     // Filter achievements by category

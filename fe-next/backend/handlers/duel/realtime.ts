@@ -8,6 +8,7 @@
 import type { Namespace } from 'socket.io';
 // Language type no longer needed — validateAndScoreWord handles it internally
 import { type DuelSocket, type SubmitWordPayload, submitWordSchema } from './types';
+import { registerDuelRejoinHandler } from './rejoin';
 import { getSupabase } from '@/backend/modules/supabase/client';
 import { validateAndScoreWord } from '@/backend/utils/wordValidation';
 import { EDUCATION_XP_CONFIG } from '@/backend/modules/educationXpManager';
@@ -66,6 +67,10 @@ export function registerRealtimeHandlers(
   namespace: Namespace,
   socket: DuelSocket
 ): void {
+  // The duel SCREEN's own join path lives in ./rejoin (keeps this file
+  // under the size cap and the two concerns apart).
+  registerDuelRejoinHandler(socket);
+
   // ==========================================
   // duel:submit-word - Submit word with server-side validation
   // ==========================================

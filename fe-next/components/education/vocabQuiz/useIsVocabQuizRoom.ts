@@ -102,7 +102,89 @@ export function projectorShowsQuiz({
   hasBoard,
   isQuizRoom,
 }: ProjectorGateInput): boolean {
-  if (waitingForResults || hostPlaying) return false;
+  if (hostPlaying) return false;
+  // `waitingForResults` is a BOARD fact — "the grid's clock hit zero and the
+  // server has not sent scores yet" — raised by the shell's own watchdogs. A
+  // quiz has no grid and no board clock, so for a quiz room the flag is never
+  // information, only noise; honouring it took the podium off the wall at the
+  // exact moment the class looked up (round-2 capture: every projector shot
+  // labelled "standings" was the lobby). The host's phone still wins, because
+  // that is a different view, not a different state.
   if (isQuizRoom) return true;
+  if (waitingForResults) return false;
   return !!(gameStarted || hasActiveGameData) && !!hasBoard;
+}
+
+/**
+ * Which ending does a classroom room show — the quiz's, or the board's?
+ *
+ * The multiplayer shell renders `ResultsPage` the moment `showResults` flips,
+ * before any quiz-aware branch. For a quiz room that page is wrong twice over:
+ * its scores come from words found on a grid the quiz never drew (so they are
+ * zero by construction) and its lesson-word tally counts board coverage (so it
+ * is zero too). A student who had just scored 502 was shown "0 POINTS / 0 of 25
+ * lesson words" — recurring-pitfall class 3, two endings for one room with the
+ * wrong one rendering.
+ *
+ * Stated here, next to `projectorShowsQuiz`, because that predicate's own
+ * comment records that this bug class is invisible exactly while it lives as an
+ * inline boolean at the call site.
+ */
+export interface RoundEndOwnershipInput {
+  /** The server's quiz traffic has claimed this room. */
+  isQuizRoom?: boolean;
+  /** The shell wants to render the board's results page. */
+  showResults?: boolean;
+  /** The shell still has a room mounted to render into. */
+  isActive?: boolean;
+}
+
+export function quizOwnsRoundEnd({
+  isQuizRoom,
+  showResults,
+  isActive,
+}: RoundEndOwnershipInput): boolean {
+  if (!isQuizRoom || !showResults) return false;
+  // With no room mounted there is nothing for the quiz surfaces to render into;
+  // the board's fallback beats a blank screen.
+  return !!isActive;
+}
+
+/**
+ * Should the student's phone show the BOARD's "Tallying the scores…" card?
+ *
+ * `PlayerView` renders that card whenever `waitingForResults` is raised, above
+ * every mode-specific branch. It reads its score from the board leaderboard and
+ * its word count from words found on a grid — for a quiz both are zero by
+ * construction, and the quiz's own end screen sits one branch below it.
+ *
+ * Reproduced live on 2026-09-11 (room 6H59DJ): a student finished a quiz on 540
+ * points and their phone read "0 SCORE · 0 words · Tallying the scores…". Same
+ * fact as `projectorShowsQuiz`, one surface over: `waitingForResults` is a
+ * board-shaped flag and a quiz room must never be judged by it.
+ */
+export function showBoardWaitingScreen({
+  isQuizRoom,
+  waitingForResults,
+}: {
+  isQuizRoom?: boolean;
+  waitingForResults?: boolean;
+}): boolean {
+  return !!waitingForResults && !isQuizRoom;
+}
+
+/**
+ * The same rule, as one line at the call site.
+ *
+ * `PlayerView` is 828 lines and the gauntlet gate refuses to let a pre-existing
+ * file grow, so the fix has to cost the shell a single statement: detection and
+ * predicate are folded together here instead of being spelled out over there.
+ * The pure `showBoardWaitingScreen` stays exported — a rule that can only be
+ * exercised by mounting an 800-line shell is a rule nobody tests.
+ */
+export function useBoardWaitingScreen(
+  socket: Socket | null,
+  waitingForResults?: boolean
+): boolean {
+  return showBoardWaitingScreen({ isQuizRoom: useIsVocabQuizRoom(socket), waitingForResults });
 }

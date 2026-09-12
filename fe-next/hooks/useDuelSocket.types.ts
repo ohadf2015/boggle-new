@@ -89,6 +89,37 @@ export interface OpponentProgressData {
  */
 export interface DuelCreatedData {
   duelId: string;
+  /**
+   * True when the server created this duel because BOTH students tapped
+   * REMATCH. It is the signal that says "follow this even if your own wait
+   * lapsed" — a rematch neither side can decline unilaterally.
+   */
+  isRematch?: boolean;
+}
+
+/** The other student tapped REMATCH first; my button becomes ACCEPT. */
+export interface RematchOfferedData {
+  fromUserId: string;
+  fromName?: string;
+  lessonId?: string;
+  duelId?: string | null;
+}
+
+/** My offer is live and the other podium has been told. */
+export interface RematchPendingData {
+  opponentId: string;
+  expiresInMs?: number;
+}
+
+/** They had already left: the rematch is a challenge in their lobby instead. */
+export interface RematchInvitedData {
+  duelId: string;
+  opponentId: string;
+}
+
+/** An offer was withdrawn (cancelled, or it expired). */
+export interface RematchWithdrawnData {
+  fromUserId: string;
 }
 
 /** A mascot sticker thrown by the other side of an async duel. */
@@ -147,6 +178,11 @@ export interface UseDuelSocketReturn {
   onDuelDeclined: (cb: (data: { duelId: string }) => void) => () => void;
   onDuelCompleted: (cb: (data: DuelCompletedData) => void) => () => void;
   onDuelCreated: (cb: (data: DuelCreatedData) => void) => () => void;
+  // Rematch handshake
+  onRematchOffered: (cb: (data: RematchOfferedData) => void) => () => void;
+  onRematchPending: (cb: (data: RematchPendingData) => void) => () => void;
+  onRematchInvited: (cb: (data: RematchInvitedData) => void) => () => void;
+  onRematchWithdrawn: (cb: (data: RematchWithdrawnData) => void) => () => void;
   onScoreSubmitted: (cb: (data: ScoreSubmittedData) => void) => () => void;
   onError: (cb: (data: { message: string }) => void) => () => void;
   // Real-time event listeners

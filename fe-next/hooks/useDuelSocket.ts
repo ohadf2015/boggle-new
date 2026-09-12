@@ -35,6 +35,10 @@ import type {
   DuelAcceptedData,
   DuelCompletedData,
   DuelCreatedData,
+  RematchOfferedData,
+  RematchPendingData,
+  RematchInvitedData,
+  RematchWithdrawnData,
   ScoreSubmittedData,
   DuelStartedData,
   WordAcceptedData,
@@ -252,6 +256,20 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     socketRef.current?.emit('duel:sync-state', { duelId });
   }, []);
 
+  /**
+   * Announce this SCREEN to a duel that is already running.
+   *
+   * `duel:started` is emitted once, at accept time, to the `duel:<id>` room —
+   * and the duel screen mounts a fresh socket that was never in it. Without
+   * this emit both players wait for an opponent who is also waiting
+   * (recurring-pitfalls Class 3: the accept path and the join path have to
+   * agree about the room). The server replays the board, the original start
+   * time and the live scores.
+   */
+  const joinDuelGame = useCallback((duelId: string) => {
+    socketRef.current?.emit('duel:join-game', { duelId });
+  }, []);
+
   /** Throw a mascot sticker at the other side of a duel (ids only — allowlisted server-side). */
   const sendTaunt = useCallback((duelId: string, stickerId: string) => {
     socketRef.current?.emit('duel:taunt', { duelId, stickerId });
@@ -284,6 +302,27 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
   /** Where a freshly created duel (including a rematch) lives. */
   const onDuelCreated = useCallback(
     (cb: (data: DuelCreatedData) => void) => registerListener('duel:created', cb),
+    [registerListener]
+  );
+  /**
+   * The rematch handshake. A tap creates nothing: the first tap offers, the
+   * second matches, and only then does `duel:created` arrive — for BOTH
+   * students, with the same duel id.
+   */
+  const onRematchOffered = useCallback(
+    (cb: (data: RematchOfferedData) => void) => registerListener('duel:rematch-offered', cb),
+    [registerListener]
+  );
+  const onRematchPending = useCallback(
+    (cb: (data: RematchPendingData) => void) => registerListener('duel:rematch-pending', cb),
+    [registerListener]
+  );
+  const onRematchInvited = useCallback(
+    (cb: (data: RematchInvitedData) => void) => registerListener('duel:rematch-invited', cb),
+    [registerListener]
+  );
+  const onRematchWithdrawn = useCallback(
+    (cb: (data: RematchWithdrawnData) => void) => registerListener('duel:rematch-withdrawn', cb),
     [registerListener]
   );
   const onScoreSubmitted = useCallback(
@@ -350,6 +389,7 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     sendTaunt,
     forfeitDuel,
     syncState,
+    joinDuelGame,
     // Event listeners
     onChallengeReceived,
     onLobbyUpdate,
@@ -357,6 +397,10 @@ export function useDuelSocket(options?: UseDuelSocketOptions): UseDuelSocketRetu
     onDuelDeclined,
     onDuelCompleted,
     onDuelCreated,
+    onRematchOffered,
+    onRematchPending,
+    onRematchInvited,
+    onRematchWithdrawn,
     onScoreSubmitted,
     onError,
     // Real-time event listeners

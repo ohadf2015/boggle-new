@@ -40,7 +40,7 @@ import { getPresetValues, applyVocabularyCap, type ClassroomPresetId } from '@/l
 import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility } from '@/shared/types/classroom';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
-import { recommendedModeBadge } from '@/lib/education/gameModes';
+import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { LobbyModeHero } from './lobby/LobbyModeHero';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
@@ -163,6 +163,13 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
   const gameMode: ClassroomGameMode =
     pickedGameMode ?? (selectedLessonIds.length > 0 ? VOCAB_QUIZ_MODE : 'classic');
   const recommended = useMemo(() => recommendedModeBadge(lessonWords), [lessonWords]);
+  // The poster's minute chip quotes THIS room, not the catalog, so it cannot
+  // promise five minutes and open a three-minute round (pitfall class 3).
+  const roundMinutes = configuredRoundMinutes(gameMode, {
+    timerMinutes,
+    vocabQuizQuestionCount,
+    vocabQuizSeconds,
+  });
 
   const cannotStart =
     selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
@@ -304,6 +311,7 @@ export function ClassroomGameLobby({ initialLessonId, initialFlow, onBack }: Cla
         <LobbyModeHero
           selected={gameMode}
           recommended={recommended}
+          minutes={roundMinutes}
           busy={isStarting}
           blockedKey={blockedKey}
           expanded={modesExpanded}

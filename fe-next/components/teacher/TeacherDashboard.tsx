@@ -168,8 +168,22 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
     >
       {/* Both are fixed overlays, and only ever ONE at a time: the welcome
           dialog waits until the first-run walkthrough is finished, or it would
-          land at z-[90] under an onboarding modal at z-[100] and be missed. */}
-      <TeacherOnboarding onDismiss={() => setOnboardingDismissed(true)} />
+          land at z-[90] under an onboarding modal at z-[100] and be missed.
+
+          The walkthrough is gated on having NO classroom. Measured live at
+          1440x900: it rendered `fixed inset-0 z-[100]`, opaque and clickable,
+          over an armed GO LIVE — `elementFromPoint` at the button's centre
+          returned the modal. A fullscreen prompt above the primary action is
+          the same defect the addendum spells out for consent and install
+          prompts. A teacher who already has a class is not a first-run
+          teacher, and that is every visit where GO LIVE has words to launch.
+
+          Read pessimistically: `classroomsLoading` gates it too, so the modal
+          never flashes over the hero for the frame before the read lands
+          (pitfall class 1 — the late source overriding the early render). */}
+      {!classroomsLoading && classrooms.length === 0 && (
+        <TeacherOnboarding onDismiss={() => setOnboardingDismissed(true)} />
+      )}
       {!proLoading && onboardingClear && (
         <ProWelcomeCelebration grant={proGrant} paid={checkoutSuccess && hasPro && proSource === 'polar'} />
       )}

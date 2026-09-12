@@ -36,21 +36,21 @@ describe('MissGapGradePassback', () => {
     vi.mocked(shareWithFallback).mockResolvedValue('copied');
   });
 
-  it('shows Kahoot grade-passback foil + score receipt', () => {
+  it('shows the score receipt without the positioning copy', () => {
     const score = scoreMissGapHomework({
       dueDate: '2026-09-15',
       completedOn: '2026-09-14',
     });
     render(<MissGapGradePassback payload={payload} score={score} />);
     expect(screen.getByTestId('miss-gap-grade-passback')).toBeInTheDocument();
-    expect(screen.getByTestId('miss-gap-grade-passback-foil')).toBeInTheDocument();
+    expect(screen.queryByTestId('miss-gap-grade-passback-foil')).not.toBeInTheDocument();
     const card = screen.getByTestId('miss-gap-grade-score');
     expect(card).toHaveAttribute('data-points', '100');
     expect(card).toHaveAttribute('data-max', '100');
     expect(card).toHaveAttribute('data-on-time', '1');
     expect(screen.getByTestId('miss-gap-grade-privacy')).toBeInTheDocument();
     expect(screen.getByTestId('miss-gap-whatsapp-share-card')).toBeInTheDocument();
-    expect(screen.getByTestId('miss-gap-whatsapp-foil')).toBeInTheDocument();
+    expect(screen.queryByTestId('miss-gap-whatsapp-foil')).not.toBeInTheDocument();
   });
 
   it('copies grade receipt URL with points', async () => {

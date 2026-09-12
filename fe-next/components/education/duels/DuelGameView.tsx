@@ -210,7 +210,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <button
           type="button"
           onClick={onBackToLobby}
-          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
         >
           {t('duels.backToLobby')}
         </button>
@@ -243,7 +243,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className={cn(
-            'mb-6 p-6 rounded-neo border-neo-thick shadow-hard',
+            'mb-6 p-6 rounded-neo border-[3px] border-neo-cream shadow-hard',
             isDraw ? 'bg-yellow-500 border-neo-black' : isWinner ? 'bg-neo-lime border-neo-black' : 'bg-red-500 border-neo-black'
           )}
         >
@@ -277,7 +277,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         </div>
 
         {/* XP Earned */}
-        <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
+        <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard">
           <Flame className="w-6 h-6 text-neo-pink" />
           <span className="text-neo-white font-neo-body">
             {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
@@ -294,14 +294,14 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                 onBackToLobby?.();
               }
             }}
-            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
             {t('duels.rematch')}
           </button>
           <button
             type="button"
             onClick={onBackToLobby}
-            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
             {t('duels.backToLobby')}
           </button>
@@ -327,7 +327,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         </h2>
 
         {/* Score Feedback */}
-        <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-6 mb-6 max-w-md">
+        <div className="bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard p-6 mb-6 max-w-md">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Check className="w-5 h-5 text-green-500" />
@@ -359,7 +359,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 p-4 bg-neo-navy border-neo rounded-neo shadow-hard">
+      <div className="flex items-center justify-between mb-6 p-4 bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard">
         <div className="flex items-center gap-3">
           <Swords className="w-6 h-6 text-neo-pink" />
           <h1 className="text-xl font-neo-display font-bold text-neo-white">
@@ -371,7 +371,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <div className="flex items-center gap-4">
           {/* G4: Countdown timer */}
           <div className={cn(
-            'flex items-center gap-1 px-3 py-1 rounded-neo border-neo font-neo-display font-bold',
+            'flex items-center gap-1 px-3 py-1 rounded-neo border-[2px] border-neo-cream font-neo-display font-bold',
             timeRemaining <= 30 ? 'bg-red-500 text-neo-white animate-pulse' :
             timeRemaining <= 60 ? 'bg-neo-pink text-neo-black' :
             'bg-neo-lime text-neo-black'
@@ -394,13 +394,13 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             {t('duels.findWords')}
           </h2>
           <div
-            className="grid grid-cols-4 gap-2 p-4 bg-neo-navy border-neo-thick rounded-neo shadow-hard"
+            className="grid grid-cols-4 gap-2 p-4 bg-neo-navy border-[3px] border-neo-cream rounded-neo shadow-hard"
             data-testid="duel-board-grid"
           >
             {duelData.boardState.flat().map((letter, idx) => (
               <div
                 key={`cell-${idx}-${letter}`}
-                className="aspect-square flex items-center justify-center bg-neo-lime text-neo-black font-neo-display font-bold text-2xl rounded-neo border-neo shadow-hard-sm"
+                className="aspect-square flex items-center justify-center bg-neo-lime text-neo-black font-neo-display font-bold text-2xl rounded-neo border-[2px] border-neo-black shadow-hard-sm"
                 data-testid={`board-letter-${idx}`}
               >
                 {letter}
@@ -422,14 +422,14 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               {...wordInputProps}
               onKeyDown={handleKeyPress}
               placeholder={t('duels.typeWord')}
-              className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
+              className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-[2px] border-neo-cream rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
             <button
               type="button"
               onClick={handleAddWord}
               aria-disabled={currentWordEmpty}
               className={cn(
-                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all',
+                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all',
                 currentWordEmpty && 'opacity-50 cursor-not-allowed'
               )}
             >
@@ -438,7 +438,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </div>
 
           {/* Found Words List */}
-          <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
+          <div className="bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
             <AdaptiveAnimatePresence>
               {wordsFound.length === 0 ? (
                 <p className="text-neo-white text-sm text-center py-8">
@@ -452,7 +452,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="px-3 py-1 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard-sm"
+                      className="px-3 py-1 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard-sm"
                     >
                       {word}
                     </AdaptiveMotion.div>
@@ -467,7 +467,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             type="button"
             onClick={handleSubmitScore}
             disabled={wordsFound.length === 0 || phase === 'submitting'}
-            className="w-full px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold text-lg rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-neo-pink text-neo-black font-neo-display font-bold text-lg rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {phase === 'submitting' ? t('duels.loading') : t('duels.submitScore')}
           </button>

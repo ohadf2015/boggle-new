@@ -158,7 +158,19 @@ export function useVocabQuizJuice(input: VocabQuizJuiceInput): VocabQuizJuiceRes
     }
     if (finishedRef.current) return;
     finishedRef.current = true;
-    if (surface !== 'student') return;
+
+    // The projector celebrates unconditionally. The round finishing IS the
+    // moment for the room — waiting for someone to have been perfect leaves
+    // thirty people looking at a silent final screen, which is the payoff cliff
+    // a blind critic called disqualifying in round 2. The burst itself is fired
+    // by `VocabQuizFinale`, which owns that screen; this is its sound.
+    if (surface === 'host') {
+      playSound('confettiRain', { volume: 0.7, requiresGameActive: false });
+      return;
+    }
+
+    // The phone celebrates a clean sheet, and only that: a fanfare for four out
+    // of five is a fanfare that means nothing by question ten.
     if (!isPerfectRound({ correctCount: input.myCorrectCount, totalQuestions })) return;
     playSound('confettiRain', { volume: 0.7, requiresGameActive: false });
     fireVictoryConfetti();

@@ -161,7 +161,6 @@ export default function FlashcardReview({
             correct={correctCount}
             total={words.length}
             xpEarned={xpSessionData?.sessionXpEarned}
-            masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
             onAgain={handleRestart}
             onBack={onBack}
             onNext={onNext}
@@ -169,7 +168,7 @@ export default function FlashcardReview({
           />
 
           {/* Per-word recap — the one thing a flashcard deck owes the student. */}
-          <div className="max-h-40 overflow-y-auto rounded-neo border-3 border-black bg-black/30 p-3">
+          <div className="max-h-40 overflow-y-auto rounded-neo border-[3px] border-black bg-black/30 p-3">
             {words.map((word, idx) => (
               <div
                 key={`word-${idx}-${word.word}`}
@@ -201,7 +200,7 @@ export default function FlashcardReview({
               size="sm"
               onClick={onBack}
               aria-label={t('common.back')}
-              className="text-slate-400 hover:text-neo-white"
+              className="text-neo-cream hover:text-neo-white"
             >
               <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             </Button>
@@ -209,7 +208,7 @@ export default function FlashcardReview({
               <h1 className="text-xl font-neo-display text-neo-white">
                 {t('education.practice.flashcards')}
               </h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-neo-cream">
                 {currentIndex + 1} / {words.length}
               </p>
             </div>
@@ -276,7 +275,7 @@ export default function FlashcardReview({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-slate-400 hover:text-neo-white"
+            className="text-neo-cream hover:text-neo-white"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
@@ -284,7 +283,7 @@ export default function FlashcardReview({
             <h1 className="text-xl font-neo-display text-neo-white">
               {t('education.practice.flashcards')}
             </h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-neo-cream">
               {currentIndex + 1} / {words.length}
             </p>
           </div>
@@ -349,7 +348,7 @@ export default function FlashcardReview({
             />
             <label
               htmlFor="auto-pronounce"
-              className="text-sm text-slate-400 font-neo-body cursor-pointer select-none"
+              className="text-sm text-neo-cream font-neo-body cursor-pointer select-none"
             >
               {t('education.lesson.autoPronounce')}
             </label>
@@ -375,7 +374,7 @@ export default function FlashcardReview({
             >
               <div
                 className={cn(
-                  'h-full rounded-neo border-3 border-black shadow-hard-lg',
+                  'h-full rounded-neo border-[3px] border-black shadow-hard-lg',
                   'flex items-center justify-center',
                   isFlipped ? 'bg-neo-cyan/15' : 'bg-neo-navy/80'
                 )}
@@ -384,7 +383,7 @@ export default function FlashcardReview({
                   {isFlipped ? (
                     <div>
                       <div className="flex items-center justify-center gap-3 mb-3">
-                        <span className="px-2 py-0.5 bg-neo-cyan/20 border-2 border-neo-cyan/40 rounded-neo text-xs font-black text-neo-cyan uppercase">
+                        <span className="px-2 py-0.5 bg-neo-cyan/20 border-[2px] border-neo-cyan/40 rounded-neo text-xs font-black text-neo-cyan uppercase">
                           {t('education.practice.definition')}
                         </span>
                         <PronunciationButton
@@ -399,7 +398,7 @@ export default function FlashcardReview({
                     </div>
                   ) : (
                     <div>
-                      <span className="inline-block px-2 py-0.5 bg-neo-yellow/20 border-2 border-neo-yellow/40 rounded-neo text-xs font-black text-neo-yellow uppercase mb-3">
+                      <span className="inline-block px-2 py-0.5 bg-neo-yellow/20 border-[2px] border-neo-yellow/40 rounded-neo text-xs font-black text-neo-yellow uppercase mb-3">
                         {t('education.practice.word')}
                       </span>
                       <p className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white">
@@ -431,7 +430,7 @@ export default function FlashcardReview({
             className={cn(
               'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
               'bg-neo-pink text-black font-neo-display font-black uppercase',
-              'border-3 border-black shadow-hard',
+              'border-[3px] border-black shadow-hard',
               'disabled:opacity-40 disabled:cursor-not-allowed'
             )}
           >
@@ -447,7 +446,7 @@ export default function FlashcardReview({
             className={cn(
               'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
               'bg-neo-cyan text-black font-neo-display font-black uppercase',
-              'border-3 border-black shadow-hard',
+              'border-[3px] border-black shadow-hard',
               'disabled:opacity-40 disabled:cursor-not-allowed'
             )}
           >

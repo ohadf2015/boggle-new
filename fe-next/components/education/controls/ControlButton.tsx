@@ -9,7 +9,9 @@ const TONE_CLASSES: Record<ControlTone, string> = {
   go: 'bg-neo-lime text-neo-black',
   time: 'bg-neo-yellow text-neo-black',
   neutral: 'bg-neo-cyan text-neo-black',
-  danger: 'bg-neo-pink text-neo-white',
+  // Black, not white: white on neo-pink measures 3.64:1, under the 4.5:1 the
+  // contrast sweep enforces (flagged on the quiz projector, 1440x900).
+  danger: 'bg-neo-pink text-neo-black',
   armed: 'bg-neo-red text-neo-white animate-pulse',
 };
 

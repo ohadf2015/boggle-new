@@ -53,7 +53,16 @@ const sv = {
     },
     "finished": {
       "title": "Då var det slut!",
-      "yourScore": "Du fick {score} poäng."
+      "yourScore": "Du fick {score} poäng.",
+      "subtitle": "{questions} frågor · {players} spelare",
+      "classAccuracy": "Klassen rätt",
+      "wordsNailed": "Ord i hamn",
+      "topStreak": "Bästa svit",
+      "percent": "{percent} %",
+      "mascotAlt": "Lexi håller upp pokalen",
+      "perfect": "Perfekt runda!",
+      "bestStreak": "Bästa svit {count}",
+      "correctOf": "{correct} av {total} rätt"
     },
     "host": {
       "joinCode": "Kod",
@@ -4381,6 +4390,118 @@ const sv = {
     "viewProgress": "Se Framsteg"
   },
   "achievements": {
+    "first_lesson": {
+      "name": "Första lektionen",
+      "description": "Klara din allra första lektion"
+    },
+    "word_master": {
+      "name": "Ordmästare",
+      "description": "Bemästra ord på riktigt"
+    },
+    "level_climber": {
+      "name": "Nivåklättrare",
+      "description": "Klättra i nivåstegen"
+    },
+    "xp_collector": {
+      "name": "XP-samlare",
+      "description": "Samla på dig massor av XP"
+    },
+    "practice_veteran": {
+      "name": "Träningsveteran",
+      "description": "Kör träningspass efter pass"
+    },
+    "duel_veteran": {
+      "name": "Duellveteran",
+      "description": "Spela duell efter duell"
+    },
+    "speed_demon": {
+      "name": "Fartdemon",
+      "description": "Svara innan klockan hinner blinka"
+    },
+    "perfect_streak": {
+      "name": "Felfri runda",
+      "description": "Klara rundor utan en enda miss"
+    },
+    "boss_slayer": {
+      "name": "Bossdräpare",
+      "description": "Fäll ordbossarna"
+    },
+    "combo_master": {
+      "name": "Combomästare",
+      "description": "Kedja ihop svar till combos"
+    },
+    "duel_champion": {
+      "name": "Duellmästare",
+      "description": "Vinn dueller mot klasskompisar"
+    },
+    "comeback_king": {
+      "name": "Comebackkung",
+      "description": "Vinn en duell efter att ha legat under"
+    },
+    "speed_dueler": {
+      "name": "Snabbast fram",
+      "description": "Hitta ordet först i duellen"
+    },
+    "spelling_ace": {
+      "name": "Stavningsess",
+      "description": "Klara stavningsrundor felfritt"
+    },
+    "matching_master": {
+      "name": "Parmästare",
+      "description": "Klara parrundor snabbt"
+    },
+    "blitz_champion": {
+      "name": "Blixtmästare",
+      "description": "Sätt höga blixtpoäng"
+    },
+    "streak_starter": {
+      "name": "Svitstartare",
+      "description": "Spela dagar i rad"
+    },
+    "early_bird": {
+      "name": "Morgonpigg",
+      "description": "Träna innan skolan börjar"
+    },
+    "dedicated_learner": {
+      "name": "Trogen elev",
+      "description": "Dyk upp dag efter dag"
+    },
+    "weekly_warrior": {
+      "name": "Veckokrigare",
+      "description": "Hela veckor utan luckor"
+    },
+    "streak_champion": {
+      "name": "Svitmästare",
+      "description": "Håll en monstersvit vid liv"
+    },
+    "duel_streak": {
+      "name": "Duellsvit",
+      "description": "Vinn dueller i rad"
+    },
+    "practice_streak": {
+      "name": "Träningssvit",
+      "description": "Träningsdagar i rad"
+    },
+    "mode_explorer": {
+      "name": "Lägesutforskare",
+      "description": "Testa varje spelläge en gång"
+    },
+    "lesson_collector": {
+      "name": "Lektionssamlare",
+      "description": "Samla på klara lektioner"
+    },
+    "classroom_contributor": {
+      "name": "Klasshjälte",
+      "description": "Lägg poäng till klassens resultat"
+    },
+    "word_variety": {
+      "name": "Ordregnbåge",
+      "description": "Spela en vild bredd av ord"
+    },
+    "mode_master": {
+      "name": "Lägesmästare",
+      "description": "Bemästra alla träningslägen"
+    },
     "unlocked": "Prestation Upplåst!",
     "upgraded": "Prestation Uppgraderad!",
     "shareText": "Jag låste upp \"{{name}}\" i LexiClash! Kom och spela!",
@@ -12502,8 +12623,20 @@ const sv = {
       "allGames": "Alla spel",
       "streakLabel": "{{count}} i rad",
       "beatTheClock": "Slå klockan",
+      "bestStreak": "Bästa svit",
+      "listenAndSpell": "Lyssna och stava ordet",
+      "needsDefinitions": "Behöver ordförklaringar — be din lärare lägga till dem",
+      "recommended": "Rekommenderas",
+      "playNow": "Spela",
+      "moreGames": "Fler spel ({{count}})",
+      "fewerGames": "Färre spel",
       "floors": "Våningar",
-      "height": "Höjd"
+      "height": "Höjd",
+      "points": "Poäng",
+      "answerLabel": "Svar:",
+      "levelUp": "Nivå {{level}}!",
+      "tryAgain": "Försök igen",
+      "myLessons": "Mina lektioner"
     },
     "hub": {
       "playZone": "Spela",
@@ -12649,6 +12782,7 @@ const sv = {
   "teacher": {
     "nav": {
       "play": "Spela",
+      "classes": "Klasser",
       "lessons": "Lektioner",
       "reports": "Rapporter",
       "me": "Jag",
@@ -13457,6 +13591,8 @@ const sv = {
   },
   "education": {
     "homework": {
+      "takeHomeToggle": "Övningskort att ta hem",
+      "backToDashboard": "Tillbaka till panelen",
       "classmatesFirst": "Du är först klar i dag — sviten börjar med dig.",
       "introTitle": "{{count}} ord klassen missade",
       "introSubtitle": "Tryck på rätt svar och stava de kluriga. Tar ungefär två minuter.",
@@ -13482,12 +13618,19 @@ const sv = {
       "saveFailed": "Vi kunde inte spara omgången. Kolla uppkopplingen och kör en gång till.",
       "classStreakDays": "{{count}} dagar i rad för klassen",
       "classStreakSubtitle": "Dagar i rad då någon i klassen blivit klar.",
+      "classStreakChecking": "Kollar klassens svit…",
+      "cheer": "Tryck när du vet.",
+      "studentEyebrow": "Din läxa",
+      "studentTitle": "{{count}} ord att ta tillbaka",
       "classmates": "{{count}} klasskompisar har också klarat den",
+      "classmatesOne": "En klasskompis har också klarat den",
       "anonStudent": "Någon",
       "teacherEyebrow": "Vilka har spelat",
       "teacherPlayed": "Klara",
       "teacherAverage": "Klassens snitt",
       "teacherEmpty": "Ingen har spelat än. Dela länken så fylls listan på direkt.",
+      "teacherNamesSignedOut": "Logga in som lärare för att se vilka som spelat.",
+      "gradeOnTime": "I tid — klassens svit är räddad.",
       "teacherLoadFailed": "Vi kunde inte hämta vilka som spelat. Försök igen om en stund.",
       "teacherOnTime": "I tid",
       "teacherLate": "Sent"
@@ -13753,6 +13896,7 @@ const sv = {
       "allFound": "Klassen hittade alla lektionsord.",
       "practiceMissed": "Öva de här orden",
       "playReteachRound": "Spela repetitionsrunda — bara missade ord",
+      "backToLobby": "Tillbaka till lobbyn",
       "rematch": "Revansch — samma lista, samma kod",
       "teamBattle": {
         "title": "Lagkamp",
@@ -13800,6 +13944,8 @@ const sv = {
         "none": "Alla hittade minst halva listan. Kör en runda till.",
         "hint": "Under hälften av lektionens ord den här ronden."
       },
+      "moreWords": "+{count} till",
+      "fewerWords": "Visa färre",
       "allBoardWordsFound": "Klassen hittade varje lektionsord som kom med på spelplanen.",
       "shareGapTitle": "Klassens ordförrådslucka",
       "shareGapText": "{{lesson}} — klassen hittade {{found}} av {{total}} lektionsord. Öva: {{missed}}",
@@ -13861,13 +14007,13 @@ const sv = {
       "shareMissGapPracticeTitle": "Miss-gap-övningskort",
       "shareMissGapPracticeText": "{{lesson}} — hemläxa miss-gap (skriv ut eller spara PDF): {{missed}}",
       "missGapPracticeEyebrow": "Hemläxa att öva",
-      "missGapPracticeSubtitle": "Enhetsfri miss-gap-övning efter Unplugged-uppgift i Classroom — öppna, skriv ut eller spara som PDF.",
+      "missGapPracticeSubtitle": "Ett utskrivbart övningsblad med orden klassen missade — öppna, skriv ut eller spara som PDF. Inga enheter behövs.",
       "missGapPracticeFoil": "Kahoot Unplugged har ingen hemläxa — LexiClash har",
       "missGapPracticePrintPdf": "Skriv ut / spara övnings-PDF",
       "assignMissGapAsyncHomework": "Tilldela asynkron miss-gap-läxa",
       "assignMissGapAsyncEyebrow": "Asynkron läxa",
       "assignMissGapAsyncHeading": "Miss-gap-övning med deadline",
-      "assignMissGapAsyncSubtitle": "Elever övar #972 miss-gap-kortet på egen hand — inte en live Unplugged-session. I tid matar klassens streak.",
+      "assignMissGapAsyncSubtitle": "Eleverna spelar ett tvåminutersspel på orden klassen missade. Du ser vilka som blev klara, och en omgång klar i tid håller klassens svit vid liv.",
       "assignMissGapAsyncFoil": "Kahootopia Assignments är live-spelläxor — LexiClash tilldelar asynkron miss-gap-övning som matar klassens streak",
       "assignMissGapAsyncDueLabel": "Deadline",
       "assignMissGapAsyncDueBanner": "Deadline {{due}} — slutför miss-gap-övningen för att behålla klassens streak",
@@ -13882,13 +14028,13 @@ const sv = {
       "assignMissGapAsyncStreak": "Klass-streak: {{streak}} dag(ar)",
       "missGapGradePassbackEyebrow": "Betygsåterkoppling till Google Classroom",
       "missGapGradePassbackHeading": "Lämna in ditt miss-gap-betyg",
-      "missGapGradePassbackSubtitle": "Övningen klar — ditt resultat är redo för Classroom-betygsboken (Kahoot Marketplace grade-passback-foil).",
+      "missGapGradePassbackSubtitle": "Övningen är klar — poängen är redo att lämnas in i klassens betygsbok.",
       "missGapGradePassbackFoil": "Kahoot Marketplace synkar quizpoäng till Classroom — LexiClash gör samma sak för asynk miss-gap-läxa, utan roster-OAuth",
       "missGapGradePassbackScore": "Poäng: {{points}} / {{max}}",
       "missGapGradePassbackOnTime": "I tid — full poäng + klass-streak",
       "missGapGradePassbackLate": "Sen inlämning — sänkt utkastbetyg (streak oförändrad)",
       "missGapGradePassbackDue": "Deadline {{due}}",
-      "missGapGradePassbackPrivacy": "Inga elevnamn. Ingen rosterimport. Betygssynk via Classroom-tillägg är redo när teacher-scope aktiveras.",
+      "missGapGradePassbackPrivacy": "Inga namn delas och ingen klasslista importeras. Bara poängen för den här övningen lämnas in.",
       "missGapGradePassbackCopy": "Kopiera länk till betygskvitto",
       "missGapGradePassbackCopied": "Kvitto kopierat — klistra in i Classroom eller dela med läraren",
       "missGapGradePassbackShareText": "{{lesson}} — miss-gap-betyg {{points}}/{{max}} (deadline {{due}})",
@@ -13898,7 +14044,7 @@ const sv = {
 
       "missGapWhatsAppEyebrow": "Föräldrapraktik via WhatsApp",
       "missGapWhatsAppHeading": "Skicka miss-gap-övningen hem via WhatsApp",
-      "missGapWhatsAppSubtitle": "Efter GC betygs-passback — ett tryck skickar #972-övningskortet till en föräldrarchatt. Bara klassord.",
+      "missGapWhatsAppSubtitle": "Skicka övningskortet rakt in i en föräldrachatt med ett tryck — bara klassens ord, inga elevnamn.",
       "missGapWhatsAppParentSubtitle": "Öva de missade orden från {{lesson}} med ditt barn — skriv ut eller öppna övningskortet.",
       "missGapWhatsAppFoil": "Classrooms betygssync stannar i betygsboken — LexiClash skickar miss-gap-övningskortet hem via WhatsApp",
       "missGapWhatsAppDue": "Inlämning {{due}}",
@@ -13945,6 +14091,7 @@ const sv = {
       "vocabScore": "Du hittade {{found}} av {{total}} glosor!"
     },
     "duels": {
+      "recommended": "Rekommenderas",
       "lobby": "Väntrum",
       "history": "Historik",
       "classmates": "Klasskompisar",
@@ -13960,6 +14107,7 @@ const sv = {
       "aheadBy": "Leder med {{points}}",
       "behindBy": "Ligger under med {{points}}",
       "levelPegged": "Helt jämnt",
+      "changeSetup": "Ändra",
       "revealWin": "Mästare!",
       "revealLose": "Besegrad!",
       "revealDraw": "Oavgjort!",
@@ -13978,12 +14126,24 @@ const sv = {
       "turnBeatIt": "Slå det",
       "turnPlay": "Spela min tur",
       "turnDecline": "Hoppa över",
+      "turnLiveBadge": "Live",
+      "turnLiveInvite": "{{name}} väntar — live!",
+      "turnAcceptLive": "Spela live",
       "tauntPrompt": "Skicka en dekal",
       "tauntSent": "Dekal skickad",
       "tauntFire": "För lätt",
       "tauntMindblown": "Wow!",
       "tauntTrophy": "Slå det där",
       "tauntTears": "Bra match",
+      "rematchAccept": "Anta returmatchen",
+      "rematchWants": "{{name}} vill ha en returmatch",
+      "rematchWaiting": "Väntar på {{name}}",
+      "rematchTapCancel": "Tryck för att avbryta",
+      "rematchInvited": "Inbjudan skickad till deras lobby",
+      "waitingForName": "Väntar på {{name}}…",
+      "stillWaiting": "{{name}} är inte här än",
+      "waitingHint": "De kanske stängde duellen. Försök igen eller gå tillbaka till lobbyn.",
+      "tryAgain": "Försök igen",
       "rematchSent": "Fixar omgången…",
       "noClassmatesOnline": "Ingen är online just nu",
       "challengeSomeone": "Utmana någon!",
@@ -13999,6 +14159,24 @@ const sv = {
       "coinReward": "+{{amount}} mynt"
     },
     "achievements": {
+      "first_lesson": { "name": "Första lektionen", "description": "Klara en lektion från din lärare" },
+      "word_master": { "name": "Ordmästare", "description": "Bemästra nya ord" },
+      "level_climber": { "name": "Nivåklättrare", "description": "Nå en ny nivå" },
+      "xp_collector": { "name": "XP-samlare", "description": "Samla XP från träning" },
+      "practice_veteran": { "name": "Träningsveteran", "description": "Klara träningsrundor" },
+      "speed_demon": { "name": "Snabbtänkare", "description": "Svara innan klockan hinner" },
+      "perfect_streak": { "name": "Felfri runda", "description": "Klara en runda utan misstag" },
+      "boss_slayer": { "name": "Bossdräpare", "description": "Besegra en bossrunda" },
+      "combo_master": { "name": "Combomästare", "description": "Bygg ett långt combo" },
+      "streak_starter": { "name": "Svitstartare", "description": "Träna flera dagar i rad" },
+      "early_bird": { "name": "Morgonpigg", "description": "Träna före skolan" },
+      "dedicated_learner": { "name": "Trägen elev", "description": "Träna många olika dagar" },
+      "weekly_warrior": { "name": "Veckokrigare", "description": "Träna varje dag en hel vecka" },
+      "streak_champion": { "name": "Svitmästare", "description": "Håll en lång daglig svit vid liv" },
+      "mode_explorer": { "name": "Spelutforskare", "description": "Testa olika träningsspel" },
+      "lesson_collector": { "name": "Lektionssamlare", "description": "Träna på massor av lektioner" },
+      "classroom_contributor": { "name": "Lagspelare", "description": "Ta poäng åt din klass" },
+      "word_variety": { "name": "Ordsamlare", "description": "Hitta ord av alla slag" },
       "categories": {"consistency":"Uthållighet","exploration":"Utforskande","progress":"Framsteg","skill":"Färdighet"},
       "ariaDismissError": "Avfärda fel",
       "ariaOverallProgress": "Övergripande framsteg",

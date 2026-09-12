@@ -31,6 +31,7 @@ import { VocabQuizAnswerGrid } from './VocabQuizAnswerGrid';
 import { VocabQuizStandings } from './VocabQuizStandings';
 import { VocabQuizStudentHeader } from './VocabQuizStudentHeader';
 import { VocabQuizRevealBanner } from './VocabQuizRevealBanner';
+import { VocabQuizOwnFinale } from './VocabQuizOwnFinale';
 import { StudentRoundOutcome } from '../results/StudentRoundOutcome';
 
 export interface VocabQuizViewProps {
@@ -85,6 +86,7 @@ export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
         score={quiz.myScore}
         pop={pop}
         mascot={juice.mascot}
+        finished={phase === 'ended'}
         lockedIn={phase === 'question' ? quiz.lockIn : null}
         rank={
           phase === 'reveal' && myIndex >= 0
@@ -180,17 +182,47 @@ export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
             <Trophy className="w-7 h-7 text-neo-yellow" aria-hidden />
             {t('vocabQuiz.finished.title')}
           </h2>
-          <StudentRoundOutcome
-            username={username}
-            standings={quiz.standings}
-            mastery={
-              myStanding
-                ? { found: myStanding.correctCount, total: quiz.totalQuestions }
-                : undefined
-            }
+          {myStanding ? (
+            <StudentRoundOutcome
+              username={username}
+              standings={quiz.standings}
+              mastery={{ found: myStanding.correctCount, total: quiz.totalQuestions }}
+              t={t}
+            />
+          ) : (
+            /*
+             * The standings row is the normal source of the recap, and
+             * `StudentRoundOutcome` renders NOTHING when it cannot find this
+             * player — correct for a spectator, catastrophic for a student who
+             * just watched their own score climb. A late joiner, a renamed
+             * player, or a room the server scored under a different display
+             * name all land here, and the round-2 critic's disqualifying
+             * finding was exactly this number going missing. So the score the
+             * server sent THIS socket is shown on its own: never a podium
+             * placing invented on the client (Class 3), never a zero.
+             */
+            <div
+              data-testid="vocab-quiz-own-score"
+              className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard"
+            >
+              <p className="font-neo-body font-bold text-sm uppercase tracking-widest text-neo-cream">
+                {t('education.results.you.points')}
+              </p>
+              <p className="font-neo-display font-black text-5xl leading-none tabular-nums text-neo-white">
+                {quiz.myScore}
+              </p>
+            </div>
+          )}
+          <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={10} podium t={t} />
+
+          {/* The bottom of the phone belongs to what the student earned — the
+              run they built and whether they went clean. See VocabQuizOwnFinale. */}
+          <VocabQuizOwnFinale
+            correct={myStanding?.correctCount ?? 0}
+            total={quiz.totalQuestions}
+            bestStreak={myStanding?.bestStreak ?? quiz.myStreak}
             t={t}
           />
-          <VocabQuizStandings standings={quiz.standings} meUsername={username} limit={10} podium t={t} />
         </div>
       )}
     </div>

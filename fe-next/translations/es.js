@@ -53,7 +53,16 @@ const es = {
     },
     "finished": {
       "title": "¡Se acabó!",
-      "yourScore": "Tu puntuación: {score}."
+      "yourScore": "Tu puntuación: {score}.",
+      "subtitle": "{questions} preguntas · {players} jugando",
+      "classAccuracy": "Acierto de la clase",
+      "wordsNailed": "Palabras clavadas",
+      "topStreak": "Mejor racha",
+      "percent": "{percent} %",
+      "mascotAlt": "Lexi levantando el trofeo",
+      "perfect": "¡Ronda perfecta!",
+      "bestStreak": "Mejor racha {count}",
+      "correctOf": "{correct} de {total} correctas"
     },
     "host": {
       "joinCode": "Código",
@@ -3719,6 +3728,118 @@ const es = {
     }
   },
   "achievements": {
+    "first_lesson": {
+      "name": "Primera lección",
+      "description": "Termina tu primera lección"
+    },
+    "word_master": {
+      "name": "Maestro de palabras",
+      "description": "Domina palabras de verdad"
+    },
+    "level_climber": {
+      "name": "Escalaniveles",
+      "description": "Sube la escalera de niveles"
+    },
+    "xp_collector": {
+      "name": "Coleccionista XP",
+      "description": "Acumula montones de XP"
+    },
+    "practice_veteran": {
+      "name": "Veterano de práctica",
+      "description": "Suma sesión tras sesión"
+    },
+    "duel_veteran": {
+      "name": "Veterano de duelos",
+      "description": "Juega duelo tras duelo"
+    },
+    "speed_demon": {
+      "name": "Demonio veloz",
+      "description": "Responde antes que el reloj"
+    },
+    "perfect_streak": {
+      "name": "Ronda impecable",
+      "description": "Rondas sin un solo fallo"
+    },
+    "boss_slayer": {
+      "name": "Cazajefes",
+      "description": "Derriba a los jefes de palabras"
+    },
+    "combo_master": {
+      "name": "Amo del combo",
+      "description": "Encadena respuestas en combos"
+    },
+    "duel_champion": {
+      "name": "Campeón de duelos",
+      "description": "Gana duelos a tus compañeros"
+    },
+    "comeback_king": {
+      "name": "Rey del remonte",
+      "description": "Gana un duelo desde atrás"
+    },
+    "speed_dueler": {
+      "name": "Mano rápida",
+      "description": "Encuentra la palabra primero"
+    },
+    "spelling_ace": {
+      "name": "As del deletreo",
+      "description": "Rondas de deletreo perfectas"
+    },
+    "matching_master": {
+      "name": "Amo de las parejas",
+      "description": "Completa las parejas rapidísimo"
+    },
+    "blitz_champion": {
+      "name": "Campeón blitz",
+      "description": "Marca puntazos en blitz"
+    },
+    "streak_starter": {
+      "name": "Inicia rachas",
+      "description": "Juega días seguidos"
+    },
+    "early_bird": {
+      "name": "Madrugador",
+      "description": "Practica antes de clase"
+    },
+    "dedicated_learner": {
+      "name": "Alumno constante",
+      "description": "Aparece día tras día"
+    },
+    "weekly_warrior": {
+      "name": "Guerrero semanal",
+      "description": "Semanas enteras sin fallar"
+    },
+    "streak_champion": {
+      "name": "Campeón de rachas",
+      "description": "Mantén viva una racha bestial"
+    },
+    "duel_streak": {
+      "name": "Racha de duelos",
+      "description": "Gana duelos seguidos"
+    },
+    "practice_streak": {
+      "name": "Racha de práctica",
+      "description": "Días de práctica seguidos"
+    },
+    "mode_explorer": {
+      "name": "Explorador de modos",
+      "description": "Prueba todos los modos de juego"
+    },
+    "lesson_collector": {
+      "name": "Coleccionista",
+      "description": "Reúne lecciones completadas"
+    },
+    "classroom_contributor": {
+      "name": "Apoyo de clase",
+      "description": "Suma al marcador de tu clase"
+    },
+    "word_variety": {
+      "name": "Arcoíris de palabras",
+      "description": "Juega con una variedad salvaje"
+    },
+    "mode_master": {
+      "name": "Amo de los modos",
+      "description": "Domina todos los modos de práctica"
+    },
     "unlocked": "¡Logro Desbloqueado!",
     "upgraded": "¡Logro Mejorado!",
     "shareText": "¡Desbloqueé \"{{name}}\" en LexiClash! ¡Ven a jugar!",
@@ -12266,8 +12387,20 @@ const es = {
       "allGames": "Todos los juegos",
       "streakLabel": "{{count}} seguidas",
       "beatTheClock": "Contrarreloj",
+      "bestStreak": "Mejor racha",
+      "listenAndSpell": "Escucha y escríbela",
+      "needsDefinitions": "Faltan los significados — pídeselos a tu profe",
+      "recommended": "Recomendado",
+      "playNow": "Jugar",
+      "moreGames": "Más juegos ({{count}})",
+      "fewerGames": "Menos juegos",
       "floors": "Pisos",
-      "height": "Altura"
+      "height": "Altura",
+      "points": "Puntos",
+      "answerLabel": "Respuesta:",
+      "levelUp": "¡Nivel {{level}}!",
+      "tryAgain": "Reintentar",
+      "myLessons": "Mis lecciones"
     },
     "hub": {
       "playZone": "Jugar",
@@ -12408,6 +12541,7 @@ const es = {
   "teacher": {
     "nav": {
       "play": "Jugar",
+      "classes": "Clases",
       "lessons": "Lecciones",
       "reports": "Informes",
       "me": "Perfil",
@@ -13216,6 +13350,8 @@ const es = {
   },
   "education": {
     "homework": {
+      "takeHomeToggle": "Tarjeta de práctica para casa",
+      "backToDashboard": "Volver al panel",
       "classmatesFirst": "Eres el primero en terminar hoy: la racha empieza contigo.",
       "introTitle": "{{count}} palabras que se le escaparon a la clase",
       "introSubtitle": "Toca la respuesta correcta y deletrea las difíciles. Unos dos minutos.",
@@ -13241,12 +13377,19 @@ const es = {
       "saveFailed": "No pudimos guardar la ronda. Revisa la conexión y juégala otra vez.",
       "classStreakDays": "Racha de clase: {{count}} días",
       "classStreakSubtitle": "Días seguidos en que alguien de la clase terminó.",
+      "classStreakChecking": "Comprobando la racha de la clase…",
+      "cheer": "Toca cuando lo sepas.",
+      "studentEyebrow": "Tus deberes",
+      "studentTitle": "{{count}} palabras por recuperar",
       "classmates": "{{count}} compañeros también la terminaron",
+      "classmatesOne": "Un compañero de clase ya lo terminó",
       "anonStudent": "Alguien",
       "teacherEyebrow": "Quién ha jugado",
       "teacherPlayed": "Terminaron",
       "teacherAverage": "Media de la clase",
       "teacherEmpty": "Todavía no ha jugado nadie. Comparte el enlace y la lista se llena al momento.",
+      "teacherNamesSignedOut": "Inicia sesión como docente para ver quién jugó.",
+      "gradeOnTime": "A tiempo: la racha de la clase está a salvo.",
       "teacherLoadFailed": "No pudimos cargar quién ha jugado. Inténtalo en un momento.",
       "teacherOnTime": "A tiempo",
       "teacherLate": "Tarde"
@@ -13512,6 +13655,7 @@ const es = {
       "allFound": "La clase encontró todas las palabras de la lección.",
       "practiceMissed": "Practicar estas palabras",
       "playReteachRound": "Jugar ronda de repaso — solo las palabras que faltan",
+      "backToLobby": "Volver a la sala",
       "rematch": "Revancha — misma lista, mismo código",
       "teamBattle": {
         "title": "Batalla por equipos",
@@ -13559,6 +13703,8 @@ const es = {
         "none": "Toda la clase encontró al menos la mitad de la lista. Otra ronda.",
         "hint": "Menos de la mitad de las palabras de la lección en esta ronda."
       },
+      "moreWords": "+{count} más",
+      "fewerWords": "Ver menos",
       "allBoardWordsFound": "La clase encontró todas las palabras de la lección que aparecieron en el tablero.",
       "shareGapTitle": "Hueco de vocabulario de la clase",
       "shareGapText": "{{lesson}} — la clase encontró {{found}} de {{total}} palabras. Para practicar: {{missed}}",
@@ -13620,13 +13766,13 @@ const es = {
       "shareMissGapPracticeTitle": "Tarjeta de práctica miss-gap",
       "shareMissGapPracticeText": "{{lesson}} — práctica miss-gap para casa (imprimir o guardar PDF): {{missed}}",
       "missGapPracticeEyebrow": "Práctica para casa",
-      "missGapPracticeSubtitle": "Práctica miss-gap sin dispositivos tras asignar Unplugged en Classroom — abre, imprime o guarda como PDF.",
+      "missGapPracticeSubtitle": "Una hoja de práctica imprimible con las palabras que la clase falló: ábrela, imprímela o guárdala en PDF. Sin dispositivos.",
       "missGapPracticeFoil": "Kahoot Unplugged no tiene tarea para casa — LexiClash sí",
       "missGapPracticePrintPdf": "Imprimir / guardar PDF de práctica",
       "assignMissGapAsyncHomework": "Asignar deberes async de miss-gap",
       "assignMissGapAsyncEyebrow": "Deberes asíncronos",
       "assignMissGapAsyncHeading": "Práctica miss-gap con fecha de entrega",
-      "assignMissGapAsyncSubtitle": "El alumnado practica la tarjeta miss-gap (#972) por su cuenta — no es una sesión Unplugged en vivo. Entregar a tiempo alimenta la racha de clase.",
+      "assignMissGapAsyncSubtitle": "Los estudiantes juegan dos minutos con las palabras que la clase falló. Ves quién terminó, y terminar a tiempo mantiene viva la racha de la clase.",
       "assignMissGapAsyncFoil": "Kahootopia Assignments son deberes de juego en vivo — LexiClash asigna práctica miss-gap asíncrona que alimenta la racha de clase",
       "assignMissGapAsyncDueLabel": "Fecha de entrega",
       "assignMissGapAsyncDueBanner": "Entrega {{due}} — termina la práctica miss-gap para mantener la racha de clase",
@@ -13641,13 +13787,13 @@ const es = {
       "assignMissGapAsyncStreak": "Racha de clase: {{streak}} día(s)",
       "missGapGradePassbackEyebrow": "Devolución de notas a Google Classroom",
       "missGapGradePassbackHeading": "Entrega tu nota de miss-gap",
-      "missGapGradePassbackSubtitle": "Práctica completa — tu puntuación está lista para el libro de calificaciones de Classroom (foil de Kahoot Marketplace grade passback).",
+      "missGapGradePassbackSubtitle": "Práctica terminada: tu puntuación está lista para entregarla en el cuaderno de notas de la clase.",
       "missGapGradePassbackFoil": "Kahoot Marketplace sincroniza notas en Classroom — LexiClash hace lo mismo para la tarea async miss-gap, sin OAuth de lista",
       "missGapGradePassbackScore": "Nota: {{points}} / {{max}}",
       "missGapGradePassbackOnTime": "A tiempo — nota completa + racha de clase",
       "missGapGradePassbackLate": "Entrega tarde — nota borrador reducida (racha sin cambios)",
       "missGapGradePassbackDue": "Fecha límite {{due}}",
-      "missGapGradePassbackPrivacy": "Sin nombres de alumnos. Sin importar lista. La sincronización de notas vía add-on de Classroom queda lista cuando el alcance de profesor esté activo.",
+      "missGapGradePassbackPrivacy": "No se comparten nombres ni se importa la lista de la clase. Solo se entrega la puntuación de esta práctica.",
       "missGapGradePassbackCopy": "Copiar enlace del recibo de nota",
       "missGapGradePassbackCopied": "Recibo copiado — pégalo en Classroom o compártelo con tu profesor",
       "missGapGradePassbackShareText": "{{lesson}} — nota miss-gap {{points}}/{{max}} (vence {{due}})",
@@ -13657,7 +13803,7 @@ const es = {
 
       "missGapWhatsAppEyebrow": "Práctica para padres por WhatsApp",
       "missGapWhatsAppHeading": "Enviar la práctica miss-gap a casa por WhatsApp",
-      "missGapWhatsAppSubtitle": "Tras el passback de nota a Classroom, un toque envía la tarjeta #972 al chat de padres — solo palabras de clase.",
+      "missGapWhatsAppSubtitle": "Envía la tarjeta de práctica al chat de las familias con un toque: solo palabras de la clase, sin nombres de estudiantes.",
       "missGapWhatsAppParentSubtitle": "Practica con tu hijo/a las palabras falladas de {{lesson}} — imprime o abre la tarjeta.",
       "missGapWhatsAppFoil": "La sync de notas de Classroom se queda en el libro — LexiClash manda la tarjeta miss-gap a casa por WhatsApp",
       "missGapWhatsAppDue": "Tarea para el {{due}}",
@@ -13704,6 +13850,7 @@ const es = {
       "vocabScore": "¡Acertaste {{found}} de {{total}} palabras!"
     },
     "duels": {
+      "recommended": "Recomendado",
       "lobby": "Sala",
       "history": "Historial",
       "classmates": "Compañeros",
@@ -13719,6 +13866,7 @@ const es = {
       "aheadBy": "Ganas por {{points}}",
       "behindBy": "Pierdes por {{points}}",
       "levelPegged": "Empate total",
+      "changeSetup": "Cambiar",
       "revealWin": "¡Campeón!",
       "revealLose": "¡Derrotado!",
       "revealDraw": "¡Empate!",
@@ -13737,12 +13885,24 @@ const es = {
       "turnBeatIt": "Superarlo",
       "turnPlay": "Jugar mi turno",
       "turnDecline": "Saltar",
+      "turnLiveBadge": "En vivo",
+      "turnLiveInvite": "¡{{name}} te espera en vivo!",
+      "turnAcceptLive": "Jugar en vivo",
       "tauntPrompt": "Envía una pegatina",
       "tauntSent": "Pegatina enviada",
       "tauntFire": "Muy fácil",
       "tauntMindblown": "¡Guau!",
       "tauntTrophy": "Supera eso",
       "tauntTears": "Buen juego",
+      "rematchAccept": "Aceptar la revancha",
+      "rematchWants": "{{name}} quiere la revancha",
+      "rematchWaiting": "Esperando a {{name}}",
+      "rematchTapCancel": "Toca para cancelar",
+      "rematchInvited": "Invitación enviada a su sala",
+      "waitingForName": "Esperando a {{name}}…",
+      "stillWaiting": "{{name}} aún no llega",
+      "waitingHint": "Quizá cerró el duelo. Inténtalo otra vez o vuelve a la sala.",
+      "tryAgain": "Intentar de nuevo",
       "rematchSent": "Preparando…",
       "noClassmatesOnline": "No hay compañeros conectados ahora",
       "challengeSomeone": "¡Reta a alguien!",
@@ -13758,6 +13918,24 @@ const es = {
       "coinReward": "+{{amount}} monedas"
     },
     "achievements": {
+      "first_lesson": { "name": "Primera lección", "description": "Termina una lección de tu profe" },
+      "word_master": { "name": "Maestro de palabras", "description": "Domina palabras nuevas" },
+      "level_climber": { "name": "Sube de nivel", "description": "Alcanza un nivel nuevo" },
+      "xp_collector": { "name": "Coleccionista de XP", "description": "Acumula XP practicando" },
+      "practice_veteran": { "name": "Veterano del repaso", "description": "Completa rondas de práctica" },
+      "speed_demon": { "name": "Rapidísimo", "description": "Responde antes de que suene el reloj" },
+      "perfect_streak": { "name": "Ronda perfecta", "description": "Termina una ronda sin fallos" },
+      "boss_slayer": { "name": "Caza jefes", "description": "Gana una ronda contra el jefe" },
+      "combo_master": { "name": "Maestro del combo", "description": "Encadena un combo largo" },
+      "streak_starter": { "name": "Racha iniciada", "description": "Practica varios días seguidos" },
+      "early_bird": { "name": "Madrugador", "description": "Practica antes de clase" },
+      "dedicated_learner": { "name": "Constante", "description": "Practica en muchos días distintos" },
+      "weekly_warrior": { "name": "Semana completa", "description": "Practica todos los días de una semana" },
+      "streak_champion": { "name": "Campeón de rachas", "description": "Mantén viva una racha larga" },
+      "mode_explorer": { "name": "Explorador de juegos", "description": "Prueba juegos de práctica distintos" },
+      "lesson_collector": { "name": "Coleccionista de lecciones", "description": "Practica muchísimas lecciones" },
+      "classroom_contributor": { "name": "Compañero de equipo", "description": "Suma puntos para tu clase" },
+      "word_variety": { "name": "Cazador de palabras", "description": "Encuentra palabras de todo tipo" },
       "categories": {"consistency":"Constancia","exploration":"Exploración","progress":"Progreso","skill":"Habilidad"},
       "ariaDismissError": "Descartar error",
       "ariaOverallProgress": "Progreso general",

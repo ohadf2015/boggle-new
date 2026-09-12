@@ -74,12 +74,12 @@ export function MissGapWhatsAppShareCard({
     return (
       <div
         data-testid="miss-gap-whatsapp-share-card"
-        className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard text-center"
+        className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard text-center"
       >
         <p className="text-neo-white font-neo-body mb-4">{t('education.results.allFound')}</p>
         <Link
           href={`/${locale}/education`}
-          className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard"
+          className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard"
         >
           {t('education.results.shareGapCta')}
         </Link>
@@ -90,24 +90,18 @@ export function MissGapWhatsAppShareCard({
   return (
     <article
       data-testid="miss-gap-whatsapp-share-card"
-      className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard"
+      className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard"
     >
-      <p className="text-neo-pink font-bold text-xs uppercase tracking-widest mb-2">
+      <p className="text-neo-lime font-bold text-xs uppercase tracking-widest mb-2">
         {t('education.results.missGapWhatsAppEyebrow')}
       </p>
       <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight">
         {t('education.results.missGapWhatsAppHeading')}
       </h1>
-      <p className="text-neo-white/80 font-neo-body text-sm mt-3">
+      <p className="text-neo-cream font-neo-body text-sm mt-3">
         {parentView
           ? t('education.results.missGapWhatsAppParentSubtitle', { lesson })
           : t('education.results.missGapWhatsAppSubtitle')}
-      </p>
-      <p
-        className="text-neo-lime/90 font-neo-body text-xs mt-2"
-        data-testid="miss-gap-whatsapp-foil"
-      >
-        {t('education.results.missGapWhatsAppFoil')}
       </p>
 
       {payload.dueDate ? (
@@ -128,7 +122,7 @@ export function MissGapWhatsAppShareCard({
           {words.map((word) => (
             <li
               key={word}
-              className="px-3 py-1.5 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-bold text-sm"
+              className="px-3 py-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-white font-bold text-sm"
             >
               {word}
             </li>
@@ -136,7 +130,7 @@ export function MissGapWhatsAppShareCard({
         </ul>
       </div>
 
-      <p className="text-neo-white/60 font-neo-body text-xs mt-3" data-testid="miss-gap-whatsapp-privacy">
+      <p className="text-neo-cream font-neo-body text-xs mt-3" data-testid="miss-gap-whatsapp-privacy">
         {t('education.results.missGapWhatsAppPrivacy')}
       </p>
 
@@ -148,7 +142,7 @@ export function MissGapWhatsAppShareCard({
             onClick={handleWhatsApp}
             className={cn(
               'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-              'bg-brand-whatsapp text-neo-black border-neo border-neo-black rounded-neo',
+              'bg-brand-whatsapp text-neo-black border-[3px] border-neo-black rounded-neo',
               'shadow-hard hover:shadow-hard-lg transition-all hover:bg-brand-whatsapp-hover',
             )}
           >
@@ -171,7 +165,7 @@ export function MissGapWhatsAppShareCard({
           data-testid="miss-gap-whatsapp-open-practice"
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
-            'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
+            'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition-all',
           )}
         >
@@ -184,9 +178,10 @@ export function MissGapWhatsAppShareCard({
             href={homeworkHref}
             data-testid="miss-gap-whatsapp-open-homework"
             className={cn(
-              'w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-              'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
-              'shadow-hard-sm hover:shadow-hard transition-all',
+              'w-full flex items-center justify-center gap-2 px-4 py-4',
+              'font-neo-display font-bold text-lg',
+              'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
+              'shadow-hard hover:shadow-hard-lg transition-all',
             )}
           >
             {t('education.results.missGapWhatsAppOpenHomework')}

@@ -199,7 +199,7 @@ export default function PracticeModeSelector({
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 400, damping: 24, delay: 0.05 }}
         >
-          <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80 mb-6">
+          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-6">
             <CardContent className="py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -272,7 +272,7 @@ export default function PracticeModeSelector({
                 }}
                 onClick={() => onSelectMode(option.type)}
                 className={cn(
-                  'relative rounded-neo border-3 border-black shadow-hard cursor-pointer overflow-hidden',
+                  'relative rounded-neo border-[3px] border-black shadow-hard cursor-pointer overflow-hidden',
                   solidBg,
                 )}
               >
@@ -282,7 +282,7 @@ export default function PracticeModeSelector({
                 <div className="p-5">
                   <div className="flex items-start gap-4">
                     <AdaptiveMotion.div
-                      className="w-14 h-14 rounded-neo border-2 border-black bg-black/20 flex items-center justify-center shadow-hard-sm shrink-0"
+                      className="w-14 h-14 rounded-neo border-[2px] border-black bg-black/20 flex items-center justify-center shadow-hard-sm shrink-0"
                       animate={{ rotate: [0, -5, 5, -3, 0] }}
                       transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 + index * 0.5, ease: 'easeInOut' }}
                     >
@@ -292,13 +292,13 @@ export default function PracticeModeSelector({
                       <h3 className="text-lg font-neo-display font-black text-black uppercase">
                         {t(getTranslationKey(option.type, 'title')) || option.type}
                       </h3>
-                      <p className="text-sm font-neo-body font-bold text-black/60 mt-0.5">
+                      <p className="text-sm font-neo-body font-bold text-black/80 mt-0.5">
                         {t(getTranslationKey(option.type, 'desc')) || ''}
                       </p>
                       {sessions > 0 && (
-                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-black/15 rounded-neo text-xs font-black text-black/70">
+                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-black/15 rounded-neo text-xs font-black text-black/80">
                           <CheckCircle className="w-3 h-3" />
-                          {sessions} {t('education.practice.sessionsCompleted')}
+                          {t('education.practice.sessionsCompleted', { count: sessions })}
                         </div>
                       )}
                     </div>
@@ -316,19 +316,19 @@ export default function PracticeModeSelector({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 22, delay: 0.5 }}
-            className="mt-4 rounded-neo border-3 border-black shadow-hard bg-neo-cream overflow-hidden"
+            className="mt-4 rounded-neo border-[3px] border-black shadow-hard bg-neo-cream overflow-hidden"
           >
             <div className="h-1.5 bg-black/20" />
             <div className="p-5">
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-14 h-14 rounded-neo border-2 border-black bg-neo-yellow flex items-center justify-center shadow-hard-sm shrink-0">
+                <div className="w-14 h-14 rounded-neo border-[2px] border-black bg-neo-yellow flex items-center justify-center shadow-hard-sm shrink-0">
                   <Crosshair className="w-8 h-8 text-black" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-neo-display font-black text-black uppercase">
                     {t('education.vocabFocus.title')}
                   </h3>
-                  <p className="text-sm font-neo-body font-bold text-black/60 mt-0.5">
+                  <p className="text-sm font-neo-body font-bold text-black/80 mt-0.5">
                     {t('education.vocabFocus.desc')}
                   </p>
                 </div>
@@ -343,17 +343,17 @@ export default function PracticeModeSelector({
                       disabled={!unlocked}
                       onClick={() => unlocked && onSelectMode('vocab_focus', { focus })}
                       className={cn(
-                        'min-h-14 px-4 py-2 rounded-neo border-3 border-black text-start transition-all',
+                        'min-h-14 px-4 py-2 rounded-neo border-[3px] border-black text-start transition-all',
                         unlocked
                           ? 'bg-neo-yellow text-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-0.5'
-                          : 'bg-black/5 text-black/50 border-black/30 cursor-not-allowed'
+                          : 'bg-black/10 text-black/80 border-black/50 cursor-not-allowed'
                       )}
                     >
                       <span className="flex items-center gap-2 font-neo-display font-black">
                         {!unlocked && <Lock className="w-4 h-4 shrink-0" aria-hidden="true" />}
                         {t(`education.vocabFocus.focus.${focus}`)}
                       </span>
-                      <span className="block text-xs font-neo-body font-bold text-black/60 mt-0.5">
+                      <span className="block text-xs font-neo-body font-bold text-black/80 mt-0.5">
                         {unlocked
                           ? t(`education.vocabFocus.instructions.${focus}`)
                           : t(`education.vocabFocus.unlock.${focus}`, { min: MIN_WORDS_PER_FOCUS })}

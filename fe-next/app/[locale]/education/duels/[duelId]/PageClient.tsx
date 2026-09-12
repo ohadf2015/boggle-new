@@ -6,10 +6,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { useEducationShellLock } from '@/components/education/shell/useEducationShellLock';
 import { DuelGameView, RealTimeDuelGame } from '@/components/education/duels';
 import { cn } from '@/lib/utils';
 import { getDuelById } from '@/lib/supabase/education/duels';
 import { getProfile } from '@/lib/supabase';
+import { readStudentName } from '@/lib/education/duelOpponentNames';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 
 /**
  * Duel Game Page Client
@@ -18,10 +21,30 @@ import { getProfile } from '@/lib/supabase';
  * Students play a specific duel and submit their score.
  */
 export default function DuelGamePageClient({ duelId }: { duelId: string }) {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
+  /**
+   * The other half of "no page scroll": <body> ships `.screen-fit`
+   * (min-height:100dvh, overflow-y:auto) and the layout hangs a footer and the
+   * global bottom nav below this route, so a one-viewport subtree still left
+   * the document scrollable. Ref-counted, shared with EducationShell.
+   */
+  useEducationShellLock();
+
+  /**
+   * A duel is a game surface, so the app's own chrome comes off. Without this
+   * `GlobalBottomNav` (fixed bottom-0, z-[80]) painted QUESTS / FRIENDS / HOME
+   * across the bottom of the live board and over the reveal's REMATCH row —
+   * three controls from another screen on top of this screen's only primary
+   * action. Released on unmount, or the nav stays hidden everywhere after.
+   */
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   const [isChecking, setIsChecking] = useState(true);
   const [duelError, setDuelError] = useState<string | null>(null);
@@ -37,7 +60,16 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
     const verifyDuel = async () => {
       if (authLoading) return;
 
-      if (!isAuthenticated || !user) {
+      /**
+       * `user` alone answers "is someone signed in". `isAuthenticated` also
+       * waits on the PROFILE, which resolves a beat later — so on a full page
+       * load (a refresh mid-duel, or opening the duel link directly) there is a
+       * window where loading is false, the user is present, and
+       * isAuthenticated is still false. Reading that window as "signed out"
+       * ejected the student to /education mid-duel (recurring-pitfalls
+       * Class 1: the late source flipping after the early render).
+       */
+      if (!user) {
         router.push(`/${language}/education`);
         return;
       }
@@ -69,7 +101,17 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
         const opponentId = duel.challenger_id === user.id ? duel.opponent_id : duel.challenger_id;
         setOpponentId(opponentId ?? undefined);
         const { data: opponentProfile } = await getProfile(opponentId, 'minimal');
-        setOpponentName(opponentProfile?.display_name || t('common.opponent'));
+        /**
+         * A student reading ANOTHER student's `profiles` row gets
+         * `{ data: null, error: null }` — own-row RLS, indistinguishable from
+         * "no such person". The lobby banks every name it sees against the user
+         * id, so read that before giving up and calling them "Opponent".
+         */
+        setOpponentName(
+          opponentProfile?.display_name ||
+            (opponentId ? readStudentName(opponentId) : null) ||
+            t('common.opponent')
+        );
       } catch (error) {
         console.error('[DuelGamePageClient] Failed to verify duel:', error);
         setDuelError(t('duelNotFound'));
@@ -79,7 +121,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
     };
 
     verifyDuel();
-  }, [duelId, isAuthenticated, authLoading, router, language, user, t]);
+  }, [duelId, authLoading, router, language, user, t]);
 
   const handleBackToLobby = useCallback(() => {
     router.push(`/${language}/education/duels`);
@@ -87,7 +129,10 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
   if (isChecking || authLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
+      <div
+        data-testid="duel-page-loading"
+        className="flex h-dvh items-center justify-center overflow-hidden bg-neo-navy"
+      >
         <PageLoader
           size="lg"
           text={t('common.loading')}
@@ -98,14 +143,17 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
   if (duelError) {
     return (
-      <div className={cn('flex-1 flex flex-col bg-neo-navy w-full min-h-dvh', isRTL && 'rtl')}>
+      <div
+        data-testid="duel-page-error"
+        className={cn('flex h-dvh w-full flex-col overflow-hidden bg-neo-navy', isRTL && 'rtl')}
+      >
         <EducationHeader showBackButton title={t('duelsTitle')} />
 
         <main className="flex-1 flex items-center justify-center px-4">
           <div
             className={cn(
-              'p-8 rounded-neo border-3 border-neo-black',
-              'bg-neo-navy/80 shadow-hard-sm text-center max-w-md'
+              'p-8 rounded-neo border-[3px] border-neo-cream',
+              'bg-neo-navy shadow-hard text-center max-w-md'
             )}
           >
             <p className="text-neo-white text-xl font-bold mb-4">{duelError}</p>
@@ -115,7 +163,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
               className={cn(
                 'px-6 py-3 font-bold rounded-neo',
                 'bg-neo-lime text-neo-black',
-                'border-3 border-neo-black shadow-hard-sm',
+                'border-[3px] border-neo-black shadow-hard',
                 'hover:shadow-hard transition-all'
               )}
             >
@@ -131,11 +179,17 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
 
   return (
     <div
+      data-testid="duel-surface"
+      /** Proof the chrome switch ran — a capture can read it. */
+      data-chrome="hidden"
       className={cn(
-        'flex flex-col bg-neo-navy w-full',
-        // A live duel is a game surface: the shell locks and the play panel owns
-        // the one scrolling region, so a thumb never scrolls the page mid-duel.
-        isLive ? 'h-dvh overflow-hidden' : 'min-h-dvh',
+        'flex w-full flex-col overflow-hidden bg-neo-navy',
+        // Both halves of this route are fixed-height phone screens now. A live
+        // duel's play panel owns the one scrolling region; an async turn's
+        // <main> does. `min-h-dvh` on the async half let the body grow past the
+        // viewport — the same measurement the round-1 critic disqualified the
+        // lobby on.
+        'h-dvh',
         isRTL && 'rtl'
       )}
     >
@@ -144,7 +198,8 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
       <main
         className={cn(
           'w-full max-w-4xl mx-auto px-3 sm:px-6 lg:px-8',
-          isLive ? 'flex-1 min-h-0 overflow-hidden py-2' : 'flex-1 py-6'
+          'flex-1 min-h-0',
+          isLive ? 'overflow-hidden py-2' : 'edu-shell-scroll overflow-y-auto overscroll-contain py-6'
         )}
       >
         {isLive ? (
