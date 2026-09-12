@@ -255,7 +255,7 @@ export default function WarmupRound({
         </div>
 
         {/* Hints panel */}
-        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-pink/10 mb-4 shrink-0">
+        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-pink/10 mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -306,7 +306,7 @@ export default function WarmupRound({
         </Card>
 
         {/* Stats bar */}
-        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
+        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -347,7 +347,7 @@ export default function WarmupRound({
 
         {/* Found words */}
         {foundWords.length > 0 && (
-          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
+          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
             <CardContent className="py-3">
               <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
