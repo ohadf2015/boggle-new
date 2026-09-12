@@ -42,7 +42,18 @@ export type UseCaseKind = 'free' | 'chip' | 'empty';
  */
 export function isMachineRequest(email: string | null | undefined): boolean {
   const e = (email ?? '').trim().toLowerCase();
-  return e.endsWith('@example.com') || e.startsWith('rls-test-') || e.startsWith('rls-update-test-');
+  return (
+    e.endsWith('@example.com') ||
+    // The QA/gauntlet signup convention; `profiles.is_test_account` is set from it by
+    // a DB trigger, but rows predating that trigger only have the address to go on.
+    e.endsWith('@lexiclash.test') ||
+    // Domains QA tooling produced before that convention existed. Verified 2026-09-12
+    // to match zero real applicants in teacher_access_requests.
+    e.endsWith('@test.com') ||
+    e.endsWith('@mailtests.dev') ||
+    e.startsWith('rls-test-') ||
+    e.startsWith('rls-update-test-')
+  );
 }
 
 export type TrialState = 'none' | 'active' | 'expired';
@@ -67,6 +78,8 @@ export interface TeacherFunnelInput {
   profiles: Array<{
     id: string;
     user_role: string | null;
+    /** Set by a DB trigger for QA rigs. Such a profile is excluded from every number. */
+    is_test_account?: boolean | null;
     last_seen_at?: string | null;
     display_name?: string | null;
     username?: string | null;
@@ -233,9 +246,21 @@ function buildReasons(rows: TeacherFunnelRow[]): UseCaseReason[] {
 }
 
 export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResult {
-  const { profiles, classrooms, memberships, assignments, nowMs } = input;
-  const requests = input.requests.filter((r) => !isMachineRequest(r.email));
+  const { profiles, memberships, assignments, nowMs } = input;
+
+  // A QA rig is not a school. On 2026-09-12 the gauntlet accounts were 14 of 32
+  // classrooms, so leaving them in overstated module activity by ~44%. Excluded here,
+  // at the single point every caller routes through, rather than per query.
+  const testAccountIds = new Set(
+    profiles.filter((p) => p.is_test_account).map((p) => p.id),
+  );
+  const requests = input.requests.filter(
+    (r) => !isMachineRequest(r.email) && !(r.user_id && testAccountIds.has(r.user_id)),
+  );
   const excludedMachineRows = input.requests.length - requests.length;
+  const classrooms = input.classrooms.filter(
+    (c) => !(c.teacher_id && testAccountIds.has(c.teacher_id)),
+  );
 
   const roleById = new Map(profiles.map((p) => [p.id, p.user_role]));
   const lastSeenById = new Map(profiles.map((p) => [p.id, p.last_seen_at ?? null]));

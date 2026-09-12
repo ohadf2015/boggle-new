@@ -290,3 +290,76 @@ describe('reasons', () => {
     });
   });
 });
+
+describe('test accounts', () => {
+  // 2026-09-12: 93 of 787 profiles and 14 of 32 classrooms were QA rigs from the
+  // teacher-module gauntlet runs. They made the module look 44% more active than it
+  // was. `profiles.is_test_account` is now the single source of truth for "this is a
+  // rig, not a school" and must zero these rows out of every number.
+  it('excludes a request whose profile is flagged is_test_account', () => {
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ id: 'rig', user_id: 'rig', email: 'ms.gauntlet@lexiclash.test' })],
+        profiles: [{ id: 'rig', user_role: 'teacher', is_test_account: true }],
+        classrooms: [{ id: 'c1', teacher_id: 'rig' }],
+        memberships: [{ classroom_id: 'c1', student_id: 's1' }],
+      }),
+    );
+
+    expect(out.rows).toHaveLength(0);
+    expect(out.summary.roleGranted).toBe(0);
+    expect(out.summary.gotStudents).toBe(0);
+    expect(out.summary.excludedMachineRows).toBe(1);
+  });
+
+  it('does not let a test teacher inflate a real teacher row', () => {
+    // Both own a classroom; only the real one may be counted.
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ id: 'r1', user_id: 'u1' }), req({ id: 'r2', user_id: 'rig' })],
+        profiles: [
+          { id: 'u1', user_role: 'teacher' },
+          { id: 'rig', user_role: 'teacher', is_test_account: true },
+        ],
+        classrooms: [
+          { id: 'c1', teacher_id: 'u1' },
+          { id: 'c2', teacher_id: 'rig' },
+        ],
+        memberships: [
+          { classroom_id: 'c1', student_id: 's1' },
+          { classroom_id: 'c2', student_id: 's2' },
+        ],
+      }),
+    );
+
+    expect(out.rows).toHaveLength(1);
+    expect(out.rows[0].userId).toBe('u1');
+    expect(out.summary.gotStudents).toBe(1);
+  });
+
+  it.each(['rig@test.com', 'qa.teacher.ws2.123@mailtests.dev'])(
+    'treats the QA tool domain %s as a machine row',
+    (email) => {
+      // Domains QA tooling actually produced before the @lexiclash.test convention
+      // existed. No trigger can flag them retroactively, so the filter must.
+      const out = buildTeacherFunnel(input({ requests: [req({ email })] }));
+
+      expect(out.rows).toHaveLength(0);
+      expect(out.summary.excludedMachineRows).toBe(1);
+    },
+  );
+
+  it('treats an unflagged @lexiclash.test signup as a machine row', () => {
+    // Belt and braces: the flag is set by a DB trigger, but a row that predates
+    // the trigger (or arrives via a path that bypasses it) is still a rig.
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ id: 'r1', user_id: 'u1', email: 'gauntlet2-c@lexiclash.test' })],
+        profiles: [{ id: 'u1', user_role: 'teacher' }],
+      }),
+    );
+
+    expect(out.rows).toHaveLength(0);
+    expect(out.summary.excludedMachineRows).toBe(1);
+  });
+});

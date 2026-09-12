@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   const profilesRes = userIds.length
     ? await supabase
         .from('profiles')
-        .select('id, user_role, last_seen_at, display_name, username')
+        .select('id, user_role, is_test_account, last_seen_at, display_name, username')
         .in('id', userIds)
     : { data: [], error: null };
   if (profilesRes.error) {
