@@ -31,7 +31,7 @@ export const contentByLocale: Record<string, LocaleContent> = {
   en: {
     title: 'The Most Popular Online Word Games of 2026 — and Why They Exploded',
     subtitle:
-      'From a puzzle one guy built for his girlfriend to a $3.36 billion industry. Here are the word games everyone is actually playing in 2026 — and the surprisingly human reasons each one took off.',
+      'From a puzzle one guy built for his girlfriend to a $3.36 billion industry. These are the best word games online in 2026 — the ones people actually play — and the surprisingly human reasons each one took off.',
     category: 'Trends',
     readTime: '8 min read',
     authorName: 'Ohad Fisher',
@@ -39,11 +39,11 @@ export const contentByLocale: Record<string, LocaleContent> = {
       "I build word games for a living, which means I also play everyone else's word games \"for research\" until 2am. Bias fully acknowledged.",
     sections: [
       {
-        content: `Let me give you one number to start with: $3.36 billion.
+        content: `$3.36 billion.
 
-That's the projected revenue of the word-games market in 2026 — up more than 50% since 2022, growing at roughly 9.6% a year. Five years ago, word games basically meant "the crossword your grandparent does in pen." Now it's a multi-billion dollar industry, and the games making it happen are deceptively simple.
+That's the projected revenue of the word-games market in 2026 — up more than 50% since 2022, growing at roughly 9.6% a year. Five years ago, "word game" meant the crossword your grandparent does in pen. Now it's a multi-billion dollar industry, and the games making it happen are deceptively simple.
 
-So what are people actually playing? And — the more interesting question — why did each of these games blow up the way it did? I went down the rabbit hole. Here's the honest field guide to the most popular online word games of 2026, with the origin story behind each one.`,
+I build word games for a living, so I get asked the same question at every family dinner: what is everyone actually playing? And behind it, the more interesting question — why did *those* games blow up? I went down the rabbit hole. Here's the honest field guide to the most popular word games of 2026, with the origin story behind each one.`,
         image: { src: '/images/blog/most-popular-word-games-2026.jpg', alt: 'Neo-brutalist illustration of word game letter tiles exploding upward like a rocket' },
       },
       {
@@ -70,7 +70,7 @@ Why did it hit? Because it's argument fuel. Wordle is solitary. Connections is t
         image: { src: '/images/blog/multiplayer-social.jpg', alt: 'Friends arguing playfully over a word puzzle on their phones' },
       },
       {
-        title: 'The multi-grid arms race and the depths players crave',
+        title: 'Word games like Wordle, but harder: the multi-grid arms race',
         content: `Wordle's success spawned a whole genre of "but harder" variants.
 
 **Quordle** (2022): four Wordles at once, nine guesses total. **Octordle** (also 2022): *eight* grids, thirteen guesses. These exist for players who found one Wordle too easy and wanted their morning coffee to come with a small panic attack.
@@ -81,7 +81,7 @@ The lesson here is subtle but important: there is real, durable demand for *dept
         image: { src: '/images/blog/brain-training-words.jpg', alt: 'A dense letter grid puzzle illustration' },
       },
       {
-        title: 'Words With Friends and the social lane that never died',
+        title: 'Words With Friends: the 6-billion-download lane that never died',
         content: `While the daily-puzzle world was exploding, the original word-game juggernaut just kept... going.
 
 Words With Friends — now under Take-Two Interactive — has crossed 6 billion lifetime downloads, and in late 2025 it shipped a whole suite of new single-player modes.
@@ -91,7 +91,7 @@ It plays a completely different game from Wordle, literally and strategically. I
 That distinction matters, because it's the gap a lot of newer games are racing to fill: the daily puzzle gives you the habit, but the multiplayer game gives you the people.`,
       },
       {
-        title: 'Why did all of them explode? Four forces.',
+        title: 'Why do word games explode? The same four forces, every time.',
         content: `Step back and the same four engines show up under every one of these games.
 
 **1. The daily habit loop.** One puzzle a day, a streak you'd hate to break. Scarcity beats abundance — you can't doom-scroll a thing that only exists once every 24 hours.

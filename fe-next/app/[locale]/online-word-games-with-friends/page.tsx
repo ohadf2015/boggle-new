@@ -45,24 +45,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const faqs = [
   {
+    q: 'Can I play Words With Friends online for free, without the app?',
+    a: "Words With Friends itself requires the mobile app and an account. LexiClash is a free alternative that runs entirely in your browser — no app, no account, no ads popping between turns. And instead of waiting for each other's moves, everyone plays the same grid live, so a whole rivalry resolves in one sitting.",
+  },
+  {
     q: 'How do I play word games online with friends?',
-    a: "It's easy! Go to LexiClash, tap 'Create Room', and share the link with your friends via text, WhatsApp, Discord, or any messenger. Friends click the link and join instantly — no signup or download needed. Up to 20+ players can join.",
+    a: "Go to LexiClash, tap 'Create Room', and share the link via text, WhatsApp, Discord, or any messenger. Friends click and join instantly — no signup or download. Up to 50 players can pile into one room.",
   },
   {
     q: 'Is this like Words With Friends but multiplayer?',
-    a: "Similar idea but very different gameplay. Words With Friends is turn-based (you wait for each other). LexiClash is real-time — everyone plays the same grid simultaneously, racing to find words. It's faster, more exciting, and better for groups.",
+    a: "Same family, very different tempo. Words With Friends is turn-based and one-on-one — you play a word, then wait. LexiClash is real-time: the whole group races on the same grid simultaneously. It's faster, louder, and built for groups rather than duels.",
   },
   {
     q: 'What online multiplayer word games are like Hanging With Friends?',
-    a: 'LexiClash captures the social, competitive spirit of Hanging With Friends but with richer gameplay. Instead of guessing letters, you find words on a grid in real-time against friends. Plus it has daily challenges, adventure mode, and brain training — all multiplayer.',
+    a: 'LexiClash captures the social, competitive spirit of Hanging With Friends with richer gameplay. Instead of guessing letters one at a time, you find words on a grid in real-time against friends — plus daily challenges, adventure mode, and brain training, all multiplayer.',
   },
   {
     q: 'Can I play word games with friends on different devices?',
-    a: 'Yes! LexiClash works in any browser — phone, tablet, laptop, desktop. No app needed. Friends on iPhone can play against friends on Android or desktop. Everyone just needs the room link.',
+    a: 'Yes — LexiClash works in any browser on phone, tablet, laptop, or desktop. iPhone friends can battle Android friends can battle that one friend on a smart TV. Everyone just needs the room link.',
   },
   {
     q: 'How many friends can play at once?',
-    a: 'Up to 20+ players can join a single room. Perfect for large parties, classrooms, team building events, or family game nights. Everyone plays the same grid simultaneously.',
+    a: 'Up to 50 players in a single room, all on the same grid at the same time. That covers parties, classrooms, team-building events, and family game nights where grandma plays to win.',
   },
 ];
 
@@ -90,13 +94,18 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Online Word Games With Friends — Play Free
+          Play Words With Friends Online — Free, Real-Time, No App
         </h1>
 
+        <p className="mb-6 text-lg leading-relaxed text-neo-gray-200">
+          Looking for Words With Friends online, without the app and without the waiting? Here&apos;s the
+          catch with the classic: you take a turn, then wait hours — sometimes days — for your friend to
+          notice. LexiClash is that same itch scratched at full speed: everyone plays the same letter grid
+          at the same time, live, and the bragging rights settle in 3 minutes instead of 3 weeks.
+        </p>
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Want to play word games with friends online? LexiClash makes it easy — create a room, share the link,
-          and compete in real-time word battles with 2-20+ players. No download, no signup. Like Boggle meets
-          Words With Friends, but everyone plays at the same time.
+          Create a room, share one link, and up to 50 friends join instantly from any browser — phone,
+          laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -133,6 +142,23 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Why Real-Time Beats Turn-Based</h2>
+          <div className="space-y-4 text-lg leading-relaxed text-neo-gray-200">
+            <p>
+              Turn-based word games have a dirty secret: most matches never finish. Someone forgets, the
+              notification gets buried, and three weeks later you&apos;re both pretending the game doesn&apos;t
+              exist. Real-time flips that — a LexiClash round is 2–3 minutes of everyone shouting at the
+              same grid, and it always ends with a winner.
+            </p>
+            <p>
+              It also changes who you can play with. Async games work for two patient people. A live room
+              works for a party: project the grid on a TV, everyone plays from their phone, and suddenly
+              it&apos;s a game night — not a notification thread.
+            </p>
           </div>
         </section>
 

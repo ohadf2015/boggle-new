@@ -97,7 +97,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     },
     {
       q: 'Var kan man spela Scrabble online på svenska gratis?',
-      a: 'LexiClash är det bästa gratis alternativet till Scrabble och Wordfeud på svenska. Spela direkt i webbläsaren — ingen app, ingen registrering. Skapa ett rum, bjud in upp till 20 vänner via länk, och tävla i realtid med över 10 000 svenska ord.',
+      a: 'LexiClash är det bästa gratis alternativet till Scrabble och Wordfeud på svenska. Spela direkt i webbläsaren — ingen app, ingen registrering. Skapa ett rum, bjud in upp till 50 vänner via länk, och tävla i realtid med över 10 000 svenska ord.',
     },
   ];
 
@@ -124,7 +124,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
                 totalTime: 'PT1M',
                 step: [
                   { '@type': 'HowToStep', name: 'Öppna LexiClash', text: 'Gå till lexiclash.live i valfri webbläsare på telefon, surfplatta eller dator. Ingen nedladdning krävs.' },
-                  { '@type': 'HowToStep', name: 'Skapa ett rum', text: 'Välj "Skapa rum" och dela länken via WhatsApp, Discord eller direktmeddelande. Upp till 20 spelare kan ansluta.' },
+                  { '@type': 'HowToStep', name: 'Skapa ett rum', text: 'Välj "Skapa rum" och dela länken via WhatsApp, Discord eller direktmeddelande. Upp till 50 spelare kan ansluta.' },
                   { '@type': 'HowToStep', name: 'Hitta ord i realtid', text: 'Alla spelare ser samma rutnät samtidigt. Klicka eller dra för att skapa ord — längre ord ger fler poäng. Match varar 2-3 minuter.' },
                 ],
               },
@@ -140,10 +140,11 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
         </h1>
 
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Välkommen till LexiClash, det ultimata gratis multiplayer ordspelet online på svenska! Om du älskar Boggle,
-          Scrabble eller Wordfeud kommer vår realtidsplattform att kombinera det bästa av varje spel. Skapa ett rum,
-          skicka en länk till dina vänner och tävla i spännande ordkamper direkt. Med 10 000+ ord i vår svenska ordbok,
-          ingen nedladdning krävs och helt gratis tillgång, LexiClash är ditt ultimata ordspel för rolig tävling.
+          Letar du efter Scrabble på svenska online — gratis, utan app och utan konto? LexiClash är det
+          snabbaste sättet att avgöra vem i kompisgänget som faktiskt kan flest ord. Skapa ett rum, skicka
+          länken, och upp till 50 spelare tävlar på samma bokstavsrutnät i realtid. Med över 10 000 svenska
+          ord i ordboken och matcher på 2–3 minuter är det lika enkelt att komma igång som det är svårt
+          att sluta.
         </p>
 
         <section className="mb-12">
@@ -159,7 +160,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
               'Dagliga utmaningar med poängtabeller',
               'Bosskamper med unika vändningar',
               'Helt gratis, ingen nedladdning behövs',
-              'Spela på 6 språk (EN, HE, SV, JA, ES)',
+              'Spela på 6 språk (EN, HE, SV, JA, ES, RU)',
             ].map((feature) => (
               <div
                 key={feature}
@@ -169,6 +170,23 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
                 <p className="text-sm sm:text-base">{feature}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="mb-12 max-w-none">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Bilda ord av bokstäver — så funkar det</h2>
+          <div className="space-y-4 text-neo-gray-200">
+            <p>
+              På ytan är det enkelt: du får ett rutnät med slumpade bokstäver och ska bilda ord av
+              bokstäverna genom att koppla ihop intilliggande rutor. Men det är tempot som gör det
+              beroendeframkallande — alla letar på samma rutnät samtidigt, så ordet du tvekar på kan
+              din kompis haffa först.
+            </p>
+            <p>
+              Längre ord ger fler poäng, och sällsynta ord är guld värda. Efter varje runda visas hela
+              listan med ord som gömde sig i rutnätet — ett förvånansvärt roligt sätt att bygga ut sitt
+              svenska ordförråd mellan matcherna.
+            </p>
           </div>
         </section>
 
@@ -214,9 +232,9 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
         <section className="mb-12 max-w-none">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Om LexiClash Multiplayer</h2>
           <p className="mt-4 text-neo-gray-200">
-            LexiClash revolutionerar onlinespel med ord genom att kombinera det strategiska djupet av Scrabble,
-            realtidshastigheten av Boggle och pussel-nöjet av Wordle. Vår plattform är utformad för ordentusiaster,
-            casual gamers och tävlande spelare.
+            LexiClash tar det strategiska djupet från Scrabble, tempot från Boggle och pusselglädjen från
+            Wordle — och blandar allt i en enda realtidsduell. Det är byggt för alla som någonsin bråkat
+            om ett ord faktiskt finns: ordnördar, söndagsspelare och renodlade tävlingsmänniskor.
           </p>
           <p className="mt-4 text-neo-gray-200">
             Spela multiplayer ordspel online med vänner, familj eller främlingar världen över. Oavsett om du vill ha en

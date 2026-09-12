@@ -15,7 +15,7 @@ export const STATS = [
   { num: '10K+', label: 'palabras ES', color: 'text-neo-lime' },
   { num: '0€', label: 'precio total', color: 'text-neo-pink' },
   { num: '2-50', label: 'jugadores', color: 'text-neo-cyan' },
-  { num: '5', label: 'idiomas', color: 'text-neo-purple-light' },
+  { num: '6', label: 'idiomas', color: 'text-neo-purple-light' },
 ];
 
 export const FEATURES = [
@@ -26,7 +26,7 @@ export const FEATURES = [
   { icon: '📅', text: 'Desafíos diarios con clasificaciones', accent: 'border-neo-pink shadow-hard-pink' },
   { icon: '👹', text: 'Batallas de jefes con giros únicos', accent: 'border-neo-cyan shadow-hard-cyan' },
   { icon: '💸', text: '100 % gratis, sin descargas', accent: 'border-neo-lime shadow-hard-lime' },
-  { icon: '🌍', text: 'Juega en 6 idiomas (EN, HE, SV, JA, ES)', accent: 'border-neo-purple shadow-hard' },
+  { icon: '🌍', text: 'Juega en 6 idiomas (EN, HE, SV, JA, ES, RU)', accent: 'border-neo-purple shadow-hard' },
 ];
 
 export const STEPS = [
@@ -114,12 +114,12 @@ export const FAQ_ACCENTS = [
 
 export const FAQS = [
   {
-    q: '¿Cómo juego una alternativa a Scrabble online en español multijugador gratis?',
+    q: '¿Cómo puedo jugar al Scrabble online en español, gratis y con varios jugadores?',
     a: 'En LexiClash haces clic en "Crear sala" en la página multijugador, compartes el enlace con tus amigos y todos compiten en tiempo real al estilo Scrabble. LexiClash es una alternativa independiente al Scrabble — sin registro, sin descargas, 100% gratis. Funciona en móvil y ordenador.',
   },
   {
     q: '¿LexiClash es como Scrabble o Apalabrados pero online?',
-    a: 'Sí. LexiClash combina la profundidad estratégica de Scrabble, la velocidad de Boggle y el formato social de Apalabrados, todo en tiempo real con más de 10,000 palabras en español.',
+    a: 'Es la misma familia, pero sin la espera. LexiClash combina la profundidad estratégica de Scrabble, la velocidad de Boggle y el formato social de Apalabrados — con la diferencia de que todos juegan a la vez, en tiempo real, con más de 10,000 palabras en español.',
   },
   {
     q: '¿Puedo jugar Scrabble online con amigos sin registrarme?',

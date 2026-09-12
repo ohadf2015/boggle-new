@@ -54,6 +54,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const faqs = [
   {
+    q: 'What is Boggle online?',
+    a: 'Boggle online is the browser version of the classic letter-grid word game: you get a grid of random letters and race a timer to find as many words as possible by connecting adjacent letters. LexiClash is a free online Boggle-style game with no download — solo against AI bots, or real-time multiplayer where everyone plays the same grid at once.',
+  },
+  {
     q: 'Can I play Boggle online free with no download?',
     a: 'Yes! LexiClash lets you play boggle online completely free with no download and no signup required. Just visit lexiclash.live and start playing instantly in your browser on any device — phone, tablet, or desktop.',
   },
@@ -63,7 +67,7 @@ const faqs = [
   },
   {
     q: 'Can I play with friends online?',
-    a: 'Absolutely! Create a room, share the link with friends, and compete in real-time word battles. Up to 20+ players can join. No account required — just share the room code or QR code.',
+    a: 'Absolutely! Create a room, share the link with friends, and compete in real-time word battles. Up to 50 players can join. No account required — just share the room code or QR code.',
   },
   {
     q: 'Is LexiClash better than Words With Friends?',
@@ -79,7 +83,7 @@ const faqs = [
   },
   {
     q: 'Can students play Boggle online free in a classroom?',
-    a: 'Yes! LexiClash works great as a free classroom Boggle game — no accounts, no downloads, no setup. Teachers create a room in seconds and share the link or QR code. Up to 20+ students compete simultaneously on the word grid, making it ideal for vocabulary practice, spelling drills, and ESL classes.',
+    a: 'Yes! LexiClash works great as a free classroom Boggle game — no accounts, no downloads, no setup. Teachers create a room in seconds and share the link or QR code. Up to 50 students compete simultaneously on the word grid, making it ideal for vocabulary practice, spelling drills, and ESL classes.',
   },
 ];
 
@@ -115,10 +119,10 @@ const softwareAppJsonLd = JSON.stringify({
   operatingSystem: 'Any',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   featureList: [
-    'Real-time multiplayer up to 20 players',
+    'Real-time multiplayer up to 50 players',
     'No download required — play in browser',
     'Daily Word Wheel puzzle',
-    '5 language support (EN, HE, SV, JA, ES)',
+    '6 language support (EN, HE, SV, JA, ES, RU)',
     '4x4, 5x5, 6x6 grid sizes',
     'Adventure mode with boss battles',
     'Combo scoring system',
@@ -131,7 +135,7 @@ const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'NO ADS HELL', 'PLAY IN 5s', 
 
 const modes = [
   { href: 'singleplayer', color: 'lime', label: 'Solo', title: 'BEAT THE BOTS', desc: 'You vs sneaky AI rivals. Three difficulty tiers — pick your pain.', mascot: '/mascot/play.webp', cta: 'Play Solo Free' },
-  { href: 'multiplayer', color: 'pink', label: 'Multiplayer', title: 'BRING THE CHAOS', desc: 'Real-time word brawls with 2–20+ friends. Share a code, drop in, fight.', mascot: '/mascot/dj.webp', cta: 'Play With Friends' },
+  { href: 'multiplayer', color: 'pink', label: 'Multiplayer', title: 'BRING THE CHAOS', desc: 'Real-time word brawls with 2–50 friends. Share a code, drop in, fight.', mascot: '/mascot/dj.webp', cta: 'Play With Friends' },
   { href: 'daily', color: 'cyan', label: 'Daily', title: 'WORD WHEEL', desc: 'One letter set, the whole world plays it. Chase the global record.', mascot: '/mascot/scholar.webp', cta: 'Spin The Wheel' },
 ] as const;
 
@@ -149,20 +153,20 @@ const modeBgMap = {
 
 const stats = [
   { value: '4×4-6×6', label: 'Grid Sizes', color: 'text-neo-lime' },
-  { value: '5', label: 'Languages', color: 'text-neo-cyan' },
-  { value: '20', label: 'Max Players', color: 'text-neo-pink' },
+  { value: '6', label: 'Languages', color: 'text-neo-cyan' },
+  { value: '50', label: 'Max Players', color: 'text-neo-pink' },
   { value: '8', label: 'Game Modes', color: 'text-neo-yellow' },
 ];
 
 const features = [
   { icon: '⚡', text: 'Free online — no download, no signup, no ads-hell' },
   { icon: '🤖', text: 'Solo mode vs AI bots at three sass levels' },
-  { icon: '🎉', text: 'Real-time multiplayer with 2–20+ players' },
+  { icon: '🎉', text: 'Real-time multiplayer with 2–50 players' },
   { icon: '🔠', text: 'Three grid sizes: 4×4, 5×5, 6×6' },
   { icon: '🌀', text: 'Daily Word Wheel — chase the global record' },
   { icon: '🔥', text: 'Combo scoring rewards lightning chains' },
   { icon: '📱', text: 'Phone, tablet, desktop — same game everywhere' },
-  { icon: '🌍', text: 'Six languages: EN · HE · SV · JA · ES' },
+  { icon: '🌍', text: 'Six languages: EN · HE · SV · JA · ES · RU' },
   { icon: '🐉', text: 'Adventure mode with boss battles & loot' },
   { icon: '🧠', text: 'Brain drills to sharpen the word-brain' },
 ];
@@ -173,7 +177,7 @@ const compareRows: ReadonlyArray<readonly [string, string, string, string]> = [
   ['Real-time MP', '✓', '✓ in person', '✗ turn-based'],
   ['Online with friends', '✓', '✗', '✓'],
   ['Daily challenges', '✓', '✗', '✗'],
-  ['Multi-language', '5 langs', '✗', '✗'],
+  ['Multi-language', '6 langs', '✗', '✗'],
   ['Boss battles', '✓', '✗', '✗'],
   ['Grid sizes', '4×4 · 5×5 · 6×6', '4×4 only', 'N/A'],
 ];
@@ -218,7 +222,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               The loudest, fastest free Boggle alternative on the internet. Find words on a letter grid solo, or
-              throw 20 friends into a real-time word brawl. Open the browser. Start playing. That&apos;s it.
+              throw 50 friends into a real-time word brawl. Open the browser. Start playing. That&apos;s it.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -234,7 +238,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
                 className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7"
               >
                 <span className="block text-base sm:text-lg">★ Play w/ Friends</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">2–20 players</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">2–50 players</span>
               </Link>
             </div>
 
@@ -242,7 +246,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <span className="inline-flex items-center gap-2"><span className="text-neo-lime">●</span> live now</span>
               <span>browser-based</span>
               <span className="text-neo-yellow">6 languages</span>
-              <span>2-20 players</span>
+              <span>2-50 players</span>
             </div>
           </div>
 
@@ -275,7 +279,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <h3 className="mt-3 font-neo-display text-xl font-black uppercase leading-tight text-neo-white sm:text-2xl">
                 The free <span className="bg-neo-navy px-2 text-neo-lime">Words With Friends</span> alternative — but real-time.
               </h3>
-              <p className="mt-2 max-w-xl text-sm text-neo-white">2-20 friends play the same grid simultaneously. Match takes 2-3 min, not 3 days. No download.</p>
+              <p className="mt-2 max-w-xl text-sm text-neo-white">2-50 friends play the same grid simultaneously. Match takes 2-3 min, not 3 days. No download.</p>
             </div>
             <span className="relative shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-lime shadow-hard transition-all group-hover:translate-x-1">
               Compare →
@@ -395,7 +399,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           </h2>
           <p className="text-sm leading-relaxed text-neo-white sm:text-base">
             Teachers use LexiClash as a free classroom Boggle game — no accounts, no downloads, no setup. Spin up a
-            room in seconds, share the link or QR code, and 20+ students compete live on the same word grid. Great
+            room in seconds, share the link or QR code, and up to 50 students compete live on the same word grid. Great
             for vocabulary practice, spelling drills, and ESL classes. Want a version built for schools, with
             classroom-ready tools?{' '}
             <Link href={`/${locale}/education/for-schools`} className="text-neo-cyan underline">
