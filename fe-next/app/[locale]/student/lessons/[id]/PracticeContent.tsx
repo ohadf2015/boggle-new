@@ -184,7 +184,7 @@ export default function PracticeContent({
    * round-end fork.
    */
   const finishRound = useCallback(async (
-    type: Parameters<typeof completePracticeSession>[0]['type'],
+    type: PracticeType,
     payload: {
       focus?: VocabFocus;
       cardsReviewed?: number;
@@ -199,6 +199,9 @@ export default function PracticeContent({
       cardsCorrect: payload.cardsCorrect,
       vocabularyWordsFound: payload.vocabularyWordsFound,
     });
+    // ponytail: warmup / word_list are not persistable session types (the API union
+    // has no row for them) — the guard also narrows `type` for the call below.
+    if (type === 'warmup' || type === 'word_list') return;
     await completePracticeSession({ type, ...payload });
   }, [completePracticeSession, onGuestResult]);
 

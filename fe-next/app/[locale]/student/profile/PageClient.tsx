@@ -461,8 +461,8 @@ export default function StudentProfilePageClient() {
                   <div className="space-y-2">
                     {recentDuels.map((duel, index) => {
                       const opponentName = duel.challenger_id === user.id
-                        ? duel.opponent.display_name
-                        : duel.challenger.display_name;
+                        ? duel.opponent?.display_name ?? '—'
+                        : duel.challenger?.display_name ?? '—';
                       const score = duel.challenger_id === user.id
                         ? duel.challenger_score
                         : duel.opponent_score;

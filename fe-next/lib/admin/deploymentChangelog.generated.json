@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-11T08:35:59.455Z",
+  "generatedAt": "2026-09-12T13:55:11.788Z",
   "commits": [
     {
-      "sha": "0f8f2ce18102fea386a320fffa27e0ace285ba4e",
-      "shortSha": "0f8f2ce",
-      "subject": "wip(education): teacher-module gauntlet checkpoint — reliability + teacher home won blind vs Kahoot",
+      "sha": "c1ce436d84eba9356bb2809975885351fbc1df83",
+      "shortSha": "c1ce436",
+      "subject": "merge: origin/master (6ace30de2) into gauntlet/teacher-module-r2 — i18n manifest regenerated",
       "author": "Ohad Fisher",
-      "date": "2026-09-11T01:52:17+03:00"
+      "date": "2026-09-12T15:58:38+03:00"
     },
     {
-      "sha": "ef45197f268ca59998ba1357f50c4e358afedb9b",
-      "shortSha": "ef45197",
-      "subject": "chore(education): split EducationMenuDropdown out of EducationHeader (#995)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T20:21:54+04:00"
-    },
-    {
-      "sha": "64c06ad69004aa6c996f2ba16a84820f1b6b047b",
-      "shortSha": "64c06ad",
-      "subject": "feat(education): polish teacher surfaces — motion, responsiveness, dialog system (#994)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T20:14:36+04:00"
-    },
-    {
-      "sha": "e1d097a8f940de25667416bc73dc6b977227e393",
-      "shortSha": "e1d097a",
-      "subject": "fix(teacher): red CI on master — plan read outside request scope + access-page test (#993)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T17:18:41+04:00"
-    },
-    {
-      "sha": "bfc35124dd9dd56c952707dd47d09f55ed539e52",
-      "shortSha": "bfc3512",
-      "subject": "feat(teacher): gate reports behind Pro + admin education drill-down (#992)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T16:37:01+04:00"
-    },
-    {
-      "sha": "7ebb3976b3f944c4daa6fba112bafc1f3d94b645",
-      "shortSha": "7ebb397",
-      "subject": "chore(teacher): strip hardcoded EN fallbacks, single-source upsell numbers (#991)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T16:36:58+04:00"
-    },
-    {
-      "sha": "dcb36a6579898ff24d896ddce454dfe668cf7f24",
-      "shortSha": "dcb36a6",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-09",
+      "sha": "406f70f59357a44e13f2f859cb67c7be5da4ee4b",
+      "shortSha": "406f70f",
+      "subject": "wip(gauntlet II): practice, round-end, duels r4, homework r5/r6 partial, assets — pre-ship snapshot 2026-09-12 15:58",
       "author": "Ohad Fisher",
-      "date": "2026-09-09T12:17:52+04:00"
+      "date": "2026-09-12T15:57:48+03:00"
     },
     {
-      "sha": "982033be98f81b0092a23d5de8c075db364a24be",
-      "shortSha": "982033b",
-      "subject": "fix(subscriptions): Polar order webhooks must not wipe provider fields (+ teacher seat count) (#987)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T11:04:19+04:00"
-    },
-    {
-      "sha": "7fd931e6a973c5ca7659acb186f99ee9f107e011",
-      "shortSha": "7fd931e",
-      "subject": "fix(education): surface paid Pro, hide trial upsell from Pro teachers, fix 6 Sentry crashes (#989)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T11:00:54+04:00"
-    },
-    {
-      "sha": "5944dec3d07d40f994fcc3c964be5c72712a44fa",
-      "shortSha": "5944dec",
-      "subject": "chore: resolve the five deferred cleanup items from #986 (#988)",
-      "author": "ohadf2015",
-      "date": "2026-09-09T10:43:49+04:00"
-    },
-    {
-      "sha": "4f0aedce3c2d0fc0b4360bdc7323917517f623a3",
-      "shortSha": "4f0aedc",
-      "subject": "chore(nightly): post-run residue 2026-09-06",
+      "sha": "6ace30de22876e2a91ccd9a0b37093d67d1610cc",
+      "shortSha": "6ace30d",
+      "subject": "chore(nightly): land the 2026-08-05 lane code that never shipped",
       "author": "Ohad Fisher",
-      "date": "2026-09-06T12:20:01+04:00"
+      "date": "2026-09-12T15:13:05+03:00"
     },
     {
-      "sha": "c8e142e8b23b0928a33213c7e07ee0cedb177720",
-      "shortSha": "c8e142e",
-      "subject": "fix(sentry): kill joinView.undefined for ru rooms and welcome-email Sentry noise",
+      "sha": "9ba5b8aba5e5469f4a2aa63e35548ed5c1bddd82",
+      "shortSha": "9ba5b8a",
+      "subject": "chore(nightly): land unshipped lane code from 2026-09-04, 09-10, 09-12",
       "author": "Ohad Fisher",
-      "date": "2026-09-08T23:25:14+04:00"
+      "date": "2026-09-12T14:33:52+03:00"
     },
     {
-      "sha": "9dd0d08517926d2bc9e39a950145683b82a589d8",
-      "shortSha": "9dd0d08",
-      "subject": "fix(daily): show the finisher on the board, and give guests a real avatar",
+      "sha": "3b569068bdf7a03bea53d26ac785ed814fc3edc5",
+      "shortSha": "3b56906",
+      "subject": "SEO: daily meta tag improvements (2026-09-12) (#1019)",
+      "author": "ohadf2015",
+      "date": "2026-09-12T09:24:35+04:00"
+    },
+    {
+      "sha": "09209b1479b54df0166fdd040d9f02417c9c9085",
+      "shortSha": "09209b1",
+      "subject": "feat(education): school-lead notify to Ohad + weekly digest (#1017)",
+      "author": "ohadf2015",
+      "date": "2026-09-12T00:31:17+04:00"
+    },
+    {
+      "sha": "3d759f58791c1fa24fb25359d9ba68214b87e18e",
+      "shortSha": "3d759f5",
+      "subject": "fix(ui): hydration #418 i18n race + selected-tile 1.23:1 contrast (#1018)",
+      "author": "ohadf2015",
+      "date": "2026-09-12T00:31:13+04:00"
+    },
+    {
+      "sha": "c0f86401a9b405b1d51ff9a276796c144f46cc4a",
+      "shortSha": "c0f8640",
+      "subject": "merge: origin/master (0fe5da14e simplify pass) into gauntlet/teacher-module-r2",
       "author": "Ohad Fisher",
-      "date": "2026-09-08T22:52:02+04:00"
+      "date": "2026-09-11T19:34:36+03:00"
     },
     {
-      "sha": "dab8f088125c6efdc16f0f0df6007961aaf0c622",
-      "shortSha": "dab8f08",
-      "subject": "chore: remove dead code, unused deps, and tracked build artifacts (#986)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T22:50:51+04:00"
-    },
-    {
-      "sha": "2e13200f96d57a86115c87886aa6d15ff7a9ba2f",
-      "shortSha": "2e13200",
-      "subject": "feat(modes): fix broken gameplay counters, brag OG image, remove shiritori",
+      "sha": "dfbaca0931d4af1b19704da2f4cda5947c73de76",
+      "shortSha": "dfbaca0",
+      "subject": "wip(gauntlet): teacher gauntlet II builders' work in progress before merging master",
       "author": "Ohad Fisher",
-      "date": "2026-09-08T16:40:06+04:00"
+      "date": "2026-09-11T19:30:36+03:00"
     },
     {
-      "sha": "8ef04c60f79fa4138c0b2b8cec433a10524a5766",
-      "shortSha": "8ef04c6",
-      "subject": "feat(ads): ad-quality measurement + broken-ad cooldown (Deloitte x AdMob) (#985)",
-      "author": "ohadf2015",
-      "date": "2026-09-08T13:51:03+04:00"
+      "sha": "0fe5da14e038c8c5874f9dd16b02ce33d1834538",
+      "shortSha": "0fe5da1",
+      "subject": "refactor(education): simplify pass over the teacher module gauntlet",
+      "author": "Ohad Fisher",
+      "date": "2026-09-11T18:40:37+03:00"
     },
     {
-      "sha": "0fc922bd4686a2fb9a5c363276b380665f411116",
-      "shortSha": "0fc922b",
-      "subject": "feat(education): teacher P0 on one-screen dashboard (#983)",
+      "sha": "6ac5c06826f7b58f2346a78fb0c542c42ac5cd5e",
+      "shortSha": "6ac5c06",
+      "subject": "feat(education): teacher module gauntlet — six pieces judged blind against Kahoot (#1016)",
       "author": "ohadf2015",
-      "date": "2026-09-08T12:03:02+04:00"
+      "date": "2026-09-11T13:55:35+04:00"
     },
     {
-      "sha": "746c9cf4c6a953052dbe05fb5a08fcdce89ed89c",
-      "shortSha": "746c9cf",
-      "subject": "fix(education): Print unplugged pack / practice sheet in Chrome (#982)",
+      "sha": "dac2a4ab822bd63bac4fd273d019c2c913d7bac5",
+      "shortSha": "dac2a4a",
+      "subject": "SEO: daily meta tag improvements (2026-09-11) (#1014)",
       "author": "ohadf2015",
-      "date": "2026-09-08T11:09:29+04:00"
+      "date": "2026-09-11T12:30:48+04:00"
     },
     {
-      "sha": "a552f93a48cc44ff1cf711cd764ee39324c13233",
-      "shortSha": "a552f93",
-      "subject": "feat(education): unplugged reteach printable pack PDF + QR Live deep-link (#981)",
+      "sha": "9caf112f36dd3944dd65d46ba5d320b7040d78f0",
+      "shortSha": "9caf112",
+      "subject": "fix(edu): persist teacher-trial-reminders pg_cron schedule in git (#1015)",
       "author": "ohadf2015",
-      "date": "2026-09-08T07:30:43+04:00"
+      "date": "2026-09-11T11:16:26+04:00"
     },
     {
-      "sha": "be97774a30d97dd73b16d8faa5129a72a40f7e2d",
-      "shortSha": "be97774",
-      "subject": "feat(education): parent WhatsApp shareable miss-gap practice card after GC passback (#980)",
+      "sha": "c6abaf1e7875d2346834edfdd0f72d905d41ec90",
+      "shortSha": "c6abaf1",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-10",
+      "author": "Ohad Fisher",
+      "date": "2026-09-11T02:36:42+03:00"
+    },
+    {
+      "sha": "ff5c5601358c454373715959508e3dbe08d3bfa3",
+      "shortSha": "ff5c560",
+      "subject": "test(seo): fix ES scrabble metadata test broken by #997 (#1001)",
       "author": "ohadf2015",
-      "date": "2026-09-08T05:19:48+04:00"
+      "date": "2026-09-11T00:31:26+04:00"
+    },
+    {
+      "sha": "4a22fa016d6c3f414e83ad9235a42a875e7ea0e5",
+      "shortSha": "4a22fa0",
+      "subject": "feat(education): packages page — Teacher Pro $9/mo, Classroom $39/term lead, schools contact (#1005)",
+      "author": "ohadf2015",
+      "date": "2026-09-11T00:31:22+04:00"
+    },
+    {
+      "sha": "2218cb21906279a8534602221d5851dc9fbd6998",
+      "shortSha": "2218cb2",
+      "subject": "fix(education): CREATE ROOM no longer no-ops for email-only teachers (#1007)",
+      "author": "ohadf2015",
+      "date": "2026-09-10T19:02:54+04:00"
+    },
+    {
+      "sha": "2a2f27c83a316175886e3dbde1c2f0829ac62018",
+      "shortSha": "2a2f27c",
+      "subject": "feat(education): playable ESL demo + CEFR lists on the winner page (#1006)",
+      "author": "ohadf2015",
+      "date": "2026-09-10T18:33:05+04:00"
+    },
+    {
+      "sha": "0f3c7a6c49f8539a89d55bfa8aa90c713dd2b369",
+      "shortSha": "0f3c7a6",
+      "subject": "grok: You are working on the LexiClash repo (fe-next/ is the main Next.js 16 (#1003)",
+      "author": "ohadf2015",
+      "date": "2026-09-10T17:14:33+04:00"
+    },
+    {
+      "sha": "23a655a5bd996cd537f85c2e46a0bfe1b43fbde6",
+      "shortSha": "23a655a",
+      "subject": "fix(geo): correct llms-full.txt drift — 6 languages, education landings, Teacher Pro claim (#1002)",
+      "author": "ohadf2015",
+      "date": "2026-09-10T17:11:48+04:00"
     }
   ]
 }

@@ -32,6 +32,7 @@ import type { Server, Socket } from 'socket.io';
 
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { setClassroomGameMode } from '../modules/classroomGameSettings.js';
+import type { SwitchableClassroomMode } from '../modules/classroomGameSettings';
 import { CLASSROOM_GAME_MODES, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
@@ -67,7 +68,8 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       });
       return;
     }
-    const payload = validation.data as { gameCode: string; gameMode: ClassroomGameMode };
+    // CLASSROOM_GAME_MODES (the zod enum above) is exactly the switchable set, so the narrower type is a fact, not a cast of convenience.
+    const payload = validation.data as { gameCode: string; gameMode: SwitchableClassroomMode };
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {

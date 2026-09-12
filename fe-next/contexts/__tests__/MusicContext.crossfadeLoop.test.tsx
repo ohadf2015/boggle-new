@@ -52,6 +52,10 @@ vi.mock('howler', () => {
         return this;
       }),
 
+      duration: vi.fn(() => 30), // MusicContext (7fd931e6a) reads it in onload
+
+      loop: vi.fn(function(this: any) { return this; }),
+
       play: vi.fn(function(this: any) {
         howlCallLog.push({ instance: this._instanceId, method: 'play', args: [] });
         this._playing = true;

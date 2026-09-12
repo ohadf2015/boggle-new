@@ -45,6 +45,10 @@ vi.mock('howler', () => {
         return this;
       }),
 
+      duration: vi.fn(() => 30), // MusicContext (7fd931e6a) reads it in onload
+
+      loop: vi.fn(function(this: any) { return this; }),
+
       play: vi.fn(function (this: any) {
         // Howler: play() with no id while already playing spawns a NEW instance.
         this._active += 1;

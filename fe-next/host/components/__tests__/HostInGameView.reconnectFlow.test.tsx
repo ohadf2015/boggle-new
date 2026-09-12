@@ -85,6 +85,8 @@ vi.mock('@/lib/multiplayer/useReconnectFlow', () => ({
   useReconnectFlow: () => mockReconnectFlow,
 }));
 
+vi.mock('@/components/education/vocabQuiz/VocabQuizHostView', () => ({ VocabQuizHostView: () => null })); // eager next/dynamic mock: never load the quiz chain here
+vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
 vi.mock('@/components/multiplayer/PendingWordChip', () => ({ PendingWordChip: () => null }));
 
 vi.mock('@/components/multiplayer/ReconnectingOverlay', () => ({

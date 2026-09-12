@@ -179,7 +179,7 @@ export function useUnpluggedRun(words: readonly string[]): UnpluggedRun {
           playStreakFireSound();
         }
       } else if (prev.streak >= UNPLUGGED_FIRE_STREAK) {
-        playComboBreakSound();
+        playComboBreakSound(prev.streak);
       } else {
         playButtonClickSound();
       }

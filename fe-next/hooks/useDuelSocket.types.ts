@@ -170,6 +170,7 @@ export interface UseDuelSocketReturn {
   /** Throw a mascot sticker into a duel room (async duels). */
   sendTaunt: (duelId: string, stickerId: string) => void;
   forfeitDuel: (duelId: string) => void;
+  joinDuelGame: (duelId: string) => void;
   syncState: (duelId: string) => void;
   // Event listeners (caller provides callbacks)
   onChallengeReceived: (cb: (data: ChallengeReceivedData) => void) => () => void;

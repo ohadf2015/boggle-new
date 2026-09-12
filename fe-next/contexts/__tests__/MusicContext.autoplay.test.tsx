@@ -40,6 +40,8 @@ vi.mock('howler', () => {
         return this;
       }),
 
+      // MusicContext (7fd931e6a) reads duration() in onload and disables loop for 0s tracks
+      duration: vi.fn(() => 30),
       play: vi.fn(function(this: any) {
         this._playing = true;
         return 1; // sound ID

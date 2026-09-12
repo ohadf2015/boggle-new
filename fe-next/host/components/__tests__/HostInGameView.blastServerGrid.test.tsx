@@ -79,6 +79,8 @@ vi.mock('@/lib/multiplayer/usePendingWords', () => ({
 vi.mock('@/lib/multiplayer/useReconnectFlow', () => ({
   useReconnectFlow: () => ({ isReconnecting: false, reconnectAttempt: 0, maxReconnectAttempts: 30, showAbortModal: false, lastServerSeq: 0, triggerAbort: vi.fn(), dismissAbortModal: vi.fn() }),
 }));
+vi.mock('@/components/education/vocabQuiz/VocabQuizHostView', () => ({ VocabQuizHostView: () => null })); // eager next/dynamic mock: never load the quiz chain here
+vi.mock('@/components/wordTower/WordTowerVersus', () => ({ WordTowerVersus: () => null }));
 vi.mock('@/components/multiplayer/PendingWordChip', () => ({ PendingWordChip: () => null }));
 vi.mock('@/components/multiplayer/ReconnectingOverlay', () => ({ ReconnectingOverlay: () => null }));
 vi.mock('@/components/multiplayer/MPGameAbortedModal', () => ({ MPGameAbortedModal: () => null }));
