@@ -10,6 +10,7 @@ import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { getAchievementShareUrl, shareWithOgImage } from '../../utils/ogShare';
 import { gameEvents } from '../GoogleAnalytics';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { AchievementPayload } from '@/shared/types/socket';
 
 interface LocalizedAchievement {
@@ -54,6 +55,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
     // Track the share
     gameEvents.achievementUnlock(achievementKey);
     gameEvents.share('social', 'achievement');
+    trackGrowthEvent('achievement_shared', { achievementId: achievementKey });
 
     // Generate share URL with OG image
     const ogImageUrl = getAchievementShareUrl(achievementKey, language);

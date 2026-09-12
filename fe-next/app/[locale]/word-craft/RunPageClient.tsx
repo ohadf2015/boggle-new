@@ -245,7 +245,12 @@ export function RunPageClient() {
         </button>
       </div>
       {state.lastError && (
-        <p className="font-neo-body text-sm text-neo-red">{state.lastError}</p>
+        <div
+          role="alert"
+          className="animate-neo-shake rounded-neo border-neo border-neo-red bg-neo-navy-light px-3 py-2 shadow-hard"
+        >
+          <p className="font-neo-body text-sm text-neo-red">{state.lastError}</p>
+        </div>
       )}
     </div>
   );
