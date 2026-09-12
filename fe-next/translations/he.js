@@ -8372,6 +8372,7 @@ const he = {
         "loading": "טוען פרסומת…"
       },
       "luckyGemBonus": "אבן חן בת מזל!",
+      "flawless": "ללא רבב — לא איבדת חיים!",
       "lightning-round": {
         "name": "סיבוב ברק",
         "description": "מצא מילים הכי מהר שאפשר",
@@ -17350,6 +17351,7 @@ const he = {
   },
   "sealedBid": {
     "luckyStreak": "רצף מזל!",
+    "hotStreak": "{n} ברצף!",
     "allIn": "הכל פנימה",
     "clear": "נקה",
     "currentStake": "ההימור הנוכחי",

@@ -1,11 +1,14 @@
+import { useEffect, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Clock, Target } from 'lucide-react';
+import { Clock, Target, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import DrillCompleteActions from './DrillCompleteActions';
 import DrillEarningsBreakdown from '@/components/brain/DrillEarningsBreakdown';
 import { MemoryInsightsCard } from '@/components/brain/MemoryInsightsCard';
 import { calculateForgivingDrillScore } from '@/shared/utils/drillScoring';
+import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 interface MemoryHuntCompletePhaseProps {
   isDarkMode: boolean;
@@ -34,6 +37,18 @@ export function MemoryHuntCompletePhase({
     maxSetbacks: maxLives,
   });
 
+  // A literal flawless clear (every word found, zero lives lost) is currently
+  // indistinguishable from an 85%+ platinum run — this surfaces that surprise.
+  const isFlawless = results.wordsFound > 0 && results.wordsFound === results.totalWords && lives >= maxLives;
+  const reducedMotion = useShouldReduceMotion();
+  const flawlessFxFired = useRef(false);
+
+  useEffect(() => {
+    if (!isFlawless || reducedMotion || flawlessFxFired.current) return;
+    flawlessFxFired.current = true;
+    SharedFxApp.spawnBurst('celebration', window.innerWidth / 2, window.innerHeight / 3, { count: 28 });
+  }, [isFlawless, reducedMotion]);
+
   return (
     <AdaptiveMotion.div
       initial={{ scale: 0.9 }}
@@ -47,6 +62,17 @@ export function MemoryHuntCompletePhase({
         participation={forgiving.participation}
         performance={forgiving.performance}
       />
+
+      {isFlawless && (
+        <AdaptiveMotion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-auto inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-navy shadow-hard-sm w-fit"
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          {t('brain.drills.flawless')}
+        </AdaptiveMotion.div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xs mx-auto">
         <AdaptiveMotion.div

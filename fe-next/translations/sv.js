@@ -8724,6 +8724,7 @@ const sv = {
         "loading": "Laddar annons…"
       },
       "luckyGemBonus": "Turgemma!",
+      "flawless": "Felfritt — inga liv förlorade!",
       "lightning-round": {
         "name": "Blixtrundan",
         "description": "Hitta ord så snabbt som möjligt",
@@ -17420,6 +17421,7 @@ const sv = {
   },
   "sealedBid": {
     "luckyStreak": "TURSVIT!",
+    "hotStreak": "{n} i rad!",
     "allIn": "Allt in",
     "clear": "Rensa",
     "currentStake": "Nuvarande insats",

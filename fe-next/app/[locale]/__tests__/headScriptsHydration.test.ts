@@ -72,4 +72,15 @@ describe('<head> scripts cannot race hydration', () => {
     // No next/script tag may be emitted ahead of the shim and shift it.
     expect(shimAt).toBeLessThan(firstNextScriptAt);
   });
+
+  it('loads the i18n catalogue via next/script beforeInteractive, not a raw <script src>', () => {
+    // Prod HTML 2026-09-11: a raw `<script src={messagesSrc}>` was emitted
+    // AFTER dozens of Next async chunks, so hydration ran without
+    // __LEXI_MESSAGES__ → t() returned keys → React #418 (args=text) on every
+    // page load. beforeInteractive is the Next API that injects the tag ahead
+    // of the runtime.
+    expect(SOURCE).toMatch(/<Script[^>]*id="lexi-i18n-messages"/);
+    expect(SOURCE).toMatch(/strategy="beforeInteractive"/);
+    expect(SOURCE).not.toMatch(/<script src=\{messagesSrc\}/);
+  });
 });

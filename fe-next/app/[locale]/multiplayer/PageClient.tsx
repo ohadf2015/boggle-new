@@ -197,6 +197,17 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   useConnectionToasts();
 
   const { t, language } = useLanguage();
+
+  // classroom_host_lobby_viewed — fills instrumentation gap behind the 2026-09-10
+  // rage-click signal on ?classroom=true&host=true. Mount-only: distinguishes a
+  // teacher's classroom-host landing from an ordinary MP lobby view.
+  useEffect(() => {
+    if (isClassroomMode && isClassroomHost) {
+      trackGrowthEvent('classroom_host_lobby_viewed', { language });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
   // CrazyGames requires displaying their usernames in multiplayer (Full Launch requirement)
   const { user: cgUser, isCrazyGames, login: loginCrazyGames } = useCrazyGamesAuth();

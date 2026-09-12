@@ -39,7 +39,7 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
   eligible,
   throttleKey,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { shouldShow, recordRating, dismiss } = useGameFeedback({
     surface,
     eligible,
@@ -48,17 +48,28 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
   });
 
   const { variant: issueProbeVariant } = useExperiment('exp-mp-round-issue-probe-v1');
+  const { variant: greatDelightVariant } = useExperiment('exp-mp-round-great-delight-v1');
   const [showingProbe, setShowingProbe] = useState(false);
+  const [showingDelight, setShowingDelight] = useState(false);
 
   if (!isOpen || !shouldShow) return null;
 
   // exp-mp-round-issue-probe-v1: MP-only follow-up asking WHY a round felt bad.
   const probeArm = issueProbeVariant === 'issue-probe' && surface === 'mp_round';
+  // exp-mp-round-great-delight-v1: MP-only positive reinforcement on 'great'.
+  const delightArm = greatDelightVariant === 'confetti' && surface === 'mp_round';
 
   const handleRating = (rating: FeedbackRating) => {
     recordRating(rating);
     if (probeArm && (rating === 'bad' || rating === 'ok')) {
       setShowingProbe(true);
+      trackGrowthEvent('mp_round_issue_probe_shown', { language });
+      return;
+    }
+    if (delightArm && rating === 'great') {
+      setShowingDelight(true);
+      trackGrowthEvent('mp_round_great_delight_shown', { language });
+      setTimeout(onClose, 600);
       return;
     }
     onClose();
@@ -91,7 +102,17 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
         onClick={(e) => e.stopPropagation()}
         className="relative z-50 w-full max-w-sm mx-4 p-6 rounded-2xl bg-neo-navy border-4 border-black shadow-hard-lg pointer-events-auto"
       >
-        {showingProbe ? (
+        {showingDelight ? (
+          <div className="flex flex-col items-center justify-center py-8">
+            <m.div
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1.2, opacity: 1 }}
+              transition={{ type: 'spring', damping: 12, stiffness: 300 }}
+            >
+              <Heart size={48} className="text-neo-lime" fill="currentColor" />
+            </m.div>
+          </div>
+        ) : showingProbe ? (
           <>
             <h3 className="text-xl font-neo-display font-black text-neo-white text-center mb-6">
               {t('gameFeedback.issueProbe.prompt')}

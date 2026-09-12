@@ -7926,6 +7926,7 @@ const en = {
         "legendary": "legendary"
       },
       "luckyGemBonus": "Lucky Gem!",
+      "flawless": "Flawless — no lives lost!",
       "lightning-round": {
         "name": "Lightning Round",
         "description": "Find words as fast as possible",
@@ -16458,6 +16459,7 @@ const en = {
   },
   "sealedBid": {
     "luckyStreak": "LUCKY STREAK!",
+    "hotStreak": "{n} in a row!",
     "allIn": "All in",
     "clear": "Clear",
     "currentStake": "Current stake",

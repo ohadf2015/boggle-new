@@ -383,6 +383,19 @@ export type GrowthEvent =
   //   Fires when player picks a follow-up chip after bad/ok mp_round rating.
   //   Props: { issue: 'bots_too_strong' | 'technical_issue', language: string }.
   | 'mp_round_issue_selected'
+  // mp_round_issue_probe_shown — exposure event for the issue-probe arm, fires
+  // when the triage chips actually render (bad/ok rating + issue-probe variant).
+  // Was missing: only the SELECTION was tracked, so probe-shown-but-dismissed
+  // (guardrail = response rate) had no denominator. Props: { language }.
+  | 'mp_round_issue_probe_shown'
+  // exp-mp-round-great-delight-v1 exposure — fires when a 'great' mp_round
+  // rating triggers the confetti-delight variant. Props: { language }.
+  | 'mp_round_great_delight_shown'
+  // classroom_host_lobby_viewed — teacher lands on /multiplayer?classroom=true&
+  // host=true. Fills the blind spot behind the 2026-09-10 rage-click signal on
+  // that URL: no event previously distinguished a classroom HOST landing from
+  // an ordinary MP lobby view. Props: { language }.
+  | 'classroom_host_lobby_viewed'
   // mp_room_join_rate_limited — a direct-invite JoinRoomModal join tripped the
   // 50msg/10s socket limiter, quantifying the rage-click-into-lockout path the
   // Join button's loading spinner is meant to reduce.

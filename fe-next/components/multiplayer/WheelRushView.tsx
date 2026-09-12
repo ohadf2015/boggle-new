@@ -126,6 +126,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [wheelRadius, setWheelRadius] = useState(76);
   const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
   const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Consecutive 'all'-tier clears this round — powers the streak badge (variable reward).
+  const wheelStreakRef = useRef(0);
   // Ref-bridged so the once-bound socket onResult closure can reach the latest trigger.
   const celebrateRef = useRef<(tier: 'all' | 'almost', word: string) => void>(() => {});
 
@@ -263,7 +265,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // beat. Single keyed state so a second pangram replaces (re-animates) rather
   // than queues. fireConfetti self-gates on reduced-motion/low-end devices.
   const triggerCelebration = useCallback((tier: 'all' | 'almost', word: string) => {
-    setCelebration({ tier, word, key: Date.now() });
+    wheelStreakRef.current = tier === 'all' ? wheelStreakRef.current + 1 : 0;
+    setCelebration({ tier, word, key: Date.now(), streak: wheelStreakRef.current });
     playLegendaryWordSound?.();
     haptic([50, 30, 50, 30, 80]);
     fireConfetti({
@@ -298,6 +301,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       myWords?: string[];
     }) => {
       const me = latestRef.current.username;
+      wheelStreakRef.current = 0;
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
       const sa = data.startedAt ?? Date.now();

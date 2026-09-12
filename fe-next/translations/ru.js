@@ -11343,6 +11343,7 @@ const ru = {
   },
   "sealedBid": {
     "luckyStreak": "СЧАСТЛИВАЯ СЕРИЯ!",
+    "hotStreak": "{n} подряд!",
     "allIn": "Всё на кон",
     "currentStake": "Текущая ставка",
     "balance": "Баланс",
@@ -11877,6 +11878,7 @@ const ru = {
         "legendary": "легендарное"
       },
       "luckyGemBonus": "Счастливый самоцвет!",
+      "flawless": "Идеально — ни одной потерянной жизни!",
       "lightning-round": {
         "name": "Молниеносный Раунд",
         "description": "Найдите слова как можно быстрее",

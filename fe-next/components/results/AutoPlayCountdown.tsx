@@ -14,6 +14,7 @@ import { Play, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/utils';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 interface AutoPlayCountdownProps {
   /** Called when countdown reaches 0 or user clicks "Play Again" */
@@ -43,6 +44,12 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
   const [cancelled, setCancelled] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const completedRef = useRef(false);
+
+  // Funnel anchor: fires once on mount so PostHog can pair against
+  // results_autoplay_cancelled to compute a cancel rate.
+  useEffect(() => {
+    trackGrowthEvent('replay_countdown_shown', {});
+  }, []);
 
   const handleComplete = useCallback(() => {
     if (completedRef.current) return;

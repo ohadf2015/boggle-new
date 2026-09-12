@@ -56,6 +56,10 @@ export default function SealedBidPage() {
   const [history, setHistory] = useState<RoundRecord[]>([]);
   const [coinsAwarded, setCoinsAwarded] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
+  // Consecutive-unique-win streak — cosmetic momentum cue only, never touches
+  // wager math or the payout in wager.ts. Resets on a clash/rejected word;
+  // a deliberate pass neither wins nor loses, so it doesn't break the streak.
+  const [streak, setStreak] = useState(0);
 
   const bidMultiplierRef = useRef(3.0);
   const [bidMultiplier, setBidMultiplier] = useState(3.0);
@@ -138,6 +142,7 @@ export default function SealedBidPage() {
     setSettlement(finalSett);
     setPhase('revealed');
     setValidationError(null);
+    setStreak((s) => (finalSett.outcome === 'unique' ? s + 1 : finalSett.outcome === 'clash' || finalSett.delta < 0 ? 0 : s));
 
     if (finalSett.outcome === 'unique') {
       playSound('wordAccepted');
@@ -206,6 +211,7 @@ export default function SealedBidPage() {
     setPhase('bidding');
     setHistory([]);
     setCoinsAwarded(0);
+    setStreak(0);
   }, [language]);
 
   const handleWordChange = useCallback((w: string) => {
@@ -240,6 +246,15 @@ export default function SealedBidPage() {
       >
         {t('sealedBid.roundLabel', { n: roundIndex + 1, total: 5 })}
       </span>
+
+      {streak >= 2 && (
+        <span
+          data-testid="sb-hot-streak"
+          className="animate-neo-pop rounded-full border-2 border-black bg-neo-orange px-2.5 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-navy shadow-hard-sm"
+        >
+          {t('sealedBid.hotStreak', { n: streak })}
+        </span>
+      )}
 
       <span
         ref={payoutTargetRef}
