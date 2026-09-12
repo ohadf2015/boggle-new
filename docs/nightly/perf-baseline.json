@@ -1,25 +1,25 @@
 {
-  "date": "2026-09-12",
-  "note": "IMPACT CHECK closed: 08-31 board-k 6->3 change verdict=improved (posthog:lcp:sv/singleplayer p75=2232ms, n=57, first night clearing the 50-sample floor, vs baseline 18100ms). Brief's other frontend items were all either external domains not owned by us (oddities.app, imposketch.io -- reach=0, skipped) or below the n>=50 sample floor on our own routes (/en/online-word-games-with-friends n=2 p75=7908ms, /en/daily/word-wheel n=1 p75=3912ms) -- DEFERRED per mandatory sample gate, no verdict written, no code change on noise. Backend: db_perf_top_query_audit top query is still the realtime WAL->JSON parser (55.77% of DB CPU, growing weekly since 08-10's 50.79%) but v_suspicious_realtime_publications returned only 2 low-write/0-subscriber tables (student_lesson_progress, word_tower_pending_wrecks), both verdict=ok -- the WAL cost is systemic across all published tables with real subscribers (leaderboard etc.), not a single unconsumed table or indexable query; already tracked by the existing 50-supabase-perf.md guardrail jobs (realtime-publication-audit, db-perf-top-query-audit, realtime-auto-remediation). Not actionable as a migration/index fix in this lane -- flagging the growth trend for human review, not a new finding. Bundle: fresh build present (BUILD_ID pzVqjBdkHzpZOaL0B-UBX), top-10 chunk sum 6184KB vs 09-09's 6152KB (+32KB, filenames content-hashed so no 1:1 mapping across builds), max single chunk flat (856KB both nights) -- consistent with hash/content churn, no chunk crossed the 50KB-heavier regression threshold.",
+  "date": "2026-09-13",
+  "note": "Brief was STALE (last-good reused) -- same imposketch.io/tryshopli.com external-domain LCP items as 09-12 (not our app, PostHog shared across ~12 apps, reach=0, skipped) and the same IMPACT CHECK for 02-perf-2026-08-31-board-k-6-to-3, which was ALREADY closed 09-12 (verdict=improved, measured p75=2232ms, n=57). Re-ran the check's exact query tonight: route dropped back below the n>=50 sample floor (0 rows over 7d) -- no new verdict appended, existing 09-12 closure stands, per mandatory sample gate no verdict off insufficient n. /en/multiplayer (n=187, real signal) still carries LCP 2760ms/INP 504ms/CLS 0.265 from 09-09 -- perf-watch.md already flags this needs Chrome DevTools INP/CLS attribution profiling before touching PageClient.tsx/RoomListView.tsx (large, actively-instrumented files); not safe to guess-fix in this lane's budget, carried again. Shipped one concrete SPEED win instead: DailyActivityChart (recharts ~120KB) in admin PageClient.tsx was a static import despite being conditionally rendered only after authToken resolves -- converted to next/dynamic(ssr:false) so recharts no longer ships in the admin page's initial JS bundle.",
   "backend": {
     "advisor_warnings_count": 1,
     "shipped": [],
     "deferred": {
       "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
-      "realtime_wal_json_parser_cpu": "55.77% of DB CPU as of 09-07 audit (growing weekly from 50.79% on 08-10) -- systemic cost across all realtime-published tables with real subscribers, not a single unconsumed table (v_suspicious_realtime_publications shows only 2 low-write/0-sub tables, both verdict=ok); already tracked by existing 50-supabase-perf.md pg_cron guardrails, human/founder call needed on publication scope reduction"
+      "realtime_wal_json_parser_cpu": "systemic across all realtime-published tables with real subscribers, tracked by existing 50-supabase-perf.md pg_cron guardrails, not a single indexable query -- unchanged, human/founder call needed on publication scope"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp": 2760, "p75_inp": 504, "p75_cls": 0.265, "n": 187, "window": "24h", "status": "carried from 09-09, unchanged this run -- not re-queried, see perf-watch.md" },
-      { "route": "/en/online-word-games-with-friends", "p75_lcp": 7908, "n": 2, "window": "24h", "status": "DEFERRED -- n=2, below 50-sample floor" },
-      { "route": "/en/daily/word-wheel", "p75_lcp": 3912, "n": 1, "window": "24h", "status": "DEFERRED -- n=1, below 50-sample floor" },
-      { "route": "sv/singleplayer", "p75_lcp": 2232, "n": 57, "window": "7d", "status": "IMPACT CHECK closed -- verdict=improved vs 08-31 board-k change baseline 18100ms" }
+      { "route": "/en/multiplayer", "p75_lcp": 2760, "p75_inp": 504, "p75_cls": 0.265, "n": 187, "window": "24h", "status": "carried from 09-09, unchanged -- needs DevTools profiling before touching PageClient.tsx/RoomListView.tsx, see perf-watch.md" },
+      { "route": "sv/singleplayer", "p75_lcp": 2232, "n": 57, "window": "7d", "status": "IMPACT CHECK closed 09-12 -- verdict=improved. Re-checked tonight: dropped below n>=50 floor (0 rows), closure unchanged" }
     ],
-    "no_change_shipped": "all brief frontend items were either external (not our app) or sub-floor noise on our own routes -- no guess-fix"
+    "shipped": [
+      { "file": "app/[locale]/admin/PageClient.tsx", "change": "DailyActivityChart (recharts) static import -> next/dynamic(ssr:false); conditionally rendered behind authToken, so no first-paint cost" }
+    ]
   },
   "bundle": {
-    "note": "fresh build present (BUILD_ID pzVqjBdkHzpZOaL0B-UBX), top-10 chunk sum 6184KB vs 09-09 baseline 6152KB (+32KB) -- filenames are content-hashed per build so no chunk-to-chunk name mapping is possible; max single chunk flat (856KB both nights); consistent with hash/content churn, no regression",
+    "note": "09-12 baseline: top-10 chunk sum 6184KB, max single chunk 856KB, filenames content-hashed per build so no chunk-to-chunk name mapping across nights -- not re-measured tonight (lane time spent on the admin chart dynamic-import fix instead of a full build)",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },

@@ -2350,3 +2350,27 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: classic React/DOM-race insertBefore error (portal or list unmount racing a DOM mutation); needs the PostHog issue's page URL + component stack to localize, not pulled this run due to time budget after the two supabase RPC fixes
   - recommended owner: self (next run: pull full PostHog issue event props for page/component before touching any portal/list code)
+
+## 2026-09-13
+- [Sentry] TypeError: Cannot read properties of undefined (reading 'name') — JAVASCRIPT-NEXTJS-247
+  - first/last seen 2026-09-09, count 32, userCount 1, escalating
+  - https://lexiclash.sentry.io/issues/145817108/
+  - status: deferred
+  - why: stack is inside bundled socket.io-client (chunks/59729, chunks/21069) on /en/multiplayer — an event handler reads `.name` off an undefined object during a socket emit/reconnect chain. Grep for `player.name`/`data.name` in multiplayer hooks came up empty; root cause needs a sourcemapped stack trace or Seer analysis, not a guess-fix under time budget.
+  - recommended owner: self (tomorrow, with more time) — pull sourcemapped stack via mcp__sentry__analyze_issue_with_seer first
+- [Restore] Stale dropped nightly work 20260904-020001 (9 nights unshipped, 6 files: education/access/PageClient.tsx, play-boggle-online-free/page.tsx, dictionary candidates en/es/he/ja.txt)
+  - status: deferred
+  - why: dictionary candidate txt diffs total 4400+ lines — too large to review/re-gate safely in a 15-min lane budget. Needs a dedicated pass (likely lane 10 dict or a longer lane 01 run) to diff against current candidates and re-apply.
+  - recommended owner: lane 10 (dict) or next lane 01 run with full budget
+- [Restore] Stale dropped nightly work 20260910-010000 (2 nights unshipped, 6 files incl. multiplayer/PageClient.tsx, experiments.ts, translations)
+  - status: deferred
+  - why: same time-budget constraint; not yet reviewed this run.
+  - recommended owner: next lane 01 run
+- [Restore] 20260912-000001, 20260817-010002 (27 nights stale), 20260827-010001 (17 nights stale)
+  - status: deferred (not reviewed this run — time budget)
+  - recommended owner: next lane 01 run, oldest-first
+
+## Lane 03 (2026-09-13) — PostHog flag variant not resolving
+- `exp-teacher-gate-redirect-clarity-v1` — flag is live and called (63 calls/7d) but
+  `$feature_flag_variant` is `null` on every event. Experiment cannot report a winner
+  until this is fixed PostHog-side (check multivariate rollout config for the key).

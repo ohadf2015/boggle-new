@@ -1,0 +1,3 @@
+status: shipped
+files_touched: docs/nightly/ideas/2026-09-13.md (new), docs/nightly/ideas/2026-09-13-reddit.md (new), docs/nightly/reports/2026-09-13.md (appended Lane 4 section)
+next_steps: reddit-fetch.sh dailygames feed + search path returned "jq parse failed" tonight (wordgames feed worked via browser-snapshot fallback but with null score/comment fields) — worth a lane-07 script fix if it recurs. Reddit reply candidates lack verified upvote counts this run; treat as lower-confidence reach signal. Two polish ideas (sealed-bid legacy trophy row, brain-drill near-miss heat trail) ready for lane 05 to pick up.
