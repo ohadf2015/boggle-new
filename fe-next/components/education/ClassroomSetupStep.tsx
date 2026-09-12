@@ -131,13 +131,13 @@ export function ClassroomSetupStep({
     allPlayableWords.length === 0;
 
   // "Preview what students will see" — needs a classroom (for its real join
-  // code) and at least one lesson (for words to hide in the sample board).
+  // code) and at least one lesson. Default mode WITH a lesson attached is
+  // Vocab Quiz (`ClassroomGameLobby`); gating on a letter-board mode kept the
+  // button disabled on the common path and the hint still blamed classroom/
+  // lesson selection (dogfood 2026-09-10).
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  // The preview draws a sample letter board. A Vocab Quiz has no board, so the
-  // button is disabled there rather than opening a dialog that would show
-  // students a screen they never see.
   const canPreview =
-    Boolean(selectedClassroomId) && selectedLessonIds.length > 0 && gameMode !== 'vocab-quiz';
+    Boolean(selectedClassroomId) && selectedLessonIds.length > 0;
   const selectedClassroom = useMemo(
     () => classrooms.find((c) => c.id === selectedClassroomId) ?? null,
     [classrooms, selectedClassroomId]
@@ -399,9 +399,6 @@ export function ClassroomSetupStep({
         </div>
       </div>
 
-      {/* The preview renders a letter board, which a Vocab Quiz never shows —
-          previewing one would promise students a screen they never get. */}
-      {gameMode !== 'vocab-quiz' && (
       <StudentViewPreview
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
@@ -412,7 +409,6 @@ export function ClassroomSetupStep({
         boardSize={boardSize}
         minWordLength={minWordLength}
       />
-      )}
     </WizardStep>
   );
 }

@@ -71,4 +71,12 @@ describe('ClassroomSetupStep — student preview', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByTestId('student-preview-join-code')).toHaveTextContent('QWE789');
   });
+
+  it('enables preview in vocab-quiz (the default once a lesson is attached)', () => {
+    render(<ClassroomSetupStep {...baseProps} gameMode="vocab-quiz" />);
+    expect(previewButton()).not.toBeDisabled();
+    fireEvent.click(previewButton());
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('student-preview-join-code')).toHaveTextContent('QWE789');
+  });
 });
