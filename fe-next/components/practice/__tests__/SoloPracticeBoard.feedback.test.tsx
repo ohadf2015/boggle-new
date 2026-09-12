@@ -38,13 +38,17 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-vi.mock('@/utils/utils', () => ({
-  generateRandomTable: () => [
-    ['T', 'E', 'S', 'T'],
-    ['W', 'O', 'R', 'D'],
-    ['H', 'E', 'L', 'P'],
-    ['G', 'A', 'M', 'E'],
-  ],
+vi.mock('@/lib/education/practiceBoard', () => ({
+  generatePlayablePracticeBoard: () => ({
+    grid: [
+      ['T', 'E', 'S', 'T'],
+      ['W', 'O', 'R', 'D'],
+      ['H', 'E', 'L', 'P'],
+      ['G', 'A', 'M', 'E'],
+    ],
+    embedded: ['test'],
+    seed: 1,
+  }),
 }));
 
 // Mock clientWordValidator - allow all words through local validation

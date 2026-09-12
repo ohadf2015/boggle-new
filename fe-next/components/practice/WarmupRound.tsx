@@ -9,19 +9,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import GridComponent from '@/components/GridComponent';
-import { generateRandomTable } from '@/utils/utils';
-import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   ArrowLeft,
   RotateCcw,
   CheckCircle,
   Star,
-  Trophy,
   Lightbulb,
   Eye,
   EyeOff
 } from 'lucide-react';
+import PracticeResultsCard from './PracticeResultsCard';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { DRILL_ROOT_CLASS } from './drillLayout';
+import { generatePlayablePracticeBoard } from '@/lib/education/practiceBoard';
+import { normalizePracticeWords } from '@/lib/education/normalizePracticeWords';
 import type { LetterGrid, Language, DifficultyLevel } from '@/types';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
@@ -59,27 +61,23 @@ export default function WarmupRound({
     return () => setGameActive(false);
   }, [setGameActive]);
 
-  // Get vocabulary words that can be integrated (normalized for comparison)
-  const vocabularyWords = useMemo(() =>
-    words.filter((w) => w.canIntegrate).map((w) => normalizeWord(w.word, language)),
-    [words, language]
+  const vocabularyWords = useMemo(
+    () => normalizePracticeWords(words).map((entry) => normalizeWord(entry.word, language)),
+    [words, language],
   );
 
-  // Generate initial board with vocabulary words embedded
   const generateBoard = useCallback(() => {
     const config = DIFFICULTIES[difficulty];
-    return pickRichestBoardClient(
-      () => generateRandomTable(
-        config.rows,
-        config.cols,
-        language,
-        language !== 'ja' ? vocabularyWords : []
-      ),
-      language
-    );
+    return generatePlayablePracticeBoard({
+      words: vocabularyWords,
+      language,
+      rows: config.rows,
+      cols: config.cols,
+    });
   }, [difficulty, language, vocabularyWords]);
 
-  const [grid, setGrid] = useState<LetterGrid>(() => generateBoard());
+  const [board, setBoard] = useState(() => generateBoard());
+  const [grid, setGrid] = useState<LetterGrid>(() => board?.grid ?? []);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [vocabularyFound, setVocabularyFound] = useState<string[]>([]);
   const [score, setScore] = useState(0);
@@ -129,7 +127,9 @@ export default function WarmupRound({
 
   // Handle regenerate board
   const handleRegenerate = useCallback(() => {
-    setGrid(generateBoard());
+    const next = generateBoard();
+    setBoard(next);
+    if (next) setGrid(next.grid);
     setFoundWords([]);
     setVocabularyFound([]);
     setScore(0);
@@ -145,107 +145,34 @@ export default function WarmupRound({
     });
   }, [foundWords, vocabularyFound, score, onComplete]);
 
+  if (!board) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   // Completion screen
   if (showComplete) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
-        <Card className="border-neo border-neo-black shadow-hard-lg bg-neo-navy/80 max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <Trophy className="w-16 h-16 mx-auto text-neo-yellow mb-4" />
-
-            <h2 className="text-2xl font-neo-display text-neo-white mb-2">
-              {t('education.practice.complete')}
-            </h2>
-
-            <div className="my-6 space-y-4">
-              <div className="flex items-center justify-center gap-2">
-                <Star className="w-6 h-6 text-neo-yellow" />
-                <span className="text-3xl font-neo-display text-neo-cyan">{score}</span>
-                <span className="text-slate-400">{t('education.practice.points')}</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="p-3 bg-neo-black/30 rounded-neo">
-                  <p className="text-2xl font-neo-display text-neo-white">{foundWords.length}</p>
-                  <p className="text-xs text-slate-400">
-                    {t('education.practice.wordsFound')}
-                  </p>
-                </div>
-                <div className="p-3 bg-neo-pink/10 rounded-neo">
-                  <p className="text-2xl font-neo-display text-neo-pink">
-                    {vocabularyFound.length}/{vocabularyWords.length}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {t('education.practice.vocabulary')}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* XP Session Summary */}
-            {xpSessionData && (
-              <div className="mb-4 pt-4 border-t border-neo-black/30">
-                {xpSessionData.sessionMasteryMessage && (
-                  <p className="font-neo-display text-lg text-neo-yellow mb-2">
-                    {xpSessionData.sessionMasteryMessage}
-                  </p>
-                )}
-                <p className="text-neo-white font-neo-body">
-                  +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
-                </p>
-              </div>
-            )}
-
-            {/* Vocabulary words found */}
-            {vocabularyFound.length > 0 && (
-              <div className="bg-neo-black/30 rounded-neo p-4 mb-6 max-h-32 overflow-y-auto">
-                <p className="text-xs text-slate-400 mb-2">{t('education.practice.vocabularyWordsFound')}</p>
-                <div className="flex flex-wrap gap-2">
-                  {vocabularyFound.map((word) => (
-                    <span
-                      key={word}
-                      className="px-2 py-1 bg-neo-pink/20 text-neo-pink text-sm rounded font-neo-body"
-                    >
-                      {word}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <Button
-                onClick={() => {
-                  setShowComplete(false);
-                  handleRegenerate();
-                }}
-                className={cn(
-                  'flex-1 bg-neo-pink text-neo-black font-bold',
-                  'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
-                )}
-              >
-                <RotateCcw className="w-4 h-4 me-2" />
-                {t('common.retry')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onBack}
-                className="border-slate-400 text-slate-400 hover:bg-slate-400/20"
-              >
-                {t('common.back')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4 sm:p-6')}>
+        <PracticeResultsCard
+          correct={vocabularyFound.length}
+          total={Math.max(vocabularyWords.length, foundWords.length)}
+          xpEarned={xpSessionData?.sessionXpEarned}
+          masteryMessage={xpSessionData?.sessionMasteryMessage ?? undefined}
+          onRestart={() => {
+            setShowComplete(false);
+            handleRegenerate();
+          }}
+          onBack={onBack}
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
-      <div className="max-w-2xl mx-auto">
+    <div className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')}>
+      <div className="max-w-2xl mx-auto flex flex-col h-full min-h-0 w-full">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4 mb-4 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -274,7 +201,7 @@ export default function WarmupRound({
         </div>
 
         {/* Hints panel */}
-        <Card className="border-neo border-neo-black shadow-hard bg-neo-pink/10 mb-4">
+        <Card className="border-neo border-neo-black shadow-hard bg-neo-pink/10 mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -325,7 +252,7 @@ export default function WarmupRound({
         </Card>
 
         {/* Stats bar */}
-        <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+        <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -350,9 +277,8 @@ export default function WarmupRound({
           </CardContent>
         </Card>
 
-        {/* Game grid - container needs proper dimensions for absolute-positioned inner grid */}
-        <div className="mb-4 flex items-center justify-center">
-          <div className="w-full max-w-[min(100%,calc(100vh-350px))]" style={{ aspectRatio: '1/1' }}>
+        <div className="mb-4 flex-1 min-h-0 flex items-center justify-center">
+          <div className="aspect-square h-full max-w-full w-auto">
             <GridComponent
               grid={grid}
               interactive
@@ -391,7 +317,7 @@ export default function WarmupRound({
         <Button
           onClick={handleFinish}
           className={cn(
-            'w-full bg-neo-pink text-neo-black font-bold',
+            'w-full bg-neo-pink text-neo-black font-bold shrink-0',
             'border-neo border-neo-black shadow-hard hover:shadow-hard-pressed'
           )}
         >

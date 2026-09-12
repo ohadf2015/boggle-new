@@ -38,7 +38,11 @@ import {
   matchLessonTarget,
   nextLessonTarget,
   LESSON_HIT_POINTS,
+  type LessonSeed,
 } from '@/lib/wordTower/lessonSeed';
+import PracticeResultsCard from '@/components/practice/PracticeResultsCard';
+import { PracticeInsufficientData } from '@/components/practice/PracticeInsufficientData';
+import { DRILL_ROOT_CLASS } from '@/components/practice/drillLayout';
 
 /** Locales the Word Craft dictionary ships — see `lessonSeedSupportsLanguage`. */
 const DICTIONARY_LOCALES: SupportedLocale[] = ['en', 'he', 'sv', 'es', 'ja'];
@@ -65,16 +69,13 @@ export interface WordTowerPracticeProps {
   onBack: () => void;
 }
 
-export default function WordTowerPractice({
-  words,
+function WordTowerPracticePlay({
+  seed,
   language,
   onComplete,
   onBack,
-}: WordTowerPracticeProps) {
+}: Omit<WordTowerPracticeProps, 'words'> & { seed: LessonSeed }) {
   const { t, dir } = useLanguage();
-
-  const seed = useMemo(() => buildLessonSeed(words, language), [words, language]);
-  const seeded = seed.tray.length > 0;
 
   // Lesson words are authoritative for THIS run: a teacher's list can hold a
   // proper noun or a domain term the general dictionary has never heard of, and
@@ -86,7 +87,6 @@ export default function WordTowerPractice({
 
   const [dict, setDict] = useState<Set<string> | null>(null);
   useEffect(() => {
-    if (!seeded) return;
     let live = true;
     const locale = DICTIONARY_LOCALES.includes(language as SupportedLocale)
       ? (language as SupportedLocale)
@@ -104,7 +104,7 @@ export default function WordTowerPractice({
     return () => {
       live = false;
     };
-  }, [seeded, language, lessonWords]);
+  }, [language, lessonWords]);
 
   const isInDictionary = useCallback(
     (canonWord: string) => lessonWords.has(canonWord) || (dict?.has(canonWord) ?? false),
@@ -160,35 +160,12 @@ export default function WordTowerPractice({
     });
   }, [hits, game.floors, game.heightM, onComplete]);
 
-  if (!seeded) {
-    return (
-      <div className="w-full bg-neo-navy p-4 rounded-neo border-3 border-black">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          aria-label={t('common.back')}
-          className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
-        >
-          <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
-        </Button>
-        <p
-          data-testid="word-tower-practice-unavailable"
-          role="status"
-          className="mt-3 text-sm font-neo-body text-neo-white/85 text-pretty"
-        >
-          {t('education.wordTowerPractice.unavailable')}
-        </p>
-      </div>
-    );
-  }
-
   const next = nextLessonTarget(seed, new Set(hits));
   const canBuild = tower.word.length >= WORD_TOWER_MIN_WORD_LEN;
 
   return (
-    <div className="w-full bg-neo-navy rounded-neo border-3 border-black p-4">
-      <div className="flex items-center gap-2 mb-3">
+    <div className={cn(DRILL_ROOT_CLASS, 'rounded-neo border-3 border-black p-4')}>
+      <div className="flex items-center gap-2 mb-3 shrink-0">
         <Button
           variant="ghost"
           size="sm"
@@ -222,7 +199,7 @@ export default function WordTowerPractice({
           total: seed.targets.length,
         })}
       </p>
-      <ul className="flex flex-wrap gap-2 mb-4">
+      <ul className="flex flex-wrap gap-2 mb-4 shrink-0 overflow-y-auto max-h-24">
         {seed.targets.map((target) => {
           const isHit = hits.includes(target);
           return (
@@ -269,7 +246,7 @@ export default function WordTowerPractice({
         </p>
       )}
 
-      <div className="relative mx-auto aspect-square w-full max-w-sm">
+      <div className="relative mx-auto aspect-square w-full max-w-sm flex-1 min-h-0">
         <WordTowerWheel
           tray={game.tray}
           selected={tower.state.selected}
@@ -294,6 +271,50 @@ export default function WordTowerPractice({
         />
       </div>
     </div>
+  );
+}
+
+export default function WordTowerPractice({
+  words,
+  language,
+  onComplete,
+  onBack,
+}: WordTowerPracticeProps) {
+  const seed = useMemo(() => buildLessonSeed(words, language), [words, language]);
+  const [playKey, setPlayKey] = useState(0);
+  const [results, setResults] = useState<WordTowerPracticeResults | null>(null);
+
+  if (seed.tray.length === 0) {
+    return <PracticeInsufficientData onBack={onBack} testId="word-tower-practice-unavailable" />;
+  }
+
+  if (results) {
+    return (
+      <div className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4')}>
+        <PracticeResultsCard
+          correct={results.vocabularyWordsFound.length}
+          total={seed.targets.length}
+          onRestart={() => {
+            setResults(null);
+            setPlayKey((key) => key + 1);
+          }}
+          onBack={onBack}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <WordTowerPracticePlay
+      key={playKey}
+      seed={seed}
+      language={language}
+      onComplete={(payload) => {
+        setResults(payload);
+        void onComplete(payload);
+      }}
+      onBack={onBack}
+    />
   );
 }
 

@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import type { VocabularyWord } from '@/lib/supabase/education';
+import { DRILL_ROOT_CLASS, DRILL_SCROLL_CLASS } from './drillLayout';
+import { normalizePracticeWords } from '@/lib/education/normalizePracticeWords';
 
 interface WordListPreviewProps {
   lessonName: string;
@@ -35,8 +37,10 @@ export default function WordListPreview({
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedWord, setExpandedWord] = useState<string | null>(null);
 
+  const usable = normalizePracticeWords(words);
+
   // Filter words based on search
-  const filteredWords = words.filter((word) =>
+  const filteredWords = usable.filter((word) =>
     word.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (word.definition?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -46,10 +50,10 @@ export default function WordListPreview({
   };
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
-      <div className="max-w-2xl mx-auto">
+    <div className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')}>
+      <div className="max-w-2xl mx-auto flex flex-col h-full min-h-0 w-full">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -75,16 +79,16 @@ export default function WordListPreview({
           <CardContent className="py-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-400">
-                {words.length} {t('education.practice.wordCount')} {t('education.practice.total')}
+                {usable.length} {t('education.practice.wordCount')} {t('education.practice.total')}
               </span>
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1 text-neo-cyan">
                   <CheckCircle className="w-4 h-4" />
-                  {words.filter((w) => w.canIntegrate).length} {t('education.practice.canEmbed')}
+                  {usable.filter((w) => w.canIntegrate).length} {t('education.practice.canEmbed')}
                 </span>
                 <span className="flex items-center gap-1 text-neo-yellow">
                   <AlertCircle className="w-4 h-4" />
-                  {words.filter((w) => !w.canIntegrate).length} {t('education.practice.trackOnly')}
+                  {usable.filter((w) => !w.canIntegrate).length} {t('education.practice.trackOnly')}
                 </span>
               </div>
             </div>
@@ -92,7 +96,7 @@ export default function WordListPreview({
         </Card>
 
         {/* Search */}
-        <div className="relative mb-4">
+        <div className="relative mb-4 shrink-0">
           <Search className={cn(
             'absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400',
             isRTL ? 'right-3' : 'left-3'
@@ -108,8 +112,8 @@ export default function WordListPreview({
           />
         </div>
 
-        {/* Word list */}
-        <div className="space-y-2">
+        {/* Word list — this is the one surface allowed to scroll internally */}
+        <div className={cn('space-y-2', DRILL_SCROLL_CLASS)}>
           {filteredWords.length === 0 ? (
             <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
               <CardContent className="py-8 text-center">
@@ -174,7 +178,7 @@ export default function WordListPreview({
         </div>
 
         {/* Done button */}
-        <div className="mt-6">
+        <div className="mt-6 shrink-0">
           <Button
             onClick={() => {
               onViewComplete?.();

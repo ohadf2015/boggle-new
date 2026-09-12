@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useCallback, useMemo } from 'react';
+import { memo, useState, useCallback, useMemo, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -14,6 +14,7 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -25,6 +26,9 @@ import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { EnrichedVocabularyWord } from '@/types/vocabulary';
 import { WordContextRow } from './WordContextRow';
 import { PronunciationButton } from '@/components/practice/PronunciationButton';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { DRILL_ROOT_CLASS, DRILL_SCROLL_CLASS } from './drillLayout';
+import { wordsReadyForDrill, DRILL_MIN_USABLE } from '@/lib/education/normalizePracticeWords';
 
 export interface WordMatchingPracticeProps {
   words: VocabularyWord[];
@@ -129,6 +133,9 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
   ({ words, onComplete, onBack, xpSessionData }) => {
     const { t, dir, language } = useLanguage();
     const isRTL = dir === 'rtl';
+    const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
+
+    const usable = useMemo(() => wordsReadyForDrill(words, 'definition'), [words]);
 
     const {
       wordColumn,
@@ -140,7 +147,12 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
       accuracy,
       checkMatch,
       resetGame,
-    } = useMatchingGame(words);
+    } = useMatchingGame(usable);
+
+    useEffect(() => {
+      setGameActive(true);
+      return () => setGameActive(false);
+    }, [setGameActive]);
 
     const [feedback, setFeedback] = useState<Record<string, 'correct' | 'incorrect'>>({});
     const [showResults, setShowResults] = useState(false);
@@ -172,6 +184,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
         const result = checkMatch(wordId, definitionText);
 
         if (result.correct) {
+          playWordAcceptedSound();
           // Show correct feedback
           setFeedback((prev) => ({ ...prev, [over.id as string]: 'correct' }));
 
@@ -184,6 +197,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             });
           }, 1000);
         } else {
+          playWordRejectedSound();
           // Show incorrect feedback
           setFeedback((prev) => ({ ...prev, [over.id as string]: 'incorrect' }));
 
@@ -197,12 +211,13 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
           }, 1000);
         }
       },
-      [definitionColumn, checkMatch]
+      [definitionColumn, checkMatch, playWordAcceptedSound, playWordRejectedSound]
     );
 
     // Show results and report completion when game ends
     useMemo(() => {
-      if (isComplete && !showResults && words.length > 0) {
+      if (usable.length < DRILL_MIN_USABLE.matching) return;
+      if (isComplete && !showResults && usable.length > 0) {
         setTimeout(() => {
           setShowResults(true);
           onComplete({
@@ -212,7 +227,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
           });
         }, 500);
       }
-    }, [isComplete, showResults, words.length, onComplete, correctCount, attempts, accuracy]);
+    }, [isComplete, showResults, usable.length, onComplete, correctCount, attempts, accuracy]);
 
     // Handle restart
     const handleRestart = useCallback(() => {
@@ -222,9 +237,13 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
     }, [resetGame]);
 
 
+    if (usable.length < DRILL_MIN_USABLE.matching) {
+      return <PracticeInsufficientData onBack={onBack} />;
+    }
+
     if (showResults) {
       return (
-        <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className={cn(DRILL_ROOT_CLASS, 'items-center justify-center p-4')} dir={isRTL ? 'rtl' : 'ltr'}>
           <PracticeResultsCard
             correct={correctCount}
             total={attempts}
@@ -238,9 +257,9 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
     }
 
     return (
-      <div className="min-h-screen bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={cn(DRILL_ROOT_CLASS, 'p-4')} dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="max-w-5xl mx-auto mb-4">
+        <div className="max-w-5xl mx-auto mb-4 shrink-0">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
@@ -258,12 +277,12 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               </h2>
               <div className="flex flex-col items-center gap-1">
                 <p className="text-neo-white font-neo-body">
-                  {matchedPairs.size} / {words.length}
+                  {matchedPairs.size} / {usable.length}
                 </p>
                 <div className="h-1.5 w-24 bg-neo-black/30 rounded-neo overflow-hidden">
                   <AdaptiveMotion.div
                     className="h-full bg-neo-cyan"
-                    animate={{ width: `${(matchedPairs.size / words.length) * 100}%` }}
+                    animate={{ width: `${(matchedPairs.size / usable.length) * 100}%` }}
                     transition={{ duration: 0.3 }}
                   />
                 </div>
@@ -284,7 +303,8 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
             data-testid="dnd-context"
             className={cn(
               'max-w-5xl mx-auto grid gap-6',
-              words.length < 4 ? 'grid-cols-2 max-w-2xl' : 'md:grid-cols-2'
+              DRILL_SCROLL_CLASS,
+              usable.length < 4 ? 'grid-cols-2 max-w-2xl' : 'md:grid-cols-2'
             )}
           >
             {/* Word column */}
@@ -294,7 +314,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               </h3>
               <AdaptiveMotion.div className="space-y-3">
                 {wordColumn.map((item) => {
-                  const wordData = words.find((w) => w.word === item.id);
+                  const wordData = usable.find((w) => w.word === item.id);
                   return (
                     <div key={item.id}>
                       <div className="flex items-center gap-2">

@@ -272,7 +272,8 @@ describe('SpellingChallengePractice', () => {
         />
       );
 
-      expect(screen.getByTestId('progress-text')).toHaveTextContent('0 / 0');
+      expect(screen.getByTestId('practice-insufficient-data')).toBeInTheDocument();
+      expect(screen.queryByTestId('progress-text')).not.toBeInTheDocument();
     });
   });
 });
