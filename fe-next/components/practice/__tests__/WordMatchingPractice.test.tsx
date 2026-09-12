@@ -157,8 +157,7 @@ describe('WordMatchingPractice', () => {
   });
 
   describe('completion', () => {
-    it('should show results card when all pairs matched', () => {
-      // Create a version with 0 words to trigger immediate completion
+    it('shows the insufficient-data panel when no pairs can be made', () => {
       render(
         <WordMatchingPractice
           words={[]}
@@ -167,9 +166,7 @@ describe('WordMatchingPractice', () => {
         />
       );
 
-      // With 0 words, game should be complete immediately
-      // Should show some completion UI (exact implementation may vary)
-      expect(screen.queryByText('0 / 0')).toBeInTheDocument();
+      expect(screen.getByTestId('practice-insufficient-data')).toBeInTheDocument();
     });
   });
 
@@ -231,11 +228,10 @@ describe('WordMatchingPractice', () => {
         />
       );
 
-      // Should render without errors
-      expect(screen.getByText('0 / 0')).toBeInTheDocument();
+      expect(screen.getByTestId('practice-insufficient-data')).toBeInTheDocument();
     });
 
-    it('should handle single word pair', () => {
+    it('should refuse a single word pair (matching needs two)', () => {
       const singleWord: VocabularyWord[] = [
         { word: 'test', definition: 'a test', canIntegrate: true },
       ];
@@ -248,8 +244,8 @@ describe('WordMatchingPractice', () => {
         />
       );
 
-      expect(screen.getByText('test')).toBeInTheDocument();
-      expect(screen.getByText('a test')).toBeInTheDocument();
+      expect(screen.getByTestId('practice-insufficient-data')).toBeInTheDocument();
+      expect(screen.queryByText('test')).not.toBeInTheDocument();
     });
   });
 });

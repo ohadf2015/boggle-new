@@ -272,15 +272,6 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         </div>
       </div>
 
-      {/* Mobile Breadcrumbs (below header bar) — skipped on titled context pages
-          (classroom game, duels): the title already says where the player is,
-          and the row cost vertical space in a game lobby on a phone. */}
-      {!title && (
-        <div className="lg:hidden mt-2 px-1">
-          <EducationBreadcrumbs className="text-xs" />
-        </div>
-      )}
-
       {/* Mobile Menu Slide-out Pane */}
       {mounted && createPortal(
         <>

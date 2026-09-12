@@ -25,6 +25,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
+import { PracticeInsufficientData } from '@/components/practice/PracticeInsufficientData';
+import { DRILL_ROOT_CLASS } from '@/components/practice/drillLayout';
 import { ArrowLeft, Check, Blocks } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
 import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
@@ -202,26 +204,14 @@ function WordTowerRun({
     );
   }
 
+  /*
+    A lesson whose words can never seed the wheel gets the same dead-end panel
+    every other drill shows, rather than a mode-specific one-liner. `testId`
+    keeps the marker the Word Tower suite has always asserted on.
+  */
   if (!seeded) {
     return (
-      <div className="w-full bg-neo-navy p-4 rounded-neo border-[3px] border-black">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          aria-label={t('common.back')}
-          className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
-        >
-          <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
-        </Button>
-        <p
-          data-testid="word-tower-practice-unavailable"
-          role="status"
-          className="mt-3 text-sm font-neo-body text-neo-white/85 text-pretty"
-        >
-          {t('education.wordTowerPractice.unavailable')}
-        </p>
-      </div>
+      <PracticeInsufficientData onBack={onBack} testId="word-tower-practice-unavailable" />
     );
   }
 
@@ -229,8 +219,8 @@ function WordTowerRun({
   const canBuild = tower.word.length >= WORD_TOWER_MIN_WORD_LEN;
 
   return (
-    <div className="w-full bg-neo-navy rounded-neo border-[3px] border-black p-4">
-      <div className="flex items-center gap-2 mb-3">
+    <div className={cn(DRILL_ROOT_CLASS, 'w-full rounded-neo border-[3px] border-black p-4')}>
+      <div className="flex items-center gap-2 mb-3 shrink-0">
         <Button
           variant="ghost"
           size="sm"
@@ -264,7 +254,7 @@ function WordTowerRun({
           total: seed.targets.length,
         })}
       </p>
-      <ul className="flex flex-wrap gap-2 mb-4">
+      <ul className="flex flex-wrap gap-2 mb-4 shrink-0 overflow-y-auto max-h-24">
         {seed.targets.map((target) => {
           const isHit = hits.includes(target);
           return (
@@ -311,7 +301,8 @@ function WordTowerRun({
         </p>
       )}
 
-      <div className="relative mx-auto aspect-square w-full max-w-sm">
+      {/* The wheel takes whatever height the checklist above leaves it. */}
+      <div className="relative mx-auto aspect-square w-full max-w-sm flex-1 min-h-0">
         <WordTowerWheel
           tray={game.tray}
           selected={tower.state.selected}

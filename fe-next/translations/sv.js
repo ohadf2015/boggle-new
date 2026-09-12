@@ -14686,6 +14686,10 @@ const sv = {
       "soloBoard": "Ensamt spel",
       "lessonUnavailable": "Kan inte öppna lektionen",
       "lessonUnavailableBody": "Länken kan vara för gammal, eller så är lektionen borttagen. Be din lärare om en ny.",
+      "insufficientData": {
+        "title": "För lite för den här övningen",
+        "body": "Lektionen har inte tillräckligt många ord med den information spelet behöver. Be läraren lägga till förklaringar, eller välj ett annat spel."
+      },
       "spellTheWord": "Stava ordet",
       "spelling": "Stavning",
       "streak": "{{count}} i rad",

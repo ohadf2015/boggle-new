@@ -9,8 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import GridComponent from '@/components/GridComponent';
-import { generateRandomTable } from '@/utils/utils';
-import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   ArrowLeft,
@@ -22,6 +20,10 @@ import {
   EyeOff
 } from 'lucide-react';
 import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { DRILL_ROOT_CLASS } from './drillLayout';
+import { generatePlayablePracticeBoard, PRACTICE_BOARD_MAX_ATTEMPTS } from '@/lib/education/practiceBoard';
+import { normalizePracticeWords } from '@/lib/education/normalizePracticeWords';
 import type { LetterGrid, Language, DifficultyLevel } from '@/types';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
@@ -65,27 +67,44 @@ export default function WarmupRound({
     return () => setGameActive(false);
   }, [setGameActive]);
 
-  // Get vocabulary words that can be integrated (normalized for comparison)
+  // Get vocabulary words that can be integrated (normalized for comparison),
+  // after the teacher's list has been trimmed, de-duplicated and stripped of
+  // blanks — a board cannot hide a word that is an empty string.
   const vocabularyWords = useMemo(() =>
-    words.filter((w) => w.canIntegrate).map((w) => normalizeWord(w.word, language)),
+    normalizePracticeWords(words)
+      .filter((w) => w.canIntegrate)
+      .map((w) => normalizeWord(w.word, language)),
     [words, language]
   );
 
-  // Generate initial board with vocabulary words embedded
-  const generateBoard = useCallback(() => {
+  /*
+    Warmup's whole premise is "your teacher's words are hiding in here", so a
+    grid that happens to contain none of them is not a warmup — it is a lie the
+    hints panel then repeats. Retry seeds (capped, deterministic) until at
+    least one lesson word is genuinely placeable; null means none ever can be,
+    and the drill says so instead of dealing an unplayable board.
+  */
+  const generateBoard = useCallback((seed: number) => {
     const config = DIFFICULTIES[difficulty];
-    return pickRichestBoardClient(
-      () => generateRandomTable(
-        config.rows,
-        config.cols,
-        language,
-        language !== 'ja' ? vocabularyWords : []
-      ),
-      language
-    );
+    return generatePlayablePracticeBoard({
+      words: vocabularyWords,
+      language,
+      rows: config.rows,
+      cols: config.cols,
+      seed,
+    });
   }, [difficulty, language, vocabularyWords]);
 
-  const [grid, setGrid] = useState<LetterGrid>(() => generateBoard());
+  /*
+    The generator is deterministic per seed, so AGAIN has to ASK for a new one
+    — without this the student who tapped "play again" got the grid they had
+    just finished, letter for letter. Each regenerate steps a whole attempt
+    window past the last, so the retry never lands on a seed the previous run
+    already rejected.
+  */
+  const [boardSeed, setBoardSeed] = useState(1);
+  const [board, setBoard] = useState(() => generateBoard(1));
+  const [grid, setGrid] = useState<LetterGrid>(() => board?.grid ?? []);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [vocabularyFound, setVocabularyFound] = useState<string[]>([]);
   const [score, setScore] = useState(0);
@@ -135,11 +154,15 @@ export default function WarmupRound({
 
   // Handle regenerate board
   const handleRegenerate = useCallback(() => {
-    setGrid(generateBoard());
+    const nextSeed = boardSeed + PRACTICE_BOARD_MAX_ATTEMPTS;
+    setBoardSeed(nextSeed);
+    const next = generateBoard(nextSeed);
+    setBoard(next);
+    if (next) setGrid(next.grid);
     setFoundWords([]);
     setVocabularyFound([]);
     setScore(0);
-  }, [generateBoard]);
+  }, [generateBoard, boardSeed]);
 
   // Handle finish practice
   const handleFinish = useCallback(() => {
@@ -158,6 +181,10 @@ export default function WarmupRound({
     teacher's vocabulary the student dug out, a mascot that reacts, a stinger,
     and ONE big forward action instead of a retry/back pair.
   */
+  if (!board) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   if (showComplete) {
     return (
       <div className="flex min-h-full items-center justify-center bg-neo-navy p-4" translate="no">
@@ -186,10 +213,10 @@ export default function WarmupRound({
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
-      <div className="max-w-2xl mx-auto">
+    <div className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')}>
+      <div className="max-w-2xl mx-auto flex flex-col h-full min-h-0 w-full">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4 mb-4 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -218,7 +245,7 @@ export default function WarmupRound({
         </div>
 
         {/* Hints panel */}
-        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-pink/10 mb-4">
+        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-pink/10 mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -269,7 +296,7 @@ export default function WarmupRound({
         </Card>
 
         {/* Stats bar */}
-        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+        <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -294,9 +321,10 @@ export default function WarmupRound({
           </CardContent>
         </Card>
 
-        {/* Game grid - container needs proper dimensions for absolute-positioned inner grid */}
-        <div className="mb-4 flex items-center justify-center">
-          <div className="w-full max-w-[min(100%,calc(100vh-350px))]" style={{ aspectRatio: '1/1' }}>
+        {/* The grid takes the height left over, so it never pushes the finish
+            button off a 390x844 phone. */}
+        <div className="mb-4 flex-1 min-h-0 flex items-center justify-center">
+          <div className="aspect-square h-full max-w-full w-auto">
             <GridComponent
               grid={grid}
               interactive
@@ -309,7 +337,7 @@ export default function WarmupRound({
 
         {/* Found words */}
         {foundWords.length > 0 && (
-          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
+          <Card className="border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
             <CardContent className="py-3">
               <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
@@ -335,7 +363,7 @@ export default function WarmupRound({
         <Button
           onClick={handleFinish}
           className={cn(
-            'w-full bg-neo-pink text-neo-black font-bold',
+            'w-full bg-neo-pink text-neo-black font-bold shrink-0',
             'border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed'
           )}
         >

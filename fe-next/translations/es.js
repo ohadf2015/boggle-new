@@ -14445,6 +14445,10 @@ const es = {
       "soloBoard": "Tablero individual",
       "lessonUnavailable": "No se puede abrir la lección",
       "lessonUnavailableBody": "Puede que el enlace ya no sirva o que la lección se haya borrado. Pídele uno nuevo a tu profe.",
+      "insufficientData": {
+        "title": "Faltan palabras para este juego",
+        "body": "Esta lección no tiene suficientes palabras con los datos que este juego necesita. Pídele a tu profe que añada definiciones, o elige otro juego."
+      },
       "spellTheWord": "Deletréala",
       "spelling": "Ortografía",
       "streak": "Racha de {{count}}",

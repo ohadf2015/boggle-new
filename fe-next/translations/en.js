@@ -12977,6 +12977,10 @@ const en = {
       "soloBoard": "Solo Board",
       "lessonUnavailable": "Can't open this lesson",
       "lessonUnavailableBody": "The link may be out of date, or the lesson was removed. Ask your teacher for a new one.",
+      "insufficientData": {
+        "title": "This drill needs more words",
+        "body": "This lesson doesn't have enough words with the details this game needs. Ask your teacher to add definitions, or pick another game."
+      },
       "spellTheWord": "Spell it out",
       "spelling": "Spelling",
       "streak": "{{count}} streak",

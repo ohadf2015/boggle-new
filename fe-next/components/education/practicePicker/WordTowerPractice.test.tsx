@@ -119,7 +119,7 @@ describe('WordTowerPractice', () => {
 
   it('tells the student the lesson cannot seed a wheel instead of dealing an empty one', async () => {
     renderIt(['cat', 'dog']);
-    expect(await screen.findByTestId('word-tower-practice-unavailable')).toBeTruthy();
+    expect(await screen.findByTestId('practice-insufficient-data')).toBeTruthy();
     expect(tiles()).toHaveLength(0);
   });
 });

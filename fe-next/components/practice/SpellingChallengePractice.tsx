@@ -15,6 +15,8 @@ import { WordContextRow } from './WordContextRow';
 import { PronunciationButton } from './PronunciationButton';
 import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 import StreakFlame from '@/components/education/practice/StreakFlame';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
@@ -54,6 +56,14 @@ export function SpellingChallengePractice({
   const isRTL = dir === 'rtl';
   const sfx = usePracticeSfx();
 
+  /*
+    Trimmed, de-duplicated, blanks dropped — a teacher's list arrives with all
+    three. Spelling asks for the WORD and nothing else (the definition is a
+    bonus prompt, not the question — see the definition card below), so the
+    only entry this drill cannot use is one with no word at all.
+  */
+  const usable = useMemo(() => wordsReadyForDrill(words, 'word'), [words]);
+
   const {
     currentWord,
     wordIndex,
@@ -69,18 +79,15 @@ export function SpellingChallengePractice({
     accuracy,
     isComplete,
     resetGame,
-  } = useSpellingGame(words);
+  } = useSpellingGame(usable);
 
   // Mirror the hook's sort-by-length so wordIndex maps to the right enriched
   // word — including the hook's drop of entries with no `word`, or the two
   // lists index differently and the hint row describes a different card than
   // the one on screen.
   const sortedWords = useMemo(
-    () =>
-      words
-        .filter((entry) => typeof entry?.word === 'string' && entry.word.length > 0)
-        .sort((a, b) => a.word.length - b.word.length),
-    [words]
+    () => [...usable].sort((a, b) => a.word.length - b.word.length),
+    [usable]
   );
 
   const [inputValue, setInputValue] = useState('');
@@ -153,6 +160,10 @@ export function SpellingChallengePractice({
     setTotalHintsUsed(prev => prev + hintsUsed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordIndex]);
+
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
 
   if (showResults) {
     return (

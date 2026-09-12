@@ -11,8 +11,6 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import GridComponent from '@/components/GridComponent';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
-import { generateRandomTable } from '@/utils/utils';
-import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   ArrowLeft,
@@ -23,6 +21,9 @@ import {
 } from 'lucide-react';
 import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
 import BeatTheClock from '@/components/education/practice/BeatTheClock';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { generatePlayablePracticeBoard, PRACTICE_BOARD_MAX_ATTEMPTS } from '@/lib/education/practiceBoard';
+import { normalizePracticeWords } from '@/lib/education/normalizePracticeWords';
 import type { LetterGrid, Language, DifficultyLevel } from '@/types';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
@@ -66,27 +67,45 @@ export default function SoloPracticeBoard({
     return () => setGameActive(false);
   }, [setGameActive]);
 
-  // Get vocabulary words that can be integrated (normalized for comparison)
+  // Get vocabulary words that can be integrated (normalized for comparison),
+  // after the teacher's list has been trimmed, de-duplicated and stripped of
+  // blanks — a board cannot hide a word that is an empty string.
   const vocabularyWords = useMemo(() =>
-    words.filter((w) => w.canIntegrate).map((w) => normalizeWord(w.word, language)),
+    normalizePracticeWords(words)
+      .filter((w) => w.canIntegrate)
+      .map((w) => normalizeWord(w.word, language)),
     [words, language]
   );
 
-  // Generate initial board with vocabulary words embedded
-  const generateBoard = useCallback(() => {
+  /*
+    A random grid is not necessarily a PLAYABLE one: the old generator took one
+    roll and shipped it, so a lesson whose words never landed handed the student
+    a board with nothing of theirs on it — and a `?mode=` deep link skips the
+    picker's readiness check, so the drill is the only thing standing there.
+    This retries seeds (capped, deterministic) until a lesson word is actually
+    on the board, and returns null when none of them can ever fit.
+  */
+  const generateBoard = useCallback((seed: number) => {
     const config = DIFFICULTIES[difficulty];
-    return pickRichestBoardClient(
-      () => generateRandomTable(
-        config.rows,
-        config.cols,
-        language,
-        language !== 'ja' ? vocabularyWords : []
-      ),
-      language
-    );
+    return generatePlayablePracticeBoard({
+      words: vocabularyWords,
+      language,
+      rows: config.rows,
+      cols: config.cols,
+      seed,
+    });
   }, [difficulty, language, vocabularyWords]);
 
-  const [grid, setGrid] = useState<LetterGrid>(() => generateBoard());
+  /*
+    The generator is deterministic per seed, so AGAIN has to ASK for a new one
+    — without this the student who tapped "play again" got the grid they had
+    just finished, letter for letter. Each regenerate steps a whole attempt
+    window past the last, so the retry never lands on a seed the previous run
+    already rejected.
+  */
+  const [boardSeed, setBoardSeed] = useState(1);
+  const [board, setBoard] = useState(() => generateBoard(1));
+  const [grid, setGrid] = useState<LetterGrid>(() => board?.grid ?? []);
   const [vocabularyFound, setVocabularyFound] = useState<string[]>([]);
   const [showComplete, setShowComplete] = useState(false);
 
@@ -145,12 +164,16 @@ export default function SoloPracticeBoard({
 
   // Handle regenerate board
   const handleRegenerate = useCallback(() => {
-    setGrid(generateBoard());
+    const nextSeed = boardSeed + PRACTICE_BOARD_MAX_ATTEMPTS;
+    setBoardSeed(nextSeed);
+    const next = generateBoard(nextSeed);
+    setBoard(next);
+    if (next) setGrid(next.grid);
     setVocabularyFound([]);
     resetSubmission();
     setFormingWord('');
     setFormingLetterCount(0);
-  }, [generateBoard, resetSubmission]);
+  }, [generateBoard, boardSeed, resetSubmission]);
 
   // Handle finish practice
   const handleFinish = useCallback(() => {
@@ -168,6 +191,10 @@ export default function SoloPracticeBoard({
     same completion moment every other practice mode uses, scored on how much of
     the teacher's vocabulary the student actually dug out of the grid.
   */
+  if (!board) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   if (showComplete) {
     return (
       <div className="flex min-h-full items-center justify-center bg-neo-navy p-4" translate="no">

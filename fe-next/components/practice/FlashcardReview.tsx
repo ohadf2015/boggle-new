@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,8 @@ import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { WordContextRow } from './WordContextRow';
 import PracticeCompletionMoment from '@/components/education/practice/PracticeCompletionMoment';
 import BeatTheClock from '@/components/education/practice/BeatTheClock';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
@@ -55,6 +57,15 @@ export default function FlashcardReview({
   const socketContext = useSocketOptional();
   const socket = socketContext?.socket;
 
+  /*
+    A lesson's word list is teacher-typed: it arrives with blanks, duplicate
+    spellings and entries that never got a definition. A card whose back is
+    empty is not a card, so the deck is built from the words that can actually
+    make one — and if none can, the student gets a panel with the drill's own
+    back button instead of a stack of blank cards.
+  */
+  const usable = useMemo(() => wordsReadyForDrill(words, 'definition'), [words]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [results, setResults] = useState<boolean[]>([]);
@@ -65,8 +76,8 @@ export default function FlashcardReview({
 
   const { speak } = useSpeechSynthesis(language);
 
-  const currentWord = words[currentIndex];
-  const progress = ((currentIndex + 1) / words.length) * 100;
+  const currentWord = usable[currentIndex];
+  const progress = ((currentIndex + 1) / usable.length) * 100;
 
   // Practice renders from the teacher's own words, always and immediately.
   //
@@ -77,9 +88,9 @@ export default function FlashcardReview({
   // sat on a spinner forever, on every lesson. The emit and listener are gone
   // with it; there is nothing on the other end to talk to.
   useEffect(() => {
-    if (words.length === 0) return;
+    if (usable.length === 0) return;
     setEnrichedWords(
-      words.map((word) => ({
+      usable.map((word) => ({
         word: word.word,
         definition: word.definition || '',
         pronunciation: undefined,
@@ -93,7 +104,7 @@ export default function FlashcardReview({
         contextualExamples: word.example ? [{ text: word.example }] : [],
       }))
     );
-  }, [words]);
+  }, [usable]);
 
   const handleFlip = useCallback(() => {
     setIsFlipped((prev) => {
@@ -110,18 +121,18 @@ export default function FlashcardReview({
     setResults((prev) => [...prev, correct]);
     onCardReviewed?.(correct);
 
-    if (currentIndex === words.length - 1) {
+    if (currentIndex === usable.length - 1) {
       // Last card - show results
       const finalResults = [...results, correct];
       const correctCount = finalResults.filter(Boolean).length;
       setShowResults(true);
-      onComplete({ correct: correctCount, total: words.length });
+      onComplete({ correct: correctCount, total: usable.length });
     } else {
       // Next card
       setCurrentIndex((prev) => prev + 1);
       setIsFlipped(false);
     }
-  }, [currentIndex, words.length, results, onCardReviewed, onComplete]);
+  }, [currentIndex, usable.length, results, onCardReviewed, onComplete]);
 
   const handleRestart = useCallback(() => {
     setCurrentIndex(0);
@@ -142,8 +153,8 @@ export default function FlashcardReview({
     finishedRef.current = true;
     const correctCount = results.filter(Boolean).length;
     setShowResults(true);
-    onComplete({ correct: correctCount, total: words.length });
-  }, [results, words.length, onComplete, showResults]);
+    onComplete({ correct: correctCount, total: usable.length });
+  }, [results, usable.length, onComplete, showResults]);
 
   /*
     The deck used to end on a trophy glyph, a percentage and a scroll of every
@@ -151,6 +162,10 @@ export default function FlashcardReview({
     same completion moment every other mode now shows, so finishing a deck
     finally sounds and looks like finishing something.
   */
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   if (showResults) {
     const correctCount = results.filter(Boolean).length;
 
@@ -159,7 +174,7 @@ export default function FlashcardReview({
         <div className="w-full max-w-sm space-y-3">
           <PracticeCompletionMoment
             correct={correctCount}
-            total={words.length}
+            total={usable.length}
             xpEarned={xpSessionData?.sessionXpEarned}
             onAgain={handleRestart}
             onBack={onBack}
@@ -169,7 +184,7 @@ export default function FlashcardReview({
 
           {/* Per-word recap — the one thing a flashcard deck owes the student. */}
           <div className="max-h-40 overflow-y-auto rounded-neo border-[3px] border-black bg-black/30 p-3">
-            {words.map((word, idx) => (
+            {usable.map((word, idx) => (
               <div
                 key={`word-${idx}-${word.word}`}
                 className="flex items-center justify-between py-1 text-sm"
@@ -209,7 +224,7 @@ export default function FlashcardReview({
                 {t('education.practice.flashcards')}
               </h1>
               <p className="text-sm text-neo-cream">
-                {currentIndex + 1} / {words.length}
+                {currentIndex + 1} / {usable.length}
               </p>
             </div>
             {/* Mode toggle buttons - in swipe mode, swipe button is active */}
@@ -242,7 +257,7 @@ export default function FlashcardReview({
           */}
           <BeatTheClock
             mode="flashcard"
-            wordCount={words.length}
+            wordCount={usable.length}
             defaultOn={false}
             active={!showResults}
             onExpire={handleClockExpired}
@@ -256,7 +271,7 @@ export default function FlashcardReview({
             onComplete={() => {
               const correctCount = results.filter(Boolean).length;
               setShowResults(true);
-              onComplete({ correct: correctCount, total: words.length });
+              onComplete({ correct: correctCount, total: usable.length });
             }}
           />
         </div>
@@ -284,7 +299,7 @@ export default function FlashcardReview({
               {t('education.practice.flashcards')}
             </h1>
             <p className="text-sm text-neo-cream">
-              {currentIndex + 1} / {words.length}
+              {currentIndex + 1} / {usable.length}
             </p>
           </div>
           {/* Mode toggle buttons (only show if enriched) */}
@@ -318,7 +333,7 @@ export default function FlashcardReview({
         */}
         <BeatTheClock
           mode="flashcard"
-          wordCount={words.length}
+          wordCount={usable.length}
           defaultOn={false}
           active={!showResults}
           onExpire={handleClockExpired}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,8 @@ import CircularTimer from '../CircularTimer';
 import PracticeResultsCard from './PracticeResultsCard';
 import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 import StreakFlame from '@/components/education/practice/StreakFlame';
+import { PracticeInsufficientData } from './PracticeInsufficientData';
+import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
 export interface TimedBlitzPracticeProps {
@@ -59,6 +61,15 @@ export function TimedBlitzPractice({
   const isRTL = dir === 'rtl';
   const sfx = usePracticeSfx();
 
+  /*
+    Blitz shows a definition and asks for the word, so an entry the teacher
+    never defined has no question to ask — it used to deal the card anyway and
+    print "no words to practise" where the prompt belongs, mid-round, on the
+    clock. Filtered out here; if none survive, the panel replaces the drill
+    rather than the countdown running down on an unplayable board.
+  */
+  const usable = useMemo(() => wordsReadyForDrill(words, 'definition'), [words]);
+
   const [phase, setPhase] = useState<GamePhase>('countdown');
   const [countdown, setCountdown] = useState(3);
   const [inputValue, setInputValue] = useState('');
@@ -76,13 +87,14 @@ export function TimedBlitzPractice({
     score,
     submitAnswer,
     startGame,
-  } = useBlitzGame(words, 60);
+  } = useBlitzGame(usable, 60);
 
   /**
    * Countdown phase effect
    * 3-2-1 countdown before game starts
    */
   useEffect(() => {
+    if (usable.length < 1) return;
     if (phase !== 'countdown') return;
 
     const timer = setTimeout(() => {
@@ -98,7 +110,7 @@ export function TimedBlitzPractice({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [phase, countdown, startGame, sfx]);
+  }, [phase, countdown, startGame, sfx, usable.length]);
 
   /**
    * Focus input when playing
@@ -189,10 +201,17 @@ export function TimedBlitzPractice({
     sfx.urgent();
   }, [remainingTime, phase, sfx]);
 
+  if (usable.length < 1) {
+    return <PracticeInsufficientData onBack={onBack} />;
+  }
+
   return (
     <div
       className={cn(
-        'w-full h-full flex flex-col items-center justify-center',
+        // Fills the height the shell gives it and refuses to grow the page:
+        // `min-h-0` is what lets this column shrink instead of pushing the
+        // document past the viewport on a 390x844 phone.
+        'w-full h-full min-h-0 flex flex-col items-center justify-center',
         'p-4 relative'
       )}
       dir={isRTL ? 'rtl' : 'ltr'}

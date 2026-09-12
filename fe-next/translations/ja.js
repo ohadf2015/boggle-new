@@ -14453,6 +14453,10 @@ const ja = {
       "soloBoard": "ソロボード",
       "lessonUnavailable": "このレッスンを開けません",
       "lessonUnavailableBody": "リンクが古いか、レッスンが削除された可能性があります。先生に新しいリンクをもらってね。",
+      "insufficientData": {
+        "title": "このゲームには単語が足りないよ",
+        "body": "このレッスンには、このゲームに必要な情報つきの単語が足りません。先生に意味を足してもらうか、別のゲームを選んでね。"
+      },
       "spellTheWord": "スペルを書いてみよう",
       "spelling": "スペリング",
       "streak": "{{count}}連続",
