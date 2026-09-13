@@ -99,7 +99,7 @@ function PackageCard({
       className={
         highlighted
           ? 'flex flex-col rounded-neo border-4 border-neo-black bg-neo-lime p-5 text-neo-navy shadow-hard-xl'
-          : 'flex flex-col rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 text-neo-white shadow-hard'
+          : 'flex flex-col rounded-neo border-4 border-neo-cream bg-neo-navy-light p-5 text-neo-white shadow-hard'
       }
     >
       <h3 className="font-neo-display text-xl font-black">{t(`education.packages.${ns}.name`)}</h3>
@@ -136,7 +136,7 @@ function PackageCard({
           onClick={() => pkg.leadPlan && onLead(pkg.leadPlan)}
           className={
             highlighted
-              ? 'mt-6 rounded-neo border-4 border-neo-black bg-neo-navy px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard'
+              ? 'mt-6 rounded-neo border-4 border-neo-cream bg-neo-navy px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard'
               : 'mt-6 rounded-neo border-4 border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard'
           }
         >

@@ -56,7 +56,7 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
         </button>
       )}
 
-      <details className="group mt-3 rounded-neo border-[3px] border-neo-black bg-neo-navy overflow-hidden">
+      <details className="group mt-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy overflow-hidden">
         <summary
           data-testid="reteach-more-actions"
           className={cn(

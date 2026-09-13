@@ -320,8 +320,8 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
         data-testid="express-failure"
         className="min-h-0 flex-1 overflow-y-auto rounded-neo-lg border-4 border-neo-red bg-neo-cream p-6 shadow-hard-lg text-center"
       >
-        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-neo border-3 border-black bg-neo-red/15 shadow-hard-sm">
-          <TriangleAlert className="size-7 text-neo-red" strokeWidth={3} aria-hidden="true" />
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red shadow-hard-sm">
+          <TriangleAlert className="size-7 text-neo-black" strokeWidth={3} aria-hidden="true" />
         </div>
         <p className="font-neo-display text-xl font-black text-black text-balance">
           {t(`teacher.playNow.failure.${failure.code}`)}
@@ -357,7 +357,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
   return (
     <div
       data-testid="express-progress"
-      className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-black bg-neo-navy p-5 shadow-hard-lg sm:p-8"
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-neo-cream bg-neo-navy p-5 shadow-hard-lg sm:p-8"
     >
       <div className="flex items-center justify-center gap-3">
         <Rocket className="size-9 shrink-0 text-neo-lime motion-safe:animate-bounce" strokeWidth={3} aria-hidden="true" />

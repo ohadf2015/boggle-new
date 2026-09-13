@@ -122,7 +122,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
           variants={sectionReveal}
           className={cn(
             'flex flex-col items-center gap-4 py-10 px-6',
-            'bg-neo-navy border-3 border-black rounded-neo shadow-hard text-center'
+            'bg-neo-navy border-3 border-neo-cream rounded-neo shadow-hard text-center'
           )}
         >
           <m.div

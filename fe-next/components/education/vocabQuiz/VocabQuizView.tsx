@@ -101,7 +101,7 @@ export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
       {phase === 'question' && (
         <div
           className={cn(
-            'h-3 w-full shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated overflow-hidden',
+            'h-3 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
             juice.ticking && 'animate-pulse'
           )}
           role="timer"
@@ -134,7 +134,7 @@ export function VocabQuizView({ socket, username, t }: VocabQuizViewProps) {
       {/* Question + answers */}
       {(phase === 'question' || phase === 'reveal') && question && (
         <>
-          <div className="shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated p-3 shadow-hard">
+          <div className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard">
             <p className="text-[11px] font-bold uppercase tracking-wide text-neo-cyan mb-1">{focusLabel}</p>
             <p className="font-neo-display font-bold text-lg leading-snug break-words">{question.prompt}</p>
           </div>

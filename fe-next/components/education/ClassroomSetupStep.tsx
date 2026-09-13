@@ -224,11 +224,11 @@ export function ClassroomSetupStep({
               <label
                 key={classroom.id}
                 className={cn(
-                  'flex items-center p-4 rounded-neo border-neo border-neo-black',
+                  'flex items-center p-4 rounded-neo border-neo',
                   'cursor-pointer transition-all',
                   selectedClassroomId === classroom.id
-                    ? 'bg-neo-cyan/20 shadow-hard'
-                    : 'bg-neo-navy/50 hover:bg-neo-navy'
+                    ? 'bg-neo-cyan/20 border-neo-cyan shadow-hard'
+                    : 'bg-neo-navy/50 border-neo-cream hover:bg-neo-navy'
                 )}
               >
                 <input

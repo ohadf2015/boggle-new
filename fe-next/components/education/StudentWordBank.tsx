@@ -70,7 +70,7 @@ export function StudentWordBank({
       className={cn(
         // Bottom sheet: pinned to the viewport bottom, above the board, safe-area aware.
         'fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg',
-        'border-3 border-b-0 border-black rounded-t-neo bg-neo-navy text-white shadow-hard',
+        'border-3 border-b-0 border-neo-cream rounded-t-neo bg-neo-navy text-white shadow-hard',
         'pb-[env(safe-area-inset-bottom)]',
         className
       )}

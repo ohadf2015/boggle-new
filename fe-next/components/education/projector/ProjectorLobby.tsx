@@ -262,7 +262,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             ) : (
               <li
                 key={fact.key}
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/25 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-[1vw] py-[0.4vw] text-[2.6vw] font-bold text-neo-cream/85 md:text-[1vw]"
               >
                 {fact.icon}
                 {fact.text}
@@ -279,7 +279,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             <p
               data-testid="projector-start-reason"
               role="status"
-              className="rounded-neo border-3 border-neo-pink/60 bg-neo-pink/10 px-3 py-2 text-start font-neo-body text-[3.2vw] font-bold leading-tight text-neo-pink md:max-w-[34ch] md:px-[1vw] md:py-[0.5vw] md:text-[1vw]"
+              className="rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-3 py-2 text-start font-neo-body text-[3.2vw] font-bold leading-tight text-neo-pink md:max-w-[34ch] md:px-[1vw] md:py-[0.5vw] md:text-[1vw]"
             >
               {t('education.projectorLobby.startBlocked')}
             </p>

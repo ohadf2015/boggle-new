@@ -134,7 +134,7 @@ export default function AssignmentCreator({
           className={cn(
             'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
             'w-full max-w-xl p-6',
-            'bg-neo-navy border-neo border-neo-black shadow-hard-lg z-50 rounded-neo'
+            'bg-neo-navy border-neo border-neo-cream shadow-hard-lg z-50 rounded-neo'
           )}
         >
           <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4">

@@ -87,7 +87,7 @@ export function StudentRoundOutcome({
       data-testid="student-round-outcome"
       data-rank={String(rank)}
       className={cn(
-        'mb-5 p-4 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated shadow-hard'
+        'mb-5 p-4 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated shadow-hard'
       )}
     >
       <div className="flex items-center gap-4">
@@ -212,7 +212,7 @@ export function StudentRoundOutcome({
         {ahead && (
           <span
             data-testid="student-outcome-gap"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-black bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm"
           >
             <TrendingUp className="w-4 h-4 shrink-0 text-neo-yellow" aria-hidden />
             {t('education.results.you.gapToNext', { points: gap, name: ahead.username })}

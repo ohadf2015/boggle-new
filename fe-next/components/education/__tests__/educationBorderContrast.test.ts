@@ -68,7 +68,10 @@ function resolve(token: string): { rgb: RGB; alpha: number } | null {
   return { rgb: toRgb(hex), alpha: pct ? Number(pct) / 100 : 1 };
 }
 
-const HAS_BORDER_WIDTH = /^(border|border-[0-9]|border-neo|border-neo-thick)$/;
+// Arbitrary pixel widths (`border-[2px]`) are border utilities too — without
+// them a `border-[2px] border-neo-black bg-neo-navy` card (1.23:1) scanned
+// green while the identical `border-2` spelling failed.
+const HAS_BORDER_WIDTH = /^(border|border-[0-9]|border-\[\d+px\]|border-neo|border-neo-thick)$/;
 
 const ROOTS = ['components/education', 'components/teacher', 'app/[locale]/education'];
 const REPO = path.resolve(__dirname, '../../..');
@@ -95,7 +98,15 @@ function sourceFiles(): string[] {
   return out;
 }
 
-const CLASS_ATTR = /className=(?:"([^"]*)"|\{`([^`]*)`\})/gs;
+// `className={cn('…', cond && '…')}` carries its classes in single-quoted
+// strings; a brace-limited match + quote extraction reads those too, or the
+// same invisible-border bug scans green just for using cn().
+const CLASS_ATTR = /className=(?:"([^"]*)"|\{`([^`]*)`\}|\{([^{}]*)\})/gs;
+
+/** Quoted class fragments from a `{…}` expression (cn args, ternaries). */
+function quotedFragments(expr: string): string {
+  return (expr.match(/'[^']*'/g) ?? []).map((s) => s.slice(1, -1)).join(' ');
+}
 
 interface Violation {
   file: string;
@@ -109,7 +120,8 @@ function scan(): Violation[] {
   for (const file of sourceFiles()) {
     const src = fs.readFileSync(file, 'utf8');
     for (const m of src.matchAll(CLASS_ATTR)) {
-      const tokens = (m[1] ?? m[2] ?? '').replace(/\s+/g, ' ').split(' ').filter(Boolean);
+      const raw = m[1] ?? m[2] ?? quotedFragments(m[3] ?? '');
+      const tokens = raw.replace(/\s+/g, ' ').split(' ').filter(Boolean);
       if (!tokens.some((t) => HAS_BORDER_WIDTH.test(t))) continue;
 
       // Take the first token that RESOLVES, not the first that matches the

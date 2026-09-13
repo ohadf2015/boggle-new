@@ -83,7 +83,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
         </div>
 
         {/* Meter track */}
-        <div className="mt-1 h-2 w-full overflow-hidden rounded-full border-2 border-neo-black bg-neo-black/60">
+        <div className="mt-1 h-2 w-full overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-black/60">
           <m.div
             data-testid="duel-combo-fill"
             className={cn('h-full', tier.fillClass)}

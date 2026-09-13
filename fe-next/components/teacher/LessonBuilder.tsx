@@ -369,7 +369,7 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
                       variant="outline"
                       data-testid={`lesson-practice-${lesson.id}`}
                       onClick={() => router.push(`/${language}/student/lessons/${lesson.id}`)}
-                      className={cn('flex-1 border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
+                      className={cn('flex-1 border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
                     >
                       {t('education.practice.title')}
                     </Button>
@@ -378,11 +378,11 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
                       variant="outline"
                       data-testid={`lesson-results-${lesson.id}`}
                       onClick={() => router.push(`/${language}/teacher/reports`)}
-                      className={cn('flex-1 border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
+                      className={cn('flex-1 border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
                     >
                       {t('teacher.dashboard.viewReports')}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleOpenEdit(lesson)} className={cn('border-neo border-neo-black shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all')} aria-label={t('teacher.lesson.editLesson')}>
+                    <Button size="sm" variant="outline" onClick={() => handleOpenEdit(lesson)} className={cn('border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all')} aria-label={t('teacher.lesson.editLesson')}>
                       <Pencil className="w-4 h-4" />
                     </Button>
                   </div>

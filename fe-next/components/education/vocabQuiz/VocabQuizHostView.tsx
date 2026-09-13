@@ -126,7 +126,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
         {/* How much of the room has committed — the number a teacher watches to
             decide whether to let the clock run out or cut to the reveal. */}
         {phase === 'question' && quiz.lockIn && quiz.lockIn.total > 0 && (
-          <span className="rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated px-4 py-1.5 font-neo-display font-bold text-xl tabular-nums text-neo-cyan">
+          <span className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated px-4 py-1.5 font-neo-display font-bold text-xl tabular-nums text-neo-cyan">
             {t('vocabQuiz.lockedInCount', { locked: quiz.lockIn.locked, total: quiz.lockIn.total })}
           </span>
         )}
@@ -141,7 +141,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
       {phase === 'question' && (
         <div
           className={cn(
-            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated overflow-hidden',
+            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
             juice.ticking && 'animate-pulse'
           )}
           role="timer"
@@ -169,7 +169,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
 
       {(phase === 'question' || phase === 'reveal') && question && (
         <div className="flex-1 flex flex-col gap-5 min-h-0 overflow-hidden">
-          <div className="shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated p-6 shadow-hard">
+          <div className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-6 shadow-hard">
             <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan mb-2">
               {t(`vocabQuiz.focus.${question.focus}`)}
             </p>

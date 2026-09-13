@@ -36,7 +36,7 @@ export default function LessonBuilderDraftPrompt({
         <AlertDialogOverlay className="z-[60]" />
         <AlertDialogContent
           className={cn(
-            'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-[60]',
+            'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-cream shadow-hard-lg z-[60]',
             'rounded-neo'
           )}
         >

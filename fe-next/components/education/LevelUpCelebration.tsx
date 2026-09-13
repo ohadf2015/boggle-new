@@ -87,7 +87,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
             ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
-              'bg-neo-navy border-4 border-neo-black',
+              'bg-neo-navy border-4 border-neo-cream',
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
               'text-center',

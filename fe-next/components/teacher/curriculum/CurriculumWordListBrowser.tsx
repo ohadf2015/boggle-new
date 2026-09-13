@@ -155,7 +155,7 @@ export function CurriculumWordListBrowser({
       </div>
 
       {/* Filters */}
-      <div className="bg-neo-navy/50 border-neo border-black rounded-neo p-4">
+      <div className="bg-neo-navy/50 border-neo border-neo-cream rounded-neo p-4">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-neo-lime" />
           <h2 className="text-lg font-semibold text-neo-white">
@@ -255,7 +255,7 @@ export function CurriculumWordListBrowser({
           {lists.map((list) => (
             <div
               key={list.id}
-              className="bg-neo-navy border-neo border-black rounded-neo shadow-hard overflow-hidden"
+              className="bg-neo-navy border-neo border-neo-cream rounded-neo shadow-hard overflow-hidden"
             >
               {/* List Header */}
               <div className="p-4">

@@ -191,7 +191,7 @@ export function TeacherLiveControls({
             onClick={() => setRosterOpen((open) => !open)}
             className={cn(
               'inline-flex shrink-0 items-center gap-2 lg:gap-3 tv:gap-4 leading-none',
-              'rounded-neo border-3 lg:border-4 border-neo-black bg-neo-navy shadow-hard lg:shadow-hard-lg',
+              'rounded-neo border-3 lg:border-4 border-neo-cream bg-neo-navy shadow-hard lg:shadow-hard-lg',
               'font-neo-display font-black uppercase tracking-wide text-neo-cream',
               sizeClasses,
               'transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
