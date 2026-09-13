@@ -10,13 +10,20 @@
    - Play Console → Users and permissions → Invite new users → paste SA email (`…@…iam.gserviceaccount.com`) → app access: LexiClash → account permissions: "Release manager" (or: View app info, Manage testing tracks, Create/edit releases) → Invite.
    - Note: linking Play Console to a GCP project is no longer required (deprecated 2024).
 
-2. **Upload keystore env vars** (put in `~/.zshrc` or direnv):
+2. **Upload keystore creds** — one file, `~/.config/lexiclash-keystore-creds.env` (chmod 600), which
+   `release-android.sh` sources itself:
    ```
-   export ANDROID_KEYSTORE_PATH="$HOME/git/boggle-new/fe-next/android/lexiclash-release.keystore"
-   export ANDROID_KEY_ALIAS="<alias>"
-   export ANDROID_KEYSTORE_PASSWORD="<pw>"
-   export ANDROID_KEY_PASSWORD="<pw>"
+   ANDROID_KEYSTORE_PATH="$HOME/git/boggle-new/fe-next/android/lexiclash-upload-v2.keystore"
+   ANDROID_KEY_ALIAS="upload"
+   ANDROID_KEYSTORE_PASSWORD="<pw>"     # PKCS12: store pw == key pw
+   ANDROID_KEY_PASSWORD="<pw>"
    ```
+   Do **not** export these from `~/.zshrc`. Play signs against the UPLOAD key
+   (`lexiclash-upload-v2.keystore`, alias `upload`, SHA1 `B8:46:6E:…`), not the near-twin
+   `lexiclash-release.keystore` sitting next to it — and an exported var shadows the script's
+   default. That is exactly what happened on 2026-09-13: a whole build was thrown away at the
+   upload step with "The Android App Bundle was signed with the wrong key". The script now checks
+   the AAB's SHA1 before it uploads.
 
 3. **Play App Signing deployment cert** (one-time, already done — SHA `C9:20:6C:B2:…:55:8D`)
    - Play Console → App integrity → App signing → Download app signing key certificate (`.der`).
