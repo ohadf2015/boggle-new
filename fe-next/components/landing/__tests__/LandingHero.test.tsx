@@ -74,6 +74,23 @@ describe('LandingHero', () => {
     expect(screen.getByTestId('landing-play-cta')).toHaveAttribute('href', '/en/multiplayer');
   });
 
+  it('makes Play Now the visually dominant CTA and For Teachers subordinate', () => {
+    render(<LandingHero {...baseProps} />);
+    const playCta = screen.getByTestId('landing-play-cta');
+    const teachersCta = screen.getByTestId('landing-for-teachers-cta');
+
+    // Play Now gets the high-visibility "action" treatment.
+    expect(playCta.className).toMatch(/\bbg-neo-lime\b/);
+    // For Teachers is styled as a subordinate/secondary surface, not an action color.
+    expect(teachersCta.className).not.toMatch(/\bbg-neo-lime\b/);
+
+    // Play Now must appear first in DOM order (tab order / hierarchy).
+    const ctaContainer = playCta.parentElement;
+    expect(ctaContainer).toBe(teachersCta.parentElement);
+    const children = Array.from(ctaContainer?.children ?? []);
+    expect(children.indexOf(playCta)).toBeLessThan(children.indexOf(teachersCta));
+  });
+
   it('keeps consumer copy on CrazyGames (no teacher CTA)', () => {
     mockIsOnCG = true;
     render(<LandingHero {...baseProps} />);

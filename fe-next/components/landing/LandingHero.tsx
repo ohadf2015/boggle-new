@@ -112,20 +112,20 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
           {showClassroomHero && (
             <div className="mt-4 flex flex-wrap items-center justify-center gap-3 lg:justify-start animate-[fadeInUp_0.4s_ease-out_0.3s_both]">
               <Link
-                href={`/${language}/education`}
-                prefetch={false}
-                data-testid="landing-for-teachers-cta"
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
-              >
-                {t('landing.forTeachers')}
-              </Link>
-              <Link
                 href={`/${language}/multiplayer`}
                 prefetch={false}
                 data-testid="landing-play-cta"
-                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-navy px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-6 py-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
               >
                 {t('landing.playNowFree')}
+              </Link>
+              <Link
+                href={`/${language}/education`}
+                prefetch={false}
+                data-testid="landing-for-teachers-cta"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-white px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+              >
+                {t('landing.forTeachers')}
               </Link>
             </div>
           )}
