@@ -10,21 +10,21 @@
  * here with `adminOnly: true`, surfaces only to admins via {@link adminOnlyDailyModes},
  * and graduates to public by flipping the flag — no hub rewrite.
  *
- * Word Tower was the first mode driven by this: its daily run gives every player the
- * same letters for the day (see `lib/wordTower/dailySeed.ts`) and keeps a per-day best
- * + streak. Cross-day tower carryover ("continue building each day") is now LIVE — the
- * physical tower (floors/height/records) persists across UTC days while the wheel +
- * per-session mechanics refresh to each day's shared seed (see the HYBRID branch in
- * `restoreWordTowerState`, keyed on the save blob's `gameCode`).
- *
- * Connections (Word Bridge) is the second graduate: the daily route hosts BOTH
+ * Connections (Word Bridge) is the daily route's third mode: it hosts BOTH
  * flavors, alternating by UTC day — the classic 5-riddle chain and the pyramid
- * (see lib/connections/dailyVariant.ts). It stays a registry-driven generic card
- * like its beta days, but now public, with the hub feeding it a played-today
- * status so a cleared day reads like every other quest.
+ * (see lib/connections/dailyVariant.ts). It is a registry-driven generic card,
+ * public, with the hub feeding it a played-today status so a cleared day reads
+ * like every other quest.
+ *
+ * Word Tower was REMOVED from this registry (Ohad product directive 2026-09-13):
+ * the mode is hidden from all consumer surfaces, so it no longer gets a daily
+ * quest card and no longer counts in the hub /N progress denominator. Its
+ * routes (/word-tower, /word-tower-v2, /daily/word-tower) stay alive and
+ * playable for anyone with a direct link — this is a visibility change, not a
+ * takedown.
  */
 
-export type DailyModeId = 'word-hunt' | 'word-wheel' | 'word-tower' | 'connections';
+export type DailyModeId = 'word-hunt' | 'word-wheel' | 'connections';
 
 export interface DailyModeDef {
   id: DailyModeId;
@@ -58,14 +58,6 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     accent: 'yellow',
   },
   {
-    id: 'word-tower',
-    path: '/daily/word-tower',
-    adminOnly: false,
-    titleKey: 'wordTower.daily.questTitle',
-    descKey: 'wordTower.daily.questDesc',
-    accent: 'cyan',
-  },
-  {
     id: 'connections',
     path: '/connections/daily',
     adminOnly: false,
@@ -87,14 +79,12 @@ export function adminOnlyDailyModes(): DailyModeDef[] {
 
 /** Modes the hub renders from the REGISTRY as generic quest cards.
  *
- *  Word Hunt, Word Wheel and Word Tower are excluded because the hub draws them
- *  with the shared `QuestCard` box (same chrome, same quest chain, same SPA nav)
- *  — Word Tower graduated out of the generic card once it went public, because a
- *  first-class daily quest should not look different from its siblings.
- *  Everything still gated (Connections) is drawn generically. Splitting it here —
- *  instead of gating the section on `adminOnly` inside the hub — is what lets a
- *  mode graduate to public by flipping one boolean. */
-const HERO_CARD_MODES: readonly DailyModeId[] = ['word-hunt', 'word-wheel', 'word-tower'];
+ *  Word Hunt and Word Wheel are excluded because the hub draws them with the
+ *  shared `QuestCard` box (same chrome, same quest chain, same SPA nav).
+ *  Connections is drawn generically. Splitting it here — instead of gating the
+ *  section on `adminOnly` inside the hub — is what lets a mode graduate to
+ *  public by flipping one boolean. */
+const HERO_CARD_MODES: readonly DailyModeId[] = ['word-hunt', 'word-wheel'];
 
 export function questCardModes(isAdmin: boolean): DailyModeDef[] {
   return visibleDailyModes(isAdmin).filter((mode) => !HERO_CARD_MODES.includes(mode.id));

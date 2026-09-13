@@ -50,13 +50,14 @@ interface LandingChallengeCardsProps {
  * (server stats).
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
+ * `'wordTower'` was removed (2026-09-13): Word Tower is hidden from consumer
+ * surfaces per Ohad's directive — its routes stay alive, no hub card links out.
  */
 type LandingCardKey =
   | LandingGameMode
   | 'connections'
   | 'brainGym'
   | 'wordCraft'
-  | 'wordTower'
   | 'sealedBid'
   | 'crossword'
   | 'wordfall'
@@ -73,7 +74,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordTower',
+  'connections', 'brainGym', 'wordCraft',
   'sealedBid', 'crossword', 'wordfall',
   'wordTowerV2', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
   'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
@@ -126,8 +127,10 @@ export function LandingChallengeCards({
   // Practice also disappears as soon as the player has finished any game —
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
-  // Word Tower, Blast Classic (V1), and Word Craft are admin-only dev previews —
-  // gated on in-work access (admin OR beta tester), no extra experiment lock.
+  // Dev-preview modes (sealedBid, crossword, wordfall, wordTowerV2, quickPlay,
+  // adventure) are gated on in-work access (admin OR beta tester) in rawOrder —
+  // no extra experiment lock. Word Tower is no longer gated, it is HIDDEN: no
+  // hub card for anyone (Ohad directive 2026-09-13).
   const { canSeeInWorkModes } = useAuth();
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -153,8 +156,8 @@ export function LandingChallengeCards({
     if (!next.includes('brainGym')) next.push('brainGym');
     // WordCraft is public — territory surfaces on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
-    // Word Tower is public (shipped 2026-08-14 alongside its daily quest card).
-    if (!next.includes('wordTower')) next.push('wordTower');
+    // Word Tower is HIDDEN from the hub (Ohad directive 2026-09-13) — it used
+    // to be pushed here as a public card; routes stay alive, no card links out.
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
     if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
@@ -201,7 +204,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer
@@ -217,11 +220,11 @@ export function LandingChallengeCards({
 
 
   // Modes that fire `mode_selected` in the control switch — preserve so the
-  // A/B compares layout, not instrumentation.
-  // `wordTower` was omitted when it went public (2026-08-14), so the hub → mode
-  // step of its funnel emitted nothing and the mode looked like it had no intake.
+  // A/B compares layout, not instrumentation. `wordTower` left this set when the
+  // mode was hidden from the hub (2026-09-13) — a card that never renders can
+  // never fire the event, so keeping it here would be dead config.
   const TRACK_SELECTED = new Set<LandingCardKey>([
-    'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower',
+    'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft',
   ]);
   const buildCubeModel = (key: LandingCardKey, role: 'anchor' | 'normal'): ModeCubeModel | null => {
     const meta = MODE_META[key];

@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
-import { Timer, CircleDot, Check, X, Eye, Sparkles, Building2 } from 'lucide-react';
+import { Timer, CircleDot, Check, X, Eye, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -15,9 +15,7 @@ import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 import { questCardModes, visibleDailyModes } from '@/lib/dailyModes';
-import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
-import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { DailyHubHeader } from './landing/DailyHubHeader';
@@ -45,13 +43,12 @@ export function DailyChallengeLanding({
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
   const { user, canSeeInWorkModes } = useAuth();
-  // Registry-driven quest cards: the PUBLIC ones (Word Tower) for everybody, plus
-  // the still-gated ones (Connections) for admins + beta testers. Word Tower used
-  // to be drawn from `adminOnlyDailyModes()`, which meant ordinary players saw a
-  // two-card hub and the mode was effectively unshipped. See lib/dailyModes.ts.
+  // Registry-driven quest cards: Connections (Word Bridge) is the one public
+  // generic quest card today. Word Tower used to live here (and as a bespoke
+  // QuestCard before that) — it was hidden from consumer surfaces per Ohad's
+  // 2026-09-13 directive, so it left the registry (see lib/dailyModes.ts).
   const questModes = questCardModes(canSeeInWorkModes);
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Pre-game gauntlet banner. Reads the same rival contract the share link emits
@@ -77,9 +74,6 @@ export function DailyChallengeLanding({
   // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
   const [todayIso, setTodayIso] = useState<string>('');
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
-  // Word Tower "played today" — client-only localStorage read (SSR-safe), kept
-  // fresh when the player returns from the game (visibility/back nav).
-  const [wordTowerPlayed, setWordTowerPlayed] = useState(false);
   // Connections (Word Bridge) played today — same marker both daily flavors
   // write on their terminal screens (5-riddle chain AND pyramid).
   const [connectionsPlayed, setConnectionsPlayed] = useState(false);
@@ -97,9 +91,6 @@ export function DailyChallengeLanding({
 
   useEffect(() => {
     const check = () => {
-      try {
-        setWordTowerPlayed(isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey()))));
-      } catch { /* storage disabled — treat as not played */ }
       try {
         setConnectionsPlayed(hasPlayedConnectionsToday());
       } catch { /* storage disabled — treat as not played */ }
@@ -167,23 +158,17 @@ export function DailyChallengeLanding({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Word Tower is the 3rd quest: only expand the bar to /3 and count it when the
-  // player actually sees the card. Read off the REGISTRY, not `questModes` — Word
-  // Tower is drawn with the shared QuestCard now, so it is deliberately absent
-  // from the generic registry-card list and checking there would silently drop
-  // the bar back to /2. Connections is the 4th quest (generic card) with the
-  // same registry-driven rule.
+  // The hub shows /3 quests: Word Hunt + Word Wheel + Connections. Word Tower
+  // used to expand the bar to /4 — it left the registry (hidden from consumer
+  // surfaces, 2026-09-13), so the denominator follows the visible modes only.
   const visibleModes = visibleDailyModes(canSeeInWorkModes);
-  const showsWordTower = visibleModes.some((mode) => mode.id === 'word-tower');
   const showsConnections = visibleModes.some((mode) => mode.id === 'connections');
-  const wordTowerHref = `/${currentLanguage}/daily/word-tower`;
-  const totalQuests = 2 + (showsWordTower ? 1 : 0) + (showsConnections ? 1 : 0);
+  const totalQuests = 2 + (showsConnections ? 1 : 0);
 
   // Completion count for progress bar
   const completedCount =
     (wordHuntStatus === 'won' ? 1 : 0) +
     (wordWheelStatus === 'played' ? 1 : 0) +
-    (showsWordTower && wordTowerPlayed ? 1 : 0) +
     (showsConnections && connectionsPlayed ? 1 : 0);
 
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
@@ -371,88 +356,14 @@ export function DailyChallengeLanding({
         />
       )}
 
-      {/* Quest 3: Word Tower — same chain node, same box, same SPA nav as the two
-          quests above. It used to be drawn by the generic registry card (a hard-nav
-          `<a>`), which is why it read as a detached afterthought. */}
-      {showsWordTower && (
-        <>
-          {wordTowerPlayed ? (
-            <m.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
-              className="w-full"
-              data-testid="word-tower-hero"
-            >
-              <button
-                type="button"
-                onClick={() => router.push(wordTowerHref)}
-                className={cn(
-                  'relative w-full rounded-xl border-3 border-neo-black',
-                  'shadow-hard overflow-hidden cursor-pointer p-4',
-                  'flex items-center gap-4',
-                  'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
-                  'transition-all duration-200 group',
-                  'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
-                )}
-              >
-                <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
-                <m.div
-                  data-testid="tower-cleared-badge"
-                  className={cn(
-                    'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-                    'flex items-center justify-center shadow-hard-xs',
-                    'bg-neo-lime'
-                  )}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.35, type: 'spring', stiffness: 200, damping: 15 }}
-                >
-                  <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-                </m.div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
-                    {t('wordTower.daily.questTitle')}
-                  </h2>
-                  <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
-                    <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />
-                    {t('daily.cleared')}
-                  </span>
-                </div>
-                <div className={cn(
-                  'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-                  'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm',
-                  'active:translate-y-0.5 active:shadow-none transition-all',
-                  'flex items-center gap-1.5 group-hover:scale-105'
-                )}>
-                  <Eye className="w-4 h-4" />
-                  {t('daily.viewResults')}
-                </div>
-              </button>
-            </m.div>
-          ) : (
-            <QuestCard
-              challengeId="wordTower"
-              icon={<Building2 className="w-8 h-8" />}
-              title={t('wordTower.daily.questTitle')}
-              tagline={t('wordTower.daily.questDesc')}
-              color="cyan"
-              status="new"
-              onPlay={() => router.push(wordTowerHref)}
-              timeMode="relaxed"
-              timeModeLabel={t('daily.relaxedQuest')}
-              previewImageUrl="/daily/word-tower-mascot.jpg"
-              previewImageAlt={t('wordTower.daily.questTitle')}
-              buttonText={t('daily.startQuest')}
-              delay={0.3}
-            />
-          )}
-        </>
-      )}
+      {/* Word Tower used to render here as quest 3 (shared QuestCard + SPA nav
+          to /daily/word-tower). Hidden from the hub per Ohad's 2026-09-13
+          directive — the route stays alive for direct links, but no consumer
+          surface links to it. */}
 
       {/* Registry-driven quest cards — Connections (Word Bridge) is the daily
-          quest #4 now that it graduated from beta: public card, played-today
-          status fed from the same marker both daily flavors write. */}
+          quest #3: public card, played-today status fed from the same marker
+          both daily flavors write. */}
       {questModes.length > 0 && (
         <>
           <div className="w-full flex flex-col gap-2" data-testid="daily-quest-modes">
