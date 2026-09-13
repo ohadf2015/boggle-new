@@ -56,6 +56,21 @@ describe('EducationShell — nav shell', () => {
     expect(queryByTestId('education-sidebar')).toBeNull();
   });
 
+  it('chromeFree hides the nav even on a navigable student path (active drill)', () => {
+    // A student mid-drill is on /student/lessons/[id], which normally draws
+    // the student tab bar. The round owns the whole screen.
+    pathname.current = '/en/student/lessons/abc-123';
+    const { queryByTestId } = render(<EducationShell chromeFree>body</EducationShell>);
+    expect(queryByTestId('education-tabbar')).toBeNull();
+    expect(queryByTestId('education-sidebar')).toBeNull();
+  });
+
+  it('without chromeFree the same student path keeps its tab bar', () => {
+    pathname.current = '/en/student/lessons/abc-123';
+    const { getByTestId } = render(<EducationShell>body</EducationShell>);
+    expect(getByTestId('education-tabbar')).toBeTruthy();
+  });
+
   it('lays the tab bar out in the column, so the scroll region gets shorter', () => {
     pathname.current = '/en/teacher';
     const { getByTestId } = render(<EducationShell>body</EducationShell>);

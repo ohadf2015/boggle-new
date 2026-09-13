@@ -241,8 +241,16 @@ export default function PracticeContent({
   if (selectedMode) {
     return (
       <PracticeCelebrationProvider levelUp={celebrationLevelUp} onAcknowledge={dismissLevelUp}>
+        {/*
+          chromeFree: while a round is live the education tab bar is hidden.
+          The drill owns a back button, and a bottom tab bar under a timed
+          board is one stray thumb-tap away from abandoning the round — plus
+          the ~64px it eats is ~15% of a phone screen the grid could use.
+          The picker below (no mode selected) keeps the nav.
+        */}
         <EducationShell
           className={cn(isRTL && 'rtl')}
+          chromeFree
           scrollRegionLabel={lesson.name}
           header={
             /*

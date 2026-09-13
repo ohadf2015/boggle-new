@@ -55,6 +55,14 @@ export interface EducationShellProps {
   className?: string;
   /** Applied to the scroll region (padding, max-width wrappers live here). */
   contentClassName?: string;
+  /**
+   * In-game surfaces (an active practice drill) hide the education nav
+   * entirely — sidebar and bottom tabs. The drill owns its own back
+   * affordance, and a tab bar under a timed round is an accidental-exit
+   * trap; every pixel of it is also a pixel the game board cannot use.
+   * Browsing surfaces (the picker, dashboards) keep the nav.
+   */
+  chromeFree?: boolean;
   /** Escape hatch for a screen that must render its own root (tests, portals). */
   'data-testid'?: string;
 }
@@ -68,12 +76,14 @@ export function EducationShell({
   scrollRegionLabel,
   className,
   contentClassName,
+  chromeFree = false,
   'data-testid': testId = 'education-shell',
 }: EducationShellProps) {
   useEducationShellLock();
   // Derived here, not passed in: nine screens mount this shell and one of them
   // (student/profile) sits on its line ceiling with nothing to spare for a prop.
-  const nav = resolveEducationNav(usePathname());
+  const pathname = usePathname();
+  const nav = chromeFree ? null : resolveEducationNav(pathname);
 
   return (
     <div

@@ -230,10 +230,10 @@ export default function SoloPracticeBoard({
   }
 
   return (
-    <div className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')} translate="no">
+    <div className={cn(DRILL_ROOT_CLASS, 'p-3 sm:p-6')} translate="no">
       <div className="max-w-2xl mx-auto flex flex-col h-full min-h-0 w-full">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-4 mb-3 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -243,11 +243,11 @@ export default function SoloPracticeBoard({
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
-          <div className="flex-1">
-            <h1 className="text-xl font-neo-display text-neo-white">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-neo-display text-neo-white truncate">
               {t('education.practice.soloBoard')}
             </h1>
-            <p className="text-sm text-neo-cream">{lessonName}</p>
+            <p className="text-sm text-neo-cream truncate">{lessonName}</p>
           </div>
           <Button
             variant="ghost"
@@ -260,54 +260,57 @@ export default function SoloPracticeBoard({
           </Button>
         </div>
 
-        {/* Stats bar */}
-        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-neo-yellow" />
-                  <span className="font-neo-display text-neo-white">{score}</span>
-                </div>
-                <div className="h-4 w-px bg-neo-black/30" />
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-neo-cyan" />
-                  <span className="text-sm text-neo-cream">
-                    {validWordCount} {t('education.practice.wordCount')}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-neo-orange" />
-                <span className="text-sm text-neo-cream">
-                  {vocabularyFound.length}/{vocabularyWords.length} {t('education.practice.vocab')}
-                </span>
-              </div>
-            </div>
-
-            {/*
-              The board had no time pressure of any kind. It does now, on by
-              default, and the student can switch it off in one tap if they
-              would rather browse the grid.
-            */}
-            <BeatTheClock
-              mode="solo_board"
-              wordCount={vocabularyWords.length}
-              defaultOn
-              active={!showComplete}
-              onExpire={handleFinish}
-              className="mt-3 border-t-[2px] border-black/30 pt-3"
-            />
-          </CardContent>
-        </Card>
+        {/*
+          ONE slim strip carries the round's numbers AND the clock. The old
+          3px-bordered card, with a second card row for BeatTheClock, ate
+          ~110px of vertical chrome — and the grid sizes itself to the
+          measured LEFTOVER area, so every pixel of that chrome came straight
+          out of the board (dogfood 2026-09-12: grid at ~45% of screen width
+          on a phone).
+        */}
+        <div
+          data-testid="drill-stats-strip"
+          className="mb-3 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-y-2 border-neo-white/10 py-2"
+        >
+          <div className="flex items-center gap-1.5">
+            <Star className="w-4 h-4 text-neo-yellow" />
+            <span className="font-neo-display text-neo-white">{score}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-neo-cyan" />
+            <span className="text-sm text-neo-cream">
+              {validWordCount} {t('education.practice.wordCount')}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Target className="w-4 h-4 text-neo-orange" />
+            <span className="text-sm text-neo-cream">
+              {vocabularyFound.length}/{vocabularyWords.length} {t('education.practice.vocab')}
+            </span>
+          </div>
+          {/*
+            The clock flexes to fill the remainder of the strip's row. On a
+            narrow phone the stats wrap onto their own line and the timer bar
+            still gets a full line — still one strip, never a card with its
+            own row.
+          */}
+          <BeatTheClock
+            mode="solo_board"
+            wordCount={vocabularyWords.length}
+            defaultOn
+            active={!showComplete}
+            onExpire={handleFinish}
+            className="min-w-0 flex-1 basis-40"
+          />
+        </div>
 
         {/* Word forming area with feedback */}
-        <WordFormingArea word={formingWord} letterCount={formingLetterCount} feedback={currentFeedback} compact className="mb-3 justify-center" />
+        <WordFormingArea word={formingWord} letterCount={formingLetterCount} feedback={currentFeedback} compact className="mb-2 justify-center shrink-0" />
 
         {/* Game grid: largest square that fits the measured leftover area.
             Percentage/aspect-ratio chains collapse to 0 inside the flex
             drill root on phones — measure and pin explicit px instead. */}
-        <div ref={gridAreaRef} className="mb-4 flex-1 min-h-0 flex items-center justify-center">
+        <div ref={gridAreaRef} className="mb-3 flex-1 min-h-0 flex items-center justify-center">
           {gridSize > 0 && (
             <div style={{ width: gridSize, height: gridSize }}>
               <GridComponent
@@ -325,10 +328,10 @@ export default function SoloPracticeBoard({
 
         {/* Found words */}
         {validWords.length > 0 && (
-          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4">
-            <CardContent className="py-3">
-              <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
-              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-3 shrink-0">
+            <CardContent className="py-2">
+              <p className="text-xs text-neo-cream mb-1.5">{t('education.practice.foundWordsLabel')}</p>
+              <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
                 {validWords.map((word) => (
                   <span
                     key={word}
@@ -351,7 +354,7 @@ export default function SoloPracticeBoard({
         <Button
           onClick={handleFinish}
           className={cn(
-            'w-full bg-neo-cyan text-neo-black font-bold',
+            'w-full bg-neo-cyan text-neo-black font-bold shrink-0',
             'border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed'
           )}
         >

@@ -223,10 +223,10 @@ export default function WarmupRound({
   }
 
   return (
-    <div className={cn(DRILL_ROOT_CLASS, 'p-4 sm:p-6')}>
+    <div className={cn(DRILL_ROOT_CLASS, 'p-3 sm:p-6')}>
       <div className="max-w-2xl mx-auto flex flex-col h-full min-h-0 w-full">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-4 shrink-0">
+        <div className="flex items-center gap-4 mb-3 shrink-0">
           <Button
             variant="ghost"
             size="sm"
@@ -255,8 +255,8 @@ export default function WarmupRound({
         </div>
 
         {/* Hints panel */}
-        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-pink/10 mb-4 shrink-0">
-          <CardContent className="py-3">
+        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-pink/10 mb-3 shrink-0">
+          <CardContent className="py-2">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Lightbulb className="w-4 h-4 text-neo-pink" />
@@ -305,33 +305,33 @@ export default function WarmupRound({
           </CardContent>
         </Card>
 
-        {/* Stats bar */}
-        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-neo-yellow" />
-                  <span className="font-neo-display text-neo-white">{score}</span>
-                </div>
-                <div className="h-4 w-px bg-neo-black/30" />
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-neo-cyan" />
-                  <span className="text-sm text-neo-cream">
-                    {foundWords.length} {t('education.practice.wordCount')}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-neo-pink font-bold">
-                  {vocabularyFound.length}/{vocabularyWords.length}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/*
+          ONE slim strip for the round's numbers — same compaction as
+          SoloPracticeBoard: the 3px-bordered stats card came out of the
+          grid's measured leftover area.
+        */}
+        <div
+          data-testid="drill-stats-strip"
+          className="mb-3 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-y-2 border-neo-white/10 py-2"
+        >
+          <div className="flex items-center gap-1.5">
+            <Star className="w-4 h-4 text-neo-yellow" />
+            <span className="font-neo-display text-neo-white">{score}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-neo-cyan" />
+            <span className="text-sm text-neo-cream">
+              {foundWords.length} {t('education.practice.wordCount')}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm text-neo-pink font-bold">
+              {vocabularyFound.length}/{vocabularyWords.length}
+            </span>
+          </div>
+        </div>
 
-        <div ref={gridAreaRef} className="mb-4 flex-1 min-h-0 flex items-center justify-center">
+        <div ref={gridAreaRef} className="mb-3 flex-1 min-h-0 flex items-center justify-center">
           {gridSize > 0 && (
             <div style={{ width: gridSize, height: gridSize }}>
               <GridComponent
@@ -347,10 +347,10 @@ export default function WarmupRound({
 
         {/* Found words */}
         {foundWords.length > 0 && (
-          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
-            <CardContent className="py-3">
-              <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
-              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
+          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-3 shrink-0">
+            <CardContent className="py-2">
+              <p className="text-xs text-neo-cream mb-1.5">{t('education.practice.foundWordsLabel')}</p>
+              <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
                 {foundWords.map((word) => (
                   <span
                     key={word}
