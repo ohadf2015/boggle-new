@@ -364,8 +364,8 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'Juegos de palabras en inglés para el aula — 6 idiomas | LexiClash',
-    metaDescription: 'Juegos de palabras en inglés para toda la clase: los estudiantes entran desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.',
+    metaTitle: 'Juegos de palabras en inglés gratis — para el aula | LexiClash',
+    metaDescription: 'Juegos de palabras en inglés gratis y sin descarga: la clase entra desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.',
     ogTitle: 'Juegos de palabras en inglés para el aula',
     ogDescription: 'Juegos de palabras en vivo para estudiantes de inglés. Cuentas gratis, 6 diccionarios, panel de maestro.',
     twitterDescription: 'Juegos de inglés multijugador gratis para la clase.',
@@ -506,6 +506,29 @@ const content: Record<EducationLocale, LocaleContent> = {
       {
         q: '¿Cuáles son los mejores juegos de vocabulario en inglés?',
         a: 'Word Wheel y Boggle son los juegos de vocabulario en inglés más completos de LexiClash: cada palabra hallada suma al conteo de aciertos, y el panel de maestro marca los términos que más cuestan a la clase — ideal para repasar vocabulario jugando, gratis y sin descargas.',
+      },
+      {
+        // GSC 28d (2026-09-13): "juegos para aprender inglés gratis",
+        // "juego de inglés gratis" — ~40 impr at pos 8-21, near-zero CTR.
+        q: '¿Son gratis estos juegos de palabras en inglés?',
+        a: 'Sí. La cuenta de docente, hasta 3 clases y las rondas con tus propias listas son gratis, sin tarjeta y sin anuncios para los estudiantes. Teacher Pro (9 $/mes) solo añade clases ilimitadas e informes imprimibles — una clase completa cabe en el nivel gratuito.',
+      },
+      {
+        // GSC: "juegos para aprender vocabulario en ingles" pos 20.9,
+        // "aprender vocabulario en ingles juegos" pos 16.
+        q: '¿Puedo aprender vocabulario en inglés jugando?',
+        a: 'Sí — es la idea central. Sube la lista de vocabulario de esta semana, elige Boggle o Word Wheel, y el tablero se construye alrededor de tus palabras: encontrarlas en la cuadrícula es la práctica. Al terminar, el panel muestra los términos que más falló la clase, que son exactamente los que se repasan al día siguiente.',
+      },
+      {
+        // GSC: "juegos para aprender ingles gratis"/"online" modifiers — the
+        // no-download, no-signup facts are the objection-killer for teachers.
+        q: '¿Hay que instalar algo o crear cuentas de estudiante?',
+        a: 'No. Todo funciona en el navegador del móvil, la tablet, el Chromebook o el ordenador. Los estudiantes escriben un código de seis caracteres para entrar — sin correo, sin registro y sin aplicación que instalar.',
+      },
+      {
+        // GSC: "cómo se dice juego de palabras en inglés" pos 11 (11 impr).
+        q: '¿Cómo se dice «juego de palabras» en inglés?',
+        a: '"Word game" es el término general para los juegos de palabras en inglés; "wordplay" se reserva para los que juegan con el significado (rimas, dobles sentidos). En esta página encontrarás los primeros: juegos de palabras en inglés para practicar vocabulario y ortografía en clase.',
       },
     ],
   },
