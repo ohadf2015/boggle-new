@@ -83,7 +83,7 @@ export function VocabQuizRevealBanner({
       </div>
 
       {definition && (
-        <p className="rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated px-3 py-2 text-sm font-neo-body text-neo-white/85 shadow-hard-sm">
+        <p className="rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated px-3 py-2 text-sm font-neo-body text-neo-white/85 shadow-hard-sm">
           <span className="font-bold text-neo-cyan">{word}</span>
           <span className="mx-1">—</span>
           {definition}

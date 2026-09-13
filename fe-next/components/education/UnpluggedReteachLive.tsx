@@ -135,7 +135,7 @@ export function UnpluggedReteachLive({ payload, educationHref }: UnpluggedReteac
         data-testid="unplugged-reteach-live"
         className="fixed inset-0 z-40 overflow-hidden bg-neo-navy flex items-center justify-center px-4"
       >
-        <div className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard text-center">
+        <div className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream bg-neo-navy-light shadow-hard text-center">
           <p className="text-neo-white font-neo-body mb-4">{t('education.results.allFound')}</p>
           <Link
             href={homeHref}

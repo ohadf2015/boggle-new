@@ -84,7 +84,7 @@ export function UnpluggedFinishCard({
       data-perfect={String(perfect)}
       className={cn(
         'flex-1 min-h-0 flex flex-col items-center justify-center gap-2 sm:gap-4 px-3 sm:px-6 py-3',
-        'rounded-neo border-[3px] border-neo-black bg-neo-navy-light shadow-hard overflow-hidden',
+        'rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard overflow-hidden',
       )}
     >
       <UnpluggedMascot

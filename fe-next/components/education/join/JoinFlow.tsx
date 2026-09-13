@@ -84,9 +84,9 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
     >
       {/* Loud, cheap, and behind everything — no layout cost, no tween. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-black bg-neo-purple/25" />
-        <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-black bg-neo-pink/20" />
-        <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-black bg-neo-cyan/15" />
+        <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-purple bg-neo-purple/20" />
+        <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-pink bg-neo-pink/20" />
+        <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
       </div>
 
       <main className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6">
@@ -154,7 +154,7 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
               <button
                 type="button"
                 onClick={handlePaste}
-                className="flex shrink-0 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-navy-light px-4 py-4 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform active:translate-y-0.5"
+                className="flex shrink-0 items-center gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-4 py-4 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform active:translate-y-0.5"
               >
                 <ClipboardPaste aria-hidden="true" className="h-5 w-5" />
                 {t(`${K}.pasteButton`)}
@@ -216,7 +216,7 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
                   </p>
                 </div>
               ) : flow.isChecking ? (
-                <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard">
+                <div className="rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 shadow-hard">
                   <div className="h-3 w-24 animate-pulse rounded-full bg-neo-cyan/40" />
                   <div className="mt-2 h-4 w-40 animate-pulse rounded-full bg-neo-cyan/25" />
                 </div>
@@ -269,7 +269,7 @@ export function JoinFlow({ initialCode = '' }: JoinFlowProps) {
                 <button
                   type="button"
                   onClick={() => flow.submit(flow.suggestedName ?? undefined)}
-                  className="rounded-neo border-3 border-neo-black bg-neo-navy px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm"
+                  className="rounded-neo border-3 border-neo-cream bg-neo-navy px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm"
                 >
                   {t(`${K}.useSuggestedName`, { suggestedName: flow.suggestedName })}
                 </button>

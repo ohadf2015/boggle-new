@@ -79,7 +79,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
             className={cn(
               'relative h-8 w-full',
               'bg-neo-navy/50 rounded-full',
-              'border-neo border-neo-black',
+              'border-neo border-neo-cream/40',
               'overflow-hidden'
             )}
             role="progressbar"

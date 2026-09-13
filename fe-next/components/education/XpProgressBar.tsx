@@ -187,7 +187,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         data-testid="xp-progress-container"
         className={cn(
           'relative w-full rounded-neo overflow-hidden',
-          'bg-neo-navy border-[3px] border-neo-black shadow-hard',
+          'bg-neo-navy border-[3px] border-neo-cream shadow-hard',
           sizeConfig.container,
           // RTL: Progress bar fill direction handled by CSS
           isRTL && 'rtl:shadow-hard-rtl'

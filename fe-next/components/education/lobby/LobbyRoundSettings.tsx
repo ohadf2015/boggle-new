@@ -117,7 +117,7 @@ export function LobbyRoundSettings({
         iconClassName="text-neo-lime"
         value={boardSize}
         onChange={onBoardSizeChange}
-        selectedClassName="bg-neo-lime text-black shadow-hard"
+        selectedClassName="bg-neo-lime border-neo-black text-black shadow-hard"
         choices={BOARD_SIZES.map((s) => ({ value: s, label: t(`teacher.classroom.board.${s}`) }))}
       />
 

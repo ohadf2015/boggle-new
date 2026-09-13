@@ -426,7 +426,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
           data-testid="classroom-leaderboard"
           dir={isRTL ? 'rtl' : 'ltr'}
           className={cn(
-            'w-full rounded-neo border-neo border-neo-black shadow-hard bg-neo-navy',
+            'w-full rounded-neo border-neo border-neo-cream shadow-hard bg-neo-navy',
             className
           )}
         >

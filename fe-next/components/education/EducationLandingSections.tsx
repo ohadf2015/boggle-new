@@ -149,7 +149,7 @@ export function EducationSectionRenderer({
                 )}
               </>
             );
-            const shell = 'relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard';
+            const shell = 'relative rounded-neo border-3 border-neo-cream bg-neo-navy-light p-5 shadow-hard';
             // A card with somewhere to go is a link, not a div with a label that
             // looks clickable.
             return u.href ? (

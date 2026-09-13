@@ -81,7 +81,7 @@ export function JoinCodeField({
                   ? 'border-neo-black bg-neo-red/90 text-neo-white shadow-hard'
                   : filled
                     ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
-                    : 'border-neo-black bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
+                    : 'border-neo-cream bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
                 isActive && 'bg-neo-cyan text-neo-navy shadow-hard'
               )}
             >

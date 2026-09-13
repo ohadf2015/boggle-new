@@ -218,7 +218,7 @@ export function ModePosterTile({
           {recommended && (
             <span
               data-testid="mode-recommended"
-              className="inline-flex shrink-0 items-center gap-1 rounded-neo border-[2px] border-black bg-neo-navy px-1.5 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-tight text-neo-cream"
+              className="inline-flex shrink-0 items-center gap-1 rounded-neo border-[2px] border-neo-cream bg-neo-navy px-1.5 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-tight text-neo-cream"
             >
               <Sparkles className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
               {t('education.modePicker.recommended')}

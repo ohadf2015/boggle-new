@@ -231,7 +231,7 @@ export function WordCoverageGlance({
         aria-valuemax={total}
         aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
         className={cn(
-          'w-full shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated overflow-hidden mb-3',
+          'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden mb-3',
           projector ? 'h-8' : 'h-4'
         )}
       >
@@ -268,7 +268,7 @@ export function WordCoverageGlance({
                 'flex items-center gap-1.5 rounded-neo font-bold',
                 projector ? 'px-4 py-2.5 text-2xl' : 'px-3 py-1.5 text-sm',
                 hit && 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',
-                !hit && !unplaced && 'border-[2px] border-neo-black bg-neo-navy-light text-neo-white/60',
+                !hit && !unplaced && 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-white/60',
                 // A word the board never carried is still a word a teacher
                 // reads off a wall: the dash says "not the class's fault",
                 // the 75% keeps it legible (50% measured 4.61:1 — over the
