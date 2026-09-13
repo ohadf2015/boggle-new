@@ -221,8 +221,9 @@ describe('XpProgressBar', () => {
       render(<XpProgressBar totalXp={150} />);
 
       const container = screen.getByTestId('xp-progress-container');
-      // Uses border-neo-black for the chunky border and shadow-hard for hard shadows
-      expect(container).toHaveClass('border-neo-black');
+      // Cream border on the navy track: black-on-navy measured 1.23:1 (invisible),
+      // cream keeps the chunky edge visible (WCAG 1.4.11, >= 3:1).
+      expect(container).toHaveClass('border-neo-cream');
       expect(container).toHaveClass('shadow-hard');
     });
 
