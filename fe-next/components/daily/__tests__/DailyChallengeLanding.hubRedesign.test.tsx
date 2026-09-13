@@ -100,24 +100,23 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
     expect(dateText).toMatch(/20\d{2}-\d{2}-\d{2}/);
   });
 
-  it('should render three game cards in order: Word Hunt, Word Wheel, Word Tower', () => {
+  it('should render the quest cards in order: Word Hunt, Word Wheel, then Connections (Word Tower hidden 2026-09-13)', () => {
     const { container } = renderComponent();
-    // The three main cards should be visible (whether as quest cards or hero cards)
+    // Word Hunt + Word Wheel render as bespoke quest cards; Connections is the
+    // generic registry card. Word Tower must NOT appear in any form.
     const wordHuntCard = screen.getByTestId('quest-card-wordHunt');
     const wordWheelCard = screen.getByTestId('quest-card-wordWheel');
-    const wordTowerCard = screen.getByTestId('quest-card-wordTower');
 
     expect(wordHuntCard).toBeInTheDocument();
     expect(wordWheelCard).toBeInTheDocument();
-    expect(wordTowerCard).toBeInTheDocument();
+    expect(screen.queryByTestId('quest-card-wordTower')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('word-tower-hero')).not.toBeInTheDocument();
 
-    // Verify card order in DOM: hunt before wheel before tower
+    // Verify card order in DOM: hunt before wheel
     const huntIndex = Array.from(container.querySelectorAll('[data-testid*="quest-card-"]')).indexOf(wordHuntCard);
     const wheelIndex = Array.from(container.querySelectorAll('[data-testid*="quest-card-"]')).indexOf(wordWheelCard);
-    const towerIndex = Array.from(container.querySelectorAll('[data-testid*="quest-card-"]')).indexOf(wordTowerCard);
 
     expect(huntIndex).toBeLessThan(wheelIndex);
-    expect(wheelIndex).toBeLessThan(towerIndex);
   });
 
   it('should not render decorative elements (ConfettiBackground, FloatingDecorations, connector dots)', () => {

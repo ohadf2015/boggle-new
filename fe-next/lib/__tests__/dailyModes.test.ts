@@ -9,12 +9,14 @@ import {
 } from '@/lib/dailyModes';
 
 describe('dailyModes registry', () => {
-  it('lists the four known daily modes', () => {
+  it('lists the three visible daily modes (Word Tower hidden 2026-09-13)', () => {
     const ids = DAILY_MODES.map((m) => m.id);
     expect(ids).toContain('word-hunt');
     expect(ids).toContain('word-wheel');
-    expect(ids).toContain('word-tower');
     expect(ids).toContain('connections');
+    // Word Tower is hidden from consumer surfaces (Ohad directive 2026-09-13):
+    // out of the registry → no daily quest card, out of the hub /N denominator.
+    expect(ids).not.toContain('word-tower');
   });
 
   it('ships every daily mode PUBLIC (no admin gate left in the registry)', () => {
@@ -33,12 +35,12 @@ describe('dailyModes registry', () => {
     expect(adminOnlyDailyModes()).toEqual([]);
   });
 
-  // Word Tower graduated OUT of the generic quest cards in 42bc4968a (2026-08-18,
-  // "render Word Tower with the shared daily QuestCard"): once it went public it is
-  // drawn with the same QuestCard chrome as Word Hunt and Word Wheel, so all three
-  // are excluded here. Connections is the second public mode but STAYS generic —
-  // the DailyModeQuestCard already gives it full-bleed mascot art and a played
-  // badge, and its hard-nav `<a>` guarantees the daily host re-reads the date.
+  // Word Hunt and Word Wheel are drawn with the shared QuestCard chrome (bespoke
+  // hero cards), so they are excluded from the generic registry-card list.
+  // Connections STAYS generic — the DailyModeQuestCard already gives it
+  // full-bleed mascot art and a played badge, and its hard-nav `<a>` guarantees
+  // the daily host re-reads the date. (Word Tower sat between these two worlds
+  // until 2026-09-13, when it left the registry entirely.)
   it('exposes the registry-driven quest cards (everything but the bespoke hero cards)', () => {
     const publicIds = questCardModes(false).map((m) => m.id);
     expect(publicIds).toEqual(['connections']);
@@ -55,11 +57,12 @@ describe('dailyModes registry', () => {
     expect(dailyModeHref(connections, 'he')).toBe('/he/connections/daily');
   });
 
-  // Same commit moved Word Tower off the hard-nav query form (/word-tower?daily=1)
-  // onto the SPA daily route, so the href is a plain locale-prefixed path now.
+  // Word Tower used to assert its SPA daily href here (/he/daily/word-tower) —
+  // it left the registry 2026-09-13, so the locale-prefix check now runs on
+  // Word Wheel (same plain-path shape the tower assertion guarded).
   it('prefixes the locale on the daily route href', () => {
-    const tower = DAILY_MODES.find((m) => m.id === 'word-tower')!;
-    expect(dailyModeHref(tower, 'he')).toBe('/he/daily/word-tower');
+    const wheel = DAILY_MODES.find((m) => m.id === 'word-wheel')!;
+    expect(dailyModeHref(wheel, 'he')).toBe('/he/daily/word-wheel');
   });
 
   it('every mode carries i18n title + desc keys', () => {

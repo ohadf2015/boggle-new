@@ -120,19 +120,17 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
     Icon: Grid3x3, variant: 'cyan', badge: 'NEW', category: 'calm', genIcon: '/modes/cubes/crossword.png',
   },
+  // Word Tower (v1) is HIDDEN from consumer surfaces (Ohad directive 2026-09-13):
+  // no MODE_META entry — the hub can't render a card for a mode it must not
+  // link to. The /word-tower route stays alive for direct links.
   // Admin-only dev previews — also carry generated cube icons so the "+ More"
   // grid is full-bleed art across the board. Colours spread to avoid clusters.
-  wordTower: {
-    titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
-    Icon: Building2, variant: 'lime', badge: 'NEW', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
-  },
   sealedBid: {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
     Icon: Gavel, variant: 'cyan', badge: 'ADMIN', category: 'calm', genIcon: '/modes/cubes/sealedbid.png',
   },
   // Word Tower v2 — the physics rebuild (matter-js rigid bodies, emergent
-  // collapse). Beta preview; v1 stays the public Word Tower until this replaces
-  // it, so both cubes can be on the hub at once for a tester.
+  // collapse). Beta preview, gated to admins/beta testers on the hub.
   wordTowerV2: {
     titleKey: 'wordTowerV2.cardTitle', descKey: 'wordTowerV2.cardDesc', path: '/word-tower-v2',
     Icon: Building2, variant: 'purple', badge: 'BETA', genIcon: '/modes/cubes/wordtower.png',
