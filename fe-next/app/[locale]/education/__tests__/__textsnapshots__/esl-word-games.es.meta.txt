@@ -1,6 +1,6 @@
 {
-  "title": "Juegos de palabras en inglés para el aula — 6 idiomas | LexiClash",
-  "description": "Juegos de palabras en inglés para toda la clase: los estudiantes entran desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
+  "title": "Juegos de palabras en inglés gratis — para el aula | LexiClash",
+  "description": "Juegos de palabras en inglés gratis y sin descarga: la clase entra desde el móvil con un código de seis caracteres, el tablero va al proyector y tú fijas Apoyo, Base o Desafío por estudiante. Seis idiomas, sin cuentas de estudiante.",
   "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
   "robots": {
     "index": true,
