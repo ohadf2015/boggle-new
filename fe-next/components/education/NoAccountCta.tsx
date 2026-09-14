@@ -13,55 +13,56 @@ import Link from 'next/link';
  * `content.ts`; the hub is a client component using `t()`. A component that carried its
  * own copy is the only shape that drops into both without a translation round trip.
  *
- * The promise is verified, not assumed: `MultiplayerFlow.tsx` falls back to
- * `getOrCreateStoredUsername()` for the quick-play name and never reads
- * `isAuthenticated`, so a guest is auto-joined with a temporary name and no prompt.
- * Do not add "no email" or "no download" claims here without re-reading that path.
+ * The promise is verified, not assumed: the destination is
+ * `/education/classroom-game`, which renders `ClassroomGuestDemo` for guests
+ * (class-code join → `/join/[code]` → display name, no email). Do not claim a
+ * live board or a temporary player name here — that was the consumer
+ * quick-play path this CTA used to dump into.
  */
 
 export type NoAccountCopy = { heading: string; body: string; cta: string; note: string };
 
 const COPY: Record<string, NoAccountCopy> = {
   en: {
-    heading: 'Start a 2-minute game right now — no account',
-    body: 'The button opens a live board in this browser. You get a temporary player name you can change on the way in, and nothing asks for an email or a password.',
+    heading: 'Join a class game right now — no account',
+    body: 'The button opens the classroom game in this browser. Enter a class code and a display name to jump in. Nothing asks for an email or a password.',
     cta: 'Play now — no sign-up',
     note: 'No email · No password · Runs on the school Wi-Fi',
   },
   he: {
-    heading: 'התחילו משחק של שתי דקות עכשיו — בלי חשבון',
-    body: 'הכפתור פותח לוח חי כאן בדפדפן. מקבלים שם שחקן זמני שאפשר לשנות בדרך פנימה, ואף אחד לא מבקש אימייל או סיסמה.',
+    heading: 'הצטרפו למשחק כיתה עכשיו — בלי חשבון',
+    body: 'הכפתור פותח את משחק הכיתה בדפדפן. מזינים קוד כיתה ושם תצוגה כדי להיכנס. אף אחד לא מבקש אימייל או סיסמה.',
     cta: 'שחקו עכשיו — בלי הרשמה',
     note: 'בלי אימייל · בלי סיסמה · עובד על הרשת של בית הספר',
   },
   es: {
-    heading: 'Empieza una partida de 2 minutos ahora — sin cuenta',
-    body: 'El botón abre un tablero en vivo en este navegador. Recibes un nombre de jugador temporal que puedes cambiar al entrar, y nadie te pide correo ni contraseña.',
+    heading: 'Entra a un juego de clase ahora — sin cuenta',
+    body: 'El botón abre el juego de clase en este navegador. Escribe un código de clase y un nombre para entrar. Nadie te pide correo ni contraseña.',
     cta: 'Jugar ahora — sin registro',
     note: 'Sin correo · Sin contraseña · Funciona en el wifi del colegio',
   },
   sv: {
-    heading: 'Starta ett tvåminutersspel nu — utan konto',
-    body: 'Knappen öppnar en levande spelplan direkt i webbläsaren. Du får ett tillfälligt spelarnamn som går att byta på vägen in, och ingen frågar efter e-post eller lösenord.',
+    heading: 'Gå med i ett klasspel nu — utan konto',
+    body: 'Knappen öppnar klasspelet i webbläsaren. Ange en klasskod och ett visningsnamn för att hoppa in. Ingen frågar efter e-post eller lösenord.',
     cta: 'Spela nu — ingen registrering',
     note: 'Ingen e-post · Inget lösenord · Fungerar på skolans wifi',
   },
   ja: {
-    heading: '2分のゲームを今すぐ — アカウント不要',
-    body: 'ボタンを押すと、このブラウザでライブのボードが開きます。仮のプレイヤー名が割り当てられ、入る途中で変更できます。メールもパスワードも聞かれません。',
+    heading: 'クラスゲームに今すぐ参加 — アカウント不要',
+    body: 'ボタンを押すと、このブラウザでクラスゲームが開きます。クラスコードと表示名を入力して参加できます。メールもパスワードも聞かれません。',
     cta: '今すぐプレイ — 登録なし',
     note: 'メール不要 · パスワード不要 · 学校のWi-Fiで動きます',
   },
   ru: {
-    heading: 'Начните двухминутную игру прямо сейчас — без аккаунта',
-    body: 'Кнопка открывает живое поле прямо в этом браузере. Вы получаете временное имя игрока, которое можно поменять на входе, и никто не просит почту или пароль.',
+    heading: 'Присоединитесь к игре класса прямо сейчас — без аккаунта',
+    body: 'Кнопка открывает игру для класса в этом браузере. Введите код класса и имя, чтобы войти. Никто не просит почту или пароль.',
     cta: 'Играть сейчас — без регистрации',
     note: 'Без почты · Без пароля · Работает на школьном Wi-Fi',
   },
 };
 
 /** The one route on the education surface that asks a teacher for nothing. */
-export const QUICK_PLAY_PATH = '/multiplayer?quickPlay=true';
+export const QUICK_PLAY_PATH = '/education/classroom-game';
 
 export function noAccountCopy(locale: string): NoAccountCopy {
   return COPY[locale.toLowerCase().split('-')[0]] ?? COPY.en;
