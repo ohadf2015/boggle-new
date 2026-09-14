@@ -105,21 +105,21 @@ describe('LandingChallengeCards — Word Craft consolidated to ONE public card',
   });
 });
 
-describe('LandingChallengeCards — Word Tower hidden from the hub (2026-09-13)', () => {
-  it('renders NO Word Tower card for a NON-admin user', () => {
+describe('LandingChallengeCards — Word Tower is public', () => {
+  it('renders the Word Tower card for a NON-admin user (mode shipped 2026-08-14)', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeNull();
+    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeInTheDocument();
   });
 
-  it('renders NO Word Tower card even for an admin (hidden, not gated)', () => {
-    // Hiding is deliberate: the mode leaves every consumer surface — admins
-    // included. The /word-tower route stays alive for direct links.
+  it('renders the Word Tower SOLO card for an admin with /word-tower href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeNull();
+    const card = container.querySelector('[data-cube-key="wordTower"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/word-tower');
   });
 });
 
@@ -137,7 +137,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       // WordCraft consolidated to ONE public card; Cards/Gems are URL sub-modes
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
       // Party, Word Alchemy, Word Forge and Word Vault modes were removed.
-      // Word Tower (v1) is hidden from the hub for everyone since 2026-09-13.
+      'wordTower',          // Word Tower
       'sealedBid',          // Sealed Bid
       'wordfall',           // Wordfall (Blast V2)
     ];
@@ -155,8 +155,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
-      // 'wordTower' is NOT here any more — it left the hub entirely 2026-09-13
-      // (hidden for everyone, covered by its own describe block above).
+      // 'wordTower' is NOT here any more — the mode shipped publicly 2026-08-14.
       'sealedBid',
       'wordfall',
     ];

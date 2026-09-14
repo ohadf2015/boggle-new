@@ -33,14 +33,9 @@ describe('offlineCapableModes', () => {
 
     it('includes pass-and-play party plus the extra client-side solos', () => {
       expect(OFFLINE_CAPABLE_MODES).toContain('party');
+      expect(OFFLINE_CAPABLE_MODES).toContain('word-tower');
       expect(OFFLINE_CAPABLE_MODES).toContain('sealed-bid');
-      expect(OFFLINE_MODES.length).toBeGreaterThanOrEqual(11);
-    });
-
-    it('does NOT include word-tower (hidden from consumer surfaces 2026-09-13)', () => {
-      // The mode left the OfflineFallback launcher and the SW precache list;
-      // its route stays alive online but is no longer advertised offline.
-      expect(OFFLINE_CAPABLE_MODES).not.toContain('word-tower');
+      expect(OFFLINE_MODES.length).toBeGreaterThanOrEqual(12);
     });
 
     it('does NOT include multiplayer or other server-only modes', () => {
@@ -92,10 +87,12 @@ describe('offlineCapableModes', () => {
       expect(wf.entry('en')).toBe('/en/blast/v2');
     });
 
-    it('party / sealed-bid entries resolve to their play routes', () => {
+    it('party / word-tower / sealed-bid entries resolve to their play routes', () => {
       const party = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playParty')!;
       expect(party.segment).toBe('party');
       expect(party.entry('he')).toBe('/he/party');
+      const tower = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playWordTower')!;
+      expect(tower.entry('en')).toBe('/en/word-tower');
       const sb = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playSealedBid')!;
       expect(sb.entry('es')).toBe('/es/sealed-bid');
     });
@@ -184,7 +181,7 @@ describe('offlineCapableModes', () => {
       expect(routes).toContain('/en/blast/v2');
       expect(routes).toContain('/ru/daily');
       expect(routes).toContain('/en/party');
-      expect(routes).not.toContain('/en/word-tower');
+      expect(routes).toContain('/en/word-tower');
       expect(routes).toContain('/en/sealed-bid');
       // One route per (locale × offline mode entry) — derived from the sources so
       // it never drifts when a locale or a mode is added (7 original modes +
