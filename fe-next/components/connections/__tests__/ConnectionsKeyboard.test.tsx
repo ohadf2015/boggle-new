@@ -116,4 +116,26 @@ describe('ConnectionsKeyboard', () => {
     // No fixed-width utility (a min-w floor is fine; a hard w-9/w-10 is not).
     expect(a.className).not.toMatch(/(?<![a-z-])w-(?:9|10)\b/);
   });
+
+  it('matches the wheel/hunt neo-brutalist key language (border-3, hard shadow, pressed offset)', () => {
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    const letterKey = screen.getByRole('button', { name: 'Q' });
+    // Same visual language as the word-wheel letters / word-hunt tiles:
+    // 3px black border, hard offset shadow that collapses on press with a 1px
+    // translate — not the old scale-95 press, which read as "danced but didn't
+    // commit" on slow Android frames (rage-click lesson from the wheel).
+    expect(letterKey.className).toContain('border-3');
+    expect(letterKey.className).toContain('border-neo-black');
+    expect(letterKey.className).toContain('shadow-hard');
+    expect(letterKey.className).toContain('active:shadow-hard-pressed');
+    expect(letterKey.className).toContain('active:translate-x-px');
+    expect(letterKey.className).toContain('active:translate-y-px');
+    expect(letterKey.className).toContain('bg-neo-white');
+    expect(letterKey.className).toContain('touch-manipulation');
+    expect(letterKey.className).not.toContain('active:scale-95');
+    // Action keys share the same press language.
+    const submit = screen.getByRole('button', { name: 'Submit' });
+    expect(submit.className).toContain('active:shadow-hard-pressed');
+    expect(submit.className).not.toContain('active:scale-95');
+  });
 });

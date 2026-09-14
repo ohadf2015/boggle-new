@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { LeaderboardRow } from '@/lib/connections/dailyClient';
 import type { BridgeOutcome } from '@/lib/connections/shareGrid';
 import type { Puzzle } from '@/lib/connections/types';
@@ -68,7 +68,9 @@ describe('ConnectionsDailyResults', () => {
     puzzles: mockPuzzles,
     leaderboardRows: mockLeaderboard,
     isLoading: false,
-    onShare: vi.fn(),
+    shareText: 'LexiClash · Word Chain 2026-09-13\nclean · messy',
+    dateISO: '2026-09-13',
+    onShareClick: vi.fn(),
   };
 
   beforeEach(() => {
@@ -81,7 +83,7 @@ describe('ConnectionsDailyResults', () => {
     // Check hero score circle appears
     expect(screen.getByTestId('score-circle')).toBeTruthy();
     // Final score should be visible after animation
-    expect(screen.getByText('350')).toBeTruthy();
+    expect(within(screen.getByTestId('score-circle')).getByText('350')).toBeTruthy();
   });
 
   it('renders tier message based on score', () => {
@@ -120,7 +122,7 @@ describe('ConnectionsDailyResults', () => {
   it('renders recap, answer key, and leaderboard', () => {
     render(<ConnectionsDailyResults {...defaultProps} />);
 
-    // DailyResultRecap renders recap-squares (one per outcome)
+    // BridgeOutcomeTiles renders recap-squares (one per outcome)
     expect(screen.getAllByTestId('recap-square').length).toBeGreaterThan(0);
     // DailyAnswerKey has this testid
     expect(screen.getByTestId('daily-answer-key')).toBeTruthy();
@@ -128,21 +130,42 @@ describe('ConnectionsDailyResults', () => {
     expect(screen.getByTestId('connections-leaderboard')).toBeTruthy();
   });
 
-  it('renders share button', () => {
+  it('renders the shared share card (GameEmojiShareCard) with the recap tiles inside', () => {
     render(<ConnectionsDailyResults {...defaultProps} />);
-
-    const shareButton = screen.getByRole('button', { name: /connections\.daily\.share/ });
-    expect(shareButton).toBeTruthy();
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card).toBeTruthy();
+    // The bridge outcome tiles are the share artifact, inside the shared card.
+    const tiles = card.querySelectorAll('[data-testid="recap-square"]');
+    expect(tiles.length).toBe(mockOutcomes.length);
+    // The shared card shows the score + labeled stats — and no emoji artifact.
+    expect(card.textContent).toContain('350');
+    expect(card.textContent).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2B1B}-\u{2B1C}]/u);
   });
 
-  it('calls onShare when share button is clicked', async () => {
-    const onShare = vi.fn();
-    const { getByRole } = render(<ConnectionsDailyResults {...{ ...defaultProps, onShare }} />);
+  it('copy button copies the paste-text path (shareText prop)', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(<ConnectionsDailyResults {...defaultProps} />);
+    const copyButton = screen.getByRole('button', { name: 'share.emojiCard.copy' });
+    copyButton.click();
+    await screen.findByText('common.copied');
+    expect(writeText).toHaveBeenCalledWith(defaultProps.shareText);
+  });
 
-    const shareButton = getByRole('button', { name: /connections\.daily\.share/ });
-    shareButton.click();
+  it('reports share clicks through onShareClick', () => {
+    const onShareClick = vi.fn();
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+      configurable: true,
+    });
+    render(<ConnectionsDailyResults {...{ ...defaultProps, onShareClick }} />);
+    screen.getByRole('button', { name: 'share.emojiCard.copy' }).click();
+    expect(onShareClick).toHaveBeenCalledWith('copy');
+  });
 
-    expect(onShare).toHaveBeenCalled();
+  it('shows the countdown to the next UTC day', () => {
+    render(<ConnectionsDailyResults {...defaultProps} />);
+    expect(screen.getByText(/connections\.daily\.nextIn/)).toBeTruthy();
   });
 
   it('respects reduced motion preference for score animation', () => {
@@ -150,7 +173,7 @@ describe('ConnectionsDailyResults', () => {
 
     // When reduced motion is enabled (default in tests), score should appear immediately
     // The mock for useReducedMotion returns true by default
-    const scoreText = screen.getByText('350');
+    const scoreText = within(screen.getByTestId('score-circle')).getByText('350');
     expect(scoreText).toBeTruthy();
     // Verify the circle has motion-reduce class for accessibility
     const circle = screen.getByTestId('score-circle');
@@ -164,11 +187,18 @@ describe('ConnectionsDailyResults', () => {
     expect(getByText('connections.daily.leaderboard')).toBeTruthy();
   });
 
-  it('has back button with DirectionalIcon', () => {
+  it('has a back link to the daily hub', () => {
     render(<ConnectionsDailyResults {...defaultProps} />);
 
-    const backButton = screen.getByTestId('back-button');
-    expect(backButton).toBeTruthy();
+    const backLink = screen.getByTestId('back-button');
+    expect(backLink.tagName).toBe('A');
+    expect(backLink.getAttribute('href')).toBe('/en/daily');
+  });
+
+  it('renders a labeled rank stat tile when rank is known', () => {
+    render(<ConnectionsDailyResults {...defaultProps} />);
+    const rankTile = screen.getByTestId('stat-tile-rank');
+    expect(rankTile.textContent).toContain('#12');
   });
 
   it('keeps all existing data-testids for regression', () => {

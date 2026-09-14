@@ -107,7 +107,6 @@ export default function ConnectionsDailyChallenge() {
   const prevWrongAttemptsRef = useRef(state.wrongAttempts);
   const submittedRef = useRef(false);
   const [results, setResults] = useState<Results | null>(null);
-  const [copied, setCopied] = useState(false);
   // Bumped when a puzzle is solved so the (ref-backed) progress track re-renders.
   const [solvedVersion, setSolvedVersion] = useState(0);
 
@@ -253,11 +252,13 @@ export default function ConnectionsDailyChallenge() {
       outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
     ), [total]);
 
-  const handleShare = useCallback(async () => {
+  // Paste-text share path (emoji callouts live here — the on-screen share card
+  // stays emoji-free). Built once the run is terminal; the results card's
+  // copy/native-share buttons put exactly this on the clipboard.
+  const buildShareText = useCallback((): string => {
     const outcomes = collectOutcomes();
-    trackDailyShared({ locale: language, solved: outcomes.filter((o) => o.solved).length, total });
     const url = typeof window !== 'undefined' ? `${window.location.origin}/connections/daily` : undefined;
-    const text = buildDailyBridgeGrid({
+    return buildDailyBridgeGrid({
       title: t('connections.title'),
       dateISO: today,
       outcomes,
@@ -266,17 +267,12 @@ export default function ConnectionsDailyChallenge() {
       callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),
       url,
     });
-    try {
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ text });
-      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-      }
-    } catch {
-      /* user cancelled / unsupported */
-    }
-  }, [t, today, results, collectOutcomes, language, total]);
+  }, [t, today, results, collectOutcomes]);
+
+  const handleShareClick = useCallback((_method: 'native' | 'copy') => {
+    const outcomes = collectOutcomes();
+    trackDailyShared({ locale: language, solved: outcomes.filter((o) => o.solved).length, total });
+  }, [collectOutcomes, language, total]);
 
   if (isTerminal) {
     return (
@@ -292,7 +288,9 @@ export default function ConnectionsDailyChallenge() {
           puzzles={state.puzzles}
           leaderboardRows={results?.rows ?? []}
           isLoading={results?.loading ?? true}
-          onShare={handleShare}
+          shareText={buildShareText()}
+          dateISO={today}
+          onShareClick={handleShareClick}
         />
 
         {/* Pyramid is the deeper mode and the natural next step once the day's
