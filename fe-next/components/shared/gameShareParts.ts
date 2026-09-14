@@ -46,12 +46,24 @@ export interface DrillShareData {
   timeSpent?: number;
 }
 
+export interface ConnectionsShareData {
+  mode: 'connections';
+  /** UTC day of the daily set, e.g. '2026-09-13'. */
+  dateISO: string;
+  score: number;
+  solved: number;
+  total: number;
+  streak: number;
+  rank?: number | null;
+}
+
 export type GameShareData =
   | ClassicDailyShareData
   | BlastShareData
   | SingleplayerShareData
   | AdventureShareData
-  | DrillShareData;
+  | DrillShareData
+  | ConnectionsShareData;
 
 export interface ShareStat {
   value: string;
@@ -197,6 +209,24 @@ export function getShareParts(data: GameShareData, t: (key: string) => string): 
       }
       return {
         header: t('share.emojiCard.drillHeader').replace('{type}', data.drillType),
+        score: data.score.toLocaleString(),
+        scoreLabel: t('common.pts'),
+        stats,
+        details: [],
+      };
+    }
+    case 'connections': {
+      const stats: ShareStat[] = [
+        { value: `${data.solved}/${data.total}`, label: t('share.emojiCard.bridges') },
+      ];
+      if (data.streak > 0) {
+        stats.push({ value: String(data.streak), label: t('share.streak') });
+      }
+      if (data.rank != null) {
+        stats.push({ value: `#${data.rank}`, label: t('share.emojiCard.rank') });
+      }
+      return {
+        header: t('share.emojiCard.connectionsHeader').replace('{date}', data.dateISO),
         score: data.score.toLocaleString(),
         scoreLabel: t('common.pts'),
         stats,

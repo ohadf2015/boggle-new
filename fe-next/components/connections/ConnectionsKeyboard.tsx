@@ -24,8 +24,12 @@ interface ConnectionsKeyboardProps {
   disabled?: boolean;
 }
 
+// Same visual language as the word-wheel letters / word-hunt tiles: 3px black
+// border, hard offset shadow that collapses on press with a 1px translate.
+// No scale-95 — a non-uniform press reads as "danced but didn't commit" on
+// slow Android frames and drives rage-re-taps (wheel lesson, PostHog 2026-04-27).
 const KEY_BASE =
-  'inline-flex items-center justify-center rounded-neo border-2 border-black font-neo-display font-black select-none transition-all duration-75 shadow-hard-sm active:translate-y-[2px] active:shadow-none active:scale-95 disabled:opacity-40 disabled:cursor-default';
+  'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-all duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
 
 /** Shared key sizing — taller keys, no basis floor, so no key squashes. */
 const KEY_SIZE = 'h-12 sm:h-14 min-w-0';
@@ -102,7 +106,7 @@ export default function ConnectionsKeyboard({
               disabled={disabled}
               aria-label={ch}
               style={keyStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-cream text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-white active:bg-neo-lime`}
+              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-white text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-cream active:bg-neo-lime/30`}
             >
               {ch}
             </button>

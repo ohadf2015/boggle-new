@@ -14,6 +14,7 @@ export type {
   SingleplayerShareData,
   AdventureShareData,
   DrillShareData,
+  ConnectionsShareData,
   GameShareData,
 } from '@/components/shared/gameShareParts';
 
@@ -22,6 +23,14 @@ export interface GameEmojiShareCardProps {
   t: (key: string) => string;
   language?: string;
   onShareClick?: (method: 'native' | 'copy') => void;
+  /** Extra content rendered inside the card (e.g. the connections outcome tiles). */
+  extra?: React.ReactNode;
+  /**
+   * Override the generated paste text (e.g. the connections emoji-callout grid
+   * from buildDailyBridgeGrid). The card UI never changes — only what Copy /
+   * native share put on the clipboard.
+   */
+  shareText?: string;
 }
 
 function longestOf(words: string[]): string | null {
@@ -37,9 +46,9 @@ function lengthBarsFor(words: string[]): Array<{ len: number; found: number; tot
     .map(([len, count]) => ({ len, found: count, total: count }));
 }
 
-export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t, onShareClick }) => {
+export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t, onShareClick, extra, shareText: shareTextOverride }) => {
   const [copied, setCopied] = useState(false);
-  const shareText = buildShareText(data, t);
+  const shareText = shareTextOverride ?? buildShareText(data, t);
   const parts = getShareParts(data, t);
 
   const findWords = data.mode === 'classic' || data.mode === 'singleplayer' ? data.words : [];
@@ -81,6 +90,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
       longestWord={longest}
       revealed
       lengthBars={lengthBars}
+      extra={extra}
       onShare={handleNativeShare}
       onCopy={handleCopy}
       copied={copied}

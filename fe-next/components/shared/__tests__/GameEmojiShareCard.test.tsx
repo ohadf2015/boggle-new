@@ -156,3 +156,67 @@ describe('GameEmojiShareCard — onShareClick telemetry hook', () => {
     expect(onShareClick).toHaveBeenCalledWith('native');
   });
 });
+
+describe('GameEmojiShareCard — connections mode', () => {
+  const connectionsT = (key: string) => {
+    const map: Record<string, string> = {
+      'share.emojiCard.connectionsHeader': 'LexiClash Word Bridge · {date}',
+      'share.emojiCard.bridges': 'bridges',
+      'share.emojiCard.rank': 'rank',
+      'share.emojiCard.share': 'Share',
+      'share.emojiCard.copy': 'Copy',
+      'share.streak': 'streak',
+      'common.pts': 'pts',
+      'common.copied': 'Copied!',
+    };
+    return map[key] ?? key;
+  };
+  const connectionsData = {
+    mode: 'connections' as const,
+    dateISO: '2026-09-13',
+    score: 350,
+    solved: 3,
+    total: 5,
+    streak: 7,
+    rank: 12,
+  };
+
+  it('renders the dated header, score and labeled bridge stats', () => {
+    render(<GameEmojiShareCard data={connectionsData} t={connectionsT} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card).toHaveTextContent('LexiClash Word Bridge · 2026-09-13');
+    expect(card).toHaveTextContent('350');
+    expect(card).toHaveTextContent('3/5');
+    expect(card).toHaveTextContent('bridges');
+    expect(card).toHaveTextContent('#12');
+  });
+
+  it('renders no emoji in the artifact', () => {
+    render(<GameEmojiShareCard data={connectionsData} t={connectionsT} />);
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card.textContent).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2B1B}-\u{2B1C}\u{26A1}]/u);
+  });
+
+  it('renders the optional extra slot inside the card', () => {
+    render(
+      <GameEmojiShareCard
+        data={connectionsData}
+        t={connectionsT}
+        extra={<div data-testid="recap-extra">tiles here</div>}
+      />,
+    );
+    const card = screen.getByTestId('game-emoji-share-card');
+    expect(card.contains(screen.getByTestId('recap-extra'))).toBe(true);
+  });
+
+  it('copies the provided shareText override instead of the generated text', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(
+      <GameEmojiShareCard data={connectionsData} t={connectionsT} shareText="CUSTOM PASTE TEXT" />,
+    );
+    fireEvent.click(screen.getByText('Copy'));
+    await screen.findByText('Copied!');
+    expect(writeText).toHaveBeenCalledWith('CUSTOM PASTE TEXT');
+  });
+});
