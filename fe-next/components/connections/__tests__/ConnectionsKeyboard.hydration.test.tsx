@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { act } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { renderToString } from 'react-dom/server';
 import { hydrateRoot } from 'react-dom/client';
-import { act } from 'react';
 import { render, screen } from '@testing-library/react';
 import { LazyMotion, domMax } from 'framer-motion';
 import ConnectionsKeyboard from '../ConnectionsKeyboard';
