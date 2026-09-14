@@ -10832,6 +10832,23 @@ const ru = {
         "status": "Статус",
         "accuracy": "Точность",
         "attempts": "Попытки"
+      },
+      "viewStudentProgress": "Прогресс ученика: {{name}}",
+      "issue": {
+        "lowAccuracy": "Низкая точность",
+        "inactive": "Неактивен"
+      },
+      "mastery": {
+        "mastered": "Освоено",
+        "practicing": "Тренируется"
+      },
+      "streakDays": "{{count}} дн.",
+      "practiceDuration": "{{hours}} ч {{minutes}} мин",
+      "practiceDurationMinutesOnly": "{{minutes}} мин",
+      "recommendations": {
+        "lowAccuracyFocus": "Сосредоточьтесь на повторении слов с низкой точностью",
+        "practiceFrequency": "Увеличьте частоту практики для лучшего запоминания",
+        "masteryWork": "Поработайте над освоением большего количества слов"
       }
     },
     "curriculum": {

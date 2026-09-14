@@ -27,6 +27,17 @@ export interface ClassProgressReportProps {
   onStudentClick?: (studentId: string) => void;
 }
 
+/**
+ * The data layer emits machine codes (lib/supabase/analyticsReports.ts); the
+ * badge copy lives in the locales, so a Hebrew parent evening never reads
+ * "Low accuracy" off a Hebrew report. Keys are literals in this map so the
+ * reportsI18n contract test can scan and resolve them.
+ */
+const ISSUE_LABEL_KEY = {
+  low_accuracy: 'teacher.reports.issue.lowAccuracy',
+  inactive: 'teacher.reports.issue.inactive',
+} as const;
+
 // =============================================
 // COMPONENT
 // =============================================
@@ -147,7 +158,7 @@ export function ClassProgressReport({
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-red-500">{t('teacher.reports.error')}</div>
+        <div className="text-neo-red">{t('teacher.reports.error')}</div>
       </div>
     );
   }
@@ -170,7 +181,7 @@ export function ClassProgressReport({
             {t('teacher.reports.classReport')}
           </h1>
           <p className="text-xl text-neo-white mt-1">{data.classroomName}</p>
-          <p className="text-neo-gray">Teacher: {data.teacherName}</p>
+          <p className="text-neo-gray">{t('teacher.reports.teacherLabel')}: {data.teacherName}</p>
         </div>
         <button
           type="button"
@@ -240,7 +251,7 @@ export function ClassProgressReport({
                     type="button"
                     onClick={() => handleStudentClick(performer.studentId)}
                     className="flex-1 text-start text-neo-white font-medium hover:text-neo-lime transition-colors"
-                    aria-label={`View ${performer.studentName}'s profile`}
+                    aria-label={t('teacher.reports.viewStudentProgress', { name: performer.studentName })}
                   >
                     {performer.studentName}
                   </button>
@@ -250,7 +261,7 @@ export function ClassProgressReport({
                   </span>
                 )}
                 <span className="text-neo-gray text-sm">
-                  {performer.accuracy}% | {performer.wordsLearned} words
+                  {performer.accuracy}% · {t('education.classroomGame.words', { count: performer.wordsLearned })}
                 </span>
               </div>
             ))}
@@ -268,14 +279,14 @@ export function ClassProgressReport({
             {data.studentsNeedingAttention.map((student) => (
               <div
                 key={student.studentId}
-                className="flex items-center gap-4 p-3 bg-red-500/10 border-neo border-black rounded-neo"
+                className="flex items-center gap-4 p-3 bg-neo-red/10 border-neo border-neo-red rounded-neo"
               >
                 {handleStudentClick ? (
                   <button
                     type="button"
                     onClick={() => handleStudentClick(student.studentId)}
                     className="flex-1 text-start text-neo-white font-medium hover:text-neo-lime transition-colors"
-                    aria-label={`View ${student.studentName}'s profile`}
+                    aria-label={t('teacher.reports.viewStudentProgress', { name: student.studentName })}
                   >
                     {student.studentName}
                   </button>
@@ -287,8 +298,8 @@ export function ClassProgressReport({
                 <span className="text-neo-gray text-sm">
                   {student.accuracy}%
                 </span>
-                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-                  {student.issue}
+                <span className="px-2 py-1 bg-neo-red text-neo-white text-xs font-bold rounded-full">
+                  {t(ISSUE_LABEL_KEY[student.issue])}
                 </span>
               </div>
             ))}
@@ -305,11 +316,11 @@ export function ClassProgressReport({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-neo-navy border-b-2 border-black">
-                <th className="text-start p-3 text-neo-white font-bold w-16">Rank</th>
-                <th className="text-start p-3 text-neo-white font-bold">Student</th>
-                <th className="text-start p-3 text-neo-white font-bold">Score</th>
-                <th className="text-start p-3 text-neo-white font-bold">Accuracy</th>
-                <th className="text-start p-3 text-neo-white font-bold">Words</th>
+                <th className="text-start p-3 text-neo-white font-bold w-16">{t('teacher.reports.columns.rank')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.student')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.score')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.accuracy')}</th>
+                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.words')}</th>
               </tr>
             </thead>
             <tbody>
@@ -326,7 +337,7 @@ export function ClassProgressReport({
                       <button
                         onClick={() => handleStudentClick(student.studentId)}
                         className="text-neo-white font-medium hover:text-neo-lime transition-colors"
-                        aria-label={`View ${student.studentName}'s profile`}
+                        aria-label={t('teacher.reports.viewStudentProgress', { name: student.studentName })}
                       >
                         {student.studentName}
                       </button>

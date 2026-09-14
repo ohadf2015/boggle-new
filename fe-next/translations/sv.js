@@ -13543,6 +13543,23 @@ const sv = {
         "status": "Status",
         "accuracy": "Precision",
         "attempts": "Försök"
+      },
+      "viewStudentProgress": "Visa {{name}}s framsteg",
+      "issue": {
+        "lowAccuracy": "Låg precision",
+        "inactive": "Inaktiv"
+      },
+      "mastery": {
+        "mastered": "Bemästrat",
+        "practicing": "Övar"
+      },
+      "streakDays": "{{count}} dagar",
+      "practiceDuration": "{{hours}} h {{minutes}} min",
+      "practiceDurationMinutesOnly": "{{minutes}} min",
+      "recommendations": {
+        "lowAccuracyFocus": "Fokusera på att repetera ord med låg träffsäkerhet",
+        "practiceFrequency": "Öva oftare för bättre inlärning",
+        "masteryWork": "Arbeta med att bemästra fler ord"
       }
     },
     "curriculum": {

@@ -27,15 +27,14 @@ export type VocabQuizMode = typeof VOCAB_QUIZ_MODE;
 export type ClassroomGameMode = GameMode | VocabQuizMode;
 
 /**
- * The modes a teacher can actually pick in the classroom wizard, in wizard order.
+ * The modes a teacher can actually pick in the classroom mode picker, in picker order.
  *
  * `GameMode` is wider (nine values) because it covers every board the app ships;
- * only these five are offered for a live class. That list existed twice — a local
- * `GAME_MODES` array in `components/education/ClassroomModeSettings.tsx` and a Zod
- * enum in `backend/handlers/classroomGameHandler.ts` — with nothing exported for a
- * third party to count, which is why marketing copy about "how many modes" had to
- * be typed by hand. `app/[locale]/education/__tests__/playFormats.test.ts` asserts
- * this array still agrees with both.
+ * only these five are offered for a live class. The teacher-facing catalog built
+ * from this list lives in `lib/education/gameModes.ts` (`TEACHER_GAME_MODES`);
+ * the Zod enum in `backend/handlers/classroomGameHandler.ts` is the enforcing
+ * twin. `app/[locale]/education/__tests__/playFormats.test.ts` asserts this
+ * array still agrees with both.
  */
 export const CLASSROOM_GAME_MODES: readonly ClassroomGameMode[] = [
   'classic',
