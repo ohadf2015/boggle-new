@@ -21,6 +21,8 @@ import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
+import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { stagger, slideUp } from './teacherDashboardTabs';
 
 // Re-exported for the existing contract test; the map itself is shared with the
@@ -36,11 +38,14 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
   const isRTL = language === 'he';
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } =
     useClassrooms();
+  const { trial, isLoading: accessLoading } = useTeacherAccess();
+  const { hasPro, loading: proLoading } = useTeacherPro();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
+  const [isTrialUpsellOpen, setIsTrialUpsellOpen] = useState(false);
   const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
   const [expandedClassroomId, setExpandedClassroomId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -57,9 +62,9 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
   // shortcut or a deep-link), open it once on mount.
   useEffect(() => {
     if (autoOpenCreate) {
-      setIsCreateDialogOpen(true);
+      openCreateDialog();
     }
-     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpenCreate]);
 
   const handleCreate = async (name: string, classroomLanguage: Language) => {
@@ -188,7 +193,20 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
     }
   };
 
+  /**
+   * The trial-expiry paywall nudge. A teacher whose 14-day trial has ended (and
+   * who never converted to Pro) gets the Pro ask the next time they reach for
+   * the create flow — the single highest-intent moment they have. It is a
+   * nudge, not a wall: the free tier still works (grandfathering doctrine in
+   * freeTierLimits.ts), so the modal carries a "continue free" escape that
+   * proceeds into the wizard. While access/pro state is still resolving we
+   * show nothing — an eager modal could fire on a paying teacher.
+   */
   const openCreateDialog = () => {
+    if (!accessLoading && !proLoading && !hasPro && trial?.isExpired) {
+      setIsTrialUpsellOpen(true);
+      return;
+    }
     setIsCreateDialogOpen(true);
   };
 
@@ -500,6 +518,19 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
           limit={upsellData.limit}
         />
       )}
+
+      {/* Trial-expiry nudge — the Pro ask at the create-flow entrance */}
+      <ClassLimitUpsellModal
+        isOpen={isTrialUpsellOpen}
+        onClose={() => setIsTrialUpsellOpen(false)}
+        currentCount={classrooms.length}
+        limit={FREE_TIER_LIMITS.classes}
+        reason="trial_expired"
+        onContinueFree={() => {
+          setIsTrialUpsellOpen(false);
+          setIsCreateDialogOpen(true);
+        }}
+      />
     </div>
   );
 }
