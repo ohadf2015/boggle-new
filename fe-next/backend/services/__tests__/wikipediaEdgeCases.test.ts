@@ -15,6 +15,22 @@ vi.mock('@/lib/ai-service', () => ({
   },
 }));
 
+// The suites below intentionally simulate AI/DB failures ("Connection timeout",
+// "Database connection lost", ...). Without this mock those messages hit
+// console.warn and land in CI logs, where log-scanning QA reads them as a real
+// OpenRouter/network outage (see kanban t_6d537dce — there is no OpenRouter
+// anywhere in this repo; the AI stack is Google Vertex and it is fully mocked
+// above). Keep the logger silenced so intentional-error tests stay quiet.
+vi.mock('@/utils/logger', () => ({
+  default: {
+    log: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     from: vi.fn(() => ({
@@ -151,8 +167,9 @@ describe('Wikipedia pipeline edge cases', () => {
     });
 
     it('should log database errors with context', async () => {
-      // GIVEN: Database error occurs
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation();
+      // GIVEN: Database error occurs (logger is mocked at module level so
+      // intentional-error output never reaches CI logs)
+      const logger = (await import('@/utils/logger')).default;
 
       const { gameAIService } = await import('@/lib/ai-service');
       (gameAIService.checkDatabaseOnly as Mock).mockRejectedValue(
@@ -163,12 +180,10 @@ describe('Wikipedia pipeline edge cases', () => {
       await validateWordWithAI('PRISM', 'en' as Language, 75);
 
       // THEN: Log includes error message
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[WordProcessor] AI validation error for PRISM'),
-        expect.stringContaining('Database connection lost')
+      expect(logger.warn as Mock).toHaveBeenCalledWith(
+        '[WordProcessor] AI validation error for PRISM:',
+        'Database connection lost'
       );
-
-      consoleWarnSpy.mockRestore();
     });
   });
 
