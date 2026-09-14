@@ -15,6 +15,11 @@ vi.mock('@/lib/supabase', () => ({
   supabase: { auth: { signInWithIdToken: vi.fn() } },
 }));
 
+const mockConsentDecided = vi.fn(() => true);
+vi.mock('@/hooks/useConsentDecided', () => ({
+  useConsentDecided: () => mockConsentDecided(),
+}));
+
 // Render next/script as a plain tag so we can assert it mounts.
 vi.mock('next/script', () => ({
   // data-src (not src) so the @next/next/no-sync-scripts lint rule doesn't fire on the mock
@@ -27,6 +32,7 @@ describe('GoogleOneTapInitializer', () => {
   beforeEach(() => {
     mockIsNative.mockReturnValue(false);
     mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false });
+    mockConsentDecided.mockReturnValue(true);
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
   });
   afterEach(() => {
@@ -62,6 +68,13 @@ describe('GoogleOneTapInitializer', () => {
 
   it('renders nothing when the Google client id is not configured', () => {
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', '');
+    render(<GoogleOneTapInitializer />);
+    expect(screen.queryByTestId('gsi-script')).toBeNull();
+  });
+
+  it('does not load GIS / One Tap while cookie consent is still undecided', () => {
+    // Mobile audit 2026-09-14: One Tap stacked on the cookie sheet → double blocker.
+    mockConsentDecided.mockReturnValue(false);
     render(<GoogleOneTapInitializer />);
     expect(screen.queryByTestId('gsi-script')).toBeNull();
   });
