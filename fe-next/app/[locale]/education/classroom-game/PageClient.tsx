@@ -132,8 +132,6 @@ function ClassroomGameInner() {
   );
 }
 
-import { TeacherGate } from '@/components/education/TeacherGate';
-
 /**
  * Guests land here from NoAccountCta ("Play now — no sign-up"). TeacherGate
  * would bounce them to the access signup wall — a signup wall behind a
