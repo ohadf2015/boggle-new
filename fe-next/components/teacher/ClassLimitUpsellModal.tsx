@@ -14,6 +14,15 @@ interface ClassLimitUpsellModalProps {
   onClose: () => void;
   currentCount: number;
   limit: number | null;
+  /**
+   * Why the ask is up. 'class_limit' (default) is the hard cap; 'trial_expired'
+   * is the nudge shown when a teacher whose 14-day trial ended re-enters the
+   * create flow — the free tier still works, so that variant gets a
+   * "continue free" escape instead of a plain cancel.
+   */
+  reason?: 'class_limit' | 'trial_expired';
+  /** Trial-expired variant only: dismiss the ask and continue into the create wizard. */
+  onContinueFree?: () => void;
 }
 
 export default function ClassLimitUpsellModal({
@@ -21,19 +30,23 @@ export default function ClassLimitUpsellModal({
   onClose,
   currentCount,
   limit,
+  reason = 'class_limit',
+  onContinueFree,
 }: ClassLimitUpsellModalProps) {
   const { t, language } = useLanguage();
+  const isTrialExpired = reason === 'trial_expired';
+  const source = isTrialExpired ? 'trial_expired' : 'class_limit';
 
   // Track the upgrade surface when modal opens
   useEffect(() => {
     if (isOpen) {
       trackGrowthEvent('iap_viewed', {
-        source: 'class_limit',
+        source,
         currentCount,
         limit,
       });
     }
-  }, [isOpen, currentCount, limit]);
+  }, [isOpen, currentCount, limit, source]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -45,7 +58,9 @@ export default function ClassLimitUpsellModal({
       >
           <div className="bg-neo-cyan px-6 py-4 border-b-3 border-black flex items-center justify-between">
             <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
-              {t('teacher.subscription.classLimitTitle')}
+              {isTrialExpired
+                ? t('teacher.subscription.trialExpiredTitle')
+                : t('teacher.subscription.classLimitTitle')}
             </DialogTitle>
             <DialogClose asChild>
               <button
@@ -62,10 +77,12 @@ export default function ClassLimitUpsellModal({
               <div className="flex items-center gap-3 mb-2">
                 <Zap className="w-5 h-5 text-black flex-shrink-0" />
                 <p className="font-bold text-black">
-                  {t('teacher.subscription.classLimitMessage', {
-                    current: currentCount,
-                    limit: limit ?? FREE_TIER_LIMITS.classes,
-                  })}
+                  {isTrialExpired
+                    ? t('teacher.subscription.trialExpiredMessage')
+                    : t('teacher.subscription.classLimitMessage', {
+                        current: currentCount,
+                        limit: limit ?? FREE_TIER_LIMITS.classes,
+                      })}
                 </p>
               </div>
               <p className="text-sm text-black/70 font-bold leading-relaxed">
@@ -120,7 +137,7 @@ export default function ClassLimitUpsellModal({
                   onClick={() =>
                     trackGrowthEvent('landing_cta_clicked', {
                       cta: 'teacher_pro',
-                      source: 'class_limit_modal',
+                      source: isTrialExpired ? 'trial_expired_modal' : 'class_limit_modal',
                     })
                   }
                 >
@@ -128,11 +145,13 @@ export default function ClassLimitUpsellModal({
                 </Link>
               </Button>
               <Button
-                onClick={onClose}
+                onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
                 variant="outline"
                 className="flex-1 border-2 border-black bg-neo-cream text-black font-black shadow-hard hover:-translate-y-0.5 transition-all"
               >
-                {t('common.cancel')}
+                {isTrialExpired && onContinueFree
+                  ? t('teacher.subscription.continueFree')
+                  : t('common.cancel')}
               </Button>
             </div>
 
