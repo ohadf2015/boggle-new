@@ -11,6 +11,7 @@ import type {
   WordsAttemptedRecord,
   DateRange,
   StudentReportData,
+  StudentRecommendation,
   ClassReportData,
   MasteryLevel,
   HeatmapCell,
