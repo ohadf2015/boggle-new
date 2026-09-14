@@ -13309,6 +13309,23 @@ const ja = {
         "status": "ステータス",
         "accuracy": "正確さ",
         "attempts": "試行回数"
+      },
+      "viewStudentProgress": "{{name}}の進捗を見る",
+      "issue": {
+        "lowAccuracy": "正確さが低い",
+        "inactive": "非アクティブ"
+      },
+      "mastery": {
+        "mastered": "習得済み",
+        "practicing": "練習中"
+      },
+      "streakDays": "{{count}}日",
+      "practiceDuration": "{{hours}}時間{{minutes}}分",
+      "practiceDurationMinutesOnly": "{{minutes}}分",
+      "recommendations": {
+        "lowAccuracyFocus": "正解率の低い単語の復習に集中しましょう",
+        "practiceFrequency": "練習頻度を上げて定着を高めましょう",
+        "masteryWork": "より多くの語彙の習得に取り組みましょう"
       }
     },
     "curriculum": {

@@ -13216,6 +13216,23 @@ const es = {
         "status": "Estado",
         "accuracy": "Precisión",
         "attempts": "Intentos"
+      },
+      "viewStudentProgress": "Ver el progreso de {{name}}",
+      "issue": {
+        "lowAccuracy": "Precisión baja",
+        "inactive": "Inactivo"
+      },
+      "mastery": {
+        "mastered": "Dominada",
+        "practicing": "Practicando"
+      },
+      "streakDays": "{{count}} días",
+      "practiceDuration": "{{hours}} h {{minutes}} min",
+      "practiceDurationMinutesOnly": "{{minutes}} min",
+      "recommendations": {
+        "lowAccuracyFocus": "Enfócate en repasar las palabras con baja precisión",
+        "practiceFrequency": "Aumenta la frecuencia de práctica para mejorar la retención",
+        "masteryWork": "Trabaja en dominar más palabras de vocabulario"
       }
     },
     "teacher": {

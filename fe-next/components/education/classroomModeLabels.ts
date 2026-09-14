@@ -30,9 +30,9 @@ export function classroomModeLabelKey(mode: string | undefined): string {
 }
 
 /**
- * Board-size label, matching `ClassroomSetupStep` one size for one.
+ * Board-size label, matching the lobby's round settings one size for one.
  *
- * INCIDENT (2026-09-06): this table was one step behind that screen — an older
+ * INCIDENT (2026-09-06): this table was one step behind the setup screen — an older
  * 4×4/5×5/6×6 scale with no `medium` case — so the teacher's Medium fell
  * through to the default and the lobby announced 5×5 to a room that was 6×6.
  * Every size was off by one. Reported as "board size silently reverted";

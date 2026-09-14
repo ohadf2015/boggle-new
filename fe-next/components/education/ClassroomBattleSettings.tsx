@@ -5,7 +5,7 @@
  *  - Play style: free-for-all or a team battle with auto split (2-4 teams).
  *  - Support (SPED) toggles: larger type, audio cues, participation points.
  *
- * Kept out of ClassroomSetupStep so that file stays under the size budget.
+ * Kept out of the lobby setup panel so that file stays under the size budget.
  */
 
 'use client';

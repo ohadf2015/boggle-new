@@ -83,6 +83,12 @@ export interface DateRange {
   end: Date;
 }
 
+/**
+ * Recommendation machine codes, translated at render — never locale strings
+ * from the data layer.
+ */
+export type StudentRecommendation = 'low_accuracy_focus' | 'practice_frequency' | 'mastery_work';
+
 export interface StudentReportData {
   studentId: string;
   studentName: string;
@@ -113,7 +119,7 @@ export interface StudentReportData {
     wordsReviewed: number;
     accuracy: number;
   }>;
-  recommendations: string[];
+  recommendations: StudentRecommendation[];
 }
 
 export interface ClassReportData {
@@ -140,7 +146,8 @@ export interface ClassReportData {
     studentName: string;
     accuracy: number;
     lastActive: string | null;
-    issue: string;
+    /** Machine code, translated at render — never a locale string. */
+    issue: 'low_accuracy' | 'inactive';
   }>;
   studentRankings: Array<{
     rank: number;
