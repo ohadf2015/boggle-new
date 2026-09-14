@@ -5,8 +5,9 @@
  * (Word Bridge) daily is done — the marker is the same localStorage key both
  * connections daily flavors write on their terminal screens
  * (markConnectionsPlayedToday in lib/connections/dailyClient), read back via
- * hasPlayedConnectionsToday. Denominator stays /3 (hunt + wheel + connections;
- * Word Tower is hidden — see DailyChallengeLanding.wordTowerHidden.test.tsx).
+ * hasPlayedConnectionsToday. Denominator is /4 (hunt + wheel + connections +
+ * word-tower — tower was restored to the hub 2026-09-14, superseding the /3
+ * this file pinned while the hide directive was in force).
  */
 
 import React from 'react';
@@ -102,32 +103,32 @@ describe('DailyChallengeLanding — Connections counts in hub progress', () => {
     mockFetch.mockImplementation(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) }));
   });
 
-  it('starts at 0/3 when nothing was played today', async () => {
+  it('starts at 0/4 when nothing was played today', async () => {
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    expect(bar).toHaveAttribute('aria-valuemax', '4');
     // aria-valuenow is the percent (see DailyMissionsHeader); the visible
     // label is the honest completedCount/total.
-    await screen.findByText('0/3');
+    await screen.findByText('0/4');
   });
 
-  it('increments to 1/3 when today\'s Connections daily is marked played', async () => {
+  it('increments to 1/4 when today\'s Connections daily is marked played', async () => {
     window.localStorage.setItem(PLAYED_KEY, todayUTC());
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    expect(bar).toHaveAttribute('aria-valuemax', '4');
     // connectionsPlayed resolves in an effect after mount — wait for the flip.
-    await screen.findByText('1/3');
-    await waitFor(() => expect(bar).toHaveAttribute('aria-valuenow', '33'));
+    await screen.findByText('1/4');
+    await waitFor(() => expect(bar).toHaveAttribute('aria-valuenow', '25'));
   });
 
   it('ignores a stale Connections marker from a previous day', async () => {
     window.localStorage.setItem(PLAYED_KEY, '2020-01-01');
     renderHub();
-    await screen.findByText('0/3');
+    await screen.findByText('0/4');
     // Give the mount effect a beat to (not) flip the count.
     await new Promise((r) => setTimeout(r, 50));
-    expect(screen.getByText('0/3')).toBeInTheDocument();
+    expect(screen.getByText('0/4')).toBeInTheDocument();
   });
 
   it('marks the Connections quest card played when the marker is set', async () => {

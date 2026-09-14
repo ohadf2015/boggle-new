@@ -24,12 +24,14 @@ const ACCENT: Record<DailyModeDef['accent'], { bar: string; ring: string; cta: s
 
 /** Per-mode glyph (registry stays presentation-light). */
 const ICON: Partial<Record<DailyModeDef['id'], typeof Building2>> = {
+  'word-tower': Building2,
   connections: Link2,
 };
 
 /** Per-mode mascot preview — same full-bleed treatment the public QuestCards use,
- *  so a registry mode reads as a real quest, not a compact afterthought. */
+ *  so a beta mode reads as a real quest (game 3), not a compact afterthought. */
 const PREVIEW: Partial<Record<DailyModeDef['id'], string>> = {
+  'word-tower': '/daily/word-tower-mascot.jpg',
   connections: '/daily/connections-mascot.jpg',
 };
 
@@ -38,9 +40,10 @@ const PREVIEW: Partial<Record<DailyModeDef['id'], string>> = {
  *
  * Registry-driven so a mode graduates from beta to public by flipping one
  * `adminOnly` boolean, with zero hub edits. Uses a plain hard-nav `<a>` (not the
- * SPA router) so the daily host re-reads the date at mount. The "BETA" flask
- * badge is drawn ONLY for modes still gated to admins/beta (`mode.adminOnly`);
- * a public mode must read as a first-class quest. When the
+ * SPA router) because Word Tower's daily run reads its mode from the `?daily=1`
+ * query at mount — a client nav wouldn't re-read it. The "BETA" flask badge is
+ * drawn ONLY for modes still gated to admins/beta (`mode.adminOnly`); a public
+ * mode like Word Tower must read as a first-class quest. When the
  * mode has a mascot preview it renders full-bleed (QuestCard parity); otherwise a
  * compact icon-circle row (fallback for future modes without art).
  */
