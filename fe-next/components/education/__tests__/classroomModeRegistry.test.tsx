@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { CLASSROOM_GAME_MODES } from '@/shared/types/vocabQuiz';
+import { TEACHER_GAME_MODES } from '@/lib/education/gameModes';
 
 /**
  * The banner's expanded panel is the STUDENT surface now — a classroom HOST in
@@ -168,11 +169,15 @@ describe('every classroom mode is complete on every surface', () => {
     }
   });
 
-  it.each([...CLASSROOM_GAME_MODES])('%s is offered in the teacher wizard', (mode) => {
-    // Source-text pin rather than importing the component: the wizard pulls in
-    // the whole education tree, and this assertion only needs the mode list.
-    const src = read('components/education/ClassroomModeSettings.tsx');
-    expect(src, `ClassroomModeSettings has no entry for ${mode}`).toContain(`'${mode}'`);
+  it.each([...CLASSROOM_GAME_MODES])('%s is offered in the teacher mode picker', (mode) => {
+    // The live picker is `ModePickerStrip`, fed by `TEACHER_GAME_MODES` — the
+    // dead `ClassroomModeSettings` wizard this assertion used to source-scan
+    // was deleted in the teacher-simplicity pass. Importing the catalog pins
+    // the same contract more strongly than a source-text match ever could.
+    expect(
+      TEACHER_GAME_MODES.some((m) => m.id === mode),
+      `TEACHER_GAME_MODES has no entry for ${mode}`
+    ).toBe(true);
   });
 
   it.each([...CLASSROOM_GAME_MODES])('%s is accepted by the classroom create handler', (mode) => {

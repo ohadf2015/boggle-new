@@ -33,29 +33,25 @@ export interface StudentProgressReportProps {
 // =============================================
 
 /**
- * Format minutes to hours and minutes string
- */
-function formatMinutes(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hours}h ${mins}m`;
-}
-
-/**
- * Get mastery status label
- */
-function getMasteryStatus(mastered: boolean): string {
-  return mastered ? 'Mastered' : 'Practicing';
-}
-
-/**
- * Get mastery status color class
+ * Mastery badge colors, from the neo palette — raw `green-500`/`yellow-500`
+ * were the only non-token fills on the reports screens.
  */
 function getMasteryColor(mastered: boolean): string {
   return mastered
-    ? 'bg-green-500 text-white'
-    : 'bg-yellow-500 text-black';
+    ? 'bg-neo-lime text-black'
+    : 'bg-neo-yellow text-black';
 }
+
+/**
+ * The data layer emits machine codes (lib/supabase/analyticsReports.ts); the
+ * recommendation copy lives in the locales. Keys are literals in this map so
+ * the reportsI18n contract test can scan and resolve them.
+ */
+const RECOMMENDATION_LABEL_KEY = {
+  low_accuracy_focus: 'teacher.reports.recommendations.lowAccuracyFocus',
+  practice_frequency: 'teacher.reports.recommendations.practiceFrequency',
+  mastery_work: 'teacher.reports.recommendations.masteryWork',
+} as const;
 
 // =============================================
 // COMPONENT
@@ -78,6 +74,21 @@ export function StudentProgressReport({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+
+  /**
+   * Practice-time formatting goes through the locales: "1h 5m" is an English
+   * abbreviation pattern, and under an hour the hours segment reads as noise.
+   */
+  const formatPracticeMinutes = useCallback(
+    (minutes: number): string => {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return hours > 0
+        ? t('teacher.reports.practiceDuration', { hours, minutes: mins })
+        : t('teacher.reports.practiceDurationMinutesOnly', { minutes: mins });
+    },
+    [t]
+  );
 
   // Fetch data on mount or when props change
   useEffect(() => {
@@ -177,7 +188,7 @@ export function StudentProgressReport({
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-red-500">{t('teacher.reports.error')}</div>
+        <div className="text-neo-red">{t('teacher.reports.error')}</div>
       </div>
     );
   }
@@ -235,14 +246,14 @@ export function StudentProgressReport({
           />
 
           <Stat
-            value={formatMinutes(data.metrics.practiceTimeMinutes)}
+            value={formatPracticeMinutes(data.metrics.practiceTimeMinutes)}
             label={t('teacher.reports.metrics.practiceTime')}
             size="lg"
             className="w-full"
           />
 
           <Stat
-            value={`${data.metrics.currentStreak} days`}
+            value={t('teacher.reports.streakDays', { count: data.metrics.currentStreak })}
             label={t('teacher.reports.metrics.currentStreak')}
             size="lg"
             className="w-full"
@@ -280,7 +291,9 @@ export function StudentProgressReport({
                         word.mastered
                       )}`}
                     >
-                      {getMasteryStatus(word.mastered)}
+                      {word.mastered
+                        ? t('teacher.reports.mastery.mastered')
+                        : t('teacher.reports.mastery.practicing')}
                     </span>
                   </td>
                   <td className="p-3 text-neo-white">{word.accuracy}%</td>
@@ -304,8 +317,10 @@ export function StudentProgressReport({
                 key={`rec-${index}-${recommendation}`}
                 className="flex items-start gap-2 p-3 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo"
               >
-                <span className="text-neo-lime font-bold">-</span>
-                <span className="text-neo-white">{recommendation}</span>
+                <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-none bg-neo-lime" />
+                <span className="text-neo-white">
+                  {t(RECOMMENDATION_LABEL_KEY[recommendation])}
+                </span>
               </li>
             ))}
           </ul>

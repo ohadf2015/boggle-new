@@ -13163,6 +13163,23 @@ const he = {
         "status": "סטטוס",
         "accuracy": "דיוק",
         "attempts": "ניסיונות"
+      },
+      "viewStudentProgress": "צפה בהתקדמות של {{name}}",
+      "issue": {
+        "lowAccuracy": "דיוק נמוך",
+        "inactive": "לא פעיל"
+      },
+      "mastery": {
+        "mastered": "נשלט",
+        "practicing": "בתרגול"
+      },
+      "streakDays": "{{count}} ימים",
+      "practiceDuration": "{{hours}} שע׳ {{minutes}} דק׳",
+      "practiceDurationMinutesOnly": "{{minutes}} דק׳",
+      "recommendations": {
+        "lowAccuracyFocus": "התמקדו בחזרה על מילים עם דיוק נמוך",
+        "practiceFrequency": "הגבירו את תדירות התרגול כדי לשפר את הזכירה",
+        "masteryWork": "עבדו על שליטה בעוד מילים"
       }
     },
     "curriculum": {
