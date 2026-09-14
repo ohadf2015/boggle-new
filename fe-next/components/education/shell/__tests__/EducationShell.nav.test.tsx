@@ -56,6 +56,23 @@ describe('EducationShell — nav shell', () => {
     expect(queryByTestId('education-sidebar')).toBeNull();
   });
 
+  it('drops the nav on ANY path when chromeFree is set (active drill)', () => {
+    // A drill on a measured-square board sizes to the leftover area — the tab
+    // bar mounted during the round is grid area thrown away (2026-09-12 grid
+    // pass). chromeFree skips nav resolution even where a nav would resolve.
+    pathname.current = '/en/student/lessons/lesson-1';
+    const { queryByTestId } = render(<EducationShell chromeFree>body</EducationShell>);
+    expect(queryByTestId('education-tabbar')).toBeNull();
+    expect(queryByTestId('education-sidebar')).toBeNull();
+  });
+
+  it('keeps the nav without chromeFree on the same drill path (picker needs a way home)', () => {
+    pathname.current = '/en/student/lessons/lesson-1';
+    const { queryByTestId } = render(<EducationShell>body</EducationShell>);
+    // Whatever nav this path resolves to, chromeFree=false must not suppress it.
+    expect(queryByTestId('education-tabbar') ?? queryByTestId('education-sidebar')).not.toBeNull();
+  });
+
   it('lays the tab bar out in the column, so the scroll region gets shorter', () => {
     pathname.current = '/en/teacher';
     const { getByTestId } = render(<EducationShell>body</EducationShell>);

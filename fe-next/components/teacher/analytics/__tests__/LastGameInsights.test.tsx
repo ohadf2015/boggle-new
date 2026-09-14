@@ -79,7 +79,7 @@ describe('LastGameInsights', () => {
     expect(screen.getByTestId('last-game-loading')).toBeInTheDocument();
   });
 
-  it('shows the empty state with a hint to start a game from the Play tab', () => {
+  it('shows the empty state with a hint to start a game from the Play now hero', () => {
     mockHook({ games: [] });
     render(<LastGameInsights classroomId="class-1" />);
     expect(screen.getByTestId('last-game-empty')).toBeInTheDocument();
