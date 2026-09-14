@@ -66,7 +66,7 @@ vi.mock('../MpModeCrossPromo', () => ({
 
 const result: WordWheelGameResult = { score: 40, wordsFound: ['ABC', 'DEFGH'], timeSeconds: 120 };
 
-const renderResults = (hasPlayedWordHunt: boolean, isAuthenticated = true) =>
+const renderResults = (hasPlayedWordHunt: boolean, hasPlayedConnections = true, isAuthenticated = true) =>
   render(
     <WordWheelResults
       result={result}
@@ -74,12 +74,18 @@ const renderResults = (hasPlayedWordHunt: boolean, isAuthenticated = true) =>
       puzzleDate="2026-05-18"
       language="en"
       hasPlayedWordHunt={hasPlayedWordHunt}
+      hasPlayedConnections={hasPlayedConnections}
       isAuthenticated={isAuthenticated}
     />,
   );
 
 describe('WordWheelResults — sticky primary CTA', () => {
-  it('pins the "finish today\'s challenge" CTA when Word Hunt is unplayed', () => {
+  it('pins the Connections CTA while Connections is unplayed', () => {
+    renderResults(false, false);
+    expect(screen.getByTestId('wordwheel-connections-cta').className).toContain('sticky');
+  });
+
+  it('pins the "finish today\'s challenge" CTA when Word Hunt is unplayed (Connections done)', () => {
     renderResults(false);
     expect(screen.getByTestId('wordwheel-hunt-cta').className).toContain('sticky');
   });
@@ -92,18 +98,23 @@ describe('WordWheelResults — sticky primary CTA', () => {
   it('never renders both primary CTAs at once', () => {
     renderResults(true);
     expect(screen.queryByTestId('wordwheel-hunt-cta')).toBeNull();
+    expect(screen.queryByTestId('wordwheel-connections-cta')).toBeNull();
   });
 
   /* Same rule the Word Hunt screen enforces via its guest early-return: an
      unregistered player's one CTA is the signup card, so neither primary CTA
      may pin over it. They still have the top-left Back link, so no dead end. */
   it('gives a guest no sticky CTA in either state', () => {
-    const done = renderResults(true, false);
+    const done = renderResults(true, true, false);
     expect(done.queryByTestId('wordwheel-back-to-daily-cta')).toBeNull();
     done.unmount();
 
-    const unfinished = renderResults(false, false);
+    const unfinished = renderResults(false, true, false);
     expect(unfinished.queryByTestId('wordwheel-hunt-cta')).toBeNull();
+    unfinished.unmount();
+
+    const connectionsOpen = renderResults(false, false, false);
+    expect(connectionsOpen.queryByTestId('wordwheel-connections-cta')).toBeNull();
   });
 
   it('leaves no overflow-hidden ancestor to swallow the sticky CTA', () => {
