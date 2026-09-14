@@ -18,6 +18,18 @@ import { getRedisClient } from '../../redisClient';
 // Mock Redis client
 vi.mock('../../redisClient');
 
+// Keep the intentional Redis-failure test from printing an ERROR line that
+// looks like a real CI failure. The behaviour is still asserted via the
+// rejected promise below.
+vi.mock('../../utils/logger', () => ({
+  default: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+  },
+}));
+
 const mockRedis = {
   setex: vi.fn(),
   get: vi.fn(),
