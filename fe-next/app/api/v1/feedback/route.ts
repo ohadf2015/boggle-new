@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Same-origin proxy for the embedded feedback.devtools widget.
 //
-// The widget (public/widget.js) posts to `${origin}/api/v1/feedback?sdk=<token>`
+// The hosted widget bundle posts to `${origin}/api/v1/feedback?sdk=<token>`
 // with Content-Type text/plain and NO Authorization header (CORS "simple
 // request" workaround — the token travels in the `sdk` query param, which is
 // the upstream ingest API's native SDK auth scheme). Proxying server-side
