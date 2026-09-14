@@ -136,14 +136,6 @@ describe('OfflineDownloadManager', () => {
 
   it('refreshes status after successful download', async () => {
     mockListDownloads.mockResolvedValue([]);
-    render(<OfflineDownloadManager />);
-
-    await waitFor(() => {
-      expect(mockListDownloads).toHaveBeenCalled();
-    });
-
-    const initialCallCount = mockListDownloads.mock.calls.length;
-
     mockDownloadDictionary.mockResolvedValue({
       lang: 'en',
       wordCount: 50000,
@@ -151,15 +143,32 @@ describe('OfflineDownloadManager', () => {
       sizeBytes: 1258291,
     });
 
-    const downloadButtons = screen.getAllByText('offlineDownload.downloadButton');
-    fireEvent.click(downloadButtons[0]);
+    render(<OfflineDownloadManager />);
+
+    // Wait for UI paint — asserting only that listDownloads was called races setState.
+    await waitFor(() => {
+      expect(screen.getAllByText('offlineDownload.downloadButton').length).toBe(locales.length);
+    });
+
+    const initialCallCount = mockListDownloads.mock.calls.length;
+
+    // Post-download refresh should see the new entry.
+    mockListDownloads.mockResolvedValue([
+      {
+        lang: 'en',
+        wordCount: 50000,
+        downloadedAt: Date.now(),
+        sizeBytes: 1258291,
+      },
+    ]);
+
+    fireEvent.click(screen.getAllByText('offlineDownload.downloadButton')[0]);
 
     await waitFor(() => {
       expect(mockDownloadDictionary).toHaveBeenCalled();
+      expect(mockListDownloads.mock.calls.length).toBeGreaterThan(initialCallCount);
+      expect(screen.getByText('offlineDownload.deleteButton')).toBeInTheDocument();
     });
-
-    // After the download completes, listDownloads should be called again
-    expect(mockListDownloads.mock.calls.length).toBeGreaterThan(initialCallCount);
   });
 
   it('shows Delete button for downloaded languages', async () => {
@@ -211,21 +220,27 @@ describe('OfflineDownloadManager', () => {
     mockDeleteDownload.mockResolvedValue(undefined);
 
     render(<OfflineDownloadManager />);
+
+    // Wait for downloaded UI to paint — asserting only that listDownloads was
+    // called races the setState after await (CI flake: still shows notDownloaded).
     await waitFor(() => {
-      expect(mockListDownloads).toHaveBeenCalled();
+      expect(screen.getByText('offlineDownload.deleteButton')).toBeInTheDocument();
     });
 
     const initialCallCount = mockListDownloads.mock.calls.length;
 
-    const deleteButton = screen.getByText('offlineDownload.deleteButton');
-    fireEvent.click(deleteButton);
+    // After delete, refreshStatus must see an empty list so the row flips.
+    mockListDownloads.mockResolvedValue([]);
+
+    fireEvent.click(screen.getByText('offlineDownload.deleteButton'));
 
     await waitFor(() => {
       expect(mockDeleteDownload).toHaveBeenCalled();
+      expect(mockListDownloads.mock.calls.length).toBeGreaterThan(initialCallCount);
+      expect(screen.queryByText('offlineDownload.deleteButton')).not.toBeInTheDocument();
+      expect(screen.getAllByText('offlineDownload.downloadButton').length).toBe(locales.length);
+      expect(screen.getAllByText('offlineDownload.notDownloaded').length).toBe(locales.length);
     });
-
-    // After the delete completes, the status should be refreshed
-    expect(mockListDownloads.mock.calls.length).toBeGreaterThan(initialCallCount);
   });
 
   it('shows error state when download fails', async () => {
