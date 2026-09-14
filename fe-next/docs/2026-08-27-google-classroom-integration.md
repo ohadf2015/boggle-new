@@ -157,3 +157,7 @@ Note for Phase 2: `NEXT_PUBLIC_*` values freeze at build time in this repo. A pr
 Teacher Pro outage came from exactly that (`NEXT_PUBLIC_CHECKOUT_ENABLED` set at runtime but not
 baked into the bundle), and "unset" is indistinguishable from "set but not baked" when read from a
 browser. Probe the runtime endpoint, not just the rendered HTML.
+
+### Team Tiles Unplugged (Kahoot Team Tiles foil)
+
+Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Teams flip tiles → word; teacher marks. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). No student devices. Class-level words only — no roster OAuth. Prod: **lexiclash.live** (never lexiclash.com).

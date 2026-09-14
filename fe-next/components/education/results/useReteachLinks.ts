@@ -17,6 +17,7 @@ import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import { buildMissGapAssignmentPath } from '@/lib/education/missGapAsyncAssignment';
 import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
+import { buildTeamTilesUnpluggedPath } from '@/lib/education/teamTilesUnplugged';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
@@ -31,6 +32,7 @@ export interface ReteachLinks {
   googleClassroomAssignHref: string | null;
   googleClassroomUnpluggedAssignHref: string | null;
   unpluggedReteachHref: string | null;
+  teamTilesUnpluggedHref: string | null;
   missGapAsyncAssignHref: string | null;
   shareState: ShareState;
   missGapShareState: ShareState;
@@ -115,6 +117,9 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
   );
 
   const unpluggedReteachHref = hasMisses ? safely(() => buildUnpluggedReteachPath(gapArgs)) : null;
+
+  /** Kahoot Team Tiles foil: miss-gap tileboard on teacher screen (#1045 passback). */
+  const teamTilesUnpluggedHref = hasMisses ? safely(() => buildTeamTilesUnpluggedPath(gapArgs)) : null;
 
   /**
    * Google Classroom *assignment* that ships Unplugged reteach (#959) + the #957
@@ -235,6 +240,7 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
     googleClassroomAssignHref,
     googleClassroomUnpluggedAssignHref,
     unpluggedReteachHref,
+    teamTilesUnpluggedHref,
     missGapAsyncAssignHref,
     shareState,
     missGapShareState,
