@@ -4,6 +4,7 @@ import { useCallback, useRef } from 'react';
 import Script from 'next/script';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { isNative } from '@/utils/platform';
 import { supabase } from '@/lib/supabase';
 import {
@@ -24,10 +25,15 @@ const GSI_SRC = 'https://accounts.google.com/gsi/client';
  * already uses the same `signInWithIdToken` path (utils/nativeOAuth.ts).
  *
  * Mounted once globally; the existing redirect buttons remain as a fallback.
+ *
+ * UX: never stack One Tap over the cookie bar. GIS is not loaded (and prompt
+ * never fires) until `useConsentDecided()` is true — measured 2026-09-14 on
+ * mobile where One Tap + cookie sheet formed a double blocker.
  */
 export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
+  const consentDecided = useConsentDecided();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
 
@@ -48,7 +54,8 @@ export default function GoogleOneTapInitializer() {
     google.accounts.id.prompt();
   }, [clientId]);
 
-  if (!enabled) return null;
+  // Consent first: do not mount GSI (or prompt) while the cookie bar is up.
+  if (!enabled || !consentDecided) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
   // without it, One Tap falls back to the browser/OS locale instead of the site's.
