@@ -235,8 +235,23 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const telemetrySurface = analyticsSurface ?? surface;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
-  const [dailyViewCount, setDailyViewCount] = useState(() => getDailyViewCount());
+  // Hydration safety (t_b6fd1f5b): SSR has no window/localStorage, so every
+  // storage- or window-derived gate must render with the SERVER's values on
+  // the client's first (hydration) render and converge in an effect. Seeding
+  // from storage in a useState initializer (or live-reading storage/window
+  // during render) flips canShowAd for returning capped users and for
+  // production-web users (ayet/GD/H5 report isAvailable = typeof window !==
+  // 'undefined'), which React 19 treats as a structural hydration mismatch —
+  // it recovers the nearest Suspense boundary, discarding + remounting the
+  // whole subtree (the double entrance-animation churn on /connections/daily).
+  const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(false);
+  const [dailyViewCount, setDailyViewCount] = useState(0);
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setPlaceholderCooldownFlag(isPlaceholderCapped());
+    setDailyViewCount(getDailyViewCount());
+    setHasMounted(true);
+  }, []);
 
   // Timers held in refs so a single showAd session can clear its own watchdog
   // and so unmount can sweep any pending timer (hygiene — no setState on a
@@ -273,7 +288,16 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const gdAds = useGameDistributionAds();
   const ayetAds = useAyetVideoAds();
 
-  // Determine which ad platform to use (priority order)
+  // Determine which ad platform to use (priority order).
+  // `webProvidersSettled` keeps the first client render identical to SSR: the
+  // web provider hooks (ayet/GD/H5) report `isAvailable = typeof window !==
+  // 'undefined'` — false on the server, true on the hydration render — so
+  // without the gate, `isPlaceholder` (and thus `canShowAd`) would flip between
+  // SSR and hydration for every production-web user. crazyGames/AdMob are
+  // already hydration-safe (useState(false) seeds / non-web platform). The
+  // gate only defers WHEN web availability is read — showAd can only fire from
+  // a post-hydration tap, so provider routing semantics are unchanged.
+  const webProvidersSettled = hasMounted;
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
   const shouldUseAdMob = !shouldUseCrazyGames && Capacitor.isNativePlatform();
   // Production web (not CG, not native) → Google H5 Games Ads via `adBreak()`.
@@ -306,14 +330,14 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     (window as unknown as { __ayetAdsTest?: boolean }).__ayetAdsTest === true ||
     (typeof location !== 'undefined' && /[?&]ayet_test=1/.test(location.search))
   );
-  const shouldUseAyet = !shouldUseCrazyGames && !shouldUseAdMob && ayetAds.isAvailable && ayetEnvEnabled && (isProd || hasAyetTestFlag);
+  const shouldUseAyet = webProvidersSettled && !shouldUseCrazyGames && !shouldUseAdMob && ayetAds.isAvailable && ayetEnvEnabled && (isProd || hasAyetTestFlag);
   const gdEnvEnabled = process.env.NEXT_PUBLIC_GD_ADS_ENABLED === 'true' && getGdGameId() !== '';
   const hasGdTestFlag = typeof window !== 'undefined' && (
     (window as unknown as { __gdAdsTest?: boolean }).__gdAdsTest === true ||
     (typeof location !== 'undefined' && /[?&]gdads_test=1/.test(location.search))
   );
-  const shouldUseGd = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
-  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  const shouldUseGd = webProvidersSettled && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
+  const shouldUseH5 = webProvidersSettled && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
   // Simulation only in development — never award free gold in production
   const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5;
   // Placeholder: no ad platform available — still grant coins, log for admin
@@ -586,6 +610,12 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     void adMob.prepareRewarded({ surface });
   }, [warm, shouldUseAdMob, adMob, surface, rewardKind]);
 
+  // Storage-derived render gates: until mounted, report the exact values SSR
+  // computed (storage empty → limit not reached) so the hydration render is
+  // byte-identical; the tap-time guard inside showAd still live-reads storage,
+  // so the economy protection is not weakened by the deferred UI gate.
+  const dailyLimitReached = hasMounted ? isDailyLimitReached(rewardKind) : false;
+
   return {
     status,
     isAdAvailable,
@@ -594,10 +624,10 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     prepareAd,
     error,
     rewardAmount,
-    canShowAd: !isDailyLimitReached(rewardKind) && !(isPlaceholder && !isDev),
+    canShowAd: !dailyLimitReached && !(isPlaceholder && !isDev),
     viewsToday: dailyViewCount,
     maxViews: MAX_DAILY_AD_VIEWS,
-    isDailyLimitReached: isDailyLimitReached(rewardKind),
+    isDailyLimitReached: dailyLimitReached,
     isPlaceholder,
   };
 }
