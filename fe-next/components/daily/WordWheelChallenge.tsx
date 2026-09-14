@@ -41,6 +41,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
+import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { isNative } from '@/utils/platform';
 import PracticeBadge from '@/components/practice/PracticeBadge';
@@ -179,6 +180,28 @@ const WordWheelChallenge: React.FC = () => {
     guestFingerprint,
     isPractice,
   });
+
+  // Mirror for the Connections (Word Bridge) follow-up CTA — don't nudge a mode
+  // the player already finished today. localStorage-only is fine here:
+  // Connections is a separate daily system (same pattern as the Word Hunt
+  // results page). Refreshed on focus/visibility so a player returning from the
+  // connections tab sees the CTA flip without a reload.
+  const [hasPlayedConnections, setHasPlayedConnections] = useState(false);
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        setHasPlayedConnections(hasPlayedConnectionsToday());
+      } catch { /* storage disabled — treat as not played */ }
+    };
+    refresh();
+    const onVis = () => { if (!document.hidden) refresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', refresh);
+    return () => {
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
 
   // Daily guest identity (utils/dailyChallenge/guestPlayer) — the SAME fingerprint
   // Word Hunt records guests under, so a guest's hunt + wheel rows merge on the
@@ -772,6 +795,7 @@ const WordWheelChallenge: React.FC = () => {
               puzzleDate={catchupDate || getDailyChallengeDate()}
               language={language as Language}
               hasPlayedWordHunt={hasPlayedWH}
+              hasPlayedConnections={hasPlayedConnections}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
               isAuthenticated={isAuthenticated}
