@@ -16,6 +16,7 @@ import {
   type ClassGapSharePayload,
 } from '@/lib/education/classGapShare';
 import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
+import { buildTeamTilesUnpluggedPath } from '@/lib/education/teamTilesUnplugged';
 
 export interface ClassGapReteachLiveCtaProps {
   payload: ClassGapSharePayload;
@@ -24,6 +25,8 @@ export interface ClassGapReteachLiveCtaProps {
   educationLabel: string;
   /** Teacher-screen-only unplugged reteach (students use printable sheet). */
   unpluggedLabel: string;
+  /** Kahoot Team Tiles foil — miss-gap tileboard on teacher screen. */
+  teamTilesLabel: string;
 }
 
 const primaryClass =
@@ -37,6 +40,7 @@ export function ClassGapReteachLiveCta({
   educationHref,
   educationLabel,
   unpluggedLabel,
+  teamTilesLabel,
 }: ClassGapReteachLiveCtaProps) {
   const router = useRouter();
 
@@ -61,6 +65,7 @@ export function ClassGapReteachLiveCta({
   }
 
   const unpluggedHref = buildUnpluggedReteachPath(payload);
+  const teamTilesHref = buildTeamTilesUnpluggedPath(payload);
 
   return (
     <>
@@ -79,6 +84,13 @@ export function ClassGapReteachLiveCta({
         className={secondaryClass}
       >
         {unpluggedLabel}
+      </Link>
+      <Link
+        href={teamTilesHref}
+        data-testid="start-team-tiles-unplugged"
+        className={secondaryClass}
+      >
+        {teamTilesLabel}
       </Link>
       <Link href={educationHref} className={secondaryClass}>
         {educationLabel}
