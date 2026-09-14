@@ -1,58 +1,59 @@
 import { describe, it, expect } from 'vitest';
 import {
   CEFR_LEVELS,
+  DEMO_ROUND_SECONDS,
+  cefrGlosses,
+  cefrLessonPack,
   cefrList,
-  demoBoard,
   findWordOnBoard,
-  isAdjacent,
+  demoBoard,
   practiceHref,
-  wordFromPath,
 } from '../eslCefrDemo';
 
-describe('CEFR lists', () => {
-  it('exposes A1, A2 and B1 with at least 12 English words each', () => {
-    expect(CEFR_LEVELS).toEqual(['A1', 'A2', 'B1']);
+describe('eslCefrDemo', () => {
+  it('ships a 12-word starter list with en+es glosses for every level', () => {
     for (const level of CEFR_LEVELS) {
-      const words = cefrList(level);
-      expect(words.length).toBeGreaterThanOrEqual(12);
-      expect(words.every((w) => /^[a-z]+$/.test(w))).toBe(true);
-    }
-  });
-
-  it('maps each list onto a distinct practice mode', () => {
-    expect(practiceHref('A1', 'en')).toContain('/en/education/classroom-game');
-    expect(practiceHref('A1', 'en')).toContain('cefr=A1');
-    expect(practiceHref('A1', 'en')).toContain('mode=warmup');
-    expect(practiceHref('A2', 'es')).toContain('/es/education/classroom-game');
-    expect(practiceHref('A2', 'es')).toContain('mode=spelling');
-    expect(practiceHref('B1', 'he')).toContain('/he/education/classroom-game');
-    expect(practiceHref('B1', 'he')).toContain('mode=blitz');
-  });
-});
-
-describe('playable demo board', () => {
-  it('treats orthogonal and diagonal neighbours as adjacent, not wrap-around', () => {
-    expect(isAdjacent(0, 1)).toBe(true);
-    expect(isAdjacent(0, 5)).toBe(true);
-    expect(isAdjacent(0, 4)).toBe(true);
-    expect(isAdjacent(0, 2)).toBe(false);
-    expect(isAdjacent(3, 4)).toBe(false);
-  });
-
-  it('spells the path in order', () => {
-    const board = demoBoard('A1').letters;
-    expect(wordFromPath(board, [0, 1, 2])).toBe('CAT');
-  });
-
-  it('can find every target word on its CEFR board', () => {
-    for (const level of CEFR_LEVELS) {
-      const { letters, targets } = demoBoard(level);
-      expect(targets.length).toBeGreaterThanOrEqual(4);
-      for (const word of targets) {
-        const path = findWordOnBoard(letters, word);
-        expect(path, `${level} missing ${word}`).not.toBeNull();
-        expect(wordFromPath(letters, path!)).toBe(word);
+      const glosses = cefrGlosses(level);
+      expect(glosses.length).toBe(12);
+      expect(cefrList(level)).toEqual(glosses.map((g) => g.word));
+      for (const g of glosses) {
+        expect(g.word.length).toBeGreaterThan(0);
+        expect(g.en.length).toBeGreaterThan(0);
+        expect(g.es.length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('practiceHref carries only the cefr param classroom-game honours', () => {
+    expect(practiceHref('A2', 'es')).toBe('/es/education/classroom-game?cefr=A2');
+    expect(practiceHref('B1', 'en')).not.toContain('mode=');
+  });
+
+  it('builds a stable-named starter pack so repeat visits dedupe on name', () => {
+    const a = cefrLessonPack('A1');
+    const b = cefrLessonPack('A1');
+    expect(a.name).toBe('CEFR A1 Starter (ESL)');
+    expect(a.name).toBe(b.name);
+    expect(a.language).toBe('en');
+    expect(a.words.length).toBe(12);
+    for (const w of a.words) {
+      expect(w.difficulty).toBe('easy');
+      expect(w.definition.length).toBeGreaterThan(0);
+    }
+    expect(cefrLessonPack('A2').words.every((w) => w.difficulty === 'medium')).toBe(true);
+    expect(cefrLessonPack('B1').words.every((w) => w.difficulty === 'hard')).toBe(true);
+  });
+
+  it('every board target is actually traceable on its board', () => {
+    for (const level of CEFR_LEVELS) {
+      const board = demoBoard(level);
+      for (const target of board.targets) {
+        expect(findWordOnBoard(board.letters, target)).not.toBeNull();
+      }
+    }
+  });
+
+  it('the demo round length matches the 60-second copy promise', () => {
+    expect(DEMO_ROUND_SECONDS).toBe(60);
   });
 });
