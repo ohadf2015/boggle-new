@@ -121,16 +121,18 @@ export async function getStudentReportData(
     else if (accuracy >= 70) masteryLevel = 'proficient';
     else if (accuracy >= 50) masteryLevel = 'developing';
 
-    // Generate recommendations
-    const recommendations: string[] = [];
+    // Generate recommendations — MACHINE CODES, translated at render via
+    // RECOMMENDATION_LABEL_KEY in StudentProgressReport (English used to leak
+    // from this layer onto reports in all six locales).
+    const recommendations: StudentRecommendation[] = [];
     if (accuracy < 60) {
-      recommendations.push('Focus on reviewing words with low accuracy');
+      recommendations.push('low_accuracy_focus');
     }
     if (totalAttempts < 50) {
-      recommendations.push('Increase practice frequency to improve retention');
+      recommendations.push('practice_frequency');
     }
     if (wordMasteryList.filter(w => !w.mastered).length > 5) {
-      recommendations.push('Work on mastering more vocabulary words');
+      recommendations.push('mastery_work');
     }
 
     const reportData: StudentReportData = {
@@ -309,7 +311,10 @@ export async function getClassReportData(
       wordsLearned: r.wordsLearned,
     }));
 
-    // Students needing attention (accuracy < 50% or inactive > 7 days)
+    // Students needing attention (accuracy < 50% or inactive > 7 days).
+    // `issue` is a MACHINE CODE, translated at render via ISSUE_LABEL_KEY in
+    // ClassProgressReport — English strings used to leak from this layer onto
+    // reports in all six locales.
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -324,7 +329,7 @@ export async function getClassReportData(
         studentName: s.studentName,
         accuracy: s.accuracy,
         lastActive: s.lastActive,
-        issue: s.accuracy < 50 ? 'Low accuracy' : 'Inactive',
+        issue: (s.accuracy < 50 ? 'low_accuracy' : 'inactive') as 'low_accuracy' | 'inactive',
       }));
 
     const reportData: ClassReportData = {

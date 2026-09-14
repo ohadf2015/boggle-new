@@ -11760,6 +11760,23 @@ const en = {
         "status": "Status",
         "accuracy": "Accuracy",
         "attempts": "Attempts"
+      },
+      "viewStudentProgress": "View {{name}}'s progress",
+      "issue": {
+        "lowAccuracy": "Low accuracy",
+        "inactive": "Inactive"
+      },
+      "mastery": {
+        "mastered": "Mastered",
+        "practicing": "Practicing"
+      },
+      "streakDays": "{{count}} days",
+      "practiceDuration": "{{hours}}h {{minutes}}m",
+      "practiceDurationMinutesOnly": "{{minutes}}m",
+      "recommendations": {
+        "lowAccuracyFocus": "Focus on reviewing words with low accuracy",
+        "practiceFrequency": "Increase practice frequency to improve retention",
+        "masteryWork": "Work on mastering more vocabulary words"
       }
     },
     "curriculum": {

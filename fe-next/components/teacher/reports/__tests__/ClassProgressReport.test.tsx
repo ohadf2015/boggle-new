@@ -41,7 +41,7 @@ vi.mock('@react-pdf/renderer', () => ({
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
         'teacher.reports.classReport': 'Class Progress Report',
         'teacher.reports.metrics.totalStudents': 'Total Students',
@@ -58,8 +58,24 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.loading': 'Loading report...',
         'teacher.reports.error': 'Error loading report',
         'teacher.reports.noData': 'No data available',
+        'teacher.reports.teacherLabel': 'Teacher',
+        'teacher.reports.columns.rank': 'COL_RANK',
+        'teacher.reports.columns.student': 'COL_STUDENT',
+        'teacher.reports.columns.score': 'COL_SCORE',
+        'teacher.reports.columns.accuracy': 'COL_ACCURACY',
+        'teacher.reports.columns.words': 'COL_WORDS',
+        'teacher.reports.issue.lowAccuracy': 'LOW_ACCURACY_LBL',
+        'teacher.reports.issue.inactive': 'INACTIVE_LBL',
+        'teacher.reports.viewStudentProgress': 'VIEW_PROGRESS_OF {{name}}',
+        'education.classroomGame.words': '{{count}} WORDS_LBL',
       };
-      return translations[key] || key;
+      let value = translations[key] || key;
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          value = value.replace(`{{${k}}}`, String(v));
+        }
+      }
+      return value;
     },
     language: 'en',
     dir: 'ltr',
@@ -91,8 +107,8 @@ const mockClassData: ClassReportData = {
     { studentId: 's3', studentName: 'Charlie', accuracy: 90, wordsLearned: 40 },
   ],
   studentsNeedingAttention: [
-    { studentId: 's4', studentName: 'David', accuracy: 45, lastActive: '2024-01-10', issue: 'Low accuracy' },
-    { studentId: 's5', studentName: 'Eve', accuracy: 50, lastActive: null, issue: 'Inactive for 7+ days' },
+    { studentId: 's4', studentName: 'David', accuracy: 45, lastActive: '2024-01-10', issue: 'low_accuracy' as const },
+    { studentId: 's5', studentName: 'Eve', accuracy: 50, lastActive: null, issue: 'inactive' as const },
   ],
   studentRankings: [
     { rank: 1, studentId: 's1', studentName: 'Alice', score: 95, accuracy: 95, wordsLearned: 45 },
@@ -230,6 +246,59 @@ describe('ClassProgressReport', () => {
         // Check rankings appear
         const rankCells = screen.getAllByText(/^[1-3]$/);
         expect(rankCells.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  describe('i18n — every visible string comes from t()', () => {
+    it('renders rankings table headers from locale keys, never hardcoded English', async () => {
+      render(<ClassProgressReport classroomId="classroom-456" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('COL_RANK')).toBeInTheDocument();
+        expect(screen.getByText('COL_STUDENT')).toBeInTheDocument();
+        expect(screen.getByText('COL_SCORE')).toBeInTheDocument();
+        expect(screen.getByText('COL_ACCURACY')).toBeInTheDocument();
+        expect(screen.getByText('COL_WORDS')).toBeInTheDocument();
+      });
+    });
+
+    it('labels the teacher line via teacherLabel, not a hardcoded prefix', async () => {
+      render(<ClassProgressReport classroomId="classroom-456" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Teacher: Ms. Smith')).toBeInTheDocument();
+      });
+    });
+
+    it('translates issue codes from the data layer into badge copy', async () => {
+      render(<ClassProgressReport classroomId="classroom-456" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('LOW_ACCURACY_LBL')).toBeInTheDocument();
+        expect(screen.getByText('INACTIVE_LBL')).toBeInTheDocument();
+      });
+      // The machine codes themselves must never reach the screen.
+      expect(screen.queryByText('low_accuracy')).not.toBeInTheDocument();
+    });
+
+    it('counts performer words through the shared words key', async () => {
+      render(<ClassProgressReport classroomId="classroom-456" />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/45 WORDS_LBL/)).toBeInTheDocument();
+      });
+    });
+
+    it('localizes the student-button aria-labels', async () => {
+      render(
+        <ClassProgressReport classroomId="classroom-456" onStudentClick={() => {}} />
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getAllByRole('button', { name: 'VIEW_PROGRESS_OF Alice' }).length
+        ).toBeGreaterThan(0);
       });
     });
   });
