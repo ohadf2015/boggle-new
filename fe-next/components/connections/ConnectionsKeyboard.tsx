@@ -44,9 +44,21 @@ const KEY_SIZE = 'h-12 sm:h-14 min-w-0';
  * submit/backspace keys flanking the last row — dividing by the longest row
  * alone squashed the bottom row on layouts where it is already the longest
  * (Hebrew). See lib/connections/keyboard.ts.
+ *
+ * The minWidth floor is pure catastrophe insurance: it never binds in a
+ * healthy layout (even a 12-key Russian row on a 280px Fold computes ~13px
+ * above it), but if a row is ever over-subscribed (e.g. a transient
+ * hydration-recovery DOM mid-deploy) shrink stops at a tappable key instead
+ * of crushing letters to their 6px borders — overflow is visible and
+ * debuggable, a 6px pill is not (t_55afcea2).
  */
 function letterKeyStyle(columns: number): CSSProperties {
-  return { flexBasis: `calc(${(100 / columns).toFixed(4)}% - 0.375rem)`, flexGrow: 0, flexShrink: 1 };
+  return {
+    flexBasis: `calc(${(100 / columns).toFixed(4)}% - 0.375rem)`,
+    flexGrow: 0,
+    flexShrink: 1,
+    minWidth: '0.875rem',
+  };
 }
 
 /**
@@ -81,8 +93,14 @@ export default function ConnectionsKeyboard({
       {rows.map((row, rowIdx) => (
         <m.div
           key={`row-${rowIdx}`}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          // Transform only — never `opacity: 0` (same lesson as PuzzleCard's
+          // entrance): `m` stays frozen on `initial` until hydration runs, so
+          // an invisible start renders the whole keyboard as an empty box for
+          // seconds on slow connections — measured live at 0-4s under 400ms
+          // latency / 6x CPU throttle (t_55afcea2). A position-only entrance
+          // degrades to "keys sit 10px low until JS arrives" — fully tappable.
+          initial={{ y: 10 }}
+          animate={{ y: 0 }}
           transition={{ delay: rowIdx * 0.06, type: 'spring', stiffness: 400, damping: 26 }}
           className="flex w-full min-w-0 items-stretch justify-center gap-1 sm:gap-1.5"
         >
