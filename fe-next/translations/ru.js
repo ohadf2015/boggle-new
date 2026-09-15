@@ -1569,7 +1569,13 @@ const ru = {
         "antonym": "Слова с противоположным значением",
         "context": "Догадайся о слове по предложению",
         "multiple_meaning": "Одно слово, два значения",
-        "roots_affixes": "Что означают части слова"
+        "roots_affixes": "Что означают части слова",
+        "produce": {
+            "definition": "Прочитай значение и напиши слово",
+            "synonym": "Увидь похожее слово и напиши слово",
+            "antonym": "Увидь противоположное и напиши слово",
+            "context": "Заполни пропуск по памяти"
+          }
       },
       "locked": {
         "word_tower": "Нужно не менее 4 слов из списка длиной 4–6 букв",
@@ -1580,6 +1586,36 @@ const ru = {
         "spelling": "Добавьте слова в урок, чтобы открыть",
         "flashcard": "Добавьте слова в урок, чтобы открыть",
         "word_list": "Добавьте слова в урок, чтобы открыть"
+      }
+    },
+    "produce": {
+      "title": "Кузница слов",
+      "desc": "Прочитай значение и напиши слово",
+      "newWord": "Новое слово — посмотри",
+      "gotIt": "Понятно",
+      "hint": "Подсказка",
+      "hintLength": "{count} букв",
+      "inputLabel": "Введите слово",
+      "placeholder": "Введите слово…",
+      "check": "Проверить",
+      "theWordWas": "Слово было",
+      "finish": "Готово",
+      "cue": {
+        "definition": "Какое это слово?",
+        "context": "Заполни пропуск",
+        "synonym": "Другое слово для…",
+        "antonym": "Противоположность…"
+      },
+      "verdict": {
+        "correct": "Верно!",
+        "near-miss": "Почти — проверь написание",
+        "wrong": "Не в этот раз"
+      },
+      "notEnough": {
+        "definition": "Добавьте определения к уроку, чтобы открыть",
+        "context": "Добавьте примеры предложений к уроку, чтобы открыть",
+        "synonym": "Добавьте синонимы к уроку, чтобы открыть",
+        "antonym": "Добавьте антонимы к уроку, чтобы открыть"
       }
     },
     "vocabFocus": {
@@ -1826,6 +1862,25 @@ const ru = {
       "teamTilesPerfectHeadline": "Идеальный Team Tiles!",
       "teamTilesPerfectSub": "Каждая miss-gap плитка перевёрнута и пройдена.",
       "teamTilesPlayAgain": "Перемешать и сыграть снова",
+      "startClassicUnplugged": "Начать Classic Unplugged",
+      "classicUnpluggedProgress": "Слово {{current}} из {{total}}",
+      "classicUnpluggedClassScore": "Счёт класса",
+      "classicUnpluggedChooseMode": "Класс или команды?",
+      "classicUnpluggedClassMode": "Класс",
+      "classicUnpluggedTeamName": "Команда {{number}}",
+      "classicUnpluggedActiveTeam": "Ход команды {{number}}",
+      "classicUnpluggedDiscussHint": "Обсудите, затем откройте",
+      "classicUnpluggedReveal": "Показать слово",
+      "classicUnpluggedSubmitGotIt": "Отправить: справились",
+      "classicUnpluggedSubmitNotYet": "Отправить: ещё нет",
+      "classicUnpluggedExit": "Выйти из Classic Unplugged",
+      "classicUnpluggedMascotAlt": "Lexi ведёт Classic Unplugged",
+      "classicUnpluggedMascotWinAlt": "Lexi празднует Classic Unplugged",
+      "classicUnpluggedWinHeadline": "Classic Unplugged завершён!",
+      "classicUnpluggedWinSub": "{{cleared}} из {{total}} слов — отправил учитель, без устройств.",
+      "classicUnpluggedPerfectHeadline": "Идеальный Classic Unplugged!",
+      "classicUnpluggedPerfectSub": "Все miss-gap слова закрыты классом.",
+      "classicUnpluggedPlayAgain": "Сыграть снова",
       "assignUnpluggedGoogleClassroom": "Назначить офлайн reteach в Google Classroom",
       "assignUnpluggedGoogleClassroomTitle": "Офлайн reteach — домашнее задание — {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Домашнее задание без устройств: откройте ссылку Unplugged Live, распечатайте лист практики пропущенных слов и потренируйте: {{missed}}. Устройства учеников не нужны — сдайте, когда закончите.",
@@ -15245,6 +15300,7 @@ const ru = {
     "rejected": "Слово отклонено",
     "duplicateWord": "Дублированное слово",
     "lessonWordTitle": "Слово из словаря урока!",
+    "lessonWordBonus": "Слово урока — бонус +{bonus}!",
     "dictionaryTitle": "Постройте наш словарь",
     "submittedBy": "Отправлено",
     "skipHint": "Нажми ESC для пропуска",

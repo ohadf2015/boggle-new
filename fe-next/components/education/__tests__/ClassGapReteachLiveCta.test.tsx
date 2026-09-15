@@ -37,6 +37,7 @@ describe('ClassGapReteachLiveCta', () => {
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
         teamTilesLabel="Start Team Tiles Unplugged"
+        classicUnpluggedLabel="Start Classic Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -51,6 +52,7 @@ describe('ClassGapReteachLiveCta', () => {
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
         teamTilesLabel="Start Team Tiles Unplugged"
+        classicUnpluggedLabel="Start Classic Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -70,6 +72,7 @@ describe('ClassGapReteachLiveCta', () => {
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
         teamTilesLabel="Start Team Tiles Unplugged"
+        classicUnpluggedLabel="Start Classic Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -85,6 +88,7 @@ describe('ClassGapReteachLiveCta', () => {
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
         teamTilesLabel="Start Team Tiles Unplugged"
+        classicUnpluggedLabel="Start Classic Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -97,6 +101,26 @@ describe('ClassGapReteachLiveCta', () => {
     expect(href).not.toContain('Maya');
   });
 
+
+  it('offers Start Classic Unplugged linking to the shared-screen path', () => {
+    render(
+      <ClassGapReteachLiveCta
+        payload={payload}
+        reteachLabel="Start 3-min reteach Live"
+        unpluggedLabel="Start unplugged reteach Live"
+        teamTilesLabel="Start Team Tiles Unplugged"
+        classicUnpluggedLabel="Start Classic Unplugged"
+        educationHref="/en/education"
+        educationLabel="Play a class game"
+      />,
+    );
+    const link = screen.getByTestId('start-classic-unplugged');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/classic-unplugged');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('lexiclash.com');
+  });
+
   it('offers Start Team Tiles Unplugged linking to the tileboard path', () => {
     render(
       <ClassGapReteachLiveCta
@@ -104,6 +128,7 @@ describe('ClassGapReteachLiveCta', () => {
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
         teamTilesLabel="Start Team Tiles Unplugged"
+        classicUnpluggedLabel="Start Classic Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,

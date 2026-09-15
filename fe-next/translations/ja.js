@@ -6077,6 +6077,7 @@ const ja = {
     "rejected": "単語が拒否されました",
     "duplicateWord": "重複した単語",
     "lessonWordTitle": "レッスンの語彙!",
+    "lessonWordBonus": "レッスンの単語 — ボーナス +{bonus}！",
     "dictionaryTitle": "辞書を作ろう",
     "submittedBy": "提出者",
     "skipHint": "ESCでスキップ",
@@ -13548,7 +13549,13 @@ const ja = {
         "antonym": "反対の意味の単語",
         "context": "文から単語を推理しよう",
         "multiple_meaning": "1つの単語に2つの意味",
-        "roots_affixes": "語のパーツの意味"
+        "roots_affixes": "語のパーツの意味",
+        "produce": {
+            "definition": "意味を読んで単語を書く",
+            "synonym": "似た単語を見て単語を書く",
+            "antonym": "反対の意味を見て単語を書く",
+            "context": "空欄を記憶から埋める"
+          }
       },
       "locked": {
         "word_tower": "4〜6文字のリスト単語が4つ以上必要です",
@@ -13559,6 +13566,36 @@ const ja = {
         "spelling": "このレッスンに単語を追加すると使えます",
         "flashcard": "このレッスンに単語を追加すると使えます",
         "word_list": "このレッスンに単語を追加すると使えます"
+      }
+    },
+    "produce": {
+      "title": "ワードフォージ",
+      "desc": "意味を読んで単語を書く",
+      "newWord": "新しい単語 — 確認しよう",
+      "gotIt": "わかった",
+      "hint": "ヒント",
+      "hintLength": "{count} 文字",
+      "inputLabel": "単語を入力",
+      "placeholder": "単語を入力…",
+      "check": "確認",
+      "theWordWas": "正解は",
+      "finish": "終了",
+      "cue": {
+        "definition": "これは何の単語？",
+        "context": "空欄を埋めて",
+        "synonym": "別の言い方は…",
+        "antonym": "反対の意味は…"
+      },
+      "verdict": {
+        "correct": "正解！",
+        "near-miss": "おしい — つづりを確認",
+        "wrong": "今回は違う"
+      },
+      "notEnough": {
+        "definition": "このレッスンに定義を追加して解除",
+        "context": "このレッスンに例文を追加して解除",
+        "synonym": "このレッスンに類義語を追加して解除",
+        "antonym": "このレッスンに対義語を追加して解除"
       }
     },
     "vocabFocus": {
@@ -13805,6 +13842,25 @@ const ja = {
       "teamTilesPerfectHeadline": "完璧な Team Tiles！",
       "teamTilesPerfectSub": "すべての miss-gap タイルをめくってクリア。",
       "teamTilesPlayAgain": "シャッフルしてもう一度",
+      "startClassicUnplugged": "Classic Unplugged を開始",
+      "classicUnpluggedProgress": "単語 {{current}} / {{total}}",
+      "classicUnpluggedClassScore": "クラススコア",
+      "classicUnpluggedChooseMode": "クラスかチーム？",
+      "classicUnpluggedClassMode": "クラス",
+      "classicUnpluggedTeamName": "チーム {{number}}",
+      "classicUnpluggedActiveTeam": "チーム {{number}} の番",
+      "classicUnpluggedDiscussHint": "話し合ってから公開",
+      "classicUnpluggedReveal": "単語を公開",
+      "classicUnpluggedSubmitGotIt": "送信：できた",
+      "classicUnpluggedSubmitNotYet": "送信：まだ",
+      "classicUnpluggedExit": "Classic Unplugged を終了",
+      "classicUnpluggedMascotAlt": "Classic Unplugged を進行するLexi",
+      "classicUnpluggedMascotWinAlt": "Classic Unplugged を祝うLexi",
+      "classicUnpluggedWinHeadline": "Classic Unplugged 完了！",
+      "classicUnpluggedWinSub": "{{cleared}} / {{total}} 語 — 先生が送信、生徒端末なし。",
+      "classicUnpluggedPerfectHeadline": "Perfect Classic Unplugged！",
+      "classicUnpluggedPerfectSub": "miss-gap の単語をすべてクリア。",
+      "classicUnpluggedPlayAgain": "もう一度",
       "assignUnpluggedGoogleClassroom": "アンプラグドリティーチを Google Classroom に割り当て",
       "assignUnpluggedGoogleClassroomTitle": "アンプラグドリティーチ宿題 — {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "デバイス不要の宿題: Unplugged Live のリンクを開き、見逃した単語の練習シートを印刷して練習: {{missed}}。生徒用デバイスは不要 — 終わったら提出してください。",

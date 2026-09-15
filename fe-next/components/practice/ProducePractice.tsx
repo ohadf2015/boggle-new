@@ -343,7 +343,7 @@ export function ProducePractice({
                   className="font-neo-display text-neo-cream tracking-widest"
                 >
                   {hint.kind === 'length'
-                    ? t('education.produce.hintLength', '{count} letters', { count: hint.length })
+                    ? t('education.produce.hintLength', { count: hint.length })
                     : hint.revealed}
                 </span>
               )}

@@ -158,6 +158,11 @@ Teacher Pro outage came from exactly that (`NEXT_PUBLIC_CHECKOUT_ENABLED` set at
 baked into the bundle), and "unset" is indistinguishable from "set but not baked" when read from a
 browser. Probe the runtime endpoint, not just the rendered HTML.
 
+
+### Classic Unplugged (Kahoot Classic:Unplugged foil)
+
+Shared teacher-screen miss-gap Live (`/education/classic-unplugged`). Class or 2–4 teams discuss; teacher reveals and submits consensus. No student devices, no answer timer. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). Foils the Sep 2026 Classic:Unplugged asymmetry left after #1047 Team Tiles. Prod: **lexiclash.live** (never lexiclash.com).
+
 ### Team Tiles Unplugged (Kahoot Team Tiles foil)
 
 Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Teams flip tiles → word; teacher marks. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). No student devices. Class-level words only — no roster OAuth. Prod: **lexiclash.live** (never lexiclash.com).

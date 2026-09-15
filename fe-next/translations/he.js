@@ -6121,6 +6121,7 @@ const he = {
     "rejected": "המילה נדחתה",
     "duplicateWord": "מילה כפולה",
     "lessonWordTitle": "מילת אוצר מלים מהשיעור!",
+    "lessonWordBonus": "מילת שיעור — בונוס +{bonus}!",
     "dictionaryTitle": "בנה את המילון שלנו",
     "submittedBy": "נשלח על ידי",
     "skipHint": "לחץ ESC לדילוג",
@@ -13402,7 +13403,13 @@ const he = {
         "antonym": "מילים במשמעות הפוכה",
         "context": "מנחשים את המילה מתוך המשפט",
         "multiple_meaning": "מילה אחת, שתי משמעויות",
-        "roots_affixes": "מה הפירוש של חלקי המילה"
+        "roots_affixes": "מה הפירוש של חלקי המילה",
+        "produce": {
+            "definition": "קראו את המשמעות וכתבו את המילה",
+            "synonym": "ראו מילה דומה וכתבו את המילה",
+            "antonym": "ראו את ההפך וכתבו את המילה",
+            "context": "השלימו את החסר מהזיכרון"
+          }
       },
       "locked": {
         "word_tower": "צריך 4 מילים לפחות מהרשימה, באורך 4–6 אותיות",
@@ -13413,6 +13420,36 @@ const he = {
         "spelling": "הוסיפו מילים לשיעור כדי לפתוח",
         "flashcard": "הוסיפו מילים לשיעור כדי לפתוח",
         "word_list": "הוסיפו מילים לשיעור כדי לפתוח"
+      }
+    },
+    "produce": {
+      "title": "בית המלאכה למילים",
+      "desc": "קראו את המשמעות וכתבו את המילה",
+      "newWord": "מילה חדשה — הציצו",
+      "gotIt": "הבנתי",
+      "hint": "רמז",
+      "hintLength": "{count} אותיות",
+      "inputLabel": "הקלידו את המילה",
+      "placeholder": "הקלידו את המילה…",
+      "check": "בדיקה",
+      "theWordWas": "המילה הייתה",
+      "finish": "סיום",
+      "cue": {
+        "definition": "איזו מילה זו?",
+        "context": "השלימו את החסר",
+        "synonym": "מילה אחרת ל…",
+        "antonym": "ההפך של…"
+      },
+      "verdict": {
+        "correct": "נכון!",
+        "near-miss": "כמעט — בדקו את האיות",
+        "wrong": "לא הפעם"
+      },
+      "notEnough": {
+        "definition": "הוסיפו הגדרות לשיעור כדי לפתוח",
+        "context": "הוסיפו משפטי דוגמה לשיעור כדי לפתוח",
+        "synonym": "הוסיפו מילים נרדפות לשיעור כדי לפתוח",
+        "antonym": "הוסיפו ניגודים לשיעור כדי לפתוח"
       }
     },
     "vocabFocus": {
@@ -13659,6 +13696,25 @@ const he = {
       "teamTilesPerfectHeadline": "ריצת Team Tiles מושלמת!",
       "teamTilesPerfectSub": "כל אריח miss-gap הופך ונוקה.",
       "teamTilesPlayAgain": "ערבב ושחק שוב",
+      "startClassicUnplugged": "התחל Classic Unplugged",
+      "classicUnpluggedProgress": "מילה {{current}} מתוך {{total}}",
+      "classicUnpluggedClassScore": "ניקוד הכיתה",
+      "classicUnpluggedChooseMode": "כיתה או קבוצות?",
+      "classicUnpluggedClassMode": "כיתה",
+      "classicUnpluggedTeamName": "קבוצה {{number}}",
+      "classicUnpluggedActiveTeam": "תור קבוצה {{number}}",
+      "classicUnpluggedDiscussHint": "דונו ואז חשפו",
+      "classicUnpluggedReveal": "חשוף מילה",
+      "classicUnpluggedSubmitGotIt": "שלח: הצליחו",
+      "classicUnpluggedSubmitNotYet": "שלח: עדיין לא",
+      "classicUnpluggedExit": "צא מ-Classic Unplugged",
+      "classicUnpluggedMascotAlt": "לקסי מנחה Classic Unplugged",
+      "classicUnpluggedMascotWinAlt": "לקסי חוגגת Classic Unplugged",
+      "classicUnpluggedWinHeadline": "Classic Unplugged הושלם!",
+      "classicUnpluggedWinSub": "{{cleared}} מתוך {{total}} מילים — המורה שלח/ה, בלי מכשירים.",
+      "classicUnpluggedPerfectHeadline": "Classic Unplugged מושלם!",
+      "classicUnpluggedPerfectSub": "כל מילת miss-gap נסגרה בכיתה.",
+      "classicUnpluggedPlayAgain": "שחקו שוב",
       "assignUnpluggedGoogleClassroom": "שיבוץ שיעור מנותק ב-Google Classroom",
       "assignUnpluggedGoogleClassroomTitle": "שיעורי בית מנותקים ממסכים — {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "שיעורי בית בלי מכשירים: פתחו את קישור Unplugged Live, הדפיסו את דף התרגול למילים החסרות ותרגלו: {{missed}}. בלי מכשירי תלמידים — הגישו כשתסיימו.",

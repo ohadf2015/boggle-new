@@ -19,6 +19,7 @@ const t = (key: string, params?: Record<string, string | number>) =>
 const links = {
   unpluggedReteachHref: '/en/education/unplugged-reteach?x=1',
   teamTilesUnpluggedHref: '/en/education/team-tiles-unplugged?x=1',
+  classicUnpluggedHref: '/en/education/classic-unplugged?x=1',
   chatGptHref: '/en/education/chatgpt-reteach?x=1',
   missGapAssignmentHref: null,
   missGapPracticeHref: null,

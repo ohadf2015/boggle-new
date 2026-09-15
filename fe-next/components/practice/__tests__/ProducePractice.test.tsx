@@ -22,14 +22,25 @@ import { ProducePractice } from '../ProducePractice';
  * every return point. A mock that just echoes the key silently swallows any
  * value passed through a translation — the hint count among them — and makes a
  * working component look broken (or, worse, a broken one look fine).
+ *
+ * When the component calls `t(key, { count })` with no string fallback (the
+ * production i18n shape), look up a minimal EN template so `{count}` still
+ * interpolates the way `translations/en.js` does.
  */
+const MOCK_STRINGS: Record<string, string> = {
+  'education.produce.hintLength': '{count} letters',
+};
+
 function translate(
   key: string,
   fallbackOrParams?: string | Record<string, string | number>,
   maybeParams?: Record<string, string | number>
 ): string {
   const params = typeof fallbackOrParams === 'object' ? fallbackOrParams : maybeParams;
-  const base = typeof fallbackOrParams === 'string' ? fallbackOrParams : key;
+  const base =
+    typeof fallbackOrParams === 'string'
+      ? fallbackOrParams
+      : (MOCK_STRINGS[key] ?? key);
   if (!params) return base;
   return base.replace(/\{(\w+)\}/g, (_, name: string) => String(params[name] ?? ''));
 }

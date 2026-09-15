@@ -18,6 +18,7 @@ import {
   ClipboardList,
   GraduationCap,
   LayoutGrid,
+  MonitorPlay,
   Play,
   Printer,
   QrCode,
@@ -83,6 +84,16 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
             >
               <Play className="w-4 h-4 shrink-0" aria-hidden />
               {t('education.results.startUnpluggedReteachLive')}
+            </Link>
+          )}
+          {links.classicUnpluggedHref && (
+            <Link
+              href={links.classicUnpluggedHref}
+              data-testid="start-classic-unplugged"
+              className={cn(ACTION, 'bg-neo-cyan')}
+            >
+              <MonitorPlay className="w-4 h-4 shrink-0" aria-hidden />
+              {t('education.results.startClassicUnplugged')}
             </Link>
           )}
           {links.teamTilesUnpluggedHref && (

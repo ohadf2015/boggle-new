@@ -333,6 +333,16 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       extends: ['#970', '#977', '#980', '#981'],
       notes: 'Class cleared/total after Unplugged Live finish; complements miss-gap homework passback.',
     },
+    classic_unplugged: {
+      for: 'classic-unplugged',
+      foil: 'Kahoot Classic:Unplugged',
+      deep_link: 'classic-unplugged',
+      student_devices: false,
+      grade_passback: 'unplugged-grade-passback (#1045)',
+      notes:
+        'Shared teacher-screen miss-gap Live; class or teams discuss; teacher submits consensus; reuses Unplugged finish + grade passback.',
+      extends: ['#959', '#1045', '#1047'],
+    },
     team_tiles_unplugged: {
       for: 'team-tiles-unplugged',
       foil: 'Kahoot Team Tiles',

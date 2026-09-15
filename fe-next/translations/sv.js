@@ -6363,6 +6363,7 @@ const sv = {
     "rejected": "Ord avvisat",
     "duplicateWord": "Dubblettord",
     "lessonWordTitle": "Lektionens ordförråd!",
+    "lessonWordBonus": "Lektionsord — bonus +{bonus}!",
     "dictionaryTitle": "Bygg vår ordbok",
     "submittedBy": "Skickad av",
     "skipHint": "Tryck ESC för att hoppa över",
@@ -13782,7 +13783,13 @@ const sv = {
         "antonym": "Ord som betyder motsatsen",
         "context": "Lista ut ordet med hjälp av meningen",
         "multiple_meaning": "Ett ord, två betydelser",
-        "roots_affixes": "Vad orddelarna betyder"
+        "roots_affixes": "Vad orddelarna betyder",
+        "produce": {
+            "definition": "Läs betydelsen och skriv ordet",
+            "synonym": "Se ett liknande ord och skriv ordet",
+            "antonym": "Se motsatsen och skriv ordet",
+            "context": "Fyll i luckan ur minnet"
+          }
       },
       "locked": {
         "word_tower": "Kräver minst 4 listord på 4–6 bokstäver",
@@ -13793,6 +13800,36 @@ const sv = {
         "spelling": "Lägg till ord i lektionen för att låsa upp",
         "flashcard": "Lägg till ord i lektionen för att låsa upp",
         "word_list": "Lägg till ord i lektionen för att låsa upp"
+      }
+    },
+    "produce": {
+      "title": "Ordsmedjan",
+      "desc": "Läs betydelsen och skriv ordet",
+      "newWord": "Nytt ord — titta först",
+      "gotIt": "Jag fattar",
+      "hint": "Ledtråd",
+      "hintLength": "{count} bokstäver",
+      "inputLabel": "Skriv ordet",
+      "placeholder": "Skriv ordet…",
+      "check": "Kontrollera",
+      "theWordWas": "Ordet var",
+      "finish": "Avsluta",
+      "cue": {
+        "definition": "Vilket ord är detta?",
+        "context": "Fyll i luckan",
+        "synonym": "Ett annat ord för…",
+        "antonym": "Motsatsen till…"
+      },
+      "verdict": {
+        "correct": "Rätt!",
+        "near-miss": "Nästan — kolla stavningen",
+        "wrong": "Inte den här gången"
+      },
+      "notEnough": {
+        "definition": "Lägg till definitioner i den här lektionen för att låsa upp",
+        "context": "Lägg till exempelmeningar i den här lektionen för att låsa upp",
+        "synonym": "Lägg till synonymer i den här lektionen för att låsa upp",
+        "antonym": "Lägg till antonymer i den här lektionen för att låsa upp"
       }
     },
     "vocabFocus": {
@@ -14039,6 +14076,25 @@ const sv = {
       "teamTilesPerfectHeadline": "Perfekt Team Tiles-runda!",
       "teamTilesPerfectSub": "Varje miss-gap-bricka vändes och klarades.",
       "teamTilesPlayAgain": "Blanda och spela igen",
+      "startClassicUnplugged": "Starta Classic Unplugged",
+      "classicUnpluggedProgress": "Ord {{current}} av {{total}}",
+      "classicUnpluggedClassScore": "Klasspoäng",
+      "classicUnpluggedChooseMode": "Klass eller lag?",
+      "classicUnpluggedClassMode": "Klass",
+      "classicUnpluggedTeamName": "Lag {{number}}",
+      "classicUnpluggedActiveTeam": "Lag {{number}}s tur",
+      "classicUnpluggedDiscussHint": "Diskutera, sedan avslöja",
+      "classicUnpluggedReveal": "Visa ord",
+      "classicUnpluggedSubmitGotIt": "Skicka: klarade det",
+      "classicUnpluggedSubmitNotYet": "Skicka: inte än",
+      "classicUnpluggedExit": "Lämna Classic Unplugged",
+      "classicUnpluggedMascotAlt": "Lexi leder Classic Unplugged",
+      "classicUnpluggedMascotWinAlt": "Lexi firar Classic Unplugged",
+      "classicUnpluggedWinHeadline": "Classic Unplugged klart!",
+      "classicUnpluggedWinSub": "{{cleared}} av {{total}} ord — läraren skickade, inga elevskärmar.",
+      "classicUnpluggedPerfectHeadline": "Perfekt Classic Unplugged!",
+      "classicUnpluggedPerfectSub": "Varje miss-gap-ord klarat tillsammans.",
+      "classicUnpluggedPlayAgain": "Spela igen",
       "assignUnpluggedGoogleClassroom": "Tilldela frånkopplad reteach i Google Classroom",
       "assignUnpluggedGoogleClassroomTitle": "Frånkopplad reteach-läxa — {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Enhetsfri läxa: öppna Unplugged Live-länken, skriv ut övningsbladet för missade ord och öva: {{missed}}. Inga elevapparater behövs — lämna in när du är klar.",

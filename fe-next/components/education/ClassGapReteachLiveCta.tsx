@@ -17,6 +17,7 @@ import {
 } from '@/lib/education/classGapShare';
 import { buildUnpluggedReteachPath } from '@/lib/education/unpluggedReteachLive';
 import { buildTeamTilesUnpluggedPath } from '@/lib/education/teamTilesUnplugged';
+import { buildClassicUnpluggedPath } from '@/lib/education/classicUnplugged';
 
 export interface ClassGapReteachLiveCtaProps {
   payload: ClassGapSharePayload;
@@ -27,6 +28,8 @@ export interface ClassGapReteachLiveCtaProps {
   unpluggedLabel: string;
   /** Kahoot Team Tiles foil — miss-gap tileboard on teacher screen. */
   teamTilesLabel: string;
+  /** Kahoot Classic:Unplugged foil — teacher submits class/team answers. */
+  classicUnpluggedLabel: string;
 }
 
 const primaryClass =
@@ -41,6 +44,7 @@ export function ClassGapReteachLiveCta({
   educationLabel,
   unpluggedLabel,
   teamTilesLabel,
+  classicUnpluggedLabel,
 }: ClassGapReteachLiveCtaProps) {
   const router = useRouter();
 
@@ -66,6 +70,7 @@ export function ClassGapReteachLiveCta({
 
   const unpluggedHref = buildUnpluggedReteachPath(payload);
   const teamTilesHref = buildTeamTilesUnpluggedPath(payload);
+  const classicUnpluggedHref = buildClassicUnpluggedPath(payload);
 
   return (
     <>
@@ -84,6 +89,13 @@ export function ClassGapReteachLiveCta({
         className={secondaryClass}
       >
         {unpluggedLabel}
+      </Link>
+      <Link
+        href={classicUnpluggedHref}
+        data-testid="start-classic-unplugged"
+        className={secondaryClass}
+      >
+        {classicUnpluggedLabel}
       </Link>
       <Link
         href={teamTilesHref}

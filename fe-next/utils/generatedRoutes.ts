@@ -86,6 +86,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/brain-breaks-word-games",
   "/education/chatgpt-reteach",
   "/education/class-gap",
+  "/education/classic-unplugged",
   "/education/classroom-addon",
   "/education/classroom-addon/attachment",
   "/education/classroom-game",
