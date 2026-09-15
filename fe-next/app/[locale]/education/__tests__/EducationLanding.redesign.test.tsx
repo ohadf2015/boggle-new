@@ -148,5 +148,12 @@ describe('Education Landing — redesign (WU-9)', () => {
       expect(teacherAccessLink).toBeInTheDocument();
       expect(teacherAccessLink).toHaveAttribute('href', expect.stringContaining('/education/access'));
     });
+
+    it('ships an above-fold Teacher Pro checkout CTA to teacher/upgrade with $9', () => {
+      render(<EducationPageClient />);
+      const pro = screen.getByTestId('teacher-pro-checkout-link');
+      expect(pro).toHaveAttribute('href', expect.stringContaining('teacher/upgrade'));
+      expect(pro.textContent).toMatch(/\$9/);
+    });
   });
 });

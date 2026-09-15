@@ -20,6 +20,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
+import { TeacherProCheckoutCta } from '@/components/education/TeacherProCheckoutCta';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 // Same modal every other surface opens; lazy because it is a modal nobody sees
@@ -99,7 +100,13 @@ export function PageClient() {
         exact reader it is for. Rendered unconditionally: it never changes, so it
         cannot flash.
       */}
-      <div className="mx-auto w-full max-w-6xl px-4 pb-2 sm:px-6 lg:px-8">
+      {/*
+        Money path must be in SSR HTML. EducationHero / ProFraming sit behind
+        AuthContext loading=true, so crawlers never saw /teacher/upgrade.
+        Both CTAs are auth-agnostic and render unconditionally (like NoAccountCta).
+      */}
+      <div className="mx-auto grid w-full max-w-6xl gap-4 px-4 pb-2 sm:grid-cols-2 sm:px-6 lg:px-8">
+        <TeacherProCheckoutCta locale={language} />
         <NoAccountCta locale={language} />
       </div>
 
@@ -165,6 +172,14 @@ export function PageClient() {
                     className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
                   >
                     {t('education.landing.createClassroom', 'Create classroom')}
+                  </Link>
+                  <Link
+                    href={`/${language}/teacher/upgrade`}
+                    data-testid="teacher-hub-pro-upgrade-link"
+                    onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_hub_pro' })}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-neo-pink text-neo-white font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-shadow border-3 border-black"
+                  >
+                    {t('education.landing.pro.chooseNow', 'Get Teacher Pro')}
                   </Link>
                   <Link
                     href={`/${language}/teacher`}
