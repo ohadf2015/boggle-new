@@ -8,6 +8,8 @@ export { default as SpellingChallengePractice } from './SpellingChallengePractic
 export { default as TimedBlitzPractice } from './TimedBlitzPractice';
 export { default as VocabFocusPractice } from './VocabFocusPractice';
 export type { VocabFocusPracticeProps, VocabFocusResults } from './VocabFocusPractice';
+export { ProducePractice } from './ProducePractice';
+export type { ProducePracticeProps, ProduceResults } from './ProducePractice';
 
 // New unified practice components
 export { QuickPracticeButton } from './QuickPracticeButton';

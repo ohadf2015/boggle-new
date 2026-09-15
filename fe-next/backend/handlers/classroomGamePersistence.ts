@@ -28,6 +28,11 @@ import { matchKey } from '../modules/classroomSummary.js';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger.js';
+import {
+  buildClassroomGameCompletedEvents,
+  captureEduServerEvents,
+  type ClassroomPlayerOutcome,
+} from '../utils/educationTelemetry';
 
 type PlayerScore = { userId: string; score: number; wordsFound?: string[]; username?: string };
 
@@ -408,6 +413,8 @@ export async function persistClassroomGameScores(
   }
 
   const rewards: ClassroomGameReward[] = [];
+  /** Per-player outcomes for `edu_classroom_game_completed` (emitted after the loop). */
+  const outcomes: ClassroomPlayerOutcome[] = [];
   let sessionsWritten = 0;
 
   // Anchor the session row to the first lesson to avoid inflating
@@ -442,6 +449,11 @@ export async function persistClassroomGameScores(
 
   for (const player of participants) {
     let xpEarned = 0;
+    // Telemetry-only mirrors of the per-player stats computed inside the try.
+    // Declared out here so a mid-loop throw still reports what was known.
+    let plScore = 0;
+    let plFound = 0;
+    let plAsked = 0;
     try {
       const playerScore = playerScores?.find(ps => ps.userId === player.userId);
       const score = playerScore?.score ?? 0;
@@ -458,6 +470,9 @@ export async function persistClassroomGameScores(
       const { found: lessonWordsFound, missed: lessonWordsMissed } = splitLessonWords(askedVocab, foundKeys);
       const attempted = askedVocab.words.size;
       const correct = lessonWordsFound.length;
+      plScore = score;
+      plFound = correct;
+      plAsked = attempted;
 
       const results: ClassroomSessionResults = {
         gameCode: game.gameCode,
@@ -563,7 +578,21 @@ export async function persistClassroomGameScores(
       );
     }
     rewards.push({ userId: player.userId, xpEarned, lessonIds });
+    outcomes.push({
+      userId: player.userId,
+      score: plScore,
+      xpEarned,
+      // ...Count, deliberately: the `results` blob above has its own
+      // `lessonWordsFound` / `lessonWordsAsked` and those are string[].
+      lessonWordsFoundCount: plFound,
+      lessonWordsAskedCount: plAsked,
+    });
   }
+
+  // The only place a real classroom practice completion is observable. The
+  // browser-side `edu_practice_complete` cannot see this path at all — it lives
+  // in PracticeSessionProvider, which this server never runs.
+  captureEduServerEvents(buildClassroomGameCompletedEvents(game, outcomes));
 
   // The teacher's whole report hangs off these rows, so their count is the one
   // fact worth stating out loud. A round that wrote nothing releases the lock

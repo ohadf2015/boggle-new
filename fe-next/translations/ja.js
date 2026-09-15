@@ -1313,6 +1313,7 @@ const ja = {
     "creating": "作成中...",
     "guest": "ゲスト",
     "unknown": "不明",
+    "loading": "確認中…",
     "back": "戻る",
     "backHome": "ホームへ",
     "backToHome": "ホームに戻る",
@@ -12573,6 +12574,31 @@ const ja = {
       "profileLabel": "先生プロフィール",
       "analyticsLabel": "クラス分析"
     },
+    "pulse": {
+      "state": {
+        "noRoster": "生徒がまだいません",
+        "neverPlayed": "まだプレイしていません",
+        "needsReview": "復習が必要",
+        "ready": "順調",
+        "unknown": "読み込めません"
+      },
+      "action": {
+        "invite": "参加コードを表示",
+        "play": "初めてのゲームを開始",
+        "review": "苦手な単語を練習",
+        "playAgain": "もう一度プレイ",
+        "retry": "再試行"
+      },
+      "enrolled": "人が登録済み",
+      "participation": "{{total}}人中{{played}}人がプレイ · {{absent}}人が不参加",
+      "lastPlayedToday": "今日プレイ · 平均{{accuracy}}%",
+      "lastPlayedDays": "{{days}}日前にプレイ · 平均{{accuracy}}%",
+      "lastPlayedOneDay": "昨日プレイ · 平均{{accuracy}}%",
+      "strugglingOne": "{{names}}が苦戦しています",
+      "struggling": "{{count}}人が苦戦: {{names}}",
+      "regionLabel": "{{classroom}}のクラス状況",
+      "switcherLabel": "どのクラス"
+    },
     "playNow": {
       "recommended": "おすすめ",
       "title": "いますぐプレイ",
@@ -14539,7 +14565,20 @@ const ja = {
         "title": "クラスに参加"
       },
       "classroomRoomGone": "クラスのゲームが終了しました。先生に新しいゲームを始めてもらってね。",
-      "lessonsAssigned": "割り当てられたレッスン"
+      "lessonsAssigned": "割り当てられたレッスン",
+      "feel": {
+        "points": "点",
+        "words": "単語",
+        "correct": "いいね！",
+        "lessonWord": "授業の単語！",
+        "tryAgain": "それじゃないよ — つづけよう",
+        "roundOver": "ラウンド終了！",
+        "rival": {
+          "toCatch": "追いつくまで",
+          "ahead": "リード",
+          "tied": "同点"
+        }
+      }
     },
     "template": {
       "allowLateJoin": "途中参加を許可",
@@ -14788,6 +14827,7 @@ const ja = {
       "days_left": "日残り",
       "day_left": "日残り",
       "hours_left": "時間残り",
+      "hour_left": "時間残り",
       "cta": "最初のクラスを作成",
       "expired_title": "教師トライアルが終了しました",
       "expired_body": "無料トライアル期間が終了しました。教室モードを続けるには、再申請またはお問い合わせください。",

@@ -307,6 +307,12 @@ describe('ClassroomGameHandler', () => {
       // THEN
       expect(mockIo.emit).toHaveBeenCalledWith('classroomGameStarted', {
         gameCode,
+        // The client had no way to learn which classroom it was playing in:
+        // this payload omitted classroomId AND had no listener at all. Both are
+        // wired now — `useActiveClassroomGame` receives it and scopes analytics
+        // to the class. Kept as an EXACT payload assertion on purpose; it is
+        // what forces anyone adding a field here to come and read the contract.
+        classroomId: '00000000-0000-4000-8000-000000000002',
         gameMode: 'classic',
         settings: game.settings,
         playerCount: 1,

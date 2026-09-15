@@ -39,6 +39,7 @@ import {
 
 // Extracted sub-components
 import { PortraitLayout } from './in-game/components';
+import { isClassroomStudentPlay as resolveClassroomStudentPlay } from '@/lib/education/classroomPlaySurface';
 import type { RoundEventState } from './in-game/components/RoundEventOverlay';
 import type { SpecialWordEvent } from './in-game/components/SpecialWordToast';
 
@@ -146,6 +147,30 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   } = useSoundEffects();
 
   const { announceWordResult, announceTimer } = useAnnouncer();
+
+  /**
+   * Am I a student inside a teacher's class session? Decides whether the live
+   * HUD shows whole-class absolute rank or local framing (see
+   * `lib/education/classroomPlaySurface.ts`).
+   *
+   * Read from `window.location.search` in an effect rather than through
+   * `useSearchParams()`: this component also renders on the daily-challenge and
+   * quick-play routes, and pulling the search-params hook in here would force
+   * every one of them out of static prerendering.
+   *
+   * The effect's one-frame delay is not a flash risk. The rank rail only mounts
+   * once `isPlaying` is true with two or more players on the board — a state
+   * that is reachable only after socket traffic, many frames after mount. The
+   * `false` first render also matches the server exactly, so there is nothing
+   * for hydration to disagree about.
+   */
+  const [isClassroomStudentPlay, setIsClassroomStudentPlay] = useState(false);
+  useEffect(() => {
+    setIsClassroomStudentPlay(
+      resolveClassroomStudentPlay(new URLSearchParams(window.location.search)),
+    );
+  }, []);
+
   // Enable sound effects when in-game
   useEffect(() => {
     setSoundGameActive(true);
@@ -668,6 +693,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
         gameCode={gameCode}
         isHost={isHost}
         gameplayFocusMode={gameplayFocusMode}
+        isClassroomStudentPlay={isClassroomStudentPlay}
         deferredLeaderboard={deferredLeaderboard}
         foundWords={normalizedFoundWords}
         tournamentData={tournamentData}

@@ -15,6 +15,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import {
   TEACHER_GAME_MODES,
   teacherGameMode,
@@ -26,6 +28,24 @@ import {
 } from '../gameModes';
 import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_MODE } from '@/shared/types/vocabQuiz';
 import { pickQuickLaunchMode } from '@/components/teacher/dashboard/quickLaunchIntent';
+
+/**
+ * `/_next/image` serves every `-nobg` poster under an immutable one-year
+ * cache header (see the `poster` field doc on `TeacherGameMode`), so a typo'd
+ * or not-yet-landed filename here doesn't 404 loudly — it just leaves the
+ * picker tile broken for a year on every warm browser. 2026-09-15: exactly
+ * this happened mid-flight (a poster path pointed at art before the file was
+ * copied into `public/`). This guard reads the real filesystem, not a mock,
+ * so it fails the moment catalog and disk drift apart again.
+ */
+describe('TEACHER_GAME_MODES posters — the file must actually exist on disk', () => {
+  it('resolves every poster path to a real file under public/', () => {
+    const missing = TEACHER_GAME_MODES.filter(
+      (mode) => !existsSync(join(process.cwd(), 'public', mode.poster))
+    );
+    expect(missing.map((m) => `${m.id} -> ${m.poster}`)).toEqual([]);
+  });
+});
 
 describe('TEACHER_GAME_MODES — one poster per playable classroom mode', () => {
   it('covers exactly the modes a teacher may pick, in wizard order', () => {

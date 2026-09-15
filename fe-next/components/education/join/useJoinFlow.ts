@@ -186,10 +186,28 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
         setCodeErrorKey('education.student.join.flow.codeTooShort');
         return;
       }
+      // Rule 1 above says nothing WAITS on the lookup. It does not say we throw
+      // away an answer already sitting in `target`. Without this the student
+      // cannot get a still frame in which to fix the code: "change code" puts
+      // them back on the step, the six known-bad characters are still there,
+      // and the next tap throws them at the nickname again with the red alert
+      // scrolling past on the way.
+      //
+      // `effective === code` is load-bearing, not caution. `target` describes
+      // `code`; on the sixth keystroke `codeArg` is a code `target` has never
+      // been about. Gating on that mismatch would block a brand-new code behind
+      // the PREVIOUS one's verdict — and gating on the pending lookup instead
+      // would put the network wait back on the keystroke, which is the failure
+      // rule 1 exists to prevent. An unknown, in-flight or `unverified` verdict
+      // therefore still advances, exactly as before.
+      if (effective === code && target?.verdict === 'invalid') {
+        setCodeErrorKey('education.student.join.invalidCode');
+        return;
+      }
       setCodeErrorKey(null);
       setStep('name');
     },
-    [code]
+    [code, target]
   );
 
   const backToCode = useCallback(() => {
@@ -215,7 +233,7 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
       if (trimmedCode.length !== JOIN_CODE_LENGTH) {
         setCodeErrorKey('education.student.join.flow.codeTooShort');
         setStep('code');
-        trackEduClassroomJoin({ result: 'invalid_code' });
+        trackEduClassroomJoin({ result: 'invalid_code', attemptedCode: trimmedCode });
         return;
       }
       if (showNameField && !trimmedName) {
@@ -245,7 +263,14 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
           );
 
           if (result.success) {
-            trackEduClassroomJoin({ result: 'success', classroomId: result.classroomId });
+            trackEduClassroomJoin({
+              result: 'success',
+              classroomId: result.classroomId,
+              attemptedCode: trimmedCode,
+              // The ONLY signal that separates the two six-character systems —
+              // they are shape-identical, so the resolution is the discriminator.
+              matchedCodeType: result.gameCode ? 'game_code' : 'roster_code',
+            });
             toast.success(t('education.student.join.success'));
             // A student who typed the LIVE GAME code came to PLAY, not to be
             // enrolled. Walk them straight in; the enrolment already happened.
@@ -259,6 +284,7 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
 
           trackEduClassroomJoin({
             result: result.code === 'INVALID_CODE' ? 'not_found' : 'error',
+            attemptedCode: trimmedCode,
           });
 
           if (result.code === 'NAME_TAKEN') {
@@ -279,7 +305,7 @@ export function useJoinFlow(initialCode = ''): JoinFlowState {
             setFormErrorKey('common.error');
           }
         } catch {
-          trackEduClassroomJoin({ result: 'error' });
+          trackEduClassroomJoin({ result: 'error', attemptedCode: trimmedCode });
           setFormErrorKey('common.error');
         } finally {
           setIsSubmitting(false);

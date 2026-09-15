@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils';
 import { GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
 
 function TeacherProfileInner() {
-  const { user, profile, loading, isAuthenticated } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const { classrooms, isLoading: classroomsLoading } = useClassrooms();
@@ -34,10 +34,26 @@ function TeacherProfileInner() {
 
   useEffect(() => {
     if (loading) return;
-    if (!isAuthenticated || !isTeacher) {
+    // On `user`, never on `isAuthenticated` — that flag is `!!user && !!profile`
+    // and the profile row is a second round-trip that lands AFTER `loading` goes
+    // false. This is the student sub-page bug (see
+    // app/[locale]/student/__tests__/subpageGuard.test.tsx) on the one teacher
+    // surface that never got the fix.
+    //
+    // TeacherGate does not cover the gap, it opens it: its `isLoading` includes
+    // `profileLoading = !!user && !profile`, and TeacherGate.tsx:122 keeps the
+    // children MOUNTED for an already-granted teacher so the dashboard does not
+    // lose its state on every token refresh. Deciding a role here during that
+    // window threw a working teacher to the marketing home mid-lesson.
+    if (!user) {
       router.push(`/${language}`);
+      return;
     }
-  }, [loading, isAuthenticated, isTeacher, router, language]);
+    // Nothing else is decided here on purpose. While `profile` is in flight the
+    // role is simply unknown, and the role decision itself belongs to
+    // TeacherGate — it owns it with the wider `isLoading`, and it sends a
+    // genuine non-teacher to /education/access rather than to the homepage.
+  }, [loading, user, router, language]);
 
   // The loading branch is inside the shell too (the shell is now above the
   // gate): a page that scrolls for the second before the profile lands, then

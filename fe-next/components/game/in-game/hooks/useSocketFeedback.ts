@@ -51,6 +51,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       goldenBonus?: number;
       rushBonus?: number;
       fromLesson?: boolean;
+      /** Flat points added because this was one of the teacher's lesson words. */
+      lessonBonus?: number;
     }): void => {
       // Track when the last word was found for inactivity-based trail visibility
       setLastWordFoundTime(Date.now());
@@ -68,6 +70,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         goldenBonus: data.goldenBonus,
         rushBonus: data.rushBonus,
         fromLesson: data.fromLesson,
+        lessonBonus: data.lessonBonus,
         longWordLabel,
         timestamp: Date.now(),
       });

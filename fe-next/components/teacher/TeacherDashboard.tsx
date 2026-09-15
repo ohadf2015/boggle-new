@@ -39,8 +39,9 @@ import { cn } from '@/lib/utils';
 import ClassroomManager from './ClassroomManager';
 import LessonBuilder from './LessonBuilder';
 import PlayTabFirstRunCard from './PlayTabFirstRunCard';
-import StudentsPresentStrip from './StudentsPresentStrip';
 import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
+import { ClassPulseSection } from './dashboard/ClassPulseSection';
+import { ClassSwitcher } from './dashboard/ClassSwitcher';
 import {
   QUICK_LAUNCH_FLOW,
   writeQuickLaunchIntent,
@@ -138,6 +139,21 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
       setSelectedClassroomId(classrooms[0].id);
     }
   }, [classrooms, selectedClassroomId]);
+
+  // The class the pulse card and the tools drawer both describe. Derived, not
+  // a second piece of state: two sources for "which class am I looking at" is
+  // exactly how the drawer and the card come to disagree (pitfall class 1).
+  const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
+
+  // The pulse's "play" action puts the teacher on the launch control that is
+  // already on this page rather than opening a second route to the same room.
+  // A duplicate launch path is a second thing to keep armed and correct.
+  const focusLauncher = useCallback(() => {
+    const go = document.querySelector<HTMLButtonElement>('[data-testid="play-now-go"]');
+    if (!go) return;
+    go.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    go.focus();
+  }, []);
 
   // Land back here with the missed words in hand, straight into the lesson
   // creator — there is no tab to route to any more.
@@ -299,11 +315,35 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
               </Link>
             </nav>
 
-            {/* Who is already waiting. One line, and the reason to press host. */}
-            {!classroomsLoading && classrooms.length > 0 && (
-              <div className="mb-6">
-                <StudentsPresentStrip classrooms={classrooms} />
-              </div>
+            {/* The state of the class, and the one thing to do about it.
+                This slot used to hold `StudentsPresentStrip`, which rendered
+                `member_count` under the copy "{count} students are in
+                {classroom} right now" — the ENROLMENT count sold as presence.
+                A teacher with 28 on the roster and an empty room was told 28
+                students were waiting, in the loudest slab on the page. */}
+            {/* Which class the deck is pointed at. Out here, not inside the
+                collapsed tools drawer where changing it used to cost two taps
+                and a hunt. Each chip carries its own roster, so the row says
+                which class is empty before it is selected. */}
+            {!classroomsLoading && classrooms.length > 1 && (
+              <ClassSwitcher
+                className="mb-3"
+                classrooms={classrooms}
+                selectedId={selectedClassroomId}
+                onSelect={setSelectedClassroomId}
+              />
+            )}
+
+            {!classroomsLoading && selectedClassroom && (
+              <ClassPulseSection
+                className="mb-6"
+                classroomId={selectedClassroom.id}
+                classroomName={selectedClassroom.name}
+                rosterCount={selectedClassroom.member_count || 0}
+                onInvite={() => router.push(`/${language}/teacher/classroom`)}
+                onPlay={focusLauncher}
+                onReviewWords={openReviewLesson}
+              />
             )}
             </m.aside>
 

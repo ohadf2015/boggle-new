@@ -20,6 +20,7 @@ import { X, Shuffle, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { cn } from '@/lib/utils';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import {
   classifyLessonWords,
   generatePreviewBoard,
@@ -316,7 +317,7 @@ export function StudentViewPreview({
             disabled={stepIndex === 0}
             className="inline-flex items-center gap-1 rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light px-4 py-2 font-bold text-neo-white shadow-hard-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           >
-            <ChevronLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+            <DirectionalIcon icon={ChevronLeft} className="h-4 w-4" />
             {t('education.studentPreview.back')}
           </button>
           <button
@@ -325,7 +326,7 @@ export function StudentViewPreview({
             className="inline-flex items-center gap-1 rounded-neo border-3 border-neo-black bg-neo-cyan px-5 py-2 font-black text-neo-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
           >
             {isLast ? t('education.studentPreview.done') : t('education.studentPreview.next')}
-            {!isLast && <ChevronRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />}
+            {!isLast && <DirectionalIcon icon={ChevronRight} className="h-4 w-4" />}
           </button>
         </div>
       </div>

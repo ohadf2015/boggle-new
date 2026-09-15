@@ -71,7 +71,7 @@ const MODE_SHAPE: Record<string, ModeShape> = {
   classic: { poster: '/mascot/teacher/mode-classic-nobg.webp', accent: 'cyan', minutes: 3, needsDefinitions: false },
   'word-hunt': { poster: '/mascot/teacher/mode-word-hunt-nobg.webp', accent: 'lime', minutes: 4, needsDefinitions: false },
   blast: { poster: '/mascot/teacher/mode-blast-nobg.webp', accent: 'pink', minutes: 3, needsDefinitions: false },
-  'wheel-rush': { poster: '/mascot/teacher/mode-wheel-rush-nobg.webp', accent: 'purple', minutes: 4, needsDefinitions: false },
+  'wheel-rush': { poster: '/mascot/teacher/mode-wheel-rush-v2-nobg.webp', accent: 'purple', minutes: 4, needsDefinitions: false },
   [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/mode-vocab-quiz-nobg.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
 };
 

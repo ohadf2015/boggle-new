@@ -84,3 +84,51 @@ export function modeSceneOwnsHeroSlot({
 }: Pick<HostResultsRouteInput, 'hasClassroomSummary'>): boolean {
   return !hasClassroomSummary;
 }
+
+/** What the results surface knows about the round that just ended. */
+export interface PlayedGameModeInput {
+  /** The store's `gameMode` — the round's mode OR the next round's intent. */
+  gameMode?: string | null;
+  /** True only while that value came from the server's `startGame` payload. */
+  gameModeConfirmed: boolean;
+}
+
+/**
+ * The mode the round that just ENDED was played in, or `undefined` when we no
+ * longer know — never a guess.
+ *
+ * `gameMode` alone cannot answer this. It carries two different things at two
+ * different times: the mode the server confirmed for the round in progress,
+ * and an optimistic selection for the round to come. `setGameMode` writes the
+ * second and clears `gameModeConfirmed`; only `confirmGameMode` /
+ * `batchStartGame` — both fed by the server's `startGame` — set it again.
+ *
+ * The teacher's mode picker writes through the optimistic path, and it does it
+ * to the whole room: `useClassroomModeSwitch` answers the server's
+ * `classroomGameModeChanged` broadcast with `setGameMode(mode)`. A teacher
+ * lining up the next round from the podium therefore rewrote `gameMode` on
+ * every student's phone while those phones were still showing the previous
+ * round's results — and a Classic round's stat card came out headed "Blast
+ * Results".
+ *
+ * `HostInGameView` has refused to render a mode-specific view without this
+ * flag since the "prevents classic flash" fix; so has the game-end telemetry.
+ * The results surface was the sibling that read the flag's value instead of
+ * the flag (recurring pitfall class 3), so the rule lives here as one
+ * predicate both results layouts call.
+ *
+ * WHY WITHHOLDING IS THE RIGHT ANSWER, not a lesser one. Once the mode has
+ * been overwritten the played mode is genuinely gone from the store, so the
+ * honest options are "no mode-specific card" and "the wrong mode's card". Only
+ * the mode-specific extra is affected: the podium, the scores, the lesson
+ * recap and the word list are all mode-independent and still render. Rendering
+ * the pessimistic state while a value is unresolved is the same discipline
+ * pitfall class 1 asks for everywhere else.
+ */
+export function playedGameMode({
+  gameMode,
+  gameModeConfirmed,
+}: PlayedGameModeInput): string | undefined {
+  if (!gameModeConfirmed) return undefined;
+  return gameMode ?? undefined;
+}

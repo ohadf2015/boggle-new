@@ -6,6 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { buildFocusQuestions, VOCAB_FOCUSES } from '../vocabFocus';
+import { PRODUCE_FOCUSES } from '../produceQuestions';
 import {
   buildPracticeTiles,
   readyTiles,
@@ -55,11 +56,14 @@ const richLesson: VocabularyWord[] = [
 ];
 
 describe('buildPracticeTiles', () => {
-  it('offers one tile per base practice mode plus Word Tower plus one per vocabulary skill', () => {
+  it('offers one tile per base practice mode plus Word Tower plus one per vocabulary skill plus one per produce cue', () => {
     const tiles = buildPracticeTiles(richLesson, { language: 'en' });
     // The +1 is Word Tower: a variant of solo_board rather than a base mode of
-    // its own, so it is not in BASE_PRACTICE_MODES.
-    expect(tiles).toHaveLength(BASE_PRACTICE_MODES.length + 1 + VOCAB_FOCUSES.length);
+    // its own, so it is not in BASE_PRACTICE_MODES. PRODUCE_FOCUSES are the
+    // Word Forge tiles — variants of vocab_focus, likewise not base modes.
+    expect(tiles).toHaveLength(
+      BASE_PRACTICE_MODES.length + 1 + VOCAB_FOCUSES.length + PRODUCE_FOCUSES.length
+    );
     expect(new Set(tiles.map((t) => t.id)).size).toBe(tiles.length);
   });
 
