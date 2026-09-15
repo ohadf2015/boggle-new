@@ -22,7 +22,7 @@ import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
 import { teacherMenuEntry } from '@/lib/education/teacherRole';
-import Avatar from '../Avatar';
+import AvatarLite from '@/components/AvatarLite';
 import { getStoredCustomAvatar, getStoredUsername, setStoredUsername } from '../../utils/profileStorage';
 import { setGuestName } from '../../utils/guestManager';
 import { updateGuestDailyPlayer } from '../../utils/dailyChallenge/guestPlayer';
@@ -477,7 +477,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         <div className="flex flex-col gap-3">
                                             <div className="flex items-center gap-3">
                                                 <div className="rounded-full border-3 border-neo-white/20 shadow-hard-sm p-0.5 bg-neo-navy">
-                                                    <Avatar
+                                                    <AvatarLite
                                                         customAvatar={avatarConfig}
                                                         userId="guest"
                                                         size="lg"
