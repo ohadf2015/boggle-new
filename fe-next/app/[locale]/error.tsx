@@ -5,39 +5,15 @@ import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
-import { clearCachesAndReload } from '@/lib/deploy/staleDeployReload';
+import {
+  clearCachesAndReload,
+  isChunkLoadError as isChunkLoadErrorNameMessage,
+  claimChunkRecoveryGuard,
+  clearChunkRecoveryGuard,
+} from '@/lib/deploy/staleDeployReload';
 
 function isChunkLoadError(error: Error): boolean {
-  const message = error.message?.toLowerCase() || '';
-  const name = error.name?.toLowerCase() || '';
-
-  // Check for explicit chunk load error name
-  if (name === 'chunkloaderror') return true;
-
-  // Check for "module is not defined" - CommonJS/ESM bundling issue
-  // This happens when Turbopack fails to transpile a CommonJS module for browser
-  // Fixes JAVASCRIPT-NEXTJS-9S: ReferenceError: module is not defined
-  if (name === 'referenceerror' && message.includes('module is not defined')) {
-    return true;
-  }
-
-  // Check for specific chunk-related error messages
-  // Note: 'failed to fetch' alone is too broad - only match if it's clearly a chunk/module error
-  return (
-    message.includes('loading chunk') ||
-    message.includes('failed to load chunk') ||
-    message.includes('loading css chunk') ||
-    message.includes('dynamically imported module') ||
-    message.includes('_next/static/chunks') ||
-    message.includes('module 964893') || // Specific error from report
-    // Only match 'failed to fetch' if it's in context of module/chunk loading
-    (message.includes('failed to fetch') && (
-      message.includes('module') ||
-      message.includes('chunk') ||
-      message.includes('_next/') ||
-      message.includes('dynamically imported')
-    ))
-  );
+  return isChunkLoadErrorNameMessage(error.name, error.message);
 }
 
 
@@ -87,15 +63,12 @@ export default function Error({
 
     // Auto-refresh on chunk load errors (stale deployment cache)
     if (chunkError) {
-      const hasRefreshed = sessionStorage.getItem('chunk_error_refresh');
-      if (!hasRefreshed) {
-        sessionStorage.setItem('chunk_error_refresh', 'true');
-        // Clear caches and reload to get fresh chunks
-        clearCachesAndReload();
+      if (claimChunkRecoveryGuard()) {
+        void clearCachesAndReload();
         return;
       }
       // Already tried refreshing once - clear the flag for next time
-      sessionStorage.removeItem('chunk_error_refresh');
+      clearChunkRecoveryGuard();
     }
   }, [error, locale]);
 

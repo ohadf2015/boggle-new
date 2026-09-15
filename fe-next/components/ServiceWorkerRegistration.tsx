@@ -66,18 +66,40 @@ async function registerServiceWorker() {
 
     if (process.env.NODE_ENV === 'development') console.log('[PWA] Service worker registered:', registration.scope);
 
-    // Handle updates
+    // Handle updates — activate waiting workers immediately so build-stamped
+    // cache names purge on activate (t_9cc3561f: stale SW after #979).
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing;
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // New service worker available - could notify user to refresh
-            if (process.env.NODE_ENV === 'development') console.log('[PWA] New version available');
+            if (process.env.NODE_ENV === 'development') console.log('[PWA] New version available — activating');
+            try {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            } catch {
+              /* worker may already be gone */
+            }
           }
         });
       }
     });
+
+    // If a worker is already waiting (tab open across a deploy), activate it now.
+    if (registration.waiting && navigator.serviceWorker.controller) {
+      try {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } catch {
+        /* ignore */
+      }
+    }
+
+    // Periodic update check — long-lived tabs otherwise keep a stale controller
+    // that cache-first-serves /_next/static until the next navigation.
+    const updateInterval = window.setInterval(() => {
+      registration.update().catch(() => undefined);
+    }, 5 * 60 * 1000);
+    // Cleared when the page unloads; registration lives for the document lifetime.
+    window.addEventListener('beforeunload', () => window.clearInterval(updateInterval), { once: true });
   } catch (error) {
     // SW registration can fail for many legitimate reasons (HTTP context, incognito,
     // iframe restrictions, browser settings). Use warn to avoid Sentry noise.

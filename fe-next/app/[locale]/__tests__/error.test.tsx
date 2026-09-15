@@ -67,14 +67,27 @@ describe('app/[locale]/error.tsx — resilient fallback (black-screen fix)', () 
     expect(screen.getAllByRole('button').length).toBeGreaterThanOrEqual(2);
   });
 
-  it('hard-reloads exactly once on a ChunkLoadError (stale-deploy self-heal)', () => {
+  it('cache-bust hard-navigates exactly once on a ChunkLoadError (stale-deploy self-heal)', async () => {
     const reload = vi.fn();
+    const replace = vi.fn();
     Object.defineProperty(window, 'location', {
       configurable: true,
-      value: { ...window.location, reload, href: '/he/daily' },
+      value: { href: 'https://lexiclash.live/he/daily', reload, replace },
+    });
+    // caches / serviceWorker may be touched by clearCachesAndReload — stub lightly
+    Object.defineProperty(window, 'caches', {
+      configurable: true,
+      value: { keys: async () => [], delete: async () => true },
+    });
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: { getRegistrations: async () => [] },
     });
     render(<Error error={makeError('ChunkLoadError', 'Loading chunk 42 failed')} reset={vi.fn()} />);
-    expect(reload).toHaveBeenCalledTimes(1);
+    // clearCachesAndReload is async (activate SW → caches → navigate)
+    await vi.waitFor(() => expect(replace).toHaveBeenCalledTimes(1));
+    expect(String(replace.mock.calls[0][0])).toContain('_lc_chunk=');
+    expect(reload).not.toHaveBeenCalled();
   });
 
   it('does NOT statically import the heavy InteractiveMascot component into the error fallback', () => {
@@ -95,5 +108,13 @@ describe('app/global-error.tsx — last-resort boundary depends on no lazy chunk
     expect(src).not.toMatch(/lucide-react/);
     expect(src).not.toMatch(/framer-motion/);
     expect(src).not.toMatch(/InteractiveMascot/);
+  });
+
+  it('uses cache-bust clearCachesAndReload — not bare location.reload (t_9cc3561f)', () => {
+    const src = readFileSync(join(__dirname, '..', '..', 'global-error.tsx'), 'utf8');
+    expect(src).toMatch(/clearCachesAndReload/);
+    // Reject real call sites; comments mentioning reload are fine.
+    expect(src).not.toMatch(/window\.location\.reload\s*\(/);
+    expect(src.split('\n').filter((l) => /location\.reload\s*\(/.test(l) && !l.trim().startsWith('//') && !l.includes('*')).length).toBe(0);
   });
 });
