@@ -117,7 +117,7 @@ export function ClassroomAddonPlanner({
             type="button"
             data-testid={`classroom-addon-planner-example-${example.slice(0, 12).replace(/\s+/g, '-')}`}
             onClick={() => setPrompt(example)}
-            className="px-2.5 py-1 text-xs font-bold rounded-neo border-neo border-neo-cream/30 bg-neo-navy text-neo-cream/90 hover:border-neo-lime hover:text-neo-lime transition-colors"
+            className="px-2.5 py-1 text-xs font-bold rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-cream/90 hover:border-neo-lime hover:text-neo-lime transition-colors"
           >
             {example}
           </button>
@@ -164,14 +164,14 @@ export function ClassroomAddonPlanner({
           >
             <span className="font-bold">{t(modeLabelKey(plan.mode))}</span>
             {plan.timer_seconds ? (
-              <span className="ml-2 opacity-80">
+              <span className="ms-2 opacity-80">
                 {t('education.classroomAddon.planner.timerNote', {
                   seconds: plan.timer_seconds,
                 })}
               </span>
             ) : null}
             {plan.cefr_level ? (
-              <span className="ml-2 opacity-80">
+              <span className="ms-2 opacity-80">
                 {t('education.classroomAddon.planner.cefrNote', {
                   level: plan.cefr_level,
                 })}
