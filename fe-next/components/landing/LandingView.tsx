@@ -158,7 +158,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   // signup CTA from flashing on first paint while the CG SDK confirms env.
   const hideExternalAuth = cgLoading || isOnCrazyGamesPlatform;
   const [showShareModal, setShowShareModal] = useState(false);
-  const [, setIsAvatarBuilderOpen] = useState(false);
 
   // Mark returning players (cleared localStorage) as onboarded
   useEffect(() => {
@@ -317,7 +316,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
                 <LandingYourRank />
               </div>
               <div className="lg:flex-1">
-                <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+                <LandingAvatarTeaser />
               </div>
             </div>
           </div>
