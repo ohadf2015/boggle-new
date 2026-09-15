@@ -55,6 +55,16 @@ const flushTimer = async (ms = 1600): Promise<void> => {
   });
 };
 
+// t_da22db9a: the prompt no longer fires at app boot — it requires a fresh
+// `guestStatsChanged` (a game just completed this SPA session). Helper models
+// production: saveGuestStats writes stats, then dispatches the window event.
+const qualifyWithFreshGame = async (stats: unknown): Promise<void> => {
+  mockStats.mockReturnValue(stats);
+  await act(async () => {
+    window.dispatchEvent(new Event('guestStatsChanged'));
+  });
+};
+
 beforeEach(() => {
   vi.useFakeTimers();
   mockFlag.mockReturnValue('after-first-win');
@@ -93,21 +103,35 @@ describe('useSignupPrompt — after-first-win variant', () => {
   });
 
   it('shows after first win (wins=1, games=1)', async () => {
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
   });
 
   it('fallback: shows after 5 games even with 0 wins', async () => {
-    mockStats.mockReturnValue({ games: 5, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await qualifyWithFreshGame({ games: 5, wins: 0 });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+  });
+
+  it('does NOT fire at app boot even when stored stats qualify (returning guest)', async () => {
+    // t_da22db9a: PostHog 14d showed the sheet popping 1.5s after boot on
+    // /en/daily and /en/education/* for guests with qualifying history —
+    // mistimed, and often under a z-90 results dialog. The prompt now only
+    // fires after a game completes IN this session.
+    mockStats.mockReturnValue({ games: 10, wins: 5 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
     await flushTimer();
-    expect(result.current.showSignupModal).toBe(true);
+    expect(result.current.showSignupModal).toBe(false);
+    expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
   });
 
   it('does not show when authenticated', async () => {
@@ -144,10 +168,10 @@ describe('useSignupPrompt — after-third-game variant', () => {
   });
 
   it('shows after 3 games regardless of wins', async () => {
-    mockStats.mockReturnValue({ games: 3, wins: 0 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 3, wins: 0 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
   });
@@ -171,7 +195,11 @@ describe('useSignupPrompt — guestStatsChanged re-evaluation', () => {
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
     expect(result.current.isFirstWin).toBe(true);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+    // t_da22db9a: the shown event now carries the surface prop so the UR
+    // funnel can split sheet vs dialog arms.
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true, {
+      surface: 'soft-sheet',
+    });
   });
 
   it('ignores stats-change event when authenticated', async () => {
@@ -193,10 +221,10 @@ describe('useSignupPrompt — guestStatsChanged re-evaluation', () => {
 describe('useSignupPrompt — isFirstWin exposure', () => {
   it('exposes isFirstWin=true when shown via actual win', async () => {
     mockFlag.mockReturnValue('after-first-win');
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
     expect(result.current.isFirstWin).toBe(true);
@@ -204,10 +232,10 @@ describe('useSignupPrompt — isFirstWin exposure', () => {
 
   it('exposes isFirstWin=false when shown via 5-game fallback', async () => {
     mockFlag.mockReturnValue('after-first-win');
-    mockStats.mockReturnValue({ games: 5, wins: 0 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 5, wins: 0 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
     expect(result.current.isFirstWin).toBe(false);
@@ -215,10 +243,10 @@ describe('useSignupPrompt — isFirstWin exposure', () => {
 
   it('exposes isFirstWin=false for after-third-game variant', async () => {
     mockFlag.mockReturnValue('after-third-game');
-    mockStats.mockReturnValue({ games: 3, wins: 2 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 3, wins: 2 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
     expect(result.current.isFirstWin).toBe(false);
@@ -236,35 +264,41 @@ describe('useSignupPrompt — isFirstWin exposure', () => {
 describe('useSignupPrompt — impression telemetry', () => {
   it('emits first_win_signup_shown when first-win qualifies via actual win', async () => {
     mockFlag.mockReturnValue('after-first-win');
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true, {
+      surface: 'soft-sheet',
+    });
   });
 
   it('emits signup_prompt_shown when first-win qualifies via 5-game fallback', async () => {
     mockFlag.mockReturnValue('after-first-win');
-    mockStats.mockReturnValue({ games: 5, wins: 0 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 5, wins: 0 });
     await flushTimer();
     expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false, {
+      surface: 'soft-sheet',
+    });
   });
 
   it('emits signup_prompt_shown for after-third-game variant', async () => {
     mockFlag.mockReturnValue('after-third-game');
-    mockStats.mockReturnValue({ games: 3, wins: 0 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 3, wins: 0 });
     await flushTimer();
     expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false, {
+      surface: 'soft-sheet',
+    });
   });
 
   it('does NOT emit when user does not qualify', async () => {
@@ -288,10 +322,10 @@ describe('useSignupPrompt — impression telemetry', () => {
 
   it('does NOT emit twice across re-renders (sessionStorage guard)', async () => {
     mockFlag.mockReturnValue('after-first-win');
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { rerender } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     rerender();
     await flushTimer();
@@ -302,10 +336,13 @@ describe('useSignupPrompt — impression telemetry', () => {
 describe('useSignupPrompt — active-game deferral', () => {
   it('does NOT interrupt live gameplay: defers show + telemetry while a game is active', async () => {
     mockIsGameActive.mockReturnValue(true);
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    // Fresh game completes mid-session while another game is live: timer is
+    // scheduled, fires, and must defer WITHOUT latching (t_da22db9a boot gate
+    // means the event, not the mount, starts evaluation).
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(false);
     expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
@@ -331,47 +368,52 @@ describe('useSignupPrompt — active-game deferral', () => {
     });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true, {
+      surface: 'soft-sheet',
+    });
   });
 });
 
 describe('useSignupPrompt — cookie consent gating', () => {
   it('does NOT show while cookie consent is undecided, even if qualified', async () => {
     mockConsentDecided.mockReturnValue(false);
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(false);
     expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
   });
 
-  it('shows once consent is decided (gate flips on re-render)', async () => {
+  it('shows once consent is decided and a fresh game has completed', async () => {
     mockConsentDecided.mockReturnValue(false);
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
-    const { result, rerender } = renderHook(() =>
+    const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(false);
 
-    // User clicks Accept/Decline → useConsentDecided flips → effect re-runs → timer starts.
+    // User clicks Accept/Decline → useConsentDecided flips → effect re-runs;
+    // the next completed game (guestStatsChanged) starts the timer.
     mockConsentDecided.mockReturnValue(true);
-    rerender();
+    await qualifyWithFreshGame({ games: 2, wins: 1 });
     await flushTimer();
     expect(result.current.showSignupModal).toBe(true);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true, {
+      surface: 'soft-sheet',
+    });
   });
 });
 
 describe('useSignupPrompt — friction timing + latch', () => {
   it('uses peak 1.5s delay on soft-sheet (default)', async () => {
     mockFrictionVariant.mockReturnValue('soft-sheet');
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await act(async () => { vi.advanceTimersByTime(1400); });
     expect(result.current.showSignupModal).toBe(false);
     await act(async () => { vi.advanceTimersByTime(200); });
@@ -381,10 +423,10 @@ describe('useSignupPrompt — friction timing + latch', () => {
 
   it('keeps legacy 3.5s delay on control', async () => {
     mockFrictionVariant.mockReturnValue('control');
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     const { result } = renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await act(async () => { vi.advanceTimersByTime(3400); });
     expect(result.current.showSignupModal).toBe(false);
     await act(async () => { vi.advanceTimersByTime(200); });
@@ -392,15 +434,19 @@ describe('useSignupPrompt — friction timing + latch', () => {
   });
 
   it('re-checks sessionStorage inside the timer (no double fire across mounts)', async () => {
-    mockStats.mockReturnValue({ games: 1, wins: 1 });
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
     renderHook(() =>
       useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
     );
+    // One fresh game completes; both parallel mounts schedule a timer, the
+    // in-timer sessionStorage re-check must let exactly one fire.
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
     await flushTimer();
     expect(mockTrackSignupFunnel).toHaveBeenCalledTimes(1);
-    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true, {
+      surface: 'soft-sheet',
+    });
   });
 });

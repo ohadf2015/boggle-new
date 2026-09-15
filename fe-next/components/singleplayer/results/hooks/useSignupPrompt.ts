@@ -11,6 +11,14 @@
  * (1.5s); control keeps the legacy 3.5s delay. Timer re-checks the
  * once-per-session latch so parallel mounts (Host + leftover results
  * callers) cannot double-fire prompt_shown.
+ *
+ * t_da22db9a: the peak-timing claim only holds for in-session games. A
+ * returning guest's localStorage stats qualify on app BOOT, and the delay
+ * then popped the sheet on whatever page they landed on (observed in
+ * PostHog 14d: /en/daily, /en/education/* — mistimed, often under a z-90
+ * results dialog). The prompt now requires a fresh `guestStatsChanged`
+ * (a game just completed this SPA session) so it fires only at a real
+ * post-game pause.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -98,6 +106,14 @@ export function useSignupPrompt({
     const alreadyShown = sessionStorage.getItem(SIGNUP_PROMPT_SHOWN_KEY);
     if (alreadyShown) return;
 
+    // t_da22db9a: never fire at app boot. `statsVersion` only bumps on a
+    // `guestStatsChanged` event (a game just wrote stats — see saveGuestStats).
+    // Without this gate a returning guest with qualifying history gets the
+    // sheet 1.5s after landing on ANY page. First-session guests still get
+    // their prompt: their first completed game fires the event, re-running
+    // this effect at the results screen.
+    if (statsVersion === 0) return;
+
     const stats = getGuestStats();
     const games = stats.games || 0;
     const wins = stats.wins || 0;
@@ -132,7 +148,7 @@ export function useSignupPrompt({
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
       shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
-      trackSignupFunnel('prompt_shown', qualifiesAsFirstWin);
+      trackSignupFunnel('prompt_shown', qualifiesAsFirstWin, { surface: frictionVariant });
       trackFrictionExposure();
     }, delayMs);
 
@@ -146,6 +162,7 @@ export function useSignupPrompt({
     statsVersion,
     consentDecided,
     delayMs,
+    frictionVariant,
     trackFrictionExposure,
   ]);
 

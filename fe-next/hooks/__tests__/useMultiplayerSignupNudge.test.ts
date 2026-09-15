@@ -9,8 +9,25 @@ import { renderHook, act } from '@testing-library/react';
 
 // Mock dependencies before imports
 const mockTrackGrowthEvent = vi.fn();
+// Mirror production trackSignupFunnel: event-name mapping + the sessionStorage
+// pending latch that AuthContext reads for completion source attribution
+// (t_da22db9a — the MP nudge now routes through it for real).
+const PENDING_KEY = 'lexiclash_signup_funnel_pending';
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
+  trackSignupFunnel: (step: string, _isFirstWin: boolean, props?: Record<string, unknown>) => {
+    if (typeof window !== 'undefined') {
+      if (step === 'prompt_shown') window.sessionStorage.setItem(PENDING_KEY, 'multi_game');
+      else window.sessionStorage.removeItem(PENDING_KEY);
+    }
+    const name =
+      step === 'prompt_shown'
+        ? 'signup_prompt_shown'
+        : step === 'completed'
+          ? 'signup_completed'
+          : 'signup_dismissed';
+    mockTrackGrowthEvent(name, props);
+  },
 }));
 
 let mockIsOnCrazyGamesPlatform = false;
@@ -160,6 +177,86 @@ describe('useMultiplayerSignupNudge', () => {
     // Dismiss
     act(() => { result.current.dismissNudge(); });
     expect(result.current.activeNudge).toBeNull();
+  });
+
+  describe('t_da22db9a — funnel integrity', () => {
+    it('logs a sheet DISMISS as signup_dismissed — never a second prompt_shown', () => {
+      // PostHog 14d: 83 `mp_sheet_dismissed` events (77 users) were emitted as
+      // `signup_prompt_shown`, polluting the funnel denominator with
+      // impressions that can never convert (measured 0.72% prompt→completed).
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      expect(result.current.activeNudge).toBe('sheet');
+      mockTrackGrowthEvent.mockClear();
+
+      act(() => { result.current.dismissNudge(); });
+
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+        'signup_dismissed',
+        expect.objectContaining({ trigger: 'mp_sheet' })
+      );
+      const shownAfterDismiss = mockTrackGrowthEvent.mock.calls.filter(
+        ([name]) => name === 'signup_prompt_shown'
+      );
+      expect(shownAfterDismiss).toHaveLength(0);
+    });
+
+    it('sheet impression latches the pending key so an MP-driven signup attributes as multi_game_prompt', () => {
+      // Previously the MP hook emitted a raw signup_prompt_shown without the
+      // sessionStorage latch — a signup started from this sheet could never
+      // resolve into the strict prompt→completed funnel.
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+
+      expect(window.sessionStorage.getItem(PENDING_KEY)).toBe('multi_game');
+    });
+
+    it('dismiss clears the pending completion latch (later header signup attributes as header_or_menu)', () => {
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      expect(window.sessionStorage.getItem(PENDING_KEY)).toBe('multi_game');
+
+      act(() => { result.current.dismissNudge(); });
+      expect(window.sessionStorage.getItem(PENDING_KEY)).toBeNull();
+    });
+
+    it('parallel mounts fire only ONE mp_sheet prompt_shown (in-timer latch re-check)', () => {
+      // PostHog 14d: 3 prompt_shown within 1s from a single device — parallel
+      // results-view mounts each scheduled a timer before any latched.
+      const first = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+      act(() => { first.result.current.recordMpGame(); });
+      act(() => { first.result.current.recordMpGame(); });
+
+      // Second mount sees the same shared session counter and ALSO schedules.
+      const second = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      act(() => { vi.advanceTimersByTime(2500); });
+
+      const sheetEmits = mockTrackGrowthEvent.mock.calls.filter(
+        ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_sheet',
+      );
+      expect(sheetEmits).toHaveLength(1);
+      void second;
+    });
   });
 
   it('tracks a dedicated mp_session_game event on recordMpGame (NOT game_completed)', () => {

@@ -147,6 +147,7 @@ export type GrowthEvent =
   | 'wordwheel_drag_hint_dismissed'
   // Conversion
   | 'signup_prompt_shown'
+  | 'signup_prompt_clicked'
   | 'signup_completed'
   | 'signup_dismissed'
   | 'first_win_signup_shown'
@@ -833,7 +834,9 @@ const SIGNUP_FUNNEL_PENDING_KEY = 'lexiclash_signup_funnel_pending';
 
 export const trackSignupFunnel = (
   step: 'prompt_shown' | 'completed' | 'dismissed',
-  isFirstWin: boolean
+  isFirstWin: boolean,
+  /** Extra properties merged into the emitted event (trigger, surface, …). */
+  props?: Record<string, unknown>
 ): void => {
   const variant = isFirstWin ? 'first_win' : 'multi_game';
   if (typeof window !== 'undefined') {
@@ -844,12 +847,23 @@ export const trackSignupFunnel = (
     }
   }
   if (step === 'prompt_shown') {
-    trackGrowthEvent(isFirstWin ? 'first_win_signup_shown' : 'signup_prompt_shown');
+    trackGrowthEvent(isFirstWin ? 'first_win_signup_shown' : 'signup_prompt_shown', props);
   } else if (step === 'completed') {
-    trackGrowthEvent(isFirstWin ? 'first_win_signup_completed' : 'signup_completed');
+    trackGrowthEvent(isFirstWin ? 'first_win_signup_completed' : 'signup_completed', props);
   } else {
-    trackGrowthEvent(isFirstWin ? 'first_win_signup_dismissed' : 'signup_dismissed');
+    trackGrowthEvent(isFirstWin ? 'first_win_signup_dismissed' : 'signup_dismissed', props);
   }
+};
+
+/**
+ * Track an OAuth-CTA tap on any signup prompt surface (sheet / dialog / toast).
+ * t_da22db9a: the prompt funnel was blind between `prompt_shown` and
+ * `signup_completed` — we could not distinguish "never clicked" from
+ * "clicked but OAuth failed". `source` identifies the surface that served
+ * the tap (e.g. 'first_win_sheet', 'mp_sheet').
+ */
+export const trackSignupPromptClicked = (source: string): void => {
+  trackGrowthEvent('signup_prompt_clicked', { source });
 };
 
 /**

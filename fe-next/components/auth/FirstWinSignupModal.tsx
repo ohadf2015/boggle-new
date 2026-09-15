@@ -56,12 +56,16 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isDarkMode = theme === 'dark';
-
-  const { signIn, loadingProvider, error } = useOAuthSignIn();
-
-  const guestStats: GuestStats = getGuestStatsSummary();
   const isMultiGamesVariant = variant === 'multiGames';
   const useSheet = surface === 'sheet';
+
+  const { signIn, loadingProvider, error } = useOAuthSignIn({
+    // t_da22db9a: which prompt surface served the OAuth tap — feeds the
+    // `signup_prompt_clicked` mid-funnel event.
+    analyticsSource: `${isMultiGamesVariant ? 'multi_games' : 'first_win'}_${useSheet ? 'sheet' : 'dialog'}`,
+  });
+
+  const guestStats: GuestStats = getGuestStatsSummary();
 
   // A/B: subtitle copy variant. Title + OAuth UI stay constant so we
   // isolate the conversion delta to the persuasion line.
@@ -170,7 +174,11 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              'fixed inset-x-0 bottom-3 z-50 max-h-[min(70dvh,28rem)]',
+              // t_da22db9a: z-[95] — ABOVE the z-90 results-dialog overlay
+              // (competing PracticeResults modals used to render this sheet
+              // behind their backdrop: impression fired, surface invisible).
+              // Still below the z-110 cookie-consent banner.
+              'fixed inset-x-0 bottom-3 z-[95] max-h-[min(70dvh,28rem)]',
               'flex flex-col rounded-2xl border-3 border-black overflow-hidden',
               'shadow-hard-lg md:max-w-lg md:mx-auto max-w-[calc(100%-1.5rem)] mx-auto',
               isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
