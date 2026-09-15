@@ -144,7 +144,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 setCurrentTranslations(cached);
                 setTranslationsReady(true);
             }
-            return;
+            return undefined;
         }
         if (cached && isPartialCatalogue(cached)) {
             if (cached !== currentTranslations) {
@@ -187,6 +187,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }).catch((err) => {
             logger.warn(`Failed to load translations for ${language}:`, err);
         });
+        return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [language]);
 
