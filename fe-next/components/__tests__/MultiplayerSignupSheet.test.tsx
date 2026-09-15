@@ -32,12 +32,16 @@ vi.mock('@/utils/growthTracking', () => ({
 }));
 
 const mockSignIn = vi.fn();
+const mockUseOAuthSignIn = vi.fn();
 vi.mock('../auth/hooks/useOAuthSignIn', () => ({
-  useOAuthSignIn: () => ({
-    signIn: mockSignIn,
-    loadingProvider: null,
-    error: null,
-  }),
+  useOAuthSignIn: (opts: unknown) => {
+    mockUseOAuthSignIn(opts);
+    return {
+      signIn: mockSignIn,
+      loadingProvider: null,
+      error: null,
+    };
+  },
 }));
 
 vi.mock('../auth/shared', () => ({

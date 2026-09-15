@@ -57,12 +57,16 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isDarkMode = theme === 'dark';
-
-  const { signIn, loadingProvider, error } = useOAuthSignIn();
-
-  const guestStats: GuestStats = getGuestStatsSummary();
   const isMultiGamesVariant = variant === 'multiGames';
   const useSheet = surface === 'sheet';
+
+  const { signIn, loadingProvider, error } = useOAuthSignIn({
+    // t_da22db9a: which prompt surface served the OAuth tap — feeds the
+    // `signup_prompt_clicked` mid-funnel event.
+    analyticsSource: `${isMultiGamesVariant ? 'multi_games' : 'first_win'}_${useSheet ? 'sheet' : 'dialog'}`,
+  });
+
+  const guestStats: GuestStats = getGuestStatsSummary();
 
   // A/B: subtitle copy variant. Title + OAuth UI stay constant so we
   // isolate the conversion delta to the persuasion line.

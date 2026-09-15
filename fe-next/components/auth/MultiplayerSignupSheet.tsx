@@ -49,6 +49,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
   const isDarkMode = theme === 'dark';
 
   const { signIn, loadingProvider, error } = useOAuthSignIn({
+    analyticsSource: 'mp_sheet',
     onSuccess: () => {
       trackGrowthEvent('guest_conversion', {
         trigger: 'mp_signup_sheet',

@@ -180,6 +180,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGameCompletion: vi.fn(),
   trackStreakMilestone: vi.fn(),
   trackGrowthEvent: vi.fn(),
+  trackSignupFunnel: vi.fn(),
 }));
 
 vi.mock('@/utils/gameHistoryManager', () => ({

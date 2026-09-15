@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { getGuestStats } from '@/utils/guestManager';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { trackGrowthEvent } from '@/utils/growthTracking';
+import { trackGrowthEvent, trackSignupFunnel } from '@/utils/growthTracking';
 
 // Session-scoped MP game counter (separate from global guest stats)
 const MP_SESSION_GAMES_KEY = 'boggle_mp_session_games';
@@ -139,10 +139,13 @@ export function useMultiplayerSignupNudge({
   const dismissNudge = useCallback(() => {
     if (activeNudge === 'sheet') {
       markSheetShown();
-      trackGrowthEvent('signup_prompt_shown', {
-        trigger: 'mp_sheet_dismissed',
-        mpSessionGame: mpGames,
-      });
+      // t_da22db9a: a DISMISS must never be logged as `signup_prompt_shown`.
+      // PostHog 14d: 83 `mp_sheet_dismissed` events (77 users) polluted the
+      // funnel denominator — impressions that can never convert. Emit the
+      // proper dismissed step (also clears the pending completion latch so a
+      // later header signup attributes as header_or_menu, matching the solo
+      // prompt's semantics).
+      trackSignupFunnel('dismissed', false, { trigger: 'mp_sheet', mpSessionGame: mpGames });
     }
     setActiveNudge(null);
   }, [activeNudge, mpGames]);
@@ -157,15 +160,22 @@ export function useMultiplayerSignupNudge({
 
     // Sheet: show once per session at threshold. Mark shown at SHOW time (not in
     // dismissNudge) so a reload/remount before the user dismisses can't re-pop it
-    // (recurring-pitfalls Class 1). dismissNudge still emits mp_sheet_dismissed.
+    // (recurring-pitfalls Class 1). dismissNudge emits signup_dismissed
+    // (trigger: mp_sheet) — never a second prompt_shown.
     if (mpGames >= sheetThreshold && !wasSheetShown()) {
       const timer = setTimeout(() => {
+        // t_da22db9a: parallel mounts (host/player results views) all schedule
+        // this timer before any latches. Re-check INSIDE the timer so only the
+        // first fire wins — PostHog 14d showed 3 prompt_shown within 1s from a
+        // single device. (The solo useSignupPrompt already re-checks this way.)
+        if (wasSheetShown()) return;
         markSheetShown();
         setActiveNudge('sheet');
-        trackGrowthEvent('signup_prompt_shown', {
-          trigger: 'mp_sheet',
-          mpSessionGame: mpGames,
-        });
+        // Route through trackSignupFunnel so the sessionStorage pending latch
+        // is set — a signup started from this sheet now attributes to
+        // `multi_game_prompt` on the guest→authed flip (previously the raw
+        // emit left the funnel attribution hole at 0 conversions forever).
+        trackSignupFunnel('prompt_shown', false, { trigger: 'mp_sheet', mpSessionGame: mpGames });
       }, 2000); // 2s delay — let them see their results first
       return () => clearTimeout(timer);
     }
@@ -178,12 +188,10 @@ export function useMultiplayerSignupNudge({
     // a reload-without-dismiss can't re-pop it (recurring-pitfalls Class 1).
     if (toastEnabled && mpGames >= toastThreshold && wasSheetShown() && !wasToastShown()) {
       const timer = setTimeout(() => {
+        if (wasToastShown()) return;
         markToastShown();
         setActiveNudge('toast');
-        trackGrowthEvent('signup_prompt_shown', {
-          trigger: 'mp_toast',
-          mpSessionGame: mpGames,
-        });
+        trackSignupFunnel('prompt_shown', false, { trigger: 'mp_toast', mpSessionGame: mpGames });
       }, 1500);
       return () => clearTimeout(timer);
     }

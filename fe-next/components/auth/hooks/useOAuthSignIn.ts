@@ -11,6 +11,7 @@ import {
 } from '@/utils/nativeOAuth';
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackSignupPromptClicked } from '@/utils/growthTracking';
 
 interface UseOAuthSignInOptions {
   /** Callback before redirect (e.g., to store pending data) */
@@ -24,6 +25,13 @@ interface UseOAuthSignInOptions {
    * Useful if native OAuth is not configured or for specific providers
    */
   forceBrowserOAuth?: boolean;
+  /**
+   * Signup-prompt surface that served this tap (e.g. 'first_win_sheet',
+   * 'mp_sheet'). Emits `signup_prompt_clicked` { source } at tap time —
+   * closes the mid-funnel blind spot between prompt_shown and
+   * signup_completed (t_da22db9a).
+   */
+  analyticsSource?: string;
 }
 
 interface UseOAuthSignInReturn {
@@ -55,7 +63,7 @@ interface UseOAuthSignInReturn {
  * - Required for Discord (no native SDK)
  */
 export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSignInReturn {
-  const { onBeforeRedirect, onError, onSuccess, forceBrowserOAuth = false } = options;
+  const { onBeforeRedirect, onError, onSuccess, forceBrowserOAuth = false, analyticsSource } = options;
   const { t } = useLanguage();
 
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
@@ -81,6 +89,12 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
   const signIn = useCallback(async (provider: 'google' | 'discord' | 'apple') => {
     setLoadingProvider(provider);
     setError(null);
+
+    // Tap telemetry before any early-return path (native/cancel/apple-web all
+    // return early — the click still happened and the funnel needs it).
+    if (analyticsSource) {
+      trackSignupPromptClicked(analyticsSource);
+    }
 
     try {
       // Call before redirect callback (e.g., to store pending game data)
@@ -183,7 +197,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
     } finally {
       setLoadingProvider(null);
     }
-  }, [onBeforeRedirect, onError, onSuccess, forceBrowserOAuth, t]);
+  }, [onBeforeRedirect, onError, onSuccess, forceBrowserOAuth, analyticsSource, t]);
 
   return {
     signIn,
