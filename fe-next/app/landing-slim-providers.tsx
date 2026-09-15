@@ -16,6 +16,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { RadixDirectionProvider } from '@/components/providers/RadixDirectionProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
+import { NavigationProvider } from '@/contexts/NavigationContext';
 import type { TranslationData } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
@@ -35,7 +36,9 @@ export function LandingSlimProviders({
       <QueryProvider>
         <ThemeProvider>
           <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
-            <RadixDirectionProvider>{children}</RadixDirectionProvider>
+            <RadixDirectionProvider>
+              <NavigationProvider>{children}</NavigationProvider>
+            </RadixDirectionProvider>
           </LanguageProvider>
         </ThemeProvider>
       </QueryProvider>

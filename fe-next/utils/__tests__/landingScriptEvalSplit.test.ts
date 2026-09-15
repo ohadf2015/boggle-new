@@ -37,6 +37,8 @@ describe('landing first-paint script-eval split', () => {
     expect(src).toContain('isLandingPath');
     expect(src).toMatch(/nextDynamic\([\s\S]*essential-providers/);
     expect(src).not.toMatch(/^import \{ EssentialProviders \} from '\.\/essential-providers'/m);
+    const slim = fs.readFileSync(path.join(feRoot, 'app', 'landing-slim-providers.tsx'), 'utf8');
+    expect(slim).toContain('NavigationProvider');
   });
 
   it('authFetch guest-fast-paths without ensureSupabase', () => {
