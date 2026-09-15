@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, ensureSupabase } from '@/lib/supabase';
 import { linkSessionToUser } from '@/utils/sessionTracking';
 import { registerPushToken, unregisterPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import { broadcastSessionRefreshed } from '@/utils/crossTabAuthSync';
@@ -88,11 +88,12 @@ export function useAuthInitialization({
     isMountedRef.current = true;
 
     const initAuth = async () => {
+      const client = await ensureSupabase();
       const configured = await isSupabaseConfigured();
       if (!isMountedRef.current) return;
       setIsSupabaseEnabled(configured);
 
-      if (!configured || !supabase) {
+      if (!configured || !client) {
         setLoading(false);
         return;
       }

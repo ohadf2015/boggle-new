@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLiveRoomStats } from './useLiveRoomStats';
-import { supabase } from '@/lib/supabase';
+import { ensureSupabase } from '@/lib/supabase';
 import { SUPPORTED_GAME_LANGUAGES } from '@/lib/languageConfig';
 
 interface UseLandingStatsOptions {
@@ -27,13 +27,16 @@ export function useLandingStats(options: UseLandingStatsOptions = {}) {
     let cancelled = false;
     const today = new Date().toISOString().slice(0, 10);
 
-    supabase
-      ?.from('game_results')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', `${today}T00:00:00Z`)
-      .then(({ count }) => {
-        if (!cancelled && count != null) setGamesToday(count);
-      });
+    void ensureSupabase().then((client) => {
+      if (!client || cancelled) return;
+      client
+        .from('game_results')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', `${today}T00:00:00Z`)
+        .then(({ count }) => {
+          if (!cancelled && count != null) setGamesToday(count);
+        });
+    });
 
     return () => { cancelled = true; };
   }, [initialGamesToday]);

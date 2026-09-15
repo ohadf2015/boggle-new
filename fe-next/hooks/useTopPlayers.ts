@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { ensureSupabase } from '@/lib/supabase';
 
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -50,11 +50,6 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
   const [loading, setLoading] = useState(!cached && !initialData);
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
     if (isCacheFresh()) {
       setLoading(false);
       return;
@@ -63,9 +58,15 @@ export function useTopPlayers(limit = 5, options: UseTopPlayersOptions = {}) {
     let cancelled = false;
 
     async function fetchData() {
-      const seasonResp = await supabase!.rpc('get_current_season_id');
+      const client = await ensureSupabase();
+      if (!client) {
+        setLoading(false);
+        return;
+      }
+
+      const seasonResp = await client.rpc('get_current_season_id');
       const seasonId = (seasonResp?.data as number | null) ?? 1;
-      const { data, error } = await supabase!
+      const { data, error } = await client
         .from('leaderboard')
         .select('player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)')
         .eq('season_id', seasonId)

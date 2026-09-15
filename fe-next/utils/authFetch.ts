@@ -20,7 +20,7 @@
  * @returns Fetch Response
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase, ensureSupabase, hasLikelySupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 interface FetchWithAuthOptions extends RequestInit {
@@ -45,7 +45,14 @@ export async function fetchWithAuth(
   url: string,
   options: FetchWithAuthOptions = {}
 ): Promise<Response> {
-  if (!supabase) {
+  if (!hasLikelySupabaseSession() && !supabase) {
+    if (options.requireSession) {
+      return new Response(null, { status: 401, statusText: 'Unauthorized' });
+    }
+    return fetch(url, options);
+  }
+  const client = await ensureSupabase();
+  if (!client) {
     // Downgraded warn → debug: expected on public pages with no Supabase env.
     logger.debug('Supabase not configured - making unauthenticated request');
     return fetch(url, options);

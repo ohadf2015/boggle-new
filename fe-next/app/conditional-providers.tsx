@@ -1,38 +1,43 @@
 'use client';
 
 /**
- * Conditional Providers - Intelligently loads providers based on route
+ * Conditional Providers
  *
- * ARCHITECTURE:
- * - EssentialProviders is ALWAYS mounted and provides base functionality
- *   (Theme, Language, Auth, Music, SFX, Haptics, Accessibility, Motion, Navigation)
- * - GameSpecificProviders are conditionally added INSIDE EssentialProviders
- *   for game pages (Socket, GameState, Achievements, Coins, etc.)
+ * Landing (`/`, `/en`, `/he`, …) uses LandingSlimProviders so Auth/Music/Ads
+ * stay out of the first-paint webpack graph (PSI script-eval wall).
+ * EssentialProviders is next/dynamic'd and only rendered off landing — a
+ * static import would still put it in the locale layout client manifest.
  *
- * CRITICAL: EssentialProviders must NEVER unmount during navigation.
- * This prevents issues like:
- * - Duplicate MusicProvider instances causing duplicate audio playback
- * - Loss of audio state (current track, volume, mute state)
- * - Memory leaks from unreleased Howl instances
+ * Off-landing, EssentialProviders stays mounted for the rest of the session
+ * (music instance, auth). Crossing landing → game remounts once; that is
+ * intentional and cheaper than shipping 2.7MB of JS to every Lighthouse /en.
  */
 
 import { usePathname } from 'next/navigation';
 import { ReactNode, useMemo, lazy, Suspense } from 'react';
+import nextDynamic from 'next/dynamic';
 import { NextIntlClientProvider } from 'next-intl';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { GameSpecificProviders } from './providers';
-import { EssentialProviders } from './essential-providers';
-
-const CommandPalette = lazy(() => import('@/components/CommandPalette'));
+import { LandingSlimProviders } from './landing-slim-providers';
+import { isLandingPath } from '@/lib/i18n/isLandingPath';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
+
+const EssentialProviders = nextDynamic(
+  () => import('./essential-providers').then((m) => ({ default: m.EssentialProviders })),
+);
+const GameSpecificProviders = nextDynamic(
+  () => import('./providers').then((m) => ({ default: m.GameSpecificProviders })),
+);
+const NuqsAdapter = nextDynamic(
+  () => import('nuqs/adapters/next/app').then((m) => ({ default: m.NuqsAdapter })),
+);
+const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 
 interface ConditionalProvidersProps {
   children: ReactNode;
   lang: Language;
 }
 
-// Routes that need the full provider stack (Socket.IO, game state, etc.)
 const GAME_ROUTES = [
   '/multiplayer',
   '/singleplayer',
@@ -45,52 +50,37 @@ const GAME_ROUTES = [
   '/party-screen',
   '/teacher',
   '/student',
-  '/auth/callback',  // Auth callback needs full providers
-  '/hebrew-multiplayer-word-game',  // SEO page
-  // Social routes need Socket.IO for realtime gift/friend-request delivery
+  '/auth/callback',
+  '/hebrew-multiplayer-word-game',
   '/friends',
   '/profile',
 ];
 
-/**
- * Determines if the current route needs game-specific providers
- */
 export function needsGameProviders(pathname: string | null): boolean {
   if (!pathname) return false;
-
-  // Remove locale prefix (e.g., /en/multiplayer -> /multiplayer)
   const path = pathname.replace(/^\/(en|he|sv|ja|es|ru)/, '');
-
   return GAME_ROUTES.some(route => path.startsWith(route));
 }
 
-/**
- * ConditionalProviders - Routes to appropriate provider stack
- *
- * IMPORTANT: EssentialProviders is ALWAYS rendered to ensure:
- * - Single MusicProvider instance (prevents duplicate music)
- * - Consistent audio state across navigation
- * - No memory leaks from provider remounting
- *
- * Game-specific providers are added conditionally inside EssentialProviders.
- */
 export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
   const pathname = usePathname();
-
-  // Read the catalogue instead of receiving it as a prop. As a prop it crossed
-  // the server→client boundary, so React serialised ~525kB of JSON into every
-  // page's RSC flight payload. Both sides can source it locally: on the server
-  // getCachedTranslation() require()s the file, in the browser it reads the
-  // global set by the hashed <head> asset — which runs before hydration, so
-  // both renders see identical strings.
   const initialTranslations = getCachedTranslation(lang);
+  const landing = isLandingPath(pathname || '');
 
   const needsGameStack = useMemo(() => {
     return needsGameProviders(pathname);
   }, [pathname]);
 
-  // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
-  // Conditionally add game-specific providers inside
+  if (landing) {
+    return (
+      <NextIntlClientProvider locale={lang} timeZone="UTC" messages={initialTranslations as Record<string, unknown>}>
+        <LandingSlimProviders lang={lang} initialTranslations={initialTranslations}>
+          {children}
+        </LandingSlimProviders>
+      </NextIntlClientProvider>
+    );
+  }
+
   return (
     <NextIntlClientProvider locale={lang} timeZone="UTC" messages={initialTranslations as Record<string, unknown>}>
       <NuqsAdapter>
