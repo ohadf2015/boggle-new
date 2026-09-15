@@ -13867,6 +13867,8 @@ const ja = {
       "assignMissGapLiveGoogleClassroom": "miss-gap LiveをGoogle Classroomに割り当て",
       "assignMissGapLiveGoogleClassroomTitle": "3分miss-gap Live — {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "リンクを開き、取りこぼした語で3分Liveを開始: {{missed}}。生徒はClassworkから参加。無料のGoogle Workspace for Educationで動作 — Education Plus不要。",
+      "launchMissGapQuestionPackLive": "ライブ問題パックを開始 — 未習得の単語",
+      "missGapQuestionPackTitle": "ミスギャップ問題パック — {{lesson}}",
       "unpluggedReteachHint": "生徒は印刷した練習シートで答えます — 端末不要",
       "unpluggedReteachReveal": "表示",
       "unpluggedReteachNext": "次へ",

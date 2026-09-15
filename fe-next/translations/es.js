@@ -13859,6 +13859,8 @@ const es = {
       "assignMissGapLiveGoogleClassroom": "Asignar Live de miss-gap a Google Classroom",
       "assignMissGapLiveGoogleClassroomTitle": "Live miss-gap de 3 min — {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "Abre el enlace y empieza el Live de 3 min con estas palabras falladas: {{missed}}. Los alumnos entran desde Classwork. Funciona en Google Workspace for Education gratis — sin Education Plus.",
+      "launchMissGapQuestionPackLive": "Iniciar paquete de preguntas en vivo — palabras falladas",
+      "missGapQuestionPackTitle": "Paquete de preguntas miss-gap — {{lesson}}",
       "unpluggedReteachHint": "Los alumnos responden en la hoja impresa — sin dispositivos",
       "unpluggedReteachReveal": "Mostrar",
       "unpluggedReteachNext": "Siguiente",

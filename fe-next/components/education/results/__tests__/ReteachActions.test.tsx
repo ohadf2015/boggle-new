@@ -24,6 +24,8 @@ const links = {
   missGapAssignmentHref: null,
   missGapPracticeHref: null,
   missGapWhatsAppHref: null,
+  canLaunchMissGapQuestionPack: true,
+  onLaunchMissGapQuestionPack: vi.fn(),
   shareState: 'idle',
   onShareGap: vi.fn(),
   onPrintPack: vi.fn(),
@@ -43,5 +45,15 @@ describe('ReteachActions', () => {
     const onReteach = vi.fn();
     render(<ReteachActions links={links} onReteach={onReteach} t={t} />);
     expect(screen.getByTestId('play-reteach-round').className).toMatch(/bg-neo-pink/);
+  });
+
+  it('offers in-product miss-gap Live question pack (no ChatGPT hop)', () => {
+    render(<ReteachActions links={links} t={t} />);
+    // Open disclosure so the CTA is visible in the a11y tree the way teachers find it.
+    screen.getByTestId('reteach-more-actions').click();
+    const cta = screen.getByTestId('launch-miss-gap-question-pack-live');
+    expect(cta.className).toMatch(/bg-neo-lime/);
+    cta.click();
+    expect(links.onLaunchMissGapQuestionPack).toHaveBeenCalled();
   });
 });

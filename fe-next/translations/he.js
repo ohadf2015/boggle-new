@@ -13721,6 +13721,8 @@ const he = {
       "assignMissGapLiveGoogleClassroom": "שיבוץ Live לפי miss-gap ל-Google Classroom",
       "assignMissGapLiveGoogleClassroomTitle": "Live miss-gap ל-3 דק׳ — {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו Live של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Classwork. עובד ב-Google Workspace for Education החינמי — בלי Education Plus.",
+      "launchMissGapQuestionPackLive": "הפעלת חבילת שאלות בשידור חי — מילים שחסרו",
+      "missGapQuestionPackTitle": "חבילת שאלות miss-gap — {{lesson}}",
       "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס — בלי מכשירים",
       "unpluggedReteachReveal": "חשוף",
       "unpluggedReteachNext": "הבא",

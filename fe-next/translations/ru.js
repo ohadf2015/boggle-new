@@ -1887,6 +1887,8 @@ const ru = {
       "assignMissGapLiveGoogleClassroom": "Назначить miss-gap Live в Google Classroom",
       "assignMissGapLiveGoogleClassroomTitle": "3-мин miss-gap Live — {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 3-мин Live по пропущенным словам: {{missed}}. Ученики заходят из Classwork. Работает на бесплатном Google Workspace for Education — без Education Plus.",
+      "launchMissGapQuestionPackLive": "Запустить живой набор вопросов — пропущенные слова",
+      "missGapQuestionPackTitle": "Набор вопросов miss-gap — {{lesson}}",
       "unpluggedReteachHint": "Ученики отвечают на распечатанном листе — без устройств",
       "unpluggedReteachReveal": "Показать",
       "unpluggedReteachNext": "Далее",
