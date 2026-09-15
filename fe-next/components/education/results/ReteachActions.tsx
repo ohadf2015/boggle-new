@@ -18,6 +18,7 @@ import {
   ClipboardList,
   GraduationCap,
   LayoutGrid,
+  ListChecks,
   MonitorPlay,
   Play,
   Printer,
@@ -76,6 +77,17 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
         </summary>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3">
+          {links.canLaunchMissGapQuestionPack && (
+            <button
+              type="button"
+              data-testid="launch-miss-gap-question-pack-live"
+              onClick={links.onLaunchMissGapQuestionPack}
+              className={cn(ACTION, 'bg-neo-lime sm:col-span-2')}
+            >
+              <ListChecks className="w-4 h-4 shrink-0" aria-hidden />
+              {t('education.results.launchMissGapQuestionPackLive')}
+            </button>
+          )}
           {links.unpluggedReteachHref && (
             <Link
               href={links.unpluggedReteachHref}

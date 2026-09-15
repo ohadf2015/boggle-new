@@ -14101,6 +14101,8 @@ const sv = {
       "assignMissGapLiveGoogleClassroom": "Tilldela miss-gap Live till Google Classroom",
       "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live — {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "Öppna länken och starta 3-min Live på dessa missade ord: {{missed}}. Elever går med från Classwork. Fungerar på gratis Google Workspace for Education — ingen Education Plus krävs.",
+      "launchMissGapQuestionPackLive": "Starta live-frågepaket — missade ord",
+      "missGapQuestionPackTitle": "Miss-gap-frågepaket — {{lesson}}",
       "unpluggedReteachHint": "Eleverna svarar på det utskrivna övningsbladet — inga enheter",
       "unpluggedReteachReveal": "Visa",
       "unpluggedReteachNext": "Nästa",

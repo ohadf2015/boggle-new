@@ -172,6 +172,15 @@ Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Te
 
 Phase-1 `classroom.google.com/share` assignment pointing at the class-gap card (`?intent=live`). Teacher assigns a 3-min miss-gap Live into Classwork; students open from Classroom; teacher starts Live from the card. **Works on free Google Workspace for Education** — Quizlet's Google Classroom add-on requires Education Plus / Teaching & Learning Upgrade. No roster OAuth. Surfaces: Marketplace Discovery CTA, results "Assign miss-gap Live", `liveStreamAssignUrl` on `/api/classroom-addon/assign`. Prod: **lexiclash.live**.
 
+### Miss-gap Live question pack (Kahoot ChatGPT-app foil)
+
+Kahoot's ChatGPT app hops teachers out to generate a quiz pack. From miss-gap
+results, **Launch Live question pack** writes a quickLaunch `paste` intent and
+opens `classroom-game?flow=quickLaunch` — stays inside LexiClash, no ChatGPT hop.
+Class-level missed words only. Implementation: `lib/education/missGapQuestionPack.ts`,
+wired from `useReteachLinks` / `ReteachActions`.
+
+
 ### Conversational Classroom add-on planner (Discovery Gemini foil)
 
 Teacher plain-language prompt inside the Marketplace add-on (`/education/classroom-addon/planner`, API `/api/classroom-addon/plan`) routes into shipped Classic Unplugged, Team Tiles Unplugged, or Unplugged reteach Live + #1045 grade passback. Example prompts: "Unplugged reteach on yesterday's misses", "3-min Live on CEFR gaps". Class-level missed words only — no roster OAuth / student names. Does **not** reopen Unplugged game logic. Foils Discovery Education Gemini conversational Classroom. Prod: **lexiclash.live**.

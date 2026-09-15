@@ -12400,6 +12400,8 @@ const en = {
       "assignMissGapLiveGoogleClassroom": "Assign miss-gap Live to Google Classroom",
       "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live — {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "Open the link and start the 3-min Live on these missed words: {{missed}}. Students join from Classwork. Works on free Google Workspace for Education — no Education Plus required.",
+      "launchMissGapQuestionPackLive": "Launch Live question pack — missed words",
+      "missGapQuestionPackTitle": "Miss-gap question pack — {{lesson}}",
       "unpluggedReteachHint": "Students answer on the printed practice sheet — no devices needed",
       "unpluggedReteachReveal": "Reveal",
       "unpluggedReteachNext": "Next",

@@ -12,10 +12,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { buildClassGapShareUrl } from '@/lib/education/classGapShare';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
 import { buildMissGapAssignmentPath } from '@/lib/education/missGapAsyncAssignment';
+import { stageMissGapQuestionPackLaunch } from '@/lib/education/missGapQuestionPack';
 import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/education/unpluggedReteachLive';
 import { buildTeamTilesUnpluggedPath } from '@/lib/education/teamTilesUnplugged';
 import { buildClassicUnpluggedPath } from '@/lib/education/classicUnplugged';
@@ -38,6 +40,9 @@ export interface ReteachLinks {
   teamTilesUnpluggedHref: string | null;
   classicUnpluggedHref: string | null;
   missGapAsyncAssignHref: string | null;
+  /** In-product miss-gap → Live question pack (Kahoot ChatGPT-app foil; no hop). */
+  canLaunchMissGapQuestionPack: boolean;
+  onLaunchMissGapQuestionPack: () => void;
   shareState: ShareState;
   missGapShareState: ShareState;
   onPrintPracticeSheet: () => void;
@@ -48,6 +53,7 @@ export interface ReteachLinks {
 
 export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): ReteachLinks {
   const { t, language } = useLanguage();
+  const router = useRouter();
   const [shareState, setShareState] = useState<ShareState>('idle');
   const [missGapShareState, setMissGapShareState] = useState<ShareState>('idle');
 
@@ -169,6 +175,21 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
    */
   const missGapAsyncAssignHref = hasMisses ? safely(() => buildMissGapAssignmentPath(gapArgs)) : null;
 
+  /**
+   * Kahoot ChatGPT-app foil: stage missed words as a quickLaunch paste pack and
+   * open the express Live lobby inside LexiClash — no ChatGPT hop.
+   */
+  const onLaunchMissGapQuestionPack = () => {
+    if (!hasMisses) return;
+    const path = stageMissGapQuestionPackLaunch({
+      missedWords: summary.missedWords,
+      title: t('education.results.missGapQuestionPackTitle', { lesson }),
+      language,
+    });
+    if (!path) return;
+    router.push(path);
+  };
+
   const sheetLabels = () => ({
     title: t('education.results.printPracticeSheetTitle', { lesson }),
     subtitle: t('education.results.printPracticeSheetSubtitle'),
@@ -273,6 +294,8 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
     teamTilesUnpluggedHref,
     classicUnpluggedHref,
     missGapAsyncAssignHref,
+    canLaunchMissGapQuestionPack: hasMisses,
+    onLaunchMissGapQuestionPack,
     shareState,
     missGapShareState,
     onPrintPracticeSheet,
