@@ -231,10 +231,16 @@ export default function EndlessPageClient(): React.JSX.Element {
               exit={{ opacity: 0, scale: 0.9 }}
               className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 gap-5"
             >
+              {/* Multi-keyframe rotate must tween — framer-motion springs
+                  accept two keyframes max (t_15ec0d7a, #893 recurrence). */}
               <AdaptiveMotion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-                transition={{ type: 'spring', stiffness: 200 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 200,
+                  rotate: { type: 'tween', duration: 0.5, ease: 'easeInOut' },
+                }}
                 className="text-neo-lime text-5xl font-black"
               >
                 {t('adventure.endlessMode.floorCleared')}

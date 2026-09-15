@@ -83,6 +83,8 @@ export function ScoreCountUp({
     );
   }
 
+  // Multi-keyframe land-settle must tween — springs accept two keyframes
+  // max (t_15ec0d7a, #893 recurrence).
   return (
     <m.span
       className={className}
@@ -97,12 +99,7 @@ export function ScoreCountUp({
           'drop-shadow(0 0 0px rgba(191,255,0,0))',
         ],
       } : { scale: 1 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 12,
-        duration: 0.5,
-      }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       {display.toLocaleString()}
     </m.span>

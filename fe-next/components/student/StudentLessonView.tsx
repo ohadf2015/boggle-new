@@ -76,7 +76,14 @@ const doneBadge = {
   visible: {
     scale: 1,
     rotate: [0, 8, -5, 3, 0],
-    transition: { type: 'spring' as const, stiffness: 500, damping: 12 },
+    // Multi-keyframe rotate wobble must tween — springs accept two keyframes
+    // max (t_15ec0d7a, #893 recurrence).
+    transition: {
+      type: 'spring' as const,
+      stiffness: 500,
+      damping: 12,
+      rotate: { type: 'tween' as const, duration: 0.5, ease: 'easeOut' },
+    },
   },
 };
 

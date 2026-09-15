@@ -98,11 +98,20 @@ const SkillCheckpoint = memo<{
   const isDarkMode = theme === 'dark';
   const Icon = skill.icon;
 
+  // Multi-keyframe unlock pop must tween — springs accept two keyframes
+  // max (t_15ec0d7a, #893 recurrence).
   return (
     <m.div
       initial={isJustUnlocked ? { scale: 0.8, opacity: 0 } : false}
       animate={isJustUnlocked ? { scale: [0.8, 1.2, 1], opacity: 1 } : { scale: 1, opacity: 1 }}
-      transition={isJustUnlocked ? { type: 'spring', stiffness: 400, damping: 22 } : undefined}
+      transition={isJustUnlocked
+        ? {
+            type: 'spring',
+            stiffness: 400,
+            damping: 22,
+            scale: { type: 'tween', duration: 0.4, ease: 'easeOut' },
+          }
+        : undefined}
       className={cn(
         'flex items-center gap-2 p-2 rounded-lg border-2 transition-all duration-300',
         isCompleted

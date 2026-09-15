@@ -576,10 +576,12 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
+            {/* Multi-keyframe pulse must tween — springs accept two
+                keyframes max (t_15ec0d7a, #893 recurrence). */}
             <m.span
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: [1, 1.2, 1] }}
-              transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
+              transition={{ delay: 0.1, duration: 0.4, ease: 'easeInOut', repeat: 1 }}
               className="text-2xl text-neo-black"
               aria-hidden="true"
             >

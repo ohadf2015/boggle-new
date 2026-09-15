@@ -176,6 +176,8 @@ export const BossHPBar = memo(function BossHPBar({
       {/* Boss name + enraged badge */}
       <div className="flex items-center justify-between mb-1">
         <span className="text-sm font-black text-neo-white uppercase tracking-wide">{bossName}</span>
+        {/* Multi-keyframe pop must tween — springs accept two keyframes
+            max (t_15ec0d7a, #893 recurrence). */}
         <AdaptiveAnimatePresence>
           {isEnraged && (
             <AdaptiveMotion.span
@@ -183,7 +185,12 @@ export const BossHPBar = memo(function BossHPBar({
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.3, 1] }}
               exit={{ scale: 0 }}
-              transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+              transition={{
+                type: 'spring',
+                stiffness: 600,
+                damping: 20,
+                scale: { type: 'tween', duration: 0.35, ease: 'easeOut' },
+              }}
               className="text-[10px] font-black text-neo-red bg-neo-red/20 border border-neo-red/60 rounded-neo px-1.5 py-0.5 uppercase"
             >
               {t('adventure.bosses.enraged')}

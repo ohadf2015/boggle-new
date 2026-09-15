@@ -129,7 +129,14 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                   exit={{ x: -30, opacity: 0 }}
                   transition={
                     isLatest && wordText.length >= 6
-                      ? { type: 'spring', stiffness: 350, damping: 12 }
+                      ? {
+                          type: 'spring',
+                          stiffness: 350,
+                          damping: 12,
+                          // Multi-keyframe scale settle must tween — springs
+                          // accept two keyframes max (t_15ec0d7a, #893 recurrence).
+                          scale: { type: 'tween', duration: 0.4, ease: 'easeOut' },
+                        }
                       : undefined
                   }
                   className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all

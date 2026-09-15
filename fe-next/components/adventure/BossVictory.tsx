@@ -42,9 +42,10 @@ const BossStarDisplay = memo<{ filled: boolean; index: number }>(
       }}
       transition={{
         delay: 0.5 + index * 0.2,
-        type: 'spring',
-        stiffness: 180,
-        damping: 12,
+        // Multi-keyframe star pop must tween — springs accept two keyframes
+        // max (t_15ec0d7a, #893 recurrence).
+        duration: 0.5,
+        ease: 'easeOut',
       }}
     >
       <Star

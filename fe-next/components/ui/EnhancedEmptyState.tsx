@@ -116,6 +116,8 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           />
         </m.div>
       ) : (
+        // Multi-keyframe rotate wobble must tween — springs accept two
+        // keyframes max (t_15ec0d7a, #893 recurrence).
         <m.div
           className={cn(
             'relative flex items-center justify-center rounded-neo-lg border-4 border-neo-black shadow-hard mb-6',
@@ -124,7 +126,11 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           )}
           variants={reduceMotion ? {} : itemVariants}
           whileHover={reduceMotion ? {} : { scale: 1.05, rotate: [-2, 2, 0] }}
-          transition={{ type: 'spring', stiffness: 300 }}
+          transition={{
+            type: 'spring',
+            stiffness: 300,
+            rotate: { type: 'tween', duration: 0.4, ease: 'easeInOut' },
+          }}
         >
           {IconComponent ? (
             <IconComponent

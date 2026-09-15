@@ -400,6 +400,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
           {demoWord.split('').map((targetLetter, i) => {
             const filled = i < selected.length;
+            // Multi-keyframe letter pop must tween — springs accept two
+            // keyframes max (t_15ec0d7a, #893 recurrence).
             return (
               <m.span
                 key={`mini-letter-${i}-${targetLetter}`}
@@ -410,7 +412,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                     : 'bg-neo-white/20 text-neo-white border-2 border-neo-white/40'
                 )}
                 animate={filled ? { scale: [0.7, 1.2, 1], rotate: [0, -5, 0] } : { scale: 1 }}
-                transition={filled ? SPRING_BOUNCE : undefined}
+                transition={filled ? { duration: 0.4, ease: 'easeOut' } : undefined}
               >
                 {filled ? selected[i].letter : targetLetter}
               </m.span>

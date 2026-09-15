@@ -36,7 +36,10 @@ export interface BossAnimationSet {
 // SHARED PRESETS
 // ==============================================
 
-const SPRING_HIT: Transition = { type: 'spring', stiffness: 400, damping: 12, mass: 0.8 };
+// Hit recoils are multi-keyframe shake bursts; framer-motion springs accept
+// two keyframes max, so the recoil must tween — the keyframe array itself
+// carries the shake choreography (t_15ec0d7a, #893 recurrence).
+const HIT_RECOIL: Transition = { duration: 0.35, ease: [0.22, 1, 0.36, 1] };
 const SPRING_ATTACK: Transition = { duration: 0.4, ease: [0.22, 1, 0.36, 1] };
 
 // ==============================================
@@ -56,7 +59,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { x: [0, -5, 4, -3, 2, 0], rotate: [0, 3, -2, 1, 0], scale: [1, 0.92, 1.04, 1] },
-      transition: SPRING_HIT,
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { rotate: [0, -15, 5, 0], scale: [1, 1.15, 0.95, 1], y: [0, -4, 2, 0] },
@@ -77,7 +80,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { rotate: [0, 15, -10, 5, 0], y: [0, 5, -2, 0], scale: [1, 0.85, 1.1, 1] },
-      transition: SPRING_HIT,
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { x: [0, -8, 12, -3, 0], scale: [1, 0.9, 1.2, 1], rotate: [0, -5, 8, 0] },
@@ -98,7 +101,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { y: [0, 4, -1, 0], scale: [1, 0.9, 1.05, 1], rotate: [0, -3, 1, 0] },
-      transition: { type: 'spring', stiffness: 200, damping: 15, mass: 1.5 },
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 1.2, 0.95, 1.05, 1], y: [0, -6, 2, 0] },
@@ -119,7 +122,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { x: [0, -6, 5, -3, 0], rotate: [0, 8, -5, 2, 0], scale: [1, 0.88, 1.06, 1] },
-      transition: SPRING_HIT,
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { x: [0, -10, 15, -4, 0], rotate: [0, -8, 10, -2, 0], scale: [1, 1.15, 0.95, 1] },
@@ -140,7 +143,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { x: [0, -3, 3, -2, 2, -1, 0], scale: [1, 0.93, 1.06, 0.98, 1], rotate: [0, -4, 4, -2, 0] },
-      transition: { type: 'spring', stiffness: 500, damping: 10, mass: 0.6 },
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 1.2, 1.2, 0.9, 1], rotate: [0, 0, -8, 4, 0], y: [0, -2, -2, 3, 0] },
@@ -162,7 +165,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { rotate: [0, 10, -8, 5, -2, 0], scale: [1, 0.85, 1.1, 0.95, 1] },
-      transition: { type: 'spring', stiffness: 350, damping: 10, mass: 0.7 },
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 0.8, 1.25, 1], rotate: [0, 180, 360], y: [0, -5, 0] },
@@ -183,7 +186,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { x: [0, 3, -3, 2, -2, 1, 0], scale: [1, 0.9, 1.08, 1], rotate: [0, -2, 2, 0] },
-      transition: SPRING_HIT,
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 1.15, 1.15, 0.95, 1], y: [0, 0, -8, 2, 0] },
@@ -205,7 +208,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { scale: [1, 0.8, 1.15, 0.95, 1], rotate: [0, 5, -5, 2, 0], y: [0, 3, -2, 0] },
-      transition: { type: 'spring', stiffness: 300, damping: 8, mass: 1.2 },
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 1.3, 0.9, 1.05, 1], y: [0, -10, 3, 0], rotate: [0, -3, 5, 0] },
@@ -227,7 +230,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { y: [0, 3, -2, 1, 0], rotate: [0, -4, 3, -1, 0], scale: [1, 0.92, 1.05, 1] },
-      transition: { type: 'spring', stiffness: 250, damping: 12, mass: 1.3 },
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 0.9, 1.2, 1], y: [0, 2, -6, 0], rotate: [0, -2, 4, 0] },
@@ -248,7 +251,7 @@ const BOSS_ANIMATIONS: Record<string, BossAnimationSet> = {
     },
     hit: {
       animate: { x: [0, -6, 6, -4, 3, -1, 0], scale: [1, 0.88, 1.1, 0.95, 1], rotate: [0, 4, -3, 1, 0] },
-      transition: { type: 'spring', stiffness: 350, damping: 10, mass: 1.5 },
+      transition: HIT_RECOIL,
     },
     attack: {
       animate: { scale: [1, 1.25, 1.25, 0.9, 1.05, 1], y: [0, -3, -3, 5, -1, 0], rotate: [0, -5, -5, 8, -2, 0] },
@@ -275,7 +278,7 @@ const DEFAULT_ANIMATIONS: BossAnimationSet = {
   },
   hit: {
     animate: { x: [0, -4, 5, -3, 2, -1, 0], scale: [1, 0.9, 1.05, 0.97, 1], rotate: [0, 2, -2, 1, 0] },
-    transition: SPRING_HIT,
+    transition: HIT_RECOIL,
   },
   attack: {
     animate: { scale: [1, 1.18, 0.95, 1.05, 1], rotate: [0, -6, 6, -2, 0], y: [0, -3, 0] },
