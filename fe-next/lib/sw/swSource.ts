@@ -142,6 +142,16 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Page → SW: activate a waiting worker immediately (chunk recovery / VersionChecker).
+// Without this, unregister() alone leaves the dying controller intercepting the
+// recovery navigation (t_9cc3561f after #979).
+self.addEventListener('message', (event) => {
+  const data = event && event.data;
+  if (data && data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // On a failed page navigation, fall back to a cached shell so a cold offline
 // launch (entry is '/' → uncacheable redirect) can still boot. Prefer a shell
 // whose locale matches the requested path, else any cached shell.
@@ -214,6 +224,13 @@ self.addEventListener('fetch', (event) => {
   const isNavigation =
     request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html');
   if (isNavigation) {
+    // Recovery navigations stamp _lc_chunk (staleDeployReload). Unregister does
+    // not drop control of the current client, so this SW still handles the fetch —
+    // never fall back to a precached shell or re-cache the bust URL as a shell.
+    if (url.searchParams.has('_lc_chunk')) {
+      event.respondWith(fetch(request).catch(() => Response.error()));
+      return;
+    }
     event.respondWith(
       fetch(request)
         .then((response) => {
