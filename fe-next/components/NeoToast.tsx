@@ -306,7 +306,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               type: 'spring',
               stiffness: 400,
               damping: 25,
-              x: { duration: 0.4, delay: 0.1 }
+              x: { type: 'tween', duration: 0.4, delay: 0.1 }
             }}
             role="alert"
             aria-live="assertive"
@@ -368,7 +368,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
               type: 'spring',
               stiffness: 400,
               damping: 25,
-              x: { duration: 0.4, delay: 0.1 }
+              x: { type: 'tween', duration: 0.4, delay: 0.1 }
             }}
             role="alert"
             aria-live="assertive"
@@ -459,7 +459,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
               type: 'spring',
               stiffness: 400,
               damping: 25,
-              x: { duration: 0.3 }
+              x: { type: 'tween', duration: 0.3 }
             }}
             role="alert"
             aria-live="assertive"
@@ -569,7 +569,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
               type: 'spring',
               stiffness: 400,
               damping: 25,
-              x: { duration: 0.3, delay: 0.1 }
+              x: { type: 'tween', duration: 0.3, delay: 0.1 }
             }}
             role="status"
             aria-live="polite"
@@ -578,8 +578,9 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
           >
             <m.span
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: [1, 1.2, 1] }}
-              transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
+              // Springs support 2 keyframes max (t_15ec0d7a / #893 recurrence).
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 16 }}
               className="text-2xl text-neo-black"
               aria-hidden="true"
             >

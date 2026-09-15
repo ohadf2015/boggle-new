@@ -233,7 +233,8 @@ export default function EndlessPageClient(): React.JSX.Element {
             >
               <AdaptiveMotion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+                // Springs support 2 keyframes max (t_15ec0d7a / #893).
+                animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 200 }}
                 className="text-neo-lime text-5xl font-black"
               >
