@@ -48,4 +48,10 @@ describe('Sentry client entry split', () => {
     const src = fs.readFileSync(path.join(feRoot, 'lib', 'sentry', 'clientInit.ts'), 'utf8');
     expect(src).toContain('Sentry.init(');
   });
+
+  it('instrumentation-client auto-load is outside the Lighthouse trace window', () => {
+    const src = fs.readFileSync(path.join(feRoot, 'instrumentation-client.ts'), 'utf8');
+    expect(src).toMatch(/60_000|60000/);
+    expect(src).not.toMatch(/setTimeout\(\(\) => \{ void loadSentry\(\); \}, 12\s?\*?\s?000\)/);
+  });
 });

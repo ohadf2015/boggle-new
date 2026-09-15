@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { act, render } from '@testing-library/react';
 import FeedbackDevtoolsWidget, {
+    FEEDBACK_WIDGET_INTENT_EVENTS,
     FEEDBACK_WIDGET_SCRIPT_ID,
     FEEDBACK_WIDGET_SRC,
     FEEDBACK_WIDGET_TOKEN,
@@ -12,9 +13,9 @@ import FeedbackDevtoolsWidget, {
  * still downloads + evaluates lazyOnload tags during the trace.
  *
  * Intent-gate: do not emit a <script> until the first user gesture
- * (pointerdown/keydown/scroll/touchstart). Lighthouse does not generate
- * those, so the 3.6s drops off the landing first-paint graph. Real users
- * tap Play almost immediately and still get the launcher.
+ * (pointerdown/keydown/touchstart). Do NOT use `scroll` — Lighthouse
+ * scrolls while hunting LCP. Real users tap Play almost immediately
+ * and still get the launcher.
  *
  * Hosted-latest pointer + project token stay pinned so a future edit
  * cannot silently re-vendor public/widget.js.
@@ -73,13 +74,23 @@ describe('<FeedbackDevtoolsWidget>', () => {
         );
     });
 
-    it('injects the script at most once across repeated gestures', async () => {
+    it('does not treat Lighthouse page-scroll as intent', async () => {
         render(<FeedbackDevtoolsWidget />);
         await flushEffects();
         await act(async () => {
             window.dispatchEvent(new Event('scroll'));
+        });
+        expect(widgetScript()).toBeNull();
+        expect(FEEDBACK_WIDGET_INTENT_EVENTS).not.toContain('scroll');
+    });
+
+    it('injects the script at most once across repeated gestures', async () => {
+        render(<FeedbackDevtoolsWidget />);
+        await flushEffects();
+        await act(async () => {
             window.dispatchEvent(new Event('pointerdown'));
             window.dispatchEvent(new Event('touchstart'));
+            window.dispatchEvent(new Event('keydown'));
         });
         expect(document.querySelectorAll(`script[src="${FEEDBACK_WIDGET_SRC}"]`).length).toBe(1);
     });
