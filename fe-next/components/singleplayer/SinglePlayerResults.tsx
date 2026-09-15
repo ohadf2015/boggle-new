@@ -34,6 +34,7 @@ import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { useIsDesktop } from '@/hooks/useDesktopLayout';
+import { useResultsStickyCtaHeight } from '@/hooks/useResultsStickyCtaHeight';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
@@ -162,7 +163,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
-  const isDesktop = useIsDesktop();
+  const isDesktop = useIsDesktop()
+  const stickyCtaRef = useResultsStickyCtaHeight<HTMLDivElement>();
   const { submitLeaderboardScore } = useCrazyGames();
 
   useEffect(() => {
@@ -613,7 +615,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       </div>
 
       {!isDesktop && (
-        <div className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+        <div ref={stickyCtaRef} className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" beforeNavigate={gateWithInterstitial} />
         </div>
       )}

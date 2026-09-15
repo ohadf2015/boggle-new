@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import { Trophy, TrendingUp, Medal, Users, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
@@ -160,8 +161,11 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
   );
 
   // ── Soft sheet (default / treatment) — non-blocking, value before auth ──
+  // Portal to body at z-[120]: PracticeResults / SP sticky CTAs are also
+  // `fixed … z-50` and paint later in the tree, so an in-tree z-50 sheet lost
+  // the stacking contest and covered OAuth on mobile (t_da22db9a).
   if (useSheet) {
-    return (
+    const sheet = (
       <AnimatePresence>
         {isOpen && (
           <m.div
@@ -170,7 +174,9 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              'fixed inset-x-0 bottom-3 z-50 max-h-[min(70dvh,28rem)]',
+              'fixed inset-x-0 z-[120] max-h-[min(70dvh,28rem)]',
+              // Clear sticky results CTAs + safe area (MP sheet uses the same idea).
+              'bottom-[calc(0.75rem+var(--results-sticky-cta-h,0px)+env(safe-area-inset-bottom,0px))]',
               'flex flex-col rounded-2xl border-3 border-black overflow-hidden',
               'shadow-hard-lg md:max-w-lg md:mx-auto max-w-[calc(100%-1.5rem)] mx-auto',
               isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
@@ -269,6 +275,8 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
         )}
       </AnimatePresence>
     );
+    if (typeof document === 'undefined') return sheet;
+    return createPortal(sheet, document.body);
   }
 
   // ── Legacy blocking Dialog (control holdout) ──

@@ -124,6 +124,8 @@ export interface GoogleIdServices {
     id: {
       initialize: (config: Record<string, unknown>) => void;
       prompt: (listener?: (notification: unknown) => void) => void;
+      /** Cancels a visible / pending One Tap prompt (no-op if none). */
+      cancel?: () => void;
       renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
     };
   };
