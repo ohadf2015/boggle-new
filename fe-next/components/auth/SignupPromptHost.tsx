@@ -14,6 +14,10 @@
  *
  * t_4833c3cd: honor frictionVariant so soft-sheet vs blocking Dialog is
  * driven by signup-prompt-friction-v1 (default soft-sheet).
+ *
+ * t_da22db9a: this Host is the *sole* useSignupPrompt mount. ResultsPage must
+ * not dual-mount the hook or route to AuthModal — that raced soft-sheet and
+ * deepened the prompt→completed cliff after #978.
  */
 
 import dynamic from 'next/dynamic';

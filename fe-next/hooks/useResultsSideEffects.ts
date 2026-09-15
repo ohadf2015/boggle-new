@@ -10,7 +10,7 @@
  * - Cognitive score saving (brain training)
  * - Game completion tracking (analytics, win streaks)
  * - Game history (performance chart data)
- * - Signup prompts (guest user conversion)
+ * - Signup prompts: owned solely by SignupPromptHost (t_da22db9a)
  */
 
 import { useCallback, useEffect, useRef, useState, startTransition } from 'react';
@@ -18,7 +18,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useWinStreak } from '@/hooks/useWinStreak';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
-import { useSignupPrompt } from '@/components/singleplayer/results/hooks/useSignupPrompt';
 import logger from '@/utils/logger';
 import {
   getGuestStatsSummary,
@@ -32,7 +31,6 @@ import type { WordObject } from '@/components/results/types';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { useMpWinStreak, type MpMode } from '@/hooks/useMpWinStreak';
 import { syncGhostRivalScore } from '@/utils/ghostRivalSync';
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // ==============================================
 // TYPES
@@ -166,7 +164,7 @@ export function useResultsSideEffects({
   gameDuration = 180,
   gridSize = 16,
   achievements,
-  showWordFeedback,
+  showWordFeedback: _unusedShowWordFeedback,
   normalizeUsername,
   mpGameMode,
   gameMode,
@@ -175,8 +173,7 @@ export function useResultsSideEffects({
   // AUTH & CONTEXT
   // ==============================================
 
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
-  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const { user, isAuthenticated } = useAuth();
   const { refreshCoins } = useCoinContext();
   const { currentStreak, bestStreak, lastWinDate, recordWin } = useWinStreak();
   const { saveCognitiveScore } = useSaveCognitiveScore();
@@ -201,7 +198,6 @@ export function useResultsSideEffects({
   const [previousStreak, setPreviousStreak] = useState<number>(0);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
-  const hasRoutedSignupPromptRef = useRef<boolean>(false);
 
   // ==============================================
   // REFS (Prevent duplicate execution)
@@ -472,52 +468,21 @@ export function useResultsSideEffects({
   }, [user?.id, currentPlayerData]);
 
   // ==============================================
-  // EFFECT 6: Signup Prompt (hook-driven, timer-based)
+  // EFFECT 6: Signup Prompt — DISABLED (t_da22db9a)
   //
-  // Prior scroll-gated logic fired ~5% of the time (PostHog `first_win_signup`
-  // modalId had 0 events in 7d) because most mobile results screens fit in one
-  // viewport — users never scrolled past 80%. `useSignupPrompt` uses a 3.5s
-  // post-results timer + sessionStorage guard. Route its decision to one of
-  // the two existing modal slots based on winner status.
+  // SignupPromptHost is the sole owner of useSignupPrompt + FirstWinSignupModal
+  // (soft-sheet / friction experiment). A second mount here raced the Host on
+  // the session latch and often opened blocking AuthModal for non-first-win
+  // guests — bypassing soft-sheet and stacking auth walls. Keep the ResultsModals
+  // slots for share/level-up/etc., but never drive them from the growth funnel.
   // ==============================================
 
-  const signupPrompt = useSignupPrompt({
-    isAuthenticated,
-    hasUser: !!user,
-    authLoading,
-    disabled:
-      !!gameCode ||
-      isOnCrazyGamesPlatform ||
-      showWordFeedback ||
-      !hasUpdatedStatsRef.current,
-  });
-
-  useEffect(() => {
-    if (!signupPrompt.showSignupModal) return;
-    if (hasRoutedSignupPromptRef.current) return;
-    hasRoutedSignupPromptRef.current = true;
-    if (isCurrentUserWinner && signupPrompt.isFirstWin) {
-      setShowFirstWinModal(true);
-    } else {
-      setShowAuthModal(true);
-    }
-  }, [signupPrompt.showSignupModal, signupPrompt.isFirstWin, isCurrentUserWinner]);
-
-  const dismissSignupModal = signupPrompt.dismissSignupModal;
-  const wrappedSetShowAuthModal = useCallback(
-    (show: boolean) => {
-      setShowAuthModal(show);
-      if (!show) dismissSignupModal();
-    },
-    [dismissSignupModal],
-  );
-  const wrappedSetShowFirstWinModal = useCallback(
-    (show: boolean) => {
-      setShowFirstWinModal(show);
-      if (!show) dismissSignupModal();
-    },
-    [dismissSignupModal],
-  );
+  const wrappedSetShowAuthModal = useCallback((show: boolean) => {
+    setShowAuthModal(show);
+  }, []);
+  const wrappedSetShowFirstWinModal = useCallback((show: boolean) => {
+    setShowFirstWinModal(show);
+  }, []);
 
   // ==============================================
   // RETURN ALL DATA

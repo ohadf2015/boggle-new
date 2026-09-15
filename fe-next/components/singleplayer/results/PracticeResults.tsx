@@ -13,6 +13,7 @@ import { clearSessionPreservingUsername } from '@/utils/session';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/shared/types/game';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { useResultsStickyCtaHeight } from '@/hooks/useResultsStickyCtaHeight';
 import { usePracticeStreak } from '@/hooks/usePracticeStreak';
 import { selectFirstSessionDailyCta } from '@/lib/growth/firstSessionDailyCta';
 import {
@@ -189,6 +190,7 @@ const PracticeResults = memo(function PracticeResults({
   const { t, language } = useLanguage();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const reducedMotion = useReducedMotion();
+  const stickyCtaRef = useResultsStickyCtaHeight<HTMLDivElement>();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -503,7 +505,7 @@ const PracticeResults = memo(function PracticeResults({
       </div>
 
       {/* ── Mobile sticky bottom — single daily CTA + go home ── */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+      <div ref={stickyCtaRef} className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
             <m.button
