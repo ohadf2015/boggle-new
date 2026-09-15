@@ -1,5 +1,5 @@
 /**
- * Classroom Marketplace assign API — returns #968 Stream share URL + attachment URIs.
+ * Classroom Marketplace assign API — returns miss-gap Live + Unplugged Stream share URLs + attachment URIs.
  * POST missed words (class-level only). Never student names.
  */
 
@@ -25,7 +25,7 @@ export async function GET(): Promise<NextResponse> {
       marketplace_path: '/api/classroom-addon/marketplace',
       student_names: false,
       instructions:
-        'POST missed_words (and optional lesson/locale) to receive streamAssignUrl (#968 Unplugged homework) plus teacher/student attachment URIs.',
+        'POST missed_words (and optional lesson/locale) to receive liveStreamAssignUrl (free-Workspace miss-gap Live — Quizlet Education Plus foil), streamAssignUrl (#968 Unplugged homework), plus teacher/student attachment URIs.',
     },
     { status: 200, headers: classroomAddonCorsHeaders() },
   );

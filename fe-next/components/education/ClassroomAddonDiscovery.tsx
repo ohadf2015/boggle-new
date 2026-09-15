@@ -1,16 +1,16 @@
 /**
  * Google Classroom Marketplace — Attachment Discovery iframe.
  *
- * Teacher enters class-level missed words; one-click posts Unplugged reteach
- * homework (#968 printable + Live deep-link) to the Classroom Stream via the
- * Phase-1 share dialog (no OAuth / no roster PII). Foils Discovery Education
- * Gemini Classroom + Kahootopia Assignments.
+ * Teacher enters class-level missed words; one-click assigns a 3-min miss-gap
+ * Live (Quizlet Education Plus foil — works on free Workspace) or posts
+ * Unplugged reteach homework (#968 printable + Live deep-link) to the Classroom
+ * Stream via the Phase-1 share dialog (no OAuth / no roster PII).
  */
 
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, GraduationCap, Printer, Share2 } from 'lucide-react';
+import { Check, GraduationCap, Play, Printer, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -48,6 +48,7 @@ export function ClassroomAddonDiscovery({
     });
   }, [missedText, lesson, locale]);
 
+  const liveStreamHref = assign.ok ? assign.liveStreamAssignUrl : null;
   const streamHref = assign.ok ? assign.streamAssignUrl : null;
   const unpluggedHref = assign.ok ? assign.unpluggedUrl : null;
   const words = assign.ok ? assign.attachment.title : '';
@@ -162,20 +163,20 @@ export function ClassroomAddonDiscovery({
         {t('education.classroomAddon.planner.title')}
       </a>
 
-      {streamHref ? (
+      {liveStreamHref ? (
         <a
-          href={streamHref}
+          href={liveStreamHref}
           target="_blank"
           rel="noopener noreferrer"
-          data-testid="classroom-addon-post-stream"
+          data-testid="classroom-addon-assign-live"
           className={cn(
             'mt-5 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm',
             'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard hover:shadow-hard-lg transition-all',
           )}
         >
-          <Share2 className="w-4 h-4" aria-hidden />
-          {t('education.classroomAddon.postToStream')}
+          <Play className="w-4 h-4" aria-hidden />
+          {t('education.classroomAddon.assignLive')}
         </a>
       ) : (
         <NeoNote
@@ -185,6 +186,32 @@ export function ClassroomAddonDiscovery({
         >
           {t('education.classroomAddon.needMissedWords')}
         </NeoNote>
+      )}
+
+      {liveStreamHref && (
+        <p
+          className="mt-2 text-neo-lime/90 font-neo-body text-xs"
+          data-testid="classroom-addon-free-workspace-foil"
+        >
+          {t('education.classroomAddon.freeWorkspaceFoil')}
+        </p>
+      )}
+
+      {streamHref && (
+        <a
+          href={streamHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="classroom-addon-post-stream"
+          className={cn(
+            'mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
+            'bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo',
+            'shadow-hard-sm hover:shadow-hard transition-all',
+          )}
+        >
+          <Share2 className="w-4 h-4" aria-hidden />
+          {t('education.classroomAddon.postToStream')}
+        </a>
       )}
 
       {unpluggedHref && (
