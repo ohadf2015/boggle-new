@@ -115,6 +115,11 @@ export default async function ClassGapPage(props: PageProps) {
     'education.results.startTeamTilesUnplugged',
     'Start Team Tiles Unplugged',
   );
+  const classicUnpluggedLive = readString(
+    t,
+    'education.results.startClassicUnplugged',
+    'Start Classic Unplugged',
+  );
   const eyebrow = readString(t, 'education.results.shareGapEyebrow', "Today's class gap");
   const practiceHome = readString(t, 'education.results.shareGapPracticeHome', 'Words to practice at home');
   const allFound = readString(t, 'education.results.allFound', 'The class found every lesson word.');
@@ -158,6 +163,7 @@ export default async function ClassGapPage(props: PageProps) {
           reteachLabel={reteachLive}
           unpluggedLabel={unpluggedLive}
           teamTilesLabel={teamTilesLive}
+          classicUnpluggedLabel={classicUnpluggedLive}
           educationHref={`/${payload.locale}/education`}
           educationLabel={cta}
         />
