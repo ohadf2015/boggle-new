@@ -132,13 +132,18 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       // /he/daily/word-wheel were exclusively Mobile (he, ר, ש).
       whileTap={{ scale: 0.94 }}
       whileHover={!isCenter && !isUsed ? { scale: 1.1, boxShadow: '2px 2px 0px black, 0 0 18px rgba(191,255,0,0.5)' } : undefined}
-      animate={{
-        x: offsetX,
-        y: offsetY,
-        ...(isCenter && !isUsed && !reducedMotion
-          ? { scale: [1, 1.06, 1], boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'] }
-          : { scale: isUsed ? 0.9 : 1 }),
-      }}
+      animate={isCenter && !isUsed && !reducedMotion
+        ? {
+            x: offsetX,
+            y: offsetY,
+            scale: [1, 1.06, 1],
+            boxShadow: ['3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)', '3px 3px 0px black, 0 0 28px rgba(191,255,0,0.7)', '3px 3px 0px black, 0 0 20px rgba(191,255,0,0.5)'],
+          }
+        : {
+            x: offsetX,
+            y: offsetY,
+            scale: isUsed ? 0.9 : 1,
+          }}
       transition={isCenter && !isUsed && !reducedMotion
         // Multi-keyframe scale pulse must be tween; x/y stay springs (2-value).
         ? { type: 'tween' as const, duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
