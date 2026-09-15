@@ -11,7 +11,6 @@ import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import AdSenseLoader from '@/components/ads/AdSenseLoader';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
@@ -635,24 +634,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
                 <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
                 <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
-                {/* No AdSense tag here — `AdSenseLoader` (mounted below) is the sole
-                    injector. This layout used to render one too, and it was wrong twice.
-                    (1) next/script stamps `data-nscript` on the tag, which adsbygoogle.js
-                    rejects: 405 warnings across 8 users (Sentry JAVASCRIPT-NEXTJS-1PQ).
-                    (2) It rendered UNCONDITIONALLY and won the race for the shared
-                    `adsbygoogle-init` id, so AdSenseLoader's `getElementById` guard
-                    early-returned on every page load ever — its advertising-consent,
-                    child-tier, native/CrazyGames and FTUE gates were dead code while the
-                    script itself loaded for everybody. Loading AdSense without consent is
-                    the actual severity here; the console warning was just the symptom that
-                    surfaced.
-                    The hydration property that put a `<Script strategy="lazyOnload">` here
-                    in the first place is preserved and then some: AdSenseLoader appends a
-                    plain `<script>` from a `useEffect`, which cannot run until after
-                    hydration completes — strictly later than lazyOnload. See
-                    `headScriptsHydration.test.ts`. Domain verification is unaffected: the
-                    `google-adsense-account` meta in the root layout is the ownership
-                    signal, not this tag. */}
+                {/* No AdSense script here — and none anywhere on the web build.
+                    Web AdSense was REJECTED ("low value content"), so Auto-Ads
+                    (162 KiB of show_ads_impl main-thread cost per Lighthouse
+                    2026-08-24) could never earn: the loader component was deleted
+                    2026-09-15 (kanban t_79e9fcc1). The web ad path that CAN earn
+                    is H5 Games Ads (lib/ads/h5GamesAds.ts) — adBreak-only,
+                    loaded on user intent, never on first paint.
+                    Domain verification is unaffected: the
+                    `google-adsense-account` meta in the ROOT layout (app/layout.tsx)
+                    is the ownership signal for a future resubmission, not a script. */}
                 {/* CrazyGames SDK — preconnect for game-distribution builds */}
                 <link rel="preconnect" href="https://sdk.crazygames.com" />
                 <link rel="dns-prefetch" href="https://sdk.crazygames.com" />
@@ -734,9 +725,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <GoogleConsentMode />
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
-                {/* Direct AdSense (web Auto-Ads) — replaces PurpleAds. Dark until
-                    NEXT_PUBLIC_ADSENSE_ENABLED=true; consent/tier/web gated internally. */}
-                <AdSenseLoader />
+                {/* Web AdSense Auto-Ads loader DELETED 2026-09-15 (kanban t_79e9fcc1):
+                    web AdSense is rejected, so the script was 162 KiB of pure main-thread
+                    cost with zero possible revenue. H5 Games Ads remains the web ad path
+                    (intent-gated, see lib/ads/h5GamesAds.ts). */}
                 {/* Web anchor-ad height observer — measures AdSense anchor ad band
                     and publishes --web-anchor-ad-height for CLS prevention. */}
                 <WebAnchorAdObserver />
