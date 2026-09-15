@@ -5,6 +5,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
 import { withPostHogConfig } from '@posthog/nextjs-config';
 import { RETIRED_PRACTICE_REDIRECTS } from './lib/seo/retiredPracticeRedirects.mjs';
+import { ChunkLoadRetryPlugin } from './lib/deploy/chunkLoadRetryPlugin.mjs';
 
 const pkg = createRequire(import.meta.url)('./package.json');
 
@@ -637,9 +638,19 @@ const nextConfig = {
   },
 
   // Webpack configuration - alias for swedish-words package
-  webpack: (config, { isServer: _isServer, dev }) => {
+  webpack: (config, { isServer, dev }) => {
     // Alias the TypeScript index to the compiled JavaScript version
     config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
+
+    // Client-only: retry a failed chunk <script> ONCE (cache-bust re-request)
+    // before webpack surfaces ChunkLoadError. Cuts the residual transient-flake
+    // exceptions (~1/week) that pollute PostHog even when recovery reload later
+    // succeeds. See lib/deploy/chunkLoadRetryPlugin.mjs. Turbopack builds ignore
+    // webpack plugins entirely, so build:turbopack is unaffected (and unhardened).
+    if (!isServer) {
+      config.plugins = config.plugins || [];
+      config.plugins.push(new ChunkLoadRetryPlugin());
+    }
 
     // Peak build-memory reduction for the webpack engine (prod builds with
     // `next build --webpack`). Railway's build container has less RAM than a dev
