@@ -1,9 +1,15 @@
 /**
- * Direct Google AdSense (web) — load policy.
+ * Direct Google AdSense (web) — load policy + site-ownership meta.
  *
- * Replaces the externally-injected PurpleAds managed layer with a direct, in-repo AdSense
- * integration under our own publisher id (`google.com, pub-1896836706464880, DIRECT` in
- * ads.txt). Pure + testable; the React loader (components/ads/AdSenseLoader.tsx) consults it.
+ * HISTORY: this module used to drive a React Auto-Ads loader
+ * (components/ads/AdSenseLoader.tsx). That loader was DELETED 2026-09-15
+ * (kanban t_79e9fcc1): web AdSense was rejected, so adsbygoogle.js was 162 KiB
+ * of first-paint main-thread cost with zero possible revenue. What remains here:
+ * `getAdSenseAccountMeta()` powers the `google-adsense-account` meta in
+ * app/layout.tsx — the privacy-neutral ownership signal a resubmission needs —
+ * and the pure policy helpers below are kept (and tested) so an approved
+ * resubmission can reintroduce a loader without re-deriving the gates.
+ * The earning web ad path today is H5 Games Ads (lib/ads/h5GamesAds.ts).
  *
  * Ships DARK: gated on `NEXT_PUBLIC_ADSENSE_ENABLED==='true'` so it cannot double-serve while
  * any legacy PurpleAds tag still exists. Flip on once PurpleAds is removed (GTM tag + ads.txt)

@@ -41,24 +41,21 @@ describe('<head> scripts cannot race hydration', () => {
   });
 
   /**
-   * This layout used to ALSO load adsbygoogle.js through `<Script strategy="lazyOnload">`,
-   * which was wrong twice over. next/script stamps `data-nscript` on the tag and AdSense
-   * rejects it — 405 warnings, 8 users (Sentry JAVASCRIPT-NEXTJS-1PQ). And because the tag
-   * was rendered UNCONDITIONALLY, it beat `AdSenseLoader` to the shared `adsbygoogle-init`
-   * id, so the loader's `getElementById` guard returned early forever: the advertising-consent,
-   * child-tier, native/CrazyGames and FTUE gates it exists to enforce were all dead code while
-   * the script itself loaded for everyone regardless.
-   *
-   * AdSenseLoader is the single injector now: a plain `<script>` (no `data-nscript`) appended
-   * from a `useEffect`, which is strictly later than lazyOnload and so keeps the hydration
-   * property this file pins.
+   * Web AdSense Auto-Ads was deleted 2026-09-15 (kanban t_79e9fcc1): the site is
+   * REJECTED for web AdSense, so adsbygoogle.js + its 162 KiB show_ads_impl were
+   * structurally unmonetizable main-thread cost (Lighthouse 2026-08-24 mobile PSI 33).
+   * The remaining web ad path is H5 Games Ads (lib/ads/h5GamesAds.ts) — adBreak-only,
+   * injected on user intent from a useEffect, never from this layout.
+   * Site-ownership verification for a future resubmission is the
+   * `google-adsense-account` META in app/layout.tsx — it needs no script.
    */
-  it('does not load AdSense from the layout at all — AdSenseLoader owns it', () => {
+  it('does not load AdSense from the layout at all — web Auto-Ads is deleted', () => {
     // Tags only. Prose naming the script is how this file explains itself.
     const scriptTags: string[] = SOURCE.match(/<[Ss]cript\b[^>]*>/g) ?? [];
     expect(scriptTags.filter((t) => t.includes('adsbygoogle'))).toEqual([]);
-    // The consent-gated component must still be mounted, or web ads go dark entirely.
-    expect(SOURCE).toContain('<AdSenseLoader />');
+    // The consent-gated injector component was deleted with the program; a mount
+    // reappearing here means someone re-added Auto-Ads to the first-paint graph.
+    expect(SOURCE).not.toContain('<AdSenseLoader />');
   });
 
   it('still keeps the storage shim as a same-document inline script, which must be first', () => {
