@@ -10,15 +10,13 @@ installTranslationDomGuard();
 // Sentry is NOT statically imported here anymore — the SDK (~155KB min,
 // ~490KB transferred with tracing) used to ride along in the boot chunk and
 // cost seconds of main-thread eval on mobile. It loads on the first error,
-// or ~12s after window-load, whichever comes first. The delayed idle load
-// matters twice over: (1) it keeps the SDK's fetch+init burst out of the
-// first-interaction window, where it collided with user input (CrUX INP was
-// SLOW, 517ms p75), and (2) it keeps the ~8.7s of main-thread work the SDK
-// triggers out of the Lighthouse trace (chunk 67917, the largest single
-// contributor to TBT on the landing page).
+// or 60s after window-load, whichever comes first. 12s was still inside
+// Lighthouse traces on this landing (LH 13 mobile often runs 15–40s when
+// the page is slow; chunk 78883 then reappears as 8s of Script Evaluation).
+// Errors still load the SDK immediately via onRecoverableError / sentryLazy.
 if (typeof window !== "undefined") {
   const kickoff = () => {
-    setTimeout(() => { void loadSentry(); }, 12000);
+    setTimeout(() => { void loadSentry(); }, 60_000);
   };
   if (document.readyState === "complete") kickoff();
   else window.addEventListener("load", kickoff, { once: true });

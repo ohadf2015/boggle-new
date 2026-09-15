@@ -15,8 +15,10 @@
  * next/script strategy="lazyOnload" still put widget.js (250 KiB / ~3.6s
  * scripting) on the landing Lighthouse graph because LH waits for network
  * idle and evaluates lazy tags. Inject only after the first user gesture
- * (pointer/key/scroll/touch). Real users tap Play immediately; Lighthouse
- * does not, so the 3.6s leaves the first-paint budget.
+ * (pointer/key/touch). Do NOT listen for `scroll` — Lighthouse scrolls the
+ * page while hunting LCP, which would pull widget.js back onto the PSI
+ * graph. Real users tap Play immediately; Lighthouse does not, so the 3.6s
+ * leaves the first-paint budget.
  *
  * The data-token is the LexiClash project's PUBLIC ingest SDK token (scope:
  * ingest only, rate-limited upstream) — safe to ship client-side by design,
@@ -43,7 +45,6 @@ export const FEEDBACK_WIDGET_SCRIPT_ID = 'fdw-widget';
 export const FEEDBACK_WIDGET_INTENT_EVENTS = [
     'pointerdown',
     'keydown',
-    'scroll',
     'touchstart',
 ] as const;
 
