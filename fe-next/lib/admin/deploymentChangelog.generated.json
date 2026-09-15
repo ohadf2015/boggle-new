@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-12T17:28:23.894Z",
+  "generatedAt": "2026-09-15T04:59:55.182Z",
   "commits": [
     {
-      "sha": "012883867e8c26cb4cbb6c0e7a4687f5d7c8be34",
-      "shortSha": "0128838",
-      "subject": "merge: origin/master (97c8704df, #1021 practice-drill fit + guards) into gauntlet/teacher-module-r2",
+      "sha": "91252908081202ce9ea7e271232464448e1e1b91",
+      "shortSha": "9125290",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-14",
       "author": "Ohad Fisher",
-      "date": "2026-09-12T20:25:21+03:00"
+      "date": "2026-09-14T04:14:29+03:00"
     },
     {
-      "sha": "3d31ecedb4b183982474bd0b4610db5f1aa35d65",
-      "shortSha": "3d31ece",
-      "subject": "chore(i18n): regenerate translation report",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T19:59:57+03:00"
-    },
-    {
-      "sha": "ecbaa7f2b153d45ade11ea03fe43bf3228becdad",
-      "shortSha": "ecbaa7f",
-      "subject": "feat(education): teacher module gauntlet II — six pieces won blind vs Blooket, interim ship",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T17:25:54+03:00"
-    },
-    {
-      "sha": "97c8704df2e727103e4987dcf2e9065b25378d43",
-      "shortSha": "97c8704",
-      "subject": "fix(practice): no-scroll drill fit, missing-data guards, SFX, drop mobile breadcrumbs (#1021)",
+      "sha": "5db1336856d9a7a95abb26bfc7708a79cb0a8c64",
+      "shortSha": "5db1336",
+      "subject": "feat(connections): keyboard polish + daily result page at wheel/hunt parity (#1033)",
       "author": "ohadf2015",
-      "date": "2026-09-12T18:11:27+04:00"
+      "date": "2026-09-14T04:59:34+04:00"
     },
     {
-      "sha": "c1ce436d84eba9356bb2809975885351fbc1df83",
-      "shortSha": "c1ce436",
-      "subject": "merge: origin/master (6ace30de2) into gauntlet/teacher-module-r2 — i18n manifest regenerated",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T15:58:38+03:00"
-    },
-    {
-      "sha": "406f70f59357a44e13f2f859cb67c7be5da4ee4b",
-      "shortSha": "406f70f",
-      "subject": "wip(gauntlet II): practice, round-end, duels r4, homework r5/r6 partial, assets — pre-ship snapshot 2026-09-12 15:58",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T15:57:48+03:00"
-    },
-    {
-      "sha": "6ace30de22876e2a91ccd9a0b37093d67d1610cc",
-      "shortSha": "6ace30d",
-      "subject": "chore(nightly): land the 2026-08-05 lane code that never shipped",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T15:13:05+03:00"
-    },
-    {
-      "sha": "9ba5b8aba5e5469f4a2aa63e35548ed5c1bddd82",
-      "shortSha": "9ba5b8a",
-      "subject": "chore(nightly): land unshipped lane code from 2026-09-04, 09-10, 09-12",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T14:33:52+03:00"
-    },
-    {
-      "sha": "3b569068bdf7a03bea53d26ac785ed814fc3edc5",
-      "shortSha": "3b56906",
-      "subject": "SEO: daily meta tag improvements (2026-09-12) (#1019)",
+      "sha": "075ae4dbf9e57f5b89922cfd2a5f4eb7c89845ed",
+      "shortSha": "075ae4d",
+      "subject": "Hide Word Tower from consumer surfaces (keep routes alive) (#1032)",
       "author": "ohadf2015",
-      "date": "2026-09-12T09:24:35+04:00"
+      "date": "2026-09-14T01:52:23+04:00"
     },
     {
-      "sha": "09209b1479b54df0166fdd040d9f02417c9c9085",
-      "shortSha": "09209b1",
-      "subject": "feat(education): school-lead notify to Ohad + weekly digest (#1017)",
+      "sha": "06e623cad8653fa6e7995a0cc9733ffd50de8b1c",
+      "shortSha": "06e623c",
+      "subject": "fix(education): visible card borders on dark fills (WCAG 1.4.11, shard 5) (#1030)",
       "author": "ohadf2015",
-      "date": "2026-09-12T00:31:17+04:00"
+      "date": "2026-09-14T00:31:04+04:00"
     },
     {
-      "sha": "3d759f58791c1fa24fb25359d9ba68214b87e18e",
-      "shortSha": "3d759f5",
-      "subject": "fix(ui): hydration #418 i18n race + selected-tile 1.23:1 contrast (#1018)",
+      "sha": "2c95f30560ee2b9e5b745f8498fa0128bc620c5d",
+      "shortSha": "2c95f30",
+      "subject": "SEO/AEO: GSC-grounded title + 4 real-query FAQs on the Spanish ESL winner (#1027)",
       "author": "ohadf2015",
-      "date": "2026-09-12T00:31:13+04:00"
+      "date": "2026-09-13T15:00:31+04:00"
     },
     {
-      "sha": "c0f86401a9b405b1d51ff9a276796c144f46cc4a",
-      "shortSha": "c0f8640",
-      "subject": "merge: origin/master (0fe5da14e simplify pass) into gauntlet/teacher-module-r2",
+      "sha": "18ac501c79941950e8ee56980d6f8d4159b0a1a5",
+      "shortSha": "18ac501",
+      "subject": "SEO: daily meta tag improvements (2026-09-13) (#1026)",
+      "author": "ohadf2015",
+      "date": "2026-09-13T11:09:23+04:00"
+    },
+    {
+      "sha": "da42c7ee926a8ff79ea7cc216cc411c43e0167cd",
+      "shortSha": "da42c7e",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-13",
       "author": "Ohad Fisher",
-      "date": "2026-09-11T19:34:36+03:00"
+      "date": "2026-09-13T02:22:00+03:00"
     },
     {
-      "sha": "dfbaca0931d4af1b19704da2f4cda5947c73de76",
-      "shortSha": "dfbaca0",
-      "subject": "wip(gauntlet): teacher gauntlet II builders' work in progress before merging master",
+      "sha": "182ef587bda0e922371a1c86f6329db915079340",
+      "shortSha": "182ef58",
+      "subject": "chore(i18n): refresh translation-report for the new wordWheel keys",
       "author": "Ohad Fisher",
-      "date": "2026-09-11T19:30:36+03:00"
+      "date": "2026-09-13T01:33:54+03:00"
     },
     {
-      "sha": "0fe5da14e038c8c5874f9dd16b02ce33d1834538",
-      "shortSha": "0fe5da1",
-      "subject": "refactor(education): simplify pass over the teacher module gauntlet",
+      "sha": "374f1ec1c733a890f96caf8e67e8daac2b33c8b1",
+      "shortSha": "374f1ec",
+      "subject": "chore(nightly): land the 2026-09-13 lane artifacts and queue updates",
       "author": "Ohad Fisher",
-      "date": "2026-09-11T18:40:37+03:00"
+      "date": "2026-09-13T01:33:29+03:00"
     },
     {
-      "sha": "6ac5c06826f7b58f2346a78fb0c542c42ac5cd5e",
-      "shortSha": "6ac5c06",
-      "subject": "feat(education): teacher module gauntlet — six pieces judged blind against Kahoot (#1016)",
-      "author": "ohadf2015",
-      "date": "2026-09-11T13:55:35+04:00"
-    },
-    {
-      "sha": "dac2a4ab822bd63bac4fd273d019c2c913d7bac5",
-      "shortSha": "dac2a4a",
-      "subject": "SEO: daily meta tag improvements (2026-09-11) (#1014)",
-      "author": "ohadf2015",
-      "date": "2026-09-11T12:30:48+04:00"
-    },
-    {
-      "sha": "9caf112f36dd3944dd65d46ba5d320b7040d78f0",
-      "shortSha": "9caf112",
-      "subject": "fix(edu): persist teacher-trial-reminders pg_cron schedule in git (#1015)",
-      "author": "ohadf2015",
-      "date": "2026-09-11T11:16:26+04:00"
-    },
-    {
-      "sha": "c6abaf1e7875d2346834edfdd0f72d905d41ec90",
-      "shortSha": "c6abaf1",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-10",
+      "sha": "9cb494f8b1a7d58020329bb3eec0429f1112bb4e",
+      "shortSha": "9cb494f",
+      "subject": "perf(admin): lazy-load DailyActivityChart; seo(guides): link the word solver",
       "author": "Ohad Fisher",
-      "date": "2026-09-11T02:36:42+03:00"
+      "date": "2026-09-13T01:33:14+03:00"
     },
     {
-      "sha": "ff5c5601358c454373715959508e3dbe08d3bfa3",
-      "shortSha": "ff5c560",
-      "subject": "test(seo): fix ES scrabble metadata test broken by #997 (#1001)",
-      "author": "ohadf2015",
-      "date": "2026-09-11T00:31:26+04:00"
+      "sha": "6582188d992363c0d03543aba679421c8e451d29",
+      "shortSha": "6582188",
+      "subject": "feat(word-wheel): on-fire badge for streaks of 4 or more",
+      "author": "Ohad Fisher",
+      "date": "2026-09-13T01:32:57+03:00"
     },
     {
-      "sha": "4a22fa016d6c3f414e83ad9235a42a875e7ea0e5",
-      "shortSha": "4a22fa0",
-      "subject": "feat(education): packages page — Teacher Pro $9/mo, Classroom $39/term lead, schools contact (#1005)",
+      "sha": "8ebd4ffee17fed7e5533dea239053a26148affc8",
+      "shortSha": "8ebd4ff",
+      "subject": "Merge remote-tracking branch 'origin/master'",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T23:40:28+03:00"
+    },
+    {
+      "sha": "75fb443e2c91c8836fead73a8d061cbf4da02d9a",
+      "shortSha": "75fb443",
+      "subject": "test(achievements): replace dead single-player achievement test with a cross-surface guard",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T23:39:43+03:00"
+    },
+    {
+      "sha": "4fc2854a229d3f488d5f26e2076c05599e38882f",
+      "shortSha": "4fc2854",
+      "subject": "fix(practice): board still empty — base Card h-full starves the grid (P0, prod) (#1024)",
       "author": "ohadf2015",
-      "date": "2026-09-11T00:31:22+04:00"
+      "date": "2026-09-13T00:20:07+04:00"
+    },
+    {
+      "sha": "b3204a0ffeee20921310fe9feb23d7314fcdf9f2",
+      "shortSha": "b3204a0",
+      "subject": "chore: land pending nightly artifacts and education component changes",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T22:42:43+03:00"
+    },
+    {
+      "sha": "a833a0250fe8d2c3a8a2b73ca431a7a4779f502c",
+      "shortSha": "a833a02",
+      "subject": "feat(content): improve landing page + blog copy for humans and SEO keywords",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T22:42:04+03:00"
+    },
+    {
+      "sha": "a85d8928c577d97078d3cfd1b8d52bec07c8b9b6",
+      "shortSha": "a85d892",
+      "subject": "feat(blog): add death-of-turn-based-word-games post (5 locales)",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T22:41:42+03:00"
+    },
+    {
+      "sha": "be2159d05a6ff33a364f15729d349041105bc863",
+      "shortSha": "be2159d",
+      "subject": "chore(db): purge QA education accounts and add is_test_account flag",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T15:36:23+03:00"
+    },
+    {
+      "sha": "8facdefa3abf726dd51f58a5901715d547eae0de",
+      "shortSha": "8facdef",
+      "subject": "fix(practice): Solo Board renders empty board — restore flex-column drill root (P0, prod) (#1023)",
+      "author": "ohadf2015",
+      "date": "2026-09-12T23:15:16+04:00"
+    },
+    {
+      "sha": "d6461f4a87d3176913ffbd98cf15954a68976013",
+      "shortSha": "d6461f4",
+      "subject": "merge: origin/master (7bf3739f6, #1022 measured board grid) into gauntlet/teacher-module-r2",
+      "author": "Ohad Fisher",
+      "date": "2026-09-12T20:59:00+03:00"
     }
   ]
 }

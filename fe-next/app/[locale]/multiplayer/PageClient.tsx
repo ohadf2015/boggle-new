@@ -52,6 +52,7 @@ const HostLeftGraceModal = nextDynamic(
   { ssr: false },
 );
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
+import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
 import { rejoinFeedback } from '@/lib/multiplayer/rejoinFeedback';
 import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/utils/growthTracking';
@@ -301,7 +302,26 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         window.history.replaceState({}, '', stripped);
       }
     }
-  }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
+    // Stripping the params says what this room is NOT; it does not say where the
+    // user now is. Without the params `/multiplayer` is the CONSUMER arcade
+    // lobby, so a teacher leaving a classroom game was left standing in the
+    // consumer app with the education shell gone (measured 2026-09-15). The
+    // strip stays — it closes the 2026-05-04 reload-re-entry trap — and the
+    // destination is chosen here. `replaceState` alone could never fix this: it
+    // rewrites the URL without re-running route guards or re-evaluating the
+    // layout, which is exactly why the education shell never came back.
+    const destination = multiplayerExitDestination({
+      isClassroomMode,
+      isHost: isHost || isClassroomHost,
+      locale: language,
+    });
+    // `null` = an ordinary arcade game, where the lobby genuinely is home and
+    // the in-place reset above is the whole exit (a hard nav blanks the
+    // Capacitor WebView). A router push is SPA navigation, so it is safe there
+    // too — `exitClassroomStudentToHub` already relies on that.
+    if (destination) router.push(destination);
+  }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
+      isClassroomMode, isHost, isClassroomHost, language, router]);
 
   // Hide global footer only when in a game room or viewing results (not the lobby)
   useEffect(() => {
@@ -727,6 +747,22 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // `?classroom=true&host=true`, which just makes them another room.
             if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
               window.history.replaceState({}, '', stripMultiplayerExitParams(window.location.href));
+            }
+            // This is the in-lobby Back button — the exit a teacher actually
+            // taps mid-lesson, and the one measured landing on `/en/multiplayer`
+            // (the consumer arcade) on 2026-09-15. Same decision as
+            // `handleExitToLobby`: stripping says what the room is NOT, this
+            // says where the user now is. Both paths have to make it — fixing
+            // only one leaves the other broken, which is how they drifted apart
+            // in the first place.
+            const destination = multiplayerExitDestination({
+              isClassroomMode,
+              isHost: isHost || isClassroomHost,
+              locale: language,
+            });
+            if (destination) {
+              router.push(destination);
+              return;
             }
             toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
           }} /> : <ConnectionDot />}

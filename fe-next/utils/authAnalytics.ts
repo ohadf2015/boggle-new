@@ -10,6 +10,7 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { getStoredUtmData } from '@/utils/utmCapture';
 import { setPostHogUserPropsOnce } from '@/utils/posthogEngagement';
 import logger from '@/utils/logger';
+import { setEduTestAccountFlag, isTestAccountEmail } from '@/lib/education/telemetry';
 
 export interface IdentifyArgs {
   userId: string;
@@ -52,6 +53,12 @@ export function identifyUserForAnalytics(args: IdentifyArgs): void {
       ...(email ? { email } : {}),
     })
   );
+
+  // Test/QA traffic must be excludable with a property filter rather than a
+  // hand-built email pattern reconstructed after the fact
+  // (.claude/rules/70-test-accounts.md). Registered as a super property so it
+  // rides every later event, not just this one.
+  setEduTestAccountFlag(isTestAccountEmail(email));
 
   safe(() =>
     (posthog.capture as PHFn)('user_identified', {

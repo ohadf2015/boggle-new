@@ -14,14 +14,13 @@ vi.mock('@/utils/growthTracking', () => ({
 describe('EducationHero', () => {
   beforeEach(() => mockTrackLandingCtaClick.mockClear());
 
-  it('renders exactly one call-to-action — the teacher access CTA', () => {
+  it('renders a primary Teacher Pro checkout CTA and a secondary free-access path', () => {
     render(<EducationHero />);
-    const links = screen.getAllByRole('link');
-    const ctaLinks = links.filter((l) =>
-      (l.getAttribute('href') ?? '').includes('/education/access'),
-    );
-    expect(ctaLinks).toHaveLength(1);
-    expect(ctaLinks[0]).toHaveTextContent('education.landing.hero.cta_primary');
+    const pro = screen.getByTestId('education-hero-pro-cta');
+    expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(pro.textContent).toMatch(/\$9/);
+    const free = screen.getByTestId('education-hero-free-cta');
+    expect(free).toHaveAttribute('href', '/en/education/access');
   });
 
   it('no longer renders the secondary "see it in action" anchor', () => {
@@ -30,15 +29,11 @@ describe('EducationHero', () => {
     expect(anchors.some((a) => (a.getAttribute('href') ?? '') === '#modes')).toBe(false);
   });
 
-  it('the CTA points to the access page for the active locale', () => {
+  it('tracks Pro and free hero CTA clicks separately', () => {
     render(<EducationHero />);
-    const cta = screen.getByRole('link', { name: 'education.landing.hero.cta_primary' });
-    expect(cta).toHaveAttribute('href', '/en/education/access');
-  });
-
-  it('tracks a landing CTA click when the CTA is pressed', () => {
-    render(<EducationHero />);
-    fireEvent.click(screen.getByRole('link', { name: 'education.landing.hero.cta_primary' }));
+    fireEvent.click(screen.getByTestId('education-hero-pro-cta'));
+    expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('education_hero_pro');
+    fireEvent.click(screen.getByTestId('education-hero-free-cta'));
     expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('education_hero');
   });
 
@@ -62,7 +57,7 @@ describe('EducationHero', () => {
   it('ensures h1 and primary CTA precede the product mock in source order (mobile-first)', () => {
     const { container } = render(<EducationHero />);
     const h1 = screen.getByRole('heading', { level: 1 });
-    const primaryCTA = screen.getByRole('link', { name: 'education.landing.hero.cta_primary' });
+    const primaryCTA = screen.getByTestId('education-hero-pro-cta');
     const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
 
     // H1 should come before CTA (semantic order)

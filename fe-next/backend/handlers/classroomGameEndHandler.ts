@@ -51,13 +51,14 @@ import {
   getClassroomGame,
   updateClassroomGameStatus,
 } from '../modules/classroomGameManager.js';
-import { deleteGame, getActiveRooms } from '../modules/gameStateManager.js';
+import { deleteGame, getActiveRooms, getGame } from '../modules/gameStateManager.js';
 import {
   broadcastToRoom,
   broadcastActiveRooms,
   getGameRoom,
 } from '../utils/socketHelpers.js';
 import { persistClassroomGameScores } from './classroomGamePersistence.js';
+import { seatedAuthUserIds } from './classroomSeatedRoster.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
@@ -141,8 +142,34 @@ export function registerClassroomGameEndHandlers(io: Server, socket: Socket): vo
       try {
         // Only score rows for players the server saw join this game. Anything
         // else is a fabricated userId with a fabricated score and XP behind it.
-        const joinedUserIds = new Set((game.players || []).map((p) => p.userId));
+        //
+        // The set is the UNION of both rosters, because `game.players` alone is
+        // usually empty: it is appended only by `joinClassroomGame`, which a
+        // student arriving through the join page or the projector code never
+        // emits. A guest is in the live MP room and nowhere else — the same
+        // asymmetry this file's own header describes for the room broadcast.
+        // Filtering on the classroom roster alone therefore dropped EVERY
+        // score, wrote no `practice_sessions` rows, and left the teacher's
+        // report resolving a full class to nobody. See `classroomSeatedRoster`.
+        const joinedUserIds = seatedAuthUserIds(
+          game.players,
+          getGame(payload.gameCode)?.users,
+          game.teacherId
+        );
         const verifiedScores = payload.playerScores?.filter((s) => joinedUserIds.has(s.userId));
+
+        // Scores came in and not one survived. That is either a real attack or
+        // the roster bug above coming back, and both must be visible: the
+        // downstream "no participants to record" line cannot tell them apart,
+        // because by then the scores are already gone (pitfall class 4).
+        if (payload.playerScores?.length && !verifiedScores?.length) {
+          logger.warn(
+            'CLASSROOM_GAME',
+            `Every score submitted for ${payload.gameCode} was refused — ` +
+              `${payload.playerScores.length} claimed, 0 matched the ${joinedUserIds.size} seat(s) ` +
+              `the server verified (classroom roster ${game.players?.length ?? 0})`
+          );
+        }
 
         // Persist scores to Supabase (S2.5) — F-24: capture per-player rewards
         const rewards = await persistClassroomGameScores(game, verifiedScores);

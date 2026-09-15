@@ -63,6 +63,12 @@ export interface WordFeedback {
   goldenBonus?: number;
   /** Rush-tile bonus points (recurring transient MP tiles) */
   rushBonus?: number;
+  /**
+   * Points the server added because this was one of the teacher's lesson words.
+   * Always the server's figure — the client never recomputes it. Absent from an
+   * older server, in which case the badge shows without a number.
+   */
+  lessonBonus?: number;
   timestamp: number;
   /** Name of the player who found this word first (for foundByOther type) */
   foundBy?: string;
@@ -177,6 +183,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   // Determine current state
   const isForming = word.length > 0;
   const showFeedback = visibleFeedback !== null;
+
+  // Lesson badge label. Screen-reader users get the points spoken, not a bare
+  // "lesson word" that hides the thing the badge exists to communicate. Falls
+  // back to the original wording when the server sent no figure.
+  const lessonBonusPoints = visibleFeedback?.lessonBonus;
+  const lessonBonusLabel = lessonBonusPoints
+    ? t('wordFeedback.lessonWordBonus', 'Lesson word +{bonus}', { bonus: lessonBonusPoints })
+    : t('wordFeedback.lessonWordTitle');
   const showForming = isForming && !showFeedback;
 
   // Show content while forming, while feedback is on screen, OR during the
@@ -413,10 +427,17 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                     'bg-linear-to-br from-neo-pink to-neo-purple text-white font-black rounded-neo border-2 border-neo-black',
                     compact ? 'text-sm px-2 py-0.5' : 'text-base px-2.5 py-1'
                   )}
-                  title={t('wordFeedback.lessonWordTitle')}
-                  aria-label={t('wordFeedback.lessonWordTitle')}
+                  title={lessonBonusLabel}
+                  aria-label={lessonBonusLabel}
                 >
-                  📚
+                  {/*
+                    The points come FIRST: the student's eye is on the word pill,
+                    and "+5" is the part that tells them the teacher's word paid
+                    more. The book stays so the cue is never number-alone.
+                    An older server sends no figure — then this is just the book,
+                    exactly as it rendered before.
+                  */}
+                  {visibleFeedback.lessonBonus ? `+${visibleFeedback.lessonBonus} ` : ''}📚
                 </m.span>
               )}
             </AnimatePresence>

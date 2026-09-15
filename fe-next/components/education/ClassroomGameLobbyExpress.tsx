@@ -29,6 +29,7 @@ import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 import type { Classroom, Language } from '@/lib/supabase/education/types';
+import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import {
   abandonLaunch,
   ensureLaunch,
@@ -200,6 +201,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
                   });
                   const body = await res.json().catch(() => ({}));
                   if (!res.ok) return { success: false, error: body?.message, code: body?.error };
+                  if (body?.data?.id) trackEduClassroomCreated({ classroomId: body.data.id, createdVia: 'express_lobby' });
                   return { success: true, data: body?.data as Classroom };
                 } catch (err) {
                   return { success: false, error: String(err) };

@@ -334,26 +334,34 @@ export default function ClassroomManager({ autoOpenCreate }: ClassroomManagerPro
                     >
                       {classroom.join_code}
                     </code>
-                    <div className="mt-3 flex gap-2">
+                    {/* Wraps, and each button may shrink. Measured at 1280x800
+                        with three classes: the shell's sidebar leaves each card
+                        ~300px, and a non-wrapping row of two `flex-1` buttons
+                        stayed wider than the card — which carries
+                        `overflow-hidden`, so SHARE rendered as "SHAR" with its
+                        right edge sliced off. `flex-1` alone cannot shrink past
+                        its content's min-content width; `min-w-0` is what
+                        actually permits it. */}
+                    <div className="mt-3 flex flex-col gap-2">
                       <Button
                         type="button"
                         data-testid="copy-join-code"
                         onClick={() => copyJoinCode(classroom.join_code)}
-                        className="flex-1 min-h-11 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
+                        className="flex-1 min-w-0 min-h-11 bg-neo-cyan text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
                         aria-label={t('teacher.classroom.copyCode')}
                       >
-                        <Copy className="w-4 h-4 me-2" />
-                        {t('teacher.classroom.copyCode')}
+                        <Copy className="w-4 h-4 me-2 shrink-0" />
+                        <span className="truncate">{t('teacher.classroom.copyCode')}</span>
                       </Button>
                       <Button
                         type="button"
                         data-testid="share-join-code"
                         onClick={() => shareInvite(classroom.name, classroom.join_code)}
-                        className="flex-1 min-h-11 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
+                        className="flex-1 min-w-0 min-h-11 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
                         aria-label={t('teacher.classroom.share')}
                       >
-                        <Share2 className="w-4 h-4 me-2" />
-                        {t('teacher.classroom.share')}
+                        <Share2 className="w-4 h-4 me-2 shrink-0" />
+                        <span className="truncate">{t('teacher.classroom.share')}</span>
                       </Button>
                     </div>
                     {googleClassroomHref(classroom.name, classroom.join_code) && (

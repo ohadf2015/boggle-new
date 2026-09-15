@@ -1,27 +1,28 @@
 {
-  "date": "2026-09-14",
-  "note": "IMPACT CHECK for 02-perf-2026-09-09-mp-cwv-watch (/en/multiplayer CWV): re-ran exact query, n dropped to 7 (24h window, was 187) -- below the 50-sample floor, verdict=neutral (insufficient sample), values directionally fine (lcp1910/inp440/cls0.09) but not a real signal either way. perf-watch.md carry (needs DevTools INP/CLS attribution profiling before touching PageClient.tsx/RoomListView.tsx) still stands, unchanged. Brief's other frontend LCP items (/he/profile, /en/daily/word-wheel, /he) all had n=1-2 -- ineligible for a regression verdict per mandatory sample gate, not flagged. imposketch.io items are a different app entirely (PostHog shared across ~12 apps), skipped. Backend brief item (auth_db_connections_absolute) is an unchanged dashboard-config toggle, not code -- still human queue. supabase MCP never connected within this lane's window (tried repeatedly) so no fresh pg_stat_statements/advisor query this run; deferred items below are carried, not re-verified. Shipped one concrete SPEED win: WordWheelChallenge.tsx statically imported WordWheelGame (1444 lines) and WordWheelResults (661 lines) despite each rendering only behind a phase gate ('playing'/'completed') -- converted both to next/dynamic(ssr:false), matching the existing TabbedDailyLeaderboard pattern in the same file, cutting ~2100 lines of dead-weight JS from word-wheel's initial bundle.",
+  "date": "2026-09-15",
+  "note": "All 5 frontend LCP items in tonight's brief re-queried against live PostHog with the EXACT route -- every one is below the mandatory 50-sample floor: /en n=37 (actual p75_lcp=1676ms, nothing like the brief's 10652ms), /en/student/profile n=1 (9184ms is a single sample), /en/multiplayer n=34 (3440ms), /ru/balda-onlayn n=1 (6005ms). imposketch.io/solo skipped -- different app entirely, PostHog shared across ~12 apps (carried learning). No regression verdict issued for any of them per the mandatory sample gate; this matches the same pattern as 09-12/09-14 (brief's aggregate LCP figures come from a wider window / fewer-than-24h-floor sample and are not directly actionable). Homepage (/en) LCP path was independently re-audited (PageClient.tsx, LandingModeCubes.tsx) and confirmed still fully optimized from prior nights: anchor <Image priority>, matching <link rel=preload imageSrcSet>, OnboardingFlow dynamic(ssr:false) behind FTUE gate -- no regression found, no action needed. Backend: supabase MCP did not connect within this lane's window (repeated checks, same as 09-14) -- auth_db_connections_absolute and vocabulary_lessons unindexed-FK advisor items carried, not re-verified with EXPLAIN this run. Bundle: not re-measured (no fresh .next build, building one is out of budget) -- carrying 09-14 numbers unchanged. Net: no code shipped tonight -- every top-of-brief item was verified as noise rather than acted on blind, and the mandatory sample gate held.",
   "backend": {
-    "advisor_warnings_count": 1,
+    "advisor_warnings_count": 2,
     "shipped": [],
     "deferred": {
       "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
-      "realtime_wal_json_parser_cpu": "systemic across all realtime-published tables with real subscribers, tracked by existing 50-supabase-perf.md pg_cron guardrails, not a single indexable query -- unchanged, human/founder call needed on publication scope"
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "supabase MCP never connected this run -- could not EXPLAIN ANALYZE to confirm before adding an index (hard rule: no speculative indexes). Carry to next perf lane.",
+      "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- human/founder call needed on publication scope"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp": 1910, "p75_inp": 440, "p75_cls": 0.09, "n": 7, "window": "24h", "status": "n dropped below 50-sample floor tonight (was 187 on 09-09) -- neutral verdict, still needs DevTools profiling before touching PageClient.tsx/RoomListView.tsx, see perf-watch.md" },
-      { "route": "/he/profile", "p75_lcp": 4500, "n": 2, "window": "24h", "status": "DEFERRED -- below 50-sample floor, cannot verdict" },
-      { "route": "/en/daily/word-wheel", "p75_lcp": 4240, "n": 1, "window": "24h", "status": "DEFERRED -- below 50-sample floor; shipped a bundle-size fix anyway (dynamic import of WordWheelGame/WordWheelResults) as a general SPEED win, not a regression fix" },
-      { "route": "/he", "p75_lcp": 3672, "p75_cls": 0.164, "n": 2, "window": "24h", "status": "DEFERRED -- below 50-sample floor; homepage above-fold tree audited, already has priority/sizes/dynamic-import on all candidates, no action" }
+      { "route": "/en", "p75_lcp": 1676, "n": 37, "window": "24h", "status": "brief claimed 10652ms -- live query at n=37 (still below 50-floor) shows 1676ms, no regression. Re-audited LCP path (PageClient.tsx, LandingModeCubes.tsx): priority image + preload link + dynamic FTUE all already correct from prior nights, no action." },
+      { "route": "/en/student/profile", "p75_lcp": 9184, "n": 1, "window": "24h", "status": "DEFERRED for regression verdict (n=1). Shipped one safe general SPEED win regardless: avatar <Image> (PageClient.tsx) was missing `priority` despite being above-the-fold on first real paint -- added. Root cause of the slow LCP is almost certainly the multi-fetch waterfall (auth, achievements, duels, classroom) gating first paint, not the image -- that needs an SSR/streaming redesign, too large for this lane. Logged to perf-watch.md for a dedicated pass." },
+      { "route": "/en/multiplayer", "p75_lcp": 3440, "n": 34, "window": "24h", "status": "DEFERRED -- below 50-sample floor, carried from 09-14 (PageClient.tsx/RoomListView.tsx CLS/INP profiling still needed, see perf-watch.md)" },
+      { "route": "/ru/balda-onlayn", "p75_lcp": 6005, "n": 1, "window": "24h", "status": "DEFERRED -- n=1, cannot verdict" }
     ],
     "shipped": [
-      { "file": "components/daily/WordWheelChallenge.tsx", "change": "WordWheelGame + WordWheelResults static imports -> next/dynamic(ssr:false); each only renders behind a phase gate, so no first-paint cost, ~2100 lines removed from initial bundle" }
+      { "file": "app/[locale]/student/profile/PageClient.tsx", "change": "above-fold avatar <Image> was missing `priority` -- added. Explore subagent's other claim (sync framer-motion `m` import blocking FCP) was checked and REJECTED: `m` is the app's intentional LazyMotion pattern (app/LazyMotionRoot.tsx wraps root layout in one domMax bundle), not per-file bloat." }
     ]
   },
   "bundle": {
-    "note": "not re-measured tonight -- no .next build artifact present and building one is explicitly out of budget for this lane; carrying 09-12 baseline numbers below unchanged",
+    "note": "not re-measured tonight -- no .next build artifact present and building one is out of budget for this lane; carrying 09-14 baseline numbers unchanged",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },

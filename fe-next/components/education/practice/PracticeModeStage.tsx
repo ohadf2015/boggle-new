@@ -32,6 +32,17 @@ import {
 } from '@/components/practice';
 import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
 import { availableFocuses, type VocabFocus } from '@/lib/education/vocabFocus';
+import { ProducePractice } from '@/components/practice/ProducePractice';
+import { PRODUCE_FOCUSES, type ProduceFocus } from '@/lib/education/produceQuestions';
+
+/**
+ * `ProduceFocus` is a deliberate SUBSET of `VocabFocus` — multiple-meaning and
+ * roots/affixes have answers that are not the lesson word, so they cannot be
+ * production tasks. This narrows a picker focus safely instead of casting.
+ */
+function isProduceFocus(focus: VocabFocus): focus is ProduceFocus {
+  return (PRODUCE_FOCUSES as readonly string[]).includes(focus);
+}
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import type { PracticeVariant } from '@/lib/education/practicePicker';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
@@ -188,6 +199,34 @@ export default function PracticeModeStage({
 
     case 'vocab_focus': {
       const resolved = focus ?? availableFocuses(words, { language })[0] ?? 'definition';
+      // Word Forge — the student WRITES the word instead of picking it. A
+      // variant of vocab_focus rather than a mode of its own, exactly as Word
+      // Tower is a variant of solo_board: `practice_type` is a DB CHECK
+      // constraint with no 'produce' value. Without this branch the produce
+      // tiles would open the four-choice drill and the one mode that asks for
+      // production would silently be recognition.
+      if (variant === 'produce') {
+        const produceFocus = isProduceFocus(resolved) ? resolved : 'definition';
+        return (
+          <ProducePractice
+            words={words}
+            focus={produceFocus}
+            language={language}
+            onComplete={(results) =>
+              onFinish('vocab_focus', {
+                focus: results.focus,
+                cardsReviewed: results.total,
+                // Near misses are retrievals with a spelling slip, not correct
+                // answers. Counting them as correct would inflate the mastery
+                // signal the teacher's report is built on.
+                cardsCorrect: results.correct,
+              })
+            }
+            onBack={onBack}
+            {...forward}
+          />
+        );
+      }
       return (
         <VocabFocusPractice
           words={words}

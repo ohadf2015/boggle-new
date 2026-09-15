@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { TrialStatus } from '@/lib/education/trial';
+import { trialCountdownUnit, type TrialStatus } from '@/lib/education/trial';
 
 // Activation-urgency banner for a teacher trial. Renders a live countdown and
 // "start now / don't miss it" framing so approved teachers act before the
@@ -50,13 +50,7 @@ export function TrialUrgencyBanner({ trial, href }: Props) {
   }
 
   // ---- Active: countdown + urgency. Final day counts down in hours. ----
-  const finalDay = trial.daysLeft <= 1;
-  const count = finalDay ? trial.hoursLeft : trial.daysLeft;
-  const unitKey = finalDay
-    ? 'education.trial.hours_left'
-    : trial.daysLeft === 1
-      ? 'education.trial.day_left'
-      : 'education.trial.days_left';
+  const { key: unitKey, count } = trialCountdownUnit(trial);
   const titleKey = trial.isUrgent ? 'education.trial.urgent_title' : 'education.trial.title';
   const tone = trial.isUrgent ? 'bg-neo-pink text-neo-white' : 'bg-neo-lime text-neo-navy';
 

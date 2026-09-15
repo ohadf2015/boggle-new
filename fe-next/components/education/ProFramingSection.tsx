@@ -150,7 +150,8 @@ export function ProFramingSection() {
           </ul>
 
           <Link
-            href={`/${language}/pricing`}
+            href={`/${language}/teacher/upgrade`}
+            data-testid="pro-framing-upgrade-link"
             className="inline-block w-full text-center rounded-neo bg-neo-navy text-neo-lime font-bold py-3 border-neo border-neo-cream/40 shadow-hard hover:shadow-hard-lg transition-shadow"
           >
             {t('education.landing.pro.chooseNow')}

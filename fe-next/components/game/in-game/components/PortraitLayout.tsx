@@ -3,6 +3,7 @@
 import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { MobileRankIndicator } from './MobileRankIndicator';
+import { StudentRankRail } from '@/components/education/StudentRankRail';
 import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import { Trophy } from 'lucide-react';
@@ -81,6 +82,16 @@ interface PortraitLayoutProps {
   hasAnimated: boolean;
   earthquakeState: EarthquakeState;
   gameplayFocusMode: boolean;
+  /**
+   * This room is a teacher's class session and I am a STUDENT in it.
+   * Resolved once, upstream, from `?classroom=true` (and not `&host=true`) —
+   * see `lib/education/classroomPlaySurface.ts`. Read there rather than here so
+   * the tree has exactly one reader of that query param.
+   *
+   * Flips the two live absolute-rank surfaces below to local framing. Absent or
+   * false in every public multiplayer room, which renders exactly as before.
+   */
+  isClassroomStudentPlay?: boolean;
 
   // Player data
   playerScore: number;
@@ -203,6 +214,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   hasAnimated,
   earthquakeState,
   gameplayFocusMode,
+  isClassroomStudentPlay = false,
   playerScore,
   playerRank,
   deferredLeaderboard,
@@ -694,12 +706,30 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               clear "You're #N" plus a transient "{name} passed you!" cue. */}
           {isPlaying && deferredLeaderboard && deferredLeaderboard.length > 1 && (
             <div className="mt-0.5 flex justify-center">
-              <MobileRankIndicator
-                leaderboard={deferredLeaderboard}
-                currentUsername={username}
-                t={t}
-                dir={dir}
-              />
+              {isClassroomStudentPlay ? (
+                /* A class session swaps the absolute pill for local framing:
+                   own score + ONE nearby classmate, and no "{name} passed you!"
+                   alert. Constant visible whole-class rank is the documented
+                   harm (it demotivates the bottom half and widens the gap);
+                   points are not. End-of-round standings are untouched — bounded
+                   exposure is the form the research permits. */
+                <StudentRankRail
+                  leaderboard={deferredLeaderboard}
+                  currentUsername={username}
+                  wordsFound={foundWords.length}
+                  feedback={currentFeedback}
+                  roundOver={remainingTime !== null && remainingTime <= 0}
+                  t={t}
+                  dir={dir}
+                />
+              ) : (
+                <MobileRankIndicator
+                  leaderboard={deferredLeaderboard}
+                  currentUsername={username}
+                  t={t}
+                  dir={dir}
+                />
+              )}
             </div>
           )}
 
@@ -708,7 +738,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               so single-player users can see their progress. */}
           {isPlaying && !gameplayFocusMode && (
             <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] medium-short:max-h-[88px] short:max-h-[80px] scrollbar-thin">
-              {deferredLeaderboard && deferredLeaderboard.length > 1 && (
+              {/* The full class standings are the second absolute-rank surface
+                  on a student's phone — windowed around "me", but still printing
+                  a position. The teacher's projector still shows the room; the
+                  student's own device does not. */}
+              {!isClassroomStudentPlay && deferredLeaderboard && deferredLeaderboard.length > 1 && (
                 <GameLeaderboard
                   leaderboard={deferredLeaderboard}
                   username={username}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
+import { setEduClassroomContext } from '@/lib/education/telemetry';
 
 export interface ActiveGame {
   gameCode: string;
@@ -150,6 +151,26 @@ export function useActiveClassroomGame(classroomId: string) {
           (g) => !!g?.gameCode && (!g.classroomId || g.classroomId === classroomId)
         ) ?? null;
         setActiveGame(joinable);
+        // Second analytics clear path. The student who plays in class, walks
+        // away mid-game and later plays solo never receives `classroomGameEnded`
+        // (this hook's socket is gone by then), so without this their solo games
+        // would keep the classroom tag. Returning to the hub with no live game
+        // is the honest "you are not in a class game" signal.
+        if (!joinable) setEduClassroomContext(null);
+      });
+
+      // Analytics scope for the class's live game. Until this listener existed
+      // the server's `classroomGameStarted` broadcast had NO receiver at all,
+      // so `classroom_id` never reached the browser and has never appeared on a
+      // single game lifecycle event. Registering it as a super property puts it
+      // on every later event by construction, rather than asking each emitter
+      // (and its `growth:`-prefixed twin) to remember.
+      sock.on('classroomGameStarted', (data: { gameCode?: string; classroomId?: string }) => {
+        // Trust the payload's own scope, exactly as the banner does above. An
+        // older server omits it, and the socket is only ever subscribed to the
+        // room it asked for, so our own argument is a safe fallback.
+        if (data?.classroomId && data.classroomId !== classroomId) return;
+        setEduClassroomContext(data?.classroomId ?? classroomId);
       });
 
       // The server broadcasts this from every end-of-ROUND path, and the
@@ -162,6 +183,10 @@ export function useActiveClassroomGame(classroomId: string) {
       // classroom index the moment its session is marked ended.
       sock.on('classroomGameEnded', (data: { gameCode?: string; sessionEnded?: boolean }) => {
         if (!data?.sessionEnded) return;
+        // Clearing is as load-bearing as setting: a super property persists in
+        // localStorage, so a classroom left behind would tag every later SOLO
+        // game as classroom play.
+        setEduClassroomContext(null);
         setActiveGame((current) => {
           if (!current) return null;
           // No gameCode on the payload → end whatever this classroom was running.
@@ -201,6 +226,14 @@ export function useActiveClassroomGame(classroomId: string) {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }
+      // DELIBERATELY no `setEduClassroomContext(null)` here. Both consumers
+      // (ClassroomGameBanner, PlayWithClassButton) `router.push` to
+      // /multiplayer to PLAY, which unmounts this hook — so clearing on unmount
+      // would wipe classroom_id at the exact moment the classroom game begins,
+      // a beat before `game_started` fires on the multiplayer page. The whole
+      // feature would be a silent no-op. The scope has to survive that
+      // navigation; it is cleared when the session ends or when the classroom
+      // reports no live game instead.
       socketInstance?.disconnect();
     };
   }, [classroomId, requestActiveGames]);

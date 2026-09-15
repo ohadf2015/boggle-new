@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { GraduationCap, BookOpen, Sparkles, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import type { TrialStatus } from '@/lib/education/trial';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { trialCountdownUnit, type TrialStatus } from '@/lib/education/trial';
 
 export type EducationHomeRole = 'teacher' | 'student' | 'promo';
 
@@ -120,12 +121,12 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
         )}
       >
         {cta}
-        <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+        <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />
       </span>
       {/* Mobile: chevron only (label lives above) */}
-      <ArrowRight
-        className="ms-auto h-5 w-5 shrink-0 text-neo-black/60 dark:text-neo-white/60 sm:hidden rtl:rotate-180"
-        aria-hidden="true"
+      <DirectionalIcon
+        icon={ArrowRight}
+        className="ms-auto h-5 w-5 shrink-0 text-neo-black/60 dark:text-neo-white/60 sm:hidden"
       />
     </Link>
   );
@@ -155,13 +156,10 @@ function TrialPill({ trial, t }: TrialPillProps) {
   }
 
   // Final day → count in hours so the number keeps moving; otherwise whole days.
-  const finalDay = trial.daysLeft <= 1;
-  const count = finalDay ? trial.hoursLeft : trial.daysLeft;
-  const unitKey = finalDay
-    ? 'education.trial.hours_left'
-    : trial.daysLeft === 1
-      ? 'education.trial.day_left'
-      : 'education.trial.days_left';
+  // Shared with TrialUrgencyBanner so the two badges agree, and so the singular
+  // hour gets its own unit string (the badge stacks bare number over bare unit,
+  // so the unit has to carry its own grammatical number).
+  const { key: unitKey, count } = trialCountdownUnit(trial);
   const tone = trial.isUrgent ? 'bg-neo-pink text-neo-white' : 'bg-neo-lime text-neo-navy';
 
   return (

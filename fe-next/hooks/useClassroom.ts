@@ -18,6 +18,7 @@ import { createClient } from '@/utils/supabase/client';
 import { signInAsGuestStudent, waitForProfile } from '@/lib/education/guestStudent';
 import { runGuestJoinPreflight } from '@/lib/education/joinGuestPreflight';
 import logger from '@/utils/logger';
+import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 
 interface UseClassroomsState {
   classrooms: ClassroomWithMembers[];
@@ -173,6 +174,8 @@ export function useClassrooms(): UseClassroomsReturn {
       }
 
       const { data: classroom } = await response.json();
+
+      if (classroom?.id) trackEduClassroomCreated({ classroomId: classroom.id, createdVia: 'dashboard' });
 
       // Optimistically update state
       if (isMounted.current && classroom) {

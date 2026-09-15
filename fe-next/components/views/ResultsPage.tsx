@@ -59,7 +59,7 @@ import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { INTERSTITIAL_MAX_WAIT_MS } from '@/hooks/useAdMob';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
+import { useGameMode, useGameModeConfirmed, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
 import type { BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
 import BlastMpResults, { buildBlastMpResults } from '@/components/blast/legacy/BlastMpResults';
@@ -73,7 +73,7 @@ import { toStandings } from '@/components/education/results/resultsStandings';
 const TeamBattleStandings = dynamic(() => import('@/components/education/TeamBattleStandings').then(m => m.TeamBattleStandings), { ssr: false });
 
 import { buildReteachLessonData } from '@/lib/education/classroomGameHandoff';
-import { modeSceneOwnsHeroSlot } from '@/lib/education/roundEndResultsRoute';
+import { modeSceneOwnsHeroSlot, playedGameMode } from '@/lib/education/roundEndResultsRoute';
 
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 
@@ -390,8 +390,41 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     onEscape: () => setShowExitConfirm(true),
     enabled: scoreRevealComplete,
   });
-  // Game mode override for host (results page lets host change mode before next game)
-  const resolvedGameMode = useGameMode();
+  // The mode the round that just ENDED was played in.
+  //
+  // NOT the raw store value. `gameMode` carries two things at two times: the
+  // mode the server confirmed for the round in progress, and an optimistic
+  // pick for the round to come — and this page is where those overlap, because
+  // it is where the host changes the mode before the next game. `setGameMode`
+  // writes the optimistic one and clears `gameModeConfirmed`; the teacher's
+  // picker writes through it FOR THE WHOLE ROOM (`useClassroomModeSwitch`
+  // answers the `classroomGameModeChanged` broadcast), so a teacher lining up
+  // the next round rewrote `gameMode` on thirty phones mid-recap and a Classic
+  // round's stat card came out headed "Blast Results".
+  //
+  // `HostInGameView` and the game-end telemetry have both gated on
+  // `gameModeConfirmed` for exactly this reason; the results surface was the
+  // sibling that did not (pitfall class 3). See `playedGameMode`.
+  // LATCHED, not just gated. Gating alone would answer "we no longer know" with
+  // `undefined`, which is honest but throws away a mode we DID know a moment
+  // ago — and this value also feeds the wheel-rush scene, the word-hunt
+  // summary, `blastMpResults` and `recordMpGame`, so the wrong round would lose
+  // its legitimate card too. Remembering the last CONFIRMED mode keeps every
+  // correct card and still refuses the overwritten one.
+  //
+  // It cannot leak across rounds: both `resetForNewRound` callers clear the
+  // results in the same call, so the page unmounts with the ref; and if one
+  // ever did not, the next round arrives via `batchStartGame` with
+  // `gameModeConfirmed` true, which re-latches the new mode immediately.
+  const storeGameMode = useGameMode();
+  const gameModeConfirmed = useGameModeConfirmed();
+  const lastConfirmedMode = useRef<string | undefined>(undefined);
+  const confirmedMode = playedGameMode({
+    gameMode: storeGameMode,
+    gameModeConfirmed,
+  });
+  if (confirmedMode) lastConfirmedMode.current = confirmedMode;
+  const resolvedGameMode = lastConfirmedMode.current;
   // Host's intended mode (preserved across rounds — "random" stays "random" so each round re-rolls)
   const hostSelectedGameMode = useHostSelectedGameMode();
   const { setHostSelectedGameMode } = useGameActions();

@@ -944,6 +944,7 @@ const en = {
     "creating": "Creating...",
     "guest": "Guest",
     "unknown": "Unknown",
+    "loading": "Checking…",
     "back": "Back",
     "backHome": "Back Home",
     "backToHome": "Back to Home",
@@ -5594,6 +5595,7 @@ const en = {
     "rejected": "Word rejected",
     "duplicateWord": "Duplicate word",
     "lessonWordTitle": "Lesson vocabulary word!",
+    "lessonWordBonus": "Lesson word — bonus +{bonus}!",
     "dictionaryTitle": "Build Our Dictionary",
     "submittedBy": "Submitted by",
     "skipHint": "Press ESC to skip",
@@ -11110,6 +11112,31 @@ const en = {
       "profileLabel": "My teacher profile",
       "analyticsLabel": "Class analytics"
     },
+    "pulse": {
+      "state": {
+        "noRoster": "No students yet",
+        "neverPlayed": "Not played yet",
+        "needsReview": "Needs review",
+        "ready": "On track",
+        "unknown": "Can't load"
+      },
+      "action": {
+        "invite": "Get the join code",
+        "play": "Start their first game",
+        "review": "Practise the hard words",
+        "playAgain": "Play again",
+        "retry": "Try again"
+      },
+      "enrolled": "enrolled",
+      "participation": "{{played}} of {{total}} played · {{absent}} missed it",
+      "lastPlayedToday": "Played today · {{accuracy}}% average",
+      "lastPlayedDays": "Played {{days}}d ago · {{accuracy}}% average",
+      "lastPlayedOneDay": "Played yesterday · {{accuracy}}% average",
+      "strugglingOne": "{{names}} is struggling",
+      "struggling": "{{count}} struggling: {{names}}",
+      "regionLabel": "Class status for {{classroom}}",
+      "switcherLabel": "Which class"
+    },
     "playNow": {
       "recommended": "Recommended",
       "title": "Play now",
@@ -12055,7 +12082,13 @@ const en = {
         "antonym": "Words that mean the opposite",
         "context": "Work the word out from the sentence",
         "multiple_meaning": "One word, two meanings",
-        "roots_affixes": "What the word parts mean"
+        "roots_affixes": "What the word parts mean",
+        "produce": {
+          "definition": "Read the meaning, write the word",
+          "synonym": "See a similar word, write the word",
+          "antonym": "See the opposite, write the word",
+          "context": "Fill the blank from memory"
+        }
       },
       "locked": {
         "word_tower": "Needs 4+ list words of 4–6 letters to unlock",
@@ -12066,6 +12099,36 @@ const en = {
         "spelling": "Add words to this lesson to unlock",
         "flashcard": "Add words to this lesson to unlock",
         "word_list": "Add words to this lesson to unlock"
+      }
+    },
+    "produce": {
+      "title": "Word Forge",
+      "desc": "Read the meaning, write the word",
+      "newWord": "New word — take a look",
+      "gotIt": "Got it",
+      "hint": "Hint",
+      "hintLength": "{count} letters",
+      "inputLabel": "Type the word",
+      "placeholder": "Type the word…",
+      "check": "Check",
+      "theWordWas": "The word was",
+      "finish": "Finish",
+      "cue": {
+        "definition": "What word is this?",
+        "context": "Fill the blank",
+        "synonym": "Another word for…",
+        "antonym": "The opposite of…"
+      },
+      "verdict": {
+        "correct": "Correct!",
+        "near-miss": "So close — check the spelling",
+        "wrong": "Not this time"
+      },
+      "notEnough": {
+        "definition": "Add definitions to this lesson to unlock",
+        "context": "Add example sentences to this lesson to unlock",
+        "synonym": "Add synonyms to this lesson to unlock",
+        "antonym": "Add antonyms to this lesson to unlock"
       }
     },
     "vocabFocus": {
@@ -13170,7 +13233,20 @@ const en = {
         "title": "Join a Class"
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
-      "lessonsAssigned": "Lessons Assigned"
+      "lessonsAssigned": "Lessons Assigned",
+      "feel": {
+        "points": "pts",
+        "words": "words",
+        "correct": "Nice one!",
+        "lessonWord": "Class word!",
+        "tryAgain": "Not that one — keep going",
+        "roundOver": "Round done!",
+        "rival": {
+          "toCatch": "to catch",
+          "ahead": "ahead",
+          "tied": "tied"
+        }
+      }
     },
     "students": "Students",
     "template": {
@@ -13384,6 +13460,7 @@ const en = {
       "days_left": "days left",
       "day_left": "day left",
       "hours_left": "hours left",
+      "hour_left": "hour left",
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
       "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",

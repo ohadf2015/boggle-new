@@ -52,3 +52,28 @@ export function teacherTrialStatus(
 
   return { expiresAt: expiresAtISO, msLeft, daysLeft, hoursLeft, isExpired, isUrgent };
 }
+
+/**
+ * Which number, and which unit phrase, the trial countdown badge shows.
+ *
+ * The badge stacks a bare numeral above a bare unit phrase, so nothing
+ * interpolates and the unit string must carry its own grammatical number. That
+ * makes the singular cases real: at one hour remaining, `hours_left` renders
+ * "1 / hours left" in English and "1 / часов осталось" in Russian, where a
+ * genitive plural cannot follow "1" and the verb must agree ("час остался").
+ *
+ * `daysLeft` is rounded UP, so `daysLeft === 1` already means "inside the final
+ * 24 hours" — which is why that case counts hours, and why the old
+ * `education.trial.day_left` branch was unreachable.
+ *
+ * Both consumers call this so the two badges cannot drift apart.
+ */
+export function trialCountdownUnit(trial: TrialStatus): { key: string; count: number } {
+  if (trial.daysLeft > 1) {
+    return { key: 'education.trial.days_left', count: trial.daysLeft };
+  }
+  return {
+    key: trial.hoursLeft === 1 ? 'education.trial.hour_left' : 'education.trial.hours_left',
+    count: trial.hoursLeft,
+  };
+}

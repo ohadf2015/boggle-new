@@ -30,6 +30,10 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger.js';
+import {
+  buildClassroomGameStartedEvent,
+  captureEduServerEvents,
+} from '../utils/educationTelemetry';
 
 // ==========================================
 // Zod Schemas for classroom events
@@ -463,11 +467,19 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
       io.to(`classroom:${game.classroomId}`).emit('classroomGameStarted', {
         gameCode: payload.gameCode,
+        // The client had no way to learn which classroom it was playing in —
+        // this broadcast omitted it AND had no listener. Both are fixed now;
+        // the receiver checks this against its own subscribed classroom rather
+        // than trusting the room it thinks it is in.
+        classroomId: game.classroomId,
         gameMode: game.settings.gameMode || 'classic',
         settings: game.settings,
         playerCount: game.players.length,
         vocabularyWords: game.vocabularyWords,
       });
+
+      const startedEvent = buildClassroomGameStartedEvent(game, { isTestAccount: false });
+      if (startedEvent) captureEduServerEvents([startedEvent]);
 
       logger.info('CLASSROOM_GAME', `Teacher ${authUserId} started game ${payload.gameCode}`);
     } catch (error) {

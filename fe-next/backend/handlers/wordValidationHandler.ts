@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { WordDetail } from '@/shared/types';
+import type { WordDetail, Language } from '@/shared/types';
 import type { GameState } from '../modules/gameState/types.js';
 import type { LeaderboardPlayer } from '../modules/scoreManager.js';
 
@@ -30,10 +30,12 @@ import { processLongWordEngagement } from './engagementHandler';
 import { calculateBlastTileBonus, getTilesOnPath, getTilesOnResolvedPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
+import { isLessonWord } from '../utils/lessonVocabulary.js';
 import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
+import { lessonWordBonus } from '@/shared/constants/lessonScoring';
 
 interface Achievement {
   key: string;
@@ -73,8 +75,28 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   const userData = game.users?.[username];
   const isFirstFinder = recordFirstFinder(gameCode, normalizedWord, username, userData?.avatar ?? undefined);
 
-  // Check if word is from lesson vocabulary (classroom games)
-  const fromLesson = game.lessonVocabulary?.has(normalizedWord.toUpperCase()) || false;
+  // Check if word is from lesson vocabulary (classroom games).
+  // Both sides go through the same normalizer — see backend/utils/lessonVocabulary.
+  const fromLesson = isLessonWord(
+    game.lessonVocabulary,
+    normalizedWord,
+    (game.language || 'en') as Language
+  );
+
+  // ---- Lesson-word bonus ----
+  // Flat, not a percentage — see shared/constants/lessonScoring.ts for the
+  // reasoning (speed-neutral, length-neutral, legible to a student mid-round).
+  // Until this existed `fromLesson` was computed, stored and broadcast while
+  // paying nothing, so a class playing its teacher's vocabulary scored exactly
+  // like a class on a random board.
+  //
+  // KNOWN LIMIT: this rides the auto-validated path only. A word that scores
+  // later through community/peer validation (`handleWordBecameValid`) never
+  // reads `lessonVocabulary` at all and so earns no lesson bonus. A teacher's
+  // vocabulary word is normally a dictionary word and lands here; the peer-
+  // validated lesson word is the rare case, and covering it means emitting to a
+  // socket that path does not currently hold.
+  const lessonBonus = lessonWordBonus(fromLesson);
 
   // Calculate blast mode tile bonus BEFORE storing word details so the stored
   // score includes tile bonuses (used by scoringEngine for final results).
@@ -272,13 +294,13 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Single atomic score update: word score + blast tile bonus + blast letter-value
   // bonus + word-hunt board bonus + bonuses
   const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus;
+  const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus;
   updatePlayerScore(gameCode, username, totalDelta, true);
   // Mirror the bonuses that are NOT baked into the stored per-word score
   // (wordScore + blast bonuses are; golden/lightning/special/word-hunt-board are not)
   // into a per-player accumulator so the end-of-game recompute can add them back and
   // the result page matches the live leaderboard. See playerEventBonuses.
-  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus;
+  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus + lessonBonus;
   if (eventBonusDelta !== 0) {
     addPlayerEventBonus(gameCode, username, eventBonusDelta);
   }
@@ -306,6 +328,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
     ...(lightningBonus > 0 ? { lightningBonus } : {}),
     ...(rushBonus > 0 ? { rushBonus } : {}),
+    ...(lessonBonus > 0 ? { lessonBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
     ...(blastMoveResult ? {

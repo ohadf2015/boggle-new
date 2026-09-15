@@ -396,13 +396,44 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   });
 
   // Handle requestGameState - recovery for players who missed startGame
+  //
+  // Both opening guards used to `return` in silence. This is the RECOVERY door:
+  // the only client that knocks on it is one that is already stuck, so "no
+  // answer" is the one response it cannot act on — the watchdog re-fires, the
+  // server says nothing again, and a student sits on a spinner for the rest of
+  // the lesson (recurring pitfall class 4). Worse, the server's in-memory
+  // socket→game map is wiped by a restart, so an unseated socket is the NORMAL
+  // state after a deploy, not an exotic one — and only `join` rebuilds that map
+  // (see `utils/socketRejoin.ts`).
+  //
+  // `resetGame` below answers these same two conditions with these same two
+  // errors. Two routes through one pair of guards must not diverge (class 3),
+  // so this one now says what the sibling says. Both codes are in
+  // `EXPECTED_SOCKET_ERROR_CODES`, so surfacing them costs no Sentry noise, and
+  // the rate limiter above already bounds a retrying watchdog.
   socket.on('requestGameState', () => {
     if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
-    if (!gameCode) return;
+    if (!gameCode) {
+      logger.warn(
+        'SOCKET',
+        `requestGameState from socket ${socket.id}, which is not seated in any game — ` +
+          `answering PLAYER_NOT_IN_GAME. The client must re-emit \`join\` to rebuild the mapping.`
+      );
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
+      return;
+    }
 
     const game = getGame(gameCode);
-    if (!game) return;
+    if (!game) {
+      logger.warn(
+        'SOCKET',
+        `requestGameState from socket ${socket.id} mapped to game ${gameCode}, which no longer exists — ` +
+          `answering GAME_NOT_FOUND`
+      );
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+      return;
+    }
 
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);

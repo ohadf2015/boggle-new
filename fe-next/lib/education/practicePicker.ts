@@ -11,6 +11,7 @@ import type { VocabularyWord } from '@/lib/supabase/education/types';
 import type { Language } from '@/shared/types/game';
 import type { PracticeType } from '@/hooks/usePracticeSession';
 import { VOCAB_FOCUSES, focusQuestionCounts, READINESS_SEED, type VocabFocus } from './vocabFocus';
+import { PRODUCE_FOCUSES, produceFocusAvailability } from './produceQuestions';
 import { eligibleLessonWords, isLessonSeedReady } from '@/lib/wordTower/lessonSeed';
 
 /** Seed used for every readiness/count scan, so the badge and the drill agree. */
@@ -29,8 +30,19 @@ export type BasePracticeMode = Exclude<PracticeType, 'vocab_focus'>;
  */
 export const WORD_TOWER_TILE_ID = 'word_tower';
 
+/**
+ * The Word Forge tiles' id prefix — `produce:<cue>`.
+ *
+ * Same reasoning as Word Tower above: producing a word is a VARIANT of
+ * `vocab_focus`, not a practice type of its own, because `practice_type` is a
+ * DB CHECK constraint with no 'produce' value and targeted vocabulary practice
+ * is the closest semantics it does accept. The variant on the tile is what
+ * keeps it from opening the four-choice drill.
+ */
+export const PRODUCE_TILE_PREFIX = 'produce:';
+
 /** Distinguishes tiles that share a `mode` but open different screens. */
-export type PracticeVariant = 'word_tower';
+export type PracticeVariant = 'word_tower' | 'produce';
 
 /** Board and drill modes, in the order they appear in the grid. */
 export const BASE_PRACTICE_MODES: readonly BasePracticeMode[] = [
@@ -229,7 +241,31 @@ export function buildPracticeTiles(
     };
   });
 
-  return [...baseTiles, towerTile, ...focusTiles];
+  // Word Forge: the same lesson, but the student writes the word instead of
+  // picking it. Counts come from its own availability scan because it needs no
+  // distractors — a one-word lesson forges fine and cannot run multiple choice.
+  const produceCounts = produceFocusAvailability(words);
+  const produceTiles: PracticeTile[] = PRODUCE_FOCUSES.map((focus) => {
+    const count = produceCounts[focus];
+    const ready = count > 0;
+    return {
+      id: `${PRODUCE_TILE_PREFIX}${focus}`,
+      mode: 'vocab_focus' as PracticeType,
+      variant: 'produce' as PracticeVariant,
+      focus: focus as VocabFocus,
+      titleKey: `education.produce.cue.${focus}`,
+      skillKey: `education.practicePicker.skill.produce.${focus}`,
+      ready,
+      count,
+      countKind: 'questions' as const,
+      // Produce sessions record as vocab_focus and are not counted per cue in
+      // student_practice_progress, so there is nothing honest to show yet.
+      sessions: 0,
+      ...(ready ? {} : { lockedKey: `education.produce.notEnough.${focus}` }),
+    };
+  });
+
+  return [...baseTiles, towerTile, ...focusTiles, ...produceTiles];
 }
 
 /** The playable tiles, in picker order. */

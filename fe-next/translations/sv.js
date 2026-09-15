@@ -1598,6 +1598,7 @@ const sv = {
     "creating": "Skapar...",
     "guest": "Gäst",
     "unknown": "Okänd",
+    "loading": "Kollar…",
     "back": "Tillbaka",
     "backHome": "Tillbaka hem",
     "backToHome": "Tillbaka till startsidan",
@@ -12811,6 +12812,31 @@ const sv = {
       "profileLabel": "Min lärarprofil",
       "analyticsLabel": "Klassens statistik"
     },
+    "pulse": {
+      "state": {
+        "noRoster": "Inga elever än",
+        "neverPlayed": "Har inte spelat än",
+        "needsReview": "Behöver repetition",
+        "ready": "På rätt spår",
+        "unknown": "Kan inte laddas"
+      },
+      "action": {
+        "invite": "Hämta klasskoden",
+        "play": "Starta deras första spel",
+        "review": "Öva de svåra orden",
+        "playAgain": "Spela igen",
+        "retry": "Försök igen"
+      },
+      "enrolled": "registrerade",
+      "participation": "{{played}} av {{total}} spelade · {{absent}} missade",
+      "lastPlayedToday": "Spelade i dag · {{accuracy}}% i snitt",
+      "lastPlayedDays": "Spelade för {{days}} dagar sedan · {{accuracy}}% i snitt",
+      "lastPlayedOneDay": "Spelade i går · {{accuracy}}% i snitt",
+      "strugglingOne": "{{names}} kämpar",
+      "struggling": "{{count}} kämpar: {{names}}",
+      "regionLabel": "Klasstatus för {{classroom}}",
+      "switcherLabel": "Vilken klass"
+    },
     "playNow": {
       "recommended": "Rekommenderas",
       "title": "Spela nu",
@@ -14883,7 +14909,20 @@ const sv = {
         "title": "Gå med i klassrummet"
       },
       "classroomRoomGone": "Klassens spel är slut. Be din lärare starta ett nytt.",
-      "lessonsAssigned": "Tilldelade lektioner"
+      "lessonsAssigned": "Tilldelade lektioner",
+      "feel": {
+        "points": "p",
+        "words": "ord",
+        "correct": "Snyggt!",
+        "lessonWord": "Lektionsord!",
+        "tryAgain": "Inte den — fortsätt",
+        "roundOver": "Rundan är slut!",
+        "rival": {
+          "toCatch": "att ta igen",
+          "ahead": "före",
+          "tied": "lika"
+        }
+      }
     },
     "students": "Elever",
     "template": {
@@ -15096,6 +15135,7 @@ const sv = {
       "days_left": "dagar kvar",
       "day_left": "dag kvar",
       "hours_left": "timmar kvar",
+      "hour_left": "timme kvar",
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprövoperiod har tagit slut",
       "expired_body": "Din gratis prövoperiod är slut. Ansök igen eller kontakta oss för att behålla klassrumsläget.",

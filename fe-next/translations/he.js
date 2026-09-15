@@ -1313,6 +1313,7 @@ const he = {
     "creating": "יוצר...",
     "guest": "אורח",
     "unknown": "לא ידוע",
+    "loading": "בודקים…",
     "back": "חזור",
     "backHome": "חזרה הביתה",
     "backToHome": "חזרה לדף הבית",
@@ -12431,6 +12432,31 @@ const he = {
       "profileLabel": "פרופיל המורה שלי",
       "analyticsLabel": "נתוני הכיתה"
     },
+    "pulse": {
+      "state": {
+        "noRoster": "אין עדיין תלמידים",
+        "neverPlayed": "עוד לא שיחקו",
+        "needsReview": "צריך חזרה",
+        "ready": "במסלול",
+        "unknown": "לא נטען"
+      },
+      "action": {
+        "invite": "קבלו קוד הצטרפות",
+        "play": "התחילו משחק ראשון",
+        "review": "תרגלו את המילים הקשות",
+        "playAgain": "שחקו שוב",
+        "retry": "נסו שוב"
+      },
+      "enrolled": "רשומים",
+      "participation": "{{played}} מתוך {{total}} שיחקו · {{absent}} פספסו",
+      "lastPlayedToday": "שיחקו היום · ממוצע {{accuracy}}%",
+      "lastPlayedDays": "שיחקו לפני {{days}} ימים · ממוצע {{accuracy}}%",
+      "lastPlayedOneDay": "שיחקו אתמול · ממוצע {{accuracy}}%",
+      "strugglingOne": "{{names}} מתקשה",
+      "struggling": "{{count}} מתקשים: {{names}}",
+      "regionLabel": "מצב הכיתה {{classroom}}",
+      "switcherLabel": "איזו כיתה"
+    },
     "playNow": {
       "recommended": "מומלץ",
       "title": "משחקים עכשיו",
@@ -14499,7 +14525,20 @@ const he = {
         "title": "הצטרף לכיתה"
       },
       "classroomRoomGone": "משחק הכיתה הסתיים. בקשו מהמורה להתחיל משחק חדש.",
-      "lessonsAssigned": "שיעורים שהוקצו"
+      "lessonsAssigned": "שיעורים שהוקצו",
+      "feel": {
+        "points": "נק'",
+        "words": "מילים",
+        "correct": "יפה מאוד!",
+        "lessonWord": "מילה מהשיעור!",
+        "tryAgain": "לא זו — תמשיכו",
+        "roundOver": "הסיבוב נגמר!",
+        "rival": {
+          "toCatch": "להשיג",
+          "ahead": "מוביל",
+          "tied": "תיקו"
+        }
+      }
     },
     "students": "תלמידים",
     "template": {
@@ -14712,6 +14751,7 @@ const he = {
       "days_left": "ימים נותרו",
       "day_left": "יום נותר",
       "hours_left": "שעות נותרו",
+      "hour_left": "שעה נותרה",
       "cta": "התחל/י את הכיתה הראשונה שלך",
       "expired_title": "תקופת הניסיון שלך כמורה הסתיימה",
       "expired_body": "תקופת הניסיון החינמית הסתיימה. הגש/י בקשה מחדש או פנה/י אלינו כדי לשמור על מצב הכיתה.",

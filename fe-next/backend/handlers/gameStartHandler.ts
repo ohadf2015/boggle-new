@@ -79,6 +79,7 @@ import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 import { scheduleWheelRushBots } from '../modules/wheelRushBot.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { verifyBoostToken } from '../utils/boostToken.js';
+import { buildLessonVocabulary } from '../utils/lessonVocabulary.js';
 
 // In-memory mutex to prevent concurrent startGame flows for the same game.
 // The state machine transition is synchronous, but async work before it
@@ -467,8 +468,12 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     // Classroom game? Reads the record AND marks the code live for this round.
     const classroomGame = await beginClassroomRound(gameCode);
+    // Normalized per-language (sofit finals, ё→е, accent-stripping) so the live
+    // match in wordValidationHandler can actually hit. A bare toUpperCase() here
+    // made every Hebrew lesson word ending in כ/מ/נ/פ/צ unmatchable, because the
+    // board only ever carries regular-form letters. See backend/utils/lessonVocabulary.
     const lessonVocabulary = classroomGame?.vocabularyWords
-      ? new Set(classroomGame.vocabularyWords.map(w => w.toUpperCase()))
+      ? buildLessonVocabulary(classroomGame.vocabularyWords, gameLang)
       : undefined;
 
     // SECURITY: Regenerate grid server-side for ALL multiplayer games (2+ players).

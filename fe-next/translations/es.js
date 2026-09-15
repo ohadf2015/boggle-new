@@ -1314,6 +1314,7 @@ const es = {
     "creating": "Creando...",
     "guest": "Invitado",
     "unknown": "Desconocido",
+    "loading": "Comprobando…",
     "back": "Atrás",
     "backHome": "Volver a Inicio",
     "backToHome": "Volver al Inicio",
@@ -12569,6 +12570,31 @@ const es = {
       "profileLabel": "Mi perfil de docente",
       "analyticsLabel": "Analíticas de la clase"
     },
+    "pulse": {
+      "state": {
+        "noRoster": "Aún sin alumnos",
+        "neverPlayed": "Aún sin jugar",
+        "needsReview": "Necesita repaso",
+        "ready": "Va bien",
+        "unknown": "No se pudo cargar"
+      },
+      "action": {
+        "invite": "Ver el código de acceso",
+        "play": "Empezar su primera partida",
+        "review": "Practicar las palabras difíciles",
+        "playAgain": "Jugar otra vez",
+        "retry": "Reintentar"
+      },
+      "enrolled": "inscritos",
+      "participation": "{{played}} de {{total}} jugaron · {{absent}} no participaron",
+      "lastPlayedToday": "Jugaron hoy · {{accuracy}} % de media",
+      "lastPlayedDays": "Jugaron hace {{days}} días · {{accuracy}} % de media",
+      "lastPlayedOneDay": "Jugaron ayer · {{accuracy}} % de media",
+      "strugglingOne": "{{names}} tiene dificultades",
+      "struggling": "{{count}} con dificultades: {{names}}",
+      "regionLabel": "Estado de la clase {{classroom}}",
+      "switcherLabel": "Qué clase"
+    },
     "playNow": {
       "recommended": "Recomendado",
       "title": "Jugar ya",
@@ -14638,7 +14664,20 @@ const es = {
         "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe."
       },
       "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
-      "lessonsAssigned": "Lecciones asignadas"
+      "lessonsAssigned": "Lecciones asignadas",
+      "feel": {
+        "points": "pts",
+        "words": "palabras",
+        "correct": "¡Muy bien!",
+        "lessonWord": "¡Palabra de clase!",
+        "tryAgain": "Esa no — sigue intentando",
+        "roundOver": "¡Ronda terminada!",
+        "rival": {
+          "toCatch": "para alcanzar",
+          "ahead": "por delante",
+          "tied": "empate"
+        }
+      }
     },
     "template": {
       "settings": "Ajustes",
@@ -14843,6 +14882,7 @@ const es = {
       "days_left": "días restantes",
       "day_left": "día restante",
       "hours_left": "horas restantes",
+      "hour_left": "hora restante",
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
       "expired_body": "Tu periodo de prueba gratis ha terminado. Vuelve a solicitarlo o escríbenos para conservar el modo aula.",

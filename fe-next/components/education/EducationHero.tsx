@@ -6,7 +6,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { locales } from '@/lib/i18n';
+import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { EducationModeMock } from './EducationModeMock';
+import {
+  TEACHER_PRO_CHECKOUT_PATH,
+  teacherProCheckoutCtaLabel,
+} from './TeacherProCheckoutCta';
 import Mascot from '@/components/ui/Mascot';
 
 /**
@@ -27,11 +32,9 @@ const LANGUAGE_COUNT = String(locales.length);
 /**
  * Design tokens (from frontend-design skill):
  * - Hero: dark neo-navy background with neo-lime primary CTA
- * - Single primary CTA: oversized bg-neo-lime button with shadow-hard-xl, an
- *   animated arrow, and a reassurance note. We deliberately keep ONE CTA so the
- *   teacher's next action is unmistakable (clicks tracked via growth analytics).
- * - Right column shows EducationModeMock — a live "see it in action" preview —
- *   so the page demonstrates the product instead of needing a second CTA.
+ * - Primary CTA: Teacher Pro checkout ($TEACHER_PRO_PRICE_USD/mo) → /teacher/upgrade.
+ *   Revenue path must be above the fold; secondary free path stays visible.
+ * - Right column shows EducationModeMock — a live "see it in action" preview.
  * - Decorative dots: neo-lime/neo-pink at low opacity for personality
  *
  * Entry: GSAP timeline cascades eyebrow → h1 → sub → CTA, then floats the
@@ -128,11 +131,12 @@ export function EducationHero() {
             className="mt-8 flex flex-col items-center gap-3 lg:items-start"
           >
             <Link
-              href={`/${language}/education/access`}
-              onClick={() => trackLandingCtaClick('education_hero')}
+              href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
+              data-testid="education-hero-pro-cta"
+              onClick={() => trackLandingCtaClick('education_hero_pro')}
               className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-xl transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard motion-safe:animate-pulse-subtle"
             >
-              {t('education.landing.hero.cta_primary')}
+              {teacherProCheckoutCtaLabel(language)}
               <span
                 aria-hidden
                 className="text-xl transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
@@ -140,8 +144,19 @@ export function EducationHero() {
                 →
               </span>
             </Link>
+            <Link
+              href={`/${language}/education/access`}
+              data-testid="education-hero-free-cta"
+              onClick={() => trackLandingCtaClick('education_hero')}
+              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-cyan px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-neo-cyan shadow-hard-sm transition-all hover:bg-neo-cyan/15 hover:shadow-hard"
+            >
+              {t('education.landing.hero.cta_primary', 'Start free — request teacher access')}
+            </Link>
             <p className="text-xs font-bold uppercase tracking-wider text-neo-cream/70">
-              {t('education.landing.hero.cta_note')}
+              {t(
+                'education.landing.hero.cta_note',
+                `Free plan to start · Teacher Pro $${TEACHER_PRO_PRICE_USD}/mo`,
+              )}
             </p>
             <Link
               href={`/${language}/education/for-schools`}

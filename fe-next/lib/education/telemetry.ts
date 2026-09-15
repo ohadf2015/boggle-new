@@ -7,12 +7,26 @@
  * - Guarantees property naming convention without each caller needing to
  *   remember it.
  * - Never throws — analytics must not break gameplay.
+ *
+ * SCOPE NOTE (2026-09-15): four declarations — `edu_practice_start`,
+ * `edu_xp_awarded`, `edu_student_join_classroom`, `edu_achievement_unlock` —
+ * were deleted here. None had a call site anywhere in the codebase and none had
+ * ever emitted an event. They made the education module look instrumented on
+ * every audit while measuring nothing, which is worse than an honest gap.
+ * `edu_student_join_classroom` was additionally a near-duplicate of the working
+ * `edu_classroom_join`; keeping both would have split one funnel across two
+ * names.
+ *
+ * The events that matter for CLASSROOM gameplay are emitted SERVER-side, from
+ * `backend/utils/educationTelemetry.ts` — that is where classroom games are
+ * actually completed. See that module's header for why.
  */
 
 import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
+type Register = (props: Record<string, unknown>) => void;
 
 const safeCapture: Capture = (event, props) => {
   try {
@@ -20,6 +34,16 @@ const safeCapture: Capture = (event, props) => {
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {
       logger.debug('[eduTelemetry] capture failed', { event, err });
+    }
+  }
+};
+
+const safeRegister: Register = (props) => {
+  try {
+    (posthog.register as unknown as Register)(props);
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('[eduTelemetry] register failed', { err });
     }
   }
 };
@@ -32,18 +56,6 @@ export type PracticeType =
   | 'blitz'
   | 'vocab_focus'
   | 'lesson_completion';
-
-export interface EduPracticeStartArgs {
-  lessonId: string;
-  practiceType: PracticeType;
-}
-
-export function trackEduPracticeStart(args: EduPracticeStartArgs): void {
-  safeCapture('edu_practice_start', {
-    lesson_id: args.lessonId,
-    practice_type: args.practiceType,
-  });
-}
 
 export interface EduPracticeCompleteArgs {
   lessonId: string;
@@ -71,46 +83,77 @@ export function trackEduPracticeComplete(args: EduPracticeCompleteArgs): void {
   safeCapture('edu_practice_complete', props);
 }
 
-export type XpSource =
-  | 'flashcard'
-  | 'solo_board'
-  | 'lesson_completion'
-  | 'matching'
-  | 'spelling'
-  | 'blitz'
-  | 'duel_async'
-  | 'duel_realtime'
-  | 'daily_challenge'
-  | 'classroom_game'
-  | 'achievement';
-
-export interface EduXpAwardedArgs {
-  source: XpSource;
-  amount: number;
-  newTotalXp: number;
-  newLevel: number;
-}
-
-export function trackEduXpAwarded(args: EduXpAwardedArgs): void {
-  safeCapture('edu_xp_awarded', {
-    source: args.source,
-    amount: args.amount,
-    new_total_xp: args.newTotalXp,
-    new_level: args.newLevel,
-  });
-}
-
 export type ClassroomJoinResult = 'success' | 'invalid_code' | 'not_found' | 'error';
+
+/**
+ * Which of the TWO six-character code systems actually resolved.
+ *
+ * `/join/[code]` accepts both the roster `join_code` and the live game code
+ * shown on the projector. Verified against production 2026-09-15, they are
+ * shape-identical — roster `UHMKL4`, game `5L7UCD`, both six uppercase
+ * alphanumerics — so nothing about the STRING can tell them apart. Only the
+ * lookup can, which is why this is reported by the caller rather than derived.
+ */
+export type MatchedCodeType = 'roster_code' | 'game_code';
+
+export type CodeCharset = 'letters' | 'digits' | 'alphanumeric' | 'other';
+
+/** Shape only — the code itself is a shared secret and never leaves the client. */
+function charsetOf(code: string): CodeCharset {
+  if (/^[A-Za-z]+$/.test(code)) return 'letters';
+  if (/^[0-9]+$/.test(code)) return 'digits';
+  if (/^[A-Za-z0-9]+$/.test(code)) return 'alphanumeric';
+  return 'other';
+}
 
 export interface EduClassroomJoinArgs {
   result: ClassroomJoinResult;
   classroomId?: string;
+  /**
+   * The code the student typed. Used ONLY to derive length + charset; it is
+   * never put on the event.
+   */
+  attemptedCode?: string;
+  matchedCodeType?: MatchedCodeType;
 }
 
+/**
+ * `edu_classroom_join` — the one event that has always worked, now carrying the
+ * shape of its failures.
+ *
+ * Production 2026-09-15: 42 attempts, 21 success, 19 `not_found`. Seven of
+ * twelve users hit a not-found at least once, and nothing on the event said
+ * what they had typed or which system it belonged to. `matched_code_type` on
+ * the successes and `code_length` / `code_charset` on the failures are what
+ * turn that 50% into a diagnosable number.
+ */
 export function trackEduClassroomJoin(args: EduClassroomJoinArgs): void {
   const props: Record<string, unknown> = { result: args.result };
   if (args.classroomId) props.classroom_id = args.classroomId;
+  if (args.matchedCodeType) props.matched_code_type = args.matchedCodeType;
+  if (args.attemptedCode) {
+    props.code_length = args.attemptedCode.length;
+    props.code_charset = charsetOf(args.attemptedCode);
+  }
   safeCapture('edu_classroom_join', props);
+}
+
+export interface EduClassroomCreatedArgs {
+  classroomId: string;
+  /** Which surface created it — the dashboard form or the express game lobby. */
+  createdVia: 'dashboard' | 'express_lobby' | 'onboarding';
+}
+
+/**
+ * `edu_classroom_created` — the step between "teacher onboarded" and "students
+ * joined" that had no event at all, so the teacher funnel could not tell a
+ * teacher who never created a classroom from one whose students never joined.
+ */
+export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
+  safeCapture('edu_classroom_created', {
+    classroom_id: args.classroomId,
+    created_via: args.createdVia,
+  });
 }
 
 export interface EduTeacherOnboardingStepArgs {
@@ -124,30 +167,6 @@ export function trackEduTeacherOnboardingStep(args: EduTeacherOnboardingStepArgs
     step: args.step,
     total_steps: args.totalSteps,
     action: args.action,
-  });
-}
-
-export interface EduStudentJoinClassroomArgs {
-  classroomId: string;
-  isFirst: boolean;
-}
-
-export function trackEduStudentJoinClassroom(args: EduStudentJoinClassroomArgs): void {
-  safeCapture('edu_student_join_classroom', {
-    classroom_id: args.classroomId,
-    is_first: args.isFirst,
-  });
-}
-
-export interface EduAchievementUnlockArgs {
-  achievementId: string;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-}
-
-export function trackEduAchievementUnlock(args: EduAchievementUnlockArgs): void {
-  safeCapture('edu_achievement_unlock', {
-    achievement_id: args.achievementId,
-    tier: args.tier,
   });
 }
 
@@ -168,4 +187,59 @@ export function trackEduError(args: EduErrorArgs): void {
     surface: args.surface,
     code: args.code,
   });
+}
+
+/**
+ * Register `classroom_id` as a PostHog SUPER PROPERTY, so it rides every
+ * subsequent event from this browser — `game_started`, `game_completed`,
+ * `growth:game_started`, `growth:game_completed`, `results_viewed`, all of it.
+ *
+ * Why a super property rather than editing the emitters: `classroom_id` has
+ * never appeared on ANY game lifecycle event, all-time, so "which modes do
+ * students play in class" was unanswerable. The lifecycle events are emitted
+ * from many call sites — and `game_completed` deliberately dual-emits under
+ * both its canonical and `growth:` names — so adding the property at each
+ * emitter is exactly the asymmetric-paths pitfall (rules class 3): one path
+ * would carry it and its twin would not. Registering once covers every path by
+ * construction.
+ *
+ * MUST be called with `null` when the student leaves classroom context. Super
+ * properties persist in localStorage, so a value left behind would tag every
+ * later solo game as classroom play (rules class 2 — stale state).
+ */
+export function setEduClassroomContext(classroomId: string | null): void {
+  safeRegister({ classroom_id: classroomId });
+}
+
+/**
+ * Register `is_test_account`, so QA and automation traffic can be excluded with
+ * a property filter instead of the hand-built email patterns the 2026-09-12
+ * purge had to reconstruct by hand (`.claude/rules/70-test-accounts.md`).
+ *
+ * Always pass an explicit boolean — an ABSENT property and `false` are
+ * different things in a PostHog filter, and "absent" would quietly drop real
+ * users from any funnel written as `is_test_account = false`.
+ */
+export function setEduTestAccountFlag(isTestAccount: boolean): void {
+  safeRegister({ is_test_account: isTestAccount });
+}
+
+/**
+ * The QA/automation signup convention: `<tag>@lexiclash.test`
+ * (`.claude/rules/70-test-accounts.md`). A DB trigger sets
+ * `profiles.is_test_account` from the same address, so this mirrors the
+ * server's own predicate rather than inventing a second one.
+ *
+ * Deliberately NOT matched: a `+qa` alias on a real domain. The rule says such
+ * aliases are not auto-flagged, and widening the match here would quietly drop
+ * real users out of every funnel.
+ *
+ * LIMIT: anonymous guest students have `auth.users.email IS NULL` by
+ * construction, so email can never catch them. They are flagged in the DB via
+ * the test-teacher's classroom; `profiles.is_test_account` stays the
+ * authoritative filter for those.
+ */
+export function isTestAccountEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  return email.trim().toLowerCase().endsWith('@lexiclash.test');
 }

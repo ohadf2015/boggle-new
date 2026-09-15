@@ -25,6 +25,7 @@ import { describe, it, expect } from 'vitest';
 import {
   hostLeavesProjectorRecap,
   modeSceneOwnsHeroSlot,
+  playedGameMode,
   NEXT_ROUND_MODES,
 } from '../roundEndResultsRoute';
 
@@ -120,5 +121,51 @@ describe('NEXT_ROUND_MODES', () => {
     expect([...NEXT_ROUND_MODES]).toEqual(
       expect.arrayContaining(['classic', 'wheel-rush', 'blast', 'word-hunt', 'random']),
     );
+  });
+});
+
+/**
+ * `playedGameMode` — the mode the round that just ENDED was played in.
+ *
+ * The store's `gameMode` is not that. It is ALSO the next round's intent, and
+ * it is written optimistically: `setGameMode` sets the mode and clears
+ * `gameModeConfirmed`, and only the server's `startGame` (`confirmGameMode` /
+ * `batchStartGame`) sets that flag back.
+ *
+ * The teacher's mode picker rides exactly that path. `useClassroomModeSwitch`
+ * answers the server's `classroomGameModeChanged` — a ROOM broadcast, so every
+ * student's client receives it — by calling `setGameMode(mode)`. A teacher
+ * choosing next round's mode while the recap is still up therefore rewrote
+ * `gameMode` on thirty phones that were displaying the results of a round
+ * played in a different mode, and the results page, which read `gameMode` raw,
+ * relabelled a Classic round's stat card "Blast Results".
+ *
+ * `HostInGameView` already refuses to render a mode-specific view until
+ * `gameModeConfirmed` (its test is named "prevents classic flash"), and so does
+ * the game-end telemetry. The results surface was the sibling that did not —
+ * recurring pitfall class 3 — so the rule lives here, as one predicate both
+ * results layouts call.
+ */
+describe('playedGameMode', () => {
+  it('is the mode when the server confirmed it', () => {
+    expect(playedGameMode({ gameMode: 'blast', gameModeConfirmed: true })).toBe('blast');
+  });
+
+  it('is undefined once the mode is only an unconfirmed INTENT', () => {
+    // The teacher picked next round's mode while the recap was still up.
+    expect(playedGameMode({ gameMode: 'blast', gameModeConfirmed: false })).toBeUndefined();
+  });
+
+  it('never invents a mode from nothing', () => {
+    expect(playedGameMode({ gameMode: undefined, gameModeConfirmed: true })).toBeUndefined();
+    expect(playedGameMode({ gameMode: null, gameModeConfirmed: true })).toBeUndefined();
+  });
+
+  it('withholds rather than guesses — a wrong mode heading is worse than none', () => {
+    // Every mode goes quiet on the same rule; none is special-cased, so a mode
+    // added next sprint is covered by construction.
+    for (const mode of ['classic', 'blast', 'wheel-rush', 'word-hunt']) {
+      expect(playedGameMode({ gameMode: mode, gameModeConfirmed: false })).toBeUndefined();
+    }
   });
 });
