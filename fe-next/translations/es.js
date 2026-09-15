@@ -6062,6 +6062,7 @@ const es = {
     "rejected": "Palabra rechazada",
     "duplicateWord": "Palabra duplicada",
     "lessonWordTitle": "¡Palabra del vocabulario de la lección!",
+    "lessonWordBonus": "¡Palabra de la lección — bonus +{bonus}!",
     "dictionaryTitle": "Construye Nuestro Diccionario",
     "submittedBy": "Enviado por",
     "skipHint": "Presiona ESC para saltar",
@@ -13540,7 +13541,13 @@ const es = {
         "antonym": "Palabras que significan lo contrario",
         "context": "Deduce la palabra a partir de la oración",
         "multiple_meaning": "Una palabra, dos significados",
-        "roots_affixes": "Qué significan las partes de la palabra"
+        "roots_affixes": "Qué significan las partes de la palabra",
+        "produce": {
+            "definition": "Lee el significado y escribe la palabra",
+            "synonym": "Ve una palabra similar y escribe la palabra",
+            "antonym": "Ve lo contrario y escribe la palabra",
+            "context": "Completa el espacio de memoria"
+          }
       },
       "locked": {
         "word_tower": "Necesita 4 palabras de la lista de 4 a 6 letras",
@@ -13551,6 +13558,36 @@ const es = {
         "spelling": "Añade palabras a esta lección para desbloquear",
         "flashcard": "Añade palabras a esta lección para desbloquear",
         "word_list": "Añade palabras a esta lección para desbloquear"
+      }
+    },
+    "produce": {
+      "title": "Forja de palabras",
+      "desc": "Lee el significado y escribe la palabra",
+      "newWord": "Palabra nueva — mírala",
+      "gotIt": "Entendido",
+      "hint": "Pista",
+      "hintLength": "{count} letras",
+      "inputLabel": "Escribe la palabra",
+      "placeholder": "Escribe la palabra…",
+      "check": "Comprobar",
+      "theWordWas": "La palabra era",
+      "finish": "Terminar",
+      "cue": {
+        "definition": "¿Qué palabra es esta?",
+        "context": "Completa el espacio",
+        "synonym": "Otra palabra para…",
+        "antonym": "Lo contrario de…"
+      },
+      "verdict": {
+        "correct": "¡Correcto!",
+        "near-miss": "Casi — revisa la ortografía",
+        "wrong": "No esta vez"
+      },
+      "notEnough": {
+        "definition": "Añade definiciones a esta lección para desbloquear",
+        "context": "Añade oraciones de ejemplo a esta lección para desbloquear",
+        "synonym": "Añade sinónimos a esta lección para desbloquear",
+        "antonym": "Añade antónimos a esta lección para desbloquear"
       }
     },
     "vocabFocus": {
