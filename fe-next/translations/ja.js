@@ -594,6 +594,9 @@ const ja = {
       "windfall": "棚ぼた！",
       "updraft": "上昇気流！次の単語が強化",
       "crystal": "クリスタル発見！",
+      "echo": "エコーブースト！",
+      "meteorStrike": "隕石落下！",
+      "phantomFloor": "幻の階！",
       "goldenFloor": "黄金の階！"
     },
     "daily": {
@@ -14205,6 +14208,9 @@ const ja = {
       "retry": "リトライ",
       "streak": "{{count}}日連続",
       "struggling": "サポートが必要",
+      "mastered": "習得済み",
+      "practicing": "練習中",
+      "notStarted": "未着手",
       "student": "生徒",
       "studentDetail": "生徒の詳細",
       "studentProgress": "生徒の進捗",
@@ -14621,6 +14627,7 @@ const ja = {
       "soloBoard": "ソロボード",
       "lessonUnavailable": "このレッスンを開けません",
       "lessonUnavailableBody": "リンクが古いか、レッスンが削除された可能性があります。先生に新しいリンクをもらってね。",
+      "startFailed": "練習を開始できませんでした。もう一度お試しください。",
       "insufficientData": {
         "title": "このゲームには単語が足りないよ",
         "body": "このレッスンには、このゲームに必要な情報つきの単語が足りません。先生に意味を足してもらうか、別のゲームを選んでね。"

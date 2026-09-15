@@ -879,6 +879,9 @@ const sv = {
       "windfall": "Skänk!",
       "updraft": "Uppvind! Nästa ord boostat",
       "crystal": "Kristallfynd!",
+      "echo": "Eko-boost!",
+      "meteorStrike": "Meteornedslag!",
+      "phantomFloor": "Spökvåning!",
       "goldenFloor": "Gyllene våning!"
     },
     "daily": {
@@ -14439,6 +14442,9 @@ const sv = {
       "retry": "Försök igen",
       "streak": "{{count}} dagars träning",
       "struggling": "Behöver stöd",
+      "mastered": "Behärskar",
+      "practicing": "Övar",
+      "notStarted": "Inte påbörjad",
       "student": "Elev",
       "studentDetail": "Elevprofil",
       "studentProgress": "Elevframsteg",
@@ -14855,6 +14861,7 @@ const sv = {
       "soloBoard": "Ensamt spel",
       "lessonUnavailable": "Kan inte öppna lektionen",
       "lessonUnavailableBody": "Länken kan vara för gammal, eller så är lektionen borttagen. Be din lärare om en ny.",
+      "startFailed": "Kunde inte starta övningen. Försök igen.",
       "insufficientData": {
         "title": "För lite för den här övningen",
         "body": "Lektionen har inte tillräckligt många ord med den information spelet behöver. Be läraren lägga till förklaringar, eller välj ett annat spel."
