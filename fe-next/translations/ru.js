@@ -2003,7 +2003,27 @@ const ru = {
       "privacyNote": "Без импорта списков. Без имён учеников. Публикация через диалог Google — мы не видим, какой класс вы выбрали.",
       "postToStream": "Опубликовать Unplugged в ленту Classroom",
       "openUnplugged": "Открыть Unplugged Live",
-      "needMissedWords": "Добавьте хотя бы одно пропущенное слово, чтобы включить назначение."
+            "needMissedWords": "Добавьте хотя бы одно пропущенное слово, чтобы включить назначение в один клик.",
+      "planner": {
+        "eyebrow": "Разговорный планировщик Classroom",
+        "title": "Скажите, что нужно — мы направим Live",
+        "subtitle": "Опишите план простыми словами. Откроем Classic или Team Unplugged, либо reteach Live с возвратом оценок. Только слова класса — без имён.",
+        "promptLabel": "Что хотите запустить?",
+        "promptPlaceholder": "напр. Unplugged reteach по вчерашним пропускам",
+        "privacyNote": "Без импорта списков. Без имён учеников. Направляем в уже готовые режимы Unplugged — без новой игровой логики.",
+        "needPrompt": "Введите простой запрос, чтобы спланировать Live.",
+        "needMissedWords": "Добавьте пропущенные слова или укажите уровень CEFR, чтобы подставить пробелы.",
+        "modeClassic": "Classic Unplugged — класс/команды обсуждают на проекторе",
+        "modeTeam": "Team Tiles Unplugged — общая плиточная доска, учитель отмечает",
+        "modeReteach": "Unplugged reteach Live — распечатка + проектор",
+        "modeLive3min": "3-мин reteach Live — проектор + возврат оценок",
+        "timerNote": "Таймер {{seconds}} с",
+        "cefrNote": "Пробелы CEFR {{level}}",
+        "openLive": "Открыть запланированный Live",
+        "openGradePassback": "Открыть квитанцию возврата оценок",
+        "postToStream": "Опубликовать Unplugged в ленту Classroom",
+        "foilNote": "Против разговорного Discovery Education Gemini в Classroom — LexiClash направляет в реальные Unplugged Live с возвратом оценок."
+      }
     },
     "nav": {
       "section": "Учителям",

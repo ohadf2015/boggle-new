@@ -13975,7 +13975,27 @@ const es = {
       "privacyNote": "Sin importar listas. Sin nombres de alumnos. La publicación usa el diálogo de Google — nunca vemos qué clase eliges.",
       "postToStream": "Publicar Unplugged en el tablón de Classroom",
       "openUnplugged": "Abrir Unplugged Live",
-      "needMissedWords": "Añade al menos una palabra fallada para activar la asignación."
+            "needMissedWords": "Añade al menos una palabra fallada para activar la asignación en un clic.",
+      "planner": {
+        "eyebrow": "Planificador conversacional de Classroom",
+        "title": "Di lo que necesitas — nosotros enrutamos el Live",
+        "subtitle": "Escribe un plan en lenguaje sencillo. Abrimos Classic o Team Unplugged, o un reteach Live con devolución de notas. Solo palabras de clase — sin nombres.",
+        "promptLabel": "¿Qué quieres poner en marcha?",
+        "promptPlaceholder": "p. ej. Unplugged reteach de los fallos de ayer",
+        "privacyNote": "Sin importar listas. Sin nombres. Enruta a modos Unplugged ya publicados — no inventamos lógica de juego nueva.",
+        "needPrompt": "Escribe un prompt en lenguaje sencillo para planificar el Live.",
+        "needMissedWords": "Añade palabras falladas, o pide un nivel CEFR para sembrar huecos.",
+        "modeClassic": "Classic Unplugged — la clase/equipos discuten en el proyector",
+        "modeTeam": "Team Tiles Unplugged — tablero compartido, el docente marca",
+        "modeReteach": "Unplugged reteach Live — imprimible + proyector",
+        "modeLive3min": "Reteach Live de 3 min — proyector + devolución de notas",
+        "timerNote": "Temporizador de {{seconds}}s",
+        "cefrNote": "Huecos CEFR {{level}}",
+        "openLive": "Abrir Live planificado",
+        "openGradePassback": "Abrir recibo de devolución de notas",
+        "postToStream": "Publicar Unplugged en el tablón de Classroom",
+        "foilNote": "Frente a Discovery Education Gemini conversacional en Classroom — LexiClash enruta a Lives Unplugged reales con devolución de notas."
+      }
     },
     "nav": {
       "section": "Docentes",

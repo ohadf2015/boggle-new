@@ -286,7 +286,7 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       'One-click post Unplugged reteach homework (printable practice sheet + Live deep-link) into Google Classroom Stream. Class-level missed words only — no student names or roster import.',
     origin: CLASS_GAP_ORIGIN,
     production_url: 'https://www.lexiclash.live',
-    foils: ['Discovery Education Gemini Classroom', 'Kahootopia Assignments', 'Kahoot Marketplace grade passback'],
+    foils: ['Discovery Education Gemini Classroom', 'Discovery Education Gemini conversational Classroom', 'Kahootopia Assignments', 'Kahoot Marketplace grade passback'],
     extends: ['#949', '#954', '#957', '#959', '#968'],
     privacy: {
       student_names: false,
@@ -342,6 +342,30 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       notes:
         'Shared teacher-screen miss-gap Live; class or teams discuss; teacher submits consensus; reuses Unplugged finish + grade passback.',
       extends: ['#959', '#1045', '#1047'],
+    },
+    conversational_planner: {
+      for: 'conversational-classroom-addon-planner',
+      foil: 'Discovery Education Gemini conversational Classroom',
+      path: '/education/classroom-addon/planner',
+      api: '/api/classroom-addon/plan',
+      routes_into: [
+        'classic-unplugged',
+        'team-tiles-unplugged',
+        'unplugged-reteach',
+        'unplugged-grade-passback (#1045)',
+      ],
+      example_prompts: [
+        "Unplugged reteach on yesterday's misses",
+        '3-min Live on CEFR gaps',
+        'Classic Unplugged with the class',
+        'Team Tiles for two groups',
+      ],
+      student_names: false,
+      roster_scopes: false,
+      reopens_unplugged_game_logic: false,
+      extends: ['#959', '#970', '#1045', '#1047', '#1058'],
+      notes:
+        'Plain-language teacher prompt routes into Classic/Team Unplugged or reteach Live + grade passback. No new Unplugged game logic.',
     },
     team_tiles_unplugged: {
       for: 'team-tiles-unplugged',

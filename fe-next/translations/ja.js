@@ -13983,7 +13983,27 @@ const ja = {
       "privacyNote": "名簿の取り込みなし。生徒名なし。投稿は Google の共有ダイアログ — どのクラスかは見えません。",
       "postToStream": "Unplugged 課題を Classroom ストリームへ投稿",
       "openUnplugged": "Unplugged Live を開く",
-      "needMissedWords": "ワンクリック課題には、見逃した単語を1つ以上入力してください。"
+            "needMissedWords": "ワンクリック課題には、見逃した単語を1つ以上入力してください。",
+      "planner": {
+        "eyebrow": "会話型 Classroom プランナー",
+        "title": "やりたいことを書いて — Live へ案内します",
+        "subtitle": "ふだんの言葉で計画を入力。Classic / Team Unplugged、または成績連携つき reteach Live を開きます。クラスの単語のみ — 生徒名は不要。",
+        "promptLabel": "何を実施しますか？",
+        "promptPlaceholder": "例: 昨日のミスの Unplugged reteach",
+        "privacyNote": "名簿取り込みなし。生徒名なし。既存の Unplugged モードへ案内 — 新しいゲームロジックは追加しません。",
+        "needPrompt": "Live を計画するには、ふだんの言葉でプロンプトを入力してください。",
+        "needMissedWords": "見逃した単語を追加するか、CEFR レベルを指定してギャップ語を用意します。",
+        "modeClassic": "Classic Unplugged — クラス/チームがプロジェクターで相談",
+        "modeTeam": "Team Tiles Unplugged — 共有タイルボード、教師が採点",
+        "modeReteach": "Unplugged reteach Live — プリント + プロジェクター",
+        "modeLive3min": "3分 reteach Live — プロジェクター + 成績連携",
+        "timerNote": "{{seconds}}秒タイマー",
+        "cefrNote": "CEFR {{level}} ギャップ",
+        "openLive": "計画した Live を開く",
+        "openGradePassback": "成績連携レシートを開く",
+        "postToStream": "Unplugged 課題を Classroom ストリームへ投稿",
+        "foilNote": "Discovery Education Gemini の会話型 Classroom に対抗 — LexiClash は本物の Unplugged Live と成績連携へ案内します。"
+      }
     },
     "nav": {
       "section": "教師向け",

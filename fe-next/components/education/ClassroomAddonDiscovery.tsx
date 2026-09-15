@@ -154,6 +154,14 @@ export function ClassroomAddonDiscovery({
         {t('education.classroomAddon.privacyNote')}
       </p>
 
+      <a
+        href={`/${locale}/education/classroom-addon/planner`}
+        data-testid="classroom-addon-open-planner"
+        className="mt-3 inline-flex text-neo-lime font-bold text-xs underline-offset-2 hover:underline"
+      >
+        {t('education.classroomAddon.planner.title')}
+      </a>
+
       {streamHref ? (
         <a
           href={streamHref}
