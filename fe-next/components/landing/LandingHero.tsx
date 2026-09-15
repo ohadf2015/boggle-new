@@ -8,6 +8,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames, detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
 import { useExperiment } from '@/hooks/useExperiment';
 import { HeroStyleMascot } from './HeroStyleMascot';
+import {
+  TEACHER_PRO_CHECKOUT_PATH,
+  teacherProCheckoutCtaLabel,
+} from '@/components/education/TeacherProCheckoutCta';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 import posthog from '@/lib/analytics/lazyPosthog';
 
@@ -118,6 +122,14 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
                 className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
               >
                 {t('landing.forTeachers')}
+              </Link>
+              <Link
+                href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
+                prefetch={false}
+                data-testid="landing-teacher-pro-cta"
+                className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-pink px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+              >
+                {teacherProCheckoutCtaLabel(language)}
               </Link>
               <Link
                 href={`/${language}/multiplayer`}

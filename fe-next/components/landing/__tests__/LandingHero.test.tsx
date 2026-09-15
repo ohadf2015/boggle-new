@@ -74,10 +74,18 @@ describe('LandingHero', () => {
     expect(screen.getByTestId('landing-play-cta')).toHaveAttribute('href', '/en/multiplayer');
   });
 
+  it('shows a Teacher Pro $9 checkout CTA next to For Teachers', () => {
+    render(<LandingHero {...baseProps} />);
+    const pro = screen.getByTestId('landing-teacher-pro-cta');
+    expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(pro.textContent).toMatch(/\$9/);
+  });
+
   it('keeps consumer copy on CrazyGames (no teacher CTA)', () => {
     mockIsOnCG = true;
     render(<LandingHero {...baseProps} />);
     expect(screen.getByText('landing.welcomeTitle')).toBeInTheDocument();
+    expect(screen.queryByTestId('landing-teacher-pro-cta')).not.toBeInTheDocument();
     expect(screen.queryByText('landing.classroomHeroTitle')).not.toBeInTheDocument();
     expect(screen.queryByTestId('landing-for-teachers-cta')).not.toBeInTheDocument();
   });
