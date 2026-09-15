@@ -166,3 +166,8 @@ Shared teacher-screen miss-gap Live (`/education/classic-unplugged`). Class or 2
 ### Team Tiles Unplugged (Kahoot Team Tiles foil)
 
 Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Teams flip tiles → word; teacher marks. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). No student devices. Class-level words only — no roster OAuth. Prod: **lexiclash.live** (never lexiclash.com).
+
+
+### Conversational Classroom add-on planner (Discovery Gemini foil)
+
+Teacher plain-language prompt inside the Marketplace add-on (`/education/classroom-addon/planner`, API `/api/classroom-addon/plan`) routes into shipped Classic Unplugged, Team Tiles Unplugged, or Unplugged reteach Live + #1045 grade passback. Example prompts: "Unplugged reteach on yesterday's misses", "3-min Live on CEFR gaps". Class-level missed words only — no roster OAuth / student names. Does **not** reopen Unplugged game logic. Foils Discovery Education Gemini conversational Classroom. Prod: **lexiclash.live**.

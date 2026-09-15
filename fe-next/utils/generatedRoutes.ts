@@ -89,6 +89,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/classic-unplugged",
   "/education/classroom-addon",
   "/education/classroom-addon/attachment",
+  "/education/classroom-addon/planner",
   "/education/classroom-game",
   "/education/duels",
   "/education/early-finishers-activities",

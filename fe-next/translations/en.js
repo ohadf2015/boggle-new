@@ -12516,7 +12516,27 @@ const en = {
       "privacyNote": "No roster import. No student names. Stream post uses Google's share dialog — we never see which class you pick.",
       "postToStream": "Post Unplugged assign to Classroom Stream",
       "openUnplugged": "Open Unplugged Live",
-      "needMissedWords": "Add at least one missed word to enable one-click assign."
+            "needMissedWords": "Add at least one missed word to enable one-click assign.",
+      "planner": {
+        "eyebrow": "Conversational Classroom planner",
+        "title": "Say what you need — we route the Live",
+        "subtitle": "Type a plain-language plan. We open Classic or Team Unplugged, or a reteach Live with grade passback. Class words only — no student names.",
+        "promptLabel": "What do you want to run?",
+        "promptPlaceholder": "e.g. Unplugged reteach on yesterday's misses",
+        "privacyNote": "No roster import. No student names. Routes into shipped Unplugged modes — we do not invent new game logic.",
+        "needPrompt": "Type a plain-language prompt to plan the Live.",
+        "needMissedWords": "Add missed words, or ask for a CEFR level so we can seed gap words.",
+        "modeClassic": "Classic Unplugged — class/teams discuss on the projector",
+        "modeTeam": "Team Tiles Unplugged — shared tileboard, teacher marks",
+        "modeReteach": "Unplugged reteach Live — printable + projector",
+        "modeLive3min": "3-min reteach Live — projector + grade passback",
+        "timerNote": "{{seconds}}s timer",
+        "cefrNote": "CEFR {{level}} gaps",
+        "openLive": "Open planned Live",
+        "openGradePassback": "Open grade passback receipt",
+        "postToStream": "Post Unplugged assign to Classroom Stream",
+        "foilNote": "Foils Discovery Education Gemini conversational Classroom — LexiClash routes into real Unplugged Lives with grade passback."
+      }
     },
     "nav": {
       "section": "Teachers",

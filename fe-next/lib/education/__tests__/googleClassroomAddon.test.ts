@@ -124,4 +124,17 @@ describe('classroomAddonMarketplaceListing', () => {
     expect((listing.api as { assign: string }).assign).toContain(CLASSROOM_ADDON_ASSIGN_PATH);
     expect(JSON.stringify(listing)).not.toContain('lexiclash.com');
   });
+
+  it('lists the conversational planner foil (Discovery Gemini)', () => {
+    const listing = classroomAddonMarketplaceListing();
+    const planner = listing.conversational_planner as {
+      foil: string;
+      reopens_unplugged_game_logic: boolean;
+      path: string;
+    };
+    expect(planner.foil).toMatch(/Discovery Education Gemini conversational Classroom/);
+    expect(planner.reopens_unplugged_game_logic).toBe(false);
+    expect(planner.path).toBe('/education/classroom-addon/planner');
+    expect(JSON.stringify(listing.foils)).toContain('conversational Classroom');
+  });
 });

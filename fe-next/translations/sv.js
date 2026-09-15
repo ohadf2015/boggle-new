@@ -14217,7 +14217,27 @@ const sv = {
       "privacyNote": "Ingen roster-import. Inga elevnamn. Publicering via Googles dialog — vi ser aldrig vilken klass du väljer.",
       "postToStream": "Publicera Unplugged-uppgift till Classroom-strömmen",
       "openUnplugged": "Öppna Unplugged Live",
-      "needMissedWords": "Lägg till minst ett missat ord för att aktivera tilldelning."
+            "needMissedWords": "Lägg till minst ett missat ord för att aktivera tilldelning med ett klick.",
+      "planner": {
+        "eyebrow": "Konversationell Classroom-planerare",
+        "title": "Säg vad du behöver — vi dirigerar Live",
+        "subtitle": "Skriv en plan på vanlig svenska. Vi öppnar Classic eller Team Unplugged, eller reteach Live med betygsåterkoppling. Endast klassord — inga elevnamn.",
+        "promptLabel": "Vad vill du köra?",
+        "promptPlaceholder": "t.ex. Unplugged reteach på gårdagens missar",
+        "privacyNote": "Ingen roster-import. Inga elevnamn. Dirigerar till befintliga Unplugged-lägen — ingen ny spellogik.",
+        "needPrompt": "Skriv en vanlig prompt för att planera Live.",
+        "needMissedWords": "Lägg till missade ord, eller be om en CEFR-nivå så vi kan så gap-ord.",
+        "modeClassic": "Classic Unplugged — klass/lag diskuterar på projektorn",
+        "modeTeam": "Team Tiles Unplugged — delad brickbräda, läraren markerar",
+        "modeReteach": "Unplugged reteach Live — utskrift + projektor",
+        "modeLive3min": "3-min reteach Live — projektor + betygsåterkoppling",
+        "timerNote": "{{seconds}}s timer",
+        "cefrNote": "CEFR {{level}}-gap",
+        "openLive": "Öppna planerad Live",
+        "openGradePassback": "Öppna kvitto för betygsåterkoppling",
+        "postToStream": "Publicera Unplugged-uppgift till Classroom-strömmen",
+        "foilNote": "Mot Discovery Education Gemini konversationell Classroom — LexiClash dirigerar till riktiga Unplugged Lives med betygsåterkoppling."
+      }
     },
     "nav": {
       "section": "Lärare",

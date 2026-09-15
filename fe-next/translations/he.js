@@ -13837,7 +13837,27 @@ const he = {
       "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. הפרסום דרך דיאלוג Google — אנחנו לא רואים איזו כיתה נבחרה.",
       "postToStream": "פרסם משימת Unplugged לזרם Classroom",
       "openUnplugged": "פתח Unplugged Live",
-      "needMissedWords": "הוסיפו לפחות מילה אחת שפספסו כדי להפעיל שיבוץ בלחיצה."
+            "needMissedWords": "הוסיפו לפחות מילה אחת שפספסו כדי לאפשר שיבוץ בלחיצה אחת.",
+      "planner": {
+        "eyebrow": "מתכנן Classroom שיחתי",
+        "title": "תגידו מה צריך — אנחנו מנתבים את ה-Live",
+        "subtitle": "כתבו תוכנית בשפה פשוטה. נפתח Classic או Team Unplugged, או reteach Live עם החזרת ציון. מילים ברמת הכיתה בלבד — בלי שמות.",
+        "promptLabel": "מה תרצו להריץ?",
+        "promptPlaceholder": "לדוגמה: Unplugged reteach על הפספוסים מאתמול",
+        "privacyNote": "בלי ייבוא רשימות. בלי שמות תלמידים. מנתב למצבי Unplugged שכבר קיימים — בלי לוגיקת משחק חדשה.",
+        "needPrompt": "כתבו פרומפט בשפה פשוטה כדי לתכנן את ה-Live.",
+        "needMissedWords": "הוסיפו מילים שפספסו, או בקשו רמת CEFR כדי לזרוע פערי מילים.",
+        "modeClassic": "Classic Unplugged — הכיתה/קבוצות דנות על המקרן",
+        "modeTeam": "Team Tiles Unplugged — לוח משותף, המורה מסמן",
+        "modeReteach": "Unplugged reteach Live — להדפסה + מקרן",
+        "modeLive3min": "reteach Live של 3 דק׳ — מקרן + החזרת ציון",
+        "timerNote": "טיימר {{seconds}} שנ׳",
+        "cefrNote": "פערי CEFR {{level}}",
+        "openLive": "פתח Live מתוכנן",
+        "openGradePassback": "פתח קבלה להחזרת ציון",
+        "postToStream": "פרסם משימת Unplugged לזרם Classroom",
+        "foilNote": "מול Discovery Education Gemini השיחתי ב-Classroom — LexiClash מנתב ל-Live Unplugged אמיתי עם החזרת ציון."
+      }
     },
     "nav": {
       "section": "מורים",
