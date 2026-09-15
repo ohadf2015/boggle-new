@@ -13,6 +13,7 @@ import {
   buildClassroomAddonDiscoveryUrl,
   buildUnpluggedAddOnAttachment,
   buildUnpluggedStreamAssignUrl,
+  buildMissGapLiveStreamAssignUrl,
   classroomAddonMarketplaceListing,
 } from '../googleClassroomAddon';
 
@@ -35,6 +36,31 @@ describe('buildUnpluggedStreamAssignUrl', () => {
 
   it('rejects an empty missed-word list', () => {
     expect(() => buildUnpluggedStreamAssignUrl({ missedWords: [] })).toThrow(/missed word/);
+  });
+});
+
+
+describe('buildMissGapLiveStreamAssignUrl', () => {
+  it('assigns class-gap?intent=live as Classroom homework on free Workspace', () => {
+    const href = buildMissGapLiveStreamAssignUrl({
+      missedWords: ['neutron', 'quark'],
+      lesson: 'Physics 101',
+      locale: 'en',
+    });
+    const u = new URL(href);
+    expect(u.origin + u.pathname).toBe('https://classroom.google.com/share');
+    expect(u.searchParams.get('itemtype')).toBe('assignment');
+    const join = u.searchParams.get('url') || '';
+    expect(join).toContain('https://www.lexiclash.live/en/education/class-gap');
+    expect(join).toContain('intent=live');
+    expect(join).toContain('neutron');
+    expect(join).not.toContain('lexiclash.com');
+    expect(u.searchParams.get('title') || '').toMatch(/miss-gap Live/i);
+    expect(u.searchParams.get('body') || '').toMatch(/free Google Workspace/i);
+  });
+
+  it('rejects an empty missed-word list', () => {
+    expect(() => buildMissGapLiveStreamAssignUrl({ missedWords: [] })).toThrow(/missed word/);
   });
 });
 
@@ -91,6 +117,11 @@ describe('buildClassroomAddonAssign', () => {
     if (!result.ok) return;
     expect(result.streamAssignUrl).toContain('classroom.google.com/share');
     expect(result.streamAssignUrl).toContain('itemtype=assignment');
+    expect(result.liveStreamAssignUrl).toContain('classroom.google.com/share');
+    expect(result.liveStreamAssignUrl).toContain('itemtype=assignment');
+    expect(decodeURIComponent(result.liveStreamAssignUrl)).toContain('intent=live');
+    expect(result.classGapUrl).toContain('/education/class-gap');
+    expect(result.free_workspace).toBe(true);
     expect(result.unpluggedUrl).toContain('/education/unplugged-reteach');
     expect(result.attachment.teacherViewUri).toContain(CLASSROOM_ADDON_ATTACHMENT_PATH);
     expect(result.student_names).toBe(false);
@@ -123,6 +154,20 @@ describe('classroomAddonMarketplaceListing', () => {
     expect((listing.privacy as { roster_scopes: boolean }).roster_scopes).toBe(false);
     expect((listing.api as { assign: string }).assign).toContain(CLASSROOM_ADDON_ASSIGN_PATH);
     expect(JSON.stringify(listing)).not.toContain('lexiclash.com');
+  });
+
+
+  it('lists miss-gap Live assign as Quizlet Education Plus foil', () => {
+    const listing = classroomAddonMarketplaceListing();
+    const live = listing.miss_gap_live_assign as {
+      foil: string;
+      free_workspace: boolean;
+      education_plus_required: boolean;
+    };
+    expect(live.foil).toMatch(/Quizlet Education Plus/);
+    expect(live.free_workspace).toBe(true);
+    expect(live.education_plus_required).toBe(false);
+    expect(JSON.stringify(listing.foils)).toContain('Quizlet Education Plus');
   });
 
   it('lists the conversational planner foil (Discovery Gemini)', () => {

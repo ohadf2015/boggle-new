@@ -1,6 +1,6 @@
 # Google Classroom integration — spec
 
-**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 1.6 miss-gap grade passback shipped 2026-09-08 (Kahoot Marketplace foil; no roster OAuth). Phase 1.7 Unplugged reteach Live grade passback shipped 2026-09-14 (Kahoot Classroom add-on foil; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
+**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 1.6 miss-gap grade passback shipped 2026-09-08 (Kahoot Marketplace foil; no roster OAuth). Phase 1.7 Unplugged reteach Live grade passback shipped 2026-09-14 (Kahoot Classroom add-on foil; no roster OAuth). Phase 1.8 free-Workspace miss-gap Live assign shipped 2026-09-15 (Quizlet Education Plus lock foil; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
 the product owner's, not an engineer's (see below).
 
 ## Why
@@ -167,6 +167,10 @@ Shared teacher-screen miss-gap Live (`/education/classic-unplugged`). Class or 2
 
 Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Teams flip tiles → word; teacher marks. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). No student devices. Class-level words only — no roster OAuth. Prod: **lexiclash.live** (never lexiclash.com).
 
+
+### Free-Workspace miss-gap Live assign (Quizlet Education Plus foil)
+
+Phase-1 `classroom.google.com/share` assignment pointing at the class-gap card (`?intent=live`). Teacher assigns a 3-min miss-gap Live into Classwork; students open from Classroom; teacher starts Live from the card. **Works on free Google Workspace for Education** — Quizlet's Google Classroom add-on requires Education Plus / Teaching & Learning Upgrade. No roster OAuth. Surfaces: Marketplace Discovery CTA, results "Assign miss-gap Live", `liveStreamAssignUrl` on `/api/classroom-addon/assign`. Prod: **lexiclash.live**.
 
 ### Conversational Classroom add-on planner (Discovery Gemini foil)
 

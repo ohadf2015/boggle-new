@@ -31,6 +31,26 @@ describe('ClassroomAddonDiscovery', () => {
     vi.clearAllMocks();
   });
 
+
+  it('offers free-Workspace miss-gap Live assign (Quizlet Education Plus foil)', () => {
+    render(
+      <ClassroomAddonDiscovery
+        locale="en"
+        initialLesson="Physics 101"
+        initialMissedWords={['neutron', 'quark']}
+      />,
+    );
+    const link = screen.getByTestId('classroom-addon-assign-live');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('https://classroom.google.com/share');
+    expect(href).toContain('itemtype=assignment');
+    expect(decodeURIComponent(href)).toContain('/education/class-gap');
+    expect(decodeURIComponent(href)).toContain('intent=live');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('lexiclash.com');
+    expect(screen.getByTestId('classroom-addon-free-workspace-foil')).toBeInTheDocument();
+  });
+
   it('builds a Classroom Stream assign link from missed words (#968 payload)', () => {
     render(
       <ClassroomAddonDiscovery

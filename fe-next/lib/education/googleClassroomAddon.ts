@@ -1,10 +1,15 @@
 /**
- * Google Classroom Marketplace / Workspace add-on — Unplugged reteach assign.
+ * Google Classroom Marketplace / Workspace add-on — Unplugged + miss-gap Live assign.
  *
  * Smallest shippable slice toward a Workspace Marketplace listing so teachers
  * can one-click post Unplugged reteach homework (printable #957 + Live deep-link
- * #959/#968) into the Classroom Stream from inside Classroom — not only via the
- * in-app CTA (#968).
+ * #959/#968) OR a 3-min miss-gap Live assign into the Classroom Stream from
+ * inside Classroom — not only via the in-app CTA (#968).
+ *
+ * Free-Workspace foil: Quizlet's Google Classroom add-on requires Google
+ * Workspace for Education Plus (or Teaching & Learning Upgrade). LexiClash
+ * miss-gap Live assign uses the Phase-1 `classroom.google.com/share` dialog,
+ * which works on free Workspace for Education — no Plus, no roster OAuth.
  *
  * Privacy stance (docs/2026-08-27-google-classroom-integration.md):
  * - Phase 1 share dialog remains the Stream post path (no OAuth, no roster PII).
@@ -12,15 +17,20 @@
  *   AddOnAttachment body shape Google expects. Creating the attachment via
  *   `courses.courseWork.addOnAttachments.create` still needs
  *   `classroom.addons.teacher` (NOT roster scopes) — deferred; Stream share is
- *   the one-click path that works today.
+ *   the one-click path that works today on free Workspace.
  *
- * Reuses #968 assign payload: Unplugged Live URL + assignment itemType + copy.
+ * Reuses #968 Unplugged assign payload + class-gap Live assign (#954/#class-gap).
  * Class-level missed words only — never student names.
  *
  * Pure: no network, no side effects, no browser APIs. Safe on the server.
  */
 
-import { CLASS_GAP_ORIGIN, type ClassGapShareInput, type ClassGapSharePayload } from './classGapShare';
+import {
+  CLASS_GAP_ORIGIN,
+  buildClassGapShareUrl,
+  type ClassGapShareInput,
+  type ClassGapSharePayload,
+} from './classGapShare';
 import { buildGoogleClassroomShareUrl } from './googleClassroomShare';
 import { buildUnpluggedReteachUrl } from './unpluggedReteachLive';
 import { rejectStudentNames } from './chatgptReteach';
@@ -66,6 +76,10 @@ export interface ClassroomAddonAssignResult {
   ok: true;
   unpluggedUrl: string;
   streamAssignUrl: string;
+  /** Class-gap card → 3-min reteach Live; Phase-1 share assignment (free Workspace). */
+  classGapUrl: string;
+  /** Quizlet Education Plus foil — miss-gap Live as Classroom assignment on free Workspace. */
+  liveStreamAssignUrl: string;
   teacherViewUri: string;
   studentViewUri: string;
   attachment: {
@@ -74,6 +88,8 @@ export interface ClassroomAddonAssignResult {
     studentViewUri: string;
   };
   student_names: false;
+  /** True when Live assign uses Phase-1 share (no Education Plus required). */
+  free_workspace: true;
   marketplace_url: string;
   instructions: string;
 }
@@ -215,6 +231,40 @@ export function buildUnpluggedStreamAssignUrl(input: ClassroomAddonAssignInput):
 }
 
 /**
+ * Miss-gap Live assign — class-gap card as a Classroom *assignment* (itemtype=assignment).
+ *
+ * Foils Quizlet Education Plus: Quizlet's Classroom add-on only works on Google
+ * Workspace for Education Plus / Teaching & Learning Upgrade. This URL uses the
+ * Phase-1 share dialog and works on free Workspace for Education. Students open
+ * the class-gap card from Classwork and the teacher starts the 3-min Live.
+ * Class-level missed words only — never student names.
+ */
+export function buildMissGapLiveStreamAssignUrl(input: ClassroomAddonAssignInput): string {
+  const shareInput = toShareInput(input);
+  if (shareInput.missedWords.length === 0) {
+    throw new Error('buildMissGapLiveStreamAssignUrl: at least one missed word required');
+  }
+  const classGapUrl = buildClassGapShareUrl(shareInput);
+  // intent=live marks Classwork opens as Live reteach (not at-home practice).
+  const liveUrl = new URL(classGapUrl);
+  liveUrl.searchParams.set('intent', 'live');
+  const lesson = shareInput.lessonNames.join(', ') || 'class';
+  const missed = shareInput.missedWords.slice(0, 8).join(', ');
+  const title =
+    input.title?.trim() ||
+    `3-min miss-gap Live — ${lesson}`;
+  const body =
+    input.body?.trim() ||
+    `Open the link and start the 3-min Live on these missed words: ${missed}. Students join from Classwork. Works on free Google Workspace for Education — no Education Plus required.`;
+  return buildGoogleClassroomShareUrl({
+    joinUrl: liveUrl.toString(),
+    title,
+    body,
+    itemType: 'assignment',
+  });
+}
+
+/**
  * AddOnAttachment body shape for `courses.courseWork.addOnAttachments.create`.
  * Teacher/student views both point at the framed Unplugged attachment URI.
  */
@@ -262,31 +312,42 @@ export function buildClassroomAddonAssign(body: unknown): ClassroomAddonAssignRe
   const shareInput = toShareInput(input);
   const unpluggedUrl = buildUnpluggedReteachUrl(shareInput);
   const streamAssignUrl = buildUnpluggedStreamAssignUrl(input);
+  const classGapUrl = buildClassGapShareUrl(shareInput);
+  const liveStreamAssignUrl = buildMissGapLiveStreamAssignUrl(input);
   const attachment = buildUnpluggedAddOnAttachment(input);
 
   return {
     ok: true,
     unpluggedUrl,
     streamAssignUrl,
+    classGapUrl,
+    liveStreamAssignUrl,
     teacherViewUri: attachment.teacherViewUri,
     studentViewUri: attachment.studentViewUri,
     attachment,
     student_names: false,
+    free_workspace: true,
     marketplace_url: `${CLASS_GAP_ORIGIN}${CLASSROOM_ADDON_MARKETPLACE_PATH}`,
     instructions:
-      'Open streamAssignUrl to post Unplugged reteach homework to the Classroom Stream (printable + Live deep-link). Attachment URIs are ready for Workspace Marketplace createAddOnAttachment when classroom.addons.teacher is enabled. Never include student names.',
+      'Open liveStreamAssignUrl to assign a 3-min miss-gap Live on free Workspace (Quizlet Education Plus foil), or streamAssignUrl for Unplugged homework. Attachment URIs are ready for Workspace Marketplace createAddOnAttachment when classroom.addons.teacher is enabled. Never include student names.',
   };
 }
 
 /** Workspace Marketplace listing metadata (public JSON). */
 export function classroomAddonMarketplaceListing(): Record<string, unknown> {
   return {
-    name: 'LexiClash Unplugged Reteach',
+    name: 'LexiClash Classroom Miss-gap Live',
     description:
-      'One-click post Unplugged reteach homework (printable practice sheet + Live deep-link) into Google Classroom Stream. Class-level missed words only — no student names or roster import.',
+      'One-click assign 3-min miss-gap Live or Unplugged reteach homework into Google Classroom Stream. Works on free Google Workspace for Education (Quizlet Classroom add-on needs Education Plus). Class-level missed words only — no student names or roster import.',
     origin: CLASS_GAP_ORIGIN,
     production_url: 'https://www.lexiclash.live',
-    foils: ['Discovery Education Gemini Classroom', 'Discovery Education Gemini conversational Classroom', 'Kahootopia Assignments', 'Kahoot Marketplace grade passback'],
+    foils: [
+      'Quizlet Education Plus Google Classroom add-on lock',
+      'Discovery Education Gemini Classroom',
+      'Discovery Education Gemini conversational Classroom',
+      'Kahootopia Assignments',
+      'Kahoot Marketplace grade passback',
+    ],
     extends: ['#949', '#954', '#957', '#959', '#968'],
     privacy: {
       student_names: false,
@@ -342,6 +403,18 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       notes:
         'Shared teacher-screen miss-gap Live; class or teams discuss; teacher submits consensus; reuses Unplugged finish + grade passback.',
       extends: ['#959', '#1045', '#1047'],
+    },
+    miss_gap_live_assign: {
+      for: 'miss-gap-live-assign',
+      foil: 'Quizlet Education Plus Google Classroom add-on lock',
+      deep_link: 'class-gap?intent=live',
+      itemType: 'assignment',
+      student_devices: true,
+      free_workspace: true,
+      education_plus_required: false,
+      notes:
+        'Phase-1 share dialog assigns the class-gap card as Classwork. Teacher starts 3-min Live from the card. Works on free Workspace for Education — Quizlet\'s Classroom add-on requires Education Plus / Teaching & Learning Upgrade.',
+      extends: ['#949', '#954', '#968', '#970'],
     },
     conversational_planner: {
       for: 'conversational-classroom-addon-planner',

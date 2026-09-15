@@ -140,13 +140,25 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
               {t('education.results.assignPracticeGoogleClassroom')}
             </a>
           )}
+          {links.googleClassroomLiveAssignHref && (
+            <a
+              href={links.googleClassroomLiveAssignHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="assign-miss-gap-live-google-classroom"
+              className={cn(ACTION, 'bg-neo-lime')}
+            >
+              <Play className="w-4 h-4 shrink-0" aria-hidden />
+              {t('education.results.assignMissGapLiveGoogleClassroom')}
+            </a>
+          )}
           {links.googleClassroomUnpluggedAssignHref && (
             <a
               href={links.googleClassroomUnpluggedAssignHref}
               target="_blank"
               rel="noopener noreferrer"
               data-testid="assign-unplugged-google-classroom"
-              className={cn(ACTION, 'bg-neo-lime')}
+              className={cn(ACTION, 'bg-neo-yellow')}
             >
               <GraduationCap className="w-4 h-4 shrink-0" aria-hidden />
               {t('education.results.assignUnpluggedGoogleClassroom')}

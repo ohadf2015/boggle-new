@@ -20,6 +20,7 @@ import { buildUnpluggedReteachPath, buildUnpluggedReteachUrl } from '@/lib/educa
 import { buildTeamTilesUnpluggedPath } from '@/lib/education/teamTilesUnplugged';
 import { buildClassicUnpluggedPath } from '@/lib/education/classicUnplugged';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
+import { buildMissGapLiveStreamAssignUrl } from '@/lib/education/googleClassroomAddon';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
 import { shareWithFallback } from '@/utils/shareWithFallback';
@@ -32,6 +33,7 @@ export interface ReteachLinks {
   googleClassroomReteachHref: string | null;
   googleClassroomAssignHref: string | null;
   googleClassroomUnpluggedAssignHref: string | null;
+  googleClassroomLiveAssignHref: string | null;
   unpluggedReteachHref: string | null;
   teamTilesUnpluggedHref: string | null;
   classicUnpluggedHref: string | null;
@@ -140,6 +142,28 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
   );
 
   /**
+   * Miss-gap Live as Classroom assignment on free Workspace (Quizlet Education
+   * Plus foil). Phase-1 share → class-gap?intent=live; students open from
+   * Classwork, teacher starts the 3-min Live. No Education Plus required.
+   */
+  const googleClassroomLiveAssignHref = hasMisses
+    ? safely(() =>
+        buildMissGapLiveStreamAssignUrl({
+          missedWords: summary.missedWords,
+          lesson: lesson || undefined,
+          locale: language,
+          teacherName: summary.teacherName,
+          found: summary.classFoundCount,
+          total: summary.totalWords,
+          title: t('education.results.assignMissGapLiveGoogleClassroomTitle', { lesson }),
+          body: t('education.results.assignMissGapLiveGoogleClassroomBody', {
+            missed: summary.missedWords.slice(0, 8).join(', '),
+          }),
+        }),
+      )
+    : null;
+
+  /**
    * Async miss-gap homework (#972 practice card + due date → class streak).
    * Foil Kahootopia Assignments (live-game homework). NOT Unplugged Live.
    */
@@ -244,6 +268,7 @@ export function useReteachLinks(summary: ClassroomSummary, isTeacher: boolean): 
     googleClassroomReteachHref,
     googleClassroomAssignHref,
     googleClassroomUnpluggedAssignHref,
+    googleClassroomLiveAssignHref,
     unpluggedReteachHref,
     teamTilesUnpluggedHref,
     classicUnpluggedHref,
