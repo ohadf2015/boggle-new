@@ -225,7 +225,7 @@ function AuthCallbackContent(): React.JSX.Element {
           setTimeout(async () => {
             if (resolved) return;
             if (!supabase) return;
-            const { data } = await supabase.auth.getSession();
+            const { data } = await supabase!.auth.getSession();
             if (data?.session) {
               resolved = true;
               cleanup();
@@ -252,7 +252,7 @@ function AuthCallbackContent(): React.JSX.Element {
 
         isCheckingRef = true;
         try {
-          const { data } = await supabase.auth.getSession();
+          const { data } = await supabase!.auth.getSession();
           if (data?.session) {
             logger.log('Auth callback: Session detected from other tab via polling');
             resolved = true;
@@ -326,7 +326,7 @@ function AuthCallbackContent(): React.JSX.Element {
         // This handles the case where another tab already completed the auth
         // Retry mechanism handles cookie sync timing issues across tabs
         for (let attempt = 0; attempt < 5; attempt++) {
-          const { data: existingSession } = await supabase.auth.getSession();
+          const { data: existingSession } = await supabase!.auth.getSession();
           if (existingSession?.session) {
             logger.log(`Auth callback: Session already exists (attempt ${attempt + 1}), redirecting`);
             await redirectWithRole(existingSession.session.user.id, next, isDefault);
@@ -348,7 +348,7 @@ function AuthCallbackContent(): React.JSX.Element {
             const gotSession = await waitForSessionFromOtherTab(next);
             if (!gotSession) {
               // Another tab had the lock but we never got a session - check one more time
-              const { data: finalCheck } = await supabase.auth.getSession();
+              const { data: finalCheck } = await supabase!.auth.getSession();
               if (finalCheck?.session) {
                 logger.log('Auth callback: Session found after waiting for other tab');
                 await redirectWithRole(finalCheck.session.user.id, next, isDefault);
@@ -367,7 +367,7 @@ function AuthCallbackContent(): React.JSX.Element {
             logger.log('Auth callback: Another tab just acquired lock, waiting for session');
             const gotSession = await waitForSessionFromOtherTab(next);
             if (!gotSession) {
-              const { data: finalCheck } = await supabase.auth.getSession();
+              const { data: finalCheck } = await supabase!.auth.getSession();
               if (finalCheck?.session) {
                 await redirectWithRole(finalCheck.session.user.id, next, isDefault);
                 return;
@@ -383,7 +383,7 @@ function AuthCallbackContent(): React.JSX.Element {
           // in data.session, so we don't need to call getSession() again
           // Wrapped with timeout to prevent infinite hang if exchange fails silently
           const { data, error } = await withTimeout(
-            supabase.auth.exchangeCodeForSession(code),
+            supabase!.auth.exchangeCodeForSession(code),
             CODE_EXCHANGE_TIMEOUT,
             'Code exchange timed out'
           );
@@ -403,7 +403,7 @@ function AuthCallbackContent(): React.JSX.Element {
               if (gotSession) return;
 
               // One final check
-              const { data: retrySession } = await supabase.auth.getSession();
+              const { data: retrySession } = await supabase!.auth.getSession();
               if (retrySession?.session) {
                 logger.log('Auth callback: Found session after failed exchange');
                 // Broadcast success since we have a valid session
@@ -429,7 +429,7 @@ function AuthCallbackContent(): React.JSX.Element {
           }
 
           // Fallback: If somehow no session in response, try getSession() as backup
-          const { data: sessionData } = await supabase.auth.getSession();
+          const { data: sessionData } = await supabase!.auth.getSession();
           if (sessionData?.session) {
             logger.log('Auth callback: Session found in fallback getSession()');
             broadcastAuthSuccess(sessionData.session.user.id);
@@ -449,7 +449,7 @@ function AuthCallbackContent(): React.JSX.Element {
           logger.log('Auth callback: Found access_token in hash, setting session manually');
 
           // Manually set the session since detectSessionInUrl is disabled
-          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+          const { data: sessionData, error: sessionError } = await supabase!.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken || ''
           });
@@ -473,7 +473,7 @@ function AuthCallbackContent(): React.JSX.Element {
         // Final check for session - might have been set asynchronously
         // Use longer timeout for slow connections/mobile networks
         await new Promise(resolve => setTimeout(resolve, 1000));
-        const { data: finalCheck } = await supabase.auth.getSession();
+        const { data: finalCheck } = await supabase!.auth.getSession();
         if (finalCheck?.session) {
           logger.log('Auth callback: Session found in final check');
           broadcastAuthSuccess(finalCheck.session.user.id);
@@ -496,7 +496,7 @@ function AuthCallbackContent(): React.JSX.Element {
 
         // Before giving up, check if another tab succeeded (timeout case)
         if (supabase) {
-          const { data: recoverySession } = await supabase.auth.getSession();
+          const { data: recoverySession } = await supabase!.auth.getSession();
           if (recoverySession?.session) {
             logger.log('Auth callback: Found session after exception, redirecting');
             broadcastAuthSuccess(recoverySession.session.user.id);

@@ -59,7 +59,7 @@ export async function fetchWithAuth(
   }
 
   // Get current session token
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  const { data: { session }, error: sessionError } = await client.auth.getSession();
 
   if (sessionError || !session?.access_token) {
     if (options.requireSession) {
@@ -92,7 +92,7 @@ export async function fetchWithAuth(
   logger.log('401 detected, attempting token refresh');
 
   try {
-    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+    const { data: refreshData, error: refreshError } = await client.auth.refreshSession();
 
     if (refreshError || !refreshData.session?.access_token) {
       logger.debug('Token refresh failed:', refreshError?.message || 'No session');

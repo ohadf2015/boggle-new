@@ -19,11 +19,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * Keep this module free of a static `@supabase/ssr` import so landing can
  * parse without pulling the SDK; call `ensureSupabase()` from auth/effects.
  */
-export let supabase: SupabaseClient | null = null;
+let supabaseClient: SupabaseClient | null = null;
+// Call-site compatible type: runtime stays null until ensureSupabase().
+// Exported `let … | null` does not narrow in other modules and breaks `next build`.
+export let supabase = null as unknown as SupabaseClient;
 let supabaseLoad: Promise<SupabaseClient | null> | null = null;
 
 export async function ensureSupabase(): Promise<SupabaseClient | null> {
-  if (supabase) return supabase;
+  if (supabaseClient) return supabaseClient;
   if (!supabaseUrl || !supabaseAnonKey) return null;
   if (!supabaseLoad) {
     supabaseLoad = import(
@@ -33,13 +36,14 @@ export async function ensureSupabase(): Promise<SupabaseClient | null> {
       // in auth callback. When true (default), Supabase auto-detects and
       // exchanges the auth code in background, which races with our manual
       // exchangeCodeForSession() call in the callback page.
-      supabase = createBrowserClient(supabaseUrl as string, supabaseAnonKey as string, {
+      supabaseClient = createBrowserClient(supabaseUrl as string, supabaseAnonKey as string, {
         auth: {
           detectSessionInUrl: false,
           flowType: 'pkce' as const,
         },
       });
-      return supabase;
+      supabase = supabaseClient;
+      return supabaseClient;
     });
   }
   return supabaseLoad;

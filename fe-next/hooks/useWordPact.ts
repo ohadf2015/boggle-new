@@ -97,7 +97,7 @@ export function useWordPact(): UseWordPactReturn {
 
   const handleCreatePact = useCallback(async (friendId: string) => {
     if (!user?.id || !supabase) return;
-    await supabase.from('word_pacts').insert({
+    await supabase!.from('word_pacts').insert({
       player1_id: user.id,
       player2_id: friendId,
       active: true,
@@ -110,7 +110,7 @@ export function useWordPact(): UseWordPactReturn {
 
   const handleDissolvePact = useCallback(async () => {
     if (!pact?.id || !supabase) return;
-    await supabase.from('word_pacts').update({ active: false }).eq('id', pact.id);
+    await supabase!.from('word_pacts').update({ active: false }).eq('id', pact.id);
     setPact(null);
   }, [pact?.id]);
 

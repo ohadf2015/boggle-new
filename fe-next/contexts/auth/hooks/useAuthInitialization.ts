@@ -59,7 +59,7 @@ export function useClearAuthState(
       setRankedProgress(null);
       if (supabase) {
         try {
-          await supabase.auth.signOut({ scope: 'local' });
+          await supabase!.auth.signOut({ scope: 'local' });
         } catch {
           // Ignore signout errors - we're already clearing state
         }
@@ -100,7 +100,7 @@ export function useAuthInitialization({
 
       // Get initial session with timeout to prevent slow connections from blocking UI
       try {
-        const sessionPromise = supabase.auth.getSession();
+        const sessionPromise = client.auth.getSession();
         const timeoutPromise = new Promise<{ data: { session: null }; error: SupabaseAuthError }>(
           (_, reject) =>
             setTimeout(
@@ -143,7 +143,7 @@ export function useAuthInitialization({
       }
 
       // Listen for auth changes (including cross-tab events)
-      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const { data } = client.auth.onAuthStateChange(async (event, session) => {
         if (!isMountedRef.current) return;
 
         // New-signup welcome email. Fire-and-forget — server is idempotent and
@@ -265,7 +265,7 @@ async function handleSessionError(
   } else {
     logger.debug('Session error:', getAuthErrorMessage(error));
     if (!isNetworkError(error) && supabase) {
-      await supabase.auth.signOut();
+      await supabase!.auth.signOut();
     }
   }
 }
@@ -440,7 +440,7 @@ async function handleTabBecameVisible(
     // Verify session is still valid after long inactivity
     logger.log('Tab visible after long inactivity, checking session validity');
     if (supabase) {
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData } = await supabase!.auth.getSession();
       if (!sessionData?.session && isMountedRef.current) {
         logger.log('Session expired during inactivity');
         await clearAuthState('Session expired during inactivity');
@@ -452,7 +452,7 @@ async function handleTabBecameVisible(
   // Always sync session when tab becomes visible (fixes stuck auth issue)
   logger.log('Tab became visible, syncing session state');
   if (supabase) {
-    const { data: sessionData } = await supabase.auth.getSession();
+    const { data: sessionData } = await supabase!.auth.getSession();
     if (sessionData?.session?.user) {
       if (sessionData.session.user.id !== userIdRef.current) {
         if (isMountedRef.current) {

@@ -186,7 +186,7 @@ export async function signInWithGoogleNative(): Promise<NativeOAuthResult> {
     logger.log('[NativeOAuth] Got Google ID token, exchanging with Supabase');
 
     // Exchange ID token with Supabase
-    const { data, error } = await supabase.auth.signInWithIdToken({
+    const { data, error } = await supabase!.auth.signInWithIdToken({
       provider: 'google',
       token: idToken
     });
@@ -257,7 +257,7 @@ export async function signInWithAppleNative(): Promise<NativeOAuthResult> {
     logger.log('[NativeOAuth] Got Apple ID token, exchanging with Supabase');
 
     // Exchange ID token with Supabase
-    const { data, error } = await supabase.auth.signInWithIdToken({
+    const { data, error } = await supabase!.auth.signInWithIdToken({
       provider: 'apple',
       token: idToken
     });
@@ -277,7 +277,7 @@ export async function signInWithAppleNative(): Promise<NativeOAuthResult> {
       const { givenName, familyName } = result.result.profile;
       if (givenName || familyName) {
         const fullName = [givenName, familyName].filter(Boolean).join(' ');
-        await supabase.auth.updateUser({
+        await supabase!.auth.updateUser({
           data: {
             full_name: fullName,
             given_name: givenName,

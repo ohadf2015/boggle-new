@@ -55,7 +55,7 @@ export function useCrossTabSync({
           // Another tab successfully authenticated - check for session
           logger.log('AuthContext: Another tab authenticated, checking for session');
           try {
-            const { data: sessionData } = await supabase.auth.getSession();
+            const { data: sessionData } = await supabase!.auth.getSession();
             if (sessionData?.session?.user && isMountedRef.current) {
               // Only update user if ID changed to prevent infinite loops
               if (sessionData.session.user.id !== userIdRef.current) {
@@ -85,7 +85,7 @@ export function useCrossTabSync({
         case 'SESSION_REFRESHED':
           // Another tab refreshed the session - ensure we have fresh state
           try {
-            const { data: sessionData } = await supabase.auth.getSession();
+            const { data: sessionData } = await supabase!.auth.getSession();
             if (sessionData?.session?.user && isMountedRef.current) {
               // Only update user if ID changed to prevent infinite loops
               if (sessionData.session.user.id !== userIdRef.current) {

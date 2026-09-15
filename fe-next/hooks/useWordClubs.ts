@@ -176,7 +176,7 @@ export function useWordClubs(): UseWordClubsReturn {
         const club = parseClub(data as Record<string, unknown>);
 
         // Add creator as owner member
-        await supabase.from('word_club_members').insert({
+        await supabase!.from('word_club_members').insert({
           club_id: club.id,
           user_id: user.id,
           role: 'owner',
@@ -213,7 +213,7 @@ export function useWordClubs(): UseWordClubsReturn {
         // Check if already a member
         if (myClubs.some((c) => c.id === club.id)) return false;
 
-        const { error: joinError } = await supabase.from('word_club_members').insert({
+        const { error: joinError } = await supabase!.from('word_club_members').insert({
           club_id: club.id,
           user_id: user.id,
           role: 'member',

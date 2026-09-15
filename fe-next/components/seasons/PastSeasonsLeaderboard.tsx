@@ -42,7 +42,7 @@ export const PastSeasonsLeaderboard: React.FC = () => {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.rpc('list_past_seasons').then(({ data, error }) => {
+    supabase!.rpc('list_past_seasons').then(({ data, error }) => {
       if (error) {
         setError(error.message);
         return;
