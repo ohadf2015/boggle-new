@@ -243,7 +243,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className={cn(
-            'mb-6 p-6 rounded-neo border-[3px] border-neo-cream shadow-hard',
+            'mb-6 p-6 rounded-neo border-[3px] shadow-hard',
             isDraw ? 'bg-yellow-500 border-neo-black' : isWinner ? 'bg-neo-lime border-neo-black' : 'bg-red-500 border-neo-black'
           )}
         >

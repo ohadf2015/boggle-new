@@ -22,7 +22,7 @@ import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { getSocketURL } from '@/utils/SocketContext';
 import { getClassrooms, getLesson, createLesson } from '@/lib/supabase/education';
 import { createClient } from '@/utils/supabase/client';
-import { classroomMultiplayerPath, type LessonGameData } from '@/lib/education/classroomGameHandoff';
+import { classroomMultiplayerPath, socketTeacherName, type LessonGameData } from '@/lib/education/classroomGameHandoff';
 import { clearQuickLaunchIntent, type QuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { ModePickerStrip } from './modePicker/ModePickerStrip';
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -105,7 +105,11 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
 
   const { stage, failure, gameCode: liveGameCode, mode: derivedMode } = snapshot;
 
-  const teacherName = profile?.display_name || user?.email || 'Teacher';
+  // #1007-class: teacherName on createClassroomGame is UsernameSchema — never
+  // hand it `display_name || email` raw (an email 400s and the room silently
+  // never appears). The express lobby re-derives the name, so it goes through
+  // the same sanitize path the classic lobby uses.
+  const teacherName = socketTeacherName(user, profile?.display_name);
   const defaultClassName = t('teacher.playNow.defaultClassName');
 
   useEffect(() => {
@@ -320,8 +324,8 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
         data-testid="express-failure"
         className="min-h-0 flex-1 overflow-y-auto rounded-neo-lg border-4 border-neo-red bg-neo-cream p-6 shadow-hard-lg text-center"
       >
-        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-neo border-3 border-black bg-neo-red/15 shadow-hard-sm">
-          <TriangleAlert className="size-7 text-neo-red" strokeWidth={3} aria-hidden="true" />
+        <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red shadow-hard-sm">
+          <TriangleAlert className="size-7 text-neo-black" strokeWidth={3} aria-hidden="true" />
         </div>
         <p className="font-neo-display text-xl font-black text-black text-balance">
           {t(`teacher.playNow.failure.${failure.code}`)}
@@ -357,7 +361,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
   return (
     <div
       data-testid="express-progress"
-      className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-black bg-neo-navy p-5 shadow-hard-lg sm:p-8"
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-neo-lg border-4 border-neo-cream bg-neo-navy p-5 shadow-hard-lg sm:p-8"
     >
       <div className="flex items-center justify-center gap-3">
         <Rocket className="size-9 shrink-0 text-neo-lime motion-safe:animate-bounce" strokeWidth={3} aria-hidden="true" />

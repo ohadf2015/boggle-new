@@ -117,13 +117,13 @@ export function MultiLessonSelector({
               aria-checked={isSelected}
               onClick={() => handleToggleLesson(lesson.id)}
               className={cn(
-                'relative p-4 rounded-neo border-[3px] border-neo-cream',
+                'relative p-4 rounded-neo border-[3px]',
                 'transition-all duration-150',
                 'text-start',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                 isSelected
-                  ? 'bg-neo-cyan text-neo-black shadow-hard'
-                  : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm',
+                  ? 'bg-neo-cyan border-neo-black text-neo-black shadow-hard'
+                  : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm',
                 'active:shadow-hard-pressed active:translate-y-0.5'
               )}
             >

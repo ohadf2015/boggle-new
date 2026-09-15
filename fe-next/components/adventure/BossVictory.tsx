@@ -33,9 +33,10 @@ const BossStarDisplay = memo<{ filled: boolean; index: number }>(
     <AdaptiveMotion.div
       data-testid={filled ? 'star-filled' : 'star-empty'}
       initial={{ scale: 0, rotate: -180 }}
+      // Springs support 2 keyframes max (t_15ec0d7a / #893). initial already -180→0 / 0→1.
       animate={filled ? {
-        scale: [0, 1.3, 1],
-        rotate: [180, -10, 0],
+        scale: 1,
+        rotate: 0,
       } : {
         scale: 1,
         rotate: 0,

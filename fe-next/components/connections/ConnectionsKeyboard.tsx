@@ -24,8 +24,12 @@ interface ConnectionsKeyboardProps {
   disabled?: boolean;
 }
 
+// Same visual language as the word-wheel letters / word-hunt tiles: 3px black
+// border, hard offset shadow that collapses on press with a 1px translate.
+// No scale-95 — a non-uniform press reads as "danced but didn't commit" on
+// slow Android frames and drives rage-re-taps (wheel lesson, PostHog 2026-04-27).
 const KEY_BASE =
-  'inline-flex items-center justify-center rounded-neo border-2 border-black font-neo-display font-black select-none transition-all duration-75 shadow-hard-sm active:translate-y-[2px] active:shadow-none active:scale-95 disabled:opacity-40 disabled:cursor-default';
+  'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-all duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
 
 /** Shared key sizing — taller keys, no basis floor, so no key squashes. */
 const KEY_SIZE = 'h-12 sm:h-14 min-w-0';
@@ -40,9 +44,21 @@ const KEY_SIZE = 'h-12 sm:h-14 min-w-0';
  * submit/backspace keys flanking the last row — dividing by the longest row
  * alone squashed the bottom row on layouts where it is already the longest
  * (Hebrew). See lib/connections/keyboard.ts.
+ *
+ * The minWidth floor is pure catastrophe insurance: it never binds in a
+ * healthy layout (even a 12-key Russian row on a 280px Fold computes ~13px
+ * above it), but if a row is ever over-subscribed (e.g. a transient
+ * hydration-recovery DOM mid-deploy) shrink stops at a tappable key instead
+ * of crushing letters to their 6px borders — overflow is visible and
+ * debuggable, a 6px pill is not (t_55afcea2).
  */
 function letterKeyStyle(columns: number): CSSProperties {
-  return { flexBasis: `calc(${(100 / columns).toFixed(4)}% - 0.375rem)`, flexGrow: 0, flexShrink: 1 };
+  return {
+    flexBasis: `calc(${(100 / columns).toFixed(4)}% - 0.375rem)`,
+    flexGrow: 0,
+    flexShrink: 1,
+    minWidth: '0.875rem',
+  };
 }
 
 /**
@@ -77,8 +93,14 @@ export default function ConnectionsKeyboard({
       {rows.map((row, rowIdx) => (
         <m.div
           key={`row-${rowIdx}`}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          // Transform only — never `opacity: 0` (same lesson as PuzzleCard's
+          // entrance): `m` stays frozen on `initial` until hydration runs, so
+          // an invisible start renders the whole keyboard as an empty box for
+          // seconds on slow connections — measured live at 0-4s under 400ms
+          // latency / 6x CPU throttle (t_55afcea2). A position-only entrance
+          // degrades to "keys sit 10px low until JS arrives" — fully tappable.
+          initial={{ y: 10 }}
+          animate={{ y: 0 }}
           transition={{ delay: rowIdx * 0.06, type: 'spring', stiffness: 400, damping: 26 }}
           className="flex w-full min-w-0 items-stretch justify-center gap-1 sm:gap-1.5"
         >
@@ -102,7 +124,7 @@ export default function ConnectionsKeyboard({
               disabled={disabled}
               aria-label={ch}
               style={keyStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-cream text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-white active:bg-neo-lime`}
+              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-white text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-cream active:bg-neo-lime/30`}
             >
               {ch}
             </button>

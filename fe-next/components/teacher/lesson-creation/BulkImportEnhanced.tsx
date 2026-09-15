@@ -338,7 +338,7 @@ export default function BulkImportEnhanced({
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder={t('teacher.lesson.bulkImportPlaceholder')}
                 className={cn(
-                  'w-full h-40 px-4 py-3 bg-neo-black/50 border-neo border-neo-black',
+                  'w-full h-40 px-4 py-3 bg-neo-black/50 border-neo border-neo-cream',
                   'text-neo-white font-neo-body shadow-hard-sm resize-none',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
                   'placeholder:text-neo-white/50'
@@ -417,8 +417,8 @@ export default function BulkImportEnhanced({
                         className={cn(
                           'flex items-center gap-1 px-2 py-1 rounded text-sm font-neo-body',
                           result.canIntegrate
-                            ? 'bg-neo-cyan/20 text-neo-cyan border border-neo-cyan/30'
-                            : 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
+                            ? 'bg-neo-cyan/20 text-neo-cyan border border-neo-cyan'
+                            : 'bg-neo-lime/20 text-neo-lime border border-neo-lime'
                         )}
                       >
                         {result.canIntegrate ? (

@@ -128,7 +128,7 @@ export function ResultsPodium({ entries, size = 'card', stage = FINAL_STAGE, t }
             {/* Name cap — sits on the plinth like a placard. */}
             <div
               className={cn(
-                'relative z-10 w-full rounded-neo border-[2px] border-neo-black bg-neo-navy-elevated',
+                'relative z-10 w-full rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated',
                 'px-3 py-2 text-center shadow-hard-sm',
                 TILT[rank],
                 REVEAL_MOTION,

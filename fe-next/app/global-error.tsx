@@ -2,30 +2,15 @@
 
 import { useEffect } from "react";
 import type { Language } from "@/types";
+import {
+  isChunkLoadError as isChunkLoadErrorNameMessage,
+  clearCachesAndReload,
+  claimChunkRecoveryGuard,
+  clearChunkRecoveryGuard,
+} from "@/lib/deploy/staleDeployReload";
 
 function isChunkLoadError(error: Error): boolean {
-  const message = error.message?.toLowerCase() || "";
-  const name = error.name?.toLowerCase() || "";
-
-  // Check for explicit chunk load error name
-  if (name === "chunkloaderror") return true;
-
-  // Check for specific chunk-related error messages
-  // Note: 'failed to fetch' alone is too broad - only match if it's clearly a chunk/module error
-  return (
-    message.includes("loading chunk") ||
-    message.includes("failed to load chunk") ||
-    message.includes("loading css chunk") ||
-    message.includes("dynamically imported module") ||
-    message.includes("_next/static/chunks") ||
-    // Only match 'failed to fetch' if it's in context of module/chunk loading
-    (message.includes("failed to fetch") && (
-      message.includes("module") ||
-      message.includes("chunk") ||
-      message.includes("_next/") ||
-      message.includes("dynamically imported")
-    ))
-  );
+  return isChunkLoadErrorNameMessage(error.name, error.message);
 }
 
 export default function GlobalError({
@@ -45,10 +30,9 @@ export default function GlobalError({
     }
   })();
   const isRTL = detectedLocale === 'he';
+  const chunkError = isChunkLoadError(error);
 
   useEffect(() => {
-    const chunkError = isChunkLoadError(error);
-
     // Fire telemetry BEFORE any reload so the event has a chance to flush
     // (a reload mid-capture drops it — keeping us blind to recurrence).
     import("@/utils/sentry").then(({ captureError }) => {
@@ -70,18 +54,17 @@ export default function GlobalError({
       });
     });
 
-    // Auto-refresh on chunk load errors (stale deployment cache)
+    // Auto-refresh on chunk load errors — must use cache-bust + SW purge, not
+    // bare reload (that re-served offline-shell SWR HTML; t_9cc3561f).
     if (chunkError) {
-      const hasRefreshed = sessionStorage.getItem("chunk_error_refresh");
-      if (!hasRefreshed) {
-        sessionStorage.setItem("chunk_error_refresh", "true");
-        window.location.reload();
+      if (claimChunkRecoveryGuard()) {
+        void clearCachesAndReload();
         return;
       }
-      // Clear flag after showing error (so future errors can refresh again)
-      sessionStorage.removeItem("chunk_error_refresh");
+      // Already tried once — clear so a later session can recover again.
+      clearChunkRecoveryGuard();
     }
-  }, [error, detectedLocale]);
+  }, [error, detectedLocale, chunkError]);
 
   const t = (path: string): string => {
     const fallbacks: Record<string, Record<string, string>> = {
@@ -91,6 +74,8 @@ export default function GlobalError({
         'errors.refreshPage': 'Try Again',
         'errors.goHome': 'Go Home',
         'errors.globalErrorEncouragement': "Don't worry, these things happen!",
+        'errors.updateHeading': 'Fresh Update Ready!',
+        'errors.updateMessage': "Cool new stuff just dropped! Quick refresh and you're back in.",
       },
       he: {
         'errors.somethingWentWrong': 'משהו השתבש',
@@ -98,9 +83,20 @@ export default function GlobalError({
         'errors.refreshPage': 'נסו שוב',
         'errors.goHome': 'חזרה הביתה',
         'errors.globalErrorEncouragement': 'אל דאגה, דברים כאלה קורים!',
+        'errors.updateHeading': 'עדכון חדש מוכן!',
+        'errors.updateMessage': 'יש לנו עדכון חדש! רענון קצר וממשיכים.',
       },
     };
     return fallbacks[detectedLocale]?.[path] || fallbacks.en[path] || path;
+  };
+
+  const handleRetry = () => {
+    if (chunkError) {
+      clearChunkRecoveryGuard();
+      void clearCachesAndReload();
+      return;
+    }
+    reset();
   };
 
   return (
@@ -115,17 +111,17 @@ export default function GlobalError({
             </div>
 
             <h1 className="text-3xl font-black mb-4 uppercase tracking-wide text-neo-black font-neo-display">
-              {t("errors.somethingWentWrong")}
+              {chunkError ? t("errors.updateHeading") : t("errors.somethingWentWrong")}
             </h1>
 
             <p className="text-neo-gray text-lg mb-8 leading-relaxed">
-              {t("errors.unexpectedError")}
+              {chunkError ? t("errors.updateMessage") : t("errors.unexpectedError")}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 type="button"
-                onClick={reset}
+                onClick={handleRetry}
                 className="btn-neo-primary px-6 py-3 text-lg"
                 aria-label={t("errors.refreshPage")}
               >

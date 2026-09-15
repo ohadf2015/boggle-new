@@ -41,7 +41,7 @@ vi.mock('@react-pdf/renderer', () => ({
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
         'teacher.reports.title': 'Progress Report',
         'teacher.reports.studentReport': 'Student Progress Report',
@@ -62,8 +62,26 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.loading': 'Loading report...',
         'teacher.reports.error': 'Error loading report',
         'teacher.reports.noData': 'No data available',
+        'teacher.reports.columns.word': 'COL_WORD',
+        'teacher.reports.columns.status': 'COL_STATUS',
+        'teacher.reports.columns.accuracy': 'COL_ACCURACY',
+        'teacher.reports.columns.attempts': 'COL_ATTEMPTS',
+        'teacher.reports.mastery.mastered': 'MASTERED_LBL',
+        'teacher.reports.mastery.practicing': 'PRACTICING_LBL',
+        'teacher.reports.streakDays': '{{count}} DAYS_LBL',
+        'teacher.reports.practiceDuration': '{{hours}}H {{minutes}}M_LBL',
+        'teacher.reports.practiceDurationMinutesOnly': '{{minutes}}M_ONLY_LBL',
+        'teacher.reports.recommendations.lowAccuracyFocus': 'REC_LOW_ACCURACY_LBL',
+        'teacher.reports.recommendations.practiceFrequency': 'REC_PRACTICE_FREQ_LBL',
+        'teacher.reports.recommendations.masteryWork': 'REC_MASTERY_LBL',
       };
-      return translations[key] || key;
+      let value = translations[key] || key;
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          value = value.replace(`{{${k}}}`, String(v));
+        }
+      }
+      return value;
     },
     language: 'en',
     dir: 'ltr',
@@ -102,10 +120,7 @@ const mockStudentData: StudentReportData = {
     { date: '2024-01-15', sessionsCount: 2, wordsReviewed: 15, accuracy: 85 },
     { date: '2024-01-14', sessionsCount: 1, wordsReviewed: 10, accuracy: 90 },
   ],
-  recommendations: [
-    'Focus on words with lower accuracy',
-    'Practice more frequently for better retention',
-  ],
+  recommendations: ['low_accuracy_focus', 'practice_frequency'],
 };
 
 describe('StudentProgressReport', () => {
@@ -212,7 +227,7 @@ describe('StudentProgressReport', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Practice Time')).toBeInTheDocument();
-        expect(screen.getByText('2h 0m')).toBeInTheDocument();
+        expect(screen.getByText('2H 0M_LBL')).toBeInTheDocument();
       });
     });
 
@@ -223,7 +238,7 @@ describe('StudentProgressReport', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Current Streak')).toBeInTheDocument();
-        expect(screen.getByText(/7\s*days/i)).toBeInTheDocument();
+        expect(screen.getByText('7 DAYS_LBL')).toBeInTheDocument();
       });
     });
 
@@ -247,9 +262,57 @@ describe('StudentProgressReport', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Recommendations')).toBeInTheDocument();
-        expect(
-          screen.getByText('Focus on words with lower accuracy')
-        ).toBeInTheDocument();
+        // Machine codes from the data layer render as translated labels
+        expect(screen.getByText('REC_LOW_ACCURACY_LBL')).toBeInTheDocument();
+        expect(screen.getByText('REC_PRACTICE_FREQ_LBL')).toBeInTheDocument();
+      });
+      expect(screen.queryByText('low_accuracy_focus')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('i18n — every visible string comes from t()', () => {
+    it('renders mastery badges from locale keys, never hardcoded English', async () => {
+      render(
+        <StudentProgressReport studentId="student-123" classroomId="classroom-456" />
+      );
+
+      await waitFor(() => {
+        // apple + banana mastered, cherry practicing
+        expect(screen.getAllByText('MASTERED_LBL')).toHaveLength(2);
+        expect(screen.getByText('PRACTICING_LBL')).toBeInTheDocument();
+      });
+      expect(screen.queryByText('Mastered')).not.toBeInTheDocument();
+      expect(screen.queryByText('Practicing')).not.toBeInTheDocument();
+    });
+
+    it('renders word-mastery table headers from locale keys', async () => {
+      render(
+        <StudentProgressReport studentId="student-123" classroomId="classroom-456" />
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('COL_WORD')).toBeInTheDocument();
+        expect(screen.getByText('COL_STATUS')).toBeInTheDocument();
+        expect(screen.getByText('COL_ACCURACY')).toBeInTheDocument();
+        expect(screen.getByText('COL_ATTEMPTS')).toBeInTheDocument();
+      });
+    });
+
+    it('formats sub-hour practice time through the minutes-only key', async () => {
+      mockGetStudentReportData.mockResolvedValue({
+        data: {
+          ...mockStudentData,
+          metrics: { ...mockStudentData.metrics, practiceTimeMinutes: 45 },
+        },
+        error: null,
+      });
+
+      render(
+        <StudentProgressReport studentId="student-123" classroomId="classroom-456" />
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('45M_ONLY_LBL')).toBeInTheDocument();
       });
     });
   });

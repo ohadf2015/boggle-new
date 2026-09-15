@@ -8,7 +8,8 @@
  */
 'use client';
 
-import { RotateCcw, Star } from 'lucide-react';
+import Link from 'next/link';
+import { GraduationCap, RotateCcw, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UnpluggedMascot } from './UnpluggedMascot';
 
@@ -27,9 +28,13 @@ export interface UnpluggedFinishCardProps {
     playAgain: string;
     mascotAlt: string;
     perfectBadge: string;
+    /** Optional GC grade passback CTA (Kahoot Classroom foil). */
+    gradePassback?: string;
   };
   reducedMotion?: boolean;
   onReplay: () => void;
+  /** When set, show lime CTA to open Classroom grade receipt. */
+  gradePassbackHref?: string | null;
 }
 
 function Stat({
@@ -77,6 +82,7 @@ export function UnpluggedFinishCard({
   labels,
   reducedMotion = false,
   onReplay,
+  gradePassbackHref,
 }: UnpluggedFinishCardProps) {
   return (
     <div
@@ -84,7 +90,7 @@ export function UnpluggedFinishCard({
       data-perfect={String(perfect)}
       className={cn(
         'flex-1 min-h-0 flex flex-col items-center justify-center gap-2 sm:gap-4 px-3 sm:px-6 py-3',
-        'rounded-neo border-[3px] border-neo-black bg-neo-navy-light shadow-hard overflow-hidden',
+        'rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard overflow-hidden',
       )}
     >
       <UnpluggedMascot
@@ -115,6 +121,22 @@ export function UnpluggedFinishCard({
         <Stat value={String(bestStreak)} label={labels.streakLabel} tone="orange" />
         <Stat value={String(score)} label={labels.scoreLabel} tone="yellow" />
       </div>
+
+      {gradePassbackHref && labels.gradePassback ? (
+        <Link
+          href={gradePassbackHref}
+          data-testid="unplugged-grade-passback-open"
+          className={cn(
+            'w-full max-w-md flex items-center justify-center gap-2 px-4 py-3 sm:py-4',
+            'font-neo-display font-bold uppercase text-[clamp(0.85rem,1.6vw,1.25rem)]',
+            'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
+            'shadow-hard active:shadow-hard-pressed active:translate-y-[1px]',
+          )}
+        >
+          <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" aria-hidden />
+          <span className="truncate">{labels.gradePassback}</span>
+        </Link>
+      ) : null}
 
       <button
         type="button"

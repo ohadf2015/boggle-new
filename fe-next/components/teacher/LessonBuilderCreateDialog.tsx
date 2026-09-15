@@ -98,7 +98,7 @@ export default function LessonBuilderCreateDialog({
                 rows={4}
                 placeholder={t('teacher.lesson.pasteWordsPlaceholder')}
                 className={cn(
-                  'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
+                  'w-full px-4 py-2 bg-neo-navy border-neo border-neo-cream',
                   'text-neo-white font-neo-body shadow-hard-sm',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                 )}
@@ -187,7 +187,7 @@ export default function LessonBuilderCreateDialog({
                 value={formData.language}
                 onChange={(e) => onFormDataChange({ ...formData, language: e.target.value as Language })}
                 className={cn(
-                  'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
+                  'w-full px-4 py-2 bg-neo-navy border-neo border-neo-cream',
                   'text-neo-white font-neo-body shadow-hard-sm',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                 )}
@@ -208,7 +208,7 @@ export default function LessonBuilderCreateDialog({
                 value={formData.classroomId}
                 onChange={(e) => onFormDataChange({ ...formData, classroomId: e.target.value })}
                 className={cn(
-                  'w-full px-4 py-2 bg-neo-navy border-neo border-neo-black',
+                  'w-full px-4 py-2 bg-neo-navy border-neo border-neo-cream',
                   'text-neo-white font-neo-body shadow-hard-sm',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                 )}

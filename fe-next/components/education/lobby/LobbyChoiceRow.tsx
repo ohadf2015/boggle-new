@@ -38,7 +38,7 @@ export function LobbyChoiceRow<T extends string | number>({
   choices,
   value,
   onChange,
-  selectedClassName = 'bg-neo-cyan text-black shadow-hard',
+  selectedClassName = 'bg-neo-cyan border-neo-black text-black shadow-hard',
 }: LobbyChoiceRowProps<T>) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -61,7 +61,7 @@ export function LobbyChoiceRow<T extends string | number>({
               aria-label={choice.label}
               onClick={() => onChange(choice.value)}
               className={cn(
-                'min-h-9 rounded-neo border-2 border-black px-3 py-1 font-neo-display text-xs font-black uppercase transition-all',
+                'min-h-9 rounded-neo border-2 px-3 py-1 font-neo-display text-xs font-black uppercase transition-all',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isSelected
                   ? selectedClassName

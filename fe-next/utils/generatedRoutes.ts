@@ -109,6 +109,8 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/miss-gap-whatsapp",
   "/education/sight-words-practice",
   "/education/spelling-bee-practice",
+  "/education/team-tiles-unplugged",
+  "/education/unplugged-grade-passback",
   "/education/unplugged-reteach",
   "/education/vocabulary-games-classroom",
   "/erudit-onlayn",

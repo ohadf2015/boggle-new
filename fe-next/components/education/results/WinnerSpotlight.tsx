@@ -106,7 +106,7 @@ export function WinnerSpotlight({
       data-testid="winner-spotlight"
       data-active={String(active)}
       className={cn(
-        'flex items-center gap-4 rounded-neo border-[2px] border-neo-black shadow-hard',
+        'flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
         'bg-neo-navy-elevated text-neo-white',
         projector ? 'px-6 py-4 gap-6' : 'px-4 py-3'
       )}
@@ -132,7 +132,7 @@ export function WinnerSpotlight({
           // Decorative: `aria-hidden` keeps it out of the a11y tree but does
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
-          'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-black bg-neo-navy',
+          'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy',
           projector ? 'w-28 h-28' : 'w-16 h-16'
         )}
       >

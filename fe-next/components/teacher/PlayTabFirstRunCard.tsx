@@ -82,7 +82,7 @@ export default function PlayTabFirstRunCard({ onJoinCodeCreated, initialJoinCode
   return (
     <section
       data-testid="play-tab-first-run-card"
-      className="flex items-center gap-4 rounded-neo border-3 border-black bg-neo-navy-light px-4 py-4 shadow-hard sm:gap-5 sm:px-5"
+      className="flex items-center gap-4 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-4 py-4 shadow-hard sm:gap-5 sm:px-5"
     >
       {/* Lexi minding an empty room. Decorative — the copy carries the meaning. */}
       <Image

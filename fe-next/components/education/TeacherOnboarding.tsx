@@ -246,7 +246,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
         ref={modalRef}
         className={cn(
           'relative w-full max-w-4xl max-h-[90dvh] overflow-y-auto',
-          'bg-neo-navy border-neo-thick border-neo-black',
+          'bg-neo-navy border-neo-thick border-neo-cream',
           'rounded-neo-lg shadow-hard-xl',
           'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
         )}
@@ -294,7 +294,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: shouldReduceMotion ? 0 : idx * 0.08, type: 'spring', stiffness: 300, damping: 26 }}
                 className={cn(
-                  'relative flex items-center gap-4 rounded-neo border-2 border-neo-black',
+                  'relative flex items-center gap-4 rounded-neo border-2 border-neo-cream',
                   'bg-neo-navy-light p-4 shadow-hard-sm',
                   'sm:flex-col sm:items-start sm:gap-3'
                 )}

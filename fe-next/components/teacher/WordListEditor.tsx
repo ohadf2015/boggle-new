@@ -373,7 +373,7 @@ export default function WordListEditor({
                               aria-checked={active}
                               onClick={() => updateWord(idx, { level: option.value })}
                               className={cn(
-                                'min-h-9 px-3 rounded-neo border-2 border-neo-black text-xs font-bold transition-all',
+                                'min-h-9 px-3 rounded-neo border-2 border-neo-cream text-xs font-bold transition-all',
                                 active ? cn(option.activeClass, 'shadow-hard-sm') : 'bg-neo-black/30 text-neo-white hover:bg-neo-black/50'
                               )}
                             >

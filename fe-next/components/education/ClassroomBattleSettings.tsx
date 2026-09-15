@@ -5,7 +5,7 @@
  *  - Play style: free-for-all or a team battle with auto split (2-4 teams).
  *  - Support (SPED) toggles: larger type, audio cues, participation points.
  *
- * Kept out of ClassroomSetupStep so that file stays under the size budget.
+ * Kept out of the lobby setup panel so that file stays under the size budget.
  */
 
 'use client';
@@ -151,11 +151,11 @@ export function ClassroomBattleSettings({
                 data-testid={`support-${key}`}
                 onClick={() => toggle(key)}
                 className={cn(
-                  'px-4 py-2 min-h-[44px] font-bold text-sm rounded-neo border-[3px] border-neo-cream transition-all',
+                  'px-4 py-2 min-h-[44px] font-bold text-sm rounded-neo border-[3px] transition-all',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
                   isOn
-                    ? 'bg-neo-lime text-neo-black shadow-hard'
-                    : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
+                    ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard'
+                    : 'bg-neo-navy/50 border-neo-cream text-neo-white hover:bg-neo-navy shadow-hard-sm'
                 )}
               >
                 {t(labelKey)}

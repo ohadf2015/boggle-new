@@ -62,7 +62,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       vi.resetModules();
     });
 
-    it('shows the Word Hunt CTA when player has not played Word Hunt today', async () => {
+    it('shows the Word Hunt CTA when player has not played Word Hunt today (Connections already done)', async () => {
       vi.doMock('@/contexts/LanguageContext', () => ({
         useLanguage: () => ({
           t: (k: string, fb?: string) => fb || k,
@@ -78,6 +78,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
           puzzleDate="2026-04-21"
           language="en"
           hasPlayedWordHunt={false}
+          hasPlayedConnections={true}
         />
       );
       const ctaLink = screen.getByRole('link', { name: /finish today/i });
@@ -122,6 +123,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
           puzzleDate="2026-04-21"
           language="en"
           hasPlayedWordHunt={true}
+          hasPlayedConnections={true}
         />
       );
       const link = screen.getByTestId('back-to-daily-link');
@@ -145,6 +147,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
           puzzleDate="2026-04-21"
           language="en"
           hasPlayedWordHunt={true}
+          hasPlayedConnections={true}
         />
       );
       const cls = screen.getByTestId('back-to-daily-link').className;

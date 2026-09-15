@@ -1,10 +1,10 @@
 /**
- * CookieConsent — non-blocking bottom-sheet layout guard.
+ * CookieConsent — non-blocking compact bottom-bar layout guard.
  *
- * The consent prompt is now a fixed bottom sheet (Option A from t_01e346a5).
- * It does NOT cover the screen, does NOT use backdrop-filter, and does NOT lock
- * background scroll, so it cannot shift in-flow layout. It still defers its
- * initial mount to an idle slice so the hero/LCP element is not delayed.
+ * The consent prompt is a fixed bottom BAR (compact after UX audit 2026-09-14;
+ * previously a ~350px sheet from t_01e346a5). It does NOT cover the screen,
+ * does NOT use backdrop-filter, and does NOT lock background scroll. It still
+ * defers its initial mount to an idle slice so the hero/LCP element is not delayed.
  */
 
 import React from 'react';
@@ -37,7 +37,7 @@ vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
 });
 vi.stubGlobal('cancelIdleCallback', () => {});
 
-describe('CookieConsent — non-blocking bottom-sheet layout guard', () => {
+describe('CookieConsent — non-blocking compact bottom-bar layout guard', () => {
   beforeEach(() => {
     document.body.style.paddingBottom = '';
     document.body.style.overflow = '';
@@ -76,10 +76,18 @@ describe('CookieConsent — non-blocking bottom-sheet layout guard', () => {
     expect(document.body.style.overflow).toBe(prior);
   });
 
-  it('reserves a fixed min-height so the sheet does not cause layout shift', () => {
+  it('is a compact bar — no forced min-h-[280px] that stole the fold', () => {
     render(<CookieConsent />);
     const dialog = screen.getByRole('dialog');
-    expect(dialog).toHaveClass('min-h-[280px]');
+    expect(dialog).toHaveAttribute('data-cookie-consent', 'compact-bar');
+    expect(dialog.className).not.toMatch(/min-h-\[280px\]/);
+  });
+
+  it('keeps Accept All off neo-lime so Play owns the lime primary', () => {
+    render(<CookieConsent />);
+    const accept = screen.getByRole('button', { name: 'cookieConsent.accept' });
+    expect(accept.className).toMatch(/bg-neo-cyan/);
+    expect(accept.className).not.toMatch(/bg-accent\b|bg-neo-lime/);
   });
 
   it('defers the initial mount to an idle callback so it is not the LCP element', () => {

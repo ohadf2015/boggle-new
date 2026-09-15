@@ -178,3 +178,38 @@ describe('swSource — dictionary offline-first behavior', () => {
     expect(SW_SOURCE).toContain('/\\/api\\/dictionary-words/');
   });
 });
+
+
+describe('swSource — chunk recovery (t_9cc3561f)', () => {
+  it('listens for SKIP_WAITING messages from the page', () => {
+    expect(SW_SOURCE).toContain("addEventListener('message'");
+    expect(SW_SOURCE).toContain("SKIP_WAITING");
+    expect(SW_SOURCE).toContain('skipWaiting()');
+  });
+
+  it('treats `_lc_chunk` navigations as network-only (no stale shell fallback)', () => {
+    expect(SW_SOURCE).toContain("searchParams.has('_lc_chunk')");
+    // Recovery path must not call navigationFallback — dying SW still controls the client.
+    const idx = SW_SOURCE.indexOf("searchParams.has('_lc_chunk')");
+    expect(idx).toBeGreaterThan(-1);
+    const slice = SW_SOURCE.slice(idx, idx + 280);
+    expect(slice).toContain('fetch(request)');
+    expect(slice).not.toContain('navigationFallback');
+  });
+
+  it('serves network-only for a `_lc_chunk` document navigation even when a shell is cached', async () => {
+    const { dispatchFetch, store } = runSwInSandbox({
+      fetchImpl: () => Promise.resolve(mockResponse('<html>fresh</html>')),
+    });
+    store.set('https://www.lexiclash.live/en', mockResponse('<html>stale-shell</html>'));
+
+    const req: MockRequest = {
+      url: 'https://www.lexiclash.live/en?_lc_chunk=123',
+      method: 'GET',
+      mode: 'navigate',
+      headers: { get: (k: string) => (k.toLowerCase() === 'accept' ? 'text/html' : null) },
+    };
+    const res = await dispatchFetch(req);
+    expect(res._body).toBe('<html>fresh</html>');
+  });
+});

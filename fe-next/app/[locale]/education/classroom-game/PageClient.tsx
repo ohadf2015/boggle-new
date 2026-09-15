@@ -9,6 +9,8 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
 import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
+import { ClassroomGuestDemo } from '@/components/education/ClassroomGuestDemo';
+import { TeacherGate } from '@/components/education/TeacherGate';
 import {
   QUICK_LAUNCH_FLOW,
   clearQuickLaunchIntent,
@@ -130,8 +132,31 @@ function ClassroomGameInner() {
   );
 }
 
-import { TeacherGate } from '@/components/education/TeacherGate';
-
+/**
+ * Guests land here from NoAccountCta ("Play now — no sign-up"). TeacherGate
+ * would bounce them to the access signup wall — a signup wall behind a
+ * no-signup promise — so they get the class-code join instead. Signed-in
+ * teachers keep the gated lobby below.
+ */
 export default function ClassroomGamePage() {
-  return <TeacherGate><ClassroomGameInner /></TeacherGate>;
+  const { isAuthenticated, loading } = useAuth();
+  const { t } = useLanguage();
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
+        <PageLoader size="lg" text={t('common.loading')} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <ClassroomGuestDemo />;
+  }
+
+  return (
+    <TeacherGate>
+      <ClassroomGameInner />
+    </TeacherGate>
+  );
 }

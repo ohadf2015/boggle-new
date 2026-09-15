@@ -1,6 +1,6 @@
 {
-  "date": "2026-09-13",
-  "note": "Brief was STALE (last-good reused) -- same imposketch.io/tryshopli.com external-domain LCP items as 09-12 (not our app, PostHog shared across ~12 apps, reach=0, skipped) and the same IMPACT CHECK for 02-perf-2026-08-31-board-k-6-to-3, which was ALREADY closed 09-12 (verdict=improved, measured p75=2232ms, n=57). Re-ran the check's exact query tonight: route dropped back below the n>=50 sample floor (0 rows over 7d) -- no new verdict appended, existing 09-12 closure stands, per mandatory sample gate no verdict off insufficient n. /en/multiplayer (n=187, real signal) still carries LCP 2760ms/INP 504ms/CLS 0.265 from 09-09 -- perf-watch.md already flags this needs Chrome DevTools INP/CLS attribution profiling before touching PageClient.tsx/RoomListView.tsx (large, actively-instrumented files); not safe to guess-fix in this lane's budget, carried again. Shipped one concrete SPEED win instead: DailyActivityChart (recharts ~120KB) in admin PageClient.tsx was a static import despite being conditionally rendered only after authToken resolves -- converted to next/dynamic(ssr:false) so recharts no longer ships in the admin page's initial JS bundle.",
+  "date": "2026-09-14",
+  "note": "IMPACT CHECK for 02-perf-2026-09-09-mp-cwv-watch (/en/multiplayer CWV): re-ran exact query, n dropped to 7 (24h window, was 187) -- below the 50-sample floor, verdict=neutral (insufficient sample), values directionally fine (lcp1910/inp440/cls0.09) but not a real signal either way. perf-watch.md carry (needs DevTools INP/CLS attribution profiling before touching PageClient.tsx/RoomListView.tsx) still stands, unchanged. Brief's other frontend LCP items (/he/profile, /en/daily/word-wheel, /he) all had n=1-2 -- ineligible for a regression verdict per mandatory sample gate, not flagged. imposketch.io items are a different app entirely (PostHog shared across ~12 apps), skipped. Backend brief item (auth_db_connections_absolute) is an unchanged dashboard-config toggle, not code -- still human queue. supabase MCP never connected within this lane's window (tried repeatedly) so no fresh pg_stat_statements/advisor query this run; deferred items below are carried, not re-verified. Shipped one concrete SPEED win: WordWheelChallenge.tsx statically imported WordWheelGame (1444 lines) and WordWheelResults (661 lines) despite each rendering only behind a phase gate ('playing'/'completed') -- converted both to next/dynamic(ssr:false), matching the existing TabbedDailyLeaderboard pattern in the same file, cutting ~2100 lines of dead-weight JS from word-wheel's initial bundle.",
   "backend": {
     "advisor_warnings_count": 1,
     "shipped": [],
@@ -11,15 +11,17 @@
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp": 2760, "p75_inp": 504, "p75_cls": 0.265, "n": 187, "window": "24h", "status": "carried from 09-09, unchanged -- needs DevTools profiling before touching PageClient.tsx/RoomListView.tsx, see perf-watch.md" },
-      { "route": "sv/singleplayer", "p75_lcp": 2232, "n": 57, "window": "7d", "status": "IMPACT CHECK closed 09-12 -- verdict=improved. Re-checked tonight: dropped below n>=50 floor (0 rows), closure unchanged" }
+      { "route": "/en/multiplayer", "p75_lcp": 1910, "p75_inp": 440, "p75_cls": 0.09, "n": 7, "window": "24h", "status": "n dropped below 50-sample floor tonight (was 187 on 09-09) -- neutral verdict, still needs DevTools profiling before touching PageClient.tsx/RoomListView.tsx, see perf-watch.md" },
+      { "route": "/he/profile", "p75_lcp": 4500, "n": 2, "window": "24h", "status": "DEFERRED -- below 50-sample floor, cannot verdict" },
+      { "route": "/en/daily/word-wheel", "p75_lcp": 4240, "n": 1, "window": "24h", "status": "DEFERRED -- below 50-sample floor; shipped a bundle-size fix anyway (dynamic import of WordWheelGame/WordWheelResults) as a general SPEED win, not a regression fix" },
+      { "route": "/he", "p75_lcp": 3672, "p75_cls": 0.164, "n": 2, "window": "24h", "status": "DEFERRED -- below 50-sample floor; homepage above-fold tree audited, already has priority/sizes/dynamic-import on all candidates, no action" }
     ],
     "shipped": [
-      { "file": "app/[locale]/admin/PageClient.tsx", "change": "DailyActivityChart (recharts) static import -> next/dynamic(ssr:false); conditionally rendered behind authToken, so no first-paint cost" }
+      { "file": "components/daily/WordWheelChallenge.tsx", "change": "WordWheelGame + WordWheelResults static imports -> next/dynamic(ssr:false); each only renders behind a phase gate, so no first-paint cost, ~2100 lines removed from initial bundle" }
     ]
   },
   "bundle": {
-    "note": "09-12 baseline: top-10 chunk sum 6184KB, max single chunk 856KB, filenames content-hashed per build so no chunk-to-chunk name mapping across nights -- not re-measured tonight (lane time spent on the admin chart dynamic-import fix instead of a full build)",
+    "note": "not re-measured tonight -- no .next build artifact present and building one is explicitly out of budget for this lane; carrying 09-12 baseline numbers below unchanged",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },

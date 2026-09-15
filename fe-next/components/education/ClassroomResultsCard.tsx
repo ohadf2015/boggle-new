@@ -149,7 +149,7 @@ export function ClassroomResultsCard({
       // Self-describing for a screenshot harness (and for a human wondering
       // whether the podium is mid-reveal or broken): poll for `done`.
       data-round-end-stage={stage}
-      className="p-5 rounded-neo border-[2px] border-neo-black bg-neo-navy shadow-hard"
+      className="p-5 rounded-neo border-[2px] border-neo-cream bg-neo-navy shadow-hard"
     >
       <div className="flex items-start gap-3 mb-4">
         <GraduationCap className="w-6 h-6 text-neo-lime shrink-0 mt-0.5" />
@@ -245,7 +245,7 @@ export function ClassroomResultsCard({
         (summary.missedWords.length > 0 ? (
           <div
             data-testid="reteach-list"
-            className="p-3 rounded-neo border border-neo-pink/40 bg-neo-pink/10"
+            className="p-3 rounded-neo border border-neo-pink bg-neo-pink/10"
           >
             {missedOnBoard.length > 0 ? (
               <>
@@ -271,7 +271,7 @@ export function ClassroomResultsCard({
             {neverPlaced.size > 0 && (
               <div
                 data-testid="never-placed-words"
-                className="mt-3 p-3 rounded-neo border border-dashed border-neo-white/30 bg-neo-navy/60"
+                className="mt-3 p-3 rounded-neo border border-dashed border-neo-white/50 bg-neo-navy/60"
               >
                 <p className="flex items-center gap-2 text-neo-white/80 font-bold text-sm mb-1">
                   <EyeOff className="w-4 h-4 shrink-0" aria-hidden />

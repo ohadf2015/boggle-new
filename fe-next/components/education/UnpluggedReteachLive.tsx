@@ -28,6 +28,10 @@ import { useMasterMute } from '@/hooks/useMasterMute';
 import { openMissedWordsPracticeSheet } from '@/lib/education/missedWordsPracticeSheet';
 import { openUnpluggedReteachPrintablePack } from '@/lib/education/unpluggedReteachPrintablePack';
 import { buildMissGapPracticeShareUrl } from '@/lib/education/missGapPracticeShare';
+import {
+  buildUnpluggedGradePassbackPath,
+  scoreUnpluggedReteach,
+} from '@/lib/education/unpluggedReteachGradePassback';
 import { UNPLUGGED_FIRE_STREAK } from '@/lib/education/unpluggedReteachGame';
 import type { ClassGapSharePayload } from '@/lib/education/classGapShare';
 import { shareWithFallback } from '@/utils/shareWithFallback';
@@ -54,6 +58,16 @@ export function UnpluggedReteachLive({ payload, educationHref }: UnpluggedReteac
   const homeHref = educationHref || `/${payload.locale || language}/education`;
   const lesson = payload.lesson || t('education.results.title');
   const finished = run.state.phase === 'finished' && words.length > 0;
+
+  const gradePassbackHref = useMemo(() => {
+    if (!finished || words.length === 0) return null;
+    const score = scoreUnpluggedReteach({
+      cleared: run.state.cleared,
+      total: words.length,
+      completed: true,
+    });
+    return buildUnpluggedGradePassbackPath({ input: payload, score });
+  }, [finished, words.length, run.state.cleared, payload]);
 
   const mood: UnpluggedMood = finished
     ? 'celebration'
@@ -135,7 +149,7 @@ export function UnpluggedReteachLive({ payload, educationHref }: UnpluggedReteac
         data-testid="unplugged-reteach-live"
         className="fixed inset-0 z-40 overflow-hidden bg-neo-navy flex items-center justify-center px-4"
       >
-        <div className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard text-center">
+        <div className="w-full max-w-xl p-6 rounded-neo border-neo border-neo-cream bg-neo-navy-light shadow-hard text-center">
           <p className="text-neo-white font-neo-body mb-4">{t('education.results.allFound')}</p>
           <Link
             href={homeHref}
@@ -193,6 +207,7 @@ export function UnpluggedReteachLive({ payload, educationHref }: UnpluggedReteac
             score={run.state.score}
             reducedMotion={run.reducedMotion}
             onReplay={run.replay}
+            gradePassbackHref={gradePassbackHref}
             labels={{
               clearedLabel: t('education.results.unpluggedGameCleared'),
               streakLabel: t('education.results.unpluggedGameBestStreak'),
@@ -200,6 +215,7 @@ export function UnpluggedReteachLive({ payload, educationHref }: UnpluggedReteac
               playAgain: t('education.results.unpluggedGamePlayAgain'),
               mascotAlt: t('education.results.unpluggedGameMascotWinAlt'),
               perfectBadge: t('education.results.unpluggedGamePerfectBadge'),
+              gradePassback: t('education.results.unpluggedGradePassbackOpen'),
             }}
           />
         ) : (

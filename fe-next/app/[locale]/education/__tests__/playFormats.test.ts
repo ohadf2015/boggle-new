@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CLASSROOM_GAME_MODES } from '@/shared/types/vocabQuiz';
+import { TEACHER_GAME_MODES } from '@/lib/education/gameModes';
 import { BASE_PRACTICE_MODES } from '@/lib/education/practicePicker';
 import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import { getVocabClassroomContent } from '../vocabulary-games-classroom/content';
@@ -27,26 +28,24 @@ const FE_NEXT = join(__dirname, '..', '..', '..', '..');
 const LOCALES = ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const;
 
 describe('the registries agree with the code that enforces them', () => {
-  const wizard = readFileSync(
-    join(FE_NEXT, 'components', 'education', 'ClassroomModeSettings.tsx'),
-    'utf8',
-  );
   const handler = readFileSync(
     join(FE_NEXT, 'backend', 'handlers', 'classroomGameHandler.ts'),
     'utf8',
   );
 
-  it.each(CLASSROOM_GAME_MODES)('%s is offered by the classroom wizard', (mode) => {
-    expect(wizard).toContain(`key: '${mode}'`);
+  it.each(CLASSROOM_GAME_MODES)('%s is offered by the teacher mode picker', (mode) => {
+    // The picker's catalog, not the deleted wizard component: `ModePickerStrip`
+    // (lobby + mode sheet) renders from `TEACHER_GAME_MODES`.
+    expect(TEACHER_GAME_MODES.some((m) => m.id === mode)).toBe(true);
   });
 
   it.each(CLASSROOM_GAME_MODES)('%s is accepted by the socket handler', (mode) => {
     expect(handler).toContain(`'${mode}'`);
   });
 
-  it('the wizard offers no mode the registry omits', () => {
-    const offered = [...wizard.matchAll(/\{ key: '([a-z-]+)', icon:/g)].map((m) => m[1]);
-    expect(offered.sort()).toEqual([...CLASSROOM_GAME_MODES].sort());
+  it('the picker offers no mode the registry omits', () => {
+    const offered = TEACHER_GAME_MODES.map((m) => m.id);
+    expect([...offered].sort()).toEqual([...CLASSROOM_GAME_MODES].sort());
   });
 });
 

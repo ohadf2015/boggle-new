@@ -101,7 +101,7 @@ export function UnpluggedStage({
         data-revealed={String(revealed)}
         className={cn(
           'flex-1 min-h-0 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-8 px-3 sm:px-6 py-3',
-          'rounded-neo border-[3px] border-neo-black bg-neo-navy-light shadow-hard',
+          'rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard',
         )}
       >
         <UnpluggedRingTimer
@@ -222,7 +222,7 @@ export function UnpluggedStage({
 
         {revealed ? (
           <div className="flex flex-col sm:flex-row gap-2">
-            <div className="flex shrink-0 items-center gap-1 px-2 py-1 rounded-neo border-[3px] border-neo-black bg-neo-navy-light shadow-hard-sm">
+            <div className="flex shrink-0 items-center gap-1 px-2 py-1 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard-sm">
               <Hand className="w-4 h-4 sm:w-5 sm:h-5 text-neo-cyan shrink-0" aria-hidden />
               <span className="sr-only">{labels.hands}</span>
               <button

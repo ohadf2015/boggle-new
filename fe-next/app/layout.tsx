@@ -128,6 +128,15 @@ export default function RootLayout({ children }: RootLayoutProps): ReactNode {
                 layout <head>. */}
             <Script src="https://growthradar.app/gr.js" data-key="grw_fb2d7c376b18ced8cfb4742219d40ffa" strategy="lazyOnload" />
             <Script src="https://growthradar.app/gr-extended.js" strategy="lazyOnload" />
+            {/* GrowthRadar session replay — the OPT-IN tag, deliberately separate
+                from gr.js (growth-radar docs/INSTALL.md). The recorder masks every
+                input and blocks password/email/card fields + payment iframes by
+                default; the sample rate is a SERVER setting on the growth-radar
+                project (served via /api/u/site, www-normalized), so tuning it
+                never needs a deploy. lazyOnload per headScriptsHydration.test.ts's
+                rule — same as gr.js above. Enabled 2026-09-14 (Ohad) at 10%
+                sampling; the daily server-side cap scales with the rate. */}
+            <Script src="https://growthradar.app/gr-replay.js" data-key="grw_fb2d7c376b18ced8cfb4742219d40ffa" strategy="lazyOnload" />
             <LazyMotionRoot>{children}</LazyMotionRoot>
         </>
     );

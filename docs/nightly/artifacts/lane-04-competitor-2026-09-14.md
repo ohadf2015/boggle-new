@@ -1,0 +1,3 @@
+status: research-only
+files_touched: docs/nightly/ideas/2026-09-14.md, docs/nightly/ideas/2026-09-14-reddit.md, docs/nightly/reports/2026-09-14.md (appended Lane 4 section)
+next_steps: reddit-fetch.sh degraded after 1 call tonight (jq parse failed on feed dailygames/Anagrams/Scrabble + search) — worth a look if it recurs; only 1 reddit reply candidate cleared the bar (score unverifiable — snapshot returned null score/comments, flagged honestly in the reddit file rather than guessing). 2 mode-improvement polish cards + 1 top idea emitted, all checked against idea-history ledger for dedup. No code edits, no commits — per lane rules.

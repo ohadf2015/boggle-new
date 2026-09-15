@@ -1,6 +1,6 @@
 # Google Classroom integration — spec
 
-**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 1.6 miss-gap grade passback shipped 2026-09-08 (Kahoot Marketplace foil; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
+**Status:** Phase 1 implemented 2026-08-27. Phase 1.5 Marketplace Discovery slice shipped 2026-09-07 (Stream assign via share dialog + iframe URIs; no roster OAuth). Phase 1.6 miss-gap grade passback shipped 2026-09-08 (Kahoot Marketplace foil; no roster OAuth). Phase 1.7 Unplugged reteach Live grade passback shipped 2026-09-14 (Kahoot Classroom add-on foil; no roster OAuth). Phase 2 NOT started, and blocked on a decision that is
 the product owner's, not an engineer's (see below).
 
 ## Why
@@ -94,6 +94,26 @@ another rebuild of the homework path.
 **Implementation:** `lib/education/missGapGradePassback.ts`, receipt UI,
 API route above; wired from `MissGapAsyncAssignment` on complete.
 
+
+## Phase 1.7 — Unplugged reteach Live grade passback (SHIPPED slice)
+
+Kahoot Classroom add-on grade-passback foil for **Unplugged reteach Live**
+completion (complements Phase 1.6 miss-gap homework). When the teacher finishes
+an Unplugged Live session, LexiClash scores class cleared/total and exposes:
+
+- Grade receipt tool route: `/{locale}/education/unplugged-grade-passback` (**NON_LANDING**)
+- `POST /api/classroom-addon/unplugged-grade-passback` → `attachment.maxPoints` +
+  `studentSubmission` patch body (`pointsEarned`, `postState=TURNED_IN`)
+- Finish CTA on Unplugged Live end sticker → open Classroom grade receipt
+- Parent WhatsApp miss-gap practice card on the receipt (#980)
+- Classroom iframe CSP on the receipt route (same ancestors as #970 / #977)
+
+No roster OAuth. `classroom.addons.teacher` patch wire-up remains deferred.
+Class-level missed words + cleared/total only — never student names.
+
+**Implementation:** `lib/education/unpluggedReteachGradePassback.ts`, receipt UI,
+API route above; wired from `UnpluggedReteachLive` / `UnpluggedFinishCard` on finish.
+
 ## Phase 2 — Roster import (NOT BUILT — needs a product decision first)
 
 The obvious next step is `courses.list` + `courses.students.list` so a teacher picks an existing
@@ -137,3 +157,7 @@ Note for Phase 2: `NEXT_PUBLIC_*` values freeze at build time in this repo. A pr
 Teacher Pro outage came from exactly that (`NEXT_PUBLIC_CHECKOUT_ENABLED` set at runtime but not
 baked into the bundle), and "unset" is indistinguishable from "set but not baked" when read from a
 browser. Probe the runtime endpoint, not just the rendered HTML.
+
+### Team Tiles Unplugged (Kahoot Team Tiles foil)
+
+Shared teacher-screen miss-gap tileboard (`/education/team-tiles-unplugged`). Teams flip tiles → word; teacher marks. Reuses Unplugged finish sticker + Phase 1.7 / #1045 grade passback (`cleared/total`). No student devices. Class-level words only — no roster OAuth. Prod: **lexiclash.live** (never lexiclash.com).

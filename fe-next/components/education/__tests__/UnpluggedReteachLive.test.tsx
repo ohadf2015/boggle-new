@@ -156,6 +156,19 @@ describe('UnpluggedReteachLive', () => {
     expect(sfx.playEpicVictorySound).toHaveBeenCalledTimes(1);
   });
 
+  it('offers Google Classroom grade passback on the finish sticker', async () => {
+    render(<UnpluggedReteachLive payload={payload} />);
+    playWord(true);
+    playWord(true);
+    await screen.findByTestId('unplugged-finish');
+    const cta = screen.getByTestId('unplugged-grade-passback-open');
+    expect(cta).toHaveAttribute('href');
+    expect(cta.getAttribute('href')).toContain('/education/unplugged-grade-passback');
+    expect(cta.getAttribute('href')).toContain('points=');
+    expect(cta.getAttribute('href')).toContain('cleared=2');
+    expect(cta.getAttribute('href')).not.toContain('lexiclash.com');
+  });
+
   it('shows a non-perfect win when a word was missed, then replays from zero', async () => {
     render(<UnpluggedReteachLive payload={payload} />);
     playWord(false);
