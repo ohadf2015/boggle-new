@@ -44,6 +44,13 @@ vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
+// Lesson access is read with the service-role client (classroom membership,
+// not lesson_assignments) — see lib/education/lessonAccess.ts.
+const mockAdmin = vi.fn();
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => mockAdmin(),
+}));
+
 import { NextRequest } from 'next/server';
 import { PATCH, POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
@@ -62,25 +69,35 @@ describe('POST /api/education/practice — vocab_focus', () => {
         single: vi.fn().mockResolvedValue({ data: { id: SESSION, practice_type: 'vocab_focus' }, error: null }),
       }),
     });
-    const accessChain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: { id: 'assign-1' }, error: null }),
-    };
-    const lessonChain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: { teacher_id: 'someone-else' }, error: null }),
-    };
     (createClient as any).mockResolvedValue({
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER } }, error: null }) },
       from: vi.fn((table: string) => {
         if (table === 'practice_sessions') return { insert: insertMock };
-        if (table === 'lesson_assignments') return accessChain;
-        return lessonChain;
+        throw new Error(`server client should not read ${table} for the access check`);
       }),
       rpc: vi.fn(),
+    });
+    // Access is granted via classroom membership, not ownership or
+    // lesson_assignments — mirrors lib/education/lessonAccess.ts.
+    (mockAdmin as any).mockReturnValue({
+      from: vi.fn((table: string) => {
+        const chain: Record<string, unknown> = {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+        };
+        if (table === 'vocabulary_lessons') {
+          chain.single = vi.fn().mockResolvedValue({
+            data: { teacher_id: 'someone-else', classroom_id: 'classroom-1' },
+            error: null,
+          });
+        } else if (table === 'classroom_memberships') {
+          chain.then = (resolve: (v: unknown) => unknown) =>
+            Promise.resolve({ data: [{ classroom_id: 'classroom-1' }], error: null }).then(resolve);
+        } else {
+          throw new Error(`unexpected admin table ${table}`);
+        }
+        return chain;
+      }),
     });
   });
 

@@ -442,7 +442,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const ctaBlock = (
     <div className="space-y-3">
-      {!autoPlayCancelled ? (
+      {/* Auto-play only after a game the player actually played — an idle tab must not loop forever */}
+      {!autoPlayCancelled && (results.playerWords?.length ?? 0) > 0 ? (
         <AutoPlayCountdown
           onComplete={handlePlayAgainGated}
           onCancel={() => {

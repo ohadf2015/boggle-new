@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6911,
+    "totalKeysInCode": 6933,
     "keyCountByLanguage": {
-      "en": 13393,
-      "es": 13701,
-      "he": 13603,
-      "ja": 13663,
-      "ru": 13436,
-      "sv": 13659
+      "en": 13425,
+      "es": 13730,
+      "he": 13635,
+      "ja": 13695,
+      "ru": 13465,
+      "sv": 13691
     },
     "missingFromEnglish": 99,
     "problematicFlatKeys": 0,
@@ -2799,7 +2799,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/auth/FirstWinSignupModal.tsx",
-        "line": 240,
+        "line": 244,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -2807,7 +2807,7 @@
         "variable": "subtitleKey",
         "type": "variable_key",
         "file": "components/auth/FirstWinSignupModal.tsx",
-        "line": 339,
+        "line": 343,
         "context": "{t(subtitleKey)}"
       },
       {
@@ -2839,7 +2839,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/auth/MultiplayerSignupSheet.tsx",
-        "line": 183,
+        "line": 184,
         "context": "{t(key)}"
       },
       {
@@ -3047,7 +3047,7 @@
         "variable": "titleKey",
         "type": "variable_key",
         "file": "components/education/results/useReteachLinks.ts",
-        "line": 89,
+        "line": 97,
         "context": "title: t(titleKey, { lesson }),"
       },
       {
@@ -3055,7 +3055,7 @@
         "variable": "bodyKey",
         "type": "variable_key",
         "file": "components/education/results/useReteachLinks.ts",
-        "line": 90,
+        "line": 98,
         "context": "body: t(bodyKey, { missed: summary.missedWords.slice(0, 8).join(', ') }),"
       },
       {
@@ -4777,9 +4777,6 @@
   },
   "keysNotInEnglish": {
     "es": [
-      "wordTower.surprise.echo",
-      "wordTower.surprise.meteorStrike",
-      "wordTower.surprise.phantomFloor",
       "hostView.progressAnnouncement",
       "playerView.loadFailed",
       "howToPlay.steps.mpResults.boardCleared",
@@ -5720,9 +5717,6 @@
       "education.student.join.codeNotRecognised",
       "education.student.join.codePlaceholder",
       "education.student.join.nameRequired",
-      "wordTower.surprise.echo",
-      "wordTower.surprise.meteorStrike",
-      "wordTower.surprise.phantomFloor",
       "admin.deployment.loading",
       "daily.flow.startLabel",
       "daily.flow.introHint",

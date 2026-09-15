@@ -69,6 +69,8 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
     if (cancelled || reducedMotion) return;
 
     intervalRef.current = setInterval(() => {
+      // Nobody watching → don't chain another game (a background tab looped 268 games in 19h).
+      if (document.visibilityState === 'hidden') return;
       setSecondsLeft(prev => {
         if (prev <= 1) {
           handleComplete();

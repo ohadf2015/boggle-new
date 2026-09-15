@@ -129,4 +129,39 @@ describe('AutoPlayCountdown', () => {
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();
   });
+
+  // 2026-09-15: an abandoned tab looped solo games 30×/hour for 19h (268 games,
+  // all score 0) because the countdown kept firing with nobody watching.
+  describe('hidden tab', () => {
+    const setVisibility = (state: DocumentVisibilityState) =>
+      Object.defineProperty(document, 'visibilityState', { value: state, configurable: true });
+
+    afterEach(() => setVisibility('visible'));
+
+    it('does not auto-start the next game while the tab is hidden', () => {
+      // Given a hidden tab
+      setVisibility('hidden');
+      const onComplete = vi.fn();
+      render(<AutoPlayCountdown onComplete={onComplete} onCancel={vi.fn()} />);
+
+      // When far more than the countdown elapses
+      act(() => { vi.advanceTimersByTime(60_000); });
+
+      // Then nothing auto-starts and the countdown is frozen
+      expect(onComplete).not.toHaveBeenCalled();
+      expect(screen.getByText('5')).toBeInTheDocument();
+    });
+
+    it('resumes counting once the tab becomes visible again', () => {
+      setVisibility('hidden');
+      const onComplete = vi.fn();
+      render(<AutoPlayCountdown onComplete={onComplete} onCancel={vi.fn()} />);
+      act(() => { vi.advanceTimersByTime(10_000); });
+
+      setVisibility('visible');
+      act(() => { vi.advanceTimersByTime(5000); });
+
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    });
+  });
 });

@@ -594,6 +594,9 @@ const he = {
       "windfall": "מתנה!",
       "updraft": "רוח נושאת! המילה הבאה מוגברת",
       "crystal": "גביש נדיר!",
+      "echo": "הד מאיץ!",
+      "meteorStrike": "פגיעת מטאור!",
+      "phantomFloor": "קומת רפאים!",
       "goldenFloor": "קומת זהב!"
     },
     "daily": {
@@ -14059,6 +14062,9 @@ const he = {
       "retry": "נסו שוב",
       "streak": "רצף {{count}} ימים",
       "struggling": "זקוק/ה לעזרה",
+      "mastered": "שולט/ת",
+      "practicing": "בתרגול",
+      "notStarted": "טרם התחיל/ה",
       "student": "תלמיד/ה",
       "studentDetail": "פרטי תלמיד",
       "studentProgress": "התקדמות תלמידים",
@@ -14475,6 +14481,7 @@ const he = {
       "soloBoard": "לוח עצמאי",
       "lessonUnavailable": "אי אפשר לפתוח את השיעור",
       "lessonUnavailableBody": "ייתכן שהקישור כבר לא בתוקף או שהשיעור נמחק. בקשו מהמורה קישור חדש.",
+      "startFailed": "לא הצלחנו להתחיל את התרגול. נסו שוב.",
       "insufficientData": {
         "title": "אין מספיק בשביל המשחק הזה",
         "body": "בשיעור אין מספיק מילים עם הפרטים שהמשחק הזה צריך. בקשו מהמורה להוסיף הגדרות, או בחרו משחק אחר."

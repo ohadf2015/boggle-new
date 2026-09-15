@@ -314,6 +314,27 @@ describe('exp-results-replay-cta-v1', () => {
     });
   });
 
+  describe('auto-play gating on engagement', () => {
+    it('does NOT mount the auto-play countdown when the player found no words', async () => {
+      // Given a game where the player never played (idle tab / bot)
+      await act(async () => {
+        render(
+          <SinglePlayerResults
+            results={{ ...baseResults, playerScore: 0, playerWords: [], playerWordData: [] }}
+            mode="practice"
+            onPlayAgain={mockOnPlayAgain}
+            onBackToLobby={mockOnBackToLobby}
+          />,
+        );
+      });
+
+      // Then no countdown mounted (the mock would have tracked a cancel), manual CTAs show
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('results_autoplay_cancelled', expect.anything());
+      expect(screen.getByTestId('next-step-prompt')).toBeDefined();
+      expect(mockOnPlayAgain).not.toHaveBeenCalled();
+    });
+  });
+
   describe('control variant', () => {
     it('does NOT render quick-replay button', async () => {
       experimentVariant = 'control';

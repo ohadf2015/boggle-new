@@ -53,6 +53,15 @@ export interface CompletePracticeSessionData {
   type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz' | 'vocab_focus';
   /** vocab_focus only: which skill was drilled. */
   focus?: VocabFocus;
+  /**
+   * The `practice_sessions.id` the round was started under (from
+   * `usePracticeProgress().startSession()`). When present, completion PATCHes
+   * `/api/education/practice` to set `completed_at` and award server-side XP —
+   * the ONLY writer of both. Omitted for rounds with no persistable session
+   * (guest practice, or types like `warmup`/`word_list` the caller already
+   * filters out before reaching here).
+   */
+  sessionId?: string;
   cardsReviewed?: number;
   cardsCorrect?: number;
   vocabularyWordsFound?: string[];
@@ -150,6 +159,11 @@ export function PracticeSessionProvider({
   const uniqueWordsRef = useRef<Set<string>>(new Set());
   const [, setUniqueWordsCount] = useState<number>(0);
   const [practiceDaysThisMonth, setPracticeDaysThisMonth] = useState<number>(0);
+  // Guards the server PATCH against a double-send (e.g. a fast double-tap on
+  // the same completion). Independent of the server's own idempotency guard
+  // (completed_at already set → no re-award) — this just avoids firing the
+  // request twice from one client.
+  const completedSessionIdsRef = useRef<Set<string>>(new Set());
 
   // Initialize achievement trackers from localStorage on mount
   useEffect(() => {
@@ -238,8 +252,52 @@ export function PracticeSessionProvider({
           });
         }
 
-        // XP persistence is handled server-side by PATCH /api/education/practice
-        // Do NOT call persistToSupabase() here — it bypasses server validation (C2 fix)
+        // XP persistence is handled server-side by PATCH /api/education/practice.
+        // Do NOT call persistToSupabase() here — it bypasses server validation (C2 fix).
+        //
+        // `sessionId` is the id `startSession()` created; without it there is
+        // no row to complete (guest rounds, or types the caller already
+        // filtered out). The ref guards against sending this PATCH twice for
+        // the same session from this client.
+        if (sessionData.sessionId && !completedSessionIdsRef.current.has(sessionData.sessionId)) {
+          completedSessionIdsRef.current.add(sessionData.sessionId);
+          try {
+            const patchBody: Record<string, unknown> = {
+              sessionId: sessionData.sessionId,
+              completed: true,
+            };
+            if (sessionData.cardsReviewed !== undefined) patchBody.cardsReviewed = sessionData.cardsReviewed;
+            if (sessionData.cardsCorrect !== undefined) patchBody.cardsCorrect = sessionData.cardsCorrect;
+            if (sessionData.wordsFound !== undefined) patchBody.wordsFound = sessionData.wordsFound;
+            if (sessionData.vocabularyWordsFound !== undefined) {
+              patchBody.vocabularyWordsFound = sessionData.vocabularyWordsFound;
+            }
+
+            const response = await fetch('/api/education/practice', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(patchBody),
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              // Server is the XP source of truth (it never trusts a
+              // client-supplied amount, and an idempotent replay returns the
+              // existing session with no re-award) — prefer its number over
+              // the client-side estimate once it's back.
+              if (typeof data?.session?.xp_awarded === 'number') {
+                setSessionXpEarned(data.session.xp_awarded);
+              }
+            } else {
+              logger.error('Failed to complete practice session on server', {
+                sessionId: sessionData.sessionId,
+                status: response.status,
+              });
+            }
+          } catch (patchError) {
+            logger.error('Error completing practice session on server:', patchError);
+          }
+        }
 
         // Increment session counter
         const newSessionCount = totalPracticeSessions + 1;

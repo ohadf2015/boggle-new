@@ -418,7 +418,7 @@ const en = {
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
     "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "wobble": "Wobble", "sabotage": "Sabotage", "lost": "{kind}! −{n} floors" },
     "clutch": { "save": "Clutch save!", "critical": "Wobbling — land it clean!" },
-    "surprise": { "nextWord": "Next word", "surge": "Surge!", "windfall": "Windfall!", "updraft": "Updraft! Next word boosted", "crystal": "Crystal find!", "goldenFloor": "Golden floor!" },
+    "surprise": { "nextWord": "Next word", "surge": "Surge!", "windfall": "Windfall!", "updraft": "Updraft! Next word boosted", "crystal": "Crystal find!", "echo": "Echo boost!", "meteorStrike": "Meteor strike!", "phantomFloor": "Phantom floor!", "goldenFloor": "Golden floor!" },
     "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless", "newBest": "New daily best!", "questTitle": "Word Tower", "questDesc": "Stack words sky-high — same letters for everyone today." },
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
     "runPerk": { "hotStreak": { "a11y": "Hot Streak: {n} drops remaining" } },
@@ -12729,6 +12729,9 @@ const en = {
       "retry": "Retry",
       "streak": "{{count}}-day streak",
       "struggling": "Needs Help",
+      "mastered": "Mastered",
+      "practicing": "Practicing",
+      "notStarted": "Not Started",
       "student": "Student",
       "studentDetail": "Student Details",
       "studentProgress": "Student Progress",
@@ -13145,6 +13148,7 @@ const en = {
       "soloBoard": "Solo Board",
       "lessonUnavailable": "Can't open this lesson",
       "lessonUnavailableBody": "The link may be out of date, or the lesson was removed. Ask your teacher for a new one.",
+      "startFailed": "Couldn't start practice. Please try again.",
       "insufficientData": {
         "title": "This drill needs more words",
         "body": "This lesson doesn't have enough words with the details this game needs. Ask your teacher to add definitions, or pick another game."

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
@@ -7,6 +8,7 @@ import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/e
 import { updateEducationChallengeProgress } from '@/lib/supabase/education/challengeProgress';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
+import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
 
 function tooManyRequests(retryAfter: number | undefined) {
   return NextResponse.json(
@@ -220,29 +222,22 @@ export async function POST(request: NextRequest) {
 
     const { lessonId, practiceType, focus } = parseResult.data;
 
-    // Verify student has access to this lesson (assigned via classroom membership)
-    const { data: hasAccess } = await supabase
-      .from('lesson_assignments')
-      .select(`
-        id,
-        classroom:classrooms!inner(
-          id,
-          members:classroom_memberships!inner(student_id)
-        )
-      `)
-      .eq('lesson_id', lessonId)
-      .eq('classroom.members.student_id', user.id)
-      .limit(1)
-      .single();
+    // Verify student has access to this lesson: owns it, or belongs to the
+    // classroom it lives in. `lesson_assignments` is metadata (due date,
+    // pinned focus), never the gate — see lib/education/lessonAccess.ts and
+    // app/api/education/practice/lessons/route.ts, which already treat access
+    // this way. Read with the service-role client: the `vocabulary_lessons`
+    // RLS SELECT policy for a student is assignment-shaped, so the student's
+    // own session would read back zero rows / error: null for exactly the
+    // lessons this check needs to see.
+    const admin = createAdminClient();
+    if (!admin) {
+      logger.error('POST practice: service-role client unavailable');
+      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+    }
 
-    // Also check if user is the teacher (they can practice their own lessons)
-    const { data: lesson } = await supabase
-      .from('vocabulary_lessons')
-      .select('teacher_id')
-      .eq('id', lessonId)
-      .single();
-
-    if (!hasAccess && lesson?.teacher_id !== user.id) {
+    const hasAccess = await canStudentPracticeLesson(admin, user.id, lessonId);
+    if (!hasAccess) {
       return NextResponse.json(
         { error: 'Not authorized to practice this lesson' },
         { status: 403 }
