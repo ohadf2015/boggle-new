@@ -59,10 +59,13 @@ export default function ConnectionsMascot({ status, className }: ConnectionsMasc
         <m.span
           key={mood}
           initial={{ scale: 0.4, opacity: 0, rotate: -8 }}
+          // Springs support 2 keyframes max — [0.4, 1.12, 1] + spring threw
+          // "Only two keyframes currently supported with spring..." (t_15ec0d7a / #893).
+          // Wrong-mood shake stays a tween (multi-keyframe is legal there).
           animate={
             mood === 'wrong'
               ? { scale: 1, opacity: 1, rotate: [0, -10, 10, -6, 6, 0] }
-              : { scale: [0.4, 1.12, 1], opacity: 1, rotate: 0 }
+              : { scale: 1, opacity: 1, rotate: 0 }
           }
           exit={{ scale: 0.5, opacity: 0 }}
           transition={
