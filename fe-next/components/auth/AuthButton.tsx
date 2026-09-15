@@ -10,7 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../lib/supabase';
 import dynamic from 'next/dynamic';
 const AuthModal = dynamic(() => import('./AuthModal'), { ssr: false });
-import Avatar from '../Avatar';
+import AvatarLite from '@/components/AvatarLite';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import LevelBadge from '../LevelBadge';
 import { getLevelFromXp } from '../XpProgressBar';
@@ -177,7 +177,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               )}
             >
               <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
-                <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
+                <AvatarLite customAvatar={profile.avatar_config} userId={user?.id} size="sm" />
               </span>
               <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
               {profile.total_xp !== undefined && (
