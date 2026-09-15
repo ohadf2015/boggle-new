@@ -244,6 +244,10 @@ export default function PracticeContent({
         <EducationShell
           className={cn(isRTL && 'rtl')}
           scrollRegionLabel={lesson.name}
+          // Active drill = chrome-free: on a measured-square board the tab bar
+          // is grid area thrown away. The PICKER (below) keeps its nav — a
+          // deep-linked picker with no way home is a dead end.
+          chromeFree
           header={
             /*
               The XP bar used to be `position: fixed` with a `pt-16` spacer

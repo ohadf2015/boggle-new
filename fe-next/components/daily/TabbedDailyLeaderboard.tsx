@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users, Target, CircleDot, Globe, Sparkles } from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users, Target, CircleDot, Globe, Sparkles, Link2 } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useFriends } from '@/hooks/useFriends';
 import type { Language } from '@/types';
@@ -17,6 +17,7 @@ import ChaseBanner from './ChaseBanner';
 import type { ChaseParticipant } from './chaseTarget';
 import { DailySeasonRibbon } from './DailySeasonRibbon';
 import { participantKey, computeRankMovements, collectCountries, type RankMovement } from './leaderboardLive';
+import ConnectionsDailyTab from './ConnectionsDailyTab';
 
 /**
  * The leaderboard routes answer with `Cache-Control: public, max-age=20`. That is
@@ -109,7 +110,7 @@ export interface DailySeasonSummary {
   isCurrent: boolean;
 }
 
-type LeaderboardTab = 'today' | 'season' | 'alltime' | 'friends';
+type LeaderboardTab = 'today' | 'season' | 'alltime' | 'friends' | 'connections';
 export type LeaderboardScope = 'combined' | 'word-hunt' | 'word-wheel';
 type LanguageScope = 'all' | 'mine';
 
@@ -213,6 +214,10 @@ const LeaderboardTabs = memo<{
       <ToggleGroupItem value="friends" size="sm" className="text-xs px-2 sm:px-3">
         <Users className="w-3.5 h-3.5 me-1 sm:me-1.5" />
         {t('leaderboard.friends')}
+      </ToggleGroupItem>
+      <ToggleGroupItem value="connections" size="sm" className="text-xs px-2 sm:px-3" data-testid="connections-tab-button">
+        <Link2 className="w-3.5 h-3.5 me-1 sm:me-1.5" />
+        {t('wordHunt.leaderboard.connections', 'Connections')}
       </ToggleGroupItem>
     </ToggleGroup>
   </div>
@@ -866,6 +871,14 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   // Render content based on state
   const renderContent = () => {
+    // Connections (Word Bridge) daily board — separate store whose public
+    // endpoint leaks no identifiers, so it can't merge into the combined
+    // hunt+wheel rows; it surfaces as its own tab on this same component
+    // (self-contained fetch/poll inside the panel).
+    if (activeTab === 'connections') {
+      return <ConnectionsDailyTab puzzleDate={puzzleDate} />;
+    }
+
     // Loading state - show skeleton rows
     if (isLoading) {
       return (

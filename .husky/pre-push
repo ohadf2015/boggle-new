@@ -17,7 +17,12 @@ cd fe-next
 
 # Collect changed files once (fast: no subshell per-file)
 CHANGED=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' || true)
-LINT_FILES=$(echo "$CHANGED" | sed 's|^fe-next/||' | while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && printf '%s ' "$f"; done)
+# `|| true`: husky runs this hook as `sh -e`, and a command substitution's exit status becomes the
+# assignment's. The `while read` loop always ends on a failing `read`, so this line exited 1 and
+# `-e` killed the hook right here — before a single check ran, printing only
+# "husky - pre-push script failed (code 1)" with no reason. Every push was blocked, and the gate
+# looked like it had run. The two lines below already guard the same way.
+LINT_FILES=$(echo "$CHANGED" | sed 's|^fe-next/||' | while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && printf '%s ' "$f"; done) || true
 BACKEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
 FRONTEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
 

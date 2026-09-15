@@ -65,11 +65,10 @@ export type LocaleContent = {
    *
    * This page lost a blind comparison against a printable-worksheet listicle purely
    * on friction: that page asks for nothing, and ours pitched a platform. The product
-   * already HAS a no-account path — `/multiplayer?quickPlay=true` auto-joins a guest
-   * with a stored or generated name (components/multiplayer/MultiplayerFlow.tsx, the
-   * `quickPlayUsername` fallback) and never touches `isAuthenticated`. It was simply
-   * never offered here. The copy promises exactly that and nothing more: no account,
-   * no email, a temporary name you can change.
+   * already HAS a no-account path — `/education/classroom-game` opens a class-code
+   * join (display name, no email) instead of dumping the teacher into consumer
+   * multiplayer. The copy promises exactly that and nothing more: no account, no
+   * email, a class code.
    */
   noAccount: {
     heading: string;
@@ -235,9 +234,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       howTeachersUse: 'How teachers use it.',
     },
     noAccount: {
-      heading: 'Start a 2-minute game right now — no account',
+      heading: 'Join a class game right now — no account',
       body:
-        'The button opens a live board in this browser. You get a temporary player name you can change on the way in, and nothing asks for an email or a password. Try it before you decide whether it belongs in a lesson.',
+        'The button opens the classroom game in this browser. Enter a class code and a display name to jump in. Nothing asks for an email or a password. Try it before you decide whether it belongs in a lesson.',
       cta: 'Play now — no sign-up',
       note: 'No email · No password · Runs on the school Wi-Fi',
     },
@@ -409,9 +408,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       howTeachersUse: 'איך מורים משתמשים בזה.',
     },
     noAccount: {
-      heading: 'התחילו משחק של שתי דקות עכשיו — בלי חשבון',
+      heading: 'הצטרפו למשחק כיתה עכשיו — בלי חשבון',
       body:
-        'הכפתור פותח לוח חי כאן בדפדפן. מקבלים שם שחקן זמני שאפשר לשנות בדרך פנימה, ואף אחד לא מבקש אימייל או סיסמה. נסו לפני שאתם מחליטים אם זה מתאים לשיעור.',
+        'הכפתור פותח את משחק הכיתה בדפדפן. מזינים קוד כיתה ושם תצוגה כדי להיכנס. אף אחד לא מבקש אימייל או סיסמה. נסו לפני שאתם מחליטים אם זה מתאים לשיעור.',
       cta: 'שחקו עכשיו — בלי הרשמה',
       note: 'בלי אימייל · בלי סיסמה · עובד על הרשת של בית הספר',
     },
@@ -583,9 +582,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       howTeachersUse: 'Cómo se usa.',
     },
     noAccount: {
-      heading: 'Empieza una partida de 2 minutos ahora — sin cuenta',
+      heading: 'Entra a un juego de clase ahora — sin cuenta',
       body:
-        'El botón abre un tablero en vivo en este navegador. Recibes un nombre de jugador temporal que puedes cambiar al entrar, y nadie te pide correo ni contraseña. Pruébalo antes de decidir si encaja en una clase.',
+        'El botón abre el juego de clase en este navegador. Escribe un código de clase y un nombre para entrar. Nadie te pide correo ni contraseña. Pruébalo antes de decidir si encaja en una clase.',
       cta: 'Jugar ahora — sin registro',
       note: 'Sin correo · Sin contraseña · Funciona en el wifi del colegio',
     },
@@ -757,9 +756,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       howTeachersUse: 'Hur det fungerar.',
     },
     noAccount: {
-      heading: 'Starta ett tvåminutersspel nu — utan konto',
+      heading: 'Gå med i ett klasspel nu — utan konto',
       body:
-        'Knappen öppnar en levande spelplan direkt i webbläsaren. Du får ett tillfälligt spelarnamn som går att byta på vägen in, och ingen frågar efter e-post eller lösenord. Testa innan du avgör om det hör hemma på en lektion.',
+        'Knappen öppnar klasspelet i webbläsaren. Ange en klasskod och ett visningsnamn för att hoppa in. Ingen frågar efter e-post eller lösenord. Testa innan du avgör om det hör hemma på en lektion.',
       cta: 'Spela nu — ingen registrering',
       note: 'Ingen e-post · Inget lösenord · Fungerar på skolans wifi',
     },
@@ -931,9 +930,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       howTeachersUse: '先生はどう使うか。',
     },
     noAccount: {
-      heading: '2分のゲームを今すぐ — アカウント不要',
+      heading: 'クラスゲームに今すぐ参加 — アカウント不要',
       body:
-        'ボタンを押すと、このブラウザでライブのボードが開きます。仮のプレイヤー名が割り当てられ、入る途中で変更できます。メールもパスワードも聞かれません。授業に合うかどうかは、遊んでから決めてください。',
+        'ボタンを押すと、このブラウザでクラスゲームが開きます。クラスコードと表示名を入力して参加できます。メールもパスワードも聞かれません。授業に合うかどうかは、遊んでから決めてください。',
       cta: '今すぐプレイ — 登録なし',
       note: 'メール不要 · パスワード不要 · 学校のWi-Fiで動きます',
     },
@@ -1105,9 +1104,9 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
       howTeachersUse: 'Как учителя его используют.',
     },
     noAccount: {
-      heading: 'Начните двухминутную игру прямо сейчас — без аккаунта',
+      heading: 'Присоединитесь к игре класса прямо сейчас — без аккаунта',
       body:
-        'Кнопка открывает живое поле прямо в этом браузере. Вы получаете временное имя игрока, которое можно поменять на входе, и никто не просит почту или пароль. Попробуйте, прежде чем решать, место ли этому на уроке.',
+        'Кнопка открывает игру для класса в этом браузере. Введите код класса и имя, чтобы войти. Никто не просит почту или пароль. Попробуйте, прежде чем решать, место ли этому на уроке.',
       cta: 'Играть сейчас — без регистрации',
       note: 'Без почты · Без пароля · Работает на школьном Wi-Fi',
     },

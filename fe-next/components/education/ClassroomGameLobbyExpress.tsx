@@ -22,7 +22,7 @@ import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { getSocketURL } from '@/utils/SocketContext';
 import { getClassrooms, getLesson, createLesson } from '@/lib/supabase/education';
 import { createClient } from '@/utils/supabase/client';
-import { classroomMultiplayerPath, type LessonGameData } from '@/lib/education/classroomGameHandoff';
+import { classroomMultiplayerPath, socketTeacherName, type LessonGameData } from '@/lib/education/classroomGameHandoff';
 import { clearQuickLaunchIntent, type QuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { ModePickerStrip } from './modePicker/ModePickerStrip';
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -106,7 +106,11 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
 
   const { stage, failure, gameCode: liveGameCode, mode: derivedMode } = snapshot;
 
-  const teacherName = profile?.display_name || user?.email || 'Teacher';
+  // #1007-class: teacherName on createClassroomGame is UsernameSchema — never
+  // hand it `display_name || email` raw (an email 400s and the room silently
+  // never appears). The express lobby re-derives the name, so it goes through
+  // the same sanitize path the classic lobby uses.
+  const teacherName = socketTeacherName(user, profile?.display_name);
   const defaultClassName = t('teacher.playNow.defaultClassName');
 
   useEffect(() => {

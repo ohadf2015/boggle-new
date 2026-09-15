@@ -36,6 +36,7 @@ describe('ClassGapReteachLiveCta', () => {
         payload={payload}
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
+        teamTilesLabel="Start Team Tiles Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -49,6 +50,7 @@ describe('ClassGapReteachLiveCta', () => {
         payload={payload}
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
+        teamTilesLabel="Start Team Tiles Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -67,6 +69,7 @@ describe('ClassGapReteachLiveCta', () => {
         payload={{ ...payload, missedWords: [] }}
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
+        teamTilesLabel="Start Team Tiles Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -81,6 +84,7 @@ describe('ClassGapReteachLiveCta', () => {
         payload={payload}
         reteachLabel="Start 3-min reteach Live"
         unpluggedLabel="Start unplugged reteach Live"
+        teamTilesLabel="Start Team Tiles Unplugged"
         educationHref="/en/education"
         educationLabel="Play a class game"
       />,
@@ -91,6 +95,24 @@ describe('ClassGapReteachLiveCta', () => {
     expect(href).toContain('/en/education/unplugged-reteach');
     expect(href).toContain('neutron');
     expect(href).not.toContain('Maya');
+  });
+
+  it('offers Start Team Tiles Unplugged linking to the tileboard path', () => {
+    render(
+      <ClassGapReteachLiveCta
+        payload={payload}
+        reteachLabel="Start 3-min reteach Live"
+        unpluggedLabel="Start unplugged reteach Live"
+        teamTilesLabel="Start Team Tiles Unplugged"
+        educationHref="/en/education"
+        educationLabel="Play a class game"
+      />,
+    );
+    const link = screen.getByTestId('start-team-tiles-unplugged');
+    const href = link.getAttribute('href') || '';
+    expect(href).toContain('/en/education/team-tiles-unplugged');
+    expect(href).toContain('neutron');
+    expect(href).not.toContain('lexiclash.com');
   });
 
 });

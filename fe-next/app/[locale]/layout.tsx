@@ -21,6 +21,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 // Eager (not nextDynamic): a lazily-loaded recovery component could itself be
 // the stale chunk that 404s, defeating its purpose.
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
+import ChunkErrorBoundary from '@/components/ChunkErrorBoundary';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
@@ -785,7 +786,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             tabIndex={-1}
                         >
                             <div className="flex-1 flex flex-col min-h-0">
-                                {children}
+                                {/* Catch render-time ChunkLoadError that never become window events
+                                    (t_9cc3561f — extend #979 beyond CDN document bust alone). */}
+                                <ChunkErrorBoundary>{children}</ChunkErrorBoundary>
                             </div>
                         </main>
                         <AutoHideFooter className="relative z-0 shrink-0" />

@@ -18,7 +18,14 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  httpLogger.error({ err: error, url: req.url, method: req.method }, 'Express error');
+  // Route goes in the message string, not just the structured payload:
+  // Railway's deploymentLogs filter matches on the message field only, so an
+  // unattributed 'Express error' line cannot be traced to a surface from the
+  // deploy console (78 such lines in the 2026-09-07→14 window, t_dc4e8fe6).
+  httpLogger.error(
+    { err: error, url: req.url, method: req.method },
+    `Express error ${req.method} ${req.url}`
+  );
 
   // Capture to Sentry (only in production)
   if (process.env.NODE_ENV === 'production') {

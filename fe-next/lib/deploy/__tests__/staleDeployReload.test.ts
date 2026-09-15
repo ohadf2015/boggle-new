@@ -216,3 +216,101 @@ describe('hardNavigateCacheBust / stripChunkReloadParam', () => {
     expect(window.history.replaceState).not.toHaveBeenCalled();
   });
 });
+
+describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)', () => {
+  const originalSW = navigator.serviceWorker;
+
+  afterEach(() => {
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: originalSW,
+    });
+    sessionStorage.clear();
+  });
+
+  it('posts SKIP_WAITING to waiting workers and calls update()', async () => {
+    const { activateWaitingServiceWorkers, SW_SKIP_WAITING_MESSAGE } = await import('../staleDeployReload');
+    const postMessage = vi.fn();
+    const update = vi.fn(async () => undefined);
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        getRegistrations: async () => [
+          { update, waiting: { postMessage }, installing: null, active: null },
+        ],
+      },
+    });
+    await activateWaitingServiceWorkers();
+    expect(update).toHaveBeenCalledOnce();
+    expect(postMessage).toHaveBeenCalledWith(SW_SKIP_WAITING_MESSAGE);
+  });
+
+  it('claimChunkRecoveryGuard is one-shot per session', async () => {
+    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard, CHUNK_RECOVERY_GUARD_KEY } =
+      await import('../staleDeployReload');
+    expect(claimChunkRecoveryGuard()).toBe(true);
+    expect(sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY)).toBe('true');
+    expect(claimChunkRecoveryGuard()).toBe(false);
+    clearChunkRecoveryGuard();
+    expect(claimChunkRecoveryGuard()).toBe(true);
+  });
+});
+
+describe('clearCachesAndReload activates waiting SW before unregister (t_9cc3561f)', () => {
+  const originalSW = navigator.serviceWorker;
+  const originalCaches = window.caches;
+  const originalLocation = window.location;
+
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        href: 'https://lexiclash.live/en/daily',
+        reload: vi.fn(),
+        replace: vi.fn(),
+      },
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: originalSW });
+    Object.defineProperty(window, 'caches', { configurable: true, value: originalCaches });
+    Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+  });
+
+  it('updates + skipWaiting + deletes caches + unregisters, then cache-bust navigates', async () => {
+    const { clearCachesAndReload, CHUNK_RELOAD_PARAM, SW_SKIP_WAITING_MESSAGE } = await import(
+      '../staleDeployReload'
+    );
+    const postMessage = vi.fn();
+    const update = vi.fn(async () => undefined);
+    const unregister = vi.fn(async () => true);
+    const deleteCache = vi.fn(async () => true);
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        getRegistrations: async () => [
+          { update, waiting: { postMessage }, unregister },
+        ],
+      },
+    });
+    Object.defineProperty(window, 'caches', {
+      configurable: true,
+      value: {
+        keys: async () => ['lexiclash-v8-old'],
+        delete: deleteCache,
+      },
+    });
+
+    await clearCachesAndReload();
+
+    expect(update).toHaveBeenCalled();
+    expect(postMessage).toHaveBeenCalledWith(SW_SKIP_WAITING_MESSAGE);
+    expect(deleteCache).toHaveBeenCalledWith('lexiclash-v8-old');
+    expect(unregister).toHaveBeenCalled();
+    expect(window.location.replace).toHaveBeenCalledOnce();
+    expect(String((window.location.replace as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0])).toContain(
+      `${CHUNK_RELOAD_PARAM}=`,
+    );
+  });
+});

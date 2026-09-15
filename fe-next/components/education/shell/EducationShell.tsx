@@ -57,6 +57,15 @@ export interface EducationShellProps {
   contentClassName?: string;
   /** Escape hatch for a screen that must render its own root (tests, portals). */
   'data-testid'?: string;
+  /**
+   * Skip nav resolution entirely — no sidebar, no tab bar.
+   *
+   * For an active drill on a measured-square board every pixel of chrome
+   * directly shrinks the grid (the board sizes to the leftover area), so the
+   * round view mounts the shell chrome-free. Only the ACTIVE drill sets this:
+   * a picker with no nav is a dead end with no way home.
+   */
+  chromeFree?: boolean;
 }
 
 export function EducationShell({
@@ -68,12 +77,17 @@ export function EducationShell({
   scrollRegionLabel,
   className,
   contentClassName,
+  chromeFree = false,
   'data-testid': testId = 'education-shell',
 }: EducationShellProps) {
   useEducationShellLock();
   // Derived here, not passed in: nine screens mount this shell and one of them
   // (student/profile) sits on its line ceiling with nothing to spare for a prop.
-  const nav = resolveEducationNav(usePathname());
+  // An active drill opts out via chromeFree — chrome costs grid area there.
+  // usePathname must run unconditionally (rules-of-hooks) — the opt-out applies
+  // to resolution, not the hook call.
+  const pathname = usePathname();
+  const nav = chromeFree ? null : resolveEducationNav(pathname);
 
   return (
     <div

@@ -321,6 +321,28 @@ export function classroomAddonMarketplaceListing(): Record<string, unknown> {
       oauth_required_for_grade_sync: true,
       extends: ['#970', '#975'],
     },
+    unplugged_grade_passback: {
+      for: 'unplugged-reteach-live',
+      foil: 'Kahoot Classroom add-on grade passback',
+      api: '/api/classroom-addon/unplugged-grade-passback',
+      studentViewPath: '/education/unplugged-grade-passback',
+      maxPoints: 100,
+      student_names: false,
+      roster_scopes: false,
+      oauth_required_for_grade_sync: true,
+      extends: ['#970', '#977', '#980', '#981'],
+      notes: 'Class cleared/total after Unplugged Live finish; complements miss-gap homework passback.',
+    },
+    team_tiles_unplugged: {
+      for: 'team-tiles-unplugged',
+      foil: 'Kahoot Team Tiles',
+      deep_link: 'team-tiles-unplugged',
+      student_devices: false,
+      grade_passback: 'unplugged-grade-passback (#1045)',
+      notes:
+        'Shared teacher-screen miss-gap tileboard; teams flip → word; teacher marks; reuses Unplugged finish + grade passback.',
+      extends: ['#959', '#1045'],
+    },
   };
 }
 

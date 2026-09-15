@@ -8,8 +8,12 @@ import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { labelLessonsForPicker } from '@/lib/education/lessonLabels';
 import { cn } from '@/lib/utils';
-import * as Dialog from '@radix-ui/react-dialog';
-import { X, Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Calendar, Swords, BookOpen, ChevronDown, Crosshair, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
@@ -127,21 +131,20 @@ export default function AssignmentCreator({
   };
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onClose}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-neo-black/80 z-50" />
-        <Dialog.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-            'w-full max-w-xl p-6',
-            'bg-neo-navy border-neo border-neo-cream shadow-hard-lg z-50 rounded-neo'
-          )}
-        >
-          <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4">
-            {t('teacher.assignment.createTitle')}
-          </Dialog.Title>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent
+        noDescription
+        closeButtonLabel={t('common.close')}
+        className={cn(
+          'w-full max-w-xl sm:max-w-xl lg:max-w-xl xl:max-w-xl p-6',
+          'bg-neo-navy border-neo-cream text-neo-white'
+        )}
+      >
+        <DialogTitle className="text-2xl font-neo-display text-neo-white mb-4 normal-case tracking-normal">
+          {t('teacher.assignment.createTitle')}
+        </DialogTitle>
 
-          <div className="space-y-5">
+        <div className="space-y-5">
             {/* Assignment Type Selector */}
             <div>
               <label className="block text-sm font-neo-body text-neo-white mb-2">
@@ -361,23 +364,8 @@ export default function AssignmentCreator({
                 {t('common.cancel')}
               </Button>
             </div>
-          </div>
-
-          <Dialog.Close asChild>
-            <button
-              type="button"
-              // `end-4`, not `right-4`: in Hebrew the X belongs on the same side
-              // the dialog's RTL title starts from. 44px target like the rest of
-              // this codebase — a bare w-5 icon is a ~20px tap area.
-              className="absolute top-4 end-4 flex min-h-[44px] min-w-[44px] items-center justify-center text-neo-white hover:text-neo-white"
-              aria-label={t('common.close')}
-              disabled={isSubmitting}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

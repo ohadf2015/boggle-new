@@ -40,17 +40,20 @@ function useModalOwnsScreen(): boolean {
 }
 
 /**
- * Non-blocking cookie-consent bottom sheet (GDPR).
+ * Non-blocking cookie-consent bottom BAR (GDPR).
  *
- * Product decision t_01e346a5 (Option A): convert the full-screen backdrop-blur
- * modal into a fixed bottom sheet. It does NOT block interaction with the page
- * behind it, it does NOT lock body scroll, and it carries no backdrop-filter cost,
- * so the hero/LCP element can paint and measure unimpeded. The same legal copy,
- * Accept/Decline/Manage choices, and granular toggles are preserved.
+ * History: t_01e346a5 turned the full-screen backdrop modal into a bottom sheet.
+ * UX audit 2026-09-14 (lexiclash.live): that sheet still measured ~350px and sat
+ * over the lower grid / lime PLAY NOW CTA; ACCEPT ALL (bg-accent = neo-lime)
+ * was the loudest above-fold button. On mobile, Google One Tap stacked on top.
  *
- * The sheet is still a persistent consent gate: it cannot be dismissed by
- * backdrop click or Escape, and a choice is still required before non-essential
- * scripts fire (ads/analytics are consent-gated independently).
+ * This revision shrinks the prompt to a compact fixed bottom bar so the play-
+ * first home and Puzzle #N hero stay usable without dismissing first. Accept
+ * uses cyan (not lime) so one lime Play primary owns the fold. One Tap is gated
+ * separately in GoogleOneTapInitializer until consent is decided.
+ *
+ * Still non-blocking: no backdrop, no scroll-lock, no Escape dismiss. Choice is
+ * still required before non-essential scripts fire.
  */
 export default function CookieConsent() {
   const { t, language } = useLanguage();
@@ -189,79 +192,83 @@ export default function CookieConsent() {
   const isRtl = language === 'he';
 
   // Portal to <body> at z-[200]: the Android install Dialog portals to body at
-  // z-90, and an in-tree z-[110] sheet loses the stacking contest to that portal
-  // (layout ancestors create stacking contexts). Body-level z-[200] keeps ACCEPT
-  // ALL clickable even if another modal races the first visit.
+  // z-90, and an in-tree sheet loses the stacking contest to that portal
+  // (layout ancestors create stacking contexts). Body-level z-[200] keeps
+  // consent actions clickable even if another modal races the first visit.
   const sheet = (
-    // Fixed bottom sheet. No full-screen backdrop, no backdrop-filter.
-    // A reserved min-height prevents layout shift when the sheet mounts.
+    // Compact fixed bottom BAR — not a ~350px sheet. No backdrop, no filter.
+    // Collapsed height stays small so lime Play / the letter grid stay clear;
+    // Customize expands in-place (ResizeObserver updates the reservation).
     <div
       ref={sheetRef}
       role="dialog"
       aria-modal="false"
       aria-label={t('cookieConsent.title')}
+      data-cookie-consent="compact-bar"
       className={cn(
         'fixed bottom-0 left-0 right-0',
         // z-[200] wins every stacking contest — including the ones it should
         // lose. On a projected game surface it covered `TeacherLiveControls`
-        // (z-[70]) and `GamePausedOverlay` (z-60): the class watched a cookie
-        // sheet sit on the host's START GAME and on the round-end screen.
-        // There it drops below both and waits its turn; everywhere else it
-        // keeps the rank that makes ACCEPT ALL reachable over the install
-        // Dialog's body-level z-90 portal.
+        // (z-[70]) and `GamePausedOverlay` (z-60). There it drops below both
+        // and waits its turn; everywhere else it keeps the rank that makes
+        // consent reachable over the install Dialog's body-level z-90 portal.
         inGameSurface ? 'z-[60]' : 'z-[200]',
-        'w-full max-w-2xl mx-auto',
-        'min-h-[280px] max-h-[60vh] overflow-y-auto',
+        'w-full max-w-4xl mx-auto',
+        // No min-h-[280px]: that forced the fold-stealing ~350px band.
+        showDetails ? 'max-h-[50vh] overflow-y-auto' : 'overflow-visible',
         'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
-        'p-4 sm:p-5 animate-slide-up pointer-events-auto'
+        'px-3 py-2.5 sm:px-4 sm:py-3 animate-slide-up pointer-events-auto'
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      {/* Mascot happily munching a cookie — decorative, brand personality */}
-      <Image
-        src="/cookie-consent-mascot.png"
-        alt={t('cookieConsent.mascotAlt')}
-        width={80}
-        height={80}
-        className="mx-auto mb-2 h-20 w-20 object-contain"
-      />
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:items-center">
+          {/* Small inline mascot — brand personality without owning the fold */}
+          <Image
+            src="/cookie-consent-mascot.png"
+            alt={t('cookieConsent.mascotAlt')}
+            width={40}
+            height={40}
+            className="mt-0.5 h-10 w-10 shrink-0 object-contain sm:mt-0"
+          />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm font-bold font-neo-display text-neo-white sm:text-base">
+              {t('cookieConsent.title')}
+            </h2>
+            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 line-clamp-2 sm:text-[13px]">
+              {t('cookieConsent.message')}{' '}
+              <a
+                href={`/${language}/legal/cookies`}
+                className="font-bold text-neo-cyan hover:underline"
+              >
+                {t('cookieConsent.learnMore')}
+              </a>
+            </p>
+          </div>
+        </div>
 
-      <h2 className="mb-2 text-center text-lg font-bold font-neo-display text-neo-white">
-        {t('cookieConsent.title')}
-      </h2>
-      <p className="mb-4 text-center text-sm font-medium text-neo-white">
-        {t('cookieConsent.message')}{' '}
-        <a
-          href={`/${language}/legal/cookies`}
-          className="font-bold text-neo-cyan hover:underline"
-        >
-          {t('cookieConsent.learnMore')}
-        </a>
-      </p>
-
-      {/* Actions. Accept = prominent primary (top, full-width, accent).
-          Decline + Customize = equal-weight one-click buttons below — reject
-          stays as easy as accept; only visual weight nudges toward Accept. */}
-      <div className="flex flex-col gap-2 max-w-md mx-auto">
-        <button
-          type="button"
-          onClick={handleAcceptAll}
-          className={cn(
-            'w-full px-4 py-3 text-base font-bold uppercase',
-            'bg-accent text-accent-foreground',
-            'border-3 border-neo-black rounded-neo shadow-hard',
-            'hover:shadow-hard-lg active:shadow-hard-pressed',
-            'transition-all duration-100'
-          )}
-        >
-          {t('cookieConsent.accept')}
-        </button>
-        <div className="flex items-center gap-2">
+        {/* Actions stay one-tap reachable. Accept is cyan — NOT neo-lime — so the
+            home Play CTA remains the only lime primary above the fold. Decline
+            and Customize stay equal-weight secondary. */}
+        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+          <button
+            type="button"
+            onClick={handleAcceptAll}
+            className={cn(
+              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none sm:px-4',
+              'bg-neo-cyan text-neo-black',
+              'border-3 border-neo-black rounded-neo shadow-hard-sm',
+              'hover:shadow-hard active:shadow-hard-pressed',
+              'transition-all duration-100'
+            )}
+          >
+            {t('cookieConsent.accept')}
+          </button>
           <button
             type="button"
             onClick={() => setShowDetails(!showDetails)}
             className={cn(
-              'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
+              'min-h-[44px] flex-1 px-3 py-2 text-xs font-bold uppercase sm:flex-none',
               'text-neo-cyan hover:text-neo-white',
               'border-2 border-neo-cyan rounded-neo transition-colors duration-100'
             )}
@@ -272,8 +279,8 @@ export default function CookieConsent() {
             type="button"
             onClick={handleDeclineAll}
             className={cn(
-              'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-              'text-neo-white hover:text-neo-white',
+              'min-h-[44px] flex-1 px-3 py-2 text-xs font-bold uppercase sm:flex-none',
+              'text-neo-white',
               'border-2 border-neo-cream rounded-neo transition-colors duration-100'
             )}
           >
@@ -282,11 +289,10 @@ export default function CookieConsent() {
         </div>
       </div>
 
-      {/* Granular preferences panel */}
+      {/* Granular preferences panel — expands the bar; reservation tracks height */}
       {showDetails && (
-        <div className="mt-5 pt-5 border-t-2 border-neo-cream/10 max-w-md mx-auto">
-          <div className="grid grid-cols-1 gap-3 mb-4">
-            {/* Essential — always on */}
+        <div className="mt-3 border-t-2 border-neo-cream/10 pt-3">
+          <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
             <ConsentToggle
               label={t('cookieConsent.categories.essential')}
               description={t('cookieConsent.categories.essentialDesc')}
@@ -294,14 +300,12 @@ export default function CookieConsent() {
               checked={true}
               disabled
             />
-            {/* Analytics */}
             <ConsentToggle
               label={t('cookieConsent.categories.analytics')}
               description={t('cookieConsent.categories.analyticsDesc')}
               checked={analytics}
               onChange={setAnalytics}
             />
-            {/* Advertising */}
             <ConsentToggle
               label={t('cookieConsent.categories.advertising')}
               description={t('cookieConsent.categories.advertisingDesc')}
@@ -313,7 +317,7 @@ export default function CookieConsent() {
             type="button"
             onClick={handleSavePreferences}
             className={cn(
-              'w-full px-5 py-2 min-h-[44px] text-sm font-bold uppercase',
+              'w-full px-5 py-2 min-h-[44px] text-sm font-bold uppercase sm:w-auto',
               'bg-neo-cyan text-neo-black',
               'border-3 border-neo-black rounded-neo shadow-hard-sm',
               'hover:shadow-hard active:shadow-hard-pressed',

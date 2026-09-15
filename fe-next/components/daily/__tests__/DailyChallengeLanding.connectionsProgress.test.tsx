@@ -1,12 +1,13 @@
 /**
- * Word Tower is HIDDEN from the daily hub (Ohad product directive 2026-09-13).
+ * Hub progress counts Connections (slice 3b of the 2026-09-13 directive).
  *
- * It used to render as quest 3 — first through the generic registry card, then
- * with the shared `QuestCard` box next to Word Hunt and Word Wheel, counting in
- * the /4 progress bar. The mode is now off every consumer surface: no quest
- * card, no hero row, and the hub progress denominator drops back to the three
- * visible quests (Word Hunt + Word Wheel + Connections). The /daily/word-tower
- * route itself stays alive for direct links — this guards the hub only.
+ * The /N progress bar on the daily hub must increment when today's Connections
+ * (Word Bridge) daily is done — the marker is the same localStorage key both
+ * connections daily flavors write on their terminal screens
+ * (markConnectionsPlayedToday in lib/connections/dailyClient), read back via
+ * hasPlayedConnectionsToday. Denominator is /4 (hunt + wheel + connections +
+ * word-tower — tower was restored to the hub 2026-09-14, superseding the /3
+ * this file pinned while the hide directive was in force).
  */
 
 import React from 'react';
@@ -77,6 +78,10 @@ vi.mock('framer-motion', () => ({
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+// The exact localStorage contract from lib/connections/dailyClient.
+const PLAYED_KEY = 'connections-daily-played';
+const todayUTC = () => new Date().toISOString().slice(0, 10);
+
 function renderHub() {
   return render(
     <AuthProvider>
@@ -91,46 +96,45 @@ function renderHub() {
   );
 }
 
-describe('DailyChallengeLanding — Word Tower hidden from the hub', () => {
+describe('DailyChallengeLanding — Connections counts in hub progress', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.localStorage.clear();
     mockFetch.mockImplementation(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) }));
   });
 
-  it('renders NO Word Tower card in any form (quest card, hero row, or registry card)', async () => {
-    renderHub();
-    // Wait for the hub to settle on its real cards first so a bare "absent"
-    // assertion can't pass on an unfinished render.
-    await waitFor(() => {
-      expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
-    });
-    expect(screen.queryByTestId('quest-card-wordTower')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('daily-quest-card-word-tower')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('word-tower-hero')).not.toBeInTheDocument();
-  });
-
-  it('still renders the three visible quests: Word Hunt, Word Wheel, Connections', async () => {
-    renderHub();
-    await waitFor(() => {
-      expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
-    });
-    expect(screen.getByTestId('quest-card-wordWheel')).toBeInTheDocument();
-    expect(await screen.findByTestId('daily-quest-card-connections')).toBeInTheDocument();
-  });
-
-  it('counts only the three visible quests in the progress bar (/3, tower out of the denominator)', async () => {
+  it('starts at 0/4 when nothing was played today', async () => {
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
-    // Word Hunt + Word Wheel + Connections. Word Tower used to make this /4.
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    expect(bar).toHaveAttribute('aria-valuemax', '4');
+    // aria-valuenow is the percent (see DailyMissionsHeader); the visible
+    // label is the honest completedCount/total.
+    await screen.findByText('0/4');
   });
 
-  it('no rendered link points at the Word Tower routes', async () => {
-    const { container } = renderHub();
-    await waitFor(() => {
-      expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
-    });
-    const hrefs = Array.from(container.querySelectorAll('a[href]')).map((a) => a.getAttribute('href') ?? '');
-    expect(hrefs.some((h) => h.includes('word-tower'))).toBe(false);
+  it('increments to 1/4 when today\'s Connections daily is marked played', async () => {
+    window.localStorage.setItem(PLAYED_KEY, todayUTC());
+    renderHub();
+    const bar = await screen.findByTestId('xp-progress-bar');
+    expect(bar).toHaveAttribute('aria-valuemax', '4');
+    // connectionsPlayed resolves in an effect after mount — wait for the flip.
+    await screen.findByText('1/4');
+    await waitFor(() => expect(bar).toHaveAttribute('aria-valuenow', '25'));
+  });
+
+  it('ignores a stale Connections marker from a previous day', async () => {
+    window.localStorage.setItem(PLAYED_KEY, '2020-01-01');
+    renderHub();
+    await screen.findByText('0/4');
+    // Give the mount effect a beat to (not) flip the count.
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.getByText('0/4')).toBeInTheDocument();
+  });
+
+  it('marks the Connections quest card played when the marker is set', async () => {
+    window.localStorage.setItem(PLAYED_KEY, todayUTC());
+    renderHub();
+    const card = await screen.findByTestId('daily-quest-card-connections');
+    expect(card).toBeInTheDocument();
   });
 });

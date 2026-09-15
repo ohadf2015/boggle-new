@@ -17,6 +17,7 @@ import {
   Check,
   ClipboardList,
   GraduationCap,
+  LayoutGrid,
   Play,
   Printer,
   QrCode,
@@ -82,6 +83,16 @@ export function ReteachActions({ links, onReteach, t }: ReteachActionsProps) {
             >
               <Play className="w-4 h-4 shrink-0" aria-hidden />
               {t('education.results.startUnpluggedReteachLive')}
+            </Link>
+          )}
+          {links.teamTilesUnpluggedHref && (
+            <Link
+              href={links.teamTilesUnpluggedHref}
+              data-testid="start-team-tiles-unplugged"
+              className={cn(ACTION, 'bg-neo-yellow')}
+            >
+              <LayoutGrid className="w-4 h-4 shrink-0" aria-hidden />
+              {t('education.results.startTeamTilesUnplugged')}
             </Link>
           )}
           {links.missGapAsyncAssignHref && (

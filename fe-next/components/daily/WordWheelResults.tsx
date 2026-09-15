@@ -41,6 +41,10 @@ interface WordWheelResultsProps {
   puzzleDate: string;
   language: Language;
   hasPlayedWordHunt: boolean;
+  /** True when today's Connections (Word Bridge) daily is done — the results
+   *  follow-up CTA nudges Connections first (Ohad directive 2026-09-13), so an
+   *  unfinished Connections suppresses the back-to-hub state. */
+  hasPlayedConnections?: boolean;
   currentPlayerId?: string | null;
   currentGuestFingerprint?: string | null;
   /**
@@ -143,6 +147,7 @@ const CONFETTI_COLORS = ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6', '#FFD700', 
 
 const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
+  hasPlayedConnections = false,
   currentPlayerId, currentGuestFingerprint, leaderboardKey = 0,
   isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
   isCatchup = false, onPracticeAgain,
@@ -482,9 +487,61 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* PRIMARY CROSS-PROMO: Word Hunt CTA — promoted above leaderboard so users
-          finish today's daily-pair (mirrors Word Hunt results page treatment). */}
-      {!isPractice && !hasPlayedWordHunt && !isGuest && (
+      {/* PRIMARY CROSS-PROMO: Connections (Word Bridge) daily CTA — the results
+          follow-up now sends the player to today's Connections puzzle (Ohad
+          directive 2026-09-13; it used to point at Word Hunt, and before the
+          hub redesign at Word Tower). Shown while Connections is unplayed. */}
+      {!isPractice && !hasPlayedConnections && !isGuest && (
+        <m.div
+          data-testid="wordwheel-connections-cta"
+          className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <div className="relative">
+            <span className="absolute -top-2 left-4 z-10 inline-block px-2 py-0.5 rounded-full bg-neo-pink text-neo-black text-[10px] font-neo-display font-black tracking-wider border-2 border-neo-black shadow-hard-sm">
+              {t('wordWheel.results.nextUpBadge', 'NEXT UP')}
+            </span>
+            <Link
+              href={`/${language}/connections/daily`}
+              data-testid="wordwheel-connections-link"
+              onClick={() => trackGrowthEvent('cross_promo_click', {
+                target: 'connections',
+                source: 'word_wheel_results',
+                placement: 'primary',
+                score: result.score,
+                language,
+              })}
+              className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
+                  ↔
+                </div>
+                <div>
+                  <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
+                    {t('wordWheel.results.playConnectionsTitle', 'Next up: Word Bridge')}
+                  </span>
+                  <p className="text-neo-black/70 text-xs mt-0.5">
+                    {t('wordWheel.results.playConnectionsDesc', "Solve today's Connections puzzle to finish your daily set")}
+                  </p>
+                </div>
+              </div>
+              <m.div
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.2, repeat: 3, repeatDelay: 0.4, ease: 'easeInOut' }}
+              >
+                <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
+              </m.div>
+            </Link>
+          </div>
+        </m.div>
+      )}
+
+      {/* Word Hunt CTA — only once Connections is done, so it never competes
+          with the primary follow-up above. */}
+      {!isPractice && hasPlayedConnections && !hasPlayedWordHunt && !isGuest && (
         <m.div
           data-testid="wordwheel-hunt-cta"
           className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
@@ -531,11 +588,11 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* Back to Daily Hub — both challenges complete. Registered players only:
+      {/* Back to Daily Hub — all three dailies complete. Registered players only:
           now that this pins to the bottom of the scrollport, showing it to a
           guest would ride a second CTA over their signup card for the whole
           scroll. The top-left Back link keeps them out of a dead end. */}
-      {!isPractice && hasPlayedWordHunt && !isGuest && (
+      {!isPractice && hasPlayedWordHunt && hasPlayedConnections && !isGuest && (
         <m.div
           data-testid="wordwheel-back-to-daily-cta"
           className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
