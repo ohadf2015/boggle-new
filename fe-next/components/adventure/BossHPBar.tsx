@@ -181,7 +181,8 @@ export const BossHPBar = memo(function BossHPBar({
             <AdaptiveMotion.span
               data-testid="enraged-badge"
               initial={{ scale: 0 }}
-              animate={{ scale: [0, 1.3, 1] }}
+              // Springs support 2 keyframes max (t_15ec0d7a / #893).
+              animate={{ scale: 1 }}
               exit={{ scale: 0 }}
               transition={{ type: 'spring', stiffness: 600, damping: 20 }}
               className="text-[10px] font-black text-neo-red bg-neo-red/20 border border-neo-red/60 rounded-neo px-1.5 py-0.5 uppercase"

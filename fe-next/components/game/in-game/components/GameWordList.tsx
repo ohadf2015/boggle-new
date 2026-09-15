@@ -121,9 +121,12 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                       ? { x: -30, opacity: 0, scale: 1.3 }
                       : { x: -30, opacity: 0 }
                   }
+                  // Springs support 2 keyframes max — [1.3, 1.08, 1] + spring threw
+                  // on live MP games (t_15ec0d7a / #893 recurrence). initial scale 1.3
+                  // + underdamped spring lands with the same pop.
                   animate={
                     isLatest && wordText.length >= 6
-                      ? { x: 0, opacity: 1, scale: [1.3, 1.08, 1] }
+                      ? { x: 0, opacity: 1, scale: 1 }
                       : { x: 0, opacity: 1 }
                   }
                   exit={{ x: -30, opacity: 0 }}

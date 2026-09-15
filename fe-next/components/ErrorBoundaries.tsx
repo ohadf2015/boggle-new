@@ -5,6 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, RefreshCw, Home, HelpCircle, Wifi } from 'lucide-react';
 import logger from '@/utils/logger';
+import {
+  isChunkLoadError as isChunkLoadErrorNameMessage,
+  clearCachesAndReload,
+  claimChunkRecoveryGuard,
+  clearChunkRecoveryGuard,
+} from '@/lib/deploy/staleDeployReload';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
@@ -50,73 +56,31 @@ function getTranslationFn(): TranslationFunction {
 }
 
 // ==========================================
-// Chunk Load Error Detection
+// Chunk Load Error Detection (shared with #979 / t_9cc3561f recovery)
 // ==========================================
 
-const CHUNK_ERROR_REFRESH_KEY = 'lexiclash_chunk_error_refresh';
-const CHUNK_ERROR_REFRESH_TIMEOUT_MS = 10000; // 10 seconds to prevent loops
-
 /**
- * Detects if an error is a chunk loading failure (stale deployment)
- * IMPORTANT: Be very specific to avoid false positives that cause refresh loops
+ * Detects if an error is a chunk loading failure (stale deployment).
+ * Delegates to the shared matcher so every boundary agrees with ChunkErrorRecovery.
  */
 function isChunkLoadError(error: Error | null): boolean {
   if (!error) return false;
-  const message = error.message?.toLowerCase() || '';
-  const name = error.name?.toLowerCase() || '';
-
-  // Check for explicit chunk load error name
-  if (name === 'chunkloaderror') return true;
-
-  // Check for specific Next.js chunk loading patterns
-  // Must include '_next/' path to ensure it's actually a chunk error
-  const hasNextPath = message.includes('_next/');
-  const isChunkError = (
-    message.includes('loading chunk') ||
-    message.includes('loading css chunk') ||
-    message.includes('failed to load chunk')
-  );
-
-  if (isChunkError) return true;
-
-  // For "dynamically imported module" errors, require explicit fetch failure + next path
-  // This prevents false positives from other module/resource loading failures
-  if (message.includes('failed to fetch dynamically imported module') && hasNextPath) {
-    return true;
-  }
-
-  return false;
+  return isChunkLoadErrorNameMessage(error.name, error.message);
 }
 
 /**
- * Attempts auto-refresh for chunk errors, with loop prevention
- * Returns true if refresh was triggered, false if skipped (recent refresh)
+ * Attempts auto-refresh for chunk errors via the shared cache-bust + SW purge path.
+ * Returns true if refresh was triggered, false if the session guard already fired.
  */
 function handleChunkErrorRefresh(): boolean {
   if (typeof window === 'undefined') return false;
-
-  try {
-    const lastRefresh = sessionStorage.getItem(CHUNK_ERROR_REFRESH_KEY);
-    const now = Date.now();
-
-    if (lastRefresh) {
-      const elapsed = now - parseInt(lastRefresh, 10);
-      if (elapsed < CHUNK_ERROR_REFRESH_TIMEOUT_MS) {
-        // Recently refreshed, don't loop
-        logger.warn('[ChunkError] Skipping auto-refresh (recent refresh detected)');
-        return false;
-      }
-    }
-
-    // Mark refresh timestamp and reload
-    sessionStorage.setItem(CHUNK_ERROR_REFRESH_KEY, now.toString());
-    logger.info('[ChunkError] Auto-refreshing page to load new chunks');
-    window.location.reload();
-    return true;
-  } catch {
-    // sessionStorage not available, skip auto-refresh
+  if (!claimChunkRecoveryGuard()) {
+    logger.warn('[ChunkError] Skipping auto-refresh (recovery guard already set)');
     return false;
   }
+  logger.info('[ChunkError] Auto-refreshing page to load new chunks (cache-bust)');
+  void clearCachesAndReload();
+  return true;
 }
 
 /**
@@ -284,13 +248,10 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
   };
 
   handleHardRefresh = (): void => {
-    // Clear the chunk error flag to allow refresh
-    try {
-      sessionStorage.removeItem(CHUNK_ERROR_REFRESH_KEY);
-    } catch {
-      // Ignore sessionStorage errors
-    }
-    window.location.reload();
+    // Clear the shared guard so a manual retry can reclaim the recovery slot,
+    // then use the same cache-bust + SW purge path as ChunkErrorRecovery.
+    clearChunkRecoveryGuard();
+    void clearCachesAndReload();
   };
 
   render(): ReactNode {

@@ -78,4 +78,17 @@ describe('GoogleOneTapInitializer', () => {
     render(<GoogleOneTapInitializer />);
     expect(screen.queryByTestId('gsi-script')).toBeNull();
   });
+
+  it('cancels a live One Tap when the growth signup prompt becomes active (t_da22db9a)', () => {
+    const cancel = vi.fn();
+    (window as unknown as { google: { accounts: { id: { cancel: typeof cancel } } } }).google = {
+      accounts: { id: { cancel } },
+    };
+    render(<GoogleOneTapInitializer />);
+    window.dispatchEvent(
+      new CustomEvent('lexiclash:signup-prompt-active', { detail: { active: true } }),
+    );
+    expect(cancel).toHaveBeenCalledTimes(1);
+    delete (window as unknown as { google?: unknown }).google;
+  });
 });

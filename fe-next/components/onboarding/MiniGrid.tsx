@@ -409,7 +409,11 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                     ? 'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm'
                     : 'bg-neo-white/20 text-neo-white border-2 border-neo-white/40'
                 )}
-                animate={filled ? { scale: [0.7, 1.2, 1], rotate: [0, -5, 0] } : { scale: 1 }}
+                // Springs support 2 keyframes max — [0.7, 1.2, 1]/[0, -5, 0] + spring
+                // threw "Only two keyframes currently supported with spring..." for real
+                // visitors on /en FTUE (growth-radar t_15ec0d7a, recurrence of #893).
+                // Underdamped SPRING_BOUNCE (stiffness 600 / damping 18) overshoots ~1.2.
+                animate={filled ? { scale: 1, rotate: 0 } : { scale: 1 }}
                 transition={filled ? SPRING_BOUNCE : undefined}
               >
                 {filled ? selected[i].letter : targetLetter}

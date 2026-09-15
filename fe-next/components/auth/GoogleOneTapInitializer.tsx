@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,8 +12,22 @@ import {
   shouldEnableGoogleOneTap,
   type GoogleIdServices,
 } from '@/lib/auth/googleOneTap';
+import {
+  SIGNUP_PROMPT_ACTIVE_EVENT,
+  shouldSuppressOneTapForSignupFunnel,
+  type SignupPromptActiveDetail,
+} from '@/lib/auth/signupPromptCoordination';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
+
+function cancelOneTapPrompt(): void {
+  const google = (window as unknown as { google?: GoogleIdServices }).google;
+  try {
+    google?.accounts?.id?.cancel?.();
+  } catch {
+    // GIS may throw if never initialized — safe to ignore.
+  }
+}
 
 /**
  * Headless initializer for Google One Tap / Sign In With Google on the WEB.
@@ -29,6 +43,10 @@ const GSI_SRC = 'https://accounts.google.com/gsi/client';
  * UX: never stack One Tap over the cookie bar. GIS is not loaded (and prompt
  * never fires) until `useConsentDecided()` is true — measured 2026-09-14 on
  * mobile where One Tap + cookie sheet formed a double blocker.
+ *
+ * t_da22db9a: also never stack One Tap on the post-game soft-sheet. After
+ * consent, both used to fire in the same idle/1.5s window; cancel + suppress
+ * when the growth signup funnel owns the session.
  */
 export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
@@ -46,15 +64,37 @@ export default function GoogleOneTapInitializer() {
 
   const initOneTap = useCallback(async () => {
     if (promptedRef.current || !clientId) return;
+    // Post-game funnel owns auth — do not prompt One Tap over soft-sheet.
+    if (shouldSuppressOneTapForSignupFunnel()) return;
     const google = (window as unknown as { google?: GoogleIdServices }).google;
     if (!google?.accounts?.id) return;
     promptedRef.current = true;
 
     await ensureGoogleIdInitialized(google, clientId);
+    // Re-check after idle/init — soft-sheet may have opened meanwhile.
+    if (shouldSuppressOneTapForSignupFunnel()) {
+      cancelOneTapPrompt();
+      return;
+    }
     google.accounts.id.prompt();
   }, [clientId]);
 
+  // Cancel a live One Tap when the growth signup sheet opens.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onPromptActive = (event: Event) => {
+      const detail = (event as CustomEvent<SignupPromptActiveDetail>).detail;
+      if (detail?.active) {
+        cancelOneTapPrompt();
+      }
+    };
+    window.addEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, onPromptActive);
+    return () => window.removeEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, onPromptActive);
+  }, []);
+
   // Consent first: do not mount GSI (or prompt) while the cookie bar is up.
+  // Do NOT gate Script mount on signup-funnel suppress (that reads localStorage
+  // and would hydrate-mismatch). Suppress is enforced inside initOneTap + cancel.
   if (!enabled || !consentDecided) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —

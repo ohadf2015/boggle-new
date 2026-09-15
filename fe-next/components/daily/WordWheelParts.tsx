@@ -140,7 +140,8 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
           : { scale: isUsed ? 0.9 : 1 }),
       }}
       transition={isCenter && !isUsed && !reducedMotion
-        ? { duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
+        // Multi-keyframe scale pulse must be tween; x/y stay springs (2-value).
+        ? { type: 'tween' as const, duration: 2, repeat: Infinity, ease: 'easeInOut', x: { type: 'spring', stiffness: 300, damping: 25 }, y: { type: 'spring', stiffness: 300, damping: 25 } }
         : { type: 'spring', stiffness: 400, damping: 22 }
       }
       aria-label={isUsed ? `${letter}. ${t('wordWheel.tapToRemove')}` : letter}

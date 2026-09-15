@@ -97,11 +97,12 @@ export function ScoreCountUp({
           'drop-shadow(0 0 0px rgba(191,255,0,0))',
         ],
       } : { scale: 1 }}
+      // Multi-keyframe land pulse must be a tween — spring only accepts 2 keyframes
+      // (t_15ec0d7a / #893 recurrence).
       transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 12,
+        type: 'tween',
         duration: 0.5,
+        ease: 'easeOut',
       }}
     >
       {display.toLocaleString()}

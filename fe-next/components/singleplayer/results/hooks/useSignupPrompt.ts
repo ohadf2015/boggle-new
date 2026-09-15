@@ -19,6 +19,8 @@
  * results dialog). The prompt now requires a fresh `guestStatsChanged`
  * (a game just completed this SPA session) so it fires only at a real
  * post-game pause.
+ * t_da22db9a: emit signup-prompt-active so One Tap can cancel; sole intended
+ * mount is SignupPromptHost (Results dual-mount removed).
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,9 +30,10 @@ import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { useExperiment } from '@/hooks/useExperiment';
 import { trackSignupFunnel } from '@/utils/growthTracking';
 import { isGameActive } from '@/utils/abandonOnPagehide';
-
-// Session storage key for tracking if signup prompt was shown
-const SIGNUP_PROMPT_SHOWN_KEY = 'boggle_sp_signup_shown';
+import {
+  SIGNUP_PROMPT_SHOWN_KEY,
+  emitSignupPromptActive,
+} from '@/lib/auth/signupPromptCoordination';
 
 /** Legacy delay — control arm of signup-prompt-friction-v1. */
 export const SIGNUP_PROMPT_DELAY_CONTROL_MS = 3500;
@@ -150,6 +153,7 @@ export function useSignupPrompt({
       shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
       trackSignupFunnel('prompt_shown', qualifiesAsFirstWin, { surface: frictionVariant });
       trackFrictionExposure();
+      emitSignupPromptActive(true);
     }, delayMs);
 
     return () => clearTimeout(timer);
@@ -168,6 +172,7 @@ export function useSignupPrompt({
 
   const dismissSignupModal = useCallback(() => {
     setShowSignupModal(false);
+    emitSignupPromptActive(false);
     const shown = shownVariantRef.current;
     if (shown) {
       shownVariantRef.current = null;

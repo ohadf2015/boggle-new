@@ -123,7 +123,8 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
             'bg-linear-to-br from-neo-lime to-neo-lime-hover'
           )}
           variants={reduceMotion ? {} : itemVariants}
-          whileHover={reduceMotion ? {} : { scale: 1.05, rotate: [-2, 2, 0] }}
+          // Springs support 2 keyframes max — rotate:[-2,2,0] + spring is illegal (t_15ec0d7a).
+          whileHover={reduceMotion ? {} : { scale: 1.05, rotate: 2 }}
           transition={{ type: 'spring', stiffness: 300 }}
         >
           {IconComponent ? (

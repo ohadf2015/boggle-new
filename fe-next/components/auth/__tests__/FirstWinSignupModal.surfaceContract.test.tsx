@@ -85,7 +85,7 @@ describe('FirstWinSignupModal — surface contract (t_da22db9a)', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the bottom sheet with the sheet testid and reports first_win_sheet', () => {
+  it('renders the bottom sheet (portaled to body) and reports first_win_sheet', () => {
     const { container } = render(
       <FirstWinSignupModal
         isOpen
@@ -96,7 +96,10 @@ describe('FirstWinSignupModal — surface contract (t_da22db9a)', () => {
       />
     );
 
-    expect(container.querySelector('[data-testid="first-win-signup-sheet"]')).not.toBeNull();
+    // t_da22db9a/#1051: the sheet is portaled to document.body, so it lives
+    // outside the render container.
+    expect(container.querySelector('[data-testid="first-win-signup-sheet"]')).toBeNull();
+    expect(document.querySelector('[data-testid="first-win-signup-sheet"]')).not.toBeNull();
     expect(mockUseOAuthSignIn).toHaveBeenCalledWith(
       expect.objectContaining({ analyticsSource: 'first_win_sheet' })
     );
@@ -119,15 +122,20 @@ describe('FirstWinSignupModal — surface contract (t_da22db9a)', () => {
     );
   });
 
-  it('sheet stacking context sits above the z-90 results-dialog overlay (source shape)', () => {
-    // Regression shape: the sheet used `z-50` and rendered UNDER the z-90
-    // results overlay — invisible chrome whose buttons can never be tapped
-    // (PostHog 14d: 0/117 mp/first-win sheet conversions).
+  it('sheet stacking context: portaled above results chrome (source shape, #1051)', () => {
+    // Regression shape: the sheet used in-tree `z-50` and lost the stacking
+    // contest to sticky results CTAs / the z-90 results overlay — invisible
+    // chrome whose buttons can never be tapped (PostHog 14d: 0/117 mp/first-win
+    // sheet conversions). #1051 portaled it to body at z-[120] with a
+    // sticky-CTA clearance offset; this pins that shape so it can't silently
+    // regress back under results chrome.
     const src = readFileSync(
       join(__dirname, '..', 'FirstWinSignupModal.tsx'),
       'utf8'
     );
-    expect(src).toContain('z-[95]');
+    expect(src).toContain('createPortal');
+    expect(src).toContain('z-[120]');
+    expect(src).toContain('--results-sticky-cta-h');
     expect(src).not.toContain('bottom-3 z-50');
   });
 });
