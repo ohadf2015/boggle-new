@@ -71,7 +71,7 @@ export function useDynamicDifficulty(gameMode: string): UseDynamicDifficultyRetu
       if (!user?.id || !supabase) return;
 
       try {
-        const { data, error } = await supabase.rpc('update_difficulty_after_game', {
+        const { data, error } = await supabase!.rpc('update_difficulty_after_game', {
           p_user_id: user.id,
           p_game_mode: gameModeRef.current,
           p_won: won,

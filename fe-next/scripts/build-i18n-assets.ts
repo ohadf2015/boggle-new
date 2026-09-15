@@ -31,6 +31,8 @@ import {
   fingerprintSources,
   SOURCES_KEY,
 } from '../lib/i18n/i18nAssetFreshness';
+import { pickLandingMessages } from '../lib/i18n/pickLandingMessages';
+import { LANDING_NAMESPACES, LANDING_EXTRA_KEYS } from '../lib/i18n/landingNamespaces';
 
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -60,6 +62,7 @@ mkdirSync(path.dirname(MANIFEST), { recursive: true });
 const SOURCE_FILES = [
   ...LOCALES.map((lang) => path.join(ROOT, 'translations', `${lang}.js`)),
   path.join(ROOT, 'i18n', 'normalizeMessages.ts'),
+  path.join(ROOT, 'lib', 'i18n', 'landingNamespaces.ts'),
 ];
 const SOURCES_FINGERPRINT = fingerprintSources(
   SOURCE_FILES.map((file) => readFileSync(file, 'utf8')),
@@ -94,7 +97,8 @@ for (const lang of LOCALES) {
 
   // Normalised at build time — doing it per page load burns main-thread CPU for
   // a result that is byte-identical every time.
-  const json = JSON.stringify(normalizeMessages(raw));
+  const normalized = normalizeMessages(raw);
+  const json = JSON.stringify(normalized);
   const hash = createHash('sha256').update(json).digest('hex').slice(0, 8);
   const file = `${lang}.${hash}.js`;
 
@@ -120,6 +124,26 @@ for (const lang of LOCALES) {
     `  i18n ${lang} → ${file} (${(json.length / 1024).toFixed(0)}kB${
       brotli ? `, br ${(brotli.length / 1024).toFixed(0)}kB` : ', br skipped'
     })\n`,
+  );
+
+  const landing = pickLandingMessages(normalized, LANDING_NAMESPACES, LANDING_EXTRA_KEYS);
+  const landingJson = JSON.stringify(landing);
+  const landingHash = createHash('sha256').update(landingJson).digest('hex').slice(0, 8);
+  const landingFile = `${lang}.landing.${landingHash}.js`;
+  const landingSource = `globalThis.${GLOBAL}=Object.assign(globalThis.${GLOBAL}||{},{${JSON.stringify(lang)}:${landingJson}});\n`;
+  writeFileSync(path.join(OUT_DIR, landingFile), landingSource);
+  const landingBrotli = SKIP_BROTLI
+    ? null
+    : brotliCompressSync(Buffer.from(landingSource), {
+        params: {
+          [zlibConstants.BROTLI_PARAM_QUALITY]: 11,
+          [zlibConstants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(landingSource),
+        },
+      });
+  if (landingBrotli) writeFileSync(path.join(OUT_DIR, `${landingFile}.br`), landingBrotli);
+  manifest[`${lang}Landing`] = `/i18n/${landingFile}`;
+  process.stdout.write(
+    `  i18n ${lang} landing → ${landingFile} (${(landingJson.length / 1024).toFixed(0)}kB)\n`,
   );
 }
 

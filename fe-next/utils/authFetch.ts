@@ -20,7 +20,7 @@
  * @returns Fetch Response
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase, ensureSupabase, hasLikelySupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 interface FetchWithAuthOptions extends RequestInit {
@@ -45,14 +45,21 @@ export async function fetchWithAuth(
   url: string,
   options: FetchWithAuthOptions = {}
 ): Promise<Response> {
-  if (!supabase) {
+  if (!hasLikelySupabaseSession() && !supabase) {
+    if (options.requireSession) {
+      return new Response(null, { status: 401, statusText: 'Unauthorized' });
+    }
+    return fetch(url, options);
+  }
+  const client = await ensureSupabase();
+  if (!client) {
     // Downgraded warn → debug: expected on public pages with no Supabase env.
     logger.debug('Supabase not configured - making unauthenticated request');
     return fetch(url, options);
   }
 
   // Get current session token
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  const { data: { session }, error: sessionError } = await client.auth.getSession();
 
   if (sessionError || !session?.access_token) {
     if (options.requireSession) {
@@ -85,7 +92,7 @@ export async function fetchWithAuth(
   logger.log('401 detected, attempting token refresh');
 
   try {
-    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+    const { data: refreshData, error: refreshError } = await client.auth.refreshSession();
 
     if (refreshError || !refreshData.session?.access_token) {
       logger.debug('Token refresh failed:', refreshError?.message || 'No session');

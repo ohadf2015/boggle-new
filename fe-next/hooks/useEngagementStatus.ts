@@ -116,10 +116,10 @@ export function useEngagementStatus(): EngagementStatusData {
       // the code below already handles: every read is `?? 0`, so a missing row is expected,
       // not exceptional. `maybeSingle()` returns `{ data: null, error: null }` instead.
       const [engagementRes, profileRes] = await Promise.all([
-        supabase.from('player_engagement')
+        supabase!.from('player_engagement')
           .select('current_streak, longest_streak, streak_freezes_available, games_today')
           .eq('player_id', playerId).maybeSingle(),
-        supabase.from('profiles')
+        supabase!.from('profiles')
           .select('total_xp, current_level, total_coins')
           .eq('id', playerId).maybeSingle(),
       ]);

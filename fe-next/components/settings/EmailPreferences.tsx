@@ -52,7 +52,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
       }
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase!.auth.getSession();
         if (!session?.access_token) {
           setIsLoading(false);
           return;
@@ -96,7 +96,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
     setIsSaving(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase!.auth.getSession();
       if (!session?.access_token) {
         toast.error(t('error.notAuthenticated'));
         return;

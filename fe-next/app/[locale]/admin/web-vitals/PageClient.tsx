@@ -174,7 +174,7 @@ export default function WebVitalsPageClient() {
       return;
     }
 
-    const { data, error } = await supabase.rpc('get_web_vitals_stats', {
+    const { data, error } = await supabase!.rpc('get_web_vitals_stats', {
       time_range_minutes: timeRange === '1h' ? 60 : timeRange === '24h' ? 1440 : timeRange === '7d' ? 10080 : 43200
     });
 

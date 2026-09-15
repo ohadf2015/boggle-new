@@ -58,7 +58,7 @@ export async function performMobileOAuth(
   try {
     logger.log(`[MobileOAuth] Starting ${provider} OAuth with redirect: ${redirectTo}`);
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase!.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo,

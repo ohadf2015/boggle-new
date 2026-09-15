@@ -1,7 +1,7 @@
 /**
  * Reusable, side-effect-free regexes for Sentry `ignoreErrors`.
  *
- * Kept out of `sentry.client.config.ts` (which runs `Sentry.init()` on import)
+ * Kept out of `lib/sentry/clientInit.ts` (which runs `Sentry.init()` on import)
  * so the patterns can be unit-tested in isolation.
  */
 

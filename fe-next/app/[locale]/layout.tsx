@@ -4,33 +4,15 @@ import nextDynamic from 'next/dynamic';
 import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
 import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
+import { isLandingPath, PATHNAME_HEADER } from '@/lib/i18n/isLandingPath';
 import { HREFLANG_LOCALES } from '@/lib/seo/hreflang';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
-import InGameAudioButton from '@/components/InGameAudioButton';
-import GoogleConsentMode from '@/components/GoogleConsentMode';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
-import AdSenseLoader from '@/components/ads/AdSenseLoader';
-import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
-import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
-import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
-import WebVitalsReporter from '@/components/WebVitalsReporter';
-import PagePresenceReporter from '@/components/PagePresenceReporter';
-import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
-// Eager (not nextDynamic): a lazily-loaded recovery component could itself be
-// the stale chunk that 404s, defeating its purpose.
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import ChunkErrorBoundary from '@/components/ChunkErrorBoundary';
-import AnimationsLoader from '@/components/AnimationsLoader';
 import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
-import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
-import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
-import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
-import NativePGSInitializer from '@/components/NativePGSInitializer';
-import { OfflineBanner } from '@/components/offline/OfflineBanner';
-import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
@@ -46,10 +28,7 @@ import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
 // layout's own entry chunk — 175kB raw / 58kB gz on every route. `ssr: false`
 // actually splits them out but is rejected inside a Server Component, so they
 // moved to a client wrapper. See components/DeferredLayoutWidgets.tsx.
-const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLayoutWidgets'), {
-  loading: () => null,
-});
-const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixels'), {
+const LocaleDeferredChrome = nextDynamic(() => import('@/components/LocaleDeferredChrome'), {
   loading: () => null,
 });
 
@@ -273,6 +252,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     // Server-side rendering still reads the catalogue directly (loadTranslation's
     // require() path), so the SSR'd text is unchanged.
     const messagesSrc = MESSAGES_MANIFEST[validLocale] ?? MESSAGES_MANIFEST.en;
+    const landingMessagesSrc =
+        MESSAGES_MANIFEST[`${validLocale}Landing`] ?? messagesSrc;
+    const isLanding = isLandingPath(headerList.get(PATHNAME_HEADER) || '');
 
     // IMPORTANT: The theme script below modifies the DOM before React hydration
     // To prevent hydration mismatches, we need to ensure the server-rendered className
@@ -604,8 +586,17 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     async runtime chunks in the served HTML, so hydration can
                     win the race. next/script beforeInteractive is injected into
                     the initial HTML ahead of the Next runtime on purpose. */}
-                <link rel="preload" as="script" href={messagesSrc} />
-                <Script id="lexi-i18n-messages" src={messagesSrc} strategy="beforeInteractive" />
+                {isLanding ? (
+                    <>
+                        <link rel="preload" as="script" href={landingMessagesSrc} />
+                        <Script id="lexi-i18n-messages-landing" src={landingMessagesSrc} strategy="beforeInteractive" />
+                    </>
+                ) : (
+                    <>
+                        <link rel="preload" as="script" href={messagesSrc} />
+                        <Script id="lexi-i18n-messages" src={messagesSrc} strategy="beforeInteractive" />
+                    </>
+                )}
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://www.lexiclash.live" />
@@ -697,10 +688,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
-                {/* CrazyGames SDK — loaded with lazyOnload strategy (non-blocking).
-                    Render position in <head> is vestigial (next/script injects at
-                    the document body regardless of tree position). */}
-                <CrazyGamesScriptServer />
                 {/* CLS guard: prime --admob-banner-height and --bottom-nav-height
                     from localStorage BEFORE first paint.
                     Static string literal, no user input. */}
@@ -711,11 +698,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
-        {/* GA4 G-7VLG16BJQH — deferred to lazyOnload so it never competes with
-            the hero/LCP paint. Google Consent Mode v2 defaults are already set
-            above, so tags respect the stored consent decision when this fires. */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" strategy="lazyOnload" />
-        <Script id="ga4-init" strategy="lazyOnload">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
+                {!isLanding && (
+                    <>
+                        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7VLG16BJQH" strategy="lazyOnload" />
+                        <Script id="ga4-init" strategy="lazyOnload">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7VLG16BJQH');`}</Script>
+                    </>
+                )}
                 {/* Dark-only theme — static string literal, no user input, safe from XSS */}
                 <script
                     dangerouslySetInnerHTML={{
@@ -730,30 +718,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 >
                     {translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 </a>
-                {/* Google Consent Mode v2 — MUST load before GA */}
-                <GoogleConsentMode />
-                {/* Load external scripts with optimized strategies to prevent blocking */}
-                <GoogleAnalytics />
-                {/* Direct AdSense (web Auto-Ads) — replaces PurpleAds. Dark until
-                    NEXT_PUBLIC_ADSENSE_ENABLED=true; consent/tier/web gated internally. */}
-                <AdSenseLoader />
-                {/* Web anchor-ad height observer — measures AdSense anchor ad band
-                    and publishes --web-anchor-ad-height for CLS prevention. */}
-                <WebAnchorAdObserver />
-                <SocialMediaPixels />
-                <WebVitalsReporter />
-                {/* Report current page so admin live monitor sees users not in a game */}
-                <PagePresenceReporter />
-                <ServiceWorkerRegistration />
-                {/* Defer loading animations.css (60KB) after page mount */}
-                <AnimationsLoader />
-                {/* Warm client dict Set on idle so first word submit skips ~100-300ms fetch */}
-                <DictionaryPrewarmer lang={validLocale as Language} />
-                {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
-                {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
-                <NativeOAuthInitializer />
-                {/* Warm the Android-only Play Games Services bridge on mobile */}
-                <NativePGSInitializer />
                 {/* Server-rendered legal navigation — guarantees crawlers find
                     privacy/terms/about links even without JS execution */}
                 <nav aria-label="Site Navigation" className="sr-only">
@@ -769,16 +733,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     </ul>
                 </nav>
                 <ConditionalProviders lang={validLocale}>
-                    {/* Pin every new route to the top of the page — the app's scroll
-                        container is <body class="screen-fit">, so without this a stale
-                        offset (or a child's mount-time auto-scroll) can open a page at
-                        the footer. */}
                     <ScrollToTopOnNavigate />
-                    {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries
-                        (prefetch / asset onerror / next/dynamic import rejections). */}
                     <ChunkErrorRecovery />
-                    <OfflineBanner />
-                    <OfflineSyncBridge />
                     <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
                         <main
                             id="main-content"
@@ -786,29 +742,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             tabIndex={-1}
                         >
                             <div className="flex-1 flex flex-col min-h-0">
-                                {/* Catch render-time ChunkLoadError that never become window events
-                                    (t_9cc3561f — extend #979 beyond CDN document bust alone). */}
                                 <ChunkErrorBoundary>{children}</ChunkErrorBoundary>
                             </div>
                         </main>
                         <AutoHideFooter className="relative z-0 shrink-0" />
-                        {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
-                        {/* Global mute control — appears only during active gameplay, when
-                            the header (and its MusicControls) is hidden. */}
-                        <InGameAudioButton />
                     </div>
-                    {/* Install prompts, cookie banner, version checker, churn tracker
-                        and the seasonal countdown — all post-hydration only, all
-                        ssr:false so they stay out of this layout's entry chunk. */}
-                    <DeferredLayoutWidgets />
-                    {/* Single feedback entry point: feedback.devtools shared widget —
-                        neo-brutalist launcher, posts via same-origin /api/v1/feedback
-                        proxy to the shared ingest API */}
-                    <FeedbackDevtoolsWidget />
-                    {/* Google One Tap (web) — in-page ID-token sign-in so Google's
-                        consent shows our domain, not <ref>.supabase.co. No redirect. */}
-                    <GoogleOneTapInitializer />
+                    {!isLanding && <LocaleDeferredChrome lang={validLocale as Language} />}
                 </ConditionalProviders>
             </body>
         </html>

@@ -28,7 +28,7 @@ const NOISE_VALUE_PATTERNS: RegExp[] = [
   /Unable to convert color/i,
   // JSON-LD @context TypeError from browser extensions (SEO analyzers, schema
   // validators). Not first-party code — no application code calls .toLowerCase()
-  // on @context. Mirrors the same suppression in sentry.client.config.ts.
+  // on @context. Mirrors the same suppression in lib/sentry/clientInit.ts.
   /\["@context"\]\.toLowerCase/i,
 ];
 

@@ -1,4 +1,3 @@
-import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
@@ -14,18 +13,47 @@ if (!supabaseUrl || !supabaseAnonKey) {
   logger.warn('Supabase credentials not configured. Auth features will be disabled.');
 }
 
-// Browser client using @supabase/ssr for proper cookie-based session handling
-// CRITICAL: detectSessionInUrl must be false to prevent race condition in auth callback
-// When true (default), Supabase auto-detects and exchanges the auth code in background,
-// which races with our manual exchangeCodeForSession() call in the callback page.
-export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
-  ? createBrowserClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        detectSessionInUrl: false,
-        flowType: 'pkce'
-      }
-    })
-  : null;
+/**
+ * Lazy browser client. `@supabase/ssr` is ~224KB of eval (webpack chunk 69263)
+ * and used to ride on every `/en` first paint via Auth + landing hooks.
+ * Keep this module free of a static `@supabase/ssr` import so landing can
+ * parse without pulling the SDK; call `ensureSupabase()` from auth/effects.
+ */
+let supabaseClient: SupabaseClient | null = null;
+// Call-site compatible type: runtime stays null until ensureSupabase().
+// Exported `let … | null` does not narrow in other modules and breaks `next build`.
+export let supabase = null as unknown as SupabaseClient;
+let supabaseLoad: Promise<SupabaseClient | null> | null = null;
+
+export async function ensureSupabase(): Promise<SupabaseClient | null> {
+  if (supabaseClient) return supabaseClient;
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+  if (!supabaseLoad) {
+    supabaseLoad = import(
+      /* webpackChunkName: "supabase-ssr" */ '@supabase/ssr'
+    ).then(({ createBrowserClient }) => {
+      // CRITICAL: detectSessionInUrl must be false to prevent race condition
+      // in auth callback. When true (default), Supabase auto-detects and
+      // exchanges the auth code in background, which races with our manual
+      // exchangeCodeForSession() call in the callback page.
+      supabaseClient = createBrowserClient(supabaseUrl as string, supabaseAnonKey as string, {
+        auth: {
+          detectSessionInUrl: false,
+          flowType: 'pkce' as const,
+        },
+      });
+      supabase = supabaseClient;
+      return supabaseClient;
+    });
+  }
+  return supabaseLoad;
+}
+
+/** Cheap cookie sniff so guest first-paint never loads @supabase/ssr. */
+export function hasLikelySupabaseSession(): boolean {
+  if (typeof document === 'undefined') return false;
+  return document.cookie.includes('sb-') && document.cookie.includes('auth-token');
+}
 
 // Helper to get the current locale from the URL path
 function getCurrentLocale(): string | null {
@@ -207,13 +235,15 @@ export async function signOut() {
 }
 
 export async function getSession() {
-  if (!supabase) return { data: { session: null } };
-  return supabase.auth.getSession();
+  const client = await ensureSupabase();
+  if (!client) return { data: { session: null } };
+  return client.auth.getSession();
 }
 
 export async function getUser() {
-  if (!supabase) return { data: { user: null } };
-  return supabase.auth.getUser();
+  const client = await ensureSupabase();
+  if (!client) return { data: { user: null } };
+  return client.auth.getUser();
 }
 
 // Profile helpers
@@ -354,7 +384,8 @@ export async function getRankedProgress(userId: string): Promise<RankedProgressR
 }
 
 export async function isSupabaseConfigured(): Promise<boolean> {
-  return !!supabase;
+  const client = await ensureSupabase();
+  return !!client;
 }
 
 

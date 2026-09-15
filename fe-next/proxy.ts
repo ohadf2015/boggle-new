@@ -81,9 +81,7 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  let response = NextResponse.next({
-    request,
-  });
+  let response = continueRequest(request);
 
   if (needsAuth && !isBot && supabaseUrl && supabaseAnonKey) {
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -100,9 +98,7 @@ export async function proxy(request: NextRequest) {
           // 2. Recreate the response with the updated request — this is
           //    critical because the original response captured the old
           //    headers before the token refresh.
-          response = NextResponse.next({
-            request,
-          });
+          response = continueRequest(request);
           // 3. Set cookies on the response so the browser persists the
           //    new tokens for subsequent requests.
           cookiesToSet.forEach(({ name, value, options }) => {
@@ -157,6 +153,14 @@ export async function proxy(request: NextRequest) {
   // This allows CrazyGames and other game portals to embed our game in iframes
 
   return response;
+}
+
+function continueRequest(request: NextRequest): NextResponse {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-lc-pathname', request.nextUrl.pathname);
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 }
 
 /**

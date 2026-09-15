@@ -602,7 +602,7 @@ export function MusicProviderStub({ children }: { children: React.ReactNode }): 
 export function useMusic(): MusicContextType {
   const context = useContext(MusicContext);
   if (!context) {
-    throw new Error('useMusic must be used within a MusicProvider');
+    return stubValue;
   }
   return context;
 }
