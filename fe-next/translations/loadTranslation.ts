@@ -11,6 +11,7 @@
 
 import type { Language } from '@/types';
 import { normalizeMessages } from '@/i18n/normalizeMessages';
+import { isPartialCatalogue } from '@/lib/i18n/isPartialCatalogue';
 
 // Translation data type — the shape of each language file
 export type TranslationData = Record<string, unknown>;
@@ -43,11 +44,12 @@ function readGlobalMessages(lang: Language): TranslationData | undefined {
  */
 export async function loadTranslation(lang: Language): Promise<TranslationData> {
   const cached = cache.get(lang);
-  if (cached) return cached;
+  if (cached && !isPartialCatalogue(cached)) return cached;
 
-  // Already in the page courtesy of the <head> asset — skip the network entirely.
+  // Full catalogue already in the page — skip the network. A *partial*
+  // landing catalogue must not short-circuit; we still import the rest.
   const fromGlobal = readGlobalMessages(lang);
-  if (fromGlobal) {
+  if (fromGlobal && !isPartialCatalogue(fromGlobal)) {
     cache.set(lang, fromGlobal);
     return fromGlobal;
   }
@@ -89,11 +91,15 @@ export async function loadTranslation(lang: Language): Promise<TranslationData> 
  * Returns undefined only if loading fails.
  */
 export function getCachedTranslation(lang: Language): TranslationData | undefined {
+  const fromGlobal = readGlobalMessages(lang);
+  if (fromGlobal && !isPartialCatalogue(fromGlobal)) {
+    cache.set(lang, fromGlobal);
+    return fromGlobal;
+  }
+
   const cached = cache.get(lang);
   if (cached) return cached;
 
-  // The <head> asset runs before hydration, so this is the browser's fast path.
-  const fromGlobal = readGlobalMessages(lang);
   if (fromGlobal) {
     cache.set(lang, fromGlobal);
     return fromGlobal;

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { locales, defaultLocale } from '../lib/i18n';
 import { matchLanguageList } from '../lib/localeResolution';
 import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
+import { isPartialCatalogue } from '@/lib/i18n/isPartialCatalogue';
 import logger from '@/utils/logger';
 import { trackTelemetryEvent } from '@/utils/sentry';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
@@ -138,12 +139,45 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
     // Load translations when language changes or on first mount when no initialTranslations
     useEffect(() => {
         const cached = getCachedTranslation(language);
-        if (cached) {
+        if (cached && !isPartialCatalogue(cached)) {
             if (cached !== currentTranslations) {
                 setCurrentTranslations(cached);
                 setTranslationsReady(true);
             }
-            return;
+            return undefined;
+        }
+        if (cached && isPartialCatalogue(cached)) {
+            if (cached !== currentTranslations) {
+                setCurrentTranslations(cached);
+                setTranslationsReady(true);
+            }
+            let cancelled = false;
+            const upgrade = () => {
+                loadTranslation(language).then((data) => {
+                    if (cancelled) return;
+                    setCurrentTranslations(data);
+                    setTranslationsReady(true);
+                }).catch((err) => {
+                    logger.warn(`Failed to load translations for ${language}:`, err);
+                });
+            };
+            const onInteract = () => upgrade();
+            window.addEventListener('pointerdown', onInteract, { once: true });
+            window.addEventListener('keydown', onInteract, { once: true });
+            const idleId =
+                typeof window.requestIdleCallback === 'function'
+                    ? window.requestIdleCallback(() => upgrade(), { timeout: 4000 })
+                    : null;
+            const timeoutId = idleId === null ? window.setTimeout(upgrade, 4000) : null;
+            return () => {
+                cancelled = true;
+                window.removeEventListener('pointerdown', onInteract);
+                window.removeEventListener('keydown', onInteract);
+                if (idleId !== null && typeof window.cancelIdleCallback === 'function') {
+                    window.cancelIdleCallback(idleId);
+                }
+                if (timeoutId !== null) window.clearTimeout(timeoutId);
+            };
         }
         setTranslationsReady(false);
         // Async load for language switch (or first mount without initialTranslations)
@@ -153,6 +187,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         }).catch((err) => {
             logger.warn(`Failed to load translations for ${language}:`, err);
         });
+        return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [language]);
 

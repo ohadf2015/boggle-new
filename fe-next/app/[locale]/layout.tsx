@@ -4,6 +4,7 @@ import nextDynamic from 'next/dynamic';
 import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
 import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
+import { isLandingPath, PATHNAME_HEADER } from '@/lib/i18n/isLandingPath';
 import { HREFLANG_LOCALES } from '@/lib/seo/hreflang';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
@@ -273,6 +274,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     // Server-side rendering still reads the catalogue directly (loadTranslation's
     // require() path), so the SSR'd text is unchanged.
     const messagesSrc = MESSAGES_MANIFEST[validLocale] ?? MESSAGES_MANIFEST.en;
+    const landingMessagesSrc =
+        MESSAGES_MANIFEST[`${validLocale}Landing`] ?? messagesSrc;
+    const isLanding = isLandingPath(headerList.get(PATHNAME_HEADER) || '');
 
     // IMPORTANT: The theme script below modifies the DOM before React hydration
     // To prevent hydration mismatches, we need to ensure the server-rendered className
@@ -604,8 +608,17 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     async runtime chunks in the served HTML, so hydration can
                     win the race. next/script beforeInteractive is injected into
                     the initial HTML ahead of the Next runtime on purpose. */}
-                <link rel="preload" as="script" href={messagesSrc} />
-                <Script id="lexi-i18n-messages" src={messagesSrc} strategy="beforeInteractive" />
+                {isLanding ? (
+                    <>
+                        <link rel="preload" as="script" href={landingMessagesSrc} />
+                        <Script id="lexi-i18n-messages-landing" src={landingMessagesSrc} strategy="beforeInteractive" />
+                    </>
+                ) : (
+                    <>
+                        <link rel="preload" as="script" href={messagesSrc} />
+                        <Script id="lexi-i18n-messages" src={messagesSrc} strategy="beforeInteractive" />
+                    </>
+                )}
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://www.lexiclash.live" />
