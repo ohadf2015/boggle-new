@@ -66,8 +66,11 @@ export function HomeHub({
 }: HomeHubProps) {
   const { t } = useLanguage();
 
+  // min-h-[28rem] reserves the mobile arcade hub's first-paint height.
+  // Lighthouse CLS 0.13 vs bar 0.016 was this one node:
+  // `div.flex-1 > div.flex > section.w-full > div.flex` (HomeHub root).
   return (
-    <div className={cn('flex w-full flex-col gap-[18px] px-1.5 pt-1', className)}>
+    <div className={cn('flex w-full min-h-[28rem] flex-col gap-[18px] px-1.5 pt-1', className)}>
       <HomeTopBar
         profile={profile}
         streak={dailyChallengeStats.currentStreak}

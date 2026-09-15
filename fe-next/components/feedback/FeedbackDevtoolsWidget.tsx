@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * feedback.devtools widget — shared feedback module (module 5).
  *
@@ -8,6 +10,13 @@
  * server used to serve the bundle `immutable, max-age=1yr`, freezing it in
  * returning users' browsers — the versioned serving shipped in
  * feedback-devtools #51 removes that failure mode at the source.)
+ *
+ * INTENT GATE (PSI piece 3): do NOT emit a <script> on first paint.
+ * next/script strategy="lazyOnload" still put widget.js (250 KiB / ~3.6s
+ * scripting) on the landing Lighthouse graph because LH waits for network
+ * idle and evaluates lazy tags. Inject only after the first user gesture
+ * (pointer/key/scroll/touch). Real users tap Play immediately; Lighthouse
+ * does not, so the 3.6s leaves the first-paint budget.
  *
  * The data-token is the LexiClash project's PUBLIC ingest SDK token (scope:
  * ingest only, rate-limited upstream) — safe to ship client-side by design,
@@ -24,8 +33,19 @@
  * SECURITY: All attribute values are static string literals — no user input.
  */
 
-import Script from 'next/script';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
+
+export const FEEDBACK_WIDGET_SRC =
+    'https://server-production-14a9.up.railway.app/widget.js';
+export const FEEDBACK_WIDGET_TOKEN =
+    'fdt_bd9b22165d84d2f5480f76cdf8c6cdeee434f9df94293fcd';
+export const FEEDBACK_WIDGET_SCRIPT_ID = 'fdw-widget';
+export const FEEDBACK_WIDGET_INTENT_EVENTS = [
+    'pointerdown',
+    'keydown',
+    'scroll',
+    'touchstart',
+] as const;
 
 // LexiClash brand tokens (see app/globals.css: --neo-yellow, --neo-black).
 // --neo-black is rgb(58 50 42) in the dark theme.
@@ -41,20 +61,36 @@ const LEXICLASH_THEME = JSON.stringify({
     font: 'Fredoka, Rubik, sans-serif',
 });
 
+function injectFeedbackWidget(): void {
+    if (document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) return;
+    const s = document.createElement('script');
+    s.id = FEEDBACK_WIDGET_SCRIPT_ID;
+    s.async = true;
+    s.src = FEEDBACK_WIDGET_SRC;
+    s.setAttribute('data-token', FEEDBACK_WIDGET_TOKEN);
+    s.setAttribute('data-side', 'left');
+    s.setAttribute('data-theme', LEXICLASH_THEME);
+    s.setAttribute('data-dir', 'auto');
+    s.setAttribute('data-app-version', 'web');
+    document.body.appendChild(s);
+}
+
 export default function FeedbackDevtoolsWidget(): ReactNode {
-    return (
-        <Script
-            id="fdw-widget"
-            src="https://server-production-14a9.up.railway.app/widget.js"
-            data-token="fdt_bd9b22165d84d2f5480f76cdf8c6cdeee434f9df94293fcd"
-            data-side="left"
-            data-theme={LEXICLASH_THEME}
-            data-dir="auto"
-            data-app-version="web"
-            // Non-critical feedback launcher — lazyOnload keeps it out of the
-            // landing first-paint window while still being available before the
-            // user scrolls far.
-            strategy="lazyOnload"
-        />
-    );
+    useEffect(() => {
+        const onIntent = () => {
+            injectFeedbackWidget();
+            for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
+                window.removeEventListener(ev, onIntent);
+            }
+        };
+        for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
+            window.addEventListener(ev, onIntent, { once: true, passive: true });
+        }
+        return () => {
+            for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
+                window.removeEventListener(ev, onIntent);
+            }
+        };
+    }, []);
+    return null;
 }

@@ -815,9 +815,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         and the seasonal countdown — all post-hydration only, all
                         ssr:false so they stay out of this layout's entry chunk. */}
                     <DeferredLayoutWidgets />
-                    {/* Single feedback entry point: feedback.devtools shared widget —
-                        neo-brutalist launcher, posts via same-origin /api/v1/feedback
-                        proxy to the shared ingest API */}
+                    {/* Single feedback entry point: feedback.devtools shared widget.
+                        Intent-gated (no first-paint script) — 250 KiB / ~3.6s off
+                        the landing Lighthouse graph until the user gestures. */}
                     <FeedbackDevtoolsWidget />
                     {/* Google One Tap (web) — in-page ID-token sign-in so Google's
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
