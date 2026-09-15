@@ -33,6 +33,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { getStudentClassroomIds } from '@/lib/education/lessonAccess';
 import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -119,14 +120,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: memberships } = await admin
-      .from('classroom_memberships')
-      .select('classroom_id')
-      .eq('student_id', user.id);
-
-    const classroomIds = (memberships ?? [])
-      .map((m: { classroom_id: string | null }) => m.classroom_id)
-      .filter((id: string | null): id is string => !!id);
+    const classroomIds = await getStudentClassroomIds(admin, user.id);
 
     const assignments: AssignmentRow[] = classroomIds.length
       ? ((

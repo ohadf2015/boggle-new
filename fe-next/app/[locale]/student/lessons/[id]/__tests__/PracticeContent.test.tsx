@@ -138,4 +138,26 @@ describe('PracticeContent', () => {
     expect(await screen.findByTestId('stage')).toHaveAttribute('data-mode', 'blitz');
     expect(mockStartSession).toHaveBeenCalledWith('blitz', undefined);
   });
+
+  it('GIVEN the server refuses to start a session (e.g. 403) WHEN a mode is picked THEN the failure is surfaced, not swallowed', async () => {
+    mockStartSession.mockResolvedValueOnce({ success: false, error: 'Not authorized to practice this lesson' });
+    const user = userEvent.setup();
+    renderContent();
+
+    await user.click(screen.getByTestId('pick-spelling'));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('education.practice.startFailed');
+    // No broken round left on screen — back on the picker.
+    expect(screen.getByTestId('picker')).toBeInTheDocument();
+    expect(screen.queryByTestId('stage')).not.toBeInTheDocument();
+  });
+
+  it('GIVEN a deep link WHEN the server refuses to start it THEN the picker shows with the failure message', async () => {
+    mockStartSession.mockResolvedValueOnce({ success: false, error: 'Not authorized to practice this lesson' });
+    renderContent({ initialMode: 'blitz' });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('education.practice.startFailed');
+    expect(screen.getByTestId('picker')).toBeInTheDocument();
+    expect(screen.queryByTestId('stage')).not.toBeInTheDocument();
+  });
 });

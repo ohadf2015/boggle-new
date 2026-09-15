@@ -9,7 +9,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -105,6 +105,16 @@ export default function PracticeContent({
   // Set the moment a round finishes, cleared on every mode change. It is what
   // turns the round-end into a fork rather than a dead end.
   const [roundFinished, setRoundFinished] = useState(false);
+  // POST /api/education/practice can 403/500 (e.g. a classroom student the
+  // server doesn't yet recognise as a member). `startSession` already reports
+  // that as `{ success: false }` — this is what stops the failure from being
+  // swallowed silently, per the picker's dead-end problem.
+  const [startError, setStartError] = useState<string | null>(null);
+  // The `practice_sessions.id` the currently-open round started under. Set on
+  // every successful `startSession()` call, read by `finishRound` so
+  // completion can PATCH the same row completed_at/xp_awarded is written to —
+  // without it, nothing downstream had a session to complete.
+  const currentSessionIdRef = useRef<string | undefined>(undefined);
   /*
     `lessons.words` is jsonb and holds two shapes: objects from the lesson
     builder, plain strings from seeded/imported lists. Every practice mode reads
@@ -123,13 +133,23 @@ export default function PracticeContent({
     [practiceWords, lesson.language, progress]
   );
 
-  // Auto-start session if we have an initial mode from URL
+  // Auto-start session if we have an initial mode from URL. `selectedMode`
+  // already opened this mode optimistically (its initial state is
+  // `initialMode`); a failure here must walk that back to the picker instead
+  // of leaving a round on screen with no session behind it.
   useEffect(() => {
     if (initialMode && !hasInitialized) {
       setHasInitialized(true);
-      startSession(initialMode, initialFocus ? { focus: initialFocus } : undefined);
+      void startSession(initialMode, initialFocus ? { focus: initialFocus } : undefined).then((result) => {
+        if (!result.success) {
+          setStartError(t('education.practice.startFailed'));
+          setSelectedMode(null);
+        } else {
+          currentSessionIdRef.current = result.sessionId;
+        }
+      });
     }
-  }, [initialMode, initialFocus, hasInitialized, startSession]);
+  }, [initialMode, initialFocus, hasInitialized, startSession, t]);
 
   // Access XP context
   const {
@@ -162,10 +182,19 @@ export default function PracticeContent({
       what the round-end redesign exists to remove.
     */
     dismissLevelUp();
+    setStartError(null);
     // The variant is a client-side routing detail; the session still starts as
     // the practice type the database accepts.
-    await startSession(mode, options?.focus ? { focus: options.focus } : undefined);
-  }, [startSession, dismissLevelUp]);
+    const result = await startSession(mode, options?.focus ? { focus: options.focus } : undefined);
+    if (!result.success) {
+      // Don't leave the student staring at a round with no session behind
+      // it — back out to the picker and say so.
+      setStartError(t('education.practice.startFailed'));
+      setSelectedMode(null);
+    } else {
+      currentSessionIdRef.current = result.sessionId;
+    }
+  }, [startSession, dismissLevelUp, t]);
 
   // Handle back to mode selector
   const handleBack = useCallback(() => {
@@ -202,7 +231,7 @@ export default function PracticeContent({
     // ponytail: warmup / word_list are not persistable session types (the API union
     // has no row for them) — the guard also narrows `type` for the call below.
     if (type === 'warmup' || type === 'word_list') return;
-    await completePracticeSession({ type, ...payload });
+    await completePracticeSession({ type, sessionId: currentSessionIdRef.current, ...payload });
   }, [completePracticeSession, onGuestResult]);
 
   // XP session data for practice components
@@ -324,6 +353,14 @@ export default function PracticeContent({
         top of the phone on the first flick.
       */}
       <div className="flex h-full min-h-0 w-full max-w-4xl flex-col mx-auto">
+        {startError && (
+          <div
+            role="alert"
+            className="mb-2 shrink-0 rounded-lg border-2 border-neo-pink bg-neo-pink/10 px-3 py-2 text-sm font-medium text-neo-pink"
+          >
+            {startError}
+          </div>
+        )}
         {/* XP progress: one slim line. The "next level" preview is a second
             row of chrome on a screen whose job is showing games. */}
         <div className="mb-2 flex shrink-0 items-center gap-3">

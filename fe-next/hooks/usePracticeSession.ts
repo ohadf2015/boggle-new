@@ -156,7 +156,7 @@ interface UsePracticeProgressActions {
   startSession: (
     practiceType: PracticeType,
     options?: { focus?: VocabFocus }
-  ) => Promise<{ success: boolean; error?: string }>;
+  ) => Promise<{ success: boolean; sessionId?: string; error?: string }>;
 }
 
 export type UsePracticeProgressReturn = UsePracticeProgressState & UsePracticeProgressActions;
@@ -270,7 +270,7 @@ export function usePracticeProgress(
   const startSession = useCallback(async (
     practiceType: PracticeType,
     options?: { focus?: VocabFocus }
-  ): Promise<{ success: boolean; session?: PracticeSession; error?: string }> => {
+  ): Promise<{ success: boolean; sessionId?: string; error?: string }> => {
     if (!lessonId) {
       return { success: false, error: 'No lesson ID' };
     }
@@ -300,7 +300,7 @@ export function usePracticeProgress(
         return { success: false, error: error || 'Failed to start session' };
       }
 
-      return { success: true };
+      return { success: true, sessionId: session.id };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to start session';
       logger.error('Exception in startSession:', error);

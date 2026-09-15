@@ -57,10 +57,44 @@ vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: (...args: unknown[]) => mockCheckApiRateLimit(...args),
 }));
 
+// Lesson access (classroom membership, not lesson_assignments) is read with
+// the service-role client — RLS hides a classroom lesson from the student's
+// own session. See app/api/education/practice/lessons/route.ts.
+const mockAdmin = vi.fn();
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => mockAdmin(),
+}));
+
 import { NextRequest } from 'next/server';
 import { PATCH, POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import * as logger from '@/utils/logger';
+
+/**
+ * Minimal PostgREST double for the admin client, mirroring
+ * app/api/education/practice/lessons/__tests__/route.test.ts. Each table
+ * answers the one query shape the access check builds; an unexpected table
+ * throws rather than silently returning an empty list.
+ */
+function adminDouble(rows: Record<string, unknown[]>) {
+  return {
+    from(table: string) {
+      if (!(table in rows)) throw new Error(`unexpected table ${table}`);
+      const data = rows[table];
+      const builder: Record<string, unknown> = {};
+      for (const method of ['select', 'eq', 'in', 'limit']) {
+        builder[method] = () => builder;
+      }
+      builder.single = async () => ({
+        data: (data as unknown[])[0] ?? null,
+        error: (data as unknown[])[0] ? null : { code: 'PGRST116' },
+      });
+      builder.then = (resolve: (v: unknown) => unknown) =>
+        Promise.resolve({ data, error: null }).then(resolve);
+      return builder;
+    },
+  };
+}
 
 describe('PATCH /api/education/practice', () => {
   let mockSupabase: any;
@@ -433,5 +467,68 @@ describe('PATCH /api/education/practice', () => {
       const response = await POST(request);
       expect(response.status).toBe(429);
     });
+  });
+});
+
+describe('POST /api/education/practice — lesson access (classroom membership, not lesson_assignments)', () => {
+  const USER = '550e8400-e29b-41d4-a716-446655440002';
+  const LESSON = '550e8400-e29b-41d4-a716-446655440003';
+  const CLASSROOM = '550e8400-e29b-41d4-a716-446655440010';
+
+  function requestFor(lessonId: string) {
+    return new NextRequest('http://localhost/api/education/practice', {
+      method: 'POST',
+      body: JSON.stringify({ lessonId, practiceType: 'flashcard' }),
+    });
+  }
+
+  function mockServerClient() {
+    const insertMock = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: { id: 'session-1', practice_type: 'flashcard' }, error: null }),
+      }),
+    });
+    (createClient as any).mockResolvedValue({
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: USER } }, error: null }) },
+      from: vi.fn((table: string) => {
+        if (table === 'practice_sessions') return { insert: insertMock };
+        throw new Error(`server client should not read ${table} for the access check`);
+      }),
+    });
+    return insertMock;
+  }
+
+  beforeEach(() => {
+    mockCheckApiRateLimit.mockReturnValue({ success: true });
+  });
+
+  it('starts a session for a classroom member with NO lesson_assignments row', async () => {
+    mockServerClient();
+    mockAdmin.mockReturnValue(
+      adminDouble({
+        vocabulary_lessons: [{ teacher_id: 'teacher-1', classroom_id: CLASSROOM }],
+        classroom_memberships: [{ classroom_id: CLASSROOM }],
+      })
+    );
+
+    const response = await POST(requestFor(LESSON));
+    const body = await response.json();
+
+    expect(response.status).toBe(201);
+    expect(body.session).toBeDefined();
+  });
+
+  it('403s a student who is not a classroom member, has no assignment, and does not own the lesson', async () => {
+    mockServerClient();
+    mockAdmin.mockReturnValue(
+      adminDouble({
+        vocabulary_lessons: [{ teacher_id: 'teacher-1', classroom_id: CLASSROOM }],
+        classroom_memberships: [],
+      })
+    );
+
+    const response = await POST(requestFor(LESSON));
+
+    expect(response.status).toBe(403);
   });
 });
