@@ -712,7 +712,7 @@ const sentryConfig = withSentryConfig(nextConfig, {
       removeDebugLogging: true,
       // Strips browser tracing (browserTracingIntegration/startSpan/etc) from
       // the client bundle via __SENTRY_TRACING__=false. See tracesSampleRate
-      // note in sentry.client.config.ts — tracing was the top main-thread
+      // note in lib/sentry/clientInit.ts — tracing was the top main-thread
       // cost on the landing page. Error capture is unaffected.
       removeTracing: true,
     },

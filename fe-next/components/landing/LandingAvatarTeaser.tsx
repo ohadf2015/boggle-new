@@ -1,16 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
-import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useAuth } from '@/contexts/AuthContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+
+// The builder modal (category grids, color controls, premium part previews)
+// only exists once the user taps the teaser — keep it off the landing
+// first-paint graph.
+const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), {
+  ssr: false,
+});
 
 const SAMPLE_AVATARS: CustomAvatarConfig[] = [
   { gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18', eyes: 'star', mouth: 'grin', accessory: 'sunglasses', accessoryColor: '#000000', bgColor: '#FF6B35' },
