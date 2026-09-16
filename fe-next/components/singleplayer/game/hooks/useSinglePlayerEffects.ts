@@ -13,6 +13,8 @@ interface UseSinglePlayerEffectsOptions {
   score: number;
   language: string;
   mode: string;
+  /** Rides along on the single `game_started` this hook emits. */
+  difficulty?: string;
   isLandscape: boolean;
   isDesktop: boolean;
   isTv: boolean;
@@ -56,6 +58,7 @@ export function useSinglePlayerEffects({
   score,
   language,
   mode,
+  difficulty,
   isLandscape,
   isDesktop,
   isTv,
@@ -89,7 +92,17 @@ export function useSinglePlayerEffects({
   // Game start time + analytics
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
-    trackGameStart('singleplayer', { subMode: mode, boardSize: grid?.length ?? 0 });
+    // The ONLY `game_started` emitter for single player. SinglePlayerGame used to
+    // emit a second one on mount, so every SP game was counted twice (275 of 563
+    // prod starts in the week to 2026-09-16 were duplicates <500ms apart). This
+    // hook is the right home: Quick Play mounts useSinglePlayerCore without
+    // SinglePlayerGame, so emitting there would have missed it.
+    trackGameStart('singleplayer', {
+      subMode: mode,
+      boardSize: grid?.length ?? 0,
+      ...(difficulty ? { difficulty } : {}),
+      language,
+    });
     // Mount-only — one event per game instance; remount = new game.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
