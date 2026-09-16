@@ -5,6 +5,7 @@ import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canAddStudent } from '@/lib/subscriptions';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
+import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 
 const joinClassroomSchema = z.object({
   joinCode: z.string().min(1).max(10),
@@ -167,6 +168,29 @@ export async function POST(request: NextRequest) {
         { error: 'Classroom not found. Please check the code with your teacher.' },
         { status: 400 }
       );
+    }
+
+    // The OTHER direction of the same problem. Above resolves a projector code to
+    // its classroom; this resolves a classroom to its projector code.
+    //
+    // The teacher posts ONE code in Google Classroom and it is the PERMANENT roster
+    // code — the game code is minted per session and is only ever on the board. So
+    // the code most students actually hold was the one that did not lead to the
+    // game: they were enrolled, handed no `gameCode`, and `useJoinFlow` reads
+    // exactly that field to choose between the room and the student hub. A green
+    // "joined!" toast, a dashboard, and a class playing without them.
+    //
+    // Runs for BOTH the new student and the returning one — the "already a member"
+    // branch below returns early, and returning students are the majority of any
+    // second lesson.
+    if (!liveGameCode) {
+      try {
+        liveGameCode = await lookupLiveGameForClassroom(classroom.id);
+      } catch (liveGameError) {
+        // Enrolment is the thing that must not be lost. A student on the roster with
+        // no room can be walked in by the banner; a student refused outright cannot.
+        logger.error('Live game lookup failed for classroom during join:', liveGameError);
+      }
     }
 
     // Check if already a member
