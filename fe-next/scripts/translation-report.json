@@ -2025,14 +2025,14 @@
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 375,
+        "line": 361,
         "context": "{t(`education.vocabFocus.focus.${assignedFocus}`)}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 423,
+        "line": 409,
         "context": "{t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) }"
       },
       {
@@ -2165,7 +2165,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 626,
+        "line": 627,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -3311,7 +3311,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 306,
+        "line": 307,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3319,7 +3319,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 306,
+        "line": 307,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {

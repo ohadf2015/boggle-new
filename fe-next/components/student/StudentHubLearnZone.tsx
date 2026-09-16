@@ -15,6 +15,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
+import { usePracticeLessons } from '@/hooks/usePracticeLessons';
 import { useSpacedRepetition } from '@/hooks/useSpacedRepetition';
 import { useClassroomRewardListener } from '@/hooks/useClassroomRewardListener';
 import { ReviewDueBadge } from '@/components/education/ReviewDueBadge';
@@ -23,6 +24,7 @@ import { ChallengePanel } from '@/components/education/challenges/ChallengePanel
 import StudentLessonView from '@/components/student/StudentLessonView';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
 import { pickWordOfTheDay } from '@/lib/education/wordOfTheDay';
+import { mergeStudentLessons } from '@/lib/education/mergeLessons';
 
 interface StudentHubLearnZoneProps {
   userId: string;
@@ -42,9 +44,20 @@ export function StudentHubLearnZone({ userId, classroomId }: StudentHubLearnZone
     return () => clearTimeout(timer);
   }, [reward, clearReward]);
 
-  // Spaced repetition data
+  // Spaced repetition data. `useStudentProgress` alone only knows ASSIGNED
+  // lessons — a student with practisable-but-unassigned lessons and nothing
+  // assigned got lessonId='' and words=[] here, silently dropping the review
+  // badge and word of the day even though they have something to practise.
+  // Merge in `usePracticeLessons` (the wider "anything I can play" set) using
+  // the same rule StudentLessonView already uses, so this pick agrees with the
+  // lesson list rendered just below.
   const { lessons } = useStudentProgress();
-  const firstLesson = lessons.find(l => l.lesson?.words?.length);
+  const { lessons: practisableLessons } = usePracticeLessons();
+  const mergedLessons = useMemo(
+    () => mergeStudentLessons(lessons, practisableLessons),
+    [lessons, practisableLessons]
+  );
+  const firstLesson = mergedLessons.find(l => l.lesson?.words?.length);
   const lessonId = firstLesson?.lessonId ?? '';
   const words = useMemo(
     () => (firstLesson?.lesson?.words ?? []).map((w: { word: string }) => w.word),
