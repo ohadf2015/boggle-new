@@ -13331,10 +13331,18 @@ const ja = {
       },
       "export": {
         "pdf": "PDF出力",
-        "downloading": "ダウンロード中..."
+        "downloading": "ダウンロード中...",
+        "failed": "PDFを作成できませんでした。もう一度お試しください。",
+        "done": "ダウンロード完了",
+        "fileStudent": "{{name}} – 学習レポート",
+        "fileClass": "{{name}} – クラスレポート"
       },
-      "teacherLabel": "先生",
-      "generatedBy": "LexiClash で作成",
+      "teacherLine": "先生：{{name}}",
+      "generatedOn": "LexiClashで作成 · {{date}}",
+      "pageOf": "{{page}} / {{total}} ページ",
+      "masteredShare": "単語の{{percent}}%を習得",
+      "retry": "もう一度試す",
+      "noWordsYet": "まだ練習した単語はありません",
       "columns": {
         "rank": "順位",
         "student": "生徒",

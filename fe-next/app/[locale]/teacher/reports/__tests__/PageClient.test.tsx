@@ -238,4 +238,21 @@ describe('ReportsPageClient', () => {
       expect(classroomButtons.length).toBeGreaterThan(0);
     });
   });
+
+  describe('Browser history', () => {
+    it('follows the URL when the teacher presses browser Back', () => {
+      // GIVEN the student view opened from a URL
+      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('studentId', 'student-123');
+      const { rerender } = render(<ReportsPageClient />);
+      expect(screen.getByTestId('student-progress-report')).toBeInTheDocument();
+
+      // WHEN Back drops studentId from the URL
+      mockSearchParams.delete('studentId');
+      rerender(<ReportsPageClient />);
+
+      // THEN the class view shows — local state must not pin the old view
+      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
+    });
+  });
 });

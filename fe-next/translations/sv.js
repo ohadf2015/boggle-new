@@ -13565,10 +13565,18 @@ const sv = {
       },
       "export": {
         "pdf": "Exportera PDF",
-        "downloading": "Laddar ner..."
+        "downloading": "Laddar ner...",
+        "failed": "Det gick inte att skapa PDF:en. Försök igen.",
+        "done": "Nedladdad",
+        "fileStudent": "{{name}} – framstegsrapport",
+        "fileClass": "{{name}} – klassrapport"
       },
-      "teacherLabel": "Lärare",
-      "generatedBy": "Skapad av LexiClash",
+      "teacherLine": "Lärare: {{name}}",
+      "generatedOn": "Skapad av LexiClash · {{date}}",
+      "pageOf": "Sida {{page}} av {{total}}",
+      "masteredShare": "{{percent}} % av orden behärskas",
+      "retry": "Försök igen",
+      "noWordsYet": "Inga ord övade än",
       "columns": {
         "rank": "Placering",
         "student": "Elev",

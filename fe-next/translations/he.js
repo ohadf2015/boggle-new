@@ -13185,10 +13185,18 @@ const he = {
       },
       "export": {
         "pdf": "ייצוא PDF",
-        "downloading": "מוריד..."
+        "downloading": "מוריד...",
+        "failed": "לא הצלחנו ליצור את ה-PDF. נסו שוב.",
+        "done": "הקובץ הורד",
+        "fileStudent": "{{name}} – דוח התקדמות",
+        "fileClass": "{{name}} – דוח כיתה"
       },
-      "teacherLabel": "מורה",
-      "generatedBy": "הופק על ידי LexiClash",
+      "teacherLine": "מורה: {{name}}",
+      "generatedOn": "הופק ב-LexiClash · {{date}}",
+      "pageOf": "עמוד {{page}} מתוך {{total}}",
+      "masteredShare": "שליטה ב-{{percent}}% מהמילים",
+      "retry": "נסו שוב",
+      "noWordsYet": "עוד לא תורגלו מילים",
       "columns": {
         "rank": "דירוג",
         "student": "תלמיד/ה",

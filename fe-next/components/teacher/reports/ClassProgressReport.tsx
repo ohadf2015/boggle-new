@@ -1,25 +1,32 @@
 /**
  * ClassProgressReport - Class Progress Report View
  *
- * Displays class-wide progress metrics with top performers,
- * students needing attention, rankings, and PDF export capability.
+ * Class-wide progress: headline metrics, top performers, students needing
+ * attention and the full ranking, with PDF export. Every student name drills
+ * into that student's report.
  */
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  getClassReportData,
-  ClassReportData,
-  DateRange,
-} from '@/lib/supabase/analytics';
-import logger from '@/utils/logger';
+import { getClassReportData, DateRange } from '@/lib/supabase/analytics';
 import { Stat } from '@/components/ui/Stat';
-
-// =============================================
-// TYPE DEFINITIONS
-// =============================================
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { cn } from '@/lib/utils';
+import { downloadReportPdf } from './downloadReportPdf';
+import { ISSUE_LABEL_KEY } from './reportLabels';
+import {
+  AccuracyBar,
+  ReportEmpty,
+  ReportError,
+  ReportHeader,
+  ReportSkeleton,
+  SectionTitle,
+  useReportData,
+  useReportExport,
+} from './ReportChrome';
 
 export interface ClassProgressReportProps {
   classroomId: string;
@@ -27,329 +34,159 @@ export interface ClassProgressReportProps {
   onStudentClick?: (studentId: string) => void;
 }
 
-/**
- * The data layer emits machine codes (lib/supabase/analyticsReports.ts); the
- * badge copy lives in the locales, so a Hebrew parent evening never reads
- * "Low accuracy" off a Hebrew report. Keys are literals in this map so the
- * reportsI18n contract test can scan and resolve them.
- */
-const ISSUE_LABEL_KEY = {
-  low_accuracy: 'teacher.reports.issue.lowAccuracy',
-  inactive: 'teacher.reports.issue.inactive',
-} as const;
+/** Podium fills — accent fills take black ink only. */
+const PODIUM = ['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink'];
 
-// =============================================
-// COMPONENT
-// =============================================
+export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: ClassProgressReportProps) {
+  const { t, language, dir } = useLanguage();
 
-/**
- * ClassProgressReport - Class-wide progress view
- *
- * Fetches and displays class progress data with metrics,
- * top performers, students needing attention, rankings, and PDF export.
- */
-export function ClassProgressReport({
-  classroomId,
-  dateRange,
-  onStudentClick,
-}: ClassProgressReportProps) {
-  const { t } = useLanguage();
-  const [data, setData] = useState<ClassReportData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [exporting, setExporting] = useState(false);
+  const load = useCallback(() => getClassReportData(classroomId, dateRange), [classroomId, dateRange]);
+  const { data, loading, failed, retry } = useReportData(load);
 
-  // Fetch data on mount or when props change
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-
-      const result = await getClassReportData(classroomId, dateRange);
-
-      if (result.error) {
-        setError(result.error.message);
-      } else {
-        setData(result.data);
-      }
-
-      setLoading(false);
-    }
-
-    fetchData();
-  }, [classroomId, dateRange]);
-
-  // Handle PDF export
-  const handleExportPDF = useCallback(async () => {
+  const build = useCallback(async () => {
     if (!data) return;
-
-    setExporting(true);
-
-    try {
-      // Dynamically import PDF components to reduce initial bundle size
-      const [{ pdf }, { ProgressReportPDF }] = await Promise.all([
-        import('@react-pdf/renderer'),
-        import('./ProgressReportPDF'),
-      ]);
-
-      // Convert data to PDF format
-      const pdfData = {
-        type: 'class' as const,
+    await downloadReportPdf({
+      t,
+      language,
+      dir,
+      fileName: t('teacher.reports.export.fileClass', { name: data.classroomName }),
+      data: {
+        type: 'class',
         classroomName: data.classroomName,
         teacherName: data.teacherName,
         generatedAt: new Date(),
-        metrics: {
-          totalStudents: data.metrics.totalStudents,
-          activeStudents: data.metrics.activeStudents,
-          classAverageAccuracy: data.metrics.classAverageAccuracy,
-          classAverageWordsLearned: data.metrics.classAverageWordsLearned,
-          completionRate: data.metrics.completionRate,
-          participationRate: data.metrics.participationRate,
-        },
-        topPerformers: data.topPerformers.map((p) => ({
-          studentName: p.studentName,
-          accuracy: p.accuracy,
-          wordsLearned: p.wordsLearned,
+        metrics: { ...data.metrics },
+        topPerformers: data.topPerformers.map(({ studentName, accuracy, wordsLearned }) => ({ studentName, accuracy, wordsLearned })),
+        studentsNeedingAttention: data.studentsNeedingAttention.map(({ studentName, accuracy, issue }) => ({ studentName, accuracy, issue })),
+        studentRankings: data.studentRankings.map(({ rank, studentName, score, accuracy, wordsLearned }) => ({
+          rank,
+          studentName,
+          score,
+          accuracy,
+          wordsLearned,
         })),
-        studentRankings: data.studentRankings.map((s) => ({
-          rank: s.rank,
-          studentName: s.studentName,
-          score: s.score,
-          accuracy: s.accuracy,
-          wordsLearned: s.wordsLearned,
-        })),
-      };
+      },
+    });
+  }, [data, t, language, dir]);
+  const exporter = useReportExport(build);
 
-      // Generate PDF blob
-      const blob = await pdf(<ProgressReportPDF data={pdfData} />).toBlob();
+  if (loading) return <ReportSkeleton />;
+  if (failed) return <ReportError onRetry={retry} />;
+  if (!data) return <ReportEmpty />;
 
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${data.classroomName.replace(/\s+/g, '_')}_class_report.pdf`;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      logger.error('Error generating PDF:', err);
-    } finally {
-      setExporting(false);
-    }
-  }, [data]);
+  const { metrics } = data;
 
-  // Handle student click - just pass through to parent handler
-  const handleStudentClick = onStudentClick;
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-neo-gray animate-pulse">
-          {t('teacher.reports.loading')}
-        </div>
-      </div>
+  /** A student's name — a drill-down link when the page supports it. */
+  const studentName = (studentId: string, name: string, className?: string) =>
+    onStudentClick ? (
+      <button
+        type="button"
+        onClick={() => onStudentClick(studentId)}
+        aria-label={t('teacher.reports.viewStudentProgress', { name })}
+        className={cn(
+          'group inline-flex min-h-11 items-center gap-1 text-start font-bold text-neo-white underline-offset-4 transition-colors hover:text-neo-lime hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+          className
+        )}
+      >
+        <span className="break-words">{name}</span>
+        <DirectionalIcon
+          icon={ChevronRight}
+          className="size-4 shrink-0 opacity-40 transition-[opacity,transform] group-hover:translate-x-0.5 group-hover:opacity-100 rtl:group-hover:-translate-x-0.5"
+        />
+      </button>
+    ) : (
+      <span className={cn('font-bold text-neo-white', className)}>{name}</span>
     );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-neo-red">{t('teacher.reports.error')}</div>
-      </div>
-    );
-  }
-
-  // Empty state
-  if (!data) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-neo-gray">{t('teacher.reports.noData')}</div>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-neo-white font-neo-display">
-            {t('teacher.reports.classReport')}
-          </h1>
-          <p className="text-xl text-neo-white mt-1">{data.classroomName}</p>
-          <p className="text-neo-gray">{t('teacher.reports.teacherLabel')}: {data.teacherName}</p>
-        </div>
-        <button
-          type="button"
-          onClick={handleExportPDF}
-          disabled={exporting}
-          className="px-4 py-2 bg-neo-lime text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
-        >
-          {exporting
-            ? t('teacher.reports.export.downloading')
-            : t('teacher.reports.export.pdf')}
-        </button>
-      </div>
+    <div className="space-y-8">
+      <ReportHeader
+        title={t('teacher.reports.classReport')}
+        subject={data.classroomName}
+        meta={[t('teacher.reports.teacherLine', { name: data.teacherName })]}
+        exportState={exporter.state}
+        onExport={exporter.run}
+      />
 
-      {/* Class Metrics */}
-      <section>
-        <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-          {t('teacher.reports.sections.summary')}
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Stat
-            value={data.metrics.totalStudents}
-            label={t('teacher.reports.metrics.totalStudents')}
-            size="lg"
-            className="w-full"
-          />
-
-          <Stat
-            value={data.metrics.activeStudents}
-            label={t('teacher.reports.metrics.activeStudents')}
-            size="lg"
-            className="w-full"
-          />
-
-          <Stat
-            value={`${data.metrics.classAverageAccuracy}%`}
-            label={t('teacher.reports.metrics.classAverageAccuracy')}
-            size="lg"
-            className="w-full"
-          />
-
-          <Stat
-            value={`${data.metrics.completionRate}%`}
-            label={t('teacher.reports.metrics.completionRate')}
-            size="lg"
-            className="w-full"
-          />
-        </div>
+      <section aria-label={t('teacher.reports.sections.summary')} className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <Stat value={metrics.totalStudents} label={t('teacher.reports.metrics.totalStudents')} size="lg" className="w-full" />
+        <Stat value={metrics.activeStudents} label={t('teacher.reports.metrics.activeStudents')} size="lg" className="w-full" />
+        <Stat value={`${metrics.classAverageAccuracy}%`} label={t('teacher.reports.metrics.classAverageAccuracy')} size="lg" className="w-full" />
+        <Stat value={`${metrics.completionRate}%`} label={t('teacher.reports.metrics.completionRate')} size="lg" className="w-full" />
       </section>
 
-      {/* Top Performers */}
       {data.topPerformers.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-            {t('teacher.reports.sections.topPerformers')}
-          </h2>
-          <div className="space-y-2">
+          <SectionTitle>{t('teacher.reports.sections.topPerformers')}</SectionTitle>
+          <ol className="grid gap-3 sm:grid-cols-3">
             {data.topPerformers.map((performer, index) => (
-              <div
+              <li
                 key={performer.studentId}
-                className="flex items-center gap-4 p-3 bg-neo-lime/10 border-neo border-neo-cream/40 rounded-neo"
+                className="flex items-center gap-3 rounded-neo border-2 border-neo-cream/30 bg-neo-navy-light p-3 shadow-hard-sm"
               >
-                <span className="text-xl font-bold text-neo-lime w-8">
-                  #{index + 1}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'grid size-10 shrink-0 place-items-center rounded-neo border-2 border-black font-neo-display text-lg font-black text-black',
+                    PODIUM[index] ?? 'bg-neo-cream'
+                  )}
+                >
+                  {index + 1}
                 </span>
-                {handleStudentClick ? (
-                  <button
-                    type="button"
-                    onClick={() => handleStudentClick(performer.studentId)}
-                    className="flex-1 text-start text-neo-white font-medium hover:text-neo-lime transition-colors"
-                    aria-label={t('teacher.reports.viewStudentProgress', { name: performer.studentName })}
-                  >
-                    {performer.studentName}
-                  </button>
-                ) : (
-                  <span className="flex-1 text-neo-white font-medium">
-                    {performer.studentName}
-                  </span>
-                )}
-                <span className="text-neo-gray text-sm">
-                  {performer.accuracy}% · {t('education.classroomGame.words', { count: performer.wordsLearned })}
-                </span>
-              </div>
+                <div className="min-w-0">
+                  {studentName(performer.studentId, performer.studentName)}
+                  <p className="text-sm text-neo-cream/75 tabular-nums">
+                    {`${performer.accuracy}% · ${t('education.classroomGame.words', { count: performer.wordsLearned })}`}
+                  </p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
       )}
 
-      {/* Students Needing Attention */}
       {data.studentsNeedingAttention.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-            {t('teacher.reports.sections.needsAttention')}
-          </h2>
-          <div className="space-y-2">
+          <SectionTitle>{t('teacher.reports.sections.needsAttention')}</SectionTitle>
+          <ul className="divide-y divide-neo-pink/25 rounded-neo border-2 border-neo-pink bg-neo-pink/10">
             {data.studentsNeedingAttention.map((student) => (
-              <div
-                key={student.studentId}
-                className="flex items-center gap-4 p-3 bg-neo-red/10 border-neo border-neo-red rounded-neo"
-              >
-                {handleStudentClick ? (
-                  <button
-                    type="button"
-                    onClick={() => handleStudentClick(student.studentId)}
-                    className="flex-1 text-start text-neo-white font-medium hover:text-neo-lime transition-colors"
-                    aria-label={t('teacher.reports.viewStudentProgress', { name: student.studentName })}
-                  >
-                    {student.studentName}
-                  </button>
-                ) : (
-                  <span className="flex-1 text-neo-white font-medium">
-                    {student.studentName}
-                  </span>
-                )}
-                <span className="text-neo-gray text-sm">
-                  {student.accuracy}%
+              <li key={student.studentId} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-1">
+                <div className="min-w-0 flex-1">{studentName(student.studentId, student.studentName)}</div>
+                <span className="text-sm text-neo-white">
+                  <AccuracyBar value={student.accuracy} />
                 </span>
-                <span className="px-2 py-1 bg-neo-red text-neo-white text-xs font-bold rounded-full">
+                <span className="rounded-neo border-2 border-black bg-neo-pink px-2 py-0.5 text-xs font-bold text-black">
                   {t(ISSUE_LABEL_KEY[student.issue])}
                 </span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
 
-      {/* Student Rankings */}
       <section>
-        <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-          {t('teacher.reports.sections.studentRankings')}
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+        <SectionTitle>{t('teacher.reports.sections.studentRankings')}</SectionTitle>
+        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/25">
+          <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-neo-navy border-b-2 border-black">
-                <th className="text-start p-3 text-neo-white font-bold w-16">{t('teacher.reports.columns.rank')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.student')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.score')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.accuracy')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.words')}</th>
+              <tr className="bg-neo-navy text-neo-cream/80">
+                <th scope="col" className="w-16 p-3 text-start font-bold">{t('teacher.reports.columns.rank')}</th>
+                <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.student')}</th>
+                <th scope="col" className="hidden p-3 text-end font-bold sm:table-cell">{t('teacher.reports.columns.score')}</th>
+                <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.accuracy')}</th>
+                <th scope="col" className="p-3 text-end font-bold">{t('teacher.reports.columns.words')}</th>
               </tr>
             </thead>
             <tbody>
-              {data.studentRankings.map((student, index) => (
-                <tr
-                  key={student.studentId}
-                  className={`border-b border-neo-gray/30 ${
-                    index % 2 === 0 ? 'bg-neo-navy/50' : 'bg-neo-navy/30'
-                  }`}
-                >
-                  <td className="p-3 text-neo-white font-bold">{student.rank}</td>
-                  <td className="p-3">
-                    {handleStudentClick ? (
-                      <button
-                        onClick={() => handleStudentClick(student.studentId)}
-                        className="text-neo-white font-medium hover:text-neo-lime transition-colors"
-                        aria-label={t('teacher.reports.viewStudentProgress', { name: student.studentName })}
-                      >
-                        {student.studentName}
-                      </button>
-                    ) : (
-                      <span className="text-neo-white font-medium">
-                        {student.studentName}
-                      </span>
-                    )}
+              {data.studentRankings.map((student) => (
+                <tr key={student.studentId} className="border-t border-neo-cream/10 transition-colors hover:bg-neo-cream/5">
+                  <td className="px-3 font-neo-display text-base font-black text-neo-cream/80 tabular-nums">{student.rank}</td>
+                  <td className="px-3">{studentName(student.studentId, student.studentName)}</td>
+                  <td className="hidden px-3 text-end text-neo-white tabular-nums sm:table-cell">{student.score}</td>
+                  <td className="px-3 text-neo-white">
+                    <AccuracyBar value={student.accuracy} />
                   </td>
-                  <td className="p-3 text-neo-white">{student.score}</td>
-                  <td className="p-3 text-neo-white">{student.accuracy}%</td>
-                  <td className="p-3 text-neo-white">{student.wordsLearned}</td>
+                  <td className="px-3 text-end text-neo-white tabular-nums">{student.wordsLearned}</td>
                 </tr>
               ))}
             </tbody>

@@ -25,9 +25,8 @@ vi.mock('@react-pdf/renderer', () => ({
   Font: { register: vi.fn() },
 }));
 
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key, language: 'he', dir: 'rtl' }),
-}));
+const t = (key: string) => key;
+// teacherLine replaced `{teacherLabel}: {name}` — glued copy broke RTL order.
 
 import { ProgressReportPDF, type ClassReportPDFData } from '../ProgressReportPDF';
 
@@ -40,7 +39,9 @@ const CLASS_DATA: ClassReportPDFData = {
     totalStudents: 5,
     activeStudents: 4,
     classAverageAccuracy: 82,
+    classAverageWordsLearned: 11,
     completionRate: 60,
+    participationRate: 80,
   },
   topPerformers: [{ studentName: 'Maya', accuracy: 94, wordsLearned: 21 }],
   studentRankings: [{ rank: 1, studentName: 'Maya', score: 310, accuracy: 94, wordsLearned: 21 }],
@@ -68,7 +69,7 @@ const LEAKED_ENGLISH = [
 describe('ProgressReportPDF class report — every label goes through t()', () => {
   it('leaves no hardcoded English label in the tree', () => {
     // GIVEN a Hebrew teacher exporting a class report
-    const { container } = render(<ProgressReportPDF data={CLASS_DATA} />);
+    const { container } = render(<ProgressReportPDF data={CLASS_DATA} t={t} language="he" dir="rtl" />);
     const text = container.textContent ?? '';
 
     // THEN none of the old literals survive
@@ -79,7 +80,7 @@ describe('ProgressReportPDF class report — every label goes through t()', () =
 
   it('renders the metric labels from their existing translation keys', () => {
     // GIVEN the same report
-    render(<ProgressReportPDF data={CLASS_DATA} />);
+    render(<ProgressReportPDF data={CLASS_DATA} t={t} language="he" dir="rtl" />);
 
     // THEN the keys that already existed are the ones being used
     expect(screen.getByText('teacher.reports.metrics.totalStudents')).toBeInTheDocument();
@@ -92,10 +93,10 @@ describe('ProgressReportPDF class report — every label goes through t()', () =
 
   it('translates the teacher line and the ranking column headers', () => {
     // GIVEN the same report
-    render(<ProgressReportPDF data={CLASS_DATA} />);
+    render(<ProgressReportPDF data={CLASS_DATA} t={t} language="he" dir="rtl" />);
 
     // THEN the labels that had no key yet now have one
-    expect(screen.getByText(/teacher\.reports\.teacherLabel/)).toBeInTheDocument();
+    expect(screen.getByText(/teacher\.reports\.teacherLine/)).toBeInTheDocument();
     expect(screen.getByText('teacher.reports.columns.rank')).toBeInTheDocument();
     expect(screen.getByText('teacher.reports.columns.student')).toBeInTheDocument();
     expect(screen.getByText('teacher.reports.columns.score')).toBeInTheDocument();

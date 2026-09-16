@@ -30,10 +30,8 @@ vi.mock('@react-pdf/renderer', () => ({
   },
 }));
 
-// Mock useLanguage
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => {
+// The document takes language as props — it renders outside LanguageProvider.
+const t = (key: string, params?: Record<string, string | number>) => {
       const translations: Record<string, string> = {
         'teacher.reports.title': 'Progress Report',
         'teacher.reports.metrics.wordsLearned': 'Words Learned',
@@ -45,12 +43,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.classReport': 'Class Progress Report',
         'teacher.reports.studentReport': 'Student Progress Report',
       };
+      if (key === 'teacher.reports.teacherLine') return `Teacher: ${params?.name}`;
       return translations[key] || key;
-    },
-    language: 'en',
-    dir: 'ltr',
-  }),
-}));
+    };
 
 import { ProgressReportPDF, StudentReportPDFData, ClassReportPDFData } from '../ProgressReportPDF';
 
@@ -103,14 +98,14 @@ describe('ProgressReportPDF', () => {
 
   describe('Student Report', () => {
     it('renders PDF document structure', () => {
-      const { getByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
 
       expect(getByTestId('pdf-document')).toBeInTheDocument();
       expect(getByTestId('pdf-page')).toBeInTheDocument();
     });
 
     it('displays student name', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasStudentName = textElements.some(el => el.textContent?.includes('John Doe'));
@@ -118,7 +113,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays classroom name', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasClassroom = textElements.some(el => el.textContent?.includes('English 101'));
@@ -126,7 +121,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays metrics', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasAccuracy = textElements.some(el => el.textContent?.includes('85%'));
@@ -134,7 +129,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays word mastery section', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasWords = textElements.some(
@@ -146,14 +141,14 @@ describe('ProgressReportPDF', () => {
 
   describe('Class Report', () => {
     it('renders PDF document structure', () => {
-      const { getByTestId } = render(<ProgressReportPDF data={mockClassData} />);
+      const { getByTestId } = render(<ProgressReportPDF data={mockClassData} t={t} language="en" dir="ltr" />);
 
       expect(getByTestId('pdf-document')).toBeInTheDocument();
       expect(getByTestId('pdf-page')).toBeInTheDocument();
     });
 
     it('displays classroom name', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasClassroom = textElements.some(el => el.textContent?.includes('English 101'));
@@ -161,7 +156,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays teacher name', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasTeacher = textElements.some(el => el.textContent?.includes('Ms. Smith'));
@@ -169,7 +164,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays class metrics', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasStudentCount = textElements.some(el => el.textContent?.includes('25'));
@@ -177,7 +172,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays top performers', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasTopPerformer = textElements.some(el => el.textContent?.includes('Alice'));
@@ -185,7 +180,7 @@ describe('ProgressReportPDF', () => {
     });
 
     it('displays student rankings', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockClassData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasRanking = textElements.some(
@@ -197,7 +192,7 @@ describe('ProgressReportPDF', () => {
 
   describe('Common Functionality', () => {
     it('displays generation date', () => {
-      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getAllByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
 
       const textElements = getAllByTestId('pdf-text');
       const hasDate = textElements.some(el => el.textContent?.includes('2024'));
@@ -207,7 +202,7 @@ describe('ProgressReportPDF', () => {
     it('handles RTL direction for Hebrew', () => {
       // Note: RTL handling is tested at the Page level with direction prop
       // This test verifies the component renders without errors
-      const { getByTestId } = render(<ProgressReportPDF data={mockStudentData} />);
+      const { getByTestId } = render(<ProgressReportPDF data={mockStudentData} t={t} language="en" dir="ltr" />);
       expect(getByTestId('pdf-document')).toBeInTheDocument();
     });
   });

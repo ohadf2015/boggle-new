@@ -10,7 +10,7 @@
  * read out of the source files, resolved against every locale dictionary.
  */
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { en } from '../../../../translations/en.js';
 import { he } from '../../../../translations/he.js';
@@ -24,7 +24,9 @@ type Dict = Record<string, unknown>;
 const LOCALES: Record<string, Dict> = { en, he, sv, ja, es, ru };
 
 const COMPONENT_DIR = join(process.cwd(), 'components/teacher/reports');
-const SOURCES = ['ClassProgressReport.tsx', 'StudentProgressReport.tsx'];
+// Every source file in the folder — the PDF document and the export helper
+// render copy too, and the PDF is what a teacher hands a parent.
+const SOURCES = readdirSync(COMPONENT_DIR).filter((f) => /\.tsx?$/.test(f));
 
 /** Literal `t('...')` keys from the source itself. */
 function literalKeys(): string[] {
@@ -53,6 +55,10 @@ function resolve(dict: Dict, path: string): unknown {
 describe('progress reports i18n contract', () => {
   it('scans a plausible number of keys — a broken regex must not pass vacuously', () => {
     expect(literalKeys().length).toBeGreaterThan(15);
+  });
+
+  it('covers the PDF document, not only the on-screen reports', () => {
+    expect(SOURCES).toContain('ProgressReportPDF.tsx');
   });
 
   for (const [name, dict] of Object.entries(LOCALES)) {

@@ -7,160 +7,232 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { ArrowLeft, ChevronRight, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
+import { TeacherGate } from '@/components/education/TeacherGate';
+import { ProGate } from '@/components/teacher/ProGate';
+
+/** Slide distance for the drill-down; the direction follows depth and locale. */
+const SLIDE_PX = 32;
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 /**
  * TeacherReportsInner - Teacher Reports Page
  *
- * Shows class and student progress reports with navigation between views.
+ * Classroom picker → class report → student report, one level at a time.
  */
 function TeacherReportsInner() {
-  const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { t, dir } = useLanguage();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { classrooms, isLoading: classroomsLoading } = useClassrooms();
+  const reduceMotion = useReducedMotion();
 
-  // Get URL params for current view
   const classroomIdFromUrl = searchParams.get('classroomId');
   const studentIdFromUrl = searchParams.get('studentId');
 
-  // Local state for selected IDs (allows updating without URL navigation)
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(
-    classroomIdFromUrl
-  );
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
-    studentIdFromUrl
+  // Local state so a click switches views without waiting on navigation...
+  const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(classroomIdFromUrl);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
+
+  // ...but the URL stays the source of truth: browser Back/Forward change it,
+  // and the view used to stay pinned on the old student.
+  const urlKey = `${classroomIdFromUrl}|${studentIdFromUrl}`;
+  const [seenUrlKey, setSeenUrlKey] = useState(urlKey);
+  if (seenUrlKey !== urlKey) {
+    setSeenUrlKey(urlKey);
+    setSelectedClassroomId(classroomIdFromUrl);
+    setSelectedStudentId(studentIdFromUrl);
+  }
+
+  // Deeper = slide forward, shallower = slide back.
+  const depth = selectedStudentId ? 2 : selectedClassroomId ? 1 : 0;
+  const [prevDepth, setPrevDepth] = useState(depth);
+  const [travel, setTravel] = useState(1);
+  if (prevDepth !== depth) {
+    setPrevDepth(depth);
+    setTravel(depth > prevDepth ? 1 : -1);
+  }
+
+  const pushView = useCallback(
+    (classroomId: string | null, studentId: string | null) => {
+      const params = new URLSearchParams();
+      if (classroomId) params.set('classroomId', classroomId);
+      if (studentId) params.set('studentId', studentId);
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router],
   );
 
-  // Handle classroom selection
   const handleClassroomSelect = useCallback(
     (classroomId: string) => {
       setSelectedClassroomId(classroomId);
       setSelectedStudentId(null);
-
-      // Update URL
-      const params = new URLSearchParams();
-      params.set('classroomId', classroomId);
-      router.push(`/${language}/teacher/reports?${params.toString()}`);
+      pushView(classroomId, null);
     },
-    [language, router]
+    [pushView],
   );
 
-  // Handle student selection (from class report)
   const handleStudentClick = useCallback(
     (studentId: string) => {
       setSelectedStudentId(studentId);
-
-      // Update URL
-      const params = new URLSearchParams();
-      if (selectedClassroomId) {
-        params.set('classroomId', selectedClassroomId);
-      }
-      params.set('studentId', studentId);
-      router.push(`/${language}/teacher/reports?${params.toString()}`);
+      pushView(selectedClassroomId, studentId);
     },
-    [language, router, selectedClassroomId]
+    [pushView, selectedClassroomId],
   );
 
-  // Handle back to class view
   const handleBackToClass = useCallback(() => {
     setSelectedStudentId(null);
+    pushView(selectedClassroomId, null);
+  }, [pushView, selectedClassroomId]);
 
-    // Update URL
-    const params = new URLSearchParams();
-    if (selectedClassroomId) {
-      params.set('classroomId', selectedClassroomId);
+  const viewKey = selectedStudentId
+    ? `student:${selectedStudentId}`
+    : selectedClassroomId
+      ? `class:${selectedClassroomId}`
+      : 'picker';
+
+  // A drill-down from the bottom of a long ranking should land on the new
+  // report's header, not mid-table.
+  const viewRef = useRef<HTMLDivElement>(null);
+  const firstView = useRef(true);
+  useEffect(() => {
+    if (firstView.current) {
+      firstView.current = false;
+      return;
     }
-    router.push(`/${language}/teacher/reports?${params.toString()}`);
-  }, [language, router, selectedClassroomId]);
+    viewRef.current?.scrollIntoView?.({
+      block: 'start',
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+  }, [viewKey, reduceMotion]);
 
-  // No classroom selected - show classroom list
+  const offset = SLIDE_PX * (dir === 'rtl' ? -1 : 1);
+  const variants = {
+    enter: (d: number) => ({ opacity: 0, x: reduceMotion ? 0 : d * offset }),
+    center: { opacity: 1, x: 0 },
+    exit: (d: number) => ({
+      opacity: 0,
+      x: reduceMotion ? 0 : -d * offset * 0.5,
+    }),
+  };
+
+  let view: React.ReactNode;
   if (!selectedClassroomId) {
-    return (
-      <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl font-bold text-neo-white font-neo-display mb-6">
+    view = (
+      <>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-neo-display text-3xl font-bold text-neo-white sm:text-4xl">
             {t('teacher.reports.title')}
           </h1>
+          <TeacherPlanBadge />
+        </div>
 
-          <h2 className="text-lg text-neo-white/70 mb-4">
-            {t('teacher.reports.selectClassroom')}
-          </h2>
+        <h2 className="mb-4 text-lg font-bold text-neo-cream/80">{t('teacher.reports.selectClassroom')}</h2>
 
-          {classroomsLoading ? (
-            <div className="text-neo-white/70 animate-pulse">{t('teacher.reports.loadingClassrooms')}</div>
-          ) : classrooms && classrooms.length > 0 ? (
-            <div className="space-y-3">
-              {classrooms.map((classroom) => (
-                <button type="button"
-                  key={classroom.id}
+        {classroomsLoading ? (
+          <div aria-busy="true" className="grid gap-3 sm:grid-cols-2">
+            <span className="sr-only" role="status">
+              {t('teacher.reports.loadingClassrooms')}
+            </span>
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+            ))}
+          </div>
+        ) : classrooms && classrooms.length > 0 ? (
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {classrooms.map((classroom) => (
+              <li key={classroom.id}>
+                <button
+                  type="button"
                   onClick={() => handleClassroomSelect(classroom.id)}
                   // The class picker IS the primary action of this screen, and
                   // it read as navy-on-navy with a black edge (~1.2:1 both
-                  // ways). Cream edge + a lighter fill puts it back on the
-                  // page. Width written literally — `border-neo` is merged
-                  // away by cn() elsewhere and the habit costs nothing here.
-                  className="w-full flex items-center justify-between p-4 bg-neo-navy-light border-[3px] border-neo-cream rounded-neo shadow-hard hover:shadow-hard-pressed hover:-translate-y-0.5 transition-all text-start"
+                  // ways). Cream edge + a lighter fill puts it back on the page.
+                  className="group flex min-h-20 w-full items-center justify-between gap-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-4 text-start shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0.5 active:shadow-none"
                 >
-                  <span className="text-neo-white font-medium">
-                    {classroom.name}
+                  <span className="min-w-0">
+                    <span className="block break-words font-neo-display text-lg font-bold text-neo-white">
+                      {classroom.name}
+                    </span>
+                    {typeof classroom.member_count === 'number' && (
+                      <span className="mt-1 inline-flex items-center gap-1.5 text-sm text-neo-cream/75 tabular-nums">
+                        <Users aria-hidden="true" className="size-4" />
+                        <span className="sr-only">{t('teacher.reports.metrics.totalStudents')}: </span>
+                        {classroom.member_count}
+                      </span>
+                    )}
                   </span>
-                  <DirectionalIcon icon={ChevronRight} className="w-5 h-5 text-neo-cyan" />
+                  <span className="grid size-10 shrink-0 place-items-center rounded-neo border-2 border-black bg-neo-cyan text-black transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
+                    <DirectionalIcon icon={ChevronRight} className="size-5" />
+                  </span>
                 </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-neo-white/70">{t('teacher.reports.noClassroomsFound')}</div>
-          )}
-      </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="rounded-neo border-2 border-dashed border-neo-cream/30 p-8 text-center text-neo-cream/80">
+            {t('teacher.reports.noClassroomsFound')}
+          </p>
+        )}
+      </>
     );
+  } else if (selectedStudentId) {
+    view = (
+      <>
+        <button
+          type="button"
+          onClick={handleBackToClass}
+          className="mb-6 inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none"
+          aria-label={t('teacher.reports.backToClass')}
+        >
+          <DirectionalIcon icon={ArrowLeft} className="size-5" />
+          <span>{t('teacher.reports.backToClass')}</span>
+        </button>
+        <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
+      </>
+    );
+  } else {
+    view = <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />;
   }
 
-  // Student view
-  if (selectedStudentId) {
-    return (
-      <div className="max-w-4xl mx-auto">
-          {/* Back button */}
-          <button type="button"
-            onClick={handleBackToClass}
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-[2px] border-neo-cream bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm mb-6 transition-all hover:-translate-y-0.5 hover:shadow-hard focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
-            aria-label={t('teacher.reports.backToClass')}
-          >
-            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
-            <span>{t('teacher.reports.backToClass')}</span>
-          </button>
-
-          <StudentProgressReport
-            studentId={selectedStudentId}
-            classroomId={selectedClassroomId}
-          />
-      </div>
-    );
-  }
-
-  // Class view
   return (
-    <div className="max-w-4xl mx-auto">
-        <ClassProgressReport
-          classroomId={selectedClassroomId}
-          onStudentClick={handleStudentClick}
-        />
+    <div ref={viewRef} className="mx-auto max-w-5xl scroll-mt-4">
+      {/* The shell's scroll region is overflow-y:auto, which makes x auto too:
+          the slide would flash a horizontal scrollbar. Clip x, padded so the
+          hard offset shadows stay inside the clip. */}
+      <div className="-mx-2 overflow-x-clip px-2 pb-1">
+        <AnimatePresence mode="wait" custom={travel} initial={false}>
+          <m.div
+            key={viewKey}
+            custom={travel}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              duration: reduceMotion ? 0.12 : 0.32,
+              ease: EASE_OUT_EXPO,
+            }}
+          >
+            {view}
+          </m.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
-
-import { TeacherGate } from '@/components/education/TeacherGate';
-import { ProGate } from '@/components/teacher/ProGate';
 
 // Reports are a Pro surface (planMatrix: analytics/reports are what the money
 // buys; last-game insights on the dashboard stay free). The gate swaps the
