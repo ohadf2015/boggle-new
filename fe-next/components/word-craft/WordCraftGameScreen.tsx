@@ -65,6 +65,7 @@ import {
   trackWordCraftRecallAll,
   trackWordCraftTurnSubmitted,
   trackWordCraftGameStarted,
+  trackWordCraftDictRetryClicked,
   emitWordCraftGameEnd,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
@@ -926,7 +927,10 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         <DictStatusChip
           loading={!dict && !dictError}
           error={dictError}
-          onRetry={() => window.location.reload()}
+          onRetry={() => {
+            trackWordCraftDictRetryClicked();
+            window.location.reload();
+          }}
         />
 
         <WordCraftScoreboard

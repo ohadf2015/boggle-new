@@ -77,6 +77,36 @@ export function trackWordCraftAbandoned(params: {
   safeCapture('word_craft_abandoned', { ...params });
 }
 
+/**
+ * Fired when a player taps submit while the dictionary is still loading — the
+ * board is disabled (`disabled={!canInteract || !dict}`) so this cannot come
+ * from the submit button itself, only from a keyboard/enter shortcut racing
+ * the load. Diagnostic for the /word-craft rage-click signal: distinguishes
+ * "blocked on dict load" from "blocked on an unfinished word".
+ */
+export function trackWordCraftSubmitBlockedDictLoading(params: { pendingTiles: number }): void {
+  safeCapture('word_craft_submit_blocked_dict_loading', { ...params });
+}
+
+/**
+ * Fired when a player tries to submit a turn with a joker tile that has no
+ * letter assigned yet. Previously invisible — a repeated hit here for the
+ * same turn is a rage-click candidate (player keeps hitting submit instead
+ * of noticing the blank needs a tap-to-assign first).
+ */
+export function trackWordCraftSubmitBlockedBlankUnassigned(params: { pendingTiles: number }): void {
+  safeCapture('word_craft_submit_blocked_blank_unassigned', { ...params });
+}
+
+/**
+ * Fired when a player force-reloads via the DictStatusChip retry action.
+ * A non-zero rate here means the dict load itself is stalling/failing in
+ * the wild, not just running long — separates "slow" from "stuck".
+ */
+export function trackWordCraftDictRetryClicked(): void {
+  safeCapture('word_craft_dict_retry_clicked', {});
+}
+
 /** Fired the first time during a turn that 2 pending tiles establish an axis. */
 export function trackWordCraftAxisLocked(params: {
   axis: WordCraftAxis;

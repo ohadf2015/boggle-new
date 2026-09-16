@@ -1,25 +1,25 @@
 {
-  "date": "2026-09-15",
-  "note": "All 5 frontend LCP items in tonight's brief re-queried against live PostHog with the EXACT route -- every one is below the mandatory 50-sample floor: /en n=37 (actual p75_lcp=1676ms, nothing like the brief's 10652ms), /en/student/profile n=1 (9184ms is a single sample), /en/multiplayer n=34 (3440ms), /ru/balda-onlayn n=1 (6005ms). imposketch.io/solo skipped -- different app entirely, PostHog shared across ~12 apps (carried learning). No regression verdict issued for any of them per the mandatory sample gate; this matches the same pattern as 09-12/09-14 (brief's aggregate LCP figures come from a wider window / fewer-than-24h-floor sample and are not directly actionable). Homepage (/en) LCP path was independently re-audited (PageClient.tsx, LandingModeCubes.tsx) and confirmed still fully optimized from prior nights: anchor <Image priority>, matching <link rel=preload imageSrcSet>, OnboardingFlow dynamic(ssr:false) behind FTUE gate -- no regression found, no action needed. Backend: supabase MCP did not connect within this lane's window (repeated checks, same as 09-14) -- auth_db_connections_absolute and vocabulary_lessons unindexed-FK advisor items carried, not re-verified with EXPLAIN this run. Bundle: not re-measured (no fresh .next build, building one is out of budget) -- carrying 09-14 numbers unchanged. Net: no code shipped tonight -- every top-of-brief item was verified as noise rather than acted on blind, and the mandatory sample gate held.",
+  "date": "2026-09-16",
+  "note": "Brief's top item (/en/multiplayer?quickPlay=true LCP 104760ms) and the 4 other frontend LCP items are per-URL (query-string-specific) single-session outliers -- re-queried live PostHog grouped by bare pathname: /en/multiplayer n=46, /en n=39, /en/teacher/upgrade n=3, /he/teacher/upgrade n=2, /sv/swedish-multiplayer-word-game n=2. ALL below the mandatory 50-sample floor -- same noise pattern as 09-15, no regression verdict issued, no fix applied. Checked /en/teacher/upgrade PageClient.tsx for a safe general SPEED win anyway (above-fold Image) -- already has `priority` from a prior night, nothing to add. Backend: supabase MCP again did not connect within the lane window (3rd straight night -- 09-14, 09-15, 09-16), but used the Supabase Management API raw-SQL fallback (POST /v1/projects/{ref}/database/query with SUPABASE_ACCESS_TOKEN) to unblock both advisor items without the MCP. vocabulary_lessons has only 18 rows (`SELECT count(*)`) -- the unindexed-FK advisor warning is a correctly-skipped false positive at this scale (a btree index has zero read benefit over a scan on 18 rows and nonzero write cost); CLOSING this item rather than carrying it again. pg_stat_statements top-2 by total_exec_time are both `realtime.list_changes` (3.6M + 0.77M calls) -- confirms the existing 50-supabase-perf.md WAL/publication-cost finding, not a new regression, no action (founder-scope publication call, not this lane's). auth_db_connections_absolute remains a dashboard toggle, carried. Bundle: not re-measured (no fresh .next build; out of budget) -- carrying prior numbers unchanged. Net: no code shipped -- every brief item verified as noise or already-fixed; one advisor item resolved to a definitive skip instead of another carry.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
+    "closed": {
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "verified via Supabase Management API raw-SQL (MCP unavailable) -- table has 18 rows. No index added: zero read benefit at this cardinality, nonzero write cost (hard rule: no speculative indexes). Correctly-skipped false positive, not carrying further unless row count grows."
+    },
     "deferred": {
       "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (unchanged since 09-01)",
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "supabase MCP never connected this run -- could not EXPLAIN ANALYZE to confirm before adding an index (hard rule: no speculative indexes). Carry to next perf lane.",
-      "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- human/founder call needed on publication scope"
+      "realtime_wal_json_parser_cpu": "confirmed still #1+#2 in pg_stat_statements total_exec_time (list_changes, 3.6M+0.77M calls) -- systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- human/founder call needed on publication scope"
     }
   },
   "frontend": {
     "by_route": [
-      { "route": "/en", "p75_lcp": 1676, "n": 37, "window": "24h", "status": "brief claimed 10652ms -- live query at n=37 (still below 50-floor) shows 1676ms, no regression. Re-audited LCP path (PageClient.tsx, LandingModeCubes.tsx): priority image + preload link + dynamic FTUE all already correct from prior nights, no action." },
-      { "route": "/en/student/profile", "p75_lcp": 9184, "n": 1, "window": "24h", "status": "DEFERRED for regression verdict (n=1). Shipped one safe general SPEED win regardless: avatar <Image> (PageClient.tsx) was missing `priority` despite being above-the-fold on first real paint -- added. Root cause of the slow LCP is almost certainly the multi-fetch waterfall (auth, achievements, duels, classroom) gating first paint, not the image -- that needs an SSR/streaming redesign, too large for this lane. Logged to perf-watch.md for a dedicated pass." },
-      { "route": "/en/multiplayer", "p75_lcp": 3440, "n": 34, "window": "24h", "status": "DEFERRED -- below 50-sample floor, carried from 09-14 (PageClient.tsx/RoomListView.tsx CLS/INP profiling still needed, see perf-watch.md)" },
-      { "route": "/ru/balda-onlayn", "p75_lcp": 6005, "n": 1, "window": "24h", "status": "DEFERRED -- n=1, cannot verdict" }
+      { "route": "/en/multiplayer?quickPlay=true", "p75_lcp": 104760, "n": 1, "window": "24h", "status": "brief's headline item -- query-string-specific URL is a single-session outlier; bare-pathname /en/multiplayer is n=46, still below 50-floor. DEFERRED, no verdict." },
+      { "route": "/en/multiplayer", "p75_lcp": 824, "n": 46, "window": "24h", "status": "DEFERRED -- n=46, just below 50-sample floor" },
+      { "route": "/en", "p75_lcp": 11290, "n": 39, "window": "24h", "status": "DEFERRED -- n=39, below floor; carried optimizations (priority image, preload link, dynamic FTUE) from prior nights still in place" },
+      { "route": "/en/teacher/upgrade", "p75_lcp": 7990, "n": 3, "window": "24h", "status": "DEFERRED -- n=3; PageClient.tsx above-fold Image already has `priority` (prior night), no action needed" }
     ],
-    "shipped": [
-      { "file": "app/[locale]/student/profile/PageClient.tsx", "change": "above-fold avatar <Image> was missing `priority` -- added. Explore subagent's other claim (sync framer-motion `m` import blocking FCP) was checked and REJECTED: `m` is the app's intentional LazyMotion pattern (app/LazyMotionRoot.tsx wraps root layout in one domMax bundle), not per-file bloat." }
-    ]
+    "shipped": []
   },
   "bundle": {
     "note": "not re-measured tonight -- no .next build artifact present and building one is out of budget for this lane; carrying 09-14 baseline numbers unchanged",

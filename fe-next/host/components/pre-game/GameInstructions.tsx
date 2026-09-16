@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
-import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { Grid3X3, Zap, Crosshair, Disc3, Building2, Lightbulb, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useAutoAdvanceStep } from '../../hooks/useAutoAdvanceStep';
@@ -80,6 +80,15 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
     steps: [
       { titleKey: 'gameModes.wheelRush.name', descKey: 'gameModes.wheelRush.description' },
       { titleKey: 'howToPlay.steps.scoring.title', descKey: 'howToPlay.steps.scoring.description' },
+      { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
+    ],
+  },
+  'word-tower': {
+    icon: <Building2 className="w-4 h-4" />,
+    barClass: 'bg-neo-purple', iconBgClass: 'bg-neo-purple', dotClass: 'bg-neo-purple',
+    steps: [
+      { titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc' },
+      { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
       { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
     ],
   },

@@ -12,6 +12,10 @@ import { getBoardDims, type BoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
 import { assignBlankLetter, hasUnassignedBlank } from './blankAssign';
 import type { PlacedTile, PlayerState, RackTile } from './types';
+import {
+  trackWordCraftSubmitBlockedDictLoading,
+  trackWordCraftSubmitBlockedBlankUnassigned,
+} from '@/components/word-craft/wordCraftTelemetry';
 
 export type Turn = 'player' | 'bot' | 'over';
 
@@ -568,12 +572,14 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const submitMove = useCallback(() => {
     if (hotseat ? state.turn === 'over' : state.turn !== 'player') return;
     if (!dict) {
+      trackWordCraftSubmitBlockedDictLoading({ pendingTiles: state.pendingPlacements.length });
       dispatch({ type: 'SET_ERROR', message: 'DICT_LOADING' });
       return;
     }
     // A joker (blank) must carry a chosen letter before it can play, otherwise
     // the validator would build the word with a literal '_' and always reject.
     if (hasUnassignedBlank(state.pendingPlacements)) {
+      trackWordCraftSubmitBlockedBlankUnassigned({ pendingTiles: state.pendingPlacements.length });
       dispatch({ type: 'SET_ERROR', message: 'BLANK_UNASSIGNED' });
       return;
     }

@@ -2374,3 +2374,15 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - `exp-teacher-gate-redirect-clarity-v1` — flag is live and called (63 calls/7d) but
   `$feature_flag_variant` is `null` on every event. Experiment cannot report a winner
   until this is fixed PostHog-side (check multivariate rollout config for the key).
+
+## 2026-09-16
+- [Nightly-restore] Stale-restore false positive: 20260904-020001
+  - brief flagged as "12 nights unshipped" (severity 0.99), but was actually already landed 2026-09-12 in 9ba5b8aba via manual 3-way merge
+  - status: resolved (queue entry appended, no code change — blind rsync-restore was tried, diffed against master, found it would clobber legit newer work + reintroduce intentional deletions, reverted)
+  - why: rsync-based restore-salvaged-code.sh has no merge/diff safety — always diff a stale (>1 night) restore against current master before trusting the brief's staleness signal
+  - recommended owner: self (done)
+- [Nightly-restore] Genuinely-unshipped restore: 20260915-000000 (26 files: blog pages, student profile/hub, sealedBid Showdown, WheelRush header/results, translations x6)
+  - confirmed NOT landed since 2026-09-14 (git log clean on sample files)
+  - status: deferred
+  - why: 26-file cross-cutting restore (game logic + i18n + tests) exceeds what one 15-min lane can land AND self-verify; rsync restore has no merge safety so needs careful per-file diff against current master before landing
+  - recommended owner: self (next lane 01 run) or a dedicated restore lane — restore via `scripts/nightly/restore-salvaged-code.sh 20260915-000000`, diff each file against HEAD before keeping, re-gate
