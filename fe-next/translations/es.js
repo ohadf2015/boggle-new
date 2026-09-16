@@ -13237,10 +13237,18 @@ const es = {
       },
       "export": {
         "pdf": "Exportar PDF",
-        "downloading": "Descargando..."
+        "downloading": "Descargando...",
+        "failed": "No se pudo crear el PDF. Inténtalo de nuevo.",
+        "done": "Descargado",
+        "fileStudent": "{{name}} – informe de progreso",
+        "fileClass": "{{name}} – informe de la clase"
       },
-      "teacherLabel": "Profesor/a",
-      "generatedBy": "Generado por LexiClash",
+      "teacherLine": "Profesor/a: {{name}}",
+      "generatedOn": "Generado por LexiClash · {{date}}",
+      "pageOf": "Página {{page}} de {{total}}",
+      "masteredShare": "{{percent}} % de las palabras dominadas",
+      "retry": "Reintentar",
+      "noWordsYet": "Aún no ha practicado ninguna palabra",
       "columns": {
         "rank": "Puesto",
         "student": "Estudiante",

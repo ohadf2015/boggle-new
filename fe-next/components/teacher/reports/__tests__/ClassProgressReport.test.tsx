@@ -36,6 +36,8 @@ vi.mock('@react-pdf/renderer', () => ({
   StyleSheet: {
     create: (styles: Record<string, unknown>) => styles,
   },
+  // The export registers a locale font before building the document.
+  Font: { register: vi.fn(), registerHyphenationCallback: vi.fn() },
 }));
 
 // Mock useLanguage
@@ -58,7 +60,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.loading': 'Loading report...',
         'teacher.reports.error': 'Error loading report',
         'teacher.reports.noData': 'No data available',
-        'teacher.reports.teacherLabel': 'Teacher',
+        'teacher.reports.teacherLine': 'Teacher: {{name}}',
         'teacher.reports.columns.rank': 'COL_RANK',
         'teacher.reports.columns.student': 'COL_STUDENT',
         'teacher.reports.columns.score': 'COL_SCORE',
@@ -263,7 +265,7 @@ describe('ClassProgressReport', () => {
       });
     });
 
-    it('labels the teacher line via teacherLabel, not a hardcoded prefix', async () => {
+    it('labels the teacher line via one interpolated key, not a glued prefix', async () => {
       render(<ClassProgressReport classroomId="classroom-456" />);
 
       await waitFor(() => {
@@ -458,6 +460,31 @@ describe('ClassProgressReport', () => {
         const aliceButtons = screen.getAllByRole('button', { name: /alice/i });
         expect(aliceButtons.length).toBeGreaterThan(0);
       });
+    });
+  });
+
+  describe('Pro polish', () => {
+    it('tells the teacher when the PDF could not be built — no silent no-op', async () => {
+      const user = userEvent.setup();
+      const { pdf } = await import('@react-pdf/renderer');
+      (pdf as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        toBlob: vi.fn().mockRejectedValue(new Error('font fetch blocked')),
+      });
+      render(<ClassProgressReport classroomId="classroom-456" />);
+
+      await user.click(await screen.findByRole('button', { name: /export pdf/i }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent('teacher.reports.export.failed');
+    });
+
+    it('offers a retry after a failed load', async () => {
+      const user = userEvent.setup();
+      mockGetClassReportData.mockResolvedValueOnce({ data: null, error: { message: 'boom' } });
+      render(<ClassProgressReport classroomId="classroom-456" />);
+
+      await user.click(await screen.findByRole('button', { name: 'teacher.reports.retry' }));
+
+      expect(await screen.findByText('English 101')).toBeInTheDocument();
     });
   });
 });

@@ -10986,10 +10986,18 @@ const ru = {
       },
       "export": {
         "pdf": "Экспортировать PDF",
-        "downloading": "Загрузка..."
+        "downloading": "Загрузка...",
+        "failed": "Не удалось создать PDF. Попробуйте ещё раз.",
+        "done": "Скачано",
+        "fileStudent": "{{name}} – отчёт об успехах",
+        "fileClass": "{{name}} – отчёт по классу"
       },
-      "teacherLabel": "Учитель",
-      "generatedBy": "Создано в LexiClash",
+      "teacherLine": "Учитель: {{name}}",
+      "generatedOn": "Создано в LexiClash · {{date}}",
+      "pageOf": "Страница {{page}} из {{total}}",
+      "masteredShare": "Освоено {{percent}}% слов",
+      "retry": "Повторить",
+      "noWordsYet": "Пока нет отработанных слов",
       "columns": {
         "rank": "Место",
         "student": "Ученик",

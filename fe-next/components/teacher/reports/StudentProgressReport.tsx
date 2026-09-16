@@ -1,25 +1,30 @@
 /**
  * StudentProgressReport - Individual Student Progress Report View
  *
- * Displays detailed progress metrics for a single student with
- * word mastery breakdown and PDF export capability.
+ * Detailed progress for a single student: headline metrics, a mastery meter,
+ * the per-word breakdown and recommendations, with PDF export.
  */
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  getStudentReportData,
-  StudentReportData,
-  DateRange,
-} from '@/lib/supabase/analytics';
-import logger from '@/utils/logger';
+import { getStudentReportData, DateRange } from '@/lib/supabase/analytics';
 import { Stat } from '@/components/ui/Stat';
-
-// =============================================
-// TYPE DEFINITIONS
-// =============================================
+import { cn } from '@/lib/utils';
+import { downloadReportPdf } from './downloadReportPdf';
+import { RECOMMENDATION_LABEL_KEY, formatPracticeMinutes, percentOf } from './reportLabels';
+import {
+  AccuracyBar,
+  MasteryMeter,
+  ReportEmpty,
+  ReportError,
+  ReportHeader,
+  ReportSkeleton,
+  SectionTitle,
+  useReportData,
+  useReportExport,
+} from './ReportChrome';
 
 export interface StudentProgressReportProps {
   studentId: string;
@@ -28,299 +33,130 @@ export interface StudentProgressReportProps {
   dateRange?: DateRange;
 }
 
-// =============================================
-// HELPER FUNCTIONS
-// =============================================
+export function StudentProgressReport({ studentId, classroomId, lessonId, dateRange }: StudentProgressReportProps) {
+  const { t, language, dir } = useLanguage();
 
-/**
- * Mastery badge colors, from the neo palette — raw `green-500`/`yellow-500`
- * were the only non-token fills on the reports screens.
- */
-function getMasteryColor(mastered: boolean): string {
-  return mastered
-    ? 'bg-neo-lime text-black'
-    : 'bg-neo-yellow text-black';
-}
-
-/**
- * The data layer emits machine codes (lib/supabase/analyticsReports.ts); the
- * recommendation copy lives in the locales. Keys are literals in this map so
- * the reportsI18n contract test can scan and resolve them.
- */
-const RECOMMENDATION_LABEL_KEY = {
-  low_accuracy_focus: 'teacher.reports.recommendations.lowAccuracyFocus',
-  practice_frequency: 'teacher.reports.recommendations.practiceFrequency',
-  mastery_work: 'teacher.reports.recommendations.masteryWork',
-} as const;
-
-// =============================================
-// COMPONENT
-// =============================================
-
-/**
- * StudentProgressReport - Individual student progress view
- *
- * Fetches and displays student progress data with metrics,
- * word mastery breakdown, and PDF export functionality.
- */
-export function StudentProgressReport({
-  studentId,
-  classroomId,
-  lessonId,
-  dateRange,
-}: StudentProgressReportProps) {
-  const { t } = useLanguage();
-  const [data, setData] = useState<StudentReportData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [exporting, setExporting] = useState(false);
-
-  /**
-   * Practice-time formatting goes through the locales: "1h 5m" is an English
-   * abbreviation pattern, and under an hour the hours segment reads as noise.
-   */
-  const formatPracticeMinutes = useCallback(
-    (minutes: number): string => {
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      return hours > 0
-        ? t('teacher.reports.practiceDuration', { hours, minutes: mins })
-        : t('teacher.reports.practiceDurationMinutesOnly', { minutes: mins });
-    },
-    [t]
+  const load = useCallback(
+    () => getStudentReportData(studentId, classroomId, lessonId, dateRange),
+    [studentId, classroomId, lessonId, dateRange]
   );
+  const { data, loading, failed, retry } = useReportData(load);
 
-  // Fetch data on mount or when props change
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-
-      const result = await getStudentReportData(
-        studentId,
-        classroomId,
-        lessonId,
-        dateRange
-      );
-
-      if (result.error) {
-        setError(result.error.message);
-      } else {
-        setData(result.data);
-      }
-
-      setLoading(false);
-    }
-
-    fetchData();
-  }, [studentId, classroomId, lessonId, dateRange]);
-
-  // Handle PDF export
-  const handleExportPDF = useCallback(async () => {
+  const build = useCallback(async () => {
     if (!data) return;
-
-    setExporting(true);
-
-    try {
-      // Dynamically import PDF components to reduce initial bundle size
-      const [{ pdf }, { ProgressReportPDF }] = await Promise.all([
-        import('@react-pdf/renderer'),
-        import('./ProgressReportPDF'),
-      ]);
-
-      // Convert data to PDF format
-      const pdfData = {
-        type: 'student' as const,
+    await downloadReportPdf({
+      t,
+      language,
+      dir,
+      fileName: t('teacher.reports.export.fileStudent', { name: data.studentName }),
+      data: {
+        type: 'student',
         studentName: data.studentName,
         classroomName: data.classroomName,
         generatedAt: new Date(),
-        metrics: {
-          wordsLearned: data.metrics.wordsLearned,
-          totalWords: data.metrics.totalWords,
-          accuracy: data.metrics.accuracy,
-          practiceTimeMinutes: data.metrics.practiceTimeMinutes,
-          currentStreak: data.metrics.currentStreak,
-          longestStreak: data.metrics.longestStreak,
-          sessionsCompleted: data.metrics.sessionsCompleted,
-          averageScore: data.metrics.averageScore,
-          masteryLevel: data.metrics.masteryLevel,
-        },
-        wordMastery: data.wordMastery.map((w) => ({
-          word: w.word,
-          mastered: w.mastered,
-          accuracy: w.accuracy,
-          attempts: w.attempts,
-        })),
-      };
+        metrics: { ...data.metrics },
+        wordMastery: data.wordMastery.map(({ word, mastered, accuracy, attempts }) => ({ word, mastered, accuracy, attempts })),
+        recommendations: data.recommendations,
+      },
+    });
+  }, [data, t, language, dir]);
+  const exporter = useReportExport(build);
 
-      // Generate PDF blob
-      const blob = await pdf(<ProgressReportPDF data={pdfData} />).toBlob();
+  if (loading) return <ReportSkeleton />;
+  if (failed) return <ReportError onRetry={retry} />;
+  if (!data) return <ReportEmpty />;
 
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${data.studentName.replace(/\s+/g, '_')}_progress_report.pdf`;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      logger.error('Error generating PDF:', err);
-    } finally {
-      setExporting(false);
-    }
-  }, [data]);
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-neo-gray animate-pulse">
-          {t('teacher.reports.loading')}
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-neo-red">{t('teacher.reports.error')}</div>
-      </div>
-    );
-  }
-
-  // Empty state
-  if (!data) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-neo-gray">{t('teacher.reports.noData')}</div>
-      </div>
-    );
-  }
+  const { metrics } = data;
+  const masteredPct = percentOf(metrics.wordsLearned, metrics.totalWords);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-neo-white font-neo-display">
-            {t('teacher.reports.studentReport')}
-          </h1>
-          <p className="text-xl text-neo-white mt-1">{data.studentName}</p>
-          <p className="text-neo-gray">{data.classroomName}</p>
+    <div className="space-y-8">
+      <ReportHeader
+        title={t('teacher.reports.studentReport')}
+        subject={data.studentName}
+        meta={[data.classroomName]}
+        exportState={exporter.state}
+        onExport={exporter.run}
+      />
+
+      <section aria-label={t('teacher.reports.sections.summary')} className="space-y-5">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <Stat value={`${metrics.wordsLearned} / ${metrics.totalWords}`} label={t('teacher.reports.metrics.wordsLearned')} size="lg" className="w-full" />
+          <Stat value={`${metrics.accuracy}%`} label={t('teacher.reports.metrics.accuracy')} size="lg" className="w-full" />
+          <Stat value={formatPracticeMinutes(t, metrics.practiceTimeMinutes)} label={t('teacher.reports.metrics.practiceTime')} size="lg" className="w-full" />
+          <Stat value={t('teacher.reports.streakDays', { count: metrics.currentStreak })} label={t('teacher.reports.metrics.currentStreak')} size="lg" className="w-full" />
         </div>
-        <button
-          type="button"
-          onClick={handleExportPDF}
-          disabled={exporting}
-          className="px-4 py-2 bg-neo-lime text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
-        >
-          {exporting
-            ? t('teacher.reports.export.downloading')
-            : t('teacher.reports.export.pdf')}
-        </button>
-      </div>
 
-      {/* Metrics Summary */}
-      <section>
-        <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-          {t('teacher.reports.sections.summary')}
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Stat
-            value={`${data.metrics.wordsLearned} / ${data.metrics.totalWords}`}
-            label={t('teacher.reports.metrics.wordsLearned')}
-            size="lg"
-            className="w-full"
-          />
+        <MasteryMeter percent={masteredPct} label={t('teacher.reports.masteredShare', { percent: masteredPct })} />
 
-          <Stat
-            value={`${data.metrics.accuracy}%`}
-            label={t('teacher.reports.metrics.accuracy')}
-            size="lg"
-            className="w-full"
-          />
-
-          <Stat
-            value={formatPracticeMinutes(data.metrics.practiceTimeMinutes)}
-            label={t('teacher.reports.metrics.practiceTime')}
-            size="lg"
-            className="w-full"
-          />
-
-          <Stat
-            value={t('teacher.reports.streakDays', { count: data.metrics.currentStreak })}
-            label={t('teacher.reports.metrics.currentStreak')}
-            size="lg"
-            className="w-full"
-          />
-        </div>
+        <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+          {[
+            [t('teacher.reports.metrics.sessionsCompleted'), metrics.sessionsCompleted],
+            [t('teacher.reports.metrics.averageScore'), metrics.averageScore],
+            [t('teacher.reports.metrics.longestStreak'), t('teacher.reports.streakDays', { count: metrics.longestStreak })],
+          ].map(([label, value]) => (
+            <div key={String(label)} className="flex items-baseline gap-2">
+              <dt className="text-neo-cream/75">{label}</dt>
+              <dd className="font-bold text-neo-white tabular-nums">{value}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
-      {/* Word Mastery */}
       <section>
-        <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-          {t('teacher.reports.sections.wordMastery')}
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-neo-navy border-b-2 border-black">
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.word')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.status')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.accuracy')}</th>
-                <th className="text-start p-3 text-neo-white font-bold">{t('teacher.reports.columns.attempts')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.wordMastery.map((word, index) => (
-                <tr
-                  key={word.word}
-                  className={`border-b border-neo-gray/30 ${
-                    index % 2 === 0 ? 'bg-neo-navy/50' : 'bg-neo-navy/30'
-                  }`}
-                >
-                  <td className="p-3 text-neo-white font-medium">{word.word}</td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-bold ${getMasteryColor(
-                        word.mastered
-                      )}`}
-                    >
-                      {word.mastered
-                        ? t('teacher.reports.mastery.mastered')
-                        : t('teacher.reports.mastery.practicing')}
-                    </span>
-                  </td>
-                  <td className="p-3 text-neo-white">{word.accuracy}%</td>
-                  <td className="p-3 text-neo-white">{word.attempts}</td>
+        <SectionTitle>{t('teacher.reports.sections.wordMastery')}</SectionTitle>
+        {data.wordMastery.length === 0 ? (
+          <p className="rounded-neo border-2 border-dashed border-neo-cream/30 p-6 text-center text-neo-cream/80">
+            {t('teacher.reports.noWordsYet')}
+          </p>
+        ) : (
+          <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/25">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="bg-neo-navy text-neo-cream/80">
+                  <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.word')}</th>
+                  <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.status')}</th>
+                  <th scope="col" className="p-3 text-start font-bold">{t('teacher.reports.columns.accuracy')}</th>
+                  <th scope="col" className="p-3 text-end font-bold">{t('teacher.reports.columns.attempts')}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {data.wordMastery.map((word) => (
+                  <tr key={word.word} className="border-t border-neo-cream/10 transition-colors hover:bg-neo-cream/5">
+                    <td className="p-3 font-bold text-neo-white">{word.word}</td>
+                    <td className="p-3">
+                      <span
+                        className={cn(
+                          'inline-block rounded-neo border-2 border-black px-2 py-0.5 text-xs font-bold text-black',
+                          word.mastered ? 'bg-neo-lime' : 'bg-neo-yellow'
+                        )}
+                      >
+                        {word.mastered ? t('teacher.reports.mastery.mastered') : t('teacher.reports.mastery.practicing')}
+                      </span>
+                    </td>
+                    <td className="p-3 text-neo-white">
+                      <AccuracyBar value={word.accuracy} />
+                    </td>
+                    <td className="p-3 text-end text-neo-white tabular-nums">{word.attempts}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
-      {/* Recommendations */}
       {data.recommendations && data.recommendations.length > 0 && (
         <section>
-          <h2 className="text-lg font-bold text-neo-white mb-4 font-neo-display">
-            {t('teacher.reports.sections.recommendations')}
-          </h2>
+          <SectionTitle>{t('teacher.reports.sections.recommendations')}</SectionTitle>
           <ul className="space-y-2">
-            {data.recommendations.map((recommendation, index) => (
+            {data.recommendations.map((recommendation) => (
               <li
-                key={`rec-${index}-${recommendation}`}
-                className="flex items-start gap-2 p-3 bg-neo-navy/50 border-neo border-neo-cream/40 rounded-neo"
+                key={recommendation}
+                className="flex items-start gap-3 rounded-neo border-2 border-neo-cream/25 bg-neo-navy-light p-4"
               >
-                <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-none bg-neo-lime" />
-                <span className="text-neo-white">
-                  {t(RECOMMENDATION_LABEL_KEY[recommendation])}
-                </span>
+                <span aria-hidden="true" className="mt-1.5 size-2.5 shrink-0 border-2 border-black bg-neo-lime" />
+                <span className="text-neo-white">{t(RECOMMENDATION_LABEL_KEY[recommendation])}</span>
               </li>
             ))}
           </ul>

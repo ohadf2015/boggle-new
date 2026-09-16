@@ -36,6 +36,8 @@ vi.mock('@react-pdf/renderer', () => ({
   StyleSheet: {
     create: (styles: Record<string, unknown>) => styles,
   },
+  // The export registers a locale font before building the document.
+  Font: { register: vi.fn(), registerHyphenationCallback: vi.fn() },
 }));
 
 // Mock useLanguage
@@ -74,6 +76,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.recommendations.lowAccuracyFocus': 'REC_LOW_ACCURACY_LBL',
         'teacher.reports.recommendations.practiceFrequency': 'REC_PRACTICE_FREQ_LBL',
         'teacher.reports.recommendations.masteryWork': 'REC_MASTERY_LBL',
+        'teacher.reports.masteredShare': '{{percent}}% MASTERED_SHARE',
       };
       let value = translations[key] || key;
       if (params) {
@@ -462,6 +465,50 @@ describe('StudentProgressReport', () => {
         const button = screen.getByRole('button', { name: /export pdf/i });
         expect(button).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Pro polish', () => {
+    it('shows mastery as a progressbar, not only a fraction', async () => {
+      // GIVEN 25 of 50 words mastered
+      render(<StudentProgressReport studentId="student-123" classroomId="classroom-456" />);
+
+      // THEN a labelled progressbar reports 50
+      const bar = await screen.findByRole('progressbar');
+      expect(bar).toHaveAttribute('aria-valuenow', '50');
+      expect(screen.getByText('50% MASTERED_SHARE')).toBeInTheDocument();
+    });
+
+    it('offers a retry after a failed load, and refetches', async () => {
+      const user = userEvent.setup();
+      mockGetStudentReportData.mockResolvedValueOnce({ data: null, error: { message: 'boom' } });
+      render(<StudentProgressReport studentId="student-123" classroomId="classroom-456" />);
+
+      await user.click(await screen.findByRole('button', { name: 'teacher.reports.retry' }));
+
+      // THEN the report loads on the second call
+      expect(await screen.findByText('John Doe')).toBeInTheDocument();
+      expect(mockGetStudentReportData).toHaveBeenCalledTimes(2);
+    });
+
+    it('tells the teacher when the PDF could not be built — no silent no-op', async () => {
+      const user = userEvent.setup();
+      const { pdf } = await import('@react-pdf/renderer');
+      (pdf as unknown as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        toBlob: vi.fn().mockRejectedValue(new Error('font fetch blocked')),
+      });
+      render(<StudentProgressReport studentId="student-123" classroomId="classroom-456" />);
+
+      await user.click(await screen.findByRole('button', { name: /export pdf/i }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent('teacher.reports.export.failed');
+    });
+
+    it('shows an empty-table message when no words were practiced', async () => {
+      mockGetStudentReportData.mockResolvedValue({ data: { ...mockStudentData, wordMastery: [] }, error: null });
+      render(<StudentProgressReport studentId="student-123" classroomId="classroom-456" />);
+
+      expect(await screen.findByText('teacher.reports.noWordsYet')).toBeInTheDocument();
     });
   });
 });
