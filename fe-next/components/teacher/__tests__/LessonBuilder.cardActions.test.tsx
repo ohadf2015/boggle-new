@@ -32,11 +32,14 @@ const LESSON = {
   description: '',
   language: 'en',
   words: [{ word: 'osmosis', canIntegrate: true }],
+  classroom_id: null as string | null,
 };
+
+const ASSIGNED_LESSON = { ...LESSON, id: 'lesson-2', classroom_id: 'c1' };
 
 vi.mock('@/hooks/useVocabularyLesson', () => ({
   useLessons: () => ({
-    lessons: [LESSON],
+    lessons: [LESSON, ASSIGNED_LESSON],
     isLoading: false,
     createLesson: vi.fn(),
     updateLesson: vi.fn(),
@@ -78,10 +81,16 @@ describe('LessonBuilder — lesson card actions', () => {
     expect(push).toHaveBeenCalledWith('/en/student/lessons/lesson-1');
   });
 
-  it('opens the results for the class from the card', () => {
+  it('opens the reports picker for a lesson with no classroom', () => {
     render(<LessonBuilder />);
     fireEvent.click(screen.getByTestId('lesson-results-lesson-1'));
     expect(push).toHaveBeenCalledWith('/en/teacher/reports');
+  });
+
+  it("opens that lesson's classroom report directly when it has one", () => {
+    render(<LessonBuilder />);
+    fireEvent.click(screen.getByTestId('lesson-results-lesson-2'));
+    expect(push).toHaveBeenCalledWith('/en/teacher/reports?classroomId=c1');
   });
 
   it('drops the assign and template-settings icon buttons', () => {

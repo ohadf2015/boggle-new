@@ -12569,7 +12569,7 @@ const ja = {
     "nav": {
       "play": "プレイ",
       "classes": "クラス",
-      "lessons": "レッスン",
+      "lessons": "単語リスト",
       "reports": "レポート",
       "me": "マイページ",
       "studentPlay": "プレイ",

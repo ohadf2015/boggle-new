@@ -11099,7 +11099,7 @@ const en = {
     "nav": {
       "play": "Play",
       "classes": "Classes",
-      "lessons": "Lessons",
+      "lessons": "Word lists",
       "reports": "Reports",
       "me": "Me",
       "studentPlay": "Play",

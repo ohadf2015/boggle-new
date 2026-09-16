@@ -12558,7 +12558,7 @@ const es = {
     "nav": {
       "play": "Jugar",
       "classes": "Clases",
-      "lessons": "Lecciones",
+      "lessons": "Listas",
       "reports": "Informes",
       "me": "Perfil",
       "studentPlay": "Jugar",

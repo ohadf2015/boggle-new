@@ -12803,7 +12803,7 @@ const sv = {
     "nav": {
       "play": "Spela",
       "classes": "Klasser",
-      "lessons": "Lektioner",
+      "lessons": "Ordlistor",
       "reports": "Rapporter",
       "me": "Jag",
       "studentPlay": "Spela",

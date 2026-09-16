@@ -10222,7 +10222,7 @@ const ru = {
     "nav": {
       "play": "Игра",
       "classes": "Классы",
-      "lessons": "Уроки",
+      "lessons": "Списки слов",
       "reports": "Отчёты",
       "me": "Профиль",
       "studentPlay": "Игра",

@@ -12423,7 +12423,7 @@ const he = {
     "nav": {
       "play": "משחק",
       "classes": "כיתות",
-      "lessons": "שיעורים",
+      "lessons": "רשימות מילים",
       "reports": "דוחות",
       "me": "שלי",
       "studentPlay": "משחק",

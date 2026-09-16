@@ -377,7 +377,13 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
                       size="sm"
                       variant="outline"
                       data-testid={`lesson-results-${lesson.id}`}
-                      onClick={() => router.push(`/${language}/teacher/reports`)}
+                      onClick={() =>
+                        router.push(
+                          lesson.classroom_id
+                            ? `/${language}/teacher/reports?classroomId=${lesson.classroom_id}`
+                            : `/${language}/teacher/reports`
+                        )
+                      }
                       className={cn('flex-1 border-neo border-neo-cream shadow-hard hover:shadow-hard-pressed', 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy', 'transition-all text-xs')}
                     >
                       {t('teacher.dashboard.viewReports')}
