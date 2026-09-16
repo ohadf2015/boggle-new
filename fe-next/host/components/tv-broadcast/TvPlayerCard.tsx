@@ -8,6 +8,7 @@ import Avatar from '../../../components/Avatar';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { cn } from '../../../lib/utils';
+import { teamFillClass } from '@/lib/education/teamColors';
 
 // Illustrated rank badge images
 const RANK_BADGE_IMAGES: Record<number, string> = {
@@ -32,6 +33,11 @@ interface TvPlayerCardProps {
   gameMode?: string | null;
   lives?: number;
   isEliminated?: boolean;
+  /**
+   * Team battle: which side this student is on, 0-based. Null in a free-for-all
+   * and for anyone the round's deal has not met yet.
+   */
+  teamId?: number | null;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -87,6 +93,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   gameMode,
   lives,
   isEliminated = false,
+  teamId = null,
   t,
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
@@ -259,6 +266,22 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           >
             {username}
           </p>
+          {teamId != null && (
+            // The number, not just the colour: a projector two rows of desks
+            // away loses hue before it loses a digit, and one student in the
+            // room will be colour-blind.
+            <span
+              data-testid={`tv-player-team-${teamId}`}
+              aria-label={t('education.results.teamBattle.teamName', { number: teamId + 1 })}
+              className={cn(
+                'shrink-0 w-6 h-6 grid place-items-center rounded-neo border-2 border-neo-black',
+                'font-black text-xs text-neo-black',
+                teamFillClass(teamId)
+              )}
+            >
+              {teamId + 1}
+            </span>
+          )}
           {isEliminated && (
             <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded bg-neo-red text-neo-cream text-[10px] font-black uppercase border border-neo-black">
               <Skull className="w-3 h-3" />

@@ -2585,6 +2585,11 @@ const es = {
     "requestSent": "Solicitud enviada"
   },
   "tvBroadcast": {
+    "classroom": {
+      "round": "Ronda {number}",
+      "teamBattle": "Batalla por equipos",
+      "freeForAll": "Todos contra todos"
+    },
     "liveGameInProgress": "Juego en Vivo en Progreso",
     "joinAt": "Únete en",
     "gameCode": "Código de Juego",

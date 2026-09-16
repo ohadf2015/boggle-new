@@ -2570,6 +2570,11 @@ const he = {
     "requestSent": "הבקשה נשלחה"
   },
   "tvBroadcast": {
+    "classroom": {
+      "round": "סבב {number}",
+      "teamBattle": "קרב קבוצות",
+      "freeForAll": "כולם נגד כולם"
+    },
     "liveGameInProgress": "משחק חי מתנהל",
     "joinAt": "הצטרפו ב",
     "gameCode": "קוד משחק",

@@ -2138,6 +2138,11 @@ const en = {
     "languageChangedNotification": "{{name}} changed the game language to {{language}}"
   },
   "tvBroadcast": {
+    "classroom": {
+      "round": "Round {number}",
+      "teamBattle": "Team battle",
+      "freeForAll": "Everyone vs everyone"
+    },
     "liveGameInProgress": "Live Game in Progress",
     "joinAt": "Join at",
     "gameCode": "Game Code",

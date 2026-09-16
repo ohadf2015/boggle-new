@@ -128,3 +128,65 @@ export function computeTeamStandings(
   });
   return standings.sort((a, b) => b.totalScore - a.totalScore);
 }
+
+/**
+ * Keep an existing team assignment and seat only the students it does not know.
+ *
+ * `assignTeams` sorts and seeded-shuffles the WHOLE roster, so it is stable for
+ * a fixed set of names and violently unstable for a growing one: one student
+ * arriving late re-deals every other child. That was harmless while teams
+ * existed only on the results screen — the roster was final by then — and is
+ * not harmless now that the projector paints them live. A class would watch
+ * itself change colour mid-round.
+ *
+ * So the first deal of a session is the assignment, and every later reconcile
+ * is additive:
+ *  - a student already seated NEVER moves, whatever else changed;
+ *  - a student absent this round keeps their seat (wifi drops, bathroom passes);
+ *  - a newcomer joins the smallest team, ties going to the lowest team id, so
+ *    the result is a pure function of the inputs on every client.
+ *
+ * The one case that re-deals is the teacher changing the team count between
+ * rounds: there is no honest way to map 2 teams onto 4, and the class expects a
+ * fresh split.
+ */
+export function reconcileTeams(
+  existing: ClassroomTeam[] | undefined,
+  usernames: string[],
+  teamCount: number,
+  seed: string
+): ClassroomTeam[] {
+  const count = clampTeamCount(teamCount);
+  if (!existing?.length || existing.length !== count) {
+    return assignTeams(usernames, count, seed);
+  }
+
+  const teams: ClassroomTeam[] = existing.map((team) => ({
+    id: team.id,
+    memberNames: [...team.memberNames],
+  }));
+  const seated = new Set(
+    teams.flatMap((team) => team.memberNames.map((name) => name.toLowerCase()))
+  );
+
+  // Sorted so the seating order — and therefore which newcomer lands on which
+  // team — does not depend on socket join order.
+  const newcomers = usernames
+    .filter(Boolean)
+    .filter((name) => {
+      const key = name.toLowerCase();
+      if (seated.has(key)) return false;
+      seated.add(key);
+      return true;
+    })
+    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
+  for (const name of newcomers) {
+    const smallest = teams.reduce((best, team) =>
+      team.memberNames.length < best.memberNames.length ? team : best
+    );
+    smallest.memberNames.push(name);
+  }
+
+  return teams;
+}

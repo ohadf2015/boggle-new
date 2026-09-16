@@ -8,6 +8,8 @@ import { AnimatePresence, m } from 'framer-motion';
 import TvTutorialOverlay, { TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
+import TvBattleBar from './tv-broadcast/TvBattleBar';
+import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import TvLeaderboard from './tv-broadcast/TvLeaderboard';
 import TvActivityPanel from './tv-broadcast/TvActivityPanel';
 import TvMomentumTicker from './tv-broadcast/TvMomentumTicker';
@@ -73,6 +75,12 @@ interface TvBroadcastViewProps {
   earthquakeState?: EarthquakeState;
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
+
+  /**
+   * What the class is playing this round — lesson, round number, format, team
+   * rosters. Null outside classroom games, which is every public room.
+   */
+  classroomLive?: ClassroomLiveContext | null;
 }
 
 // ==================== Component ====================
@@ -110,6 +118,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   earthquakeState = 'idle',
   fireRoundActive = false,
   fireRoundRemaining = 0,
+  classroomLive = null,
 }) => {
   // Mode-overlay state read directly from store — keeps HostView from
   // re-rendering on word-hunt updates when the host isn't using TV broadcast.
@@ -371,6 +380,11 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         t={t}
       />
 
+      {/* Classroom state sentence: which lesson, which round, which format —
+          and, in a team battle, the live tug-of-war. Renders nothing in a
+          public room. */}
+      <TvBattleBar classroom={classroomLive} players={leaderboardData} t={t} />
+
       {/* Momentum Ticker — auto-generated commentary */}
       <TvMomentumTicker
         playerScores={playerScores}
@@ -445,6 +459,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         <div className="min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg overflow-auto">
           <TvLeaderboard
             players={leaderboardData}
+            teams={classroomLive?.teams}
             playerCombos={playerCombos}
             hostUsername={username}
             gameMode={gameMode}

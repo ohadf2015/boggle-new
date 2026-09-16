@@ -51,7 +51,8 @@ import { startVocabQuizForClassroom } from './vocabQuizHandler.js';
 import { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY } from '@/shared/constants/gameConstants';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
-import { beginClassroomRound, setClassroomGamePlacedVocabulary } from '../modules/classroomGameManager.js';
+import { beginClassroomRound, setClassroomGamePlacedVocabulary, saveClassroomTeams } from '../modules/classroomGameManager.js';
+import { buildClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
 import { initWordHuntState, selectTargetWordWithFallback, selectCleanCommonTarget, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
 import { resolveTeacherHuntTarget } from '@/shared/utils/classroomHuntTarget';
@@ -811,10 +812,24 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         audioCues: !!classroomAccessibility.audioCues,
       };
     }
-    if (classroomGame?.settings?.playStyle === 'teams') {
-      startPayload.teamBattle = {
-        teamCount: classroomGame.settings.teamCount ?? 2,
-      };
+    // What the class is playing — lesson, round number, format, team rosters.
+    // The projector is the teacher's ONLY live surface (classroom rooms force
+    // broadcast mode) and until now it received none of this: a team battle
+    // reached the screen as a flat list of names. It rides the shared start
+    // payload so the projector and every phone learn it from one message.
+    const classroomLive = buildClassroomLiveContext({
+      game: classroomGame,
+      humanUsernames,
+    });
+    if (classroomLive) {
+      startPayload.classroom = classroomLive;
+      if (classroomLive.teams) {
+        // Kept the pre-2026-09-16 shape alongside so an older client that only
+        // learned to read `teamBattle` still gets the team count.
+        startPayload.teamBattle = { teamCount: classroomLive.teamCount };
+        // Fire-and-forget: the round must start whether or not Redis answers.
+        void saveClassroomTeams(gameCode, classroomLive.teams);
+      }
     }
 
     // Broadcast start

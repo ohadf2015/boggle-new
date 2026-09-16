@@ -11,6 +11,7 @@ import {
   assignTeams,
   computeTeamStandings,
   clampTeamCount,
+  reconcileTeams,
 } from '../teamBattle';
 
 describe('clampTeamCount', () => {
@@ -80,5 +81,105 @@ describe('computeTeamStandings', () => {
     const standings = computeTeamStandings(teams, [{ username: 'ANA', score: 12 }]);
     expect(standings[0].totalScore).toBe(12);
     expect(standings[0].members.find((m) => m.username === 'ghost')?.score).toBe(0);
+  });
+});
+
+describe('reconcileTeams', () => {
+  const seed = 'ABC123';
+
+  it('deals from scratch when there is no existing assignment', () => {
+    // Given no prior teams, When reconciling, Then it matches a fresh deal.
+    const fresh = assignTeams(['ana', 'bo', 'cy'], 2, seed);
+    expect(reconcileTeams(undefined, ['ana', 'bo', 'cy'], 2, seed)).toEqual(fresh);
+  });
+
+  it('never moves a student who is already seated', () => {
+    // Given a dealt roster, When one more student joins mid-lesson,
+    // Then every original student keeps the exact team they had.
+    const before = assignTeams(['ana', 'bo', 'cy', 'di'], 2, seed);
+    const after = reconcileTeams(before, ['ana', 'bo', 'cy', 'di', 'eli'], 2, seed);
+
+    for (const team of before) {
+      const same = after.find((t) => t.id === team.id)!;
+      for (const name of team.memberNames) {
+        expect(same.memberNames).toContain(name);
+      }
+    }
+  });
+
+  it('seats a newcomer on the smallest team', () => {
+    const existing = [
+      { id: 0, memberNames: ['ana', 'bo'] },
+      { id: 1, memberNames: ['cy'] },
+    ];
+    const after = reconcileTeams(existing, ['ana', 'bo', 'cy', 'di'], 2, seed);
+    expect(after[1].memberNames).toEqual(['cy', 'di']);
+    expect(after[0].memberNames).toEqual(['ana', 'bo']);
+  });
+
+  it('splits two newcomers instead of stacking them on one team', () => {
+    const existing = [
+      { id: 0, memberNames: ['ana'] },
+      { id: 1, memberNames: ['bo'] },
+    ];
+    const after = reconcileTeams(existing, ['ana', 'bo', 'cy', 'di'], 2, seed);
+    expect(after[0].memberNames).toHaveLength(2);
+    expect(after[1].memberNames).toHaveLength(2);
+  });
+
+  it('treats a re-typed nickname as the same student, whatever the case', () => {
+    // Guest students retype their name every round; 'Ana' and 'ana' are one child.
+    const existing = [
+      { id: 0, memberNames: ['Ana'] },
+      { id: 1, memberNames: ['bo'] },
+    ];
+    const after = reconcileTeams(existing, ['ana', 'bo'], 2, seed);
+    expect(after[0].memberNames).toEqual(['Ana']);
+    expect(after[1].memberNames).toEqual(['bo']);
+  });
+
+  it('keeps a student who sat this round out', () => {
+    // Wifi dropped, or they stepped out. Their seat waits for them.
+    const existing = [
+      { id: 0, memberNames: ['ana', 'cy'] },
+      { id: 1, memberNames: ['bo'] },
+    ];
+    const after = reconcileTeams(existing, ['ana', 'bo'], 2, seed);
+    expect(after[0].memberNames).toContain('cy');
+  });
+
+  it('re-deals from scratch when the teacher changes the team count', () => {
+    const existing = assignTeams(['ana', 'bo', 'cy', 'di'], 2, seed);
+    const after = reconcileTeams(existing, ['ana', 'bo', 'cy', 'di'], 4, seed);
+    expect(after).toEqual(assignTeams(['ana', 'bo', 'cy', 'di'], 4, seed));
+    expect(after).toHaveLength(4);
+  });
+
+  it('is idempotent — reconciling twice changes nothing', () => {
+    const once = reconcileTeams(undefined, ['ana', 'bo', 'cy'], 2, seed);
+    const twice = reconcileTeams(once, ['ana', 'bo', 'cy'], 2, seed);
+    expect(twice).toEqual(once);
+  });
+});
+
+describe('the deal survives the round it was dealt for', () => {
+  const seed = 'ABC123';
+
+  it('keeps every colour when a student drops mid-round', () => {
+    // The projector painted this deal for three minutes. If results re-derived
+    // it from whoever happened to finish, a dropped student would recolour the
+    // whole class between the bar and the podium — the room WILL notice.
+    const atStart = assignTeams(['ana', 'bo', 'cy', 'di'], 2, seed);
+    const atResults = reconcileTeams(atStart, ['ana', 'bo', 'cy'], 2, seed);
+    expect(atResults).toEqual(atStart);
+  });
+
+  it('would have recoloured the class without the stored deal', () => {
+    // The bug this guards, stated as a fact: dealing from the finishing roster
+    // is NOT the same deal. If this ever starts passing, the seeded shuffle
+    // became order-stable and the guard above is no longer load-bearing.
+    const atStart = assignTeams(['ana', 'bo', 'cy', 'di'], 2, seed);
+    const reDealt = assignTeams(['ana', 'bo', 'cy'], 2, seed);
+    expect(reDealt).not.toEqual(atStart);
   });
 });

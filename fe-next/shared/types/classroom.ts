@@ -70,8 +70,22 @@ export interface ClassroomSummary {
   /** How many distinct lesson words the class found between them. */
   classFoundCount: number;
   masteryByPlayer: Record<string, ClassroomPlayerMastery>;
-  /** Present when the teacher ran a team battle: server-dealt rosters. */
-  teamBattle?: { teamCount: number; teams: ClassroomTeam[] };
+  /**
+   * Present when the teacher ran a team battle: server-dealt rosters, plus the
+   * per-student totals the team panel sums.
+   *
+   * `scores` is the LESSON total, not the round's, and it is here rather than
+   * left to the client because the two surfaces that render teams have
+   * different data: the student's results page holds the full score list, the
+   * projector holds only the top-three `podium`. Summing a top three into a
+   * team total is simply wrong, and it is the kind of wrong that looks
+   * plausible on screen.
+   */
+  teamBattle?: {
+    teamCount: number;
+    teams: ClassroomTeam[];
+    scores?: Array<{ username: string; score: number }>;
+  };
   /** Present when the SPED preset awarded a flat participation bonus. */
   participationBonus?: number;
   /** Echo of the room's accessibility flags (large type, audio cues). */

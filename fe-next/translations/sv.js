@@ -2812,6 +2812,11 @@ const sv = {
     "requestSent": "Förfrågan skickad"
   },
   "tvBroadcast": {
+    "classroom": {
+      "round": "Omgång {number}",
+      "teamBattle": "Lagkamp",
+      "freeForAll": "Alla mot alla"
+    },
     "liveGameInProgress": "Livespel pågår",
     "joinAt": "Gå med på",
     "gameCode": "Spelkod",

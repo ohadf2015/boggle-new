@@ -142,4 +142,35 @@ describe('ClassroomTvResults', () => {
     expect(screen.getByTestId('classroom-tv-results').className).toContain('overflow-hidden');
     expect(screen.getByTestId('coverage-words').className).toContain('overflow-y-auto');
   });
+
+  it('names the winning TEAM, not just the winning child, after a team battle', () => {
+    // The podium ranks individuals. In a team battle that is not what the room
+    // was playing for, and until 2026-09-16 the teacher's screen had no team
+    // result on it at all — only the students' own phones did.
+    render(
+      <ClassroomTvResults
+        summary={summary({
+          teamBattle: {
+            teamCount: 2,
+            teams: [
+              { id: 0, memberNames: ['Maya'] },
+              { id: 1, memberNames: ['Noa'] },
+            ],
+            scores: [
+              { username: 'Maya', score: 90 },
+              { username: 'Noa', score: 70 },
+            ],
+          },
+        })}
+        t={t}
+      />
+    );
+    expect(screen.getByTestId('team-battle-standings')).toBeInTheDocument();
+    expect(screen.getByTestId('team-standing-0')).toHaveTextContent('Maya');
+  });
+
+  it('shows no team panel in a free-for-all', () => {
+    render(<ClassroomTvResults summary={summary()} t={t} />);
+    expect(screen.queryByTestId('team-battle-standings')).not.toBeInTheDocument();
+  });
 });

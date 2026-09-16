@@ -354,7 +354,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     socket, isConnected, roomsLoading, attemptingReconnect,
     setAttemptingReconnect, refreshRooms, signalIntentionalLeave,
     isPaused, pauseGame, resumeGame, extendTime, endRoundNow, skipTargetWord,
-    classroomAccessibility,
+    classroomAccessibility, classroomLive,
     classroomLevel, classroomWordBank,
   } = useMultiplayerSocket({
     language: language as Language, gameCode, username, roomName,
@@ -697,6 +697,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onExitToLobby={handleExitToLobby}
             isClassroomMode={isClassroomMode}
             classroomGameMode={liveClassroomGame?.gameMode}
+            classroomLive={classroomLive}
           />
         </FeatureErrorBoundary>
       );

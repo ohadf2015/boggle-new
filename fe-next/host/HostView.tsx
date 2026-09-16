@@ -71,6 +71,8 @@ interface GameStartData {
   messageId?: string;
 }
 
+import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
+
 interface LessonData {
   lessonId: string;
   lessonName: string;
@@ -98,6 +100,12 @@ interface HostViewProps {
   onGameStartConsumed?: () => void;
   /** Lesson data for vocabulary-based games started from teacher dashboard */
   lessonData?: LessonData | null;
+  /**
+   * What the class is playing this round, off the `startGame` payload — lesson,
+   * round number, format, team rosters. The projector is the teacher's only
+   * live surface, and until 2026-09-16 it received none of this.
+   */
+  classroomLive?: ClassroomLiveContext | null;
   /** Callback when host changes their display name */
   onUsernameChange?: (newName: string) => void;
   /** Quick Play: auto-start solo game immediately after room join */
@@ -134,6 +142,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   pendingGameStart,
   onGameStartConsumed,
   lessonData,
+  classroomLive = null,
   onUsernameChange,
   autoStart = false,
   isPrivate = false,
@@ -843,6 +852,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           earthquakeState={earthquakeState}
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
+          classroomLive={classroomLive}
         />
       )}
     </div>

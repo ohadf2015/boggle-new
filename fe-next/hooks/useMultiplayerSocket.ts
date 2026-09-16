@@ -17,6 +17,7 @@ import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
 import { isVocabularyLevel } from '@/lib/education/differentiation';
+import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
@@ -92,6 +93,12 @@ interface UseMultiplayerSocketReturn {
   classroomWordBank: string[];
   /** Room-wide SPED accommodations from the startGame payload (classroom games). */
   classroomAccessibility: { largeText?: boolean; audioCues?: boolean } | null;
+  /**
+   * What the class is playing this round — lesson, round number, format, team
+   * rosters. Rides the same `startGame` payload, so the projector and every
+   * phone read it from one message. Null outside classroom games.
+   */
+  classroomLive: ClassroomLiveContext | null;
   setAttemptingReconnect: (value: boolean) => void;
   setRoomsLoading: (value: boolean) => void;
   refreshRooms: () => void;
@@ -126,6 +133,7 @@ export function useMultiplayerSocket(
     largeText?: boolean;
     audioCues?: boolean;
   } | null>(null);
+  const [classroomLive, setClassroomLive] = useState<ClassroomLiveContext | null>(null);
   const [roomsLoading, setRoomsLoading] = useState<boolean>(true);
   const [attemptingReconnect, setAttemptingReconnect] = useState<boolean>(false);
 
@@ -501,6 +509,10 @@ export function useMultiplayerSocket(
             }
           : null
       );
+      // Same rule as the two above: derive from the payload every time. A
+      // round played after the teacher switched to free-for-all must not keep
+      // painting last round's teams.
+      setClassroomLive((data?.classroom as ClassroomLiveContext | undefined) ?? null);
       optionsRef.current.onGameStart(data);
     });
 
@@ -824,6 +836,7 @@ export function useMultiplayerSocket(
     classroomLevel,
     classroomWordBank,
     classroomAccessibility,
+    classroomLive,
     setAttemptingReconnect,
     setRoomsLoading,
     refreshRooms,

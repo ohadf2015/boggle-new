@@ -15,6 +15,7 @@ import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { computeTeamStandings, type ClassroomTeam } from '@/shared/utils/teamBattle';
+import { teamFillClass } from '@/lib/education/teamColors';
 
 export interface TeamBattleStandingsProps {
   teams: ClassroomTeam[];
@@ -22,7 +23,6 @@ export interface TeamBattleStandingsProps {
   scores: Array<{ username: string; score: number }>;
 }
 
-const TEAM_COLORS = ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-yellow'];
 
 export function TeamBattleStandings({ teams, scores }: TeamBattleStandingsProps) {
   const { t } = useLanguage();
@@ -49,7 +49,7 @@ export function TeamBattleStandings({ teams, scores }: TeamBattleStandingsProps)
               data-testid={`team-standing-${team.id}`}
               className={cn(
                 'rounded-neo border-neo border-neo-black p-3',
-                TEAM_COLORS[team.id % TEAM_COLORS.length],
+                teamFillClass(team.id),
                 'text-neo-black',
                 isWinner && 'shadow-hard'
               )}

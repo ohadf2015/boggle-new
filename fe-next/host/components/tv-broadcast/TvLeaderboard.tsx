@@ -7,6 +7,7 @@ import { Users } from 'lucide-react';
 import TvPlayerCard from './TvPlayerCard';
 import TvGapIndicator from './TvGapIndicator';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import type { ClassroomTeam } from '@/shared/utils/teamBattle';
 
 interface LeaderboardEntry {
   username: string;
@@ -26,6 +27,12 @@ interface PlayerComboData {
 
 interface TvLeaderboardProps {
   players: LeaderboardEntry[];
+  /**
+   * Team battle rosters for this round. The tug-of-war above says which side
+   * leads; this is what says which side each child is on. Absent in a
+   * free-for-all and in every public room.
+   */
+  teams?: ClassroomTeam[];
   playerCombos?: Record<string, PlayerComboData>;
   hostUsername?: string;
   gameMode?: string | null;
@@ -44,6 +51,7 @@ const VIRTUAL_THRESHOLD = 15;
  */
 const TvLeaderboard = memo<TvLeaderboardProps>(({
   players,
+  teams,
   playerCombos = {},
   hostUsername,
   gameMode,
@@ -52,6 +60,18 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   t,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
+
+  // Guest students retype their nickname every round, so the lookup is
+  // case-insensitive — the same rule the roster and the deal already use. A
+  // name the deal has not met (a late arrival, seated at the next round start)
+  // stays uncoloured rather than being guessed onto a team.
+  const teamByName = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const team of teams ?? []) {
+      for (const name of team.memberNames) map.set(name.toLowerCase(), team.id);
+    }
+    return map;
+  }, [teams]);
 
   // Sort players by score (descending)
   const sortedPlayers = useMemo(() => {
@@ -106,6 +126,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
             <Fragment key={player.username}>
               <TvPlayerCard
                 username={player.username}
+                teamId={teamByName.get(player.username.toLowerCase()) ?? null}
                 avatar={player.avatar}
                 score={player.score}
                 wordCount={player.wordCount}
@@ -175,6 +196,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
               >
                 <TvPlayerCard
                   username={player.username}
+                  teamId={teamByName.get(player.username.toLowerCase()) ?? null}
                   avatar={player.avatar}
                   score={player.score}
                   wordCount={player.wordCount}

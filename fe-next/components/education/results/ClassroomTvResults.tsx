@@ -42,6 +42,7 @@ import { Flame, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './ResultsPodium';
 import ClassroomSessionStandings from './ClassroomSessionStandings';
+import { TeamBattleStandings } from '../TeamBattleStandings';
 import { WordCoverageGlance } from './WordCoverageGlance';
 import { WinnerSpotlight } from './WinnerSpotlight';
 import { CelebrationLoop } from './CelebrationLoop';
@@ -176,6 +177,17 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
               is asking a different question than the podium answers — see
               `ClassroomSessionStandings`. Absent on a single-round session,
               where the podium already is the answer. */}
+          {/* In a team battle the podium answers the wrong question entirely:
+              the room was playing for a side, and the side's result lived only
+              on the students' own phones (`ResultsPage`). First, because it is
+              what the class was actually competing for. */}
+          {summary.teamBattle?.scores?.length ? (
+            <TeamBattleStandings
+              teams={summary.teamBattle.teams}
+              scores={summary.teamBattle.scores}
+            />
+          ) : null}
+
           {summary.sessionStandings?.length ? (
             <ClassroomSessionStandings
               standings={summary.sessionStandings}

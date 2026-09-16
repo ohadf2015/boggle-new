@@ -2527,6 +2527,11 @@ const ja = {
     "requestSent": "リクエスト送信済み"
   },
   "tvBroadcast": {
+    "classroom": {
+      "round": "ラウンド{number}",
+      "teamBattle": "チーム対戦",
+      "freeForAll": "全員対戦"
+    },
     "liveGameInProgress": "ライブゲーム進行中",
     "joinAt": "参加URL",
     "gameCode": "ゲームコード",

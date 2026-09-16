@@ -7,6 +7,7 @@
 
 import { getRedisClient } from '../redisClient';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import type { ClassroomTeam } from '@/shared/utils/teamBattle';
 import logger from '../utils/logger';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
 import type { ClassroomSessionScores } from './classroomSessionScores';
@@ -109,6 +110,17 @@ export interface ClassroomGame {
   sessionScores?: ClassroomSessionScores;
   /** Rounds this session has actually finished. 1 during the first results screen. */
   roundsPlayed?: number;
+  /**
+   * Team battle: the assignment dealt when this session's first team round
+   * started, and reused by every round after it.
+   *
+   * `assignTeams` is stable for a fixed roster and violently unstable for a
+   * growing one — it sorts and seeded-shuffles everybody, so one late arrival
+   * re-deals the whole class. Recomputing per round was survivable while teams
+   * appeared only on the results screen; the projector now paints them live, so
+   * the deal has to be a stored fact. `reconcileTeams` extends it additively.
+   */
+  teams?: ClassroomTeam[];
 }
 
 export interface CreateClassroomGameData {
@@ -514,5 +526,31 @@ export async function saveClassroomSessionScores(
     await redis.setex(`classroom_game:${gameCode}`, CLASSROOM_GAME_TTL, JSON.stringify(game));
   } catch (error) {
     logger.error('CLASSROOM_GAME', `Failed to record session scores: ${error}`);
+  }
+}
+
+/**
+ * Persist the team deal for this session.
+ *
+ * Written at round start, before the board is broadcast, so that the results
+ * screen at the end of the round reads back the same teams the projector has
+ * been showing for the whole round instead of dealing its own.
+ *
+ * Swallows its errors on purpose: losing the stored deal costs a re-deal next
+ * round, and must never stop a round from starting.
+ */
+export async function saveClassroomTeams(
+  gameCode: string,
+  teams: ClassroomTeam[]
+): Promise<void> {
+  try {
+    const redis = getRedis();
+    const game = await getClassroomGame(gameCode);
+    if (!game) return;
+
+    game.teams = teams;
+    await redis.setex(`classroom_game:${gameCode}`, CLASSROOM_GAME_TTL, JSON.stringify(game));
+  } catch (error) {
+    logger.error('CLASSROOM_GAME', `Failed to record team assignment: ${error}`);
   }
 }

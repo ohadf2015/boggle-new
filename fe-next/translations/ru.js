@@ -11242,6 +11242,11 @@ const ru = {
     }
   },
   "tvBroadcast": {
+    "classroom": {
+      "round": "Раунд {number}",
+      "teamBattle": "Битва команд",
+      "freeForAll": "Каждый за себя"
+    },
     "liveGameInProgress": "Прямая игра в процессе",
     "joinAt": "Присоединитесь к",
     "gameCode": "Код игры",

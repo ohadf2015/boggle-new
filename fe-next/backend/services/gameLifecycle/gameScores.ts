@@ -30,7 +30,7 @@ import { buildClassroomPodium, splitNeverPlacedWords } from '../../modules/class
 import { accumulateSessionScores, toSessionStandings } from '../../modules/classroomSessionScores';
 import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
-import { assignTeams, clampTeamCount } from '@/shared/utils/teamBattle';
+import { clampTeamCount, reconcileTeams } from '@/shared/utils/teamBattle';
 import { PARTICIPATION_BONUS } from '@/shared/types/classroom';
 import type { UserData } from './types';
 import logger from '../../utils/logger';
@@ -268,9 +268,32 @@ export async function calculateAndBroadcastFinalScores(
           const humanNames = resultsWithIconAchievements
             .filter((p) => !game.users?.[p.username]?.isBot)
             .map((p) => p.username);
+          // Prefer the deal the round STARTED with — the one the projector has
+          // been painting for the last three minutes. Re-dealing here used to be
+          // harmless because teams were invisible until this screen; it is not
+          // harmless now, and `assignTeams` re-shuffles everybody whenever the
+          // roster changes, so a student who dropped mid-round would have flipped
+          // the whole class's colours between the board and the podium.
+          // `reconcileTeams` seats anyone the stored deal has not met yet.
+          if (!classroomGame?.teams?.length) {
+            // The projector painted a deal for this whole round. Losing it here
+            // means the podium re-deals from the roster that FINISHED, so a
+            // student who dropped mid-round silently recolours the class. Never
+            // silent (class 4) — a mismatch between the bar and the podium is
+            // exactly the kind of thing a room notices and we do not.
+            logger.warn(
+              'CLASSROOM_GAME',
+              `No stored team deal for ${gameCode} at results — re-dealing from the finishing roster`
+            );
+          }
           classroomSummary.teamBattle = {
             teamCount: clampTeamCount(classroomSettings.teamCount),
-            teams: assignTeams(humanNames, classroomSettings.teamCount ?? 2, gameCode),
+            teams: reconcileTeams(
+              classroomGame?.teams,
+              humanNames,
+              classroomSettings.teamCount ?? 2,
+              gameCode
+            ),
           };
         }
         if (participationBonus > 0) {
@@ -310,6 +333,14 @@ export async function calculateAndBroadcastFinalScores(
         // saying the same thing is noise on a projector.
         if (roundsPlayed > 1) {
           classroomSummary.sessionStandings = toSessionStandings(sessionScores);
+        }
+        // The team panel sums whole students, so it needs the whole class. On
+        // round one this is just round one's scores, which is what it should be.
+        if (classroomSummary.teamBattle) {
+          classroomSummary.teamBattle.scores = toSessionStandings(sessionScores).map((row) => ({
+            username: row.username,
+            score: row.totalScore,
+          }));
         }
         // AWAITED, deliberately. `roundsPlayed` for the NEXT round is read back
         // off this same Redis record, and the record is rewritten whole
