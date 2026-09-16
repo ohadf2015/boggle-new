@@ -1,7 +1,9 @@
 /**
- * Funnel parity: SinglePlayerGame must emit `trackGameStart('singleplayer', { subMode })`
- * once on mount. subMode = settings.mode, matching emitSinglePlayerGameEnd(results, settings.mode)
- * in useSinglePlayerCore so PostHog can join mode_started → game_completed.
+ * Funnel parity: exactly ONE `game_started` per SP game. The emitter lives in
+ * useSinglePlayerEffects (inside useSinglePlayerCore) because Quick Play mounts that
+ * core without SinglePlayerGame. This file pins that SinglePlayerGame adds no second
+ * emitter — it did until 2026-09-16, and this test's own mock of useSinglePlayerCore
+ * is what hid the duplicate.
  */
 import React from 'react';
 import { render } from '@testing-library/react';
@@ -100,7 +102,7 @@ beforeEach(() => {
 });
 
 describe('SinglePlayerGame trackGameStart', () => {
-  it("emits trackGameStart('singleplayer') once on mount with subMode=settings.mode", () => {
+  it('delegates game_started to useSinglePlayerCore and never emits its own', () => {
     render(
       <SinglePlayerGame
         settings={settings}
@@ -109,10 +111,9 @@ describe('SinglePlayerGame trackGameStart', () => {
         onQuit={vi.fn()}
       />
     );
-    expect(trackGameStart).toHaveBeenCalledTimes(1);
-    expect(trackGameStart).toHaveBeenCalledWith(
-      'singleplayer',
-      expect.objectContaining({ subMode: 'practice', language: 'en' })
-    );
+    // The real emitter lives in useSinglePlayerEffects (inside useSinglePlayerCore,
+    // mocked out here), so this component must add NOTHING of its own. It used to
+    // emit a second game_started, which double-counted every SP game in prod.
+    expect(trackGameStart).not.toHaveBeenCalled();
   });
 });

@@ -13,6 +13,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress, type StudentLesson } from '@/hooks/useStudentProgress';
 import { usePracticeLessons } from '@/hooks/usePracticeLessons';
+import { mergeStudentLessons } from '@/lib/education/mergeLessons';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { wordsForLevel } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
@@ -104,29 +105,14 @@ export default function StudentLessonView() {
   // everything else the student may practise. A lesson present in both is ONE
   // card, and the homework half wins — it is the half that carries the deadline
   // and the real progress row.
-  const cards = useMemo<StudentLesson[]>(() => {
-    const byId = new Map<string, StudentLesson>();
-    for (const entry of lessons) byId.set(entry.lessonId, entry);
-    for (const open of practisable) {
-      if (byId.has(open.id)) continue;
-      byId.set(open.id, {
-        lessonId: open.id,
-        // Not 'assigned': that status paints a pulsing NEW badge that means
-        // "your teacher gave you this", which is precisely what did not happen.
-        status: 'started',
-        lesson: {
-          id: open.id,
-          name: open.name,
-          description: open.description,
-          language: open.language,
-          words: open.words,
-          classroom_id: open.classroom_id,
-        } as StudentLesson['lesson'],
-        ...(open.assignment ? { assignment: open.assignment as StudentLesson['assignment'] } : {}),
-      });
-    }
-    return [...byId.values()];
-  }, [lessons, practisable]);
+  // One rule, one place: `mergeStudentLessons` (the hub reads the same helper, so
+  // the two screens cannot drift). A practisable-only lesson lands as 'started',
+  // never 'assigned' — that status paints a pulsing NEW badge meaning "your
+  // teacher gave you this", which is precisely what did not happen.
+  const cards = useMemo<StudentLesson[]>(
+    () => mergeStudentLessons(lessons, practisable),
+    [lessons, practisable]
+  );
 
   // "Is this homework late?" needs the clock, and reading `Date.now()` during
   // render is impure — the same reason `useTeacherAccess` keeps a ticking

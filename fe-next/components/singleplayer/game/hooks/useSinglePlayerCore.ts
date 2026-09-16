@@ -244,6 +244,7 @@ export function useSinglePlayerCore({
 
   const effects = useSinglePlayerEffects({
     grid, isPaused, isGameOver, score, language: settings.language, mode: settings.mode,
+    difficulty: settings.difficulty,
     isLandscape: false, isDesktop, isTv, remainingTime: timer.remainingTime, gameActive,
     foundWords, timerSeconds: settings.timerSeconds,
     trainingCompletedSkillsRef, trainingUpdateProgress, announceTimer, setGameActive,

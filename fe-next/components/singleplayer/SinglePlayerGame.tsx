@@ -7,7 +7,7 @@ import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
-import { trackDeadTime, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
+import { trackDeadTime, trackGrowthEvent } from '@/utils/growthTracking';
 import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogEngagement';
 import { useBoardReadyTelemetry } from './game/hooks/useBoardReadyTelemetry';
 
@@ -65,13 +65,9 @@ function SinglePlayerGame({
     quitStaysOnPage,
   });
 
-  // Funnel parity: emit game_started once on mount to pair with emitSinglePlayerGameEnd('singleplayer', settings.mode, ...)
+  // No game_started here: useSinglePlayerEffects (inside useSinglePlayerCore above)
+  // is the single emitter. Emitting here too double-counted every SP game.
   useEffect(() => {
-    trackGameStart('singleplayer', {
-      subMode: settings.mode,
-      difficulty: settings.difficulty,
-      language: settings.language,
-    });
     // CrazyGames ranking signal — fires `first_minute_retained` if player
     // stays past 60s. Cancelled on unmount (early abandon).
     const survival = createFirstMinuteSurvivalTimer({

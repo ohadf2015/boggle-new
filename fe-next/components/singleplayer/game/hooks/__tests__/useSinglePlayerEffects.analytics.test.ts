@@ -46,6 +46,7 @@ function baseOptions(overrides: Partial<Parameters<typeof useSinglePlayerEffects
     score: 0,
     language: 'en',
     mode: 'practice',
+    difficulty: 'EASY',
     isLandscape: false,
     isDesktop: false,
     isTv: false,
@@ -79,6 +80,19 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     global.fetch = vi.fn(() => Promise.resolve({ ok: true } as Response)) as unknown as typeof fetch;
   });
 
+  // 2026-09-16: SinglePlayerGame emitted a SECOND game_started (with difficulty +
+  // language) on top of this one — 275 of 563 prod singleplayer starts were dupes
+  // within 500ms. This hook is now the single emitter (it also covers Quick Play,
+  // which mounts useSinglePlayerCore without SinglePlayerGame), so it must carry
+  // the fields that emitter contributed.
+  it('carries difficulty and language so no field is lost with one emitter', () => {
+    renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'classic', grid: grid4, difficulty: 'HARD' })));
+    expect(trackGameStart).toHaveBeenCalledTimes(1);
+    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
+      subMode: 'classic', boardSize: 4, difficulty: 'HARD', language: 'en',
+    }));
+  });
+
   it('fires trackGameStart exactly once on mount with mode + boardSize', () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'practice', grid: grid4 })));
 
@@ -86,6 +100,8 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
       subMode: 'practice',
       boardSize: 4,
+      difficulty: 'EASY',
+      language: 'en',
     });
   });
 
@@ -95,6 +111,8 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
       subMode: 'classic',
       boardSize: 5,
+      difficulty: 'EASY',
+      language: 'en',
     });
   });
 
@@ -104,6 +122,8 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
       subMode: 'practice',
       boardSize: 0,
+      difficulty: 'EASY',
+      language: 'en',
     });
   });
 
