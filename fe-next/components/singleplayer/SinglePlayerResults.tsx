@@ -89,6 +89,17 @@ const RANK_CONFETTI_COLORS: Record<number, string[]> = {
   3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'],
 };
 
+// ponytail: module-level so it survives the results -> game -> results remount
+// cycle inside one tab session; a page reload resets it, which is the right scope.
+// Guards against an unattended tab auto-restarting games forever (prod: 535
+// consecutive 0-score games from one session).
+let consecutiveIdleAutoPlays = 0;
+const MAX_CONSECUTIVE_IDLE_AUTOPLAYS = 3;
+
+export function __resetAutoPlayGuardForTests() {
+  consecutiveIdleAutoPlays = 0;
+}
+
 interface SinglePlayerResultsProps {
   results: SinglePlayerResultsData;
   mode: SinglePlayerMode;
@@ -113,6 +124,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [autoPlayCancelled, setAutoPlayCancelled] = useState(false);
   const [showTomorrowPreview, setShowTomorrowPreview] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
+  // See consecutiveIdleAutoPlays above: a real player always finds at least
+  // one word, which resets the counter every round — only an idle tab with
+  // zero score/words can ever run it up to the cap.
+  // Optional-chained on purpose: the type says playerWords is required, but every
+  // other read in this file guards it (`|| []`, `?.length || 0`), so it evidently
+  // arrives undefined in the wild. An unguarded read here would white-screen results.
+  const playerWasActive = results.playerScore > 0 || (results.playerWords?.length ?? 0) > 0;
+  const autoPlayAllowed = consecutiveIdleAutoPlays < MAX_CONSECUTIVE_IDLE_AUTOPLAYS;
 
   // Interstitial AT THE TRANSITION, not over the score reveal. It used to fire
   // on mount — a fullscreen ad before the player had even seen their score,
@@ -442,11 +462,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   const ctaBlock = (
     <div className="space-y-3">
-      {!autoPlayCancelled ? (
+      {!autoPlayCancelled && autoPlayAllowed ? (
         <AutoPlayCountdown
-          onComplete={handlePlayAgainGated}
+          onComplete={(reason) => {
+            consecutiveIdleAutoPlays = (reason === 'click' || playerWasActive) ? 0 : consecutiveIdleAutoPlays + 1;
+            handlePlayAgainGated();
+          }}
           onCancel={() => {
             trackGrowthEvent('results_autoplay_cancelled', { mode });
+            consecutiveIdleAutoPlays = 0;
             setAutoPlayCancelled(true);
           }}
           duration={5}

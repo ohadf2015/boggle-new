@@ -17,8 +17,12 @@ import { cn } from '@/lib/utils';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 interface AutoPlayCountdownProps {
-  /** Called when countdown reaches 0 or user clicks "Play Again" */
-  onComplete: () => void;
+  /**
+   * Called when countdown reaches 0 or user clicks "Play Again". `reason`
+   * distinguishes an unattended timeout from a human click, so a caller can
+   * detect (and stop) an idle tab auto-restarting forever.
+   */
+  onComplete: (reason: 'timeout' | 'click') => void;
   /** Called when user clicks "Exit" — parent should show normal navigation */
   onCancel: () => void;
   /** Countdown duration in seconds (default: 5) */
@@ -51,11 +55,11 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
     trackGrowthEvent('replay_countdown_shown', {});
   }, []);
 
-  const handleComplete = useCallback(() => {
+  const handleComplete = useCallback((reason: 'timeout' | 'click') => {
     if (completedRef.current) return;
     completedRef.current = true;
     if (intervalRef.current) clearInterval(intervalRef.current);
-    onComplete();
+    onComplete(reason);
   }, [onComplete]);
 
   const handleCancel = useCallback(() => {
@@ -71,7 +75,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
     intervalRef.current = setInterval(() => {
       setSecondsLeft(prev => {
         if (prev <= 1) {
-          handleComplete();
+          handleComplete('timeout');
           return 0;
         }
         return prev - 1;
@@ -89,7 +93,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
       <div className={cn('flex flex-col items-center gap-3', className)}>
         <button
           type="button"
-          onClick={handleComplete}
+          onClick={() => handleComplete('click')}
           className={cn(
             'w-full py-4 px-8',
             'bg-neo-yellow text-neo-navy',
@@ -131,7 +135,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
       {/* Countdown ring + number */}
       <button
         type="button"
-        onClick={handleComplete}
+        onClick={() => handleComplete('click')}
         className={cn(
           'relative flex items-center justify-center',
           'w-20 h-20 sm:w-24 sm:h-24',

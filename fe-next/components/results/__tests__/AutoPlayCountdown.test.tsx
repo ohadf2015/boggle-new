@@ -129,4 +129,17 @@ describe('AutoPlayCountdown', () => {
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();
   });
+
+  it('should report the completion reason: "timeout" on expiry, "click" on manual trigger', () => {
+    const onTimeoutComplete = vi.fn();
+    const { unmount } = render(<AutoPlayCountdown onComplete={onTimeoutComplete} onCancel={vi.fn()} />);
+    act(() => { vi.advanceTimersByTime(5000); });
+    expect(onTimeoutComplete).toHaveBeenCalledWith('timeout');
+    unmount();
+
+    const onClickComplete = vi.fn();
+    render(<AutoPlayCountdown onComplete={onClickComplete} onCancel={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'PLAY AGAIN' }));
+    expect(onClickComplete).toHaveBeenCalledWith('click');
+  });
 });
