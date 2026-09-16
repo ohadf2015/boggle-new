@@ -23,10 +23,11 @@ import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
 import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
-import { getClassroomGame, updateClassroomGameStatus, type ClassroomGame } from '../../modules/classroomGameManager';
+import { getClassroomGame, updateClassroomGameStatus, saveClassroomSessionScores, type ClassroomGame } from '../../modules/classroomGameManager';
 import { hasQuizSession } from '../../modules/vocabQuizStore.js';
 import { buildClassroomSummary } from '../../modules/classroomSummary';
 import { buildClassroomPodium, splitNeverPlacedWords } from '../../modules/classroomResultsExtras';
+import { accumulateSessionScores, toSessionStandings } from '../../modules/classroomSessionScores';
 import { persistClassroomGameScores, playerScoresFromGameResults } from '../../handlers/classroomGamePersistence';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import { assignTeams, clampTeamCount } from '@/shared/utils/teamBattle';
@@ -289,6 +290,40 @@ export async function calculateAndBroadcastFinalScores(
           // broadcast), so their zero was sorting onto the top plinth.
           exclude: [classroomGame.teacherName],
         });
+        // The LESSON total, not the round total. `resetGameForNewRound` zeroes
+        // the room's scores on every rematch, so without this fold each round's
+        // podium is a separate reset-to-zero contest and no screen can say who
+        // won the period. Folded here — the one place a round's final scores and
+        // the session-long Redis record are both in scope.
+        const sessionScores = accumulateSessionScores(
+          classroomGame.sessionScores,
+          resultsWithIconAchievements.map((p) => ({
+            username: p.username,
+            totalScore: p.totalScore,
+            isBot: !!game.users?.[p.username]?.isBot,
+          })),
+          [classroomGame.teacherName]
+        );
+        const roundsPlayed = (classroomGame.roundsPlayed ?? 0) + 1;
+        classroomSummary.roundsPlayed = roundsPlayed;
+        // Round one's podium already IS the session answer — a second list
+        // saying the same thing is noise on a projector.
+        if (roundsPlayed > 1) {
+          classroomSummary.sessionStandings = toSessionStandings(sessionScores);
+        }
+        // AWAITED, deliberately. `roundsPlayed` for the NEXT round is read back
+        // off this same Redis record, and the record is rewritten whole
+        // (get → mutate → setex) by `beginClassroomRound` and
+        // `setClassroomGamePlacedVocabulary` at the start of round two. Fired
+        // and forgotten, this write races both: it can land after they have
+        // already read, and their `setex` then drops `sessionScores` — so
+        // round two reads `roundsPlayed` as undefined, computes 1 again, and
+        // the session leaderboard never appears at all. That is the bug this
+        // whole feature exists to fix, silently restored. The cost of awaiting
+        // is one Redis round-trip before a results payload that is already
+        // waiting on several; errors are swallowed inside.
+        await saveClassroomSessionScores(gameCode, sessionScores, roundsPlayed);
+
         const neverPlaced = splitNeverPlacedWords({
           missedWords: classroomSummary.missedWords,
           placedWords: classroomGame.placedVocabulary,

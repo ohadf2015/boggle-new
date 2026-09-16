@@ -13730,6 +13730,11 @@ const ja = {
         "wordsFound": "{{total}}語中{{found}}語",
         "correct": "正解{{count}}問"
       },
+      "session": {
+        "title": "レッスンの順位",
+        "subtitle": "{{rounds}}ラウンド終了時点",
+        "winner": "{{name}} がレッスン優勝！"
+      },
       "you": {
         "won": "ゆうしょう！",
         "podium": "にゅうしょう！",

@@ -12300,6 +12300,11 @@ const en = {
         "wordsFound": "{{found}} of {{total}} words",
         "correct": "{{count}} correct"
       },
+      "session": {
+        "title": "Lesson leaderboard",
+        "subtitle": "After {{rounds}} rounds",
+        "winner": "{{name}} wins the lesson!"
+      },
       "you": {
         "won": "YOU WON!",
         "podium": "ON THE PODIUM!",

@@ -13584,6 +13584,11 @@ const he = {
         "wordsFound": "{{found}} מתוך {{total}} מילים",
         "correct": "{{count}} תשובות נכונות"
       },
+      "session": {
+        "title": "טבלת השיעור",
+        "subtitle": "אחרי {{rounds}} סבבים",
+        "winner": "{{name}} בראש השיעור!"
+      },
       "you": {
         "won": "ניצחת!",
         "podium": "על הפודיום!",

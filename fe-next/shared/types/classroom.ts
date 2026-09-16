@@ -37,6 +37,15 @@ export interface ClassroomAccessibility {
 /** Points every human player gets when participationPoints is on. */
 export const PARTICIPATION_BONUS = 10;
 
+/** One row of the whole-session leaderboard. */
+export interface ClassroomSessionStanding {
+  username: string;
+  /** Summed across every round this student played. */
+  totalScore: number;
+  roundsPlayed: number;
+  rank: number;
+}
+
 /** One plinth on the end-of-game podium. */
 export interface ClassroomPodiumEntry {
   username: string;
@@ -72,6 +81,18 @@ export interface ClassroomSummary {
    * teacher's laptop and every student phone celebrate the same three names.
    */
   podium?: ClassroomPodiumEntry[];
+  /**
+   * The LESSON's standings — every student, summed across every round played.
+   *
+   * The podium above is one round; a rematch zeroes the room's scores, so after
+   * round two the podium answers "who won that round" and nothing answered "who
+   * won today". A teacher running three rounds in a period had no way to tell
+   * her class who had actually won (reported 2026-09-14). Absent on a
+   * single-round session, where the podium already IS the answer.
+   */
+  sessionStandings?: ClassroomSessionStanding[];
+  /** Rounds finished in this session. Absent or 1 on the first results screen. */
+  roundsPlayed?: number;
   /**
    * Subset of `missedWords` the board generator never actually embedded, so
    * results can say "the class never saw these" instead of blaming the class.

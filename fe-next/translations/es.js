@@ -13722,6 +13722,11 @@ const es = {
         "wordsFound": "{{found}} de {{total}} palabras",
         "correct": "{{count}} aciertos"
       },
+      "session": {
+        "title": "Clasificación de la lección",
+        "subtitle": "Después de {{rounds}} rondas",
+        "winner": "¡{{name}} gana la lección!"
+      },
       "you": {
         "won": "¡GANASTE!",
         "podium": "¡EN EL PODIO!",
