@@ -5,9 +5,13 @@ describe('/es/juego-de-palabras-multijugador metadata', () => {
   it('uses a keyword-led title and a CTR-focused description for scrabble online', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'es' }) });
 
-    expect(meta.title).toBe('Scrabble Online en Español Gratis — 50 Jugadores, Sin Registro | LexiClash');
+    // Title is kept under 60 chars so Google does not truncate it in the SERP
+    // (#1071 shortened it from 74). Update BOTH this expectation and page.tsx
+    // together — that PR changed only page.tsx and turned master red.
+    expect(meta.title).toBe('Scrabble Online Gratis en Español — Sin App | LexiClash');
+    expect(meta.title.length).toBeLessThanOrEqual(60);
     expect(meta.description).toBe(
-      'Juega Scrabble en español gratis — sin app, sin registro. Hasta 50 jugadores en tiempo real. ¡Crea tu sala en 10 segundos! →',
+      'Juega Scrabble en español gratis con amigos — sin app, sin registro. Hasta 50 jugadores en tiempo real. ¡Empieza en 10 segundos! →',
     );
     expect(meta.robots).toEqual({ index: true, follow: true });
     expect(meta.alternates?.canonical).toBe('https://www.lexiclash.live/es/juego-de-palabras-multijugador');
