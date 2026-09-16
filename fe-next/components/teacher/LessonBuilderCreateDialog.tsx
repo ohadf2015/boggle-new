@@ -10,6 +10,8 @@ import WordListEditor from './WordListEditor';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { BookTemplate, ChevronDown } from 'lucide-react';
 import type { Language, VocabularyWord } from '@/lib/supabase/education';
+import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
+import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
 
 interface Classroom {
   id: string;
@@ -154,10 +156,11 @@ export default function LessonBuilderCreateDialog({
 
             {/* Lesson Name */}
             <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
+              <label htmlFor="lesson-name" className="block text-sm font-neo-body text-neo-white mb-2">
                 {t('teacher.lesson.name')}
               </label>
               <Input
+                id="lesson-name"
                 value={formData.name}
                 onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
                 placeholder={t('teacher.lesson.namePlaceholder')}
@@ -167,10 +170,11 @@ export default function LessonBuilderCreateDialog({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
+              <label htmlFor="lesson-description" className="block text-sm font-neo-body text-neo-white mb-2">
                 {t('teacher.lesson.description')}
               </label>
               <Input
+                id="lesson-description"
                 value={formData.description}
                 onChange={(e) => onFormDataChange({ ...formData, description: e.target.value })}
                 placeholder={t('teacher.lesson.descriptionPlaceholder')}
@@ -180,10 +184,11 @@ export default function LessonBuilderCreateDialog({
 
             {/* Language */}
             <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
+              <label htmlFor="lesson-language" className="block text-sm font-neo-body text-neo-white mb-2">
                 {t('teacher.classroom.language')}
               </label>
               <select
+                id="lesson-language"
                 value={formData.language}
                 onChange={(e) => onFormDataChange({ ...formData, language: e.target.value as Language })}
                 className={cn(
@@ -192,19 +197,21 @@ export default function LessonBuilderCreateDialog({
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
                 )}
               >
-                <option value="en">English</option>
-                <option value="he">Hebrew</option>
-                <option value="sv">Swedish</option>
-                <option value="ja">Japanese</option>
+                {EDUCATION_LANGUAGES.map((code) => (
+                  <option key={code} value={code}>
+                    {t(LANGUAGE_LABEL_KEYS[code])}
+                  </option>
+                ))}
               </select>
             </div>
 
             {/* Classroom Assignment */}
             <div>
-              <label className="block text-sm font-neo-body text-neo-white mb-2">
+              <label htmlFor="lesson-classroom" className="block text-sm font-neo-body text-neo-white mb-2">
                 {t('teacher.lesson.assignToClassroom')}
               </label>
               <select
+                id="lesson-classroom"
                 value={formData.classroomId}
                 onChange={(e) => onFormDataChange({ ...formData, classroomId: e.target.value })}
                 className={cn(

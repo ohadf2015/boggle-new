@@ -12803,7 +12803,7 @@ const sv = {
     "nav": {
       "play": "Spela",
       "classes": "Klasser",
-      "lessons": "Ordlistor",
+      "lessons": "Bibliotek",
       "reports": "Rapporter",
       "me": "Jag",
       "studentPlay": "Spela",
@@ -13326,6 +13326,8 @@ const sv = {
       }
     },
     "lesson": {
+      "sectionTitle": "Dina lektioner",
+      "sectionHint": "En lektion är en ordlista. Kör den live med hela klassen, eller dela den så att eleverna kan öva på egen hand.",
       "pasteWords": "Klistra in din ordlista",
       "pasteWordsPlaceholder": "Ett ord per rad – eller separerade med kommatecken",
       "pasteWordsParsed": "{count} ord klara",
@@ -13346,7 +13348,7 @@ const sv = {
       "wordPlaceholder": "Skriv ett ord...",
       "canIntegrate": "Kan användas i spel",
       "cannotIntegrate": "Endast spårning",
-      "assignToClassroom": "Tilldela klassrum",
+      "assignToClassroom": "Tilldela klass (valfritt)",
       "noClassroomSelected": "Inget klassrum (privat lektion)",
       "isPublic": "Gör offentlig",
       "publicDescription": "Andra lärare kan hitta och använda lektionen",

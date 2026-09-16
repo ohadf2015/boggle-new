@@ -12569,7 +12569,7 @@ const ja = {
     "nav": {
       "play": "プレイ",
       "classes": "クラス",
-      "lessons": "単語リスト",
+      "lessons": "ライブラリ",
       "reports": "レポート",
       "me": "マイページ",
       "studentPlay": "プレイ",
@@ -13092,6 +13092,8 @@ const ja = {
       }
     },
     "lesson": {
+      "sectionTitle": "あなたのレッスン",
+      "sectionHint": "レッスンは単語リストです。クラス全員でライブで遊ぶことも、生徒が自分で練習できるように共有することもできます。",
       "pasteWords": "単語リストを貼り付け",
       "pasteWordsPlaceholder": "1行に1単語 — またはカンマ区切り",
       "pasteWordsParsed": "{count}語を読み込みました",
@@ -13112,7 +13114,7 @@ const ja = {
       "wordPlaceholder": "単語を入力...",
       "canIntegrate": "ゲーム連携可能",
       "cannotIntegrate": "進捗のみ記録",
-      "assignToClassroom": "クラスに割り当て",
+      "assignToClassroom": "クラスに割り当て（任意）",
       "noClassroomSelected": "クラスなし（個人レッスン）",
       "isPublic": "公開する",
       "publicDescription": "他の教師がこのレッスンを使用できます",

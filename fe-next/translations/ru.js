@@ -10222,7 +10222,7 @@ const ru = {
     "nav": {
       "play": "Игра",
       "classes": "Классы",
-      "lessons": "Списки слов",
+      "lessons": "Библиотека",
       "reports": "Отчёты",
       "me": "Профиль",
       "studentPlay": "Игра",
@@ -10745,6 +10745,8 @@ const ru = {
       }
     },
     "lesson": {
+      "sectionTitle": "Ваши уроки",
+      "sectionHint": "Урок — это список слов. Запустите его вживую со всем классом или поделитесь им, чтобы ученики тренировались самостоятельно.",
       "pasteWords": "Вставьте список слов",
       "pasteWordsPlaceholder": "По одному слову в строке или через запятую",
       "pasteWordsParsed": "Готово слов: {count}",
@@ -10765,7 +10767,7 @@ const ru = {
       "wordPlaceholder": "Введите слово...",
       "canIntegrate": "Можно встроить в игры",
       "cannotIntegrate": "Только отслеживание",
-      "assignToClassroom": "Назначить классу",
+      "assignToClassroom": "Назначить классу (необязательно)",
       "noClassroomSelected": "Класс не выбран (личный урок)",
       "isPublic": "Сделать общедоступным",
       "publicDescription": "Другие учителя могут найти и использовать этот урок",

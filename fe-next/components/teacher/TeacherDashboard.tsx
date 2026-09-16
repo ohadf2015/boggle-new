@@ -144,6 +144,10 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
   // a second piece of state: two sources for "which class am I looking at" is
   // exactly how the drawer and the card come to disagree (pitfall class 1).
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
+  // Reports open on the class this dashboard is already showing; the bare page is a picker.
+  const reportsHref = selectedClassroomId
+    ? `/${language}/teacher/reports?classroomId=${selectedClassroomId}`
+    : `/${language}/teacher/reports`;
 
   // The pulse's "play" action puts the teacher on the launch control that is
   // already on this page rather than opening a second route to the same room.
@@ -306,7 +310,7 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
                 {t('teacher.playNow.shortcutSetup')}
               </Link>
               <Link
-                href={`/${language}/teacher/reports`}
+                href={reportsHref}
                 data-testid="shortcut-reports"
                 className={SHORTCUT_CLASS}
               >
@@ -436,7 +440,7 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
                   </ProGate>
 
                   <Link
-                    href={`/${language}/teacher/reports`}
+                    href={reportsHref}
                     className={cn(
                       'flex items-center gap-3 p-4 rounded-neo border-2 border-black',
                       'bg-neo-cream shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',

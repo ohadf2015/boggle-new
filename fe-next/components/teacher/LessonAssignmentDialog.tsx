@@ -144,7 +144,7 @@ export default function LessonAssignmentDialog({
           <DialogClose asChild>
             <button type="button"
               className="absolute top-4 end-4 text-neo-white hover:text-neo-white"
-              aria-label="Close"
+              aria-label={t('common.close')}
               disabled={isAssigning}
             >
               <X className="w-5 h-5" />

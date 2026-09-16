@@ -92,7 +92,8 @@ describe('<TeacherDashboard> — play now in one tap', () => {
     render(<TeacherDashboard />);
     const shortcuts = screen.getByTestId('teacher-shortcuts');
     expect(shortcuts.contains(screen.getByTestId('play-now-launcher'))).toBe(false);
-    expect(screen.getByTestId('shortcut-reports')).toHaveAttribute('href', '/en/teacher/reports');
+    // Opens the class the dashboard is already showing, not the empty picker.
+    expect(screen.getByTestId('shortcut-reports')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c1');
   });
 
   it('opens the last-game panel in one tap without it ever being in the way', () => {

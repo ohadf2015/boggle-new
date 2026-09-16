@@ -12558,7 +12558,7 @@ const es = {
     "nav": {
       "play": "Jugar",
       "classes": "Clases",
-      "lessons": "Listas",
+      "lessons": "Biblioteca",
       "reports": "Informes",
       "me": "Perfil",
       "studentPlay": "Jugar",
@@ -13060,6 +13060,8 @@ const es = {
       }
     },
     "lesson": {
+      "sectionTitle": "Tus lecciones",
+      "sectionHint": "Una lección es una lista de palabras. Juégala en vivo con toda la clase o compártela para que tus alumnos practiquen por su cuenta.",
       "pasteWords": "Pega tu lista de palabras",
       "pasteWordsPlaceholder": "Una palabra por línea o separadas por comas",
       "pasteWordsParsed": "{count} palabras listas",
@@ -13080,7 +13082,7 @@ const es = {
       "wordPlaceholder": "Escribe una palabra...",
       "canIntegrate": "Se puede usar en juegos",
       "cannotIntegrate": "Solo seguimiento",
-      "assignToClassroom": "Asignar a Aula",
+      "assignToClassroom": "Asignar a una clase (opcional)",
       "noClassroomSelected": "Sin aula (lección personal)",
       "isPublic": "Hacer pública",
       "publicDescription": "Otros profesores pueden descubrir esta lección",

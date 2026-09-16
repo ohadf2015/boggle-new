@@ -93,6 +93,18 @@ describe('LessonBuilder — lesson card actions', () => {
     expect(push).toHaveBeenCalledWith('/en/teacher/reports?classroomId=c1');
   });
 
+  it('names the classroom an assigned lesson went to, on its card', () => {
+    render(<LessonBuilder />);
+    expect(screen.getByTestId('lesson-classroom-lesson-2')).toHaveTextContent('Class 1');
+    expect(screen.queryByTestId('lesson-classroom-lesson-1')).not.toBeInTheDocument();
+  });
+
+  it('says what a lesson is and what to do with it, above the list', () => {
+    render(<LessonBuilder />);
+    expect(screen.getByRole('heading', { name: 'teacher.lesson.sectionTitle' })).toBeInTheDocument();
+    expect(screen.getByText('teacher.lesson.sectionHint')).toBeInTheDocument();
+  });
+
   it('drops the assign and template-settings icon buttons', () => {
     render(<LessonBuilder />);
     expect(screen.queryByLabelText('teacher.lessons.assign.trigger')).not.toBeInTheDocument();

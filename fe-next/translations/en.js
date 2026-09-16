@@ -11099,7 +11099,7 @@ const en = {
     "nav": {
       "play": "Play",
       "classes": "Classes",
-      "lessons": "Word lists",
+      "lessons": "Library",
       "reports": "Reports",
       "me": "Me",
       "studentPlay": "Play",
@@ -11540,6 +11540,8 @@ const en = {
       }
     },
     "lesson": {
+      "sectionTitle": "Your lessons",
+      "sectionHint": "A lesson is a list of words. Host it live with the whole class, or share it so students practise on their own.",
       "pasteWords": "Paste your word list",
       "pasteWordsPlaceholder": "One word per line — or separated by commas",
       "pasteWordsParsed": "{count} words ready",
@@ -11560,7 +11562,7 @@ const en = {
       "wordPlaceholder": "Enter a word...",
       "canIntegrate": "Can embed in games",
       "cannotIntegrate": "Track only",
-      "assignToClassroom": "Assign to Classroom",
+      "assignToClassroom": "Assign to class (optional)",
       "noClassroomSelected": "No classroom (personal lesson)",
       "isPublic": "Make public",
       "publicDescription": "Other teachers can discover and use this lesson",

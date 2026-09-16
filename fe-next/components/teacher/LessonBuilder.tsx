@@ -237,8 +237,15 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
 
   return (
     <div className="space-y-6">
-      {/* Create Lesson Button */}
-      <div className="flex justify-between items-center">
+      {/* What a lesson is, in one line — "lesson", "word list", "assignment" and
+          "classroom game" otherwise meet a new teacher with no definition. */}
+      <div className="flex flex-wrap justify-between items-end gap-3">
+        <div className="min-w-0">
+          <h2 className="text-xl font-neo-display text-neo-white text-balance">
+            {t('teacher.lesson.sectionTitle')}
+          </h2>
+          <p className="text-sm text-neo-white/80 text-pretty max-w-prose">{t('teacher.lesson.sectionHint')}</p>
+        </div>
         <Button
           onClick={() => {
             setFormData({ name: '', description: '', language: language as Language, classroomId: '', isPublic: false });
@@ -295,6 +302,9 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
           {lessons.map((lesson) => {
             const defCount = lesson.words.filter((w) => w.definition).length;
             const totalWords = lesson.words.length;
+            const classroomName = lesson.classroom_id
+              ? classrooms.find((c) => c.id === lesson.classroom_id)?.name
+              : undefined;
             return (
               <Card
                 key={lesson.id}
@@ -326,6 +336,14 @@ export default function LessonBuilder({ initialReviewWords }: LessonBuilderProps
                     >
                       {t('teacher.lesson.definitionCoverage', { count: defCount, total: totalWords })}
                     </span>
+                    {classroomName && (
+                      <span
+                        data-testid={`lesson-classroom-${lesson.id}`}
+                        className="text-xs font-bold px-1.5 py-0.5 rounded shrink-0 text-neo-lime bg-neo-lime/15"
+                      >
+                        {classroomName}
+                      </span>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">

@@ -12423,7 +12423,7 @@ const he = {
     "nav": {
       "play": "משחק",
       "classes": "כיתות",
-      "lessons": "רשימות מילים",
+      "lessons": "ספרייה",
       "reports": "דוחות",
       "me": "שלי",
       "studentPlay": "משחק",
@@ -12946,6 +12946,8 @@ const he = {
       }
     },
     "lesson": {
+      "sectionTitle": "השיעורים שלך",
+      "sectionHint": "שיעור הוא רשימת מילים. אפשר להריץ אותו בשידור חי עם כל הכיתה, או לשתף אותו כדי שהתלמידים יתרגלו לבד.",
       "pasteWords": "הדביקו את רשימת המילים",
       "pasteWordsPlaceholder": "מילה אחת בכל שורה — או מופרדות בפסיקים",
       "pasteWordsParsed": "{count} מילים מוכנות",
@@ -12966,7 +12968,7 @@ const he = {
       "wordPlaceholder": "הקלידו מילה...",
       "canIntegrate": "ניתן לשלב במשחקים",
       "cannotIntegrate": "מעקב בלבד",
-      "assignToClassroom": "שייך לכיתה",
+      "assignToClassroom": "שייך לכיתה (אופציונלי)",
       "noClassroomSelected": "ללא כיתה (שיעור אישי)",
       "isPublic": "הפוך לציבורי",
       "publicDescription": "מורים אחרים יוכלו להשתמש בשיעור",
