@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
-import { ExternalLink, Globe, Users, Trophy, Hash } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ExternalLink, Globe, Users, Trophy, Hash, Ban } from 'lucide-react';
+import toast from 'react-hot-toast';
 import type { GameGroup, GamePlayer } from '@/lib/admin/gameLog/groupGames';
 import { countryFlag, platformLabel, playerDeviceLabel } from '@/lib/admin/gameLog/gameGroupDisplay';
 import { ACQUISITION_TONE } from '../utils/classifyAcquisition';
 import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { PlayerAvatar } from './PlayerAvatar';
 
 interface Props {
@@ -58,6 +60,56 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
   const showAcqChip = acq.kind !== 'unknown' || !!acq.rawLabel;
   const distinctId = player.playerId || player.guestSessionId || undefined;
   const phUrl = postHogPersonUrl(distinctId);
+
+  // Prefer the auth id: an authed player keeps playing after a new guest session
+  // is minted, so blocking the account is the durable half of the pair.
+  //
+  // ponytail: guestSessionId is the real join session id ONLY on source=analytics
+  // (the panel's only live feed today). The source=tables branch of
+  // app/api/admin/game-logs/route.ts aliases guest_fingerprint onto this same
+  // field, and a block minted from THAT value could never match at join — a
+  // silent no-op. Safe now because that branch renders nothing; re-check if the
+  // source toggle in GamesFilters is ever wired up.
+  const blockTarget = useMemo<{ type: 'auth_user' | 'guest_session'; value: string } | null>(
+    () =>
+      player.playerId
+        ? { type: 'auth_user', value: player.playerId }
+        : player.guestSessionId
+          ? { type: 'guest_session', value: player.guestSessionId }
+          : null,
+    [player.playerId, player.guestSessionId],
+  );
+
+  // Shares the TanStack cache key with the page-level useAdminAuth(), so this is
+  // a cache read, not a second token fetch.
+  const { authToken } = useAdminAuth();
+  const [blocking, setBlocking] = useState(false);
+
+  const handleBlock = useCallback(async () => {
+    if (!blockTarget || blocking || !authToken) return;
+    const label = player.displayName || blockTarget.value.slice(0, 12);
+    // ponytail: window.confirm matches the sibling quick-block buttons in
+    // PlayerManager/GuestManager. A styled modal is the upgrade if this grows.
+    if (!window.confirm(`Block ${label} from joining games?`)) return;
+    setBlocking(true);
+    try {
+      const res = await fetch('/api/admin/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({
+          blockType: blockTarget.type,
+          value: blockTarget.value,
+          reason: 'Blocked from games log',
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      toast.success(t('admin.todayGames.detail.blocked', 'Blocked'));
+    } catch {
+      toast.error(t('admin.todayGames.detail.blockFailed', 'Failed to block'));
+    } finally {
+      setBlocking(false);
+    }
+  }, [authToken, blockTarget, blocking, player.displayName, t]);
 
   return (
     <div className="bg-neo-navy-light/30 rounded border border-slate-700/50 p-2.5 text-xs">
@@ -159,6 +211,23 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
           <span className="font-mono text-slate-500" title={player.guestSessionId}>
             {t('admin.todayGames.detail.session', 'Session')}: {player.guestSessionId.slice(0, 12)}
           </span>
+        )}
+        {blockTarget && (
+          <button
+            type="button"
+            onClick={handleBlock}
+            disabled={blocking || !authToken}
+            data-testid="block-player-btn"
+            // Enforced at the socket `join` handler only (playerJoinHandler.ts) —
+            // it stops multiplayer joins, not solo play.
+            title={`Block this ${blockTarget.type === 'auth_user' ? 'account' : 'guest session'} from joining games`}
+            className="inline-flex items-center gap-1 text-neo-red hover:underline disabled:opacity-40 disabled:no-underline"
+          >
+            <Ban className="w-2.5 h-2.5" />
+            {blocking
+              ? t('admin.todayGames.detail.blocking', 'Blocking…')
+              : t('admin.todayGames.detail.block', 'Block')}
+          </button>
         )}
       </div>
     </div>
