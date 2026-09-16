@@ -38,6 +38,8 @@ export function useActiveClassroomGame(classroomId: string) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [error, setError] = useState<string | null>(null);
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** Unsubscribes the auth watcher below; null whenever there is nothing to undo. */
+  const authCleanupRef = useRef<(() => void) | null>(null);
 
   const requestActiveGames = useCallback((sock: Socket) => {
     if (sock.connected) {
@@ -68,11 +70,51 @@ export function useActiveClassroomGame(classroomId: string) {
 
     async function initSocket() {
       let token: string | undefined;
+      /** Undone on cleanup; set only when we open WITHOUT a token. */
+      let unsubscribeAuth: (() => void) | undefined;
       try {
         const { createClient } = await import('@/utils/supabase/client');
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
         token = session?.access_token;
+
+        // The handshake is read ONCE, by the server, at connect time — it sets
+        // `socket.data.verifiedUserId` and never revisits it. So a socket that
+        // opens without a token is anonymous for its entire life, and
+        // `joinClassroomGame` hard-refuses an anonymous socket
+        // ("Authentication required", `classroomGameHandler.ts:319`). The
+        // banner's JOIN then fails every single time, and re-entering the class
+        // code does not help because nothing re-mounts this socket.
+        //
+        // `getSession()` comes back empty more often than it looks: a cold load
+        // or a deep link can run this effect before the cookie-backed session
+        // has hydrated, and an in-app WebView (Google Classroom opens links in
+        // one) can partition storage so the first read finds nothing. Watching
+        // for the session and re-handshaking costs one reconnect and converts a
+        // permanent dead end into a short delay.
+        if (!token) {
+          const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+            const late = (nextSession as { access_token?: string } | null)?.access_token;
+            // No token means signed-out or a no-op event. Reconnecting then
+            // would drop a working anonymous feed for nothing.
+            if (!late || cancelled) return;
+            const sock = socketInstance;
+            if (!sock) return;
+            sock.auth = { token: late };
+            // A handshake is only re-read on a fresh connection.
+            sock.disconnect();
+            sock.connect();
+            // One upgrade is all we need; stop listening so a token refresh
+            // does not bounce the socket every hour.
+            unsubscribeAuth?.();
+            unsubscribeAuth = undefined;
+          });
+          unsubscribeAuth = () => data?.subscription?.unsubscribe?.();
+          authCleanupRef.current = () => {
+            unsubscribeAuth?.();
+            unsubscribeAuth = undefined;
+          };
+        }
       } catch {
         // proceed without token
       }
@@ -234,6 +276,8 @@ export function useActiveClassroomGame(classroomId: string) {
       // feature would be a silent no-op. The scope has to survive that
       // navigation; it is cleared when the session ends or when the classroom
       // reports no live game instead.
+      authCleanupRef.current?.();
+      authCleanupRef.current = null;
       socketInstance?.disconnect();
     };
   }, [classroomId, requestActiveGames]);
