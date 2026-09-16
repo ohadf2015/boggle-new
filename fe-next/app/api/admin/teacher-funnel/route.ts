@@ -26,7 +26,7 @@ const ACTIVITY_TABLES = [
   ['classrooms', 'classrooms'],
   ['lessons', 'vocabulary_lessons'],
   ['studentsJoined', 'classroom_memberships'],
-  ['assignments', 'teacher_assignments'],
+  ['assignments', 'lesson_assignments'],
   ['lessonProgress', 'student_lesson_progress'],
   ['achievements', 'student_achievements'],
   ['duels', 'student_duels'],
@@ -52,7 +52,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false }),
     supabase.from('classrooms').select('id, teacher_id, name, join_code, language, created_at'),
     supabase.from('classroom_memberships').select('classroom_id, student_id'),
-    supabase.from('teacher_assignments').select('teacher_id'),
+    // `lesson_assignments` is what the app actually writes (see
+    // lib/supabase/education/assignments.ts createAssignment); `teacher_assignments`
+    // has zero rows and no writer. It has no teacher_id column, so it's mapped
+    // through classroom ownership below rather than changing buildTeacherFunnel's
+    // input contract.
+    supabase.from('lesson_assignments').select('classroom_id'),
   ]);
 
   const firstError =
@@ -100,12 +105,21 @@ export async function GET(request: NextRequest) {
     }),
   );
 
+  // lesson_assignments has classroom_id, not teacher_id — map through the
+  // classroom's owner so buildTeacherFunnel keeps its { teacher_id } shape.
+  const teacherIdByClassroomId = new Map(
+    (classroomsRes.data ?? []).map((c) => [c.id, c.teacher_id]),
+  );
+  const assignments = (assignmentsRes.data ?? []).map((a) => ({
+    teacher_id: teacherIdByClassroomId.get(a.classroom_id) ?? null,
+  }));
+
   const funnel = buildTeacherFunnel({
     requests,
     profiles: profilesRes.data ?? [],
     classrooms: classroomsRes.data ?? [],
     memberships: membershipsRes.data ?? [],
-    assignments: assignmentsRes.data ?? [],
+    assignments,
     nowMs: Date.now(),
   });
 
