@@ -9,6 +9,7 @@ import { getRedisClient } from '../redisClient';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
+import type { ClassroomSessionScores } from './classroomSessionScores';
 
 /** Exported so in-place settings edits (classroomGameSettings) re-use ONE TTL. */
 export const CLASSROOM_GAME_TTL = 14400; // 4 hours
@@ -97,6 +98,17 @@ export interface ClassroomGame {
   status: 'waiting' | 'playing' | 'finished' | 'ended';
   /** The SESSION clock: set once when the teacher ends the game. Terminal. */
   endedAt?: string;
+  /**
+   * Running per-student totals across every round of this session.
+   *
+   * The room in `gameStateManager` zeroes its scores on each rematch
+   * (`resetScoresForNewRound`), so this record — which outlives the round — is
+   * the only place a lesson-long total can live. See
+   * `classroomSessionScores.ts` for why it has to exist at all.
+   */
+  sessionScores?: ClassroomSessionScores;
+  /** Rounds this session has actually finished. 1 during the first results screen. */
+  roundsPlayed?: number;
 }
 
 export interface CreateClassroomGameData {
@@ -476,5 +488,31 @@ export async function setClassroomGamePlacedVocabulary(
     );
   } catch (error) {
     logger.error('CLASSROOM_GAME', `Failed to record placed vocabulary: ${error}`);
+  }
+}
+
+/**
+ * Persist the session's running totals after a round is scored.
+ *
+ * Writes through the same 4h-TTL record the round boundary already survives.
+ * Failure is logged and swallowed: a lost cumulative total must never take the
+ * round's own results down with it.
+ */
+export async function saveClassroomSessionScores(
+  gameCode: string,
+  sessionScores: ClassroomSessionScores,
+  roundsPlayed: number
+): Promise<void> {
+  try {
+    const redis = getRedis();
+    const game = await getClassroomGame(gameCode);
+    if (!game) return;
+
+    game.sessionScores = sessionScores;
+    game.roundsPlayed = roundsPlayed;
+
+    await redis.setex(`classroom_game:${gameCode}`, CLASSROOM_GAME_TTL, JSON.stringify(game));
+  } catch (error) {
+    logger.error('CLASSROOM_GAME', `Failed to record session scores: ${error}`);
   }
 }

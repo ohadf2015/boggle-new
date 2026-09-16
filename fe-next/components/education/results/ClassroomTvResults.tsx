@@ -41,6 +41,7 @@
 import { Flame, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './ResultsPodium';
+import ClassroomSessionStandings from './ClassroomSessionStandings';
 import { WordCoverageGlance } from './WordCoverageGlance';
 import { WinnerSpotlight } from './WinnerSpotlight';
 import { CelebrationLoop } from './CelebrationLoop';
@@ -171,6 +172,18 @@ export function ClassroomTvResults({ summary, onRematch, t }: ClassroomTvResults
         </div>
 
         <div className="lg:col-span-2 min-h-0 flex flex-col gap-3">
+          {/* The podium to the left is THIS round. From round two on, the room
+              is asking a different question than the podium answers — see
+              `ClassroomSessionStandings`. Absent on a single-round session,
+              where the podium already is the answer. */}
+          {summary.sessionStandings?.length ? (
+            <ClassroomSessionStandings
+              standings={summary.sessionStandings}
+              roundsPlayed={summary.roundsPlayed ?? 1}
+              t={t}
+            />
+          ) : null}
+
           <section className="flex-1 min-h-0 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-4 shadow-hard">
             {/* No username: `isTeacher` means class-wide coverage, so the
                 per-player mastery lookup is never consulted. Only the words

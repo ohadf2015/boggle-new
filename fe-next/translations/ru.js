@@ -1787,6 +1787,11 @@ const ru = {
         "wordsFound": "{{found}} из {{total}} слов",
         "correct": "{{count}} верных"
       },
+      "session": {
+        "title": "Итоги урока",
+        "subtitle": "После {{rounds}} раундов",
+        "winner": "{{name}} побеждает в уроке!"
+      },
       "you": {
         "won": "ПОБЕДА!",
         "podium": "НА ПЬЕДЕСТАЛЕ!",

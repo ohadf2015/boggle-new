@@ -14004,6 +14004,11 @@ const sv = {
         "wordsFound": "{{found}} av {{total}} ord",
         "correct": "{{count}} rätt"
       },
+      "session": {
+        "title": "Lektionens ställning",
+        "subtitle": "Efter {{rounds}} rundor",
+        "winner": "{{name}} vinner lektionen!"
+      },
       "you": {
         "won": "DU VANN!",
         "podium": "PÅ PALLEN!",
