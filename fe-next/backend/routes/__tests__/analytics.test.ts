@@ -37,6 +37,11 @@ vi.mock('../../modules/supabaseServer', () => ({
   isSupabaseConfigured: vi.fn(() => true),
 }));
 
+const mockIsBlocked = vi.fn(async (_input: unknown) => null as unknown);
+vi.mock('../../modules/blockListManager', () => ({
+  isBlocked: (input: unknown) => mockIsBlocked(input),
+}));
+
 vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
@@ -90,6 +95,8 @@ const insertedMeta = (): Record<string, unknown> =>
 beforeEach(() => {
   lastInsert = null;
   mockAuthGetUser.mockReset();
+  mockIsBlocked.mockReset();
+  mockIsBlocked.mockResolvedValue(null);
 });
 
 describe('POST /api/analytics/track — identity is server-derived', () => {
@@ -166,5 +173,25 @@ describe('POST /api/analytics/track — identity is server-derived', () => {
     const r = await callTrack({ body: { session_id: 's1' } });
     expect(r.status).toBe(400);
     expect(lastInsert).toBeNull();
+  });
+});
+
+describe('POST /api/analytics/track — admin blocklist', () => {
+  it('drops events from a blocked guest session without inserting', async () => {
+    // Given an admin blocked this guest session from the games log
+    mockIsBlocked.mockResolvedValue({ blockType: 'guest_session', value: 'blocked-sess', reason: null });
+    // When that session keeps sending events
+    const r = await callTrack({ body: { event_type: 'game_started', session_id: 'blocked-sess' } });
+    // Then nothing is written, and the client still sees a plain success
+    expect(lastInsert).toBeNull();
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true });
+    expect(mockIsBlocked).toHaveBeenCalledWith(expect.objectContaining({ guestSessionId: 'blocked-sess' }));
+  });
+
+  it('records events from a session that is not blocked', async () => {
+    const r = await callTrack({ body: { event_type: 'game_started', session_id: 'ok-sess' } });
+    expect(r.body).toEqual({ success: true, event_id: 'evt-1' });
+    expect(lastInsert!.session_id).toBe('ok-sess');
   });
 });

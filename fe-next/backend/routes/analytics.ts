@@ -8,6 +8,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 import logger from '../utils/logger';
+import { isBlocked } from '../modules/blockListManager';
 
 const router: Router = express.Router();
 
@@ -123,6 +124,14 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     // metadata.userId / metadata.username is spoofable and would forge admin-log
     // attribution + inject arbitrary names. Guests verify to null (anonymous).
     const authedUserId = await getAuthUserId(req, supabase);
+
+    // Admin blocklist: a blocked guest session / account is dropped at ingest so
+    // it vanishes from the games log. The client still gets a plain success —
+    // a stale tab looping on old JS can't be stopped any other way.
+    if (await isBlocked({ authUserId: authedUserId, guestSessionId: session_id || null })) {
+      send(200, { success: true });
+      return;
+    }
 
     // Get country from geolocation if available
     const country_code = req.geoData?.countryCode || req.headers['x-country-code'] as string || null;
