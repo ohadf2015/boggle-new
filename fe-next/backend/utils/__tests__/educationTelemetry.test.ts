@@ -24,6 +24,7 @@ import {
   buildClassroomGameStartedEvent,
   buildClassroomGameCompletedEvents,
   captureEduServerEvents,
+  buildClassroomJoinRefusedEvent,
   EDU_ANALYTICS_HOST,
 } from '../educationTelemetry';
 
@@ -159,5 +160,55 @@ describe('captureEduServerEvents — $host', () => {
   it('Given an empty list, When captured, Then PostHog is not called at all', () => {
     captureEduServerEvents([]);
     expect(mockCapture).not.toHaveBeenCalled();
+  });
+});
+
+describe('buildClassroomJoinRefusedEvent', () => {
+  it('records which gate refused the student, and on which code', () => {
+    const event = buildClassroomJoinRefusedEvent({
+      gameCode: 'ABC123',
+      classroomId: 'class-1',
+      reason: 'GAME_NOT_FOUND',
+      door: 'join',
+      actorId: 'student-9',
+    })!;
+
+    expect(event.event).toBe('edu_classroom_join_refused');
+    expect(event.distinctId).toBe('student-9');
+    expect(event.properties).toMatchObject({
+      game_code: 'ABC123',
+      classroom_id: 'class-1',
+      reason: 'GAME_NOT_FOUND',
+      door: 'join',
+    });
+  });
+
+  it('still reports an anonymous student rather than dropping the refusal', () => {
+    // Guest students have no auth id at all. Dropping their refusal is how the
+    // 2026-09-14 session left no trace of the children who never got in.
+    const event = buildClassroomJoinRefusedEvent({
+      gameCode: 'ABC123',
+      classroomId: null,
+      reason: 'NOT_A_MEMBER',
+      door: 'classroomBanner',
+      actorId: null,
+    })!;
+    expect(event.distinctId).toBe('anonymous-ABC123');
+    expect(event.properties.classroom_id).toBeNull();
+  });
+
+  it('carries a host so the event is visible to every dashboard', () => {
+    mockCapture.mockClear();
+    captureEduServerEvents([
+      buildClassroomJoinRefusedEvent({
+        gameCode: 'ABC123',
+        classroomId: 'class-1',
+        reason: 'SESSION_ENDED',
+        door: 'join',
+        actorId: 'student-9',
+      })!,
+    ]);
+    expect(mockCapture).toHaveBeenCalledTimes(1);
+    expect(mockCapture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST);
   });
 });

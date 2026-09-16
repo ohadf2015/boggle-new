@@ -32,6 +32,7 @@ import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger.js';
 import {
   buildClassroomGameStartedEvent,
+  buildClassroomJoinRefusedEvent,
   captureEduServerEvents,
 } from '../utils/educationTelemetry';
 
@@ -101,6 +102,34 @@ const leaveClassroomGameSchema = z.object({
 /**
  * Register classroom game socket event handlers
  */
+/**
+ * Turn a student away from a live classroom game, and leave a record that they
+ * were turned away.
+ *
+ * The refusal itself is unchanged — several of these strings are deliberately
+ * vague, and this must not make them less so. What changes is that the server
+ * now writes down which gate fired. Before this, a student who could not get in
+ * left no row and no event anywhere, which is why the 2026-09-14 report could
+ * not be diagnosed at all. See `buildClassroomJoinRefusedEvent`.
+ */
+function refuseClassroomJoin(
+  socket: Socket,
+  gameCode: string,
+  reason: string,
+  payload: Record<string, unknown>,
+  classroomId: string | null
+): void {
+  socket.emit('classroomGameError', { ...payload, gameCode });
+  const event = buildClassroomJoinRefusedEvent({
+    gameCode,
+    classroomId,
+    reason,
+    door: 'classroomBanner',
+    actorId: getAuthUserId(socket),
+  });
+  if (event) captureEduServerEvents([event]);
+}
+
 export function registerClassroomGameHandlers(io: Server, socket: Socket): void {
   registerClassroomRecoveryHandlers(socket);
   /**
@@ -316,11 +345,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Auth check: authentication required, userId must match authenticated user
     const joinAuthUserId = getAuthUserId(socket);
     if (!joinAuthUserId) {
-      socket.emit('classroomGameError', { error: 'Authentication required', gameCode: joinPayload.gameCode });
+      refuseClassroomJoin(socket, joinPayload.gameCode, 'AUTH_REQUIRED', { error: 'Authentication required' }, null);
       return;
     }
     if (joinAuthUserId !== joinPayload.userId) {
-      socket.emit('classroomGameError', { error: 'User ID does not match authenticated user', gameCode: joinPayload.gameCode });
+      refuseClassroomJoin(socket, joinPayload.gameCode, 'USER_ID_MISMATCH', { error: 'User ID does not match authenticated user' }, null);
       return;
     }
 
@@ -335,11 +364,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // is the worst version of this — they cannot act on it, and it looks
       // like the teacher set the room up wrong.
       logger.error('CLASSROOM_GAME', `Membership lookup unavailable for ${joinAuthUserId} joining ${existingGame.gameCode}`);
-      socket.emit('classroomGameError', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE', gameCode: joinPayload.gameCode });
+      refuseClassroomJoin(socket, joinPayload.gameCode, 'LOOKUP_UNAVAILABLE', { error: 'education.errors.serverUnavailable', code: 'LOOKUP_UNAVAILABLE' }, existingGame.classroomId);
       return;
     }
     if (!joinRoleResult.role) {
-      socket.emit('classroomGameError', { error: 'You are not a member of this classroom', gameCode: joinPayload.gameCode });
+      refuseClassroomJoin(socket, joinPayload.gameCode, 'NOT_A_MEMBER', { error: 'You are not a member of this classroom' }, existingGame.classroomId);
       return;
     }
 
@@ -370,7 +399,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       logger.info('CLASSROOM_GAME', `Player ${joinPayload.username} joined game ${joinPayload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to join game: ${error}`);
-      socket.emit('classroomGameError', { error: 'Failed to join game', gameCode: joinPayload.gameCode });
+      refuseClassroomJoin(socket, joinPayload.gameCode, 'JOIN_THREW', { error: 'Failed to join game' }, existingGame.classroomId);
     }
   });
 

@@ -86,7 +86,26 @@ function sourceFiles(dir: string): string[] {
  * call with params (`, {`) can be told apart from a bare call (`)`) and from a
  * string fallback (`, '`), which does NOT fill placeholders.
  */
-const T_CALL = /\bt\(\s*'([A-Za-z0-9_.]+)'\s*(\)|,\s*\{|,\s*[^{])/g;
+// `t` takes (key, fallback?, params?), so the params object is the second OR
+// the third argument. Capturing only up to the second argument reported
+// `t('key', 'fallback', { count })` — the correct three-argument form — as a
+// raw placeholder. Capture the rest of the line instead and decide below.
+const T_CALL = /\bt\(\s*'([A-Za-z0-9_.]+)'\s*([^\n]*)/g;
+
+/**
+ * Does this `t(...)` call hand over an interpolation object?
+ *
+ * `t` takes (key, fallback?, params?), so the object is the second argument OR
+ * the third, after a string fallback. Only recognising the second form reported
+ * the correct three-argument call as a raw placeholder.
+ */
+function suppliesParams(tail: string): boolean {
+  const STRING = /'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`/.source;
+  return (
+    new RegExp(`^,\\s*\\{`).test(tail) ||
+    new RegExp(`^,\\s*(?:${STRING})\\s*,\\s*\\{`).test(tail)
+  );
+}
 
 interface Offence {
   file: string;
@@ -105,10 +124,7 @@ function findOffences(): Offence[] {
       T_CALL.lastIndex = 0;
       while ((match = T_CALL.exec(src)) !== null) {
         const [, key, tail] = match;
-        const suppliesParams = tail.startsWith(',') && tail.trimStart().startsWith(',{')
-          ? true
-          : /,\s*\{$/.test(tail);
-        if (suppliesParams) continue;
+        if (suppliesParams(tail)) continue;
         for (const [locale, dict] of LOCALES) {
           const value = lookup(dict, key);
           if (typeof value !== 'string') continue;
@@ -134,6 +150,17 @@ describe('practice surfaces — raw i18n placeholders', () => {
       .map((o) => `${o.file}:${o.line} ${o.key} [${o.locale}] => ${JSON.stringify(o.value)}`)
       .join('\n');
     expect(report).toBe('');
+  });
+
+  // The detector was widened on 2026-09-16 to understand the three-argument
+  // form. A widened detector that stops detecting is worse than no detector,
+  // so it gets its own positive control.
+  it('still recognises a call that hands over no params at all', () => {
+    expect(suppliesParams(", { count: 3 })")).toBe(true);
+    expect(suppliesParams(", '{count} letters', { count: 3 })")).toBe(true);
+    expect(suppliesParams(')')).toBe(false);
+    expect(suppliesParams(", '{count} letters')")).toBe(false);
+    expect(suppliesParams(', fallbackVar)')).toBe(false);
   });
 
   it('has the label-only points key the completion card needs', () => {

@@ -74,7 +74,16 @@ export function ensureJoinableClassroomGame<T extends ClassroomGameJoinability>(
   // The words come from `classroomSeatGate`, which every other seating path
   // also refuses through — so the enrolment door and the base multiplayer door
   // cannot drift into saying two different things.
-  refuseSeat(socket, gameCode, 'classroom', game ? 'ended' : 'unknown');
+  // The classroom id when we have one: a refusal recorded with a null id is
+  // indistinguishable from a refusal on a code that was never a class's, and
+  // telling those two apart is the whole point of recording it.
+  refuseSeat(
+    socket,
+    gameCode,
+    'classroom',
+    game ? 'ended' : 'unknown',
+    (game as { classroomId?: string } | null | undefined)?.classroomId ?? null
+  );
   return false;
 }
 

@@ -46,6 +46,7 @@
 
 import type { Socket } from 'socket.io';
 
+import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry';
 import logger from '../utils/logger.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { getClassroomGame, type ClassroomGame } from '../modules/classroomGameManager.js';
@@ -81,11 +82,26 @@ export function refuseSeat(
   socket: Socket,
   gameCode: string,
   dialect: SeatDialect,
-  refusal: SeatRefusal
+  refusal: SeatRefusal,
+  classroomId: string | null = null
 ): void {
   if (refusal === 'ended') {
     logger.info('CLASSROOM_GAME', `Rejected join of ended game ${gameCode}`);
   }
+
+  // The student's screen says "Game not found" whichever gate fired, on
+  // purpose — F-03: a precise message would make this an oracle for valid
+  // classroom codes. That vagueness is right for the student and leaves the
+  // teacher with nothing, which is why the server writes down the real reason
+  // here. One record per refusal, at the one place both dialects refuse.
+  const refusalEvent = buildClassroomJoinRefusedEvent({
+    gameCode,
+    classroomId,
+    reason: refusal === 'ended' ? 'SESSION_ENDED' : 'CODE_UNKNOWN',
+    door: dialect === 'multiplayer' ? 'join' : 'classroomBanner',
+    actorId: (socket.data?.verifiedUserId as string | undefined) ?? null,
+  });
+  if (refusalEvent) captureEduServerEvents([refusalEvent]);
 
   if (dialect === 'multiplayer') {
     emitError(socket, ErrorCodes.GAME_NOT_FOUND);
@@ -132,7 +148,7 @@ export async function checkClassroomSeat(
 
   if (!isClassroomSessionEnded(game)) return { game, refused: false };
 
-  refuseSeat(socket, gameCode, dialect, 'ended');
+  refuseSeat(socket, gameCode, dialect, 'ended', game.classroomId);
   return { game, refused: true };
 }
 

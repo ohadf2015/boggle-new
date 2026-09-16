@@ -44,6 +44,8 @@ import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer, resumeGameTimerIfMissing } from '../services/gameLifecycle/gameTimer.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
+import { getClassroomGame } from '../modules/classroomGameManager.js';
+import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry.js';
 import logger from '../utils/logger.js';
 import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
 import { emitClassroomContext } from '../modules/classroomGameContext.js';
@@ -120,6 +122,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         logger.info('SOCKET', `Restored game ${gameCode} from Redis for join request`);
       } else {
         emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+        // The room is gone from memory AND from Redis. For a public room that
+        // is just a stale link; for a class it is the single most common way a
+        // child is turned away — 43 of these on production in the three weeks
+        // to 2026-09-16 — and nothing recorded whether the code was a class's
+        // at all. One extra Redis read, on the refusal path only.
+        void recordClassroomRoomGone(socket, gameCode);
         return;
       }
     }
@@ -516,6 +524,36 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
 // Helper functions (handleReconnection, handleLateJoin, handleTournamentJoin, handleExistingAuthConnectionJoin)
 // are in ./playerReconnectHandler.ts
+
+
+/**
+ * Was the code that just failed to resolve a classroom's?
+ *
+ * Runs only after the join has already been refused, so it costs nothing on the
+ * path that works and never delays the error the student is waiting for. Never
+ * throws: a missing analytics row must not become a second failure on top of
+ * the one it is describing.
+ */
+async function recordClassroomRoomGone(socket: Socket, gameCode: string): Promise<void> {
+  try {
+    const classroomGame = await getClassroomGame(gameCode);
+    if (!classroomGame) return;
+
+    const event = buildClassroomJoinRefusedEvent({
+      gameCode,
+      classroomId: classroomGame.classroomId,
+      // Distinct from SESSION_ENDED: the teacher never ended this session, the
+      // ROOM stopped existing underneath it (restart, redeploy, or an instance
+      // that never held it). That difference is the whole diagnosis.
+      reason: 'ROOM_GONE',
+      door: 'join',
+      actorId: (socket.data?.verifiedUserId as string | undefined) ?? null,
+    });
+    if (event) captureEduServerEvents([event]);
+  } catch (err) {
+    logger.warn('CLASSROOM_GAME', `Could not record a lost room for ${gameCode}: ${(err as Error)?.message ?? err}`);
+  }
+}
 
 export {
   registerPlayerJoinHandlers,

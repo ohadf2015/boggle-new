@@ -194,3 +194,60 @@ export function captureEduServerEvents(events: EduServerEvent[]): void {
     }
   }
 }
+
+/** Which door turned the student away. The two have different auth rules. */
+export type ClassroomJoinDoor = 'join' | 'classroomBanner';
+
+export interface ClassroomJoinRefusal {
+  gameCode: string;
+  /** Null when the code never resolved to a classroom in the first place. */
+  classroomId: string | null;
+  /** The server's own reason code, not the string the student was shown. */
+  reason: string;
+  door: ClassroomJoinDoor;
+  /** Supabase auth id, or null for a guest student. */
+  actorId: string | null;
+}
+
+/**
+ * `edu_classroom_join_refused` — a student who was turned away from a live
+ * classroom game.
+ *
+ * WHY THIS EXISTS
+ * ---------------
+ * A teacher reported on 2026-09-14 that a few students got an error on the same
+ * code that worked for the rest of the class. Reconstructing what happened was
+ * impossible: a refused student writes no row and, on a school Chromebook that
+ * blocks PostHog, emits no browser event either. The 8-student roster against
+ * ~5 browser-side `mp_join_outcome` events was the only evidence that anything
+ * had gone wrong, and it could not say WHY.
+ *
+ * The server always sees the refusal, so the server is where the record has to
+ * be made. It carries the server's own reason code rather than the student-
+ * facing message, because several gates answer "Game not found" deliberately —
+ * the seat gate and the ended-session gate both do, so that a stranger probing
+ * codes learns nothing. That ambiguity is correct for the student and useless
+ * for a teacher, and this is how both can be true at once.
+ *
+ * A guest has no auth id, so the refusal is keyed to the room instead of being
+ * dropped: an un-attributed refusal still answers "how many children did not
+ * get in, and which gate stopped them", which is the question that had no
+ * answer at all.
+ */
+export function buildClassroomJoinRefusedEvent(
+  refusal: ClassroomJoinRefusal
+): EduServerEvent | null {
+  if (!refusal?.gameCode) return null;
+
+  return {
+    distinctId: refusal.actorId ?? `anonymous-${refusal.gameCode}`,
+    event: 'edu_classroom_join_refused',
+    properties: {
+      game_code: refusal.gameCode,
+      classroom_id: refusal.classroomId,
+      reason: refusal.reason,
+      door: refusal.door,
+      is_guest: !refusal.actorId,
+    },
+  };
+}
