@@ -71,9 +71,25 @@ function resolve(token: string): { rgb: RGB; alpha: number } | null {
 // Arbitrary pixel widths (`border-[2px]`) are border utilities too — without
 // them a `border-[2px] border-neo-black bg-neo-navy` card (1.23:1) scanned
 // green while the identical `border-2` spelling failed.
-const HAS_BORDER_WIDTH = /^(border|border-[0-9]|border-\[\d+px\]|border-neo|border-neo-thick)$/;
+// Side-specific widths (`border-b-2`, `border-t-neo`) draw the same edge: a
+// table header's `border-b-2 border-black` on navy is exactly as invisible.
+const HAS_BORDER_WIDTH = /^border(-[xytrblse])?(-[0-9]|-\[\d+px\]|-neo|-neo-thick)?$/;
 
-const ROOTS = ['components/education', 'components/teacher', 'app/[locale]/education'];
+// `@utility border-neo` (app/globals.css) paints `solid rgb(var(--neo-black))`,
+// so a bare `border-neo` with no colour token IS a black border.
+const BLACK_BY_DEFAULT = /^border(-[xytrblse])?-neo(-thick)?$/;
+
+const ROOTS = [
+  'components/education',
+  'components/teacher',
+  'components/student',
+  'app/[locale]/education',
+  'app/[locale]/student',
+  'app/[locale]/teacher',
+  // Education surfaces living outside the education folders.
+  'components/ui/EducationSkeletons.tsx',
+  'components/multiplayer/ClassroomJoinNamePrompt.tsx',
+];
 const REPO = path.resolve(__dirname, '../../..');
 
 function sourceFiles(): string[] {
@@ -94,7 +110,7 @@ function sourceFiles(): string[] {
       }
     }
   };
-  ROOTS.forEach((r) => walk(path.join(REPO, r)));
+  ROOTS.forEach((r) => (r.endsWith('.tsx') ? out.push(path.join(REPO, r)) : walk(path.join(REPO, r))));
   return out;
 }
 
@@ -121,7 +137,14 @@ function scan(): Violation[] {
     const src = fs.readFileSync(file, 'utf8');
     for (const m of src.matchAll(CLASS_ATTR)) {
       const raw = m[1] ?? m[2] ?? quotedFragments(m[3] ?? '');
-      const tokens = raw.replace(/\s+/g, ' ').split(' ').filter(Boolean);
+      // Ternaries inside a backtick template (`${earned ? 'bg-neo-navy/50' : …}`)
+      // leave quotes and `${` glued to the class — strip them or the token
+      // never matches and the card scans green.
+      const tokens = raw
+        .replace(/[`'"{}$?:]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .split(' ')
+        .filter(Boolean);
       if (!tokens.some((t) => HAS_BORDER_WIDTH.test(t))) continue;
 
       // Take the first token that RESOLVES, not the first that matches the
@@ -140,7 +163,8 @@ function scan(): Violation[] {
               ? 'neo-black'
               : null,
         )
-        .find((t): t is string => t !== null && resolve(t) !== null);
+        .find((t): t is string => t !== null && resolve(t) !== null) ??
+        (tokens.some((t) => BLACK_BY_DEFAULT.test(t)) ? 'neo-black' : undefined);
       if (!bgToken || !border) continue;
 
       const bg = resolve(bgToken);
