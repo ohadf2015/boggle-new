@@ -60,6 +60,7 @@ vi.mock('pixi.js', () => {
       if (i !== -1) captured.tickerListeners.splice(i, 1);
     }
     stop = vi.fn();
+    start = vi.fn();
     deltaMS = 16;
   }
   class MockApplication {
@@ -143,5 +144,14 @@ describe('GameCanvas — ticker survives a mid-frame throw (Sentry 1RP)', () => 
     const badTicker = { deltaMS: 16 };
     expect(() => updateListener.fn(badTicker)).not.toThrow();
     expect(loggerMock.warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('restarts the ticker when the document becomes visible after a native overlay', async () => {
+    render(<GameCanvas config={baseConfig} usePhysics={false} />);
+    await waitFor(() => expect(captured.appInstances.length).toBe(1));
+    const app = captured.appInstances[0] as unknown as { ticker: { start: ReturnType<typeof vi.fn> } };
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(app.ticker.start).toHaveBeenCalled();
   });
 });
