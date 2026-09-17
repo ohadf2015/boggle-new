@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { translateKey } from '@/lib/i18n/serverTranslate';
 import {
   buildEducationFaqJsonLd,
   buildEducationOrgJsonLd,
@@ -204,9 +207,10 @@ function EducationResourceLinks({ locale }: { locale: string }) {
   const lang = locale in RESOURCE_TITLES ? locale : 'en';
   const t = RESOURCE_TITLES[lang];
   const rc = RESOURCE_CARDS[lang] ?? RESOURCE_CARDS.en;
+  const resourcesAriaLabel = translateKey('education.landing.resourcesAriaLabel', lang, 'Education resources');
 
   return (
-    <section aria-label="Education resources" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-3 border-neo-black/30">
+    <section aria-label={resourcesAriaLabel} className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-3 border-neo-black/30">
       <h2 className="font-neo-display text-2xl sm:text-3xl font-black uppercase text-neo-white">
         {t.heading}
       </h2>
@@ -219,7 +223,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         >
           <h3 className="font-neo-display text-lg font-black uppercase text-neo-white">{t.cards.duels.title}</h3>
           <p className="mt-2 text-sm text-neo-white">{t.cards.duels.desc}</p>
-          <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-lime">→</span>
+          <DirectionalIcon icon={ArrowRight} className="mt-3 inline-block size-4 text-neo-lime" />
         </Link>
         <Link
           href={`/${locale}/education/classroom-game`}
@@ -227,7 +231,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         >
           <h3 className="font-neo-display text-lg font-black uppercase text-neo-navy">{t.cards.classroom.title}</h3>
           <p className="mt-2 text-sm text-neo-navy/90">{t.cards.classroom.desc}</p>
-          <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy">→</span>
+          <DirectionalIcon icon={ArrowRight} className="mt-3 inline-block size-4 text-neo-navy" />
         </Link>
       </div>
 
@@ -242,7 +246,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/vocabulary-games-classroom`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.vocab.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy">{rc.vocab.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.vocab.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.vocab.desc}</p>
         </Link>
@@ -250,7 +254,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/esl-word-games`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.esl.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy">{rc.esl.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.esl.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.esl.desc}</p>
         </Link>
@@ -258,7 +262,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/games-for-teachers`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">{rc.teachers.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-purple px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white">{rc.teachers.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.teachers.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.teachers.desc}</p>
         </Link>
@@ -266,7 +270,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/spelling-bee-practice`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">{rc.spelling.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white">{rc.spelling.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.spelling.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.spelling.desc}</p>
         </Link>
@@ -274,7 +278,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           href={`/${locale}/education/sight-words-practice`}
           className="rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-lime px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.sightWords.badge}</span>
+          <span className="inline-block border-2 border-neo-black bg-neo-lime px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy">{rc.sightWords.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.sightWords.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.sightWords.desc}</p>
         </Link>
@@ -283,7 +287,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           className="rounded-neo border-3 border-neo-black bg-neo-lime p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
           data-ph-capture-attribute-source="edu_hub_for_schools_card"
         >
-          <span className="inline-block border-2 border-neo-cream/40 bg-neo-navy px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-lime">{rc.forSchools.badge}</span>
+          <span className="inline-block border-2 border-neo-cream/40 bg-neo-navy px-2 py-0.5 font-neo-display text-xs font-black uppercase tracking-widest text-neo-lime">{rc.forSchools.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-black">{rc.forSchools.title}</h3>
           <p className="mt-2 text-xs text-black/70">{rc.forSchools.desc}</p>
         </Link>
