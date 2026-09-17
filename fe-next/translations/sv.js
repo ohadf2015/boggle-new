@@ -6451,6 +6451,10 @@ const sv = {
     "kofiTooltip": "Stöd LexiClash-utveckling"
   },
   "blog": {
+    "wordGamesForKidsEducation": {
+      "teachersTitle": "Ordspel för lärare",
+      "eslTitle": "ESL-ordspel online",
+      "vocabTitle": "Ordförrådsspel för klassrummet", "heroAlt": "Barn som spelar ordspel i ett klassrum" },
     "backToBlog": "Tillbaka till bloggen",
     "dailyChallenge": "Daglig utmaning",
     "date": "Publicerad",
@@ -12626,6 +12630,7 @@ const sv = {
     }
   },
   "student": {
+    "achievements": { "emptyHint": "Spela en lektion eller en duell för att låsa upp din första utmärkelse!" },
     "practiceFun": {
       "headline": {
         "perfect": "FELFRITT!",
@@ -12813,7 +12818,7 @@ const sv = {
       "tabsLabel": "Huvudavsnitt"
     },
     "emptyClassroom": {
-      "title": "Ingen klass än – och det behövs inte",
+      "title": "Ingen klass än, och det behövs inte",
       "body": "Tryck på KÖR IGÅNG så bygger vi klassen medan koden går upp på tavlan.",
       "getCode": "Hämta min klasskod"
     },
@@ -12862,7 +12867,7 @@ const sv = {
       "goLive": "Kör igång",
       "armedWith": "{{title}} · {{count}} ord",
       "pickSomething": "Välj en ordlista så är du igång",
-      "noSetupNeeded": "Ingen klass att skapa, ingen lista att skriva — eleverna går in med koden.",
+      "noSetupNeeded": "Ingen klass att skapa, ingen lista att skriva: eleverna går in med koden.",
       "changeWords": "Vill du ha andra ord?",
       "shortcutsLabel": "Genvägar för läraren",
       "shortcutLastGame": "Senaste spelet",
@@ -12894,11 +12899,11 @@ const sv = {
       "antonymsPlaceholder": "Motsatsord, kommaseparerade (t.ex. ledsen)",
       "example": "Exempelmening",
       "examplePlaceholder": "En mening som använder ordet",
-      "exampleHelp": "Skriv ___ där ordet ska stå — t.ex. 'Den ___ hunden skällde.'",
+      "exampleHelp": "Skriv ___ där ordet ska stå, t.ex. 'Den ___ hunden skällde.'",
       "summary": "{{count}} ord · {{definitions}} med definition · {{synonyms}} med synonymer · {{antonyms}} med motsatsord · {{examples}} med exempel",
-      "aiFill": "Fyll i saknade definitioner, synonymer och exempel (AI – granska innan du sparar)",
+      "aiFill": "Fyll i saknade definitioner, synonymer och exempel (AI, granska innan du sparar)",
       "aiFilling": "Skriver förslag…",
-      "aiFilledNote": "Markerade fält är AI-förslag – kontrollera dem innan du sparar.",
+      "aiFilledNote": "Markerade fält är AI-förslag, kontrollera dem innan du sparar.",
       "aiError": "Kunde inte hämta förslag just nu. Försök igen om en minut.",
       "meanings": "Andra betydelser",
       "meaningsPlaceholder": "Betydelser, åtskilda med ; (t.ex. kanten vid en å; ett ställe för pengar)",
@@ -12924,7 +12929,7 @@ const sv = {
       "challenge": "Utmaning",
       "legend": "Stöd: ser en ordbank under livespel och övar på stöd- och basord · Bas: standard · Utmaning: övar på alla ord inkl. utmaningsord och får ett mål med längre ord",
       "saved": "Nivån sparades",
-      "saveFailed": "Nivån kunde inte sparas – försök igen"
+      "saveFailed": "Nivån kunde inte sparas, försök igen"
     },
     "lastGame": {
       "title": "Senaste klasspelet",
@@ -12932,7 +12937,7 @@ const sv = {
       "error": "Vi kunde inte ladda resultaten från senaste spelet.",
       "retry": "Försök igen",
       "emptyTitle": "Inget klasspel ännu",
-      "emptyHint": "Starta ett från Spela nu ovan – orden klassen hittar och missar visas här.",
+      "emptyHint": "Starta ett från Spela nu ovan. Orden klassen hittar och missar visas här.",
       "previousGames": "Tidigare spel",
       "playersPlayed": "{{count}} elever spelade",
       "studentFallback": "Elev",
@@ -12940,7 +12945,7 @@ const sv = {
       "nobodyFound": "Ord ingen hittade",
       "avgAccuracy": "Genomsnittlig träffsäkerhet på lektionsord",
       "wordsToReview": "Ord att repetera",
-      "nothingToReview": "Inget att repetera – klassen hittade alla lektionsord.",
+      "nothingToReview": "Inget att repetera. Klassen hittade alla lektionsord.",
       "missedBy": "missades av",
       "student": "Elev",
       "score": "Poäng",
@@ -12958,7 +12963,7 @@ const sv = {
     },
     "classReport": {
       "title": "Ord per elev",
-      "hint": "Varje ord i lektionen mot varje elev. De svåraste överst — det är din repetitionslista.",
+      "hint": "Varje ord i lektionen mot varje elev. De svåraste överst: det är din repetitionslista.",
       "word": "Ord",
       "classMiss": "Klassen missade",
       "accuracy": "Träffsäkerhet",
@@ -12990,9 +12995,9 @@ const sv = {
         "close": "Stäng"
       },
       "practice": {
-        "flashcard": "Betydelsen först — flashkort och sedan ett quiz",
+        "flashcard": "Betydelsen först: flashkort och sedan ett quiz",
         "spelling": "En kort stavningsövning på orden som missades",
-        "none": "Inget att repetera — ge nästa lista",
+        "none": "Inget att repetera, ge nästa lista",
         "absent": "Ta igen det enskilt före nästa omgång"
       },
       "notes": {
@@ -13009,7 +13014,7 @@ const sv = {
     },
     "proWelcome": {
       "title": "Du har Teacher Pro",
-      "until": "Ditt till {date} – inget att lösa in, inget kort.",
+      "until": "Ditt till {date}, inget att lösa in, inget kort.",
       "perk": {
         "analytics": "Se vilka ord klassen hade svårt med, efter varje omgång",
         "reports": "Utskrivbara klass- och elevrapporter",
@@ -13037,15 +13042,15 @@ const sv = {
         "title": "Framstegsrapporter är en Pro-funktion",
         "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter."
       },
-      "cta": "Lås upp med Pro — ${{price}}/månad"
+      "cta": "Lås upp med Pro: ${{price}}/månad"
     },
     "subscription": {
-      "giftedNoCard": "Inget kort registrerat, ingen förnyelse – det tar bara slut och du går tillbaka till gratis.",
+      "giftedNoCard": "Inget kort registrerat, ingen förnyelse. Det tar bara slut och du går tillbaka till gratis.",
       "giftedUntil": "Kostnadsfritt Pro till",
       "giftedBadge": "Gåva",
       "classLimitTitle": "Du har nått din klassgräns",
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
-      "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass — inga gränser för att växa din undervisning.",
+      "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass, inga gränser för att växa din undervisning.",
       "proFeatures": "Pro innehåller",
       "unlimitedClasses": "Obegränsat antal klassrum",
       "unlimitedStudents": "Obegränsat antal elever per klassrum",
@@ -13056,12 +13061,12 @@ const sv = {
       "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
       "signInRequired": "Logga in för att uppgradera till Teacher Pro.",
       "currentPlan": "Du har den här planen",
-      "upgradePricingTitle": "Se vem som fattade — innan klockan ringer.",
+      "upgradePricingTitle": "Se vem som fattade, innan klockan ringer.",
       "upgradePricingSubtitle": "Hantera obegränsat antal klassrum och elever",
-      "upgradePricingReassure": "Avsluta när du vill — dina klassrum, lektioner och elevdata är alltid säkra.",
+      "upgradePricingReassure": "Avsluta när du vill. Dina klassrum, lektioner och elevdata är alltid säkra.",
       "pricePerDay": "Ungefär $0,30 per dag",
       "everythingInFree": "Allt i Free, plus:",
-      "freeStartNote": "En riktig klass får plats — upp till 3 klasser med 50 elever vardera. Pro är för fler klasser eller för rapporterna.",
+      "freeStartNote": "En riktig klass får plats: upp till 3 klasser med 50 elever vardera. Pro är för fler klasser eller för rapporterna.",
       "proCtaSubtext": "Klart på 30 sekunder · Avsluta när du vill",
       "trustCancel": "Avsluta när du vill, ingen bindningstid",
       "trustDataSafe": "Dina data är säkra",
@@ -13088,7 +13093,7 @@ const sv = {
       "districtTitle": "Skola eller kommun?",
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
       "districtCta": "Kontakta oss för skolpriser",
-      "checkoutUnavailable": "Kassan är stängd just nu — inget har debiterats. Försök igen om en stund.",
+      "checkoutUnavailable": "Kassan är stängd just nu. Inget har debiterats. Försök igen om en stund.",
       "featureOutcome1": "Kör alla klasser du undervisar, utan tak",
       "featureOutcome2": "Lägg till alla klasser du undervisar, inte bara de tre första",
       "featureOutcome3": "Se vem som fastnar, ord för ord, i realtid",
@@ -13197,7 +13202,7 @@ const sv = {
         "teams": "Lag",
         "teamsDesc": "Automatisk uppdelning i balanserade lag",
         "teamCount": "Hur många lag?",
-        "autoAssignNote": "Eleverna delas in automatiskt — ingen förberedelse, rättvist varje gång."
+        "autoAssignNote": "Eleverna delas in automatiskt, ingen förberedelse, rättvist varje gång."
       },
       "support": {
         "title": "Stöd (SPED)",
@@ -13218,7 +13223,7 @@ const sv = {
         "title": "Jaktord",
         "description": "Välj ordet klassen ska jaga, eller låt spelet välja.",
         "random": "Överraska klassen",
-        "noneEligible": "Inget ord i den här lektionen går att jaga — ett målord måste vara {{min}}–{{max}} bokstäver. Spelet väljer ett."
+        "noneEligible": "Inget ord i den här lektionen går att jaga. Ett målord måste vara {{min}}-{{max}} bokstäver. Spelet väljer ett."
       },
       "minWordLength": {
         "title": "Kortaste ordet som räknas",
@@ -13269,7 +13274,7 @@ const sv = {
       "createdBannerTitle": "Klassrummet är redo!",
       "googleClassroom": "Publicera i Google Classroom",
       "googleClassroomTitle": "Gå med i {{name}} på LexiClash",
-      "googleClassroomBody": "Tryck på länken för att gå med i klassen. Inget konto behövs – välj bara ett namn.",
+      "googleClassroomBody": "Tryck på länken för att gå med i klassen. Inget konto behövs, välj bara ett namn.",
       "createdBannerBody": "Dela koden med dina elever.",
       "dismissBanner": "Okej",
       "wizard": {
@@ -13326,10 +13331,11 @@ const sv = {
       }
     },
     "lesson": {
+      "bulkImportDropCsv": "Släpp CSV-filen här eller klicka för att bläddra",
       "sectionTitle": "Dina lektioner",
       "sectionHint": "En lektion är en ordlista. Kör den live med hela klassen, eller dela den så att eleverna kan öva på egen hand.",
       "pasteWords": "Klistra in din ordlista",
-      "pasteWordsPlaceholder": "Ett ord per rad – eller separerade med kommatecken",
+      "pasteWordsPlaceholder": "Ett ord per rad, eller separerade med kommatecken",
       "pasteWordsParsed": "{count} ord klara",
       "pasteWordsAdd": "Lägg till {count} ord",
       "create": "Skapa lektion",
@@ -13386,9 +13392,9 @@ const sv = {
       "bulkImportLabel": "Klistra in ord här",
       "bulkImportPlaceholder": "Klistra in ord, ett per rad. Använd 'ord - definition' för definitioner.",
       "bulkImportDetected": "{{count}} ord upptäckta",
-      "bulkImportUnreadable": "Kunde inte läsa {{count}} rad(er) (rad {{rows}}) — inget ord hittades, så de utelämnades. Kolla om ett | blivit över eller om ordet saknas.",
+      "bulkImportUnreadable": "Kunde inte läsa {{count}} rad(er) (rad {{rows}}): inget ord hittades, så de utelämnades. Kolla om ett | blivit över eller om ordet saknas.",
       "bulkImportOneWordPerLine": "Rad {{rows}} ser ut att innehålla flera ord på samma rad. Skriv ett ord per rad och importera igen.",
-      "savedAndAssigned": "Lektionen sparades och tilldelades {{classroom}} — dina elever ser den nu.",
+      "savedAndAssigned": "Lektionen sparades och tilldelades {{classroom}}. Dina elever ser den nu.",
       "savedNotAssigned": "Lektionen sparades, men vi kunde inte tilldela den till {{classroom}}. Försök igen med lektionens knapp Tilldela klass.",
       "bulkImportButton": "Importera",
       "templates": "Lektionsmallar",
@@ -13570,8 +13576,8 @@ const sv = {
         "downloading": "Laddar ner...",
         "failed": "Det gick inte att skapa PDF:en. Försök igen.",
         "done": "Nedladdad",
-        "fileStudent": "{{name}} – framstegsrapport",
-        "fileClass": "{{name}} – klassrapport"
+        "fileStudent": "{{name}} - framstegsrapport",
+        "fileClass": "{{name}} - klassrapport"
       },
       "teacherLine": "Lärare: {{name}}",
       "generatedOn": "Skapad av LexiClash · {{date}}",
@@ -13665,13 +13671,13 @@ const sv = {
     "homework": {
       "takeHomeToggle": "Övningskort att ta hem",
       "backToDashboard": "Tillbaka till panelen",
-      "classmatesFirst": "Du är först klar i dag — sviten börjar med dig.",
+      "classmatesFirst": "Du är först klar i dag. Sviten börjar med dig.",
       "introTitle": "{{count}} ord klassen missade",
       "introSubtitle": "Tryck på rätt svar och stava de kluriga. Tar ungefär två minuter.",
       "nameLabel": "Ditt förnamn",
       "namePlaceholder": "t.ex. Maja",
       "start": "Kör!",
-      "startCta": "Starta — {{count}} ord",
+      "startCta": "Starta: {{count}} ord",
       "playAgainCta": "Spela igen",
       "exit": "Stäng spelet",
       "promptMeaning": "Vad betyder det?",
@@ -13702,7 +13708,7 @@ const sv = {
       "teacherAverage": "Klassens snitt",
       "teacherEmpty": "Ingen har spelat än. Dela länken så fylls listan på direkt.",
       "teacherNamesSignedOut": "Logga in som lärare för att se vilka som spelat.",
-      "gradeOnTime": "I tid — klassens svit är räddad.",
+      "gradeOnTime": "I tid. Klassens svit är räddad.",
       "teacherLoadFailed": "Vi kunde inte hämta vilka som spelat. Försök igen om en stund.",
       "teacherOnTime": "I tid",
       "teacherLate": "Sent"
@@ -13711,7 +13717,7 @@ const sv = {
       "title": "Välj spelet",
       "subtitle": "Tryck på en affisch. En sekund senare spelar klassen.",
       "recommended": "Passar bäst",
-      "recommendedHint": "{{mode}} passar de här orden bäst — din lista har definitioner att fråga om.",
+      "recommendedHint": "{{mode}} passar de här orden bäst. Din lista har definitioner att fråga om.",
       "minutes": "{{count}} min",
       "playing": "Spelas nu",
       "change": "Byt spel",
@@ -13721,12 +13727,12 @@ const sv = {
       "settings": "Finjustera",
       "settingsHide": "Dölj finjustering",
       "needsLesson": "Välj en ordlista först",
-      "launch": "KÖR IGÅNG — {{mode}}",
+      "launch": "KÖR IGÅNG: {{mode}}",
       "tapAgain": "Tryck igen för att starta",
       "moreModes": "Fler spel ({{count}})",
       "fewerModes": "Färre spel",
-      "sameCode": "Samma kod — ingen behöver gå in igen.",
-      "switched": "Nu spelas {{mode}} — samma kod.",
+      "sameCode": "Samma kod, ingen behöver gå in igen.",
+      "switched": "Nu spelas {{mode}}, samma kod.",
       "switchFailed": "Bytet gick inte igenom. Tryck igen.",
       "switchMidRound": "Spela klart rundan först, byt spel sedan.",
       "how": {
@@ -13734,7 +13740,7 @@ const sv = {
         "wordHunt": "Tävla med klassen om att gräva fram ett dolt målord ur rutnätet.",
         "blast": "Kedja ord snabbt och spräng brickorna i kombos.",
         "wheelRush": "Snurra bokstavshjulet och skjut iväg ord mot klockan.",
-        "vocabQuiz": "Fyra alternativ, en betydelse — snabbast rätt svar ger mest."
+        "vocabQuiz": "Fyra alternativ, en betydelse: snabbast rätt svar ger mest."
       }
     },
     "projectorLobby": {
@@ -13750,7 +13756,7 @@ const sv = {
       "lateJoinOff": "Sen anslutning stängd"
     },
     "errors": {
-      "serverUnavailable": "Vi når inte klasslistan just nu. Det är vårt fel, inte ditt – försök igen om en liten stund."
+      "serverUnavailable": "Vi når inte klasslistan just nu. Det är vårt fel, inte ditt. Försök igen om en liten stund."
     },
     "intentCta": {
       "forTeachers": "För lärare / för att lära sig engelska",
@@ -13810,7 +13816,7 @@ const sv = {
           }
       },
       "locked": {
-        "word_tower": "Kräver minst 4 listord på 4–6 bokstäver",
+        "word_tower": "Kräver minst 4 listord på 4-6 bokstäver",
         "solo_board": "Lägg till ord i lektionen för att låsa upp",
         "warmup": "Lägg till ord i lektionen för att låsa upp",
         "blitz": "Lägg till ord i lektionen för att låsa upp",
@@ -13823,7 +13829,7 @@ const sv = {
     "produce": {
       "title": "Ordsmedjan",
       "desc": "Läs betydelsen och skriv ordet",
-      "newWord": "Nytt ord — titta först",
+      "newWord": "Nytt ord, titta först",
       "gotIt": "Jag fattar",
       "hint": "Ledtråd",
       "hintLength": "{count} bokstäver",
@@ -13840,7 +13846,7 @@ const sv = {
       },
       "verdict": {
         "correct": "Rätt!",
-        "near-miss": "Nästan — kolla stavningen",
+        "near-miss": "Nästan, kolla stavningen",
         "wrong": "Inte den här gången"
       },
       "notEnough": {
@@ -13925,7 +13931,7 @@ const sv = {
       "skipWord": "Hoppa över ordet",
       "skipQuestion": "Hoppa över frågan",
       "pausedTitle": "Pausat",
-      "pausedBody": "Din lärare har pausat spelet. Häng kvar – vi fortsätter snart.",
+      "pausedBody": "Din lärare har pausat spelet. Häng kvar, vi fortsätter snart.",
       "pausedBodyHost": "Klassen är pausad. Tryck på Fortsätt när du vill köra vidare.",
       "timeAddedToast": "Din lärare lade till {{seconds}} sekunder",
       "wordSkippedToast": "Din lärare valde ett nytt ord att leta efter",
@@ -14003,9 +14009,9 @@ const sv = {
       "reteach": "Ingen hittade de här",
       "allFound": "Klassen hittade alla lektionsord.",
       "practiceMissed": "Öva de här orden",
-      "playReteachRound": "Spela repetitionsrunda — bara missade ord",
+      "playReteachRound": "Spela repetitionsrunda: bara missade ord",
       "backToLobby": "Tillbaka till lobbyn",
-      "rematch": "Revansch — samma lista, samma kod",
+      "rematch": "Revansch: samma lista, samma kod",
       "teamBattle": {
         "title": "Lagkamp",
         "teamName": "Lag {number}",
@@ -14013,7 +14019,7 @@ const sv = {
       },
       "participationBonus": "+{points} deltagarpoäng till alla",
       "shareGap": "Dela klassens lucka",
-      "shareGapCopied": "Länk kopierad — klistra in i Slack eller föräldrachatten",
+      "shareGapCopied": "Länk kopierad, klistra in i Slack eller föräldrachatten",
       "podium": {
         "title": "Topplacerade",
         "wordsFound": "{{found}} av {{total}} ord",
@@ -14051,7 +14057,7 @@ const sv = {
       "moreWaysToReteach": "Fler sätt att repetera orden",
       "fullReport": "Fullständig rapport",
       "neverPlaced": "Kom aldrig med på spelplanen",
-      "neverPlacedHint": "Spelplanen fick inte plats med dem — klassen såg dem aldrig. Kör en returmatch så får de en ny chans.",
+      "neverPlacedHint": "Spelplanen fick inte plats med dem. Klassen såg dem aldrig. Kör en returmatch så får de en ny chans.",
       "needsHelp": {
         "title": "Ta åt sidan ({{count}})",
         "none": "Alla hittade minst halva listan. Kör en runda till.",
@@ -14061,21 +14067,21 @@ const sv = {
       "fewerWords": "Visa färre",
       "allBoardWordsFound": "Klassen hittade varje lektionsord som kom med på spelplanen.",
       "shareGapTitle": "Klassens ordförrådslucka",
-      "shareGapText": "{{lesson}} — klassen hittade {{found}} av {{total}} lektionsord. Öva: {{missed}}",
-      "shareGapAllFoundText": "{{lesson}} — klassen hittade alla lektionsord.",
+      "shareGapText": "{{lesson}}: klassen hittade {{found}} av {{total}} lektionsord. Öva: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}}: klassen hittade alla lektionsord.",
       "shareGapCta": "Spela ett klassspel",
       "shareGapEyebrow": "Dagens klasslucka",
       "shareGapPracticeHome": "Ord att öva hemma",
       "startReteachLive": "Starta 3-minuters reteach Live",
       "postReteachGoogleClassroom": "Publicera 3-minuters reteach i Google Classroom",
-      "postReteachGoogleClassroomTitle": "3-minuters reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomTitle": "3-minuters reteach Live: {{lesson}}",
       "postReteachGoogleClassroomBody": "Öppna länken och starta 3-minuters Live på de missade orden: {{missed}}. Eleverna går med från Stream.",
       "assignPracticeGoogleClassroom": "Tilldela hemövning i Google Classroom",
-      "assignPracticeGoogleClassroomTitle": "Öva missade ord — {{lesson}}",
+      "assignPracticeGoogleClassroomTitle": "Öva missade ord: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Öppna länken och öva dessa missade ord hemma: {{missed}}. Lämna in när du är klar.",
       "printPracticeSheet": "Skriv ut övningsblad",
-      "printPracticeSheetTitle": "Övning på missade ord — {{lesson}}",
-      "printPracticeSheetSubtitle": "Enhetsfri reteach — skriv varje ord och använd det i en mening",
+      "printPracticeSheetTitle": "Övning på missade ord: {{lesson}}",
+      "printPracticeSheetSubtitle": "Enhetsfri reteach: skriv varje ord och använd det i en mening",
       "printPracticeSheetWriteLabel": "Skriv ordet",
       "printPracticeSheetSentenceLabel": "Använd det i en mening",
       "printPracticeSheetNameLine": "Namn: ________________",
@@ -14095,7 +14101,7 @@ const sv = {
       "teamTilesMascotAlt": "Lexi hejar på lagen",
       "teamTilesMascotWinAlt": "Lexi firar Team Tiles",
       "teamTilesWinHeadline": "Brickorna klarade!",
-      "teamTilesWinSub": "{{cleared}} av {{total}} ord — Team Tiles Unplugged.",
+      "teamTilesWinSub": "{{cleared}} av {{total}} ord: Team Tiles Unplugged.",
       "teamTilesPerfectHeadline": "Perfekt Team Tiles-runda!",
       "teamTilesPerfectSub": "Varje miss-gap-bricka vändes och klarades.",
       "teamTilesPlayAgain": "Blanda och spela igen",
@@ -14114,19 +14120,19 @@ const sv = {
       "classicUnpluggedMascotAlt": "Lexi leder Classic Unplugged",
       "classicUnpluggedMascotWinAlt": "Lexi firar Classic Unplugged",
       "classicUnpluggedWinHeadline": "Classic Unplugged klart!",
-      "classicUnpluggedWinSub": "{{cleared}} av {{total}} ord — läraren skickade, inga elevskärmar.",
+      "classicUnpluggedWinSub": "{{cleared}} av {{total}} ord, läraren skickade, inga elevskärmar.",
       "classicUnpluggedPerfectHeadline": "Perfekt Classic Unplugged!",
       "classicUnpluggedPerfectSub": "Varje miss-gap-ord klarat tillsammans.",
       "classicUnpluggedPlayAgain": "Spela igen",
       "assignUnpluggedGoogleClassroom": "Tilldela frånkopplad reteach i Google Classroom",
-      "assignUnpluggedGoogleClassroomTitle": "Frånkopplad reteach-läxa — {{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "Enhetsfri läxa: öppna Unplugged Live-länken, skriv ut övningsbladet för missade ord och öva: {{missed}}. Inga elevapparater behövs — lämna in när du är klar.",
+      "assignUnpluggedGoogleClassroomTitle": "Frånkopplad reteach-läxa: {{lesson}}",
+      "assignUnpluggedGoogleClassroomBody": "Enhetsfri läxa: öppna Unplugged Live-länken, skriv ut övningsbladet för missade ord och öva: {{missed}}. Inga elevapparater behövs, lämna in när du är klar.",
       "assignMissGapLiveGoogleClassroom": "Tilldela miss-gap Live till Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live — {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Öppna länken och starta 3-min Live på dessa missade ord: {{missed}}. Elever går med från Classwork. Fungerar på gratis Google Workspace for Education — ingen Education Plus krävs.",
-      "launchMissGapQuestionPackLive": "Starta live-frågepaket — missade ord",
-      "missGapQuestionPackTitle": "Miss-gap-frågepaket — {{lesson}}",
-      "unpluggedReteachHint": "Eleverna svarar på det utskrivna övningsbladet — inga enheter",
+      "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Öppna länken och starta 3-min Live på dessa missade ord: {{missed}}. Elever går med från Classwork. Fungerar på gratis Google Workspace for Education, ingen Education Plus krävs.",
+      "launchMissGapQuestionPackLive": "Starta live-frågepaket: missade ord",
+      "missGapQuestionPackTitle": "Miss-gap-frågepaket: {{lesson}}",
+      "unpluggedReteachHint": "Eleverna svarar på det utskrivna övningsbladet, inga enheter",
       "unpluggedReteachReveal": "Visa",
       "unpluggedReteachNext": "Nästa",
       "unpluggedReteachPrev": "Föregående",
@@ -14149,7 +14155,7 @@ const sv = {
       "unpluggedGameMascotAlt": "Lexi hejar på klassen",
       "unpluggedGameMascotWinAlt": "Lexi firar med klassen",
       "unpluggedGameWinHeadline": "Klassen klarade alla!",
-      "unpluggedGameWinSub": "{{cleared}} av {{total}} ord besegrade — som ett lag.",
+      "unpluggedGameWinSub": "{{cleared}} av {{total}} ord besegrade, som ett lag.",
       "unpluggedGamePerfectHeadline": "Perfekt klassrunda!",
       "unpluggedGamePerfectSub": "Varje ord, allihop tillsammans, inga missar.",
       "unpluggedGamePerfectBadge": "Rent hus",
@@ -14157,80 +14163,80 @@ const sv = {
       "unpluggedGameBestStreak": "Bästa svit",
       "unpluggedGamePlayAgain": "Kör en runda till",
       "shareMissGapPractice": "Dela miss-gap-övningskort",
-      "shareMissGapPracticeCopied": "Övningskortlänk kopierad — klistra in till vårdnadshavare",
+      "shareMissGapPracticeCopied": "Övningskortlänk kopierad, klistra in till vårdnadshavare",
       "shareMissGapPracticeTitle": "Miss-gap-övningskort",
-      "shareMissGapPracticeText": "{{lesson}} — hemläxa miss-gap (skriv ut eller spara PDF): {{missed}}",
+      "shareMissGapPracticeText": "{{lesson}}: hemläxa miss-gap (skriv ut eller spara PDF): {{missed}}",
       "missGapPracticeEyebrow": "Hemläxa att öva",
-      "missGapPracticeSubtitle": "Ett utskrivbart övningsblad med orden klassen missade — öppna, skriv ut eller spara som PDF. Inga enheter behövs.",
-      "missGapPracticeFoil": "Kahoot Unplugged har ingen hemläxa — LexiClash har",
+      "missGapPracticeSubtitle": "Ett utskrivbart övningsblad med orden klassen missade. Öppna, skriv ut eller spara som PDF. Inga enheter behövs.",
+      "missGapPracticeFoil": "Kahoot Unplugged har ingen hemläxa. LexiClash har",
       "missGapPracticePrintPdf": "Skriv ut / spara övnings-PDF",
       "assignMissGapAsyncHomework": "Tilldela asynkron miss-gap-läxa",
       "assignMissGapAsyncEyebrow": "Asynkron läxa",
       "assignMissGapAsyncHeading": "Miss-gap-övning med deadline",
       "assignMissGapAsyncSubtitle": "Eleverna spelar ett tvåminutersspel på orden klassen missade. Du ser vilka som blev klara, och en omgång klar i tid håller klassens svit vid liv.",
-      "assignMissGapAsyncFoil": "Kahootopia Assignments är live-spelläxor — LexiClash tilldelar asynkron miss-gap-övning som matar klassens streak",
+      "assignMissGapAsyncFoil": "Kahootopia Assignments är live-spelläxor. LexiClash tilldelar asynkron miss-gap-övning som matar klassens streak",
       "assignMissGapAsyncDueLabel": "Deadline",
-      "assignMissGapAsyncDueBanner": "Deadline {{due}} — slutför miss-gap-övningen för att behålla klassens streak",
+      "assignMissGapAsyncDueBanner": "Deadline {{due}}: slutför miss-gap-övningen för att behålla klassens streak",
       "assignMissGapAsyncGoogleClassroom": "Tilldela asynkron miss-gap i Google Classroom",
-      "assignMissGapAsyncTitle": "Asynkron miss-gap-läxa — {{lesson}}",
+      "assignMissGapAsyncTitle": "Asynkron miss-gap-läxa: {{lesson}}",
       "assignMissGapAsyncBody": "Asynkron miss-gap-övning (inte ett livespel). Öppna länken och öva: {{missed}}. Deadline {{due}}. I tid matar klassens streak.",
       "assignMissGapAsyncShare": "Kopiera asynkron läxlänk",
-      "assignMissGapAsyncShareCopied": "Länk kopierad — klistra in till föräldrar eller Classroom",
-      "assignMissGapAsyncShareText": "{{lesson}} — asynkron miss-gap-läxa till {{due}}: {{missed}}",
+      "assignMissGapAsyncShareCopied": "Länk kopierad, klistra in till föräldrar eller Classroom",
+      "assignMissGapAsyncShareText": "{{lesson}}: asynkron miss-gap-läxa till {{due}}: {{missed}}",
       "assignMissGapAsyncComplete": "Markera övning klar (matar klass-streak)",
-      "assignMissGapAsyncCompleted": "Övning klar — klass-streak uppdaterad",
+      "assignMissGapAsyncCompleted": "Övning klar, klass-streak uppdaterad",
       "assignMissGapAsyncStreak": "Klass-streak: {{streak}} dag(ar)",
       "missGapGradePassbackEyebrow": "Betygsåterkoppling till Google Classroom",
       "missGapGradePassbackHeading": "Lämna in ditt miss-gap-betyg",
-      "missGapGradePassbackSubtitle": "Övningen är klar — poängen är redo att lämnas in i klassens betygsbok.",
-      "missGapGradePassbackFoil": "Kahoot Marketplace synkar quizpoäng till Classroom — LexiClash gör samma sak för asynk miss-gap-läxa, utan roster-OAuth",
+      "missGapGradePassbackSubtitle": "Övningen är klar. Poängen är redo att lämnas in i klassens betygsbok.",
+      "missGapGradePassbackFoil": "Kahoot Marketplace synkar quizpoäng till Classroom. LexiClash gör samma sak för asynk miss-gap-läxa, utan roster-OAuth",
       "missGapGradePassbackScore": "Poäng: {{points}} / {{max}}",
-      "missGapGradePassbackOnTime": "I tid — full poäng + klass-streak",
-      "missGapGradePassbackLate": "Sen inlämning — sänkt utkastbetyg (streak oförändrad)",
+      "missGapGradePassbackOnTime": "I tid: full poäng + klass-streak",
+      "missGapGradePassbackLate": "Sen inlämning, sänkt utkastbetyg (streak oförändrad)",
       "missGapGradePassbackDue": "Deadline {{due}}",
       "missGapGradePassbackPrivacy": "Inga namn delas och ingen klasslista importeras. Bara poängen för den här övningen lämnas in.",
       "missGapGradePassbackCopy": "Kopiera länk till betygskvitto",
-      "missGapGradePassbackCopied": "Kvitto kopierat — klistra in i Classroom eller dela med läraren",
-      "missGapGradePassbackShareText": "{{lesson}} — miss-gap-betyg {{points}}/{{max}} (deadline {{due}})",
-      "missGapGradePassbackTitle": "Miss-gap-betyg — {{lesson}}",
+      "missGapGradePassbackCopied": "Kvitto kopierat, klistra in i Classroom eller dela med läraren",
+      "missGapGradePassbackShareText": "{{lesson}}: miss-gap-betyg {{points}}/{{max}} (deadline {{due}})",
+      "missGapGradePassbackTitle": "Miss-gap-betyg: {{lesson}}",
       "missGapGradePassbackBackHomework": "Tillbaka till miss-gap-läxan",
       "missGapGradePassbackOpen": "Öppna Google Classroom-betygskvitto",
 
       "unpluggedGradePassbackEyebrow": "Betygsåterkoppling till Google Classroom",
       "unpluggedGradePassbackHeading": "Skicka in Unplugged reteach-betyg",
-      "unpluggedGradePassbackSubtitle": "Livesession klar — klassens cleared/total är redo för Classroom-betygsboken.",
-      "unpluggedGradePassbackFoil": "Kahoots Classroom-tillägg synkar livepoäng — LexiClash gör samma sak för Unplugged reteach utan roster-OAuth",
+      "unpluggedGradePassbackSubtitle": "Livesession klar. Klassens cleared/total är redo för Classroom-betygsboken.",
+      "unpluggedGradePassbackFoil": "Kahoots Classroom-tillägg synkar livepoäng. LexiClash gör samma sak för Unplugged reteach utan roster-OAuth",
       "unpluggedGradePassbackScore": "Betyg: {{points}} / {{max}}",
       "unpluggedGradePassbackCleared": "Klassen klarade {{cleared}} / {{total}} ({{accuracy}}%)",
-      "unpluggedGradePassbackOnTime": "I tid — fulla poäng för träffsäkerhet",
-      "unpluggedGradePassbackLate": "Sen inlämning — sänkt utkastbetyg",
+      "unpluggedGradePassbackOnTime": "I tid: fulla poäng för träffsäkerhet",
+      "unpluggedGradePassbackLate": "Sen inlämning, sänkt utkastbetyg",
       "unpluggedGradePassbackDue": "Session / deadline {{due}}",
       "unpluggedGradePassbackPrivacy": "Inga namn delas och ingen klasslista importeras. Endast klassens cleared/total lämnas in.",
       "unpluggedGradePassbackCopy": "Kopiera betygskvitto-länk",
-      "unpluggedGradePassbackCopied": "Kvittot kopierat — klistra in i Classroom",
-      "unpluggedGradePassbackShareText": "{{lesson}} — Unplugged-betyg {{points}}/{{max}} (klarade {{cleared}}/{{total}})",
-      "unpluggedGradePassbackTitle": "Unplugged-betyg — {{lesson}}",
+      "unpluggedGradePassbackCopied": "Kvittot kopierat, klistra in i Classroom",
+      "unpluggedGradePassbackShareText": "{{lesson}}: Unplugged-betyg {{points}}/{{max}} (klarade {{cleared}}/{{total}})",
+      "unpluggedGradePassbackTitle": "Unplugged-betyg: {{lesson}}",
       "unpluggedGradePassbackBackLive": "Tillbaka till Unplugged Live",
       "unpluggedGradePassbackOpen": "Skicka betyg till Google Classroom",
 
       "missGapWhatsAppEyebrow": "Föräldrapraktik via WhatsApp",
       "missGapWhatsAppHeading": "Skicka miss-gap-övningen hem via WhatsApp",
-      "missGapWhatsAppSubtitle": "Skicka övningskortet rakt in i en föräldrachatt med ett tryck — bara klassens ord, inga elevnamn.",
-      "missGapWhatsAppParentSubtitle": "Öva de missade orden från {{lesson}} med ditt barn — skriv ut eller öppna övningskortet.",
-      "missGapWhatsAppFoil": "Classrooms betygssync stannar i betygsboken — LexiClash skickar miss-gap-övningskortet hem via WhatsApp",
+      "missGapWhatsAppSubtitle": "Skicka övningskortet rakt in i en föräldrachatt med ett tryck. Bara klassens ord, inga elevnamn.",
+      "missGapWhatsAppParentSubtitle": "Öva de missade orden från {{lesson}} med ditt barn. Skriv ut eller öppna övningskortet.",
+      "missGapWhatsAppFoil": "Classrooms betygssync stannar i betygsboken. LexiClash skickar miss-gap-övningskortet hem via WhatsApp",
       "missGapWhatsAppDue": "Inlämning {{due}}",
       "missGapWhatsAppWordsLabel": "Klassens missade ord att öva",
-      "missGapWhatsAppPrivacy": "Inga elevnamn. Bara klassord — säkert att klistra in i en föräldragrupp på WhatsApp.",
+      "missGapWhatsAppPrivacy": "Inga elevnamn. Bara klassord, säkert att klistra in i en föräldragrupp på WhatsApp.",
       "missGapWhatsAppShare": "Dela övningskortet på WhatsApp",
-      "missGapWhatsAppOpened": "WhatsApp öppnat — välj en föräldrarchatt",
-      "missGapWhatsAppShareText": "{{lesson}} — öva miss-gap-orden hemma (deadline {{due}}): {{missed}}",
-      "missGapWhatsAppOgTitle": "Miss-gap-övning för föräldrar — {{lesson}}",
+      "missGapWhatsAppOpened": "WhatsApp öppnat, välj en föräldrarchatt",
+      "missGapWhatsAppShareText": "{{lesson}}: öva miss-gap-orden hemma (deadline {{due}}): {{missed}}",
+      "missGapWhatsAppOgTitle": "Miss-gap-övning för föräldrar: {{lesson}}",
       "missGapWhatsAppOpenPractice": "Öppna miss-gap-övningskort",
       "missGapWhatsAppOpenHomework": "Öppna asynkron miss-gap-läxa",
       "printUnpluggedReteachPack": "Skriv ut Unplugged reteach-paket (PDF + QR)",
-      "unpluggedReteachPackTitle": "Unplugged reteach-paket — {{lesson}}",
-      "unpluggedReteachPackSubtitle": "Utskrivbart paket från förra passets missar — QR öppnar Unplugged Live på projektorn",
-      "unpluggedReteachPackFoil": "Kahoot Classic Unplugged har inget utskrivbart paket med Live-QR — LexiClash har",
+      "unpluggedReteachPackTitle": "Unplugged reteach-paket: {{lesson}}",
+      "unpluggedReteachPackSubtitle": "Utskrivbart paket från förra passets missar. QR öppnar Unplugged Live på projektorn",
+      "unpluggedReteachPackFoil": "Kahoot Classic Unplugged har inget utskrivbart paket med Live-QR. LexiClash har",
       "unpluggedReteachPackQrHint": "Skanna för att öppna Unplugged reteach Live",
       "unpluggedReteachPackHowTo": "1) Skriv ut paketet 2) Ge övningssidor till elever 3) Skanna QR på lärarskärmen",
       "unpluggedReteachPackPracticeHeading": "Elevövningssidor",
@@ -14239,34 +14245,34 @@ const sv = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "Tilldela miss-gap Live",
-      "subtitle": "Ett klick till Classwork-tilldelning för 3-min Live på missade ord — fungerar på gratis Google Workspace for Education. Quizlets Classroom-tillägg kräver Education Plus. Endast klassord — inga elevnamn.",
+      "subtitle": "Ett klick till Classwork-tilldelning för 3-min Live på missade ord, fungerar på gratis Google Workspace for Education. Quizlets Classroom-tillägg kräver Education Plus. Endast klassord, inga elevnamn.",
       "assignLive": "Tilldela miss-gap Live till Classroom",
-      "freeWorkspaceFoil": "Fungerar på gratis Google Workspace for Education — Quizlets Classroom-tillägg kräver Education Plus. LexiClash använder Googles delningsdialog, så Plus behövs inte.",
+      "freeWorkspaceFoil": "Fungerar på gratis Google Workspace for Education. Quizlets Classroom-tillägg kräver Education Plus. LexiClash använder Googles delningsdialog, så Plus behövs inte.",
       "lessonLabel": "Lektionsnamn",
       "missedWordsLabel": "Missade ord (kommaseparerade)",
-      "privacyNote": "Ingen roster-import. Inga elevnamn. Publicering via Googles dialog — vi ser aldrig vilken klass du väljer.",
+      "privacyNote": "Ingen roster-import. Inga elevnamn. Publicering via Googles dialog. Vi ser aldrig vilken klass du väljer.",
       "postToStream": "Publicera Unplugged-tilldelning till Classroom Stream",
       "openUnplugged": "Öppna Unplugged Live",
             "needMissedWords": "Lägg till minst ett missat ord för att aktivera tilldelning med ett klick.",
       "planner": {
         "eyebrow": "Konversationell Classroom-planerare",
-        "title": "Säg vad du behöver — vi dirigerar Live",
-        "subtitle": "Skriv en plan på vanlig svenska. Vi öppnar Classic eller Team Unplugged, eller reteach Live med betygsåterkoppling. Endast klassord — inga elevnamn.",
+        "title": "Säg vad du behöver, vi dirigerar Live",
+        "subtitle": "Skriv en plan på vanlig svenska. Vi öppnar Classic eller Team Unplugged, eller reteach Live med betygsåterkoppling. Endast klassord, inga elevnamn.",
         "promptLabel": "Vad vill du köra?",
         "promptPlaceholder": "t.ex. Unplugged reteach på gårdagens missar",
-        "privacyNote": "Ingen roster-import. Inga elevnamn. Dirigerar till befintliga Unplugged-lägen — ingen ny spellogik.",
+        "privacyNote": "Ingen roster-import. Inga elevnamn. Dirigerar till befintliga Unplugged-lägen, ingen ny spellogik.",
         "needPrompt": "Skriv en vanlig prompt för att planera Live.",
         "needMissedWords": "Lägg till missade ord, eller be om en CEFR-nivå så vi kan så gap-ord.",
-        "modeClassic": "Classic Unplugged — klass/lag diskuterar på projektorn",
-        "modeTeam": "Team Tiles Unplugged — delad brickbräda, läraren markerar",
-        "modeReteach": "Unplugged reteach Live — utskrift + projektor",
-        "modeLive3min": "3-min reteach Live — projektor + betygsåterkoppling",
+        "modeClassic": "Classic Unplugged: klass/lag diskuterar på projektorn",
+        "modeTeam": "Team Tiles Unplugged: delad brickbräda, läraren markerar",
+        "modeReteach": "Unplugged reteach Live: utskrift + projektor",
+        "modeLive3min": "3-min reteach Live: projektor + betygsåterkoppling",
         "timerNote": "{{seconds}}s timer",
         "cefrNote": "CEFR {{level}}-gap",
         "openLive": "Öppna planerad Live",
         "openGradePassback": "Öppna kvitto för betygsåterkoppling",
         "postToStream": "Publicera Unplugged-uppgift till Classroom-strömmen",
-        "foilNote": "Mot Discovery Education Gemini konversationell Classroom — LexiClash dirigerar till riktiga Unplugged Lives med betygsåterkoppling."
+        "foilNote": "Mot Discovery Education Gemini konversationell Classroom. LexiClash dirigerar till riktiga Unplugged Lives med betygsåterkoppling."
       }
     },
     "nav": {
@@ -14320,7 +14326,7 @@ const sv = {
       "turnPlay": "Spela min tur",
       "turnDecline": "Hoppa över",
       "turnLiveBadge": "Live",
-      "turnLiveInvite": "{{name}} väntar — live!",
+      "turnLiveInvite": "{{name}} väntar, live!",
       "turnAcceptLive": "Spela live",
       "tauntPrompt": "Skicka en dekal",
       "tauntSent": "Dekal skickad",
@@ -14412,14 +14418,14 @@ const sv = {
       "matchingProgress": "Du matchade {{count}} par!",
       "spellingPerfect": "Perfekt stavning!",
       "spellingProgress": "Du stavade {{count}} ord rätt!",
-      "blitzResult": "{{count}} ord på 60 sekunder — bra!",
+      "blitzResult": "{{count}} ord på 60 sekunder, bra!",
       "dailyChallengeComplete": "Daglig utmaning slutförd!",
       "lessonMastered": "Lektion klar! Du behärskar dessa ord!",
       "lessonProgress": "Bra arbete! Fortsätt träna.",
       "duel": {
         "win": "Seger! Du spelade bra!",
         "loss": "Bra försök! Nästa gång vinner du!",
-        "draw": "Oavgjort — ni var lika bra!"
+        "draw": "Oavgjort, ni var lika bra!"
       }
     },
     "analytics": {
@@ -14482,6 +14488,8 @@ const sv = {
       "yesterday": "Igår"
     },
     "classroomGame": {
+      "forSchoolsCta": "Se LexiClash för skolor",
+      "forSchoolsFooter": "Vill du ta LexiClash till hela din skola eller kommun?",
       "questions": "Frågor",
       "perQuestion": "Per fråga",
       "namePrompt": {
@@ -14505,7 +14513,7 @@ const sv = {
       "lessonsSelected": "{{count}} lektioner valda",
       "missingRequirements": "Det saknas något",
       "startFailed": "Vi kunde inte starta spelet. Försök igen.",
-      "tooFast": "Ett ögonblick – försök igen om några sekunder.",
+      "tooFast": "Ett ögonblick, försök igen om några sekunder.",
       "more": "fler",
       "multiLessonHelp": "Blanda lektioner för mer variation",
       "noClassrooms": "Inga klassrum ännu",
@@ -14559,7 +14567,7 @@ const sv = {
       "badge_teacher": "Lärare",
       "badge_student": "Klassrum",
       "badge_promo": "Klassläge",
-      "promo_title": "Undervisa med LexiClash — gratis",
+      "promo_title": "Undervisa med LexiClash, gratis",
       "promo_subtitle": "Kör ordspel med klassen, gör egna ordlistor och se vem som fastnar.",
       "promo_cta": "Se klassläget",
       "teacher_title": "Ditt klassrum är redo",
@@ -14571,6 +14579,7 @@ const sv = {
       "trial_ended": "Provperioden är slut"
     },
     "landing": {
+      "resourcesAriaLabel": "Utbildningsresurser",
       "pro": {
         "title": "Två planer. Inga trick.",
         "subtitle": "Allt du behöver för din första lektion är gratis. Pro tar bort taken.",
@@ -14602,7 +14611,7 @@ const sv = {
       "roleGuest": "Gäst",
       "roleStudent": "Elev",
       "roleTeacher": "Lärare",
-      "socialProof": "Du är inte ensam — tusentals spelar redan.",
+      "socialProof": "Du är inte ensam, tusentals spelar redan.",
       "student": "Elev",
       "studentCta": "Börja nu",
       "studentJoinCta": "Gå med via klasskod",
@@ -14621,8 +14630,8 @@ const sv = {
       "startGame": "Starta spel",
       "hero": {
         "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska, spanska och ryska",
-        "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
-        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
+        "h1": "Ordförrådsspel för ditt klassrum, utan elevkonton.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar, spela i valfri webbläsare. Byggt nativt för {count} språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
         "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
@@ -14635,23 +14644,23 @@ const sv = {
         "players": "28 spelar",
         "board_caption": "Tryck på bokstäver för att stava ord",
         "leaderboard_title": "Live-topplista",
-        "caption": "Ditt klassrum i realtid: elever ansluter med en kod, tävlar om att stava ord och klättrar på en live-topplista — inga inloggningar, inga installationer.",
+        "caption": "Ditt klassrum i realtid: elever ansluter med en kod, tävlar om att stava ord och klättrar på en live-topplista, inga inloggningar, inga installationer.",
         "s1": "Astrid",
         "s2": "Erik",
         "s3": "Saga"
       },
       "moat": {
         "title": "Varför lärare väljer LexiClash framför Kahoot, Quizlet och Wordwall",
-        "subtitle": "Tre löften vi håller — inte bara påstår.",
+        "subtitle": "Tre löften vi håller, inte bara påstår.",
         "native_multilingual": {
           "tag": "Inbyggt",
           "title": "Verkligt flerspråkigt",
-          "body": "Hebreiska höger-till-vänster, japanska IME och kana, svenska sammansatta ord (ordspel, inte ord-spel), spanska accenter — allt i motorn, inte Google Translate."
+          "body": "Hebreiska höger-till-vänster, japanska IME och kana, svenska sammansatta ord (ordspel, inte ord-spel), spanska accenter: allt i motorn, inte Google Translate."
         },
         "local_inventory": {
           "tag": "Lokalt",
           "title": "Ord från elevernas egen ordbok",
-          "body": "Svenska ordlistor från normalordbok, hebreiska från Milog, japanska från JMdict — inte gamla amerikanska läromedel. Eleverna lär sig ord som faktiskt används i deras språk."
+          "body": "Svenska ordlistor från normalordbok, hebreiska från Milog, japanska från JMdict, inte gamla amerikanska läromedel. Eleverna lär sig ord som faktiskt används i deras språk."
         },
         "ad_free": {
           "tag": "Reklamfritt",
@@ -14660,7 +14669,7 @@ const sv = {
         }
       },
       "modes": {
-        "title": "Sex spellägen — varje elev lär på sitt sätt",
+        "title": "Sex spellägen, varje elev lär på sitt sätt",
         "teaches": "Tränar",
         "classroom_game": {
           "tag": "Live",
@@ -14700,6 +14709,7 @@ const sv = {
         }
       },
       "compare": {
+        "rowHeader": "Funktion",
         "title": "Jämförelse med konkurrenter",
         "subtitle": "Varför LexiClash skiljer sig åt",
         "col": {
@@ -14727,15 +14737,15 @@ const sv = {
         "title": "Vanliga frågor från lärare",
         "q1": {
           "q": "Hur får jag lärargång?",
-          "a": "Fyll i det korta formuläret på /education/access — åtkomsten ges direkt när du skickar in, och panelen öppnas på en gång."
+          "a": "Fyll i det korta formuläret på /education/access. Åtkomsten ges direkt när du skickar in, och panelen öppnas på en gång."
         },
         "q2": {
           "q": "Finns det en gratisplan?",
-          "a": "Ja — en gratis basplan för verifierade lärare: upp till 3 klasser med 50 elever vardera, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
+          "a": "Ja, en gratis basplan för verifierade lärare: upp till 3 klasser med 50 elever vardera, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
         },
         "q3": {
           "q": "Stöder LexiClash hebreiska, japanska, svenska och spanska?",
-          "a": "Ja — fullt stöd. Hebreiska höger-till-vänster, japansk IME och kana, svenska sammansatta ord — allt är inbyggt."
+          "a": "Ja, fullt stöd. Hebreiska höger-till-vänster, japansk IME och kana, svenska sammansatta ord, allt är inbyggt."
         },
         "q4": {
           "q": "Är det säkert för barn?",
@@ -14747,25 +14757,25 @@ const sv = {
         },
         "q6": {
           "q": "Vad gör LexiClash annorlunda?",
-          "a": "Sex spellägen, verkligt flerspråkigt, noll annonser, ordförråd från elevernas eget språk — och det kostar ingenting för lärare."
+          "a": "Sex spellägen, verkligt flerspråkigt, noll annonser, ordförråd från elevernas eget språk, och det kostar ingenting för lärare."
         },
         "q7": {
           "q": "Kan jag följa elevernas framsteg?",
-          "a": "Ja. Lärarpanelen visar detaljerad statistik per elev och per klass — träffackerhet, ordförråd, sviter och mer."
+          "a": "Ja. Lärarpanelen visar detaljerad statistik per elev och per klass: träffackerhet, ordförråd, sviter och mer."
         },
         "q8": {
           "q": "Spelar det på Chromebook och telefon?",
-          "a": "Ja. Det är en webbapp — inget att installera. Fungerar överallt."
+          "a": "Ja. Det är en webbapp, inget att installera. Fungerar överallt."
         }
       },
       "cta": {
         "title": "Redo att börja?",
-        "body": "Två minuter att ansöka — du är inne så fort du skickar in.",
+        "body": "Två minuter att ansöka, du är inne så fort du skickar in.",
         "button": "Ansök nu"
       },
       "teacherLeadCta": {
         "title": "Är du lärare?",
-        "body": "LexiClash har en gratis basplan för lärare — uppgradera till Pro för obegränsade klasser.",
+        "body": "LexiClash har en gratis basplan för lärare. Uppgradera till Pro för obegränsade klasser.",
         "button": "Få läraråtkomst"
       },
       "districtCta": {
@@ -14775,11 +14785,11 @@ const sv = {
       },
       "esl-word-games": {
         "course_name": "Ordspel för ESL och språkundervisning",
-        "course_desc": "Ordförråd, stavning och live-multiplayer på 6 språk — för ESL-klassrum."
+        "course_desc": "Ordförråd, stavning och live-multiplayer på 6 språk, för ESL-klassrum."
       },
       "vocabulary-games-classroom": {
         "course_name": "Ordförrådsspel för klassrummet",
-        "course_desc": "Live och asynkrona ordspel med läraranalys — helt utan annonser för eleverna."
+        "course_desc": "Live och asynkrona ordspel med läraranalys, helt utan annonser för eleverna."
       },
       "welcomeBack": "Välkommen tillbaka!",
       "openDashboard": "Öppna lärarpanelen",
@@ -14811,6 +14821,7 @@ const sv = {
       "xp": "{{xp}} XP"
     },
     "milestones": {
+      "levelTooltipWithTitle": "Nivå {{level}} - {{title}}",
       "coinBonus": "+{{coins}} mynt",
       "continue": "Fortsätt",
       "level": "Nivå {{level}}",
@@ -14826,13 +14837,13 @@ const sv = {
       "title": "Så funkar LexiClash i ditt klassrum",
       "subtitle": "Fem snabba steg från noll till ditt första live-ordspel.",
       "steps": {
-        "create": { "title": "Skapa ditt klassrum", "text": "Ett tryck — namnge det och klart." },
+        "create": { "title": "Skapa ditt klassrum", "text": "Ett tryck, namnge det och klart." },
         "share": { "title": "Dela gå-med-koden", "text": "Projicera den på tavlan eller skicka länken." },
-        "join": { "title": "Eleverna ansluter", "text": "Från valfri enhet — inga konton behövs." },
+        "join": { "title": "Eleverna ansluter", "text": "Från valfri enhet, inga konton behövs." },
         "play": { "title": "Kör ett live-ordspel", "text": "Välj en lektion och tryck start." },
         "results": { "title": "Se resultaten", "text": "Följ varje elevs framsteg i din instrumentpanel." }
       },
-      "gotIt": "Fattat — kör igång!",
+      "gotIt": "Fattat, kör igång!",
       "showTutorial": "Så funkar det"
     },
     "practice": {
@@ -14964,27 +14975,27 @@ const sv = {
           "steps": "Steg för att gå med",
           "codeHeadline": "SKRIV IN KODEN",
           "codeSub": "Sex tecken, direkt från lärarens skärm.",
-          "codeTooShort": "Sex tecken — det fattas några.",
+          "codeTooShort": "Sex tecken, det fattas några.",
           "next": "Vidare",
           "changeCode": "Byt kod",
           "nameHeadline": "VÄLJ ETT NAMN",
-          "nameRequired": "Välj ett namn först — hela klassen ser det.",
+          "nameRequired": "Välj ett namn först, hela klassen ser det.",
           "readyHeadline": "REDO?",
           "readySub": "Ett tryck så är du inne.",
           "go": "Kör!",
           "entering": "Vi släpper in dig…"
         },
         "heroLine": "Fråga din lärare om klasskoden",
-        "preparing": "Gör i ordning – ett ögonblick.",
-        "queuedNeedsName": "Nästan inne — skriv ditt namn ovanför så tar vi dig direkt dit.",
+        "preparing": "Gör i ordning, ett ögonblick.",
+        "queuedNeedsName": "Nästan inne, skriv ditt namn ovanför så tar vi dig direkt dit.",
         "nameTaken": "Någon i klassen heter redan så. Testa {{suggestedName}}.",
         "useSuggestedName": "Gå med som {{suggestedName}}",
         "codePlaceholder": "6 bokstäver",
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
-        "invalidCode": "Vi känner inte igen den koden. Dubbelkolla med din lärare – koder slutar fungera när spelet är slut.",
+        "invalidCode": "Vi känner inte igen den koden. Dubbelkolla med din lärare. Koder slutar fungera när spelet är slut.",
         "joining": "Går med...",
-        "nameHint": "Inget konto behövs – välj bara ett namn",
+        "nameHint": "Inget konto behövs, välj bara ett namn",
         "nameLabel": "Ditt namn",
         "namePlaceholder": "t.ex. Maya",
         "nameRequired": "Ange ditt namn",
@@ -14993,7 +15004,7 @@ const sv = {
           "label": "Går med i:",
           "confirm": "Det här är ditt klassrum",
           "gameLabel": "Live-spel:",
-          "gameConfirm": "Din klass spelar nu – du hoppar in direkt"
+          "gameConfirm": "Din klass spelar nu, du hoppar in direkt"
         },
         "subtitle": "Fråga din lärare om koden",
         "success": "Du är med!",
@@ -15006,7 +15017,7 @@ const sv = {
         "words": "ord",
         "correct": "Snyggt!",
         "lessonWord": "Lektionsord!",
-        "tryAgain": "Inte den — fortsätt",
+        "tryAgain": "Inte den, fortsätt",
         "roundOver": "Rundan är slut!",
         "rival": {
           "toCatch": "att ta igen",
@@ -15142,9 +15153,9 @@ const sv = {
     },
     "access": {
       "h1": "Begär gratis lärargång",
-      "lede": "Berätta lite om ditt klassrum. Åtkomst ges direkt — ingen väntan på granskning.",
+      "lede": "Berätta lite om ditt klassrum. Åtkomst ges direkt, ingen väntan på granskning.",
       "redirect_title": "Den sidan kräver lärarbehörighet",
-      "redirect_body": "Du var på väg till {{dest}}. Godkännandet sker direkt — det korta formuläret nedan låser upp den.",
+      "redirect_body": "Du var på väg till {{dest}}. Godkännandet sker direkt, det korta formuläret nedan låser upp den.",
       "redirect_dest_fallback": "dina klassrumsverktyg",
       "full_name": "Dit namn",
       "email": "Din e-postadress",
@@ -15157,7 +15168,7 @@ const sv = {
       "role_other": "Annat",
       "school_or_org": "Skola/organisation (valfritt)",
       "country": "Land (valfritt)",
-      "use_case": "Hur tänker du använda LexiClash i ditt klassrum? (10–800 tecken)",
+      "use_case": "Hur tänker du använda LexiClash i ditt klassrum? (10-800 tecken)",
       "submit": "Skicka ansökan",
       "submitting": "Skickar…",
       "submit_error": "Något gick fel. Försök igen senare.",
@@ -15177,7 +15188,7 @@ const sv = {
       "auth_required_title": "Registrera dig för att ansöka om läraråtkomst",
       "auth_required_body": "Läraråtkomst är kopplad till ett verifierat konto. Skapa ett gratiskonto eller logga in, så fortsätter vi direkt här.",
       "auth_required_cta": "Skapa mitt gratis lärarkonto",
-      "trust_instant": "Direkt åtkomst — ingen granskningskö",
+      "trust_instant": "Direkt åtkomst, ingen granskningskö",
       "trust_free": "Gratis lärarplan, utan slutdatum",
       "trust_nologins": "Inga elevkonton, ingen installation",
       "cta_micro": "Tar 60 sekunder · Inget kreditkort",
@@ -15186,14 +15197,14 @@ const sv = {
       "verify_email_body": "Vi skickade en bekräftelselänk till {email}. Bekräfta den för att låsa upp ansökan om läraråtkomst.",
       "verify_email_resend": "Skicka bekräftelsemejl igen",
       "verify_email_sending": "Skickar…",
-      "verify_email_resent": "Skickat — kolla din inkorg",
-      "verify_email_refresh": "Jag har verifierat — uppdatera",
+      "verify_email_resent": "Skickat, kolla din inkorg",
+      "verify_email_refresh": "Jag har verifierat, uppdatera",
       "email_locked_hint": "Ansökningar är kopplade till ditt kontos verifierade e-postadress.",
       "greeting": "Hej {name}! 👋",
       "greeting_noname": "Du är nästan klar! 👋",
-      "greeting_sub": "Vi har redan ditt namn och din e-post från kontot — bara två snabba saker kvar.",
+      "greeting_sub": "Vi har redan ditt namn och din e-post från kontot, bara två snabba saker kvar.",
       "applying_as": "Ansöker som",
-      "role_q": "Först — vilken är du?",
+      "role_q": "Först, vilken är du?",
       "use_case_q": "Nu det roliga 🎯",
       "use_case_hint": "Hur ska du använda LexiClash med dina elever? En mening eller två räcker fint.",
       "use_case_placeholder": "t.ex. Ordförrådsmatcher varje fredag med min årskurs 7…",
@@ -15202,16 +15213,16 @@ const sv = {
       "use_case_ex2": "Läxor som eleverna faktiskt gillar",
       "use_case_ex3": "Live-lagspel för att öva stavning",
       "use_case_remaining": "{count} tecken kvar",
-      "use_case_ready": "Perfekt — det räcker gott! ✨",
+      "use_case_ready": "Perfekt, det räcker gott! ✨",
       "school_q": "Var finns ditt klassrum? (valfritt)",
       "school_placeholder": "Skola, läxhjälp eller hemundervisning",
       "next": {
         "step1_title": "Steg 1: Ansöka",
         "step1_body": "Fyll formuläret. Två minuter.",
         "step2_title": "Steg 2: Direktgodkännande",
-        "step2_body": "Ingen manuell granskning — verifierade lärare får åtkomst samma sekund de ansöker.",
+        "step2_body": "Ingen manuell granskning. Verifierade lärare får åtkomst samma sekund de ansöker.",
         "step3_title": "Steg 3: Du får åtkomst",
-        "step3_body": "Din panel öppnas direkt — plus en personlig hälsning från Ohad."
+        "step3_body": "Din panel öppnas direkt, plus en personlig hälsning från Ohad."
       },
       "regular_game_title": "Inte lärare?",
       "regular_game_body": "Spela LexiClash gratis. Börja här, ansök om lärargång senare.",
@@ -15221,8 +15232,8 @@ const sv = {
     },
     "trial": {
       "title": "Din lärarprövoperiod är igång 🎉",
-      "urgent_title": "Sista chansen — din prövoperiod är nästan slut ⏳",
-      "body": "Full klassrumsåtkomst till {date}. Skapa en klass och kör ett live-spel nu — missa det inte.",
+      "urgent_title": "Sista chansen, din prövoperiod är nästan slut ⏳",
+      "body": "Full klassrumsåtkomst till {date}. Skapa en klass och kör ett live-spel nu, missa det inte.",
       "days_left": "dagar kvar",
       "day_left": "dag kvar",
       "hours_left": "timmar kvar",
@@ -15246,9 +15257,9 @@ const sv = {
         "role_other": "Övrigt",
         "student_count": "Hur många elever?",
         "count_lt_50": "Färre än 50",
-        "count_50_200": "50–200",
-        "count_200_500": "200–500",
-        "count_500_2000": "500–2 000",
+        "count_50_200": "50-200",
+        "count_200_500": "200-500",
+        "count_500_2000": "500-2 000",
         "count_gte_2000": "2 000+",
         "interests_legend": "Vad intresserar dig? (valfritt)",
         "interest_district_admin_dashboard": "Instrumentpanel för kommunal huvudman",
@@ -15263,26 +15274,26 @@ const sv = {
         "submitting": "Skickar…",
         "submit_error": "Något gick fel. Försök igen.",
         "rate_limited": "För många inlämningar. Försök igen om 24 timmar.",
-        "success_title": "Tack — vi har tagit emot det!",
-        "success_body": "Vi bekräftar din provperiod och delar information om skolplanen inom 1–2 arbetsdagar. Fortsätt spela med din klass under tiden — det är gratis.",
+        "success_title": "Tack, vi har tagit emot det!",
+        "success_body": "Vi bekräftar din provperiod och delar information om skolplanen inom 1-2 arbetsdagar. Fortsätt spela med din klass under tiden, det är gratis.",
         "class_size": "Klassstorlek",
         "privacy_note": "Vi använder detta endast för att kontakta dig om skolfunktioner. Ingen spam."
       }
     },
     "packages": {
       "title": "Utbildningspaket",
-      "subtitle": "Teacher Pro är live-betalning. Klassrumsplanen är ett prisankare — berätta om din klass. Skolor och distrikt: kontakta oss. Ingen kassa för klassrum förrän efterfrågan når tröskeln.",
+      "subtitle": "Teacher Pro är live-betalning. Klassrumsplanen är ett prisankare, berätta om din klass. Skolor och distrikt: kontakta oss. Ingen kassa för klassrum förrän efterfrågan når tröskeln.",
       "teacherPro": {
         "name": "Teacher Pro",
         "interval": "/mån",
         "blurb": "Alla rapporter, miss-gap-läxor och reteach-verktyg för en lärare.",
-        "cta": "Uppgradera — $9/mån"
+        "cta": "Uppgradera: $9/mån"
       },
       "classroom": {
         "name": "Klassrumsplan",
         "interval": "/termin",
         "blurb": "Hela klassen, alla Pro-funktioner, klass-streaks och prioriterad support.",
-        "cta": "Begär klassrum — $39/termin"
+        "cta": "Begär klassrum: $39/termin"
       },
       "school": {
         "name": "Skolor och distrikt",

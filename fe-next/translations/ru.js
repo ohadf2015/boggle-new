@@ -734,6 +734,7 @@ const ru = {
     }
   },
   "student": {
+    "achievements": { "emptyHint": "Сыграй урок или дуэль, чтобы получить свой первый значок!" },
     "practiceFun": {
       "headline": {
         "perfect": "БЕЗУПРЕЧНО!",
@@ -1433,14 +1434,14 @@ const ru = {
     "homework": {
       "takeHomeToggle": "Карточка для практики дома",
       "backToDashboard": "Назад в панель учителя",
-      "classmatesFirst": "Ты первый, кто закончил сегодня — серия начинается с тебя.",
+      "classmatesFirst": "Ты первый, кто закончил сегодня. Серия начинается с тебя.",
       "classmatesOne": "Один одноклассник тоже уже прошёл",
       "introTitle": "{{count}} слов, которые класс не нашёл",
       "introSubtitle": "Нажимай правильный ответ, а сложные слова собирай по буквам. Примерно две минуты.",
       "nameLabel": "Твоё имя",
       "namePlaceholder": "например, Майя",
       "start": "Поехали",
-      "startCta": "Начать — {{count}} слов",
+      "startCta": "Начать: {{count}} слов",
       "playAgainCta": "Сыграть ещё раз",
       "exit": "Закрыть игру",
       "promptMeaning": "Что это значит?",
@@ -1468,33 +1469,33 @@ const ru = {
       "teacherEyebrow": "Кто играл",
       "teacherPlayed": "Завершили",
       "teacherAverage": "Средний результат",
-      "teacherEmpty": "Пока никто не играл. Поделитесь ссылкой — список заполнится сразу.",
+      "teacherEmpty": "Пока никто не играл. Поделитесь ссылкой, и список заполнится сразу.",
       "teacherNamesSignedOut": "Войдите как учитель, чтобы увидеть, кто играл.",
-      "gradeOnTime": "Вовремя — серия класса в безопасности.",
+      "gradeOnTime": "Вовремя: серия класса в безопасности.",
       "teacherLoadFailed": "Не удалось загрузить список. Попробуйте через минуту.",
       "teacherOnTime": "В срок",
       "teacherLate": "С опозданием"
     },
     "modePicker": {
       "title": "Выберите игру",
-      "subtitle": "Нажмите на постер — через секунду класс уже играет.",
+      "subtitle": "Нажмите на постер, и через секунду класс уже играет.",
       "recommended": "Лучше всего",
       "recommendedHint": "{{mode}} лучше всего подходит этим словам: в списке есть определения для вопросов.",
       "minutes": "{{count}} мин",
       "playing": "Идёт сейчас",
       "change": "Сменить игру",
       "sheetTitle": "Сменить игру",
-      "sheetHint": "Нажмите другой постер — откроем комнату с ним.",
+      "sheetHint": "Нажмите другой постер, и мы откроем комнату с ним.",
       "close": "Оставить эту",
       "settings": "Тонкая настройка",
       "settingsHide": "Свернуть настройку",
       "needsLesson": "Сначала выберите список слов",
-      "launch": "НАЧАТЬ — {{mode}}",
+      "launch": "НАЧАТЬ: {{mode}}",
       "tapAgain": "Нажмите ещё раз, чтобы начать",
       "moreModes": "Другие игры ({{count}})",
       "fewerModes": "Свернуть",
-      "sameCode": "Код тот же — заходить заново не нужно.",
-      "switched": "Теперь играем в {{mode}} — код тот же.",
+      "sameCode": "Код тот же, заходить заново не нужно.",
+      "switched": "Теперь играем в {{mode}}, код тот же.",
       "switchFailed": "Сменить не вышло. Нажмите ещё раз.",
       "switchMidRound": "Доиграйте раунд, потом смените игру.",
       "how": {
@@ -1502,7 +1503,7 @@ const ru = {
         "wordHunt": "Кто первым выкопает из поля спрятанное слово-цель.",
         "blast": "Быстро сцепляйте слова и взрывайте плитки цепочкой комбо.",
         "wheelRush": "Крутите колесо букв и выстреливайте словами наперегонки с таймером.",
-        "vocabQuiz": "Четыре варианта, одно значение — быстрый верный ответ даёт больше."
+        "vocabQuiz": "Четыре варианта, одно значение: быстрый верный ответ даёт больше."
       }
     },
     "projectorLobby": {
@@ -1512,13 +1513,13 @@ const ru = {
       "inTheRoom": "в комнате",
       "readyCount": "{{ready}} из {{total}} готовы",
       "nobodyYet": "Пока никто не зашёл",
-      "nobodyYetHint": "Введите код сверху. Кто первый — тот и герой.",
+      "nobodyYetHint": "Введите код сверху. Кто первый, тот и герой.",
       "startBlocked": "Дождитесь хотя бы одного ученика, чтобы начать.",
       "lateJoinOn": "Можно присоединиться позже",
       "lateJoinOff": "Позже присоединиться нельзя"
     },
     "errors": {
-      "serverUnavailable": "Сейчас не удаётся получить список класса. Это проблема на нашей стороне, не у вас — попробуйте ещё раз через минуту."
+      "serverUnavailable": "Сейчас не удаётся получить список класса. Это проблема на нашей стороне, не у вас. Попробуйте ещё раз через минуту."
     },
     "intentCta": {
       "forTeachers": "Для учителей / учить английский",
@@ -1578,7 +1579,7 @@ const ru = {
           }
       },
       "locked": {
-        "word_tower": "Нужно не менее 4 слов из списка длиной 4–6 букв",
+        "word_tower": "Нужно не менее 4 слов из списка длиной 4-6 букв",
         "solo_board": "Добавьте слова в урок, чтобы открыть",
         "warmup": "Добавьте слова в урок, чтобы открыть",
         "blitz": "Добавьте слова в урок, чтобы открыть",
@@ -1591,7 +1592,7 @@ const ru = {
     "produce": {
       "title": "Кузница слов",
       "desc": "Прочитай значение и напиши слово",
-      "newWord": "Новое слово — посмотри",
+      "newWord": "Новое слово, посмотри",
       "gotIt": "Понятно",
       "hint": "Подсказка",
       "hintLength": "{count} букв",
@@ -1608,7 +1609,7 @@ const ru = {
       },
       "verdict": {
         "correct": "Верно!",
-        "near-miss": "Почти — проверь написание",
+        "near-miss": "Почти, проверь написание",
         "wrong": "Не в этот раз"
       },
       "notEnough": {
@@ -1693,7 +1694,7 @@ const ru = {
       "skipWord": "Пропустить слово",
       "skipQuestion": "Пропустить вопрос",
       "pausedTitle": "Пауза",
-      "pausedBody": "Учитель поставил игру на паузу. Подождите немного — скоро продолжим.",
+      "pausedBody": "Учитель поставил игру на паузу. Подождите немного. Скоро продолжим.",
       "pausedBodyHost": "Класс на паузе. Нажмите «Продолжить», когда будете готовы.",
       "timeAddedToast": "Учитель добавил {{seconds}} секунд",
       "wordSkippedToast": "Учитель выбрал новое слово для поиска",
@@ -1771,9 +1772,9 @@ const ru = {
       "reteach": "Эти слова не нашёл никто",
       "allFound": "Класс нашёл все слова урока.",
       "practiceMissed": "Потренировать эти слова",
-      "playReteachRound": "Сыграть раунд повторения — только пропущенные слова",
+      "playReteachRound": "Сыграть раунд повторения: только пропущенные слова",
       "backToLobby": "Назад в лобби",
-      "rematch": "Реванш — тот же список, тот же код",
+      "rematch": "Реванш: тот же список, тот же код",
       "teamBattle": {
         "title": "Командная битва",
         "teamName": "Команда {number}",
@@ -1781,7 +1782,7 @@ const ru = {
       },
       "participationBonus": "+{points} очков участия всем",
       "shareGap": "Поделиться пробелом класса",
-      "shareGapCopied": "Ссылка скопирована — вставьте в Slack или родительский чат",
+      "shareGapCopied": "Ссылка скопирована, вставьте в Slack или родительский чат",
       "podium": {
         "title": "Лучшие результаты",
         "wordsFound": "{{found}} из {{total}} слов",
@@ -1819,7 +1820,7 @@ const ru = {
       "moreWaysToReteach": "Другие способы повторить эти слова",
       "fullReport": "Полный отчёт",
       "neverPlaced": "Не попали на поле",
-      "neverPlacedHint": "Они не поместились на поле — класс их не видел. Сыграйте реванш, чтобы дать им шанс.",
+      "neverPlacedHint": "Они не поместились на поле, класс их не видел. Сыграйте реванш, чтобы дать им шанс.",
       "needsHelp": {
         "title": "Позаниматься ({{count}})",
         "none": "Все нашли хотя бы половину списка. Можно ещё раунд.",
@@ -1829,21 +1830,21 @@ const ru = {
       "fewerWords": "Показать меньше",
       "allBoardWordsFound": "Класс нашёл все слова урока, которые попали на поле.",
       "shareGapTitle": "Словарный пробел класса",
-      "shareGapText": "{{lesson}} — класс нашёл {{found}} из {{total}} слов урока. Для практики: {{missed}}",
-      "shareGapAllFoundText": "{{lesson}} — класс нашёл все слова урока.",
+      "shareGapText": "{{lesson}}: класс нашёл {{found}} из {{total}} слов урока. Для практики: {{missed}}",
+      "shareGapAllFoundText": "{{lesson}}: класс нашёл все слова урока.",
       "shareGapCta": "Сыграть классную игру",
       "shareGapEyebrow": "Пробел класса за сегодня",
       "shareGapPracticeHome": "Слова для практики дома",
       "startReteachLive": "Начать 3-минутный reteach Live",
       "postReteachGoogleClassroom": "Опубликовать 3-мин reteach в Google Classroom",
-      "postReteachGoogleClassroomTitle": "3-мин reteach Live — {{lesson}}",
+      "postReteachGoogleClassroomTitle": "3-мин reteach Live: {{lesson}}",
       "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream.",
       "assignPracticeGoogleClassroom": "Назначить практику в Google Classroom",
-      "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов — {{lesson}}",
+      "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите.",
       "printPracticeSheet": "Распечатать лист практики",
-      "printPracticeSheetTitle": "Практика пропущенных слов — {{lesson}}",
-      "printPracticeSheetSubtitle": "Повтор без устройств — напишите каждое слово и используйте в предложении",
+      "printPracticeSheetTitle": "Практика пропущенных слов: {{lesson}}",
+      "printPracticeSheetSubtitle": "Повтор без устройств: напишите каждое слово и используйте в предложении",
       "printPracticeSheetWriteLabel": "Напишите слово",
       "printPracticeSheetSentenceLabel": "Используйте в предложении",
       "printPracticeSheetNameLine": "Имя: ________________",
@@ -1863,7 +1864,7 @@ const ru = {
       "teamTilesMascotAlt": "Lexi болеет за команды",
       "teamTilesMascotWinAlt": "Lexi празднует Team Tiles",
       "teamTilesWinHeadline": "Плитки пройдены!",
-      "teamTilesWinSub": "{{cleared}} из {{total}} слов — Team Tiles Unplugged.",
+      "teamTilesWinSub": "{{cleared}} из {{total}} слов: Team Tiles Unplugged.",
       "teamTilesPerfectHeadline": "Идеальный Team Tiles!",
       "teamTilesPerfectSub": "Каждая miss-gap плитка перевёрнута и пройдена.",
       "teamTilesPlayAgain": "Перемешать и сыграть снова",
@@ -1882,19 +1883,19 @@ const ru = {
       "classicUnpluggedMascotAlt": "Lexi ведёт Classic Unplugged",
       "classicUnpluggedMascotWinAlt": "Lexi празднует Classic Unplugged",
       "classicUnpluggedWinHeadline": "Classic Unplugged завершён!",
-      "classicUnpluggedWinSub": "{{cleared}} из {{total}} слов — отправил учитель, без устройств.",
+      "classicUnpluggedWinSub": "{{cleared}} из {{total}} слов: отправил учитель, без устройств.",
       "classicUnpluggedPerfectHeadline": "Идеальный Classic Unplugged!",
       "classicUnpluggedPerfectSub": "Все miss-gap слова закрыты классом.",
       "classicUnpluggedPlayAgain": "Сыграть снова",
       "assignUnpluggedGoogleClassroom": "Назначить офлайн reteach в Google Classroom",
-      "assignUnpluggedGoogleClassroomTitle": "Офлайн reteach — домашнее задание — {{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "Домашнее задание без устройств: откройте ссылку Unplugged Live, распечатайте лист практики пропущенных слов и потренируйте: {{missed}}. Устройства учеников не нужны — сдайте, когда закончите.",
+      "assignUnpluggedGoogleClassroomTitle": "Офлайн reteach, домашнее задание: {{lesson}}",
+      "assignUnpluggedGoogleClassroomBody": "Домашнее задание без устройств: откройте ссылку Unplugged Live, распечатайте лист практики пропущенных слов и потренируйте: {{missed}}. Устройства учеников не нужны. Сдайте, когда закончите.",
       "assignMissGapLiveGoogleClassroom": "Назначить miss-gap Live в Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "3-мин miss-gap Live — {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 3-мин Live по пропущенным словам: {{missed}}. Ученики заходят из Classwork. Работает на бесплатном Google Workspace for Education — без Education Plus.",
-      "launchMissGapQuestionPackLive": "Запустить живой набор вопросов — пропущенные слова",
-      "missGapQuestionPackTitle": "Набор вопросов miss-gap — {{lesson}}",
-      "unpluggedReteachHint": "Ученики отвечают на распечатанном листе — без устройств",
+      "assignMissGapLiveGoogleClassroomTitle": "3-мин miss-gap Live: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 3-мин Live по пропущенным словам: {{missed}}. Ученики заходят из Classwork. Работает на бесплатном Google Workspace for Education (без Education Plus).",
+      "launchMissGapQuestionPackLive": "Запустить живой набор вопросов: пропущенные слова",
+      "missGapQuestionPackTitle": "Набор вопросов miss-gap: {{lesson}}",
+      "unpluggedReteachHint": "Ученики отвечают на распечатанном листе, без устройств",
       "unpluggedReteachReveal": "Показать",
       "unpluggedReteachNext": "Далее",
       "unpluggedReteachPrev": "Назад",
@@ -1917,7 +1918,7 @@ const ru = {
       "unpluggedGameMascotAlt": "Лекси болеет за класс",
       "unpluggedGameMascotWinAlt": "Лекси празднует вместе с классом",
       "unpluggedGameWinHeadline": "Класс прошёл весь список!",
-      "unpluggedGameWinSub": "{{cleared}} из {{total}} слов взято — одной командой.",
+      "unpluggedGameWinSub": "{{cleared}} из {{total}} слов взято одной командой.",
       "unpluggedGamePerfectHeadline": "Идеальный заход!",
       "unpluggedGamePerfectSub": "Все слова, все вместе, без промахов.",
       "unpluggedGamePerfectBadge": "Чистая победа",
@@ -1925,80 +1926,80 @@ const ru = {
       "unpluggedGameBestStreak": "Лучшая серия",
       "unpluggedGamePlayAgain": "Ещё раз",
       "shareMissGapPractice": "Поделиться карточкой практики miss-gap",
-      "shareMissGapPracticeCopied": "Ссылка на карточку скопирована — вставьте для родителей",
+      "shareMissGapPracticeCopied": "Ссылка на карточку скопирована, вставьте для родителей",
       "shareMissGapPracticeTitle": "Карточка практики miss-gap",
-      "shareMissGapPracticeText": "{{lesson}} — домашняя практика miss-gap (печать или PDF): {{missed}}",
+      "shareMissGapPracticeText": "{{lesson}}: домашняя практика miss-gap (печать или PDF): {{missed}}",
       "missGapPracticeEyebrow": "Домашняя практика",
       "missGapPracticeSubtitle": "Лист для печати со словами, которые класс пропустил: откройте, распечатайте или сохраните в PDF. Устройства не нужны.",
-      "missGapPracticeFoil": "У Kahoot Unplugged нет домашки — у LexiClash есть",
+      "missGapPracticeFoil": "У Kahoot Unplugged нет домашки, у LexiClash есть",
       "missGapPracticePrintPdf": "Печать / сохранить PDF для практики",
       "assignMissGapAsyncHomework": "Назначить асинхронное miss-gap ДЗ",
       "assignMissGapAsyncEyebrow": "Асинхронное ДЗ",
       "assignMissGapAsyncHeading": "Практика miss-gap со сроком",
       "assignMissGapAsyncSubtitle": "Ученики играют две минуты со словами, которые класс пропустил. Вы видите, кто закончил, а выполнение в срок сохраняет серию класса.",
-      "assignMissGapAsyncFoil": "Kahootopia Assignments — это ДЗ в живой игре; LexiClash назначает асинхронную miss-gap практику, которая питает классную серию",
+      "assignMissGapAsyncFoil": "Kahootopia Assignments: ДЗ в живой игре; LexiClash назначает асинхронную miss-gap практику, которая питает классную серию",
       "assignMissGapAsyncDueLabel": "Срок сдачи",
-      "assignMissGapAsyncDueBanner": "Срок {{due}} — завершите miss-gap практику, чтобы сохранить классную серию",
+      "assignMissGapAsyncDueBanner": "Срок {{due}}: завершите miss-gap практику, чтобы сохранить классную серию",
       "assignMissGapAsyncGoogleClassroom": "Назначить асинхронный miss-gap в Google Classroom",
-      "assignMissGapAsyncTitle": "Асинхронное miss-gap ДЗ — {{lesson}}",
-      "assignMissGapAsyncBody": "Асинхронная miss-gap практика (не живая игра). Откройте ссылку и потренируйте: {{missed}}. Срок {{due}}. Вовремя — в зачёт классной серии.",
+      "assignMissGapAsyncTitle": "Асинхронное miss-gap ДЗ: {{lesson}}",
+      "assignMissGapAsyncBody": "Асинхронная miss-gap практика (не живая игра). Откройте ссылку и потренируйте: {{missed}}. Срок {{due}}. Вовремя, в зачёт классной серии.",
       "assignMissGapAsyncShare": "Скопировать ссылку на асинхронное ДЗ",
-      "assignMissGapAsyncShareCopied": "Ссылка скопирована — вставьте родителям или в Classroom",
-      "assignMissGapAsyncShareText": "{{lesson}} — асинхронное miss-gap ДЗ до {{due}}: {{missed}}",
+      "assignMissGapAsyncShareCopied": "Ссылка скопирована, вставьте родителям или в Classroom",
+      "assignMissGapAsyncShareText": "{{lesson}}: асинхронное miss-gap ДЗ до {{due}}: {{missed}}",
       "assignMissGapAsyncComplete": "Отметить практику выполненной (в серию класса)",
-      "assignMissGapAsyncCompleted": "Практика выполнена — серия класса обновлена",
+      "assignMissGapAsyncCompleted": "Практика выполнена, серия класса обновлена",
       "assignMissGapAsyncStreak": "Серия класса: {{streak}} дн.",
       "missGapGradePassbackEyebrow": "Передача оценок в Google Classroom",
       "missGapGradePassbackHeading": "Сдать оценку miss-gap",
-      "missGapGradePassbackSubtitle": "Практика завершена — оценка готова к отправке в классный журнал.",
-      "missGapGradePassbackFoil": "Kahoot Marketplace синхронизирует баллы с Classroom — LexiClash делает то же для асинхронного miss-gap ДЗ без OAuth списка учеников",
+      "missGapGradePassbackSubtitle": "Практика завершена, оценка готова к отправке в классный журнал.",
+      "missGapGradePassbackFoil": "Kahoot Marketplace синхронизирует баллы с Classroom, LexiClash делает то же для асинхронного miss-gap ДЗ без OAuth списка учеников",
       "missGapGradePassbackScore": "Оценка: {{points}} / {{max}}",
-      "missGapGradePassbackOnTime": "Вовремя — полный балл + серия класса",
-      "missGapGradePassbackLate": "С опозданием — сниженный черновик (серия без изменений)",
+      "missGapGradePassbackOnTime": "Вовремя: полный балл + серия класса",
+      "missGapGradePassbackLate": "С опозданием: сниженный черновик (серия без изменений)",
       "missGapGradePassbackDue": "Срок {{due}}",
       "missGapGradePassbackPrivacy": "Имена не передаются и список класса не импортируется. Отправляется только оценка за эту практику.",
       "missGapGradePassbackCopy": "Скопировать ссылку квитанции оценки",
-      "missGapGradePassbackCopied": "Квитанция скопирована — вставьте в Classroom или отправьте учителю",
-      "missGapGradePassbackShareText": "{{lesson}} — оценка miss-gap {{points}}/{{max}} (срок {{due}})",
-      "missGapGradePassbackTitle": "Оценка miss-gap — {{lesson}}",
+      "missGapGradePassbackCopied": "Квитанция скопирована, вставьте в Classroom или отправьте учителю",
+      "missGapGradePassbackShareText": "{{lesson}}: оценка miss-gap {{points}}/{{max}} (срок {{due}})",
+      "missGapGradePassbackTitle": "Оценка miss-gap: {{lesson}}",
       "missGapGradePassbackBackHomework": "Назад к miss-gap ДЗ",
       "missGapGradePassbackOpen": "Открыть квитанцию оценки Google Classroom",
 
       "unpluggedGradePassbackEyebrow": "Передача оценки в Google Classroom",
       "unpluggedGradePassbackHeading": "Сдать оценку Unplugged reteach",
-      "unpluggedGradePassbackSubtitle": "Живая сессия завершена — cleared/total класса готов для журнала Classroom.",
-      "unpluggedGradePassbackFoil": "Аддон Kahoot Classroom синхронизирует живые баллы — LexiClash делает то же для Unplugged reteach без OAuth списка учеников",
+      "unpluggedGradePassbackSubtitle": "Живая сессия завершена, cleared/total класса готов для журнала Classroom.",
+      "unpluggedGradePassbackFoil": "Аддон Kahoot Classroom синхронизирует живые баллы, LexiClash делает то же для Unplugged reteach без OAuth списка учеников",
       "unpluggedGradePassbackScore": "Оценка: {{points}} / {{max}}",
       "unpluggedGradePassbackCleared": "Класс закрыл {{cleared}} / {{total}} ({{accuracy}}%)",
-      "unpluggedGradePassbackOnTime": "Вовремя — полные баллы за точность",
-      "unpluggedGradePassbackLate": "Поздняя сдача — сниженная черновая оценка",
+      "unpluggedGradePassbackOnTime": "Вовремя: полные баллы за точность",
+      "unpluggedGradePassbackLate": "Поздняя сдача: сниженная черновая оценка",
       "unpluggedGradePassbackDue": "Сессия / срок {{due}}",
       "unpluggedGradePassbackPrivacy": "Имена не передаются и список не импортируется. В журнал уходит только cleared/total класса.",
       "unpluggedGradePassbackCopy": "Скопировать ссылку квитанции",
-      "unpluggedGradePassbackCopied": "Квитанция скопирована — вставьте в Classroom",
-      "unpluggedGradePassbackShareText": "{{lesson}} — оценка Unplugged {{points}}/{{max}} (закрыто {{cleared}}/{{total}})",
-      "unpluggedGradePassbackTitle": "Оценка Unplugged — {{lesson}}",
+      "unpluggedGradePassbackCopied": "Квитанция скопирована, вставьте в Classroom",
+      "unpluggedGradePassbackShareText": "{{lesson}}: оценка Unplugged {{points}}/{{max}} (закрыто {{cleared}}/{{total}})",
+      "unpluggedGradePassbackTitle": "Оценка Unplugged: {{lesson}}",
       "unpluggedGradePassbackBackLive": "Назад к Unplugged Live",
       "unpluggedGradePassbackOpen": "Отправить оценку в Google Classroom",
 
       "missGapWhatsAppEyebrow": "Практика для родителей в WhatsApp",
       "missGapWhatsAppHeading": "Отправить miss-gap практику домой в WhatsApp",
       "missGapWhatsAppSubtitle": "Отправьте карточку практики в родительский чат одним касанием: только слова класса, без имён учеников.",
-      "missGapWhatsAppParentSubtitle": "Потренируйте с ребёнком пропущенные слова из {{lesson}} — распечатайте или откройте карточку.",
-      "missGapWhatsAppFoil": "Синхронизация оценок Classroom останавливается на журнале — LexiClash шлёт miss-gap карточку домой в WhatsApp",
+      "missGapWhatsAppParentSubtitle": "Потренируйте с ребёнком пропущенные слова из {{lesson}}, распечатайте или откройте карточку.",
+      "missGapWhatsAppFoil": "Синхронизация оценок Classroom останавливается на журнале, LexiClash шлёт miss-gap карточку домой в WhatsApp",
       "missGapWhatsAppDue": "Срок сдачи {{due}}",
       "missGapWhatsAppWordsLabel": "Слова класса для практики",
-      "missGapWhatsAppPrivacy": "Без имён учеников. Только слова класса — безопасно для родительского WhatsApp.",
+      "missGapWhatsAppPrivacy": "Без имён учеников. Только слова класса, безопасно для родительского WhatsApp.",
       "missGapWhatsAppShare": "Поделиться карточкой практики в WhatsApp",
-      "missGapWhatsAppOpened": "WhatsApp открыт — выберите чат родителей",
-      "missGapWhatsAppShareText": "{{lesson}} — потренируйте miss-gap слова дома (срок {{due}}): {{missed}}",
-      "missGapWhatsAppOgTitle": "Miss-gap практика для родителей — {{lesson}}",
+      "missGapWhatsAppOpened": "WhatsApp открыт, выберите чат родителей",
+      "missGapWhatsAppShareText": "{{lesson}}: потренируйте miss-gap слова дома (срок {{due}}): {{missed}}",
+      "missGapWhatsAppOgTitle": "Miss-gap практика для родителей: {{lesson}}",
       "missGapWhatsAppOpenPractice": "Открыть карточку miss-gap практики",
       "missGapWhatsAppOpenHomework": "Открыть асинхронное miss-gap ДЗ",
       "printUnpluggedReteachPack": "Печать Unplugged reteach-пакета (PDF + QR)",
-      "unpluggedReteachPackTitle": "Unplugged reteach-пакет — {{lesson}}",
-      "unpluggedReteachPackSubtitle": "Печатный пакет по пропускам прошлого занятия — QR открывает Unplugged Live на проекторе",
-      "unpluggedReteachPackFoil": "У Kahoot Classic Unplugged нет печатного пакета с QR на Live — у LexiClash есть",
+      "unpluggedReteachPackTitle": "Unplugged reteach-пакет: {{lesson}}",
+      "unpluggedReteachPackSubtitle": "Печатный пакет по пропускам прошлого занятия, QR открывает Unplugged Live на проекторе",
+      "unpluggedReteachPackFoil": "У Kahoot Classic Unplugged нет печатного пакета с QR на Live, у LexiClash есть",
       "unpluggedReteachPackQrHint": "Отсканируйте, чтобы открыть Unplugged reteach Live",
       "unpluggedReteachPackHowTo": "1) Распечатайте пакет 2) Раздайте страницы практики 3) Отсканируйте QR на экране учителя",
       "unpluggedReteachPackPracticeHeading": "Страницы практики для учеников",
@@ -2007,34 +2008,34 @@ const ru = {
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
       "title": "Назначить miss-gap Live",
-      "subtitle": "Однокликовое Classwork-назначение 3-мин Live по пропущенным словам — на бесплатном Google Workspace for Education. Classroom add-on Quizlet требует Education Plus. Только слова класса — без имён учеников.",
+      "subtitle": "Однокликовое Classwork-назначение 3-мин Live по пропущенным словам на бесплатном Google Workspace for Education. Classroom add-on Quizlet требует Education Plus. Только слова класса, без имён учеников.",
       "assignLive": "Назначить miss-gap Live в Classroom",
-      "freeWorkspaceFoil": "Работает на бесплатном Google Workspace for Education — add-on Quizlet требует Education Plus. LexiClash использует диалог Google Share, Plus не нужен.",
+      "freeWorkspaceFoil": "Работает на бесплатном Google Workspace for Education, add-on Quizlet требует Education Plus. LexiClash использует диалог Google Share, Plus не нужен.",
       "lessonLabel": "Название урока",
       "missedWordsLabel": "Пропущенные слова (через запятую)",
-      "privacyNote": "Без импорта списков. Без имён учеников. Публикация через диалог Google — мы не видим, какой класс вы выбрали.",
+      "privacyNote": "Без импорта списков. Без имён учеников. Публикация через диалог Google, мы не видим, какой класс вы выбрали.",
       "postToStream": "Опубликовать Unplugged в Stream Classroom",
       "openUnplugged": "Открыть Unplugged Live",
             "needMissedWords": "Добавьте хотя бы одно пропущенное слово, чтобы включить назначение в один клик.",
       "planner": {
         "eyebrow": "Разговорный планировщик Classroom",
-        "title": "Скажите, что нужно — мы направим Live",
-        "subtitle": "Опишите план простыми словами. Откроем Classic или Team Unplugged, либо reteach Live с возвратом оценок. Только слова класса — без имён.",
+        "title": "Скажите, что нужно, мы направим Live",
+        "subtitle": "Опишите план простыми словами. Откроем Classic или Team Unplugged, либо reteach Live с возвратом оценок. Только слова класса, без имён.",
         "promptLabel": "Что хотите запустить?",
         "promptPlaceholder": "напр. Unplugged reteach по вчерашним пропускам",
-        "privacyNote": "Без импорта списков. Без имён учеников. Направляем в уже готовые режимы Unplugged — без новой игровой логики.",
+        "privacyNote": "Без импорта списков. Без имён учеников. Направляем в уже готовые режимы Unplugged, без новой игровой логики.",
         "needPrompt": "Введите простой запрос, чтобы спланировать Live.",
         "needMissedWords": "Добавьте пропущенные слова или укажите уровень CEFR, чтобы подставить пробелы.",
-        "modeClassic": "Classic Unplugged — класс/команды обсуждают на проекторе",
-        "modeTeam": "Team Tiles Unplugged — общая плиточная доска, учитель отмечает",
-        "modeReteach": "Unplugged reteach Live — распечатка + проектор",
-        "modeLive3min": "3-мин reteach Live — проектор + возврат оценок",
+        "modeClassic": "Classic Unplugged: класс/команды обсуждают на проекторе",
+        "modeTeam": "Team Tiles Unplugged: общая плиточная доска, учитель отмечает",
+        "modeReteach": "Unplugged reteach Live: распечатка + проектор",
+        "modeLive3min": "3-мин reteach Live: проектор + возврат оценок",
         "timerNote": "Таймер {{seconds}} с",
         "cefrNote": "Пробелы CEFR {{level}}",
         "openLive": "Открыть запланированный Live",
         "openGradePassback": "Открыть квитанцию возврата оценок",
         "postToStream": "Опубликовать Unplugged в ленту Classroom",
-        "foilNote": "Против разговорного Discovery Education Gemini в Classroom — LexiClash направляет в реальные Unplugged Live с возвратом оценок."
+        "foilNote": "Против разговорного Discovery Education Gemini в Classroom, LexiClash направляет в реальные Unplugged Live с возвратом оценок."
       }
     },
     "nav": {
@@ -2079,7 +2080,7 @@ const ru = {
       "turnPlay": "Сыграть ход",
       "turnDecline": "Пропустить",
       "turnLiveBadge": "Вживую",
-      "turnLiveInvite": "{{name}} ждёт — вживую!",
+      "turnLiveInvite": "{{name}} ждёт, вживую!",
       "turnAcceptLive": "Играть сейчас",
       "tauntPrompt": "Отправь стикер",
       "tauntSent": "Стикер отправлен",
@@ -2241,6 +2242,8 @@ const ru = {
       "yesterday": "Вчера"
     },
     "classroomGame": {
+      "forSchoolsCta": "Смотреть LexiClash для школ",
+      "forSchoolsFooter": "Хотите внедрить LexiClash во всей школе или районе?",
       "questions": "Вопросы",
       "perQuestion": "На вопрос",
       "namePrompt": {
@@ -2264,7 +2267,7 @@ const ru = {
       "lessonsSelected": "{{count}} уроков выбрано",
       "missingRequirements": "Не выполнены требования",
       "startFailed": "Не удалось запустить игру. Попробуйте ещё раз.",
-      "tooFast": "Одну секунду — попробуйте ещё раз через несколько секунд.",
+      "tooFast": "Одну секунду, попробуйте ещё раз через несколько секунд.",
       "more": "ещё",
       "multiLessonHelp": "Объедини уроки для разнообразия",
       "noClassrooms": "Нет классов",
@@ -2318,7 +2321,7 @@ const ru = {
       "badge_teacher": "Учитель",
       "badge_student": "Класс",
       "badge_promo": "Режим класса",
-      "promo_title": "Учите с LexiClash — бесплатно",
+      "promo_title": "Учите с LexiClash, бесплатно",
       "promo_subtitle": "Игры со словами для класса, свои списки слов и видно, кто застрял.",
       "promo_cta": "Посмотреть режим класса",
       "teacher_title": "Ваш класс готов",
@@ -2330,9 +2333,10 @@ const ru = {
       "trial_ended": "Пробный период истёк"
     },
     "landing": {
+      "resourcesAriaLabel": "Образовательные ресурсы",
       "pro": {
         "title": "Два тарифа. Без подвоха.",
-        "subtitle": "Всё, что нужно для первого урока, — бесплатно. Pro снимает ограничения.",
+        "subtitle": "Всё, что нужно для первого урока, бесплатно. Pro снимает ограничения.",
         "comparisonAlt": "Сравнение бесплатного тарифа и Teacher Pro",
         "freeTier": "Бесплатно",
         "perMonth": "/месяц",
@@ -2348,7 +2352,7 @@ const ru = {
         "studentLimitPro": "Учеников без ограничений",
         "analytics": "Аналитика прогресса по каждому ученику",
         "chooseNow": "Подключить Teacher Pro",
-        "whyNow": "Начните бесплатно — серьёзно. Pro нужен тогда, когда {count} учеников в одном классе уже мало."
+        "whyNow": "Начните бесплатно, серьёзно. Pro нужен тогда, когда {count} учеников в одном классе уже мало."
       },
       "duelTeaser": {
         "cta": "Вызови друга",
@@ -2369,7 +2373,7 @@ const ru = {
       "studentFeature1": "Отслеживай прогресс",
       "studentFeature2": "Зарабатывай XP и значки",
       "studentFeature3": "Вызывай одноклассников",
-      "tagline": "Слова — это сила",
+      "tagline": "Слова дают силу",
       "teacher": "Учитель",
       "teacherCta": "Настроить класс",
       "teacherDesc": "Геймифицируй уроки словарного запаса",
@@ -2380,8 +2384,8 @@ const ru = {
       "startGame": "Начать игру",
       "hero": {
         "eyebrow": "Для учителей английского, иврита, шведского, японского, испанского и русского",
-        "h1": "Словарные игры для твоего класса — без входа учеников.",
-        "sub": "Многопользовательские словесные игры для всего класса со своими словарями. Без аккаунтов, без рекламы, без загрузок — играй в любом браузере. Встроенная поддержка {count} языков. Бесплатный базовый план для учителей; Teacher Pro — $9 в месяц за неограниченные классы и учеников.",
+        "h1": "Словарные игры для твоего класса, без входа учеников.",
+        "sub": "Многопользовательские словесные игры для всего класса со своими словарями. Без аккаунтов, без рекламы, без загрузок. Играй в любом браузере. Встроенная поддержка {count} языков. Бесплатный базовый план для учителей; Teacher Pro стоит $9 в месяц за неограниченные классы и учеников.",
         "cta_primary": "Запросить доступ учителя",
         "cta_secondary": "Посмотри, как это работает",
         "cta_note": "Бесплатный план для начала • Одобрено примерно за 24 ч",
@@ -2394,7 +2398,7 @@ const ru = {
         "players": "28 играют",
         "board_caption": "Нажимай на буквы, чтобы составить слова",
         "leaderboard_title": "Живая таблица лидеров",
-        "caption": "Твой класс в реальном времени: ученики присоединяются по коду, скачут в поиске слов и поднимаются в живой таблице лидеров — без входа, без установок.",
+        "caption": "Твой класс в реальном времени: ученики присоединяются по коду, скачут в поиске слов и поднимаются в живой таблице лидеров, без входа, без установок.",
         "s1": "Майя",
         "s2": "Лео",
         "s3": "Ария"
@@ -2405,21 +2409,21 @@ const ru = {
         "native_multilingual": {
           "tag": "Встроенно",
           "title": "Встроена для твоего языка",
-          "body": "Иврит справа налево, японский кана с IME, шведские составные слова, испанские ударения — всё обработано на уровне механики. Не Google-перевод."
+          "body": "Иврит справа налево, японский кана с IME, шведские составные слова, испанские ударения. Всё обработано на уровне механики. Не Google-перевод."
         },
         "local_inventory": {
           "tag": "Локально",
           "title": "Слова из местных источников",
-          "body": "Словари из Википедии твой локали + иврит Milog. Ученики видят культурно актуальные слова из своей страны — не американские учебники K-12."
+          "body": "Словари из Википедии твой локали + иврит Milog. Ученики видят культурно актуальные слова из своей страны, а не американские учебники K-12."
         },
         "ad_free": {
           "tag": "Без рекламы",
           "title": "Без рекламы для учеников. Всегда.",
-          "body": "Kahoot, Quizlet, Blooket — все показывают рекламу ученикам. Мы клянёмся нулевой рекламой на каждом образовательном маршруте. COPPA + GDPR aware."
+          "body": "Kahoot, Quizlet и Blooket показывают рекламу ученикам. Мы клянёмся нулевой рекламой на каждом образовательном маршруте. COPPA + GDPR aware."
         }
       },
       "modes": {
-        "title": "6 режимов, одна платформа — чередуй, чтобы избежать усталости",
+        "title": "6 режимов, одна платформа: чередуй, чтобы избежать усталости",
         "teaches": "Учит",
         "classroom_game": {
           "tag": "Прямо",
@@ -2459,8 +2463,9 @@ const ru = {
         }
       },
       "compare": {
+        "rowHeader": "Функция",
         "title": "Как LexiClash сравнивается",
-        "subtitle": "Честные проверки — только там, где мы действительно доставляем.",
+        "subtitle": "Честные проверки, только там, где мы действительно доставляем.",
         "col": {
           "lexiclash": "LexiClash",
           "kahoot": "Kahoot!",
@@ -2486,15 +2491,15 @@ const ru = {
         "title": "Часто задаваемые вопросы",
         "q1": {
           "q": "Как учителям получить доступ?",
-          "a": "Заполните короткую форму на /education/access — доступ открывается сразу после отправки, и панель учителя открывается тут же."
+          "a": "Заполните короткую форму на /education/access, доступ открывается сразу после отправки, и панель учителя открывается тут же."
         },
         "q2": {
           "q": "Есть ли бесплатный план?",
-          "a": "Да — бесплатный базовый план для проверенных учителей: до 3 классов по 50 учеников в каждом, без рекламы для учеников. Teacher Pro ($9 в месяц) открывает неограниченные классы и учеников."
+          "a": "Да, бесплатный базовый план для проверенных учителей: до 3 классов по 50 учеников в каждом, без рекламы для учеников. Teacher Pro ($9 в месяц) открывает неограниченные классы и учеников."
         },
         "q3": {
           "q": "Работает ли на иврите, японском, шведском и испанском?",
-          "a": "Да — встроенная поддержка включая иврит RTL и японский кана/IME. Не перевод."
+          "a": "Да, встроенная поддержка включая иврит RTL и японский кана/IME. Не перевод."
         },
         "q4": {
           "q": "Как вы обрабатываете приватность ученика?",
@@ -2519,12 +2524,12 @@ const ru = {
       },
       "cta": {
         "title": "Готов привести LexiClash в свой класс?",
-        "body": "Заявка на доступ учителя — 60 секунд, и вы внутри сразу после отправки.",
+        "body": "Заявка на доступ учителя: 60 секунд, и вы внутри сразу после отправки.",
         "button": "Запросить доступ учителя"
       },
       "teacherLeadCta": {
         "title": "Ты учитель?",
-        "body": "У LexiClash есть бесплатный базовый план для учителей — перейди на Pro для неограниченных классов.",
+        "body": "У LexiClash есть бесплатный базовый план для учителей, перейди на Pro для неограниченных классов.",
         "button": "Получить доступ учителя"
       },
       "districtCta": {
@@ -2570,6 +2575,7 @@ const ru = {
       "xp": "{{xp}} XP"
     },
     "milestones": {
+      "levelTooltipWithTitle": "Уровень {{level}} - {{title}}",
       "coinBonus": "+{{coins}} монет",
       "continue": "Продолжить",
       "level": "Уровень {{level}}",
@@ -2585,13 +2591,13 @@ const ru = {
       "title": "Как LexiClash работает в классе",
       "subtitle": "Пять быстрых шагов до первой живой игры в слова.",
       "steps": {
-        "create": { "title": "Создайте класс", "text": "Одно нажатие — назовите и готово." },
+        "create": { "title": "Создайте класс", "text": "Одно нажатие, назовите и готово." },
         "share": { "title": "Поделитесь кодом", "text": "Покажите на доске или отправьте ссылку." },
-        "join": { "title": "Ученики присоединяются", "text": "С любого устройства — аккаунт не нужен." },
+        "join": { "title": "Ученики присоединяются", "text": "С любого устройства, аккаунт не нужен." },
         "play": { "title": "Запустите игру в слова", "text": "Выберите урок и нажмите «Старт»." },
         "results": { "title": "Смотрите результаты", "text": "Отслеживайте прогресс учеников в панели." }
       },
-      "gotIt": "Понятно — начинаем!",
+      "gotIt": "Понятно, начинаем!",
       "showTutorial": "Как это работает"
     },
     "practice": {
@@ -2723,28 +2729,28 @@ const ru = {
         "flow": {
           "steps": "Шаги присоединения",
           "codeHeadline": "ВВЕДИ КОД",
-          "codeSub": "Шесть символов — прямо с экрана учителя.",
-          "codeTooShort": "Нужно шесть символов — пары не хватает.",
+          "codeSub": "Шесть символов, прямо с экрана учителя.",
+          "codeTooShort": "Нужно шесть символов, пары не хватает.",
           "next": "Дальше",
           "changeCode": "Изменить код",
           "nameHeadline": "ВЫБЕРИ ИМЯ",
-          "nameRequired": "Сначала выбери имя — его увидит весь класс.",
+          "nameRequired": "Сначала выбери имя, его увидит весь класс.",
           "readyHeadline": "ГОТОВ?",
-          "readySub": "Одно касание — и ты в игре.",
+          "readySub": "Одно касание, и ты в игре.",
           "go": "Поехали!",
           "entering": "Заводим тебя в игру…"
         },
         "heroLine": "Спроси у учителя код класса",
-        "preparing": "Готовим всё — одну секунду.",
-        "queuedNeedsName": "Почти внутри — впиши имя выше, и мы сразу тебя подключим.",
+        "preparing": "Готовим всё, одну секунду.",
+        "queuedNeedsName": "Почти внутри, впиши имя выше, и мы сразу тебя подключим.",
         "nameTaken": "В этом классе уже есть кто-то с таким именем. Попробуй {{suggestedName}}.",
         "useSuggestedName": "Войти как {{suggestedName}}",
         "codePlaceholder": "6 символов",
         "emptyClipboard": "Буфер обмена пуст",
         "guestError": "Не удалось начать твой сеанс. Попробуй снова или спроси учителя.",
-        "invalidCode": "Мы не узнали этот код. Проверь его у учителя — после окончания игры код перестаёт работать.",
+        "invalidCode": "Мы не узнали этот код. Проверь его у учителя. После окончания игры код перестаёт работать.",
         "joining": "Присоединяюсь...",
-        "nameHint": "Аккаунт не требуется — просто выбери имя",
+        "nameHint": "Аккаунт не требуется, просто выбери имя",
         "nameLabel": "Твоё имя",
         "namePlaceholder": "например, Майя",
         "nameRequired": "Пожалуйста, введи свое имя",
@@ -2753,7 +2759,7 @@ const ru = {
           "label": "Присоединяешься к:",
           "confirm": "Это твой класс",
           "gameLabel": "Идёт игра:",
-          "gameConfirm": "Ваш класс уже играет — вы присоединитесь сразу"
+          "gameConfirm": "Ваш класс уже играет, вы присоединитесь сразу"
         },
         "subtitle": "Введи код твоего учителя",
         "success": "Ты в классе!",
@@ -2766,7 +2772,7 @@ const ru = {
         "words": "слова",
         "correct": "Отлично!",
         "lessonWord": "Слово урока!",
-        "tryAgain": "Не то — продолжай",
+        "tryAgain": "Не то, продолжай",
         "roundOver": "Раунд окончен!",
         "rival": {
           "toCatch": "до соперника",
@@ -2903,9 +2909,9 @@ const ru = {
     },
     "access": {
       "h1": "Подай заявку на бесплатный доступ учителя",
-      "lede": "Расскажи нам о своём классе. Доступ выдаётся мгновенно — без ожидания проверки.",
+      "lede": "Расскажи нам о своём классе. Доступ выдаётся мгновенно, без ожидания проверки.",
       "redirect_title": "Для этой страницы нужен доступ учителя",
-      "redirect_body": "Вы направлялись в «{{dest}}». Одобрение мгновенное — короткая форма ниже откроет доступ.",
+      "redirect_body": "Вы направлялись в «{{dest}}». Одобрение мгновенное. Короткая форма ниже откроет доступ.",
       "redirect_dest_fallback": "ваши классные инструменты",
       "full_name": "Твоё полное имя",
       "email": "Адрес электронной почты",
@@ -2936,9 +2942,9 @@ const ru = {
       "status_unknown_title": "Не удалось определить статус доступа",
       "status_unknown_body": "Что-то сломалось на нашей стороне. Откройте панель учителя или обновите страницу, чтобы проверить ещё раз.",
       "auth_required_title": "Зарегистрируйтесь, чтобы запросить доступ учителя",
-      "auth_required_body": "Доступ учителя привязан к подтверждённому аккаунту. Создайте бесплатный аккаунт или войдите — и продолжим прямо здесь.",
+      "auth_required_body": "Доступ учителя привязан к подтверждённому аккаунту. Создайте бесплатный аккаунт или войдите, и продолжим прямо здесь.",
       "auth_required_cta": "Создать бесплатный аккаунт учителя",
-      "trust_instant": "Мгновенный доступ — без очереди на проверку",
+      "trust_instant": "Мгновенный доступ, без очереди на проверку",
       "trust_free": "Бесплатный тариф для учителей, без срока",
       "trust_nologins": "Без входа для учеников и без настройки",
       "cta_micro": "Займёт 60 секунд · Без банковской карты",
@@ -2947,14 +2953,14 @@ const ru = {
       "verify_email_body": "Мы отправили ссылку для подтверждения на {email}. Подтвердите её, чтобы открыть запрос доступа учителя.",
       "verify_email_resend": "Отправить письмо повторно",
       "verify_email_sending": "Отправка…",
-      "verify_email_resent": "Отправлено — проверьте почту",
-      "verify_email_refresh": "Я подтвердил — обновить",
+      "verify_email_resent": "Отправлено, проверьте почту",
+      "verify_email_refresh": "Я подтвердил, обновить",
       "email_locked_hint": "Запросы привязаны к подтверждённому email вашего аккаунта.",
       "greeting": "Привет, {name}! 👋",
       "greeting_noname": "Почти готово! 👋",
-      "greeting_sub": "Имя и email мы уже взяли из вашего аккаунта — осталось всего два пункта.",
+      "greeting_sub": "Имя и email мы уже взяли из вашего аккаунта, осталось всего два пункта.",
       "applying_as": "Заявка от",
-      "role_q": "Для начала — кто вы?",
+      "role_q": "Для начала, кто вы?",
       "use_case_q": "А теперь самое интересное 🎯",
       "use_case_hint": "Как вы будете использовать LexiClash с учениками? Хватит одного-двух предложений.",
       "use_case_placeholder": "напр. Словарные баттлы по пятницам с моим 7 классом…",
@@ -2963,16 +2969,16 @@ const ru = {
       "use_case_ex2": "Домашние задания, которые нравятся ученикам",
       "use_case_ex3": "Живые командные игры для повторения орфографии",
       "use_case_remaining": "осталось символов: {count}",
-      "use_case_ready": "Отлично — этого достаточно! ✨",
+      "use_case_ready": "Отлично, этого достаточно! ✨",
       "school_q": "Где ваш класс? (необязательно)",
       "school_placeholder": "Школа, учебный центр или домашнее обучение",
       "next": {
         "step1_title": "Подай заявку",
-        "step1_body": "Заполни форму ниже — займёт 60 секунд.",
+        "step1_body": "Заполни форму ниже, займёт 60 секунд.",
         "step2_title": "Мгновенное одобрение",
-        "step2_body": "Без ручной проверки — подтверждённые учителя получают доступ сразу после заявки.",
+        "step2_body": "Без ручной проверки, подтверждённые учителя получают доступ сразу после заявки.",
         "step3_title": "Ты получишь доступ",
-        "step3_body": "Панель откроется сразу — плюс личная записка от Охада."
+        "step3_body": "Панель откроется сразу, плюс личная записка от Охада."
       },
       "regular_game_title": "Ты не учитель? Без проблем.",
       "regular_game_body": "LexiClash бесплатен для игры для всех. Попробуй обычную игру и вернись, если захочешь функции класса.",
@@ -2982,8 +2988,8 @@ const ru = {
     },
     "trial": {
       "title": "Твой пробный период учителя активен 🎉",
-      "urgent_title": "Последний шанс — твой пробный период почти закончился ⏳",
-      "body": "Полный доступ к классу до {date}. Настрой класс и запусти прямую игру сейчас — не упусти.",
+      "urgent_title": "Последний шанс, твой пробный период почти закончился ⏳",
+      "body": "Полный доступ к классу до {date}. Настрой класс и запусти прямую игру сейчас, не упусти.",
       "days_left": "дней осталось",
       "day_left": "день остался",
       "hours_left": "часов осталось",
@@ -3007,9 +3013,9 @@ const ru = {
         "role_other": "Другое",
         "student_count": "Сколько учеников?",
         "count_lt_50": "Меньше 50",
-        "count_50_200": "50–200",
-        "count_200_500": "200–500",
-        "count_500_2000": "500–2 000",
+        "count_50_200": "50-200",
+        "count_200_500": "200-500",
+        "count_500_2000": "500-2 000",
         "count_gte_2000": "2 000+",
         "interests_legend": "Что тебя интересует? (опционально)",
         "interest_district_admin_dashboard": "Панель администратора округа",
@@ -3024,26 +3030,26 @@ const ru = {
         "submitting": "Отправляю…",
         "submit_error": "Что-то пошло не так. Попробуй снова.",
         "rate_limited": "Слишком много заявок. Попробуй снова через 24 часа.",
-        "success_title": "Спасибо — мы в курсе!",
-        "success_body": "Мы свяжемся с тобой о раннем доступе к функциям школы. А пока продолжай играть со своим классом — это бесплатно.",
+        "success_title": "Спасибо, мы в курсе!",
+        "success_body": "Мы свяжемся с тобой о раннем доступе к функциям школы. А пока продолжай играть со своим классом, это бесплатно.",
         "class_size": "Размер класса",
         "privacy_note": "Мы будем использовать это только для разговора о функциях школы. Без спама."
       }
     },
     "packages": {
           "title": "Образовательные пакеты",
-          "subtitle": "Teacher Pro — живая оплата. Классный план — якорь цены: расскажите о классе. Школы и округа: свяжитесь с нами. Без кассы для класса до порога спроса.",
+          "subtitle": "Teacher Pro: живая оплата. Классный план: якорь цены, расскажите о классе. Школы и округа: свяжитесь с нами. Без кассы для класса до порога спроса.",
           "teacherPro": {
                 "name": "Teacher Pro",
                 "interval": "/мес",
                 "blurb": "Все отчёты, домашние задания по пробелам и инструменты повторного обучения для одного учителя.",
-                "cta": "Обновить — $9/мес"
+                "cta": "Обновить: $9/мес"
           },
           "classroom": {
                 "name": "Классный план",
                 "interval": "/семестр",
                 "blurb": "Весь класс, все функции Pro, серии класса и приоритетная поддержка.",
-                "cta": "Запросить класс — $39/семестр"
+                "cta": "Запросить класс: $39/семестр"
           },
           "school": {
                 "name": "Школы и округа",
@@ -10232,8 +10238,8 @@ const ru = {
       "tabsLabel": "Основные разделы"
     },
     "emptyClassroom": {
-      "title": "Класса ещё нет — и он не нужен",
-      "body": "Нажмите «В ЭФИР» — мы создадим класс, пока код появляется на доске.",
+      "title": "Класса ещё нет, и он не нужен",
+      "body": "Нажмите «В ЭФИР», мы создадим класс, пока код появляется на доске.",
       "getCode": "Получить код входа"
     },
     "shell": {
@@ -10268,7 +10274,7 @@ const ru = {
     "playNow": {
       "recommended": "Рекомендуем",
       "title": "Играть сейчас",
-      "subtitle": "Одно нажатие — и код уже на экране.",
+      "subtitle": "Одно нажатие, и код уже на экране.",
       "sourceGroup": "Выберите слова",
       "sourceRecent": "Ваши списки",
       "sourcePacks": "Готовые наборы",
@@ -10276,12 +10282,12 @@ const ru = {
       "pasteLabel": "Вставьте свои слова сюда",
       "pastePlaceholder": "фотосинтез, митоз, осмос…",
       "pasteTooFew": "Добавьте хотя бы {{min}} слова",
-      "pasteReady": "{{count}} слов — можно начинать",
+      "pasteReady": "{{count}} слов, можно начинать",
       "pastedRoundName": "Слова на сегодня",
       "goLive": "В эфир",
       "armedWith": "{{title}} · {{count}} слов",
-      "pickSomething": "Выберите список слов — и поехали",
-      "noSetupNeeded": "Не нужно создавать класс и вводить список — ученики входят по коду.",
+      "pickSomething": "Выберите список слов, и поехали",
+      "noSetupNeeded": "Не нужно создавать класс и вводить список, ученики входят по коду.",
       "changeWords": "Нужны другие слова?",
       "shortcutsLabel": "Быстрые ссылки для учителя",
       "shortcutLastGame": "Последняя игра",
@@ -10313,11 +10319,11 @@ const ru = {
       "antonymsPlaceholder": "Антонимы через запятую (например: грустный)",
       "example": "Пример предложения",
       "examplePlaceholder": "Предложение с этим словом",
-      "exampleHelp": "Вместо слова напишите ___ — например: «___ пёс залаял.»",
+      "exampleHelp": "Вместо слова напишите ___, например: «___ пёс залаял.»",
       "summary": "{{count}} слов · с определением: {{definitions}} · с синонимами: {{synonyms}} · с антонимами: {{antonyms}} · с примером: {{examples}}",
-      "aiFill": "Дополнить недостающие определения, синонимы и примеры (ИИ — проверьте перед сохранением)",
+      "aiFill": "Дополнить недостающие определения, синонимы и примеры (ИИ, проверьте перед сохранением)",
       "aiFilling": "Готовим подсказки…",
-      "aiFilledNote": "Выделенные поля предложил ИИ — проверьте их перед сохранением.",
+      "aiFilledNote": "Выделенные поля предложил ИИ, проверьте их перед сохранением.",
       "aiError": "Сейчас не удалось получить подсказки. Попробуйте через минуту.",
       "meanings": "Другие значения",
       "meaningsPlaceholder": "Значения через ; (например: берег реки; место, где хранят деньги)",
@@ -10333,7 +10339,7 @@ const ru = {
       "suffix": "Суффикс",
       "suffixPlaceholder": "ник",
       "summarySkills": "{{meanings}} с двумя значениями · {{morphology}} с частями слова",
-      "importFormatHelp": "Необязательные добавки после вертикальной черты |: syn: — синонимы, ant: — антонимы, ex: — пример предложения (вместо слова пишите ___), level: support / core / challenge, mean: — другие значения через ;, а также root: / pre: / suf: — части слова (root: вод = вода задаёт и корень, и его значение).",
+      "importFormatHelp": "Необязательные добавки после вертикальной черты |: syn: синонимы, ant: антонимы, ex: пример предложения (вместо слова пишите ___), level: support / core / challenge, mean: другие значения через ;, а также root: / pre: / suf: части слова (root: вод = вода задаёт и корень, и его значение).",
       "importFormatExample": "радостный - испытывающий радость | syn: весёлый, довольный | ant: грустный | ex: ___ пёс вилял хвостом. | level: core\nключ - предмет для замка | mean: предмет, которым открывают замок; родник с водой | root: клю = замыкать"
     },
     "levels": {
@@ -10343,7 +10349,7 @@ const ru = {
       "challenge": "Вызов",
       "legend": "Поддержка: видит банк слов в живой игре и тренирует слова уровней «поддержка» и «базовый» · Базовый: по умолчанию · Вызов: тренирует все слова, включая уровень «вызов», с целью находить более длинные слова",
       "saved": "Уровень сохранён",
-      "saveFailed": "Не удалось сохранить уровень — попробуйте ещё раз"
+      "saveFailed": "Не удалось сохранить уровень, попробуйте ещё раз"
     },
     "lastGame": {
       "title": "Последняя игра класса",
@@ -10351,7 +10357,7 @@ const ru = {
       "error": "Не удалось загрузить результаты последней игры.",
       "retry": "Повторить",
       "emptyTitle": "Класс ещё не играл",
-      "emptyHint": "Запустите игру из блока «Играть сейчас» выше — здесь появятся слова, которые класс нашёл и пропустил.",
+      "emptyHint": "Запустите игру из блока «Играть сейчас» выше. Здесь появятся слова, которые класс нашёл и пропустил.",
       "previousGames": "Предыдущие игры",
       "playersPlayed": "Играли: {{count}} учеников",
       "studentFallback": "Ученик",
@@ -10359,7 +10365,7 @@ const ru = {
       "nobodyFound": "Слова, которые никто не нашёл",
       "avgAccuracy": "Средняя точность по словам урока",
       "wordsToReview": "Слова для повторения",
-      "nothingToReview": "Повторять нечего — класс нашёл все слова урока.",
+      "nothingToReview": "Повторять нечего, класс нашёл все слова урока.",
       "missedBy": "пропустили",
       "student": "Ученик",
       "score": "Очки",
@@ -10377,7 +10383,7 @@ const ru = {
     },
     "classReport": {
       "title": "Слово и ученик",
-      "hint": "Каждое слово урока напротив каждого ученика. Самые трудные сверху — это и есть список для повторения.",
+      "hint": "Каждое слово урока напротив каждого ученика. Самые трудные сверху: это и есть список для повторения.",
       "word": "Слово",
       "classMiss": "Класс не справился",
       "accuracy": "Точность",
@@ -10409,9 +10415,9 @@ const ru = {
         "close": "Закрыть"
       },
       "practice": {
-        "flashcard": "Сначала значение — карточки, потом викторина",
+        "flashcard": "Сначала значение: карточки, потом викторина",
         "spelling": "Короткая тренировка написания пропущенных слов",
-        "none": "Повторять нечего — можно давать следующий список",
+        "none": "Повторять нечего, можно давать следующий список",
         "absent": "Догоните материал один на один до следующей игры"
       },
       "notes": {
@@ -10428,7 +10434,7 @@ const ru = {
     },
     "proWelcome": {
       "title": "У вас Teacher Pro",
-      "until": "Ваш до {date} — ничего активировать не нужно, карта не нужна.",
+      "until": "Ваш до {date}, ничего активировать не нужно, карта не нужна.",
       "perk": {
         "analytics": "Видеть, какие слова дались классу тяжело, после каждой игры",
         "reports": "Отчёты по классу и ученикам для печати",
@@ -10453,18 +10459,18 @@ const ru = {
         "body": "С Pro каждая игра превращается в картину класса: какие слова закрепились, кто из учеников застрял и насколько каждый продвинулся с начала года. Готовый материал для родительского собрания или методического совета."
       },
       "reports": {
-        "title": "Отчёты о прогрессе — функция Pro",
+        "title": "Отчёты о прогрессе: функция Pro",
         "body": "Следите за успехами каждого ученика во всех классах и играх: выученные слова, уровни, XP и печатные PDF-отчёты для родительских собраний. Обновите до Teacher Pro, чтобы открыть отчёты по классам и ученикам."
       },
-      "cta": "Открыть с Pro — ${{price}}/месяц"
+      "cta": "Открыть с Pro: ${{price}}/месяц"
     },
     "subscription": {
-      "giftedNoCard": "Карта не привязана, продления нет — срок просто закончится, и вы вернётесь на бесплатный план.",
+      "giftedNoCard": "Карта не привязана, продления нет. Срок просто закончится, и вы вернётесь на бесплатный план.",
       "giftedUntil": "Бесплатный Pro до",
       "giftedBadge": "Подарок",
       "classLimitTitle": "Вы достигли лимита классов",
       "classLimitMessage": "Вы создали {{current}} из {{limit}} бесплатных классов. Перейдите на Pro для неограниченного числа классов и учеников.",
-      "upgradeProDescription": "Pro даёт неограниченное число классов и учеников в каждом классе — никаких пределов для роста вашего преподавания.",
+      "upgradeProDescription": "Pro даёт неограниченное число классов и учеников в каждом классе, никаких пределов для роста вашего преподавания.",
       "proFeatures": "В Pro входит",
       "unlimitedClasses": "Неограниченное число классов",
       "unlimitedStudents": "Неограниченное число учеников в классе",
@@ -10475,12 +10481,12 @@ const ru = {
       "checkoutError": "Не удалось начать оплату. Попробуйте ещё раз.",
       "signInRequired": "Пожалуйста, войдите для перехода на Teacher Pro.",
       "currentPlan": "Ваш текущий план",
-      "upgradePricingTitle": "Увидите, кто понял — до звонка.",
+      "upgradePricingTitle": "Увидите, кто понял, до звонка.",
       "upgradePricingSubtitle": "Управляйте неограниченным числом классов и учеников",
-      "upgradePricingReassure": "Отмена в любой момент — ваши классы, уроки и данные учеников всегда в безопасности.",
+      "upgradePricingReassure": "Отмена в любой момент. Ваши классы, уроки и данные учеников всегда в безопасности.",
       "pricePerDay": "Примерно $0,30 в день",
       "everythingInFree": "Всё из бесплатного плана, плюс:",
-      "freeStartNote": "Реальный класс помещается — до 3 классов по 50 учеников в каждом. Pro нужен для большего числа классов и отчётов.",
+      "freeStartNote": "Реальный класс помещается: до 3 классов по 50 учеников в каждом. Pro нужен для большего числа классов и отчётов.",
       "proCtaSubtext": "Настройка за 30 секунд · Отмена в любой момент",
       "trustCancel": "Отмена в любой момент, без обязательств",
       "trustDataSafe": "Ваши данные в безопасности",
@@ -10582,7 +10588,7 @@ const ru = {
       "insights": "АНАЛИТИКА",
       "viewReports": "Просмотр отчётов",
       "viewReportsDesc": "Просмотрите подробные отчёты и аналитику классов",
-      "studentsPresentTitle": "Сейчас в {classroom} — {count} учеников",
+      "studentsPresentTitle": "Сейчас в {classroom}: {count} учеников",
       "studentsPresentDescription": "Запустите игру, и они сразу присоединятся.",
       "tab": {
         "play": "Играть",
@@ -10616,7 +10622,7 @@ const ru = {
         "teams": "Команды",
         "teamsDesc": "Автоматическое деление на равные команды",
         "teamCount": "Сколько команд?",
-        "autoAssignNote": "Ученики делятся автоматически — без подготовки, честно каждый раз."
+        "autoAssignNote": "Ученики делятся автоматически, без подготовки, честно каждый раз."
       },
       "support": {
         "title": "Поддержка (SPED)",
@@ -10637,7 +10643,7 @@ const ru = {
         "title": "Искомое слово",
         "description": "Задайте слово, которое будет искать класс, или доверьте выбор игре.",
         "random": "Удивите класс",
-        "noneEligible": "Ни одно слово этого урока не подходит: искомое слово должно быть длиной {{min}}–{{max}} букв. Игра выберет сама."
+        "noneEligible": "Ни одно слово этого урока не подходит: искомое слово должно быть длиной {{min}}-{{max}} букв. Игра выберет сама."
       },
       "minWordLength": {
         "title": "Минимальная длина слова",
@@ -10688,7 +10694,7 @@ const ru = {
       "createdBannerTitle": "Класс готов!",
       "googleClassroom": "Опубликовать в Google Classroom",
       "googleClassroomTitle": "Присоединяйтесь к «{{name}}» в LexiClash",
-      "googleClassroomBody": "Нажмите на ссылку, чтобы войти в класс. Аккаунт не нужен — просто выберите имя.",
+      "googleClassroomBody": "Нажмите на ссылку, чтобы войти в класс. Аккаунт не нужен, просто выберите имя.",
       "createdBannerBody": "Поделитесь этим кодом с учениками.",
       "dismissBanner": "Понятно",
       "wizard": {
@@ -10745,8 +10751,9 @@ const ru = {
       }
     },
     "lesson": {
+      "bulkImportDropCsv": "Перетащите файл CSV сюда или нажмите, чтобы выбрать",
       "sectionTitle": "Ваши уроки",
-      "sectionHint": "Урок — это список слов. Запустите его вживую со всем классом или поделитесь им, чтобы ученики тренировались самостоятельно.",
+      "sectionHint": "Урок: список слов. Запустите его вживую со всем классом или поделитесь им, чтобы ученики тренировались самостоятельно.",
       "pasteWords": "Вставьте список слов",
       "pasteWordsPlaceholder": "По одному слову в строке или через запятую",
       "pasteWordsParsed": "Готово слов: {count}",
@@ -10805,9 +10812,9 @@ const ru = {
       "bulkImportLabel": "Вставьте слова здесь",
       "bulkImportPlaceholder": "Вставьте слова, по одному в строке или через запятую. Используйте формат 'слово - определение' для определений.",
       "bulkImportDetected": "{{count}} слов обнаружено",
-      "bulkImportUnreadable": "Не удалось прочитать строк: {{count}} (строка {{rows}}) — слово не найдено, поэтому они пропущены. Проверьте лишний | или пропущенное слово.",
+      "bulkImportUnreadable": "Не удалось прочитать строк: {{count}} (строка {{rows}}): слово не найдено, поэтому они пропущены. Проверьте лишний | или пропущенное слово.",
       "bulkImportOneWordPerLine": "В строке {{rows}}, похоже, несколько слов сразу. Пишите по одному слову в строке и повторите импорт.",
-      "savedAndAssigned": "Урок сохранён и назначен классу {{classroom}} — ученики уже его видят.",
+      "savedAndAssigned": "Урок сохранён и назначен классу {{classroom}}, ученики уже его видят.",
       "savedNotAssigned": "Урок сохранён, но назначить его классу {{classroom}} не удалось. Попробуйте ещё раз кнопкой «Назначить классу» на карточке урока.",
       "bulkImportButton": "Импортировать",
       "templates": "Шаблоны уроков",
@@ -10989,8 +10996,8 @@ const ru = {
         "downloading": "Загрузка...",
         "failed": "Не удалось создать PDF. Попробуйте ещё раз.",
         "done": "Скачано",
-        "fileStudent": "{{name}} – отчёт об успехах",
-        "fileClass": "{{name}} – отчёт по классу"
+        "fileStudent": "{{name}} - отчёт об успехах",
+        "fileClass": "{{name}} - отчёт по классу"
       },
       "teacherLine": "Учитель: {{name}}",
       "generatedOn": "Создано в LexiClash · {{date}}",
@@ -12936,6 +12943,10 @@ const ru = {
     "androidApp": "Приложение для Android"
   },
   "blog": {
+    "wordGamesForKidsEducation": {
+      "teachersTitle": "Словесные игры для учителей",
+      "eslTitle": "Онлайн словесные игры для ESL",
+      "vocabTitle": "Игры на словарный запас для класса", "heroAlt": "Дети играют в словесные игры в классе" },
     "backToBlog": "Назад в Блог",
     "dailyChallenge": "Ежедневный Вызов",
     "date": "Опубликовано",
