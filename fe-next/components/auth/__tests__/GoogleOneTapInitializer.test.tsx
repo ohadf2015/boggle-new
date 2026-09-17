@@ -15,11 +15,6 @@ vi.mock('@/lib/supabase', () => ({
   supabase: { auth: { signInWithIdToken: vi.fn() } },
 }));
 
-const mockConsentDecided = vi.fn(() => true);
-vi.mock('@/hooks/useConsentDecided', () => ({
-  useConsentDecided: () => mockConsentDecided(),
-}));
-
 // Render next/script as a plain tag so we can assert it mounts.
 vi.mock('next/script', () => ({
   // data-src (not src) so the @next/next/no-sync-scripts lint rule doesn't fire on the mock
@@ -32,7 +27,6 @@ describe('GoogleOneTapInitializer', () => {
   beforeEach(() => {
     mockIsNative.mockReturnValue(false);
     mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false });
-    mockConsentDecided.mockReturnValue(true);
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
   });
   afterEach(() => {
@@ -72,11 +66,18 @@ describe('GoogleOneTapInitializer', () => {
     expect(screen.queryByTestId('gsi-script')).toBeNull();
   });
 
-  it('does not load GIS / One Tap while cookie consent is still undecided', () => {
-    // Mobile audit 2026-09-14: One Tap stacked on the cookie sheet → double blocker.
-    mockConsentDecided.mockReturnValue(false);
+  it('loads GIS even while cookie consent is still undecided', () => {
+    // Regression: #1046 held GIS back until useConsentDecided() was true, but that
+    // flag only flips on an explicit Accept/Decline CLICK. Visitors who ignored the
+    // bar never saw One Tap and signups went 6-21/day -> 0 the next day. The cookie
+    // bar is a compact bottom strip now and no longer overlaps One Tap (top-right).
+    //
+    // useConsentDecided is deliberately NOT mocked here: with no decision in
+    // storage the real hook returns false, so re-adding a consent gate to this
+    // component fails this test instead of silently passing a stubbed `true`.
+    localStorage.clear();
     render(<GoogleOneTapInitializer />);
-    expect(screen.queryByTestId('gsi-script')).toBeNull();
+    expect(screen.queryByTestId('gsi-script')).not.toBeNull();
   });
 
   it('cancels a live One Tap when the growth signup prompt becomes active (t_da22db9a)', () => {

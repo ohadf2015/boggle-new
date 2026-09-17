@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { isNative } from '@/utils/platform';
 import { supabase } from '@/lib/supabase';
 import {
@@ -40,9 +39,14 @@ function cancelOneTapPrompt(): void {
  *
  * Mounted once globally; the existing redirect buttons remain as a fallback.
  *
- * UX: never stack One Tap over the cookie bar. GIS is not loaded (and prompt
- * never fires) until `useConsentDecided()` is true — measured 2026-09-14 on
- * mobile where One Tap + cookie sheet formed a double blocker.
+ * UX: One Tap used to stack on the cookie sheet, so #1046 held GIS back until
+ * `useConsentDecided()` was true. That flag only flips when the visitor CLICKS
+ * Accept or Decline — ignoring the bar blocked One Tap forever, and signups fell
+ * from 6-21/day to 0 the day after it shipped. The same #1046 removed the cause:
+ * the bar is now a compact bottom strip (90px desktop / 151px at 390x844,
+ * measured on lexiclash.live 2026-09-18) and One Tap renders top-right, so they
+ * no longer overlap. Do not re-add a consent gate here without also giving it a
+ * release path that does not require a click.
  *
  * t_da22db9a: also never stack One Tap on the post-game soft-sheet. After
  * consent, both used to fire in the same idle/1.5s window; cancel + suppress
@@ -51,7 +55,6 @@ function cancelOneTapPrompt(): void {
 export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
-  const consentDecided = useConsentDecided();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
 
@@ -92,10 +95,9 @@ export default function GoogleOneTapInitializer() {
     return () => window.removeEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, onPromptActive);
   }, []);
 
-  // Consent first: do not mount GSI (or prompt) while the cookie bar is up.
-  // Do NOT gate Script mount on signup-funnel suppress (that reads localStorage
+  // Do NOT gate the Script mount on signup-funnel suppress (that reads localStorage
   // and would hydrate-mismatch). Suppress is enforced inside initOneTap + cancel.
-  if (!enabled || !consentDecided) return null;
+  if (!enabled) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
   // without it, One Tap falls back to the browser/OS locale instead of the site's.
