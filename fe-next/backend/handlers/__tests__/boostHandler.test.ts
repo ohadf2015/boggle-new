@@ -78,6 +78,17 @@ describe('boostHandler', () => {
       }));
     });
 
+    it('emits the registered PLAYER_NOT_IN_GAME code (has a socketErrors translation) when the socket has no player', async () => {
+      const { socket, handlers } = createMockSocket();
+      registerBoostHandlers(mockIo, socket);
+      mockGetGame.mockReturnValue(makeGame());
+      mockGetUsernameBySocketId.mockReturnValue(undefined);
+
+      await handlers['boost:apply']({ gameCode: 'GAME1', sessionId: 'sess-1', token: 'x' });
+
+      expect(socket.emit).toHaveBeenCalledWith('error', expect.objectContaining({ code: 'PLAYER_NOT_IN_GAME' }));
+    });
+
     it('rejects a second claim for the same session (idempotency guard)', async () => {
       const { socket, handlers } = createMockSocket();
       registerBoostHandlers(mockIo, socket);

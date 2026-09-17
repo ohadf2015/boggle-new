@@ -31,6 +31,7 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
     _howlPromise = import('howler').then((mod) => {
       _HowlCtor = mod.Howl;
       patchHowlerRemoveEventListenerRace();
+      patchHowlerStaleSoundListeners();
       return _HowlCtor;
     });
   }
@@ -56,6 +57,32 @@ function patchHowlerRemoveEventListenerRace(): void {
     if (listener == null || typeof listener === 'number') return;
     return origRemove.call(this, type, listener, options);
   } as typeof origRemove;
+}
+
+/**
+ * Howler's HTML5 Sound listeners (canplaythrough / ended / error) read
+ * `this._node`, which `Howl.unload()` deletes. When one of those events still
+ * reaches an unloaded Sound, the listener throws on every event of the pooled
+ * <audio> element (Sentry JAVASCRIPT-NEXTJS-25R: "reading 'duration'", 1.8k
+ * events from one tab). A Sound with no node has nothing left to update, so
+ * the listener becomes a no-op.
+ *
+ * Sound is not exported; howler publishes it on the global object. Sounds bind
+ * these listeners at construction, so this must run before the first Howl —
+ * createLazyHowl guarantees that via ensureHowl().
+ */
+function patchHowlerStaleSoundListeners(): void {
+  type Listener = (this: { _node?: unknown }, ...args: unknown[]) => unknown;
+  const proto = (globalThis as { Sound?: { prototype: Record<string, Listener> } }).Sound?.prototype;
+  if (!proto) return;
+  for (const name of ['_loadListener', '_endListener', '_errorListener']) {
+    const original = proto[name];
+    if (typeof original !== 'function') continue;
+    proto[name] = function (this: { _node?: unknown }, ...args: unknown[]) {
+      if (!this._node) return;
+      return original.apply(this, args);
+    };
+  }
 }
 
 /**

@@ -12593,7 +12593,8 @@ const ja = {
         "neverPlayed": "まだプレイしていません",
         "needsReview": "復習が必要",
         "ready": "順調",
-        "unknown": "読み込めません"
+        "unknown": "読み込めません",
+        "loading": "確認中…"
       },
       "action": {
         "invite": "参加コードを表示",

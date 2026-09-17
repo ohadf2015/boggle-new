@@ -66,7 +66,7 @@ export function registerBoostHandlers(io: Server, socket: Socket): void {
       // Get player username from socket
       const username = getUsernameBySocketId(socket.id);
       if (!username) {
-        socket.emit('error', { code: 'NOT_IN_GAME', message: 'You are not in this game' });
+        socket.emit('error', { code: 'PLAYER_NOT_IN_GAME', message: 'You are not in this game' });
         return;
       }
 

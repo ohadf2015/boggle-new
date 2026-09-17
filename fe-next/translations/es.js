@@ -12582,7 +12582,8 @@ const es = {
         "neverPlayed": "Aún sin jugar",
         "needsReview": "Necesita repaso",
         "ready": "Va bien",
-        "unknown": "No se pudo cargar"
+        "unknown": "No se pudo cargar",
+        "loading": "Comprobando…"
       },
       "action": {
         "invite": "Ver el código de acceso",

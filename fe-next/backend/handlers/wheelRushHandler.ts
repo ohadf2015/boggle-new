@@ -41,7 +41,7 @@ function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
 export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWheelWordData): void {
   const gameCode = getGameBySocketId(socket.id);
   const username = getUsernameBySocketId(socket.id);
-  if (!gameCode || !username) { socket.emit('error', { code: 'NOT_IN_GAME' }); return; }
+  if (!gameCode || !username) { socket.emit('error', { code: 'PLAYER_NOT_IN_GAME', message: 'You are not in a game' }); return; }
 
   const game = getGame(gameCode);
   if (!game) { socket.emit('error', { code: 'GAME_NOT_FOUND' }); return; }

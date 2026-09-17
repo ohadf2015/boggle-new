@@ -11123,7 +11123,8 @@ const en = {
         "neverPlayed": "Not played yet",
         "needsReview": "Needs review",
         "ready": "On track",
-        "unknown": "Can't load"
+        "unknown": "Can't load",
+        "loading": "Checking…"
       },
       "action": {
         "invite": "Get the join code",

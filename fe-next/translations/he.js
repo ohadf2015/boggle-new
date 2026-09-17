@@ -12447,7 +12447,8 @@ const he = {
         "neverPlayed": "עוד לא שיחקו",
         "needsReview": "צריך חזרה",
         "ready": "במסלול",
-        "unknown": "לא נטען"
+        "unknown": "לא נטען",
+        "loading": "בודקים…"
       },
       "action": {
         "invite": "קבלו קוד הצטרפות",
