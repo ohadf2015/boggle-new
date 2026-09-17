@@ -37,7 +37,7 @@ vi.mock('../../modules/scoreManager', () => ({
 
 import { handleSubmitWheelWord, handleRequestWheelRushState } from '../wheelRushHandler';
 import { broadcastToRoom } from '../../utils/socketHelpers';
-import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
+import { getGame, getGameBySocketId, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 import { validateWheelSubmission, applyWheelWord } from '../../modules/wheelRushManager';
 import { getLeaderboard } from '../../modules/scoreManager';
 
@@ -116,6 +116,13 @@ describe('wheelRushHandler', () => {
     expect(sock.emit).toHaveBeenCalledWith('wheelWordResult', expect.objectContaining({
       word: 'CANE', accepted: true, score: 3, repeat: true,
     }));
+  });
+
+  it('emits the registered PLAYER_NOT_IN_GAME code (has a socketErrors translation) when the socket has no game', () => {
+    (getGameBySocketId as unknown as Mock).mockReturnValueOnce(null);
+    const sock = mkSocket();
+    handleSubmitWheelWord(mkIo(), sock, { word: 'CANT' });
+    expect(sock.emit).toHaveBeenCalledWith('error', expect.objectContaining({ code: 'PLAYER_NOT_IN_GAME' }));
   });
 
   it('rejects when game is not wheel-rush mode', () => {

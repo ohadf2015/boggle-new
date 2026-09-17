@@ -12908,7 +12908,8 @@ const sv = {
         "neverPlayed": "Har inte spelat än",
         "needsReview": "Behöver repetition",
         "ready": "På rätt spår",
-        "unknown": "Kan inte laddas"
+        "unknown": "Kan inte laddas",
+        "loading": "Kollar…"
       },
       "action": {
         "invite": "Hämta klasskoden",
