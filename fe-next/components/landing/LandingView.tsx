@@ -19,7 +19,6 @@ import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
-import { ScrollIndicator } from './ScrollIndicator';
 import { LandingHero } from './LandingHero';
 // SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
@@ -324,8 +323,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
           </div>
         </div>
       </section>
-
-      <ScrollIndicator />
 
       {/* Space reserved in SSR so ads load into a pre-committed slot — eliminates the
           104px layout shift that fires when mounted flips true post-hydration. CSS

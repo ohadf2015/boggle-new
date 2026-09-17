@@ -546,7 +546,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       // plain `center`) so a step whose content is taller than the viewport (e.g.
       // the style grid on a tablet-height screen) falls back to top-alignment
       // instead of centering the box and pushing its heading off the top edge.
-      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-start sm:[justify-content:safe_center] overflow-y-auto py-[max(env(safe-area-inset-top),1rem)]"
+      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-start sm:[justify-content:safe_center] overflow-y-auto pb-4 pt-[max(env(safe-area-inset-top),4.5rem)] sm:pt-[max(env(safe-area-inset-top),1rem)]"
       style={{ minHeight: '100dvh' }}
       dir={dir}
     >

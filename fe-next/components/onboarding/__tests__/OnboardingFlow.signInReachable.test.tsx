@@ -84,6 +84,15 @@ describe('OnboardingFlow — sign-in survives the header takeover', () => {
     expect(signIn.className).toContain('absolute');
   });
 
+  // The pinned control is 44px tall at top-4 (ends at 60px). On a 390px phone the
+  // step content is top-aligned, so without a reserved band the wordmark sat under it.
+  it('reserves a top band on phones so the pinned control never covers the step', () => {
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    const shell = screen.getByTestId('onboarding-flow');
+    expect(shell.className).toContain('pt-[max(env(safe-area-inset-top),4.5rem)]');
+    expect(shell.className).toContain('sm:pt-[max(env(safe-area-inset-top),1rem)]');
+  });
+
   it('opens the auth modal when the pinned control is used', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     expect(screen.queryByTestId('auth-modal')).not.toBeInTheDocument();

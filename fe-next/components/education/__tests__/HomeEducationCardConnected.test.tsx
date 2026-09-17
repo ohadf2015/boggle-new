@@ -65,6 +65,14 @@ describe('HomeEducationCardConnected', () => {
     expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
   });
 
+  // Desktop web already leads with the classroom hero, so the promo strip above it
+  // repeated the same pitch. Phones (HomeHub) have no such hero and keep it.
+  it('limits the promo to phone widths', () => {
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
+    render(<HomeEducationCardConnected />);
+    expect(screen.getByTestId('home-education-card').closest('.md\\:hidden')).not.toBeNull();
+  });
+
   it('promotes education to an authed user with no classroom membership', () => {
     useAuthMock.mockReturnValue(auth());
     useStudentClassroomMock.mockReturnValue(studentClassroom());

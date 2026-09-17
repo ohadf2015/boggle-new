@@ -58,7 +58,13 @@ function StudentHomeCard() {
 
 /** Always-on pitch for everyone education has never enrolled: guests and
  * unenrolled players. Shown on every homepage visit so teachers can find
- * classroom mode without having seen it "once" in a previous session. */
+ * classroom mode without having seen it "once" in a previous session.
+ * Phone widths only: from md up the landing leads with the classroom hero, and the
+ * strip above it repeated the same pitch. */
 function EducationPromoCard() {
-  return <HomeEducationCard role="promo" />;
+  return (
+    <div className="md:hidden">
+      <HomeEducationCard role="promo" />
+    </div>
+  );
 }

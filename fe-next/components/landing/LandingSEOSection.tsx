@@ -10,7 +10,6 @@ import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
 import { ModeShowcase } from './seo/ModeShowcase';
 import { WhoPlays } from './seo/WhoPlays';
 import { CommunityBand } from './seo/CommunityBand';
-import { ScrollIndicator } from './ScrollIndicator';
 
 /* ── Animation variants (visible-by-default — must never gate SSR content) ─── */
 
@@ -150,5 +149,3 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
     </section>
   );
 }
-
-export { ScrollIndicator };
