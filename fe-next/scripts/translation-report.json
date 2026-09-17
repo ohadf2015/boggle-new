@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6956,
+    "totalKeysInCode": 6966,
     "keyCountByLanguage": {
-      "en": 13441,
-      "es": 13746,
-      "he": 13651,
-      "ja": 13711,
-      "ru": 13481,
-      "sv": 13707
+      "en": 13452,
+      "es": 13757,
+      "he": 13662,
+      "ja": 13722,
+      "ru": 13492,
+      "sv": 13718
     },
     "missingFromEnglish": 103,
     "problematicFlatKeys": 0,
@@ -1297,49 +1297,49 @@
         "pattern": "`education.access.role_${value}`",
         "type": "template_literal",
         "file": "components/education/AccessRequestForm.tsx",
-        "line": 216,
+        "line": 224,
         "context": "<span className=\"text-sm\">{t(`education.access.role_${value}`)}</span>"
       },
       {
         "pattern": "`education.achievements.${achievement.key}.name`",
         "type": "template_literal",
         "file": "components/education/AchievementProgressCard.tsx",
-        "line": 116,
+        "line": 99,
         "context": "aria-label={`${t(`education.achievements.${achievement.key}.name`)} achievement`}"
       },
       {
         "pattern": "`education.achievements.${achievement.key}.name`",
         "type": "template_literal",
         "file": "components/education/AchievementProgressCard.tsx",
-        "line": 137,
+        "line": 119,
         "context": ": `${t(`education.achievements.${achievement.key}.name`)} icon`"
       },
       {
         "pattern": "`education.achievements.${achievement.key}.name`",
         "type": "template_literal",
         "file": "components/education/AchievementProgressCard.tsx",
-        "line": 153,
+        "line": 135,
         "context": ": t(`education.achievements.${achievement.key}.name`)}"
       },
       {
         "pattern": "`education.achievements.tiers.${achievement.currentTier}`",
         "type": "template_literal",
         "file": "components/education/AchievementProgressCard.tsx",
-        "line": 157,
+        "line": 139,
         "context": "{t(`education.achievements.tiers.${achievement.currentTier}`)}"
       },
       {
         "pattern": "`education.achievements.${achievement.key}.hint`",
         "type": "template_literal",
         "file": "components/education/AchievementProgressCard.tsx",
-        "line": 230,
+        "line": 212,
         "context": "? t(`education.achievements.${achievement.key}.hint`)"
       },
       {
         "pattern": "`education.achievements.${achievement.key}.hint`",
         "type": "template_literal",
         "file": "components/education/AchievementProgressCard.tsx",
-        "line": 231,
+        "line": 213,
         "context": ": t(`education.achievements.${achievement.key}.hint`)}"
       },
       {
@@ -1395,21 +1395,21 @@
         "pattern": "`education.landing.moat.${p.key}.tag`",
         "type": "template_literal",
         "file": "components/education/MoatTrifectaSection.tsx",
-        "line": 51,
+        "line": 60,
         "context": "{t(`education.landing.moat.${p.key}.tag`)}"
       },
       {
         "pattern": "`education.landing.moat.${p.key}.title`",
         "type": "template_literal",
         "file": "components/education/MoatTrifectaSection.tsx",
-        "line": 54,
+        "line": 63,
         "context": "{t(`education.landing.moat.${p.key}.title`)}"
       },
       {
         "pattern": "`education.landing.moat.${p.key}.body`",
         "type": "template_literal",
         "file": "components/education/MoatTrifectaSection.tsx",
-        "line": 57,
+        "line": 66,
         "context": "{t(`education.landing.moat.${p.key}.body`)}"
       },
       {
@@ -1528,7 +1528,7 @@
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizHostView.tsx",
-        "line": 174,
+        "line": 180,
         "context": "{t(`vocabQuiz.focus.${question.focus}`)}"
       },
       {
@@ -2025,14 +2025,14 @@
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 361,
+        "line": 362,
         "context": "{t(`education.vocabFocus.focus.${assignedFocus}`)}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${assignedFocus}`",
         "type": "template_literal",
         "file": "components/student/StudentLessonView.tsx",
-        "line": 409,
+        "line": 410,
         "context": "{t('education.vocabFocus.startAssigned', { focus: t(`education.vocabFocus.focus.${assignedFocus}`) }"
       },
       {
@@ -3007,7 +3007,7 @@
         "variable": "labelKey",
         "type": "variable_key",
         "file": "components/education/achievements/AchievementGrid.tsx",
-        "line": 90,
+        "line": 101,
         "context": "{t(labelKey)}"
       },
       {
@@ -3015,7 +3015,7 @@
         "variable": "nameKey",
         "type": "variable_key",
         "file": "components/education/achievements/AchievementGrid.tsx",
-        "line": 115,
+        "line": 126,
         "context": "const displayName = isSecret && !isUnlocked ? '???' : t(nameKey);"
       },
       {

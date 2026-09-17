@@ -10,7 +10,6 @@ import { describe, expect, it } from 'vitest';
  */
 
 const REPO = path.resolve(__dirname, '../..');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const config = require(path.join(REPO, 'tailwind.config.js'));
 
 function walk(dir: string, out: string[] = []): string[] {
