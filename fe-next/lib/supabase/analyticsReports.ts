@@ -73,16 +73,30 @@ export async function getStudentReportData(
       return { data: null, error: { message: progressError.message } };
     }
 
-    // Get student's XP tracking data
-    const { data: xpData, error: xpError } = await supabase
-      .from('student_xp_tracking')
-      .select('*')
-      .eq('student_id', studentId)
-      .single();
+    // Practice time + completed sessions. (These used to come from
+    // `student_xp_tracking`, a table that never existed — every report showed 0.)
+    let sessionsQuery = supabase
+      .from('practice_sessions')
+      .select('time_spent_seconds, duration_seconds, completed_at')
+      .eq('student_id', studentId);
 
-    if (xpError && xpError.code !== 'PGRST116') {
-      logger.error('Error fetching XP data:', xpError);
+    if (lessonId) {
+      sessionsQuery = sessionsQuery.eq('lesson_id', lessonId);
     }
+
+    const { data: sessionRows, error: sessionsError } = await sessionsQuery;
+
+    if (sessionsError) {
+      logger.error('Error fetching practice sessions:', sessionsError);
+    }
+
+    const practiceSeconds = (sessionRows || []).reduce(
+      (sum, row) => sum + (row.time_spent_seconds || row.duration_seconds || 0),
+      0
+    );
+    const sessionsCompleted = (sessionRows || []).filter((row) => row.completed_at).length;
+    const currentStreak = Math.max(0, ...(progressData || []).map((p) => p.current_streak || 0));
+    const longestStreak = Math.max(0, ...(progressData || []).map((p) => p.longest_streak || 0));
 
     // Calculate metrics from progress data
     let totalWordsLearned = 0;
@@ -146,10 +160,10 @@ export async function getStudentReportData(
         wordsLearned: totalWordsLearned,
         totalWords: totalWords || 0,
         accuracy,
-        practiceTimeMinutes: xpData?.total_practice_minutes || 0,
-        currentStreak: xpData?.current_streak || 0,
-        longestStreak: xpData?.longest_streak || 0,
-        sessionsCompleted: xpData?.total_sessions || 0,
+        practiceTimeMinutes: Math.round(practiceSeconds / 60),
+        currentStreak,
+        longestStreak,
+        sessionsCompleted,
         averageScore: accuracy,
         masteryLevel,
       },
