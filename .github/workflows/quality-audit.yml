@@ -53,9 +53,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-analyze-${{ hashFiles('fe-next/package-lock.json') }}-
 
-      - name: Build with bundle analysis
+      # ponytail: plain build — the webpack analyzer OOM'd the 16GB runner at a
+      # 13GB heap every run since <=2026-09-10, so neither report was produced.
+      # The size report below only needs .next/static/chunks. Run
+      # `npm run build:analyze` locally for the treemap.
+      - name: Build for bundle size report
         working-directory: fe-next
-        run: npm run build:analyze
+        run: npm run build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
