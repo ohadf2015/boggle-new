@@ -242,7 +242,7 @@ export function MasteryMeter({ percent, label }: { percent: number; label: strin
         aria-valuemax={100}
         aria-valuenow={percent}
         aria-label={label}
-        className="h-5 overflow-hidden rounded-neo border-2 border-black bg-neo-navy shadow-hard-sm"
+        className="h-5 overflow-hidden rounded-neo border-2 border-neo-cream bg-neo-navy shadow-hard-sm"
       >
         <m.div
           className="h-full origin-left bg-neo-lime rtl:origin-right"

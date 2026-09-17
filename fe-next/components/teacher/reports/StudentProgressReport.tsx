@@ -153,7 +153,7 @@ export function StudentProgressReport({ studentId, classroomId, lessonId, dateRa
             {data.recommendations.map((recommendation) => (
               <li
                 key={recommendation}
-                className="flex items-start gap-3 rounded-neo border-2 border-neo-cream/25 bg-neo-navy-light p-4"
+                className="flex items-start gap-3 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light p-4"
               >
                 <span aria-hidden="true" className="mt-1.5 size-2.5 shrink-0 border-2 border-black bg-neo-lime" />
                 <span className="text-neo-white">{t(RECOMMENDATION_LABEL_KEY[recommendation])}</span>

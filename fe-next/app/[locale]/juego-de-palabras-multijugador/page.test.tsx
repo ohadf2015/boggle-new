@@ -11,7 +11,7 @@ describe('/es/juego-de-palabras-multijugador metadata', () => {
     expect(meta.title).toBe('Scrabble Online Gratis en Español — Sin App | LexiClash');
     expect(meta.title.length).toBeLessThanOrEqual(60);
     expect(meta.description).toBe(
-      'Juega Scrabble en español gratis con amigos — sin app, sin registro. Hasta 50 jugadores en tiempo real. ¡Empieza en 10 segundos! →',
+      'Juega Scrabble online en español gratis — sin app, sin registro. Crea sala en 10 segundos, hasta 50 jugadores en tiempo real. ¡Juega ahora! →',
     );
     expect(meta.robots).toEqual({ index: true, follow: true });
     expect(meta.alternates?.canonical).toBe('https://www.lexiclash.live/es/juego-de-palabras-multijugador');

@@ -122,7 +122,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
             {data.topPerformers.map((performer, index) => (
               <li
                 key={performer.studentId}
-                className="flex items-center gap-3 rounded-neo border-2 border-neo-cream/30 bg-neo-navy-light p-3 shadow-hard-sm"
+                className="flex items-center gap-3 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-sm"
               >
                 <span
                   aria-hidden="true"
