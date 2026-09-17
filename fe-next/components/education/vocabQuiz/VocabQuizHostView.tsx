@@ -141,7 +141,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
       {phase === 'question' && (
         <div
           className={cn(
-            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
+            'h-5 w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden md:h-[0.9vw]',
             juice.ticking && 'animate-pulse'
           )}
           role="timer"
@@ -170,10 +170,16 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, t }: VocabQui
       {(phase === 'question' || phase === 'reveal') && question && (
         <div className="flex-1 flex flex-col gap-5 min-h-0 overflow-hidden">
           <div className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-6 shadow-hard">
-            <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan mb-2">
+            {/* `md:` scale-up only — the base size is untouched, so a host on
+                their own phone (< md) sees exactly what it saw before. From
+                `md` up (the room's real projector, mirrored or not) the text
+                grows with the viewport the way ProjectorLobby/ProjectorRoster
+                already do, instead of staying pinned at a fixed rem size that
+                a back row cannot read. */}
+            <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan mb-2 md:text-[1.1vw]">
               {t(`vocabQuiz.focus.${question.focus}`)}
             </p>
-            <p className="font-neo-display font-bold text-4xl leading-snug break-words">{question.prompt}</p>
+            <p className="font-neo-display font-bold text-4xl leading-snug break-words md:text-[3.2vw]">{question.prompt}</p>
           </div>
 
           <VocabQuizChoiceBars

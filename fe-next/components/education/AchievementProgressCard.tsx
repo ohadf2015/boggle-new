@@ -13,6 +13,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { achievementTierTone, type AchievementTier } from '@/lib/education/outcomeTone';
 
 // ============================================
 // TYPES
@@ -41,34 +42,16 @@ export interface AchievementProgressCardProps {
 // ============================================
 
 // B3 contrast: tier "text" tone is shown over neo-navy and must stay
-// >= 4.5:1. Silver in particular previously used `bg-neo-white/60` as a
-// text color, which renders ~2.5:1 on navy.
-const TIER_COLORS = {
-  bronze: {
-    bg: 'bg-amber-700',
-    border: 'border-amber-800',
-    fill: 'bg-amber-500',
-    text: 'text-amber-300',
-  },
-  silver: {
-    bg: 'bg-slate-300',
-    border: 'border-slate-400',
-    fill: 'bg-slate-300',
-    text: 'text-slate-200',
-  },
-  gold: {
-    bg: 'bg-yellow-500',
-    border: 'border-yellow-600',
-    fill: 'bg-yellow-400',
-    text: 'text-yellow-300',
-  },
-  platinum: {
-    bg: 'bg-cyan-400',
-    border: 'border-cyan-500',
-    fill: 'bg-cyan-300',
-    text: 'text-cyan-200',
-  },
-};
+// >= 4.5:1. Neo tokens only — bronze/silver/gold/platinum map onto the
+// orange/cream/yellow/cyan families (see lib/education/outcomeTone.ts),
+// every one of which measures >= 7:1 against black, so a solid-fill badge
+// can keep its black border while a navy-family fallback cannot.
+function tierColorsFor(tier: AchievementTier | null) {
+  if (!tier) return null;
+  const tone = achievementTierTone(tier);
+  const fill = tone.badge.split(' ')[0]; // e.g. 'bg-neo-orange'
+  return { bg: fill, fill, text: tone.text };
+}
 
 // ============================================
 // COMPONENT
@@ -87,7 +70,7 @@ export default function AchievementProgressCard({
   const isEarned = !isLocked;
 
   // Get tier-specific colors
-  const tierColors = achievement.currentTier ? TIER_COLORS[achievement.currentTier] : null;
+  const tierColors = tierColorsFor(achievement.currentTier);
 
   // Get percent to next tier (already calculated from backend)
   const calculatePercentToNext = (): number => {
@@ -109,7 +92,7 @@ export default function AchievementProgressCard({
   return (
     <article
       className={`
-        relative rounded-neo border-neo border-neo-black
+        relative rounded-neo border-neo border-neo-cream/40
         ${isEarned ? 'bg-neo-navy/50 shadow-hard' : 'bg-neo-navy-light/70 opacity-80'}
         p-4 transition-all
       `}
@@ -122,9 +105,8 @@ export default function AchievementProgressCard({
         <div
           className={`
             shrink-0 w-16 h-16 rounded-full flex items-center justify-center
-            border-neo-thick border-neo-black
-            ${tierColors?.bg || 'bg-neo-navy-light'}
-            ${tierColors?.border || 'border-neo-black'}
+            border-neo-thick
+            ${tierColors ? `${tierColors.bg} border-neo-black` : 'bg-neo-navy-light border-neo-cream/40'}
             ${isLocked ? 'opacity-40' : ''}
           `}
         >
@@ -173,8 +155,8 @@ export default function AchievementProgressCard({
                 title={!isPinned && !canPin ? t('education.achievements.maxPinsReached') : ''}
                 className={`
                   w-8 h-8 rounded flex items-center justify-center
-                  border-neo border-neo-black transition-all
-                  ${isPinned ? 'bg-neo-lime text-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white'}
+                  border-neo transition-all
+                  ${isPinned ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white border-neo-cream/40'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
               >

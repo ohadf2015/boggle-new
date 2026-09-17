@@ -66,8 +66,19 @@ export const AchievementGrid = memo<AchievementGridProps>(
       return achievement.category === activeCategory;
     });
 
+    // A brand-new student sees a full wall of greyed-out locked badges with
+    // no context. One header note, same pattern as StudentLessonView's
+    // EnhancedEmptyState for zero lessons, without hiding the grid itself.
+    const earnedCount = Object.values(achievements).filter((a) => a.count > 0).length;
+
     return (
       <div className={cn('space-y-4', className)}>
+        {earnedCount === 0 && (
+          <p className="text-sm text-neo-cream/70 font-neo-body text-center">
+            {t('student.achievements.emptyHint')}
+          </p>
+        )}
+
         {/* Category Filter Tabs */}
         <div className="flex gap-2 flex-wrap">
           {categories.map(({ key, labelKey }) => (
@@ -118,7 +129,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 <AdaptiveMotion.div
                   key={key}
                   className={cn(
-                    'bg-neo-navy border-neo rounded-neo p-3 shadow-hard',
+                    'bg-neo-navy border-neo border-neo-cream/40 rounded-neo p-3 shadow-hard',
                     'relative overflow-hidden',
                     !isEarned && 'grayscale opacity-75'
                   )}

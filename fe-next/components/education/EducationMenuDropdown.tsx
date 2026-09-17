@@ -29,7 +29,6 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
   const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isRTL = language === 'he';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -74,7 +73,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
               'rounded-neo shadow-hard-lg',
               'overflow-hidden z-50',
               'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150',
-              isRTL ? 'left-0' : 'right-0'
+              'end-0'
             )}
           >
             {/* Navigation Links */}

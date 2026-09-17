@@ -46,7 +46,7 @@ export function PreviewWaitingScreen({
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
       <div>
-        <p className="mb-1 text-[10px] uppercase tracking-widest text-neo-white/60">
+        <p className="mb-1 text-xs uppercase tracking-wide text-neo-white/60">
           {t('education.classroomGame.classCode')}
         </p>
         <p dir="ltr" className="font-mono text-3xl font-black tracking-widest text-neo-cyan">
@@ -67,7 +67,7 @@ export function PreviewWaitingScreen({
       </div>
 
       <div className="w-full rounded-neo border-3 border-neo-cyan bg-neo-navy-light p-3 text-start">
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neo-white/60">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-white/60">
           {t('education.studentPreview.waiting.settingsTitle')}
         </p>
         <dl className="space-y-1.5">

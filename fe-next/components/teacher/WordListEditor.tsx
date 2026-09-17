@@ -311,7 +311,7 @@ export default function WordListEditor({
                       )}
                       <span className="text-neo-white font-neo-body ms-2 truncate">{word.word}</span>
                       {word.level && word.level !== 'core' && (
-                        <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-neo-black/40 text-neo-white/80">
+                        <span className="text-xs uppercase font-bold px-1.5 py-0.5 rounded bg-neo-black/40 text-neo-white/80">
                           {t(LEVELS.find((l) => l.value === word.level)?.key ?? 'teacher.wordDetails.levelCore')}
                         </span>
                       )}

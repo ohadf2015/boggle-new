@@ -95,7 +95,7 @@ export function AsyncDuelTurnCard({
           {isLive && (
             <span
               data-testid="duel-turn-live-badge"
-              className="mb-1 inline-flex items-center gap-1 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2 py-0.5 font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-black"
+              className="mb-1 inline-flex items-center gap-1 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2 py-0.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-black"
             >
               <Zap className="h-3 w-3" aria-hidden="true" />
               {t('education.duels.turnLiveBadge')}
@@ -123,7 +123,7 @@ export function AsyncDuelTurnCard({
               <Target className="h-4 w-4" aria-hidden="true" />
               {opponentScore}
             </span>
-            <span className="font-neo-body text-[9px] font-black uppercase tracking-widest text-neo-black/70">
+            <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">
               {t('education.duels.turnToBeat')}
             </span>
           </div>

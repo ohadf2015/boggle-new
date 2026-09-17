@@ -40,8 +40,8 @@ export function VocabQuizNextUp({ secondsLeft, hint, isLast, t }: VocabQuizNextU
   return (
     <div
       className={cn(
-        'flex items-center gap-5 rounded-neo border-[2px] border-neo-black px-5 py-4 shadow-hard',
-        isLast ? 'bg-neo-yellow text-neo-black' : 'bg-neo-navy-elevated text-neo-white'
+        'flex items-center gap-5 rounded-neo border-[2px] px-5 py-4 shadow-hard',
+        isLast ? 'border-neo-black bg-neo-yellow text-neo-black' : 'border-neo-cream/40 bg-neo-navy-elevated text-neo-white'
       )}
       role="status"
     >

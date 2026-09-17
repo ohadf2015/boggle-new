@@ -83,7 +83,7 @@ export function TeamTilesBoard({
               isDown && tone,
               isActive && 'bg-neo-cream text-neo-black ring-4 ring-neo-lime',
               isCleared && 'bg-neo-lime/80 text-neo-black opacity-90',
-              isMissed && 'bg-neo-navy-elevated text-neo-cream/70 opacity-80',
+              isMissed && 'border-neo-cream/40 bg-neo-navy-elevated text-neo-cream/70 opacity-80',
               tile.face === 'up' && !isActive && 'bg-neo-cream text-neo-black',
             )}
           >

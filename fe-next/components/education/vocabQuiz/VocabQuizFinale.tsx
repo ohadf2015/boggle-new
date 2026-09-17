@@ -98,7 +98,7 @@ export function VocabQuizFinale({ standings, totalQuestions, t }: VocabQuizFinal
             sizeClassName="w-28 h-28"
             clipShape="rounded-square"
             clipBorder="lime"
-            clipBg="var(--neo-navy, #141a33)"
+            clipBg="var(--neo-navy, #1a1a2e)"
             animated
             enableHover={false}
             enableClick={false}

@@ -155,7 +155,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.3 }}
-              className="px-2 py-0.5 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-lime text-black"
+              className="px-2 py-0.5 border-3 border-black text-xs font-black rounded-neo shadow-hard-sm uppercase tracking-wide bg-neo-lime text-black"
             >
               {dailyChallenges.length}
             </m.span>
@@ -194,7 +194,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 500, damping: 14, delay: 0.3 }}
-              className="px-2 py-0.5 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-cyan text-black"
+              className="px-2 py-0.5 border-3 border-black text-xs font-black rounded-neo shadow-hard-sm uppercase tracking-wide bg-neo-cyan text-black"
             >
               {weeklyQuests.length}
             </m.span>

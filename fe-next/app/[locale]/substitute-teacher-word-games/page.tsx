@@ -100,16 +100,20 @@ export default async function Page({ params }: PageProps) {
           {c.intro}
         </p>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
+        {/* One primary CTA, unmistakable next action — the other two used to be
+            equal-weight `border-4` buttons in the same row with no hierarchy. */}
+        <section data-testid="hero-ctas" className="mb-12">
+          <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
             {c.ctaStart}
           </Link>
-          <Link href={`/${locale}/word-games-for-the-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            {c.ctaClassroom}
-          </Link>
-          <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            {c.ctaDuels}
-          </Link>
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold">
+            <Link href={`/${locale}/word-games-for-the-classroom`} className="text-neo-cyan underline underline-offset-2 transition-colors hover:text-neo-cyan/80">
+              {c.ctaClassroom}
+            </Link>
+            <Link href={`/${locale}/education/duels`} className="text-neo-pink underline underline-offset-2 transition-colors hover:text-neo-pink/80">
+              {c.ctaDuels}
+            </Link>
+          </div>
         </section>
 
         <section className="mb-12">

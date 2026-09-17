@@ -98,7 +98,7 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
 
       {/* Name, one meta line, and the single primary action, on a hard band so
           they stay legible over any art. */}
-      <span className="relative mt-auto w-full border-t-[3px] border-black bg-neo-navy px-3 pb-3 pt-2">
+      <span className="relative mt-auto w-full border-t-[3px] border-neo-cream/40 bg-neo-navy px-3 pb-3 pt-2">
         <span className="block font-neo-display text-xl font-black uppercase leading-none text-neo-white text-balance">
           {t(tile.titleKey)}
         </span>

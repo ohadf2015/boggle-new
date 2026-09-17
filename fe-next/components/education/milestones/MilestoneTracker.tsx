@@ -8,6 +8,8 @@
 'use client';
 
 import React, { memo } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getMilestoneProgress, getMilestones } from '@/lib/supabase/education/milestones';
@@ -52,7 +54,7 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
             <span className="text-neo-lime font-black text-lg">
               {currentLevel}
             </span>
-            <span className="text-neo-white">→</span>
+            <DirectionalIcon icon={ArrowRight} className="inline size-4 text-neo-white" />
             <span className={cn(
               'font-black text-lg',
               nextMilestone ? 'text-neo-white' : 'text-neo-white'
@@ -131,7 +133,14 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
                       left: `${positionPercent}%`,
                       transform: 'translateX(-50%)',
                     }}
-                    title={`Level ${milestone.level}${milestone.title ? ` - ${milestone.title}` : ''}`}
+                    title={
+                      milestone.title
+                        ? t('education.milestones.levelTooltipWithTitle', {
+                            level: milestone.level,
+                            title: milestone.title,
+                          })
+                        : t('education.milestones.level', { level: milestone.level })
+                    }
                   />
                 );
               })}

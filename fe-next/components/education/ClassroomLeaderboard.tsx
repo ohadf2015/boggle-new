@@ -22,7 +22,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { getLeaderboardTier } from '@/lib/supabase/education/leaderboard';
 import { cn } from '@/lib/utils';
-import { Loader } from '@/components/ui/Loader';
+import logger from '@/utils/logger';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { LeaderboardEntryWithDelta, LeaderboardTimeScope } from '@/lib/supabase/education/types';
 
@@ -153,7 +153,7 @@ const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) => {
     return (
       <AdaptiveMotion.span
         data-testid="rank-delta-up"
-        className="flex items-center gap-1 text-green-400 text-sm font-neo-body font-bold"
+        className="flex items-center gap-1 text-neo-lime text-sm font-neo-body font-bold"
         initial={{ y: 8, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 18 }}
@@ -199,7 +199,7 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
   const tierConfig = {
     top10: { bg: 'bg-neo-lime', text: 'text-neo-black', label: t('education.leaderboard.top10') },
     top25: { bg: 'bg-neo-cyan', text: 'text-neo-black', label: t('education.leaderboard.top25') },
-    top50: { bg: 'bg-neo-pink', text: 'text-white', label: t('education.leaderboard.top50') },
+    top50: { bg: 'bg-neo-pink', text: 'text-neo-white', label: t('education.leaderboard.top50') },
   };
 
   const config = tierConfig[tier];
@@ -313,7 +313,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
             {currentStreak >= 3 && (
               <span
                 data-testid="streak-badge"
-                className="px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-white rounded flex items-center gap-1"
+                className="px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-neo-white rounded flex items-center gap-1"
               >
                 <Flame className="w-4 h-4 inline" /> {currentStreak}
               </span>
@@ -390,7 +390,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
     const { t, dir } = useLanguage();
     const isRTL = dir === 'rtl';
 
-    const { fullList, totalStudents, isLoading, error, timeScope, setTimeScope } =
+    const { fullList, totalStudents, isLoading, error, timeScope, setTimeScope, refresh } =
       useClassroomLeaderboard({
         classroomId,
         currentUserId,
@@ -405,18 +405,32 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
       return null;
     }
 
-    // Loading state
+    // Loading state — row-shaped placeholders matching LeaderboardEntryRow, so the list doesn't jump when real rows arrive.
     if (isLoading) {
       return (
-        <div data-testid="leaderboard-skeleton" className={cn('w-full flex justify-center py-8', className)}>
-          <Loader size="md" />
+        <div data-testid="leaderboard-skeleton" aria-busy="true" className={cn('w-full space-y-3', className)}>
+          {Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 rounded-neo border-neo border-neo-cream/40 bg-neo-navy animate-pulse">
+              <div className="shrink-0 w-8 h-8 rounded-neo bg-neo-white/10" />
+              <div className="shrink-0 w-12 h-12 rounded-full bg-neo-white/10" />
+              <div className="flex-1 min-w-0 space-y-2">
+                <div className="h-4 w-1/3 rounded bg-neo-white/10" />
+                <div className="h-3 w-1/2 rounded bg-neo-white/10" />
+              </div>
+            </div>
+          ))}
         </div>
       );
     }
 
-    // Error state (silent fail)
+    // Error state — a fetch failure must say so, not render nothing (Class 4: can't tell "no data" from "broken").
     if (error) {
-      return null;
+      logger.error('ClassroomLeaderboard failed to load:', error);
+      return (
+        <div data-testid="classroom-leaderboard-error" role="alert" className={cn('w-full rounded-neo border-neo border-neo-cream shadow-hard bg-neo-navy', className)}>
+          <EnhancedEmptyState title={t('errors.leaderboardFailed')} icon="sad" compact action={{ label: t('common.retry'), onClick: refresh }} />
+        </div>
+      );
     }
 
     // Empty state

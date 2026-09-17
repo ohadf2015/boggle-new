@@ -126,7 +126,7 @@ export function LobbyModeSwitcher({
                 data-testid="lobby-mode-sheet-close"
                 onClick={() => setOpen(false)}
                 aria-label={t('education.modePicker.close')}
-                className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy p-1.5 text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className="shrink-0 grid min-h-11 min-w-11 place-items-center rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-cream transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
               >
                 <X className="size-4" strokeWidth={3} aria-hidden="true" />
               </button>

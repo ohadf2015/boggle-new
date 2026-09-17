@@ -225,7 +225,7 @@ export function VocabQuizFocusPicker({
                 'px-4 py-3 font-bold rounded-neo border-[2px] border-neo-cream transition-all',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
                 secondsPerQuestion === seconds
-                  ? 'bg-neo-pink text-black shadow-hard'
+                  ? 'bg-neo-pink text-neo-black shadow-hard'
                   : 'bg-neo-navy/50 text-neo-white hover:bg-neo-navy shadow-hard-sm'
               )}
             >

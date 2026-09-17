@@ -324,7 +324,7 @@ export function CurriculumWordListBrowser({
 
                 {/* Success/Error Messages */}
                 {importSuccess === list.id && (
-                  <div className="mt-2 text-sm text-green-400">
+                  <div className="mt-2 text-sm text-neo-lime">
                     {t('teacher.curriculum.imported')}
                   </div>
                 )}
@@ -337,12 +337,12 @@ export function CurriculumWordListBrowser({
 
               {/* Word Preview (Expandable) */}
               {expandedListId === list.id && (
-                <div className="border-t border-black/20 bg-neo-navy/30 p-4">
+                <div className="border-t border-neo-cream/40 bg-neo-navy/30 p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {list.words.map((word, index) => (
                       <div
                         key={`word-${index}-${word.word}`}
-                        className="bg-neo-navy/50 border border-black/20 rounded p-3"
+                        className="bg-neo-navy/50 border border-neo-cream/40 rounded p-3"
                       >
                         <span className="font-medium text-neo-white">{word.word}</span>
                         {word.definition && (

@@ -72,9 +72,11 @@ export function EducationLandingTemplate({ locale, path, content }: Props) {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-6" />
 
-        {heroBanner && (
-          <EducationHeroBanner title={heroBanner.title} subtitle={heroBanner.subtitle} />
-        )}
+        {/* `heroBanner` on the content still carries title/subtitle for pages that
+            haven't been re-authored yet, but the banner itself is image-only now —
+            see EducationHeroBanner for why (it was a verbatim duplicate of the H1
+            a few lines below). */}
+        {heroBanner && <EducationHeroBanner />}
 
         <header className={heroBanner ? 'mt-12 max-w-4xl' : 'max-w-4xl'}>
           {hero.tag && (

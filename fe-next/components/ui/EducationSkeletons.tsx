@@ -33,7 +33,7 @@ export function LessonCardSkeleton() {
     <div
       data-testid="lesson-card-skeleton"
       aria-busy="true"
-      className="border-neo border-neo-black shadow-hard bg-neo-navy/80 rounded-neo animate-pulse flex flex-col"
+      className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80 rounded-neo animate-pulse flex flex-col"
     >
       {/* Header */}
       <div className="p-4 pb-3">
@@ -75,7 +75,7 @@ export function ClassroomCardSkeleton() {
     <div
       data-testid="classroom-card-skeleton"
       aria-busy="true"
-      className="border-neo border-neo-black shadow-hard bg-neo-navy/80 rounded-neo animate-pulse"
+      className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80 rounded-neo animate-pulse"
     >
       {/* Header */}
       <div className="p-4 pb-3">
@@ -93,7 +93,7 @@ export function ClassroomCardSkeleton() {
         {/* Join code box */}
         <div
           data-testid="skeleton-join-code"
-          className="bg-neo-black/30 border-2 border-neo-yellow/30 p-3 rounded-neo"
+          className="bg-neo-black/30 border-2 border-neo-yellow p-3 rounded-neo"
         >
           <SkeletonBlock className="h-3 w-16 mb-2" />
           <SkeletonBlock className="h-8 w-24" />
@@ -120,7 +120,7 @@ export function MetricCardSkeleton() {
     <div
       data-testid="metric-card-skeleton"
       aria-busy="true"
-      className="p-4 rounded-neo border-neo border-neo-black bg-neo-navy/50 shadow-hard-sm animate-pulse"
+      className="p-4 rounded-neo border-neo border-neo-cream/40 bg-neo-navy/50 shadow-hard-sm animate-pulse"
     >
       <div className="flex items-center gap-3">
         {/* Icon placeholder */}
@@ -150,7 +150,7 @@ export function PracticeCardSkeleton() {
     <div
       data-testid="practice-card-skeleton"
       aria-busy="true"
-      className="border-neo-thick border-neo-black shadow-hard-lg bg-neo-navy rounded-neo animate-pulse overflow-hidden"
+      className="border-neo-thick border-neo-cream/40 shadow-hard-lg bg-neo-navy rounded-neo animate-pulse overflow-hidden"
     >
       <div className="p-8 space-y-6">
         {/* Definition area */}

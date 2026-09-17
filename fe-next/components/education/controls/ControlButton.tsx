@@ -93,7 +93,7 @@ export function ControlButton({
       >
         {icon}
       </span>
-      <span className="truncate">{label}</span>
+      <span className="truncate" title={label}>{label}</span>
     </button>
   );
 }

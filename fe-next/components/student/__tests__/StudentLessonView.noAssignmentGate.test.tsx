@@ -129,7 +129,9 @@ describe('StudentLessonView — assignment is metadata, not a gate', () => {
 
     // Rendering the empty state while a source is still resolving is the
     // "join a classroom" prompt flashing at a student who already has lessons.
+    // Loading now renders lesson-card skeletons (not a spinner) — see
+    // components/ui/EducationSkeletons.tsx.
     expect(screen.queryByText('empty')).not.toBeInTheDocument();
-    expect(screen.getByText('loading')).toBeInTheDocument();
+    expect(screen.getAllByTestId('lesson-card-skeleton').length).toBeGreaterThan(0);
   });
 });

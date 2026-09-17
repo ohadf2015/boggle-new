@@ -43,16 +43,10 @@ export function TeacherAccessCTA() {
       >
         {t('education.landing.cta.button')}
       </Link>
-      <div data-cta-item className="mt-4 border-t border-neo-navy/20 pt-4">
-        <p className="text-sm font-bold text-neo-navy">{t('education.landing.districtCta.title')}</p>
-        <Link
-          href={`/${language}/education/for-schools`}
-          onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_upsell' })}
-          className="mt-1 inline-block text-sm font-bold text-neo-navy/70 underline underline-offset-2 transition-colors hover:text-neo-navy"
-        >
-          {t('education.landing.districtCta.button')} →
-        </Link>
-      </div>
+      {/* District CTA lives in `DistrictUpsellStrip` only — every landing page
+          renders that immediately after this one, and it used to repeat the exact
+          same title/button/destination here, so pages ended with 2x identical
+          "talk to us about your district" CTAs. */}
     </aside>
   );
 }

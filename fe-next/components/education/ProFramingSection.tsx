@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 
@@ -98,9 +99,10 @@ export function ProFramingSection() {
 
         {/* Pro Tier */}
         <div className="rounded-neo border-neo-thick border-black bg-neo-lime p-6 shadow-hard-lg relative md:scale-105">
-          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-neo-pink px-4 py-1 border-2 border-black rounded-neo">
+          <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-neo-pink px-4 py-1 border-2 border-black rounded-neo">
+            <Star className="size-3.5 shrink-0 fill-neo-black text-neo-black" aria-hidden />
             <span className="font-neo-display font-black text-black text-sm">
-              ⭐ {t('teacher.subscription.popular')}
+              {t('teacher.subscription.popular')}
             </span>
           </div>
 

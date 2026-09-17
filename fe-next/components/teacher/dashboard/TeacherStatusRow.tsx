@@ -28,7 +28,7 @@ export function TeacherStatusRow({ className }: { className?: string }) {
     <div
       data-testid="teacher-status-row"
       className={cn(
-        'flex items-center gap-3 border-b-3 border-black/40 bg-neo-navy px-4 py-2 sm:px-6',
+        'flex items-center gap-3 border-b-3 border-neo-cream/40 bg-neo-navy px-4 py-2 sm:px-6',
         className,
       )}
     >

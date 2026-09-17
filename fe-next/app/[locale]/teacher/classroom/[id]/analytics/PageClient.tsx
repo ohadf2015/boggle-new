@@ -147,7 +147,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           {/* Live Activity Indicator */}
           <div
             className={cn(
-              'bg-neo-navy/50 border-[2px] border-neo-black shadow-hard rounded-neo',
+              'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo',
               'px-4 py-3'
             )}
           >
@@ -161,7 +161,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         </div>
 
         {/* Metrics Dashboard */}
-        <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
+        <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
           <ProGate feature="analytics">
             <AnalyticsDashboard
               classroomId={classroomId}
@@ -176,7 +176,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           <TabsList
             className={cn(
               'grid w-full grid-cols-4 gap-2',
-              'bg-neo-navy/50 border-[2px] border-neo-black shadow-hard rounded-neo p-2'
+              'bg-neo-navy/50 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-2'
             )}
           >
             <TabsTrigger
@@ -239,7 +239,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
           {/* Student Progress Tab */}
           <TabsContent value="students" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
               <h2 className="text-2xl font-neo-display text-neo-white mb-4">
                 {t('education.analytics.studentProgress')}
               </h2>
@@ -252,14 +252,14 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
           {/* Lesson Effectiveness Tab */}
           <TabsContent value="lessons" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
               <LessonEffectivenessChart classroomId={classroomId} />
             </div>
           </TabsContent>
 
           {/* Vocabulary Mastery Tab */}
           <TabsContent value="vocabulary" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
               <h2 className="text-2xl font-neo-display text-neo-white mb-4">
                 {t('education.analytics.vocabularyMastery')}
               </h2>
@@ -269,7 +269,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
           {/* Assignments Tab */}
           <TabsContent value="assignments" className="space-y-4">
-            <div className="bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-6">
+            <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-6">
               <AssignmentTrackingPanel
                 classroomId={classroomId}
                 onCreateAssignment={() => {
@@ -285,7 +285,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {recentActivity.length > 0 && (
           <div
             className={cn(
-              'bg-neo-navy/30 border-[2px] border-neo-black shadow-hard rounded-neo p-4',
+              'bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-4',
               'hidden lg:block'
             )}
           >

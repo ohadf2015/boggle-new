@@ -130,7 +130,7 @@ export default function CompletionTracker({
             className="flex items-center justify-between p-3 rounded-neo bg-neo-black/20 border border-neo-cream/40"
           >
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-500" />
+              <CheckCircle className="w-5 h-5 text-neo-lime" />
               <div>
                 <div className="font-neo-body text-neo-white">
                   {completion.profiles?.display_name || t('teacher.completion.student')}
@@ -225,7 +225,7 @@ export default function CompletionTracker({
                         <div
                           className={cn(
                             'h-full transition-all',
-                            item.errorRate > 66 ? 'bg-red-500' :
+                            item.errorRate > 66 ? 'bg-neo-red' :
                             item.errorRate > 33 ? 'bg-neo-orange' :
                             'bg-neo-lime'
                           )}

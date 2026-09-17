@@ -22,6 +22,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'education.leaderboard.top10': 'Top 10%',
         'education.leaderboard.top25': 'Top 25%',
         'education.leaderboard.top50': 'Top 50%',
+        'errors.leaderboardFailed': "Couldn't load leaderboard. Try refreshing!",
+        'common.retry': 'Try Again',
       };
       let result = translations[key] ?? key;
       if (params) {
@@ -258,6 +260,39 @@ describe('ClassroomLeaderboard', () => {
 
       // THEN: Should show student count
       expect(screen.getByText('5 students')).toBeInTheDocument();
+    });
+  });
+
+  // ==================== ERROR STATE ====================
+
+  describe('Error State', () => {
+    it('renders a visible error message instead of nothing when the fetch fails', () => {
+      // GIVEN: The hook reports a fetch error
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ error: new Error('network down') }));
+
+      // WHEN: Component is rendered
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+
+      // THEN: Should show a visible alert, not silently render nothing
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText("Couldn't load leaderboard. Try refreshing!")).toBeInTheDocument();
+    });
+
+    it('lets the student retry the failed fetch', () => {
+      // GIVEN: The hook reports a fetch error and exposes a refresh() callback
+      const refresh = vi.fn();
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ error: new Error('network down'), refresh }));
+
+      // WHEN: Component is rendered and the retry action is clicked
+      renderWithLanguage(
+        <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
+      );
+      screen.getByRole('button', { name: 'Try Again' }).click();
+
+      // THEN: The hook's refresh should be invoked
+      expect(refresh).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -68,10 +68,10 @@ export function VocabQuizChoiceBars({
           role="status"
         >
           <Sparkles className="w-8 h-8 shrink-0" aria-hidden />
-          <span className="font-neo-display font-black text-3xl uppercase tracking-wide">
+          <span className="font-neo-display font-black text-3xl uppercase tracking-wide md:text-[2.2vw]">
             {t('vocabQuiz.sweep.title')}
           </span>
-          <span className="font-neo-body text-xl">{t('vocabQuiz.sweep.subtitle')}</span>
+          <span className="font-neo-body text-xl md:text-[1.3vw]">{t('vocabQuiz.sweep.subtitle')}</span>
         </div>
       )}
 
@@ -126,19 +126,19 @@ export function VocabQuizChoiceBars({
               <div className="relative h-full flex items-center gap-4 px-5 py-4">
                 <span
                   className={cn(
-                    'grid place-items-center w-10 h-10 shrink-0 rounded-neo border-[2px] border-neo-black text-xl',
+                    'grid place-items-center w-10 h-10 shrink-0 rounded-neo border-[2px] border-neo-black text-xl md:w-[2.6vw] md:h-[2.6vw] md:text-[1.4vw]',
                     style.chip
                   )}
                   aria-hidden
                 >
                   {style.glyph}
                 </span>
-                <span className="flex-1 font-neo-display font-bold text-2xl break-words">{choice}</span>
+                <span className="flex-1 font-neo-display font-bold text-2xl break-words md:text-[1.8vw]">{choice}</span>
                 {isCorrect && (
                   <Check data-testid="vocab-quiz-bar-correct" className="w-8 h-8 shrink-0 text-neo-yellow" aria-hidden />
                 )}
                 {count > 0 && (
-                  <span className="shrink-0 font-neo-display font-bold text-2xl tabular-nums animate-neo-pop">
+                  <span className="shrink-0 font-neo-display font-bold text-2xl tabular-nums animate-neo-pop md:text-[1.8vw]">
                     {count}
                   </span>
                 )}

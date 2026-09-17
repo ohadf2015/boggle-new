@@ -73,7 +73,7 @@ export function WordStudentGrid({
       <div
         data-testid="report-grid-scroll"
         className={cn(
-          'overflow-x-auto rounded-neo border-3 border-black bg-white',
+          'overflow-x-auto rounded-neo border-3 border-black bg-neo-white',
           // A printed report must show every column, not the first screenful.
           'print:overflow-visible print:border-black print:text-[9px]'
         )}
@@ -85,10 +85,10 @@ export function WordStudentGrid({
         <table className="w-full border-separate border-spacing-0 text-sm font-neo-body">
           <caption className="sr-only">{t('teacher.classReport.title')}</caption>
           <thead>
-            <tr className="bg-black text-neo-cream">
+            <tr className="bg-neo-black text-neo-cream">
               <th
                 scope="col"
-                className="sticky start-0 z-20 bg-black px-3 py-2 text-start font-black min-w-[7rem]"
+                className="sticky start-0 z-20 bg-neo-black px-3 py-2 text-start font-black min-w-[7rem]"
               >
                 {t('teacher.classReport.word')}
               </th>

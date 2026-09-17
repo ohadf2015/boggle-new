@@ -94,7 +94,7 @@ export function DuelRematchButton({
       {state === 'offered' && (
         <p
           data-testid="duel-rematch-note"
-          className="truncate text-center font-neo-body text-[11px] font-black uppercase tracking-widest text-neo-lime"
+          className="truncate text-center font-neo-body text-xs font-black uppercase tracking-wide text-neo-lime"
         >
           {t('education.duels.rematchWants', undefined, { name })}
         </p>
@@ -121,7 +121,7 @@ export function DuelRematchButton({
       </button>
 
       {state === 'pending' && (
-        <p className="text-center font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+        <p className="text-center font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream/80">
           {t('education.duels.rematchTapCancel')}
         </p>
       )}

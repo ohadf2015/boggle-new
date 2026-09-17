@@ -209,12 +209,13 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         {/* Border overlay for fill edge */}
         {!progress.isMaxLevel && progress.progressPercent > 0 && (
           <div
-            className={cn(
-              'absolute inset-y-0 w-[3px] bg-neo-black',
-              isRTL ? 'right-0' : 'left-0'
-            )}
+            className="absolute inset-y-0 start-0 w-[3px] bg-neo-black"
             style={{
-              [isRTL ? 'right' : 'left']: `${progress.progressPercent}%`,
+              // Logical property: resolves to `left` in LTR, `right` in RTL
+              // on its own, so this needs no `isRTL` branch to pick the side.
+              insetInlineStart: `${progress.progressPercent}%`,
+              // `translateX` is a physical (not logical) transform, so
+              // centering the overlay on that edge still needs the branch.
               transform: isRTL ? 'translateX(50%)' : 'translateX(-50%)'
             }}
           />

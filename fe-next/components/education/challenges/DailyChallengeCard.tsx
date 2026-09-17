@@ -32,7 +32,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
 
   return (
     <div
-      className="bg-neo-navy border-neo border-3 rounded-neo shadow-hard p-4"
+      className="bg-neo-navy border-3 border-neo-cream/40 rounded-neo shadow-hard p-4"
       data-testid="daily-challenge-card"
     >
       {/* Tier Badge */}
@@ -46,7 +46,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       </div>
 
       {/* Title & Description */}
-      <h3 className="font-neo-display text-lg text-white mb-1" data-testid="challenge-title">
+      <h3 className="font-neo-display text-lg text-neo-white mb-1" data-testid="challenge-title">
         {t(challenge.title)}
       </h3>
       <p className="text-sm text-neo-white mb-3" data-testid="challenge-description">
@@ -62,7 +62,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
           transition={{ type: 'spring', stiffness: 100 }}
           data-testid="progress-fill"
         />
-        <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold">
+        <div className="absolute inset-0 flex items-center justify-center text-neo-white text-sm font-bold">
           {challenge.current_value} / {challenge.target_value}
         </div>
       </div>
@@ -80,7 +80,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
         <button
           type="button"
           onClick={() => onClaim(challenge.id)}
-          className="w-full bg-neo-lime text-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
+          className="w-full bg-neo-lime text-neo-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
           data-testid="claim-button"
         >
           {t('challenges.claim')}

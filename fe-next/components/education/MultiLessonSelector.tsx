@@ -31,8 +31,7 @@ export function MultiLessonSelector({
   onSelectChange,
   className,
 }: MultiLessonSelectorProps) {
-  const { t, language } = useLanguage();
-  const isRTL = language === 'he';
+  const { t } = useLanguage();
 
   // How many words the LESSON has. Not how many a Boggle grid could hold:
   // `canIntegrate` is false under 3 and over 12 letters, so counting with it
@@ -131,8 +130,7 @@ export function MultiLessonSelector({
               {isSelected && (
                 <div
                   className={cn(
-                    'absolute top-2 bg-neo-black rounded-full p-1',
-                    isRTL ? 'left-2' : 'right-2'
+                    'absolute top-2 end-2 bg-neo-black rounded-full p-1'
                   )}
                 >
                   <Check className="w-4 h-4 text-neo-cyan" />

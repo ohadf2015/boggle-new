@@ -1,6 +1,27 @@
 {
-  "generatedAt": "2026-09-17T08:44:49.638Z",
+  "generatedAt": "2026-09-17T11:14:38.573Z",
   "commits": [
+    {
+      "sha": "682317ae26715487fa407f57b9a068b338ef5d88",
+      "shortSha": "682317a",
+      "subject": "chore: regenerate deployment changelog, i18n manifest and translation report",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T12:16:01+03:00"
+    },
+    {
+      "sha": "40ba762919d134bada1e20f065c82fb81a30dbc7",
+      "shortSha": "40ba762",
+      "subject": "ci(quality-audit): plain build for bundle size report — analyzer OOM'd every nightly",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T11:53:32+03:00"
+    },
+    {
+      "sha": "a5e3dbd09c0908481727586a1280dbc559df814c",
+      "shortSha": "a5e3dbd",
+      "subject": "fix(ci): master reds — report border contrast + stale SEO meta test",
+      "author": "Ohad Fisher",
+      "date": "2026-09-17T11:52:54+03:00"
+    },
     {
       "sha": "91da6f5d432c18603469db233989e79da367784c",
       "shortSha": "91da6f5",
@@ -119,27 +140,6 @@
       "subject": "perf(web): delete rejected AdSense Auto-Ads loader — 162 KiB of zero-revenue JS off first paint (#1061)",
       "author": "ohadf2015",
       "date": "2026-09-16T00:31:27+04:00"
-    },
-    {
-      "sha": "55e72d55da509f0d944fb34deaff7aeb29429ff6",
-      "shortSha": "55e72d5",
-      "subject": "perf(landing): split Sentry SDK + avatar builder off the first-paint chunk graph (#1064)",
-      "author": "ohadf2015",
-      "date": "2026-09-16T00:31:22+04:00"
-    },
-    {
-      "sha": "589ca36d6fde621bd6fdb6a02f0bd1e9a70aa13a",
-      "shortSha": "589ca36",
-      "subject": "perf(landing): intent-gate feedback widget off first paint (PSI piece 3) (#1066)",
-      "author": "ohadf2015",
-      "date": "2026-09-16T00:31:18+04:00"
-    },
-    {
-      "sha": "4dcc48580a40656402cb30173a9fc47d76add11f",
-      "shortSha": "4dcc485",
-      "subject": "feat(edu): miss-gap → Live question pack without ChatGPT hop (#1062)",
-      "author": "ohadf2015",
-      "date": "2026-09-15T16:03:51+04:00"
     }
   ]
 }

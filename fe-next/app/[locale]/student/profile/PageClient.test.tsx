@@ -433,7 +433,7 @@ describe('StudentProfilePageClient - Duel Features', () => {
     await waitFor(() => {
       const link = screen.getByText(/student\.profile\.viewDuelHistory/);
       expect(link).toBeInTheDocument();
-      expect(link.closest('a')).toHaveAttribute('href', '/en/duels/history');
+      expect(link.closest('a')).toHaveAttribute('href', '/en/education/duels');
     });
   });
 
@@ -463,7 +463,8 @@ describe('StudentProfilePageClient - Duel Features', () => {
     });
 
     // Check "View All" link exists and points to achievements page
-    const viewAllLink = screen.getByText('student.dashboard.viewAll →');
+    // (arrow is now a DirectionalIcon, not a hardcoded → glyph in the text)
+    const viewAllLink = screen.getByText('student.dashboard.viewAll');
     expect(viewAllLink).toBeInTheDocument();
     expect(viewAllLink.closest('a')).toHaveAttribute('href', '/en/student/achievements');
   });

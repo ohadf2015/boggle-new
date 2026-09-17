@@ -89,7 +89,7 @@ export default function ClassLimitUpsellModal({
               </ul>
             </div>
 
-            <div className="border-2 border-black rounded-neo p-4 bg-white">
+            <div className="border-2 border-black rounded-neo p-4 bg-neo-white">
               <p className="text-sm font-bold text-black/70">
                 {t('teacher.subscription.priceUSD')}
               </p>
@@ -104,7 +104,7 @@ export default function ClassLimitUpsellModal({
               </p>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               {/* This modal used to POST /api/subscription/checkout itself — a second,
                   degraded copy of the upgrade page's handler that was missing its 401
                   (sign-in) and 503 (checkout kill switch) branches. With the switch off

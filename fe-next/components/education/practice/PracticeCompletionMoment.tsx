@@ -180,7 +180,7 @@ export default function PracticeCompletionMoment({
                 )}
               >
                 <Star
-                  className={cn('h-6 w-6', filled ? 'fill-black text-black' : 'text-neo-white/25')}
+                  className={cn('h-6 w-6', filled ? 'fill-black text-black' : 'text-neo-white/40')}
                   aria-hidden="true"
                 />
               </AdaptiveMotion.div>

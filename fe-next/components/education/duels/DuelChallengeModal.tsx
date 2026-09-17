@@ -133,7 +133,7 @@ export default function DuelChallengeModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-neo border-[2px] border-neo-cream p-1 text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-neo border-[2px] border-neo-cream text-neo-cream transition-colors hover:bg-neo-cream hover:text-neo-navy"
             aria-label={t('common.close')}
           >
             <X className="w-6 h-6" />
@@ -232,7 +232,7 @@ export default function DuelChallengeModal({
                   >
                     <div className="mb-1 flex items-center gap-1.5">
                       <span className="text-base font-black">{t('realTime')}</span>
-                      <span className="rounded-neo border-[2px] border-neo-black bg-neo-cyan px-1.5 py-0.5 font-neo-body text-[9px] font-black uppercase tracking-widest text-neo-black">
+                      <span className="rounded-neo border-[2px] border-neo-black bg-neo-cyan px-1.5 py-0.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-black">
                         {t('education.duels.recommended')}
                       </span>
                     </div>

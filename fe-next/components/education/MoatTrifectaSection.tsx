@@ -40,24 +40,34 @@ export function MoatTrifectaSection() {
           {t('education.landing.moat.subtitle')}
         </p>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {PILLARS.map((p) => (
-            <article
-              key={p.key}
-              data-moat-item
-              className={`rounded-neo border-neo-thick ${p.borderAccent} bg-neo-cream p-6 shadow-hard-lg transition-transform hover:-translate-y-1`}
-            >
-              <div className={`mb-4 inline-block rounded-full ${p.accent} px-3 py-1 text-xs font-bold text-neo-navy uppercase`}>
-                {t(`education.landing.moat.${p.key}.tag`)}
-              </div>
-              <h3 className="text-lg font-neo-display font-black text-neo-navy">
-                {t(`education.landing.moat.${p.key}.title`)}
-              </h3>
-              <p className="mt-2 text-sm text-neo-navy/70">
-                {t(`education.landing.moat.${p.key}.body`)}
-              </p>
-            </article>
-          ))}
+        {/* The three pillars used to be a textbook equal triad — same size, same
+            layout, no emphasis. Native multilingual is the strongest
+            differentiator, so it gets a grid-span lead: a taller card beside the
+            other two stacked in the second column, instead of three identical
+            boxes in a row. */}
+        <div className="mt-10 grid gap-6 md:grid-cols-2 md:grid-rows-2">
+          {PILLARS.map((p, i) => {
+            const lead = i === 0;
+            return (
+              <article
+                key={p.key}
+                data-moat-item
+                className={`flex flex-col justify-center rounded-neo border-neo-thick ${p.borderAccent} bg-neo-cream shadow-hard-lg transition-transform hover:-translate-y-1 ${
+                  lead ? 'row-span-2 p-8' : 'p-6'
+                }`}
+              >
+                <div className={`mb-4 inline-block w-fit rounded-full ${p.accent} px-3 py-1 text-xs font-bold text-neo-navy uppercase`}>
+                  {t(`education.landing.moat.${p.key}.tag`)}
+                </div>
+                <h3 className={`font-neo-display font-black text-neo-navy ${lead ? 'text-2xl sm:text-3xl' : 'text-lg'}`}>
+                  {t(`education.landing.moat.${p.key}.title`)}
+                </h3>
+                <p className={`text-neo-navy/70 ${lead ? 'mt-3 text-base' : 'mt-2 text-sm'}`}>
+                  {t(`education.landing.moat.${p.key}.body`)}
+                </p>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -24,15 +24,19 @@ describe('TeacherAccessCTA', () => {
     expect(link).toHaveAttribute('href', '/en/education/access');
   });
 
-  it('renders district pricing link pointing to for-schools', () => {
+  // The district CTA lives in `DistrictUpsellStrip` only — every landing page
+  // renders that immediately after this one. This component used to duplicate
+  // the exact same title/button/destination, so every page ended with 2x
+  // identical "talk to us about your district" CTAs.
+  it('renders exactly one link — no duplicate district CTA', () => {
     render(<TeacherAccessCTA />);
-    const link = screen.getByRole('link', { name: /education\.landing\.districtCta\.button/ });
-    expect(link).toHaveAttribute('href', '/en/education/for-schools');
+    expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
-  it('shows district CTA title text', () => {
+  it('does not render district CTA copy', () => {
     render(<TeacherAccessCTA />);
-    expect(screen.getByText('education.landing.districtCta.title')).toBeTruthy();
+    expect(screen.queryByText('education.landing.districtCta.title')).not.toBeInTheDocument();
+    expect(screen.queryByText(/education\.landing\.districtCta\.button/)).not.toBeInTheDocument();
   });
 
   // RED → GREEN: telemetry
@@ -48,10 +52,4 @@ describe('TeacherAccessCTA', () => {
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_individual' });
   });
 
-  it('tracks district link click', () => {
-    render(<TeacherAccessCTA />);
-    const link = screen.getByRole('link', { name: /education\.landing\.districtCta\.button/ });
-    fireEvent.click(link);
-    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'district_upsell' });
-  });
 });

@@ -77,7 +77,7 @@ export function DuelPlayPanel({
       {/* Timer + live scores */}
       <div className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy px-3 py-2 shadow-hard">
         <div className="text-neo-white">
-          <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+          <p className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream/80">
             {t('duels.you')}
           </p>
           <p className="font-neo-display text-xl font-black tabular-nums" data-testid="my-score">
@@ -98,7 +98,7 @@ export function DuelPlayPanel({
         </div>
 
         <div className="text-end text-neo-white">
-          <p className="truncate font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+          <p className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream/80">
             {opponentName}
           </p>
           <p

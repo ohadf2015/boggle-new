@@ -191,7 +191,7 @@ function TeacherProfileInner() {
 
         {/* Email Info */}
         {user.email && (
-          <div className="p-5 bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard">
+          <div className="p-5 bg-neo-navy-light border-3 border-neo-cream/40 rounded-neo shadow-hard">
             <div className="flex items-center gap-3">
               <GraduationCap className="w-5 h-5 text-neo-cyan shrink-0" />
               <div>

@@ -172,7 +172,7 @@ export function VocabularyHeatmap({
                     >
                       {/* Tooltip on hover */}
                       {isHovered && cellData && (
-                        <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-black text-white text-xs rounded whitespace-nowrap">
+                        <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-neo-black text-neo-white text-xs rounded whitespace-nowrap">
                           {`${cellData.studentName}: ${cellData.accuracy}% on "${cellData.word}"`}
                         </div>
                       )}

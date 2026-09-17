@@ -17,7 +17,7 @@ import { mergeStudentLessons } from '@/lib/education/mergeLessons';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { wordsForLevel } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
-import { PageLoader } from '@/components/ui/PageLoader';
+import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
@@ -130,8 +130,9 @@ export default function StudentLessonView() {
   // still in flight flashes an empty state at a student who has lessons.
   if (isLoading || isLoadingPractisable) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <PageLoader size="lg" text={t('common.loading')} />
+      <div aria-busy="true">
+        <span className="sr-only">{t('common.loading')}</span>
+        <SkeletonGrid count={3} skeleton={LessonCardSkeleton} className="grid-cols-1 sm:grid-cols-2 gap-4" />
       </div>
     );
   }

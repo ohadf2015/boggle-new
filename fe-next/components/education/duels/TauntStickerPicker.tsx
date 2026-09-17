@@ -35,7 +35,7 @@ export function TauntStickerPicker({
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <p className="font-neo-body text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+      <p className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream/80">
         {selected ? t('education.duels.tauntSent') : t('education.duels.tauntPrompt')}
       </p>
       <div className="flex items-center gap-2" role="group" aria-label={t('education.duels.tauntPrompt')}>

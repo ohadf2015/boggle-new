@@ -42,7 +42,7 @@ function LevelControl({ value, onChange, disabled, label, t }: LevelControlProps
     <div
       role="group"
       aria-label={label}
-      className="inline-flex w-full sm:w-auto border-2 border-black rounded-neo overflow-hidden bg-white shadow-hard-sm"
+      className="inline-flex w-full sm:w-auto border-2 border-black rounded-neo overflow-hidden bg-neo-white shadow-hard-sm"
     >
       {LEVEL_ORDER.map((level, i) => {
         const selected = level === value;
@@ -57,7 +57,7 @@ function LevelControl({ value, onChange, disabled, label, t }: LevelControlProps
               'flex-1 sm:flex-none min-h-[44px] px-3 text-xs sm:text-sm font-neo-display font-black uppercase tracking-wide text-black',
               'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset',
               i > 0 && 'border-s-2 border-black',
-              selected ? LEVEL_SELECTED_BG[level] : 'bg-white hover:bg-neo-cream',
+              selected ? LEVEL_SELECTED_BG[level] : 'bg-neo-white hover:bg-neo-cream',
               disabled && 'opacity-60 cursor-wait'
             )}
           >

@@ -313,7 +313,7 @@ export default function UpgradePricingPageClient() {
 
             <Button
               disabled
-              className="w-full bg-neo-black/40 text-white font-black border-2 border-black cursor-not-allowed"
+              className="w-full bg-neo-black/40 text-neo-white font-black border-2 border-neo-cream/40 cursor-not-allowed"
             >
               {t('teacher.subscription.currentPlan')}
             </Button>
@@ -398,7 +398,7 @@ export default function UpgradePricingPageClient() {
           {trustChips.map(({ icon: Icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2.5 bg-neo-navy-light border-2 border-black rounded-neo px-4 py-3 shadow-hard-sm"
+              className="flex items-center gap-2.5 bg-neo-navy-light border-2 border-neo-cream/40 rounded-neo px-4 py-3 shadow-hard-sm"
             >
               <Icon
                 className="w-5 h-5 text-neo-lime flex-shrink-0"
@@ -417,7 +417,7 @@ export default function UpgradePricingPageClient() {
         <PlanComparisonMatrix />
 
         {/* FAQ Section */}
-        <div className="bg-neo-navy-light border-3 border-black rounded-neo p-7 sm:p-8 mb-12 shadow-hard">
+        <div className="bg-neo-navy-light border-3 border-neo-cream/40 rounded-neo p-7 sm:p-8 mb-12 shadow-hard">
           <h2 className="text-2xl font-neo-display font-black text-neo-white mb-6">
             {t('teacher.subscription.faqTitle')}
           </h2>

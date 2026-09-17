@@ -16,6 +16,7 @@ import { memo, useMemo } from 'react';
 import { m } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
 // ============================================
@@ -124,7 +125,10 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
       >
         {/* Top row: Fire emoji + streak count */}
         <div className={cn('flex items-center', sizeConfig.gap)}>
-          <m.span
+          {/* AdaptiveMotion, not raw `m`: this loop is `repeat: Infinity` and
+              decorative, so it must fully stop (not just fail to start) under
+              reduced motion / low-end devices — see useShouldReduceMotion(). */}
+          <AdaptiveMotion.span
             animate={{ rotate: [0, -5, 5, 0] }}
             transition={{
               duration: 0.5,
@@ -135,7 +139,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
             className={sizeConfig.emoji}
           >
             <Flame className="w-4 h-4" />
-          </m.span>
+          </AdaptiveMotion.span>
           <span className={cn(
             'font-neo-display font-black text-neo-black',
             sizeConfig.text
@@ -180,7 +184,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         className
       )}
     >
-      <m.span
+      <AdaptiveMotion.span
         animate={{ rotate: [0, -3, 3, 0] }}
         transition={{
           duration: 0.5,
@@ -191,7 +195,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
         className={sizeConfig.emoji}
       >
         <Flame className="w-4 h-4" />
-      </m.span>
+      </AdaptiveMotion.span>
       <span className="font-neo-display font-black text-neo-pink">
         {currentStreak}
       </span>

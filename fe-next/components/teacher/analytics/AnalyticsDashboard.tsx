@@ -251,10 +251,10 @@ export function AnalyticsDashboard({
         {students.length > 0 ? (
           // overflow-x-auto: five columns of student metrics need ~560px; on a
           // phone the table must scroll inside the card, not push the page wide.
-          <div className="border-3 border-black rounded-neo overflow-hidden overflow-x-auto">
+          <div className="border-3 border-neo-cream/40 rounded-neo overflow-hidden overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-neo-navy/60 border-b-2 border-black/30">
+                <tr className="bg-neo-navy/60 border-b-2 border-neo-cream/40">
                   <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
                   <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
                   <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
