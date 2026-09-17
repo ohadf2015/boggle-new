@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6933,
+    "totalKeysInCode": 6956,
     "keyCountByLanguage": {
-      "en": 13425,
-      "es": 13730,
-      "he": 13635,
-      "ja": 13695,
-      "ru": 13465,
-      "sv": 13691
+      "en": 13441,
+      "es": 13746,
+      "he": 13651,
+      "ja": 13711,
+      "ru": 13481,
+      "sv": 13707
     },
-    "missingFromEnglish": 99,
+    "missingFromEnglish": 103,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 350,
@@ -373,7 +373,7 @@
         "pattern": "`admin.todayGames.source.${acq.kind}`",
         "type": "template_literal",
         "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-        "line": 125,
+        "line": 177,
         "context": "{t(`admin.todayGames.source.${acq.kind}`, acq.kind)}"
       },
       {
@@ -2053,14 +2053,14 @@
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 87,
+        "line": 93,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 90,
+        "line": 96,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
       },
       {
@@ -4369,6 +4369,42 @@
         {
           "file": "components/admin/overview/TeacherHealthCard.tsx",
           "line": 100
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.detail.block",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
+          "line": 229
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.detail.blocked",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.detail.blockFailed",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "key": "admin.todayGames.detail.blocking",
+      "usages": [
+        {
+          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
+          "line": 228
         }
       ]
     },

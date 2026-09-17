@@ -736,3 +736,4 @@ const finalConfig = hasPostHogSourcemapUpload
   : sentryConfig;
 
 export default withNextIntl(withBundleAnalyzer(finalConfig));
+

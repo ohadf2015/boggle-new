@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-15T04:59:55.182Z",
+  "generatedAt": "2026-09-17T08:44:49.638Z",
   "commits": [
     {
-      "sha": "91252908081202ce9ea7e271232464448e1e1b91",
-      "shortSha": "9125290",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-14",
+      "sha": "91da6f5d432c18603469db233989e79da367784c",
+      "shortSha": "91da6f5",
+      "subject": "feat(education): teacher dashboard observability + funnel reads lesson_assignments",
       "author": "Ohad Fisher",
-      "date": "2026-09-14T04:14:29+03:00"
+      "date": "2026-09-17T11:41:51+03:00"
     },
     {
-      "sha": "5db1336856d9a7a95abb26bfc7708a79cb0a8c64",
-      "shortSha": "5db1336",
-      "subject": "feat(connections): keyboard polish + daily result page at wheel/hunt parity (#1033)",
+      "sha": "5837504795180efd161ac539b86e18f9afc565a8",
+      "shortSha": "5837504",
+      "subject": "feat(seo): daily meta tag improvements 2026-09-17 (#1074)",
       "author": "ohadf2015",
-      "date": "2026-09-14T04:59:34+04:00"
+      "date": "2026-09-17T10:21:59+04:00"
     },
     {
-      "sha": "075ae4dbf9e57f5b89922cfd2a5f4eb7c89845ed",
-      "shortSha": "075ae4d",
-      "subject": "Hide Word Tower from consumer surfaces (keep routes alive) (#1032)",
+      "sha": "3c6f66ce67b54a155b4fe9275493b3bea28757d0",
+      "shortSha": "3c6f66c",
+      "subject": "feat(teacher): pro-grade progress reports and a PDF that speaks every locale",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T20:36:38+03:00"
+    },
+    {
+      "sha": "ab85c8bac492637dbb5e1c7e7cf2df5852e8855e",
+      "shortSha": "ab85c8b",
+      "subject": "fix(education): lesson form offers every language and says what is optional",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T20:32:17+03:00"
+    },
+    {
+      "sha": "7db1449c6c9d583294a9b9116ed32fbe17e20ae4",
+      "shortSha": "7db1449",
+      "subject": "fix(education): lesson card Results opens that class, nav tab says Word lists",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T19:50:37+03:00"
+    },
+    {
+      "sha": "ce213f3adbe02960b0c96034f6585c80fc090df3",
+      "shortSha": "ce213f3",
+      "subject": "fix(analytics): drop events from blocked guests and accounts at ingest",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T13:33:35+03:00"
+    },
+    {
+      "sha": "096efab7efadc4c14c4ed24b1216e23c0e9012fe",
+      "shortSha": "096efab",
+      "subject": "feat(admin): block a player or guest directly from the games log",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T09:22:47+03:00"
+    },
+    {
+      "sha": "3846194c85a644719e87eedc59c1bcaeede495a2",
+      "shortSha": "3846194",
+      "subject": "fix(education): record which gate turns a student away from a live game",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T10:55:36+03:00"
+    },
+    {
+      "sha": "38e2d5a2ced21fb2bf30d722e12b8d9b20c640af",
+      "shortSha": "38e2d5a",
+      "subject": "feat(education): show the class what it is playing, live on the projector",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T10:55:09+03:00"
+    },
+    {
+      "sha": "8ccf71c71ea7429867f38ab8d4fdb27b3f520702",
+      "shortSha": "8ccf71c",
+      "subject": "feat(education): show who won the lesson, not just the last round",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T09:28:16+03:00"
+    },
+    {
+      "sha": "f3862e1cfb63c17b1851bcf5190643b4b69a2718",
+      "shortSha": "f3862e1",
+      "subject": "fix(education): classroom banner socket stayed anonymous for life",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T09:27:47+03:00"
+    },
+    {
+      "sha": "a3ef5e4e72c5fc0a428982513c04c925ebd5f0ba",
+      "shortSha": "a3ef5e4",
+      "subject": "fix(education): roster code during a live game was a dead end",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T09:27:26+03:00"
+    },
+    {
+      "sha": "4b7c856ce3f3315a467f146715f32e7dce49e2f7",
+      "shortSha": "4b7c856",
+      "subject": "fix: education gaps round 2 — teacher funnel, SP game_started double-count, student lesson merge (#1072)",
       "author": "ohadf2015",
-      "date": "2026-09-14T01:52:23+04:00"
+      "date": "2026-09-16T10:22:42+04:00"
     },
     {
-      "sha": "06e623cad8653fa6e7995a0cc9733ffd50de8b1c",
-      "shortSha": "06e623c",
-      "subject": "fix(education): visible card borders on dark fills (WCAG 1.4.11, shard 5) (#1030)",
+      "sha": "0837777adafd03a78d59c49ba918ae2a85ce00a9",
+      "shortSha": "0837777",
+      "subject": "seo: shorten meta titles to fix SERP truncation (2026-09-16) (#1071)",
       "author": "ohadf2015",
-      "date": "2026-09-14T00:31:04+04:00"
+      "date": "2026-09-16T09:35:04+04:00"
     },
     {
-      "sha": "2c95f30560ee2b9e5b745f8498fa0128bc620c5d",
-      "shortSha": "2c95f30",
-      "subject": "SEO/AEO: GSC-grounded title + 4 real-query FAQs on the Spanish ESL winner (#1027)",
+      "sha": "aae72ee6dc89820e7eec041d634f4fc9fe92caa9",
+      "shortSha": "aae72ee",
+      "subject": "chore(nightly): autonomous improvement loop 2026-09-16",
+      "author": "Ohad Fisher",
+      "date": "2026-09-16T03:19:59+03:00"
+    },
+    {
+      "sha": "70af7247df3afc11acf564dc46e45dd8b6d7c78e",
+      "shortSha": "70af724",
+      "subject": "fix: idle auto-play loop, Sentry i18n keys, education practice start/complete + XP RPC guard (#1070)",
       "author": "ohadf2015",
-      "date": "2026-09-13T15:00:31+04:00"
+      "date": "2026-09-16T01:53:56+04:00"
     },
     {
-      "sha": "18ac501c79941950e8ee56980d6f8d4159b0a1a5",
-      "shortSha": "18ac501",
-      "subject": "SEO: daily meta tag improvements (2026-09-13) (#1026)",
+      "sha": "19bc16fa3a5988a17515ba06306c2de8c51366d8",
+      "shortSha": "19bc16f",
+      "subject": "perf(web): delete rejected AdSense Auto-Ads loader — 162 KiB of zero-revenue JS off first paint (#1061)",
       "author": "ohadf2015",
-      "date": "2026-09-13T11:09:23+04:00"
+      "date": "2026-09-16T00:31:27+04:00"
     },
     {
-      "sha": "da42c7ee926a8ff79ea7cc216cc411c43e0167cd",
-      "shortSha": "da42c7e",
-      "subject": "chore(nightly): autonomous improvement loop 2026-09-13",
-      "author": "Ohad Fisher",
-      "date": "2026-09-13T02:22:00+03:00"
-    },
-    {
-      "sha": "182ef587bda0e922371a1c86f6329db915079340",
-      "shortSha": "182ef58",
-      "subject": "chore(i18n): refresh translation-report for the new wordWheel keys",
-      "author": "Ohad Fisher",
-      "date": "2026-09-13T01:33:54+03:00"
-    },
-    {
-      "sha": "374f1ec1c733a890f96caf8e67e8daac2b33c8b1",
-      "shortSha": "374f1ec",
-      "subject": "chore(nightly): land the 2026-09-13 lane artifacts and queue updates",
-      "author": "Ohad Fisher",
-      "date": "2026-09-13T01:33:29+03:00"
-    },
-    {
-      "sha": "9cb494f8b1a7d58020329bb3eec0429f1112bb4e",
-      "shortSha": "9cb494f",
-      "subject": "perf(admin): lazy-load DailyActivityChart; seo(guides): link the word solver",
-      "author": "Ohad Fisher",
-      "date": "2026-09-13T01:33:14+03:00"
-    },
-    {
-      "sha": "6582188d992363c0d03543aba679421c8e451d29",
-      "shortSha": "6582188",
-      "subject": "feat(word-wheel): on-fire badge for streaks of 4 or more",
-      "author": "Ohad Fisher",
-      "date": "2026-09-13T01:32:57+03:00"
-    },
-    {
-      "sha": "8ebd4ffee17fed7e5533dea239053a26148affc8",
-      "shortSha": "8ebd4ff",
-      "subject": "Merge remote-tracking branch 'origin/master'",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T23:40:28+03:00"
-    },
-    {
-      "sha": "75fb443e2c91c8836fead73a8d061cbf4da02d9a",
-      "shortSha": "75fb443",
-      "subject": "test(achievements): replace dead single-player achievement test with a cross-surface guard",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T23:39:43+03:00"
-    },
-    {
-      "sha": "4fc2854a229d3f488d5f26e2076c05599e38882f",
-      "shortSha": "4fc2854",
-      "subject": "fix(practice): board still empty — base Card h-full starves the grid (P0, prod) (#1024)",
+      "sha": "55e72d55da509f0d944fb34deaff7aeb29429ff6",
+      "shortSha": "55e72d5",
+      "subject": "perf(landing): split Sentry SDK + avatar builder off the first-paint chunk graph (#1064)",
       "author": "ohadf2015",
-      "date": "2026-09-13T00:20:07+04:00"
+      "date": "2026-09-16T00:31:22+04:00"
     },
     {
-      "sha": "b3204a0ffeee20921310fe9feb23d7314fcdf9f2",
-      "shortSha": "b3204a0",
-      "subject": "chore: land pending nightly artifacts and education component changes",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T22:42:43+03:00"
-    },
-    {
-      "sha": "a833a0250fe8d2c3a8a2b73ca431a7a4779f502c",
-      "shortSha": "a833a02",
-      "subject": "feat(content): improve landing page + blog copy for humans and SEO keywords",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T22:42:04+03:00"
-    },
-    {
-      "sha": "a85d8928c577d97078d3cfd1b8d52bec07c8b9b6",
-      "shortSha": "a85d892",
-      "subject": "feat(blog): add death-of-turn-based-word-games post (5 locales)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T22:41:42+03:00"
-    },
-    {
-      "sha": "be2159d05a6ff33a364f15729d349041105bc863",
-      "shortSha": "be2159d",
-      "subject": "chore(db): purge QA education accounts and add is_test_account flag",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T15:36:23+03:00"
-    },
-    {
-      "sha": "8facdefa3abf726dd51f58a5901715d547eae0de",
-      "shortSha": "8facdef",
-      "subject": "fix(practice): Solo Board renders empty board — restore flex-column drill root (P0, prod) (#1023)",
+      "sha": "589ca36d6fde621bd6fdb6a02f0bd1e9a70aa13a",
+      "shortSha": "589ca36",
+      "subject": "perf(landing): intent-gate feedback widget off first paint (PSI piece 3) (#1066)",
       "author": "ohadf2015",
-      "date": "2026-09-12T23:15:16+04:00"
+      "date": "2026-09-16T00:31:18+04:00"
     },
     {
-      "sha": "d6461f4a87d3176913ffbd98cf15954a68976013",
-      "shortSha": "d6461f4",
-      "subject": "merge: origin/master (7bf3739f6, #1022 measured board grid) into gauntlet/teacher-module-r2",
-      "author": "Ohad Fisher",
-      "date": "2026-09-12T20:59:00+03:00"
+      "sha": "4dcc48580a40656402cb30173a9fc47d76add11f",
+      "shortSha": "4dcc485",
+      "subject": "feat(edu): miss-gap → Live question pack without ChatGPT hop (#1062)",
+      "author": "ohadf2015",
+      "date": "2026-09-15T16:03:51+04:00"
     }
   ]
 }
