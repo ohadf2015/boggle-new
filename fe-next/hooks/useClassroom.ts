@@ -18,7 +18,7 @@ import { createClient } from '@/utils/supabase/client';
 import { signInAsGuestStudent, waitForProfile } from '@/lib/education/guestStudent';
 import { runGuestJoinPreflight } from '@/lib/education/joinGuestPreflight';
 import logger from '@/utils/logger';
-import { trackEduClassroomCreated } from '@/lib/education/telemetry';
+import { trackEduClassroomCreated, trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 
 interface UseClassroomsState {
   classrooms: ClassroomWithMembers[];
@@ -159,6 +159,7 @@ export function useClassrooms(): UseClassroomsReturn {
 
       if (response.status === 403) {
         const data = await response.json();
+        trackEduTeacherActionFailed({ action: 'create_classroom', reason: String(data.error || 'forbidden') });
         return {
           success: false,
           error: data.message || 'Classroom limit reached. Upgrade to Pro for unlimited classrooms.',
@@ -170,6 +171,7 @@ export function useClassrooms(): UseClassroomsReturn {
 
       if (!response.ok) {
         const data = await response.json();
+        trackEduTeacherActionFailed({ action: 'create_classroom', reason: String(data.error || `http_${response.status}`) });
         return { success: false, error: data.error || 'Failed to create classroom' };
       }
 
@@ -193,6 +195,7 @@ export function useClassrooms(): UseClassroomsReturn {
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to create classroom';
       logger.error('Exception in createClassroom:', error);
+      trackEduTeacherActionFailed({ action: 'create_classroom', reason: error });
       return { success: false, error };
     }
   }, [user, isMounted]);

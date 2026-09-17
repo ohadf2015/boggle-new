@@ -14,6 +14,7 @@ import {
   type Language,
 } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
+import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 
 interface UseLessonsState {
   lessons: VocabularyLesson[];
@@ -128,6 +129,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
       });
 
       if (error) {
+        trackEduTeacherActionFailed({ action: 'create_lesson', reason: error.message });
         return { success: false, error: error.message };
       }
 
@@ -143,6 +145,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to create lesson';
       logger.error('Exception in createLesson:', error);
+      trackEduTeacherActionFailed({ action: 'create_lesson', reason: error });
       return { success: false, error };
     }
   }, [user, isMounted]);

@@ -9,6 +9,7 @@ import {
 import type { TeacherAssignment, AssignmentStatus, AssignmentType } from '@/lib/supabase/education/types';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '@/utils/logger';
+import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 
 interface UseAssignmentsState {
   assignments: TeacherAssignment[];
@@ -120,6 +121,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
             ...prev,
             assignments: prev.assignments.filter(a => a.id !== tempId),
           }));
+          trackEduTeacherActionFailed({ action: 'create_assignment', reason: error.message });
           return { success: false, error: error.message };
         }
 
@@ -137,6 +139,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       } catch (err) {
         const error = err instanceof Error ? err.message : 'Failed to create assignment';
         logger.error('Exception in createAssignment:', error);
+        trackEduTeacherActionFailed({ action: 'create_assignment', reason: error });
 
         // Rollback optimistic update
         setState(prev => ({

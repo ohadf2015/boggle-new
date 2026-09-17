@@ -40,17 +40,23 @@ export type ProFeature = (typeof PRO_FEATURES)[number];
 interface ProGateProps {
   feature: ProFeature;
   children: React.ReactNode;
+  /**
+   * Whether the gate is actually on screen. A closed `<details>` still renders
+   * its children, so on the dashboard's Tools drawer the impression fired for
+   * teachers who never opened it. Defaults to true for always-visible mounts.
+   */
+  active?: boolean;
 }
 
-export function ProGate({ feature, children }: ProGateProps) {
+export function ProGate({ feature, children, active = true }: ProGateProps) {
   const { t, language } = useLanguage();
   const { hasPro, loading } = useTeacherPro();
 
   useEffect(() => {
-    if (!loading && !hasPro) {
+    if (active && !loading && !hasPro) {
       trackGrowthEvent('iap_viewed', { source: `pro_gate_${feature}` });
     }
-  }, [loading, hasPro, feature]);
+  }, [active, loading, hasPro, feature]);
 
   // Neither branch while the entitlement is unresolved: painting the surface then removing it
   // is the flash, painting the upsell tells a paying teacher they are not paying.

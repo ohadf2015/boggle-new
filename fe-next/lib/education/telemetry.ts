@@ -170,6 +170,59 @@ export function trackEduTeacherOnboardingStep(args: EduTeacherOnboardingStepArgs
   });
 }
 
+export interface EduTeacherSnapshot {
+  classroomCount: number;
+  studentCount: number;
+  hasPro: boolean;
+}
+
+function snapshotProps(s: EduTeacherSnapshot): Record<string, unknown> {
+  return { classroom_count: s.classroomCount, student_count: s.studentCount, has_pro: s.hasPro };
+}
+
+/**
+ * `edu_teacher_dashboard_viewed` — one per /teacher mount, after classrooms and
+ * the Pro entitlement resolve.
+ *
+ * Production 2026-09-17: 54 approved teachers, 4 seen more than a day after
+ * approval. Pageviews said who opened /teacher, not what they found there —
+ * a teacher with no class and one with a full roster looked identical. Daily
+ * uniques on this event are the returning-teacher number; the snapshot is the
+ * state they were in when they left.
+ */
+export function trackEduTeacherDashboardViewed(s: EduTeacherSnapshot): void {
+  safeCapture('edu_teacher_dashboard_viewed', snapshotProps(s));
+}
+
+/**
+ * `edu_teacher_tools_opened` — the collapsed Tools drawer holds the classroom
+ * manager, assignments, analytics and reports. Every one of those had
+ * near-zero use and no way to tell "unwanted" from "never found".
+ */
+export function trackEduTeacherToolsOpened(s: EduTeacherSnapshot): void {
+  safeCapture('edu_teacher_tools_opened', snapshotProps(s));
+}
+
+export type EduTeacherAction = 'create_classroom' | 'create_lesson' | 'create_assignment';
+
+export interface EduTeacherActionFailedArgs {
+  action: EduTeacherAction;
+  /** Server/Supabase message or error code. Capped — never user-typed content. */
+  reason: string;
+}
+
+/**
+ * `edu_teacher_action_failed` — the create hooks return `{success:false}` and
+ * the only trace was a console line in the teacher's own browser. A create
+ * that fails looks exactly like a teacher who never tried (rules class 4).
+ */
+export function trackEduTeacherActionFailed(args: EduTeacherActionFailedArgs): void {
+  safeCapture('edu_teacher_action_failed', {
+    action: args.action,
+    reason: args.reason.slice(0, 120),
+  });
+}
+
 export type EduErrorSurface =
   | 'record_xp'
   | 'practice_session'

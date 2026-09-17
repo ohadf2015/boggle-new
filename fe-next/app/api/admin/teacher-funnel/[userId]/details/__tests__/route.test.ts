@@ -106,7 +106,7 @@ describe('GET /api/admin/teacher-funnel/[userId]/details', () => {
         teacher_access_requests: { data: null, error: null },
         classrooms: { data: [], error: null },
         vocabulary_lessons: { data: [], error: null },
-        teacher_assignments: { data: [], error: null },
+        lesson_assignments: { data: [], error: null },
         classroom_memberships: { data: [], error: null },
         student_lesson_progress: { data: [], error: null },
       }),
@@ -169,12 +169,12 @@ describe('GET /api/admin/teacher-funnel/[userId]/details', () => {
           ],
           error: null,
         },
-        teacher_assignments: {
+        // The dashboard writes lesson_assignments (no title/type/teacher_id);
+        // teacher_assignments has no writer at all.
+        lesson_assignments: {
           data: [
             {
               id: 'a1',
-              title: 'Practice',
-              assignment_type: 'practice',
               classroom_id: 'c1',
               lesson_id: 'l1',
               due_date: null,
@@ -212,6 +212,7 @@ describe('GET /api/admin/teacher-funnel/[userId]/details', () => {
     expect(body.classrooms[0].studentCount).toBe(1);
     expect(body.wordlists[0].wordCount).toBe(1);
     expect(body.assignments[0].completedCount).toBe(1);
+    expect(body.assignments[0].title).toBe('Week 1');
     expect(body.completions).toHaveLength(1);
     expect(body.completions[0].wordsMasteredCount).toBe(1);
   });

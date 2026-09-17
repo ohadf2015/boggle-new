@@ -70,6 +70,25 @@ describe('ProGate', () => {
     });
   });
 
+  it('Given a gate inside a closed drawer, When it mounts, Then no impression fires until it is shown', () => {
+    // A closed <details> still renders its children, so the impression used to
+    // fire for teachers who never opened the Tools drawer.
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false });
+    const { rerender } = render(
+      <ProGate feature="analytics" active={false}>
+        <div>paid surface</div>
+      </ProGate>,
+    );
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalled();
+
+    rerender(
+      <ProGate feature="analytics" active>
+        <div>paid surface</div>
+      </ProGate>,
+    );
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', { source: 'pro_gate_analytics' });
+  });
+
   it('does not fire an impression for a Pro teacher', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: true, loading: false });
     render(

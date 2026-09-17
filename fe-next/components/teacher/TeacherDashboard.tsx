@@ -20,7 +20,7 @@
 
 'use client';
 
-import { type ReactNode, useState, useCallback, useEffect, useRef } from 'react';
+import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
@@ -74,6 +74,7 @@ const SHORTCUT_CLASS = cn(
   'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan'
 );
 import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { trackEduTeacherDashboardViewed, trackEduTeacherToolsOpened } from '@/lib/education/telemetry';
 
 export interface TeacherDashboardProps {
   /**
@@ -133,6 +134,25 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
   }, [checkoutSuccess, proLoading, hasPro, refreshPro]);
 
   const hasTeacherAccess = isTeacherProfile(profile);
+
+  // What the teacher had in front of them — sent on view and on opening Tools.
+  // Only once both sources resolve: a "0 classrooms" sent mid-load would be a
+  // false zero indistinguishable from a real empty dashboard (pitfall class 1).
+  const snapshotReady = !classroomsLoading && !proLoading;
+  const snapshot = useMemo(
+    () => ({
+      classroomCount: classrooms.length,
+      studentCount: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
+      hasPro,
+    }),
+    [classrooms, hasPro]
+  );
+  const viewTracked = useRef(false);
+  useEffect(() => {
+    if (!snapshotReady || viewTracked.current) return;
+    viewTracked.current = true;
+    trackEduTeacherDashboardViewed(snapshot);
+  }, [snapshotReady, snapshot]);
 
   useEffect(() => {
     if (classrooms.length >= 1 && !selectedClassroomId) {
@@ -378,7 +398,11 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
             ref={toolsRef}
             data-testid="teacher-tools"
             open={toolsOpen}
-            onToggle={(e) => setToolsOpen((e.currentTarget as HTMLDetailsElement).open)}
+            onToggle={(e) => {
+              const open = (e.currentTarget as HTMLDetailsElement).open;
+              if (open && !toolsOpen) trackEduTeacherToolsOpened(snapshot);
+              setToolsOpen(open);
+            }}
             className="group mt-10 lg:col-span-3"
           >
             {/* The border lives on the summary, not the wrapper: the summary is
@@ -432,7 +456,7 @@ export default function TeacherDashboard({ banner }: TeacherDashboardProps = {})
                     onCreateAssignment={() => setShowAssignmentCreator(true)}
                   />
 
-                  <ProGate feature="analytics">
+                  <ProGate feature="analytics" active={toolsOpen}>
                     <AnalyticsDashboard
                       classroomId={selectedClassroomId}
                       onCreateReviewLesson={openReviewLesson}

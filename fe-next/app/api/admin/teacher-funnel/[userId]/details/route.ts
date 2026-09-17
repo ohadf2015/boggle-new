@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
   }
 
-  const [profileRes, requestRes, classroomsRes, lessonsRes, assignmentsRes] = await Promise.all([
+  const [profileRes, requestRes, classroomsRes, lessonsRes] = await Promise.all([
     supabase
       .from('profiles')
       .select('id, user_role, last_seen_at, display_name, username')
@@ -57,19 +57,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
       .select('id, name, language, created_at, words, source_game_code')
       .eq('teacher_id', userId)
       .order('created_at', { ascending: false }),
-    supabase
-      .from('teacher_assignments')
-      .select('id, title, assignment_type, classroom_id, lesson_id, due_date, created_at')
-      .eq('teacher_id', userId)
-      .order('created_at', { ascending: false }),
   ]);
 
   const firstError =
     profileRes.error ||
     requestRes.error ||
     classroomsRes.error ||
-    lessonsRes.error ||
-    assignmentsRes.error;
+    lessonsRes.error;
   if (firstError) {
     return NextResponse.json({ error: firstError.message }, { status: 500 });
   }
@@ -83,7 +77,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const classroomIds = classrooms.map((c) => c.id);
   const lessonIds = lessons.map((l) => l.id);
 
-  const [membershipsRes, progressRes] = await Promise.all([
+  // `lesson_assignments` is what the dashboard writes; it has no teacher_id, so
+  // it is reached through the teacher's classrooms. (`teacher_assignments` has
+  // no writer — reading it showed every teacher 0 assignments.)
+  const [membershipsRes, progressRes, assignmentsRes] = await Promise.all([
     classroomIds.length
       ? supabase
           .from('classroom_memberships')
@@ -109,9 +106,19 @@ export async function GET(request: NextRequest, context: RouteContext) {
           }>,
           error: null,
         }),
+    classroomIds.length
+      ? supabase
+          .from('lesson_assignments')
+          .select('id, classroom_id, lesson_id, due_date, created_at')
+          .in('classroom_id', classroomIds)
+          .order('created_at', { ascending: false })
+      : Promise.resolve({
+          data: [] as Array<{ id: string; classroom_id: string; lesson_id: string; due_date: string | null; created_at: string }>,
+          error: null,
+        }),
   ]);
 
-  const followError = membershipsRes.error || progressRes.error;
+  const followError = membershipsRes.error || progressRes.error || assignmentsRes.error;
   if (followError) {
     return NextResponse.json({ error: followError.message }, { status: 500 });
   }
@@ -160,7 +167,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       classrooms,
       memberships: membershipsRes.data ?? [],
       lessons,
-      assignments: assignmentsRes.data ?? [],
+      assignments: (assignmentsRes.data ?? []).map((a) => ({ ...a, title: null, assignment_type: null })),
       progress: progressRes.data ?? [],
       gamesByClassroom,
       plan,

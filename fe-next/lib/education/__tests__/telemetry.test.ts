@@ -32,6 +32,9 @@ import {
   trackEduClassroomCreated,
   trackEduTeacherOnboardingStep,
   trackEduError,
+  trackEduTeacherDashboardViewed,
+  trackEduTeacherToolsOpened,
+  trackEduTeacherActionFailed,
   setEduClassroomContext,
   setEduTestAccountFlag,
   isTestAccountEmail,
@@ -219,6 +222,42 @@ describe('education telemetry', () => {
     it('Given a real account, When flagged, Then is_test_account is explicitly false, not absent', () => {
       setEduTestAccountFlag(false);
       expect(registerMock).toHaveBeenCalledWith({ is_test_account: false });
+    });
+  });
+
+  describe('teacher dashboard', () => {
+    it('Given a loaded dashboard, When viewed, Then the teacher state snapshot rides the event', () => {
+      trackEduTeacherDashboardViewed({ classroomCount: 2, studentCount: 7, hasPro: false });
+      expect(captureMock).toHaveBeenCalledWith('edu_teacher_dashboard_viewed', {
+        classroom_count: 2,
+        student_count: 7,
+        has_pro: false,
+      });
+    });
+
+    it('Given the tools drawer, When opened, Then the same snapshot is sent under its own name', () => {
+      trackEduTeacherToolsOpened({ classroomCount: 0, studentCount: 0, hasPro: true });
+      expect(captureMock).toHaveBeenCalledWith('edu_teacher_tools_opened', {
+        classroom_count: 0,
+        student_count: 0,
+        has_pro: true,
+      });
+    });
+  });
+
+  describe('teacher action failed', () => {
+    it('Given a failed create, When tracked, Then action + reason are sent', () => {
+      trackEduTeacherActionFailed({ action: 'create_lesson', reason: 'permission denied' });
+      expect(captureMock).toHaveBeenCalledWith('edu_teacher_action_failed', {
+        action: 'create_lesson',
+        reason: 'permission denied',
+      });
+    });
+
+    it('Given a long server message, When tracked, Then reason is capped at 120 chars', () => {
+      trackEduTeacherActionFailed({ action: 'create_classroom', reason: 'x'.repeat(500) });
+      const props = captureMock.mock.calls[0][1] as { reason: string };
+      expect(props.reason).toHaveLength(120);
     });
   });
 
